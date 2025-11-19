@@ -1,5 +1,4 @@
 import * as Taxonomy from '@core/survey/taxonomy'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 
@@ -22,12 +21,12 @@ export default class TaxonomiesImportJob extends Job {
     const taxonomies = await ArenaSurveyFileZip.getTaxonomies(arenaSurveyFileZip)
     this.total = taxonomies.length
 
-    await PromiseUtils.each(taxonomies, async (taxonomy) => {
+    for (const taxonomy of taxonomies) {
       if (!this.isCanceled()) {
         await this._insertTaxonomy({ taxonomy })
         this.incrementProcessedItems()
       }
-    })
+    }
 
     this.setContext({ taxonomies })
   }
@@ -36,13 +35,7 @@ export default class TaxonomiesImportJob extends Job {
     const { arenaSurveyFileZip: zipFile, backup, surveyId } = this.context
 
     const taxonomyImported = await TaxonomyManager.insertTaxonomy(
-      {
-        user: this.user,
-        surveyId,
-        taxonomy,
-        addLogs: false,
-        backup,
-      },
+      { user: this.user, surveyId, taxonomy, addLogs: false, backup },
       this.tx
     )
     const taxonomyUuid = Taxonomy.getUuid(taxonomyImported)

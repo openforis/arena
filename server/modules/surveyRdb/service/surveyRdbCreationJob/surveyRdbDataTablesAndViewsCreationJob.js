@@ -1,6 +1,5 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
@@ -33,36 +32,33 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     // (break loop if job is canceled)
     const stopIfFunction = () => this.isCanceled()
 
-    await PromiseUtils.each(
-      descendantMultipleDefs,
-      async (nodeDef) => {
-        const nodeDefName = NodeDef.getName(nodeDef)
+    for (let index = 0; index < descendantMultipleDefs.length && !this.isCanceled(); index++) {
+      const nodeDef = descendantMultipleDefs[index]
 
-        // ===== create table and view
-        this.logDebug(`create data table ${nodeDefName} - start`)
-        await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx)
-        this.logDebug(`create data table ${nodeDefName} - end`)
+      const nodeDefName = NodeDef.getName(nodeDef)
 
-        // ===== insert into table
-        this.logDebug(`insert into table ${nodeDefName} - start`)
-        await SurveyRdbManager.populateTable({ survey, nodeDef, stopIfFunction }, tx)
-        this.logDebug(`insert into table ${nodeDefName} - end`)
+      // ===== create table and view
+      this.logDebug(`create data table ${nodeDefName} - start`)
+      await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx)
+      this.logDebug(`create data table ${nodeDefName} - end`)
 
-        this.incrementProcessedItems()
-      },
-      stopIfFunction
-    )
+      // ===== insert into table
+      this.logDebug(`insert into table ${nodeDefName} - start`)
+      await SurveyRdbManager.populateTable({ survey, nodeDef, stopIfFunction }, tx)
+      this.logDebug(`insert into table ${nodeDefName} - end`)
+
+      this.incrementProcessedItems()
+    }
+
     // create views
-    await PromiseUtils.each(
-      descendantMultipleDefs,
-      async (nodeDef) => {
-        const nodeDefName = NodeDef.getName(nodeDef)
-        this.logDebug(`create view for ${nodeDefName} - start`)
-        await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
-        this.logDebug(`create view for ${nodeDefName} - end`)
-      },
-      stopIfFunction
-    )
+    for (let index = 0; index < descendantMultipleDefs.length && !this.isCanceled(); index++) {
+      const nodeDef = descendantMultipleDefs[index]
+
+      const nodeDefName = NodeDef.getName(nodeDef)
+      this.logDebug(`create view for ${nodeDefName} - start`)
+      await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
+      this.logDebug(`create view for ${nodeDefName} - end`)
+    }
 
     if (this.isCanceled()) return
 

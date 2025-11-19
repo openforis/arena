@@ -1,4 +1,3 @@
-import * as PromiseUtils from '@core/promiseUtils'
 import { quote } from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 
@@ -29,7 +28,7 @@ export default class RFileInit extends RFileSystem {
 
     await FileUtils.mkdir(this.dirInit)
 
-    await PromiseUtils.each(fileNamesInit, async (fileNameInit) => {
+    for (const fileNameInit of fileNamesInit) {
       const fileName = `${fileNameInit}.R`
       const fileInitSrc = FileUtils.join(__dirname, fileName)
       const fileInitDest = FileUtils.join(this.dirInit, fileName)
@@ -39,7 +38,7 @@ export default class RFileInit extends RFileSystem {
       const fileInitSourcePath = FileUtils.join(...dirRelativeSplit, dirNameInit, fileName)
 
       await Promise.all([FileUtils.copyFile(fileInitSrc, fileInitDest), this.appendContent(source(fileInitSourcePath))])
-    })
+    }
 
     const { survey, serverUrl, token } = this.rChain
     const language = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))

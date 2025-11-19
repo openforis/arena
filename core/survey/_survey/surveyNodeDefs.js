@@ -4,7 +4,6 @@ import { Objects, Surveys, TraverseMethod } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import * as ObjectUtils from '@core/objectUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 import Queue from '@core/queue'
 
 import * as NodeDef from '../nodeDef'
@@ -392,9 +391,9 @@ export const getHierarchy =
 export const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) => {
   await visitorFn(nodeDefItem, depth)
   const children = R.propOr([], 'children', nodeDefItem)
-  await PromiseUtils.each(children, async (child) => {
+  for (const child of children) {
     await traverseHierarchyItem(child, visitorFn, depth + 1)
-  })
+  }
 }
 
 export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => {

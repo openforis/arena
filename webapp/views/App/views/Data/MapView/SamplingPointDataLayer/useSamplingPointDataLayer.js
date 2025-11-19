@@ -3,10 +3,9 @@ import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
 
-import { PointFactory, Points } from '@openforis/arena-core'
+import { Arrays, PointFactory, Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
-import * as PromiseUtils from '@core/promiseUtils'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { useIsMountedRef } from '@webapp/components/hooks'
@@ -70,7 +69,7 @@ const _fetchItems = async ({ surveyId, levelIndex, fetchCancelRef, isMountedRef 
   // load items in pages
   const items = []
   const pagesCount = Math.ceil(count / itemsPageSize)
-  await PromiseUtils.each([...Array(pagesCount).keys()], async (currentPage) => {
+  for (const currentPage of Arrays.fromNumberOfElements(pagesCount)) {
     if (isMountedRef.current) {
       const { request: itemsRequest, cancel: itemsFetchCancel } = API.fetchSamplingPointData({
         surveyId,
@@ -89,7 +88,7 @@ const _fetchItems = async ({ surveyId, levelIndex, fetchCancelRef, isMountedRef 
 
       fetchCancelRef.current = null
     }
-  })
+  }
 
   return items
 }
@@ -103,12 +102,7 @@ export const useSamplingPointDataLayer = (props) => {
   const map = useMap()
 
   const fetchCancelRef = useRef(null)
-  const [state, setState] = useState({
-    loaded: false,
-    loading: false,
-    points: [],
-    items: [],
-  })
+  const [state, setState] = useState({ loaded: false, loading: false, points: [], items: [] })
   const { loaded, loading, points, items } = state
 
   const survey = useSurvey()
