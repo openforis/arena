@@ -65,4 +65,8 @@ export default {
   ChainExportJob: 'Гинжин хэлхээ экспортлох',
   UsersExportJob: 'Хэрэглэгч экспортлох',
   ActivityLogExportJob: 'Үйл ажиллагааны бүртгэл экспортлох',
+  // validation report
+  VaidationReportGenerationJob: 'Баталгаажуулалтын тайлан үүсгэх',
+  // record Validation
+  RecordsValidationJob: 'Бичлэгүүдийн баталгаажуулалт',
 }

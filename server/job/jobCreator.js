@@ -15,6 +15,7 @@ import { GeoJsonDataExportJob } from '@server/modules/geo/service/GeoJsonDataExp
 import PersistOlapDataJob from '@server/modules/analysis/service/olap/PersistOlapDataJob'
 import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistResultsJob'
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
+import RecordsValidationJob from '@server/modules/record/service/recordsValidationJob'
 import SelectedRecordsExportJob from '@server/modules/record/service/selectedRecordsExportJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import SurveyActivityLogClearJob from '@server/modules/survey/service/surveyActivityLogClearJob'
@@ -43,6 +44,7 @@ const jobClasses = [
   PersistOlapDataJob,
   PersistResultsJob,
   RecordsCloneJob,
+  RecordsValidationJob,
   SelectedRecordsExportJob,
   SurveyCloneJob,
   SurveyActivityLogClearJob,
