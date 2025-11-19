@@ -690,6 +690,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       promoteAllRecordsToCleansing: 'Оролт -> Цэвэрлэгээ',
       step: 'Алхам',
       updateRecordsStep: 'Бичлэгийн алхамыг шинэчлэх',
+      validateAll: 'Бүгдийг баталгаажуулах',
       viewRecord: 'Бичлэгийг харах',
     },
     recordsClone: {

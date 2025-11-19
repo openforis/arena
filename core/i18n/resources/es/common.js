@@ -605,6 +605,7 @@ export default {
       promoteAllRecordsToCleansing: 'Entrada -> Limpieza',
       step: 'Paso',
       updateRecordsStep: 'Actualizar paso de registros',
+      validateAll: 'Validar todo',
       viewRecord: 'Ver registro',
     },
     recordsClone: {

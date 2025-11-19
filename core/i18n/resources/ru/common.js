@@ -691,6 +691,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       promoteAllRecordsToCleansing: 'Ввод -> Очистка',
       step: 'Шаг',
       updateRecordsStep: 'Обновить шаг записей',
+      validateAll: 'Проверить всё',
       viewRecord: 'Просмотреть запись',
     },
     recordsClone: {

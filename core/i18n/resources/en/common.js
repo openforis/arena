@@ -694,6 +694,7 @@ Merge cannot be performed.`,
       promoteAllRecordsToCleansing: 'Entry -> Cleansing',
       step: 'Step',
       updateRecordsStep: 'Update records step',
+      validateAll: 'Validate all',
       viewRecord: 'View record',
     },
     recordsClone: {
