@@ -338,7 +338,7 @@ export default class RecordsImportJob extends Job {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       if (NodeDef.isEntity(nodeDef)) {
         const childrenApplicability = {}
-        const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
+        const nodeDefChildren = Survey.getNodeDefChildren({ nodeDef })(survey)
         for (const childDef of nodeDefChildren) {
           const applicable = await evaluateApplicability({ survey, childDef, record: recordUpdated, node })
           const childDefUuid = NodeDef.getUuid(childDef)

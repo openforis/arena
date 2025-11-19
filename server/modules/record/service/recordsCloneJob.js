@@ -1,4 +1,4 @@
-import { Objects, Promises, RecordCloner, SystemError } from '@openforis/arena-core'
+import { Objects, RecordCloner, SystemError } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -38,7 +38,9 @@ export default class RecordsCloneJob extends Job {
 
     this.total = recordsToClone.length
 
-    await Promises.each(recordsToClone, async (recordSummary) => this.cloneRecord({ recordSummary }))
+    for (const recordSummary of recordsToClone) {
+      await this.cloneRecord({ recordSummary })
+    }
   }
 
   async beforeSuccess() {
@@ -98,12 +100,12 @@ export default class RecordsCloneJob extends Job {
 
     // insert nodes (add them to batch persister)
 
-    await Promises.each(nodesArray, async (node) => {
+    for (const node of nodesArray) {
       // check that the node definition associated to the node has not been deleted from the survey
       if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
         await this.nodesInsertBatchPersister.addItem(node)
       }
-    })
+    }
 
     // update RDB
     await DataTableUpdateRepository.updateTables({ survey, record: recordCloned, nodes }, tx)

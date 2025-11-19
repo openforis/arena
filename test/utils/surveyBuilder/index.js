@@ -27,7 +27,7 @@ const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
   await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
 
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
-    const children = Survey.getNodeDefChildren(nodeDef, true)(survey)
+    const children = Survey.getNodeDefChildren({ nodeDef })(survey)
     // insert virtual node defs after source entity defs
     children.sort((nodeDefA, nodeDefB) => NodeDef.isVirtual(nodeDefA) - NodeDef.isVirtual(nodeDefB))
 
@@ -131,12 +131,7 @@ class SurveyBuilder {
       }
 
       const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-        {
-          surveyId,
-          cycle: Survey.cycleOneKey,
-          draft: !publish,
-          advanced: true,
-        },
+        { surveyId, cycle: Survey.cycleOneKey, draft: !publish, advanced: true },
         t
       )
       return Survey.buildAndAssocDependencyGraph(surveyDb)

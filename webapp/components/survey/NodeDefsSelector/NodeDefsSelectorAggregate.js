@@ -23,7 +23,7 @@ const getPrevCalculations = ({ nodeDefUuidEntity, survey }) => {
     if (NodeDef.getUuid(ancestorDef) === nodeDefUuidEntity) {
       return
     }
-    const children = Survey.getNodeDefChildren(ancestorDef)(survey)
+    const children = Survey.getNodeDefChildren({ nodeDef: ancestorDef })(survey)
     const analysisChildren = children.filter(NodeDef.isAnalysis).map((object) => ({
       ...object,
       aggregate: Query.DEFAULT_AGGREGATE_FUNCTIONS.sum, // TODO_ADD_AGGREGATE_EXPRESSION

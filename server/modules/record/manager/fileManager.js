@@ -1,4 +1,4 @@
-import { Objects, Promises } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 
 import { ENV } from '@core/processUtils'
 import * as RecordFile from '@core/record/recordFile'
@@ -18,11 +18,7 @@ const logger = Log.getLogger('FileManager')
 export const defaultSurveyFilesTotalSpaceMB = 10 * 1024 // in MB (=10 GB)
 export const maxSurveyFilesTotalSpaceMB = 100 * 1024 // in MB (=100 GB)
 
-export const fileContentStorageTypes = {
-  db: 'db',
-  fileSystem: 'fileSystem',
-  s3Bucket: 's3Bucket',
-}
+export const fileContentStorageTypes = { db: 'db', fileSystem: 'fileSystem', s3Bucket: 's3Bucket' }
 
 export const getFileContentStorageType = () => {
   if (!Objects.isEmpty(ENV.fileStoragePath)) {
@@ -111,13 +107,13 @@ export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db
   logger.debug(`Survey ${surveyId}: started moving ${fileUuids.length} files from DB to new storage (${storageType})`)
 
   await client.tx(async (tx) => {
-    await Promises.each(fileUuids, async (fileUuid) => {
+    for (const fileUuid of fileUuids) {
       const file = await FileRepository.fetchFileAndContentByUuid(surveyId, fileUuid, tx)
 
       const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
       const content = RecordFile.getContent(file)
       await contentStoreFunction({ surveyId, fileUuid, content })
-    })
+    }
     logger.debug(`Files moved from DB; clearing 'content' column in DB 'file' table`)
     await FileRepository.clearAllSurveyFilesContent({ surveyId }, tx)
   })
