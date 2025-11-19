@@ -68,6 +68,8 @@ export default {
   ChainExportJob: 'Chain Export',
   UsersExportJob: 'Users Export',
   ActivityLogExportJob: 'Activity Log Export',
-  // Validation Report
+  // validation Report
   VaidationReportGenerationJob: 'Generate Validation Report',
+  // record Validation
+  RecordsValidationJob: `Records' validation`,
 }

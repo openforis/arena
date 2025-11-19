@@ -65,4 +65,8 @@ export default {
   ChainExportJob: 'Экспорт цепочки',
   UsersExportJob: 'Экспорт пользователей',
   ActivityLogExportJob: 'Экспорт журнала активности',
+  // validation report
+  VaidationReportGenerationJob: 'Сформировать отчет о проверке',
+  // record validation
+  RecordsValidationJob: 'Проверка записей',
 }
