@@ -222,11 +222,7 @@ export const init = (app) => {
 
   // ====== UPDATE - OLAP data
   app.put(
-    ApiRoutes.rChain.olapData({
-      surveyId: ':surveyId',
-      cycle: ':cycle',
-      chainUuid: ':chainUuid',
-    }),
+    ApiRoutes.rChain.olapData({ surveyId: ':surveyId', cycle: ':cycle', chainUuid: ':chainUuid' }),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
@@ -237,13 +233,7 @@ export const init = (app) => {
 
         const user = Request.getUser(req)
 
-        const job = AnalysisService.startPersistOlapDataJob({
-          user,
-          surveyId,
-          cycle,
-          chainUuid,
-          filePath,
-        })
+        const job = AnalysisService.startPersistOlapDataJob({ user, surveyId, cycle, chainUuid, filePath })
 
         res.json(JobUtils.jobToJSON(job))
       } catch (e) {
