@@ -38,11 +38,12 @@ import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProv
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
-import RecordsCloneJob from './recordsCloneJob'
-import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
+import RecordsCloneJob from './recordsCloneJob'
+import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
+import RecordsValidationJob from './recordsValidationJob'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -262,6 +263,12 @@ export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recor
 // Validation Report
 export const startValidationReportGenerationJob = ({ user, surveyId, cycle, lang, recordUuid, fileFormat }) => {
   const job = new VaidationReportGenerationJob({ user, surveyId, cycle, lang, recordUuid, fileFormat })
+  JobManager.enqueueJob(job)
+  return job
+}
+
+export const startRecordsValidationJob = ({ user, surveyId }) => {
+  const job = new RecordsValidationJob({ user, surveyId })
   JobManager.enqueueJob(job)
   return job
 }

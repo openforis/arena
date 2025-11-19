@@ -30,10 +30,6 @@ export default class RecordsValidationJob extends Job {
     }
   }
 
-  async beforeSuccess() {
-    await super.beforeSuccess()
-  }
-
   async findRecordsToValidate() {
     const { context } = this
     const { surveyId } = context

@@ -9,7 +9,7 @@ import { Objects } from '@openforis/arena-core'
 
 import { TestId } from '@webapp/utils/testId'
 
-import { ExportCsvDataActions } from '@webapp/store/ui'
+import { RecordListActions } from '@webapp/store/ui'
 import { Button, RadioButtonGroup } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
 import { DataExportOptionsPanel } from './DataExportOptionsPanel'
@@ -47,7 +47,7 @@ const DataExport = (props) => {
 
   const onExportClick = () =>
     dispatch(
-      ExportCsvDataActions.startCSVExport({
+      RecordListActions.startCSVExport({
         recordUuids: source === sources.selectedRecords ? recordUuids : null,
         search: source === sources.filteredRecords ? search : null,
         options: selectedOptionsByKey,

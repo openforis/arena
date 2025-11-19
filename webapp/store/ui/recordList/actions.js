@@ -30,3 +30,12 @@ export const startDataSummaryExport =
 
     dispatch(JobActions.showJobMonitor({ job, closeButton: DataSummaryExportDownloadButton }))
   }
+
+export const startRecordsValidation = () => async (dispatch, getState) => {
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+
+  const job = await API.startRecordsValidationJob({ surveyId })
+
+  dispatch(JobActions.showJobMonitor({ job }))
+}
