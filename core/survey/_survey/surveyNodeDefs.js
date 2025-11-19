@@ -41,7 +41,10 @@ const filterNodeDefsWithoutSiblings = (nodeDefs) => {
 }
 
 export const getNodeDefChildren =
-  (nodeDef, includeAnalysis = true, includeLayoutElements = false, includeSamplingDefsWithoutSiblings = false) =>
+  (
+    nodeDef,
+    { includeAnalysis = true, includeLayoutElements = false, includeSamplingDefsWithoutSiblings = false } = {}
+  ) =>
   (survey) => {
     const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
     let childDefs = Surveys.getNodeDefChildren({

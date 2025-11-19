@@ -86,10 +86,7 @@ const _replaceUpdatedNodesInEntities = ({
     updateResult.addNode(entityTargetUpdated, { sideEffect })
   }
 
-  Survey.getNodeDefChildren(
-    entityDef,
-    includeAnalysis
-  )(survey).forEach((childDef) => {
+  Survey.getNodeDefChildren(entityDef, { includeAnalysis })(survey).forEach((childDef) => {
     const childDefUuid = NodeDef.getUuid(childDef)
 
     const childrenSource = RecordReader.getNodeChildrenByDefUuidUnsorted(entitySource, childDefUuid)(recordSource)
@@ -321,7 +318,7 @@ const _cloneEntityAndDescendants = async ({
     const newParentEntityUuid =
       visitedChildSource === entitySource
         ? Node.getUuid(parentEntity)
-        : newNodeUuidByOldUuid[oldParentUuid] ?? oldParentUuid
+        : (newNodeUuidByOldUuid[oldParentUuid] ?? oldParentUuid)
     const nodeTarget = ObjectUtils.clone(visitedChildSource)
     Node.removeFlags({ sideEffect: true })(nodeTarget)
     nodeTarget[Node.keys.created] = true // consider it as new node, to allow RDB updates

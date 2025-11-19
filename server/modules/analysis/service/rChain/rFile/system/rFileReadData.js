@@ -63,7 +63,9 @@ export default class RFileReadData extends RFileSystem {
   async initMultipleAttributesData({ entityDef }) {
     const { chainUuid, survey, cycle } = this.rChain
 
-    const multipleAttrDefs = Survey.getNodeDefChildren(entityDef, false)(survey).filter(NodeDef.isMultipleAttribute)
+    const multipleAttrDefs = Survey.getNodeDefChildren(entityDef, { includeAnalysis: false })(survey).filter(
+      NodeDef.isMultipleAttribute
+    )
     for (const multipleAttrDef of multipleAttrDefs) {
       const dfName = NodeDef.getName(multipleAttrDef)
       const dataCSV = arenaGetCSV(

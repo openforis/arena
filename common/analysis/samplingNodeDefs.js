@@ -50,9 +50,7 @@ const newEntityAreaNodeDef = ({ nodeDefParent, baseUnitNodeDef, chainUuid, cycle
   const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
   const name = isWeight ? WEIGHT_NODE_DEF_NAME : getEntityAreaNodeDefName({ nodeDefParent })
 
-  const props = {
-    [NodeDef.propKeys.name]: name,
-  }
+  const props = { [NodeDef.propKeys.name]: name }
   const script = getAreaNodeDefDefaultScript({ nodeDefParent, isWeight })
 
   const advancedProps = {
@@ -84,8 +82,8 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
   const chainUuid = Chain.getUuid(chain)
   const cycleKeys = Survey.getCycleKeys(survey)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-  const descendants = Survey.getNodeDefDescendantsAndSelf({ nodeDef: baseUnitNodeDef })(survey)
-  const descendantEntities = descendants.filter(
+  const baseUnitDescendants = Survey.getNodeDefDescendantsAndSelf({ nodeDef: baseUnitNodeDef })(survey)
+  const baseUnitDescendantEntities = baseUnitDescendants.filter(
     (descendantEntity) =>
       NodeDef.isEntity(descendantEntity) && (NodeDef.isMultiple(descendantEntity) || NodeDef.isRoot(descendantEntity))
   )
@@ -106,8 +104,8 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
     }
   }
 
-  descendantEntities.forEach((nodeDefParent) => {
-    const childDefs = Survey.getNodeDefChildren(nodeDefParent, true)(survey)
+  for (const nodeDefParent of baseUnitDescendantEntities) {
+    const childDefs = Survey.getNodeDefChildren(nodeDefParent, { includeSamplingDefsWithoutSiblings: true })(survey)
     const existingEntityAreaNodeDef = childDefs.find((childDef) =>
       isEntityAreaNodeDef({ nodeDef: childDef, nodeDefParent })
     )
@@ -128,7 +126,7 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
       // delete entity area node defs when entity doesn't have any area based node def
       nodeDefsToDelete.push(existingEntityAreaNodeDef)
     }
-  })
+  }
 
   // check if some existing entity area node def is not valid anymore and must be deleted
   const existingEntityAreaNodeDefs = getAllEntityAreaNodeDefs({ survey, chain })
