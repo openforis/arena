@@ -23,6 +23,15 @@ const taxonProvider = TaxonProviderDefault
 export const persistValidation = async ({ survey, record }, tx) =>
   RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
 
+const replaceAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
+  const validation = R.pipe(
+    Validation.mergeValidation(nodesValidation, true),
+    Validation.updateCounts
+  )(Validation.newInstance())
+  const recordValidated = Validation.assocValidation(validation)(record)
+  await persistValidation({ survey, record: recordValidated }, tx)
+}
+
 export const mergeAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
   const recordValidationUpdated = R.pipe(
     Record.getValidation,
@@ -46,7 +55,7 @@ const isRootUniqueNodesUpdated = ({ survey, nodesArray }) =>
   })
 
 export const validateSortedNodesAndPersistValidation = async (
-  { user, survey, record, nodesArray, validateRecordUniqueness = false },
+  { user, survey, record, nodesArray, validateRecordUniqueness = false, mergeValidation = true },
   tx
 ) => {
   // 1. validate node values
@@ -99,8 +108,11 @@ export const validateSortedNodesAndPersistValidation = async (
   const nodesValidation = Validation.recalculateValidity(Validation.newInstance(true, fullNodesValidationByUuid))
 
   // 7. persist validation
-  await mergeAndPersistValidation({ survey, record, nodesValidation }, tx)
-
+  if (mergeValidation) {
+    await mergeAndPersistValidation({ survey, record, nodesValidation }, tx)
+  } else {
+    await replaceAndPersistValidation({ record, survey, nodesValidation }, tx)
+  }
   return nodesValidation
 }
 

@@ -61,6 +61,7 @@ export default class RecordsValidationJob extends Job {
         record,
         nodesArray,
         validateRecordUniqueness: true,
+        mergeValidation: false,
       },
       tx
     )
