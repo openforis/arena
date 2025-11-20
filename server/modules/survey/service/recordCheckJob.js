@@ -129,13 +129,11 @@ export default class RecordCheckJob extends Job {
     if (!R.isEmpty(nodeDefDeletedUuids)) {
       // this.logDebug(`remove deleted nodes`)
       const recordDeletedNodes = await RecordManager.deleteNodesByNodeDefUuids(
-        user,
-        surveyId,
-        nodeDefDeletedUuids,
-        record,
+        { user, surveyId, nodeDefUuids: nodeDefDeletedUuids, record },
         tx
       )
       record = recordDeletedNodes || record
+
       // this.logDebug(`nodes deleted`)
     }
 

@@ -193,6 +193,7 @@ export const dissocFieldValidationsStartingWith = (fieldStartsWith) => (validati
     R.prop(keys.fields),
     Object.entries,
     R.reduce((accFields, [field, fieldValidation]) => {
+      console.log('===field', field, fieldStartsWith)
       if (!field.startsWith(fieldStartsWith)) {
         A.set(field, fieldValidation)(accFields)
       }

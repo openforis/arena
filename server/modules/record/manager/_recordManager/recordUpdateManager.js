@@ -11,6 +11,7 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Node from '@core/record/node'
+import * as Validation from '@core/validation/validation'
 
 import SystemError from '@core/systemError'
 
@@ -238,7 +239,27 @@ export const deleteNode = async (
     t
   )
 
-export const { deleteNodesByNodeDefUuids, deleteNodesByUuids } = NodeUpdateManager
+export const { deleteNodesByUuids } = NodeUpdateManager
+
+export const deleteNodesByNodeDefUuids = async ({ user, surveyId, nodeDefUuids, record }, client = db) => {
+  const { record: recordUpdated, nodesDeleted } = await NodeUpdateManager.deleteNodesByNodeDefUuids(
+    user,
+    surveyId,
+    nodeDefUuids,
+    record,
+    client
+  )
+  let validation = Record.getValidation(recordUpdated)
+  console.log('====validation 1', JSON.stringify(validation))
+
+  for (const nodeDeleted of nodesDeleted) {
+    console.log('===deleted node uuid', Node.getUuid(nodeDeleted))
+    validation = Validation.dissocFieldValidationsStartingWith(Node.getUuid(nodeDeleted))(validation)
+  }
+  validation = Validation.updateCounts(validation)
+  console.log('====validation 2', JSON.stringify(validation))
+  return Validation.assocValidation(validation)(recordUpdated)
+}
 
 const _updateNodeAndValidateRecordUniqueness = async (
   {
