@@ -63,6 +63,7 @@ export const useAuthCanDeleteAllRecords = () => useAuthCanEditSurvey()
 export const useAuthCanUpdateRecordsStep = () => Authorizer.canUpdateRecordsStep(useUser(), useSurveyInfo())
 export const useAuthCanExportRecordsList = () => Authorizer.canExportRecordsList(useUser(), useSurveyInfo())
 export const useAuthCanExportRecords = () => Authorizer.canExportRecords(useUser(), useSurveyInfo())
+export const useAuthCanValidateAllRecords = useUserIsSystemAdmin
 
 // ====== Auth / Map
 export const useAuthCanUseMap = () => Authorizer.canUseMap(useUser(), useSurveyInfo())
@@ -84,9 +85,7 @@ export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) =>
 
   const { data = null, dispatch: fetchUserProfilePicture } = useAsyncGetRequest(
     `/api/user/${userUuid}/profilePicture`,
-    {
-      responseType: 'blob',
-    }
+    { responseType: 'blob' }
   )
 
   useEffect(() => {
