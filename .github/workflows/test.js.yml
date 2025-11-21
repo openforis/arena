@@ -64,3 +64,4 @@ jobs:
           PGDATABASE: of-arena-test
           PGUSER: arena
           PGPASSWORD: arena
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
