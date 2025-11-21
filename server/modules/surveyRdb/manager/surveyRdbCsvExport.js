@@ -44,10 +44,7 @@ const fieldsExtractorByNodeDefType = {
           nodeDef,
           itemVisitor: (item) => {
             result.push(
-              CsvDataExportModel.getExpandedCategoryItemColumnHeader({
-                nodeDef,
-                code: CategoryItem.getCode(item),
-              })
+              CsvDataExportModel.getExpandedCategoryItemColumnHeader({ nodeDef, code: CategoryItem.getCode(item) })
             )
           },
         })
@@ -73,9 +70,6 @@ const getCsvExportFields = ({
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
 
-  // Consider only user selected fields (from column node defs)
-  const nodeDefUuidCols = Query.getAttributeDefUuids(query)
-  const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const fields = []
   if (includeInternalUuids) {
     ArrayUtils.addIfNotEmpty(viewDataNodeDef.columnParentUuidName)(fields)
@@ -88,17 +82,15 @@ const getCsvExportFields = ({
   if (includeDateCreated) {
     fields.push(ViewDataNodeDef.columnSet.dateCreated)
   }
+  // Consider only user selected fields (from column node defs)
+  const nodeDefUuidCols = Query.getAttributeDefUuids(query)
+  const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   fields.push(
     ...nodeDefCols.flatMap((nodeDefCol) => {
       const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
       const fieldsExtractor = fieldsExtractorByNodeDefType[NodeDef.getType(nodeDefCol)]
       if (fieldsExtractor) {
-        return fieldsExtractor({
-          survey,
-          columnNodeDef,
-          includeCategoryItemsLabels,
-          expandCategoryItems,
-        })
+        return fieldsExtractor({ survey, columnNodeDef, includeCategoryItemsLabels, expandCategoryItems })
       } else {
         const { names, jsTypes } = columnNodeDef
         return names.map((name, index) => {
@@ -149,10 +141,7 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
         nodeDef,
         itemVisitor: (item) => {
           const code = CategoryItem.getCode(item)
-          const colName = CsvDataExportModel.getExpandedCategoryItemColumnHeader({
-            nodeDef,
-            code,
-          })
+          const colName = CsvDataExportModel.getExpandedCategoryItemColumnHeader({ nodeDef, code })
           obj[colName] = values?.includes(code)
         },
       })
@@ -210,11 +199,7 @@ const getCsvObjectTransformer = ({
     transformers.push(getCsvObjectTransformerNullsToEmpty())
   }
   if (keepFileNamesUnique && uniqueFileNamesGenerator) {
-    const transformer = getCsvObjectTransformerUniqueFileNames({
-      survey,
-      query,
-      uniqueFileNamesGenerator,
-    })
+    const transformer = getCsvObjectTransformerUniqueFileNames({ survey, query, uniqueFileNamesGenerator })
     if (transformer) {
       transformers.push(transformer)
     }
@@ -222,8 +207,4 @@ const getCsvObjectTransformer = ({
   return { transformers }
 }
 
-export const SurveyRdbCsvExport = {
-  getCsvExportFields,
-  getCsvExportFieldsAgg,
-  getCsvObjectTransformer,
-}
+export const SurveyRdbCsvExport = { getCsvExportFields, getCsvExportFieldsAgg, getCsvObjectTransformer }
