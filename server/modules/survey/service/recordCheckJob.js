@@ -99,13 +99,7 @@ export default class RecordCheckJob extends Job {
         this.logDebug('survey with ref data fetched')
       }
 
-      surveyAndNodeDefs = {
-        survey,
-        nodeDefAddedUuids,
-        nodeDefUpdatedUuids,
-        nodeDefDeletedUuids,
-        requiresCheck,
-      }
+      surveyAndNodeDefs = { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, requiresCheck }
       this.surveyAndNodeDefsByCycle[cycle] = surveyAndNodeDefs
     }
 
@@ -123,6 +117,7 @@ export default class RecordCheckJob extends Job {
       { surveyId, recordUuid, includeSurveyUuid: false, includeRecordUuid: false },
       tx
     )
+
     // this.logDebug(`record fetched`)
 
     // 2. remove deleted nodes
@@ -193,7 +188,11 @@ export default class RecordCheckJob extends Job {
 
     Object.assign(allUpdatedNodesByUuid, newNodes)
 
-    if (nodeDefAddedOrUpdatedUuids.length > 0 || !R.isEmpty(allUpdatedNodesByUuid)) {
+    if (
+      !R.isEmpty(nodeDefAddedOrUpdatedUuids) ||
+      !R.isEmpty(nodeDefDeletedUuids) ||
+      !R.isEmpty(allUpdatedNodesByUuid)
+    ) {
       // this.logDebug(`validating record ${recordUuid}`)
       await _validateNodes({ user, survey, nodeDefAddedOrUpdatedUuids, record, nodes: allUpdatedNodesByUuid }, this.tx)
     }
@@ -263,9 +262,7 @@ const _insertMissingSingleNode = async ({ survey, childDef, record, parentNode, 
 }
 
 const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, record, newNodes, tx) => {
-  const nodesToUpdate = {
-    ...newNodes,
-  }
+  const nodesToUpdate = { ...newNodes }
 
   // Include nodes associated to updated node defs
   for (const nodeDefUpdatedUuid of nodeDefUpdatedUuids) {
@@ -296,9 +293,7 @@ const _clearRecordKeysValidation = (record) => {
 }
 
 const _validateNodes = async ({ user, survey, nodeDefAddedOrUpdatedUuids, record, nodes }, tx) => {
-  const nodesToValidate = {
-    ...nodes,
-  }
+  const nodesToValidate = { ...nodes }
 
   // Include parent nodes of new/updated node defs (needed for min/max count validation)
   for (const nodeDefUuid of nodeDefAddedOrUpdatedUuids) {

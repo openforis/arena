@@ -11,7 +11,6 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Node from '@core/record/node'
-import * as Validation from '@core/validation/validation'
 
 import SystemError from '@core/systemError'
 
@@ -116,10 +115,7 @@ export const deleteRecord = async (user, survey, record, client = db) =>
       null,
       t
     )
-    const logContent = {
-      [ActivityLog.keysContent.uuid]: uuid,
-      [ActivityLog.keysContent.keys]: keys,
-    }
+    const logContent = { [ActivityLog.keysContent.uuid]: uuid, [ActivityLog.keysContent.keys]: keys }
 
     if (!R.isEmpty(Record.getNodes(record))) {
       // validate uniqueness of records with same keys/unique node values
@@ -242,23 +238,14 @@ export const deleteNode = async (
 export const { deleteNodesByUuids } = NodeUpdateManager
 
 export const deleteNodesByNodeDefUuids = async ({ user, surveyId, nodeDefUuids, record }, client = db) => {
-  const { record: recordUpdated, nodesDeleted } = await NodeUpdateManager.deleteNodesByNodeDefUuids(
+  const { record: recordUpdated } = await NodeUpdateManager.deleteNodesByNodeDefUuids(
     user,
     surveyId,
     nodeDefUuids,
     record,
     client
   )
-  let validation = Record.getValidation(recordUpdated)
-  console.log('====validation 1', JSON.stringify(validation))
-
-  for (const nodeDeleted of nodesDeleted) {
-    console.log('===deleted node uuid', Node.getUuid(nodeDeleted))
-    validation = Validation.dissocFieldValidationsStartingWith(Node.getUuid(nodeDeleted))(validation)
-  }
-  validation = Validation.updateCounts(validation)
-  console.log('====validation 2', JSON.stringify(validation))
-  return Validation.assocValidation(validation)(recordUpdated)
+  return recordUpdated
 }
 
 const _updateNodeAndValidateRecordUniqueness = async (
@@ -372,10 +359,7 @@ const _onNodesUpdate = async (
 
   record = recordUpdatedDependentNodes
 
-  const updatedNodesAndDependents = {
-    ...nodesUpdated,
-    ...updatedDependentNodes,
-  }
+  const updatedNodesAndDependents = { ...nodesUpdated, ...updatedDependentNodes }
 
   // 3. update node validations
   const nodesToValidate = _getDependentNodesToValidate({ survey, record, nodes: updatedNodesAndDependents })
@@ -384,10 +368,7 @@ const _onNodesUpdate = async (
     { user, survey, record, nodes: nodesToValidate, nodesValidationListener },
     t
   )
-  return {
-    record: recordUpdated,
-    nodes: updatedNodesAndDependents,
-  }
+  return { record: recordUpdated, nodes: updatedNodesAndDependents }
 }
 
 const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
