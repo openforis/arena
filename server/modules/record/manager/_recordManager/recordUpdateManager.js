@@ -115,10 +115,7 @@ export const deleteRecord = async (user, survey, record, client = db) =>
       null,
       t
     )
-    const logContent = {
-      [ActivityLog.keysContent.uuid]: uuid,
-      [ActivityLog.keysContent.keys]: keys,
-    }
+    const logContent = { [ActivityLog.keysContent.uuid]: uuid, [ActivityLog.keysContent.keys]: keys }
 
     if (!R.isEmpty(Record.getNodes(record))) {
       // validate uniqueness of records with same keys/unique node values
@@ -238,7 +235,18 @@ export const deleteNode = async (
     t
   )
 
-export const { deleteNodesByNodeDefUuids, deleteNodesByUuids } = NodeUpdateManager
+export const { deleteNodesByUuids } = NodeUpdateManager
+
+export const deleteNodesByNodeDefUuids = async ({ user, surveyId, nodeDefUuids, record }, client = db) => {
+  const { record: recordUpdated } = await NodeUpdateManager.deleteNodesByNodeDefUuids(
+    user,
+    surveyId,
+    nodeDefUuids,
+    record,
+    client
+  )
+  return recordUpdated
+}
 
 const _updateNodeAndValidateRecordUniqueness = async (
   {
@@ -351,10 +359,7 @@ const _onNodesUpdate = async (
 
   record = recordUpdatedDependentNodes
 
-  const updatedNodesAndDependents = {
-    ...nodesUpdated,
-    ...updatedDependentNodes,
-  }
+  const updatedNodesAndDependents = { ...nodesUpdated, ...updatedDependentNodes }
 
   // 3. update node validations
   const nodesToValidate = _getDependentNodesToValidate({ survey, record, nodes: updatedNodesAndDependents })
@@ -363,10 +368,7 @@ const _onNodesUpdate = async (
     { user, survey, record, nodes: nodesToValidate, nodesValidationListener },
     t
   )
-  return {
-    record: recordUpdated,
-    nodes: updatedNodesAndDependents,
-  }
+  return { record: recordUpdated, nodes: updatedNodesAndDependents }
 }
 
 const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
