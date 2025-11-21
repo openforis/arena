@@ -23,25 +23,23 @@ const taxonProvider = TaxonProviderDefault
 export const persistValidation = async ({ survey, record }, tx) =>
   RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
 
-const replaceAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
-  const validation = R.pipe(
+const _processAndPersistValidation = async ({ survey, record, nodesValidation, startValidation }, tx) => {
+  const validationUpdated = R.pipe(
     Validation.mergeValidation(nodesValidation, true),
     Validation.updateCounts
-  )(Validation.newInstance())
-  const recordValidated = Validation.assocValidation(validation)(record)
-  await persistValidation({ survey, record: recordValidated }, tx)
+  )(startValidation)
+  const recordUpdated = Validation.assocValidation(validationUpdated)(record)
+  await persistValidation({ survey, record: recordUpdated }, tx)
+}
+
+export const replaceAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
+  const startValidation = Validation.newInstance()
+  await _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
 }
 
 export const mergeAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
-  const recordValidationUpdated = R.pipe(
-    Record.getValidation,
-    Validation.mergeValidation(nodesValidation, true),
-    Validation.updateCounts
-  )(record)
-
-  const recordUpdated = Validation.assocValidation(recordValidationUpdated)(record)
-
-  await persistValidation({ survey, record: recordUpdated }, tx)
+  const startValidation = Record.getValidation(record)
+  await _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
 }
 
 const isRootUniqueNodesUpdated = ({ survey, nodesArray }) =>
@@ -121,13 +119,7 @@ export const validateNodesAndPersistValidation = async (
   tx
 ) =>
   validateSortedNodesAndPersistValidation(
-    {
-      user,
-      survey,
-      record,
-      nodesArray: Object.values(nodes),
-      validateRecordUniqueness,
-    },
+    { user, survey, record, nodesArray: Object.values(nodes), validateRecordUniqueness },
     tx
   )
 
@@ -136,15 +128,7 @@ export const validateRecordsUniquenessAndPersistValidation = async (
   t
 ) => {
   const validationByRecord = await RecordUniquenessValidator.validateRecordsUniqueness(
-    {
-      survey,
-      cycle,
-      nodeDefsUnique,
-      nodesUnique,
-      recordUuidsExcluded,
-      excludeRecordsFromCount,
-      errorKey,
-    },
+    { survey, cycle, nodeDefsUnique, nodesUnique, recordUuidsExcluded, excludeRecordsFromCount, errorKey },
     t
   )
   for (const [recordUuid, nodesValidation] of Object.entries(validationByRecord)) {
