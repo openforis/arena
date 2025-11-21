@@ -158,13 +158,7 @@ export const updateCounts = (validation) => {
     }
   }
 
-  return {
-    ...validation,
-    [keys.counts]: {
-      [keys.errors]: totalErrors,
-      [keys.warnings]: totalWarnings,
-    },
-  }
+  return { ...validation, [keys.counts]: { [keys.errors]: totalErrors, [keys.warnings]: totalWarnings } }
 }
 
 // ====== UPDATE
@@ -188,20 +182,17 @@ export const deleteFieldValidation = (field) => (validation) =>
  * @param {!string} fieldStartsWith - The start with value.
  * @returns {object} The updated validation object.
  */
-export const dissocFieldValidationsStartingWith = (fieldStartsWith) => (validation) =>
-  R.pipe(
-    R.prop(keys.fields),
-    Object.entries,
-    R.reduce((accFields, [field, fieldValidation]) => {
-      console.log('===field', field, fieldStartsWith)
-      if (!field.startsWith(fieldStartsWith)) {
-        A.set(field, fieldValidation)(accFields)
-      }
-      return accFields
-    }, {}),
-    (fieldsValidations) => R.assoc(keys.fields, fieldsValidations)(validation),
-    cleanup
-  )(validation)
+export const dissocFieldValidationsStartingWith = (fieldStartsWith) => (validation) => {
+  const validationFields = getFieldValidations(validation)
+  const validationFieldsUpdated = {}
+  for (const [field, fieldValidation] of Object.entries(validationFields)) {
+    if (!field.startsWith(fieldStartsWith)) {
+      A.set(field, fieldValidation)(validationFieldsUpdated)
+    }
+  }
+  const validationUpdated = R.assoc(keys.fields, validationFieldsUpdated)(validation)
+  return cleanup(validationUpdated)
+}
 
 export const mergeValidation =
   (validationNext, doCleanup = true) =>
@@ -210,7 +201,7 @@ export const mergeValidation =
     const validationFieldsNext = getFieldValidations(validationNext)
 
     // iterate over new field validations: remove valid ones, merge invalid ones with previous ones
-    Object.entries(validationFieldsNext).forEach(([fieldKey, validationFieldNext]) => {
+    for (const [fieldKey, validationFieldNext] of Object.entries(validationFieldsNext)) {
       if (isValid(validationFieldNext)) {
         if (doCleanup) {
           // field validation valid: remove it from resulting validation
@@ -226,12 +217,9 @@ export const mergeValidation =
           : validationFieldNext
         validationFieldsResult[fieldKey] = validationFieldMerged
       }
-    })
-
-    const validationResult = {
-      ...validationPrev,
-      [keys.fields]: validationFieldsResult,
     }
+
+    const validationResult = { ...validationPrev, [keys.fields]: validationFieldsResult }
     validationResult[keys.errors] = getErrors(validationNext)
     validationResult[keys.warnings] = getWarnings(validationNext)
 
@@ -240,12 +228,12 @@ export const mergeValidation =
 
 export const mergeFieldValidations = (fieldValidationsNext, fieldValidationsPrev) => {
   const result = { ...fieldValidationsPrev }
-  Object.entries(fieldValidationsNext).forEach(([fieldKey, fieldValidationNext]) => {
+  for (const [fieldKey, fieldValidationNext] of Object.entries(fieldValidationsNext)) {
     const fieldValidationPrev = fieldValidationsPrev[fieldKey]
     result[fieldKey] = fieldValidationPrev
       ? mergeValidation(fieldValidationNext, false)(fieldValidationPrev)
       : fieldValidationNext
-  })
+  }
   return result
 }
 
