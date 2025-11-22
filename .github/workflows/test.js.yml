@@ -34,11 +34,8 @@ jobs:
         run: yarn
         env:
           NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Build
         run: yarn build
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Run server
         run: |
           ln -s dist/server.js .
@@ -53,7 +50,6 @@ jobs:
           ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
           ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}
           SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Wait for server to start
         run: while ! nc -z localhost 9090; do sleep 5; done;
       - name: Run tests
@@ -64,4 +60,3 @@ jobs:
           PGDATABASE: of-arena-test
           PGUSER: arena
           PGPASSWORD: arena
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
