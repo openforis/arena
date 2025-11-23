@@ -25,7 +25,7 @@ const fileSizeLimit = 2 * 1024 * 1024 * 1024 // 2GB
 const initializeCategoryItemIndexesIfNecessary = async ({ logger, serviceRegistry }) => {
   const infoService = serviceRegistry.getService(ServiceType.info)
   const versionInDb = await infoService.getVersion()
-  if (versionInDb === '2.0.0') {
+  if (versionInDb === '1.0.0') {
     await CategoryService.initializeAllSurveysCategoryItemIndexes()
   } else {
     logger.info(`Category item indexes already initialized. App version in DB: ${versionInDb}`)
