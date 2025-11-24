@@ -1168,7 +1168,7 @@ export default {
       taxaNotImported: 'Taxones no importados',
       family: 'Familia',
       genus: 'Género',
-      scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
+      scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       extraPropsNotDefined: 'Propiedades extra no definidas para esta taxonomía',
     },
     taxaCount: 'Recuento de taxones',
