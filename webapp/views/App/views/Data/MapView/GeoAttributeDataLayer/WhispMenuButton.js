@@ -58,7 +58,7 @@ export const WhispMenuButton = (props) => {
             disabled={whispDataLoading}
             label={label}
             iconHeight={25}
-            iconSrc="/img/of_whisp_icon.svg"
+            iconSrc="/img/of_whisp_icon.png"
             iconWidth={25}
             onClick={onClick}
             size="small"
@@ -76,7 +76,7 @@ export const WhispMenuButton = (props) => {
       label={whispDataLoading ? 'common.loading' : 'mapView.whisp'}
       iconAlt="Whisp"
       iconHeight={25}
-      iconSrc="/img/of_whisp_icon.svg"
+      iconSrc="/img/of_whisp_icon.png"
       items={buttons}
       variant="outlined"
     />
