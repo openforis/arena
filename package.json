@@ -1,10 +1,9 @@
 {
   "name": "open-foris-arena",
-  "version": "2.2.6",
+  "version": "2.2.7",
   "license": "MIT",
   "engines": {
-    "node": "^22.14.0",
-    "yarn": "^1.22.22"
+    "node": "^24.11.1"
   },
   "scripts": {
     "build-dev": "cross-env NODE_ENV=development webpack --mode development --config webpack.config.babel.js",
@@ -224,5 +223,6 @@
   ],
   "lint-staged": {
     "{common,core,server,test,webapp}/**/*.js": "eslint --cache --fix"
-  }
+  },
+  "packageManager": "yarn@4.12.0"
 }

@@ -8,11 +8,13 @@ const transformJsonToCsv = ({ fields, options: optionsParam = FlatDataWriterUtil
   const { objectTransformer = null } = options
   const rowTransformer = objectTransformer ?? FlatDataWriterUtils.defaultObjectTransformer(options)
   const fieldNames = CsvField.getNames(fields)
-  return format({
+  const formatOptions = {
+    alwaysWriteHeaders: !!fieldNames, // alwaysWriteHeaders set to true throws an error if headers is not specified as an array
     headers: fieldNames ?? true, // if fieldNames is null or undefined, include all fields
     quoteColumns: true,
     transform: (row) => rowTransformer(row), // use this syntax to avoid passing callback function to rowTranformer callback
-  })
+  }
+  return format(formatOptions)
 }
 
 export const writeItemsToStream = ({

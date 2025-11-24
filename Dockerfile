@@ -1,8 +1,11 @@
 ############################################################
 
-ARG node_version=22.14.0
+ARG node_version=24.11.1
 
 FROM node:${node_version} AS arena
+
+# Enable Corepack for Yarn Modern
+RUN corepack enable
 
 COPY . /app/
 
@@ -10,13 +13,9 @@ COPY . /app/
 
 WORKDIR /app
 
-RUN --mount=type=secret,id=npm_token,env=NPM_TOKEN echo -e "scripts-prepend-node-path=true\n\
-    @openforis:registry=https://npm.pkg.github.com\n\
-    always-auth=true\n\
-    //npm.pkg.github.com/:_authToken=$NPM_TOKEN\n" > /app/.npmrc \
-    && yarn install --ignore-scripts --frozen-lockfile \
+RUN --mount=type=secret,id=npm_token,env=NPM_TOKEN \
+    yarn install --immutable \
     && yarn build \
-    && rm -f /app/.npmrc \
     && npm install pm2 -g \
     && ln -s dist/server.js .
 
