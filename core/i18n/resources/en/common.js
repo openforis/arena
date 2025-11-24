@@ -751,7 +751,6 @@ Merge cannot be performed.`,
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
-    earthMap: 'Earth Map',
     elevation: 'Elevation (m)',
     location: 'Location',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
@@ -775,9 +774,6 @@ Merge cannot be performed.`,
       levelCode: 'Level {{level}} code',
     },
     selectedPeriod: 'Selected period',
-    whisp: 'Whisp',
-    whispEarthMap: 'Whisp Earth Map',
-    whispCsv: 'Whisp CSV',
   },
 
   samplingPolygonOptions: {
