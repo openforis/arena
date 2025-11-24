@@ -59,7 +59,7 @@ const plugins = [
         NODE_ENV: JSON.stringify(ProcessUtils.ENV.nodeEnv),
         ALLOW_USER_ACCESS_REQUEST: process.env.ALLOW_USER_ACCESS_REQUEST,
         EXPERIMENTAL_FEATURES: process.env.EXPERIMENTAL_FEATURES,
-        APPLICATION_VERSION: gitRevisionPlugin
+        APP_VERSION: gitRevisionPlugin
           ? JSON.stringify(gitRevisionPlugin.version())
           : JSON.stringify(process.env.APP_VERSION),
         RECAPTCHA_ENABLED: process.env.RECAPTCHA_ENABLED,
