@@ -661,7 +661,6 @@ export default {
   mapView: {
     createRecord: 'Crear nuevo registro',
     editRecord: 'Editar registro',
-    earthMap: 'Mapa terrestre',
     elevation: 'Elevación (m)',
     location: 'Ubicación',
     locationEditInfo: 'Haga doble clic en el mapa o arrastre el marcador para actualizar la ubicación',
@@ -681,9 +680,6 @@ export default {
       levelCode: 'Código de nivel {{level}}',
     },
     selectedPeriod: 'Período seleccionado',
-    whisp: 'Whisp',
-    whispEarthMap: 'Mapa terrestre de Whisp',
-    whispCsv: 'CSV de Whisp',
   },
   samplingPolygonOptions: {
     circle: 'Círculo',

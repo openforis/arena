@@ -38,11 +38,11 @@ export const WhispMenuButton = (props) => {
   const whispButtonDefinitions = useMemo(
     () => ({
       earthMap: {
-        label: 'mapView.whispEarthMap',
+        label: 'Whisp Earth Map',
         onClick: onWhispEarthMapButtonClick,
       },
       csv: {
-        label: 'mapView.whispCsv',
+        label: 'Whisp CSV',
         onClick: onWhispCsvButtonClick,
       },
     }),

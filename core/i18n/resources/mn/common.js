@@ -747,7 +747,6 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
   mapView: {
     createRecord: 'Шинэ бичлэг үүсгэх',
     editRecord: 'Бичлэгийг засах',
-    earthMap: 'Дэлхийн зураг',
     elevation: 'Өндөр (м)',
     location: 'Байршил',
     locationEditInfo: 'Байршлыг шинэчлэхийн тулд газрын зураг дээр давхар товших эсвэл тэмдэглэгээг чирэх',
@@ -767,9 +766,6 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       levelCode: 'Түвшин {{level}} код',
     },
     selectedPeriod: 'Сонгогдсон хугацаа',
-    whisp: 'Шивнээ',
-    whispEarthMap: 'Шивнээ дэлхийн зураг',
-    whispCsv: 'Шивнээ CSV',
   },
 
   samplingPolygonOptions: {
