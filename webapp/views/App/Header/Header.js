@@ -54,7 +54,7 @@ const Header = () => {
     <div className={classNames('app-header', { 'sidebar-open': isSideBarOpen })}>
       <div className="app-header__logo">
         <a href="https://www.openforis.org" target="_blank" rel="noopener noreferrer" className="flex-center">
-          <img src="/img/of_icon.png" alt="Open Foris" />
+          <img src="/img/of_arena_icon.png" alt="Open Foris" />
         </a>
       </div>
 
