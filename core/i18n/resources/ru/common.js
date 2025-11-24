@@ -748,7 +748,6 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
   mapView: {
     createRecord: 'Создать новую запись',
     editRecord: 'Редактировать запись',
-    earthMap: 'Карта Земли',
     elevation: 'Высота (м)',
     location: 'Местоположение',
     locationEditInfo: 'Дважды щелкните на карте или перетащите маркер, чтобы обновить местоположение',
@@ -768,9 +767,6 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       levelCode: 'Код уровня {{level}}',
     },
     selectedPeriod: 'Выбранный период',
-    whisp: 'Шепот',
-    whispEarthMap: 'Карта Земли Шепота',
-    whispCsv: 'Шепот CSV',
   },
 
   samplingPolygonOptions: {
