@@ -421,7 +421,7 @@ export const fetchEntitiesFileUuidsByCycle = async (
     ).filter(NodeDef.isFile)
 
     if (childrenFileDefs.length === 0) {
-      return
+      continue
     }
 
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
