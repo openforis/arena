@@ -33,7 +33,7 @@ export default class RecordsExportJob extends Job {
         includeRecordUuid: false,
       })
       if (!includeAnalysis) {
-        this.deleteAnalysisNodes({ record: recordData })
+        this.clearAnalysisNodeValues({ record: recordData })
       }
       archive.append(JSON.stringify(recordData, null, 2), {
         name: ExportFile.record({ recordUuid }),
@@ -42,13 +42,13 @@ export default class RecordsExportJob extends Job {
     }
   }
 
-  deleteAnalysisNodes({ record }) {
+  clearAnalysisNodeValues({ record }) {
     const { surveyFull: survey } = this.context
-    const nodes = Record.getNodes(record)
-    for (const node of Object.values(nodes)) {
+    const nodes = Record.getNodesArray(record)
+    for (const node of nodes) {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       if (NodeDef.isAnalysis(nodeDef)) {
-        delete nodes[Node.getUuid(node)]
+        node[Node.keys.value] = null
       }
     }
   }
