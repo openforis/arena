@@ -120,18 +120,24 @@ const SurveyInfo = (props) => {
                         testId: TestId.dashboard.surveyExportWithDataBtn,
                       },
                       {
-                        key: 'survey-export-with-data-no-result-attributes',
-                        label: 'homeView:dashboard.exportWithDataNoResultAttributes',
-                        onClick: () =>
-                          dispatch(SurveyActions.exportSurvey({ includeData: true, includeResultAttributes: false })),
-                        testId: TestId.dashboard.surveyExportWithDataNoResultAttributesBtn,
-                      },
-                      {
                         key: 'survey-export-with-data-no-activity-log',
                         label: 'homeView:dashboard.exportWithDataNoActivityLog',
                         onClick: () =>
                           dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false })),
                         testId: TestId.dashboard.surveyExportWithDataNoActivityLogBtn,
+                      },
+                      {
+                        key: 'survey-export-with-data-no-result-attributes',
+                        label: 'homeView:dashboard.exportWithDataNoResultAttributes',
+                        onClick: () =>
+                          dispatch(
+                            SurveyActions.exportSurvey({
+                              includeData: true,
+                              includeResultAttributes: false,
+                              includeActivityLog: false,
+                            })
+                          ),
+                        testId: TestId.dashboard.surveyExportWithDataNoResultAttributesBtn,
                       },
                     ]
                   : []),
