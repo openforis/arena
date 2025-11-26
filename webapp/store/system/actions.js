@@ -1,3 +1,4 @@
+import { AppInfo } from '@core/app/appInfo'
 import * as User from '@core/user/user'
 import analytics from '@webapp/service/analytics'
 import * as API from '@webapp/service/api'
@@ -13,6 +14,13 @@ export const initSystem = () => async (dispatch) => {
   const { user, survey } = await API.fetchUserAndSurvey()
 
   analytics.init({ user })
+
+  const appInfo = AppInfo.newAppInfo()
+
+  analytics.event({
+    name: 'app_access',
+    params: { appId: AppInfo.getAppId(appInfo), appVersion: AppInfo.getVersion(appInfo) },
+  })
 
   dispatch({ type: SYSTEM_INIT, user, survey })
 
