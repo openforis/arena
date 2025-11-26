@@ -14487,6 +14487,7 @@ __metadata:
     react-avatar-editor: "npm:^13.0.2"
     react-dom: "npm:^18.2.0"
     react-dropzone: "npm:^14.2.3"
+    react-ga4: "npm:^2.1.0"
     react-google-recaptcha: "npm:^3.1.0"
     react-grid-layout: "npm:^1.4.4"
     react-i18next: "npm:^15.0.1"
@@ -16124,6 +16125,13 @@ __metadata:
   peerDependencies:
     react: ">= 16.8 || 18.0.0"
   checksum: 10c0/e17b1832783cda7b8824fe9370e99185d1abbdd5e4980b2985d6321c5768c8de18ff7b9ad550c809ee9743269dea608ff74d5208062754ce8377ad022897b278
+  languageName: node
+  linkType: hard
+
+"react-ga4@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "react-ga4@npm:2.1.0"
+  checksum: 10c0/314aa86dd7cb868535f26bfb8b537d3b3c20649c66b2b942fba72e081295441446932a4ae96499231c8a4836ab0a222a97b1bd03633b8cc1477991efe93444cd
   languageName: node
   linkType: hard
 

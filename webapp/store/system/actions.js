@@ -12,10 +12,7 @@ export const initSystem = () => async (dispatch) => {
 
   const { user, survey } = await API.fetchUserAndSurvey()
 
-  analytics.identify({
-    userId: user?.uuid,
-    properties: user,
-  })
+  analytics.init({ user })
 
   dispatch({ type: SYSTEM_INIT, user, survey })
 

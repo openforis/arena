@@ -1,3 +1,12 @@
+import ReactGA from 'react-ga4'
+
+const gaMeasurementId = 'G-08YPKWTSF0'
+
+const init = ({ user }) => {
+  identify({ userId: user?.uuid, properties: user })
+  ReactGA.initialize(gaMeasurementId)
+}
+
 /* eslint-disable no-undef */
 
 const _analytics = ({ methodName = 'track', type = false, properties = {} }) => {
@@ -43,13 +52,23 @@ const addTraits = ({ traits = {} } = {}) => {
     ...getTraits(),
     ...traits,
   }
-  analytics.identify(getUserId(), _traits)
+  window?.analytics.identify(getUserId(), _traits)
+}
+
+const event = ({ name, params }) => {
+  const eventParams = {
+    category: 'User',
+    ...params,
+  }
+  ReactGA.event(name, eventParams)
 }
 
 export default {
+  init,
   track,
   page,
   identify,
   addTraits,
   getTraits,
+  event,
 }
