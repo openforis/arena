@@ -5,7 +5,10 @@ import { AppInfo } from '@core/app/appInfo'
 
 export const fetchUserAndSurvey = async () => {
   const appInfo = AppInfo.newAppInfo()
-  analytics.event({ name: 'user_fetch', params: { appInfo } })
+  analytics.event({
+    name: 'user_fetch',
+    params: { appId: AppInfo.getAppId(appInfo), appVersion: AppInfo.getVersion(appInfo) },
+  })
 
   const {
     data: { user, survey },

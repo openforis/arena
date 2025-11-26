@@ -28,6 +28,8 @@ const getAppId = A.propOr(arenaAppId, keys.appId)
 
 const getAppNameById = (appId) => appNameById[appId] ?? appId
 
+const getVersion = (appInfo) => A.propOr('unknown', keys.version, appInfo)
+
 export const AppInfo = {
   arenaAppId,
   arenaMobileId,
@@ -36,4 +38,5 @@ export const AppInfo = {
   newAppInfo,
   getAppId,
   getAppNameById,
+  getVersion,
 }
