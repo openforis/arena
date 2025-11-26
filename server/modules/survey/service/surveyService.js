@@ -68,9 +68,22 @@ export const startDeleteActivityLogJob = (user, surveyId) => {
   return job
 }
 
-export const exportSurvey = ({ surveyId, user, includeData = false, includeActivityLog = true }) => {
+export const exportSurvey = ({
+  surveyId,
+  user,
+  includeData = false,
+  includeResultAttributes = true,
+  includeActivityLog = true,
+}) => {
   const outputFileName = `survey_export_${surveyId}_${Date.now()}.zip`
-  const job = new SurveyExportJob({ surveyId, user, outputFileName, backup: includeData, includeActivityLog })
+  const job = new SurveyExportJob({
+    surveyId,
+    user,
+    outputFileName,
+    backup: includeData,
+    includeResultAttributes,
+    includeActivityLog,
+  })
 
   JobManager.enqueueJob(job)
 

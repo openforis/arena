@@ -44,7 +44,7 @@ export default class CategoriesExportJob extends Job {
           totalPages === 1
             ? ExportFile.categoryItemsSingleFile({ categoryUuid })
             : ExportFile.categoryItemsPart({ categoryUuid, index: pageIndex })
-        archive.append(JSON.stringify(itemsData, null, 2), { name: fileName })
+        archive.append(JSON.stringify(itemsData), { name: fileName })
       }
 
       this.incrementProcessedItems()
