@@ -8,13 +8,13 @@ import SurveyInfoExportJob from './jobs/surveyInfoExportJob'
 import TaxonomiesExportJob from './jobs/taxonomiesExportJob'
 import UsersExportJob from './jobs/usersExportJob'
 
-const createInnerJobs = ({ backup, includeActivityLog }) => {
+const createInnerJobs = ({ backup, includeAnalysis, includeActivityLog }) => {
   // records, files, activity log are included only if exporting survey as backup (not cloning)
   return [
     new SurveyInfoExportJob(),
     new CategoriesExportJob(),
     new TaxonomiesExportJob(),
-    ...(backup ? [new RecordsExportJob(), new FilesExportJob()] : []),
+    ...(backup ? [new RecordsExportJob({ includeAnalysis }), new FilesExportJob()] : []),
     new ChainExportJob(),
     ...(backup && includeActivityLog ? [new UsersExportJob(), new ActivityLogExportJob()] : []),
   ]
@@ -33,11 +33,11 @@ export default class SurveyExportJob extends ZipFileCreatorBaseJob {
    * @returns {SurveyExportJob} - The export job.
    */
   constructor(params) {
-    const { backup = true, includeActivityLog = true } = params
+    const { backup = true, includeAnalysis = true, includeActivityLog = true } = params
     super(
       SurveyExportJob.type,
-      { ...params, backup, includeActivityLog },
-      createInnerJobs({ backup, includeActivityLog })
+      { ...params, backup, includeAnalysis, includeActivityLog },
+      createInnerJobs({ backup, includeAnalysis, includeActivityLog })
     )
   }
 

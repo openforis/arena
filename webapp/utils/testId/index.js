@@ -38,6 +38,7 @@ export const TestId = {
     surveyExportBtn: 'survey-export-btn',
     surveyExportOnlySurveyBtn: 'survey-export-only-survey-btn',
     surveyExportWithDataBtn: 'survey-export-with-data-btn',
+    surveyExportWithDataNoAnalysisBtn: 'survey-export-with-data-no-analysis-btn',
     surveyExportWithDataNoActivityLogBtn: 'survey-export-with-data-no-activity-log-btn',
     surveyInfoBtnHeader: 'survey-info-btn-header',
     surveyInfoBtn: 'survey-info-btn',

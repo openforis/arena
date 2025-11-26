@@ -207,11 +207,17 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/export', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, includeData, includeActivityLog } = Request.getParams(req)
+      const { surveyId, includeData, includeAnalysis, includeActivityLog } = Request.getParams(req)
 
       const user = Request.getUser(req)
 
-      const { job, outputFileName } = SurveyService.exportSurvey({ surveyId, user, includeData, includeActivityLog })
+      const { job, outputFileName } = SurveyService.exportSurvey({
+        surveyId,
+        user,
+        includeData,
+        includeAnalysis,
+        includeActivityLog,
+      })
       res.json({ job, outputFileName })
     } catch (error) {
       next(error)
