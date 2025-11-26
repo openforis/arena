@@ -72,7 +72,7 @@ export const exportSurvey = ({
   surveyId,
   user,
   includeData = false,
-  includeAnalysis = true,
+  includeResultAttributes = true,
   includeActivityLog = true,
 }) => {
   const outputFileName = `survey_export_${surveyId}_${Date.now()}.zip`
@@ -81,7 +81,7 @@ export const exportSurvey = ({
     user,
     outputFileName,
     backup: includeData,
-    includeAnalysis,
+    includeResultAttributes,
     includeActivityLog,
   })
 

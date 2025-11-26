@@ -10,7 +10,7 @@ import { TestId } from '@webapp/utils/testId'
 import * as SurveyState from '../state'
 
 export const exportSurvey =
-  ({ includeData = false, includeAnalysis = true, includeActivityLog = true } = {}) =>
+  ({ includeData = false, includeResultAttributes = true, includeActivityLog = true } = {}) =>
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
@@ -21,7 +21,7 @@ export const exportSurvey =
     const {
       data: { job, outputFileName: fileName },
     } = await axios.get(`/api/survey/${surveyId}/export/`, {
-      params: { includeData, includeAnalysis, includeActivityLog },
+      params: { includeData, includeResultAttributes, includeActivityLog },
     })
 
     dispatch(
@@ -31,7 +31,7 @@ export const exportSurvey =
           <ButtonDownload
             testId={TestId.surveyExport.downloadBtn}
             href={`/api/survey/${surveyId}/export/download`}
-            requestParams={{ fileName, surveyName, includeData, includeActivityLog }}
+            requestParams={{ fileName, surveyName, includeData, includeResultAttributes, includeActivityLog }}
             onClick={() => dispatch(JobActions.hideJobMonitor())}
             variant="contained"
           />

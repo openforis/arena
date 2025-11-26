@@ -13,7 +13,7 @@ export default class RecordsExportJob extends Job {
   }
 
   async execute() {
-    const { archive, surveyId, recordUuids, includeAnalysis } = this.context
+    const { archive, surveyId, recordUuids, includeResultAttributes } = this.context
 
     const records = await RecordService.fetchRecordsUuidAndCycle({ surveyId, recordUuidsIncluded: recordUuids })
     archive.append(JSON.stringify(records, null, 2), { name: ExportFile.records })
@@ -32,7 +32,7 @@ export default class RecordsExportJob extends Job {
         includeSurveyUuid: false,
         includeRecordUuid: false,
       })
-      if (!includeAnalysis) {
+      if (!includeResultAttributes) {
         this.clearAnalysisNodeValues({ record: recordData })
       }
       archive.append(JSON.stringify(recordData), {
