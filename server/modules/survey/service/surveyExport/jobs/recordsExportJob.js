@@ -35,7 +35,7 @@ export default class RecordsExportJob extends Job {
       if (!includeAnalysis) {
         this.clearAnalysisNodeValues({ record: recordData })
       }
-      archive.append(JSON.stringify(recordData, null, 2), {
+      archive.append(JSON.stringify(recordData), {
         name: ExportFile.record({ recordUuid }),
       })
       this.incrementProcessedItems()

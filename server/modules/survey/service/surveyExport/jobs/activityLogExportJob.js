@@ -19,7 +19,7 @@ export default class ActivityLogExportJob extends Job {
     for (const index of ArrayUtils.fromNumberOfElements(this.total)) {
       const offset = index * BATCH_SIZE
       const activityLog = await ActivityLogService.fetchSimple({ surveyId, limit: BATCH_SIZE, offset }, this.tx)
-      const activityLogString = JSON.stringify(activityLog, null, 2)
+      const activityLogString = JSON.stringify(activityLog)
       archive.append(activityLogString, { name: ExportFile.activityLog({ index }) })
       this.incrementProcessedItems()
     }
