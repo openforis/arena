@@ -20,6 +20,7 @@ export default {
     },
     exportWithData: 'Exportar + datos (Copia de seguridad)',
     exportWithDataNoActivityLog: 'Exportar + datos (SIN registro de actividad)',
+    exportWithDataNoResultAttributes: 'Exportar + datos (SIN atributos de resultado)',
     surveyPropUpdate: {
       main: '<title>Bienvenido a Arena</title>\n  \n        <p>Primero debe establecer el <strong>nombre</strong> y la <strong>etiqueta</strong> de la encuesta.</p>\n        \n        <p>Haga clic a continuación en <linkWithIcon> $t(homeView:surveyInfo.editInfo)</linkWithIcon>o en el nombre de la encuesta:<basicLink>{{surveyName}}</basicLink></p>\n        ',
       secondary:

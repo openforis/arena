@@ -20,6 +20,7 @@ export default {
     },
     exportWithData: 'Экспорт + данные (резервная копия)',
     exportWithDataNoActivityLog: 'Экспорт + данные (БЕЗ журнала активности)',
+    exportWithDataNoResultAttributes: 'Экспорт + данные (БЕЗ атрибутов результата)',
     surveyPropUpdate: {
       main: `<title>Добро пожаловать в Arena</title>
   
