@@ -207,7 +207,12 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/export', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, includeData, includeResultAttributes, includeActivityLog } = Request.getParams(req)
+      const {
+        surveyId,
+        includeData = true,
+        includeResultAttributes = true,
+        includeActivityLog = true,
+      } = Request.getParams(req)
 
       const user = Request.getUser(req)
 
@@ -227,7 +232,13 @@ export const init = (app) => {
   // download generated survey export file
   app.get('/survey/:surveyId/export/download', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyName, fileName, includeData, includeResultAttributes, includeActivityLog } = Request.getParams(req)
+      const {
+        surveyName,
+        fileName,
+        includeData = true,
+        includeResultAttributes = true,
+        includeActivityLog = true,
+      } = Request.getParams(req)
 
       const path = FileUtils.join(ProcessUtils.ENV.tempFolder, fileName)
       let prefix = includeData ? 'arena_backup' : 'arena_survey'
