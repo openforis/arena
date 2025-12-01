@@ -7,10 +7,8 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useChains, useSurvey } from '@webapp/store/survey'
 import { useChain, useChainRecordsCountByStep } from '@webapp/store/ui/chain'
-
-import * as API from '@webapp/service/api'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
@@ -23,21 +21,19 @@ export const ChainBasicProps = (props) => {
   const i18n = useI18n()
   const chain = useChain()
   const survey = useSurvey()
+  const chains = useChains()
 
   const [existsAnotherChainWithSamplingDesign, setExistsAnotherChainWithSamplingDesign] = useState(false)
 
   const recordsCountByStep = useChainRecordsCountByStep()
 
   useEffect(() => {
-    const fetchChains = async () => {
-      const { chains } = await API.fetchChains({ surveyId: Survey.getId(survey) })
+    if (chains) {
       setExistsAnotherChainWithSamplingDesign(
         chains.some((_chain) => Chain.getUuid(_chain) !== Chain.getUuid(chain) && Chain.hasSamplingDesign(_chain))
       )
     }
-
-    fetchChains()
-  }, [survey, chain])
+  }, [chain, chains])
 
   const validation = Chain.getValidation(chain)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
