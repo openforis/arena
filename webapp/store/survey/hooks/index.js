@@ -133,11 +133,17 @@ export const useChains = () => {
   const surveyId = useSurveyId()
   const [chains, setChains] = useState(null)
   useEffect(() => {
+    let isMounted = true
     const fetchChains = async () => {
       const { chains: _chains } = await API.fetchChains({ surveyId })
-      setChains(_chains)
+      if (isMounted) {
+        setChains(_chains)
+      }
     }
     fetchChains()
+    return () => {
+      isMounted = false
+    }
   }, [surveyId])
   return chains
 }
