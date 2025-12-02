@@ -11,7 +11,20 @@ export const Link = (props) => {
   const safeHref = !disabled && hrefIsSafe ? href : undefined
 
   return (
-    <MuiLink href={safeHref} target="_blank" rel="noopener noreferrer">
+    <MuiLink
+      href={safeHref}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-disabled={disabled ? "true" : undefined}
+      tabIndex={disabled ? -1 : undefined}
+      onClick={e => {
+        if (disabled) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      style={disabled ? { pointerEvents: 'none', color: '#888' } : undefined}
+    >
       {children ?? label ?? href}
     </MuiLink>
   )
