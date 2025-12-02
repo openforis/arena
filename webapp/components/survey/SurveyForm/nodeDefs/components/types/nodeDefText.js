@@ -13,6 +13,7 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
+import { Strings } from '@openforis/arena-core'
 
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => {
   const multiline = NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine
@@ -63,8 +64,8 @@ const extractConstantHyperlinkValue = (nodeDef) => {
     if (defaultValues?.length === 1) {
       const defaultValue = defaultValues[0]
       const expr = NodeDefExpression.getExpression(defaultValue)
-      if (expr?.startsWith('http://') || expr?.startsWith('https://') || expr?.startsWith('www.')) {
-        return expr
+      if (expr?.startsWith(`"http://`) || expr?.startsWith(`"https://`)) {
+        return Strings.unquoteDouble(expr)
       }
     }
   }
@@ -77,7 +78,7 @@ const NodeDefText = (props) => {
   const isHyperlink = NodeDef.isReadOnly(nodeDef) && NodeDef.isShownAsHyperlink(nodeDef)
   if (edit) {
     if (isHyperlink) {
-      const hyperlink = extractConstantHyperlinkValue(nodeDef) ?? 'www.openforis.org'
+      const hyperlink = extractConstantHyperlinkValue(nodeDef) ?? 'https://www.example-link.org'
       return <Link disabled href="#" label={hyperlink} />
     }
     return <TextInput {...props} />
