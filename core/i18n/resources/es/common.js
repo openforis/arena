@@ -1032,6 +1032,7 @@ export default {
       readOnly: 'Solo lectura',
       relevantIf: 'Relevante si',
       script: 'Script',
+      shownAsHyperlink: 'Mostrar como hipervínculo',
     },
     mobileAppProps: {
       hiddenInMobile: {

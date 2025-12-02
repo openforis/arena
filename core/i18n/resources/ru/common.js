@@ -1213,6 +1213,7 @@ $t(common.appNameFull)
       readOnly: 'Только для чтения',
       relevantIf: 'Актуально, если',
       script: 'Скрипт',
+      shownAsHyperlink: 'Показать как гиперссылку',
     },
     mobileAppProps: {
       hiddenInMobile: {
