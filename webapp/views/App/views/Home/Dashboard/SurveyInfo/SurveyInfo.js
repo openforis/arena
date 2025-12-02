@@ -9,7 +9,7 @@ import * as Survey from '@core/survey/survey'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
-import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
+import { SurveyActions, useChains, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
@@ -30,6 +30,8 @@ const SurveyInfo = (props) => {
 
   const canEditSurvey = useAuthCanEditSurvey()
   const canExportSurvey = useAuthCanExportSurvey()
+  const chains = useChains()
+  const hasChains = chains?.length > 0
 
   const surveyName = Survey.getName(surveyInfo)
 
@@ -126,19 +128,23 @@ const SurveyInfo = (props) => {
                           dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false })),
                         testId: TestId.dashboard.surveyExportWithDataNoActivityLogBtn,
                       },
-                      {
-                        key: 'survey-export-with-data-no-result-attributes',
-                        label: 'homeView:dashboard.exportWithDataNoResultAttributes',
-                        onClick: () =>
-                          dispatch(
-                            SurveyActions.exportSurvey({
-                              includeData: true,
-                              includeResultAttributes: false,
-                              includeActivityLog: false,
-                            })
-                          ),
-                        testId: TestId.dashboard.surveyExportWithDataNoResultAttributesBtn,
-                      },
+                      ...(hasChains
+                        ? [
+                            {
+                              key: 'survey-export-with-data-no-result-attributes',
+                              label: 'homeView:dashboard.exportWithDataNoResultAttributes',
+                              onClick: () =>
+                                dispatch(
+                                  SurveyActions.exportSurvey({
+                                    includeData: true,
+                                    includeResultAttributes: false,
+                                    includeActivityLog: false,
+                                  })
+                                ),
+                              testId: TestId.dashboard.surveyExportWithDataNoResultAttributesBtn,
+                            },
+                          ]
+                        : []),
                     ]
                   : []),
               ]}

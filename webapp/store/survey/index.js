@@ -29,4 +29,5 @@ export {
   useNodeDefRootKeys,
   useIsAncestorMultipleEntityRoot,
   useIsSurveyDirty,
+  useChains,
 } from './hooks'
