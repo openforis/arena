@@ -15,15 +15,14 @@ export const Link = (props) => {
       href={safeHref}
       target="_blank"
       rel="noopener noreferrer"
-      aria-disabled={disabled ? "true" : undefined}
+      aria-disabled={disabled ? 'true' : undefined}
       tabIndex={disabled ? -1 : undefined}
-      onClick={e => {
+      onClick={(e) => {
         if (disabled) {
-          e.preventDefault();
-          e.stopPropagation();
+          e.preventDefault()
+          e.stopPropagation()
         }
       }}
-      style={disabled ? { pointerEvents: 'none', color: '#888' } : undefined}
     >
       {children ?? label ?? href}
     </MuiLink>

@@ -3,6 +3,8 @@ import './nodeDefText.scss'
 import React from 'react'
 import classNames from 'classnames'
 
+import { Strings } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Node from '@core/record/node'
@@ -13,7 +15,21 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
-import { Strings } from '@openforis/arena-core'
+
+const extractConstantHyperlinkValue = (nodeDef) => {
+  if (NodeDef.isReadOnly(nodeDef) && NodeDef.isShownAsHyperlink(nodeDef)) {
+    const defaultValues = NodeDef.getDefaultValues(nodeDef)
+    if (defaultValues?.length === 1) {
+      const defaultValue = defaultValues[0]
+      const expr = NodeDefExpression.getExpression(defaultValue)
+      const validUrlPrefixes = ['http://', 'https://']
+      if (validUrlPrefixes.some((prefix) => expr?.startsWith(`"${prefix}`))) {
+        return Strings.unquoteDouble(expr)
+      }
+    }
+  }
+  return null
+}
 
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => {
   const multiline = NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine
@@ -56,20 +72,6 @@ const MultipleTextInput = (props) => {
       )}
     </>
   )
-}
-
-const extractConstantHyperlinkValue = (nodeDef) => {
-  if (NodeDef.isReadOnly(nodeDef) && NodeDef.isShownAsHyperlink(nodeDef)) {
-    const defaultValues = NodeDef.getDefaultValues(nodeDef)
-    if (defaultValues?.length === 1) {
-      const defaultValue = defaultValues[0]
-      const expr = NodeDefExpression.getExpression(defaultValue)
-      if (expr?.startsWith(`"http://`) || expr?.startsWith(`"https://`)) {
-        return Strings.unquoteDouble(expr)
-      }
-    }
-  }
-  return null
 }
 
 const NodeDefText = (props) => {
