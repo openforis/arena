@@ -4,8 +4,10 @@ import React from 'react'
 import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Node from '@core/record/node'
 
+import { Link } from '@webapp/components'
 import { Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
@@ -55,14 +57,36 @@ const MultipleTextInput = (props) => {
   )
 }
 
+const extractConstantHyperlinkValue = (nodeDef) => {
+  if (NodeDef.isReadOnly(nodeDef) && NodeDef.isShownAsHyperlink(nodeDef)) {
+    const defaultValues = NodeDef.getDefaultValues(nodeDef)
+    if (defaultValues?.length === 1) {
+      const defaultValue = defaultValues[0]
+      const expr = NodeDefExpression.getExpression(defaultValue)
+      if (expr?.startsWith('http://') || expr?.startsWith('https://') || expr?.startsWith('www.')) {
+        return expr
+      }
+    }
+  }
+  return null
+}
+
 const NodeDefText = (props) => {
   const { edit, entryDataQuery, nodeDef, nodes } = props
 
+  const isHyperlink = NodeDef.isReadOnly(nodeDef) && NodeDef.isShownAsHyperlink(nodeDef)
   if (edit) {
+    if (isHyperlink) {
+      const hyperlink = extractConstantHyperlinkValue(nodeDef) ?? 'www.openforis.org'
+      return <Link disabled href="#" label={hyperlink} />
+    }
     return <TextInput {...props} />
   }
   if (NodeDef.isMultiple(nodeDef) && !entryDataQuery) {
     return <MultipleTextInput {...props} />
+  }
+  if (isHyperlink) {
+    return <Link href={Node.getValue(nodes[0], '')} />
   }
   return <TextInput {...props} node={nodes[0]} />
 }
