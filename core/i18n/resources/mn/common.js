@@ -1205,6 +1205,7 @@ $t(common.appNameFull)
       readOnly: 'Зөвхөн унших',
       relevantIf: 'Хэрэв хамааралтай бол',
       script: 'Скрипт',
+      shownAsHyperlink: 'Гипер холбоосоор харуулах',
     },
     mobileAppProps: {
       hiddenInMobile: {
