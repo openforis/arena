@@ -63,6 +63,7 @@ export const propKeys = {
   layout: 'layout',
   // available only when readOnly is true
   hidden: 'hidden',
+  shownAsHyperlink: 'shownAsHyperlink',
 
   // Text
   textInputType: 'textInputType',
@@ -256,6 +257,7 @@ export const isFormHeader = isType(nodeDefType.formHeader)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
 export const isHidden = getProp(propKeys.hidden, false)
+export const isShownAsHyperlink = getProp(propKeys.shownAsHyperlink, false)
 
 export const getLayout = getProp(propKeys.layout, {})
 
