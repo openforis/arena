@@ -44,7 +44,7 @@ export default class TaxonomiesExportJob extends Job {
       const fileName =
         totalPages === 1 ? ExportFile.taxa({ taxonomyUuid }) : ExportFile.taxaPart({ taxonomyUuid, index: pageIndex })
 
-      archive.append(JSON.stringify(taxaData, null, 2), { name: fileName })
+      archive.append(JSON.stringify(taxaData), { name: fileName })
     }
     this.incrementProcessedItems()
   }

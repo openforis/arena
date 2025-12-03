@@ -1,3 +1,4 @@
+import * as User from '@core/user/user'
 import analytics from '@webapp/service/analytics'
 import * as API from '@webapp/service/api'
 import { showJobMonitor } from '../app/job/actions'
@@ -21,6 +22,11 @@ export const initSystem = () => async (dispatch) => {
     }
   } catch (error) {
     dispatch({ type: SYSTEM_INIT, user: null, survey: null, errorMessage: String(error) })
+  }
+
+  const userPreferredLanguage = user ? User.getPrefLanguage(user) : null
+  if (userPreferredLanguage) {
+    i18n.changeLanguage(userPreferredLanguage)
   }
 }
 

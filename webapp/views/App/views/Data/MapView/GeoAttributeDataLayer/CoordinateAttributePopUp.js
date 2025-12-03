@@ -159,7 +159,7 @@ export const CoordinateAttributePopUp = (props) => {
               className="earth-map-btn"
               iconAlt="Earth Map"
               iconSrc="/img/of_earth_map_icon_small.png"
-              label="mapView.earthMap"
+              label="Earth Map"
               size="small"
               onClick={onEarthMapButtonClick}
               variant="outlined"

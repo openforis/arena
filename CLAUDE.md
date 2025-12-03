@@ -7,7 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Open Foris Arena is a cloud-based platform for storing and processing data collected in field inventories or questionnaires. It provides multilingual data entry forms, multi-cycle data management, data quality assurance with validation, and integrated statistical analysis with RStudio Server.
 
 **Key technologies:**
-- Node.js 22.14.0
+
+- Node.js 24.11.1
 - React 18 (frontend)
 - Express (backend)
 - PostgreSQL with PostGIS
@@ -63,6 +64,7 @@ const surveyUpdated = Survey.assocNodeDef({ nodeDef })(survey)
 
 **Module Organization:**
 Server modules follow a layered architecture:
+
 - `api/` - Express route handlers
 - `service/` - Business logic orchestration
 - `repository/` - Database queries and persistence
@@ -72,6 +74,7 @@ Server modules follow a layered architecture:
 Frontend uses Redux Toolkit with slices in `webapp/store/`. Each feature area has its own slice (survey, record, user, etc.).
 
 **Database:**
+
 - PostgreSQL accessed via pg-promise
 - Migration system in `server/db/` (look for migration files)
 - JSONB columns extensively used for flexible schema (props, meta, validation)
@@ -79,6 +82,7 @@ Frontend uses Redux Toolkit with slices in `webapp/store/`. Each feature area ha
 ## Common Development Commands
 
 ### Development
+
 ```bash
 # Install dependencies
 yarn install
@@ -96,6 +100,7 @@ yarn client:dev-server
 ```
 
 ### Building
+
 ```bash
 # Build for production (builds both client and server)
 yarn build
@@ -114,6 +119,7 @@ yarn build:server:dev
 ```
 
 ### Testing
+
 ```bash
 # Run all tests (unit + e2e)
 yarn test
@@ -135,6 +141,7 @@ yarn test:e2e:codegen
 ```
 
 ### Linting
+
 ```bash
 # Lint and fix (runs via lint-staged on pre-commit)
 # Targets: {common,core,server,test,webapp}/**/*.js
@@ -142,12 +149,14 @@ npx eslint --cache --fix path/to/file.js
 ```
 
 ### Database
+
 ```bash
 # Run database migrations only (without starting server)
 yarn server:migrate
 ```
 
 ### Docker
+
 ```bash
 # Build and run with Docker
 docker build -t openforis/arena .
@@ -162,11 +171,13 @@ yarn test:docker
 ### Running a Single Test File
 
 For e2e tests:
+
 ```bash
 jest --config=test/e2e/jest.config.js test/e2e/tests/yourTest.js
 ```
 
 For unit tests (after building):
+
 ```bash
 yarn build:test:unit
 jest dist/__tests__/bundle.unit.js
@@ -175,6 +186,7 @@ jest dist/__tests__/bundle.unit.js
 ### Adding a New Survey Node Definition Type
 
 When adding a new node definition type or modifying the survey schema:
+
 1. Update domain model in `core/survey/nodeDef*.js`
 2. Update database repository in `server/modules/nodeDef/repository/`
 3. Update API endpoints in `server/modules/nodeDef/api/`
@@ -189,6 +201,7 @@ Database migrations are in `server/db/` directory. The server automatically runs
 
 **Path Aliases:**
 All imports use path aliases defined in `jsconfig.json` and webpack config:
+
 - `@common/*` → `./common/*`
 - `@core/*` → `./core/*`
 - `@server/*` → `./server/*`
@@ -203,6 +216,7 @@ The ESLint config has `"no-console": "error"`. Use the `log4js` logger from `@se
 
 **JSDoc Required:**
 The project enforces comprehensive JSDoc comments. All functions should have:
+
 - Description ending with period
 - `@param` with type and description for each parameter
 - `@returns` with type and description
@@ -211,6 +225,7 @@ The project enforces comprehensive JSDoc comments. All functions should have:
 Core domain objects are treated as immutable. Use Ramda or the provided utility functions for updates rather than mutating objects directly.
 
 **Survey vs Record:**
+
 - **Survey** = the form definition/schema (node definitions, categories, taxonomies)
 - **Record** = an instance of collected data following a survey schema
 
@@ -220,16 +235,19 @@ Long-running operations use the job system in `server/job/`. Jobs are persisted 
 ## Testing Notes
 
 **E2E Tests:**
+
 - Use Playwright with jest-playwright-preset
 - Tests are in `test/e2e/tests/`
 - Authentication state is saved in `test/e2e/resources/auth.json`
 - Test utilities in `test/e2e/tests/utils/`
 
 **Integration Tests:**
+
 - Located in `test/integration/`
 - Require database connection
 - Bundled via webpack before running with Jest
 
 **Unit Tests:**
+
 - Located in `test/unit/`
 - Bundled via webpack before running with Jest

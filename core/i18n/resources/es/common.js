@@ -580,6 +580,7 @@ export default {
         '### ¿Fusionar los registros seleccionados en uno?\n\n- el registro "fuente" se fusionará con el registro "destino":\n  - fuente: [{{sourceRecordKeys}}], modificado {{sourceRecordModifiedDate}};\n  - destino: [{{targetRecordKeys}}], modificado {{targetRecordModifiedDate}};\n\n- se mostrará una vista previa del resultado antes de realizar la fusión;\n\n- cuando se confirme la fusión, **el registro fuente SERÁ ELIMINADO**',
       confirmUpdateRecordsStep: '¿Mover el/los {{count}} registro(s) seleccionado(s) de {{stepFrom}} a {{stepTo}}?',
       confirmUpdateRecordOwner: '¿Cambiar el propietario del registro seleccionado a {{ownerName}}?',
+      confirmValidateAllRecords: `¿Volver a validar todos los registros?\n\nEsto puede tardar varios minutos.`,
       deleteRecord: 'Eliminar registro',
       demoteAllRecordsFromAnalysis: 'Análisis -> Limpieza',
       demoteAllRecordsFromCleansing: 'Limpieza -> Entrada',
@@ -605,6 +606,7 @@ export default {
       promoteAllRecordsToCleansing: 'Entrada -> Limpieza',
       step: 'Paso',
       updateRecordsStep: 'Actualizar paso de registros',
+      validateAll: 'Validar todo',
       viewRecord: 'Ver registro',
     },
     recordsClone: {
@@ -659,7 +661,6 @@ export default {
   mapView: {
     createRecord: 'Crear nuevo registro',
     editRecord: 'Editar registro',
-    earthMap: 'Mapa terrestre',
     elevation: 'Elevación (m)',
     location: 'Ubicación',
     locationEditInfo: 'Haga doble clic en el mapa o arrastre el marcador para actualizar la ubicación',
@@ -679,9 +680,6 @@ export default {
       levelCode: 'Código de nivel {{level}}',
     },
     selectedPeriod: 'Período seleccionado',
-    whisp: 'Whisp',
-    whispEarthMap: 'Mapa terrestre de Whisp',
-    whispCsv: 'CSV de Whisp',
   },
   samplingPolygonOptions: {
     circle: 'Círculo',
@@ -1034,6 +1032,7 @@ export default {
       readOnly: 'Solo lectura',
       relevantIf: 'Relevante si',
       script: 'Script',
+      shownAsHyperlink: 'Mostrar como hipervínculo',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1166,7 +1165,7 @@ export default {
       taxaNotImported: 'Taxones no importados',
       family: 'Familia',
       genus: 'Género',
-      scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
+      scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       extraPropsNotDefined: 'Propiedades extra no definidas para esta taxonomía',
     },
     taxaCount: 'Recuento de taxones',

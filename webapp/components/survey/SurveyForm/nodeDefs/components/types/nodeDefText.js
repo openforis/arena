@@ -3,14 +3,33 @@ import './nodeDefText.scss'
 import React from 'react'
 import classNames from 'classnames'
 
+import { Strings } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Node from '@core/record/node'
 
+import { Link } from '@webapp/components'
 import { Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
+
+const extractConstantHyperlinkValue = (nodeDef) => {
+  if (NodeDef.isReadOnly(nodeDef) && NodeDef.isShownAsHyperlink(nodeDef)) {
+    const defaultValues = NodeDef.getDefaultValues(nodeDef)
+    if (defaultValues?.length === 1) {
+      const defaultValue = defaultValues[0]
+      const expr = NodeDefExpression.getExpression(defaultValue)
+      const validUrlPrefixes = ['http://', 'https://']
+      if (validUrlPrefixes.some((prefix) => expr?.startsWith(`"${prefix}`))) {
+        return Strings.unquoteDouble(expr)
+      }
+    }
+  }
+  return null
+}
 
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => {
   const multiline = NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine
@@ -58,11 +77,19 @@ const MultipleTextInput = (props) => {
 const NodeDefText = (props) => {
   const { edit, entryDataQuery, nodeDef, nodes } = props
 
+  const isHyperlink = NodeDef.isReadOnly(nodeDef) && NodeDef.isShownAsHyperlink(nodeDef)
   if (edit) {
+    if (isHyperlink) {
+      const hyperlink = extractConstantHyperlinkValue(nodeDef) ?? 'https://www.example-link.org'
+      return <Link disabled href="#" label={hyperlink} />
+    }
     return <TextInput {...props} />
   }
   if (NodeDef.isMultiple(nodeDef) && !entryDataQuery) {
     return <MultipleTextInput {...props} />
+  }
+  if (isHyperlink) {
+    return <Link href={Node.getValue(nodes[0], '')} />
   }
   return <TextInput {...props} node={nodes[0]} />
 }

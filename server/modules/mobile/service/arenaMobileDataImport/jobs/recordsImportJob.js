@@ -126,6 +126,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const { context, currentRecord: record, user, tx } = this
     const { survey } = context
 
+    const recordUuid = Record.getUuid(record)
     // check owner uuid: if user not defined, use the job user as owner
     const ownerUuidSource = Record.getOwnerUuid(record)
     const ownerSource = await UserService.fetchUserByUuid(ownerUuidSource, tx)
@@ -135,11 +136,13 @@ export default class RecordsImportJob extends DataImportBaseJob {
     delete record['_nodesIndex']
     const nodes = Record.getNodes(record)
 
-    Object.entries(nodes).forEach(([nodeUuid, node]) => {
+    for (const [nodeUuid, node] of Object.entries(nodes)) {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const { valid, error } = checkNodeIsValid({ nodes, node, nodeDef })
       if (valid) {
+        // ensure recordUuid is set in node
+        node[Node.keys.recordUuid] = recordUuid
         Node.removeFlags({ sideEffect: true })(node)
       } else {
         const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
@@ -147,7 +150,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
         this.logWarn(`${messagePrefix} ${error} ${messageSuffix}`)
         delete nodes[nodeUuid]
       }
-    })
+    }
     // assoc nodes and build index from scratch
     this.currentRecord = Record.assocNodes({ nodes, sideEffect: true })(record)
   }

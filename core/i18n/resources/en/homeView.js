@@ -9,6 +9,7 @@ export default {
     },
     exportWithData: 'Export + data (Backup)',
     exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
+    exportWithDataNoResultAttributes: 'Export + data (NO Result Attributes)',
     surveyPropUpdate: {
       main: `<title>Welcome to Arena</title>
   

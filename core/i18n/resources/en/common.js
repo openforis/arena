@@ -666,6 +666,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
 - when merging will be confirmed, **the source record WILL BE DELETED**`,
       confirmUpdateRecordsStep: `Move the selected {{count}} record(s) from {{stepFrom}} to {{stepTo}}?`,
       confirmUpdateRecordOwner: `Change the owner of the selected record into {{ownerName}}?`,
+      confirmValidateAllRecords: `Re-validate all records?\n\nThis may take several minutes.`,
       deleteRecord: 'Delete record',
       demoteAllRecordsFromAnalysis: 'Analysis -> Cleansing',
       demoteAllRecordsFromCleansing: 'Cleansing -> Entry',
@@ -694,6 +695,7 @@ Merge cannot be performed.`,
       promoteAllRecordsToCleansing: 'Entry -> Cleansing',
       step: 'Step',
       updateRecordsStep: 'Update records step',
+      validateAll: 'Validate all',
       viewRecord: 'View record',
     },
     recordsClone: {
@@ -749,7 +751,6 @@ Merge cannot be performed.`,
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
-    earthMap: 'Earth Map',
     elevation: 'Elevation (m)',
     location: 'Location',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
@@ -773,9 +774,6 @@ Merge cannot be performed.`,
       levelCode: 'Level {{level}} code',
     },
     selectedPeriod: 'Selected period',
-    whisp: 'Whisp',
-    whispEarthMap: 'Whisp Earth Map',
-    whispCsv: 'Whisp CSV',
   },
 
   samplingPolygonOptions: {
@@ -1226,6 +1224,7 @@ E.g. this.region = region_attribute_name
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
+      shownAsHyperlink: 'Shown as hyperlink',
     },
     mobileAppProps: {
       hiddenInMobile: {

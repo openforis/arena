@@ -23,6 +23,7 @@ import {
   useAuthCanExportRecordsList,
   useAuthCanUpdateRecordsStep,
   useAuthCanUseAnalysis,
+  useAuthCanValidateAllRecords,
 } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
 
@@ -31,7 +32,7 @@ import { RecordsDataExportModal } from './RecordsDataExportModal'
 import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 import { RecordMergePreviewModal } from './RecordMergePreviewModal'
 import { RecordKeyValuesExtractor } from '../recordKeyValuesExtractor'
-import { ExportCsvDataActions } from '@webapp/store/ui'
+import { RecordListActions } from '@webapp/store/ui'
 
 const extractMergeSourceAndTargetRecordsFromSelectedRecords = ({ selectedItems }) => {
   // sort selected records by date modified; source record will be the newest one
@@ -66,6 +67,8 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   const canDeleteSelectedRecords = useAuthCanDeleteRecords(selectedItems)
   const canExportRecordsSummary = useAuthCanExportRecordsList()
   const canExportRecordsData = useAuthCanExportRecords()
+  const canValidateAllRecords = useAuthCanValidateAllRecords()
+
   const lastCycle = cycles[cycles.length - 1]
   const canCloneRecords = canAnalyzeRecords && cycles.length > 1 && cycle !== lastCycle
 
@@ -103,9 +106,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
   const onMergePreviewConfirm = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, recordsMergePreviewModalOpen: true }))
-    const { sourceRecord, targetRecord } = extractMergeSourceAndTargetRecordsFromSelectedRecords({
-      selectedItems,
-    })
+    const { sourceRecord, targetRecord } = extractMergeSourceAndTargetRecordsFromSelectedRecords({ selectedItems })
     dispatch(
       RecordActions.previewRecordsMerge({
         sourceRecordUuid: Record.getUuid(sourceRecord),
@@ -115,21 +116,11 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   }, [dispatch, selectedItems])
 
   const mergeSelectedRecords = useCallback(async () => {
-    const { sourceRecord, targetRecord } = extractMergeSourceAndTargetRecordsFromSelectedRecords({
-      selectedItems,
-    })
-    const sourceRecordKeys = RecordKeyValuesExtractor.extractKeyValuesAndLabels({
-      survey,
-      record: sourceRecord,
-      lang,
-    })
+    const { sourceRecord, targetRecord } = extractMergeSourceAndTargetRecordsFromSelectedRecords({ selectedItems })
+    const sourceRecordKeys = RecordKeyValuesExtractor.extractKeyValuesAndLabels({ survey, record: sourceRecord, lang })
     const sourceRecordModifiedDate = DateUtils.formatDateTimeDisplay(Record.getDateModified(sourceRecord))
 
-    const targetRecordKeys = RecordKeyValuesExtractor.extractKeyValuesAndLabels({
-      survey,
-      record: targetRecord,
-      lang,
-    })
+    const targetRecordKeys = RecordKeyValuesExtractor.extractKeyValuesAndLabels({ survey, record: targetRecord, lang })
     const targetRecordModifiedDate = DateUtils.formatDateTimeDisplay(Record.getDateModified(targetRecord))
 
     if (
@@ -154,9 +145,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
   const onMergeConfirm = useCallback(() => {
     closeMergePreviewModal()
-    const { sourceRecord, targetRecord } = extractMergeSourceAndTargetRecordsFromSelectedRecords({
-      selectedItems,
-    })
+    const { sourceRecord, targetRecord } = extractMergeSourceAndTargetRecordsFromSelectedRecords({ selectedItems })
     dispatch(
       RecordActions.mergeRecords({
         sourceRecordUuid: Record.getUuid(sourceRecord),
@@ -165,6 +154,12 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
       })
     )
   }, [closeMergePreviewModal, dispatch, onRecordsUpdate, selectedItems])
+
+  const onValidateAllRecordsClick = useCallback(async () => {
+    if (await confirm({ key: 'dataView.records.confirmValidateAllRecords' })) {
+      dispatch(RecordListActions.startRecordsValidation({ onRecordsUpdate }))
+    }
+  }, [confirm, dispatch, onRecordsUpdate])
 
   return (
     <div className="records__header-left">
@@ -200,8 +195,11 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           {canAnalyzeRecords && (
             <ButtonDownload
               label="dataView.records.exportDataSummary"
-              onClick={() => dispatch(ExportCsvDataActions.startDataSummaryExport())}
+              onClick={() => dispatch(RecordListActions.startDataSummaryExport())}
             />
+          )}
+          {canValidateAllRecords && (
+            <ButtonDownload label="dataView.records.validateAll" onClick={onValidateAllRecordsClick} />
           )}
           {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
             <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />

@@ -8,7 +8,6 @@ import * as ProcessUtils from '@core/processUtils'
 
 import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
-import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as FileService from '@server/modules/record/service/fileService'
 import * as UserService from '@server/modules/user/service/userService'
 
@@ -19,18 +18,9 @@ import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
 import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 import { SwaggerInitializer } from './swaggerInitializer'
+import { DataMigrator } from './dataMigrator'
 
 const fileSizeLimit = 2 * 1024 * 1024 * 1024 // 2GB
-
-const initializeCategoryItemIndexesIfNecessary = async ({ logger, serviceRegistry }) => {
-  const infoService = serviceRegistry.getService(ServiceType.info)
-  const versionInDb = await infoService.getVersion()
-  if (versionInDb === '2.0.0') {
-    await CategoryService.initializeAllSurveysCategoryItemIndexes()
-  } else {
-    logger.info(`Category item indexes already initialized. App version in DB: ${versionInDb}`)
-  }
-}
 
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -63,7 +53,8 @@ export const run = async () => {
 
   SwaggerInitializer.init(app)
 
-  await initializeCategoryItemIndexesIfNecessary({ logger, serviceRegistry })
+  // Data migrations
+  await DataMigrator.migrateData({ logger, serviceRegistry })
 
   // ====== System Admin user creation
   await UserService.insertSystemAdminUserIfNotExisting()
