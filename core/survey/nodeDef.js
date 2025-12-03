@@ -715,7 +715,7 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
     nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenInMobile })(nodeDefUpdated)
   }
-  // clear shown as hyperlink if not applicable
+  // clear shown as hyperlink if not applicabled
   if (!canBeShownAsHyperlink(nodeDefUpdated) && isShownAsHyperlink(nodeDef)) {
     nodeDefUpdated = assocProp({ key: propKeys.shownAsHyperlink, value: false })(nodeDefUpdated)
   }

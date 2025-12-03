@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 export default {
   common: {
     active: 'Active',
@@ -1270,6 +1268,11 @@ E.g. this.region = region_attribute_name
       },
     },
     textProps: {
+      displayAsTypes: {
+        hyperlink: 'Hyperlink',
+        markdown: 'Markdown',
+        text: 'Text',
+      },
       textInputType: 'Text input type',
       textInputTypes: {
         singleLine: 'Single line',
@@ -1293,7 +1296,6 @@ E.g. this.region = region_attribute_name
     codeProps: {
       category: 'Category',
       codeShown: 'Show code',
-      displayAs: 'Display As',
       displayAsTypes: {
         checkbox: 'Checkbox',
         dropdown: 'Dropdown',
