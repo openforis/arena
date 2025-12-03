@@ -1286,6 +1286,9 @@ $t(common.appNameFull)
       displayAsTypes: {
         checkbox: 'Флажок',
         dropdown: 'Выпадающий список',
+        hyperlink: 'Гиперссылка',
+        markdown: 'Markdown',
+        text: 'Текст',
       },
       parentCode: 'Родительский код',
     },

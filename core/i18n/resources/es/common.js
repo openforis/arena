@@ -1105,6 +1105,9 @@ export default {
       displayAsTypes: {
         checkbox: 'Casilla de verificación',
         dropdown: 'Desplegable',
+        hyperlink: 'Hipervínculo',
+        markdown: 'Markdown',
+        text: 'Texto',
       },
       parentCode: 'Código padre',
     },

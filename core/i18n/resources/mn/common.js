@@ -1278,6 +1278,9 @@ $t(common.appNameFull)
       displayAsTypes: {
         checkbox: 'Чекбокс',
         dropdown: 'Дропдаун',
+        hyperlink: 'Гиперлинк',
+        markdown: 'Markdown',
+        text: 'Текст',
       },
       parentCode: 'Эх код',
     },
