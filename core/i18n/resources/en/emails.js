@@ -1,7 +1,9 @@
 export default {
   signature: `<p>Thank you,<br>
       $t(common.appNameFull) platform
-      </p>`,
+      </p>
+      <p><i>Note: this is an automated message, please <b>DO NOT REPLY</b> to this email.</i></p>
+      `,
   temporaryMsg: '<p><i>This link is only valid for the next 7 days. Please do not share it with anyone else.</i></p>',
   userInviteCommon: `<p>You have been invited by {{invitingUserName}} to join the $t(common.appNameFull) survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
       {{-message}}
@@ -13,7 +15,7 @@ export default {
     body: `<p>Hello,</p>
              $t(emails:userInviteCommon)
              <p><a href="{{urlResetPassword}}">Click here to complete your registration to $t(common.appNameFull)</a></p>
-             <p>If it doesn't work, please copy and paste the following link in your browser: {{urlResetPassword}}</p>
+             <p>If the link doesn't work, please copy and paste this address into your browser: {{urlResetPassword}}</p>
              $t(emails:temporaryMsg)
              <p><i>You have received this email because {{invitingUserName}} invited you to access $t(common.appNameFull) through {{serverUrl}}. If you are not the recipient, please ignore it.</i></p>
              <p>After you have completed the registration, you can access directly $t(common.appNameFull) with this link: <a href="{{serverUrl}}">{{serverUrl}}</a></p>
@@ -25,7 +27,7 @@ export default {
     body: `<p>Hello,</p>
              $t(emails:userInviteCommon)
              <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
-             <p>If it doesn't work, please copy and paste the following link in your browser: {{serverUrl}}</p>
+             <p>If the link doesn't work, please copy and paste this address into your browser: {{serverUrl}}</p>
              $t(emails:signature)`,
   },
   userAccessRequest: {
@@ -53,8 +55,9 @@ export default {
     body: `<p>Hello {{name}},</p>
              <p>You recently requested to reset your password for your $t(common.appNameFull) account. Click the link below to reset it.</p>
              <p><a href="{{url}}">Reset your password</a></p>
+             <p>If the link doesn't work, please copy and paste this address into your browser: {{url}}</p>
              $t(emails:temporaryMsg)
-             <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 7 days.</p>
+             <p>If you did not request a password reset, please ignore this email or let us know.</p>
              $t(emails:signature)`,
   },
   userDeleted: {
