@@ -57,7 +57,7 @@ export default {
              <p><a href="{{url}}">Reset your password</a></p>
              <p>If the link doesn't work, please copy and paste this address into your browser: {{url}}</p>
              $t(emails:temporaryMsg)
-             <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 7 days.</p>
+             <p>If you did not request a password reset, please ignore this email or let us know.</p>
              $t(emails:signature)`,
   },
   userDeleted: {
