@@ -85,17 +85,20 @@ const NodeDefText = (props) => {
   const { edit, entryDataQuery, nodeDef, nodes, surveyCycleKey } = props
 
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
-  const isHyperlink = NodeDef.isReadOnly(nodeDef) && renderType === NodeDefLayout.textRenderType.hyperlink
-  const isMarkdown = NodeDef.isReadOnly(nodeDef) && renderType === NodeDefLayout.textRenderType.markdown
+  const isReadOnly = NodeDef.isReadOnly(nodeDef)
+  const isHyperlink = isReadOnly && renderType === NodeDefLayout.textRenderType.hyperlink
+  const isMarkdown = isReadOnly && renderType === NodeDefLayout.textRenderType.markdown
   if (edit) {
-    if (isHyperlink) {
-      const hyperlink = extractConstantHyperlinkValue(nodeDef) ?? 'https://www.example-link.org'
-      return <Link disabled href="#" label={hyperlink} />
-    }
-    if (isMarkdown) {
-      const markdown = extractConstantMarkdownValue(nodeDef)
-      if (markdown) {
-        return <Markdown source={markdown} />
+    if (isReadOnly) {
+      if (isHyperlink) {
+        const hyperlink = extractConstantHyperlinkValue(nodeDef) ?? 'https://www.example-link.org'
+        return <Link disabled href="#" label={hyperlink} />
+      }
+      if (isMarkdown) {
+        const markdown = extractConstantMarkdownValue(nodeDef)
+        if (markdown) {
+          return <Markdown source={markdown} />
+        }
       }
     }
     return <TextInput {...props} />
@@ -103,14 +106,17 @@ const NodeDefText = (props) => {
   if (NodeDef.isMultiple(nodeDef) && !entryDataQuery) {
     return <MultipleTextInput {...props} />
   }
-  if (isHyperlink) {
-    return <Link href={Node.getValue(nodes[0], '')} />
+  const node = nodes[0]
+  if (isReadOnly) {
+    if (isHyperlink) {
+      return <Link href={Node.getValue(node, '')} />
+    }
+    if (isMarkdown) {
+      const text = Node.getValue(node, '')
+      return <Markdown source={text} />
+    }
   }
-  if (isMarkdown) {
-    const text = Node.getValue(nodes[0], '')
-    return <Markdown source={text} />
-  }
-  return <TextInput {...props} node={nodes[0]} />
+  return <TextInput {...props} node={node} />
 }
 
 export default NodeDefText
