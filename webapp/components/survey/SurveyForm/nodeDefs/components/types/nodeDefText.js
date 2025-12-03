@@ -81,6 +81,24 @@ const MultipleTextInput = (props) => {
   )
 }
 
+const NodeDefTextDesigner = (props) => {
+  const { isHyperlink, isMarkdown, isReadOnly, nodeDef } = props
+
+  if (isReadOnly) {
+    if (isHyperlink) {
+      const hyperlink = extractConstantHyperlinkValue(nodeDef) ?? 'https://www.example-link.org'
+      return <Link disabled href="#" label={hyperlink} />
+    }
+    if (isMarkdown) {
+      const markdown = extractConstantMarkdownValue(nodeDef)
+      if (markdown) {
+        return <Markdown source={markdown} />
+      }
+    }
+  }
+  return <TextInput {...props} />
+}
+
 const NodeDefText = (props) => {
   const { edit, entryDataQuery, nodeDef, nodes, surveyCycleKey } = props
 
@@ -88,20 +106,9 @@ const NodeDefText = (props) => {
   const isReadOnly = NodeDef.isReadOnly(nodeDef)
   const isHyperlink = isReadOnly && renderType === NodeDefLayout.textRenderType.hyperlink
   const isMarkdown = isReadOnly && renderType === NodeDefLayout.textRenderType.markdown
+
   if (edit) {
-    if (isReadOnly) {
-      if (isHyperlink) {
-        const hyperlink = extractConstantHyperlinkValue(nodeDef) ?? 'https://www.example-link.org'
-        return <Link disabled href="#" label={hyperlink} />
-      }
-      if (isMarkdown) {
-        const markdown = extractConstantMarkdownValue(nodeDef)
-        if (markdown) {
-          return <Markdown source={markdown} />
-        }
-      }
-    }
-    return <TextInput {...props} />
+    return <NodeDefTextDesigner {...props} isHyperlink={isHyperlink} isMarkdown={isMarkdown} isReadOnly={isReadOnly} />
   }
   if (NodeDef.isMultiple(nodeDef) && !entryDataQuery) {
     return <MultipleTextInput {...props} />
