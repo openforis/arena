@@ -251,5 +251,8 @@ export const fetchTableSize = async ({ surveyId }, client = db) => {
   return DbUtils.fetchTableSize({ schema, table: 'activity_log' }, client)
 }
 
-export const deleteAll = async ({ surveyId }, client = db) =>
-  client.none(`DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.activity_log`)
+export const deleteAll = async ({ surveyId }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  // keep only first 5 logs (survey creation logs); useful to determine if survey is empty or brand new
+  return client.none(`DELETE FROM ${schema}.activity_log WHERE id > 5`)
+}
