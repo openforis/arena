@@ -2,6 +2,9 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+
+import { useSurveyCycleKey } from '@webapp/store/survey'
 
 import { FormItem } from '@webapp/components/form/Input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
@@ -18,8 +21,15 @@ const textTransformTypes = Object.keys(NodeDef.textTransformValues).map((key) =>
   label: `nodeDefEdit.textProps.textTransformTypes.${key}`,
 }))
 
+const displayAsItems = Object.keys(NodeDefLayout.textRenderType).map((key) => ({
+  key,
+  label: `nodeDefEdit.textProps.displayAsTypes.${key}`,
+}))
+
 const TextProps = (props) => {
   const { state, Actions } = props
+
+  const surveyCycleKey = useSurveyCycleKey()
 
   const nodeDef = State.getNodeDef(state)
 
@@ -33,7 +43,9 @@ const TextProps = (props) => {
   const onInputTypeChange = useCallback(
     (value) => {
       Actions.setProp({ state, key: NodeDef.propKeys.textInputType, value })
-    }, [Actions, state])
+    },
+    [Actions, state]
+  )
 
   return (
     <>
@@ -51,6 +63,15 @@ const TextProps = (props) => {
           items={textInputTypes}
         />
       </FormItem>
+      {NodeDef.isReadOnly(nodeDef) && (
+        <FormItem label="nodeDefEdit.basicProps.displayAs">
+          <ButtonGroup
+            selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
+            onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
+            items={displayAsItems}
+          />
+        </FormItem>
+      )}
     </>
   )
 }

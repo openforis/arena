@@ -49,16 +49,6 @@ const AdvancedProps = (props) => {
                   />
                 </FormItem>
               )}
-              {NodeDef.isReadOnly(nodeDef) && NodeDef.isText(nodeDef) && (
-                <FormItem label="nodeDefEdit.advancedProps.shownAsHyperlink">
-                  <Checkbox
-                    checked={NodeDef.isShownAsHyperlink(nodeDef)}
-                    disabled={readOnly}
-                    validation={Validation.getFieldValidation(NodeDef.propKeys.shownAsHyperlink)(validation)}
-                    onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.shownAsHyperlink, value })}
-                  />
-                </FormItem>
-              )}
             </div>
           </FormItem>
 

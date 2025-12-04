@@ -1213,7 +1213,6 @@ $t(common.appNameFull)
       readOnly: 'Только для чтения',
       relevantIf: 'Актуально, если',
       script: 'Скрипт',
-      shownAsHyperlink: 'Показать как гиперссылку',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1259,6 +1258,11 @@ $t(common.appNameFull)
       },
     },
     textProps: {
+      displayAsTypes: {
+        hyperlink: 'Гиперссылка',
+        markdown: 'Markdown',
+        text: 'Текст',
+      },
       textInputType: 'Тип текстового ввода',
       textInputTypes: {
         singleLine: 'Одна строка',
@@ -1282,7 +1286,6 @@ $t(common.appNameFull)
     codeProps: {
       category: 'Категория',
       codeShown: 'Показать код',
-      displayAs: 'Отображать как',
       displayAsTypes: {
         checkbox: 'Флажок',
         dropdown: 'Выпадающий список',

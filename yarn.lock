@@ -5025,6 +5025,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/trusted-types@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "@types/trusted-types@npm:2.0.7"
+  checksum: 10c0/4c4855f10de7c6c135e0d32ce462419d8abbbc33713b31d294596c0cc34ae1fa6112a2f9da729c8f7a20707782b0d69da3b1f8df6645b0366d08825ca1522e0c
+  languageName: node
+  linkType: hard
+
 "@types/use-sync-external-store@npm:^0.0.6":
   version: 0.0.6
   resolution: "@types/use-sync-external-store@npm:0.0.6"
@@ -8552,6 +8559,18 @@ __metadata:
   dependencies:
     domelementtype: "npm:^2.2.0"
   checksum: 10c0/5c199c7468cb052a8b5ab80b13528f0db3d794c64fc050ba793b574e158e67c93f8336e87fd81e9d5ee43b0e04aea4d8b93ed7be4899cb726a1601b3ba18538b
+  languageName: node
+  linkType: hard
+
+"dompurify@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "dompurify@npm:3.3.0"
+  dependencies:
+    "@types/trusted-types": "npm:^2.0.7"
+  dependenciesMeta:
+    "@types/trusted-types":
+      optional: true
+  checksum: 10c0/66b1787b0bc8250d8f58e13284cf7f5f6bb400a0a55515e7a2a030316a4bb0d8306fdb669c17ed86ed58ff7e53c62b5da4488c2f261d11c58870fe01b8fcc486
   languageName: node
   linkType: hard
 
@@ -14422,6 +14441,7 @@ __metadata:
     css-loader: "npm:^6.10.0"
     csv-load-sync: "npm:^2.3.1"
     d3: "npm:^7.9.0"
+    dompurify: "npm:^3.3.0"
     dotenv: "npm:^16.4.5"
     eslint: "npm:^8.57.0"
     eslint-config-prettier: "npm:^9.1.0"
