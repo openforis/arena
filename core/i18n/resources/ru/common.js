@@ -1286,7 +1286,6 @@ $t(common.appNameFull)
     codeProps: {
       category: 'Категория',
       codeShown: 'Показать код',
-      displayAs: 'Отображать как',
       displayAsTypes: {
         checkbox: 'Флажок',
         dropdown: 'Выпадающий список',

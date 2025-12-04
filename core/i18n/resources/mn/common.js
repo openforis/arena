@@ -1278,7 +1278,6 @@ $t(common.appNameFull)
     codeProps: {
       category: 'Ангилал',
       codeShown: 'Кодыг харуулах',
-      displayAs: 'Илэрхийлэх',
       displayAsTypes: {
         checkbox: 'Чекбокс',
         dropdown: 'Дропдаун',

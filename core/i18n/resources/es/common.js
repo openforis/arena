@@ -1105,7 +1105,6 @@ export default {
     codeProps: {
       category: 'Categoría',
       codeShown: 'Mostrar código',
-      displayAs: 'Mostrar como',
       displayAsTypes: {
         checkbox: 'Casilla de verificación',
         dropdown: 'Desplegable',
