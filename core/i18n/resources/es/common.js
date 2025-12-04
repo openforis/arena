@@ -1032,7 +1032,6 @@ export default {
       readOnly: 'Solo lectura',
       relevantIf: 'Relevante si',
       script: 'Script',
-      shownAsHyperlink: 'Mostrar como hipervínculo',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1078,6 +1077,11 @@ export default {
       },
     },
     textProps: {
+      displayAsTypes: {
+        hyperlink: 'Hipervínculo',
+        markdown: 'Markdown',
+        text: 'Texto',
+      },
       textInputType: 'Tipo de entrada de texto',
       textInputTypes: {
         singleLine: 'Una sola línea',
@@ -1101,7 +1105,6 @@ export default {
     codeProps: {
       category: 'Categoría',
       codeShown: 'Mostrar código',
-      displayAs: 'Mostrar como',
       displayAsTypes: {
         checkbox: 'Casilla de verificación',
         dropdown: 'Desplegable',

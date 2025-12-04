@@ -93,7 +93,7 @@ const CodeProps = (props) => {
             </FormItem>
           )}
 
-          <FormItem label="nodeDefEdit.codeProps.displayAs">
+          <FormItem label="nodeDefEdit.basicProps.displayAs">
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
               onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
