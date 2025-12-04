@@ -115,12 +115,12 @@ const NodeDefText = (props) => {
   }
   const node = nodes[0]
   if (isReadOnly) {
+    const value = Node.getValue(node, '')
     if (isHyperlink) {
-      return <Link href={Node.getValue(node, '')} />
+      return <Link href={value} />
     }
     if (isMarkdown) {
-      const text = Node.getValue(node, '')
-      return <Markdown source={text} />
+      return <Markdown source={value} />
     }
   }
   return <TextInput {...props} node={node} />
