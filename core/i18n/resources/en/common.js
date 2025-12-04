@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+
 export default {
   common: {
     active: 'Active',
@@ -1222,7 +1224,6 @@ E.g. this.region = region_attribute_name
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
-      shownAsHyperlink: 'Shown as hyperlink',
     },
     mobileAppProps: {
       hiddenInMobile: {

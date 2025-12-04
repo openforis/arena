@@ -1205,7 +1205,6 @@ $t(common.appNameFull)
       readOnly: 'Зөвхөн унших',
       relevantIf: 'Хэрэв хамааралтай бол',
       script: 'Скрипт',
-      shownAsHyperlink: 'Гипер холбоосоор харуулах',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1251,6 +1250,11 @@ $t(common.appNameFull)
       },
     },
     textProps: {
+      displayAsTypes: {
+        hyperlink: 'Гиперлинк',
+        markdown: 'Markdown',
+        text: 'Текст',
+      },
       textInputType: 'Текстийн оролтын төрөл',
       textInputTypes: {
         singleLine: 'Нэг мөр',
@@ -1278,9 +1282,6 @@ $t(common.appNameFull)
       displayAsTypes: {
         checkbox: 'Чекбокс',
         dropdown: 'Дропдаун',
-        hyperlink: 'Гиперлинк',
-        markdown: 'Markdown',
-        text: 'Текст',
       },
       parentCode: 'Эх код',
     },
