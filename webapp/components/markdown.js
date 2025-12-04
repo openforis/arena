@@ -17,10 +17,6 @@ const Markdown = (props) => {
     setOutput(DOMPurify.sanitize(parsedSource))
   }, [source])
 
-  if (!output) {
-    return null
-  }
-
   return <Container className={className} dangerouslySetInnerHTML={{ __html: output }} />
 }
 
