@@ -1,9 +1,17 @@
+@use '~@webapp/style/vars' as *;
+
 .btn-checkbox {
   display: inline-flex;
   align-items: center;
 
   .tooltip {
     display: inline-flex;
+  }
+
+  .tooltip-error {
+    .MuiCheckbox-root {
+      color: $red;
+    }
   }
 
   .info-icon-btn {
