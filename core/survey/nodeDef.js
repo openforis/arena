@@ -257,7 +257,6 @@ export const isFormHeader = isType(nodeDefType.formHeader)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
 export const isHidden = getProp(propKeys.hidden, false)
-export const isShownAsHyperlink = getProp(propKeys.shownAsHyperlink, false)
 
 export const getLayout = getProp(propKeys.layout, {})
 
@@ -670,7 +669,7 @@ export const canMultipleAttributeBeAggregated = (nodeDef) =>
 
 export const canNameBeEdited = (nodeDef) => !isSampling(nodeDef)
 export const canBeHidden = (nodeDef) => isReadOnly(nodeDef)
-export const canBeShownAsHyperlink = (nodeDef) => isText(nodeDef) && isReadOnly(nodeDef)
+export const canBeShownAsHyperlinkOrMarkdown = (nodeDef) => isText(nodeDef) && isReadOnly(nodeDef)
 export const canBeHiddenInMobile = (nodeDef) =>
   !isKey(nodeDef) && !NodeDefValidations.isRequired(getValidations(nodeDef))
 
@@ -715,9 +714,12 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
     nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenInMobile })(nodeDefUpdated)
   }
-  // clear shown as hyperlink if not applicabled
-  if (!canBeShownAsHyperlink(nodeDefUpdated) && isShownAsHyperlink(nodeDef)) {
-    nodeDefUpdated = assocProp({ key: propKeys.shownAsHyperlink, value: false })(nodeDefUpdated)
+  // clear shown as hyperlink or Markdown if not applicable
+  if (
+    !canBeShownAsHyperlinkOrMarkdown(nodeDefUpdated) &&
+    NodeDefLayout.getRenderType(cycle)(nodeDef) !== NodeDefLayout.textRenderType.text
+  ) {
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.renderType })(nodeDefUpdated)
   }
   // clear include in multiple entity summary if not applicable
   if (
