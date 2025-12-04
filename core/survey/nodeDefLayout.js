@@ -65,15 +65,15 @@ export const newLayout = (cycle, renderAs, pageUuid = null) =>
 // ====== READ
 
 const layoutPropsDefault = {
-  indexChildren: [],
+  codeShown: true,
   columnsNo: 3,
   columnWidth: `${columnWidthMinPx}px`,
-  layoutChildren: [],
-  hiddenWhenNotRelevant: false,
   hiddenInMobile: false,
+  hiddenWhenNotRelevant: false,
   includedInMultipleEntitySummary: false,
   includedInPreviousCycleLink: true,
-  codeShown: true,
+  indexChildren: [],
+  layoutChildren: [],
 }
 
 export const getLayout = ObjectUtils.getProp(keys.layout, {})

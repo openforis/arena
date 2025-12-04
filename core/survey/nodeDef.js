@@ -714,8 +714,9 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
     nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenInMobile })(nodeDefUpdated)
   }
-  // clear shown as hyperlink or Markdown if not applicable
+  // text attribute: clear render type hyperlink or Markdown if not applicable
   if (
+    isText(nodeDef) &&
     !canBeShownAsHyperlinkOrMarkdown(nodeDefUpdated) &&
     NodeDefLayout.getRenderType(cycle)(nodeDef) !== NodeDefLayout.textRenderType.text
   ) {
