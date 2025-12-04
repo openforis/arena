@@ -2,26 +2,26 @@ import * as User from '@core/user/user'
 import analytics from '@webapp/service/analytics'
 import * as API from '@webapp/service/api'
 import { showJobMonitor } from '../app/job/actions'
-import { useI18n } from './i18n'
 
 export const SYSTEM_INIT = 'system/init'
 export const SYSTEM_RESET = 'system/reset'
 
 export const initSystem = () => async (dispatch) => {
-  const i18n = useI18n()
+  try {
+    const { user, survey } = await API.fetchLoggedInUserAndSurvey()
 
-  const { user, survey } = await API.fetchUserAndSurvey()
+    analytics.identify({ userId: user?.uuid, properties: user })
 
-  analytics.identify({
-    userId: user?.uuid,
-    properties: user,
-  })
+    dispatch({ type: SYSTEM_INIT, user, survey })
 
-  dispatch({ type: SYSTEM_INIT, user, survey })
-
-  const activeJob = await API.fetchActiveJob()
-  if (activeJob) {
-    dispatch(showJobMonitor({ job: activeJob }))
+    if (user) {
+      const activeJob = await API.fetchActiveJob()
+      if (activeJob) {
+        dispatch(showJobMonitor({ job: activeJob }))
+      }
+    }
+  } catch (error) {
+    dispatch({ type: SYSTEM_INIT, user: null, survey: null, errorMessage: String(error) })
   }
 
   const userPreferredLanguage = user ? User.getPrefLanguage(user) : null

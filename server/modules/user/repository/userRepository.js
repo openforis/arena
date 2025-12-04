@@ -16,12 +16,7 @@ import { DbOrder } from '@server/db'
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
 
-const userSortBy = {
-  email: 'email',
-  name: 'name',
-  lastLoginTime: 'last_login_time',
-  status: 'status',
-}
+const userSortBy = { email: 'email', name: 'name', lastLoginTime: 'last_login_time', status: 'status' }
 
 const orderByFieldBySortBy = {
   [userSortBy.email]: 'email',
@@ -124,12 +119,11 @@ GROUP BY gu.user_uuid`
 
 const getUsersSelectQueryPrefix = ({ includeSurveys = false }) => `
   WITH us AS (
-    SELECT DISTINCT ON (us.sess #>> '{passport,user}')
-      (us.sess #>> '{passport,user}')::uuid AS user_uuid,
-      (us.expire - interval '30 days') AS last_login_time
-    FROM user_sessions us
-    WHERE us.sess #>> '{passport,user}' IS NOT NULL
-    ORDER BY us.sess #>> '{passport,user}', expire DESC
+    SELECT DISTINCT ON(us.user_uuid)
+      us.user_uuid, 
+      us.date_created AS last_login_time
+    FROM user_refresh_token us
+    ORDER BY us.user_uuid, date_created DESC
   )
   ${includeSurveys ? `, user_surveys AS (${_userSurveysSelect})` : ''}
   `
@@ -260,14 +254,15 @@ export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, cl
   const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
 
   return client.map(
-    `SELECT uuid 
+    `SELECT u.uuid 
     FROM "user" u 
-      JOIN user_sessions us
-      ON (us.sess #>> '{passport,user}')::uuid = u.uuid
+      JOIN user_refresh_token us
+      ON 
+        us.user_uuid = u.uuid
+         -- fetch users with active sessions (interactions in the last hour)
+        AND (us.date_created + INTERVAL '1 hour') > NOW() at time zone 'utc'
     WHERE prefs #>> ${surveyCurrentJsonbPath} = $1 
-      -- fetch users with active sessions (interactions in the last hour)
-      AND (us.expire - INTERVAL '30 days - 1 hour') > NOW() at time zone 'utc'
-    GROUP BY uuid`,
+    GROUP BY u.uuid`,
     [surveyId],
     (row) => row.uuid
   )

@@ -1,6 +1,5 @@
+export { fetchLoggedInUserAndSurvey } from './fetchUserAndSurvey'
 export { fetchVersion } from './generic'
-
-export { fetchUserAndSurvey } from './fetchUserAndSurvey'
 
 export {
   fetchCategories,
