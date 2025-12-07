@@ -3,7 +3,6 @@ import { AreaBasedEstimatedOfNodeDef } from '@common/analysis/areaBasedEstimated
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -67,14 +66,12 @@ const _fixUpdatedAreaBasedEstimatedOfNodeDefs = async ({ user, surveyId }, tx) =
   )
   const chains = await ChainRepository.fetchChains({ surveyId }, tx)
 
-  await PromiseUtils.each(Survey.getNodeDefsArray(survey), async (nodeDef) => {
+  for (const nodeDef of Survey.getNodeDefsArray(survey)) {
     const chainUuid = NodeDef.getChainUuid(nodeDef)
     if (chainUuid) {
       const areaBasedEstimatedOfNodeDef = Survey.getAreaBasedEstimatedOfNodeDef(nodeDef)(survey)
       if (areaBasedEstimatedOfNodeDef) {
-        const expectedName = AreaBasedEstimatedOfNodeDef.getName({
-          estimatedOfNodeDef: areaBasedEstimatedOfNodeDef,
-        })
+        const expectedName = AreaBasedEstimatedOfNodeDef.getName({ estimatedOfNodeDef: areaBasedEstimatedOfNodeDef })
         if (NodeDef.getName(nodeDef) !== expectedName) {
           // ancestors node defs have been updated, so the name of this node def must be updated too
           const chain = chains.find((_chain) => Chain.getUuid(_chain) === chainUuid)
@@ -88,7 +85,7 @@ const _fixUpdatedAreaBasedEstimatedOfNodeDefs = async ({ user, surveyId }, tx) =
         }
       }
     }
-  })
+  }
   return { nodeDefsUpdated, nodeDefsValidation }
 }
 

@@ -10,12 +10,15 @@ export const useUpdateCategoryItemExtraPropItem = ({ setState }) => {
   const surveyId = useSurveyId()
   const refreshCategory = useRefreshCategory({ setState })
 
-  return useCallback(async ({ categoryUuid, name, itemExtraDef = null, deleted = false }) => {
-    const category = await API.updateCategoryItemExtraDefItem({ surveyId, categoryUuid, name, itemExtraDef, deleted })
+  return useCallback(
+    async ({ categoryUuid, name, itemExtraDef = null, deleted = false }) => {
+      const category = await API.updateCategoryItemExtraDefItem({ surveyId, categoryUuid, name, itemExtraDef, deleted })
 
-    refreshCategory({ category })
+      refreshCategory({ category })
 
-    dispatch(SurveyActions.surveyCategoryUpdated(category))
-    dispatch(SurveyActions.metaUpdated())
-  }, [])
+      dispatch(SurveyActions.surveyCategoryUpdated(category))
+      dispatch(SurveyActions.metaUpdated())
+    },
+    [dispatch, refreshCategory, surveyId]
+  )
 }

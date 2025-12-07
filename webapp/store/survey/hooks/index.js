@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
@@ -6,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useOnUpdate } from '@webapp/components/hooks'
+import * as API from '@webapp/service/api'
 
 import * as SurveyState from '../state'
 import { SurveyStatusState } from '../status'
@@ -126,3 +128,22 @@ export const useSurveyHasFileAttributes = () =>
   })
 
 export const useIsSurveyDirty = () => useSelector(SurveyStatusState.isDirty)
+
+export const useChains = () => {
+  const surveyId = useSurveyId()
+  const [chains, setChains] = useState(null)
+  useEffect(() => {
+    let isMounted = true
+    const fetchChains = async () => {
+      const { chains: _chains } = await API.fetchChains({ surveyId })
+      if (isMounted) {
+        setChains(_chains)
+      }
+    }
+    fetchChains()
+    return () => {
+      isMounted = false
+    }
+  }, [surveyId])
+  return chains
+}

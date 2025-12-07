@@ -6,7 +6,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
-
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     services:
       postgres:
         image: postgis/postgis:12-3.0
@@ -19,11 +20,11 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: microsoft/playwright-github-action@v1
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: '22.14.0'
+          node-version: '24.11.1'
           always-auth: true
           auth-token: ${{secrets.ACCESS_TOKEN}}
           registry-url: 'https://npm.pkg.github.com'
@@ -48,6 +49,7 @@ jobs:
           PGPASSWORD: arena
           SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
           ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
+          ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}
           SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
       - name: Wait for server to start
         run: while ! nc -z localhost 9090; do sleep 5; done;

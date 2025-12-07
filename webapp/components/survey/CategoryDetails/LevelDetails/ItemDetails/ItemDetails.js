@@ -1,6 +1,7 @@
 import './itemDetails.scss'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
 import * as Category from '@core/survey/category'
@@ -18,7 +19,6 @@ import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { State, useActions } from '../../store'
-import classNames from 'classnames'
 import { ItemExtraPropsEditor } from './ItemExtraPropsEditor'
 
 const ItemDetails = (props) => {
@@ -69,6 +69,21 @@ const ItemDetails = (props) => {
       }
     }
   }, [active])
+
+  const onMoveUpClick = useCallback(
+    () => Actions.moveItem({ setItem, category, level, item, offset: -1 }),
+    [Actions, category, item, level]
+  )
+
+  const onMoveDownClick = useCallback(
+    () => Actions.moveItem({ setItem, category, level, item, offset: 1 }),
+    [Actions, category, item, level]
+  )
+
+  const onDeleteClick = useCallback(
+    () => Actions.deleteItem({ category, level, item, leaf }),
+    [Actions, category, item, leaf, level]
+  )
 
   const prefixId = `category-level-${levelIndex}-item-${index}`
 
@@ -140,12 +155,29 @@ const ItemDetails = (props) => {
           )}
 
           {!readOnly && (
-            <ButtonDelete
-              testId={TestId.categoryDetails.itemDeleteBtn(levelIndex, index)}
-              disabled={disabled}
-              onClick={() => Actions.deleteItem({ category, level, item, leaf })}
-              label="categoryEdit.deleteItem"
-            />
+            <div className="button-bar">
+              <Button
+                disabled={CategoryItem.getIndex(item) === 0}
+                className="move-up-btn"
+                iconClassName="icon-arrow-up2 icon-12px"
+                label="common.moveUp"
+                onClick={onMoveUpClick}
+                variant="outlined"
+              />
+              <Button
+                className="move-down-btn"
+                iconClassName="icon-arrow-down2 icon-12px"
+                label="common.moveDown"
+                onClick={onMoveDownClick}
+                variant="outlined"
+              />
+              <ButtonDelete
+                testId={TestId.categoryDetails.itemDeleteBtn(levelIndex, index)}
+                disabled={disabled}
+                onClick={onDeleteClick}
+                label="categoryEdit.deleteItem"
+              />
+            </div>
           )}
         </>
       ) : (

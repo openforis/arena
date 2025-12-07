@@ -44,6 +44,6 @@ export default class SurveyInfoExportJob extends Job {
     }
     archive.append(JSON.stringify(surveyFull, null, 2), { name: ExportFile.survey })
 
-    this.setContext({ survey })
+    this.setContext({ survey, surveyFull })
   }
 }

@@ -1,5 +1,3 @@
-import * as PromiseUtils from '@core/promiseUtils'
-
 import Job from '@server/job/job'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import { ExportFile } from '../exportFile'
@@ -31,7 +29,7 @@ export default class CategoriesExportJob extends Job {
       this.ts
     )
 
-    await PromiseUtils.each(categoriesUuids, async (categoryUuid) => {
+    for (const categoryUuid of categoriesUuids) {
       const itemsCount = itemsCountByCategoryUuid[categoryUuid]
       const totalPages = Math.ceil(itemsCount / itemsBatchSize)
       const pageIndexes = ArrayUtils.fromNumberOfElements(totalPages)
@@ -46,12 +44,10 @@ export default class CategoriesExportJob extends Job {
           totalPages === 1
             ? ExportFile.categoryItemsSingleFile({ categoryUuid })
             : ExportFile.categoryItemsPart({ categoryUuid, index: pageIndex })
-        archive.append(JSON.stringify(itemsData, null, 2), {
-          name: fileName,
-        })
+        archive.append(JSON.stringify(itemsData), { name: fileName })
       }
 
       this.incrementProcessedItems()
-    })
+    }
   }
 }

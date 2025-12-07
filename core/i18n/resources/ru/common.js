@@ -663,6 +663,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
 - при подтверждении объединения, **запись-источник БУДЕТ УДАЛЕНА**`,
       confirmUpdateRecordsStep: `Переместить выбранные {{count}} записей из {{stepFrom}} в {{stepTo}}?`,
       confirmUpdateRecordOwner: `Изменить владельца выбранной записи на {{ownerName}}?`,
+      confirmValidateAllRecords: `Перепроверить все записи?\n\nЭто может занять несколько минут.`,
       deleteRecord: 'Удалить запись',
       demoteAllRecordsFromAnalysis: 'Анализ -> Очистка',
       demoteAllRecordsFromCleansing: 'Очистка -> Ввод',
@@ -691,6 +692,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       promoteAllRecordsToCleansing: 'Ввод -> Очистка',
       step: 'Шаг',
       updateRecordsStep: 'Обновить шаг записей',
+      validateAll: 'Проверить всё',
       viewRecord: 'Просмотреть запись',
     },
     recordsClone: {
@@ -746,7 +748,6 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
   mapView: {
     createRecord: 'Создать новую запись',
     editRecord: 'Редактировать запись',
-    earthMap: 'Карта Земли',
     elevation: 'Высота (м)',
     location: 'Местоположение',
     locationEditInfo: 'Дважды щелкните на карте или перетащите маркер, чтобы обновить местоположение',
@@ -766,9 +767,6 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       levelCode: 'Код уровня {{level}}',
     },
     selectedPeriod: 'Выбранный период',
-    whisp: 'Шепот',
-    whispEarthMap: 'Карта Земли Шепота',
-    whispCsv: 'Шепот CSV',
   },
 
   samplingPolygonOptions: {
@@ -1260,6 +1258,11 @@ $t(common.appNameFull)
       },
     },
     textProps: {
+      displayAsTypes: {
+        hyperlink: 'Гиперссылка',
+        markdown: 'Markdown',
+        text: 'Текст',
+      },
       textInputType: 'Тип текстового ввода',
       textInputTypes: {
         singleLine: 'Одна строка',
@@ -1283,7 +1286,6 @@ $t(common.appNameFull)
     codeProps: {
       category: 'Категория',
       codeShown: 'Показать код',
-      displayAs: 'Отображать как',
       displayAsTypes: {
         checkbox: 'Флажок',
         dropdown: 'Выпадающий список',

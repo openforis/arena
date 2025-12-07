@@ -29,7 +29,7 @@ const ENV = {
   tempFolder: process.env.TEMP_FOLDER || '/tmp/arena_upload',
   buildReport: isTrue(process.env.BUILD_REPORT),
   // APP VERSION
-  applicationVersion: process.env.APPLICATION_VERSION,
+  applicationVersion: process.env.APP_VERSION,
   // DB
   dbUrl,
   pgUser,

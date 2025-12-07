@@ -1,4 +1,4 @@
-import { Objects, Promises } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
 import Job from '@server/job/job'
@@ -20,17 +20,15 @@ export default class ChainsSamplingNodeDefsCheckJob extends Job {
       tx
     )
     const chains = await AnalysisManager.fetchChains({ surveyId }, tx)
-    await Promises.each(chains, async (chain) => {
+    for (const chain of chains) {
       const { nodeDefsToCreate, nodeDefsToDelete } = SamplingNodeDefs.determinePlotAreaNodeDefs({ survey, chain })
-      if (!Objects.isEmpty(nodeDefsToDelete)) {
-        await Promises.each(nodeDefsToDelete, async (nodeDefToDelete) => {
-          await NodeDefManager.markNodeDefDeleted({ user, survey, nodeDefUuid: nodeDefToDelete.uuid }, tx)
-        })
+      for (const nodeDefToDelete of nodeDefsToDelete) {
+        await NodeDefManager.markNodeDefDeleted({ user, survey, nodeDefUuid: nodeDefToDelete.uuid }, tx)
       }
       if (!Objects.isEmpty(nodeDefsToCreate)) {
         await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: nodeDefsToCreate }, tx)
       }
-    })
+    }
   }
 }
 

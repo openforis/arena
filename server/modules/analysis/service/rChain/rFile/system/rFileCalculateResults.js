@@ -1,7 +1,5 @@
-import * as PromiseUtils from '@core/promiseUtils'
-
-import RFileSystem from './rFileSystem'
 import DfResults from './dfResults'
+import RFileSystem from './rFileSystem'
 
 export default class RFileCalculateResults extends RFileSystem {
   constructor(rChain) {
@@ -11,13 +9,13 @@ export default class RFileCalculateResults extends RFileSystem {
   async generateChainEntitiesResults() {
     const { entitiesWithActiveQuantitativeVariables } = this.rChain
 
-    await PromiseUtils.each(entitiesWithActiveQuantitativeVariables, async (entity) => {
+    for (const entity of entitiesWithActiveQuantitativeVariables) {
       const dfResults = new DfResults(this.rChain, entity)
 
       await this.logInfo(`'Generating results for entity ${dfResults.dfSourceName} started'`)
       await this.appendContent(...dfResults.scripts)
       await this.logInfo(`'Generating results for entity ${dfResults.dfSourceName} completed'`)
-    })
+    }
   }
 
   async init() {

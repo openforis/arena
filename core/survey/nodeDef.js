@@ -63,6 +63,7 @@ export const propKeys = {
   layout: 'layout',
   // available only when readOnly is true
   hidden: 'hidden',
+  shownAsHyperlink: 'shownAsHyperlink',
 
   // Text
   textInputType: 'textInputType',
@@ -668,6 +669,7 @@ export const canMultipleAttributeBeAggregated = (nodeDef) =>
 
 export const canNameBeEdited = (nodeDef) => !isSampling(nodeDef)
 export const canBeHidden = (nodeDef) => isReadOnly(nodeDef)
+export const canBeShownAsHyperlinkOrMarkdown = (nodeDef) => isText(nodeDef) && isReadOnly(nodeDef)
 export const canBeHiddenInMobile = (nodeDef) =>
   !isKey(nodeDef) && !NodeDefValidations.isRequired(getValidations(nodeDef))
 
@@ -711,6 +713,14 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   // clear hidden in mobile if not applicable
   if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
     nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenInMobile })(nodeDefUpdated)
+  }
+  // text attribute: clear render type hyperlink or Markdown if not applicable
+  if (
+    isText(nodeDef) &&
+    !canBeShownAsHyperlinkOrMarkdown(nodeDefUpdated) &&
+    NodeDefLayout.getRenderType(cycle)(nodeDef) !== NodeDefLayout.textRenderType.text
+  ) {
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.renderType })(nodeDefUpdated)
   }
   // clear include in multiple entity summary if not applicable
   if (

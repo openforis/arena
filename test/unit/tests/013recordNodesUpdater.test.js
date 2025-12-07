@@ -88,7 +88,7 @@ describe('RecordNodesUpdater Test', () => {
     })(record)
 
     // expect plot descendant nodes created
-    const expectedNodesCreatedCount = 1 + Survey.getNodeDefChildren(treeDef)(survey).length // tree node + descendants
+    const expectedNodesCreatedCount = 1 + Survey.getNodeDefChildren({ nodeDef: treeDef })(survey).length // tree node + descendants
     expect(Object.values(nodesUpdated).length).toBe(expectedNodesCreatedCount)
 
     // expect node value has been updated
@@ -175,10 +175,7 @@ describe('RecordNodesUpdater Test', () => {
     const { record: recordUpdated } = await Record.updateAttributesWithValues({
       survey,
       entityDefUuid: plotDef.uuid,
-      valuesByDefUuid: {
-        [plotIdDef.uuid]: 1,
-        [plotRemarksDef.uuid]: 'This is plot 1 (modified)',
-      },
+      valuesByDefUuid: { [plotIdDef.uuid]: 1, [plotRemarksDef.uuid]: 'This is plot 1 (modified)' },
     })(record)
 
     // expect plot remarks to be "This is plot 1 (modified)"

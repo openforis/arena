@@ -18,6 +18,7 @@ import { useFetchLevelItems } from './item/useFetchLevelItems'
 import { useSetItemActive } from './item/useSetItemActive'
 import { useResetItemActive } from './item/useResetItemActive'
 import { useUpdateItemProp } from './item/useUpdateItemProp'
+import { useMoveItem } from './item/useMoveItem'
 import { useDeleteItem } from './item/useDeleteItem'
 
 export const useActions = ({ setState }) => ({
@@ -47,5 +48,6 @@ export const useActions = ({ setState }) => ({
   setItemActive: useSetItemActive({ setState }),
   resetItemActive: useResetItemActive({ setState }),
   updateItemProp: useUpdateItemProp({ setState }),
+  moveItem: useMoveItem({ setState }),
   deleteItem: useDeleteItem({ setState }),
 })

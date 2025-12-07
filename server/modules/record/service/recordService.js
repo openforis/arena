@@ -10,7 +10,6 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as A from '@core/arena'
 import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Record from '@core/record/record'
@@ -38,11 +37,12 @@ import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProv
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
-import RecordsCloneJob from './recordsCloneJob'
-import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
+import RecordsCloneJob from './recordsCloneJob'
+import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
+import RecordsValidationJob from './recordsValidationJob'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -97,11 +97,7 @@ export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat })
         formatTo: DateUtils.formats.dateDefault,
       }),
     [NodeDef.nodeDefType.time]: ({ value }) =>
-      DateUtils.convertDate({
-        dateStr: value,
-        formatFrom: 'HH:mm:ss',
-        formatTo: DateUtils.formats.timeStorage,
-      }),
+      DateUtils.convertDate({ dateStr: value, formatFrom: 'HH:mm:ss', formatTo: DateUtils.formats.timeStorage }),
   }
 
   const objectTransformer = (recordSummary) => {
@@ -179,9 +175,9 @@ export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notif
 export const deleteRecords = async ({ socketId, user, surveyId, recordUuids }) => {
   Logger.debug('deleting records - surveyId:', surveyId, 'recordUuids:', recordUuids)
 
-  await PromiseUtils.each(recordUuids, async (recordUuid) => {
+  for (const recordUuid of recordUuids) {
     await deleteRecord({ socketId, user, surveyId, recordUuid })
-  })
+  }
 
   Logger.debug('records deleted - surveyId:', surveyId, 'recordUuids:', recordUuids)
 }
@@ -189,10 +185,10 @@ export const deleteRecords = async ({ socketId, user, surveyId, recordUuids }) =
 export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
   let count = 0
-  await PromiseUtils.each(surveyIds, async (surveyId) => {
+  for (const surveyId of surveyIds) {
     const deletedRecordsCount = await RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)
     count += deletedRecordsCount
-  })
+  }
   return count
 }
 
@@ -266,6 +262,12 @@ export const startValidationReportGenerationJob = ({ user, surveyId, cycle, lang
   return job
 }
 
+export const startRecordsValidationJob = ({ user, surveyId }) => {
+  const job = new RecordsValidationJob({ user, surveyId })
+  JobManager.enqueueJob(job)
+  return job
+}
+
 // NODE
 const _sendNodeUpdateMessage = ({ socketId, user, recordUuid, msg }) => {
   RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
@@ -309,15 +311,7 @@ export const persistNode = async ({
     socketId,
     user,
     recordUuid,
-    msg: {
-      type: RecordsUpdateThreadMessageTypes.nodePersist,
-      surveyId,
-      cycle,
-      draft,
-      node,
-      user,
-      timezoneOffset,
-    },
+    msg: { type: RecordsUpdateThreadMessageTypes.nodePersist, surveyId, cycle, draft, node, user, timezoneOffset },
   })
 }
 
@@ -439,12 +433,7 @@ export const mergeRecords = async (
     const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid }, tx)
 
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      {
-        surveyId,
-        advanced: true,
-        includeBigCategories: false,
-        includeBigTaxonomies: false,
-      },
+      { surveyId, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
       tx
     )
 
@@ -470,11 +459,7 @@ export const mergeRecords = async (
       await persistRecordNodes({ user, survey, record: recordTargetUpdated, nodesArray }, tx)
 
       await RecordManager.updateRecordMergedInto(
-        {
-          surveyId,
-          recordUuid: sourceRecordUuid,
-          mergedIntoRecordUuid: targetRecordUuid,
-        },
+        { surveyId, recordUuid: sourceRecordUuid, mergedIntoRecordUuid: targetRecordUuid },
         tx
       )
       await SurveyRdbManager.deleteRowsByRecordUuid({ survey, recordUuid: sourceRecordUuid }, tx)

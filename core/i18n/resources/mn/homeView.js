@@ -20,6 +20,7 @@ export default {
     },
     exportWithData: 'Экспорт + өгөгдөл (Нөөц)',
     exportWithDataNoActivityLog: 'Экспорт + өгөгдөл (ҮЙЛ АЖИЛЛАГААНЫ БҮРТГЭЛГҮЙ)',
+    exportWithDataNoResultAttributes: 'Экспорт + өгөгдөл (Үр дүнгийн Атрибут ҮГҮЙ)',
     surveyPropUpdate: {
       main: `<title>Аренад тавтай морилно уу</title>
   

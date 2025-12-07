@@ -20,6 +20,7 @@ export {
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
   updateCategoryItemProp,
+  updateCategoryItemIndexes,
 } from './categories'
 export { fetchChains, getChainSummaryExportUrl } from './analysis'
 
@@ -54,6 +55,7 @@ export {
   startExportDataSummaryJob,
   downloadExportedDataSummaryUrl,
   startRecordsCloneJob,
+  startRecordsValidationJob,
   mergeRecords,
   startValidationReportGeneration,
   getValidationReportDownloadUrl,

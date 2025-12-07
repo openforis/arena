@@ -13,8 +13,9 @@ import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
-
 import { NotificationActions } from '@webapp/store/ui'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
+
 import { Dropzone } from '@webapp/components'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
@@ -23,7 +24,6 @@ import { FileUtils } from '@webapp/utils/fileUtils'
 
 import { ImportStartButton } from './ImportStartButton'
 
-const fileMaxSize = 1000 // 1 GB
 const acceptedFileExtensions = ['zip']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
 
@@ -51,11 +51,15 @@ const generateImportSummary = ({ result, i18n }) =>
     .join('\n')
 
 export const DataImportArenaView = () => {
+  const userIsSystemAdmin = useUserIsSystemAdmin()
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
+  const fileMaxSize = userIsSystemAdmin
+    ? 2048 // 2 GB
+    : 1024 // 1 GB
 
   const [cycle, setCycle] = useState(surveyCycle)
   const [conflictResolutionStrategy, setConflictResolutionStrategy] = useState(ConflictResolutionStrategy.skipExisting)

@@ -12,37 +12,45 @@ import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../../state'
 
-const _delete = ({ surveyId, category, level, item, setState }) => async (dispatch) => {
-  dispatch(LoaderActions.showLoader())
+const _delete =
+  ({ surveyId, category, level, item, setState }) =>
+  async (dispatch) => {
+    dispatch(LoaderActions.showLoader())
 
-  const {
-    data: { category: categoryUpdated },
-  } = await axios.delete(
-    `/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/${CategoryItem.getUuid(item)}`
-  )
-  setState(
-    A.pipe(
-      State.dissocItem({ levelIndex: CategoryLevel.getIndex(level), itemUuid: CategoryItem.getUuid(item) }),
-      State.assocCategory({ category: categoryUpdated })
+    const levelIndex = CategoryLevel.getIndex(level)
+    const itemUuid = CategoryItem.getUuid(item)
+    const deletedItemIndex = CategoryItem.getIndex(item)
+
+    const {
+      data: { category: categoryUpdated },
+    } = await axios.delete(`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/${itemUuid}`)
+    setState(
+      A.pipe(
+        State.dissocItem({ levelIndex, itemUuid }),
+        State.updateSiblingItemIndexesAfterDelete({ levelIndex, deletedItemIndex }),
+        State.assocCategory({ category: categoryUpdated })
+      )
     )
-  )
 
-  dispatch(SurveyActions.metaUpdated())
-  dispatch(LoaderActions.hideLoader())
-}
+    dispatch(SurveyActions.metaUpdated())
+    dispatch(LoaderActions.hideLoader())
+  }
 
 export const useDeleteItem = ({ setState }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
 
-  return useCallback(({ category, level, item, leaf }) => {
-    const messageKeyConfirm = leaf ? 'categoryEdit.confirmDeleteItem' : 'categoryEdit.confirmDeleteItemWithChildren'
+  return useCallback(
+    ({ category, level, item, leaf }) => {
+      const messageKeyConfirm = leaf ? 'categoryEdit.confirmDeleteItem' : 'categoryEdit.confirmDeleteItemWithChildren'
 
-    dispatch(
-      DialogConfirmActions.showDialogConfirm({
-        key: messageKeyConfirm,
-        onOk: () => dispatch(_delete({ surveyId, category, level, item, setState })),
-      })
-    )
-  }, [])
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: messageKeyConfirm,
+          onOk: () => dispatch(_delete({ surveyId, category, level, item, setState })),
+        })
+      )
+    },
+    [dispatch, setState, surveyId]
+  )
 }

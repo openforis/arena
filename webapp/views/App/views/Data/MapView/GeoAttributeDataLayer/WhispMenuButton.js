@@ -9,6 +9,12 @@ const getWhispEarthMapUrl = (geojson) => `https://whisp.earthmap.org/?aoi=global
 
 const getWhispDataDownloadUrl = (token) => `https://whisp.openforis.org/api/download-csv/${token}`
 
+const labels = {
+  whisp: 'Whisp',
+  earthMap: 'Whisp Earth Map',
+  csv: 'Whisp CSV',
+}
+
 export const WhispMenuButton = (props) => {
   const { geoJsonGenerator } = props
 
@@ -23,7 +29,7 @@ export const WhispMenuButton = (props) => {
       const { data: token } = await axios.post(url, geojson)
       const csvDownloadUrl = getWhispDataDownloadUrl(token)
       setWhispDataLoading(false)
-      window.open(csvDownloadUrl, 'Whisp')
+      window.open(csvDownloadUrl, labels.whisp)
     } catch (_error) {
       setWhispDataLoading(false)
     }
@@ -38,11 +44,11 @@ export const WhispMenuButton = (props) => {
   const whispButtonDefinitions = useMemo(
     () => ({
       earthMap: {
-        label: 'mapView.whispEarthMap',
+        label: labels.earthMap,
         onClick: onWhispEarthMapButtonClick,
       },
       csv: {
-        label: 'mapView.whispCsv',
+        label: labels.csv,
         onClick: onWhispCsvButtonClick,
       },
     }),
@@ -58,7 +64,7 @@ export const WhispMenuButton = (props) => {
             disabled={whispDataLoading}
             label={label}
             iconHeight={25}
-            iconSrc="/img/of_whisp_icon.svg"
+            iconSrc="/img/of_whisp_icon.png"
             iconWidth={25}
             onClick={onClick}
             size="small"
@@ -73,10 +79,10 @@ export const WhispMenuButton = (props) => {
     <ButtonMenu
       className="whisp-menu-btn"
       disabled={whispDataLoading}
-      label={whispDataLoading ? 'common.loading' : 'mapView.whisp'}
+      label={whispDataLoading ? 'common.loading' : labels.whisp}
       iconAlt="Whisp"
       iconHeight={25}
-      iconSrc="/img/of_whisp_icon.svg"
+      iconSrc="/img/of_whisp_icon.png"
       items={buttons}
       variant="outlined"
     />

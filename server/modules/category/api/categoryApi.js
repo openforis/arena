@@ -453,6 +453,28 @@ export const init = (app) => {
   )
 
   app.put(
+    '/survey/:surveyId/categories/:categoryUuid/item-indexes',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, indexByUuid, parentUuid = null } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        await CategoryService.updateItemsIndex({
+          user,
+          surveyId,
+          categoryUuid,
+          indexByUuid,
+          parentUuid,
+        })
+        Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
     '/survey/:surveyId/categories/:categoryUuid/cleanup',
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
