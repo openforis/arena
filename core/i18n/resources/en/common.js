@@ -500,6 +500,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     errors: {
       rowNum: 'Row #',
     },
+    fileUploadChunkSize: {
+      label: 'File upload chunk size',
+    },
     forceImportFromAnotherSurvey: 'Force import from another survey',
 
     importFromArena: 'Arena/Arena Mobile',
