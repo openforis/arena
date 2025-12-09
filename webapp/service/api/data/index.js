@@ -118,39 +118,50 @@ export const startDataImportFromArenaJob = ({
   conflictResolutionStrategy,
   file,
   fileId,
+  chunkSize,
   onUploadProgress,
   dryRun = false,
   startFromChunk = 1,
 }) => {
-  let fileProcessor = null
-  const promise = new Promise((resolve, reject) => {
-    fileProcessor = new FileProcessor({
-      file,
-      chunkProcessor: async ({ chunk, totalChunks, content }) => {
-        const formData = objectToFormData({
-          fileId,
-          file: content,
-          chunk,
-          totalChunks,
-          cycle,
-          dryRun,
-          conflictResolutionStrategy,
-        })
-        const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, {
-          onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
-        })
-        return data
-      },
-      onComplete: (data) => {
-        resolve(data.job)
-      },
-      onError: (error) => {
-        reject(error)
-      },
+  const commonParameters = {
+    fileId,
+    cycle,
+    dryRun,
+    conflictResolutionStrategy,
+  }
+  if (chunkSize > 0) {
+    let fileProcessor = null
+    const promise = new Promise((resolve, reject) => {
+      fileProcessor = new FileProcessor({
+        file,
+        chunkSize,
+        chunkProcessor: async ({ chunk, totalChunks, content }) => {
+          const formData = objectToFormData({
+            ...commonParameters,
+            file: content,
+            chunk,
+            totalChunks,
+          })
+          const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, {
+            onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
+          })
+          return data
+        },
+        onComplete: (data) => {
+          resolve(data.job)
+        },
+        onError: (error) => {
+          reject(error)
+        },
+      })
+      fileProcessor.start(startFromChunk)
     })
-    fileProcessor.start(startFromChunk)
-  })
-  return { promise, processor: fileProcessor }
+    return { promise, processor: fileProcessor }
+  } else {
+    const formData = objectToFormData({ ...commonParameters, file })
+    const promise = axios.post(`/api/mobile/survey/${surveyId}`, formData, { onUploadProgress })
+    return { promise }
+  }
 }
 
 export const getDataImportFromCsvTemplateUrl = ({ surveyId }) =>

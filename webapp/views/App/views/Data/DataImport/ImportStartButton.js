@@ -129,44 +129,40 @@ export const ImportStartButton = (props) => {
     processorRef.current?.resume()
   }, [])
 
-  return (
-    <>
-      {uploadProgressPercent >= 0 ? (
-        <div className="import-start-btn-progress-container">
-          <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey={'common.uploadingFile'} />
-          {processorRef.current && (
-            <>
-              {status === stata.running ? (
-                <Button
-                  iconClassName="icon-pause icon-12px"
-                  label="common.pause"
-                  onClick={onUploadPauseClick}
-                  showLabel={false}
-                  variant="text"
-                />
-              ) : (
-                <Button
-                  iconClassName="icon-play3 icon-12px"
-                  label="common.resume"
-                  onClick={onUploadResumeClick}
-                  showLabel={false}
-                  variant="text"
-                />
-              )}
-              <ButtonIconCancel onClick={onUploadCancelClick} />
-            </>
+  return uploadProgressPercent >= 0 ? (
+    <div className="import-start-btn-progress-container">
+      <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey={'common.uploadingFile'} />
+      {processorRef.current && (
+        <>
+          {status === stata.running ? (
+            <Button
+              iconClassName="icon-pause icon-12px"
+              label="common.pause"
+              onClick={onUploadPauseClick}
+              showLabel={false}
+              variant="text"
+            />
+          ) : (
+            <Button
+              iconClassName="icon-play3 icon-12px"
+              label="common.resume"
+              onClick={onUploadResumeClick}
+              showLabel={false}
+              variant="text"
+            />
           )}
-        </div>
-      ) : (
-        <Button
-          className={className}
-          disabled={disabled || uploadProgressPercent >= 0}
-          label={label}
-          onClick={onStartClick}
-          testId={testId}
-        />
+          <ButtonIconCancel onClick={onUploadCancelClick} />
+        </>
       )}
-    </>
+    </div>
+  ) : (
+    <Button
+      className={className}
+      disabled={disabled || uploadProgressPercent >= 0}
+      label={label}
+      onClick={onStartClick}
+      testId={testId}
+    />
   )
 }
 
