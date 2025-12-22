@@ -169,20 +169,20 @@ export default class TableDataNodeDef extends TableSurveyRdb {
 
   getRowValuesByColumnName = ({ nodeRow, nodeDefColumns }) => {
     const { survey, nodeDef } = this
-    const getRowValuesByColumnName = TableDataNodeDefRowUtils.getValuesByColumnName({ survey, nodeRow, nodeDefColumns })
-    return {
+    const valuesByColumnName = TableDataNodeDefRowUtils.getValuesByColumnName({ survey, nodeRow, nodeDefColumns })
+    const result = {
       [columnSet.uuid]: nodeRow[columnSet.uuid],
       [columnSet.parentUuid]: nodeRow[columnSet.ancestorUuid],
       [columnSet.dateCreated]: nodeRow[columnSet.dateCreated],
       [columnSet.dateModified]: nodeRow[columnSet.dateModified],
-      ...(NodeDef.isRoot(nodeDef)
-        ? rootDefColumnNames.reduce((acc, colName) => {
-            acc[colName] = nodeRow[colName]
-            return acc
-          }, {})
-        : {}),
-      ...getRowValuesByColumnName,
     }
+    if (NodeDef.isRoot(nodeDef)) {
+      for (const colName of rootDefColumnNames) {
+        result[colName] = nodeRow[colName]
+      }
+    }
+    Object.assign(result, valuesByColumnName)
+    return result
   }
 }
 
