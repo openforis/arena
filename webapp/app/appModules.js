@@ -59,6 +59,11 @@ export const appModules = {
     path: 'analysis',
     icon: 'stats-dots',
   },
+  message: {
+    key: 'message',
+    path: 'message',
+    icon: 'envelop',
+  },
   help: {
     key: 'help',
     path: 'help',
@@ -235,6 +240,17 @@ export const analysisModules = {
   },
 }
 
+export const messageModules = {
+  messages: {
+    key: 'message_plural',
+    path: 'messages',
+  },
+  message: {
+    key: 'message',
+    path: 'message',
+  },
+}
+
 export const helpModules = {
   about: {
     key: 'about',
@@ -252,7 +268,15 @@ export const helpModules = {
   },
 }
 
-const allAppModuleGroups = [homeModules, designerModules, dataModules, userModules, analysisModules, helpModules]
+const allAppModuleGroups = [
+  homeModules,
+  designerModules,
+  dataModules,
+  userModules,
+  analysisModules,
+  messageModules,
+  helpModules,
+]
 
 export const app = 'app'
 
@@ -266,6 +290,7 @@ const _getModuleParentPathParts = (module) => {
   if (Object.values(dataModules).includes(module)) return _getModulePathParts(appModules.data)
   if (Object.values(userModules).includes(module)) return _getModulePathParts(appModules.users)
   if (Object.values(analysisModules).includes(module)) return _getModulePathParts(appModules.analysis)
+  if (Object.values(messageModules).includes(module)) return _getModulePathParts(appModules.message)
   if (Object.values(helpModules).includes(module)) return _getModulePathParts(appModules.help)
 
   throw new Error(`Parent path not found for module ${module?.path}`)

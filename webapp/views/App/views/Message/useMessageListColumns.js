@@ -15,6 +15,7 @@ export const useMessageListColumns = () => {
       {
         key: 'status',
         header: 'message:status',
+        renderItem: ({ item }) => item.status,
         width: '7rem',
       },
       {

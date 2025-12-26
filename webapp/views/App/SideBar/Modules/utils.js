@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 
@@ -12,6 +13,7 @@ import {
   homeModules,
   userModules,
   helpModules,
+  messageModules,
 } from '@webapp/app/appModules'
 
 const keys = {
@@ -84,6 +86,15 @@ export const getModulesHierarchy = (user, surveyInfo) => {
       children: [userModules.usersSurvey],
       hidden: !Authorizer.canViewSurveyUsers(user, surveyInfo) || Survey.isTemplate(surveyInfo),
     }),
+    // message
+    ...(User.isSystemAdmin(user)
+      ? [
+          getModule({
+            module: appModules.message,
+            children: [messageModules.messages],
+          }),
+        ]
+      : []),
     getModule({
       module: appModules.help,
       children: [helpModules.userManual, helpModules.about, helpModules.disclaimer],
