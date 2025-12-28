@@ -7,8 +7,7 @@ import { appModules } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
 import { injectReducers } from '@webapp/store'
 
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
-import { useAuthCanUseMessages } from '@webapp/store/user/hooks'
+import { useAuthCanUseAnalysis, useAuthCanUseMessages } from '@webapp/store/user'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 

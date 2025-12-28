@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import { AppSavingActions } from '@webapp/store/app'
 import { debounceAction } from '@webapp/utils/reduxUtils'
+
 import { MessageActionTypes } from './actionTypes'
 
 export const updateMessage =
@@ -11,7 +12,7 @@ export const updateMessage =
 
     const action = async () => {
       dispatch(AppSavingActions.showAppSaving())
-      const { data: messageUpdated } = await axios.put(`/api/survey/message`, { message })
+      const { data: messageUpdated } = await axios.put(`/api/message`, { message })
       dispatch({ type: MessageActionTypes.messageUpdate, message: messageUpdated })
       dispatch(AppSavingActions.hideAppSaving())
     }

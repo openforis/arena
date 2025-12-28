@@ -1,7 +1,7 @@
 import { SystemActions } from '@webapp/store/system'
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { MessageActionTypes } from './actions'
+import { MessageActionTypes } from './actions/actionTypes'
 
 const initialState = {
   message: null,

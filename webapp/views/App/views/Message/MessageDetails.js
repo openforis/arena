@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { Messages, MessageStatus, MessageTarget } from '@openforis/arena-server'
+import { MessageStatus, MessageTarget, Messages } from '@openforis/arena-core'
 
 import { ButtonGroup, TextInput } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
