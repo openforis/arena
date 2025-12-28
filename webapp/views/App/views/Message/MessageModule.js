@@ -19,10 +19,6 @@ const MessageModule = () => {
         },
         {
           component: MessageDetails,
-          path: messageModules.message.path,
-        },
-        {
-          component: MessageDetails,
           path: `${messageModules.message.path}/:messageUuid/`,
         },
       ]}
