@@ -59,12 +59,7 @@ const sendEmailMSOffice365 = async ({ to, subject, html, text = null }) => {
   })
 }
 
-export const sendEmail = async ({ to, msgKey, msgParams = {}, i18n: i18nParam = null, lang = 'en' }) => {
-  const i18n = i18nParam ? i18nParam : await i18nFactory.createI18nAsync(lang)
-
-  const subject = i18n.t(`${msgKey}.subject`, msgParams)
-  const html = i18n.t(`${msgKey}.body`, msgParams)
-
+export const sendCustomEmail = async ({ to, subject, html }) => {
   if (emailService === emailServices.sendgrid) {
     await sendEmailSendgrid({ to, subject, html })
   } else if (emailService === emailServices.office365) {
@@ -72,4 +67,13 @@ export const sendEmail = async ({ to, msgKey, msgParams = {}, i18n: i18nParam = 
   } else {
     throw new Error('Invalid email service specified: ' + emailService)
   }
+}
+
+export const sendEmail = async ({ to, msgKey, msgParams = {}, i18n: i18nParam = null, lang = 'en' }) => {
+  const i18n = i18nParam ? i18nParam : await i18nFactory.createI18nAsync(lang)
+
+  const subject = i18n.t(`${msgKey}.subject`, msgParams)
+  const html = i18n.t(`${msgKey}.body`, msgParams)
+
+  return sendCustomEmail({ to, subject, html })
 }
