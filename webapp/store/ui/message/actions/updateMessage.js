@@ -12,7 +12,7 @@ export const updateMessage =
 
     const action = async () => {
       dispatch(AppSavingActions.showAppSaving())
-      const { data: messageUpdated } = await axios.put(`/api/message`, { message })
+      const { data: messageUpdated } = await axios.put(`/api/message`, message)
       dispatch({ type: MessageActionTypes.messageUpdate, message: messageUpdated })
       dispatch(AppSavingActions.hideAppSaving())
     }

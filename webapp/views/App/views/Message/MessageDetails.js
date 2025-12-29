@@ -1,5 +1,6 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { useParams } from 'react-router'
 
 import { MessageStatus, MessageTarget, Messages } from '@openforis/arena-core'
 
@@ -20,13 +21,18 @@ const targetItems = [
 
 const MessageDetails = () => {
   const dispatch = useDispatch()
+  const { messageUuid } = useParams()
   const message = useMessage()
 
-  const readOnly = Messages.getStatus(message) === MessageStatus.Sent
+  const readOnly = !message || Messages.getStatus(message) === MessageStatus.Sent
+
+  useEffect(() => {
+    messageUuid && dispatch(MessageActions.fetchMessage({ messageUuid }))
+  }, [dispatch, messageUuid])
 
   const onMessageChange = useCallback(
-    (messageUpated) => {
-      dispatch(MessageActions.updateMessage(messageUpated))
+    (messageUpdated) => {
+      dispatch(MessageActions.updateMessage({ message: messageUpdated }))
     },
     [dispatch]
   )
@@ -47,18 +53,33 @@ const MessageDetails = () => {
 
   const onTargetChange = useCallback(
     (value) => {
-      onMessageChange(Messages.assocTargets(value)(message))
+      const targetsPrev = Messages.getTargets(message)
+      let targetsNext = value
+      if (value.length > 1) {
+        if (targetsPrev.includes(MessageTarget.All)) {
+          // if "all" was previously selected and now other targets are selected, remove "all"
+          targetsNext = value.filter((t) => t !== MessageTarget.All)
+        } else if (value.includes(MessageTarget.All)) {
+          // if "all" is now selected along with other targets, keep only "all"
+          targetsNext = [MessageTarget.All]
+        }
+      }
+      onMessageChange(Messages.assocTargets(targetsNext)(message))
     },
     [message, onMessageChange]
   )
 
+  if (!message) {
+    return '...'
+  }
+
   return (
     <div>
       <FormItem label="messageView.subject">
-        <TextInput value={message.subject} onChange={onSubjectChange} />
+        <TextInput value={Messages.getSubject(message)} onChange={onSubjectChange} />
       </FormItem>
       <FormItem label="messageView.body">
-        <TextInput value={message.body} onChange={onBodyChange} />
+        <TextInput value={Messages.getBody(message)} onChange={onBodyChange} />
       </FormItem>
       <FormItem label="messageView.audience">
         <ButtonGroup
@@ -66,7 +87,7 @@ const MessageDetails = () => {
           groupName="messageTargets"
           multiple
           onChange={onTargetChange}
-          selectedItemKey={Messages.getAudience(message)}
+          selectedItemKey={Messages.getTargets(message)}
           items={targetItems}
         />
       </FormItem>
