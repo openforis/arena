@@ -18,6 +18,7 @@ import * as jobApi from '@server/job/jobApi'
 import * as expressionApi from '@server/modules/expression/api/expressionApi'
 import * as rstudioApi from '@server/modules/rstudio/api/rstudioApi'
 import * as mobileApi from '@server/modules/mobile/api/mobileApi'
+import * as messageApi from '@server/modules/message/api'
 
 export const router = expressRouter()
 
@@ -49,3 +50,5 @@ expressionApi.init(router)
 
 rstudioApi.init(router)
 mobileApi.init(router)
+
+messageApi.init(router)

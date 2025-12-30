@@ -1,3 +1,5 @@
+import './MessageDetails.scss'
+
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router'
@@ -8,6 +10,8 @@ import { ButtonGroup, TextInput } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
+import { Button } from '@webapp/components'
+import { useConfirm } from '@webapp/components/hooks'
 
 const targetItems = [
   MessageTarget.All,
@@ -16,13 +20,14 @@ const targetItems = [
   MessageTarget.DataEditors,
 ].map((target) => ({
   key: target,
-  label: `messageView.target.${target}`,
+  label: `messageView:target.${target}`,
 }))
 
 const MessageDetails = () => {
   const dispatch = useDispatch()
   const { messageUuid } = useParams()
   const message = useMessage()
+  const confirm = useConfirm()
 
   const readOnly = !message || Messages.getStatus(message) === MessageStatus.Sent
 
@@ -69,19 +74,26 @@ const MessageDetails = () => {
     [message, onMessageChange]
   )
 
+  const onSendClick = useCallback(() => {
+    confirm({
+      key: 'messageView:sendMessage.confirmTitle',
+      onOk: () => dispatch(MessageActions.sendMessage()),
+    })
+  }, [confirm, dispatch])
+
   if (!message) {
     return '...'
   }
 
   return (
-    <div>
-      <FormItem label="messageView.subject">
+    <div className="message-details">
+      <FormItem label="messageView:subject">
         <TextInput value={Messages.getSubject(message)} onChange={onSubjectChange} />
       </FormItem>
-      <FormItem label="messageView.body">
-        <TextInput value={Messages.getBody(message)} onChange={onBodyChange} />
+      <FormItem label="messageView:body">
+        <TextInput rows={14} value={Messages.getBody(message)} onChange={onBodyChange} />
       </FormItem>
-      <FormItem label="messageView.audience">
+      <FormItem label="messageView:audience">
         <ButtonGroup
           disabled={readOnly}
           groupName="messageTargets"
@@ -91,6 +103,7 @@ const MessageDetails = () => {
           items={targetItems}
         />
       </FormItem>
+      {!readOnly && <Button className="message-send-btn" label="messageView:sendMessage.label" onClick={onSendClick} />}
     </div>
   )
 }

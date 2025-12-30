@@ -7,14 +7,18 @@ import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Mailer from '@server/utils/mailer'
 
-export class MessageSendJob extends Job {
+export default class MessageSendJob extends Job {
   constructor(params) {
     super(MessageSendJob.type, params)
   }
 
   async execute() {
     const { context, tx } = this
-    const { message } = context
+    const { messageUuid } = context
+
+    const messageService = ServiceRegistry.getInstance().getService(ServerServiceType.message)
+    const message = await messageService.getByUuid(messageUuid, tx)
+    this.setContext({ message })
 
     const notificationTypes = Messages.getNotificationTypes(message)
     if (notificationTypes.includes(MessageNotificationType.Email)) {
@@ -22,7 +26,6 @@ export class MessageSendJob extends Job {
     }
     // update message status to "Sent"
     const messageUpdated = Messages.assocStatus(MessageStatus.Sent)(message)
-    const messageService = ServiceRegistry.getInstance().getService(ServerServiceType.message)
     await messageService.update(message.uuid, messageUpdated, tx)
   }
 

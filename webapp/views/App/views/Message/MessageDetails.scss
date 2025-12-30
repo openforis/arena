@@ -1,0 +1,12 @@
+.message-details {
+  display: flex;
+  flex-direction: column;
+
+  .form-item {
+    height: auto;
+  }
+
+  .message-send-btn {
+    align-self: center;
+  }
+}
