@@ -99,12 +99,12 @@ const MessageDetails = () => {
       </FormItem>
       <FormItem label="messageView:body">
         <div className="message-body-editor">
-          <TextInput onChange={onBodyChange} readOnly={readOnly} rows={14} value={messageBody} />
+          <TextInput onChange={onBodyChange} readOnly={readOnly} rows={12} value={messageBody} />
           <Switch label="messageView:preview" checked={showPreview} onChange={onShowPreviewChange} />
           {showPreview && <Markdown source={messageBody} className="message-body-preview" />}
         </div>
       </FormItem>
-      <FormItem label="messageView:audience">
+      <FormItem label="messageView:target.label">
         <ButtonGroup
           disabled={readOnly}
           groupName="messageTargets"

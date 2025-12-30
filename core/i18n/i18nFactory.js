@@ -22,6 +22,7 @@ const namespaces = [
   'emails',
   'homeView',
   'jobs',
+  'messageView',
   'surveyCreate',
   'surveyForm',
   'usersView',

@@ -326,6 +326,9 @@ Try again?`,
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Instances',
 
+    message: 'Message',
+    message_plural: '$t(common.message_plural)',
+
     help: 'Help',
     about: 'About',
     disclaimer: 'Disclaimer',

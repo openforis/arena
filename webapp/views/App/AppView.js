@@ -68,7 +68,7 @@ const AppView = () => {
                 component: Users,
                 path: `${appModules.users.path}/*`,
               },
-              ...(canUseMessages ? [{ component: Message, path: `${appModules.message.path}/*` }] : []),
+              ...(canUseMessages ? [{ component: Message, path: `${appModules.messages.path}/*` }] : []),
               {
                 component: Help,
                 path: `${appModules.help.path}/*`,

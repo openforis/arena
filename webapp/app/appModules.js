@@ -59,9 +59,9 @@ export const appModules = {
     path: 'analysis',
     icon: 'stats-dots',
   },
-  message: {
-    key: 'message',
-    path: 'message',
+  messages: {
+    key: 'message_plural',
+    path: 'messages',
     icon: 'envelop',
   },
   help: {
@@ -290,7 +290,7 @@ const _getModuleParentPathParts = (module) => {
   if (Object.values(dataModules).includes(module)) return _getModulePathParts(appModules.data)
   if (Object.values(userModules).includes(module)) return _getModulePathParts(appModules.users)
   if (Object.values(analysisModules).includes(module)) return _getModulePathParts(appModules.analysis)
-  if (Object.values(messageModules).includes(module)) return _getModulePathParts(appModules.message)
+  if (Object.values(messageModules).includes(module)) return _getModulePathParts(appModules.messages)
   if (Object.values(helpModules).includes(module)) return _getModulePathParts(appModules.help)
 
   throw new Error(`Parent path not found for module ${module?.path}`)

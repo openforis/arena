@@ -90,7 +90,7 @@ export const getModulesHierarchy = (user, surveyInfo) => {
     ...(User.isSystemAdmin(user)
       ? [
           getModule({
-            module: appModules.message,
+            module: appModules.messages,
             children: [messageModules.messages],
           }),
         ]

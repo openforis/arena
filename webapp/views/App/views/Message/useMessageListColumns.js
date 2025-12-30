@@ -26,7 +26,7 @@ export const useMessageListColumns = () => {
       },
       {
         key: 'date-modified',
-        header: 'common.dateModified',
+        header: 'common.dateLastModified',
         width: '12rem',
         renderItem: ({ item }) => DateUtils.convertDateTimeFromISOToDisplay(item.dateModified),
       },

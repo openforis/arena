@@ -10,7 +10,7 @@ import { MessageList } from './MessageList'
 const MessageModule = () => {
   return (
     <ModuleSwitch
-      moduleRoot={appModules.message}
+      moduleRoot={appModules.messages}
       moduleDefault={messageModules.messages}
       modules={[
         {
