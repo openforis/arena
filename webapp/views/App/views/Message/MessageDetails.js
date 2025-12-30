@@ -1,6 +1,6 @@
 import './MessageDetails.scss'
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router'
 
@@ -10,7 +10,7 @@ import { ButtonGroup, TextInput } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
-import { Button } from '@webapp/components'
+import { Button, Markdown, Switch } from '@webapp/components'
 import { useConfirm } from '@webapp/components/hooks'
 
 const targetItems = [
@@ -28,6 +28,7 @@ const MessageDetails = () => {
   const { messageUuid } = useParams()
   const message = useMessage()
   const confirm = useConfirm()
+  const [showPreview, setShowPreview] = useState(true)
 
   const readOnly = !message || Messages.getStatus(message) === MessageStatus.Sent
 
@@ -74,6 +75,10 @@ const MessageDetails = () => {
     [message, onMessageChange]
   )
 
+  const onShowPreviewChange = useCallback((checked) => {
+    setShowPreview(checked)
+  }, [])
+
   const onSendClick = useCallback(() => {
     confirm({
       key: 'messageView:sendMessage.confirmTitle',
@@ -85,22 +90,28 @@ const MessageDetails = () => {
     return '...'
   }
 
+  const messageBody = Messages.getBody(message) ?? ''
+
   return (
     <div className="message-details">
       <FormItem label="messageView:subject">
-        <TextInput value={Messages.getSubject(message)} onChange={onSubjectChange} />
+        <TextInput onChange={onSubjectChange} readOnly={readOnly} value={Messages.getSubject(message)} />
       </FormItem>
       <FormItem label="messageView:body">
-        <TextInput rows={14} value={Messages.getBody(message)} onChange={onBodyChange} />
+        <div className="message-body-editor">
+          <TextInput onChange={onBodyChange} readOnly={readOnly} rows={14} value={messageBody} />
+          <Switch label="messageView:preview" checked={showPreview} onChange={onShowPreviewChange} />
+          {showPreview && <Markdown source={messageBody} className="message-body-preview" />}
+        </div>
       </FormItem>
       <FormItem label="messageView:audience">
         <ButtonGroup
           disabled={readOnly}
           groupName="messageTargets"
+          items={targetItems}
           multiple
           onChange={onTargetChange}
           selectedItemKey={Messages.getTargets(message)}
-          items={targetItems}
         />
       </FormItem>
       {!readOnly && <Button className="message-send-btn" label="messageView:sendMessage.label" onClick={onSendClick} />}
