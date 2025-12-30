@@ -1,11 +1,17 @@
-import { Messages, MessageNotificationType, MessageTarget, ServiceRegistry, MessageStatus } from '@openforis/arena-core'
-import { ServerServiceType } from '@openforis/arena-server'
+import { Messages, MessageNotificationType, MessageTarget, MessageStatus } from '@openforis/arena-core'
+import { ArenaServer, ServerServiceType } from '@openforis/arena-server'
 
 import Job from '@server/job/job'
 import * as UserService from '@server/modules/user/service/userService'
 import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Mailer from '@server/utils/mailer'
+
+const getMessageService = () => {
+  // Ensure services are initialized
+  const serviceRegistry = ArenaServer.initServices()
+  return serviceRegistry.getService(ServerServiceType.message)
+}
 
 export default class MessageSendJob extends Job {
   constructor(params) {
@@ -16,7 +22,7 @@ export default class MessageSendJob extends Job {
     const { context, tx } = this
     const { messageUuid } = context
 
-    const messageService = ServiceRegistry.getInstance().getService(ServerServiceType.message)
+    const messageService = getMessageService()
     const message = await messageService.getByUuid(messageUuid, tx)
     this.setContext({ message })
 
