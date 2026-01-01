@@ -3,19 +3,22 @@ import React, { useMemo } from 'react'
 import * as DateUtils from '@core/dateUtils'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { useI18n } from '@webapp/store/system'
 
 export const useMessageListColumns = () => {
+  const i18n = useI18n()
+
   return useMemo(
     () => [
       {
         key: 'subject',
-        header: 'message:subject',
+        header: 'messageView:subject',
         renderItem: ({ item }) => <LabelWithTooltip label={item.props.subject} />,
       },
       {
         key: 'status',
-        header: 'message:status',
-        renderItem: ({ item }) => item.status,
+        header: 'messageView:status.label',
+        renderItem: ({ item }) => i18n.t(`messageView:status.${item.status}`),
         width: '7rem',
       },
       {

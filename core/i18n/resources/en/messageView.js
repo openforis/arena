@@ -6,6 +6,11 @@ export default {
   subject: 'Subject',
   body: 'Body',
   preview: 'Preview',
+  status: {
+    label: 'Status',
+    draft: 'Draft',
+    sent: 'Sent',
+  },
   target: {
     label: 'Target',
     all: 'All Users',
