@@ -1,4 +1,4 @@
-import { Messages, MessageNotificationType, MessageTarget, MessageStatus } from '@openforis/arena-core'
+import { Messages, MessageNotificationType, MessageTarget, MessageStatus, Objects } from '@openforis/arena-core'
 import { ArenaServer, ServerServiceType } from '@openforis/arena-server'
 
 import Job from '@server/job/job'
@@ -11,6 +11,32 @@ const getMessageService = () => {
   // Ensure services are initialized
   const serviceRegistry = ArenaServer.initServices()
   return serviceRegistry.getService(ServerServiceType.message)
+}
+
+/**
+ * Replace template variables in message body.
+ * Template variables:
+ * - {{userTitleAndFirstName}}: replaced with user's title and first name (e.g. "Dr. John")
+ * - {{userFirstName}}: replaced with user's first name (e.g. "John").
+ * @param {!object} params - Parameters object.
+ * @param {!string} params.body - Message body.
+ * @param {!object} params.user - User object.
+ * @returns {string} - Message body with template variables replaced.
+ */
+const replaceBodyTemplateVariables = ({ body, user }) => {
+  const title = User.getTitle(user)
+  const firstName = User.getFirstName(user)
+  const titleAndNameParts = []
+  if (Objects.isNotEmpty(firstName)) {
+    titleAndNameParts.push(firstName)
+  }
+  if (Objects.isNotEmpty(title)) {
+    titleAndNameParts.unshift(title)
+  }
+  const userTitleAndFirstName = titleAndNameParts.length > 0 ? titleAndNameParts.join(' ') : 'User'
+  let bodyFixed = body.replaceAll('{{userTitleAndFirstName}}', userTitleAndFirstName)
+  bodyFixed = bodyFixed.replaceAll('{{userFirstName}}', firstName ?? 'User')
+  return bodyFixed
 }
 
 export default class MessageSendJob extends Job {
@@ -56,9 +82,12 @@ export default class MessageSendJob extends Job {
 
     this.total = usersFiltered.length
 
-    const to = usersFiltered.map(User.getEmail)
-
-    await Mailer.sendCustomEmail({ to, subject: Messages.getSubject(message), html: Messages.getBody(message) })
+    for (const user of usersFiltered) {
+      const body = replaceBodyTemplateVariables({ body: Messages.getBody(message), user })
+      const subject = Messages.getSubject(message)
+      const to = User.getEmail(user)
+      await Mailer.sendCustomEmail({ to, subject, html: body })
+    }
   }
 }
 
