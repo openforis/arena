@@ -2,6 +2,7 @@ import { fetchMessage } from './fetchMessage'
 import { createMessage } from './createMessage'
 import { updateMessage } from './updateMessage'
 import { sendMessage } from './sendMessage'
+import { deleteMessage } from './deleteMessage'
 
 export { MessageActionTypes } from './actionTypes'
 
@@ -10,4 +11,5 @@ export const MessageActions = {
   createMessage,
   updateMessage,
   sendMessage,
+  deleteMessage,
 }

@@ -2,16 +2,18 @@ import './MessageDetails.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
 import { MessageStatus, MessageTarget, Messages } from '@openforis/arena-core'
 
+import * as Validator from '@core/validation/validator'
 import { ButtonGroup, TextInput } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
-import { Button, ButtonBack, Markdown, Switch } from '@webapp/components'
+import { ButtonBack, ButtonDelete, ButtonSave, Markdown, Switch } from '@webapp/components'
 import { useConfirm } from '@webapp/components/hooks'
+import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
 
 const targetItems = [
   MessageTarget.All,
@@ -25,6 +27,7 @@ const targetItems = [
 
 const MessageDetails = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { messageUuid } = useParams()
   const message = useMessage()
   const confirm = useConfirm()
@@ -75,6 +78,13 @@ const MessageDetails = () => {
     [message, onMessageChange]
   )
 
+  const onTargetEmailsExcludedChange = useCallback(
+    (value) => {
+      onMessageChange(Messages.assocTargetExcludedUserEmails(value)(message))
+    },
+    [message, onMessageChange]
+  )
+
   const onShowPreviewChange = useCallback((checked) => {
     setShowPreview(checked)
   }, [])
@@ -85,6 +95,15 @@ const MessageDetails = () => {
       onOk: () => dispatch(MessageActions.sendMessage()),
     })
   }, [confirm, dispatch])
+
+  const onDeleteClick = useCallback(() => {
+    confirm({
+      key: 'messageView:deleteMessage.confirmTitle',
+      onOk: () => {
+        dispatch(MessageActions.deleteMessage({ navigate }))
+      },
+    })
+  }, [confirm, dispatch, navigate])
 
   if (!message) {
     return '...'
@@ -114,11 +133,23 @@ const MessageDetails = () => {
           selectedItemKey={Messages.getTargets(message)}
         />
       </FormItem>
+      <FormItem label="messageView:target.emailsExcluded.label">
+        <InputChipsText
+          isInputFieldValueValid={Validator.isEmailValueValid}
+          onChange={onTargetEmailsExcludedChange}
+          placeholder="messageView:target.emailsExcluded.placeholder"
+          selection={Messages.getTargetExcludedUserEmails(message)}
+          textTransformFunction={(value) => value.trim().toLowerCase()}
+        />
+      </FormItem>
 
       <div className="button-bar">
         <ButtonBack />
         {!readOnly && (
-          <Button className="message-send-btn" label="messageView:sendMessage.label" onClick={onSendClick} />
+          <>
+            <ButtonSave className="message-send-btn" label="messageView:sendMessage.label" onClick={onSendClick} />
+            <ButtonDelete onClick={onDeleteClick} />
+          </>
         )}
       </div>
     </div>

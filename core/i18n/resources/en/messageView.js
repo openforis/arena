@@ -1,18 +1,26 @@
 export default {
+  body: 'Body',
+  deleteMessage: {
+    confirmTitle: 'Are you sure you want to delete this message?',
+  },
+  messageDeleted: 'Message deleted successfully.',
+  preview: 'Preview',
   sendMessage: {
     label: 'Send Message',
     confirmTitle: 'Are you sure you want to send this message?',
   },
-  subject: 'Subject',
-  body: 'Body',
-  preview: 'Preview',
   status: {
     label: 'Status',
     draft: 'Draft',
     sent: 'Sent',
   },
+  subject: 'Subject',
   target: {
     label: 'Target',
+    emailsExcluded: {
+      label: 'Excluded Emails',
+      placeholder: 'Type an email addresse to exclude, then press Add button',
+    },
     all: 'All Users',
     system_admins: 'System Administrators',
     survey_managers: 'Survey Managers',
