@@ -10,7 +10,7 @@ import { ButtonGroup, TextInput } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
-import { Button, Markdown, Switch } from '@webapp/components'
+import { Button, ButtonBack, Markdown, Switch } from '@webapp/components'
 import { useConfirm } from '@webapp/components/hooks'
 
 const targetItems = [
@@ -114,7 +114,13 @@ const MessageDetails = () => {
           selectedItemKey={Messages.getTargets(message)}
         />
       </FormItem>
-      {!readOnly && <Button className="message-send-btn" label="messageView:sendMessage.label" onClick={onSendClick} />}
+
+      <div className="button-bar">
+        <ButtonBack />
+        {!readOnly && (
+          <Button className="message-send-btn" label="messageView:sendMessage.label" onClick={onSendClick} />
+        )}
+      </div>
     </div>
   )
 }
