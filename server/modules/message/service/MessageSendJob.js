@@ -22,6 +22,7 @@ const getMessageService = () => {
  * - {{userTitleAndName}}: replaced with user's title and name (e.g. "Mr John")
  * - {{userName}}: replaced with user's name (e.g. "John").
  * @param {!object} params - Parameters object.
+ * @param {!object} params.i18n - I18n instance.
  * @param {!string} params.body - Message body.
  * @param {!object} params.user - User object.
  * @returns {string} - Message body with template variables replaced.
@@ -38,8 +39,7 @@ const replaceBodyTemplateVariables = ({ i18n, body, user }) => {
     titleAndNameParts.unshift(title)
   }
   const userTitleAndName = titleAndNameParts.length > 0 ? titleAndNameParts.join(' ') : 'User'
-  let bodyFixed = body.replaceAll('{{userTitleAndName}}', userTitleAndName)
-  bodyFixed = bodyFixed.replaceAll('{{userName}}', name ?? 'User')
+  const bodyFixed = body.replaceAll('{{userTitleAndName}}', userTitleAndName).replaceAll('{{userName}}', name ?? 'User')
   return bodyFixed
 }
 
