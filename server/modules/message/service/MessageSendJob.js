@@ -1,6 +1,9 @@
 import { Messages, MessageNotificationType, MessageTarget, MessageStatus, Objects } from '@openforis/arena-core'
 import { ArenaServer, ServerServiceType } from '@openforis/arena-server'
 
+import * as i18nFactory from '@core/i18n/i18nFactory'
+import { parseMarkdown } from '@core/markdownUtils'
+
 import Job from '@server/job/job'
 import * as UserService from '@server/modules/user/service/userService'
 import * as User from '@core/user/user'
@@ -16,26 +19,27 @@ const getMessageService = () => {
 /**
  * Replace template variables in message body.
  * Template variables:
- * - {{userTitleAndFirstName}}: replaced with user's title and first name (e.g. "Dr. John")
- * - {{userFirstName}}: replaced with user's first name (e.g. "John").
+ * - {{userTitleAndName}}: replaced with user's title and name (e.g. "Mr John")
+ * - {{userName}}: replaced with user's name (e.g. "John").
  * @param {!object} params - Parameters object.
  * @param {!string} params.body - Message body.
  * @param {!object} params.user - User object.
  * @returns {string} - Message body with template variables replaced.
  */
-const replaceBodyTemplateVariables = ({ body, user }) => {
-  const title = User.getTitle(user)
-  const firstName = User.getFirstName(user)
+const replaceBodyTemplateVariables = ({ i18n, body, user }) => {
+  const titleKey = User.getTitle(user)
+  const name = User.getName(user)
   const titleAndNameParts = []
-  if (Objects.isNotEmpty(firstName)) {
-    titleAndNameParts.push(firstName)
+  if (Objects.isNotEmpty(name)) {
+    titleAndNameParts.push(name)
   }
-  if (Objects.isNotEmpty(title)) {
+  if (Objects.isNotEmpty(titleKey) && User.titleKeys.preferNotToSay !== titleKey) {
+    const title = i18n.t(`user.titleValues.${titleKey}`)
     titleAndNameParts.unshift(title)
   }
-  const userTitleAndFirstName = titleAndNameParts.length > 0 ? titleAndNameParts.join(' ') : 'User'
-  let bodyFixed = body.replaceAll('{{userTitleAndFirstName}}', userTitleAndFirstName)
-  bodyFixed = bodyFixed.replaceAll('{{userFirstName}}', firstName ?? 'User')
+  const userTitleAndName = titleAndNameParts.length > 0 ? titleAndNameParts.join(' ') : 'User'
+  let bodyFixed = body.replaceAll('{{userTitleAndName}}', userTitleAndName)
+  bodyFixed = bodyFixed.replaceAll('{{userName}}', name ?? 'User')
   return bodyFixed
 }
 
@@ -62,6 +66,8 @@ export default class MessageSendJob extends Job {
   }
 
   async notifyUsersByEmail() {
+    const i18n = await i18nFactory.createI18nAsync()
+
     const { context, tx } = this
     const { message } = context
 
@@ -69,7 +75,7 @@ export default class MessageSendJob extends Job {
     const excludedEmails = Messages.getTargetExcludedUserEmails(message)
     const users = await UserService.fetchUsers({ onlyAccepted: true }, tx)
 
-    const usersFiltered = targets.some(MessageTarget.All)
+    const usersFiltered = targets.includes(MessageTarget.All)
       ? users
       : users.filter(
           (user) =>
@@ -82,8 +88,10 @@ export default class MessageSendJob extends Job {
 
     this.total = usersFiltered.length
 
+    const bodyMarkdown = parseMarkdown(Messages.getBody(message))
+
     for (const user of usersFiltered) {
-      const body = replaceBodyTemplateVariables({ body: Messages.getBody(message), user })
+      const body = replaceBodyTemplateVariables({ i18n, body: bodyMarkdown, user })
       const subject = Messages.getSubject(message)
       const to = User.getEmail(user)
       await Mailer.sendCustomEmail({ to, subject, html: body })

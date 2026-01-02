@@ -15,7 +15,7 @@ export const createMessage =
       status: MessageStatus.Draft,
       props: {
         subject: 'Open Foris Arena - Communication',
-        body: `Dear {{userTitleAndFirstName}},  
+        body: `Dear {{userTitleAndName}},  
 Many thanks,  
 Open Foris Arena Team`,
         notificationTypes: [MessageNotificationType.Email],
