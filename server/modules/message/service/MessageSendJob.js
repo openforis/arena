@@ -88,14 +88,19 @@ export default class MessageSendJob extends Job {
 
     this.total = usersFiltered.length
 
+    const subject = Messages.getSubject(message)
+    this.logDebug(`Sending ${this.total} emails for message ${subject}`)
+
     const bodyMarkdown = parseMarkdown(Messages.getBody(message))
 
     for (const user of usersFiltered) {
       const bodyHtml = replaceBodyTemplateVariables({ i18n, body: bodyMarkdown, user })
-      const subject = Messages.getSubject(message)
       const to = User.getEmail(user)
       await Mailer.sendCustomEmail({ to, subject, html: bodyHtml })
+      this.incrementProcessedItems()
     }
+
+    this.logDebug(`Sent ${this.total} emails for message ${subject}`)
   }
 }
 
