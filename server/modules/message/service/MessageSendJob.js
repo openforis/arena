@@ -1,4 +1,4 @@
-import { Messages, MessageNotificationType, MessageTarget, MessageStatus, Objects } from '@openforis/arena-core'
+import { Messages, MessageNotificationType, MessageStatus, Objects } from '@openforis/arena-core'
 import { ArenaServer, ServerServiceType } from '@openforis/arena-server'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
@@ -7,7 +7,6 @@ import { parseMarkdown } from '@core/markdownUtils'
 import Job from '@server/job/job'
 import * as UserService from '@server/modules/user/service/userService'
 import * as User from '@core/user/user'
-import * as AuthGroup from '@core/auth/authGroup'
 import * as Mailer from '@server/utils/mailer'
 
 const getMessageService = () => {
@@ -71,20 +70,9 @@ export default class MessageSendJob extends Job {
     const { context, tx } = this
     const { message } = context
 
-    const targets = Messages.getTargets(message)
-    const excludedEmails = Messages.getTargetExcludedUserEmails(message)
     const users = await UserService.fetchUsers({ onlyAccepted: true }, tx)
 
-    const usersFiltered = targets.includes(MessageTarget.All)
-      ? users
-      : users.filter(
-          (user) =>
-            (!excludedEmails || !excludedEmails.includes(User.getEmail(user))) &&
-            ((targets.includes(MessageTarget.SystemAdmins) && User.isSystemAdmin(user)) ||
-              (targets.includes(MessageTarget.SurveyManagers) && User.isSurveyManager(user)) ||
-              (targets.includes(MessageTarget.DataEditors) &&
-                !!User.getAuthGroupByName(AuthGroup.groupNames.dataEditor)(user)))
-        )
+    const usersFiltered = users.filter((user) => Messages.isTargetingUser(user)(message))
 
     this.total = usersFiltered.length
 

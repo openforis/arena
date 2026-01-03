@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { MessageNotificationType, MessageStatus, MessageTarget } from '@openforis/arena-core'
+import { MessageNotificationType, MessagePropsKey, MessageStatus, MessageTargetUserType } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
 import { appModuleUri, messageModules } from '@webapp/app/appModules'
@@ -22,10 +22,10 @@ export const createMessage =
     const messageParam = {
       status: MessageStatus.Draft,
       props: {
-        subject: 'Open Foris Arena - Communication',
-        body: defaultMessageBody,
-        notificationTypes: [MessageNotificationType.Email],
-        targets: [MessageTarget.All],
+        [MessagePropsKey.subject]: 'Open Foris Arena - Communication',
+        [MessagePropsKey.body]: defaultMessageBody,
+        [MessagePropsKey.notificationTypes]: [MessageNotificationType.Email],
+        [MessagePropsKey.targetUserTypes]: [MessageTargetUserType.All],
       },
       createdByUserUuid: User.getUuid(user),
     }

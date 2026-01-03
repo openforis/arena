@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 
-import { MessageStatus, MessageTarget, Messages } from '@openforis/arena-core'
+import { MessageStatus, MessageTargetUserType, Messages } from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
@@ -17,15 +17,18 @@ import { useConfirm } from '@webapp/components/hooks'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
 
-const targetItems = [
-  MessageTarget.All,
-  MessageTarget.SystemAdmins,
-  MessageTarget.SurveyManagers,
-  MessageTarget.DataEditors,
-].map((target) => ({
-  key: target,
-  label: `messageView:target.${target}`,
+const targetUserTypeItems = [
+  MessageTargetUserType.All,
+  MessageTargetUserType.SystemAdmins,
+  MessageTargetUserType.SurveyManagers,
+  MessageTargetUserType.DataEditors,
+  MessageTargetUserType.Individual,
+].map((targetUserType) => ({
+  key: targetUserType,
+  label: `messageView:target.userType.${targetUserType}`,
 }))
+
+const emailTransformFunction = (value) => value.trim().toLowerCase()
 
 const MessageDetails = () => {
   const dispatch = useDispatch()
@@ -62,23 +65,45 @@ const MessageDetails = () => {
     [message, onMessageChange]
   )
 
-  const onTargetChange = useCallback(
+  const onTargetUserTypesChange = useCallback(
     (value) => {
-      const targetsPrev = Messages.getTargets(message)
+      const targetsPrev = Messages.getTargetUserTypes(message)
       let targetsNext = value
       if (value.length === 0) {
         // prevent having no target selected
-        targetsNext = [MessageTarget.All]
+        targetsNext = [MessageTargetUserType.All]
       } else if (value.length > 1) {
-        if (targetsPrev.includes(MessageTarget.All)) {
+        if (targetsPrev.includes(MessageTargetUserType.All)) {
           // if "all" was previously selected and now other targets are selected, remove "all"
-          targetsNext = value.filter((t) => t !== MessageTarget.All)
-        } else if (value.includes(MessageTarget.All)) {
+          targetsNext = value.filter((t) => t !== MessageTargetUserType.All)
+        } else if (targetsPrev.includes(MessageTargetUserType.Individual)) {
+          // if "individual" was previously selected and now other targets are selected, remove "individual"
+          targetsNext = value.filter((t) => t !== MessageTargetUserType.Individual)
+        } else if (value.includes(MessageTargetUserType.All)) {
           // if "all" is now selected along with other targets, keep only "all"
-          targetsNext = [MessageTarget.All]
+          targetsNext = [MessageTargetUserType.All]
+        } else if (value.includes(MessageTargetUserType.Individual)) {
+          // if "individual" is now selected along with other targets, keep only "individual"
+          targetsNext = [MessageTargetUserType.Individual]
         }
       }
-      onMessageChange(Messages.assocTargets(targetsNext)(message))
+      let messageNext = Messages.assocTargetUserTypes(targetsNext)(message)
+      const targetEmailsNext = targetsNext.includes(MessageTargetUserType.Individual)
+        ? Messages.getTargetUserEmails(message)
+        : []
+      messageNext = Messages.assocTargetUserEmails(targetEmailsNext)(messageNext)
+      const excludedEmailsNext = targetsNext.includes(MessageTargetUserType.Individual)
+        ? []
+        : Messages.getTargetExcludedUserEmails(message)
+      messageNext = Messages.assocTargetExcludedUserEmails(excludedEmailsNext)(messageNext)
+      onMessageChange(messageNext)
+    },
+    [message, onMessageChange]
+  )
+
+  const onTargetEmailsIncludedChange = useCallback(
+    (value) => {
+      onMessageChange(Messages.assocTargetUserEmails(value)(message))
     },
     [message, onMessageChange]
   )
@@ -120,6 +145,7 @@ const MessageDetails = () => {
 
   const messageBody = Messages.getBody(message) ?? ''
   const validation = Validation.getValidation(message)
+  const targetingIndividualUsers = Messages.getTargetUserTypes(message).includes(MessageTargetUserType.Individual)
 
   return (
     <div className="message-details">
@@ -145,25 +171,38 @@ const MessageDetails = () => {
           {showPreview && <Markdown source={messageBody} className="message-body-preview" />}
         </div>
       </FormItem>
-      <FormItem label="messageView:target.label">
+      <FormItem label="messageView:target.userTypes.label">
         <ButtonGroup
           disabled={readOnly}
-          groupName="messageTargets"
-          items={targetItems}
+          groupName="messageTargetUserTypes"
+          items={targetUserTypeItems}
           multiple
-          onChange={onTargetChange}
-          selectedItemKey={Messages.getTargets(message)}
+          onChange={onTargetUserTypesChange}
+          selectedItemKey={Messages.getTargetUserTypes(message)}
         />
       </FormItem>
-      <FormItem label="messageView:target.emailsExcluded.label">
-        <InputChipsText
-          isInputFieldValueValid={Validator.isEmailValueValid}
-          onChange={onTargetEmailsExcludedChange}
-          placeholder="messageView:target.emailsExcluded.placeholder"
-          selection={Messages.getTargetExcludedUserEmails(message)}
-          textTransformFunction={(value) => value.trim().toLowerCase()}
-        />
-      </FormItem>
+      {targetingIndividualUsers && (
+        <FormItem label="messageView:target.emailsIncluded.label">
+          <InputChipsText
+            isInputFieldValueValid={Validator.isEmailValueValid}
+            onChange={onTargetEmailsIncludedChange}
+            placeholder="messageView:target.emailsIncluded.placeholder"
+            selection={Messages.getTargetUserEmails(message)}
+            textTransformFunction={emailTransformFunction}
+          />
+        </FormItem>
+      )}
+      {!targetingIndividualUsers && (
+        <FormItem label="messageView:target.emailsExcluded.label">
+          <InputChipsText
+            isInputFieldValueValid={Validator.isEmailValueValid}
+            onChange={onTargetEmailsExcludedChange}
+            placeholder="messageView:target.emailsExcluded.placeholder"
+            selection={Messages.getTargetExcludedUserEmails(message)}
+            textTransformFunction={emailTransformFunction}
+          />
+        </FormItem>
+      )}
 
       <div className="button-bar">
         <Button label="common.back" onClick={onBackClick} variant="outlined" />
