@@ -7,6 +7,7 @@ import messageView from './messageView'
 import surveyCreate from './surveyCreate'
 import surveyForm from './surveyForm'
 import usersView from './usersView'
+import validationErrors from './validationErrors'
 
 export default {
   appErrors,
@@ -18,4 +19,5 @@ export default {
   surveyCreate,
   surveyForm,
   usersView,
+  validationErrors,
 }
