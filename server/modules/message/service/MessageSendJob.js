@@ -91,10 +91,10 @@ export default class MessageSendJob extends Job {
     const bodyMarkdown = parseMarkdown(Messages.getBody(message))
 
     for (const user of usersFiltered) {
-      const body = replaceBodyTemplateVariables({ i18n, body: bodyMarkdown, user })
+      const bodyHtml = replaceBodyTemplateVariables({ i18n, body: bodyMarkdown, user })
       const subject = Messages.getSubject(message)
       const to = User.getEmail(user)
-      await Mailer.sendCustomEmail({ to, subject, html: body })
+      await Mailer.sendCustomEmail({ to, subject, html: bodyHtml })
     }
   }
 }

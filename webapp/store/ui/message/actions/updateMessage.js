@@ -10,12 +10,14 @@ export const updateMessage =
   async (dispatch) => {
     dispatch({ type: MessageActionTypes.messageUpdate, message })
 
+    const { uuid } = message
+
     const action = async () => {
       dispatch(AppSavingActions.showAppSaving())
-      const { data: messageUpdated } = await axios.put(`/api/message`, message)
+      const { data: messageUpdated } = await axios.put(`/api/message/${uuid}`, message)
       dispatch({ type: MessageActionTypes.messageUpdate, message: messageUpdated })
       dispatch(AppSavingActions.hideAppSaving())
     }
 
-    dispatch(debounceAction(action, `message_update_${message.uuid}`))
+    dispatch(debounceAction(action, `message_update_${uuid}`))
   }
