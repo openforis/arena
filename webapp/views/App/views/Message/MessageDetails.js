@@ -8,13 +8,14 @@ import { MessageStatus, MessageTarget, Messages } from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
+
+import { Button, ButtonDelete, ButtonSave, Markdown, Switch } from '@webapp/components'
 import { ButtonGroup } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
+import { useConfirm } from '@webapp/components/hooks'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
-import { ButtonBack, ButtonDelete, ButtonSave, Markdown, Switch } from '@webapp/components'
-import { useConfirm } from '@webapp/components/hooks'
-import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
 
 const targetItems = [
   MessageTarget.All,
@@ -93,6 +94,10 @@ const MessageDetails = () => {
     setShowPreview(checked)
   }, [])
 
+  const onBackClick = useCallback(() => {
+    dispatch(MessageActions.resetMessage({ navigate }))
+  }, [dispatch, navigate])
+
   const onSendClick = useCallback(() => {
     confirm({
       key: 'messageView:sendMessage.confirmTitle',
@@ -161,7 +166,7 @@ const MessageDetails = () => {
       </FormItem>
 
       <div className="button-bar">
-        <ButtonBack />
+        <Button label="common.back" onClick={onBackClick} variant="outlined" />
         {!readOnly && (
           <>
             <ButtonSave

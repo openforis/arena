@@ -4,7 +4,7 @@ import { AppSavingActions } from '@webapp/store/app'
 
 import { MessageState } from '../state'
 import { NotificationActions } from '../../notification'
-import { appModuleUri, messageModules } from '@webapp/app/appModules'
+import { resetMessage } from './resetMessage'
 
 export const deleteMessage =
   ({ navigate }) =>
@@ -21,6 +21,5 @@ export const deleteMessage =
 
     dispatch(NotificationActions.notifyInfo({ key: 'messageView:messageDeleted' }))
 
-    // navigate to messages list
-    navigate(appModuleUri(messageModules.messages))
+    dispatch(resetMessage({ navigate }))
   }
