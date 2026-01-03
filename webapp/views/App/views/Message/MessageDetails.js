@@ -88,6 +88,7 @@ const MessageDetails = () => {
         }
       }
       let messageNext = Messages.assocTargetUserTypes(targetsNext)(message)
+      // clear not applicable props
       const targetEmailsNext = targetsNext.includes(MessageTargetUserType.Individual)
         ? Messages.getTargetUserEmails(message)
         : []
