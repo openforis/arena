@@ -26,6 +26,7 @@ const namespaces = [
   'surveyCreate',
   'surveyForm',
   'usersView',
+  'validationErrors',
 ]
 const defaultNamespace = 'common'
 

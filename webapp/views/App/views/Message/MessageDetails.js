@@ -6,9 +6,10 @@ import { useNavigate, useParams } from 'react-router'
 
 import { MessageStatus, MessageTarget, Messages } from '@openforis/arena-core'
 
+import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
-import { ButtonGroup, TextInput } from '@webapp/components/form'
-import { FormItem } from '@webapp/components/form/Input'
+import { ButtonGroup } from '@webapp/components/form'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
 import { ButtonBack, ButtonDelete, ButtonSave, Markdown, Switch } from '@webapp/components'
@@ -64,7 +65,10 @@ const MessageDetails = () => {
     (value) => {
       const targetsPrev = Messages.getTargets(message)
       let targetsNext = value
-      if (value.length > 1) {
+      if (value.length === 0) {
+        // prevent having no target selected
+        targetsNext = [MessageTarget.All]
+      } else if (value.length > 1) {
         if (targetsPrev.includes(MessageTarget.All)) {
           // if "all" was previously selected and now other targets are selected, remove "all"
           targetsNext = value.filter((t) => t !== MessageTarget.All)
@@ -110,15 +114,28 @@ const MessageDetails = () => {
   }
 
   const messageBody = Messages.getBody(message) ?? ''
+  const validation = Validation.getValidation(message)
 
   return (
     <div className="message-details">
       <FormItem label="messageView:subject">
-        <TextInput onChange={onSubjectChange} readOnly={readOnly} value={Messages.getSubject(message)} />
+        <Input
+          onChange={onSubjectChange}
+          readOnly={readOnly}
+          value={Messages.getSubject(message)}
+          validation={Validation.getFieldValidation('subject')(validation)}
+        />
       </FormItem>
       <FormItem label="messageView:body">
         <div className="message-body-editor">
-          <TextInput onChange={onBodyChange} readOnly={readOnly} rows={12} value={messageBody} />
+          <Input
+            onChange={onBodyChange}
+            readOnly={readOnly}
+            inputType="textarea"
+            textAreaRows={12}
+            value={messageBody}
+            validation={Validation.getFieldValidation('body')(validation)}
+          />
           <Switch label="messageView:preview" checked={showPreview} onChange={onShowPreviewChange} />
           {showPreview && <Markdown source={messageBody} className="message-body-preview" />}
         </div>
@@ -147,7 +164,12 @@ const MessageDetails = () => {
         <ButtonBack />
         {!readOnly && (
           <>
-            <ButtonSave className="message-send-btn" label="messageView:sendMessage.label" onClick={onSendClick} />
+            <ButtonSave
+              className="message-send-btn"
+              disabled={Validation.isNotValid(validation)}
+              label="messageView:sendMessage.label"
+              onClick={onSendClick}
+            />
             <ButtonDelete onClick={onDeleteClick} />
           </>
         )}

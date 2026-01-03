@@ -1,5 +1,8 @@
 import axios from 'axios'
 
+import * as Validation from '@core/validation/validation'
+import * as MessageValidator from '@core/message/messageValidator'
+
 import { AppSavingActions } from '@webapp/store/app'
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
@@ -8,16 +11,21 @@ import { MessageActionTypes } from './actionTypes'
 export const updateMessage =
   ({ message }) =>
   async (dispatch) => {
-    dispatch({ type: MessageActionTypes.messageUpdate, message })
+    const validation = await MessageValidator.validateMessage(message)
+    const messageWithValidation = Validation.assocValidation(validation)(message)
 
-    const { uuid } = message
+    dispatch({ type: MessageActionTypes.messageUpdate, message: messageWithValidation })
 
-    const action = async () => {
-      dispatch(AppSavingActions.showAppSaving())
-      const { data: messageUpdated } = await axios.put(`/api/message/${uuid}`, message)
-      dispatch({ type: MessageActionTypes.messageUpdate, message: messageUpdated })
-      dispatch(AppSavingActions.hideAppSaving())
+    if (Validation.isValid(validation)) {
+      const { uuid } = message
+
+      const action = async () => {
+        dispatch(AppSavingActions.showAppSaving())
+        const { data: messageUpdated } = await axios.put(`/api/message/${uuid}`, message)
+        dispatch({ type: MessageActionTypes.messageUpdate, message: messageUpdated })
+        dispatch(AppSavingActions.hideAppSaving())
+      }
+
+      dispatch(debounceAction(action, `message_update_${uuid}`))
     }
-
-    dispatch(debounceAction(action, `message_update_${uuid}`))
   }
