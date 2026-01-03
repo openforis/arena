@@ -126,7 +126,7 @@ const MessageDetails = () => {
           validation={Validation.getFieldValidation('subject')(validation)}
         />
       </FormItem>
-      <FormItem label="messageView:body">
+      <FormItem label="messageView:body.label" info="messageView:body.info" isInfoMarkdown>
         <div className="message-body-editor">
           <Input
             onChange={onBodyChange}

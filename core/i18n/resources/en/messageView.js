@@ -1,5 +1,11 @@
 export default {
-  body: 'Body',
+  body: {
+    label: 'Body',
+    info: `You can use [Markdown](https://www.markdownguide.org) syntax to format the message body.  
+Some placeholder variables are also available:
+- \`{{userTitleAndName}}\`: replaced with user's title and name (e.g. "Mr John")
+- \`{{userName}}\`: replaced with user's name (e.g. "John")`,
+  },
   deleteMessage: {
     confirmTitle: 'Are you sure you want to delete this message?',
   },
