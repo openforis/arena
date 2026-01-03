@@ -34,6 +34,6 @@ export const useMessageListColumns = () => {
         renderItem: ({ item }) => DateUtils.convertDateTimeFromISOToDisplay(item.dateModified),
       },
     ],
-    []
+    [i18n]
   )
 }
