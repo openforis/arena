@@ -1,0 +1,23 @@
+import { SystemActions } from '@webapp/store/system'
+import { exportReducer } from '@webapp/utils/reduxUtils'
+
+import { MessageActionTypes } from './actions/actionTypes'
+
+const initialState = {
+  message: null,
+}
+
+const reset = () => initialState
+
+const actionHandlers = {
+  [SystemActions.SYSTEM_RESET]: reset,
+
+  [MessageActionTypes.messageReset]: reset,
+
+  [MessageActionTypes.messageUpdate]: (state, { message }) => ({
+    ...state,
+    message,
+  }),
+}
+
+export const MessageReducer = exportReducer(actionHandlers, initialState)

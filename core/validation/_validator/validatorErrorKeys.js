@@ -75,6 +75,14 @@ export const ValidatorErrorKeys = {
     nameRequired: 'validationErrors.extraPropEdit.nameRequired',
     valueRequired: 'validationErrors.extraPropEdit.valueRequired',
   },
+
+  message: {
+    bodyRequired: 'validationErrors:message.bodyRequired',
+    notificationTypeRequired: 'validationErrors:message.notificationTypeRequired',
+    subjectRequired: 'validationErrors:message.subjectRequired',
+    targetsRequired: 'validationErrors:message.targetsRequired',
+  },
+
   nodeDefEdit: {
     analysisParentEntityRequired: 'validationErrors.nodeDefEdit.analysisParentEntityRequired',
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',

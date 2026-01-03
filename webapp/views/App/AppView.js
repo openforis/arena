@@ -7,7 +7,7 @@ import { appModules } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
 import { injectReducers } from '@webapp/store'
 
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
+import { useAuthCanUseAnalysis, useAuthCanUseMessages } from '@webapp/store/user'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
@@ -22,6 +22,7 @@ const Data = React.lazy(() => import('./views/Data'))
 const Designer = React.lazy(() => import('./views/Designer'))
 const Home = React.lazy(() => import('./views/Home'))
 const Users = React.lazy(() => import('./views/Users'))
+const Message = React.lazy(() => import('./views/Message'))
 const Help = React.lazy(() => import('./views/Help'))
 
 const AppView = () => {
@@ -31,6 +32,7 @@ const AppView = () => {
 
   const isSideBarOpen = useIsSidebarOpened()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
+  const canUseMessages = useAuthCanUseMessages()
 
   return (
     <>
@@ -66,6 +68,7 @@ const AppView = () => {
                 component: Users,
                 path: `${appModules.users.path}/*`,
               },
+              ...(canUseMessages ? [{ component: Message, path: `${appModules.messages.path}/*` }] : []),
               {
                 component: Help,
                 path: `${appModules.help.path}/*`,

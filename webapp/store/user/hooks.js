@@ -68,6 +68,8 @@ export const useAuthCanValidateAllRecords = useUserIsSystemAdmin
 // ====== Auth / Map
 export const useAuthCanUseMap = () => Authorizer.canUseMap(useUser(), useSurveyInfo())
 
+export const useAuthCanUseMessages = useUserIsSystemAdmin
+
 // ====== Auth / Users
 export const useAuthCanCreateUsers = () => Authorizer.canCreateUsers(useUser())
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)

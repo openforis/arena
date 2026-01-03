@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { marked } from 'marked'
-import DOMPurify from 'dompurify'
+
+import { parseMarkdown } from '@core/markdownUtils'
 
 const Markdown = (props) => {
   const { container: Container = 'div', className = undefined, source } = props
@@ -9,12 +9,8 @@ const Markdown = (props) => {
   const [output, setOutput] = useState('')
 
   useEffect(() => {
-    const parsedSource = marked.parse(source, {
-      // disable deprecated options
-      headerIds: false,
-      mangle: false,
-    })
-    setOutput(DOMPurify.sanitize(parsedSource))
+    const parsedSource = parseMarkdown(source)
+    setOutput(parsedSource)
   }, [source])
 
   return <Container className={className} dangerouslySetInnerHTML={{ __html: output }} />

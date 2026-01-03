@@ -12,13 +12,13 @@ import * as FileService from '@server/modules/record/service/fileService'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as apiRouter from './apiRouter'
-import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
+import { DataMigrator } from './dataMigrator'
+import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
+import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
-import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 import { SwaggerInitializer } from './swaggerInitializer'
-import { DataMigrator } from './dataMigrator'
 
 const fileSizeLimit = 2 * 1024 * 1024 * 1024 // 2GB
 
