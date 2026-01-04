@@ -6,6 +6,7 @@ Some placeholder variables are also available:
 - \`{{userTitleAndName}}\`: replaced with user's title and name (e.g. "Mr John")
 - \`{{userName}}\`: replaced with user's name (e.g. "John")`,
   },
+  dateSent: 'Date Sent',
   deleteMessage: {
     confirmTitle: 'Are you sure you want to delete this message?',
   },
@@ -22,7 +23,6 @@ Some placeholder variables are also available:
   },
   subject: 'Subject',
   target: {
-    label: 'Target',
     emailsExcluded: {
       label: 'Excluded Emails',
       placeholder: 'Type an email address to exclude, then press Add button',
@@ -32,6 +32,7 @@ Some placeholder variables are also available:
       placeholder: 'Type an email address to include, then press Add button',
     },
     userType: {
+      label: 'Target User Type',
       all: 'All Users',
       system_admins: 'System Administrators',
       survey_managers: 'Survey Managers',

@@ -6,6 +6,7 @@ Algunas variables de marcador de posición también están disponibles:
 - \`{{userTitleAndName}}\`: reemplazado con el título y nombre del usuario (p. ej., "Sr. Juan")
 - \`{{userName}}\`: reemplazado con el nombre del usuario (p. ej., "Juan")`,
   },
+  dateSent: 'Fecha de envío',
   deleteMessage: {
     confirmTitle: '¿Está seguro de que desea eliminar este mensaje?',
   },
@@ -32,6 +33,7 @@ Algunas variables de marcador de posición también están disponibles:
       placeholder: 'Escriba una dirección de correo electrónico para incluir, luego presione el botón Agregar',
     },
     userType: {
+      label: 'Tipo de usuario objetivo',
       all: 'Todos los usuarios',
       system_admins: 'Administradores del sistema',
       survey_managers: 'Gestores de encuestas',

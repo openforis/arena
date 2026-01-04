@@ -19,6 +19,7 @@ export default {
   DataImportJob: 'Өгөгдөл импортлох',
   DataImportValidationJob: 'Өгөгдөл импортлох файлын баталгаажуулалт',
   FilesImportJob: 'Файл импортлох',
+  MessageSendJob: 'Мессеж илгээх',
   NodeDefsImportJob: 'Зангилааны тодорхойлолт импортлох',
   NodeDefsValidationJob: 'Зангилааны тодорхойлолт баталгаажуулах',
   chainsCyclesCheckJob: 'Гинжин хэлхээний мөчлөгийг шалгах',
@@ -40,6 +41,7 @@ export default {
   SurveyRdbCreationJob: 'Судалгааны RDB үүсгэх',
   SurveyUnpublishJob: 'Судалгааг нийтлэхгүй болгох',
   SurveyPropsUnpublishJob: 'Судалгааны шинж чанарыг нийтлэхгүй болгох',
+  SurveysListExportJob: 'Судалгааны жагсаалт экспортлох',
   TaxonomiesImportJob: 'Таксоном импортлох',
   TaxonomiesValidationJob: 'Таксоном баталгаажуулах',
   TaxonomyImportJob: 'Таксоном импортлох',
@@ -48,6 +50,8 @@ export default {
   DataSummaryExportJob: 'Өгөгдлийн хураангуй экспортлох',
   ZipCreationJob: 'ZIP файл үүсгэх',
   CSVDataExtraction: 'Өгөгдөл задлах',
+  // geo
+  GeoJsonDataExportJob: 'GeoJson өгөгдөл экспортлох',
   // import arena survey
   ArenaImportJob: 'Arena импортлох',
   ArenaSurveyReaderJob: 'Arena судалгаа уншигч',
