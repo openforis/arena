@@ -8,6 +8,7 @@ import { MessageStatus, MessageTargetUserType, Messages } from '@openforis/arena
 
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
+import * as DateUtils from '@core/dateUtils'
 
 import { Button, ButtonDelete, ButtonSave, Markdown, Switch } from '@webapp/components'
 import { ButtonGroup } from '@webapp/components/form'
@@ -201,6 +202,15 @@ const MessageDetails = () => {
             placeholder="messageView:target.emailsExcluded.placeholder"
             selection={Messages.getTargetExcludedUserEmails(message)}
             textTransformFunction={emailTransformFunction}
+          />
+        </FormItem>
+      )}
+      {readOnly && (
+        <FormItem label="messageView:dateSent">
+          <Input
+            className="message-date-modified-input"
+            readOnly
+            value={DateUtils.formatDateTimeDisplay(message?.dateModified)}
           />
         </FormItem>
       )}

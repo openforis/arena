@@ -6,6 +6,7 @@ Some placeholder variables are also available:
 - \`{{userTitleAndName}}\`: replaced with user's title and name (e.g. "Mr John")
 - \`{{userName}}\`: replaced with user's name (e.g. "John")`,
   },
+  dateSent: 'Date Sent',
   deleteMessage: {
     confirmTitle: 'Are you sure you want to delete this message?',
   },
