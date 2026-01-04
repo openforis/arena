@@ -32,6 +32,7 @@ Algunas variables de marcador de posición también están disponibles:
       placeholder: 'Escriba una dirección de correo electrónico para incluir, luego presione el botón Agregar',
     },
     userType: {
+      label: 'Tipo de usuario objetivo',
       all: 'Todos los usuarios',
       system_admins: 'Administradores del sistema',
       survey_managers: 'Gestores de encuestas',
