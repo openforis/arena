@@ -172,7 +172,7 @@ const MessageDetails = () => {
           {showPreview && <Markdown source={messageBody} className="message-body-preview" />}
         </div>
       </FormItem>
-      <FormItem label="messageView:target.userTypes.label">
+      <FormItem label="messageView:target.userType.label">
         <ButtonGroup
           disabled={readOnly}
           groupName="messageTargetUserTypes"

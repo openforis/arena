@@ -19,6 +19,7 @@ export default {
   DataImportJob: 'Data Import',
   DataImportValidationJob: 'Data Import File Validation',
   FilesImportJob: 'Files Import',
+  MessageSendJob: 'Message Send',
   NodeDefsImportJob: 'Node Definitions Import',
   NodeDefsValidationJob: 'Node Definitions Validation',
   chainsCyclesCheckJob: `Chains Cycles Check`,
