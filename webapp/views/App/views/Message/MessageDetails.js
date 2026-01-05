@@ -189,6 +189,7 @@ const MessageDetails = () => {
             isInputFieldValueValid={Validator.isEmailValueValid}
             onChange={onTargetEmailsIncludedChange}
             placeholder="messageView:target.emailsIncluded.placeholder"
+            readOnly={readOnly}
             selection={Messages.getTargetUserEmails(message)}
             textTransformFunction={emailTransformFunction}
           />
@@ -200,6 +201,7 @@ const MessageDetails = () => {
             isInputFieldValueValid={Validator.isEmailValueValid}
             onChange={onTargetEmailsExcludedChange}
             placeholder="messageView:target.emailsExcluded.placeholder"
+            readOnly={readOnly}
             selection={Messages.getTargetExcludedUserEmails(message)}
             textTransformFunction={emailTransformFunction}
           />
