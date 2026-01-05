@@ -28,7 +28,7 @@ export const initSystem = () => async (dispatch) => {
     i18n.changeLanguage(userPreferredLanguage)
   }
 
-  dispatch(MessageNotificationActions.fetchMessagesNotifiedToUser())
+  dispatch(MessageNotificationActions.fetchMessagesNotifiedToUser({ i18n }))
 }
 
 export const resetSystem = () => ({ type: SystemActionTypes.SYSTEM_RESET })
