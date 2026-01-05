@@ -93,7 +93,12 @@ const Header = () => {
       <div></div>
 
       <div className="app-header__user-controls">
-        <Button iconClassName="icon-bell icon-16px" onClick={toggleShowMessageNotifications} variant="text" />
+        <Button
+          iconClassName="icon-bell icon-16px"
+          onClick={toggleShowMessageNotifications}
+          title="common.notification_other"
+          variant="text"
+        />
         {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
 
         <button

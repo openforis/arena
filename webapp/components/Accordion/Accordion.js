@@ -1,3 +1,5 @@
+import './Accordion.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import MuiAccordion from '@mui/material/Accordion'
@@ -9,11 +11,11 @@ export const Accordion = (props) => {
   const { items } = props
 
   return (
-    <div>
+    <div className="accordion">
       {items.map((item, index) => (
         <MuiAccordion key={index} defaultExpanded={item.defaultExpanded}>
           <MuiAccordionSummary
-            expandIcon={<span className="icon icon-ctrl icon-20px" />}
+            expandIcon={<span className="icon icon-ctrl icon-20px expand-icon" />}
             aria-controls={`panel${index}-content`}
             id={`panel${index}-header`}
           >
