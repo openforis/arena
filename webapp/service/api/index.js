@@ -78,6 +78,7 @@ export {
   getEarthMapJsonDownloadUrl,
   getEarthMapPolygonUrl,
 } from './map'
+export { fetchNotifiedMessages } from './messageNotification'
 export {
   fetchSurveyFull,
   fetchSurveys,

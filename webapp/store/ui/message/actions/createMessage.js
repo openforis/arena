@@ -11,7 +11,7 @@ const defaultMessageBody = `Dear {{userTitleAndName}},
 MESSAGE CONTENT  
   
 Many thanks,  
-Open Foris Arena Team`
+The Open Foris Arena Team`
 
 export const createMessage =
   ({ navigate }) =>
@@ -24,7 +24,7 @@ export const createMessage =
       props: {
         [MessagePropsKey.subject]: 'Open Foris Arena - Communication',
         [MessagePropsKey.body]: defaultMessageBody,
-        [MessagePropsKey.notificationTypes]: [MessageNotificationType.Email],
+        [MessagePropsKey.notificationTypes]: [MessageNotificationType.Email, MessageNotificationType.PushNotification],
         [MessagePropsKey.targetUserTypes]: [MessageTargetUserType.All],
       },
       createdByUserUuid: User.getUuid(user),

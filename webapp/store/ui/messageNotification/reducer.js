@@ -1,10 +1,10 @@
 import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { MessageActionTypes } from './actions/actionTypes'
+import { MessageNotificationActionTypes } from './actions'
 
 const initialState = {
-  message: null,
+  messages: [],
 }
 
 const reset = () => initialState
@@ -12,12 +12,10 @@ const reset = () => initialState
 const actionHandlers = {
   [SystemActionTypes.SYSTEM_RESET]: reset,
 
-  [MessageActionTypes.messageReset]: reset,
-
-  [MessageActionTypes.messageUpdate]: (state, { message }) => ({
+  [MessageNotificationActionTypes.SET_MESSAGES]: (state, action) => ({
     ...state,
-    message,
+    messages: action.messages,
   }),
 }
 
-export const MessageReducer = exportReducer(actionHandlers, initialState)
+export const MessageNotificationReducer = exportReducer(actionHandlers, initialState)

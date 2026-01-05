@@ -1,14 +1,14 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { SurveyActions } from '@webapp/store/survey'
-import { SystemActions } from '@webapp/store/system'
+import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 
 import * as TablesActions from './actions'
 import * as TablesState from './state'
 
 const actionHandlers = {
   // Reset form
-  [SystemActions.SYSTEM_RESET]: () => ({}),
+  [SystemActionTypes.SYSTEM_RESET]: () => ({}),
 
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),

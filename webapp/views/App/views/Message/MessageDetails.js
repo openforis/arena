@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 
-import { MessageStatus, MessageTargetUserType, Messages } from '@openforis/arena-core'
+import { MessageNotificationType, MessageStatus, MessageTargetUserType, Messages } from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
@@ -18,10 +18,19 @@ import { useConfirm } from '@webapp/components/hooks'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
 
+const notificationTypeItems = [MessageNotificationType.Email, MessageNotificationType.PushNotification].map(
+  (notificationType) => ({
+    key: notificationType,
+    label: `messageView:notificationType.${notificationType}`,
+  })
+)
+
 const targetUserTypeItems = [
   MessageTargetUserType.All,
   MessageTargetUserType.SystemAdmins,
   MessageTargetUserType.SurveyManagers,
+  MessageTargetUserType.DataAnalysts,
+  MessageTargetUserType.DataCleaners,
   MessageTargetUserType.DataEditors,
   MessageTargetUserType.Individual,
 ].map((targetUserType) => ({
@@ -62,6 +71,13 @@ const MessageDetails = () => {
   const onBodyChange = useCallback(
     (value) => {
       onMessageChange(Messages.assocBody(value)(message))
+    },
+    [message, onMessageChange]
+  )
+
+  const onNotificationTypesChange = useCallback(
+    (value) => {
+      onMessageChange(Messages.assocNotificationTypes(value)(message))
     },
     [message, onMessageChange]
   )
@@ -172,6 +188,16 @@ const MessageDetails = () => {
           <Switch label="messageView:preview" checked={showPreview} onChange={onShowPreviewChange} />
           {showPreview && <Markdown source={messageBody} className="message-body-preview" />}
         </div>
+      </FormItem>
+      <FormItem label="messageView:target.notificationType.label">
+        <ButtonGroup
+          disabled={readOnly}
+          groupName="messageNotificationType"
+          items={notificationTypeItems}
+          multiple
+          onChange={onNotificationTypesChange}
+          selectedItemKey={Messages.getNotificationTypes(message)}
+        />
       </FormItem>
       <FormItem label="messageView:target.userType.label">
         <ButtonGroup

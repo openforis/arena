@@ -2,14 +2,14 @@ import * as Validation from '@core/validation/validation'
 
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { SystemActions } from '@webapp/store/system'
+import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 
 import * as SurveyActions from '../actions'
 import { NodeDefsActions } from '../nodeDefs'
 
 const actionHandlers = {
   // Reset state
-  [SystemActions.SYSTEM_RESET]: () => ({}),
+  [SystemActionTypes.SYSTEM_RESET]: () => ({}),
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),
   [SurveyActions.surveyDelete]: () => ({}),
