@@ -1,3 +1,4 @@
+export { Accordion } from './Accordion'
 export {
   Button,
   ButtonAdd,
