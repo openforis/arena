@@ -4,7 +4,14 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 
-import { MessageNotificationType, MessageStatus, MessageTargetUserType, Messages } from '@openforis/arena-core'
+import {
+  DateFormats,
+  MessageNotificationType,
+  MessagePropsKey,
+  MessageStatus,
+  MessageTargetUserType,
+  Messages,
+} from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
@@ -17,6 +24,7 @@ import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
 import { useConfirm } from '@webapp/components/hooks'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
+import { DateInput } from '@webapp/components/form/DateTimeInput'
 
 const notificationTypeItems = [MessageNotificationType.Email, MessageNotificationType.PushNotification].map(
   (notificationType) => ({
@@ -133,6 +141,14 @@ const MessageDetails = () => {
     [message, onMessageChange]
   )
 
+  const onDateValidUntilChange = useCallback(
+    (dateValidUntilString) => {
+      const dateValidUntil = DateUtils.parse(dateValidUntilString, DateFormats.dateDisplay)
+      onMessageChange(Messages.assocDateValidUntil(dateValidUntil)(message))
+    },
+    [message, onMessageChange]
+  )
+
   const onShowPreviewChange = useCallback((checked) => {
     setShowPreview(checked)
   }, [])
@@ -164,6 +180,7 @@ const MessageDetails = () => {
   const messageBody = Messages.getBody(message) ?? ''
   const validation = Validation.getValidation(message)
   const targetingIndividualUsers = Messages.getTargetUserTypes(message).includes(MessageTargetUserType.Individual)
+  const dataValidUntilFormatted = DateUtils.format(Messages.getDateValidUntil(message), DateFormats.dateDisplay)
 
   return (
     <div className="message-details">
@@ -172,7 +189,7 @@ const MessageDetails = () => {
           onChange={onSubjectChange}
           readOnly={readOnly}
           value={Messages.getSubject(message)}
-          validation={Validation.getFieldValidation('subject')(validation)}
+          validation={Validation.getFieldValidation(MessagePropsKey.subject)(validation)}
         />
       </FormItem>
       <FormItem label="messageView:body.label" info="messageView:body.info" isInfoMarkdown>
@@ -183,13 +200,13 @@ const MessageDetails = () => {
             inputType="textarea"
             textAreaRows={12}
             value={messageBody}
-            validation={Validation.getFieldValidation('body')(validation)}
+            validation={Validation.getFieldValidation(MessagePropsKey.body)(validation)}
           />
           <Switch label="messageView:preview" checked={showPreview} onChange={onShowPreviewChange} />
           {showPreview && <Markdown source={messageBody} className="message-body-preview" />}
         </div>
       </FormItem>
-      <FormItem label="messageView:target.notificationType.label">
+      <FormItem label="messageView:notificationType.label">
         <ButtonGroup
           disabled={readOnly}
           groupName="messageNotificationType"
@@ -197,6 +214,7 @@ const MessageDetails = () => {
           multiple
           onChange={onNotificationTypesChange}
           selectedItemKey={Messages.getNotificationTypes(message)}
+          validation={Validation.getFieldValidation(MessagePropsKey.notificationTypes)(validation)}
         />
       </FormItem>
       <FormItem label="messageView:target.userType.label">
@@ -233,6 +251,9 @@ const MessageDetails = () => {
           />
         </FormItem>
       )}
+      <FormItem label="messageView:dateValidUntil">
+        <DateInput onChange={onDateValidUntilChange} value={dataValidUntilFormatted} />
+      </FormItem>
       {readOnly && (
         <FormItem label="messageView:dateSent">
           <Input
