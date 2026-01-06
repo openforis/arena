@@ -7,10 +7,16 @@ Algunas variables de marcador de posición también están disponibles:
 - \`{{userName}}\`: reemplazado con el nombre del usuario (p. ej., "Juan")`,
   },
   dateSent: 'Fecha de envío',
+  dateValidUntil: 'Fecha válida hasta',
   deleteMessage: {
     confirmTitle: '¿Está seguro de que desea eliminar este mensaje?',
   },
   messageDeleted: 'Mensaje eliminado exitosamente.',
+  notificationType: {
+    label: 'Tipo de notificación',
+    email: 'Correo electrónico',
+    push_notification: 'Notificación en la aplicación',
+  },
   preview: 'Vista previa',
   sendMessage: {
     label: 'Enviar mensaje',
@@ -37,6 +43,8 @@ Algunas variables de marcador de posición también están disponibles:
       all: 'Todos los usuarios',
       system_admins: 'Administradores del sistema',
       survey_managers: 'Gestores de encuestas',
+      data_analysts: 'Analistas de datos',
+      data_cleaners: 'Limpiadores de datos',
       data_editors: 'Editores de datos',
       individual: 'Usuarios individuales',
     },

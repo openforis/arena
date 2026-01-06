@@ -7,10 +7,16 @@ export default {
 - \`{{userName}}\`: хэрэглэгчийн нэрээр солигдоно (жишээ нь "Жон")`,
   },
   dateSent: 'Илгээсэн огноо',
+  dateValidUntil: 'Хүчинтэй огноо',
   deleteMessage: {
     confirmTitle: 'Та энэ мессежийг устгахдаа итгэлтэй байна уу?',
   },
   messageDeleted: 'Мессеж амжилттай устгагдлаа.',
+  notificationType: {
+    label: 'Мэдэгдлийн төрөл',
+    email: 'Имэйл',
+    push_notification: 'Апп доторх мэдэгдэл',
+  },
   preview: 'Урьдчилан харах',
   sendMessage: {
     label: 'Мессеж илгээх',
@@ -37,6 +43,8 @@ export default {
       all: 'Бүх хэрэглэгчид',
       system_admins: 'Системийн администраторууд',
       survey_managers: 'Судалгааны менежерүүд',
+      data_analysts: 'Өгөгдөл шинжээчид',
+      data_cleaners: 'Өгөгдөл цэвэрлэгчид',
       data_editors: 'Өгөгдөл засварлагчид',
       individual: 'Бие даасан хэрэглэгчид',
     },
