@@ -12,12 +12,12 @@ export const Accordion = (props) => {
 
   return (
     <div className="accordion">
-      {items.map((item, index) => (
-        <MuiAccordion key={index} defaultExpanded={item.defaultExpanded}>
+      {items.map((item) => (
+        <MuiAccordion key={item.key} defaultExpanded={item.defaultExpanded}>
           <MuiAccordionSummary
             expandIcon={<span className="icon icon-ctrl icon-20px expand-icon" />}
-            aria-controls={`panel${index}-content`}
-            id={`panel${index}-header`}
+            aria-controls={`panel${item.key}-content`}
+            id={`panel${item.key}-header`}
           >
             <MuiTypography component="span">{item.title}</MuiTypography>
           </MuiAccordionSummary>
@@ -31,6 +31,7 @@ export const Accordion = (props) => {
 Accordion.propTypes = {
   items: PropTypes.arrayOf(
     PropTypes.shape({
+      key: PropTypes.string.isRequired,
       defaultExpanded: PropTypes.bool,
       title: PropTypes.node.isRequired,
       content: PropTypes.node.isRequired,

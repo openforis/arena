@@ -14,6 +14,7 @@ export const MessageNotificationPanel = (props) => {
     <PanelRight header="common.notification_other" onClose={onClose}>
       <Accordion
         items={messages.map((message) => ({
+          key: message.uuid,
           defaultExpanded: true,
           title: Messages.getSubject(message),
           content: (

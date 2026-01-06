@@ -113,15 +113,7 @@ const MessageDetails = () => {
         }
       }
       let messageNext = Messages.assocTargetUserTypes(targetsNext)(message)
-      // clear not applicable props
-      const targetEmailsNext = targetsNext.includes(MessageTargetUserType.Individual)
-        ? Messages.getTargetUserEmails(message)
-        : []
-      messageNext = Messages.assocTargetUserEmails(targetEmailsNext)(messageNext)
-      const excludedEmailsNext = targetsNext.includes(MessageTargetUserType.Individual)
-        ? []
-        : Messages.getTargetExcludedUserEmails(message)
-      messageNext = Messages.assocTargetExcludedUserEmails(excludedEmailsNext)(messageNext)
+      messageNext = Messages.clearNotApplicableProps(messageNext)
       onMessageChange(messageNext)
     },
     [message, onMessageChange]
@@ -259,7 +251,7 @@ const MessageDetails = () => {
           <Input
             className="message-date-modified-input"
             readOnly
-            value={DateUtils.formatDateTimeDisplay(message?.dateModified)}
+            value={DateUtils.formatDateTimeDisplay(Messages.getDateModified(message))}
           />
         </FormItem>
       )}
