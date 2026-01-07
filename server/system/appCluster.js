@@ -20,7 +20,7 @@ import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
 import { SwaggerInitializer } from './swaggerInitializer'
 
-const fileSizeLimit = 2 * 1024 * 1024 * 1024 // 2GB
+const fileSizeLimit = ProcessUtils.ENV.fileUploadLimit
 
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
