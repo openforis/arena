@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 
 import { UUIDs } from '@openforis/arena-core'
 
+import * as ProcessUtils from '@core/processUtils'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import * as JobSerialized from '@common/job/jobSerialized'
 
@@ -23,6 +24,8 @@ import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
 import { ImportStartButton } from './ImportStartButton'
+
+const fileMaxSize = ProcessUtils.ENV.fileUploadLimit / 1024 ** 2 // in MB
 
 const acceptedFileExtensions = ['zip']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
@@ -66,9 +69,6 @@ export const DataImportArenaView = () => {
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
-  const fileMaxSize = userIsSystemAdmin
-    ? 2048 // 2 GB
-    : 1024 // 1 GB
 
   const [state, setState] = useState({
     cycle: surveyCycle,

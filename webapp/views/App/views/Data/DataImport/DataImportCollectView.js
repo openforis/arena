@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
+import * as ProcessUtils from '@core/processUtils'
 import { RecordCycle } from '@core/record/recordCycle'
 
 import * as API from '@webapp/service/api'
@@ -20,7 +21,7 @@ import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { ImportStartButton } from './ImportStartButton'
 
-const fileMaxSize = 1000 // 1 GB
+const fileMaxSize = ProcessUtils.ENV.fileUploadLimit / 1024 ** 2 // in MB
 const acceptedFileExtensions = ['collect-backup', 'collect-data']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
 

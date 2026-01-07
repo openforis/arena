@@ -51,6 +51,7 @@ const ENV = {
   sessionIdCookieSecret: process.env.SESSION_ID_COOKIE_SECRET,
   // SERVER
   useHttps: isTrue(process.env.USE_HTTPS),
+  fileUploadLimit: Number(process.env.FILE_UPLOAD_LIMIT) || 1024 ** 3, // 1GB
   // RStudio Server
   rStudioDownloadServerUrl: process.env.RSTUDIO_DOWNLOAD_SERVER_URL,
   rStudioServerUrl: process.env.RSTUDIO_SERVER_URL,
