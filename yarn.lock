@@ -2381,27 +2381,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@date-io/core@npm:^2.17.0":
-  version: 2.17.0
-  resolution: "@date-io/core@npm:2.17.0"
-  checksum: 10c0/e56df44e9b0bc14eefad8509fef2f4a0b847ea01ad0f2cf6b7b5fce5f69120e607a90b6436e84266a2b0336b6bb986fd3f56c3f4b897db85578b9050ac6610bd
-  languageName: node
-  linkType: hard
-
-"@date-io/date-fns@npm:^2.16.0":
-  version: 2.17.0
-  resolution: "@date-io/date-fns@npm:2.17.0"
-  dependencies:
-    "@date-io/core": "npm:^2.17.0"
-  peerDependencies:
-    date-fns: ^2.0.0
-  peerDependenciesMeta:
-    date-fns:
-      optional: true
-  checksum: 10c0/0c2a4d4a841d7918e3e7457ee18d3cee469246be71a6e78879c7b0ec7bac29de7f3a63659fed6b1da2976527bec9886f509836d399c6a066aa502acf9ade2e60
-  languageName: node
-  linkType: hard
-
 "@discoveryjs/json-ext@npm:0.5.7, @discoveryjs/json-ext@npm:^0.5.0":
   version: 0.5.7
   resolution: "@discoveryjs/json-ext@npm:0.5.7"
@@ -3316,8 +3295,8 @@ __metadata:
   linkType: hard
 
 "@mui/x-data-grid@npm:^7.14.0":
-  version: 7.29.11
-  resolution: "@mui/x-data-grid@npm:7.29.11"
+  version: 7.29.12
+  resolution: "@mui/x-data-grid@npm:7.29.12"
   dependencies:
     "@babel/runtime": "npm:^7.25.7"
     "@mui/utils": "npm:^5.16.6 || ^6.0.0 || ^7.0.0"
@@ -3338,7 +3317,7 @@ __metadata:
       optional: true
     "@emotion/styled":
       optional: true
-  checksum: 10c0/662adaeb3eedc85a34d6c8aedfb232faf06f7bd76ceb74ea2589f6e58d7555bd86f83d02595b16961cb2fc789e8e0e4124708324222bd2b4e468de436a3313b5
+  checksum: 10c0/c2d19474271d00e56909db63485e1223c005c17891c13c23ffe2486d4b887f2971603cd6513e258dcd8c07bca383eb87fc8faaff17b2f5be6bee4c659e921e64
   languageName: node
   linkType: hard
 
@@ -14634,7 +14613,6 @@ __metadata:
     "@babel/runtime-corejs3": "npm:^7.25.0"
     "@codemirror/autocomplete": "npm:^6.18.0"
     "@codemirror/lang-javascript": "npm:^6.2.2"
-    "@date-io/date-fns": "npm:^2.16.0"
     "@emotion/react": "npm:^11.11.4"
     "@emotion/styled": "npm:^11.11.5"
     "@fontsource/noto-sans": "npm:^5.2.7"

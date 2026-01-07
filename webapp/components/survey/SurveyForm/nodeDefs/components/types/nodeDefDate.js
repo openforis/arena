@@ -35,6 +35,7 @@ const NodeDefDate = (props) => {
             dateStr: newDate,
             formatFrom: dateFormat.display,
             formatTo: dateFormat.storage,
+            keepTimeZone: false, // in this case we need to discard the timezone info
           })
         : null
 
