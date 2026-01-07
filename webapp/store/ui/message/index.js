@@ -1,2 +1,3 @@
-export { MessageActionTypes } from './actions'
-export { MessageActions } from './actions'
+export { MessageActionTypes, MessageActions } from './actions'
+export { MessageReducer } from './reducer'
+export { MessageState } from './state'

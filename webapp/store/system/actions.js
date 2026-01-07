@@ -3,9 +3,8 @@ import analytics from '@webapp/service/analytics'
 import * as API from '@webapp/service/api'
 import { showJobMonitor } from '../app/job/actions'
 import { useI18n } from './i18n'
-
-export const SYSTEM_INIT = 'system/init'
-export const SYSTEM_RESET = 'system/reset'
+import { MessageNotificationActions } from '../ui/messageNotification'
+import { SystemActionTypes } from './actionTypes'
 
 export const initSystem = () => async (dispatch) => {
   const i18n = useI18n()
@@ -17,17 +16,21 @@ export const initSystem = () => async (dispatch) => {
     properties: user,
   })
 
-  dispatch({ type: SYSTEM_INIT, user, survey })
+  dispatch({ type: SystemActionTypes.SYSTEM_INIT, user, survey })
 
-  const activeJob = await API.fetchActiveJob()
-  if (activeJob) {
-    dispatch(showJobMonitor({ job: activeJob }))
-  }
+  if (user) {
+    const activeJob = await API.fetchActiveJob()
+    if (activeJob) {
+      dispatch(showJobMonitor({ job: activeJob }))
+    }
 
-  const userPreferredLanguage = user ? User.getPrefLanguage(user) : null
-  if (userPreferredLanguage) {
-    i18n.changeLanguage(userPreferredLanguage)
+    const userPreferredLanguage = User.getPrefLanguage(user)
+    if (userPreferredLanguage) {
+      i18n.changeLanguage(userPreferredLanguage)
+    }
+
+    dispatch(MessageNotificationActions.fetchMessagesNotifiedToUser({ i18n }))
   }
 }
 
-export const resetSystem = () => ({ type: SYSTEM_RESET })
+export const resetSystem = () => ({ type: SystemActionTypes.SYSTEM_RESET })

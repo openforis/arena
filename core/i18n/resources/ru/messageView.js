@@ -7,10 +7,16 @@ export default {
 - \`{{userName}}\`: заменяется именем пользователя (например, "Иван")`,
   },
   dateSent: 'Дата отправки',
+  dateValidUntil: 'Дата действия до',
   deleteMessage: {
     confirmTitle: 'Вы уверены, что хотите удалить это сообщение?',
   },
   messageDeleted: 'Сообщение успешно удалено.',
+  notificationType: {
+    label: 'Тип уведомления',
+    email: 'Электронная почта',
+    push_notification: 'Уведомление в приложении',
+  },
   preview: 'Предпросмотр',
   sendMessage: {
     label: 'Отправить сообщение',
@@ -37,6 +43,8 @@ export default {
       all: 'Все пользователи',
       system_admins: 'Системные администраторы',
       survey_managers: 'Менеджеры опросов',
+      data_analysts: 'Аналитики данных',
+      data_cleaners: 'Специалисты по очистке данных',
       data_editors: 'Редакторы данных',
       individual: 'Отдельные пользователи',
     },

@@ -67,16 +67,23 @@
   margin-left: 10px;
 }
 
-.app-header__btn-user {
-  max-height: $headerHeight - 1px;
-  margin-right: 20px;
+.app-header__user-controls {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  cursor: pointer;
-  border: unset;
+  gap: 1rem;
 
-  .icon {
-    padding: 1.2rem 0 0.7rem 0.2rem;
-    transform: scaleY(-0.7);
+  .app-header__btn-user {
+    max-height: $headerHeight - 1px;
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border: unset;
+
+    .icon {
+      padding: 1.2rem 0 0.7rem 0.2rem;
+      transform: scaleY(-0.7);
+    }
   }
 }

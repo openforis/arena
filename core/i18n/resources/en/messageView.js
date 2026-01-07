@@ -7,10 +7,16 @@ Some placeholder variables are also available:
 - \`{{userName}}\`: replaced with user's name (e.g. "John")`,
   },
   dateSent: 'Date Sent',
+  dateValidUntil: 'Date Valid Until',
   deleteMessage: {
     confirmTitle: 'Are you sure you want to delete this message?',
   },
   messageDeleted: 'Message deleted successfully.',
+  notificationType: {
+    label: 'Notification Type',
+    email: 'Email',
+    push_notification: 'In App Notification',
+  },
   preview: 'Preview',
   sendMessage: {
     label: 'Send Message',
@@ -36,6 +42,8 @@ Some placeholder variables are also available:
       all: 'All Users',
       system_admins: 'System Administrators',
       survey_managers: 'Survey Managers',
+      data_analysts: 'Data Analysts',
+      data_cleaners: 'Data Cleaners',
       data_editors: 'Data Editors',
       individual: 'Individual Users',
     },

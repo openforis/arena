@@ -4,7 +4,14 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 
-import { MessageStatus, MessageTargetUserType, Messages } from '@openforis/arena-core'
+import {
+  DateFormats,
+  MessageNotificationType,
+  MessagePropsKey,
+  MessageStatus,
+  MessageTargetUserType,
+  Messages,
+} from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
@@ -17,11 +24,21 @@ import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
 import { useConfirm } from '@webapp/components/hooks'
 import { MessageActions } from '@webapp/store/ui/message'
 import { useMessage } from '@webapp/store/ui/message/hooks'
+import { DateInput } from '@webapp/components/form/DateTimeInput'
+
+const notificationTypeItems = [MessageNotificationType.Email, MessageNotificationType.PushNotification].map(
+  (notificationType) => ({
+    key: notificationType,
+    label: `messageView:notificationType.${notificationType}`,
+  })
+)
 
 const targetUserTypeItems = [
   MessageTargetUserType.All,
   MessageTargetUserType.SystemAdmins,
   MessageTargetUserType.SurveyManagers,
+  MessageTargetUserType.DataAnalysts,
+  MessageTargetUserType.DataCleaners,
   MessageTargetUserType.DataEditors,
   MessageTargetUserType.Individual,
 ].map((targetUserType) => ({
@@ -66,6 +83,13 @@ const MessageDetails = () => {
     [message, onMessageChange]
   )
 
+  const onNotificationTypesChange = useCallback(
+    (value) => {
+      onMessageChange(Messages.assocNotificationTypes(value)(message))
+    },
+    [message, onMessageChange]
+  )
+
   const onTargetUserTypesChange = useCallback(
     (value) => {
       const targetsPrev = Messages.getTargetUserTypes(message)
@@ -89,15 +113,7 @@ const MessageDetails = () => {
         }
       }
       let messageNext = Messages.assocTargetUserTypes(targetsNext)(message)
-      // clear not applicable props
-      const targetEmailsNext = targetsNext.includes(MessageTargetUserType.Individual)
-        ? Messages.getTargetUserEmails(message)
-        : []
-      messageNext = Messages.assocTargetUserEmails(targetEmailsNext)(messageNext)
-      const excludedEmailsNext = targetsNext.includes(MessageTargetUserType.Individual)
-        ? []
-        : Messages.getTargetExcludedUserEmails(message)
-      messageNext = Messages.assocTargetExcludedUserEmails(excludedEmailsNext)(messageNext)
+      messageNext = Messages.clearNotApplicableProps(messageNext)
       onMessageChange(messageNext)
     },
     [message, onMessageChange]
@@ -113,6 +129,14 @@ const MessageDetails = () => {
   const onTargetEmailsExcludedChange = useCallback(
     (value) => {
       onMessageChange(Messages.assocTargetExcludedUserEmails(value)(message))
+    },
+    [message, onMessageChange]
+  )
+
+  const onDateValidUntilChange = useCallback(
+    (dateValidUntilString) => {
+      const dateValidUntil = DateUtils.parse(dateValidUntilString, DateFormats.dateDisplay)
+      onMessageChange(Messages.assocDateValidUntil(dateValidUntil)(message))
     },
     [message, onMessageChange]
   )
@@ -148,6 +172,7 @@ const MessageDetails = () => {
   const messageBody = Messages.getBody(message) ?? ''
   const validation = Validation.getValidation(message)
   const targetingIndividualUsers = Messages.getTargetUserTypes(message).includes(MessageTargetUserType.Individual)
+  const dataValidUntilFormatted = DateUtils.format(Messages.getDateValidUntil(message), DateFormats.dateDisplay)
 
   return (
     <div className="message-details">
@@ -156,7 +181,7 @@ const MessageDetails = () => {
           onChange={onSubjectChange}
           readOnly={readOnly}
           value={Messages.getSubject(message)}
-          validation={Validation.getFieldValidation('subject')(validation)}
+          validation={Validation.getFieldValidation(MessagePropsKey.subject)(validation)}
         />
       </FormItem>
       <FormItem label="messageView:body.label" info="messageView:body.info" isInfoMarkdown>
@@ -167,11 +192,22 @@ const MessageDetails = () => {
             inputType="textarea"
             textAreaRows={12}
             value={messageBody}
-            validation={Validation.getFieldValidation('body')(validation)}
+            validation={Validation.getFieldValidation(MessagePropsKey.body)(validation)}
           />
           <Switch label="messageView:preview" checked={showPreview} onChange={onShowPreviewChange} />
           {showPreview && <Markdown source={messageBody} className="message-body-preview" />}
         </div>
+      </FormItem>
+      <FormItem label="messageView:notificationType.label">
+        <ButtonGroup
+          disabled={readOnly}
+          groupName="messageNotificationType"
+          items={notificationTypeItems}
+          multiple
+          onChange={onNotificationTypesChange}
+          selectedItemKey={Messages.getNotificationTypes(message)}
+          validation={Validation.getFieldValidation(MessagePropsKey.notificationTypes)(validation)}
+        />
       </FormItem>
       <FormItem label="messageView:target.userType.label">
         <ButtonGroup
@@ -189,6 +225,7 @@ const MessageDetails = () => {
             isInputFieldValueValid={Validator.isEmailValueValid}
             onChange={onTargetEmailsIncludedChange}
             placeholder="messageView:target.emailsIncluded.placeholder"
+            readOnly={readOnly}
             selection={Messages.getTargetUserEmails(message)}
             textTransformFunction={emailTransformFunction}
           />
@@ -200,17 +237,21 @@ const MessageDetails = () => {
             isInputFieldValueValid={Validator.isEmailValueValid}
             onChange={onTargetEmailsExcludedChange}
             placeholder="messageView:target.emailsExcluded.placeholder"
+            readOnly={readOnly}
             selection={Messages.getTargetExcludedUserEmails(message)}
             textTransformFunction={emailTransformFunction}
           />
         </FormItem>
       )}
+      <FormItem label="messageView:dateValidUntil">
+        <DateInput onChange={onDateValidUntilChange} value={dataValidUntilFormatted} />
+      </FormItem>
       {readOnly && (
         <FormItem label="messageView:dateSent">
           <Input
             className="message-date-modified-input"
             readOnly
-            value={DateUtils.formatDateTimeDisplay(message?.dateModified)}
+            value={DateUtils.formatDateTimeDisplay(Messages.getDateModified(message))}
           />
         </FormItem>
       )}
