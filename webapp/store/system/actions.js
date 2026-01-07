@@ -18,17 +18,19 @@ export const initSystem = () => async (dispatch) => {
 
   dispatch({ type: SystemActionTypes.SYSTEM_INIT, user, survey })
 
-  const activeJob = await API.fetchActiveJob()
-  if (activeJob) {
-    dispatch(showJobMonitor({ job: activeJob }))
-  }
+  if (user) {
+    const activeJob = await API.fetchActiveJob()
+    if (activeJob) {
+      dispatch(showJobMonitor({ job: activeJob }))
+    }
 
-  const userPreferredLanguage = user ? User.getPrefLanguage(user) : null
-  if (userPreferredLanguage) {
-    i18n.changeLanguage(userPreferredLanguage)
-  }
+    const userPreferredLanguage = User.getPrefLanguage(user)
+    if (userPreferredLanguage) {
+      i18n.changeLanguage(userPreferredLanguage)
+    }
 
-  dispatch(MessageNotificationActions.fetchMessagesNotifiedToUser({ i18n }))
+    dispatch(MessageNotificationActions.fetchMessagesNotifiedToUser({ i18n }))
+  }
 }
 
 export const resetSystem = () => ({ type: SystemActionTypes.SYSTEM_RESET })
