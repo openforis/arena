@@ -10,9 +10,10 @@ export { NotificationActions, NotificationState, useNotification } from './notif
 // ====== MessageNotification
 export {
   MessageNotificationActions,
-  useMessageNotifications,
   MessageNotificationReducer,
   MessageNotificationState,
+  useMessageNotifications,
+  useHasMessageNotifications,
 } from './messageNotification'
 
 // ====== Loader

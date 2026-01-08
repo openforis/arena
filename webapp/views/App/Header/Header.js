@@ -25,8 +25,9 @@ import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/Surve
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 
 import { Breadcrumbs } from './Breadcrumbs'
-import { MessageNotificationPanel } from './MessageNotificationsPanel/MessageNotificationPanel'
+import { MessageNotificationPanel } from './MessageNotificationsPanel'
 import UserPopupMenu from './UserPopupMenu'
+import { useHasMessageNotifications } from '@webapp/store/ui'
 
 const Header = () => {
   const dispatch = useDispatch()
@@ -38,6 +39,7 @@ const Header = () => {
   const surveyIsDirty = useIsSurveyDirty()
   const surveyCycleKey = useSurveyCycleKey()
   const canEditSurvey = useAuthCanEditSurvey()
+  const hasMessageNotifications = useHasMessageNotifications()
 
   const [showUserPopup, setShowUserPopup] = useState(false)
   const toggleShowUserPopup = useCallback(() => setShowUserPopup((showUserPopupPrev) => !showUserPopupPrev), [])
@@ -93,14 +95,17 @@ const Header = () => {
       <div></div>
 
       <div className="app-header__user-controls">
-        <Button
-          iconClassName="icon-bell icon-16px"
-          onClick={toggleShowMessageNotifications}
-          title="common.notification_other"
-          variant="text"
-        />
-        {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
-
+        {hasMessageNotifications && (
+          <>
+            <Button
+              iconClassName="icon-bell icon-16px"
+              onClick={toggleShowMessageNotifications}
+              title="common.notification_other"
+              variant="text"
+            />
+            {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
+          </>
+        )}
         <button
           className="app-header__btn-user"
           data-testid={TestId.header.userBtn}
