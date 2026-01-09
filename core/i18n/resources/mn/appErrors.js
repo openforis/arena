@@ -16,6 +16,7 @@ export default {
   },
   dataImport: {
     importFromMobileNotAllawed: 'Arena Mobile-с өгөгдөл импортлохыг хориглоно',
+    noRecordsFound: 'Импортын файлд бичлэг олдсонгүй эсвэл буруу файлын формат',
   },
   entryDataNotFound: 'Оролтын өгөгдөл олдсонгүй: {{entryName}}',
   expression: {

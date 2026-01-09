@@ -30,7 +30,7 @@ const namespaces = [
 ]
 const defaultNamespace = 'common'
 
-const experimentalLanguages = ['ru']
+const experimentalLanguages = []
 
 export const supportedLanguages = Object.keys(resources).filter(
   (lang) => ProcessUtils.ENV.experimentalFeatures || !experimentalLanguages.includes(lang)
