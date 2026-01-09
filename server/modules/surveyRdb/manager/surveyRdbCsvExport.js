@@ -1,4 +1,4 @@
-import { Objects } from '@openforis/arena-core'
+import { FlatDataExportModel, Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -6,7 +6,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
 import { ArrayUtils } from '@core/arrayUtils'
-import { CsvDataExportModel } from '@common/model/csvExport'
 import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
 
@@ -44,7 +43,7 @@ const fieldsExtractorByNodeDefType = {
           nodeDef,
           itemVisitor: (item) => {
             result.push(
-              CsvDataExportModel.getExpandedCategoryItemColumnHeader({ nodeDef, code: CategoryItem.getCode(item) })
+              FlatDataExportModel.getExpandedCategoryItemColumnHeader({ nodeDef, code: CategoryItem.getCode(item) })
             )
           },
         })
@@ -141,7 +140,7 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
         nodeDef,
         itemVisitor: (item) => {
           const code = CategoryItem.getCode(item)
-          const colName = CsvDataExportModel.getExpandedCategoryItemColumnHeader({ nodeDef, code })
+          const colName = FlatDataExportModel.getExpandedCategoryItemColumnHeader({ nodeDef, code })
           obj[colName] = values?.includes(code)
         },
       })

@@ -1,6 +1,4 @@
-import { Objects } from '@openforis/arena-core'
-
-import { CsvDataExportModel } from '@common/model/csvExport'
+import { FlatDataExportModel, Objects } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
 import * as Srs from '@core/geo/srs'
@@ -257,7 +255,7 @@ const createReaderFromStream = ({
 }) => {
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-  const csvDataExportModel = new CsvDataExportModel({
+  const csvDataExportModel = new FlatDataExportModel({
     survey,
     cycle,
     nodeDefContext,
