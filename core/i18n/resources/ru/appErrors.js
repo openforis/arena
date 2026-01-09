@@ -16,6 +16,7 @@ export default {
   },
   dataImport: {
     importFromMobileNotAllawed: 'Импорт данных из Arena Mobile не разрешен',
+    noRecordsFound: 'В файле импорта не найдено записей или неверный формат файла',
   },
   entryDataNotFound: 'Данные записи не найдены: {{entryName}}',
   expression: {

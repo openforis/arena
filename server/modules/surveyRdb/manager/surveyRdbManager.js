@@ -1,59 +1,56 @@
 import pgPromise from 'pg-promise'
 
-import { Dates, Objects, SystemError } from '@openforis/arena-core'
+import { Dates, Objects, SystemError, UniqueFileNamesGenerator } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 import * as Record from '@core/record/record'
 import * as StringUtils from '@core/stringUtils'
-import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
-import * as FileUtils from '@server/utils/file/fileUtils'
+import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
+import { Query } from '@common/model/query'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+
+import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import { StreamUtils } from '@server/utils/streamUtils'
 
-import { db } from '../../../db/db'
-import * as DbUtils from '../../../db/dbUtils'
-import * as FlatDataWriter from '../../../utils/file/flatDataWriter'
-
-import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
-
-import { Query } from '../../../../common/model/query'
-import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
-
+import * as DataTableRepository from '../repository/dataTable'
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
-import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
 import { SurveyRdbCsvExport } from './surveyRdbCsvExport'
-import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
-import { StreamUtils } from '@server/utils/streamUtils'
 
 // ==== DDL
 
 // schema
+export { deleteRowsByRecordUuid } from '../repository/dataTableDeleteRepository'
 export {
   createSchema,
-  dropSchema,
-  selectOlapDataTablesExists,
   dropDataTablesAndViews,
   dropOlapDataTablesAndViews,
+  dropSchema,
+  selectOlapDataTablesExists,
 } from '../repository/schemaRdbRepository'
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository
 export const { createDataView, countViewData, countViewDataAgg } = DataViewRepository
-export { deleteRowsByRecordUuid } from '../repository/dataTableDeleteRepository'
 
 // Node key views
-export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
 export { createNodeHierarchyDisaggregatedView } from '../repository/nodeHierarchyDisaggregatedViewRepository'
 export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyViewRepository'
+export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
 
 // Result tables and views
 export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } from '../repository/resultNode'
 
-export { createOlapDataTable, insertOlapData, clearOlapData } from '../repository/olapDataTable'
+export { clearOlapData, createOlapDataTable, insertOlapData } from '../repository/olapDataTable'
 
 const maxExcelCellsLimit = 1000000
 
@@ -434,8 +431,8 @@ export const fetchEntitiesFileUuidsByCycle = async (
     const entityData = await fetchViewData({ survey, cycle, recordOwnerUuid, query, addCycle: true }, client)
     const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDefContext)
 
-    entityData.forEach((entityRow) => {
-      childrenFileDefs.forEach((nodeDefFile) => {
+    for (const entityRow of entityData) {
+      for (const nodeDefFile of childrenFileDefs) {
         const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefFile)
         const fileUuidColumnName = columnNodeDef.name
         const fileUuid = entityRow[fileUuidColumnName]
@@ -446,8 +443,8 @@ export const fetchEntitiesFileUuidsByCycle = async (
           fileUuidsByCycle[rowCycle] = fileUuids
           total++
         }
-      })
-    })
+      }
+    }
   }
   return { fileUuidsByCycle, total }
 }
