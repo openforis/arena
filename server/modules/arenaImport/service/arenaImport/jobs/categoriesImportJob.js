@@ -57,12 +57,15 @@ export default class CategoriesImportJob extends Job {
     let items = await ArenaSurveyFileZip.getCategoryItems(zipFile, categoryUuid)
     if (items.length > 0) {
       // category items in a single file
+      this.logDebug(`Inserting ${items.length} items for category ${Category.getName(category)}`)
       await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
     } else {
       // big category: items splitted in parts
+      this.logDebug(`Inserting items in parts for category ${Category.getName(category)}`)
       const partsCount = ArenaSurveyFileZip.getCategoryItemsPartsCount({ zipFile, categoryUuid })
       let partIndex = 0
       while (partIndex < partsCount) {
+        this.logDebug(`Inserting part ${partIndex + 1} of ${partsCount} for category ${Category.getName(category)}`)
         items = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: partIndex })
         await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
         partIndex = partIndex + 1
