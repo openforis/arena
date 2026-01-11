@@ -54,20 +54,59 @@ export default class CategoriesImportJob extends Job {
       this.tx
     )
 
+    const categoryName = Category.getName(category)
     let items = await ArenaSurveyFileZip.getCategoryItems(zipFile, categoryUuid)
     if (items.length > 0) {
       // category items in a single file
+      this.logDebug(`Inserting ${items.length} items for category ${categoryName}`)
       await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
     } else {
       // big category: items splitted in parts
-      const partsCount = ArenaSurveyFileZip.getCategoryItemsPartsCount({ zipFile, categoryUuid })
-      let partIndex = 0
-      while (partIndex < partsCount) {
-        items = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: partIndex })
-        await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
-        partIndex = partIndex + 1
-      }
+      this.logDebug(`Inserting items in parts for category ${categoryName}`)
+
+      await this.insertItemsInSplittedParts({ category })
     }
     await CategoryService.initializeSurveyCategoryItemsIndexes({ surveyId, category: categoryWithLevels }, this.tx)
+  }
+
+  async insertItemsInSplittedParts({ category }) {
+    const { arenaSurveyFileZip: zipFile, backup, surveyId } = this.context
+
+    const categoryUuid = Category.getUuid(category)
+    const categoryName = Category.getName(category)
+
+    const partsCount = ArenaSurveyFileZip.getCategoryItemsPartsCount({ zipFile, categoryUuid })
+
+    try {
+      // use a nested transaction to be able to rollback only the parts insertion if something fails
+      await this.tx.tx(async (nestedTx) => {
+        let partIndex = 0
+        let items = []
+        while (partIndex < partsCount) {
+          this.logDebug(`Inserting part ${partIndex + 1} of ${partsCount} for category ${Category.getName(category)}`)
+          items = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: partIndex })
+          await CategoryService.insertItemsInBatch({ surveyId, items, backup }, nestedTx)
+          partIndex = partIndex + 1
+        }
+      })
+    } catch (error) {
+      // if an error occurs during the parts insertion, fallback to inserting all items at once
+      this.logDebug(`Error occurred during parts insertion for category ${categoryName}: ${error.message}`)
+      this.logDebug(`Falling back to inserting all parts at once for category ${categoryName}`)
+      try {
+        const totalItems = []
+        for (let i = 0; i < partsCount; i++) {
+          let partItems = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: i })
+          totalItems.push(...partItems)
+        }
+        this.logDebug(`Total items to insert for category ${categoryName}: ${totalItems.length}`)
+        await CategoryService.insertItemsInBatch({ surveyId, items: totalItems, backup }, this.tx)
+      } catch (fallbackError) {
+        this.logDebug(
+          `Fallback insertion of all parts at once failed for category ${categoryName}: ${fallbackError.message}`
+        )
+        throw fallbackError
+      }
+    }
   }
 }

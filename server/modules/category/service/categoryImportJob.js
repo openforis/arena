@@ -56,7 +56,7 @@ export class CategoryImportInternalJob extends Job {
     // 4. import item extra def
     await this._importItemExtraDef()
     // 5. read items from csv file
-    await this._readItems()
+    await this._importItems()
 
     if (this.total === 0) {
       // Error: empty file
@@ -259,7 +259,7 @@ export class CategoryImportInternalJob extends Job {
     this.logDebug('item extra def imported', itemExtraDef)
   }
 
-  async _readItems() {
+  async _importItems() {
     this.logDebug('reading flat data file rows')
 
     const { surveyId, survey, category, summary, user, tx } = this
@@ -284,7 +284,7 @@ export class CategoryImportInternalJob extends Job {
           reader.cancel()
           return
         }
-        await this._onRow(itemRow)
+        await this._onItemRow(itemRow)
       },
       onTotalChange: (total) => {
         this.total = total + 1 // +1 consider final db inserts
@@ -296,7 +296,7 @@ export class CategoryImportInternalJob extends Job {
     this.logDebug(`${this.total - 1} rows read`)
   }
 
-  async _onRow(itemRow) {
+  async _onItemRow(itemRow) {
     const { error, levelIndex, codes, labelsByLang, descriptionsByLang, extra } = itemRow
     if (error) {
       this._addError(error.key, error.params)
