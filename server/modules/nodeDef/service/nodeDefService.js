@@ -64,8 +64,6 @@ const afterNodeDefUpdate = async ({ survey, nodeDef = null, nodeDefsDependentsUu
 
   const dependencyGraph = Survey.getDependencyGraph(surveyUpdated)
 
-  // await SurveyManager.updateSurveyDependencyGraphs(Survey.getId(surveyUpdated), dependencyGraph, client)
-
   const nodeDefsValidation = await _validateNodeDefs({
     survey: surveyUpdated,
     nodeDef,
