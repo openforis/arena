@@ -63,12 +63,28 @@ export default class CategoriesImportJob extends Job {
       // big category: items splitted in parts
       this.logDebug(`Inserting items in parts for category ${Category.getName(category)}`)
       const partsCount = ArenaSurveyFileZip.getCategoryItemsPartsCount({ zipFile, categoryUuid })
-      let partIndex = 0
-      while (partIndex < partsCount) {
-        this.logDebug(`Inserting part ${partIndex + 1} of ${partsCount} for category ${Category.getName(category)}`)
-        items = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: partIndex })
-        await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
-        partIndex = partIndex + 1
+
+      try {
+        let partIndex = 0
+        while (partIndex < partsCount) {
+          this.logDebug(`Inserting part ${partIndex + 1} of ${partsCount} for category ${Category.getName(category)}`)
+          items = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: partIndex })
+          await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
+          partIndex = partIndex + 1
+        }
+      } catch (error) {
+        this.logDebug(
+          `Error occurred during parts insertion for category ${Category.getName(category)}: ${error.message}`
+        )
+        this.logDebug(`Falling back to inserting all parts at once for category ${Category.getName(category)}`)
+
+        let totalItems = []
+        for (let i = 0; i < partsCount; i++) {
+          let partItems = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: i })
+          totalItems = totalItems.concat(partItems)
+        }
+        this.logDebug(`Total items to insert for category ${Category.getName(category)}: ${totalItems.length}`)
+        await CategoryService.insertItemsInBatch({ surveyId, items: totalItems, backup }, this.tx)
       }
     }
     await CategoryService.initializeSurveyCategoryItemsIndexes({ surveyId, category: categoryWithLevels }, this.tx)
