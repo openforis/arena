@@ -253,7 +253,7 @@ export const compressFormItems = (nodeDef) => async (dispatch, getState) => {
 
 // ==== DELETE
 
-const _checkCanRemoveNodeDef = (nodeDef) => async (dispatch, getState) => {
+const _checkCanRemoveNodeDef = async ({ dispatch, getState, nodeDef }) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const lang = SurveyState.getSurveyPreferredLang(state)
@@ -301,7 +301,7 @@ export const removeNodeDef =
 
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-    if (dispatch(_checkCanRemoveNodeDef(nodeDef))) {
+    if (await _checkCanRemoveNodeDef({ dispatch, getState, nodeDef })) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'surveyForm:nodeDefEditFormActions.confirmDelete',
