@@ -19,10 +19,10 @@ const keys = {
   version: 'version',
 }
 
-const newAppInfo = ({ appId = arenaAppId, version = ENV.applicationVersion } = {}) => ({
-  [keys.appId]: appId,
-  [keys.version]: version,
-})
+const currentAppInfo = {
+  [keys.appId]: arenaAppId,
+  [keys.version]: ENV.applicationVersion,
+}
 
 const getAppId = A.propOr(arenaAppId, keys.appId)
 
@@ -33,7 +33,7 @@ export const AppInfo = {
   arenaMobileId,
   arenaMobile2Id,
   keys,
-  newAppInfo,
+  currentAppInfo,
   getAppId,
   getAppNameById,
 }

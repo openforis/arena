@@ -29,7 +29,7 @@ export const newRecord = (user, cycle, preview = false, dateCreated = null, step
     [keys.cycle]: cycle,
     [keys.preview]: preview,
     [keys.dateCreated]: dateCreated,
-    [keys.info]: { [infoKeys.createdWith]: AppInfo.newAppInfo() },
+    [keys.info]: { [infoKeys.createdWith]: AppInfo.currentAppInfo },
   }
 }
 
