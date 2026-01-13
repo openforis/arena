@@ -55,7 +55,7 @@ const ImageProgressive = (props) => {
       setState((statePrev) => ({ ...statePrev, loading: true, error: false }))
 
       // Fetch main image with authorization
-      const { url: mainUrl, blobUrl: mainBlobUrl } = await fetchImage(srcProp)
+      const { url: mainUrl, blobUrl: mainBlobUrl } = (await fetchImage(srcProp)) ?? {}
       if (mainBlobUrl) {
         createdBlobUrls.push(mainBlobUrl)
       }

@@ -101,7 +101,7 @@ const createAxiosMiddleware =
       const { url } = originalRequest
 
       // Check for 401 response and ensure it's not the refresh endpoint itself or the login endpoint
-      if (error.response.status === 401 && !isAuthorizationIgnoredUrl(url)) {
+      if (error.response?.status === 401 && !isAuthorizationIgnoredUrl(url)) {
         return handleAuthorizationError({ originalRequest })
       }
       if (!axios.isCancel(error) && url && !isErrorIgnoredUrlIgnored(url)) {
