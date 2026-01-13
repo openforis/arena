@@ -3,7 +3,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as Survey from '@core/survey/survey'
 
 // App actions
-import { SystemActions } from '@webapp/store/system'
+import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 
 import * as SurveyActions from '../actions'
 import * as SurveyInfoActions from './actions'
@@ -13,8 +13,8 @@ import * as SurveyInfoState from './state'
 
 const actionHandlers = {
   // App initialization
-  [SystemActions.SYSTEM_INIT]: (state, { survey }) => (survey ? Survey.getSurveyInfo(survey) : state),
-  [SystemActions.SYSTEM_RESET]: () => ({}),
+  [SystemActionTypes.SYSTEM_INIT]: (state, { survey }) => (survey ? Survey.getSurveyInfo(survey) : state),
+  [SystemActionTypes.SYSTEM_RESET]: () => ({}),
 
   // Survey Update
   [SurveyActions.surveyCreate]: (state, { survey }) => Survey.getSurveyInfo(survey),

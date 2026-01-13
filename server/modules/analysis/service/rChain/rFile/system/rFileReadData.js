@@ -1,8 +1,9 @@
+import { FlatDataExportColumnDataType, FlatDataExportModel } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as ApiRoutes from '@common/apiRoutes'
-import { CsvDataExportModel } from '@common/model/csvExport'
 
 import RFileSystem from './rFileSystem'
 import {
@@ -16,9 +17,9 @@ import {
 const dataConversionTypes = { asCharacter: 'asCharacter', asLogical: 'asLogical', asNumeric: 'asNumeric' }
 
 const conversionTypeByColumnDataType = {
-  [CsvDataExportModel.columnDataType.boolean]: dataConversionTypes.asLogical,
-  [CsvDataExportModel.columnDataType.numeric]: dataConversionTypes.asNumeric,
-  [CsvDataExportModel.columnDataType.text]: dataConversionTypes.asCharacter,
+  [FlatDataExportColumnDataType.boolean]: dataConversionTypes.asLogical,
+  [FlatDataExportColumnDataType.numeric]: dataConversionTypes.asNumeric,
+  [FlatDataExportColumnDataType.text]: dataConversionTypes.asCharacter,
 }
 
 const conversionFunctionByType = {
@@ -83,14 +84,14 @@ export default class RFileReadData extends RFileSystem {
   async appendContentToConvertDataTypes({ entityDef }) {
     const { survey, cycle } = this.rChain
 
-    const csvDataExportModel = new CsvDataExportModel({
+    const flatDataExportModel = new FlatDataExportModel({
       survey,
       cycle,
       nodeDefContext: entityDef,
       options: { includeAncestorAttributes: true, includeFiles: false },
     })
 
-    const columnNamesByConversionType = csvDataExportModel.columns.reduce((acc, column) => {
+    const columnNamesByConversionType = flatDataExportModel.columns.reduce((acc, column) => {
       const { header, nodeDef, dataType } = column
 
       const conversionType = conversionTypeByColumnDataType[dataType]

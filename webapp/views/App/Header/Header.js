@@ -1,12 +1,12 @@
 import './Header.scss'
 
-import React, { useRef, useState } from 'react'
+import classNames from 'classnames'
+import React, { useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
-import classNames from 'classnames'
 
-import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
 
 import { useIsAppSaving } from '@webapp/store/app'
 import { useIsSurveyDirty, useSurveyCycleKey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -15,17 +15,19 @@ import { TestId } from '@webapp/utils/testId'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
-import { Spinner } from '@webapp/components'
-import { usePrevious } from '@webapp/components/hooks'
-import ProfilePicture from '@webapp/components/profilePicture'
+import { Button, Spinner } from '@webapp/components'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
-import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
+import { usePrevious } from '@webapp/components/hooks'
+import ProfilePicture from '@webapp/components/profilePicture'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
-
-import UserPopupMenu from './UserPopupMenu'
-import { Breadcrumbs } from './Breadcrumbs'
+import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+
+import { Breadcrumbs } from './Breadcrumbs'
+import { MessageNotificationPanel } from './MessageNotificationsPanel'
+import UserPopupMenu from './UserPopupMenu'
+import { useHasMessageNotifications } from '@webapp/store/ui'
 
 const Header = () => {
   const dispatch = useDispatch()
@@ -37,9 +39,12 @@ const Header = () => {
   const surveyIsDirty = useIsSurveyDirty()
   const surveyCycleKey = useSurveyCycleKey()
   const canEditSurvey = useAuthCanEditSurvey()
+  const hasMessageNotifications = useHasMessageNotifications()
 
   const [showUserPopup, setShowUserPopup] = useState(false)
-  const toggleShowUserPopup = () => setShowUserPopup((showUserPopupPrev) => !showUserPopupPrev)
+  const toggleShowUserPopup = useCallback(() => setShowUserPopup((showUserPopupPrev) => !showUserPopupPrev), [])
+  const [showMessageNotifications, setShowMessageNotifications] = useState(false)
+  const toggleShowMessageNotifications = useCallback(() => setShowMessageNotifications((prev) => !prev), [])
 
   const prevUser = usePrevious(user)
   const pictureUpdateKeyRef = useRef(0)
@@ -89,23 +94,35 @@ const Header = () => {
       {/* Placeholder to make the header symmetric */}
       <div></div>
 
-      <button
-        className="app-header__btn-user"
-        data-testid={TestId.header.userBtn}
-        disabled={surveyIsDirty}
-        onClick={(event) => {
-          event.preventDefault()
-          event.stopPropagation()
-          toggleShowUserPopup()
-        }}
-        onKeyDown={toggleShowUserPopup}
-        tabIndex="0"
-        type="button"
-      >
-        <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKeyRef.current} thumbnail />
-        <span className="icon icon-ctrl" />
-      </button>
-
+      <div className="app-header__user-controls">
+        {hasMessageNotifications && (
+          <>
+            <Button
+              iconClassName="icon-bell icon-16px"
+              onClick={toggleShowMessageNotifications}
+              title="common.notification_other"
+              variant="text"
+            />
+            {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
+          </>
+        )}
+        <button
+          className="app-header__btn-user"
+          data-testid={TestId.header.userBtn}
+          disabled={surveyIsDirty}
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            toggleShowUserPopup()
+          }}
+          onKeyDown={toggleShowUserPopup}
+          tabIndex="0"
+          type="button"
+        >
+          <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKeyRef.current} thumbnail />
+          <span className="icon icon-ctrl" />
+        </button>
+      </div>
       {showUserPopup && <UserPopupMenu onClose={() => setShowUserPopup(false)} />}
     </div>
   )

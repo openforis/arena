@@ -1,6 +1,4 @@
-import { PointFactory } from '@openforis/arena-core'
-
-import { CsvDataExportModel } from '@common/model/csvExport'
+import { FlatDataExportModel, PointFactory } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -44,7 +42,7 @@ const valuesByNodeDefType = {
 
 const extractDataImportTemplate = async ({ survey, cycle, nodeDefUuid, includeFiles }) => {
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const exportModel = new CsvDataExportModel({
+  const exportModel = new FlatDataExportModel({
     survey,
     cycle,
     nodeDefContext: nodeDef,

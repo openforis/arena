@@ -19,6 +19,7 @@ export default {
   DataImportJob: 'Импорт данных',
   DataImportValidationJob: 'Валидация файла импорта данных',
   FilesImportJob: 'Импорт файлов',
+  MessageSendJob: 'Отправка сообщения',
   NodeDefsImportJob: 'Импорт определений узлов',
   NodeDefsValidationJob: 'Валидация определений узлов',
   chainsCyclesCheckJob: 'Проверка циклов цепочек',
@@ -40,6 +41,7 @@ export default {
   SurveyRdbCreationJob: 'Создание RDB опроса',
   SurveyUnpublishJob: 'Отмена публикации опроса',
   SurveyPropsUnpublishJob: 'Отмена публикации свойств опроса',
+  SurveysListExportJob: 'Экспорт списка опросов',
   TaxonomiesImportJob: 'Импорт таксономий',
   TaxonomiesValidationJob: 'Валидация таксономий',
   TaxonomyImportJob: 'Импорт таксономии',
@@ -48,6 +50,8 @@ export default {
   DataSummaryExportJob: 'Экспорт сводных данных',
   ZipCreationJob: 'Создание ZIP-файла',
   CSVDataExtraction: 'Извлечение данных',
+  // geo
+  GeoJsonDataExportJob: 'Экспорт данных GeoJson',
   // import arena survey
   ArenaImportJob: 'Импорт Arena',
   ArenaSurveyReaderJob: 'Чтение опроса Arena',

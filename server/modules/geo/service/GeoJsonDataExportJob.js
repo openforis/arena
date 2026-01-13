@@ -32,9 +32,9 @@ const generateLocationGeoJson = ({ survey, longitude, latitude }) => {
 }
 
 const extractKeys = ({ survey, ancestorKeyDefs, dataItem }) =>
-  ancestorKeyDefs.map((ancestorDef) =>
-    DataQueryValueFormatter.formatDataItemKey({ i18n, survey, nodeDef: ancestorDef, dataItem })
-  )
+  ancestorKeyDefs
+    .map((ancestorDef) => DataQueryValueFormatter.formatDataItemKey({ i18n, survey, nodeDef: ancestorDef, dataItem }))
+    .join(' - ')
 
 export class GeoJsonDataExportJob extends Job {
   constructor(params) {

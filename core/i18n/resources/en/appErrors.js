@@ -15,6 +15,7 @@ export default {
   },
   dataImport: {
     importFromMobileNotAllawed: 'Data import from Arena Mobile not allowed',
+    noRecordsFound: 'No records found in the import file or wrong file format',
   },
   entryDataNotFound: 'Entry data not found: {{entryName}}',
   expression: {

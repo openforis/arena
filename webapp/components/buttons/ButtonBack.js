@@ -12,9 +12,10 @@ export const ButtonBack = (props) => {
   return (
     <Button
       {...otherProps}
+      className={classNames('btn-secondary btn-back', className)}
       label={label}
       onClick={() => navigate(-1)}
-      className={classNames('btn-secondary btn-back', className)}
+      variant="outlined"
     />
   )
 }

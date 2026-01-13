@@ -8,6 +8,8 @@ import { RecordReducer, RecordState } from './record'
 import { SurveyFormReducer, SurveyFormState } from './surveyForm'
 import { TablesReducer, TablesState } from './tables'
 import { ChainReducer } from './chain'
+import { MessageReducer, MessageState } from './message'
+import { MessageNotificationReducer, MessageNotificationState } from './messageNotification'
 
 export default combineReducers({
   [FileUploadDialogState.stateKey]: FileUploadDialogReducer,
@@ -18,4 +20,6 @@ export default combineReducers({
   [SurveyFormState.stateKey]: SurveyFormReducer,
   [TablesState.stateKey]: TablesReducer,
   chain: ChainReducer,
+  [MessageState.stateKey]: MessageReducer,
+  [MessageNotificationState.stateKey]: MessageNotificationReducer,
 })

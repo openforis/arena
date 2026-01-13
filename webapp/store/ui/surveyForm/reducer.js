@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { TreeSelectViewMode } from '@webapp/model'
-import { SystemActions } from '@webapp/store/system'
+import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
 import * as RecordActions from '../record/actions'
 
@@ -15,7 +15,7 @@ import * as SurveyFormState from './state'
 
 const actionHandlers = {
   // Reset form
-  [SystemActions.SYSTEM_RESET]: () => ({}),
+  [SystemActionTypes.SYSTEM_RESET]: () => ({}),
 
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),

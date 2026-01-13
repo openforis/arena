@@ -249,7 +249,7 @@ export const fetchItemsByCategoryUuid = async (
       JOIN ${schema}.category_level l 
         ON l.uuid = i.level_uuid
         AND l.category_uuid = $/categoryUuid/
-     ORDER BY ${indexColumn}
+     ORDER BY l.index, ${indexColumn}
      ${offset ? 'OFFSET $/offset/' : ''}
      ${limit ? 'LIMIT $/limit/' : ''}
     `,

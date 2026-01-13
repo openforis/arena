@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router'
 
 import * as A from '@core/arena'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
@@ -16,7 +17,6 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { contentTypes } from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
@@ -31,8 +31,7 @@ import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
 import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
 
-const fileMaxSizeDefault = 1000 // 1GB
-const fileMaxSizeSystemAdmin = 2000 // 2GB
+const fileMaxSizeDefault = ProcessUtils.ENV.fileUploadLimit / 1024 ** 2 // in MB
 
 const importSourceButtonGroupItems = Object.values(importSources).map((key) => ({
   key,
@@ -57,7 +56,6 @@ const SurveyCreate = (props) => {
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
   const navigate = useNavigate()
-  const isSystemAdmin = useUserIsSystemAdmin()
 
   const {
     newSurvey,
@@ -92,8 +90,6 @@ const SurveyCreate = (props) => {
   useOnUpdate(() => {
     navigate(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
-
-  const fileMaxSize = isSystemAdmin ? fileMaxSizeSystemAdmin : fileMaxSizeDefault
 
   return (
     <div className="home-survey-create">
@@ -227,7 +223,7 @@ const SurveyCreate = (props) => {
               <div className="row">
                 <Dropzone
                   accept={dropzoneAcceptBySource[source]}
-                  maxSize={fileMaxSize}
+                  maxSize={fileMaxSizeDefault}
                   onDrop={onFilesDrop}
                   droppedFiles={file ? [file] : []}
                 />

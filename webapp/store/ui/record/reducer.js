@@ -2,7 +2,7 @@ import * as A from '@core/arena'
 
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { SystemActions } from '@webapp/store/system'
+import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 
 import { SurveyActions } from '@webapp/store/survey'
 import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
@@ -12,7 +12,7 @@ import * as RecordState from './state'
 
 const actionHandlers = {
   // Reset form
-  [SystemActions.SYSTEM_RESET]: () => ({}),
+  [SystemActionTypes.SYSTEM_RESET]: () => ({}),
 
   [SurveyActions.surveyCreate]: () => ({}),
   [SurveyActions.surveyUpdate]: () => ({}),

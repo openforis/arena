@@ -1,6 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { SystemActions } from '@webapp/store/system'
+import { SystemActionTypes } from '@webapp/store/system/actionTypes'
 
 import * as SurveyActions from '../actions'
 import * as NodeDefsActions from './actions'
@@ -8,7 +8,7 @@ import * as NodeDefsActions from './actions'
 import * as NodeDefsState from './state'
 
 const actionHandlers = {
-  [SystemActions.SYSTEM_RESET]: () => ({}),
+  [SystemActionTypes.SYSTEM_RESET]: () => ({}),
 
   // Reset state
   [SurveyActions.surveyCreate]: () => ({}),

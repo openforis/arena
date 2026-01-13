@@ -26,6 +26,12 @@ export const commonAttributeKeys = [
   keys.includedInPreviousCycleLink,
 ]
 
+export const textRenderType = {
+  text: 'text',
+  hyperlink: 'hyperlink',
+  markdown: 'markdown',
+}
+
 export const renderType = {
   // Entity
   form: 'form',
@@ -59,15 +65,15 @@ export const newLayout = (cycle, renderAs, pageUuid = null) =>
 // ====== READ
 
 const layoutPropsDefault = {
-  indexChildren: [],
+  codeShown: true,
   columnsNo: 3,
   columnWidth: `${columnWidthMinPx}px`,
-  layoutChildren: [],
-  hiddenWhenNotRelevant: false,
   hiddenInMobile: false,
+  hiddenWhenNotRelevant: false,
   includedInMultipleEntitySummary: false,
   includedInPreviousCycleLink: true,
-  codeShown: true,
+  indexChildren: [],
+  layoutChildren: [],
 }
 
 export const getLayout = ObjectUtils.getProp(keys.layout, {})
@@ -80,7 +86,10 @@ export const getPropLayout = (cycle, prop) => R.pipe(getLayoutCycle(cycle), R.pr
 
 export const getIndexChildren = (cycle) => getPropLayout(cycle, keys.indexChildren)
 
-export const getRenderType = (cycle) => getPropLayout(cycle, keys.renderType)
+const getDefaultRenderType = (nodeDef) => (nodeDef?.type === 'text' ? textRenderType.text : null)
+
+export const getRenderType = (cycle) => (nodeDef) =>
+  getPropLayout(cycle, keys.renderType)(nodeDef) ?? getDefaultRenderType(nodeDef)
 
 export const getLayoutChildren = (cycle) => getPropLayout(cycle, keys.layoutChildren)
 

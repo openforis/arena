@@ -125,6 +125,8 @@ Do you want to proceed?`,
     next: 'Next',
     no: 'No',
     noItems: `$t(common.no) $t(common.item_plural)`,
+    notification: 'Notification',
+    notification_other: 'Notifications',
     notSpecified: '---Not specified---',
     orderBy: 'Order by',
     of: 'of',
@@ -326,6 +328,9 @@ Try again?`,
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Instances',
 
+    message: 'Message',
+    message_plural: '$t(common.message_plural)',
+
     help: 'Help',
     about: 'About',
     disclaimer: 'Disclaimer',
@@ -499,6 +504,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     downloadTemplate_xlsx: 'Download template (Excel)',
     errors: {
       rowNum: 'Row #',
+    },
+    fileUploadChunkSize: {
+      label: 'File upload chunk size',
     },
     forceImportFromAnotherSurvey: 'Force import from another survey',
 
@@ -1224,7 +1232,6 @@ E.g. this.region = region_attribute_name
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
-      shownAsHyperlink: 'Shown as hyperlink',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1270,6 +1277,11 @@ E.g. this.region = region_attribute_name
       },
     },
     textProps: {
+      displayAsTypes: {
+        hyperlink: 'Hyperlink',
+        markdown: 'Markdown',
+        text: 'Text',
+      },
       textInputType: 'Text input type',
       textInputTypes: {
         singleLine: 'Single line',
@@ -1293,7 +1305,6 @@ E.g. this.region = region_attribute_name
     codeProps: {
       category: 'Category',
       codeShown: 'Show code',
-      displayAs: 'Display As',
       displayAsTypes: {
         checkbox: 'Checkbox',
         dropdown: 'Dropdown',

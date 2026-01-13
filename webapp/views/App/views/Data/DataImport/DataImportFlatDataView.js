@@ -7,6 +7,7 @@ import { Objects, UUIDs } from '@openforis/arena-core'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { RecordCycle } from '@core/record/recordCycle'
@@ -41,7 +42,7 @@ const infoVisibleByOption = {
   deleteExistingEntities: true,
 }
 const fileMaxSizeDefault = 20 // 20MB
-const fileMaxSizeWithFiles = 1024 // 1GB
+const fileMaxSizeWithFiles = ProcessUtils.ENV.fileUploadLimit / 1024 ** 2 // in MB
 
 const allowedLabelTypes = [
   NodeDef.NodeDefLabelTypes.label,

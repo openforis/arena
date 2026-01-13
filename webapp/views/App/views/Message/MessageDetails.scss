@@ -1,0 +1,31 @@
+@use '~@webapp/style/vars' as *;
+
+.message-details {
+  display: flex;
+  flex-direction: column;
+
+  .form-item {
+    height: auto;
+  }
+
+  .message-body-editor {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+  }
+
+  .message-body-preview {
+    border: 1px solid $greyBorder;
+    border-radius: 4px;
+    background-color: $grey;
+    padding: 0.4rem;
+  }
+
+  .message-date-modified-input {
+    width: 11rem;
+  }
+
+  .button-bar {
+    width: 100%;
+  }
+}

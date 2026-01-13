@@ -22,17 +22,15 @@ const namespaces = [
   'emails',
   'homeView',
   'jobs',
+  'messageView',
   'surveyCreate',
   'surveyForm',
   'usersView',
+  'validationErrors',
 ]
 const defaultNamespace = 'common'
 
-const experimentalLanguages = ['ru']
-
-export const supportedLanguages = Object.keys(resources).filter(
-  (lang) => ProcessUtils.ENV.experimentalFeatures || !experimentalLanguages.includes(lang)
-)
+export const supportedLanguages = Object.keys(resources)
 
 const createParams = (lang = defaultLanguage) => ({
   fallbackLng: defaultLanguage,

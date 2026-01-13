@@ -6,14 +6,14 @@ import * as Log from '@server/log/log'
 import Thread from '@server/threads/thread'
 import IdleTimeoutCache from '@server/utils/IdleTimeoutCache'
 
-import * as Survey from '@core/survey/survey'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as Validation from '@core/validation/validation'
 import Queue from '@core/queue'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
 
-import * as RecordManager from '../../../manager/recordManager'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
+import * as RecordManager from '../../../manager/recordManager'
 import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
@@ -131,10 +131,8 @@ class RecordsUpdateThread extends Thread {
       includeBigTaxonomies: false,
     })
 
-    // If in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
-    const dependencyGraph = draft
-      ? await Survey.buildDependencyGraph(surveyDb)
-      : await SurveyManager.fetchDependencies(surveyId)
+    // always rebuild dependency graph to ensure it's up to date
+    const dependencyGraph = await Survey.buildDependencyGraph(surveyDb)
 
     const survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
 
