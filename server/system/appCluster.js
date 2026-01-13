@@ -41,8 +41,8 @@ export const run = async () => {
 
   // static resources
   app.use('/', express.static(dist))
-  app.use('/app', express.static(dist))
-  app.use('/guest', express.static(dist))
+  app.use('/app{/*path}', express.static(dist))
+  app.use('/guest{/*path}', express.static(dist))
   const imgDir = `${arenaRoot}/web-resources/img`
   app.use('/img', express.static(imgDir))
   app.use('/noHeader', express.static(dist))
