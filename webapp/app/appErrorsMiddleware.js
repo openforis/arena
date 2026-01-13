@@ -5,15 +5,23 @@ import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 
 const tokenRefreshEndpoint = '/auth/token/refresh'
 
+const loginUrlRegExp = /^\/auth\/login$/
+const tokenRefreshUrlRegExp = /^\/auth\/token\/refresh$/
+
 const errorIgnoredUrlRegExps = [
-  /^\/auth\/login$/, // login
+  loginUrlRegExp, // login
   /^\/auth\/user$/, // user (if not logged in or authorized)
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/query$/, // data query
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/export\/start$/, // data query export
   /^\/api\/mobile\/survey\/\d+$/, // data import (Arena format)
 ]
 
+const authorizationIgnoredUrlRegExps = [loginUrlRegExp, tokenRefreshUrlRegExp]
+
 const isErrorIgnoredUrlIgnored = (url) => errorIgnoredUrlRegExps.some((ignoredUrlRegExp) => ignoredUrlRegExp.test(url))
+
+const isAuthorizationIgnoredUrl = (url) =>
+  authorizationIgnoredUrlRegExps.some((ignoredUrlRegExp) => ignoredUrlRegExp.test(url))
 
 let isRefreshingToken = false
 let failedRequestsQueue = []
@@ -92,8 +100,8 @@ const createAxiosMiddleware =
       const originalRequest = error.config ?? {}
       const { url } = originalRequest
 
-      // Check for 401 response and ensure it's not the refresh endpoint itself
-      if (error.response.status === 401 && url !== tokenRefreshEndpoint) {
+      // Check for 401 response and ensure it's not the refresh endpoint itself or the login endpoint
+      if (error.response.status === 401 && !isAuthorizationIgnoredUrl(url)) {
         return handleAuthorizationError({ originalRequest })
       }
       if (!axios.isCancel(error) && url && !isErrorIgnoredUrlIgnored(url)) {
