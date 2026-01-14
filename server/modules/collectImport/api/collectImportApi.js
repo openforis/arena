@@ -71,7 +71,7 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, draft = true, fileFormat = FileFormats.csv } = Request.getParams(req)
+        const { surveyId, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)
