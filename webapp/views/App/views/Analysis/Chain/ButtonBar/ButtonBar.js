@@ -23,7 +23,7 @@ const ButtonBar = () => {
     <div className="button-bar">
       <ButtonDownload
         className="chain-summary-download-btn"
-        fileName={`chain_summary.json`}
+        fileName="chain_summary.json"
         label="chainView.downloadSummaryJSON"
         href={API.getChainSummaryExportUrl({ surveyId, chainUuid: Chain.getUuid(chain) })}
         requestParams={{ cycle, lang }}
