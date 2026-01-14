@@ -34,7 +34,7 @@ export const openSocket = async (throwErrorFn) => {
   }
 
   const authToken = ApiConstants.getAuthToken()
-  socket = io(globalThis.window.location.origin, { auth: { token: authToken } })
+  socket = io(window.location.origin, { auth: { token: authToken } })
 
   on(WebSocketEvents.connect, _addSocketIdToEveryRequest)
 
