@@ -7,6 +7,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
+import * as ProcessUtils from '@core/processUtils'
 
 import * as Log from '@server/log/log'
 import * as SurveyService from '../../survey/service/surveyService'
@@ -70,7 +71,7 @@ export const init = (app) => {
         httpOnly: true,
         path: ApiEndpoint.auth.tokenRefresh(),
         sameSite: 'strict',
-        secure: true,
+        secure: ProcessUtils.isEnvProduction,
       })
       Response.sendOk(res)
     } catch (error) {
