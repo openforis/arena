@@ -22,9 +22,13 @@ export const ButtonDownload = forwardRef((props, ref) => {
       params: requestParams,
       responseType: 'blob',
     })
-    // Create a blob URL and trigger download
-    const blob = new Blob([response.data])
-    DomUtils.downloadBlobToFile(blob, fileName)
+
+    // Extract filename from Content-Disposition header if not provided
+    const contentDisposition = response.headers['content-disposition']
+    const extractedFileName = contentDisposition?.split('filename=')[1]?.replace(/"/g, '')
+
+    // Use response.data directly (it's already a Blob from axios)
+    DomUtils.downloadBlobToFile(response.data, fileName ?? extractedFileName ?? 'download')
   }, [href, requestParams, fileName])
 
   const onClick = useCallback(async () => {
