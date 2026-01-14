@@ -127,16 +127,16 @@ export const init = (app) => {
   // surveys list export (download generated zip file)
   app.get('/surveys/export/download', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
     try {
-      const { tempFileName } = Request.getParams(req)
+      const { tempFileName, fileFormat } = Request.getParams(req)
       const exportedFilePath = FileUtils.tempFilePath(tempFileName)
       const date = DateUtils.nowFormatDefault()
-      const name = `arena_surveys_${date}.csv`
+      const name = `arena_surveys_${date}.xlsx`
 
       Response.sendFile({
         res,
         path: exportedFilePath,
         name,
-        contentType: Response.contentTypes.csv,
+        fileFormat,
       })
     } catch (error) {
       next(error)

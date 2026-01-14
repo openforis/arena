@@ -1,4 +1,5 @@
 import * as DateUtils from '@core/dateUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import Job from '@server/job/job'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
@@ -11,7 +12,7 @@ export default class SurveysListExportJob extends Job {
   }
 
   async execute() {
-    const { user, draft, template } = this.context
+    const { user, draft, template, fileFormat = FileFormats.xlsx } = this.context
 
     const items = await SurveyManager.fetchUserSurveysInfo({
       user,
@@ -71,6 +72,7 @@ export default class SurveysListExportJob extends Job {
       items,
       fields,
       options: { objectTransformer, removeNewLines: false },
+      fileFormat,
     })
 
     this.setContext({ outputTempFileName })
