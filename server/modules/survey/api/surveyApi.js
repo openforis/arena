@@ -17,7 +17,7 @@ import * as User from '../../../../core/user/user'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '../service/surveyService'
 import * as UserService from '../../user/service/userService'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 export const init = (app) => {
   // ==== CREATE

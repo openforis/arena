@@ -2,7 +2,7 @@ import { isUuid } from '@core/uuid'
 
 import * as Response from '@server/utils/response'
 import * as Request from '@server/utils/request'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as JobUtils from '@server/job/jobUtils'
 

@@ -9,7 +9,7 @@ import * as Taxonomy from '../../../../core/survey/taxonomy'
 import { jobToJSON } from '../../../job/jobUtils'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as TaxonomyService from '../service/taxonomyService'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 

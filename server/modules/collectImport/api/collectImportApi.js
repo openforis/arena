@@ -7,7 +7,7 @@ import * as JobUtils from '@server/job/jobUtils'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 

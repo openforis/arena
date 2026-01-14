@@ -13,7 +13,7 @@ import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import { CategoryImportTemplateGenerator } from '@server/modules/category/manager/categoryImportTemplateGenerator'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'

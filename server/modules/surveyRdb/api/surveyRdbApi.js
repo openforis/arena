@@ -6,7 +6,7 @@ import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyRdbService from '../service/surveyRdbService'
 
 import { requireRecordListViewPermission, requireSurveyRdbRefreshPermission } from '../../auth/authApiMiddleware'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 export const init = (app) => {
   app.get('/surveyRdb/recreateRdbs', requireSurveyRdbRefreshPermission, async (req, res, next) => {

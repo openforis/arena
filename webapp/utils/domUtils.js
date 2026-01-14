@@ -55,10 +55,15 @@ export const downloadToFile = (url, outputFileName) => {
   document.body.removeChild(link)
 }
 
+export const downloadBlobToFile = (blob, outputFileName) => {
+  const downloadUrl = URL.createObjectURL(blob)
+  downloadToFile(downloadUrl, outputFileName)
+  URL.revokeObjectURL(downloadUrl)
+}
+
 export const downloadTextToFile = (text, outputFileName) => {
   const blob = new Blob([text], { type: 'text/plain' })
-  const url = URL.createObjectURL(blob)
-  downloadToFile(url, outputFileName)
+  downloadBlobToFile(blob, outputFileName)
 }
 
 export const downloadSvgToPng = (svgElement) => {
