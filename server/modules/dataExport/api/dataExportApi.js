@@ -63,12 +63,11 @@ export const init = (app) => {
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
 
         const fileFormat = FileFormats.zip
-        const extension = 'zip'
         const outputFileName = ExportFileNameGenerator.generate({
           survey,
           cycle,
           fileType: 'DataExport',
-          extension,
+          fileFormat,
           includeTimestamp: true,
         })
         sendTempFileToResponse({ res, tempFileName: exportUuid, fileFormat, outputFileName })
