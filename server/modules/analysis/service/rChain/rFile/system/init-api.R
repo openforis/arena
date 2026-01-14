@@ -136,6 +136,9 @@ arena._deleteInternal = function(url, body) {
 
 arena.delete = function(url, body) {
   resp <- arena._deleteInternal(url, body)
+  if (resp$status == 401 && arena.refreshAuthTokens()) {
+    resp <- arena._deleteInternal(url, body)
+  }
   return(arena.parseResponse(resp))
 }
 
