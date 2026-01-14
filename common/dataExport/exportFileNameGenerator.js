@@ -8,6 +8,7 @@ import { getExtensionByFileFormat } from '@core/fileFormats'
 const generate = ({
   fileType,
   survey = null,
+  surveyName = null,
   cycle = null,
   itemName = null,
   fileFormat = null,
@@ -15,8 +16,8 @@ const generate = ({
   includeTimestamp = false,
 }) => {
   const parts = []
-  if (survey) {
-    parts.push(Survey.getName(survey))
+  if (surveyName || survey) {
+    parts.push(surveyName ?? Survey.getName(survey))
   }
   if (Objects.isNotEmpty(cycle)) {
     parts.push(`(cycle-${RecordCycle.getLabel(cycle)})`)

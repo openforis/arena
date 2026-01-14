@@ -16,6 +16,7 @@ export {
   useSurveyDefsFetched,
   useSurvey,
   useSurveyId,
+  useSurveyName,
   useSurveyInfo,
   useSurveyCycleKey,
   useSurveyCycleKeys,
