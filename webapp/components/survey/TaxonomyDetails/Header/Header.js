@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { ButtonMenu } from '@webapp/components/buttons'
@@ -11,7 +12,7 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import UploadButton from '@webapp/components/form/uploadButton'
 
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
@@ -24,10 +25,19 @@ const Header = (props) => {
   const { state, Actions } = props
   const notifyWarn = useNotifyWarning()
   const surveyId = useSurveyId()
+  const surveyInfo = useSurveyInfo()
   const canEdit = useAuthCanEditSurvey()
   const taxonomy = State.getTaxonomy(state)
   const validation = Validation.getValidation(taxonomy)
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
+
+  const exportFileNameGenerator = ({ fileFormat }) =>
+    ExportFileNameGenerator.generate({
+      survey: surveyInfo,
+      fileType: 'Taxonomy',
+      itemName: Taxonomy.getName(taxonomy),
+      fileFormat,
+    })
 
   const onExtraPropsClick = useCallback(() => {
     if (Taxonomy.getExtraPropKeys(taxonomy).length === 0) {
@@ -77,6 +87,7 @@ const Header = (props) => {
           />
         )}
         <ButtonMenuExport
+          fileNameGenerator={exportFileNameGenerator}
           href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export`}
           requestParams={{ draft: canEdit }}
         />

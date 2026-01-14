@@ -19,6 +19,7 @@ export const ButtonMenuExport = (props) => {
   const {
     className = null,
     excelExportDisabled = false,
+    fileNameGenerator = null,
     href = null,
     label = 'common.export',
     onClick: onClickProp,
@@ -44,6 +45,7 @@ export const ButtonMenuExport = (props) => {
       key: fileFormat,
       content: (
         <ButtonDownload
+          fileName={fileNameGenerator?.({ fileFormat })}
           label={labelByFileFormat[fileFormat]}
           href={href}
           onClick={onClick}
@@ -68,6 +70,7 @@ export const ButtonMenuExport = (props) => {
 ButtonMenuExport.propTypes = {
   className: PropTypes.string,
   excelExportDisabled: PropTypes.bool,
+  fileNameGenerator: PropTypes.func,
   href: PropTypes.string,
   label: PropTypes.string,
   onClick: PropTypes.func,

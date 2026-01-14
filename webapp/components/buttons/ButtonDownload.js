@@ -7,7 +7,7 @@ import * as DomUtils from '@webapp/utils/domUtils'
 
 export const ButtonDownload = forwardRef((props, ref) => {
   const {
-    fileName,
+    fileName = null,
     href = null,
     iconClassName = 'icon-download2 icon-14px',
     label = 'common.download',
@@ -44,7 +44,7 @@ export const ButtonDownload = forwardRef((props, ref) => {
 
 ButtonDownload.propTypes = {
   ...Button.propTypes,
-  fileName: PropTypes.string.isRequired,
+  fileName: PropTypes.string, // required if href is specified
   href: PropTypes.string, // specify href, onClick or both
   onClick: PropTypes.func, // specify href, onClick or both. If onClick is specified and returns false, href will not be used
   requestParams: PropTypes.object,
