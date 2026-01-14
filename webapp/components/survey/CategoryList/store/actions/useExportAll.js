@@ -1,17 +1,17 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
+import { FileFormats } from '@core/fileFormats'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
-import * as API from '@webapp/service/api'
 
 import { ButtonDownload } from '@webapp/components/buttons'
-
+import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
-import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyId, useSurveyName } from '@webapp/store/survey'
 
 export const useExportAll = () => {
   const surveyId = useSurveyId()
-  const survey = useSurveyInfo()
+  const surveyName = useSurveyName()
   const dispatch = useDispatch()
 
   // always export draft properties
@@ -22,9 +22,9 @@ export const useExportAll = () => {
       const { job } = await API.startExportAllCategoriesJob({ surveyId, draft, fileFormat })
 
       const downloadFileName = ExportFileNameGenerator.generate({
-        survey,
+        surveyName,
         fileType: 'categories',
-        fileFormat,
+        fileFormat: FileFormats.zip,
       })
 
       dispatch(
@@ -45,6 +45,6 @@ export const useExportAll = () => {
         })
       )
     },
-    [dispatch, draft, survey, surveyId]
+    [dispatch, draft, surveyId, surveyName]
   )
 }
