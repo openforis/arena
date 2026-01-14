@@ -4,27 +4,17 @@ import PropTypes from 'prop-types'
 import { FileFormats } from '@core/fileFormats'
 
 import { ButtonDownload } from '@webapp/components/buttons'
-import { useSurveyId, useSurveyCycleKey, useSurveyName } from '@webapp/store/survey'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
 
 const SurveySchemaSummaryDownloadButton = (props) => {
   const { className, fileFormat = FileFormats.xlsx, testId } = props
 
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  const surveyName = useSurveyName()
-
-  const fileName = ExportFileNameGenerator.generate({
-    surveyName,
-    cycle,
-    fileType: 'SchemaSummary',
-    fileFormat,
-  })
 
   return (
     <ButtonDownload
       className={className}
-      fileName={fileName}
       testId={testId}
       href={`/api/survey/${surveyId}/schema-summary/`}
       requestParams={{ cycle, fileFormat }}

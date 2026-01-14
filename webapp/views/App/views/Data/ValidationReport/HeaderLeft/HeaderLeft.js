@@ -21,8 +21,6 @@ const onExportComplete =
       params: { tempFileName },
       responseType: 'blob',
     })
-    // Create a blob URL and trigger download
-    const blob = new Blob([response.data])
 
     const outputFileName = ExportFileNameGenerator.generate({
       surveyName,
@@ -31,7 +29,7 @@ const onExportComplete =
       fileFormat: FileFormats.xlsx,
     })
 
-    DomUtils.downloadBlobToFile(blob, outputFileName)
+    DomUtils.downloadBlobToFile(response.data, outputFileName)
   }
 
 export const HeaderLeft = ({ restParams = {} }) => {

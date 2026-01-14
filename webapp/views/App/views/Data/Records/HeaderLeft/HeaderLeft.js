@@ -4,14 +4,12 @@ import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
-import { FileFormats } from '@core/fileFormats'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as DateUtils from '@core/dateUtils'
 import * as StringUtils from '@core/stringUtils'
 
-import { useSurvey, useSurveyCycleKey, useSurveyName, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { RecordActions, useRecord } from '@webapp/store/ui/record'
 
 import { TestId } from '@webapp/utils/testId'
@@ -55,7 +53,6 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   const i18n = useI18n()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
-  const surveyName = useSurveyName()
   const lang = useSurveyPreferredLang()
   const confirm = useConfirmAsync()
   const record = useRecord()
@@ -78,13 +75,6 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   const selectedItemsCount = selectedItems.length
   const selectedRecordsUuids = selectedItems.map((selectedItem) => selectedItem.uuid)
   const canEditSelectedItem = useAuthCanEditRecord(selectedItems[0]) && selectedItems.length === 1
-
-  const recordsSummaryExportFileName = ExportFileNameGenerator.generate({
-    surveyName,
-    cycle,
-    fileType: 'Records',
-    fileFormat: FileFormats.xlsx,
-  })
 
   const [state, setState] = useState({
     recordsCloneModalOpen: false,
@@ -194,7 +184,6 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           {canExportRecordsSummary && (
             <ButtonDownload
               testId={TestId.records.exportBtn}
-              fileName={recordsSummaryExportFileName}
               href={`/api/survey/${surveyId}/records/summary/export`}
               requestParams={{ cycle }}
               label="dataView.records.exportList"

@@ -7,14 +7,12 @@ import classNames from 'classnames'
 
 import { FileFormats } from '@core/fileFormats'
 import * as StringUtils from '@core/stringUtils'
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
@@ -41,43 +39,11 @@ const templateTypes = {
   samplingPointDataImport: 'samplingPointDataImport',
 }
 
-const getTemplateExportTileType = (templateType) => {
-  switch (templateType) {
-    case templateTypes.genericDataImport:
-      return 'CategoryImportGeneric'
-    case templateTypes.specificDataImport:
-      return 'CategoryImport'
-    case templateTypes.samplingPointDataImport:
-      return 'SamplingPointDataImport'
-    default:
-      return 'CategoryImport'
-  }
-}
-
-const getExportFileNameGenerator =
-  ({ surveyName, category }) =>
-  ({ fileFormat }) =>
-    ExportFileNameGenerator.generate({
-      surveyName,
-      fileType: 'Category',
-      fileFormat,
-      itemName: Category.getName(category),
-    })
-
-const getTemplateExportFileName = ({ surveyName, templateType, fileFormat }) =>
-  ExportFileNameGenerator.generate({
-    surveyName,
-    fileType: getTemplateExportTileType(templateType),
-    fileFormat,
-  })
-
 const CategoryDetails = (props) => {
   const { categoryUuid: categoryUuidProp, onCategoryUpdate, showClose = true } = props
 
   const { categoryUuid: categoryUuidParam } = useParams()
   const surveyId = useSurveyId()
-  const surveyInfo = useSurveyInfo()
-  const surveyName = Survey.getName(surveyInfo)
 
   const readOnly = !useAuthCanEditSurvey()
 
@@ -137,7 +103,6 @@ const CategoryDetails = (props) => {
                       key: `data-import-template-${templateType}-${fileFormat}`,
                       content: (
                         <ButtonDownload
-                          fileName={getTemplateExportFileName({ surveyName, templateType, fileFormat })}
                           href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
                           requestParams={{
                             fileFormat,
@@ -190,7 +155,6 @@ const CategoryDetails = (props) => {
             <ButtonMenuExport
               className="export-btn"
               excelExportDisabled={excelExportDisabled}
-              fileNameGenerator={getExportFileNameGenerator({ surveyName, category })}
               href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
               testId={TestId.categoryDetails.exportBtn}
             />
