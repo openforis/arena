@@ -76,7 +76,13 @@ const FileInput = (props) => {
   }, [surveyId, node, toggleShowMap, dispatch])
 
   const downloadButton = (
-    <ButtonDownload href={fileUrl} label={fileName} title={isImage ? undefined : fileName} className="btn-s ellipsis" />
+    <ButtonDownload
+      fileName={fileName}
+      href={fileUrl}
+      label={fileName}
+      title={isImage ? undefined : fileName}
+      className="btn-s ellipsis"
+    />
   )
 
   return (
