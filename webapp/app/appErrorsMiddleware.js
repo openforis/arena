@@ -1,23 +1,113 @@
 import axios from 'axios'
 
 import { ServiceErrorActions } from '@webapp/store/system'
+import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 
-const ignoredUrlRegExps = [
-  /^\/auth\/login$/, // login
+const tokenRefreshEndpoint = '/auth/token/refresh'
+
+const loginUrlRegExp = /^\/auth\/login$/
+const tokenRefreshUrlRegExp = /^\/auth\/token\/refresh$/
+
+const errorIgnoredUrlRegExps = [
+  loginUrlRegExp, // login
+  /^\/auth\/user$/, // user (if not logged in or authorized)
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/query$/, // data query
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/export\/start$/, // data query export
   /^\/api\/mobile\/survey\/\d+$/, // data import (Arena format)
 ]
 
+const authorizationIgnoredUrlRegExps = [loginUrlRegExp, tokenRefreshUrlRegExp]
+
+const isErrorIgnoredUrlIgnored = (url) => errorIgnoredUrlRegExps.some((ignoredUrlRegExp) => ignoredUrlRegExp.test(url))
+
+const isAuthorizationIgnoredUrl = (url) =>
+  authorizationIgnoredUrlRegExps.some((ignoredUrlRegExp) => ignoredUrlRegExp.test(url))
+
+let isRefreshingToken = false
+let failedRequestsQueue = []
+
+const setAuthorizationHeader = ({ config, authToken }) => {
+  config.headers = { ...config.headers, Authorization: `Bearer ${authToken}` }
+}
+
+const processFailedRequestsQueue = ({ error = null, authToken = null }) => {
+  for (const failedRequest of failedRequestsQueue) {
+    const { resolve, reject, config } = failedRequest
+    if (error) {
+      reject(error)
+    } else if (authToken) {
+      setAuthorizationHeader({ config, authToken })
+      resolve(axios.request(config))
+    }
+  }
+  failedRequestsQueue = []
+}
+
+const refreshAuthToken = async () => {
+  isRefreshingToken = true
+  try {
+    const response = await axios.post(tokenRefreshEndpoint, null, {
+      withCredentials: true, // Important if using HttpOnly cookies
+    })
+    const { authToken } = response.data
+    ApiConstants.setAuthToken(authToken)
+    return { authToken }
+  } catch (error) {
+    return { error }
+  } finally {
+    isRefreshingToken = false
+  }
+}
+
+const handleAuthorizationError = async ({ originalRequest }) => {
+  if (isRefreshingToken) {
+    // Queue the request if a token refresh is already in progress
+    return new Promise((resolve, reject) => {
+      failedRequestsQueue.push({ resolve, reject, config: originalRequest })
+    })
+  }
+
+  const { authToken, error } = await refreshAuthToken()
+
+  processFailedRequestsQueue({ authToken, error })
+
+  if (authToken) {
+    // Retry the original failed request
+    setAuthorizationHeader({ config: originalRequest, authToken })
+    return axios.request(originalRequest)
+  } else {
+    processFailedRequestsQueue({ error }) // Reject all queued requests
+
+    // Log the user out and redirect to the login page
+    // window.location.href = '/'
+
+    throw error
+  }
+}
+
 const createAxiosMiddleware =
   (axiosInstance) =>
   ({ dispatch }) => {
-    axiosInstance.interceptors.response.use(null, (error) => {
-      const url = error?.config?.url
-      if (!axios.isCancel(error) && url && !ignoredUrlRegExps.some((urlRegExp) => urlRegExp.test(url))) {
+    axiosInstance.interceptors.request.use((config) => {
+      const token = ApiConstants.getAuthToken()
+      // If a token exists, add it to the Authorization header
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`
+      }
+      return config
+    })
+    axiosInstance.interceptors.response.use(null, async (error) => {
+      const originalRequest = error.config ?? {}
+      const { url } = originalRequest
+
+      // Check for 401 response and ensure it's not the refresh endpoint itself or the login endpoint
+      if (error.response?.status === 401 && !isAuthorizationIgnoredUrl(url)) {
+        return handleAuthorizationError({ originalRequest })
+      }
+      if (!axios.isCancel(error) && url && !isErrorIgnoredUrlIgnored(url)) {
         dispatch(ServiceErrorActions.createServiceError({ error }))
       }
-      return Promise.reject(error)
+      throw error
     })
 
     return (next) => (action) => next(action)

@@ -2,6 +2,9 @@ import React from 'react'
 import { useNavigate } from 'react-router'
 import PropTypes from 'prop-types'
 
+import { FileFormats } from '@core/fileFormats'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+
 import { Button, ButtonDownload } from '@webapp/components'
 import { TextInput } from '@webapp/components/form'
 import { useAuthCanCreateUsers } from '@webapp/store/user'
@@ -13,6 +16,12 @@ export const TableHeaderLeft = (props) => {
   const canCreateUsers = useAuthCanCreateUsers()
   const navigate = useNavigate()
 
+  const fileName = ExportFileNameGenerator.generate({
+    fileType: 'arena-users',
+    includeTimestamp: true,
+    fileFormat: FileFormats.xlsx,
+  })
+
   return (
     <div className="users__header-left">
       <TextInput
@@ -21,7 +30,7 @@ export const TableHeaderLeft = (props) => {
         defaultValue={search}
         onChange={handleSearch}
       />
-      <ButtonDownload label="common.exportAll" href="/api/users/export" />
+      <ButtonDownload fileName={fileName} label="common.exportToExcel" href="/api/users/export" />
       {canCreateUsers && (
         <Button label="appModules.userNew" onClick={() => navigate(appModuleUri(userModules.userNew))} />
       )}

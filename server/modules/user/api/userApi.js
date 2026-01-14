@@ -3,7 +3,7 @@ import { FileFormats } from '@core/fileFormats'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'

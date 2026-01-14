@@ -173,7 +173,7 @@ export const init = (app) => {
   )
 
   // === Download R SCRIPTS
-  app.get('/survey/:surveyId/chain/:chainUuid/script/public', async (req, res, next) => {
+  app.get('/public/survey/:surveyId/chain/:chainUuid/script', async (req, res, next) => {
     try {
       const { surveyId, surveyCycleKey, chainUuid, token } = Request.getParams(req)
 

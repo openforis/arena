@@ -2,6 +2,7 @@ import io from 'socket.io-client'
 import axios from 'axios'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 
 let socket = null
 
@@ -32,7 +33,8 @@ export const openSocket = async (throwErrorFn) => {
     closeSocket()
   }
 
-  socket = io(window.location.origin)
+  const authToken = ApiConstants.getAuthToken()
+  socket = io(globalThis.window.location.origin, { auth: { token: authToken } })
 
   on(WebSocketEvents.connect, _addSocketIdToEveryRequest)
 

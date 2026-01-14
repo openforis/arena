@@ -2,7 +2,7 @@ import { isUuid } from '@core/uuid'
 
 import * as Response from '@server/utils/response'
 import * as Request from '@server/utils/request'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as JobUtils from '@server/job/jobUtils'
 
@@ -63,12 +63,11 @@ export const init = (app) => {
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
 
         const fileFormat = FileFormats.zip
-        const extension = 'zip'
         const outputFileName = ExportFileNameGenerator.generate({
           survey,
           cycle,
           fileType: 'DataExport',
-          extension,
+          fileFormat,
           includeTimestamp: true,
         })
         sendTempFileToResponse({ res, tempFileName: exportUuid, fileFormat, outputFileName })

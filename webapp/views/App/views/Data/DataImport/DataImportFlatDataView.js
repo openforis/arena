@@ -6,11 +6,13 @@ import { useDispatch } from 'react-redux'
 import { Objects, UUIDs } from '@openforis/arena-core'
 
 import * as JobSerialized from '@common/job/jobSerialized'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { RecordCycle } from '@core/record/recordCycle'
+import { FileFormats } from '@core/fileFormats'
 
 import { FileUtils } from '@webapp/utils/fileUtils'
 import * as API from '@webapp/service/api'
@@ -54,6 +56,7 @@ export const DataImportFlatDataView = () => {
   const i18n = useI18n()
   const survey = useSurvey()
   const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyName = Survey.getName(surveyInfo)
   const surveyId = useSurveyId()
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
@@ -258,6 +261,13 @@ export const DataImportFlatDataView = () => {
           {!Objects.isEmpty(cycle) && (
             <ButtonMenuExport
               className="download-templates-btn"
+              fileNameGenerator={() =>
+                ExportFileNameGenerator.generate({
+                  surveyName,
+                  fileType: `data_import_templates`,
+                  fileFormat: FileFormats.zip,
+                })
+              }
               href={API.getDataImportFromCsvTemplatesUrl({ surveyId })}
               label="dataImportView.downloadAllTemplates"
               requestParams={{ cycle, includeFiles }}
@@ -267,6 +277,13 @@ export const DataImportFlatDataView = () => {
             <>
               <ButtonMenuExport
                 className="download-template-btn"
+                fileNameGenerator={({ fileFormat }) =>
+                  ExportFileNameGenerator.generate({
+                    surveyName,
+                    fileType: `data_import_template_${NodeDef.getName(selectedNodeDef)}`,
+                    fileFormat,
+                  })
+                }
                 href={API.getDataImportFromCsvTemplateUrl({ surveyId })}
                 label="dataImportView.downloadTemplate"
                 requestParams={{ cycle, nodeDefUuid: selectedNodeDefUuid, includeFiles }}

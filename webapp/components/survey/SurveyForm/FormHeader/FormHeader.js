@@ -8,10 +8,18 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 import { FileFormats } from '@core/fileFormats'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import { TreeSelectViewMode } from '@webapp/model'
 import { JobActions } from '@webapp/store/app'
-import { NodeDefsActions, SurveyActions, useIsSurveyDirty, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import {
+  NodeDefsActions,
+  SurveyActions,
+  useIsSurveyDirty,
+  useSurveyCycleKey,
+  useSurveyId,
+  useSurveyName,
+} from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
   SurveyFormActions,
@@ -36,6 +44,9 @@ import { FileUploadDialogActions } from '@webapp/store/ui'
 
 const labelsExportAllowedFileFormats = [FileFormats.xlsx, FileFormats.csv]
 
+const getLabelsExportFileName = ({ surveyName, fileFormat }) =>
+  ExportFileNameGenerator.generate({ surveyName, fileType: 'Labels', fileFormat })
+
 const FormHeader = (props) => {
   const { disableLockUnlock, disableValidationReport, edit, entry, preview, canEditDef, analysis } = props
 
@@ -43,6 +54,7 @@ const FormHeader = (props) => {
   const navigate = useNavigate()
 
   const surveyId = useSurveyId()
+  const surveyName = useSurveyName()
   const surveyCycleKey = useSurveyCycleKey()
   const surveyIsDirty = useIsSurveyDirty()
   const nodeDefLabelType = useNodeDefLabelType()
@@ -135,6 +147,7 @@ const FormHeader = (props) => {
                 key: `labels-export-${fileFormat}`,
                 content: (
                   <ButtonDownload
+                    fileName={getLabelsExportFileName({ surveyName, fileFormat })}
                     href={`/api/survey/${surveyId}/labels`}
                     label={`surveyForm:exportLabels_${fileFormat}`}
                     requestParams={{ fileFormat }}

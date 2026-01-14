@@ -44,7 +44,7 @@ const _getRStudioCode = ({
   surveyCycleKey,
 }) => {
   const serverUrl = ProcessUtils.ENV.rStudioDownloadServerUrl || serverUrlParam
-  const scriptUrl = `${serverUrl}/api/survey/${surveyId}/chain/${chainUuid}/script/public?surveyCycleKey=${surveyCycleKey}&token=${token}`
+  const scriptUrl = `${serverUrl}/api/public/survey/${surveyId}/chain/${chainUuid}/script?surveyCycleKey=${surveyCycleKey}&token=${token}`
   const localDir = `./arena/arena-${Survey.getName(surveyInfo)}-${DateUtils.nowFormatDefault()}`
   const zipFile = `./${token}.zip`
 

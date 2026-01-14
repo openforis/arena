@@ -2,6 +2,7 @@ import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
+import * as DateUtils from '@core/dateUtils'
 import * as API from '@webapp/service/api'
 import { Checkbox, TextInput } from '@webapp/components/form'
 import { ButtonDownload } from '@webapp/components/buttons'
@@ -23,8 +24,11 @@ const HeaderLeft = (props) => {
         job,
         closeButton: ({ job: jobCompleted }) => {
           const { outputTempFileName: tempFileName } = jobCompleted.result
+          const date = DateUtils.nowFormatDefault()
+          const fileName = `arena_surveys_${date}.xlsx`
           return (
             <ButtonDownload
+              fileName={fileName}
               href={API.getSurveyListExportedFileDownloadUrl({ tempFileName })}
               onClick={() => dispatch(JobActions.hideJobMonitor())}
               variant="contained"

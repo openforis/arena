@@ -7,7 +7,7 @@ import * as JobUtils from '@server/job/jobUtils'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
@@ -71,7 +71,7 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, draft = true, fileFormat = FileFormats.csv } = Request.getParams(req)
+        const { surveyId, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)

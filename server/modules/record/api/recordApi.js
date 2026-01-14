@@ -19,7 +19,7 @@ import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import * as RecordService from '../service/recordService'
 import * as FileService from '../service/fileService'
 
