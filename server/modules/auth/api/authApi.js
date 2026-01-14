@@ -7,6 +7,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
+import * as ProcessUtils from '@core/processUtils'
 
 import * as Log from '@server/log/log'
 import * as SurveyService from '../../survey/service/surveyService'
@@ -66,7 +67,12 @@ export const init = (app) => {
       const socketId = Request.getSocketId(req)
       RecordService.dissocSocketFromUpdateThread(socketId)
 
-      res.clearCookie('refreshToken', { path: ApiEndpoint.auth.tokenRefresh() })
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        path: ApiEndpoint.auth.tokenRefresh(),
+        sameSite: 'strict',
+        secure: ProcessUtils.isEnvProduction,
+      })
       Response.sendOk(res)
     } catch (error) {
       next(error)
