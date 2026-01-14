@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { FileFormats } from '@core/fileFormats'
 
 import { ButtonDownload } from '@webapp/components/buttons'
-import { useSurveyId, useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyId, useSurveyCycleKey, useSurveyName } from '@webapp/store/survey'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 const SurveySchemaSummaryDownloadButton = (props) => {
@@ -12,9 +12,10 @@ const SurveySchemaSummaryDownloadButton = (props) => {
 
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  const survey = useSurveyInfo()
+  const surveyName = useSurveyName()
+
   const fileName = ExportFileNameGenerator.generate({
-    survey,
+    surveyName,
     cycle,
     fileType: 'SchemaSummary',
     fileFormat,
