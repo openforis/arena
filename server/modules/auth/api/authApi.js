@@ -66,7 +66,12 @@ export const init = (app) => {
       const socketId = Request.getSocketId(req)
       RecordService.dissocSocketFromUpdateThread(socketId)
 
-      res.clearCookie('refreshToken', { path: ApiEndpoint.auth.tokenRefresh() })
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        path: ApiEndpoint.auth.tokenRefresh(),
+        sameSite: 'strict',
+        secure: true,
+      })
       Response.sendOk(res)
     } catch (error) {
       next(error)
