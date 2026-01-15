@@ -1,6 +1,7 @@
 import exifr from 'exifr'
 
 import { Objects } from '@openforis/arena-core'
+import { Requests } from '@openforis/arena-server'
 
 import * as Authorizer from '@core/auth/authorizer'
 import * as ProcessUtils from '@core/processUtils'
@@ -484,9 +485,10 @@ export const init = (app) => {
 
   app.delete('/survey/:surveyId/records', requireRecordsEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, recordUuids } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const socketId = Request.getSocketId(req)
+      const { surveyId } = Requests.getParams(req)
+      const recordUuids = Requests.getArrayParam('recordUuids')(req)
+      const user = Requests.getUser(req)
+      const socketId = Requests.getSocketId(req)
 
       await RecordService.deleteRecords({ socketId, user, surveyId, recordUuids })
 
