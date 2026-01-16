@@ -18,7 +18,7 @@ export const ButtonDownload = forwardRef((props, ref) => {
     ...otherProps
   } = props
 
-  const handleDownload = useCallback(async () => {
+  const handleDownloadInMemory = useCallback(async () => {
     const response = await axios.get(href, {
       params: requestParams,
       responseType: 'blob',
@@ -39,14 +39,14 @@ export const ButtonDownload = forwardRef((props, ref) => {
     }
     if (href && onClickResult !== false) {
       if (downloadInMemory) {
-        await handleDownload()
+        await handleDownloadInMemory()
       } else {
         // direct link download
         const url = `${href}${requestParams ? `?${new URLSearchParams(requestParams)}` : ''}`
         globalThis.open(url, '_blank')
       }
     }
-  }, [downloadInMemory, handleDownload, href, onClickProp, requestParams])
+  }, [downloadInMemory, handleDownloadInMemory, href, onClickProp, requestParams])
 
   return (
     <Button iconClassName={iconClassName} label={label} onClick={onClick} ref={ref} variant={variant} {...otherProps} />
