@@ -87,7 +87,7 @@ export const exportSurvey = ({
 
   JobManager.enqueueJob(job)
 
-  return { job: JobUtils.jobToJSON(job), outputFileName }
+  return { job: JobUtils.jobToJSON(job) }
 }
 
 export const startSurveysListExport = ({ user, draft, template }) => {

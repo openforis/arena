@@ -7,6 +7,7 @@ import * as DomUtils from '@webapp/utils/domUtils'
 
 export const ButtonDownload = forwardRef((props, ref) => {
   const {
+    downloadInMemory = true,
     fileName = null,
     href = null,
     iconClassName = 'icon-download2 icon-14px',
@@ -17,7 +18,7 @@ export const ButtonDownload = forwardRef((props, ref) => {
     ...otherProps
   } = props
 
-  const handleDownload = useCallback(async () => {
+  const handleDownloadInMemory = useCallback(async () => {
     const response = await axios.get(href, {
       params: requestParams,
       responseType: 'blob',
@@ -37,9 +38,19 @@ export const ButtonDownload = forwardRef((props, ref) => {
       onClickResult = await onClickProp()
     }
     if (href && onClickResult !== false) {
-      await handleDownload()
+      if (downloadInMemory) {
+        await handleDownloadInMemory()
+      } else {
+        // direct link download
+        let url = href
+        if (requestParams) {
+          const params = new URLSearchParams(requestParams)
+          url += `?${params.toString()}`
+        }
+        globalThis.open(url, '_blank')
+      }
     }
-  }, [handleDownload, href, onClickProp])
+  }, [downloadInMemory, handleDownloadInMemory, href, onClickProp, requestParams])
 
   return (
     <Button iconClassName={iconClassName} label={label} onClick={onClick} ref={ref} variant={variant} {...otherProps} />
@@ -48,6 +59,7 @@ export const ButtonDownload = forwardRef((props, ref) => {
 
 ButtonDownload.propTypes = {
   ...Button.propTypes,
+  downloadInMemory: PropTypes.bool, // if true, downloads the file in memory and then triggers the download. If false, uses direct link download
   fileName: PropTypes.string, // required if href is specified
   href: PropTypes.string, // specify href, onClick or both
   onClick: PropTypes.func, // specify href, onClick or both. If onClick is specified and returns false, href will not be used

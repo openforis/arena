@@ -45,3 +45,6 @@ export const getSocketId = getHeader('socketid')
 // HTTPS
 
 export const isHttps = (req) => req.secure || req.header('x-forwarded-proto') === 'https'
+
+// Download file name set by download auth middleware
+export const getDownloadFileName = R.prop('downloadFileName')
