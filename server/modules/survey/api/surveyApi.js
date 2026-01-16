@@ -231,8 +231,8 @@ export const init = (app) => {
 
   // download generated survey export file
   app.get('/survey/:surveyId/export/download', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
-    const downloadFileName = Request.getDownloadFileName(req)
     try {
+      const downloadFileName = Request.getDownloadFileName(req)
       const {
         surveyName,
         includeData = true,
