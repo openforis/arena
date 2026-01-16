@@ -1,8 +1,7 @@
-import { ServiceRegistry, ServiceType } from '@openforis/arena-core'
-
 import * as User from '@core/user/user'
 
 import ZipFileCreatorBaseJob from '@server/job/zipFileCreatorBaseJob'
+import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 
 import ActivityLogExportJob from './jobs/activityLogExportJob'
 import CategoriesExportJob from './jobs/categoriesExportJob'
@@ -63,16 +62,12 @@ export default class SurveyExportJob extends ZipFileCreatorBaseJob {
   }
 
   generateDownloadToken() {
+    this.logDebug('Generating download token')
     const { user, outputFileName } = this.context
 
     const userUuid = User.getUuid(user)
 
-    const serviceRegistry = ServiceRegistry.getInstance()
-    const authTokenService = serviceRegistry.getService(ServiceType.userAuthToken)
-    return authTokenService.createDownloadAuthToken({
-      userUuid,
-      fileName: outputFileName,
-    })
+    return DownloadAuthTokenUtils.generateToken({ userUuid, fileName: outputFileName })
   }
 }
 

@@ -1,8 +1,9 @@
+import * as User from '@core/user/user'
+
 import Job from '@server/job/job'
-
-import * as FileUtils from '@server/utils/file/fileUtils'
-
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 
 import CSVDataExtractionJob from './jobs/CSVDataExtractionJob'
 import CategoriesExportJob from './jobs/CategoriesExportJob'
@@ -74,14 +75,12 @@ export default class DataExportJob extends Job {
         })
   }
 
-  async beforeSuccess() {
-    await super.beforeSuccess()
+  generateResult() {
+    const result = super.generateResult()
 
-    const { exportUuid } = this.context
+    const { token: downloadToken } = this.generateDownloadToken()
 
-    this.setResult({
-      exportUuid,
-    })
+    return { ...result, downloadToken }
   }
 
   async beforeEnd() {
@@ -90,6 +89,16 @@ export default class DataExportJob extends Job {
     const { outputDir } = this.context
 
     await FileUtils.rmdir(outputDir)
+  }
+
+  generateDownloadToken() {
+    this.logDebug('Generating download token')
+
+    const { user, outputFileName } = this.context
+
+    const userUuid = User.getUuid(user)
+
+    return DownloadAuthTokenUtils.generateToken({ userUuid, fileName: outputFileName })
   }
 }
 

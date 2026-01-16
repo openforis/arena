@@ -17,14 +17,15 @@ export const DataExportDownloadButton = (props) => {
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
 
-  const { exportUuid } = JobSerialized.getResult(job)
+  const { downloadToken } = JobSerialized.getResult(job)
 
   const onClick = useCallback(() => dispatch(JobActions.hideJobMonitor()), [dispatch])
 
   return (
     <ButtonDownload
       testId={TestId.dataExport.downloadExportedFileBtn}
-      href={API.downloadExportedDataUrl({ surveyId, cycle, exportUuid })}
+      downloadInMemory={false}
+      href={API.downloadExportedDataUrl({ surveyId, cycle, downloadToken })}
       onClick={onClick}
       variant="contained"
     />
