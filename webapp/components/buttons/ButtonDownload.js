@@ -42,7 +42,11 @@ export const ButtonDownload = forwardRef((props, ref) => {
         await handleDownloadInMemory()
       } else {
         // direct link download
-        const url = `${href}${requestParams ? `?${new URLSearchParams(requestParams)}` : ''}`
+        let url = href
+        if (requestParams) {
+          const params = new URLSearchParams(requestParams)
+          url += `?${params.toString()}`
+        }
         globalThis.open(url, '_blank')
       }
     }
