@@ -51,8 +51,8 @@ export const init = (app) => {
     }
   })
 
-  // get zip with csv
-  app.get('/survey/:surveyId/data-export', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
+  // get ZIP with CSV or Excel files
+  app.get('/survey/:surveyId/data-export/download', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
     try {
       const downloadFileName = Request.getDownloadFileName(req)
       const { surveyId, cycle } = Request.getParams(req)

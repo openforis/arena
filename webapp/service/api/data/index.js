@@ -184,7 +184,7 @@ export const startExportDataJob = async ({ surveyId, cycle, recordUuids, search,
 
 export const downloadExportedDataUrl = ({ surveyId, cycle, downloadToken }) => {
   const params = new URLSearchParams({ cycle, downloadToken })
-  return `/api/survey/${surveyId}/data-export?${params.toString()}`
+  return `/api/survey/${surveyId}/data-export/download?${params.toString()}`
 }
 
 export const startExportDataSummaryJob = async ({ surveyId, cycle, lang, options }) => {
