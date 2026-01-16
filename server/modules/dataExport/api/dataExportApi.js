@@ -1,33 +1,20 @@
-import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
-import { isUuid } from '@core/uuid'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { FileFormats } from '@core/fileFormats'
+import { isUuid } from '@core/uuid'
 
-import * as Response from '@server/utils/response'
-import * as Request from '@server/utils/request'
-import * as FileUtils from '@server/utils/file/fileUtils'
 import * as JobUtils from '@server/job/jobUtils'
+import * as Request from '@server/utils/request'
 
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import { sendTempFileToResponse } from '@server/modules/fileDownload/api/fileDownloadApi'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+
 import * as DataExportService from '../service/dataExportService'
 
 const checkExportUuid = (exportUuid) => {
   if (!isUuid(exportUuid)) {
     throw new Error('Invalid exportUuid specified')
   }
-}
-
-const sendTempFileToResponse = ({ res, tempFileUuid, tempFileName, fileFormat, outputFileName }) => {
-  const extension = getExtensionByFileFormat(fileFormat)
-  const fileName = tempFileName ?? `${tempFileUuid}.${extension}`
-  const filePath = FileUtils.tempFilePath(fileName)
-  Response.sendFile({
-    res,
-    path: filePath,
-    name: outputFileName,
-    fileFormat,
-    onEnd: async () => FileUtils.deleteFile(filePath),
-  })
 }
 
 export const init = (app) => {

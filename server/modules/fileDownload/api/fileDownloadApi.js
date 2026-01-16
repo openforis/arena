@@ -8,7 +8,7 @@ import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
-const sendTempFileToResponse = ({ res, tempFileUuid, tempFileName, fileFormat, outputFileName }) => {
+export const sendTempFileToResponse = ({ res, tempFileUuid, tempFileName, fileFormat, outputFileName }) => {
   const extension = getExtensionByFileFormat(fileFormat)
   const fileName = tempFileName ?? `${tempFileUuid}.${extension}`
   const filePath = FileUtils.tempFilePath(fileName)
