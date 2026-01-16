@@ -230,28 +230,32 @@ export const init = (app) => {
   })
 
   // download generated survey export file
-  app.get('/survey/:surveyId/export/download', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/export/download', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
+    const downloadFileName = Request.getDownloadFileName(req)
     try {
       const {
         surveyName,
-        fileName,
         includeData = true,
         includeResultAttributes = true,
         includeActivityLog = true,
       } = Request.getParams(req)
 
-      const path = FileUtils.join(ProcessUtils.ENV.tempFolder, fileName)
-      let prefix = includeData ? 'arena_backup' : 'arena_survey'
+      const path = FileUtils.join(ProcessUtils.ENV.tempFolder, downloadFileName)
+
+      const outputFileNameParts = [includeData ? 'arena_backup' : 'arena_survey']
       if (includeData) {
         if (!includeActivityLog) {
-          prefix += '_no_log'
+          outputFileNameParts.push('no_log')
         }
         if (!includeResultAttributes) {
-          prefix += '_no_result_attributes'
+          outputFileNameParts.push('no_result_attributes')
         }
       }
       const date = DateUtils.nowFormatDefault()
-      Response.sendFile({ res, path, name: `${prefix}_${surveyName}_${date}.zip` })
+      outputFileNameParts.push(surveyName, date)
+      const outputFileName = `${outputFileNameParts.join('_')}.zip`
+
+      Response.sendFile({ res, path, name: outputFileName })
     } catch (error) {
       next(error)
     }

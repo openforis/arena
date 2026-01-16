@@ -43,6 +43,8 @@ export const {
   // User access requests
   requireCanViewAccessRequestsPermission,
   requireCanEditAccessRequestsPermission,
+  // Download token middleware
+  requireDownloadToken,
 } = ApiAuthMiddleware
 
 const sendUnauthorizedError = ({ res, req = null }) => {
