@@ -38,12 +38,12 @@ export const ButtonDownload = forwardRef((props, ref) => {
       onClickResult = await onClickProp()
     }
     if (href && onClickResult !== false) {
-      if (!downloadInMemory) {
+      if (downloadInMemory) {
+        await handleDownload()
+      } else {
         // direct link download
         const url = `${href}${requestParams ? `?${new URLSearchParams(requestParams)}` : ''}`
         globalThis.open(url, '_blank')
-      } else {
-        await handleDownload()
       }
     }
   }, [downloadInMemory, handleDownload, href, onClickProp, requestParams])
