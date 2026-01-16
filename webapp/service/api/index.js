@@ -1,5 +1,5 @@
 export { fetchLoggedInUserAndSurvey } from './fetchUserAndSurvey'
-export { fetchVersion } from './generic'
+export { downloadFileUrl, fetchVersion } from './generic'
 
 export {
   fetchCategories,
@@ -50,7 +50,6 @@ export {
   fetchRecordSummary,
   fetchRecordsSummary,
   startExportDataJob,
-  downloadExportedDataUrl,
   startExportDataSummaryJob,
   downloadExportedDataSummaryUrl,
   startRecordsCloneJob,

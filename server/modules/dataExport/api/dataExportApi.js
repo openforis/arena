@@ -51,28 +51,6 @@ export const init = (app) => {
     }
   })
 
-  // get ZIP with CSV or Excel files
-  app.get('/survey/:surveyId/data-export/download', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
-    try {
-      const downloadFileName = Request.getDownloadFileName(req)
-      const { surveyId, cycle } = Request.getParams(req)
-
-      const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-
-      const fileFormat = FileFormats.zip
-      const outputFileName = ExportFileNameGenerator.generate({
-        survey,
-        cycle,
-        fileType: 'DataExport',
-        fileFormat,
-        includeTimestamp: true,
-      })
-      sendTempFileToResponse({ res, tempFileName: downloadFileName, fileFormat, outputFileName })
-    } catch (error) {
-      next(error)
-    }
-  })
-
   app.post(
     '/survey/:surveyId/data-summary-export',
     AuthMiddleware.requireRecordAnalysisPermission,

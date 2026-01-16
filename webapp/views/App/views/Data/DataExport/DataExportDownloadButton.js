@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import * as JobSerialized from '@common/job/jobSerialized'
+import { FileFormats } from '@core/fileFormats'
 
 import { ButtonDownload } from '@webapp/components/buttons'
 import * as API from '@webapp/service/api'
@@ -25,7 +26,13 @@ export const DataExportDownloadButton = (props) => {
     <ButtonDownload
       testId={TestId.dataExport.downloadExportedFileBtn}
       downloadInMemory={false}
-      href={API.downloadExportedDataUrl({ surveyId, cycle, downloadToken })}
+      href={API.downloadFileUrl({
+        downloadToken,
+        surveyId,
+        cycle,
+        fileType: 'DataExport',
+        fileFormat: FileFormats.zip,
+      })}
       onClick={onClick}
       variant="contained"
     />
