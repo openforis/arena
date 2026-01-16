@@ -1,32 +1,20 @@
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { FileFormats } from '@core/fileFormats'
 import { isUuid } from '@core/uuid'
 
-import * as Response from '@server/utils/response'
-import * as Request from '@server/utils/request'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
-import * as FileUtils from '@server/utils/file/fileUtils'
 import * as JobUtils from '@server/job/jobUtils'
+import * as Request from '@server/utils/request'
 
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import { sendTempFileToResponse } from '@server/modules/fileDownload/api/fileDownloadApi'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+
 import * as DataExportService from '../service/dataExportService'
-import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 
 const checkExportUuid = (exportUuid) => {
   if (!isUuid(exportUuid)) {
     throw new Error('Invalid exportUuid specified')
   }
-}
-
-const sendTempFileToResponse = ({ res, tempFileName, fileFormat, outputFileName }) => {
-  const extension = getExtensionByFileFormat(fileFormat)
-  const tempFilePath = FileUtils.tempFilePath(`${tempFileName}.${extension}`)
-  Response.sendFile({
-    res,
-    path: tempFilePath,
-    name: outputFileName,
-    fileFormat,
-    onEnd: async () => FileUtils.deleteFile(tempFilePath),
-  })
 }
 
 export const init = (app) => {
@@ -49,33 +37,6 @@ export const init = (app) => {
       next(error)
     }
   })
-
-  // get zip with csv
-  app.get(
-    '/survey/:surveyId/data-export/:exportUuid',
-    AuthMiddleware.requireRecordsExportPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, exportUuid } = Request.getParams(req)
-
-        checkExportUuid(exportUuid)
-
-        const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-
-        const fileFormat = FileFormats.zip
-        const outputFileName = ExportFileNameGenerator.generate({
-          survey,
-          cycle,
-          fileType: 'DataExport',
-          fileFormat,
-          includeTimestamp: true,
-        })
-        sendTempFileToResponse({ res, tempFileName: exportUuid, fileFormat, outputFileName })
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
 
   app.post(
     '/survey/:surveyId/data-summary-export',
@@ -115,7 +76,7 @@ export const init = (app) => {
           includeTimestamp: true,
         })
 
-        sendTempFileToResponse({ res, tempFileName: exportUuid, fileFormat, outputFileName })
+        sendTempFileToResponse({ res, tempFileUuid: exportUuid, fileFormat, outputFileName })
       } catch (error) {
         next(error)
       }

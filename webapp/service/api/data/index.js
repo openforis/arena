@@ -182,11 +182,6 @@ export const startExportDataJob = async ({ surveyId, cycle, recordUuids, search,
   return job
 }
 
-export const downloadExportedDataUrl = ({ surveyId, cycle, exportUuid }) => {
-  const params = new URLSearchParams({ cycle })
-  return `/api/survey/${surveyId}/data-export/${exportUuid}?${params.toString()}`
-}
-
 export const startExportDataSummaryJob = async ({ surveyId, cycle, lang, options }) => {
   const { data } = await axios.post(`/api/survey/${surveyId}/data-summary-export`, { cycle, lang, options })
   const { job } = data
