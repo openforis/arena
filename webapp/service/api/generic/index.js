@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Objects } from '@openforis/arena-core'
 
 export const fetchVersion = async () => {
   const {
@@ -8,6 +9,8 @@ export const fetchVersion = async () => {
 }
 
 export const downloadFileUrl = ({ downloadToken, fileType, fileFormat, surveyId = null, cycle = null }) => {
-  const params = new URLSearchParams({ downloadToken, fileType, fileFormat, surveyId, cycle })
-  return `/api/download?${params.toString()}`
+  const params = { downloadToken, fileType, fileFormat, surveyId, cycle }
+  const cleanParams = Objects.deleteEmptyProps(params)
+  const searchParams = new URLSearchParams(cleanParams)
+  return `/api/download?${searchParams.toString()}`
 }
