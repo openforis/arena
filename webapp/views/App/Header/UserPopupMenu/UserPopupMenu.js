@@ -1,6 +1,6 @@
 import './UserPopupMenu.scss'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -17,6 +17,7 @@ import { useUser } from '@webapp/store/user'
 
 import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
 import ProfilePicture from '@webapp/components/profilePicture'
+import QRCodeLoginDialog from '../QRCodeLoginDialog'
 
 import {
   useAuthCanCreateSurvey,
@@ -36,6 +37,8 @@ const UserPopupMenu = (props) => {
   const navigate = useNavigate()
   const i18n = useI18n()
   const elementRef = useRef(null)
+
+  const [showQRCodeDialog, setShowQRCodeDialog] = useState(false)
 
   const user = useUser()
   const canCreateSurvey = useAuthCanCreateSurvey()
@@ -164,6 +167,18 @@ const UserPopupMenu = (props) => {
       <Separator />
 
       <button
+        type="button"
+        className="btn-s btn-transparent"
+        onClick={() => {
+          setShowQRCodeDialog(true)
+          onClose()
+        }}
+      >
+        <span className="icon icon-qrcode icon-12px icon-left" />
+        {i18n.t('header.qrCodeLogin')}
+      </button>
+
+      <button
         data-testid={TestId.header.userLogoutBtn}
         type="button"
         className="btn-s btn-transparent"
@@ -175,6 +190,8 @@ const UserPopupMenu = (props) => {
         <span className="icon icon-switch icon-12px icon-left" />
         {i18n.t('sidebar.logout')}
       </button>
+
+      {showQRCodeDialog && <QRCodeLoginDialog onClose={() => setShowQRCodeDialog(false)} />}
     </div>
   )
 }

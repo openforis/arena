@@ -162,6 +162,7 @@
     "pg-promise": "^11.8.0",
     "pg-query-stream": "^4.6.0",
     "prop-types": "^15.8.1",
+    "qrcode": "^1.5.4",
     "r-script": "^0.0.4",
     "ramda": "^0.28.0",
     "react": "^18.2.0",

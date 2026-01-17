@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 import { SystemActions, useSystemError, useI18n, useSystemStatusReady } from '@webapp/store/system'
 import { ExpansionPanel } from '@webapp/components'
+import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 
 import Routes from './Routes'
 
@@ -11,10 +13,27 @@ const Arena = () => {
   const i18n = useI18n()
   const ready = useSystemStatusReady()
   const systemError = useSystemError()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
+    // Check if there's an authToken in the URL (from QR login redirect)
+    const params = new URLSearchParams(location.search)
+    const authToken = params.get('authToken')
+
+    if (authToken) {
+      // Set the auth token from QR login
+      ApiConstants.setAuthToken(authToken)
+
+      // Remove authToken from URL for security
+      params.delete('authToken')
+      const newSearch = params.toString()
+      const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`
+      navigate(newUrl, { replace: true })
+    }
+
     dispatch(SystemActions.initSystem())
-  }, [])
+  }, [dispatch, location.pathname, location.search, navigate])
 
   if (!ready) return null
 

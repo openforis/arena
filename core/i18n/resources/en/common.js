@@ -165,6 +165,7 @@ Do you want to proceed?`,
     reset: 'Reset',
     resume: 'Resume',
     retry: 'Retry',
+    refresh: 'Refresh',
     role: 'Role',
     save: 'Save',
     saveAndBack: 'Save & Back',
@@ -261,6 +262,10 @@ Try again?`,
 
   header: {
     myProfile: 'My profile',
+    qrCodeLogin: 'QR Code Login',
+    qrCodeLoginDescription: 'Scan this QR code with your mobile device to login.',
+    qrCodeExpired: 'QR code has expired',
+    qrCodeExpiresIn: 'Expires in {{time}}',
   },
 
   nodeDefsTypes: {

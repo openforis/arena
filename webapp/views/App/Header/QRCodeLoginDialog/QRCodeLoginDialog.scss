@@ -1,0 +1,78 @@
+.qr-code-login-dialog {
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+    min-height: 400px;
+  }
+
+  &__loading,
+  &__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+  }
+
+  &__description {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--ui-textPrimary);
+    max-width: 400px;
+  }
+
+  &__qr-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &__qr-image {
+    display: block;
+    max-width: 300px;
+    height: auto;
+  }
+
+  &__expired-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    z-index: 1;
+
+    p {
+      margin: 0;
+      font-weight: 600;
+      color: var(--ui-textSecondary);
+    }
+  }
+
+  &__timer {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ui-textSecondary);
+    font-size: 0.9rem;
+
+    .icon {
+      color: var(--ui-textSecondary);
+    }
+  }
+}

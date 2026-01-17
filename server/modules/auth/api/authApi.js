@@ -13,6 +13,7 @@ import * as Log from '@server/log/log'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
+import * as QRCodeAuthService from '../service/qrCodeAuthService'
 
 const Logger = Log.getLogger('AuthAPI')
 
@@ -106,6 +107,101 @@ export const init = (app) => {
       const { uuid, name, password, title } = Request.getParams(req)
       await UserService.resetPassword({ uuid, name, password, title })
       res.json({ result: true })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // ===== QR CODE LOGIN
+  app.post('/auth/qr-code/generate', async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized' })
+      }
+
+      const { token, expiresAt } = await QRCodeAuthService.generateQRCodeToken(user)
+      const serverUrl = Request.getServerUrl(req)
+      const qrCodeUrl = `${serverUrl}/guest/qr-login?token=${token}`
+
+      res.json({
+        token,
+        qrCodeUrl,
+        expiresAt,
+      })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/auth/qr-code/validate', async (req, res, next) => {
+    try {
+      const { token } = Request.getParams(req)
+      const result = await QRCodeAuthService.validateQRCodeToken(token)
+
+      if (!result.valid) {
+        return res.status(400).json({ error: result.error })
+      }
+
+      // Return user data for login
+      const userWithGroups = await UserService.fetchUserWithGroups(result.user.uuid)
+      res.json({ user: userWithGroups })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // QR Code Login endpoint - validates token and authenticates user with JWT
+  app.get('/guest/qr-login', async (req, res, next) => {
+    try {
+      const { token } = req.query
+
+      if (!token) {
+        return res.redirect('/guest/login?error=missing_token')
+      }
+
+      const result = await QRCodeAuthService.validateQRCodeToken(token)
+
+      if (!result.valid) {
+        return res.redirect(`/guest/login?error=${encodeURIComponent(result.error)}`)
+      }
+
+      // Fetch user with groups
+      const userWithGroups = await UserService.fetchUserWithGroups(result.user.uuid)
+
+      // Generate JWT tokens using Arena's auth token service
+      const { ServiceRegistry, ServiceType } = await import('@openforis/arena-core')
+      const serviceRegistry = ServiceRegistry.getInstance()
+      const authTokenService = serviceRegistry.getService(ServiceType.userAuthToken)
+
+      const { authToken, refreshToken } = await authTokenService.createUserAuthTokens({
+        userUuid: userWithGroups.uuid,
+        props: { qrLogin: true },
+      })
+
+      // Set refresh token as HTTP-only cookie
+      res.cookie('refreshToken', refreshToken.token, {
+        httpOnly: true,
+        path: ApiEndpoint.auth.tokenRefresh(),
+        sameSite: 'strict',
+        secure: ProcessUtils.isEnvProduction,
+        expires: refreshToken.expiresAt,
+      })
+
+      // Redirect to app with auth token in query param (will be picked up by the frontend)
+      const redirectUrl = `/app/home?authToken=${authToken.token}`
+      res.redirect(redirectUrl)
+    } catch (error) {
+      Logger.error('QR login error:', error)
+      res.redirect('/guest/login?error=authentication_failed')
+    }
+  })
+
+  // Clean up expired QR tokens periodically (can be called from a scheduled job)
+  app.post('/auth/qr-code/cleanup', async (req, res, next) => {
+    try {
+      await QRCodeAuthService.cleanupExpiredTokens()
+      Response.sendOk(res)
     } catch (error) {
       next(error)
     }
