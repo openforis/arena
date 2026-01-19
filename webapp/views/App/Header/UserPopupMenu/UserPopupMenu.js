@@ -1,6 +1,6 @@
 import './UserPopupMenu.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -27,12 +27,11 @@ import {
 } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 import { Button } from '@webapp/components'
-import { QRCodeLoginDialog } from '../QRCodeLoginDialog'
 
 const Separator = () => <div className="user-popup-menu__sep" />
 
 const UserPopupMenu = (props) => {
-  const { onClose } = props
+  const { onClose, onQrCodeLoginDialogOpen } = props
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -45,12 +44,6 @@ const UserPopupMenu = (props) => {
   const canEditTemplates = useAuthCanEditTemplates()
   const canViewUsersAccessRequests = useAuthCanViewUsersAccessRequests() && ProcessUtils.ENV.allowUserAccessRequest
   const canViewAllUsers = useAuthCanViewAllUsers()
-
-  const [qrLoginDialogShown, setQrLoginDialogShown] = useState(false)
-
-  const toggleQrLoginDialogVisible = useCallback(() => {
-    setQrLoginDialogShown(!qrLoginDialogShown)
-  }, [qrLoginDialogShown])
 
   useEffect(() => {
     const onClickListener = (e) => {
@@ -173,10 +166,8 @@ const UserPopupMenu = (props) => {
         className="btn-s btn-transparent"
         iconClassName="qrcode"
         label="header.qrCodeLoginDialog.title"
-        onClick={toggleQrLoginDialogVisible}
+        onClick={onQrCodeLoginDialogOpen}
       />
-
-      {qrLoginDialogShown && <QRCodeLoginDialog onClose={toggleQrLoginDialogVisible} />}
 
       <Separator />
 
@@ -198,6 +189,7 @@ const UserPopupMenu = (props) => {
 
 UserPopupMenu.propTypes = {
   onClose: PropTypes.func.isRequired,
+  onQrCodeLoginDialogOpen: PropTypes.func.isRequired,
 }
 
 export default UserPopupMenu

@@ -405,7 +405,7 @@ export const init = (app) => {
 
       const serviceRegistry = ServiceRegistry.getInstance()
       const service = serviceRegistry.getService(ServerServiceType.userTempAuthToken)
-      const tempAuthToken = await service.createTempAuthToken({ userUuid: User.getUuid(user) })
+      const tempAuthToken = await service.create({ userUuid: User.getUuid(user) })
 
       res.json({ tempAuthToken })
     } catch (error) {

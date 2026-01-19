@@ -28,6 +28,7 @@ import { Breadcrumbs } from './Breadcrumbs'
 import { MessageNotificationPanel } from './MessageNotificationsPanel'
 import UserPopupMenu from './UserPopupMenu'
 import { useHasMessageNotifications } from '@webapp/store/ui'
+import { QRCodeLoginDialog } from './QRCodeLoginDialog'
 
 const Header = () => {
   const dispatch = useDispatch()
@@ -44,7 +45,16 @@ const Header = () => {
   const [showUserPopup, setShowUserPopup] = useState(false)
   const toggleShowUserPopup = useCallback(() => setShowUserPopup((showUserPopupPrev) => !showUserPopupPrev), [])
   const [showMessageNotifications, setShowMessageNotifications] = useState(false)
+  const [qrLoginDialogShown, setQrLoginDialogShown] = useState(false)
+
+  const toggleQrLoginDialogVisible = () => setQrLoginDialogShown((prevQrLoginDialogShown) => !prevQrLoginDialogShown)
+
   const toggleShowMessageNotifications = useCallback(() => setShowMessageNotifications((prev) => !prev), [])
+
+  const onQrCodeLoginDialogOpen = useCallback(() => {
+    setShowUserPopup(false)
+    toggleQrLoginDialogVisible()
+  }, [])
 
   const prevUser = usePrevious(user)
   const pictureUpdateKeyRef = useRef(0)
@@ -123,7 +133,10 @@ const Header = () => {
           <span className="icon icon-ctrl" />
         </button>
       </div>
-      {showUserPopup && <UserPopupMenu onClose={() => setShowUserPopup(false)} />}
+      {showUserPopup && (
+        <UserPopupMenu onClose={toggleShowUserPopup} onQrCodeLoginDialogOpen={onQrCodeLoginDialogOpen} />
+      )}
+      {qrLoginDialogShown && <QRCodeLoginDialog onClose={toggleQrLoginDialogVisible} />}
     </div>
   )
 }

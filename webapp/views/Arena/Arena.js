@@ -14,7 +14,7 @@ const Arena = () => {
 
   useEffect(() => {
     dispatch(SystemActions.initSystem())
-  }, [])
+  }, [dispatch])
 
   if (!ready) return null
 
