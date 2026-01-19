@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 
-import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+import { WebSocketEvent, WebSocketServer, UserTempAuthTokenService } from '@openforis/arena-server'
 
 import { db } from '@server/db/db'
 
