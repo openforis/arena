@@ -256,6 +256,11 @@ export default {
 
   header: {
     myProfile: 'Миний профайл',
+    qrCodeLoginDialog: {
+      title: 'QR кодоор нэвтрэх',
+      success: 'Амжилттай нэвтэрлээ! Та одоо энэ цонхыг хааж болно.',
+      error: 'QR код үүсгэхэд алдаа гарлаа: {{error}}',
+    },
   },
 
   nodeDefsTypes: {

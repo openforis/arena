@@ -255,6 +255,11 @@ export default {
 
   header: {
     myProfile: 'Мой профиль',
+    qrCodeLoginDialog: {
+      title: 'Вход по QR-коду',
+      success: 'Вход выполнен успешно! Теперь вы можете закрыть это диалоговое окно.',
+      error: 'Ошибка при генерации QR-кода: {{error}}',
+    },
   },
 
   nodeDefsTypes: {

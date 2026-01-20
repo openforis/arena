@@ -231,6 +231,11 @@ export default {
   },
   header: {
     myProfile: 'Mi perfil',
+    qrCodeLoginDialog: {
+      title: 'Inicio de sesión con código QR',
+      success: '¡Inicio de sesión exitoso! Ahora puede cerrar este diálogo.',
+      error: 'Error al generar el código QR: {{error}}',
+    },
   },
   nodeDefsTypes: {
     integer: 'Entero',

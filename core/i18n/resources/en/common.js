@@ -261,6 +261,11 @@ Try again?`,
 
   header: {
     myProfile: 'My profile',
+    qrCodeLoginDialog: {
+      title: 'QR Code Login',
+      success: 'Login successful! You can now close this dialog.',
+      error: 'Error generating QR code: {{error}}',
+    },
   },
 
   nodeDefsTypes: {
