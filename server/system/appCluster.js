@@ -18,6 +18,7 @@ import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
+import * as UserTempAuthTokensCleanup from './schedulers/userTempAuthTokensCleanup'
 import { SwaggerInitializer } from './swaggerInitializer'
 
 const fileSizeLimit = ProcessUtils.ENV.fileUploadLimit
@@ -76,6 +77,6 @@ export const run = async () => {
   await RecordPreviewCleanup.init()
   // await SurveysFilesPropsCleanup.init()
   await ExpiredUserInvitationsCleanup.init()
-
-  logger.info('server initialization complete; server started.')
+  await UserTempAuthTokensCleanup.init()
+  await logger.info('server initialization complete; server started.')
 }
