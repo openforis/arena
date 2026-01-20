@@ -78,5 +78,6 @@ export const run = async () => {
   // await SurveysFilesPropsCleanup.init()
   await ExpiredUserInvitationsCleanup.init()
   await UserTempAuthTokensCleanup.init()
-  await logger.info('server initialization complete; server started.')
+
+  logger.info('server initialization complete; server started.')
 }
