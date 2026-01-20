@@ -1,10 +1,12 @@
+import './QRCodeLoginDialog.scss'
+
 import React, { useCallback, useEffect, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import PropTypes from 'prop-types'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-import { Button, Modal, ModalBody, Spinner } from '@webapp/components'
+import { Button, Markdown, Modal, ModalBody, Spinner } from '@webapp/components'
 import { useOnWebSocketEvent } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
@@ -79,7 +81,12 @@ export const QRCodeLoginDialog = (props) => {
       <ModalBody>
         {loginSuccessful && <div>{i18n.t('header.qrCodeLoginDialog.success')}</div>}
         {loading && <Spinner />}
-        {!loading && qrValue && <QRCodeCanvas value={qrValue} />}
+        {!loading && qrValue && (
+          <div className="qr-code-container">
+            <QRCodeCanvas value={qrValue} />
+            <Markdown className="qr-code-instructions" source={i18n.t('header.qrCodeLoginDialog.instructions')} />
+          </div>
+        )}
         {error && (
           <>
             <div className="error-message">{i18n.t('header.qrCodeLoginDialog.error', { error })}</div>
