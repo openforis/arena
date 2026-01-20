@@ -47,14 +47,17 @@ const Header = () => {
   const [showMessageNotifications, setShowMessageNotifications] = useState(false)
   const [qrLoginDialogShown, setQrLoginDialogShown] = useState(false)
 
-  const toggleQrLoginDialogVisible = () => setQrLoginDialogShown((prevQrLoginDialogShown) => !prevQrLoginDialogShown)
+  const toggleQrLoginDialogVisible = useCallback(
+    () => setQrLoginDialogShown((prevQrLoginDialogShown) => !prevQrLoginDialogShown),
+    []
+  )
 
   const toggleShowMessageNotifications = useCallback(() => setShowMessageNotifications((prev) => !prev), [])
 
   const onQrCodeLoginDialogOpen = useCallback(() => {
     setShowUserPopup(false)
     toggleQrLoginDialogVisible()
-  }, [])
+  }, [toggleQrLoginDialogVisible])
 
   const prevUser = usePrevious(user)
   const pictureUpdateKeyRef = useRef(0)
