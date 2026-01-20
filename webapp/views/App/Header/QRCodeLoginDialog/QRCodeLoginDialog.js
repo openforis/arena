@@ -2,7 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import PropTypes from 'prop-types'
 
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+
 import { Button, Modal, ModalBody, Spinner } from '@webapp/components'
+import { useOnWebSocketEvent } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 
@@ -10,24 +13,29 @@ export const QRCodeLoginDialog = (props) => {
   const { onClose } = props
 
   const i18n = useI18n()
-  const [qrValue, setQrValue] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [state, setState] = useState({
+    error: null,
+    loginSuccessful: false,
+    loading: true,
+    qrValue: '',
+    token: null,
+  })
+  const { error, loginSuccessful, loading, qrValue, token } = state
 
   const fetchTempAuthToken = useCallback(async () => {
     try {
-      setLoading(true)
+      setState((state) => ({ ...state, loading: true }))
       const tempAuthToken = await API.createTempAuthToken()
       const serverUrl = window.location.origin
       const qrData = JSON.stringify({
         serverUrl,
         token: tempAuthToken.token,
       })
-      setQrValue(qrData)
+      setState((state) => ({ ...state, qrValue: qrData, token: tempAuthToken.token }))
     } catch (error) {
-      setError(error.message)
+      setState((state) => ({ ...state, error: error.message }))
     } finally {
-      setLoading(false)
+      setState((state) => ({ ...state, loading: false }))
     }
   }, [])
 
@@ -36,18 +44,32 @@ export const QRCodeLoginDialog = (props) => {
   }, [fetchTempAuthToken])
 
   const onRefreshClick = useCallback(() => {
-    setError(null)
-    setLoading(true)
-    setQrValue('')
+    setState((state) => ({ ...state, error: null, loading: true, qrValue: '', token: null }))
 
     fetchTempAuthToken()
   }, [fetchTempAuthToken])
 
+  const onLoginSuccessful = useCallback(
+    (event) => {
+      const { token: eventToken } = event
+      if (eventToken === token) {
+        setState((state) => ({ ...state, qrValue: null, loginSuccessful: true }))
+      }
+    },
+    [token]
+  )
+
+  useOnWebSocketEvent({
+    eventName: WebSocketEvents.tempLoginSuccessful,
+    eventHandler: onLoginSuccessful,
+  })
+
   return (
     <Modal className="qr-code-login-dialog" onClose={onClose} showCloseButton title="header.qrCodeLoginDialog.title">
       <ModalBody>
+        {loginSuccessful && <div>{i18n.t('header.qrCodeLoginDialog.success')}</div>}
         {loading && <Spinner />}
-        {!loading && qrValue && <QRCodeCanvas value={qrValue} size={256} />}
+        {!loading && qrValue && <QRCodeCanvas value={qrValue} />}
         {error && (
           <>
             <div className="error-message">{i18n.t('header.qrCodeLoginDialog.error', { error })}</div>

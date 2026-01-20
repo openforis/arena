@@ -7,14 +7,22 @@ export const WebSocketEvents = {
   reconnectAttempt: 'reconnect_attempt',
 
   // App events
+  applicationError: 'applicationError',
+  error: 'threadError',
   jobUpdate: 'jobUpdate',
+
+  // Record update events
   nodesUpdate: 'nodesUpdate',
   nodesUpdateCompleted: 'nodesUpdateCompleted',
   nodeValidationsUpdate: 'nodeValidationsUpdate',
+
+  // Record events
   recordDelete: 'recordDelete',
+  recordSessionExpired: 'recordSessionExpired',
+
+  // Survey Events
   surveyUpdate: 'surveyUpdate',
 
-  error: 'threadError',
-  recordSessionExpired: 'recordSessionExpired',
-  applicationError: 'applicationError',
+  // temp auth token events
+  tempLoginSuccessful: 'tempLoginSuccessful',
 }
