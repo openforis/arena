@@ -9,6 +9,24 @@ import { useOnWebSocketEvent } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 
+const fetchTempAuthTokenInternal = async () => {
+  let stateNext = {}
+  try {
+    const tempAuthToken = await API.createTempAuthToken()
+    const serverUrl = window.location.origin
+    const qrData = JSON.stringify({
+      serverUrl,
+      token: tempAuthToken.token,
+    })
+    Object.assign(stateNext, { qrValue: qrData, token: tempAuthToken.token })
+  } catch (error) {
+    Object.assign(stateNext, { error: error.message })
+  } finally {
+    Object.assign(stateNext, { loading: false })
+  }
+  return stateNext
+}
+
 export const QRCodeLoginDialog = (props) => {
   const { onClose } = props
 
@@ -23,20 +41,12 @@ export const QRCodeLoginDialog = (props) => {
   const { error, loginSuccessful, loading, qrValue, token } = state
 
   const fetchTempAuthToken = useCallback(async () => {
-    try {
-      setState((state) => ({ ...state, loading: true }))
-      const tempAuthToken = await API.createTempAuthToken()
-      const serverUrl = window.location.origin
-      const qrData = JSON.stringify({
-        serverUrl,
-        token: tempAuthToken.token,
+    setState((state) => ({ ...state, loading: true }))
+    setTimeout(() => {
+      fetchTempAuthTokenInternal().then((stateNext) => {
+        setState((state) => ({ ...state, ...stateNext }))
       })
-      setState((state) => ({ ...state, qrValue: qrData, token: tempAuthToken.token }))
-    } catch (error) {
-      setState((state) => ({ ...state, error: error.message }))
-    } finally {
-      setState((state) => ({ ...state, loading: false }))
-    }
+    }, 1000) // Allow loading spinner to render
   }, [])
 
   useEffect(() => {
