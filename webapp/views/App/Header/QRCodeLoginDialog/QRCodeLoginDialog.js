@@ -44,7 +44,7 @@ export const QRCodeLoginDialog = (props) => {
       let stateNext = {}
       try {
         const tempAuthToken = await API.createTempAuthToken()
-        const serverUrl = window.location.origin
+        const serverUrl = globalThis.location.origin
         const qrData = JSON.stringify({
           serverUrl,
           token: tempAuthToken.token,
