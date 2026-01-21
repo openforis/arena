@@ -232,7 +232,7 @@ export default {
   header: {
     myProfile: 'Mi perfil',
     qrCodeLoginDialog: {
-      title: 'Conectarse desde Arena Mobile usando código QR',
+      title: 'Iniciar sesión desde Arena Mobile usando código QR',
       instructions: `1. Abra la aplicación Arena Mobile en su dispositivo móvil
 2. Vaya al menú de Configuración
 3. Seleccione "Conexión al servidor"
