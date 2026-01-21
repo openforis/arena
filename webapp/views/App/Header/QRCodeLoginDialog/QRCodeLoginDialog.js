@@ -13,18 +13,21 @@ import { useI18n } from '@webapp/store/system'
 
 const tempAuthTokenExpirationMs = 60 * 1000 // 60 seconds
 
+const initialState = {
+  error: null,
+  loginSuccessful: false,
+  loading: true,
+  qrValue: '',
+  token: null,
+}
+
 export const QRCodeLoginDialog = (props) => {
   const { onClose } = props
 
   const i18n = useI18n()
   const authTokenFetchIntervalRef = React.useRef(null) // to store interval ID
-  const [state, setState] = useState({
-    error: null,
-    loginSuccessful: false,
-    loading: true,
-    qrValue: '',
-    token: null,
-  })
+
+  const [state, setState] = useState(initialState)
   const { error, loginSuccessful, loading, qrValue, token } = state
 
   const cancelAuthTokenFetchInterval = useCallback(() => {
@@ -35,7 +38,7 @@ export const QRCodeLoginDialog = (props) => {
     }
   }, [])
 
-  const fetchTempAuthTokenInternal = async () => {
+  const fetchTempAuthTokenInternal = useCallback(async () => {
     setState((state) => ({ ...state, error: null, loading: true, qrValue: '', token: null }))
     const fetch = async () => {
       let stateNext = {}
@@ -60,7 +63,7 @@ export const QRCodeLoginDialog = (props) => {
         setState((state) => ({ ...state, ...stateNext }))
       })
     }, 500) // allow loading state to propagate
-  }
+  }, [])
 
   const fetchTempAuthToken = useCallback(async () => {
     cancelAuthTokenFetchInterval()
@@ -70,7 +73,7 @@ export const QRCodeLoginDialog = (props) => {
         fetchTempAuthTokenInternal()
       }, tempAuthTokenExpirationMs) // Refresh token every 60 seconds
     })
-  }, [cancelAuthTokenFetchInterval])
+  }, [cancelAuthTokenFetchInterval, fetchTempAuthTokenInternal])
 
   useEffect(() => {
     fetchTempAuthToken()
@@ -88,10 +91,11 @@ export const QRCodeLoginDialog = (props) => {
     (event) => {
       const { token: eventToken } = event
       if (eventToken === token) {
-        setState((state) => ({ ...state, qrValue: null, loginSuccessful: true }))
+        cancelAuthTokenFetchInterval()
+        setState({ ...initialState, loginSuccessful: true })
       }
     },
-    [token]
+    [cancelAuthTokenFetchInterval, token]
   )
 
   useOnWebSocketEvent({
@@ -107,7 +111,7 @@ export const QRCodeLoginDialog = (props) => {
           <div className="inner-container">
             <div className="qr-code-container">
               {loading && <Spinner />}
-              {qrValue && <QRCodeCanvas value={qrValue} />}
+              {qrValue && <QRCodeCanvas value={qrValue} size={200} />}
             </div>
             <Markdown className="instructions" source={i18n.t('header.qrCodeLoginDialog.instructions')} />
           </div>
