@@ -231,6 +231,16 @@ export default {
   },
   header: {
     myProfile: 'Mi perfil',
+    qrCodeLoginDialog: {
+      title: 'Iniciar sesión desde Arena Mobile usando código QR',
+      instructions: `1. Abra la aplicación **Arena Mobile** en su dispositivo móvil
+2. Vaya al menú de **Configuración**
+3. Seleccione **Conexión al servidor**
+4. Presione **Iniciar sesión usando código QR**
+5. Escanee el código QR que se muestra en esta pantalla`,
+      success: '¡Inicio de sesión exitoso! Ahora puede cerrar este diálogo.',
+      error: 'Error al generar el código QR: {{error}}',
+    },
   },
   nodeDefsTypes: {
     integer: 'Entero',

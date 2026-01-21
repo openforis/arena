@@ -10,6 +10,7 @@ import * as User from '@core/user/user'
 import * as ProcessUtils from '@core/processUtils'
 
 import { clickedOutside } from '@webapp/utils/domUtils'
+import { TestId } from '@webapp/utils/testId'
 
 import { LoginActions } from '@webapp/store/login'
 import { useI18n } from '@webapp/store/system'
@@ -25,12 +26,29 @@ import {
   useAuthCanViewAllUsers,
   useAuthCanViewUsersAccessRequests,
 } from '@webapp/store/user/hooks'
-import { TestId } from '@webapp/utils/testId'
 
 const Separator = () => <div className="user-popup-menu__sep" />
 
+const PopupMenuButton = (props) => {
+  const i18n = useI18n()
+  const { onClick, iconClassName, label, testId } = props
+  return (
+    <button data-testid={testId} type="button" className="btn-s btn-transparent" onClick={onClick}>
+      <span className={`icon ${iconClassName} icon-12px icon-left`} />
+      {i18n.t(label)}
+    </button>
+  )
+}
+
+PopupMenuButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  iconClassName: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  testId: PropTypes.string,
+}
+
 const UserPopupMenu = (props) => {
-  const { onClose } = props
+  const { onClose, onQrCodeLoginDialogOpen } = props
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -163,24 +181,30 @@ const UserPopupMenu = (props) => {
 
       <Separator />
 
-      <button
-        data-testid={TestId.header.userLogoutBtn}
-        type="button"
-        className="btn-s btn-transparent"
+      <PopupMenuButton
+        iconClassName="icon-qrcode"
+        label="header.qrCodeLoginDialog.title"
+        onClick={onQrCodeLoginDialogOpen}
+      />
+
+      <Separator />
+
+      <PopupMenuButton
+        testId={TestId.header.userLogoutBtn}
+        iconClassName="icon-switch"
+        label="sidebar.logout"
         onClick={() => {
           onClose()
           dispatch(LoginActions.logout({ navigate }))
         }}
-      >
-        <span className="icon icon-switch icon-12px icon-left" />
-        {i18n.t('sidebar.logout')}
-      </button>
+      />
     </div>
   )
 }
 
 UserPopupMenu.propTypes = {
   onClose: PropTypes.func.isRequired,
+  onQrCodeLoginDialogOpen: PropTypes.func.isRequired,
 }
 
 export default UserPopupMenu

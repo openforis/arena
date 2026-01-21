@@ -1,0 +1,16 @@
+.qr-code-login-dialog {
+  .inner-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+
+    .qr-code-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 200px;
+      height: 200px;
+    }
+  }
+}

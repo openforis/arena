@@ -116,6 +116,7 @@ export {
   fetchUserSurveys,
   fetchUsers,
   changeUserPassword,
+  createTempAuthToken,
 } from './user'
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
