@@ -1,0 +1,25 @@
+/*******************************************************************************
+*   text justification
+*
+**/
+p {text-align: justify;}
+
+/*********************************************************************************
+*   change the lightbox cursor
+*
+**/
+a[data-lightbox] {cursor: zoom-in;}
+a[data-lightbox] img {padding: .25em;}
+
+/*********************************************************************************
+*  make the footer inlined
+*
+**/
+.footer-item {
+   display: inline-block;
+}
+.footer-item:not(:last-child) {
+   border-right: 1px solid rgba(var(--pst-color-text-base), 1);
+   margin-right: .5em;
+   padding-right: .5em;
+ }

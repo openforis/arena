@@ -1,0 +1,14 @@
+:orphan:
+
+404 not found
+=============
+
+.. image:: _static/img/404-compass.png
+    :align: left
+    :width: 40%
+
+UH OH! You're lost.
+-------------------
+
+The page you are looking for does not exist.
+How you got here is a mystery. But you can click the SEPAL button on top of the page to go back to the homepage.
