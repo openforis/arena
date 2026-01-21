@@ -1,5 +1,3 @@
-import { ServiceRegistry } from '@openforis/arena-core'
-
 import * as A from '@core/arena'
 import { FileFormats } from '@core/fileFormats'
 
@@ -17,7 +15,6 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import { UserExportService } from '../service/userExportService'
-import { ServerServiceType } from '@openforis/arena-server'
 
 export const init = (app) => {
   // ==== CREATE
@@ -393,21 +390,6 @@ export const init = (app) => {
       const validation = await UserService.updateUserPassword({ user, passwordChangeForm })
 
       res.json({ validation })
-    } catch (error) {
-      next(error)
-    }
-  })
-
-  // ==== TEMP AUTH TOKEN
-  app.post('/user/temp-auth-token', async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-
-      const serviceRegistry = ServiceRegistry.getInstance()
-      const service = serviceRegistry.getService(ServerServiceType.userTempAuthToken)
-      const tempAuthToken = await service.create({ userUuid: User.getUuid(user) })
-
-      res.json({ tempAuthToken })
     } catch (error) {
       next(error)
     }

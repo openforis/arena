@@ -75,7 +75,7 @@ export const changeUserPassword = async ({ form }) => {
 export const createTempAuthToken = async () => {
   const {
     data: { tempAuthToken },
-  } = await axios.post(`/api/user/temp-auth-token`)
+  } = await axios.post(`/auth/token/temp`)
 
   return tempAuthToken
 }
