@@ -181,13 +181,16 @@ const UserPopupMenu = (props) => {
 
       <Separator />
 
-      <PopupMenuButton
-        iconClassName="icon-qrcode"
-        label="header.qrCodeLoginDialog.title"
-        onClick={onQrCodeLoginDialogOpen}
-      />
-
-      <Separator />
+      {ProcessUtils.ENV.experimentalFeatures && (
+        <>
+          <PopupMenuButton
+            iconClassName="icon-qrcode"
+            label="header.qrCodeLoginDialog.title"
+            onClick={onQrCodeLoginDialogOpen}
+          />
+          <Separator />
+        </>
+      )}
 
       <PopupMenuButton
         testId={TestId.header.userLogoutBtn}
