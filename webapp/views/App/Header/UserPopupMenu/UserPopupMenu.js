@@ -47,10 +47,6 @@ PopupMenuButton.propTypes = {
   testId: PropTypes.string,
 }
 
-PopupMenuButton.defaultProps = {
-  testId: null,
-}
-
 const UserPopupMenu = (props) => {
   const { onClose, onQrCodeLoginDialogOpen } = props
 
@@ -186,7 +182,7 @@ const UserPopupMenu = (props) => {
       <Separator />
 
       <PopupMenuButton
-        iconClassName="qrcode"
+        iconClassName="icon-qrcode"
         label="header.qrCodeLoginDialog.title"
         onClick={onQrCodeLoginDialogOpen}
       />

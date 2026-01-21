@@ -11,28 +11,13 @@ import { useOnWebSocketEvent } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 
-const fetchTempAuthTokenInternal = async () => {
-  let stateNext = {}
-  try {
-    const tempAuthToken = await API.createTempAuthToken()
-    const serverUrl = window.location.origin
-    const qrData = JSON.stringify({
-      serverUrl,
-      token: tempAuthToken.token,
-    })
-    Object.assign(stateNext, { qrValue: qrData, token: tempAuthToken.token })
-  } catch (error) {
-    Object.assign(stateNext, { error: error.message })
-  } finally {
-    Object.assign(stateNext, { loading: false })
-  }
-  return stateNext
-}
+const tempAuthTokenExpirationMs = 60 * 1000 // 60 seconds
 
 export const QRCodeLoginDialog = (props) => {
   const { onClose } = props
 
   const i18n = useI18n()
+  const authTokenFetchIntervalRef = React.useRef(null) // to store interval ID
   const [state, setState] = useState({
     error: null,
     loginSuccessful: false,
@@ -42,22 +27,60 @@ export const QRCodeLoginDialog = (props) => {
   })
   const { error, loginSuccessful, loading, qrValue, token } = state
 
-  const fetchTempAuthToken = useCallback(async () => {
-    setState((state) => ({ ...state, loading: true }))
+  const cancelAuthTokenFetchInterval = useCallback(() => {
+    const interval = authTokenFetchIntervalRef.current
+    if (interval) {
+      clearInterval(interval)
+      authTokenFetchIntervalRef.current = null
+    }
+  }, [])
+
+  const fetchTempAuthTokenInternal = async () => {
+    setState((state) => ({ ...state, error: null, loading: true, qrValue: '', token: null }))
+    const fetch = async () => {
+      let stateNext = {}
+      try {
+        const tempAuthToken = await API.createTempAuthToken()
+        const serverUrl = window.location.origin
+        const qrData = JSON.stringify({
+          serverUrl,
+          token: tempAuthToken.token,
+        })
+        Object.assign(stateNext, { qrValue: qrData, token: tempAuthToken.token })
+      } catch (caughtError) {
+        const error = caughtError?.message || String(caughtError) || 'Unknown error'
+        Object.assign(stateNext, { error })
+      } finally {
+        Object.assign(stateNext, { loading: false })
+      }
+      return stateNext
+    }
     setTimeout(() => {
-      fetchTempAuthTokenInternal().then((stateNext) => {
+      fetch().then((stateNext) => {
         setState((state) => ({ ...state, ...stateNext }))
       })
-    }, 1000) // Allow loading spinner to render
-  }, [])
+    }, 500) // allow loading state to propagate
+  }
+
+  const fetchTempAuthToken = useCallback(async () => {
+    cancelAuthTokenFetchInterval()
+
+    fetchTempAuthTokenInternal().then(() => {
+      authTokenFetchIntervalRef.current = setInterval(() => {
+        fetchTempAuthTokenInternal()
+      }, tempAuthTokenExpirationMs) // Refresh token every 60 seconds
+    })
+  }, [cancelAuthTokenFetchInterval])
 
   useEffect(() => {
     fetchTempAuthToken()
-  }, [fetchTempAuthToken])
+
+    return () => {
+      cancelAuthTokenFetchInterval()
+    }
+  }, [cancelAuthTokenFetchInterval, fetchTempAuthToken])
 
   const onRefreshClick = useCallback(() => {
-    setState((state) => ({ ...state, error: null, loading: true, qrValue: '', token: null }))
-
     fetchTempAuthToken()
   }, [fetchTempAuthToken])
 
@@ -80,11 +103,13 @@ export const QRCodeLoginDialog = (props) => {
     <Modal className="qr-code-login-dialog" onClose={onClose} showCloseButton title="header.qrCodeLoginDialog.title">
       <ModalBody>
         {loginSuccessful && <div>{i18n.t('header.qrCodeLoginDialog.success')}</div>}
-        {loading && <Spinner />}
-        {!loading && qrValue && (
-          <div className="qr-code-container">
-            <QRCodeCanvas value={qrValue} />
-            <Markdown className="qr-code-instructions" source={i18n.t('header.qrCodeLoginDialog.instructions')} />
+        {(loading || qrValue) && (
+          <div className="inner-container">
+            <div className="qr-code-container">
+              {loading && <Spinner />}
+              {qrValue && <QRCodeCanvas value={qrValue} />}
+            </div>
+            <Markdown className="instructions" source={i18n.t('header.qrCodeLoginDialog.instructions')} />
           </div>
         )}
         {error && (
