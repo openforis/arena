@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import PropTypes from 'prop-types'
 
+import { waitFor } from '@core/promiseUtils'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import { Button, Markdown, Modal, ModalBody, Spinner } from '@webapp/components'
@@ -40,8 +41,8 @@ export const QRCodeLoginDialog = (props) => {
 
   const fetchTempAuthTokenInternal = useCallback(async () => {
     setState((state) => ({ ...state, error: null, loading: true, qrValue: '', token: null }))
-    const fetch = async () => {
-      let stateNext = {}
+
+    const fetchToken = async () => {
       try {
         const tempAuthToken = await API.createTempAuthToken()
         const serverUrl = globalThis.location.origin
@@ -49,20 +50,19 @@ export const QRCodeLoginDialog = (props) => {
           serverUrl,
           token: tempAuthToken.token,
         })
-        Object.assign(stateNext, { qrValue: qrData, token: tempAuthToken.token })
+        return { qrValue: qrData, token: tempAuthToken.token }
       } catch (caughtError) {
         const error = caughtError?.message || String(caughtError) || 'Unknown error'
-        Object.assign(stateNext, { error })
-      } finally {
-        Object.assign(stateNext, { loading: false })
+        return { error }
       }
-      return stateNext
     }
-    setTimeout(() => {
-      fetch().then((stateNext) => {
-        setState((state) => ({ ...state, ...stateNext }))
-      })
-    }, 500) // allow loading state to propagate
+
+    const stateNext = { ...(await fetchToken()), loading: false }
+
+    // Allow loading state to propagate
+    await waitFor(0.5)
+
+    setState((state) => ({ ...state, ...stateNext }))
   }, [])
 
   const fetchTempAuthToken = useCallback(async () => {
