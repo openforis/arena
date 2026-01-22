@@ -5766,14 +5766,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ace-builds@npm:^1.4.14":
-  version: 1.43.4
-  resolution: "ace-builds@npm:1.43.4"
-  checksum: 10c0/5389f4ce025b55198693688f09a8023f8dee69c19d0f451387677ad1c3f93d2f7f3cb60eb4f433f5c4b53783d3d6aa6c2e0d7f22d619335c2ee9b4eeca529708
-  languageName: node
-  linkType: hard
-
-"ace-builds@npm:^1.43.5":
+"ace-builds@npm:^1.36.3, ace-builds@npm:^1.43.5":
   version: 1.43.5
   resolution: "ace-builds@npm:1.43.5"
   checksum: 10c0/ee155b912e177bc37ba619979be08730ed5ed142f5bd6a3ca9ee6359685e5372b6a646625b7a1c2ce31b44ce3b7c0d6a47af3e18c4db1b75e1d892bffc5c3038
@@ -15244,7 +15237,7 @@ __metadata:
     r-script: "npm:^0.0.4"
     ramda: "npm:^0.28.0"
     react: "npm:^18.3.1"
-    react-ace: "npm:^10.1.0"
+    react-ace: "npm:^14.0.1"
     react-avatar-editor: "npm:^13.0.2"
     react-dom: "npm:^18.3.1"
     react-dropzone: "npm:^14.3.8"
@@ -16910,19 +16903,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-ace@npm:^10.1.0":
-  version: 10.1.0
-  resolution: "react-ace@npm:10.1.0"
+"react-ace@npm:^14.0.1":
+  version: 14.0.1
+  resolution: "react-ace@npm:14.0.1"
   dependencies:
-    ace-builds: "npm:^1.4.14"
+    ace-builds: "npm:^1.36.3"
     diff-match-patch: "npm:^1.0.5"
     lodash.get: "npm:^4.4.2"
     lodash.isequal: "npm:^4.5.0"
-    prop-types: "npm:^15.7.2"
+    prop-types: "npm:^15.8.1"
   peerDependencies:
-    react: ^0.13.0 || ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0 || ^18.0.0
-    react-dom: ^0.13.0 || ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/c7f4b08ec9873662b33b1e3d3e9312a5172120425b3842310438430ed0618a00de0e076defed057658ae0ae565d943fd573ae6decf13b7d1ca3f27eb26b0ce81
+    react: ^0.13.0 || ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^0.13.0 || ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/dbc77970836f13bad88365903d077edd68cc1955857290475bc067e0b801181c1d60a9ee08cf89b20895fe312dbb169c072c5b23338d7176f9f658db7929732f
   languageName: node
   linkType: hard
 
