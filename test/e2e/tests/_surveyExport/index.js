@@ -20,3 +20,6 @@ export { verifyUsers } from './users'
 
 // ActivityLog
 export { verifyActivityLog } from './activityLog'
+
+// Info
+export { verifyInfo } from './info'
