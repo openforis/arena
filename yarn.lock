@@ -3709,9 +3709,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^1.2.3":
-  version: 1.2.3
-  resolution: "@openforis/arena-server@npm:1.2.3::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.2.3%2F004244a7aa53bc3a017c919a9013cef7e4afd5fd"
+"@openforis/arena-server@npm:^1.2.4":
+  version: 1.2.4
+  resolution: "@openforis/arena-server@npm:1.2.4::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.2.4%2F92862d43aefa76909a1b5d57d248c8a43fd957ad"
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
     "@openforis/arena-core": "npm:^1.0.81"
@@ -3730,7 +3730,7 @@ __metadata:
     passport-local: "npm:^1.0.0"
     pg-promise: "npm:^12.3.0"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/6b472e792db8d63581d3b9244dd6097007c29e2f00b1082e3a6d8ace1682347259dadeb81a2a8b8d33f99ee0bd7c698fb1d149d1d1c23c8135c90d321355744a
+  checksum: 10c0/b4ecb53fb8047064f76f81eaddcc370f02d7ab0361eb6d59b84f36cf76d0546851ecdefd2282bf1274c672bce1b5a44e7e392dd33ef1a4bc3ad5df0cf77f5889
   languageName: node
   linkType: hard
 
@@ -6671,13 +6671,6 @@ __metadata:
   dependencies:
     tweetnacl: "npm:^0.14.3"
   checksum: 10c0/ddfe85230b32df25aeebfdccfbc61d3bc493ace49c884c9c68575de1f5dcf733a5d7de9def3b0f318b786616b8d85bad50a28b1da1750c43e0012c93badcc148
-  languageName: node
-  linkType: hard
-
-"bcryptjs@npm:^2.4.3":
-  version: 2.4.3
-  resolution: "bcryptjs@npm:2.4.3"
-  checksum: 10c0/b969467087ed7a01ff905a1c6a0c45014ec586248a448ea08370c8ed8bb314bda16a870ca23e0961d7d23bdce1a04c76fa70a9d680be814fa9ac7d8fc61870a3
   languageName: node
   linkType: hard
 
@@ -15146,7 +15139,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^7.14.0"
     "@mui/x-date-pickers": "npm:^7.14.0"
     "@mui/x-tree-view": "npm:^7.7.1"
-    "@openforis/arena-server": "npm:^1.2.3"
+    "@openforis/arena-server": "npm:^1.2.4"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
@@ -15164,7 +15157,6 @@ __metadata:
     archiver: "npm:^7.0.1"
     axios: "npm:^1.13.2"
     babel-loader: "npm:^9.2.1"
-    bcryptjs: "npm:^2.4.3"
     buffer: "npm:^6.0.3"
     cache-loader: "npm:^4.1.0"
     camelize: "npm:^1.0.1"
@@ -15214,7 +15206,6 @@ __metadata:
     leaflet-side-by-side: "npm:^2.2.0"
     leaflet.markercluster: "npm:^1.5.3"
     lint-staged: "npm:^13.3.0"
-    log4js: "npm:^6.9.1"
     marked: "npm:^14.1.4"
     mini-css-extract-plugin: "npm:^2.10.0"
     morgan: "npm:^1.10.1"
@@ -15228,7 +15219,6 @@ __metadata:
     optimize-css-assets-webpack-plugin: "npm:^6.0.1"
     path: "npm:^0.12.7"
     pg: "npm:^8.17.2"
-    pg-promise: "npm:^11.15.0"
     pg-query-stream: "npm:^4.11.2"
     playwright: "npm:1.24.2"
     prettier: "npm:^3.8.1"
@@ -15838,20 +15828,6 @@ __metadata:
   peerDependencies:
     pg: ">=8.0"
   checksum: 10c0/4b104b48a47257a0edad0c62e5ea1908b72cb79386270264b452e69895e9e4c589d00cdbf6e46d4e9c05bc7e7d191656b66814b5282d65f33b12648a21df3c7f
-  languageName: node
-  linkType: hard
-
-"pg-promise@npm:^11.15.0":
-  version: 11.15.0
-  resolution: "pg-promise@npm:11.15.0"
-  dependencies:
-    assert-options: "npm:0.8.3"
-    pg: "npm:8.16.3"
-    pg-minify: "npm:1.8.0"
-    spex: "npm:3.4.1"
-  peerDependencies:
-    pg-query-stream: 4.10.3
-  checksum: 10c0/738e6a05d165a9402382fff946c7e6892d19d0af8f7dc5fc81783835010b5617a9f2018086285aac8ac8f06a5c38d150020abac3093bdd10c691dfa142b415d4
   languageName: node
   linkType: hard
 
@@ -18714,13 +18690,6 @@ __metadata:
     select-hose: "npm:^2.0.0"
     spdy-transport: "npm:^3.0.0"
   checksum: 10c0/983509c0be9d06fd00bb9dff713c5b5d35d3ffd720db869acdd5ad7aa6fc0e02c2318b58f75328957d8ff772acdf1f7d19382b6047df342044ff3e2d6805ccdf
-  languageName: node
-  linkType: hard
-
-"spex@npm:3.4.1":
-  version: 3.4.1
-  resolution: "spex@npm:3.4.1"
-  checksum: 10c0/eb8be72c6d795c789b63a240167f731f6d1f6656c26efaacdae91340ac8607c22565cd7bd152ea8e8670f2fb3940ebd0ed01b7a4ab2b948b865ee18438f016ee
   languageName: node
   linkType: hard
 
