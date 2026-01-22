@@ -1,7 +1,7 @@
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 import { getSurveyEntry } from '../../paths'
 
-export const verifySurvey = (survey) =>
+export const verifyInfo = (survey) =>
   test(`Verify info file ${survey.name}`, async () => {
     const infoEntry = getSurveyEntry(survey, ExportFile.info)
     expect(infoEntry.appInfo).toBeDefined()
