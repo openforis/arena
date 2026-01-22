@@ -1477,6 +1477,11 @@ export default {
       confirmPasswordRequired: 'La confirmación de la contraseña es obligatoria',
       confirmedPasswordNotMatching: 'La nueva contraseña y la confirmación de la contraseña no coinciden',
     },
+
+    userInvite: {
+      messageContainsLinks: 'El mensaje de invitación no puede contener enlaces',
+      messageTooLong: 'El mensaje de invitación es demasiado largo (máximo {{maxLength}} caracteres)',
+    },
   },
   record: {
     ancestorNotFound: 'Nodo ancestro no encontrado en el registro',

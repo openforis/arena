@@ -1692,6 +1692,11 @@ $t(common.cantUndoWarning)`,
       confirmPasswordRequired: 'Подтверждение пароля обязательно',
       confirmedPasswordNotMatching: 'Новый пароль и подтверждение пароля не совпадают',
     },
+
+    userInvite: {
+      messageContainsLinks: 'Приглашение не может содержать ссылки',
+      messageTooLong: 'Сообщение приглашения слишком длинное (максимум {{maxLength}} символов)',
+    },
   },
 
   record: {

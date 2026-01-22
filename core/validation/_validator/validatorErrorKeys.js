@@ -195,4 +195,9 @@ export const ValidatorErrorKeys = {
     confirmPasswordRequired: 'validationErrors.userPasswordChange.confirmPasswordRequired',
     confirmedPasswordNotMatching: 'validationErrors.userPasswordChange.confirmedPasswordNotMatching',
   },
+
+  userInvite: {
+    messageContainsLinks: 'validationErrors.userInvite.messageContainsLinks',
+    messageTooLong: 'validationErrors.userInvite.messageTooLong',
+  },
 }
