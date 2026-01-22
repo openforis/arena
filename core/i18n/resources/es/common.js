@@ -238,7 +238,7 @@ export default {
 3. Seleccione **Conexión al servidor**
 4. Presione **Iniciar sesión usando código QR**
 5. Escanee el código QR que se muestra en esta pantalla`,
-      success: '¡Inicio de sesión exitoso! Ahora puede cerrar este diálogo.',
+      success: '¡Inicio de sesión exitoso!',
       error: 'Error al generar el código QR: {{error}}',
     },
   },
