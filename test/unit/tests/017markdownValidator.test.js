@@ -1,4 +1,4 @@
-import { checkTextHasLinks } from '@core/markdownUtils'
+import { checkTextHasLinks } from '@core/markdownValidator'
 
 describe('MarkdownUtils: checkTextHasLinks', () => {
   describe('should return false when text has no links', () => {
@@ -7,7 +7,6 @@ describe('MarkdownUtils: checkTextHasLinks', () => {
       ['empty string', ''],
       ['text with square brackets but no link', 'This text has [brackets] but no actual link'],
       ['incomplete markdown link syntax', 'This has [incomplete link syntax'],
-      ['URL-like text without markdown syntax', 'Visit https://example.com for more info'],
       [
         'text with multiple paragraphs and no links',
         `First paragraph.
@@ -84,6 +83,7 @@ Another paragraph.`,
       ['image links (treated as links)', '![Alt text](https://example.com/image.png)'],
       ['link with special characters in URL', '[Link](https://example.com/path?query=value&other=123#anchor)'],
       ['relative links', '[Link](/relative/path)'],
+      ['URL-like text without markdown syntax', 'Visit https://example.com for more info'],
     ])('%s', (_description, text) => {
       expect(checkTextHasLinks(text)).toBe(true)
     })

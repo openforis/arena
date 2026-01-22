@@ -4,7 +4,7 @@ import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
 import { UserPasswordChangeFormValidator } from './userPasswordChangeFormValidator'
-import { checkTextHasLinks } from '@core/markdownUtils'
+import { checkTextHasLinks } from '@core/markdownValidator'
 
 const invitationMessageMaxLength = 500
 
