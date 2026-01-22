@@ -43,7 +43,7 @@ const tests = [
       [3, 'three'],
     ]),
     valueText: "new Map([[1, 'one'],[2, 'two'], [3, 'three']])",
-    expected: '{"__type":"Map","__values":"[[1,\\"one\\"],[2,\\"two\\"],[3,\\"three\\"]]"}',
+    expected: String.raw`{"__type":"Map","__values":"[[1,\"one\"],[2,\"two\"],[3,\"three\"]]"}`,
   },
   {
     value: {
