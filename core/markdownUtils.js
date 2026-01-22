@@ -9,3 +9,21 @@ export const parseMarkdown = (source) => {
   })
   return DOMPurify.sanitize(parsedSource)
 }
+
+export const checkTextHasLinks = (text) => {
+  const tokens = marked.lexer(text)
+  const stack = [...tokens]
+
+  while (stack.length > 0) {
+    const current = stack.pop()
+
+    if (current.type === 'link') {
+      return true
+    }
+
+    if (current.tokens && current.tokens.length > 0) {
+      stack.push(...current.tokens)
+    }
+  }
+  return false
+}

@@ -1710,6 +1710,11 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       confirmPasswordRequired: 'Confirm password is required',
       confirmedPasswordNotMatching: 'New password and confirm password do not match',
     },
+
+    userInvite: {
+      messageContainsLinks: 'Invitation message cannot contain links',
+      messageTooLong: 'Invitation message is too long (maximum {{maxLength}} characters)',
+    },
   },
 
   record: {
