@@ -268,7 +268,7 @@ Try again?`,
 3. Select  **Connection to server**
 4. Press **Scan QR code**
 5. Scan the QR code displayed on this screen`,
-      success: 'Login successful! You can now close this dialog.',
+      success: 'Login successful!',
       error: 'Error generating QR code: {{error}}',
     },
   },

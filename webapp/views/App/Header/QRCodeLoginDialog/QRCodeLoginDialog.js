@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 import { waitFor } from '@core/promiseUtils'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-import { Button, Markdown, Modal, ModalBody, Spinner } from '@webapp/components'
+import { Button, Markdown, Modal, ModalBody, ModalFooter, Spinner } from '@webapp/components'
 import { useOnWebSocketEvent } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
@@ -92,7 +92,7 @@ export const QRCodeLoginDialog = (props) => {
       const { token: eventToken } = event
       if (eventToken === token) {
         cancelAuthTokenFetchInterval()
-        setState({ ...initialState, loginSuccessful: true })
+        setState({ ...initialState, loginSuccessful: true, loading: false })
       }
     },
     [cancelAuthTokenFetchInterval, token]
@@ -106,7 +106,9 @@ export const QRCodeLoginDialog = (props) => {
   return (
     <Modal className="qr-code-login-dialog" onClose={onClose} showCloseButton title="header.qrCodeLoginDialog.title">
       <ModalBody>
-        {loginSuccessful && <div>{i18n.t('header.qrCodeLoginDialog.success')}</div>}
+        {loginSuccessful && (
+          <div className="login-successful-message">{i18n.t('header.qrCodeLoginDialog.success')}</div>
+        )}
         {(loading || qrValue) && (
           <div className="inner-container">
             <div className="qr-code-container">
@@ -123,6 +125,11 @@ export const QRCodeLoginDialog = (props) => {
           </>
         )}
       </ModalBody>
+      {loginSuccessful && (
+        <ModalFooter>
+          <Button className="btn modal-footer__item" onClick={onClose} label="common.close" />
+        </ModalFooter>
+      )}
     </Modal>
   )
 }
