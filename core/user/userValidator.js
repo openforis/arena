@@ -6,6 +6,8 @@ import * as Validation from '@core/validation/validation'
 import { UserPasswordChangeFormValidator } from './userPasswordChangeFormValidator'
 import { checkTextHasLinks } from '@core/markdownUtils'
 
+const invitationMessageMaxLength = 500
+
 export const validateEmail = Validator.validateEmail({ errorKey: Validation.messageKeys.user.emailInvalid })
 
 export const validateUser = async (user, userWithSameEmail = null) => {
@@ -42,9 +44,8 @@ const validateInviteMessage = (_propName, item) => {
   if (message.length === 0) {
     return null
   }
-  const maxLength = 500
-  if (message.length > maxLength) {
-    return { key: Validation.messageKeys.userInvite.messageTooLong, params: { maxLength } }
+  if (message.length > invitationMessageMaxLength) {
+    return { key: Validation.messageKeys.userInvite.messageTooLong, params: { maxLength: invitationMessageMaxLength } }
   }
   if (checkTextHasLinks(message)) {
     return { key: Validation.messageKeys.userInvite.messageContainsLinks }

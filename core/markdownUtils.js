@@ -21,7 +21,7 @@ export const checkTextHasLinks = (text) => {
       return true
     }
 
-    if (current.tokens && current.tokens.length > 0) {
+    if (current.tokens?.length > 0) {
       stack.push(...current.tokens)
     }
   }
