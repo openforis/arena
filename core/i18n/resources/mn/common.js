@@ -1682,6 +1682,11 @@ $t(common.cantUndoWarning)`,
       confirmPasswordRequired: 'Нууц үгээ баталгаажуулах шаардлагатай',
       confirmedPasswordNotMatching: 'Шинэ нууц үг болон баталгаажуулсан нууц үг таарахгүй байна',
     },
+
+    userInvite: {
+      messageContainsLinks: 'Урилгын мессеж холбоос агуулж болохгүй',
+      messageTooLong: 'Урилгын мессеж хэт урт байна (хамгийн ихдээ {{maxLength}} тэмдэгт)',
+    },
   },
 
   record: {
