@@ -4,6 +4,7 @@ import {
   exportSurvey,
   verifyActivityLog,
   verifyCategories,
+  verifyInfo,
   verifyNodeDefs,
   verifyRecords,
   verifySurvey,
@@ -33,4 +34,6 @@ export default () =>
     verifyUsers(survey)
 
     verifyActivityLog(survey)
+
+    verifyInfo(survey)
   })

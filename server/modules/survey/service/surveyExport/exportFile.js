@@ -20,6 +20,7 @@ export const ExportFile = {
   filesDir: dir.files,
   filesSummaries: [dir.files, 'files.json'].join(separator),
   file: ({ fileUuid }) => [dir.files, `${fileUuid}.bin`].join(separator),
+  info: 'info.json',
   records: [dir.records, 'records.json'].join(separator),
   record: ({ recordUuid }) => [dir.records, `${recordUuid}.json`].join(separator),
   survey: 'survey.json',

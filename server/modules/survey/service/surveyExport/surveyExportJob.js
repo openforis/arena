@@ -11,6 +11,7 @@ import RecordsExportJob from './jobs/recordsExportJob'
 import SurveyInfoExportJob from './jobs/surveyInfoExportJob'
 import TaxonomiesExportJob from './jobs/taxonomiesExportJob'
 import UsersExportJob from './jobs/usersExportJob'
+import InfoExportJob from './jobs/infoExportJob'
 
 const createInnerJobs = ({ backup, includeResultAttributes, includeActivityLog }) => {
   // records, files, activity log are included only if exporting survey as backup (not cloning)
@@ -21,6 +22,7 @@ const createInnerJobs = ({ backup, includeResultAttributes, includeActivityLog }
     ...(backup ? [new RecordsExportJob({ includeResultAttributes }), new FilesExportJob()] : []),
     new ChainExportJob(),
     ...(backup && includeActivityLog ? [new UsersExportJob(), new ActivityLogExportJob()] : []),
+    new InfoExportJob(),
   ]
 }
 
