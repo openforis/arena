@@ -14675,12 +14675,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"marked@npm:^17.0.1":
-  version: 17.0.1
-  resolution: "marked@npm:17.0.1"
+"marked@npm:^14.1.4":
+  version: 14.1.4
+  resolution: "marked@npm:14.1.4"
   bin:
     marked: bin/marked.js
-  checksum: 10c0/0197337aad33882308cea52d2c86d7b830a89be729a4010a26a488ae1c224cdc7520b8cce056832a81a127fc39a3827f45e3865c1ff257324cb553cb06ce0e57
+  checksum: 10c0/7ccc4c9b58d430b68eb878133fc284235ef3022b1a465345d2464712bf7d47507203b54639826839b6cb8d8847cf46f2e382588b9e1fc1d98b657520e16bfa62
   languageName: node
   linkType: hard
 
@@ -15758,7 +15758,7 @@ __metadata:
     leaflet-side-by-side: "npm:^2.2.0"
     leaflet.markercluster: "npm:^1.5.3"
     lint-staged: "npm:^16.2.7"
-    marked: "npm:^17.0.1"
+    marked: "npm:^14.1.4"
     mini-css-extract-plugin: "npm:^2.10.0"
     morgan: "npm:^1.10.1"
     ncp: "npm:^2.0.0"
