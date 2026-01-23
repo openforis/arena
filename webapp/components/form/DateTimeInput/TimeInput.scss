@@ -1,8 +1,9 @@
 @use '~@webapp/style/vars' as *;
 
 .time-picker__text-field {
-  input {
-    width: 4rem;
-    padding: 4px 6px;
+  width: 7rem;
+
+  .MuiPickersInputBase-root {
+    height: 2rem;
   }
 }

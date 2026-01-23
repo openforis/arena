@@ -1,6 +1,6 @@
 import './AppView.scss'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import classNames from 'classnames'
 
 import { appModules } from '@webapp/app/appModules'
@@ -34,6 +34,41 @@ const AppView = () => {
   const canAnalyzeRecords = useAuthCanUseAnalysis()
   const canUseMessages = useAuthCanUseMessages()
 
+  const modules = useMemo(() => {
+    const result = [
+      {
+        component: Home,
+        path: `${appModules.home.path}/*`,
+      },
+      {
+        component: Designer,
+        path: `${appModules.designer.path}/*`,
+      },
+      {
+        component: Data,
+        path: `${appModules.data.path}/*`,
+      },
+    ]
+    if (canAnalyzeRecords) {
+      result.push({
+        component: Analysis,
+        path: `${appModules.analysis.path}/*`,
+      })
+    }
+    result.push({
+      component: Users,
+      path: `${appModules.users.path}/*`,
+    })
+    if (canUseMessages) {
+      result.push({ component: Message, path: `${appModules.messages.path}/*` })
+    }
+    result.push({
+      component: Help,
+      path: `${appModules.help.path}/*`,
+    })
+    return result
+  }, [canAnalyzeRecords, canUseMessages])
+
   return (
     <>
       <Header />
@@ -41,40 +76,7 @@ const AppView = () => {
       <div className="app__container">
         <SideBar />
         <div className={classNames('app-module', { 'sidebar-open': isSideBarOpen })}>
-          <ModuleSwitch
-            moduleDefault={appModules.home}
-            modules={[
-              {
-                component: Home,
-                path: `${appModules.home.path}/*`,
-              },
-              {
-                component: Designer,
-                path: `${appModules.designer.path}/*`,
-              },
-              {
-                component: Data,
-                path: `${appModules.data.path}/*`,
-              },
-              ...(canAnalyzeRecords
-                ? [
-                    {
-                      component: Analysis,
-                      path: `${appModules.analysis.path}/*`,
-                    },
-                  ]
-                : []),
-              {
-                component: Users,
-                path: `${appModules.users.path}/*`,
-              },
-              ...(canUseMessages ? [{ component: Message, path: `${appModules.messages.path}/*` }] : []),
-              {
-                component: Help,
-                path: `${appModules.help.path}/*`,
-              },
-            ]}
-          />
+          <ModuleSwitch moduleDefault={appModules.home} modules={modules} />
         </div>
       </div>
 
