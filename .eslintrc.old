@@ -1,0 +1,71 @@
+{
+  "parser": "@babel/eslint-parser",
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jest-playwright/recommended"
+  ],
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "es2020": true,
+    "jest": true,
+    "mocha": true,
+    "node": true
+  },
+  "globals": {
+    "step": "readonly"
+  },
+  "plugins": ["prettier", "jsdoc", "react", "react-hooks"],
+  "rules": {
+    "no-console": "error",
+    "no-underscore-dangle": 0,
+    "prettier/prettier": "error",
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/display-name": "off",
+    "react/forbid-prop-types": 0,
+    "react-hooks/rules-of-hooks": 2,
+    "react-hooks/exhaustive-deps": 1,
+    "import/prefer-default-export": 0,
+    "jsdoc/check-alignment": 2,
+    "jsdoc/check-examples": 0, //eslint 8 does not support this yet
+    "jsdoc/check-indentation": 2,
+    "jsdoc/check-param-names": 2,
+    "jsdoc/check-syntax": 2,
+    "jsdoc/check-tag-names": 2,
+    "jsdoc/check-types": 2,
+    "jsdoc/implements-on-classes": 2,
+    "jsdoc/match-description": 2,
+    "jsdoc/no-types": 0,
+    "jsdoc/no-undefined-types": 1,
+    "jsdoc/require-description": 1,
+    "jsdoc/require-description-complete-sentence": 2,
+    "jsdoc/require-example": 0,
+    "jsdoc/require-hyphen-before-param-description": 2,
+    "jsdoc/require-jsdoc": 0,
+    "jsdoc/require-param": 2,
+    "jsdoc/require-param-description": 2,
+    "jsdoc/require-param-name": 2,
+    "jsdoc/require-param-type": 2,
+    "jsdoc/require-returns": 1,
+    "jsdoc/require-returns-check": 2,
+    "jsdoc/require-returns-description": 2,
+    "jsdoc/require-returns-type": 2,
+    "jsdoc/valid-types": 2
+  },
+
+  "settings": {
+    "import/resolver": {
+      "node": {},
+      "webpack": {
+        "config": "webpack.config.babel.js"
+      }
+    },
+    "react": {
+      "version": "detect"
+    }
+  }
+}
