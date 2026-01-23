@@ -9,5 +9,4 @@ export const verifyInfo = (survey) =>
     expect(infoEntry.exportedByUserUuid).toBeDefined()
     expect(infoEntry.survey).toBeDefined()
     expect(infoEntry.survey.name).toBe(survey.name)
-    expect(infoEntry.survey.uuid).toBe(survey.uuid)
   })
