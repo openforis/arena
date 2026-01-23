@@ -32,7 +32,7 @@ export const gotoTemplateList = () =>
 
 // ==== Dashboard
 export const gotoSurveyInfo = () =>
-  test('Goto survey create', async () => {
+  test('Goto survey info', async () => {
     await page.goto(`${BASE_URL}/app/home/dashboard/`)
     await page.click(getSelector(TestId.dashboard.surveyInfoBtn, 'button'))
     expect(page.url()).toBe(`${BASE_URL}/app/home/surveyInfo/`)
