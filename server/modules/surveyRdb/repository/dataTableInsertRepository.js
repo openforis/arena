@@ -13,7 +13,7 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
     NodeRepository.getNodeSelectQuery({ surveyId, includeRefData: true, includeRecordInfo: true, ancestorDef })
 
   const nodesSelect = `${getNodeSelectQuery(nodeDefAncestorMultipleEntity)}
-    WHERE n.node_def_uuid = $1
+    WHERE n.node_def_uuid = $/nodeDefUuid/
     ORDER BY n.id`
 
   if (NodeDef.isAttribute(nodeDef)) {
@@ -45,7 +45,7 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
           FROM c
           WHERE
             c.value IS NOT NULL
-            ${nodeDefColumnsUuids.length > 0 ? 'AND c.node_def_uuid IN ($2:csv)' : ''} 
+            ${nodeDefColumnsUuids.length > 0 ? 'AND c.node_def_uuid IN ($/nodeDefColumnsUuids:csv/)' : ''} 
           GROUP BY
             c.ancestor_uuid
         ) c
@@ -74,7 +74,7 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
     nodeDefColumnsUuids,
   })
 
-  await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, [nodeDefUuid, nodeDefColumnsUuids])
+  await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, { nodeDefUuid, nodeDefColumnsUuids })
 
   const { count } = await client.one(`SELECT count(id) FROM ${viewName}`)
 

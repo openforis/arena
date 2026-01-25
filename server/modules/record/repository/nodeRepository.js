@@ -69,7 +69,8 @@ const _getAncestorUuidSelectField = (ancestorDef) => {
  * @param {boolean} [params.includeRefData] - If true, category item and taxon item associated to the node value will be fetched.
  * @param {boolean} [params.includeRecordUuid] - If true, the record uuid will be included in the fetch (useful when selecting by record_uuid to make the query faster).
  * @param {boolean} [params.includeSurveyUuid] - If true, the survey uuid will be included in the fetch (useful when selecting by survey_uuid to make the query faster).
- * @param {boolean} [params.ancestorDef] - Ancestor entity definition used to populate the ancestorUuid field with the corresponding value in the node meta hierarchy.
+ * @param {boolean} [params.includeRecordInfo] - If true, record info will be included in the fetch.
+ * @param {object|null} [params.ancestorDef] - Ancestor entity definition used to populate the ancestorUuid field with the corresponding value in the node meta hierarchy.
  * @param {boolean} [params.draft] - If true, draft category and taxonomy item props will be fetched, otherwise only published props.
  * @returns {Array} - List of fetched nodes.
  */
