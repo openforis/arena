@@ -64,14 +64,13 @@ const _getAncestorUuidSelectField = (ancestorDef) => {
 
 /**
  * It builds the node select query.
- *
  * @param {!object} params - The parameters.
  * @param {!number} [params.surveyId] - The survey ID.
- * @param {boolean} [params.includeRefData = true] - If true, category item and taxon item associated to the node value will be fetched.
- * @param {boolean} [params.includeRecordUuid = true] - If true, the record uuid will be included in the fetch (useful when selecting by record_uuid to make the query faster).
- * @param {boolean} [params.includeSurveyUuid = true] - If true, the survey uuid will be included in the fetch (useful when selecting by survey_uuid to make the query faster).
- * @param {boolean} [params.ancestorDef = null] - Ancestor entity definition used to populate the ancestorUuid field with the corresponding value in the node meta hierarchy.
- * @param {boolean} [params.draft = true] - If true, draft category and taxonomy item props will be fetched, otherwise only published props.
+ * @param {boolean} [params.includeRefData] - If true, category item and taxon item associated to the node value will be fetched.
+ * @param {boolean} [params.includeRecordUuid] - If true, the record uuid will be included in the fetch (useful when selecting by record_uuid to make the query faster).
+ * @param {boolean} [params.includeSurveyUuid] - If true, the survey uuid will be included in the fetch (useful when selecting by survey_uuid to make the query faster).
+ * @param {boolean} [params.ancestorDef] - Ancestor entity definition used to populate the ancestorUuid field with the corresponding value in the node meta hierarchy.
+ * @param {boolean} [params.draft] - If true, draft category and taxonomy item props will be fetched, otherwise only published props.
  * @returns {Array} - List of fetched nodes.
  */
 export const getNodeSelectQuery = ({
@@ -293,7 +292,7 @@ export const updateNodes = async ({ surveyId, nodes }, client = db) => {
     DbUtils.updateAllQuery(
       getSurveyDBSchema(surveyId),
       'node',
-      { name: 'id', cast: 'int' },
+      { name: 'id', cast: 'bigint' },
       [
         { name: 'value', cast: 'jsonb' },
         { name: 'meta', cast: 'jsonb' },
