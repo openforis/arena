@@ -74,7 +74,11 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
     nodeDefColumnsUuids,
   })
 
-  await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, { nodeDefUuid, nodeDefColumnsUuids })
+  await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, {
+    surveyId,
+    nodeDefUuid,
+    nodeDefColumnsUuids,
+  })
 
   const { count } = await client.one(`SELECT count(id) FROM ${viewName}`)
 
