@@ -64,15 +64,15 @@ const _getAncestorUuidSelectField = (ancestorDef) => {
 
 /**
  * It builds the node select query.
- *
  * @param {!object} params - The parameters.
  * @param {!number} [params.surveyId] - The survey ID.
- * @param {boolean} [params.includeRefData = true] - If true, category item and taxon item associated to the node value will be fetched.
- * @param {boolean} [params.includeRecordUuid = true] - If true, the record uuid will be included in the fetch (useful when selecting by record_uuid to make the query faster).
- * @param {boolean} [params.includeSurveyUuid = true] - If true, the survey uuid will be included in the fetch (useful when selecting by survey_uuid to make the query faster).
- * @param {boolean} [params.ancestorDef = null] - Ancestor entity definition used to populate the ancestorUuid field with the corresponding value in the node meta hierarchy.
- * @param {boolean} [params.draft = true] - If true, draft category and taxonomy item props will be fetched, otherwise only published props.
- * @returns {Array} - List of fetched nodes.
+ * @param {boolean} [params.includeRefData] - If true, category item and taxon item associated to the node value will be fetched.
+ * @param {boolean} [params.includeRecordUuid] - If true, the record uuid will be included in the fetch (useful when selecting by record_uuid to make the query faster).
+ * @param {boolean} [params.includeSurveyUuid] - If true, the survey uuid will be included in the fetch (useful when selecting by survey_uuid to make the query faster).
+ * @param {boolean} [params.includeRecordInfo] - If true, record info will be included in the fetch.
+ * @param {object|null} [params.ancestorDef] - Ancestor entity definition used to populate the ancestorUuid field with the corresponding value in the node meta hierarchy.
+ * @param {boolean} [params.draft] - If true, draft category and taxonomy item props will be fetched, otherwise only published props.
+ * @returns {string} - The SQL SELECT query for fetching nodes.
  */
 export const getNodeSelectQuery = ({
   surveyId,
@@ -89,10 +89,11 @@ export const getNodeSelectQuery = ({
     (field) => `n.${field}`
   )
 
-  if (includeSurveyUuid) {
-    selectFields.push(`(SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = ${surveyId})`)
-  }
   const fromParts = [`${schema}.node n`]
+  if (includeSurveyUuid) {
+    selectFields.push('si.survey_uuid')
+    fromParts.push(`CROSS JOIN survey_info si`)
+  }
 
   if (includeRecordInfo) {
     selectFields.push(
@@ -116,23 +117,34 @@ export const getNodeSelectQuery = ({
 
     selectFields.push(
       ` CASE
-          WHEN n.value->>'taxonUuid' IS NOT NULL
+          WHEN val_taxon IS NOT NULL
           THEN json_build_object('${refDataKeys.taxon}', json_build_object('id',t.id, 'uuid',t.uuid, '${taxonKeys.taxonomyUuid}',t.taxonomy_uuid, 'props',${propsTaxon}, '${taxonKeys.vernacularNameUuid}',v.uuid, '${taxonKeys.vernacularLanguage}',(${propsVernacularName})->>'lang', '${taxonKeys.vernacularName}', (${propsVernacularName})->>'name') )
-          WHEN n.value->>'itemUuid' IS NOT NULL
+          WHEN val_item IS NOT NULL
           THEN json_build_object('${refDataKeys.categoryItem}', json_build_object('id',c.id, 'uuid', c.uuid, '${categoryItemKeys.levelUuid}', c.level_uuid, '${categoryItemKeys.parentUuid}', c.parent_uuid, 'props',${propsCategoryItem}) )
           ELSE NULL
       END AS ref_data`
     )
     fromParts.push(`
-      LEFT OUTER JOIN ${schema}.category_item c
-      ON (n.value->>'${Node.valuePropsCode.itemUuid}')::uuid = c.uuid
-      LEFT OUTER JOIN ${schema}.taxon t
-      ON (n.value->>'${Node.valuePropsTaxon.taxonUuid}')::uuid = t.uuid
-      LEFT OUTER JOIN ${schema}.taxon_vernacular_name v
-      ON (n.value->>'${Node.valuePropsTaxon.vernacularNameUuid}')::uuid = v.uuid`)
+      -- Extracting the UUIDs once in the LATERAL join to avoid repeating JSON logic
+      LEFT JOIN LATERAL (SELECT (n.value ->> '${Node.valuePropsCode.itemUuid}')::uuid AS val_item) vi ON TRUE
+      LEFT JOIN LATERAL (SELECT (n.value ->> '${Node.valuePropsTaxon.taxonUuid}')::uuid AS val_taxon) vt ON TRUE
+      LEFT JOIN LATERAL (SELECT (n.value ->> '${Node.valuePropsTaxon.vernacularNameUuid}')::uuid AS val_vernacular) vv ON TRUE
+      -- Now join using the pre-extracted UUIDs
+      LEFT JOIN ${schema}.category_item c ON c.uuid = vi.val_item
+      LEFT JOIN ${schema}.taxon t ON t.uuid = vt.val_taxon
+      LEFT JOIN ${schema}.taxon_vernacular_name v ON v.uuid = vv.val_vernacular
+    `)
   }
 
-  return `SELECT ${selectFields.join(', ')} FROM ${fromParts.join(' ')}`
+  const surveyInfoQuery = `WITH survey_info AS (
+    SELECT uuid AS survey_uuid 
+    FROM survey 
+    WHERE id = $/surveyId/ 
+    LIMIT 1
+  )`
+
+  return `${includeSurveyUuid ? surveyInfoQuery : ''}
+  SELECT ${selectFields.join(', ')} FROM ${fromParts.join(' ')}`
 }
 
 export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, recordUuid = null }, client = db) => {
@@ -220,9 +232,9 @@ export const fetchNodesByRecordUuid = async (
 ) =>
   client.map(
     `${getNodeSelectQuery({ surveyId, includeRefData, includeSurveyUuid, includeRecordUuid, draft })}
-    WHERE n.record_uuid = $1
+    WHERE n.record_uuid = $/recordUuid/
     ORDER BY n.date_created`,
-    [recordUuid],
+    { surveyId, recordUuid },
     dbTransformCallback
   )
 
@@ -239,23 +251,23 @@ export const fetchNodesWithRefDataByUuids = async ({ surveyId, nodeUuids, draft 
   client.map(
     `
     ${getNodeSelectQuery({ surveyId, draft })}
-    WHERE n.uuid IN ($1:list)
+    WHERE n.uuid IN ($/nodeUuids:list/)
   `,
-    [nodeUuids],
+    { surveyId, nodeUuids },
     dbTransformCallback
   )
 
 export const fetchNodeWithRefDataByUuid = async ({ surveyId, nodeUuid, draft }, client = db) =>
   (await fetchNodesWithRefDataByUuids({ surveyId, nodeUuids: [nodeUuid], draft }, client))[0]
 
-export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
+export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUuids, client = db) =>
   client.map(
     `
     ${getNodeSelectQuery({ surveyId, draft: false })}
-    WHERE n.record_uuid = $1
-      AND n.parent_uuid ${nodeUuid ? '= $2' : 'is null'}
-      AND n.node_def_uuid IN ($3:csv)`,
-    [recordUuid, nodeUuid, childDefUUids],
+    WHERE n.record_uuid = $/recordUuid/
+      AND n.parent_uuid ${nodeUuid ? '= $/nodeUuid/' : 'is null'}
+      AND n.node_def_uuid IN ($/childDefUuids:csv/)`,
+    { surveyId, recordUuid, nodeUuid, childDefUuids },
     dbTransformCallback
   )
 
@@ -293,7 +305,7 @@ export const updateNodes = async ({ surveyId, nodes }, client = db) => {
     DbUtils.updateAllQuery(
       getSurveyDBSchema(surveyId),
       'node',
-      { name: 'id', cast: 'int' },
+      { name: 'id', cast: 'bigint' },
       [
         { name: 'value', cast: 'jsonb' },
         { name: 'meta', cast: 'jsonb' },
