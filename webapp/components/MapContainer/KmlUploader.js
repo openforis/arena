@@ -10,6 +10,13 @@ import { useI18n } from '@webapp/store/system'
 import { ZipForEach } from '@webapp/utils/zipUtils'
 import classNames from 'classnames'
 
+const generatePopupContent = (f, l) => {
+  if (f.properties) {
+    const out = Object.entries(f.properties).map((key) => key + ': ' + f.properties[key])
+    l.bindPopup(out.join('<br />'))
+  }
+}
+
 export const KmlUploader = () => {
   const map = useMap()
 
@@ -88,12 +95,7 @@ export const KmlUploader = () => {
         const geo = L.geoJson(
           { features: [] },
           {
-            onEachFeature: function popUp(f, l) {
-              if (f.properties) {
-                const out = Object.entries(f.properties).map((key) => key + ': ' + f.properties[key])
-                l.bindPopup(out.join('<br />'))
-              }
-            },
+            onEachFeature: generatePopupContent,
           }
         ).addTo(map)
         const data = await shp(text)
