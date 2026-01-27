@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/refs */
 import * as R from 'ramda'
-import React, { useMemo, useRef } from 'react'
+import React, { createRef, useMemo, useRef } from 'react'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import './ServiceErrors.scss'
 
@@ -26,12 +26,15 @@ const ServiceErrors = () => {
 
     // 2. Map: Ensure every current error has a stable React ref
     return errors.map((error) => {
+      let nodeRef = null
       if (!nodeMap.has(error.id)) {
-        nodeMap.set(error.id, React.createRef())
+        nodeRef = createRef()
+        nodeMap.set(error.id, nodeRef)
       }
+      nodeRef = nodeMap.get(error.id)
       return {
         error,
-        nodeRef: nodeMap.get(error.id),
+        nodeRef,
       }
     })
   }, [errors]) // Only re-runs when the errors array changes
@@ -40,7 +43,7 @@ const ServiceErrors = () => {
     <TransitionGroup className={`service-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`} enter appear>
       {itemsWithRefs.map(({ error, nodeRef }) => (
         <CSSTransition key={error.id} timeout={500} classNames="fade" nodeRef={nodeRef}>
-          <ServiceError ref={nodeRef} error={error} />
+          <ServiceError error={error} nodeRef={nodeRef} />
         </CSSTransition>
       ))}
     </TransitionGroup>
