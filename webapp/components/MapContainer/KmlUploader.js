@@ -9,6 +9,7 @@ require('./L.KML')
 import { useI18n } from '@webapp/store/system'
 import { ZipForEach } from '@webapp/utils/zipUtils'
 import classNames from 'classnames'
+import { FileUtils } from '@webapp/utils/fileUtils'
 
 const generatePopupContent = (f, l) => {
   if (f.properties) {
@@ -108,16 +109,19 @@ export const KmlUploader = () => {
   )
 
   useEffect(() => {
-    if (selectedFile) {
-      if (selectedFile.name.endsWith('.kmz')) {
-        processKMZFile(selectedFile)
-      } else if (selectedFile.name.endsWith('.kml')) {
-        processKMLFile(selectedFile)
-      } else if (selectedFile.name.endsWith('.zip')) {
-        processShapeFile(selectedFile)
-      } else if (selectedFile.name.endsWith('.json') || selectedFile.name.endsWith('.geojson')) {
-        processGeoJson(selectedFile)
-      }
+    const extension = FileUtils.getExtension(selectedFile)
+    switch (extension) {
+      case 'kmz':
+        return processKMZFile(selectedFile)
+      case 'kml':
+        return processKMLFile(selectedFile)
+      case 'zip':
+        return processShapeFile(selectedFile)
+      case 'json':
+      case 'geojson':
+        return processGeoJson(selectedFile)
+      default:
+        break
     }
   }, [processGeoJson, processKMLFile, processKMZFile, processShapeFile, selectedFile])
 
