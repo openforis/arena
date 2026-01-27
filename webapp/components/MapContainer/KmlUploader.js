@@ -20,6 +20,91 @@ export const KmlUploader = () => {
   const [opacity, setOpacity] = useState(50)
   const [open, setOpen] = useState(false)
 
+  const addKMLLayers = useCallback(
+    (kmlTexts) => {
+      const parser = new DOMParser()
+      kmlTexts.forEach((text) => {
+        const kml = parser.parseFromString(text, 'text/xml')
+        const track = new L.KML(kml)
+        map.addLayer(track)
+        setLayers((old) => [...old, track])
+      })
+    },
+    [map]
+  )
+
+  const processKMLFile = useCallback(
+    (file) => {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const text = e.target.result
+        addKMLLayers([text])
+      }
+      reader.readAsText(file)
+    },
+    [addKMLLayers]
+  )
+
+  const processKMZFile = useCallback(
+    async (file) => {
+      const kmlList = []
+      const promises = []
+      await ZipForEach(file, (relativePath, fileEntry) => {
+        promises.push(
+          new Promise((resolve) => {
+            if (relativePath.endsWith('.kml')) {
+              resolve(fileEntry.async('string').then((data) => kmlList.push(data)))
+            }
+            resolve()
+          })
+        )
+      })
+      await Promise.all(promises)
+      addKMLLayers(kmlList)
+    },
+    [addKMLLayers]
+  )
+
+  const processGeoJson = useCallback(
+    (file) => {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const text = e.target.result
+        const geo = JSON.parse(text)
+        const geojson = L.geoJSON(geo).addTo(map)
+        setLayers((old) => [...old, geojson])
+      }
+      reader.readAsText(file)
+    },
+    [map]
+  )
+
+  const processShapeFile = useCallback(
+    (file) => {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const text = e.target.result
+
+        const geo = L.geoJson(
+          { features: [] },
+          {
+            onEachFeature: function popUp(f, l) {
+              if (f.properties) {
+                const out = Object.entries(f.properties).map((key) => key + ': ' + f.properties[key])
+                l.bindPopup(out.join('<br />'))
+              }
+            },
+          }
+        ).addTo(map)
+        const data = await shp(text)
+        geo.addData(data)
+        setLayers((old) => [...old, geo])
+      }
+      reader.readAsArrayBuffer(file)
+    },
+    [map]
+  )
+
   useEffect(() => {
     if (selectedFile) {
       if (selectedFile.name.endsWith('.kmz')) {
@@ -32,7 +117,7 @@ export const KmlUploader = () => {
         processGeoJson(selectedFile)
       }
     }
-  }, [selectedFile])
+  }, [processGeoJson, processKMLFile, processKMZFile, processShapeFile, selectedFile])
 
   const onIconClick = useCallback(() => {
     setOpen(true)
@@ -41,76 +126,6 @@ export const KmlUploader = () => {
   const onMouseLeave = useCallback(() => {
     setOpen(false)
   }, [])
-
-  const processGeoJson = (file) => {
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const text = e.target.result
-      const geo = JSON.parse(text)
-      const geojson = L.geoJSON(geo).addTo(map)
-      setLayers((old) => [...old, geojson])
-    }
-    reader.readAsText(file)
-  }
-
-  const processShapeFile = (file) => {
-    const geo = L.geoJson(
-      { features: [] },
-      {
-        onEachFeature: function popUp(f, l) {
-          if (f.properties) {
-            const out = Object.entries(f.properties).map((key) => key + ': ' + f.properties[key])
-            l.bindPopup(out.join('<br />'))
-          }
-        },
-      }
-    ).addTo(map)
-    setLayers((old) => [...old, geo])
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const text = e.target.result
-      shp(text).then(function (data) {
-        geo.addData(data)
-      })
-    }
-    reader.readAsArrayBuffer(file)
-  }
-
-  const processKMLFile = (file) => {
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const text = e.target.result
-      addKMLLayers([text])
-    }
-    reader.readAsText(file)
-  }
-
-  const processKMZFile = async (file) => {
-    const kmlList = []
-    let promises = []
-    await ZipForEach(file, (relativePath, fileEntry) => {
-      promises.push(
-        new Promise((resolve) => {
-          if (relativePath.endsWith('.kml')) {
-            resolve(fileEntry.async('string').then((data) => kmlList.push(data)))
-          }
-          resolve()
-        })
-      )
-    })
-    await Promise.all(promises)
-    addKMLLayers(kmlList)
-  }
-
-  const addKMLLayers = (kmlTexts) => {
-    const parser = new DOMParser()
-    kmlTexts.forEach((text) => {
-      const kml = parser.parseFromString(text, 'text/xml')
-      const track = new L.KML(kml)
-      map.addLayer(track)
-      setLayers((old) => [...old, track])
-    })
-  }
 
   const fileChangeHandler = (event) => {
     setSelectedFile(event.target.files[0])
