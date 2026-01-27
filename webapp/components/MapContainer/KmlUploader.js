@@ -112,14 +112,18 @@ export const KmlUploader = () => {
     const extension = FileUtils.getExtension(selectedFile)
     switch (extension) {
       case 'kmz':
-        return processKMZFile(selectedFile)
+        processKMZFile(selectedFile)
+        break
       case 'kml':
-        return processKMLFile(selectedFile)
+        processKMLFile(selectedFile)
+        break
       case 'zip':
-        return processShapeFile(selectedFile)
+        processShapeFile(selectedFile)
+        break
       case 'json':
       case 'geojson':
-        return processGeoJson(selectedFile)
+        processGeoJson(selectedFile)
+        break
       default:
         break
     }
