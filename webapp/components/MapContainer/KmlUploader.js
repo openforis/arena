@@ -2,13 +2,13 @@ import './KmlUploader.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
+import classNames from 'classnames'
 import shp from 'shpjs'
 import L from 'leaflet'
 require('./L.KML')
 
 import { useI18n } from '@webapp/store/system'
 import { ZipForEach } from '@webapp/utils/zipUtils'
-import classNames from 'classnames'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
 const generatePopupContent = (f, l) => {
