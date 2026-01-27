@@ -109,7 +109,10 @@ export const KmlUploader = () => {
   )
 
   useEffect(() => {
-    const extension = selectedFile ? FileUtils.getExtension(selectedFile) : null
+    if (!selectedFile) {
+      return
+    }
+    const extension = FileUtils.getExtension(selectedFile)?.toLowerCase()
     switch (extension) {
       case 'kmz':
         processKMZFile(selectedFile)
