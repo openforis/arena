@@ -7,7 +7,7 @@ export const ZipForEach = async (file, callback) => {
   const MAX_SIZE = 1000000000 // 1 GB
   let fileCount = 0
   let totalSize = 0
-  let targetDirectory = '/archive_tmp'
+  const targetDirectory = '/archive_tmp'
   await jszip.loadAsync(file).then((zip) => {
     zip.forEach((relativePath, fileEntry) => {
       fileCount++

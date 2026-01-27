@@ -2,13 +2,21 @@ import './KmlUploader.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
+import classNames from 'classnames'
 import shp from 'shpjs'
 import L from 'leaflet'
 require('./L.KML')
 
 import { useI18n } from '@webapp/store/system'
 import { ZipForEach } from '@webapp/utils/zipUtils'
-import classNames from 'classnames'
+import { FileUtils } from '@webapp/utils/fileUtils'
+
+const generatePopupContent = (f, l) => {
+  if (f.properties) {
+    const out = Object.entries(f.properties).map((key) => key + ': ' + f.properties[key])
+    l.bindPopup(out.join('<br />'))
+  }
+}
 
 export const KmlUploader = () => {
   const map = useMap()
@@ -20,19 +28,109 @@ export const KmlUploader = () => {
   const [opacity, setOpacity] = useState(50)
   const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    if (selectedFile) {
-      if (selectedFile.name.endsWith('.kmz')) {
-        processKMZFile(selectedFile)
-      } else if (selectedFile.name.endsWith('.kml')) {
-        processKMLFile(selectedFile)
-      } else if (selectedFile.name.endsWith('.zip')) {
-        processShapeFile(selectedFile)
-      } else if (selectedFile.name.endsWith('.json') || selectedFile.name.endsWith('.geojson')) {
-        processGeoJson(selectedFile)
+  const addKMLLayers = useCallback(
+    (kmlTexts) => {
+      const parser = new DOMParser()
+      kmlTexts.forEach((text) => {
+        const kml = parser.parseFromString(text, 'text/xml')
+        const track = new L.KML(kml)
+        map.addLayer(track)
+        setLayers((old) => [...old, track])
+      })
+    },
+    [map]
+  )
+
+  const processKMLFile = useCallback(
+    (file) => {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const text = e.target.result
+        addKMLLayers([text])
       }
+      reader.readAsText(file)
+    },
+    [addKMLLayers]
+  )
+
+  const processKMZFile = useCallback(
+    async (file) => {
+      const kmlList = []
+      const promises = []
+      await ZipForEach(file, (relativePath, fileEntry) => {
+        promises.push(
+          new Promise((resolve) => {
+            if (relativePath.endsWith('.kml')) {
+              resolve(fileEntry.async('string').then((data) => kmlList.push(data)))
+            }
+            resolve()
+          })
+        )
+      })
+      await Promise.all(promises)
+      addKMLLayers(kmlList)
+    },
+    [addKMLLayers]
+  )
+
+  const processGeoJson = useCallback(
+    (file) => {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const text = e.target.result
+        const geo = JSON.parse(text)
+        const geojson = L.geoJSON(geo).addTo(map)
+        setLayers((old) => [...old, geojson])
+      }
+      reader.readAsText(file)
+    },
+    [map]
+  )
+
+  const processShapeFile = useCallback(
+    (file) => {
+      const reader = new FileReader()
+      reader.onload = async (e) => {
+        const text = e.target.result
+
+        const geo = L.geoJson(
+          { features: [] },
+          {
+            onEachFeature: generatePopupContent,
+          }
+        ).addTo(map)
+        const data = await shp(text)
+        geo.addData(data)
+        setLayers((old) => [...old, geo])
+      }
+      reader.readAsArrayBuffer(file)
+    },
+    [map]
+  )
+
+  useEffect(() => {
+    if (!selectedFile) {
+      return
     }
-  }, [selectedFile])
+    const extension = FileUtils.getExtension(selectedFile)?.toLowerCase()
+    switch (extension) {
+      case 'kmz':
+        processKMZFile(selectedFile)
+        break
+      case 'kml':
+        processKMLFile(selectedFile)
+        break
+      case 'zip':
+        processShapeFile(selectedFile)
+        break
+      case 'json':
+      case 'geojson':
+        processGeoJson(selectedFile)
+        break
+      default:
+        break
+    }
+  }, [processGeoJson, processKMLFile, processKMZFile, processShapeFile, selectedFile])
 
   const onIconClick = useCallback(() => {
     setOpen(true)
@@ -41,76 +139,6 @@ export const KmlUploader = () => {
   const onMouseLeave = useCallback(() => {
     setOpen(false)
   }, [])
-
-  const processGeoJson = (file) => {
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const text = e.target.result
-      const geo = JSON.parse(text)
-      const geojson = L.geoJSON(geo).addTo(map)
-      setLayers((old) => [...old, geojson])
-    }
-    reader.readAsText(file)
-  }
-
-  const processShapeFile = (file) => {
-    const geo = L.geoJson(
-      { features: [] },
-      {
-        onEachFeature: function popUp(f, l) {
-          if (f.properties) {
-            const out = Object.entries(f.properties).map((key) => key + ': ' + f.properties[key])
-            l.bindPopup(out.join('<br />'))
-          }
-        },
-      }
-    ).addTo(map)
-    setLayers((old) => [...old, geo])
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const text = e.target.result
-      shp(text).then(function (data) {
-        geo.addData(data)
-      })
-    }
-    reader.readAsArrayBuffer(file)
-  }
-
-  const processKMLFile = (file) => {
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const text = e.target.result
-      addKMLLayers([text])
-    }
-    reader.readAsText(file)
-  }
-
-  const processKMZFile = async (file) => {
-    const kmlList = []
-    let promises = []
-    await ZipForEach(file, (relativePath, fileEntry) => {
-      promises.push(
-        new Promise((resolve) => {
-          if (relativePath.endsWith('.kml')) {
-            resolve(fileEntry.async('string').then((data) => kmlList.push(data)))
-          }
-          resolve()
-        })
-      )
-    })
-    await Promise.all(promises)
-    addKMLLayers(kmlList)
-  }
-
-  const addKMLLayers = (kmlTexts) => {
-    const parser = new DOMParser()
-    kmlTexts.forEach((text) => {
-      const kml = parser.parseFromString(text, 'text/xml')
-      const track = new L.KML(kml)
-      map.addLayer(track)
-      setLayers((old) => [...old, track])
-    })
-  }
 
   const fileChangeHandler = (event) => {
     setSelectedFile(event.target.files[0])
@@ -134,7 +162,7 @@ export const KmlUploader = () => {
 
   return (
     <div
-      className={classNames(`leaflet-top leaflet-right map-kml-uploader-wrapper`, { open })}
+      className={classNames(`leaflet-top leaflet-right leaflet-control map-kml-uploader-wrapper`, { open })}
       onMouseLeave={onMouseLeave}
       role="dialog"
     >
