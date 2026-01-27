@@ -162,7 +162,7 @@ export const KmlUploader = () => {
 
   return (
     <div
-      className={classNames(`leaflet-top leaflet-right map-kml-uploader-wrapper`, { open })}
+      className={classNames(`leaflet-top leaflet-right leaflet-control map-kml-uploader-wrapper`, { open })}
       onMouseLeave={onMouseLeave}
       role="dialog"
     >
