@@ -378,22 +378,30 @@ export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, t
 export const updateUserPassword = async ({ user, passwordChangeForm }) => {
   const userUuid = User.getUuid(user)
   const userToUpdateUuid = UserPasswordChangeForm.getUserUuid(passwordChangeForm)
-  const validation = await UserPasswordChangeFormValidator.validate(passwordChangeForm)
+  const isSystemAdmin = User.isSystemAdmin(user)
+  const editingSameUser = !userToUpdateUuid || userUuid === userToUpdateUuid
+  if (!editingSameUser && !isSystemAdmin) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+  const oldPasswordCheck = !isSystemAdmin
+  const validation = await UserPasswordChangeFormValidator.validate(passwordChangeForm, {
+    includeOldPassword: oldPasswordCheck,
+  })
   if (Validation.isNotValid(validation)) {
     return validation
   }
-  // check old password
-  const oldUser = await UserManager.fetchUserByUuidWithPassword(userUuid)
-  const oldPasswordEncrypted = User.getPassword(oldUser)
-  const oldPasswordParam = UserPasswordChangeForm.getOldPassword(passwordChangeForm)
-
-  if (!UserPasswordUtils.comparePassword(oldPasswordParam, oldPasswordEncrypted)) {
-    // password not matching the existing one
-    return Validation.newInstance(false, {
-      [UserPasswordChangeForm.keys.oldPassword]: Validation.newInstance(false, {}, [
-        ValidationResult.newInstance(Validation.messageKeys.userPasswordChange.oldPasswordWrong),
-      ]),
-    })
+  if (oldPasswordCheck) {
+    const oldUser = await UserManager.fetchUserByUuidWithPassword(userUuid)
+    const oldPasswordEncrypted = User.getPassword(oldUser)
+    const oldPasswordParam = UserPasswordChangeForm.getOldPassword(passwordChangeForm)
+    if (!UserPasswordUtils.comparePassword(oldPasswordParam, oldPasswordEncrypted)) {
+      // password not matching the existing one
+      return Validation.newInstance(false, {
+        [UserPasswordChangeForm.keys.oldPassword]: Validation.newInstance(false, {}, [
+          ValidationResult.newInstance(Validation.messageKeys.userPasswordChange.oldPasswordWrong),
+        ]),
+      })
+    }
   }
   // store new password
   const newPassword = UserPasswordChangeForm.getNewPassword(passwordChangeForm)
