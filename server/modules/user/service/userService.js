@@ -73,7 +73,6 @@ export const insertSystemAdminUserIfNotExisting = async (client = db) =>
  * Generates a new reset password uuid.
  * It returns an object like { uuid } if the reset password uuid has been generated without problems
  * or an object like { error } if an error occurred.
- *
  * @param {!string} email - Email of the user.
  * @param {!string} serverUrl - Address of the server.
  * @returns {Promise<object>} - THe generated password reset uuid.
@@ -377,12 +376,14 @@ export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, t
 }
 
 export const updateUserPassword = async ({ user, passwordChangeForm }) => {
+  const userUuid = User.getUuid(user)
+  const userToUpdateUuid = UserPasswordChangeForm.getUserUuid(passwordChangeForm)
   const validation = await UserPasswordChangeFormValidator.validate(passwordChangeForm)
   if (Validation.isNotValid(validation)) {
     return validation
   }
   // check old password
-  const oldUser = await UserManager.fetchUserByUuidWithPassword(User.getUuid(user))
+  const oldUser = await UserManager.fetchUserByUuidWithPassword(userUuid)
   const oldPasswordEncrypted = User.getPassword(oldUser)
   const oldPasswordParam = UserPasswordChangeForm.getOldPassword(passwordChangeForm)
 

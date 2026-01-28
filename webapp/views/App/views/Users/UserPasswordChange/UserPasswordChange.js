@@ -11,26 +11,32 @@ import * as API from '@webapp/service/api'
 import { Button, ButtonBack } from '@webapp/components'
 import { useNotifyInfo } from '@webapp/components/hooks'
 import { UserPasswordSetForm } from './UserPasswordSetForm'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
+import { useParams } from 'react-router'
 
 const defaultState = { form: UserPasswordChangeForm.newForm(), validation: {} }
 
 const UserPasswordChange = () => {
+  const { userUuid } = useParams()
   const notifyInfo = useNotifyInfo()
 
   const [state, setState] = useState(defaultState)
+  const isSystemAdmin = useUserIsSystemAdmin()
   const { form, validation } = state
   const empty = UserPasswordChangeForm.isEmpty(form)
 
   const setStateProp = (prop) => async (value) => {
     const formNext = { ...form, [prop]: value }
-    const validationNext = await UserPasswordChangeFormValidator.validate(formNext)
+    const validationNext = await UserPasswordChangeFormValidator.validate(formNext, {
+      includeOldPassword: !isSystemAdmin,
+    })
     setState({ form: formNext, validation: validationNext })
   }
 
   const resetState = () => setState(defaultState)
 
   const onChangePasswordClick = async () => {
-    const { validation: validationUpdated } = await API.changeUserPassword({ form })
+    const { validation: validationUpdated } = await API.changeUserPassword({ form, userUuid })
     if (!validationUpdated) {
       notifyInfo({ key: 'userPasswordChangeView.passwordChangedSuccessfully' })
       resetState()
@@ -44,7 +50,7 @@ const UserPasswordChange = () => {
       <UserPasswordSetForm
         form={form}
         onFieldChange={(key) => (value) => setStateProp(key)(value)}
-        passwordChange
+        passwordChange={!isSystemAdmin}
         validation={validation}
       />
 

@@ -66,7 +66,7 @@ const Users = () => {
       },
       {
         component: UserPasswordChange,
-        path: userModules.userPasswordChange.path,
+        path: `${userModules.userPasswordChange.path}/:userUuid?`,
       }
     )
     return _modules
