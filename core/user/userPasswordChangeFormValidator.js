@@ -32,7 +32,8 @@ const getPropsValidations = ({ passwordRequired = true, includeOldPassword = tru
   return validations
 }
 
-const validate = async (userPasswordChangeForm) => Validator.validate(userPasswordChangeForm, getPropsValidations())
+const validate = async (form, { includeOldPassword = true } = {}) =>
+  Validator.validate(form, getPropsValidations({ includeOldPassword }))
 
 export const UserPasswordChangeFormValidator = {
   getPropsValidations,

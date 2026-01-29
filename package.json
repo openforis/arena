@@ -1,6 +1,6 @@
 {
   "name": "open-foris-arena",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "license": "MIT",
   "engines": {
     "node": "^24.11.1"
@@ -108,7 +108,7 @@
     "@mui/x-data-grid": "^8.26.0",
     "@mui/x-date-pickers": "^8.26.0",
     "@mui/x-tree-view": "^8.26.0",
-    "@openforis/arena-server": "^1.2.7",
+    "@openforis/arena-server": "^1.2.8",
     "@reduxjs/toolkit": "^2.11.2",
     "@sendgrid/mail": "^8.1.6",
     "@shopify/draggable": "^1.2.1",

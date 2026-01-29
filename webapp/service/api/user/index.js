@@ -64,10 +64,10 @@ export const fetchUserSurveys = async ({ userUuid }) => {
 }
 
 // ==== UPDATE
-export const changeUserPassword = async ({ form }) => {
+export const changeUserPassword = async ({ form, userUuid }) => {
   const {
     data: { validation },
-  } = await axios.post(`/api/user/change-password`, form)
+  } = await axios.post(`/api/user/change-password`, { ...form, userUuid })
 
   return { validation }
 }

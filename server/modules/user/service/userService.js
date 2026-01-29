@@ -73,10 +73,9 @@ export const insertSystemAdminUserIfNotExisting = async (client = db) =>
  * Generates a new reset password uuid.
  * It returns an object like { uuid } if the reset password uuid has been generated without problems
  * or an object like { error } if an error occurred.
- *
  * @param {!string} email - Email of the user.
  * @param {!string} serverUrl - Address of the server.
- * @returns {Promise<object>} - THe generated password reset uuid.
+ * @returns {Promise<object>} - The generated password reset uuid.
  */
 export const generateResetPasswordUuid = async (email, serverUrl) => {
   try {
@@ -377,27 +376,37 @@ export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, t
 }
 
 export const updateUserPassword = async ({ user, passwordChangeForm }) => {
-  const validation = await UserPasswordChangeFormValidator.validate(passwordChangeForm)
+  const userUuid = User.getUuid(user)
+  const userToUpdateUuid = UserPasswordChangeForm.getUserUuid(passwordChangeForm) ?? userUuid
+  const isSystemAdmin = User.isSystemAdmin(user)
+  const editingSameUser = userUuid === userToUpdateUuid
+  if (!editingSameUser && !isSystemAdmin) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+  const oldPasswordCheck = !isSystemAdmin
+  const validation = await UserPasswordChangeFormValidator.validate(passwordChangeForm, {
+    includeOldPassword: oldPasswordCheck,
+  })
   if (Validation.isNotValid(validation)) {
     return validation
   }
-  // check old password
-  const oldUser = await UserManager.fetchUserByUuidWithPassword(User.getUuid(user))
-  const oldPasswordEncrypted = User.getPassword(oldUser)
-  const oldPasswordParam = UserPasswordChangeForm.getOldPassword(passwordChangeForm)
-
-  if (!UserPasswordUtils.comparePassword(oldPasswordParam, oldPasswordEncrypted)) {
-    // password not matching the existing one
-    return Validation.newInstance(false, {
-      [UserPasswordChangeForm.keys.oldPassword]: Validation.newInstance(false, {}, [
-        ValidationResult.newInstance(Validation.messageKeys.userPasswordChange.oldPasswordWrong),
-      ]),
-    })
+  if (oldPasswordCheck) {
+    const oldUser = await UserManager.fetchUserByUuidWithPassword(userToUpdateUuid)
+    const oldPasswordEncrypted = User.getPassword(oldUser)
+    const oldPasswordParam = UserPasswordChangeForm.getOldPassword(passwordChangeForm)
+    if (!UserPasswordUtils.comparePassword(oldPasswordParam, oldPasswordEncrypted)) {
+      // password not matching the existing one
+      return Validation.newInstance(false, {
+        [UserPasswordChangeForm.keys.oldPassword]: Validation.newInstance(false, {}, [
+          ValidationResult.newInstance(Validation.messageKeys.userPasswordChange.oldPasswordWrong),
+        ]),
+      })
+    }
   }
   // store new password
   const newPassword = UserPasswordChangeForm.getNewPassword(passwordChangeForm)
   const newPasswordEncrypted = UserPasswordUtils.encryptPassword(newPassword)
-  await UserManager.updatePassword({ userUuid: User.getUuid(user), password: newPasswordEncrypted })
+  await UserManager.updatePassword({ userUuid: userToUpdateUuid, password: newPasswordEncrypted })
 
   return null // no validation errors => ok
 }

@@ -16,7 +16,9 @@ export const UserPasswordSetForm = (props) => {
   const availableFormKeys = useMemo(
     () =>
       Object.values(UserPasswordChangeForm.keys).filter(
-        (key) => passwordChange || key !== UserPasswordChangeForm.keys.oldPassword
+        (key) =>
+          key !== UserPasswordChangeForm.keys.userUuid &&
+          (passwordChange || key !== UserPasswordChangeForm.keys.oldPassword)
       ),
     [passwordChange]
   )

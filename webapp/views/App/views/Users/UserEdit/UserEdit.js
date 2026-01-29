@@ -177,7 +177,7 @@ const UserEdit = () => {
           {!systemAdmin && (
             <FormItem label="usersView:roleInCurrentSurvey">
               <DropdownUserRole
-                editingLoggedUser={User.isEqual(user)(userToUpdate)}
+                editingLoggedUser={editingSameUser}
                 disabled={!canEditGroup}
                 validation={Validation.getFieldValidation(User.keys.authGroupsUuids)(validation)}
                 groupUuid={AuthGroup.getUuid(groupInCurrentSurvey)}
@@ -229,7 +229,13 @@ const UserEdit = () => {
             <Button
               iconClassName="icon-pencil"
               label="userPasswordChangeView.changePassword"
-              onClick={() => navigate(appModuleUri(userModules.userPasswordChange))}
+              onClick={() => {
+                let changePasswordUri = appModuleUri(userModules.userPasswordChange)
+                if (!editingSameUser) {
+                  changePasswordUri += userUuid
+                }
+                navigate(changePasswordUri)
+              }}
             />
           )}
 

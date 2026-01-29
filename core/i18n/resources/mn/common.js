@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 export default {
   common: {
     active: 'Идэвхтэй',
@@ -859,11 +857,13 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
   },
 
   userPasswordChangeView: {
+    changingPasswordForUser: 'Хэрэглэгчийн нууц үг солих: {{user}}',
     oldPassword: 'Хуучин нууц үг',
     newPassword: 'Шинэ нууц үг',
     confirmPassword: 'Шинэ нууц үгээ баталгаажуулах',
     changePassword: 'Нууц үг солих',
     passwordChangedSuccessfully: 'Нууц үг амжилттай солигдлоо!',
+    notAuthorizedToChangePasswordOfAnotherUser: 'Та өөр хэрэглэгчийн нууц үгийг солих эрхгүй байна',
   },
 
   userInviteView: {

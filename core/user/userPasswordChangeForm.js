@@ -6,6 +6,7 @@ const keys = {
   oldPassword: 'oldPassword',
   newPassword: 'newPassword',
   confirmPassword: 'confirmPassword',
+  userUuid: 'userUuid',
 }
 
 const newForm = () => Object.values(keys).reduce((acc, key) => ({ ...acc, [key]: '' }), {})
@@ -13,6 +14,7 @@ const isEmpty = (form) => Object.values(keys).every((key) => Objects.isEmpty(for
 
 const getOldPassword = A.propOr('', keys.oldPassword)
 const getNewPassword = A.propOr('', keys.newPassword)
+const getUserUuid = A.prop(keys.userUuid)
 
 export const UserPasswordChangeForm = {
   keys,
@@ -20,4 +22,5 @@ export const UserPasswordChangeForm = {
   isEmpty,
   getOldPassword,
   getNewPassword,
+  getUserUuid,
 }

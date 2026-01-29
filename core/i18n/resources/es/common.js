@@ -766,11 +766,13 @@ export default {
     },
   },
   userPasswordChangeView: {
+    changingPasswordForUser: 'Cambiando contraseña para el usuario: {{user}}',
     oldPassword: 'Contraseña antigua',
     newPassword: 'Nueva contraseña',
     confirmPassword: 'Confirmar nueva contraseña',
     changePassword: 'Cambiar contraseña',
     passwordChangedSuccessfully: '¡Contraseña cambiada correctamente!',
+    notAuthorizedToChangePasswordOfAnotherUser: 'No está autorizado para cambiar la contraseña de otro usuario',
   },
   userInviteView: {
     confirmInviteSystemAdmin: '¿Invitar al usuario {{email}} como Administrador del Sistema?',
