@@ -29,11 +29,11 @@ const exportQueryData = createAsyncThunk('dataQuery/exportData', async (params, 
   const options = { ...defaultDataExportOptionsSelection, ...params }
   const { fileFormat } = options
   try {
-    const tempFileName = await API.exportDataQueryToTempFile({ surveyId, cycle, query, options })
-    API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName, fileFormat })
+    const { downloadToken } = await API.exportDataQueryToTempFile({ surveyId, cycle, query, options })
+    API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, downloadToken, fileFormat })
   } catch (error) {
     const key =
-      fileFormat === FileFormats.xlsx ? 'appErrors:dataExport..excelMaxCellsLimitExceeded' : 'dataExportView.error'
+      fileFormat === FileFormats.xlsx ? 'appErrors:dataExport.excelMaxCellsLimitExceeded' : 'dataExportView.error'
     dispatch(notifyWarning({ key, params: { details: String(error) } }))
   }
 })

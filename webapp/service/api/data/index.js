@@ -196,17 +196,17 @@ export const downloadExportedDataSummaryUrl = ({ surveyId, cycle, exportUuid }) 
 export const exportDataQueryToTempFile = async ({ surveyId, cycle, query, options }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const {
-    data: { tempFileName },
+    data: { downloadToken },
   } = await axios.post(`/api/surveyRdb/${surveyId}/${entityDefUuid}/export/start`, {
     cycle,
     query,
     options,
   })
-  return tempFileName
+  return { downloadToken }
 }
 
-export const downloadDataQueryExport = ({ surveyId, cycle, entityDefUuid, tempFileName, fileFormat }) => {
-  const params = new URLSearchParams({ cycle, tempFileName, fileFormat }).toString()
+export const downloadDataQueryExport = ({ surveyId, cycle, entityDefUuid, fileFormat, downloadToken }) => {
+  const params = new URLSearchParams({ cycle, fileFormat, downloadToken }).toString()
   window.open(`/api/surveyRdb/${surveyId}/${entityDefUuid}/export/download?${params}`, 'data-query-export')
 }
 
