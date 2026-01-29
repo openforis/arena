@@ -1,12 +1,19 @@
+import * as User from '@core/user/user'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 import * as FileUtils from '../../../utils/file/fileUtils'
 
+import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
-import * as SurveyRdbService from '../service/surveyRdbService'
 
-import { requireRecordListViewPermission, requireSurveyRdbRefreshPermission } from '../../auth/authApiMiddleware'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import * as SurveyRdbService from '../service/surveyRdbService'
+import {
+  requireDownloadToken,
+  requireRecordListViewPermission,
+  requireSurveyRdbRefreshPermission,
+} from '../../auth/authApiMiddleware'
 
 export const init = (app) => {
   app.get('/surveyRdb/recreateRdbs', requireSurveyRdbRefreshPermission, async (req, res, next) => {
@@ -73,7 +80,7 @@ export const init = (app) => {
         const { surveyId, cycle, query, options } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const tempFileName = await SurveyRdbService.exportViewDataToTempFile({
+        const fileName = await SurveyRdbService.exportViewDataToTempFile({
           user,
           surveyId,
           cycle,
@@ -81,38 +88,35 @@ export const init = (app) => {
           addCycle: true,
           options,
         })
-
-        res.json({ tempFileName })
+        const userUuid = User.getUuid(user)
+        const { token: downloadToken } = DownloadAuthTokenUtils.generateToken({ userUuid, fileName })
+        res.json({ downloadToken })
       } catch (error) {
         next(error)
       }
     }
   )
 
-  app.get(
-    '/surveyRdb/:surveyId/:nodeDefUuidTable/export/download',
-    requireRecordListViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, tempFileName, fileFormat } = Request.getParams(req)
+  app.get('/surveyRdb/:surveyId/:nodeDefUuidTable/export/download', requireDownloadToken, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, fileFormat } = Request.getParams(req)
+      const downloadFileName = Request.getDownloadFileName(req)
+      const survey = await SurveyService.fetchSurveyById({ surveyId })
+      const outputFileName = ExportFileNameGenerator.generate({
+        survey,
+        cycle,
+        fileType: 'ExplorerTable',
+        fileFormat,
+      })
 
-        const survey = await SurveyService.fetchSurveyById({ surveyId })
-        const outputFileName = ExportFileNameGenerator.generate({
-          survey,
-          cycle,
-          fileType: 'ExplorerTable',
-          fileFormat,
-        })
-
-        Response.sendFile({
-          res,
-          path: FileUtils.tempFilePath(tempFileName),
-          name: outputFileName,
-          fileFormat,
-        })
-      } catch (error) {
-        next(error)
-      }
+      Response.sendFile({
+        res,
+        path: FileUtils.tempFilePath(downloadFileName),
+        name: outputFileName,
+        fileFormat,
+      })
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 }

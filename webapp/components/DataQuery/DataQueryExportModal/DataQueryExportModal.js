@@ -48,13 +48,13 @@ export const DataQueryExportModal = (props) => {
 
   const onExportClick = useCallback(async () => {
     try {
-      const tempFileName = await API.exportDataQueryToTempFile({
+      const { downloadToken } = await API.exportDataQueryToTempFile({
         surveyId,
         cycle,
         query,
         options: selectedOptionsByKey,
       })
-      API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName, fileFormat })
+      API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, fileFormat, downloadToken })
     } catch (error) {
       const key =
         fileFormat === FileFormats.xlsx ? 'appErrors:dataExport.excelMaxCellsLimitExceeded' : 'dataExportView.error'
