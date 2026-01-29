@@ -60,6 +60,8 @@ export default [
       // Recommended React Hooks rules
       ...pluginReactHooks.configs.recommended.rules,
 
+      'react/display-name': 'off',
+
       // React 17+ Obsolete Rules
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',
