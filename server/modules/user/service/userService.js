@@ -377,9 +377,9 @@ export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, t
 
 export const updateUserPassword = async ({ user, passwordChangeForm }) => {
   const userUuid = User.getUuid(user)
-  const userToUpdateUuid = UserPasswordChangeForm.getUserUuid(passwordChangeForm)
+  const userToUpdateUuid = UserPasswordChangeForm.getUserUuid(passwordChangeForm) ?? userUuid
   const isSystemAdmin = User.isSystemAdmin(user)
-  const editingSameUser = !userToUpdateUuid || userUuid === userToUpdateUuid
+  const editingSameUser = userUuid === userToUpdateUuid
   if (!editingSameUser && !isSystemAdmin) {
     throw new UnauthorizedError(User.getName(user))
   }
@@ -391,7 +391,7 @@ export const updateUserPassword = async ({ user, passwordChangeForm }) => {
     return validation
   }
   if (oldPasswordCheck) {
-    const oldUser = await UserManager.fetchUserByUuidWithPassword(userUuid)
+    const oldUser = await UserManager.fetchUserByUuidWithPassword(userToUpdateUuid)
     const oldPasswordEncrypted = User.getPassword(oldUser)
     const oldPasswordParam = UserPasswordChangeForm.getOldPassword(passwordChangeForm)
     if (!UserPasswordUtils.comparePassword(oldPasswordParam, oldPasswordEncrypted)) {
@@ -406,7 +406,7 @@ export const updateUserPassword = async ({ user, passwordChangeForm }) => {
   // store new password
   const newPassword = UserPasswordChangeForm.getNewPassword(passwordChangeForm)
   const newPasswordEncrypted = UserPasswordUtils.encryptPassword(newPassword)
-  await UserManager.updatePassword({ userUuid: User.getUuid(user), password: newPasswordEncrypted })
+  await UserManager.updatePassword({ userUuid: userToUpdateUuid, password: newPasswordEncrypted })
 
   return null // no validation errors => ok
 }
