@@ -766,6 +766,7 @@ export default {
     },
   },
   userPasswordChangeView: {
+    changingPasswordForUser: 'Cambiando contraseña para el usuario: {{user}}',
     oldPassword: 'Contraseña antigua',
     newPassword: 'Nueva contraseña',
     confirmPassword: 'Confirmar nueva contraseña',

@@ -1,14 +1,14 @@
+import { useCallback } from 'react'
 import { useParams } from 'react-router'
 
-import { useSurveyId } from '@webapp/store/survey'
-
-import { useUser } from '@webapp/store/user'
 import * as User from '@core/user/user'
+
 import * as API from '@webapp/service/api'
+import { useUser } from '@webapp/store/user'
+import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyUuid } from '@webapp/store/survey/hooks'
 
 import { validateUserEdit } from './validate'
-import { useSurveyUuid } from '@webapp/store/survey/hooks'
-import { useCallback } from 'react'
 
 export const useGetUser = ({ setUserToUpdate, setUserToUpdateOriginal }) => {
   const { userUuid } = useParams()

@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 export default {
   common: {
     active: 'Active',
@@ -878,6 +876,7 @@ Merge cannot be performed.`,
   },
 
   userPasswordChangeView: {
+    changingPasswordForUser: 'Changing password for user: {{user}}',
     oldPassword: 'Old password',
     newPassword: 'New password',
     confirmPassword: 'Confirm new password',

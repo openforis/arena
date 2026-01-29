@@ -1,7 +1,10 @@
 import './UserPasswordChange.scss'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router'
+import classNames from 'classnames'
 
+import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
 import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
@@ -12,25 +15,38 @@ import { Button, ButtonBack } from '@webapp/components'
 import { useNotifyInfo } from '@webapp/components/hooks'
 import { UserPasswordSetForm } from './UserPasswordSetForm'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
-import { useParams } from 'react-router'
+import { useI18n } from '@webapp/store/system'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { useIsMobile } from '@webapp/components/hooks/useIsMobile'
 
-const defaultState = { form: UserPasswordChangeForm.newForm(), validation: {} }
+const defaultState = { form: UserPasswordChangeForm.newForm(), userToUpdate: null, validation: {} }
 
 const UserPasswordChange = () => {
   const { userUuid } = useParams()
+  const i18n = useI18n()
   const notifyInfo = useNotifyInfo()
-
-  const [state, setState] = useState(defaultState)
   const isSystemAdmin = useUserIsSystemAdmin()
-  const { form, validation } = state
+  const isMobile = useIsMobile()
+  const [state, setState] = useState(defaultState)
+  const { form, userToUpdate, validation } = state
   const empty = UserPasswordChangeForm.isEmpty(form)
+
+  useEffect(() => {
+    const fetchAndSetUser = async () => {
+      const userLoaded = await API.fetchUser({ userUuid })
+      setState((statePrev) => ({ ...statePrev, userToUpdate: userLoaded }))
+    }
+    if (userUuid) {
+      fetchAndSetUser()
+    }
+  }, [userUuid])
 
   const setStateProp = (prop) => async (value) => {
     const formNext = { ...form, [prop]: value }
     const validationNext = await UserPasswordChangeFormValidator.validate(formNext, {
       includeOldPassword: !isSystemAdmin,
     })
-    setState({ form: formNext, validation: validationNext })
+    setState((statePrev) => ({ ...statePrev, form: formNext, validation: validationNext }))
   }
 
   const resetState = () => setState(defaultState)
@@ -47,6 +63,14 @@ const UserPasswordChange = () => {
 
   return (
     <div className="user-change-password">
+      {userUuid && userToUpdate && (
+        <LabelWithTooltip
+          className={classNames('title', { mobile: isMobile })}
+          label={i18n.t('userPasswordChangeView.changingPasswordForUser', {
+            user: `${User.getName(userToUpdate)} (${User.getEmail(userToUpdate)})`,
+          })}
+        />
+      )}
       <UserPasswordSetForm
         form={form}
         onFieldChange={(key) => (value) => setStateProp(key)(value)}

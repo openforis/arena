@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 export default {
   common: {
     active: 'Активно',
@@ -860,6 +858,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
   },
 
   userPasswordChangeView: {
+    changingPasswordForUser: 'Смена пароля для пользователя: {{user}}',
     oldPassword: 'Старый пароль',
     newPassword: 'Новый пароль',
     confirmPassword: 'Подтвердите новый пароль',
