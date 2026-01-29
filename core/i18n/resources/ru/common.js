@@ -864,6 +864,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
     confirmPassword: 'Подтвердите новый пароль',
     changePassword: 'Сменить пароль',
     passwordChangedSuccessfully: 'Пароль успешно изменен!',
+    notAuthorizedToChangePasswordOfAnotherUser: 'У вас нет прав на изменение пароля другого пользователя',
   },
 
   userInviteView: {

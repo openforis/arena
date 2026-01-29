@@ -882,6 +882,7 @@ Merge cannot be performed.`,
     confirmPassword: 'Confirm new password',
     changePassword: 'Change password',
     passwordChangedSuccessfully: 'Password changed successfully!',
+    notAuthorizedToChangePasswordOfAnotherUser: 'You are not authorized to change the password of another user',
   },
 
   userInviteView: {

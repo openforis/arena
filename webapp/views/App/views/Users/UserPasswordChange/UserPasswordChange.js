@@ -14,7 +14,7 @@ import * as API from '@webapp/service/api'
 import { Button, ButtonBack } from '@webapp/components'
 import { useNotifyInfo } from '@webapp/components/hooks'
 import { UserPasswordSetForm } from './UserPasswordSetForm'
-import { useUserIsSystemAdmin } from '@webapp/store/user'
+import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useIsMobile } from '@webapp/components/hooks/useIsMobile'
@@ -25,11 +25,13 @@ const UserPasswordChange = () => {
   const { userUuid } = useParams()
   const i18n = useI18n()
   const notifyInfo = useNotifyInfo()
+  const user = useUser()
   const isSystemAdmin = useUserIsSystemAdmin()
   const isMobile = useIsMobile()
   const [state, setState] = useState(defaultState)
   const { form, userToUpdate, validation } = state
   const empty = UserPasswordChangeForm.isEmpty(form)
+  const canEdit = isSystemAdmin || userUuid === User.getUuid(user)
 
   useEffect(() => {
     const fetchAndSetUser = async () => {
@@ -59,6 +61,14 @@ const UserPasswordChange = () => {
     } else {
       setState((statePrev) => ({ ...statePrev, validation: validationUpdated }))
     }
+  }
+
+  if (!canEdit) {
+    return (
+      <div className="user-change-password">
+        {i18n.t('userPasswordChangeView.notAuthorizedToChangePasswordOfAnotherUser')}
+      </div>
+    )
   }
 
   return (
