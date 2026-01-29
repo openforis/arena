@@ -19,7 +19,7 @@ export default class FilesImportJob extends Job {
   }
 
   async execute() {
-    const { surveyId } = this.context
+    const { surveyId, skipMissingFiles = false } = this.context
     const filesSummaries = await this.fetchFilesSummaries()
 
     await this.checkFileUuidsAreValid(filesSummaries)
@@ -38,6 +38,9 @@ export default class FilesImportJob extends Job {
         const fileUuid = RecordFile.getUuid(fileSummary)
         const fileName = RecordFile.getName(fileSummary)
         const fileContent = await this.fetchFileContent({ fileName, fileUuid })
+        if (!fileContent && !skipMissingFiles) {
+          throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
+        }
         if (fileContent) {
           file = RecordFile.assocContent(fileContent)(file)
 
@@ -63,8 +66,7 @@ export default class FilesImportJob extends Job {
     return ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
   }
 
-  // eslint-disable-next-line no-unused-vars
-  async fetchFileContent({ fileName, fileUuid }) {
+  async fetchFileContent({ fileName: _fileName, fileUuid }) {
     const { arenaSurveyFileZip } = this.context
     return ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
   }
