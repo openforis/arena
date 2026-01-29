@@ -14,7 +14,7 @@ const isEmpty = (form) => Object.values(keys).every((key) => Objects.isEmpty(for
 
 const getOldPassword = A.propOr('', keys.oldPassword)
 const getNewPassword = A.propOr('', keys.newPassword)
-const getUserUuid = A.propOr('', keys.userUuid)
+const getUserUuid = A.prop(keys.userUuid)
 
 export const UserPasswordChangeForm = {
   keys,
