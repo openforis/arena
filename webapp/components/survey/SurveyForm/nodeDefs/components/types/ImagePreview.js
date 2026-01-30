@@ -65,7 +65,9 @@ export const ImagePreview = ({ path, onLoadComplete = null, file = null }) => {
   return (
     <div className="survey-form__node-def-file__preview-image">
       {loading && <LoadingBar />}
-      {!error && <img ref={imgRef} onLoad={onLoad} style={{ display: loading ? 'none' : 'block' }} onError={onError} />}
+      {!error && (
+        <img ref={imgRef} alt="" onLoad={onLoad} style={{ display: loading ? 'none' : 'block' }} onError={onError} />
+      )}
       {error && (
         <span className="icon error icon-warning" title={i18n.t('surveyForm:nodeDefFile.errorLoadingPreview')} />
       )}
