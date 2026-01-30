@@ -62,7 +62,7 @@ export const useAccessRequest = () => {
       if (error) {
         const errorMessage = i18n.t(error, errorParams)
         dispatch(NotificationActions.notifyError({ key: 'accessRequestView.error', params: { error: errorMessage } }))
-        reCaptchaRef.current.reset()
+        reCaptchaRef.current?.reset()
       } else {
         setRequestSentSuccessfully(true)
       }
