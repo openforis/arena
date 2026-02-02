@@ -46,7 +46,7 @@ export const run = async () => {
   app.use('/guest{/*path}', express.static(dist))
   const imgDir = `${arenaRoot}/web-resources/img`
   app.use('/img', express.static(imgDir))
-  app.use('/noHeader', express.static(dist))
+  app.use('/noHeader{/*path}', express.static(dist))
 
   // ====== APIs
   authApi.init(app)
