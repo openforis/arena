@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import { db } from '@server/db/db'
 
 // Reset password expires in 7 days (168 hours)
-const expiredCondition = `date_created < NOW() - INTERVAL '168 HOURS'`
+const expiredCondition = `date_created < (NOW() - INTERVAL '7 days')`
 
 export const insertOrUpdateResetPassword = async (userUuid, client = db) =>
   await client.one(
