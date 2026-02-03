@@ -51,9 +51,11 @@ const _getRStudioCode = ({
 
   // Cleanup workspace (only remote instance)
   if (!isLocal) {
-    lines.push('rm(list = ls(all.names = TRUE));')
-    lines.push('unlink("./*", recursive = TRUE, force = TRUE);')
-    lines.push('unlink(".Rprofile", force = TRUE);')
+    lines.push(
+      'rm(list = ls(all.names = TRUE));',
+      'unlink("./*", recursive = TRUE, force = TRUE);',
+      'unlink(".Rprofile", force = TRUE);'
+    )
   }
 
   // Set working directory for local instance
@@ -62,22 +64,19 @@ const _getRStudioCode = ({
   }
 
   // Download and extract the script
-  lines.push(`url <- "${scriptUrl}";`)
-  lines.push(`download.file(url,"${zipFile}"${isLocal ? ', mode="wb"' : ''});`)
+  lines.push(`url <- "${scriptUrl}";`, `download.file(url,"${zipFile}"${isLocal ? ', mode="wb"' : ''});`)
 
   if (isLocal) {
     lines.push(`dir.create("${localDir}", mode="0777", recursive=TRUE);`)
   }
 
-  lines.push(`unzip("${zipFile}", exdir="${isLocal ? localDir : '.'}");`)
-  lines.push(`file.remove("${zipFile}");`)
+  lines.push(`unzip("${zipFile}", exdir="${isLocal ? localDir : '.'}");`, `file.remove("${zipFile}");`)
 
   // Open the project or navigate to files
   if (isLocal) {
     lines.push(`rstudioapi::openProject('${localDir}');`)
   } else {
-    lines.push('rstudioapi::navigateToFile("arena.R");')
-    lines.push('rstudioapi::filesPaneNavigate(getwd());')
+    lines.push('rstudioapi::navigateToFile("arena.R");', 'rstudioapi::filesPaneNavigate(getwd());')
   }
 
   return lines.join('\r\n')
