@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 import axios from 'axios'
 import * as ProcessUtils from '@core/processUtils'
 import * as Chain from '@common/analysis/chain'
@@ -63,7 +62,12 @@ const _getRStudioCode = ({
   ${isLocal ? `dir.create("${localDir}", mode="0777", recursive=TRUE);\r\n` : ''}
   unzip("${zipFile}", exdir="${isLocal ? localDir : '.'}");\r\n
   file.remove("${zipFile}");\r\n
-  ${isLocal ? `rstudioapi::openProject('${localDir}');` : 'rstudioapi::navigateToFile("arena.R")'}\r\n
+  ${
+    isLocal
+      ? `rstudioapi::openProject('${localDir}');`
+      : `rstudioapi::navigateToFile("arena.R");\r\n
+  rstudioapi::filesPaneNavigate(getwd());`
+  }\r\n
   `
 }
 
