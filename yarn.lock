@@ -3867,9 +3867,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^1.0.83":
-  version: 1.0.83
-  resolution: "@openforis/arena-core@npm:1.0.83::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.0.83%2Fc207982b1e0bc3dd75381a9da516c38a4dc161d1"
+"@openforis/arena-core@npm:^1.0.84":
+  version: 1.0.84
+  resolution: "@openforis/arena-core@npm:1.0.84::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.0.84%2F34f862e2e4a72fa665a127dea347a6c95cc61990"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     bignumber.js: "npm:^9.3.1"
@@ -3881,16 +3881,16 @@ __metadata:
     moment: "npm:^2.30.1"
     proj4: "npm:^2.19.10"
     uuid: "npm:^11.0.3"
-  checksum: 10c0/d3c0f82a462492f6cc0cf351ca11552f9791007d476a6e32ac7603a53dd3e80616ddfa1f0c649166c22fcde17a6c9247b291e2957627995d4ed23b3a55a76c2b
+  checksum: 10c0/09c90fbd7a87ddebb2223687bd5a0bbf402d7b6a8b166743964648211a58e441bd554cff07b38800a0f53cd28849d6b2ccc5697a037a8d7142ffd51b736c259b
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^1.2.9":
-  version: 1.2.9
-  resolution: "@openforis/arena-server@npm:1.2.9::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.2.9%2F1949b4e0ebeafdce7396751ececd54f9dd17dc43"
+"@openforis/arena-server@npm:^1.2.10":
+  version: 1.2.10
+  resolution: "@openforis/arena-server@npm:1.2.10::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.2.10%2Fd1c0b12d2bb299f127ef5101ef96c0f08f081f39"
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^1.0.83"
+    "@openforis/arena-core": "npm:^1.0.84"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.1"
     cookie-parser: "npm:^1.4.7"
@@ -3898,15 +3898,16 @@ __metadata:
     db-migrate-pg: "npm:^1.5.2"
     express: "npm:^5.2.1"
     express-fileupload: "npm:^1.5.2"
+    express-rate-limit: "npm:^8.2.1"
     jsonwebtoken: "npm:^9.0.3"
     lodash.throttle: "npm:^4.1.1"
     log4js: "npm:^6.9.1"
     passport: "npm:^0.7.0"
     passport-jwt: "npm:^4.0.1"
     passport-local: "npm:^1.0.0"
-    pg-promise: "npm:^12.3.0"
+    pg-promise: "npm:^12.6.0"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/b576a70708dc91f8d831e2bcbac59c39e36e5f431753f9373dfba44c02046d57098f0250e8552affd4cb164b0c61144b95ad0616a43f41a97b6af947c56141af
+  checksum: 10c0/7483f3b0422306260c2548388ff90492eb4a26d6b1765412850c216e446c6c8f204eddc9e397128daf7d31cc2f6792e2a1f17c467c9700d2591e8d0302acd834
   languageName: node
   linkType: hard
 
@@ -10525,6 +10526,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"express-rate-limit@npm:^8.2.1":
+  version: 8.2.1
+  resolution: "express-rate-limit@npm:8.2.1"
+  dependencies:
+    ip-address: "npm:10.0.1"
+  peerDependencies:
+    express: ">= 4.11"
+  checksum: 10c0/54185f211c25655382436b8ad1a2136df0d5dc88f4d9d4438ca7cbc87cef0cd34cb01b8fc62d290445326aa6581470d2ff44502c3f1a34a5ed2c2ce56809fa01
+  languageName: node
+  linkType: hard
+
 "express@npm:^4.22.1":
   version: 4.22.1
   resolution: "express@npm:4.22.1"
@@ -12148,6 +12160,13 @@ __metadata:
   version: 3.1.1
   resolution: "interpret@npm:3.1.1"
   checksum: 10c0/6f3c4d0aa6ec1b43a8862375588a249e3c917739895cbe67fe12f0a76260ea632af51e8e2431b50fbcd0145356dc28ca147be08dbe6a523739fd55c0f91dc2a5
+  languageName: node
+  linkType: hard
+
+"ip-address@npm:10.0.1":
+  version: 10.0.1
+  resolution: "ip-address@npm:10.0.1"
+  checksum: 10c0/1634d79dae18394004775cb6d699dc46b7c23df6d2083164025a2b15240c1164fccde53d0e08bd5ee4fc53913d033ab6b5e395a809ad4b956a940c446e948843
   languageName: node
   linkType: hard
 
@@ -15344,7 +15363,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
-    "@openforis/arena-server": "npm:^1.2.9"
+    "@openforis/arena-server": "npm:^1.2.10"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
@@ -15940,17 +15959,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-cloudflare@npm:^1.2.7, pg-cloudflare@npm:^1.3.0":
+"pg-cloudflare@npm:^1.3.0":
   version: 1.3.0
   resolution: "pg-cloudflare@npm:1.3.0"
   checksum: 10c0/b0866c88af8e54c7b3ed510719d92df37714b3af5e3a3a10d9f761fcec99483e222f5b78a1f2de590368127648087c45c01aaf66fadbe46edb25673eedc4f8fc
   languageName: node
   linkType: hard
 
-"pg-connection-string@npm:^2.10.1, pg-connection-string@npm:^2.9.1":
+"pg-connection-string@npm:^2.10.1":
   version: 2.10.1
   resolution: "pg-connection-string@npm:2.10.1"
   checksum: 10c0/f218a72b59c661022caca9a7f2116655632b1d7e7d6dc9a8ee9f238744e0927e0d6f44e12f50d9767c6d9cd47d9b3766aa054b77504b15c6bf503400530e053e
+  languageName: node
+  linkType: hard
+
+"pg-connection-string@npm:^2.11.0":
+  version: 2.11.0
+  resolution: "pg-connection-string@npm:2.11.0"
+  checksum: 10c0/7a4bcf9b4f1e1fee6482e2bd814f544d451240059be6b8a186f24f73f163f1c599bb8c4984c398254869f744f6c3659b83e285c3d525fc640e99c60c453bd0df
   languageName: node
   linkType: hard
 
@@ -15977,7 +16003,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-pool@npm:^3.10.1, pg-pool@npm:^3.11.0":
+"pg-pool@npm:^3.11.0":
   version: 3.11.0
   resolution: "pg-pool@npm:3.11.0"
   peerDependencies:
@@ -15986,21 +16012,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-promise@npm:^12.3.0":
-  version: 12.3.0
-  resolution: "pg-promise@npm:12.3.0"
+"pg-promise@npm:^12.6.0":
+  version: 12.6.0
+  resolution: "pg-promise@npm:12.6.0"
   dependencies:
     assert-options: "npm:0.8.3"
-    pg: "npm:8.16.3"
+    pg: "npm:8.18.0"
     pg-minify: "npm:1.8.0"
     spex: "npm:4.1.0"
   peerDependencies:
-    pg-query-stream: 4.10.3
-  checksum: 10c0/e170ffa741e3849672cdc8733ddf24c80a900744988f390e324b104ac3da553d6d4adc2cd81078250b6e59d923692958ead243f5ed04c1cccfcf76e4660195a0
+    pg-query-stream: 4.12.0
+  checksum: 10c0/aa8e8c20ca0c02b8acf06acae2bdb3e124ec97bf3e27a8e78667807cf2545774ef59862b3d3dd34691c02155127b3ac4a9c853f0936b2e1cc51a9d68419a8455
   languageName: node
   linkType: hard
 
-"pg-protocol@npm:^1.10.3, pg-protocol@npm:^1.11.0":
+"pg-protocol@npm:^1.11.0":
   version: 1.11.0
   resolution: "pg-protocol@npm:1.11.0"
   checksum: 10c0/93e83581781418c9173eba4e4545f73392cfe66b78dd1d3624d7339fbd37e7f4abebaf2615e68e0701a9bf0edf5b81a4ad533836f388f775fe25fa24a691c464
@@ -16031,14 +16057,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg@npm:8.16.3":
-  version: 8.16.3
-  resolution: "pg@npm:8.16.3"
+"pg@npm:8.18.0":
+  version: 8.18.0
+  resolution: "pg@npm:8.18.0"
   dependencies:
-    pg-cloudflare: "npm:^1.2.7"
-    pg-connection-string: "npm:^2.9.1"
-    pg-pool: "npm:^3.10.1"
-    pg-protocol: "npm:^1.10.3"
+    pg-cloudflare: "npm:^1.3.0"
+    pg-connection-string: "npm:^2.11.0"
+    pg-pool: "npm:^3.11.0"
+    pg-protocol: "npm:^1.11.0"
     pg-types: "npm:2.2.0"
     pgpass: "npm:1.0.5"
   peerDependencies:
@@ -16049,7 +16075,7 @@ __metadata:
   peerDependenciesMeta:
     pg-native:
       optional: true
-  checksum: 10c0/a6a407ff0efb7599760d72ffdcda47a74c34c0fd71d896623caac45cf2cfb0f49a10973cce23110f182b9810639a1e9f6904454d7358c7001574ee0ffdcbce2a
+  checksum: 10c0/9525e34d603ee5d715b8952269b2fa9fdd350a55fc5a3360104e7613724441858e57d52eed435fb16e993d028b45d8175dc277d270d31f69e5746987a549f772
   languageName: node
   linkType: hard
 
