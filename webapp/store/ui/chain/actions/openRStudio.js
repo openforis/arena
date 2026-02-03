@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 import axios from 'axios'
 import * as ProcessUtils from '@core/processUtils'
 import * as Chain from '@common/analysis/chain'
@@ -48,23 +47,39 @@ const _getRStudioCode = ({
   const localDir = `./arena/arena-${Survey.getName(surveyInfo)}-${DateUtils.nowFormatDefault()}`
   const zipFile = `./${token}.zip`
 
-  return `
-  ${
-    // cleanup workspace (only remote instance)
-    isLocal
-      ? ''
-      : `rm(list = ls(all.names = TRUE));\r\n
-  unlink("./*", recursive = TRUE, force = TRUE);\r\n
-  unlink(".Rprofile", force = TRUE);\r\n`
+  const lines = []
+
+  // Cleanup workspace (only remote instance)
+  if (!isLocal) {
+    lines.push(
+      'rm(list = ls(all.names = TRUE));',
+      'unlink("./*", recursive = TRUE, force = TRUE);',
+      'unlink(".Rprofile", force = TRUE);'
+    )
   }
-  ${isLocal ? `setwd(Sys.getenv("HOME"));` : ''}\r\n
-  url <- "${scriptUrl}";\r\n
-  download.file(url,"${zipFile}" ${isLocal ? `, mode="wb"` : ''});\r\n
-  ${isLocal ? `dir.create("${localDir}", mode="0777", recursive=TRUE);\r\n` : ''}
-  unzip("${zipFile}", exdir="${isLocal ? localDir : '.'}");\r\n
-  file.remove("${zipFile}");\r\n
-  ${isLocal ? `rstudioapi::openProject('${localDir}');` : 'rstudioapi::navigateToFile("arena.R")'}\r\n
-  `
+
+  // Set working directory for local instance
+  if (isLocal) {
+    lines.push('setwd(Sys.getenv("HOME"));')
+  }
+
+  // Download and extract the script
+  lines.push(`url <- "${scriptUrl}";`, `download.file(url,"${zipFile}"${isLocal ? ', mode="wb"' : ''});`)
+
+  if (isLocal) {
+    lines.push(`dir.create("${localDir}", mode="0777", recursive=TRUE);`)
+  }
+
+  lines.push(`unzip("${zipFile}", exdir="${isLocal ? localDir : '.'}");`, `file.remove("${zipFile}");`)
+
+  // Open the project or navigate to files
+  if (isLocal) {
+    lines.push(`rstudioapi::openProject('${localDir}');`)
+  } else {
+    lines.push('rstudioapi::navigateToFile("arena.R");', 'rstudioapi::filesPaneNavigate(getwd());')
+  }
+
+  return lines.join('\r\n')
 }
 
 const _copyRStudioCode = async ({ rStudioCode }) => copyToClipboard(rStudioCode)
