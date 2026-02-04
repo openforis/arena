@@ -1,0 +1,1 @@
+export { UserTwoFactorDevice } from './userTwoFactorDevice'
