@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
 import { UserTwoFactorDevice } from '@core/userTwoFactorDevice'
 import * as Validation from '@core/validation/validation'
@@ -14,6 +14,7 @@ import { Button, ButtonSave } from '@webapp/components'
 export const UserTwoFactorDeviceDetails = () => {
   const { deviceUuid } = useParams()
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const device = useUserTwoFactorDevice()
   const validation = Validation.getValidation(device)
   const deviceName = UserTwoFactorDevice.getDeviceName(device)
@@ -22,6 +23,9 @@ export const UserTwoFactorDeviceDetails = () => {
     if (deviceUuid) {
       dispatch(UserTwoFactorDeviceActions.fetchUserTwoFactorDevice({ uuid: deviceUuid }))
     } else {
+      dispatch({ type: UserTwoFactorDeviceActionTypes.USER_TWO_FACTOR_DEVICE_RESET })
+    }
+    return () => {
       dispatch({ type: UserTwoFactorDeviceActionTypes.USER_TWO_FACTOR_DEVICE_RESET })
     }
   }, [dispatch, deviceUuid])
@@ -37,12 +41,12 @@ export const UserTwoFactorDeviceDetails = () => {
   )
 
   const onBackClick = useCallback(() => {
-    window.history.back()
+    globalThis.history.back()
   }, [])
 
   const onSendClick = useCallback(() => {
     dispatch(UserTwoFactorDeviceActions.addUserTwoFactorDevice({ navigate, deviceName }))
-  }, [dispatch, deviceName])
+  }, [dispatch, deviceName, navigate])
 
   if (deviceUuid && !device) {
     return '...'

@@ -9,7 +9,7 @@ export const addUserTwoFactorDevice =
   async (_dispatch, _getState) => {
     const { data: device } = await axios.post('/api/2fa/device/add', { deviceName })
 
-    navigate(`${appModuleUri(userTwoFactorDeviceModules.userTwoFactorDevice)}/${device.uuid}/`)
+    navigate(`${appModuleUri(userTwoFactorDeviceModules.userTwoFactorDevice)}/${device.uuid}`)
   }
 
 export const fetchUserTwoFactorDevice =
