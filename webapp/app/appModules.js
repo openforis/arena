@@ -203,6 +203,14 @@ export const userModules = {
     key: 'userPasswordChange',
     path: 'userPasswordChange',
   },
+  userTwoFactorDevices: {
+    key: 'userTwoFactorDevice_plural',
+    path: '2fa-devices',
+  },
+  userTwoFactorDevice: {
+    key: 'userTwoFactorDevice',
+    path: '2fa-device',
+  },
   userInvite: {
     key: 'userInvite',
     path: 'userInvite',
