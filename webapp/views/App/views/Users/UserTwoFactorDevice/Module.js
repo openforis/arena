@@ -11,11 +11,11 @@ const UserTwoFactorDeviceModule = () => {
   return (
     <ModuleSwitch
       moduleRoot={appModules.users}
-      moduleDefault={userModules.userTwoFactorDevices}
+      moduleDefault={userTwoFactorDeviceModules.userTwoFactorDeviceList}
       modules={[
         {
           component: UserTwoFactorDeviceList,
-          path: userModules.userTwoFactorDevices.path,
+          path: userTwoFactorDeviceModules.userTwoFactorDeviceList.path,
         },
         {
           component: UserTwoFactorDeviceDetails,

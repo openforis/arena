@@ -245,9 +245,13 @@ export const analysisModules = {
 }
 
 export const userTwoFactorDeviceModules = {
+  userTwoFactorDeviceList: {
+    key: 'userTwoFactorDeviceList',
+    path: 'list',
+  },
   userTwoFactorDevice: {
-    key: 'userTwoFactorDevice',
-    path: '2fa-device',
+    key: 'userTwoFactorDeviceDetails',
+    path: 'details',
   },
 }
 

@@ -13,11 +13,9 @@ export const addUserTwoFactorDevice =
   }
 
 export const fetchUserTwoFactorDevice =
-  ({ uuid }) =>
+  ({ deviceUuid }) =>
   async (dispatch) => {
-    const {
-      data: { device },
-    } = await axios.get(`/api/2fa/device/${uuid}`)
+    const { data: device } = await axios.get(`/api/2fa/device/${deviceUuid}`)
 
     dispatch({ type: UserTwoFactorDeviceActionTypes.USER_TWO_FACTOR_DEVICE_UPDATE, device })
   }

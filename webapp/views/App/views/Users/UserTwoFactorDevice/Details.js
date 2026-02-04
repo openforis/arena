@@ -12,7 +12,7 @@ import { useUserTwoFactorDevice } from '@webapp/store/user2fa/hooks'
 import { Button, ButtonSave } from '@webapp/components'
 
 export const UserTwoFactorDeviceDetails = () => {
-  const { deviceUuid } = useParams()
+  const { uuid: deviceUuid } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const device = useUserTwoFactorDevice()
@@ -21,7 +21,7 @@ export const UserTwoFactorDeviceDetails = () => {
 
   useEffect(() => {
     if (deviceUuid) {
-      dispatch(UserTwoFactorDeviceActions.fetchUserTwoFactorDevice({ uuid: deviceUuid }))
+      dispatch(UserTwoFactorDeviceActions.fetchUserTwoFactorDevice({ deviceUuid }))
     } else {
       dispatch({ type: UserTwoFactorDeviceActionTypes.USER_TWO_FACTOR_DEVICE_RESET })
     }
