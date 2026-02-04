@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { appModuleUri, userModules } from '@webapp/app/appModules'
+import { appModuleUri, userTwoFactorDeviceModules } from '@webapp/app/appModules'
 
 import { UserTwoFactorDeviceActionTypes } from './actionTypes'
 
@@ -9,7 +9,7 @@ export const addUserTwoFactorDevice =
   async (_dispatch, _getState) => {
     const { data: device } = await axios.post('/api/2fa/device/add')
 
-    navigate(`${appModuleUri(userModules.userTwoFactorDevice)}/${device.uuid}/`)
+    navigate(`${appModuleUri(userTwoFactorDeviceModules.userTwoFactorDevice)}/${device.uuid}/`)
   }
 
 export const fetchUserTwoFactorDevice =

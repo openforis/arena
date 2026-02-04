@@ -2,15 +2,13 @@ import React, { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
 import { ButtonNew } from '@webapp/components'
-import { appModules, userModules } from '@webapp/app/appModules'
+import { appModuleUri, userTwoFactorDeviceModules } from '@webapp/app/appModules'
 
 const UserTwoFactorDeviceHeaderLeft = () => {
   const navigate = useNavigate()
 
   const navigateToUserTwoFactorDeviceEditForm = useCallback(() => {
-    navigate(
-      `${appModules.users.path}/${userModules.userTwoFactorDevices.path}/${userModules.userTwoFactorDevice.path}`
-    )
+    navigate(appModuleUri(userTwoFactorDeviceModules.userTwoFactorDevice))
   }, [navigate])
 
   return <ButtonNew onClick={navigateToUserTwoFactorDeviceEditForm} />

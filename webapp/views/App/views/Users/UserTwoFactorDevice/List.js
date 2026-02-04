@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
 import Table from '@webapp/components/Table'
-import { appModuleUri, userModules } from '@webapp/app/appModules'
+import { appModuleUri, userTwoFactorDeviceModules } from '@webapp/app/appModules'
 
 import { useUserTwoFactorDeviceColumns } from './useColumns'
 import UserTwoFactorDeviceHeaderLeft from './HeaderLeft'
@@ -12,7 +12,7 @@ export const UserTwoFactorDeviceList = () => {
   const columns = useUserTwoFactorDeviceColumns()
   const onRowClick = useCallback(
     (item) => {
-      navigate(`${appModuleUri(userModules.userTwoFactorDevice)}${item.uuid}`)
+      navigate(`${appModuleUri(userTwoFactorDeviceModules.userTwoFactorDevice)}${item.uuid}`)
     },
     [navigate]
   )

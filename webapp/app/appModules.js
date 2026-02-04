@@ -207,10 +207,6 @@ export const userModules = {
     key: 'userTwoFactorDevice_plural',
     path: '2fa-devices',
   },
-  userTwoFactorDevice: {
-    key: 'userTwoFactorDevice',
-    path: '2fa-device',
-  },
   userInvite: {
     key: 'userInvite',
     path: 'userInvite',
@@ -245,6 +241,13 @@ export const analysisModules = {
   instances: {
     key: 'instances',
     path: 'instances',
+  },
+}
+
+export const userTwoFactorDeviceModules = {
+  userTwoFactorDevice: {
+    key: 'userTwoFactorDevice',
+    path: '2fa-device',
   },
 }
 
@@ -299,6 +302,8 @@ const _getModuleParentPathParts = (module) => {
   if (Object.values(userModules).includes(module)) return _getModulePathParts(appModules.users)
   if (Object.values(analysisModules).includes(module)) return _getModulePathParts(appModules.analysis)
   if (Object.values(messageModules).includes(module)) return _getModulePathParts(appModules.messages)
+  if (Object.values(userTwoFactorDeviceModules).includes(module))
+    return _getModulePathParts(userModules.userTwoFactorDevices)
   if (Object.values(helpModules).includes(module)) return _getModulePathParts(appModules.help)
 
   throw new Error(`Parent path not found for module ${module?.path}`)

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { appModules, userModules } from '@webapp/app/appModules'
+import { appModules, userModules, userTwoFactorDeviceModules } from '@webapp/app/appModules'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
@@ -19,7 +19,7 @@ const UserTwoFactorDeviceModule = () => {
         },
         {
           component: UserTwoFactorDeviceDetails,
-          path: `${userModules.userTwoFactorDevice.path}/:uuid?`,
+          path: `${userTwoFactorDeviceModules.userTwoFactorDevice.path}/:uuid?`,
         },
       ]}
     />
