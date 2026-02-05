@@ -1,39 +1,37 @@
 import React, { useMemo } from 'react'
 
+import { UserTwoFactorDevice } from '@core/userTwoFactorDevice'
 import * as DateUtils from '@core/dateUtils'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
-import { useI18n } from '@webapp/store/system'
 
 export const useUserTwoFactorDeviceColumns = () => {
-  const i18n = useI18n()
-
   return useMemo(
     () => [
       {
         key: 'deviceName',
         header: 'userTwoFactorDevice:deviceName',
-        renderItem: ({ item }) => <LabelWithTooltip label={item.deviceName} />,
+        renderItem: ({ item }) => <LabelWithTooltip label={UserTwoFactorDevice.getDeviceName(item)} />,
       },
       {
         key: 'enabled',
         header: 'userTwoFactorDevice:enabled',
-        renderItem: ({ item }) => i18n.t(`userTwoFactorDevice:enabled.${item.enabled}`),
+        renderItem: ({ item }) => UserTwoFactorDevice.isEnabled(item) && <span className="icon icon-checkmark" />,
         width: '7rem',
       },
       {
         key: 'date-created',
         header: 'common.dateCreated',
         width: '12rem',
-        renderItem: ({ item }) => DateUtils.convertDateTimeFromISOToDisplay(item.dateCreated),
+        renderItem: ({ item }) => DateUtils.convertDateTimeFromISOToDisplay(UserTwoFactorDevice.getDateCreated(item)),
       },
       {
         key: 'date-modified',
         header: 'common.dateLastModified',
         width: '12rem',
-        renderItem: ({ item }) => DateUtils.convertDateTimeFromISOToDisplay(item.dateModified),
+        renderItem: ({ item }) => DateUtils.convertDateTimeFromISOToDisplay(UserTwoFactorDevice.getDateModified(item)),
       },
     ],
-    [i18n]
+    []
   )
 }

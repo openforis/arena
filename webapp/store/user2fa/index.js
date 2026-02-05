@@ -1,3 +1,5 @@
+export { UserTwoFactorDeviceActionTypes } from './actionTypes'
 export * as UserTwoFactorDeviceActions from './actions'
+export { useUserTwoFactorDevice } from './hooks'
 export { default as UserTwoFactorDeviceReducer } from './reducer'
 export { UserTwoFactorDeviceState } from './state'

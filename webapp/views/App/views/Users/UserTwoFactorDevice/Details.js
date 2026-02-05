@@ -6,10 +6,14 @@ import { UserTwoFactorDevice } from '@core/userTwoFactorDevice'
 import * as Validation from '@core/validation/validation'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { UserTwoFactorDeviceActions } from '@webapp/store/user2fa'
-import { UserTwoFactorDeviceActionTypes } from '@webapp/store/user2fa/actionTypes'
-import { useUserTwoFactorDevice } from '@webapp/store/user2fa/hooks'
 import { Button, ButtonSave } from '@webapp/components'
+
+import {
+  UserTwoFactorDeviceActions,
+  UserTwoFactorDeviceActionTypes,
+  useUserTwoFactorDevice,
+} from '@webapp/store/user2fa'
+import i18n from '@core/i18n/i18nFactory'
 
 export const UserTwoFactorDeviceDetails = () => {
   const { uuid: deviceUuid } = useParams()
@@ -44,7 +48,7 @@ export const UserTwoFactorDeviceDetails = () => {
     globalThis.history.back()
   }, [])
 
-  const onSendClick = useCallback(() => {
+  const onCreateClick = useCallback(() => {
     dispatch(UserTwoFactorDeviceActions.addUserTwoFactorDevice({ navigate, deviceName }))
   }, [dispatch, deviceName, navigate])
 
@@ -62,13 +66,28 @@ export const UserTwoFactorDeviceDetails = () => {
         />
       </FormItem>
 
+      <ol>
+        <li>
+          <h3>{i18n.t('userTwoFactorDeviceView:steps.installAuthenticatorApp.title')}</h3>
+          <p>{i18n.t('userTwoFactorDeviceView:steps.installAuthenticatorApp.description')}</p>
+        </li>
+        <li>
+          <h3>{i18n.t('userTwoFactorDeviceView:steps.scanCode.title')}</h3>
+          <p>{i18n.t('userTwoFactorDeviceView:steps.scanCode.description')}</p>
+        </li>
+        <li>
+          <h3>{i18n.t('userTwoFactorDeviceView:steps.typeAuthenticatorCodes.title')}</h3>
+          <p>{i18n.t('userTwoFactorDeviceView:steps.typeAuthenticatorCodes.description')}</p>
+        </li>
+      </ol>
+
       <div className="button-bar">
         <Button label="common.back" onClick={onBackClick} variant="outlined" />
         <ButtonSave
           className="save-btn"
           disabled={Validation.isNotValid(validation)}
           label="userTwoFactorDeviceView:create.label"
-          onClick={onSendClick}
+          onClick={onCreateClick}
         />
       </div>
     </div>
