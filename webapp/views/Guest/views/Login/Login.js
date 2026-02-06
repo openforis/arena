@@ -15,6 +15,7 @@ import Error from '@webapp/views/Guest/Error'
 import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 import { Input } from '@webapp/components/form/Input'
+import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
 const { ViewState } = LoginState
 
@@ -67,12 +68,15 @@ const Login = () => {
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
       {viewState === ViewState.askTwoFactorToken && (
-        <Input
-          label="loginView.twoFactorToken"
-          name={FormFields.twoFactorToken}
-          onChange={onChangeTwoFactorToken}
-          value={formObject.twoFactorToken}
-        />
+        <>
+          <div className="two-factor-token-description">{i18n.t('loginView.twoFactorTokenDescription')}</div>
+          <SimpleTextInput
+            label="loginView.twoFactorToken"
+            name={FormFields.twoFactorToken}
+            onChange={onChangeTwoFactorToken}
+            value={formObject.twoFactorToken}
+          />
+        </>
       )}
       {viewState === ViewState.askUsernameAndPassword && (
         <>
@@ -105,7 +109,7 @@ const Login = () => {
         </button>
       </div>
 
-      {allowAccessRequest && (
+      {allowAccessRequest && viewState === ViewState.askUsernameAndPassword && (
         <Link
           className="btn btn-s btn-transparent guest-login__btn-request-access"
           to={appModuleUri(guestModules.accessRequest)}
