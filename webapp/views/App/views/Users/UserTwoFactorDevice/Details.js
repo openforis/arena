@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import axios from 'axios'
 
+import * as StringUtils from '@core/stringUtils'
 import i18n from '@core/i18n/i18nFactory'
 import { UserTwoFactorDevice } from '@core/userTwoFactorDevice'
 import * as Validation from '@core/validation/validation'
@@ -9,10 +10,14 @@ import * as Validation from '@core/validation/validation'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Button, ButtonSave, QRCode } from '@webapp/components'
 import { TooltipNew } from '@webapp/components/TooltipNew'
+import { useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 
 export const UserTwoFactorDeviceDetails = () => {
-  const { uuid: deviceUuid } = useParams()
-  const isNew = !deviceUuid
+  const { uuid: deviceUuidParam } = useParams()
+  const navigate = useNavigate()
+  const notifyInfo = useNotifyInfo()
+  const notifyError = useNotifyError()
+  const isNew = !deviceUuidParam
   const [device, setDevice] = useState(isNew ? {} : null)
   const [authenticatorCodeOne, setAuthenticatorCodeOne] = useState('')
   const [authenticatorCodeTwo, setAuthenticatorCodeTwo] = useState('')
@@ -22,12 +27,13 @@ export const UserTwoFactorDeviceDetails = () => {
   const secret = UserTwoFactorDevice.getSecret(device || {})
   const otpAuthUrl = UserTwoFactorDevice.getOtpAuthUrl(device || {})
   const deviceCreated = !!otpAuthUrl
+  const deviceUuid = deviceUuidParam || UserTwoFactorDevice.getUuid(device)
 
   useEffect(() => {
     let isMounted = true
-    if (deviceUuid) {
+    if (deviceUuidParam) {
       axios
-        .get(`/api/2fa/device/${deviceUuid}`)
+        .get(`/api/2fa/device/${deviceUuidParam}`)
         .then(({ data: fetchedDevice }) => {
           setDevice(fetchedDevice)
         })
@@ -40,12 +46,27 @@ export const UserTwoFactorDeviceDetails = () => {
     return () => {
       isMounted = false
     }
-  }, [deviceUuid])
+  }, [deviceUuidParam])
 
   const onCreateClick = useCallback(async () => {
     const { data: createdDevice } = await axios.post('/api/2fa/device/add', { deviceName })
     setDevice(createdDevice)
   }, [deviceName])
+
+  const onValidateClick = useCallback(async () => {
+    try {
+      await axios.post(`/api/2fa/device/verify`, {
+        deviceUuid,
+        token1: authenticatorCodeOne,
+        token2: authenticatorCodeTwo,
+      })
+      notifyInfo({ key: 'userTwoFactorDeviceView:validation.successful' })
+      // navigate back to the list after successful validation
+      navigate(-1)
+    } catch (error) {
+      notifyError({ key: 'userTwoFactorDeviceView:validation.error', params: { message: error.message } })
+    }
+  }, [deviceUuid, authenticatorCodeOne, authenticatorCodeTwo, notifyInfo, navigate, notifyError])
 
   const onAuthenticatorCodeOneChange = useCallback((value) => {
     setAuthenticatorCodeOne(value)
@@ -63,7 +84,7 @@ export const UserTwoFactorDeviceDetails = () => {
     globalThis.history.back()
   }, [])
 
-  if (deviceUuid && !device) {
+  if (deviceUuidParam && !device) {
     if (error) {
       return <div className="error">{error}</div>
     }
@@ -75,6 +96,7 @@ export const UserTwoFactorDeviceDetails = () => {
       <FormItem label="userTwoFactorDeviceView:deviceName">
         <Input
           onChange={onDeviceNameChange}
+          textTransformFunction={StringUtils.normalizeName}
           value={deviceName}
           validation={Validation.getFieldValidation(UserTwoFactorDevice.keys.deviceName)(validation)}
         />
@@ -110,6 +132,12 @@ export const UserTwoFactorDeviceDetails = () => {
             <FormItem label={i18n.t('userTwoFactorDeviceView:authenticatorCodeTwo')}>
               <Input onChange={onAuthenticatorCodeTwoChange} value={authenticatorCodeTwo} />
             </FormItem>
+            <ButtonSave
+              className="save-btn"
+              disabled={Validation.isNotValid(validation)}
+              label="userTwoFactorDeviceView:validate.label"
+              onClick={onValidateClick}
+            />
           </li>
         </ol>
       )}
