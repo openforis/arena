@@ -289,6 +289,7 @@ const allAppModuleGroups = [
   dataModules,
   userModules,
   analysisModules,
+  userTwoFactorDeviceModules,
   messageModules,
   helpModules,
 ]

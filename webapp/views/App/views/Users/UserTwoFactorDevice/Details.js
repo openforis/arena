@@ -40,7 +40,9 @@ export const UserTwoFactorDeviceDetails = () => {
       axios
         .get(`/api/2fa/device/${deviceUuidParam}`)
         .then(({ data: fetchedDevice }) => {
-          setDevice(fetchedDevice)
+          if (isMounted) {
+            setDevice(fetchedDevice)
+          }
         })
         .catch((error) => {
           if (isMounted) {
@@ -141,15 +143,13 @@ export const UserTwoFactorDeviceDetails = () => {
             <h3>{i18n.t('userTwoFactorDeviceView:steps.scanCode.title')}</h3>
             <p>{i18n.t('userTwoFactorDeviceView:steps.scanCode.description')}</p>
             <p>
-              <div style={{ marginTop: '20px' }}>
-                <h3>{i18n.t('userTwoFactorDeviceView:scanQrCode')}</h3>
-                <div>
-                  <QRCode value={otpAuthUrl} />
-                </div>
-                <TooltipNew title={secret}>
-                  <span>{i18n.t('userTwoFactorDeviceView:showSecretKey')}</span>
-                </TooltipNew>
+              <h3>{i18n.t('userTwoFactorDeviceView:scanQrCode')}</h3>
+              <div>
+                <QRCode value={otpAuthUrl} />
               </div>
+              <TooltipNew title={secret}>
+                <span>{i18n.t('userTwoFactorDeviceView:showSecretKey')}</span>
+              </TooltipNew>
             </p>
           </li>
           <li>
