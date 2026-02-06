@@ -9,12 +9,12 @@ import { appModuleUri, guestModules } from '@webapp/app/appModules'
 
 import { useFormObject } from '@webapp/components/hooks'
 import { EmailInput, PasswordInput } from '@webapp/components/form'
+import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
 import Error from '@webapp/views/Guest/Error'
 
 import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
-import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
 const { ViewState } = LoginState
 
