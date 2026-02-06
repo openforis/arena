@@ -68,10 +68,10 @@ const Login = () => {
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
       {viewState === ViewState.askTwoFactorToken && (
         <Input
-          defaultValue={formObject.twoFactorToken}
-          onChange={onChangeTwoFactorToken}
           label="loginView.twoFactorToken"
           name={FormFields.twoFactorToken}
+          onChange={onChangeTwoFactorToken}
+          value={formObject.twoFactorToken}
         />
       )}
       {viewState === ViewState.askUsernameAndPassword && (
