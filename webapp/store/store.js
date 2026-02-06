@@ -11,7 +11,6 @@ import { LoginReducer, LoginState } from '@webapp/store/login'
 import { SurveyReducer, SurveyState } from '@webapp/store/survey'
 import { UiReducer, UiState } from '@webapp/store/ui'
 import { UserReducer, UserState } from '@webapp/store/user'
-import { UserTwoFactorDeviceReducer, UserTwoFactorDeviceState } from './user2fa'
 
 const appReducers = {
   [DataExplorerState.stateKey]: DataExplorerReducer,
@@ -20,7 +19,6 @@ const appReducers = {
   [UserState.stateKey]: UserReducer,
   [SurveyState.stateKey]: SurveyReducer,
   [UiState.stateKey]: UiReducer,
-  [UserTwoFactorDeviceState.stateKey]: UserTwoFactorDeviceReducer,
 }
 
 const createReducer = (asyncReducers) =>

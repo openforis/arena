@@ -1,65 +1,77 @@
-import React, { useCallback, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import { useNavigate, useParams } from 'react-router'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router'
+import axios from 'axios'
 
+import i18n from '@core/i18n/i18nFactory'
 import { UserTwoFactorDevice } from '@core/userTwoFactorDevice'
 import * as Validation from '@core/validation/validation'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Button, ButtonSave, QRCode } from '@webapp/components'
-
-import {
-  UserTwoFactorDeviceActions,
-  UserTwoFactorDeviceActionTypes,
-  useUserTwoFactorDevice,
-} from '@webapp/store/user2fa'
-import i18n from '@core/i18n/i18nFactory'
-import Tooltip from '@webapp/components/tooltip'
 import { TooltipNew } from '@webapp/components/TooltipNew'
 
 export const UserTwoFactorDeviceDetails = () => {
   const { uuid: deviceUuid } = useParams()
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const device = useUserTwoFactorDevice()
   const isNew = !deviceUuid
-  const validation = Validation.getValidation(device)
-  const deviceName = UserTwoFactorDevice.getDeviceName(device)
-  const secret = UserTwoFactorDevice.getSecret(device)
-  const otpAuthUrl = UserTwoFactorDevice.getOtpAuthUrl(device)
+  const [device, setDevice] = useState(isNew ? {} : null)
+  const [authenticatorCodeOne, setAuthenticatorCodeOne] = useState('')
+  const [authenticatorCodeTwo, setAuthenticatorCodeTwo] = useState('')
+  const [error, setError] = useState(null)
+  const validation = useMemo(() => Validation.getValidation(device || {}), [device])
+  const deviceName = UserTwoFactorDevice.getDeviceName(device || {})
+  const secret = UserTwoFactorDevice.getSecret(device || {})
+  const otpAuthUrl = UserTwoFactorDevice.getOtpAuthUrl(device || {})
   const deviceCreated = !!otpAuthUrl
 
+  const fetchDevice = useCallback(async () => {
+    const { data: fetchedDevice } = await axios.get(`/api/2fa/device/${deviceUuid}`)
+    return fetchedDevice
+  }, [deviceUuid])
+
   useEffect(() => {
+    let isMounted = true
     if (deviceUuid) {
-      dispatch(UserTwoFactorDeviceActions.fetchUserTwoFactorDevice({ deviceUuid }))
-    } else {
-      dispatch({ type: UserTwoFactorDeviceActionTypes.USER_TWO_FACTOR_DEVICE_RESET })
+      fetchDevice()
+        .then((fetchedDevice) => {
+          setDevice(fetchedDevice)
+        })
+        .catch((error) => {
+          if (isMounted) {
+            setError(i18n.t('userTwoFactorDeviceView:error.fetchDevice', { message: error.message }))
+          }
+        })
     }
     return () => {
-      dispatch({ type: UserTwoFactorDeviceActionTypes.USER_TWO_FACTOR_DEVICE_RESET })
+      isMounted = false
     }
-  }, [dispatch, deviceUuid])
+  }, [deviceUuid, fetchDevice])
 
-  const onDeviceNameChange = useCallback(
-    (value) => {
-      dispatch({
-        type: UserTwoFactorDeviceActionTypes.USER_TWO_FACTOR_DEVICE_UPDATE,
-        device: { ...device, [UserTwoFactorDevice.keys.deviceName]: value },
-      })
-    },
-    [device, dispatch]
-  )
+  const onCreateClick = useCallback(async () => {
+    const { data: createdDevice } = await axios.post('/api/2fa/device/add', { deviceName })
+    setDevice(createdDevice)
+  }, [deviceName])
+
+  const onAuthenticatorCodeOneChange = useCallback((value) => {
+    setAuthenticatorCodeOne(value)
+  }, [])
+
+  const onAuthenticatorCodeTwoChange = useCallback((value) => {
+    setAuthenticatorCodeTwo(value)
+  }, [])
+
+  const onDeviceNameChange = useCallback((value) => {
+    setDevice((prevDevice) => ({ ...(prevDevice || {}), [UserTwoFactorDevice.keys.deviceName]: value }))
+  }, [])
 
   const onBackClick = useCallback(() => {
     globalThis.history.back()
   }, [])
 
-  const onCreateClick = useCallback(() => {
-    dispatch(UserTwoFactorDeviceActions.addUserTwoFactorDevice({ navigate, deviceName }))
-  }, [dispatch, deviceName, navigate])
-
   if (deviceUuid && !device) {
-    return '...'
+    if (error) {
+      return <div className="error">{error}</div>
+    }
+    return '...' // fetching device details
   }
 
   return (
@@ -96,6 +108,12 @@ export const UserTwoFactorDeviceDetails = () => {
           <li>
             <h3>{i18n.t('userTwoFactorDeviceView:steps.typeAuthenticatorCodes.title')}</h3>
             <p>{i18n.t('userTwoFactorDeviceView:steps.typeAuthenticatorCodes.description')}</p>
+            <FormItem label={i18n.t('userTwoFactorDeviceView:authenticatorCodeOne')}>
+              <Input onChange={onAuthenticatorCodeOneChange} value={authenticatorCodeOne} />
+            </FormItem>
+            <FormItem label={i18n.t('userTwoFactorDeviceView:authenticatorCodeTwo')}>
+              <Input onChange={onAuthenticatorCodeTwoChange} value={authenticatorCodeTwo} />
+            </FormItem>
           </li>
         </ol>
       )}
