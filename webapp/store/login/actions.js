@@ -7,12 +7,18 @@ import { appModules, appModuleUri } from '@webapp/app/appModules'
 import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 import { AppInfo } from '@core/app/appInfo'
 
+import { ViewState } from './state'
+
 export const loginEmailUpdate = 'login/email/update'
 export const loginErrorUpdate = 'login/error'
+export const loginViewStateUpdate = 'login/viewState/update'
+export const reset = 'login/reset'
 
 export const setEmail = (email) => (dispatch) => dispatch({ type: loginEmailUpdate, email })
-
 export const setLoginError = (message) => (dispatch) => dispatch({ type: loginErrorUpdate, message })
+
+const setViewState = (viewState) => (dispatch) => dispatch({ type: loginViewStateUpdate, viewState })
+const resetState = (dispatch) => dispatch({ type: reset })
 
 const _createAction = (handlerFn) => async (dispatch, getState) => {
   try {
@@ -28,16 +34,17 @@ const _createAction = (handlerFn) => async (dispatch, getState) => {
   }
 }
 
-export const login = (email, password) =>
+export const login = (email, password, twoFactorToken) =>
   _createAction(async (dispatch) => {
     const {
-      data: { message, user, authToken },
-    } = await axios.post('/auth/login', { email, password, appInfo: AppInfo.currentAppInfo })
-
+      data: { message, user, twoFactorRequired, authToken },
+    } = await axios.post('/auth/login', { email, password, twoFactorToken, appInfo: AppInfo.currentAppInfo })
     if (user) {
       ApiConstants.setAuthToken(authToken)
-      dispatch(setEmail(''))
+      dispatch(resetState)
       dispatch(SystemActions.initSystem())
+    } else if (twoFactorRequired) {
+      dispatch(setViewState(ViewState.askTwoFactorToken))
     } else {
       dispatch(setLoginError(message))
     }
