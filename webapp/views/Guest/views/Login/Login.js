@@ -1,5 +1,5 @@
 import './Login.scss'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
@@ -14,7 +14,6 @@ import Error from '@webapp/views/Guest/Error'
 
 import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
-import { Input } from '@webapp/components/form/Input'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
 const { ViewState } = LoginState
@@ -40,7 +39,7 @@ const Login = () => {
     validation,
   } = useFormObject({ email, password: '', twoFactorToken: '' }, LoginValidator.validateLoginObj, true)
 
-  const onClickLogin = () => {
+  const onClickLogin = useCallback(() => {
     if (objectValid) {
       dispatch(LoginActions.login(formObject.email, formObject.password, formObject.twoFactorToken))
     } else {
@@ -48,7 +47,11 @@ const Login = () => {
         LoginActions.setLoginError(LoginValidator.getFirstError(validation, [FormFields.email, FormFields.password]))
       )
     }
-  }
+  }, [objectValid, formObject, validation, dispatch])
+
+  const onClickBack = useCallback(() => {
+    dispatch(LoginActions.setViewState(ViewState.askUsernameAndPassword))
+  }, [dispatch])
 
   const onChangeEmail = (value) => {
     dispatch(LoginActions.setEmail(value))
@@ -104,9 +107,17 @@ const Login = () => {
         </>
       )}
       <div className="guest__buttons">
-        <button type="submit" className="btn" onClick={onClickLogin}>
+        {viewState === ViewState.askTwoFactorToken ? (
+          <button type="button" className="btn back" onClick={onClickBack}>
+            {i18n.t('common.back')}
+          </button>
+        ) : (
+          <span className="spacer" />
+        )}
+        <button type="submit" className="btn login" onClick={onClickLogin}>
           {i18n.t('loginView.login')}
         </button>
+        <span className="spacer" />
       </div>
 
       {allowAccessRequest && viewState === ViewState.askUsernameAndPassword && (

@@ -16,8 +16,8 @@ export const reset = 'login/reset'
 
 export const setEmail = (email) => (dispatch) => dispatch({ type: loginEmailUpdate, email })
 export const setLoginError = (message) => (dispatch) => dispatch({ type: loginErrorUpdate, message })
+export const setViewState = (viewState) => (dispatch) => dispatch({ type: loginViewStateUpdate, viewState })
 
-const setViewState = (viewState) => (dispatch) => dispatch({ type: loginViewStateUpdate, viewState })
 const resetState = (dispatch) => dispatch({ type: reset })
 
 const _createAction = (handlerFn) => async (dispatch, getState) => {
