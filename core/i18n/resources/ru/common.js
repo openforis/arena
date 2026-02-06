@@ -352,6 +352,10 @@ export default {
     login: 'Войти',
     forgotPassword: 'Забыли пароль',
     sendPasswordResetEmail: 'Отправить письмо для сброса пароля',
+    twoFactorToken: 'Код подтверждения',
+    twoFactorTokenDescription: `Чтобы обеспечить безопасность вашей учетной записи, мы подтверждаем вашу личность.
+
+  Введите код, сгенерированный вашим приложением-аутентификатором.`,
   },
 
   accessRequestView: {

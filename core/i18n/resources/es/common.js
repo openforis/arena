@@ -319,6 +319,10 @@ export default {
     login: 'Iniciar sesión',
     forgotPassword: '¿Olvidó su contraseña?',
     sendPasswordResetEmail: 'Enviar correo electrónico de restablecimiento de contraseña',
+    twoFactorToken: 'Código de verificación',
+    twoFactorTokenDescription: `Para mantener su cuenta segura, verificamos su identidad.
+
+  Ingrese el código generado por su aplicación de autenticación.`,
   },
   accessRequestView: {
     error: 'Error al solicitar acceso: {{error}}',

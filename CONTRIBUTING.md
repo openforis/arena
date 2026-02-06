@@ -38,7 +38,7 @@ $ npm login --scope=@OWNER --registry=https://npm.pkg.github.com
 To install local database:
 
 ```shell script
-sudo docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:17.3.5
+sudo docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:17-3.5
 ```
 
 In order to access Arena when it's installed on a remote server, you need to request access to it or being invited to it.

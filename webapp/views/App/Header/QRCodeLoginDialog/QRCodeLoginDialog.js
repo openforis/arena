@@ -1,13 +1,12 @@
 import './QRCodeLoginDialog.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { QRCodeCanvas } from 'qrcode.react'
 import PropTypes from 'prop-types'
 
 import { waitFor } from '@core/promiseUtils'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-import { Button, Markdown, Modal, ModalBody, ModalFooter, Spinner } from '@webapp/components'
+import { Button, Markdown, Modal, ModalBody, ModalFooter, QRCode, Spinner } from '@webapp/components'
 import { useOnWebSocketEvent } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
@@ -113,7 +112,7 @@ export const QRCodeLoginDialog = (props) => {
           <div className="inner-container">
             <div className="qr-code-container">
               {loading && <Spinner />}
-              {qrValue && <QRCodeCanvas value={qrValue} size={200} />}
+              {qrValue && <QRCode value={qrValue} size={200} />}
             </div>
             <Markdown className="instructions" source={i18n.t('header.qrCodeLoginDialog.instructions')} />
           </div>
