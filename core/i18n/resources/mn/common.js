@@ -353,6 +353,10 @@ export default {
     login: 'Нэвтрэх',
     forgotPassword: 'Нууц үг мартсан',
     sendPasswordResetEmail: 'Нууц үг сэргээх имэйл илгээх',
+    twoFactorToken: 'Баталгаажуулах код',
+    twoFactorTokenDescription: `Таны бүртгэлийг аюулгүй байлгахын тулд бид таныг баталгаажуулна.
+
+  Таны баталгаажуулагч апп-аас үүсгэсэн кодыг оруулна уу.`,
   },
 
   accessRequestView: {
