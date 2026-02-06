@@ -23,16 +23,12 @@ export const UserTwoFactorDeviceDetails = () => {
   const otpAuthUrl = UserTwoFactorDevice.getOtpAuthUrl(device || {})
   const deviceCreated = !!otpAuthUrl
 
-  const fetchDevice = useCallback(async () => {
-    const { data: fetchedDevice } = await axios.get(`/api/2fa/device/${deviceUuid}`)
-    return fetchedDevice
-  }, [deviceUuid])
-
   useEffect(() => {
     let isMounted = true
     if (deviceUuid) {
-      fetchDevice()
-        .then((fetchedDevice) => {
+      axios
+        .get(`/api/2fa/device/${deviceUuid}`)
+        .then(({ data: fetchedDevice }) => {
           setDevice(fetchedDevice)
         })
         .catch((error) => {
@@ -44,7 +40,7 @@ export const UserTwoFactorDeviceDetails = () => {
     return () => {
       isMounted = false
     }
-  }, [deviceUuid, fetchDevice])
+  }, [deviceUuid])
 
   const onCreateClick = useCallback(async () => {
     const { data: createdDevice } = await axios.post('/api/2fa/device/add', { deviceName })
