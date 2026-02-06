@@ -1,3 +1,5 @@
+import './Details.scss'
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import axios from 'axios'
@@ -7,14 +9,16 @@ import i18n from '@core/i18n/i18nFactory'
 import { UserTwoFactorDevice } from '@core/userTwoFactorDevice'
 import * as Validation from '@core/validation/validation'
 
-import { FormItem, Input } from '@webapp/components/form/Input'
-import { Button, ButtonSave, QRCode } from '@webapp/components'
+import { Button, ButtonDelete, ButtonSave, QRCode } from '@webapp/components'
 import { TooltipNew } from '@webapp/components/TooltipNew'
-import { useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
+import { Checkbox } from '@webapp/components/form'
+import { FormItem, Input } from '@webapp/components/form/Input'
+import { useConfirmAsync, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 
 export const UserTwoFactorDeviceDetails = () => {
   const { uuid: deviceUuidParam } = useParams()
   const navigate = useNavigate()
+  const confirm = useConfirmAsync()
   const notifyInfo = useNotifyInfo()
   const notifyError = useNotifyError()
   const isNew = !deviceUuidParam
@@ -28,6 +32,7 @@ export const UserTwoFactorDeviceDetails = () => {
   const otpAuthUrl = UserTwoFactorDevice.getOtpAuthUrl(device || {})
   const deviceCreated = !!otpAuthUrl
   const deviceUuid = deviceUuidParam || UserTwoFactorDevice.getUuid(device)
+  const deviceNameEditable = isNew && !deviceCreated
 
   useEffect(() => {
     let isMounted = true
@@ -68,6 +73,23 @@ export const UserTwoFactorDeviceDetails = () => {
     }
   }, [deviceUuid, authenticatorCodeOne, authenticatorCodeTwo, notifyInfo, navigate, notifyError])
 
+  const onDeleteClick = useCallback(async () => {
+    const confirmed = await confirm({
+      key: 'userTwoFactorDeviceView:deletion.confirm',
+      params: { deviceName },
+      okButtonLabel: 'common.delete',
+    })
+    if (!confirmed) return
+    try {
+      await axios.delete(`/api/2fa/device/remove`, { data: { deviceUuid } })
+      notifyInfo({ key: 'userTwoFactorDeviceView:deletion.successful' })
+      // navigate back to the list after successful deletion
+      navigate(-1)
+    } catch (error) {
+      notifyError({ key: 'userTwoFactorDeviceView:deletion.error', params: { message: error.message } })
+    }
+  }, [confirm, deviceName, deviceUuid, notifyInfo, navigate, notifyError])
+
   const onAuthenticatorCodeOneChange = useCallback((value) => {
     setAuthenticatorCodeOne(value)
   }, [])
@@ -81,8 +103,8 @@ export const UserTwoFactorDeviceDetails = () => {
   }, [])
 
   const onBackClick = useCallback(() => {
-    globalThis.history.back()
-  }, [])
+    navigate(-1)
+  }, [navigate])
 
   if (deviceUuidParam && !device) {
     if (error) {
@@ -92,15 +114,22 @@ export const UserTwoFactorDeviceDetails = () => {
   }
 
   return (
-    <div>
+    <div className="user-two-factor-device-details">
       <FormItem label="userTwoFactorDeviceView:deviceName">
         <Input
           onChange={onDeviceNameChange}
+          readOnly={!deviceNameEditable}
           textTransformFunction={StringUtils.normalizeName}
           value={deviceName}
           validation={Validation.getFieldValidation(UserTwoFactorDevice.keys.deviceName)(validation)}
         />
       </FormItem>
+
+      {!isNew && (
+        <FormItem label="userTwoFactorDeviceView:enabled">
+          <Checkbox checked={UserTwoFactorDevice.isEnabled(device)} disabled />
+        </FormItem>
+      )}
 
       {isNew && deviceCreated && (
         <ol>
@@ -127,31 +156,45 @@ export const UserTwoFactorDeviceDetails = () => {
             <h3>{i18n.t('userTwoFactorDeviceView:steps.typeAuthenticatorCodes.title')}</h3>
             <p>{i18n.t('userTwoFactorDeviceView:steps.typeAuthenticatorCodes.description')}</p>
             <FormItem label={i18n.t('userTwoFactorDeviceView:authenticatorCodeOne')}>
-              <Input onChange={onAuthenticatorCodeOneChange} value={authenticatorCodeOne} />
+              <Input
+                className="authenticator-code"
+                onChange={onAuthenticatorCodeOneChange}
+                value={authenticatorCodeOne}
+              />
             </FormItem>
             <FormItem label={i18n.t('userTwoFactorDeviceView:authenticatorCodeTwo')}>
-              <Input onChange={onAuthenticatorCodeTwoChange} value={authenticatorCodeTwo} />
+              <Input
+                className="authenticator-code"
+                onChange={onAuthenticatorCodeTwoChange}
+                value={authenticatorCodeTwo}
+              />
             </FormItem>
-            <ButtonSave
-              className="save-btn"
-              disabled={Validation.isNotValid(validation)}
-              label="userTwoFactorDeviceView:validate.label"
-              onClick={onValidateClick}
-            />
           </li>
         </ol>
       )}
 
       <div className="button-bar">
-        <Button label="common.back" onClick={onBackClick} variant="outlined" />
+        <Button className="back btn" label="common.back" onClick={onBackClick} variant="outlined" />
         {isNew && (
-          <ButtonSave
-            className="save-btn"
-            disabled={Validation.isNotValid(validation)}
-            label="userTwoFactorDeviceView:create.label"
-            onClick={onCreateClick}
-          />
+          <>
+            {deviceCreated ? (
+              <ButtonSave
+                className="save-btn"
+                disabled={Validation.isNotValid(validation)}
+                label="userTwoFactorDeviceView:validate.label"
+                onClick={onValidateClick}
+              />
+            ) : (
+              <ButtonSave
+                className="save-btn"
+                disabled={Validation.isNotValid(validation)}
+                label="userTwoFactorDeviceView:create.label"
+                onClick={onCreateClick}
+              />
+            )}
+          </>
         )}
+        {(!isNew || deviceCreated) && <ButtonDelete onClick={onDeleteClick} />}
       </div>
     </div>
   )
