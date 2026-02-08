@@ -15,19 +15,7 @@ const resources = {
 
 export const defaultLanguage = 'en'
 
-const namespaces = [
-  'auth',
-  'common',
-  'appErrors',
-  'emails',
-  'homeView',
-  'jobs',
-  'messageView',
-  'surveyCreate',
-  'surveyForm',
-  'usersView',
-  'validationErrors',
-]
+const namespaces = Object.keys(enTranslation)
 const defaultNamespace = 'common'
 
 export const supportedLanguages = Object.keys(resources)

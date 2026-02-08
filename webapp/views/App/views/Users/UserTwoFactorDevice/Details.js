@@ -47,7 +47,7 @@ export const UserTwoFactorDeviceDetails = () => {
         })
         .catch((error) => {
           if (isMounted) {
-            setError(i18n.t('userTwoFactorDeviceView:error.fetchDevice', { message: error.message }))
+            setError(i18n.t('userTwoFactorDevice:error.fetchDevice', { message: error.message }))
           }
         })
     } else {
@@ -72,28 +72,28 @@ export const UserTwoFactorDeviceDetails = () => {
         token1: authenticatorCodeOne,
         token2: authenticatorCodeTwo,
       })
-      notifyInfo({ key: 'userTwoFactorDeviceView:validation.successful' })
+      notifyInfo({ key: 'userTwoFactorDevice:validation.successful' })
       // navigate back to the list after successful validation
       navigate(-1)
     } catch (error) {
-      notifyError({ key: 'userTwoFactorDeviceView:validation.error', params: { message: error.message } })
+      notifyError({ key: 'userTwoFactorDevice:validation.error', params: { message: error.message } })
     }
   }, [deviceUuid, authenticatorCodeOne, authenticatorCodeTwo, notifyInfo, navigate, notifyError])
 
   const onDeleteClick = useCallback(async () => {
     const confirmed = await confirm({
-      key: 'userTwoFactorDeviceView:deletion.confirm',
+      key: 'userTwoFactorDevice:deletion.confirm',
       params: { deviceName },
       okButtonLabel: 'common.delete',
     })
     if (!confirmed) return
     try {
       await axios.delete(`/api/2fa/device/remove`, { data: { deviceUuid } })
-      notifyInfo({ key: 'userTwoFactorDeviceView:deletion.successful' })
+      notifyInfo({ key: 'userTwoFactorDevice:deletion.successful' })
       // navigate back to the list after successful deletion
       navigate(-1)
     } catch (error) {
-      notifyError({ key: 'userTwoFactorDeviceView:deletion.error', params: { message: error.message } })
+      notifyError({ key: 'userTwoFactorDevice:deletion.error', params: { message: error.message } })
     }
   }, [confirm, deviceName, deviceUuid, notifyInfo, navigate, notifyError])
 
@@ -128,7 +128,7 @@ export const UserTwoFactorDeviceDetails = () => {
 
   return (
     <div className="user-two-factor-device-details">
-      <FormItem label="userTwoFactorDeviceView:deviceName">
+      <FormItem label="userTwoFactorDevice:deviceName">
         <Input
           onChange={onDeviceNameChange}
           readOnly={!deviceNameEditable}
@@ -138,7 +138,7 @@ export const UserTwoFactorDeviceDetails = () => {
       </FormItem>
 
       {!isNew && (
-        <FormItem label="userTwoFactorDeviceView:enabled">
+        <FormItem label="userTwoFactorDevice:enabled">
           <Checkbox checked={UserTwoFactorDevice.isEnabled(device)} disabled />
         </FormItem>
       )}
@@ -146,33 +146,30 @@ export const UserTwoFactorDeviceDetails = () => {
       {isNew && deviceCreated && (
         <ol>
           <li>
-            <h3>{i18n.t('userTwoFactorDeviceView:steps.installAuthenticatorApp.title')}</h3>
-            <p>{i18n.t('userTwoFactorDeviceView:steps.installAuthenticatorApp.description')}</p>
+            <h3>{i18n.t('userTwoFactorDevice:steps.installAuthenticatorApp.title')}</h3>
+            <p>{i18n.t('userTwoFactorDevice:steps.installAuthenticatorApp.description')}</p>
           </li>
           <li>
-            <h3>{i18n.t('userTwoFactorDeviceView:steps.scanCode.title')}</h3>
-            <p>{i18n.t('userTwoFactorDeviceView:steps.scanCode.description')}</p>
+            <h3>{i18n.t('userTwoFactorDevice:steps.scanCode.title')}</h3>
+            <p>{i18n.t('userTwoFactorDevice:steps.scanCode.description')}</p>
             <p>
-              <h3>{i18n.t('userTwoFactorDeviceView:scanQrCode')}</h3>
-              <div>
-                <QRCode value={otpAuthUrl} />
-              </div>
+              <QRCode value={otpAuthUrl} />
               <TooltipNew title={secret}>
-                <span>{i18n.t('userTwoFactorDeviceView:showSecretKey')}</span>
+                <Button label="userTwoFactorDevice:showSecretKey" variant="text" />
               </TooltipNew>
             </p>
           </li>
           <li>
-            <h3>{i18n.t('userTwoFactorDeviceView:steps.typeAuthenticatorCodes.title')}</h3>
-            <p>{i18n.t('userTwoFactorDeviceView:steps.typeAuthenticatorCodes.description')}</p>
-            <FormItem label={i18n.t('userTwoFactorDeviceView:authenticatorCodeOne')}>
+            <h3>{i18n.t('userTwoFactorDevice:steps.typeAuthenticatorCodes.title')}</h3>
+            <p>{i18n.t('userTwoFactorDevice:steps.typeAuthenticatorCodes.description')}</p>
+            <FormItem label={i18n.t('userTwoFactorDevice:authenticatorCodeOne')}>
               <Input
                 className="authenticator-code"
                 onChange={onAuthenticatorCodeOneChange}
                 value={authenticatorCodeOne}
               />
             </FormItem>
-            <FormItem label={i18n.t('userTwoFactorDeviceView:authenticatorCodeTwo')}>
+            <FormItem label={i18n.t('userTwoFactorDevice:authenticatorCodeTwo')}>
               <Input
                 className="authenticator-code"
                 onChange={onAuthenticatorCodeTwoChange}
@@ -191,14 +188,14 @@ export const UserTwoFactorDeviceDetails = () => {
               <ButtonSave
                 className="save-btn"
                 disabled={Validation.isNotValid(validation)}
-                label="userTwoFactorDeviceView:validate.label"
+                label="userTwoFactorDevice:validation.label"
                 onClick={onValidateClick}
               />
             ) : (
               <ButtonSave
                 className="save-btn"
                 disabled={Validation.isNotValid(validation)}
-                label="userTwoFactorDeviceView:create.label"
+                label="userTwoFactorDevice:create.label"
                 onClick={onCreateClick}
               />
             )}
