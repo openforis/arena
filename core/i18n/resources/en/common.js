@@ -1720,6 +1720,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       messageContainsLinks: 'Invitation message cannot contain links',
       messageTooLong: 'Invitation message is too long (maximum {{maxLength}} characters)',
     },
+
+    userTwoFactorDevice: {
+      nameRequired: 'Device name is required',
+    },
   },
 
   record: {

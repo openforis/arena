@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import axios from 'axios'
 
-import * as StringUtils from '@core/stringUtils'
 import i18n from '@core/i18n/i18nFactory'
 import { UserTwoFactorDevice } from '@core/userTwoFactorDevice'
 import * as Validation from '@core/validation/validation'
@@ -14,6 +13,8 @@ import { TooltipNew } from '@webapp/components/TooltipNew'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { useConfirmAsync, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
+
+import { UserTwoFactorDeviceValidator } from './userTwoFactorDeviceValidator'
 
 export const UserTwoFactorDeviceDetails = () => {
   const { uuid: deviceUuidParam } = useParams()
@@ -49,6 +50,10 @@ export const UserTwoFactorDeviceDetails = () => {
             setError(i18n.t('userTwoFactorDeviceView:error.fetchDevice', { message: error.message }))
           }
         })
+    } else {
+      UserTwoFactorDeviceValidator.validateDevice({}).then((nextValidation) => {
+        setDevice(Validation.assocValidation(nextValidation)({}))
+      })
     }
     return () => {
       isMounted = false
@@ -101,7 +106,13 @@ export const UserTwoFactorDeviceDetails = () => {
   }, [])
 
   const onDeviceNameChange = useCallback((value) => {
-    setDevice((prevDevice) => ({ ...(prevDevice || {}), [UserTwoFactorDevice.keys.deviceName]: value }))
+    setDevice((prevDevice) => {
+      const nextDevice = { ...(prevDevice || {}), [UserTwoFactorDevice.keys.deviceName]: value }
+      UserTwoFactorDeviceValidator.validateDevice(nextDevice).then((nextValidation) => {
+        setDevice(Validation.assocValidation(nextValidation)(nextDevice))
+      })
+      return nextDevice
+    })
   }, [])
 
   const onBackClick = useCallback(() => {
@@ -121,7 +132,6 @@ export const UserTwoFactorDeviceDetails = () => {
         <Input
           onChange={onDeviceNameChange}
           readOnly={!deviceNameEditable}
-          textTransformFunction={StringUtils.normalizeName}
           value={deviceName}
           validation={Validation.getFieldValidation(UserTwoFactorDevice.keys.deviceName)(validation)}
         />

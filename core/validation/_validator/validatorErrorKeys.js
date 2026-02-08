@@ -201,4 +201,8 @@ export const ValidatorErrorKeys = {
     messageContainsLinks: 'validationErrors.userInvite.messageContainsLinks',
     messageTooLong: 'validationErrors.userInvite.messageTooLong',
   },
+
+  userTwoFactorDevice: {
+    nameRequired: 'validationErrors.userTwoFactorDevice.nameRequired',
+  },
 }
