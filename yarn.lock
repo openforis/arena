@@ -3807,6 +3807,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openforis/arena-core@file:../arena-core::locator=open-foris-arena%40workspace%3A.":
+  version: 1.0.84
+  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=e27f44&locator=open-foris-arena%40workspace%3A."
+  dependencies:
+    "@jsep-plugin/regex": "npm:^1.0.4"
+    bignumber.js: "npm:^9.3.1"
+    jsep: "npm:^1.4.0"
+    lodash.differencewith: "npm:^4.5.0"
+    lodash.frompairs: "npm:^4.0.1"
+    lodash.isequal: "npm:^4.5.0"
+    lodash.topairs: "npm:^4.3.0"
+    moment: "npm:^2.30.1"
+    proj4: "npm:^2.19.10"
+    uuid: "npm:^11.0.3"
+  checksum: 10c0/19ddab43575eef91846714bb1a4154704a1b36649aaec86c22205012c60eb37b3e7d7b9c3b2637f9ed978eabdfdf95cf14fe350d5c3ebfe1fcb5729b5feb54e0
+  languageName: node
+  linkType: hard
+
 "@openforis/arena-core@npm:^1.0.84":
   version: 1.0.84
   resolution: "@openforis/arena-core@npm:1.0.84::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.0.84%2F34f862e2e4a72fa665a127dea347a6c95cc61990"
@@ -15355,6 +15373,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
+    "@openforis/arena-core": ../arena-core
     "@openforis/arena-server": ../arena-server
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"

@@ -1682,6 +1682,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       userNotFound: 'User not found. Make sure email and password are correct',
       passwordChangeRequired: 'Password change required',
       passwordResetNotAllowedWithPendingInvitation: `Password reset not allowed: user has been invited to a survey but the invitation hasn't been accepted yet`,
+      twoFactorTokenRequired: 'Verification code is required',
     },
 
     userAccessRequest: {

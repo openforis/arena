@@ -32,12 +32,20 @@ const Login = () => {
   const viewState = useSelector(LoginState.getViewState)
   const allowAccessRequest = ProcessUtils.ENV.allowUserAccessRequest
 
+  const validatorFn = useCallback(
+    (obj) =>
+      LoginValidator.validateLoginObj({
+        requireTwoFactorToken: viewState === ViewState.askTwoFactorToken,
+      })(obj),
+    [viewState]
+  )
+
   const {
     object: formObject,
     setObjectField,
     objectValid,
     validation,
-  } = useFormObject({ email, password: '', twoFactorToken: '' }, LoginValidator.validateLoginObj, true)
+  } = useFormObject({ email, password: '', twoFactorToken: '' }, validatorFn, true)
 
   const onClickLogin = useCallback(() => {
     if (objectValid) {
