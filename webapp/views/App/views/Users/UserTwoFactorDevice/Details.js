@@ -146,12 +146,12 @@ export const UserTwoFactorDeviceDetails = () => {
       {isNew && deviceCreated && (
         <ol>
           <li>
-            <h3>{i18n.t('userTwoFactorDevice:steps.installAuthenticatorApp.title')}</h3>
-            <p>{i18n.t('userTwoFactorDevice:steps.installAuthenticatorApp.description')}</p>
+            <h3>{i18n.t('userTwoFactorDevice:validationSteps.installAuthenticatorApp.title')}</h3>
+            <p>{i18n.t('userTwoFactorDevice:validationSteps.installAuthenticatorApp.description')}</p>
           </li>
           <li>
-            <h3>{i18n.t('userTwoFactorDevice:steps.scanCode.title')}</h3>
-            <p>{i18n.t('userTwoFactorDevice:steps.scanCode.description')}</p>
+            <h3>{i18n.t('userTwoFactorDevice:validationSteps.scanCode.title')}</h3>
+            <p>{i18n.t('userTwoFactorDevice:validationSteps.scanCode.description')}</p>
             <p>
               <QRCode value={otpAuthUrl} />
               <TooltipNew title={secret}>
@@ -160,8 +160,8 @@ export const UserTwoFactorDeviceDetails = () => {
             </p>
           </li>
           <li>
-            <h3>{i18n.t('userTwoFactorDevice:steps.typeAuthenticatorCodes.title')}</h3>
-            <p>{i18n.t('userTwoFactorDevice:steps.typeAuthenticatorCodes.description')}</p>
+            <h3>{i18n.t('userTwoFactorDevice:validationSteps.typeAuthenticatorCodes.title')}</h3>
+            <p>{i18n.t('userTwoFactorDevice:validationSteps.typeAuthenticatorCodes.description')}</p>
             <FormItem label={i18n.t('userTwoFactorDevice:authenticatorCodeOne')}>
               <Input
                 className="authenticator-code"
