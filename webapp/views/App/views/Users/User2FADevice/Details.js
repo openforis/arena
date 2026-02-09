@@ -161,15 +161,15 @@ export const User2FADeviceDetails = () => {
           <li>
             <h3>{i18n.t('user2FADevice:validationSteps.scanCode.title')}</h3>
             <p>{i18n.t('user2FADevice:validationSteps.scanCode.description')}</p>
-            <p className="scan-qr-code-internal-container">
+            <div className="scan-qr-code-internal-container">
               <QRCode value={otpAuthUrl} />
-              <p>
+              <div>
                 {i18n.t('user2FADevice:validationSteps.scanCode.descriptionAlternative')}
                 <TooltipNew title={secret}>
                   <Button label="user2FADevice:showSecretKey" variant="text" />
                 </TooltipNew>
-              </p>
-            </p>
+              </div>
+            </div>
           </li>
           <li>
             <h3>{i18n.t('user2FADevice:validationSteps.typeAuthenticatorCodes.title')}</h3>

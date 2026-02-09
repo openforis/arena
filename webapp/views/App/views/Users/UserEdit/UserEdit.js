@@ -1,11 +1,10 @@
 import './UserEdit.scss'
 
-import React, { useCallback } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import React from 'react'
+import { useParams } from 'react-router'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -18,7 +17,6 @@ import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import ProfilePicture from '@webapp/components/profilePicture'
 
-import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
