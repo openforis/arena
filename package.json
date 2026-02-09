@@ -108,7 +108,7 @@
     "@mui/x-data-grid": "^8.26.0",
     "@mui/x-date-pickers": "^8.26.0",
     "@mui/x-tree-view": "^8.26.0",
-    "@openforis/arena-server": "^1.2.11",
+    "@openforis/arena-server": "^1.2.12",
     "@reduxjs/toolkit": "^2.11.2",
     "@sendgrid/mail": "^8.1.6",
     "@shopify/draggable": "^1.2.1",
