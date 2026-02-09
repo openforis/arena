@@ -1,8 +1,12 @@
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as DialogConfirmState from './state'
+import { useCallback } from 'react'
+import * as DialogConfirmActions from './actions'
 
 export const useDialogConfirm = () => {
+  const dispatch = useDispatch()
+
   const key = useSelector(DialogConfirmState.getKey)
   const params = useSelector(DialogConfirmState.getParams)
   const okButtonLabel = useSelector(DialogConfirmState.getOkButtonLabel)
@@ -13,6 +17,20 @@ export const useDialogConfirm = () => {
   const strongConfirmInputLabel = useSelector(DialogConfirmState.getStrongConfirmInputLabel)
   const strongConfirmRequiredText = useSelector(DialogConfirmState.getStrongConfirmRequiredText)
   const strongConfirmText = useSelector(DialogConfirmState.getStrongConfirmText)
+  const isDismissable = useSelector(DialogConfirmState.isDismissable)
+
+  const onStrongConfirmInputChange = useCallback(
+    (event) => dispatch(DialogConfirmActions.onDialogConfirmTextChange(event.target.value)),
+    [dispatch]
+  )
+
+  const onOk = useCallback(() => dispatch(DialogConfirmActions.onDialogConfirmOk()), [dispatch])
+
+  const onClose = useCallback(() => {
+    if (isDismissable) {
+      dispatch(DialogConfirmActions.onDialogConfirmCancel())
+    }
+  }, [isDismissable, dispatch])
 
   return {
     key,
@@ -25,5 +43,9 @@ export const useDialogConfirm = () => {
     strongConfirmInputLabel,
     strongConfirmRequiredText,
     strongConfirmText,
+    isDismissable,
+    onStrongConfirmInputChange,
+    onOk,
+    onClose,
   }
 }

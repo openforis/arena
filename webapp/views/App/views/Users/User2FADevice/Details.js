@@ -96,6 +96,7 @@ export const User2FADeviceDetails = () => {
         strongConfirm: true,
         strongConfirmRequiredText: 'copied',
         okButtonLabel: 'common.confirm',
+        dismissable: false,
       })
     } catch (error) {
       notifyError({ key: 'user2FADevice:validation.error', params: { message: error.message } })

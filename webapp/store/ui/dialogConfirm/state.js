@@ -10,7 +10,8 @@ const keys = {
   key: 'key',
   params: 'params',
   onOk: 'onOk',
-  onCancel: 'onCancel',
+  dismissable: 'dismissable', // boolean: true if the dialog can be dismissed by clicking outside of it or pressing Esc
+  onCancel: 'onCancel', // optional, applicable only if dismissable is true
   okButtonLabel: 'okButtonLabel',
   okButtonClass: 'okButtonClass',
   okButtonIconClass: 'okButtonIconClass',
@@ -27,6 +28,7 @@ const keys = {
 export const getKey = R.pipe(getState, R.propOr(null, keys.key))
 export const getParams = R.pipe(getState, R.propOr({}, keys.params))
 export const getOnOk = R.pipe(getState, R.prop(keys.onOk))
+export const isDismissable = R.pipe(getState, R.propEq(keys.dismissable, true))
 export const getOnCancel = R.pipe(getState, R.prop(keys.onCancel))
 export const getOkButtonLabel = R.pipe(getState, R.propOr('common.ok', keys.okButtonLabel))
 export const getOkButtonClass = R.pipe(getState, R.prop(keys.okButtonClass))
@@ -44,6 +46,7 @@ export const show = ({
   key,
   params,
   onOk,
+  dismissable = true,
   onCancel,
   okButtonLabel = 'common.ok',
   okButtonClass = undefined,
@@ -56,6 +59,7 @@ export const show = ({
   [keys.key]: key,
   [keys.params]: params,
   [keys.onOk]: onOk,
+  [keys.dismissable]: dismissable,
   [keys.onCancel]: onCancel,
   [keys.okButtonLabel]: okButtonLabel,
   [keys.okButtonClass]: okButtonClass,
