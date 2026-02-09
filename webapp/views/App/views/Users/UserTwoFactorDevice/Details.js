@@ -152,24 +152,30 @@ export const UserTwoFactorDeviceDetails = () => {
           <li>
             <h3>{i18n.t('userTwoFactorDevice:validationSteps.scanCode.title')}</h3>
             <p>{i18n.t('userTwoFactorDevice:validationSteps.scanCode.description')}</p>
-            <p>
+            <p className="scan-qr-code-internal-container">
               <QRCode value={otpAuthUrl} />
-              <TooltipNew title={secret}>
-                <Button label="userTwoFactorDevice:showSecretKey" variant="text" />
-              </TooltipNew>
+              <p>
+                {i18n.t('userTwoFactorDevice:validationSteps.scanCode.descriptionAlternative')}
+                <TooltipNew title={secret}>
+                  <Button label="userTwoFactorDevice:showSecretKey" variant="text" />
+                </TooltipNew>
+              </p>
             </p>
           </li>
           <li>
             <h3>{i18n.t('userTwoFactorDevice:validationSteps.typeAuthenticatorCodes.title')}</h3>
             <p>{i18n.t('userTwoFactorDevice:validationSteps.typeAuthenticatorCodes.description')}</p>
-            <FormItem label={i18n.t('userTwoFactorDevice:authenticatorCodeOne')}>
+            <FormItem label="userTwoFactorDevice:authenticatorCodeOne">
               <Input
                 className="authenticator-code"
                 onChange={onAuthenticatorCodeOneChange}
                 value={authenticatorCodeOne}
               />
             </FormItem>
-            <FormItem label={i18n.t('userTwoFactorDevice:authenticatorCodeTwo')}>
+            <FormItem
+              label="userTwoFactorDevice:authenticatorCodeTwo"
+              info="userTwoFactorDevice:authenticatorCodeTwoInfo"
+            >
               <Input
                 className="authenticator-code"
                 onChange={onAuthenticatorCodeTwoChange}
