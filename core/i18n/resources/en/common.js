@@ -329,6 +329,8 @@ Try again?`,
     usersList: 'Users list (all)',
     user2FADevice: '2FA device',
     user2FADevice_plural: '2FA devices',
+    user2FADeviceDetails: '$t(appModules.user2FADevice)',
+    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
 
     analysis: 'Analysis',
     chain: 'Chain',

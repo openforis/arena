@@ -321,6 +321,10 @@ export default {
     userNew: 'Новый пользователь',
     usersSurvey: 'Список пользователей',
     usersList: 'Список пользователей (все)',
+    user2FADevice: 'Устройство 2FA',
+    user2FADevice_plural: 'Устройства 2FA',
+    user2FADeviceDetails: '$t(appModules.user2FADevice)',
+    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
 
     analysis: 'Анализ',
     chain: 'Цепочка',

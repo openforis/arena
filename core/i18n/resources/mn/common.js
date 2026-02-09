@@ -322,6 +322,10 @@ export default {
     userNew: 'Шинэ хэрэглэгч',
     usersSurvey: 'Хэрэглэгчдийн жагсаалт',
     usersList: 'Хэрэглэгчдийн жагсаалт (бүгд)',
+    user2FADevice: '2FA төхөөрөмж',
+    user2FADevice_plural: '2FA төхөөрөмжүүд',
+    user2FADeviceDetails: '$t(appModules.user2FADevice)',
+    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
 
     analysis: 'Шинжилгээ',
     chain: 'Гинж',
