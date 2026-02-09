@@ -55,13 +55,24 @@ export const User2FADeviceDetails = () => {
         })
     } else {
       // new device
-      axios.get('/api/2fa/devices').then(({ data: { list } }) => {
-        setExistingDevices(list)
-        const newDeviceObj = {}
-        User2FADeviceValidator.validateDevice(list)(newDeviceObj).then((nextValidation) => {
-          setDevice(Validation.assocValidation(nextValidation))
+      axios
+        .get('/api/2fa/devices')
+        .then(({ data: { list } }) => {
+          if (isMounted) {
+            setExistingDevices(list)
+            const newDeviceObj = {}
+            User2FADeviceValidator.validateDevice(list)(newDeviceObj).then((nextValidation) => {
+              if (isMounted) {
+                setDevice(Validation.assocValidation(nextValidation))
+              }
+            })
+          }
         })
-      })
+        .catch((error) => {
+          if (isMounted) {
+            setError(i18n.t('user2FADevice:error.fetchDevice', { message: error.message }))
+          }
+        })
     }
     return () => {
       isMounted = false
