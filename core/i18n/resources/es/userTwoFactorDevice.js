@@ -1,6 +1,7 @@
 export default {
   authenticatorCodeOne: 'Codigo de autenticador 1',
   authenticatorCodeTwo: 'Codigo de autenticador 2',
+  authenticatorCodeTwoInfo: 'Espera 30 segundos e ingresa un segundo código',
   create: {
     label: 'Crear',
   },
@@ -31,10 +32,12 @@ export default {
     scanCode: {
       title: 'Escanear codigo QR',
       description: 'Usa la aplicacion de autenticacion para escanear el codigo QR.',
+      descriptionAlternative: 'Alternativamente, puedes ingresar la clave secreta en la aplicacion de autenticacion.',
     },
     typeAuthenticatorCodes: {
       title: 'Escribir codigos de autenticador',
-      description: 'Introduce los codigos generados por la aplicacion de autenticacion.',
+      description:
+        'Introduce dos codigos consecutivos generados por la aplicacion de autenticacion para validar el dispositivo.',
     },
   },
 }

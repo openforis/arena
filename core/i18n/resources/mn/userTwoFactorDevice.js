@@ -1,6 +1,7 @@
 export default {
   authenticatorCodeOne: 'Баталгаажуулагчийн код 1',
   authenticatorCodeTwo: 'Баталгаажуулагчийн код 2',
+  authenticatorCodeTwoInfo: '30 секунд хүлээгээд хоёр дахь кодыг оруулна уу',
   create: {
     label: 'Үүсгэх',
   },
@@ -30,10 +31,11 @@ export default {
     scanCode: {
       title: 'QR код скан хийх',
       description: 'Баталгаажуулагч апп-аа ашиглан QR кодыг скан хийнэ үү.',
+      descriptionAlternative: 'Эсвэл нууц түлхүүрийг баталгаажуулагч апп-д гараар оруулж болно.',
     },
     typeAuthenticatorCodes: {
       title: 'Баталгаажуулагчийн код оруулах',
-      description: 'Баталгаажуулагч апп-аас гарсан кодуудыг оруулна уу.',
+      description: 'Баталгаажуулагч апп-аас гарсан дараалсан хоёр кодыг оруулж төхөөрөмжийг баталгаажуулна уу.',
     },
   },
 }
