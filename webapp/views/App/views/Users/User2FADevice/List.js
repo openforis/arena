@@ -2,17 +2,17 @@ import React, { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
 import Table from '@webapp/components/Table'
-import { appModuleUri, userTwoFactorDeviceModules } from '@webapp/app/appModules'
+import { appModuleUri, user2FADeviceModules } from '@webapp/app/appModules'
 
-import { useUserTwoFactorDeviceColumns } from './useColumns'
-import UserTwoFactorDeviceHeaderLeft from './HeaderLeft'
+import { useUser2FADeviceColumns } from './useColumns'
+import User2FADeviceHeaderLeft from './HeaderLeft'
 
-export const UserTwoFactorDeviceList = () => {
+export const User2FADeviceList = () => {
   const navigate = useNavigate()
-  const columns = useUserTwoFactorDeviceColumns()
+  const columns = useUser2FADeviceColumns()
   const onRowClick = useCallback(
     (item) => {
-      navigate(`${appModuleUri(userTwoFactorDeviceModules.userTwoFactorDevice)}${item.uuid}`)
+      navigate(`${appModuleUri(user2FADeviceModules.user2FADevice)}${item.uuid}`)
     },
     [navigate]
   )
@@ -22,7 +22,7 @@ export const UserTwoFactorDeviceList = () => {
       module="2fa-devices"
       moduleApiUri="/api/2fa/devices"
       columns={columns}
-      headerLeftComponent={UserTwoFactorDeviceHeaderLeft}
+      headerLeftComponent={User2FADeviceHeaderLeft}
       onRowClick={onRowClick}
       selectable={false}
       visibleColumnsSelectionEnabled

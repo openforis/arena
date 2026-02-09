@@ -18,7 +18,7 @@ const getDateModified = A.propOr(null, keys.dateModified)
 const getSecret = A.propOr(null, keys.secret)
 const getOtpAuthUrl = A.propOr(null, keys.otpAuthUrl)
 
-export const UserTwoFactorDevice = {
+export const User2FADevice = {
   keys,
   getUuid,
   getDeviceName,

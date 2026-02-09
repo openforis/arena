@@ -327,6 +327,8 @@ Try again?`,
     userNew: 'New User',
     usersSurvey: 'Users list',
     usersList: 'Users list (all)',
+    user2FADevice: '2FA device',
+    user2FADevice_plural: '2FA devices',
 
     analysis: 'Analysis',
     chain: 'Chain',
@@ -877,6 +879,10 @@ Merge cannot be performed.`,
     },
     newPassword: 'Password',
     confirmPassword: 'Confirm password',
+    manageTwoFactorDevices: {
+      label: 'Manage 2FA',
+      title: 'Manage Two-Factor Authentication Devices',
+    },
   },
 
   userPasswordChangeView: {
@@ -1721,7 +1727,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       messageTooLong: 'Invitation message is too long (maximum {{maxLength}} characters)',
     },
 
-    userTwoFactorDevice: {
+    user2FADevice: {
       nameRequired: 'Device name is required',
     },
   },

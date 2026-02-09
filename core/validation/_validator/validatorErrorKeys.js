@@ -202,7 +202,7 @@ export const ValidatorErrorKeys = {
     messageTooLong: 'validationErrors.userInvite.messageTooLong',
   },
 
-  userTwoFactorDevice: {
-    nameRequired: 'validationErrors.userTwoFactorDevice.nameRequired',
+  user2FADevice: {
+    nameRequired: 'validationErrors.user2FADevice.nameRequired',
   },
 }

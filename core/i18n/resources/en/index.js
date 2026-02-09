@@ -8,7 +8,7 @@ import jobs from './jobs'
 import messageView from './messageView'
 import surveyCreate from './surveyCreate'
 import surveyForm from './surveyForm'
-import userTwoFactorDevice from './userTwoFactorDevice'
+import user2FADevice from './user2FADevice'
 import usersView from './usersView'
 import validationErrors from './validationErrors'
 
@@ -23,7 +23,7 @@ export default {
   messageView,
   surveyCreate,
   surveyForm,
-  userTwoFactorDevice,
+  user2FADevice,
   usersView,
   validationErrors,
 }

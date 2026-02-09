@@ -1,1 +1,0 @@
-export { UserTwoFactorDevice } from './userTwoFactorDevice'
