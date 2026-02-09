@@ -119,4 +119,6 @@ export {
   createTempAuthToken,
 } from './user'
 
+export { getDevices, getDevice, addDevice, verifyDevice, removeDevice } from './user2FA'
+
 export { contentTypes, objectToFormData } from './utils/apiUtils'

@@ -2,7 +2,6 @@ import './Details.scss'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import axios from 'axios'
 
 import i18n from '@core/i18n/i18nFactory'
 import { User2FADevice } from '@core/user2FADevice'
@@ -13,6 +12,8 @@ import { TooltipNew } from '@webapp/components/TooltipNew'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { useConfirmAsync, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
+
+import * as API from '@webapp/service/api'
 
 import { User2FADeviceValidator } from './user2FADeviceValidator'
 
@@ -41,9 +42,8 @@ export const User2FADeviceDetails = () => {
   useEffect(() => {
     let isMounted = true
     if (deviceUuidParam) {
-      axios
-        .get(`/api/2fa/device/${deviceUuidParam}`)
-        .then(({ data: fetchedDevice }) => {
+      API.getDevice(deviceUuidParam)
+        .then((fetchedDevice) => {
           if (isMounted) {
             setDevice(fetchedDevice)
           }
@@ -55,9 +55,8 @@ export const User2FADeviceDetails = () => {
         })
     } else {
       // new device
-      axios
-        .get('/api/2fa/devices')
-        .then(({ data: { list } }) => {
+      API.getDevices()
+        .then((list) => {
           if (isMounted) {
             setExistingDevices(list)
             const newDeviceObj = {}
@@ -80,17 +79,13 @@ export const User2FADeviceDetails = () => {
   }, [deviceUuidParam])
 
   const onCreateClick = useCallback(async () => {
-    const { data: createdDevice } = await axios.post('/api/2fa/device/add', { deviceName })
+    const createdDevice = await API.addDevice({ deviceName })
     setDevice(createdDevice)
   }, [deviceName])
 
   const onValidateClick = useCallback(async () => {
     try {
-      await axios.post(`/api/2fa/device/verify`, {
-        deviceUuid,
-        token1: authenticatorCodeOne,
-        token2: authenticatorCodeTwo,
-      })
+      await API.verifyDevice({ deviceUuid, token1: authenticatorCodeOne, token2: authenticatorCodeTwo })
       // navigate back to the list after successful validation
       navigate(-1)
 
@@ -115,7 +110,7 @@ export const User2FADeviceDetails = () => {
     })
     if (!confirmed) return
     try {
-      await axios.delete(`/api/2fa/device/remove`, { data: { deviceUuid } })
+      await API.removeDevice(deviceUuid)
       notifyInfo({ key: 'user2FADevice:deletion.successful' })
       // navigate back to the list after successful deletion
       navigate(-1)
