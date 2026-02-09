@@ -1,8 +1,8 @@
+import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import * as DialogConfirmState from './state'
-import { useCallback } from 'react'
 import * as DialogConfirmActions from './actions'
+import * as DialogConfirmState from './state'
 
 export const useDialogConfirm = () => {
   const dispatch = useDispatch()
@@ -20,11 +20,15 @@ export const useDialogConfirm = () => {
   const isDismissable = useSelector(DialogConfirmState.isDismissable)
 
   const onStrongConfirmInputChange = useCallback(
-    (event) => dispatch(DialogConfirmActions.onDialogConfirmTextChange(event.target.value)),
+    (event) => {
+      dispatch(DialogConfirmActions.onDialogConfirmTextChange(event.target.value))
+    },
     [dispatch]
   )
 
-  const onOk = useCallback(() => dispatch(DialogConfirmActions.onDialogConfirmOk()), [dispatch])
+  const onOk = useCallback(() => {
+    dispatch(DialogConfirmActions.onDialogConfirmOk())
+  }, [dispatch])
 
   const onClose = useCallback(() => {
     if (isDismissable) {
