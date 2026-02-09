@@ -114,7 +114,7 @@ export const User2FADeviceDetails = () => {
   const onDeviceNameChange = useCallback(
     (value) => {
       setDevice((prevDevice) => {
-        const nextDevice = { ...(prevDevice || {}), [User2FADevice.keys.deviceName]: value }
+        const nextDevice = { ...prevDevice, [User2FADevice.keys.deviceName]: value }
         User2FADeviceValidator.validateDevice(existingDevices)(nextDevice).then((nextValidation) => {
           setDevice(Validation.assocValidation(nextValidation)(nextDevice))
         })
