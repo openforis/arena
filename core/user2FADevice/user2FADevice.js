@@ -7,6 +7,7 @@ const keys = {
   dateModified: 'dateModified',
   secret: 'secret',
   otpAuthUrl: 'otpAuthUrl',
+  backupCodes: 'backupCodes',
   uuid: 'uuid',
 }
 
@@ -17,6 +18,7 @@ const getDateCreated = A.propOr(null, keys.dateCreated)
 const getDateModified = A.propOr(null, keys.dateModified)
 const getSecret = A.propOr(null, keys.secret)
 const getOtpAuthUrl = A.propOr(null, keys.otpAuthUrl)
+const getBackupCodes = A.propOr([], keys.backupCodes)
 
 export const User2FADevice = {
   keys,
@@ -27,4 +29,5 @@ export const User2FADevice = {
   getDateModified,
   getSecret,
   getOtpAuthUrl,
+  getBackupCodes,
 }

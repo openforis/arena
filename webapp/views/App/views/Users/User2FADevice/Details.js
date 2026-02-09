@@ -20,6 +20,7 @@ export const User2FADeviceDetails = () => {
   const { uuid: deviceUuidParam } = useParams()
   const navigate = useNavigate()
   const confirm = useConfirmAsync()
+
   const notifyInfo = useNotifyInfo()
   const notifyError = useNotifyError()
   const isNew = !deviceUuidParam
@@ -28,10 +29,11 @@ export const User2FADeviceDetails = () => {
   const [authenticatorCodeOne, setAuthenticatorCodeOne] = useState('')
   const [authenticatorCodeTwo, setAuthenticatorCodeTwo] = useState('')
   const [error, setError] = useState(null)
-  const validation = useMemo(() => Validation.getValidation(device || {}), [device])
-  const deviceName = User2FADevice.getDeviceName(device || {})
-  const secret = User2FADevice.getSecret(device || {})
-  const otpAuthUrl = User2FADevice.getOtpAuthUrl(device || {})
+  const validation = useMemo(() => Validation.getValidation(device), [device])
+  const deviceName = User2FADevice.getDeviceName(device)
+  const secret = User2FADevice.getSecret(device)
+  const backupCodes = User2FADevice.getBackupCodes(device)
+  const otpAuthUrl = User2FADevice.getOtpAuthUrl(device)
   const deviceCreated = !!otpAuthUrl
   const deviceUuid = deviceUuidParam || User2FADevice.getUuid(device)
   const deviceNameEditable = isNew && !deviceCreated
@@ -57,7 +59,7 @@ export const User2FADeviceDetails = () => {
         setExistingDevices(list)
         const newDeviceObj = {}
         User2FADeviceValidator.validateDevice(list)(newDeviceObj).then((nextValidation) => {
-          setDevice(Validation.assocValidation(nextValidation)(newDeviceObj))
+          setDevice(Validation.assocValidation(nextValidation))
         })
       })
     }
@@ -78,13 +80,21 @@ export const User2FADeviceDetails = () => {
         token1: authenticatorCodeOne,
         token2: authenticatorCodeTwo,
       })
-      notifyInfo({ key: 'user2FADevice:validation.successful' })
       // navigate back to the list after successful validation
       navigate(-1)
+
+      await confirm({
+        key: 'user2FADevice:creationSuccessful.message',
+        params: { deviceName, backupCodes: backupCodes.join(' - ') },
+        headerText: 'user2FADevice:creationSuccessful.title',
+        strongConfirm: true,
+        strongConfirmRequiredText: 'copied',
+        okButtonLabel: 'common.confirm',
+      })
     } catch (error) {
       notifyError({ key: 'user2FADevice:validation.error', params: { message: error.message } })
     }
-  }, [deviceUuid, authenticatorCodeOne, authenticatorCodeTwo, notifyInfo, navigate, notifyError])
+  }, [deviceUuid, authenticatorCodeOne, authenticatorCodeTwo, navigate, confirm, deviceName, backupCodes, notifyError])
 
   const onDeleteClick = useCallback(async () => {
     const confirmed = await confirm({
@@ -116,7 +126,8 @@ export const User2FADeviceDetails = () => {
       setDevice((prevDevice) => {
         const nextDevice = { ...prevDevice, [User2FADevice.keys.deviceName]: value }
         User2FADeviceValidator.validateDevice(existingDevices)(nextDevice).then((nextValidation) => {
-          setDevice(Validation.assocValidation(nextValidation)(nextDevice))
+          const nextDeviceWithValidation = Validation.assocValidation(nextValidation)(nextDevice)
+          setDevice(nextDeviceWithValidation)
         })
         return nextDevice
       })
