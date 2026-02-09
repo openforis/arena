@@ -55,8 +55,9 @@ export const User2FADeviceDetails = () => {
       // new device
       axios.get('/api/2fa/devices').then(({ data: { list } }) => {
         setExistingDevices(list)
-        User2FADeviceValidator.validateDevice(list)({}).then((nextValidation) => {
-          setDevice(Validation.assocValidation(nextValidation)({}))
+        const newDeviceObj = {}
+        User2FADeviceValidator.validateDevice(list)(newDeviceObj).then((nextValidation) => {
+          setDevice(Validation.assocValidation(nextValidation)(newDeviceObj))
         })
       })
     }
