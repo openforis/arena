@@ -203,6 +203,7 @@ export const ValidatorErrorKeys = {
   },
 
   user2FADevice: {
+    nameDuplicate: 'validationErrors.user2FADevice.nameDuplicate',
     nameRequired: 'validationErrors.user2FADevice.nameRequired',
   },
 }

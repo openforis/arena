@@ -1695,6 +1695,10 @@ $t(common.cantUndoWarning)`,
       messageContainsLinks: 'Урилгын мессеж холбоос агуулж болохгүй',
       messageTooLong: 'Урилгын мессеж хэт урт байна (хамгийн ихдээ {{maxLength}} тэмдэгт)',
     },
+    user2FADevice: {
+      nameDuplicate: 'Ижил нэртэй төхөөрөмж аль хэдийн байна',
+      nameRequired: 'Төхөөрөмжийн нэр шаардлагатай',
+    },
   },
 
   record: {

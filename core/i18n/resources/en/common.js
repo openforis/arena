@@ -1730,6 +1730,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     user2FADevice: {
+      nameDuplicate: 'Device with same name already exists',
       nameRequired: 'Device name is required',
     },
   },

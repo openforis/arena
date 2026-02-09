@@ -24,6 +24,7 @@ export const User2FADeviceDetails = () => {
   const notifyError = useNotifyError()
   const isNew = !deviceUuidParam
   const [device, setDevice] = useState(isNew ? {} : null)
+  const [existingDevices, setExistingDevices] = useState([])
   const [authenticatorCodeOne, setAuthenticatorCodeOne] = useState('')
   const [authenticatorCodeTwo, setAuthenticatorCodeTwo] = useState('')
   const [error, setError] = useState(null)
@@ -51,8 +52,12 @@ export const User2FADeviceDetails = () => {
           }
         })
     } else {
-      User2FADeviceValidator.validateDevice({}).then((nextValidation) => {
-        setDevice(Validation.assocValidation(nextValidation)({}))
+      // new device
+      axios.get('/api/2fa/devices').then(({ data: { list } }) => {
+        setExistingDevices(list)
+        User2FADeviceValidator.validateDevice(list)({}).then((nextValidation) => {
+          setDevice(Validation.assocValidation(nextValidation)({}))
+        })
       })
     }
     return () => {
@@ -105,15 +110,18 @@ export const User2FADeviceDetails = () => {
     setAuthenticatorCodeTwo(value)
   }, [])
 
-  const onDeviceNameChange = useCallback((value) => {
-    setDevice((prevDevice) => {
-      const nextDevice = { ...(prevDevice || {}), [User2FADevice.keys.deviceName]: value }
-      User2FADeviceValidator.validateDevice(nextDevice).then((nextValidation) => {
-        setDevice(Validation.assocValidation(nextValidation)(nextDevice))
+  const onDeviceNameChange = useCallback(
+    (value) => {
+      setDevice((prevDevice) => {
+        const nextDevice = { ...(prevDevice || {}), [User2FADevice.keys.deviceName]: value }
+        User2FADeviceValidator.validateDevice(existingDevices)(nextDevice).then((nextValidation) => {
+          setDevice(Validation.assocValidation(nextValidation)(nextDevice))
+        })
+        return nextDevice
       })
-      return nextDevice
-    })
-  }, [])
+    },
+    [existingDevices]
+  )
 
   const onBackClick = useCallback(() => {
     navigate(-1)

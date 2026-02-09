@@ -1492,6 +1492,10 @@ export default {
       messageContainsLinks: 'El mensaje de invitación no puede contener enlaces',
       messageTooLong: 'El mensaje de invitación es demasiado largo (máximo {{maxLength}} caracteres)',
     },
+    user2FADevice: {
+      nameDuplicate: 'Ya existe un dispositivo con el mismo nombre',
+      nameRequired: 'Se requiere el nombre del dispositivo',
+    },
   },
   record: {
     ancestorNotFound: 'Nodo ancestro no encontrado en el registro',

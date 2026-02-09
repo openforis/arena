@@ -1705,6 +1705,10 @@ $t(common.cantUndoWarning)`,
       messageContainsLinks: 'Приглашение не может содержать ссылки',
       messageTooLong: 'Сообщение приглашения слишком длинное (максимум {{maxLength}} символов)',
     },
+    user2FADevice: {
+      nameDuplicate: 'Устройство с таким именем уже существует',
+      nameRequired: 'Требуется имя устройства',
+    },
   },
 
   record: {
