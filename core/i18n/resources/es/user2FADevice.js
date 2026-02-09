@@ -5,6 +5,15 @@ export default {
   create: {
     label: 'Crear',
   },
+  creationSuccessful: {
+    title: 'Dispositivo 2FA creado correctamente',
+    message: `El dispositivo 2FA "{{deviceName}}" ha sido creado.  
+Guarda los siguientes 8 codigos de respaldo en un lugar seguro:  
+**{{backupCodes}}**  
+Se pueden usar para acceder a tu cuenta si pierdes el acceso a tu dispositivo autenticador.
+Solo se puede usar un codigo de respaldo una vez. Despues de usar un codigo de respaldo, ya no sera valido.
+Los codigos de respaldo solo se pueden ver al momento de crear el dispositivo, asi que asegurate de guardarlos ahora.`,
+  },
   deletion: {
     confirm: 'Estas seguro de que deseas eliminar el dispositivo "{{deviceName}}"?',
     error: 'Error al eliminar el dispositivo: {{message}}',

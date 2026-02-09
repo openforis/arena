@@ -354,8 +354,10 @@ export default {
     requestAccess: 'Впервые в $t(common.appNameFull)? Запросить доступ',
     resetPassword: 'Сбросить пароль',
     login: 'Войти',
+    loginUsingBackupCode: 'Войти с помощью резервного кода 2FA',
     forgotPassword: 'Забыли пароль',
     sendPasswordResetEmail: 'Отправить письмо для сброса пароля',
+    twoFactorBackupCode: 'Резервный код 2FA',
     twoFactorToken: 'Код подтверждения',
     twoFactorTokenDescription: `Чтобы обеспечить безопасность вашей учетной записи, мы подтверждаем вашу личность.
 

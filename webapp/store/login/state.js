@@ -10,8 +10,11 @@ const keys = {
 
 export const ViewState = {
   askUsernameAndPassword: 'askUsernameAndPassword',
-  askTwoFactorToken: 'askTwoFactorToken',
+  ask2FAToken: 'ask2FAToken',
+  ask2FABackupCode: 'ask2FABackupCode',
 }
+
+const VIEW_STATES_2FA = [ViewState.ask2FAToken, ViewState.ask2FABackupCode]
 
 const getStateProp = (key, defaultValue = null) => R.pathOr(defaultValue, [stateKey, key])
 
@@ -19,6 +22,7 @@ export const getError = getStateProp(keys.error)
 export const assocError = R.assoc(keys.error)
 
 export const getViewState = getStateProp(keys.viewState, ViewState.askUsernameAndPassword)
+export const is2FAViewState = (state) => VIEW_STATES_2FA.includes(getViewState(state))
 export const assocViewState = R.assoc(keys.viewState)
 
 export const getEmail = getStateProp(keys.email, '')

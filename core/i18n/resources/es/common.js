@@ -321,8 +321,10 @@ export default {
     requestAccess: '¿Nuevo en $t(common.appNameFull)? Solicitar acceso',
     resetPassword: 'Restablecer contraseña',
     login: 'Iniciar sesión',
+    loginUsingBackupCode: 'Iniciar sesion con codigo de respaldo 2FA',
     forgotPassword: '¿Olvidó su contraseña?',
     sendPasswordResetEmail: 'Enviar correo electrónico de restablecimiento de contraseña',
+    twoFactorBackupCode: 'Codigo de respaldo 2FA',
     twoFactorToken: 'Código de verificación',
     twoFactorTokenDescription: `Para mantener su cuenta segura, verificamos su identidad.
 

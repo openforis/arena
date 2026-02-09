@@ -364,8 +364,10 @@ Try again?`,
     requestAccess: 'New to $t(common.appNameFull)? Request access',
     resetPassword: 'Reset password',
     login: 'Login',
+    loginUsingBackupCode: 'Login using 2FA backup code',
     forgotPassword: 'Forgot password',
     sendPasswordResetEmail: 'Send password reset email',
+    twoFactorBackupCode: '2FA backup code',
     twoFactorToken: 'Verification code',
     twoFactorTokenDescription: `To keep your account secure, we verify your identity.
 

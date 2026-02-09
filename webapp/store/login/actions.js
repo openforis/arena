@@ -44,7 +44,7 @@ export const login = (email, password, twoFactorToken) =>
       dispatch(resetState)
       dispatch(SystemActions.initSystem())
     } else if (twoFactorRequired) {
-      dispatch(setViewState(ViewState.askTwoFactorToken))
+      dispatch(setViewState(ViewState.ask2FAToken))
     } else {
       dispatch(setLoginError(message))
     }

@@ -8,8 +8,8 @@ export default {
   creationSuccessful: {
     title: '2FA device created successfully',
     message: `2FA device "{{deviceName}}" has been created.  
-Please save the following 6 backup codes in a safe place:
-**{{backupCodes}}**
+Please save the following 8 backup codes in a safe place:  
+**{{backupCodes}}**  
 They can be used to access your account if you lose access to your authenticator device.
 Only one backup code can be used once. After using a backup code, it will no longer be valid.
 Backup codes can only be viewed at the time of device creation, so make sure to save them now.`,

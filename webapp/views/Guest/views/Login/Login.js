@@ -7,6 +7,7 @@ import * as ProcessUtils from '@core/processUtils'
 
 import { appModuleUri, guestModules } from '@webapp/app/appModules'
 
+import { Button } from '@webapp/components'
 import { useFormObject } from '@webapp/components/hooks'
 import { EmailInput, PasswordInput } from '@webapp/components/form'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
@@ -30,12 +31,13 @@ const Login = () => {
   const error = useSelector(LoginState.getError)
   const email = useSelector(LoginState.getEmail)
   const viewState = useSelector(LoginState.getViewState)
+  const is2FAViewState = useSelector(LoginState.is2FAViewState)
   const allowAccessRequest = ProcessUtils.ENV.allowUserAccessRequest
 
   const validatorFn = useCallback(
     (obj) =>
       LoginValidator.validateLoginObj({
-        requireTwoFactorToken: viewState === ViewState.askTwoFactorToken,
+        requireTwoFactorToken: viewState === ViewState.ask2FAToken,
       })(obj),
     [viewState]
   )
@@ -61,32 +63,48 @@ const Login = () => {
     dispatch(LoginActions.setViewState(ViewState.askUsernameAndPassword))
   }, [dispatch])
 
-  const onChangeEmail = (value) => {
-    dispatch(LoginActions.setEmail(value))
-    setObjectField(FormFields.email, value)
-  }
+  const onChangeEmail = useCallback(
+    (value) => {
+      dispatch(LoginActions.setEmail(value))
+      setObjectField(FormFields.email, value)
+    },
+    [dispatch, setObjectField]
+  )
 
-  const onChangePassword = (value) => {
-    dispatch(LoginActions.setLoginError(null))
-    setObjectField(FormFields.password, value)
-  }
+  const onChangePassword = useCallback(
+    (value) => {
+      dispatch(LoginActions.setLoginError(null))
+      setObjectField(FormFields.password, value)
+    },
+    [dispatch, setObjectField]
+  )
 
-  const onChangeTwoFactorToken = (value) => {
-    dispatch(LoginActions.setLoginError(null))
-    setObjectField(FormFields.twoFactorToken, value)
-  }
+  const onChangeTwoFactorToken = useCallback(
+    (value) => {
+      dispatch(LoginActions.setLoginError(null))
+      setObjectField(FormFields.twoFactorToken, value)
+    },
+    [dispatch, setObjectField]
+  )
+
+  const onLoginUsingBackupCodeClick = useCallback(() => {
+    dispatch(LoginActions.setViewState(ViewState.ask2FABackupCode))
+  }, [dispatch])
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-      {viewState === ViewState.askTwoFactorToken && (
+      {is2FAViewState && (
         <>
           <div className="two-factor-token-description">{i18n.t('loginView.twoFactorTokenDescription')}</div>
           <SimpleTextInput
-            label="loginView.twoFactorToken"
+            label={viewState === ViewState.ask2FAToken ? 'loginView.twoFactorToken' : 'loginView.twoFactorBackupCode'}
             name={FormFields.twoFactorToken}
             onChange={onChangeTwoFactorToken}
             value={formObject.twoFactorToken}
           />
+          {viewState === ViewState.ask2FAToken && (
+            <Button label="loginView.loginUsingBackupCode" onClick={onLoginUsingBackupCodeClick} variant="text" />
+          )}
         </>
       )}
       {viewState === ViewState.askUsernameAndPassword && (
@@ -115,7 +133,7 @@ const Login = () => {
         </>
       )}
       <div className="guest__buttons">
-        {viewState === ViewState.askTwoFactorToken ? (
+        {is2FAViewState ? (
           <button type="button" className="btn back" onClick={onClickBack}>
             {i18n.t('common.back')}
           </button>

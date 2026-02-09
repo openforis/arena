@@ -355,8 +355,10 @@ export default {
     requestAccess: '$t(common.appNameFull)-д шинээр ирсэн үү? Хандалтын хүсэлт илгээх',
     resetPassword: 'Нууц үг сэргээх',
     login: 'Нэвтрэх',
+    loginUsingBackupCode: '2FA нөөц кодоор нэвтрэх',
     forgotPassword: 'Нууц үг мартсан',
     sendPasswordResetEmail: 'Нууц үг сэргээх имэйл илгээх',
+    twoFactorBackupCode: '2FA нөөц код',
     twoFactorToken: 'Баталгаажуулах код',
     twoFactorTokenDescription: `Таны бүртгэлийг аюулгүй байлгахын тулд бид таныг баталгаажуулна.
 

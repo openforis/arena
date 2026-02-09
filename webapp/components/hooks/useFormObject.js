@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import * as Validation from '@core/validation/validation'
 
@@ -9,9 +9,9 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
     obj,
   })
 
-  const initialValidation = Validation.getValidation(obj)
-
   const { obj: object, validation } = state
+
+  const initialValidation = useMemo(() => Validation.getValidation(obj), [obj])
 
   const objectValid = Validation.isValid(state.validation)
 
