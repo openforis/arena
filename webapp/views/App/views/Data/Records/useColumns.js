@@ -65,6 +65,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         sortable: true,
         sortField: NodeDef.getName(nodeDef),
         header: NodeDef.getLabel(nodeDef, lang),
+        headerIsTranslationKey: false,
         renderItem: ({ item: record }) => {
           const name = NodeDef.getName(nodeDef)
           const uuid = NodeDef.getUuid(nodeDef)
