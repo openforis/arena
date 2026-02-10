@@ -3845,9 +3845,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^1.0.84":
-  version: 1.0.84
-  resolution: "@openforis/arena-core@npm:1.0.84::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.0.84%2F34f862e2e4a72fa665a127dea347a6c95cc61990"
+"@openforis/arena-core@npm:^1.0.85":
+  version: 1.0.85
+  resolution: "@openforis/arena-core@npm:1.0.85::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.0.85%2F11c673873f20c553ee7919dba26c80185f42fb86"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     bignumber.js: "npm:^9.3.1"
@@ -3859,16 +3859,16 @@ __metadata:
     moment: "npm:^2.30.1"
     proj4: "npm:^2.19.10"
     uuid: "npm:^11.0.3"
-  checksum: 10c0/09c90fbd7a87ddebb2223687bd5a0bbf402d7b6a8b166743964648211a58e441bd554cff07b38800a0f53cd28849d6b2ccc5697a037a8d7142ffd51b736c259b
+  checksum: 10c0/a1daf1bc846b66af7ec46b7359a7394ee84b7a0a9b1a2db8f17bc21c02c7a8ef2290eb25211ca82abfb8732c276337690201498cc3721dd28cec6fdb5bdf7fd3
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@file:../arena-server::locator=open-foris-arena%40workspace%3A.":
-  version: 1.2.10
-  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=dafec5&locator=open-foris-arena%40workspace%3A."
+"@openforis/arena-server@npm:^1.2.13":
+  version: 1.2.13
+  resolution: "@openforis/arena-server@npm:1.2.13::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.2.13%2F56cb4626569094e6e0c456c8efae24e340fa52cf"
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^1.0.84"
+    "@openforis/arena-core": "npm:^1.0.85"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.1"
     cookie-parser: "npm:^1.4.7"
@@ -3886,7 +3886,7 @@ __metadata:
     passport-local: "npm:^1.0.0"
     pg-promise: "npm:^12.6.0"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/d757e486571716f7a4f26b302fa7dee8f33bbd745074f5533bd3129034d5cf719301cfabf36bb93b83f25b3992d150aff91e39afa9300157f7e4a4dcc8503180
+  checksum: 10c0/71b8d78fa1ea3595fbe964889b9bb02596de5003ffae750d0fc670187f2e89f18bf89195f52c7e6dcbb7729f076a651730b7ba8d3e43e0492120581726c0f233
   languageName: node
   linkType: hard
 
@@ -15393,7 +15393,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
-    "@openforis/arena-server": ../arena-server
+    "@openforis/arena-server": "npm:^1.2.13"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
