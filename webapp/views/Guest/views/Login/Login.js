@@ -35,11 +35,8 @@ const Login = () => {
   const allowAccessRequest = ProcessUtils.ENV.allowUserAccessRequest
 
   const validatorFn = useCallback(
-    (obj) =>
-      LoginValidator.validateLoginObj({
-        requireTwoFactorToken: viewState === ViewState.ask2FAToken,
-      })(obj),
-    [viewState]
+    (obj) => LoginValidator.validateLoginObj({ requireTwoFactorToken: is2FAViewState })(obj),
+    [is2FAViewState]
   )
 
   const {
