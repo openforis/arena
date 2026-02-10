@@ -29,6 +29,7 @@ export default {
     cnt: 'Contar',
     code: 'Código',
     collapse: 'Colapsar',
+    confirm: 'Confirmar',
     convert: 'Convertir',
     copy: 'Copiar',
     createdWith: 'Creado con',

@@ -29,6 +29,7 @@ export default {
     cnt: 'Количество',
     code: 'Код',
     collapse: 'Свернуть',
+    confirm: 'Подтвердить',
     convert: 'Преобразовать',
     copy: 'Копировать',
     createdWith: 'Создано с помощью',

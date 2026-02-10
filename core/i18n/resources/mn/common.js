@@ -29,6 +29,7 @@ export default {
     cnt: 'Тоо',
     code: 'Код',
     collapse: 'Хумих',
+    confirm: 'Батлах',
     convert: 'Хөрвүүлэх',
     copy: 'Хуулах',
     createdWith: 'Үүсгэсэн',
