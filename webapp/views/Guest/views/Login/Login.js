@@ -51,7 +51,9 @@ const Login = () => {
       dispatch(LoginActions.login(formObject.email, formObject.password, formObject.twoFactorToken))
     } else {
       dispatch(
-        LoginActions.setLoginError(LoginValidator.getFirstError(validation, [FormFields.email, FormFields.password]))
+        LoginActions.setLoginError(
+          LoginValidator.getFirstError(validation, [FormFields.email, FormFields.password, FormFields.twoFactorToken])
+        )
       )
     }
   }, [objectValid, formObject, validation, dispatch])
