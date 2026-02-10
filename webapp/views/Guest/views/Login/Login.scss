@@ -12,6 +12,26 @@
       padding: 1rem;
     }
   }
+
+  .two-factor-token-description {
+    justify-self: center;
+    white-space: break-spaces;
+  }
+
+  .guest__buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .spacer {
+      width: 5rem;
+    }
+
+    .login.btn {
+      width: 10rem;
+    }
+  }
 }
 
 .guest-login__btn-request-access,

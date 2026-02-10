@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import * as Validation from '@core/validation/validation'
 
@@ -9,16 +9,28 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
     obj,
   })
 
+  const { obj: object, validation } = state
+
+  const initialValidation = useMemo(() => Validation.getValidation(obj), [obj])
+
+  const objectValid = Validation.isValid(state.validation)
+
+  const setValidation = (validation) =>
+    setState((statePrev) => ({
+      ...statePrev,
+      validation,
+    }))
+
   // Validation effect
   useEffect(() => {
     ;(async () => {
       if (validatorFn) {
-        setValidation(await validatorFn(state.obj))
+        setValidation(await validatorFn(object))
       } else {
-        setValidation(Validation.getValidation(obj))
+        setValidation(initialValidation)
       }
     })()
-  }, [state.obj])
+  }, [initialValidation, object, validatorFn])
 
   const setObjectFields = (fieldValuePairs) => {
     setState((statePrev) => ({
@@ -31,12 +43,6 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
     setObjectFields({ [field]: value })
   }
 
-  const setValidation = (validation) =>
-    setState((statePrev) => ({
-      ...statePrev,
-      validation,
-    }))
-
   const getFieldValidation = (field) =>
     state.validationEnabled ? Validation.getFieldValidation(field)(state.validation) : null
 
@@ -48,13 +54,13 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
   }
 
   return {
-    object: state.obj,
-    objectValid: Validation.isValid(state.validation),
+    object,
+    objectValid,
     setObjectFields,
     setObjectField,
     setValidation,
     enableValidation,
     getFieldValidation,
-    validation: state.validation,
+    validation,
   }
 }

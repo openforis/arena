@@ -15,11 +15,16 @@ const _validatePasswordConfirm = (propName, item) => {
   return password !== passwordConfirm ? { key: Validation.messageKeys.user.passwordsDoNotMatch } : null
 }
 
-export const validateLoginObj = async (obj) =>
-  Validator.validate(obj, {
-    email: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), UserValidator.validateEmail],
-    password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired)],
-  })
+export const validateLoginObj =
+  ({ requireTwoFactorToken = false } = {}) =>
+  async (obj) =>
+    Validator.validate(obj, {
+      email: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), UserValidator.validateEmail],
+      password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired)],
+      twoFactorToken: requireTwoFactorToken
+        ? [Validator.validateRequired(Validation.messageKeys.user.twoFactorTokenRequired)]
+        : [],
+    })
 
 export const validateEmail = async (obj) =>
   Validator.validate(obj, {

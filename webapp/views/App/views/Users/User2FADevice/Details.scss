@@ -1,0 +1,34 @@
+.app-module > :first-child.user-two-factor-device-details {
+  display: flex;
+  flex-direction: column;
+  justify-self: center;
+  align-items: center;
+  padding: 20px;
+  width: 80%;
+
+  .form-item {
+    width: 100%;
+    height: auto;
+  }
+
+  .scan-qr-code-internal-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    width: 40rem;
+  }
+
+  .authenticator-code {
+    width: 200px;
+  }
+
+  .button-bar {
+    width: 100%;
+
+    .back.btn {
+      position: absolute;
+      left: 20px;
+    }
+  }
+}

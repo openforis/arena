@@ -203,6 +203,10 @@ export const userModules = {
     key: 'userPasswordChange',
     path: 'userPasswordChange',
   },
+  user2FADevices: {
+    key: 'user2FADevice_plural',
+    path: '2fa-devices',
+  },
   userInvite: {
     key: 'userInvite',
     path: 'userInvite',
@@ -240,6 +244,17 @@ export const analysisModules = {
   },
 }
 
+export const user2FADeviceModules = {
+  user2FADeviceList: {
+    key: 'user2FADeviceList',
+    path: 'list',
+  },
+  user2FADevice: {
+    key: 'user2FADeviceDetails',
+    path: 'details',
+  },
+}
+
 export const messageModules = {
   messages: {
     key: 'message_plural',
@@ -274,6 +289,7 @@ const allAppModuleGroups = [
   dataModules,
   userModules,
   analysisModules,
+  user2FADeviceModules,
   messageModules,
   helpModules,
 ]
@@ -291,6 +307,7 @@ const _getModuleParentPathParts = (module) => {
   if (Object.values(userModules).includes(module)) return _getModulePathParts(appModules.users)
   if (Object.values(analysisModules).includes(module)) return _getModulePathParts(appModules.analysis)
   if (Object.values(messageModules).includes(module)) return _getModulePathParts(appModules.messages)
+  if (Object.values(user2FADeviceModules).includes(module)) return _getModulePathParts(userModules.user2FADevices)
   if (Object.values(helpModules).includes(module)) return _getModulePathParts(appModules.help)
 
   throw new Error(`Parent path not found for module ${module?.path}`)

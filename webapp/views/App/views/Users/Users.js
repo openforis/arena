@@ -18,6 +18,7 @@ import UserInvite from './UserInvite'
 import UserEdit from './UserEdit'
 import { UsersAccessRequest } from './UsersAccessRequest'
 import UserPasswordChange from './UserPasswordChange'
+import User2FADevice from './User2FADevice'
 
 const Users = () => {
   const user = useUser()
@@ -69,6 +70,12 @@ const Users = () => {
         path: `${userModules.userPasswordChange.path}/:userUuid?`,
       }
     )
+    if (Authorizer.canManageUser2FADevices(user)) {
+      _modules.push({
+        component: User2FADevice,
+        path: `${userModules.user2FADevices.path}/*`,
+      })
+    }
     return _modules
   }, [surveyInfo, user])
 

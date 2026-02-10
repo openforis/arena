@@ -29,6 +29,7 @@ export default {
     cnt: 'Тоо',
     code: 'Код',
     collapse: 'Хумих',
+    confirm: 'Батлах',
     convert: 'Хөрвүүлэх',
     copy: 'Хуулах',
     createdWith: 'Үүсгэсэн',
@@ -322,6 +323,10 @@ export default {
     userNew: 'Шинэ хэрэглэгч',
     usersSurvey: 'Хэрэглэгчдийн жагсаалт',
     usersList: 'Хэрэглэгчдийн жагсаалт (бүгд)',
+    user2FADevice: '2FA төхөөрөмж',
+    user2FADevice_plural: '2FA төхөөрөмжүүд',
+    user2FADeviceDetails: '$t(appModules.user2FADevice)',
+    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
 
     analysis: 'Шинжилгээ',
     chain: 'Гинж',
@@ -351,8 +356,14 @@ export default {
     requestAccess: '$t(common.appNameFull)-д шинээр ирсэн үү? Хандалтын хүсэлт илгээх',
     resetPassword: 'Нууц үг сэргээх',
     login: 'Нэвтрэх',
+    loginUsingBackupCode: '2FA нөөц кодоор нэвтрэх',
     forgotPassword: 'Нууц үг мартсан',
     sendPasswordResetEmail: 'Нууц үг сэргээх имэйл илгээх',
+    twoFactorBackupCode: '2FA нөөц код',
+    twoFactorToken: 'Баталгаажуулах код',
+    twoFactorTokenDescription: `Таны бүртгэлийг аюулгүй байлгахын тулд бид таныг баталгаажуулна.
+
+  Таны баталгаажуулагч апп-аас үүсгэсэн кодыг оруулна уу.`,
   },
 
   accessRequestView: {
@@ -1686,6 +1697,10 @@ $t(common.cantUndoWarning)`,
     userInvite: {
       messageContainsLinks: 'Урилгын мессеж холбоос агуулж болохгүй',
       messageTooLong: 'Урилгын мессеж хэт урт байна (хамгийн ихдээ {{maxLength}} тэмдэгт)',
+    },
+    user2FADevice: {
+      nameDuplicate: 'Ижил нэртэй төхөөрөмж аль хэдийн байна',
+      nameRequired: 'Төхөөрөмжийн нэр шаардлагатай',
     },
   },
 

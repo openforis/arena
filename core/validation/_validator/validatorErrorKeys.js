@@ -166,6 +166,7 @@ export const ValidatorErrorKeys = {
     userNotFound: 'validationErrors.user.userNotFound',
     passwordChangeRequired: 'validationErrors.user.passwordChangeRequired',
     passwordResetNotAllowedWithPendingInvitation: 'validationErrors.user.passwordResetNotAllowedWithPendingInvitation',
+    twoFactorTokenRequired: 'validationErrors.user.twoFactorTokenRequired',
   },
 
   userAccessRequest: {
@@ -199,5 +200,10 @@ export const ValidatorErrorKeys = {
   userInvite: {
     messageContainsLinks: 'validationErrors.userInvite.messageContainsLinks',
     messageTooLong: 'validationErrors.userInvite.messageTooLong',
+  },
+
+  user2FADevice: {
+    nameDuplicate: 'validationErrors.user2FADevice.nameDuplicate',
+    nameRequired: 'validationErrors.user2FADevice.nameRequired',
   },
 }

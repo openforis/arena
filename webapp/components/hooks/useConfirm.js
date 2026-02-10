@@ -19,6 +19,7 @@ export const useConfirm = () => {
       strongConfirm = false,
       strongConfirmInputLabel = undefined,
       strongConfirmRequiredText = undefined,
+      dismissable = true,
     }) => {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
@@ -33,6 +34,7 @@ export const useConfirm = () => {
           strongConfirm,
           strongConfirmInputLabel,
           strongConfirmRequiredText,
+          dismissable,
         })
       )
     },
@@ -53,6 +55,7 @@ export const useConfirmAsync = () => {
       strongConfirm = false,
       strongConfirmInputLabel = undefined,
       strongConfirmRequiredText = undefined,
+      dismissable = true,
     }) =>
       new Promise((resolve, reject) => {
         try {
@@ -67,6 +70,7 @@ export const useConfirmAsync = () => {
               strongConfirm,
               strongConfirmInputLabel,
               strongConfirmRequiredText,
+              dismissable,
               onOk: () => resolve(true),
               onCancel: () => resolve(false),
             })

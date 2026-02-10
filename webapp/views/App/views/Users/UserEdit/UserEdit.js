@@ -1,11 +1,10 @@
 import './UserEdit.scss'
 
-import React, { useCallback } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import React from 'react'
+import { useParams } from 'react-router'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -14,10 +13,10 @@ import * as Validation from '@core/validation/validation'
 import { Button, ButtonDelete, ButtonInvite, ButtonSave, ExpansionPanel } from '@webapp/components'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
+import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import ProfilePicture from '@webapp/components/profilePicture'
 
-import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
@@ -29,7 +28,6 @@ import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/U
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 import { DropdownPreferredUILanguage } from './DropdownPreferredUILanguage'
 import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
-import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -51,32 +49,29 @@ const UserEdit = () => {
     canEditSystemAdmin,
     canViewSurveyManager,
     canEditSurveyManager,
+    canManageTwoFactorDevices,
     hideSurveyGroup,
 
+    onChangePasswordClick,
+    onExtraChange,
+    onInviteRepeat,
+    onManage2FADevicesClick,
     onMapApiKeyTest,
-    onUpdate,
-    onUpdateProfilePicture,
+    onNameChange,
+    onPasswordFormFieldChange,
+    onRemove,
+    onSave,
     onSurveyAuthGroupChange,
     onSurveyManagerChange,
-    onExtraChange,
     onSurveyExtraPropsChange,
-    onSave,
-    onRemove,
-    onInviteRepeat,
+    onUpdate,
+    onUpdateProfilePicture,
   } = useEditUser({ userUuid })
 
-  const navigate = useNavigate()
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
   const canUseMap = useAuthCanUseMap()
-
-  const onNameChange = useCallback((value) => onUpdate(User.assocName(value)(userToUpdate)), [onUpdate, userToUpdate])
-
-  const onPasswordFormFieldChange = useCallback(
-    (fieldKey) => (value) => onUpdate(A.assoc(fieldKey)(value)(userToUpdate)),
-    [onUpdate, userToUpdate]
-  )
 
   if (!ready) return null
 
@@ -88,7 +83,7 @@ const UserEdit = () => {
 
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
   const invitationExpired = User.isInvitationExpired(userToUpdate)
-  const editingSameUser = User.isEqual(user)(userToUpdate)
+  const editingLoggedInUser = User.isEqual(user)(userToUpdate)
   const newUser = !userUuid
   const surveyGroupsVisible = !newUser && !hideSurveyGroup
   const surveyHasExtraProps = Objects.isNotEmpty(Survey.getUserExtraPropDefs(surveyInfo))
@@ -127,7 +122,7 @@ const UserEdit = () => {
           value={User.getEmail(userToUpdate)}
         />
       )}
-      {userUuid && editingSameUser && (
+      {userUuid && editingLoggedInUser && (
         <FormItem label="userView.preferredUILanguage.label">
           <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
         </FormItem>
@@ -177,7 +172,7 @@ const UserEdit = () => {
           {!systemAdmin && (
             <FormItem label="usersView:roleInCurrentSurvey">
               <DropdownUserRole
-                editingLoggedUser={editingSameUser}
+                editingLoggedUser={editingLoggedInUser}
                 disabled={!canEditGroup}
                 validation={Validation.getFieldValidation(User.keys.authGroupsUuids)(validation)}
                 groupUuid={AuthGroup.getUuid(groupInCurrentSurvey)}
@@ -200,7 +195,7 @@ const UserEdit = () => {
       {!userUuid && (
         <UserPasswordSetForm form={userToUpdate} onFieldChange={onPasswordFormFieldChange} validation={validation} />
       )}
-      {editingSameUser && hideSurveyGroup && canUseMap && (
+      {editingLoggedInUser && hideSurveyGroup && canUseMap && (
         // show map api keys only when editing the current user
         <fieldset className="map-api-keys">
           <legend>{i18n.t('user.mapApiKeys.title')}</legend>
@@ -229,13 +224,16 @@ const UserEdit = () => {
             <Button
               iconClassName="icon-pencil"
               label="userPasswordChangeView.changePassword"
-              onClick={() => {
-                let changePasswordUri = appModuleUri(userModules.userPasswordChange)
-                if (!editingSameUser) {
-                  changePasswordUri += userUuid
-                }
-                navigate(changePasswordUri)
-              }}
+              onClick={onChangePasswordClick}
+            />
+          )}
+
+          {editingLoggedInUser && canManageTwoFactorDevices && (
+            <Button
+              iconClassName="icon-shield"
+              label="userView.manageTwoFactorDevices.label"
+              onClick={onManage2FADevicesClick}
+              title="userView.manageTwoFactorDevices.title"
             />
           )}
 

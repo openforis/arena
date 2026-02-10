@@ -29,6 +29,7 @@ export default {
     cnt: 'Количество',
     code: 'Код',
     collapse: 'Свернуть',
+    confirm: 'Подтвердить',
     convert: 'Преобразовать',
     copy: 'Копировать',
     createdWith: 'Создано с помощью',
@@ -321,6 +322,10 @@ export default {
     userNew: 'Новый пользователь',
     usersSurvey: 'Список пользователей',
     usersList: 'Список пользователей (все)',
+    user2FADevice: 'Устройство 2FA',
+    user2FADevice_plural: 'Устройства 2FA',
+    user2FADeviceDetails: '$t(appModules.user2FADevice)',
+    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
 
     analysis: 'Анализ',
     chain: 'Цепочка',
@@ -350,8 +355,14 @@ export default {
     requestAccess: 'Впервые в $t(common.appNameFull)? Запросить доступ',
     resetPassword: 'Сбросить пароль',
     login: 'Войти',
+    loginUsingBackupCode: 'Войти с помощью резервного кода 2FA',
     forgotPassword: 'Забыли пароль',
     sendPasswordResetEmail: 'Отправить письмо для сброса пароля',
+    twoFactorBackupCode: 'Резервный код 2FA',
+    twoFactorToken: 'Код подтверждения',
+    twoFactorTokenDescription: `Чтобы обеспечить безопасность вашей учетной записи, мы подтверждаем вашу личность.
+
+  Введите код, сгенерированный вашим приложением-аутентификатором.`,
   },
 
   accessRequestView: {
@@ -1696,6 +1707,10 @@ $t(common.cantUndoWarning)`,
     userInvite: {
       messageContainsLinks: 'Приглашение не может содержать ссылки',
       messageTooLong: 'Сообщение приглашения слишком длинное (максимум {{maxLength}} символов)',
+    },
+    user2FADevice: {
+      nameDuplicate: 'Устройство с таким именем уже существует',
+      nameRequired: 'Требуется имя устройства',
     },
   },
 

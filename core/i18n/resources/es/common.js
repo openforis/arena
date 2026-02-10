@@ -29,6 +29,7 @@ export default {
     cnt: 'Contar',
     code: 'Código',
     collapse: 'Colapsar',
+    confirm: 'Confirmar',
     convert: 'Convertir',
     copy: 'Copiar',
     createdWith: 'Creado con',
@@ -292,6 +293,10 @@ export default {
     userNew: 'Nuevo usuario',
     usersSurvey: 'Lista de usuarios',
     usersList: 'Lista de usuarios (todos)',
+    user2FADevice: 'Dispositivo 2FA',
+    user2FADevice_plural: 'Dispositivos 2FA',
+    user2FADeviceDetails: '$t(appModules.user2FADevice)',
+    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
     analysis: 'Análisis',
     chain: 'Cadena',
     chain_plural: 'Cadenas',
@@ -317,8 +322,14 @@ export default {
     requestAccess: '¿Nuevo en $t(common.appNameFull)? Solicitar acceso',
     resetPassword: 'Restablecer contraseña',
     login: 'Iniciar sesión',
+    loginUsingBackupCode: 'Iniciar sesion con codigo de respaldo 2FA',
     forgotPassword: '¿Olvidó su contraseña?',
     sendPasswordResetEmail: 'Enviar correo electrónico de restablecimiento de contraseña',
+    twoFactorBackupCode: 'Codigo de respaldo 2FA',
+    twoFactorToken: 'Código de verificación',
+    twoFactorTokenDescription: `Para mantener su cuenta segura, verificamos su identidad.
+
+  Ingrese el código generado por su aplicación de autenticación.`,
   },
   accessRequestView: {
     error: 'Error al solicitar acceso: {{error}}',
@@ -1483,6 +1494,10 @@ export default {
     userInvite: {
       messageContainsLinks: 'El mensaje de invitación no puede contener enlaces',
       messageTooLong: 'El mensaje de invitación es demasiado largo (máximo {{maxLength}} caracteres)',
+    },
+    user2FADevice: {
+      nameDuplicate: 'Ya existe un dispositivo con el mismo nombre',
+      nameRequired: 'Se requiere el nombre del dispositivo',
     },
   },
   record: {

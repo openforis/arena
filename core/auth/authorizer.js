@@ -203,6 +203,9 @@ export const canEditUserMaxSurveys = (user) => User.isSystemAdmin(user)
 export const canViewUsersAccessRequests = (user) => User.isSystemAdmin(user)
 export const canEditUsersAccessRequests = (user) => User.isSystemAdmin(user)
 
+// User Two Factor Authentication
+export const canManageUser2FADevices = (user) => User.isSystemAdmin(user)
+
 // INVITE
 export const getUserGroupsCanAssign = ({
   user,
