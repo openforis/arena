@@ -89,10 +89,11 @@ export default class RecordCheckJob extends Job {
         }
       }
 
-      result = { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, requiresCheck }
-
       const requiresCheck =
         cleanupRecords || nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
+
+      result = { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, requiresCheck }
+
       if (requiresCheck) {
         this.logDebug('survey has been updated: record check necessary; fetching survey and ref data...')
         // fetch survey reference data (used later for record validation)
