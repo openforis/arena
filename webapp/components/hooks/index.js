@@ -22,6 +22,7 @@ export {
   useIsTaxonomiesRoute,
   useLocationPathMatcher,
 } from './useIsInRoute'
+export { useKeyboardShiftKeyPressed } from './useKeyboardShiftKeyPressed'
 export { useOnBrowserBack } from './useOnBrowserBack'
 export { useOnPageUnload } from './useOnPageUnload'
 export { useBrowserLanguageCode } from './useBrowserLanguageCode'

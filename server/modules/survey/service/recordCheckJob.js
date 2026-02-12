@@ -25,6 +25,7 @@ export default class RecordCheckJob extends Job {
   }
 
   async execute() {
+    const { cleanupRecords } = this.context
     const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle({ surveyId: this.surveyId }, this.tx)
 
     this.total = R.length(recordsUuidAndCycle)
@@ -34,7 +35,7 @@ export default class RecordCheckJob extends Job {
 
       const { requiresCheck } = surveyAndNodeDefs
 
-      if (requiresCheck) {
+      if (requiresCheck || cleanupRecords) {
         await this._checkRecord(surveyAndNodeDefs, recordUuid)
       }
 
@@ -107,8 +108,9 @@ export default class RecordCheckJob extends Job {
   }
 
   async _checkRecord(surveyAndNodeDefs, recordUuid) {
-    const { surveyId, user, tx } = this
+    const { context, surveyId, user, tx } = this
     const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids } = surveyAndNodeDefs
+    const { cleanupRecords } = context
 
     // this.logDebug(`checking record ${recordUuid}`)
 
@@ -135,12 +137,15 @@ export default class RecordCheckJob extends Job {
     const nodesInsertedByUuid = {}
     const allUpdatedNodesByUuid = {}
 
+    const allNodeDefUuids = Object.keys(Survey.getNodeDefs(survey))
+
     // 3. insert missing nodes
-    if (!R.isEmpty(nodeDefAddedUuids)) {
-      // this.logDebug(`inserting missing nodes with node def uuids ${nodeDefAddedUuids}`)
+    const nodeDefToCheckForMissingNodesUuids = cleanupRecords ? allNodeDefUuids : nodeDefAddedUuids
+    if (nodeDefToCheckForMissingNodesUuids.length > 0) {
+      // this.logDebug(`inserting missing nodes with node def uuids ${nodeDefToCheckForMissingNodesUuids}`)
       const { record: recordUpdateInsert, nodes: nodesUpdatedMissing = {} } = await this._insertMissingSingleNodes({
         survey,
-        nodeDefAddedUuids,
+        nodeDefUuids: nodeDefToCheckForMissingNodesUuids,
         record,
         sideEffect: true,
       })
@@ -193,18 +198,22 @@ export default class RecordCheckJob extends Job {
       !R.isEmpty(nodeDefDeletedUuids) ||
       !R.isEmpty(allUpdatedNodesByUuid)
     ) {
+      const nodeDefUuidsToValidate = cleanupRecords ? allNodeDefUuids : nodeDefAddedOrUpdatedUuids
       // this.logDebug(`validating record ${recordUuid}`)
-      await _validateNodes({ user, survey, nodeDefAddedOrUpdatedUuids, record, nodes: allUpdatedNodesByUuid }, this.tx)
+      await _validateNodes(
+        { user, survey, nodeDefUuids: nodeDefUuidsToValidate, record, nodes: allUpdatedNodesByUuid },
+        this.tx
+      )
     }
     // this.logDebug('record check complete')
   }
 
-  // Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
+  // Inserts all the missing single nodes in the specified records having the node def in the specified ones.
   // Returns an indexed object with all the inserted nodes.
-  async _insertMissingSingleNodes({ survey, nodeDefAddedUuids, record, sideEffect = false }) {
+  async _insertMissingSingleNodes({ survey, nodeDefUuids, record, sideEffect = false }) {
     const nodesUpdated = {}
     let recordUpdated = { ...record }
-    for (const nodeDefUuid of nodeDefAddedUuids) {
+    for (const nodeDefUuid of nodeDefUuids) {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(recordUpdated)
       for (const parentNode of parentNodes) {
@@ -292,11 +301,11 @@ const _clearRecordKeysValidation = (record) => {
   return record
 }
 
-const _validateNodes = async ({ user, survey, nodeDefAddedOrUpdatedUuids, record, nodes }, tx) => {
+const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx) => {
   const nodesToValidate = { ...nodes }
 
   // Include parent nodes of new/updated node defs (needed for min/max count validation)
-  for (const nodeDefUuid of nodeDefAddedOrUpdatedUuids) {
+  for (const nodeDefUuid of nodeDefUuids) {
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
     for (const parentNode of parentNodes) {

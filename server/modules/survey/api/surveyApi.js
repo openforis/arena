@@ -310,10 +310,10 @@ export const init = (app) => {
   })
 
   app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
-    const { surveyId } = Request.getParams(req)
+    const { surveyId, cleanupRecords = false } = Request.getParams(req)
     const user = Request.getUser(req)
 
-    const job = SurveyService.startPublishJob(user, surveyId)
+    const job = SurveyService.startPublishJob({ user, surveyId, cleanupRecords })
 
     res.json({ job: JobUtils.jobToJSON(job) })
   })
