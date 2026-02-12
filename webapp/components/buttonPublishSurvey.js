@@ -7,7 +7,9 @@ import * as Survey from '@core/survey/survey'
 import { SurveyActions, useIsSurveyDirty, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
+
 import { Button } from './buttons'
+import { useKeyboardShiftKeyPressed } from './hooks'
 
 const ButtonPublishSurvey = (props) => {
   const { className, disabled = false, variant = 'outlined' } = props
@@ -16,6 +18,7 @@ const ButtonPublishSurvey = (props) => {
   const surveyInfo = useSurveyInfo()
   const surveyIsDirty = useIsSurveyDirty()
   const lang = useSurveyPreferredLang()
+  const shiftPressed = useKeyboardShiftKeyPressed()
 
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
 
@@ -30,7 +33,7 @@ const ButtonPublishSurvey = (props) => {
           DialogConfirmActions.showDialogConfirm({
             key: 'common.publishConfirm',
             params: { survey: surveyLabel },
-            onOk: SurveyActions.publishSurvey(),
+            onOk: SurveyActions.publishSurvey({ cleanupRecords: shiftPressed }),
           })
         )
       }

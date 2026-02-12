@@ -35,7 +35,7 @@ export default class RecordCheckJob extends Job {
       const { requiresCheck } = surveyAndNodeDefs
 
       if (requiresCheck) {
-        await this._checkRecord(surveyAndNodeDefs, recordUuid)
+        await this._checkRecord({ surveyAndNodeDefs, recordUuid })
       }
 
       this.incrementProcessedItems()
@@ -52,10 +52,11 @@ export default class RecordCheckJob extends Job {
   }
 
   async _getOrFetchSurveyAndNodeDefsByCycle(cycle) {
-    const { surveyId, tx } = this
+    const { context, surveyId, tx } = this
+    const { cleanupRecords } = context
     this._cleanSurveysCache(cycle)
-    let surveyAndNodeDefs = this.surveyAndNodeDefsByCycle[cycle]
-    if (!surveyAndNodeDefs) {
+    let result = this.surveyAndNodeDefsByCycle[cycle]
+    if (!result) {
       // 1. fetch survey
       this.logDebug(`fetching survey for cycle ${cycle}...`)
       let survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
@@ -88,7 +89,11 @@ export default class RecordCheckJob extends Job {
         }
       }
 
-      const requiresCheck = nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
+      const requiresCheck =
+        cleanupRecords || nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
+
+      result = { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, requiresCheck }
+
       if (requiresCheck) {
         this.logDebug('survey has been updated: record check necessary; fetching survey and ref data...')
         // fetch survey reference data (used later for record validation)
@@ -96,19 +101,25 @@ export default class RecordCheckJob extends Job {
           { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
           tx
         )
+        result.survey = survey
+
+        // get all not deleted node defs uuids (used for cleanupRecords)
+        const allNotDeletedNodeDefs = Survey.getNodeDefsArray(survey).filter((def) => !NodeDef.isDeleted(def))
+        const allNotDeletedNodeDefUuids = allNotDeletedNodeDefs.map(NodeDef.getUuid)
+        result.allNotDeletedNodeDefUuids = allNotDeletedNodeDefUuids
         this.logDebug('survey with ref data fetched')
       }
-
-      surveyAndNodeDefs = { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, requiresCheck }
-      this.surveyAndNodeDefsByCycle[cycle] = surveyAndNodeDefs
+      this.surveyAndNodeDefsByCycle[cycle] = result
     }
 
-    return surveyAndNodeDefs
+    return result
   }
 
-  async _checkRecord(surveyAndNodeDefs, recordUuid) {
-    const { surveyId, user, tx } = this
-    const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids } = surveyAndNodeDefs
+  async _checkRecord({ surveyAndNodeDefs, recordUuid }) {
+    const { context, surveyId, user, tx } = this
+    const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, allNotDeletedNodeDefUuids } =
+      surveyAndNodeDefs
+    const { cleanupRecords } = context
 
     // this.logDebug(`checking record ${recordUuid}`)
 
@@ -136,11 +147,12 @@ export default class RecordCheckJob extends Job {
     const allUpdatedNodesByUuid = {}
 
     // 3. insert missing nodes
-    if (!R.isEmpty(nodeDefAddedUuids)) {
-      // this.logDebug(`inserting missing nodes with node def uuids ${nodeDefAddedUuids}`)
+    const nodeDefToCheckForMissingNodesUuids = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedUuids
+    if (nodeDefToCheckForMissingNodesUuids.length > 0) {
+      // this.logDebug(`inserting missing nodes with node def uuids ${nodeDefToCheckForMissingNodesUuids}`)
       const { record: recordUpdateInsert, nodes: nodesUpdatedMissing = {} } = await this._insertMissingSingleNodes({
         survey,
-        nodeDefAddedUuids,
+        nodeDefUuids: nodeDefToCheckForMissingNodesUuids,
         record,
         sideEffect: true,
       })
@@ -193,18 +205,22 @@ export default class RecordCheckJob extends Job {
       !R.isEmpty(nodeDefDeletedUuids) ||
       !R.isEmpty(allUpdatedNodesByUuid)
     ) {
+      const nodeDefUuidsToValidate = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedOrUpdatedUuids
       // this.logDebug(`validating record ${recordUuid}`)
-      await _validateNodes({ user, survey, nodeDefAddedOrUpdatedUuids, record, nodes: allUpdatedNodesByUuid }, this.tx)
+      await _validateNodes(
+        { user, survey, nodeDefUuids: nodeDefUuidsToValidate, record, nodes: allUpdatedNodesByUuid },
+        this.tx
+      )
     }
     // this.logDebug('record check complete')
   }
 
-  // Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
+  // Inserts all the missing single nodes in the specified records having the node def in the specified ones.
   // Returns an indexed object with all the inserted nodes.
-  async _insertMissingSingleNodes({ survey, nodeDefAddedUuids, record, sideEffect = false }) {
+  async _insertMissingSingleNodes({ survey, nodeDefUuids, record, sideEffect = false }) {
     const nodesUpdated = {}
     let recordUpdated = { ...record }
-    for (const nodeDefUuid of nodeDefAddedUuids) {
+    for (const nodeDefUuid of nodeDefUuids) {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(recordUpdated)
       for (const parentNode of parentNodes) {
@@ -292,11 +308,11 @@ const _clearRecordKeysValidation = (record) => {
   return record
 }
 
-const _validateNodes = async ({ user, survey, nodeDefAddedOrUpdatedUuids, record, nodes }, tx) => {
+const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx) => {
   const nodesToValidate = { ...nodes }
 
   // Include parent nodes of new/updated node defs (needed for min/max count validation)
-  for (const nodeDefUuid of nodeDefAddedOrUpdatedUuids) {
+  for (const nodeDefUuid of nodeDefUuids) {
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
     for (const parentNode of parentNodes) {
