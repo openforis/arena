@@ -25,7 +25,6 @@ export default class RecordCheckJob extends Job {
   }
 
   async execute() {
-    const { cleanupRecords } = this.context
     const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle({ surveyId: this.surveyId }, this.tx)
 
     this.total = R.length(recordsUuidAndCycle)
@@ -35,7 +34,7 @@ export default class RecordCheckJob extends Job {
 
       const { requiresCheck } = surveyAndNodeDefs
 
-      if (requiresCheck || cleanupRecords) {
+      if (requiresCheck) {
         await this._checkRecord(surveyAndNodeDefs, recordUuid)
       }
 
@@ -53,7 +52,8 @@ export default class RecordCheckJob extends Job {
   }
 
   async _getOrFetchSurveyAndNodeDefsByCycle(cycle) {
-    const { surveyId, tx } = this
+    const { context, surveyId, tx } = this
+    const { cleanupRecords } = context
     this._cleanSurveysCache(cycle)
     let surveyAndNodeDefs = this.surveyAndNodeDefsByCycle[cycle]
     if (!surveyAndNodeDefs) {
@@ -89,7 +89,8 @@ export default class RecordCheckJob extends Job {
         }
       }
 
-      const requiresCheck = nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
+      const requiresCheck =
+        cleanupRecords || nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
       if (requiresCheck) {
         this.logDebug('survey has been updated: record check necessary; fetching survey and ref data...')
         // fetch survey reference data (used later for record validation)
@@ -137,10 +138,11 @@ export default class RecordCheckJob extends Job {
     const nodesInsertedByUuid = {}
     const allUpdatedNodesByUuid = {}
 
-    const allNodeDefUuids = Object.keys(Survey.getNodeDefs(survey))
+    const allNotDeletedNodeDefs = Survey.getNodeDefsArray(survey).filter((def) => !NodeDef.isDeleted(def))
+    const allNotDeletedNodeDefUuids = allNotDeletedNodeDefs.map(NodeDef.getUuid)
 
     // 3. insert missing nodes
-    const nodeDefToCheckForMissingNodesUuids = cleanupRecords ? allNodeDefUuids : nodeDefAddedUuids
+    const nodeDefToCheckForMissingNodesUuids = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedUuids
     if (nodeDefToCheckForMissingNodesUuids.length > 0) {
       // this.logDebug(`inserting missing nodes with node def uuids ${nodeDefToCheckForMissingNodesUuids}`)
       const { record: recordUpdateInsert, nodes: nodesUpdatedMissing = {} } = await this._insertMissingSingleNodes({
@@ -198,7 +200,7 @@ export default class RecordCheckJob extends Job {
       !R.isEmpty(nodeDefDeletedUuids) ||
       !R.isEmpty(allUpdatedNodesByUuid)
     ) {
-      const nodeDefUuidsToValidate = cleanupRecords ? allNodeDefUuids : nodeDefAddedOrUpdatedUuids
+      const nodeDefUuidsToValidate = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedOrUpdatedUuids
       // this.logDebug(`validating record ${recordUuid}`)
       await _validateNodes(
         { user, survey, nodeDefUuids: nodeDefUuidsToValidate, record, nodes: allUpdatedNodesByUuid },
