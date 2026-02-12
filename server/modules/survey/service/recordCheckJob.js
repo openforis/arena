@@ -35,7 +35,7 @@ export default class RecordCheckJob extends Job {
       const { requiresCheck } = surveyAndNodeDefs
 
       if (requiresCheck) {
-        await this._checkRecord(surveyAndNodeDefs, recordUuid)
+        await this._checkRecord({ surveyAndNodeDefs, recordUuid })
       }
 
       this.incrementProcessedItems()
@@ -55,8 +55,8 @@ export default class RecordCheckJob extends Job {
     const { context, surveyId, tx } = this
     const { cleanupRecords } = context
     this._cleanSurveysCache(cycle)
-    let surveyAndNodeDefs = this.surveyAndNodeDefsByCycle[cycle]
-    if (!surveyAndNodeDefs) {
+    let result = this.surveyAndNodeDefsByCycle[cycle]
+    if (!result) {
       // 1. fetch survey
       this.logDebug(`fetching survey for cycle ${cycle}...`)
       let survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
@@ -89,6 +89,8 @@ export default class RecordCheckJob extends Job {
         }
       }
 
+      result = { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, requiresCheck }
+
       const requiresCheck =
         cleanupRecords || nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
       if (requiresCheck) {
@@ -98,19 +100,24 @@ export default class RecordCheckJob extends Job {
           { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
           tx
         )
+        result.survey = survey
+
+        // get all not deleted node defs uuids (used for cleanupRecords)
+        const allNotDeletedNodeDefs = Survey.getNodeDefsArray(survey).filter((def) => !NodeDef.isDeleted(def))
+        const allNotDeletedNodeDefUuids = allNotDeletedNodeDefs.map(NodeDef.getUuid)
+        result.allNotDeletedNodeDefUuids = allNotDeletedNodeDefUuids
         this.logDebug('survey with ref data fetched')
       }
-
-      surveyAndNodeDefs = { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, requiresCheck }
-      this.surveyAndNodeDefsByCycle[cycle] = surveyAndNodeDefs
+      this.surveyAndNodeDefsByCycle[cycle] = result
     }
 
-    return surveyAndNodeDefs
+    return result
   }
 
-  async _checkRecord(surveyAndNodeDefs, recordUuid) {
+  async _checkRecord({ surveyAndNodeDefs, recordUuid }) {
     const { context, surveyId, user, tx } = this
-    const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids } = surveyAndNodeDefs
+    const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, allNotDeletedNodeDefUuids } =
+      surveyAndNodeDefs
     const { cleanupRecords } = context
 
     // this.logDebug(`checking record ${recordUuid}`)
@@ -137,9 +144,6 @@ export default class RecordCheckJob extends Job {
 
     const nodesInsertedByUuid = {}
     const allUpdatedNodesByUuid = {}
-
-    const allNotDeletedNodeDefs = Survey.getNodeDefsArray(survey).filter((def) => !NodeDef.isDeleted(def))
-    const allNotDeletedNodeDefUuids = allNotDeletedNodeDefs.map(NodeDef.getUuid)
 
     // 3. insert missing nodes
     const nodeDefToCheckForMissingNodesUuids = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedUuids
