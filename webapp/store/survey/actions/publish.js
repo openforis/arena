@@ -6,7 +6,7 @@ import * as SurveyState from '../state'
 import { setActiveSurvey } from './active'
 
 export const publishSurvey =
-  ({ cleanupRecords }) =>
+  ({ cleanupRecords = false } = {}) =>
   async (dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
