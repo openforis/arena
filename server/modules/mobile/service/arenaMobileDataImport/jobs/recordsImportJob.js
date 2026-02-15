@@ -110,7 +110,6 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     const sideEffect = true // do side effect to avoid creating new objects and use less memory
 
-    const recordUuid = Record.getUuid(record)
     // check owner uuid: if user not defined, use the job user as owner
     const ownerUuidSource = Record.getOwnerUuid(record)
     const ownerSource = await UserService.fetchUserByUuid(ownerUuidSource, tx)
