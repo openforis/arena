@@ -220,7 +220,7 @@ export const updateNodesDependents = async (
 // ==== DELETE
 
 const _getNodeDependentKeyAttributes = (survey, record, node) => {
-  const nodeDependentKeyAttributes = {}
+  const nodeDependentKeyAttributesByIId = {}
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   if (NodeDef.isMultipleEntity(nodeDef)) {
     // Find sibling entities with same key values
@@ -240,14 +240,14 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
 
         if (R.equals(nodeKeyValues, nodeDeletedKeyValues)) {
           nodeKeys.forEach((nodeKey) => {
-            nodeDependentKeyAttributes[Node.getUuid(nodeKey)] = nodeKey
+            nodeDependentKeyAttributesByIId[Node.getIId(nodeKey)] = nodeKey
           })
         }
       })
     }
   }
 
-  return nodeDependentKeyAttributes
+  return nodeDependentKeyAttributesByIId
 }
 
 export const deleteNode = async (user, survey, record, nodeUuid, t) => {
@@ -277,11 +277,11 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
 
   // mark deleted dependent attributes
   nodeDependentUniqueAttributes = Object.values(nodeDependentUniqueAttributes).reduce((nodesAcc, nodeDependent) => {
-    const nodeDependentUuid = Node.getUuid(nodeDependent)
-    const deleted = !Record.getNodeByUuid(nodeDependentUuid)(recordUpdated)
+    const nodeDependentIId = Node.getIId(nodeDependent)
+    const deleted = !Record.getNodeByInternalId(nodeDependentIId)(recordUpdated)
     const nodeDependentUpdated =
       Node.isDeleted(nodeDependent) !== deleted ? Node.assocDeleted(deleted)(nodeDependent) : nodeDependent
-    return { ...nodesAcc, [nodeDependentUuid]: nodeDependentUpdated }
+    return { ...nodesAcc, [nodeDependentIId]: nodeDependentUpdated }
   }, {})
 
   return _onNodeUpdate(
@@ -297,18 +297,18 @@ export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, re
   client.tx(async (t) => {
     const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefUuids, t)
     const activities = nodesDeleted.map((node) =>
-      ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true)
+      ActivityLog.newActivity(ActivityLog.type.nodeDelete, { iId: Node.getIId(node) }, true)
     )
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
-    const nodesDeletedByUuid = ObjectUtils.toUuidIndexedObj(nodesDeleted)
-    const recordUpdated = Record.mergeNodes(nodesDeletedByUuid, { sideEffect: true })(record)
+    const nodesDeletedByIId = ObjectUtils.toIIdIndexedObj(nodesDeleted)
+    const recordUpdated = Record.mergeNodes(nodesDeletedByIId, { sideEffect: true })(record)
     return { record: recordUpdated, nodesDeleted }
   })
 
 export const deleteNodesByInternalIds = async ({ user, surveyId, nodeInternalIds, systemActivity = false }, tx) => {
   const nodesDeleted = await NodeRepository.deleteNodesByInternalIds(surveyId, nodeInternalIds, tx)
-  const activities = nodeUuids.map((uuid) =>
-    ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid }, systemActivity)
+  const activities = nodeInternalIds.map((iId) =>
+    ActivityLog.newActivity(ActivityLog.type.nodeDelete, { iId }, systemActivity)
   )
   await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
   return nodesDeleted

@@ -190,9 +190,9 @@ export const persistNode = async (
       node,
       timezoneOffset,
       nodesUpdateFn: async (user, survey, record, node, t) => {
-        const nodeUuid = Node.getUuid(node)
+        const nodeIId = Node.getIId(node)
 
-        const existingNode = Record.getNodeByUuid(nodeUuid)(record)
+        const existingNode = Record.getNodeByInternalId(nodeIId)(record)
 
         if (existingNode) {
           return NodeUpdateManager.updateNode({ user, survey, record, node, system }, t)

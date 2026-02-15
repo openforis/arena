@@ -136,6 +136,8 @@ export const toIndexedObj = (array, propNameOrExtractor) =>
 
 export const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
 
+export const toIIdIndexedObj = R.partialRight(toIndexedObj, [keys.iId])
+
 export const groupByProps =
   (...propNamesOrExtractors) =>
   (items) =>

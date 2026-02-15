@@ -13,7 +13,7 @@ const createNodesRecordUniqueValidation = ({ nodes, unique, errorKey }) =>
   nodes.reduce(
     (validationAcc, keyNode) => ({
       ...validationAcc,
-      [Node.getUuid(keyNode)]: RecordValidation.newValidationRecordDuplicate({ unique, errorKey }),
+      [Node.getIId(keyNode)]: RecordValidation.newValidationRecordDuplicate({ unique, errorKey }),
     }),
     {}
   )
