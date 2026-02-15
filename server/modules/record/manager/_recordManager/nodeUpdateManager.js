@@ -33,9 +33,9 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
   return {
     record: recordUpdated,
     nodes: {
-      [Node.getUuid(node)]: node,
+      [Node.getIId(node)]: node,
       // Always assoc parentNode, used in surveyRdbManager.updateTableNodes
-      ...(parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}),
+      ...(parentNode ? { [Node.getIId(parentNode)]: parentNode } : {}),
       ...nodes,
     },
   }
@@ -58,11 +58,11 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
           const nodeDefDependent = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeDependent))(survey)
 
           return NodeDef.isMultiple(nodeDefDependent)
-            ? NodeRepository.deleteNode(surveyId, Node.getUuid(nodeDependent), t)
+            ? NodeRepository.deleteNode(surveyId, Node.getIId(nodeDependent), t)
             : NodeRepository.updateNode(
                 {
                   surveyId,
-                  nodeUuid: Node.getUuid(nodeDependent),
+                  nodeIId: Node.getIId(nodeDependent),
                   meta: Node.getMeta(nodeDependent),
                   draft: Record.isPreview(record),
                 },
@@ -103,7 +103,7 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
   const value = Node.getValue(node)
   if (NodeDef.isFile(nodeDef)) {
     // mark old file as deleted if changed
-    const nodePrev = await NodeRepository.fetchNodeByUuid(surveyId, Node.getUuid(node), t)
+    const nodePrev = await NodeRepository.fetchNodeByIId(surveyId, Node.getRecordUuid(node), Node.getIId(node), t)
     const fileUuidPrev = Node.getFileUuid(nodePrev)
     if (fileUuidPrev !== null && fileUuidPrev !== Node.getFileUuid(node)) {
       await FileRepository.markFileAsDeleted(surveyId, fileUuidPrev, t)
@@ -113,7 +113,8 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
   const nodeUpdated = await NodeRepository.updateNode(
     {
       surveyId,
-      nodeUuid: Node.getUuid(node),
+      recordUuid: Node.getRecordUuid(node),
+      nodeIId: Node.getIId(node),
       value,
       meta,
       draft: Record.isPreview(record),
@@ -131,14 +132,15 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
 }
 
 const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
+  const recordUuid = Record.getUuid(record)
   const nodesReloadedArray = (
     await NodeRepository.fetchNodesWithRefDataByUuids(
-      { surveyId, nodeUuids: Object.keys(nodes), draft: Record.isPreview(record) },
+      { surveyId, recordUuid, nodeUuids: Object.keys(nodes), draft: Record.isPreview(record) },
       tx
     )
   ).map((nodeReloaded) => {
     // preserve status flags (used in rdb updates)
-    const oldNode = nodes[Node.getUuid(nodeReloaded)]
+    const oldNode = nodes[Node.getIId(nodeReloaded)]
     return R.pipe(
       Node.assocCreated(Node.isCreated(oldNode)),
       Node.assocDeleted(Node.isDeleted(oldNode)),
@@ -173,7 +175,7 @@ const _persistNodes = async ({ surveyId, nodesArray }, tx) => {
     await NodeRepository.updateNodes({ surveyId, nodes: nodesUpdated }, tx)
   }
   if (nodesDeleted.length) {
-    await NodeRepository.deleteNodesByUuids(surveyId, nodesDeleted.map(Node.getUuid), tx)
+    await NodeRepository.deleteNodesByInternalIds(surveyId, nodesDeleted.map(Node.getIId), tx)
   }
 }
 
@@ -303,8 +305,8 @@ export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, re
     return { record: recordUpdated, nodesDeleted }
   })
 
-export const deleteNodesByUuids = async ({ user, surveyId, nodeUuids, systemActivity = false }, tx) => {
-  const nodesDeleted = await NodeRepository.deleteNodesByUuids(surveyId, nodeUuids, tx)
+export const deleteNodesByInternalIds = async ({ user, surveyId, nodeInternalIds, systemActivity = false }, tx) => {
+  const nodesDeleted = await NodeRepository.deleteNodesByInternalIds(surveyId, nodeInternalIds, tx)
   const activities = nodeUuids.map((uuid) =>
     ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid }, systemActivity)
   )

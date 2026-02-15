@@ -38,11 +38,11 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
     this.dataImportFileReader = null
     this.flatDataReader = null
-    this.entitiesWithMultipleAttributesClearedByUuid = {} // used to clear multiple attribute values only once
+    this.entitiesWithMultipleAttributesClearedByIId = {} // used to clear multiple attribute values only once
     this.updatedFilesByUuid = {}
     this.updatedFilesByName = {}
     this.filesToDeleteByUuid = {}
-    this.entityUuidTouchedByRecordUuid = {}
+    this.entityIIdTouchedByRecordUuid = {}
     this.entitiesCreated = 0
   }
 
@@ -100,7 +100,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         dataImportFileReader: this.dataImportFileReader,
         updatedFilesByUuid: this.updatedFilesByUuid,
         filesToDeleteByUuid: this.filesToDeleteByUuid,
-        entityUuidTouchedByRecordUuid: this.entityUuidTouchedByRecordUuid,
+        entityIIdTouchedByRecordUuid: this.entityIIdTouchedByRecordUuid,
       })
     }
   }
@@ -241,9 +241,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         sideEffect,
       })(this.currentRecord)
 
-      const entityUuid = Node.getUuid(entity)
+      const entityIId = Node.getIId(entity)
 
-      Objects.setInPath({ obj: this.entityUuidTouchedByRecordUuid, path: [recordUuid, entityUuid], value: true })
+      Objects.setInPath({ obj: this.entityIIdTouchedByRecordUuid, path: [recordUuid, entityIId], value: true })
 
       if (Node.isCreated(entity)) {
         this.entitiesCreated += 1
@@ -294,8 +294,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     const multipleAttributeDefsBeingUpdated = Object.keys(valuesByDefUuid)
       .map((nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey))
       .filter(NodeDef.isMultipleAttribute)
-    const entityUuid = Node.getUuid(entity)
-    if (multipleAttributeDefsBeingUpdated.length > 0 && !this.entitiesWithMultipleAttributesClearedByUuid[entityUuid]) {
+    const entityIId = Node.getIId(entity)
+    if (multipleAttributeDefsBeingUpdated.length > 0 && !this.entitiesWithMultipleAttributesClearedByIId[entityIId]) {
       const nodeDefUuidsToClear = multipleAttributeDefsBeingUpdated.map(NodeDef.getUuid)
       const entityClearUpdateResult = await Record.deleteNodesInEntityByNodeDefUuid({
         survey,
@@ -305,7 +305,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       })(this.currentRecord)
 
       this.currentRecord = entityClearUpdateResult.record
-      this.entitiesWithMultipleAttributesClearedByUuid[entityUuid] = true
+      this.entitiesWithMultipleAttributesClearedByIId[entityIId] = true
 
       await this.persistUpdatedNodes({ nodesUpdated: entityClearUpdateResult.nodes })
     }
@@ -318,7 +318,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       if (NodeDef.isFile(nodeDef)) {
-        const oldNode = Record.getNodeByUuid(Node.getUuid(node))(originalRecord)
+        const oldNode = Record.getNodeByInternalId(Node.getIId(node))(originalRecord)
         if (!Node.isValueBlank(oldNode)) {
           const fileToDeleteUuid = Node.getFileUuid(oldNode)
           filesToDeleteByUuid[fileToDeleteUuid] = RecordFile.createFileFromNode({ node: oldNode })

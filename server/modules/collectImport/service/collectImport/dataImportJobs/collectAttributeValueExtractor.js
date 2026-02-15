@@ -126,7 +126,7 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
       size: fileSize,
       content,
       recordUuid: Node.getRecordUuid(node),
-      nodeUuid: Node.getUuid(node),
+      nodeIId: Node.getIId(node),
     })
     await FileManager.insertFile(Survey.getId(survey), file, tx)
 

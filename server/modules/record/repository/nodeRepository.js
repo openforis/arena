@@ -238,12 +238,12 @@ export const fetchNodesByRecordUuid = async (
     dbTransformCallback
   )
 
-export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
+export const fetchNodeByIId = async (surveyId, recordUuid, iId, client = db) =>
   client.one(
     `
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE uuid = $1`,
-    [uuid],
+    WHERE record_uuid = $/recordUuid/ AND iid = $/iId/`,
+    { recordUuid, iId },
     dbTransformCallback
   )
 
@@ -273,7 +273,7 @@ export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUu
 
 // ============== UPDATE
 export const updateNode = async (
-  { surveyId, nodeUuid, value = null, meta = {}, draft, reloadNode = true },
+  { surveyId, nodeIId, value = null, meta = {}, draft, reloadNode = true },
   client = db
 ) => {
   await client.query(
@@ -282,14 +282,16 @@ export const updateNode = async (
     SET value = $1::jsonb,
     meta = meta || $2::jsonb, 
     date_modified = ${DbUtils.now}
-    WHERE uuid = $3
+    WHERE iid = $3
     `,
-    [_toValueQueryParam(value), meta || {}, nodeUuid]
+    [_toValueQueryParam(value), meta || {}, nodeIId]
   )
   if (!reloadNode) return null
 
   // fetch node with ref data
-  const node = await fetchNodeWithRefDataByUuid({ surveyId, nodeUuid, draft }, client)
+  // TODO
+  const recordUuid = null
+  const node = await fetchNodeWithRefDataByUuid({ surveyId, recordUuid, nodeIId, draft }, client)
   node[Node.keys.updated] = true
   return node
 }
@@ -339,11 +341,11 @@ export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client =
     dbTransformCallback
   )
 
-export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>
+export const deleteNodesByInternalIds = async (surveyId, nodeInternalIds, client = db) =>
   client.manyOrNone(
     `DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE uuid IN ($1:csv)
+    WHERE iid IN ($1:csv)
     RETURNING *, true as ${Node.keys.deleted}`,
-    [nodeUuids],
+    [nodeInternalIds],
     dbTransformCallback
   )

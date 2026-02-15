@@ -453,17 +453,17 @@ const deleteNodesInEntityByNodeDefUuid =
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
-    const nodeUuidsToDelete = []
+    const nodeIIdsToDelete = []
     for (const nodeDefUuid of nodeDefUuids) {
       const children = RecordReader.getNodeChildrenByDefUuid(entity, nodeDefUuid)(record)
-      nodeUuidsToDelete.push(...children.map(Node.getUuid))
+      nodeIIdsToDelete.push(...children.map(Node.getIId))
     }
 
     const nodesDeleteUpdateResult = await deleteNodes({
       user,
       survey,
       record,
-      nodeUuids: nodeUuidsToDelete,
+      nodeUuids: nodeIIdsToDelete,
       categoryItemProvider,
       taxonProvider,
       sideEffect,

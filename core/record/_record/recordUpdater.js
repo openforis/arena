@@ -14,9 +14,8 @@ import * as RecordReader from './recordReader'
  * Updates the record nodes with the ones passed as parameter.
  * Existing nodes will be replaced by the ones in the specified parameter.
  * Nodes marked as "deleted" will be removed from the record.
- *
  * @param {object} nodes - The nodes to be added or updated.
- * @param {boolean} [removeFlags = false] - True if flags like "deleted" or "created" must be removed from the nodes, false otherwise.
+ * @param {boolean} [removeFlags] - True if flags like "deleted" or "created" must be removed from the nodes, false otherwise.
  * @returns {object} - The updated record.
  */
 export const mergeNodes =
@@ -64,11 +63,10 @@ export const assocNode =
 /**
  * Adds new nodes to the record.
  * Nodes shouldn't have been added previously to the record, so in this casa there is no need to check for duplicates.
- *
  * @param {!object} params - The parameters.
  * @param {!object} [params.nodes] - The nodes to be added.
- * @param {boolean} [params.updateNodesIndex = true] - True if the nodes must be added to the index (slower), false otherwise (faster).
- * @param {boolean} [params.sideEffect = true] - True if the passed record object can be modified by calling this function (faster), false otherwise.
+ * @param {boolean} [params.updateNodesIndex] - True if the nodes must be added to the index (slower), false otherwise (faster).
+ * @param {boolean} [params.sideEffect] - True if the passed record object can be modified by calling this function (faster), false otherwise.
  * @returns {object} - The updated record.
  */
 export const assocNodes =
@@ -93,7 +91,7 @@ export const assocDateModified = (dateModified) => (record) => {
 export const deleteNode =
   (node, { sideEffect = false } = {}) =>
   (record) => {
-    const nodeUuid = Node.getUuid(node)
-    const { record: recordUpdated } = Records.deleteNode(nodeUuid, { sideEffect })(record)
+    const nodeIId = Node.getIId(node)
+    const { record: recordUpdated } = Records.deleteNode(nodeIId, { sideEffect })(record)
     return recordUpdated
   }

@@ -57,7 +57,8 @@ export const getCreatedWithAppId = (record) => {
   return AppInfo.getAppId(createdWith)
 }
 
-export const { getNodes, getNodesArray, getNodeByUuid, getRootNode, getNodesByDefUuid } = RecordReader
+export const { getNodes, getNodesArray, getNodeByInternalId, getNodeByUuid, getRootNode, getNodesByDefUuid } =
+  RecordReader
 
 // ==== hierarchy
 export const {

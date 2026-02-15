@@ -214,7 +214,7 @@ export const fetchRecordAndNodesByUuid = async (
   return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate, sideEffect: true })(record)
 }
 
-export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
+export { fetchNodeByIId as fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
 
 const fetchNodeRefData = async ({ survey, node, isCode }, client) => {
   const surveyId = Survey.getId(survey)
@@ -333,7 +333,7 @@ export {
   deleteRecordsByCycles,
   deleteNode,
   deleteNodesByNodeDefUuids,
-  deleteNodesByUuids,
+  deleteNodesByInternalIds,
 } from './_recordManager/recordUpdateManager'
 
 // ==== VALIDATION

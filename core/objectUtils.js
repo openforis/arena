@@ -11,9 +11,11 @@ export const keys = {
   draft: 'draft',
   extra: 'extra',
   id: 'id',
+  iId: 'iId',
   index: 'index',
   name: 'name',
   nodeDefUuid: 'nodeDefUuid',
+  pIId: 'pIId',
   parentUuid: 'parentUuid',
   props: 'props',
   propsDraft: 'propsDraft',
@@ -31,6 +33,7 @@ export const keysProps = {
 
 // ====== READ
 export const getId = R.prop(keys.id)
+export const getIId = R.prop(keys.iId)
 export const getUuid = R.propOr(null, keys.uuid)
 
 export const getProps = R.propOr({}, keys.props)
@@ -40,6 +43,7 @@ export const isKeyTrue = (key) => (obj) => !!R.propOr(false, key)(obj)
 export const isPropTrue = (prop) => (obj) => !!getProp(prop)(obj)
 
 export const getParentUuid = R.propOr(null, keys.parentUuid)
+export const getParentInternalId = R.propOr(null, keys.pIId)
 
 export const getLabels = getProp(keysProps.labels, {})
 export const getLabel = (lang, defaultTo = null) => R.pipe(getLabels, R.propOr(defaultTo, lang))

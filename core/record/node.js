@@ -43,8 +43,10 @@ const flagKeysIncludingDirty = [...flagKeysArray, dirtyFlag]
 
 export const keys = {
   id: ObjectUtils.keys.id,
+  iId: ObjectUtils.keys.iId,
   uuid: ObjectUtils.keys.uuid,
   parentUuid: ObjectUtils.keys.parentUuid,
+  pIId: ObjectUtils.keys.pIId,
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
   recordUuid: 'recordUuid',
@@ -70,9 +72,9 @@ export const isValueProp = ({ nodeDef, prop }) => Boolean(R.path([NodeDef.getTyp
 // ======
 //
 
-export const { getId, getUuid } = ObjectUtils
+export const { getId, getIId, getUuid } = ObjectUtils
 
-export const { getParentUuid } = ObjectUtils
+export const { getParentUuid, getParentInternalId } = ObjectUtils
 
 export const getRecordUuid = R.prop(keys.recordUuid)
 

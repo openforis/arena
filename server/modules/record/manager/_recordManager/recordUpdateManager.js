@@ -235,7 +235,7 @@ export const deleteNode = async (
     t
   )
 
-export const { deleteNodesByUuids } = NodeUpdateManager
+export const { deleteNodesByInternalIds } = NodeUpdateManager
 
 export const deleteNodesByNodeDefUuids = async ({ user, surveyId, nodeDefUuids, record }, client = db) => {
   const { record: recordUpdated } = await NodeUpdateManager.deleteNodesByNodeDefUuids(

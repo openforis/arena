@@ -18,7 +18,7 @@ export const propKeys = {
   name: 'name',
   size: 'size',
   recordUuid: 'recordUuid',
-  nodeUuid: 'nodeUuid',
+  nodeIId: 'nodeIId',
 }
 
 export const invalidPropKeys = {
@@ -26,13 +26,13 @@ export const invalidPropKeys = {
   fileSize: 'fileSize',
 }
 
-export const createFile = ({ name, uuid = null, size = null, content = null, recordUuid = null, nodeUuid = null }) => ({
+export const createFile = ({ name, uuid = null, size = null, content = null, recordUuid = null, nodeIId = null }) => ({
   [keys.uuid]: uuid ?? uuidv4(),
   [keys.props]: {
     [propKeys.name]: name,
     [propKeys.size]: size,
     [propKeys.recordUuid]: recordUuid,
-    [propKeys.nodeUuid]: nodeUuid,
+    [propKeys.nodeIId]: nodeIId,
   },
   [keys.content]: content,
 })
@@ -42,7 +42,7 @@ export const createFileFromNode = ({ node, size = null, content = null }) =>
     uuid: Node.getFileUuid(node),
     name: Node.getFileName(node),
     recordUuid: Node.getRecordUuid(node),
-    nodeUuid: Node.getUuid(node),
+    nodeIId: Node.getIId(node),
     size,
     content,
   })
@@ -62,7 +62,7 @@ export const { getUuid, getProps } = ObjectUtils
 export const isDeleted = (file) => Boolean(ObjectUtils.getProp(propKeys.deleted, false)(file))
 export const getName = ObjectUtils.getProp(propKeys.name)
 export const getSize = ObjectUtils.getProp(propKeys.size)
-export const getNodeUuid = ObjectUtils.getProp(propKeys.nodeUuid)
+export const getNodeIId = ObjectUtils.getProp(propKeys.nodeIId)
 export const getRecordUuid = ObjectUtils.getProp(propKeys.recordUuid)
 export const getContent = R.prop(keys.content)
 export const getExtension = R.pipe(getName, FileNames.getExtension)
@@ -85,7 +85,7 @@ export const cleanupInvalidProps = (file) => {
     [propKeys.name]: props[invalidPropKeys.fileName],
     [propKeys.size]: props[invalidPropKeys.fileSize],
     [propKeys.recordUuid]: props[propKeys.recordUuid],
-    [propKeys.nodeUuid]: props[propKeys.nodeUuid],
+    [propKeys.nodeIId]: props[propKeys.nodeIId],
   }
   if (props.deleted) {
     propsUpdated[propKeys.deleted] = true

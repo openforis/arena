@@ -148,7 +148,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
         node[Node.keys.recordUuid] = recordUuid
         Node.removeFlags({ sideEffect: true })(node)
       } else {
-        const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
+        const messagePrefix = `record ${Record.getUuid(record)}: node with internal id ${Node.getIId(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
         const messageSuffix = `: skipping it`
         this.logWarn(`${messagePrefix} ${error} ${messageSuffix}`)
         delete nodes[nodeUuid]
@@ -275,19 +275,19 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const nodesIndexedByUuid = Record.getNodesArray(record)
       .sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
       .reduce((acc, node) => {
-        const nodeUuid = Node.getUuid(node)
+        const nodeIId = Node.getIId(node)
         const nodeDefUuid = Node.getNodeDefUuid(node)
         // check that the node definition associated to the node has not been deleted from the survey
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
         if (nodeDef) {
           node[Node.keys.created] = true // do side effect to avoid creating new objects
-          acc[nodeUuid] = node
+          acc[nodeIId] = node
           if (NodeDef.isFile(nodeDef)) {
             this.trackFileUuid({ node })
           }
         } else {
           this.logDebug(
-            `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeUuid}; skipping it`
+            `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeIId}; skipping it`
           )
         }
         return acc
