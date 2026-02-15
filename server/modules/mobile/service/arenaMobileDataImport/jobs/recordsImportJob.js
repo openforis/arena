@@ -25,27 +25,6 @@ const resultKeys = {
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
 
-const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
-  if (!nodeDef) {
-    return { valid: false, error: 'refers a missing node definition' }
-  }
-  const parentUuid = Node.getParentUuid(node)
-  if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
-    return { valid: false, error: `has missing or invalid parent_uuid` }
-  }
-  if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
-    return { valid: false, error: `is multiple and has an empty value` }
-  }
-  const nodeHierarchy = Node.getHierarchy(node)
-  if (
-    nodeHierarchy.length !== NodeDef.getMetaHierarchy(nodeDef)?.length ||
-    nodeHierarchy.some((ancestorUuid) => !nodes[ancestorUuid])
-  ) {
-    return { valid: false, error: `has an invalid meta hierarchy` }
-  }
-  return { valid: true }
-}
-
 const getRecordFormattedKeyValues = ({ survey, record }) => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const recordRootEntity = Records.getRoot(record)
@@ -117,12 +96,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
   trackFileUuids({ nodes }) {
     // keep track of file uuids found in record attribute values
     const { survey } = this.context
-    Object.values(nodes).forEach((node) => {
+    for (const node of Object.values(nodes)) {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       if (NodeDef.isFile(nodeDef)) {
         this.trackFileUuid({ node })
       }
-    })
+    }
   }
 
   async cleanupCurrentRecord() {
@@ -139,24 +118,6 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     // remove invalid nodes and build index from scratch
     delete record['_nodesIndex']
-    const nodes = Record.getNodes(record)
-
-    for (const [nodeUuid, node] of Object.entries(nodes)) {
-      const nodeDefUuid = Node.getNodeDefUuid(node)
-      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const { valid, error } = checkNodeIsValid({ nodes, node, nodeDef })
-      if (valid) {
-        // ensure recordUuid is set in node
-        node[Node.keys.recordUuid] = recordUuid
-      } else {
-        const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
-        const messageSuffix = `: skipping it`
-        this.logWarn(`${messagePrefix} ${error} ${messageSuffix}`)
-        delete nodes[nodeUuid]
-      }
-    }
-    // assoc nodes and build index from scratch
-    this.currentRecord = Record.assocNodes({ nodes, sideEffect })(record)
 
     // fix record (e.g. insert missing nodes, remove status flags)
     RecordFixer.fixRecord({ survey, record: this.currentRecord, sideEffect })
