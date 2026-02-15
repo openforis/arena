@@ -1,4 +1,4 @@
-import { Dates, Objects, Records, Surveys } from '@openforis/arena-core'
+import { Dates, Objects, RecordFixer, Records, Surveys } from '@openforis/arena-core'
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
@@ -129,6 +129,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const { context, currentRecord: record, user, tx } = this
     const { survey } = context
 
+    const sideEffect = true // do side effect to avoid creating new objects and use less memory
+
     const recordUuid = Record.getUuid(record)
     // check owner uuid: if user not defined, use the job user as owner
     const ownerUuidSource = Record.getOwnerUuid(record)
@@ -146,7 +148,6 @@ export default class RecordsImportJob extends DataImportBaseJob {
       if (valid) {
         // ensure recordUuid is set in node
         node[Node.keys.recordUuid] = recordUuid
-        Node.removeFlags({ sideEffect: true })(node)
       } else {
         const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
         const messageSuffix = `: skipping it`
@@ -155,7 +156,10 @@ export default class RecordsImportJob extends DataImportBaseJob {
       }
     }
     // assoc nodes and build index from scratch
-    this.currentRecord = Record.assocNodes({ nodes, sideEffect: true })(record)
+    this.currentRecord = Record.assocNodes({ nodes, sideEffect })(record)
+
+    // fix record (e.g. insert missing nodes, remove status flags)
+    RecordFixer.fixRecord({ survey, record: this.currentRecord, sideEffect })
   }
 
   findExistingRecordSummaryWithSameKeys() {
