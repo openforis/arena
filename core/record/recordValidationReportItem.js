@@ -13,7 +13,7 @@ const keys = {
   recordOwnerUuid: 'recordOwnerUuid',
   recordStep: 'recordStep',
   recordUuid: 'recordUuid',
-  nodeUuid: 'nodeUuid',
+  nodeIId: 'nodeIId',
   nodeDefUuid: 'nodeDefUuid',
   keysHierarchy: 'keysHierarchy',
   keysSelf: 'keysSelf',
@@ -28,7 +28,7 @@ export const getRecordDateModified = R.prop(keys.recordDateModified)
 export const getRecordOwnerName = R.prop(keys.recordOwnerName)
 export const getRecordOwnerUuid = R.prop(keys.recordOwnerUuid)
 export const getRecordUuid = R.prop(keys.recordUuid)
-const getNodeUuid = R.prop(keys.nodeUuid)
+const getNodeIId = R.prop(keys.nodeIId)
 const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 const getValidationCountChildDefUuid = R.prop(keys.validationCountChildDefUuid)
 const getKeysSelf = R.propOr({}, keys.keysSelf)
@@ -64,9 +64,9 @@ export const getPath =
     return NodeKeys.getKeysHierarchyPath({ survey, lang, includeRootKeys: true, labelType })(keys)
   }
 
-export const getNodeContextUuid = R.ifElse(
+export const getNodeContextIId = R.ifElse(
   isValidationCount,
-  getNodeUuid, // Node has a validation count, the context will be the node itself (an entity)
+  getNodeIId, // Node has a validation count, the context will be the node itself (an entity)
   R.pipe(
     // Node is an attribute, the context node will be its parent entity (it's the last item of the hierarchy)
     R.prop(keys.keysHierarchy),

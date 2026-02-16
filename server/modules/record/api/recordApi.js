@@ -37,11 +37,11 @@ import {
   requireRecordsExportPermission,
 } from '../../auth/authApiMiddleware'
 
-const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
-  const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
+const fetchRecordNodeFileAsStream = async ({ surveyId, recordUuid, nodeIId }) => {
+  const node = await RecordService.fetchNodeByIId(surveyId, recordUuid, nodeIId)
   const fileUuid = Node.getFileUuid(node)
   const file = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid)
-  const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
+  const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeIId, file })
   const contentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid })
   return { fileName, file, contentStream }
 }
@@ -280,13 +280,13 @@ export const init = (app) => {
   })
 
   app.get(
-    '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
+    '/survey/:surveyId/record/:recordUuid/nodes/:nodeIId/file',
     requireRecordViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, nodeUuid } = Request.getParams(req)
+        const { surveyId, recordUuid, nodeIId } = Request.getParams(req)
 
-        const { fileName, file, contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
+        const { fileName, file, contentStream } = await fetchRecordNodeFileAsStream({ surveyId, recordUuid, nodeIId })
         setContentTypeFile({ res, fileName, fileSize: RecordFile.getSize(file) })
         contentStream.pipe(res)
       } catch (error) {
@@ -296,13 +296,13 @@ export const init = (app) => {
   )
 
   app.get(
-    '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
+    '/survey/:surveyId/record/:recordUuid/nodes/:nodeIId/file-exif',
     requireRecordViewPermission,
     async (req, res, next) => {
       let tempFilePath
       try {
-        const { surveyId, nodeUuid } = Request.getParams(req)
-        const { contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
+        const { surveyId, recordUuid, nodeIId } = Request.getParams(req)
+        const { contentStream } = await fetchRecordNodeFileAsStream({ surveyId, recordUuid, nodeIId })
         ;({ tempFilePath } = await FileUtils.writeStreamToTempFile(contentStream))
         const info = await exifr.parse(tempFilePath)
         res.json(info)

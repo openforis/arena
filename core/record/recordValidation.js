@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { RecordValidations } from '@openforis/arena-core'
@@ -33,7 +34,7 @@ export const newValidationRecordDuplicate = ({
 export const getValidationChildrenCount = (nodeParentUuid, nodeDefChildUuid) =>
   RecordValidations.getValidationChildrenCount({ nodeParentUuid, nodeDefChildUuid })
 
-export const getNodeValidation = (node) => RecordValidations.getValidationNode({ nodeUuid: node?.uuid })
+export const getNodeValidation = (node) => RecordValidations.getValidationNode({ nodeInternalId: Node.getIId(node) })
 
 // ===== UPDATE
 export const setValidationCount = (nodeParentUuid, nodeDefChildUuid, validationCount) =>

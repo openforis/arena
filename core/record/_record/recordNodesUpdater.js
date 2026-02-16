@@ -463,7 +463,7 @@ const deleteNodesInEntityByNodeDefUuid =
       user,
       survey,
       record,
-      nodeUuids: nodeIIdsToDelete,
+      nodeInternalIds: nodeIIdsToDelete,
       categoryItemProvider,
       taxonProvider,
       sideEffect,

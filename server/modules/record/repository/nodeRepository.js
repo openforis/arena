@@ -263,14 +263,14 @@ export const fetchNodesWithRefDataByIIds = async ({ surveyId, recordUuid, nodeII
 export const fetchNodeWithRefDataByIId = async ({ surveyId, recordUuid, nodeIId, draft }, client = db) =>
   (await fetchNodesWithRefDataByIIds({ surveyId, recordUuid, nodeIIds: [nodeIId], draft }, client))[0]
 
-export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUuids, client = db) =>
+export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeIId, childDefUuids, client = db) =>
   client.map(
     `
     ${getNodeSelectQuery({ surveyId, draft: false })}
     WHERE n.record_uuid = $/recordUuid/
-      AND n.parent_uuid ${nodeUuid ? '= $/nodeUuid/' : 'is null'}
+      AND n.parent_iid ${nodeIId ? '= $/nodeIId/' : 'is null'}
       AND n.node_def_uuid IN ($/childDefUuids:csv/)`,
-    { surveyId, recordUuid, nodeUuid, childDefUuids },
+    { surveyId, recordUuid, nodeIId, childDefUuids },
     dbTransformCallback
   )
 

@@ -139,7 +139,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     delete record['_nodesIndex']
     const nodes = Record.getNodes(record)
 
-    for (const [nodeUuid, node] of Object.entries(nodes)) {
+    for (const [nodeIId, node] of Object.entries(nodes)) {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const { valid, error } = checkNodeIsValid({ nodes, node, nodeDef })
@@ -148,10 +148,10 @@ export default class RecordsImportJob extends DataImportBaseJob {
         node[Node.keys.recordUuid] = recordUuid
         Node.removeFlags({ sideEffect: true })(node)
       } else {
-        const messagePrefix = `record ${Record.getUuid(record)}: node with internal id ${Node.getIId(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
+        const messagePrefix = `record ${Record.getUuid(record)}: node with internal id ${nodeIId} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
         const messageSuffix = `: skipping it`
         this.logWarn(`${messagePrefix} ${error} ${messageSuffix}`)
-        delete nodes[nodeUuid]
+        delete nodes[nodeIId]
       }
     }
     // assoc nodes and build index from scratch

@@ -22,12 +22,12 @@ const ValidationReport = () => {
   const { recordUuid } = useParams()
 
   const onRowClick = (row) => {
-    const pageNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
+    const pageNodeIId = RecordValidationReportItem.getNodeContextIId(row)
     const pageNodeDefUuid = RecordValidationReportItem.getNodeDefContextUuid(row)
     const recordUuid = RecordValidationReportItem.getRecordUuid(row)
     const recordEditUrl = `${appModuleUri(
       dataModules.record
-    )}${recordUuid}?pageNodeUuid=${pageNodeUuid}&pageNodeDefUuid=${pageNodeDefUuid}`
+    )}${recordUuid}?pageNodeUuid=${pageNodeIId}&pageNodeDefUuid=${pageNodeDefUuid}`
 
     navigate(recordEditUrl)
   }

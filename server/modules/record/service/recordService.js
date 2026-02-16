@@ -276,7 +276,7 @@ const _sendNodeUpdateMessage = ({ socketId, user, recordUuid, msg }) => {
   thread.postMessage(msg, user)
 }
 
-export const { fetchNodeByUuid } = RecordManager
+export const { fetchNodeByIId } = RecordManager
 
 export const persistNode = async ({
   socketId,
@@ -334,7 +334,7 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
 
 // generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
 export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
-  const node = await fetchNodeByUuid(surveyId, nodeUuid)
+  const node = await fetchNodeByIId(surveyId, nodeUuid)
   const record = await fetchRecordAndNodesByUuid({
     surveyId,
     recordUuid: Node.getRecordUuid(node),

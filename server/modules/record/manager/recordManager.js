@@ -214,7 +214,7 @@ export const fetchRecordAndNodesByUuid = async (
   return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate, sideEffect: true })(record)
 }
 
-export { fetchNodeByIId as fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
+export { fetchNodeByIId, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
 
 const fetchNodeRefData = async ({ survey, node, isCode }, client) => {
   const surveyId = Survey.getId(survey)
