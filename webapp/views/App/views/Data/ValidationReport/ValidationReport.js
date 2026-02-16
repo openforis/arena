@@ -27,7 +27,7 @@ const ValidationReport = () => {
     const recordUuid = RecordValidationReportItem.getRecordUuid(row)
     const recordEditUrl = `${appModuleUri(
       dataModules.record
-    )}${recordUuid}?pageNodeUuid=${pageNodeIId}&pageNodeDefUuid=${pageNodeDefUuid}`
+    )}${recordUuid}?pageNodeIId=${pageNodeIId}&pageNodeDefUuid=${pageNodeDefUuid}`
 
     navigate(recordEditUrl)
   }

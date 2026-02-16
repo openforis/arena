@@ -212,7 +212,7 @@ class RecordsUpdateThread extends Thread {
   }
 
   async processRecordNodeDeleteMsg(msg) {
-    const { nodeUuid, recordUuid, user, timezoneOffset } = msg
+    const { nodeIId, recordUuid, user, timezoneOffset } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -221,7 +221,7 @@ class RecordsUpdateThread extends Thread {
       user,
       survey,
       record,
-      nodeUuid,
+      nodeIId,
       timezoneOffset,
       (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       (validations) => this.handleNodesValidationUpdated({ record, validations })
@@ -243,7 +243,7 @@ class RecordsUpdateThread extends Thread {
   async processSurveyClearMsg(msg) {
     const { surveyId, cycle } = msg
 
-    let keysToDelete = []
+    const keysToDelete = []
 
     if (!Objects.isNil(cycle)) {
       const key = this.getSurveyDataKey(msg)

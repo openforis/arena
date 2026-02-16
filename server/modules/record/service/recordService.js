@@ -333,8 +333,8 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
   })
 
 // generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
-export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
-  const node = await fetchNodeByIId(surveyId, nodeUuid)
+export const generateNodeFileNameForDownload = async ({ surveyId, nodeIId, file }) => {
+  const node = await fetchNodeByIId(surveyId, nodeIId)
   const record = await fetchRecordAndNodesByUuid({
     surveyId,
     recordUuid: Node.getRecordUuid(node),

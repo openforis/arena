@@ -65,9 +65,9 @@ const mapStateToProps = (state, props) => {
   const getEntryProps = () => {
     const entryMultiple = NodeDef.isMultiple(nodeDef)
 
-    const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
+    const selectedNodeIId = SurveyFormState.getFormPageNodeIId(nodeDef)(state)
 
-    const selectedNode = selectedNodeUuid ? Record.getNodeByUuid(selectedNodeUuid)(record) : null
+    const selectedNode = selectedNodeIId ? Record.getNodeByInternalId(selectedNodeIId)(record) : null
 
     return {
       entryMultiple,

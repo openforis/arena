@@ -72,10 +72,10 @@ const actionHandlers = {
   },
 
   // Record
-  [RecordActions.recordLoad]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>
+  [RecordActions.recordLoad]: (state, { nodeDefActivePage, formPageNodeIIdByNodeDefUuid }) =>
     R.pipe(
       SurveyFormState.assocNodeDefAddChildTo(null),
-      SurveyFormState.assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
+      SurveyFormState.assocFormPageNodes(formPageNodeIIdByNodeDefUuid),
       SurveyFormState.assocFormActivePage(nodeDefActivePage)
     )(state),
 }

@@ -35,7 +35,7 @@ const NodeDefEntityTableRows = (props) => {
   const survey = useSelector(SurveyState.getSurvey)
   const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
   const nodeDefUuid = nodeDef?.uuid
-  const minCount = useNodesMinCount({ parentNodeUuid: parentNode?.uuid, nodeDefUuid })
+  const minCount = useNodesMinCount({ parentNodeIId: parentNode?.iId, nodeDefUuid })
   const canDeleteRows = !NodeDef.isEnumerate(nodeDef) && (!minCount || nodes.length > minCount)
 
   const nodeDefColumns = R.reduce(

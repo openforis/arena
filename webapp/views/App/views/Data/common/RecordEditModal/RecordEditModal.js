@@ -58,7 +58,7 @@ export const RecordEditModal = (props) => {
     initialState: initialStateProp,
     onClose,
     onRequestClose,
-    parentNodeUuid,
+    parentNodeIId,
     recordUuid,
   } = props
 
@@ -89,7 +89,7 @@ export const RecordEditModal = (props) => {
       onRequestClose={onRequestClose}
       top={initialTop}
     >
-      <RecordEditor recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader locked />
+      <RecordEditor recordUuid={recordUuid} pageNodeIId={parentNodeIId} noHeader locked />
     </ResizableModal>
   )
 }
@@ -99,6 +99,6 @@ RecordEditModal.propTypes = {
   initialState: PropTypes.object,
   onClose: PropTypes.func,
   onRequestClose: PropTypes.func,
-  parentNodeUuid: PropTypes.string,
+  parentNodeIId: PropTypes.number,
   recordUuid: PropTypes.string.isRequired,
 }

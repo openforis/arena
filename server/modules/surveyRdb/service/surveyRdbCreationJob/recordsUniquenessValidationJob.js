@@ -14,14 +14,14 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 
 const recordValidationUpdateBatchSize = 1000
 
-const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
-  const validationNodeOld = Validation.getFieldValidation(nodeUuid)(validationRecord)
+const _updateNodeValidation = (validationRecord, nodeIId, validationNode) => {
+  const validationNodeOld = Validation.getFieldValidation(nodeIId)(validationRecord)
 
   // Merge new validation with node validation
   const nodeValidationUpdated = R.mergeDeepRight(validationNodeOld, validationNode)
 
   // Replace node validation in record validation
-  return R.pipe(Validation.setValid(false), Validation.setField(nodeUuid, nodeValidationUpdated))(validationRecord)
+  return R.pipe(Validation.setValid(false), Validation.setField(nodeIId, nodeValidationUpdated))(validationRecord)
 }
 
 export default class RecordsUniquenessValidationJob extends Job {
