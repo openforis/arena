@@ -57,7 +57,7 @@ export const checkInRecord =
 
       // Getting the nodes associated to the nodeDef page
       const formPageNodeUuidByNodeDefUuid = R.reduce(
-        (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
+        (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getIId(ancestor), acc),
         [],
         ancestors
       )

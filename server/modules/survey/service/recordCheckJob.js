@@ -284,7 +284,7 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
   for (const nodeDefUpdatedUuid of nodeDefUpdatedUuids) {
     const nodesToUpdatePartial = Record.getNodesByDefUuid(nodeDefUpdatedUuid)(record)
     for (const nodeUpdated of nodesToUpdatePartial) {
-      nodesToUpdate[Node.getUuid(nodeUpdated)] = nodeUpdated
+      nodesToUpdate[Node.getIId(nodeUpdated)] = nodeUpdated
     }
   }
 
@@ -316,7 +316,7 @@ const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx)
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
     for (const parentNode of parentNodes) {
-      nodesToValidate[Node.getUuid(parentNode)] = parentNode
+      nodesToValidate[Node.getIId(parentNode)] = parentNode
     }
   }
 

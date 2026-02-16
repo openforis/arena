@@ -75,14 +75,14 @@ export const assocFormPageNode = (nodeDefUuid, nodeUuid) => {
   return nodeUuid ? R.assocPath(path, nodeUuid) : R.dissocPath(path)
 }
 
-export const assocFormPageNodes = (formPageNodeUuidByNodeDefUuid) => (state) =>
+export const assocFormPageNodes = (formPageNodeIIdByNodeDefUuid) => (state) =>
   R.pipe(
     R.keys,
     R.reduce((stateAcc, nodeDefUuid) => {
-      const nodeUuid = R.prop(nodeDefUuid, formPageNodeUuidByNodeDefUuid)
-      return assocFormPageNode(nodeDefUuid, nodeUuid)(stateAcc)
+      const nodeIId = R.prop(nodeDefUuid, formPageNodeIIdByNodeDefUuid)
+      return assocFormPageNode(nodeDefUuid, nodeIId)(stateAcc)
     }, state)
-  )(formPageNodeUuidByNodeDefUuid)
+  )(formPageNodeIIdByNodeDefUuid)
 
 export const getPagesUuidMap = getStateProp(keys.nodeDefUuidPageNodeUuid, {})
 

@@ -42,23 +42,23 @@ export const formPageNodesUpdate = 'survey/form/pageNodes/update'
 
 // Sets the node (entity) for a page (identified by the entity def)
 // and reset the node set for the descendant entity defs.
-export const setFormPageNode = (nodeDef, nodeUuid) => (dispatch, getState) => {
+export const setFormPageNode = (nodeDef, nodeIId) => (dispatch, getState) => {
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
   const survey = SurveyState.getSurvey(state)
-  const formPageNodeUuidByNodeDefUuid = {}
+  const formPageNodeIIdByNodeDefUuid = {}
 
   Survey.visitDescendantsAndSelf({
     nodeDef,
     visitorFn: (descendantNodeDef) => {
       if (NodeDef.isEntity(descendantNodeDef) && NodeDefLayout.hasPage(cycle)(descendantNodeDef)) {
-        const formPageNodeUuid = NodeDef.isEqual(descendantNodeDef)(nodeDef) ? nodeUuid : null
-        formPageNodeUuidByNodeDefUuid[NodeDef.getUuid(descendantNodeDef)] = formPageNodeUuid
+        const formPageNodeIId = NodeDef.isEqual(descendantNodeDef)(nodeDef) ? nodeIId : null
+        formPageNodeIIdByNodeDefUuid[NodeDef.getUuid(descendantNodeDef)] = formPageNodeIId
       }
     },
   })(survey)
 
-  dispatch({ type: formPageNodesUpdate, formPageNodeUuidByNodeDefUuid })
+  dispatch({ type: formPageNodesUpdate, formPageNodeIIdByNodeDefUuid })
 }
 
 // Toggle form page navigation

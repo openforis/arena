@@ -45,7 +45,7 @@ const NodeDefEntityFormGrid = (props) => {
   const mountedRef = useIsMountedRef({ delay: 200 })
 
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const nodeUuid = Node.getUuid(node)
+  const nodeIId = Node.getIId(node)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
   // on node def or node change, scroll inner container to top
@@ -54,7 +54,7 @@ const NodeDefEntityFormGrid = (props) => {
     if (innerContainer) {
       innerContainer.scrollTop = 0
     }
-  }, [nodeDefUuid, nodeUuid])
+  }, [nodeDefUuid, nodeIId])
 
   const onChangeLayout = useCallback(
     (layout) => {

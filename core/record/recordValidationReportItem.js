@@ -71,7 +71,7 @@ export const getNodeContextUuid = R.ifElse(
     // Node is an attribute, the context node will be its parent entity (it's the last item of the hierarchy)
     R.prop(keys.keysHierarchy),
     R.last,
-    R.prop(NodeKeys.keys.nodeUuid)
+    R.prop(NodeKeys.keys.nodeIId)
   )
 )
 

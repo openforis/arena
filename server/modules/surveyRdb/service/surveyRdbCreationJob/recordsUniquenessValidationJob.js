@@ -88,7 +88,7 @@ export default class RecordsUniquenessValidationJob extends Job {
         const validationRecordUpdated = R.pipe(
           R.reduce(
             (validationRecordAccumulator, nodeKeyDuplicate) =>
-              _updateNodeValidation(validationRecordAccumulator, Node.getUuid(nodeKeyDuplicate), validationDuplicate),
+              _updateNodeValidation(validationRecordAccumulator, Node.getIId(nodeKeyDuplicate), validationDuplicate),
             validationRecord
           ),
           Validation.updateCounts

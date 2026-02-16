@@ -64,7 +64,7 @@ const MultipleTextInput = (props) => {
         (n) =>
           (!Node.isPlaceholder(n) || canEditRecord) && (
             <div
-              key={Node.getUuid(n)}
+              key={Node.getIId(n)}
               className={`survey-form__node-def-text-multiple-container survey-form__node-def-${nodeDefType}`}
             >
               <NodeDefErrorBadge nodeDef={nodeDef} edit={false} parentNode={parentNode} node={n} />

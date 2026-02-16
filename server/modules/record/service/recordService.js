@@ -302,7 +302,7 @@ export const persistNode = async ({
       size: file.size,
       content: fs.readFileSync(file.tempFilePath),
       recordUuid,
-      nodeUuid: Node.getUuid(node),
+      nodeIId: Node.getIId(node),
     })
     await FileService.insertFile(surveyId, fileObj)
   }
@@ -315,7 +315,7 @@ export const persistNode = async ({
   })
 }
 
-export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset }) =>
+export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeIId, timezoneOffset }) =>
   _sendNodeUpdateMessage({
     socketId,
     user,
@@ -326,7 +326,7 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
       cycle,
       draft,
       recordUuid,
-      nodeUuid,
+      nodeIId,
       user,
       timezoneOffset,
     },

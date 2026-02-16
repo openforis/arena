@@ -214,7 +214,7 @@ export const deleteNode = async (
   user,
   survey,
   record,
-  nodeUuid,
+  nodeIId,
   timezoneOffset,
   nodesUpdateListener = null,
   nodesValidationListener = null,
@@ -225,10 +225,10 @@ export const deleteNode = async (
       user,
       survey,
       record,
-      node: Record.getNodeByUuid(nodeUuid)(record),
+      node: Record.getNodeByInternalId(nodeIId)(record),
       timezoneOffset,
       nodesUpdateFn: (user, survey, record, node, t) =>
-        NodeUpdateManager.deleteNode(user, survey, record, Node.getUuid(node), t),
+        NodeUpdateManager.deleteNode(user, survey, record, Node.getIId(node), t),
       nodesUpdateListener,
       nodesValidationListener,
     },
@@ -412,7 +412,7 @@ const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
 const validateNodesAndPersistToRDB = async ({ user, survey, record, nodes, nodesValidationListener = null }, t) => {
   const nodesArray = Object.values(nodes)
   const nodesToValidate = nodesArray.reduce(
-    (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getUuid(node)]: node }),
+    (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getIId(node)]: node }),
     {}
   )
   const validations = await RecordValidationManager.validateNodesAndPersistValidation(

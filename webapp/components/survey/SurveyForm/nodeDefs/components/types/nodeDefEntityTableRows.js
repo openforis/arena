@@ -166,7 +166,7 @@ const NodeDefEntityTableRows = (props) => {
                 createRow({
                   renderType: NodeDefLayout.renderType.tableBody,
                   node,
-                  key: `entity-table-row-${Node.getUuid(node)}`,
+                  key: `entity-table-row-${Node.getIId(node)}`,
                   canDelete: canDeleteRows,
                   index,
                 })

@@ -47,7 +47,7 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
   const recordAndParentEqualCondition = NodeDef.isRoot(nodeDefEntity)
     ? ''
     : `AND ${getColEqualCondition(TableDataNodeDef.columnSet.recordUuid)}
-         AND ${getColEqualCondition(TableDataNodeDef.columnSet.parentUuid)}`
+         AND ${getColEqualCondition(TableDataNodeDef.columnSet.parentInternalId)}`
 
   return await client.any(
     `

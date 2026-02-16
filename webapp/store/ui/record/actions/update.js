@@ -44,7 +44,7 @@ const _updateNodeDebounced = (node, file, delay) => {
     await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/node`, formData)
   }
 
-  return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)
+  return debounceAction(action, `node_update_${recordUuid}_${Node.getIId(node)}`, delay)
 }
 
 export const updateNode =
@@ -59,7 +59,7 @@ export const updateNode =
         Node.assocDirty(true)
       )(node)
       const removeDirtyFlag = false
-      await dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }, removeDirtyFlag))
+      await dispatch(recordNodesUpdate({ [Node.getIId(node)]: nodeToUpdate }, removeDirtyFlag))
       dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
     }
     checkAndConfirmUpdateNode({ dispatch, getState, node, nodeDef, onOk })

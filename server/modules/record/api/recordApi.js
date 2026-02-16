@@ -498,12 +498,12 @@ export const init = (app) => {
     }
   })
 
-  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, (req, res) => {
-    const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset } = Request.getParams(req)
+  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeIId', requireRecordEditPermission, (req, res) => {
+    const { surveyId, cycle, draft, recordUuid, nodeIId, timezoneOffset } = Request.getParams(req)
     const user = Request.getUser(req)
     const socketId = Request.getSocketId(req)
 
-    RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset })
+    RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeIId, timezoneOffset })
     sendOk(res)
   })
 }

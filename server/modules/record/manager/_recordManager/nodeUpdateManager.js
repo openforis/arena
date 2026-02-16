@@ -44,6 +44,7 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
 const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
   // TODO check if it should be removed
   const surveyId = Survey.getId(survey)
+  const recordUuid = Record.getUuid(record)
 
   let updatedNodes = nodeDependents || {}
 
@@ -58,10 +59,11 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
           const nodeDefDependent = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeDependent))(survey)
 
           return NodeDef.isMultiple(nodeDefDependent)
-            ? NodeRepository.deleteNode(surveyId, Node.getIId(nodeDependent), t)
+            ? NodeRepository.deleteNode({ surveyId, recordUuid, nodeIId: Node.getIId(nodeDependent) }, t)
             : NodeRepository.updateNode(
                 {
                   surveyId,
+                  recordUuid,
                   nodeIId: Node.getIId(nodeDependent),
                   meta: Node.getMeta(nodeDependent),
                   draft: Record.isPreview(record),
@@ -134,8 +136,8 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
 const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
   const recordUuid = Record.getUuid(record)
   const nodesReloadedArray = (
-    await NodeRepository.fetchNodesWithRefDataByUuids(
-      { surveyId, recordUuid, nodeUuids: Object.keys(nodes), draft: Record.isPreview(record) },
+    await NodeRepository.fetchNodesWithRefDataByIIds(
+      { surveyId, recordUuid, nodeIIds: Object.keys(nodes), draft: Record.isPreview(record) },
       tx
     )
   ).map((nodeReloaded) => {
@@ -250,15 +252,16 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
   return nodeDependentKeyAttributesByIId
 }
 
-export const deleteNode = async (user, survey, record, nodeUuid, t) => {
+export const deleteNode = async (user, survey, record, nodeIId, t) => {
   const surveyId = Survey.getId(survey)
+  const recordUuid = Record.getUuid(record)
 
-  const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
+  const node = await NodeRepository.deleteNode({ surveyId, recordUuid, nodeIId }, t)
 
   if (!Record.isPreview(record)) {
     const logContent = {
-      [ActivityLog.keysContent.uuid]: nodeUuid,
       [ActivityLog.keysContent.recordUuid]: Node.getRecordUuid(node),
+      [ActivityLog.keysContent.nodeIId]: nodeIId,
       [ActivityLog.keysContent.nodeDefUuid]: Node.getNodeDefUuid(node),
       [Node.keys.meta]: {
         [Node.metaKeys.hierarchy]: Node.getHierarchy(node),

@@ -33,7 +33,7 @@ class EntityBuilder extends NodeBuilder {
     return R.pipe(
       R.map((childBuilder) => childBuilder.build(survey, nodeDef, recordUuid, entity)),
       R.mergeAll,
-      R.assoc(Node.getUuid(entity), entity)
+      R.assoc(Node.getIId(entity), entity)
     )(this.childBuilders)
   }
 
@@ -64,12 +64,12 @@ class AttributeBuilder extends NodeBuilder {
     this.value = value
   }
 
-  build(survey, parentNodeDef, recordUuid, parentNode) {
+  build(survey, _parentNodeDef, recordUuid, parentNode) {
     const nodeDef = Survey.getNodeDefByName(this.nodeDefName)(survey)
     const attribute = Node.newNode(NodeDef.getUuid(nodeDef), recordUuid, parentNode, this.value)
 
     return {
-      [Node.getUuid(attribute)]: attribute,
+      [Node.getIId(attribute)]: attribute,
     }
   }
 

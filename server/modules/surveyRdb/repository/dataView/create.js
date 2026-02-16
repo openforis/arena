@@ -50,12 +50,13 @@ const _getJoinWithMultipleAttributeTable = ({ viewDataNodeDef, multAttrColumnNod
   return `LEFT JOIN 
   (
     SELECT 
-      ${multAttrDataTable.columnParentUuid}, 
+      ${multAttrDataTable.columnParentInternalId}, 
       ${columnNames.map((colName) => `json_agg(${multAttrDataTable.alias}.${colName}) AS ${colName}`).join(', ')}
     FROM ${multAttrDataTable.nameAliased}
-    GROUP BY ${multAttrDataTable.columnParentUuid}
+    GROUP BY ${multAttrDataTable.columnParentInternalId}
   ) AS ${multAttrDataTable.alias}
-  ON ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
+  ON ${multAttrDataTable.columnRecordUuid} = ${tableData.columnRecordUuid} 
+    AND ${multAttrDataTable.columnParentInternalId} = ${tableData.columnIId}`
 }
 
 const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef) => {
@@ -72,12 +73,10 @@ const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef) => {
 
 /**
  * Create a nodeDef data view.
- *
  * @param {object} params - The query parameters.
  * @param {Survey} params.survey - The survey.
  * @param {NodeDef} params.nodeDef - The nodeDef to create the data view for.
  * @param {pgPromise.IDatabase} client - The data base client.
- *
  * @returns {Promise<null|*>} - The result promise.
  */
 export const createDataView = async ({ survey, nodeDef }, client) => {

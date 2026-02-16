@@ -29,7 +29,7 @@ export const useRecordCodeAttributesUuidsHierarchy = ({ nodeDef, parentNode }) =
     const survey = SurveyState.getSurvey(state)
     const record = RecordState.getRecord(state)
     const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-    return parentCodeAttribute ? [...Node.getHierarchyCode(parentCodeAttribute), Node.getUuid(parentCodeAttribute)] : []
+    return parentCodeAttribute ? [...Node.getHierarchyCode(parentCodeAttribute), Node.getIId(parentCodeAttribute)] : []
   }, Objects.isEqual)
 
 export const useIsRecordViewWithoutHeader = () => useSelector(RecordState.hasNoHeader)
