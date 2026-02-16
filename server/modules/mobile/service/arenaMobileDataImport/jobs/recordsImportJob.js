@@ -119,7 +119,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     delete record['_nodesIndex']
 
     // fix record (e.g. insert missing nodes, remove status flags)
-    RecordFixer.fixRecord({ survey, record: this.currentRecord, sideEffect })
+    RecordFixer.fixRecord({ survey, record, sideEffect })
   }
 
   findExistingRecordSummaryWithSameKeys() {
