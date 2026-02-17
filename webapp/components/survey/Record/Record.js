@@ -13,7 +13,7 @@ const Record = (props) => {
     editable: editableProp = true,
     locked = false,
     noHeader = false,
-    pageNodeUuid,
+    pageNodeIId,
     record: recordProp = null,
     recordUuid,
   } = props
@@ -21,7 +21,7 @@ const Record = (props) => {
     editableProp,
     locked,
     noHeader,
-    pageNodeUuid,
+    pageNodeIId,
     recordProp,
     recordUuid,
   })
@@ -55,7 +55,7 @@ Record.propTypes = {
   editable: PropTypes.bool,
   locked: PropTypes.bool,
   noHeader: PropTypes.bool,
-  pageNodeUuid: PropTypes.string,
+  pageNodeIId: PropTypes.number,
   record: PropTypes.object,
   recordUuid: PropTypes.string,
 }

@@ -5,6 +5,7 @@ const columnSetCommon = {
   dateCreated: 'date_created',
   dateModified: 'date_modified',
   id: 'id',
+  iId: 'i_id',
   props: 'props',
   propsDraft: 'props_draft',
   uuid: 'uuid',
@@ -12,7 +13,6 @@ const columnSetCommon = {
 
 /**
  * A database table object.
- *
  * @typedef {object} module:arena.Table
  * @property {string} schema - The schema it belongs to.
  * @property {string} name - The table name.
@@ -22,10 +22,9 @@ const columnSetCommon = {
 export default class Table {
   /**
    * Create an instance of a Table.
-   *
    * @param {!string} schema - The schema.
    * @param {!string} name - The table name.
-   * @param {{[key: string]: string}} [columnSet={}] - The table column set.
+   * @param {{[key: string]: string}} [columnSet] - The table column set.
    */
   constructor(schema, name, columnSet = {}) {
     if (new.target === Table) {

@@ -20,7 +20,7 @@ const { nodeDefType } = NodeDef
 const colValueProcessor = 'colValueProcessor'
 
 const _extractCategoryItem = ({ survey, node }) => {
-  let item = NodeRefData.getCategoryItem(node)
+  const item = NodeRefData.getCategoryItem(node)
   if (item) return item
 
   const itemUuid = Node.getCategoryItemUuid(node)
@@ -105,7 +105,7 @@ const props = {
     },
   },
   [nodeDefType.entity]: {
-    [colValueProcessor]: () => () => Node.getUuid,
+    [colValueProcessor]: () => () => Node.getIId,
   },
   [nodeDefType.file]: {
     [colValueProcessor]: ({ nodeDefCol }) => {

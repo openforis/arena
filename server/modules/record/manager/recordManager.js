@@ -214,7 +214,7 @@ export const fetchRecordAndNodesByUuid = async (
   return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate, sideEffect: true })(record)
 }
 
-export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
+export { fetchNodeByIId, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
 
 const fetchNodeRefData = async ({ survey, node, isCode }, client) => {
   const surveyId = Survey.getId(survey)
@@ -302,9 +302,9 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
   client.tx(async (t) => {
     const activities = nodes.map((node) => {
       const logContent = R.pick([
-        Node.keys.uuid,
         Node.keys.recordUuid,
-        Node.keys.parentUuid,
+        Node.keys.iId,
+        Node.keys.pIId,
         Node.keys.nodeDefUuid,
         Node.keys.meta,
         Node.keys.value,
@@ -333,7 +333,7 @@ export {
   deleteRecordsByCycles,
   deleteNode,
   deleteNodesByNodeDefUuids,
-  deleteNodesByUuids,
+  deleteNodesByInternalIds,
 } from './_recordManager/recordUpdateManager'
 
 // ==== VALIDATION

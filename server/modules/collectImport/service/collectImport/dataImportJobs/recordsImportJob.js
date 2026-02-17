@@ -169,7 +169,6 @@ export default class RecordsImportJob extends Job {
   async traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath }) {
     const { collectSurveyFileZip, collectSurvey } = this.context
 
-    const recordUuid = Record.getUuid(record)
     let recordUpdated = { ...record }
 
     const collectRootEntityName = CollectRecord.getRootEntityName(collectRecordJson)
@@ -190,7 +189,7 @@ export default class RecordsImportJob extends Job {
       const item = queue.dequeue()
       const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
 
-      let nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
+      const nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
 
       if (!nodeDefsInfo) {
         this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
@@ -202,7 +201,7 @@ export default class RecordsImportJob extends Job {
             continue
           }
 
-          let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
+          let nodeToInsert = Node.newNode({ record: recordUpdated, nodeDefUuid, parentNode: nodeParent })
 
           const valueAndMeta = NodeDef.isAttribute(nodeDef)
             ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
@@ -250,7 +249,7 @@ export default class RecordsImportJob extends Job {
     const surveyInfo = Survey.getSurveyInfo(survey)
     const nodeDefsInfoByCollectPath = Survey.getCollectNodeDefsInfoByPath(surveyInfo)
 
-    let nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
+    const nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
     if (nodeDefsInfo) return nodeDefsInfo
 
     const nodeDefName = nodeDefNamesByPath[collectNodeDefPath]
@@ -323,7 +322,6 @@ export default class RecordsImportJob extends Job {
 
   /**
    * Evaluates all record entities children applicability and stores the updated nodes.
-   *
    * @param {!Survey} survey - The survey object.
    * @param {!Record} record - The record object.
    * @returns {Promise<null>} - The updated record (promise).

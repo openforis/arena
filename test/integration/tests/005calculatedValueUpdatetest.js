@@ -26,7 +26,7 @@ const updateNodeAndExpectDependentNodeValueToBe = async (
   const nodeSource = RecordUtils.findNodeByPath(sourcePath)(survey, record)
 
   const nodesUpdated = {
-    [Node.getUuid(nodeSource)]: Node.assocValue(sourceValue)(nodeSource),
+    [Node.getIId(nodeSource)]: Node.assocValue(sourceValue)(nodeSource),
   }
   global.applicableRecord = Record.mergeNodes(nodesUpdated)(record)
 
@@ -34,10 +34,10 @@ const updateNodeAndExpectDependentNodeValueToBe = async (
   const { record: recordUpdate } = await RecordManager.updateNodesDependents({ survey, record, nodes: nodesUpdated })
   global.applicableRecord = recordUpdate
 
-  const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, record)
+  const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, recordUpdate)
 
   expect(Node.getValue(nodeDependent)).toBe(dependentExpectedValue)
-  return record
+  return recordUpdate
 }
 
 describe('Calculated value test', () => {

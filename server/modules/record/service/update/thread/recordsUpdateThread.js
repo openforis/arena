@@ -18,6 +18,12 @@ import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
 
+const prepareNodeForStorage = ({ record, node }) => {
+  const lastIId = Record.getLastNodeInternalId(record)
+  const nodeIId = Node.getIId(node) ?? lastIId + 1
+  return Node.assocIId(nodeIId)(node)
+}
+
 class RecordsUpdateThread extends Thread {
   constructor(paramsObj) {
     super(paramsObj)
@@ -199,11 +205,13 @@ class RecordsUpdateThread extends Thread {
     const recordUuid = Node.getRecordUuid(node)
     let record = await this.getOrFetchRecord({ msg, recordUuid })
 
+    const nodePreparedForStorage = prepareNodeForStorage({ record, node })
+
     record = await RecordManager.persistNode({
       user,
       survey,
       record,
-      node,
+      node: nodePreparedForStorage,
       timezoneOffset,
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
@@ -212,7 +220,7 @@ class RecordsUpdateThread extends Thread {
   }
 
   async processRecordNodeDeleteMsg(msg) {
-    const { nodeUuid, recordUuid, user, timezoneOffset } = msg
+    const { nodeIId, recordUuid, user, timezoneOffset } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -221,7 +229,7 @@ class RecordsUpdateThread extends Thread {
       user,
       survey,
       record,
-      nodeUuid,
+      nodeIId,
       timezoneOffset,
       (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       (validations) => this.handleNodesValidationUpdated({ record, validations })
@@ -243,7 +251,7 @@ class RecordsUpdateThread extends Thread {
   async processSurveyClearMsg(msg) {
     const { surveyId, cycle } = msg
 
-    let keysToDelete = []
+    const keysToDelete = []
 
     if (!Objects.isNil(cycle)) {
       const key = this.getSurveyDataKey(msg)

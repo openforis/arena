@@ -45,14 +45,14 @@ const _getValuesByColumnName = ({ survey, record, nodeDef, node, ancestorMultipl
   } else {
     const { columnSet } = TableDataNodeDef
     const result = {
-      [columnSet.uuid]: Node.getUuid(node),
-      [columnSet.parentUuid]: Node.getUuid(ancestorMultipleEntity),
+      [columnSet.recordUuid]: Node.getRecordUuid(node),
+      [columnSet.iId]: Node.getIId(node),
+      [columnSet.parentInternalId]: Node.getIId(ancestorMultipleEntity),
       [columnSet.dateCreated]: Node.getDateCreated(node),
       [columnSet.dateModified]: Node.getDateModified(node),
     }
     if (NodeDef.isRoot(nodeDef)) {
       Object.assign(result, {
-        [columnSet.recordUuid]: Node.getRecordUuid(node),
         [columnSet.recordCycle]: Record.getCycle(record),
         [columnSet.recordStep]: Record.getStep(record),
         [columnSet.recordOwnerUuid]: Record.getOwnerUuid(record),
@@ -66,59 +66,61 @@ const _getValuesByColumnName = ({ survey, record, nodeDef, node, ancestorMultipl
 }
 
 const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
-  let currentParent = nodes[Node.getParentUuid(node)]
+  let currentParent = nodes[Node.getParentInternalId(node)]
   while (currentParent && !Node.isRoot(currentParent) && Node.getNodeDefUuid(currentParent) !== ancestorDefUuid) {
-    currentParent = nodes[Node.getParentUuid(currentParent)]
+    currentParent = nodes[Node.getParentInternalId(currentParent)]
   }
   return currentParent
 }
 
-const _getRowUuid = ({ nodeDef, ancestorMultipleEntity, node }) =>
-  _hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(ancestorMultipleEntity)
+const _getUpdateKey = ({ nodeDef, ancestorMultipleEntity, node }) =>
+  _hasTable(nodeDef) ? Node.getIId(node) : Node.getIId(ancestorMultipleEntity)
 
 export const generateRdbUpdates = ({ survey, record, nodes }) => {
   // visit nodes with BFS algorithm to avoid FK constraints violations (sort nodes by hierarchy depth)
   const nodesArray = Object.values(nodes).sort(
     (nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length
   )
-  return nodesArray.reduce((updatesAcc, node) => {
+  const updatesAcc = new RdbUpdates()
+  for (const node of nodesArray) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     // skip single entities
     if (!NodeDef.isRoot(nodeDef) && NodeDef.isSingleEntity(nodeDef)) {
-      return updatesAcc
+      continue
     }
     const type = _getType(nodeDef, node)
-    if (type) {
-      const ancestorDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
-      const ancestorDefUuid = NodeDef.getUuid(ancestorDef)
-      const ancestorMultipleEntity = _findAncestor({ ancestorDefUuid, node, nodes })
-      const update = {
-        type,
-        schema: Schemata.getSchemaSurveyRdb(Survey.getId(survey)),
-        table: NodeDefTable.getTableName(nodeDef, ancestorDef),
-        nodeDefUuid: NodeDef.getUuid(nodeDef),
-        nodeDefHierarchyLevel: NodeDef.getMetaHierarchy(nodeDef).length,
-        valuesByColumnName: _getValuesByColumnName({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
-        rowUuid: _getRowUuid({ nodeDef, ancestorMultipleEntity, node }),
-      }
-      updatesAcc.addUpdate(update)
+    if (!type) {
+      continue
     }
-    return updatesAcc
-  }, new RdbUpdates())
+    const ancestorDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+    const ancestorDefUuid = NodeDef.getUuid(ancestorDef)
+    const ancestorMultipleEntity = _findAncestor({ ancestorDefUuid, node, nodes })
+    const update = {
+      type,
+      schema: Schemata.getSchemaSurveyRdb(Survey.getId(survey)),
+      table: NodeDefTable.getTableName(nodeDef, ancestorDef),
+      recordUuid: Record.getUuid(record),
+      nodeIId: _getUpdateKey({ nodeDef, ancestorMultipleEntity, node }),
+      nodeDefUuid: NodeDef.getUuid(nodeDef),
+      nodeDefHierarchyLevel: NodeDef.getMetaHierarchy(nodeDef).length,
+      valuesByColumnName: _getValuesByColumnName({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
+    }
+    updatesAcc.addUpdate(update)
+  }
 }
 
 // ==== execution
 
 const _update = (update, client) => {
-  const { schema, table, valuesByColumnName, rowUuid } = update
+  const { schema, table, valuesByColumnName, recordUuid, nodeIId } = update
   const columnNames = Object.keys(valuesByColumnName)
   const values = Object.values(valuesByColumnName)
   return client.one(
     `UPDATE ${schema}.${table}
-      SET ${columnNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
-      WHERE uuid = $1
-      RETURNING uuid`,
-    [rowUuid, ...values]
+      SET ${columnNames.map((col, i) => `${col} = $${i + 3}`).join(',')}
+      WHERE record_uuid = $1 AND i_id = $2
+      RETURNING record_uuid, i_id`,
+    [recordUuid, nodeIId, ...values]
   )
 }
 
@@ -131,18 +133,18 @@ const _insert = (update, client) => {
       (${columnNames.join(',')})
       VALUES 
       (${columnNames.map((_col, i) => `$${i + 1}`).join(',')})
-      RETURNING uuid`,
+      RETURNING record_uuid, i_id`,
     values
   )
 }
 
 const _delete = (update, client) => {
-  const { schema, table, rowUuid } = update
+  const { schema, table, recordUuid, nodeIId } = update
   return client.oneOrNone(
     `DELETE FROM ${schema}.${table} 
-    WHERE uuid = $1
-    RETURNING uuid`,
-    rowUuid
+    WHERE record_uuid = $1 AND i_id = $2
+    RETURNING record_uuid, i_id`,
+    [recordUuid, nodeIId]
   )
 }
 

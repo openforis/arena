@@ -21,7 +21,7 @@ const keys = {
   nodeDefUuid: 'nodeDefUuid', // Current node def (if view mode is "allNodeDefs")
   nodeDefUuidPage: 'nodeDefUuidPage', // Current page nodeDef
   nodeDefUuidAddChildTo: 'nodeDefUuidAddChildTo', // NodeDef (entity) selected to add children to
-  nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // Map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
+  nodeDefUuidPageNodeIId: 'nodeDefUuidPageNodeIId', // Map of nodeDefUuid -> nodeIId representing the node loaded in page nodeDefUuid
   showPageNavigation: 'showPageNavigation',
   expandedPageNavigation: 'expandedPageNavigation',
   nodeDefLabelType: 'nodeDefLabelType', // NodeDef label function
@@ -68,25 +68,25 @@ export const getNodeDefAddChildTo = (state) => {
   return Survey.getNodeDefByUuid(nodeDefUuidAddChildTo)(survey)
 }
 
-// ====== nodeDefUuidPageNodeUuid
+// ====== nodeDefUuidPageNodeIId
 
-export const assocFormPageNode = (nodeDefUuid, nodeUuid) => {
-  const path = [keys.nodeDefUuidPageNodeUuid, nodeDefUuid]
-  return nodeUuid ? R.assocPath(path, nodeUuid) : R.dissocPath(path)
+export const assocFormPageNode = (nodeDefUuid, nodeIId) => {
+  const path = [keys.nodeDefUuidPageNodeIId, nodeDefUuid]
+  return nodeIId ? R.assocPath(path, nodeIId) : R.dissocPath(path)
 }
 
-export const assocFormPageNodes = (formPageNodeUuidByNodeDefUuid) => (state) =>
+export const assocFormPageNodes = (formPageNodeIIdByNodeDefUuid) => (state) =>
   R.pipe(
     R.keys,
     R.reduce((stateAcc, nodeDefUuid) => {
-      const nodeUuid = R.prop(nodeDefUuid, formPageNodeUuidByNodeDefUuid)
-      return assocFormPageNode(nodeDefUuid, nodeUuid)(stateAcc)
+      const nodeIId = R.prop(nodeDefUuid, formPageNodeIIdByNodeDefUuid)
+      return assocFormPageNode(nodeDefUuid, nodeIId)(stateAcc)
     }, state)
-  )(formPageNodeUuidByNodeDefUuid)
+  )(formPageNodeIIdByNodeDefUuid)
 
-export const getPagesUuidMap = getStateProp(keys.nodeDefUuidPageNodeUuid, {})
+export const getPagesIIdMap = getStateProp(keys.nodeDefUuidPageNodeIId, {})
 
-export const getFormPageNodeUuid = (nodeDef) => R.pipe(getPagesUuidMap, R.prop(NodeDef.getUuid(nodeDef)))
+export const getFormPageNodeIId = (nodeDef) => R.pipe(getPagesIIdMap, R.prop(NodeDef.getUuid(nodeDef)))
 
 export const getFormPageParentNode = (nodeDef) => (state) => {
   const survey = SurveyState.getSurvey(state)
@@ -99,9 +99,8 @@ export const getFormPageParentNode = (nodeDef) => (state) => {
     if (NodeDef.isRoot(nodeDefParent)) {
       return Record.getRootNode(record)
     }
-
-    const parentNodeUuid = getFormPageNodeUuid(nodeDefParent)(state)
-    return Record.getNodeByUuid(parentNodeUuid)(record)
+    const parentNodeIId = getFormPageNodeIId(nodeDefParent)(state)
+    return Record.getNodeByInternalId(parentNodeIId)(record)
   }
 
   return null

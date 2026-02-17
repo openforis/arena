@@ -26,28 +26,28 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
           (
             SELECT
               n.id                                         AS ${columns.nodeId},
-              n.uuid                                       AS ${columns.nodeUuid},
+              n.i_id                                       AS ${columns.nodeIId},
               n.node_def_uuid                              AS ${columns.nodeDefUuid},
-              jsonb_array_elements_text(n.meta->'h')::uuid AS ${columns.nodeAncestorUuid}
+              jsonb_array_elements_text(n.meta->'h')::integer AS ${columns.nodeAncestorIId}
             FROM
               ${getSurveyDBSchema(surveyId)}.node n
            ) h
         ON
-          n.uuid = h.${columns.nodeAncestorUuid}
+          n.i_id = h.${columns.nodeAncestorIId}
         -- Union with root nodes  
         UNION ALL
         SELECT
           n.record_uuid     AS ${columns.recordUuid},
           n.id              AS ${columns.nodeId},
-          n.uuid            AS ${columns.nodeUuid},
+          n.i_id            AS ${columns.nodeIId},
           n.node_def_uuid   AS ${columns.nodeDefUuid},
-          NULL              AS ${columns.nodeAncestorUuid},
+          NULL              AS ${columns.nodeAncestorIId},
           NULL              AS ${columns.nodeAncestorId},
           NULL              AS ${columns.nodeDefAncestorUuid}
         FROM
           ${getSurveyDBSchema(surveyId)}.node n
         WHERE
-          n.parent_uuid IS NULL
+          n.p_i_id IS NULL
         ORDER BY
           ${columns.nodeAncestorId},
           ${columns.nodeId}

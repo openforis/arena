@@ -11,9 +11,9 @@ import * as RecordState from '../state'
 
 export const useRecord = () => useSelector(RecordState.getRecord)
 
-export const useRecordNode = ({ nodeUuid }) => {
+export const useRecordNode = ({ nodeIId }) => {
   const record = useSelector(RecordState.getRecord)
-  return nodeUuid && record ? Record.getNodeByUuid(nodeUuid)(record) : null
+  return nodeIId && record ? Record.getNodeByInternalId(nodeIId)(record) : null
 }
 
 export const useRecordParentCategoryItemUuid = ({ nodeDef, parentNode }) =>
@@ -29,12 +29,12 @@ export const useRecordCodeAttributesUuidsHierarchy = ({ nodeDef, parentNode }) =
     const survey = SurveyState.getSurvey(state)
     const record = RecordState.getRecord(state)
     const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-    return parentCodeAttribute ? [...Node.getHierarchyCode(parentCodeAttribute), Node.getUuid(parentCodeAttribute)] : []
+    return parentCodeAttribute ? [...Node.getHierarchyCode(parentCodeAttribute), Node.getIId(parentCodeAttribute)] : []
   }, Objects.isEqual)
 
 export const useIsRecordViewWithoutHeader = () => useSelector(RecordState.hasNoHeader)
 
-const useNodesCount = ({ parentNodeUuid, nodeDefUuid, countType }) =>
+const useNodesCount = ({ parentNodeIId, nodeDefUuid, countType }) =>
   useSelector((state) => {
     const survey = SurveyState.getSurvey(state)
     const nodeDef = Surveys.getNodeDefByUuid({ survey, uuid: nodeDefUuid })
@@ -44,15 +44,15 @@ const useNodesCount = ({ parentNodeUuid, nodeDefUuid, countType }) =>
       // count is an array of expressions
       const record = RecordState.getRecord(state)
       if (!record) return undefined
-      const parentNode = Records.getNodeByUuid(parentNodeUuid)(record)
+      const parentNode = Records.getNodeByInternalId(parentNodeIId)(record)
       return Nodes.getChildrenMinOrMaxCount({ parentNode, nodeDef, countType })
     }
     // count is constant value (backward compatibility)
     return Number(count)
   })
 
-export const useNodesMaxCount = ({ parentNodeUuid, nodeDefUuid }) =>
-  useNodesCount({ parentNodeUuid, nodeDefUuid, countType: NodeDefValidations.keys.max })
+export const useNodesMaxCount = ({ parentNodeIId, nodeDefUuid }) =>
+  useNodesCount({ parentNodeIId, nodeDefUuid, countType: NodeDefValidations.keys.max })
 
-export const useNodesMinCount = ({ parentNodeUuid, nodeDefUuid }) =>
-  useNodesCount({ parentNodeUuid, nodeDefUuid, countType: NodeDefValidations.keys.min })
+export const useNodesMinCount = ({ parentNodeIId, nodeDefUuid }) =>
+  useNodesCount({ parentNodeIId, nodeDefUuid, countType: NodeDefValidations.keys.min })

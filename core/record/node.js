@@ -4,7 +4,6 @@ import { Objects } from '@openforis/arena-core'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
-import { uuidv4 } from '@core/uuid'
 
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -43,8 +42,9 @@ const flagKeysIncludingDirty = [...flagKeysArray, dirtyFlag]
 
 export const keys = {
   id: ObjectUtils.keys.id,
+  iId: ObjectUtils.keys.iId,
   uuid: ObjectUtils.keys.uuid,
-  parentUuid: ObjectUtils.keys.parentUuid,
+  pIId: ObjectUtils.keys.pIId,
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
   recordUuid: 'recordUuid',
@@ -70,9 +70,9 @@ export const isValueProp = ({ nodeDef, prop }) => Boolean(R.path([NodeDef.getTyp
 // ======
 //
 
-export const { getId, getUuid } = ObjectUtils
+export const { getId, getIId, getUuid } = ObjectUtils
 
-export const { getParentUuid } = ObjectUtils
+export const { getParentInternalId } = ObjectUtils
 
 export const getRecordUuid = R.prop(keys.recordUuid)
 
@@ -107,7 +107,7 @@ export const isCreated = R.propEq(keys.created, true)
 export const isUpdated = R.propEq(keys.updated, true)
 export const isDeleted = R.propEq(keys.deleted, true)
 export const isDirty = R.propEq(dirtyFlag, true)
-export const isRoot = R.pipe(getParentUuid, R.isNil)
+export const isRoot = R.pipe(getParentInternalId, R.isNil)
 export const { isEqual } = ObjectUtils
 
 export const { getValidation } = Validation
@@ -126,13 +126,13 @@ export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancesto
 // ======
 //
 
-export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => {
+export const newNode = ({ record, nodeDefUuid, parentNode = null, value = null }) => {
   const now = new Date()
   return {
-    [keys.uuid]: uuidv4(),
     [keys.nodeDefUuid]: nodeDefUuid,
-    [keys.recordUuid]: recordUuid,
-    [keys.parentUuid]: getUuid(parentNode),
+    [keys.recordUuid]: ObjectUtils.getUuid(record),
+    [keys.iId]: record.lastInternalId + 1,
+    [keys.pIId]: getIId(parentNode),
     [keys.value]: value,
     [keys.meta]: {
       [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
@@ -144,7 +144,7 @@ export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null
 }
 
 export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
-  ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
+  ...newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDef), parentNode, value }),
   [keys.placeholder]: true,
 })
 
@@ -153,6 +153,7 @@ export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
 // UPDATE
 // ======
 //
+export const assocIId = R.assoc(keys.iId)
 export const assocValue = R.assoc(keys.value)
 export const { assocValidation } = Validation
 

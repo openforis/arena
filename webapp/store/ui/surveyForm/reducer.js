@@ -39,8 +39,8 @@ const actionHandlers = {
       SurveyFormState.assocNodeDefAddChildTo(showAddChildTo ? nodeDef : null)
     )(state),
 
-  [SurveyFormActions.formPageNodesUpdate]: (state, { formPageNodeUuidByNodeDefUuid }) =>
-    SurveyFormState.assocFormPageNodes(formPageNodeUuidByNodeDefUuid)(state),
+  [SurveyFormActions.formPageNodesUpdate]: (state, { formPageNodeIIdByNodeDefUuid }) =>
+    SurveyFormState.assocFormPageNodes(formPageNodeIIdByNodeDefUuid)(state),
 
   [SurveyFormActions.formShowPageNavigationUpdate]: (state, { showPageNavigation }) =>
     SurveyFormState.setShowPageNavigation(showPageNavigation)(state),
@@ -72,10 +72,10 @@ const actionHandlers = {
   },
 
   // Record
-  [RecordActions.recordLoad]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>
+  [RecordActions.recordLoad]: (state, { nodeDefActivePage, formPageNodeIIdByNodeDefUuid }) =>
     R.pipe(
       SurveyFormState.assocNodeDefAddChildTo(null),
-      SurveyFormState.assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
+      SurveyFormState.assocFormPageNodes(formPageNodeIIdByNodeDefUuid),
       SurveyFormState.assocFormActivePage(nodeDefActivePage)
     )(state),
 }

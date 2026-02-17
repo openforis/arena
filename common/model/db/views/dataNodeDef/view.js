@@ -123,8 +123,12 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull)
   }
 
-  get columnParentUuidName() {
-    return this.viewDataParent?.columnUuidName
+  get columnParentInternalId() {
+    return this.viewDataParent?.columnIId
+  }
+
+  get columnParentInternalIdName() {
+    return this.viewDataParent?.columnIIdName
   }
 
   get tableData() {

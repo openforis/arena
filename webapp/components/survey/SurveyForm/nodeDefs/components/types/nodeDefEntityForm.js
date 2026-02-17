@@ -33,12 +33,12 @@ const NodeDefEntityForm = (props) => {
   // when there is no entity selected, select the first one
   useEffect(() => {
     if (entry && !selectedNode && !R.isEmpty(nodes)) {
-      const nodeUuid = R.pipe(R.head, Node.getUuid)(nodes)
-      if (nodeUuid) {
-        dispatch(SurveyFormActions.setFormPageNode(nodeDef, nodeUuid))
+      const nodeIId = R.pipe(R.head, Node.getIId)(nodes)
+      if (nodeIId) {
+        dispatch(SurveyFormActions.setFormPageNode(nodeDef, nodeIId))
       }
     }
-  }, [entry, selectedNode, nodes, NodeDef.getUuid(nodeDef)])
+  }, [entry, selectedNode, nodes, dispatch, nodeDef])
 
   return (
     <>
@@ -48,7 +48,7 @@ const NodeDefEntityForm = (props) => {
         <NodeDefEntityFormNodeSelect
           {...props}
           selectedNode={selectedNode}
-          onChange={(selectedNodeUuid) => dispatch(SurveyFormActions.setFormPageNode(nodeDef, selectedNodeUuid))}
+          onChange={(selectedNodeIId) => dispatch(SurveyFormActions.setFormPageNode(nodeDef, selectedNodeIId))}
         />
       )}
 
@@ -65,9 +65,9 @@ const mapStateToProps = (state, props) => {
   const getEntryProps = () => {
     const entryMultiple = NodeDef.isMultiple(nodeDef)
 
-    const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
+    const selectedNodeIId = SurveyFormState.getFormPageNodeIId(nodeDef)(state)
 
-    const selectedNode = selectedNodeUuid ? Record.getNodeByUuid(selectedNodeUuid)(record) : null
+    const selectedNode = selectedNodeIId ? Record.getNodeByInternalId(selectedNodeIId)(record) : null
 
     return {
       entryMultiple,

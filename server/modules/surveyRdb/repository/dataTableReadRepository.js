@@ -15,7 +15,7 @@ import { db } from '@server/db/db'
  * {
  *   uuid, //record uuid,
  *   validation: {}, //record validation object,
-     node_duplicate_uuids: [nodeUuid1, nodeUuid2, ...] //array of duplicate entity uuids
+     node_duplicate_iids: [nodeIId1, nodeIId2, ...] //array of duplicate entity iids
  * }
  * ```.
  * @param {!object} survey - The survey object.
@@ -47,11 +47,11 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
   const recordAndParentEqualCondition = NodeDef.isRoot(nodeDefEntity)
     ? ''
     : `AND ${getColEqualCondition(TableDataNodeDef.columnSet.recordUuid)}
-         AND ${getColEqualCondition(TableDataNodeDef.columnSet.parentUuid)}`
+         AND ${getColEqualCondition(TableDataNodeDef.columnSet.parentInternalId)}`
 
   return await client.any(
     `
-    SELECT r.uuid, r.validation, json_agg(${aliasA}.uuid) as node_duplicate_uuids
+    SELECT r.uuid, r.validation, json_agg(${aliasA}.i_id) as node_duplicate_i_ids
     FROM ${Schemata.getSchemaSurvey(surveyId)}.record r
       JOIN ${tableName} ${aliasA}
         ON r.uuid = ${aliasA}.${TableDataNodeDef.columnSet.recordUuid} 
@@ -59,13 +59,13 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
       r.cycle = $1 
       AND EXISTS (
       --exists a node entity with the same key node values in the same record (if not root entity) and in the same parent node entity
-      SELECT ${aliasB}.${TableDataNodeDef.columnSet.uuid}
+      SELECT ${aliasB}.${TableDataNodeDef.columnSet.iId}
       FROM ${tableName} ${aliasB}
       WHERE
         --same cycle
         ${aliasB}.${TableDataNodeDef.columnSet.recordCycle} = $1
-        --different node uuid 
-        AND ${aliasA}.${TableDataNodeDef.columnSet.uuid} != ${aliasB}.${TableDataNodeDef.columnSet.uuid}
+        --different node internal ID 
+        AND ${aliasA}.${TableDataNodeDef.columnSet.iId} != ${aliasB}.${TableDataNodeDef.columnSet.iId}
         ${recordAndParentEqualCondition}
         --same key node(s) values
         AND (${equalKeysCondition})
@@ -80,14 +80,14 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
   survey,
   entityDefUuid,
   recordUuid,
-  nodeUuid = null,
+  nodeIId = null,
   client = db
 ) => {
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const tableDef = new TableDataNodeDef(survey, entityDef)
   const entityDefKeys = Survey.getNodeDefKeys(entityDef)(survey)
   const keyColumns = R.pipe(R.map(NodeDefTable.getColumnName), R.join(', '))(entityDefKeys)
-  const nodeUuidWhereCondition = NodeDef.isRoot(entityDef) ? '' : `AND ${tableDef.columnUuid} = $2`
+  const nodeIIdWhereCondition = NodeDef.isRoot(entityDef) ? '' : `AND ${tableDef.columnIId} = $/nodeIId/`
 
   return await client.oneOrNone(
     `
@@ -96,9 +96,9 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
     FROM
       ${tableDef.nameAliased}
     WHERE
-      ${tableDef.columnRecordUuid} = $1
-      ${nodeUuidWhereCondition}`,
-    [recordUuid, nodeUuid],
+      ${tableDef.columnRecordUuid} = $/recordUuid/
+      ${nodeIIdWhereCondition}`,
+    { recordUuid, nodeIId },
     (row) => (row ? Object.values(row) : [])
   )
 }

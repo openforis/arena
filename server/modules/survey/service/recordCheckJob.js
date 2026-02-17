@@ -270,7 +270,7 @@ const _insertMissingSingleNode = async ({ survey, childDef, record, parentNode, 
     return {}
   }
   // insert missing single node
-  const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
+  const childNode = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(childDef), parentNode })
   return RecordManager.insertNode(
     { user, survey, record, node: childNode, system: true, persistNodes: false, sideEffect },
     tx
@@ -284,7 +284,7 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
   for (const nodeDefUpdatedUuid of nodeDefUpdatedUuids) {
     const nodesToUpdatePartial = Record.getNodesByDefUuid(nodeDefUpdatedUuid)(record)
     for (const nodeUpdated of nodesToUpdatePartial) {
-      nodesToUpdate[Node.getUuid(nodeUpdated)] = nodeUpdated
+      nodesToUpdate[Node.getIId(nodeUpdated)] = nodeUpdated
     }
   }
 
@@ -316,7 +316,7 @@ const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx)
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
     for (const parentNode of parentNodes) {
-      nodesToValidate[Node.getUuid(parentNode)] = parentNode
+      nodesToValidate[Node.getIId(parentNode)] = parentNode
     }
   }
 

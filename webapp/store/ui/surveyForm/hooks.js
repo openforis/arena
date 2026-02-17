@@ -28,7 +28,7 @@ export const useNodeDefPage = () => useSelector(SurveyFormState.getFormActivePag
 
 export const useShowPageNavigation = () => useSelector(SurveyFormState.showPageNavigation)
 
-export const usePagesUuidMap = () => useSelector(SurveyFormState.getPagesUuidMap)
+export const usePagesUuidMap = () => useSelector(SurveyFormState.getPagesIIdMap)
 
 const visitSurveyEntityDefsInOwnPage = ({ survey, cycle, visitor }) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)

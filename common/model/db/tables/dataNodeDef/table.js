@@ -15,9 +15,9 @@ const columnSet = {
   id: Table.columnSetCommon.id,
   dateCreated: Table.columnSetCommon.dateCreated,
   dateModified: Table.columnSetCommon.dateModified,
-  uuid: Table.columnSetCommon.uuid,
-  parentUuid: 'parent_uuid',
-  ancestorUuid: 'ancestor_uuid',
+  iId: Table.columnSetCommon.iId,
+  parentInternalId: 'p_i_id',
+  ancestorIId: 'a_i_id',
   recordUuid: 'record_uuid',
   recordCycle: 'record_cycle',
   recordStep: 'record_step',
@@ -32,15 +32,15 @@ const rootDefColumnNames = [
 ]
 
 const commonColumnNamesAndTypes = [
-  `${columnSet.id}            bigint      NOT NULL GENERATED ALWAYS AS IDENTITY`,
-  `${columnSet.dateCreated}   TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
-  `${columnSet.dateModified}  TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
-  `${columnSet.uuid}          uuid        NOT NULL`,
-  `${columnSet.parentUuid}    uuid            NULL`,
+  `${columnSet.id}                bigint      NOT NULL GENERATED ALWAYS AS IDENTITY`,
+  `${columnSet.recordUuid}        uuid        NOT NULL`,
+  `${columnSet.iId}               int         NOT NULL`,
+  `${columnSet.parentInternalId}  int         NULL`,
+  `${columnSet.dateCreated}       TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
+  `${columnSet.dateModified}      TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
 ]
 
 const rootDefColumnNamesAndTypes = [
-  `${columnSet.recordUuid}      uuid        NOT NULL`,
   `${columnSet.recordCycle}     varchar(2)  NOT NULL`,
   `${columnSet.recordStep}      varchar(63) NOT NULL`,
   `${columnSet.recordOwnerUuid} uuid        NOT NULL`,
@@ -71,12 +71,24 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this.getColumn(columnSet.id)
   }
 
+  get columnIId() {
+    return this.getColumn(columnSet.iId)
+  }
+
+  get columnIIdName() {
+    return this.columnIId.name
+  }
+
   get columnUuid() {
     return this.getColumn(columnSet.uuid)
   }
 
-  get columnParentUuid() {
-    return this.getColumn(columnSet.parentUuid)
+  get columnParentInternalId() {
+    return this.getColumn(columnSet.parentInternalId)
+  }
+
+  get columnParentInternalIdName() {
+    return this.columnParentInternalId.name
   }
 
   get columnRecordUuid() {
@@ -121,7 +133,13 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   getColumnNames = ({ includeAnalysis = true } = {}) => {
     const { nodeDef } = this
     const nodeDefsForColumns = this.getNodeDefsForColumns({ includeAnalysis })
-    const names = [columnSet.uuid, columnSet.parentUuid, columnSet.dateCreated, columnSet.dateModified]
+    const names = [
+      columnSet.recordUuid,
+      columnSet.iId,
+      columnSet.parentInternalId,
+      columnSet.dateCreated,
+      columnSet.dateModified,
+    ]
     if (NodeDef.isRoot(nodeDef)) {
       names.push(...rootDefColumnNames)
     }
@@ -135,16 +153,24 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     if (NodeDef.isRoot(this.nodeDef)) {
       columnsAndType.push(...rootDefColumnNamesAndTypes)
     }
-    this.columnNodeDefs.forEach((nodeDefColumn) => {
-      columnsAndType.push(...nodeDefColumn.names.map((name, i) => `${name} ${nodeDefColumn.types[i]}`))
-    })
+    for (const nodeDefColumn of this.columnNodeDefs) {
+      for (let i = 0; i < nodeDefColumn.names.length; i++) {
+        const name = nodeDefColumn.names[i]
+        const type = nodeDefColumn.types[i]
+        columnsAndType.push(`${name} ${type}`)
+      }
+    }
     return columnsAndType
   }
 
-  _getConstraintFk(tableReferenced, column) {
+  _getConstraintFk(tableReferenced, ...columns) {
+    const referencedColumnNames = [columnSet.recordUuid]
+    if (columns.length > 1) {
+      referencedColumnNames.push(columnSet.iId)
+    }
     return `CONSTRAINT ${this.name}_${tableReferenced.name}_fk 
-    FOREIGN KEY (${column}) 
-    REFERENCES ${tableReferenced.nameQualified} (${columnSet.uuid}) 
+    FOREIGN KEY (${columns.join(', ')}) 
+    REFERENCES ${tableReferenced.nameQualified} (${referencedColumnNames.join(', ')}) 
     ON DELETE CASCADE`
   }
 
@@ -160,19 +186,24 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       return null
     }
     const ancestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(this.nodeDef)(this.survey)
-    return this._getConstraintFk(new TableDataNodeDef(this.survey, ancestorMultipleEntity), columnSet.parentUuid)
+    return this._getConstraintFk(
+      new TableDataNodeDef(this.survey, ancestorMultipleEntity),
+      columnSet.recordUuid,
+      columnSet.parentInternalId
+    )
   }
 
-  getConstraintUuidUnique() {
-    return `CONSTRAINT ${NodeDef.getName(this.nodeDef)}_uuid_unique_ix1 UNIQUE (${columnSet.uuid})`
+  getConstraintIIdUnique() {
+    return `CONSTRAINT ${NodeDef.getName(this.nodeDef)}_i_id_unique_ix1 UNIQUE (${columnSet.recordUuid}, ${columnSet.iId})`
   }
 
   getRowValuesByColumnName = ({ nodeRow, nodeDefColumns }) => {
     const { survey, nodeDef } = this
     const valuesByColumnName = TableDataNodeDefRowUtils.getValuesByColumnName({ survey, nodeRow, nodeDefColumns })
     const result = {
-      [columnSet.uuid]: nodeRow[columnSet.uuid],
-      [columnSet.parentUuid]: nodeRow[columnSet.ancestorUuid],
+      [columnSet.iId]: nodeRow[columnSet.iId],
+      [columnSet.recordUuid]: nodeRow[columnSet.recordUuid],
+      [columnSet.parentInternalId]: nodeRow[columnSet.ancestorIId],
       [columnSet.dateCreated]: nodeRow[columnSet.dateCreated],
       [columnSet.dateModified]: nodeRow[columnSet.dateModified],
     }
