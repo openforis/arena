@@ -47,7 +47,7 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
         FROM
           ${getSurveyDBSchema(surveyId)}.node n
         WHERE
-          n.parent_uuid IS NULL
+          n.p_i_id IS NULL
         ORDER BY
           ${columns.nodeAncestorId},
           ${columns.nodeId}

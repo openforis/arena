@@ -269,7 +269,7 @@ export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeII
     `
     ${getNodeSelectQuery({ surveyId, draft: false })}
     WHERE n.record_uuid = $/recordUuid/
-      AND n.parent_iid ${nodeIId ? '= $/nodeIId/' : 'is null'}
+      AND n.p_i_id ${nodeIId ? '= $/nodeIId/' : 'is null'}
       AND n.node_def_uuid IN ($/childDefUuids:csv/)`,
     { surveyId, recordUuid, nodeIId, childDefUuids },
     dbTransformCallback
