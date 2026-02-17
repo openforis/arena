@@ -162,7 +162,7 @@ const _addOrUpdateAttribute =
     if (!attribute || NodeDef.isMultipleAttribute(attributeDef)) {
       // create new attribute
       const updateResult = new RecordUpdateResult({ record })
-      const attributeCreated = Node.newNode(attributeDefUuid, record.uuid, entity, value)
+      const attributeCreated = Node.newNode({ record, nodeDefUuid: attributeDefUuid, parentNode: entity, value })
       updateResult.addNode(attributeCreated, { sideEffect })
       return updateResult
     }

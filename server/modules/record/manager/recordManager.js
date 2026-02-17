@@ -302,9 +302,9 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
   client.tx(async (t) => {
     const activities = nodes.map((node) => {
       const logContent = R.pick([
-        Node.keys.uuid,
         Node.keys.recordUuid,
-        Node.keys.parentUuid,
+        Node.keys.iId,
+        Node.keys.pIId,
         Node.keys.nodeDefUuid,
         Node.keys.meta,
         Node.keys.value,

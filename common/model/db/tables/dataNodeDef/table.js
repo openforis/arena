@@ -16,9 +16,7 @@ const columnSet = {
   dateCreated: Table.columnSetCommon.dateCreated,
   dateModified: Table.columnSetCommon.dateModified,
   iId: Table.columnSetCommon.iId,
-  parentUuid: 'parent_uuid',
   parentInternalId: 'p_i_id',
-  ancestorUuid: 'ancestor_uuid',
   ancestorIId: 'a_i_id',
   recordUuid: 'record_uuid',
   recordCycle: 'record_cycle',
@@ -77,16 +75,20 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this.getColumn(columnSet.iId)
   }
 
+  get columnIIdName() {
+    return this.columnIId.name
+  }
+
   get columnUuid() {
     return this.getColumn(columnSet.uuid)
   }
 
-  get columnParentUuid() {
-    return this.getColumn(columnSet.parentUuid)
-  }
-
   get columnParentInternalId() {
     return this.getColumn(columnSet.parentInternalId)
+  }
+
+  get columnParentInternalIdName() {
+    return this.columnParentInternalId.name
   }
 
   get columnRecordUuid() {

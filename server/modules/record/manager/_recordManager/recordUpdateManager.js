@@ -49,7 +49,7 @@ export const initNewRecord = async (
 ) => {
   const rootNodeDef = Survey.getNodeDefRoot(survey)
 
-  const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
+  const rootNode = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(rootNodeDef) })
 
   return persistNode(
     {

@@ -73,19 +73,19 @@ export default class DfResults {
     const columnNodeDef = NodeDef.isVirtual(this.entity)
       ? Survey.getNodeDefParent(this.entity)(this.survey)
       : this.entity
-    const setUuids = [
+    const setIdentifiers = [
       { name: NodeDef.keysPropsAdvanced.chainUuid, value: quote(this.rChain.chainUuid) },
       {
         name: TableNode.columnSet.recordUuid,
         value: dfVar(this.dfSourceName, ViewDataNodeDef.columnSet.recordUuid),
       },
       {
-        name: TableNode.columnSet.parentUuid,
+        name: TableNode.columnSet.parentIId,
         value: dfVar(this.dfSourceName, ColumnNodeDef.getColumnName(columnNodeDef)),
       },
     ].map((uuidMapping) => setVar(dfVar(this.name, uuidMapping.name), uuidMapping.value))
 
-    this.scripts.push(...setUuids)
+    this.scripts.push(...setIdentifiers)
   }
 
   initCodeAttributes() {

@@ -18,6 +18,12 @@ import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
 
+const prepareNodeForStorage = ({ record, node }) => {
+  const lastIId = Record.getLastNodeInternalId(record)
+  const nodeIId = Node.getIId(node) ?? lastIId + 1
+  return Node.assocIId(nodeIId)(node)
+}
+
 class RecordsUpdateThread extends Thread {
   constructor(paramsObj) {
     super(paramsObj)
@@ -199,11 +205,13 @@ class RecordsUpdateThread extends Thread {
     const recordUuid = Node.getRecordUuid(node)
     let record = await this.getOrFetchRecord({ msg, recordUuid })
 
+    const nodePreparedForStorage = prepareNodeForStorage({ record, node })
+
     record = await RecordManager.persistNode({
       user,
       survey,
       record,
-      node,
+      node: nodePreparedForStorage,
       timezoneOffset,
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),

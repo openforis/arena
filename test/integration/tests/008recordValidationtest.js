@@ -62,7 +62,7 @@ const _addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, expecte
   const parentNode = RecordUtils.findNodeByPath(parentNodePath)(survey, record)
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
 
-  const node = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
+  const node = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(childDef), parentNode })
 
   await _persistNode(node)
 
@@ -76,7 +76,7 @@ const _addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
   // Add a new plot
   const nodeRoot = Record.getRootNode(record)
   const nodeDefPlot = Survey.getNodeDefByName('plot')(survey)
-  const nodePlot = Node.newNode(NodeDef.getUuid(nodeDefPlot), Record.getUuid(record), nodeRoot)
+  const nodePlot = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDefPlot), parentNode: nodeRoot })
   await _persistNode(nodePlot)
 
   // Update new plot num with a duplicate value

@@ -34,7 +34,11 @@ const NodeDefEntityFormNodeSelect = (props) => {
           testId={TestId.entities.form.addNewNode}
           size="small"
           onClick={() => {
-            const entity = Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
+            const entity = Node.newNode({
+              record: { uuid: Node.getRecordUuid(parentNode) },
+              nodeDefUuid: NodeDef.getUuid(nodeDef),
+              parentNode,
+            })
             updateNode(nodeDef, entity)
             onChange(Node.getIId(entity))
           }}

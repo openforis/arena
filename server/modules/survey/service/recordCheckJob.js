@@ -270,7 +270,7 @@ const _insertMissingSingleNode = async ({ survey, childDef, record, parentNode, 
     return {}
   }
   // insert missing single node
-  const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
+  const childNode = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(childDef), parentNode })
   return RecordManager.insertNode(
     { user, survey, record, node: childNode, system: true, persistNodes: false, sideEffect },
     tx

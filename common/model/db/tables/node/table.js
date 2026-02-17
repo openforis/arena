@@ -9,10 +9,10 @@ import TableSurvey from '../tableSurvey'
 import { getSelect } from './select'
 
 const columnSet = {
-  uuid: Table.columnSetCommon.uuid,
   id: Table.columnSetCommon.id,
   recordUuid: 'record_uuid',
-  parentUuid: 'parent_uuid',
+  iId: 'i_id',
+  parentIId: 'p_i_id',
   nodeDefUuid: 'node_def_uuid',
   value: 'value',
   meta: 'meta',
@@ -38,8 +38,12 @@ export default class TableNode extends TableSurvey {
     return super.getColumn(columnSet.recordUuid)
   }
 
-  get columnParentUuid() {
-    return super.getColumn(columnSet.parentUuid)
+  get columnIId() {
+    return super.getColumn(columnSet.iId)
+  }
+
+  get columnParentIId() {
+    return super.getColumn(columnSet.parentIId)
   }
 
   get columnNodeDefUuid() {

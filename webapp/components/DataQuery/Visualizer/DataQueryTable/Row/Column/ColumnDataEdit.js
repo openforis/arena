@@ -30,7 +30,7 @@ const ColumnDataEdit = (props) => {
   const { widthOuter } = useColumn({ nodeDef, query, colWidth })
 
   const cellNode = cell?.node
-  const nodeUpdated = useRecordNode({ nodeIId: cellNode?.uuid })
+  const nodeUpdated = useRecordNode({ nodeIId: Node.getIId(cellNode) })
   const node = nodeUpdated || cellNode
   const recordValidation = Record.getValidation(record)
   const validation = RecordValidation.getNodeValidation(node)(recordValidation)
@@ -48,7 +48,7 @@ const ColumnDataEdit = (props) => {
             nodeDef={nodeDef}
             parentNode={{
               [Node.keys.recordUuid]: Record.getUuid(record),
-              [Node.keys.parentUuid]: cell.parentUuid,
+              [Node.keys.pIId]: Node.getParentInternalId(cellNode),
             }}
             nodes={[node]}
             entry

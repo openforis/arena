@@ -23,15 +23,16 @@ class EntityBuilder extends NodeBuilder {
     this.childBuilders = childBuilders
   }
 
-  build(survey, parentNodeDef, recordUuid, parentNode) {
+  build(survey, parentNodeDef, record, parentNode) {
     const nodeDef = parentNodeDef
       ? Survey.getNodeDefChildByName(parentNodeDef, this.nodeDefName)(survey)
       : Survey.getNodeDefRoot(survey)
 
-    const entity = Node.newNode(NodeDef.getUuid(nodeDef), recordUuid, parentNode)
+    const entity = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDef), parentNode })
+    record.lastNodeInternalId = Node.getIId(entity)
 
     return R.pipe(
-      R.map((childBuilder) => childBuilder.build(survey, nodeDef, recordUuid, entity)),
+      R.map((childBuilder) => childBuilder.build(survey, nodeDef, record, entity)),
       R.mergeAll,
       R.assoc(Node.getIId(entity), entity)
     )(this.childBuilders)
@@ -46,7 +47,8 @@ class EntityBuilder extends NodeBuilder {
     } else if (NodeDef.isSingle(nodeDef)) {
       node = R.head(Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record))
     } else {
-      node = Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), parentNode)
+      node = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDef), parentNode })
+      record.lastNodeInternalId = Node.getIId(node)
       record = await RecordManager.persistNode({ user, survey, record, node, system: true }, t)
     }
 
@@ -64,10 +66,10 @@ class AttributeBuilder extends NodeBuilder {
     this.value = value
   }
 
-  build(survey, _parentNodeDef, recordUuid, parentNode) {
+  build(survey, _parentNodeDef, record, parentNode) {
     const nodeDef = Survey.getNodeDefByName(this.nodeDefName)(survey)
-    const attribute = Node.newNode(NodeDef.getUuid(nodeDef), recordUuid, parentNode, this.value)
-
+    const attribute = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDef), parentNode, value: this.value })
+    record.lastNodeInternalId = Node.getIId(attribute)
     return {
       [Node.getIId(attribute)]: attribute,
     }
@@ -84,10 +86,13 @@ class AttributeBuilder extends NodeBuilder {
       ? R.head(Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record))
       : null
 
-    const nodeToPersist = nodeInRecord
-      ? Node.assocValue(this.value)(nodeInRecord)
-      : Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), parentNode, this.value)
-
+    let nodeToPersist
+    if (nodeInRecord) {
+      nodeToPersist = Node.assocValue(this.value)(nodeInRecord)
+    } else {
+      nodeToPersist = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDef), parentNode, value: this.value })
+      record.lastNodeInternalId = Node.getIId(nodeToPersist)
+    }
     return await RecordManager.persistNode({ user, survey, record, node: nodeToPersist, system: true }, t)
   }
 }
@@ -101,7 +106,7 @@ class RecordBuilder {
 
   build() {
     const record = RecordUtils.newRecord(this.user)
-    const nodes = this.rootEntityBuilder.build(this.survey, null, Record.getUuid(record), null)
+    const nodes = this.rootEntityBuilder.build(this.survey, null, record, null)
     return Record.assocNodes({ nodes })(record)
   }
 

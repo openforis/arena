@@ -128,13 +128,13 @@ export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancesto
 // ======
 //
 
-export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => {
+export const newNode = ({ record, nodeDefUuid, parentNode = null, value = null }) => {
   const now = new Date()
   return {
-    [keys.uuid]: uuidv4(),
     [keys.nodeDefUuid]: nodeDefUuid,
-    [keys.recordUuid]: recordUuid,
-    [keys.parentUuid]: getUuid(parentNode),
+    [keys.recordUuid]: ObjectUtils.getUuid(record),
+    [keys.iId]: record.lastInternalId + 1,
+    [keys.pIId]: getIId(parentNode),
     [keys.value]: value,
     [keys.meta]: {
       [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
@@ -146,7 +146,7 @@ export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null
 }
 
 export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
-  ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
+  ...newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDef), parentNode, value }),
   [keys.placeholder]: true,
 })
 
@@ -155,6 +155,7 @@ export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
 // UPDATE
 // ======
 //
+export const assocIId = R.assoc(keys.iId)
 export const assocValue = R.assoc(keys.value)
 export const { assocValidation } = Validation
 
