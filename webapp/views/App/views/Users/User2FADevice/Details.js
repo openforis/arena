@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router'
 import i18n from '@core/i18n/i18nFactory'
 import { User2FADevice } from '@core/user2FADevice'
 import * as Validation from '@core/validation/validation'
+import * as User from '@core/user/user'
 
 import { Button, ButtonDelete, ButtonSave, QRCode } from '@webapp/components'
 import { TooltipNew } from '@webapp/components/TooltipNew'
@@ -14,6 +15,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { useConfirmAsync, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 
 import * as API from '@webapp/service/api'
+import { useUser } from '@webapp/store/user'
 
 import { User2FADeviceValidator } from './user2FADeviceValidator'
 
@@ -21,6 +23,7 @@ export const User2FADeviceDetails = () => {
   const { uuid: deviceUuidParam } = useParams()
   const navigate = useNavigate()
   const confirm = useConfirmAsync()
+  const user = useUser()
 
   const notifyInfo = useNotifyInfo()
   const notifyError = useNotifyError()
@@ -38,6 +41,7 @@ export const User2FADeviceDetails = () => {
   const deviceCreated = !!otpAuthUrl
   const deviceUuid = deviceUuidParam || User2FADevice.getUuid(device)
   const deviceNameEditable = isNew && !deviceCreated
+  const deviceNameFinal = deviceName ? `Arena: ${deviceName} - ${User.getEmail(user)}` : ''
 
   useEffect(() => {
     let isMounted = true
@@ -196,7 +200,9 @@ export const User2FADeviceDetails = () => {
           validation={Validation.getFieldValidation(User2FADevice.keys.deviceName)(validation)}
         />
       </FormItem>
-
+      <FormItem label="user2FADevice:deviceNameFinal">
+        <Input value={deviceNameFinal} readOnly />
+      </FormItem>
       {!isNew && (
         <FormItem label="user2FADevice:enabled">
           <Checkbox checked={User2FADevice.isEnabled(device)} disabled />

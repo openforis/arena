@@ -25,6 +25,7 @@ $t(user2FADevice:backupCodesRegenerated.message)`,
     successful: 'Device deleted successfully',
   },
   deviceName: 'Device name',
+  deviceNameFinal: 'Device name shown in Auth APP',
   enabled: 'Enabled',
   error: {
     fetchDevice: 'Error fetching device details: {{message}}',
