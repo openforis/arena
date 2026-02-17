@@ -4,7 +4,6 @@ import { Objects } from '@openforis/arena-core'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
-import { uuidv4 } from '@core/uuid'
 
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -45,7 +44,6 @@ export const keys = {
   id: ObjectUtils.keys.id,
   iId: ObjectUtils.keys.iId,
   uuid: ObjectUtils.keys.uuid,
-  parentUuid: ObjectUtils.keys.parentUuid,
   pIId: ObjectUtils.keys.pIId,
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
@@ -74,7 +72,7 @@ export const isValueProp = ({ nodeDef, prop }) => Boolean(R.path([NodeDef.getTyp
 
 export const { getId, getIId, getUuid } = ObjectUtils
 
-export const { getParentUuid, getParentInternalId } = ObjectUtils
+export const { getParentInternalId } = ObjectUtils
 
 export const getRecordUuid = R.prop(keys.recordUuid)
 
@@ -109,7 +107,7 @@ export const isCreated = R.propEq(keys.created, true)
 export const isUpdated = R.propEq(keys.updated, true)
 export const isDeleted = R.propEq(keys.deleted, true)
 export const isDirty = R.propEq(dirtyFlag, true)
-export const isRoot = R.pipe(getParentUuid, R.isNil)
+export const isRoot = R.pipe(getParentInternalId, R.isNil)
 export const { isEqual } = ObjectUtils
 
 export const { getValidation } = Validation

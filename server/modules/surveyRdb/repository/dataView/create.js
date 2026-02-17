@@ -109,7 +109,8 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
 
   const joinWithParentView = viewDataParent
     ? `LEFT JOIN ${viewDataParent.nameAliased}  
-            ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
+        ON ${viewDataParent.columnRecordUuid} = ${tableData.columnRecordUuid} 
+          AND ${viewDataParent.columnIId} = ${tableData.columnParentIId}`
     : ''
 
   const query = `

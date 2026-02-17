@@ -45,8 +45,8 @@ const MapWrapper = () => {
   const layerColors = useRandomColors(samplingPointDataLevels.length + geoAttributeDefs.length)
 
   const onRecordEditClick = useCallback((params) => {
-    const { recordUuid, parentUuid } = params || {}
-    setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid, editingParentNodeIId: parentUuid }))
+    const { recordUuid, parentIId } = params || {}
+    setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid, editingParentNodeIId: parentIId }))
   }, [])
 
   const closeRecordEditor = useCallback(() => {

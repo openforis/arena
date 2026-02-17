@@ -197,7 +197,8 @@ const _addNodeToUpdateResult = ({
   delete newNodeToAdd[Node.keys.id] // clear internal id
   newNodeToAdd[Node.keys.recordUuid] = updateResult.record.uuid
 
-  const parentEntity = parentEntityParam ?? RecordReader.getNodeByUuid(Node.getParentUuid(node))(updateResult.record)
+  const parentEntity =
+    parentEntityParam ?? RecordReader.getNodeByInternalId(Node.getParentInternalId(node))(updateResult.record)
   _recalculateNodeHierarchy({ node: newNodeToAdd, parentEntity })
   updateResult.addNode(newNodeToAdd, { sideEffect })
 }

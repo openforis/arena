@@ -66,9 +66,9 @@ const _getValuesByColumnName = ({ survey, record, nodeDef, node, ancestorMultipl
 }
 
 const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
-  let currentParent = nodes[Node.getParentUuid(node)]
+  let currentParent = nodes[Node.getParentInternalId(node)]
   while (currentParent && !Node.isRoot(currentParent) && Node.getNodeDefUuid(currentParent) !== ancestorDefUuid) {
-    currentParent = nodes[Node.getParentUuid(currentParent)]
+    currentParent = nodes[Node.getParentInternalId(currentParent)]
   }
   return currentParent
 }

@@ -182,13 +182,13 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
   await client.query(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
-        (iid, record_uuid, parent_uuid, node_def_uuid, value, meta)
+        (i_id, record_uuid, p_i_id, node_def_uuid, value, meta)
     VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
     `,
     [
       nodeIId,
       recordUuid,
-      Node.getParentUuid(node),
+      Node.getParentInternalId(node),
       Node.getNodeDefUuid(node),
       _toValueQueryParam(Node.getValue(node, null)),
       meta,

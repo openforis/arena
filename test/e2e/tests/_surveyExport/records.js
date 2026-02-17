@@ -1,4 +1,5 @@
 import * as PromiseUtils from '../../../../core/promiseUtils'
+import * as Node from '../../../../core/record/node'
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 import { getSurveyEntry } from '../../paths'
 import { records } from '../../mock/records'
@@ -6,7 +7,6 @@ import { cluster, tree } from '../../mock/nodeDefs'
 import { formatTime } from '../_record'
 import { getNodeDefByName } from './_surveyUtils'
 
-// eslint-disable-next-line camelcase
 const { tree_id } = tree.children
 
 const getNodesByDefUuid = (nodeDefUuid) => (record) =>
@@ -81,12 +81,11 @@ const verifyRecord = async (survey, surveyExport, recordsMock, recordUuid) => {
         const treeId = treeNode[tree_id.name]
         const treeIdExport = treeIdsExport.find((_nodeExport) => _nodeExport.value === treeId)
         await verifyNode(treeIdDefExport, treeIdExport, treeId)
-        // const treeExport = recordExport.nodes[treeIdExport.parentUuid]
 
         await PromiseUtils.each(Object.entries(treeNode), async ([treeChildName, treeChildValue]) => {
           const nodeDefExport = getNodeDefByName(treeChildName)(surveyExport)
           const nodeExport = getNodesByDefUuid(nodeDefExport.uuid)(recordExport).find(
-            (_node) => _node.parentUuid === treeIdExport.parentUuid
+            (_node) => Node.getParentInternalId(_node) === Node.getParentInternalId(treeIdExport)
           )
           await verifyNode(nodeDefExport, nodeExport, treeChildValue)
         })

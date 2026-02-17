@@ -29,9 +29,9 @@ const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
   if (!nodeDef) {
     return { valid: false, error: 'refers a missing node definition' }
   }
-  const parentUuid = Node.getParentUuid(node)
-  if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
-    return { valid: false, error: `has missing or invalid parent_uuid` }
+  const parentIId = Node.getParentInternalId(node)
+  if ((!parentIId && !NodeDef.isRoot(nodeDef)) || (parentIId && !nodes[parentIId])) {
+    return { valid: false, error: `has missing or invalid parent internal id` }
   }
   if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
     return { valid: false, error: `is multiple and has an empty value` }
@@ -39,7 +39,7 @@ const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
   const nodeHierarchy = Node.getHierarchy(node)
   if (
     nodeHierarchy.length !== NodeDef.getMetaHierarchy(nodeDef)?.length ||
-    nodeHierarchy.some((ancestorUuid) => !nodes[ancestorUuid])
+    nodeHierarchy.some((ancestorIId) => !nodes[ancestorIId])
   ) {
     return { valid: false, error: `has an invalid meta hierarchy` }
   }
