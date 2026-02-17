@@ -21,11 +21,11 @@ const { keys: categoryItemKeys } = CategoryItem
 const { keys: taxonKeys } = Taxon
 
 export const tableColumnsInsert = [
-  'uuid',
   'date_created',
   'date_modified',
   'record_uuid',
-  'parent_uuid',
+  'i_id',
+  'p_i_id',
   'node_def_uuid',
   'value',
   'meta',
@@ -216,7 +216,8 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
       date_created: Dates.formatForStorage(Node.getDateCreated(node)),
       date_modified: Dates.formatForStorage(Node.getDateModified(node)),
       record_uuid: Node.getRecordUuid(node),
-      parent_uuid: Node.getParentUuid(node),
+      i_id: Node.getIId(node),
+      p_i_id: Node.getParentIId(node),
       node_def_uuid: Node.getNodeDefUuid(node),
       value: _toValueQueryParam(Node.getValue(node)),
       meta: Node.getMeta(node),

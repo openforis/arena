@@ -32,16 +32,15 @@ const _createUpdateResult = ({ record, node = null, nodes = {}, sideEffect = fal
 
 export const insertNodesInBulk = async ({ user, surveyId, nodesArray, systemActivity = false }, tx) => {
   const nodeValues = nodesArray.map((node) => [
-    Node.getIId(node),
     Node.getDateCreated(node),
     Node.getDateModified(node),
     Node.getRecordUuid(node),
+    Node.getIId(node),
     Node.getParentInternalId(node),
     Node.getNodeDefUuid(node),
     JSON.stringify(Node.getValue(node, null)),
     Node.getMeta(node),
   ])
-
   await NodeRepository.insertNodesFromValues(surveyId, nodeValues, tx)
 
   const activities = nodesArray.map((node) =>

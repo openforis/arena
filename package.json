@@ -109,7 +109,7 @@
     "@mui/x-date-pickers": "^8.26.0",
     "@mui/x-tree-view": "^8.26.0",
     "@openforis/arena-core": "../arena-core",
-    "@openforis/arena-server": "^1.2.14",
+    "@openforis/arena-server": "../arena-server",
     "@reduxjs/toolkit": "^2.11.2",
     "@sendgrid/mail": "^8.1.6",
     "@shopify/draggable": "^1.2.1",
