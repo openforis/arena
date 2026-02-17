@@ -2,17 +2,22 @@ export default {
   authenticatorCodeOne: 'Authenticator code 1',
   authenticatorCodeTwo: 'Authenticator code 2',
   authenticatorCodeTwoInfo: 'Wait 30 seconds and enter a second code',
+  backupCodesRegenerated: {
+    title: 'Backup codes regenerated successfully',
+    message: `Please save the following 8 backup codes in a safe place:  
+{{backupCodes}}  
+
+Use them to access your account if you lose access to your authenticator device.  
+**Every backup code can be used only once**.  
+They can only be viewed now, so make sure to **save them now**.`,
+  },
   create: {
     label: 'Create',
   },
   creationSuccessful: {
     title: '2FA device created successfully',
     message: `2FA device "{{deviceName}}" has been created.  
-Please save the following 8 backup codes in a safe place:  
-**{{backupCodes}}**  
-They can be used to access your account if you lose access to your authenticator device.
-Only one backup code can be used once. After using a backup code, it will no longer be valid.
-Backup codes can only be viewed at the time of device creation, so make sure to save them now.`,
+$t(user2FADevice:backupCodesRegenerated.message)`,
   },
   deletion: {
     confirm: 'Are you sure you want to delete the device "{{deviceName}}"?',
@@ -25,6 +30,12 @@ Backup codes can only be viewed at the time of device creation, so make sure to 
     fetchDevice: 'Error fetching device details: {{message}}',
     createDevice: 'Error creating device: {{message}}',
     updateDevice: 'Error updating device: {{message}}',
+    regenerateBackupCodes: 'Error regenerating backup codes: {{message}}',
+  },
+  regenerateBackupCodes: {
+    label: 'Regenerate backup codes',
+    confirm: `Are you sure you want to regenerate backup codes for device "{{deviceName}}"?  
+The previous backup codes will no longer work.`,
   },
   showSecretKey: 'Show secret key',
   validation: {
