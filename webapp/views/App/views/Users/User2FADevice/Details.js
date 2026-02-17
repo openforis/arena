@@ -6,7 +6,6 @@ import { useNavigate, useParams } from 'react-router'
 import i18n from '@core/i18n/i18nFactory'
 import { User2FADevice } from '@core/user2FADevice'
 import * as Validation from '@core/validation/validation'
-import * as User from '@core/user/user'
 
 import { Button, ButtonDelete, ButtonSave, QRCode } from '@webapp/components'
 import { TooltipNew } from '@webapp/components/TooltipNew'
@@ -41,7 +40,7 @@ export const User2FADeviceDetails = () => {
   const deviceCreated = !!otpAuthUrl
   const deviceUuid = deviceUuidParam || User2FADevice.getUuid(device)
   const deviceNameEditable = isNew && !deviceCreated
-  const deviceNameFinal = deviceName ? `Arena: ${deviceName} - ${User.getEmail(user)}` : ''
+  const deviceNameFinal = User2FADevice.getDeviceNameFinal({ user })(device)
 
   useEffect(() => {
     let isMounted = true
