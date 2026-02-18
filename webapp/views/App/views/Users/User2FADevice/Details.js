@@ -14,6 +14,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { useConfirmAsync, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 
 import * as API from '@webapp/service/api'
+import { useUser } from '@webapp/store/user'
 
 import { User2FADeviceValidator } from './user2FADeviceValidator'
 
@@ -21,6 +22,7 @@ export const User2FADeviceDetails = () => {
   const { uuid: deviceUuidParam } = useParams()
   const navigate = useNavigate()
   const confirm = useConfirmAsync()
+  const user = useUser()
 
   const notifyInfo = useNotifyInfo()
   const notifyError = useNotifyError()
@@ -33,11 +35,12 @@ export const User2FADeviceDetails = () => {
   const validation = useMemo(() => Validation.getValidation(device), [device])
   const deviceName = User2FADevice.getDeviceName(device)
   const secret = User2FADevice.getSecret(device)
-  const backupCodes = User2FADevice.getBackupCodes(device)
+  const deviceBackupCodes = User2FADevice.getBackupCodes(device)
   const otpAuthUrl = User2FADevice.getOtpAuthUrl(device)
   const deviceCreated = !!otpAuthUrl
   const deviceUuid = deviceUuidParam || User2FADevice.getUuid(device)
   const deviceNameEditable = isNew && !deviceCreated
+  const deviceNameFinal = User2FADevice.getDeviceNameFinal({ user })(device)
 
   useEffect(() => {
     let isMounted = true
@@ -83,25 +86,40 @@ export const User2FADeviceDetails = () => {
     setDevice(createdDevice)
   }, [deviceName])
 
+  const showConfirmBackupCodesGenerated = useCallback(
+    async ({ newDevice, backupCodes }) => {
+      await confirm({
+        key: newDevice ? 'user2FADevice:creationSuccessful.message' : 'user2FADevice:backupCodesRegenerated.message',
+        params: { deviceName, backupCodes: backupCodes.map((code) => `- ${code}`).join('  \n') },
+        headerText: newDevice ? 'user2FADevice:creationSuccessful.title' : 'user2FADevice:backupCodesRegenerated.title',
+        strongConfirm: true,
+        strongConfirmRequiredText: 'copied',
+        okButtonLabel: 'common.confirm',
+        dismissable: false,
+      })
+    },
+    [confirm, deviceName]
+  )
+
   const onValidateClick = useCallback(async () => {
     try {
       await API.verifyDevice({ deviceUuid, token1: authenticatorCodeOne, token2: authenticatorCodeTwo })
       // navigate back to the list after successful validation
       navigate(-1)
 
-      await confirm({
-        key: 'user2FADevice:creationSuccessful.message',
-        params: { deviceName, backupCodes: backupCodes.join(' - ') },
-        headerText: 'user2FADevice:creationSuccessful.title',
-        strongConfirm: true,
-        strongConfirmRequiredText: 'copied',
-        okButtonLabel: 'common.confirm',
-        dismissable: false,
-      })
+      showConfirmBackupCodesGenerated({ newDevice: true, backupCodes: deviceBackupCodes })
     } catch (error) {
       notifyError({ key: 'user2FADevice:validation.error', params: { message: error.message } })
     }
-  }, [deviceUuid, authenticatorCodeOne, authenticatorCodeTwo, navigate, confirm, deviceName, backupCodes, notifyError])
+  }, [
+    deviceUuid,
+    authenticatorCodeOne,
+    authenticatorCodeTwo,
+    navigate,
+    showConfirmBackupCodesGenerated,
+    deviceBackupCodes,
+    notifyError,
+  ])
 
   const onDeleteClick = useCallback(async () => {
     const confirmed = await confirm({
@@ -142,6 +160,24 @@ export const User2FADeviceDetails = () => {
     [existingDevices]
   )
 
+  const onRegenerateBackupCodesClick = useCallback(async () => {
+    try {
+      const confirmed = await confirm({
+        key: 'user2FADevice:regenerateBackupCodes.confirm',
+        params: { deviceName },
+        okButtonLabel: 'user2FADevice:regenerateBackupCodes.label',
+      })
+      if (!confirmed) return
+      const newBackupCodes = await API.regenerateBackupCodes({ deviceUuid })
+
+      navigate(-1)
+
+      await showConfirmBackupCodesGenerated({ newDevice: false, backupCodes: newBackupCodes })
+    } catch (error) {
+      notifyError({ key: 'user2FADevice:error.regenerateBackupCodes', params: { message: error.message } })
+    }
+  }, [confirm, deviceName, deviceUuid, navigate, showConfirmBackupCodesGenerated, notifyError])
+
   const onBackClick = useCallback(() => {
     navigate(-1)
   }, [navigate])
@@ -163,7 +199,9 @@ export const User2FADeviceDetails = () => {
           validation={Validation.getFieldValidation(User2FADevice.keys.deviceName)(validation)}
         />
       </FormItem>
-
+      <FormItem label="user2FADevice:deviceNameFinal">
+        <Input value={deviceNameFinal} readOnly />
+      </FormItem>
       {!isNew && (
         <FormItem label="user2FADevice:enabled">
           <Checkbox checked={User2FADevice.isEnabled(device)} disabled />
@@ -230,6 +268,9 @@ export const User2FADeviceDetails = () => {
               />
             )}
           </>
+        )}
+        {!isNew && !deviceCreated && (
+          <Button label="user2FADevice:regenerateBackupCodes.label" onClick={onRegenerateBackupCodesClick} />
         )}
         {(!isNew || deviceCreated) && <ButtonDelete onClick={onDeleteClick} />}
       </div>
