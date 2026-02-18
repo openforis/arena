@@ -14,12 +14,12 @@
   .modal-body {
     display: flex;
     flex-direction: column;
-    row-gap: 2rem;
+    row-gap: 1rem;
 
     .highlight {
       background-color: $yellow;
       color: black;
-      line-height: 3rem;
+      line-height: 2rem;
       text-align: center;
     }
 
@@ -27,6 +27,15 @@
       background-color: white;
       padding: 1rem;
       text-align: center;
+    }
+
+    ul {
+      max-height: 6rem;
+      overflow-y: auto;
+
+      li {
+        line-height: 2rem;
+      }
     }
   }
 }

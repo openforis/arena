@@ -265,7 +265,7 @@ Try again?`,
       instructions: `1. Start **Arena Mobile** app on your mobile device
 2. Go to the **Settings** menu
 3. Select  **Connection to server**
-4. Press **Scan QR code**
+4. Press **Login using QR code**
 5. Scan the QR code displayed on this screen`,
       success: 'Login successful!',
       error: 'Error generating QR code: {{error}}',
