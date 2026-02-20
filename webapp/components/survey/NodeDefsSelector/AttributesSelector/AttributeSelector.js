@@ -9,7 +9,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import NodeDefIconKey from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefIconKey'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const AttributeSelector = (props) => {
   const {
@@ -23,6 +23,7 @@ const AttributeSelector = (props) => {
   } = props
 
   const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -50,7 +51,7 @@ const AttributeSelector = (props) => {
         <NodeDefIconKey nodeDef={nodeDef} />
         {label}
       </span>
-      {NodeDefUIProps.getIconByNodeDef(nodeDef)}
+      {NodeDefUIProps.getIconByNodeDef({ nodeDef, cycle })}
     </button>
   )
 }
