@@ -108,7 +108,7 @@ export const useBuildTreeData = ({
     return {
       key: NodeDef.getUuid(nodeDef),
       disabled: isNodeDefDisabled(nodeDef),
-      icon: NodeDefUIProps.getIconByNodeDef(nodeDef, true),
+      icon: NodeDefUIProps.getIconByNodeDef({ nodeDef, cycle, includeKey: true }),
       label: `${nodeDefLabel}${suffix}`,
       testId: TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef)),
     }

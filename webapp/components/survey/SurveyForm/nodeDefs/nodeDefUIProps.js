@@ -156,7 +156,7 @@ const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropBy
 
 export const getIconByType = getPropByType('icon')
 
-const getEntityIcon = (nodeDef) => {
+const getEntityIcon = ({ nodeDef, cycle }) => {
   if (NodeDef.isRoot(nodeDef)) {
     return undefined
   }
@@ -164,18 +164,18 @@ const getEntityIcon = (nodeDef) => {
     return singleEntityIcon
   }
   // multiple entity with form layout
-  if (NodeDefLayout.isRenderForm('0')(nodeDef)) {
+  if (NodeDefLayout.isRenderForm(cycle)(nodeDef)) {
     return <span className="icon icon-files-empty icon-left" />
   }
   // multiple entity with table layout
   return <span className="icon icon-table2 icon-left" />
 }
 
-export const getIconByNodeDef = (nodeDef, includeKey = false) => (
+export const getIconByNodeDef = ({ nodeDef, cycle, includeKey = false }) => (
   <div className="node-def__icon-wrapper">
     {includeKey && NodeDef.isKey(nodeDef) && keyIcon}
     {NodeDef.isMultipleAttribute(nodeDef) && multipleAttributeIcon}
-    {NodeDef.isEntity(nodeDef) ? getEntityIcon(nodeDef) : getIconByType(NodeDef.getType(nodeDef))}
+    {NodeDef.isEntity(nodeDef) ? getEntityIcon({ nodeDef, cycle }) : getIconByType(NodeDef.getType(nodeDef))}
   </div>
 )
 
