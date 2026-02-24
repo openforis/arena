@@ -13,6 +13,7 @@ export class NodesDeleteBatchPersister extends BatchPersister {
           {
             user: this.user,
             surveyId: this.surveyId,
+            recordUuid: Node.getRecordUuid(nodes[0]), // all nodes belong to the same record
             nodeInternalIds: nodes.map(Node.getIId),
             systemActivity: true,
           },

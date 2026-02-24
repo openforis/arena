@@ -277,24 +277,22 @@ export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeII
 
 // ============== UPDATE
 export const updateNode = async (
-  { surveyId, nodeIId, value = null, meta = {}, draft, reloadNode = true },
+  { surveyId, recordUuid, nodeIId, value = null, meta = {}, draft, reloadNode = true },
   client = db
 ) => {
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node
-    SET value = $1::jsonb,
-    meta = meta || $2::jsonb, 
+    SET value = $/value/::jsonb,
+    meta = meta || $/meta/::jsonb, 
     date_modified = ${DbUtils.now}
-    WHERE i_id = $3
+    WHERE record_uuid = $/recordUuid/ AND i_id = $/nodeIId/
     `,
-    [_toValueQueryParam(value), meta || {}, nodeIId]
+    { value: _toValueQueryParam(value), meta: meta || {}, recordUuid, nodeIId }
   )
   if (!reloadNode) return null
 
   // fetch node with ref data
-  // TODO
-  const recordUuid = null
   const node = await fetchNodeWithRefDataByIId({ surveyId, recordUuid, nodeIId, draft }, client)
   node[Node.keys.updated] = true
   return node
@@ -345,11 +343,11 @@ export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client =
     dbTransformCallback
   )
 
-export const deleteNodesByInternalIds = async (surveyId, nodeInternalIds, client = db) =>
+export const deleteNodesByInternalIds = async ({ surveyId, recordUuid, nodeInternalIds }, client = db) =>
   client.manyOrNone(
     `DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE i_id IN ($1:csv)
+    WHERE record_uuid = $/recordUuid/ AND i_id IN ($/nodeInternalIds:csv/)
     RETURNING *, true as ${Node.keys.deleted}`,
-    [nodeInternalIds],
+    { recordUuid, nodeInternalIds },
     dbTransformCallback
   )

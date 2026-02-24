@@ -167,7 +167,7 @@ const _groupNodesByFlags = (nodesArray) =>
     { nodesInserted: [], nodesUpdated: [], nodesDeleted: [] }
   )
 
-const _persistNodes = async ({ surveyId, nodesArray }, tx) => {
+const _persistNodes = async ({ surveyId, recordUuid, nodesArray }, tx) => {
   const { nodesInserted, nodesUpdated, nodesDeleted } = _groupNodesByFlags(nodesArray)
 
   if (nodesInserted.length) {
@@ -177,7 +177,10 @@ const _persistNodes = async ({ surveyId, nodesArray }, tx) => {
     await NodeRepository.updateNodes({ surveyId, nodes: nodesUpdated }, tx)
   }
   if (nodesDeleted.length) {
-    await NodeRepository.deleteNodesByInternalIds(surveyId, nodesDeleted.map(Node.getIId), tx)
+    await NodeRepository.deleteNodesByInternalIds(
+      { surveyId, recordUuid, nodeInternalIds: nodesDeleted.map(Node.getIId) },
+      tx
+    )
   }
 }
 
@@ -203,8 +206,9 @@ export const updateNodesDependents = async (
   if (persistNodes && !R.isEmpty(allNodesUpdated)) {
     const nodesArray = Object.values(allNodesUpdated)
     const surveyId = Survey.getId(survey)
+    const recordUuid = Record.getUuid(record)
 
-    await _persistNodes({ surveyId, nodesArray }, tx)
+    await _persistNodes({ surveyId, recordUuid, nodesArray }, tx)
 
     // reload nodes to get nodes ref data
     const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: allNodesUpdated }, tx)
@@ -308,8 +312,11 @@ export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, re
     return { record: recordUpdated, nodesDeleted }
   })
 
-export const deleteNodesByInternalIds = async ({ user, surveyId, nodeInternalIds, systemActivity = false }, tx) => {
-  const nodesDeleted = await NodeRepository.deleteNodesByInternalIds(surveyId, nodeInternalIds, tx)
+export const deleteNodesByInternalIds = async (
+  { user, surveyId, recordUuid, nodeInternalIds, systemActivity = false },
+  tx
+) => {
+  const nodesDeleted = await NodeRepository.deleteNodesByInternalIds({ surveyId, recordUuid, nodeInternalIds }, tx)
   const activities = nodeInternalIds.map((iId) =>
     ActivityLog.newActivity(ActivityLog.type.nodeDelete, { iId }, systemActivity)
   )
