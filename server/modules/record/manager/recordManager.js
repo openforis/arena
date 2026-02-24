@@ -36,7 +36,7 @@ export { insertRecord, createRecordFromSamplingPointDataItem } from './_recordMa
 export { insertNodesInBatch, insertNodesInBulk } from './_recordManager/nodeCreationManager'
 
 export const { insertNode } = RecordUpdateManager
-export const { generateRdbUpates, persistNodesToRDB } = NodeRdbManager
+export const { generateRdbUpdates, persistNodesToRDB } = NodeRdbManager
 
 // ==== READ
 

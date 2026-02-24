@@ -107,6 +107,7 @@ export const generateRdbUpdates = ({ survey, record, nodes }) => {
     }
     updatesAcc.addUpdate(update)
   }
+  return updatesAcc
 }
 
 // ==== execution

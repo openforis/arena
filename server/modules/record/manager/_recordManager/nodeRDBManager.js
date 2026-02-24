@@ -5,7 +5,7 @@ import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository
 
 const { updateTablesFromUpdates } = DataTableUpdateRepository
 
-const generateRdbUpates = ({ survey, record, nodesArray }) => {
+const generateRdbUpdates = ({ survey, record, nodesArray }) => {
   // include ancestor nodes (used to find the correct rdb table to update)
   const nodesAndDependentsAndAncestors = nodesArray.reduce((nodesAcc, node) => {
     Record.visitAncestorsAndSelf({ node, visitor: (n) => (nodesAcc[n.uuid] = n) })(record)
@@ -26,7 +26,7 @@ const generateRdbUpates = ({ survey, record, nodesArray }) => {
 }
 
 const persistNodesToRDB = async ({ survey, record, nodesArray }, t) => {
-  const { rdbUpdates, record: recordUpdated } = generateRdbUpates({ survey, record, nodesArray })
+  const { rdbUpdates, record: recordUpdated } = generateRdbUpdates({ survey, record, nodesArray })
 
   await updateTablesFromUpdates({ rdbUpdates }, t)
 
@@ -34,7 +34,7 @@ const persistNodesToRDB = async ({ survey, record, nodesArray }, t) => {
 }
 
 export const NodeRdbManager = {
-  generateRdbUpates,
+  generateRdbUpdates,
   persistNodesToRDB,
   updateTablesFromUpdates,
 }
