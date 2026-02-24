@@ -210,7 +210,7 @@ export const fetchRecordAndNodesByUuid = async (
     },
     client
   )
-  const indexedNodes = ObjectUtils.toUuidIndexedObj(nodes)
+  const indexedNodes = ObjectUtils.toIIdIndexedObj(nodes)
   return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate, sideEffect: true })(record)
 }
 

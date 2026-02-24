@@ -217,7 +217,7 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
       date_modified: Dates.formatForStorage(Node.getDateModified(node)),
       record_uuid: Node.getRecordUuid(node),
       i_id: Node.getIId(node),
-      p_i_id: Node.getParentIId(node),
+      p_i_id: Node.getParentInternalId(node),
       node_def_uuid: Node.getNodeDefUuid(node),
       value: _toValueQueryParam(Node.getValue(node)),
       meta: Node.getMeta(node),
@@ -246,7 +246,7 @@ export const fetchNodeByIId = async (surveyId, recordUuid, iId, client = db) =>
   client.one(
     `
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_uuid = $/recordUuid/ AND iid = $/iId/`,
+    WHERE record_uuid = $/recordUuid/ AND i_id = $/iId/`,
     { recordUuid, iId },
     dbTransformCallback
   )
@@ -255,7 +255,7 @@ export const fetchNodesWithRefDataByIIds = async ({ surveyId, recordUuid, nodeII
   client.map(
     `
     ${getNodeSelectQuery({ surveyId, draft })}
-    WHERE n.record_uuid = $/recordUuid/ AND n.iid IN ($/nodeIIds:list/)
+    WHERE n.record_uuid = $/recordUuid/ AND n.i_id IN ($/nodeIIds:list/)
   `,
     { surveyId, recordUuid, nodeIIds },
     dbTransformCallback
@@ -286,7 +286,7 @@ export const updateNode = async (
     SET value = $1::jsonb,
     meta = meta || $2::jsonb, 
     date_modified = ${DbUtils.now}
-    WHERE iid = $3
+    WHERE i_id = $3
     `,
     [_toValueQueryParam(value), meta || {}, nodeIId]
   )
@@ -327,7 +327,7 @@ export const deleteNode = async ({ surveyId, recordUuid, nodeIId }, client = db)
   client.one(
     `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_uuid = $/recordUuid/ AND iid = $/nodeIId/
+    WHERE record_uuid = $/recordUuid/ AND i_id = $/nodeIId/
     RETURNING *, true as ${Node.keys.deleted}
     `,
     { recordUuid, nodeIId },
@@ -348,7 +348,7 @@ export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client =
 export const deleteNodesByInternalIds = async (surveyId, nodeInternalIds, client = db) =>
   client.manyOrNone(
     `DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE iid IN ($1:csv)
+    WHERE i_id IN ($1:csv)
     RETURNING *, true as ${Node.keys.deleted}`,
     [nodeInternalIds],
     dbTransformCallback

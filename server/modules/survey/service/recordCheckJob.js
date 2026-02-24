@@ -193,9 +193,9 @@ export default class RecordCheckJob extends Job {
     record = _clearRecordKeysValidation(record)
 
     // 6. validate nodes
-    const newNodes = nodeDefAddedUuids.reduce((nodesByUuid, nodeDefUuid) => {
+    const newNodes = nodeDefAddedUuids.reduce((nodesByIId, nodeDefUuid) => {
       const nodes = Record.getNodesByDefUuid(nodeDefUuid)(record)
-      return Object.assign(nodesByUuid, ObjectUtils.toUuidIndexedObj(nodes))
+      return Object.assign(nodesByIId, ObjectUtils.toIIdIndexedObj(nodes))
     }, {})
 
     Object.assign(allUpdatedNodesByUuid, newNodes)

@@ -74,7 +74,7 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
       )
       updatedNodes = {
         ...updatedNodes,
-        ...ObjectUtils.toUuidIndexedObj(nodesClearedArray),
+        ...ObjectUtils.toIIdIndexedObj(nodesClearedArray),
       }
     }
   }
@@ -149,7 +149,7 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
       Node.assocUpdated(Node.isUpdated(oldNode))
     )(nodeReloaded)
   })
-  return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
+  return ObjectUtils.toIIdIndexedObj(nodesReloadedArray)
 }
 
 const _groupNodesByFlags = (nodesArray) =>

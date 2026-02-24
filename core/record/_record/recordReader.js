@@ -344,7 +344,7 @@ export const getAttributesUniqueDependent = ({ survey, record, node }) => {
   } else if (_isNodeDefUnique(nodeDef)) {
     siblingUniqueAttributes = getAttributesUniqueSibling({ record, attribute: node, attributeDef: nodeDef })
   }
-  return ObjectUtils.toUuidIndexedObj(siblingUniqueAttributes)
+  return ObjectUtils.toIIdIndexedObj(siblingUniqueAttributes)
 }
 
 export const isNodeFilledByUser = (node) => (record) => Records.isNodeFilledByUser(node)(record)

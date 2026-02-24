@@ -85,16 +85,22 @@ export const insertNode = async (
     }
   }
 
+  const nodeIId = Node.getIId(node)
   const nodesCreatedByIId = {
-    [Node.getIId(node)]: node,
+    [nodeIId]: node,
   }
   let recordUpdated = record
+  recordUpdated = Record.assocNode(node)(recordUpdated)
+
+  recordUpdated.lastInternalId = recordUpdated.lastInternalId
+    ? Math.max(recordUpdated.lastInternalId, nodeIId)
+    : nodeIId
 
   if (NodeDef.isEntity(nodeDef)) {
     const descendantsCreateResult = await RecordNodesUpdater.createDescendants({
       user,
       survey,
-      record,
+      record: recordUpdated,
       parentNode: node,
       nodeDef,
       timezoneOffset,
@@ -105,7 +111,7 @@ export const insertNode = async (
   }
 
   const nodesInserted = persistNodes
-    ? ObjectUtils.toUuidIndexedObj(
+    ? ObjectUtils.toIIdIndexedObj(
         await insertNodesInBatch({ user, surveyId, nodes: Object.values(nodesCreatedByIId), systemActivity: system }, t)
       )
     : nodesCreatedByIId

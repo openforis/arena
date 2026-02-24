@@ -338,7 +338,7 @@ const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
     record,
     nodePointers: dependentNodePointersToValidate,
   })
-  return { ...nodes, ...ObjectUtils.toUuidIndexedObj(dependentNodesToValidate) }
+  return { ...nodes, ...ObjectUtils.toIIdIndexedObj(dependentNodesToValidate) }
 }
 
 const _onNodesUpdate = async (
