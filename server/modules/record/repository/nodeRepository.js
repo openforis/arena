@@ -55,11 +55,11 @@ const dbTransformCallback = (node) => {
 
 const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
 
-const _getAncestorUuidSelectField = (ancestorDef) => {
+const _getAncestorIIdSelectField = (ancestorDef) => {
   const nodeAncestorEntityHierarchyIndex = ancestorDef ? NodeDef.getMetaHierarchy(ancestorDef).length : null
   return nodeAncestorEntityHierarchyIndex === null
     ? 'null'
-    : `(n.meta -> '${Node.metaKeys.hierarchy}' ->> ${nodeAncestorEntityHierarchyIndex})::uuid`
+    : `(n.meta -> '${Node.metaKeys.hierarchy}' -> ${nodeAncestorEntityHierarchyIndex})::integer`
 }
 
 /**
@@ -100,7 +100,7 @@ export const getNodeSelectQuery = ({
       'r.cycle AS record_cycle',
       'r.step AS record_step',
       'r.owner_uuid AS record_owner_uuid',
-      `${_getAncestorUuidSelectField(ancestorDef)} AS ancestor_uuid`
+      `${_getAncestorIIdSelectField(ancestorDef)} AS ancestor_i_id`
     )
     fromParts.push(`JOIN ${schema}.record r 
       ON r.uuid = n.record_uuid

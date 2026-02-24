@@ -76,11 +76,11 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   }
 
   get columnIIdName() {
-    return this.columnIId.name
+    return columnSet.iId
   }
 
-  get columnUuid() {
-    return this.getColumn(columnSet.uuid)
+  get columnIId() {
+    return this.getColumn(columnSet.iId)
   }
 
   get columnParentInternalId() {
@@ -88,7 +88,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   }
 
   get columnParentInternalIdName() {
-    return this.columnParentInternalId.name
+    return columnSet.parentInternalId
   }
 
   get columnRecordUuid() {
@@ -163,22 +163,20 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return columnsAndType
   }
 
-  _getConstraintFk(tableReferenced, ...columns) {
-    const referencedColumnNames = [columnSet.recordUuid]
-    if (columns.length > 1) {
-      referencedColumnNames.push(columnSet.iId)
-    }
-    return `CONSTRAINT ${this.name}_${tableReferenced.name}_fk 
-    FOREIGN KEY (${columns.join(', ')}) 
-    REFERENCES ${tableReferenced.nameQualified} (${referencedColumnNames.join(', ')}) 
+  _getConstraintFk({ referencedTable, referencingColumnNames, referencedColumnNames }) {
+    return `CONSTRAINT ${this.name}_${referencedTable.name}_fk 
+    FOREIGN KEY (${referencingColumnNames.join(', ')}) 
+    REFERENCES ${referencedTable.nameQualified} (${referencedColumnNames.join(', ')}) 
     ON DELETE CASCADE`
   }
 
   getConstraintFkRecord() {
-    if (!NodeDef.isRoot(this.nodeDef)) {
-      return null
-    }
-    return this._getConstraintFk(new TableRecord(this.surveyId), columnSet.recordUuid)
+    const tableRecord = new TableRecord(this.surveyId)
+    return this._getConstraintFk({
+      referencedTable: tableRecord,
+      referencingColumnNames: [columnSet.recordUuid],
+      referencedColumnNames: [TableRecord.columnSet.uuid],
+    })
   }
 
   getConstraintFkParent() {
@@ -186,11 +184,12 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       return null
     }
     const ancestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(this.nodeDef)(this.survey)
-    return this._getConstraintFk(
-      new TableDataNodeDef(this.survey, ancestorMultipleEntity),
-      columnSet.recordUuid,
-      columnSet.parentInternalId
-    )
+    const ancestorEntityTable = new TableDataNodeDef(this.survey, ancestorMultipleEntity)
+    return this._getConstraintFk({
+      referencedTable: ancestorEntityTable,
+      referencingColumnNames: [columnSet.recordUuid, columnSet.parentInternalId],
+      referencedColumnNames: [TableDataNodeDef.columnSet.recordUuid, TableDataNodeDef.columnSet.iId],
+    })
   }
 
   getConstraintIIdUnique() {

@@ -21,9 +21,8 @@ export const createNodeKeysView = async (survey, client = db) => {
     selectViews.push(`
         SELECT 
             ${viewDataNodeDef.columnIdName} AS ${NodeKeysView.columns.nodeId},
-            ${viewDataNodeDef.columnRecordUuid.name} AS ${NodeKeysView.columns.recordUuid},
-            ${viewDataNodeDef.columnIId.name} AS ${NodeKeysView.columns.nodeIId},
-            ${viewDataNodeDef.columnNodeDefUuid.name} AS ${NodeKeysView.columns.nodeDefUuid},
+            ${ViewDataNodeDef.columnSet.recordUuid} AS ${NodeKeysView.columns.recordUuid},
+            ${viewDataNodeDef.columnNodeDefIIdName} AS ${NodeKeysView.columns.nodeIId},
             ${RDBDataView.columns.keys} AS ${NodeKeysView.columns.keys}
         FROM
             ${RDBDataView.getNameWithSchema(surveyId)(nodeDef)}  

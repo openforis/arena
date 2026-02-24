@@ -19,7 +19,7 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
     const isMultipleAttribute = NodeDef.isMultipleAttribute(nodeDef)
     if (NodeDef.isEqual(nodeDef)(viewNodeDef)) {
       if (!isMultipleAttribute) {
-        return [`${tableData.columnUuid} AS ${colName}`]
+        return [`${tableData.columnIId} AS ${colName}`]
       }
     } else if (isMultipleAttribute && NodeDef.isDescendantOf(viewNodeDef)(nodeDef)) {
       if (canJoinWithMultipleAttributeTable({ nodeDef, viewNodeDef })) {
