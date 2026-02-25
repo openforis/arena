@@ -1773,6 +1773,11 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     call: 'Function',
     operator: 'Operator',
 
+    geoLocationAtDistanceEditor: {
+      coordinateAttributeOrigin: 'Coordinate attribute origin',
+      distanceAttribute: 'Distance attribute',
+      bearingAttribute: 'Bearing attribute',
+    },
     coordinateAttributeWithPosition: 'Coordinate attribute {{position}}',
 
     dateTimeDiffEditor: {

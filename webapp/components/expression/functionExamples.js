@@ -9,6 +9,8 @@ const functionExamples = {
     [functionNames.dateTimeDiff]: 'dateTimeDiff(date_1, time_1, date_2, time_2)',
     [functionNames.distance]: 'distance(coordinate_attribute_1, coordinate_attribute_2)',
     [functionNames.first]: 'first(multiple_attribute_name), first(multiple_entity_name).entity_attribute_name, ...',
+    [functionNames.geoLocationAtDistance]:
+      'geoLocationAtDistance(coordinate_attribute, 20, 90), geoLocationAtDistance(coordinate_attribute, distance_attribute, bearing_attribute), ...',
     [functionNames.geoPolygon]:
       'geoPolygon(coordinate_attribute_1, coordinate_attribute_2, ...), geoPolygon(multiple_entity_name.coordinate_attribute), ...',
     [functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,

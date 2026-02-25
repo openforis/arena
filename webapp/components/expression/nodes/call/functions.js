@@ -4,6 +4,7 @@ import { CallCategoryItemPropEditor } from './callCategoryItemPropEditor'
 import { CallCountEditor } from './callCountEditor'
 import { CallDateTimeDiffEditor } from './callDateTimeDiffEditor'
 import { CallDistanceEditor } from './callDistanceEditor'
+import { CallGeoLocationAtDistanceEditor } from './callGeoLocationAtDistanceEditor'
 import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
 import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
@@ -33,13 +34,17 @@ export const functions = {
     label: 'count(...)',
     component: CallCountEditor,
   },
+  [functionNames.dateTimeDiff]: {
+    label: 'dateTimeDiff(...)',
+    component: CallDateTimeDiffEditor,
+  },
   [functionNames.distance]: {
     label: 'distance(...)',
     component: CallDistanceEditor,
   },
-  [functionNames.dateTimeDiff]: {
-    label: 'dateTimeDiff(...)',
-    component: CallDateTimeDiffEditor,
+  [functionNames.geoLocationAtDistance]: {
+    label: 'geoLocationAtDistance(...)',
+    component: CallGeoLocationAtDistanceEditor,
   },
   [functionNames.includes]: {
     label: 'includes(...)',
