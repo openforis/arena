@@ -111,31 +111,28 @@ export const init = (app) => {
           limit = 20,
           offset = 0,
           includeUnlUnk = false,
+          includeVerancularNameIfSingle = false,
         } = Request.getParams(req)
 
+        const commonParams = {
+          surveyId,
+          taxonomyUuid,
+          draft,
+          filterValue,
+          includeUnlUnk,
+          includeVerancularNameIfSingle,
+        }
         let list
         if (filterProp) {
           if (filterProp === Taxon.keys.vernacularName) {
-            list = await TaxonomyService.findTaxaByVernacularName(
-              surveyId,
-              taxonomyUuid,
-              filterValue,
-              draft,
-              includeUnlUnk
-            )
+            list = await TaxonomyService.findTaxaByVernacularName(commonParams)
           } else if (filterProp === Taxon.propKeys.code) {
-            list = await TaxonomyService.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
+            list = await TaxonomyService.findTaxaByCode(commonParams)
           } else {
-            list = await TaxonomyService.findTaxaByScientificName(
-              surveyId,
-              taxonomyUuid,
-              filterValue,
-              draft,
-              includeUnlUnk
-            )
+            list = await TaxonomyService.findTaxaByScientificName(commonParams)
           }
         } else {
-          list = await TaxonomyService.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft, limit, offset })
+          list = await TaxonomyService.fetchTaxaWithVernacularNames({ ...commonParams, limit, offset })
         }
 
         res.json({ list })
