@@ -476,12 +476,10 @@ export const findTaxaFilteringFields = async ({
     [Taxon.propKeys.scientificName]: 't',
   }
   const filterCondition = searchValue
-    ? filterFields
-        .map((field) => DbUtils.getPropFilterCondition(field, draft, `${tableAliasByField[field]}.`))
-        .join(' OR ')
+    ? filterFields.map((field) => DbUtils.getPropFilterCondition(field, draft, tableAliasByField[field])).join(' OR ')
     : ''
   const orderByConditions = orderByFields
-    .map((field) => `${DbUtils.getPropColCombined(field, draft, `${tableAliasByField[field]}.`)} ASC`)
+    .map((field) => `${DbUtils.getPropColCombined(field, draft, tableAliasByField[field])} ASC`)
     .join(', ')
 
   const filteringByVernacularName = filterFields.includes(TaxonVernacularName.keysProps.name)
