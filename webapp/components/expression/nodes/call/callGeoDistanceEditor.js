@@ -13,7 +13,7 @@ import { CallEditorPropTypes } from './callEditorPropTypes'
 
 const variablesFilterFn = (variable) => variable.root || [NodeDef.nodeDefType.coordinate].includes(variable.nodeDefType)
 
-export const CallDistanceEditor = (props) => {
+export const CallGeoDistanceEditor = (props) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const identifierArguments = expressionNode?.arguments ?? []
@@ -44,7 +44,7 @@ export const CallDistanceEditor = (props) => {
 
   const buildFunctionCall = useCallback(() => {
     const params = identifierParams
-    return Expression.newCall({ callee: Expression.functionNames.distance, params })
+    return Expression.newCall({ callee: Expression.functionNames.geoDistance, params })
   }, [identifierParams])
 
   const onConfirm = useCallback(() => {
@@ -78,4 +78,4 @@ export const CallDistanceEditor = (props) => {
   )
 }
 
-CallDistanceEditor.propTypes = CallEditorPropTypes
+CallGeoDistanceEditor.propTypes = CallEditorPropTypes
