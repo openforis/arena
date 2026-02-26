@@ -1741,6 +1741,12 @@ $t(common.cantUndoWarning)`,
     call: 'Функц',
     operator: 'Оператор',
 
+    geoCoordinateAtDistanceEditor: {
+      coordinateAttributeOrigin: 'Эх координатын шинж чанар',
+      distanceAttribute: 'Зайны шинж чанар',
+      bearingAttribute: 'Азимутын шинж чанар',
+    },
+
     coordinateAttributeWithPosition: 'Координат шинж чанар {{position}}',
 
     dateTimeDiffEditor: {

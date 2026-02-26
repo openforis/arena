@@ -1533,6 +1533,11 @@ export default {
     const: 'Valor constante',
     call: 'Función',
     operator: 'Operador',
+    geoCoordinateAtDistanceEditor: {
+      coordinateAttributeOrigin: 'Atributo de coordenada de origen',
+      distanceAttribute: 'Atributo de distancia',
+      bearingAttribute: 'Atributo de rumbo',
+    },
     coordinateAttributeWithPosition: 'Atributo de coordenada {{position}}',
     dateTimeDiffEditor: {
       firstDateAttribute: 'Primer atributo de fecha',

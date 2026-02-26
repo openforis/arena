@@ -1751,6 +1751,12 @@ $t(common.cantUndoWarning)`,
     call: 'Функция',
     operator: 'Оператор',
 
+    geoCoordinateAtDistanceEditor: {
+      coordinateAttributeOrigin: 'Атрибут исходной координаты',
+      distanceAttribute: 'Атрибут расстояния',
+      bearingAttribute: 'Атрибут азимута',
+    },
+
     coordinateAttributeWithPosition: 'Атрибут координат {{position}}',
 
     dateTimeDiffEditor: {
