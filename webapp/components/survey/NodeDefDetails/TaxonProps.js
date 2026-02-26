@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Node from '@core/record/node'
@@ -26,6 +26,7 @@ import { useTaxonomyByUuid } from '@webapp/store/survey/hooks'
 import { TaxonomySelector } from '../TaxonomySelector'
 
 import { State } from './store'
+import { NodeDefs } from '@openforis/arena-core'
 
 const valueProps = Node.valuePropsTaxon
 
@@ -43,13 +44,16 @@ const TaxonProps = (props) => {
   const surveyId = useSurveyId()
   const surveyInfo = useSurveyInfo()
 
-  const nodeDef = State.getNodeDef(state)
-  const validation = State.getValidation(state)
-  const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef) || Survey.isTemplate(surveyInfo)
-  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-  const taxonomy = useTaxonomyByUuid(taxonomyUuid)
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
   const [taxonomyToEdit, setTaxonomyToEdit] = useState(null)
+
+  const nodeDef = useMemo(() => State.getNodeDef(state), [state])
+  const validation = useMemo(() => State.getValidation(state), [state])
+
+  const taxonomyUuid = useMemo(() => NodeDef.getTaxonomyUuid(nodeDef), [nodeDef])
+  const taxonomy = useTaxonomyByUuid(taxonomyUuid)
+
+  const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef) || Survey.isTemplate(surveyInfo)
 
   const onTaxonomySelect = useCallback(
     (taxonomySelected) =>
@@ -119,11 +123,24 @@ const TaxonProps = (props) => {
       />
 
       <FormItem label="surveyForm:nodeDefTaxon.vernacularNameSelectionKept">
-        <Checkbox
-          checked={NodeDef.isVernacularNameSelectionKept(nodeDef)}
-          validation={Validation.getFieldValidation(NodeDef.propKeys.vernacularNameSelectionKept)(validation)}
-          onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameSelectionKept, value })}
-        />
+        <div className="form-item_body">
+          <Checkbox
+            checked={NodeDef.isVernacularNameSelectionKept(nodeDef)}
+            validation={Validation.getFieldValidation(NodeDef.propKeys.vernacularNameSelectionKept)(validation)}
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameSelectionKept, value })}
+          />
+          <FormItem label="surveyForm:nodeDefTaxon.vernacularNameAlwaysIncludedIfSingle">
+            <Checkbox
+              checked={NodeDefs.isVernacularNameAlwaysIncludedIfSingle(nodeDef)}
+              validation={Validation.getFieldValidation(NodeDef.propKeys.vernacularNameAlwaysIncludedIfSingle)(
+                validation
+              )}
+              onChange={(value) =>
+                Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameAlwaysIncludedIfSingle, value })
+              }
+            />
+          </FormItem>
+        </div>
       </FormItem>
 
       <div className="taxon-props__panel-right">

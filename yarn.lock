@@ -3845,6 +3845,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openforis/arena-core@file:../arena-core::locator=open-foris-arena%40workspace%3A.":
+  version: 1.0.89
+  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=11c16e&locator=open-foris-arena%40workspace%3A."
+  dependencies:
+    "@jsep-plugin/regex": "npm:^1.0.4"
+    "@turf/destination": "npm:^7.3.4"
+    bignumber.js: "npm:^9.3.1"
+    jsep: "npm:^1.4.0"
+    lodash.differencewith: "npm:^4.5.0"
+    lodash.frompairs: "npm:^4.0.1"
+    lodash.isequal: "npm:^4.5.0"
+    lodash.topairs: "npm:^4.3.0"
+    moment: "npm:^2.30.1"
+    proj4: "npm:^2.19.10"
+    uuid: "npm:^11.0.3"
+  checksum: 10c0/1221c71163715dc871953762a3d57269825ed17fde30c99870619aff1056542753333fb0509a50416fe2923abacfced9d4be1e84de3ce72865b113e455a14ed7
+  languageName: node
+  linkType: hard
+
 "@openforis/arena-core@npm:^1.0.87":
   version: 1.0.87
   resolution: "@openforis/arena-core@npm:1.0.87::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.0.87%2Ff92873e922de27240be9113aaf44b99c034ffdd6"
@@ -5131,6 +5150,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@turf/destination@npm:^7.3.4":
+  version: 7.3.4
+  resolution: "@turf/destination@npm:7.3.4"
+  dependencies:
+    "@turf/helpers": "npm:7.3.4"
+    "@turf/invariant": "npm:7.3.4"
+    "@types/geojson": "npm:^7946.0.10"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/9eb087e7dc1b3aef56fa4199ea419134688623af16b8dfa186ab36da6fa5e860ac10f368fb9ce31b39e1e038476e031ff1a899d971165215a5d2969650c8e420
+  languageName: node
+  linkType: hard
+
 "@turf/distance@npm:7.3.3":
   version: 7.3.3
   resolution: "@turf/distance@npm:7.3.3"
@@ -5153,6 +5184,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@turf/helpers@npm:7.3.4":
+  version: 7.3.4
+  resolution: "@turf/helpers@npm:7.3.4"
+  dependencies:
+    "@types/geojson": "npm:^7946.0.10"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/e10cc2e9d4e25c46e79310847a9b1a3c8613558defaa8bcc0b2e8622d106c875e4e4c7895942bc89687ab72b12bdce0835cac10362118f8eeb3c0939042a5ccd
+  languageName: node
+  linkType: hard
+
 "@turf/invariant@npm:7.3.3":
   version: 7.3.3
   resolution: "@turf/invariant@npm:7.3.3"
@@ -5161,6 +5202,17 @@ __metadata:
     "@types/geojson": "npm:^7946.0.10"
     tslib: "npm:^2.8.1"
   checksum: 10c0/c64c13637b947afaeb7465c91cbb2dd920e397409e4183883996d59d32bc5cf773dbd02c42a5293a6d483b14a511fda6db642a1d4a02ac6e924d9d4556f3739f
+  languageName: node
+  linkType: hard
+
+"@turf/invariant@npm:7.3.4":
+  version: 7.3.4
+  resolution: "@turf/invariant@npm:7.3.4"
+  dependencies:
+    "@turf/helpers": "npm:7.3.4"
+    "@types/geojson": "npm:^7946.0.10"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/8c5c420981d42304ebf32a984892b15150c6dcafabacefd165a5950eaf16024551272071426bfa23e5198b03c7c9495a2547ea9ee455ce3ff77d6449f51df1b3
   languageName: node
   linkType: hard
 
@@ -15393,6 +15445,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
+    "@openforis/arena-core": ../arena-core
     "@openforis/arena-server": "npm:^1.2.14"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
