@@ -42,10 +42,10 @@ export const CallGeoCoordinateAtDistanceEditor = (props) => {
     []
   )
 
-  const buildFunctionCall = useCallback(() => {
-    const params = identifierParams
-    return Expression.newCall({ callee: Expression.functionNames.geoCoordinateAtDistance, params })
-  }, [identifierParams])
+  const buildFunctionCall = useCallback(
+    () => Expression.newCall({ callee: Expression.functionNames.geoCoordinateAtDistance, params: identifierParams }),
+    [identifierParams]
+  )
 
   const onConfirm = useCallback(() => {
     onConfirmProp(buildFunctionCall())
