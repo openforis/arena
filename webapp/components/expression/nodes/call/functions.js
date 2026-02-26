@@ -3,8 +3,8 @@ import * as Expression from '@core/expressionParser/expression'
 import { CallCategoryItemPropEditor } from './callCategoryItemPropEditor'
 import { CallCountEditor } from './callCountEditor'
 import { CallDateTimeDiffEditor } from './callDateTimeDiffEditor'
-import { CallDistanceEditor } from './callDistanceEditor'
-import { CallGeoLocationAtDistanceEditor } from './callGeoLocationAtDistanceEditor'
+import { CallGeoDistanceEditor } from './callGeoDistanceEditor'
+import { CallGeoCoordinateAtDistanceEditor } from './callGeoCoordinateAtDistanceEditor'
 import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
 import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
@@ -40,11 +40,15 @@ export const functions = {
   },
   [functionNames.distance]: {
     label: 'distance(...)',
-    component: CallDistanceEditor,
+    component: CallGeoDistanceEditor,
   },
-  [functionNames.geoLocationAtDistance]: {
-    label: 'geoLocationAtDistance(...)',
-    component: CallGeoLocationAtDistanceEditor,
+  [functionNames.geoCoordinateAtDistance]: {
+    label: 'geoCoordinateAtDistance(...)',
+    component: CallGeoCoordinateAtDistanceEditor,
+  },
+  [functionNames.geoDistance]: {
+    label: 'geoDistance(...)',
+    component: CallGeoDistanceEditor,
   },
   [functionNames.includes]: {
     label: 'includes(...)',

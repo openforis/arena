@@ -13,7 +13,7 @@ const coordinateVarFilterFn = (variable) => variable.root || NodeDef.nodeDefType
 const numericVarFilterFn = (variable) =>
   variable.root || [NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer].includes(variable.nodeDefType)
 
-export const CallGeoLocationAtDistanceEditor = (props) => {
+export const CallGeoCoordinateAtDistanceEditor = (props) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const identifierArguments = expressionNode?.arguments ?? []
@@ -44,7 +44,7 @@ export const CallGeoLocationAtDistanceEditor = (props) => {
 
   const buildFunctionCall = useCallback(() => {
     const params = identifierParams
-    return Expression.newCall({ callee: Expression.functionNames.geoLocationAtDistance, params })
+    return Expression.newCall({ callee: Expression.functionNames.geoCoordinateAtDistance, params })
   }, [identifierParams])
 
   const onConfirm = useCallback(() => {
@@ -54,7 +54,7 @@ export const CallGeoLocationAtDistanceEditor = (props) => {
 
   return (
     <div className="function-editor">
-      <FormItem label="expressionEditor.geoLocationAtDistanceEditor.coordinateAttributeOrigin">
+      <FormItem label="expressionEditor.geoCoordinateAtDistanceEditor.coordinateAttributeOrigin">
         <Identifier
           node={identifierParams[0]}
           onChange={onIdentifierParamChange(0)}
@@ -62,7 +62,7 @@ export const CallGeoLocationAtDistanceEditor = (props) => {
           variablesFilterFn={coordinateVarFilterFn}
         />
       </FormItem>
-      <FormItem label="expressionEditor.geoLocationAtDistanceEditor.distanceAttribute">
+      <FormItem label="expressionEditor.geoCoordinateAtDistanceEditor.distanceAttribute">
         <Identifier
           node={identifierParams[1]}
           onChange={onIdentifierParamChange(1)}
@@ -70,7 +70,7 @@ export const CallGeoLocationAtDistanceEditor = (props) => {
           variablesFilterFn={numericVarFilterFn}
         />
       </FormItem>
-      <FormItem label="expressionEditor.geoLocationAtDistanceEditor.bearingAttribute">
+      <FormItem label="expressionEditor.geoCoordinateAtDistanceEditor.bearingAttribute">
         <Identifier
           node={identifierParams[2]}
           onChange={onIdentifierParamChange(2)}
@@ -87,4 +87,4 @@ export const CallGeoLocationAtDistanceEditor = (props) => {
   )
 }
 
-CallGeoLocationAtDistanceEditor.propTypes = CallEditorPropTypes
+CallGeoCoordinateAtDistanceEditor.propTypes = CallEditorPropTypes

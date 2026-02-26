@@ -971,6 +971,9 @@ export default {
         'Devuelve el valor de la $t(extraProp.label) especificada de un elemento de categoría que tiene el código especificado',
       dateTimeDiff: 'Devuelve la diferencia (en minutos) de 2 pares de fecha-hora',
       distance: 'Devuelve la distancia (en metros) entre las coordenadas especificadas',
+      geoCoordinateAtDistance:
+        'Devuelve las coordenadas a una distancia y rumbo especificados desde las coordenadas especificadas',
+      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
       first: 'Devuelve el primer valor o nodo del atributo o entidad múltiple especificado',
       geoPolygon: 'Genera un polígono en GeoJSON a partir de una lista de coordenadas',
       includes: 'Devuelve verdadero si el atributo múltiple especificado incluye el valor especificado.',
