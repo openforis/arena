@@ -3846,8 +3846,8 @@ __metadata:
   linkType: hard
 
 "@openforis/arena-core@file:../arena-core::locator=open-foris-arena%40workspace%3A.":
-  version: 1.0.89
-  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=11c16e&locator=open-foris-arena%40workspace%3A."
+  version: 1.0.90
+  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=0b59b1&locator=open-foris-arena%40workspace%3A."
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     "@turf/destination": "npm:^7.3.4"
@@ -3858,17 +3858,18 @@ __metadata:
     lodash.isequal: "npm:^4.5.0"
     lodash.topairs: "npm:^4.3.0"
     moment: "npm:^2.30.1"
-    proj4: "npm:^2.19.10"
-    uuid: "npm:^11.0.3"
-  checksum: 10c0/1221c71163715dc871953762a3d57269825ed17fde30c99870619aff1056542753333fb0509a50416fe2923abacfced9d4be1e84de3ce72865b113e455a14ed7
+    proj4: "npm:^2.20.2"
+    uuid: "npm:^11.1.0"
+  checksum: 10c0/2855427c86f9a73ec39c2af1244544f3f01d31f4d80eb497597b0fd193484f69b208450c09ef3d17bed94964b36134814beb9f5e277bb2c47679b4accbcb6f53
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^1.0.87":
-  version: 1.0.87
-  resolution: "@openforis/arena-core@npm:1.0.87::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.0.87%2Ff92873e922de27240be9113aaf44b99c034ffdd6"
+"@openforis/arena-core@npm:^1.0.90":
+  version: 1.0.90
+  resolution: "@openforis/arena-core@npm:1.0.90::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.0.90%2F735689a4cd4fe0ba3e3a4827421a48b5fa7686f6"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
+    "@turf/destination": "npm:^7.3.4"
     bignumber.js: "npm:^9.3.1"
     jsep: "npm:^1.4.0"
     lodash.differencewith: "npm:^4.5.0"
@@ -3876,18 +3877,18 @@ __metadata:
     lodash.isequal: "npm:^4.5.0"
     lodash.topairs: "npm:^4.3.0"
     moment: "npm:^2.30.1"
-    proj4: "npm:^2.19.10"
-    uuid: "npm:^11.0.3"
-  checksum: 10c0/ae556b20379adc6eb126226fd80af8479c0a371fa602b3044364378b2a1d3809df7f26e93ce54f650a116b86578e7934d3187607fa98aabd84610b5e255a2a59
+    proj4: "npm:^2.20.2"
+    uuid: "npm:^11.1.0"
+  checksum: 10c0/5e5284161bdeb0bda230fdd5c3c66b019c01cdfd57e58cf0ec56e19b09bf1bcccdb406f983cfe9a25592a4c8c99e81ca5b9e61ebbabcf2209095bf03d2a0816f
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^1.2.14":
-  version: 1.2.14
-  resolution: "@openforis/arena-server@npm:1.2.14::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.2.14%2F66bee3dc92ac2de5a55efb3ee05e025888bd067d"
+"@openforis/arena-server@npm:^1.2.17":
+  version: 1.2.17
+  resolution: "@openforis/arena-server@npm:1.2.17::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.2.17%2Fd6961387c3a91a24a05a358768c86da6b983d841"
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^1.0.87"
+    "@openforis/arena-core": "npm:^1.0.90"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.1"
     cookie-parser: "npm:^1.4.7"
@@ -3903,9 +3904,9 @@ __metadata:
     passport: "npm:^0.7.0"
     passport-jwt: "npm:^4.0.1"
     passport-local: "npm:^1.0.0"
-    pg-promise: "npm:^12.6.0"
+    pg-promise: "npm:^12.6.1"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/8964dcbfe5705d882047ff09308b3ba8577f70e08f8d9e1f00562498edcff49f5af44d93b745faa0840eabc001a0abe00ba477fa0dcd1fd9bacdbb1db08e2e0c
+  checksum: 10c0/259527b28cfa426c87570ff284727a45ac3c728261fef54ffa618a060a36d28980577811da7ebffc762d16d635088577e328054ef32d518809ec2fd0664b15d1
   languageName: node
   linkType: hard
 
@@ -15446,7 +15447,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
     "@openforis/arena-core": ../arena-core
-    "@openforis/arena-server": "npm:^1.2.14"
+    "@openforis/arena-server": "npm:^1.2.17"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
@@ -16106,9 +16107,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-promise@npm:^12.6.0":
-  version: 12.6.0
-  resolution: "pg-promise@npm:12.6.0"
+"pg-promise@npm:^12.6.1":
+  version: 12.6.1
+  resolution: "pg-promise@npm:12.6.1"
   dependencies:
     assert-options: "npm:0.8.3"
     pg: "npm:8.18.0"
@@ -16116,7 +16117,7 @@ __metadata:
     spex: "npm:4.1.0"
   peerDependencies:
     pg-query-stream: 4.12.0
-  checksum: 10c0/aa8e8c20ca0c02b8acf06acae2bdb3e124ec97bf3e27a8e78667807cf2545774ef59862b3d3dd34691c02155127b3ac4a9c853f0936b2e1cc51a9d68419a8455
+  checksum: 10c0/ff67714a5a1d3cb70259fe633017f48195adeb960fa8a71c6eaf4a74682a36d03d4bbaa407589f747ab4f9cd37c0bca4bdb21a135b000db13e2a11607360f896
   languageName: node
   linkType: hard
 
@@ -16886,7 +16887,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proj4@npm:^2.1.4, proj4@npm:^2.19.10":
+"proj4@npm:^2.1.4, proj4@npm:^2.20.2":
   version: 2.20.2
   resolution: "proj4@npm:2.20.2"
   dependencies:
@@ -20453,7 +20454,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^11.0.3":
+"uuid@npm:^11.1.0":
   version: 11.1.0
   resolution: "uuid@npm:11.1.0"
   bin:
