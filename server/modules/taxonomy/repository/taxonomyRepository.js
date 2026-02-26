@@ -16,10 +16,8 @@ import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import {
-  getSurveyDBSchema,
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
-  dbTransformCallback,
 } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 const searchTypes = {
@@ -46,11 +44,11 @@ export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, cli
   const { props, propsDraft } = Taxonomy.getPropsAndPropsDraft({ backup })(taxonomy)
   return client.one(
     `
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.taxonomy (uuid, props, props_draft)
+        INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.taxonomy (uuid, props, props_draft)
         VALUES ($1, $2, $3)
         RETURNING *`,
     [Taxonomy.getUuid(taxonomy), props, propsDraft],
-    (record) => dbTransformCallback(record, true, true)
+    (record) => DB.transformCallback(record, true, true)
   )
 }
 
@@ -87,12 +85,12 @@ const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, 
       const { props, propsDraft } = TaxonVernacularName.getPropsAndPropsDraft({ backup })(vernacularName)
       return client.none(
         `INSERT INTO 
-         ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name (uuid, taxon_uuid, props, props_draft)
+         ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name (uuid, taxon_uuid, props, props_draft)
       VALUES 
         ($1, $2, $3, $4)
       ON CONFLICT (uuid) DO UPDATE SET
-        props = ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name.props || $3,
-        props_draft = ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name.props_draft || $4
+        props = ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name.props || $3,
+        props_draft = ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name.props_draft || $4
       `,
         [TaxonVernacularName.getUuid(vernacularName), taxonUuid, props, propsDraft]
       )
@@ -104,7 +102,7 @@ const insertTaxon = async ({ surveyId, taxon, backup = false, client = db }) => 
 
   return client.batch([
     client.none(
-      `INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon (uuid, taxonomy_uuid, props, props_draft)
+      `INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.taxon (uuid, taxonomy_uuid, props, props_draft)
        VALUES ($1, $2, $3, $4)`,
       [Taxon.getUuid(taxon), Taxon.getTaxonomyUuid(taxon), props, propsDraft]
     ),
@@ -125,10 +123,10 @@ export const insertTaxa = async ({ surveyId, taxa, backup = false, client = db }
 
 export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client = db) =>
   client.one(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxonomy
+    `SELECT * FROM ${Schemata.getSchemaSurvey(surveyId)}.taxonomy
      WHERE uuid = $1`,
     [uuid],
-    (record) => dbTransformCallback(record, draft, true)
+    (record) => DB.transformCallback(record, draft, true)
   )
 
 export const fetchTaxonomiesBySurveyId = async (
@@ -181,7 +179,7 @@ export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
   client.one(
     `
       SELECT COUNT(*) 
-      FROM ${getSurveyDBSchema(surveyId)}.taxonomy`,
+      FROM ${Schemata.getSchemaSurvey(surveyId)}.taxonomy`,
     [],
     (r) => parseInt(r.count, 10)
   )
@@ -246,11 +244,11 @@ export const fetchTaxa = async (
   client.map(
     `SELECT t.*
     FROM
-        ${getSurveyDBSchema(surveyId)}.taxon t
+        ${Schemata.getSchemaSurvey(surveyId)}.taxon t
     ${
       !backup && !draft
         ? `--exclude not published taxonomies if not draft
-      JOIN ${getSurveyDBSchema(surveyId)}.taxonomy
+      JOIN ${Schemata.getSchemaSurvey(surveyId)}.taxonomy
         ON t.taxonomy_uuid = taxonomy.uuid 
         AND taxonomy.props <> '{}'::jsonb`
         : ''
@@ -309,7 +307,7 @@ export const fetchTaxaWithVernacularNames = async (
               '${TaxonVernacularName.keys.props}', vn.props${draft ? ' || vn.props_draft' : ''}
             )
           ) as names
-        FROM ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
+        FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name vn
         ${
           !backup && !draft
             ? `--exclude not published vernacular names if not draft
@@ -330,11 +328,11 @@ export const fetchTaxaWithVernacularNames = async (
           ) as vernacular_names,
         ROW_NUMBER () OVER (partition by t.taxonomy_uuid order by t.id) AS index
       FROM
-          ${getSurveyDBSchema(surveyId)}.taxon t
+          ${Schemata.getSchemaSurvey(surveyId)}.taxon t
       ${
         !backup && !draft
           ? `--exclude not published taxonomies if not draft
-        JOIN ${getSurveyDBSchema(surveyId)}.taxonomy
+        JOIN ${Schemata.getSchemaSurvey(surveyId)}.taxonomy
           ON t.taxonomy_uuid = taxonomy.uuid 
           AND taxonomy.props <> '{}'::jsonb`
           : ''
@@ -380,7 +378,7 @@ export const fetchTaxaWithVernacularNamesStream = ({
               TaxonVernacularName.NAMES_SEPARATOR
             }') as names
         FROM
-            ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
+            ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name vn
         WHERE
             vn.taxon_uuid = t.uuid
             AND ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')} = '${langCode}'
@@ -406,7 +404,7 @@ export const fetchTaxaWithVernacularNamesStream = ({
           ${A.isEmpty(extraPropsFields) ? '' : `, ${extraPropsFields}`}
           ${A.isEmpty(vernacularNamesSubSelects) ? '' : `, ${vernacularNamesSubSelects}`}
       FROM
-          ${getSurveyDBSchema(surveyId)}.taxon t
+          ${Schemata.getSchemaSurvey(surveyId)}.taxon t
       WHERE
           t.taxonomy_uuid = $1
       ORDER BY t.id`
@@ -417,13 +415,13 @@ export const fetchTaxaWithVernacularNamesStream = ({
 const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searchValue, orderByProp, draft, client) =>
   client.map(
     `SELECT *
-       FROM ${getSurveyDBSchema(surveyId)}.taxon
+       FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
        WHERE taxonomy_uuid = $/taxonomyUuid/ 
          ${whereCondition ? ` AND (${whereCondition})` : ''}
        ORDER BY ${DbUtils.getPropColCombined(orderByProp, draft)} ASC
        LIMIT 100`,
     { taxonomyUuid, searchValue },
-    (taxon) => dbTransformCallback(taxon, draft, true)
+    (taxon) => DB.transformCallback(taxon, draft, true)
   )
 
 const toSearchValue = (filterValue, searchType = searchTypes.equals) => {
@@ -470,7 +468,7 @@ export const findTaxaFilteringFields = async ({
   draft = false,
   client = db,
 }) => {
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
   const searchValue = toSearchValue(filterValue, searchTypes.includes)
   const tableAliasByField = {
     [TaxonVernacularName.keysProps.name]: 'vn',
@@ -501,7 +499,7 @@ export const findTaxaFilteringFields = async ({
      ORDER BY ${orderByConditions}
      LIMIT 100`,
     { taxonomyUuid, searchValue },
-    (record) => dbTransformCallback(record, draft, true)
+    (record) => DB.transformCallback(record, draft, true)
   )
 }
 
@@ -530,12 +528,12 @@ export const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterVal
 export const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = false, client = db) =>
   client.one(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
-     FROM ${getSurveyDBSchema(surveyId)}.taxon t
-       LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
+     FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon t
+       LEFT OUTER JOIN ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name vn 
        ON vn.taxon_uuid = t.uuid
      WHERE vn.uuid = $1`,
     [uuid],
-    (record) => dbTransformCallback(record, draft, true)
+    (record) => DB.transformCallback(record, draft, true)
   )
 
 export const fetchTaxonVernacularNamesByTaxonUuid = async (
@@ -544,22 +542,22 @@ export const fetchTaxonVernacularNamesByTaxonUuid = async (
 ) =>
   client.map(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
-     FROM ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
-       JOIN ${getSurveyDBSchema(surveyId)}.taxon t
+     FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name vn
+       JOIN ${Schemata.getSchemaSurvey(surveyId)}.taxon t
           ON vn.taxon_uuid = t.uuid
      WHERE t.taxonomy_uuid = $/taxonomyUuid/
        AND t.uuid = $/taxonUuid/`,
     { taxonomyUuid, taxonUuid },
-    (record) => dbTransformCallback(record, draft, true)
+    (record) => DB.transformCallback(record, draft, true)
   )
 
 export const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
   client.one(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
+    `SELECT * FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
      WHERE uuid = $1
     `,
     [uuid],
-    (record) => dbTransformCallback(record, draft, true)
+    (record) => DB.transformCallback(record, draft, true)
   )
 
 export const fetchTaxonWithVernacularNamesByUuid = async (
@@ -588,7 +586,7 @@ export const updateTaxonomyProp = async (surveyId, taxonomyUuid, key, value, cli
 
 export const updateTaxonProps = async ({ surveyId, taxon }, client = db) =>
   client.none(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.taxon
+    `UPDATE ${Schemata.getSchemaSurvey(surveyId)}.taxon
      SET props_draft = $2
      WHERE uuid = $1`,
     [Taxon.getUuid(taxon), Taxon.getProps(taxon)]
@@ -618,7 +616,7 @@ export const deleteTaxonomy = async (surveyId, taxonomyUuid, client = db) =>
 
 export const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, client = db) =>
   client.none(
-    `DELETE FROM ${getSurveyDBSchema(surveyId)}.taxon
+    `DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
      WHERE taxonomy_uuid = $1
        AND props::text = '{}'::text`,
     [taxonomyUuid]
