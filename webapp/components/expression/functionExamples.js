@@ -7,8 +7,10 @@ const functionExamples = {
   [modes.json]: {
     [functionNames.categoryItemProp]: `cateoryItemProp('category_name', 'prop_name', 'codeLevel1', 'codeLevel2', ...)`,
     [functionNames.dateTimeDiff]: 'dateTimeDiff(date_1, time_1, date_2, time_2)',
-    [functionNames.distance]: 'distance(coordinate_attribute_1, coordinate_attribute_2)',
     [functionNames.first]: 'first(multiple_attribute_name), first(multiple_entity_name).entity_attribute_name, ...',
+    [functionNames.geoCoordinateAtDistance]:
+      'geoCoordinateAtDistance(coordinate_attribute, 20, 90), geoCoordinateAtDistance(coordinate_attribute, distance_attribute, bearing_attribute), ...',
+    [functionNames.geoDistance]: 'geoDistance(coordinate_attribute_1, coordinate_attribute_2)',
     [functionNames.geoPolygon]:
       'geoPolygon(coordinate_attribute_1, coordinate_attribute_2, ...), geoPolygon(multiple_entity_name.coordinate_attribute), ...',
     [functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
