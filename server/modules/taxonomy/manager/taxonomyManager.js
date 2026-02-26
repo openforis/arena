@@ -116,13 +116,22 @@ export const fetchTaxonomyByUuid = async (surveyId, taxonomyUuid, draft = false,
   return taxonomy
 }
 
-const includeUnknownUnlistedItems = async (surveyId, taxonomyUuid, taxa, includeUnlUnk, draft) =>
-  R.isEmpty(taxa) && includeUnlUnk
-    ? [
-        await TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unknownCode, draft),
-        await TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unlistedCode, draft),
-      ]
-    : taxa
+const prepareTaxaAsResult = ({
+  surveyId,
+  taxonomyUuid,
+  taxa,
+  includeUnlUnk,
+  includeVerancularNameIfSingle,
+  draft,
+  client,
+}) => {
+  if (taxa.length > 0 || !includeUnlUnk) return taxa
+
+  return Promise.all([
+    TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unknownCode, draft, client),
+    TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unlistedCode, draft, client),
+  ])
+}
 
 export const findTaxaByCode = async (
   surveyId,
@@ -130,15 +139,20 @@ export const findTaxaByCode = async (
   filterValue,
   draft = false,
   includeUnlUnk = false,
+  includeVerancularNameIfSingle = false,
   client = db
-) =>
-  includeUnknownUnlistedItems(
+) => {
+  const taxa = await TaxonomyRepository.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, client)
+  return prepareTaxaAsResult({
     surveyId,
     taxonomyUuid,
-    await TaxonomyRepository.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, client),
+    taxa,
     includeUnlUnk,
-    draft
-  )
+    includeVerancularNameIfSingle,
+    draft,
+    client,
+  })
+}
 
 export const findTaxaByScientificName = async (
   surveyId,
@@ -146,15 +160,20 @@ export const findTaxaByScientificName = async (
   filterValue,
   draft = false,
   includeUnlUnk = false,
+  includeVerancularNameIfSingle = false,
   client = db
-) =>
-  includeUnknownUnlistedItems(
+) => {
+  const taxa = await TaxonomyRepository.findTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, client)
+  return prepareTaxaAsResult({
     surveyId,
     taxonomyUuid,
-    await TaxonomyRepository.findTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
+    taxa,
     includeUnlUnk,
-    draft
-  )
+    includeVerancularNameIfSingle,
+    draft,
+    client,
+  })
+}
 
 export const findTaxaByCodeOrScientificName = async (
   surveyId,
@@ -162,15 +181,26 @@ export const findTaxaByCodeOrScientificName = async (
   filterValue,
   draft = false,
   includeUnlUnk = false,
+  includeVerancularNameIfSingle = false,
   client = db
-) =>
-  includeUnknownUnlistedItems(
+) => {
+  const taxa = await TaxonomyRepository.findTaxaByCodeOrScientificName(
     surveyId,
     taxonomyUuid,
-    await TaxonomyRepository.findTaxaByCodeOrScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
-    includeUnlUnk,
-    draft
+    filterValue,
+    draft,
+    client
   )
+  return prepareTaxaAsResult({
+    surveyId,
+    taxonomyUuid,
+    taxa,
+    includeUnlUnk,
+    includeVerancularNameIfSingle,
+    draft,
+    client,
+  })
+}
 
 export const findTaxaByVernacularName = async (
   surveyId,
@@ -178,15 +208,20 @@ export const findTaxaByVernacularName = async (
   filterValue,
   draft = false,
   includeUnlUnk = false,
+  includeVerancularNameIfSingle = false,
   client = db
-) =>
-  includeUnknownUnlistedItems(
+) => {
+  const taxa = await TaxonomyRepository.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client)
+  return prepareTaxaAsResult({
     surveyId,
     taxonomyUuid,
-    await TaxonomyRepository.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client),
+    taxa,
     includeUnlUnk,
-    draft
-  )
+    includeVerancularNameIfSingle,
+    draft,
+    client,
+  })
+}
 
 export const { fetchTaxonByUuid, fetchTaxonByCode, fetchTaxonVernacularNameByUuid, fetchTaxaWithVernacularNames } =
   TaxonomyRepository

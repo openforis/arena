@@ -72,12 +72,11 @@ export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, cli
  *   name: 'English Name'
  * }
  * ```.
- *
  * @param {!object} params - The search parameters.
  * @param {!number} [params.surveyId] - The ID of the survey.
  * @param {!string} [params.taxonUuid] - The UUID of the taxon.
  * @param {!object} [params.vernacularNames] - The vernacular names indexed by language code.
- * @param {pgPromise.IDatabase} [params.client=db] - The database client.
+ * @param {pgPromise.IDatabase} [params.client] - The database client.
  * @returns {Array.<Promise>} - The result promises.
  */
 const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, backup = false, client = db }) =>
@@ -462,52 +461,71 @@ export const findTaxaByCode = async (surveyId, taxonomyUuid, filterValue, draft 
 export const findTaxaByScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) =>
   findTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.scientificName, `*${filterValue}*`, draft, client)
 
-export const findTaxaByCodeOrScientificName = async (
+export const findTaxaFilteringFields = async ({
   surveyId,
   taxonomyUuid,
+  filterFields,
   filterValue,
+  orderByFields,
   draft = false,
-  client = db
-) => {
+  client = db,
+}) => {
+  const schema = getSurveyDBSchema(surveyId)
   const searchValue = toSearchValue(filterValue, searchTypes.includes)
-  const whereCondition = searchValue
-    ? `${DbUtils.getPropFilterCondition(Taxon.propKeys.scientificName, draft)} 
-     OR  
-    ${DbUtils.getPropFilterCondition(Taxon.propKeys.code, draft)}`
-    : null
-
-  return findTaxaByCondition(
-    surveyId,
-    taxonomyUuid,
-    whereCondition,
-    searchValue,
-    Taxon.propKeys.scientificName,
-    draft,
-    client
-  )
-}
-
-export const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) => {
-  const searchValue = toSearchValue(filterValue, searchTypes.includes)
+  const tableAliasByField = {
+    [TaxonVernacularName.keysProps.name]: 'vn',
+    [Taxon.propKeys.code]: 't',
+    [Taxon.propKeys.scientificName]: 't',
+  }
   const filterCondition = searchValue
-    ? DbUtils.getPropFilterCondition(TaxonVernacularName.keysProps.name, draft, 'vn.')
+    ? filterFields
+        .map((field) => DbUtils.getPropFilterCondition(field, draft, `${tableAliasByField[field]}.`))
+        .join(' OR ')
     : ''
+  const orderByConditions = orderByFields
+    .map((field) => `${DbUtils.getPropColCombined(field, draft, `${tableAliasByField[field]}.`)} ASC`)
+    .join(', ')
+
+  const filteringByVernacularName = filterFields.includes(TaxonVernacularName.keysProps.name)
+  const fromClause = filteringByVernacularName
+    ? `${schema}.taxon_vernacular_name vn 
+       JOIN ${schema}.taxon t
+          ON vn.taxon_uuid = t.uuid`
+    : `${schema}.taxon t`
 
   return client.map(
-    `SELECT ${getTaxonVernacularNameSelectFields(draft)}
-     FROM ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
-       JOIN ${getSurveyDBSchema(surveyId)}.taxon t
-       ON vn.taxon_uuid = t.uuid
+    `SELECT ${filteringByVernacularName ? getTaxonVernacularNameSelectFields(draft) : '*'}
+     FROM ${fromClause}
      WHERE t.taxonomy_uuid = $/taxonomyUuid/ 
-      AND ${filterCondition}
-     ORDER BY 
-      ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')} ASC,
-      ${DbUtils.getPropColCombined(Taxon.propKeys.scientificName, draft, 't.')} ASC
-     LIMIT 20`,
+       ${filterCondition ? `AND ${filterCondition}` : ''}
+     ORDER BY ${orderByConditions}
+     LIMIT 100`,
     { taxonomyUuid, searchValue },
     (record) => dbTransformCallback(record, draft, true)
   )
 }
+
+export const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) =>
+  findTaxaFilteringFields({
+    surveyId,
+    taxonomyUuid,
+    filterFields: [Taxon.propKeys.code, Taxon.propKeys.scientificName],
+    filterValue,
+    orderByFields: [Taxon.propKeys.scientificName],
+    draft,
+    client,
+  })
+
+export const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) =>
+  findTaxaFilteringFields({
+    surveyId,
+    taxonomyUuid,
+    filterFields: [TaxonVernacularName.keysProps.name],
+    filterValue,
+    orderByFields: [TaxonVernacularName.keysProps.name, Taxon.propKeys.scientificName],
+    draft,
+    client,
+  })
 
 export const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = false, client = db) =>
   client.one(
