@@ -20,7 +20,7 @@ const extractFunctionLabel = ({ i18n, functionKey, func }) => {
   return `${callee ?? functionKey}()`
 }
 
-const deprecatedFunctionNames = [Expression.functionNames.distance]
+const deprecatedFunctionNames = new Set([Expression.functionNames.distance])
 
 const Call = (props) => {
   const { node: expressionNode, variables, onChange } = props
@@ -42,7 +42,7 @@ const Call = (props) => {
 
   const dropdownItems = useMemo(() => {
     const availableFunctionEntries = Object.entries(functions).filter(
-      ([functionKey]) => !deprecatedFunctionNames.includes(functionKey) || functionKey === initialSelectedFunctionKey
+      ([functionKey]) => !deprecatedFunctionNames.has(functionKey) || functionKey === initialSelectedFunctionKey
     )
     return availableFunctionEntries.map(([functionKey, func]) => ({
       value: functionKey,
