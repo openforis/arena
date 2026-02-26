@@ -116,7 +116,7 @@ export const fetchTaxonomyByUuid = async (surveyId, taxonomyUuid, draft = false,
   return taxonomy
 }
 
-const prepareTaxaAsResult = ({
+const prepareTaxaAsResult = async ({
   surveyId,
   taxonomyUuid,
   taxa,
@@ -125,7 +125,22 @@ const prepareTaxaAsResult = ({
   draft,
   client,
 }) => {
-  if (taxa.length > 0 || !includeUnlUnk) return taxa
+  if (taxa.length > 0 || !includeUnlUnk) {
+    if (includeVerancularNameIfSingle) {
+      const result = []
+      for (const taxon of taxa) {
+        const taxonUuid = Taxon.getUuid(taxon)
+        const vernacularNames = await TaxonomyRepository.fetchTaxonVernacularNamesByTaxonUuid(
+          { surveyId, taxonomyUuid, taxonUuid, draft },
+          client
+        )
+        const taxonUpdated = vernacularNames.length === 1 ? Taxon.assocVernacularNames(vernacularNames)(taxon) : taxon
+        result.push(taxonUpdated)
+      }
+      return result
+    }
+    return taxa
+  }
 
   return Promise.all([
     TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unknownCode, draft, client),

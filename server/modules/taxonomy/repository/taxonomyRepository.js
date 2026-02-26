@@ -538,6 +538,21 @@ export const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = fal
     (record) => dbTransformCallback(record, draft, true)
   )
 
+export const fetchTaxonVernacularNamesByTaxonUuid = async (
+  { surveyId, taxonomyUuid, taxonUuid, draft = false },
+  client = db
+) =>
+  client.map(
+    `SELECT ${getTaxonVernacularNameSelectFields(draft)}
+     FROM ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
+       JOIN ${getSurveyDBSchema(surveyId)}.taxon t
+          ON vn.taxon_uuid = t.uuid
+     WHERE t.taxonomy_uuid = $/taxonomyUuid/
+       AND t.uuid = $/taxonUuid/`,
+    { taxonomyUuid, taxonUuid },
+    (record) => dbTransformCallback(record, draft, true)
+  )
+
 export const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
   client.one(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
