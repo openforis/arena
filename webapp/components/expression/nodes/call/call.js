@@ -20,6 +20,8 @@ const extractFunctionLabel = ({ i18n, functionKey, func }) => {
   return `${callee ?? functionKey}()`
 }
 
+const deprecatedFunctionNames = new Set([Expression.functionNames.distance])
+
 const Call = (props) => {
   const { node: expressionNode, variables, onChange } = props
 
@@ -29,22 +31,25 @@ const Call = (props) => {
   const exprString = expressionNode ? Expression.toString(expressionNode) : null
   const complexFunctionName = getComplexFunctionNameByExpression(exprString)
 
+  const initialSelectedFunctionKey = complexFunctionName ?? nodeCallee
+
   const [state, setState] = useState({
-    selectedFunctionKey: complexFunctionName ?? nodeCallee,
+    selectedFunctionKey: initialSelectedFunctionKey,
     editDialogOpen: false,
   })
 
   const { selectedFunctionKey, editDialogOpen } = state
 
-  const dropdownItems = useMemo(
-    () =>
-      Object.entries(functions).map(([functionKey, func]) => ({
-        value: functionKey,
-        label: extractFunctionLabel({ i18n, functionKey, func }),
-        description: i18n.t(`nodeDefEdit.functionDescriptions.${functionKey}`),
-      })),
-    [i18n]
-  )
+  const dropdownItems = useMemo(() => {
+    const availableFunctionEntries = Object.entries(functions).filter(
+      ([functionKey]) => !deprecatedFunctionNames.has(functionKey) || functionKey === initialSelectedFunctionKey
+    )
+    return availableFunctionEntries.map(([functionKey, func]) => ({
+      value: functionKey,
+      label: extractFunctionLabel({ i18n, functionKey, func }),
+      description: i18n.t(`nodeDefEdit.functionDescriptions.${functionKey}`),
+    }))
+  }, [i18n, initialSelectedFunctionKey])
 
   const openEditDialog = useCallback(() => setState((statePrev) => ({ ...statePrev, editDialogOpen: true })), [])
   const closeEditDialog = useCallback(() => setState((statePrev) => ({ ...statePrev, editDialogOpen: false })), [])

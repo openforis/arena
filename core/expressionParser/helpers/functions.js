@@ -5,6 +5,8 @@ export const functionNames = {
   dateTimeDiff: 'dateTimeDiff',
   distance: 'distance',
   first: 'first',
+  geoCoordinateAtDistance: 'geoCoordinateAtDistance',
+  geoDistance: 'geoDistance',
   geoPolygon: 'geoPolygon',
   includes: 'includes',
   index: 'index',

@@ -1141,6 +1141,8 @@ $t(common.appNameFull)
       categoryItemProp: 'Заасан кодтой ангиллын элементийн заасан $t(extraProp.label)-ийн утгыг буцаана',
       dateTimeDiff: '2 огноо-цагийн хоорондох ялгааг (минутаар) буцаана',
       distance: 'Заасан координатуудын хоорондох зайг (метрээр) буцаана',
+      geoCoordinateAtDistance: 'Заасан координатаас тодорхой зай болон чиглэлд байрлах координатыг буцаана',
+      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
       first: 'Заасан олон шинж чанар эсвэл объектын эхний утга эсвэл зангилааг буцаана',
       geoPolygon: 'Координатуудын жагсаалтаас GeoJSON-д олон өнцөгт үүсгэнэ',
       includes: 'Заасан олон шинж чанар заасан утгыг агуулсан бол үнэн буцаана.',
@@ -1738,6 +1740,12 @@ $t(common.cantUndoWarning)`,
     const: 'Тогтмол утга',
     call: 'Функц',
     operator: 'Оператор',
+
+    geoCoordinateAtDistanceEditor: {
+      coordinateAttributeOrigin: 'Эх координатын шинж чанар',
+      distanceAttribute: 'Зайны шинж чанар',
+      bearingAttribute: 'Азимутын шинж чанар',
+    },
 
     coordinateAttributeWithPosition: 'Координат шинж чанар {{position}}',
 
