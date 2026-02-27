@@ -94,6 +94,7 @@ export default {
     code: '$t(common.code)',
     scientificName: 'Научное название',
     vernacularName: 'Народное название',
+    vernacularNameAlwaysIncludedIfSingle: 'Народное название всегда включается, если оно только одно',
     vernacularNameSelectionKept: 'Выбор народного названия сохранен',
     visibleFields: 'Видимые поля',
   },
