@@ -2,8 +2,9 @@ import * as R from 'ramda'
 import * as pgPromise from 'pg-promise'
 import * as _QueryStream from 'pg-query-stream'
 
+import { Objects, Strings } from '@openforis/arena-core'
+
 import { db } from '@server/db/db'
-import { Objects } from '@openforis/arena-core'
 
 const pgp = pgPromise()
 
@@ -94,7 +95,6 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
 
 /**
  * Creates a multi-items update query.
- *
  * @param {!string} schema - The target schema.
  * @param {!string} table - The target table.
  * @param {!string} idCol - Name of the identifier column (used to build the WHERE condition) or pgromise helpers.ColumnConfig object.
@@ -136,17 +136,17 @@ export const getPropsPublishedCondition = ({ draft, tableAlias = null }) => {
 
 /**
  * Combines draft and published props.
- *
  * @param {!boolean} draft - Whether the item is draft or published.
- * @param {string} columnPrefix - Prefix (table alias) for the column.
+ * @param {string} tableAlias - Table alias (prefix) for the column.
  * @param {string} alias - Alias of the result column.
  * @returns {string} - The column with combined props.
  */
-export const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
-  draft
+export const getPropsCombined = (draft, tableAlias = '', alias = 'props') => {
+  const columnPrefix = tableAlias ? Strings.appendIfMissing('.')(tableAlias) : ''
+  return draft
     ? `${columnPrefix}props || ${columnPrefix}props_draft${alias ? ` AS ${alias}` : ''}`
     : `${columnPrefix}props${alias ? ` AS ${alias}` : ''}`
-
+}
 /**
  * Combines a draft and a published column prop, if needed.
  * @param {!string} propName - Property name.

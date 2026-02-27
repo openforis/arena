@@ -127,3 +127,10 @@ export const renameExtraProp =
     extraUpdated[nameNew] = extraProp
     return setProp(propKeys.extra, extraUpdated)(taxon)
   }
+
+// associate a single vernacular name (only for rendering in UI)
+export const assocVernacularName = (vernacularName) => R.assoc(keys.vernacularName, vernacularName)
+
+export const assocVernacularLanguage = (vernacularLanguage) => R.assoc(keys.vernacularLanguage, vernacularLanguage)
+
+export const assocVernacularNameUuid = (vernacularNameUuid) => R.assoc(keys.vernacularNameUuid, vernacularNameUuid)
