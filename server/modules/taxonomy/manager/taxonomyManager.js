@@ -120,11 +120,19 @@ const associateSingleVernacularNamesToTaxa = async ({ surveyId, taxonomyUuid, ta
   const result = []
   for (const taxon of taxa) {
     const taxonUuid = Taxon.getUuid(taxon)
-    const vernacularNames = await TaxonomyRepository.fetchTaxonVernacularNamesByTaxonUuid(
+    const taxaWithVernacularNames = await TaxonomyRepository.fetchTaxaWithVernacularNamesByTaxonUuid(
       { surveyId, taxonomyUuid, taxonUuid, draft },
       client
     )
-    const taxonUpdated = vernacularNames.length === 1 ? Taxon.assocVernacularNames(vernacularNames)(taxon) : taxon
+    let taxonUpdated = taxon
+    if (taxaWithVernacularNames.length === 1) {
+      const taxonWithVernacularName = taxaWithVernacularNames[0]
+      taxonUpdated = R.pipe(
+        Taxon.assocVernacularName(Taxon.getVernacularName(taxonWithVernacularName)),
+        Taxon.assocVernacularLanguage(Taxon.getVernacularLanguage(taxonWithVernacularName)),
+        Taxon.assocVernacularNameUuid(Taxon.getVernacularNameUuid(taxonWithVernacularName))
+      )(taxon)
+    }
     result.push(taxonUpdated)
   }
   return result

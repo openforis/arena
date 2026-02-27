@@ -534,7 +534,7 @@ export const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = fal
     (record) => DB.transformCallback(record, draft, true)
   )
 
-export const fetchTaxonVernacularNamesByTaxonUuid = async (
+export const fetchTaxaWithVernacularNamesByTaxonUuid = async (
   { surveyId, taxonomyUuid, taxonUuid, draft = false },
   client = db
 ) =>
