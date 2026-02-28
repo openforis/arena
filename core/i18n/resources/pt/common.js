@@ -932,7 +932,7 @@ A mesclagem não pode ser realizada.`,
         </li>
         <li>Usuários:
           <ul>
-            <li>convidar usuários paro inventários próprios</li>
+            <li>convidar usuários para inventários próprios</li>
           </ul>
         </li>
         $t(userInviteView.groupPermissions.dataAnalyst)`,
@@ -1309,7 +1309,7 @@ $t(common.appNameFull)
       displayAsTypes: {
         hyperlink: 'Hiperlink',
         markdown: 'Markdown',
-        text: 'Text',
+        text: 'Texto',
       },
       textInputType: 'Tipo de entrada de texto',
       textInputTypes: {
