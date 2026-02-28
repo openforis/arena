@@ -16,7 +16,7 @@ Eles só podem ser visualizados agora, então certifique-se de **salvá-los agor
   },
   creationSuccessful: {
     title: 'Dispositivo 2FA criado com sucesso',
-    message: `2FA device "{{deviceName}}" has been created.  
+    message: `O dispositivo 2FA "{{deviceName}}" foi criado.
 $t(user2FADevice:backupCodesRegenerated.message)`,
   },
   deletion: {

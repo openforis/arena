@@ -38,8 +38,8 @@ Deseja ignorá-las?`,
     createdWithApp: `$t(common.createdWith) {{app}}`,
     cycle: 'Ciclo',
     cycle_plural: 'Ciclos',
-    dateCreated: 'Dados de criação',
-    dateLastModified: 'Dados da última alteração',
+    dateCreated: 'Data de criação',
+    dateLastModified: 'Data da última alteração',
     delete: 'Excluir',
     deleted: 'Excluído!',
     descending: 'Decrescente',
@@ -840,7 +840,7 @@ A mesclagem não pode ser realizada.`,
     languages: 'Idiomas',
     nodes: 'Nós',
     noSurveysMatchingFilter: 'Nenhum inventário corresponde ao filtro especificado',
-    onlyOwn: 'Somente próprias inventários',
+    onlyOwn: 'Somente inventários próprios',
     records: 'Registros',
     recordsCreatedWithMoreApps: 'Registros criados com mais aplicativos:',
   },
@@ -902,7 +902,7 @@ A mesclagem não pode ser realizada.`,
     confirmInviteSystemAdmin_other: 'Convidar os usuários {{email}} como Administradores do Sistema?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
     
-    {{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para esto inventário anteriormente): {{skippedEmails}}`,
+    {{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Permissões',
       systemAdmin: `
@@ -918,7 +918,7 @@ A mesclagem não pode ser realizada.`,
         </li>
         <li>Usuários:
           <ul>
-            <li>convidar usuários paro inventários próprios</li>
+            <li>convidar usuários para inventários próprios</li>
           </ul>
         </li>
         $t(userInviteView.groupPermissions.dataAnalyst)`,
