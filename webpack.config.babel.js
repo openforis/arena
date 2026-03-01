@@ -26,7 +26,6 @@ const gitRevisionPlugin = config.mode === 'production' ? null : new GitRevisionP
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
 class CleanUpStatsPlugin {
-  // eslint-disable-next-line class-methods-use-this
   shouldPickStatChild(child) {
     return child.name.indexOf('mini-css-extract-plugin') !== 0
   }
@@ -35,7 +34,6 @@ class CleanUpStatsPlugin {
     compiler.hooks.done.tap('CleanUpStatsPlugin', (stats) => {
       const { children } = stats.compilation
       if (Array.isArray(children)) {
-        // eslint-disable-next-line no-param-reassign
         stats.compilation.children = children.filter((child) => this.shouldPickStatChild(child))
       }
     })
@@ -65,7 +63,7 @@ const plugins = [
         RECAPTCHA_ENABLED: process.env.RECAPTCHA_ENABLED,
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
         RSTUDIO_DOWNLOAD_SERVER_URL: JSON.stringify(process.env.RSTUDIO_DOWNLOAD_SERVER_URL),
-        FILE_UPLOAD_LIMIT: ProcessUtils.ENV.fileUploadLimit,
+        FILE_UPLOAD_LIMIT: process.env.FILE_UPLOAD_LIMIT,
       },
     },
   }),
@@ -121,7 +119,7 @@ const webPackConfig = {
       {
         context: '/',
         target: 'http://localhost:9090',
-        // eslint-disable-next-line consistent-return
+
         bypass(req) {
           return req.path !== '/' ? '/index.html' : undefined
         },
