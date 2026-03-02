@@ -1,4 +1,3 @@
-import * as PromiseUtils from '../../../../core/promiseUtils'
 import * as Node from '../../../../core/record/node'
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 import { getSurveyEntry } from '../../paths'
@@ -72,30 +71,30 @@ const verifyRecord = async (survey, surveyExport, recordsMock, recordUuid) => {
   await expect(recordExport.step).toBe('1')
   await expect(recordExport.cycle).toBe('0')
 
-  await PromiseUtils.each(Object.entries(record), async ([name, value]) => {
+  for (const [name, value] of Object.entries(record)) {
     if (name === 'trees') {
       // const treeDefExport = getNodeDefByName(tree.name)(surveyExport)
       const treeIdDefExport = getNodeDefByName(tree_id.name)(surveyExport)
       const treeIdsExport = getNodesByDefUuid(treeIdDefExport.uuid)(recordExport)
-      await PromiseUtils.each(value, async (treeNode) => {
+      for (const treeNode of value) {
         const treeId = treeNode[tree_id.name]
         const treeIdExport = treeIdsExport.find((_nodeExport) => _nodeExport.value === treeId)
         await verifyNode(treeIdDefExport, treeIdExport, treeId)
 
-        await PromiseUtils.each(Object.entries(treeNode), async ([treeChildName, treeChildValue]) => {
+        for (const [treeChildName, treeChildValue] of Object.entries(treeNode)) {
           const nodeDefExport = getNodeDefByName(treeChildName)(surveyExport)
           const nodeExport = getNodesByDefUuid(nodeDefExport.uuid)(recordExport).find(
             (_node) => Node.getParentInternalId(_node) === Node.getParentInternalId(treeIdExport)
           )
           await verifyNode(nodeDefExport, nodeExport, treeChildValue)
-        })
-      })
+        }
+      }
     } else {
       const nodeDefExport = getNodeDefByName(name)(surveyExport)
       const nodeExport = getNodeByDefUuid(nodeDefExport.uuid)(recordExport)
       await verifyNode(nodeDefExport, nodeExport, value)
     }
-  })
+  }
 }
 
 export const verifyRecords = (survey, recordsMock = records) =>
@@ -105,7 +104,7 @@ export const verifyRecords = (survey, recordsMock = records) =>
 
     await expect(recordsExport.length).toBe(recordsMock.length)
 
-    await PromiseUtils.each(recordsExport, async (recordExport) =>
+    for (const recordExport of recordsExport) {
       verifyRecord(survey, surveyExport, recordsMock, recordExport.uuid)
-    )
+    }
   })
