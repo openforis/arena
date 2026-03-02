@@ -12,7 +12,7 @@ import { useI18nT } from '@webapp/store/system'
 import Markdown from '../markdown'
 
 export const TooltipNew = (props) => {
-  const { children, className, isTitleMarkdown, markdownClassName, title: titleProp, renderTitle } = props
+  const { children, className, isTitleMarkdown, markdownClassName, maxWidth, title: titleProp, renderTitle } = props
 
   const t = useI18nT()
   const tUnescapeHtml = useI18nT({ unescapeHtml: true })
@@ -37,7 +37,19 @@ export const TooltipNew = (props) => {
   const tooltipClass = useMemo(() => ({ popper: classNames('arena-tooltip', className) }), [className])
 
   return (
-    <Tooltip arrow classes={tooltipClass} onOpen={onOpen} title={title}>
+    <Tooltip
+      arrow
+      classes={tooltipClass}
+      onOpen={onOpen}
+      slotProps={{
+        tooltip: {
+          sx: {
+            maxWidth,
+          },
+        },
+      }}
+      title={title}
+    >
       {children}
     </Tooltip>
   )
@@ -48,6 +60,7 @@ TooltipNew.propTypes = {
   className: PropTypes.string,
   isTitleMarkdown: PropTypes.bool,
   markdownClassName: PropTypes.string,
+  maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   renderTitle: PropTypes.func,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 }

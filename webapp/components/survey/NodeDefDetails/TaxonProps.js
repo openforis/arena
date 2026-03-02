@@ -125,7 +125,7 @@ const TaxonProps = (props) => {
       <FormItem
         label="surveyForm:nodeDefTaxon.vernacularNameSelectionKept"
         info="surveyForm:nodeDefTaxon.vernacularNameSelectionKeptInfo"
-        infoTitleMarkdownClassName="large"
+        infoTitleMaxWidth={600}
         isInfoMarkdown
       >
         <div className="form-item_body">
@@ -137,7 +137,7 @@ const TaxonProps = (props) => {
           <FormItem
             label="surveyForm:nodeDefTaxon.vernacularNameAlwaysIncludedIfSingle"
             info="surveyForm:nodeDefTaxon.vernacularNameAlwaysIncludedIfSingleInfo"
-            infoTitleMarkdownClassName="large"
+            infoTitleMaxWidth={600}
             isInfoMarkdown
           >
             <Checkbox

@@ -36,6 +36,7 @@ export const Button = forwardRef((props, ref) => {
     title: titleProp,
     titleClassName,
     titleMarkdownClassName,
+    titleMaxWidth,
     titleParams,
     variant: variantProp = 'contained',
     ...otherProps
@@ -91,6 +92,7 @@ export const Button = forwardRef((props, ref) => {
       title={title}
       markdownClassName={titleMarkdownClassName}
       isTitleMarkdown={isTitleMarkdown}
+      maxWidth={titleMaxWidth}
     >
       {btn}
     </TooltipNew>
@@ -123,6 +125,7 @@ Button.propTypes = {
   title: PropTypes.string,
   titleClassName: PropTypes.string,
   titleMarkdownClassName: PropTypes.string,
+  titleMaxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   titleParams: PropTypes.object,
   variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
 }

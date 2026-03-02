@@ -16,6 +16,7 @@ export const FormItem = (props) => {
     info = null,
     infoTitleClassName = undefined,
     infoTitleMarkdownClassName = undefined,
+    infoTitleMaxWidth = undefined,
     isInfoMarkdown = false,
     label: labelProp = null,
     labelParams = null,
@@ -41,6 +42,7 @@ export const FormItem = (props) => {
               isTitleMarkdown={isInfoMarkdown}
               titleClassName={infoTitleClassName}
               titleMarkdownClassName={infoTitleMarkdownClassName}
+              titleMaxWidth={infoTitleMaxWidth}
             />
           )}
         </div>
@@ -63,6 +65,7 @@ FormItem.propTypes = {
   isInfoMarkdown: PropTypes.bool,
   infoTitleClassName: PropTypes.string,
   infoTitleMarkdownClassName: PropTypes.string,
+  infoTitleMaxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   labelParams: PropTypes.object,
   onInfoClick: PropTypes.func,
