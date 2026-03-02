@@ -1,4 +1,4 @@
-import { Dates, Objects, Records, RecordUpdateResult, Surveys, UUIDs } from '@openforis/arena-core'
+import { Dates, Objects, Records, RecordUpdateResult, Surveys } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
