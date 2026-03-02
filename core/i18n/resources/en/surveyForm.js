@@ -98,7 +98,14 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
     scientificName: 'Scientific name',
     vernacularName: 'Vernacular name',
     vernacularNameAlwaysIncludedIfSingle: 'Vernacular name always included if only one',
+    vernacularNameAlwaysIncludedIfSingleInfo: `- **Enabled**: If this option is enabled and a taxon has only one vernacular name defined, that vernacular name will automatically be stored with the data when the taxon is selected.  
+- **Disabled**: only the taxon code and scientific name will be stored, even if the taxon has a single vernacular name.`,
     vernacularNameSelectionKept: 'Vernacular name selection kept',
+    vernacularNameSelectionKeptInfo: `- **Enabled**: when a taxon is selected using a vernacular (common) name, the specific vernacular name used for the search will also be stored in the data.  
+- **Disabled**: only the taxon code and scientific name will be stored, regardless of which vernacular name was used during the search.  
+In Arena Mobile:  
+- **Enabled**: each vernacular name appears as a separate item in the search results list.
+- **Disabled**: all vernacular names for a taxon are grouped together and displayed alongside the taxon (combined in a single entry). As a result, the autocomplete list contains fewer items.`,
     visibleFields: 'Visible fields',
   },
   nodeDefFile: {

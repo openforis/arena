@@ -122,22 +122,32 @@ const TaxonProps = (props) => {
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameLabels, value })}
       />
 
-      <FormItem label="surveyForm:nodeDefTaxon.vernacularNameSelectionKept">
+      <FormItem
+        label="surveyForm:nodeDefTaxon.vernacularNameSelectionKept"
+        info="surveyForm:nodeDefTaxon.vernacularNameSelectionKeptInfo"
+        infoTitleMarkdownClassName="large"
+        isInfoMarkdown
+      >
         <div className="form-item_body">
           <Checkbox
             checked={NodeDef.isVernacularNameSelectionKept(nodeDef)}
-            validation={Validation.getFieldValidation(NodeDef.propKeys.vernacularNameSelectionKept)(validation)}
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameSelectionKept, value })}
+            validation={Validation.getFieldValidation(NodeDef.propKeys.vernacularNameSelectionKept)(validation)}
           />
-          <FormItem label="surveyForm:nodeDefTaxon.vernacularNameAlwaysIncludedIfSingle">
+          <FormItem
+            label="surveyForm:nodeDefTaxon.vernacularNameAlwaysIncludedIfSingle"
+            info="surveyForm:nodeDefTaxon.vernacularNameAlwaysIncludedIfSingleInfo"
+            infoTitleMarkdownClassName="large"
+            isInfoMarkdown
+          >
             <Checkbox
               checked={NodeDefs.isVernacularNameAlwaysIncludedIfSingle(nodeDef)}
-              validation={Validation.getFieldValidation(NodeDef.propKeys.vernacularNameAlwaysIncludedIfSingle)(
-                validation
-              )}
               onChange={(value) =>
                 Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameAlwaysIncludedIfSingle, value })
               }
+              validation={Validation.getFieldValidation(NodeDef.propKeys.vernacularNameAlwaysIncludedIfSingle)(
+                validation
+              )}
             />
           </FormItem>
         </div>

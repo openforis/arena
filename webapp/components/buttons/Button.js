@@ -34,6 +34,8 @@ export const Button = forwardRef((props, ref) => {
     size = 'medium',
     testId,
     title: titleProp,
+    titleClassName,
+    titleMarkdownClassName,
     titleParams,
     variant: variantProp = 'contained',
     ...otherProps
@@ -84,7 +86,12 @@ export const Button = forwardRef((props, ref) => {
     return btn
   }
   return (
-    <TooltipNew title={title} isTitleMarkdown={isTitleMarkdown}>
+    <TooltipNew
+      className={titleClassName}
+      title={title}
+      markdownClassName={titleMarkdownClassName}
+      isTitleMarkdown={isTitleMarkdown}
+    >
       {btn}
     </TooltipNew>
   )
@@ -114,6 +121,8 @@ Button.propTypes = {
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   testId: PropTypes.string,
   title: PropTypes.string,
+  titleClassName: PropTypes.string,
+  titleMarkdownClassName: PropTypes.string,
   titleParams: PropTypes.object,
   variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
 }
