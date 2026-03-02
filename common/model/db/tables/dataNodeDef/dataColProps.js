@@ -105,7 +105,7 @@ const props = {
     },
   },
   [nodeDefType.entity]: {
-    [colValueProcessor]: () => () => Node.getIId,
+    [colValueProcessor]: () => (node) => Node.getIId(node),
   },
   [nodeDefType.file]: {
     [colValueProcessor]: ({ nodeDefCol }) => {

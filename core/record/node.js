@@ -164,6 +164,14 @@ export const setCreated = (node) => {
   node[keys.created] = true
   return node
 }
+export const setUpdated = (node) => {
+  node[keys.updated] = true
+  return node
+}
+export const setDeleted = (node) => {
+  node[keys.deleted] = true
+  return node
+}
 export const assocDeleted = R.assoc(keys.deleted)
 export const assocUpdated = R.assoc(keys.updated)
 export const assocDirty = R.assoc(dirtyFlag)

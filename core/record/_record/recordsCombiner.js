@@ -190,15 +190,16 @@ const _addNodeToUpdateResult = ({
   assignNewUuid = false,
   sideEffect = false,
 }) => {
+  const { record } = updateResult
   const newNodeToAdd = sideEffect ? Node.setCreated(node) : Node.assocCreated(true)(node)
   if (assignNewUuid) {
+    // TODO
     newNodeToAdd[Node.keys.uuid] = UUIDs.v4()
   }
   delete newNodeToAdd[Node.keys.id] // clear internal id
-  newNodeToAdd[Node.keys.recordUuid] = updateResult.record.uuid
+  newNodeToAdd[Node.keys.recordUuid] = record.uuid
 
-  const parentEntity =
-    parentEntityParam ?? RecordReader.getNodeByInternalId(Node.getParentInternalId(node))(updateResult.record)
+  const parentEntity = parentEntityParam ?? RecordReader.getNodeByInternalId(Node.getParentInternalId(node))(record)
   _recalculateNodeHierarchy({ node: newNodeToAdd, parentEntity })
   updateResult.addNode(newNodeToAdd, { sideEffect })
 }
@@ -256,9 +257,9 @@ const replaceNodes = ({ childrenSource, childrenTarget, entityTarget, sideEffect
   const childrenTargetToDeleteIIds = childrenTarget.map(Node.getIId)
   const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteIIds, { sideEffect })(updateResult.record)
   updateResult.merge(nodesDeleteUpdateResult)
-  childrenSource.forEach((childSource) => {
+  for (const childSource of childrenSource) {
     _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget })
-  })
+  }
 }
 
 const _mergeMultipleAttributes = ({
@@ -312,10 +313,11 @@ const _cloneEntityAndDescendants = async ({
   sideEffect = false,
 }) => {
   const newNodeIIdByOldIId = {}
+  let lastNodeInternalId = RecordReader.getLastNodeInternalId(recordSource)
   RecordReader.visitDescendantsAndSelf(entitySource, (visitedChildSource) => {
     const oldIId = Node.getIId(visitedChildSource)
     const oldParentIId = Node.getParentInternalId(visitedChildSource)
-    const newIId = UUIDs.v4()
+    const newIId = ++lastNodeInternalId
     newNodeIIdByOldIId[oldIId] = newIId
     const newParentEntityIId =
       visitedChildSource === entitySource

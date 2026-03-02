@@ -24,6 +24,8 @@ const {
 /**
  * === simple getters.
  */
+export const getLastNodeInternalId = R.propOr(0, keys.lastNodeInternalId)
+
 export const getNodes = R.propOr({}, keys.nodes)
 export const getNodesArray = (record) => Object.values(getNodes(record))
 

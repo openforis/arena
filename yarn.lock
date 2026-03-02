@@ -3845,9 +3845,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@file:../arena-core::locator=open-foris-arena%40workspace%3A.":
+"@openforis/arena-core@file:../arena-core::locator=%40openforis%2Farena-server%40file%3A..%2Farena-server%23..%2Farena-server%3A%3Ahash%3D88710c%26locator%3Dopen-foris-arena%2540workspace%253A.":
   version: 1.0.88
-  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=5515fb&locator=open-foris-arena%40workspace%3A."
+  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=e9da4d&locator=%40openforis%2Farena-server%40file%3A..%2Farena-server%23..%2Farena-server%3A%3Ahash%3D88710c%26locator%3Dopen-foris-arena%2540workspace%253A."
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     bignumber.js: "npm:^9.3.1"
@@ -3859,13 +3859,13 @@ __metadata:
     moment: "npm:^2.30.1"
     proj4: "npm:^2.19.10"
     uuid: "npm:^11.0.3"
-  checksum: 10c0/694fd73c4e3cb50e56eca22b3bf0cccdd2c7cdd7e388536ce57c2ecc4f7dedd4891f9b4f825a22d2d137962a029d10d261a8ceea61b5adcd8f3564dd29dede94
+  checksum: 10c0/f593f8d284de35dae44074a4fef21131ea0038a4740569f5795359e65d2a28a2f16b179ed10d3892ba37ac27aa8d8a77de069853e6c6cdebc66b912eca9b2f8d
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^1.0.88":
+"@openforis/arena-core@file:../arena-core::locator=open-foris-arena%40workspace%3A.":
   version: 1.0.88
-  resolution: "@openforis/arena-core@npm:1.0.88::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.0.88%2F26c4efd90751214cca71f85a526478a89a6469d0"
+  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=e9da4d&locator=open-foris-arena%40workspace%3A."
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     bignumber.js: "npm:^9.3.1"
@@ -3877,16 +3877,16 @@ __metadata:
     moment: "npm:^2.30.1"
     proj4: "npm:^2.19.10"
     uuid: "npm:^11.0.3"
-  checksum: 10c0/c44fcdd7bb76bd7955645ad9621b6c124da45f7cf787ad1cf43c2317e781aba91b927a19a767e3cb22d6257f6b20c7036a902f93beb68ba15b1b0304ad10e543
+  checksum: 10c0/f593f8d284de35dae44074a4fef21131ea0038a4740569f5795359e65d2a28a2f16b179ed10d3892ba37ac27aa8d8a77de069853e6c6cdebc66b912eca9b2f8d
   languageName: node
   linkType: hard
 
 "@openforis/arena-server@file:../arena-server::locator=open-foris-arena%40workspace%3A.":
-  version: 1.2.15
-  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=eca49a&locator=open-foris-arena%40workspace%3A."
+  version: 1.2.17
+  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=88710c&locator=open-foris-arena%40workspace%3A."
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^1.0.88"
+    "@openforis/arena-core": ../arena-core
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.1"
     cookie-parser: "npm:^1.4.7"
@@ -3902,9 +3902,9 @@ __metadata:
     passport: "npm:^0.7.0"
     passport-jwt: "npm:^4.0.1"
     passport-local: "npm:^1.0.0"
-    pg-promise: "npm:^12.6.0"
+    pg-promise: "npm:^12.6.1"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/f6958312a5335778a99371e03e4b3f778942bcfefb755f8ddbc91a145d22d3b7c65e4cb957e1b239f7b2d8cb7b85fb62b831d7717abdf4a9ba79e567ba2ca9ab
+  checksum: 10c0/66c2a7aeea7b7d45b020fc7ab450cd5bfd7de4085f99d2623711fe5c2797111951b9976af07ece2c34b7ceec6ac05da9a165e15deda858cedc8578d68545f41e
   languageName: node
   linkType: hard
 
@@ -16072,9 +16072,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-promise@npm:^12.6.0":
-  version: 12.6.0
-  resolution: "pg-promise@npm:12.6.0"
+"pg-promise@npm:^12.6.1":
+  version: 12.6.1
+  resolution: "pg-promise@npm:12.6.1"
   dependencies:
     assert-options: "npm:0.8.3"
     pg: "npm:8.18.0"
@@ -16082,7 +16082,7 @@ __metadata:
     spex: "npm:4.1.0"
   peerDependencies:
     pg-query-stream: 4.12.0
-  checksum: 10c0/aa8e8c20ca0c02b8acf06acae2bdb3e124ec97bf3e27a8e78667807cf2545774ef59862b3d3dd34691c02155127b3ac4a9c853f0936b2e1cc51a9d68419a8455
+  checksum: 10c0/ff67714a5a1d3cb70259fe633017f48195adeb960fa8a71c6eaf4a74682a36d03d4bbaa407589f747ab4f9cd37c0bca4bdb21a135b000db13e2a11607360f896
   languageName: node
   linkType: hard
 

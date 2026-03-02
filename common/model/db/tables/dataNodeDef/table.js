@@ -79,10 +79,6 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return columnSet.iId
   }
 
-  get columnIId() {
-    return this.getColumn(columnSet.iId)
-  }
-
   get columnParentInternalId() {
     return this.getColumn(columnSet.parentInternalId)
   }

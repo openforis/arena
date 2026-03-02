@@ -142,11 +142,12 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
     )
   ).map((nodeReloaded) => {
     // preserve status flags (used in rdb updates)
+    // side effect on nodes is possible: update node in place because nodes have been fetched from DB
     const oldNode = nodes[Node.getIId(nodeReloaded)]
     return R.pipe(
-      Node.assocCreated(Node.isCreated(oldNode)),
-      Node.assocDeleted(Node.isDeleted(oldNode)),
-      Node.assocUpdated(Node.isUpdated(oldNode))
+      Node.setCreated(Node.isCreated(oldNode)),
+      Node.setDeleted(Node.isDeleted(oldNode)),
+      Node.setUpdated(Node.isUpdated(oldNode))
     )(nodeReloaded)
   })
   return ObjectUtils.toIIdIndexedObj(nodesReloadedArray)
