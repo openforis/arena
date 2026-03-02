@@ -32,7 +32,7 @@ export const headerColorRgbCodesByColor = {
   [FormHeaderColor.yellow]: '#fffdaf',
 }
 
-const singleEntityIcon = <span className="icon icon-insert-template icon-left" />
+const singleEntityIcon = <span className="icon icon-file-empty icon-left" />
 const multipleAttributeIcon = <span title="Multiple">M</span>
 const keyIcon = <span className="icon icon-key icon-left" />
 
@@ -156,11 +156,26 @@ const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropBy
 
 export const getIconByType = getPropByType('icon')
 
-export const getIconByNodeDef = (nodeDef, includeKey = false) => (
+const getEntityIcon = ({ nodeDef, cycle }) => {
+  if (NodeDef.isRoot(nodeDef)) {
+    return undefined
+  }
+  if (NodeDef.isSingle(nodeDef)) {
+    return singleEntityIcon
+  }
+  // multiple entity with form layout
+  if (NodeDefLayout.isRenderForm(cycle)(nodeDef)) {
+    return <span className="icon icon-files-empty icon-left" />
+  }
+  // multiple entity with table layout
+  return <span className="icon icon-table2 icon-left" />
+}
+
+export const getIconByNodeDef = ({ nodeDef, cycle, includeKey = false }) => (
   <div className="node-def__icon-wrapper">
     {includeKey && NodeDef.isKey(nodeDef) && keyIcon}
     {NodeDef.isMultipleAttribute(nodeDef) && multipleAttributeIcon}
-    {NodeDef.isSingleEntity(nodeDef) ? singleEntityIcon : getIconByType(NodeDef.getType(nodeDef))}
+    {NodeDef.isEntity(nodeDef) ? getEntityIcon({ nodeDef, cycle }) : getIconByType(NodeDef.getType(nodeDef))}
   </div>
 )
 

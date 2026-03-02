@@ -2,17 +2,22 @@ export default {
   authenticatorCodeOne: 'Codigo de autenticador 1',
   authenticatorCodeTwo: 'Codigo de autenticador 2',
   authenticatorCodeTwoInfo: 'Espera 30 segundos e ingresa un segundo código',
+  backupCodesRegenerated: {
+    title: 'Codigos de respaldo regenerados correctamente',
+    message: `Guarda los siguientes 8 codigos de respaldo en un lugar seguro:  
+{{backupCodes}}  
+
+Usalos para acceder a tu cuenta si pierdes acceso a tu dispositivo autenticador.  
+**Cada codigo de respaldo solo se puede usar una vez**.  
+Solo se pueden ver ahora, asi que asegurate de **guardarlos ahora**.`,
+  },
   create: {
     label: 'Crear',
   },
   creationSuccessful: {
     title: 'Dispositivo 2FA creado correctamente',
     message: `El dispositivo 2FA "{{deviceName}}" ha sido creado.  
-Guarda los siguientes 8 codigos de respaldo en un lugar seguro:  
-**{{backupCodes}}**  
-Se pueden usar para acceder a tu cuenta si pierdes el acceso a tu dispositivo autenticador.
-Solo se puede usar un codigo de respaldo una vez. Despues de usar un codigo de respaldo, ya no sera valido.
-Los codigos de respaldo solo se pueden ver al momento de crear el dispositivo, asi que asegurate de guardarlos ahora.`,
+$t(user2FADevice:backupCodesRegenerated.message)`,
   },
   deletion: {
     confirm: 'Estas seguro de que deseas eliminar el dispositivo "{{deviceName}}"?',
@@ -20,11 +25,18 @@ Los codigos de respaldo solo se pueden ver al momento de crear el dispositivo, a
     successful: 'Dispositivo eliminado correctamente',
   },
   deviceName: 'Nombre del dispositivo',
+  deviceNameFinal: 'Nombre del dispositivo mostrado en la app de autenticacion',
   enabled: 'Habilitado',
   error: {
     fetchDevice: 'Error al obtener detalles del dispositivo: {{message}}',
     createDevice: 'Error al crear el dispositivo: {{message}}',
     updateDevice: 'Error al actualizar el dispositivo: {{message}}',
+    regenerateBackupCodes: 'Error al regenerar codigos de respaldo: {{message}}',
+  },
+  regenerateBackupCodes: {
+    label: 'Regenerar codigos de respaldo',
+    confirm: `Estas seguro de que deseas regenerar los codigos de respaldo para el dispositivo "{{deviceName}}"?  
+Los codigos de respaldo anteriores ya no funcionaran.`,
   },
   showSecretKey: 'Mostrar clave secreta',
   validation: {

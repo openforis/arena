@@ -11,15 +11,17 @@ export const useTaxa = ({ nodeDef, draft, entryDataQuery, field, fieldValue, par
   const survey = useSurvey()
   const surveyId = Survey.getId(survey)
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  const includeVerancularNameIfSingle = NodeDef.isVernacularNameAlwaysIncludedIfSingle(nodeDef)
 
   const params = useMemo(
     () => ({
       filterProp: field,
       filterValue: fieldValue,
       includeUnlUnk: true,
+      includeVerancularNameIfSingle,
       draft,
     }),
-    [draft, field, fieldValue]
+    [draft, field, fieldValue, includeVerancularNameIfSingle]
   )
 
   const { data: { list = [] } = { list: [] }, dispatch: fetchTaxa } = useAsyncGetRequest(

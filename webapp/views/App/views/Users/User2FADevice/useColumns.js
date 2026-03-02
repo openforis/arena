@@ -4,14 +4,21 @@ import { User2FADevice } from '@core/user2FADevice'
 import * as DateUtils from '@core/dateUtils'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { useUser } from '@webapp/store/user'
 
-export const useUser2FADeviceColumns = () =>
-  useMemo(
+export const useUser2FADeviceColumns = () => {
+  const user = useUser()
+  return useMemo(
     () => [
       {
         key: 'deviceName',
         header: 'user2FADevice:deviceName',
         renderItem: ({ item }) => <LabelWithTooltip label={User2FADevice.getDeviceName(item)} />,
+      },
+      {
+        key: 'deviceNameFinal',
+        header: 'user2FADevice:deviceNameFinal',
+        renderItem: ({ item }) => <LabelWithTooltip label={User2FADevice.getDeviceNameFinal({ user })(item)} />,
       },
       {
         key: 'enabled',
@@ -32,5 +39,6 @@ export const useUser2FADeviceColumns = () =>
         renderItem: ({ item }) => DateUtils.convertDateTimeFromISOToDisplay(User2FADevice.getDateModified(item)),
       },
     ],
-    []
+    [user]
   )
+}

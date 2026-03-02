@@ -1,4 +1,5 @@
 import * as A from '@core/arena'
+import * as User from '@core/user/user'
 
 const keys = {
   deviceName: 'deviceName',
@@ -20,6 +21,12 @@ const getSecret = A.propOr(null, keys.secret)
 const getOtpAuthUrl = A.propOr(null, keys.otpAuthUrl)
 const getBackupCodes = A.propOr([], keys.backupCodes)
 
+// utils
+const getDeviceNameFinal =
+  ({ user }) =>
+  (device) =>
+    `Arena: ${getDeviceName(device)} - ${User.getEmail(user)}`
+
 export const User2FADevice = {
   keys,
   getUuid,
@@ -30,4 +37,5 @@ export const User2FADevice = {
   getSecret,
   getOtpAuthUrl,
   getBackupCodes,
+  getDeviceNameFinal,
 }

@@ -96,7 +96,6 @@ export const useBuildTreeData = ({
   const pagesUuidMap = usePagesUuidMap()
   const nodeDefLabelTypeInStore = useNodeDefLabelType()
   const nodeDefLabelType = nodeDefLabelTypeProp ?? nodeDefLabelTypeInStore
-  const showIcons = includeSingleAttributes
 
   const stack = []
 
@@ -109,7 +108,7 @@ export const useBuildTreeData = ({
     return {
       key: NodeDef.getUuid(nodeDef),
       disabled: isNodeDefDisabled(nodeDef),
-      icon: showIcons ? NodeDefUIProps.getIconByNodeDef(nodeDef, true) : undefined,
+      icon: NodeDefUIProps.getIconByNodeDef({ nodeDef, cycle, includeKey: true }),
       label: `${nodeDefLabel}${suffix}`,
       testId: TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef)),
     }

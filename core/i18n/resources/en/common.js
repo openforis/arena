@@ -265,7 +265,7 @@ Try again?`,
       instructions: `1. Start **Arena Mobile** app on your mobile device
 2. Go to the **Settings** menu
 3. Select  **Connection to server**
-4. Press **Scan QR code**
+4. Press **Login using QR code**
 5. Scan the QR code displayed on this screen`,
       success: 'Login successful!',
       error: 'Error generating QR code: {{error}}',
@@ -1173,6 +1173,9 @@ $t(common.appNameFull)
       dateTimeDiff: 'Returns the difference (in minutes) from 2 date-time couples',
       distance: 'Returns the distance (in meters) between the specified coordinates',
       first: 'Returns the first value or node of the specified multiple attribute or entity',
+      geoCoordinateAtDistance:
+        'Returns the coordinates at a specified distance and bearing from the specified coordinates',
+      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
       geoPolygon: 'Generates a polygon in GeoJSON from a list of coordinates',
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
       index: 'Returns the index of the specified node among its siblings',
@@ -1773,6 +1776,11 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     call: 'Function',
     operator: 'Operator',
 
+    geoCoordinateAtDistanceEditor: {
+      coordinateAttributeOrigin: 'Coordinate attribute origin',
+      distanceAttribute: 'Distance attribute',
+      bearingAttribute: 'Bearing attribute',
+    },
     coordinateAttributeWithPosition: 'Coordinate attribute {{position}}',
 
     dateTimeDiffEditor: {

@@ -258,9 +258,9 @@ export default {
     qrCodeLoginDialog: {
       title: 'Arena Mobile-аас QR код ашиглан нэвтрэх',
       instructions: `1. Гар утсан дээрээ **Arena Mobile** аппыг нээнэ үү
-2. Тохиргооны цэс рүү орно уу
-3. "Серверт холбогдох"-ыг сонгоно уу
-4. "QR код уншуулах"-ыг дарна уу
+2. **Тохиргоо** цэс рүү орно уу
+3. **Серверт холбогдох**-ыг сонгоно уу
+4. **QR кодоор нэвтрэх**-ийг дарна уу
 5. Энэ дэлгэц дээр харагдаж буй QR кодыг уншуулна уу`,
       success: 'Амжилттай нэвтэрлээ!',
       error: 'QR код үүсгэхэд алдаа гарлаа: {{error}}',
@@ -1141,6 +1141,8 @@ $t(common.appNameFull)
       categoryItemProp: 'Заасан кодтой ангиллын элементийн заасан $t(extraProp.label)-ийн утгыг буцаана',
       dateTimeDiff: '2 огноо-цагийн хоорондох ялгааг (минутаар) буцаана',
       distance: 'Заасан координатуудын хоорондох зайг (метрээр) буцаана',
+      geoCoordinateAtDistance: 'Заасан координатаас тодорхой зай болон чиглэлд байрлах координатыг буцаана',
+      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
       first: 'Заасан олон шинж чанар эсвэл объектын эхний утга эсвэл зангилааг буцаана',
       geoPolygon: 'Координатуудын жагсаалтаас GeoJSON-д олон өнцөгт үүсгэнэ',
       includes: 'Заасан олон шинж чанар заасан утгыг агуулсан бол үнэн буцаана.',
@@ -1738,6 +1740,12 @@ $t(common.cantUndoWarning)`,
     const: 'Тогтмол утга',
     call: 'Функц',
     operator: 'Оператор',
+
+    geoCoordinateAtDistanceEditor: {
+      coordinateAttributeOrigin: 'Эх координатын шинж чанар',
+      distanceAttribute: 'Зайны шинж чанар',
+      bearingAttribute: 'Азимутын шинж чанар',
+    },
 
     coordinateAttributeWithPosition: 'Координат шинж чанар {{position}}',
 

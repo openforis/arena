@@ -84,6 +84,7 @@ export const propKeys = {
   vernacularNameLabels: 'vernacularNameLabels',
   visibleFields: 'visibleFields',
   vernacularNameSelectionKept: 'vernacularNameSelectionKept',
+  vernacularNameAlwaysIncludedIfSingle: 'vernacularNameAlwaysIncludedIfSingle',
 
   // File
   maxFileSize: 'maxFileSize', // max file size in MB
@@ -297,6 +298,9 @@ export const getVisibleFields = (nodeDef) => {
   return getProp(propKeys.visibleFields, visibleFieldsDefault)(nodeDef)
 }
 export const isVernacularNameSelectionKept = ObjectUtils.isPropTrue(propKeys.vernacularNameSelectionKept)
+export const isVernacularNameAlwaysIncludedIfSingle = ObjectUtils.isPropTrue(
+  propKeys.vernacularNameAlwaysIncludedIfSingle
+)
 // text
 export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.singleLine)
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
@@ -592,7 +596,6 @@ export const copyLayout =
 /**
  * It keeps only cycleToKeep information and moves it to cycleTarget.
  * (it does side effect on the specified nodeDef).
- *
  * @param {!object} params - The function parameters.
  * @param {!string} params.cycleToKeep - Id of source cycle to keep.
  * @param {!string} params.cycleTarget - Id of target cycle.

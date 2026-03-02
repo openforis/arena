@@ -1,6 +1,6 @@
 {
   "name": "open-foris-arena",
-  "version": "2.3.8",
+  "version": "2.3.11",
   "license": "MIT",
   "engines": {
     "node": "^24.11.1"
@@ -117,7 +117,6 @@
     "@turf/bbox-polygon": "^7.3.2",
     "@turf/centroid": "^7.3.2",
     "@turf/circle": "^7.3.2",
-    "@turf/destination": "^7.3.2",
     "@turf/helpers": "^7.3.2",
     "@turf/length": "^7.3.2",
     "@uiw/react-codemirror": "^4.25.4",

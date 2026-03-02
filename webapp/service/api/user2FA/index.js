@@ -19,6 +19,11 @@ export const verifyDevice = async ({ deviceUuid, token1, token2 }) => {
   await axios.post(`/api/2fa/device/${deviceUuid}/verify`, { token1, token2 })
 }
 
+export const regenerateBackupCodes = async ({ deviceUuid }) => {
+  const { data } = await axios.post(`/api/2fa/device/${deviceUuid}/regenerate-backup-codes`)
+  return data.backupCodes
+}
+
 export const removeDevice = async (deviceUuid) => {
   await axios.delete(`/api/2fa/device/${deviceUuid}/remove`)
 }

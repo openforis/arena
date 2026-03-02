@@ -80,11 +80,11 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity, inc
   })
 
   if (includeCustomFunctions) {
-    Object.keys(functionExamples[mode]).forEach((fnName) => {
-      if (fnName?.toLowerCase().startsWith(tokenText)) {
+    for (const fnName in functionExamples[mode]) {
+      if (fnName.toLowerCase().includes(tokenText)) {
         completions.push(getFunctionCompletion({ mode, i18n, fnName }))
       }
-    })
+    }
   }
   return completions
 }
