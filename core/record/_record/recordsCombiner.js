@@ -187,16 +187,21 @@ const _addNodeToUpdateResult = ({
   updateResult,
   node,
   parentEntity: parentEntityParam = undefined,
-  assignNewUuid = false,
+  assignNewIds = false,
   sideEffect = false,
 }) => {
   const { record } = updateResult
   const newNodeToAdd = sideEffect ? Node.setCreated(node) : Node.assocCreated(true)(node)
-  if (assignNewUuid) {
-    // TODO
-    newNodeToAdd[Node.keys.uuid] = UUIDs.v4()
+  if (assignNewIds) {
+    const lastNodeInternalId = RecordReader.getLastNodeInternalId(record)
+    const newInternalId = lastNodeInternalId + 1
+    newNodeToAdd[Node.keys.iId] = newInternalId
+    const recordUpdated = { ...record, lastNodeInternalId: newInternalId }
+    updateResult.merge(new RecordUpdateResult({ record: recordUpdated }))
   }
-  delete newNodeToAdd[Node.keys.id] // clear internal id
+  // clear id, used for storage in DB, but not needed for the updateResult
+  delete newNodeToAdd[Node.keys.id]
+
   newNodeToAdd[Node.keys.recordUuid] = record.uuid
 
   const parentEntity = parentEntityParam ?? RecordReader.getNodeByInternalId(Node.getParentInternalId(node))(record)
@@ -283,7 +288,7 @@ const _mergeMultipleAttributes = ({
       }
     } else {
       // keep nodes from both records, unless they have the same value
-      childrenSource.forEach((childSource) => {
+      for (const childSource of childrenSource) {
         const sourceValue = Node.getValue(childSource)
         if (
           !targetValues.find((targetValue) =>
@@ -298,9 +303,9 @@ const _mergeMultipleAttributes = ({
           )
         ) {
           // value not in target values => add it to the record
-          _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget, assignNewUuid: true })
+          _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget, assignNewIds: true })
         }
-      })
+      }
     }
   }
 }

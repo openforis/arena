@@ -94,9 +94,8 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
     meta[Node.metaKeys.defaultValue] = false
   }
   if (!Record.isPreview(record)) {
-    // Keep only node uuid, recordUuid, meta and value
     const logContent = R.pipe(
-      R.pick([Node.keys.uuid, Node.keys.recordUuid, Node.keys.nodeDefUuid, Node.keys.value]),
+      R.pick([Node.keys.iId, Node.keys.recordUuid, Node.keys.nodeDefUuid, Node.keys.value]),
       R.assoc(Node.keys.meta, meta)
     )(node)
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
