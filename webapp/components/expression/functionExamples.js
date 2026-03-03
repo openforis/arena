@@ -45,12 +45,12 @@ const functionExamples = {
   },
 }
 
-const experimentalFunctions = [functionNames.geoCoordinateAtDistance]
+const experimentalFunctions = new Set()
 
 const isFunctionAvailable =
   ({ experimentalFeatures }) =>
   (functionName) =>
-    experimentalFeatures || !experimentalFunctions.includes(functionName)
+    experimentalFeatures || !experimentalFunctions.has(functionName)
 
 export const getAvailableFunctionExamples = ({ experimentalFeatures }) =>
   Object.entries(functionExamples).reduce((accFunctionsByMode, [mode, functionsInMode]) => {
