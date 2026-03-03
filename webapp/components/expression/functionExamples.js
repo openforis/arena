@@ -46,16 +46,18 @@ const functionExamples = {
   },
 }
 
-const experimentalFunctions = []
+const experimentalFunctions = [functionNames.geoCoordinateAtDistance]
 
-const isFunctionAvailable = (functionName) =>
-  ProcessUtils.ENV.experimentalFeatures || !experimentalFunctions.includes(functionName)
+const isFunctionAvailable =
+  ({ experimentalFeatures }) =>
+  (functionName) =>
+    experimentalFeatures || !experimentalFunctions.includes(functionName)
 
-const availableFunctionExamples = Object.entries(functionExamples).reduce(
-  (accFunctionsByMode, [mode, functionsInMode]) => {
+export const getAvailableFunctionExamples = ({ experimentalFeatures }) =>
+  Object.entries(functionExamples).reduce((accFunctionsByMode, [mode, functionsInMode]) => {
     const availableFunctionInMode = Object.entries(functionsInMode).reduce(
       (accFunctionsByName, [functionName, value]) => {
-        if (isFunctionAvailable(functionName)) {
+        if (isFunctionAvailable({ experimentalFeatures })(functionName)) {
           accFunctionsByName[functionName] = value
         }
         return accFunctionsByName
@@ -64,8 +66,4 @@ const availableFunctionExamples = Object.entries(functionExamples).reduce(
     )
     accFunctionsByMode[mode] = availableFunctionInMode
     return accFunctionsByMode
-  },
-  {}
-)
-
-export default availableFunctionExamples
+  }, {})

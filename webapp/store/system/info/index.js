@@ -5,6 +5,7 @@ import {
   useSystemConfig,
   useSystemConfigFileUploadLimit,
   useSystemConfigFileUploadLimitMB,
+  useSystemConfigExperimentalFeatures,
 } from './hooks'
 
 export {
@@ -14,4 +15,5 @@ export {
   useSystemConfig,
   useSystemConfigFileUploadLimit,
   useSystemConfigFileUploadLimitMB,
+  useSystemConfigExperimentalFeatures,
 }

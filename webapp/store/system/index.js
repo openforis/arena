@@ -10,6 +10,7 @@ export {
   useSystemConfig,
   useSystemConfigFileUploadLimit,
   useSystemConfigFileUploadLimitMB,
+  useSystemConfigExperimentalFeatures,
 } from './info'
 
 // ====== system error
