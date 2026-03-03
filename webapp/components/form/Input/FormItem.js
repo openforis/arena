@@ -14,6 +14,9 @@ export const FormItem = (props) => {
     className = '',
     hideLabelInMobile = false,
     info = null,
+    infoTitleClassName = undefined,
+    infoTitleMarkdownClassName = undefined,
+    infoTitleMaxWidth = undefined,
     isInfoMarkdown = false,
     label: labelProp = null,
     labelParams = null,
@@ -32,7 +35,16 @@ export const FormItem = (props) => {
         <div className="form-label-wrapper">
           {label}
           {required ? ' *' : ''}
-          {info && <ButtonIconInfo onClick={onInfoClick} title={info} isTitleMarkdown={isInfoMarkdown} />}
+          {info && (
+            <ButtonIconInfo
+              onClick={onInfoClick}
+              title={info}
+              isTitleMarkdown={isInfoMarkdown}
+              titleClassName={infoTitleClassName}
+              titleMarkdownClassName={infoTitleMarkdownClassName}
+              titleMaxWidth={infoTitleMaxWidth}
+            />
+          )}
         </div>
       </div>
     ) : null
@@ -51,6 +63,9 @@ FormItem.propTypes = {
   hideLabelInMobile: PropTypes.bool,
   info: PropTypes.string,
   isInfoMarkdown: PropTypes.bool,
+  infoTitleClassName: PropTypes.string,
+  infoTitleMarkdownClassName: PropTypes.string,
+  infoTitleMaxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   labelParams: PropTypes.object,
   onInfoClick: PropTypes.func,

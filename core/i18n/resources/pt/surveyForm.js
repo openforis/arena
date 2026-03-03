@@ -98,7 +98,14 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
     scientificName: 'Nome científico',
     vernacularName: 'Nome vernacular',
     vernacularNameAlwaysIncludedIfSingle: 'Nome vernacular sempre incluído quando houver apenas um',
+    vernacularNameAlwaysIncludedIfSingleInfo: `- **Ativado**: se esta opção estiver ativada e um táxon tiver apenas um nome vernacular definido, esse nome vernacular será automaticamente armazenado com os dados quando o táxon for selecionado.  
+- **Desativado**: apenas o código do táxon e o nome científico serão armazenados, mesmo que o táxon tenha apenas um nome vernacular.`,
     vernacularNameSelectionKept: 'Seleção do nome vernacular mantida',
+    vernacularNameSelectionKeptInfo: `- **Ativado**: quando um táxon é selecionado usando um nome vernacular (comum), o nome vernacular específico usado na busca também será armazenado nos dados.  
+- **Desativado**: apenas o código do táxon e o nome científico serão armazenados, independentemente de qual nome vernacular foi usado durante a busca.  
+No Arena Mobile:  
+- **Ativado**: cada nome vernacular aparece como um item separado na lista de resultados da busca.
+- **Desativado**: todos os nomes vernaculares de um táxon são agrupados e exibidos junto ao táxon (combinados em uma única entrada). Como resultado, a lista de autocompletar contém menos itens.`,
     visibleFields: 'Campos visíveis',
   },
   nodeDefFile: {

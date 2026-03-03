@@ -98,7 +98,14 @@ Confirmar promoción`,
     scientificName: 'Nombre científico',
     vernacularName: 'Nombre vernáculo',
     vernacularNameAlwaysIncludedIfSingle: 'Nombre vernáculo siempre incluido si solo hay uno',
+    vernacularNameAlwaysIncludedIfSingleInfo: `- **Activado**: si esta opción está activada y un taxón tiene definido un solo nombre vernáculo, ese nombre vernáculo se almacenará automáticamente con los datos cuando se seleccione el taxón.  
+- **Desactivado**: solo se almacenarán el código del taxón y el nombre científico, incluso si el taxón tiene un solo nombre vernáculo.`,
     vernacularNameSelectionKept: 'Selección de nombre vernáculo mantenida',
+    vernacularNameSelectionKeptInfo: `- **Activado**: cuando se selecciona un taxón usando un nombre vernáculo (común), también se almacenará en los datos el nombre vernáculo específico usado para la búsqueda.  
+- **Desactivado**: solo se almacenarán el código del taxón y el nombre científico, sin importar qué nombre vernáculo se haya usado durante la búsqueda.  
+En Arena Mobile:  
+- **Activado**: cada nombre vernáculo aparece como un elemento separado en la lista de resultados de búsqueda.
+- **Desactivado**: todos los nombres vernáculos de un taxón se agrupan y se muestran junto al taxón (combinados en una sola entrada). Como resultado, la lista de autocompletado contiene menos elementos.`,
     visibleFields: 'Campos visibles',
   },
   nodeDefFile: {
