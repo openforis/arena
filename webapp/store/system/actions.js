@@ -15,12 +15,12 @@ export const initSystem = () => async (dispatch) => {
 
     analytics.identify({ userId: user?.uuid, properties: user })
 
-    const sytemInitPayload = { user, survey }
+    const systemInitPayload = { user, survey }
 
     if (user) {
       const { appInfo, config } = await API.fetchInfo()
 
-      Object.assign(sytemInitPayload, { appInfo, config })
+      Object.assign(systemInitPayload, { appInfo, config })
 
       const activeJob = await API.fetchActiveJob()
       if (activeJob) {
@@ -33,7 +33,7 @@ export const initSystem = () => async (dispatch) => {
 
       dispatch(MessageNotificationActions.fetchMessagesNotifiedToUser({ i18n }))
     }
-    dispatch({ type: SystemActionTypes.SYSTEM_INIT, ...sytemInitPayload })
+    dispatch({ type: SystemActionTypes.SYSTEM_INIT, ...systemInitPayload })
   } catch (error) {
     dispatch({
       type: SystemActionTypes.SYSTEM_INIT,
