@@ -5,14 +5,13 @@ import { useDispatch } from 'react-redux'
 
 import { UUIDs } from '@openforis/arena-core'
 
-import * as ProcessUtils from '@core/processUtils'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
@@ -24,8 +23,6 @@ import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
 import { ImportStartButton } from './ImportStartButton'
-
-const fileMaxSize = ProcessUtils.ENV.fileUploadLimit / 1024 ** 2 // in MB
 
 const acceptedFileExtensions = ['zip']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
@@ -69,6 +66,7 @@ export const DataImportArenaView = () => {
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
+  const fileMaxSizeMB = useSystemConfigFileUploadLimitMB()
 
   const [state, setState] = useState({
     cycle: surveyCycle,
@@ -137,7 +135,7 @@ export const DataImportArenaView = () => {
           />
         </FormItem>
 
-        <Dropzone maxSize={fileMaxSize} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
+        <Dropzone maxSize={fileMaxSizeMB} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
 
         {userIsSystemAdmin && (
           <FormItem className="display-flex" label="dataImportView.fileUploadChunkSize.label">

@@ -1,13 +1,13 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import * as ExpressionVariables from './expressionVariables'
-import functionExamples from './functionExamples'
+import { getAvailableFunctionExamples } from './functionExamples'
 
 const _findCharIndex = ({ value, end, matchingRegEx }) => {
   for (let i = end; i >= 0; i -= 1) {
@@ -41,20 +41,26 @@ const getVariableCompletion = ({ group = null, variable }) => {
   }
 }
 
-const getFunctionCompletion = ({ mode, i18n, fnName }) => {
+const getFunctionCompletion = ({ mode, i18n, fnName, functionExample }) => {
   const description = i18n.t(`nodeDefEdit.functionDescriptions.${fnName}`)
-  const exampleUsage = functionExamples[mode][fnName]
   // const label = `${i18n.t('nodeDefEdit.function')}: ${fnName}: ${exampleUsage}`
   const completion = {
     label: fnName,
-    detail: `e.g. ${exampleUsage}\n${description}`,
+    detail: `e.g. ${functionExample}\n${description}`,
     apply: `${fnName}()`,
     type: 'function',
   }
   return completion
 }
 
-const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity, includeCustomFunctions = true }) => {
+const getCompletions = ({
+  mode,
+  i18n,
+  availableFunctionExamples,
+  token,
+  variablesGroupedByParentEntity,
+  includeCustomFunctions = true,
+}) => {
   const completions = []
   const tokenText = token.text.toLowerCase()
 
@@ -80,9 +86,10 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity, inc
   })
 
   if (includeCustomFunctions) {
-    for (const fnName in functionExamples[mode]) {
+    for (const fnName in availableFunctionExamples[mode]) {
       if (fnName.toLowerCase().includes(tokenText)) {
-        completions.push(getFunctionCompletion({ mode, i18n, fnName }))
+        const functionExample = availableFunctionExamples[mode][fnName]
+        completions.push(getFunctionCompletion({ mode, i18n, fnName, functionExample }))
       }
     }
   }
@@ -151,6 +158,11 @@ export const useAutocompletionSource = ({ mode, nodeDefCurrent, isContextParent 
   const i18n = useI18n()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
+  const availableFunctionExamples = useMemo(
+    () => getAvailableFunctionExamples({ experimentalFeatures }),
+    [experimentalFeatures]
+  )
 
   return useCallback(
     async (context) => {
@@ -179,6 +191,7 @@ export const useAutocompletionSource = ({ mode, nodeDefCurrent, isContextParent 
       const options = getCompletions({
         mode,
         i18n,
+        availableFunctionExamples,
         token,
         variablesGroupedByParentEntity,
         includeCustomFunctions: !nodeDefContextPath,
@@ -186,6 +199,6 @@ export const useAutocompletionSource = ({ mode, nodeDefCurrent, isContextParent 
 
       return { from: token.from, options }
     },
-    [cycle, i18n, includeAnalysis, isContextParent, mode, nodeDefCurrent, survey]
+    [mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis, availableFunctionExamples]
   )
 }

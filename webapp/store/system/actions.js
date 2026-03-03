@@ -10,13 +10,18 @@ import { SystemActionTypes } from './actionTypes'
 export const initSystem = () => async (dispatch) => {
   try {
     const i18n = useI18n()
+
     const { user, survey } = await API.fetchLoggedInUserAndSurvey()
 
     analytics.identify({ userId: user?.uuid, properties: user })
 
-    dispatch({ type: SystemActionTypes.SYSTEM_INIT, user, survey })
+    const systemInitPayload = { user, survey }
 
     if (user) {
+      const { appInfo, config } = await API.fetchInfo()
+
+      Object.assign(systemInitPayload, { appInfo, config })
+
       const activeJob = await API.fetchActiveJob()
       if (activeJob) {
         dispatch(showJobMonitor({ job: activeJob }))
@@ -28,8 +33,16 @@ export const initSystem = () => async (dispatch) => {
 
       dispatch(MessageNotificationActions.fetchMessagesNotifiedToUser({ i18n }))
     }
+    dispatch({ type: SystemActionTypes.SYSTEM_INIT, ...systemInitPayload })
   } catch (error) {
-    dispatch({ type: SystemActionTypes.SYSTEM_INIT, user: null, survey: null, errorMessage: String(error) })
+    dispatch({
+      type: SystemActionTypes.SYSTEM_INIT,
+      appInfo: null,
+      config: null,
+      user: null,
+      survey: null,
+      errorMessage: String(error),
+    })
   }
 }
 

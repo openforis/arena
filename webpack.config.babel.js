@@ -56,14 +56,12 @@ const plugins = [
       env: {
         NODE_ENV: JSON.stringify(ProcessUtils.ENV.nodeEnv),
         ALLOW_USER_ACCESS_REQUEST: process.env.ALLOW_USER_ACCESS_REQUEST,
-        EXPERIMENTAL_FEATURES: process.env.EXPERIMENTAL_FEATURES,
         APP_VERSION: gitRevisionPlugin
           ? JSON.stringify(gitRevisionPlugin.version())
           : JSON.stringify(process.env.APP_VERSION),
         RECAPTCHA_ENABLED: process.env.RECAPTCHA_ENABLED,
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
         RSTUDIO_DOWNLOAD_SERVER_URL: JSON.stringify(process.env.RSTUDIO_DOWNLOAD_SERVER_URL),
-        FILE_UPLOAD_LIMIT: Number(process.env.FILE_UPLOAD_LIMIT),
       },
     },
   }),

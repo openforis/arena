@@ -7,7 +7,6 @@ import { Objects, UUIDs } from '@openforis/arena-core'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { RecordCycle } from '@core/record/recordCycle'
@@ -16,7 +15,7 @@ import { FileUtils } from '@webapp/utils/fileUtils'
 import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
 import { useNodeDefByUuid, useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
 
@@ -42,7 +41,6 @@ const infoVisibleByOption = {
   deleteExistingEntities: true,
 }
 const fileMaxSizeDefault = 20 // 20MB
-const fileMaxSizeWithFiles = ProcessUtils.ENV.fileUploadLimit / 1024 ** 2 // in MB
 
 const allowedLabelTypes = [
   NodeDef.NodeDefLabelTypes.label,
@@ -60,6 +58,7 @@ export const DataImportFlatDataView = () => {
   const dispatch = useDispatch()
   const isSystemAdmin = useUserIsSystemAdmin()
   const canSelectCycle = surveyCycleKeys.length > 1
+  const fileUploadLimitMB = useSystemConfigFileUploadLimitMB()
 
   const [state, setState] = useState({
     cycle: canSelectCycle ? null : surveyCycle,
@@ -112,13 +111,19 @@ export const DataImportFlatDataView = () => {
     [includeFiles]
   )
 
-  const fileMaxSize = useMemo(() => (includeFiles ? fileMaxSizeWithFiles : fileMaxSizeDefault), [includeFiles])
+  const fileMaxSizeMB = useMemo(
+    () => (includeFiles ? fileUploadLimitMB : fileMaxSizeDefault),
+    [fileUploadLimitMB, includeFiles]
+  )
 
   const errorsExportFileName = `${Survey.getName(surveyInfo)}_(cycle-${RecordCycle.getLabel(cycle)})_ImportError`
 
   const { activeStep, steps } = useDataImportFlatDataViewSteps({ state, canSelectCycle })
 
-  const setStateProp = useCallback((prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value })), [])
+  const setStateProp = useCallback(
+    (prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value })),
+    [setState]
+  )
 
   const onNodeDefSelect = (nodeDef) => {
     setState((statePrev) => ({
@@ -156,14 +161,17 @@ export const DataImportFlatDataView = () => {
         return stateNext
       })
     },
-    [survey]
+    [setState, survey]
   )
 
-  const onFilesDrop = useCallback((files) => {
-    const file = files[0]
-    const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)
-    setState((statePrev) => ({ ...statePrev, file, fileFormat, fileId: UUIDs.v4() }))
-  }, [])
+  const onFilesDrop = useCallback(
+    (files) => {
+      const file = files[0]
+      const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)
+      setState((statePrev) => ({ ...statePrev, file, fileFormat, fileId: UUIDs.v4() }))
+    },
+    [setState]
+  )
 
   const onImportJobStart = useCallback(
     (job) => {
@@ -179,7 +187,7 @@ export const DataImportFlatDataView = () => {
         })
       )
     },
-    [dispatch, errorsExportFileName]
+    [dispatch, setState, errorsExportFileName]
   )
 
   const onJobCompletedDialogClose = useCallback(() => {
@@ -193,7 +201,7 @@ export const DataImportFlatDataView = () => {
         return stateNext
       })
     }
-  }, [jobCompleted])
+  }, [setState, jobCompleted])
 
   const importStartParams = {
     surveyId,
@@ -287,7 +295,7 @@ export const DataImportFlatDataView = () => {
                 </ExpansionPanel>
               )}
               <Dropzone
-                maxSize={fileMaxSize}
+                maxSize={fileMaxSizeMB}
                 accept={fileAccept}
                 onDrop={onFilesDrop}
                 droppedFiles={file ? [file] : []}
