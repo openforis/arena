@@ -1,7 +1,8 @@
-import * as SystemInfoState from './state'
 import SystemInfoReducer from './reducer'
+export { SystemInfoReducer }
 
-export { SystemInfoState, SystemInfoReducer }
+export * as SystemInfoState from './state'
+
 export {
   useSystemAppInfo,
   useSystemConfig,
