@@ -1,19 +1,11 @@
 import * as SystemInfoState from './state'
 import SystemInfoReducer from './reducer'
-import {
+
+export { SystemInfoState, SystemInfoReducer }
+export {
   useSystemAppInfo,
   useSystemConfig,
   useSystemConfigFileUploadLimit,
   useSystemConfigFileUploadLimitMB,
   useSystemConfigExperimentalFeatures,
 } from './hooks'
-
-export {
-  SystemInfoState,
-  SystemInfoReducer,
-  useSystemAppInfo,
-  useSystemConfig,
-  useSystemConfigFileUploadLimit,
-  useSystemConfigFileUploadLimitMB,
-  useSystemConfigExperimentalFeatures,
-}

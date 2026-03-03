@@ -1,4 +1,3 @@
-import * as ProcessUtils from '@core/processUtils'
 import * as Expression from '@core/expressionParser/expression'
 
 const { functionNames, modes } = Expression
