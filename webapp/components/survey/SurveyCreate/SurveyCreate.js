@@ -14,7 +14,7 @@ import { RecordCycle } from '@core/record/recordCycle'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { contentTypes } from '@webapp/service/api'
-import { useI18n, useSystemConfigFileUploadLimit } from '@webapp/store/system'
+import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
@@ -88,8 +88,7 @@ const SurveyCreate = (props) => {
     navigate(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
 
-  const fileUploadLimit = useSystemConfigFileUploadLimit()
-  const fileMaxSizeMB = fileUploadLimit / 1024 ** 2
+  const fileUploadLimitMB = useSystemConfigFileUploadLimitMB()
 
   return (
     <div className="home-survey-create">
@@ -223,7 +222,7 @@ const SurveyCreate = (props) => {
               <div className="row">
                 <Dropzone
                   accept={dropzoneAcceptBySource[source]}
-                  maxSize={fileMaxSizeMB}
+                  maxSize={fileUploadLimitMB}
                   onDrop={onFilesDrop}
                   droppedFiles={file ? [file] : []}
                 />

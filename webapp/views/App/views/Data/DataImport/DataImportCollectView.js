@@ -3,13 +3,12 @@ import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import * as ProcessUtils from '@core/processUtils'
 import { RecordCycle } from '@core/record/recordCycle'
 
 import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
 
@@ -21,7 +20,6 @@ import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { ImportStartButton } from './ImportStartButton'
 
-const fileMaxSize = ProcessUtils.ENV.fileUploadLimit / 1024 ** 2 // in MB
 const acceptedFileExtensions = ['collect-backup', 'collect-data']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
 
@@ -32,6 +30,7 @@ export const CollectDataImportView = () => {
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
   const canDeleteAllRecords = useAuthCanDeleteAllRecords()
+  const fileMaxSizeMB = useSystemConfigFileUploadLimitMB()
 
   const [deleteAllRecords, setDeleteAllRecords] = useState(false)
   const [cycle, setCycle] = useState(surveyCycle)
@@ -90,7 +89,7 @@ export const CollectDataImportView = () => {
           />
         </fieldset>
 
-        <Dropzone maxSize={fileMaxSize} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
+        <Dropzone maxSize={fileMaxSizeMB} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
 
         <ImportStartButton
           disabled={!file}

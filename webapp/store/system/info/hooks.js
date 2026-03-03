@@ -8,3 +8,7 @@ export const useSystemConfigFileUploadLimit = () => {
   const { fileUploadLimit } = useSystemConfig()
   return fileUploadLimit
 }
+export const useSystemConfigFileUploadLimitMB = () => {
+  const fileUploadLimit = useSystemConfigFileUploadLimit()
+  return fileUploadLimit / 1024 ** 2
+}
