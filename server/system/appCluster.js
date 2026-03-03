@@ -21,14 +21,12 @@ import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup
 import * as UserTempAuthTokensCleanup from './schedulers/userTempAuthTokensCleanup'
 import { SwaggerInitializer } from './swaggerInitializer'
 
-const fileSizeLimit = ProcessUtils.ENV.fileUploadLimit
-
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
 
   logger.info('server initialization start')
 
-  const arenaApp = await ArenaServer.init({ fileSizeLimit })
+  const arenaApp = await ArenaServer.init()
   const { express: app, serviceRegistry } = arenaApp
 
   if (ProcessUtils.isEnvDevelopment) {

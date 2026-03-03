@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router'
 
 import * as A from '@core/arena'
 
-import * as ProcessUtils from '@core/processUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
@@ -15,7 +14,7 @@ import { RecordCycle } from '@core/record/recordCycle'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { contentTypes } from '@webapp/service/api'
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigFileUploadLimit } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
@@ -26,12 +25,10 @@ import { useOnUpdate } from '@webapp/components/hooks'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 import { Button, Dropzone, RadioButtonGroup } from '@webapp/components'
 import { SurveyType } from '@webapp/model'
+import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
-import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
-
-const fileMaxSizeDefault = ProcessUtils.ENV.fileUploadLimit / 1024 ** 2 // in MB
 
 const importSourceButtonGroupItems = Object.values(importSources).map((key) => ({
   key,
@@ -90,6 +87,9 @@ const SurveyCreate = (props) => {
   useOnUpdate(() => {
     navigate(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
+
+  const fileUploadLimit = useSystemConfigFileUploadLimit()
+  const fileMaxSizeMB = fileUploadLimit / 1024 ** 2
 
   return (
     <div className="home-survey-create">
@@ -223,7 +223,7 @@ const SurveyCreate = (props) => {
               <div className="row">
                 <Dropzone
                   accept={dropzoneAcceptBySource[source]}
-                  maxSize={fileMaxSizeDefault}
+                  maxSize={fileMaxSizeMB}
                   onDrop={onFilesDrop}
                   droppedFiles={file ? [file] : []}
                 />

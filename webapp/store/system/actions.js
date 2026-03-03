@@ -18,9 +18,9 @@ export const initSystem = () => async (dispatch) => {
     const sytemInitPayload = { user, survey }
 
     if (user) {
-      const info = await API.fetchInfo()
+      const { appInfo, config } = await API.fetchInfo()
 
-      Object.assign(sytemInitPayload, { info })
+      Object.assign(sytemInitPayload, { appInfo, config })
 
       const activeJob = await API.fetchActiveJob()
       if (activeJob) {
@@ -35,7 +35,14 @@ export const initSystem = () => async (dispatch) => {
     }
     dispatch({ type: SystemActionTypes.SYSTEM_INIT, ...sytemInitPayload })
   } catch (error) {
-    dispatch({ type: SystemActionTypes.SYSTEM_INIT, info: null, user: null, survey: null, errorMessage: String(error) })
+    dispatch({
+      type: SystemActionTypes.SYSTEM_INIT,
+      appInfo: null,
+      config: null,
+      user: null,
+      survey: null,
+      errorMessage: String(error),
+    })
   }
 }
 
