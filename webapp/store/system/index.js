@@ -4,6 +4,15 @@ import SystemReducer from './reducer'
 
 export { SystemActions, SystemState, SystemReducer }
 
+// info
+export {
+  useSystemAppInfo,
+  useSystemConfig,
+  useSystemConfigFileUploadLimit,
+  useSystemConfigFileUploadLimitMB,
+  useSystemConfigExperimentalFeatures,
+} from './info'
+
 // ====== system error
 export { SystemErrorActions, useSystemError } from './systemError'
 
