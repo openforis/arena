@@ -8,8 +8,11 @@ import * as SystemInfoState from './state'
 const actionHandlers = {
   [SystemActionTypes.SYSTEM_INIT]: (state, { appInfo, config }) => {
     const infoState = SystemInfoState.getState(state)
-    const stateUpdated = A.pipe(SystemInfoState.assocAppInfo(appInfo), SystemInfoState.assocConfig(config))(infoState)
-    return stateUpdated
+    const infoStateUpdated = A.pipe(
+      SystemInfoState.assocAppInfo(appInfo),
+      SystemInfoState.assocConfig(config)
+    )(infoState)
+    return infoStateUpdated
   },
 }
 
