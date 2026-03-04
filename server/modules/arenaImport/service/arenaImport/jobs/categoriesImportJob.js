@@ -5,6 +5,7 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
 
 /**
  * Inserts a category for each code list in the Collect survey.
@@ -55,7 +56,7 @@ export default class CategoriesImportJob extends Job {
     )
 
     const categoryName = Category.getName(category)
-    let items = await ArenaSurveyFileZip.getCategoryItems(zipFile, categoryUuid)
+    const items = await ArenaSurveyFileZip.getCategoryItems(zipFile, categoryUuid)
     if (items.length > 0) {
       // category items in a single file
       this.logDebug(`Inserting ${items.length} items for category ${categoryName}`)
@@ -63,7 +64,6 @@ export default class CategoriesImportJob extends Job {
     } else {
       // big category: items splitted in parts
       this.logDebug(`Inserting items in parts for category ${categoryName}`)
-
       await this.insertItemsInSplittedParts({ category })
     }
     await CategoryService.initializeSurveyCategoryItemsIndexes({ surveyId, category: categoryWithLevels }, this.tx)
@@ -76,7 +76,7 @@ export default class CategoriesImportJob extends Job {
     const categoryName = Category.getName(category)
 
     const partsCount = ArenaSurveyFileZip.getCategoryItemsPartsCount({ zipFile, categoryUuid })
-
+    const insertedItemUuids = new Set()
     try {
       // use a nested transaction to be able to rollback only the parts insertion if something fails
       await this.tx.tx(async (nestedTx) => {
@@ -85,7 +85,17 @@ export default class CategoriesImportJob extends Job {
         while (partIndex < partsCount) {
           this.logDebug(`Inserting part ${partIndex + 1} of ${partsCount} for category ${Category.getName(category)}`)
           items = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: partIndex })
-          await CategoryService.insertItemsInBatch({ surveyId, items, backup }, nestedTx)
+          const itemsToInsert = []
+          for (const item of items) {
+            const itemUuid = CategoryItem.getUuid(item)
+            if (insertedItemUuids.has(itemUuid)) {
+              this.logDebug(`Item with uuid ${itemUuid} already inserted for category ${categoryName}, skipping it`)
+            } else {
+              itemsToInsert.push(item)
+            }
+            insertedItemUuids.add(itemUuid)
+          }
+          await CategoryService.insertItemsInBatch({ surveyId, items: itemsToInsert, backup }, nestedTx)
           partIndex = partIndex + 1
         }
       })
@@ -96,7 +106,7 @@ export default class CategoriesImportJob extends Job {
       try {
         const totalItems = []
         for (let i = 0; i < partsCount; i++) {
-          let partItems = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: i })
+          const partItems = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: i })
           totalItems.push(...partItems)
         }
         this.logDebug(`Total items to insert for category ${categoryName}: ${totalItems.length}`)
