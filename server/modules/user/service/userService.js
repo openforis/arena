@@ -25,7 +25,6 @@ import * as Mailer from '@server/utils/mailer'
 import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
 import * as Log from '@server/log/log'
 
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import * as SurveyManager from '../../survey/manager/surveyManager'
