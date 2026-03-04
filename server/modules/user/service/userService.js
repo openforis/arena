@@ -441,15 +441,8 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
 
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
-  Logger.info(`IDs of surveys to be deleted (if without any activity): ${surveyIds}`)
-  for (const surveyId of surveyIds) {
-    const activityLogsCount = await ActivityLogManager.count({ surveyId }, client)
-    // delete survey only if it is brand new
-    if (activityLogsCount < 5) {
-      Logger.info(`Deleting survey ${surveyId}`)
-      await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, client)
-    }
-  }
+  Logger.info(`IDs of surveys that could be deleted (if without any activity): ${surveyIds}`)
+
   Logger.debug('deleting users with expired invitations')
   const usersWithExpiredInvitation = await UserManager.fetchUsersWithExpiredInvitation(client)
   const deletedUsers = []
