@@ -241,7 +241,7 @@ export const fetchItemsByCategoryUuid = async (
   client = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
-  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.')
+  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
   const items = await client.map(
     `
       SELECT i.* 
