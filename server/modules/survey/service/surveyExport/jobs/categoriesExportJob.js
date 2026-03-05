@@ -36,7 +36,7 @@ export default class CategoriesExportJob extends Job {
       const itemsCount = itemsCountByCategoryUuid[categoryUuid]
       const totalPages = Math.ceil(itemsCount / itemsBatchSize)
       const pageIndexes = ArrayUtils.fromNumberOfElements(totalPages)
-      // avoid exporting items with same UUID (see PR #)
+      // avoid exporting items with same UUID (see PR #4134)
       const exportedItemUuids = new Set()
 
       for (const pageIndex of pageIndexes) {
@@ -52,8 +52,8 @@ export default class CategoriesExportJob extends Job {
             this.logDebug(`Item with uuid ${itemUuid} already exported for category ${categoryUuid}, skipping it`)
           } else {
             exportedItemUuids.add(itemUuid)
+            itemsToExport.push(item)
           }
-          itemsToExport.push(item)
         }
         const fileName =
           totalPages === 1

@@ -91,9 +91,9 @@ export default class CategoriesImportJob extends Job {
             if (insertedItemUuids.has(itemUuid)) {
               this.logDebug(`Item with uuid ${itemUuid} already inserted for category ${categoryName}, skipping it`)
             } else {
+              insertedItemUuids.add(itemUuid)
               itemsToInsert.push(item)
             }
-            insertedItemUuids.add(itemUuid)
           }
           await CategoryService.insertItemsInBatch({ surveyId, items: itemsToInsert, backup }, nestedTx)
           partIndex = partIndex + 1
