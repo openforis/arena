@@ -25,7 +25,6 @@ import * as Mailer from '@server/utils/mailer'
 import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
 import * as Log from '@server/log/log'
 
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import * as SurveyManager from '../../survey/manager/surveyManager'
@@ -441,15 +440,8 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
 
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
-  Logger.info(`IDs of surveys to be deleted (if without any activity): ${surveyIds}`)
-  for (const surveyId of surveyIds) {
-    const activityLogsCount = await ActivityLogManager.count({ surveyId }, client)
-    // delete survey only if it is brand new
-    if (activityLogsCount < 5) {
-      Logger.info(`Deleting survey ${surveyId}`)
-      await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, client)
-    }
-  }
+  Logger.info(`IDs of surveys that could be deleted (if without any activity): ${surveyIds}`)
+
   Logger.debug('deleting users with expired invitations')
   const usersWithExpiredInvitation = await UserManager.fetchUsersWithExpiredInvitation(client)
   const deletedUsers = []
