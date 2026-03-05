@@ -190,7 +190,7 @@ export default class RecordsImportJob extends Job {
       const item = queue.dequeue()
       const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
 
-      let nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
+      const nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
 
       if (!nodeDefsInfo) {
         this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
@@ -250,7 +250,7 @@ export default class RecordsImportJob extends Job {
     const surveyInfo = Survey.getSurveyInfo(survey)
     const nodeDefsInfoByCollectPath = Survey.getCollectNodeDefsInfoByPath(surveyInfo)
 
-    let nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
+    const nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
     if (nodeDefsInfo) return nodeDefsInfo
 
     const nodeDefName = nodeDefNamesByPath[collectNodeDefPath]
@@ -317,13 +317,12 @@ export default class RecordsImportJob extends Job {
 
   async _insertRecordNodes(record) {
     for (const node of Record.getNodesArray(record)) {
-      this.batchPersister.addItem(node, this.tx)
+      await this.batchPersister.addItem(node, this.tx)
     }
   }
 
   /**
    * Evaluates all record entities children applicability and stores the updated nodes.
-   *
    * @param {!Survey} survey - The survey object.
    * @param {!Record} record - The record object.
    * @returns {Promise<null>} - The updated record (promise).
