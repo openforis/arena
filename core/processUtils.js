@@ -81,6 +81,8 @@ const ENV = {
   jobQueueConcurrency: process.env.JOB_QUEUE_CONCURRENCY || 3,
   // WHISP
   whispApiKey: process.env.WHISP_API_KEY,
+  // Activity log
+  activityLogDisabled: isTrue(process.env.ACTIVITY_LOG_DISABLED),
   // Experimental features
   experimentalFeatures: isTrue(process.env.EXPERIMENTAL_FEATURES),
 }
