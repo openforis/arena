@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
@@ -12,12 +12,13 @@ import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
 
-import { NotificationActions } from '@webapp/store/ui'
+import { DialogConfirmActions } from '@webapp/store/ui'
 import { Dropzone } from '@webapp/components'
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
+
 import { ImportStartButton } from './ImportStartButton'
 
 const acceptedFileExtensions = ['collect-backup', 'collect-data']
@@ -37,23 +38,32 @@ export const CollectDataImportView = () => {
   const [forceImport, setForceImport] = useState(false)
   const [file, setFile] = useState(null)
 
-  const onJobStart = (job) => {
-    dispatch(
-      JobActions.showJobMonitor({
-        job,
-        autoHide: true,
-        onComplete: async (jobCompleted) => {
-          const { insertedRecords } = JobSerialized.getResult(jobCompleted)
-          dispatch(
-            NotificationActions.notifyInfo({
-              key: 'dataImportView.jobs.CollectDataImportJob.importCompleteSuccessfully',
-              params: { insertedRecords },
-            })
-          )
-        },
-      })
-    )
-  }
+  const onJobComplete = useCallback(
+    async (jobCompleted) => {
+      const { insertedRecords } = JobSerialized.getResult(jobCompleted)
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'dataImportView.jobs.CollectDataImportJob.importCompleteSuccessfully',
+          params: { insertedRecords },
+          dismissable: false,
+        })
+      )
+    },
+    [dispatch]
+  )
+
+  const onJobStart = useCallback(
+    (job) => {
+      dispatch(
+        JobActions.showJobMonitor({
+          job,
+          autoHide: true,
+          onComplete: onJobComplete,
+        })
+      )
+    },
+    [dispatch, onJobComplete]
+  )
 
   const onFilesDrop = async (files) => {
     const _file = files.filter((file) => {
