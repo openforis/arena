@@ -53,7 +53,7 @@ export const writeItemsToStream = async ({
   })
 
   // loop over the items
-  items.forEach((item) => {
+  for (const item of items) {
     const transformedItem = itemTransformer(item)
     const row = worksheet.addRow(transformedItem)
     // apply border style
@@ -68,10 +68,10 @@ export const writeItemsToStream = async ({
         }
       }
     })
-  })
+  }
 
   // set column widths based on the content
-  worksheet.columns.forEach((column) => {
+  for (const column of worksheet.columns) {
     let maxLength = 0
     column.eachCell({ includeEmpty: true }, (cell) => {
       const columnLength = cell.value?.toString().length ?? 10
@@ -80,7 +80,7 @@ export const writeItemsToStream = async ({
       }
     })
     column.width = maxLength < 10 ? 10 : maxLength
-  })
+  }
 
   return workbook.xlsx.write(outputStream)
 }
