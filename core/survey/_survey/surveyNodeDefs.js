@@ -208,7 +208,7 @@ export const getAreaBasedEstimatedOfNodeDef = (nodeDef) => (survey) =>
 const _nodeDefKeysFilter = (n) => NodeDef.isKey(n) && !NodeDef.isDeleted(n)
 
 export const getNodeDefKeys = (nodeDef) => (survey) =>
-  getNodeDefChildren({ nodeDef })(survey).filter(_nodeDefKeysFilter)
+  getNodeDefDescendantAttributesInSingleEntities({ nodeDef })(survey).filter(_nodeDefKeysFilter)
 
 export const getNodeDefKeysSorted =
   ({ nodeDef, cycle }) =>

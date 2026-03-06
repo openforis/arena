@@ -16,6 +16,7 @@ const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValida
 
 const query = ({ surveyId, recordUuid }) => {
   const surveySchema = getSurveyDBSchema(surveyId)
+  const surveyRdbSchema = SchemaRdb.getName(surveyId)
   const uuidLength = 36
 
   return `WITH node_validation AS (
@@ -60,11 +61,11 @@ const query = ({ surveyId, recordUuid }) => {
       
       -- TODO: check why subquery is faster than outer join when joining _node_keys_hierarchy view
       (SELECT h.keys_self 
-        FROM ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
+        FROM ${surveyRdbSchema}._node_keys_hierarchy h
         WHERE h.node_uuid = n.uuid
       ),
       (SELECT h.keys_hierarchy 
-        FROM ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
+        FROM ${surveyRdbSchema}._node_keys_hierarchy h
         WHERE h.node_uuid = n.uuid
       )
     FROM

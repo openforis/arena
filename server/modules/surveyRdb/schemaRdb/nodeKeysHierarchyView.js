@@ -9,6 +9,6 @@ export const columns = {
   recordUuid: 'record_uuid',
 }
 
-export const name = '_node_keys_hierarchy'
+const viewName = '_node_keys_hierarchy'
 
-export const getNameWithSchema = (surveyId) => `${SchemaRdb.getName(surveyId)}.${name}`
+export const getNameWithSchema = (surveyId) => `${SchemaRdb.getName(surveyId)}.${viewName}`
