@@ -1,4 +1,4 @@
-@use "~@webapp/style/vars" as *;
+@use '~@webapp/style/vars' as *;
 
 .dropzone {
   flex: 1;
@@ -13,9 +13,15 @@
   background-color: $backgroundColorSecondary;
   color: $colorTextPrimary;
   outline: none;
-  transition: border .24s ease-in-out;
+  transition: border 0.24s ease-in-out;
 
-  &:focus {
+  &.drag-accept {
+    border-color: $dragAcceptColor;
+  }
+  &.drag-reject {
+    border-color: $dragRejectColor;
+  }
+  &.focused {
     border-color: $borderColorFocussed;
   }
 

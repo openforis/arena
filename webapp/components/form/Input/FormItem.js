@@ -26,7 +26,9 @@ export const FormItem = (props) => {
 
   const i18n = useI18n()
   const label =
-    Objects.isNotEmpty(labelProp) && typeof labelProp === 'string' ? i18n.t(labelProp, labelParams) : labelProp
+    Objects.isNotEmpty(labelProp) && typeof labelProp === 'string'
+      ? i18n.t(labelProp, { ...labelParams, interpolation: { escapeValue: false } })
+      : labelProp
   const isMobile = useIsMobile()
 
   const labelComponent =
