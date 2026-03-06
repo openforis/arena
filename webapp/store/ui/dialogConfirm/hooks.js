@@ -17,7 +17,7 @@ export const useDialogConfirm = () => {
   const strongConfirmInputLabel = useSelector(DialogConfirmState.getStrongConfirmInputLabel)
   const strongConfirmRequiredText = useSelector(DialogConfirmState.getStrongConfirmRequiredText)
   const strongConfirmText = useSelector(DialogConfirmState.getStrongConfirmText)
-  const isDismissable = useSelector(DialogConfirmState.isDismissable)
+  const dismissable = useSelector(DialogConfirmState.isDismissable)
 
   const onStrongConfirmInputChange = useCallback(
     (event) => {
@@ -31,10 +31,10 @@ export const useDialogConfirm = () => {
   }, [dispatch])
 
   const onClose = useCallback(() => {
-    if (isDismissable) {
+    if (dismissable) {
       dispatch(DialogConfirmActions.onDialogConfirmCancel())
     }
-  }, [isDismissable, dispatch])
+  }, [dismissable, dispatch])
 
   return {
     key,
@@ -47,7 +47,7 @@ export const useDialogConfirm = () => {
     strongConfirmInputLabel,
     strongConfirmRequiredText,
     strongConfirmText,
-    isDismissable,
+    dismissable,
     onStrongConfirmInputChange,
     onOk,
     onClose,

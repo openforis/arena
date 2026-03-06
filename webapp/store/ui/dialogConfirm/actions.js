@@ -14,7 +14,9 @@ export const hideDialogConfirm = () => (dispatch) => dispatch({ type: DIALOG_CON
 
 export const onDialogConfirmOk = () => (dispatch, getState) => {
   const onOk = DialogConfirmState.getOnOk(getState())
-  dispatch(onOk)
+  if (onOk) {
+    dispatch(onOk)
+  }
   dispatch(hideDialogConfirm())
 }
 

@@ -25,13 +25,17 @@ const DialogConfirm = () => {
     strongConfirmInputLabel,
     strongConfirmRequiredText,
     strongConfirmText,
-    isDismissable,
+    dismissable: isDismissable,
     onStrongConfirmInputChange,
     onClose,
     onOk,
   } = useDialogConfirm()
 
-  return key ? (
+  if (!key) {
+    return null
+  }
+
+  return (
     <Modal className="dialog-confirm" onClose={onClose} title={headerText}>
       <ModalBody>
         <Markdown className={headerText ? 'highlight' : undefined} source={i18n.t(key, params)} />
@@ -63,7 +67,7 @@ const DialogConfirm = () => {
         />
       </ModalFooter>
     </Modal>
-  ) : null
+  )
 }
 
 export default DialogConfirm
