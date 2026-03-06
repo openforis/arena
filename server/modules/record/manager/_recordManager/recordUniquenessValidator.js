@@ -57,21 +57,18 @@ export const validateRecordsUniqueness = async (
     { survey, cycle, nodeDefs: nodeDefsUnique, nodes: nodesUnique, recordUuidsExcluded, excludeRecordsFromCount },
     tx
   )
-
+  console.log('===> recordsCountRows', recordsCountRows)
   if (R.isEmpty(recordsCountRows)) return {}
 
-  return recordsCountRows.reduce((result, { recordUuid, count, nodesKeyUuids }) => {
+  const result = {}
+  for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {
     const unique = Number(count) === 1
-    const validationNodesKeyFields = nodesKeyUuids.reduce(
-      (validationFieldsAcc, nodeKeyUuid) => ({
-        ...validationFieldsAcc,
-        [nodeKeyUuid]: RecordValidation.newValidationRecordDuplicate({ unique, errorKey }),
-      }),
-      {}
-    )
-    return {
-      ...result,
-      [recordUuid]: Validation.newInstance(unique, validationNodesKeyFields),
+    const validationNodesKeyFields = {}
+    for (const nodeKeyUuid of nodesKeyUuids) {
+      validationNodesKeyFields[nodeKeyUuid] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
     }
-  }, {})
+    result[recordUuid] = Validation.newInstance(unique, validationNodesKeyFields)
+  }
+  console.log('===result', result)
+  return result
 }

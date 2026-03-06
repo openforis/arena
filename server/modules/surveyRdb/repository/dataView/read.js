@@ -437,8 +437,7 @@ export const fetchRecordsCountByRootNodesValue = async (
 
   const rootTableRecordUuidAliasedCol = `${rootTableAlias}.${TableDataNodeDef.columnSet.recordUuid}`
 
-  return client.map(
-    `
+  const query = `
     WITH count_records AS (
       SELECT
         ${filterColumnsString}, COUNT(*) AS count
@@ -464,7 +463,9 @@ export const fetchRecordsCountByRootNodesValue = async (
       AND ${filterCondition}
       AND ${rootTableRecordUuidAliasedCol} NOT IN ($/recordUuidsExcluded:csv/)
     GROUP BY ${rootTableRecordUuidAliasedCol}, cr.count
-  `,
+  `
+  return client.map(
+    query,
     {
       recordUuidsExcluded,
       cycle,

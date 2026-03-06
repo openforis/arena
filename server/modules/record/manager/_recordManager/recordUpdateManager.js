@@ -379,7 +379,8 @@ const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
   )
 
   // Check if root keys have been modified
-  if (nodeDefsModified.some((nodeDef) => Survey.isNodeDefRootKey(nodeDef)(survey))) {
+  const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
+  if (nodeDefsModified.some((nodeDef) => rootKeyDefs.includes(nodeDef))) {
     // Validate record uniqueness of records with same record keys
     await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
       { survey, record, excludeRecordFromCount: false },
