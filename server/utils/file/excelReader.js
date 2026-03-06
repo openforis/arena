@@ -9,13 +9,13 @@ const extractRowValues = (row) => {
 }
 
 const extractRowValuesFixed = (row, cellsCount) => {
-  const rowValues = []
+  const values = []
   for (let index = 0; index < cellsCount; index++) {
     const cell = row.getCell(index + 1)
     const cellValue = cell?.value ?? '' // null values considered as empty strings
-    rowValues.push(cellValue)
+    values.push(cellValue)
   }
-  return rowValues
+  return values
 }
 
 const extractRowsFromExcelStream = async ({ stream }) => {
