@@ -31,7 +31,7 @@ const _extractValidHeaders = (row) => {
 }
 
 const _rowToObject = ({ headers, row }) => {
-  const result = {}
+  const result = Object.create(null)
   for (let index = 0; index < headers.length; index++) {
     const header = headers[index]
     const cellValue = row[index]
