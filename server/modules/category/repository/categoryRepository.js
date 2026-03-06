@@ -241,7 +241,7 @@ export const fetchItemsByCategoryUuid = async (
   client = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
-  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.')
+  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
   const items = await client.map(
     `
       SELECT i.* 
@@ -249,7 +249,7 @@ export const fetchItemsByCategoryUuid = async (
       JOIN ${schema}.category_level l 
         ON l.uuid = i.level_uuid
         AND l.category_uuid = $/categoryUuid/
-     ORDER BY l.index, ${indexColumn}
+     ORDER BY l.index, ${indexColumn}, l.id
      ${offset ? 'OFFSET $/offset/' : ''}
      ${limit ? 'LIMIT $/limit/' : ''}
     `,
@@ -287,7 +287,7 @@ export const fetchItemsByLevelParentAndCode = async (
   client = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
-  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.')
+  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
   const items = await client.map(
     `
       SELECT i.* 
@@ -363,7 +363,7 @@ const _getSearchQueryParam = ({ searchValue }) =>
 const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
   const schema = Schemata.getSchemaSurvey(surveyId)
-  const indexCol = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.')
+  const indexCol = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
   return `SELECT i.* 
     FROM ${schema}.category_item i
     JOIN ${schema}.category_level l 
@@ -506,7 +506,7 @@ export const fetchIndex = async ({ surveyId, draft = false, includeBigCategories
   const allCategoriesIncluded = includeBigCategories || categoryUuidsExceedingMaxItems.length === 0
   const whereCondition = allCategoriesIncluded ? '' : 'WHERE l.category_uuid NOT IN ($1:csv)'
   const queryParams = allCategoriesIncluded ? [] : [categoryUuidsExceedingMaxItems]
-  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.')
+  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
 
   return client.map(
     `
