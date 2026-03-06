@@ -16,10 +16,10 @@
   transition: border 0.24s ease-in-out;
 
   &.drag-accept {
-    border-color: green;
+    border-color: $dragAcceptColor;
   }
   &.drag-reject {
-    border-color: red;
+    border-color: $dragRejectColor;
   }
   &.focused {
     border-color: $borderColorFocussed;
