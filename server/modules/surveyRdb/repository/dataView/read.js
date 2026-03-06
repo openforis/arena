@@ -276,20 +276,18 @@ const _createViewDataQuery = (params) => {
 
 /**
  * Runs a select query on a data view associated to an entity node definition.
- *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query to execute.
- * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
- * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
+ * @param {boolean} [params.columnNodeDefs] - Whether to select only columnNodes.
+ * @param {boolean} [params.includeFileAttributeDefs] - Whether to include file attribute column node defs.
  * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
- * @param {number} [params.offset=null] - The query offset.
- * @param {number} [params.limit=null] - The query limit.
- * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
+ * @param {number} [params.offset] - The query offset.
+ * @param {number} [params.limit] - The query limit.
+ * @param {boolean} [params.stream] - Whether to fetch rows to be streamed.
+ * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params, client = db) => {

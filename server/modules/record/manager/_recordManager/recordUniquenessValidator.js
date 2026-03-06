@@ -9,14 +9,13 @@ import * as Validation from '@core/validation/validation'
 
 import * as DataViewRepository from '@server/modules/surveyRdb/repository/dataView'
 
-const createNodesRecordUniqueValidation = ({ nodes, unique, errorKey }) =>
-  nodes.reduce(
-    (validationAcc, keyNode) => ({
-      ...validationAcc,
-      [Node.getUuid(keyNode)]: RecordValidation.newValidationRecordDuplicate({ unique, errorKey }),
-    }),
-    {}
-  )
+const createNodesRecordUniqueValidation = ({ nodes, unique, errorKey }) => {
+  const validationAcc = {}
+  for (const node of nodes) {
+    validationAcc[Node.getUuid(node)] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
+  }
+  return validationAcc
+}
 
 const validateRecordKeysUniqueness = async ({ survey, record }, tx) => {
   const rootNode = Record.getRootNode(record)

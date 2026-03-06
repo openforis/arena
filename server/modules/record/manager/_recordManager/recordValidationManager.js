@@ -30,16 +30,17 @@ const _processAndPersistValidation = async ({ survey, record, nodesValidation, s
   )(startValidation)
   const recordUpdated = Validation.assocValidation(validationUpdated)(record)
   await persistValidation({ survey, record: recordUpdated }, tx)
+  return recordUpdated
 }
 
 export const replaceAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
   const startValidation = Validation.newInstance()
-  await _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
+  return _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
 }
 
 export const mergeAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
   const startValidation = Record.getValidation(record)
-  await _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
+  return _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
 }
 
 const isRootUniqueNodesUpdated = ({ survey, nodesArray }) =>
@@ -106,12 +107,11 @@ export const validateSortedNodesAndPersistValidation = async (
   const nodesValidation = Validation.recalculateValidity(Validation.newInstance(true, fullNodesValidationByUuid))
 
   // 7. persist validation
-  if (mergeValidation) {
-    await mergeAndPersistValidation({ survey, record, nodesValidation }, tx)
-  } else {
-    await replaceAndPersistValidation({ record, survey, nodesValidation }, tx)
-  }
-  return nodesValidation
+  const recordUpdated = mergeValidation
+    ? await mergeAndPersistValidation({ survey, record, nodesValidation }, tx)
+    : await replaceAndPersistValidation({ record, survey, nodesValidation }, tx)
+
+  return { record: recordUpdated, nodesValidation }
 }
 
 export const validateNodesAndPersistValidation = async (

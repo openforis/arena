@@ -415,7 +415,7 @@ const validateNodesAndPersistToRDB = async ({ user, survey, record, nodes, nodes
     (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getUuid(node)]: node }),
     {}
   )
-  const validations = await RecordValidationManager.validateNodesAndPersistValidation(
+  const { nodesValidation: validations } = await RecordValidationManager.validateNodesAndPersistValidation(
     { user, survey, record, nodes: nodesToValidate, validateRecordUniqueness: true },
     t
   )
