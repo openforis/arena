@@ -24,7 +24,6 @@ export const persistValidation = async ({ survey, record }, tx) =>
   RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
 
 const _processAndPersistValidation = async ({ survey, record, nodesValidation, startValidation }, tx) => {
-  console.log('===nodes validation', JSON.stringify(nodesValidation))
   const validationUpdated = R.pipe(
     Validation.mergeValidation(nodesValidation, true),
     Validation.updateCounts

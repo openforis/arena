@@ -57,7 +57,6 @@ export const validateRecordsUniqueness = async (
     { survey, cycle, nodeDefs: nodeDefsUnique, nodes: nodesUnique, recordUuidsExcluded, excludeRecordsFromCount },
     tx
   )
-  console.log('===> recordsCountRows', recordsCountRows)
   if (R.isEmpty(recordsCountRows)) return {}
 
   const result = {}
@@ -69,6 +68,5 @@ export const validateRecordsUniqueness = async (
     }
     result[recordUuid] = Validation.newInstance(unique, validationNodesKeyFields)
   }
-  console.log('===result', result)
   return result
 }
