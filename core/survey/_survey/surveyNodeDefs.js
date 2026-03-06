@@ -72,7 +72,9 @@ export const getNodeDefChildrenSorted =
   (survey) => {
     const cycleKeysToConsider = Objects.isEmpty(cycle) ? Surveys.getCycleKeys(survey) : [cycle]
     // get child defs from the cycles to consider, then combine them keeping their sorting
-    let childDefs = cycleKeysToConsider.reduce((acc, currentCycle, currentCycleIndex) => {
+    let childDefs = []
+    for (let cycleIndex = 0; cycleIndex < cycleKeysToConsider.length && childDefs.length === 0; cycleIndex++) {
+      const currentCycle = cycleKeysToConsider[cycleIndex]
       const childDefsInCycle = Surveys.getNodeDefChildrenSorted({
         survey,
         cycle: currentCycle,
@@ -80,17 +82,17 @@ export const getNodeDefChildrenSorted =
         includeAnalysis,
         includeLayoutElements,
       })
-      if (currentCycleIndex === 0) {
-        acc.push(...childDefsInCycle)
+      if (cycleIndex === 0) {
+        childDefs.push(...childDefsInCycle)
       } else {
-        childDefsInCycle.forEach((childDef, index) => {
-          if (!acc.includes(childDef)) {
-            acc.splice(index, 0, childDef)
+        for (let index = 0; index < childDefs.length; index++) {
+          const childDef = childDefs[index]
+          if (!childDefs.includes(childDef)) {
+            childDefs.splice(index, 0, childDef)
           }
-        })
+        }
       }
-      return acc
-    }, [])
+    }
 
     if (!includeSamplingDefsWithoutSiblings) {
       childDefs = filterNodeDefsWithoutSiblings(childDefs)
@@ -211,12 +213,19 @@ export const getNodeDefKeys = (nodeDef) => (survey) =>
 export const getNodeDefKeysSorted =
   ({ nodeDef, cycle }) =>
   (survey) =>
-    getNodeDefChildrenSorted({ nodeDef, cycle })(survey).filter(_nodeDefKeysFilter)
+    getNodeDefDescendantsInSingleEntities({ nodeDef, cycle, sorted: true })(survey).filter(_nodeDefKeysFilter)
 
 export const getNodeDefRootKeys = (survey) => {
   const root = getNodeDefRoot(survey)
   return root ? getNodeDefKeys(root)(survey) : []
 }
+
+export const getNodeDefRootKeysSorted =
+  ({ cycle }) =>
+  (survey) => {
+    const root = getNodeDefRoot(survey)
+    return root ? getNodeDefKeysSorted({ nodeDef: root, cycle })(survey) : []
+  }
 
 export const getSummaryDefs =
   ({ nodeDef, cycle }) =>
@@ -351,7 +360,7 @@ export const getNodeDefAncestorsKeyAttributes =
   }
 
 export const getNodeDefAncestorsKeyAttributesByAncestorUuid = (nodeDef) => (survey) => {
-  let ancestorsKeyAttributesIndexed = {}
+  const ancestorsKeyAttributesIndexed = {}
   visitAncestors(nodeDef, (ancestorDef) => {
     const ancestorKeyAttributes = getNodeDefKeys(ancestorDef)(survey)
     ancestorsKeyAttributesIndexed[NodeDef.getUuid(ancestorDef)] = ancestorKeyAttributes

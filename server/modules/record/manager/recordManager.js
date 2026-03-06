@@ -73,7 +73,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
     survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: nodeDefsDraft }, client)
     summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
-    nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+    nodeDefKeys = Survey.getNodeDefRootKeysSorted({ cycle })(survey)
   }
 
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(

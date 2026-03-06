@@ -24,13 +24,12 @@ import * as SurveyAnalysis from './_survey/surveyAnalysis'
 
 /**
  * Creates a new survey info object with the specified parameters.
- *
  * @param {!object} params - The cration parameters.
  * @param {!string} params.ownerUuid - The owner user UUID.
  * @param {!string} params.name - The survey name.
  * @param {!Array.<string>} params.languages - The survey languages.
- * @param {string} [params.label=null] - The label in the default language.
- * @param {object} [params.otherProps=null] - Other props to set.
+ * @param {string} [params.label] - The label in the default language.
+ * @param {object} [params.otherProps] - Other props to set.
  * @returns {object} The newly created survey info object.
  */
 export const newSurvey = ({
@@ -78,7 +77,6 @@ export const canHaveData = (survey) => {
 }
 /**
  * Returns true if all the root key attribute definitions are code attributes using the sampling point data category.
- *
  * @param {!object} survey - The survey object.
  * @returns {boolean} - True if all key attributes are using the sampling point data category.
  */
@@ -166,6 +164,7 @@ export const {
   getNodeDefsByUuids,
   getNodeDefRoot,
   getNodeDefRootKeys,
+  getNodeDefRootKeysSorted,
   getNodeDefsRootUnique,
   getNodeDefByUuid,
   getNodeDefChildren,
