@@ -201,6 +201,7 @@ export default class RecordCheckJob extends Job {
     Object.assign(allUpdatedNodesByUuid, newNodes)
 
     if (
+      cleanupRecords ||
       !R.isEmpty(nodeDefAddedOrUpdatedUuids) ||
       !R.isEmpty(nodeDefDeletedUuids) ||
       !R.isEmpty(allUpdatedNodesByUuid)
@@ -319,7 +320,6 @@ const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx)
       nodesToValidate[Node.getUuid(parentNode)] = parentNode
     }
   }
-
   // Record keys uniqueness must be validated after RDB generation
   await RecordManager.validateNodesAndPersistValidation({ user, survey, record, nodes: nodesToValidate }, tx)
 }

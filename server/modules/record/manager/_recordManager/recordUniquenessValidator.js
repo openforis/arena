@@ -9,14 +9,13 @@ import * as Validation from '@core/validation/validation'
 
 import * as DataViewRepository from '@server/modules/surveyRdb/repository/dataView'
 
-const createNodesRecordUniqueValidation = ({ nodes, unique, errorKey }) =>
-  nodes.reduce(
-    (validationAcc, keyNode) => ({
-      ...validationAcc,
-      [Node.getUuid(keyNode)]: RecordValidation.newValidationRecordDuplicate({ unique, errorKey }),
-    }),
-    {}
-  )
+const createNodesRecordUniqueValidation = ({ nodes, unique, errorKey }) => {
+  const validationAcc = {}
+  for (const node of nodes) {
+    validationAcc[Node.getUuid(node)] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
+  }
+  return validationAcc
+}
 
 const validateRecordKeysUniqueness = async ({ survey, record }, tx) => {
   const rootNode = Record.getRootNode(record)
@@ -51,28 +50,23 @@ export const validateRecordUniqueNodes = async ({ survey, record }, tx) => {
 
 // Returns an indexed object with recordUuid as key and validation as value
 export const validateRecordsUniqueness = async (
-  { survey, cycle, nodeDefsUnique, nodesUnique, recordUuidsExcluded, excludeRecordsFromCount, errorKey },
+  { survey, cycle, nodeDefsUnique, nodesUnique, recordUuidsExcluded, errorKey },
   tx
 ) => {
   const recordsCountRows = await DataViewRepository.fetchRecordsCountByRootNodesValue(
-    { survey, cycle, nodeDefs: nodeDefsUnique, nodes: nodesUnique, recordUuidsExcluded, excludeRecordsFromCount },
+    { survey, cycle, nodeDefs: nodeDefsUnique, nodes: nodesUnique, recordUuidsExcluded },
     tx
   )
-
   if (R.isEmpty(recordsCountRows)) return {}
 
-  return recordsCountRows.reduce((result, { recordUuid, count, nodesKeyUuids }) => {
+  const result = {}
+  for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {
     const unique = Number(count) === 1
-    const validationNodesKeyFields = nodesKeyUuids.reduce(
-      (validationFieldsAcc, nodeKeyUuid) => ({
-        ...validationFieldsAcc,
-        [nodeKeyUuid]: RecordValidation.newValidationRecordDuplicate({ unique, errorKey }),
-      }),
-      {}
-    )
-    return {
-      ...result,
-      [recordUuid]: Validation.newInstance(unique, validationNodesKeyFields),
+    const validationNodesKeyFields = {}
+    for (const nodeKeyUuid of nodesKeyUuids) {
+      validationNodesKeyFields[nodeKeyUuid] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
     }
-  }, {})
+    result[recordUuid] = Validation.newInstance(unique, validationNodesKeyFields)
+  }
+  return result
 }
