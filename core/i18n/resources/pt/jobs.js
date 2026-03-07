@@ -69,8 +69,11 @@ export default {
   ChainExportJob: 'Exportação de cadeia',
   UsersExportJob: 'Exportação de usuários',
   ActivityLogExportJob: 'Exportação de log de atividades',
+  InfoExportJob: 'Geração de informações do arquivo de saída',
   // validation Report
   VaidationReportGenerationJob: 'Gerar relatório de validação',
   // record Validation
   RecordsValidationJob: `Validação de registros`,
+  // analysis
+  PersistResultsJob: 'Persistência dos resultados da análise',
 }
