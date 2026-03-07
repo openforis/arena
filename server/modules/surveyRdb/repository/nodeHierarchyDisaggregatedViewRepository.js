@@ -11,6 +11,7 @@ const { columns } = NodeHierarchyDisaggregatedView
 
 export const createNodeHierarchyDisaggregatedView = async (survey, client = db) => {
   const surveyId = Survey.getId(survey)
+  const surveySchema = getSurveyDBSchema(surveyId)
 
   await client.query(`
     CREATE VIEW ${NodeHierarchyDisaggregatedView.getNameWithSchema(surveyId)} AS
@@ -21,7 +22,7 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
           n.id            AS ${columns.nodeAncestorId},
           n.node_def_uuid AS ${columns.nodeDefAncestorUuid}
         FROM
-          ${getSurveyDBSchema(surveyId)}.node n
+          ${surveySchema}.node n
         JOIN
           (
             SELECT
@@ -30,7 +31,7 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
               n.node_def_uuid                              AS ${columns.nodeDefUuid},
               jsonb_array_elements_text(n.meta->'h')::uuid AS ${columns.nodeAncestorUuid}
             FROM
-              ${getSurveyDBSchema(surveyId)}.node n
+              ${surveySchema}.node n
            ) h
         ON
           n.uuid = h.${columns.nodeAncestorUuid}
@@ -45,7 +46,7 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
           NULL              AS ${columns.nodeAncestorId},
           NULL              AS ${columns.nodeDefAncestorUuid}
         FROM
-          ${getSurveyDBSchema(surveyId)}.node n
+          ${surveySchema}.node n
         WHERE
           n.parent_uuid IS NULL
         ORDER BY

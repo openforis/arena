@@ -30,16 +30,17 @@ const _processAndPersistValidation = async ({ survey, record, nodesValidation, s
   )(startValidation)
   const recordUpdated = Validation.assocValidation(validationUpdated)(record)
   await persistValidation({ survey, record: recordUpdated }, tx)
+  return recordUpdated
 }
 
 export const replaceAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
   const startValidation = Validation.newInstance()
-  await _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
+  return _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
 }
 
 export const mergeAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
   const startValidation = Record.getValidation(record)
-  await _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
+  return _processAndPersistValidation({ survey, record, nodesValidation, startValidation }, tx)
 }
 
 const isRootUniqueNodesUpdated = ({ survey, nodesArray }) =>
@@ -106,12 +107,11 @@ export const validateSortedNodesAndPersistValidation = async (
   const nodesValidation = Validation.recalculateValidity(Validation.newInstance(true, fullNodesValidationByUuid))
 
   // 7. persist validation
-  if (mergeValidation) {
-    await mergeAndPersistValidation({ survey, record, nodesValidation }, tx)
-  } else {
-    await replaceAndPersistValidation({ record, survey, nodesValidation }, tx)
-  }
-  return nodesValidation
+  const recordUpdated = mergeValidation
+    ? await mergeAndPersistValidation({ survey, record, nodesValidation }, tx)
+    : await replaceAndPersistValidation({ record, survey, nodesValidation }, tx)
+
+  return { record: recordUpdated, nodesValidation }
 }
 
 export const validateNodesAndPersistValidation = async (
@@ -124,26 +124,27 @@ export const validateNodesAndPersistValidation = async (
   )
 
 export const validateRecordsUniquenessAndPersistValidation = async (
-  { survey, cycle, nodeDefsUnique, nodesUnique, recordUuidsExcluded, excludeRecordsFromCount, errorKey },
+  { survey, cycle, nodeDefsUnique, nodesUnique, recordUuidsExcluded, errorKey },
   t
 ) => {
   const validationByRecord = await RecordUniquenessValidator.validateRecordsUniqueness(
-    { survey, cycle, nodeDefsUnique, nodesUnique, recordUuidsExcluded, excludeRecordsFromCount, errorKey },
+    { survey, cycle, nodeDefsUnique, nodesUnique, recordUuidsExcluded, errorKey },
     t
   )
   for (const [recordUuid, nodesValidation] of Object.entries(validationByRecord)) {
     const record = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, t)
     await mergeAndPersistValidation({ survey, record, nodesValidation }, t)
   }
+  return validationByRecord
 }
 
 export const validateRecordKeysUniquenessAndPersistValidation = async (
-  { survey, record, excludeRecordFromCount },
+  { survey, record, excludeRecordFromCount = false },
   t
 ) => {
   const nodesUnique = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
   if (nodesUnique.length === 0) {
-    return null // empty record, consider its uniqueness as valid
+    return {} // empty record, consider its uniqueness as valid
   }
   const nodeDefsUnique = Survey.getNodeDefRootKeys(survey)
 
@@ -153,8 +154,7 @@ export const validateRecordKeysUniquenessAndPersistValidation = async (
       cycle: Record.getCycle(record),
       nodeDefsUnique,
       nodesUnique,
-      recordUuidsExcluded: [Record.getUuid(record)],
-      excludeRecordsFromCount: excludeRecordFromCount,
+      recordUuidsExcluded: excludeRecordFromCount ? [Record.getUuid(record)] : [],
       errorKey: Validation.messageKeys.record.keyDuplicate,
     },
     t
@@ -162,13 +162,13 @@ export const validateRecordKeysUniquenessAndPersistValidation = async (
 }
 
 export const validateRecordUniqueNodesUniquenessAndPersistValidation = async (
-  { survey, record, nodeDefUniqueUuid, excludeRecordFromCount },
+  { survey, record, nodeDefUniqueUuid, excludeRecordFromCount = false },
   t
 ) => {
   const rootNode = Record.getRootNode(record)
   const nodesUnique = Record.getNodeChildrenByDefUuid(rootNode, nodeDefUniqueUuid)(record)
   if (nodesUnique.length === 0) {
-    return null // empty record, consider its uniqueness as valid
+    return {} // empty record, consider its uniqueness as valid
   }
   const nodeDefUnique = Survey.getNodeDefByUuid(nodeDefUniqueUuid)(survey)
 
@@ -178,8 +178,7 @@ export const validateRecordUniqueNodesUniquenessAndPersistValidation = async (
       cycle: Record.getCycle(record),
       nodeDefsUnique: [nodeDefUnique],
       nodesUnique,
-      recordUuidsExcluded: [Record.getUuid(record)],
-      excludeRecordsFromCount: excludeRecordFromCount,
+      recordUuidsExcluded: excludeRecordFromCount ? [Record.getUuid(record)] : [],
       errorKey: Validation.messageKeys.record.uniqueAttributeDuplicate,
     },
     t
