@@ -168,7 +168,7 @@ export const validateRecordUniqueNodesUniquenessAndPersistValidation = async (
   const rootNode = Record.getRootNode(record)
   const nodesUnique = Record.getNodeChildrenByDefUuid(rootNode, nodeDefUniqueUuid)(record)
   if (nodesUnique.length === 0) {
-    return null // empty record, consider its uniqueness as valid
+    return {} // empty record, consider its uniqueness as valid
   }
   const nodeDefUnique = Survey.getNodeDefByUuid(nodeDefUniqueUuid)(survey)
 
