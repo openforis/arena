@@ -24,7 +24,7 @@ import * as SurveyAnalysis from './_survey/surveyAnalysis'
 
 /**
  * Creates a new survey info object with the specified parameters.
- * @param {!object} params - The cration parameters.
+ * @param {!object} params - The creation parameters.
  * @param {!string} params.ownerUuid - The owner user UUID.
  * @param {!string} params.name - The survey name.
  * @param {!Array.<string>} params.languages - The survey languages.

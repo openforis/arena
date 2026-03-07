@@ -1,9 +1,8 @@
-import * as R from 'ramda'
-
 import { NodePointers, Records, SurveyDependencyType } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -117,7 +116,7 @@ export const deleteRecord = async (user, survey, record, client = db) =>
     )
     const logContent = { [ActivityLog.keysContent.uuid]: uuid, [ActivityLog.keysContent.keys]: keys }
 
-    if (!R.isEmpty(Record.getNodes(record))) {
+    if (!A.isEmpty(Record.getNodes(record))) {
       // validate uniqueness of records with same keys/unique node values
       await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
         { survey, record, excludeRecordFromCount: true },
@@ -149,7 +148,7 @@ export const deleteRecordPreview = async (surveyId, recordUuid) =>
 export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
   db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
-    if (!R.isEmpty(recordUuids)) {
+    if (!A.isEmpty(recordUuids)) {
       await FileManager.deleteFilesByRecordUuids(surveyId, recordUuids, t)
     }
     return recordUuids.length
@@ -378,7 +377,7 @@ const _onNodesUpdate = async (
   return { record: recordUpdated, nodes: updatedNodesAndDependents }
 }
 
-const _afterNodesUpdate = async ({ survey, record, nodes, nodesValidationListener }, t) => {
+const _afterNodesUpdate = async ({ survey, record, nodes, nodesValidationListener = null }, t) => {
   if (Record.isPreview(record)) return
 
   const nodeDefsModified = Object.values(nodes).map((node) =>
@@ -394,7 +393,7 @@ const _afterNodesUpdate = async ({ survey, record, nodes, nodesValidationListene
       t
     )
     const recordNodesValidation = validationByRecordUuid[Record.getUuid(record)]
-    if (!R.isEmpty(recordNodesValidation)) {
+    if (nodesValidationListener && !A.isEmpty(recordNodesValidation)) {
       nodesValidationListener(recordNodesValidation)
     }
   }
@@ -417,7 +416,7 @@ const _afterNodesUpdate = async ({ survey, record, nodes, nodesValidationListene
         t
       )
     const recordNodesValidation = validationByRecordUuid[Record.getUuid(record)]
-    if (!R.isEmpty(recordNodesValidation)) {
+    if (nodesValidationListener && !A.isEmpty(recordNodesValidation)) {
       nodesValidationListener(recordNodesValidation)
     }
   }
@@ -436,7 +435,7 @@ const validateNodesAndPersistToRDB = async ({ user, survey, record, nodes, nodes
     { user, survey, record, nodes: nodesToValidate, validateRecordUniqueness: true },
     t
   )
-  if (nodesValidationListener) {
+  if (nodesValidationListener && !A.isEmpty(validations)) {
     nodesValidationListener(validations)
   }
 

@@ -73,7 +73,7 @@ export const getNodeDefChildrenSorted =
     const cycleKeysToConsider = Objects.isEmpty(cycle) ? Surveys.getCycleKeys(survey) : [cycle]
     // get child defs from the cycles to consider, then combine them keeping their sorting
     let childDefs = []
-    for (let cycleIndex = 0; cycleIndex < cycleKeysToConsider.length && childDefs.length === 0; cycleIndex++) {
+    for (let cycleIndex = 0; cycleIndex < cycleKeysToConsider.length; cycleIndex++) {
       const currentCycle = cycleKeysToConsider[cycleIndex]
       const childDefsInCycle = Surveys.getNodeDefChildrenSorted({
         survey,
@@ -85,15 +85,14 @@ export const getNodeDefChildrenSorted =
       if (cycleIndex === 0) {
         childDefs.push(...childDefsInCycle)
       } else {
-        for (let index = 0; index < childDefs.length; index++) {
-          const childDef = childDefs[index]
+        for (let index = 0; index < childDefsInCycle.length; index++) {
+          const childDef = childDefsInCycle[index]
           if (!childDefs.includes(childDef)) {
             childDefs.splice(index, 0, childDef)
           }
         }
       }
     }
-
     if (!includeSamplingDefsWithoutSiblings) {
       childDefs = filterNodeDefsWithoutSiblings(childDefs)
     }
