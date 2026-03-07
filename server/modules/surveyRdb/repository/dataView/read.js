@@ -398,7 +398,7 @@ export const isRecordUniqueByUniqueNodes = async ({ survey, record }, client = d
 }
 
 export const fetchRecordsCountByRootNodesValue = async (
-  { survey, cycle, nodeDefs, nodes, recordUuidsExcluded = [], excludeRecordsFromCount = false },
+  { survey, cycle, nodeDefs, nodes, recordUuidsExcluded = [] },
   client = db
 ) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
@@ -437,6 +437,8 @@ export const fetchRecordsCountByRootNodesValue = async (
 
   const rootTableRecordUuidAliasedCol = `${rootTableAlias}.${TableDataNodeDef.columnSet.recordUuid}`
 
+  const excludeSomeRecords = recordUuidsExcluded?.length > 0
+
   const query = `
     WITH count_records AS (
       SELECT
@@ -445,7 +447,7 @@ export const fetchRecordsCountByRootNodesValue = async (
         ${rootTable}
       WHERE 
         ${TableDataNodeDef.columnSet.recordCycle} = $/cycle/
-        ${excludeRecordsFromCount ? ` AND ${TableDataNodeDef.columnSet.recordUuid} NOT IN ($/recordUuidsExcluded:csv/)` : ''}
+        ${excludeSomeRecords ? ` AND ${TableDataNodeDef.columnSet.recordUuid} NOT IN ($/recordUuidsExcluded:csv/)` : ''}
       GROUP BY 
         ${filterColumnsString}
     )
@@ -461,7 +463,7 @@ export const fetchRecordsCountByRootNodesValue = async (
     WHERE
       ${rootTableAlias}.${TableDataNodeDef.columnSet.recordCycle} = $/cycle/
       AND ${filterCondition}
-      AND ${rootTableRecordUuidAliasedCol} NOT IN ($/recordUuidsExcluded:csv/)
+      ${excludeSomeRecords ? `AND ${rootTableRecordUuidAliasedCol} NOT IN ($/recordUuidsExcluded:csv/)` : ''}
     GROUP BY ${rootTableRecordUuidAliasedCol}, cr.count
   `
   return client.map(
