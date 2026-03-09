@@ -316,7 +316,7 @@ export default class RecordsImportJob extends Job {
 
   async _insertRecordNodes(record) {
     for (const node of Record.getNodesArray(record)) {
-      this.batchPersister.addItem(node, this.tx)
+      await this.batchPersister.addItem(node, this.tx)
     }
   }
 

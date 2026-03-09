@@ -5,6 +5,7 @@
   display: flex;
   padding: 0.5rem;
   background-color: $formBgColorGrey;
+  border-bottom: 4px solid $blue;
 
   .node-select-form-item {
     min-width: 30rem;

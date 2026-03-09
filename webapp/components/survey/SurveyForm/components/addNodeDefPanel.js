@@ -1,12 +1,11 @@
 import './addNodeDefPanel.scss'
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { connect } from 'react-redux'
 import { useNavigate } from 'react-router'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
-import * as ProcessUtils from '@core/processUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
@@ -22,8 +21,14 @@ const AddNodeDefButtons = (props) => {
 
   const i18n = useI18n()
 
-  const availableNodeDefTypes = Object.values(NodeDef.nodeDefType).filter(
-    (type) => ProcessUtils.ENV.experimentalFeatures || !experimentalNodeDefTypes.includes(type)
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
+
+  const availableNodeDefTypes = useMemo(
+    () =>
+      Object.values(NodeDef.nodeDefType).filter(
+        (type) => experimentalFeatures || !experimentalNodeDefTypes.includes(type)
+      ),
+    [experimentalFeatures]
   )
 
   return (
@@ -68,7 +73,7 @@ const AddNodeDefPanel = (props) => {
 
         <div className="flex-center add-to-label">
           <span className="icon icon-plus icon-10px icon-left" />
-          {i18n.t('surveyForm:addChildTo', { nodeDefLabel })}
+          {i18n.t('surveyForm:addChildTo', { nodeDefLabel, interpolation: { escapeValue: false } })}
         </div>
 
         <AddNodeDefButtons

@@ -1,5 +1,23 @@
 import ExcelJS from 'exceljs'
 
+const extractRowValues = (row) => {
+  const values = []
+  row.eachCell((cell) => {
+    values.push(cell.value)
+  })
+  return values
+}
+
+const extractRowValuesFixed = (row, cellsCount) => {
+  const values = []
+  for (let index = 0; index < cellsCount; index++) {
+    const cell = row.getCell(index + 1)
+    const cellValue = cell?.value ?? '' // null values considered as empty strings
+    values.push(cellValue)
+  }
+  return values
+}
+
 const extractRowsFromExcelStream = async ({ stream }) => {
   const workbook = new ExcelJS.Workbook()
   await workbook.xlsx.read(stream)
@@ -13,18 +31,10 @@ const extractRowsFromExcelStream = async ({ stream }) => {
   let headers = null
   worksheet.eachRow((row, rowNumber) => {
     if (rowNumber === 1) {
-      headers = []
-      row.eachCell((cell) => {
-        headers.push(cell.value)
-      })
+      headers = extractRowValues(row)
       rows.push(headers)
     } else {
-      const rowValues = []
-      headers.forEach((_header, index) => {
-        const cell = row.getCell(index + 1)
-        const cellValue = cell?.value ?? '' // null values considered as empty strings
-        rowValues.push(cellValue)
-      })
+      const rowValues = extractRowValuesFixed(row, headers.length)
       rows.push(rowValues)
     }
   })

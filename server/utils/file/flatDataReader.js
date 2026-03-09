@@ -30,13 +30,16 @@ const _extractValidHeaders = (row) => {
   return headers
 }
 
-const _rowToObject = ({ headers, row }) =>
-  headers.reduce((acc, header, index) => {
+const _rowToObject = ({ headers, row }) => {
+  const result = Object.create(null)
+  for (let index = 0; index < headers.length; index++) {
+    const header = headers[index]
     const cellValue = row[index]
     const trimmedCellValue = StringUtils.isString(cellValue) ? StringUtils.trim(cellValue) : cellValue
-    acc[header] = trimmedCellValue
-    return acc
-  }, {})
+    result[header] = trimmedCellValue
+  }
+  return result
+}
 
 export const createReaderFromStream = ({
   stream,

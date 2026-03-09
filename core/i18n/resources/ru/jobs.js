@@ -69,8 +69,11 @@ export default {
   ChainExportJob: 'Экспорт цепочки',
   UsersExportJob: 'Экспорт пользователей',
   ActivityLogExportJob: 'Экспорт журнала активности',
+  InfoExportJob: 'Формирование информации о выходном файле',
   // validation report
   VaidationReportGenerationJob: 'Сформировать отчет о проверке',
   // record validation
   RecordsValidationJob: 'Проверка записей',
+  // analysis
+  PersistResultsJob: 'Сохранение результатов анализа',
 }

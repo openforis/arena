@@ -94,7 +94,15 @@ const props = {
   [nodeDefType.date]: {
     [colValueProcessor]: ({ nodeCol }) => {
       const [year, month, day] = [Node.getDateYear(nodeCol), Node.getDateMonth(nodeCol), Node.getDateDay(nodeCol)]
-      return () => (DateTimeUtils.isValidDate(year, month, day) ? `${year}-${month}-${day}` : null)
+      return () => {
+        if (!DateTimeUtils.isValidDate(year, month, day)) {
+          return null
+        }
+        const yearStr = StringUtils.padStart(4, '0')(year)
+        const monthStr = StringUtils.padStart(2, '0')(month)
+        const dayStr = StringUtils.padStart(2, '0')(day)
+        return `${yearStr}-${monthStr}-${dayStr}`
+      }
     },
   },
   [nodeDefType.decimal]: {
@@ -167,7 +175,8 @@ const props = {
   [nodeDefType.time]: {
     [colValueProcessor]: ({ nodeCol }) => {
       const [hour, minute] = [Node.getTimeHour(nodeCol), Node.getTimeMinute(nodeCol)]
-      return () => (DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${minute}:00` : null)
+      return () =>
+        DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${StringUtils.padStart(2, '0')(minute)}:00` : null
     },
   },
 }

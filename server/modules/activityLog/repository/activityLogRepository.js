@@ -4,6 +4,7 @@ import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
+import * as ProcessUtils from '@core/processUtils'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -26,17 +27,23 @@ export const tableColumns = [
 ] // Used for activity_logs values batch insert
 
 // ===== CREATE
-export const insert = async (user, surveyId, type, content, system, client = db) =>
-  client.none(
+export const insert = async (user, surveyId, type, content, system, client = db) => {
+  if (ProcessUtils.ENV.activityLogDisabled) {
+    return
+  }
+  await client.none(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content, system)
     VALUES ($1, $2, $3::jsonb, $4)`,
     [type, User.getUuid(user), content || {}, system]
   )
+}
 
-export const insertMany = async (user, surveyId, activities, client = db) =>
-  activities.length > 0 &&
-  client.none(
+export const insertMany = async (user, surveyId, activities, client = db) => {
+  if (activities.length === 0 || ProcessUtils.ENV.activityLogDisabled) {
+    return
+  }
+  await client.none(
     DbUtils.insertAllQueryBatch(
       getSurveyDBSchema(surveyId),
       tableName,
@@ -49,6 +56,7 @@ export const insertMany = async (user, surveyId, activities, client = db) =>
       }))
     )
   )
+}
 
 // ===== READ
 export const fetchSimple = async ({ surveyId, limit = 30, offset = 0 }, client = db) =>

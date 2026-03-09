@@ -105,8 +105,16 @@ const Dropzone = (props) => {
         onDropAccepted={onDropAccepted}
         onDropRejected={onDropRejected}
       >
-        {({ getRootProps, getInputProps }) => (
-          <div className={classNames('dropzone', { disabled })} {...getRootProps()}>
+        {({ isDragReject, isDragAccept, isFocused, getRootProps, getInputProps }) => (
+          <div
+            className={classNames('dropzone', {
+              disabled,
+              focused: isFocused,
+              'drag-accept': isDragAccept,
+              'drag-reject': isDragReject,
+            })}
+            {...getRootProps()}
+          >
             <input {...getInputProps()} />
             <p>{i18n.t('dropzone.message')}</p>
             {acceptedExtensions.length > 0 && (

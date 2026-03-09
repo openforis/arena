@@ -237,15 +237,8 @@ export const getAncestorCodeAttributes =
 
 // ====== Keys
 
-export const getEntityKeyNodes = (survey, nodeEntity) => (record) => {
-  const nodeDefEntity = SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(nodeEntity))(survey)
-  const nodeDefKeys = SurveyNodeDefs.getNodeDefKeys(nodeDefEntity)(survey)
-
-  return R.pipe(
-    R.map((nodeDefKey) => getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)),
-    R.flatten
-  )(nodeDefKeys)
-}
+export const getEntityKeyNodes = (survey, nodeEntity) => (record) =>
+  Records.getEntityKeyNodes({ survey, record, entity: nodeEntity })
 
 export const getEntityKeyValues = (survey, nodeEntity) =>
   R.pipe(getEntityKeyNodes(survey, nodeEntity), R.map(Node.getValue))

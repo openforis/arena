@@ -25,6 +25,7 @@ const Row = (props) => {
   const i18n = useI18n()
 
   const path = RecordValidationReportItem.getPath({ survey, lang })(row)
+  const ownerName = RecordValidationReportItem.getRecordOwnerName(row)
   const canEdit =
     Survey.isPublished(surveyInfo) &&
     Authorizer.canEditRecord(user, {
@@ -49,6 +50,9 @@ const Row = (props) => {
         data-value={jointValidationText}
       >
         <ValidationFieldMessages validation={validation} showKeys={false} showIcons />
+      </div>
+      <div className="validation-report__owner-col" data-value={ownerName}>
+        <LabelWithTooltip label={ownerName} />
       </div>
       <div>
         <span className={`icon icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`} />
