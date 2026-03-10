@@ -136,17 +136,18 @@ export const useChains = () => {
   const surveyId = useSurveyId()
   const [chains, setChains] = useState(null)
   useEffect(() => {
-    if (!canUseAnalysis) return
-
     let isMounted = true
-
-    const fetchChains = async () => {
-      const { chains: _chains } = await API.fetchChains({ surveyId })
-      if (isMounted) {
-        setChains(_chains)
+    if (canUseAnalysis) {
+      const fetchChains = async () => {
+        const { chains: _chains } = await API.fetchChains({ surveyId })
+        if (isMounted) {
+          setChains(_chains)
+        }
       }
+      fetchChains()
+    } else {
+      setChains(null)
     }
-    fetchChains()
     return () => {
       isMounted = false
     }

@@ -2,9 +2,10 @@ import * as StringUtils from '@core/stringUtils'
 
 const baseLayerProviders = {
   esri: 'ESRI',
+  carto: 'Carto',
+  openTopoMap: 'OpenTopoMap',
   openStreetMap: 'OpenStreetMap',
   planet: 'planet',
-  // wmts: 'WMTS',
 }
 
 // const baseLayerAttribution = {
@@ -65,9 +66,54 @@ export const baseLayers = [
     key: 'OpenStreetMap',
     name: 'OpenStreetMap',
     provider: baseLayerProviders.openStreetMap,
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  },
+  {
+    key: 'OpenStreetMap HOT',
+    name: 'OpenStreetMap HOT',
+    provider: baseLayerProviders.openStreetMap,
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by Humanitarian OpenStreetMap Team',
+    maxZoom: 19,
+    url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+  },
+  {
+    key: 'OpenTopoMap',
+    name: 'OpenTopoMap',
+    provider: baseLayerProviders.openTopoMap,
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+    maxZoom: 17,
+    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+  },
+  {
+    key: 'CartoDB Positron',
+    name: 'CartoDB Positron',
+    provider: baseLayerProviders.carto,
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 20,
+    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  },
+  {
+    key: 'CartoDB Dark Matter',
+    name: 'CartoDB Dark Matter',
+    provider: baseLayerProviders.carto,
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 20,
+    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  },
+  {
+    key: 'CartoDB Voyager',
+    name: 'CartoDB Voyager',
+    provider: baseLayerProviders.carto,
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 20,
+    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
   },
   // {
   //   key: 'WMTS',
