@@ -6,7 +6,6 @@ const baseLayerProviders = {
   openTopoMap: 'OpenTopoMap',
   openStreetMap: 'OpenStreetMap',
   planet: 'planet',
-  // wmts: 'WMTS',
 }
 
 // const baseLayerAttribution = {

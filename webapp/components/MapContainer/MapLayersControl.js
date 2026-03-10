@@ -47,7 +47,7 @@ export const MapLayersControl = (props) => {
       const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, url } = baseLayer
 
       const tileUrl = getTileUrl({ url, apiKeyRequired, provider, user })
-      if (!tileUrl && provider != 'WMTS') {
+      if (!tileUrl) {
         continue
       }
 
