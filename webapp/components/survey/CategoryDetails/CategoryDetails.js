@@ -74,6 +74,7 @@ const CategoryDetails = (props) => {
           <div className="row">
             <FormItem label="categoryEdit.categoryName">
               <Input
+                autoFocus
                 id={TestId.categoryDetails.categoryName}
                 value={Category.getName(category)}
                 validation={Validation.getFieldValidation(Category.keysProps.name)(validation)}

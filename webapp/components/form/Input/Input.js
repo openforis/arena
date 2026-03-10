@@ -15,6 +15,7 @@ import { SimpleTextInput } from '../SimpleTextInput'
 
 export const Input = React.forwardRef((props, ref) => {
   const {
+    autoFocus,
     className: classNameProp = null,
     disabled = false,
     id = null,
@@ -82,6 +83,7 @@ export const Input = React.forwardRef((props, ref) => {
       {numberFormat ? (
         <NumericFormat
           autoComplete="off"
+          autoFocus={autoFocus}
           disabled={disabled || readOnly}
           className={className}
           customInput={TextField}
@@ -103,10 +105,10 @@ export const Input = React.forwardRef((props, ref) => {
       ) : (
         <SimpleTextInput
           autoComplete="off"
+          autoFocus={autoFocus}
           className={className}
           disabled={disabled}
           id={id}
-          inputRef={inputRef}
           label={label}
           maxLength={maxLength}
           name={name}
@@ -115,6 +117,7 @@ export const Input = React.forwardRef((props, ref) => {
           onFocus={onFocus}
           placeholder={placeholderProp}
           readOnly={readOnly}
+          ref={inputRef}
           rows={rows}
           testId={id}
           title={title}
@@ -128,6 +131,7 @@ export const Input = React.forwardRef((props, ref) => {
 
 Input.propTypes = {
   className: PropTypes.string,
+  autoFocus: PropTypes.bool,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   inputType: PropTypes.oneOf(['input', 'textarea']),

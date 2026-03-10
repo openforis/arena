@@ -65,6 +65,7 @@ const LevelDetails = (props) => {
 
           <FormItem label="common.name">
             <Input
+              autoFocus
               id={TestId.categoryDetails.levelName(levelIndex)}
               value={CategoryLevel.getName(level)}
               validation={Validation.getFieldValidation('name')(validation)}

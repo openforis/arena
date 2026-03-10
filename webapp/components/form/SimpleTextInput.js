@@ -8,6 +8,7 @@ import { useI18n } from '@webapp/store/system'
 export const SimpleTextInput = forwardRef((props, ref) => {
   const {
     autoComplete = 'off',
+    autoFocus,
     className,
     defaultValue,
     disabled,
@@ -52,17 +53,18 @@ export const SimpleTextInput = forwardRef((props, ref) => {
   return (
     <MuiTextField
       autoComplete={autoComplete}
+      autoFocus={autoFocus}
       className={classNames('input-text', className)}
       defaultValue={defaultValue}
       disabled={disabled || readOnly}
       label={label}
       id={id}
-      inputRef={inputRef}
       InputProps={{
         'data-testid': testId,
         startAdornment,
         endAdornment,
       }}
+      inputRef={inputRef}
       margin="none"
       multiline={multiline}
       name={name}
@@ -81,6 +83,7 @@ export const SimpleTextInput = forwardRef((props, ref) => {
 
 SimpleTextInput.propTypes = {
   autoComplete: PropTypes.string,
+  autoFocus: PropTypes.bool,
   className: PropTypes.string,
   defaultValue: PropTypes.string,
   disabled: PropTypes.bool,

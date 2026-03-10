@@ -1,6 +1,6 @@
 import './itemDetails.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -33,16 +33,16 @@ const ItemDetails = (props) => {
   const [item, setItem] = useState(itemProp)
 
   const category = State.getCategory(state)
-  const categoryUuid = Category.getUuid(category)
+  const categoryUuid = useMemo(() => Category.getUuid(category), [category])
   const itemExtraDefsArray = Category.getItemExtraDefsArray(category)
   const validation = Category.getItemValidation(item)(category)
   const { published: disabled } = item
 
-  const levelIndex = CategoryLevel.getIndex(level)
+  const levelIndex = useMemo(() => CategoryLevel.getIndex(level), [level])
   const levelIsLast = levelIndex === Category.getLevelsArray(category).length - 1
   const itemActive = State.getItemActive({ levelIndex })(state)
   const itemActiveUuid = itemActive ? CategoryItem.getUuid(itemActive) : null
-  const itemUuid = CategoryItem.getUuid(item)
+  const itemUuid = useMemo(() => CategoryItem.getUuid(item), [item])
   const active = itemUuid === itemActiveUuid
   const leaf = active && State.isItemActiveLeaf({ levelIndex })(state)
   const extraPropsEditorVisible =
@@ -117,6 +117,7 @@ const ItemDetails = (props) => {
 
           <FormItem label="common.code">
             <Input
+              autoFocus
               id={TestId.categoryDetails.itemCode(levelIndex, index)}
               value={CategoryItem.getCode(item)}
               disabled={disabled}
