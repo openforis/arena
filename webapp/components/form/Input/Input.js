@@ -83,6 +83,7 @@ export const Input = React.forwardRef((props, ref) => {
       {numberFormat ? (
         <NumericFormat
           autoComplete="off"
+          autoFocus={autoFocus}
           disabled={disabled || readOnly}
           className={className}
           customInput={TextField}
