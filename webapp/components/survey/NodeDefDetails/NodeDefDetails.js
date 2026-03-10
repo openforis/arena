@@ -39,7 +39,6 @@ const NodeDefDetails = (props) => {
   const nodeDefIsRoot = nodeDef && NodeDef.isRoot(nodeDef)
   const nodeDefType = nodeDef && NodeDef.getType(nodeDef)
   const canHaveMobileProps = NodeDef.canHaveMobileProps(cycle)(nodeDef)
-
   const tabs = useMemo(() => {
     if (nodeDefNull) return []
     const tabProps = { state, Actions, editingFromDesigner }
@@ -98,6 +97,7 @@ const NodeDefDetails = (props) => {
         <FormItem label="common.name" className="node-def-edit__title">
           <Input
             id={TestId.nodeDefDetails.nodeDefName}
+            autoFocus
             value={NodeDef.getName(nodeDef)}
             validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.name, value })}
