@@ -11,6 +11,7 @@ import * as API from '@webapp/service/api'
 
 import * as SurveyState from '../state'
 import { SurveyStatusState } from '../status'
+import { useAuthCanUseAnalysis, useUser } from '@webapp/store/user'
 
 // ==== Survey
 export const useSurveyDefsFetched = ({ draft, includeAnalysis, validate }) =>
@@ -131,10 +132,14 @@ export const useSurveyHasFileAttributes = () =>
 export const useIsSurveyDirty = () => useSelector(SurveyStatusState.isDirty)
 
 export const useChains = () => {
+  const canUseAnalysis = useAuthCanUseAnalysis()
   const surveyId = useSurveyId()
   const [chains, setChains] = useState(null)
   useEffect(() => {
+    if (!canUseAnalysis) return
+
     let isMounted = true
+
     const fetchChains = async () => {
       const { chains: _chains } = await API.fetchChains({ surveyId })
       if (isMounted) {
@@ -145,6 +150,6 @@ export const useChains = () => {
     return () => {
       isMounted = false
     }
-  }, [surveyId])
+  }, [canUseAnalysis, surveyId])
   return chains
 }
