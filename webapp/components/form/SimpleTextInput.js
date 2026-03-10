@@ -14,6 +14,7 @@ export const SimpleTextInput = forwardRef((props, ref) => {
     disabled,
     endAdornment,
     id,
+    inputRef,
     label: labelProp,
     maxLength,
     name,
@@ -58,12 +59,12 @@ export const SimpleTextInput = forwardRef((props, ref) => {
       disabled={disabled || readOnly}
       label={label}
       id={id}
-      inputRef={ref}
       InputProps={{
         'data-testid': testId,
         startAdornment,
         endAdornment,
       }}
+      inputRef={inputRef}
       margin="none"
       multiline={multiline}
       name={name}
