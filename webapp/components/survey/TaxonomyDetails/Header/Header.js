@@ -46,6 +46,7 @@ const Header = (props) => {
       <div>
         <FormItem label="taxonomy.edit.taxonomyListName">
           <Input
+            autoFocus
             id={TestId.taxonomyDetails.taxonomyName}
             value={Taxonomy.getName(taxonomy)}
             validation={Validation.getFieldValidation(Taxonomy.keysProps.name)(validation)}

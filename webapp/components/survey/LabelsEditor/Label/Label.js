@@ -7,6 +7,7 @@ import { Input } from '@webapp/components/form/Input'
 import Badge from './Badge'
 
 const Label = ({
+  autoFocus,
   compactLanguage = false,
   inputFieldIdPrefix,
   inputType = 'input',
@@ -22,6 +23,7 @@ const Label = ({
     {showLanguageBadge && <Badge lang={lang} compact={compactLanguage} />}
 
     <Input
+      autoFocus={autoFocus}
       id={inputFieldIdPrefix ? `${inputFieldIdPrefix}-${lang}` : null}
       value={R.propOr('', lang, labels)}
       onChange={(value) => onChange(R.ifElse(R.always(R.isEmpty(value)), R.dissoc(lang), R.assoc(lang, value))(labels))}
@@ -34,6 +36,7 @@ const Label = ({
 )
 
 Label.propTypes = {
+  autoFocus: PropTypes.bool,
   inputFieldIdPrefix: PropTypes.string,
   inputType: PropTypes.oneOf(['input', 'textarea']),
   labels: PropTypes.object,

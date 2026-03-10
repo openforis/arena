@@ -25,6 +25,7 @@ const sortLanguages = ({ languages, preferredLanguage }) =>
 
 const LabelsEditor = (props) => {
   const {
+    autoFocus,
     compactLanguage = false,
     formLabelKey = 'common.label',
     inputFieldIdPrefix,
@@ -58,9 +59,10 @@ const LabelsEditor = (props) => {
       </div>
       <div className="labels-editor__labels">
         <ValidationTooltip validation={validation}>
-          {languagesToEdit.map((lang) => (
+          {languagesToEdit.map((lang, index) => (
             <Label
               key={lang}
+              autoFocus={autoFocus && index === 0}
               inputFieldIdPrefix={inputFieldIdPrefix}
               inputType={inputType}
               lang={lang}
@@ -80,6 +82,7 @@ const LabelsEditor = (props) => {
 }
 
 LabelsEditor.propTypes = {
+  autoFocus: PropTypes.bool,
   compactLanguage: PropTypes.bool,
   formLabelKey: PropTypes.string,
   inputFieldIdPrefix: PropTypes.string,
