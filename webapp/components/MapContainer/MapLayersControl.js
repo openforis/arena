@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { LayersControl, TileLayer, useMapEvents } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -40,23 +40,31 @@ export const MapLayersControl = (props) => {
     [surveyId]
   )
 
+  const baseLayersControls = useMemo(() => {
+    const result = []
+    for (let index = 0; index < baseLayers.length; index++) {
+      const baseLayer = baseLayers[index]
+      const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, url } = baseLayer
+
+      const tileUrl = getTileUrl({ url, apiKeyRequired, provider, user })
+      if (!tileUrl) {
+        continue
+      }
+
+      const checked = (!contextBaseLayer && index === 0) || contextBaseLayer?.name === name
+
+      result.push(
+        <LayersControl.BaseLayer key={key} name={name} checked={checked}>
+          <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} minZoom={3} />
+        </LayersControl.BaseLayer>
+      )
+    }
+    return result
+  }, [contextBaseLayer, getTileUrl, user])
+
   return (
     <LayersControl autoZIndex position="topright">
-      {baseLayers.reduce((acc, baseLayer, index) => {
-        const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, url } = baseLayer
-
-        const tileUrl = getTileUrl({ url, apiKeyRequired, provider, user })
-        if (!tileUrl && provider != 'WMTS') return acc
-
-        const checked = (!contextBaseLayer && index === 0) || contextBaseLayer?.name === name
-
-        return [
-          ...acc,
-          <LayersControl.BaseLayer key={key} name={name} checked={checked}>
-            <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} minZoom={3} />
-          </LayersControl.BaseLayer>,
-        ]
-      }, [])}
+      {baseLayersControls}
       <WmtsComponent />
       {layers}
     </LayersControl>
