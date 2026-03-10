@@ -15,7 +15,7 @@ import { db } from '@server/db/db'
  * {
  *   uuid, //record uuid,
  *   validation: {}, //record validation object,
-     node_duplicate_iids: [nodeIId1, nodeIId2, ...] //array of duplicate entity iids
+     node_duplicate_i_ids: [nodeIId1, nodeIId2, ...] //array of duplicate entity iids
  * }
  * ```.
  * @param {!object} survey - The survey object.
@@ -45,13 +45,16 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
   )(nodeDefKeys)
 
   const recordAndParentEqualCondition = NodeDef.isRoot(nodeDefEntity)
-    ? ''
+    ? `AND ${getColEqualCondition(TableDataNodeDef.columnSet.recordUuid)}`
     : `AND ${getColEqualCondition(TableDataNodeDef.columnSet.recordUuid)}
          AND ${getColEqualCondition(TableDataNodeDef.columnSet.parentInternalId)}`
 
   return await client.any(
     `
-    SELECT r.uuid, r.validation, json_agg(${aliasA}.i_id) as node_duplicate_i_ids
+    SELECT 
+      r.uuid, 
+      r.validation, 
+      json_agg(${aliasA}.i_id) as node_duplicate_i_ids
     FROM ${Schemata.getSchemaSurvey(surveyId)}.record r
       JOIN ${tableName} ${aliasA}
         ON r.uuid = ${aliasA}.${TableDataNodeDef.columnSet.recordUuid} 
@@ -63,7 +66,7 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
       FROM ${tableName} ${aliasB}
       WHERE
         --same cycle
-        ${aliasB}.${TableDataNodeDef.columnSet.recordCycle} = $1
+        ${aliasB}.${TableDataNodeDef.columnSet.recordCycle} = $/cycle/
         --different node internal ID 
         AND ${aliasA}.${TableDataNodeDef.columnSet.iId} != ${aliasB}.${TableDataNodeDef.columnSet.iId}
         ${recordAndParentEqualCondition}
@@ -72,7 +75,7 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
       )
     GROUP BY r.uuid, r.validation
     `,
-    [cycle]
+    { cycle }
   )
 }
 
