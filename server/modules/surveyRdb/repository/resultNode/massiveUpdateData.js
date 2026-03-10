@@ -70,8 +70,8 @@ export default class MassiveUpdateData extends MassiveUpdate {
       },
       {
         [TableDataNodeDef.columnSet.recordUuid]: rowResult[TableDataNodeDef.columnSet.recordUuid],
-        // in this table the coloumn uuid is the parent_uuid of the result
-        [TableDataNodeDef.columnSet.uuid]: rowResult[TableDataNodeDef.columnSet.parentUuid],
+        // in this table the coloumn iId is the parentInternalId of the result
+        [TableDataNodeDef.columnSet.iId]: rowResult[TableDataNodeDef.columnSet.parentInternalId],
       }
     )
 

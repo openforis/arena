@@ -16,14 +16,14 @@ export const createNodeKeysHierarchyView = async (survey, client = db) => {
     CREATE VIEW ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} AS (
       SELECT
         h.${NodeHierarchyDisaggregatedView.columns.nodeId} AS ${NodeKeysHierarchyView.columns.nodeId},
-        h.${NodeHierarchyDisaggregatedView.columns.nodeUuid} AS ${NodeKeysHierarchyView.columns.nodeUuid},
+        h.${NodeHierarchyDisaggregatedView.columns.nodeIId} AS ${NodeKeysHierarchyView.columns.nodeIId},
         h.${NodeHierarchyDisaggregatedView.columns.nodeDefUuid} AS ${NodeKeysHierarchyView.columns.nodeDefUuid},
         h.${NodeHierarchyDisaggregatedView.columns.recordUuid} AS ${NodeKeysHierarchyView.columns.recordUuid},
         k_s.${NodeKeysView.columns.keys} AS ${NodeKeysHierarchyView.columns.keysSelf},
         jsonb_agg(
           jsonb_build_object(
             '${NodeKeys.keys.nodeDefUuid}', h.${NodeHierarchyDisaggregatedView.columns.nodeDefAncestorUuid}, 
-            '${NodeKeys.keys.nodeUuid}', h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorUuid}, 
+            '${NodeKeys.keys.nodeIId}', h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorIId}, 
             '${NodeKeys.keys.nodeId}', h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorId}, 
             '${NodeKeys.keys.recordUuid}', h.${NodeHierarchyDisaggregatedView.columns.recordUuid}, 
             '${NodeKeys.keys.keys}', k_h.${NodeKeysView.columns.keys} 
@@ -36,12 +36,12 @@ export const createNodeKeysHierarchyView = async (survey, client = db) => {
       LEFT OUTER JOIN
         ${NodeKeysView.getNameWithSchema(surveyId)} k_h
       ON
-        k_h.${NodeKeysView.columns.nodeUuid} = h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorUuid}
+        k_h.${NodeKeysView.columns.nodeIId} = h.${NodeHierarchyDisaggregatedView.columns.nodeAncestorIId}
         -- Join to get keys for itself if it's an entity
       LEFT OUTER JOIN
         ${NodeKeysView.getNameWithSchema(surveyId)} k_s
       ON
-        k_s.${NodeKeysView.columns.nodeUuid} = h.${NodeHierarchyDisaggregatedView.columns.nodeUuid}
+        k_s.${NodeKeysView.columns.nodeIId} = h.${NodeHierarchyDisaggregatedView.columns.nodeIId}
       GROUP BY
         1,2,3,4,5
     )`)

@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 export const keys = {
   nodeId: 'nodeId',
-  nodeUuid: 'nodeUuid',
+  nodeIId: 'nodeIId',
   nodeDefUuid: 'nodeDefUuid',
   recordUuid: 'recordUuid',
   keys: 'keys',

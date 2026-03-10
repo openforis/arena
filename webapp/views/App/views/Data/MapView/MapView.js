@@ -31,10 +31,10 @@ const MapWrapper = () => {
 
   const [state, setState] = useState({
     editingRecordUuid: null,
-    editingParentNodeUuid: null,
+    editingParentNodeIId: null,
     lastRecordEditModalState: null,
   })
-  const { editingRecordUuid, editingParentNodeUuid, lastRecordEditModalState } = state
+  const { editingRecordUuid, editingParentNodeIId, lastRecordEditModalState } = state
 
   const geoAttributeDefs = useMemo(
     () => Survey.getNodeDefsArray(survey).filter((nodeDef) => NodeDef.isGeo(nodeDef) || NodeDef.isCoordinate(nodeDef)),
@@ -45,12 +45,12 @@ const MapWrapper = () => {
   const layerColors = useRandomColors(samplingPointDataLevels.length + geoAttributeDefs.length)
 
   const onRecordEditClick = useCallback((params) => {
-    const { recordUuid, parentUuid } = params || {}
-    setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid, editingParentNodeUuid: parentUuid }))
+    const { recordUuid, parentIId } = params || {}
+    setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid, editingParentNodeIId: parentIId }))
   }, [])
 
   const closeRecordEditor = useCallback(() => {
-    setState((statePrev) => ({ ...statePrev, editingRecordUuid: null, editingParentNodeUuid: null }))
+    setState((statePrev) => ({ ...statePrev, editingRecordUuid: null, editingParentNodeIId: null }))
   }, [])
 
   const onRecordEditorClose = useCallback(({ modalState: lastRecordEditModalState }) => {
@@ -111,7 +111,7 @@ const MapWrapper = () => {
           onClose={onRecordEditorClose}
           onRequestClose={closeRecordEditor}
           recordUuid={editingRecordUuid}
-          parentNodeUuid={editingParentNodeUuid}
+          parentNodeIId={editingParentNodeIId}
         />
       )}
     </>

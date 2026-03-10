@@ -276,7 +276,7 @@ const _sendNodeUpdateMessage = ({ socketId, user, recordUuid, msg }) => {
   thread.postMessage(msg, user)
 }
 
-export const { fetchNodeByUuid } = RecordManager
+export const { fetchNodeByIId } = RecordManager
 
 export const persistNode = async ({
   socketId,
@@ -302,7 +302,7 @@ export const persistNode = async ({
       size: file.size,
       content: fs.readFileSync(file.tempFilePath),
       recordUuid,
-      nodeUuid: Node.getUuid(node),
+      nodeIId: Node.getIId(node),
     })
     await FileService.insertFile(surveyId, fileObj)
   }
@@ -315,7 +315,7 @@ export const persistNode = async ({
   })
 }
 
-export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset }) =>
+export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeIId, timezoneOffset }) =>
   _sendNodeUpdateMessage({
     socketId,
     user,
@@ -326,15 +326,15 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
       cycle,
       draft,
       recordUuid,
-      nodeUuid,
+      nodeIId,
       user,
       timezoneOffset,
     },
   })
 
 // generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
-export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
-  const node = await fetchNodeByUuid(surveyId, nodeUuid)
+export const generateNodeFileNameForDownload = async ({ surveyId, nodeIId, file }) => {
+  const node = await fetchNodeByIId(surveyId, nodeIId)
   const record = await fetchRecordAndNodesByUuid({
     surveyId,
     recordUuid: Node.getRecordUuid(node),

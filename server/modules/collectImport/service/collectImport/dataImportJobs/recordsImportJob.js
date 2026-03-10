@@ -169,7 +169,6 @@ export default class RecordsImportJob extends Job {
   async traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath }) {
     const { collectSurveyFileZip, collectSurvey } = this.context
 
-    const recordUuid = Record.getUuid(record)
     let recordUpdated = { ...record }
 
     const collectRootEntityName = CollectRecord.getRootEntityName(collectRecordJson)
@@ -202,7 +201,7 @@ export default class RecordsImportJob extends Job {
             continue
           }
 
-          let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
+          let nodeToInsert = Node.newNode({ record: recordUpdated, nodeDefUuid, parentNode: nodeParent })
 
           const valueAndMeta = NodeDef.isAttribute(nodeDef)
             ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({

@@ -1,8 +1,8 @@
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 export const columns = {
-  nodeUuid: 'node_uuid',
   nodeId: 'node_id',
+  nodeIId: 'node_i_id',
   nodeDefUuid: 'node_def_uuid',
   keysHierarchy: 'keys_hierarchy',
   keysSelf: 'keys_self',

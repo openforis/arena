@@ -67,9 +67,9 @@ export const DataQueryScatterChart = (props) => {
       const { payload } = e
       const { record_uuid: recordUuid } = payload
       const queryParentEntityField = `${queryEntityDefName}_uuid`
-      const parentNodeUuid = payload[queryParentEntityField]
-      if (recordUuid && parentNodeUuid) {
-        dispatch(DataExplorerActions.openRecordEditModal({ recordUuid, parentNodeUuid }))
+      const parentNodeIId = payload[queryParentEntityField]
+      if (recordUuid && parentNodeIId) {
+        dispatch(DataExplorerActions.openRecordEditModal({ recordUuid, parentNodeIId }))
       }
     },
     [dispatch, queryEntityDefName]

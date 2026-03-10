@@ -103,8 +103,8 @@ const _prepareSelectFields = ({
       viewDataNodeDef.columnUuid,
       // selected node def columns
       ...nodeDefCols.flatMap(_selectFieldsByNodeDefType({ viewDataNodeDef, streamMode })),
-      // Add ancestor uuid columns
-      ...viewDataNodeDef.columnUuids
+      // Add ancestor internal IDs columns
+      ...viewDataNodeDef.columnIIdsNamesFull
     )
     if (includeDateCreated) {
       queryBuilder.select(viewDataNodeDef.columnDateCreated)

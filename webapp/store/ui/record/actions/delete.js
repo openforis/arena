@@ -24,9 +24,9 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
     const recordUuid = Record.getUuid(record)
     const cycle = Record.getCycle(record)
     const draft = Record.isPreview(record)
-    const nodeUuid = Node.getUuid(node)
+    const nodeIId = Node.getIId(node)
 
-    await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}/node/${nodeUuid}`, {
+    await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}/node/${nodeIId}`, {
       data: { cycle, draft, timezoneOffset: Dates.getTimezoneOffset() },
     })
   }

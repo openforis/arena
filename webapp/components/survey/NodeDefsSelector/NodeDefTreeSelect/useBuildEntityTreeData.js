@@ -11,8 +11,8 @@ import { useNodeDefLabelType, usePagesUuidMap } from '@webapp/store/ui/surveyFor
 import { TestId } from '@webapp/utils/testId'
 
 const getPageNode = ({ record, pagesUuidMap, nodeDefUuid }) => {
-  const nodeUuid = pagesUuidMap[nodeDefUuid]
-  return record && nodeUuid ? Record.getNodeByUuid(nodeUuid)(record) : null
+  const nodeIId = pagesUuidMap[nodeDefUuid]
+  return record && nodeIId ? Record.getNodeByInternalId(nodeIId)(record) : null
 }
 
 const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) =>

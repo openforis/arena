@@ -113,6 +113,7 @@ export const keysContent = {
   // Node
   nodeDefUuid: 'nodeDefUuid',
   recordUuid: 'recordUuid',
+  nodeIId: 'nodeIId',
   // User
   groupUuid: 'groupUuid',
   // Analysis

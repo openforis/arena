@@ -71,7 +71,7 @@ const getCsvExportFields = ({
 
   const fields = []
   if (includeInternalUuids) {
-    ArrayUtils.addIfNotEmpty(viewDataNodeDef.columnParentUuidName)(fields)
+    ArrayUtils.addIfNotEmpty(viewDataNodeDef.columnParentInternalId)(fields)
     fields.push(viewDataNodeDef.columnUuidName)
   }
   if (addCycle) {

@@ -29,7 +29,7 @@ export const getNodePath = (node) => (survey, record) => {
 
     if (NodeDef.isMultiple(nodeDef)) {
       const siblings = Record.getNodeChildrenByDefUuid(parentNode, nodeDefUuid)(record)
-      const index = R.findIndex((n) => Node.getUuid(n) === Node.getUuid(node), siblings)
+      const index = R.findIndex((n) => Node.getIId(n) === Node.getIId(node), siblings)
       return `${parentNodePath}/${NodeDef.getName(nodeDef)}[${index}]`
     }
 
@@ -86,5 +86,5 @@ export const findNodeValueByPath = (path) => (survey, record) => Node.getValue(f
 export const getValidationChildrenCount = (parentNode, childDef) =>
   R.pipe(
     Validation.getValidation,
-    RecordValidation.getValidationChildrenCount(Node.getUuid(parentNode), NodeDef.getUuid(childDef))
+    RecordValidation.getValidationChildrenCount(Node.getIId(parentNode), NodeDef.getUuid(childDef))
   )

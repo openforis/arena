@@ -48,7 +48,7 @@ export const initNewRecord = async (
 ) => {
   const rootNodeDef = Survey.getNodeDefRoot(survey)
 
-  const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
+  const rootNode = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(rootNodeDef) })
 
   return persistNode(
     {
@@ -189,9 +189,9 @@ export const persistNode = async (
       node,
       timezoneOffset,
       nodesUpdateFn: async (user, survey, record, node, t) => {
-        const nodeUuid = Node.getUuid(node)
+        const nodeIId = Node.getIId(node)
 
-        const existingNode = Record.getNodeByUuid(nodeUuid)(record)
+        const existingNode = Record.getNodeByInternalId(nodeIId)(record)
 
         if (existingNode) {
           return NodeUpdateManager.updateNode({ user, survey, record, node, system }, t)
@@ -213,7 +213,7 @@ export const deleteNode = async (
   user,
   survey,
   record,
-  nodeUuid,
+  nodeIId,
   timezoneOffset,
   nodesUpdateListener = null,
   nodesValidationListener = null,
@@ -224,17 +224,17 @@ export const deleteNode = async (
       user,
       survey,
       record,
-      node: Record.getNodeByUuid(nodeUuid)(record),
+      node: Record.getNodeByInternalId(nodeIId)(record),
       timezoneOffset,
       nodesUpdateFn: (user, survey, record, node, t) =>
-        NodeUpdateManager.deleteNode(user, survey, record, Node.getUuid(node), t),
+        NodeUpdateManager.deleteNode(user, survey, record, Node.getIId(node), t),
       nodesUpdateListener,
       nodesValidationListener,
     },
     t
   )
 
-export const { deleteNodesByUuids } = NodeUpdateManager
+export const { deleteNodesByInternalIds } = NodeUpdateManager
 
 export const deleteNodesByNodeDefUuids = async ({ user, surveyId, nodeDefUuids, record }, client = db) => {
   const { record: recordUpdated } = await NodeUpdateManager.deleteNodesByNodeDefUuids(
@@ -344,7 +344,7 @@ const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
     record,
     nodePointers: dependentNodePointersToValidate,
   })
-  return { ...nodes, ...ObjectUtils.toUuidIndexedObj(dependentNodesToValidate) }
+  return { ...nodes, ...ObjectUtils.toIIdIndexedObj(dependentNodesToValidate) }
 }
 
 const _onNodesUpdate = async (
@@ -428,7 +428,7 @@ const _afterNodesUpdate = async ({ survey, record, nodes, nodesValidationListene
 const validateNodesAndPersistToRDB = async ({ user, survey, record, nodes, nodesValidationListener = null }, t) => {
   const nodesArray = Object.values(nodes)
   const nodesToValidate = nodesArray.reduce(
-    (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getUuid(node)]: node }),
+    (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getIId(node)]: node }),
     {}
   )
   const { nodesValidation: validations } = await RecordValidationManager.validateNodesAndPersistValidation(

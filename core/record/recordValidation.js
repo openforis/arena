@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { RecordValidations } from '@openforis/arena-core'
@@ -12,8 +13,8 @@ export const keys = {
 export const prefixValidationFieldChildrenCount = 'childrenCount_'
 
 // ===== UTILS
-export const getValidationChildrenCountKey = (nodeParentUuid, nodeDefChildUuid) =>
-  RecordValidations.getValidationChildrenCountKey({ nodeParentUuid, nodeDefChildUuid })
+export const getValidationChildrenCountKey = (nodeParentIId, nodeDefChildUuid) =>
+  RecordValidations.getValidationChildrenCountKey({ nodeParentInternalId: nodeParentIId, nodeDefChildUuid })
 export const isValidationFieldKeyChildrenCount = R.startsWith(prefixValidationFieldChildrenCount)
 export const isValidationResultErrorCount = (validationResult) =>
   ValidationResult.getKey(validationResult).startsWith('record.nodes.count.')
@@ -30,11 +31,11 @@ export const newValidationRecordDuplicate = ({
 
 // ===== READ
 
-export const getValidationChildrenCount = (nodeParentUuid, nodeDefChildUuid) =>
-  RecordValidations.getValidationChildrenCount({ nodeParentUuid, nodeDefChildUuid })
+export const getValidationChildrenCount = (nodeParentIId, nodeDefChildUuid) =>
+  RecordValidations.getValidationChildrenCount({ nodeParentInternalId: nodeParentIId, nodeDefChildUuid })
 
-export const getNodeValidation = (node) => RecordValidations.getValidationNode({ nodeUuid: node?.uuid })
+export const getNodeValidation = (node) => RecordValidations.getValidationNode({ nodeInternalId: Node.getIId(node) })
 
 // ===== UPDATE
-export const setValidationCount = (nodeParentUuid, nodeDefChildUuid, validationCount) =>
-  Validation.setField(getValidationChildrenCountKey(nodeParentUuid, nodeDefChildUuid), validationCount)
+export const setValidationCount = (nodeParentIId, nodeDefChildUuid, validationCount) =>
+  Validation.setField(getValidationChildrenCountKey(nodeParentIId, nodeDefChildUuid), validationCount)

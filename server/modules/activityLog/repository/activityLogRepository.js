@@ -216,7 +216,7 @@ export const fetch = async ({
     LEFT OUTER JOIN
       ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} n_h
     ON
-      l.content_uuid = n_h.${NodeKeysHierarchyView.columns.nodeUuid}
+      l.content_uuid = n_h.${NodeKeysHierarchyView.columns.nodeIId}
     `
         : ''
     }

@@ -30,7 +30,7 @@ export default (props) => {
       }
       if (NodeDefs.hasMinOrMaxCount(nodeDef)) {
         return RecordValidation.getValidationChildrenCount(
-          Node.getUuid(parentNode),
+          Node.getIId(parentNode),
           NodeDef.getUuid(nodeDef)
         )(recordValidation)
       }

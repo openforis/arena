@@ -22,9 +22,9 @@ const _createUpdateResult = ({ record, node = null, nodes = {}, sideEffect = fal
   return {
     record: recordUpdated,
     nodes: {
-      [Node.getUuid(node)]: node,
+      [Node.getIId(node)]: node,
       // Always assoc parentNode, used in surveyRdbManager.updateTableNodes
-      ...(parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}),
+      ...(parentNode ? { [Node.getIId(parentNode)]: parentNode } : {}),
       ...nodes,
     },
   }
@@ -32,16 +32,15 @@ const _createUpdateResult = ({ record, node = null, nodes = {}, sideEffect = fal
 
 export const insertNodesInBulk = async ({ user, surveyId, nodesArray, systemActivity = false }, tx) => {
   const nodeValues = nodesArray.map((node) => [
-    Node.getUuid(node),
     Node.getDateCreated(node),
     Node.getDateModified(node),
     Node.getRecordUuid(node),
-    Node.getParentUuid(node),
+    Node.getIId(node),
+    Node.getParentInternalId(node),
     Node.getNodeDefUuid(node),
     JSON.stringify(Node.getValue(node, null)),
     Node.getMeta(node),
   ])
-
   await NodeRepository.insertNodesFromValues(surveyId, nodeValues, tx)
 
   const activities = nodesArray.map((node) =>
@@ -86,30 +85,36 @@ export const insertNode = async (
     }
   }
 
-  const nodesCreated = {
-    [Node.getUuid(node)]: node,
+  const nodeIId = Node.getIId(node)
+  const nodesCreatedByIId = {
+    [nodeIId]: node,
   }
   let recordUpdated = record
+  recordUpdated = Record.assocNode(node)(recordUpdated)
+
+  recordUpdated.lastInternalId = recordUpdated.lastInternalId
+    ? Math.max(recordUpdated.lastInternalId, nodeIId)
+    : nodeIId
 
   if (NodeDef.isEntity(nodeDef)) {
     const descendantsCreateResult = await RecordNodesUpdater.createDescendants({
       user,
       survey,
-      record,
+      record: recordUpdated,
       parentNode: node,
       nodeDef,
       timezoneOffset,
       createMultipleEntities,
     })
-    Object.assign(nodesCreated, descendantsCreateResult.nodes)
+    Object.assign(nodesCreatedByIId, descendantsCreateResult.nodes)
     recordUpdated = descendantsCreateResult.record
   }
 
   const nodesInserted = persistNodes
-    ? ObjectUtils.toUuidIndexedObj(
-        await insertNodesInBatch({ user, surveyId, nodes: Object.values(nodesCreated), systemActivity: system }, t)
+    ? ObjectUtils.toIIdIndexedObj(
+        await insertNodesInBatch({ user, surveyId, nodes: Object.values(nodesCreatedByIId), systemActivity: system }, t)
       )
-    : nodesCreated
+    : nodesCreatedByIId
 
   return _createUpdateResult({ record: recordUpdated, node, nodes: nodesInserted, sideEffect })
 }

@@ -14,14 +14,14 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 
 const recordValidationUpdateBatchSize = 1000
 
-const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
-  const validationNodeOld = Validation.getFieldValidation(nodeUuid)(validationRecord)
+const _updateNodeValidation = (validationRecord, nodeIId, validationNode) => {
+  const validationNodeOld = Validation.getFieldValidation(nodeIId)(validationRecord)
 
   // Merge new validation with node validation
   const nodeValidationUpdated = R.mergeDeepRight(validationNodeOld, validationNode)
 
   // Replace node validation in record validation
-  return R.pipe(Validation.setValid(false), Validation.setField(nodeUuid, nodeValidationUpdated))(validationRecord)
+  return R.pipe(Validation.setValid(false), Validation.setField(nodeIId, nodeValidationUpdated))(validationRecord)
 }
 
 export default class RecordsUniquenessValidationJob extends Job {
@@ -74,12 +74,12 @@ export default class RecordsUniquenessValidationJob extends Job {
         }
 
         // 2. for each duplicate node entity, update record validation
-        const { uuid: recordUuid, validation, node_duplicate_uuids: nodeDuplicateUuids } = rowRecordDuplicate
-        const nodeRootUuid = nodeDuplicateUuids[0]
+        const { uuid: recordUuid, validation, node_duplicate_iids: nodeDuplicateIIds } = rowRecordDuplicate
+        const nodeRootIId = nodeDuplicateIIds[0]
         const nodesKeyDuplicate = await RecordManager.fetchChildNodesByNodeDefUuids(
           this.surveyId,
           recordUuid,
-          nodeRootUuid,
+          nodeRootIId,
           nodeDefKeys.map(NodeDef.getUuid),
           this.tx
         )
@@ -88,7 +88,7 @@ export default class RecordsUniquenessValidationJob extends Job {
         const validationRecordUpdated = R.pipe(
           R.reduce(
             (validationRecordAccumulator, nodeKeyDuplicate) =>
-              _updateNodeValidation(validationRecordAccumulator, Node.getUuid(nodeKeyDuplicate), validationDuplicate),
+              _updateNodeValidation(validationRecordAccumulator, Node.getIId(nodeKeyDuplicate), validationDuplicate),
             validationRecord
           ),
           Validation.updateCounts

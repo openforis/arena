@@ -11,10 +11,10 @@ const LinkRecord = (props) => {
 
   const i18n = useI18n()
 
-  const { parentUuid, record } = row
+  const { parentIId, record } = row
 
   const recordUuid = Record.getUuid(record)
-  const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?pageNodeUuid=${parentUuid}`
+  const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?pageNodeIId=${parentIId}`
 
   return (
     <Link type="button" className="btn-transparent" title={i18n.t('dataExplorerView.editRecord')} to={recordEditUrl}>

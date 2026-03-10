@@ -34,7 +34,7 @@ export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
 
 // ==== RECORD FILE
 export const getRecordNodeFileUrl = ({ surveyId, node }) =>
-  `/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`
+  `/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/nodes/${Node.getIId(node)}/file`
 
 export const fetchRecordsNodeFileExifInfo = async ({ surveyId, node }) => {
   const { data: info } = await axios.get(`${getRecordNodeFileUrl({ surveyId, node })}-exif`)

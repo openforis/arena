@@ -39,18 +39,18 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     }
   }
 
-  get columnNodeDefUuid() {
+  get columnNodeDefIId() {
     // node def can be the entity itself or it's source entity (if virtual)
     const { nodeDef } = this.tableData
     return new ColumnNodeDef(this, nodeDef)
   }
 
-  get columnUuid() {
-    return this.columnNodeDefUuid.nameFull
+  get columnNodeDefIIdNameFull() {
+    return this.columnNodeDefIId.nameFull
   }
 
-  get columnUuidName() {
-    return this.columnNodeDefUuid.name
+  get columnNodeDefIIdName() {
+    return this.columnNodeDefIId.name
   }
 
   get columnIdName() {
@@ -58,17 +58,17 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return `_${NodeDef.getName(nodeDef)}_${TableDataNodeDef.columnSet.id}`
   }
 
-  get columnNodeDefUuids() {
+  get columnNodeDefIIds() {
     return [
-      this.columnNodeDefUuid,
+      this.columnNodeDefIId,
       ...(this.viewDataParent
-        ? this.viewDataParent.columnNodeDefUuids.map((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef))
+        ? this.viewDataParent.columnNodeDefIIds.map((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef))
         : []),
     ]
   }
 
-  get columnUuids() {
-    return this.columnNodeDefUuids.flatMap((columnNodeDef) => columnNodeDef.namesFull)
+  get columnNodeDefIIdsNamesFull() {
+    return this.columnNodeDefIIds.flatMap((columnNodeDef) => columnNodeDef.namesFull)
   }
 
   get _multipleAttributeColumns() {
@@ -123,8 +123,12 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull)
   }
 
-  get columnParentUuidName() {
-    return this.viewDataParent?.columnUuidName
+  get columnParentInternalId() {
+    return this.viewDataParent?.columnIId
+  }
+
+  get columnParentInternalIdName() {
+    return this.viewDataParent?.columnIIdName
   }
 
   get tableData() {

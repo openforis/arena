@@ -31,7 +31,7 @@ const _deleteNode = async (parentNode, childNodeName, childNodePosition) => {
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
   const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
   const node = children[childNodePosition - 1]
-  global.applicableRecord = await RecordManager.deleteNode(getContextUser(), survey, record, Node.getUuid(node))
+  global.applicableRecord = await RecordManager.deleteNode(getContextUser(), survey, record, Node.getIId(node))
 }
 
 const _updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpected) => {
@@ -40,7 +40,7 @@ const _updateNodeAndExpectValidationToBe = async (nodePath, value, validationExp
 
   await _persistNode(Node.assocValue(value)(node))
 
-  const nodeValidation = Validation.getFieldValidation(Node.getUuid(node))(Record.getValidation(record))
+  const nodeValidation = Validation.getFieldValidation(Node.getIId(node))(Record.getValidation(record))
 
   expect(Validation.isValid(nodeValidation)).toBe(validationExpected)
 }
@@ -62,7 +62,7 @@ const _addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, expecte
   const parentNode = RecordUtils.findNodeByPath(parentNodePath)(survey, record)
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
 
-  const node = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
+  const node = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(childDef), parentNode })
 
   await _persistNode(node)
 
@@ -76,7 +76,7 @@ const _addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
   // Add a new plot
   const nodeRoot = Record.getRootNode(record)
   const nodeDefPlot = Survey.getNodeDefByName('plot')(survey)
-  const nodePlot = Node.newNode(NodeDef.getUuid(nodeDefPlot), Record.getUuid(record), nodeRoot)
+  const nodePlot = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDefPlot), parentNode: nodeRoot })
   await _persistNode(nodePlot)
 
   // Update new plot num with a duplicate value
@@ -84,15 +84,15 @@ const _addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
   const value = 2 // Duplicate value
   await _persistNode(Node.assocValue(value)(nodePlotNum))
 
+  const recordValidation = Record.getValidation(record)
   // Expect validation to be invalid
-  const nodePlotNumValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNum))(Record.getValidation(record))
+  const nodePlotNumValidation = Validation.getFieldValidation(Node.getIId(nodePlotNum))(recordValidation)
   expect(Validation.isValid(nodePlotNumValidation)).toBe(false)
 
   // Expect duplicate node validation to be invalid
   const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, record)
-  const nodePlotNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNumDuplicate))(
-    Record.getValidation(record)
-  )
+  const nodePlotNumDuplicateIId = Node.getIId(nodePlotNumDuplicate)
+  const nodePlotNumDuplicateValidation = Validation.getFieldValidation(nodePlotNumDuplicateIId)(recordValidation)
   expect(Validation.isValid(nodePlotNumDuplicateValidation)).toBe(false)
 }
 
@@ -102,10 +102,10 @@ const _removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () =
 
   await _deleteNode(Record.getRootNode(record), 'plot', 4)
 
+  const recordValidation = Record.getValidation(record)
   const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, record)
-  const nodePlotNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNumDuplicate))(
-    Record.getValidation(record)
-  )
+  const nodePlotNumDuplicateIId = Node.getIId(nodePlotNumDuplicate)
+  const nodePlotNumDuplicateValidation = Validation.getFieldValidation(nodePlotNumDuplicateIId)(recordValidation)
   expect(Validation.isValid(nodePlotNumDuplicateValidation)).toBe(true)
 }
 
@@ -255,7 +255,7 @@ describe('Record Validation Test', () => {
     const nodeDefChild = Survey.getNodeDefByName('tree')(survey)
     const validationCount = R.pipe(
       Record.getValidation,
-      RecordValidation.getValidationChildrenCount(Node.getUuid(nodeParent), NodeDef.getUuid(nodeDefChild))
+      RecordValidation.getValidationChildrenCount(Node.getIId(nodeParent), NodeDef.getUuid(nodeDefChild))
     )(record)
     expect(Validation.isValid(validationCount)).toBe(false) // Min count = 1
 
@@ -265,12 +265,12 @@ describe('Record Validation Test', () => {
       [
         Validation.keys.validation,
         Validation.keys.fields,
-        RecordValidation.getValidationChildrenCountKey(Node.getUuid(nodeParent), NodeDef.getUuid(nodeDefChild)),
+        RecordValidation.getValidationChildrenCountKey(Node.getIId(nodeParent), NodeDef.getUuid(nodeDefChild)),
       ],
       record
     )
     // Children count validation should be deleted
-    /* eslint-disable no-unused-expressions */
+
     expect(validationCountUpdated).toBeUndefined()
   })
 

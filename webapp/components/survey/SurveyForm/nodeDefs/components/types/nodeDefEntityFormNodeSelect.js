@@ -34,9 +34,13 @@ const NodeDefEntityFormNodeSelect = (props) => {
           testId={TestId.entities.form.addNewNode}
           size="small"
           onClick={() => {
-            const entity = Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
+            const entity = Node.newNode({
+              record: { uuid: Node.getRecordUuid(parentNode) },
+              nodeDefUuid: NodeDef.getUuid(nodeDef),
+              parentNode,
+            })
             updateNode(nodeDef, entity)
-            onChange(Node.getUuid(entity))
+            onChange(Node.getIId(entity))
           }}
           disabled={!canAddNode}
           iconClassName="icon-plus icon-10px icon-left"
@@ -54,7 +58,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
             <select
               className="node-select"
               data-testid={TestId.entities.form.nodeSelect}
-              value={selectedNode ? Node.getUuid(selectedNode) : 'placeholder'}
+              value={selectedNode ? Node.getIId(selectedNode) : 'placeholder'}
               onChange={(e) => onChange(e.target.value)}
               aria-disabled={R.isEmpty(nodes)}
             >
@@ -63,8 +67,8 @@ const NodeDefEntityFormNodeSelect = (props) => {
               </option>
               {nodes.map((n, index) => (
                 <option
-                  key={Node.getUuid(n)}
-                  value={Node.getUuid(n)}
+                  key={Node.getIId(n)}
+                  value={Node.getIId(n)}
                   data-testid={TestId.entities.form.nodeSelectOption(index)}
                 >
                   {nodeKeysLabelValues[index]}

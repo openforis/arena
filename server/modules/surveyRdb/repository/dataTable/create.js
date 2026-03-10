@@ -5,12 +5,10 @@ import { TableDataNodeDef } from '../../../../../common/model/db'
 
 /**
  * Create a nodeDef data table.
- *
  * @param {object} params - The query parameters.
  * @param {Survey} params.survey - The survey.
  * @param {NodeDef} params.nodeDef - The nodeDef to create the data table for.
  * @param {pgPromise.IDatabase} client - The data base client.
- *
  * @returns {Promise<null|*>} - The result promise.
  */
 export const createDataTable = async ({ survey, nodeDef }, client) => {
@@ -27,7 +25,7 @@ export const createDataTable = async ({ survey, nodeDef }, client) => {
         ${tableDataNodeDef.nameQualified}
       (
         ${tableDataNodeDef.getColumnsWithType().join(', ')},
-        ${tableDataNodeDef.getConstraintUuidUnique()},
+        ${tableDataNodeDef.getConstraintIIdUnique()},
         ${constraintFkParent ? `${constraintFkParent}, ` : ''}
         ${constraintFkRecord ? `${constraintFkRecord}, ` : ''}
         PRIMARY KEY (${TableDataNodeDef.columnSet.id})

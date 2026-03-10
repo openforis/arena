@@ -15,7 +15,7 @@ import { keys } from './recordKeys'
 
 const {
   getChildren: getNodeChildren,
-  getNodeByUuid,
+  getNodeByInternalId,
   getNodesByDefUuid,
   getParent: getParentNode,
   getRoot: getRootNode,
@@ -24,10 +24,12 @@ const {
 /**
  * === simple getters.
  */
+export const getLastNodeInternalId = R.propOr(0, keys.lastNodeInternalId)
+
 export const getNodes = R.propOr({}, keys.nodes)
 export const getNodesArray = (record) => Object.values(getNodes(record))
 
-export { getNodeChildren, getNodeByUuid, getNodesByDefUuid, getRootNode, getParentNode }
+export { getNodeChildren, getNodeByInternalId, getNodesByDefUuid, getRootNode, getParentNode }
 
 export const findNodeChildren = (parentNode, childDefUuid) => (record) => {
   try {
@@ -201,10 +203,10 @@ export const getParentCodeAttribute = (_survey, parentNode, nodeDef) => (record)
 export const visitAncestorCodeAttributes =
   ({ survey, parentNode, nodeDef, visitor }) =>
   (record) => {
-    const visitedNodeUuids = new Set() // avoid cycles
+    const visitedNodeIIds = new Set() // avoid cycles
     let currentParentCodeAttribute = Records.getParentCodeAttribute({ parentNode, nodeDef })(record)
-    while (currentParentCodeAttribute && !visitedNodeUuids.has(Node.getUuid(currentParentCodeAttribute))) {
-      visitedNodeUuids.add(Node.getUuid(currentParentCodeAttribute))
+    while (currentParentCodeAttribute && !visitedNodeIIds.has(Node.getIId(currentParentCodeAttribute))) {
+      visitedNodeIIds.add(Node.getIId(currentParentCodeAttribute))
       visitor(currentParentCodeAttribute)
       const parentCodeAttributeNodeDef = SurveyNodeDefs.getNodeDefByUuid(
         Node.getNodeDefUuid(currentParentCodeAttribute)
@@ -337,7 +339,7 @@ export const getAttributesUniqueDependent = ({ survey, record, node }) => {
   } else if (_isNodeDefUnique(nodeDef)) {
     siblingUniqueAttributes = getAttributesUniqueSibling({ record, attribute: node, attributeDef: nodeDef })
   }
-  return ObjectUtils.toUuidIndexedObj(siblingUniqueAttributes)
+  return ObjectUtils.toIIdIndexedObj(siblingUniqueAttributes)
 }
 
 export const isNodeFilledByUser = (node) => (record) => Records.isNodeFilledByUser(node)(record)

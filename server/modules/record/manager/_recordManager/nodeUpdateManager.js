@@ -33,9 +33,9 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
   return {
     record: recordUpdated,
     nodes: {
-      [Node.getUuid(node)]: node,
+      [Node.getIId(node)]: node,
       // Always assoc parentNode, used in surveyRdbManager.updateTableNodes
-      ...(parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}),
+      ...(parentNode ? { [Node.getIId(parentNode)]: parentNode } : {}),
       ...nodes,
     },
   }
@@ -44,6 +44,7 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
 const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
   // TODO check if it should be removed
   const surveyId = Survey.getId(survey)
+  const recordUuid = Record.getUuid(record)
 
   let updatedNodes = nodeDependents || {}
 
@@ -58,11 +59,12 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
           const nodeDefDependent = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeDependent))(survey)
 
           return NodeDef.isMultiple(nodeDefDependent)
-            ? NodeRepository.deleteNode(surveyId, Node.getUuid(nodeDependent), t)
+            ? NodeRepository.deleteNode({ surveyId, recordUuid, nodeIId: Node.getIId(nodeDependent) }, t)
             : NodeRepository.updateNode(
                 {
                   surveyId,
-                  nodeUuid: Node.getUuid(nodeDependent),
+                  recordUuid,
+                  nodeIId: Node.getIId(nodeDependent),
                   meta: Node.getMeta(nodeDependent),
                   draft: Record.isPreview(record),
                 },
@@ -72,7 +74,7 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
       )
       updatedNodes = {
         ...updatedNodes,
-        ...ObjectUtils.toUuidIndexedObj(nodesClearedArray),
+        ...ObjectUtils.toIIdIndexedObj(nodesClearedArray),
       }
     }
   }
@@ -92,9 +94,8 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
     meta[Node.metaKeys.defaultValue] = false
   }
   if (!Record.isPreview(record)) {
-    // Keep only node uuid, recordUuid, meta and value
     const logContent = R.pipe(
-      R.pick([Node.keys.uuid, Node.keys.recordUuid, Node.keys.nodeDefUuid, Node.keys.value]),
+      R.pick([Node.keys.iId, Node.keys.recordUuid, Node.keys.nodeDefUuid, Node.keys.value]),
       R.assoc(Node.keys.meta, meta)
     )(node)
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
@@ -103,7 +104,7 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
   const value = Node.getValue(node)
   if (NodeDef.isFile(nodeDef)) {
     // mark old file as deleted if changed
-    const nodePrev = await NodeRepository.fetchNodeByUuid(surveyId, Node.getUuid(node), t)
+    const nodePrev = await NodeRepository.fetchNodeByIId(surveyId, Node.getRecordUuid(node), Node.getIId(node), t)
     const fileUuidPrev = Node.getFileUuid(nodePrev)
     if (fileUuidPrev !== null && fileUuidPrev !== Node.getFileUuid(node)) {
       await FileRepository.markFileAsDeleted(surveyId, fileUuidPrev, t)
@@ -113,7 +114,8 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
   const nodeUpdated = await NodeRepository.updateNode(
     {
       surveyId,
-      nodeUuid: Node.getUuid(node),
+      recordUuid: Node.getRecordUuid(node),
+      nodeIId: Node.getIId(node),
       value,
       meta,
       draft: Record.isPreview(record),
@@ -131,21 +133,23 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
 }
 
 const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
+  const recordUuid = Record.getUuid(record)
   const nodesReloadedArray = (
-    await NodeRepository.fetchNodesWithRefDataByUuids(
-      { surveyId, nodeUuids: Object.keys(nodes), draft: Record.isPreview(record) },
+    await NodeRepository.fetchNodesWithRefDataByIIds(
+      { surveyId, recordUuid, nodeIIds: Object.keys(nodes), draft: Record.isPreview(record) },
       tx
     )
   ).map((nodeReloaded) => {
     // preserve status flags (used in rdb updates)
-    const oldNode = nodes[Node.getUuid(nodeReloaded)]
+    // side effect on nodes is possible: update node in place because nodes have been fetched from DB
+    const oldNode = nodes[Node.getIId(nodeReloaded)]
     return R.pipe(
-      Node.assocCreated(Node.isCreated(oldNode)),
-      Node.assocDeleted(Node.isDeleted(oldNode)),
-      Node.assocUpdated(Node.isUpdated(oldNode))
+      Node.setCreated(Node.isCreated(oldNode)),
+      Node.setDeleted(Node.isDeleted(oldNode)),
+      Node.setUpdated(Node.isUpdated(oldNode))
     )(nodeReloaded)
   })
-  return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
+  return ObjectUtils.toIIdIndexedObj(nodesReloadedArray)
 }
 
 const _groupNodesByFlags = (nodesArray) =>
@@ -163,7 +167,7 @@ const _groupNodesByFlags = (nodesArray) =>
     { nodesInserted: [], nodesUpdated: [], nodesDeleted: [] }
   )
 
-const _persistNodes = async ({ surveyId, nodesArray }, tx) => {
+const _persistNodes = async ({ surveyId, recordUuid, nodesArray }, tx) => {
   const { nodesInserted, nodesUpdated, nodesDeleted } = _groupNodesByFlags(nodesArray)
 
   if (nodesInserted.length) {
@@ -173,7 +177,10 @@ const _persistNodes = async ({ surveyId, nodesArray }, tx) => {
     await NodeRepository.updateNodes({ surveyId, nodes: nodesUpdated }, tx)
   }
   if (nodesDeleted.length) {
-    await NodeRepository.deleteNodesByUuids(surveyId, nodesDeleted.map(Node.getUuid), tx)
+    await NodeRepository.deleteNodesByInternalIds(
+      { surveyId, recordUuid, nodeInternalIds: nodesDeleted.map(Node.getIId) },
+      tx
+    )
   }
 }
 
@@ -199,8 +206,9 @@ export const updateNodesDependents = async (
   if (persistNodes && !R.isEmpty(allNodesUpdated)) {
     const nodesArray = Object.values(allNodesUpdated)
     const surveyId = Survey.getId(survey)
+    const recordUuid = Record.getUuid(record)
 
-    await _persistNodes({ surveyId, nodesArray }, tx)
+    await _persistNodes({ surveyId, recordUuid, nodesArray }, tx)
 
     // reload nodes to get nodes ref data
     const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: allNodesUpdated }, tx)
@@ -218,7 +226,7 @@ export const updateNodesDependents = async (
 // ==== DELETE
 
 const _getNodeDependentKeyAttributes = (survey, record, node) => {
-  const nodeDependentKeyAttributes = {}
+  const nodeDependentKeyAttributesByIId = {}
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   if (NodeDef.isMultipleEntity(nodeDef)) {
     // Find sibling entities with same key values
@@ -238,25 +246,26 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
 
         if (R.equals(nodeKeyValues, nodeDeletedKeyValues)) {
           nodeKeys.forEach((nodeKey) => {
-            nodeDependentKeyAttributes[Node.getUuid(nodeKey)] = nodeKey
+            nodeDependentKeyAttributesByIId[Node.getIId(nodeKey)] = nodeKey
           })
         }
       })
     }
   }
 
-  return nodeDependentKeyAttributes
+  return nodeDependentKeyAttributesByIId
 }
 
-export const deleteNode = async (user, survey, record, nodeUuid, t) => {
+export const deleteNode = async (user, survey, record, nodeIId, t) => {
   const surveyId = Survey.getId(survey)
+  const recordUuid = Record.getUuid(record)
 
-  const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
+  const node = await NodeRepository.deleteNode({ surveyId, recordUuid, nodeIId }, t)
 
   if (!Record.isPreview(record)) {
     const logContent = {
-      [ActivityLog.keysContent.uuid]: nodeUuid,
       [ActivityLog.keysContent.recordUuid]: Node.getRecordUuid(node),
+      [ActivityLog.keysContent.nodeIId]: nodeIId,
       [ActivityLog.keysContent.nodeDefUuid]: Node.getNodeDefUuid(node),
       [Node.keys.meta]: {
         [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
@@ -275,11 +284,11 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
 
   // mark deleted dependent attributes
   nodeDependentUniqueAttributes = Object.values(nodeDependentUniqueAttributes).reduce((nodesAcc, nodeDependent) => {
-    const nodeDependentUuid = Node.getUuid(nodeDependent)
-    const deleted = !Record.getNodeByUuid(nodeDependentUuid)(recordUpdated)
+    const nodeDependentIId = Node.getIId(nodeDependent)
+    const deleted = !Record.getNodeByInternalId(nodeDependentIId)(recordUpdated)
     const nodeDependentUpdated =
       Node.isDeleted(nodeDependent) !== deleted ? Node.assocDeleted(deleted)(nodeDependent) : nodeDependent
-    return { ...nodesAcc, [nodeDependentUuid]: nodeDependentUpdated }
+    return { ...nodesAcc, [nodeDependentIId]: nodeDependentUpdated }
   }, {})
 
   return _onNodeUpdate(
@@ -295,18 +304,21 @@ export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, re
   client.tx(async (t) => {
     const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefUuids, t)
     const activities = nodesDeleted.map((node) =>
-      ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true)
+      ActivityLog.newActivity(ActivityLog.type.nodeDelete, { iId: Node.getIId(node) }, true)
     )
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
-    const nodesDeletedByUuid = ObjectUtils.toUuidIndexedObj(nodesDeleted)
-    const recordUpdated = Record.mergeNodes(nodesDeletedByUuid, { sideEffect: true })(record)
+    const nodesDeletedByIId = ObjectUtils.toIIdIndexedObj(nodesDeleted)
+    const recordUpdated = Record.mergeNodes(nodesDeletedByIId, { sideEffect: true })(record)
     return { record: recordUpdated, nodesDeleted }
   })
 
-export const deleteNodesByUuids = async ({ user, surveyId, nodeUuids, systemActivity = false }, tx) => {
-  const nodesDeleted = await NodeRepository.deleteNodesByUuids(surveyId, nodeUuids, tx)
-  const activities = nodeUuids.map((uuid) =>
-    ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid }, systemActivity)
+export const deleteNodesByInternalIds = async (
+  { user, surveyId, recordUuid, nodeInternalIds, systemActivity = false },
+  tx
+) => {
+  const nodesDeleted = await NodeRepository.deleteNodesByInternalIds({ surveyId, recordUuid, nodeInternalIds }, tx)
+  const activities = nodeInternalIds.map((iId) =>
+    ActivityLog.newActivity(ActivityLog.type.nodeDelete, { iId }, systemActivity)
   )
   await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
   return nodesDeleted

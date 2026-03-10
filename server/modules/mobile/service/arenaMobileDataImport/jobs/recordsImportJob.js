@@ -29,9 +29,9 @@ const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
   if (!nodeDef) {
     return { valid: false, error: 'refers a missing node definition' }
   }
-  const parentUuid = Node.getParentUuid(node)
-  if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
-    return { valid: false, error: `has missing or invalid parent_uuid` }
+  const parentIId = Node.getParentInternalId(node)
+  if ((!parentIId && !NodeDef.isRoot(nodeDef)) || (parentIId && !nodes[parentIId])) {
+    return { valid: false, error: `has missing or invalid parent internal id` }
   }
   if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
     return { valid: false, error: `is multiple and has an empty value` }
@@ -39,7 +39,7 @@ const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
   const nodeHierarchy = Node.getHierarchy(node)
   if (
     nodeHierarchy.length !== NodeDef.getMetaHierarchy(nodeDef)?.length ||
-    nodeHierarchy.some((ancestorUuid) => !nodes[ancestorUuid])
+    nodeHierarchy.some((ancestorIId) => !nodes[ancestorIId])
   ) {
     return { valid: false, error: `has an invalid meta hierarchy` }
   }
@@ -139,7 +139,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     delete record['_nodesIndex']
     const nodes = Record.getNodes(record)
 
-    for (const [nodeUuid, node] of Object.entries(nodes)) {
+    for (const [nodeIId, node] of Object.entries(nodes)) {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const { valid, error } = checkNodeIsValid({ nodes, node, nodeDef })
@@ -148,10 +148,10 @@ export default class RecordsImportJob extends DataImportBaseJob {
         node[Node.keys.recordUuid] = recordUuid
         Node.removeFlags({ sideEffect: true })(node)
       } else {
-        const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
+        const messagePrefix = `record ${Record.getUuid(record)}: node with internal id ${nodeIId} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
         const messageSuffix = `: skipping it`
         this.logWarn(`${messagePrefix} ${error} ${messageSuffix}`)
-        delete nodes[nodeUuid]
+        delete nodes[nodeIId]
       }
     }
     // assoc nodes and build index from scratch
@@ -275,19 +275,19 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const nodesIndexedByUuid = Record.getNodesArray(record)
       .sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
       .reduce((acc, node) => {
-        const nodeUuid = Node.getUuid(node)
+        const nodeIId = Node.getIId(node)
         const nodeDefUuid = Node.getNodeDefUuid(node)
         // check that the node definition associated to the node has not been deleted from the survey
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
         if (nodeDef) {
           node[Node.keys.created] = true // do side effect to avoid creating new objects
-          acc[nodeUuid] = node
+          acc[nodeIId] = node
           if (NodeDef.isFile(nodeDef)) {
             this.trackFileUuid({ node })
           }
         } else {
           this.logDebug(
-            `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeUuid}; skipping it`
+            `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeIId}; skipping it`
           )
         }
         return acc

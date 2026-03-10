@@ -97,7 +97,7 @@ const DataQuery = () => {
         <RecordEditModal
           onRequestClose={() => dispatch(DataExplorerActions.closeRecordEditModal())}
           recordUuid={recordEditModalProps.recordUuid}
-          parentNodeUuid={recordEditModalProps.parentNodeUuid}
+          parentNodeIId={recordEditModalProps.parentNodeIId}
         />
       )}
     </div>

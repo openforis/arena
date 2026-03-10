@@ -1,4 +1,4 @@
-import { Dates, Objects, Records, RecordUpdateResult, Surveys, UUIDs } from '@openforis/arena-core'
+import { Dates, Objects, Records, RecordUpdateResult, Surveys } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -12,30 +12,30 @@ import * as RecordReader from './recordReader'
 import { updateAttributeValue } from './recordNodeValueUpdater'
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
 
-const findEntityByUuidOrKeys = ({
+const findEntityByIIdOrKeys = ({
   survey,
   record,
   entityDefUuid,
   parentEntity,
-  uuid = null,
+  iId = null,
   keyValuesByDefUuid = null,
 }) => {
-  const entityWithSameUuid = uuid ? Records.getNodeByUuid(uuid)(record) : null
-  if (entityWithSameUuid) {
-    return entityWithSameUuid
+  const entityWithSameIId = iId ? Records.getNodeByIId(iId)(record) : null
+  if (entityWithSameIId) {
+    return entityWithSameIId
   }
   return keyValuesByDefUuid
     ? Records.findEntityByKeyValues({ survey, record, parentEntity, entityDefUuid, keyValuesByDefUuid })
     : null
 }
 
-const _findNodeWithSameUuid = (nodeSearch, nodesArray) =>
-  nodesArray.find((node) => Node.getUuid(node) === Node.getUuid(nodeSearch))
+const _findNodeWithSameIId = (nodeSearch, nodesArray) =>
+  nodesArray.find((node) => Node.getIId(node) === Node.getIId(nodeSearch))
 
-const _getNodesArrayDifference = (nodes, otherNodes) => nodes.filter((node) => !_findNodeWithSameUuid(node, otherNodes))
+const _getNodesArrayDifference = (nodes, otherNodes) => nodes.filter((node) => !_findNodeWithSameIId(node, otherNodes))
 
 const _getNodesArrayIntersection = (nodes, otherNodes) =>
-  nodes.filter((node) => !!_findNodeWithSameUuid(node, otherNodes))
+  nodes.filter((node) => !!_findNodeWithSameIId(node, otherNodes))
 
 const _replaceAttributeValueIfEmptyOrModified = ({
   survey,
@@ -99,8 +99,8 @@ const _replaceUpdatedNodesInEntities = ({
     // delete nodes that are not in source record
     const childrenTargetToDelete = _getNodesArrayDifference(childrenTarget, childrenSource).map(Node.assocDeleted(true))
     if (childrenTargetToDelete.length > 0) {
-      const childrenTargetToDeleteUuids = childrenTargetToDelete.map(Node.getUuid)
-      const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(
+      const childrenTargetToDeleteIIds = childrenTargetToDelete.map(Node.getIId)
+      const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteIIds, { sideEffect })(
         updateResult.record
       )
       updateResult.merge(nodesDeleteUpdateResult)
@@ -118,7 +118,7 @@ const _replaceUpdatedNodesInEntities = ({
     // update existing nodes (nodes in both source and target records)
 
     _getNodesArrayIntersection(childrenSource, childrenTarget).forEach((childSource) => {
-      const childTargetToUpdate = _findNodeWithSameUuid(childSource, childrenTarget)
+      const childTargetToUpdate = _findNodeWithSameIId(childSource, childrenTarget)
       if (NodeDef.isAttribute(childDef)) {
         const attrUpdateResult = _replaceAttributeValueIfEmptyOrModified({
           survey,
@@ -152,9 +152,9 @@ export const replaceUpdatedNodes =
   async (recordTarget) => {
     const rootSource = RecordReader.getRootNode(recordSource)
     const rootTarget = RecordReader.getRootNode(recordTarget)
-    if (Node.getUuid(rootTarget) !== Node.getUuid(rootSource)) {
+    if (Node.getIId(rootTarget) !== Node.getIId(rootSource)) {
       // it should never happen...
-      throw new Error('error merging records: root entities have different uuids')
+      throw new Error('error merging records: root entities have different iIds')
     }
     const updateResult = _replaceUpdatedNodesInEntities({
       survey,
@@ -177,9 +177,9 @@ export const replaceUpdatedNodes =
   }
 
 const _recalculateNodeHierarchy = ({ parentEntity, node }) => {
-  const parentEntityUuid = Node.getUuid(parentEntity)
-  node[Node.keys.parentUuid] = parentEntityUuid
-  const hierarchyUpdated = [...Node.getHierarchy(parentEntity), parentEntityUuid]
+  const parentEntityIId = Node.getIId(parentEntity)
+  node[Node.keys.parentIId] = parentEntityIId
+  const hierarchyUpdated = [...Node.getHierarchy(parentEntity), parentEntityIId]
   Objects.setInPath({ obj: node, path: [Node.keys.meta, Node.metaKeys.hierarchy], value: hierarchyUpdated })
 }
 
@@ -187,17 +187,24 @@ const _addNodeToUpdateResult = ({
   updateResult,
   node,
   parentEntity: parentEntityParam = undefined,
-  assignNewUuid = false,
+  assignNewIds = false,
   sideEffect = false,
 }) => {
+  const { record } = updateResult
   const newNodeToAdd = sideEffect ? Node.setCreated(node) : Node.assocCreated(true)(node)
-  if (assignNewUuid) {
-    newNodeToAdd[Node.keys.uuid] = UUIDs.v4()
+  if (assignNewIds) {
+    const lastNodeInternalId = RecordReader.getLastNodeInternalId(record)
+    const newInternalId = lastNodeInternalId + 1
+    newNodeToAdd[Node.keys.iId] = newInternalId
+    const recordUpdated = { ...record, lastNodeInternalId: newInternalId }
+    updateResult.merge(new RecordUpdateResult({ record: recordUpdated }))
   }
-  delete newNodeToAdd[Node.keys.id] // clear internal id
-  newNodeToAdd[Node.keys.recordUuid] = updateResult.record.uuid
+  // clear id, used for storage in DB, but not needed for the updateResult
+  delete newNodeToAdd[Node.keys.id]
 
-  const parentEntity = parentEntityParam ?? RecordReader.getNodeByUuid(Node.getParentUuid(node))(updateResult.record)
+  newNodeToAdd[Node.keys.recordUuid] = record.uuid
+
+  const parentEntity = parentEntityParam ?? RecordReader.getNodeByInternalId(Node.getParentInternalId(node))(record)
   _recalculateNodeHierarchy({ node: newNodeToAdd, parentEntity })
   updateResult.addNode(newNodeToAdd, { sideEffect })
 }
@@ -252,12 +259,12 @@ const _areNotSameValues = ({ survey, childDef, updateResult, entityTarget, sourc
   })
 
 const replaceNodes = ({ childrenSource, childrenTarget, entityTarget, sideEffect, updateResult }) => {
-  const childrenTargetToDeleteUuids = childrenTarget.map(Node.getUuid)
-  const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(updateResult.record)
+  const childrenTargetToDeleteIIds = childrenTarget.map(Node.getIId)
+  const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteIIds, { sideEffect })(updateResult.record)
   updateResult.merge(nodesDeleteUpdateResult)
-  childrenSource.forEach((childSource) => {
+  for (const childSource of childrenSource) {
     _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget })
-  })
+  }
 }
 
 const _mergeMultipleAttributes = ({
@@ -281,7 +288,7 @@ const _mergeMultipleAttributes = ({
       }
     } else {
       // keep nodes from both records, unless they have the same value
-      childrenSource.forEach((childSource) => {
+      for (const childSource of childrenSource) {
         const sourceValue = Node.getValue(childSource)
         if (
           !targetValues.find((targetValue) =>
@@ -296,9 +303,9 @@ const _mergeMultipleAttributes = ({
           )
         ) {
           // value not in target values => add it to the record
-          _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget, assignNewUuid: true })
+          _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget, assignNewIds: true })
         }
-      })
+      }
     }
   }
 }
@@ -310,21 +317,22 @@ const _cloneEntityAndDescendants = async ({
   parentEntity,
   sideEffect = false,
 }) => {
-  const newNodeUuidByOldUuid = {}
+  const newNodeIIdByOldIId = {}
+  let lastNodeInternalId = RecordReader.getLastNodeInternalId(recordSource)
   RecordReader.visitDescendantsAndSelf(entitySource, (visitedChildSource) => {
-    const oldUuid = Node.getUuid(visitedChildSource)
-    const oldParentUuid = Node.getParentUuid(visitedChildSource)
-    const newUuid = UUIDs.v4()
-    newNodeUuidByOldUuid[oldUuid] = newUuid
-    const newParentEntityUuid =
+    const oldIId = Node.getIId(visitedChildSource)
+    const oldParentIId = Node.getParentInternalId(visitedChildSource)
+    const newIId = ++lastNodeInternalId
+    newNodeIIdByOldIId[oldIId] = newIId
+    const newParentEntityIId =
       visitedChildSource === entitySource
-        ? Node.getUuid(parentEntity)
-        : (newNodeUuidByOldUuid[oldParentUuid] ?? oldParentUuid)
+        ? Node.getIId(parentEntity)
+        : (newNodeIIdByOldIId[oldParentIId] ?? oldParentIId) // if parent node is not in the visited path, keep the same parentIId (it will be updated in hierarchy recalculation)
     const nodeTarget = ObjectUtils.clone(visitedChildSource)
     Node.removeFlags({ sideEffect: true })(nodeTarget)
     nodeTarget[Node.keys.created] = true // consider it as new node, to allow RDB updates
-    nodeTarget[Node.keys.uuid] = newUuid
-    nodeTarget[Node.keys.parentUuid] = newParentEntityUuid
+    nodeTarget[Node.keys.iId] = newIId
+    nodeTarget[Node.keys.pIId] = newParentEntityIId
     // node hierarchy will be recalculated in _addNodeToUpdateResult
     _addNodeToUpdateResult({ updateResult, node: nodeTarget, sideEffect })
   })(recordSource)
@@ -347,12 +355,12 @@ const _mergeMultipleEntities = ({
       record: recordSource,
       entity: childSource,
     })
-    const childTarget = findEntityByUuidOrKeys({
+    const childTarget = findEntityByIIdOrKeys({
       survey,
       record: updateResult.record,
       entityDefUuid: childDefUuid,
       parentEntity: entityTarget,
-      uuid: Node.getUuid(childSource),
+      iId: Node.getIId(childSource),
       keyValuesByDefUuid,
     })
     if (childTarget) {

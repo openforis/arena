@@ -85,11 +85,7 @@ export default class RecordsCloneJob extends Job {
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
 
     // assign new UUIDs with side effect on record and nodes, faster when record is big
-    const {
-      record: recordCloned,
-      newNodeUuidsByOldUuid,
-      newFileUuidsByOldUuid,
-    } = RecordCloner.cloneRecord({ survey, record, cycleTo })
+    const { record: recordCloned, newFileUuidsByOldUuid } = RecordCloner.cloneRecord({ survey, record, cycleTo })
 
     const newRecordUuid = Record.getUuid(recordCloned)
     const nodes = Record.getNodes(recordCloned)
@@ -110,12 +106,12 @@ export default class RecordsCloneJob extends Job {
     // update RDB
     await DataTableUpdateRepository.updateTables({ survey, record: recordCloned, nodes }, tx)
 
-    await this.cloneFiles({ newFileUuidsByOldUuid, newNodeUuidsByOldUuid, newRecordUuid })
+    await this.cloneFiles({ newFileUuidsByOldUuid, newRecordUuid })
 
     this.incrementProcessedItems()
   }
 
-  async cloneFiles({ newFileUuidsByOldUuid, newNodeUuidsByOldUuid, newRecordUuid }) {
+  async cloneFiles({ newFileUuidsByOldUuid, newRecordUuid }) {
     const { context, tx } = this
     const { surveyId } = context
 
@@ -123,12 +119,10 @@ export default class RecordsCloneJob extends Job {
       const fileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
       if (fileSummary) {
         const content = await FileService.fetchFileContentAsBuffer({ surveyId, fileUuid }, tx)
-        const oldNodeUuid = RecordFile.getNodeUuid(fileSummary)
-        const newNodeUuid = oldNodeUuid ? newNodeUuidsByOldUuid[oldNodeUuid] : null
         const newFile = RecordFile.createFile({
           content,
           name: RecordFile.getName(fileSummary),
-          nodeUuid: newNodeUuid,
+          nodeIId: RecordFile.getNodeIId(fileSummary),
           recordUuid: newRecordUuid,
           size: RecordFile.getSize(fileSummary),
           uuid: newFileUuid,
