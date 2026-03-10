@@ -8,10 +8,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 import * as SurveyState from '../state'
 import { SurveyStatusState } from '../status'
-import { useAuthCanUseAnalysis, useUser } from '@webapp/store/user'
 
 // ==== Survey
 export const useSurveyDefsFetched = ({ draft, includeAnalysis, validate }) =>
