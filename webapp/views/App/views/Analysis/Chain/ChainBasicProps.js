@@ -44,6 +44,7 @@ export const ChainBasicProps = (props) => {
   return (
     <div className="chain-basic-props">
       <LabelsEditor
+        autoFocus
         labels={chain.props?.labels}
         formLabelKey="chainView.formLabel"
         readOnly={false}
