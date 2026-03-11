@@ -59,13 +59,27 @@ const sendEmailMSOffice365 = async ({ to, subject, html, text = null }) => {
   })
 }
 
-export const sendCustomEmail = async ({ to, subject, html }) => {
+export const sendCustomEmail = async ({ to, subject, html, log = true }) => {
+  const recipientsCount = Array.isArray(to) ? to.length : 1
+  const subjectTruncationLength = 20
+  let logMessageCommonPart
+  if (log) {
+    const subjectTruncated =
+      subject?.length > subjectTruncationLength ? subject.substring(0, subjectTruncationLength) + '...' : subject
+    logMessageCommonPart = `email to ${recipientsCount} recipient(s) with subject ${subjectTruncated}`
+  }
+  if (log) {
+    logger.debug(`sending ${logMessageCommonPart}`)
+  }
   if (emailService === emailServices.sendgrid) {
     await sendEmailSendgrid({ to, subject, html })
   } else if (emailService === emailServices.office365) {
     await sendEmailMSOffice365({ to, subject, html })
   } else {
     throw new Error('Invalid email service specified: ' + emailService)
+  }
+  if (log) {
+    logger.debug(`sent ${logMessageCommonPart}`)
   }
 }
 
