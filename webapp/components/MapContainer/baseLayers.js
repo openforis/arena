@@ -6,6 +6,7 @@ const baseLayerProviders = {
   openTopoMap: 'OpenTopoMap',
   openStreetMap: 'OpenStreetMap',
   planet: 'planet',
+  un: 'UN',
 }
 
 // const baseLayerAttribution = {
@@ -63,58 +64,74 @@ export const baseLayers = [
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}.png',
   },
   {
-    key: 'OpenStreetMap',
-    name: 'OpenStreetMap',
-    provider: baseLayerProviders.openStreetMap,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 19,
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    key: 'UN ClearMap',
+    name: 'UN ClearMap',
+    provider: baseLayerProviders.un,
+    attribution: 'Map data &copy; <a href="https://www.un.org/geospatial/">United Nations</a>',
+    maxZoom: 8,
+    url: 'https://pro-ags1.dfs.un.org/arcgis/rest/services/basemaps/clearmap_webtopo_nolabel_cvw/MapServer/tile/{z}/{y}/{x}',
   },
   {
-    key: 'OpenStreetMap HOT',
-    name: 'OpenStreetMap HOT',
-    provider: baseLayerProviders.openStreetMap,
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by Humanitarian OpenStreetMap Team',
-    maxZoom: 19,
-    url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+    key: 'UN ClearMap with labels',
+    name: 'UN ClearMap (with labels)',
+    provider: baseLayerProviders.un,
+    attribution: 'Map data &copy; <a href="https://www.un.org/geospatial/">United Nations</a>',
+    url: 'https://geoservices.un.org/arcgis/rest/services/ClearMap_WebTopo/MapServer/tile/{z}/{y}/{x}',
+    maxZoom: 6,
   },
-  {
-    key: 'OpenTopoMap',
-    name: 'OpenTopoMap',
-    provider: baseLayerProviders.openTopoMap,
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-    maxZoom: 17,
-    url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-  },
-  {
-    key: 'CartoDB Positron',
-    name: 'CartoDB Positron',
-    provider: baseLayerProviders.carto,
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 20,
-    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-  },
-  {
-    key: 'CartoDB Dark Matter',
-    name: 'CartoDB Dark Matter',
-    provider: baseLayerProviders.carto,
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 20,
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-  },
-  {
-    key: 'CartoDB Voyager',
-    name: 'CartoDB Voyager',
-    provider: baseLayerProviders.carto,
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 20,
-    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-  },
+  // {
+  //   key: 'OpenStreetMap',
+  //   name: 'OpenStreetMap',
+  //   provider: baseLayerProviders.openStreetMap,
+  //   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  //   maxZoom: 19,
+  //   url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  // },
+  // {
+  //   key: 'OpenStreetMap HOT',
+  //   name: 'OpenStreetMap HOT',
+  //   provider: baseLayerProviders.openStreetMap,
+  //   attribution:
+  //     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles style by Humanitarian OpenStreetMap Team',
+  //   maxZoom: 19,
+  //   url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+  // },
+  // {
+  //   key: 'OpenTopoMap',
+  //   name: 'OpenTopoMap',
+  //   provider: baseLayerProviders.openTopoMap,
+  //   attribution:
+  //     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+  //   maxZoom: 17,
+  //   url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+  // },
+  // {
+  //   key: 'CartoDB Positron',
+  //   name: 'CartoDB Positron',
+  //   provider: baseLayerProviders.carto,
+  //   attribution:
+  //     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  //   maxZoom: 20,
+  //   url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  // },
+  // {
+  //   key: 'CartoDB Dark Matter',
+  //   name: 'CartoDB Dark Matter',
+  //   provider: baseLayerProviders.carto,
+  //   attribution:
+  //     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  //   maxZoom: 20,
+  //   url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  // },
+  // {
+  //   key: 'CartoDB Voyager',
+  //   name: 'CartoDB Voyager',
+  //   provider: baseLayerProviders.carto,
+  //   attribution:
+  //     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  //   maxZoom: 20,
+  //   url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+  // },
   // {
   //   key: 'WMTS',
   //   name: 'Custom WMTS',
