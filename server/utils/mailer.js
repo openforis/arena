@@ -65,7 +65,7 @@ export const sendCustomEmail = async ({ to, subject, html, log = true }) => {
   let logMessageCommonPart
   if (log) {
     const subjectTruncated =
-      subject.length > subjectTruncationLength ? subject?.substring(0, subjectTruncationLength) + '...' : subject
+      subject?.length > subjectTruncationLength ? subject.substring(0, subjectTruncationLength) + '...' : subject
     logMessageCommonPart = `email to ${recipientsCount} recipient(s) with subject ${subjectTruncated}`
   }
   if (log) {
