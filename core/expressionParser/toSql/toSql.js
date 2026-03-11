@@ -12,8 +12,8 @@ const stdlib2sql = {
   count: 'count',
   sum: 'sum',
   avg: 'avg',
-  isEmpty: (param) => `coalesce(${param}::text, '') = ''`,
-  isNotEmpty: (param) => `coalesce(${param}::text, '') <> ''`,
+  isEmpty: (param) => `coalesce((${param})::text, '') = ''`,
+  isNotEmpty: (param) => `coalesce((${param})::text, '') <> ''`,
   '!': (param) => `NOT (${param})`,
 }
 
