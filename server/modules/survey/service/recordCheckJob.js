@@ -8,7 +8,6 @@ import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
-import * as ObjectUtils from '@core/objectUtils'
 
 import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
