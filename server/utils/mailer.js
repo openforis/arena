@@ -61,7 +61,13 @@ const sendEmailMSOffice365 = async ({ to, subject, html, text = null }) => {
 
 export const sendCustomEmail = async ({ to, subject, html, log = true }) => {
   const recipientsCount = Array.isArray(to) ? to.length : 1
-  const logMessageCommonPart = `email to ${recipientsCount} recipient(s) with subject ${subject}`
+  const subjectTruncationLength = 20
+  let logMessageCommonPart
+  if (log) {
+    const subjectTruncated =
+      subject.length > subjectTruncationLength ? subject?.substring(0, subjectTruncationLength) + '...' : subject
+    logMessageCommonPart = `email to ${recipientsCount} recipient(s) with subject ${subjectTruncated}`
+  }
   if (log) {
     logger.debug(`sending ${logMessageCommonPart}`)
   }
