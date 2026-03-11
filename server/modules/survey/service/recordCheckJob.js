@@ -163,9 +163,12 @@ export default class RecordCheckJob extends Job {
     }
 
     // 4. apply default values and recalculate applicability
-    const nodeDefAddedOrUpdatedUuids = R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids)
-
-    if (!R.isEmpty(nodeDefUpdatedUuids) || !R.isEmpty(nodesInsertedByUuid)) {
+    const nodeDefAddedOrUpdatedUuidsUnique = new Set(R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids))
+    for (const nodeInserted in nodesInsertedByUuid) {
+      nodeDefAddedOrUpdatedUuidsUnique.add(Node.getNodeDefUuid(nodeInserted))
+    }
+    const nodeDefAddedOrUpdatedUuids = Array.from(nodeDefAddedOrUpdatedUuidsUnique)
+    if (nodeDefAddedOrUpdatedUuids.length > 0) {
       // this.logDebug('applying default values')
       const { record: recordUpdate, nodes: nodesUpdatedDefaultValues = {} } = await _applyDefaultValuesAndApplicability(
         survey,
@@ -193,13 +196,6 @@ export default class RecordCheckJob extends Job {
     record = _clearRecordKeysValidation(record)
 
     // 6. validate nodes
-    const newNodes = nodeDefAddedUuids.reduce((nodesByUuid, nodeDefUuid) => {
-      const nodes = Record.getNodesByDefUuid(nodeDefUuid)(record)
-      return Object.assign(nodesByUuid, ObjectUtils.toUuidIndexedObj(nodes))
-    }, {})
-
-    Object.assign(allUpdatedNodesByUuid, newNodes)
-
     if (
       cleanupRecords ||
       !R.isEmpty(nodeDefAddedOrUpdatedUuids) ||
@@ -223,7 +219,8 @@ export default class RecordCheckJob extends Job {
     let recordUpdated = { ...record }
     for (const nodeDefUuid of nodeDefUuids) {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(recordUpdated)
+      const parentNodeDefUuid = NodeDef.getParentUuid(nodeDef)
+      const parentNodes = Record.getNodesByDefUuid(parentNodeDefUuid)(recordUpdated)
       for (const parentNode of parentNodes) {
         const { record: recordUpdatedNodeInsert, nodes } = await _insertMissingSingleNode({
           survey,
