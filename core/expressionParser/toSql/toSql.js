@@ -12,8 +12,8 @@ const stdlib2sql = {
   count: 'count',
   sum: 'sum',
   avg: 'avg',
-  isEmpty: (param) => `coalesce(${param}, '') = ''`,
-  isNotEmpty: (param) => `coalesce(${param}, '') <> ''`,
+  isEmpty: (param) => `coalesce((${param})::text, '') = ''`,
+  isNotEmpty: (param) => `coalesce((${param})::text, '') <> ''`,
   '!': (param) => `NOT (${param})`,
 }
 
@@ -76,7 +76,6 @@ export const unary = (node, params) => {
 
 /**
  * Returns true if the specified value is a string that starts and ends with a double quote (") char.
- *
  * @param {!string} value - The value to test.
  * @returns {boolean} - True if the value is quoted, false otherwise.
  */
@@ -88,7 +87,6 @@ const _isQuotedString = (value) =>
  * so it needs to be parsed.
  * When the value is a string, it will be quoted by pg-promise itself, so there is no need to double quote it
  * and if it's already quoted, remove the double quotes.
- *
  * @param {!string} value - The value to parse.
  * @returns {object} - The result of the parsing.
  */
