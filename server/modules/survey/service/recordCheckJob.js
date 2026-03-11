@@ -163,7 +163,7 @@ export default class RecordCheckJob extends Job {
 
     // 4. apply default values and recalculate applicability
     const nodeDefAddedOrUpdatedUuidsUnique = new Set(R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids))
-    for (const nodeInserted in nodesInsertedByUuid) {
+    for (const nodeInserted in Object.values(nodesInsertedByUuid)) {
       nodeDefAddedOrUpdatedUuidsUnique.add(Node.getNodeDefUuid(nodeInserted))
     }
     const nodeDefAddedOrUpdatedUuids = Array.from(nodeDefAddedOrUpdatedUuidsUnique)
