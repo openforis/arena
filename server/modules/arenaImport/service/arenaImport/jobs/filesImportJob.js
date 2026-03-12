@@ -82,37 +82,52 @@ export default class FilesImportJob extends Job {
       this.logDebug(`persisting file ${fileUuid}`)
     }
     const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
-    if (existingFileSummary) {
-      if (detailedLogEnabled) {
-        this.logDebug(`file already existing`)
-      }
-      if (RecordFile.isDeleted(existingFileSummary)) {
-        if (detailedLogEnabled) {
-          this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
-        }
-        if (!dryRun) {
-          await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
-          await FileService.insertFile(surveyId, file, tx)
-        }
-        this.insertedFileUuids.push(fileUuid)
-      } else {
-        if (detailedLogEnabled) {
-          this.logDebug('updating props')
-        }
-        if (!dryRun) {
-          await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
-        }
-        this.updatedFileUuids.push(fileUuid)
-      }
-    } else {
-      if (detailedLogEnabled) {
-        this.logDebug(`file not existing: inserting new file`, fileProps)
-      }
-      if (!dryRun) {
-        await FileService.insertFile(surveyId, file, tx)
-      }
-      this.insertedFileUuids.push(fileUuid)
+    if (!existingFileSummary) {
+      await this.insertNewFile({ dryRun, file, fileProps, fileUuid, surveyId, tx })
+      return
     }
+
+    if (detailedLogEnabled) {
+      this.logDebug(`file already existing`)
+    }
+
+    if (RecordFile.isDeleted(existingFileSummary)) {
+      await this.replaceDeletedFile({ dryRun, file, fileUuid, surveyId, tx })
+      return
+    }
+
+    await this.updateExistingFileProps({ dryRun, fileProps, fileUuid, surveyId, tx })
+  }
+
+  async insertNewFile({ dryRun, file, fileProps, fileUuid, surveyId, tx }) {
+    if (detailedLogEnabled) {
+      this.logDebug(`file not existing: inserting new file`, fileProps)
+    }
+    if (!dryRun) {
+      await FileService.insertFile(surveyId, file, tx)
+    }
+    this.insertedFileUuids.push(fileUuid)
+  }
+
+  async replaceDeletedFile({ dryRun, file, fileUuid, surveyId, tx }) {
+    if (detailedLogEnabled) {
+      this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
+    }
+    if (!dryRun) {
+      await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+      await FileService.insertFile(surveyId, file, tx)
+    }
+    this.insertedFileUuids.push(fileUuid)
+  }
+
+  async updateExistingFileProps({ dryRun, fileProps, fileUuid, surveyId, tx }) {
+    if (detailedLogEnabled) {
+      this.logDebug('updating props')
+    }
+    if (!dryRun) {
+      await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
+    }
+    this.updatedFileUuids.push(fileUuid)
   }
 
   async checkFilesNotExceedingAvailableQuota(filesSummaries) {
