@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 
@@ -24,12 +24,25 @@ const NodeDefEntityFormNodeSelect = (props) => {
   const dispatch = useDispatch()
 
   const nodeDefName = NodeDef.getLabel(nodeDef, lang)
+  const canAddOrDeleteEntities = canEditRecord && !NodeDef.isEnumerate(nodeDef)
 
   const nodeKeysLabelValues = useNodeKeysLabelValues(nodeDef, nodes)
 
+  const onDeleteClick = useCallback(() => {
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key: 'surveyForm:nodeDefEntityForm.confirmDelete',
+        onOk: () => {
+          onChange(null)
+          removeNode(nodeDef, selectedNode)
+        },
+      })
+    )
+  }, [dispatch, onChange, removeNode, nodeDef, selectedNode])
+
   return (
     <div className="survey-form__node-def-entity-form-header">
-      {canEditRecord && (
+      {canAddOrDeleteEntities && canAddNode && (
         <Button
           testId={TestId.entities.form.addNewNode}
           size="small"
@@ -38,7 +51,6 @@ const NodeDefEntityFormNodeSelect = (props) => {
             updateNode(nodeDef, entity)
             onChange(Node.getUuid(entity))
           }}
-          disabled={!canAddNode}
           iconClassName="icon-plus icon-10px icon-left"
           label="surveyForm:nodeDefEntityForm.addNewEntity"
           labelParams={{ name: nodeDefName }}
@@ -73,20 +85,10 @@ const NodeDefEntityFormNodeSelect = (props) => {
             </select>
           </FormItem>
 
-          {canEditRecord && (
+          {canAddOrDeleteEntities && (
             <ButtonDelete
               disabled={!selectedNode}
-              onClick={() => {
-                dispatch(
-                  DialogConfirmActions.showDialogConfirm({
-                    key: 'surveyForm:nodeDefEntityForm.confirmDelete',
-                    onOk: () => {
-                      onChange(null)
-                      removeNode(nodeDef, selectedNode)
-                    },
-                  })
-                )
-              }}
+              onClick={onDeleteClick}
               size="small"
               style={{ marginLeft: '50px' }}
             />
