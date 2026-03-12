@@ -8,6 +8,8 @@ import * as FileService from '@server/modules/record/service/fileService'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
+const detailedLogEnabled = false
+
 export default class FilesImportJob extends Job {
   constructor(params) {
     super('FilesImportJob', params)
@@ -76,26 +78,36 @@ export default class FilesImportJob extends Job {
     const { surveyId, dryRun } = context
     const fileUuid = RecordFile.getUuid(file)
     const fileProps = RecordFile.getProps(file)
-    this.logDebug(`persisting file ${fileUuid}`)
+    if (detailedLogEnabled) {
+      this.logDebug(`persisting file ${fileUuid}`)
+    }
     const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
     if (existingFileSummary) {
-      this.logDebug(`file already existing`)
+      if (detailedLogEnabled) {
+        this.logDebug(`file already existing`)
+      }
       if (RecordFile.isDeleted(existingFileSummary)) {
-        this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
+        if (detailedLogEnabled) {
+          this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
+        }
         if (!dryRun) {
           await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
           await FileService.insertFile(surveyId, file, tx)
         }
         this.insertedFileUuids.push(fileUuid)
       } else {
-        this.logDebug('updating props')
+        if (detailedLogEnabled) {
+          this.logDebug('updating props')
+        }
         if (!dryRun) {
           await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
         }
         this.updatedFileUuids.push(fileUuid)
       }
     } else {
-      this.logDebug(`file not existing: inserting new file`, fileProps)
+      if (detailedLogEnabled) {
+        this.logDebug(`file not existing: inserting new file`, fileProps)
+      }
       if (!dryRun) {
         await FileService.insertFile(surveyId, file, tx)
       }
@@ -125,8 +137,9 @@ export default class FilesImportJob extends Job {
     }
 
     const filesUuids = filesSummaries.map(RecordFile.getUuid)
-    this.logDebug(`file uuids to be imported: ${filesUuids}`)
-
+    if (detailedLogEnabled) {
+      this.logDebug(`file uuids to be imported: ${filesUuids}`)
+    }
     const missingRecordFileUuidsInFiles = recordsFileUuids.filter(
       (recordFileUuid) => !filesUuids.includes(recordFileUuid)
     )

@@ -11,20 +11,30 @@ import * as Validation from '@core/validation/validation'
 
 import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
+import { RdbUpdatesBatchPersister } from '@server/modules/record/manager/RdbUpdatesBatchPersister'
+
 import * as SurveyManager from '../manager/surveyManager'
 import * as RecordManager from '../../record/manager/recordManager'
 
 export default class RecordCheckJob extends Job {
   constructor(params) {
     super(RecordCheckJob.type, params)
+  }
+
+  async onStart() {
+    await super.onStart()
+    const { surveyId, tx, user } = this
 
     this.surveyAndNodeDefsByCycle = {} // Cache of surveys and updated node defs by cycle
     this.nodesBatchInserter = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
     this.nodesBatchUpdater = new BatchPersister(this.nodesBatchUpdateHandler.bind(this), 2500)
+    this.rdbUpdatesBatchPersister = new RdbUpdatesBatchPersister({ user, surveyId, tx })
   }
 
   async execute() {
-    const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle({ surveyId: this.surveyId }, this.tx)
+    const { surveyId, tx, context } = this
+    const { recordUuidsIncluded = null } = context
+    const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle({ surveyId, recordUuidsIncluded }, tx)
 
     this.total = R.length(recordsUuidAndCycle)
 
@@ -118,7 +128,7 @@ export default class RecordCheckJob extends Job {
     const { context, surveyId, user, tx } = this
     const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, allNotDeletedNodeDefUuids } =
       surveyAndNodeDefs
-    const { cleanupRecords } = context
+    const { cleanupRecords, updateRdb } = context
 
     // this.logDebug(`checking record ${recordUuid}`)
 
@@ -167,11 +177,16 @@ export default class RecordCheckJob extends Job {
       nodeDefAddedOrUpdatedUuidsUnique.add(Node.getNodeDefUuid(nodeInserted))
     }
     const nodeDefAddedOrUpdatedUuids = Array.from(nodeDefAddedOrUpdatedUuidsUnique)
-    if (nodeDefAddedOrUpdatedUuids.length > 0) {
+
+    const nodeDefToCheckForDefaultValuesAndApplicabilityUuids = cleanupRecords
+      ? allNotDeletedNodeDefUuids
+      : nodeDefAddedOrUpdatedUuids
+
+    if (nodeDefToCheckForDefaultValuesAndApplicabilityUuids.length > 0) {
       // this.logDebug('applying default values')
       const { record: recordUpdate, nodes: nodesUpdatedDefaultValues = {} } = await _applyDefaultValuesAndApplicability(
         survey,
-        nodeDefAddedOrUpdatedUuids,
+        nodeDefToCheckForDefaultValuesAndApplicabilityUuids,
         record,
         nodesInsertedByUuid,
         tx
@@ -208,6 +223,13 @@ export default class RecordCheckJob extends Job {
         this.tx
       )
     }
+
+    if (updateRdb) {
+      await RecordManager.assocRefDataToNodes({ survey, nodes: allUpdatedNodesArray }, tx)
+      const { rdbUpdates } = RecordManager.generateRdbUpates({ survey, record, nodesArray: allUpdatedNodesArray })
+      await this.rdbUpdatesBatchPersister.addItem(rdbUpdates)
+    }
+
     // this.logDebug('record check complete')
   }
 
@@ -251,6 +273,7 @@ export default class RecordCheckJob extends Job {
     super.beforeSuccess()
     await this.nodesBatchInserter.flush(this.tx)
     await this.nodesBatchUpdater.flush(this.tx)
+    await this.rdbUpdatesBatchPersister.flush()
   }
 }
 

@@ -36,6 +36,9 @@ const getRecordFormattedKeyValues = ({ survey, record }) => {
   })
 }
 
+const nodeHierarchyLengthComparator = (nodeA, nodeB) =>
+  Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length
+
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
     super(RecordsImportJob.type, params)
@@ -108,8 +111,6 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const { context, currentRecord: record, user, tx } = this
     const { survey } = context
 
-    const sideEffect = true // do side effect to avoid creating new objects and use less memory
-
     // check owner uuid: if user not defined, use the job user as owner
     const ownerUuidSource = Record.getOwnerUuid(record)
     const ownerSource = await UserService.fetchUserByUuid(ownerUuidSource, tx)
@@ -119,7 +120,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
     delete record['_nodesIndex']
 
     // fix record (e.g. insert missing nodes, remove status flags)
-    RecordFixer.fixRecord({ survey, record, sideEffect })
+    // do side effect to avoid creating new objects and use less memory
+    RecordFixer.fixRecord({ survey, record, sideEffect: true })
   }
 
   findExistingRecordSummaryWithSameKeys() {
@@ -236,26 +238,25 @@ export default class RecordsImportJob extends DataImportBaseJob {
     await RecordManager.insertRecord(user, surveyId, record, true, tx)
 
     // insert nodes (add them to batch persister)
-    const nodesIndexedByUuid = Record.getNodesArray(record)
-      .sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
-      .reduce((acc, node) => {
-        const nodeUuid = Node.getUuid(node)
-        const nodeDefUuid = Node.getNodeDefUuid(node)
-        // check that the node definition associated to the node has not been deleted from the survey
-        const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-        if (nodeDef) {
-          node[Node.keys.created] = true // do side effect to avoid creating new objects
-          acc[nodeUuid] = node
-          if (NodeDef.isFile(nodeDef)) {
-            this.trackFileUuid({ node })
-          }
-        } else {
-          this.logDebug(
-            `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeUuid}; skipping it`
-          )
+    const nodesIndexedByUuid = {}
+    const nodesArraySorted = Record.getNodesArray(record).sort(nodeHierarchyLengthComparator)
+    for (const node of nodesArraySorted) {
+      const nodeUuid = Node.getUuid(node)
+      const nodeDefUuid = Node.getNodeDefUuid(node)
+      // check that the node definition associated to the node has not been deleted from the survey
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      if (nodeDef) {
+        node[Node.keys.created] = true // do side effect to avoid creating new objects
+        nodesIndexedByUuid[nodeUuid] = node
+        if (NodeDef.isFile(nodeDef)) {
+          this.trackFileUuid({ node })
         }
-        return acc
-      }, {})
+      } else {
+        this.logDebug(
+          `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeUuid}; skipping it`
+        )
+      }
+    }
 
     if (!Record.getDateModified(record)) {
       this.logDebug(`Empty date modified for record ${Record.getUuid(record)}`)
@@ -269,12 +270,17 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
   async beforeSuccess() {
     await super.beforeSuccess()
+    const { insertedRecordsUuids, updatedRecordsUuids } = this
     const recordsFileUuidsArray = Array.from(this.recordsFileUuids)
-    const recordsFilesCount = recordsFileUuidsArray.length
-    if (recordsFilesCount > 0) {
-      this.logDebug(`found ${recordsFilesCount} files:`, recordsFileUuidsArray)
-    }
-    this.setContext({ recordsFileUuids: recordsFileUuidsArray })
+
+    this.setContext({
+      recordsFileUuids: recordsFileUuidsArray,
+      // flag to cleanup records in RecordsCheckJob
+      cleanupRecords: true,
+      updateRdb: true,
+      // record UUIDs to consider in RecordCheckJob
+      recordUuidsIncluded: [...insertedRecordsUuids, ...updatedRecordsUuids],
+    })
   }
 
   generateResult() {

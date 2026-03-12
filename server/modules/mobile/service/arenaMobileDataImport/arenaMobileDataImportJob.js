@@ -1,19 +1,21 @@
+import { Surveys, SystemError } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
+
+import FilesImportJob from '@server/modules/arenaImport/service/arenaImport/jobs/filesImportJob'
+import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
+import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
+import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
 
 import Job from '@server/job/job'
 import FileZip from '@server/utils/file/fileZip'
 
 import RecordsImportJob from './jobs/recordsImportJob'
-import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesImportJob'
-import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
-import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
-import * as SurveyService from '@server/modules/survey/service/surveyService'
-import { Surveys, SystemError } from '@openforis/arena-core'
 
 export default class ArenaMobileDataImportJob extends Job {
   /**
    * Creates a new data import job to import survey records and files in Arena format.
-   *
    * @param {!object} params - The import parameters.
    * @param {!object} [params.user] - The user performing the import.
    * @param {!number} [params.surveyId] - The id of the survey in which data will be imported.
@@ -22,7 +24,7 @@ export default class ArenaMobileDataImportJob extends Job {
    * @returns {ArenaMobileDataImportJob} - The import job.
    */
   constructor(params) {
-    super(ArenaMobileDataImportJob.type, params, [new RecordsImportJob(), new FilesImportJob()])
+    super(ArenaMobileDataImportJob.type, params, [new RecordsImportJob(), new FilesImportJob(), new RecordCheckJob()])
   }
 
   async onStart() {

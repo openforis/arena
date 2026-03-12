@@ -64,6 +64,9 @@ export default class DataImportBaseJob extends Job {
     if (nodesArray.length === 0) return
 
     for (const node of nodesArray) {
+      if (!node[Node.keys.recordUuid]) {
+        node[Node.keys.recordUuid] = recordUuid
+      }
       if (Node.isDeleted(node)) {
         await this.nodesDeleteBatchPersister.addItem(node)
       } else if (Node.isCreated(node)) {
@@ -73,7 +76,7 @@ export default class DataImportBaseJob extends Job {
       }
     }
     await RecordManager.assocRefDataToNodes({ survey, nodes: nodesArray }, tx)
-    const { record: recordUpdated, rdbUpdates } = RecordManager.generateRdbUpates({ survey, record, nodesArray }, tx)
+    const { record: recordUpdated, rdbUpdates } = RecordManager.generateRdbUpates({ survey, record, nodesArray })
     await this.rdbUpdatesBatchPersister.addItem(rdbUpdates)
 
     this.currentRecord = recordUpdated
@@ -117,7 +120,6 @@ export default class DataImportBaseJob extends Job {
 
   /**
    * Updates the record modified date using the max modified date of the nodes.
-   *
    * @param {!object} record - The record object.
    * @returns {object} - The modified record.
    */
