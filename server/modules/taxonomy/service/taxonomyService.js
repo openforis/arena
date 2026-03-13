@@ -1,6 +1,7 @@
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as Taxonomy from '@core/survey/taxonomy'
+import { DataImportTemplateTypes } from '@core/dataImport'
 
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as DbUtils from '@server/db/dbUtils'
@@ -56,20 +57,19 @@ export const exportTaxa = async ({ surveyId, taxonomyUuid, outputStream, fileFor
   })
 }
 
-export const exportTaxaImportTemplate = async ({ surveyId, taxonomyUuid, draft, res, fileFormat }) => {
+export const exportTaxaImportTemplate = async ({ surveyId, taxonomyUuid, draft, res, fileFormat, templateType }) => {
   const [survey, taxonomy] = await Promise.all([
     SurveyManager.fetchSurveyById({ surveyId, draft }),
     TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft),
   ])
-
-  const templateData = TaxonomyImportTemplateGenerator.generateTemplate({ taxonomy })
+  const templateData = TaxonomyImportTemplateGenerator.generateTemplate({ taxonomy, templateType })
+  const fileTypeSuffix = templateType === DataImportTemplateTypes.generic ? 'Generic' : ''
   const fileName = ExportFileNameGenerator.generate({
     survey,
-    fileType: 'TaxonomyImport',
+    fileType: `TaxonomyImport${fileTypeSuffix}`,
     itemName: Taxonomy.getName(taxonomy),
     fileFormat,
   })
-
   Response.setContentTypeFile({ res, fileName, fileFormat })
   await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: templateData })
 }

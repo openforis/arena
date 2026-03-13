@@ -21,6 +21,10 @@ import { ExtraPropDefsEditorPanel } from '../../ExtraPropDefsEditor'
 import { State } from '../store'
 
 const templateFileFormats = [FileFormats.csv, FileFormats.xlsx]
+const templateTypes = {
+  generic: 'generic',
+  specific: 'specific',
+}
 
 const Header = (props) => {
   const { state, Actions } = props
@@ -45,7 +49,7 @@ const Header = (props) => {
         <ErrorBadge validation={validation} />
       </div>
 
-      <div>
+      <div className="row">
         <FormItem label="taxonomy.edit.taxonomyListName">
           <Input
             autoFocus
@@ -58,7 +62,49 @@ const Header = (props) => {
             readOnly={!canEdit}
           />
         </FormItem>
+        {canEdit && (
+          <>
+            <UploadButton
+              accept=".csv,.xlsx"
+              inputFieldId="taxonomy-upload-input"
+              label="common.import"
+              onChange={([file]) => Actions.upload({ state, file })}
+              title="common.importFromExcelOrCSVFile"
+            />
+            <ButtonMenu
+              className="date-import-template-menu-btn"
+              label="dataImportView.templateForImport"
+              iconClassName="icon-download2 icon-14px"
+              items={Object.values(templateTypes).flatMap((templateType) =>
+                templateFileFormats.map((fileFormat) => ({
+                  key: `taxonomy-import-template-${fileFormat}`,
+                  content: (
+                    <ButtonDownload
+                      href={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/import-template/`}
+                      requestParams={{ draft: canEdit, fileFormat, templateType }}
+                      label={`dataImportView.templateFor_${templateType}DataImport_${fileFormat}`}
+                      variant="text"
+                    />
+                  ),
+                }))
+              )}
+              variant="outlined"
+            />
 
+            <ButtonMenu
+              iconClassName="icon-cog icon-14px"
+              items={[
+                {
+                  key: 'extra-props-edit',
+                  label: 'extraProp.editor.title',
+                  onClick: onExtraPropsClick,
+                },
+              ]}
+            />
+          </>
+        )}
+      </div>
+      <div className="row">
         <LabelsEditor
           inputFieldIdPrefix={TestId.taxonomyDetails.taxonomyDescription('')}
           formLabelKey="common.description"
@@ -67,51 +113,10 @@ const Header = (props) => {
             Actions.update({ key: Taxonomy.keysProps.descriptions, value: descriptions, state })
           }
         />
-      </div>
-
-      <div className="button-bar">
-        {canEdit && (
-          <UploadButton
-            accept=".csv,.xlsx"
-            inputFieldId="taxonomy-upload-input"
-            label="common.import"
-            onChange={([file]) => Actions.upload({ state, file })}
-            title="common.importFromExcelOrCSVFile"
-          />
-        )}
-        <ButtonMenu
-          className="date-import-template-menu-btn"
-          label="common.downloadTemplate"
-          iconClassName="icon-download2 icon-14px"
-          items={templateFileFormats.map((fileFormat) => ({
-            key: `taxonomy-import-template-${fileFormat}`,
-            content: (
-              <ButtonDownload
-                href={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/import-template/`}
-                requestParams={{ draft: canEdit, fileFormat }}
-                label={`common.downloadTemplate_${fileFormat}`}
-                variant="text"
-              />
-            ),
-          }))}
-          variant="outlined"
-        />
         <ButtonMenuExport
           href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export`}
           requestParams={{ draft: canEdit }}
         />
-        {canEdit && (
-          <ButtonMenu
-            iconClassName="icon-cog icon-14px"
-            items={[
-              {
-                key: 'extra-props-edit',
-                label: 'extraProp.editor.title',
-                onClick: onExtraPropsClick,
-              },
-            ]}
-          />
-        )}
       </div>
 
       {State.isEditingExtraPropDefs(state) && (

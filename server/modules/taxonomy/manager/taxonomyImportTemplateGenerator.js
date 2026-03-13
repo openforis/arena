@@ -1,6 +1,7 @@
 import { getLanguageISO639part2Label } from '@core/app/languages'
-import * as Taxonomy from '@core/survey/taxonomy'
+import { DataImportTemplateTypes } from '@core/dataImport'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 const templateExtraValueByType = {
   [ExtraPropDef.dataTypes.number]: 123,
@@ -8,9 +9,20 @@ const templateExtraValueByType = {
   [ExtraPropDef.dataTypes.geometryPoint]: 'POINT(12.48902 41.88302)',
 }
 
-const generateTemplate = ({ taxonomy }) => {
-  const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
-  const extraPropsDefsArray = Taxonomy.getExtraPropsDefsArray(taxonomy)
+const genericVernacularLanguageCodes = ['eng', 'fra', 'swa']
+const genericExtraPropDefs = {
+  text_prop: { dataType: ExtraPropDef.dataTypes.text },
+  numeric_prop: { dataType: ExtraPropDef.dataTypes.number },
+}
+
+const generateTemplate = ({ taxonomy, templateType }) => {
+  const vernacularLanguageCodes =
+    templateType === DataImportTemplateTypes.generic
+      ? genericVernacularLanguageCodes
+      : Taxonomy.getVernacularLanguageCodes(taxonomy)
+
+  const extraPropsDefs =
+    templateType === DataImportTemplateTypes.generic ? genericExtraPropDefs : Taxonomy.getExtraPropsDefsArray(taxonomy)
 
   return [
     {
@@ -25,10 +37,10 @@ const generateTemplate = ({ taxonomy }) => {
         }),
         {}
       ),
-      ...extraPropsDefsArray.reduce(
-        (acc, extraPropDef) => ({
+      ...Object.entries(extraPropsDefs).reduce(
+        (acc, [key, extraPropDef]) => ({
           ...acc,
-          [ExtraPropDef.getName(extraPropDef)]: templateExtraValueByType[ExtraPropDef.getDataType(extraPropDef)],
+          [key]: templateExtraValueByType[ExtraPropDef.getDataType(extraPropDef)],
         }),
         {}
       ),
