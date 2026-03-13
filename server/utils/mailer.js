@@ -43,10 +43,10 @@ const defaultAmazonSESTransportOptions = {
   port: ProcessUtils.ENV.emailAmazonSESPort,
   auth: { user: authUser, pass: authPass },
   secure: true,
-  requireTLS: false,
+  requireTLS: true,
   tls: {
-    ciphers: 'SSLv3',
-    // rejectUnauthorized: true,
+    port: 465,
+    rejectUnauthorized: true,
   },
 }
 
@@ -103,7 +103,7 @@ const sendEmailAmazonSES = async ({ to, subject, html, text = null }) => {
 export const sendCustomEmail = async ({ to, subject, html, log = true }) => {
   const recipientsCount = Array.isArray(to) ? to.length : 1
   const subjectTruncationLength = 20
-  let logMessageCommonPart
+  let logMessageCommonPart = 'message'
   if (log) {
     const subjectTruncated =
       subject?.length > subjectTruncationLength ? subject.substring(0, subjectTruncationLength) + '...' : subject
