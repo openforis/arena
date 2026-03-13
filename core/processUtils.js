@@ -47,7 +47,8 @@ const ENV = {
   emailTransportOptions: getJson(process.env.EMAIL_TRANSPORT_OPTIONS),
   sendGridApiKey: process.env.SENDGRID_API_KEY,
   emailAmazonSESHost: process.env.EMAIL_AMAZON_SES_HOST,
-  emailAmazonSESPort: Number(process.env.EMAIL_AMAZON_SES_PORT),
+  emailAmazonSESPort: Number(process.env.EMAIL_AMAZON_SES_PORT) || 587,
+  emailAmazonSESTlsPort: Number(process.env.EMAIL_AMAZON_SES_TLS_PORT) || 465,
   // ANALYSIS
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
   // SESSION

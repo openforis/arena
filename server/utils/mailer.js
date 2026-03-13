@@ -19,11 +19,6 @@ const emailService = ProcessUtils.ENV.emailService
 logger.debug(`using ${emailService} email service`)
 
 if (emailService === emailServices.sendgrid) {
-  const sendGridApiKey = ProcessUtils.ENV.sendGridApiKey
-  if (!sendGridApiKey) {
-    throw new Error('SENDGRID_API_KEY environment variable is required when using SendGrid email service')
-  }
-  sgMail.setApiKey(sendGridApiKey)
 }
 
 const authUser = ProcessUtils.ENV.emailAuthUser
@@ -45,7 +40,7 @@ const defaultAmazonSESTransportOptions = {
   secure: true,
   requireTLS: true,
   tls: {
-    port: 465,
+    port: ProcessUtils.ENV.emailAmazonSESTlsPort,
     rejectUnauthorized: true,
   },
 }
@@ -56,13 +51,18 @@ let amazonSESTransportOptions = null
   const optionsType = ProcessUtils.ENV.emailTransportOptions ? 'custom' : 'default'
   logger.debug(`using ${optionsType} email transport options`)
   switch (emailService) {
+    case emailServices.sendgrid:
+      const sendGridApiKey = ProcessUtils.ENV.sendGridApiKey
+      if (!sendGridApiKey) {
+        throw new Error('SENDGRID_API_KEY environment variable is required when using SendGrid email service')
+      }
+      sgMail.setApiKey(sendGridApiKey)
+      break
     case emailServices.office365:
       office365TransportOptions = ProcessUtils.ENV.emailTransportOptions ?? defaultOffice365TransportOptions
-      // logger.debug(`Office365 transport config: ${JSON.stringify(office365TransportOptions)}`)
       break
     case emailServices.amazonSES:
       amazonSESTransportOptions = ProcessUtils.ENV.emailTransportOptions ?? defaultAmazonSESTransportOptions
-      // logger.debug(`Amazon SES transport config: ${JSON.stringify(amazonSESTransportOptions)}`)
       break
   }
 }
