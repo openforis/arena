@@ -41,10 +41,13 @@ const ENV = {
   pgSslAllowUnauthorized: isTrue(process.env.PGSSL_ALLOW_UNAUTHORIZED),
   // EMAIL
   emailService: process.env.EMAIL_SERVICE || 'sendgrid',
+  emailFrom: process.env.EMAIL_FROM,
   emailAuthUser: process.env.EMAIL_AUTH_USER,
   emailAuthPassword: process.env.EMAIL_AUTH_PASSWORD,
   emailTransportOptions: getJson(process.env.EMAIL_TRANSPORT_OPTIONS),
   sendGridApiKey: process.env.SENDGRID_API_KEY,
+  emailAmazonSESHost: process.env.EMAIL_AMAZON_SES_HOST,
+  emailAmazonSESPort: Number(process.env.EMAIL_AMAZON_SES_PORT) || 465,
   // ANALYSIS
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
   // SESSION
