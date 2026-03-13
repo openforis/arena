@@ -62,7 +62,7 @@ export const sendCustomEmail = async ({ to, subject, html, log = true }) => {
 }
 
 export const sendEmail = async ({ to, msgKey, msgParams = {}, i18n: i18nParam = null, lang = 'en' }) => {
-  const i18n = i18nParam ? i18nParam : await i18nFactory.createI18nAsync(lang)
+  const i18n = i18nParam ?? (await i18nFactory.createI18nAsync(lang))
 
   const subject = i18n.t(`${msgKey}.subject`, msgParams)
   const html = i18n.t(`${msgKey}.body`, msgParams)
