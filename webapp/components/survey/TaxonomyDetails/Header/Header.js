@@ -1,15 +1,17 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
+import { FileFormats } from '@core/fileFormats'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { ButtonMenu } from '@webapp/components/buttons'
+import { ButtonDownload, ButtonMenu, ButtonMenuExport } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/errorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import UploadButton from '@webapp/components/form/uploadButton'
+import { useNotifyWarning } from '@webapp/components/hooks'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -17,8 +19,8 @@ import { TestId } from '@webapp/utils/testId'
 
 import { ExtraPropDefsEditorPanel } from '../../ExtraPropDefsEditor'
 import { State } from '../store'
-import { useNotifyWarning } from '@webapp/components/hooks'
-import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
+
+const templateFileFormats = [FileFormats.csv, FileFormats.xlsx]
 
 const Header = (props) => {
   const { state, Actions } = props
@@ -77,6 +79,23 @@ const Header = (props) => {
             title="common.importFromExcelOrCSVFile"
           />
         )}
+        <ButtonMenu
+          className="date-import-template-menu-btn"
+          label="common.downloadTemplate"
+          iconClassName="icon-download2 icon-14px"
+          items={templateFileFormats.map((fileFormat) => ({
+            key: `taxonomy-import-template-${fileFormat}`,
+            content: (
+              <ButtonDownload
+                href={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/import-template/`}
+                requestParams={{ draft: canEdit, fileFormat }}
+                label={`common.downloadTemplate_${fileFormat}`}
+                variant="text"
+              />
+            ),
+          }))}
+          variant="outlined"
+        />
         <ButtonMenuExport
           href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export`}
           requestParams={{ draft: canEdit }}

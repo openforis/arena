@@ -186,6 +186,20 @@ export const init = (app) => {
     }
   )
 
+  app.get(
+    '/survey/:surveyId/taxonomies/:taxonomyUuid/import-template/',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, taxonomyUuid, draft = true, fileFormat = FileFormats.csv } = Request.getParams(req)
+
+        await TaxonomyService.exportTaxaImportTemplate({ surveyId, taxonomyUuid, draft, res, fileFormat })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ====== UPDATE
 
   app.put(
