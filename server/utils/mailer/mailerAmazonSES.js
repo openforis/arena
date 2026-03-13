@@ -18,11 +18,6 @@ const defaultTransportOptions = {
   port: ProcessUtils.ENV.emailAmazonSESPort,
   auth: { user: authUser, pass: authPass },
   secure: true,
-  requireTLS: true,
-  tls: {
-    port: ProcessUtils.ENV.emailAmazonSESTlsPort,
-    rejectUnauthorized: true,
-  },
 }
 
 const getTransportOptions = () => ProcessUtils.ENV.emailTransportOptions ?? defaultTransportOptions
@@ -31,7 +26,6 @@ export const validateEnv = ({ from }) => {
   assertTransportOptionsEnv({ emailService })
   assertResolvedFromAddress({ emailService, from })
   assertNumericEnvVar({ emailService, variableName: 'EMAIL_AMAZON_SES_PORT' })
-  assertNumericEnvVar({ emailService, variableName: 'EMAIL_AMAZON_SES_TLS_PORT' })
 
   if (!ProcessUtils.ENV.emailTransportOptions) {
     assertRequiredEnvVars({

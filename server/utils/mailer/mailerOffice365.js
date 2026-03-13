@@ -13,7 +13,6 @@ const defaultTransportOptions = {
   port: '587',
   auth: { user: authUser, pass: authPass },
   secure: true,
-  tls: { ciphers: 'SSLv3' },
 }
 
 const getTransportOptions = () => ProcessUtils.ENV.emailTransportOptions ?? defaultTransportOptions
