@@ -10,10 +10,10 @@ const templateExtraValueByType = {
 }
 
 const genericVernacularLanguageCodes = ['eng', 'fra', 'swa']
-const genericExtraPropDefs = {
+const genericExtraPropDefsArray = ExtraPropDef.extraDefsToArray({
   text_prop: { dataType: ExtraPropDef.dataTypes.text },
   numeric_prop: { dataType: ExtraPropDef.dataTypes.number },
-}
+})
 
 const generateTemplate = ({ taxonomy, templateType }) => {
   const vernacularLanguageCodes =
@@ -21,8 +21,10 @@ const generateTemplate = ({ taxonomy, templateType }) => {
       ? genericVernacularLanguageCodes
       : Taxonomy.getVernacularLanguageCodes(taxonomy)
 
-  const extraPropsDefs =
-    templateType === DataImportTemplateTypes.generic ? genericExtraPropDefs : Taxonomy.getExtraPropsDefsArray(taxonomy)
+  const extraPropsDefsArray =
+    templateType === DataImportTemplateTypes.generic
+      ? genericExtraPropDefsArray
+      : Taxonomy.getExtraPropsDefsArray(taxonomy)
 
   return [
     {
@@ -37,10 +39,10 @@ const generateTemplate = ({ taxonomy, templateType }) => {
         }),
         {}
       ),
-      ...Object.entries(extraPropsDefs).reduce(
-        (acc, [key, extraPropDef]) => ({
+      ...extraPropsDefsArray.reduce(
+        (acc, extraPropDef) => ({
           ...acc,
-          [key]: templateExtraValueByType[ExtraPropDef.getDataType(extraPropDef)],
+          [ExtraPropDef.getName(extraPropDef)]: templateExtraValueByType[ExtraPropDef.getDataType(extraPropDef)],
         }),
         {}
       ),

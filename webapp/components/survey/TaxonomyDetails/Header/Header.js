@@ -77,7 +77,7 @@ const Header = (props) => {
               iconClassName="icon-download2 icon-14px"
               items={Object.values(templateTypes).flatMap((templateType) =>
                 templateFileFormats.map((fileFormat) => ({
-                  key: `taxonomy-import-template-${fileFormat}`,
+                  key: `taxonomy-import-template-${templateType}-${fileFormat}`,
                   content: (
                     <ButtonDownload
                       href={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/import-template/`}
