@@ -14,7 +14,6 @@ export const SimpleTextInput = forwardRef((props, ref) => {
     disabled,
     endAdornment,
     id,
-    inputRef,
     label: labelProp,
     maxLength,
     name,
@@ -64,7 +63,7 @@ export const SimpleTextInput = forwardRef((props, ref) => {
         startAdornment,
         endAdornment,
       }}
-      inputRef={inputRef}
+      inputRef={ref}
       margin="none"
       multiline={multiline}
       name={name}
@@ -72,7 +71,6 @@ export const SimpleTextInput = forwardRef((props, ref) => {
       onChange={onChange}
       onFocus={onFocus}
       placeholder={placeholder}
-      ref={ref}
       rows={rows}
       title={title}
       type={type}
@@ -89,7 +87,6 @@ SimpleTextInput.propTypes = {
   disabled: PropTypes.bool,
   endAdornment: PropTypes.any,
   id: PropTypes.string,
-  inputRef: PropTypes.any,
   label: PropTypes.string,
   maxLength: PropTypes.number,
   name: PropTypes.string,

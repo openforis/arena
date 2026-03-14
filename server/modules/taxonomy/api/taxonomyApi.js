@@ -2,17 +2,18 @@ import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 
 import { FileFormats } from '@core/fileFormats'
+import { DataImportTemplateTypes } from '@core/dataImport'
 import * as ObjectUtils from '../../../../core/objectUtils'
 import * as Taxon from '../../../../core/survey/taxon'
 import * as Taxonomy from '../../../../core/survey/taxonomy'
 
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+
 import { jobToJSON } from '../../../job/jobUtils'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as TaxonomyService from '../service/taxonomyService'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
-import { DataImportTemplateTypes } from '@core/dataImport'
 
 const sendTaxonomies = async (res, surveyId, draft, validate) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate })
