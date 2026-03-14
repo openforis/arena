@@ -12,6 +12,7 @@ import * as TaxonomyService from '../service/taxonomyService'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import { DataImportTemplateTypes } from '@core/dataImport'
 
 const sendTaxonomies = async (res, surveyId, draft, validate) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate })
@@ -180,6 +181,26 @@ export const init = (app) => {
         Response.setContentTypeFile({ res, fileName, fileFormat })
 
         await TaxonomyService.exportTaxa({ surveyId, taxonomyUuid, draft, outputStream: res, fileFormat })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/taxonomies/:taxonomyUuid/import-template/',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const {
+          surveyId,
+          taxonomyUuid,
+          draft = true,
+          fileFormat = FileFormats.csv,
+          templateType = DataImportTemplateTypes.generic,
+        } = Request.getParams(req)
+
+        await TaxonomyService.exportTaxaImportTemplate({ surveyId, taxonomyUuid, draft, res, fileFormat, templateType })
       } catch (error) {
         next(error)
       }
