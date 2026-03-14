@@ -8,6 +8,8 @@ import * as FileService from '@server/modules/record/service/fileService'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
+const detailedLogEnabled = false
+
 export default class FilesImportJob extends Job {
   constructor(params) {
     super('FilesImportJob', params)
@@ -76,31 +78,56 @@ export default class FilesImportJob extends Job {
     const { surveyId, dryRun } = context
     const fileUuid = RecordFile.getUuid(file)
     const fileProps = RecordFile.getProps(file)
-    this.logDebug(`persisting file ${fileUuid}`)
-    const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
-    if (existingFileSummary) {
-      this.logDebug(`file already existing`)
-      if (RecordFile.isDeleted(existingFileSummary)) {
-        this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
-        if (!dryRun) {
-          await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
-          await FileService.insertFile(surveyId, file, tx)
-        }
-        this.insertedFileUuids.push(fileUuid)
-      } else {
-        this.logDebug('updating props')
-        if (!dryRun) {
-          await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
-        }
-        this.updatedFileUuids.push(fileUuid)
-      }
-    } else {
-      this.logDebug(`file not existing: inserting new file`, fileProps)
-      if (!dryRun) {
-        await FileService.insertFile(surveyId, file, tx)
-      }
-      this.insertedFileUuids.push(fileUuid)
+    if (detailedLogEnabled) {
+      this.logDebug(`persisting file ${fileUuid}`)
     }
+    const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
+    if (!existingFileSummary) {
+      await this.insertNewFile({ dryRun, file, fileProps, fileUuid, surveyId, tx })
+      return
+    }
+
+    if (detailedLogEnabled) {
+      this.logDebug(`file already existing`)
+    }
+
+    if (RecordFile.isDeleted(existingFileSummary)) {
+      await this.replaceDeletedFile({ dryRun, file, fileUuid, surveyId, tx })
+      return
+    }
+
+    await this.updateExistingFileProps({ dryRun, fileProps, fileUuid, surveyId, tx })
+  }
+
+  async insertNewFile({ dryRun, file, fileProps, fileUuid, surveyId, tx }) {
+    if (detailedLogEnabled) {
+      this.logDebug(`file not existing: inserting new file`, fileProps)
+    }
+    if (!dryRun) {
+      await FileService.insertFile(surveyId, file, tx)
+    }
+    this.insertedFileUuids.push(fileUuid)
+  }
+
+  async replaceDeletedFile({ dryRun, file, fileUuid, surveyId, tx }) {
+    if (detailedLogEnabled) {
+      this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
+    }
+    if (!dryRun) {
+      await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+      await FileService.insertFile(surveyId, file, tx)
+    }
+    this.insertedFileUuids.push(fileUuid)
+  }
+
+  async updateExistingFileProps({ dryRun, fileProps, fileUuid, surveyId, tx }) {
+    if (detailedLogEnabled) {
+      this.logDebug('updating props')
+    }
+    if (!dryRun) {
+      await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
+    }
+    this.updatedFileUuids.push(fileUuid)
   }
 
   async checkFilesNotExceedingAvailableQuota(filesSummaries) {
@@ -125,8 +152,9 @@ export default class FilesImportJob extends Job {
     }
 
     const filesUuids = filesSummaries.map(RecordFile.getUuid)
-    this.logDebug(`file uuids to be imported: ${filesUuids}`)
-
+    if (detailedLogEnabled) {
+      this.logDebug(`file uuids to be imported: ${filesUuids}`)
+    }
     const missingRecordFileUuidsInFiles = recordsFileUuids.filter(
       (recordFileUuid) => !filesUuids.includes(recordFileUuid)
     )
