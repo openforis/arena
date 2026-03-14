@@ -2,9 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 
+import * as Taxon from '@core/survey/taxon'
+
 import AutocompleteDialog from '@webapp/components/form/AutocompleteDialog'
 
-import * as Taxon from '@core/survey/taxon'
 import { useTaxa } from './useTaxa'
 
 const NodeDefTaxonAutocompleteItemRenderer = (props) => {
