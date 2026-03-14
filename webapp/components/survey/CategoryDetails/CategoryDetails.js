@@ -97,7 +97,7 @@ const CategoryDetails = (props) => {
                 />
                 <ButtonMenu
                   className="date-import-template-menu-btn"
-                  label="categoryEdit.templateForImport"
+                  label="dataImportView.templateForImport"
                   iconClassName="icon-download2 icon-14px"
                   items={Object.keys(templateTypes).flatMap((templateType) =>
                     templateFileFormats.map((fileFormat) => ({
@@ -110,7 +110,11 @@ const CategoryDetails = (props) => {
                             generic: templateType === templateTypes.genericDataImport,
                             samplingPointData: templateType === templateTypes.samplingPointDataImport,
                           }}
-                          label={`categoryEdit.templateFor_${templateType}_${fileFormat}`}
+                          label={
+                            templateType === templateTypes.samplingPointDataImport
+                              ? `categoryEdit.templateFor_${templateType}_${fileFormat}`
+                              : `dataImportView.templateFor_${templateType}_${fileFormat}`
+                          }
                           variant="text"
                         />
                       ),
