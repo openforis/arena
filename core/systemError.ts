@@ -17,10 +17,14 @@ export const StatusCodes = {
   BAD_GATEWAY: 502,
   SERVICE_UNAVAILABLE: 503,
   GATEWAY_TIMEOUT: 504,
-}
+} as const
 
 export default class SystemError extends Error {
-  constructor(key, params, statusCode = StatusCodes.INTERNAL_SERVER_ERROR) {
+  private readonly _key: string
+  private readonly _params: any
+  private readonly _statusCode: number
+
+  constructor(key: string, params?: any, statusCode = StatusCodes.INTERNAL_SERVER_ERROR) {
     super(key)
 
     this.name = 'SystemError'
@@ -29,25 +33,24 @@ export default class SystemError extends Error {
     this._params = params
     this._statusCode = statusCode
 
-    // Maintains proper stack trace for where our error was thrown (only available on V8)
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, SystemError)
     }
   }
 
-  get key() {
+  get key(): string {
     return this._key
   }
 
-  get params() {
+  get params(): any {
     return this._params
   }
 
-  get statusCode() {
+  get statusCode(): number {
     return this._statusCode
   }
 
-  toJSON() {
+  toJSON(): { key: string; params: any; statusCode: number } {
     const { key, params, statusCode } = this
     return { key, params, statusCode }
   }

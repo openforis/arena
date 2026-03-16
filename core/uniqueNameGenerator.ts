@@ -1,6 +1,6 @@
-const nameWithCountPattern = /^(.*)_(\d)$/ // everything ending with _ followed by 1 or 2 decimals
+const nameWithCountPattern = /^(.*)_(\d)$/
 
-const parseName = (name) => {
+const parseName = (name: string): { nameWithoutCount: string; count: number } => {
   const match = name.match(nameWithCountPattern)
   return match
     ? {
@@ -13,10 +13,16 @@ const parseName = (name) => {
       }
 }
 
-const generateUniqueName = ({ startingName, existingNames = [] }) => {
-  // extract count from startingName (suffix _NN added to the name, if it already exists)
+const generateUniqueName = ({
+  startingName,
+  existingNames = [],
+}: {
+  startingName: string
+  existingNames?: string[]
+}): string => {
   let currentName = startingName
-  let { count, nameWithoutCount } = parseName(startingName)
+  let { count } = parseName(startingName)
+  const { nameWithoutCount } = parseName(startingName)
 
   while (existingNames.includes(currentName)) {
     count += 1

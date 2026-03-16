@@ -2,7 +2,7 @@ export const FileFormats = {
   csv: 'csv',
   xlsx: 'xlsx',
   zip: 'zip',
-}
+} as const
 
 const extensionByFileFormat = {
   [FileFormats.csv]: 'csv',
@@ -10,4 +10,5 @@ const extensionByFileFormat = {
   [FileFormats.zip]: 'zip',
 }
 
-export const getExtensionByFileFormat = (fileFormat) => extensionByFileFormat[fileFormat]
+export const getExtensionByFileFormat = (fileFormat: keyof typeof extensionByFileFormat): string =>
+  extensionByFileFormat[fileFormat]

@@ -1,8 +1,10 @@
-const debounceTimeouts = {}
-const throttleTimeouts = {}
-const throttleLastRan = {}
+type TimeoutMap = Record<string, ReturnType<typeof setTimeout>>
 
-export const cancelDebounce = (id) => {
+const debounceTimeouts: TimeoutMap = {}
+const throttleTimeouts: TimeoutMap = {}
+const throttleLastRan: Record<string, number> = {}
+
+export const cancelDebounce = (id: string): void => {
   const timeoutId = debounceTimeouts[id]
   if (timeoutId) {
     clearTimeout(debounceTimeouts[id])
@@ -10,14 +12,17 @@ export const cancelDebounce = (id) => {
   }
 }
 
-export const debounce = (func, id, delay = 500, immediate = false) => {
-  return function (...args) {
-    const context = this
-
-    const onTimeout = function () {
+export const debounce = <TArgs extends unknown[]>(
+  func: (...args: TArgs) => void,
+  id: string,
+  delay = 500,
+  immediate = false
+) => {
+  return function (this: unknown, ...args: TArgs): void {
+    const onTimeout = (): void => {
       delete debounceTimeouts[id]
       if (!immediate) {
-        func.apply(context, args)
+        func.apply(this, args)
       }
     }
 
@@ -25,17 +30,15 @@ export const debounce = (func, id, delay = 500, immediate = false) => {
     cancelDebounce(id)
     debounceTimeouts[id] = setTimeout(onTimeout, delay)
     if (callNow) {
-      func.apply(context, args)
+      func.apply(this, args)
     }
   }
 }
 
-export const throttle = (func, id, limit = 500) => {
-  return function (...args) {
-    const context = this
-
-    const runFunction = () => {
-      func.apply(context, args)
+export const throttle = <TArgs extends unknown[]>(func: (...args: TArgs) => void, id: string, limit = 500) => {
+  return function (this: unknown, ...args: TArgs): void {
+    const runFunction = (): void => {
+      func.apply(this, args)
       throttleLastRan[id] = Date.now()
       delete throttleTimeouts[id]
     }
@@ -61,7 +64,7 @@ export const throttle = (func, id, limit = 500) => {
   }
 }
 
-export const cancelThrottle = (id) => {
+export const cancelThrottle = (id: string): void => {
   const timeout = throttleTimeouts[id]
   if (timeout) {
     clearTimeout(timeout)

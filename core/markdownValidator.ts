@@ -1,8 +1,8 @@
 import { marked } from 'marked'
 
-export const checkTextHasLinks = (text) => {
+export const checkTextHasLinks = (text: string): boolean => {
   const tokens = marked.lexer(text)
-  const stack = [...tokens]
+  const stack: any[] = [...tokens]
 
   while (stack.length > 0) {
     const current = stack.pop()

@@ -1,36 +1,37 @@
-export default class Queue {
-  constructor(items = []) {
-    this.data = []
+export default class Queue<T = unknown> {
+  private data: T[] = []
+
+  constructor(items: T[] = []) {
     this.enqueueItems(items)
   }
 
-  enqueue(item) {
+  enqueue(item: T): void {
     this.data.unshift(item)
   }
 
-  enqueueItems(items) {
+  enqueueItems(items: T[]): void {
     for (const item of items) {
       this.enqueue(item)
     }
   }
 
-  dequeue() {
+  dequeue(): T | undefined {
     return this.data.pop()
   }
 
-  first() {
+  first(): T | undefined {
     return this.data[this.size() - 1]
   }
 
-  last() {
+  last(): T | undefined {
     return this.data[0]
   }
 
-  size() {
+  size(): number {
     return this.data.length
   }
 
-  isEmpty() {
+  isEmpty(): boolean {
     return this.size() === 0
   }
 }

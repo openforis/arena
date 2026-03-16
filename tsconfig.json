@@ -22,6 +22,7 @@
     "skipLibCheck": true,
     "strict": false,
     "noEmit": true,
+    "allowImportingTsExtensions": false,
     "types": ["node", "jest"]
   },
   "include": ["common", "core", "server", "webapp", "test", "*.d.ts"],
