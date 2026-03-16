@@ -1,5 +1,7 @@
 import { _curry2 } from './internal/_curry2'
 
+type Indexable = Record<PropertyKey, unknown>
+
 /**
  * Returns a function that when supplied an object returns the indicated property of that object.
  *
@@ -8,4 +10,4 @@ import { _curry2 } from './internal/_curry2'
  *
  * @returns {any} - The value at `object.property`.
  */
-export const prop = _curry2((property, object) => object[property])
+export const prop = _curry2((property: PropertyKey, object: Indexable): unknown => object[property])

@@ -8,14 +8,14 @@ import { isNull } from './isNull'
  *
  * @returns {boolean} - True if the input object is its type's empty value, false otherwise.
  */
-export const isEmpty = _curry1((value) => {
+export const isEmpty = _curry1((value: unknown): boolean => {
   if (isNull(value)) return true
 
   if (value.constructor === Object) return Object.keys(value).length === 0
-  if (value.constructor === Array) return value.length === 0
-  if (value.constructor === String) return value.length === 0
-  if (value.constructor === Set) return value.size === 0
-  if (value.constructor === Map) return value.size === 0
+  if (value.constructor === Array) return (value as Array<unknown>).length === 0
+  if (value.constructor === String) return (value as string).length === 0
+  if (value.constructor === Set) return (value as Set<unknown>).size === 0
+  if (value.constructor === Map) return (value as Map<unknown, unknown>).size === 0
 
   return false
 })

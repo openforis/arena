@@ -1,8 +1,19 @@
 import { _curry2 } from './_curry2'
 
-const _camelCase = (str) => str.replace(/[_.-](\w|$)/g, (_, x) => x.toUpperCase())
+type CamelizeOptions = {
+  skip?: string[]
+  limitToLevel?: number | null
+  sideEffect?: boolean
+}
 
-const _walk = ({ object, skip = [], limitToLevel = null, sideEffect = false }) => {
+const _camelCase = (str: string): string => str.replace(/[_.-](\w|$)/g, (_, x: string) => x.toUpperCase())
+
+const _walk = ({
+  object,
+  skip = [],
+  limitToLevel = null,
+  sideEffect = false,
+}: CamelizeOptions & { object: object | unknown[] }): unknown => {
   if (!object || !(object instanceof Object) || object instanceof Date || object instanceof RegExp) {
     return object
   }
@@ -17,7 +28,7 @@ const _walk = ({ object, skip = [], limitToLevel = null, sideEffect = false }) =
   }
   const nextLimitToLevel = limitToLevel ? limitToLevel - 1 : null
 
-  return Object.entries(object).reduce(
+  return Object.entries(object).reduce<Record<string, unknown>>(
     (objAcc, [key, value]) => {
       const skipped = skip.includes(key)
       const keyTransformed = skipped ? key : _camelCase(key)
@@ -29,7 +40,7 @@ const _walk = ({ object, skip = [], limitToLevel = null, sideEffect = false }) =
       }
       return objAcc
     },
-    sideEffect ? object : {}
+    sideEffect ? (object as Record<string, unknown>) : {}
   )
 }
 
@@ -43,9 +54,11 @@ const _walk = ({ object, skip = [], limitToLevel = null, sideEffect = false }) =
  *
  * @returns {any} - The object with keys in camel case or the value in camel case.
  */
-export const _camelizePartial = _curry2(({ skip = [], limitToLevel = null, sideEffect = false } = {}, object) => {
-  if (typeof object === 'string' || object instanceof String) {
-    return _camelCase(object)
+export const _camelizePartial = _curry2(
+  ({ skip = [], limitToLevel = null, sideEffect = false }: CamelizeOptions = {}, object: any): any => {
+    if (typeof object === 'string' || object instanceof String) {
+      return _camelCase(String(object))
+    }
+    return _walk({ object, skip, limitToLevel, sideEffect })
   }
-  return _walk({ object, skip, limitToLevel, sideEffect })
-})
+)

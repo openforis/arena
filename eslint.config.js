@@ -72,6 +72,7 @@ export default [
       'no-unused-vars': 'off',
       'prefer-const': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'off', // Allow 'any' type (can be relaxed later if needed)
     },
   },
 

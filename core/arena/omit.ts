@@ -1,5 +1,7 @@
 import { _curry2 } from './internal/_curry2'
 
+type AnyRecord = Record<string, unknown>
+
 /**
  * Returns a partial copy of an object omitting the keys specified.
  *
@@ -8,14 +10,14 @@ import { _curry2 } from './internal/_curry2'
  *
  * @returns {object} - A new object with properties from `names` not on it.
  */
-export const omit = _curry2((names, object) => {
+export const omit = _curry2((names: string | string[], object: AnyRecord): AnyRecord => {
   const namesArray = Array.isArray(names) ? names : [names]
-  const exclusionByName = namesArray.reduce((acc, name) => {
+  const exclusionByName = namesArray.reduce<Record<string, boolean>>((acc, name) => {
     acc[name] = true
     return acc
   }, {})
-  const result = {}
-  for (let prop in object) {
+  const result: AnyRecord = {}
+  for (const prop in object) {
     if (!exclusionByName[prop]) {
       result[prop] = object[prop]
     }

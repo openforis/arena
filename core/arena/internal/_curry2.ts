@@ -1,6 +1,8 @@
 import { _curry1 } from './_curry1'
 import { _isPlaceholder } from './_isPlaceholder'
 
+type AnyFn = (...args: unknown[]) => unknown
+
 /**
  * Optimized internal two-arity curry function.
  *
@@ -8,9 +10,8 @@ import { _isPlaceholder } from './_isPlaceholder'
  * @param {Function} fn - The function to curry.
  * @returns {Function} The curried function.
  */
-export const _curry2 = (fn) =>
-  function f2(a, b) {
-    /* eslint-disable no-nested-ternary */
+export const _curry2 = (fn: AnyFn) =>
+  function f2(a?: unknown, b?: unknown): unknown {
     switch (arguments.length) {
       case 0:
         return f2
@@ -22,9 +23,9 @@ export const _curry2 = (fn) =>
         return _isPlaceholder(a) && _isPlaceholder(b)
           ? f2
           : _isPlaceholder(a)
-          ? _curry1((_a) => fn(_a, b))
-          : _isPlaceholder(b)
-          ? _curry1((_b) => fn(a, _b))
-          : fn(a, b)
+            ? _curry1((_a) => fn(_a, b))
+            : _isPlaceholder(b)
+              ? _curry1((_b) => fn(a, _b))
+              : fn(a, b)
     }
   }

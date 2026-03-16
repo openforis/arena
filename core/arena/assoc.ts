@@ -1,5 +1,7 @@
 import { _curry3 } from './internal/_curry3'
 
+type AnyRecord = Record<PropertyKey, unknown>
+
 /**
  * Makes a shallow clone of an object, setting or overriding the specified
  * property with the given value. Note that this copies and flattens prototype
@@ -12,7 +14,9 @@ import { _curry3 } from './internal/_curry3'
  *
  * @returns {object} - A new object equivalent to the original except for the changed property..
  */
-export const assoc = _curry3((property, value, object) => ({
-  ...object,
-  [property]: value,
-}))
+export const assoc = _curry3(
+  <K extends PropertyKey, V>(property: K, value: V, object: AnyRecord): AnyRecord => ({
+    ...object,
+    [property]: value,
+  })
+)

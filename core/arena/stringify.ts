@@ -9,10 +9,14 @@ import { isNull } from './isNull'
  * @param space
  * @returns {*} - The stringified object.
  */
-export const stringify = (object, _replacer, space = null ) => {
+export const stringify = (
+  object: unknown,
+  _replacer?: unknown,
+  space: string | number | null = null
+): string | null => {
   if (isNull(object)) return null
 
-  const replacer = (key, value) => {
+  const replacer = (key: string | null, value: any): any => {
     if (isNull(value)) return null
 
     if (isNull(key)) {
@@ -30,5 +34,5 @@ export const stringify = (object, _replacer, space = null ) => {
       }
     return value
   }
-  return JSON.stringify(object, replacer, space)
+  return JSON.stringify(object, replacer, space ?? undefined)
 }

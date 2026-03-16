@@ -7,4 +7,4 @@ import { _camelizePartial } from './internal/_camelizePartial'
  *
  * @returns {any} - The object with keys in camel case or the value in camel case.
  */
-export const camelize = (object) => _camelizePartial({}, object)
+export const camelize = (object: unknown): unknown => _camelizePartial({}, object)
