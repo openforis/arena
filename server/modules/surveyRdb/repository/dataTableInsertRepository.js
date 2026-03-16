@@ -65,55 +65,58 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, on
   const nodeDefColumnsUuids = nodeDefColumns.map(NodeDef.getUuid)
 
   // 1. create materialized view
-  const viewName = `${surveySchema}.m_view_data`
-  const selectQuery = getSelectQuery({
-    surveyId,
-    nodeDef,
-    nodeDefContext,
-    nodeDefAncestorMultipleEntity,
-    nodeDefColumnsUuids,
-  })
+  const materializedViewName = `${surveySchema}.m_view_data`
 
-  await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, {
-    surveyId,
-    nodeDefUuid,
-    nodeDefColumnsUuids,
-  })
+  try {
+    const selectQuery = getSelectQuery({
+      surveyId,
+      nodeDef,
+      nodeDefContext,
+      nodeDefAncestorMultipleEntity,
+      nodeDefColumnsUuids,
+    })
 
-  const { count } = await client.one(`SELECT count(id) FROM ${viewName}`)
+    await client.none(`CREATE MATERIALIZED VIEW ${materializedViewName} AS ${selectQuery}`, {
+      surveyId,
+      nodeDefUuid,
+      nodeDefColumnsUuids,
+    })
 
-  const limit = 4000
-  const noIter = Math.ceil(count / limit)
-  const schema = Schemata.getSchemaSurveyRdb(surveyId)
-  const tableName = tableDef.name
-  const columnNames = tableDef.getColumnNames({ includeAnalysis })
-  const nodeRowToColumnValues = (nodeRow) => tableDef.getRowValuesByColumnName({ nodeRow, nodeDefColumns })
+    const { count } = await client.one(`SELECT count(id) FROM ${materializedViewName}`)
 
-  for (let i = 0; i < noIter && !stopIfFunction?.(); i++) {
-    const offset = i * limit
+    const limit = 4000
+    const noIter = Math.ceil(count / limit)
+    const schema = Schemata.getSchemaSurveyRdb(surveyId)
+    const tableName = tableDef.name
+    const columnNames = tableDef.getColumnNames({ includeAnalysis })
+    const nodeRowToColumnValues = (nodeRow) => tableDef.getRowValuesByColumnName({ nodeRow, nodeDefColumns })
 
-    // 2. fetch nodes
-    const nodeRows = await client.any(
-      `SELECT * FROM ${viewName} 
+    for (let i = 0; i < noIter && !stopIfFunction?.(); i++) {
+      const offset = i * limit
+
+      // 2. fetch nodes
+      const nodeRows = await client.any(
+        `SELECT * FROM ${materializedViewName} 
       ORDER BY id 
       OFFSET ${offset} 
       LIMIT ${limit}`
-    )
+      )
 
-    if (stopIfFunction?.()) {
-      break
+      if (stopIfFunction?.()) {
+        break
+      }
+      // 3. convert nodes into values
+      const nodesRowValuesByColumnName = nodeRows.map(nodeRowToColumnValues)
+
+      // 4. insert node values
+      await client.none(insertAllQueryBatch(schema, tableName, columnNames, nodesRowValuesByColumnName))
+
+      if (onProgress) {
+        await onProgress({ total: noIter, processed: i + 1 })
+      }
     }
-    // 3. convert nodes into values
-    const nodesRowValuesByColumnName = nodeRows.map(nodeRowToColumnValues)
-
-    // 4. insert node values
-    await client.none(insertAllQueryBatch(schema, tableName, columnNames, nodesRowValuesByColumnName))
-
-    if (onProgress) {
-      await onProgress({ total: noIter, processed: i + 1 })
-    }
+  } finally {
+    // 5. drop materialized view
+    await client.none(`DROP MATERIALIZED VIEW ${materializedViewName}`)
   }
-
-  // 5. drop materialized view
-  await client.none(`DROP MATERIALIZED VIEW ${viewName}`)
 }
