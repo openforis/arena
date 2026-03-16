@@ -10,7 +10,13 @@ import * as NodeRepository from '@server/modules/record/repository/nodeRepositor
 
 const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMultipleEntity, nodeDefColumnsUuids }) => {
   const getNodeSelectQuery = (ancestorDef) =>
-    NodeRepository.getNodeSelectQuery({ surveyId, includeRefData: true, includeRecordInfo: true, ancestorDef })
+    NodeRepository.getNodeSelectQuery({
+      surveyId,
+      ancestorDef,
+      includeRefData: true,
+      includeRecordInfo: true,
+      includeSurveyUuid: false,
+    })
 
   const nodesSelect = `${getNodeSelectQuery(nodeDefAncestorMultipleEntity)}
     WHERE n.node_def_uuid = $/nodeDefUuid/
