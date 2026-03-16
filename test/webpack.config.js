@@ -3,7 +3,7 @@ const glob = require('glob')
 const nodeExternals = require('webpack-node-externals')
 
 const getEntry = (type) =>
-  glob.globSync(path.resolve(__dirname, type, 'tests', '*.js')).sort((fileA, fileB) => {
+  glob.globSync(path.resolve(__dirname, type, 'tests', '*.{js,jsx,ts,tsx}')).sort((fileA, fileB) => {
     const idxA = fileA.substr(0, 3)
     const idxB = fileB.substr(0, 3)
     return idxA < idxB
@@ -18,7 +18,7 @@ const getOutput = (type) => ({
 const getModule = () => ({
   rules: [
     {
-      test: /\.(js|jsx)$/,
+      test: /\.(js|jsx|ts|tsx)$/,
       exclude: /(node_modules|bower_components)/,
       use: [{ loader: 'babel-loader' }],
     },
@@ -26,7 +26,18 @@ const getModule = () => ({
 })
 
 const getResolve = () => ({
-  extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
+  extensions: [
+    '.webpack-loader.js',
+    '.web-loader.js',
+    '.loader.js',
+    '.ts',
+    '.tsx',
+    '.js',
+    '.jsx',
+    '.scss',
+    '.sass',
+    '.css',
+  ],
   alias: {
     '@common': path.resolve(__dirname, '..', 'common/'),
     '@core': path.resolve(__dirname, '..', 'core/'),

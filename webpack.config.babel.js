@@ -83,7 +83,18 @@ const webPackConfig = {
   mode: ProcessUtils.ENV.nodeEnv,
   devtool: 'source-map',
   resolve: {
-    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
+    extensions: [
+      '.webpack-loader.js',
+      '.web-loader.js',
+      '.loader.js',
+      '.ts',
+      '.tsx',
+      '.js',
+      '.jsx',
+      '.scss',
+      '.sass',
+      '.css',
+    ],
     alias: {
       '@common': path.resolve(__dirname, 'common/'),
       '@core': path.resolve(__dirname, 'core/'),
@@ -130,7 +141,7 @@ const webPackConfig = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
         use: [
           {

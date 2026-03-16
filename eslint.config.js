@@ -4,6 +4,8 @@ import pluginJs from '@eslint/js'
 import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
 import pluginJsdoc from 'eslint-plugin-jsdoc'
+import pluginTypeScript from '@typescript-eslint/eslint-plugin'
+import parserTypeScript from '@typescript-eslint/parser'
 
 // Testing Plugins
 import pluginJest from 'eslint-plugin-jest'
@@ -44,9 +46,38 @@ export default [
     },
   },
 
+  // 2. TypeScript Configuration.
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      parser: parserTypeScript,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    plugins: {
+      '@typescript-eslint': pluginTypeScript,
+    },
+    rules: {
+      ...pluginTypeScript.configs.recommended.rules,
+      'no-console': 'warn',
+      'no-unused-vars': 'off',
+      'prefer-const': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
+
   // 3. React and React Hooks Configuration (for all JSX files)
   {
-    files: ['**/*.jsx', '**/*.js'],
+    files: ['**/*.jsx', '**/*.js', '**/*.tsx', '**/*.ts'],
     plugins: {
       react: pluginReact,
       'react-hooks': pluginReactHooks,
@@ -86,7 +117,7 @@ export default [
   // 5. Jest (Unit/Integration Tests) Configuration
   {
     // Apply this to files matching Jest naming convention
-    files: ['test/**/*.js', '**/*.test.js', '**/*.spec.js'],
+    files: ['test/**/*.js', 'test/**/*.ts', '**/*.test.js', '**/*.spec.js', '**/*.test.ts', '**/*.spec.ts'],
     plugins: {
       jest: pluginJest,
     },
@@ -108,7 +139,7 @@ export default [
   // 6. Jest-Playwright (E2E Tests) Configuration
   {
     // Apply this to files matching Playwright test naming convention (often different than Jest unit tests)
-    files: ['test/e2e/**/*.js', 'test/e2e/**/*.jsx'],
+    files: ['test/e2e/**/*.js', 'test/e2e/**/*.jsx', 'test/e2e/**/*.ts', 'test/e2e/**/*.tsx'],
     plugins: {
       playwright: pluginPlaywright,
     },
@@ -125,7 +156,7 @@ export default [
 
   // 7. Prettier Integration (Must be the LAST configuration)
   {
-    files: ['**/*.js', '**/*.jsx'],
+    files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
     plugins: {
       prettier: pluginPrettier,
     },

@@ -47,14 +47,14 @@ export default {
     hotUpdateMainFilename: 'dist/hot-update-[fullhash].json',
   },
   resolve: {
-    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx'],
+    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.ts', '.tsx', '.js', '.jsx'],
     modules: [path.resolve(__dirname, 'node_modules')],
     alias: mainConfig.resolve.alias,
   },
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /(node_modules|bower_components)/,
         use: ['cache-loader', 'babel-loader'],
       },
