@@ -53,7 +53,7 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
         c.ancestor_uuid = n.uuid`
 }
 
-export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, client) => {
+export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, onProgress = null }, client) => {
   const surveyId = Survey.getId(survey)
   const surveySchema = Schemata.getSchemaSurveyRdb(surveyId)
   const includeAnalysis = true
@@ -82,13 +82,18 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
 
   const { count } = await client.one(`SELECT count(id) FROM ${viewName}`)
 
-  const limit = 5000
+  const limit = 4000
   const noIter = Math.ceil(count / limit)
+  const schema = Schemata.getSchemaSurveyRdb(surveyId)
+  const tableName = tableDef.name
+  const columnNames = tableDef.getColumnNames({ includeAnalysis })
+  const nodeRowToColumnValues = (nodeRow) => tableDef.getRowValuesByColumnName({ nodeRow, nodeDefColumns })
+
   for (let i = 0; i < noIter && !stopIfFunction?.(); i++) {
     const offset = i * limit
 
     // 2. fetch nodes
-    const nodes = await client.any(
+    const nodeRows = await client.any(
       `SELECT * FROM ${viewName} 
       ORDER BY id 
       OFFSET ${offset} 
@@ -99,17 +104,14 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
       break
     }
     // 3. convert nodes into values
-    const tableDef = new TableDataNodeDef(survey, nodeDef)
-
-    const nodesRowValuesByColumnName = nodes.map((nodeRow) =>
-      tableDef.getRowValuesByColumnName({ nodeRow, nodeDefColumns })
-    )
+    const nodesRowValuesByColumnName = nodeRows.map(nodeRowToColumnValues)
 
     // 4. insert node values
-    const schema = Schemata.getSchemaSurveyRdb(surveyId)
-    const tableName = tableDef.name
-    const columnNames = tableDef.getColumnNames({ includeAnalysis })
     await client.none(insertAllQueryBatch(schema, tableName, columnNames, nodesRowValuesByColumnName))
+
+    if (onProgress) {
+      await onProgress({ total: noIter, processed: i + 1 })
+    }
   }
 
   // 5. drop materialized view
