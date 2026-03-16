@@ -71,7 +71,8 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, on
   const nodeDefColumnsUuids = nodeDefColumns.map(NodeDef.getUuid)
 
   // 1. create materialized view
-  const materializedViewName = `${schema}.m_view_data`
+  const materializedViewName = `m_view_data`
+  const materializedViewFullName = `${schema}.${materializedViewName}`
 
   try {
     const selectQuery = getSelectQuery({
@@ -81,35 +82,43 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, on
       nodeDefAncestorMultipleEntity,
       nodeDefColumnsUuids,
     })
-    await client.none(`CREATE MATERIALIZED VIEW ${materializedViewName} AS ${selectQuery}`, {
+    await client.none(`CREATE MATERIALIZED VIEW ${materializedViewFullName} AS ${selectQuery}`, {
       surveyId,
       nodeDefUuid,
       nodeDefColumnsUuids,
     })
 
-    const { count } = await client.one(`SELECT count(id) FROM ${materializedViewName}`)
+    await client.none(`CREATE INDEX ${materializedViewName}_id_idx ON ${materializedViewFullName} (id)`)
 
+    let total
+    if (onProgress) {
+      const { count } = await client.one(`SELECT count(id) FROM ${materializedViewFullName}`)
+      total = count
+    }
+
+    let processed = 0
     const limit = 2000
-    const noIter = Math.ceil(count / limit)
     const tableName = tableDef.name
     const columnNames = tableDef.getColumnNames({ includeAnalysis })
     const nodeRowToColumnValues = (nodeRow) => tableDef.getRowValuesByColumnName({ nodeRow, nodeDefColumns })
 
     let lastId = 0
-    for (let i = 0; i < noIter && !stopIfFunction?.(); i++) {
+    while (!stopIfFunction?.()) {
       // 2. fetch nodes using keyset pagination on id
       const nodeRows = await client.any(
-        `SELECT * FROM ${materializedViewName} 
+        `SELECT * FROM ${materializedViewFullName} 
         WHERE id > $/lastId/
         ORDER BY id 
         LIMIT $/limit/`,
         { lastId, limit }
       )
 
-      if (nodeRows.length === 0 || stopIfFunction?.()) {
+      const processingCount = nodeRows.length
+      if (processingCount === 0 || stopIfFunction?.()) {
         break
       }
       lastId = nodeRows[nodeRows.length - 1].id
+
       // 3. convert nodes into values
       const nodesRowValuesByColumnName = nodeRows.map(nodeRowToColumnValues)
 
@@ -117,11 +126,12 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, on
       await client.none(insertAllQueryBatch(schema, tableName, columnNames, nodesRowValuesByColumnName))
 
       if (onProgress) {
-        await onProgress({ total: noIter, processed: i + 1 })
+        processed += processingCount
+        await onProgress({ total, processed })
       }
     }
   } finally {
     // 5. drop materialized view
-    await client.none(`DROP MATERIALIZED VIEW IF EXISTS ${materializedViewName}`)
+    await client.none(`DROP MATERIALIZED VIEW IF EXISTS ${materializedViewFullName}`)
   }
 }
