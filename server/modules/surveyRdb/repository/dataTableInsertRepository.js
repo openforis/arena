@@ -55,7 +55,7 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
 
 export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, onProgress = null }, client) => {
   const surveyId = Survey.getId(survey)
-  const surveySchema = Schemata.getSchemaSurveyRdb(surveyId)
+  const schema = Schemata.getSchemaSurveyRdb(surveyId)
   const includeAnalysis = true
   const tableDef = new TableDataNodeDef(survey, nodeDef)
   const nodeDefAncestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
@@ -65,7 +65,7 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, on
   const nodeDefColumnsUuids = nodeDefColumns.map(NodeDef.getUuid)
 
   // 1. create materialized view
-  const materializedViewName = `${surveySchema}.m_view_data`
+  const materializedViewName = `${schema}.m_view_data`
 
   try {
     const selectQuery = getSelectQuery({
@@ -86,7 +86,6 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, on
 
     const limit = 4000
     const noIter = Math.ceil(count / limit)
-    const schema = Schemata.getSchemaSurveyRdb(surveyId)
     const tableName = tableDef.name
     const columnNames = tableDef.getColumnNames({ includeAnalysis })
     const nodeRowToColumnValues = (nodeRow) => tableDef.getRowValuesByColumnName({ nodeRow, nodeDefColumns })
