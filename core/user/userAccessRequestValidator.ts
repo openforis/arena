@@ -3,7 +3,7 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
-export const validateUserAccessRequest = async (userAccessRequest) =>
+export const validateUserAccessRequest = async (userAccessRequest: Record<string, unknown>) =>
   Validator.validate(userAccessRequest, {
     [UserAccessRequest.keys.email]: [
       Validator.validateRequired(Validation.messageKeys.userAccessRequest.emailRequired),

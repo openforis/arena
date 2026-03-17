@@ -2,10 +2,16 @@ import * as UserAccessRequestAccept from '@core/user/userAccessRequestAccept'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
-const validateSurveyNameUniqueness = (surveyInfosWithSameName) => (_propName, _item) =>
+const validateSurveyNameUniqueness = (surveyInfosWithSameName: unknown[]) => (_propName: string, _item: unknown) =>
   surveyInfosWithSameName && surveyInfosWithSameName.length > 0 ? { key: Validation.messageKeys.nameDuplicate } : null
 
-export const validateUserAccessRequestAccept = async ({ accessRequestAccept, surveyInfosWithSameName = [] }) =>
+export const validateUserAccessRequestAccept = async ({
+  accessRequestAccept,
+  surveyInfosWithSameName = [],
+}: {
+  accessRequestAccept: Record<string, unknown>
+  surveyInfosWithSameName?: unknown[]
+}) =>
   Validator.validate(accessRequestAccept, {
     [UserAccessRequestAccept.keys.email]: [
       Validator.validateRequired(Validation.messageKeys.userAccessRequestAccept.emailRequired),

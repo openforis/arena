@@ -6,10 +6,16 @@ export const keys = {
   code: 'code',
   name: 'name',
   wkt: 'wkt',
+} as const
+
+export interface Srs {
+  code: string
+  name: string
+  wkt: string
 }
 
 // ===== CREATE
-export const newSrs = (code, name, wkt) => ({
+export const newSrs = (code: string, name: string, wkt: string): Srs => ({
   [keys.code]: code,
   [keys.name]: name,
   [keys.wkt]: wkt,
@@ -39,4 +45,4 @@ export const latLonSrs = newSrs(
 )
 
 export const latLongSrsCode = getCode(latLonSrs)
-export const isLatLong = (code) => latLongSrsCode === code
+export const isLatLong = (code: string): boolean => latLongSrsCode === code

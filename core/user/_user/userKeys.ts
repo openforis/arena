@@ -37,4 +37,4 @@ export const keys = {
 
   // from user_access_request
   accessRequestDate: 'accessRequestDate',
-}
+} as const

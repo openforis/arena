@@ -1,10 +1,11 @@
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
+
 import { UserPasswordChangeForm } from './userPasswordChangeForm'
 import { UserPasswordValidator } from './userPasswordValidator'
 
 const getPropsValidations = ({ passwordRequired = true, includeOldPassword = true } = {}) => {
-  const validations = {
+  const validations: any = {
     [UserPasswordChangeForm.keys.newPassword]: [
       ...(passwordRequired
         ? [Validator.validateRequired(Validation.messageKeys.userPasswordChange.newPasswordRequired)]
@@ -15,7 +16,7 @@ const getPropsValidations = ({ passwordRequired = true, includeOldPassword = tru
       ...(passwordRequired
         ? [Validator.validateRequired(Validation.messageKeys.userPasswordChange.confirmPasswordRequired)]
         : []),
-      (propName, obj) => {
+      (propName: string, obj: Record<string, unknown>) => {
         const passwordRepeated = obj[propName]
         const newPassword = obj[UserPasswordChangeForm.keys.newPassword]
         return newPassword === passwordRepeated
@@ -24,15 +25,17 @@ const getPropsValidations = ({ passwordRequired = true, includeOldPassword = tru
       },
     ],
   }
+
   if (includeOldPassword) {
     validations[UserPasswordChangeForm.keys.oldPassword] = [
       Validator.validateRequired(Validation.messageKeys.userPasswordChange.oldPasswordRequired),
     ]
   }
+
   return validations
 }
 
-const validate = async (form, { includeOldPassword = true } = {}) =>
+const validate = async (form: Record<string, unknown>, { includeOldPassword = true } = {}) =>
   Validator.validate(form, getPropsValidations({ includeOldPassword }))
 
 export const UserPasswordChangeFormValidator = {

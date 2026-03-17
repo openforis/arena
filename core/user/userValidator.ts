@@ -3,16 +3,20 @@ import * as UserInvite from '@core/user/userGroupInvitation'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
-import { UserPasswordChangeFormValidator } from './userPasswordChangeFormValidator'
 import { checkTextHasLinks } from '@core/markdownValidator'
+
+import { UserPasswordChangeFormValidator } from './userPasswordChangeFormValidator'
 
 const invitationMessageMaxLength = 500
 
 export const validateEmail = Validator.validateEmail({ errorKey: Validation.messageKeys.user.emailInvalid })
 
-export const validateUser = async (user, userWithSameEmail = null) => {
+export const validateUser = async (
+  user: Record<string, unknown>,
+  userWithSameEmail: Record<string, unknown> | null = null
+) => {
   const newUser = !User.getUuid(user)
-  const propsValidations = {
+  const propsValidations: any = {
     [`${User.keys.props}.${User.keysProps.title}`]: [
       Validator.validateRequired(Validation.messageKeys.user.titleRequired),
     ],
@@ -25,6 +29,7 @@ export const validateUser = async (user, userWithSameEmail = null) => {
         : []),
     ],
   }
+
   if (newUser) {
     // new user
     Object.assign(
@@ -36,11 +41,12 @@ export const validateUser = async (user, userWithSameEmail = null) => {
       Validator.validateRequired(Validation.messageKeys.user.groupRequired),
     ]
   }
+
   return Validator.validate(user, propsValidations)
 }
 
-const validateInviteMessage = (_propName, item) => {
-  const message = UserInvite.getMessage(item)
+const validateInviteMessage = (_propName: string, item: Record<string, unknown>) => {
+  const message = UserInvite.getMessage(item) as string
   if (message.length === 0) {
     return null
   }
@@ -53,7 +59,7 @@ const validateInviteMessage = (_propName, item) => {
   return null
 }
 
-export const validateInvitation = async (invitation) =>
+export const validateInvitation = async (invitation: Record<string, unknown>) =>
   Validator.validate(invitation, {
     [UserInvite.keys.emails]: [
       Validator.validateRequired(Validation.messageKeys.user.emailRequired),

@@ -5,7 +5,7 @@ import { normalizeName } from '@core/stringUtils'
 export const keys = {
   email: 'email',
   props: ObjectUtils.keys.props,
-}
+} as const
 
 export const keysProps = {
   firstName: 'firstName',
@@ -15,7 +15,7 @@ export const keysProps = {
   purpose: 'purpose',
   surveyName: 'surveyName',
   templateUuid: 'templateUuid',
-}
+} as const
 
 export const keysPropsNamesLowercase = Object.values(keysProps).map((prop) => prop.toLowerCase())
 
@@ -23,7 +23,7 @@ export const status = {
   ACCEPTED: 'ACCEPTED',
   CREATED: 'CREATED',
   REJECTED: 'REJECTED',
-}
+} as const
 
 export const editableFields = [
   { name: keys.email, required: true },

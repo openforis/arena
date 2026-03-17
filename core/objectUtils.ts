@@ -38,7 +38,7 @@ export const getPropsDraft = R.propOr({}, keys.propsDraft)
 export const getProp =
   (prop: string, defaultTo: unknown = null) =>
   (obj: Record<string, unknown>): unknown =>
-    R.pathOr(defaultTo, prop.split('.'))(obj)
+    R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))(obj)
 export const isKeyTrue =
   (key: string) =>
   (obj: Record<string, unknown>): boolean =>

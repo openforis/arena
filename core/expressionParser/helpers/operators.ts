@@ -1,5 +1,10 @@
 import * as R from 'ramda'
 
+interface Operator {
+  value: string
+  label: string
+}
+
 const logical = {
   and: { value: '&&', label: '&&' },
   or: { value: '||', label: '||' },
@@ -24,11 +29,11 @@ const arithmetic = {
 }
 
 const binary = R.mergeLeft(arithmetic, comparison)
-const binaryValues = R.values(binary)
+const binaryValues = R.values(binary) as Operator[]
 
-const findBinary = (operator) => R.find(R.propEq('value', operator), binaryValues)
+const findBinary = (operator: string): Operator | undefined => R.find(R.propEq('value', operator), binaryValues)
 
-const js2sqlOperators = {
+const js2sqlOperators: Record<string, string> = {
   '&&': 'AND',
   '||': 'OR',
   // IS (NOT) DISTINCT FROM always returns true/false, even for nulls

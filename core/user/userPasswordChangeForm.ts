@@ -7,10 +7,10 @@ const keys = {
   newPassword: 'newPassword',
   confirmPassword: 'confirmPassword',
   userUuid: 'userUuid',
-}
+} as const
 
-const newForm = () => Object.values(keys).reduce((acc, key) => ({ ...acc, [key]: '' }), {})
-const isEmpty = (form) => Object.values(keys).every((key) => Objects.isEmpty(form[key]))
+const newForm = () => Object.values(keys).reduce<Record<string, string>>((acc, key) => ({ ...acc, [key]: '' }), {})
+const isEmpty = (form: Record<string, unknown>) => Object.values(keys).every((key) => Objects.isEmpty(form[key]))
 
 const getOldPassword = A.propOr('', keys.oldPassword)
 const getNewPassword = A.propOr('', keys.newPassword)

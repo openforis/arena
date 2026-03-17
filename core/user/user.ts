@@ -34,7 +34,7 @@ export const getStatus = R.prop(keys.status)
 export const { getValidation } = Validation
 export const getAuthGroupsUuids = R.propOr([], keys.authGroupsUuids)
 export const getAuthGroupExtraProps = R.propOr({}, keys.authGroupExtraProps)
-export const getAuthGroupExtraProp = (prop) => R.pipe(getAuthGroupExtraProps, R.prop(prop))
+export const getAuthGroupExtraProp = (prop: string) => R.pipe(getAuthGroupExtraProps, R.prop(prop))
 export const getLastLoginTime = R.prop(keys.lastLoginTime)
 export const getSurveysCountDraft = R.prop(keys.surveysCountDraft)
 export const getSurveysCountPublished = R.prop(keys.surveysCountPublished)
@@ -51,18 +51,20 @@ export const assocProfilePicture = R.assoc(keys.profilePicture)
 export const assocProfilePictureSet = R.assoc(keys.profilePictureSet)
 
 // ====== CHECK
-export const isSystemAdmin = (user) => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
-export const isSurveyManager = (user) => user && R.any(AuthGroup.isSurveyManagerGroup)(getAuthGroups(user))
+export const isSystemAdmin = (user: any | null | undefined) =>
+  !!user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
+export const isSurveyManager = (user: any | null | undefined) =>
+  !!user && R.any(AuthGroup.isSurveyManagerGroup)(getAuthGroups(user))
 export const hasAccepted = R.propEq(keys.status, userStatus.ACCEPTED)
 export const isInvited = R.propEq(keys.status, userStatus.INVITED)
 export const isInvitationExpired = R.propEq(keys.invitationExpired, true)
 
 // ====== AUTH GROUP
 export const getAuthGroupBySurveyUuid =
-  ({ surveyUuid, defaultToMainGroup = false }) =>
-  (user) => {
+  ({ surveyUuid, defaultToMainGroup = false }: { surveyUuid: string; defaultToMainGroup?: boolean }) =>
+  (user: any) => {
     const authGroups = getAuthGroups(user)
-    const authGroup = authGroups.find((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)
+    const authGroup = authGroups.find((group: unknown) => AuthGroup.getSurveyUuid(group as never) === surveyUuid)
     if (authGroup) {
       return authGroup
     }
@@ -72,29 +74,29 @@ export const getAuthGroupBySurveyUuid =
     return null
   }
 
-export const getAuthGroupByName = (groupName) => (user) => {
+export const getAuthGroupByName = (groupName: string) => (user: any) => {
   const authGroups = getAuthGroups(user)
-  return authGroups.find((group) => AuthGroup.getName(group) === groupName)
+  return authGroups.find((group: unknown) => AuthGroup.getName(group as never) === groupName)
 }
 
-export const getAuthGroupsNonSurvey = () => (user) => {
+export const getAuthGroupsNonSurvey = () => (user: any) => {
   const authGroups = getAuthGroups(user)
-  return authGroups.filter((group) => !AuthGroup.getSurveyId(group))
+  return authGroups.filter((group: unknown) => !AuthGroup.getSurveyId(group as never))
 }
 
-export const getSystemAdminGroup = (user) => user && getAuthGroups(user).find(AuthGroup.isSystemAdminGroup)
-export const getSurveyManagerGroup = (user) => user && getAuthGroups(user).find(AuthGroup.isSurveyManagerGroup)
+export const getSystemAdminGroup = (user: any | null | undefined) =>
+  user && getAuthGroups(user).find(AuthGroup.isSystemAdminGroup)
+export const getSurveyManagerGroup = (user: any | null | undefined) =>
+  user && getAuthGroups(user).find(AuthGroup.isSurveyManagerGroup)
 
-export const assocAuthGroups = (authGroups) =>
+export const assocAuthGroups = (authGroups: any[]) =>
   R.pipe(R.assoc(keys.authGroups, authGroups), R.assoc(keys.authGroupsUuids, authGroups.map(ObjectUtils.getUuid)))
 
-const _updateAuthGroups = (updateFn) => (user) =>
-  R.pipe(getAuthGroups, updateFn, (authGroups) => assocAuthGroups(authGroups)(user))(user)
+const _updateAuthGroups = (updateFn: (a: unknown[]) => unknown[]) => (user: any) =>
+  R.pipe(getAuthGroups, updateFn, (authGroups) => assocAuthGroups(authGroups as any[])(user))(user)
 
-export const assocAuthGroup = (authGroup) => _updateAuthGroups(R.append(authGroup))
-
-export const dissocAuthGroup = (authGroup) => _updateAuthGroups(R.reject(AuthGroup.isEqual(authGroup)))
-
+export const assocAuthGroup = (authGroup: any) => _updateAuthGroups(R.append(authGroup))
+export const dissocAuthGroup = (authGroup: any) => _updateAuthGroups(R.reject(AuthGroup.isEqual(authGroup as never)))
 export const assocAuthGroupExtraProps = R.assoc(keys.authGroupExtraProps)
 
 // PREFS

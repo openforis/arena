@@ -15,12 +15,13 @@ const Type = {
 
 const centroidFeature = turfCentroid
 
-const countVertices = (geoJsonOrGeometry) => {
+const countVertices = (geoJsonOrGeometry: Record<string, unknown>): number => {
   const geometry = geoJsonOrGeometry.type === Type.Feature ? geoJsonOrGeometry.geometry : geoJsonOrGeometry
-  return geometry?.coordinates?.[0]?.length ?? 0
+  const coords = geometry as { coordinates?: unknown[][] } | null | undefined
+  return (coords?.coordinates?.[0] as unknown[] | undefined)?.length ?? 0
 }
 
-const createPointFeature = ({ x, y, properties }) => ({
+const createPointFeature = ({ x, y, properties }: { x: number; y: number; properties: Record<string, unknown> }) => ({
   type: Type.Feature,
   geometry: {
     type: 'Point',
@@ -29,26 +30,28 @@ const createPointFeature = ({ x, y, properties }) => ({
   properties,
 })
 
-const parse = (geoJsonText) => {
+const parse = (geoJsonText: string) => {
   let geoJson = null
   try {
     geoJson = JSON.parse(geoJsonText)
-  } catch (_error) {
+  } catch {
     // ignore it
   }
   return validateFeature(geoJson) ? geoJson : null
 }
 
-const pointFeatureToPoint = (pointFeature) => {
+const pointFeatureToPoint = (pointFeature: Record<string, unknown> | null | undefined) => {
   if (!pointFeature) return null
-  const [x, y] = pointFeature.geometry?.coordinates ?? []
+  const geometry = pointFeature.geometry as { coordinates?: [number, number] } | undefined
+  const [x, y] = geometry?.coordinates ?? []
   return PointFactory.createInstance({ x, y })
 }
 
-const centroidPoint = (geoJson) => pointFeatureToPoint(centroidFeature(geoJson))
+const centroidPoint = (geoJson: Parameters<typeof turfCentroid>[0]) =>
+  pointFeatureToPoint(centroidFeature(geoJson) as unknown as Record<string, unknown>)
 
-const validateFeature = (geoJson) => {
-  const { features, geometry, type } = geoJson ?? {}
+const validateFeature = (geoJson: unknown): boolean => {
+  const { features, geometry, type } = (geoJson as Record<string, unknown> | null | undefined) ?? {}
   if (!type) return false
   switch (type) {
     case Type.Feature:
@@ -60,7 +63,7 @@ const validateFeature = (geoJson) => {
   }
 }
 
-const bboxPolygon = (coordinates) => turfBboxPolygon(coordinates)
+const bboxPolygon = (coordinates: Parameters<typeof turfBboxPolygon>[0]) => turfBboxPolygon(coordinates)
 
 const rectangle = ({
   latitude,
@@ -69,6 +72,13 @@ const rectangle = ({
   lengthLongitude = 100, // in meters
   offsetNorth = 0, // in meters
   offsetEast = 0, // in meters
+}: {
+  latitude: number
+  longitude: number
+  lengthLatitude?: number
+  lengthLongitude?: number
+  offsetNorth?: number
+  offsetEast?: number
 }) => {
   // 1. Convert middlePoint to a Turf.js Point (GeoJSON convention: [longitude, latitude])
   const middlePointTurf = turfPoint([longitude, latitude])
@@ -128,7 +138,7 @@ const rectangle = ({
   // 6. Return the bounds.
   // Turf.js represents bounds as a BBox array: [minX, minY, maxX, maxY]
   // which is [west_longitude, south_latitude, east_longitude, north_latitude]
-  const bounds = [swLng, swLat, neLng, neLat]
+  const bounds: [number, number, number, number] = [swLng, swLat, neLng, neLat]
 
   const rectanglePolygon = turfBboxPolygon(bounds)
 
@@ -141,6 +151,12 @@ const circle = ({
   radius,
   units = 'meters', // Default to meters
   steps = 32, // Default precision
+}: {
+  latitude: number
+  longitude: number
+  radius: number
+  units?: Parameters<typeof turfCircle>[2] extends { units?: infer U } ? U : string
+  steps?: number
 }) => {
   const centerPoint = turfPoint([longitude, latitude])
   const options = {
@@ -152,16 +168,16 @@ const circle = ({
       units,
     },
   }
-  return turfCircle(centerPoint, radius, options)
+  return turfCircle(centerPoint, radius, options as Parameters<typeof turfCircle>[2])
 }
 
-const featureCollection = ({ features }) => ({
+const featureCollection = ({ features }: { features: unknown[] }) => ({
   type: 'FeatureCollection',
   features,
 })
 
-const setFeatureName = ({ feature, name }) =>
-  Objects.setInPath({ obj: feature, path: ['properties', 'name'], value: name })
+const setFeatureName = ({ feature, name }: { feature: unknown; name: string }) =>
+  Objects.setInPath({ obj: feature as Record<string, unknown>, path: ['properties', 'name'], value: name })
 
 export const GeoJsonUtils = {
   area,

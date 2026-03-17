@@ -6,10 +6,18 @@ import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as RecordValidation from '@core/record/recordValidation'
 
+interface I18n {
+  language: string
+  t: (key: string, params?: Record<string, unknown>) => string
+  exists: (key: string) => boolean
+}
+
 const getValidationCountErrorText =
-  ({ survey, i18n }) =>
-  (validationResult) => {
-    const nodeDef = Survey.getNodeDefByUuid(ValidationResult.getParams(validationResult).nodeDefUuid)(survey)
+  ({ survey, i18n }: { survey: unknown; i18n: I18n }) =>
+  (validationResult: ValidationResult.ValidationResultInstance): string => {
+    const nodeDef = Survey.getNodeDefByUuid(
+      (ValidationResult.getParams(validationResult) as { nodeDefUuid?: string }).nodeDefUuid
+    )(survey)
     const nodeDefName = NodeDef.getLabel(nodeDef, i18n.language)
     return i18n.t(ValidationResult.getKey(validationResult), {
       ...ValidationResult.getParams(validationResult),
@@ -18,8 +26,8 @@ const getValidationCountErrorText =
   }
 
 const getValidationText =
-  ({ survey, i18n }) =>
-  (validationResult) => {
+  ({ survey, i18n }: { survey: unknown; i18n: I18n }) =>
+  (validationResult: ValidationResult.ValidationResultInstance): string => {
     if (ValidationResult.hasMessages(validationResult)) {
       return ValidationResult.getMessage(i18n.language)(validationResult)
     }
@@ -34,13 +42,21 @@ const getValidationText =
   }
 
 const getJointText =
-  ({ i18n, survey, getterFn }) =>
-  (validation) =>
+  ({
+    i18n,
+    survey,
+    getterFn,
+  }: {
+    i18n: I18n
+    survey: unknown
+    getterFn: (v: Validation.ValidationInstance) => ValidationResult.ValidationResultInstance[]
+  }) =>
+  (validation: Validation.ValidationInstance): string =>
     getterFn(validation).map(getValidationText({ survey, i18n })).join(', ')
 
 const getValidationMessage =
-  ({ survey, i18n }) =>
-  (validation) => {
+  ({ survey, i18n }: { survey: unknown; i18n: I18n }) =>
+  (validation: Validation.ValidationInstance): { severity: ValidationResult.Severity; text: string } | null => {
     const errorText = getJointText({ i18n, survey, getterFn: Validation.getErrors })(validation)
 
     if (errorText) {
@@ -56,8 +72,8 @@ const getValidationMessage =
   }
 
 const getFieldValidationMessage =
-  ({ survey, field, i18n }) =>
-  (validation) => {
+  ({ survey, field, i18n }: { survey: unknown; field: string; i18n: I18n }) =>
+  (validation: Validation.ValidationInstance): { severity: ValidationResult.Severity; text: string } => {
     const message = getValidationMessage({ survey, i18n })(validation)
     if (message) {
       return message
@@ -74,9 +90,9 @@ const getFieldValidationMessage =
   }
 
 const getJointMessages =
-  ({ i18n, survey, showKeys = true }) =>
-  (validation) => {
-    const messages = [] // Every message is an object of type {severity, text}
+  ({ i18n, survey, showKeys = true }: { i18n: I18n; survey: unknown; showKeys?: boolean }) =>
+  (validation: Validation.ValidationInstance): { severity: ValidationResult.Severity; text: string }[] => {
+    const messages: { severity: ValidationResult.Severity; text: string }[] = []
 
     // Add messages from fields
     Object.entries(Validation.getFieldValidations(validation)).forEach(([field, childValidation]) => {
@@ -95,8 +111,18 @@ const getJointMessages =
   }
 
 const getJointMessage =
-  ({ i18n, survey, showKeys = true, severity = null }) =>
-  (validation) => {
+  ({
+    i18n,
+    survey,
+    showKeys = true,
+    severity = null,
+  }: {
+    i18n: I18n
+    survey: unknown
+    showKeys?: boolean
+    severity?: ValidationResult.Severity | null
+  }) =>
+  (validation: Validation.ValidationInstance): string => {
     const messages = getJointMessages({ i18n, survey, showKeys })(validation)
     const messagesFiltered = severity ? messages.filter((message) => message.severity === severity) : messages
     return messagesFiltered.map(({ text }) => text.trim()).join(', ')

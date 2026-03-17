@@ -28,4 +28,4 @@ const keywords = [
   'weight',
 ]
 
-export const isKeyword = (value) => keywords.includes(value)
+export const isKeyword = (value: unknown): boolean => keywords.includes(value as string)

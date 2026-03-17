@@ -8,4 +8,6 @@ export const types = {
   UnaryExpression: 'UnaryExpression',
   BinaryExpression: 'BinaryExpression',
   SequenceExpression: 'SequenceExpression',
-}
+} as const
+
+export type ExpressionType = (typeof types)[keyof typeof types]

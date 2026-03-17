@@ -6,6 +6,6 @@ export const keys = {
   surveyName: 'surveyName',
   surveyLabel: 'surveyLabel',
   role: 'role',
-}
+} as const
 
 export const requestAcceptRoles = [AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager]

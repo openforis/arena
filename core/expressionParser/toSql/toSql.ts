@@ -5,7 +5,14 @@ import SystemError from '@core/systemError'
 import { types } from '../helpers/types'
 import { operators } from '../helpers/operators'
 
-const stdlib2sql = {
+type SqlParams = Record<string, unknown>
+
+interface SqlResult {
+  clause: string
+  params: SqlParams
+}
+
+const stdlib2sql: Record<string, string | ((param: string) => string)> = {
   pow: 'pow',
   min: 'least',
   max: 'greatest',
@@ -17,7 +24,7 @@ const stdlib2sql = {
   '!': (param) => `NOT (${param})`,
 }
 
-const operatorToSql = {
+const operatorToSql: Record<string, string | ((param: string) => string)> = {
   '!': (param) => `NOT(${param})`,
 }
 
@@ -27,15 +34,15 @@ const logicalOrTemplate = `CASE
   ELSE coalesce({left}, false) OR coalesce({right}, false)
 END`
 
-const getParamNameNext = (params) => `_${Object.keys(params).length}`
+const getParamNameNext = (params: SqlParams): string => `_${Object.keys(params).length}`
 
-let _toSql = null
+let _toSql: ((expression: Record<string, unknown>, params?: SqlParams) => SqlResult) | null = null
 
-export const binary = (node, params) => {
+export const binary = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
   const { operator, left, right } = node
-  const { clause: clauseLeft, params: paramsLeft } = _toSql(left, params)
-  const { clause: clauseRight, params: paramsRight } = _toSql(right, paramsLeft)
-  const sqlOperator = operators.js2sqlOperators[operator]
+  const { clause: clauseLeft, params: paramsLeft } = _toSql!(left as Record<string, unknown>, params)
+  const { clause: clauseRight, params: paramsRight } = _toSql!(right as Record<string, unknown>, paramsLeft)
+  const sqlOperator = operators.js2sqlOperators[operator as string]
 
   if (!sqlOperator) {
     throw new SystemError('undefinedFunction', { fnName: operator })
@@ -54,19 +61,19 @@ export const binary = (node, params) => {
   }
 }
 
-export const sequence = (node, params) => {
+export const sequence = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
   const { expression } = node
-  const { clause, params: paramsGroup } = _toSql(expression, params)
+  const { clause, params: paramsGroup } = _toSql!(expression as Record<string, unknown>, params)
   return {
     clause: `(${clause})`,
     params: paramsGroup,
   }
 }
 
-export const unary = (node, params) => {
-  const { clause: clauseArguments, params: paramsUnary } = _toSql(node.argument, params)
+export const unary = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
+  const { clause: clauseArguments, params: paramsUnary } = _toSql!(node.argument as Record<string, unknown>, params)
   const { operator } = node
-  const sqlOperator = operatorToSql[operator] ?? operator
+  const sqlOperator = operatorToSql[operator as string] ?? (operator as string)
   const clause = typeof sqlOperator === 'string' ? `${sqlOperator} ${clauseArguments}` : sqlOperator(clauseArguments)
   return {
     clause,
@@ -76,10 +83,11 @@ export const unary = (node, params) => {
 
 /**
  * Returns true if the specified value is a string that starts and ends with a double quote (") char.
+ *
  * @param {!string} value - The value to test.
  * @returns {boolean} - True if the value is quoted, false otherwise.
  */
-const _isQuotedString = (value) =>
+const _isQuotedString = (value: unknown): boolean =>
   typeof value === 'string' && value.length >= 2 && value[0] === '"' && value[value.length - 1] === '"'
 
 /**
@@ -87,21 +95,22 @@ const _isQuotedString = (value) =>
  * so it needs to be parsed.
  * When the value is a string, it will be quoted by pg-promise itself, so there is no need to double quote it
  * and if it's already quoted, remove the double quotes.
+ *
  * @param {!string} value - The value to parse.
  * @returns {object} - The result of the parsing.
  */
-const _getLiteralParamValue = (value) => {
+const _getLiteralParamValue = (value: unknown): unknown => {
   if (_isQuotedString(value)) {
     try {
-      return JSON.parse(value)
-    } catch (e) {
+      return JSON.parse(value as string)
+    } catch {
       // ignore it
     }
   }
   return value
 }
 
-export const literal = (node, params) => {
+export const literal = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
   if (R.isNil(node.value)) {
     return {
       clause: 'NULL',
@@ -118,7 +127,7 @@ export const literal = (node, params) => {
   }
 }
 
-export const identifier = (node, params) => {
+export const identifier = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
   const param = getParamNameNext(params)
   return {
     clause: `$/${param}:name/`,
@@ -126,17 +135,18 @@ export const identifier = (node, params) => {
   }
 }
 
-export const call = (node, params) => {
+export const call = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
   const { callee, arguments: argumentsNode } = node
-  const name = callee.name ?? callee.value // callee can be literal or identifier
+  const calleeNode = callee as Record<string, unknown>
+  const name = (calleeNode.name ?? calleeNode.value) as string // callee can be literal or identifier
   const sqlFnNameOrFn = stdlib2sql[name]
   if (!sqlFnNameOrFn) {
     throw new SystemError('undefinedFunction', { name })
   }
 
-  const { clause: clauseArguments, params: paramsArguments } = argumentsNode.reduce(
-    (accumulator, argument, idx) => {
-      const { clause: clauseCurrent, params: paramsCurrent } = _toSql(argument, accumulator.params)
+  const { clause: clauseArguments, params: paramsArguments } = (argumentsNode as Record<string, unknown>[]).reduce(
+    (accumulator: SqlResult, argument: Record<string, unknown>, idx: number) => {
+      const { clause: clauseCurrent, params: paramsCurrent } = _toSql!(argument, accumulator.params)
       return {
         clause: `${accumulator.clause}${idx ? ', ' : ''}${clauseCurrent}`,
         params: paramsCurrent,
@@ -154,7 +164,7 @@ export const call = (node, params) => {
   }
 }
 
-const functionsByType = {
+const functionsByType: Record<string, (node: Record<string, unknown>, params: SqlParams) => SqlResult> = {
   [types.Identifier]: identifier,
   [types.Literal]: literal,
   [types.UnaryExpression]: unary,
@@ -163,6 +173,7 @@ const functionsByType = {
   [types.CallExpression]: call,
 }
 
-_toSql = (expression, params = {}) => functionsByType[expression.type](expression, params)
+_toSql = (expression: Record<string, unknown>, params: SqlParams = {}): SqlResult =>
+  functionsByType[expression.type as string](expression, params)
 
 export const toSql = _toSql
