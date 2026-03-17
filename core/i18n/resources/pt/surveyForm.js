@@ -124,7 +124,7 @@ No Arena Mobile:
     analysis: 'Análise',
   },
   confirmNodeDelete: 'Tem certeza de que deseja excluir este(a) {{nodeDefType}} ({{nodeDefLabel}})?',
-  exportLabels_csv: 'Exportar rótulos para CSV',
-  exportLabels_xlsx: 'Exportar rótulos para Excel',
+  exportLabels_csv: 'Exportar rótulos (CSV)',
+  exportLabels_xlsx: 'Exportar rótulos (Excel)',
   importLabels: 'Importar rótulos de Excel ou CSV',
 }
