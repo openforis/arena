@@ -1,4 +1,7 @@
 import * as R from 'ramda'
+
+import { UserAuthGroup } from '@openforis/arena-core'
+
 import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
@@ -9,31 +12,20 @@ export const keys = {
   surveyId: 'surveyId',
   surveyUuid: 'surveyUuid',
   name: ObjectUtils.keys.name,
-}
+} as const
 
 export const permissions = {
-  // Surveys
   surveyCreate: 'surveyCreate',
-
-  // Only owner and administrator can delete survey
-  // edit survey info props, edit nodeDefs, edit categories, edit taxonomies, publishSurvey
   surveyEdit: 'surveyEdit',
-
-  // Records
   recordCreate: 'recordCreate',
   recordEdit: 'recordEdit',
   recordView: 'recordView',
   recordCleanse: 'recordCleanse',
   recordAnalyse: 'recordAnalyse',
-
-  // Users
   userEdit: 'userEdit',
   userInvite: 'userInvite',
-
-  // Edit
-  // only owner and admin - for now
   permissionsEdit: 'permissionsEdit',
-}
+} as const
 
 export const groupNames = {
   systemAdmin: 'systemAdmin',
@@ -44,7 +36,7 @@ export const groupNames = {
   dataCleanser: 'dataCleanser',
   dataAnalyst: 'dataAnalyst',
   surveyGuest: 'surveyGuest',
-}
+} as const
 
 export const surveyGroupNames = [
   groupNames.surveyAdmin,
@@ -123,25 +115,27 @@ export const getSurveyUuid = R.prop(keys.surveyUuid)
 
 export const getSurveyId = R.prop(keys.surveyId)
 
-export const getPermissions = (group) => permissionsByGroupName[getName(group)]
+export const getPermissions = (group: UserAuthGroup): string[] =>
+  permissionsByGroupName[getName(group) as keyof typeof permissionsByGroupName] ?? []
 
 export const getRecordSteps = R.propOr([], keys.recordSteps)
 
-export const getRecordEditLevel = (step) => R.pipe(getRecordSteps, R.prop(step))
+export const getRecordEditLevel = (step: string) => R.pipe(getRecordSteps, R.prop(step))
 
-export const isSystemAdminGroup = (group) => getName(group) === groupNames.systemAdmin
+export const isSystemAdminGroup = (group: UserAuthGroup): boolean => getName(group) === groupNames.systemAdmin
 
-export const isSurveyManagerGroup = (group) => getName(group) === groupNames.surveyManager
+export const isSurveyManagerGroup = (group: UserAuthGroup): boolean => getName(group) === groupNames.surveyManager
 
-export const isSurveyGroup = (group) => !isSystemAdminGroup(group) && !isSurveyManagerGroup(group)
+export const isSurveyGroup = (group: UserAuthGroup): boolean =>
+  !isSystemAdminGroup(group) && !isSurveyManagerGroup(group)
 
 export const { isEqual } = ObjectUtils
 
-export const sortGroups = (groups) => {
+export const sortGroups = (groups: UserAuthGroup[]): UserAuthGroup[] => {
   const sortedGroups = [...groups]
   sortedGroups.sort((group1, group2) => {
-    const sortOrder1 = sortedGroupNames.indexOf(getName(group1))
-    const sortOrder2 = sortedGroupNames.indexOf(getName(group2))
+    const sortOrder1 = sortedGroupNames.indexOf(getName(group1) as (typeof sortedGroupNames)[number])
+    const sortOrder2 = sortedGroupNames.indexOf(getName(group2) as (typeof sortedGroupNames)[number])
     return sortOrder1 - sortOrder2
   })
   return sortedGroups

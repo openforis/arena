@@ -6,7 +6,7 @@ const arenaMobileId = 'arena-mobile'
 const arenaMobileExperimentsId = 'mam'
 const arenaMobile2Id = 'am'
 
-const appNameById = {
+const appNameById: Record<string, string> = {
   [arenaAppId]: 'Arena',
   [arenaMobileId]: 'Arena Mobile',
   [arenaMobile2Id]: 'Arena Mobile 2',
@@ -17,7 +17,7 @@ const keys = {
   appId: 'appId',
   platform: 'platform',
   version: 'version',
-}
+} as const
 
 const currentAppInfo = {
   [keys.appId]: arenaAppId,
@@ -26,7 +26,7 @@ const currentAppInfo = {
 
 const getAppId = A.propOr(arenaAppId, keys.appId)
 
-const getAppNameById = (appId) => appNameById[appId] ?? appId
+const getAppNameById = (appId: string): string => appNameById[appId] ?? appId
 
 export const AppInfo = {
   arenaAppId,

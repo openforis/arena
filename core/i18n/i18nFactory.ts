@@ -22,14 +22,14 @@ const defaultNamespace = 'common'
 
 export const supportedLanguages = Object.keys(resources)
 
-const createParams = (lang = defaultLanguage) => ({
+const createParams = (lang: string = defaultLanguage) => ({
   fallbackLng: defaultLanguage,
   debug: ProcessUtils.isEnvDevelopment,
 
   // React i18next special options (optional)
   react: {
-    wait: false, // Set to true if you like to wait for loaded in every translated hoc
-    nsMode: 'default', // Set it to fallback to let passed namespaces to translated hoc act as fallbacks
+    wait: false,
+    nsMode: 'default' as const,
   },
   lng: lang,
   ns: namespaces,
@@ -38,12 +38,12 @@ const createParams = (lang = defaultLanguage) => ({
   supportedLngs: supportedLanguages,
 })
 
-export const createI18nAsync = (lang = defaultLanguage) => {
+export const createI18nAsync = (lang: string = defaultLanguage): Promise<{ lang: string; t: unknown }> => {
   // Import and require return different objects
-  const createInstance = i18next.createInstance || i18next.default.createInstance
+  const createInstance = (i18next as any).createInstance || (i18next as any).default.createInstance
 
   return new Promise((resolve, reject) => {
-    createInstance(createParams(lang), (err, t) => {
+    createInstance(createParams(lang), (err: unknown, t: unknown) => {
       if (err) {
         reject(err)
         return
@@ -55,6 +55,6 @@ export const createI18nAsync = (lang = defaultLanguage) => {
 }
 
 const i18n = i18next.createInstance()
-i18n.init(createParams())
+i18n.init(createParams() as any)
 
 export default i18n
