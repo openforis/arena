@@ -34,7 +34,7 @@ import FormEditActions from '../components/formEditActions'
 import { usePath } from './usePath'
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
 
-const labelsExportAllowedFileFormats = [FileFormats.xlsx, FileFormats.csv]
+const labelsExportAllowedFileFormats = [FileFormats.csv, FileFormats.xlsx]
 
 const FormHeader = (props) => {
   const { disableLockUnlock, disableValidationReport, edit, entry, preview, canEditDef, analysis } = props
