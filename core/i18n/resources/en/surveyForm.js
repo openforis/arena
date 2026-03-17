@@ -124,7 +124,7 @@ In Arena Mobile:
     analysis: 'Analysis',
   },
   confirmNodeDelete: 'Are you sure you want to delete this {{nodeDefType}} ({{nodeDefLabel}})?',
-  exportLabels_csv: 'Export labels to CSV',
-  exportLabels_xlsx: 'Export labels to Excel',
+  exportLabels_csv: 'Export labels (CSV)',
+  exportLabels_xlsx: 'Export labels (Excel)',
   importLabels: 'Import labels from Excel or CSV',
 }
