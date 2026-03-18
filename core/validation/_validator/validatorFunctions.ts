@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, Validation as ArenaValidation } from '@openforis/arena-core'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -10,7 +10,7 @@ import * as ValidatorNameKeywords from './validatorNameKeywords'
 export type ValidatorResult =
   | { key: string; params?: Record<string, unknown> }
   | string
-  | Record<string, unknown>
+  | ArenaValidation
   | null
   | undefined
 
@@ -104,7 +104,7 @@ export const validateEmails =
   (propName, item) => {
     const emails = getProp(propName, [])(item) as unknown[]
     const hasErrors = emails.some((email) => !isEmailValueValid(email))
-    return hasErrors ? { errorKey } : null
+    return hasErrors ? { key: errorKey } : null
   }
 
 export const { isKeyword } = ValidatorNameKeywords
