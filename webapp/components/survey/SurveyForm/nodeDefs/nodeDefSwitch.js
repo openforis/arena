@@ -66,7 +66,7 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
         : []
 
     const canAddOrDeleteNodeCommon =
-      entry && canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)
+      canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)
 
     const canAddNode =
       canAddOrDeleteNodeCommon &&
