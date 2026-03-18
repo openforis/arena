@@ -104,9 +104,12 @@ const NodeDefSwitch = (props) => {
   const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
   const handleMouseEvents = edit && canEditDef && !renderAsForm
 
-  const updateNode = useCallback((...params) => dispatch(RecordActions.updateNode(...params)), [])
-  const removeNode = useCallback((...params) => dispatch(RecordActions.removeNode(...params)), [])
-  const createNodePlaceholder = useCallback((...params) => dispatch(RecordActions.createNodePlaceholder(...params)), [])
+  const updateNode = useCallback((...params) => dispatch(RecordActions.updateNode(...params)), [dispatch])
+  const removeNode = useCallback((...params) => dispatch(RecordActions.removeNode(...params)), [dispatch])
+  const createNodePlaceholder = useCallback(
+    (...params) => dispatch(RecordActions.createNodePlaceholder(...params)),
+    [dispatch]
+  )
 
   const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode })
 
