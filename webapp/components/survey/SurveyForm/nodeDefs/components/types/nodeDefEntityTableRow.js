@@ -15,7 +15,6 @@ import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 const NodeDefEntityTableRow = forwardRef((props, ref) => {
   const {
     canDelete = true,
-    canEditRecord,
     canEditDef,
     edit,
     entry,
@@ -155,15 +154,12 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
 
       {
         // header for delete column (visible only in data entry)
-        entry &&
-          renderType === NodeDefLayout.renderType.tableHeader &&
-          canEditRecord &&
-          !NodeDef.isEnumerate(nodeDef) && (
-            <div className="react-grid-item survey-form__node-def-table-cell-header" style={{ width: '26px' }} />
-          )
+        entry && renderType === NodeDefLayout.renderType.tableHeader && canDelete && (
+          <div className="react-grid-item survey-form__node-def-table-cell-header" style={{ width: '26px' }} />
+        )
       }
 
-      {renderType === NodeDefLayout.renderType.tableBody && canEditRecord && !NodeDef.isEnumerate(nodeDef) && (
+      {renderType === NodeDefLayout.renderType.tableBody && canDelete && (
         <NodeDeleteButton nodeDef={nodeDef} node={node} disabled={!canDelete} />
       )}
     </div>

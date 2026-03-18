@@ -16,7 +16,7 @@ import { useNodeKeysLabelValues } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
 const NodeDefEntityFormNodeSelect = (props) => {
-  const { nodeDef, nodes, parentNode, selectedNode, updateNode, removeNode, onChange, canEditRecord, canAddNode } =
+  const { nodeDef, nodes, parentNode, selectedNode, updateNode, removeNode, onChange, canAddNode, canDeleteNode } =
     props
 
   const i18n = useI18n()
@@ -24,7 +24,6 @@ const NodeDefEntityFormNodeSelect = (props) => {
   const dispatch = useDispatch()
 
   const nodeDefName = NodeDef.getLabel(nodeDef, lang)
-  const canAddOrDeleteEntities = canEditRecord && !NodeDef.isEnumerate(nodeDef)
 
   const nodeKeysLabelValues = useNodeKeysLabelValues(nodeDef, nodes)
 
@@ -42,7 +41,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
 
   return (
     <div className="survey-form__node-def-entity-form-header">
-      {canAddOrDeleteEntities && canAddNode && (
+      {canAddNode && (
         <Button
           testId={TestId.entities.form.addNewNode}
           size="small"
@@ -85,7 +84,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
             </select>
           </FormItem>
 
-          {canAddOrDeleteEntities && (
+          {canDeleteNode && (
             <ButtonDelete
               disabled={!selectedNode}
               onClick={onDeleteClick}
