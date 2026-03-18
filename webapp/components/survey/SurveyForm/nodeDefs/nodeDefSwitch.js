@@ -41,9 +41,14 @@ const _hasSiblingWithoutKeys = ({ survey, nodeDef, record, parentNode }) => {
   )
 }
 
-const _maxCountReached = ({ parentNode, nodeDef, nodes }) => {
+const _isNodesCountAboveMin = ({ parentNode, nodeDef, nodes }) => {
+  const minCount = Nodes.getChildrenMinCount({ parentNode, nodeDef })
+  return Objects.isEmpty(minCount) || nodes.length > Number(minCount)
+}
+
+const _isNodesCountBelowMax = ({ parentNode, nodeDef, nodes }) => {
   const maxCount = Nodes.getChildrenMaxCount({ parentNode, nodeDef })
-  return maxCount && nodes.length >= Number(maxCount)
+  return Objects.isEmpty(maxCount) || nodes.length < Number(maxCount)
 }
 
 const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
@@ -60,19 +65,23 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
         ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
         : []
 
+    const canAddOrDeleteNodeCommon =
+      canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)
+
     const canAddNode =
-      canEditRecord &&
-      parentNode &&
-      NodeDef.isMultiple(nodeDef) &&
-      !NodeDef.isEnumerate(nodeDef) &&
-      !_maxCountReached({ parentNode, nodeDef, nodes }) &&
+      canAddOrDeleteNodeCommon &&
+      _isNodesCountBelowMax({ parentNode, nodeDef, nodes }) &&
       !_hasSiblingWithoutKeys({ survey, nodeDef, record, parentNode })
 
+    const canDeleteNode = canAddOrDeleteNodeCommon && _isNodesCountAboveMin({ parentNode, nodeDef, nodes })
+
     const nodesEmpty = nodes.every((node) => Record.isNodeEmpty(node)(record))
+
     return {
       nodes,
       nodesEmpty,
       canAddNode,
+      canDeleteNode,
     }
   }, Objects.isEqual)
 
@@ -95,9 +104,12 @@ const NodeDefSwitch = (props) => {
   const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
   const handleMouseEvents = edit && canEditDef && !renderAsForm
 
-  const updateNode = useCallback((...params) => dispatch(RecordActions.updateNode(...params)), [])
-  const removeNode = useCallback((...params) => dispatch(RecordActions.removeNode(...params)), [])
-  const createNodePlaceholder = useCallback((...params) => dispatch(RecordActions.createNodePlaceholder(...params)), [])
+  const updateNode = useCallback((...params) => dispatch(RecordActions.updateNode(...params)), [dispatch])
+  const removeNode = useCallback((...params) => dispatch(RecordActions.removeNode(...params)), [dispatch])
+  const createNodePlaceholder = useCallback(
+    (...params) => dispatch(RecordActions.createNodePlaceholder(...params)),
+    [dispatch]
+  )
 
   const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode })
 

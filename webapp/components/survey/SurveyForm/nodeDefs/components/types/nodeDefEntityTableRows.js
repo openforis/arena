@@ -11,7 +11,6 @@ import * as Node from '@core/record/node'
 import { debounce } from '@core/functionsDefer'
 
 import { elementOffset } from '@webapp/utils/domUtils'
-import { useNodesMinCount } from '@webapp/store/ui/record'
 import { SurveyState } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
@@ -21,6 +20,7 @@ const NodeDefEntityTableRows = (props) => {
   const {
     canEditDef = false,
     canEditRecord = false,
+    canDeleteNode,
     entry = false,
     edit = false,
     nodeDef,
@@ -35,8 +35,6 @@ const NodeDefEntityTableRows = (props) => {
   const survey = useSelector(SurveyState.getSurvey)
   const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
   const nodeDefUuid = nodeDef?.uuid
-  const minCount = useNodesMinCount({ parentNodeUuid: parentNode?.uuid, nodeDefUuid })
-  const canDeleteRows = !NodeDef.isEnumerate(nodeDef) && (!minCount || nodes.length > minCount)
 
   const nodeDefColumns = R.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {
@@ -151,7 +149,11 @@ const NodeDefEntityTableRows = (props) => {
   return (
     <div className={classNames('survey-form__node-def-entity-table-rows', { edit })}>
       {(edit || !R.isEmpty(nodes)) &&
-        createRow({ renderType: NodeDefLayout.renderType.tableHeader, ref: tableRowsHeaderRef })}
+        createRow({
+          renderType: NodeDefLayout.renderType.tableHeader,
+          ref: tableRowsHeaderRef,
+          canDelete: canDeleteNode,
+        })}
 
       {entry && (
         <div
@@ -167,7 +169,7 @@ const NodeDefEntityTableRows = (props) => {
                   renderType: NodeDefLayout.renderType.tableBody,
                   node,
                   key: `entity-table-row-${Node.getUuid(node)}`,
-                  canDelete: canDeleteRows,
+                  canDelete: canDeleteNode,
                   index,
                 })
               )}
@@ -181,6 +183,7 @@ const NodeDefEntityTableRows = (props) => {
 NodeDefEntityTableRows.propTypes = {
   canEditDef: PropTypes.bool,
   canEditRecord: PropTypes.bool,
+  canDeleteNode: PropTypes.bool,
   entry: PropTypes.bool,
   edit: PropTypes.bool,
   nodeDef: PropTypes.any.isRequired,
