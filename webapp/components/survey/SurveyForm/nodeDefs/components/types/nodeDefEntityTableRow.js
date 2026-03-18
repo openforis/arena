@@ -29,8 +29,9 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
 
   const placeholderRef = useRef()
   const rowRef = useRef()
+  const draggedRef = useRef(null)
   useImperativeHandle(ref, () => rowRef.current)
-  const [dragged, setDragged] = useState(null)
+  const [dragInProgress, setDragInProgress] = useState(false)
   const [resizing, setResizing] = useState(false)
 
   const dispatch = useDispatch()
@@ -54,7 +55,8 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
     // Firefox requires dataTransfer data to be set
     dataTransfer.setData('text/html', currentTarget)
 
-    setDragged(currentTarget)
+    draggedRef.current = currentTarget
+    setDragInProgress(true)
   }
 
   const dragOver = (evt) => {
@@ -63,6 +65,11 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
     }
     evt.preventDefault()
     const placeholder = placeholderRef.current
+    const dragged = draggedRef.current
+
+    if (!dragged) {
+      return
+    }
 
     dragged.style.display = 'none'
     placeholder.style.display = 'block'
@@ -84,12 +91,20 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
       return
     }
     const placeholder = placeholderRef.current
+    const dragged = draggedRef.current
+
+    if (!dragged) {
+      return
+    }
 
     dragged.style.display = 'block'
     placeholder.style.display = 'none'
 
+    // insert dragged element in place of placeholder
     placeholder.parentNode.insertBefore(dragged, placeholder)
-    setDragged(null)
+
+    draggedRef.current = null
+    setDragInProgress(false)
 
     const childNodes = rowRef.current.childNodes
     const uuids = [...childNodes].map((child) => child.dataset.uuid).filter((uuid) => uuid)
@@ -108,7 +123,7 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
   const className =
     'survey-form__node-def-entity-table-row' +
     (renderType === NodeDefLayout.renderType.tableHeader ? '-header' : '') +
-    (dragged ? ' drag-in-progress' : '')
+    (dragInProgress ? ' drag-in-progress' : '')
 
   const isChildHidden = (nodeDefChild) => {
     if (!entry) {
