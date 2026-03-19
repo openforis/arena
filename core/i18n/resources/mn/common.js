@@ -835,6 +835,11 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
     onlyOwn: 'Зөвхөн өөрийн судалгаанууд',
     records: 'Бичлэгүүд',
     recordsCreatedWithMoreApps: 'Илүү олон програмаар үүсгэсэн бичлэгүүд:',
+    status: {
+      published: 'Нийтэлсэн',
+      draft: 'Ноорог',
+      'published-draft': 'Нийтэлсэн/Ноорог',
+    },
   },
 
   usersAccessRequestView: {

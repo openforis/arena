@@ -87,7 +87,7 @@ const SurveyInfo = (props) => {
           </Button>
 
           <div className="survey-status" data-testid={TestId.dashboard.surveyStatus}>
-            ({Survey.getStatus(surveyInfo)})
+            ({i18n.t(`surveysView.status.${Survey.getStatus(surveyInfo)}`)})
           </div>
         </Header>
 

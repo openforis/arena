@@ -848,6 +848,11 @@ A mesclagem não pode ser realizada.`,
     onlyOwn: 'Somente inventários próprios',
     records: 'Registros',
     recordsCreatedWithMoreApps: 'Registros criados com mais aplicativos:',
+    status: {
+      published: 'Publicado',
+      draft: 'Rascunho',
+      'published-draft': 'Publicado/Rascunho',
+    },
   },
 
   usersAccessRequestView: {
