@@ -29,7 +29,7 @@ export const useTable = ({
     [visibleColumnKeysInStore, columns]
   )
   const visibleColumns = useMemo(
-    () => visibleColumnKeys.map((key) => (columns ?? []).find((column) => column.key === key)).filter(Boolean),
+    () => columns?.filter((column) => visibleColumnKeys.includes(column.key)) ?? [],
     [visibleColumnKeys, columns]
   )
   const limitInState = useTableMaxRows(module)
