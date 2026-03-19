@@ -9,7 +9,7 @@ const templateExtraValueByType = {
   [ExtraPropDef.dataTypes.geometryPoint]: 'POINT(12.48902 41.88302)',
 }
 
-const genericVernacularLanguageCodes = ['eng', 'fra', 'swa']
+const genericVernacularLanguageCodes = ['lat', 'eng', 'fra', 'spa']
 const genericExtraPropDefsArray = ExtraPropDef.extraDefsToArray({
   text_prop: { dataType: ExtraPropDef.dataTypes.text },
   numeric_prop: { dataType: ExtraPropDef.dataTypes.number },
@@ -28,14 +28,17 @@ const generateTemplate = ({ taxonomy, templateType }) => {
 
   return [
     {
-      code: 'ACA_DEA',
+      code: 'ACACIA/DEALB',
       family: 'Fabaceae',
       genus: 'Acacia',
       scientific_name: 'Acacia dealbata',
       ...vernacularLanguageCodes.reduce(
         (acc, languageCode) => ({
           ...acc,
-          [languageCode]: `Vernacular name (${getLanguageISO639part2Label(languageCode)})`,
+          [languageCode]:
+            languageCode === 'lat'
+              ? 'Synonym name(s)'
+              : `Vernacular name(s) (${getLanguageISO639part2Label(languageCode)})`,
         }),
         {}
       ),
@@ -46,6 +49,21 @@ const generateTemplate = ({ taxonomy, templateType }) => {
         }),
         {}
       ),
+    },
+    {
+      code: 'CEIBA/PENTA',
+      family: 'Bombacaceae',
+      genus: 'Ceiba',
+      scientific_name: 'Ceiba pentandra',
+      eng: 'Kapok tree',
+      fra: 'Fromager',
+    },
+    {
+      code: 'PARAS/FALCA',
+      family: 'Leguminosae',
+      genus: 'Paraserianthes',
+      scientific_name: 'Paraserianthes falcataria',
+      lat: 'Albizia falcataria / Falcataria moluccana',
     },
   ]
 }

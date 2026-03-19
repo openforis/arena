@@ -1382,6 +1382,7 @@ $t(common.appNameFull)
       family: 'Семейство',
       genus: 'Род',
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
+      synonym: 'Синоним / Латинское название',
       extraPropsNotDefined: 'Дополнительные свойства не определены для этой таксономии',
     },
     taxaCount: 'Количество таксонов',

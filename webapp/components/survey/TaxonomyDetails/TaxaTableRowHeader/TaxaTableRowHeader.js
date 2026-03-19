@@ -23,7 +23,8 @@ const TaxaTableRowHeader = (props) => {
       <div>{i18n.t('taxonomy.edit.genus')}</div>
       <div>{i18n.t('taxonomy.edit.scientificName')}</div>
       {vernacularLanguageCodes.map((lang) => {
-        const header = `${getLanguageISO639part2Label(lang)} (${lang})`
+        const languageLabel = lang === 'lat' ? i18n.t('taxonomy.edit.synonym') : getLanguageISO639part2Label(lang)
+        const header = `${languageLabel} (${lang})`
         return <LabelWithTooltip key={`vernacular_name_header_${taxonomyUuid}_${lang}`} label={header} />
       })}
       {extraPropKeys.map((extraPropKey) => (

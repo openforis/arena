@@ -1200,6 +1200,7 @@ export default {
       family: 'Familia',
       genus: 'Género',
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
+      synonym: 'Sinónimo / Latín',
       extraPropsNotDefined: 'Propiedades extra no definidas para esta taxonomía',
     },
     taxaCount: 'Recuento de taxones',
