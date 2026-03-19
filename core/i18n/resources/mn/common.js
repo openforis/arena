@@ -1377,6 +1377,7 @@ $t(common.appNameFull)
       family: 'Овог',
       genus: 'Төрөл',
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
+      synonym: 'Ижил нэр / Латин',
       extraPropsNotDefined: 'Энэ таксономын нэмэлт шинж чанарууд тодорхойлогдоогүй',
     },
     taxaCount: 'Таксоны тоо',
