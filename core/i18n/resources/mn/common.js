@@ -592,7 +592,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       preventAddingNewEntityData: 'Шинэ объектын өгөгдөл нэмэхийг хориглох',
       preventUpdatingRecordsInAnalysis: 'Шинжилгээний алхамд бичлэгүүдийг шинэчлэхийг хориглох',
       includeFiles: 'Файлуудыг оруулах',
-      deleteExistingEntities: `сонгогдсон объектын өгөгдлийг бүх бичлэгээс устгах`,
+      deleteExistingEntities: `Сонгогдсон объектын өгөгдлийг бүх бичлэгээс устгах`,
     },
     optionsInfo: {
       deleteExistingEntities: `АНХААРУУЛГА: бүх "{{nodeDefName}}" объектууд

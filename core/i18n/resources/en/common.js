@@ -604,7 +604,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       preventAddingNewEntityData: 'Prevent adding new entity data',
       preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
       includeFiles: 'Include files',
-      deleteExistingEntities: `delete selected entity's data in all records`,
+      deleteExistingEntities: `Delete selected entity's data in all records`,
     },
     optionsInfo: {
       deleteExistingEntities: `WARNING: all entities "{{nodeDefName}}" 
