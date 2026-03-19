@@ -24,23 +24,13 @@ export const useTable = ({
   const [totalCount, setTotalCount] = useState(0)
 
   const visibleColumnKeysInStore = useTableVisibleColumns(module)
-  const visibleColumnKeys = useMemo(() => {
-    if (visibleColumnKeysInStore) {
-      return visibleColumnKeysInStore
-    }
-    if (columns) {
-      return columns.reduce((acc, column) => {
-        if (!column.hidden) {
-          acc.push(column.key)
-        }
-        return acc
-      }, [])
-    }
-    return []
-  }, [columns, visibleColumnKeysInStore])
+  const visibleColumnKeys = useMemo(
+    () => visibleColumnKeysInStore ?? columns?.filter((column) => !column.hidden).map((column) => column.key) ?? [],
+    [visibleColumnKeysInStore, columns]
+  )
   const visibleColumns = useMemo(
     () => columns?.filter((column) => visibleColumnKeys.includes(column.key)) ?? [],
-    [columns, visibleColumnKeys]
+    [visibleColumnKeys, columns]
   )
   const limitInState = useTableMaxRows(module)
   const limitInLink = getLimit()

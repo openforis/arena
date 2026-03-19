@@ -851,6 +851,11 @@ Merge cannot be performed.`,
     onlyOwn: 'Only own surveys',
     records: 'Records',
     recordsCreatedWithMoreApps: 'Records created with more apps:',
+    status: {
+      published: 'Published',
+      draft: 'Draft',
+      'published-draft': 'Published/Draft',
+    },
   },
 
   usersAccessRequestView: {

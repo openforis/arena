@@ -836,6 +836,11 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
     onlyOwn: 'Только собственные опросы',
     records: 'Записи',
     recordsCreatedWithMoreApps: 'Записи, созданные с использованием нескольких приложений:',
+    status: {
+      published: 'Опубликован',
+      draft: 'Черновик',
+      'published-draft': 'Опубликован/Черновик',
+    },
   },
 
   usersAccessRequestView: {

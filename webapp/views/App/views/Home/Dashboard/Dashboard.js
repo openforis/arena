@@ -3,6 +3,7 @@ import './Dashboard.scss'
 import React from 'react'
 
 import * as Survey from '@core/survey/survey'
+import * as ProcessUtils from '@core/processUtils'
 
 import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -68,11 +69,13 @@ const Dashboard = () => {
           renderContent: () => <SamplingPointDataSummary />,
         })
       }
-      tabItems.push({
-        key: 'activityLog',
-        label: 'homeView:dashboard.activityLog.title',
-        renderContent: () => <ActivityLog />,
-      })
+      if (!ProcessUtils.ENV.activityLogDisabled) {
+        tabItems.push({
+          key: 'activityLog',
+          label: 'homeView:dashboard.activityLog.title',
+          renderContent: () => <ActivityLog />,
+        })
+      }
     }
   }
 
