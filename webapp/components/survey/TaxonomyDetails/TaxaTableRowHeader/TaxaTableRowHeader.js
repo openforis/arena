@@ -8,6 +8,8 @@ import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import { useI18n } from '@webapp/store/system'
 
+const VERNACULAR_LANGUAGE_CODE_SYNONYM = 'lat'
+
 const TaxaTableRowHeader = (props) => {
   const { extraPropsDefsArray, taxonomyUuid, vernacularLanguageCodes } = props
 
@@ -23,7 +25,10 @@ const TaxaTableRowHeader = (props) => {
       <div>{i18n.t('taxonomy.edit.genus')}</div>
       <div>{i18n.t('taxonomy.edit.scientificName')}</div>
       {vernacularLanguageCodes.map((lang) => {
-        const languageLabel = lang === 'lat' ? i18n.t('taxonomy.edit.synonym') : getLanguageISO639part2Label(lang)
+        const languageLabel =
+          lang === VERNACULAR_LANGUAGE_CODE_SYNONYM
+            ? i18n.t('taxonomy.edit.synonym')
+            : getLanguageISO639part2Label(lang)
         const header = `${languageLabel} (${lang})`
         return <LabelWithTooltip key={`vernacular_name_header_${taxonomyUuid}_${lang}`} label={header} />
       })}

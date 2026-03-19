@@ -3,13 +3,15 @@ import { DataImportTemplateTypes } from '@core/dataImport'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 
+const VERNACULAR_LANGUAGE_CODE_SYNONYM = 'lat'
+
 const templateExtraValueByType = {
   [ExtraPropDef.dataTypes.number]: 123,
   [ExtraPropDef.dataTypes.text]: 'Text Value',
   [ExtraPropDef.dataTypes.geometryPoint]: 'POINT(12.48902 41.88302)',
 }
 
-const genericVernacularLanguageCodes = ['lat', 'eng', 'fra', 'spa']
+const genericVernacularLanguageCodes = [VERNACULAR_LANGUAGE_CODE_SYNONYM, 'eng', 'fra', 'spa']
 const genericExtraPropDefsArray = ExtraPropDef.extraDefsToArray({
   text_prop: { dataType: ExtraPropDef.dataTypes.text },
   numeric_prop: { dataType: ExtraPropDef.dataTypes.number },
@@ -36,7 +38,7 @@ const generateTemplate = ({ taxonomy, templateType }) => {
         (acc, languageCode) => ({
           ...acc,
           [languageCode]:
-            languageCode === 'lat'
+            languageCode === VERNACULAR_LANGUAGE_CODE_SYNONYM
               ? 'Synonym name(s)'
               : `Vernacular name(s) (${getLanguageISO639part2Label(languageCode)})`,
         }),
