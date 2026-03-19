@@ -56,7 +56,7 @@ const _fetchAndAssocRdbInitialized = async ({ surveyInfo }, client) => {
 }
 
 const _fetchAndAssocAdditionalInfo = async ({ surveyInfo }, client) => {
-  let surveyInfoUpdated = await _fetchAndAssocSrss({ surveyInfo }, client)
+  const surveyInfoUpdated = await _fetchAndAssocSrss({ surveyInfo }, client)
   return _fetchAndAssocRdbInitialized({ surveyInfo: surveyInfoUpdated }, client)
 }
 
@@ -91,15 +91,13 @@ const _addUserToSurveyAdmins = async ({ user, surveyInfo }, client = db) => {
 
 /**
  * Creates a new survey given the specified parameters.
- *
  * @param {!object} params - The survey creation parameters.
  * @param {!object} params.user - The user creating the survey.
  * @param {!object} params.surveyInfo - The survey info to insert.
- * @param {boolean} [params.createRootEntityDef=true] - Whether to create the root entity definition.
- * @param {boolean} [params.system=false] - Whether the creation comes from a real user or it's a system activity (survey import).
- * @param {boolean} [params.updateUserPrefs=true] - Whether to update the user preferred survey after the creation.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
+ * @param {boolean} [params.createRootEntityDef] - Whether to create the root entity definition.
+ * @param {boolean} [params.system] - Whether the creation comes from a real user or it's a system activity (survey import).
+ * @param {boolean} [params.updateUserPrefs] - Whether to update the user preferred survey after the creation.
+ * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<Survey>} - The newly created survey object.
  */
 export const insertSurvey = async (params, client = db) => {

@@ -57,9 +57,9 @@ export const cycleOneKey = '0'
 export const samplingPointDataCategoryName = 'sampling_point_data'
 
 export const status = {
-  draft: 'DRAFT',
-  published: 'PUBLISHED',
-  publishedDraft: 'PUBLISHED-DRAFT',
+  draft: 'draft',
+  published: 'published',
+  publishedDraft: 'published-draft',
 }
 
 export const getInfo = (survey) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop

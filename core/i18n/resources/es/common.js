@@ -747,6 +747,11 @@ export default {
     onlyOwn: 'Solo encuestas propias',
     records: 'Registros',
     recordsCreatedWithMoreApps: 'Registros creados con más aplicaciones:',
+    status: {
+      published: 'Publicada',
+      draft: 'Borrador',
+      'published-draft': 'Publicada/Borrador',
+    },
   },
   usersAccessRequestView: {
     status: {
