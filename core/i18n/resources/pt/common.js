@@ -1411,6 +1411,7 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
       family: 'Família',
       genus: 'Gênero',
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
+      synonym: 'Sinônimo / Latim',
       extraPropsNotDefined: 'Propriedades extras não definidas para esta taxonomia',
     },
     taxaCount: 'Contagem de táxons',

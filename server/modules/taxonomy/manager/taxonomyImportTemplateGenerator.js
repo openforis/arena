@@ -3,13 +3,15 @@ import { DataImportTemplateTypes } from '@core/dataImport'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 
+const VERNACULAR_LANGUAGE_CODE_SYNONYM = 'lat'
+
 const templateExtraValueByType = {
   [ExtraPropDef.dataTypes.number]: 123,
   [ExtraPropDef.dataTypes.text]: 'Text Value',
   [ExtraPropDef.dataTypes.geometryPoint]: 'POINT(12.48902 41.88302)',
 }
 
-const genericVernacularLanguageCodes = ['eng', 'fra', 'swa']
+const genericVernacularLanguageCodes = [VERNACULAR_LANGUAGE_CODE_SYNONYM, 'eng', 'fra', 'spa']
 const genericExtraPropDefsArray = ExtraPropDef.extraDefsToArray({
   text_prop: { dataType: ExtraPropDef.dataTypes.text },
   numeric_prop: { dataType: ExtraPropDef.dataTypes.number },
@@ -28,14 +30,17 @@ const generateTemplate = ({ taxonomy, templateType }) => {
 
   return [
     {
-      code: 'ACA_DEA',
+      code: 'ACACIA/DEALB',
       family: 'Fabaceae',
       genus: 'Acacia',
       scientific_name: 'Acacia dealbata',
       ...vernacularLanguageCodes.reduce(
         (acc, languageCode) => ({
           ...acc,
-          [languageCode]: `Vernacular name (${getLanguageISO639part2Label(languageCode)})`,
+          [languageCode]:
+            languageCode === VERNACULAR_LANGUAGE_CODE_SYNONYM
+              ? 'Synonym name(s)'
+              : `Vernacular name(s) (${getLanguageISO639part2Label(languageCode)})`,
         }),
         {}
       ),
@@ -46,6 +51,21 @@ const generateTemplate = ({ taxonomy, templateType }) => {
         }),
         {}
       ),
+    },
+    {
+      code: 'CEIBA/PENTA',
+      family: 'Bombacaceae',
+      genus: 'Ceiba',
+      scientific_name: 'Ceiba pentandra',
+      eng: 'Kapok tree',
+      fra: 'Fromager',
+    },
+    {
+      code: 'PARAS/FALCA',
+      family: 'Leguminosae',
+      genus: 'Paraserianthes',
+      scientific_name: 'Paraserianthes falcataria',
+      lat: 'Albizia falcataria / Falcataria moluccana',
     },
   ]
 }

@@ -1410,6 +1410,7 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       family: 'Family',
       genus: 'Genus',
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
+      synonym: 'Synonym / Latin',
       extraPropsNotDefined: 'Extra properties not defined for this taxonomy',
     },
     taxaCount: 'Taxa count',
