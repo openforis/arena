@@ -48,7 +48,7 @@ const createOnErrorHandler =
 
 export const useOnImport = ({ newSurvey, setNewSurvey }) =>
   useCallback(
-    ({ startFromChunk = 1, onUploadProgress }) => {
+    ({ startFromChunk = 1, chunkSize, onUploadProgress }) => {
       const { file } = newSurvey
 
       // reset upload progress (hide progress bar)
@@ -59,7 +59,7 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) =>
         const chunkProcessor = createChunkProcessor({ onUploadProgress, newSurvey })
         const onError = createOnErrorHandler({ setNewSurvey, reject })
         const onComplete = createOnCompleteHandler({ setNewSurvey, resolve })
-        fileProcessor = new FileProcessor({ file, chunkProcessor, onError, onComplete })
+        fileProcessor = new FileProcessor({ file, chunkSize, chunkProcessor, onError, onComplete })
       })
       fileProcessor.start(startFromChunk)
       return { promise, processor: fileProcessor }
