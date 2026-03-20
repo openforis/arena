@@ -1,4 +1,4 @@
-import { Dates, Objects, Records, Surveys } from '@openforis/arena-core'
+import { Dates, Objects, RecordFixer, Records, Surveys } from '@openforis/arena-core'
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
@@ -25,27 +25,6 @@ const resultKeys = {
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
 
-const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
-  if (!nodeDef) {
-    return { valid: false, error: 'refers a missing node definition' }
-  }
-  const parentUuid = Node.getParentUuid(node)
-  if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
-    return { valid: false, error: `has missing or invalid parent_uuid` }
-  }
-  if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
-    return { valid: false, error: `is multiple and has an empty value` }
-  }
-  const nodeHierarchy = Node.getHierarchy(node)
-  if (
-    nodeHierarchy.length !== NodeDef.getMetaHierarchy(nodeDef)?.length ||
-    nodeHierarchy.some((ancestorUuid) => !nodes[ancestorUuid])
-  ) {
-    return { valid: false, error: `has an invalid meta hierarchy` }
-  }
-  return { valid: true }
-}
-
 const getRecordFormattedKeyValues = ({ survey, record }) => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const recordRootEntity = Records.getRoot(record)
@@ -56,6 +35,9 @@ const getRecordFormattedKeyValues = ({ survey, record }) => {
     return NodeValueFormatter.format({ survey, nodeDef: keyDef, value })
   })
 }
+
+const nodeHierarchyLengthComparator = (nodeA, nodeB) =>
+  Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length
 
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
@@ -117,19 +99,18 @@ export default class RecordsImportJob extends DataImportBaseJob {
   trackFileUuids({ nodes }) {
     // keep track of file uuids found in record attribute values
     const { survey } = this.context
-    Object.values(nodes).forEach((node) => {
+    for (const node of Object.values(nodes)) {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       if (NodeDef.isFile(nodeDef)) {
         this.trackFileUuid({ node })
       }
-    })
+    }
   }
 
   async cleanupCurrentRecord() {
     const { context, currentRecord: record, user, tx } = this
     const { survey } = context
 
-    const recordUuid = Record.getUuid(record)
     // check owner uuid: if user not defined, use the job user as owner
     const ownerUuidSource = Record.getOwnerUuid(record)
     const ownerSource = await UserService.fetchUserByUuid(ownerUuidSource, tx)
@@ -137,25 +118,10 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     // remove invalid nodes and build index from scratch
     delete record['_nodesIndex']
-    const nodes = Record.getNodes(record)
 
-    for (const [nodeUuid, node] of Object.entries(nodes)) {
-      const nodeDefUuid = Node.getNodeDefUuid(node)
-      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const { valid, error } = checkNodeIsValid({ nodes, node, nodeDef })
-      if (valid) {
-        // ensure recordUuid is set in node
-        node[Node.keys.recordUuid] = recordUuid
-        Node.removeFlags({ sideEffect: true })(node)
-      } else {
-        const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
-        const messageSuffix = `: skipping it`
-        this.logWarn(`${messagePrefix} ${error} ${messageSuffix}`)
-        delete nodes[nodeUuid]
-      }
-    }
-    // assoc nodes and build index from scratch
-    this.currentRecord = Record.assocNodes({ nodes, sideEffect: true })(record)
+    // fix record (e.g. insert missing nodes, remove status flags)
+    // do side effect to avoid creating new objects and use less memory
+    RecordFixer.fixRecord({ survey, record, sideEffect: true })
   }
 
   findExistingRecordSummaryWithSameKeys() {
@@ -272,26 +238,25 @@ export default class RecordsImportJob extends DataImportBaseJob {
     await RecordManager.insertRecord(user, surveyId, record, true, tx)
 
     // insert nodes (add them to batch persister)
-    const nodesIndexedByUuid = Record.getNodesArray(record)
-      .sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
-      .reduce((acc, node) => {
-        const nodeUuid = Node.getUuid(node)
-        const nodeDefUuid = Node.getNodeDefUuid(node)
-        // check that the node definition associated to the node has not been deleted from the survey
-        const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-        if (nodeDef) {
-          node[Node.keys.created] = true // do side effect to avoid creating new objects
-          acc[nodeUuid] = node
-          if (NodeDef.isFile(nodeDef)) {
-            this.trackFileUuid({ node })
-          }
-        } else {
-          this.logDebug(
-            `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeUuid}; skipping it`
-          )
+    const nodesIndexedByUuid = {}
+    const nodesArraySorted = Record.getNodesArray(record).sort(nodeHierarchyLengthComparator)
+    for (const node of nodesArraySorted) {
+      const nodeUuid = Node.getUuid(node)
+      const nodeDefUuid = Node.getNodeDefUuid(node)
+      // check that the node definition associated to the node has not been deleted from the survey
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      if (nodeDef) {
+        node[Node.keys.created] = true // do side effect to avoid creating new objects
+        nodesIndexedByUuid[nodeUuid] = node
+        if (NodeDef.isFile(nodeDef)) {
+          this.trackFileUuid({ node })
         }
-        return acc
-      }, {})
+      } else {
+        this.logDebug(
+          `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeUuid}; skipping it`
+        )
+      }
+    }
 
     if (!Record.getDateModified(record)) {
       this.logDebug(`Empty date modified for record ${Record.getUuid(record)}`)
@@ -305,12 +270,17 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
   async beforeSuccess() {
     await super.beforeSuccess()
+    const { insertedRecordsUuids, updatedRecordsUuids } = this
     const recordsFileUuidsArray = Array.from(this.recordsFileUuids)
-    const recordsFilesCount = recordsFileUuidsArray.length
-    if (recordsFilesCount > 0) {
-      this.logDebug(`found ${recordsFilesCount} files:`, recordsFileUuidsArray)
-    }
-    this.setContext({ recordsFileUuids: recordsFileUuidsArray })
+
+    this.setContext({
+      recordsFileUuids: recordsFileUuidsArray,
+      // flag to cleanup records in RecordsCheckJob
+      cleanupRecords: true,
+      updateRdb: true,
+      // record UUIDs to consider in RecordCheckJob
+      recordUuidsIncluded: [...insertedRecordsUuids, ...updatedRecordsUuids],
+    })
   }
 
   generateResult() {
