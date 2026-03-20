@@ -18,6 +18,7 @@ export default {
   DataDeleteJob: 'Өгөгдөл устгах',
   DataImportJob: 'Өгөгдөл импортлох',
   DataImportValidationJob: 'Өгөгдөл импортлох файлын баталгаажуулалт',
+  EntitiesDeleteJob: 'Одоо байгаа объектуудыг устгах',
   FilesImportJob: 'Файл импортлох',
   MessageSendJob: 'Мессеж илгээх',
   NodeDefsImportJob: 'Зангилааны тодорхойлолт импортлох',

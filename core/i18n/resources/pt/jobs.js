@@ -18,6 +18,7 @@ export default {
   DataDeleteJob: 'Exclusão de dados',
   DataImportJob: 'Importação de dados',
   DataImportValidationJob: 'Validação de arquivo de importação de dados',
+  EntitiesDeleteJob: 'Exclusão de entidades existentes',
   FilesImportJob: 'Importação de arquivos',
   MessageSendJob: 'Envio de mensagem',
   NodeDefsImportJob: 'Importação de definições de nós',
