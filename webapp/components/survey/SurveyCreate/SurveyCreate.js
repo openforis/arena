@@ -26,10 +26,13 @@ import { Checkbox, Dropdown } from '@webapp/components/form'
 import { Button, Dropzone, RadioButtonGroup } from '@webapp/components'
 import { SurveyType } from '@webapp/model'
 import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
+import {
+  defaultChunkSize,
+  FileUploadChunkSizeDropdown,
+} from '@webapp/views/App/views/Data/DataImport/FileUploadChunkSizeDropdown'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
-import { useUserIsSystemAdmin } from '@webapp/store/user'
 
 const importSourceButtonGroupItems = Object.values(importSources).map((key) => ({
   key,
@@ -48,23 +51,13 @@ const dropzoneAcceptBySource = {
   [importSources.collect]: { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] },
 }
 
-const defaultUploadChunkSize = 1024 * 1024 * 10
-
-const uploadChunkSizeItems = [
-  { value: defaultUploadChunkSize, label: '10 MB' },
-  { value: 1024 * 1024 * 100, label: '100 MB' },
-  { value: 1024 * 1024 * 1024, label: '1 GB' },
-  { value: '', label: 'Not set' },
-]
-
 const SurveyCreate = (props) => {
   const { showImport = true, submitButtonLabel = 'surveyCreate:createSurvey', template = false } = props
 
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
   const navigate = useNavigate()
-  const userIsSystemAdmin = useUserIsSystemAdmin()
-  const [chunkSize, setChunkSize] = useState(defaultUploadChunkSize)
+  const [chunkSize, setChunkSize] = useState(defaultChunkSize)
 
   const {
     newSurvey,
@@ -239,18 +232,7 @@ const SurveyCreate = (props) => {
                   droppedFiles={file ? [file] : []}
                 />
               </div>
-              {userIsSystemAdmin && (
-                <FormItem label="dataImportView.fileUploadChunkSize.label">
-                  <Dropdown
-                    className="chunk-size-dropdown"
-                    clearable={false}
-                    items={uploadChunkSizeItems}
-                    itemValue={(item) => item.value}
-                    onChange={(chunkSizeItem) => setChunkSize(chunkSizeItem.value)}
-                    selection={uploadChunkSizeItems.find((item) => item.value === chunkSize)}
-                  />
-                </FormItem>
-              )}
+              <FileUploadChunkSizeDropdown onChange={setChunkSize} value={chunkSize} />
             </>
           )}
           <div className="row">
