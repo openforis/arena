@@ -593,7 +593,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       preventAddingNewEntityData: 'Запретить добавление новых данных сущностей',
       preventUpdatingRecordsInAnalysis: 'Запретить обновление записей на этапе анализа',
       includeFiles: 'Включить файлы',
-      deleteExistingEntities: `удалить данные выбранной сущности во всех записях`,
+      deleteExistingEntities: `Удалить данные выбранной сущности во всех записях`,
     },
     optionsInfo: {
       deleteExistingEntities: `ВНИМАНИЕ: все сущности "{{nodeDefName}}"
