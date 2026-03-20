@@ -140,6 +140,7 @@ export const DataImportArenaView = () => {
         {userIsSystemAdmin && (
           <FormItem className="display-flex" label="dataImportView.fileUploadChunkSize.label">
             <Dropdown
+              clearable={false}
               items={chunkSizeItems}
               itemValue={(item) => item.value}
               onChange={(chunkSizeItem) => setState((state) => ({ ...state, chunkSize: chunkSizeItem.value }))}
