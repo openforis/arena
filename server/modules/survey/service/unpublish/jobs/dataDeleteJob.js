@@ -2,7 +2,7 @@ import * as RecordFile from '@core/record/recordFile'
 
 import Job from '@server/job/job'
 
-import * as FileManager from '@server/modules/record/manager/fileManager'
+import * as FileManager from '@server/modules/record/manager/recordFileManager'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
 

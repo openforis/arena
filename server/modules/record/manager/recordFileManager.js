@@ -1,6 +1,3 @@
-import { Objects } from '@openforis/arena-core'
-
-import { ENV } from '@core/processUtils'
 import * as RecordFile from '@core/record/recordFile'
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
@@ -10,25 +7,16 @@ import * as SurveyRepository from '@server/modules/survey/repository/surveyRepos
 import * as FileRepository from '../repository/fileRepository'
 import * as FileRepositoryFileSystem from '../repository/fileRepositoryFileSystem'
 import * as FileRepositoryS3Bucket from '../repository/fileRepositoryS3Bucket'
+import { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 import { NumberConversionUtils } from '@core/numberConversionUtils'
 import { StreamUtils } from '@server/utils/streamUtils'
+
+export { fileContentStorageTypes, getFileContentStorageType }
 
 const logger = Log.getLogger('FileManager')
 
 export const defaultSurveyFilesTotalSpaceMB = 10 * 1024 // in MB (=10 GB)
 export const maxSurveyFilesTotalSpaceMB = 100 * 1024 // in MB (=100 GB)
-
-export const fileContentStorageTypes = { db: 'db', fileSystem: 'fileSystem', s3Bucket: 's3Bucket' }
-
-export const getFileContentStorageType = () => {
-  if (!Objects.isEmpty(ENV.fileStoragePath)) {
-    return fileContentStorageTypes.fileSystem
-  }
-  if (!Objects.isEmpty(ENV.fileStorageAwsS3BucketName)) {
-    return fileContentStorageTypes.s3Bucket
-  }
-  return fileContentStorageTypes.db
-}
 
 export const isFileContentStoredInDB = () => getFileContentStorageType() === fileContentStorageTypes.db
 
