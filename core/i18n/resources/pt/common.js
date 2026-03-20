@@ -602,7 +602,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       preventAddingNewEntityData: 'Impedir a adição de novos dados de entidade',
       preventUpdatingRecordsInAnalysis: 'Impedir a atualização de registros na etapa Análise',
       includeFiles: 'Incluir arquivos',
-      deleteExistingEntities: `excluir os dados da entidade selecionada em todos os registros`,
+      deleteExistingEntities: `Excluir os dados da entidade selecionada em todos os registros`,
     },
     optionsInfo: {
       deleteExistingEntities: `AVISO: todas as entidades "{{nodeDefName}}" 
