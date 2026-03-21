@@ -1,9 +1,8 @@
 import * as Survey from '@core/survey/survey'
 
-import * as Request from '@server/utils/request'
-import { processChunkedFile } from '@server/utils/requestChunkedFileProcessor'
-
 import * as JobUtils from '@server/job/jobUtils'
+import { processChunkedFile } from '@server/modules/file/service/requestChunkedFileProcessor'
+import * as Request from '@server/utils/request'
 
 import * as ArenaImportService from '../service/arenaImportService'
 

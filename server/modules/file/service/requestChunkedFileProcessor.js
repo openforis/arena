@@ -1,7 +1,7 @@
-import * as Request from './request'
-import * as FileUtils from './file/fileUtils'
+import * as Request from '../../../utils/request'
+import * as FileUtils from '../../../utils/file/fileUtils'
 
-import * as TempFileManager from '../modules/file/manager/tempFileManager'
+import * as TempFileManager from '../manager/tempFileManager'
 
 const getFileContentOrPath = (req) => {
   const filePath = Request.getFilePath(req)

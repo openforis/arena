@@ -1,5 +1,5 @@
 import * as Request from '@server/utils/request'
-import { processChunkedFile } from '@server/utils/requestChunkedFileProcessor'
+import { processChunkedFile } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as JobUtils from '@server/job/jobUtils'
 
 import * as DataImportService from '../service/dataImportService'
