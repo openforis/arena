@@ -14,9 +14,9 @@ export const getFileContentStorageType = () => {
   return fileContentStorageTypes.db
 }
 
-export const getStorageFunctionOrThrow = ({ functionByStorageType, operation }) => {
+export const getStorageFunctionOrThrow = ({ functionByStorageType, operation, defaultFn = null }) => {
   const storageType = getFileContentStorageType()
-  const fn = functionByStorageType[storageType]
+  const fn = functionByStorageType[storageType] ?? defaultFn
   if (!fn) {
     throw new Error(`Operation '${operation}' not implemented for storage type '${storageType}'`)
   }

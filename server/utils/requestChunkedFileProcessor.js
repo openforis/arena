@@ -1,6 +1,8 @@
 import * as Request from './request'
 import * as FileUtils from './file/fileUtils'
 
+import * as TempFileManager from '../modules/file/manager/tempFileManager'
+
 const getFileContentOrPath = (req) => {
   const filePath = Request.getFilePath(req)
   if (filePath) {
@@ -21,7 +23,7 @@ export const processChunkedFile = async ({ req }) => {
   const isSingleFile = !totalChunks
 
   if (!isSingleFile) {
-    await FileUtils.writeChunkToTempFile({ filePath, fileContent, fileId, chunk })
+    await TempFileManager.writeChunkToTempFile({ filePath, fileContent, fileId, chunk })
     if (filePath) {
       await FileUtils.deleteFileAsync(filePath)
     }
@@ -31,7 +33,7 @@ export const processChunkedFile = async ({ req }) => {
 
   if (isChunkingComplete) {
     // All file chunks have been received; merge them and return the file path.
-    return FileUtils.mergeTempChunks({ fileId, totalChunks })
+    return TempFileManager.mergeTempChunks({ fileId, totalChunks })
   }
   if (isSingleFile) {
     // No file chunking was used; return the original file path.

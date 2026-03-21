@@ -1,5 +1,7 @@
 import { StreamUtils } from '@server/utils/streamUtils'
 
+import * as FileUtils from '@server/utils/file/fileUtils'
+
 import { fileContentStorageTypes, getFileContentStorageType, getStorageFunctionOrThrow } from './fileManagerCommon'
 import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3Bucket'
 
@@ -56,4 +58,34 @@ export const deleteTempFile = async ({ fileUuid }) => {
     operation: 'deleteTempFile',
   })
   await deleteFn({ fileUuid })
+}
+
+const _getChunkFileName = ({ fileId, chunk }) => `${fileId}_part${chunk}`
+
+export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
+  const destFileName = _getChunkFileName({ fileId, chunk })
+  const destFilePath = FileUtils.tempFilePath(destFileName)
+  if (filePath) {
+    await FileUtils.copyFile(filePath, destFilePath)
+  } else if (fileContent) {
+    await FileUtils.writeFile(destFilePath, fileContent)
+  } else {
+    throw new Error('Missing file path or content')
+  }
+}
+
+export const mergeTempChunks = async ({ fileId, totalChunks }) => {
+  const finalFilePath = FileUtils.newTempFilePath()
+  const writeStream = FileUtils.createWriteStream(finalFilePath)
+  for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
+    // extract temporary chunk content
+    const chunkFileName = _getChunkFileName({ fileId, chunk })
+    const chunkFilePath = FileUtils.tempFilePath(chunkFileName)
+    const chunkFileContent = await FileUtils.readBinaryFile(chunkFilePath)
+    writeStream.write(chunkFileContent)
+    // delete temporary chunk
+    await FileUtils.deleteFileAsync(chunkFilePath)
+  }
+  writeStream.end()
+  return finalFilePath
 }
