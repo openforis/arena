@@ -1,15 +1,16 @@
+import { NumberConversionUtils } from '@core/numberConversionUtils'
 import * as RecordFile from '@core/record/recordFile'
+
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 
+import { fileContentStorageTypes, getFileContentStorageType } from '@server/modules/file/manager/fileManagerCommon'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+import { StreamUtils } from '@server/utils/streamUtils'
 
 import * as FileRepository from '../repository/fileRepository'
 import * as FileRepositoryFileSystem from '../repository/fileRepositoryFileSystem'
 import * as FileRepositoryS3Bucket from '../repository/fileRepositoryS3Bucket'
-import { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
-import { NumberConversionUtils } from '@core/numberConversionUtils'
-import { StreamUtils } from '@server/utils/streamUtils'
 
 export { fileContentStorageTypes, getFileContentStorageType }
 

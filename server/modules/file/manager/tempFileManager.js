@@ -1,6 +1,6 @@
 import { StreamUtils } from '@server/utils/streamUtils'
 
-import { fileContentStorageTypes, getFileContentStorageType, getStorageFunctionOrThrow } from './fileManagerCommon'
+import { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 import * as TempFileRepositoryFileSystem from '../repository/tempFileRepositoryFileSystem'
 import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3Bucket'
 
@@ -30,6 +30,17 @@ const chunkWriteFunctionByStorageType = {
 const chunkMergeFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.mergeTempChunks,
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.mergeTempChunks,
+}
+
+const getStorageFunctionOrThrow = ({ functionByStorageType, operation, defaultFn = null }) => {
+  const fileStorageType = getFileContentStorageType()
+  const tempFileStorageType =
+    fileStorageType === fileContentStorageTypes.db ? fileContentStorageTypes.fileSystem : fileStorageType
+  const fn = functionByStorageType[tempFileStorageType] ?? defaultFn
+  if (!fn) {
+    throw new Error(`Operation '${operation}' not implemented for storage type '${tempFileStorageType}'`)
+  }
+  return fn
 }
 
 export const insertTempFile = async ({ fileUuid, content }) => {

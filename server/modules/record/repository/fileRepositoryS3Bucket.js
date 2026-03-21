@@ -1,4 +1,7 @@
-import { checkCanAccessS3Bucket, createS3BucketRepository } from './fileRepositoryS3BucketCommon'
+import {
+  checkCanAccessS3Bucket,
+  createS3BucketRepository,
+} from '@server/modules/file/repository/fileRepositoryS3BucketCommon'
 
 const getFileKey = ({ surveyId, fileUuid }) => `${surveyId}_${fileUuid}`
 
