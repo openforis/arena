@@ -1,22 +1,8 @@
-import { StreamUtils } from '@server/utils/streamUtils'
-
 import { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 import * as TempFileRepositoryFileSystem from '../repository/tempFileRepositoryFileSystem'
 import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3Bucket'
 
 export { fileContentStorageTypes, getFileContentStorageType }
-
-const contentAsStreamFetchFunctionByStorageType = {
-  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.getFileContentAsStream,
-}
-
-const contentStoreFunctionByStorageType = {
-  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.uploadFileContent,
-}
-
-const contentStoreAsStreamFunctionByStorageType = {
-  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.uploadFileContentAsStream,
-}
 
 const contentDeleteFunctionByStorageType = {
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.deleteFile,
@@ -41,35 +27,6 @@ const getStorageFunctionOrThrow = ({ functionByStorageType, operation, defaultFn
     throw new Error(`Operation '${operation}' not implemented for storage type '${tempFileStorageType}'`)
   }
   return fn
-}
-
-export const insertTempFile = async ({ fileUuid, content }) => {
-  const contentStoreFunction = getStorageFunctionOrThrow({
-    functionByStorageType: contentStoreFunctionByStorageType,
-    operation: 'insertTempFile',
-  })
-  await contentStoreFunction({ fileUuid, content })
-}
-
-export const insertTempFileAsStream = async ({ fileUuid, contentStream }) => {
-  const contentStoreFunction = getStorageFunctionOrThrow({
-    functionByStorageType: contentStoreAsStreamFunctionByStorageType,
-    operation: 'insertTempFileAsStream',
-  })
-  await contentStoreFunction({ fileUuid, contentStream })
-}
-
-export const fetchTempFileContentAsStream = async ({ fileUuid }) => {
-  const fetchFn = getStorageFunctionOrThrow({
-    functionByStorageType: contentAsStreamFetchFunctionByStorageType,
-    operation: 'fetchTempFileContentAsStream',
-  })
-  return fetchFn({ fileUuid })
-}
-
-export const fetchTempFileContentAsBuffer = async ({ fileUuid }) => {
-  const contentStream = await fetchTempFileContentAsStream({ fileUuid })
-  return StreamUtils.readStreamToBuffer(contentStream)
 }
 
 export const deleteTempFile = async ({ fileUuid }) => {
