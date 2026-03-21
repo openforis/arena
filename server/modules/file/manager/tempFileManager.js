@@ -1,17 +1,10 @@
 import { StreamUtils } from '@server/utils/streamUtils'
 
-import * as FileUtils from '@server/utils/file/fileUtils'
-
 import { fileContentStorageTypes, getFileContentStorageType, getStorageFunctionOrThrow } from './fileManagerCommon'
+import * as TempFileRepositoryFileSystem from '../repository/tempFileRepositoryFileSystem'
 import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3Bucket'
 
 export { fileContentStorageTypes, getFileContentStorageType }
-
-const checkCanAccessStoreFunctionByStorageType = {
-  [fileContentStorageTypes.db]: () => false,
-  [fileContentStorageTypes.fileSystem]: () => false,
-  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.checkCanAccessS3Bucket,
-}
 
 const contentAsStreamFetchFunctionByStorageType = {
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.getFileContentAsStream,
@@ -21,14 +14,22 @@ const contentStoreFunctionByStorageType = {
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.uploadFileContent,
 }
 
+const contentStoreAsStreamFunctionByStorageType = {
+  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.uploadFileContentAsStream,
+}
+
 const contentDeleteFunctionByStorageType = {
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.deleteFile,
 }
 
-export const checkCanAccessFilesStorage = async () => {
-  const storageType = getFileContentStorageType()
-  const checkStoreFunction = checkCanAccessStoreFunctionByStorageType[storageType]
-  await checkStoreFunction?.()
+const chunkWriteFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.writeChunkToTempFile,
+  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.writeChunkToTempFile,
+}
+
+const chunkMergeFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.mergeTempChunks,
+  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.mergeTempChunks,
 }
 
 export const insertTempFile = async ({ fileUuid, content }) => {
@@ -37,6 +38,14 @@ export const insertTempFile = async ({ fileUuid, content }) => {
     operation: 'insertTempFile',
   })
   await contentStoreFunction({ fileUuid, content })
+}
+
+export const insertTempFileAsStream = async ({ fileUuid, contentStream }) => {
+  const contentStoreFunction = getStorageFunctionOrThrow({
+    functionByStorageType: contentStoreAsStreamFunctionByStorageType,
+    operation: 'insertTempFileAsStream',
+  })
+  await contentStoreFunction({ fileUuid, contentStream })
 }
 
 export const fetchTempFileContentAsStream = async ({ fileUuid }) => {
@@ -60,32 +69,18 @@ export const deleteTempFile = async ({ fileUuid }) => {
   await deleteFn({ fileUuid })
 }
 
-const _getChunkFileName = ({ fileId, chunk }) => `${fileId}_part${chunk}`
-
 export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
-  const destFileName = _getChunkFileName({ fileId, chunk })
-  const destFilePath = FileUtils.tempFilePath(destFileName)
-  if (filePath) {
-    await FileUtils.copyFile(filePath, destFilePath)
-  } else if (fileContent) {
-    await FileUtils.writeFile(destFilePath, fileContent)
-  } else {
-    throw new Error('Missing file path or content')
-  }
+  const writeChunkFunction = getStorageFunctionOrThrow({
+    functionByStorageType: chunkWriteFunctionByStorageType,
+    operation: 'writeChunkToTempFile',
+  })
+  await writeChunkFunction({ filePath, fileContent, fileId, chunk })
 }
 
 export const mergeTempChunks = async ({ fileId, totalChunks }) => {
-  const finalFilePath = FileUtils.newTempFilePath()
-  const writeStream = FileUtils.createWriteStream(finalFilePath)
-  for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
-    // extract temporary chunk content
-    const chunkFileName = _getChunkFileName({ fileId, chunk })
-    const chunkFilePath = FileUtils.tempFilePath(chunkFileName)
-    const chunkFileContent = await FileUtils.readBinaryFile(chunkFilePath)
-    writeStream.write(chunkFileContent)
-    // delete temporary chunk
-    await FileUtils.deleteFileAsync(chunkFilePath)
-  }
-  writeStream.end()
-  return finalFilePath
+  const mergeChunksFunction = getStorageFunctionOrThrow({
+    functionByStorageType: chunkMergeFunctionByStorageType,
+    operation: 'mergeTempChunks',
+  })
+  return mergeChunksFunction({ fileId, totalChunks })
 }

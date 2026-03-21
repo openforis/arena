@@ -44,6 +44,14 @@ export const createS3BucketRepository = ({ getFileKey }) => {
     return _sendCommand(command)
   }
 
+  const uploadFileContentAsStream = async ({ contentStream, ...params }) => {
+    const command = new PutObjectCommand({
+      ...createCommandParams({ getFileKey, params }),
+      Body: contentStream,
+    })
+    return _sendCommand(command)
+  }
+
   const getFileContentAsStream = async (params) => {
     const command = new GetObjectCommand(createCommandParams({ getFileKey, params }))
     const response = await _sendCommand(command)
@@ -61,5 +69,5 @@ export const createS3BucketRepository = ({ getFileKey }) => {
     }
   }
 
-  return { uploadFileContent, getFileContentAsStream, deleteFile, deleteFiles }
+  return { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream, deleteFile, deleteFiles }
 }
