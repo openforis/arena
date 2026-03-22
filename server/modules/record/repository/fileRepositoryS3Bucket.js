@@ -1,7 +1,4 @@
-import {
-  checkCanAccessS3Bucket,
-  createS3BucketRepository,
-} from '@server/modules/file/repository/fileRepositoryS3BucketCommon'
+import { createS3BucketRepository } from '@server/modules/file/repository/fileRepositoryS3BucketCommon'
 
 export { checkCanAccessS3Bucket } from '@server/modules/file/repository/fileRepositoryS3BucketCommon'
 

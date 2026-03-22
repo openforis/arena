@@ -30,12 +30,12 @@ const getStorageFunctionOrThrow = ({ functionByStorageType, operation, defaultFn
   return fn
 }
 
-export const deleteTempFile = async ({ fileUuid }) => {
+export const deleteTempFile = async (fileNameOrPath) => {
   const deleteFn = getStorageFunctionOrThrow({
     functionByStorageType: contentDeleteFunctionByStorageType,
     operation: 'deleteTempFile',
   })
-  await deleteFn({ fileUuid })
+  await deleteFn({ fileNameOrPath })
 }
 
 export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {

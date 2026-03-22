@@ -86,7 +86,7 @@ export default class ArenaImportJob extends Job {
         await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
       }
     }
-    await TempFileManager.deleteTempFile({ fileUuid: filePath })
+    await TempFileManager.deleteTempFile(filePath)
   }
 }
 

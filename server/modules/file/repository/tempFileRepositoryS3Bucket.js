@@ -10,10 +10,17 @@ export { checkCanAccessS3Bucket } from './fileRepositoryS3BucketCommon'
 
 const getTempFileKey = ({ fileUuid }) => `temp/${fileUuid}`
 
-const { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream, getFileSize, deleteFile, deleteFiles } =
-  createS3BucketRepository({
-    getFileKey: getTempFileKey,
-  })
+const {
+  uploadFileContent,
+  uploadFileContentAsStream,
+  getFileContentAsStream,
+  getFileSize,
+  deleteFile: deleteFileCommon,
+} = createS3BucketRepository({
+  getFileKey: getTempFileKey,
+})
+
+export const deleteFile = async ({ fileNameOrPath }) => deleteFileCommon({ fileUuid: fileNameOrPath })
 
 export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
   const fileUuid = getChunkFileName({ fileId, chunk })
@@ -59,7 +66,7 @@ export const mergeTempChunksToS3 = async ({ fileId, totalChunks }) => {
       const chunkFileStream = await getFileContentAsStream({ fileUuid: chunkFileName })
       await writeReadableToWritable({ readStream: chunkFileStream, writeStream: uploadStream })
       // delete temporary chunk
-      await deleteFile({ fileUuid: chunkFileName })
+      await deleteFile(chunkFileName)
     }
 
     uploadStream.end()
@@ -69,7 +76,7 @@ export const mergeTempChunksToS3 = async ({ fileId, totalChunks }) => {
   } catch (error) {
     uploadStream.destroy(error)
     await uploadPromise.catch(() => null)
-    await deleteFile({ fileUuid: finalFileName }).catch(() => null)
+    await deleteFile(finalFileName).catch(() => null)
     throw error
   }
 }
@@ -86,11 +93,10 @@ export const mergeTempChunks = async ({ fileId, totalChunks }) => {
       const chunkFileStream = await getFileContentAsStream({ fileUuid: chunkFileName })
       await writeReadableToWritable({ readStream: chunkFileStream, writeStream })
       // delete temporary chunk
-      await deleteFile({ fileUuid: chunkFileName })
+      await deleteFile(chunkFileName)
     }
-
     await endWriteStream(writeStream)
-    return finalFileName
+    return finalFilePath
   } catch (error) {
     writeStream.destroy(error)
     await FileUtils.deleteFileAsync(finalFilePath).catch(() => null)
@@ -98,4 +104,4 @@ export const mergeTempChunks = async ({ fileId, totalChunks }) => {
   }
 }
 
-export { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream, deleteFile, deleteFiles }
+export { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream }
