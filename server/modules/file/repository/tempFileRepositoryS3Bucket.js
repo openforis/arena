@@ -24,7 +24,7 @@ export const writeChunkToTempFile = async ({ filePath = null, fileContent = null
   } else if (fileContent) {
     await uploadFileContent({ fileUuid, content: fileContent })
   } else {
-    throw new Error('Missing file path or content')
+    throw new TypeError('Missing file path or content')
   }
 }
 

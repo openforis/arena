@@ -13,7 +13,7 @@ const getFileContentOrPath = (req) => {
   if (fileContentBase64) {
     return { fileContent: Buffer.from(fileContentBase64, 'base64') }
   }
-  throw new Error('Missing file content or path in request')
+  throw new TypeError('Missing file content or path in request')
 }
 
 export const processChunkedFile = async ({ req }) => {
