@@ -2,6 +2,7 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   HeadBucketCommand,
+  HeadObjectCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3'
@@ -9,6 +10,7 @@ import {
 import * as ProcessUtils from '@core/processUtils'
 
 const requestTimeout = 5 * 60 * 1000 // 5 minutes
+const requestStreamBufferSize = 64 * 1024
 
 const Bucket = ProcessUtils.ENV.fileStorageAwsS3BucketName
 
@@ -18,6 +20,7 @@ const s3Client = new S3Client({
     secretAccessKey: ProcessUtils.ENV.fileStorageAwsSecretAccessKey,
   },
   region: ProcessUtils.ENV.fileStorageAwsS3BucketRegion,
+  requestStreamBufferSize,
 })
 
 const _sendCommand = async (command) => s3Client.send(command, { requestTimeout })
@@ -44,10 +47,11 @@ export const createS3BucketRepository = ({ getFileKey }) => {
     return _sendCommand(command)
   }
 
-  const uploadFileContentAsStream = async ({ contentStream, ...params }) => {
+  const uploadFileContentAsStream = async ({ contentStream, contentLength = null, ...params }) => {
     const command = new PutObjectCommand({
       ...createCommandParams({ getFileKey, params }),
       Body: contentStream,
+      ...(Number.isFinite(contentLength) ? { ContentLength: contentLength } : {}),
     })
     return _sendCommand(command)
   }
@@ -56,6 +60,12 @@ export const createS3BucketRepository = ({ getFileKey }) => {
     const command = new GetObjectCommand(createCommandParams({ getFileKey, params }))
     const response = await _sendCommand(command)
     return response.Body
+  }
+
+  const getFileSize = async (params) => {
+    const command = new HeadObjectCommand(createCommandParams({ getFileKey, params }))
+    const response = await _sendCommand(command)
+    return response.ContentLength
   }
 
   const deleteFile = async (params) => {
@@ -69,5 +79,5 @@ export const createS3BucketRepository = ({ getFileKey }) => {
     }
   }
 
-  return { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream, deleteFile, deleteFiles }
+  return { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream, getFileSize, deleteFile, deleteFiles }
 }
