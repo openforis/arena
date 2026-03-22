@@ -66,7 +66,7 @@ export const mergeTempChunksToS3 = async ({ fileId, totalChunks }) => {
       const chunkFileStream = await getFileContentAsStream({ fileUuid: chunkFileName })
       await writeReadableToWritable({ readStream: chunkFileStream, writeStream: uploadStream })
       // delete temporary chunk
-      await deleteFile(chunkFileName)
+      await deleteFile({ fileNameOrPath: chunkFileName })
     }
 
     uploadStream.end()
@@ -76,7 +76,7 @@ export const mergeTempChunksToS3 = async ({ fileId, totalChunks }) => {
   } catch (error) {
     uploadStream.destroy(error)
     await uploadPromise.catch(() => null)
-    await deleteFile(finalFileName).catch(() => null)
+    await deleteFile({ fileNameOrPath: finalFileName }).catch(() => null)
     throw error
   }
 }
@@ -93,7 +93,7 @@ export const mergeTempChunks = async ({ fileId, totalChunks }) => {
       const chunkFileStream = await getFileContentAsStream({ fileUuid: chunkFileName })
       await writeReadableToWritable({ readStream: chunkFileStream, writeStream })
       // delete temporary chunk
-      await deleteFile(chunkFileName)
+      await deleteFile({ fileNameOrPath: chunkFileName })
     }
     await endWriteStream(writeStream)
     return finalFilePath

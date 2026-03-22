@@ -1,7 +1,7 @@
 import Job from '@server/job/job'
 
 import { SurveyCreatorJobHelper } from '@server/modules/survey/service/surveyCreatorJobHelper'
-import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import ActivityLogImportJob from './jobs/activityLogImportJob'
 import ArenaSurveyReaderJob from './jobs/arenaSurveyReaderJob'
@@ -86,7 +86,7 @@ export default class ArenaImportJob extends Job {
         await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
       }
     }
-    await TempFileManager.deleteTempFile(filePath)
+    await FileUtils.deleteFileAsync(filePath)
   }
 }
 
