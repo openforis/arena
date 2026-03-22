@@ -12,7 +12,7 @@ import * as FileRepository from '../repository/fileRepository'
 import * as FileRepositoryFileSystem from '../repository/fileRepositoryFileSystem'
 import * as FileRepositoryS3Bucket from '../repository/fileRepositoryS3Bucket'
 
-export { fileContentStorageTypes, getFileContentStorageType }
+export { fileContentStorageTypes, getFileContentStorageType } from '@server/modules/file/manager/fileManagerCommon'
 
 const logger = Log.getLogger('FileManager')
 

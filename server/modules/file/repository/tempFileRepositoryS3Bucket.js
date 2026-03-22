@@ -1,10 +1,12 @@
 import { PassThrough } from 'node:stream'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
-import { writeReadableToWritable } from '@server/utils/ioUtils'
+import { endWriteStream, writeReadableToWritable } from '@server/utils/ioUtils'
 
-import { checkCanAccessS3Bucket, createS3BucketRepository } from './fileRepositoryS3BucketCommon'
+import { createS3BucketRepository } from './fileRepositoryS3BucketCommon'
 import { getChunkFileName } from '../tempFileUtils'
+
+export { checkCanAccessS3Bucket } from './fileRepositoryS3BucketCommon'
 
 const getTempFileKey = ({ fileUuid }) => `temp/${fileUuid}`
 
@@ -39,7 +41,7 @@ const calculateTotalChunksSize = async ({ totalChunks, fileId }) => {
   return totalContentLength
 }
 
-export const mergeTempChunks = async ({ fileId, totalChunks }) => {
+export const mergeTempChunksToS3 = async ({ fileId, totalChunks }) => {
   const totalContentLength = await calculateTotalChunksSize({ fileId, totalChunks })
 
   const finalFileName = FileUtils.newTempFileName()
@@ -72,11 +74,28 @@ export const mergeTempChunks = async ({ fileId, totalChunks }) => {
   }
 }
 
-export {
-  checkCanAccessS3Bucket,
-  uploadFileContent,
-  uploadFileContentAsStream,
-  getFileContentAsStream,
-  deleteFile,
-  deleteFiles,
+export const mergeTempChunks = async ({ fileId, totalChunks }) => {
+  const finalFileName = FileUtils.newTempFileName()
+  const finalFilePath = FileUtils.tempFilePath(finalFileName)
+  const writeStream = FileUtils.createWriteStream(finalFilePath)
+
+  try {
+    for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
+      // extract temporary chunk content
+      const chunkFileName = getChunkFileName({ fileId, chunk })
+      const chunkFileStream = await getFileContentAsStream({ fileUuid: chunkFileName })
+      await writeReadableToWritable({ readStream: chunkFileStream, writeStream })
+      // delete temporary chunk
+      await deleteFile({ fileUuid: chunkFileName })
+    }
+
+    await endWriteStream(writeStream)
+    return finalFileName
+  } catch (error) {
+    writeStream.destroy(error)
+    await FileUtils.deleteFileAsync(finalFilePath).catch(() => null)
+    throw error
+  }
 }
+
+export { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream, deleteFile, deleteFiles }

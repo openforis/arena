@@ -11,8 +11,8 @@ export const init = (app) => {
 
   app.post('/survey/arena-import', async (req, res, next) => {
     try {
-      const filePath = await processChunkedFile({ req })
-      if (filePath) {
+      const tempFileNameOrPath = await processChunkedFile({ req })
+      if (tempFileNameOrPath) {
         const user = Request.getUser(req)
         const newSurveyParams = Request.getJsonParam(req, 'survey')
 
@@ -20,7 +20,12 @@ export const init = (app) => {
 
         const surveyInfoTarget = Survey.newSurvey({ ownerUuid: user.uuid, name })
 
-        const job = ArenaImportService.startArenaImportJob({ user, filePath, surveyInfoTarget, options })
+        const job = ArenaImportService.startArenaImportJob({
+          user,
+          filePath: tempFileNameOrPath,
+          surveyInfoTarget,
+          options,
+        })
 
         res.json({ job: JobUtils.jobToJSON(job) })
       } else {
