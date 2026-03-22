@@ -1,6 +1,7 @@
-import { once, PassThrough } from 'node:stream'
+import { PassThrough } from 'node:stream'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { writeReadableToWritable } from '@server/utils/ioUtils'
 
 import { checkCanAccessS3Bucket, createS3BucketRepository } from './fileRepositoryS3BucketCommon'
 import { getChunkFileName } from '../tempFileUtils'
@@ -11,14 +12,6 @@ const { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream, de
   createS3BucketRepository({
     getFileKey: getTempFileKey,
   })
-
-const _writeReadableToWritable = async ({ readStream, writeStream }) => {
-  for await (const chunk of readStream) {
-    if (!writeStream.write(chunk)) {
-      await once(writeStream, 'drain')
-    }
-  }
-}
 
 export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
   const fileUuid = getChunkFileName({ fileId, chunk })
@@ -42,7 +35,7 @@ export const mergeTempChunks = async ({ fileId, totalChunks }) => {
       // extract temporary chunk content
       const chunkFileName = getChunkFileName({ fileId, chunk })
       const chunkFileStream = await getFileContentAsStream({ fileUuid: chunkFileName })
-      await _writeReadableToWritable({ readStream: chunkFileStream, writeStream: uploadStream })
+      await writeReadableToWritable({ readStream: chunkFileStream, writeStream: uploadStream })
       // delete temporary chunk
       await deleteFile({ fileUuid: chunkFileName })
     }
