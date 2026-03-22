@@ -2,7 +2,7 @@ import { fileContentStorageTypes, getFileContentStorageType } from './fileManage
 import * as TempFileRepositoryFileSystem from '../repository/tempFileRepositoryFileSystem'
 import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3Bucket'
 
-export { fileContentStorageTypes, getFileContentStorageType }
+export { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 
 const contentDeleteFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.deleteFile,

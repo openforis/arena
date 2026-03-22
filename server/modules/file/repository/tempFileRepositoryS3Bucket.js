@@ -16,8 +16,9 @@ const { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream, ge
 export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
   const fileUuid = getChunkFileName({ fileId, chunk })
   if (filePath) {
-    const content = await FileUtils.readBinaryFile(filePath)
-    await uploadFileContent({ fileUuid, content })
+    const contentStream = FileUtils.createReadStream(filePath)
+    const contentLength = FileUtils.getFileSize(filePath)
+    await uploadFileContentAsStream({ fileUuid, contentStream, contentLength })
   } else if (fileContent) {
     await uploadFileContent({ fileUuid, content: fileContent })
   } else {
