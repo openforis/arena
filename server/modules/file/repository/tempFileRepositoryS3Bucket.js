@@ -34,7 +34,7 @@ const calculateTotalChunksSize = async ({ totalChunks, fileId }) => {
     const chunkFileName = getChunkFileName({ fileId, chunk })
     const chunkSize = await getFileSize({ fileUuid: chunkFileName })
     if (!Number.isFinite(chunkSize)) {
-      throw new Error(`Cannot determine size of temp chunk ${chunkFileName}`)
+      throw new TypeError(`Cannot determine size of temp chunk ${chunkFileName}`)
     }
     totalContentLength += chunkSize
   }
