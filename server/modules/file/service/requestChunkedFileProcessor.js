@@ -32,7 +32,7 @@ export const processChunkedFile = async ({ req }) => {
   const isChunkingComplete = totalChunks && chunk === totalChunks
 
   if (isChunkingComplete) {
-    // All file chunks have been received; merge them and return the file path.
+    // All file chunks have been received; merge them and return the temp file name.
     return TempFileManager.mergeTempChunks({ fileId, totalChunks })
   }
   if (isSingleFile) {

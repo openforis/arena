@@ -5,6 +5,7 @@ import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3B
 export { fileContentStorageTypes, getFileContentStorageType }
 
 const contentDeleteFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.deleteFile,
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.deleteFile,
 }
 

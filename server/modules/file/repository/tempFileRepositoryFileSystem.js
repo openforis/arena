@@ -3,6 +3,11 @@ import { endWriteStream, writeStreamAndWaitForEnd } from '@server/utils/ioUtils'
 
 import { getChunkFileName } from '../tempFileUtils'
 
+export const deleteFile = async ({ fileUuid }) => {
+  const filePath = fileUuid.startsWith('/') ? fileUuid : FileUtils.tempFilePath(fileUuid)
+  await FileUtils.deleteFileAsync(filePath)
+}
+
 export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
   const destFileName = getChunkFileName({ fileId, chunk })
   const destFilePath = FileUtils.tempFilePath(destFileName)
@@ -16,7 +21,8 @@ export const writeChunkToTempFile = async ({ filePath = null, fileContent = null
 }
 
 export const mergeTempChunks = async ({ fileId, totalChunks }) => {
-  const finalFilePath = FileUtils.newTempFilePath()
+  const finalFileName = FileUtils.newTempFileName()
+  const finalFilePath = FileUtils.tempFilePath(finalFileName)
   const writeStream = FileUtils.createWriteStream(finalFilePath)
   for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
     // extract temporary chunk content
@@ -28,5 +34,5 @@ export const mergeTempChunks = async ({ fileId, totalChunks }) => {
     await FileUtils.deleteFileAsync(chunkFilePath)
   }
   await endWriteStream(writeStream)
-  return finalFilePath
+  return finalFileName
 }

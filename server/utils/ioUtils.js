@@ -1,6 +1,6 @@
 export const writeStreamAndWaitForEnd = async ({ writeStream, chunkFileContent }) =>
   new Promise((resolve, reject) => {
-    writeStream.on('error', reject)
+    writeStream.once('error', reject)
     writeStream.write(chunkFileContent, (error) => {
       if (error) {
         reject(error)

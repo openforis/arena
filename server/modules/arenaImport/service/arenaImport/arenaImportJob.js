@@ -1,7 +1,7 @@
 import Job from '@server/job/job'
 
 import { SurveyCreatorJobHelper } from '@server/modules/survey/service/surveyCreatorJobHelper'
-import * as FileUtils from '@server/utils/file/fileUtils'
+import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 
 import ActivityLogImportJob from './jobs/activityLogImportJob'
 import ArenaSurveyReaderJob from './jobs/arenaSurveyReaderJob'
@@ -49,12 +49,11 @@ export default class ArenaImportJob extends Job {
    * Creates a new import job to import a survey in Arena format.
    * Records, files and activity log will be importin only when restoring a backup.
    * If not restoring a backup, node definition, categories and taxonomies will be restored as draft.
-   *
    * @param {!object} params - The import parameters.
    * @param {!string} [params.filePath] - The file path of the file to import.
    * @param {!object} [params.user] - The user performing the import.
-   * @param {boolean} [params.backup = true] - If true, props and propsDraft will be imported separately and records, files, activity logs will be imported.
-   * @param {object} [params.surveyInfoTarget = null] - Target survey info (optional).
+   * @param {boolean} [params.backup] - If true, props and propsDraft will be imported separately and records, files, activity logs will be imported.
+   * @param {object} [params.surveyInfoTarget] - Target survey info (optional).
    * @returns {ArenaImportJob} - The import job.
    */
   constructor(params) {
@@ -87,7 +86,7 @@ export default class ArenaImportJob extends Job {
         await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
       }
     }
-    FileUtils.deleteFile(filePath)
+    await TempFileManager.deleteTempFile({ fileUuid: filePath })
   }
 }
 
