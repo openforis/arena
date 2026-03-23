@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
+import * as ProcessUtils from '@core/processUtils'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
@@ -165,6 +166,7 @@ const SurveyInfo = (props) => {
                         key: 'survey-info-unpublish',
                         content: (
                           <Button
+                            className="btn-danger"
                             iconClassName="icon-eye-blocked icon-12px icon-left"
                             label="homeView:surveyInfo.unpublish"
                             onClick={onUnpublishClick}
@@ -175,19 +177,23 @@ const SurveyInfo = (props) => {
                       },
                     ]
                   : []),
-                {
-                  key: 'survey-delete-activity-log',
-                  content: (
-                    <Button
-                      className="btn-danger"
-                      iconClassName="icon-bin icon-12px icon-left"
-                      label="homeView:surveyInfo.deleteActivityLog"
-                      onClick={onDeleteActivityLogDataClick}
-                      variant="text"
-                      testId={TestId.dashboard.surveyDeleteActivityLogBtn}
-                    />
-                  ),
-                },
+                ...(!ProcessUtils.ENV.activityLogDisabled
+                  ? [
+                      {
+                        key: 'survey-delete-activity-log',
+                        content: (
+                          <Button
+                            className="btn-danger"
+                            iconClassName="icon-bin icon-12px icon-left"
+                            label="homeView:surveyInfo.deleteActivityLog"
+                            onClick={onDeleteActivityLogDataClick}
+                            variant="text"
+                            testId={TestId.dashboard.surveyDeleteActivityLogBtn}
+                          />
+                        ),
+                      },
+                    ]
+                  : []),
                 {
                   key: 'survey-info-delete',
                   content: (
