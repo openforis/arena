@@ -114,6 +114,49 @@ const SurveyInfo = (props) => {
     return items
   }, [onDeleteActivityLogDataClick, onDeleteClick, onUnpublishClick, surveyInfo])
 
+  const exportMenuItems = useMemo(() => {
+    const items = [
+      {
+        key: 'survey-export',
+        label: 'common.export',
+        onClick: () => dispatch(SurveyActions.exportSurvey()),
+        testId: TestId.dashboard.surveyExportOnlySurveyBtn,
+      },
+    ]
+    if (!Survey.isTemplate(surveyInfo)) {
+      items.push({
+        key: 'survey-export-with-data',
+        label: 'homeView:dashboard.exportWithData',
+        onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true })),
+        testId: TestId.dashboard.surveyExportWithDataBtn,
+      })
+      if (!ProcessUtils.ENV.activityLogDisabled) {
+        items.push({
+          key: 'survey-export-with-data-no-activity-log',
+          label: 'homeView:dashboard.exportWithDataNoActivityLog',
+          onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false })),
+          testId: TestId.dashboard.surveyExportWithDataNoActivityLogBtn,
+        })
+      }
+      if (hasChains) {
+        items.push({
+          key: 'survey-export-with-data-no-result-attributes',
+          label: 'homeView:dashboard.exportWithDataNoResultAttributes',
+          onClick: () =>
+            dispatch(
+              SurveyActions.exportSurvey({
+                includeData: true,
+                includeResultAttributes: false,
+                includeActivityLog: false,
+              })
+            ),
+          testId: TestId.dashboard.surveyExportWithDataNoResultAttributesBtn,
+        })
+      }
+    }
+    return items
+  }, [dispatch, hasChains, surveyInfo])
+
   return (
     <>
       <div className="home-dashboard__survey-info">
@@ -146,48 +189,7 @@ const SurveyInfo = (props) => {
           {!firstTime && canExportSurvey && (
             <ButtonMenu
               className="btn-menu-export"
-              items={[
-                {
-                  key: 'survey-export',
-                  label: 'common.export',
-                  onClick: () => dispatch(SurveyActions.exportSurvey()),
-                  testId: TestId.dashboard.surveyExportOnlySurveyBtn,
-                },
-                ...(!Survey.isTemplate(surveyInfo)
-                  ? [
-                      {
-                        key: 'survey-export-with-data',
-                        label: 'homeView:dashboard.exportWithData',
-                        onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true })),
-                        testId: TestId.dashboard.surveyExportWithDataBtn,
-                      },
-                      {
-                        key: 'survey-export-with-data-no-activity-log',
-                        label: 'homeView:dashboard.exportWithDataNoActivityLog',
-                        onClick: () =>
-                          dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false })),
-                        testId: TestId.dashboard.surveyExportWithDataNoActivityLogBtn,
-                      },
-                      ...(hasChains
-                        ? [
-                            {
-                              key: 'survey-export-with-data-no-result-attributes',
-                              label: 'homeView:dashboard.exportWithDataNoResultAttributes',
-                              onClick: () =>
-                                dispatch(
-                                  SurveyActions.exportSurvey({
-                                    includeData: true,
-                                    includeResultAttributes: false,
-                                    includeActivityLog: false,
-                                  })
-                                ),
-                              testId: TestId.dashboard.surveyExportWithDataNoResultAttributesBtn,
-                            },
-                          ]
-                        : []),
-                    ]
-                  : []),
-              ]}
+              items={exportMenuItems}
               iconClassName="icon-download2 icon-14px"
               label="common.export"
               size="small"
