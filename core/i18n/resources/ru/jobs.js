@@ -51,6 +51,7 @@ export default {
   DataSummaryExportJob: 'Экспорт сводных данных',
   ZipCreationJob: 'Создание ZIP-файла',
   CSVDataExtraction: 'Извлечение данных',
+  PrepareImportFileJob: 'Подготовка файла импорта',
   // geo
   GeoJsonDataExportJob: 'Экспорт данных GeoJson',
   // import arena survey

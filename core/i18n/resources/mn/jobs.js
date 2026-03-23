@@ -51,6 +51,7 @@ export default {
   DataSummaryExportJob: 'Өгөгдлийн хураангуй экспортлох',
   ZipCreationJob: 'ZIP файл үүсгэх',
   CSVDataExtraction: 'Өгөгдөл задлах',
+  PrepareImportFileJob: 'Импортын файлыг бэлтгэх',
   // geo
   GeoJsonDataExportJob: 'GeoJson өгөгдөл экспортлох',
   // import arena survey
