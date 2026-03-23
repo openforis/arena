@@ -24,6 +24,13 @@ export const getJsonParam = (req, param, defaultValue = null) => {
   return defaultValue
 }
 
+export const getNumericParam = (req, param, defaultValue = null) => {
+  const value = R.prop(param, getParams(req))
+  if (value === undefined) return defaultValue
+  const numericValue = Number(value)
+  return isNaN(numericValue) ? defaultValue : numericValue
+}
+
 export const getFile = R.pathOr(null, ['files', 'file'])
 export const getFiles = (req) => req?.files || req?.file || null
 export const getFilePath = (req) => getFile(req)?.tempFilePath || null

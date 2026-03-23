@@ -15,7 +15,7 @@ const urlBySource = {
 
 const createChunkProcessor =
   ({ onUploadProgress, newSurvey }) =>
-  async ({ chunk, totalChunks, content }) => {
+  async ({ chunk, content, totalChunks, totalFileSize }) => {
     const { fileId, source, ...surveyObj } = newSurvey
 
     const formData = objectToFormData({
@@ -23,6 +23,7 @@ const createChunkProcessor =
       file: content,
       chunk,
       totalChunks,
+      totalFileSize,
       survey: JSON.stringify(surveyObj),
     })
     const { data } = await axios.post(urlBySource[source], formData, {

@@ -17,13 +17,17 @@ const getFileContentOrPath = (req) => {
 }
 
 export const processChunkedFile = async ({ req }) => {
-  const { fileId = undefined, chunk = undefined, totalChunks = undefined } = Request.getParams(req)
+  const { fileId = undefined } = Request.getParams(req)
   const { filePath, fileContent } = getFileContentOrPath(req)
+
+  const chunk = Request.getNumericParam(req, 'chunk')
+  const totalChunks = Request.getNumericParam(req, 'totalChunks')
+  const totalFileSize = Request.getNumericParam(req, 'totalFileSize')
 
   const isSingleFile = !totalChunks
 
   if (!isSingleFile) {
-    await TempFileManager.writeChunkToTempFile({ filePath, fileContent, fileId, chunk })
+    await TempFileManager.writeChunkToTempFile({ filePath, fileContent, fileId, chunk, totalChunks, totalFileSize })
     if (filePath) {
       await FileUtils.deleteFileAsync(filePath)
     }
@@ -33,7 +37,7 @@ export const processChunkedFile = async ({ req }) => {
 
   if (isChunkingComplete) {
     // All file chunks have been received; merge them and return the temp file name.
-    return TempFileManager.mergeTempChunks({ fileId, totalChunks })
+    return TempFileManager.mergeTempChunks({ fileId, totalChunks, totalFileSize })
   }
   if (isSingleFile) {
     // No file chunking was used; return the original file path.

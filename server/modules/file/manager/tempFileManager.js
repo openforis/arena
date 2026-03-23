@@ -4,6 +4,8 @@ import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3B
 
 export { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 
+const minFileSizeToUseAlternativeStorage = 10 * 1024 * 1024 // 10MB - For files larger than this, use the configured storage type (e.g. S3 bucket) instead of file system storage.
+
 const contentDeleteFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.deleteFile,
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.deleteFile,
@@ -38,18 +40,38 @@ export const deleteTempFile = async (fileNameOrPath) => {
   await deleteFn({ fileNameOrPath })
 }
 
-export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
-  const writeChunkFunction = getStorageFunctionOrThrow({
-    functionByStorageType: chunkWriteFunctionByStorageType,
-    operation: 'writeChunkToTempFile',
-  })
+export const writeChunkToTempFile = async ({
+  fileId,
+  chunk,
+  filePath = null,
+  fileContent = null,
+  totalFileSize = undefined,
+}) => {
+  let writeChunkFunction
+  if (totalFileSize > minFileSizeToUseAlternativeStorage) {
+    // For larger files, use the configured storage type (e.g. S3 bucket) to write chunks.
+    writeChunkFunction = getStorageFunctionOrThrow({
+      functionByStorageType: chunkWriteFunctionByStorageType,
+      operation: 'writeChunkToTempFile',
+    })
+  } else {
+    // For smaller files, default to file system storage to avoid overhead of alternative storage types.
+    writeChunkFunction = chunkWriteFunctionByStorageType[fileContentStorageTypes.fileSystem]
+  }
   await writeChunkFunction({ filePath, fileContent, fileId, chunk })
 }
 
-export const mergeTempChunks = async ({ fileId, totalChunks }) => {
-  const mergeChunksFunction = getStorageFunctionOrThrow({
-    functionByStorageType: chunkMergeFunctionByStorageType,
-    operation: 'mergeTempChunks',
-  })
+export const mergeTempChunks = async ({ fileId, totalChunks, totalFileSize }) => {
+  let mergeChunksFunction
+  if (totalFileSize > minFileSizeToUseAlternativeStorage) {
+    // For larger files, use the configured storage type (e.g. S3 bucket) to merge chunks.
+    mergeChunksFunction = getStorageFunctionOrThrow({
+      functionByStorageType: chunkMergeFunctionByStorageType,
+      operation: 'mergeTempChunks',
+    })
+  } else {
+    // For smaller files, default to file system storage to merge chunks.
+    mergeChunksFunction = chunkMergeFunctionByStorageType[fileContentStorageTypes.fileSystem]
+  }
   return mergeChunksFunction({ fileId, totalChunks })
 }
