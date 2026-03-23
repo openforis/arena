@@ -1,6 +1,6 @@
 import './SurveyInfo.scss'
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
@@ -74,6 +74,45 @@ const SurveyInfo = (props) => {
       strongConfirmRequiredText: surveyName,
     })
   }, [confirm, dispatch, surveyName])
+
+  const advancedFunctionsItems = useMemo(() => {
+    const items = []
+    if (Survey.isPublished(surveyInfo)) {
+      items.push({
+        key: 'survey-info-unpublish',
+        content: (
+          <Button
+            className="btn-danger"
+            iconClassName="icon-eye-blocked icon-12px icon-left"
+            label="homeView:surveyInfo.unpublish"
+            onClick={onUnpublishClick}
+            variant="text"
+            testId={TestId.dashboard.surveyUnpublishBtn}
+          />
+        ),
+      })
+    }
+    if (!ProcessUtils.ENV.activityLogDisabled) {
+      items.push({
+        key: 'survey-delete-activity-log',
+        content: (
+          <Button
+            className="btn-danger"
+            iconClassName="icon-bin icon-12px icon-left"
+            label="homeView:surveyInfo.deleteActivityLog"
+            onClick={onDeleteActivityLogDataClick}
+            variant="text"
+            testId={TestId.dashboard.surveyDeleteActivityLogBtn}
+          />
+        ),
+      })
+    }
+    items.push({
+      key: 'survey-info-delete',
+      content: <ButtonDelete onClick={onDeleteClick} testId={TestId.dashboard.surveyDeleteBtn} variant="text" />,
+    })
+    return items
+  }, [onDeleteActivityLogDataClick, onDeleteClick, onUnpublishClick, surveyInfo])
 
   return (
     <>
@@ -159,48 +198,7 @@ const SurveyInfo = (props) => {
             <ButtonMenu
               className="btn-menu-advanced"
               iconClassName="icon-cog icon-14px"
-              items={[
-                ...(Survey.isPublished(surveyInfo)
-                  ? [
-                      {
-                        key: 'survey-info-unpublish',
-                        content: (
-                          <Button
-                            className="btn-danger"
-                            iconClassName="icon-eye-blocked icon-12px icon-left"
-                            label="homeView:surveyInfo.unpublish"
-                            onClick={onUnpublishClick}
-                            variant="text"
-                            testId={TestId.dashboard.surveyUnpublishBtn}
-                          />
-                        ),
-                      },
-                    ]
-                  : []),
-                ...(!ProcessUtils.ENV.activityLogDisabled
-                  ? [
-                      {
-                        key: 'survey-delete-activity-log',
-                        content: (
-                          <Button
-                            className="btn-danger"
-                            iconClassName="icon-bin icon-12px icon-left"
-                            label="homeView:surveyInfo.deleteActivityLog"
-                            onClick={onDeleteActivityLogDataClick}
-                            variant="text"
-                            testId={TestId.dashboard.surveyDeleteActivityLogBtn}
-                          />
-                        ),
-                      },
-                    ]
-                  : []),
-                {
-                  key: 'survey-info-delete',
-                  content: (
-                    <ButtonDelete onClick={onDeleteClick} testId={TestId.dashboard.surveyDeleteBtn} variant="text" />
-                  ),
-                },
-              ]}
+              items={advancedFunctionsItems}
               label="common.advancedFunctions"
               size="small"
               testId={TestId.dashboard.advancedFunctionsBtn}

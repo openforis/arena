@@ -28,7 +28,7 @@ export const getNumericParam = (req, param, defaultValue = null) => {
   const value = R.prop(param, getParams(req))
   if (value === undefined) return defaultValue
   const numericValue = Number(value)
-  return isNaN(numericValue) ? defaultValue : numericValue
+  return Number.isNaN(numericValue) ? defaultValue : numericValue
 }
 
 export const getFile = R.pathOr(null, ['files', 'file'])
