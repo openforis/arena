@@ -47,10 +47,12 @@ export default {
   TaxonomiesValidationJob: 'Валидация таксономий',
   TaxonomyImportJob: 'Импорт таксономии',
   // data export
+  ArenaFileReadJob: 'Чтение файла Arena',
   DataExportJob: 'Экспорт данных',
   DataSummaryExportJob: 'Экспорт сводных данных',
   ZipCreationJob: 'Создание ZIP-файла',
   CSVDataExtraction: 'Извлечение данных',
+  PrepareImportFileJob: 'Подготовка файла импорта',
   // geo
   GeoJsonDataExportJob: 'Экспорт данных GeoJson',
   // import arena survey

@@ -14,7 +14,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordFile from '@core/record/recordFile'
 
-import * as FileManager from '../../../../record/manager/fileManager'
+import * as FileManager from '../../../../record/manager/recordFileManager'
 import * as CollectSurvey from '../model/collectSurvey'
 import * as CollectRecord from '../model/collectRecord'
 

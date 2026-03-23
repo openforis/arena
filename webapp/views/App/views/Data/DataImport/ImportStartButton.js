@@ -16,10 +16,15 @@ const stata = {
 }
 
 const initialState = {
+  hasProcessor: false,
   uploadProgressPercent: -1,
   processedChunks: -1,
   status: stata.stopped,
 }
+
+const completedProgressVisibleMs = 200
+
+const wait = (timeout) => new Promise((resolve) => setTimeout(resolve, timeout))
 
 export const ImportStartButton = (props) => {
   const {
@@ -44,7 +49,7 @@ export const ImportStartButton = (props) => {
   const confirm = useConfirmAsync()
   const [state, setState] = useState(initialState)
 
-  const { status, uploadProgressPercent } = state
+  const { hasProcessor, status, uploadProgressPercent } = state
 
   const reset = useCallback(() => {
     uploadingRef.current = false
@@ -56,35 +61,41 @@ export const ImportStartButton = (props) => {
   const onUploadProgress = useCallback((progressEvent) => {
     if (uploadingRef.current) {
       const { loaded: processedChunks, total } = progressEvent
-      const percent = Math.round((processedChunks / total) * 100)
-      setState((statePrev) => ({ ...statePrev, uploadProgressPercent: percent }))
+      const uploadProgressPercent = Math.round((processedChunks / total) * 100)
+      setState((statePrev) => ({ ...statePrev, uploadProgressPercent }))
     }
   }, [])
 
   const onStartConfirmed = useCallback(async () => {
-    uploadingRef.current = true
-    setState((statePrev) => ({ ...statePrev, status: stata.running, uploadProgressPercent: 0 }))
+    let retry = true
+    while (retry) {
+      retry = false
+      uploadingRef.current = true
+      setState((statePrev) => ({ ...statePrev, status: stata.running, uploadProgressPercent: 0 }))
 
-    // when retrying, re-start from current chunk
-    const processorCurrentChunkNumber = processorRef.current?.currentChunkNumber
-    const startFromChunk = processorCurrentChunkNumber > 0 ? processorCurrentChunkNumber : 1
+      // when retrying, re-start from current chunk
+      const processorCurrentChunkNumber = processorRef.current?.currentChunkNumber
+      const startFromChunk = processorCurrentChunkNumber > 0 ? processorCurrentChunkNumber : 1
 
-    const startRes = startFunction({
-      ...startFunctionParams,
-      onUploadProgress,
-      startFromChunk,
-    })
-    const promise = startRes.promise ?? startRes
-    processorRef.current = startRes.processor
-    try {
-      const result = await promise
-      onUploadComplete(result)
-      reset()
-    } catch (error) {
-      if (await confirm({ key: 'common.uploadErrorConfirm.message', params: { error } })) {
-        await onStartConfirmed()
-      } else {
+      const startRes = startFunction({
+        ...startFunctionParams,
+        onUploadProgress,
+        startFromChunk,
+      })
+      const promise = startRes.promise ?? startRes
+      processorRef.current = startRes.processor
+      setState((statePrev) => ({ ...statePrev, hasProcessor: Boolean(startRes.processor) }))
+      try {
+        const result = await promise
+        setState((statePrev) => ({ ...statePrev, uploadProgressPercent: 100 }))
+        await wait(completedProgressVisibleMs)
+        onUploadComplete(result)
         reset()
+      } catch (error) {
+        retry = await confirm({ key: 'common.uploadErrorConfirm.message', params: { error } })
+        if (!retry) {
+          reset()
+        }
       }
     }
   }, [confirm, onUploadComplete, onUploadProgress, reset, startFunction, startFunctionParams])
@@ -132,7 +143,7 @@ export const ImportStartButton = (props) => {
   return uploadProgressPercent >= 0 ? (
     <div className="import-start-btn-progress-container">
       <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey={'common.uploadingFile'} />
-      {processorRef.current && (
+      {hasProcessor && (
         <>
           {status === stata.running ? (
             <Button

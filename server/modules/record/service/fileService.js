@@ -1,7 +1,7 @@
 import * as Log from '@server/log/log'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 
-import * as FileManager from '../manager/fileManager'
+import * as FileManager from '../manager/recordFileManager'
 
 const logger = Log.getLogger('FileService')
 

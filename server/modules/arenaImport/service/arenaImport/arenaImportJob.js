@@ -14,12 +14,14 @@ import FilesImportJob from './jobs/filesImportJob'
 import UsersImportJob from './jobs/usersImportJob'
 import ChainsImportJob from './jobs/chainsImportJob'
 import CreateRdbJob from './jobs/createRdb'
+import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 
 const createInnerJobs = (params) => {
   const { backup = true, options = {} } = params
   const { includeData = true } = options
 
   return [
+    new PrepareImportFileJob(),
     new ArenaSurveyReaderJob(),
 
     new SurveyCreatorJob(),
@@ -49,12 +51,11 @@ export default class ArenaImportJob extends Job {
    * Creates a new import job to import a survey in Arena format.
    * Records, files and activity log will be importin only when restoring a backup.
    * If not restoring a backup, node definition, categories and taxonomies will be restored as draft.
-   *
    * @param {!object} params - The import parameters.
    * @param {!string} [params.filePath] - The file path of the file to import.
    * @param {!object} [params.user] - The user performing the import.
-   * @param {boolean} [params.backup = true] - If true, props and propsDraft will be imported separately and records, files, activity logs will be imported.
-   * @param {object} [params.surveyInfoTarget = null] - Target survey info (optional).
+   * @param {boolean} [params.backup] - If true, props and propsDraft will be imported separately and records, files, activity logs will be imported.
+   * @param {object} [params.surveyInfoTarget] - Target survey info (optional).
    * @returns {ArenaImportJob} - The import job.
    */
   constructor(params) {
@@ -87,7 +88,9 @@ export default class ArenaImportJob extends Job {
         await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
       }
     }
-    FileUtils.deleteFile(filePath)
+    if (filePath) {
+      await FileUtils.deleteFileAsync(filePath)
+    }
   }
 }
 
