@@ -37,6 +37,27 @@ const getChunkedFileParams = (req) => {
   const totalChunks = Request.getNumericParam(req, 'totalChunks')
   const totalFileSize = Request.getNumericParam(req, 'totalFileSize')
 
+  const isChunkedUpload = totalChunks !== null
+
+  if (isChunkedUpload) {
+    const isValidPositiveInteger = (value) => Number.isFinite(value) && Number.isInteger(value) && value > 0
+
+    if (typeof fileId !== 'string' || fileId.trim() === '') {
+      const error = new Error('Invalid fileId for chunked upload')
+      error.statusCode = 400
+      throw error
+    }
+    if (!isValidPositiveInteger(chunk) || !isValidPositiveInteger(totalChunks)) {
+      const error = new Error('Invalid chunk or totalChunks for chunked upload')
+      error.statusCode = 400
+      throw error
+    }
+    if (!isValidPositiveInteger(totalFileSize)) {
+      const error = new Error('Invalid totalFileSize for chunked upload')
+      error.statusCode = 400
+      throw error
+    }
+  }
   return { chunk, fileContent, fileId, filePath, totalChunks, totalFileSize }
 }
 

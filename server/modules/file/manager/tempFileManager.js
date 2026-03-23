@@ -40,13 +40,7 @@ export const deleteTempFile = async (fileNameOrPath) => {
   await deleteFn({ fileNameOrPath })
 }
 
-export const writeChunkToTempFile = async ({
-  fileId,
-  chunk,
-  filePath = null,
-  fileContent = null,
-  totalFileSize = undefined,
-}) => {
+export const writeChunkToTempFile = async ({ fileId, chunk, totalFileSize, filePath = null, fileContent = null }) => {
   let writeChunkFunction
   if (totalFileSize > minFileSizeToUseAlternativeStorage) {
     // For larger files, use the configured storage type (e.g. S3 bucket) to write chunks.
