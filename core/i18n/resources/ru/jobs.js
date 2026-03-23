@@ -47,6 +47,7 @@ export default {
   TaxonomiesValidationJob: 'Валидация таксономий',
   TaxonomyImportJob: 'Импорт таксономии',
   // data export
+  ArenaFileReadJob: 'Чтение файла Arena',
   DataExportJob: 'Экспорт данных',
   DataSummaryExportJob: 'Экспорт сводных данных',
   ZipCreationJob: 'Создание ZIP-файла',

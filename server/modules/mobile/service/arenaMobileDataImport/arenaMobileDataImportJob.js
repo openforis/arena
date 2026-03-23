@@ -1,16 +1,17 @@
+import { Surveys, SystemError } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 
 import Job from '@server/job/job'
-import FileZip from '@server/utils/file/fileZip'
-import * as FileUtils from '@server/utils/file/fileUtils'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
-
-import RecordsImportJob from './jobs/recordsImportJob'
-import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesImportJob'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
-import { Surveys, SystemError } from '@openforis/arena-core'
+import * as FileUtils from '@server/utils/file/fileUtils'
+
+import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesImportJob'
+import ArenaFileReadJob from './jobs/arenaFileReadJob'
+import RecordsImportJob from './jobs/recordsImportJob'
 
 export default class ArenaMobileDataImportJob extends Job {
   /**
@@ -25,6 +26,7 @@ export default class ArenaMobileDataImportJob extends Job {
   constructor(params) {
     super(ArenaMobileDataImportJob.type, params, [
       new PrepareImportFileJob(),
+      new ArenaFileReadJob(),
       new RecordsImportJob(),
       new FilesImportJob(),
     ])
@@ -34,12 +36,7 @@ export default class ArenaMobileDataImportJob extends Job {
     await super.onStart()
 
     const { context, tx } = this
-    const { filePath, surveyId } = context
-
-    const arenaSurveyFileZip = new FileZip(filePath)
-    await arenaSurveyFileZip.init()
-
-    this.setContext({ arenaSurveyFileZip })
+    const { surveyId } = context
 
     const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true }, tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
