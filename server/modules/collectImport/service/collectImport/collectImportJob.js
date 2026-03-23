@@ -1,4 +1,6 @@
 import Job from '@server/job/job'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
 import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
@@ -18,6 +20,7 @@ const createInnerJob = (params) => {
   const { includeData = true } = options
 
   return [
+    new PrepareImportFileJob(),
     new CollectSurveyReaderJob(),
     new SurveyCreatorJob(),
     new CategoriesImportJob(),
@@ -46,7 +49,7 @@ export default class CollectImportJob extends Job {
   async onEnd() {
     await super.onEnd()
 
-    const { collectSurveyFileZip, surveyId } = this.context
+    const { collectSurveyFileZip, filePath, surveyId } = this.context
 
     if (collectSurveyFileZip) {
       collectSurveyFileZip.close()
@@ -54,6 +57,10 @@ export default class CollectImportJob extends Job {
 
     if (surveyId) {
       await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
+    }
+
+    if (filePath) {
+      await FileUtils.deleteFileAsync(filePath)
     }
   }
 }

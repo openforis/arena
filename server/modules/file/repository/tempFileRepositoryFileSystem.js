@@ -20,7 +20,7 @@ export const writeChunkToTempFile = async ({ filePath = null, fileContent = null
   }
 }
 
-export const mergeTempChunks = async ({ fileId, totalChunks }) => {
+export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = null }) => {
   const finalFileName = FileUtils.newTempFileName()
   const finalFilePath = FileUtils.tempFilePath(finalFileName)
   const writeStream = FileUtils.createWriteStream(finalFilePath)
@@ -32,6 +32,7 @@ export const mergeTempChunks = async ({ fileId, totalChunks }) => {
     await writeStreamAndWaitForEnd({ writeStream, chunkFileContent })
     // delete temporary chunk
     await FileUtils.deleteFileAsync(chunkFilePath)
+    await onChunkMerged?.({ chunk, totalChunks })
   }
   await endWriteStream(writeStream)
   return finalFilePath

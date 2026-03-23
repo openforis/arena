@@ -16,14 +16,7 @@ const getFileContentOrPath = (req) => {
   throw new TypeError('Missing file content or path in request')
 }
 
-export const processChunkedFile = async ({ req }) => {
-  const { fileId = undefined } = Request.getParams(req)
-  const { filePath, fileContent } = getFileContentOrPath(req)
-
-  const chunk = Request.getNumericParam(req, 'chunk')
-  const totalChunks = Request.getNumericParam(req, 'totalChunks')
-  const totalFileSize = Request.getNumericParam(req, 'totalFileSize')
-
+const writeChunkIfNeeded = async ({ filePath, fileContent, fileId, chunk, totalChunks, totalFileSize }) => {
   const isSingleFile = !totalChunks
 
   if (!isSingleFile) {
@@ -33,18 +26,49 @@ export const processChunkedFile = async ({ req }) => {
     }
   }
 
+  return { isSingleFile }
+}
+
+const getChunkedFileParams = (req) => {
+  const { fileId = undefined } = Request.getParams(req)
+  const { filePath, fileContent } = getFileContentOrPath(req)
+
+  const chunk = Request.getNumericParam(req, 'chunk')
+  const totalChunks = Request.getNumericParam(req, 'totalChunks')
+  const totalFileSize = Request.getNumericParam(req, 'totalFileSize')
+
+  return { chunk, fileContent, fileId, filePath, totalChunks, totalFileSize }
+}
+
+/**
+ * Processes an uploaded file request without merging the last chunked upload.
+ * Returns the original file path for single-file uploads, chunk metadata for completed chunked uploads,
+ * or null while chunks are still being uploaded.
+ * @param {object} params - Function parameters.
+ * @param {object} params.req - The HTTP request.
+ * @returns {Promise<object|null>} The file path or chunk metadata when upload is complete; otherwise null.
+ */
+export const processChunkedFileForBackgroundMerge = async ({ req }) => {
+  const { chunk, fileContent, fileId, filePath, totalChunks, totalFileSize } = getChunkedFileParams(req)
+
+  const { isSingleFile } = await writeChunkIfNeeded({
+    filePath,
+    fileContent,
+    fileId,
+    chunk,
+    totalChunks,
+    totalFileSize,
+  })
+
   const isChunkingComplete = totalChunks && chunk === totalChunks
 
   if (isChunkingComplete) {
-    // All file chunks have been received; merge them and return the temp file name.
-    return TempFileManager.mergeTempChunks({ fileId, totalChunks, totalFileSize })
+    return { fileId, totalChunks, totalFileSize }
   }
   if (isSingleFile) {
-    // No file chunking was used; return the original file path.
-    return filePath
+    return { filePath }
   }
   if (Number(chunk) < Number(totalChunks)) {
-    // File chunks are still being uploaded; return null to indicate the process isn't complete.
     return null
   }
   throw new Error('Invalid chunk number')

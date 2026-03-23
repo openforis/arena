@@ -3,7 +3,7 @@ import { ConflictResolutionStrategy } from '@common/dataImport'
 import * as JobUtils from '@server/job/jobUtils'
 import * as Log from '@server/log/log'
 import * as CategoryService from '@server/modules/category/service/categoryService'
-import { processChunkedFile } from '@server/modules/file/service/requestChunkedFileProcessor'
+import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as Request from '@server/utils/request'
@@ -55,11 +55,11 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const { surveyId, conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting } = Request.getParams(req)
 
-      const filePath = await processChunkedFile({ req })
-      if (filePath) {
+      const tempFile = await processChunkedFileForBackgroundMerge({ req })
+      if (tempFile) {
         const job = ArenaMobileImportService.startArenaMobileImportJob({
           user,
-          filePath,
+          ...tempFile,
           surveyId,
           conflictResolutionStrategy,
         })

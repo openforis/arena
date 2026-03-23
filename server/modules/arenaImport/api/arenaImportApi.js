@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 
 import * as JobUtils from '@server/job/jobUtils'
-import { processChunkedFile } from '@server/modules/file/service/requestChunkedFileProcessor'
+import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as Request from '@server/utils/request'
 
 import * as ArenaImportService from '../service/arenaImportService'
@@ -11,8 +11,8 @@ export const init = (app) => {
 
   app.post('/survey/arena-import', async (req, res, next) => {
     try {
-      const tempFileNameOrPath = await processChunkedFile({ req })
-      if (tempFileNameOrPath) {
+      const tempFile = await processChunkedFileForBackgroundMerge({ req })
+      if (tempFile) {
         const user = Request.getUser(req)
         const newSurveyParams = Request.getJsonParam(req, 'survey')
 
@@ -22,7 +22,7 @@ export const init = (app) => {
 
         const job = ArenaImportService.startArenaImportJob({
           user,
-          filePath: tempFileNameOrPath,
+          ...tempFile,
           surveyInfoTarget,
           options,
         })

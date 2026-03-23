@@ -1,6 +1,6 @@
 import './ImportStartButton.scss'
 
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -16,9 +16,31 @@ const stata = {
 }
 
 const initialState = {
+  hasProcessor: false,
   uploadProgressPercent: -1,
   processedChunks: -1,
   status: stata.stopped,
+}
+
+const uploadPhaseMaxPercent = 50
+const mergePhaseStartPercent = 50
+const mergePhaseMaxPercent = 95
+const mergeProgressTickMinMs = 100
+const mergeProgressTickMaxMs = 2000
+const mergeProgressStepPercent = 1
+const mergeDurationRatio = 1.3
+const completedProgressVisibleMs = 200
+
+const wait = (timeout) => new Promise((resolve) => setTimeout(resolve, timeout))
+
+const calcMergeProgressTickMs = ({ uploadDurationMs }) => {
+  const mergeProgressSteps = Math.max(
+    1,
+    Math.ceil((mergePhaseMaxPercent - mergePhaseStartPercent) / mergeProgressStepPercent)
+  )
+  const estimatedMergeDurationMs = uploadDurationMs * mergeDurationRatio
+  const tickMsEstimated = Math.round(estimatedMergeDurationMs / mergeProgressSteps)
+  return Math.max(mergeProgressTickMinMs, Math.min(mergeProgressTickMaxMs, tickMsEstimated))
 }
 
 export const ImportStartButton = (props) => {
@@ -40,54 +62,111 @@ export const ImportStartButton = (props) => {
 
   const dispatch = useDispatch()
   const uploadingRef = useRef(false)
+  const uploadStartedAtRef = useRef(null)
   const processorRef = useRef(null)
+  const mergeProgressIntervalRef = useRef(null)
   const confirm = useConfirmAsync()
   const [state, setState] = useState(initialState)
 
-  const { status, uploadProgressPercent } = state
+  const { hasProcessor, status, uploadProgressPercent } = state
+
+  const clearMergeProgressTimer = useCallback(() => {
+    if (mergeProgressIntervalRef.current) {
+      clearInterval(mergeProgressIntervalRef.current)
+      mergeProgressIntervalRef.current = null
+    }
+  }, [])
+
+  const startMergeProgressTimer = useCallback(({ tickMs }) => {
+    if (mergeProgressIntervalRef.current) return
+
+    mergeProgressIntervalRef.current = setInterval(() => {
+      setState((statePrev) => {
+        if (statePrev.status !== stata.running) return statePrev
+
+        const current = Math.max(statePrev.uploadProgressPercent, mergePhaseStartPercent)
+        if (current >= mergePhaseMaxPercent) return statePrev
+
+        return {
+          ...statePrev,
+          uploadProgressPercent: Math.min(mergePhaseMaxPercent, current + mergeProgressStepPercent),
+        }
+      })
+    }, tickMs)
+  }, [])
+
+  useEffect(() => clearMergeProgressTimer, [clearMergeProgressTimer])
 
   const reset = useCallback(() => {
     uploadingRef.current = false
     processorRef.current?.stop()
+    clearMergeProgressTimer()
     setState(initialState)
     onCancel?.()
-  }, [onCancel])
+  }, [clearMergeProgressTimer, onCancel])
 
-  const onUploadProgress = useCallback((progressEvent) => {
-    if (uploadingRef.current) {
-      const { loaded: processedChunks, total } = progressEvent
-      const percent = Math.round((processedChunks / total) * 100)
-      setState((statePrev) => ({ ...statePrev, uploadProgressPercent: percent }))
-    }
-  }, [])
+  const onUploadProgress = useCallback(
+    (progressEvent) => {
+      if (uploadingRef.current) {
+        const { loaded: processedChunks, total } = progressEvent
+        const uploadPercent = Math.round((processedChunks / total) * uploadPhaseMaxPercent)
+        const uploadPercentBounded = Math.max(0, Math.min(uploadPhaseMaxPercent, uploadPercent))
+
+        setState((statePrev) => {
+          if (statePrev.uploadProgressPercent > mergePhaseStartPercent) return statePrev
+          return {
+            ...statePrev,
+            uploadProgressPercent: Math.max(statePrev.uploadProgressPercent, uploadPercentBounded),
+          }
+        })
+
+        if (processedChunks >= total) {
+          const uploadDurationMs = Date.now() - (uploadStartedAtRef.current ?? Date.now())
+          const mergeProgressTickMs = calcMergeProgressTickMs({ uploadDurationMs })
+          startMergeProgressTimer({ tickMs: mergeProgressTickMs })
+        }
+      }
+    },
+    [startMergeProgressTimer]
+  )
 
   const onStartConfirmed = useCallback(async () => {
-    uploadingRef.current = true
-    setState((statePrev) => ({ ...statePrev, status: stata.running, uploadProgressPercent: 0 }))
+    let retry = true
+    while (retry) {
+      retry = false
+      uploadingRef.current = true
+      uploadStartedAtRef.current = Date.now()
+      clearMergeProgressTimer()
+      setState((statePrev) => ({ ...statePrev, status: stata.running, uploadProgressPercent: 0 }))
 
-    // when retrying, re-start from current chunk
-    const processorCurrentChunkNumber = processorRef.current?.currentChunkNumber
-    const startFromChunk = processorCurrentChunkNumber > 0 ? processorCurrentChunkNumber : 1
+      // when retrying, re-start from current chunk
+      const processorCurrentChunkNumber = processorRef.current?.currentChunkNumber
+      const startFromChunk = processorCurrentChunkNumber > 0 ? processorCurrentChunkNumber : 1
 
-    const startRes = startFunction({
-      ...startFunctionParams,
-      onUploadProgress,
-      startFromChunk,
-    })
-    const promise = startRes.promise ?? startRes
-    processorRef.current = startRes.processor
-    try {
-      const result = await promise
-      onUploadComplete(result)
-      reset()
-    } catch (error) {
-      if (await confirm({ key: 'common.uploadErrorConfirm.message', params: { error } })) {
-        await onStartConfirmed()
-      } else {
+      const startRes = startFunction({
+        ...startFunctionParams,
+        onUploadProgress,
+        startFromChunk,
+      })
+      const promise = startRes.promise ?? startRes
+      processorRef.current = startRes.processor
+      setState((statePrev) => ({ ...statePrev, hasProcessor: Boolean(startRes.processor) }))
+      try {
+        const result = await promise
+        clearMergeProgressTimer()
+        setState((statePrev) => ({ ...statePrev, uploadProgressPercent: 100 }))
+        await wait(completedProgressVisibleMs)
+        onUploadComplete(result)
         reset()
+      } catch (error) {
+        clearMergeProgressTimer()
+        retry = await confirm({ key: 'common.uploadErrorConfirm.message', params: { error } })
+        if (!retry) {
+          reset()
+        }
       }
     }
-  }, [confirm, onUploadComplete, onUploadProgress, reset, startFunction, startFunctionParams])
+  }, [clearMergeProgressTimer, confirm, onUploadComplete, onUploadProgress, reset, startFunction, startFunctionParams])
 
   const onStartClick = useCallback(async () => {
     if (showConfirm) {
@@ -132,7 +211,7 @@ export const ImportStartButton = (props) => {
   return uploadProgressPercent >= 0 ? (
     <div className="import-start-btn-progress-container">
       <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey={'common.uploadingFile'} />
-      {processorRef.current && (
+      {hasProcessor && (
         <>
           {status === stata.running ? (
             <Button

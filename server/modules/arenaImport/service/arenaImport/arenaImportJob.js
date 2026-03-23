@@ -14,12 +14,14 @@ import FilesImportJob from './jobs/filesImportJob'
 import UsersImportJob from './jobs/usersImportJob'
 import ChainsImportJob from './jobs/chainsImportJob'
 import CreateRdbJob from './jobs/createRdb'
+import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 
 const createInnerJobs = (params) => {
   const { backup = true, options = {} } = params
   const { includeData = true } = options
 
   return [
+    new PrepareImportFileJob(),
     new ArenaSurveyReaderJob(),
 
     new SurveyCreatorJob(),
@@ -86,7 +88,9 @@ export default class ArenaImportJob extends Job {
         await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
       }
     }
-    await FileUtils.deleteFileAsync(filePath)
+    if (filePath) {
+      await FileUtils.deleteFileAsync(filePath)
+    }
   }
 }
 

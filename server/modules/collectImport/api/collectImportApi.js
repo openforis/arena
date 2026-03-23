@@ -6,7 +6,7 @@ import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenera
 
 import * as DbUtils from '@server/db/dbUtils'
 import * as JobUtils from '@server/job/jobUtils'
-import { processChunkedFile } from '@server/modules/file/service/requestChunkedFileProcessor'
+import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as Request from '@server/utils/request'
@@ -20,8 +20,8 @@ export const init = (app) => {
 
   app.post('/survey/collect-import', async (req, res, next) => {
     try {
-      const filePath = await processChunkedFile({ req })
-      if (filePath) {
+      const tempFile = await processChunkedFileForBackgroundMerge({ req })
+      if (tempFile) {
         const user = Request.getUser(req)
         const newSurveyParam = Request.getJsonParam(req, 'survey')
 
@@ -32,7 +32,7 @@ export const init = (app) => {
         if (Validation.isValid(validation)) {
           const job = CollectImportService.startCollectImportJob({
             user,
-            filePath,
+            ...tempFile,
             newSurvey,
             options,
           })

@@ -2,6 +2,8 @@ import * as Survey from '@core/survey/survey'
 
 import Job from '@server/job/job'
 import FileZip from '@server/utils/file/fileZip'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 
 import RecordsImportJob from './jobs/recordsImportJob'
 import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesImportJob'
@@ -13,7 +15,6 @@ import { Surveys, SystemError } from '@openforis/arena-core'
 export default class ArenaMobileDataImportJob extends Job {
   /**
    * Creates a new data import job to import survey records and files in Arena format.
-   *
    * @param {!object} params - The import parameters.
    * @param {!object} [params.user] - The user performing the import.
    * @param {!number} [params.surveyId] - The id of the survey in which data will be imported.
@@ -22,7 +23,11 @@ export default class ArenaMobileDataImportJob extends Job {
    * @returns {ArenaMobileDataImportJob} - The import job.
    */
   constructor(params) {
-    super(ArenaMobileDataImportJob.type, params, [new RecordsImportJob(), new FilesImportJob()])
+    super(ArenaMobileDataImportJob.type, params, [
+      new PrepareImportFileJob(),
+      new RecordsImportJob(),
+      new FilesImportJob(),
+    ])
   }
 
   async onStart() {
@@ -68,6 +73,20 @@ export default class ArenaMobileDataImportJob extends Job {
 
   generateResult() {
     return this.combineInnerJobsResults()
+  }
+
+  async onEnd() {
+    await super.onEnd()
+
+    const { arenaSurveyFileZip, filePath } = this.context
+
+    if (arenaSurveyFileZip) {
+      arenaSurveyFileZip.close()
+    }
+
+    if (filePath) {
+      await FileUtils.deleteFileAsync(filePath)
+    }
   }
 }
 

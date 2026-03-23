@@ -81,7 +81,7 @@ export const mergeTempChunksToS3 = async ({ fileId, totalChunks }) => {
   }
 }
 
-export const mergeTempChunks = async ({ fileId, totalChunks }) => {
+export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = null }) => {
   const finalFileName = FileUtils.newTempFileName()
   const finalFilePath = FileUtils.tempFilePath(finalFileName)
   const writeStream = FileUtils.createWriteStream(finalFilePath)
@@ -94,6 +94,7 @@ export const mergeTempChunks = async ({ fileId, totalChunks }) => {
       await writeReadableToWritable({ readStream: chunkFileStream, writeStream })
       // delete temporary chunk
       await deleteFile({ fileNameOrPath: chunkFileName })
+      await onChunkMerged?.({ chunk, totalChunks })
     }
     await endWriteStream(writeStream)
     return finalFilePath

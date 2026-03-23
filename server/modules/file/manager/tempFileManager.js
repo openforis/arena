@@ -61,7 +61,7 @@ export const writeChunkToTempFile = async ({
   await writeChunkFunction({ filePath, fileContent, fileId, chunk })
 }
 
-export const mergeTempChunks = async ({ fileId, totalChunks, totalFileSize }) => {
+export const mergeTempChunks = async ({ fileId, totalChunks, totalFileSize, onChunkMerged = null }) => {
   let mergeChunksFunction
   if (totalFileSize > minFileSizeToUseAlternativeStorage) {
     // For larger files, use the configured storage type (e.g. S3 bucket) to merge chunks.
@@ -73,5 +73,5 @@ export const mergeTempChunks = async ({ fileId, totalChunks, totalFileSize }) =>
     // For smaller files, default to file system storage to merge chunks.
     mergeChunksFunction = chunkMergeFunctionByStorageType[fileContentStorageTypes.fileSystem]
   }
-  return mergeChunksFunction({ fileId, totalChunks })
+  return mergeChunksFunction({ fileId, totalChunks, onChunkMerged })
 }

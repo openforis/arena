@@ -1,5 +1,5 @@
 import * as Request from '@server/utils/request'
-import { processChunkedFile } from '@server/modules/file/service/requestChunkedFileProcessor'
+import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as JobUtils from '@server/job/jobUtils'
 
 import * as DataImportService from '../service/dataImportService'
@@ -48,12 +48,12 @@ export const init = (app) => {
         abortOnErrors,
       } = Request.getParams(req)
 
-      const filePath = await processChunkedFile({ req })
-      if (filePath) {
+      const tempFile = await processChunkedFileForBackgroundMerge({ req })
+      if (tempFile) {
         const job = DataImportService.startFlatDataImportJob({
           user,
           surveyId,
-          filePath,
+          ...tempFile,
           fileFormat,
           cycle,
           nodeDefUuid,
