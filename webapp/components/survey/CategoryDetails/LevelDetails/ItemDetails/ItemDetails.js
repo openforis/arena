@@ -70,6 +70,11 @@ const ItemDetails = (props) => {
     }
   }, [active])
 
+  // Update item when itemProp changes (e.g. after saving the item or when another item is selected)
+  useEffect(() => {
+    setItem(itemProp)
+  }, [itemProp])
+
   const onMoveUpClick = useCallback(
     () => Actions.moveItem({ setItem, category, level, item, offset: -1 }),
     [Actions, category, item, level]
