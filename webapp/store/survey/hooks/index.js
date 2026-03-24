@@ -131,15 +131,16 @@ export const useSurveyHasFileAttributes = () =>
 
 export const useIsSurveyDirty = () => useSelector(SurveyStatusState.isDirty)
 
-export const useChains = () => {
+export const useChains = ({ surveyCycleKey } = {}) => {
   const canUseAnalysis = useAuthCanUseAnalysis()
   const surveyId = useSurveyId()
   const [chains, setChains] = useState(null)
+
   useEffect(() => {
     let isMounted = true
     if (canUseAnalysis) {
       const fetchChains = async () => {
-        const { chains: _chains } = await API.fetchChains({ surveyId })
+        const { chains: _chains } = await API.fetchChains({ surveyId, surveyCycleKey })
         if (isMounted) {
           setChains(_chains)
         }
@@ -151,6 +152,6 @@ export const useChains = () => {
     return () => {
       isMounted = false
     }
-  }, [canUseAnalysis, surveyId])
+  }, [canUseAnalysis, surveyId, surveyCycleKey])
   return chains
 }
