@@ -126,6 +126,7 @@ export const exportCategoryToStream = async (
     category,
     languages,
     includeCumulativeArea,
+    draft,
   })
 
   const fields = getCategoryExportHeaders({

@@ -99,12 +99,19 @@ const generateCategoryExportQuery = ({
     ORDER BY index_path, i.id`
 }
 
-export const generateCategoryExportStream = ({ surveyId, category, languages = [], includeCumulativeArea = false }) => {
+export const generateCategoryExportStream = ({
+  surveyId,
+  category,
+  languages = [],
+  includeCumulativeArea = false,
+  draft = true,
+}) => {
   const query = generateCategoryExportQuery({
     surveyId,
     category,
     languages,
     includeCumulativeArea,
+    draft,
   })
   const categoryUuid = Category.getUuid(category)
   const queryFormatted = DbUtils.formatQuery(query, [categoryUuid])
