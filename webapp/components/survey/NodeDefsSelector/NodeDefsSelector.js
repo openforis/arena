@@ -64,7 +64,7 @@ const NodeDefsSelector = (props) => {
 
   const nodeDefTypesForFiltering = useMemo(
     () =>
-      Object.keys(NodeDef.nodeDefType).filter(
+      Object.values(NodeDef.nodeDefType).filter(
         (type) => ![NodeDef.nodeDefType.formHeader, NodeDef.nodeDefType.entity].includes(type)
       ),
     []
