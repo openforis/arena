@@ -8,6 +8,7 @@ import { useUserIsSystemAdmin } from '@webapp/store/user'
 export const defaultChunkSize = 1024 * 1024 * 10
 
 const chunkSizeItems = [
+  { value: 1024 * 1024 * 5, label: '5 MB' },
   { value: defaultChunkSize, label: '10 MB' },
   { value: 1024 * 1024 * 100, label: '100 MB' },
   { value: 1024 * 1024 * 1024, label: '1 GB' },
