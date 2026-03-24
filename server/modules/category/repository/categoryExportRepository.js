@@ -6,9 +6,10 @@ import * as CategoryItem from '@core/survey/categoryItem'
 
 import * as DbUtils from '@server/db/dbUtils'
 
-const areaPropName = Category.reportingDataItemExtraDefKeys.area
 export const cumulativeAreaField = 'area_cumulative'
 export const codeJointField = 'code_joint'
+
+const areaPropName = Category.reportingDataItemExtraDefKeys.area
 const codeJointSeparator = '*'
 
 const getQueryPrefix = ({ surveyId, draft = true }) => {
@@ -17,14 +18,16 @@ const getQueryPrefix = ({ surveyId, draft = true }) => {
       SELECT *, 
         ${DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft)} AS code,
         ARRAY[]::uuid[] as hierarchy, 
-        ARRAY[${DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft)}] AS level_codes
+        ARRAY[${DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft)}] AS level_codes,
+        ARRAY[(${DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft)})::int] AS index_path
       FROM ${schema}.category_item
       WHERE parent_uuid IS NULL
       UNION ALL
       SELECT i.*, 
         ${DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')} AS code,
         array_append(a.hierarchy, i.parent_uuid),
-        array_append(a.level_codes, ${DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')})
+        array_append(a.level_codes, ${DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')}),
+        array_append(a.index_path, (${DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.')})::int)
       FROM ${schema}.category_item i 
       JOIN category_item_extended a ON i.parent_uuid = a.uuid
     )
@@ -45,14 +48,12 @@ const getSelectCumulativeAreaSubquery = ({ draft = true }) => {
 
 /**
  * Generates the query to export the category.
- *
  * @param {!object} params - The parameters object.
  * @param {!number} [params.surveyId] - The id of the survey.
  * @param {object[]} [params.levels] - Array of levels.
  * @param {string[]} [params.selectFields] - Array with the column names to select.
  * @param {string[]} [params.languages] - Array with the languages in the survey.
- * @param {boolean} [params.includeCumulativeArea=false] - Whether to include the area_cumulative field (sum of descendants area extra property value).
- *
+ * @param {boolean} [params.includeCumulativeArea] - Whether to include the area_cumulative field (sum of descendants area extra property value).
  * @returns {string} The query to be used to export the category.
  */
 const generateCategoryExportQuery = ({
@@ -64,7 +65,7 @@ const generateCategoryExportQuery = ({
 }) => {
   const levels = Category.getLevelsArray(category)
   const extraProps = Category.getItemExtraDefKeys(category)
-  const queryPrefix = getQueryPrefix({ surveyId })
+  const queryPrefix = getQueryPrefix({ surveyId, draft })
   const codesFields = levels.map(
     (level, index) => `COALESCE(level_codes[${index + 1}], '') AS ${CategoryLevel.getName(level)}_code`
   )
@@ -95,7 +96,7 @@ const generateCategoryExportQuery = ({
     FROM category_item_extended i
     JOIN ${Schemata.getSchemaSurvey(surveyId)}.category_level l ON l.uuid = i.level_uuid
     WHERE l.category_uuid = $1
-    ORDER BY i.id`
+    ORDER BY index_path`
 }
 
 export const generateCategoryExportStream = ({ surveyId, category, languages = [], includeCumulativeArea = false }) => {
