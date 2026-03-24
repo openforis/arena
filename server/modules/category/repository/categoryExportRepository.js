@@ -96,7 +96,7 @@ const generateCategoryExportQuery = ({
     FROM category_item_extended i
     JOIN ${Schemata.getSchemaSurvey(surveyId)}.category_level l ON l.uuid = i.level_uuid
     WHERE l.category_uuid = $1
-    ORDER BY index_path`
+    ORDER BY index_path, i.id`
 }
 
 export const generateCategoryExportStream = ({ surveyId, category, languages = [], includeCumulativeArea = false }) => {
