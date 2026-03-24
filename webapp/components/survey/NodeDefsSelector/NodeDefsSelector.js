@@ -1,5 +1,5 @@
 import './NodeDefsSelector.scss'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -62,6 +62,14 @@ const NodeDefsSelector = (props) => {
     [nodeDefUuidsAttributes, onAttributesSelection]
   )
 
+  const nodeDefTypesForFiltering = useMemo(
+    () =>
+      Object.values(NodeDef.nodeDefType).filter(
+        (type) => ![NodeDef.nodeDefType.formHeader, NodeDef.nodeDefType.entity].includes(type)
+      ),
+    []
+  )
+
   return (
     <div className="node-defs-selector">
       <EntitySelector
@@ -83,26 +91,24 @@ const NodeDefsSelector = (props) => {
       {showFilter && (
         <>
           <div className="node-defs-selector__settings">
-            {Object.keys(NodeDef.nodeDefType).map((type) =>
-              NodeDef.nodeDefType.entity !== type ? (
-                <button
-                  type="button"
-                  key={type}
-                  className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable', {
-                    active: filterTypes.includes(type),
-                  })}
-                  onClick={() => {
-                    const filterTypesUpdated = filterTypes.includes(type)
-                      ? filterTypes.filter((_type) => _type !== type)
-                      : [...filterTypes, type]
-                    setFilterTypes(filterTypesUpdated)
-                  }}
-                >
-                  <span>{i18n.t(type)}</span>
-                  {NodeDefUIProps.getIconByType(type)}
-                </button>
-              ) : null
-            )}
+            {nodeDefTypesForFiltering.map((type) => (
+              <button
+                type="button"
+                key={type}
+                className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable', {
+                  active: filterTypes.includes(type),
+                })}
+                onClick={() => {
+                  const filterTypesUpdated = filterTypes.includes(type)
+                    ? filterTypes.filter((_type) => _type !== type)
+                    : [...filterTypes, type]
+                  setFilterTypes(filterTypesUpdated)
+                }}
+              >
+                <span>{i18n.t(`nodeDefsTypes.${type}`)}</span>
+                {NodeDefUIProps.getIconByType(type)}
+              </button>
+            ))}
           </div>
           <FilterByChain filterChainUuids={filterChainUuids} setFilterChainUuids={setFilterChainUuids} />
         </>
