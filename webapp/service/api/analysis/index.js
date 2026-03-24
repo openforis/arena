@@ -5,7 +5,10 @@ import axios from 'axios'
 export const fetchChains = async ({ surveyId, surveyCycleKey = null } = {}) => {
   const {
     data: { list: chains },
-  } = await axios.get(`/api/survey/${surveyId}/processing-chains`, { params: { surveyCycleKey } })
+  } = await axios.get(
+    `/api/survey/${surveyId}/processing-chains`,
+    surveyCycleKey ? { params: { surveyCycleKey } } : undefined
+  )
   return { chains }
 }
 
