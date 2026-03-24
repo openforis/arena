@@ -75,15 +75,16 @@ const ItemDetails = (props) => {
     setItem(itemProp)
   }, [itemProp])
 
-  const onMoveUpClick = useCallback(
-    () => Actions.moveItem({ setItem, category, level, item, offset: -1 }),
+  const moveItem = useCallback(
+    ({ offset }) => {
+      Actions.moveItem({ setItem, category, level, item, offset })
+    },
     [Actions, category, item, level]
   )
 
-  const onMoveDownClick = useCallback(
-    () => Actions.moveItem({ setItem, category, level, item, offset: 1 }),
-    [Actions, category, item, level]
-  )
+  const onMoveUpClick = useCallback(() => moveItem({ offset: -1 }), [moveItem])
+
+  const onMoveDownClick = useCallback(() => moveItem({ offset: 1 }), [moveItem])
 
   const onDeleteClick = useCallback(
     () => Actions.deleteItem({ category, level, item, leaf }),
