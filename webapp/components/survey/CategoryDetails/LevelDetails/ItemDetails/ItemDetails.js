@@ -70,21 +70,15 @@ const ItemDetails = (props) => {
     }
   }, [active])
 
-  // Update item when itemProp changes (e.g. after saving the item or when another item is selected)
-  useEffect(() => {
-    setItem(itemProp)
-  }, [itemProp])
-
-  const moveItem = useCallback(
-    ({ offset }) => {
-      Actions.moveItem({ setItem, category, level, item, offset })
-    },
+  const onMoveUpClick = useCallback(
+    () => Actions.moveItem({ setItem, category, level, item, offset: -1 }),
     [Actions, category, item, level]
   )
 
-  const onMoveUpClick = useCallback(() => moveItem({ offset: -1 }), [moveItem])
-
-  const onMoveDownClick = useCallback(() => moveItem({ offset: 1 }), [moveItem])
+  const onMoveDownClick = useCallback(
+    () => Actions.moveItem({ setItem, category, level, item, offset: 1 }),
+    [Actions, category, item, level]
+  )
 
   const onDeleteClick = useCallback(
     () => Actions.deleteItem({ category, level, item, leaf }),
