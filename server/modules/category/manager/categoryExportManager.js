@@ -102,7 +102,7 @@ export const exportCategoryToStream = async (
   {
     survey,
     categoryUuid,
-    draft,
+    draft = true,
     language = null,
     includeUuid = false,
     includeSingleCode = false,
