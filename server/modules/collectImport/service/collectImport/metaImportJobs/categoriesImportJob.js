@@ -99,8 +99,7 @@ export default class CategoriesImportJob extends Job {
     const level = Category.getLevelByIndex(levelIndex)(category)
     const levelUuid = CategoryLevel.getUuid(level)
 
-    for (let itemIndex = 0; itemIndex < collectItems.length; itemIndex++) {
-      const collectItem = collectItems[itemIndex]
+    for (const collectItem of collectItems) {
       if (this.isCanceled()) {
         break
       }
@@ -112,7 +111,6 @@ export default class CategoriesImportJob extends Job {
         ...CategoryItem.newItem(levelUuid, CategoryItem.getUuid(parentItem), {
           [CategoryItem.keysProps.code]: itemCode,
           [CategoryItem.keysProps.labels]: labels,
-          [CategoryItem.keysProps.index]: itemIndex,
         }),
         categoryUuid: Category.getUuid(category), // Used to revalidate categories after items import
       }

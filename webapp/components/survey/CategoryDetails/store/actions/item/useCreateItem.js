@@ -15,29 +15,26 @@ export const useCreateItem = ({ setState }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
 
-  return useCallback(
-    async ({ category, level, parentItemUuid = null }) => {
-      const categoryUuid = Category.getUuid(category)
-      const levelIndex = CategoryLevel.getIndex(level)
-      const item = CategoryItem.newItem(CategoryLevel.getUuid(level), parentItemUuid)
+  return useCallback(async ({ category, level, parentItemUuid = null }) => {
+    const categoryUuid = Category.getUuid(category)
+    const levelIndex = CategoryLevel.getIndex(level)
+    const item = CategoryItem.newItem(CategoryLevel.getUuid(level), parentItemUuid)
 
-      setState(
-        A.pipe(
-          State.assocItem({ levelIndex, item }),
-          State.assocItemActive({ levelIndex, itemUuid: CategoryItem.getUuid(item) })
-        )
+    setState(
+      A.pipe(
+        State.assocItem({ levelIndex, item }),
+        State.assocItemActive({ levelIndex, itemUuid: CategoryItem.getUuid(item) })
       )
+    )
 
-      const {
-        data: { category: categoryUpdated, item: itemInserted },
-      } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, item)
+    const {
+      data: { category: categoryUpdated, item: itemInserted },
+    } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, item)
 
-      dispatch(SurveyActions.metaUpdated())
+    dispatch(SurveyActions.metaUpdated())
 
-      setState(
-        A.pipe(State.assocCategory({ category: categoryUpdated }), State.assocItem({ levelIndex, item: itemInserted }))
-      )
-    },
-    [dispatch, setState, surveyId]
-  )
+    setState(
+      A.pipe(State.assocCategory({ category: categoryUpdated }), State.assocItem({ levelIndex, item: itemInserted }))
+    )
+  }, [])
 }

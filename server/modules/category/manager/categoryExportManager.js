@@ -102,7 +102,7 @@ export const exportCategoryToStream = async (
   {
     survey,
     categoryUuid,
-    draft = true,
+    draft,
     language = null,
     includeUuid = false,
     includeSingleCode = false,
@@ -126,7 +126,6 @@ export const exportCategoryToStream = async (
     category,
     languages,
     includeCumulativeArea,
-    draft,
   })
 
   const fields = getCategoryExportHeaders({

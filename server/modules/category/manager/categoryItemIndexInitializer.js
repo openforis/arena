@@ -16,6 +16,23 @@ const shouldItemIndexBeInitialized = (item) => item && Objects.isEmpty(CategoryI
 const isIndexable = ({ item, draft }) =>
   (draft && CategoryItem.isDraft(item)) || (!draft && CategoryItem.isPublished(item))
 
+const calculateIndexesByItemUuid = ({ itemsByParentUuid, draft }) => {
+  const indexByItemUuid = {}
+
+  for (const groupItems of Object.values(itemsByParentUuid)) {
+    // Sort by ID to maintain consistent ordering
+    const sortedItems = groupItems.sort(itemsSortFunction)
+
+    for (let index = 0; index < sortedItems.length; index++) {
+      const item = sortedItems[index]
+      if (isIndexable({ item, draft })) {
+        indexByItemUuid[CategoryItem.getUuid(item)] = index
+      }
+    }
+  }
+  return indexByItemUuid
+}
+
 const itemsSortFunction = (itemA, itemB) => {
   const indexA = CategoryItem.getIndex(itemA)
   const indexB = CategoryItem.getIndex(itemB)
@@ -43,23 +60,6 @@ const itemsSortFunction = (itemA, itemB) => {
   }
   // 3. If indices are equal (or both are undefined), sort by ID (ascending).
   return CategoryItem.getId(itemA) - CategoryItem.getId(itemB)
-}
-
-const calculateIndexesByItemUuid = ({ itemsByParentUuid, draft }) => {
-  const indexByItemUuid = {}
-
-  for (const groupItems of Object.values(itemsByParentUuid)) {
-    // Sort by index or default to ID to maintain consistent ordering
-    const sortedItems = groupItems.sort(itemsSortFunction)
-
-    for (let index = 0; index < sortedItems.length; index++) {
-      const item = sortedItems[index]
-      if (isIndexable({ item, draft })) {
-        indexByItemUuid[CategoryItem.getUuid(item)] = index
-      }
-    }
-  }
-  return indexByItemUuid
 }
 
 const groupItemsByParentUuid = (items) => {
