@@ -79,6 +79,7 @@ export default () =>
           'key',
           'categoryName',
           'parentCode',
+          'categoryLevel',
           'enumerator',
           'taxonomyName',
           'multiple',
