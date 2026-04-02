@@ -1,0 +1,7 @@
+Sphinx
+pydata-sphinx-theme
+sphinx-notfound-page
+sphinxcontrib-images
+sphinx-icon
+sphinx-btn
+sphinxcontrib-youtube
