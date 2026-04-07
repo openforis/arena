@@ -91,7 +91,7 @@ const DataExport = (props) => {
 
       <Button
         className="btn-primary"
-        label="dataExportView.startExport"
+        label="dataExportView:startExport"
         onClick={onExportClick}
         testId={TestId.dataExport.startExport}
       />

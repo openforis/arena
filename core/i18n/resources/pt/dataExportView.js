@@ -1,0 +1,41 @@
+export default {
+  error: 'Erro ao exportar dados: {{details}}',
+  optionNotCompatibleWithDataImport: 'Não compatível com importação de dados',
+  options: {
+    header: '$t(common.options)',
+    fileFormatLabel: 'Formato de arquivo',
+    fileFormat: {
+      csv: 'CSV',
+      xlsx: 'Excel',
+    },
+    includeCategoryItemsLabels: 'Incluir rótulos dos itens de categoria',
+    includeCategories: 'Incluir categorias',
+    expandCategoryItems: 'Expandir itens de categoria',
+    exportSingleEntitiesIntoSeparateFiles: 'Exporte entidades únicas para arquivos separados',
+    includeAncestorAttributes: 'Incluir atributos ancestrais',
+    includeAnalysis: 'Incluir variáveis de resultado',
+    includeDataFromAllCycles: 'Incluir dados de todos os ciclos',
+    includeDateCreated: 'Incluir data de criação',
+    includeFiles: 'Incluir arquivos',
+    includeFileAttributeDefs: 'Incluir colunas de atributos de arquivo',
+    includeInternalUuids: 'Incluir UUIDs internos',
+    recordsModifiedAfter: 'Registros modificados após',
+  },
+  optionsInfo: {
+    expandCategoryItems:
+      'adiciona uma coluna booleana para cada item de categoria com valor VERDADEIRO se o item tiver sido selecionado, FALSO caso contrário',
+    exportSingleEntitiesIntoSeparateFiles: `exporta entidades únicas em arquivos separados; quando não estiver marcada, os atributos pertencentes a uma única entidade serão incluídos entre os de sua entidade múltipla ancestral mais próxima`,
+    includeAnalysis: 'inclui atributos de análise',
+    includeAncestorAttributes: 'inclui atributos que pertencem às entidades ancestrais, até a entidade raiz',
+    includeCategoryItemsLabels: 'adiciona uma coluna com um rótulo para cada item da categoria',
+    includeCategories: `as categorias serão exportadas para uma subpasta chamada "categorias"`,
+    includeDataFromAllCycles:
+      'serão incluídos dados de todos os ciclos, caso contrário apenas o selecionado será considerado',
+    includeDateCreated: 'inclui a data de criação de cada entidade (linha) em uma coluna chamada "data_criada"',
+    includeFiles: `exporta os arquivos associados aos registros para uma subpasta chamada "arquivos"`,
+    includeFileAttributeDefs: `adiciona colunas de atributos de arquivo: identificador interno do arquivo (file_uuid) e nome (file_name)`,
+    includeInternalUuids: 'inclui os identificadores internos (UUIDs) em colunas que terminam com o sufixo "_uuid"',
+    recordsModifiedAfter: 'exporta apenas dados de registros modificados após a data especificada',
+  },
+  startExport: 'Iniciar exportação',
+}

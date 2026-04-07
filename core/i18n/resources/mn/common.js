@@ -454,47 +454,6 @@ $t(common.raiseTicketInSupportForum)
     editRecord: 'Бичлэгийг засах',
   },
 
-  dataExportView: {
-    error: 'Өгөгдөл экспортлоход алдаа гарлаа: {{details}}',
-    optionNotCompatibleWithDataImport: 'Өгөгдөл импорттой нийцэхгүй',
-    options: {
-      header: '$t(common.options)',
-      fileFormatLabel: 'Файлын формат',
-      fileFormat: {
-        csv: 'CSV',
-        xlsx: 'Excel',
-      },
-      includeCategoryItemsLabels: 'Ангиллын элементүүдийн шошгыг оруулах',
-      includeCategories: 'Ангилалуудыг оруулах',
-      expandCategoryItems: 'Ангиллын элементүүдийг дэлгэх',
-      exportSingleEntitiesIntoSeparateFiles: 'Нэг объектуудыг тусдаа файлууд руу экспортлох',
-      includeAncestorAttributes: 'Өвөг дээдсийн шинж чанаруудыг оруулах',
-      includeAnalysis: 'Үр дүнгийн хувьсагчдыг оруулах',
-      includeDataFromAllCycles: 'Бүх мөчлөгийн өгөгдлийг оруулах',
-      includeDateCreated: 'Үүсгэсэн огноог оруулах',
-      includeFiles: 'Файлуудыг оруулах',
-      includeFileAttributeDefs: 'Файлын шинж чанарын багануудыг оруулах',
-      includeInternalUuids: 'Дотоод UUID-г оруулах',
-      recordsModifiedAfter: 'Дараа нь өөрчилсөн бичлэгүүд',
-    },
-    optionsInfo: {
-      expandCategoryItems:
-        'элемент сонгогдсон бол ҮНЭН, үгүй бол ХУДАЛ утгатай ангиллын элемент бүрт нэг боол багана нэмнэ',
-      exportSingleEntitiesIntoSeparateFiles: `нэг объектуудыг тусдаа файлууд руу экспортлох; хэрэв шалгагдаагүй бол нэг объектод хамаарах шинж чанарууд нь хамгийн ойрын дээд олон объектын шинж чанаруудад багтана`,
-      includeAnalysis: 'шинжилгээний шинж чанаруудыг оруулна',
-      includeAncestorAttributes: 'үндсэн объект хүртэлх дээд объектуудад хамаарах шинж чанаруудыг оруулна',
-      includeCategoryItemsLabels: 'ангиллын элемент бүрт шошго бүхий багана нэмнэ',
-      includeCategories: `ангилалууд "categories" гэсэн дэд хавтсанд экспортлогдоно`,
-      includeDataFromAllCycles: 'бүх мөчлөгийн өгөгдөл багтана, үгүй бол зөвхөн сонгогдсон мөчлөг л тооцогдоно',
-      includeDateCreated: 'объект бүрийн (мөр) үүсгэсэн огноог "date_created" гэсэн баганад оруулна',
-      includeFiles: `бичлэгүүдтэй холбоотой файлуудыг "files" гэсэн дэд хавтсанд экспортлоно`,
-      includeFileAttributeDefs: `файлын шинж чанарын багануудыг нэмнэ: файлын дотоод танигч (file_uuid) ба нэр (file_name)`,
-      includeInternalUuids: 'дотоод танигч (UUID) -г "_uuid" төгсгөлтэй багануудад оруулна',
-      recordsModifiedAfter: 'зөвхөн заасан огнооны дараа өөрчилсөн бичлэгүүдийн өгөгдлийг экспортлоно',
-    },
-    startExport: 'Экспортлохыг эхлүүлэх',
-  },
-
   dataImportView: {
     confirmDeleteAllRecords: 'Импортлохоос өмнө бүх бичлэгүүдийг устгах уу?',
     confirmDeleteAllRecordsInCycle: 'Импортлохоос өмнө {{cycle}} мөчлөг дэх бүх бичлэгүүдийг устгах уу?',

@@ -2,6 +2,7 @@ import activityLog from './activityLog'
 import appErrors from './appErrors'
 import auth from './auth'
 import common from './common'
+import dataExportView from './dataExportView'
 import emails from './emails'
 import homeView from './homeView'
 import jobs from './jobs'
@@ -17,6 +18,7 @@ export default {
   appErrors,
   auth,
   common,
+  dataExportView,
   emails,
   homeView,
   jobs,

@@ -454,48 +454,6 @@ $t(common.raiseTicketInSupportForum)
     editRecord: 'Редактировать запись',
   },
 
-  dataExportView: {
-    error: 'Ошибка экспорта данных: {{details}}',
-    optionNotCompatibleWithDataImport: 'Не совместимо с импортом данных',
-    options: {
-      header: '$t(common.options)',
-      fileFormatLabel: 'Формат файла',
-      fileFormat: {
-        csv: 'CSV',
-        xlsx: 'Excel',
-      },
-      includeCategoryItemsLabels: 'Включить метки элементов категории',
-      includeCategories: 'Включить категории',
-      expandCategoryItems: 'Развернуть элементы категории',
-      exportSingleEntitiesIntoSeparateFiles: 'Экспортировать отдельные сущности в отдельные файлы',
-      includeAncestorAttributes: 'Включить атрибуты предков',
-      includeAnalysis: 'Включить результирующие переменные',
-      includeDataFromAllCycles: 'Включить данные из всех циклов',
-      includeDateCreated: 'Включить дату создания',
-      includeFiles: 'Включить файлы',
-      includeFileAttributeDefs: 'Включить столбцы атрибутов файлов',
-      includeInternalUuids: 'Включить внутренние UUID',
-      recordsModifiedAfter: 'Записи, измененные после',
-    },
-    optionsInfo: {
-      expandCategoryItems:
-        'добавляет один логический столбец для каждого элемента категории со значением TRUE, если элемент был выбран, FALSE в противном случае',
-      exportSingleEntitiesIntoSeparateFiles: `экспортирует отдельные сущности в отдельные файлы; если не отмечено, атрибуты, принадлежащие одной сущности, будут включены среди атрибутов ее ближайшей родительской множественной сущности`,
-      includeAnalysis: 'включает атрибуты анализа',
-      includeAncestorAttributes: 'включает атрибуты, принадлежащие родительским сущностям, до корневой сущности',
-      includeCategoryItemsLabels: 'добавляет столбец с меткой для каждого элемента категории',
-      includeCategories: `категории будут экспортированы в подпапку "categories"`,
-      includeDataFromAllCycles:
-        'данные из всех циклов будут включены, в противном случае будет учитываться только выбранный',
-      includeDateCreated: 'включает дату создания каждой сущности (строки) в столбец "date_created"',
-      includeFiles: `экспортирует файлы, связанные с записями, в подпапку "files"`,
-      includeFileAttributeDefs: `добавляет столбцы атрибутов файлов: внутренний идентификатор файла (file_uuid) и имя (file_name)`,
-      includeInternalUuids: 'включает внутренние идентификаторы (UUID) в столбцы, оканчивающиеся суффиксом "_uuid"',
-      recordsModifiedAfter: 'экспортирует только данные из записей, измененных после указанной даты',
-    },
-    startExport: 'Начать экспорт',
-  },
-
   dataImportView: {
     confirmDeleteAllRecords: 'Удалить все записи перед импортом?',
     confirmDeleteAllRecordsInCycle: 'Удалить все записи в цикле {{cycle}} перед импортом?',
