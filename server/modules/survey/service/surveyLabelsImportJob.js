@@ -9,7 +9,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import { SurveyLabelsExportModel } from './surveyLabelsExportModel'
 
-const errorPrefix = `validationErrors.surveyLabelsImport.`
+const errorPrefix = `validationErrors:surveyLabelsImport.`
 
 const extractLabels = ({ row, langCodes, columnPrefix }) =>
   langCodes.reduce((acc, langCode) => {

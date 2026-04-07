@@ -44,7 +44,7 @@ const numericValueConverter = ({ value, headers }) => {
   const val = singlePropValueConverter({ value })
   const numericVal = Number(val)
   if (Number.isNaN(numericVal)) {
-    throw new SystemError('validationErrors.dataImport.invalidNumber', { value: val, headers })
+    throw new SystemError('validationErrors:dataImport.invalidNumber', { value: val, headers })
   }
   return numericVal
 }
@@ -102,7 +102,7 @@ const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ value, headers }) => {
     const val = singlePropValueConverter({ value })
     if (!allowedBooleanValues.includes(String(val).toLocaleLowerCase())) {
-      throw new SystemError('validationErrors.dataImport.invalidBoolean', { value: val, headers })
+      throw new SystemError('validationErrors:dataImport.invalidBoolean', { value: val, headers })
     }
     return String(booleanTrueValues.includes(String(val).toLocaleLowerCase()))
   },
@@ -114,7 +114,7 @@ const valueConverterByNodeDefType = {
       const itemUuid = await findCategoryItemUuid({ survey, categoryItemProvider, nodeDef, code })
       if (!itemUuid) {
         const attributeName = NodeDef.getName(nodeDef)
-        throw new SystemError('validationErrors.dataImport.invalidCode', { code, attributeName })
+        throw new SystemError('validationErrors:dataImport.invalidCode', { code, attributeName })
       }
       return Node.newNodeValueCode({ itemUuid, code })
     }
@@ -141,13 +141,13 @@ const valueConverterByNodeDefType = {
       allowedFormats: allowedDateFormats,
       formatTo: DateUtils.formats.dateISO,
       headers,
-      errorKey: 'validationErrors.dataImport.invalidDate',
+      errorKey: 'validationErrors:dataImport.invalidDate',
     }),
   [NodeDef.nodeDefType.decimal]: numericValueConverter,
   [NodeDef.nodeDefType.file]: ({ value, headers }) => {
     const { fileName, fileUuid: fileUuidInValue } = value
     if (Objects.isEmpty(fileName)) {
-      throw new SystemError('validationErrors.dataImport.emptyFileName', { headers, fileName })
+      throw new SystemError('validationErrors:dataImport.emptyFileName', { headers, fileName })
     }
     const fileUuid = fileUuidInValue ?? uuidv4()
     return {
@@ -160,7 +160,7 @@ const valueConverterByNodeDefType = {
     const taxonCode = value[Node.valuePropsTaxon.code]
     const taxon = await findTaxon({ survey, taxonProvider, nodeDef, taxonCode })
     if (!taxon) {
-      throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value: taxonCode, headers })
+      throw new SystemError('validationErrors:dataImport.invalidTaxonCode', { value: taxonCode, headers })
     }
     const taxonUuid = Taxon.getUuid(taxon)
     const vernacularName = value[Node.valuePropsTaxon.vernacularName]
@@ -190,7 +190,7 @@ const valueConverterByNodeDefType = {
       allowedFormats: allowedTimeFormats,
       formatTo: DateUtils.formats.timeStorage,
       headers,
-      errorKey: 'validationErrors.dataImport.invalidTime',
+      errorKey: 'validationErrors:dataImport.invalidTime',
     }),
 }
 
@@ -200,7 +200,7 @@ const checkAllHeadersAreValid =
     const { headers: possibleHeaders } = csvDataExportModel
     const invalidHeaders = headers.filter((header) => !possibleHeaders.includes(header))
     if (invalidHeaders.length > 0) {
-      throw new SystemError('validationErrors.dataImport.invalidHeaders', { invalidHeaders: invalidHeaders.join(', ') })
+      throw new SystemError('validationErrors:dataImport.invalidHeaders', { invalidHeaders: invalidHeaders.join(', ') })
     }
   }
 
@@ -210,7 +210,7 @@ const checkRequiredHeadersNotMissing =
     const requiredHeaders = csvDataExportModel.columns.filter((col) => col.key).map((col) => col.header)
     const missingRequiredHeaders = requiredHeaders.filter((header) => !headers.includes(header))
     if (missingRequiredHeaders.length > 0) {
-      throw new SystemError('validationErrors.dataImport.missingRequiredHeaders', { missingRequiredHeaders })
+      throw new SystemError('validationErrors:dataImport.missingRequiredHeaders', { missingRequiredHeaders })
     }
   }
 
