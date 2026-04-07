@@ -72,7 +72,7 @@ export const DataQueryExportModal = (props) => {
   if (Objects.isEmpty(availableOptions)) return null
 
   return (
-    <Modal className="data-query-export-modal" onClose={onClose} showCloseButton title="dataView.dataExport.title">
+    <Modal className="data-query-export-modal" onClose={onClose} showCloseButton title="dataView:dataExport.title">
       <ModalBody>
         <DataExportOptionsPanel
           availableOptions={availableOptions}

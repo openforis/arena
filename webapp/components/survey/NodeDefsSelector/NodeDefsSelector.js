@@ -84,7 +84,7 @@ const NodeDefsSelector = (props) => {
         className={classNames('btn-s', 'btn-toggle-filter', { highlight: showFilter || filterTypes.length > 0 })}
         disabled={A.isEmpty(nodeDefUuidEntity)}
         onClick={() => setShowFilter(!showFilter)}
-        title="dataView.filterAttributeTypes"
+        title="dataView:filterAttributeTypes"
         variant="outlined"
       />
 

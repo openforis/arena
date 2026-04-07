@@ -75,7 +75,7 @@ export const deleteRecords =
 
     dispatch(LoaderActions.hideLoader())
 
-    dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordDeleted', params: { count: records.length } }))
+    dispatch(NotificationActions.notifyInfo({ key: 'dataView:recordDeleted', params: { count: records.length } }))
 
     onRecordsUpdate?.()
   }

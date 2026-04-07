@@ -35,12 +35,12 @@ const modeButtonItems = [
   {
     key: modes.raw,
     iconClassName: 'icon-file-text2',
-    label: 'dataView.dataQuery.mode.raw',
+    label: 'dataView:dataQuery.mode.raw',
   },
   {
     key: modes.aggregate,
     iconClassName: 'icon-sigma',
-    label: 'dataView.dataQuery.mode.aggregate',
+    label: 'dataView:dataQuery.mode.aggregate',
   },
 ]
 
@@ -92,10 +92,10 @@ const ButtonBar = (props) => {
           className={classNames('btn-toggle-node-defs-selector', 'btn-s', { highlight: nodeDefsSelectorVisible })}
           iconClassName="icon-tab icon-14px"
           onClick={() => dispatch(DataExplorerActions.setNodeDefsSelectorVisible(!nodeDefsSelectorVisible))}
-          title={nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show'}
+          title={nodeDefsSelectorVisible ? 'dataView:nodeDefsSelector.hide' : 'dataView:nodeDefsSelector.show'}
           variant="outlined"
         />
-        <FormItem className="mode-form-item" label="dataView.dataQuery.mode.label">
+        <FormItem className="mode-form-item" label="dataView:dataQuery.mode.label">
           <ButtonGroup
             disabled={appSaving || !nodeDefsSelectorVisible}
             groupName="queryMode"
@@ -123,7 +123,7 @@ const ButtonBar = (props) => {
         <Checkbox
           checked={codesVisible}
           onChange={(val) => dispatch(DataExplorerActions.setCodesVisible(val))}
-          label="dataView.dataQuery.showCodes"
+          label="dataView:dataQuery.showCodes"
         />
       )}
 

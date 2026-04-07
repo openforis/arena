@@ -3,6 +3,7 @@ import auth from './auth'
 import common from './common'
 import dataExportView from './dataExportView'
 import dataImportView from './dataImportView'
+import dataView from './dataView'
 import homeView from './homeView'
 import jobs from './jobs'
 import messageView from './messageView'
@@ -18,6 +19,7 @@ export default {
   common,
   dataExportView,
   dataImportView,
+  dataView,
   homeView,
   jobs,
   messageView,

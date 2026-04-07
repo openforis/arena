@@ -55,10 +55,10 @@ const RecordEntryButtons = (props) => {
           data-testid={TestId.record.invalidBtn}
           className="btn btn-transparent error"
           to={`${appModuleUri(dataModules.recordValidationReport)}${Record.getUuid(record)}`}
-          title={i18n.t('dataView.showValidationReport')}
+          title={i18n.t('dataView:showValidationReport')}
         >
           <span className="icon icon-12px icon-warning icon-left" />
-          {i18n.t('dataView.invalidRecord')}
+          {i18n.t('dataView:invalidRecord')}
         </Link>
       )}
       <div className="survey-form-header__record-actions-steps">

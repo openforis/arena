@@ -27,7 +27,7 @@ const ButtonFilter = (props) => {
         className={`btn btn-edit${filter ? ' highlight' : ''}`}
         disabled={disabled}
         onClick={Actions.togglePanelFilter}
-        label="dataView.filterRecords.buttonTitle"
+        label="dataView:filterRecords.buttonTitle"
         title={filter ? Expression.toString(filter, Expression.modes.sql) : undefined}
         variant="outlined"
       />
@@ -42,7 +42,7 @@ const ButtonFilter = (props) => {
           excludeCurrentNodeDef={false}
           query={filter ? Expression.toString(filter) : ''}
           mode={Expression.modes.sql}
-          header="dataView.filterRecords.expressionEditorHeader"
+          header="dataView:filterRecords.expressionEditorHeader"
           onChange={({ expr }) => {
             const exprNormalized = ExpressionParser.normalize({ expr, canBeCall: true })
             onChangeQuery(Query.assocFilter(exprNormalized)(query))
