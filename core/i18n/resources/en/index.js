@@ -3,6 +3,7 @@ import appErrors from './appErrors'
 import auth from './auth'
 import common from './common'
 import dataExportView from './dataExportView'
+import dataImportView from './dataImportView'
 import emails from './emails'
 import homeView from './homeView'
 import jobs from './jobs'
@@ -19,6 +20,7 @@ export default {
   auth,
   common,
   dataExportView,
+  dataImportView,
   emails,
   homeView,
   jobs,

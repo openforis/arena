@@ -32,7 +32,7 @@ export const ImportStartButton = (props) => {
     confirmMessageKey,
     confirmMessageParams,
     disabled = false,
-    label = 'dataImportView.startImport',
+    label = 'dataImportView:startImport',
     onCancel = null,
     onUploadComplete,
     showConfirm = false,

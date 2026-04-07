@@ -179,7 +179,7 @@ export const DataImportFlatDataView = () => {
         JobActions.showJobMonitor({
           job,
           autoHide: true,
-          errorKeyHeaderName: 'dataImportView.errors.rowNum',
+          errorKeyHeaderName: 'dataImportView:errors.rowNum',
           errorsExportFileName,
           onComplete: (jobCompleted) => {
             setState((statePrev) => ({ ...statePrev, jobCompleted }))
@@ -219,32 +219,32 @@ export const DataImportFlatDataView = () => {
   return (
     <div className="main-container">
       <div className="steps-row">
-        <ButtonIconInfo title="dataImportView.importFromCsvStepsInfo" isTitleMarkdown />
+        <ButtonIconInfo title="dataImportView:importFromCsvStepsInfo" isTitleMarkdown />
         <Stepper activeStep={activeStep} steps={steps} />
       </div>
       <div className="internal-container">
         <div className="form">
           {canSelectCycle && (
-            <FormItem label="dataImportView.importIntoCycle">
+            <FormItem label="dataImportView:importIntoCycle">
               <CycleSelector selectedCycle={cycle} onChange={setStateProp('cycle')} />
             </FormItem>
           )}
 
           {!Objects.isEmpty(cycle) && (
-            <FormItem label="dataImportView.importType.label">
+            <FormItem label="dataImportView:importType.label">
               <ButtonGroup
                 selectedItemKey={dataImportType}
                 onChange={onImportTypeChange}
                 items={Object.values(importTypes).map((importType) => ({
                   key: importType,
-                  label: i18n.t(`dataImportView.importType.${importType}`),
+                  label: i18n.t(`dataImportView:importType.${importType}`),
                 }))}
               />
             </FormItem>
           )}
 
           {dataImportType && (
-            <FormItem className="entity-form-item" label="dataImportView.importIntoMultipleEntityOrAttribute">
+            <FormItem className="entity-form-item" label="dataImportView:importIntoMultipleEntityOrAttribute">
               <>
                 <NodeDefTreeSelect
                   nodeDefLabelType={nodeDefLabelType}
@@ -267,7 +267,7 @@ export const DataImportFlatDataView = () => {
             <ButtonMenuExport
               className="download-templates-btn"
               href={API.getDataImportFromCsvTemplatesUrl({ surveyId })}
-              label="dataImportView.downloadAllTemplates"
+              label="dataImportView:downloadAllTemplates"
               requestParams={{ cycle, includeFiles }}
             />
           )}
@@ -276,18 +276,18 @@ export const DataImportFlatDataView = () => {
               <ButtonMenuExport
                 className="download-template-btn"
                 href={API.getDataImportFromCsvTemplateUrl({ surveyId })}
-                label="dataImportView.downloadTemplate"
+                label="dataImportView:downloadTemplate"
                 requestParams={{ cycle, nodeDefUuid: selectedNodeDefUuid, includeFiles }}
               />
 
               {dataImportType === importTypes.updateExistingRecords && (
-                <ExpansionPanel buttonLabel="dataImportView.options.header" startClosed>
+                <ExpansionPanel buttonLabel="dataImportView:options.header" startClosed>
                   {allowedOptionsRecordUpdate.map((optionKey) => (
                     <Checkbox
                       key={optionKey}
                       checked={state[optionKey]}
-                      label={`dataImportView.options.${optionKey}`}
-                      info={infoVisibleByOption[optionKey] ? `dataImportView.optionsInfo.${optionKey}` : undefined}
+                      label={`dataImportView:options.${optionKey}`}
+                      info={infoVisibleByOption[optionKey] ? `dataImportView:optionsInfo.${optionKey}` : undefined}
                       infoParams={{ nodeDefName: NodeDef.getName(selectedNodeDef) }}
                       onChange={setStateProp(optionKey)}
                     />
@@ -305,19 +305,19 @@ export const DataImportFlatDataView = () => {
                 <ImportStartButton
                   className="btn-secondary"
                   disabled={!file}
-                  label="dataImportView.validateFile"
+                  label="dataImportView:validateFile"
                   startFunction={API.startDataImportFromCsvJob}
                   startFunctionParams={{ ...importStartParams, dryRun: true }}
                   onUploadComplete={onImportJobStart}
                 />
-                <ButtonIconInfo title="dataImportView.validateFileInfo" />
+                <ButtonIconInfo title="dataImportView:validateFileInfo" />
               </div>
 
               <ImportStartButton
                 confirmMessageKey={
                   deleteExistingEntities
-                    ? 'dataImportView.startImportConfirmWithDeleteExistingEntities'
-                    : 'dataImportView.startImportConfirm'
+                    ? 'dataImportView:startImportConfirmWithDeleteExistingEntities'
+                    : 'dataImportView:startImportConfirm'
                 }
                 disabled={!file}
                 showConfirm

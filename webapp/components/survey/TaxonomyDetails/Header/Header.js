@@ -70,7 +70,7 @@ const Header = (props) => {
             />
             <ButtonMenu
               className="date-import-template-menu-btn"
-              label="dataImportView.templateForImport"
+              label="dataImportView:templateForImport"
               iconClassName="icon-download2 icon-14px"
               items={Object.values(DataImportTemplateTypes).flatMap((templateType) =>
                 templateFileFormats.map((fileFormat) => ({
@@ -79,7 +79,7 @@ const Header = (props) => {
                     <ButtonDownload
                       href={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/import-template/`}
                       requestParams={{ draft: canEdit, fileFormat, templateType }}
-                      label={`dataImportView.templateFor_${templateType}DataImport_${fileFormat}`}
+                      label={`dataImportView:templateFor_${templateType}DataImport_${fileFormat}`}
                       variant="text"
                     />
                   ),
