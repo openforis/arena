@@ -36,16 +36,18 @@ export const PreferredUILanguageButtonMenu = () => {
     return [
       {
         key: autoLanguageKey,
-        content: i18n.t('userView.preferredUILanguage.auto', {
+        label: 'userView.preferredUILanguage.auto',
+        labelParams: {
           detectedLanguage: getLanguageLabel(detectedLanguageCode),
-        }),
+        },
       },
       ...supportedLanguages.map((langCode) => ({
         key: langCode,
-        content: getLanguageLabel(langCode),
+        label: getLanguageLabel(langCode),
+        labelIsI18nKey: false,
       })),
     ]
-  }, [i18n, browserLanguageCode])
+  }, [browserLanguageCode])
 
   return (
     <ButtonMenu

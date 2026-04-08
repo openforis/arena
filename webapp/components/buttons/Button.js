@@ -25,6 +25,7 @@ export const Button = forwardRef((props, ref) => {
     id,
     isTitleMarkdown = false,
     label: labelProp,
+    labelIsI18nKey = true,
     labelParams,
     onClick,
     primary,
@@ -35,6 +36,7 @@ export const Button = forwardRef((props, ref) => {
     testId,
     title: titleProp,
     titleClassName,
+    titleIsI18nKey = true,
     titleMarkdownClassName,
     titleMaxWidth,
     titleParams,
@@ -44,14 +46,14 @@ export const Button = forwardRef((props, ref) => {
 
   const t = useI18nT({ unescapeHtml: true })
 
-  const label = showLabel && labelProp ? t(labelProp, labelParams) : null
+  const label = showLabel && labelProp ? (labelIsI18nKey ? t(labelProp, labelParams) : labelProp) : null
 
   let title
   if (titleProp) {
-    title = t(titleProp, titleParams)
+    title = titleIsI18nKey ? t(titleProp, titleParams) : titleProp
   } else if (!showLabel && labelProp) {
     // use label as title when not showing label
-    title = t(labelProp, labelParams)
+    title = labelIsI18nKey ? t(labelProp, labelParams) : labelProp
   }
 
   const variant = active ? 'contained' : variantProp
@@ -114,6 +116,7 @@ Button.propTypes = {
   iconWidth: PropTypes.number,
   isTitleMarkdown: PropTypes.bool,
   label: PropTypes.string,
+  labelIsI18nKey: PropTypes.bool,
   labelParams: PropTypes.object,
   onClick: PropTypes.func,
   primary: PropTypes.bool,
@@ -124,6 +127,7 @@ Button.propTypes = {
   testId: PropTypes.string,
   title: PropTypes.string,
   titleClassName: PropTypes.string,
+  titleIsI18nKey: PropTypes.bool,
   titleMarkdownClassName: PropTypes.string,
   titleMaxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   titleParams: PropTypes.object,

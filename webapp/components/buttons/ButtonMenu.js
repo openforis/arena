@@ -68,6 +68,8 @@ export const ButtonMenu = (props) => {
                 testId={item.testId}
                 iconClassName={item.iconClassName}
                 label={item.label}
+                labelIsI18nKey={item.labelIsI18nKey}
+                labelParams={item.labelParams}
                 variant="text"
               />
             )}
