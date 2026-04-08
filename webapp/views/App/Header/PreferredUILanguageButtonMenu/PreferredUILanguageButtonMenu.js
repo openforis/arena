@@ -26,10 +26,10 @@ export const PreferredUILanguageButtonMenu = () => {
 
   const onItemClick = useCallback(
     (item) => {
-      const preferredLangNext = item.key === autoLanguageKey ? detectedLanguageCode : item.key
+      const preferredLangNext = item.key === autoLanguageKey ? null : item.key
       const userUpdated = User.assocPrefLanguage({ lang: preferredLangNext })(user)
       dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
-      i18n.changeLanguage(preferredLangNext)
+      i18n.changeLanguage(preferredLangNext ?? detectedLanguageCode)
     },
     [dispatch, i18n, user, detectedLanguageCode]
   )
