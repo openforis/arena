@@ -1,2 +1,1 @@
-import { DropdownPreferredUILanguage } from './DropdownPreferredUILanguage'
-export { DropdownPreferredUILanguage }
+export { ButtonMenuPreferredUILanguage } from './DropdownPreferredUILanguage'

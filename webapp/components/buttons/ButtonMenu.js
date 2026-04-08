@@ -14,6 +14,8 @@ export const ButtonMenu = (props) => {
     closeMenuOnItemClick = true,
     menuClassName,
     items,
+    onItemClick: onItemClickProp = undefined,
+    selectedItemKey = undefined,
     testId = null,
     variant = 'text',
     ...otherProps
@@ -31,6 +33,7 @@ export const ButtonMenu = (props) => {
 
   const onItemClick = (item) => () => {
     item.onClick?.()
+    onItemClickProp?.(item)
     if (closeMenuOnItemClick) {
       closeMenu()
     }
@@ -53,7 +56,12 @@ export const ButtonMenu = (props) => {
 
       <Menu anchorEl={anchorEl} className={menuClassName} open={open} onClose={closeMenu}>
         {items.map((item) => (
-          <MenuItem key={item.key} className="button-menu__item" onClick={onItemClick(item)}>
+          <MenuItem
+            key={item.key}
+            className="button-menu__item"
+            onClick={onItemClick(item)}
+            selected={item.key === selectedItemKey}
+          >
             {item.content ?? (
               <Button
                 className={classNames(item.className)}
@@ -83,5 +91,7 @@ ButtonMenu.propTypes = {
       onClick: PropTypes.func,
     })
   ),
+  onItemClick: PropTypes.func,
   menuClassName: PropTypes.string,
+  selectedItemKey: PropTypes.string,
 }

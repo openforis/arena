@@ -28,6 +28,7 @@ import { Breadcrumbs } from './Breadcrumbs'
 import { MessageNotificationPanel } from './MessageNotificationsPanel'
 import UserPopupMenu from './UserPopupMenu'
 import { useHasMessageNotifications } from '@webapp/store/ui'
+import { ButtonMenuPreferredUILanguage } from '../views/Users/UserEdit/DropdownPreferredUILanguage'
 import { QRCodeLoginDialog } from './QRCodeLoginDialog'
 
 const Header = () => {
@@ -119,6 +120,7 @@ const Header = () => {
             {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
           </>
         )}
+        <ButtonMenuPreferredUILanguage />
         <button
           className="app-header__btn-user"
           data-testid={TestId.header.userBtn}
