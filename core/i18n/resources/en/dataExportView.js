@@ -30,7 +30,7 @@ export default {
     includeCategoryItemsLabels: 'adds a column with a label for every category item',
     includeCategories: `categories will be exported into a subfolder called "categories"`,
     includeDataFromAllCycles:
-      'data from all cycles will be included, othwerwise only the selected one will be considered',
+      'data from all cycles will be included, otherwise only the selected one will be considered',
     includeDateCreated: 'includes the creation date of every entity (row) in a column called "date_created"',
     includeFiles: `exports files associated to the records into a subfolder called "files"`,
     includeFileAttributeDefs: `adds file attributes' columns: file internal identifier (file_uuid) and name (file_name)`,
