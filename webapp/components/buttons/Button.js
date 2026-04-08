@@ -9,6 +9,18 @@ import { useI18nT } from '@webapp/store/system'
 
 import { TooltipNew } from '../TooltipNew'
 
+const getTitle = ({ labelIsI18nKey, labelProp, labelParams, showLabel, t, titleIsI18nKey, titleParams, titleProp }) => {
+  if (titleProp) {
+    if (titleIsI18nKey) return t(titleProp, titleParams)
+    return titleProp
+  }
+  if (!showLabel && labelProp) {
+    if (labelIsI18nKey) return t(labelProp, labelParams)
+    return labelProp
+  }
+  return null
+}
+
 export const Button = forwardRef((props, ref) => {
   const {
     active,
@@ -48,13 +60,16 @@ export const Button = forwardRef((props, ref) => {
 
   const label = showLabel && labelProp ? (labelIsI18nKey ? t(labelProp, labelParams) : labelProp) : null
 
-  let title
-  if (titleProp) {
-    title = titleIsI18nKey ? t(titleProp, titleParams) : titleProp
-  } else if (!showLabel && labelProp) {
-    // use label as title when not showing label
-    title = labelIsI18nKey ? t(labelProp, labelParams) : labelProp
-  }
+  const title = getTitle({
+    labelIsI18nKey,
+    labelProp,
+    labelParams,
+    showLabel,
+    t,
+    titleIsI18nKey,
+    titleParams,
+    titleProp,
+  })
 
   const variant = active ? 'contained' : variantProp
 
