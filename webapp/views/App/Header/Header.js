@@ -1,7 +1,7 @@
 import './Header.scss'
 
 import classNames from 'classnames'
-import { useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
