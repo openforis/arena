@@ -8,6 +8,7 @@ import * as User from '@core/user/user'
 import { ButtonMenu } from '@webapp/components'
 import { useI18n } from '@webapp/store/system'
 import { UserActions, useUser } from '@webapp/store/user'
+import { useBrowserLanguageCode } from '@webapp/components/hooks'
 
 const autoLanguageKey = '__auto__'
 
@@ -16,6 +17,7 @@ export const ButtonMenuPreferredUILanguage = () => {
   const i18n = useI18n()
   const user = useUser()
   const preferredLanguageCode = User.getPrefLanguage(user)
+  const browserLanguageCode = useBrowserLanguageCode()
 
   const onItemClick = useCallback(
     (item) => {
@@ -28,8 +30,9 @@ export const ButtonMenuPreferredUILanguage = () => {
   )
 
   const items = useMemo(() => {
-    const browserLanguage = navigator.language ?? defaultLanguage
-    const detectedLanguageCode = supportedLanguages.includes(browserLanguage) ? browserLanguage : defaultLanguage
+    const detectedLanguageCode = supportedLanguages.includes(browserLanguageCode)
+      ? browserLanguageCode
+      : defaultLanguage
     return [
       {
         key: autoLanguageKey,
@@ -42,7 +45,7 @@ export const ButtonMenuPreferredUILanguage = () => {
         content: getLanguageLabel(langCode),
       })),
     ]
-  }, [i18n])
+  }, [i18n, browserLanguageCode])
 
   return (
     <ButtonMenu
