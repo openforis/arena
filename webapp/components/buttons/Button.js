@@ -9,16 +9,25 @@ import { useI18nT } from '@webapp/store/system'
 
 import { TooltipNew } from '../TooltipNew'
 
-const getTitle = ({ labelIsI18nKey, labelProp, labelParams, showLabel, t, titleIsI18nKey, titleParams, titleProp }) => {
-  if (titleProp) {
-    if (titleIsI18nKey) return t(titleProp, titleParams)
-    return titleProp
+const getTitle = (props, t) => {
+  const { labelParams, label, titleParams, title } = props
+  const { labelIsI18nKey = true, showLabel = true, titleIsI18nKey = true } = props
+  if (title) {
+    if (titleIsI18nKey) return t(title, titleParams)
+    return title
   }
-  if (!showLabel && labelProp) {
-    if (labelIsI18nKey) return t(labelProp, labelParams)
-    return labelProp
+  if (!showLabel && label) {
+    if (labelIsI18nKey) return t(label, labelParams)
+    return label
   }
   return null
+}
+
+const getLabel = (props, t) => {
+  const { labelIsI18nKey = true, labelParams, label, showLabel = true } = props
+  if (!showLabel || !label) return null
+  if (labelIsI18nKey) return t(label, labelParams)
+  return label
 }
 
 export const Button = forwardRef((props, ref) => {
@@ -58,18 +67,9 @@ export const Button = forwardRef((props, ref) => {
 
   const t = useI18nT({ unescapeHtml: true })
 
-  const label = showLabel && labelProp ? (labelIsI18nKey ? t(labelProp, labelParams) : labelProp) : null
+  const label = getLabel(props, t)
 
-  const title = getTitle({
-    labelIsI18nKey,
-    labelProp,
-    labelParams,
-    showLabel,
-    t,
-    titleIsI18nKey,
-    titleParams,
-    titleProp,
-  })
+  const title = getTitle(props, t)
 
   const variant = active ? 'contained' : variantProp
 
