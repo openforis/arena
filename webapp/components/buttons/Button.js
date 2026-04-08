@@ -45,9 +45,6 @@ export const Button = forwardRef((props, ref) => {
     iconWidth,
     id,
     isTitleMarkdown = false,
-    label: labelProp,
-    labelIsI18nKey = true,
-    labelParams,
     onClick,
     primary,
     secondary,
@@ -55,12 +52,9 @@ export const Button = forwardRef((props, ref) => {
     showLabel = true,
     size = 'medium',
     testId,
-    title: titleProp,
     titleClassName,
-    titleIsI18nKey = true,
     titleMarkdownClassName,
     titleMaxWidth,
-    titleParams,
     variant: variantProp = 'contained',
     ...otherProps
   } = props
