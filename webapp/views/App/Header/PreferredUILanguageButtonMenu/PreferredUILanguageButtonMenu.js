@@ -6,9 +6,9 @@ import { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
 import * as User from '@core/user/user'
 
 import { ButtonMenu } from '@webapp/components'
+import { useBrowserLanguageCode } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { UserActions, useUser } from '@webapp/store/user'
-import { useBrowserLanguageCode } from '@webapp/components/hooks'
 
 const autoLanguageKey = '__auto__'
 
@@ -19,20 +19,22 @@ export const PreferredUILanguageButtonMenu = () => {
   const preferredLanguageCode = User.getPrefLanguage(user)
   const browserLanguageCode = useBrowserLanguageCode()
 
+  const detectedLanguageCode = useMemo(
+    () => (supportedLanguages.includes(browserLanguageCode) ? browserLanguageCode : defaultLanguage),
+    [browserLanguageCode]
+  )
+
   const onItemClick = useCallback(
     (item) => {
-      const preferredLangNext = item.key === autoLanguageKey ? null : item.key
+      const preferredLangNext = item.key === autoLanguageKey ? detectedLanguageCode : item.key
       const userUpdated = User.assocPrefLanguage({ lang: preferredLangNext })(user)
       dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
-      i18n.changeLanguage(preferredLangNext ?? defaultLanguage)
+      i18n.changeLanguage(preferredLangNext)
     },
-    [dispatch, i18n, user]
+    [dispatch, i18n, user, detectedLanguageCode]
   )
 
   const items = useMemo(() => {
-    const detectedLanguageCode = supportedLanguages.includes(browserLanguageCode)
-      ? browserLanguageCode
-      : defaultLanguage
     return [
       {
         key: autoLanguageKey,
@@ -47,7 +49,7 @@ export const PreferredUILanguageButtonMenu = () => {
         labelIsI18nKey: false,
       })),
     ]
-  }, [browserLanguageCode])
+  }, [detectedLanguageCode])
 
   return (
     <ButtonMenu
