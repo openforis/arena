@@ -6,9 +6,9 @@ import { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
 import * as User from '@core/user/user'
 
 import { ButtonMenu } from '@webapp/components'
+import { useBrowserLanguageCode } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { UserActions, useUser } from '@webapp/store/user'
-import { useBrowserLanguageCode } from '@webapp/components/hooks'
 
 const autoLanguageKey = '__auto__'
 
@@ -19,33 +19,37 @@ export const PreferredUILanguageButtonMenu = () => {
   const preferredLanguageCode = User.getPrefLanguage(user)
   const browserLanguageCode = useBrowserLanguageCode()
 
+  const detectedLanguageCode = useMemo(
+    () => (supportedLanguages.includes(browserLanguageCode) ? browserLanguageCode : defaultLanguage),
+    [browserLanguageCode]
+  )
+
   const onItemClick = useCallback(
     (item) => {
       const preferredLangNext = item.key === autoLanguageKey ? null : item.key
       const userUpdated = User.assocPrefLanguage({ lang: preferredLangNext })(user)
       dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
-      i18n.changeLanguage(preferredLangNext ?? defaultLanguage)
+      i18n.changeLanguage(preferredLangNext ?? detectedLanguageCode)
     },
-    [dispatch, i18n, user]
+    [dispatch, i18n, user, detectedLanguageCode]
   )
 
   const items = useMemo(() => {
-    const detectedLanguageCode = supportedLanguages.includes(browserLanguageCode)
-      ? browserLanguageCode
-      : defaultLanguage
     return [
       {
         key: autoLanguageKey,
-        content: i18n.t('userView.preferredUILanguage.auto', {
+        label: 'userView.preferredUILanguage.auto',
+        labelParams: {
           detectedLanguage: getLanguageLabel(detectedLanguageCode),
-        }),
+        },
       },
       ...supportedLanguages.map((langCode) => ({
         key: langCode,
-        content: getLanguageLabel(langCode),
+        label: getLanguageLabel(langCode),
+        labelIsI18nKey: false,
       })),
     ]
-  }, [i18n, browserLanguageCode])
+  }, [detectedLanguageCode])
 
   return (
     <ButtonMenu

@@ -65,9 +65,11 @@ export const ButtonMenu = (props) => {
             {item.content ?? (
               <Button
                 className={classNames(item.className)}
-                testId={item.testId}
                 iconClassName={item.iconClassName}
                 label={item.label}
+                labelIsI18nKey={item.labelIsI18nKey}
+                labelParams={item.labelParams}
+                testId={item.testId}
                 variant="text"
               />
             )}
@@ -84,11 +86,15 @@ ButtonMenu.propTypes = {
   items: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
+      className: PropTypes.string,
       content: PropTypes.node,
       icon: PropTypes.node,
       iconClassName: PropTypes.string,
       label: PropTypes.string,
+      labelIsI18nKey: PropTypes.bool,
+      labelParams: PropTypes.object,
       onClick: PropTypes.func,
+      testId: PropTypes.string,
     })
   ),
   onItemClick: PropTypes.func,

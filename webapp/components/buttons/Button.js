@@ -9,6 +9,27 @@ import { useI18nT } from '@webapp/store/system'
 
 import { TooltipNew } from '../TooltipNew'
 
+const getTitle = (props, t) => {
+  const { labelParams, label, titleParams, title } = props
+  const { labelIsI18nKey = true, showLabel = true, titleIsI18nKey = true } = props
+  if (title) {
+    if (titleIsI18nKey) return t(title, titleParams)
+    return title
+  }
+  if (!showLabel && label) {
+    if (labelIsI18nKey) return t(label, labelParams)
+    return label
+  }
+  return null
+}
+
+const getLabel = (props, t) => {
+  const { labelIsI18nKey = true, labelParams, label, showLabel = true } = props
+  if (!showLabel || !label) return null
+  if (labelIsI18nKey) return t(label, labelParams)
+  return label
+}
+
 export const Button = forwardRef((props, ref) => {
   const {
     active,
@@ -24,35 +45,24 @@ export const Button = forwardRef((props, ref) => {
     iconWidth,
     id,
     isTitleMarkdown = false,
-    label: labelProp,
-    labelParams,
     onClick,
     primary,
     secondary,
     showIcon = true,
-    showLabel = true,
     size = 'medium',
     testId,
-    title: titleProp,
     titleClassName,
     titleMarkdownClassName,
     titleMaxWidth,
-    titleParams,
     variant: variantProp = 'contained',
     ...otherProps
   } = props
 
   const t = useI18nT({ unescapeHtml: true })
 
-  const label = showLabel && labelProp ? t(labelProp, labelParams) : null
+  const label = getLabel(props, t)
 
-  let title
-  if (titleProp) {
-    title = t(titleProp, titleParams)
-  } else if (!showLabel && labelProp) {
-    // use label as title when not showing label
-    title = t(labelProp, labelParams)
-  }
+  const title = getTitle(props, t)
 
   const variant = active ? 'contained' : variantProp
 
@@ -114,6 +124,7 @@ Button.propTypes = {
   iconWidth: PropTypes.number,
   isTitleMarkdown: PropTypes.bool,
   label: PropTypes.string,
+  labelIsI18nKey: PropTypes.bool,
   labelParams: PropTypes.object,
   onClick: PropTypes.func,
   primary: PropTypes.bool,
@@ -124,6 +135,7 @@ Button.propTypes = {
   testId: PropTypes.string,
   title: PropTypes.string,
   titleClassName: PropTypes.string,
+  titleIsI18nKey: PropTypes.bool,
   titleMarkdownClassName: PropTypes.string,
   titleMaxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   titleParams: PropTypes.object,
