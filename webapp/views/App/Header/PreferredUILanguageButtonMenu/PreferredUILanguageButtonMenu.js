@@ -12,7 +12,7 @@ import { useBrowserLanguageCode } from '@webapp/components/hooks'
 
 const autoLanguageKey = '__auto__'
 
-export const ButtonMenuPreferredUILanguage = () => {
+export const PreferredUILanguageButtonMenu = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const user = useUser()

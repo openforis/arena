@@ -1,7 +1,7 @@
 import './Header.scss'
 
 import classNames from 'classnames'
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
@@ -22,13 +22,13 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { useHasMessageNotifications } from '@webapp/store/ui'
 
 import { Breadcrumbs } from './Breadcrumbs'
 import { MessageNotificationPanel } from './MessageNotificationsPanel'
-import UserPopupMenu from './UserPopupMenu'
-import { useHasMessageNotifications } from '@webapp/store/ui'
-import { ButtonMenuPreferredUILanguage } from '../views/Users/UserEdit/DropdownPreferredUILanguage'
+import { PreferredUILanguageButtonMenu } from './PreferredUILanguageButtonMenu'
 import { QRCodeLoginDialog } from './QRCodeLoginDialog'
+import UserPopupMenu from './UserPopupMenu'
 
 const Header = () => {
   const dispatch = useDispatch()
@@ -122,7 +122,7 @@ const Header = () => {
             {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
           </>
         )}
-        <ButtonMenuPreferredUILanguage />
+        <PreferredUILanguageButtonMenu />
         <button
           className="app-header__btn-user"
           data-testid={TestId.header.userBtn}
