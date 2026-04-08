@@ -29,7 +29,7 @@ export const FileUploadChunkSizeDropdown = ({ className, onChange, value }) => {
   if (!userIsSystemAdmin) return null
 
   return (
-    <FormItem className={className} label="dataImportView.fileUploadChunkSize.label">
+    <FormItem className={className} label="dataImportView:fileUploadChunkSize.label">
       <Dropdown
         className="chunk-size-dropdown"
         clearable={false}

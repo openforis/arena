@@ -26,11 +26,11 @@ export const previewRecordsMerge =
     const onMergeConfirmed = () => dispatch({ type: ActionTypes.recordLoad, record, noHeader: true })
 
     if (nodesUpdated + nodesCreated === 0) {
-      dispatch(NotificationActions.notifyWarning({ key: 'dataView.records.merge.noChangesWillBeApplied' }))
+      dispatch(NotificationActions.notifyWarning({ key: 'dataView:records.merge.noChangesWillBeApplied' }))
     } else if (nodesUpdated > updatedNodesWarnLimit) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'dataView.records.merge.confirmTooManyDifferencesMessage',
+          key: 'dataView:records.merge.confirmTooManyDifferencesMessage',
           params: { nodesUpdated },
           onOk: onMergeConfirmed,
         })
@@ -51,7 +51,7 @@ export const mergeRecords =
 
     onRecordsUpdate()
 
-    dispatch(NotificationActions.notifyInfo({ key: 'dataView.records.merge.performedSuccessfullyMessage' }))
+    dispatch(NotificationActions.notifyInfo({ key: 'dataView:records.merge.performedSuccessfullyMessage' }))
 
     dispatch(LoaderActions.hideLoader())
   }

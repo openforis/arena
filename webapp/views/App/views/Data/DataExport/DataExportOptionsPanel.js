@@ -54,13 +54,13 @@ export const DataExportOptionsPanel = (props) => {
   }, [availableOptionsProp, canAnalyzeRecords, hasMultipleCycles, isSystemAdmin])
 
   return (
-    <ExpansionPanel className="data-export-expansion-panel" buttonLabel="dataExportView.options.header">
-      <FormItem label={`dataExportView.options.${options.fileFormat}Label`}>
+    <ExpansionPanel className="data-export-expansion-panel" buttonLabel="dataExportView:options.header">
+      <FormItem label={`dataExportView:options.${options.fileFormat}Label`}>
         <ButtonGroup
           groupName="fileFormat"
           items={availableFileFormats.map((key) => ({
             key,
-            label: `dataExportView.options.fileFormat.${key}`,
+            label: `dataExportView:options.fileFormat.${key}`,
           }))}
           onChange={onOptionChange(options.fileFormat)}
           selectedItemKey={selectedOptionsByKey[options.fileFormat]}
@@ -72,14 +72,14 @@ export const DataExportOptionsPanel = (props) => {
           checked={selectedOptionsByKey[optionKey]}
           className={dataImportNonCompatibilityByOption[optionKey] ? 'with-asterisk' : undefined}
           disabled={optionKey === options.includeFileAttributeDefs && selectedOptionsByKey[options.includeFiles]}
-          info={`dataExportView.optionsInfo.${optionKey}`}
-          label={`dataExportView.options.${optionKey}`}
+          info={`dataExportView:optionsInfo.${optionKey}`}
+          label={`dataExportView:options.${optionKey}`}
           onChange={onOptionChange(optionKey)}
         />
       ))}
       <FormItem
-        info={`dataExportView.optionsInfo.${options.recordsModifiedAfter}`}
-        label={`dataExportView.options.${options.recordsModifiedAfter}`}
+        info={`dataExportView:optionsInfo.${options.recordsModifiedAfter}`}
+        label={`dataExportView:options.${options.recordsModifiedAfter}`}
       >
         <DateInput
           onChange={onOptionChange(options.recordsModifiedAfter)}
@@ -89,7 +89,7 @@ export const DataExportOptionsPanel = (props) => {
       </FormItem>
       {availableOptions.some((optionKey) => dataImportNonCompatibilityByOption[optionKey]) && (
         <span className="not-compatible-with-data-import-message">
-          *{i18n.t('dataExportView.optionNotCompatibleWithDataImport')}
+          *{i18n.t('dataExportView:optionNotCompatibleWithDataImport')}
         </span>
       )}
     </ExpansionPanel>

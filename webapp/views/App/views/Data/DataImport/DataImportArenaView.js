@@ -43,7 +43,7 @@ const generateImportSummary = ({ result, i18n }) =>
         importSummaryItemKeys.includes(key) && (!importSummaryItemKeysExcludedIfEmpty.includes(key) || value > 0)
     )
     .reduce((acc, [summaryItemKey, summaryItemValue]) => {
-      const summaryItemLabel = i18n.t(`dataImportView.jobs.ArenaDataImportJob.importSummaryItem.${summaryItemKey}`)
+      const summaryItemLabel = i18n.t(`dataImportView:jobs.ArenaDataImportJob.importSummaryItem.${summaryItemKey}`)
       acc.push(`- ${summaryItemLabel}: ${summaryItemValue}`)
       return acc
     }, [])
@@ -74,7 +74,7 @@ export const DataImportArenaView = () => {
       const summary = generateImportSummary({ result, i18n })
       dispatch(
         NotificationActions.notifyInfo({
-          key: 'dataImportView.jobs.ArenaDataImportJob.importCompleteSuccessfully',
+          key: 'dataImportView:jobs.ArenaDataImportJob.importCompleteSuccessfully',
           params: { summary },
           autoHide: false,
         })
@@ -103,8 +103,8 @@ export const DataImportArenaView = () => {
       <div className="form">
         {surveyCycleKeys.length > 1 && (
           <fieldset>
-            <legend>{i18n.t('dataImportView.options.header')}</legend>
-            <FormItem className="display-flex" label="dataImportView.importIntoCycle">
+            <legend>{i18n.t('dataImportView:options.header')}</legend>
+            <FormItem className="display-flex" label="dataImportView:importIntoCycle">
               <CycleSelector selectedCycle={cycle} onChange={(cycle) => setState((state) => ({ ...state, cycle }))} />
             </FormItem>
           </fieldset>
@@ -112,11 +112,11 @@ export const DataImportArenaView = () => {
 
         <FormItem
           className="display-flex"
-          info="dataImportView.conflictResolutionStrategy.info"
-          label="dataImportView.conflictResolutionStrategy.label"
+          info="dataImportView:conflictResolutionStrategy.info"
+          label="dataImportView:conflictResolutionStrategy.label"
         >
           <Dropdown
-            itemLabel={(strategy) => i18n.t(`dataImportView.conflictResolutionStrategy.${strategy}`)}
+            itemLabel={(strategy) => i18n.t(`dataImportView:conflictResolutionStrategy.${strategy}`)}
             itemValue={(item) => item}
             items={Object.values(ConflictResolutionStrategy)}
             onChange={(conflictResolutionStrategy) => setState((state) => ({ ...state, conflictResolutionStrategy }))}
@@ -133,7 +133,7 @@ export const DataImportArenaView = () => {
         />
 
         <ImportStartButton
-          confirmMessageKey="dataImportView.startImportConfirm"
+          confirmMessageKey="dataImportView:startImportConfirm"
           disabled={!file}
           showConfirm
           startFunction={API.startDataImportFromArenaJob}

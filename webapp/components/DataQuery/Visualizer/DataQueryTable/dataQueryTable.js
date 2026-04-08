@@ -22,10 +22,10 @@ const DataQueryTable = (props) => {
   if (!colWidth) return null
 
   if (!Query.hasSelection(query)) {
-    return <div className="no-data">{i18n.t('dataView.dataVis.noSelection')}</div>
+    return <div className="no-data">{i18n.t('dataView:dataVis.noSelection')}</div>
   }
   if (dataEmpty && !dataLoading && !dataLoadingError) {
-    return <div className="no-data">{i18n.t('dataView.dataVis.noData')}</div>
+    return <div className="no-data">{i18n.t('dataView:dataVis.noData')}</div>
   }
 
   return (
@@ -41,7 +41,7 @@ const DataQueryTable = (props) => {
       />
 
       <div className="table__data-rows">
-        {dataLoadingError && <div className="data-loading-error">{i18n.t('dataView.dataVis.errorLoadingData')}</div>}
+        {dataLoadingError && <div className="data-loading-error">{i18n.t('dataView:dataVis.errorLoadingData')}</div>}
 
         {data?.map((row, i) => {
           const rowNo = i + offset + 1

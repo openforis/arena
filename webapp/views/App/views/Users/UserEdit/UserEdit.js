@@ -26,7 +26,6 @@ import ProfilePictureEditor from './ProfilePictureEditor'
 import { useEditUser } from './store'
 import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
-import { DropdownPreferredUILanguage } from './DropdownPreferredUILanguage'
 import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
 
 const UserEdit = () => {
@@ -122,12 +121,6 @@ const UserEdit = () => {
           value={User.getEmail(userToUpdate)}
         />
       )}
-      {userUuid && editingLoggedInUser && (
-        <FormItem label="userView.preferredUILanguage.label">
-          <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
-        </FormItem>
-      )}
-
       <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
 
       {(canViewSystemAdmin || (canViewSurveyManager && !systemAdmin)) && (

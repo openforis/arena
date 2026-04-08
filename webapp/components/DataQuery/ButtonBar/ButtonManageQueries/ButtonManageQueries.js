@@ -17,7 +17,7 @@ const ButtonManageQueries = (props) => {
         disabled={disabled}
         iconClassName="icon-list icon-16px"
         onClick={Actions.togglePanelQueries}
-        label="dataView.dataQuery.manageQueries"
+        label="dataView:dataQuery.manageQueries"
       />
 
       {State.isPanelQueriesShown(state) && (

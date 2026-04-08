@@ -98,7 +98,7 @@ const AttributesSelector = (props) => {
         <AttributeSelector
           key={NodeDef.getUuid(nodeDefAncestor)}
           labelFunction={(nodeDef) =>
-            i18n.t('dataView.nodeDefsSelector.nodeDefFrequency', {
+            i18n.t('dataView:nodeDefsSelector.nodeDefFrequency', {
               nodeDefLabel: NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType }),
             })
           }
