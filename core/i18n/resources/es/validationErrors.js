@@ -185,7 +185,7 @@ export default {
   },
 
   user: {
-    emailRequired: '$t(validationErrors:user.emailRequired)',
+    emailRequired: 'El correo electrónico es obligatorio',
     emailInvalid: 'Correo electrónico no válido',
     emailNotFound: 'Correo electrónico no encontrado',
     groupRequired: 'El grupo es obligatorio',
@@ -205,7 +205,7 @@ export default {
     countryRequired: 'País es obligatorio',
     emailRequired: '$t(validationErrors:user.emailRequired)',
     firstNameRequired: 'El nombre es obligatorio',
-    institution: 'Institución es obligatorio',
+    institutionRequired: 'Institución es obligatorio',
     lastNameRequired: 'El apellido es obligatorio',
     purposeRequired: 'El propósito es obligatorio',
     surveyNameRequired: 'El nombre de la encuesta es obligatorio',
