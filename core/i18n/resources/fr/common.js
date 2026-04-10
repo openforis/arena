@@ -798,6 +798,8 @@ $t(common.cantUndoWarning)`,
     terminate: 'Terminer',
   },
   chain: {
+    quantitative: 'Quantitatif',
+    categorical: 'Catégoriel',
     addQuantitative: 'Ajouter un attribut quantitatif',
     addCategorical: 'Ajouter un attribut catégoriel',
     emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',

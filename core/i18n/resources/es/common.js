@@ -647,6 +647,8 @@ export default {
     terminate: 'Terminar',
   },
   chain: {
+    quantitative: 'Cuantitativo',
+    categorical: 'Categórico',
     addQuantitative: 'Agregar atributo cuantitativo',
     addCategorical: 'Agregar atributo categórico',
     emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
