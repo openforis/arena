@@ -9,7 +9,15 @@
 
     .form-item,
     .labels-editor.with-label {
+      height: auto;
+      white-space: nowrap;
       grid-template-columns: 0.3fr 0.65fr;
+    }
+
+    .form-row {
+      .form-item {
+        width: auto;
+      }
     }
 
     .dropdown,
@@ -46,8 +54,7 @@
     }
 
     .chain-basic-props,
-    .chain-sampling-design,
-    .statistical-analysis {
+    .chain-sampling-design {
       display: flex;
       flex-direction: column;
       justify-self: center;
@@ -59,15 +66,59 @@
     }
 
     .chain-sampling-design {
-      width: 50rem;
+      flex-flow: wrap;
 
       .form-item {
-        width: 50rem;
         grid-template-columns: 12rem 1fr;
       }
     }
 
-    .nonResponseBiasCorrectionContainer {
+    .form_row {
+      display: flex;
+      gap: 3rem;
+
+      .form-item {
+        display: flex;
+      }
+
+      &.checkbox-with-info {
+        gap: 0rem;
+        align-items: center;
+      }
+
+      &.p-value {
+        margin-left: 16%;
+      }
+    }
+
+    .entity-selector,
+    .attributes-selector {
+      width: 30rem;
+    }
+
+    .entity-selector-wrapper {
+      display: flex;
+
+      .warning-badge {
+        position: relative;
+      }
+    }
+
+    .dimensions-selector,
+    .filter {
+      width: 30rem;
+    }
+
+    .dropdown-wrapper.p-value-dropdown {
+      width: 7rem;
+
+      .dropdown {
+        width: 7rem;
+      }
+    }
+
+    .nonResponseBiasCorrectionContainer,
+    .clustering-only-variances {
       display: flex;
       flex-direction: row;
       align-items: center;
