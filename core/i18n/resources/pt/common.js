@@ -794,8 +794,8 @@ $t(common.cantUndoWarning)`,
     terminate: 'Encerrar',
   },
   chain: {
-    quantitative: 'Quantitativo',
-    categorical: 'Categórico',
+    addQuantitative: 'Adicionar atributo quantitativo',
+    addCategorical: 'Adicionar atributo categórico',
     emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
     entityExcludedInRStudioScripts:
       'a entidade e todas as variáveis de resultado relacionadas serão excluídas dos scripts do RStudio',

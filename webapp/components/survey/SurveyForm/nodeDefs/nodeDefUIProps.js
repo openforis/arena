@@ -38,19 +38,19 @@ const keyIcon = <span className="icon icon-key icon-left" />
 
 const propsUI = {
   [integer]: {
-    icon: <span className="icon-left node_def__icon">123</span>,
+    icon: <span className="icon icon-left node_def__icon">123</span>,
     numberFormat: NumberFormats.integer(),
     defaultValue: '',
   },
 
   [decimal]: {
-    icon: <span className="icon-left node_def__icon">1.23</span>,
+    icon: <span className="icon icon-left node_def__icon">1.23</span>,
     numberFormat: NumberFormats.decimal(),
     defaultValue: '',
   },
 
   [text]: {
-    icon: <span className="icon-left node_def__icon">ABC</span>,
+    icon: <span className="icon icon-left node_def__icon">ABC</span>,
     defaultValue: '',
   },
 

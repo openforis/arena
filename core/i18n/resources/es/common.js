@@ -647,8 +647,8 @@ export default {
     terminate: 'Terminar',
   },
   chain: {
-    quantitative: 'Cuantitativo',
-    categorical: 'Categórico',
+    addQuantitative: 'Agregar atributo cuantitativo',
+    addCategorical: 'Agregar atributo categórico',
     emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
     entityExcludedInRStudioScripts:
       'la entidad y todas las variables de resultado relacionadas se excluirán en los scripts de RStudio',

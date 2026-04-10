@@ -30,6 +30,19 @@ const getLabel = (props, t) => {
   return label
 }
 
+const Icon = (props) => {
+  const { icon, iconAlt, iconClassName, iconHeight, iconSrc, iconWidth, alignLeft, alignRight } = props
+  return (
+    <>
+      {iconClassName && (
+        <span className={classNames('icon', iconClassName, { 'icon-left': alignLeft, 'icon-right': alignRight })} />
+      )}
+      {iconSrc && <img alt={iconAlt} height={iconHeight} src={iconSrc} width={iconWidth} />}
+      {icon}
+    </>
+  )
+}
+
 export const Button = forwardRef((props, ref) => {
   const {
     active,
@@ -42,6 +55,9 @@ export const Button = forwardRef((props, ref) => {
     iconClassName,
     iconHeight,
     iconSrc,
+    iconEnd = null,
+    iconEndClassName = null,
+    iconEndSrc = null,
     iconWidth,
     id,
     isTitleMarkdown = false,
@@ -78,17 +94,36 @@ export const Button = forwardRef((props, ref) => {
       color={color}
       data-testid={testId}
       disabled={disabled ? disabled : undefined}
+      endIcon={
+        (iconEnd || iconEndClassName || iconEndSrc) && (
+          <Icon
+            icon={iconEnd}
+            iconAlt={iconAlt}
+            iconClassName={iconEndClassName}
+            iconHeight={iconHeight}
+            iconSrc={iconEndSrc}
+            iconWidth={iconWidth}
+            alignRight={Boolean(label)}
+          />
+        )
+      }
       onClick={onClick}
+      startIcon={
+        showIcon && (
+          <Icon
+            alignLeft={Boolean(label)}
+            icon={icon}
+            iconAlt={iconAlt}
+            iconClassName={iconClassName}
+            iconHeight={iconHeight}
+            iconSrc={iconSrc}
+            iconWidth={iconWidth}
+          />
+        )
+      }
       variant={variant}
       {...otherProps}
     >
-      {showIcon && (
-        <>
-          {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
-          {iconSrc && <img alt={iconAlt} height={iconHeight} src={iconSrc} width={iconWidth} />}
-          {icon}
-        </>
-      )}
       {label}
       {children}
     </MuiButton>

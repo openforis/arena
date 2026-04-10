@@ -767,8 +767,8 @@ $t(common.cantUndoWarning)`,
     terminate: 'Дуусгах',
   },
   chain: {
-    quantitative: 'Тоон',
-    categorical: 'Ангиллын',
+    addQuantitative: 'Тоон шинж чанар нэмэх',
+    addCategorical: 'Ангиллын шинж чанар нэмэх',
     emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
     entityExcludedInRStudioScripts:
       'объект болон түүнтэй холбоотой бүх үр дүнгийн хувьсагчид RStudio скриптүүдэд хасагдана',
