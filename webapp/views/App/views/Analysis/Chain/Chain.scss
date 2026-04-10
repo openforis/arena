@@ -14,12 +14,6 @@
       grid-template-columns: 0.3fr 0.65fr;
     }
 
-    .form-row {
-      .form-item {
-        width: auto;
-      }
-    }
-
     .dropdown,
     .dropdown-wrapper {
       width: 30rem;
@@ -58,9 +52,6 @@
       flex-direction: column;
       justify-self: center;
       gap: 0.5rem;
-    }
-
-    .chain-basic-props {
       width: 55rem;
     }
 
