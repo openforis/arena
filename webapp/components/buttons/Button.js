@@ -43,6 +43,17 @@ const Icon = (props) => {
   )
 }
 
+Icon.propTypes = {
+  alignLeft: PropTypes.bool,
+  alignRight: PropTypes.bool,
+  icon: PropTypes.node,
+  iconAlt: PropTypes.string,
+  iconClassName: PropTypes.string,
+  iconHeight: PropTypes.number,
+  iconSrc: PropTypes.string,
+  iconWidth: PropTypes.number,
+}
+
 export const Button = forwardRef((props, ref) => {
   const {
     active,
