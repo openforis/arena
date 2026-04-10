@@ -109,7 +109,8 @@ export const Button = forwardRef((props, ref) => {
       }
       onClick={onClick}
       startIcon={
-        showIcon && (
+        showIcon &&
+        (icon || iconClassName || iconSrc) && (
           <Icon
             alignLeft={Boolean(label)}
             icon={icon}
@@ -157,6 +158,9 @@ Button.propTypes = {
   iconHeight: PropTypes.number,
   iconSrc: PropTypes.string,
   iconWidth: PropTypes.number,
+  iconEnd: PropTypes.node,
+  iconEndClassName: PropTypes.string,
+  iconEndSrc: PropTypes.string,
   isTitleMarkdown: PropTypes.bool,
   label: PropTypes.string,
   labelIsI18nKey: PropTypes.bool,
