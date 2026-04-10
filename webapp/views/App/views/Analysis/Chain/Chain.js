@@ -21,6 +21,7 @@ import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import { ChainBasicProps } from './ChainBasicProps'
 import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
+import { ChainStatisticalAnalysisProps } from './StatisticalAnalysis/ChainStatisticalAnalysisProps'
 
 const ChainComponent = () => {
   const dispatch = useDispatch()
@@ -78,6 +79,11 @@ const ChainComponent = () => {
           {
             label: 'chainView.samplingDesign',
             component: ChainSamplingDesignProps,
+            props: { updateChain },
+          },
+          {
+            label: 'chainView.statisticalAnalysis.header',
+            component: ChainStatisticalAnalysisProps,
             props: { updateChain },
           },
         ]}

@@ -615,6 +615,7 @@ export default {
         dimensionsSeparate: 'Dimensiones por separado',
       },
       reportingArea: 'Área total de informe (ha) (Opcional)',
+      reportingAreaInfo: `Con muestreo estratificado, proporcione las áreas de los estratos en la tabla de categorías del atributo de estrato (nombre de la columna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
     postStratificationAttribute: 'Atributo de postestratificación',

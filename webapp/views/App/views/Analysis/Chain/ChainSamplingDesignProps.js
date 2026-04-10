@@ -1,109 +1,44 @@
-import React, { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
-import { debounceAction } from '@webapp/utils/reduxUtils'
-import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
-import { useEntityDataCount } from '@webapp/store/surveyRdb/hooks'
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { useChain } from '@webapp/store/ui/chain'
 
-import { ButtonGroup, Checkbox } from '@webapp/components/form'
-import WarningBadge from '@webapp/components/warningBadge'
+import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
-import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 
 import BaseUnitSelector from './BaseUnitSelector'
-import { StratumAttributeSelector } from './StratumAttributeSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
-import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { FirstPhaseCategorySelector } from './FirstPhaseCategorySelector'
 import { FirstPhaseCommonAttributeSelector } from './FirstPhaseCommonAttributeSelector'
-import { DimensionsSelector } from './DimensionsSelector'
-import { PValueSelector } from './PValueSelector'
+import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
+import { StratumAttributeSelector } from './StratumAttributeSelector'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props
 
-  const dispatch = useDispatch()
   const survey = useSurvey()
-  const i18n = useI18n()
   const chain = useChain()
-  const chainUuid = Chain.getUuid(chain)
-  const [chainUpdated, setChainUpdated] = useState(chain)
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const hasBaseUnit = Boolean(baseUnitNodeDef)
   const samplingDesign = Chain.getSamplingDesign(chain)
-  const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chainUpdated)
+  const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chain)
   const validation = Chain.getValidation(chain)
-  const dimensionUuids = ChainStatisticalAnalysis.getDimensionUuids(chainStatisticalAnalysis)
-  const entityDefUuid = ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)
-  const entityDef = entityDefUuid ? Survey.getNodeDefByUuid(entityDefUuid)(survey) : null
-  const entityDataCount = useEntityDataCount(entityDefUuid)
-
-  const entitiesFilterFn = useCallback(
-    (entityDef) => {
-      const childDefs = Survey.getNodeDefChildren({ nodeDef: entityDef })(survey)
-      return childDefs.some(
-        (childDef) =>
-          NodeDef.getChainUuid(childDef) === chainUuid &&
-          NodeDef.isActive(childDef) &&
-          NodeDef.hasAreaBasedEstimated(childDef)
-      )
-    },
-    [chainUuid, survey]
-  )
-
-  const reportingMethodItems = Object.entries(ChainStatisticalAnalysis.reportingMethods).map(([key, name]) => ({
-    key,
-    label: i18n.t(`chainView.statisticalAnalysis.reportingMethods.${name}`),
-  }))
 
   const updateStatisticalAnalysis = useCallback(
     (updateFn) => {
-      const _chainUpdated = Chain.updateStatisticalAnalysis(updateFn)(chainUpdated)
-      dispatch(
-        debounceAction(ChainActions.updateChain({ chain: _chainUpdated }), 'update-chain-statistical-analysis'),
-        1000
-      )
-      setChainUpdated(_chainUpdated)
+      const _chainUpdated = Chain.updateStatisticalAnalysis(updateFn)(chain)
+      updateChain(_chainUpdated)
     },
-    [chainUpdated, dispatch]
-  )
-
-  const onEntityChange = useCallback(
-    (entityDefUuid) => {
-      updateStatisticalAnalysis(ChainStatisticalAnalysis.assocEntityDefUuid(entityDefUuid))
-    },
-    [updateStatisticalAnalysis]
-  )
-
-  const onDimensionsChange = useCallback(
-    (dimensionUuidsUpdated) => {
-      updateStatisticalAnalysis(ChainStatisticalAnalysis.assocDimensionUuids(dimensionUuidsUpdated))
-    },
-    [updateStatisticalAnalysis]
-  )
-
-  const onFilterChange = useCallback(
-    (filter) => updateStatisticalAnalysis(ChainStatisticalAnalysis.assocFilter(filter)),
-    [updateStatisticalAnalysis]
-  )
-
-  const onReportingMethodChange = useCallback(
-    (reportingMethod) => {
-      updateStatisticalAnalysis(ChainStatisticalAnalysis.assocReportingMethod(reportingMethod))
-    },
-    [updateStatisticalAnalysis]
+    [chain, updateChain]
   )
 
   const onClusteringOnlyVariancesChange = useCallback(
@@ -122,99 +57,54 @@ export const ChainSamplingDesignProps = (props) => {
     [updateStatisticalAnalysis]
   )
 
-  const reportingAreaFormItem = (
-    <FormItem className="reporting-area" label="chainView.statisticalAnalysis.reportingArea">
-      <Input
-        numberFormat={NumberFormats.decimal()}
-        onChange={onReportingAreaChange}
-        value={ChainStatisticalAnalysis.getReportingArea(chainStatisticalAnalysis)}
-      />
-    </FormItem>
-  )
-
   return (
     <div className="chain-sampling-design">
-      {(Chain.hasSamplingDesign(chain) || hasBaseUnit) && <BaseUnitSelector />}
+      <div className="form">
+        {(Chain.hasSamplingDesign(chain) || hasBaseUnit) && <BaseUnitSelector />}
 
-      {hasBaseUnit && (
-        <>
-          <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
+        {hasBaseUnit && (
+          <>
+            <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
 
-          {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
-          {/* {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />} */}
+            {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
+            {/* {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />} */}
 
-          {ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign) && <FirstPhaseCategorySelector />}
+            {ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign) && <FirstPhaseCategorySelector />}
 
-          {ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(samplingDesign) && (
-            <FirstPhaseCommonAttributeSelector />
-          )}
-
-          <ClusteringEntitySelector />
-        </>
-      )}
-
-      <FormItem label="chainView.statisticalAnalysis.entityToReport">
-        <div className="entity-selector-wrapper">
-          <EntitySelector
-            hierarchy={Survey.getHierarchy()(survey)}
-            filterFn={entitiesFilterFn}
-            nodeDefUuidEntity={entityDefUuid}
-            onChange={onEntityChange}
-            showSingleEntities={false}
-            useNameAsLabel
-            allowEmptySelection
-          />
-          {entityDataCount === 0 && (
-            <WarningBadge
-              title="chainView.statisticalAnalysis.entityWithoutData"
-              titleParams={{ name: NodeDef.getName(entityDef) }}
-            />
-          )}
-        </div>
-      </FormItem>
-
-      <FormItem label="common.dimension_other">
-        <DimensionsSelector
-          chainUuid={chainUuid}
-          entityDefUuid={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
-          selectedDimensionsUuids={dimensionUuids}
-          onDimensionsChange={onDimensionsChange}
-          showAnalysisAttributes
-          disabled={!entityDefUuid}
-        />
-      </FormItem>
-
-      <FormItem label="chainView.statisticalAnalysis.filter">
-        <Input
-          className="filter"
-          inputType="textarea"
-          onChange={onFilterChange}
-          value={ChainStatisticalAnalysis.getFilter(chainStatisticalAnalysis)}
-        />
-      </FormItem>
-
-      <FormItem label="chainView.statisticalAnalysis.reportingMethod">
-        <ButtonGroup
-          selectedItemKey={ChainStatisticalAnalysis.getReportingMethod(chainStatisticalAnalysis)}
-          onChange={onReportingMethodChange}
-          items={reportingMethodItems}
-        />
-      </FormItem>
-
-      {ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign) && (
-        <FormItem className="clustering-only-variances" label="chainView.clusteringOnlyVariances">
-          <Checkbox
-            checked={ChainStatisticalAnalysis.isClusteringOnlyVariances(chainStatisticalAnalysis)}
-            validation={Validation.getFieldValidation(ChainStatisticalAnalysis.keys.clusteringOnlyVariances)(
-              validation
+            {ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(samplingDesign) && (
+              <FirstPhaseCommonAttributeSelector />
             )}
-            onChange={onClusteringOnlyVariancesChange}
+
+            <ClusteringEntitySelector />
+          </>
+        )}
+      </div>
+      <div className="form form-right">
+        <FormItem
+          className="reporting-area"
+          label="chainView.statisticalAnalysis.reportingArea"
+          info="chainView.statisticalAnalysis.reportingAreaInfo"
+        >
+          <Input
+            numberFormat={NumberFormats.decimal()}
+            onChange={onReportingAreaChange}
+            value={ChainStatisticalAnalysis.getReportingArea(chainStatisticalAnalysis)}
           />
         </FormItem>
-      )}
 
-      <FormItem label="chainView.nonResponseBiasCorrection">
-        <div className="nonResponseBiasCorrectionContainer">
+        {ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign) && (
+          <FormItem className="clustering-only-variances" label="chainView.clusteringOnlyVariances">
+            <Checkbox
+              checked={ChainStatisticalAnalysis.isClusteringOnlyVariances(chainStatisticalAnalysis)}
+              validation={Validation.getFieldValidation(ChainStatisticalAnalysis.keys.clusteringOnlyVariances)(
+                validation
+              )}
+              onChange={onClusteringOnlyVariancesChange}
+            />
+          </FormItem>
+        )}
+
+        <FormItem label="chainView.nonResponseBiasCorrection" info="chainView.nonResponseBiasCorrectionTip">
           <Checkbox
             checked={ChainStatisticalAnalysis.isNonResponseBiasCorrection(chainStatisticalAnalysis)}
             validation={Validation.getFieldValidation(ChainStatisticalAnalysis.keys.nonResponseBiasCorrection)(
@@ -222,18 +112,8 @@ export const ChainSamplingDesignProps = (props) => {
             )}
             onChange={onNonResponseBiasCorrectionChange}
           />
-          <label className="nonResponseBiasCorrectionTip">{i18n.t('chainView.nonResponseBiasCorrectionTip')}</label>
-        </div>
-      </FormItem>
-
-      {ChainSamplingDesign.getSamplingStrategy(samplingDesign) && (
-        <div className="form_row p-value">
-          <PValueSelector />
-          {reportingAreaFormItem}
-        </div>
-      )}
-
-      {!ChainSamplingDesign.getSamplingStrategy(samplingDesign) && reportingAreaFormItem}
+        </FormItem>
+      </div>
     </div>
   )
 }

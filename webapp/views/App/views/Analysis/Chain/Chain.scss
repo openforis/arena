@@ -53,8 +53,7 @@
       gap: 2rem;
     }
 
-    .chain-basic-props,
-    .chain-sampling-design {
+    .chain-basic-props {
       display: flex;
       flex-direction: column;
       justify-self: center;
@@ -66,10 +65,32 @@
     }
 
     .chain-sampling-design {
+      display: flex;
       flex-flow: wrap;
+      justify-content: center;
 
-      .form-item {
-        grid-template-columns: 12rem 1fr;
+      .form {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        gap: 0;
+
+        .form-item {
+          grid-template-columns: 12rem 1fr;
+          height: 3rem;
+        }
+
+        &.form-right {
+          width: 35rem;
+
+          .form-item {
+            grid-template-columns: 20rem 1fr;
+
+            &.reporting-area {
+              width: 30rem;
+            }
+          }
+        }
       }
     }
 
@@ -114,17 +135,6 @@
 
       .dropdown {
         width: 7rem;
-      }
-    }
-
-    .nonResponseBiasCorrectionContainer,
-    .clustering-only-variances {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-
-      .nonResponseBiasCorrectionTip {
-        color: red;
       }
     }
   }

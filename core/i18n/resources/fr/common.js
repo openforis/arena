@@ -748,6 +748,7 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
         dimensionsSeparate: 'Dimensions séparément',
       },
       reportingArea: 'Surface totale de rapport (ha) (Optionnel)',
+      reportingAreaInfo: `Avec un échantillonnage stratifié, indiquez les superficies des strates dans la table de catégories de l'attribut de strate (nom de la colonne 'area')`,
     },
     stratumAttribute: 'Attribut de strate',
     postStratificationAttribute: 'Attribut de post-stratification',

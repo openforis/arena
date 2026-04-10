@@ -725,6 +725,7 @@ $t(common.raiseTicketInSupportForum)
         dimensionsSeparate: 'Измерения отдельно',
       },
       reportingArea: 'Общая площадь отчетности (га) (Необязательно)',
+      reportingAreaInfo: `При стратифицированной выборке укажите площади страт в таблице категорий атрибута страты (название столбца 'area')`,
     },
     stratumAttribute: 'Атрибут страты',
     postStratificationAttribute: 'Атрибут послестратификации',

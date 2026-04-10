@@ -726,6 +726,7 @@ $t(common.raiseTicketInSupportForum)
         dimensionsSeparate: 'Хэмжээсүүдийг тусад нь',
       },
       reportingArea: 'Нийт тайлагнах талбай (га) (Заавал биш)',
+      reportingAreaInfo: `Үечилсэн түүвэрлэлтийн хувьд үечилсэн шинж чанарын ангиллын хүснэгтэд давхаргуудын талбайг оруулна уу (баганын нэр 'area')`,
     },
     stratumAttribute: 'Үеийн шинж чанар',
     postStratificationAttribute: 'Дараах үечилсэн шинж чанар',
