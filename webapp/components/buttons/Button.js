@@ -106,6 +106,7 @@ export const Button = forwardRef((props, ref) => {
       data-testid={testId}
       disabled={disabled ? disabled : undefined}
       endIcon={
+        showIcon &&
         (iconEnd || iconEndClassName || iconEndSrc) && (
           <Icon
             icon={iconEnd}
