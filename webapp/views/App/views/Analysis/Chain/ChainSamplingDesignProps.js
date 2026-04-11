@@ -80,18 +80,6 @@ export const ChainSamplingDesignProps = (props) => {
         )}
       </div>
       <div className="form form-right">
-        <FormItem
-          className="reporting-area"
-          label="chainView.statisticalAnalysis.reportingArea"
-          info="chainView.statisticalAnalysis.reportingAreaInfo"
-        >
-          <Input
-            numberFormat={NumberFormats.decimal()}
-            onChange={onReportingAreaChange}
-            value={ChainStatisticalAnalysis.getReportingArea(chainStatisticalAnalysis)}
-          />
-        </FormItem>
-
         {ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign) && (
           <FormItem className="clustering-only-variances" label="chainView.clusteringOnlyVariances">
             <Checkbox
@@ -104,13 +92,25 @@ export const ChainSamplingDesignProps = (props) => {
           </FormItem>
         )}
 
-        <FormItem label="chainView.nonResponseBiasCorrection" info="chainView.nonResponseBiasCorrectionTip">
+        <FormItem label="chainView.nonResponseBiasCorrection" info="chainView.nonResponseBiasCorrectionInfo">
           <Checkbox
             checked={ChainStatisticalAnalysis.isNonResponseBiasCorrection(chainStatisticalAnalysis)}
             validation={Validation.getFieldValidation(ChainStatisticalAnalysis.keys.nonResponseBiasCorrection)(
               validation
             )}
             onChange={onNonResponseBiasCorrectionChange}
+          />
+        </FormItem>
+
+        <FormItem
+          className="reporting-area"
+          label="chainView.statisticalAnalysis.reportingArea"
+          info="chainView.statisticalAnalysis.reportingAreaInfo"
+        >
+          <Input
+            numberFormat={NumberFormats.decimal()}
+            onChange={onReportingAreaChange}
+            value={ChainStatisticalAnalysis.getReportingArea(chainStatisticalAnalysis)}
           />
         </FormItem>
       </div>

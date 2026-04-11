@@ -724,7 +724,7 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
       surveyNotPublished: "$t(chainView.cannotStartRStudio.common) : publiez d'abord le formulaire",
     },
     nonResponseBiasCorrection: 'Correction du biais de non-réponse',
-    nonResponseBiasCorrectionTip: `Pour implémenter cette méthode, ajoutez 'design_psu' et 'design_ssu' dans la catégorie de strate comme propriétés supplémentaires.`,
+    nonResponseBiasCorrectionInfo: `Pour implémenter cette méthode, ajoutez 'design_psu' et 'design_ssu' dans la catégorie de strate comme propriétés supplémentaires.`,
     pValue: 'Valeur P',
     resultsBackFromRStudio: 'Résultats relus depuis RStudio',
     samplingDesign: "Plan d'échantillonnage",

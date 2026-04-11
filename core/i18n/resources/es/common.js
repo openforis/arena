@@ -590,7 +590,7 @@ export default {
       surveyNotPublished: '$t(chainView.cannotStartRStudio.common): primero publique la encuesta',
     },
     nonResponseBiasCorrection: 'Corrección de sesgo por no respuesta',
-    nonResponseBiasCorrectionTip:
+    nonResponseBiasCorrectionInfo:
       "Para implementar este método, agregue 'design_psu' y 'design_ssu' a la categoría de estrato como propiedades adicionales.",
     pValue: 'Valor P',
     resultsBackFromRStudio: 'Resultados leídos de RStudio',

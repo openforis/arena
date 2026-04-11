@@ -146,18 +146,6 @@ export const ChainStatisticalAnalysisProps = (props) => {
         />
       </FormItem>
 
-      {ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign) && (
-        <FormItem label="chainView.clusteringOnlyVariances">
-          <Checkbox
-            checked={ChainStatisticalAnalysis.isClusteringOnlyVariances(chainStatisticalAnalysis)}
-            validation={Validation.getFieldValidation(ChainStatisticalAnalysis.keys.clusteringOnlyVariances)(
-              validation
-            )}
-            onChange={onClusteringOnlyVariancesChange}
-          />
-        </FormItem>
-      )}
-
       {ChainSamplingDesign.getSamplingStrategy(samplingDesign) && (
         <div className="form_row p-value">
           <PValueSelector />
