@@ -6,12 +6,20 @@ import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
 import { FileFormats } from '@core/fileFormats'
 
 import { TreeSelectViewMode } from '@webapp/model'
 import { JobActions } from '@webapp/store/app'
-import { NodeDefsActions, SurveyActions, useIsSurveyDirty, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import {
+  NodeDefsActions,
+  SurveyActions,
+  useIsSurveyDirty,
+  useSurveyCycleKey,
+  useSurveyId,
+  useSurveyInfo,
+} from '@webapp/store/survey'
 import { FileUploadDialogActions } from '@webapp/store/ui'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
@@ -43,6 +51,8 @@ const FormHeader = (props) => {
   const navigate = useNavigate()
 
   const surveyId = useSurveyId()
+  const surveyInfo = useSurveyInfo()
+  const surveyIsDraft = Survey.isDraft(surveyInfo)
   const surveyCycleKey = useSurveyCycleKey()
   const surveyIsDirty = useIsSurveyDirty()
   const nodeDefLabelType = useNodeDefLabelType()
@@ -130,6 +140,16 @@ const FormHeader = (props) => {
               {
                 key: 'schema-summary-excel',
                 content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} />,
+              },
+              {
+                key: 'survey-docx-export',
+                content: (
+                  <ButtonDownload
+                    href={API.getSurveyDocxExportUrl({ surveyId, draft: surveyIsDraft })}
+                    label="surveyForm:exportDocx"
+                    variant="text"
+                  />
+                ),
               },
               ...labelsExportAllowedFileFormats.map((fileFormat) => ({
                 key: `labels-export-${fileFormat}`,

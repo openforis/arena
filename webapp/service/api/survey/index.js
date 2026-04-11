@@ -74,3 +74,6 @@ export const startSurveysListExportJob = async ({ draft = true, template = false
 
 export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }) =>
   `/api/surveys/export/download?${new URLSearchParams({ tempFileName })}`
+
+export const getSurveyDocxExportUrl = ({ surveyId, draft = false }) =>
+  `/api/survey/${surveyId}/docx-export?${new URLSearchParams({ draft })}`
