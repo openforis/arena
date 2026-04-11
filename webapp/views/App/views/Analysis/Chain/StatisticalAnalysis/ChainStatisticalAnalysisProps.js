@@ -8,14 +8,13 @@ import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnaly
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 import { useEntityDataCount } from '@webapp/store/surveyRdb/hooks'
 import { useChain } from '@webapp/store/ui/chain'
 
-import { ButtonGroup, Checkbox } from '@webapp/components/form'
+import { ButtonGroup } from '@webapp/components/form'
 import WarningBadge from '@webapp/components/warningBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
@@ -32,7 +31,6 @@ export const ChainStatisticalAnalysisProps = (props) => {
 
   const samplingDesign = Chain.getSamplingDesign(chain)
   const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chain)
-  const validation = Chain.getValidation(chain)
   const dimensionUuids = ChainStatisticalAnalysis.getDimensionUuids(chainStatisticalAnalysis)
   const entityDefUuid = ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)
   const entityDef = entityDefUuid ? Survey.getNodeDefByUuid(entityDefUuid)(survey) : null
@@ -87,12 +85,6 @@ export const ChainStatisticalAnalysisProps = (props) => {
     (reportingMethod) => {
       updateStatisticalAnalysis(ChainStatisticalAnalysis.assocReportingMethod(reportingMethod))
     },
-    [updateStatisticalAnalysis]
-  )
-
-  const onClusteringOnlyVariancesChange = useCallback(
-    (clusteringOnlyVariances) =>
-      updateStatisticalAnalysis(ChainStatisticalAnalysis.assocClusteringOnlyVariances(clusteringOnlyVariances)),
     [updateStatisticalAnalysis]
   )
 
