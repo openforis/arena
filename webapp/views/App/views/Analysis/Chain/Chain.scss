@@ -9,6 +9,8 @@
 
     .form-item,
     .labels-editor.with-label {
+      height: auto;
+      white-space: nowrap;
       grid-template-columns: 0.3fr 0.65fr;
     }
 
@@ -45,35 +47,85 @@
       gap: 2rem;
     }
 
-    .chain-basic-props,
-    .chain-sampling-design,
-    .statistical-analysis {
+    .chain-basic-props {
       display: flex;
       flex-direction: column;
       justify-self: center;
       gap: 0.5rem;
-    }
-
-    .chain-basic-props {
       width: 55rem;
     }
 
     .chain-sampling-design {
-      width: 50rem;
+      display: flex;
+      flex-flow: wrap;
+      justify-content: center;
 
-      .form-item {
-        width: 50rem;
-        grid-template-columns: 12rem 1fr;
+      .form {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        gap: 0;
+
+        .form-item {
+          grid-template-columns: 12rem 1fr;
+          height: 3rem;
+        }
+
+        &.form-right {
+          width: 35rem;
+
+          .form-item {
+            grid-template-columns: 20rem 1fr;
+
+            &.reporting-area {
+              width: 30rem;
+            }
+          }
+        }
       }
     }
 
-    .nonResponseBiasCorrectionContainer {
+    .form_row {
       display: flex;
-      flex-direction: row;
-      align-items: center;
+      gap: 3rem;
 
-      .nonResponseBiasCorrectionTip {
-        color: red;
+      .form-item {
+        display: flex;
+      }
+
+      &.checkbox-with-info {
+        gap: 0rem;
+        align-items: center;
+      }
+
+      &.p-value {
+        margin-left: 16%;
+      }
+    }
+
+    .entity-selector,
+    .attributes-selector {
+      width: 30rem;
+    }
+
+    .entity-selector-wrapper {
+      display: flex;
+
+      .warning-badge {
+        position: relative;
+      }
+    }
+
+    .dimensions-selector,
+    .filter {
+      width: 30rem;
+    }
+
+    .dropdown-wrapper.p-value-dropdown {
+      width: 7rem;
+
+      .dropdown {
+        width: 7rem;
       }
     }
   }

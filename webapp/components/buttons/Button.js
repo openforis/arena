@@ -30,6 +30,30 @@ const getLabel = (props, t) => {
   return label
 }
 
+const Icon = (props) => {
+  const { icon, iconAlt, iconClassName, iconHeight, iconSrc, iconWidth, alignLeft, alignRight } = props
+  return (
+    <>
+      {iconClassName && (
+        <span className={classNames('icon', iconClassName, { 'icon-left': alignLeft, 'icon-right': alignRight })} />
+      )}
+      {iconSrc && <img alt={iconAlt} height={iconHeight} src={iconSrc} width={iconWidth} />}
+      {icon}
+    </>
+  )
+}
+
+Icon.propTypes = {
+  alignLeft: PropTypes.bool,
+  alignRight: PropTypes.bool,
+  icon: PropTypes.node,
+  iconAlt: PropTypes.string,
+  iconClassName: PropTypes.string,
+  iconHeight: PropTypes.number,
+  iconSrc: PropTypes.string,
+  iconWidth: PropTypes.number,
+}
+
 export const Button = forwardRef((props, ref) => {
   const {
     active,
@@ -42,6 +66,9 @@ export const Button = forwardRef((props, ref) => {
     iconClassName,
     iconHeight,
     iconSrc,
+    iconEnd = null,
+    iconEndClassName = null,
+    iconEndSrc = null,
     iconWidth,
     id,
     isTitleMarkdown = false,
@@ -78,17 +105,38 @@ export const Button = forwardRef((props, ref) => {
       color={color}
       data-testid={testId}
       disabled={disabled ? disabled : undefined}
+      endIcon={
+        showIcon &&
+        (iconEnd || iconEndClassName || iconEndSrc) && (
+          <Icon
+            icon={iconEnd}
+            iconAlt={iconAlt}
+            iconClassName={iconEndClassName}
+            iconHeight={iconHeight}
+            iconSrc={iconEndSrc}
+            iconWidth={iconWidth}
+            alignRight={Boolean(label)}
+          />
+        )
+      }
       onClick={onClick}
+      startIcon={
+        showIcon &&
+        (icon || iconClassName || iconSrc) && (
+          <Icon
+            alignLeft={Boolean(label)}
+            icon={icon}
+            iconAlt={iconAlt}
+            iconClassName={iconClassName}
+            iconHeight={iconHeight}
+            iconSrc={iconSrc}
+            iconWidth={iconWidth}
+          />
+        )
+      }
       variant={variant}
       {...otherProps}
     >
-      {showIcon && (
-        <>
-          {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
-          {iconSrc && <img alt={iconAlt} height={iconHeight} src={iconSrc} width={iconWidth} />}
-          {icon}
-        </>
-      )}
       {label}
       {children}
     </MuiButton>
@@ -122,6 +170,9 @@ Button.propTypes = {
   iconHeight: PropTypes.number,
   iconSrc: PropTypes.string,
   iconWidth: PropTypes.number,
+  iconEnd: PropTypes.node,
+  iconEndClassName: PropTypes.string,
+  iconEndSrc: PropTypes.string,
   isTitleMarkdown: PropTypes.bool,
   label: PropTypes.string,
   labelIsI18nKey: PropTypes.bool,

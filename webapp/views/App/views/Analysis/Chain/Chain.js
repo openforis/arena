@@ -21,7 +21,7 @@ import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import { ChainBasicProps } from './ChainBasicProps'
 import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
-import { ChainStatisticalAnalysisProps } from './statisticalAnalysis/ChainStatisticalAnalysisProps'
+import { ChainStatisticalAnalysisProps } from './StatisticalAnalysis/ChainStatisticalAnalysisProps'
 
 const ChainComponent = () => {
   const dispatch = useDispatch()

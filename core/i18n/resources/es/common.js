@@ -590,7 +590,7 @@ export default {
       surveyNotPublished: '$t(chainView.cannotStartRStudio.common): primero publique la encuesta',
     },
     nonResponseBiasCorrection: 'Corrección de sesgo por no respuesta',
-    nonResponseBiasCorrectionTip:
+    nonResponseBiasCorrectionInfo:
       "Para implementar este método, agregue 'design_psu' y 'design_ssu' a la categoría de estrato como propiedades adicionales.",
     pValue: 'Valor P',
     resultsBackFromRStudio: 'Resultados leídos de RStudio',
@@ -615,6 +615,7 @@ export default {
         dimensionsSeparate: 'Dimensiones por separado',
       },
       reportingArea: 'Área total de informe (ha) (Opcional)',
+      reportingAreaInfo: `Con muestreo estratificado, proporcione las áreas de los estratos en la tabla de categorías del atributo de estrato (nombre de la columna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
     postStratificationAttribute: 'Atributo de postestratificación',
@@ -649,6 +650,8 @@ export default {
   chain: {
     quantitative: 'Cuantitativo',
     categorical: 'Categórico',
+    addQuantitative: 'Agregar atributo cuantitativo',
+    addCategorical: 'Agregar atributo categórico',
     emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
     entityExcludedInRStudioScripts:
       'la entidad y todas las variables de resultado relacionadas se excluirán en los scripts de RStudio',
