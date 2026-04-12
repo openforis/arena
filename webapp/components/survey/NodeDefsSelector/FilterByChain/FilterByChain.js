@@ -16,7 +16,7 @@ const FilterByChain = ({ filterChainUuids = [], setFilterChainUuids = () => {} }
 
   const chains = useChains({ surveyCycleKey })
 
-  if (!chains || chains.length === 0) return null
+  if (!chains || chains.length <= 1) return null
 
   return (
     <div className="node-defs-selector__chains">

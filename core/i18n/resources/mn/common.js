@@ -702,7 +702,7 @@ $t(common.raiseTicketInSupportForum)
       surveyNotPublished: '$t(chainView.cannotStartRStudio.common): эхлээд судалгааг нийтлэх',
     },
     nonResponseBiasCorrection: 'Хариу өгөхгүй байх хазайлт засварлах',
-    nonResponseBiasCorrectionInfo: `Энэ аргыг хэрэгжүүлэхийн тулд "design_psu" болон "design_ssu"-г давхаргын ангилалд нэмэлт шинж чанар болгон нэмнэ үү.`,
+    nonResponseBiasCorrectionInfo: `Жинлэлтийн ангиллын тохируулгын аргыг хэрэгжүүлэхийн тулд 'design_psu' болон 'design_ssu'-г давхаргын ангиллын хүснэгтэд нэмэлт тоон шинж чанар болгон нэмнэ үү.`,
     pValue: 'P-утга',
     resultsBackFromRStudio: 'RStudio-оос үр дүнг буцааж уншсан',
     samplingDesign: 'Түүвэрлэлтийн загвар',
