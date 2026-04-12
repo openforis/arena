@@ -701,7 +701,7 @@ $t(common.raiseTicketInSupportForum)
       surveyNotPublished: '$t(chainView.cannotStartRStudio.common): сначала опубликуйте опрос',
     },
     nonResponseBiasCorrection: 'Коррекция смещения из-за неответной реакции',
-    nonResponseBiasCorrectionInfo: `Для реализации этого метода добавьте 'design_psu' и 'design_ssu' в категорию страты как дополнительные свойства.`,
+    nonResponseBiasCorrectionInfo: `Чтобы реализовать метод корректировки по весовым классам, добавьте 'design_psu' и 'design_ssu' в таблицу категорий страты как дополнительные числовые свойства.`,
     pValue: 'P-значение',
     resultsBackFromRStudio: 'Результаты получены из RStudio',
     samplingDesign: 'Дизайн выборки',

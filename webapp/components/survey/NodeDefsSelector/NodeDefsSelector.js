@@ -1,5 +1,5 @@
 import './NodeDefsSelector.scss'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -13,7 +13,7 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 import { ButtonIconFilter } from '@webapp/components/buttons'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useChains, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
@@ -36,11 +36,18 @@ const NodeDefsSelector = (props) => {
 
   const i18n = useI18n()
   const survey = useSurvey()
+  const surveyCycleKey = useSurveyCycleKey()
+  const chains = useChains({ surveyCycleKey })
 
   const [filterTypes, setFilterTypes] = useState([])
   const [filterChainUuids, setFilterChainUuids] = useState([])
-
   const [showFilter, setShowFilter] = useState(false)
+
+  useEffect(() => {
+    if ((!chains || chains.length <= 1) && filterChainUuids.length > 0) {
+      setFilterChainUuids([])
+    }
+  }, [chains, filterChainUuids, setFilterChainUuids])
 
   const onAttributesSelection = useCallback(
     ({ attributeDefUuids, selected }) => {

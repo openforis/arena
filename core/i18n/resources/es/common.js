@@ -591,7 +591,7 @@ export default {
     },
     nonResponseBiasCorrection: 'Corrección de sesgo por no respuesta',
     nonResponseBiasCorrectionInfo:
-      "Para implementar este método, agregue 'design_psu' y 'design_ssu' a la categoría de estrato como propiedades adicionales.",
+      "Para implementar el método de ajuste por clases de ponderación, agregue 'design_psu' y 'design_ssu' a la tabla de categorías del estrato como propiedades numéricas adicionales.",
     pValue: 'Valor P',
     resultsBackFromRStudio: 'Resultados leídos de RStudio',
     samplingDesign: 'Diseño de muestreo',
