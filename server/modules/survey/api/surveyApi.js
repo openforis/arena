@@ -229,6 +229,16 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/docx/export', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft } = Request.getParams(req)
+
+      await SurveyService.exportSurveyDocx({ surveyId, draft, outputStream: res })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // download generated survey export file
   app.get('/survey/:surveyId/export/download', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
     try {

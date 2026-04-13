@@ -19,6 +19,7 @@ import {
   useSurveyCycleKey,
   useSurveyId,
   useSurveyInfo,
+  useSurveyPreferredLang,
 } from '@webapp/store/survey'
 import { FileUploadDialogActions } from '@webapp/store/ui'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -53,7 +54,8 @@ const FormHeader = (props) => {
   const surveyId = useSurveyId()
   const surveyInfo = useSurveyInfo()
   const surveyIsDraft = Survey.isDraft(surveyInfo)
-  const surveyCycleKey = useSurveyCycleKey()
+  const cycle = useSurveyCycleKey()
+  const lang = useSurveyPreferredLang()
   const surveyIsDirty = useIsSurveyDirty()
   const nodeDefLabelType = useNodeDefLabelType()
   const nodeDefPage = useNodeDefPage()
@@ -98,11 +100,7 @@ const FormHeader = (props) => {
             label="surveyForm:subPage"
             onClick={() => {
               const propsNodeDef = {
-                [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
-                  surveyCycleKey,
-                  NodeDefLayout.renderType.form,
-                  uuidv4()
-                ),
+                [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.form, uuidv4()),
               }
               dispatch(NodeDefsActions.createNodeDef(nodeDefPage, NodeDef.nodeDefType.entity, propsNodeDef, navigate))
             }}
@@ -145,7 +143,7 @@ const FormHeader = (props) => {
                 key: 'survey-docx-export',
                 content: (
                   <ButtonDownload
-                    href={API.getSurveyDocxExportUrl({ surveyId, draft: surveyIsDraft })}
+                    href={API.getSurveyDocxExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
                     label="surveyForm:exportDocx"
                     variant="text"
                   />

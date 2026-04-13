@@ -1,61 +1,19 @@
-import * as R from 'ramda'
-
 import { Objects } from '@openforis/arena-core'
-import { DB, BaseProtocol, TableNodeDef, Schemata } from '@openforis/arena-server'
+import {
+  DB,
+  BaseProtocol,
+  TableNodeDef,
+  Schemata,
+  NodeDefRepository as NodeDefRepositoryServer,
+} from '@openforis/arena-server'
 
-import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as ServerDB from '@server/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 const { getSchemaSurvey } = Schemata
 
-// advanced properties to track as draft (to be used when publishing record)
-const advancedPropKeysDraftToTrack = [
-  NodeDef.keysPropsAdvanced.applicable,
-  NodeDef.keysPropsAdvanced.defaultValues,
-  NodeDef.keysPropsAdvanced.fileNameExpression,
-  NodeDef.keysPropsAdvanced.validations,
-]
-
-const rowPropertyByAdvancedPropKeys = {
-  [NodeDef.keysPropsAdvanced.applicable]: A.camelize(NodeDef.keys.draftAdvancedApplicable),
-  [NodeDef.keysPropsAdvanced.defaultValues]: A.camelize(NodeDef.keys.draftAdvancedDefaultValues),
-  [NodeDef.keysPropsAdvanced.fileNameExpression]: A.camelize(NodeDef.keys.draftAdvancedFileNameExpression),
-  [NodeDef.keysPropsAdvanced.validations]: A.camelize(NodeDef.keys.draftAdvancedValidations),
-}
-
-const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) => {
-  const rowUpdated = { ...row }
-
-  if (advanced || backup) {
-    if (!R.isEmpty(rowUpdated.props_advanced_draft)) {
-      // there are draft advanced props to merge with "published" advanced props
-      rowUpdated[A.camelize(NodeDef.keys.draftAdvanced)] = true
-
-      // set updated props flags
-      advancedPropKeysDraftToTrack.forEach((advancedPropKey) => {
-        if (rowUpdated.props_advanced_draft[advancedPropKey]) {
-          rowUpdated[rowPropertyByAdvancedPropKeys[advancedPropKey]] = true
-        }
-      })
-
-      if (draft && !backup) {
-        // merge props_advanced and props_advanced_draft into props_advanced
-        rowUpdated.props_advanced = R.mergeLeft(row.props_advanced_draft, row.props_advanced)
-        delete rowUpdated.props_advanced_draft
-      }
-    }
-    if ((!backup && !draft) || R.isEmpty(rowUpdated.props_advanced_draft)) {
-      // ignore props_advanced_draft
-      delete rowUpdated.props_advanced_draft
-    }
-  } else {
-    delete rowUpdated.props_advanced
-    delete rowUpdated.props_advanced_draft
-  }
-  return ServerDB.transformCallback(rowUpdated, draft, true, backup)
-}
+const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) =>
+  NodeDefRepositoryServer.rowTransformCallback({ draft, advanced, backup })(row)
 
 const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, virtual, 
   ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, 
@@ -140,23 +98,17 @@ export const fetchNodeDefsBySurveyId = async (
   { surveyId, cycle, draft, advanced = false, includeDeleted = false, backup = false, includeAnalysis = true },
   client = DB
 ) =>
-  client.map(
-    `
-    SELECT ${nodeDefSelectFields}
-    FROM ${getSchemaSurvey(surveyId)}.node_def 
-    WHERE TRUE
-      ${
-        cycle
-          ? `--filter by cycle
-          AND ${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, draft, '', false)} @> $1`
-          : ''
-      } 
-      ${!backup && !draft ? " AND props <> '{}'::jsonb" : ''}
-      ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
-      ${!includeAnalysis ? ' AND analysis IS NOT TRUE' : ''}
-    ORDER BY id`,
-    [JSON.stringify(cycle || null)],
-    (row) => dbTransformCallback({ row, draft, advanced, backup })
+  NodeDefRepositoryServer.getNodeDefsBySurveyId(
+    {
+      surveyId,
+      cycle,
+      draft,
+      advanced,
+      includeAnalysis,
+      includeDeleted,
+      backup,
+    },
+    client
   )
 
 export const fetchRootNodeDef = async (surveyId, draft, client = DB) =>
@@ -473,13 +425,11 @@ export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, cli
 
 /**
  * Fetches all virtual entities.
- *
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
- * @param {number} [params.offset=0] - The select query offset.
- * @param {number} [params.limit=null] - The select query limit.
- * @param {BaseProtocol} [client=db] - The database client.
- *
+ * @param {number} [params.offset] - The select query offset.
+ * @param {number} [params.limit] - The select query limit.
+ * @param {BaseProtocol} [client] - The database client.
  * @returns {Promise<any[]>} - The result promise.
  */
 export const fetchVirtualEntities = async (params, client = DB) => {
@@ -504,11 +454,9 @@ export const fetchVirtualEntities = async (params, client = DB) => {
 
 /**
  * Count virtual entities.
- *
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
- * @param {BaseProtocol} [client=db] - The database client.
- *
+ * @param {BaseProtocol} [client] - The database client.
  * @returns {Promise<number>} - The result promise.
  */
 export const countVirtualEntities = async (params, client = DB) => {
