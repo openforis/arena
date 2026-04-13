@@ -1,7 +1,9 @@
-import { Schemata } from '@openforis/arena-server'
+import { generateSurveyDocx, Responses, Schemata } from '@openforis/arena-server'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
+
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as FileService from '@server/modules/record/service/fileService'
@@ -9,6 +11,7 @@ import { RecordsUpdateThreadService } from '@server/modules/record/service/updat
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 import * as DbUtils from '@server/db/dbUtils'
+import * as Response from '@server/utils/response'
 
 import * as SurveyManager from '../manager/surveyManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
@@ -109,6 +112,32 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileF
 
 export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
+
+export const exportSurveyDocx = async ({ surveyId, cycle, lang, draft = true, outputStream }) => {
+  const survey = await fetchSurveyAndNodeDefsBySurveyId({
+    surveyId,
+    cycle,
+    draft,
+    advanced: false,
+    includeDeleted: false,
+    includeAnalysis: true,
+  })
+  const { buffer, surveyName } = await generateSurveyDocx({ survey, cycle, lang })
+  const fileName = ExportFileNameGenerator.generate({
+    surveyName,
+    cycle,
+    fileType: 'SurveyForm',
+    extension: 'docx',
+  })
+  const fileSize = Buffer.byteLength(buffer)
+  Response.sendFileContent({
+    res: outputStream,
+    fileName,
+    content: buffer,
+    contentSize: fileSize,
+    contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  })
+}
 
 export const deleteSurvey = async (surveyId) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
