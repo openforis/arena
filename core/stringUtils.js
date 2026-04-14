@@ -57,6 +57,7 @@ export const removeSuffix = (suffix) => (text) => {
 }
 
 export const quote = (text) => (isBlank(text) ? '' : `'${text}'`)
+export const quoteDouble = (text) => (isBlank(text) ? '' : `"${text}"`)
 export const unquote = R.pipe(removePrefix(`'`), removeSuffix(`'`))
 export const unquoteDouble = R.pipe(removePrefix(`"`), removeSuffix(`"`))
 

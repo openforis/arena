@@ -232,6 +232,17 @@ export const fetchTableSize = async ({ schema, table }, client = db) =>
   )
 
 export const createColumnSet = ({ columns, schema = null, table = null }) =>
-  new pgp.helpers.ColumnSet(columns, table ? { table: { schema, table } } : undefined)
+  new pgp.helpers.ColumnSet(
+    columns.map((col) => {
+      if (typeof col === 'string') {
+        if (col.startsWith('?')) {
+          return col
+        }
+        return { name: col, prop: col }
+      }
+      return col
+    }),
+    table ? { table: { schema, table } } : undefined
+  )
 
 export const createBulkUpdateValues = ({ columnSet, values }) => pgp.helpers.values(values, columnSet)

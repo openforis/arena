@@ -136,7 +136,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       columnsAndType.push(...rootDefColumnNamesAndTypes)
     }
     this.columnNodeDefs.forEach((nodeDefColumn) => {
-      columnsAndType.push(...nodeDefColumn.names.map((name, i) => `${name} ${nodeDefColumn.types[i]}`))
+      columnsAndType.push(...nodeDefColumn.names.map((name, i) => `"${name}" ${nodeDefColumn.types[i]}`))
     })
     return columnsAndType
   }
