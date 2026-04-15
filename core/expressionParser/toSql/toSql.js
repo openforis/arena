@@ -163,6 +163,13 @@ const functionsByType = {
   [types.CallExpression]: call,
 }
 
-_toSql = (expression, params = {}) => functionsByType[expression.type](expression, params)
+_toSql = (expression, params = {}) => {
+  const { type } = expression
+  const fn = functionsByType[type]
+  if (!fn) {
+    throw new SystemError('appErrors:undefinedExpressionType', { type })
+  }
+  return fn(expression, params)
+}
 
 export const toSql = _toSql
