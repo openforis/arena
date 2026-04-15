@@ -255,7 +255,7 @@ export default {
   header: {
     myProfile: 'Мой профиль',
     qrCodeLoginDialog: {
-      title: 'Вход из Arena Mobile с помощью QR-кода',
+      title: 'Вход в Arena Mobile с помощью QR-кода',
       instructions: `1. Откройте приложение **Arena Mobile** на вашем мобильном устройстве
 2. Перейдите в меню **Настройки**
 3. Выберите **Подключение к серверу**

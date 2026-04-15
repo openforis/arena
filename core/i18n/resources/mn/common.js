@@ -256,7 +256,7 @@ export default {
   header: {
     myProfile: 'Миний профайл',
     qrCodeLoginDialog: {
-      title: 'Arena Mobile-аас QR код ашиглан нэвтрэх',
+      title: 'Arena Mobile-д QR код ашиглан нэвтрэх',
       instructions: `1. Гар утсан дээрээ **Arena Mobile** аппыг нээнэ үү
 2. **Тохиргоо** цэс рүү орно уу
 3. **Серверт холбогдох**-ыг сонгоно уу
