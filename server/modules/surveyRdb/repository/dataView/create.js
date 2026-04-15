@@ -25,7 +25,7 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
     } else if (isMultipleAttribute && NodeDef.isDescendantOf(viewNodeDef)(nodeDef)) {
       if (canJoinWithMultipleAttributeTable({ nodeDef, viewNodeDef })) {
         const multAttrDataTable = new TableDataNodeDef(survey, nodeDef)
-        return colNames.map((colName) => `${multAttrDataTable.alias}.${DbUtils.asName(colName)}`)
+        return colNames.map((colName) => `${DbUtils.asName(multAttrDataTable.alias)}.${DbUtils.asName(colName)}`)
       } else {
         // skip multiple attributes that cannot be aggregated into a single column yet
         return []
@@ -50,15 +50,16 @@ const _getJoinWithMultipleAttributeTable = ({ viewDataNodeDef, multAttrColumnNod
   const { survey, tableData } = viewDataNodeDef
   const { nodeDef: multAttrDef, names: columnNames } = multAttrColumnNodeDef
   const multAttrDataTable = new TableDataNodeDef(survey, multAttrDef)
+  const tableNameAliasQuoted = DbUtils.asName(multAttrDataTable.alias)
 
   return `LEFT JOIN 
   (
     SELECT 
       ${multAttrDataTable.columnParentUuid}, 
-      ${columnNames.map((colName) => `json_agg(${multAttrDataTable.alias}.${DbUtils.asName(colName)}) AS ${DbUtils.asName(colName)}`).join(', ')}
+      ${columnNames.map((colName) => `json_agg(${tableNameAliasQuoted}.${DbUtils.asName(colName)}) AS ${DbUtils.asName(colName)}`).join(', ')}
     FROM ${multAttrDataTable.nameAliased}
     GROUP BY ${multAttrDataTable.columnParentUuid}
-  ) AS ${multAttrDataTable.alias}
+  ) AS ${tableNameAliasQuoted}
   ON ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
 }
 
