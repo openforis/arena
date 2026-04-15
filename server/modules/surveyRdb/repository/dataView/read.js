@@ -50,7 +50,7 @@ const columnTransformByNodeDefType = {
       .map((colName) => {
         if (colName === alias) {
           // not in stream mode: read default column as a geometry point string
-          return DbUtils.geometryPointColumnAsText({ qualifiedColName: nameFull, alias })
+          return DbUtils.geometryPointColumnAsText({ qualifiedColName: nameFull, alias: DbUtils.asName(alias) })
         }
         return `${DbUtils.asName(viewAlias)}.${DbUtils.asName(colName)} AS ${DbUtils.asName(colName)}`
       })
@@ -66,7 +66,12 @@ const _selectFieldsByNodeDefType =
   ({ viewDataNodeDef, streamMode }) =>
   (nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const { name: alias, names, nameFull, namesFull } = columnNodeDef
+    const {
+      name: alias, // use column name as alias for easier mapping of transformed columns (e.g. coordinate) and default column in stream mode
+      names,
+      nameFull,
+      namesFull,
+    } = columnNodeDef
 
     const columnTransform = columnTransformByNodeDefType[NodeDef.getType(nodeDefCol)]
     if (columnTransform) {

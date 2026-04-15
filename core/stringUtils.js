@@ -72,5 +72,5 @@ export const hashCode = (str) => {
     hash = hash & hash // convert to 32bit integer
   }
   hash = hash >>> 0 // convert signed to unsigned https://stackoverflow.com/a/1908655
-  return Number(hash).toString(32).toUpperCase() // make the hash small, convert base10 to base32
+  return Number(hash).toString(32) // make the hash small, convert base10 to base32
 }
