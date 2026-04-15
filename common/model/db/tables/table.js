@@ -67,7 +67,7 @@ export default class Table {
   }
 
   get nameAliased() {
-    return `${this.nameQualified} AS ${StringUtils.quoteDouble(this.alias)}`
+    return `${this.nameQualified} AS ${this.alias}`
   }
 
   get columns() {
