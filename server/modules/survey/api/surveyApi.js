@@ -229,16 +229,6 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/docx/export', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, draft } = Request.getParams(req)
-
-      await SurveyService.exportSurveyDocx({ surveyId, draft, outputStream: res })
-    } catch (error) {
-      next(error)
-    }
-  })
-
   // download generated survey export file
   app.get('/survey/:surveyId/export/download', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
     try {
@@ -266,6 +256,16 @@ export const init = (app) => {
       const outputFileName = `${outputFileNameParts.join('_')}.zip`
 
       Response.sendFile({ res, path, name: outputFileName })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/export/docx', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft, cycle, lang } = Request.getParams(req)
+
+      await SurveyService.exportSurveyDocx({ surveyId, draft, cycle, lang, outputStream: res })
     } catch (error) {
       next(error)
     }

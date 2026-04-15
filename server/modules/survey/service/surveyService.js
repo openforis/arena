@@ -1,28 +1,28 @@
-import { generateSurveyDocx, Responses, Schemata } from '@openforis/arena-server'
+import { Schemata, SurveyDocxGenerator } from '@openforis/arena-server'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
+import * as DbUtils from '@server/db/dbUtils'
+import * as JobManager from '@server/job/jobManager'
+import * as JobUtils from '@server/job/jobUtils'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as FileService from '@server/modules/record/service/fileService'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
-import * as JobManager from '@server/job/jobManager'
-import * as JobUtils from '@server/job/jobUtils'
-import * as DbUtils from '@server/db/dbUtils'
 import * as Response from '@server/utils/response'
 
 import * as SurveyManager from '../manager/surveyManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
-import SurveyExportJob from './surveyExport/surveyExportJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
-import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
 import { SchemaSummary } from './schemaSummary'
-import SurveyLabelsImportJob from './surveyLabelsImportJob'
-import { SurveyLabelsExport } from './surveyLabelsExport'
-import SurveysListExportJob from './SurveysListExportJob'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
+import SurveyExportJob from './surveyExport/surveyExportJob'
+import { SurveyLabelsExport } from './surveyLabelsExport'
+import SurveyLabelsImportJob from './surveyLabelsImportJob'
+import SurveysListExportJob from './SurveysListExportJob'
+import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
 
 const dbMaxAvailableSpace = 1024 * 1024 * 1024 * 5 // 4GB
 
@@ -114,15 +114,15 @@ export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
 
 export const exportSurveyDocx = async ({ surveyId, cycle, lang, draft = true, outputStream }) => {
-  const survey = await fetchSurveyAndNodeDefsBySurveyId({
+  const survey = await fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
     cycle,
     draft,
     advanced: false,
     includeDeleted: false,
-    includeAnalysis: true,
+    includeAnalysis: false,
   })
-  const { buffer, surveyName } = await generateSurveyDocx({ survey, cycle, lang })
+  const { buffer, surveyName } = await SurveyDocxGenerator.generateSurveyDocx({ survey, cycle, lang })
   const fileName = ExportFileNameGenerator.generate({
     surveyName,
     cycle,
