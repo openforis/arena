@@ -16,7 +16,7 @@ export default class MassiveUpdate {
    * @param {number} [bufferSize] - The size of the buffer.
    */
   constructor({ schema, table, cols, where = null }, client = db, bufferSize = 100000) {
-    this.columnSet = createColumnSet({ columns: cols, schema, table })
+    this.columnSet = createColumnSet({ pgp, columns: cols, schema, table })
     this.client = client
     this.where = where
     this.values = []

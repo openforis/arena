@@ -4,6 +4,8 @@ import * as _QueryStream from 'pg-query-stream'
 
 import { Objects, Strings } from '@openforis/arena-core'
 
+import * as StringUtils from '@core/stringUtils'
+
 import { db } from '@server/db/db'
 
 const pgp = pgPromise()
@@ -190,6 +192,8 @@ export const prepareParameterForFilter = (value, filterType = filterTypes.includ
 
 export const formatQuery = pgp.as.format
 
+export const asName = (name) => (name.startsWith('"') ? name : StringUtils.quoteDouble(name))
+
 export const getPublishedCondition = ({ draft, tableAlias = null }) => {
   if (draft) return ''
   const tableAliasPrefix = tableAlias ? `${tableAlias}.` : ''
@@ -203,7 +207,7 @@ export const getWhereClause = (...conditions) => {
 
 // USERS (ROLES)
 export const createUser = async (name, password, client = db) =>
-  client.query(`CREATE USER "${name}" WITH LOGIN PASSWORD '${password}'`)
+  client.query(`CREATE USER ${asName(name)} WITH LOGIN PASSWORD '${password}'`)
 
 export const dropUser = async (name, client = db) => await client.query(`DROP USER IF EXISTS "${name}"`)
 
@@ -231,14 +235,14 @@ export const fetchTableSize = async ({ schema, table }, client = db) =>
     (row) => Number(row.size)
   )
 
-export const createColumnSet = ({ columns, schema = null, table = null }) =>
-  new pgp.helpers.ColumnSet(
+export const createColumnSet = ({ pgp: pgpProp = pgp, columns, schema = null, table = null }) =>
+  new pgpProp.helpers.ColumnSet(
     columns.map((col) => {
       if (typeof col === 'string') {
         if (col.startsWith('?')) {
           return col
         }
-        return { name: col, prop: col }
+        return { name: col, prop: col } // workaround to double quote column names
       }
       return col
     }),

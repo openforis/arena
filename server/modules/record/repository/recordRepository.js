@@ -232,7 +232,7 @@ const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
     .flatMap((nodeDef) => {
       const colNames = NodeDefTable.getColumnNames(nodeDef)
       return colNames.map((colName) => {
-        const qualifiedColName = `${tableAlias}.${colName}`
+        const qualifiedColName = `${StringUtils.quoteDouble(tableAlias)}.${StringUtils.quoteDouble(colName)}`
         if (NodeDef.isCoordinate(nodeDef) && colName === NodeDef.getName(nodeDef)) {
           return `'${colName}', ${DbUtils.geometryPointColumnAsText({ qualifiedColName })}`
         } else {
