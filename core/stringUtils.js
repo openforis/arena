@@ -57,6 +57,7 @@ export const removeSuffix = (suffix) => (text) => {
 }
 
 export const quote = (text) => (isBlank(text) ? '' : `'${text}'`)
+export const quoteDouble = (text) => (isBlank(text) ? '' : `"${text}"`)
 export const unquote = R.pipe(removePrefix(`'`), removeSuffix(`'`))
 export const unquoteDouble = R.pipe(removePrefix(`"`), removeSuffix(`"`))
 
@@ -71,5 +72,5 @@ export const hashCode = (str) => {
     hash = hash & hash // convert to 32bit integer
   }
   hash = hash >>> 0 // convert signed to unsigned https://stackoverflow.com/a/1908655
-  return Number(hash).toString(32).toUpperCase() // make the hash small, convert base10 to base32
+  return Number(hash).toString(32) // make the hash small, convert base10 to base32
 }

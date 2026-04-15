@@ -262,7 +262,7 @@ Réessayer ?`,
   header: {
     myProfile: 'Mon profil',
     qrCodeLoginDialog: {
-      title: 'Connexion depuis Arena Mobile via QR code',
+      title: 'Connexion à Arena Mobile via QR code',
       instructions: `1. Démarrez l'application **Arena Mobile** sur votre appareil mobile
 2. Accédez au menu **Paramètres**
 3. Sélectionnez **Connexion au serveur**
