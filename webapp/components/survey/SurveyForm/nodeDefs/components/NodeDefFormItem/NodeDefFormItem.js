@@ -10,7 +10,21 @@ import * as NodeDefUiProps from '../../nodeDefUIProps'
 import NodeDefFormItemLabel from './NodeDefFormItemLabel'
 
 const NodeDefFormItem = (props) => {
-  const { edit, entry, label, lang, nodeDef, nodes = [], parentNode = null, ...otherProps } = props
+  const {
+    edit,
+    entry,
+    keyFieldLocked = false,
+    keyFieldLockVisible = false,
+    label,
+    lang,
+    nodeDef,
+    nodes = [],
+    onKeyFieldBlur = undefined,
+    onKeyFieldFocus = undefined,
+    onKeyFieldLockToggle = undefined,
+    parentNode = null,
+    ...otherProps
+  } = props
 
   const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), {
     edit,
@@ -47,11 +61,16 @@ const NodeDefFormItem = (props) => {
           edit={edit}
           nodes={nodes}
           parentNode={parentNode}
+          keyFieldLocked={keyFieldLocked}
+          keyFieldLockVisible={keyFieldLockVisible}
+          onKeyFieldLockToggle={onKeyFieldLockToggle}
         />
       }
       className="survey-form__node-def-form-item"
     >
-      {formItemContent}
+      <div className="survey-form__node-def-form-item-content" onFocus={onKeyFieldFocus} onBlur={onKeyFieldBlur}>
+        {formItemContent}
+      </div>
     </FormItem>
   )
 }
@@ -61,8 +80,13 @@ NodeDefFormItem.propTypes = {
   entry: PropTypes.bool.isRequired,
   label: PropTypes.string.isRequired,
   lang: PropTypes.string.isRequired,
+  keyFieldLocked: PropTypes.bool,
+  keyFieldLockVisible: PropTypes.bool,
   nodeDef: PropTypes.object.isRequired,
   nodes: PropTypes.array,
+  onKeyFieldBlur: PropTypes.func,
+  onKeyFieldFocus: PropTypes.func,
+  onKeyFieldLockToggle: PropTypes.func,
   parentNode: PropTypes.object,
 }
 
