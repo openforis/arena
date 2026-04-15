@@ -1,5 +1,6 @@
 import * as Survey from '../../../../core/survey/survey'
 import * as NodeDef from '../../../../core/survey/nodeDef'
+import * as StringUtils from '../../../../core/stringUtils'
 import { ColumnNodeDef } from '../tables/dataNodeDef'
 import { Query } from '../../query'
 import SqlSelectBuilder from './sqlSelectBuilder'
@@ -33,7 +34,7 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
       })
       if (fieldAggFn) {
         // standard aggregate function
-        this.select(`${fieldAggFn}(${columnMeasure}) AS ${fieldAlias}`)
+        this.select(`${fieldAggFn}(${StringUtils.quoteDouble(columnMeasure)}) AS ${fieldAlias}`)
       } else {
         // custom aggregate function
         const aggregateFnUuid = aggFnNameOrUuid

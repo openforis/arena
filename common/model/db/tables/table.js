@@ -1,3 +1,5 @@
+import * as StringUtils from '@core/stringUtils'
+
 import * as SQL from '../sql'
 
 // common column set
@@ -12,7 +14,6 @@ const columnSetCommon = {
 
 /**
  * A database table object.
- *
  * @typedef {object} module:arena.Table
  * @property {string} schema - The schema it belongs to.
  * @property {string} name - The table name.
@@ -22,10 +23,9 @@ const columnSetCommon = {
 export default class Table {
   /**
    * Create an instance of a Table.
-   *
    * @param {!string} schema - The schema.
    * @param {!string} name - The table name.
-   * @param {{[key: string]: string}} [columnSet={}] - The table column set.
+   * @param {{[key: string]: string}} [columnSet] - The table column set.
    */
   constructor(schema, name, columnSet = {}) {
     if (new.target === Table) {
@@ -63,7 +63,7 @@ export default class Table {
   }
 
   get nameQualified() {
-    return `${this.schema}."${this.name}"`
+    return `${this.schema}.${StringUtils.quoteDouble(this.name)}` // name should be quoted: it can contain reserved words
   }
 
   get nameAliased() {

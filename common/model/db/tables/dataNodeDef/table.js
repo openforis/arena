@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as StringUtils from '../../../../../core/stringUtils'
 
 import Table from '../table'
 import TableSurveyRdb from '../tableSurveyRdb'
@@ -136,7 +137,9 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       columnsAndType.push(...rootDefColumnNamesAndTypes)
     }
     this.columnNodeDefs.forEach((nodeDefColumn) => {
-      columnsAndType.push(...nodeDefColumn.names.map((name, i) => `${name} ${nodeDefColumn.types[i]}`))
+      columnsAndType.push(
+        ...nodeDefColumn.names.map((name, i) => `${StringUtils.quoteDouble(name)} ${nodeDefColumn.types[i]}`)
+      )
     })
     return columnsAndType
   }
