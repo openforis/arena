@@ -1,5 +1,6 @@
 import { Schemata, SurveyDocxGenerator } from '@openforis/arena-server'
 
+import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
@@ -113,7 +114,7 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileF
 export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
 
-export const exportSurveyDocx = async ({ surveyId, cycle, lang, draft = true, outputStream }) => {
+export const exportSurveyDocx = async ({ surveyId, cycle, outputStream, lang = null, draft = true }) => {
   const survey = await fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
     cycle,
@@ -122,7 +123,9 @@ export const exportSurveyDocx = async ({ surveyId, cycle, lang, draft = true, ou
     includeDeleted: false,
     includeAnalysis: false,
   })
-  const { buffer, surveyName } = await SurveyDocxGenerator.generateSurveyDocx({ survey, cycle, lang })
+  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+  const i18n = await i18nFactory.createI18nAsync(langToUse)
+  const { buffer, surveyName } = await SurveyDocxGenerator.generateSurveyDocx({ survey, cycle, lang: langToUse, i18n })
   const fileName = ExportFileNameGenerator.generate({
     surveyName,
     cycle,
