@@ -1,11 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { Button } from '@webapp/components/buttons'
-
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDefIconKey from '../NodeDefIconKey'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
+import NodeDefKeyLockToggle from '../NodeDefKeyLockToggle/NodeDefKeyLockToggle'
 
 const NodeDefFormItemLabel = (props) => {
   const {
@@ -25,15 +24,10 @@ const NodeDefFormItemLabel = (props) => {
       <NodeDefIconKey nodeDef={nodeDef} />
       <span>{label}</span>
       {keyFieldLockVisible && (
-        <Button
+        <NodeDefKeyLockToggle
           className="survey-form__node-def-key-lock-btn"
-          iconClassName={keyFieldLocked ? 'icon-lock icon-12px' : 'icon-unlocked icon-12px'}
-          label={`recordView.${keyFieldLocked ? 'unlock' : 'lock'}`}
-          onMouseDown={(event) => event.preventDefault()}
+          keyFieldLocked={keyFieldLocked}
           onClick={onKeyFieldLockToggle}
-          showLabel={false}
-          size="small"
-          variant="text"
         />
       )}
       <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
