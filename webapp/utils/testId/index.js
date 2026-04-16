@@ -172,6 +172,7 @@ export const TestId = {
     entityAddBtn: (name) => `${name}-add-btn`,
     entityRowHeader: (name) => `${name}-row-header`,
     entityRowData: (name, idx) => `${name}-row-${idx}`,
+    keyLockToggle: (name) => `key-lock-toggle-${name}`,
     nodeDefAddChildToBtn: (name) => `${name}-add-child-btn`,
     nodeDefAddChildOfTypeBtn: (type) => `add-child-of-type-${type}`,
     nodeDefEditBtn: (name) => `${name}-edit-btn`,

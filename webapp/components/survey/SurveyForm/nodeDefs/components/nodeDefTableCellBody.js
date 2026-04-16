@@ -7,10 +7,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefErrorBadge from './nodeDefErrorBadge'
-import NodeDefKeyLockToggle from './NodeDefKeyLockToggle/NodeDefKeyLockToggle'
+import NodeDefKeyLockToggle from './NodeDefKeyLockToggle'
 import NodeDefMultipleTableCell from './nodeDefMultipleTableCell'
 
 const NodeDefTableCellBody = (props) => {
@@ -66,6 +67,7 @@ const NodeDefTableCellBody = (props) => {
               className="survey-form__node-def-table-cell-lock-btn"
               keyFieldLocked={keyFieldLocked}
               onClick={onKeyFieldLockToggle}
+              testId={TestId.surveyForm.keyLockToggle(NodeDef.getName(nodeDef))}
             />
           )}
           <NodeDefErrorBadge
