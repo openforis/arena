@@ -97,6 +97,7 @@ export const Button = forwardRef((props, ref) => {
     <MuiButton
       ref={ref}
       id={id}
+      aria-label={label ?? title}
       className={classNames('btn', className, {
         'btn-s': size === 'small',
         'btn-primary': primary,

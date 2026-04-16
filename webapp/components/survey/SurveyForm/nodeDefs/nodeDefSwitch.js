@@ -75,7 +75,7 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
 
     const canDeleteNode = canAddOrDeleteNodeCommon && _isNodesCountAboveMin({ parentNode, nodeDef, nodes })
 
-    const nodesHaveValue = nodes.every((node) => Nodes.isValueNotBlank(node))
+    const nodesHaveValue = nodes.length > 0 && nodes.every((node) => Nodes.isValueNotBlank(node))
     const nodesEmpty = nodes.every((node) => Record.isNodeEmpty(node)(record))
 
     return {
