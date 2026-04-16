@@ -18,6 +18,7 @@ import * as TaxonomyManager from '../manager/taxonomyManager'
 import TaxonomyImportManager from '../manager/taxonomyImportManager'
 
 import TaxonCSVParser from './taxonCSVParser'
+import SystemError from '@core/systemError'
 
 const requiredColumns = ['code', 'scientific_name']
 const fixedColumns = [...requiredColumns, 'family', 'genus']
@@ -90,7 +91,22 @@ export default class TaxonomyImportJob extends Job {
         await this.setStatusFailed()
       } else {
         this.logDebug('no errors found, finalizing import')
-        await this.taxonomyImportManager.finalizeImport()
+        try {
+          await this.taxonomyImportManager.finalizeImport()
+        } catch (error) {
+          if (error instanceof SystemError) {
+            const { key, params } = error
+            this.addError({
+              [Taxon.propKeys.scientificName]: {
+                valid: false,
+                errors: [{ key, params }],
+              },
+            })
+            await this.setStatusFailed()
+          } else {
+            throw error
+          }
+        }
       }
     }
   }
