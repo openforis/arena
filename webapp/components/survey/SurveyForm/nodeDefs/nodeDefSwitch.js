@@ -117,22 +117,25 @@ const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, nodeDefUuid, nod
   const isUnlocked = unlockedNodeDefUuid === nodeDefUuid
   const isLocked = lockEnabled && hasValue && !isUnlocked && !isEditing
 
-  const onFocus = () => {
+  const onFocus = useCallback(() => {
     if (lockEnabled) {
       setEditingNodeDefUuid(nodeDefUuid)
     }
-  }
+  }, [lockEnabled, nodeDefUuid])
 
-  const onBlur = (event) => {
-    if (!lockEnabled || event.currentTarget.contains(event.relatedTarget)) return
+  const onBlur = useCallback(
+    (event) => {
+      if (!lockEnabled || event.currentTarget.contains(event.relatedTarget)) return
 
-    setEditingNodeDefUuid(null)
-    if (hasValue) {
-      setUnlockedNodeDefUuid(null)
-    }
-  }
+      setEditingNodeDefUuid(null)
+      if (hasValue) {
+        setUnlockedNodeDefUuid(null)
+      }
+    },
+    [lockEnabled, hasValue]
+  )
 
-  const onLockToggle = () => {
+  const onLockToggle = useCallback(() => {
     if (!lockEnabled || !hasValue) return
 
     if (isLocked) {
@@ -142,7 +145,7 @@ const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, nodeDefUuid, nod
 
     setEditingNodeDefUuid(null)
     setUnlockedNodeDefUuid(null)
-  }
+  }, [lockEnabled, hasValue, isLocked, nodeDefUuid])
 
   return {
     hasValue,
