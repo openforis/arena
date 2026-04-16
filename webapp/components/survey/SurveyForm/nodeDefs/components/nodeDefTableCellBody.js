@@ -19,6 +19,7 @@ const NodeDefTableCellBody = (props) => {
     entryDataQuery = false, // True when node is being edited in data query
     keyFieldLocked = false,
     keyFieldLockVisible = false,
+    label = '',
     nodeDef,
     nodes,
     onKeyFieldBlur = undefined,
@@ -52,7 +53,12 @@ const NodeDefTableCellBody = (props) => {
   const controlsVisible = keyFieldLockVisible
 
   return (
-    <div className="survey-form__node-def-table-cell-body" onFocus={onKeyFieldFocus} onBlur={onKeyFieldBlur}>
+    <fieldset
+      aria-label={label}
+      className="survey-form__node-def-fieldset survey-form__node-def-table-cell-body"
+      onFocus={onKeyFieldFocus}
+      onBlur={onKeyFieldBlur}
+    >
       <div className="survey-form__node-def-table-cell-body-inner">
         <div className="survey-form__node-def-table-cell-controls">
           {keyFieldLockVisible && (
@@ -75,7 +81,7 @@ const NodeDefTableCellBody = (props) => {
           {nodeDefComponent}
         </div>
       </div>
-    </div>
+    </fieldset>
   )
 }
 
@@ -86,6 +92,7 @@ NodeDefTableCellBody.propTypes = {
   entryDataQuery: PropTypes.bool,
   keyFieldLocked: PropTypes.bool,
   keyFieldLockVisible: PropTypes.bool,
+  label: PropTypes.string,
   nodeDef: PropTypes.object.isRequired,
   nodes: PropTypes.array.isRequired,
   onKeyFieldBlur: PropTypes.func,

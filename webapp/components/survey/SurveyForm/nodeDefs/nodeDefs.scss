@@ -81,6 +81,13 @@
   }
 }
 
+.survey-form__node-def-fieldset {
+  border: 0;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+}
+
 .survey-form__node-def-form-item {
   grid-template-columns: 1fr !important;
   grid-template-rows: 30px 1fr;

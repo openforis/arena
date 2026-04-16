@@ -68,9 +68,14 @@ const NodeDefFormItem = (props) => {
       }
       className="survey-form__node-def-form-item"
     >
-      <div className="survey-form__node-def-form-item-content" onFocus={onKeyFieldFocus} onBlur={onKeyFieldBlur}>
+      <fieldset
+        aria-label={label}
+        className="survey-form__node-def-fieldset survey-form__node-def-form-item-content"
+        onFocus={onKeyFieldFocus}
+        onBlur={onKeyFieldBlur}
+      >
         {formItemContent}
-      </div>
+      </fieldset>
     </FormItem>
   )
 }
