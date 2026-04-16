@@ -180,6 +180,8 @@ export default {
     duplicateExtraPropsColumns: 'Duplicate Extra Info columns: {{duplicateColumns}}',
     invalidExtraPropColumn: 'Invalid Extra Info column name "{{columnName}}": it cannot be a reserved word',
     missingRequiredColumns: 'Missing required column(s): {{columns}}',
+    reservedScientificName:
+      'Scientific name "{{scientificName}}" is reserved and cannot be used; it will be inserted automatically to the taxonomy.',
   },
 
   user: {

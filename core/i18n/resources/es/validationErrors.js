@@ -182,6 +182,8 @@ export default {
     invalidExtraPropColumn:
       'Nombre de columna de información extra no válido "{{columnName}}": no puede ser una palabra reservada',
     missingRequiredColumns: 'Faltan columnas obligatorias: {{columns}}',
+    reservedScientificName:
+      'El nombre científico "{{scientificName}}" está reservado y no puede utilizarse; se insertará automáticamente en la taxonomía.',
   },
 
   user: {

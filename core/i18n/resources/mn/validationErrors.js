@@ -182,6 +182,8 @@ export default {
     invalidExtraPropColumn:
       'Нэмэлт мэдээллийн баганын нэр "{{columnName}}" хүчингүй: энэ нь нөөцлөгдсөн үг байх боломжгүй',
     missingRequiredColumns: 'Шаардлагатай багана(ууд) дутуу: {{columns}}',
+    reservedScientificName:
+      '"{{scientificName}}" шинжлэх ухааны нэр нь нөөцлөгдсөн тул ашиглах боломжгүй; энэ нь таксономид автоматаар нэмэгдэнэ.',
   },
 
   user: {
