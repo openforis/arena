@@ -182,6 +182,8 @@ export default {
     invalidExtraPropColumn:
       'Неверное имя столбца дополнительной информации "{{columnName}}": оно не может быть зарезервированным словом',
     missingRequiredColumns: 'Отсутствуют обязательные столбцы: {{columns}}',
+    reservedScientificName:
+      'Научное название "{{scientificName}}" зарезервировано и не может использоваться; оно будет автоматически добавлено в таксономию.',
   },
 
   user: {

@@ -184,6 +184,8 @@ export default {
     invalidExtraPropColumn:
       'Nom de colonne d\'information supplémentaire invalide "{{columnName}}" : ce ne peut pas être un mot réservé',
     missingRequiredColumns: 'Colonne(s) requise(s) manquante(s) : {{columns}}',
+    reservedScientificName:
+      'Le nom scientifique "{{scientificName}}" est réservé et ne peut pas être utilisé ; il sera inséré automatiquement dans la taxonomie.',
   },
 
   user: {
