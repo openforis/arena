@@ -87,6 +87,88 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
     }
   }, Objects.isEqual)
 
+const useHovering = ({ canEditDef, edit }) => {
+  const [isHovering, setIsHovering] = useState(false)
+
+  const onMouseEnter = () => {
+    if (edit && canEditDef && !isHovering) {
+      setIsHovering(true)
+    }
+  }
+
+  const onMouseLeave = () => {
+    setIsHovering(false)
+  }
+
+  return {
+    isHovering,
+    onMouseEnter,
+    onMouseLeave,
+  }
+}
+
+const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, nodeDefUuid, nodesHaveValue }) => {
+  const [editingNodeDefUuid, setEditingNodeDefUuid] = useState(null)
+  const [unlockedNodeDefUuid, setUnlockedNodeDefUuid] = useState(null)
+
+  const lockEnabled = entry && !edit && canEditRecord && NodeDef.isAttribute(nodeDef) && NodeDef.isKey(nodeDef)
+  const hasValue = lockEnabled && nodesHaveValue
+  const isEditing = editingNodeDefUuid === nodeDefUuid
+  const isUnlocked = unlockedNodeDefUuid === nodeDefUuid
+  const isLocked = lockEnabled && hasValue && !isUnlocked && !isEditing
+
+  const onFocus = () => {
+    if (lockEnabled) {
+      setEditingNodeDefUuid(nodeDefUuid)
+    }
+  }
+
+  const onBlur = (event) => {
+    if (!lockEnabled || event.currentTarget.contains(event.relatedTarget)) return
+
+    setEditingNodeDefUuid(null)
+    if (hasValue) {
+      setUnlockedNodeDefUuid(null)
+    }
+  }
+
+  const onLockToggle = () => {
+    if (!lockEnabled || !hasValue) return
+
+    if (isLocked) {
+      setUnlockedNodeDefUuid(nodeDefUuid)
+      return
+    }
+
+    setEditingNodeDefUuid(null)
+    setUnlockedNodeDefUuid(null)
+  }
+
+  return {
+    hasValue,
+    isLocked,
+    lockVisible: lockEnabled && hasValue,
+    onFocus,
+    onBlur,
+    onLockToggle,
+  }
+}
+
+const getClassName = ({ applicable, empty, keyFieldLocked, nodeDef, readOnly, renderType, surveyCycleKey }) => {
+  const mainClassNameSuffix = NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'
+  const mainClassName = 'survey-form__node-def-page' + mainClassNameSuffix
+
+  return classNames(mainClassName, {
+    'not-applicable': !applicable,
+    hidden:
+      !applicable &&
+      NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
+      renderType !== NodeDefLayout.renderType.tableBody &&
+      empty,
+    'read-only': (readOnly || keyFieldLocked) && renderType !== NodeDefLayout.renderType.tableHeader,
+  })
+}
+
 const NodeDefSwitch = (props) => {
   const { canEditDef, canEditRecord, edit, empty, entry, nodeDef, parentNode, renderType } = props
 
@@ -101,12 +183,7 @@ const NodeDefSwitch = (props) => {
   const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-  const [isHovering, setIsHovering] = useState(false)
-  const [keyFieldEditingNodeDefUuid, setKeyFieldEditingNodeDefUuid] = useState(null)
-  const [keyFieldUnlockedNodeDefUuid, setKeyFieldUnlockedNodeDefUuid] = useState(null)
-
   const renderAsForm = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
-  const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
   const handleMouseEvents = edit && canEditDef && !renderAsForm
 
   const updateNode = useCallback((...params) => dispatch(RecordActions.updateNode(...params)), [dispatch])
@@ -120,24 +197,31 @@ const NodeDefSwitch = (props) => {
 
   const applicable = parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true
   const { canAddNode, nodes, nodesHaveValue } = entryProps
-  const isKeyFieldLockEnabled =
-    entry && !edit && canEditRecord && NodeDef.isAttribute(nodeDef) && NodeDef.isKey(nodeDef)
-  const keyNodeHasValue = isKeyFieldLockEnabled && entry && nodesHaveValue
-  const isKeyFieldEditing = keyFieldEditingNodeDefUuid === nodeDefUuid
-  const keyFieldUnlocked = keyFieldUnlockedNodeDefUuid === nodeDefUuid
-  const keyFieldLocked = isKeyFieldLockEnabled && keyNodeHasValue && !keyFieldUnlocked && !isKeyFieldEditing
+  const { isHovering, onMouseEnter, onMouseLeave } = useHovering({ canEditDef, edit })
+  const {
+    isLocked: keyFieldLocked,
+    lockVisible: keyFieldLockVisible,
+    onFocus: onKeyFieldFocus,
+    onBlur: onKeyFieldBlur,
+    onLockToggle: onKeyFieldLockToggle,
+  } = useKeyFieldLock({
+    canEditRecord,
+    edit,
+    entry,
+    nodeDef,
+    nodeDefUuid,
+    nodesHaveValue,
+  })
+  const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
 
-  const mainClassNameSuffix = NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'
-  const mainClassName = 'survey-form__node-def-page' + mainClassNameSuffix
-
-  const className = classNames(mainClassName, {
-    'not-applicable': !applicable,
-    hidden:
-      !applicable &&
-      NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
-      renderType !== NodeDefLayout.renderType.tableBody &&
-      empty,
-    'read-only': (readOnly || keyFieldLocked) && renderType !== NodeDefLayout.renderType.tableHeader,
+  const className = getClassName({
+    applicable,
+    empty,
+    keyFieldLocked,
+    nodeDef,
+    readOnly,
+    renderType,
+    surveyCycleKey,
   })
 
   const checkNodePlaceholder = useCallback(() => {
@@ -161,51 +245,6 @@ const NodeDefSwitch = (props) => {
     }
   }, [nodeDefUuid])
 
-  const setHovering = (hovering) => {
-    if (edit && canEditDef) {
-      setIsHovering(hovering)
-    }
-  }
-
-  const onMouseEnter = () => {
-    if (!isHovering) {
-      setHovering(true)
-    }
-  }
-
-  const onMouseLeave = () => {
-    setHovering(false)
-  }
-
-  const onKeyFieldFocus = () => {
-    if (isKeyFieldLockEnabled) {
-      setKeyFieldEditingNodeDefUuid(nodeDefUuid)
-    }
-  }
-
-  const onKeyFieldBlur = (event) => {
-    if (!isKeyFieldLockEnabled) return
-
-    if (event.currentTarget.contains(event.relatedTarget)) return
-
-    setKeyFieldEditingNodeDefUuid(null)
-    if (keyNodeHasValue) {
-      setKeyFieldUnlockedNodeDefUuid(null)
-    }
-  }
-
-  const onKeyFieldLockToggle = () => {
-    if (!isKeyFieldLockEnabled || !keyNodeHasValue) return
-
-    if (keyFieldLocked) {
-      setKeyFieldUnlockedNodeDefUuid(nodeDefUuid)
-      return
-    }
-
-    setKeyFieldEditingNodeDefUuid(null)
-    setKeyFieldUnlockedNodeDefUuid(null)
-  }
-
   const nestedComponentsProps = {
     ...props,
     ...entryProps,
@@ -217,7 +256,7 @@ const NodeDefSwitch = (props) => {
     updateNode,
     removeNode,
     keyFieldLocked,
-    keyFieldLockVisible: isKeyFieldLockEnabled && keyNodeHasValue,
+    keyFieldLockVisible,
     onKeyFieldFocus,
     onKeyFieldBlur,
     onKeyFieldLockToggle,
