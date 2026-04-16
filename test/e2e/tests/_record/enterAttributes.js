@@ -114,7 +114,7 @@ const enterFns = {
 export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
     const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name))}`
-    const keyToggleLocator = page.$(keyToggleSelector)
+    const keyToggleLocator = await page.$(keyToggleSelector)
     if (await keyToggleLocator.isVisible()) {
       const keyToggleTitle = await keyToggleLocator.getAttribute('title')
       if (keyToggleTitle?.toLowerCase().includes('unlock')) {
