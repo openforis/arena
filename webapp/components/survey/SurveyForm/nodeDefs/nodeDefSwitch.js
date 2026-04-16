@@ -75,11 +75,13 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
 
     const canDeleteNode = canAddOrDeleteNodeCommon && _isNodesCountAboveMin({ parentNode, nodeDef, nodes })
 
+    const nodesHaveValue = nodes.every((node) => Nodes.isValueNotBlank(node))
     const nodesEmpty = nodes.every((node) => Record.isNodeEmpty(node)(record))
 
     return {
       nodes,
       nodesEmpty,
+      nodesHaveValue,
       canAddNode,
       canDeleteNode,
     }
@@ -117,10 +119,10 @@ const NodeDefSwitch = (props) => {
   const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode })
 
   const applicable = parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true
-  const { canAddNode, nodes, nodesEmpty } = entryProps
+  const { canAddNode, nodes, nodesHaveValue } = entryProps
   const isKeyFieldLockEnabled =
     entry && !edit && canEditRecord && NodeDef.isAttribute(nodeDef) && NodeDef.isKey(nodeDef)
-  const keyNodeHasValue = isKeyFieldLockEnabled && entry && !nodesEmpty
+  const keyNodeHasValue = isKeyFieldLockEnabled && entry && nodesHaveValue
   const isKeyFieldEditing = keyFieldEditingNodeDefUuid === nodeDefUuid
   const keyFieldUnlocked = keyFieldUnlockedNodeDefUuid === nodeDefUuid
   const keyFieldLocked = isKeyFieldLockEnabled && keyNodeHasValue && !keyFieldUnlocked && !isKeyFieldEditing
