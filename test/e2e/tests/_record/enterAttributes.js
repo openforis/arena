@@ -116,8 +116,8 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
     const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name))}`
     const keyToggleLocator = page.locator(keyToggleSelector)
     if (await keyToggleLocator.isVisible()) {
-      const keyToggleTitle = await keyToggleLocator.getAttribute('title')
-      if (keyToggleTitle?.toLowerCase().includes('allow')) {
+      const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
+      if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
         await keyToggleLocator.click()
       }
     }
