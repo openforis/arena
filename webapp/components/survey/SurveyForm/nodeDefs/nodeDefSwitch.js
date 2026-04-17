@@ -168,6 +168,7 @@ const getClassName = ({ applicable, empty, keyFieldLocked, nodeDef, readOnly, re
       NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
       renderType !== NodeDefLayout.renderType.tableBody &&
       empty,
+    'key-field-locked': keyFieldLocked && renderType !== NodeDefLayout.renderType.tableHeader,
     'read-only': (readOnly || keyFieldLocked) && renderType !== NodeDefLayout.renderType.tableHeader,
   })
 }

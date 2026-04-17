@@ -53,14 +53,22 @@
   }
 }
 
-// === page / page item - read-only
 .survey-form__node-def-page,
 .survey-form__node-def-page-item {
+  // === page / page item - read-only
   &.read-only {
     input,
     .survey-form__node-def-code,
     .dropdown__control {
       background-color: rgba($greyBorder, 0.2);
+    }
+  }
+  // === page / page item - key field locked
+  &.key-field-locked {
+    input,
+    .survey-form__node-def-code,
+    .dropdown__control {
+      background-color: $white;
     }
   }
 }
