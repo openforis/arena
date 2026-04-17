@@ -59,6 +59,7 @@ export const Button = forwardRef((props, ref) => {
     active,
     children,
     className,
+    closeTooltipOnClick = false,
     color,
     disabled = false,
     icon = null,
@@ -148,6 +149,7 @@ export const Button = forwardRef((props, ref) => {
   return (
     <TooltipNew
       className={titleClassName}
+      closeOnClick={closeTooltipOnClick}
       title={title}
       markdownClassName={titleMarkdownClassName}
       isTitleMarkdown={isTitleMarkdown}
@@ -162,6 +164,7 @@ Button.propTypes = {
   active: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
+  closeTooltipOnClick: PropTypes.bool,
   color: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,

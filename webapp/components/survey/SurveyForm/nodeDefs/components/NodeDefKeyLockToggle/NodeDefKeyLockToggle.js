@@ -12,13 +12,14 @@ const NodeDefKeyLockToggle = (props) => {
   return (
     <Button
       className={classNameButton}
+      closeTooltipOnClick
       iconClassName={keyFieldLocked ? 'icon-lock icon-12px' : 'icon-unlocked icon-12px'}
       onClick={onClick}
       onMouseDown={(event) => event.preventDefault()}
       showLabel={false}
       size="small"
       testId={testId}
-      title={`recordView.${keyFieldLocked ? 'unlock' : 'lock'}`}
+      title={`recordView.keyAttributeEditing.${keyFieldLocked ? 'unlock' : 'lock'}`}
       variant="text"
     />
   )

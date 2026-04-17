@@ -117,7 +117,7 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
     const keyToggleLocator = page.locator(keyToggleSelector)
     if (await keyToggleLocator.isVisible()) {
       const keyToggleTitle = await keyToggleLocator.getAttribute('title')
-      if (keyToggleTitle?.toLowerCase().includes('unlock')) {
+      if (keyToggleTitle?.toLowerCase().includes('allow')) {
         await keyToggleLocator.click()
       }
     }

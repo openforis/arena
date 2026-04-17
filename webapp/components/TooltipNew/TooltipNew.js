@@ -12,7 +12,16 @@ import { useI18nT } from '@webapp/store/system'
 import Markdown from '../markdown'
 
 export const TooltipNew = (props) => {
-  const { children, className, isTitleMarkdown, markdownClassName, maxWidth, title: titleProp, renderTitle } = props
+  const {
+    children,
+    className,
+    closeOnClick = false,
+    isTitleMarkdown,
+    markdownClassName,
+    maxWidth,
+    title: titleProp,
+    renderTitle,
+  } = props
 
   const t = useI18nT()
   const tUnescapeHtml = useI18nT({ unescapeHtml: true })
@@ -28,11 +37,22 @@ export const TooltipNew = (props) => {
 
   const titleRenderer = renderTitle ?? defaultTitleRenderer
 
+  const [open, setOpen] = useState(false)
   const [title, setTitle] = useState(null)
 
   const onOpen = useCallback(() => {
     setTitle(titleRenderer())
+    setOpen(true)
   }, [titleRenderer])
+
+  const onClose = useCallback(() => {
+    setOpen(false)
+  }, [])
+
+  const onClickCapture = useCallback(() => {
+    if (!closeOnClick) return
+    setOpen(false)
+  }, [closeOnClick])
 
   const tooltipClass = useMemo(() => ({ popper: classNames('arena-tooltip', className) }), [className])
 
@@ -40,7 +60,9 @@ export const TooltipNew = (props) => {
     <Tooltip
       arrow
       classes={tooltipClass}
+      onClose={onClose}
       onOpen={onOpen}
+      open={open}
       slotProps={{
         tooltip: {
           sx: {
@@ -50,7 +72,7 @@ export const TooltipNew = (props) => {
       }}
       title={title}
     >
-      {children}
+      <span onClickCapture={onClickCapture}>{children}</span>
     </Tooltip>
   )
 }
@@ -58,6 +80,7 @@ export const TooltipNew = (props) => {
 TooltipNew.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  closeOnClick: PropTypes.bool,
   isTitleMarkdown: PropTypes.bool,
   markdownClassName: PropTypes.string,
   maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

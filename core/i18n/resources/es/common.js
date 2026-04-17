@@ -396,6 +396,10 @@ export default {
     errorLoadingRecord: 'Error al cargar el registro: {{details}}',
     recordEditModalTitle: 'Registro: {{keyValues}}',
     recordNotFound: 'Registro no encontrado',
+    keyAttributeEditing: {
+      lock: 'Bloquear edición del atributo clave',
+      unlock: 'Permitir editar el atributo clave',
+    },
     lock: 'Bloquear',
     unlock: 'Desbloquear',
   },
