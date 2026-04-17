@@ -119,6 +119,7 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
       const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
       if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
         await keyToggleLocator.click()
+        await page.mouse.move(0, 0, { steps: 1 })
       }
     }
     await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
