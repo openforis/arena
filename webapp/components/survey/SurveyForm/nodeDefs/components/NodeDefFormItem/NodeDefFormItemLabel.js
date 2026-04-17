@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { TestId } from '@webapp/utils/testId'
+
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDefIconKey from '../NodeDefIconKey'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
@@ -30,7 +32,7 @@ const NodeDefFormItemLabel = (props) => {
           className="survey-form__node-def-key-lock-btn"
           keyFieldLocked={keyFieldLocked}
           onClick={onKeyFieldLockToggle}
-          testId={`key-lock-toggle-${NodeDef.getName(nodeDef)}`}
+          testId={TestId.surveyForm.keyLockToggle(NodeDef.getName(nodeDef))}
         />
       )}
       <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
