@@ -442,6 +442,10 @@ $t(common.raiseTicketInSupportForum)
     errorLoadingRecord: 'Ошибка загрузки записи: {{details}}',
     recordEditModalTitle: 'Запись: {{keyValues}}',
     recordNotFound: 'Запись не найдена',
+    keyAttributeEditing: {
+      lock: 'Заблокировать редактирование ключевого атрибута',
+      unlock: 'Разрешить редактирование ключевого атрибута',
+    },
     lock: 'Заблокировать',
     unlock: 'Разблокировать',
   },

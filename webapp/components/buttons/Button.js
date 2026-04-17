@@ -10,7 +10,7 @@ import { useI18nT } from '@webapp/store/system'
 import { TooltipNew } from '../TooltipNew'
 
 const getTitle = (props, t) => {
-  const { labelParams, label, titleParams, title } = props
+  const { label, labelParams, title, titleParams } = props
   const { labelIsI18nKey = true, showLabel = true, titleIsI18nKey = true } = props
   if (title) {
     if (titleIsI18nKey) return t(title, titleParams)
@@ -24,7 +24,7 @@ const getTitle = (props, t) => {
 }
 
 const getLabel = (props, t) => {
-  const { labelIsI18nKey = true, labelParams, label, showLabel = true } = props
+  const { label, labelIsI18nKey = true, labelParams, showLabel = true } = props
   if (!showLabel || !label) return null
   if (labelIsI18nKey) return t(label, labelParams)
   return label
@@ -59,6 +59,7 @@ export const Button = forwardRef((props, ref) => {
     active,
     children,
     className,
+    closeTooltipOnClick = false,
     color,
     disabled = false,
     icon = null,
@@ -97,6 +98,7 @@ export const Button = forwardRef((props, ref) => {
     <MuiButton
       ref={ref}
       id={id}
+      aria-label={label ?? title}
       className={classNames('btn', className, {
         'btn-s': size === 'small',
         'btn-primary': primary,
@@ -136,6 +138,7 @@ export const Button = forwardRef((props, ref) => {
       }
       variant={variant}
       {...otherProps}
+      title={undefined} // title is handled by TooltipNew
     >
       {label}
       {children}
@@ -147,6 +150,7 @@ export const Button = forwardRef((props, ref) => {
   return (
     <TooltipNew
       className={titleClassName}
+      closeOnClick={closeTooltipOnClick}
       title={title}
       markdownClassName={titleMarkdownClassName}
       isTitleMarkdown={isTitleMarkdown}
@@ -161,6 +165,7 @@ Button.propTypes = {
   active: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
+  closeTooltipOnClick: PropTypes.bool,
   color: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
