@@ -69,7 +69,11 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
   expect(valueSet).toBeTruthy()
 }
 
-const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
+const enterText = async (nodeDef, value, parentSelector) => {
+  const selector = getTextSelector(nodeDef, parentSelector)
+  await page.click(selector) // to focus and move cursor out of other elements (e.g. to hide tooltips)
+  await page.fill(selector, value)
+}
 
 const enterTime = async (nodeDef, value, parentSelector) => {
   // open hours/minutes selector
