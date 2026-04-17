@@ -113,15 +113,18 @@ const enterFns = {
 
 export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
-    const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name))}`
-    const keyToggleLocator = page.locator(keyToggleSelector)
-    if (await keyToggleLocator.isVisible()) {
-      const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
-      if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
-        await keyToggleLocator.click()
-        await page.mouse.move(0, 0, { steps: 1 })
+    if (nodeDef.key) {
+      const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name))}`
+      const keyToggleLocator = page.locator(keyToggleSelector)
+      if (await keyToggleLocator.isVisible()) {
+        const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
+        if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
+          await keyToggleLocator.click()
+          await page.waitForTimeout(1000)
+          await page.mouse.move(0, 0, { steps: 1 })
+        }
       }
     }
     await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
     await FormUtils.waitForHeaderLoaderToDisappear()
-  }, 30000)
+  }, 10000)
