@@ -38,12 +38,14 @@ export const TooltipNew = (props) => {
   const titleRenderer = renderTitle ?? defaultTitleRenderer
 
   const [open, setOpen] = useState(false)
+  const [openSuppressed, setOpenSuppressed] = useState(false)
   const [title, setTitle] = useState(null)
 
   const onOpen = useCallback(() => {
+    if (openSuppressed) return
     setTitle(titleRenderer())
     setOpen(true)
-  }, [titleRenderer])
+  }, [openSuppressed, titleRenderer])
 
   const onClose = useCallback(() => {
     setOpen(false)
@@ -52,6 +54,20 @@ export const TooltipNew = (props) => {
   const onClickCapture = useCallback(() => {
     if (!closeOnClick) return
     setOpen(false)
+    setOpenSuppressed(true)
+  }, [closeOnClick])
+
+  const onMouseOutCapture = useCallback(
+    (event) => {
+      if (!closeOnClick || event.currentTarget.contains(event.relatedTarget)) return
+      setOpenSuppressed(false)
+    },
+    [closeOnClick]
+  )
+
+  const onBlurCapture = useCallback(() => {
+    if (!closeOnClick) return
+    setOpenSuppressed(false)
   }, [closeOnClick])
 
   const tooltipClass = useMemo(() => ({ popper: classNames('arena-tooltip', className) }), [className])
@@ -60,6 +76,8 @@ export const TooltipNew = (props) => {
     <Tooltip
       arrow
       classes={tooltipClass}
+      disableFocusListener={openSuppressed}
+      disableHoverListener={openSuppressed}
       onClose={onClose}
       onOpen={onOpen}
       open={open}
@@ -72,7 +90,9 @@ export const TooltipNew = (props) => {
       }}
       title={title}
     >
-      <span onClickCapture={onClickCapture}>{children}</span>
+      <span onBlurCapture={onBlurCapture} onClickCapture={onClickCapture} onMouseOutCapture={onMouseOutCapture}>
+        {children}
+      </span>
     </Tooltip>
   )
 }
