@@ -120,8 +120,17 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
         const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
         if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
           await keyToggleLocator.click()
-          await page.mouse.move(0, 0, { steps: 1 })
-          await page.waitForTimeout(1000)
+          await page.mouse.click(0, 0)
+          await page.waitForSelector('.arena-tooltip', { state: 'hidden', timeout: 2000 })
+          await page.waitForFunction(
+            async (selector) => {
+              const button = document.querySelector(selector)
+              const ariaLabel = button?.getAttribute('aria-label')?.toLowerCase() ?? ''
+              return !ariaLabel.includes('allow')
+            },
+            keyToggleSelector,
+            { timeout: 2000 }
+          )
         }
       }
     }
