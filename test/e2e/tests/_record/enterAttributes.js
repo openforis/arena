@@ -119,9 +119,21 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
       if (await keyToggleLocator.isVisible()) {
         const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
         if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
+          const tooltipId = await keyToggleLocator.getAttribute('aria-describedby')
           await keyToggleLocator.click()
           await page.mouse.click(0, 0)
-          await page.waitForSelector('.arena-tooltip', { state: 'hidden', timeout: 2000 })
+          if (tooltipId) {
+            await page.waitForFunction(
+              ([selector, tooltipIdParam]) => {
+                const button = document.querySelector(selector)
+                const currentTooltipId = button?.getAttribute('aria-describedby')
+                const tooltip = document.querySelector(`[role="tooltip"][id="${tooltipIdParam}"]`)
+                return currentTooltipId !== tooltipIdParam || !tooltip || tooltip.getAttribute('open') === 'false'
+              },
+              [keyToggleSelector, tooltipId],
+              { timeout: 2000 }
+            )
+          }
           await page.waitForFunction(
             async (selector) => {
               const button = document.querySelector(selector)
