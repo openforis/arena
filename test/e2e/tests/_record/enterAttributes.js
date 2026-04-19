@@ -116,33 +116,11 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
     if (nodeDef.key) {
       const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
       const keyToggleLocator = page.locator(keyToggleSelector)
-      const surveyFormLocator = page.locator(getSelector(TestId.surveyForm.surveyForm))
       if (await keyToggleLocator.isVisible()) {
         const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
         if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
           await keyToggleLocator.click()
-          await page.waitForFunction(
-            (selector) => {
-              const button = document.querySelector(selector)
-              const ariaLabel = button?.getAttribute('aria-label')?.toLowerCase() ?? ''
-              return !ariaLabel.includes('allow')
-            },
-            keyToggleSelector,
-            { timeout: 2000 }
-          )
-          await keyToggleLocator.evaluate((button) => {
-            button.blur()
-            const trigger = button.closest('span')
-            if (trigger) {
-              const relatedTarget = document.body
-              trigger.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget }))
-              trigger.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true, relatedTarget }))
-            }
-          })
-          await page.keyboard.press('Escape')
-          if (await surveyFormLocator.isVisible()) {
-            await surveyFormLocator.click({ position: { x: 5, y: 5 } })
-          }
+          await page.keyboard.press('Escape') // close potential tooltip
         }
       }
     }
