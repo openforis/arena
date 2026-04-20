@@ -8,6 +8,7 @@ import { Checkbox } from '@webapp/components/form'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import SamplingPolygonEditor from './SamplingPolygonEditor'
+import PreloadedMapLayersEditor from '../PreloadedMapLayersEditor'
 
 export const SurveyInfoMap = (props) => {
   const {
@@ -16,6 +17,8 @@ export const SurveyInfoMap = (props) => {
     samplingPolygon,
     setSampleBasedImageInterpretationEnabled,
     setSamplingPolygon,
+    preloadedMapLayersEnabled,
+    setPreloadedMapLayersEnabled,
   } = props
 
   const readOnly = !useAuthCanEditSurvey()
@@ -37,6 +40,14 @@ export const SurveyInfoMap = (props) => {
           readOnly={readOnly}
         />
       )}
+      <Checkbox
+        checked={preloadedMapLayersEnabled}
+        disabled={readOnly}
+        label="homeView:surveyInfo.preloadedMapLayersEnabled"
+        onChange={setPreloadedMapLayersEnabled}
+        validation={getFieldValidation(Survey.infoKeys.preloadedMapLayersEnabled)}
+      />
+      {preloadedMapLayersEnabled && <PreloadedMapLayersEditor readOnly={readOnly} />}
     </div>
   )
 }

@@ -33,6 +33,8 @@ export const keys = {
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
   languages: 'languages',
+  preloadedMapLayers: 'preloadedMapLayers',
+  preloadedMapLayersEnabled: 'preloadedMapLayersEnabled',
   sampleBasedImageInterpretationEnabled: 'sampleBasedImageInterpretationEnabled',
   samplingPolygon: 'samplingPolygon',
   security: 'security',
@@ -109,6 +111,8 @@ export const getLabel = (surveyInfo, lang, defaultToName = true) => {
   }
   return null
 }
+
+export const isPreloadedMapLayersEnabled = ObjectUtils.isPropTrue(keys.preloadedMapLayersEnabled)
 
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled

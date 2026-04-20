@@ -22,10 +22,13 @@ const SurveyInfo = () => {
   const canUseAnalysis = useAuthCanUseAnalysis()
 
   const {
-    userExtraPropDefs,
+    preloadedMapLayers,
+    preloadedMapLayersEnabled,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
     security,
+    userExtraPropDefs,
+
     setCycles,
     setDefaultCycleKey,
     setDescriptions,
@@ -33,6 +36,8 @@ const SurveyInfo = () => {
     setLabels,
     setLanguages,
     setName,
+    setPreloadedMapLayers,
+    setPreloadedMapLayersEnabled,
     setSamplingPolygon,
     setSampleBasedImageInterpretationEnabled,
     setSecurity,
@@ -40,6 +45,7 @@ const SurveyInfo = () => {
     setUserExtraPropDefs,
     getFieldValidation,
     saveProps,
+
     ...surveyInfoObject
   } = useSurveyInfoForm()
 
@@ -73,6 +79,10 @@ const SurveyInfo = () => {
         samplingPolygon,
         setSampleBasedImageInterpretationEnabled,
         setSamplingPolygon,
+        preloadedMapLayers,
+        preloadedMapLayersEnabled,
+        setPreloadedMapLayers,
+        setPreloadedMapLayersEnabled,
       },
     })
   }

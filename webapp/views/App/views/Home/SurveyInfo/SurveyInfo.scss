@@ -35,8 +35,10 @@
     width: 40rem;
   }
 
-  .mapsurvey-info__map {
+  .survey-info__map {
     width: 80%;
+    display: flex;
+    flex-direction: column;
   }
 
   .survey-configuration {
