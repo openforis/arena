@@ -14,7 +14,7 @@ import * as Taxon from '@core/survey/taxon'
 
 import { db } from '@server/db/db'
 
-import { insertFile } from '../../../../record/manager/surveyFileManager'
+import { insertFile } from '@server/modules/survey/manager/surveyFileManager'
 import * as CollectRecord from '../model/collectRecord'
 import * as CollectSurvey from '../model/collectSurvey'
 

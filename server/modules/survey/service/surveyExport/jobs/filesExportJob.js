@@ -3,7 +3,7 @@ import { Objects } from '@openforis/arena-core'
 import * as RecordFile from '@core/record/recordFile'
 
 import Job from '@server/job/job'
-import * as FileService from '@server/modules/record/service/fileService'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { ExportFile } from '../exportFile'
 
 export default class FilesExportJob extends Job {
@@ -14,7 +14,7 @@ export default class FilesExportJob extends Job {
   async execute() {
     const { archive, surveyId, recordUuids } = this.context
 
-    const filesSummaries = await FileService.fetchFileSummariesBySurveyId(surveyId, this.tx)
+    const filesSummaries = await SurveyFileService.fetchFileSummariesBySurveyId(surveyId, this.tx)
     const filesSummariesIncluded = Objects.isEmpty(recordUuids)
       ? filesSummaries
       : filesSummaries.filter((fileSummary) => recordUuids.includes(RecordFile.getRecordUuid(fileSummary)))
@@ -33,7 +33,7 @@ export default class FilesExportJob extends Job {
           break
         }
         const fileUuid = RecordFile.getUuid(fileSummary)
-        const fileContentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
+        const fileContentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
         archive.append(fileContentStream, { name: ExportFile.file({ fileUuid }) })
         this.incrementProcessedItems()
       }

@@ -1,10 +1,8 @@
 import * as Log from '@server/log/log'
-import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
-
+import * as SurveyRepository from '../repository/surveyRepository'
 import * as SurveyFileManager from '../manager/surveyFileManager'
-import * as RecordFileManager from '../manager/recordFileManager'
 
-const logger = Log.getLogger('FileService')
+const logger = Log.getLogger('SurveyFileService')
 
 export const checkFilesStorage = async () => {
   const storageType = SurveyFileManager.getFileContentStorageType()
@@ -69,8 +67,7 @@ export const {
   // UPDATE
   updateFileProps,
   // DELETE
+  deleteFileByUuid,
   deleteFilesByUuids,
   cleanupSurveyFilesProps,
 } = SurveyFileManager
-
-export const { deleteFileByUuid, markRecordFilesAsDeleted } = RecordFileManager

@@ -10,18 +10,6 @@ const contentDeleteFunctionByStorageType = {
 }
 
 /**
- * Deletes a file by its UUID (record-level operation).
- * @param root0
- * @param root0.surveyId
- * @param root0.fileUuid
- * @param client
- */
-export const deleteFileByUuid = async ({ surveyId, fileUuid }, client = db) => {
-  await FileRepository.deleteFileByUuid(surveyId, fileUuid, client)
-  // do not delete content if not in DB: deletion out of transaction
-}
-
-/**
  * Deletes all files associated with the given record UUIDs (record-level operation).
  * @param surveyId
  * @param recordUuids

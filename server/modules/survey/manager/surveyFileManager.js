@@ -1,6 +1,3 @@
-// SurveyFileManager.js
-// Handles survey-level file operations (not tied to specific records)
-
 import { NumberConversionUtils } from '@core/numberConversionUtils'
 import * as RecordFile from '@core/record/recordFile'
 
@@ -115,6 +112,11 @@ export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db
   )
 
   return true
+}
+
+export const deleteFileByUuid = async ({ surveyId, fileUuid }, client = db) => {
+  await FileRepository.deleteFileByUuid(surveyId, fileUuid, client)
+  // do not delete content if not in DB: deletion out of transaction
 }
 
 export const deleteSurveyFilesContentByUuids = async ({ surveyId, fileUuids }) => {

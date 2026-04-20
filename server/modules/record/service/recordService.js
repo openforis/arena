@@ -31,7 +31,7 @@ import * as Response from '@server/utils/response'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
-import * as FileService from './fileService'
+import * as SurveyFileService from './surveyFileService'
 
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
@@ -291,7 +291,7 @@ export const persistNode = async ({
   const recordUuid = Node.getRecordUuid(node)
 
   if (file) {
-    const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+    const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
     if (filesStatistics.availableSpace < file.size) {
       throw new SystemError('cannotInsertFileExceedingQuota') // do not provide details about available quota to the user
     }
@@ -304,7 +304,7 @@ export const persistNode = async ({
       recordUuid,
       nodeUuid: Node.getUuid(node),
     })
-    await FileService.insertFile(surveyId, fileObj)
+    await SurveyFileService.insertFile(surveyId, fileObj)
   }
 
   _sendNodeUpdateMessage({

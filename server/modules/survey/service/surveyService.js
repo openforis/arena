@@ -4,7 +4,7 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-import * as FileService from '@server/modules/record/service/fileService'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
@@ -25,7 +25,7 @@ const dbMaxAvailableSpace = 1024 * 1024 * 1024 * 5 // 4GB
 
 export const fetchAndAssocStorageInfo = async ({ survey }) => {
   const surveyId = Survey.getId(survey)
-  const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+  const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
   const schema = Schemata.getSchemaSurvey(surveyId)
   const schemaTablesSize = await DbUtils.fetchSchemaTablesSize({ schema })
   const dbStatistics = { usedSpace: schemaTablesSize, totalSpace: dbMaxAvailableSpace }

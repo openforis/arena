@@ -20,9 +20,9 @@ import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import * as RecordService from '../service/recordService'
-import * as FileService from '../service/fileService'
 
 import {
   requireRecordAnalysisPermission,
@@ -40,9 +40,9 @@ import {
 const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
   const fileUuid = Node.getFileUuid(node)
-  const file = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const file = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
   const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
-  const contentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid })
+  const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid })
   return { fileName, file, contentStream }
 }
 

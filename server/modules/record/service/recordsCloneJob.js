@@ -9,9 +9,9 @@ import * as RecordFile from '@core/record/recordFile'
 import * as Node from '@core/record/node'
 
 import Job from '@server/job/job'
-import * as FileService from '@server/modules/record/service/fileService'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
@@ -120,9 +120,9 @@ export default class RecordsCloneJob extends Job {
     const { surveyId } = context
 
     for (const [fileUuid, newFileUuid] of Object.entries(newFileUuidsByOldUuid)) {
-      const fileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
+      const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
       if (fileSummary) {
-        const content = await FileService.fetchFileContentAsBuffer({ surveyId, fileUuid }, tx)
+        const content = await SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileUuid }, tx)
         const oldNodeUuid = RecordFile.getNodeUuid(fileSummary)
         const newNodeUuid = oldNodeUuid ? newNodeUuidsByOldUuid[oldNodeUuid] : null
         const newFile = RecordFile.createFile({
@@ -133,7 +133,7 @@ export default class RecordsCloneJob extends Job {
           size: RecordFile.getSize(fileSummary),
           uuid: newFileUuid,
         })
-        await FileService.insertFile(surveyId, newFile, tx)
+        await SurveyFileService.insertFile(surveyId, newFile, tx)
       }
     }
   }

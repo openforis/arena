@@ -4,7 +4,7 @@ import SystemError from '@core/systemError'
 import * as RecordFile from '@core/record/recordFile'
 
 import Job from '@server/job/job'
-import * as FileService from '@server/modules/record/service/fileService'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
@@ -77,27 +77,27 @@ export default class FilesImportJob extends Job {
     const fileUuid = RecordFile.getUuid(file)
     const fileProps = RecordFile.getProps(file)
     this.logDebug(`persisting file ${fileUuid}`)
-    const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
+    const existingFileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
     if (existingFileSummary) {
       this.logDebug(`file already existing`)
       if (RecordFile.isDeleted(existingFileSummary)) {
         this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
         if (!dryRun) {
-          await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
-          await FileService.insertFile(surveyId, file, tx)
+          await SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+          await SurveyFileService.insertFile(surveyId, file, tx)
         }
         this.insertedFileUuids.push(fileUuid)
       } else {
         this.logDebug('updating props')
         if (!dryRun) {
-          await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
+          await SurveyFileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
         }
         this.updatedFileUuids.push(fileUuid)
       }
     } else {
       this.logDebug(`file not existing: inserting new file`, fileProps)
       if (!dryRun) {
-        await FileService.insertFile(surveyId, file, tx)
+        await SurveyFileService.insertFile(surveyId, file, tx)
       }
       this.insertedFileUuids.push(fileUuid)
     }
@@ -105,7 +105,7 @@ export default class FilesImportJob extends Job {
 
   async checkFilesNotExceedingAvailableQuota(filesSummaries) {
     const { surveyId } = this.context
-    const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+    const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
     const totalSize = filesSummaries.reduce((tot, fileSummary) => tot + RecordFile.getSize(fileSummary), 0)
     if (totalSize > filesStatistics.availableSpace) {
       throw new SystemError('cannotImportFilesExceedingQuota')
@@ -152,7 +152,7 @@ export default class FilesImportJob extends Job {
       const fileUuid = RecordFile.getUuid(file)
       if (!updatedFilesByUuid[fileUuid]) {
         if (!dryRun) {
-          await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+          await SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
         }
         this.deletedFileUuids.push(fileUuid)
       }
