@@ -14,7 +14,7 @@ import * as FileRepositoryS3Bucket from '../../record/repository/fileRepositoryS
 
 export { fileContentStorageTypes, getFileContentStorageType } from '@server/modules/file/manager/fileManagerCommon'
 
-const logger = Log.getLogger('FileManager')
+const logger = Log.getLogger('SurveyFileManager')
 
 export const defaultSurveyFilesTotalSpaceMB = 10 * 1024 // in MB (=10 GB)
 export const maxSurveyFilesTotalSpaceMB = 100 * 1024 // in MB (=100 GB)

@@ -8,14 +8,14 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import { uuidv4 } from '@core/uuid'
 
-import * as Survey from '@core/survey/survey'
-import * as SurveyValidator from '@core/survey/surveyValidator'
+import * as ObjectUtils from '@core/objectUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as User from '@core/user/user'
-import * as ObjectUtils from '@core/objectUtils'
-import * as Validation from '@core/validation/validation'
+import * as Survey from '@core/survey/survey'
+import * as SurveyValidator from '@core/survey/surveyValidator'
 import SystemError from '@core/systemError'
+import * as User from '@core/user/user'
+import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
@@ -24,18 +24,18 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
+import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-import * as FileManager from '@server/modules/record/manager/recordFileManager'
+import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
-import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
-import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '../repository/surveyRepository'
+import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 
 const Logger = Log.getLogger('SurveyManager')
 
@@ -360,7 +360,7 @@ export const fetchUserSurveysInfo = async ({
     }
     try {
       const canHaveData = Survey.canHaveData(survey)
-      const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId })
+      const { count: filesCount, total: filesSize } = await SurveyFileManager.fetchCountAndTotalFilesSize({ surveyId })
 
       Object.assign(surveyWithCounts, {
         nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
@@ -451,10 +451,10 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, cl
     throw new Error(`Configuration key update not supported: ${key}`)
   }
   const valueLimited = Numbers.limit({
-    minValue: FileManager.defaultSurveyFilesTotalSpaceMB,
-    maxValue: FileManager.maxSurveyFilesTotalSpaceMB,
+    minValue: SurveyFileManager.defaultSurveyFilesTotalSpaceMB,
+    maxValue: SurveyFileManager.maxSurveyFilesTotalSpaceMB,
   })(value)
-  if (valueLimited === FileManager.defaultSurveyFilesTotalSpaceMB) {
+  if (valueLimited === SurveyFileManager.defaultSurveyFilesTotalSpaceMB) {
     await SurveyRepository.clearSurveyConfiguration({ surveyId }, client)
   } else {
     await SurveyRepository.updateSurveyConfigurationProp({ surveyId, key, value: String(valueLimited) }, client)
@@ -481,8 +481,8 @@ export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = Surve
 // ====== DELETE
 export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, client = db) => {
   // fetch file uuids to delete before survey schema is dropped
-  const filesToDeleteUuids = !FileManager.isFileContentStoredInDB()
-    ? await FileManager.fetchFileUuidsBySurveyId({ surveyId }, client)
+  const filesToDeleteUuids = !SurveyFileManager.isFileContentStoredInDB()
+    ? await SurveyFileManager.fetchFileUuidsBySurveyId({ surveyId }, client)
     : []
 
   await client.tx(async (t) => {
@@ -494,7 +494,7 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
     await SchemaRdbRepository.dropSchema(surveyId, t)
   })
   if (filesToDeleteUuids.length > 0) {
-    await FileManager.deleteSurveyFilesContentByUuids({ surveyId, fileUuids: filesToDeleteUuids })
+    await SurveyFileManager.deleteSurveyFilesContentByUuids({ surveyId, fileUuids: filesToDeleteUuids })
   }
 }
 

@@ -28,6 +28,4 @@ export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = d
 export const {
   // UPDATE
   markRecordFilesAsDeleted,
-  // DELETE
-  deleteFilesByUuids,
 } = FileRepository
