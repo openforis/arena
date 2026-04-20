@@ -78,6 +78,7 @@ export const getContent = R.prop(keys.content)
 export const getExtension = R.pipe(getName, FileNames.getExtension)
 
 // UPDATE
+export const { assocLabels } = ObjectUtils
 export const assocContent = R.assoc(keys.content)
 export const assocSize = (size) => ObjectUtils.setProp(propKeys.size, size)
 

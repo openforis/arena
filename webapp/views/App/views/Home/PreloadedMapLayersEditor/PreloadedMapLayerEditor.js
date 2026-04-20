@@ -10,9 +10,12 @@ const accept = { [contentTypes.geojson]: ['.geojson'], [contentTypes.kmz]: ['.km
 const maxSize = 10 // 10MB
 
 const PreloadedMapLayerEditor = (props) => {
-  const { onClose, onOk: onOkProp } = props
+  const { editedPreloadedMapLayer, onClose, onOk: onOkProp } = props
 
-  const [state, setState] = useState({})
+  const [state, setState] = useState({
+    file: null,
+    labels: editedPreloadedMapLayer ? SurveyFile.getLabels(editedPreloadedMapLayer) : {},
+  })
 
   const { file, labels } = state
 
@@ -23,12 +26,18 @@ const PreloadedMapLayerEditor = (props) => {
   }, [])
 
   const onOkClick = useCallback(() => {
-    const { name, size } = file
+    let surveyFile = null
+    if (editedPreloadedMapLayer) {
+      surveyFile = SurveyFile.assocLabels(labels)(editedPreloadedMapLayer)
+    } else {
+      const { name, size } = file
+      surveyFile = SurveyFile.createFile({ name, size, labels })
+    }
     onOkProp({
       file,
-      surveyFile: SurveyFile.createFile({ name, size, labels }),
+      surveyFile,
     })
-  }, [file, labels, onOkProp])
+  }, [editedPreloadedMapLayer, file, labels, onOkProp])
 
   return (
     <Modal
@@ -40,10 +49,17 @@ const PreloadedMapLayerEditor = (props) => {
       <ModalBody>
         <LabelsEditor labels={labels} onChange={onLabelsChange} />
 
-        <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
+        {!editedPreloadedMapLayer && (
+          <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
+        )}
       </ModalBody>
       <ModalFooter>
-        <Button className="btn-primary modal-footer__item" disabled={!file} onClick={onOkClick} label="common.ok" />
+        <Button
+          className="btn-primary modal-footer__item"
+          disabled={!editedPreloadedMapLayer && !file}
+          onClick={onOkClick}
+          label="common.ok"
+        />
       </ModalFooter>
     </Modal>
   )
