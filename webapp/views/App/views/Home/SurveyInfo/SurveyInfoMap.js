@@ -12,13 +12,15 @@ import PreloadedMapLayersEditor from '../PreloadedMapLayersEditor'
 
 export const SurveyInfoMap = (props) => {
   const {
-    getFieldValidation,
+    preloadedMapLayers,
+    preloadedMapLayersEnabled,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
+    getFieldValidation,
     setSampleBasedImageInterpretationEnabled,
     setSamplingPolygon,
-    preloadedMapLayersEnabled,
     setPreloadedMapLayersEnabled,
+    setPreloadedMapLayers,
   } = props
 
   const readOnly = !useAuthCanEditSurvey()
@@ -47,7 +49,13 @@ export const SurveyInfoMap = (props) => {
         onChange={setPreloadedMapLayersEnabled}
         validation={getFieldValidation(Survey.infoKeys.preloadedMapLayersEnabled)}
       />
-      {preloadedMapLayersEnabled && <PreloadedMapLayersEditor readOnly={readOnly} />}
+      {preloadedMapLayersEnabled && (
+        <PreloadedMapLayersEditor
+          preloadedMapLayers={preloadedMapLayers}
+          setPreloadedMapLayers={setPreloadedMapLayers}
+          readOnly={readOnly}
+        />
+      )}
     </div>
   )
 }

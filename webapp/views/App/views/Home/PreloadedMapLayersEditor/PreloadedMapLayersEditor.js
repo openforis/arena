@@ -1,17 +1,21 @@
 import React, { useCallback, useState } from 'react'
 
+import { SurveyPreloadedMapLayer } from '@core/survey/surveyPreloadedMapLayer'
+
 import { ButtonAdd } from '@webapp/components'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
-import NewMapLayerEditor from './NewMapLayerEditor'
+import PreloadedMapLayerEditor from './PreloadedMapLayerEditor'
 
 const PreloadedMapLayersEditor = (props) => {
-  const { preloadedMapLayers } = props
+  const { preloadedMapLayers, setPreloadedMapLayers, readOnly } = props
 
   const i18n = useI18n()
+  const lang = useSurveyPreferredLang()
 
   const [newLayerDialogVisible, setNewLayerDialogVisible] = useState(false)
 
@@ -23,16 +27,21 @@ const PreloadedMapLayersEditor = (props) => {
     setNewLayerDialogVisible(false)
   }, [])
 
-  const onNewLayerDialogOk = useCallback(() => {
-    setNewLayerDialogVisible(false)
-  }, [])
+  const onNewLayerDialogOk = useCallback(
+    ({ file, preloadedMapLayer }) => {
+      setNewLayerDialogVisible(false)
+
+      setPreloadedMapLayers([...(preloadedMapLayers ?? []), preloadedMapLayer])
+    },
+    [setPreloadedMapLayers, preloadedMapLayers]
+  )
 
   return (
     <>
       <fieldset className="preloaded-map-layers-editor">
         <legend>{i18n.t('homeView:surveyInfo.preloadedMapLayers.title')}</legend>
         <div className="container">
-          <ButtonAdd onClick={onAddClick} size="small" />
+          {!readOnly && <ButtonAdd onClick={onAddClick} size="small" />}
           <DataGrid
             columns={[
               {
@@ -45,8 +54,9 @@ const PreloadedMapLayersEditor = (props) => {
                 field: 'label',
                 flex: 0.6,
                 headerName: i18n.t('common.label'),
-                renderCell: (rowProps) => {
-                  console.log('===rowProps', rowProps)
+                renderCell: ({ row }) => {
+                  const label = SurveyPreloadedMapLayer.getLabel(lang)(row)
+                  return <LabelWithTooltip label={label} />
                 },
               },
               {
@@ -57,13 +67,14 @@ const PreloadedMapLayersEditor = (props) => {
               },
             ]}
             density="compact"
+            getRowId={(row) => SurveyPreloadedMapLayer.getUuid(row)}
+            hideFooterPagination
             rows={preloadedMapLayers}
-            getRowId={(row) => row.fileName}
           />
         </div>
       </fieldset>
 
-      {newLayerDialogVisible && <NewMapLayerEditor onClose={onNewLayerDialogClose} onOk={onNewLayerDialogOk} />}
+      {newLayerDialogVisible && <PreloadedMapLayerEditor onClose={onNewLayerDialogClose} onOk={onNewLayerDialogOk} />}
     </>
   )
 }
