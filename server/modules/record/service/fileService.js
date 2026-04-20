@@ -1,20 +1,21 @@
 import * as Log from '@server/log/log'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 
-import * as FileManager from '../manager/recordFileManager'
+import * as SurveyFileManager from '../manager/surveyFileManager'
+import * as RecordFileManager from '../manager/recordFileManager'
 
 const logger = Log.getLogger('FileService')
 
 export const checkFilesStorage = async () => {
-  const storageType = FileManager.getFileContentStorageType()
+  const storageType = SurveyFileManager.getFileContentStorageType()
 
   logger.debug(`Checking if files storage ${storageType} is accessible`)
 
-  await FileManager.checkCanAccessFilesStorage()
+  await SurveyFileManager.checkCanAccessFilesStorage()
 
   logger.debug(`Files storage ${storageType} is accessible!`)
 
-  if (storageType === FileManager.fileContentStorageTypes.db) {
+  if (storageType === SurveyFileManager.fileContentStorageTypes.db) {
     return
   }
   logger.debug(`Moving survey files to new storage (if necessary)`)
@@ -23,7 +24,7 @@ export const checkFilesStorage = async () => {
   let errorsFound = false
   for (const surveyId of surveyIds) {
     try {
-      const surveyFilesMoved = await FileManager.moveFilesToNewStorageIfNecessary({ surveyId })
+      const surveyFilesMoved = await SurveyFileManager.moveFilesToNewStorageIfNecessary({ surveyId })
       allSurveysFilesMoved = allSurveysFilesMoved || surveyFilesMoved
     } catch (error) {
       errorsFound = true
@@ -40,8 +41,8 @@ export const checkFilesStorage = async () => {
 }
 
 export const fetchFilesStatistics = async ({ surveyId }) => {
-  const totalSpace = await FileManager.fetchSurveyFilesTotalSpace({ surveyId })
-  const { total: usedSpace } = await FileManager.fetchCountAndTotalFilesSize({ surveyId })
+  const totalSpace = await SurveyFileManager.fetchSurveyFilesTotalSpace({ surveyId })
+  const { total: usedSpace } = await SurveyFileManager.fetchCountAndTotalFilesSize({ surveyId })
   const availableSpace = Math.max(0, totalSpace - usedSpace)
 
   return { availableSpace, totalSpace, usedSpace }
@@ -51,7 +52,7 @@ export const cleanupAllSurveysFilesProps = async () => {
   const surveyIds = await SurveyRepository.fetchAllSurveyIds()
   let count = 0
   for (const surveyId of surveyIds) {
-    const cleanedFiles = await FileManager.cleanupSurveyFilesProps({ surveyId })
+    const cleanedFiles = await SurveyFileManager.cleanupSurveyFilesProps({ surveyId })
     count += cleanedFiles
   }
   return count
@@ -68,5 +69,8 @@ export const {
   // UPDATE
   updateFileProps,
   // DELETE
-  deleteFileByUuid,
-} = FileManager
+  deleteFilesByUuids,
+  cleanupSurveyFilesProps,
+} = SurveyFileManager
+
+export const { deleteFileByUuid, markRecordFilesAsDeleted } = RecordFileManager

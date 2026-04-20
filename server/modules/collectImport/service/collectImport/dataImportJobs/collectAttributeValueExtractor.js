@@ -14,7 +14,7 @@ import * as Taxon from '@core/survey/taxon'
 
 import { db } from '@server/db/db'
 
-import * as FileManager from '../../../../record/manager/recordFileManager'
+import { insertFile } from '../../../../record/manager/surveyFileManager'
 import * as CollectRecord from '../model/collectRecord'
 import * as CollectSurvey from '../model/collectSurvey'
 
@@ -133,7 +133,7 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
       recordUuid: Node.getRecordUuid(node),
       nodeUuid: Node.getUuid(node),
     })
-    await FileManager.insertFile(Survey.getId(survey), file, tx)
+    await insertFile(Survey.getId(survey), file, tx)
 
     return {
       value: {
