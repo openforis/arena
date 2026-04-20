@@ -11,7 +11,7 @@ import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyU
 
 import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
 import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
-import { SurveyInfoSampleBasedImageInterpretation } from './SurveyInfoSampleBasedImageInterpretation'
+import { SurveyInfoMap } from './SurveyInfoMap'
 
 import { useSurveyInfoForm } from './store'
 import { SurveySecurityEditor } from './surveySecurityEditor'
@@ -65,8 +65,8 @@ const SurveyInfo = () => {
   if (canUseAnalysis) {
     tabs.push({
       key: 'sampleBasedInterpretation',
-      component: SurveyInfoSampleBasedImageInterpretation,
-      label: 'homeView:surveyInfo.sampleBasedImageInterpretation',
+      component: SurveyInfoMap,
+      label: 'homeView:surveyInfo.map',
       props: {
         getFieldValidation,
         sampleBasedImageInterpretationEnabled,

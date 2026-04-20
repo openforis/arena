@@ -70,6 +70,7 @@ export default {
       '¿Está seguro de que desea eliminar el ciclo {{cycle}}?\n\n$t(common.cantUndoWarning)\n\nSi hay registros asociados a este ciclo, se eliminarán.',
     cycleForArenaMobile: 'Ciclo para Arena Mobile',
     fieldManualLink: 'Enlace al manual de campo',
+    map: 'Mapa',
     editInfo: 'Editar información',
     viewInfo: 'Ver información',
     preferredLanguage: 'Idioma preferido',

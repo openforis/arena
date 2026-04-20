@@ -83,6 +83,7 @@ export default {
 Если к этому циклу привязаны записи, они будут удалены.`,
     cycleForArenaMobile: 'Цикл для Arena Mobile',
     fieldManualLink: 'Ссылка на полевое руководство',
+    map: 'Карта',
     editInfo: 'Редактировать информацию',
     viewInfo: 'Просмотреть информацию',
     preferredLanguage: 'Предпочитаемый язык',

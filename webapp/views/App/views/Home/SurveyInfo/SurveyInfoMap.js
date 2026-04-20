@@ -9,7 +9,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import SamplingPolygonEditor from './SamplingPolygonEditor'
 
-export const SurveyInfoSampleBasedImageInterpretation = (props) => {
+export const SurveyInfoMap = (props) => {
   const {
     getFieldValidation,
     sampleBasedImageInterpretationEnabled,
@@ -21,7 +21,7 @@ export const SurveyInfoSampleBasedImageInterpretation = (props) => {
   const readOnly = !useAuthCanEditSurvey()
 
   return (
-    <div className="sample-based-image-interpretation">
+    <div className="survey-info__map">
       <Checkbox
         checked={sampleBasedImageInterpretationEnabled}
         disabled={readOnly}
@@ -41,7 +41,7 @@ export const SurveyInfoSampleBasedImageInterpretation = (props) => {
   )
 }
 
-SurveyInfoSampleBasedImageInterpretation.propTypes = {
+SurveyInfoMap.propTypes = {
   getFieldValidation: PropTypes.func.isRequired,
   sampleBasedImageInterpretationEnabled: PropTypes.bool,
   samplingPolygon: PropTypes.object,
