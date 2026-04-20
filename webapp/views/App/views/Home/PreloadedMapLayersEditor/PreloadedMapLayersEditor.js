@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 
-import { SurveyPreloadedMapLayer } from '@core/survey/surveyPreloadedMapLayer'
+import * as SurveyFile from '@core/survey/surveyFile'
 
 import { ButtonAdd } from '@webapp/components'
 import { DataGrid } from '@webapp/components/DataGrid'
@@ -28,10 +28,10 @@ const PreloadedMapLayersEditor = (props) => {
   }, [])
 
   const onNewLayerDialogOk = useCallback(
-    ({ file, preloadedMapLayer }) => {
+    ({ file, surveyFile }) => {
       setNewLayerDialogVisible(false)
 
-      setPreloadedMapLayers([...(preloadedMapLayers ?? []), preloadedMapLayer])
+      setPreloadedMapLayers([...(preloadedMapLayers ?? []), surveyFile])
     },
     [setPreloadedMapLayers, preloadedMapLayers]
   )
@@ -48,26 +48,23 @@ const PreloadedMapLayersEditor = (props) => {
                 field: 'fileName',
                 flex: 0.4,
                 headerName: i18n.t('homeView:surveyInfo.preloadedMapLayers.fileName'),
-                renderCell: ({ value }) => <LabelWithTooltip label={value} />,
+                renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getName(row)} />,
               },
               {
                 field: 'label',
                 flex: 0.6,
                 headerName: i18n.t('common.label'),
-                renderCell: ({ row }) => {
-                  const label = SurveyPreloadedMapLayer.getLabel(lang)(row)
-                  return <LabelWithTooltip label={label} />
-                },
+                renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getLabel(lang)(row)} />,
               },
               {
                 field: 'fileSize',
                 flex: 0.2,
                 headerName: i18n.t('homeView:surveyInfo.preloadedMapLayers.fileSize'),
-                valueFormatter: (value) => FileUtils.toHumanReadableFileSize(value),
+                renderCell: ({ row }) => FileUtils.toHumanReadableFileSize(SurveyFile.getSize(row)),
               },
             ]}
             density="compact"
-            getRowId={(row) => SurveyPreloadedMapLayer.getUuid(row)}
+            getRowId={(row) => SurveyFile.getUuid(row)}
             hideFooterPagination
             rows={preloadedMapLayers}
           />

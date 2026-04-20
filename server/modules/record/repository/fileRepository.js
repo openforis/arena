@@ -2,7 +2,7 @@ import { Readable } from 'stream'
 
 import { Schemata } from '@common/model/db'
 
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -10,7 +10,7 @@ import * as DbUtils from '@server/db/dbUtils'
 const SUMMARY_FIELDS = ['id', 'uuid', 'props']
 const SUMMARY_FIELDS_COMMA_SEPARATED = SUMMARY_FIELDS.join(', ')
 
-const NOT_DELETED_CONDITION = `COALESCE(props ->> '${RecordFile.propKeys.deleted}', 'false') <> 'true'`
+const NOT_DELETED_CONDITION = `COALESCE(props ->> '${SurveyFile.propKeys.deleted}', 'false') <> 'true'`
 
 // ============== CREATE
 
@@ -41,7 +41,7 @@ export const fetchFileUuidsByRecordUuids = async ({ surveyId, recordUuids }, cli
     `
     SELECT uuid
     FROM ${Schemata.getSchemaSurvey(surveyId)}.file
-    WHERE props ->> '${RecordFile.propKeys.recordUuid}' IN ($1:csv)`,
+    WHERE props ->> '${SurveyFile.propKeys.recordUuid}' IN ($1:csv)`,
     [recordUuids],
     (row) => row.uuid
   )
@@ -98,11 +98,11 @@ export const fetchCountAndTotalFilesSize = async ({ surveyId, recordUuid = null 
   const schema = Schemata.getSchemaSurvey(surveyId)
   const whereConditions = [NOT_DELETED_CONDITION]
   if (recordUuid) {
-    whereConditions.push(`(props ->> '${RecordFile.propKeys.recordUuid}')::uuid = $/recordUuid/`)
+    whereConditions.push(`(props ->> '${SurveyFile.propKeys.recordUuid}')::uuid = $/recordUuid/`)
   }
   const whereClause = DbUtils.getWhereClause(...whereConditions)
   const { count, total } = await client.one(
-    `SELECT COUNT(*), SUM(COALESCE((props ->> '${RecordFile.propKeys.size}')::INTEGER, 0))
+    `SELECT COUNT(*), SUM(COALESCE((props ->> '${SurveyFile.propKeys.size}')::INTEGER, 0))
     FROM ${schema}.file
     ${whereClause}`,
     { recordUuid },
@@ -116,7 +116,7 @@ export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
   client.one(
     `
     UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
-    SET props = jsonb_set(props, '{${RecordFile.propKeys.deleted}}', 'true')
+    SET props = jsonb_set(props, '{${SurveyFile.propKeys.deleted}}', 'true')
     WHERE uuid = $1
     RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
     [uuid]
@@ -126,8 +126,8 @@ export const markRecordFilesAsDeleted = async (surveyId, recordUuid, client = db
   client.manyOrNone(
     `
     UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
-    SET props = jsonb_set(props, '{${RecordFile.propKeys.deleted}}', 'true')
-    WHERE props ->> '${RecordFile.propKeys.recordUuid}' = $1 
+    SET props = jsonb_set(props, '{${SurveyFile.propKeys.deleted}}', 'true')
+    WHERE props ->> '${SurveyFile.propKeys.recordUuid}' = $1 
     RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
     [recordUuid]
   )
@@ -152,9 +152,9 @@ export const clearAllSurveyFilesContent = async ({ surveyId }, client = db) =>
   )
 
 export const cleanupFileProps = async ({ surveyId, fileSummary }, client = db) => {
-  const fileUuid = RecordFile.getUuid(fileSummary)
-  const fileSummaryUpdated = RecordFile.cleanupInvalidProps(fileSummary)
-  return updateFileProps(surveyId, fileUuid, RecordFile.getProps(fileSummaryUpdated), client)
+  const fileUuid = SurveyFile.getUuid(fileSummary)
+  const fileSummaryUpdated = SurveyFile.cleanupInvalidProps(fileSummary)
+  return updateFileProps(surveyId, fileUuid, SurveyFile.getProps(fileSummaryUpdated), client)
 }
 
 export const cleanupSurveyFilesProps = async ({ surveyId }, client = db) =>
@@ -163,7 +163,7 @@ export const cleanupSurveyFilesProps = async ({ surveyId }, client = db) =>
       `SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
       FROM ${Schemata.getSchemaSurvey(surveyId)}.file
       WHERE ${NOT_DELETED_CONDITION} 
-        AND (props ->> '${RecordFile.invalidPropKeys.fileName}') IS NOT NULL `
+        AND (props ->> '${SurveyFile.invalidPropKeys.fileName}') IS NOT NULL `
     )
     const count = fileSummariesToClean?.length ?? 0
     if (count > 0) {
@@ -193,6 +193,6 @@ export const deleteFilesByRecordUuids = async (surveyId, uuids, client = db) =>
   client.query(
     `
     DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.file
-    WHERE props ->> '${RecordFile.propKeys.recordUuid}' IN ($1:csv)`,
+    WHERE props ->> '${SurveyFile.propKeys.recordUuid}' IN ($1:csv)`,
     [uuids]
   )

@@ -5,7 +5,8 @@ import { FileNames } from '@openforis/arena-core'
 import * as ObjectUtils from '@core/objectUtils'
 import { truncate } from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
-import * as Node from './node'
+
+import * as Node from '../record/node'
 
 const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -16,6 +17,7 @@ const keys = {
 export const propKeys = {
   deleted: 'deleted',
   name: 'name',
+  labels: 'labels',
   size: 'size',
   recordUuid: 'recordUuid',
   nodeUuid: 'nodeUuid',
@@ -26,10 +28,19 @@ export const invalidPropKeys = {
   fileSize: 'fileSize',
 }
 
-export const createFile = ({ name, uuid = null, size = null, content = null, recordUuid = null, nodeUuid = null }) => ({
+export const createFile = ({
+  name,
+  labels = null,
+  uuid = null,
+  size = null,
+  content = null,
+  recordUuid = null,
+  nodeUuid = null,
+}) => ({
   [keys.uuid]: uuid ?? uuidv4(),
   [keys.props]: {
     [propKeys.name]: name,
+    [propKeys.labels]: labels,
     [propKeys.size]: size,
     [propKeys.recordUuid]: recordUuid,
     [propKeys.nodeUuid]: nodeUuid,
@@ -50,7 +61,6 @@ export const createFileFromNode = ({ node, size = null, content = null }) =>
 export const truncateFileName = (fileName, maxLength = 10) => {
   if (fileName && !R.isEmpty(fileName)) {
     const extension = FileNames.getExtension(fileName)
-
     return R.pipe(R.dropLast(extension.length + 1), truncate(maxLength), (name) => `${name}.${extension}`)(fileName)
   }
 
@@ -58,7 +68,7 @@ export const truncateFileName = (fileName, maxLength = 10) => {
 }
 
 // READ
-export const { getUuid, getProps } = ObjectUtils
+export const { getUuid, getProps, getLabel, getLabels } = ObjectUtils
 export const isDeleted = (file) => Boolean(ObjectUtils.getProp(propKeys.deleted, false)(file))
 export const getName = ObjectUtils.getProp(propKeys.name)
 export const getSize = ObjectUtils.getProp(propKeys.size)
@@ -84,8 +94,18 @@ export const cleanupInvalidProps = (file) => {
   const propsUpdated = {
     [propKeys.name]: props[invalidPropKeys.fileName],
     [propKeys.size]: props[invalidPropKeys.fileSize],
-    [propKeys.recordUuid]: props[propKeys.recordUuid],
-    [propKeys.nodeUuid]: props[propKeys.nodeUuid],
+  }
+  const recordUuid = props[propKeys.recordUuid]
+  if (recordUuid) {
+    propsUpdated[propKeys.recordUuid] = recordUuid
+  }
+  const nodeUuid = props[propKeys.nodeUuid]
+  if (nodeUuid) {
+    propsUpdated[propKeys.nodeUuid] = nodeUuid
+  }
+  const labels = props[propKeys.labels]
+  if (!R.isEmpty(labels)) {
+    propsUpdated[propKeys.labels] = labels
   }
   if (props.deleted) {
     propsUpdated[propKeys.deleted] = true

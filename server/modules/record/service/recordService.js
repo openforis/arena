@@ -13,7 +13,7 @@ import * as DateUtils from '@core/dateUtils'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
@@ -296,7 +296,7 @@ export const persistNode = async ({
       throw new SystemError('cannotInsertFileExceedingQuota') // do not provide details about available quota to the user
     }
     // Save file to "file" table and set fileUuid and fileName into node value
-    const fileObj = RecordFile.createFile({
+    const fileObj = SurveyFile.createFile({
       uuid: Node.getFileUuid(node),
       name: file.name,
       size: file.size,
@@ -394,7 +394,7 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
     },
   })(record)
 
-  const fileName = RecordFile.getName(file)
+  const fileName = SurveyFile.getName(file)
   const extension = FileUtils.getFileExtension(fileName)
 
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`

@@ -6,7 +6,7 @@ import * as DateUtils from '@core/dateUtils'
 import * as NumberUtils from '@core/numberUtils'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -126,7 +126,7 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
 
   if (content) {
     const fileSize = Buffer.byteLength(content)
-    const file = RecordFile.createFile({
+    const file = SurveyFile.createFile({
       name: fileName,
       size: fileSize,
       content,
@@ -137,7 +137,7 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
 
     return {
       value: {
-        [Node.valuePropsFile.fileUuid]: RecordFile.getUuid(file),
+        [Node.valuePropsFile.fileUuid]: SurveyFile.getUuid(file),
         [Node.valuePropsFile.fileName]: fileName,
         [Node.valuePropsFile.fileSize]: fileSize,
       },

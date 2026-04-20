@@ -1,9 +1,10 @@
 import React, { useCallback, useState } from 'react'
 
+import * as SurveyFile from '@core/survey/surveyFile'
+
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { contentTypes } from '@webapp/service/api'
-import { SurveyPreloadedMapLayer } from '@core/survey/surveyPreloadedMapLayer'
 
 const accept = { [contentTypes.geojson]: ['.geojson'], [contentTypes.kmz]: ['.kmz'] }
 const maxSize = 10 // 10MB
@@ -22,9 +23,10 @@ const PreloadedMapLayerEditor = (props) => {
   }, [])
 
   const onOkClick = useCallback(() => {
+    const { name, size } = file
     onOkProp({
       file,
-      preloadedMapLayer: SurveyPreloadedMapLayer.newInstance({ fileName: file.name, fileSize: file.size, labels }),
+      surveyFile: SurveyFile.createFile({ name, size, labels }),
     })
   }, [file, labels, onOkProp])
 

@@ -1,5 +1,5 @@
 import { NumberConversionUtils } from '@core/numberConversionUtils'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
@@ -67,8 +67,8 @@ export const insertFile = async (surveyId, file, client = db) => {
   const storageType = getFileContentStorageType()
   const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
   if (contentStoreFunction) {
-    const fileUuid = RecordFile.getUuid(file)
-    const content = RecordFile.getContent(file)
+    const fileUuid = SurveyFile.getUuid(file)
+    const content = SurveyFile.getContent(file)
     await contentStoreFunction({ surveyId, fileUuid, content })
     // clear content in file object so it won't be stored into DB
     file.content = null
@@ -100,7 +100,7 @@ export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db
       const file = await FileRepository.fetchFileAndContentByUuid(surveyId, fileUuid, tx)
 
       const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
-      const content = RecordFile.getContent(file)
+      const content = SurveyFile.getContent(file)
       await contentStoreFunction({ surveyId, fileUuid, content })
     }
     logger.debug(`Files moved from DB; clearing 'content' column in DB 'file' table`)

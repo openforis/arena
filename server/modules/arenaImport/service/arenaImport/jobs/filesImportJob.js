@@ -1,7 +1,7 @@
 import { Objects } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 
 import Job from '@server/job/job'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
@@ -32,24 +32,24 @@ export default class FilesImportJob extends Job {
       for (const fileSummary of filesSummaries) {
         let file = { ...fileSummary }
 
-        file = RecordFile.cleanupInvalidProps(file)
+        file = SurveyFile.cleanupInvalidProps(file)
 
         // load file content from a separate file
-        const fileUuid = RecordFile.getUuid(fileSummary)
-        const fileName = RecordFile.getName(fileSummary)
+        const fileUuid = SurveyFile.getUuid(fileSummary)
+        const fileName = SurveyFile.getName(fileSummary)
         const fileContent = await this.fetchFileContent({ fileName, fileUuid })
         if (!fileContent && !skipMissingFiles) {
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
         }
         if (fileContent) {
-          file = RecordFile.assocContent(fileContent)(file)
+          file = SurveyFile.assocContent(fileContent)(file)
 
           // update file size with actual file content length
-          file = RecordFile.assocSize(Buffer.byteLength(fileContent))(file)
+          file = SurveyFile.assocSize(Buffer.byteLength(fileContent))(file)
 
           await this.persistFile(file)
         } else {
-          const recordUuid = RecordFile.getRecordUuid(fileSummary)
+          const recordUuid = SurveyFile.getRecordUuid(fileSummary)
           this.logWarn(`Survey ${surveyId} record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`)
           this.missingFileSummaries.push(fileSummary)
         }
@@ -74,13 +74,13 @@ export default class FilesImportJob extends Job {
   async persistFile(file) {
     const { context, tx } = this
     const { surveyId, dryRun } = context
-    const fileUuid = RecordFile.getUuid(file)
-    const fileProps = RecordFile.getProps(file)
+    const fileUuid = SurveyFile.getUuid(file)
+    const fileProps = SurveyFile.getProps(file)
     this.logDebug(`persisting file ${fileUuid}`)
     const existingFileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
     if (existingFileSummary) {
       this.logDebug(`file already existing`)
-      if (RecordFile.isDeleted(existingFileSummary)) {
+      if (SurveyFile.isDeleted(existingFileSummary)) {
         this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
         if (!dryRun) {
           await SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
@@ -106,7 +106,7 @@ export default class FilesImportJob extends Job {
   async checkFilesNotExceedingAvailableQuota(filesSummaries) {
     const { surveyId } = this.context
     const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
-    const totalSize = filesSummaries.reduce((tot, fileSummary) => tot + RecordFile.getSize(fileSummary), 0)
+    const totalSize = filesSummaries.reduce((tot, fileSummary) => tot + SurveyFile.getSize(fileSummary), 0)
     if (totalSize > filesStatistics.availableSpace) {
       throw new SystemError('cannotImportFilesExceedingQuota')
     }
@@ -124,7 +124,7 @@ export default class FilesImportJob extends Job {
       throw new Error('missing files summary file')
     }
 
-    const filesUuids = filesSummaries.map(RecordFile.getUuid)
+    const filesUuids = filesSummaries.map(SurveyFile.getUuid)
     this.logDebug(`file uuids to be imported: ${filesUuids}`)
 
     const missingRecordFileUuidsInFiles = recordsFileUuids.filter(
@@ -149,7 +149,7 @@ export default class FilesImportJob extends Job {
 
     const filesToDeleteArray = Object.values(filesToDeleteByUuid)
     for (const file of filesToDeleteArray) {
-      const fileUuid = RecordFile.getUuid(file)
+      const fileUuid = SurveyFile.getUuid(file)
       if (!updatedFilesByUuid[fileUuid]) {
         if (!dryRun) {
           await SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, tx)

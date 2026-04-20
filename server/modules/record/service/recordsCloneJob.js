@@ -5,7 +5,7 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as Node from '@core/record/node'
 
 import Job from '@server/job/job'
@@ -123,14 +123,14 @@ export default class RecordsCloneJob extends Job {
       const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
       if (fileSummary) {
         const content = await SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileUuid }, tx)
-        const oldNodeUuid = RecordFile.getNodeUuid(fileSummary)
+        const oldNodeUuid = SurveyFile.getNodeUuid(fileSummary)
         const newNodeUuid = oldNodeUuid ? newNodeUuidsByOldUuid[oldNodeUuid] : null
-        const newFile = RecordFile.createFile({
+        const newFile = SurveyFile.createFile({
           content,
-          name: RecordFile.getName(fileSummary),
+          name: SurveyFile.getName(fileSummary),
           nodeUuid: newNodeUuid,
           recordUuid: newRecordUuid,
-          size: RecordFile.getSize(fileSummary),
+          size: SurveyFile.getSize(fileSummary),
           uuid: newFileUuid,
         })
         await SurveyFileService.insertFile(surveyId, newFile, tx)

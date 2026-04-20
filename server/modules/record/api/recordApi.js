@@ -14,7 +14,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
@@ -287,7 +287,7 @@ export const init = (app) => {
         const { surveyId, nodeUuid } = Request.getParams(req)
 
         const { fileName, file, contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
-        setContentTypeFile({ res, fileName, fileSize: RecordFile.getSize(file) })
+        setContentTypeFile({ res, fileName, fileSize: SurveyFile.getSize(file) })
         contentStream.pipe(res)
       } catch (error) {
         next(error)

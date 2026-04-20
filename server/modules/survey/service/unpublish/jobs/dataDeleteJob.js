@@ -1,4 +1,4 @@
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 
 import Job from '@server/job/job'
 
@@ -26,10 +26,10 @@ export default class DataDeleteJob extends Job {
 
     // delete record files
     const fileSummaries = await SurveyFileManager.fetchFileSummariesBySurveyId(surveyId, tx)
-    const recordFileSummaries = fileSummaries.filter((fileSummary) => !!RecordFile.getRecordUuid(fileSummary))
+    const recordFileSummaries = fileSummaries.filter((fileSummary) => !!SurveyFile.getRecordUuid(fileSummary))
 
     if (recordFileSummaries.length > 0) {
-      const filesToDeleteUuids = recordFileSummaries.map(RecordFile.getUuid)
+      const filesToDeleteUuids = recordFileSummaries.map(SurveyFile.getUuid)
       await SurveyFileManager.deleteFilesByUuids(surveyId, filesToDeleteUuids, tx)
       await SurveyFileManager.deleteSurveyFilesContentByUuids({ surveyId, fileUuids: filesToDeleteUuids })
     }
