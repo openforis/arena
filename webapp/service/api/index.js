@@ -90,6 +90,7 @@ export {
   updateSurveyProps,
   startSurveysListExportJob,
   getSurveyListExportedFileDownloadUrl,
+  getSurveyFileDownloadUrl,
 } from './survey'
 export {
   convertNodeDef,

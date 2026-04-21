@@ -73,6 +73,17 @@ export default {
     map: 'Mapa',
     editInfo: 'Editar información',
     viewInfo: 'Ver información',
+
+    preloadedMapLayers: {
+      enabledMessage: 'Capas de mapa precargadas habilitadas',
+      title: 'Capas de mapa precargadas',
+      fileName: 'Nombre del archivo',
+      fileSize: 'Tamaño del archivo',
+      confirmDelete: '¿Está seguro de que desea eliminar esta capa de mapa precargada?',
+      editor: {
+        title: 'Capa de mapa precargada',
+      },
+    },
     preferredLanguage: 'Idioma preferido',
     sampleBasedImageInterpretation: 'Interpretación de imágenes basada en muestras',
     sampleBasedImageInterpretationEnabled: 'Interpretación de imágenes basada en muestras habilitada',

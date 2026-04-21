@@ -86,6 +86,17 @@ export default {
     map: 'Газрын зураг',
     editInfo: 'Мэдээллийг засах',
     viewInfo: 'Мэдээллийг харах',
+
+    preloadedMapLayers: {
+      enabledMessage: 'Урьдчилан ачаалсан газрын зургийн давхаргууд идэвхжсэн',
+      title: 'Урьдчилан ачаалсан газрын зургийн давхаргууд',
+      fileName: 'Файлын нэр',
+      fileSize: 'Файлын хэмжээ',
+      confirmDelete: 'Энэ урьдчилан ачаалсан газрын зургийн давхаргыг устгахдаа итгэлтэй байна уу?',
+      editor: {
+        title: 'Урьдчилан ачаалсан газрын зургийн давхарга',
+      },
+    },
     preferredLanguage: 'Хүссэн хэл',
     sampleBasedImageInterpretation: 'Дээж дээр суурилсан зураг тайлбарлах',
     sampleBasedImageInterpretationEnabled: 'Дээж дээр суурилсан зураг тайлбарлах идэвхжсэн',

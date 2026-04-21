@@ -2,7 +2,8 @@ import React, { useCallback, useState } from 'react'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 
-import { ButtonAdd, ButtonIconDelete } from '@webapp/components'
+import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit } from '@webapp/components'
+import { useConfirmAsync } from '@webapp/components/hooks'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -18,6 +19,7 @@ const PreloadedMapLayersEditor = (props) => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
+  const confirm = useConfirmAsync()
 
   const [preloadedLayerDialogVisible, setPreloadedLayerDialogVisible] = useState(false)
   const [editedPreloadedMapLayer, setEditedPreloadedMapLayer] = useState(null)
@@ -51,12 +53,14 @@ const PreloadedMapLayersEditor = (props) => {
 
   const onDeleteClick = useCallback(
     ({ preloadedMapLayer }) =>
-      () => {
-        setPreloadedMapLayers(
-          preloadedMapLayers.filter((l) => SurveyFile.getUuid(l) !== SurveyFile.getUuid(preloadedMapLayer))
-        )
+      async () => {
+        if (await confirm({ key: 'homeView:surveyInfo.preloadedMapLayers.confirmDelete' })) {
+          setPreloadedMapLayers(
+            preloadedMapLayers.filter((l) => SurveyFile.getUuid(l) !== SurveyFile.getUuid(preloadedMapLayer))
+          )
+        }
       },
-    [setPreloadedMapLayers, preloadedMapLayers]
+    [confirm, setPreloadedMapLayers, preloadedMapLayers]
   )
 
   const onRowDoubleClick = useCallback(({ row: preloadedMapLayer }) => {
@@ -73,6 +77,12 @@ const PreloadedMapLayersEditor = (props) => {
           <DataGrid
             columns={[
               {
+                field: 'edit',
+                width: 60,
+                headerName: '',
+                renderCell: ({ row }) => <ButtonIconEdit onClick={() => onRowDoubleClick({ row })} />,
+              },
+              {
                 field: 'fileName',
                 flex: 0.4,
                 headerName: i18n.t('homeView:surveyInfo.preloadedMapLayers.fileName'),
@@ -80,15 +90,27 @@ const PreloadedMapLayersEditor = (props) => {
                 sortable: false,
               },
               {
+                field: 'download',
+                width: 60,
+                headerName: '',
+                renderCell: ({ row: preloadedMapLayer }) => (
+                  <ButtonDownload
+                    href={API.getSurveyFileDownloadUrl({ surveyId, fileUuid: SurveyFile.getUuid(preloadedMapLayer) })}
+                    showLabel={false}
+                    variant="text"
+                  />
+                ),
+              },
+              {
                 field: 'label',
-                flex: 0.6,
+                flex: 0.5,
                 headerName: i18n.t('common.label'),
                 renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getLabel(lang)(row)} />,
                 sortable: false,
               },
               {
                 field: 'fileSize',
-                flex: 0.2,
+                width: 120,
                 headerName: i18n.t('homeView:surveyInfo.preloadedMapLayers.fileSize'),
                 renderCell: ({ row }) => FileUtils.toHumanReadableFileSize(SurveyFile.getSize(row)),
                 sortable: false,

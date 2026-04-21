@@ -31,7 +31,7 @@ const PreloadedMapLayerEditor = (props) => {
       surveyFile = SurveyFile.assocLabels(labels)(editedPreloadedMapLayer)
     } else {
       const { name, size } = file
-      surveyFile = SurveyFile.createFile({ name, size, labels })
+      surveyFile = SurveyFile.createFile({ labels, name, size, type: SurveyFile.SurveyFileType.preloadedMapLayer })
     }
     await onOkProp({ file, surveyFile })
   }, [editedPreloadedMapLayer, file, labels, onOkProp])
@@ -39,7 +39,7 @@ const PreloadedMapLayerEditor = (props) => {
   return (
     <Modal
       className="file-upload-dialog"
-      title="homeView:surveyInfo.preloadedMapLayerEditor.title"
+      title="homeView:surveyInfo.preloadedMapLayers.editor.title"
       onClose={onClose}
       showCloseButton
     >

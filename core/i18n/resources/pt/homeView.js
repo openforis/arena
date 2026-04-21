@@ -85,6 +85,17 @@ Se houver registros associados a este ciclo, eles serão excluídos.`,
     map: 'Mapa',
     editInfo: 'Editar informações',
     viewInfo: 'Ver informações',
+
+    preloadedMapLayers: {
+      enabledMessage: 'Camadas de mapa pré-carregadas ativadas',
+      title: 'Camadas de mapa pré-carregadas',
+      fileName: 'Nome do arquivo',
+      fileSize: 'Tamanho do arquivo',
+      confirmDelete: 'Tem certeza de que deseja excluir esta camada de mapa pré-carregada?',
+      editor: {
+        title: 'Camada de mapa pré-carregada',
+      },
+    },
     preferredLanguage: 'Idioma preferido',
     sampleBasedImageInterpretation: 'Interpretação de imagem baseada em amostra',
     sampleBasedImageInterpretationEnabled: 'Interpretação de imagem baseada em amostra habilitada',

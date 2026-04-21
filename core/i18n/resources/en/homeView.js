@@ -88,14 +88,15 @@ If there are records associated to this cycle, they will be deleted.`,
     viewInfo: 'View info',
 
     preloadedMapLayers: {
+      enabledMessage: 'Preloaded map layers enabled',
       title: 'Preloaded map layers',
       fileName: 'File name',
       fileSize: 'File size',
+      confirmDelete: 'Are you sure you want to delete this preloaded map layer?',
+      editor: {
+        title: 'Preloaded map layer',
+      },
     },
-    preloadedMapLayerEditor: {
-      title: 'New preloaded map layer',
-    },
-    preloadedMapLayersEnabled: 'Preloaded map layers enabled',
 
     preferredLanguage: 'Preferred language',
     sampleBasedImageInterpretation: 'Sample-based image interpretation',

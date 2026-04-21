@@ -45,6 +45,8 @@ export const fetchSurveyTemplatesPublished = async () => {
   return surveys
 }
 
+export const getSurveyFileDownloadUrl = ({ surveyId, fileUuid }) => `/api/survey/${surveyId}/file/${fileUuid}`
+
 // ==== UPDATE
 export const startImportLabelsJob = async ({ surveyId, file }) => {
   const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)

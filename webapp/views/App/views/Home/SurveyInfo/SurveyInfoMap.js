@@ -45,7 +45,7 @@ export const SurveyInfoMap = (props) => {
       <Checkbox
         checked={preloadedMapLayersEnabled}
         disabled={readOnly}
-        label="homeView:surveyInfo.preloadedMapLayersEnabled"
+        label="homeView:surveyInfo.preloadedMapLayers.enabledMessage"
         onChange={setPreloadedMapLayersEnabled}
         validation={getFieldValidation(Survey.infoKeys.preloadedMapLayersEnabled)}
       />
@@ -66,4 +66,8 @@ SurveyInfoMap.propTypes = {
   samplingPolygon: PropTypes.object,
   setSampleBasedImageInterpretationEnabled: PropTypes.func.isRequired,
   setSamplingPolygon: PropTypes.func.isRequired,
+  preloadedMapLayersEnabled: PropTypes.bool,
+  preloadedMapLayers: PropTypes.array,
+  setPreloadedMapLayersEnabled: PropTypes.func.isRequired,
+  setPreloadedMapLayers: PropTypes.func.isRequired,
 }

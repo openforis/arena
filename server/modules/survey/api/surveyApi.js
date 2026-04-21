@@ -11,6 +11,7 @@ import * as Request from '../../../utils/request'
 import * as JobUtils from '../../../job/jobUtils'
 
 import * as Survey from '../../../../core/survey/survey'
+import * as SurveyFile from '../../../../core/survey/surveyFile'
 import * as Validation from '../../../../core/validation/validation'
 import * as User from '../../../../core/user/user'
 
@@ -287,6 +288,19 @@ export const init = (app) => {
       const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'Labels', fileFormat })
       Response.setContentTypeFile({ res, fileName, fileFormat })
       await SurveyService.exportLabels({ surveyId, outputStream: res, fileFormat })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/file/:fileUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, fileUuid } = Request.getParams(req)
+      const { summary, contentStream } = await SurveyService.fetchSurveyFile({ surveyId, fileUuid })
+      const fileName = SurveyFile.getName(summary)
+      const fileSize = SurveyFile.getSize(summary)
+      Response.setContentTypeFile({ res, fileName, fileSize })
+      contentStream.pipe(res)
     } catch (error) {
       next(error)
     }

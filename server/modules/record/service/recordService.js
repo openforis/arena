@@ -303,6 +303,7 @@ export const persistNode = async ({
       content: fs.readFileSync(file.tempFilePath),
       recordUuid,
       nodeUuid: Node.getUuid(node),
+      type: SurveyFile.SurveyFileType.recordAttachment,
     })
     await SurveyFileService.insertFile(surveyId, fileObj)
   }

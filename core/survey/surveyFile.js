@@ -9,23 +9,29 @@ import { uuidv4 } from '@core/uuid'
 import * as Node from '../record/node'
 
 const keys = {
-  uuid: ObjectUtils.keys.uuid,
-  props: ObjectUtils.keys.props,
   content: 'content',
+  props: ObjectUtils.keys.props,
+  uuid: ObjectUtils.keys.uuid,
 }
 
 export const propKeys = {
   deleted: 'deleted',
-  name: 'name',
   labels: 'labels',
-  size: 'size',
-  recordUuid: 'recordUuid',
+  name: 'name',
   nodeUuid: 'nodeUuid',
+  recordUuid: 'recordUuid',
+  size: 'size',
+  type: 'type',
 }
 
 export const invalidPropKeys = {
   fileName: 'fileName',
   fileSize: 'fileSize',
+}
+
+export const SurveyFileType = {
+  preloadedMapLayer: 'preloadedMapLayer',
+  recordAttachment: 'recordAttachment',
 }
 
 export const createFile = ({
@@ -36,17 +42,22 @@ export const createFile = ({
   content = null,
   recordUuid = null,
   nodeUuid = null,
-}) => ({
-  [keys.uuid]: uuid ?? uuidv4(),
-  [keys.props]: {
-    [propKeys.name]: name,
+  type = null,
+}) => {
+  const props = ObjectUtils.keepNonEmptyProps({
     [propKeys.labels]: labels,
-    [propKeys.size]: size,
-    [propKeys.recordUuid]: recordUuid,
+    [propKeys.name]: name,
     [propKeys.nodeUuid]: nodeUuid,
-  },
-  [keys.content]: content,
-})
+    [propKeys.recordUuid]: recordUuid,
+    [propKeys.size]: size,
+    [propKeys.type]: type,
+  })
+  return {
+    [keys.uuid]: uuid ?? uuidv4(),
+    [keys.props]: props,
+    [keys.content]: content,
+  }
+}
 
 export const createFileFromNode = ({ node, size = null, content = null }) =>
   createFile({
@@ -56,6 +67,7 @@ export const createFileFromNode = ({ node, size = null, content = null }) =>
     nodeUuid: Node.getUuid(node),
     size,
     content,
+    type: SurveyFileType.recordAttachment,
   })
 
 export const truncateFileName = (fileName, maxLength = 10) => {
@@ -95,18 +107,11 @@ export const cleanupInvalidProps = (file) => {
   const propsUpdated = {
     [propKeys.name]: props[invalidPropKeys.fileName],
     [propKeys.size]: props[invalidPropKeys.fileSize],
-  }
-  const recordUuid = props[propKeys.recordUuid]
-  if (recordUuid) {
-    propsUpdated[propKeys.recordUuid] = recordUuid
-  }
-  const nodeUuid = props[propKeys.nodeUuid]
-  if (nodeUuid) {
-    propsUpdated[propKeys.nodeUuid] = nodeUuid
-  }
-  const labels = props[propKeys.labels]
-  if (!R.isEmpty(labels)) {
-    propsUpdated[propKeys.labels] = labels
+    ...ObjectUtils.keepNonEmptyProps({
+      [propKeys.recordUuid]: props[propKeys.recordUuid],
+      [propKeys.nodeUuid]: props[propKeys.nodeUuid],
+      [propKeys.labels]: props[propKeys.labels],
+    }),
   }
   if (props.deleted) {
     propsUpdated[propKeys.deleted] = true

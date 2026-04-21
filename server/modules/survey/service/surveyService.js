@@ -129,6 +129,12 @@ export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
   await SurveyFileManager.insertFile(surveyId, surveyFileToStore)
 }
 
+export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
+  const summary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const contentStream = await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileUuid })
+  return { summary, contentStream }
+}
+
 export const {
   // CREATE
   insertSurvey,

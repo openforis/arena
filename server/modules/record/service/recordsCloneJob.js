@@ -131,6 +131,7 @@ export default class RecordsCloneJob extends Job {
           nodeUuid: newNodeUuid,
           recordUuid: newRecordUuid,
           size: SurveyFile.getSize(fileSummary),
+          type: SurveyFile.SurveyFileType.recordAttachment,
           uuid: newFileUuid,
         })
         await SurveyFileService.insertFile(surveyId, newFile, tx)

@@ -86,6 +86,17 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
     map: 'Carte',
     editInfo: 'Modifier les infos',
     viewInfo: 'Voir les infos',
+
+    preloadedMapLayers: {
+      enabledMessage: 'Couches de carte préchargées activées',
+      title: 'Couches de carte préchargées',
+      fileName: 'Nom du fichier',
+      fileSize: 'Taille du fichier',
+      confirmDelete: 'Êtes-vous sûr de vouloir supprimer cette couche de carte préchargée ?',
+      editor: {
+        title: 'Couche de carte préchargée',
+      },
+    },
     preferredLanguage: 'Langue préférée',
     sampleBasedImageInterpretation: "Interprétation d'images basée sur des échantillons",
     sampleBasedImageInterpretationEnabled: "Interprétation d'images basée sur des échantillons activée",
