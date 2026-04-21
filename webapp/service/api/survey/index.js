@@ -47,6 +47,11 @@ export const fetchSurveyTemplatesPublished = async () => {
 
 export const getSurveyFileDownloadUrl = ({ surveyId, fileUuid }) => `/api/survey/${surveyId}/file/${fileUuid}`
 
+export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
+  const response = await axios.get(getSurveyFileDownloadUrl({ surveyId, fileUuid }), { responseType: 'blob' })
+  return response
+}
+
 // ==== UPDATE
 export const startImportLabelsJob = async ({ surveyId, file }) => {
   const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)
