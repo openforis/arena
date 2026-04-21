@@ -9,8 +9,10 @@ import { RecordsUpdateThreadService } from '@server/modules/record/service/updat
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 import * as DbUtils from '@server/db/dbUtils'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '../manager/surveyManager'
+import * as SurveyFileManager from '../manager/surveyFileManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
@@ -119,6 +121,12 @@ export const deleteSurvey = async (surveyId) => {
 export const startLabelsImportJob = ({ user, surveyId, filePath, fileFormat }) => {
   const job = new SurveyLabelsImportJob({ user, surveyId, filePath, fileFormat })
   return JobManager.enqueueJob(job)
+}
+
+export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
+  const content = await FileUtils.readBinaryFile(filePath)
+  const surveyFileToStore = { ...surveyFile, content }
+  await SurveyFileManager.insertFile(surveyId, surveyFileToStore)
 }
 
 export const {

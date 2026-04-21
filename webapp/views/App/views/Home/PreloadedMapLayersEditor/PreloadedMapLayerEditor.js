@@ -25,7 +25,7 @@ const PreloadedMapLayerEditor = (props) => {
     setState((statePrev) => ({ ...statePrev, file: files[0] }))
   }, [])
 
-  const onOkClick = useCallback(() => {
+  const onOkClick = useCallback(async () => {
     let surveyFile = null
     if (editedPreloadedMapLayer) {
       surveyFile = SurveyFile.assocLabels(labels)(editedPreloadedMapLayer)
@@ -33,10 +33,7 @@ const PreloadedMapLayerEditor = (props) => {
       const { name, size } = file
       surveyFile = SurveyFile.createFile({ name, size, labels })
     }
-    onOkProp({
-      file,
-      surveyFile,
-    })
+    await onOkProp({ file, surveyFile })
   }, [editedPreloadedMapLayer, file, labels, onOkProp])
 
   return (

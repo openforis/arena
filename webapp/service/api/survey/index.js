@@ -11,6 +11,11 @@ export const insertSurvey = async ({ newSurvey }) => {
   return data
 }
 
+export const insertSurveyFile = async ({ surveyId, file, surveyFile }) => {
+  const formData = objectToFormData({ surveyFile: JSON.stringify(surveyFile), file })
+  await axios.post(`/api/survey/${surveyId}/file`, formData)
+}
+
 // ==== READ
 export const fetchSurveys = async ({ draft = true, template = false } = {}) => {
   const {

@@ -373,6 +373,20 @@ export const init = (app) => {
     }
   })
 
+  app.post('/survey/:surveyId/file', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const filePath = Request.getFilePath(req)
+      const { surveyId } = Request.getParams(req)
+      const surveyFile = Request.getJsonParam(req, 'surveyFile')
+
+      await SurveyService.insertSurveyFile({ surveyId, filePath, surveyFile })
+
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== DELETE
 
   app.delete('/survey/:surveyId', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {

@@ -83,6 +83,7 @@ export {
   fetchSurveys,
   fetchSurveyTemplatesPublished,
   insertSurvey,
+  insertSurveyFile,
   startImportLabelsJob,
   updateSurveyConfigurationProp,
   updateSurveyOwner,
