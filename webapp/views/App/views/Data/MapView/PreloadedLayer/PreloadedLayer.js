@@ -1,9 +1,5 @@
-const LayerType = {
-  geojson: 'geojson',
-  kmz: 'kmz',
-}
-import React, { useEffect, useState, useCallback } from 'react'
-import { LayersControl, LayerGroup, GeoJSON, useMap } from 'react-leaflet'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
+import { LayersControl, LayerGroup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import L from 'leaflet'
@@ -32,42 +28,26 @@ const extractKmlDomFromKmz = async (blob) => {
   return null
 }
 
-// Custom KMLLayer component for react-leaflet
-const KMLLayer = ({ kmlDom }) => {
-  const map = useMap()
-  useEffect(() => {
-    if (!kmlDom) return
-    const kmlLayer = new L.KML(kmlDom)
-    kmlLayer.addTo(map)
-    return () => {
-      map.removeLayer(kmlLayer)
-    }
-  }, [kmlDom, map])
-  return null
-}
-
-KMLLayer.propTypes = {
-  kmlDom: PropTypes.object,
-}
-
 export const PreloadedLayer = (props) => {
   const { preloadedMapLayer } = props
 
+  const map = useMap()
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
 
-  const [layerType, setLayerType] = useState(null)
-  const [geoJsonData, setGeoJsonData] = useState(null)
-  const [kmlDom, setKmlDom] = useState(null)
+  const layerRef = useRef(null)
+  const [layer, setLayer] = useState(null)
 
   const fileUuid = SurveyFile.getUuid(preloadedMapLayer)
   const layerName = SurveyFile.getLabel(lang)(preloadedMapLayer)
 
   const removePreviousLayer = useCallback(() => {
-    setGeoJsonData(null)
-    setKmlDom(null)
-    setLayerType(null)
-  }, [])
+    if (layerRef.current) {
+      map.removeLayer(layerRef.current)
+      layerRef.current = null
+      setLayer(null)
+    }
+  }, [map])
 
   const fetchAndSetLayer = useCallback(async () => {
     if (!fileUuid || !surveyId) return
@@ -76,21 +56,31 @@ export const PreloadedLayer = (props) => {
     const extension = FileUtils.getExtension(fileName)?.toLowerCase()
     const url = API.getSurveyFileDownloadUrl({ surveyId, fileUuid })
     try {
+      let layer = null
       if (extension === 'geojson' || extension === 'json') {
         const { data } = await axios.get(url)
-        setLayerType(LayerType.geojson)
-        setGeoJsonData(data)
+        layer = L.geoJSON(data)
       } else if (extension === 'kmz') {
         const response = await axios.get(url, { responseType: 'blob' })
-        setLayerType(LayerType.kmz)
         const kmlDom = await extractKmlDomFromKmz(response.data)
-        setKmlDom(kmlDom)
+        if (kmlDom) {
+          layer = new L.KML(kmlDom)
+        }
+      }
+      if (layer) {
+        setLayer(layer)
+        layerRef.current = layer
+        map.addLayer(layer)
+        const bounds = layer.getBounds()
+        if (bounds.isValid()) {
+          map.fitBounds(bounds)
+        }
       }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Error loading preloaded map layer:', err)
     }
-  }, [fileUuid, preloadedMapLayer, removePreviousLayer, surveyId])
+  }, [fileUuid, preloadedMapLayer, removePreviousLayer, surveyId, map])
 
   useEffect(() => {
     // Cleanup on unmount
@@ -106,10 +96,7 @@ export const PreloadedLayer = (props) => {
   // Render the overlay for MapLayersControl
   return (
     <LayersControl.Overlay name={layerName}>
-      <LayerGroup>
-        {layerType === LayerType.geojson && geoJsonData && <GeoJSON data={geoJsonData} />}
-        {layerType === LayerType.kmz && kmlDom && <KMLLayer kmlDom={kmlDom} />}
-      </LayerGroup>
+      <LayerGroup>{layer && <></>}</LayerGroup>
     </LayersControl.Overlay>
   )
 }
