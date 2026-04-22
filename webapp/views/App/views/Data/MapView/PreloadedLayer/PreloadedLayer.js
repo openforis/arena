@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+import React, { useEffect, useCallback, useRef } from 'react'
 import { LayersControl, LayerGroup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 import axios from 'axios'

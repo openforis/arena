@@ -1,4 +1,3 @@
-import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 
 import Job from '@server/job/job'
