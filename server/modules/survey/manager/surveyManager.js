@@ -415,7 +415,8 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
     if (!Validation.isValid(validation)) {
       return assocSurveyInfo({ validation })
     }
-    const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
+    const surveyPrev = await fetchSurveyById({ surveyId, draft: true }, t)
+    const surveyInfoPrev = Survey.getSurveyInfo(surveyPrev)
     const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
     for (const [key, value] of Object.entries(props)) {
@@ -434,7 +435,6 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
       }
     }
     const surveyUpdated = await fetchSurveyById({ surveyId, draft: true, validate: true }, t)
-
     const surveyInfoUpdated = Survey.getSurveyInfo(surveyUpdated)
     const preloadedMapLayersUpdated = Survey.getPreloadedMapLayers(surveyInfoUpdated)
     for (const preloadedMapLayer of preloadedMapLayersUpdated) {
@@ -445,6 +445,25 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
 
     return surveyUpdated
   })
+
+export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
+  const survey = await fetchSurveyById({ surveyId, draft: true }, client)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const preloadedMapLayers = Survey.getPreloadedMapLayers(surveyInfo)
+  const preloadedMapLayerFileUuids = preloadedMapLayers.map(SurveyFile.getUuid)
+  const preloadedMapLayerFileSummaries = await SurveyFileManager.fetchFileSummariesByType(
+    { surveyId, type: SurveyFile.SurveyFileType.preloadedMapLayer },
+    client
+  )
+  const preloadedMapLayerFileSummariesToDelete = preloadedMapLayerFileSummaries.filter(
+    (fileSummary) => !preloadedMapLayerFileUuids.includes(SurveyFile.getUuid(fileSummary))
+  )
+  const fileUuidsToDelete = preloadedMapLayerFileSummariesToDelete.map(SurveyFile.getUuid)
+  if (fileUuidsToDelete.length > 0) {
+    await SurveyFileManager.deleteFilesAndContentByUuids({ surveyId, fileUuids: fileUuidsToDelete }, client)
+    Logger.debug(`Deleted ${fileUuidsToDelete.length} unused preloaded map layer files of survey ${surveyId}`)
+  }
+}
 
 export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
   client.tx(async (t) => {

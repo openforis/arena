@@ -3,6 +3,8 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import Job from '@server/job/job'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
 import RecordCheckJob from '@server/modules/survey/service/recordCheckJob'
 import SurveyDependencyGraphsGenerationJob from '@server/modules/survey/service/surveyDependencyGraphsGenerationJob'
 import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob'
@@ -40,6 +42,19 @@ export default class SurveyPublishJob extends Job {
     await super.onStart()
 
     await ActivityLogManager.insert(this.user, this.surveyId, ActivityLog.type.surveyPublish, null, false, this.tx)
+  }
+
+  async onEnd() {
+    await super.onEnd()
+    if (this.isSucceeded()) {
+      try {
+        // After successful publish, delete unused survey files
+        // note: run it out of DB transaction; file content cannot be deleted permanently until transation on DB is committed
+        await SurveyManager.deleteUnusedSurveyFiles(this.surveyId)
+      } catch (error) {
+        this.logError('Error deleting unused survey files after publish', { error: error?.message ?? String(error) })
+      }
+    }
   }
 }
 

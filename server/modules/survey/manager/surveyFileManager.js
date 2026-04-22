@@ -150,6 +150,7 @@ export const deleteTemporaryFiles = async (surveyId, client = db) => {
 export const {
   // READ
   fetchFileSummariesBySurveyId,
+  fetchFileSummariesByType,
   fetchFileSummaryByUuid,
   fetchFileUuidsBySurveyId,
   fetchCountAndTotalFilesSize,

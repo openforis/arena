@@ -28,12 +28,22 @@ export const insertFile = async (surveyId, file, client = db) => {
 
 // ============== READ
 
-export const fetchFileSummariesBySurveyId = async (surveyId, client) =>
+export const fetchFileSummariesBySurveyId = async (surveyId, client = db) =>
   client.manyOrNone(
     `
     SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
     FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE ${NOT_DELETED_CONDITION}`
+  )
+
+export const fetchFileSummariesByType = async ({ surveyId, type }, client = db) =>
+  client.manyOrNone(
+    `
+    SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.file
+    WHERE ${NOT_DELETED_CONDITION} 
+      AND props ->> '${SurveyFile.propKeys.type}' = $1`,
+    [type]
   )
 
 export const fetchFileUuidsByRecordUuids = async ({ surveyId, recordUuids }, client = db) =>
