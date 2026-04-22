@@ -15,7 +15,7 @@ import { useI18n } from '@webapp/store/system'
 import { JobActions } from '@webapp/store/app'
 import * as API from '@webapp/service/api'
 
-import { useMapClusters, useMapLayerAdd } from '../common'
+import { useMapClusters, useMapLayerToggle } from '../common'
 import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
 
@@ -99,9 +99,9 @@ export const useGeoAttributeDataLayer = (props) => {
   const layerName = buildLayerNameComponent({ layerInnerName, layerEarthMapButtonId, markersColor })
 
   // on layer add, create query and fetch data
-  useMapLayerAdd({
+  useMapLayerToggle({
     layerName,
-    callback: () => {
+    onAdd: () => {
       const query = Query.create({
         entityDefUuid: NodeDef.getUuid(nodeDefParent),
         attributeDefUuids: [...ancestorsKeyAttributes.map(NodeDef.getUuid), attributeDefUuid],
