@@ -36,7 +36,6 @@ export const PreloadedLayer = (props) => {
   const lang = useSurveyPreferredLang()
 
   const layerRef = useRef(null)
-  const [layer, setLayer] = useState(null)
 
   const fileUuid = SurveyFile.getUuid(preloadedMapLayer)
   const layerName = SurveyFile.getLabel(lang)(preloadedMapLayer)
@@ -45,40 +44,33 @@ export const PreloadedLayer = (props) => {
     if (layerRef.current) {
       map.removeLayer(layerRef.current)
       layerRef.current = null
-      setLayer(null)
     }
   }, [map])
 
-  const fetchAndSetLayer = useCallback(async () => {
+  const fetchDataAndAddLayerToMap = useCallback(async () => {
     if (!fileUuid || !surveyId) return
     removePreviousLayer()
     const fileName = SurveyFile.getName(preloadedMapLayer)
     const extension = FileUtils.getExtension(fileName)?.toLowerCase()
     const url = API.getSurveyFileDownloadUrl({ surveyId, fileUuid })
-    try {
-      let layer = null
-      if (extension === 'geojson' || extension === 'json') {
-        const { data } = await axios.get(url)
-        layer = L.geoJSON(data)
-      } else if (extension === 'kmz') {
-        const response = await axios.get(url, { responseType: 'blob' })
-        const kmlDom = await extractKmlDomFromKmz(response.data)
-        if (kmlDom) {
-          layer = new L.KML(kmlDom)
-        }
+    let layer = null
+    if (extension === 'geojson' || extension === 'json') {
+      const { data } = await axios.get(url)
+      layer = L.geoJSON(data)
+    } else if (extension === 'kmz') {
+      const response = await axios.get(url, { responseType: 'blob' })
+      const kmlDom = await extractKmlDomFromKmz(response.data)
+      if (kmlDom) {
+        layer = new L.KML(kmlDom)
       }
-      if (layer) {
-        setLayer(layer)
-        layerRef.current = layer
-        map.addLayer(layer)
-        const bounds = layer.getBounds()
-        if (bounds.isValid()) {
-          map.fitBounds(bounds)
-        }
+    }
+    if (layer) {
+      layerRef.current = layer
+      map.addLayer(layer)
+      const bounds = layer.getBounds()
+      if (bounds.isValid()) {
+        map.fitBounds(bounds)
       }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Error loading preloaded map layer:', err)
     }
   }, [fileUuid, preloadedMapLayer, removePreviousLayer, surveyId, map])
 
@@ -89,14 +81,14 @@ export const PreloadedLayer = (props) => {
 
   useMapLayerToggle({
     layerName,
-    onAdd: fetchAndSetLayer,
+    onAdd: fetchDataAndAddLayerToMap,
     onRemove: removePreviousLayer,
   })
 
   // Render the overlay for MapLayersControl
   return (
     <LayersControl.Overlay name={layerName}>
-      <LayerGroup>{layer && <></>}</LayerGroup>
+      <LayerGroup />
     </LayersControl.Overlay>
   )
 }
