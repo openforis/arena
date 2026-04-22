@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
-import { LayersControl, LayerGroup } from 'react-leaflet'
+import { LayersControl, LayerGroup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import L from 'leaflet'
@@ -36,18 +36,13 @@ const createKmzLayer = async (blob) => {
   return null
 }
 
-const LayerType = {
-  geojson: 'geojson',
-  kmz: 'kmz',
-}
-
 export const PreloadedLayer = (props) => {
   const { preloadedMapLayer } = props
 
+  const map = useMap()
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
 
-  const [layerType, setLayerType] = useState(null)
   const [leafletLayer, setLeafletLayer] = useState(null)
   const layerRef = useRef(null)
 
@@ -55,12 +50,13 @@ export const PreloadedLayer = (props) => {
 
   const layerName = SurveyFile.getLabel(lang)(preloadedMapLayer)
 
-  const removePreviousLayer = () => {
+  const removePreviousLayer = useCallback(() => {
     if (layerRef.current) {
+      map.removeLayer(layerRef.current)
       layerRef.current = null
       setLeafletLayer(null)
     }
-  }
+  }, [map])
 
   const fetchAndSetLayer = useCallback(async () => {
     if (!fileUuid || !surveyId) return
@@ -72,14 +68,13 @@ export const PreloadedLayer = (props) => {
       let layer = null
       if (extension === 'geojson' || extension === 'json') {
         const { data } = await axios.get(url)
-        setLayerType(LayerType.geojson)
         layer = await createGeoJsonLayer(data)
       } else if (extension === 'kmz') {
         const response = await axios.get(url, { responseType: 'blob' })
-        setLayerType(LayerType.kmz)
         layer = await createKmzLayer(response.data)
       }
       if (layer) {
+        layer.addTo(map)
         setLeafletLayer(layer)
         layerRef.current = layer
       }
@@ -87,12 +82,12 @@ export const PreloadedLayer = (props) => {
       // eslint-disable-next-line no-console
       console.error('Error loading preloaded map layer:', err)
     }
-  }, [fileUuid, preloadedMapLayer, surveyId])
+  }, [fileUuid, map, preloadedMapLayer, removePreviousLayer, surveyId])
 
   useEffect(() => {
     // Cleanup on unmount
     return removePreviousLayer
-  }, [])
+  }, [removePreviousLayer])
 
   useMapLayerAdd({
     layerName,
