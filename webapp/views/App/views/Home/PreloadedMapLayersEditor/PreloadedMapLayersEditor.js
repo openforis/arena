@@ -148,6 +148,7 @@ const PreloadedMapLayersEditor = (props) => {
           editedPreloadedMapLayer={editedPreloadedMapLayer}
           onClose={onPreloadedLayerDialogClose}
           onOk={onPreloadedLayerDialogOk}
+          preloadedMapLayers={preloadedMapLayers}
         />
       )}
     </>

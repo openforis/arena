@@ -8,7 +8,7 @@ import { uuidv4 } from '@core/uuid'
 
 import * as Node from '../record/node'
 
-const keys = {
+export const keys = {
   content: 'content',
   props: ObjectUtils.keys.props,
   uuid: ObjectUtils.keys.uuid,

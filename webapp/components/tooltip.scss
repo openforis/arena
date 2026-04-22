@@ -22,7 +22,7 @@
   margin-top: 0.5rem;
   border-radius: 0.4rem;
   border: 1px solid $yellow;
-  z-index: $zIndex20Dropdown;
+  z-index: $zIndex20Tooltip;
 
   &:after {
     content: '';
@@ -72,6 +72,10 @@
 
   &:after {
     border-color: transparent;
+  }
+
+  &.inside-modal {
+    z-index: $zIndex1300TooltipInModal;
   }
 }
 

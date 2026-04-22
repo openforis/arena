@@ -19,14 +19,14 @@ const ValidationTooltip = (props) => {
 
   return (
     <Tooltip
-      type={type}
-      messageComponent={content}
       className={className}
-      showContent={showContent}
       id={id}
       insideTable={insideTable}
+      messageComponent={content}
       position={position}
+      showContent={showContent}
       testId={testId}
+      type={type}
     >
       {children}
     </Tooltip>

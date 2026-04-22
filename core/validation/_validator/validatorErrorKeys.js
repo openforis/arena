@@ -132,6 +132,12 @@ export const ValidatorErrorKeys = {
     fieldManualLinksInvalid: 'validationErrors:surveyInfoEdit.fieldManualLinksInvalid',
   },
 
+  surveyPreloadedMapLayer: {
+    fileRequired: 'validationErrors:surveyPreloadedMapLayer.fileRequired',
+    fileNameDuplicate: 'validationErrors:surveyPreloadedMapLayer.fileNameDuplicate',
+    labelsRequired: 'validationErrors:surveyPreloadedMapLayer.labelsRequired',
+  },
+
   taxonomyEdit: {
     codeChangedAfterPublishing: 'validationErrors:taxonomyEdit.codeChangedAfterPublishing',
     codeDuplicate: 'validationErrors:taxonomyEdit.codeDuplicate',

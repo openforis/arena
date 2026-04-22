@@ -1,8 +1,12 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as SurveyFile from '@core/survey/surveyFile'
+import * as Validation from '@core/validation/validation'
+import { validatePreloadedMapLayer } from '@core/survey/surveyPreloadedMapLayerValidator'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { contentTypes } from '@webapp/service/api'
 
@@ -10,14 +14,16 @@ const accept = { [contentTypes.geojson]: ['.geojson'], [contentTypes.kmz]: ['.km
 const maxSize = 10 // 10MB
 
 const PreloadedMapLayerEditor = (props) => {
-  const { editedPreloadedMapLayer, onClose, onOk: onOkProp } = props
+  const { editedPreloadedMapLayer, onClose, onOk: onOkProp, preloadedMapLayers } = props
 
   const [state, setState] = useState({
+    draftPreloadedMapLayer: editedPreloadedMapLayer,
     file: null,
     labels: editedPreloadedMapLayer ? SurveyFile.getLabels(editedPreloadedMapLayer) : {},
+    validation: null,
   })
 
-  const { file, labels } = state
+  const { draftPreloadedMapLayer, file, labels, validation } = state
 
   const onLabelsChange = useCallback((newLabels) => setState((statePrev) => ({ ...statePrev, labels: newLabels })), [])
 
@@ -25,13 +31,13 @@ const PreloadedMapLayerEditor = (props) => {
     setState((statePrev) => ({ ...statePrev, file: files[0] }))
   }, [])
 
-  const onOkClick = useCallback(async () => {
-    let surveyFile = null
+  useEffect(() => {
+    let draftPreloadedMapLayer
     if (editedPreloadedMapLayer) {
-      surveyFile = SurveyFile.assocLabels(labels)(editedPreloadedMapLayer)
+      draftPreloadedMapLayer = SurveyFile.assocLabels(labels)(editedPreloadedMapLayer)
     } else {
-      const { name, size } = file
-      surveyFile = SurveyFile.createFile({
+      const { name, size } = file ?? {}
+      draftPreloadedMapLayer = SurveyFile.createFile({
         labels,
         name,
         size,
@@ -39,8 +45,20 @@ const PreloadedMapLayerEditor = (props) => {
         temporary: true,
       })
     }
-    await onOkProp({ file, surveyFile })
-  }, [editedPreloadedMapLayer, file, labels, onOkProp])
+    validatePreloadedMapLayer({ preloadedMapLayers, preloadedMapLayer: draftPreloadedMapLayer }).then((validation) => {
+      setState((statePrev) => ({
+        ...statePrev,
+        draftPreloadedMapLayer,
+        validation,
+      }))
+    })
+  }, [editedPreloadedMapLayer, file, labels, preloadedMapLayers])
+
+  const onOkClick = useCallback(async () => {
+    await onOkProp({ file, surveyFile: draftPreloadedMapLayer })
+  }, [file, draftPreloadedMapLayer, onOkProp])
+
+  const okButtonDisabled = !Validation.isValid(validation) || (!editedPreloadedMapLayer && !file)
 
   return (
     <Modal
@@ -50,22 +68,34 @@ const PreloadedMapLayerEditor = (props) => {
       showCloseButton
     >
       <ModalBody>
-        <LabelsEditor labels={labels} onChange={onLabelsChange} />
-
+        <LabelsEditor
+          labels={labels}
+          onChange={onLabelsChange}
+          validation={Validation.getFieldValidation(SurveyFile.propKeys.labels)(validation)}
+        />
         {!editedPreloadedMapLayer && (
-          <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
+          <ValidationTooltip validation={Validation.getFieldValidation(SurveyFile.propKeys.name)(validation)}>
+            <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
+          </ValidationTooltip>
         )}
       </ModalBody>
       <ModalFooter>
         <Button
           className="btn-primary modal-footer__item"
-          disabled={!editedPreloadedMapLayer && !file}
+          disabled={okButtonDisabled}
           onClick={onOkClick}
           label="common.ok"
         />
       </ModalFooter>
     </Modal>
   )
+}
+
+PreloadedMapLayerEditor.propTypes = {
+  editedPreloadedMapLayer: PropTypes.object,
+  onClose: PropTypes.func.isRequired,
+  onOk: PropTypes.func.isRequired,
+  preloadedMapLayers: PropTypes.array.isRequired,
 }
 
 export default PreloadedMapLayerEditor
