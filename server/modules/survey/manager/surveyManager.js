@@ -450,13 +450,13 @@ export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
   const survey = await fetchSurveyById({ surveyId, draft: true }, client)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const preloadedMapLayers = Survey.getPreloadedMapLayers(surveyInfo)
-  const preloadedMapLayerFileUuids = preloadedMapLayers.map(SurveyFile.getUuid)
+  const preloadedMapLayerFileUuids = new Set(preloadedMapLayers.map(SurveyFile.getUuid))
   const preloadedMapLayerFileSummaries = await SurveyFileManager.fetchFileSummariesByType(
     { surveyId, type: SurveyFile.SurveyFileType.preloadedMapLayer },
     client
   )
   const preloadedMapLayerFileSummariesToDelete = preloadedMapLayerFileSummaries.filter(
-    (fileSummary) => !preloadedMapLayerFileUuids.includes(SurveyFile.getUuid(fileSummary))
+    (fileSummary) => !preloadedMapLayerFileUuids.has(SurveyFile.getUuid(fileSummary))
   )
   const fileUuidsToDelete = preloadedMapLayerFileSummariesToDelete.map(SurveyFile.getUuid)
   if (fileUuidsToDelete.length > 0) {
@@ -511,9 +511,9 @@ export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = Surve
 // ====== DELETE
 export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, client = db) => {
   // fetch file uuids to delete before survey schema is dropped
-  const filesToDeleteUuids = !SurveyFileManager.isFileContentStoredInDB()
-    ? await SurveyFileManager.fetchFileUuidsBySurveyId({ surveyId }, client)
-    : []
+  const filesToDeleteUuids = SurveyFileManager.isFileContentStoredInDB()
+    ? []
+    : await SurveyFileManager.fetchFileUuidsBySurveyId({ surveyId }, client)
 
   await client.tx(async (t) => {
     if (deleteUserPrefs) {
