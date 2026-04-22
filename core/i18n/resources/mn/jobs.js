@@ -33,6 +33,7 @@ export default {
   SurveyCreatorJob: 'Судалгаа үүсгэх',
   SurveyDependencyGraphsGenerationJob: 'Судалгааны хамаарлын график үүсгэх',
   SurveyExportJob: 'Судалгаа экспортлох',
+  SurveyFilesImportJob: 'Судалгааны файлуудыг импортлох',
   SurveyIndexGeneratorJob: 'Судалгааны индекс үүсгэгч',
   SurveyInfoValidationJob: 'Судалгааны мэдээлэл баталгаажуулах',
   SurveyLabelsImportJob: 'Судалгааны шошго импортлох',

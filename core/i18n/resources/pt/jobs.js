@@ -33,6 +33,7 @@ export default {
   SurveyCreatorJob: 'Criação de inventário',
   SurveyDependencyGraphsGenerationJob: 'Geração de grafos de dependência do inventário',
   SurveyExportJob: 'Exportação de inventário',
+  SurveyFilesImportJob: 'Importação de arquivos do inventário',
   SurveyIndexGeneratorJob: 'Gerador de índice do inventário',
   SurveyInfoValidationJob: 'Validação de informações do inventário',
   SurveyLabelsImportJob: 'Importação de rótulos do inventário',

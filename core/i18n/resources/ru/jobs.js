@@ -33,6 +33,7 @@ export default {
   SurveyCreatorJob: 'Создание опроса',
   SurveyDependencyGraphsGenerationJob: 'Генерация графов зависимостей опроса',
   SurveyExportJob: 'Экспорт опроса',
+  SurveyFilesImportJob: 'Импорт файлов опроса',
   SurveyIndexGeneratorJob: 'Генератор индекса опроса',
   SurveyInfoValidationJob: 'Валидация информации об опросе',
   SurveyLabelsImportJob: 'Импорт меток опроса',

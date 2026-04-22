@@ -33,6 +33,7 @@ export default {
   SurveyCreatorJob: 'Création de formulaire',
   SurveyDependencyGraphsGenerationJob: 'Génération du graphe de dépendances du formulaire',
   SurveyExportJob: 'Exportation du formulaire',
+  SurveyFilesImportJob: 'Importation des fichiers du formulaire',
   SurveyIndexGeneratorJob: "Générateur d'index du formulaire",
   SurveyInfoValidationJob: 'Validation des informations du formulaire',
   SurveyLabelsImportJob: 'Importation des étiquettes du formulaire',

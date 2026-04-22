@@ -3,19 +3,14 @@ import { Objects } from '@openforis/arena-core'
 import SystemError from '@core/systemError'
 import * as SurveyFile from '@core/survey/surveyFile'
 
-import Job from '@server/job/job'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
+import { FileImportBaseJob } from './filesImportBaseJob'
 
-export default class FilesImportJob extends Job {
+export default class FilesImportJob extends FileImportBaseJob {
   constructor(params) {
     super('FilesImportJob', params)
-
-    this.insertedFileUuids = []
-    this.updatedFileUuids = []
-    this.deletedFileUuids = []
-    this.missingFileSummaries = []
   }
 
   async execute() {
@@ -71,38 +66,6 @@ export default class FilesImportJob extends Job {
     return ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
   }
 
-  async persistFile(file) {
-    const { context, tx } = this
-    const { surveyId, dryRun } = context
-    const fileUuid = SurveyFile.getUuid(file)
-    const fileProps = SurveyFile.getProps(file)
-    this.logDebug(`persisting file ${fileUuid}`)
-    const existingFileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
-    if (existingFileSummary) {
-      this.logDebug(`file already existing`)
-      if (SurveyFile.isDeleted(existingFileSummary)) {
-        this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
-        if (!dryRun) {
-          await SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
-          await SurveyFileService.insertFile(surveyId, file, tx)
-        }
-        this.insertedFileUuids.push(fileUuid)
-      } else {
-        this.logDebug('updating props')
-        if (!dryRun) {
-          await SurveyFileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
-        }
-        this.updatedFileUuids.push(fileUuid)
-      }
-    } else {
-      this.logDebug(`file not existing: inserting new file`, fileProps)
-      if (!dryRun) {
-        await SurveyFileService.insertFile(surveyId, file, tx)
-      }
-      this.insertedFileUuids.push(fileUuid)
-    }
-  }
-
   async checkFilesNotExceedingAvailableQuota(filesSummaries) {
     const { surveyId } = this.context
     const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
@@ -156,17 +119,6 @@ export default class FilesImportJob extends Job {
         }
         this.deletedFileUuids.push(fileUuid)
       }
-    }
-  }
-
-  generateResult() {
-    const result = super.generateResult()
-    return {
-      ...result,
-      insertedFiles: this.insertedFileUuids.length,
-      updatedFiles: this.updatedFileUuids.length,
-      deletedFiles: this.deletedFileUuids.length,
-      missingFiles: this.missingFileSummaries.length,
     }
   }
 }
