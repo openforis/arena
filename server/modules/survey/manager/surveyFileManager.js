@@ -119,11 +119,31 @@ export const deleteFileByUuid = async ({ surveyId, fileUuid }, client = db) => {
   // do not delete content if not in DB: deletion out of transaction
 }
 
-export const deleteSurveyFilesContentByUuids = async ({ surveyId, fileUuids }) => {
+export const deleteFilesContentByUuids = async ({ surveyId, fileUuids }) => {
   const storageType = getFileContentStorageType()
   const deleteFn = contentDeleteFunctionByStorageType[storageType]
   if (deleteFn) {
     await deleteFn({ surveyId, fileUuids })
+  }
+}
+
+export const deleteFilesAndContentByUuids = async ({ surveyId, fileUuids }, client = db) => {
+  await deleteFilesContentByUuids({ surveyId, fileUuids })
+  await FileRepository.deleteFilesByUuids(surveyId, fileUuids, client)
+}
+
+export const deleteTemporaryFiles = async (surveyId, client = db) => {
+  const fileSummaries = await FileRepository.fetchFileSummariesBySurveyId(surveyId, client)
+  const temporaryFileUuids = []
+  for (const fileSummary of fileSummaries) {
+    const fileUuid = SurveyFile.getUuid(fileSummary)
+    if (SurveyFile.isTemporary(fileSummary)) {
+      temporaryFileUuids.push(fileUuid)
+    }
+  }
+  if (temporaryFileUuids.length > 0) {
+    logger.debug(`Deleting ${temporaryFileUuids.length} temporary files of survey ${surveyId}`)
+    await deleteFilesAndContentByUuids({ surveyId, fileUuids: temporaryFileUuids }, client)
   }
 }
 
@@ -135,7 +155,6 @@ export const {
   fetchCountAndTotalFilesSize,
   // UPDATE
   updateFileProps,
+  clearFileTemporaryFlag,
   cleanupSurveyFilesProps,
-  // DELETE
-  deleteFilesByUuids,
 } = FileRepository

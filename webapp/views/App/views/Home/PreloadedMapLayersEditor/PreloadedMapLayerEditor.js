@@ -31,7 +31,13 @@ const PreloadedMapLayerEditor = (props) => {
       surveyFile = SurveyFile.assocLabels(labels)(editedPreloadedMapLayer)
     } else {
       const { name, size } = file
-      surveyFile = SurveyFile.createFile({ labels, name, size, type: SurveyFile.SurveyFileType.preloadedMapLayer })
+      surveyFile = SurveyFile.createFile({
+        labels,
+        name,
+        size,
+        type: SurveyFile.SurveyFileType.preloadedMapLayer,
+        temporary: true,
+      })
     }
     await onOkProp({ file, surveyFile })
   }, [editedPreloadedMapLayer, file, labels, onOkProp])

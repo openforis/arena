@@ -142,6 +142,16 @@ export const updateFileProps = async (surveyId, fileUuid, props, client = db) =>
     [fileUuid, props]
   )
 
+export const clearFileTemporaryFlag = async (surveyId, fileUuid, client = db) =>
+  client.one(
+    `
+    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
+    SET props = props - '${SurveyFile.propKeys.temporary}'
+    WHERE uuid = $1
+    RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
+    [fileUuid]
+  )
+
 export const clearAllSurveyFilesContent = async ({ surveyId }, client = db) =>
   client.none(
     `
@@ -195,4 +205,11 @@ export const deleteFilesByRecordUuids = async (surveyId, uuids, client = db) =>
     DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE props ->> '${SurveyFile.propKeys.recordUuid}' IN ($1:csv)`,
     [uuids]
+  )
+
+export const deleteTemporaryFiles = async (surveyId, client = db) =>
+  client.query(
+    `
+    DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.file
+    WHERE props ->> '${SurveyFile.propKeys.temporary}' = 'true'`
   )

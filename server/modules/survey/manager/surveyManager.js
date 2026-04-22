@@ -12,6 +12,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Survey from '@core/survey/survey'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import SystemError from '@core/systemError'
 import * as User from '@core/user/user'
@@ -432,7 +433,17 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
         }
       }
     }
-    return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
+    const surveyUpdated = await fetchSurveyById({ surveyId, draft: true, validate: true }, t)
+
+    const surveyInfoUpdated = Survey.getSurveyInfo(surveyUpdated)
+    const preloadedMapLayersUpdated = Survey.getPreloadedMapLayers(surveyInfoUpdated)
+    for (const preloadedMapLayer of preloadedMapLayersUpdated) {
+      const fileUuid = SurveyFile.getUuid(preloadedMapLayer)
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t)
+    }
+    await SurveyFileManager.deleteTemporaryFiles(surveyId, t)
+
+    return surveyUpdated
   })
 
 export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
@@ -494,7 +505,7 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
     await SchemaRdbRepository.dropSchema(surveyId, t)
   })
   if (filesToDeleteUuids.length > 0) {
-    await SurveyFileManager.deleteSurveyFilesContentByUuids({ surveyId, fileUuids: filesToDeleteUuids })
+    await SurveyFileManager.deleteFilesContentByUuids({ surveyId, fileUuids: filesToDeleteUuids })
   }
 }
 

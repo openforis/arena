@@ -21,6 +21,7 @@ export const propKeys = {
   nodeUuid: 'nodeUuid',
   recordUuid: 'recordUuid',
   size: 'size',
+  temporary: 'temporary',
   type: 'type',
 }
 
@@ -43,6 +44,7 @@ export const createFile = ({
   recordUuid = null,
   nodeUuid = null,
   type = null,
+  temporary = false,
 }) => {
   const props = ObjectUtils.keepNonEmptyProps({
     [propKeys.labels]: labels,
@@ -52,6 +54,9 @@ export const createFile = ({
     [propKeys.size]: size,
     [propKeys.type]: type,
   })
+  if (temporary) {
+    props[propKeys.temporary] = true
+  }
   return {
     [keys.uuid]: uuid ?? uuidv4(),
     [keys.props]: props,
@@ -82,6 +87,7 @@ export const truncateFileName = (fileName, maxLength = 10) => {
 // READ
 export const { getUuid, getProps, getLabel, getLabels } = ObjectUtils
 export const isDeleted = (file) => Boolean(ObjectUtils.getProp(propKeys.deleted, false)(file))
+export const isTemporary = (file) => Boolean(ObjectUtils.getProp(propKeys.temporary, false)(file))
 export const getName = ObjectUtils.getProp(propKeys.name)
 export const getSize = ObjectUtils.getProp(propKeys.size)
 export const getNodeUuid = ObjectUtils.getProp(propKeys.nodeUuid)
