@@ -7,7 +7,7 @@ import * as SurveyFile from '@core/survey/surveyFile'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-const SUMMARY_FIELDS = ['id', 'uuid', 'props']
+const SUMMARY_FIELDS = ['id', 'uuid', 'props', 'date_created']
 const SUMMARY_FIELDS_COMMA_SEPARATED = SUMMARY_FIELDS.join(', ')
 
 const NOT_DELETED_CONDITION = `COALESCE(props ->> '${SurveyFile.propKeys.deleted}', 'false') <> 'true'`

@@ -1,6 +1,8 @@
 import React, { useCallback, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as SurveyFile from '@core/survey/surveyFile'
+import * as DateUtils from '@core/dateUtils'
 
 import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
@@ -81,6 +83,7 @@ const PreloadedMapLayersEditor = (props) => {
                 width: 60,
                 headerName: '',
                 renderCell: ({ row }) => <ButtonIconEdit onClick={() => onRowDoubleClick({ row })} />,
+                sortable: false,
               },
               {
                 field: 'fileName',
@@ -100,6 +103,7 @@ const PreloadedMapLayersEditor = (props) => {
                     variant="text"
                   />
                 ),
+                sortable: false,
               },
               {
                 field: 'label',
@@ -114,6 +118,12 @@ const PreloadedMapLayersEditor = (props) => {
                 headerName: i18n.t('homeView:surveyInfo.preloadedMapLayers.fileSize'),
                 renderCell: ({ row }) => FileUtils.toHumanReadableFileSize(SurveyFile.getSize(row)),
                 sortable: false,
+              },
+              {
+                field: 'dateCreated',
+                width: 180,
+                headerName: i18n.t('common.dateCreated'),
+                renderCell: ({ row }) => DateUtils.formatDateTimeDisplay(SurveyFile.getDateCreated(row)),
               },
               {
                 field: 'delete',
@@ -142,6 +152,12 @@ const PreloadedMapLayersEditor = (props) => {
       )}
     </>
   )
+}
+
+PreloadedMapLayersEditor.propTypes = {
+  preloadedMapLayers: PropTypes.array,
+  setPreloadedMapLayers: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool,
 }
 
 export default PreloadedMapLayersEditor

@@ -12,6 +12,7 @@ const keys = {
   content: 'content',
   props: ObjectUtils.keys.props,
   uuid: ObjectUtils.keys.uuid,
+  dateCreated: ObjectUtils.keys.dateCreated,
 }
 
 export const propKeys = {
@@ -61,6 +62,7 @@ export const createFile = ({
     [keys.uuid]: uuid ?? uuidv4(),
     [keys.props]: props,
     [keys.content]: content,
+    [keys.dateCreated]: new Date().toISOString(),
   }
 }
 
@@ -85,7 +87,7 @@ export const truncateFileName = (fileName, maxLength = 10) => {
 }
 
 // READ
-export const { getUuid, getProps, getLabel, getLabels } = ObjectUtils
+export const { getDateCreated, getLabel, getLabels, getProps, getUuid } = ObjectUtils
 export const isDeleted = (file) => Boolean(ObjectUtils.getProp(propKeys.deleted, false)(file))
 export const isTemporary = (file) => Boolean(ObjectUtils.getProp(propKeys.temporary, false)(file))
 export const getName = ObjectUtils.getProp(propKeys.name)
