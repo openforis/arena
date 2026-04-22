@@ -96,6 +96,7 @@ export const getNodeUuid = ObjectUtils.getProp(propKeys.nodeUuid)
 export const getRecordUuid = ObjectUtils.getProp(propKeys.recordUuid)
 export const getContent = R.prop(keys.content)
 export const getExtension = R.pipe(getName, FileNames.getExtension)
+export const getType = ObjectUtils.getProp(propKeys.type, SurveyFileType.recordAttachment)
 
 // UPDATE
 export const { assocLabels } = ObjectUtils

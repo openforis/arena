@@ -64,6 +64,7 @@ export const {
   fetchFileContentAsBuffer,
   fetchFileSummaryByUuid,
   fetchFileSummariesBySurveyId,
+  fetchFileSummariesByType,
   // UPDATE
   updateFileProps,
   // DELETE
