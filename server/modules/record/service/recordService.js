@@ -13,36 +13,36 @@ import * as DateUtils from '@core/dateUtils'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
 import * as Validation from '@core/validation/validation'
 
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { db } from '@server/db/db'
 import * as JobManager from '@server/job/jobManager'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as Response from '@server/utils/response'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
-import * as FileService from './fileService'
 
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
+import RecordsCloneJob from './recordsCloneJob'
+import RecordsValidationJob from './recordsValidationJob'
+import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
-import RecordsCloneJob from './recordsCloneJob'
-import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
-import RecordsValidationJob from './recordsValidationJob'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -291,20 +291,21 @@ export const persistNode = async ({
   const recordUuid = Node.getRecordUuid(node)
 
   if (file) {
-    const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+    const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
     if (filesStatistics.availableSpace < file.size) {
       throw new SystemError('cannotInsertFileExceedingQuota') // do not provide details about available quota to the user
     }
     // Save file to "file" table and set fileUuid and fileName into node value
-    const fileObj = RecordFile.createFile({
+    const fileObj = SurveyFile.createFile({
       uuid: Node.getFileUuid(node),
       name: file.name,
       size: file.size,
       content: fs.readFileSync(file.tempFilePath),
       recordUuid,
       nodeUuid: Node.getUuid(node),
+      type: SurveyFile.SurveyFileType.recordAttachment,
     })
-    await FileService.insertFile(surveyId, fileObj)
+    await SurveyFileService.insertFile(surveyId, fileObj)
   }
 
   _sendNodeUpdateMessage({
@@ -394,7 +395,7 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
     },
   })(record)
 
-  const fileName = RecordFile.getName(file)
+  const fileName = SurveyFile.getName(file)
   const extension = FileUtils.getFileExtension(fileName)
 
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`

@@ -159,6 +159,12 @@ export default {
     fieldManualLinksInvalid: 'Field manual link is invalid',
   },
 
+  surveyPreloadedMapLayer: {
+    fileRequired: 'File is required',
+    fileNameDuplicate: 'Another file with the same name already exists',
+    labelsRequired: 'At least one label is required',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
     cannotFindNodeDef: "Cannot find attribute or entity definition with name '{{name}}'",

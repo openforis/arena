@@ -11,7 +11,7 @@ import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyU
 
 import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
 import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
-import { SurveyInfoSampleBasedImageInterpretation } from './SurveyInfoSampleBasedImageInterpretation'
+import { SurveyInfoMap } from './SurveyInfoMap'
 
 import { useSurveyInfoForm } from './store'
 import { SurveySecurityEditor } from './surveySecurityEditor'
@@ -22,10 +22,13 @@ const SurveyInfo = () => {
   const canUseAnalysis = useAuthCanUseAnalysis()
 
   const {
-    userExtraPropDefs,
+    preloadedMapLayers,
+    preloadedMapLayersEnabled,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
     security,
+    userExtraPropDefs,
+
     setCycles,
     setDefaultCycleKey,
     setDescriptions,
@@ -33,6 +36,8 @@ const SurveyInfo = () => {
     setLabels,
     setLanguages,
     setName,
+    setPreloadedMapLayers,
+    setPreloadedMapLayersEnabled,
     setSamplingPolygon,
     setSampleBasedImageInterpretationEnabled,
     setSecurity,
@@ -40,6 +45,7 @@ const SurveyInfo = () => {
     setUserExtraPropDefs,
     getFieldValidation,
     saveProps,
+
     ...surveyInfoObject
   } = useSurveyInfoForm()
 
@@ -65,14 +71,18 @@ const SurveyInfo = () => {
   if (canUseAnalysis) {
     tabs.push({
       key: 'sampleBasedInterpretation',
-      component: SurveyInfoSampleBasedImageInterpretation,
-      label: 'homeView:surveyInfo.sampleBasedImageInterpretation',
+      component: SurveyInfoMap,
+      label: 'homeView:surveyInfo.map',
       props: {
         getFieldValidation,
         sampleBasedImageInterpretationEnabled,
         samplingPolygon,
         setSampleBasedImageInterpretationEnabled,
         setSamplingPolygon,
+        preloadedMapLayers,
+        preloadedMapLayersEnabled,
+        setPreloadedMapLayers,
+        setPreloadedMapLayersEnabled,
       },
     })
   }

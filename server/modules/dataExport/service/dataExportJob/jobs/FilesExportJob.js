@@ -6,7 +6,7 @@ import Job from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
-import * as FileService from '@server/modules/record/service/fileService'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 
 const filesOutputDir = 'files'
 
@@ -46,12 +46,12 @@ export default class FilesExportJob extends Job {
     const { survey, outputDir, fileNamesByFileUuid } = this.context
     const surveyId = Survey.getId(survey)
 
-    const fileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
+    const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
     if (!fileSummary) {
       this.logWarn(`File with UUID ${fileUuid} not found`)
       return false
     }
-    const recordFileContent = await FileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
+    const recordFileContent = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
     if (!recordFileContent) {
       this.logWarn(`File content for file with UUID ${fileUuid} not found`)
       return false

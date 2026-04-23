@@ -1,21 +1,16 @@
 import { Objects } from '@openforis/arena-core'
 
 import SystemError from '@core/systemError'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 
-import Job from '@server/job/job'
-import * as FileService from '@server/modules/record/service/fileService'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
+import { FileImportBaseJob } from './filesImportBaseJob'
 
-export default class FilesImportJob extends Job {
+export default class FilesImportJob extends FileImportBaseJob {
   constructor(params) {
     super('FilesImportJob', params)
-
-    this.insertedFileUuids = []
-    this.updatedFileUuids = []
-    this.deletedFileUuids = []
-    this.missingFileSummaries = []
   }
 
   async execute() {
@@ -32,24 +27,24 @@ export default class FilesImportJob extends Job {
       for (const fileSummary of filesSummaries) {
         let file = { ...fileSummary }
 
-        file = RecordFile.cleanupInvalidProps(file)
+        file = SurveyFile.cleanupInvalidProps(file)
 
         // load file content from a separate file
-        const fileUuid = RecordFile.getUuid(fileSummary)
-        const fileName = RecordFile.getName(fileSummary)
+        const fileUuid = SurveyFile.getUuid(fileSummary)
+        const fileName = SurveyFile.getName(fileSummary)
         const fileContent = await this.fetchFileContent({ fileName, fileUuid })
         if (!fileContent && !skipMissingFiles) {
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
         }
         if (fileContent) {
-          file = RecordFile.assocContent(fileContent)(file)
+          file = SurveyFile.assocContent(fileContent)(file)
 
           // update file size with actual file content length
-          file = RecordFile.assocSize(Buffer.byteLength(fileContent))(file)
+          file = SurveyFile.assocSize(Buffer.byteLength(fileContent))(file)
 
           await this.persistFile(file)
         } else {
-          const recordUuid = RecordFile.getRecordUuid(fileSummary)
+          const recordUuid = SurveyFile.getRecordUuid(fileSummary)
           this.logWarn(`Survey ${surveyId} record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`)
           this.missingFileSummaries.push(fileSummary)
         }
@@ -71,42 +66,10 @@ export default class FilesImportJob extends Job {
     return ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
   }
 
-  async persistFile(file) {
-    const { context, tx } = this
-    const { surveyId, dryRun } = context
-    const fileUuid = RecordFile.getUuid(file)
-    const fileProps = RecordFile.getProps(file)
-    this.logDebug(`persisting file ${fileUuid}`)
-    const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
-    if (existingFileSummary) {
-      this.logDebug(`file already existing`)
-      if (RecordFile.isDeleted(existingFileSummary)) {
-        this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
-        if (!dryRun) {
-          await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
-          await FileService.insertFile(surveyId, file, tx)
-        }
-        this.insertedFileUuids.push(fileUuid)
-      } else {
-        this.logDebug('updating props')
-        if (!dryRun) {
-          await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
-        }
-        this.updatedFileUuids.push(fileUuid)
-      }
-    } else {
-      this.logDebug(`file not existing: inserting new file`, fileProps)
-      if (!dryRun) {
-        await FileService.insertFile(surveyId, file, tx)
-      }
-      this.insertedFileUuids.push(fileUuid)
-    }
-  }
-
   async checkFilesNotExceedingAvailableQuota(filesSummaries) {
     const { surveyId } = this.context
-    const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
-    const totalSize = filesSummaries.reduce((tot, fileSummary) => tot + RecordFile.getSize(fileSummary), 0)
+    const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
+    const totalSize = filesSummaries.reduce((tot, fileSummary) => tot + SurveyFile.getSize(fileSummary), 0)
     if (totalSize > filesStatistics.availableSpace) {
       throw new SystemError('cannotImportFilesExceedingQuota')
     }
@@ -124,7 +87,7 @@ export default class FilesImportJob extends Job {
       throw new Error('missing files summary file')
     }
 
-    const filesUuids = filesSummaries.map(RecordFile.getUuid)
+    const filesUuids = filesSummaries.map(SurveyFile.getUuid)
     this.logDebug(`file uuids to be imported: ${filesUuids}`)
 
     const missingRecordFileUuidsInFiles = recordsFileUuids.filter(
@@ -149,24 +112,13 @@ export default class FilesImportJob extends Job {
 
     const filesToDeleteArray = Object.values(filesToDeleteByUuid)
     for (const file of filesToDeleteArray) {
-      const fileUuid = RecordFile.getUuid(file)
+      const fileUuid = SurveyFile.getUuid(file)
       if (!updatedFilesByUuid[fileUuid]) {
         if (!dryRun) {
-          await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+          await SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
         }
         this.deletedFileUuids.push(fileUuid)
       }
-    }
-  }
-
-  generateResult() {
-    const result = super.generateResult()
-    return {
-      ...result,
-      insertedFiles: this.insertedFileUuids.length,
-      updatedFiles: this.updatedFileUuids.length,
-      deletedFiles: this.deletedFileUuids.length,
-      missingFiles: this.missingFileSummaries.length,
     }
   }
 }

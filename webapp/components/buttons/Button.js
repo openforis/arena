@@ -77,6 +77,7 @@ export const Button = forwardRef((props, ref) => {
     primary,
     secondary,
     showIcon = true,
+    showLabel: _showLabel,
     size = 'medium',
     testId,
     titleClassName,

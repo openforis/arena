@@ -14,15 +14,15 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import * as RecordService from '../service/recordService'
-import * as FileService from '../service/fileService'
 
 import {
   requireRecordAnalysisPermission,
@@ -40,9 +40,9 @@ import {
 const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
   const fileUuid = Node.getFileUuid(node)
-  const file = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const file = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
   const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
-  const contentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid })
+  const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid })
   return { fileName, file, contentStream }
 }
 
@@ -287,7 +287,7 @@ export const init = (app) => {
         const { surveyId, nodeUuid } = Request.getParams(req)
 
         const { fileName, file, contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
-        setContentTypeFile({ res, fileName, fileSize: RecordFile.getSize(file) })
+        setContentTypeFile({ res, fileName, fileSize: SurveyFile.getSize(file) })
         contentStream.pipe(res)
       } catch (error) {
         next(error)

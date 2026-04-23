@@ -160,6 +160,12 @@ export default {
     fieldManualLinksInvalid: 'Link do manual de campo inválido',
   },
 
+  surveyPreloadedMapLayer: {
+    fileRequired: 'Arquivo obrigatório',
+    fileNameDuplicate: 'Outro arquivo com o mesmo nome já existe',
+    labelsRequired: 'Pelo menos uma etiqueta é obrigatória',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Colunas inválidas: {{invalidHeaders}}',
     cannotFindNodeDef: "Não foi possível encontrar definição de atributo ou entidade com nome '{{name}}'",

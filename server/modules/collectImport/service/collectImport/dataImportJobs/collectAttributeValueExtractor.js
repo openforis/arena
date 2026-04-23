@@ -6,7 +6,7 @@ import * as DateUtils from '@core/dateUtils'
 import * as NumberUtils from '@core/numberUtils'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -14,7 +14,7 @@ import * as Taxon from '@core/survey/taxon'
 
 import { db } from '@server/db/db'
 
-import * as FileManager from '../../../../record/manager/recordFileManager'
+import { insertFile } from '@server/modules/survey/manager/surveyFileManager'
 import * as CollectRecord from '../model/collectRecord'
 import * as CollectSurvey from '../model/collectSurvey'
 
@@ -126,18 +126,19 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
 
   if (content) {
     const fileSize = Buffer.byteLength(content)
-    const file = RecordFile.createFile({
+    const file = SurveyFile.createFile({
       name: fileName,
       size: fileSize,
       content,
       recordUuid: Node.getRecordUuid(node),
       nodeUuid: Node.getUuid(node),
+      type: SurveyFile.SurveyFileType.recordAttachment,
     })
-    await FileManager.insertFile(Survey.getId(survey), file, tx)
+    await insertFile(Survey.getId(survey), file, tx)
 
     return {
       value: {
-        [Node.valuePropsFile.fileUuid]: RecordFile.getUuid(file),
+        [Node.valuePropsFile.fileUuid]: SurveyFile.getUuid(file),
         [Node.valuePropsFile.fileName]: fileName,
         [Node.valuePropsFile.fileSize]: fileSize,
       },

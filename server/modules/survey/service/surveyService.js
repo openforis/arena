@@ -4,13 +4,15 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-import * as FileService from '@server/modules/record/service/fileService'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 import * as DbUtils from '@server/db/dbUtils'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '../manager/surveyManager'
+import * as SurveyFileManager from '../manager/surveyFileManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
@@ -25,7 +27,7 @@ const dbMaxAvailableSpace = 1024 * 1024 * 1024 * 5 // 4GB
 
 export const fetchAndAssocStorageInfo = async ({ survey }) => {
   const surveyId = Survey.getId(survey)
-  const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+  const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
   const schema = Schemata.getSchemaSurvey(surveyId)
   const schemaTablesSize = await DbUtils.fetchSchemaTablesSize({ schema })
   const dbStatistics = { usedSpace: schemaTablesSize, totalSpace: dbMaxAvailableSpace }
@@ -119,6 +121,18 @@ export const deleteSurvey = async (surveyId) => {
 export const startLabelsImportJob = ({ user, surveyId, filePath, fileFormat }) => {
   const job = new SurveyLabelsImportJob({ user, surveyId, filePath, fileFormat })
   return JobManager.enqueueJob(job)
+}
+
+export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
+  const content = await FileUtils.readBinaryFile(filePath)
+  const surveyFileToStore = { ...surveyFile, content }
+  await SurveyFileManager.insertFile(surveyId, surveyFileToStore)
+}
+
+export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
+  const summary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const contentStream = await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileUuid })
+  return { summary, contentStream }
 }
 
 export const {
