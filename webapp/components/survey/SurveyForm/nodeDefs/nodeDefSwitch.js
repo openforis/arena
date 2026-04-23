@@ -14,7 +14,13 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { SurveyState, useSurveyCycleKey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import {
+  SurveyState,
+  useIsNodeDefEnumerator,
+  useSurveyCycleKey,
+  useSurveyInfo,
+  useSurveyPreferredLang,
+} from '@webapp/store/survey'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 
 import * as NodeDefUiProps from './nodeDefUIProps'
@@ -107,11 +113,14 @@ const useHovering = ({ canEditDef, edit }) => {
   }
 }
 
-const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, nodeDefUuid, nodesHaveValue }) => {
+const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, isNodeDefEnumerator, nodesHaveValue }) => {
   const [editingNodeDefUuid, setEditingNodeDefUuid] = useState(null)
   const [unlockedNodeDefUuid, setUnlockedNodeDefUuid] = useState(null)
 
-  const lockEnabled = entry && !edit && canEditRecord && NodeDef.isAttribute(nodeDef) && NodeDef.isKey(nodeDef)
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
+  const lockEnabled =
+    entry && !edit && canEditRecord && NodeDef.isAttribute(nodeDef) && NodeDef.isKey(nodeDef) && !isNodeDefEnumerator
   const hasValue = lockEnabled && nodesHaveValue
   const isEditing = editingNodeDefUuid === nodeDefUuid
   const isUnlocked = unlockedNodeDefUuid === nodeDefUuid
@@ -182,6 +191,7 @@ const NodeDefSwitch = (props) => {
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
   const nodeDefLabelType = useNodeDefLabelType()
+  const isNodeDefEnumerator = useIsNodeDefEnumerator(nodeDef)
   const lang = useSurveyPreferredLang()
   const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
   const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef)
@@ -213,7 +223,7 @@ const NodeDefSwitch = (props) => {
     edit,
     entry,
     nodeDef,
-    nodeDefUuid,
+    isNodeDefEnumerator,
     nodesHaveValue,
   })
   const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
