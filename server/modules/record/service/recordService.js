@@ -7,6 +7,7 @@ import * as Log from '@server/log/log'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
+import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
@@ -43,6 +44,7 @@ import RecordsCloneJob from './recordsCloneJob'
 import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
 import RecordsValidationJob from './recordsValidationJob'
+import { SurveyDocxGenerator } from '@openforis/arena-server'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -472,3 +474,36 @@ export const mergeRecords = async (
       nodesUpdated: nodesArray.filter(Node.isUpdated).length,
     }
   })
+
+export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lang = null }) => {
+  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true })
+  const cycle = Record.getCycle(record)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    includeAnalysis: false,
+  })
+  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+  const i18n = await i18nFactory.createI18nAsync(langToUse)
+  const { buffer, surveyName } = await SurveyDocxGenerator.generateSurveyDocx({
+    survey,
+    cycle,
+    record,
+    lang: langToUse,
+    i18n,
+  })
+  const fileName = ExportFileNameGenerator.generate({
+    surveyName,
+    cycle,
+    fileType: 'RecordForm',
+    extension: 'docx',
+  })
+  const fileSize = Buffer.byteLength(buffer)
+  Response.sendFileContent({
+    res: outputStream,
+    fileName,
+    content: buffer,
+    contentSize: fileSize,
+    contentType: Response.contentTypes.docx,
+  })
+}

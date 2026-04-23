@@ -124,7 +124,7 @@ Dans Arena Mobile :
     analysis: 'Analyse',
   },
   confirmNodeDelete: 'Êtes-vous sûr(e) de vouloir supprimer ce {{nodeDefType}} ({{nodeDefLabel}}) ?',
-  exportDocx: "Exporter l'enquête (DOCX)",
+  exportDocx: "Exporter l'enquête (Word)",
   exportLabels_csv: 'Exporter les étiquettes (CSV)',
   exportLabels_xlsx: 'Exporter les étiquettes (Excel)',
   importLabels: 'Importer les étiquettes depuis Excel ou CSV',

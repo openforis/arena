@@ -125,7 +125,7 @@ Arena Mobile дээр:
     analysis: 'Шинжилгээ',
   },
   confirmNodeDelete: 'Та энэ {{nodeDefType}} ({{nodeDefLabel}})-г устгахыг хүсч байгаадаа итгэлтэй байна уу?',
-  exportDocx: 'Судалгааг экспортлох (DOCX)',
+  exportDocx: 'Судалгааг экспортлох (Word)',
   exportLabels_csv: 'Шошгыг экспортлох (CSV)',
   exportLabels_xlsx: 'Шошгыг экспортлох (Excel)',
   importLabels: 'Шошгыг Excel эсвэл CSV-ээс импортлох',

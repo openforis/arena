@@ -138,7 +138,7 @@ export const exportSurveyDocx = async ({ surveyId, cycle, outputStream, lang = n
     fileName,
     content: buffer,
     contentSize: fileSize,
-    contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    contentType: Response.contentTypes.docx,
   })
 }
 

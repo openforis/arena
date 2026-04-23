@@ -50,6 +50,7 @@ export {
   fetchRecordsCountByStep,
   fetchRecordSummary,
   fetchRecordsSummary,
+  getRecordDocxExportUrl,
   startExportDataJob,
   startExportDataSummaryJob,
   downloadExportedDataSummaryUrl,

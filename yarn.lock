@@ -3774,7 +3774,7 @@ __metadata:
 
 "@openforis/arena-server@file:../arena-server::locator=open-foris-arena%40workspace%3A.":
   version: 1.2.19
-  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=0f81ae&locator=open-foris-arena%40workspace%3A."
+  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=23c9e2&locator=open-foris-arena%40workspace%3A."
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
     "@openforis/arena-core": "npm:^1.1.2"
@@ -3796,7 +3796,7 @@ __metadata:
     passport-local: "npm:^1.0.0"
     pg-promise: "npm:^12.6.1"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/f421234db988d0cfa3fb964e5a6669eaceba0182b7b188155738b06baad64c91e85b5fe5920f5efeb0b7afe1c5141dcd801b150b9329314b395f5df274082c34
+  checksum: 10c0/6bbc4daecc0b6b1f7137f0daf3876ff48452d0eb2a0439d9d78c3d34f122e90811b31053e2e8372e611941f897bfbcab2d55c3ed09c5b045e1af422fc59047fd
   languageName: node
   linkType: hard
 
