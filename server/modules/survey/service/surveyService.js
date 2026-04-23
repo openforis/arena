@@ -1,27 +1,31 @@
-import { Schemata } from '@openforis/arena-server'
+import { Schemata, SurveyDocxGenerator } from '@openforis/arena-server'
 
+import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+
+import * as DbUtils from '@server/db/dbUtils'
+import * as JobManager from '@server/job/jobManager'
+import * as JobUtils from '@server/job/jobUtils'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
-import * as JobManager from '@server/job/jobManager'
-import * as JobUtils from '@server/job/jobUtils'
-import * as DbUtils from '@server/db/dbUtils'
+import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '../manager/surveyManager'
 import * as SurveyFileManager from '../manager/surveyFileManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
-import SurveyExportJob from './surveyExport/surveyExportJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
-import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
 import { SchemaSummary } from './schemaSummary'
-import SurveyLabelsImportJob from './surveyLabelsImportJob'
-import { SurveyLabelsExport } from './surveyLabelsExport'
-import SurveysListExportJob from './SurveysListExportJob'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
+import SurveyExportJob from './surveyExport/surveyExportJob'
+import { SurveyLabelsExport } from './surveyLabelsExport'
+import SurveyLabelsImportJob from './surveyLabelsImportJob'
+import SurveysListExportJob from './SurveysListExportJob'
+import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
 
 const dbMaxAvailableSpace = 1024 * 1024 * 1024 * 5 // 4GB
 
@@ -111,6 +115,34 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileF
 
 export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
+
+export const exportSurveyDocx = async ({ surveyId, cycle, outputStream, lang = null, draft = true }) => {
+  const survey = await fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    draft,
+    advanced: false,
+    includeDeleted: false,
+    includeAnalysis: false,
+  })
+  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+  const i18n = await i18nFactory.createI18nAsync(langToUse)
+  const { buffer, surveyName } = await SurveyDocxGenerator.generateSurveyDocx({ survey, cycle, lang: langToUse, i18n })
+  const fileName = ExportFileNameGenerator.generate({
+    surveyName,
+    cycle,
+    fileType: 'SurveyForm',
+    extension: 'docx',
+  })
+  const fileSize = Buffer.byteLength(buffer)
+  Response.sendFileContent({
+    res: outputStream,
+    fileName,
+    content: buffer,
+    contentSize: fileSize,
+    contentType: Response.contentTypes.docx,
+  })
+}
 
 export const deleteSurvey = async (surveyId) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })

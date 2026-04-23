@@ -69,6 +69,7 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     exportList: 'Exporter la liste',
     exportData: 'Exporter les données',
     exportDataSummary: 'Exporter le résumé des données',
+    exportRecordDocx: "Exporter l'enregistrement (Word)",
     filterPlaceholder: 'Filtrer par clés ou propriétaire',
     merge: {
       label: 'Fusionner',

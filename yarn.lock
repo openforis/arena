@@ -3704,9 +3704,9 @@ __metadata:
   linkType: hard
 
 "@noble/hashes@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@noble/hashes@npm:2.0.1"
-  checksum: 10c0/e81769ce21c3b1c80141a3b99bd001f17edea09879aa936692ae39525477386d696101cd573928a304806efb2b9fa751e1dd83241c67d0c84d30091e85c79bdb
+  version: 2.2.0
+  resolution: "@noble/hashes@npm:2.2.0"
+  checksum: 10c0/cad8630c504d6b9271984f685cd0af9101b40988fc2dfbe17ccdf068a9941f95cc5c9957d89e9ca4b7ca94c15cb35f93510c5d53a09fbcc83ee503b93d0a1034
   languageName: node
   linkType: hard
 
@@ -3759,9 +3759,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^1.0.99":
-  version: 1.0.99
-  resolution: "@openforis/arena-core@npm:1.0.99::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.0.99%2F2d2805b9d66cd2d4764f79575488f65a537f5f25"
+"@openforis/arena-core@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "@openforis/arena-core@npm:1.1.3::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.1.3%2F068256c2f3e72c15156ae71ae160d5f85787175e"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     "@turf/destination": "npm:^7.3.4"
@@ -3775,21 +3775,22 @@ __metadata:
     moment: "npm:^2.30.1"
     proj4: "npm:^2.20.4"
     uuid: "npm:^13.0.0"
-  checksum: 10c0/650208e2efb53f7aec8501f1d62bd73086e15809ea6ca13c4f26f5387fd1670c900fa05dbad7b2b23d3c27513e960329cc823a8fd5ec53080d48bdc7d381c33e
+  checksum: 10c0/afda8f65b66d0b97ab7a7573f045e9ec4c5c533937e00a1f5d962318598e04e9e725305dafaaf85ee9a28bbe75c6a180ea4f8400e0d6f23e093529f92c24203e
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^1.2.26":
-  version: 1.2.26
-  resolution: "@openforis/arena-server@npm:1.2.26::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.2.26%2Ffcb1253f47c71ed5f802cd8035335453957e045c"
+"@openforis/arena-server@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "@openforis/arena-server@npm:1.3.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.3.0%2F8e0657e1bb54cf413784d605200a06002547143a"
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^1.0.99"
+    "@openforis/arena-core": "npm:^1.1.3"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.1"
     cookie-parser: "npm:^1.4.7"
     db-migrate: "npm:^0.11.14"
     db-migrate-pg: "npm:^1.5.2"
+    docx: "npm:^9.6.1"
     express: "npm:^5.2.1"
     express-fileupload: "npm:^1.5.2"
     express-rate-limit: "npm:^8.3.1"
@@ -3802,7 +3803,7 @@ __metadata:
     passport-local: "npm:^1.0.0"
     pg-promise: "npm:^12.6.2"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/0bed56876149ac091479ed30bef29290b869b3c31ce8ca4238306fc5a668be80bafe6775ad9e63077b1b21233d7b1b6bd3619e354f04a9d5481034f664479e61
+  checksum: 10c0/4d573ad5a4408e047d8bde16b83cadcca72cb3c8bb424a518bccd39fefddf511bc4fc2a89e297d50da37bf9a50c791fe18afcb672eb1960929351f9de0264e9a
   languageName: node
   linkType: hard
 
@@ -4271,9 +4272,9 @@ __metadata:
   linkType: hard
 
 "@scure/base@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@scure/base@npm:2.0.0"
-  checksum: 10c0/7d999c7bebf053bb49cb706fdc6c5366737cff0f7f7518f52d32d7f7ad7b898904f03673648a2af5c4f22396f5c05f1d8bddbf010d6595052d07ba8163d506ad
+  version: 2.2.0
+  resolution: "@scure/base@npm:2.2.0"
+  checksum: 10c0/30158ccf5da86b0f06928f1cfe24a29fbea22824adf6f8895222910cade1ad4fe7593958aacf563287e6b4c55746f47395178e7a4763b059c22d6ee8e6f76387
   languageName: node
   linkType: hard
 
@@ -5484,6 +5485,15 @@ __metadata:
   version: 14.18.63
   resolution: "@types/node@npm:14.18.63"
   checksum: 10c0/626a371419a6a0e11ca460b22bb4894abe5d75c303739588bc96267e380aa8b90ba5a87bc552400584f0ac2a84b5c458dadcbcf0dfd2396ebeb765f7a7f95893
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^25.2.3":
+  version: 25.6.0
+  resolution: "@types/node@npm:25.6.0"
+  dependencies:
+    undici-types: "npm:~7.19.0"
+  checksum: 10c0/d2d2015630ff098a201407f55f5077a20270ae4f465c739b40865cd9933b91b9c5d2b85568eadaf3db0801b91e267333ca7eb39f007428b173d1cdab4b339ac5
   languageName: node
   linkType: hard
 
@@ -9204,6 +9214,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"docx@npm:^9.6.1":
+  version: 9.6.1
+  resolution: "docx@npm:9.6.1"
+  dependencies:
+    "@types/node": "npm:^25.2.3"
+    hash.js: "npm:^1.1.7"
+    jszip: "npm:^3.10.1"
+    nanoid: "npm:^5.1.3"
+    xml: "npm:^1.0.1"
+    xml-js: "npm:^1.6.8"
+  checksum: 10c0/6c540c327d7dc4680f464af7056faabceaccadc69d6490d16e62aa1da6dd3a99454fb28c31786ccc2a5da751677ab343e745cda84325e2cc0ec872765eb4d9c1
+  languageName: node
+  linkType: hard
+
 "dom-converter@npm:^0.2.0":
   version: 0.2.0
   resolution: "dom-converter@npm:0.2.0"
@@ -10496,13 +10520,13 @@ __metadata:
   linkType: hard
 
 "express-rate-limit@npm:^8.3.1":
-  version: 8.3.1
-  resolution: "express-rate-limit@npm:8.3.1"
+  version: 8.4.0
+  resolution: "express-rate-limit@npm:8.4.0"
   dependencies:
     ip-address: "npm:10.1.0"
   peerDependencies:
     express: ">= 4.11"
-  checksum: 10c0/e3229938457cec617460c54ef4e90c8c254facc884729325d20ea35e3838bd273e4c611fc1f4a76f6d14c411e30d31b15e88eb4be87408615ff0aacc142511a2
+  checksum: 10c0/d391c45c40ebc0eedf4f51bf86f25212294a2df25b0b50dd7044940fc7afd98886e8e7bd6709f904d394606a912efdd90a6a7d1927f5208e4d153775f9a47531
   languageName: node
   linkType: hard
 
@@ -11557,7 +11581,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hash.js@npm:^1.0.0, hash.js@npm:^1.0.3":
+"hash.js@npm:^1.0.0, hash.js@npm:^1.0.3, hash.js@npm:^1.1.7":
   version: 1.1.7
   resolution: "hash.js@npm:1.1.7"
   dependencies:
@@ -14811,6 +14835,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nanoid@npm:^5.1.3":
+  version: 5.1.7
+  resolution: "nanoid@npm:5.1.7"
+  bin:
+    nanoid: bin/nanoid.js
+  checksum: 10c0/c5523bcb11031d2e8f4eb2ba96f99cd63cbe7f6776748035b4f292c6d524902b142b18a1bf0992e0039f9f925ef51154119bb19ee021766ec0a542d07dc51a82
+  languageName: node
+  linkType: hard
+
 "natural-compare@npm:^1.4.0":
   version: 1.4.0
   resolution: "natural-compare@npm:1.4.0"
@@ -15338,7 +15371,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
-    "@openforis/arena-server": "npm:^1.2.26"
+    "@openforis/arena-server": "npm:^1.3.0"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
@@ -20124,6 +20157,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"undici-types@npm:~7.19.0":
+  version: 7.19.2
+  resolution: "undici-types@npm:7.19.2"
+  checksum: 10c0/7159f10546f9f6c47d36776bb1bbf8671e87c1e587a6fee84ae1f111ae8de4f914efa8ca0dfcd224f4f4a9dfc3f6028f627ccb5ddaccf82d7fd54671b89fac3e
+  languageName: node
+  linkType: hard
+
 "undici@npm:^7.21.0":
   version: 7.22.0
   resolution: "undici@npm:7.22.0"
@@ -21091,7 +21131,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xml-js@npm:^1.6.11":
+"xml-js@npm:^1.6.11, xml-js@npm:^1.6.8":
   version: 1.6.11
   resolution: "xml-js@npm:1.6.11"
   dependencies:
@@ -21113,6 +21153,13 @@ __metadata:
   version: 5.0.0
   resolution: "xml-name-validator@npm:5.0.0"
   checksum: 10c0/3fcf44e7b73fb18be917fdd4ccffff3639373c7cb83f8fc35df6001fecba7942f1dbead29d91ebb8315e2f2ff786b508f0c9dc0215b6353f9983c6b7d62cb1f5
+  languageName: node
+  linkType: hard
+
+"xml@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "xml@npm:1.0.1"
+  checksum: 10c0/04bcc9b8b5e7b49392072fbd9c6b0f0958bd8e8f8606fee460318e43991349a68cbc5384038d179ff15aef7d222285f69ca0f067f53d071084eb14c7fdb30411
   languageName: node
   linkType: hard
 
