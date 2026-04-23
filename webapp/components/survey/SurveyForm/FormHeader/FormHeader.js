@@ -42,6 +42,7 @@ import FormEntryActions from '../components/formEntryActions'
 import FormEditActions from '../components/formEditActions'
 import { usePath } from './usePath'
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 const labelsExportAllowedFileFormats = [FileFormats.csv, FileFormats.xlsx]
 
@@ -50,6 +51,8 @@ const FormHeader = (props) => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   const surveyId = useSurveyId()
   const surveyInfo = useSurveyInfo()
@@ -139,16 +142,20 @@ const FormHeader = (props) => {
                 key: 'schema-summary-excel',
                 content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} />,
               },
-              {
-                key: 'survey-docx-export',
-                content: (
-                  <ButtonDownload
-                    href={API.getSurveyDocxExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
-                    label="surveyForm:exportDocx"
-                    variant="text"
-                  />
-                ),
-              },
+              ...(experimentalFeatures
+                ? [
+                    {
+                      key: 'survey-docx-export',
+                      content: (
+                        <ButtonDownload
+                          href={API.getSurveyDocxExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
+                          label="surveyForm:exportDocx"
+                          variant="text"
+                        />
+                      ),
+                    },
+                  ]
+                : []),
               ...labelsExportAllowedFileFormats.map((fileFormat) => ({
                 key: `labels-export-${fileFormat}`,
                 content: (

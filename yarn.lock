@@ -3703,6 +3703,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/hashes@npm:^2.0.1":
+  version: 2.2.0
+  resolution: "@noble/hashes@npm:2.2.0"
+  checksum: 10c0/cad8630c504d6b9271984f685cd0af9101b40988fc2dfbe17ccdf068a9941f95cc5c9957d89e9ca4b7ca94c15cb35f93510c5d53a09fbcc83ee503b93d0a1034
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -3752,9 +3759,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "@openforis/arena-core@npm:1.1.2::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.1.2%2F82bd7c4a7010a8cd9651bf5a57451e5c77648266"
+"@openforis/arena-core@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "@openforis/arena-core@npm:1.1.3::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.1.3%2F068256c2f3e72c15156ae71ae160d5f85787175e"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     "@turf/destination": "npm:^7.3.4"
@@ -3768,16 +3775,16 @@ __metadata:
     moment: "npm:^2.30.1"
     proj4: "npm:^2.20.4"
     uuid: "npm:^13.0.0"
-  checksum: 10c0/91ad28b49db1daf555b19eabdc7782617f9bf3cb7b04fe3dd9680c04580d6100fd47e8d1ea0032e2a8c973ef6322b741e451b57a1e0abd5524f96e34e774d123
+  checksum: 10c0/afda8f65b66d0b97ab7a7573f045e9ec4c5c533937e00a1f5d962318598e04e9e725305dafaaf85ee9a28bbe75c6a180ea4f8400e0d6f23e093529f92c24203e
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@file:../arena-server::locator=open-foris-arena%40workspace%3A.":
-  version: 1.2.19
-  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=23c9e2&locator=open-foris-arena%40workspace%3A."
+"@openforis/arena-server@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "@openforis/arena-server@npm:1.3.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.3.0%2F8e0657e1bb54cf413784d605200a06002547143a"
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^1.1.2"
+    "@openforis/arena-core": "npm:^1.1.3"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.1"
     cookie-parser: "npm:^1.4.7"
@@ -3786,65 +3793,74 @@ __metadata:
     docx: "npm:^9.6.1"
     express: "npm:^5.2.1"
     express-fileupload: "npm:^1.5.2"
-    express-rate-limit: "npm:^8.2.1"
+    express-rate-limit: "npm:^8.3.1"
     jsonwebtoken: "npm:^9.0.3"
     lodash.throttle: "npm:^4.1.1"
     log4js: "npm:^6.9.1"
-    otplib: "npm:^12.0.1"
+    otplib: "npm:^13.4.0"
     passport: "npm:^0.7.0"
     passport-jwt: "npm:^4.0.1"
     passport-local: "npm:^1.0.0"
-    pg-promise: "npm:^12.6.1"
+    pg-promise: "npm:^12.6.2"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/6bbc4daecc0b6b1f7137f0daf3876ff48452d0eb2a0439d9d78c3d34f122e90811b31053e2e8372e611941f897bfbcab2d55c3ed09c5b045e1af422fc59047fd
+  checksum: 10c0/4d573ad5a4408e047d8bde16b83cadcca72cb3c8bb424a518bccd39fefddf511bc4fc2a89e297d50da37bf9a50c791fe18afcb672eb1960929351f9de0264e9a
   languageName: node
   linkType: hard
 
-"@otplib/core@npm:^12.0.1":
-  version: 12.0.1
-  resolution: "@otplib/core@npm:12.0.1"
-  checksum: 10c0/efe703d92d50cf11b39e47fc6ccd10c01d8bfbd9423724e88aecf2470f740562b2422c10b779e0b7d1d29c09f5d3d00de69200f04c8250e2adeb13a15e5dee7f
+"@otplib/core@npm:13.4.0":
+  version: 13.4.0
+  resolution: "@otplib/core@npm:13.4.0"
+  checksum: 10c0/9d3721df328d73a49829b838171aecc18dc54b820795dde3a8644e96d954734a895247790c3f27d1f8023e715dd1c5cbd8264df86dbffe8b401c28164ae0d525
   languageName: node
   linkType: hard
 
-"@otplib/plugin-crypto@npm:^12.0.1":
-  version: 12.0.1
-  resolution: "@otplib/plugin-crypto@npm:12.0.1"
+"@otplib/hotp@npm:13.4.0":
+  version: 13.4.0
+  resolution: "@otplib/hotp@npm:13.4.0"
   dependencies:
-    "@otplib/core": "npm:^12.0.1"
-  checksum: 10c0/7ad0cda9c643411a13a118bcf0d031ef61a9031f794a21b549fb3f1e38334f83c5481a9f706eb5b25066325759c1a598fbc1f9c05c4620dff5addccbe2ad23ad
+    "@otplib/core": "npm:13.4.0"
+    "@otplib/uri": "npm:13.4.0"
+  checksum: 10c0/8bea65184989cc6b6999aadf3a821e7d4168393cb03ae0e3235cd3402f469f783fd09e3740be4b6368044c4705b439dcaa1ffa9fbfd4a6790e698e5b4a32aae9
   languageName: node
   linkType: hard
 
-"@otplib/plugin-thirty-two@npm:^12.0.1":
-  version: 12.0.1
-  resolution: "@otplib/plugin-thirty-two@npm:12.0.1"
+"@otplib/plugin-base32-scure@npm:13.4.0":
+  version: 13.4.0
+  resolution: "@otplib/plugin-base32-scure@npm:13.4.0"
   dependencies:
-    "@otplib/core": "npm:^12.0.1"
-    thirty-two: "npm:^1.0.2"
-  checksum: 10c0/971a6f592c0f33cb258dcb750f6f0c058cbfd45e0212ea6f29d0c75dc6c5fcb67dbc8f19c3e8ae710e93292319b8d3d15fd7281714deae9fadaab794f9d44544
+    "@otplib/core": "npm:13.4.0"
+    "@scure/base": "npm:^2.0.0"
+  checksum: 10c0/47c8db336fbcb71f492936f3a8a50c957878af10740757410a7aa2fb858995a64674c93248f6548718d3145eac6f0b88ed456c3231c2255fe58378188b5b458e
   languageName: node
   linkType: hard
 
-"@otplib/preset-default@npm:^12.0.1":
-  version: 12.0.1
-  resolution: "@otplib/preset-default@npm:12.0.1"
+"@otplib/plugin-crypto-noble@npm:13.4.0":
+  version: 13.4.0
+  resolution: "@otplib/plugin-crypto-noble@npm:13.4.0"
   dependencies:
-    "@otplib/core": "npm:^12.0.1"
-    "@otplib/plugin-crypto": "npm:^12.0.1"
-    "@otplib/plugin-thirty-two": "npm:^12.0.1"
-  checksum: 10c0/cd683861b96d04b7581534169a5a130fc049bd3188a850a1642ba4cf2a53866dedafe5201763697e38a3f0726103783baf338448153752c464fff797948dc01c
+    "@noble/hashes": "npm:^2.0.1"
+    "@otplib/core": "npm:13.4.0"
+  checksum: 10c0/96f65a6b8c466ac4e7a87c07204caafeb863a03be2adc59d2c132a059a2806170b1a46322aaa167ad7a080e315528d1384a9abef85bca34ca36a2ce52d578480
   languageName: node
   linkType: hard
 
-"@otplib/preset-v11@npm:^12.0.1":
-  version: 12.0.1
-  resolution: "@otplib/preset-v11@npm:12.0.1"
+"@otplib/totp@npm:13.4.0":
+  version: 13.4.0
+  resolution: "@otplib/totp@npm:13.4.0"
   dependencies:
-    "@otplib/core": "npm:^12.0.1"
-    "@otplib/plugin-crypto": "npm:^12.0.1"
-    "@otplib/plugin-thirty-two": "npm:^12.0.1"
-  checksum: 10c0/5a1bf8198f169182e267ab6ae3115f2441190f34a212e8232ff4b9c2c8a7253fddf3aa185ab9a6246487e9c1052b676395e80b6e0b2825fa218eb8e29bd7b14b
+    "@otplib/core": "npm:13.4.0"
+    "@otplib/hotp": "npm:13.4.0"
+    "@otplib/uri": "npm:13.4.0"
+  checksum: 10c0/a0cb4241ff5581e7e299f814303dcb883c509f17228c067cfc17c3c9f50203198d7c3b1ec8efd977b2587cc3bd7b36912b89c5ed8fd6303e587c48080be76449
+  languageName: node
+  linkType: hard
+
+"@otplib/uri@npm:13.4.0":
+  version: 13.4.0
+  resolution: "@otplib/uri@npm:13.4.0"
+  dependencies:
+    "@otplib/core": "npm:13.4.0"
+  checksum: 10c0/ce818377dcf2e8b5fd2fa0aa39d23e4717ab22de9f2ec6ddfde8635db938dabaf3347d0aacbff06fad819de0838da5525679ffa68615a4fc7e4a8ace15cc120e
   languageName: node
   linkType: hard
 
@@ -4252,6 +4268,13 @@ __metadata:
   version: 1.4.0
   resolution: "@scarf/scarf@npm:1.4.0"
   checksum: 10c0/332118bb488e7a70eaad068fb1a33f016d30442fb0498b37a80cb425c1e741853a5de1a04dce03526ed6265481ecf744aa6e13f072178d19e6b94b19f623ae1c
+  languageName: node
+  linkType: hard
+
+"@scure/base@npm:^2.0.0":
+  version: 2.2.0
+  resolution: "@scure/base@npm:2.2.0"
+  checksum: 10c0/30158ccf5da86b0f06928f1cfe24a29fbea22824adf6f8895222910cade1ad4fe7593958aacf563287e6b4c55746f47395178e7a4763b059c22d6ee8e6f76387
   languageName: node
   linkType: hard
 
@@ -10496,14 +10519,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-rate-limit@npm:^8.2.1":
-  version: 8.3.2
-  resolution: "express-rate-limit@npm:8.3.2"
+"express-rate-limit@npm:^8.3.1":
+  version: 8.4.0
+  resolution: "express-rate-limit@npm:8.4.0"
   dependencies:
     ip-address: "npm:10.1.0"
   peerDependencies:
     express: ">= 4.11"
-  checksum: 10c0/5b64d0691071086cdb8cfc6bcd5e761f5687cf4fabdebfe2a043ea5b4d31443637181e7be71e7ffabce76aee816daee62c1ca83250045847957da408a129f650
+  checksum: 10c0/d391c45c40ebc0eedf4f51bf86f25212294a2df25b0b50dd7044940fc7afd98886e8e7bd6709f904d394606a912efdd90a6a7d1927f5208e4d153775f9a47531
   languageName: node
   linkType: hard
 
@@ -15348,7 +15371,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
-    "@openforis/arena-server": ../arena-server
+    "@openforis/arena-server": "npm:^1.3.0"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
@@ -15536,14 +15559,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"otplib@npm:^12.0.1":
-  version: 12.0.1
-  resolution: "otplib@npm:12.0.1"
+"otplib@npm:^13.4.0":
+  version: 13.4.0
+  resolution: "otplib@npm:13.4.0"
   dependencies:
-    "@otplib/core": "npm:^12.0.1"
-    "@otplib/preset-default": "npm:^12.0.1"
-    "@otplib/preset-v11": "npm:^12.0.1"
-  checksum: 10c0/5a6cd332ed38f9fb6915407775bb9b4bf298d4d32c7c5691291add913dc1788064ab4ca353315f8add4ea704af2cb2c970d2f2d354725c6daa0c945cd5d09811
+    "@otplib/core": "npm:13.4.0"
+    "@otplib/hotp": "npm:13.4.0"
+    "@otplib/plugin-base32-scure": "npm:13.4.0"
+    "@otplib/plugin-crypto-noble": "npm:13.4.0"
+    "@otplib/totp": "npm:13.4.0"
+    "@otplib/uri": "npm:13.4.0"
+  checksum: 10c0/98900e47909511188aae7e07bbcdb9107b026ae180ecac9b8f6e9d098ee41546c72a52d0b9a1ad335ff1b2277f04ab46230e062a73e8b4d31424bfd5d3ca434c
   languageName: node
   linkType: hard
 
@@ -16016,7 +16042,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pg-promise@npm:^12.6.1":
+"pg-promise@npm:^12.6.2":
   version: 12.6.2
   resolution: "pg-promise@npm:12.6.2"
   dependencies:
@@ -19641,13 +19667,6 @@ __metadata:
   peerDependencies:
     tslib: ^2
   checksum: 10c0/52194642c129615b6af15648621be9a2784ad25526e3facca6c28aa1a36ea32245ef146ebc3fbaf64a3605b8301a5335da505d0c314f851ff293b184e0de7fb9
-  languageName: node
-  linkType: hard
-
-"thirty-two@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "thirty-two@npm:1.0.2"
-  checksum: 10c0/a6f8c69a153a1aa4d6948eabe004f5a38e45cb869d7d6c535df7460fc44c95c596a60efc56cce56b5e4f0988601db1298be5d1b6ae3fe12dcdeb461c9aeadd17
   languageName: node
   linkType: hard
 
