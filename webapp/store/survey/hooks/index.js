@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, Surveys } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -111,6 +111,13 @@ export const useIsAncestorMultipleEntityRoot = (nodeDef) =>
     const rootDef = Survey.getNodeDefRoot(survey)
     const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
     return NodeDef.isEqual(rootDef)(ancestorMultipleEntityDef)
+  })
+
+export const useIsNodeDefEnumerator = (nodeDef) =>
+  useSelector((state) => {
+    if (!NodeDef.isCode(nodeDef)) return false
+    const survey = SurveyState.getSurvey(state)
+    return Surveys.isNodeDefEnumerator({ survey, nodeDef })
   })
 
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)
