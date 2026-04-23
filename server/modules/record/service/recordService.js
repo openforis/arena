@@ -45,7 +45,6 @@ import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
-import RecordsValidationJob from './recordsValidationJob'
 
 const Logger = Log.getLogger('RecordService')
 
