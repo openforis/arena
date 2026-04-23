@@ -94,16 +94,16 @@ const validateParentEntityUuid = (_propName, nodeDef) => {
   return null
 }
 
-const validateVirtualEntityFormula = (survey, nodeDef) =>
+const validateVirtualEntityFormula = async (survey, nodeDef) =>
   NodeDef.isVirtual(nodeDef) && !R.isEmpty(NodeDef.getFormula(nodeDef))
     ? NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.formula)
     : null
 
-const validateItemsFilterExpression = (survey, nodeDef) => {
+const validateItemsFilterExpression = async (survey, nodeDef) => {
   const expression = NodeDef.getItemsFilter(nodeDef)
   if (R.isEmpty(expression)) return null
 
-  const { validationResult } = nodeDefExpressionValidator.validate({
+  const { validationResult } = await nodeDefExpressionValidator.validate({
     survey,
     nodeDefCurrent: nodeDef,
     expression,
@@ -114,11 +114,11 @@ const validateItemsFilterExpression = (survey, nodeDef) => {
   return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
 }
 
-const validateFileNameExpression = (survey, nodeDef) => {
+const validateFileNameExpression = async (survey, nodeDef) => {
   const expression = NodeDef.getFileNameExpression(nodeDef)
   if (R.isEmpty(expression)) return null
 
-  const { validationResult } = nodeDefExpressionValidator.validate({
+  const { validationResult } = await nodeDefExpressionValidator.validate({
     survey,
     nodeDefCurrent: nodeDef,
     expression,
