@@ -8,7 +8,7 @@ import * as ProcessUtils from '@core/processUtils'
 
 import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
-import * as FileService from '@server/modules/record/service/fileService'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as apiRouter from './apiRouter'
@@ -59,7 +59,7 @@ export const run = async () => {
   await UserService.insertSystemAdminUserIfNotExisting()
 
   // run files storage check after DB migrations
-  await FileService.checkFilesStorage()
+  await SurveyFileService.checkFilesStorage()
 
   // ====== Update app version in DB
   const infoService = serviceRegistry.getService(ServiceType.info)

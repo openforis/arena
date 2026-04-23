@@ -43,6 +43,8 @@ export const useSurveyInfoForm = () => {
   const setName = (value) => setObjectField(Survey.infoKeys.name, StringUtils.normalizeName(value))
   const setLabels = (labels) => setObjectField(Survey.infoKeys.labels, labels)
   const setLanguages = (value) => setObjectField(Survey.infoKeys.languages, value)
+  const setPreloadedMapLayers = (value) => setObjectField(Survey.infoKeys.preloadedMapLayers, value)
+  const setPreloadedMapLayersEnabled = (value) => setObjectField(Survey.infoKeys.preloadedMapLayersEnabled, value)
   const setSampleBasedImageInterpretationEnabled = (value) =>
     setObjectField(Survey.infoKeys.sampleBasedImageInterpretationEnabled, value)
   const setSamplingPolygon = (value) => setObjectField(Survey.infoKeys.samplingPolygon, value)
@@ -67,6 +69,8 @@ export const useSurveyInfoForm = () => {
     setLabels,
     setLanguages,
     setName,
+    setPreloadedMapLayers,
+    setPreloadedMapLayersEnabled,
     setSampleBasedImageInterpretationEnabled,
     setSamplingPolygon,
     setSecurity,

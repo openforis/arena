@@ -27,7 +27,7 @@ export default class TaxonCSVParser {
     const family = familyRow || 'no_data'
 
     // the genus is always the first word of the scientific name
-    const genus = genusRow ?? scientificName ? scientificName.split(' ')[0] : null
+    const genus = genusRow ?? (scientificName ? scientificName.split(' ')[0] : null)
 
     const taxon = Taxon.newTaxon({
       taxonomyUuid: this.taxonomyUuid,

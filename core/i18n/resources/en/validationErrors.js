@@ -159,6 +159,12 @@ export default {
     fieldManualLinksInvalid: 'Field manual link is invalid',
   },
 
+  surveyPreloadedMapLayer: {
+    fileRequired: 'File is required',
+    fileNameDuplicate: 'Another file with the same name already exists',
+    labelsRequired: 'At least one label is required',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
     cannotFindNodeDef: "Cannot find attribute or entity definition with name '{{name}}'",
@@ -180,6 +186,8 @@ export default {
     duplicateExtraPropsColumns: 'Duplicate Extra Info columns: {{duplicateColumns}}',
     invalidExtraPropColumn: 'Invalid Extra Info column name "{{columnName}}": it cannot be a reserved word',
     missingRequiredColumns: 'Missing required column(s): {{columns}}',
+    reservedScientificName:
+      'Scientific name "{{scientificName}}" is reserved and cannot be used; it will be inserted automatically into the taxonomy.',
   },
 
   user: {

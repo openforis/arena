@@ -160,6 +160,12 @@ export default {
     fieldManualLinksInvalid: 'Link do manual de campo inválido',
   },
 
+  surveyPreloadedMapLayer: {
+    fileRequired: 'Arquivo obrigatório',
+    fileNameDuplicate: 'Outro arquivo com o mesmo nome já existe',
+    labelsRequired: 'Pelo menos uma etiqueta é obrigatória',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Colunas inválidas: {{invalidHeaders}}',
     cannotFindNodeDef: "Não foi possível encontrar definição de atributo ou entidade com nome '{{name}}'",
@@ -182,6 +188,8 @@ export default {
     invalidExtraPropColumn:
       'Nome de coluna de informação extra inválido "{{columnName}}": não pode ser palavra reservada',
     missingRequiredColumns: 'Coluna(s) obrigatória(s) ausente(s): {{columns}}',
+    reservedScientificName:
+      'O nome científico "{{scientificName}}" é reservado e não pode ser usado; ele será inserido automaticamente na taxonomia.',
   },
 
   user: {

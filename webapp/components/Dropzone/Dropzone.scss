@@ -29,3 +29,9 @@
     opacity: 0.6;
   }
 }
+
+.tooltip-error {
+  .dropzone {
+    border-color: red;
+  }
+}

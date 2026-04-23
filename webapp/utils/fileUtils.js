@@ -9,18 +9,16 @@ const excelRowsLimit = 10000
 
 const getExtension = (file) => {
   const fileName = typeof file === 'string' ? file : file.name
-  const extension = fileName.split('.').pop()
+  const extension = fileName.split('.').pop()?.toLocaleLowerCase()
   return extension
 }
 
 /**
  * Format bytes as human-readable text.
- *
  * @param {!number} bytes - Number of bytes.
  * @param {object} options - Options object.
  * @param {boolean} [options.si] - True to use metric (SI) units, aka powers of 1000. False to use binary (IEC), aka powers of 1024.
  * @param {number} [options.decimalPlaces] - Number of decimal places to display.
- *
  * @returns {string} - Formatted string.
  */
 const toHumanReadableFileSize = (bytes, { si = false, decimalPlaces = 1 } = {}) => {

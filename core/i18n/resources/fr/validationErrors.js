@@ -162,6 +162,12 @@ export default {
     fieldManualLinksInvalid: 'Le lien vers le manuel de terrain est invalide',
   },
 
+  surveyPreloadedMapLayer: {
+    fileRequired: 'Le fichier est requis',
+    fileNameDuplicate: 'Un autre fichier avec le même nom existe déjà',
+    labelsRequired: 'Au moins une étiquette est requise',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Colonnes invalides : {{invalidHeaders}}',
     cannotFindNodeDef: "Impossible de trouver la définition d'attribut ou d'entité avec le nom '{{name}}'",
@@ -184,6 +190,8 @@ export default {
     invalidExtraPropColumn:
       'Nom de colonne d\'information supplémentaire invalide "{{columnName}}" : ce ne peut pas être un mot réservé',
     missingRequiredColumns: 'Colonne(s) requise(s) manquante(s) : {{columns}}',
+    reservedScientificName:
+      'Le nom scientifique "{{scientificName}}" est réservé et ne peut pas être utilisé ; il sera inséré automatiquement dans la taxonomie.',
   },
 
   user: {

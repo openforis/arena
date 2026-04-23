@@ -1,6 +1,6 @@
 import './tooltip.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactDom from 'react-dom'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
@@ -11,6 +11,17 @@ import { elementOffset } from '@webapp/utils/domUtils'
 
 const messageLineHeight = 20
 const messageComponentHeight = 35
+
+const determineElementIsInsideModal = (element) => {
+  let el = element
+  while (el) {
+    if (el.classList?.contains('modal')) {
+      return true
+    }
+    el = el.parentElement
+  }
+  return false
+}
 
 const Tooltip = (props) => {
   const {
@@ -26,19 +37,32 @@ const Tooltip = (props) => {
     type,
   } = props
 
-  const [state, setState] = useState({ messageElement: null })
+  const [state, setState] = useState({ isInsideModal: false, messageElement: null })
   const containerRef = useRef(null)
 
-  const { messageElement } = state
+  useEffect(() => {
+    const container = containerRef.current
+    if (container) {
+      setState((statePrev) => ({ ...statePrev, isInsideModal: determineElementIsInsideModal(container) }))
+    }
+  }, [])
+
+  const { isInsideModal, messageElement } = state
 
   const typeClassNameSuffix = type ? `-${type}` : ''
 
-  const messageElementClassName = `tooltip__message${typeClassNameSuffix} ${position}`
+  const messageElementClassName = useMemo(
+    () => `tooltip__message${typeClassNameSuffix} ${position} ${isInsideModal ? 'inside-modal' : ''}`,
+    [typeClassNameSuffix, position, isInsideModal]
+  )
 
-  const hidePopup = useCallback(() => setState({ messageElement: null }), [])
+  const hidePopup = useCallback(() => {
+    setState((statePrev) => ({ ...statePrev, messageElement: null }))
+  }, [])
 
   useEffect(() => {
     if (!showContent && messageElement) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       hidePopup()
     }
   }, [hidePopup, messageElement, showContent])
@@ -63,18 +87,16 @@ const Tooltip = (props) => {
         }
         return
       }
-
-      const style = getStyle()
-      const className = messageElementClassName
-
       if (messageComponent || !Objects.isEmpty(messages)) {
-        setState({
+        const style = getStyle()
+        setState((statePrev) => ({
+          ...statePrev,
           messageElement: (
-            <div className={className} style={style}>
+            <div className={messageElementClassName} style={style}>
               {messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
             </div>
           ),
-        })
+        }))
       }
     },
     [getStyle, hidePopup, messageComponent, messageElement, messageElementClassName, messages, showContent]

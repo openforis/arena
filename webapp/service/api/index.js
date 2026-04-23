@@ -84,6 +84,7 @@ export {
   fetchSurveys,
   fetchSurveyTemplatesPublished,
   insertSurvey,
+  insertSurveyFile,
   startImportLabelsJob,
   updateSurveyConfigurationProp,
   updateSurveyOwner,
@@ -91,6 +92,7 @@ export {
   startSurveysListExportJob,
   getSurveyListExportedFileDownloadUrl,
   getSurveyDocxExportUrl,
+  getSurveyFileDownloadUrl,
 } from './survey'
 export {
   convertNodeDef,

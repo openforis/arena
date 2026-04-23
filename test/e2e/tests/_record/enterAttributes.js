@@ -1,7 +1,7 @@
 import * as PromiseUtils from '../../../../core/promiseUtils'
 import * as DateUtils from '../../../../core/dateUtils'
 
-import { TestId } from '../../../../webapp/utils/testId'
+import { getSelector, TestId } from '../../../../webapp/utils/testId'
 import { FormUtils } from '../utils/formUtils'
 import {
   getBooleanSelector,
@@ -113,6 +113,17 @@ const enterFns = {
 
 export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
+    if (nodeDef.key) {
+      const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
+      const keyToggleLocator = page.locator(keyToggleSelector)
+      if (await keyToggleLocator.isVisible()) {
+        const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
+        if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
+          await keyToggleLocator.click()
+          await page.keyboard.press('Escape') // close potential tooltip
+        }
+      }
+    }
     await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
     await FormUtils.waitForHeaderLoaderToDisappear()
-  }, 30000)
+  }, 10000)

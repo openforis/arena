@@ -442,6 +442,10 @@ $t(common.raiseTicketInSupportForum)
     errorLoadingRecord: 'Бичлэг ачааллахад алдаа гарлаа: {{details}}',
     recordEditModalTitle: 'Бичлэг: {{keyValues}}',
     recordNotFound: 'Бичлэг олдсонгүй',
+    keyAttributeEditing: {
+      lock: 'Түлхүүр атрибутын засварыг түгжих',
+      unlock: 'Түлхүүр атрибутыг засахыг зөвшөөрөх',
+    },
     lock: 'Түгжих',
     unlock: 'Түгжээг тайлах',
   },

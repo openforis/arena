@@ -3,12 +3,13 @@ import './MapView.scss'
 import React, { useCallback, useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as API from '@webapp/service/api'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { MapContainer } from '@webapp/components/MapContainer'
@@ -16,6 +17,7 @@ import { MapContainer } from '@webapp/components/MapContainer'
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { RecordEditModal } from '../common/RecordEditModal'
 import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
+import { PreloadedLayer } from './PreloadedLayer/PreloadedLayer'
 
 const getSamplingPointDataLevels = (survey) => {
   const samplingPointDataCategory = Survey.getSamplingPointDataCategory(survey)
@@ -27,6 +29,7 @@ const getSamplingPointDataLevels = (survey) => {
 
 const MapWrapper = () => {
   const survey = useSurvey()
+  const surveyInfo = useSurveyInfo()
   const surveyId = Survey.getId(survey)
 
   const [state, setState] = useState({
@@ -42,7 +45,14 @@ const MapWrapper = () => {
   )
   const samplingPointDataLevels = useMemo(() => getSamplingPointDataLevels(survey), [survey])
 
-  const layerColors = useRandomColors(samplingPointDataLevels.length + geoAttributeDefs.length)
+  const preloadedLayerSummaries = useMemo(() => {
+    if (!Survey.isPreloadedMapLayersEnabled(surveyInfo)) return []
+    return Survey.getPreloadedMapLayers(surveyInfo)
+  }, [surveyInfo])
+
+  const layerColors = useRandomColors(
+    samplingPointDataLevels.length + geoAttributeDefs.length + preloadedLayerSummaries.length
+  )
 
   const onRecordEditClick = useCallback((params) => {
     const { recordUuid, parentUuid } = params || {}
@@ -86,6 +96,13 @@ const MapWrapper = () => {
           editingRecordUuid={editingRecordUuid}
         />
       )),
+      ...preloadedLayerSummaries.map((preloadedLayerSummary, index) => (
+        <PreloadedLayer
+          key={SurveyFile.getUuid(preloadedLayerSummary)}
+          preloadedMapLayer={preloadedLayerSummary}
+          color={layerColors[samplingPointDataLevels.length + geoAttributeDefs.length + index]}
+        />
+      )),
     ],
     [
       createRecordFromSamplingPointDataItem,
@@ -93,6 +110,7 @@ const MapWrapper = () => {
       geoAttributeDefs,
       layerColors,
       onRecordEditClick,
+      preloadedLayerSummaries,
       samplingPointDataLevels,
     ]
   )

@@ -13,6 +13,7 @@ import RecordsImportJob from './jobs/recordsImportJob'
 import FilesImportJob from './jobs/filesImportJob'
 import UsersImportJob from './jobs/usersImportJob'
 import ChainsImportJob from './jobs/chainsImportJob'
+import SurveyFilesImportJob from './jobs/surveyFilesImportJob'
 import CreateRdbJob from './jobs/createRdb'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 
@@ -30,6 +31,7 @@ const createInnerJobs = (params) => {
     new CategoriesImportJob(),
     new NodeDefsImportJob(),
     new ChainsImportJob(),
+    new SurveyFilesImportJob(),
     // when not restoring a survey backup, skip activity log, records and files
     ...(backup ? [new ActivityLogImportJob()] : []),
     ...(backup && includeData ? [new RecordsImportJob()] : []),

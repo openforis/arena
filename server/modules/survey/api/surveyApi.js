@@ -11,6 +11,7 @@ import * as Request from '../../../utils/request'
 import * as JobUtils from '../../../job/jobUtils'
 
 import * as Survey from '../../../../core/survey/survey'
+import * as SurveyFile from '../../../../core/survey/surveyFile'
 import * as Validation from '../../../../core/validation/validation'
 import * as User from '../../../../core/user/user'
 
@@ -302,6 +303,19 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/file/:fileUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, fileUuid } = Request.getParams(req)
+      const { summary, contentStream } = await SurveyService.fetchSurveyFile({ surveyId, fileUuid })
+      const fileName = SurveyFile.getName(summary)
+      const fileSize = SurveyFile.getSize(summary)
+      Response.setContentTypeFile({ res, fileName, fileSize })
+      contentStream.pipe(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== UPDATE
 
   app.put('/survey/:surveyId/info', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
@@ -377,6 +391,20 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const { surveyId, ownerUuid } = Request.getParams(req)
       await SurveyService.updateSurveyOwner({ user, surveyId, ownerUuid })
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/survey/:surveyId/file', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const filePath = Request.getFilePath(req)
+      const { surveyId } = Request.getParams(req)
+      const surveyFile = Request.getJsonParam(req, 'surveyFile')
+
+      await SurveyService.insertSurveyFile({ surveyId, filePath, surveyFile })
+
       Response.sendOk(res)
     } catch (error) {
       next(error)
