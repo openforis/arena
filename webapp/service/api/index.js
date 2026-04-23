@@ -50,6 +50,7 @@ export {
   fetchRecordsCountByStep,
   fetchRecordSummary,
   fetchRecordsSummary,
+  getRecordDocxExportUrl,
   startExportDataJob,
   startExportDataSummaryJob,
   downloadExportedDataSummaryUrl,
@@ -90,6 +91,7 @@ export {
   updateSurveyProps,
   startSurveysListExportJob,
   getSurveyListExportedFileDownloadUrl,
+  getSurveyDocxExportUrl,
   getSurveyFileDownloadUrl,
 } from './survey'
 export {

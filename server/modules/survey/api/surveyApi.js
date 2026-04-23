@@ -262,6 +262,16 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/export/docx', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft, cycle, lang } = Request.getParams(req)
+
+      await SurveyService.exportSurveyDocx({ surveyId, draft, cycle, lang, outputStream: res })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)

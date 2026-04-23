@@ -45,13 +45,13 @@ export const createI18nAsync = (lang = defaultLanguage) => {
   const createInstance = i18next.createInstance || i18next.default.createInstance
 
   return new Promise((resolve, reject) => {
-    createInstance(createParams(lang), (err, t) => {
+    const instance = createInstance()
+    instance.init(createParams(lang), (err, t) => {
       if (err) {
         reject(err)
         return
       }
-
-      resolve({ lang, t })
+      resolve({ lang, t, exists: instance.exists })
     })
   })
 }

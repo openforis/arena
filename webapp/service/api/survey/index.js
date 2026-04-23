@@ -52,6 +52,9 @@ export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
   return response
 }
 
+export const getSurveyDocxExportUrl = ({ surveyId, cycle, lang, draft = false }) =>
+  `/api/survey/${surveyId}/export/docx?${new URLSearchParams({ draft, cycle, lang })}`
+
 // ==== UPDATE
 export const startImportLabelsJob = async ({ surveyId, file }) => {
   const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)

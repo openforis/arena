@@ -69,6 +69,7 @@ export default {
     exportList: 'Жагсаалт экспортлох',
     exportData: 'Өгөгдөл экспортлох',
     exportDataSummary: 'Өгөгдлийн хураангуй экспортлох',
+    exportRecordDocx: 'Бичлэгийг экспортлох (Word)',
     filterPlaceholder: 'Түлхүүр эсвэл эзэмшигчээр шүүх',
     merge: {
       label: 'Нэгтгэх',

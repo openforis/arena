@@ -60,6 +60,7 @@ export default {
     exportList: 'Exportar lista',
     exportData: 'Exportar datos',
     exportDataSummary: 'Exportar resumen de datos',
+    exportRecordDocx: 'Exportar registro (Word)',
     filterPlaceholder: 'Filtrar por claves o propietario',
     merge: {
       label: 'Fusionar',
