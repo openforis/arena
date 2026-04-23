@@ -113,9 +113,11 @@ const useHovering = ({ canEditDef, edit }) => {
   }
 }
 
-const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, nodeDefUuid, isNodeDefEnumerator, nodesHaveValue }) => {
+const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, isNodeDefEnumerator, nodesHaveValue }) => {
   const [editingNodeDefUuid, setEditingNodeDefUuid] = useState(null)
   const [unlockedNodeDefUuid, setUnlockedNodeDefUuid] = useState(null)
+
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
   const lockEnabled =
     entry && !edit && canEditRecord && NodeDef.isAttribute(nodeDef) && NodeDef.isKey(nodeDef) && !isNodeDefEnumerator
@@ -222,7 +224,6 @@ const NodeDefSwitch = (props) => {
     entry,
     nodeDef,
     isNodeDefEnumerator,
-    nodeDefUuid,
     nodesHaveValue,
   })
   const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
