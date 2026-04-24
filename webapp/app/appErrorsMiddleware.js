@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import { ServiceErrorActions } from '@webapp/store/system'
 import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
+import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 const tokenRefreshEndpoint = '/auth/token/refresh'
 
@@ -52,6 +53,7 @@ const refreshAuthToken = async () => {
     })
     const { authToken } = response.data
     ApiConstants.setAuthToken(authToken)
+    AppWebSocket.updateSocketToken(authToken)
     return { authToken }
   } catch (error) {
     return { error }
