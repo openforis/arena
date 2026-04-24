@@ -187,4 +187,9 @@ button:disabled,
     padding: 0.5rem;
     font-size: 0.8rem;
   }
+
+  .MuiButton-startIcon {
+    margin-right: -2px;
+    margin-left: -2px;
+  }
 }
