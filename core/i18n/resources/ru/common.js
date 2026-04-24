@@ -824,9 +824,12 @@ $t(common.appNameFull)
  
  * Разработано: $t(links.openforis)
  * Версия: {{version}}
+ * Веб-сайт: $t(links.openforisArenaWebsite)
+ * Видеоуроки Arena в Академии онлайн-обучения ФАО: $t(links.arenaVideoTutorialsInFaoElearningAcademy)
+ * Видеоуроки Arena на YouTube: $t(links.arenaVideoTutorialsInYouTube)
  * Форум поддержки: $t(links.supportForum)
- * Arena на GitHub: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
- * Скрипты Arena R на GitHub: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
+ * Arena на GitHub: $t(links.arenaInGitHub)
+ * Скрипты Arena R на GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
   },

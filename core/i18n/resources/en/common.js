@@ -844,9 +844,12 @@ $t(common.appNameFull)
  
  * Developed by: $t(links.openforis)
  * Version: {{version}}
+ * Website: $t(links.openforisArenaWebsite)
+ * Arena video tutorials in FAO elearning Academy: $t(links.arenaVideoTutorialsInFaoElearningAcademy)
+ * Arena video tutorials in YouTube: $t(links.arenaVideoTutorialsInYouTube)
  * Support Forum: $t(links.supportForum)
- * Arena in GitHub: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
- * Arena R Scripts in GitHub: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
+ * Arena in GitHub: $t(links.arenaInGitHub)
+ * Arena R Scripts in GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
   },
@@ -1272,12 +1275,16 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   },
   urls: {
     openforisWebsite: 'https://www.openforis.org',
-    openforisArenaWebsite: '$t(urls.openforisWebsite)/tools/arena',
+    openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
     supportForum: 'https://openforis.support',
   },
   links: {
     openforis: `<a href="$t(urls.openforisWebsite)" target="_blank">$t(common.openForis)</a>`,
     openforisArenaWebsite: `<a href="$t(urls.openforisArenaWebsite)" target="_blank">$t(urls.openforisArenaWebsite)</a>`,
     supportForum: `<a href="$t(urls.supportForum)" target="_blank">$t(urls.supportForum)</a>`,
+    arenaVideoTutorialsInFaoElearningAcademy: `<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank">FAO elearning Academy</a>`,
+    arenaVideoTutorialsInYouTube: `<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank">YouTube</a>`,
+    arenaInGitHub: `<a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>`,
+    arenaRScriptsInGitHub: `<a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>`,
   },
 }
