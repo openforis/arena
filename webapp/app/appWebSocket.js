@@ -9,12 +9,21 @@ let socket = null
 /**
  * Intercept every request and add the socket ID in the headers (using key "socketid").
  */
-const _addSocketIdToEveryRequest = () => {
-  axios.interceptors.request.use((config) => {
-    // eslint-disable-next-line no-param-reassign
-    config.headers.socketid = socket?.id
-    return config
-  })
+axios.interceptors.request.use((config) => {
+  if (socket?.id) {
+    config.headers.socketid = socket.id
+  }
+  return config
+})
+
+export const updateSocketToken = (newToken) => {
+  if (socket) {
+    socket.auth.token = newToken
+
+    if (!socket.connected) {
+      socket.connect()
+    }
+  }
 }
 
 export const closeSocket = () => {
@@ -34,9 +43,18 @@ export const openSocket = async (throwErrorFn) => {
   }
 
   const authToken = ApiConstants.getAuthToken()
-  socket = io(globalThis.window.location.origin, { auth: { token: authToken } })
 
-  on(WebSocketEvents.connect, _addSocketIdToEveryRequest)
+  socket = io(globalThis.window.location.origin, {
+    auth: { token: authToken },
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+  })
+
+  on(WebSocketEvents.connectError, (err) => {
+    if (err.message === 'Unauthorized') {
+      updateSocketToken(ApiConstants.getAuthToken())
+    }
+  })
 
   on(WebSocketEvents.error, throwError)
 }

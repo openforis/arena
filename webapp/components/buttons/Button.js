@@ -73,16 +73,18 @@ export const Button = forwardRef((props, ref) => {
     iconWidth,
     id,
     isTitleMarkdown = false,
+    labelParams: _labelParams, // exclude it from otherProps
     onClick,
     primary,
     secondary,
     showIcon = true,
-    showLabel: _showLabel,
+    showLabel: _showLabel, // exclude it from otherProps
     size = 'medium',
     testId,
     titleClassName,
     titleMarkdownClassName,
     titleMaxWidth,
+    titleParams: _titleParams, // exclude it from otherProps
     variant: variantProp = 'contained',
     ...otherProps
   } = props
