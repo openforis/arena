@@ -22,11 +22,8 @@ export const validateRequired = (errorKey) => (propName, obj) => {
 }
 
 export const validateItemPropUniqueness = (errorKey) => (items) => (propName, item) => {
-  const hasDuplicates = R.any(
-    (i) => !ObjectUtils.isEqual(i)(item) && getProp(propName)(i) === getProp(propName)(item),
-    items
-  )
-
+  const hasDuplicates =
+    items && R.any((i) => !ObjectUtils.isEqual(i)(item) && getProp(propName)(i) === getProp(propName)(item), items)
   return hasDuplicates ? { key: errorKey } : null
 }
 

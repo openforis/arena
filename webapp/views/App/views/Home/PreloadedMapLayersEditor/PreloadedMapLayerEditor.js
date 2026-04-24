@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
-import { validatePreloadedMapLayer } from '@core/survey/surveyPreloadedMapLayerValidator'
+import { SurveyPreloadedMapLayerValidator } from '@core/survey/surveyPreloadedMapLayerValidator'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
 import ValidationTooltip from '@webapp/components/validationTooltip'
@@ -45,13 +45,15 @@ const PreloadedMapLayerEditor = (props) => {
         temporary: true,
       })
     }
-    validatePreloadedMapLayer({ preloadedMapLayers, preloadedMapLayer: draftPreloadedMapLayer }).then((validation) => {
-      setState((statePrev) => ({
-        ...statePrev,
-        draftPreloadedMapLayer,
-        validation,
-      }))
-    })
+    SurveyPreloadedMapLayerValidator.validate({ preloadedMapLayers, preloadedMapLayer: draftPreloadedMapLayer }).then(
+      (validation) => {
+        setState((statePrev) => ({
+          ...statePrev,
+          draftPreloadedMapLayer,
+          validation,
+        }))
+      }
+    )
   }, [editedPreloadedMapLayer, file, labels, preloadedMapLayers])
 
   const onOkClick = useCallback(async () => {
