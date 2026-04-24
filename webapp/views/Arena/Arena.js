@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { ErrorBoundary } from 'react-error-boundary'
+import PropTypes from 'prop-types'
 
 import { SystemActions, useSystemError, useI18n, useSystemStatusReady } from '@webapp/store/system'
 import { ExpansionPanel } from '@webapp/components'
@@ -13,6 +14,10 @@ const ErrorFallback = ({ error }) => (
     <pre>{error.message}</pre>
   </div>
 )
+
+ErrorFallback.propTypes = {
+  error: PropTypes.object.isRequired,
+}
 
 const Arena = () => {
   const dispatch = useDispatch()
