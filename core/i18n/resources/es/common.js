@@ -687,9 +687,26 @@ export default {
     missingFunctionParameters: 'Parámetros de función faltantes',
     undefinedFunction: 'Función indefinida: {{name}}',
   },
+
+  // ====== Help views
   helpView: {
     about: {
-      text: 'Acerca de\n========\n\n$t(common.appNameFull)\n--------\n \n * Desarrollado por: $t(links.openforis)\n * Versión: {{version}}\n * Foro de soporte: $t(links.supportForum)\n * Arena en GitHub: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>\n * Scripts R de Arena en GitHub: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>\n',
+      text: `
+Acerca de
+========
+
+$t(common.appNameFull)
+--------
+ 
+ * Desarrollado por: $t(links.openforis)
+ * Versión: {{version}}
+ * Sitio web: $t(links.openforisArenaWebsite)
+ * Tutoriales en video de Arena en la Academia de aprendizaje en línea de FAO: $t(links.arenaVideoTutorialsInFaoElearningAcademy)
+ * Tutoriales en video de Arena en YouTube: $t(links.arenaVideoTutorialsInYouTube)
+ * Foro de soporte: $t(links.supportForum)
+ * Arena en GitHub: $t(links.arenaInGitHub)
+ * Scripts R de Arena en GitHub: $t(links.arenaRScriptsInGitHub)
+`,
     },
   },
   nodeDefEdit: {

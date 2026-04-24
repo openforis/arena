@@ -839,7 +839,7 @@ $t(common.cantUndoWarning)`,
   helpView: {
     about: {
       text: `
-    Sobre
+Sobre
 ========
 
 $t(common.appNameFull)
@@ -847,9 +847,12 @@ $t(common.appNameFull)
  
  * Desenvolvido por: $t(links.openforis)
  * Versão: {{version}}
+ * Website: $t(links.openforisArenaWebsite)
+ * Tutoriais em vídeo do Arena na Academia de Aprendizagem Online da FAO: $t(links.arenaVideoTutorialsInFaoElearningAcademy)
+ * Tutoriais em vídeo do Arena no YouTube: $t(links.arenaVideoTutorialsInYouTube)
  * Fórum de suporte: $t(links.supportForum)
- * Arena in GitHub: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
- * Arena R Scripts in GitHub: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
+ * Arena no GitHub: $t(links.arenaInGitHub)
+ * Scripts R do Arena no GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
   },

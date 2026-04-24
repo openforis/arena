@@ -839,7 +839,7 @@ $t(common.cantUndoWarning)`,
     undefinedFunction: 'Fonction non définie : {{name}}',
   },
 
-  // ====== Vues d'aide
+  // ====== Help views
   helpView: {
     about: {
       text: `
@@ -849,11 +849,14 @@ $t(common.cantUndoWarning)`,
 $t(common.appNameFull)
 --------
  
- * Développé par : $t(links.openforis)
- * Version : {{version}}
- * Forum de support : $t(links.supportForum)
- * Arena sur GitHub : <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
- * Scripts R d'Arena sur GitHub : <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
+ * Développé par $t(links.openforis)
+ * Version: {{version}}
+ * Site web: $t(links.openforisArenaWebsite)
+ * Tutoriels vidéo Arena dans l'Académie FAO elearning: $t(links.arenaVideoTutorialsInFaoElearningAcademy)
+ * Tutoriels vidéo Arena sur YouTube: $t(links.arenaVideoTutorialsInYouTube)
+ * Forum de support: $t(links.supportForum)
+ * Arena sur GitHub: $t(links.arenaInGitHub)
+ * Scripts R Arena sur GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
   },
