@@ -818,9 +818,12 @@ $t(common.appNameFull)
  
  * Хөгжүүлсэн: $t(links.openforis)
  * Хувилбар: {{version}}
+ * Вэбсайт: $t(links.openforisArenaWebsite)
+ * Arena видео хичээлүүд FAO elearning Академид: $t(links.arenaVideoTutorialsInFaoElearningAcademy)
+ * Arena видео хичээлүүд YouTube-д: $t(links.arenaVideoTutorialsInYouTube)
  * Дэмжлэгийн форум: $t(links.supportForum)
- * Арена GitHub-д: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
- * Арена R Скриптүүд GitHub-д: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
+ * Arena GitHub-д: $t(links.arenaInGitHub)
+ * Arena R Скриптүүд GitHub-д: $t(links.arenaRScriptsInGitHub)
 `,
     },
   },
