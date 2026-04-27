@@ -111,3 +111,14 @@ export const unescapeHtml = (text) => {
     return text
   }
 }
+
+export const extractPreElementContentFromHtml = (htmlText) => {
+  try {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(htmlText, 'text/html')
+    const preContent = doc.querySelector('pre')?.innerText
+    return preContent ? preContent.split('\n')[0] : null
+  } catch {
+    return null
+  }
+}
