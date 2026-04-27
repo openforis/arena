@@ -10,8 +10,15 @@ import { useI18nT } from '@webapp/store/system'
 import { TooltipNew } from '../TooltipNew'
 
 const getTitle = (props, t) => {
-  const { label, labelParams, title, titleParams } = props
-  const { labelIsI18nKey = true, showLabel = true, titleIsI18nKey = true } = props
+  const {
+    label,
+    labelIsI18nKey = true,
+    labelParams,
+    showLabel = true,
+    title,
+    titleIsI18nKey = true,
+    titleParams,
+  } = props
   if (title) {
     if (titleIsI18nKey) return t(title, titleParams)
     return title
@@ -73,6 +80,7 @@ export const Button = forwardRef((props, ref) => {
     iconWidth,
     id,
     isTitleMarkdown = false,
+    labelIsI18nKey: _labelIsI18nKey, // exclude it from otherProps
     labelParams: _labelParams, // exclude it from otherProps
     onClick,
     primary,
@@ -84,6 +92,7 @@ export const Button = forwardRef((props, ref) => {
     titleClassName,
     titleMarkdownClassName,
     titleMaxWidth,
+    titleIsI18nKey: _titleIsI18nKey, // exclude it from otherProps
     titleParams: _titleParams, // exclude it from otherProps
     variant: variantProp = 'contained',
     ...otherProps

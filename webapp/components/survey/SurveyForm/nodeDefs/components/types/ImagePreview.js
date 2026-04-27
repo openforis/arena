@@ -8,25 +8,30 @@ import LoadingBar from '@webapp/components/LoadingBar'
 
 const initialState = { error: false, loading: true }
 
+const mimeTypes = {
+  jpeg: 'image/jpeg',
+  heic: 'image/heif',
+}
+
 const fetchFile = async ({ file, path }) => {
   if (file) {
-    // used the file blob if specified, to avoid downloading the file from the path
-    return { file, contentType: file.type }
+    // use the file blob if specified, to avoid downloading the file from the path
+    return { blob: file, contentType: file.type }
   }
   if (path) {
     const { data, headers } = await axios.get(path, { responseType: 'blob' })
     const contentType = headers['content-type']
-    return { file: data, contentType }
+    return { blob: data, contentType }
   }
   return null
 }
 
 // Ensures that HEIC images are converted to JPEG before being displayed, as HEIC is not widely supported by browsers.
 const ensureJpegConversion = async ({ blob, contentType }) => {
-  if (contentType === 'image/heif') {
+  if (contentType === mimeTypes.heic) {
     return heicTo({
       blob,
-      type: 'image/jpeg',
+      type: mimeTypes.jpeg,
     })
   }
   return blob
@@ -42,32 +47,25 @@ export const ImagePreview = ({ path, onLoadComplete = null, file = null }) => {
   const isMountedRef = useRef(true)
   const { error, loading } = state
 
-  const onImageLoad = useCallback(async ({ file: blob, contentType }) => {
+  const fetchAndSetImage = useCallback(async () => {
+    const { blob, contentType } = (await fetchFile({ file, path })) ?? {}
     if (!blob || !isMountedRef.current) {
       return
     }
     const convertedBlob = await ensureJpegConversion({ blob, contentType })
-    if (!isMountedRef.current) {
+    if (isMountedRef.current) {
       const imgUrl = URL.createObjectURL(convertedBlob)
       imgSrcRef.current = imgUrl
       imgRef.current.src = imgUrl
     }
-  }, [])
+  }, [file, path])
 
   useEffect(() => {
-    fetchFile({ file, path })
-      .then(({ file, contentType }) => {
-        onImageLoad({ file, contentType }).catch(() => {
-          if (!isMountedRef.current) {
-            setState({ loading: false, error: true })
-          }
-        })
-      })
-      .catch(() => {
-        if (!isMountedRef.current) {
-          setState({ loading: false, error: true })
-        }
-      })
+    fetchAndSetImage().catch(() => {
+      if (isMountedRef.current) {
+        setState({ loading: false, error: true })
+      }
+    })
     return () => {
       isMountedRef.current = false
       // revoke object URL to avoid memory leaks
@@ -76,15 +74,19 @@ export const ImagePreview = ({ path, onLoadComplete = null, file = null }) => {
         URL.revokeObjectURL(imgSrc)
       }
     }
-  }, [path, file, onImageLoad])
+  }, [path, file, fetchAndSetImage])
 
   const onLoad = useCallback(() => {
-    setState({ loading: false, error: false })
+    if (isMountedRef.current) {
+      setState({ loading: false, error: false })
+    }
     onLoadComplete?.()
   }, [onLoadComplete])
 
   const onError = useCallback(() => {
-    setState({ loading: false, error: true })
+    if (isMountedRef.current) {
+      setState({ loading: false, error: true })
+    }
   }, [])
 
   return (
