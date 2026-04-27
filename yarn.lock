@@ -11619,6 +11619,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"heic-to@npm:^1.4.2":
+  version: 1.4.2
+  resolution: "heic-to@npm:1.4.2"
+  checksum: 10c0/1509cc51a9d041780a9fee55adb88a4f5f85c0cf08546d46be2003acc128917f1e52eabc05aefb01d83b7e0dfdf832654801ab68cacec1ad1f8dad97bae12110
+  languageName: node
+  linkType: hard
+
 "hermes-estree@npm:0.25.1":
   version: 0.25.1
   resolution: "hermes-estree@npm:0.25.1"
@@ -15420,6 +15427,7 @@ __metadata:
     file-saver: "npm:^2.0.5"
     git-revision-webpack-plugin: "npm:^5.0.0"
     glob: "npm:^13.0.0"
+    heic-to: "npm:^1.4.2"
     html-replace-webpack-plugin: "npm:^2.6.0"
     html-webpack-plugin: "npm:^5.6.6"
     husky: "npm:^9.1.7"
