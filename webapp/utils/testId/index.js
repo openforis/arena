@@ -42,7 +42,7 @@ export const TestId = {
     surveyExportWithDataNoActivityLogBtn: 'survey-export-with-data-no-activity-log-btn',
     surveyInfoBtnHeader: 'survey-info-btn-header',
     surveyInfoBtn: 'survey-info-btn',
-    surveyLabel: 'survey-label',
+    surveyLabelOrName: 'survey-label-or-name',
     surveyName: 'survey-name',
     surveyStatus: 'survey-status',
   },

@@ -172,7 +172,7 @@ const SurveyInfo = (props) => {
               testId={TestId.dashboard.surveyInfoBtnHeader}
               variant="text"
             >
-              <h2 data-testid={TestId.dashboard.surveyName}>
+              <h2 data-testid={TestId.dashboard.surveyLabelOrName}>
                 <LabelWithTooltip label={hasLabel ? surveyLabel : surveyName} />
               </h2>
             </Button>
@@ -181,7 +181,7 @@ const SurveyInfo = (props) => {
               ({i18n.t(`surveysView.status.${Survey.getStatus(surveyInfo)}`)})
             </div>
           </div>
-          <div className="row">{hasLabel && <h3>{surveyName}</h3>}</div>
+          <div className="row">{hasLabel && <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>}</div>
         </header>
 
         <div>
