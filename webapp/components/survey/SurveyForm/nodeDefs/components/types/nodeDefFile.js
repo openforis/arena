@@ -80,6 +80,7 @@ const FileInput = (props) => {
       fileName={fileName}
       href={fileUrl}
       label={fileName}
+      labelIsI18nKey={false}
       title={isImage ? undefined : fileName}
       className="btn-s ellipsis"
     />
