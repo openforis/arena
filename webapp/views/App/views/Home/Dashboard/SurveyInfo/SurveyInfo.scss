@@ -2,15 +2,40 @@
 @use '~@webapp/style/vars' as *;
 
 .home-dashboard__survey-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   padding: 0.5rem;
 
-  header h3 {
-    position: relative;
-    max-height: 55px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: calc(100vw - 310px);
+  header {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    justify-self: flex-start;
+    align-items: flex-start;
+
+    .row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+
+      h2,
+      h3 {
+        text-transform: none;
+        max-width: 100%;
+      }
+
+      h2 {
+        font-size: 1.2rem;
+      }
+
+      h3 {
+        font-size: 0.8rem;
+        margin-left: 1rem;
+        color: $blueDark;
+      }
+    }
   }
 
   .survey-status {

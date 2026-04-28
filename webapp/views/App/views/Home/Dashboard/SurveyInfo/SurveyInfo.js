@@ -5,20 +5,22 @@ import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as ProcessUtils from '@core/processUtils'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
-import { SurveyActions, useChains, useSurveyInfo } from '@webapp/store/survey'
+import { SurveyActions, useChains, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
 import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
-import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 const SurveyInfo = (props) => {
   const { firstTime = false } = props
@@ -28,6 +30,7 @@ const SurveyInfo = (props) => {
   const navigate = useNavigate()
 
   const surveyInfo = useSurveyInfo()
+  const lang = useSurveyPreferredLang()
 
   const canEditSurvey = useAuthCanEditSurvey()
   const canExportSurvey = useAuthCanExportSurvey()
@@ -35,9 +38,13 @@ const SurveyInfo = (props) => {
   const hasChains = chains?.length > 0
 
   const surveyName = Survey.getName(surveyInfo)
+  const surveyLabel = Survey.getLabel(surveyInfo, lang, false)
+  const hasLabel = Objects.isNotEmpty(surveyLabel)
 
   const confirm = useConfirm()
   const confirmDelete = useConfirmDelete()
+
+  const navigateToSurveyInfo = useCallback(() => navigate(appModuleUri(homeModules.surveyInfo)), [navigate])
 
   const onDeleteClick = useCallback(() => {
     confirmDelete({
@@ -160,25 +167,32 @@ const SurveyInfo = (props) => {
   return (
     <>
       <div className="home-dashboard__survey-info">
-        <Header>
-          <Button
-            onClick={() => navigate(appModuleUri(homeModules.surveyInfo))}
-            testId={TestId.dashboard.surveyInfoBtnHeader}
-            variant="text"
-          >
-            <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>
-          </Button>
+        <header>
+          <div className="row">
+            <Button onClick={navigateToSurveyInfo} testId={TestId.dashboard.surveyInfoBtnHeader} variant="text">
+              <h2 data-testid={TestId.dashboard.surveyLabelOrName}>
+                <LabelWithTooltip label={hasLabel ? surveyLabel : surveyName} />
+              </h2>
+            </Button>
 
-          <div className="survey-status" data-testid={TestId.dashboard.surveyStatus}>
-            ({i18n.t(`surveysView.status.${Survey.getStatus(surveyInfo)}`)})
+            <div className="survey-status" data-testid={TestId.dashboard.surveyStatus}>
+              ({i18n.t(`surveysView.status.${Survey.getStatus(surveyInfo)}`)})
+            </div>
           </div>
-        </Header>
+          {hasLabel && (
+            <div className="row">
+              <Button onClick={navigateToSurveyInfo} variant="text">
+                <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>
+              </Button>
+            </div>
+          )}
+        </header>
 
         <div>
           <Button
             iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
             label={canEditSurvey ? 'homeView:surveyInfo.editInfo' : 'homeView:surveyInfo.viewInfo'}
-            onClick={() => navigate(appModuleUri(homeModules.surveyInfo))}
+            onClick={navigateToSurveyInfo}
             size="small"
             testId={TestId.dashboard.surveyInfoBtn}
             variant="text"

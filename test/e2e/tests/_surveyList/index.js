@@ -9,8 +9,8 @@ export const clickSurvey = async (survey) => {
     page.click(surveyRowSelector),
   ])
 
-  const labelSelector = getSelector(TestId.dashboard.surveyName, 'h3')
-  expect(await page.innerText(labelSelector)).toBe(survey.name.toUpperCase())
+  const surveyNameSelector = getSelector(TestId.dashboard.surveyName, 'h3')
+  expect(await page.innerText(surveyNameSelector)).toBe(survey.name)
 }
 
 export const selectSurvey = (survey) => test(`Select survey ${survey.name}`, async () => clickSurvey(survey))
