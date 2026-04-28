@@ -117,7 +117,7 @@ export const extractPreElementContentFromHtml = (htmlText) => {
     const parser = new DOMParser()
     const doc = parser.parseFromString(htmlText, 'text/html')
     const preContent = doc.querySelector('pre')?.innerText
-    return preContent ? preContent.split('\n')[0] : null
+    return preContent ? preContent.split('\u00A0')[0] : null
   } catch {
     return null
   }

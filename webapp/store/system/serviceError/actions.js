@@ -8,11 +8,11 @@ export const createServiceError =
   ({ error }) =>
   (dispatch) => {
     let message
-    if (typeof error === 'object') {
-      message = error.message
-    } else {
-      const htmlText = error?.response?.data?.error
-      message = DomUtils.extractPreElementContentFromHtml(htmlText)
+    if (error.name === 'AxiosError') {
+      const htmlText = error?.response?.data
+      if (htmlText) {
+        message = DomUtils.extractPreElementContentFromHtml(htmlText)
+      }
     }
     if (!message) {
       message = error.message
