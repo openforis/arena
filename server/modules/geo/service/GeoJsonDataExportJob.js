@@ -64,7 +64,7 @@ export class GeoJsonDataExportJob extends Job {
 
     const query = Query.create({
       entityDefUuid: NodeDef.getUuid(nodeDefParent),
-      attributeDefUuids: [...ancestorKeyDefs.map(NodeDef.getUuid), attributeDefUuid],
+      attributeDefUuids: [...ancestorKeyDefs.map((nd) => NodeDef.getUuid(nd)), attributeDefUuid],
     })
 
     const dataItems = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query })

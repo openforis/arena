@@ -90,7 +90,13 @@ export const getSurveyManagerGroup = (user: any | null | undefined) =>
   user && getAuthGroups(user).find(AuthGroup.isSurveyManagerGroup)
 
 export const assocAuthGroups = (authGroups: any[]) =>
-  R.pipe(R.assoc(keys.authGroups, authGroups), R.assoc(keys.authGroupsUuids, authGroups.map(ObjectUtils.getUuid)))
+  R.pipe(
+    R.assoc(keys.authGroups, authGroups),
+    R.assoc(
+      keys.authGroupsUuids,
+      authGroups.map((authGroup) => ObjectUtils.getUuid(authGroup))
+    )
+  )
 
 const _updateAuthGroups = (updateFn: (a: unknown[]) => unknown[]) => (user: any) =>
   R.pipe(getAuthGroups, updateFn, (authGroups) => assocAuthGroups(authGroups as any[])(user))(user)

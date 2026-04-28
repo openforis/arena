@@ -70,7 +70,7 @@ export const useGeoAttributeDataLayer = (props) => {
     () => Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey),
     [attributeDef, survey]
   )
-  const ancestorsKeyAttributes = useMemo(
+  const ancestorsKeyAttributeDefs = useMemo(
     () => Survey.getNodeDefAncestorsKeyAttributes(attributeDef)(survey),
     [attributeDef, survey]
   )
@@ -104,7 +104,7 @@ export const useGeoAttributeDataLayer = (props) => {
     onAdd: () => {
       const query = Query.create({
         entityDefUuid: NodeDef.getUuid(nodeDefParent),
-        attributeDefUuids: [...ancestorsKeyAttributes.map(NodeDef.getUuid), attributeDefUuid],
+        attributeDefUuids: [...ancestorsKeyAttributeDefs.map((nd) => NodeDef.getUuid(nd)), attributeDefUuid],
       })
       setState((statePrev) => ({ ...statePrev, query }))
     },
