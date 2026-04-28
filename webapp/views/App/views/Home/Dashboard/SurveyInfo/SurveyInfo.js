@@ -44,6 +44,8 @@ const SurveyInfo = (props) => {
   const confirm = useConfirm()
   const confirmDelete = useConfirmDelete()
 
+  const navigateToSurveyInfo = useCallback(() => navigate(appModuleUri(homeModules.surveyInfo)), [navigate])
+
   const onDeleteClick = useCallback(() => {
     confirmDelete({
       key: 'homeView:deleteSurveyDialog.deleteWarning',
@@ -167,11 +169,7 @@ const SurveyInfo = (props) => {
       <div className="home-dashboard__survey-info">
         <header>
           <div className="row">
-            <Button
-              onClick={() => navigate(appModuleUri(homeModules.surveyInfo))}
-              testId={TestId.dashboard.surveyInfoBtnHeader}
-              variant="text"
-            >
+            <Button onClick={navigateToSurveyInfo} testId={TestId.dashboard.surveyInfoBtnHeader} variant="text">
               <h2 data-testid={TestId.dashboard.surveyLabelOrName}>
                 <LabelWithTooltip label={hasLabel ? surveyLabel : surveyName} />
               </h2>
@@ -181,14 +179,20 @@ const SurveyInfo = (props) => {
               ({i18n.t(`surveysView.status.${Survey.getStatus(surveyInfo)}`)})
             </div>
           </div>
-          <div className="row">{hasLabel && <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>}</div>
+          {hasLabel && (
+            <div className="row">
+              <Button onClick={navigateToSurveyInfo} variant="text">
+                <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>
+              </Button>
+            </div>
+          )}
         </header>
 
         <div>
           <Button
             iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
             label={canEditSurvey ? 'homeView:surveyInfo.editInfo' : 'homeView:surveyInfo.viewInfo'}
-            onClick={() => navigate(appModuleUri(homeModules.surveyInfo))}
+            onClick={navigateToSurveyInfo}
             size="small"
             testId={TestId.dashboard.surveyInfoBtn}
             variant="text"
