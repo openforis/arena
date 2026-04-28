@@ -18,7 +18,6 @@ import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
 import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
-import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
