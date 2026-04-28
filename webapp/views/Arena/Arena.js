@@ -11,7 +11,7 @@ import Routes from './Routes'
 const ErrorFallback = ({ error }) => (
   <div role="alert">
     <p>Something went wrong:</p>
-    <pre>{error.message}</pre>
+    <pre>{error.stack ?? error.message}</pre>
   </div>
 )
 
