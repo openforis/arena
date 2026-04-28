@@ -2,21 +2,21 @@ import * as R from 'ramda'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as NumberUtils from '@core/numberUtils'
 import * as DateUtils from '@core/dateUtils'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
+import * as NumberUtils from '@core/numberUtils'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
 
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as RecordFile from '@core/record/recordFile'
+import { db } from '@server/db/db'
 
-import * as FileManager from '../../../../record/manager/fileManager'
-import * as CollectSurvey from '../model/collectSurvey'
+import { insertFile } from '@server/modules/survey/manager/surveyFileManager'
 import * as CollectRecord from '../model/collectRecord'
+import * as CollectSurvey from '../model/collectSurvey'
 
 const { nodeDefType } = NodeDef
 
@@ -32,6 +32,7 @@ const findCategoryItemUuidAndCodeHierarchy = async ({
   code,
   record,
   parentNode,
+  client = db,
 }) => {
   const { itemUuid, hierarchyCode } = Survey.getCategoryItemUuidAndCodeHierarchy({
     nodeDef,
@@ -42,21 +43,24 @@ const findCategoryItemUuidAndCodeHierarchy = async ({
   if (itemUuid) {
     return { itemUuid, hierarchyCode }
   }
-  const codePaths = []
   const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-  if (parentCodeAttribute) {
-    codePaths.push(...Node.getHierarchyCode(parentCodeAttribute))
-  }
-  codePaths.push(code)
+  const parentItemUuid = parentCodeAttribute ? Node.getCategoryItemUuid(parentCodeAttribute) : null
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-  const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
+  const item = await categoryItemProvider.getItemByCode({
+    survey,
+    categoryUuid,
+    parentItemUuid,
+    code,
+    draft: true,
+    client,
+  })
   return item
     ? { itemUuid: item.uuid, hierarchyCode: CategoryItem.getCodesHierarchy(item) }
     : { itemUuid: null, hierarchyCode: null }
 }
 
 const extractCodeValueAndMeta =
-  ({ survey, categoryItemProvider, nodeDef, record, node }) =>
+  ({ survey, categoryItemProvider, nodeDef, record, node, tx }) =>
   async (collectNode) => {
     const code = CollectRecord.getTextValue('code')(collectNode)
     if (Objects.isEmpty(code)) {
@@ -70,6 +74,7 @@ const extractCodeValueAndMeta =
       code,
       record,
       parentNode,
+      client: tx,
     })
     if (!itemUuid) {
       return null
@@ -121,18 +126,19 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
 
   if (content) {
     const fileSize = Buffer.byteLength(content)
-    const file = RecordFile.createFile({
+    const file = SurveyFile.createFile({
       name: fileName,
       size: fileSize,
       content,
       recordUuid: Node.getRecordUuid(node),
       nodeUuid: Node.getUuid(node),
+      type: SurveyFile.SurveyFileType.recordAttachment,
     })
-    await FileManager.insertFile(Survey.getId(survey), file, tx)
+    await insertFile(Survey.getId(survey), file, tx)
 
     return {
       value: {
-        [Node.valuePropsFile.fileUuid]: RecordFile.getUuid(file),
+        [Node.valuePropsFile.fileUuid]: SurveyFile.getUuid(file),
         [Node.valuePropsFile.fileName]: fileName,
         [Node.valuePropsFile.fileSize]: fileSize,
       },
@@ -196,8 +202,8 @@ const extractTimeValueAndMeta = (collectNode) => {
 
 const valueAndMetaExtractorByType = {
   [nodeDefType.boolean]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
-  [nodeDefType.code]: ({ collectNode, survey, categoryItemProvider, nodeDef, record, node }) =>
-    extractCodeValueAndMeta({ survey, categoryItemProvider, nodeDef, record, node })(collectNode),
+  [nodeDefType.code]: ({ collectNode, survey, categoryItemProvider, nodeDef, record, node, tx = db }) =>
+    extractCodeValueAndMeta({ survey, categoryItemProvider, nodeDef, record, node, tx })(collectNode),
   [nodeDefType.coordinate]: ({ collectNode, nodeDef }) => extractCoordinateValueAndMeta({ nodeDef, collectNode }),
   [nodeDefType.date]: ({ collectNode }) => extractDateValueAndMeta(collectNode),
   [nodeDefType.decimal]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),

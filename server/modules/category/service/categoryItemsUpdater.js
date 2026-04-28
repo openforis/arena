@@ -27,6 +27,11 @@ export default class CategoryItemsUpdater {
      * Processed category items indexed by ancestor codes + code (as a string).
      */
     this.itemsCacheByCodes = {}
+    /**
+     * Track the latest index assigned for each parentItemUuid
+     * { [parentItemUuid: string|null]: number }
+     */
+    this.latestIndexByParent = {}
 
     this.itemsBatchInserter = new BatchPersister(async (items) =>
       CategoryManager.insertItems(this.user, this.surveyId, items, this.tx)
@@ -52,11 +57,17 @@ export default class CategoryItemsUpdater {
 
   async insertOrUpdateItem({ itemCodes, level, placeholder, labelsByLang, descriptionsByLang, extra }) {
     const itemCached = this.getItemCachedByCodes(itemCodes)
-
     let item = null
+    // --- Compute index among siblings using latestIndexByParent ---
+    const parentItemUuid = this._getParentItemUuid(itemCodes)
+    if (!(parentItemUuid in this.latestIndexByParent)) {
+      this.latestIndexByParent[parentItemUuid] = 0
+    }
+    const index = this.latestIndexByParent[parentItemUuid]++
 
     const itemProps = {
       [CategoryItem.keysProps.code]: ArrayUtils.last(itemCodes),
+      [CategoryItem.keysProps.index]: index,
     }
     ObjectUtils.setInPath([CategoryItem.keysProps.labels], labelsByLang, false)(itemProps)
     ObjectUtils.setInPath([CategoryItem.keysProps.descriptions], descriptionsByLang, false)(itemProps)
@@ -185,7 +196,6 @@ export default class CategoryItemsUpdater {
   }
 
   _putItemIntoCache(itemCodes, item) {
-    // eslint-disable-next-line no-unused-vars
     const { props, ...itemWithoutProps } = item
     this.itemsCacheByCodes[String(itemCodes)] = itemWithoutProps // store item without props in cache to save memory
   }

@@ -11,6 +11,11 @@ export const insertSurvey = async ({ newSurvey }) => {
   return data
 }
 
+export const insertSurveyFile = async ({ surveyId, file, surveyFile }) => {
+  const formData = objectToFormData({ surveyFile: JSON.stringify(surveyFile), file })
+  await axios.post(`/api/survey/${surveyId}/file`, formData)
+}
+
 // ==== READ
 export const fetchSurveys = async ({ draft = true, template = false } = {}) => {
   const {
@@ -39,6 +44,16 @@ export const fetchSurveyTemplatesPublished = async () => {
   } = await axios.get(`/api/surveyTemplates`)
   return surveys
 }
+
+export const getSurveyFileDownloadUrl = ({ surveyId, fileUuid }) => `/api/survey/${surveyId}/file/${fileUuid}`
+
+export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
+  const response = await axios.get(getSurveyFileDownloadUrl({ surveyId, fileUuid }), { responseType: 'blob' })
+  return response
+}
+
+export const getSurveyDocxExportUrl = ({ surveyId, cycle, lang, draft = false }) =>
+  `/api/survey/${surveyId}/export/docx?${new URLSearchParams({ draft, cycle, lang })}`
 
 // ==== UPDATE
 export const startImportLabelsJob = async ({ surveyId, file }) => {

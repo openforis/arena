@@ -1,34 +1,23 @@
-import { Objects } from '@openforis/arena-core'
+import { NumberConversionUtils } from '@core/numberConversionUtils'
+import * as SurveyFile from '@core/survey/surveyFile'
 
-import { ENV } from '@core/processUtils'
-import * as RecordFile from '@core/record/recordFile'
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 
+import { fileContentStorageTypes, getFileContentStorageType } from '@server/modules/file/manager/fileManagerCommon'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
-
-import * as FileRepository from '../repository/fileRepository'
-import * as FileRepositoryFileSystem from '../repository/fileRepositoryFileSystem'
-import * as FileRepositoryS3Bucket from '../repository/fileRepositoryS3Bucket'
-import { NumberConversionUtils } from '@core/numberConversionUtils'
 import { StreamUtils } from '@server/utils/streamUtils'
 
-const logger = Log.getLogger('FileManager')
+import * as FileRepository from '../../record/repository/fileRepository'
+import * as FileRepositoryFileSystem from '../../record/repository/fileRepositoryFileSystem'
+import * as FileRepositoryS3Bucket from '../../record/repository/fileRepositoryS3Bucket'
+
+export { fileContentStorageTypes, getFileContentStorageType } from '@server/modules/file/manager/fileManagerCommon'
+
+const logger = Log.getLogger('SurveyFileManager')
 
 export const defaultSurveyFilesTotalSpaceMB = 10 * 1024 // in MB (=10 GB)
 export const maxSurveyFilesTotalSpaceMB = 100 * 1024 // in MB (=100 GB)
-
-export const fileContentStorageTypes = { db: 'db', fileSystem: 'fileSystem', s3Bucket: 's3Bucket' }
-
-export const getFileContentStorageType = () => {
-  if (!Objects.isEmpty(ENV.fileStoragePath)) {
-    return fileContentStorageTypes.fileSystem
-  }
-  if (!Objects.isEmpty(ENV.fileStorageAwsS3BucketName)) {
-    return fileContentStorageTypes.s3Bucket
-  }
-  return fileContentStorageTypes.db
-}
 
 export const isFileContentStoredInDB = () => getFileContentStorageType() === fileContentStorageTypes.db
 
@@ -78,8 +67,8 @@ export const insertFile = async (surveyId, file, client = db) => {
   const storageType = getFileContentStorageType()
   const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
   if (contentStoreFunction) {
-    const fileUuid = RecordFile.getUuid(file)
-    const content = RecordFile.getContent(file)
+    const fileUuid = SurveyFile.getUuid(file)
+    const content = SurveyFile.getContent(file)
     await contentStoreFunction({ surveyId, fileUuid, content })
     // clear content in file object so it won't be stored into DB
     file.content = null
@@ -111,7 +100,7 @@ export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db
       const file = await FileRepository.fetchFileAndContentByUuid(surveyId, fileUuid, tx)
 
       const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
-      const content = RecordFile.getContent(file)
+      const content = SurveyFile.getContent(file)
       await contentStoreFunction({ surveyId, fileUuid, content })
     }
     logger.debug(`Files moved from DB; clearing 'content' column in DB 'file' table`)
@@ -130,34 +119,43 @@ export const deleteFileByUuid = async ({ surveyId, fileUuid }, client = db) => {
   // do not delete content if not in DB: deletion out of transaction
 }
 
-export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = db) => {
+export const deleteFilesContentByUuids = async ({ surveyId, fileUuids }) => {
   const storageType = getFileContentStorageType()
   const deleteFn = contentDeleteFunctionByStorageType[storageType]
   if (deleteFn) {
-    const fileUuids = await FileRepository.fetchFileUuidsByRecordUuids({ surveyId, recordUuids }, client)
     await deleteFn({ surveyId, fileUuids })
   }
-  await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, client)
 }
 
-export const deleteSurveyFilesContentByUuids = async ({ surveyId, fileUuids }) => {
-  const storageType = getFileContentStorageType()
-  const deleteFn = contentDeleteFunctionByStorageType[storageType]
-  if (deleteFn) {
-    await deleteFn({ surveyId, fileUuids })
+export const deleteFilesAndContentByUuids = async ({ surveyId, fileUuids }, client = db) => {
+  await deleteFilesContentByUuids({ surveyId, fileUuids })
+  await FileRepository.deleteFilesByUuids(surveyId, fileUuids, client)
+}
+
+export const deleteTemporaryFiles = async (surveyId, client = db) => {
+  const fileSummaries = await FileRepository.fetchFileSummariesBySurveyId(surveyId, client)
+  const temporaryFileUuids = []
+  for (const fileSummary of fileSummaries) {
+    const fileUuid = SurveyFile.getUuid(fileSummary)
+    if (SurveyFile.isTemporary(fileSummary)) {
+      temporaryFileUuids.push(fileUuid)
+    }
+  }
+  if (temporaryFileUuids.length > 0) {
+    logger.debug(`Deleting ${temporaryFileUuids.length} temporary files of survey ${surveyId}`)
+    await deleteFilesAndContentByUuids({ surveyId, fileUuids: temporaryFileUuids }, client)
   }
 }
 
 export const {
   // READ
   fetchFileSummariesBySurveyId,
+  fetchFileSummariesByType,
   fetchFileSummaryByUuid,
   fetchFileUuidsBySurveyId,
   fetchCountAndTotalFilesSize,
   // UPDATE
-  markRecordFilesAsDeleted,
   updateFileProps,
+  clearFileTemporaryFlag,
   cleanupSurveyFilesProps,
-  // DELETE
-  deleteFilesByUuids,
 } = FileRepository

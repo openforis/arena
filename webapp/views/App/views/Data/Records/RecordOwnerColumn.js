@@ -41,7 +41,7 @@ export const RecordOwnerColumn = (props) => {
       if (selectedOwnerUuid !== ownerUuid) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
-            key: 'dataView.records.confirmUpdateRecordOwner',
+            key: 'dataView:records.confirmUpdateRecordOwner',
             params: { ownerName: User.getName(selectedOwner) },
             onOk: async () => onChangeConfirmed({ selectedOwnerUuid }),
           })

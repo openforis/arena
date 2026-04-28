@@ -83,8 +83,20 @@ export default {
 Если к этому циклу привязаны записи, они будут удалены.`,
     cycleForArenaMobile: 'Цикл для Arena Mobile',
     fieldManualLink: 'Ссылка на полевое руководство',
+    map: 'Карта',
     editInfo: 'Редактировать информацию',
     viewInfo: 'Просмотреть информацию',
+
+    preloadedMapLayers: {
+      enabledMessage: 'Включены предзагруженные слои карты',
+      title: 'Предзагруженные слои карты',
+      fileName: 'Имя файла',
+      fileSize: 'Размер файла',
+      confirmDelete: 'Вы уверены, что хотите удалить этот предзагруженный слой карты?',
+      editor: {
+        title: 'Предзагруженный слой карты',
+      },
+    },
     preferredLanguage: 'Предпочитаемый язык',
     sampleBasedImageInterpretation: 'Интерпретация изображений на основе образцов',
     sampleBasedImageInterpretationEnabled: 'Интерпретация изображений на основе образцов включена',

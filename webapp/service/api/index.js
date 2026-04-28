@@ -50,6 +50,7 @@ export {
   fetchRecordsCountByStep,
   fetchRecordSummary,
   fetchRecordsSummary,
+  getRecordDocxExportUrl,
   startExportDataJob,
   startExportDataSummaryJob,
   downloadExportedDataSummaryUrl,
@@ -83,12 +84,15 @@ export {
   fetchSurveys,
   fetchSurveyTemplatesPublished,
   insertSurvey,
+  insertSurveyFile,
   startImportLabelsJob,
   updateSurveyConfigurationProp,
   updateSurveyOwner,
   updateSurveyProps,
   startSurveysListExportJob,
   getSurveyListExportedFileDownloadUrl,
+  getSurveyDocxExportUrl,
+  getSurveyFileDownloadUrl,
 } from './survey'
 export {
   convertNodeDef,

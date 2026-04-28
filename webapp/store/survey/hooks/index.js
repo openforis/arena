@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, Surveys } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -113,6 +113,13 @@ export const useIsAncestorMultipleEntityRoot = (nodeDef) =>
     return NodeDef.isEqual(rootDef)(ancestorMultipleEntityDef)
   })
 
+export const useIsNodeDefEnumerator = (nodeDef) =>
+  useSelector((state) => {
+    if (!NodeDef.isCode(nodeDef)) return false
+    const survey = SurveyState.getSurvey(state)
+    return Surveys.isNodeDefEnumerator({ survey, nodeDef })
+  })
+
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)
 
 export const useNodeDefValidationByUuid = (uuid) =>
@@ -131,15 +138,16 @@ export const useSurveyHasFileAttributes = () =>
 
 export const useIsSurveyDirty = () => useSelector(SurveyStatusState.isDirty)
 
-export const useChains = () => {
+export const useChains = ({ surveyCycleKey } = {}) => {
   const canUseAnalysis = useAuthCanUseAnalysis()
   const surveyId = useSurveyId()
   const [chains, setChains] = useState(null)
+
   useEffect(() => {
     let isMounted = true
     if (canUseAnalysis) {
       const fetchChains = async () => {
-        const { chains: _chains } = await API.fetchChains({ surveyId })
+        const { chains: _chains } = await API.fetchChains({ surveyId, surveyCycleKey })
         if (isMounted) {
           setChains(_chains)
         }
@@ -151,6 +159,6 @@ export const useChains = () => {
     return () => {
       isMounted = false
     }
-  }, [canUseAnalysis, surveyId])
+  }, [canUseAnalysis, surveyId, surveyCycleKey])
   return chains
 }

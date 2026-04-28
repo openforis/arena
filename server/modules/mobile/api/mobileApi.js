@@ -1,13 +1,14 @@
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
-import * as AuthMiddleware from '../../auth/authApiMiddleware'
-import * as Request from '@server/utils/request'
-import * as CategoryService from '@server/modules/category/service/categoryService'
-import * as SurveyService from '@server/modules/survey/service/surveyService'
-import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as JobUtils from '@server/job/jobUtils'
 import * as Log from '@server/log/log'
-import { processChunkedFile } from '@server/utils/requestChunkedFileProcessor'
+import * as CategoryService from '@server/modules/category/service/categoryService'
+import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
+import * as Request from '@server/utils/request'
+
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as ArenaMobileImportService from '../service/arenaMobileImportService'
 
 const Logger = Log.getLogger('Mobile API')
@@ -54,11 +55,11 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const { surveyId, conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting } = Request.getParams(req)
 
-      const filePath = await processChunkedFile({ req })
-      if (filePath) {
+      const tempFile = await processChunkedFileForBackgroundMerge({ req })
+      if (tempFile) {
         const job = ArenaMobileImportService.startArenaMobileImportJob({
           user,
-          filePath,
+          ...tempFile,
           surveyId,
           conflictResolutionStrategy,
         })

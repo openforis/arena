@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
+import { DataImportTemplateTypes } from '@core/dataImport'
 import { FileFormats } from '@core/fileFormats'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
@@ -21,10 +22,6 @@ import { ExtraPropDefsEditorPanel } from '../../ExtraPropDefsEditor'
 import { State } from '../store'
 
 const templateFileFormats = [FileFormats.csv, FileFormats.xlsx]
-const templateTypes = {
-  generic: 'generic',
-  specific: 'specific',
-}
 
 const Header = (props) => {
   const { state, Actions } = props
@@ -73,16 +70,16 @@ const Header = (props) => {
             />
             <ButtonMenu
               className="date-import-template-menu-btn"
-              label="dataImportView.templateForImport"
+              label="dataImportView:templateForImport"
               iconClassName="icon-download2 icon-14px"
-              items={Object.values(templateTypes).flatMap((templateType) =>
+              items={Object.values(DataImportTemplateTypes).flatMap((templateType) =>
                 templateFileFormats.map((fileFormat) => ({
                   key: `taxonomy-import-template-${templateType}-${fileFormat}`,
                   content: (
                     <ButtonDownload
                       href={`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/import-template/`}
                       requestParams={{ draft: canEdit, fileFormat, templateType }}
-                      label={`dataImportView.templateFor_${templateType}DataImport_${fileFormat}`}
+                      label={`dataImportView:templateFor_${templateType}DataImport_${fileFormat}`}
                       variant="text"
                     />
                   ),

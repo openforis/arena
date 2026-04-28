@@ -8,13 +8,15 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
+import * as API from '@webapp/service/api'
 import { RecordActions, RecordState, useRecord } from '@webapp/store/ui/record'
-import { useI18n } from '@webapp/store/system'
+import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
+import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 
 import { TestId } from '@webapp/utils/testId'
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
 
@@ -23,6 +25,9 @@ const RecordEntryButtons = (props) => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
+  const surveyId = useSurveyId()
+  const lang = useSurveyPreferredLang()
   const record = useRecord()
   const noHeader = useIsRecordViewWithoutHeader()
 
@@ -39,6 +44,8 @@ const RecordEntryButtons = (props) => {
 
   const getStepLabel = (_step) => i18n.t(`surveyForm:step.${RecordStep.getName(_step)}`)
 
+  const recordUuid = Record.getUuid(record)
+
   return (
     <>
       {!disableLockUnlock && canEdit && (
@@ -54,12 +61,30 @@ const RecordEntryButtons = (props) => {
         <Link
           data-testid={TestId.record.invalidBtn}
           className="btn btn-transparent error"
-          to={`${appModuleUri(dataModules.recordValidationReport)}${Record.getUuid(record)}`}
-          title={i18n.t('dataView.showValidationReport')}
+          to={`${appModuleUri(dataModules.recordValidationReport)}${recordUuid}`}
+          title={i18n.t('dataView:showValidationReport')}
         >
           <span className="icon icon-12px icon-warning icon-left" />
-          {i18n.t('dataView.invalidRecord')}
+          {i18n.t('dataView:invalidRecord')}
         </Link>
+      )}
+      {experimentalFeatures && (
+        <ButtonMenu
+          iconClassName="icon-cog icon-14px"
+          label="common.advancedFunctions"
+          items={[
+            {
+              key: 'survey-docx-export',
+              content: (
+                <ButtonDownload
+                  href={API.getRecordDocxExportUrl({ surveyId, recordUuid, lang })}
+                  label="surveyForm:exportDocx"
+                  variant="text"
+                />
+              ),
+            },
+          ]}
+        />
       )}
       <div className="survey-form-header__record-actions-steps">
         {canDemote && (

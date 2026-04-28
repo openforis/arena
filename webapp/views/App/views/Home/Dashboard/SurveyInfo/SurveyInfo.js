@@ -1,11 +1,12 @@
 import './SurveyInfo.scss'
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
 import * as Survey from '@core/survey/survey'
+import * as ProcessUtils from '@core/processUtils'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
@@ -74,6 +75,88 @@ const SurveyInfo = (props) => {
     })
   }, [confirm, dispatch, surveyName])
 
+  const advancedFunctionsItems = useMemo(() => {
+    const items = []
+    if (Survey.isPublished(surveyInfo)) {
+      items.push({
+        key: 'survey-info-unpublish',
+        content: (
+          <Button
+            className="btn-danger"
+            iconClassName="icon-eye-blocked icon-12px icon-left"
+            label="homeView:surveyInfo.unpublish"
+            onClick={onUnpublishClick}
+            variant="text"
+            testId={TestId.dashboard.surveyUnpublishBtn}
+          />
+        ),
+      })
+    }
+    if (!ProcessUtils.ENV.activityLogDisabled) {
+      items.push({
+        key: 'survey-delete-activity-log',
+        content: (
+          <Button
+            className="btn-danger"
+            iconClassName="icon-bin icon-12px icon-left"
+            label="homeView:surveyInfo.deleteActivityLog"
+            onClick={onDeleteActivityLogDataClick}
+            variant="text"
+            testId={TestId.dashboard.surveyDeleteActivityLogBtn}
+          />
+        ),
+      })
+    }
+    items.push({
+      key: 'survey-info-delete',
+      content: <ButtonDelete onClick={onDeleteClick} testId={TestId.dashboard.surveyDeleteBtn} variant="text" />,
+    })
+    return items
+  }, [onDeleteActivityLogDataClick, onDeleteClick, onUnpublishClick, surveyInfo])
+
+  const exportMenuItems = useMemo(() => {
+    const items = [
+      {
+        key: 'survey-export',
+        label: 'common.export',
+        onClick: () => dispatch(SurveyActions.exportSurvey()),
+        testId: TestId.dashboard.surveyExportOnlySurveyBtn,
+      },
+    ]
+    if (!Survey.isTemplate(surveyInfo)) {
+      items.push({
+        key: 'survey-export-with-data',
+        label: 'homeView:dashboard.exportWithData',
+        onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true })),
+        testId: TestId.dashboard.surveyExportWithDataBtn,
+      })
+      if (!ProcessUtils.ENV.activityLogDisabled) {
+        items.push({
+          key: 'survey-export-with-data-no-activity-log',
+          label: 'homeView:dashboard.exportWithDataNoActivityLog',
+          onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false })),
+          testId: TestId.dashboard.surveyExportWithDataNoActivityLogBtn,
+        })
+      }
+      if (hasChains) {
+        items.push({
+          key: 'survey-export-with-data-no-result-attributes',
+          label: 'homeView:dashboard.exportWithDataNoResultAttributes',
+          onClick: () =>
+            dispatch(
+              SurveyActions.exportSurvey({
+                includeData: true,
+                includeResultAttributes: false,
+                includeActivityLog: false,
+              })
+            ),
+          testId: TestId.dashboard.surveyExportWithDataNoResultAttributesBtn,
+        })
+      }
+    }
+    return items
+  }, [dispatch, hasChains, surveyInfo])
+
   return (
     <>
       <div className="home-dashboard__survey-info">
@@ -87,7 +170,7 @@ const SurveyInfo = (props) => {
           </Button>
 
           <div className="survey-status" data-testid={TestId.dashboard.surveyStatus}>
-            ({Survey.getStatus(surveyInfo)})
+            ({i18n.t(`surveysView.status.${Survey.getStatus(surveyInfo)}`)})
           </div>
         </Header>
 
@@ -106,48 +189,7 @@ const SurveyInfo = (props) => {
           {!firstTime && canExportSurvey && (
             <ButtonMenu
               className="btn-menu-export"
-              items={[
-                {
-                  key: 'survey-export',
-                  label: 'common.export',
-                  onClick: () => dispatch(SurveyActions.exportSurvey()),
-                  testId: TestId.dashboard.surveyExportOnlySurveyBtn,
-                },
-                ...(!Survey.isTemplate(surveyInfo)
-                  ? [
-                      {
-                        key: 'survey-export-with-data',
-                        label: 'homeView:dashboard.exportWithData',
-                        onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true })),
-                        testId: TestId.dashboard.surveyExportWithDataBtn,
-                      },
-                      {
-                        key: 'survey-export-with-data-no-activity-log',
-                        label: 'homeView:dashboard.exportWithDataNoActivityLog',
-                        onClick: () =>
-                          dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false })),
-                        testId: TestId.dashboard.surveyExportWithDataNoActivityLogBtn,
-                      },
-                      ...(hasChains
-                        ? [
-                            {
-                              key: 'survey-export-with-data-no-result-attributes',
-                              label: 'homeView:dashboard.exportWithDataNoResultAttributes',
-                              onClick: () =>
-                                dispatch(
-                                  SurveyActions.exportSurvey({
-                                    includeData: true,
-                                    includeResultAttributes: false,
-                                    includeActivityLog: false,
-                                  })
-                                ),
-                              testId: TestId.dashboard.surveyExportWithDataNoResultAttributesBtn,
-                            },
-                          ]
-                        : []),
-                    ]
-                  : []),
-              ]}
+              items={exportMenuItems}
               iconClassName="icon-download2 icon-14px"
               label="common.export"
               size="small"
@@ -158,43 +200,7 @@ const SurveyInfo = (props) => {
             <ButtonMenu
               className="btn-menu-advanced"
               iconClassName="icon-cog icon-14px"
-              items={[
-                ...(Survey.isPublished(surveyInfo)
-                  ? [
-                      {
-                        key: 'survey-info-unpublish',
-                        content: (
-                          <Button
-                            iconClassName="icon-eye-blocked icon-12px icon-left"
-                            label="homeView:surveyInfo.unpublish"
-                            onClick={onUnpublishClick}
-                            variant="text"
-                            testId={TestId.dashboard.surveyUnpublishBtn}
-                          />
-                        ),
-                      },
-                    ]
-                  : []),
-                {
-                  key: 'survey-delete-activity-log',
-                  content: (
-                    <Button
-                      className="btn-danger"
-                      iconClassName="icon-bin icon-12px icon-left"
-                      label="homeView:surveyInfo.deleteActivityLog"
-                      onClick={onDeleteActivityLogDataClick}
-                      variant="text"
-                      testId={TestId.dashboard.surveyDeleteActivityLogBtn}
-                    />
-                  ),
-                },
-                {
-                  key: 'survey-info-delete',
-                  content: (
-                    <ButtonDelete onClick={onDeleteClick} testId={TestId.dashboard.surveyDeleteBtn} variant="text" />
-                  ),
-                },
-              ]}
+              items={advancedFunctionsItems}
               label="common.advancedFunctions"
               size="small"
               testId={TestId.dashboard.advancedFunctionsBtn}

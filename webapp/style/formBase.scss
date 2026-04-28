@@ -73,7 +73,6 @@ button,
 button:disabled,
 *[aria-disabled='true'] {
   color: currentColor;
-  display: inline-block;
   /* For IE11/ MS Edge bug */
   pointer-events: none;
   text-decoration: none;
@@ -187,5 +186,10 @@ button:disabled,
   &.btn-s {
     padding: 0.5rem;
     font-size: 0.8rem;
+  }
+
+  .MuiButton-startIcon {
+    margin-right: -2px;
+    margin-left: -2px;
   }
 }

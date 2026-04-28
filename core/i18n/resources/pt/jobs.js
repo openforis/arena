@@ -18,6 +18,7 @@ export default {
   DataDeleteJob: 'Exclusão de dados',
   DataImportJob: 'Importação de dados',
   DataImportValidationJob: 'Validação de arquivo de importação de dados',
+  EntitiesDeleteJob: 'Exclusão de entidades existentes',
   FilesImportJob: 'Importação de arquivos',
   MessageSendJob: 'Envio de mensagem',
   NodeDefsImportJob: 'Importação de definições de nós',
@@ -32,6 +33,7 @@ export default {
   SurveyCreatorJob: 'Criação de inventário',
   SurveyDependencyGraphsGenerationJob: 'Geração de grafos de dependência do inventário',
   SurveyExportJob: 'Exportação de inventário',
+  SurveyFilesImportJob: 'Importação de arquivos do inventário',
   SurveyIndexGeneratorJob: 'Gerador de índice do inventário',
   SurveyInfoValidationJob: 'Validação de informações do inventário',
   SurveyLabelsImportJob: 'Importação de rótulos do inventário',
@@ -46,10 +48,12 @@ export default {
   TaxonomiesValidationJob: 'Validação de taxonomias',
   TaxonomyImportJob: 'Importação de taxonomia',
   // data export
+  ArenaFileReadJob: 'Leitura de arquivo do Arena',
   DataExportJob: 'Exportação de dados',
   DataSummaryExportJob: 'Exportação de resumo de dados',
   ZipCreationJob: 'Criação de arquivo ZIP',
   CSVDataExtraction: 'Extração de dados',
+  PrepareImportFileJob: 'Preparar arquivo de importação',
   // geo
   GeoJsonDataExportJob: 'Exportação de dados GeoJSON',
   // import arena survey
@@ -65,7 +69,8 @@ export default {
   CategoriesExportJob: 'Exportação de categorias',
   TaxonomiesExportJob: 'Exportação de taxonomias',
   RecordsExportJob: 'Exportação de registros',
-  FilesExportJob: 'Exportação de arquivos',
+  RecordFilesExportJob: 'Exportação de arquivos de registros',
+  SurveyFilesExportJob: 'Exportação de arquivos da pesquisa',
   ChainExportJob: 'Exportação de cadeia',
   UsersExportJob: 'Exportação de usuários',
   ActivityLogExportJob: 'Exportação de log de atividades',

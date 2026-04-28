@@ -8,14 +8,15 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import { uuidv4 } from '@core/uuid'
 
-import * as Survey from '@core/survey/survey'
-import * as SurveyValidator from '@core/survey/surveyValidator'
+import * as ObjectUtils from '@core/objectUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as User from '@core/user/user'
-import * as ObjectUtils from '@core/objectUtils'
-import * as Validation from '@core/validation/validation'
+import * as Survey from '@core/survey/survey'
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as SurveyValidator from '@core/survey/surveyValidator'
 import SystemError from '@core/systemError'
+import * as User from '@core/user/user'
+import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
@@ -24,18 +25,18 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
+import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-import * as FileManager from '@server/modules/record/manager/fileManager'
+import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
-import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
-import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '../repository/surveyRepository'
+import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 
 const Logger = Log.getLogger('SurveyManager')
 
@@ -56,7 +57,7 @@ const _fetchAndAssocRdbInitialized = async ({ surveyInfo }, client) => {
 }
 
 const _fetchAndAssocAdditionalInfo = async ({ surveyInfo }, client) => {
-  let surveyInfoUpdated = await _fetchAndAssocSrss({ surveyInfo }, client)
+  const surveyInfoUpdated = await _fetchAndAssocSrss({ surveyInfo }, client)
   return _fetchAndAssocRdbInitialized({ surveyInfo: surveyInfoUpdated }, client)
 }
 
@@ -91,15 +92,13 @@ const _addUserToSurveyAdmins = async ({ user, surveyInfo }, client = db) => {
 
 /**
  * Creates a new survey given the specified parameters.
- *
  * @param {!object} params - The survey creation parameters.
  * @param {!object} params.user - The user creating the survey.
  * @param {!object} params.surveyInfo - The survey info to insert.
- * @param {boolean} [params.createRootEntityDef=true] - Whether to create the root entity definition.
- * @param {boolean} [params.system=false] - Whether the creation comes from a real user or it's a system activity (survey import).
- * @param {boolean} [params.updateUserPrefs=true] - Whether to update the user preferred survey after the creation.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
+ * @param {boolean} [params.createRootEntityDef] - Whether to create the root entity definition.
+ * @param {boolean} [params.system] - Whether the creation comes from a real user or it's a system activity (survey import).
+ * @param {boolean} [params.updateUserPrefs] - Whether to update the user preferred survey after the creation.
+ * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<Survey>} - The newly created survey object.
  */
 export const insertSurvey = async (params, client = db) => {
@@ -362,7 +361,7 @@ export const fetchUserSurveysInfo = async ({
     }
     try {
       const canHaveData = Survey.canHaveData(survey)
-      const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId })
+      const { count: filesCount, total: filesSize } = await SurveyFileManager.fetchCountAndTotalFilesSize({ surveyId })
 
       Object.assign(surveyWithCounts, {
         nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
@@ -416,7 +415,8 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
     if (!Validation.isValid(validation)) {
       return assocSurveyInfo({ validation })
     }
-    const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
+    const surveyPrev = await fetchSurveyById({ surveyId, draft: true }, t)
+    const surveyInfoPrev = Survey.getSurveyInfo(surveyPrev)
     const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
     for (const [key, value] of Object.entries(props)) {
@@ -434,8 +434,36 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
         }
       }
     }
-    return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
+    const surveyUpdated = await fetchSurveyById({ surveyId, draft: true, validate: true }, t)
+    const surveyInfoUpdated = Survey.getSurveyInfo(surveyUpdated)
+    const preloadedMapLayersUpdated = Survey.getPreloadedMapLayers(surveyInfoUpdated)
+    for (const preloadedMapLayer of preloadedMapLayersUpdated) {
+      const fileUuid = SurveyFile.getUuid(preloadedMapLayer)
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t)
+    }
+    await SurveyFileManager.deleteTemporaryFiles(surveyId, t)
+
+    return surveyUpdated
   })
+
+export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
+  const survey = await fetchSurveyById({ surveyId, draft: true }, client)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const preloadedMapLayers = Survey.getPreloadedMapLayers(surveyInfo)
+  const preloadedMapLayerFileUuids = new Set(preloadedMapLayers.map(SurveyFile.getUuid))
+  const preloadedMapLayerFileSummaries = await SurveyFileManager.fetchFileSummariesByType(
+    { surveyId, type: SurveyFile.SurveyFileType.preloadedMapLayer },
+    client
+  )
+  const preloadedMapLayerFileSummariesToDelete = preloadedMapLayerFileSummaries.filter(
+    (fileSummary) => !preloadedMapLayerFileUuids.has(SurveyFile.getUuid(fileSummary))
+  )
+  const fileUuidsToDelete = preloadedMapLayerFileSummariesToDelete.map(SurveyFile.getUuid)
+  if (fileUuidsToDelete.length > 0) {
+    await SurveyFileManager.deleteFilesAndContentByUuids({ surveyId, fileUuids: fileUuidsToDelete }, client)
+    Logger.debug(`Deleted ${fileUuidsToDelete.length} unused preloaded map layer files of survey ${surveyId}`)
+  }
+}
 
 export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
   client.tx(async (t) => {
@@ -453,10 +481,10 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, cl
     throw new Error(`Configuration key update not supported: ${key}`)
   }
   const valueLimited = Numbers.limit({
-    minValue: FileManager.defaultSurveyFilesTotalSpaceMB,
-    maxValue: FileManager.maxSurveyFilesTotalSpaceMB,
+    minValue: SurveyFileManager.defaultSurveyFilesTotalSpaceMB,
+    maxValue: SurveyFileManager.maxSurveyFilesTotalSpaceMB,
   })(value)
-  if (valueLimited === FileManager.defaultSurveyFilesTotalSpaceMB) {
+  if (valueLimited === SurveyFileManager.defaultSurveyFilesTotalSpaceMB) {
     await SurveyRepository.clearSurveyConfiguration({ surveyId }, client)
   } else {
     await SurveyRepository.updateSurveyConfigurationProp({ surveyId, key, value: String(valueLimited) }, client)
@@ -483,9 +511,9 @@ export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = Surve
 // ====== DELETE
 export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, client = db) => {
   // fetch file uuids to delete before survey schema is dropped
-  const filesToDeleteUuids = !FileManager.isFileContentStoredInDB()
-    ? await FileManager.fetchFileUuidsBySurveyId({ surveyId }, client)
-    : []
+  const filesToDeleteUuids = SurveyFileManager.isFileContentStoredInDB()
+    ? []
+    : await SurveyFileManager.fetchFileUuidsBySurveyId({ surveyId }, client)
 
   await client.tx(async (t) => {
     if (deleteUserPrefs) {
@@ -496,7 +524,7 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
     await SchemaRdbRepository.dropSchema(surveyId, t)
   })
   if (filesToDeleteUuids.length > 0) {
-    await FileManager.deleteSurveyFilesContentByUuids({ surveyId, fileUuids: filesToDeleteUuids })
+    await SurveyFileManager.deleteFilesContentByUuids({ surveyId, fileUuids: filesToDeleteUuids })
   }
 }
 

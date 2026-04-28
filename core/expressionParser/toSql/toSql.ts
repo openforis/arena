@@ -173,7 +173,13 @@ const functionsByType: Record<string, (node: Record<string, unknown>, params: Sq
   [types.CallExpression]: call,
 }
 
-_toSql = (expression: Record<string, unknown>, params: SqlParams = {}): SqlResult =>
-  functionsByType[expression.type as string](expression, params)
+_toSql = (expression: Record<string, unknown>, params: SqlParams = {}): SqlResult => {
+  const { type } = expression
+  const fn = functionsByType[expression.type as string]
+  if (!fn) {
+    throw new SystemError('appErrors:undefinedExpressionType', { type })
+  }
+  return fn(expression, params)
+}
 
 export const toSql = _toSql

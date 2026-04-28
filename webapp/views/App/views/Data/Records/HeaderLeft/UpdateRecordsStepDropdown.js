@@ -53,14 +53,14 @@ export const UpdateRecordsStepDropdown = ({ onRecordsUpdate, records }) => {
     if (count === 0) {
       dispatch(
         NotificationActions.showNotification({
-          key: 'dataView.records.noSelectedRecordsInStep',
+          key: 'dataView:records.noSelectedRecordsInStep',
           params: { step: stepFromLabel },
         })
       )
     } else {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'dataView.records.confirmUpdateRecordsStep',
+          key: 'dataView:records.confirmUpdateRecordsStep',
           params: {
             count,
             stepFrom: stepFromLabel,
@@ -78,7 +78,7 @@ export const UpdateRecordsStepDropdown = ({ onRecordsUpdate, records }) => {
             })
             dispatch(LoaderActions.hideLoader())
 
-            dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordsUpdated', params: { count } }))
+            dispatch(NotificationActions.notifyInfo({ key: 'dataView:recordsUpdated', params: { count } }))
 
             onRecordsUpdate()
           },
@@ -91,10 +91,10 @@ export const UpdateRecordsStepDropdown = ({ onRecordsUpdate, records }) => {
     <Dropdown
       items={Object.values(updateTypes).map((key) => ({
         value: key,
-        label: i18n.t(`dataView.records.${key}`),
+        label: i18n.t(`dataView:records.${key}`),
       }))}
       onChange={(item) => moveRecords(item.value)}
-      placeholder={i18n.t('dataView.records.updateRecordsStep')}
+      placeholder={i18n.t('dataView:records.updateRecordsStep')}
       searchable={false}
       selection={null}
     />

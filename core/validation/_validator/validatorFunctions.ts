@@ -38,15 +38,15 @@ export const validateRequired =
 
 export const validateItemPropUniqueness =
   (errorKey: string) =>
-  (items: unknown[]): ValidatorFn =>
-  (propName, item) => {
-    const hasDuplicates = R.any(
-      (i) =>
-        !ObjectUtils.isEqual(i as Record<string, unknown>)(item as Record<string, unknown>) &&
-        getProp(propName)(i) === getProp(propName)(item),
-      items
-    )
-
+  (items: Record<string, unknown>[]): ValidatorFn =>
+  (propName, item: Record<string, unknown>) => {
+    const hasDuplicates =
+      items &&
+      R.any(
+        (i: Record<string, unknown>) =>
+          !ObjectUtils.isEqual(i)(item) && getProp(propName)(i) === getProp(propName)(item),
+        items
+      )
     return hasDuplicates ? { key: errorKey } : null
   }
 

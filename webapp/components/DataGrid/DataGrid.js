@@ -25,7 +25,9 @@ const DataGrid = (props) => {
     disableSelectionOnClick = true,
     getRowClassName,
     getRowId,
+    hideFooterPagination = false,
     initialState,
+    onRowDoubleClick,
     rows,
   } = props
 
@@ -44,7 +46,9 @@ const DataGrid = (props) => {
       getRowClassName={getRowClassName}
       getRowHeight={getRowHeight}
       getRowId={getRowId}
+      hideFooterPagination={hideFooterPagination}
       initialState={initialState}
+      onRowDoubleClick={onRowDoubleClick}
       rows={rows}
       slots={allowExportToCsv ? { footer: FooterWithExport({ exportFileName }) } : undefined}
     />
@@ -63,7 +67,9 @@ DataGrid.propTypes = {
   exportFileName: PropTypes.string,
   getRowClassName: PropTypes.func,
   getRowId: PropTypes.func,
+  hideFooterPagination: PropTypes.bool,
   initialState: PropTypes.object,
+  onRowDoubleClick: PropTypes.func,
   rows: PropTypes.array.isRequired,
 }
 

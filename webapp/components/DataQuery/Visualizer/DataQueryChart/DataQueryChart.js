@@ -43,7 +43,7 @@ export const DataQueryChart = (props) => {
     return null
   }
   if (dataEmpty) {
-    return i18n.t('dataView.dataVis.noData')
+    return i18n.t('dataView:dataVis.noData')
   }
 
   return (
@@ -52,7 +52,7 @@ export const DataQueryChart = (props) => {
         className="btn-download"
         onClick={downloadChartToPng}
         showLabel={false}
-        title="dataView.charts.downloadToPng"
+        title="dataView:charts.downloadToPng"
       />
       <div className="data-query-chart-wrapper" ref={wrapperRef}>
         {React.createElement(componentsByType[chartType], { data, nodeDefLabelType })}

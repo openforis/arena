@@ -110,6 +110,8 @@ export const {
   getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,
   getSamplingPolygon,
+  isPreloadedMapLayersEnabled,
+  getPreloadedMapLayers,
   getSecurity,
   getSRS,
   getSRSCodes,

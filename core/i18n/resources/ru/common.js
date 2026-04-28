@@ -255,7 +255,7 @@ export default {
   header: {
     myProfile: 'Мой профиль',
     qrCodeLoginDialog: {
-      title: 'Вход из Arena Mobile с помощью QR-кода',
+      title: 'Вход в Arena Mobile с помощью QR-кода',
       instructions: `1. Откройте приложение **Arena Mobile** на вашем мобильном устройстве
 2. Перейдите в меню **Настройки**
 3. Выберите **Подключение к серверу**
@@ -442,6 +442,10 @@ $t(common.raiseTicketInSupportForum)
     errorLoadingRecord: 'Ошибка загрузки записи: {{details}}',
     recordEditModalTitle: 'Запись: {{keyValues}}',
     recordNotFound: 'Запись не найдена',
+    keyAttributeEditing: {
+      lock: 'Заблокировать редактирование ключевого атрибута',
+      unlock: 'Разрешить редактирование ключевого атрибута',
+    },
     lock: 'Заблокировать',
     unlock: 'Разблокировать',
   },
@@ -452,321 +456,6 @@ $t(common.raiseTicketInSupportForum)
       sqlExpression: 'SQL выражение',
     },
     editRecord: 'Редактировать запись',
-  },
-
-  dataExportView: {
-    error: 'Ошибка экспорта данных: {{details}}',
-    optionNotCompatibleWithDataImport: 'Не совместимо с импортом данных',
-    options: {
-      header: '$t(common.options)',
-      fileFormatLabel: 'Формат файла',
-      fileFormat: {
-        csv: 'CSV',
-        xlsx: 'Excel',
-      },
-      includeCategoryItemsLabels: 'Включить метки элементов категории',
-      includeCategories: 'Включить категории',
-      expandCategoryItems: 'Развернуть элементы категории',
-      exportSingleEntitiesIntoSeparateFiles: 'Экспортировать отдельные сущности в отдельные файлы',
-      includeAncestorAttributes: 'Включить атрибуты предков',
-      includeAnalysis: 'Включить результирующие переменные',
-      includeDataFromAllCycles: 'Включить данные из всех циклов',
-      includeDateCreated: 'Включить дату создания',
-      includeFiles: 'Включить файлы',
-      includeFileAttributeDefs: 'Включить столбцы атрибутов файлов',
-      includeInternalUuids: 'Включить внутренние UUID',
-      recordsModifiedAfter: 'Записи, измененные после',
-    },
-    optionsInfo: {
-      expandCategoryItems:
-        'добавляет один логический столбец для каждого элемента категории со значением TRUE, если элемент был выбран, FALSE в противном случае',
-      exportSingleEntitiesIntoSeparateFiles: `экспортирует отдельные сущности в отдельные файлы; если не отмечено, атрибуты, принадлежащие одной сущности, будут включены среди атрибутов ее ближайшей родительской множественной сущности`,
-      includeAnalysis: 'включает атрибуты анализа',
-      includeAncestorAttributes: 'включает атрибуты, принадлежащие родительским сущностям, до корневой сущности',
-      includeCategoryItemsLabels: 'добавляет столбец с меткой для каждого элемента категории',
-      includeCategories: `категории будут экспортированы в подпапку "categories"`,
-      includeDataFromAllCycles:
-        'данные из всех циклов будут включены, в противном случае будет учитываться только выбранный',
-      includeDateCreated: 'включает дату создания каждой сущности (строки) в столбец "date_created"',
-      includeFiles: `экспортирует файлы, связанные с записями, в подпапку "files"`,
-      includeFileAttributeDefs: `добавляет столбцы атрибутов файлов: внутренний идентификатор файла (file_uuid) и имя (file_name)`,
-      includeInternalUuids: 'включает внутренние идентификаторы (UUID) в столбцы, оканчивающиеся суффиксом "_uuid"',
-      recordsModifiedAfter: 'экспортирует только данные из записей, измененных после указанной даты',
-    },
-    startExport: 'Начать экспорт',
-  },
-
-  dataImportView: {
-    confirmDeleteAllRecords: 'Удалить все записи перед импортом?',
-    confirmDeleteAllRecordsInCycle: 'Удалить все записи в цикле {{cycle}} перед импортом?',
-    conflictResolutionStrategy: {
-      label: 'Стратегия разрешения конфликтов',
-      info: 'Что делать, если найдена та же запись (или запись с теми же ключевыми атрибутами)',
-      skipExisting: 'Пропустить, если уже существует',
-      overwriteIfUpdated: 'Перезаписать, если обновлено',
-      merge: 'Объединить записи',
-    },
-    deleteAllRecordsBeforeImport: 'Удалить все записи перед импортом',
-    downloadAllTemplates: 'Скачать все шаблоны',
-    downloadAllTemplates_csv: 'Скачать все шаблоны (CSV)',
-    downloadAllTemplates_xlsx: 'Скачать все шаблоны (Excel)',
-    downloadTemplate: 'Скачать шаблон',
-    downloadTemplate_csv: 'Скачать шаблон (CSV)',
-    downloadTemplate_xlsx: 'Скачать шаблон (Excel)',
-    errors: {
-      rowNum: 'Строка #',
-    },
-    forceImportFromAnotherSurvey: 'Принудительный импорт из другого опроса',
-
-    importFromArena: 'Arena/Arena Mobile',
-    importFromCollect: 'Collect / Collect Mobile',
-    importFromCsvExcel: 'CSV/Excel',
-    importFromCsvStepsInfo: `### Шаги импорта
-1. Выберите целевую сущность
-2. Скачайте шаблон
-3. Заполните шаблон и сохраните его (если в CSV, используйте кодировку UTF-8)
-4. Проверьте опции
-5. Загрузите файл CSV/Excel
-6. Проверьте файл
-7. Начать импорт
-`,
-    importIntoCycle: 'Импортировать в цикл',
-    importIntoMultipleEntityOrAttribute: 'Импортировать в множественную сущность или атрибут',
-    importType: {
-      label: 'Тип импорта',
-      insertNewRecords: 'Вставить новые записи',
-      updateExistingRecords: 'Обновить существующие записи',
-    },
-    jobs: {
-      ArenaDataImportJob: {
-        importCompleteSuccessfully: `Импорт данных Arena Mobile завершен:
-{{summary}}`,
-        importSummaryItem: {
-          processed: 'обработано записей',
-          insertedRecords: 'создано записей',
-          updatedRecords: 'обновлено записей',
-          skippedRecords: 'пропущено записей',
-          missingFiles: 'отсутствующие файлы',
-        },
-      },
-      CollectDataImportJob: {
-        importCompleteSuccessfully: `Импорт данных Collect завершен:
-        - {{insertedRecords}} записей создано`,
-      },
-      DataImportJob: {
-        importCompleteSummary: `
-        - {{processed}} строк обработано
-        - {{insertedRecords}} записей создано
-        - {{updatedRecords}} записей обновлено
-        - {{entitiesCreated}} сущностей создано
-        - {{entitiesDeleted}} сущностей удалено
-        - {{updatedValues}} значений обновлено`,
-        importCompleteSuccessfully: `## Импорт завершен:
-$t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
-        importWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportJob.importCompleteSuccessfully)
-        - {{insertedFiles}} файлов вставлено
-        - {{updatedFiles}} файлов обновлено
-        - {{deletedFiles}} файлов удалено`,
-        importCompleteWithErrors: `## Импорт завершен (с ошибками):
-        - {{processed}} строк обработано`,
-      },
-      DataImportValidationJob: {
-        validationCompleteWithErrors: `## Проверка завершена ({{errorsFoundMessage}})
-        - {{processed}} строк обработано`,
-        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)`,
-        validationCompleteSuccessfully: `## Проверка завершена без ошибок
-        - {{processed}} строк обработано
-        - {{insertedRecords}} записей будет создано
-        - {{updatedRecords}} записей будет обновлено
-        - {{entitiesCreated}} сущностей будет создано
-        - {{entitiesDeleted}} сущностей будет удалено
-        - {{updatedValues}} значений будет обновлено`,
-        validationWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteSuccessfully)
-        - {{insertedFiles}} файлов будет вставлено
-        - {{updatedFiles}} файлов будет обновлено
-        - {{deletedFiles}} файлов будет удалено`,
-      },
-    },
-    options: {
-      header: '$t(common.options)',
-      abortOnErrors: 'Прервать при ошибках',
-      preventAddingNewEntityData: 'Запретить добавление новых данных сущностей',
-      preventUpdatingRecordsInAnalysis: 'Запретить обновление записей на этапе анализа',
-      includeFiles: 'Включить файлы',
-      deleteExistingEntities: `удалить данные выбранной сущности во всех записях`,
-    },
-    optionsInfo: {
-      deleteExistingEntities: `ВНИМАНИЕ: все сущности "{{nodeDefName}}"
-и все их потомки во всех записях
-будут удалены перед вставкой новых.`,
-    },
-    startImport: 'Начать импорт',
-    startImportConfirm: `Нажав "ОК", вы начнете процесс импорта.
-**Отменить изменения будет невозможно.**
-Вы уверены, что хотите продолжить?`,
-    startImportConfirmWithDeleteExistingEntities: `$t(dataImportView.startImportConfirm)
-** (выбрана опция $t(dataImportView.options.deleteExistingEntities): существующие сущности будут удалены перед созданием новых) **
-`,
-    steps: {
-      selectImportType: 'Выбрать тип импорта',
-      selectCycle: 'Выбрать цикл',
-      selectEntity: 'Выбрать сущность',
-      selectFile: 'Выбрать файл',
-      startImport: 'Начать импорт',
-    },
-    templateForImport: 'Шаблон для импорта',
-    templateFor_specificDataImport_csv: 'Шаблон для импорта данных (CSV)',
-    templateFor_specificDataImport_xlsx: 'Шаблон для импорта данных (Excel)',
-    templateFor_genericDataImport_csv: 'Шаблон для импорта данных (общий, CSV)',
-    templateFor_genericDataImport_xlsx: 'Шаблон для импорта данных (общий, Excel)',
-    validateFile: 'Проверить файл',
-    validateFileInfo:
-      'Процесс проверки проверяет, что файл содержит действительные данные в соответствии с типом данных каждого атрибута.',
-  },
-
-  dataView: {
-    charts: {
-      downloadToPng: 'Скачать диаграмму в PNG',
-      warning: {
-        selectOneDimensionAndOneMeasure: 'Пожалуйста, выберите одно измерение и одну меру для отображения диаграммы',
-        selectAtLeast2NumericAttributes: 'Пожалуйста, выберите 2 числовых атрибута для отображения диаграммы',
-        tooManyItemsToShowChart: `Слишком много элементов для отображения диаграммы;
-ожидается максимум {{maxItems}} элементов.
-Пожалуйста, уточните ваш запрос (например, добавьте фильтр), чтобы уменьшить количество элементов.
-`,
-      },
-      type: {
-        area: 'Диаграмма с областями',
-        bar: 'Столбчатая диаграмма',
-        line: 'Линейная диаграмма',
-        pie: 'Круговая диаграмма',
-        scatter: 'Точечная диаграмма',
-      },
-    },
-    dataQuery: {
-      deleteConfirmMessage: 'Удалить запрос "{{name}}"?',
-      displayType: {
-        chart: 'Диаграмма',
-        table: 'Таблица',
-      },
-      manageQueries: 'Управление запросами',
-      mode: {
-        label: 'Режим:',
-        aggregate: 'Агрегировать',
-        raw: 'Исходные данные',
-        rawEdit: 'Редактировать исходные данные',
-      },
-      replaceQueryConfirmMessage: 'Заменить текущий запрос выбранным?',
-      showCodes: 'Показать коды',
-    },
-    editSelectedRecord: 'Редактировать выбранную запись',
-    filterAttributeTypes: 'Фильтр типов атрибутов',
-    filterRecords: {
-      buttonTitle: 'Фильтр',
-      expressionEditorHeader: 'Выражение для фильтрации записей',
-    },
-    invalidRecord: 'Неверная запись',
-    nodeDefsSelector: {
-      hide: 'Скрыть селектор определений узлов',
-      show: 'Показать селектор определений узлов',
-      nodeDefFrequency: `{{nodeDefLabel}} (частота)`,
-    },
-    records: {
-      clone: 'Клонировать',
-      confirmDeleteRecord: `Удалить запись "{{keyValues}}"?`,
-      confirmDeleteSelectedRecord_one: `Удалить выбранную запись?`,
-      confirmDeleteSelectedRecord_other: `Удалить выбранные {{count}} записей?`,
-      confirmMergeSelectedRecords: `### Объединить выбранные записи в одну?
-
-- запись "источник" будет объединена с записью "цель":
-  - источник: [{{sourceRecordKeys}}], изменено {{sourceRecordModifiedDate}};
-  - цель: [{{targetRecordKeys}}], изменено {{targetRecordModifiedDate}};
-
-- предварительный просмотр результата будет показан до выполнения объединения;
-
-- при подтверждении объединения, **запись-источник БУДЕТ УДАЛЕНА**`,
-      confirmUpdateRecordsStep: `Переместить выбранные {{count}} записей из {{stepFrom}} в {{stepTo}}?`,
-      confirmUpdateRecordOwner: `Изменить владельца выбранной записи на {{ownerName}}?`,
-      confirmValidateAllRecords: `Перепроверить все записи?\n\nЭто может занять несколько минут.`,
-      deleteRecord: 'Удалить запись',
-      demoteAllRecordsFromAnalysis: 'Анализ -> Очистка',
-      demoteAllRecordsFromCleansing: 'Очистка -> Ввод',
-      editRecord: 'Редактировать запись',
-      exportList: 'Экспортировать список',
-      exportData: 'Экспортировать данные',
-      exportDataSummary: 'Экспортировать сводку данных',
-      filterPlaceholder: 'Фильтровать по ключам или владельцу',
-      merge: {
-        label: 'Объединить',
-        confirmLabel: 'Подтвердить объединение',
-        confirmTooManyDifferencesMessage: `**Слишком много различий**.
-Похоже, записи сильно отличаются друг от друга.
-Многие атрибуты (~{{nodesUpdated}}) будут обновлены во время объединения.
-Продолжить предварительный просмотр объединения?`,
-        noChangesWillBeApplied: `Изменения не будут применены к целевой записи.
-Объединение не может быть выполнено.`,
-        performedSuccessfullyMessage: 'Объединение записей выполнено успешно!',
-        previewTitle: 'Предварительный просмотр объединения (запись {{keyValues}})',
-      },
-      noRecordsAdded: 'Нет добавленных записей',
-      noRecordsAddedForThisSearch: 'Записей не найдено',
-      noSelectedRecordsInStep: 'Нет выбранных записей на шаге {{step}}',
-      owner: 'Владелец',
-      promoteAllRecordsToAnalysis: 'Очистка -> Анализ',
-      promoteAllRecordsToCleansing: 'Ввод -> Очистка',
-      step: 'Шаг',
-      updateRecordsStep: 'Обновить шаг записей',
-      validateAll: 'Проверить всё',
-      viewRecord: 'Просмотреть запись',
-    },
-    recordsClone: {
-      title: 'Клонирование записей',
-      fromCycle: 'Из цикла',
-      toCycle: 'В цикл',
-      confirmClone: `Клонировать записи из цикла {{cycleFrom}} в цикл {{cycleTo}}?\n
-(Будут клонированы только записи, которых еще нет в цикле {{cycleTo}})`,
-      startCloning: 'Начать клонирование',
-      cloneComplete: 'Клонирование завершено. {{recordsCloned}} записей клонировано из {{cycleFrom}} в {{cycleTo}}',
-      error: {
-        cycleToMissing: 'Пожалуйста, выберите "В цикл"',
-        cycleToMustBeDifferentFromCycleFrom: '"В цикл" должен отличаться от "Из цикла"',
-      },
-      source: {
-        label: 'Источник',
-        allRecords: 'Все записи в цикле {{cycleFrom}}, которых еще нет в цикле {{cycleTo}}',
-        selectedRecords: 'Только выбранные {{selectedRecordsCount}} записей',
-      },
-    },
-    recordDeleted_one: `Запись успешно удалена!`,
-    recordDeleted_other: `{{count}} записей успешно удалено!`,
-    recordsSource: {
-      label: 'Источник',
-    },
-    recordsUpdated: '{{count}} записей успешно обновлено!',
-    rowNum: 'Строка #',
-    selectedAttributes: 'Выбранные атрибуты:',
-    selectedDimensions: 'Выбранные измерения',
-    selectedMeasures: 'Выбранные меры',
-    sortableItemsInfo: 'Перетащите, чтобы отсортировать',
-    showValidationReport: 'Показать отчет о проверке',
-    sort: 'Сортировать',
-    dataExport: {
-      source: {
-        label: 'Источник',
-        allRecords: 'Все записи',
-        filteredRecords: 'Только отфильтрованные записи',
-        selectedRecord: 'Только выбранная запись',
-        selectedRecord_other: 'Только выбранные {{count}} записей',
-      },
-      title: 'Экспорт данных',
-    },
-    dataVis: {
-      errorLoadingData: 'Ошибка загрузки данных',
-      noData: 'Этот запрос не вернул данных',
-      noSelection:
-        'Пожалуйста, сделайте выбор, используя левую панель, или выберите существующий запрос из "Управление запросами"',
-    },
-    viewSelectedRecord: 'Просмотреть выбранную запись',
   },
 
   mapView: {
@@ -836,6 +525,11 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
     onlyOwn: 'Только собственные опросы',
     records: 'Записи',
     recordsCreatedWithMoreApps: 'Записи, созданные с использованием нескольких приложений:',
+    status: {
+      published: 'Опубликован',
+      draft: 'Черновик',
+      'published-draft': 'Опубликован/Черновик',
+    },
   },
 
   usersAccessRequestView: {
@@ -1011,7 +705,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       surveyNotPublished: '$t(chainView.cannotStartRStudio.common): сначала опубликуйте опрос',
     },
     nonResponseBiasCorrection: 'Коррекция смещения из-за неответной реакции',
-    nonResponseBiasCorrectionTip: `Для реализации этого метода добавьте 'design_psu' и 'design_ssu' в категорию страты как дополнительные свойства.`,
+    nonResponseBiasCorrectionInfo: `Чтобы реализовать метод корректировки по весовым классам, добавьте 'design_psu' и 'design_ssu' в таблицу категорий страты как дополнительные числовые свойства.`,
     pValue: 'P-значение',
     resultsBackFromRStudio: 'Результаты получены из RStudio',
     samplingDesign: 'Дизайн выборки',
@@ -1035,6 +729,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         dimensionsSeparate: 'Измерения отдельно',
       },
       reportingArea: 'Общая площадь отчетности (га) (Необязательно)',
+      reportingAreaInfo: `При стратифицированной выборке укажите площади страт в таблице категорий атрибута страты (название столбца 'area')`,
     },
     stratumAttribute: 'Атрибут страты',
     postStratificationAttribute: 'Атрибут послестратификации',
@@ -1086,7 +781,9 @@ $t(common.cantUndoWarning)`,
   chain: {
     quantitative: 'Количественный',
     categorical: 'Категориальный',
-    emptyNodeDefs: '$t(validationErrors.analysis.analysisNodeDefsRequired)',
+    addQuantitative: 'Добавить количественный атрибут',
+    addCategorical: 'Добавить категориальный атрибут',
+    emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
     entityExcludedInRStudioScripts:
       'сущность и все связанные результирующие переменные будут исключены из скриптов RStudio',
     entityWithoutData: 'Сущность {{name}} не содержит данных; $t(chain.entityExcludedInRStudioScripts)',
@@ -1127,9 +824,12 @@ $t(common.appNameFull)
  
  * Разработано: $t(links.openforis)
  * Версия: {{version}}
+ * Веб-сайт: $t(links.openforisArenaWebsite)
+ * Видеоуроки Arena в Академии онлайн-обучения ФАО: $t(links.arenaVideoTutorialsInFaoElearningAcademy)
+ * Видеоуроки Arena на YouTube: $t(links.arenaVideoTutorialsInYouTube)
  * Форум поддержки: $t(links.supportForum)
- * Arena на GitHub: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
- * Скрипты Arena R на GitHub: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
+ * Arena на GitHub: $t(links.arenaInGitHub)
+ * Скрипты Arena R на GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
   },
@@ -1382,6 +1082,7 @@ $t(common.appNameFull)
       family: 'Семейство',
       genus: 'Род',
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
+      synonym: 'Синоним / Латинское название',
       extraPropsNotDefined: 'Дополнительные свойства не определены для этой таксономии',
     },
     taxaCount: 'Количество таксонов',
@@ -1476,244 +1177,6 @@ $t(common.cantUndoWarning)`,
     },
     name: 'Название свойства {{position}}',
     value: 'Значение',
-  },
-
-  // ===== All validation errors
-  validationErrors: {
-    // Common
-    invalidEmail: 'Неверный адрес электронной почты',
-    invalidField: '"{{field}}" недействителен',
-    invalidNumber: 'Неверное число',
-    invalidDate: 'Неверная дата',
-    minLengthNotRespected: 'Минимальная длина {{minLength}} символов не соблюдена',
-    nameDuplicate: 'Имя повторяется',
-    nameCannotBeKeyword: `Имя "{{value}}" не может быть использовано: это зарезервированное слово`,
-    nameInvalid:
-      'Имя "{{name}}" недействительно: оно должно быть не более 40 символов и содержать только строчные буквы и цифры, начинаться с буквы, и содержать только символы "-" и "_"',
-    nameRequired: 'Имя обязательно',
-    requiredField: 'Поле {{field}} обязательно',
-    rowsDuplicate: 'строка: {{row}} дублирующая строка: {{duplicateRow}}',
-
-    analysis: {
-      labelDefaultLangRequired: 'Метка на языке по умолчанию для опроса обязательна',
-      analysisNodeDefsRequired: 'Требуется хотя бы один вычисляемый атрибут',
-    },
-
-    categoryEdit: {
-      childrenEmpty: '$t(common.childrenEmpty)',
-      childrenInvalid: 'Хотя бы один неверный дочерний элемент',
-      codeCannotBeKeyword: `Код "{{value}}" не может быть использован: это зарезервированное слово`,
-      codeDuplicate: 'Код повторяется',
-      codeRequired: 'Код обязателен',
-      itemExtraPropDataTypeRequired: 'Тип данных обязателен для $t(extraProp.label) "{{key}}"',
-      itemExtraPropNameInvalid: 'Неверное имя для $t(extraProp.label) "{{key}}"',
-      itemExtraPropInvalidNumber: 'Неверное число для $t(extraProp.label) "{{key}}"',
-      itemExtraPropInvalidGeometryPoint: 'Неверная геометрическая точка для $t(extraProp.label) "{{key}}"',
-      itemsInvalid: 'Хотя бы один неверный элемент',
-      itemsEmpty: 'Определите хотя бы один элемент',
-      levelDuplicate: 'Имя уровня повторяется',
-      levelsInvalid: 'Хотя бы один неверный уровень',
-      nameNotSpecified: 'Имя категории не указано',
-    },
-
-    categoryImport: {
-      cannotDeleteItemsOfPublishedCategory:
-        'Невозможно удалить опубликованные элементы категории. Элементы, отсутствующие в импортированном файле: {{deletedItemCodes}}',
-      cannotDeleteLevelsOfPublishedCategory:
-        'Невозможно удалить уровни опубликованной категории. Уровни, отсутствующие в импортированном файле: {{deletedLevelNames}}',
-      codeColumnMissing: 'Должен быть хотя бы один столбец "code"',
-      codeRequired: '{{columnName}}: требуется код',
-      codeDuplicate: '{{columnName}}: дублирующий код "{{code}}"',
-      columnMissing: 'Отсутствует столбец: {{columnNameMissing}}',
-      emptyHeaderFound: 'Файл содержит пустой заголовок',
-      emptyFile: '$t(validationErrors.dataImport.emptyFile)',
-      invalidImportFile:
-        'ZIP-файл должен содержать только файлы .csv или .xlsx (по одному для каждой категории), без каких-либо каталогов',
-      invalidParentItemOrder: 'Элемент с кодами {{parentItemCodes}} должен стоять перед своими дочерними элементами',
-      nameDuplicate: 'Категория с таким именем уже существует: {{name}}',
-      srsNotDefined: 'SRS с кодом {{srs}} не определено в опросе',
-    },
-
-    dataImport: {
-      emptyFile: 'Файл, который вы пытаетесь импортировать, пуст',
-      invalidHeaders: 'Неверные столбцы: {{invalidHeaders}}',
-      invalidBoolean: 'Неверное логическое значение в столбце {{headers}}: {{value}}',
-      invalidCode: `Неверный код для атрибута '{{attributeName}}': {{code}}`,
-      invalidCoordinate: 'Неверная координата в столбце {{headers}}: {{value}}',
-      invalidDate:
-        'Неверная дата в столбце {{headers}}: {{value}}. Даты должны быть отформатированы как YYYY-MM-DD или DD/MM/YYYY. Например, 2023-01-15 или 15/01/2023',
-      invalidNumber: 'Неверное число в столбце {{headers}}: {{value}}',
-      invalidTaxonCode: 'Неверный код в столбце {{headers}}: {{value}}',
-      invalidTime:
-        'Неверное время в столбце {{headers}}: {{value}}. Время должно быть отформатировано как HH:mm. Например, 09:45 или 16:30',
-      missingRequiredHeaders: 'Отсутствуют обязательные столбцы: {{missingRequiredHeaders}}',
-      errorUpdatingValues: 'Ошибка обновления значений: {{details}}',
-      multipleRecordsMatchingKeys: 'Найдено несколько записей, соответствующих ключам "{{keyValues}}"',
-      recordAlreadyExisting: 'Запись с ключами "{{keyValues}}" уже существует',
-      recordInAnalysisStepCannotBeUpdated:
-        'Запись с ключами "{{keyValues}}" находится на этапе анализа и не может быть обновлена',
-      recordKeyMissingOrInvalid: 'Отсутствует или неверное значение для ключевого атрибута "{{keyName}}"',
-      recordNotFound: 'Запись с ключами "{{keyValues}}" не найдена',
-    },
-
-    expressions: {
-      cannotGetChildOfAttribute: 'невозможно получить дочерний узел {{childName}} атрибута {{parentName}}',
-      cannotUseCurrentNode: 'невозможно использовать текущий узел {{name}} в этом выражении',
-      circularDependencyError: 'невозможно сослаться на узел {{name}}, потому что он ссылается на текущий узел',
-      expressionInvalid: 'Неверное выражение: {{details}}',
-      unableToFindNode: 'невозможно найти узел: {{name}}',
-      unableToFindNodeChild: 'невозможно найти дочерний узел: {{name}}',
-      unableToFindNodeParent: 'невозможно найти родительский узел: {{name}}',
-      unableToFindNodeSibling: 'невозможно найти родственный узел: {{name}}',
-    },
-
-    extraPropEdit: {
-      nameInvalid: 'Неверное имя',
-      nameRequired: 'Имя обязательно',
-      dataTypeRequired: 'Тип данных обязателен',
-      valueRequired: 'Значение обязательно',
-    },
-
-    nodeDefEdit: {
-      analysisParentEntityRequired: 'Сущность обязательна',
-      applyIfDuplicate: 'Условие "$t(nodeDefEdit.expressionsProp.applyIf)" повторяется',
-      applyIfInvalid: 'Неверное условие "$t(nodeDefEdit.advancedProps.relevantIf)"',
-      columnWidthCannotBeGreaterThan: 'Ширина столбца не может быть больше {{max}}',
-      columnWidthCannotBeLessThan: 'Ширина столбца не может быть меньше {{min}}',
-      countMaxMustBePositiveNumber: 'Максимальное количество должно быть положительным целым числом',
-      countMinMustBePositiveNumber: 'Минимальное количество должно быть положительным целым числом',
-      categoryRequired: 'Категория обязательна',
-      childrenEmpty: '$t(common.childrenEmpty)',
-      defaultValuesInvalid: 'Неверные "Значения по умолчанию"',
-      defaultValuesNotSpecified: 'Значение по умолчанию не указано',
-      entitySourceRequired: 'Источник сущности обязателен',
-      expressionApplyIfOnlyLastOneCanBeEmpty:
-        'Только последнее выражение может иметь пустое условие "$t(nodeDefEdit.expressionsProp.applyIf)"',
-      expressionDuplicate: 'Выражение повторяется',
-      expressionRequired: 'Выражение обязательно',
-      formulaInvalid: 'Формула неверна',
-      keysEmpty: 'Определите хотя бы один ключевой атрибут',
-
-      keysExceedingMax: 'Превышено максимальное количество ключевых атрибутов',
-      maxFileSizeInvalid: 'Максимальный размер файла должен быть больше 0 и меньше {{max}}',
-      nameInvalid:
-        'Имя недействительно (оно должно содержать только строчные буквы, цифры и подчеркивания, начинаться с буквы)',
-      taxonomyRequired: 'Таксономия обязательна',
-      validationsInvalid: 'Неверные "Проверки"',
-      countMaxInvalid: 'Неверное "Максимальное количество"',
-      countMinInvalid: 'Неверное "Минимальное количество"',
-    },
-
-    record: {
-      keyDuplicate: 'Дубликат ключа записи',
-      entityKeyDuplicate: 'Дубликат ключа сущности',
-      entityKeyValueNotSpecified: 'Значение ключа для "{{keyDefName}}" не указано',
-      missingAncestorForEntity: 'Невозможно найти "{{ancestorName}}" с этими ключами: {{keyValues}}',
-      oneOrMoreInvalidValues: 'Одно или несколько значений недействительны',
-      uniqueAttributeDuplicate: 'Дублирующее значение',
-      valueInvalid: 'Неверное значение',
-      valueRequired: 'Требуемое значение',
-    },
-
-    recordClone: {
-      differentKeyAttributes: 'Ключевые атрибуты отличаются в Цикле {{cycleFrom}} и Цикле {{cycleTo}}',
-    },
-
-    surveyInfoEdit: {
-      langRequired: 'Язык обязателен',
-      srsRequired: 'Система пространственной привязки обязательна',
-      cycleRequired: 'Цикл обязателен',
-      cyclesRequired: 'Должен быть определен хотя бы один цикл',
-      cyclesExceedingMax: 'Опрос может иметь не более 10 циклов',
-      cycleDateStartBeforeDateEnd: 'Дата начала цикла должна быть раньше даты его окончания',
-      cycleDateStartAfterPrevDateEnd: 'Дата начала цикла должна быть после даты окончания предыдущего цикла',
-      cycleDateStartInvalid: 'Дата начала цикла недействительна',
-      cycleDateStartMandatory: 'Дата начала цикла обязательна',
-      cycleDateEndInvalid: 'Дата окончания цикла недействительна',
-      cycleDateEndMandatoryExceptForLastCycle: 'Дата окончания цикла обязательна для всех циклов, кроме последнего',
-      fieldManualLinksInvalid: 'Неверная ссылка на полевое руководство',
-    },
-
-    surveyLabelsImport: {
-      invalidHeaders: 'Неверные столбцы: {{invalidHeaders}}',
-      cannotFindNodeDef: "Невозможно найти определение атрибута или сущности с именем '{{name}}'",
-    },
-
-    taxonomyEdit: {
-      codeChangedAfterPublishing: `Опубликованный код изменился: '{{oldCode}}' => '{{newCode}}'`,
-      codeDuplicate: 'Дублирующий код {{value}}; $t(validationErrors.rowsDuplicate)',
-      codeRequired: 'Код обязателен',
-      familyRequired: 'Семейство обязательно',
-      genusRequired: 'Род обязателен',
-      scientificNameDuplicate: 'Дублирующее научное название {{value}}; $t(validationErrors.rowsDuplicate)',
-      scientificNameRequired: 'Научное название обязательно',
-      taxaEmpty: 'Пустые таксоны',
-      vernacularNamesDuplicate: `Дублирующее местное название '{{name}}' для языка '{{lang}}'`,
-    },
-
-    taxonomyImportJob: {
-      duplicateExtraPropsColumns: 'Дублирующие столбцы дополнительной информации: {{duplicateColumns}}',
-      invalidExtraPropColumn:
-        'Неверное имя столбца дополнительной информации "{{columnName}}": оно не может быть зарезервированным словом',
-      missingRequiredColumns: 'Отсутствуют обязательные столбцы: {{columns}}',
-    },
-
-    user: {
-      emailRequired: 'Электронная почта обязательна',
-      emailInvalid: 'Неверный адрес электронной почты',
-      emailNotFound: 'Адрес электронной почты не найден',
-      groupRequired: 'Группа обязательна',
-      nameRequired: 'Имя обязательно',
-      titleRequired: 'Звание обязательно',
-      passwordRequired: 'Пароль обязателен',
-      passwordInvalid: 'Пароль не должен содержать пробелов',
-      passwordUnsafe: 'Пароль должен быть не менее 8 символов и содержать строчные буквы, прописные буквы и цифры',
-      passwordsDoNotMatch: `Пароли не совпадают`,
-
-      userNotFound: 'Пользователь не найден. Убедитесь, что email и пароль верны',
-      passwordChangeRequired: 'Требуется смена пароля',
-      passwordResetNotAllowedWithPendingInvitation: `Сброс пароля не разрешен: пользователь был приглашен в опрос, но приглашение еще не принято`,
-    },
-
-    userAccessRequest: {
-      countryRequired: 'Страна обязательна',
-      emailRequired: '$t(validationErrors.user.emailRequired)',
-      firstNameRequired: 'Имя обязательно',
-      institutionRequired: 'Учреждение обязательна',
-      lastNameRequired: 'Фамилия обязательна',
-      purposeRequired: 'Цель обязательна',
-      surveyNameRequired: 'Название опроса обязательно',
-      invalidRequest: 'Неверный запрос на доступ пользователя',
-      userAlreadyExisting: 'Пользователь с адресом электронной почты {{email}} уже существует',
-      requestAlreadySent: `Запрос на доступ для пользователя с адресом электронной почты {{email}} уже отправлен`,
-      invalidReCaptcha: 'Неверная ReCaptcha',
-    },
-
-    userAccessRequestAccept: {
-      accessRequestAlreadyProcessed: 'Запрос на доступ пользователя уже обработан',
-      accessRequestNotFound: 'Запрос на доступ пользователя не найден',
-      emailRequired: '$t(validationErrors.user.emailRequired)',
-      emailInvalid: '$t(validationErrors.user.emailInvalid)',
-      roleRequired: 'Роль обязательна',
-      surveyNameRequired: 'Название опроса обязательно',
-    },
-
-    userPasswordChange: {
-      oldPasswordRequired: 'Старый пароль обязателен',
-      oldPasswordWrong: 'Старый пароль неверен',
-      newPasswordRequired: 'Новый пароль обязателен',
-      confirmPasswordRequired: 'Подтверждение пароля обязательно',
-      confirmedPasswordNotMatching: 'Новый пароль и подтверждение пароля не совпадают',
-    },
-
-    userInvite: {
-      messageContainsLinks: 'Приглашение не может содержать ссылки',
-      messageTooLong: 'Сообщение приглашения слишком длинное (максимум {{maxLength}} символов)',
-    },
-    user2FADevice: {
-      nameDuplicate: 'Устройство с таким именем уже существует',
-      nameRequired: 'Требуется имя устройства',
-    },
   },
 
   record: {

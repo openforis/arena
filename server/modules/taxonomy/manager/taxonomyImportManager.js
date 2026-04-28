@@ -9,6 +9,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as TaxonomyManager from './taxonomyManager'
 import { TaxonComparator } from './taxonComparator'
+import SystemError from '@core/systemError'
 
 const createPredefinedTaxa = (taxonomy) => [
   Taxon.newTaxon({
@@ -43,6 +44,7 @@ export default class TaxonomyImportManager {
       TaxonomyManager.updateTaxa(this.user, this.surveyId, items, this.tx)
     )
     this.insertedCodes = new Set() // Inserted taxa codes
+    this.insertedScientificNames = new Set() // Inserted taxa scientific names
     this.existingTaxaByCode = {} // Existing taxa (indexed by code)
     this.existingTaxaByScientificName = {} // Existing taxa (indexed by scientific name)
   }
@@ -114,6 +116,7 @@ export default class TaxonomyImportManager {
     await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon))
 
     this.insertedCodes.add(Taxon.getCode(taxon))
+    this.insertedScientificNames.add(Taxon.getScientificName(taxon))
 
     return { success: true }
   }
@@ -126,6 +129,15 @@ export default class TaxonomyImportManager {
       createPredefinedTaxa,
       R.filter((taxon) => !this.insertedCodes.has(Taxon.getCode(taxon)))
     )(this.taxonomy)
+
+    for (const predefinedTaxon of predefinedTaxaToInsert) {
+      const scientificName = Taxon.getScientificName(predefinedTaxon)
+      if (this.insertedScientificNames.has(scientificName)) {
+        throw new SystemError('validationErrors:taxonomyImportJob.reservedScientificName', {
+          scientificName,
+        })
+      }
+    }
 
     await Promise.all(predefinedTaxaToInsert.map((predefinedTaxon) => this.addTaxonToUpdateBuffer(predefinedTaxon)))
 

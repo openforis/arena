@@ -1,48 +1,50 @@
 import * as fs from 'fs'
 
 import { NodeValues, Objects } from '@openforis/arena-core'
+import { SurveyDocxGenerator } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
+import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
 import * as Validation from '@core/validation/validation'
 
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { db } from '@server/db/db'
 import * as JobManager from '@server/job/jobManager'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as Response from '@server/utils/response'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
-import * as FileService from './fileService'
 
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
+import RecordsCloneJob from './recordsCloneJob'
+import RecordsValidationJob from './recordsValidationJob'
+import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
-import RecordsCloneJob from './recordsCloneJob'
-import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
-import RecordsValidationJob from './recordsValidationJob'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -291,20 +293,21 @@ export const persistNode = async ({
   const recordUuid = Node.getRecordUuid(node)
 
   if (file) {
-    const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+    const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
     if (filesStatistics.availableSpace < file.size) {
       throw new SystemError('cannotInsertFileExceedingQuota') // do not provide details about available quota to the user
     }
     // Save file to "file" table and set fileUuid and fileName into node value
-    const fileObj = RecordFile.createFile({
+    const fileObj = SurveyFile.createFile({
       uuid: Node.getFileUuid(node),
       name: file.name,
       size: file.size,
       content: fs.readFileSync(file.tempFilePath),
       recordUuid,
       nodeUuid: Node.getUuid(node),
+      type: SurveyFile.SurveyFileType.recordAttachment,
     })
-    await FileService.insertFile(surveyId, fileObj)
+    await SurveyFileService.insertFile(surveyId, fileObj)
   }
 
   _sendNodeUpdateMessage({
@@ -394,7 +397,7 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
     },
   })(record)
 
-  const fileName = RecordFile.getName(file)
+  const fileName = SurveyFile.getName(file)
   const extension = FileUtils.getFileExtension(fileName)
 
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`
@@ -472,3 +475,36 @@ export const mergeRecords = async (
       nodesUpdated: nodesArray.filter(Node.isUpdated).length,
     }
   })
+
+export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lang = null }) => {
+  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true })
+  const cycle = Record.getCycle(record)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    includeAnalysis: false,
+  })
+  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+  const i18n = await i18nFactory.createI18nAsync(langToUse)
+  const { buffer, surveyName } = await SurveyDocxGenerator.generateSurveyDocx({
+    survey,
+    cycle,
+    record,
+    lang: langToUse,
+    i18n,
+  })
+  const fileName = ExportFileNameGenerator.generate({
+    surveyName,
+    cycle,
+    fileType: 'RecordForm',
+    extension: 'docx',
+  })
+  const fileSize = Buffer.byteLength(buffer)
+  Response.sendFileContent({
+    res: outputStream,
+    fileName,
+    content: buffer,
+    contentSize: fileSize,
+    contentType: Response.contentTypes.docx,
+  })
+}

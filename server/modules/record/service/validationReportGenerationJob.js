@@ -1,7 +1,7 @@
 import Job from '@server/job/job'
 
 import * as DateUtils from '@core/dateUtils'
-import i18n from '@core/i18n/i18nFactory'
+import i18nInstance from '@core/i18n/i18nFactory'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ValidationResult from '@core/validation/validationResult'
@@ -40,14 +40,14 @@ export default class VaidationReportGenerationJob extends Job {
       const validation = RecordValidationReportItem.getValidation(item)
 
       const errors = ValidationUtils.getJointMessage({
-        i18n,
+        i18n: i18nInstance,
         survey,
         showKeys: false,
         severity: ValidationResult.severity.error,
       })(validation)
 
       const warnings = ValidationUtils.getJointMessage({
-        i18n,
+        i18n: i18nInstance,
         survey,
         showKeys: false,
         severity: ValidationResult.severity.warning,

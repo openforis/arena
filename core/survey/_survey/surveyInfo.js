@@ -33,6 +33,8 @@ export const keys = {
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
   languages: 'languages',
+  preloadedMapLayers: 'preloadedMapLayers',
+  preloadedMapLayersEnabled: 'preloadedMapLayersEnabled',
   sampleBasedImageInterpretationEnabled: 'sampleBasedImageInterpretationEnabled',
   samplingPolygon: 'samplingPolygon',
   security: 'security',
@@ -57,9 +59,9 @@ export const cycleOneKey = '0'
 export const samplingPointDataCategoryName = 'sampling_point_data'
 
 export const status = {
-  draft: 'DRAFT',
-  published: 'PUBLISHED',
-  publishedDraft: 'PUBLISHED-DRAFT',
+  draft: 'draft',
+  published: 'published',
+  publishedDraft: 'published-draft',
 }
 
 export const getInfo = (survey) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
@@ -109,6 +111,10 @@ export const getLabel = (surveyInfo, lang, defaultToName = true) => {
   }
   return null
 }
+
+export const isPreloadedMapLayersEnabled = ObjectUtils.isPropTrue(keys.preloadedMapLayersEnabled)
+
+export const getPreloadedMapLayers = ObjectUtils.getProp(keys.preloadedMapLayers, [])
 
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled

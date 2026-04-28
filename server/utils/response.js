@@ -17,6 +17,7 @@ const status = {
 
 export const contentTypes = {
   csv: 'text/csv',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   json: 'application/json',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   zip: 'application/zip',
@@ -66,8 +67,8 @@ export const setContentTypeFile = ({ res, fileName, fileSize = null, contentType
   }
 }
 
-export const sendFileContent = (res, fileName, content, fileSize) => {
-  setContentTypeFile({ res, fileName, fileSize })
+export const sendFileContent = ({ res, fileName, content, contentSize, contentType = null }) => {
+  setContentTypeFile({ res, fileName, fileSize: contentSize, contentType })
   res.write(content, 'binary')
   res.end(null, 'binary')
 }

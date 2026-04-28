@@ -14,7 +14,7 @@ const determineContentKey = ({ jobType, dryRun, includeFiles, hasErrors }) => {
   const action = dryRun ? 'validation' : 'import'
   const status = hasErrors ? 'WithErrors' : 'Successfully'
   const actionSuffix = includeFiles ? 'WithFiles' : ''
-  return `dataImportView.jobs.${jobType}.${action}${actionSuffix}Complete${status}`
+  return `dataImportView:jobs.${jobType}.${action}${actionSuffix}Complete${status}`
 }
 
 const cleanupContent = ({ content }) => {
@@ -44,7 +44,7 @@ export const DataImportCompleteDialog = (props) => {
         <Markdown source={contentCleaned} />
         {hasErrors && (
           <JobErrors
-            errorKeyHeaderName="dataImportView.errors.rowNum"
+            errorKeyHeaderName="dataImportView:errors.rowNum"
             exportFileName={errorsExportFileName}
             job={job}
           />

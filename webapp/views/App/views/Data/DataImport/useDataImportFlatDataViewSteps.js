@@ -36,7 +36,7 @@ export const useDataImportFlatDataViewSteps = ({ canSelectCycle, state }) => {
   const activeStep = determineActiveStep({ canSelectCycle, state })
   const stepKeysFiltered = getStepKeysFiltered({ canSelectCycle })
 
-  const steps = stepKeysFiltered.map((key) => ({ key, label: `dataImportView.steps.${key}` }))
+  const steps = stepKeysFiltered.map((key) => ({ key, label: `dataImportView:steps.${key}` }))
 
   return {
     activeStep,

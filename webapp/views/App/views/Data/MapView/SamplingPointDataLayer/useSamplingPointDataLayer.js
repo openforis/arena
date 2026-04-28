@@ -15,7 +15,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { LoaderActions } from '@webapp/store/ui'
 
-import { useMapClusters, useMapLayerAdd } from '../common'
+import { useMapClusters, useMapLayerToggle } from '../common'
 
 const itemsPageSize = 2000
 
@@ -132,9 +132,9 @@ export const useSamplingPointDataLayer = (props) => {
     }
   }, [dispatch, isMountedRef, levelIndex, map, surveyId])
 
-  useMapLayerAdd({
+  useMapLayerToggle({
     layerName: overlayName,
-    callback: () => {
+    onAdd: () => {
       const shouldLoadItems = !loaded && !loading
       if (shouldLoadItems) {
         fetchItemsAndConvertIntoPoints()

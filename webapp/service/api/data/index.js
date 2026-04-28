@@ -31,6 +31,8 @@ export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
   const list = await fetchRecordsSummary({ surveyId, cycle, recordUuid })
   return list?.[0]
 }
+export const getRecordDocxExportUrl = ({ surveyId, recordUuid, lang }) =>
+  `/api/survey/${surveyId}/record/${recordUuid}/export/docx?${new URLSearchParams({ lang })}`
 
 // ==== RECORD FILE
 export const getRecordNodeFileUrl = ({ surveyId, node }) =>
@@ -78,7 +80,7 @@ export const startDataImportFromCsvJob = ({
   const promise = new Promise((resolve, reject) => {
     fileProcessor = new FileProcessor({
       file,
-      chunkProcessor: async ({ chunk, totalChunks, content }) => {
+      chunkProcessor: async ({ chunk, content, totalChunks, totalFileSize }) => {
         const formData = objectToFormData({
           cycle,
           nodeDefUuid,
@@ -86,6 +88,7 @@ export const startDataImportFromCsvJob = ({
           file: content,
           chunk,
           totalChunks,
+          totalFileSize,
           fileFormat,
           dryRun,
           insertNewRecords,
@@ -135,12 +138,13 @@ export const startDataImportFromArenaJob = ({
       fileProcessor = new FileProcessor({
         file,
         chunkSize,
-        chunkProcessor: async ({ chunk, totalChunks, content }) => {
+        chunkProcessor: async ({ chunk, totalChunks, content, totalFileSize }) => {
           const formData = objectToFormData({
             ...commonParameters,
             file: content,
             chunk,
             totalChunks,
+            totalFileSize,
           })
           const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, {
             onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),

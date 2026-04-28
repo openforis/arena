@@ -1,6 +1,6 @@
 import './SurveyCreate.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router'
 
@@ -26,6 +26,10 @@ import { Checkbox, Dropdown } from '@webapp/components/form'
 import { Button, Dropzone, RadioButtonGroup } from '@webapp/components'
 import { SurveyType } from '@webapp/model'
 import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
+import {
+  defaultChunkSize,
+  FileUploadChunkSizeDropdown,
+} from '@webapp/views/App/views/Data/DataImport/FileUploadChunkSizeDropdown'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
@@ -53,6 +57,7 @@ const SurveyCreate = (props) => {
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
   const navigate = useNavigate()
+  const [chunkSize, setChunkSize] = useState(defaultChunkSize)
 
   const {
     newSurvey,
@@ -227,6 +232,7 @@ const SurveyCreate = (props) => {
                   droppedFiles={file ? [file] : []}
                 />
               </div>
+              <FileUploadChunkSizeDropdown onChange={setChunkSize} value={chunkSize} />
             </>
           )}
           <div className="row">
@@ -236,6 +242,7 @@ const SurveyCreate = (props) => {
               onCancel={onImportUploadCancel}
               onUploadComplete={onImportJobStart}
               startFunction={onImport}
+              startFunctionParams={{ chunkSize }}
               testId={TestId.surveyCreate.startImportBtn}
             />
           </div>

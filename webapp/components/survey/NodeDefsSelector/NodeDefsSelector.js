@@ -1,5 +1,5 @@
 import './NodeDefsSelector.scss'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -13,7 +13,7 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 import { ButtonIconFilter } from '@webapp/components/buttons'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useChains, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
@@ -36,11 +36,18 @@ const NodeDefsSelector = (props) => {
 
   const i18n = useI18n()
   const survey = useSurvey()
+  const surveyCycleKey = useSurveyCycleKey()
+  const chains = useChains({ surveyCycleKey })
 
   const [filterTypes, setFilterTypes] = useState([])
   const [filterChainUuids, setFilterChainUuids] = useState([])
-
   const [showFilter, setShowFilter] = useState(false)
+
+  useEffect(() => {
+    if ((!chains || chains.length <= 1) && filterChainUuids.length > 0) {
+      setFilterChainUuids([])
+    }
+  }, [chains, filterChainUuids, setFilterChainUuids])
 
   const onAttributesSelection = useCallback(
     ({ attributeDefUuids, selected }) => {
@@ -62,6 +69,14 @@ const NodeDefsSelector = (props) => {
     [nodeDefUuidsAttributes, onAttributesSelection]
   )
 
+  const nodeDefTypesForFiltering = useMemo(
+    () =>
+      Object.values(NodeDef.nodeDefType).filter(
+        (type) => ![NodeDef.nodeDefType.formHeader, NodeDef.nodeDefType.entity].includes(type)
+      ),
+    []
+  )
+
   return (
     <div className="node-defs-selector">
       <EntitySelector
@@ -76,33 +91,31 @@ const NodeDefsSelector = (props) => {
         className={classNames('btn-s', 'btn-toggle-filter', { highlight: showFilter || filterTypes.length > 0 })}
         disabled={A.isEmpty(nodeDefUuidEntity)}
         onClick={() => setShowFilter(!showFilter)}
-        title="dataView.filterAttributeTypes"
+        title="dataView:filterAttributeTypes"
         variant="outlined"
       />
 
       {showFilter && (
         <>
           <div className="node-defs-selector__settings">
-            {Object.keys(NodeDef.nodeDefType).map((type) =>
-              NodeDef.nodeDefType.entity !== type ? (
-                <button
-                  type="button"
-                  key={type}
-                  className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable', {
-                    active: filterTypes.includes(type),
-                  })}
-                  onClick={() => {
-                    const filterTypesUpdated = filterTypes.includes(type)
-                      ? filterTypes.filter((_type) => _type !== type)
-                      : [...filterTypes, type]
-                    setFilterTypes(filterTypesUpdated)
-                  }}
-                >
-                  <span>{i18n.t(type)}</span>
-                  {NodeDefUIProps.getIconByType(type)}
-                </button>
-              ) : null
-            )}
+            {nodeDefTypesForFiltering.map((type) => (
+              <button
+                type="button"
+                key={type}
+                className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable', {
+                  active: filterTypes.includes(type),
+                })}
+                onClick={() => {
+                  const filterTypesUpdated = filterTypes.includes(type)
+                    ? filterTypes.filter((_type) => _type !== type)
+                    : [...filterTypes, type]
+                  setFilterTypes(filterTypesUpdated)
+                }}
+              >
+                <span>{i18n.t(`nodeDefsTypes.${type}`)}</span>
+                {NodeDefUIProps.getIconByType(type)}
+              </button>
+            ))}
           </div>
           <FilterByChain filterChainUuids={filterChainUuids} setFilterChainUuids={setFilterChainUuids} />
         </>

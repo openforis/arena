@@ -96,10 +96,13 @@ export default class CategoriesImportJob extends Job {
   }
 
   async insertItems(category, levelIndex, parentItem, defaultLanguage, collectItems, tx) {
+    const categoryUuid = Category.getUuid(category)
+    const categoryName = Category.getName(category)
     const level = Category.getLevelByIndex(levelIndex)(category)
     const levelUuid = CategoryLevel.getUuid(level)
 
-    for (const collectItem of collectItems) {
+    for (let itemIndex = 0; itemIndex < collectItems.length; itemIndex++) {
+      const collectItem = collectItems[itemIndex]
       if (this.isCanceled()) {
         break
       }
@@ -111,23 +114,18 @@ export default class CategoriesImportJob extends Job {
         ...CategoryItem.newItem(levelUuid, CategoryItem.getUuid(parentItem), {
           [CategoryItem.keysProps.code]: itemCode,
           [CategoryItem.keysProps.labels]: labels,
+          [CategoryItem.keysProps.index]: itemIndex,
         }),
-        categoryUuid: Category.getUuid(category), // Used to revalidate categories after items import
+        categoryUuid, // Used to revalidate categories after items import
       }
       await this.itemBatchPersister.addItem(item, tx)
 
       // Update qualifiable item codes cache
       if (CollectSurvey.getAttribute('qualifiable')(collectItem) === 'true') {
-        const code = CollectSurvey.getChildElementText('code')(collectItem)
         this.qualifiableItemCodesByCategoryAndLevel = R.pipe(
-          R.pathOr([], [Category.getName(category), String(levelIndex)]),
-          R.ifElse(R.includes(code), R.identity, R.append(code)),
-          (codes) =>
-            R.assocPath(
-              [Category.getName(category), String(levelIndex)],
-              codes,
-              this.qualifiableItemCodesByCategoryAndLevel
-            )
+          R.pathOr([], [categoryName, String(levelIndex)]),
+          R.ifElse(R.includes(itemCode), R.identity, R.append(itemCode)),
+          (codes) => R.assocPath([categoryName, String(levelIndex)], codes, this.qualifiableItemCodesByCategoryAndLevel)
         )(this.qualifiableItemCodesByCategoryAndLevel)
       }
 

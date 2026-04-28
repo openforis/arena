@@ -1,32 +1,22 @@
 import './FilterByChain.scss'
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as Chain from '@common/analysis/chain'
 
-import * as API from '@webapp/service/api'
-
 import { Button } from '@webapp/components/buttons'
 import { useI18n } from '@webapp/store/system'
-import { useSurveyPreferredLang, useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurveyPreferredLang, useSurveyCycleKey, useChains } from '@webapp/store/survey'
 
 const FilterByChain = ({ filterChainUuids = [], setFilterChainUuids = () => {} }) => {
-  const surveyId = useSurveyId()
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const surveyCycleKey = useSurveyCycleKey()
 
-  const [chains, setChains] = useState([])
+  const chains = useChains({ surveyCycleKey })
 
-  useEffect(() => {
-    const fetchChains = async () => {
-      const { chains } = await API.fetchChains({ surveyId, params: { surveyCycleKey } })
-      setChains(chains)
-    }
-
-    fetchChains()
-  }, [surveyId, surveyCycleKey])
+  if (!chains || chains.length <= 1) return null
 
   return (
     <div className="node-defs-selector__chains">

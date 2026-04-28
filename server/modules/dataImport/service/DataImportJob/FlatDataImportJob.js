@@ -3,7 +3,7 @@ import { Objects, RecordUpdateResult } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
@@ -321,16 +321,16 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         const oldNode = Record.getNodeByUuid(Node.getUuid(node))(originalRecord)
         if (!Node.isValueBlank(oldNode)) {
           const fileToDeleteUuid = Node.getFileUuid(oldNode)
-          filesToDeleteByUuid[fileToDeleteUuid] = RecordFile.createFileFromNode({ node: oldNode })
+          filesToDeleteByUuid[fileToDeleteUuid] = SurveyFile.createFileFromNode({ node: oldNode })
         }
         if (!Node.isValueBlank(node)) {
-          const fileSummary = RecordFile.createFileFromNode({ node })
-          const fileUuid = RecordFile.getUuid(fileSummary)
+          const fileSummary = SurveyFile.createFileFromNode({ node })
+          const fileUuid = SurveyFile.getUuid(fileSummary)
           // check duplicates
           if (updatedFilesByUuid[fileUuid]) {
             throw new Error('File with same uuid already inserted: ' + fileUuid)
           }
-          const fileName = RecordFile.getName(fileSummary)
+          const fileName = SurveyFile.getName(fileSummary)
           if (updatedFilesByName[fileName]) {
             throw new Error('File with same name already inserted: ' + fileName)
           }

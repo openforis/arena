@@ -58,8 +58,8 @@ const Records = () => {
       headerLeftComponent={HeaderLeft}
       headerProps={{ navigateToRecord, onRecordsUpdate }}
       module="records/summary"
-      noItemsLabelKey="dataView.records.noRecordsAdded"
-      noItemsLabelForSearchKey="dataView.records.noRecordsAddedForThisSearch"
+      noItemsLabelKey="dataView:records.noRecordsAdded"
+      noItemsLabelForSearchKey="dataView:records.noRecordsAddedForThisSearch"
       onRowDoubleClick={navigateToRecord}
       restParams={{ cycle, includeCounts: true, recordsRequestedAt }}
       rowProps={{ navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid }}

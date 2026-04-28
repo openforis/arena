@@ -18,7 +18,7 @@ const iconByDisplayType = {
 const displayTypeItems = Object.keys(displayTypes).map((displayType) => ({
   key: displayType,
   iconClassName: iconByDisplayType[displayType],
-  label: `dataView.dataQuery.displayType.${displayType}`,
+  label: `dataView:dataQuery.displayType.${displayType}`,
 }))
 
 const iconByChartType = {
@@ -32,7 +32,7 @@ const iconByChartType = {
 const getChartTypeItemByKey = (chartType) => ({
   key: chartType,
   iconClassName: iconByChartType[chartType],
-  title: `dataView.charts.type.${chartType}`,
+  title: `dataView:charts.type.${chartType}`,
 })
 
 const chartMaxItems = 5000
@@ -59,7 +59,7 @@ export const ButtonGroupDisplayType = (props) => {
           if (type === displayTypes.chart && dataCount > chartMaxItems) {
             dispatch(
               NotificationActions.showNotification({
-                key: 'dataView.charts.warning.tooManyItemsToShowChart',
+                key: 'dataView:charts.warning.tooManyItemsToShowChart',
                 params: { maxItems: chartMaxItems },
               })
             )

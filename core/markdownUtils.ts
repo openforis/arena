@@ -6,7 +6,7 @@ const markedOptions = {
   mangle: false,
 } as any
 
-export const parseMarkdown = (source: string): string => {
+export const parseMarkdown = (source: string, sanitize: boolean = true): string => {
   const parsedSource = marked.parse(source, markedOptions) as unknown as string
-  return DOMPurify.sanitize(parsedSource)
+  return sanitize ? DOMPurify.sanitize(parsedSource) : parsedSource
 }

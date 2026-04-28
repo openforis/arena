@@ -18,6 +18,7 @@ export default {
   DataDeleteJob: 'Удаление данных',
   DataImportJob: 'Импорт данных',
   DataImportValidationJob: 'Валидация файла импорта данных',
+  EntitiesDeleteJob: 'Удаление существующих объектов',
   FilesImportJob: 'Импорт файлов',
   MessageSendJob: 'Отправка сообщения',
   NodeDefsImportJob: 'Импорт определений узлов',
@@ -32,6 +33,7 @@ export default {
   SurveyCreatorJob: 'Создание опроса',
   SurveyDependencyGraphsGenerationJob: 'Генерация графов зависимостей опроса',
   SurveyExportJob: 'Экспорт опроса',
+  SurveyFilesImportJob: 'Импорт файлов опроса',
   SurveyIndexGeneratorJob: 'Генератор индекса опроса',
   SurveyInfoValidationJob: 'Валидация информации об опросе',
   SurveyLabelsImportJob: 'Импорт меток опроса',
@@ -46,10 +48,12 @@ export default {
   TaxonomiesValidationJob: 'Валидация таксономий',
   TaxonomyImportJob: 'Импорт таксономии',
   // data export
+  ArenaFileReadJob: 'Чтение файла Arena',
   DataExportJob: 'Экспорт данных',
   DataSummaryExportJob: 'Экспорт сводных данных',
   ZipCreationJob: 'Создание ZIP-файла',
   CSVDataExtraction: 'Извлечение данных',
+  PrepareImportFileJob: 'Подготовка файла импорта',
   // geo
   GeoJsonDataExportJob: 'Экспорт данных GeoJson',
   // import arena survey
@@ -65,7 +69,8 @@ export default {
   CategoriesExportJob: 'Экспорт категорий',
   TaxonomiesExportJob: 'Экспорт таксономий',
   RecordsExportJob: 'Экспорт записей',
-  FilesExportJob: 'Экспорт файлов',
+  RecordFilesExportJob: 'Экспорт файлов записей',
+  SurveyFilesExportJob: 'Экспорт файлов опроса',
   ChainExportJob: 'Экспорт цепочки',
   UsersExportJob: 'Экспорт пользователей',
   ActivityLogExportJob: 'Экспорт журнала активности',

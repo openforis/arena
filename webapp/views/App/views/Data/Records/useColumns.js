@@ -120,7 +120,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
       {
         key: Record.keys.ownerName,
         className: 'width100',
-        header: 'dataView.records.owner',
+        header: 'dataView:records.owner',
         hidden: true,
         renderItem: RecordOwnerColumn,
         sortable: true,
@@ -128,7 +128,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
       },
       {
         key: Record.keys.step,
-        header: 'dataView.records.step',
+        header: 'dataView:records.step',
         sortable: true,
         renderItem: ({ item: record }) => Record.getStep(record),
         width: '5rem',
@@ -155,7 +155,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
             <>
               <Button
                 iconClassName={`icon-16px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}
-                title={`dataView.records.${canEdit ? 'editRecord' : 'viewRecord'}`}
+                title={`dataView:records.${canEdit ? 'editRecord' : 'viewRecord'}`}
                 onClick={onRecordEditButtonClick(record)}
                 variant="text"
               />

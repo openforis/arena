@@ -1,31 +1,37 @@
-import { Schemata } from '@openforis/arena-server'
+import { Schemata, SurveyDocxGenerator } from '@openforis/arena-server'
 
+import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-import * as FileService from '@server/modules/record/service/fileService'
-import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+
+import * as DbUtils from '@server/db/dbUtils'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
-import * as DbUtils from '@server/db/dbUtils'
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
+import * as Response from '@server/utils/response'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyManager from '../manager/surveyManager'
+import * as SurveyFileManager from '../manager/surveyFileManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
-import SurveyExportJob from './surveyExport/surveyExportJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
-import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
 import { SchemaSummary } from './schemaSummary'
-import SurveyLabelsImportJob from './surveyLabelsImportJob'
-import { SurveyLabelsExport } from './surveyLabelsExport'
-import SurveysListExportJob from './SurveysListExportJob'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
+import SurveyExportJob from './surveyExport/surveyExportJob'
+import { SurveyLabelsExport } from './surveyLabelsExport'
+import SurveyLabelsImportJob from './surveyLabelsImportJob'
+import SurveysListExportJob from './SurveysListExportJob'
+import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
 
 const dbMaxAvailableSpace = 1024 * 1024 * 1024 * 5 // 4GB
 
 export const fetchAndAssocStorageInfo = async ({ survey }) => {
   const surveyId = Survey.getId(survey)
-  const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+  const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
   const schema = Schemata.getSchemaSurvey(surveyId)
   const schemaTablesSize = await DbUtils.fetchSchemaTablesSize({ schema })
   const dbStatistics = { usedSpace: schemaTablesSize, totalSpace: dbMaxAvailableSpace }
@@ -110,6 +116,34 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileF
 export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
 
+export const exportSurveyDocx = async ({ surveyId, cycle, outputStream, lang = null, draft = true }) => {
+  const survey = await fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    draft,
+    advanced: false,
+    includeDeleted: false,
+    includeAnalysis: false,
+  })
+  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+  const i18n = await i18nFactory.createI18nAsync(langToUse)
+  const { buffer, surveyName } = await SurveyDocxGenerator.generateSurveyDocx({ survey, cycle, lang: langToUse, i18n })
+  const fileName = ExportFileNameGenerator.generate({
+    surveyName,
+    cycle,
+    fileType: 'SurveyForm',
+    extension: 'docx',
+  })
+  const fileSize = Buffer.byteLength(buffer)
+  Response.sendFileContent({
+    res: outputStream,
+    fileName,
+    content: buffer,
+    contentSize: fileSize,
+    contentType: Response.contentTypes.docx,
+  })
+}
+
 export const deleteSurvey = async (surveyId) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
@@ -119,6 +153,18 @@ export const deleteSurvey = async (surveyId) => {
 export const startLabelsImportJob = ({ user, surveyId, filePath, fileFormat }) => {
   const job = new SurveyLabelsImportJob({ user, surveyId, filePath, fileFormat })
   return JobManager.enqueueJob(job)
+}
+
+export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
+  const content = await FileUtils.readBinaryFile(filePath)
+  const surveyFileToStore = { ...surveyFile, content }
+  await SurveyFileManager.insertFile(surveyId, surveyFileToStore)
+}
+
+export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
+  const summary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const contentStream = await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileUuid })
+  return { summary, contentStream }
 }
 
 export const {

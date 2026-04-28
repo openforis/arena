@@ -6,12 +6,21 @@ import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
 import { FileFormats } from '@core/fileFormats'
 
 import { TreeSelectViewMode } from '@webapp/model'
 import { JobActions } from '@webapp/store/app'
-import { NodeDefsActions, SurveyActions, useIsSurveyDirty, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import {
+  NodeDefsActions,
+  SurveyActions,
+  useIsSurveyDirty,
+  useSurveyCycleKey,
+  useSurveyId,
+  useSurveyInfo,
+  useSurveyPreferredLang,
+} from '@webapp/store/survey'
 import { FileUploadDialogActions } from '@webapp/store/ui'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
@@ -33,6 +42,7 @@ import FormEntryActions from '../components/formEntryActions'
 import FormEditActions from '../components/formEditActions'
 import { usePath } from './usePath'
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 const labelsExportAllowedFileFormats = [FileFormats.csv, FileFormats.xlsx]
 
@@ -42,8 +52,13 @@ const FormHeader = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
+
   const surveyId = useSurveyId()
-  const surveyCycleKey = useSurveyCycleKey()
+  const surveyInfo = useSurveyInfo()
+  const surveyIsDraft = Survey.isDraft(surveyInfo)
+  const cycle = useSurveyCycleKey()
+  const lang = useSurveyPreferredLang()
   const surveyIsDirty = useIsSurveyDirty()
   const nodeDefLabelType = useNodeDefLabelType()
   const nodeDefPage = useNodeDefPage()
@@ -88,11 +103,7 @@ const FormHeader = (props) => {
             label="surveyForm:subPage"
             onClick={() => {
               const propsNodeDef = {
-                [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
-                  surveyCycleKey,
-                  NodeDefLayout.renderType.form,
-                  uuidv4()
-                ),
+                [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.form, uuidv4()),
               }
               dispatch(NodeDefsActions.createNodeDef(nodeDefPage, NodeDef.nodeDefType.entity, propsNodeDef, navigate))
             }}
@@ -131,6 +142,20 @@ const FormHeader = (props) => {
                 key: 'schema-summary-excel',
                 content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} />,
               },
+              ...(experimentalFeatures
+                ? [
+                    {
+                      key: 'survey-docx-export',
+                      content: (
+                        <ButtonDownload
+                          href={API.getSurveyDocxExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
+                          label="surveyForm:exportDocx"
+                          variant="text"
+                        />
+                      ),
+                    },
+                  ]
+                : []),
               ...labelsExportAllowedFileFormats.map((fileFormat) => ({
                 key: `labels-export-${fileFormat}`,
                 content: (

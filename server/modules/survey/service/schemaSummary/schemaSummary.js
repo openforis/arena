@@ -122,6 +122,12 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
     return parentCodeAttribute ? NodeDef.getName(parentCodeAttribute) : ''
   }
 
+  const getCodeAttributeCategoryLevel = (nodeDef) => {
+    if (!NodeDef.isCode(nodeDef)) return ''
+    const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+    return String(categoryLevelIndex + 1)
+  }
+
   const getTaxonomyName = (nodeDef) => {
     if (!NodeDef.isTaxon(nodeDef)) return ''
 
@@ -164,6 +170,7 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
       key: String(NodeDef.isKey(nodeDef)),
       categoryName: getCategoryName(nodeDef),
       parentCode: getParentCodeAttribute(nodeDef),
+      categoryLevel: getCodeAttributeCategoryLevel(nodeDef),
       enumerator,
       taxonomyName: getTaxonomyName(nodeDef),
       multiple: String(NodeDef.isMultiple(nodeDef)),

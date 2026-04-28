@@ -132,6 +132,8 @@ export const setInPath =
     return obj
   }
 
+export const assocLabels = (labels: Record<string, unknown>) => setProp(keysProps.labels, labels)
+
 export const dissocTemporary = R.unless(R.isNil, R.dissoc(keys.temporary))
 
 export const keepNonEmptyProps = (obj: Record<string, unknown>): Record<string, unknown> =>

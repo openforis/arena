@@ -31,7 +31,7 @@ export const DataQueryPieChart = (props) => {
   const maxDecimalDigits = maxDecimalDigitsByMeasureNodeDefUuid[firstMeasureNodeDefUuid]
 
   if (data.length > maxItems) {
-    return i18n.t('dataView.charts.warning.tooManyItemsToShowChart', { maxItems })
+    return i18n.t('dataView:charts.warning.tooManyItemsToShowChart', { maxItems })
   }
 
   const firstDimensionDataColumn = dataColumnByDimensionNodeDefUuid[firstDimensionNodeDefUuid]

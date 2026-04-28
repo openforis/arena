@@ -84,7 +84,20 @@ If there are records associated to this cycle, they will be deleted.`,
     },
     fieldManualLink: 'Field manual link',
     editInfo: 'Edit info',
+    map: 'Map',
     viewInfo: 'View info',
+
+    preloadedMapLayers: {
+      enabledMessage: 'Preloaded map layers enabled',
+      title: 'Preloaded map layers',
+      fileName: 'File name',
+      fileSize: 'File size',
+      confirmDelete: 'Are you sure you want to delete this preloaded map layer?',
+      editor: {
+        title: 'Preloaded map layer',
+      },
+    },
+
     preferredLanguage: 'Preferred language',
     sampleBasedImageInterpretation: 'Sample-based image interpretation',
     sampleBasedImageInterpretationEnabled: 'Sample-based image interpretation enabled',

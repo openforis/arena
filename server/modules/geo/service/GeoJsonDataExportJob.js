@@ -7,7 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
-import i18n from '@core/i18n/i18nFactory'
+import i18nInstance from '@core/i18n/i18nFactory'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -33,7 +33,9 @@ const generateLocationGeoJson = ({ survey, longitude, latitude }) => {
 
 const extractKeys = ({ survey, ancestorKeyDefs, dataItem }) =>
   ancestorKeyDefs
-    .map((ancestorDef) => DataQueryValueFormatter.formatDataItemKey({ i18n, survey, nodeDef: ancestorDef, dataItem }))
+    .map((ancestorDef) =>
+      DataQueryValueFormatter.formatDataItemKey({ i18n: i18nInstance, survey, nodeDef: ancestorDef, dataItem })
+    )
     .join(' - ')
 
 export class GeoJsonDataExportJob extends Job {

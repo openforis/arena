@@ -109,6 +109,11 @@ export const removeSuffix =
 export const quote = (text: string): string => (isBlank(text) ? '' : `'${text}'`)
 
 /**
+ * Quote text with double quotes.
+ */
+export const quoteDouble = (text: string): string => (isBlank(text) ? '' : `"${text}"`)
+
+/**
  * Remove single quotes from beginning and end.
  */
 export const unquote = R.pipe(removePrefix(`'`), removeSuffix(`'`))
@@ -132,5 +137,5 @@ export const hashCode = (str: unknown): string => {
     hash = hash & hash // convert to 32bit integer
   }
   hash = hash >>> 0 // convert signed to unsigned https://stackoverflow.com/a/1908655
-  return Number(hash).toString(32).toUpperCase() // make the hash small, convert base10 to base32
+  return Number(hash).toString(32) // make the hash small, convert base10 to base32
 }

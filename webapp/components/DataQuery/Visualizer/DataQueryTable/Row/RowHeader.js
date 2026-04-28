@@ -14,7 +14,7 @@ const RowHeader = (props) => {
 
   return (
     <div className="table__row-header">
-      <div style={{ width: colIndexWidth }}>{i18n.t('dataView.rowNum')}</div>
+      <div style={{ width: colIndexWidth }}>{i18n.t('dataView:rowNum')}</div>
 
       {nodeDefCols.map((nodeDef) => (
         <ColumnHeader
