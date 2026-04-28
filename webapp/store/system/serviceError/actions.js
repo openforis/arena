@@ -8,8 +8,8 @@ export const createServiceError =
   ({ error }) =>
   (dispatch) => {
     let message
-    if (error.name === 'AxiosError') {
-      const htmlText = error?.response?.data
+    if (error?.name === 'AxiosError') {
+      const htmlText = error.response?.data
       if (htmlText) {
         message = DomUtils.extractPreElementContentFromHtml(htmlText)
       }
