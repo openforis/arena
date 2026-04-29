@@ -95,7 +95,7 @@ export const insertNodeDefs = async ({ user, surveyId, cycle = Survey.cycleOneKe
 
     const surveyUpdated = Survey.assocNodeDefsSimple({ nodeDefs })(survey)
 
-    return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefs: nodeDefs[0], nodeDefsUpdated: nodeDefs })
+    return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefsUpdated: nodeDefs })
   })
 
 export const updateNodeDefProps = async (
@@ -145,6 +145,18 @@ export const convertNodeDef = async ({ user, surveyId, nodeDefUuid, toType }, cl
     const nodeDef = await NodeDefManager.convertNodeDef({ user, survey, nodeDefUuid, toType }, t)
 
     return afterNodeDefUpdate({ survey, nodeDef, nodeDefsDependentsUuids })
+  })
+
+export const cloneNodeDef = async ({ surveyId, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
+  client.tx(async (t) => {
+    const survey = await fetchSurvey({ surveyId }, t)
+
+    const { clonedNodeDefs } = Survey.cloneNodeDef({ nodeDefUuid, targetParentNodeDefUuid })(survey)
+
+    await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: clonedNodeDefs }, t)
+
+    const clonedNodeDefsByUuid = ObjectUtils.toUuidIndexedObj(clonedNodeDefs)
+    return afterNodeDefUpdate({ survey, nodeDefsUpdated: clonedNodeDefsByUuid })
   })
 
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {

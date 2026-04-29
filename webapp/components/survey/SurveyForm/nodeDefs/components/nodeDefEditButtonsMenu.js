@@ -36,7 +36,7 @@ const isEntitySelectableByAction = {
 }
 
 const availabilityByAction = {
-  [actionsWithEntitySelection.clone]: ({ nodeDef }) => NodeDef.isAttribute(nodeDef),
+  [actionsWithEntitySelection.clone]: () => true,
   [actionsWithEntitySelection.move]: ({ survey, cycle, nodeDef }) => {
     if (NodeDef.isPublished(nodeDef)) return false
 
@@ -95,7 +95,9 @@ export const NodeDefEditButtonsMenu = (props) => {
   const entitySelectConfirmByAction = useMemo(
     () => ({
       [actionsWithEntitySelection.clone]: ({ entityDefUuid }) =>
-        dispatch(NodeDefsActions.cloneNodeDefIntoEntityDef({ nodeDef, nodeDefParentUuid: entityDefUuid, navigate })),
+        dispatch(
+          NodeDefsActions.cloneNodeDefIntoEntityDef({ nodeDef, targetParentNodeDefUuid: entityDefUuid, navigate })
+        ),
       [actionsWithEntitySelection.move]: ({ entityDefUuid }) =>
         dispatch(
           NodeDefsActions.moveNodeDef({

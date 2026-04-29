@@ -12,6 +12,7 @@ import * as NodeDefValidations from '../nodeDefValidations'
 import * as Category from '../category'
 import * as SurveyInfo from './surveyInfo'
 import * as SurveyNodeDefsIndex from './surveyNodeDefsIndex'
+import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 
 const nodeDefsKey = 'nodeDefs'
 
@@ -290,6 +291,80 @@ export const assocNodeDef = (nodeDef) => updateNodeDefs(R.assoc(NodeDef.getUuid(
 export const mergeNodeDefs = (nodeDefs) => updateNodeDefs((nodeDefsPrev) => ({ ...nodeDefsPrev, ...nodeDefs }))
 
 export const dissocNodeDef = (nodeDefUuid) => updateNodeDefs(R.dissoc(nodeDefUuid))
+
+const updateClonedEntityDefLayout = ({ clonedEntityDef, newUuidByOldUuid }) => {
+  const layout = NodeDef.getLayout(clonedEntityDef)
+  const layoutUpdated = {}
+  for (const [cycle, layoutCycle] of Object.entries(layout)) {
+    if (!layoutCycle) {
+      continue
+    }
+    const layoutChildren = layoutCycle[NodeDefLayout.keys.layoutChildren] || []
+    const updatedLayoutChildren = layoutChildren.map((item) => {
+      if (typeof item === 'string') {
+        return newUuidByOldUuid[item]
+      }
+      return {
+        ...item,
+        i: newUuidByOldUuid[item.i] || item.i,
+      }
+    })
+    layoutUpdated[cycle] = {
+      ...layoutCycle,
+      [NodeDefLayout.keys.layoutChildren]: updatedLayoutChildren,
+    }
+  }
+  return NodeDef.assocLayout(layoutUpdated)(clonedEntityDef)
+}
+export const cloneNodeDef =
+  ({ nodeDefUuid, targetParentNodeDefUuid }) =>
+  (survey) => {
+    const nodeDef = getNodeDefByUuid(nodeDefUuid)(survey)
+    const nodeDefParent = getNodeDefByUuid(targetParentNodeDefUuid)(survey)
+    const allNodeDefs = getNodeDefs(survey)
+    const existingNodeDefNames = getNodeDefsArray(survey).map((nd) => NodeDef.getName(nd))
+
+    // Gather all descendants (including nested entities)
+    const nodeDefDescendants = getNodeDefDescendants({ nodeDef })(survey)
+
+    const newUuidByOldUuid = {}
+    const clonedNodeDefsByNewUuid = {}
+    const usedNames = new Set(existingNodeDefNames)
+
+    // Helper to generate a unique name and track it
+    const getUniqueName = (baseName) => {
+      const uniqueName = UniqueNameGenerator.generateUniqueName({
+        startingName: baseName,
+        existingNames: usedNames,
+      })
+      usedNames.add(uniqueName)
+      return uniqueName
+    }
+
+    // 1. Clone all nodeDefs (entity + descendants), assign new UUIDs and unique names
+    const nodeDefsToClone = [nodeDef, ...nodeDefDescendants]
+    for (const nd of nodeDefsToClone) {
+      const parentUuid =
+        nd.uuid === nodeDef.uuid ? targetParentNodeDefUuid : newUuidByOldUuid[NodeDef.getParentUuid(nd)]
+      const clonedName = getUniqueName(NodeDef.getName(nd))
+      const cloned = NodeDef.cloneIntoEntityDef({
+        nodeDefParent: parentUuid ? { ...allNodeDefs[parentUuid], uuid: parentUuid } : nodeDefParent,
+        clonedNodeDefName: clonedName,
+      })(nd)
+      newUuidByOldUuid[nd.uuid] = cloned.uuid
+      clonedNodeDefsByNewUuid[cloned.uuid] = cloned
+    }
+    //  Update layout props in all cloned entities to reference new UUIDs
+    const clonedEntityDefs = Object.values(clonedNodeDefsByNewUuid).filter((nd) => NodeDef.isEntity(nd))
+    for (const clonedEntityDef of clonedEntityDefs) {
+      const clonedNodeDefUpdated = updateClonedEntityDefLayout({ clonedEntityDef, newUuidByOldUuid })
+      clonedNodeDefsByNewUuid[clonedEntityDef.uuid] = clonedNodeDefUpdated
+    }
+    const clonedNodeDefs = Object.values(clonedNodeDefsByNewUuid)
+    const rootClonedNodeDef = clonedNodeDefsByNewUuid[newUuidByOldUuid[nodeDef.uuid]]
+
+    return { clonedNodeDefs, rootClonedNodeDef }
+  }
 
 // ====== HIERARCHY
 
