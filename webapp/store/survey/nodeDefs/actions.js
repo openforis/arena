@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'

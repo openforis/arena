@@ -153,10 +153,12 @@ export const cloneNodeDef = async ({ surveyId, nodeDefUuid, targetParentNodeDefU
 
     const { clonedNodeDefs } = Survey.cloneNodeDef({ nodeDefUuid, targetParentNodeDefUuid })(survey)
 
-    await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: clonedNodeDefs }, t)
+    // Insert and get inserted nodeDefs with DB ids
+    const insertedNodeDefs = await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: clonedNodeDefs }, t)
 
-    const clonedNodeDefsByUuid = ObjectUtils.toUuidIndexedObj(clonedNodeDefs)
-    return afterNodeDefUpdate({ survey, nodeDefsUpdated: clonedNodeDefsByUuid })
+    const insertedNodeDefsByUuid = ObjectUtils.toUuidIndexedObj(insertedNodeDefs)
+
+    return afterNodeDefUpdate({ survey, nodeDefsUpdated: insertedNodeDefsByUuid })
   })
 
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {
