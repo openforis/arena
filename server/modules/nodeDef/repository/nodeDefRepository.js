@@ -75,7 +75,15 @@ export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }
   })
   // Build parameterized query
   const valuePlaceholders = values
-    .map((row, rowIdx) => `(${row.map((_, colIdx) => `$${rowIdx * columns.length + colIdx + 1}`).join(', ')})`)
+    .map((row, rowIdx) => {
+      const rowPlaceholders = row
+        .map((_, colIdx) => {
+          const placeholderIdx = rowIdx * columns.length + colIdx + 1
+          return `$${placeholderIdx}`
+        })
+        .join(', ')
+      return `(${rowPlaceholders})`
+    })
     .join(', ')
   const query = `
     INSERT INTO ${schema}.node_def
