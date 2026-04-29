@@ -49,7 +49,6 @@ const availabilityByAction = {
     Survey.visitDescendantsAndSelf({
       cycle,
       visitorFn: (visitedNodeDef) => {
-        const visitedNodeDefUuid = NodeDef.getUuid(visitedNodeDef)
         if (
           NodeDef.isEntity(visitedNodeDef) &&
           isEntityVisibleByAction[actionsWithEntitySelection.move]({ cycle, entityDef: visitedNodeDef, nodeDef }) &&
