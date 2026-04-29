@@ -17,6 +17,7 @@ export default {
   dataImport: {
     importFromMobileNotAllawed: 'Arena Mobile-с өгөгдөл импортлохыг хориглоно',
     noRecordsFound: 'Импортын файлд бичлэг олдсонгүй эсвэл буруу файлын формат',
+    recordOwnedByAnotherUser: 'Өөр хэрэглэгчийн бичлэгийг шинэчлэх гэж оролдлоо',
   },
   entryDataNotFound: 'Оролтын өгөгдөл олдсонгүй: {{entryName}}',
   expression: {
