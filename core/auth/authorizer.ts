@@ -87,7 +87,8 @@ export const canEditRecord = (user: ArenaUser, record: ArenaRecord, ignoreRecord
   if (User.isSystemAdmin(user)) {
     return true
   }
-  const userAuthGroup = User.getAuthGroupBySurveyUuid({ surveyUuid: Record.getSurveyUuid(record) })(user)
+  const surveyUuid = Record.getSurveyUuid(record)
+  const userAuthGroup = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
   if (!userAuthGroup) return false
 
   const level = AuthGroup.getRecordEditLevel(Record.getStep(record))(userAuthGroup)
