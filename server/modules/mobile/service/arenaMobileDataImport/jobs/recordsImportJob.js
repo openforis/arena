@@ -3,6 +3,7 @@ import { Dates, Objects, Records, Surveys } from '@openforis/arena-core'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
 import * as A from '@core/arena'
+import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -199,13 +200,15 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     if (existingRecordSummary) {
       const existingRecordUuid = Record.getUuid(existingRecordSummary)
+      const updatingExistingRecordWithSameUuid = recordUuid === existingRecordUuid
+
       if (conflictResolutionStrategy === ConflictResolutionStrategy.skipExisting) {
         // skip record
         this.skippedRecordsUuids.add(recordUuid)
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
       } else if (
         conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated ||
-        (conflictResolutionStrategy === ConflictResolutionStrategy.merge && recordUuid === existingRecordUuid)
+        (conflictResolutionStrategy === ConflictResolutionStrategy.merge && updatingExistingRecordWithSameUuid)
       ) {
         if (Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))) {
           await this.mergeWithExistingRecord()
@@ -223,7 +226,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
   }
 
   async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null } = {}) {
-    const { context, currentRecord: record, tx } = this
+    const { context, currentRecord: record, tx, user } = this
     const { survey, surveyId } = context
 
     const recordUuid = Record.getUuid(record)
@@ -239,6 +242,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
       { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true },
       tx
     )
+    // check can update record
+    if (!Authorizer.canEditRecord(user, recordTarget)) {
+      const recordKeyValues = getRecordFormattedKeyValues({ survey, record: recordTarget })
+      throw new SystemError('dataImport.recordOwnedByAnotherUser', { recordUuid, recordKeyValues })
+    }
+
     const recordUpdateParams = { survey, categoryItemProvider, taxonProvider, recordSource: record, sideEffect: true }
     const { record: recordTargetUpdated, nodes: nodesUpdated } = merge
       ? await Record.mergeRecords(recordUpdateParams)(recordTarget)
