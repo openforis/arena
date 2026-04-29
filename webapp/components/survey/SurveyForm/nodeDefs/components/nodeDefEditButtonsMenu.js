@@ -33,9 +33,9 @@ const isEntityVisibleByAction = {
 }
 
 const isEntitySelectableByAction = {
-  [actionsWithEntitySelection.clone]: ({ entityDefUuid, nodeDef }) => entityDefUuid !== NodeDef.getUuid(nodeDef),
-  [actionsWithEntitySelection.move]: ({ entityDef, nodeDef }) =>
-    NodeDef.isEqual(entityDef)(nodeDef) && NodeDef.getUuid(entityDef) !== NodeDef.getParentUuid(nodeDef),
+  [actionsWithEntitySelection.clone]: ({ entityDefUuid, nodeDef }) => NodeDef.getUuid(nodeDef) !== entityDefUuid,
+  [actionsWithEntitySelection.move]: ({ entityDefUuid, nodeDef }) =>
+    NodeDef.getUuid(nodeDef) !== entityDefUuid && entityDefUuid !== NodeDef.getParentUuid(nodeDef),
 }
 
 const availabilityByAction = {
@@ -52,7 +52,10 @@ const availabilityByAction = {
         if (
           NodeDef.isEntity(visitedNodeDef) &&
           isEntityVisibleByAction[actionsWithEntitySelection.move]({ cycle, entityDef: visitedNodeDef, nodeDef }) &&
-          isEntitySelectableByAction[actionsWithEntitySelection.move]({ entityDef: visitedNodeDef, nodeDef })
+          isEntitySelectableByAction[actionsWithEntitySelection.move]({
+            entityDefUuid: NodeDef.getUuid(visitedNodeDef),
+            nodeDef,
+          })
         ) {
           availableEntityDefs.push(visitedNodeDef)
         }
