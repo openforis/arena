@@ -243,9 +243,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       tx
     )
     // check can update record
-    const recordOwnerUuid = Record.getOwnerUuid(recordTarget)
     if (!Authorizer.canEditRecord(user, recordTarget)) {
-      this.logError(`trying to update record ${recordUuid} owned by another user`)
       throw new SystemError('dataImport.recordOwnedByAnotherUser', { recordUuid })
     }
 
