@@ -244,7 +244,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
     )
     // check can update record
     if (!Authorizer.canEditRecord(user, recordTarget)) {
-      throw new SystemError('dataImport.recordOwnedByAnotherUser', { recordUuid })
+      const recordKeyValues = getRecordFormattedKeyValues({ survey, record: recordTarget })
+      throw new SystemError('dataImport.recordOwnedByAnotherUser', { recordUuid, recordKeyValues })
     }
 
     const recordUpdateParams = { survey, categoryItemProvider, taxonProvider, recordSource: record, sideEffect: true }

@@ -19,7 +19,8 @@ export default {
   dataImport: {
     importFromMobileNotAllawed: 'No se permite la importación de datos desde Arena Mobile',
     noRecordsFound: 'No se encontraron registros en el archivo de importación o formato de archivo incorrecto',
-    recordOwnedByAnotherUser: 'Intentando actualizar un registro que pertenece a otro usuario',
+    recordOwnedByAnotherUser:
+      'No se puede actualizar el registro "{{recordKeyValues}}" porque pertenece a otro usuario',
   },
   entryDataNotFound: 'Datos de entrada no encontrados: {{entryName}}',
   expression: {
