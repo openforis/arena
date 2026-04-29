@@ -39,7 +39,9 @@ export const useGetSiblingNodeDefUuid = () => {
 
   const getAllSurveyNodeDefUuids = useCallback(
     () =>
-      Survey.getNodeDefDescendantsAndSelf({ cycle, traverseMethod: TraverseMethod.dfs })(survey).map(NodeDef.getUuid),
+      Survey.getNodeDefDescendantsAndSelf({ cycle, traverseMethod: TraverseMethod.dfs })(survey).map((nd) =>
+        NodeDef.getUuid(nd)
+      ),
     [cycle, survey]
   )
 

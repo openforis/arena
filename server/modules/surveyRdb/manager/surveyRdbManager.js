@@ -424,7 +424,7 @@ export const fetchEntitiesFileUuidsByCycle = async (
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
     const query = Query.create({
       entityDefUuid,
-      attributeDefUuids: childrenFileDefs.map(NodeDef.getUuid),
+      attributeDefUuids: childrenFileDefs.map((nd) => NodeDef.getUuid(nd)),
       filterRecordUuids,
     })
 

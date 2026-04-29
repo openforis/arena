@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "checkJs": false,
+    "jsx": "react-jsx",
+    "baseUrl": "./",
+    "paths": {
+      "@common/*": ["./common/*"],
+      "@core/*": ["./core/*"],
+      "@server/*": ["./server/*"],
+      "@webapp/*": ["./webapp/*"],
+      "@test/*": ["./test/*"]
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "allowImportingTsExtensions": false,
+    "types": ["node", "jest"]
+  },
+  "include": ["common", "core", "server", "webapp", "test", "*.d.ts"],
+  "exclude": ["dist", "node_modules"]
+}

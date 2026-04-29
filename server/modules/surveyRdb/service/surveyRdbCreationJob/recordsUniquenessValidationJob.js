@@ -80,7 +80,7 @@ export default class RecordsUniquenessValidationJob extends Job {
           this.surveyId,
           recordUuid,
           nodeRootUuid,
-          nodeDefKeys.map(NodeDef.getUuid),
+          nodeDefKeys.map((nd) => NodeDef.getUuid(nd)),
           this.tx
         )
         const validationRecord = this.validationByRecordUuid[recordUuid] || validation

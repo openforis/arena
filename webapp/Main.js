@@ -14,7 +14,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { store } from '@webapp/store'
 import Arena from '@webapp/views/Arena'
 
-import i18n from '@core/i18n/i18nFactory'
+import i18nInstance from '@core/i18n/i18nFactory'
 
 // remove preloader
 document.getElementById('preloader-wrapper').remove()
@@ -24,7 +24,7 @@ const container = document.getElementById('main')
 const root = createRoot(container)
 root.render(
   <Provider store={store}>
-    <I18nextProvider i18n={i18n}>
+    <I18nextProvider i18n={i18nInstance}>
       <BrowserRouter>
         <LocalizationProvider dateAdapter={AdapterMoment}>
           <Arena />

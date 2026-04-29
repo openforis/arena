@@ -27,6 +27,7 @@
     "test:e2e:codegen": "npx playwright --save-storage=test/e2e/resources/auth.json codegen http://localhost:9090",
     "test:e2e:watch": "cross-env PWDEBUG=1 jest --config=test/e2e/jest.config.js",
     "test": "run-s test:unit test:e2e",
+    "typecheck": "tsc --noEmit",
     "test:docker": "test/bin/testExecDocker.sh",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
     "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
@@ -46,9 +47,16 @@
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/preset-env": "^7.28.6",
     "@babel/preset-react": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
     "@babel/register": "^7.28.6",
     "@babel/runtime-corejs3": "^7.28.6",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^24.10.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
     "babel-loader": "^10.0.0",
     "cache-loader": "^4.1.0",
     "cross-env": "^10.1.0",
@@ -89,6 +97,7 @@
     "sass-loader": "^16.0.6",
     "skeleton-loader": "^2.0.0",
     "style-loader": "^4.0.0",
+    "typescript": "^5.9.3",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^5.104.1",
     "webpack-bundle-analyzer": "^5.2.0",
@@ -218,7 +227,7 @@
     "last 2 versions"
   ],
   "lint-staged": {
-    "{common,core,server,test,webapp}/**/*.js": "eslint --cache --fix"
+    "{common,core,server,test,webapp}/**/*.{js,jsx,ts,tsx}": "eslint --cache --fix"
   },
   "packageManager": "yarn@4.13.0"
 }

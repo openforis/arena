@@ -2,11 +2,11 @@ import { useCallback } from 'react'
 import { initReactI18next, Trans as i18nTrans } from 'react-i18next'
 import detector from 'i18next-browser-languagedetector'
 
-import i18n, { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
+import i18nInstance, { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
 
 import * as DomUtils from '@webapp/utils/domUtils'
 
-const browserI18n = i18n.use(detector).use(initReactI18next)
+const browserI18n = i18nInstance.use(detector).use(initReactI18next)
 
 // set i18n language to browser language (English by default)
 const browserLanguage = navigator.language ?? defaultLanguage
