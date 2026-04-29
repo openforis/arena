@@ -76,3 +76,12 @@ export const convertNodeDef = async ({ surveyId, nodeDefUuid, toType }) => {
   })
   return { nodeDefsValidation, nodeDefsUpdated }
 }
+
+export const cloneNodeDef = async ({ surveyId, nodeDefUuid, targetParentNodeDefUuid }) => {
+  const {
+    data: { nodeDefsValidation, nodeDefsUpdated },
+  } = await axios.post(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/clone`, {
+    targetParentNodeDefUuid,
+  })
+  return { nodeDefsValidation, nodeDefsUpdated }
+}

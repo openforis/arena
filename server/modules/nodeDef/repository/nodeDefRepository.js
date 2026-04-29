@@ -43,42 +43,56 @@ export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
 
 export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }, client = DB) => {
   const schema = getSchemaSurvey(surveyId)
+  // Build values and query for batch insert with RETURNING *
+  const columns = [
+    'parent_uuid',
+    'uuid',
+    'type',
+    'props',
+    'props_draft',
+    'props_advanced',
+    'props_advanced_draft',
+    'meta',
+    'analysis',
+    'virtual',
+  ]
+  const values = nodeDefs.map((nodeDef) => {
+    const { props, propsDraft, propsAdvanced, propsAdvancedDraft } = NodeDef.getAllPropsAndAllPropsDraft({
+      backup,
+    })(nodeDef)
+    return [
+      NodeDef.getParentUuid(nodeDef),
+      nodeDef.uuid,
+      NodeDef.getType(nodeDef),
+      props,
+      propsDraft,
+      propsAdvanced,
+      propsAdvancedDraft,
+      NodeDef.getMeta(nodeDef),
+      NodeDef.isAnalysis(nodeDef),
+      NodeDef.isVirtual(nodeDef),
+    ]
+  })
+  // Build parameterized query
+  const valuePlaceholders = values
+    .map((row, rowIdx) => {
+      const rowPlaceholders = row
+        .map((_, colIdx) => {
+          const placeholderIdx = rowIdx * columns.length + colIdx + 1
+          return `$${placeholderIdx}`
+        })
+        .join(', ')
+      return `(${rowPlaceholders})`
+    })
+    .join(', ')
+  const query = `
+    INSERT INTO ${schema}.node_def
+      (${columns.join(', ')})
+    VALUES ${valuePlaceholders}
+    RETURNING *`
+  const flatValues = values.flat()
 
-  return client.none(
-    DbUtils.insertAllQuery(
-      schema,
-      'node_def',
-      [
-        'parent_uuid',
-        'uuid',
-        'type',
-        'props',
-        'props_draft',
-        'props_advanced',
-        'props_advanced_draft',
-        'meta',
-        'analysis',
-        'virtual',
-      ],
-      nodeDefs.map((nodeDef) => {
-        const { props, propsDraft, propsAdvanced, propsAdvancedDraft } = NodeDef.getAllPropsAndAllPropsDraft({
-          backup,
-        })(nodeDef)
-        return [
-          NodeDef.getParentUuid(nodeDef),
-          nodeDef.uuid,
-          NodeDef.getType(nodeDef),
-          props,
-          propsDraft,
-          propsAdvanced,
-          propsAdvancedDraft,
-          NodeDef.getMeta(nodeDef),
-          NodeDef.isAnalysis(nodeDef),
-          NodeDef.isVirtual(nodeDef),
-        ]
-      })
-    )
-  )
+  return client.map(query, flatValues, (row) => dbTransformCallback({ row, draft: true, advanced: true }))
 }
 
 // ============== READ

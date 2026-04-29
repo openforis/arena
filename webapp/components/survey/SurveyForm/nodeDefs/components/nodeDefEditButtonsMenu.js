@@ -20,35 +20,39 @@ const iconByAction = {
   [actionsWithEntitySelection.move]: 'icon-arrow-up-right2',
 }
 
+const canEntityDefBeTargetOfCreation = ({ cycle, entityDef, nodeDef }) =>
+  !NodeDef.isEqual(nodeDef)(entityDef) &&
+  !NodeDef.isDescendantOf(nodeDef)(entityDef) &&
+  !NodeDefLayout.isRenderTable(cycle)(entityDef)
+
 const isEntityVisibleByAction = {
-  [actionsWithEntitySelection.clone]: () => true,
+  [actionsWithEntitySelection.clone]: ({ cycle, entityDef, nodeDef }) =>
+    canEntityDefBeTargetOfCreation({ cycle, entityDef, nodeDef }),
   [actionsWithEntitySelection.move]: ({ cycle, entityDef, nodeDef }) =>
-    NodeDef.isAttribute(nodeDef) ||
-    (!NodeDef.isEqual(nodeDef)(entityDef) &&
-      !NodeDef.isDescendantOf(nodeDef)(entityDef) &&
-      !NodeDefLayout.isRenderTable(cycle)(entityDef)),
+    NodeDef.isAttribute(nodeDef) || canEntityDefBeTargetOfCreation({ cycle, entityDef, nodeDef }),
 }
 
 const isEntitySelectableByAction = {
-  [actionsWithEntitySelection.clone]: () => true,
-  [actionsWithEntitySelection.move]: ({ entityDefUuid, nodeDef }) =>
-    entityDefUuid !== NodeDef.getUuid(nodeDef) && entityDefUuid !== NodeDef.getParentUuid(nodeDef),
+  [actionsWithEntitySelection.clone]: ({ entityDefUuid, nodeDef }) => entityDefUuid !== NodeDef.getUuid(nodeDef),
+  [actionsWithEntitySelection.move]: ({ entityDef, nodeDef }) =>
+    NodeDef.isEqual(entityDef)(nodeDef) && NodeDef.getUuid(entityDef) !== NodeDef.getParentUuid(nodeDef),
 }
 
 const availabilityByAction = {
-  [actionsWithEntitySelection.clone]: ({ nodeDef }) => NodeDef.isAttribute(nodeDef),
+  [actionsWithEntitySelection.clone]: () => true,
   [actionsWithEntitySelection.move]: ({ survey, cycle, nodeDef }) => {
+    // published node defs cannot be moved
     if (NodeDef.isPublished(nodeDef)) return false
 
+    // target entity defs cannot be descendants of current node def
     const availableEntityDefs = []
     Survey.visitDescendantsAndSelf({
       cycle,
       visitorFn: (visitedNodeDef) => {
-        const visitedNodeDefUuid = NodeDef.getUuid(visitedNodeDef)
         if (
           NodeDef.isEntity(visitedNodeDef) &&
           isEntityVisibleByAction[actionsWithEntitySelection.move]({ cycle, entityDef: visitedNodeDef, nodeDef }) &&
-          isEntitySelectableByAction[actionsWithEntitySelection.move]({ entityDefUuid: visitedNodeDefUuid, nodeDef })
+          isEntitySelectableByAction[actionsWithEntitySelection.move]({ entityDef: visitedNodeDef, nodeDef })
         ) {
           availableEntityDefs.push(visitedNodeDef)
         }
@@ -95,7 +99,9 @@ export const NodeDefEditButtonsMenu = (props) => {
   const entitySelectConfirmByAction = useMemo(
     () => ({
       [actionsWithEntitySelection.clone]: ({ entityDefUuid }) =>
-        dispatch(NodeDefsActions.cloneNodeDefIntoEntityDef({ nodeDef, nodeDefParentUuid: entityDefUuid, navigate })),
+        dispatch(
+          NodeDefsActions.cloneNodeDefIntoEntityDef({ nodeDef, targetParentNodeDefUuid: entityDefUuid, navigate })
+        ),
       [actionsWithEntitySelection.move]: ({ entityDefUuid }) =>
         dispatch(
           NodeDefsActions.moveNodeDef({

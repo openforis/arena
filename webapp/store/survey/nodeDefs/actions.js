@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
@@ -76,24 +75,45 @@ export const createNodeDef = (parent, type, props, navigate) => async (dispatch,
 }
 
 export const cloneNodeDefIntoEntityDef =
-  ({ nodeDef, nodeDefParentUuid, navigate }) =>
-  (dispatch, getState) => {
+  ({ nodeDef, targetParentNodeDefUuid, navigate }) =>
+  async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    if (NodeDef.isAttribute(nodeDef)) {
+      // cloned node def won't be persisted immediately; update survey in memory and persist it when the user will save the cloned node def
+      const { rootClonedNodeDef } = Survey.cloneNodeDef({ nodeDefUuid, targetParentNodeDefUuid })(survey)
 
-    const nodeDefParent = Survey.getNodeDefByUuid(nodeDefParentUuid)(survey)
+      dispatch({ type: nodeDefCreate, nodeDef: rootClonedNodeDef })
 
-    const existingNodeDefNames = Survey.getNodeDefsArray(survey).map(NodeDef.getName)
-    const clonedNodeDefName = UniqueNameGenerator.generateUniqueName({
-      startingName: NodeDef.getName(nodeDef),
-      existingNames: existingNodeDefNames,
-    })
-    const nodeDefCloned = NodeDef.cloneIntoEntityDef({ nodeDefParent, clonedNodeDefName })(nodeDef)
-    dispatch({ type: nodeDefCreate, nodeDef: nodeDefCloned })
+      // Navigate to the cloned node def details page
+      navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(rootClonedNodeDef)}/`)
+      return rootClonedNodeDef
+    } else {
+      // cloned node def will be persisted immediately; call API to clone the node def and update survey in memory with the response
+      const surveyId = Survey.getId(survey)
+      const { nodeDefsValidation, nodeDefsUpdated } = await API.cloneNodeDef({
+        surveyId,
+        nodeDefUuid,
+        targetParentNodeDefUuid,
+      })
 
-    navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDefCloned)}/`)
+      dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
 
-    return nodeDefCloned
+      // update survey index: parent entity has changed
+      dispatch(_onNodeDefsIndexUpdate({ survey, nodeDefsUpdated }))
+
+      const targetParentNodeDef = Survey.getNodeDefByUuid(targetParentNodeDefUuid)(survey)
+      dispatch(
+        NotificationActions.notifyInfo({
+          key: 'nodeDefEdit.nodeDefClonedSuccessfully',
+          params: {
+            nodeDefName: NodeDef.getName(nodeDef),
+            targetParentNodeDefName: NodeDef.getName(targetParentNodeDef),
+          },
+        })
+      )
+    }
   }
 
 const _handleNodeDefMoveValidationErrors = ({ dispatch, navigate, survey, nodeDefUuid, nodeDefsValidation }) => {
@@ -143,6 +163,13 @@ const _onNodeDefsUpdate =
     }
   }
 
+const _onNodeDefsIndexUpdate =
+  ({ survey, nodeDefsUpdated }) =>
+  (dispatch) => {
+    const allNodeDefs = { ...Survey.getNodeDefs(survey), ...nodeDefsUpdated }
+    dispatch({ type: surveyDefsIndexUpdate, nodeDefs: allNodeDefs })
+  }
+
 export const moveNodeDef =
   ({ nodeDefUuid, targetParentNodeDefUuid, navigate }) =>
   async (dispatch, getState) => {
@@ -160,8 +187,7 @@ export const moveNodeDef =
     dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
 
     // update survey index: parent entity has changed
-    const allNodeDefs = { ...Survey.getNodeDefs(survey), ...nodeDefsUpdated }
-    dispatch({ type: surveyDefsIndexUpdate, nodeDefs: allNodeDefs })
+    dispatch(_onNodeDefsIndexUpdate({ survey, nodeDefsUpdated }))
 
     _handleNodeDefMoveValidationErrors({ dispatch, navigate, survey, nodeDefUuid, nodeDefsValidation })
   }

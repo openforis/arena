@@ -1086,6 +1086,8 @@ E.g. this.region = region_attribute_name
 
 E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tree_species* marked as **Unique**, you can have only one tree per species inside the same *plot*.`,
     },
+    nodeDefClonedSuccessfully:
+      'Node definition "{{nodeDefName}}" cloned successfully into "{{targetParentNodeDefName}}"',
   },
 
   languagesEditor: {

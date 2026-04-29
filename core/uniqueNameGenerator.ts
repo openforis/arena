@@ -15,16 +15,16 @@ const parseName = (name: string): { nameWithoutCount: string; count: number } =>
 
 const generateUniqueName = ({
   startingName,
-  existingNames = [],
+  existingNames = new Set(),
 }: {
   startingName: string
-  existingNames?: string[]
+  existingNames?: Set<string>
 }): string => {
   let currentName = startingName
   let { count } = parseName(startingName)
   const { nameWithoutCount } = parseName(startingName)
 
-  while (existingNames.includes(currentName)) {
+  while (existingNames.has(currentName)) {
     count += 1
     currentName = `${nameWithoutCount}_${count}`
   }
