@@ -354,21 +354,35 @@ const getLayoutInParentEntityByCycles = ({ survey, nodeDef }) => {
   return nodeDefSourceLayoutPrevByCycle
 }
 
+export const addOrRemoveNodeDefInParentLayout = async (
+  { survey, nodeDef, add = true, layoutInParentByCycle = null },
+  client = db
+) => {
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  if (nodeDefParent) {
+    const cycles = NodeDef.getCycles(nodeDef)
+    const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
+      survey,
+      nodeDef,
+      cyclesAdded: add ? cycles : [],
+      cyclesDeleted: add ? [] : cycles,
+      layoutInParentByCycle,
+    })
+    if (parentUpdated) {
+      const surveyId = Survey.getId(survey)
+      await _persistNodeDefLayout({ surveyId, nodeDef: parentUpdated }, client)
+    }
+    return parentUpdated
+  }
+}
+
 export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
   client.tx(async (t) => {
     const result = {}
 
     const addOrRemoveInParentLayout = async ({ nodeDef, add = true, layoutInParentByCycle = null }) => {
-      const cycles = NodeDef.getCycles(nodeDef)
-      const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
-        survey,
-        nodeDef,
-        cyclesAdded: add ? cycles : [],
-        cyclesDeleted: add ? [] : cycles,
-        layoutInParentByCycle,
-      })
+      const parentUpdated = await addOrRemoveNodeDefInParentLayout({ survey, nodeDef, add, layoutInParentByCycle }, t)
       if (parentUpdated) {
-        await _persistNodeDefLayout({ surveyId, nodeDef: parentUpdated }, t)
         result[NodeDef.getUuid(parentUpdated)] = parentUpdated
       }
     }

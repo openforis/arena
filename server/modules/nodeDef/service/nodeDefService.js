@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 import * as ObjectUtils from '@core/objectUtils'
@@ -95,7 +96,7 @@ export const insertNodeDefs = async ({ user, surveyId, cycle = Survey.cycleOneKe
 
     const surveyUpdated = Survey.assocNodeDefsSimple({ nodeDefs })(survey)
 
-    return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefs: nodeDefs[0], nodeDefsUpdated: nodeDefs })
+    return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefsUpdated: nodeDefs })
   })
 
 export const updateNodeDefProps = async (
@@ -145,6 +146,53 @@ export const convertNodeDef = async ({ user, surveyId, nodeDefUuid, toType }, cl
     const nodeDef = await NodeDefManager.convertNodeDef({ user, survey, nodeDefUuid, toType }, t)
 
     return afterNodeDefUpdate({ survey, nodeDef, nodeDefsDependentsUuids })
+  })
+
+export const cloneNodeDef = async ({ surveyId, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
+  client.tx(async (t) => {
+    const survey = await fetchSurvey({ surveyId }, t)
+
+    const { clonedNodeDefs, rootClonedNodeDef } = Survey.cloneNodeDef({ nodeDefUuid, targetParentNodeDefUuid })(survey)
+
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    const originalNodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const cycleKeys = Survey.getCycleKeys(survey)
+    const defaultCycle = Survey.getDefaultCycleKey(surveyInfo)
+    const isOriginalNodeDefParentForm = NodeDefLayout.isRenderForm(defaultCycle)(originalNodeDefParent)
+    const originalNodeDefParentLayoutChildren = NodeDefLayout.getLayoutChildren(defaultCycle)(originalNodeDefParent)
+    const originalNodeDefLayoutPosition = isOriginalNodeDefParentForm
+      ? originalNodeDefParentLayoutChildren.find((item) => item.i === nodeDefUuid)
+      : null
+
+    // Insert and get inserted nodeDefs with DB ids
+    const insertedNodeDefs = await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: clonedNodeDefs }, t)
+
+    // update parent layout with new node def
+    // keep the same layout position for the cloned node def if the original node def had a layout position (i.e. if the original parent is a form and the cloned node def is in the form layout)
+    const preferredRootClonedDefLayoutParentByCycle = originalNodeDefLayoutPosition
+      ? cycleKeys.reduce((acc, cycle) => {
+          const { minH, minW, h, w } = originalNodeDefLayoutPosition
+          acc[cycle] = { minH, minW, h, w }
+          return acc
+        }, {})
+      : null
+    const parentNodeDefUpdated = await NodeDefManager.addOrRemoveNodeDefInParentLayout(
+      {
+        survey,
+        nodeDef: rootClonedNodeDef,
+        add: true,
+        layoutInParentByCycle: preferredRootClonedDefLayoutParentByCycle,
+      },
+      t
+    )
+
+    const nodeDefsUpdatedByUuid = ObjectUtils.toUuidIndexedObj(insertedNodeDefs)
+    if (parentNodeDefUpdated) {
+      nodeDefsUpdatedByUuid[NodeDef.getUuid(parentNodeDefUpdated)] = parentNodeDefUpdated
+    }
+
+    return afterNodeDefUpdate({ survey, nodeDefsUpdated: nodeDefsUpdatedByUuid })
   })
 
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {

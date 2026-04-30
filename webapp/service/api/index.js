@@ -96,6 +96,7 @@ export {
 } from './survey'
 export {
   convertNodeDef,
+  cloneNodeDef,
   fetchNodeDef,
   fetchNodeDefs,
   moveNodeDef,

@@ -207,6 +207,32 @@ export const init = (app) => {
     }
   )
 
+  app.post(
+    '/survey/:surveyId/nodeDef/:nodeDefUuid/clone',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, nodeDefUuid } = Request.getParams(req)
+        const { targetParentNodeDefUuid } = Request.getBody(req)
+
+        if (!nodeDefUuid) {
+          throw new Error('nodeDefUuid is required')
+        }
+        if (!targetParentNodeDefUuid) {
+          throw new Error('targetParentNodeDefUuid is required')
+        }
+        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.cloneNodeDef({
+          surveyId,
+          nodeDefUuid,
+          targetParentNodeDefUuid,
+        })
+        res.json({ nodeDefsUpdated, nodeDefsValidation })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ==== DELETE
 
   app.delete('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
