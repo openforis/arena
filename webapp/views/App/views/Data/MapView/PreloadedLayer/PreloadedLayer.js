@@ -75,6 +75,13 @@ const createKmzLayer = async (url) => {
   return { layer, bounds }
 }
 
+const layerCreatorByExtension = {
+  geojson: createGeoJsonLayer,
+  json: createGeoJsonLayer,
+  kml: createKmlLayer,
+  kmz: createKmzLayer,
+}
+
 export const PreloadedLayer = (props) => {
   const { preloadedMapLayer } = props
 
@@ -102,26 +109,8 @@ export const PreloadedLayer = (props) => {
     const extension = FileUtils.getExtension(fileName)?.toLowerCase()
     const url = API.getSurveyFileDownloadUrl({ surveyId, fileUuid })
 
-    let result = null
-    switch (extension) {
-      case 'geojson':
-      case 'json': {
-        result = await createGeoJsonLayer(url)
-        break
-      }
-      case 'kmz': {
-        result = await createKmzLayer(url)
-        break
-      }
-      case 'kml': {
-        result = await createKmlLayer(url)
-        break
-        break
-      }
-      default:
-        // Unsupported file type
-        break
-    }
+    const layerCreator = layerCreatorByExtension[extension]
+    const result = await layerCreator?.(url)
     const { layer, bounds } = result || {}
     if (layer) {
       layerRef.current = layer
