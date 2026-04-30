@@ -63,6 +63,13 @@ export const PreloadedLayer = (props) => {
       if (kmlDom) {
         layer = new L.KML(kmlDom)
       }
+    } else if (extension === 'kml') {
+      const response = await axios.get(url)
+      const parser = new DOMParser()
+      const kmlDom = parser.parseFromString(response.data, 'text/xml')
+      if (kmlDom) {
+        layer = new L.KML(kmlDom)
+      }
     }
     if (layer) {
       layerRef.current = layer

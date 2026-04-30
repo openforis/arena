@@ -10,7 +10,11 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { contentTypes } from '@webapp/service/api'
 
-const accept = { [contentTypes.geojson]: ['.geojson'], [contentTypes.kmz]: ['.kmz'] }
+const accept = {
+  [contentTypes.geojson]: ['.geojson'],
+  [contentTypes.kml]: ['.kml'],
+  [contentTypes.kmz]: ['.kmz'],
+}
 const maxSize = 10 // 10MB
 
 const PreloadedMapLayerEditor = (props) => {
