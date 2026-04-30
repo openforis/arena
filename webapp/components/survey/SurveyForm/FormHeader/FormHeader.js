@@ -149,7 +149,7 @@ const FormHeader = (props) => {
                       content: (
                         <ButtonDownload
                           href={API.getSurveyDocxExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
-                          label="surveyForm:exportDocx"
+                          label="surveyForm:downloadPrintableDocument"
                           variant="text"
                         />
                       ),

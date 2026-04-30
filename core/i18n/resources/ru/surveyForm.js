@@ -121,7 +121,7 @@ export default {
     analysis: 'Анализ данных',
   },
   confirmNodeDelete: 'Вы уверены, что хотите удалить этот {{nodeDefType}} ({{nodeDefLabel}})?',
-  exportDocx: 'Экспорт опроса (Word)',
+  downloadPrintableDocument: 'Скачать печатный документ (Word)',
   exportLabels_csv: 'Экспорт меток (CSV)',
   exportLabels_xlsx: 'Экспорт меток (Excel)',
   importLabels: 'Импорт меток из Excel или CSV',

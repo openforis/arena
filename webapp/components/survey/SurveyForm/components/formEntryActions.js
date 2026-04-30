@@ -69,21 +69,12 @@ const RecordEntryButtons = (props) => {
         </Link>
       )}
       {experimentalFeatures && (
-        <ButtonMenu
-          iconClassName="icon-cog icon-14px"
-          label="common.advancedFunctions"
-          items={[
-            {
-              key: 'survey-docx-export',
-              content: (
-                <ButtonDownload
-                  href={API.getRecordDocxExportUrl({ surveyId, recordUuid, lang })}
-                  label="surveyForm:exportDocx"
-                  variant="text"
-                />
-              ),
-            },
-          ]}
+        <ButtonDownload
+          iconClassName="icon-file-word"
+          href={API.getRecordDocxExportUrl({ surveyId, recordUuid, lang })}
+          showLabel={false}
+          title="surveyForm:downloadPrintableDocument"
+          variant="text"
         />
       )}
       <div className="survey-form-header__record-actions-steps">
