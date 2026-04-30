@@ -34,6 +34,47 @@ const extractKmlDomFromKmz = async (blob) => {
   return []
 }
 
+const createGeoJsonLayer = async (url) => {
+  const { data } = await axios.get(url)
+  const layer = L.geoJSON(data)
+  let bounds = null
+  if (layer) {
+    bounds = layer.getBounds()
+  }
+  return { layer, bounds }
+}
+
+const createKmlLayer = async (url) => {
+  const response = await axios.get(url)
+  const kmlDom = parseKmlText(response.data)
+  let bounds = null
+  let layer = null
+  if (kmlDom) {
+    layer = new L.KML(kmlDom)
+    bounds = layer.getBounds()
+  }
+  return { layer, bounds }
+}
+
+const createKmzLayer = async (url) => {
+  const response = await axios.get(url, { responseType: 'blob' })
+  const kmlDoms = await extractKmlDomFromKmz(response.data)
+  let bounds = null
+  let layer = null
+  if (kmlDoms.length > 0) {
+    layer = L.layerGroup()
+    kmlDoms.forEach((kmlDom) => {
+      const kmlLayer = new L.KML(kmlDom)
+      layer.addLayer(kmlLayer)
+      const kmlBounds = kmlLayer.getBounds()
+      if (kmlBounds.isValid()) {
+        bounds = bounds ? bounds.extend(kmlBounds) : kmlBounds
+      }
+    })
+  }
+  return { layer, bounds }
+}
+
 export const PreloadedLayer = (props) => {
   const { preloadedMapLayer } = props
 
@@ -47,8 +88,9 @@ export const PreloadedLayer = (props) => {
   const layerName = SurveyFile.getLabel(lang)(preloadedMapLayer)
 
   const removePreviousLayer = useCallback(() => {
-    if (layerRef.current) {
-      map.removeLayer(layerRef.current)
+    const layer = layerRef.current
+    if (layer) {
+      map.removeLayer(layer)
       layerRef.current = null
     }
   }, [map])
@@ -59,52 +101,36 @@ export const PreloadedLayer = (props) => {
     const fileName = SurveyFile.getName(preloadedMapLayer)
     const extension = FileUtils.getExtension(fileName)?.toLowerCase()
     const url = API.getSurveyFileDownloadUrl({ surveyId, fileUuid })
-    let layer = null
-    if (extension === 'geojson' || extension === 'json') {
-      const { data } = await axios.get(url)
-      layer = L.geoJSON(data)
-      if (layer) {
-        layerRef.current = layer
-        map.addLayer(layer)
-        const bounds = layer.getBounds()
-        if (bounds.isValid()) {
-          map.fitBounds(bounds)
-        }
+
+    let result = null
+    switch (extension) {
+      case 'geojson':
+      case 'json': {
+        result = await createGeoJsonLayer(url)
+        break
       }
-    } else if (extension === 'kmz') {
-      const response = await axios.get(url, { responseType: 'blob' })
-      const kmlDoms = await extractKmlDomFromKmz(response.data)
-      if (kmlDoms.length > 0) {
-        const group = L.layerGroup()
-        let bounds = null
-        kmlDoms.forEach((kmlDom) => {
-          const kmlLayer = new L.KML(kmlDom)
-          group.addLayer(kmlLayer)
-          const kmlBounds = kmlLayer.getBounds()
-          if (kmlBounds.isValid()) {
-            bounds = bounds ? bounds.extend(kmlBounds) : kmlBounds
-          }
-        })
-        layerRef.current = group
-        map.addLayer(group)
-        if (bounds && bounds.isValid()) {
-          map.fitBounds(bounds)
-        }
+      case 'kmz': {
+        result = await createKmzLayer(url)
+        break
       }
-    } else if (extension === 'kml') {
-      const response = await axios.get(url)
-      const kmlDom = parseKmlText(response.data)
-      if (kmlDom) {
-        layer = new L.KML(kmlDom)
-        layerRef.current = layer
-        map.addLayer(layer)
-        const bounds = layer.getBounds()
-        if (bounds.isValid()) {
-          map.fitBounds(bounds)
-        }
+      case 'kml': {
+        result = await createKmlLayer(url)
+        break
+        break
       }
+      default:
+        // Unsupported file type
+        break
     }
-  }, [fileUuid, preloadedMapLayer, removePreviousLayer, surveyId, map])
+    const { layer, bounds } = result || {}
+    if (layer) {
+      layerRef.current = layer
+      map.addLayer(layer)
+    }
+    if (bounds?.isValid()) {
+      map.fitBounds(bounds)
+    }
+  }, [fileUuid, surveyId, removePreviousLayer, preloadedMapLayer, map])
 
   useEffect(() => {
     // Cleanup on unmount
