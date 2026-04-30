@@ -317,7 +317,13 @@ const updateClonedEntityDefLayout = ({ clonedEntityDef, newUuidByOldUuid }) => {
   return NodeDef.assocLayout(layoutUpdated)(clonedEntityDef)
 }
 export const cloneNodeDef =
-  ({ nodeDefUuid, targetParentNodeDefUuid }) =>
+  ({
+    nodeDefUuid,
+    targetParentNodeDefUuid,
+    ignoreDefaultValues = true,
+    ignoreApplicability = true,
+    ignoreValidations = true,
+  }) =>
   (survey) => {
     const nodeDef = getNodeDefByUuid(nodeDefUuid)(survey)
     const nodeDefParent = getNodeDefByUuid(targetParentNodeDefUuid)(survey)
@@ -350,6 +356,9 @@ export const cloneNodeDef =
       const cloned = NodeDef.cloneIntoEntityDef({
         nodeDefParent: parentUuid ? { ...allNodeDefs[parentUuid], uuid: parentUuid } : nodeDefParent,
         clonedNodeDefName: clonedName,
+        ignoreDefaultValues,
+        ignoreApplicability,
+        ignoreValidations,
       })(nd)
       newUuidByOldUuid[nd.uuid] = cloned.uuid
       clonedNodeDefsByNewUuid[cloned.uuid] = cloned

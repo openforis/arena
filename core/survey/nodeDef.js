@@ -518,16 +518,39 @@ export const assocHidden = (hidden) => assocProp({ key: propKeys.hidden, value: 
 
 export const dissocEnumerate = ObjectUtils.dissocProp(propKeys.enumerate)
 export const cloneIntoEntityDef =
-  ({ nodeDefParent, clonedNodeDefName }) =>
-  (nodeDef) =>
-    newNodeDef(
+  ({
+    nodeDefParent,
+    clonedNodeDefName,
+    ignoreDefaultValues = true,
+    ignoreApplicability = true,
+    ignoreValidations = true,
+  }) =>
+  (nodeDef) => {
+    const propsCloned = ObjectUtils.clone(getProps(nodeDef))
+    propsCloned[propKeys.name] = clonedNodeDefName
+
+    const propsAdvancedCloned = ObjectUtils.clone(getPropsAdvanced(nodeDef))
+    if (ignoreDefaultValues) {
+      delete propsAdvancedCloned[keysPropsAdvanced.defaultValues]
+      delete propsAdvancedCloned[keysPropsAdvanced.defaultValueEvaluatedOneTime]
+      delete propsAdvancedCloned[keysPropsAdvanced.fileNameExpression]
+      delete propsCloned[propKeys.autoIncrementalKey]
+    }
+    if (ignoreApplicability) {
+      delete propsAdvancedCloned[keysPropsAdvanced.applicable]
+    }
+    if (ignoreValidations) {
+      delete propsAdvancedCloned[keysPropsAdvanced.validations]
+    }
+    return newNodeDef(
       nodeDefParent,
       getType(nodeDef),
       [...getCycles(nodeDef)],
-      { ...ObjectUtils.clone(getProps(nodeDef)), [propKeys.name]: clonedNodeDefName },
-      ObjectUtils.clone(getPropsAdvanced(nodeDef)),
+      propsCloned,
+      propsAdvancedCloned,
       isAnalysis(nodeDef)
     )
+  }
 
 export const changeParentEntity =
   ({ targetParentNodeDef }) =>
