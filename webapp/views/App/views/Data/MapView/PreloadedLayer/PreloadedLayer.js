@@ -45,8 +45,8 @@ const createGeoJsonLayer = async (url) => {
 }
 
 const createKmlLayer = async (url) => {
-  const response = await axios.get(url)
-  const kmlDom = parseKmlText(response.data)
+  const { data } = await axios.get(url)
+  const kmlDom = parseKmlText(data)
   let bounds = null
   let layer = null
   if (kmlDom) {
@@ -57,8 +57,8 @@ const createKmlLayer = async (url) => {
 }
 
 const createKmzLayer = async (url) => {
-  const response = await axios.get(url, { responseType: 'blob' })
-  const kmlDoms = await extractKmlDomFromKmz(response.data)
+  const { data } = await axios.get(url, { responseType: 'blob' })
+  const kmlDoms = await extractKmlDomFromKmz(data)
   let bounds = null
   let layer = null
   if (kmlDoms.length > 0) {
