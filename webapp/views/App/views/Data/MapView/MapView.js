@@ -78,11 +78,18 @@ const MapWrapper = () => {
 
   const layers = useMemo(
     () => [
+      ...preloadedLayerSummaries.map((preloadedLayerSummary, index) => (
+        <PreloadedLayer
+          key={SurveyFile.getUuid(preloadedLayerSummary)}
+          preloadedMapLayer={preloadedLayerSummary}
+          color={layerColors[index]}
+        />
+      )),
       ...samplingPointDataLevels.map((level, index) => (
         <SamplingPointDataLayer
           key={CategoryLevel.getUuid(level)}
           levelIndex={CategoryLevel.getIndex(level)}
-          markersColor={layerColors[index]}
+          markersColor={layerColors[preloadedLayerSummaries.length + index]}
           onRecordEditClick={onRecordEditClick}
           createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
         />
@@ -91,16 +98,9 @@ const MapWrapper = () => {
         <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}
-          markersColor={layerColors[samplingPointDataLevels.length + index]}
+          markersColor={layerColors[preloadedLayerSummaries.length + samplingPointDataLevels.length + index]}
           onRecordEditClick={onRecordEditClick}
           editingRecordUuid={editingRecordUuid}
-        />
-      )),
-      ...preloadedLayerSummaries.map((preloadedLayerSummary, index) => (
-        <PreloadedLayer
-          key={SurveyFile.getUuid(preloadedLayerSummary)}
-          preloadedMapLayer={preloadedLayerSummary}
-          color={layerColors[samplingPointDataLevels.length + geoAttributeDefs.length + index]}
         />
       )),
     ],

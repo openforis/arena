@@ -1,6 +1,7 @@
 export const contentTypes = {
   csv: 'text/csv',
   geojson: 'application/geo+json',
+  kml: 'application/vnd.google-earth.kml+xml',
   kmz: 'application/vnd.google-earth.kmz',
   zip: 'application/zip',
 }

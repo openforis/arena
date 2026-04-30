@@ -13,6 +13,12 @@ import { ZipUtils } from '@webapp/utils/zipUtils'
 
 import { useMapLayerToggle } from '../common'
 
+const parseKmlText = (text, parser = null) => {
+  if (!text) return null
+  const actualParser = parser ?? new DOMParser()
+  return actualParser.parseFromString(text, 'text/xml')
+}
+
 const extractKmlDomFromKmz = async (blob) => {
   const kmlTexts = []
   await ZipUtils.forEachFileInZip(blob, async (relativePath, fileEntry) => {
@@ -23,9 +29,57 @@ const extractKmlDomFromKmz = async (blob) => {
   })
   if (kmlTexts.length > 0) {
     const parser = new DOMParser()
-    return parser.parseFromString(kmlTexts[0], 'text/xml')
+    return kmlTexts.map((kmlText) => parseKmlText(kmlText, parser))
   }
-  return null
+  return []
+}
+
+const createGeoJsonLayer = async (url) => {
+  const { data } = await axios.get(url)
+  const layer = L.geoJSON(data)
+  let bounds = null
+  if (layer) {
+    bounds = layer.getBounds()
+  }
+  return { layer, bounds }
+}
+
+const createKmlLayer = async (url) => {
+  const { data } = await axios.get(url)
+  const kmlDom = parseKmlText(data)
+  let bounds = null
+  let layer = null
+  if (kmlDom) {
+    layer = new L.KML(kmlDom)
+    bounds = layer.getBounds()
+  }
+  return { layer, bounds }
+}
+
+const createKmzLayer = async (url) => {
+  const { data } = await axios.get(url, { responseType: 'blob' })
+  const kmlDoms = await extractKmlDomFromKmz(data)
+  let bounds = null
+  let layer = null
+  if (kmlDoms.length > 0) {
+    layer = L.layerGroup()
+    kmlDoms.forEach((kmlDom) => {
+      const kmlLayer = new L.KML(kmlDom)
+      layer.addLayer(kmlLayer)
+      const kmlBounds = kmlLayer.getBounds()
+      if (kmlBounds.isValid()) {
+        bounds = bounds ? bounds.extend(kmlBounds) : kmlBounds
+      }
+    })
+  }
+  return { layer, bounds }
+}
+
+const layerCreatorByExtension = {
+  geojson: createGeoJsonLayer,
+  json: createGeoJsonLayer,
+  kml: createKmlLayer,
+  kmz: createKmzLayer,
 }
 
 export const PreloadedLayer = (props) => {
@@ -41,8 +95,9 @@ export const PreloadedLayer = (props) => {
   const layerName = SurveyFile.getLabel(lang)(preloadedMapLayer)
 
   const removePreviousLayer = useCallback(() => {
-    if (layerRef.current) {
-      map.removeLayer(layerRef.current)
+    const layer = layerRef.current
+    if (layer) {
+      map.removeLayer(layer)
       layerRef.current = null
     }
   }, [map])
@@ -53,26 +108,18 @@ export const PreloadedLayer = (props) => {
     const fileName = SurveyFile.getName(preloadedMapLayer)
     const extension = FileUtils.getExtension(fileName)?.toLowerCase()
     const url = API.getSurveyFileDownloadUrl({ surveyId, fileUuid })
-    let layer = null
-    if (extension === 'geojson' || extension === 'json') {
-      const { data } = await axios.get(url)
-      layer = L.geoJSON(data)
-    } else if (extension === 'kmz') {
-      const response = await axios.get(url, { responseType: 'blob' })
-      const kmlDom = await extractKmlDomFromKmz(response.data)
-      if (kmlDom) {
-        layer = new L.KML(kmlDom)
-      }
-    }
+
+    const layerCreator = layerCreatorByExtension[extension]
+    const result = await layerCreator?.(url)
+    const { layer, bounds } = result || {}
     if (layer) {
       layerRef.current = layer
       map.addLayer(layer)
-      const bounds = layer.getBounds()
-      if (bounds.isValid()) {
-        map.fitBounds(bounds)
-      }
     }
-  }, [fileUuid, preloadedMapLayer, removePreviousLayer, surveyId, map])
+    if (bounds?.isValid()) {
+      map.fitBounds(bounds)
+    }
+  }, [fileUuid, surveyId, removePreviousLayer, preloadedMapLayer, map])
 
   useEffect(() => {
     // Cleanup on unmount
