@@ -13,6 +13,12 @@ import { ZipUtils } from '@webapp/utils/zipUtils'
 
 import { useMapLayerToggle } from '../common'
 
+const parseKmlText = (text, parser = null) => {
+  if (!text) return null
+  const actualParser = parser ?? new DOMParser()
+  return actualParser.parseFromString(text, 'text/xml')
+}
+
 const extractKmlDomFromKmz = async (blob) => {
   const kmlTexts = []
   await ZipUtils.forEachFileInZip(blob, async (relativePath, fileEntry) => {
@@ -23,9 +29,9 @@ const extractKmlDomFromKmz = async (blob) => {
   })
   if (kmlTexts.length > 0) {
     const parser = new DOMParser()
-    return parser.parseFromString(kmlTexts[0], 'text/xml')
+    return kmlTexts.map((kmlText) => parseKmlText(kmlText, parser))
   }
-  return null
+  return []
 }
 
 export const PreloadedLayer = (props) => {
@@ -57,26 +63,45 @@ export const PreloadedLayer = (props) => {
     if (extension === 'geojson' || extension === 'json') {
       const { data } = await axios.get(url)
       layer = L.geoJSON(data)
+      if (layer) {
+        layerRef.current = layer
+        map.addLayer(layer)
+        const bounds = layer.getBounds()
+        if (bounds.isValid()) {
+          map.fitBounds(bounds)
+        }
+      }
     } else if (extension === 'kmz') {
       const response = await axios.get(url, { responseType: 'blob' })
-      const kmlDom = await extractKmlDomFromKmz(response.data)
-      if (kmlDom) {
-        layer = new L.KML(kmlDom)
+      const kmlDoms = await extractKmlDomFromKmz(response.data)
+      if (kmlDoms.length > 0) {
+        const group = L.layerGroup()
+        let bounds = null
+        kmlDoms.forEach((kmlDom) => {
+          const kmlLayer = new L.KML(kmlDom)
+          group.addLayer(kmlLayer)
+          const kmlBounds = kmlLayer.getBounds()
+          if (kmlBounds.isValid()) {
+            bounds = bounds ? bounds.extend(kmlBounds) : kmlBounds
+          }
+        })
+        layerRef.current = group
+        map.addLayer(group)
+        if (bounds && bounds.isValid()) {
+          map.fitBounds(bounds)
+        }
       }
     } else if (extension === 'kml') {
       const response = await axios.get(url)
-      const parser = new DOMParser()
-      const kmlDom = parser.parseFromString(response.data, 'text/xml')
+      const kmlDom = parseKmlText(response.data)
       if (kmlDom) {
         layer = new L.KML(kmlDom)
-      }
-    }
-    if (layer) {
-      layerRef.current = layer
-      map.addLayer(layer)
-      const bounds = layer.getBounds()
-      if (bounds.isValid()) {
-        map.fitBounds(bounds)
+        layerRef.current = layer
+        map.addLayer(layer)
+        const bounds = layer.getBounds()
+        if (bounds.isValid()) {
+          map.fitBounds(bounds)
+        }
       }
     }
   }, [fileUuid, preloadedMapLayer, removePreviousLayer, surveyId, map])
