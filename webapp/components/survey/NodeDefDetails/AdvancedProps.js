@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -14,18 +16,21 @@ import Checkbox from '@webapp/components/form/checkbox'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State } from './store'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 const AdvancedProps = (props) => {
   const { state, Actions } = props
 
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const readOnly = !useAuthCanEditSurvey()
+  const cycle = useSurveyCycleKey()
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
   const autoIncrementalKey = NodeDef.isAutoIncrementalKey(nodeDef)
-
-  const cycle = useSurveyCycleKey()
+  const defaultValueEvaluatedOneTime = NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
+  const hiddenWhenNotRelevant = NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)
 
   return (
     <div className="form">
@@ -65,19 +70,21 @@ const AdvancedProps = (props) => {
             isBoolean={NodeDef.isBoolean(nodeDef)}
             excludeCurrentNodeDef
           />
-          <div className="form_row without-label">
-            <Checkbox
-              checked={NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)}
-              disabled={readOnly || autoIncrementalKey}
-              label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
-              validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
-                validation
-              )}
-              onChange={(value) =>
-                Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime, value })
-              }
-            />
-          </div>
+          {(defaultValueEvaluatedOneTime || Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))) && (
+            <div className="form_row without-label">
+              <Checkbox
+                checked={defaultValueEvaluatedOneTime}
+                disabled={readOnly || autoIncrementalKey}
+                label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
+                validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
+                  validation
+                )}
+                onChange={(value) =>
+                  Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime, value })
+                }
+              />
+            </div>
+          )}
         </>
       )}
 
@@ -95,15 +102,17 @@ const AdvancedProps = (props) => {
         excludeCurrentNodeDef
       />
 
-      <div className="form_row without-label">
-        <Checkbox
-          checked={NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)}
-          disabled={readOnly}
-          label="nodeDefEdit.advancedProps.hiddenWhenNotRelevant"
-          validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenWhenNotRelevant)(validation)}
-          onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })}
-        />
-      </div>
+      {(hiddenWhenNotRelevant || Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))) && (
+        <div className="form_row without-label">
+          <Checkbox
+            checked={hiddenWhenNotRelevant}
+            disabled={readOnly}
+            label="nodeDefEdit.advancedProps.hiddenWhenNotRelevant"
+            validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenWhenNotRelevant)(validation)}
+            onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })}
+          />
+        </div>
+      )}
 
       {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (
         <FormItem label="nodeDefEdit.advancedProps.itemsFilter" info="nodeDefEdit.advancedProps.itemsFilterInfo">
@@ -111,6 +120,16 @@ const AdvancedProps = (props) => {
             onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.itemsFilter, value })}
             validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.itemsFilter)(validation)}
             value={NodeDef.getItemsFilter(nodeDef)}
+          />
+        </FormItem>
+      )}
+      {experimentalFeatures && NodeDef.canBeHiddenInReport(nodeDef) && (
+        <FormItem label="nodeDefEdit.advancedProps.hiddenInReport" info="nodeDefEdit.advancedProps.hiddenInReportInfo">
+          <Checkbox
+            checked={NodeDef.isHiddenInReport(nodeDef)}
+            disabled={readOnly}
+            validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.hiddenInReport)(validation)}
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.hiddenInReport, value })}
           />
         </FormItem>
       )}
