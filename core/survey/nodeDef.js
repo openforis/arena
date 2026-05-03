@@ -782,5 +782,11 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   if (!canBeHiddenInReport(nodeDefUpdated) && isHiddenInReport(nodeDefUpdated)) {
     nodeDefUpdated = assocProp({ key: keysPropsAdvanced.hiddenInReport, value: false })(nodeDefUpdated)
   }
+  if (NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefUpdated) && A.isEmpty(getApplicable(nodeDefUpdated))) {
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenWhenNotRelevant })(nodeDefUpdated)
+  }
+  if (isDefaultValueEvaluatedOneTime(nodeDefUpdated) && A.isEmpty(getDefaultValues(nodeDefUpdated))) {
+    nodeDefUpdated = assocDefaultValueEvaluatedOnlyOneTime(false)(nodeDefUpdated)
+  }
   return nodeDefUpdated
 }
