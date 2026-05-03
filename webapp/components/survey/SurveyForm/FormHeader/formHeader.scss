@@ -23,8 +23,9 @@
 
 .survey-form-header__actions {
   display: flex;
+  align-items: center;
 
-  >*:not(:last-child) {
+  > *:not(:last-child) {
     margin: 0 1rem;
   }
 
@@ -42,7 +43,7 @@
 .survey-form-header__record-actions-steps {
   border: 1px solid $greyBorder;
 
-  >* {
+  > * {
     margin: 0 0.5rem;
     font-size: 0.8rem;
   }

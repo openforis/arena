@@ -16,7 +16,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 
 import { TestId } from '@webapp/utils/testId'
-import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
+import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
 
@@ -69,21 +69,12 @@ const RecordEntryButtons = (props) => {
         </Link>
       )}
       {experimentalFeatures && (
-        <ButtonMenu
-          iconClassName="icon-cog icon-14px"
-          label="common.advancedFunctions"
-          items={[
-            {
-              key: 'survey-docx-export',
-              content: (
-                <ButtonDownload
-                  href={API.getRecordDocxExportUrl({ surveyId, recordUuid, lang })}
-                  label="surveyForm:exportDocx"
-                  variant="text"
-                />
-              ),
-            },
-          ]}
+        <ButtonDownload
+          iconClassName="icon-file-word"
+          href={API.getRecordDocxExportUrl({ surveyId, recordUuid, lang })}
+          showLabel={false}
+          title="surveyForm:downloadPrintableDocument"
+          variant="text"
         />
       )}
       <div className="survey-form-header__record-actions-steps">
