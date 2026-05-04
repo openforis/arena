@@ -96,6 +96,7 @@ export const propKeys = {
   includeAccuracy: 'includeAccuracy',
   includeAltitude: 'includeAltitude',
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
+  mapMarkerColor: 'mapMarkerColor',
 
   // layout elements
   headerColor: 'headerColor',
@@ -281,6 +282,7 @@ export const isAllowOnlyDeviceCoordinate = ObjectUtils.isPropTrue(propKeys.allow
 export const isAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAccuracy)
 export const isAltitudeIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitude)
 export const isAltitudeAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitudeAccuracy)
+export const getMapMarkerColor = getProp(propKeys.mapMarkerColor)
 export const getCoordinateAdditionalFields = NodeDefs.getCoordinateAdditionalFields
 // decimal
 export const getMaxNumberDecimalDigits = (nodeDef) => {

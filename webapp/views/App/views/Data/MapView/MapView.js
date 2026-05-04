@@ -2,6 +2,8 @@ import './MapView.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -18,6 +20,13 @@ import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { RecordEditModal } from '../common/RecordEditModal'
 import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
 import { PreloadedLayer } from './PreloadedLayer/PreloadedLayer'
+
+const getGeoAttributeLayerMarkersColor = ({ attributeDef, defaultColor }) => {
+  if (!NodeDef.isCoordinate(attributeDef)) return defaultColor
+
+  const mapMarkerColor = NodeDef.getMapMarkerColor(attributeDef)
+  return Objects.isEmpty(mapMarkerColor) ? defaultColor : mapMarkerColor
+}
 
 const getSamplingPointDataLevels = (survey) => {
   const samplingPointDataCategory = Survey.getSamplingPointDataCategory(survey)
@@ -98,7 +107,10 @@ const MapWrapper = () => {
         <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}
-          markersColor={layerColors[preloadedLayerSummaries.length + samplingPointDataLevels.length + index]}
+          markersColor={getGeoAttributeLayerMarkersColor({
+            attributeDef,
+            defaultColor: layerColors[preloadedLayerSummaries.length + samplingPointDataLevels.length + index],
+          })}
           onRecordEditClick={onRecordEditClick}
           editingRecordUuid={editingRecordUuid}
         />

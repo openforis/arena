@@ -26,16 +26,17 @@ export const useMapClusters = (props) => {
   const clusterIconCreator = useCallback(
     ({ count, size, color }) => {
       const clusterIconsCache = clusterIconsCacheRef.current
-      if (!clusterIconsCache[count]) {
+      const cacheKey = `${count}-${Math.round(size)}-${color}`
+      if (!clusterIconsCache[cacheKey]) {
         const textColor = Colors.getHighContrastTextColor(color)
 
-        clusterIconsCache[count] = L.divIcon({
+        clusterIconsCache[cacheKey] = L.divIcon({
           html: `<div class="cluster-marker" style="width: ${size}px; height: ${size}px; background-color: ${color}; color: ${textColor}">
         ${count}
       </div>`,
         })
       }
-      return clusterIconsCache[count]
+      return clusterIconsCache[cacheKey]
     },
     [clusterIconsCacheRef]
   )

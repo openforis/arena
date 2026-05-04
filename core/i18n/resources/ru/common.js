@@ -23,6 +23,7 @@ export default {
     chain: 'Цепочка',
     chain_plural: 'Цепочки',
     childrenEmpty: 'Определите хотя бы один дочерний элемент',
+    clear: 'Очистить',
     clone: 'Клонировать',
     close: 'Закрыть',
     cloneFrom: 'Клонировать из',
@@ -459,6 +460,7 @@ $t(common.raiseTicketInSupportForum)
   },
 
   mapView: {
+    changeMarkerColor: 'Изменить цвет маркера',
     createRecord: 'Создать новую запись',
     editRecord: 'Редактировать запись',
     elevation: 'Высота (м)',
@@ -1025,6 +1027,7 @@ $t(common.appNameFull)
     coordinateProps: {
       allowOnlyDeviceCoordinate: 'Разрешить только координаты устройства',
       allowOnlyDeviceCoordinateInfo: `Применяется только к Arena Mobile: если отмечено, пользователь не сможет изменять значения X/Y, но для их получения можно будет использовать только GPS устройства`,
+      mapMarkerColor: 'Цвет маркера на карте',
     },
     expressionsProp: {
       expression: 'Выражение',

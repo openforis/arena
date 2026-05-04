@@ -23,6 +23,7 @@ export default {
     chain: 'Гинж',
     chain_plural: 'Гинжүүд',
     childrenEmpty: 'Наад зах нь нэг хүүхэд элементийг тодорхойлно уу',
+    clear: 'Арилгах',
     clone: 'Хувилах',
     close: 'Хаах',
     cloneFrom: 'Үүнээс хувилах',
@@ -459,6 +460,7 @@ $t(common.raiseTicketInSupportForum)
   },
 
   mapView: {
+    changeMarkerColor: 'Тэмдэглэгээний өнгө өөрчлөх',
     createRecord: 'Шинэ бичлэг үүсгэх',
     editRecord: 'Бичлэгийг засах',
     elevation: 'Өндөр (м)',
@@ -1018,6 +1020,7 @@ $t(common.appNameFull)
     coordinateProps: {
       allowOnlyDeviceCoordinate: 'Зөвхөн төхөөрөмжийн координатыг зөвшөөрөх',
       allowOnlyDeviceCoordinateInfo: `Зөвхөн Арена Мобайл-д хамаарна: хэрэв шалгагдсан бол хэрэглэгч X/Y утгуудыг өөрчлөх боломжгүй, зөвхөн төхөөрөмжийн GPS-г ашиглан тэдгээрийг авах боломжтой`,
+      mapMarkerColor: 'Газрын зураг дээрх тэмдэглэгээний өнгө',
     },
     expressionsProp: {
       expression: 'Илэрхийлэл',
