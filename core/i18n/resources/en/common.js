@@ -953,8 +953,8 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
       defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
       hidden: 'Hide in entry form',
-      hiddenInReport: 'Hidden in report',
-      hiddenInReportInfo: `If marked, the attribute won't be visible in the reporting tool`,
+      hiddenInReport: 'Hidden in Analytical Dashboard',
+      hiddenInReportInfo: `If marked, the attribute won't be visible in the Analytical Dashboard`,
       hiddenWhenNotRelevant: 'Hidden when not relevant',
       itemsFilter: 'Items filter',
       itemsFilterInfo: `Expression used to filter selectable items.

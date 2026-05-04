@@ -961,8 +961,8 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valeurs par défaut non modifiables car la clé auto-incrémentielle est définie',
       hidden: 'Masquer dans le formulaire de saisie',
-      hiddenInReport: 'Masquer dans le rapport',
-      hiddenInReportInfo: `Si coché, l'attribut ne sera pas visible dans l'outil de rapport`,
+      hiddenInReport: 'Masquer dans le tableau de bord analytique',
+      hiddenInReportInfo: `Si coché, l'attribut ne sera pas visible dans le tableau de bord analytique`,
       hiddenWhenNotRelevant: 'Masqué quand non pertinent',
       itemsFilter: "Filtre d'éléments",
       itemsFilterInfo: `Expression utilisée pour filtrer les éléments sélectionnables.
