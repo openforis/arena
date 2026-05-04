@@ -23,6 +23,7 @@ export default {
     chain: 'Цепочка',
     chain_plural: 'Цепочки',
     childrenEmpty: 'Определите хотя бы один дочерний элемент',
+    clear: 'Очистить',
     clone: 'Клонировать',
     close: 'Закрыть',
     cloneFrom: 'Клонировать из',

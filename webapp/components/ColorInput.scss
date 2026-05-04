@@ -1,3 +1,9 @@
-.MuiColorInput-TextField {
-  width: 10rem;
+.color-input {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+
+  .MuiColorInput-TextField {
+    width: 10rem;
+  }
 }

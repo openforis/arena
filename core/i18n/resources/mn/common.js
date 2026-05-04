@@ -23,6 +23,7 @@ export default {
     chain: 'Гинж',
     chain_plural: 'Гинжүүд',
     childrenEmpty: 'Наад зах нь нэг хүүхэд элементийг тодорхойлно уу',
+    clear: 'Арилгах',
     clone: 'Хувилах',
     close: 'Хаах',
     cloneFrom: 'Үүнээс хувилах',

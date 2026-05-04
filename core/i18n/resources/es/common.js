@@ -23,6 +23,7 @@ export default {
     chain: 'Cadena',
     chain_plural: 'Cadenas',
     childrenEmpty: 'Defina al menos un elemento hijo',
+    clear: 'Limpiar',
     clone: 'Clonar',
     close: 'Cerrar',
     cloneFrom: 'Clonar de',
