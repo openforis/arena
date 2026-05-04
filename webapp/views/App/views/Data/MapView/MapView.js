@@ -2,6 +2,8 @@ import './MapView.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -23,7 +25,7 @@ const getGeoAttributeLayerMarkersColor = ({ attributeDef, defaultColor }) => {
   if (!NodeDef.isCoordinate(attributeDef)) return defaultColor
 
   const mapMarkerColor = NodeDef.getMapMarkerColor(attributeDef)
-  return mapMarkerColor ?? defaultColor
+  return Objects.isEmpty(mapMarkerColor) ? defaultColor : mapMarkerColor
 }
 
 const getSamplingPointDataLevels = (survey) => {

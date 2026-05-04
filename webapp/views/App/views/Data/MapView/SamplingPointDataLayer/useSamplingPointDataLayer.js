@@ -15,7 +15,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { LoaderActions } from '@webapp/store/ui'
 
-import { useMapClusters, useMapLayerToggle } from '../common'
+import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../common'
 
 const itemsPageSize = 2000
 
@@ -113,8 +113,13 @@ export const useSamplingPointDataLayer = (props) => {
     { level: levelIndex + 1 }
   )
 
-  // add icon close to name
-  const overlayName = `${overlayInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
+  const layerColorPickerId = `sampling-point-data-layer-color-picker-${levelIndex}`
+
+  const { layerName: overlayName, currentMarkersColor } = useLayerColorPicker({
+    colorPickerId: layerColorPickerId,
+    innerName: overlayInnerName,
+    initialColor: markersColor,
+  })
 
   const fetchItemsAndConvertIntoPoints = useCallback(async () => {
     dispatch(LoaderActions.showLoader())
@@ -159,6 +164,7 @@ export const useSamplingPointDataLayer = (props) => {
     clusterIconCreator,
     getClusterLeaves,
     overlayName,
+    currentMarkersColor,
     totalPoints: points.length,
     items,
     points,

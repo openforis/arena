@@ -8,7 +8,7 @@ import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 
 export const GeoAttributeDataLayer = (props) => {
-  const { attributeDef, markersColor, onRecordEditClick } = props
+  const { attributeDef, onRecordEditClick } = props
 
   const {
     layerName,

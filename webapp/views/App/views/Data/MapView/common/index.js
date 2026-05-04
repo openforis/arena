@@ -1,6 +1,7 @@
 export { ClusterMarker } from './ClusterMarker'
 export { MarkerTooltip } from './MarkerTooltip'
 export { useFlyToPoint } from './useFlyToPoint'
+export { useLayerColorPicker } from './useLayerColorPicker'
 export { useLayerMarker } from './useLayerMarker'
 export { useMapClusters } from './useMapClusters'
 export { useMapLayerToggle } from './useMapLayerToggle'

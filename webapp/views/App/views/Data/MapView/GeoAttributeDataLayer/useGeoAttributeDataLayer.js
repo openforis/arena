@@ -15,7 +15,7 @@ import { useI18n } from '@webapp/store/system'
 import { JobActions } from '@webapp/store/app'
 import * as API from '@webapp/service/api'
 
-import { useMapClusters, useMapLayerToggle } from '../common'
+import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../common'
 import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
 
@@ -30,22 +30,6 @@ const onGeoJsonDataExportComplete =
     const earthMapUrl = API.getEarthMapJsonDownloadUrl(downloadUrl)
     window.open(earthMapUrl, '_blank')
   }
-
-const buildLayerNameComponent = ({
-  layerInnerName,
-  layerEarthMapButtonId,
-  layerColorPickerId,
-  markersColor,
-  changeMarkerColorTitle,
-}) => `<div class="layer-selector-row">
-      <span class="layer-selector-name">${layerInnerName}</span>
-      <span class="layer-selector-button-bar">
-        <button id="${layerEarthMapButtonId}" class="layer-selector-earth-map-btn" title="Earth Map">
-          <img height="14" width="14" src="/img/of_earth_map_icon_small.png" />
-        </button>
-        <input type="color" id="${layerColorPickerId}" value="${markersColor}" class="layer-color-picker" title="${changeMarkerColorTitle}" />
-      </span>
-    </div>`
 
 export const useGeoAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, editingRecordUuid } = props
@@ -67,8 +51,6 @@ export const useGeoAttributeDataLayer = (props) => {
     points: [],
     pointIndexByDataIndex: [],
   })
-
-  const [currentMarkersColor, setCurrentMarkersColor] = useState(markersColor)
 
   const nodeDefParent = useMemo(
     () => Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey),
@@ -100,15 +82,22 @@ export const useGeoAttributeDataLayer = (props) => {
   const layerEarthMapButtonId = `geo-attribute-layer-earth-map-btn-${attributeDefUuid}`
   const layerColorPickerId = `geo-attribute-layer-color-picker-${attributeDefUuid}`
 
-  // add icon close to layer name
-  const changeMarkerColorTitle = i18n.t('mapView.changeMarkerColor')
-  const layerName = buildLayerNameComponent({
-    layerInnerName,
-    layerEarthMapButtonId,
-    layerColorPickerId,
-    markersColor,
-    changeMarkerColorTitle,
+  const earthMapButtonHtml = `<button id="${layerEarthMapButtonId}" class="layer-selector-earth-map-btn" title="Earth Map"><img height="14" width="14" src="/img/of_earth_map_icon_small.png" /></button>`
+
+  const { layerName, currentMarkersColor } = useLayerColorPicker({
+    colorPickerId: layerColorPickerId,
+    innerName: layerInnerName,
+    extraButtons: earthMapButtonHtml,
+    initialColor: markersColor,
   })
+
+  const earthMapButton = document.getElementById(layerEarthMapButtonId)
+
+  useEffect(() => {
+    if (!earthMapButton) return
+    earthMapButton.addEventListener('click', onEarthMapButtonClick)
+    return () => earthMapButton.removeEventListener('click', onEarthMapButtonClick)
+  }, [earthMapButton, onEarthMapButtonClick])
 
   // on layer add, create query and fetch data
   useMapLayerToggle({
@@ -121,22 +110,6 @@ export const useGeoAttributeDataLayer = (props) => {
       setState((statePrev) => ({ ...statePrev, query }))
     },
   })
-
-  const earthMapButton = document.getElementById(layerEarthMapButtonId)
-  const colorPickerInput = document.getElementById(layerColorPickerId)
-
-  useEffect(() => {
-    if (!earthMapButton) return
-    earthMapButton.addEventListener('click', onEarthMapButtonClick)
-    return () => earthMapButton.removeEventListener('click', onEarthMapButtonClick)
-  }, [earthMapButton, onEarthMapButtonClick])
-
-  useEffect(() => {
-    if (!colorPickerInput) return
-    const onColorChange = (e) => setCurrentMarkersColor(e.target.value)
-    colorPickerInput.addEventListener('input', onColorChange)
-    return () => colorPickerInput.removeEventListener('input', onColorChange)
-  }, [colorPickerInput])
 
   const {
     data: dataFetchedTemp,
