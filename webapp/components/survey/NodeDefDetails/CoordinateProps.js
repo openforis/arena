@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { ColorInput } from '@webapp/components/ColorInput'
 import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
 import { ButtonIconInfo } from '@webapp/components/buttons'
@@ -12,6 +13,7 @@ const CoordinateProps = (props) => {
   const { state, Actions } = props
 
   const nodeDef = State.getNodeDef(state)
+  const mapMarkerColor = NodeDef.getMapMarkerColor(nodeDef) ?? ''
 
   return (
     <>
@@ -24,6 +26,7 @@ const CoordinateProps = (props) => {
           />
         </div>
       </FormItem>
+
       <FormItem label="nodeDefEdit.additionalFields">
         <div className="display-flex">
           <Checkbox
@@ -42,6 +45,12 @@ const CoordinateProps = (props) => {
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeAltitudeAccuracy, value })}
           />
         </div>
+      </FormItem>
+      <FormItem label="nodeDefEdit.coordinateProps.mapMarkerColor">
+        <ColorInput
+          value={mapMarkerColor}
+          onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.mapMarkerColor, value })}
+        />
       </FormItem>
     </>
   )

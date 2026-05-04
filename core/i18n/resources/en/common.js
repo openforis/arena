@@ -25,6 +25,7 @@ Do you want to ignore them?`,
     chain: 'Chain',
     chain_plural: 'Chains',
     childrenEmpty: 'Define at least one child item',
+    clear: 'Clear',
     clone: 'Clone',
     close: 'Close',
     cloneFrom: 'Clone from',
@@ -467,6 +468,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   mapView: {
+    changeMarkerColor: 'Change marker color',
     createRecord: 'Create new record',
     editRecord: 'Edit record',
     elevation: 'Elevation (m)',
@@ -1046,6 +1048,7 @@ E.g. this.region = region_attribute_name
     coordinateProps: {
       allowOnlyDeviceCoordinate: 'Allow only device coordinate',
       allowOnlyDeviceCoordinateInfo: `It applies only to Arena Mobile: if checked, the user won't be able to modify the X/Y values, but only device GPS can be used to get them`,
+      mapMarkerColor: 'Map marker color',
     },
     expressionsProp: {
       expression: 'Expression',

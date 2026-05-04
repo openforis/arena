@@ -25,6 +25,7 @@ Voulez-vous les ignorer ?`,
     chain: 'Chaîne',
     chain_plural: 'Chaînes',
     childrenEmpty: 'Définissez au moins un élément enfant',
+    clear: 'Effacer',
     clone: 'Cloner',
     close: 'Fermer',
     cloneFrom: 'Cloner depuis',
@@ -468,6 +469,7 @@ Merci et profitez de **$t(common.appNameFull)** !`,
   },
 
   mapView: {
+    changeMarkerColor: 'Modifier la couleur du marqueur',
     createRecord: 'Créer un nouvel enregistrement',
     editRecord: "Modifier l'enregistrement",
     elevation: 'Altitude (m)',
@@ -1054,6 +1056,7 @@ Ex. this.region = nom_attribut_region
     coordinateProps: {
       allowOnlyDeviceCoordinate: "Autoriser uniquement la coordonnée de l'appareil",
       allowOnlyDeviceCoordinateInfo: `S'applique uniquement à Arena Mobile : si coché, l'utilisateur ne pourra pas modifier les valeurs X/Y, seul le GPS de l'appareil peut être utilisé pour les obtenir`,
+      mapMarkerColor: 'Couleur du marqueur de carte',
     },
     expressionsProp: {
       expression: 'Expression',

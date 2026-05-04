@@ -7,7 +7,7 @@ import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 import { SamplingPointDataMarker } from './SamplingPointDataMarker'
 
 export const SamplingPointDataLayer = (props) => {
-  const { markersColor, onRecordEditClick, createRecordFromSamplingPointDataItem } = props
+  const { onRecordEditClick, createRecordFromSamplingPointDataItem } = props
 
   const {
     clusters,
@@ -15,6 +15,7 @@ export const SamplingPointDataLayer = (props) => {
     clusterIconCreator,
     getClusterLeaves,
     overlayName,
+    currentMarkersColor,
     totalPoints,
     points,
   } = useSamplingPointDataLayer(props)
@@ -45,7 +46,7 @@ export const SamplingPointDataLayer = (props) => {
                 cluster={cluster}
                 clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
                 clusterIconCreator={clusterIconCreator}
-                color={markersColor}
+                color={currentMarkersColor}
                 getClusterLeaves={getClusterLeaves}
                 openPopupOfPoint={openPopupOfPoint}
                 pointLabelFunction={(point) => point.properties.itemCodes.join(' - ')}
@@ -61,7 +62,7 @@ export const SamplingPointDataLayer = (props) => {
               flyToPoint={flyToPoint}
               flyToNextPoint={flyToNextPoint}
               flyToPreviousPoint={flyToPreviousPoint}
-              markersColor={markersColor}
+              markersColor={currentMarkersColor}
               onRecordEditClick={onRecordEditClick}
               pointFeature={cluster}
               setMarkerByKey={setMarkerByKey}
@@ -74,7 +75,7 @@ export const SamplingPointDataLayer = (props) => {
             flyToPoint={flyToPoint}
             flyToNextPoint={flyToNextPoint}
             flyToPreviousPoint={flyToPreviousPoint}
-            markersColor={markersColor}
+            markersColor={currentMarkersColor}
             onPopupClose={onCurrentPointPopupClose}
             onRecordEditClick={onRecordEditClick}
             pointFeature={currentPointShown}

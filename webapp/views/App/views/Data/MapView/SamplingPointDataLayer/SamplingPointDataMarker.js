@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { CircleMarker } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -30,11 +30,16 @@ export const SamplingPointDataMarker = (props) => {
     flyToPoint(pointFeature)
   }, [flyToPoint, pointFeature])
 
+  const pathOptions = useMemo(
+    () => ({ color: markersColor, fillColor: markersColor, fillOpacity: 0.5 }),
+    [markersColor]
+  )
+
   return (
     <CircleMarker
       center={[latitude, longitude]}
       radius={markerRadius}
-      color={markersColor}
+      pathOptions={pathOptions}
       ref={(ref) => {
         markerRef.current = ref
         setMarkerByKey({ key, marker: ref })
