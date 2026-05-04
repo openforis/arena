@@ -19,6 +19,13 @@ import { RecordEditModal } from '../common/RecordEditModal'
 import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
 import { PreloadedLayer } from './PreloadedLayer/PreloadedLayer'
 
+const getGeoAttributeLayerMarkersColor = ({ attributeDef, defaultColor }) => {
+  if (!NodeDef.isCoordinate(attributeDef)) return defaultColor
+
+  const mapMarkerColor = NodeDef.getMapMarkerColor(attributeDef)
+  return mapMarkerColor ?? defaultColor
+}
+
 const getSamplingPointDataLevels = (survey) => {
   const samplingPointDataCategory = Survey.getSamplingPointDataCategory(survey)
   const samplingPointDataCoordinatesDefined =
@@ -98,7 +105,10 @@ const MapWrapper = () => {
         <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}
-          markersColor={layerColors[preloadedLayerSummaries.length + samplingPointDataLevels.length + index]}
+          markersColor={getGeoAttributeLayerMarkersColor({
+            attributeDef,
+            defaultColor: layerColors[preloadedLayerSummaries.length + samplingPointDataLevels.length + index],
+          })}
           onRecordEditClick={onRecordEditClick}
           editingRecordUuid={editingRecordUuid}
         />

@@ -1054,6 +1054,7 @@ Ex. this.region = nom_attribut_region
     coordinateProps: {
       allowOnlyDeviceCoordinate: "Autoriser uniquement la coordonnée de l'appareil",
       allowOnlyDeviceCoordinateInfo: `S'applique uniquement à Arena Mobile : si coché, l'utilisateur ne pourra pas modifier les valeurs X/Y, seul le GPS de l'appareil peut être utilisé pour les obtenir`,
+      mapMarkerColor: 'Couleur du marqueur de carte',
     },
     expressionsProp: {
       expression: 'Expression',

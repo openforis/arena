@@ -1046,6 +1046,7 @@ E.g. this.region = region_attribute_name
     coordinateProps: {
       allowOnlyDeviceCoordinate: 'Allow only device coordinate',
       allowOnlyDeviceCoordinateInfo: `It applies only to Arena Mobile: if checked, the user won't be able to modify the X/Y values, but only device GPS can be used to get them`,
+      mapMarkerColor: 'Map marker color',
     },
     expressionsProp: {
       expression: 'Expression',

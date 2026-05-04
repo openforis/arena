@@ -2390,6 +2390,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ctrl/tinycolor@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "@ctrl/tinycolor@npm:4.2.0"
+  checksum: 10c0/374034581953f6debd950e4b07da833d1d8f7af5aead5117c91545fbe1583c91b2407bc285e1625529839135d6465c2e7549e7a8ad70979cab4c207486798064
+  languageName: node
+  linkType: hard
+
 "@discoveryjs/json-ext@npm:0.5.7":
   version: 0.5.7
   resolution: "@discoveryjs/json-ext@npm:0.5.7"
@@ -15008,6 +15015,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mui-color-input@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "mui-color-input@npm:9.0.0"
+  dependencies:
+    "@ctrl/tinycolor": "npm:^4.2.0"
+  peerDependencies:
+    "@emotion/react": ^11.13.0
+    "@emotion/styled": ^11.13.0
+    "@mui/material": ^7.0.0 || ^9.0.0
+    "@types/react": ^18.0.0 || ^19.0.0
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/d8b173986ab2de38072f451a8f7e8473ff378affe24e74f1ee8b035f631c45aeb6a100fc26832f06a0d0336431342068b7bf3763e04546973bcdabfa5fac4660
+  languageName: node
+  linkType: hard
+
 "multicast-dns@npm:^7.2.5":
   version: 7.2.5
   resolution: "multicast-dns@npm:7.2.5"
@@ -15665,6 +15691,7 @@ __metadata:
     marked: "npm:^14.1.4"
     mini-css-extract-plugin: "npm:^2.10.0"
     morgan: "npm:^1.10.1"
+    mui-color-input: "npm:^9.0.0"
     ncp: "npm:^2.0.0"
     node-dev: "npm:^8.0.0"
     node-schedule: "npm:^2.1.1"

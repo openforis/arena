@@ -1025,6 +1025,7 @@ $t(common.appNameFull)
     coordinateProps: {
       allowOnlyDeviceCoordinate: 'Разрешить только координаты устройства',
       allowOnlyDeviceCoordinateInfo: `Применяется только к Arena Mobile: если отмечено, пользователь не сможет изменять значения X/Y, но для их получения можно будет использовать только GPS устройства`,
+      mapMarkerColor: 'Цвет маркера на карте',
     },
     expressionsProp: {
       expression: 'Выражение',

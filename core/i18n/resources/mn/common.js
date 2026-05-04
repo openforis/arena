@@ -1018,6 +1018,7 @@ $t(common.appNameFull)
     coordinateProps: {
       allowOnlyDeviceCoordinate: 'Зөвхөн төхөөрөмжийн координатыг зөвшөөрөх',
       allowOnlyDeviceCoordinateInfo: `Зөвхөн Арена Мобайл-д хамаарна: хэрэв шалгагдсан бол хэрэглэгч X/Y утгуудыг өөрчлөх боломжгүй, зөвхөн төхөөрөмжийн GPS-г ашиглан тэдгээрийг авах боломжтой`,
+      mapMarkerColor: 'Газрын зураг дээрх тэмдэглэгээний өнгө',
     },
     expressionsProp: {
       expression: 'Илэрхийлэл',

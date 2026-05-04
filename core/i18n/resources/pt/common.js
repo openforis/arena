@@ -1050,6 +1050,7 @@ $t(common.appNameFull)
     coordinateProps: {
       allowOnlyDeviceCoordinate: 'Permitir apenas coordenada do dispositivo',
       allowOnlyDeviceCoordinateInfo: `Aplica-se apenas ao Arena Mobile: se marcado, o usuário não poderá modificar os valores X/Y, e somente o GPS do dispositivo poderá ser usado para obtê-los`,
+      mapMarkerColor: 'Cor do marcador no mapa',
     },
     expressionsProp: {
       expression: 'Expressão',
