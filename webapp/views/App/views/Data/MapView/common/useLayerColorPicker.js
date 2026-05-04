@@ -6,8 +6,8 @@ const buildLayerNameHtml = ({ innerName, extraButtons = '', colorPickerId, marke
   `<div class="layer-selector-row">
       <span class="layer-selector-name">${innerName}</span>
       <span class="layer-selector-button-bar">
-        ${extraButtons}
         <input type="color" id="${colorPickerId}" value="${markersColor}" class="layer-color-picker" title="${changeMarkerColorTitle}" />
+        ${extraButtons}
       </span>
     </div>`
 
