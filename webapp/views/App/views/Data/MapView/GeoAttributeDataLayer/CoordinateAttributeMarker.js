@@ -77,6 +77,13 @@ export const CoordinateAttributeMarker = (props) => {
     [onDoubleClick, onPopupClose]
   )
 
+  const circleMarkerPathOptions = useMemo(
+    () => ({ color: markersColor, fillColor: markersColor, fillOpacity }),
+    [markersColor]
+  )
+
+  const geoJsonStyle = useMemo(() => ({ color: markersColor }), [markersColor])
+
   return (
     <div>
       {Survey.isSampleBasedImageInterpretationEnabled(surveyInfo) && (
@@ -85,10 +92,8 @@ export const CoordinateAttributeMarker = (props) => {
       {!innerData && (
         <CircleMarker
           center={[latitude, longitude]}
-          color={markersColor}
           eventHandlers={eventHandlers}
-          fillColor={markersColor}
-          fillOpacity={fillOpacity}
+          pathOptions={circleMarkerPathOptions}
           radius={markerRadius}
           ref={setRef}
         >
@@ -97,7 +102,7 @@ export const CoordinateAttributeMarker = (props) => {
       )}
 
       {innerData && (
-        <GeoJSON data={innerData} eventHandlers={eventHandlers} color={markersColor} ref={setRef}>
+        <GeoJSON data={innerData} eventHandlers={eventHandlers} style={geoJsonStyle} ref={setRef}>
           {content}
         </GeoJSON>
       )}

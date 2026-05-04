@@ -126,14 +126,16 @@ export const useGeoAttributeDataLayer = (props) => {
   const colorPickerInput = document.getElementById(layerColorPickerId)
 
   useEffect(() => {
-    earthMapButton?.addEventListener('click', onEarthMapButtonClick)
+    if (!earthMapButton) return
+    earthMapButton.addEventListener('click', onEarthMapButtonClick)
+    return () => earthMapButton.removeEventListener('click', onEarthMapButtonClick)
   }, [earthMapButton, onEarthMapButtonClick])
 
   useEffect(() => {
     if (!colorPickerInput) return
     const onColorChange = (e) => setCurrentMarkersColor(e.target.value)
-    colorPickerInput.addEventListener('change', onColorChange)
-    return () => colorPickerInput.removeEventListener('change', onColorChange)
+    colorPickerInput.addEventListener('input', onColorChange)
+    return () => colorPickerInput.removeEventListener('input', onColorChange)
   }, [colorPickerInput])
 
   const {
