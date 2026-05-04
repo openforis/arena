@@ -2,6 +2,7 @@ import { Objects, Surveys } from '@openforis/arena-core'
 
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -179,6 +180,11 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
       maxFileSize: NodeDef.isFile(nodeDef) ? String(NodeDef.getMaxFileSize(nodeDef)) : '',
       hiddenInForm: String(NodeDef.isHidden(nodeDef)),
       hiddenInMobile: String(NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)),
+      ...(ProcessUtils.ENV.experimentalFeatures
+        ? {
+            hiddenInReport: String(NodeDef.isHiddenInReport(nodeDef)),
+          }
+        : {}),
       includedInMultipleEntitySummary: String(NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(nodeDef)),
       allowOnlyDeviceCoordinate: String(NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)),
       relevantIf,

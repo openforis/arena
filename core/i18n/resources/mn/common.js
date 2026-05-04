@@ -925,6 +925,8 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Автоматаар өсөн нэмэгдэх түлхүүр тохируулагдсан тул үндсэн утгуудыг засах боломжгүй',
       hidden: 'Оролтын маягтанд нуух',
+      hiddenInReport: 'Тайланд нуух',
+      hiddenInReportInfo: `Хэрэв тэмдэглэгдсэн бол шинж чанар тайлагнах хэрэгсэлд харагдахгүй`,
       hiddenWhenNotRelevant: 'Хамааралгүй үед нуух',
       itemsFilter: 'Элементүүдийн шүүлтүүр',
       itemsFilterInfo: `Сонгогдох элементүүдийг шүүхэд ашиглагдах илэрхийлэл.

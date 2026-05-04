@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { NodeDefs, Objects } from '@openforis/arena-core'
+import { NodeDefs, NodeDefType, Objects } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
 import * as A from '@core/arena'
@@ -167,6 +167,9 @@ export const keysPropsAdvanced = {
   itemsFilter: 'itemsFilter',
   // file
   fileNameExpression: 'fileNameExpression',
+
+  // reporting
+  hiddenInReport: 'hiddenInReport',
 }
 
 const commonAttributePropsAdvancedKeys = [
@@ -456,6 +459,9 @@ export const hasAreaBasedEstimated = (nodeDef) =>
 export const getAreaBasedEstimatedOf = getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, null)
 export const isAreaBasedEstimatedOf = (nodeDef) => Boolean(getAreaBasedEstimatedOf(nodeDef))
 
+// Reporting
+export const isHiddenInReport = getPropAdvanced(keysPropsAdvanced.hiddenInReport, false)
+
 // ==== CREATE
 
 export const newNodeDef = (
@@ -730,6 +736,9 @@ export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
 
 export const canShowGeotagInformation = (nodeDef) => getFileType(nodeDef) === fileTypeValues.image
 
+export const canBeHiddenInReport = (nodeDef) =>
+  [NodeDefType.boolean, NodeDefType.code, NodeDefType.taxon].includes(getType(nodeDef))
+
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
   // clear hidden if not applicable
@@ -769,6 +778,15 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   }
   if (!canShowGeotagInformation(nodeDefUpdated) && isGeotagInformationShown(nodeDefUpdated)) {
     nodeDefUpdated = ObjectUtils.setProp(propKeys.geotagInformationShown, false)(nodeDefUpdated)
+  }
+  if (!canBeHiddenInReport(nodeDefUpdated) && isHiddenInReport(nodeDefUpdated)) {
+    nodeDefUpdated = assocProp({ key: keysPropsAdvanced.hiddenInReport, value: false })(nodeDefUpdated)
+  }
+  if (NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefUpdated) && A.isEmpty(getApplicable(nodeDefUpdated))) {
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenWhenNotRelevant })(nodeDefUpdated)
+  }
+  if (isDefaultValueEvaluatedOneTime(nodeDefUpdated) && A.isEmpty(getDefaultValues(nodeDefUpdated))) {
+    nodeDefUpdated = assocDefaultValueEvaluatedOnlyOneTime(false)(nodeDefUpdated)
   }
   return nodeDefUpdated
 }
