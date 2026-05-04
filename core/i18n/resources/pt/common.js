@@ -468,6 +468,7 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
   },
 
   mapView: {
+    changeMarkerColor: 'Alterar cor do marcador',
     createRecord: 'Criar novo registro',
     editRecord: 'Editar registro',
     elevation: 'Elevação (m)',

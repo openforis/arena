@@ -469,6 +469,7 @@ Merci et profitez de **$t(common.appNameFull)** !`,
   },
 
   mapView: {
+    changeMarkerColor: 'Modifier la couleur du marqueur',
     createRecord: 'Créer un nouvel enregistrement',
     editRecord: "Modifier l'enregistrement",
     elevation: 'Altitude (m)',

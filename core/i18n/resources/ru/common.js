@@ -460,6 +460,7 @@ $t(common.raiseTicketInSupportForum)
   },
 
   mapView: {
+    changeMarkerColor: 'Изменить цвет маркера',
     createRecord: 'Создать новую запись',
     editRecord: 'Редактировать запись',
     elevation: 'Высота (м)',

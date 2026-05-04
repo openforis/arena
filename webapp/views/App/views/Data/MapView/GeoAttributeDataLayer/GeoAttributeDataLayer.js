@@ -12,6 +12,7 @@ export const GeoAttributeDataLayer = (props) => {
 
   const {
     layerName,
+    currentMarkersColor,
     clusters,
     clusterExpansionZoomExtractor,
     clusterIconCreator,
@@ -44,7 +45,7 @@ export const GeoAttributeDataLayer = (props) => {
               <ClusterMarker
                 key={cluster.id}
                 cluster={cluster}
-                color={markersColor}
+                color={currentMarkersColor}
                 clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
                 clusterIconCreator={clusterIconCreator}
                 getClusterLeaves={getClusterLeaves}
@@ -65,7 +66,7 @@ export const GeoAttributeDataLayer = (props) => {
               flyToPoint={flyToPoint}
               flyToNextPoint={flyToNextPoint}
               flyToPreviousPoint={flyToPreviousPoint}
-              markersColor={markersColor}
+              markersColor={currentMarkersColor}
               onRecordEditClick={onRecordEditClick}
               setMarkerByKey={setMarkerByKey}
             />
@@ -77,7 +78,7 @@ export const GeoAttributeDataLayer = (props) => {
             data={currentPointShown}
             flyToNextPoint={flyToNextPoint}
             flyToPreviousPoint={flyToPreviousPoint}
-            markersColor={markersColor}
+            markersColor={currentMarkersColor}
             onPopupClose={onCurrentPointPopupClose}
             onRecordEditClick={onRecordEditClick}
             popupOpen={currentPointPopupOpen}

@@ -412,6 +412,7 @@ export default {
     editRecord: 'Editar registro',
   },
   mapView: {
+    changeMarkerColor: 'Cambiar color del marcador',
     createRecord: 'Crear nuevo registro',
     editRecord: 'Editar registro',
     elevation: 'Elevación (m)',

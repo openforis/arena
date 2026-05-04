@@ -468,6 +468,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   mapView: {
+    changeMarkerColor: 'Change marker color',
     createRecord: 'Create new record',
     editRecord: 'Edit record',
     elevation: 'Elevation (m)',

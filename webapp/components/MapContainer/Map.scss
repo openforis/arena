@@ -59,13 +59,39 @@
         }
 
         .layer-selector-button-bar {
-          width: 2rem;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          width: auto;
 
           .layer-selector-earth-map-btn {
             width: 14px;
             height: 14px;
             padding: 0;
             border: none;
+          }
+
+          .layer-color-picker {
+            width: 16px;
+            height: 16px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
+            overflow: hidden;
+            &::-webkit-color-swatch-wrapper {
+              padding: 0;
+              border-radius: 50%;
+            }
+            &::-webkit-color-swatch {
+              border: none;
+              border-radius: 50%;
+            }
+            &::-moz-color-swatch {
+              border: none;
+              border-radius: 50%;
+            }
           }
         }
       }

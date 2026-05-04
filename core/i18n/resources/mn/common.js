@@ -460,6 +460,7 @@ $t(common.raiseTicketInSupportForum)
   },
 
   mapView: {
+    changeMarkerColor: 'Тэмдэглэгээний өнгө өөрчлөх',
     createRecord: 'Шинэ бичлэг үүсгэх',
     editRecord: 'Бичлэгийг засах',
     elevation: 'Өндөр (м)',
