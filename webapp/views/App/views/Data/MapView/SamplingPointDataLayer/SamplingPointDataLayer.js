@@ -7,7 +7,7 @@ import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 import { SamplingPointDataMarker } from './SamplingPointDataMarker'
 
 export const SamplingPointDataLayer = (props) => {
-  const { markersColor, onRecordEditClick, createRecordFromSamplingPointDataItem } = props
+  const { onRecordEditClick, createRecordFromSamplingPointDataItem } = props
 
   const {
     clusters,
