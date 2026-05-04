@@ -959,8 +959,8 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valores padrão não editáveis porque a chave auto incremental está definida',
       hidden: 'Ocultar no formulário de entrada',
-      hiddenInReport: 'Ocultar no relatório',
-      hiddenInReportInfo: `Se marcado, o atributo não ficará visível na ferramenta de relatórios`,
+      hiddenInReport: 'Ocultar no Painel Analítico',
+      hiddenInReportInfo: `Se marcado, o atributo não ficará visível no Painel Analítico`,
       hiddenWhenNotRelevant: 'Oculto quando não relevante',
       itemsFilter: 'Filtro de itens',
       itemsFilterInfo: `Expressão usada para filtrar itens selecionáveis.

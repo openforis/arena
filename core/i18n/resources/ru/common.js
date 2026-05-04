@@ -934,8 +934,8 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Значения по умолчанию нередактируемы, так как установлен автоинкрементный ключ',
       hidden: 'Скрыть в форме ввода',
-      hiddenInReport: 'Скрыть в отчете',
-      hiddenInReportInfo: `Если отмечено, атрибут не будет виден в инструменте отчетности`,
+      hiddenInReport: 'Скрыть в аналитической панели',
+      hiddenInReportInfo: `Если отмечено, атрибут не будет виден в аналитической панели`,
       hiddenWhenNotRelevant: 'Скрыто, когда неактуально',
       itemsFilter: 'Фильтр элементов',
       itemsFilterInfo: `Выражение, используемое для фильтрации выбираемых элементов.
