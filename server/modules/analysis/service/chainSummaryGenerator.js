@@ -154,6 +154,8 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     [`${key}CategoryLevel`]: codeAttrDef ? Survey.getNodeDefCategoryLevelIndex(codeAttrDef)(survey) + 1 : '',
   })
 
+  const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })
+
   return {
     ...surveySummary,
     label: Chain.getLabel(lang, defaultLang)(chain),
@@ -183,14 +185,21 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
         {}),
     areaWeightingMethod: ChainSamplingDesign.isAreaWeightingMethod(chainSamplingDesign),
     clusteringEntity: NodeDef.getName(clusteringEntityDef),
+
+    // statistical analysis
+    clusteringVariances: statisticalAnalysisSummary.analysis?.clusteringVariances ?? '',
+    nonResponseBiasCorrection: statisticalAnalysisSummary.analysis?.nonResponseBiasCorrection ?? '',
+    reportingArea: statisticalAnalysisSummary.analysis?.reportingArea ?? '',
+
     clusteringEntityKeys: clusteringEntityDef
       ? Survey.getNodeDefAncestorsKeyAttributes(clusteringEntityDef, true)(survey).map(NodeDef.getName)
       : null,
+
     ...generateCategoryAttributeAncestorsSummary({ survey }),
     resultVariables: analysisNodeDefs.map((analysisNodeDef) =>
       generateResultVariableSummary({ survey, analysisNodeDef, lang })
     ),
-    ...generateStatisticalAnalysisSummary({ survey, chain }),
+    ...statisticalAnalysisSummary,
   }
 }
 
