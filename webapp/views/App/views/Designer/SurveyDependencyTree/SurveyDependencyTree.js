@@ -15,6 +15,8 @@ import { FormItem } from '@webapp/components/form/Input'
 
 import { SurveyDependencyTreeChart } from './SurveyDependencyTreeChart'
 
+const { dependencyTypes: surveyDependencyTypes } = Survey
+
 const generateExtraLinks = ({ dependencyGraph, selectedNodeDefUuid }) =>
   Object.entries(dependencyGraph).reduce((acc, [source, dependentNodeDefUuids]) => {
     if (selectedNodeDefUuid && source !== selectedNodeDefUuid && !dependentNodeDefUuids.includes(selectedNodeDefUuid)) {
@@ -52,22 +54,29 @@ const calculateDependentNodeDefsByUuid = ({ survey, dependencyGraph, selectedNod
   }, {})
 
 const colorByDependencyType = {
-  [Survey.dependencyTypes.applicable]: 'green',
-  [Survey.dependencyTypes.defaultValues]: 'blue',
-  [Survey.dependencyTypes.validations]: 'red',
-  [Survey.dependencyTypes.itemsFilter]: 'brown',
-  [Survey.dependencyTypes.minCount]: 'orange',
-  [Survey.dependencyTypes.maxCount]: 'yellow',
+  [surveyDependencyTypes.validations]: 'red',
+  [surveyDependencyTypes.minCount]: 'orange',
+  [surveyDependencyTypes.maxCount]: 'yellow',
+  [surveyDependencyTypes.defaultValues]: 'blue',
+  [surveyDependencyTypes.itemsFilter]: 'green',
+  [surveyDependencyTypes.applicable]: 'lightgrey',
+  [surveyDependencyTypes.fileName]: 'lightgreen',
+  [surveyDependencyTypes.parentCode]: 'lightblue',
 }
 
-const dependencyTypesItems = [
-  Survey.dependencyTypes.applicable,
-  Survey.dependencyTypes.defaultValues,
-  Survey.dependencyTypes.validations,
-  Survey.dependencyTypes.itemsFilter,
-  Survey.dependencyTypes.minCount,
-  Survey.dependencyTypes.maxCount,
-].map((key) => ({
+// The order of dependency types in the UI is determined by the order of items in this array
+const dependencyTypesShown = [
+  surveyDependencyTypes.applicable,
+  surveyDependencyTypes.defaultValues,
+  surveyDependencyTypes.validations,
+  surveyDependencyTypes.minCount,
+  surveyDependencyTypes.maxCount,
+  surveyDependencyTypes.parentCode,
+  surveyDependencyTypes.itemsFilter,
+  surveyDependencyTypes.fileName,
+]
+
+const dependencyTypesItems = dependencyTypesShown.map((key) => ({
   key,
   label: `surveyDependencyTreeView.dependencyTypes.${key}`,
   icon: <span className="dependency-icon" style={{ backgroundColor: colorByDependencyType[key] }} />,
@@ -79,23 +88,42 @@ const determineMessage = ({ hierarchy, dependencyTypes }) => {
   return null
 }
 
+const useSurveyWithDependencyGraph = () => {
+  const survey = useSurvey()
+
+  const [state, setState] = useState({
+    ready: false,
+    survey,
+  })
+
+  const fetchSurveyWithDependencyGraph = useCallback(async () => Survey.buildAndAssocDependencyGraph(survey), [survey])
+
+  useEffect(() => {
+    fetchSurveyWithDependencyGraph().then((surveyUpdated) => setState({ ready: true, survey: surveyUpdated }))
+  }, [fetchSurveyWithDependencyGraph])
+
+  return state
+}
+
 export const SurveyDependencyTree = () => {
   const i18n = useI18n()
-  const survey = useSurvey()
+  const { ready, survey } = useSurveyWithDependencyGraph()
   const cycle = useSurveyCycleKey()
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
-  const [dependencyTypes, setDependencyTypes] = useState([Survey.dependencyTypes.defaultValues])
+  const [dependencyTypes, setDependencyTypes] = useState([])
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
 
   const hierarchy = useMemo(() => {
+    if (!ready) return {}
     const dependencyGraphFull = Survey.getDependencyGraph(survey)
+
     const dependencyNodeDefsByUuid = dependencyTypes.reduce((acc, dependencyType) => {
       const dependencyGraph = dependencyGraphFull[dependencyType] ?? {}
       Object.assign(acc, calculateDependentNodeDefsByUuid({ survey, dependencyGraph, selectedNodeDefUuid }))
       return acc
     }, {})
     return Survey.getHierarchy((nodeDef) => !!dependencyNodeDefsByUuid[NodeDef.getUuid(nodeDef)], cycle)(survey)
-  }, [cycle, dependencyTypes, selectedNodeDefUuid, survey])
+  }, [cycle, dependencyTypes, ready, selectedNodeDefUuid, survey])
 
   const extraLinksGroups = useMemo(() => {
     const dependencyGraphFull = Survey.getDependencyGraph(survey)
@@ -107,8 +135,10 @@ export const SurveyDependencyTree = () => {
     }, [])
   }, [dependencyTypes, selectedNodeDefUuid, survey])
 
+  // If the selected node is not in the hierarchy anymore, deselect it
   useEffect(() => {
     if (hierarchy.length <= 1 && selectedNodeDefUuid) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedNodeDefUuid(null)
     }
   }, [hierarchy.length, selectedNodeDefUuid])
@@ -123,6 +153,10 @@ export const SurveyDependencyTree = () => {
     },
     [selectedNodeDefUuid]
   )
+
+  if (!ready) {
+    return null
+  }
 
   return (
     <div className="survey-dependency-tree">
