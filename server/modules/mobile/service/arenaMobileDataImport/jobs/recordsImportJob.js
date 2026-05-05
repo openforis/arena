@@ -132,10 +132,9 @@ export default class RecordsImportJob extends DataImportBaseJob {
       } else {
         const recordUuid = Record.getUuid(record)
         const nodeDefName = nodeDef ? NodeDef.getName(nodeDef) : '<missing>'
-        const messagePrefix = `record ${recordUuid}: node with uuid ${nodeUuid} and node def ${nodeDefName} (uuid ${nodeDefUuid})`
         if (warn) {
-          const messageSuffix = `: skipping it`
-          this.logWarn(`${messagePrefix} ${warn}`)
+          const messagePrefix = `record ${recordUuid}: node with uuid ${nodeUuid} and node def ${nodeDefName} (uuid ${nodeDefUuid})`
+          this.logWarn(`${messagePrefix} ${warn}: skipping it`)
           delete nodes[nodeUuid]
         } else {
           throw new SystemError('dataImport.invalidNodeInRecord', {
