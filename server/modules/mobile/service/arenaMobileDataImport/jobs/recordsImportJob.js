@@ -26,23 +26,41 @@ const resultKeys = {
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
 
-const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
+const _getOrFetchCategoryItem = async ({ survey, nodeDef, itemUuid }) => {
+  const itemInSurvey = Survey.getCategoryItemByUuid(itemUuid)(survey)
+  if (itemInSurvey) {
+    return itemInSurvey
+  }
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  return categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
+}
+
+const checkNodeIsValid = async ({ survey, nodes, node, nodeDef }) => {
   if (!nodeDef) {
-    return { valid: false, error: 'refers a missing node definition' }
+    return { valid: false, warn: 'refers a missing node definition' }
   }
   const parentUuid = Node.getParentUuid(node)
   if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
-    return { valid: false, error: `has missing or invalid parent_uuid` }
+    return { valid: false, warn: `has missing or invalid parent_uuid` }
   }
   if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
-    return { valid: false, error: `is multiple and has an empty value` }
+    return { valid: false, warn: `is multiple and has an empty value` }
   }
   const nodeHierarchy = Node.getHierarchy(node)
   if (
     nodeHierarchy.length !== NodeDef.getMetaHierarchy(nodeDef)?.length ||
     nodeHierarchy.some((ancestorUuid) => !nodes[ancestorUuid])
   ) {
-    return { valid: false, error: `has an invalid meta hierarchy` }
+    return { valid: false, warn: `has an invalid meta hierarchy` }
+  }
+  if (NodeDef.isCode(nodeDef)) {
+    const itemUuid = Node.getCategoryItemUuid(node)
+    if (itemUuid) {
+      const item = await _getOrFetchCategoryItem({ survey, nodeDef, itemUuid })
+      if (!item) {
+        return { valid: false, error: `refers category item with uuid ${itemUuid} that does not exist` }
+      }
+    }
   }
   return { valid: true }
 }
@@ -143,16 +161,29 @@ export default class RecordsImportJob extends DataImportBaseJob {
     for (const [nodeUuid, node] of Object.entries(nodes)) {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const { valid, error } = checkNodeIsValid({ nodes, node, nodeDef })
+      const { valid, error, warn } = await checkNodeIsValid({ survey, nodes, node, nodeDef })
       if (valid) {
         // ensure recordUuid is set in node
         node[Node.keys.recordUuid] = recordUuid
         Node.removeFlags({ sideEffect: true })(node)
       } else {
-        const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
-        const messageSuffix = `: skipping it`
-        this.logWarn(`${messagePrefix} ${error} ${messageSuffix}`)
-        delete nodes[nodeUuid]
+        const recordUuid = Record.getUuid(record)
+        const nodeUuid = Node.getUuid(node)
+        const nodeDefName = NodeDef.getName(nodeDef)
+        const messagePrefix = `record ${recordUuid}: node with uuid ${nodeUuid} and node def ${nodeDefName} (uuid ${nodeDefUuid})`
+        if (warn) {
+          const messageSuffix = `: skipping it`
+          this.logWarn(`${messagePrefix} ${error} ${messageSuffix}`)
+          delete nodes[nodeUuid]
+        } else {
+          throw new SystemError('dataImport.invalidNodeInRecord', {
+            recordUuid,
+            nodeUuid,
+            nodeDefName,
+            nodeDefUuid,
+            details: error,
+          })
+        }
       }
     }
     // assoc nodes and build index from scratch

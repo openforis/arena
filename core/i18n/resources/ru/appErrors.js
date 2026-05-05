@@ -16,6 +16,8 @@ export default {
   },
   dataImport: {
     importFromMobileNotAllawed: 'Импорт данных из Arena Mobile не разрешен',
+    invalidNodeInRecord:
+      'Недопустимый узел в записи "{{recordUuid}}", узел "{{nodeUuid}}" с определением узла "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'В файле импорта не найдено записей или неверный формат файла',
     recordOwnedByAnotherUser:
       'Невозможно обновить запись "{{recordKeyValues}}", так как она принадлежит другому пользователю',
