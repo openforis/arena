@@ -6,6 +6,8 @@ import * as A from '@core/arena'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
@@ -32,6 +34,10 @@ const _getOrFetchCategoryItem = async ({ survey, nodeDef, itemUuid }) => {
     return itemInSurvey
   }
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  const category = Survey.getCategoryByUuid(categoryUuid)(survey)
+  if (!Category.isBigCategory(category)) {
+    return null
+  }
   return categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
 }
 
@@ -41,6 +47,10 @@ const _getOrFetchTaxon = async ({ survey, nodeDef, taxonUuid }) => {
     return taxonInSurvey
   }
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  const taxonomy = Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
+  if (!Taxonomy.isBigTaxonomy(taxonomy)) {
+    return null
+  }
   return taxonProvider.getTaxonByUuid({ survey, taxonomyUuid, taxonUuid })
 }
 
