@@ -96,17 +96,10 @@ const useSurveyWithDependencyGraph = () => {
     survey,
   })
 
-  const fetchSurveyWithDependencyGraph = useCallback(async () => {
-    if (Survey.hasDependencyGraph(survey)) {
-      return survey
-    }
-    return Survey.buildAndAssocDependencyGraph(survey)
-  }, [survey])
+  const fetchSurveyWithDependencyGraph = useCallback(async () => Survey.buildAndAssocDependencyGraph(survey), [survey])
 
   useEffect(() => {
-    const surveyWithDependencyGraph = fetchSurveyWithDependencyGraph().then((surveyUpdated) =>
-      setState({ ready: true, survey: surveyUpdated })
-    )
+    fetchSurveyWithDependencyGraph().then((surveyUpdated) => setState({ ready: true, survey: surveyUpdated }))
   }, [fetchSurveyWithDependencyGraph])
 
   return state
@@ -121,7 +114,7 @@ export const SurveyDependencyTree = () => {
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
 
   const hierarchy = useMemo(() => {
-    if (!ready) return []
+    if (!ready) return {}
     const dependencyGraphFull = Survey.getDependencyGraph(survey)
 
     const dependencyNodeDefsByUuid = dependencyTypes.reduce((acc, dependencyType) => {
@@ -160,6 +153,10 @@ export const SurveyDependencyTree = () => {
     },
     [selectedNodeDefUuid]
   )
+
+  if (!ready) {
+    return null
+  }
 
   return (
     <div className="survey-dependency-tree">
