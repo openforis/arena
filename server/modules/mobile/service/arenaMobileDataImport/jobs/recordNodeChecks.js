@@ -82,7 +82,7 @@ const _checkTaxonExists = async ({ survey, node, nodeDef }) => {
 
 export const checkNodeIsValid = async ({ survey, nodes, node, nodeDef }) => {
   if (!nodeDef) {
-    return { valid: false, warn: 'refers a missing node definition' }
+    return { valid: false, warn: 'refers to a missing node definition' }
   }
   const checks = [
     _checkParentValid,

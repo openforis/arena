@@ -130,7 +130,6 @@ export default class RecordsImportJob extends DataImportBaseJob {
         node[Node.keys.recordUuid] = recordUuid
         Node.removeFlags({ sideEffect: true })(node)
       } else {
-        const recordUuid = Record.getUuid(record)
         const nodeDefName = nodeDef ? NodeDef.getName(nodeDef) : '<missing>'
         if (warn) {
           const messagePrefix = `record ${recordUuid}: node with uuid ${nodeUuid} and node def ${nodeDefName} (uuid ${nodeDefUuid})`
