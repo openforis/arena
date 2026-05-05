@@ -6,8 +6,6 @@ import * as A from '@core/arena'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
@@ -21,77 +19,14 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as UserService from '@server/modules/user/service/userService'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
+import { checkNodeIsValid } from './recordNodeChecks'
+
 const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',
 }
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
-
-const _getOrFetchCategoryItem = async ({ survey, nodeDef, itemUuid }) => {
-  const itemInSurvey = Survey.getCategoryItemByUuid(itemUuid)(survey)
-  if (itemInSurvey) {
-    return itemInSurvey
-  }
-  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-  const category = Survey.getCategoryByUuid(categoryUuid)(survey)
-  if (!Category.isBigCategory(category)) {
-    return null
-  }
-  return categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
-}
-
-const _getOrFetchTaxon = async ({ survey, nodeDef, taxonUuid }) => {
-  const taxonInSurvey = Survey.getTaxonByUuid(taxonUuid)(survey)
-  if (taxonInSurvey) {
-    return taxonInSurvey
-  }
-  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-  const taxonomy = Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
-  if (!Taxonomy.isBigTaxonomy(taxonomy)) {
-    return null
-  }
-  return taxonProvider.getTaxonByUuid({ survey, taxonomyUuid, taxonUuid })
-}
-
-const checkNodeIsValid = async ({ survey, nodes, node, nodeDef }) => {
-  if (!nodeDef) {
-    return { valid: false, warn: 'refers a missing node definition' }
-  }
-  const parentUuid = Node.getParentUuid(node)
-  if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
-    return { valid: false, warn: `has missing or invalid parent_uuid` }
-  }
-  if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
-    return { valid: false, warn: `is multiple and has an empty value` }
-  }
-  const nodeHierarchy = Node.getHierarchy(node)
-  if (
-    nodeHierarchy.length !== NodeDef.getMetaHierarchy(nodeDef)?.length ||
-    nodeHierarchy.some((ancestorUuid) => !nodes[ancestorUuid])
-  ) {
-    return { valid: false, warn: `has an invalid meta hierarchy` }
-  }
-  if (NodeDef.isCode(nodeDef)) {
-    const itemUuid = Node.getCategoryItemUuid(node)
-    if (itemUuid) {
-      const item = await _getOrFetchCategoryItem({ survey, nodeDef, itemUuid })
-      if (!item) {
-        return { valid: false, error: `category item with uuid ${itemUuid} does not exist` }
-      }
-    }
-  }
-  if (NodeDef.isTaxon(nodeDef)) {
-    const taxonUuid = Node.getTaxonUuid(node)
-    if (taxonUuid) {
-      const taxon = await _getOrFetchTaxon({ survey, nodeDef, taxonUuid })
-      if (!taxon) {
-        return { valid: false, error: `taxon with uuid ${taxonUuid} does not exist` }
-      }
-    }
-  }
-  return { valid: true }
-}
 
 const getRecordFormattedKeyValues = ({ survey, record }) => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
