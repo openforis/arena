@@ -35,6 +35,15 @@ const _getOrFetchCategoryItem = async ({ survey, nodeDef, itemUuid }) => {
   return categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
 }
 
+const _getOrFetchTaxon = async ({ survey, nodeDef, taxonUuid }) => {
+  const taxonInSurvey = Survey.getTaxonByUuid(taxonUuid)(survey)
+  if (taxonInSurvey) {
+    return taxonInSurvey
+  }
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  return taxonProvider.getTaxonByUuid({ survey, taxonomyUuid, taxonUuid })
+}
+
 const checkNodeIsValid = async ({ survey, nodes, node, nodeDef }) => {
   if (!nodeDef) {
     return { valid: false, warn: 'refers a missing node definition' }
@@ -58,7 +67,16 @@ const checkNodeIsValid = async ({ survey, nodes, node, nodeDef }) => {
     if (itemUuid) {
       const item = await _getOrFetchCategoryItem({ survey, nodeDef, itemUuid })
       if (!item) {
-        return { valid: false, error: `refers category item with uuid ${itemUuid} that does not exist` }
+        return { valid: false, error: `category item with uuid ${itemUuid} does not exist` }
+      }
+    }
+  }
+  if (NodeDef.isTaxon(nodeDef)) {
+    const taxonUuid = Node.getTaxonUuid(node)
+    if (taxonUuid) {
+      const taxon = await _getOrFetchTaxon({ survey, nodeDef, taxonUuid })
+      if (!taxon) {
+        return { valid: false, error: `taxon with uuid ${taxonUuid} does not exist` }
       }
     }
   }
