@@ -54,14 +54,14 @@ const calculateDependentNodeDefsByUuid = ({ survey, dependencyGraph, selectedNod
   }, {})
 
 const colorByDependencyType = {
-  [surveyDependencyTypes.applicable]: 'green',
-  [surveyDependencyTypes.defaultValues]: 'blue',
-  [surveyDependencyTypes.fileName]: 'gray',
-  [surveyDependencyTypes.itemsFilter]: 'brown',
-  [surveyDependencyTypes.maxCount]: 'yellow',
-  [surveyDependencyTypes.minCount]: 'orange',
-  [surveyDependencyTypes.parentCode]: 'purple',
   [surveyDependencyTypes.validations]: 'red',
+  [surveyDependencyTypes.minCount]: 'orange',
+  [surveyDependencyTypes.maxCount]: 'yellow',
+  [surveyDependencyTypes.defaultValues]: 'blue',
+  [surveyDependencyTypes.itemsFilter]: 'green',
+  [surveyDependencyTypes.applicable]: 'lightgrey',
+  [surveyDependencyTypes.fileName]: 'lightgreen',
+  [surveyDependencyTypes.parentCode]: 'lightblue',
 }
 
 // The order of dependency types in the UI is determined by the order of items in this array
@@ -88,23 +88,49 @@ const determineMessage = ({ hierarchy, dependencyTypes }) => {
   return null
 }
 
+const useSurveyWithDependencyGraph = () => {
+  const survey = useSurvey()
+
+  const [state, setState] = useState({
+    ready: false,
+    survey,
+  })
+
+  const fetchSurveyWithDependencyGraph = useCallback(async () => {
+    if (Survey.hasDependencyGraph(survey)) {
+      return survey
+    }
+    return Survey.buildAndAssocDependencyGraph(survey)
+  }, [survey])
+
+  useEffect(() => {
+    const surveyWithDependencyGraph = fetchSurveyWithDependencyGraph().then((surveyUpdated) =>
+      setState({ ready: true, survey: surveyUpdated })
+    )
+  }, [fetchSurveyWithDependencyGraph])
+
+  return state
+}
+
 export const SurveyDependencyTree = () => {
   const i18n = useI18n()
-  const survey = useSurvey()
+  const { ready, survey } = useSurveyWithDependencyGraph()
   const cycle = useSurveyCycleKey()
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
   const [dependencyTypes, setDependencyTypes] = useState([])
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
 
   const hierarchy = useMemo(() => {
+    if (!ready) return []
     const dependencyGraphFull = Survey.getDependencyGraph(survey)
+
     const dependencyNodeDefsByUuid = dependencyTypes.reduce((acc, dependencyType) => {
       const dependencyGraph = dependencyGraphFull[dependencyType] ?? {}
       Object.assign(acc, calculateDependentNodeDefsByUuid({ survey, dependencyGraph, selectedNodeDefUuid }))
       return acc
     }, {})
     return Survey.getHierarchy((nodeDef) => !!dependencyNodeDefsByUuid[NodeDef.getUuid(nodeDef)], cycle)(survey)
-  }, [cycle, dependencyTypes, selectedNodeDefUuid, survey])
+  }, [cycle, dependencyTypes, ready, selectedNodeDefUuid, survey])
 
   const extraLinksGroups = useMemo(() => {
     const dependencyGraphFull = Survey.getDependencyGraph(survey)
@@ -116,8 +142,10 @@ export const SurveyDependencyTree = () => {
     }, [])
   }, [dependencyTypes, selectedNodeDefUuid, survey])
 
+  // If the selected node is not in the hierarchy anymore, deselect it
   useEffect(() => {
     if (hierarchy.length <= 1 && selectedNodeDefUuid) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedNodeDefUuid(null)
     }
   }, [hierarchy.length, selectedNodeDefUuid])
