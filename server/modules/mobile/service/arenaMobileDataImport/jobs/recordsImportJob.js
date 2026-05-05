@@ -19,33 +19,14 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as UserService from '@server/modules/user/service/userService'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
+import { checkNodeIsValid } from './recordNodeChecks'
+
 const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',
 }
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
-
-const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
-  if (!nodeDef) {
-    return { valid: false, error: 'refers a missing node definition' }
-  }
-  const parentUuid = Node.getParentUuid(node)
-  if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
-    return { valid: false, error: `has missing or invalid parent_uuid` }
-  }
-  if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
-    return { valid: false, error: `is multiple and has an empty value` }
-  }
-  const nodeHierarchy = Node.getHierarchy(node)
-  if (
-    nodeHierarchy.length !== NodeDef.getMetaHierarchy(nodeDef)?.length ||
-    nodeHierarchy.some((ancestorUuid) => !nodes[ancestorUuid])
-  ) {
-    return { valid: false, error: `has an invalid meta hierarchy` }
-  }
-  return { valid: true }
-}
 
 const getRecordFormattedKeyValues = ({ survey, record }) => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
@@ -143,16 +124,26 @@ export default class RecordsImportJob extends DataImportBaseJob {
     for (const [nodeUuid, node] of Object.entries(nodes)) {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const { valid, error } = checkNodeIsValid({ nodes, node, nodeDef })
+      const { valid, error, warn } = await checkNodeIsValid({ survey, nodes, node, nodeDef })
       if (valid) {
         // ensure recordUuid is set in node
         node[Node.keys.recordUuid] = recordUuid
         Node.removeFlags({ sideEffect: true })(node)
       } else {
-        const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
-        const messageSuffix = `: skipping it`
-        this.logWarn(`${messagePrefix} ${error} ${messageSuffix}`)
-        delete nodes[nodeUuid]
+        const nodeDefName = nodeDef ? NodeDef.getName(nodeDef) : '<missing>'
+        if (warn) {
+          const messagePrefix = `record ${recordUuid}: node with uuid ${nodeUuid} and node def ${nodeDefName} (uuid ${nodeDefUuid})`
+          this.logWarn(`${messagePrefix} ${warn}: skipping it`)
+          delete nodes[nodeUuid]
+        } else {
+          throw new SystemError('dataImport.invalidNodeInRecord', {
+            recordUuid,
+            nodeUuid,
+            nodeDefName,
+            nodeDefUuid,
+            details: error,
+          })
+        }
       }
     }
     // assoc nodes and build index from scratch

@@ -16,6 +16,8 @@ export default {
   },
   dataImport: {
     importFromMobileNotAllawed: 'Arena Mobile-с өгөгдөл импортлохыг хориглоно',
+    invalidNodeInRecord:
+      '"{{recordUuid}}" бичлэгт буруу зангилаа байна, "{{nodeUuid}}" зангилаа, "{{nodeDefName}}" зангилааны тодорхойлолт (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'Импортын файлд бичлэг олдсонгүй эсвэл буруу файлын формат',
     recordOwnedByAnotherUser: '"{{recordKeyValues}}" бичлэг өөр хэрэглэгчид харьяалагддаг тул шинэчлэх боломжгүй',
   },

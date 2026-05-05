@@ -16,6 +16,8 @@ export default {
   },
   dataImport: {
     importFromMobileNotAllawed: 'Importação de dados do Arena Mobile não permitida',
+    invalidNodeInRecord:
+      'Nó inválido no registro "{{recordUuid}}", nó "{{nodeUuid}}" com a definição de nó "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'Nenhum registro encontrado no arquivo de importação ou formato de arquivo incorreto',
     recordOwnedByAnotherUser: 'Não é possível atualizar o registro "{{recordKeyValues}}" pois pertence a outro usuário',
   },
