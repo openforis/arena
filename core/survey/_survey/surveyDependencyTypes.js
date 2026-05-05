@@ -1,29 +1,35 @@
 export const dependencyTypes = {
-  defaultValues: 'defaultValues',
   applicable: 'applicable',
-  validations: 'validations',
+  defaultValues: 'defaultValues',
+  fileName: 'fileName',
   formula: 'formula',
   itemsFilter: 'itemsFilter',
-  minCount: 'minCount',
   maxCount: 'maxCount',
+  minCount: 'minCount',
+  parentCode: 'parentCode',
+  validations: 'validations',
 }
 
 export const isContextParentByDependencyType = {
-  [dependencyTypes.defaultValues]: false,
   [dependencyTypes.applicable]: true,
-  [dependencyTypes.validations]: false,
+  [dependencyTypes.defaultValues]: false,
+  [dependencyTypes.fileName]: true,
   [dependencyTypes.formula]: false,
   [dependencyTypes.itemsFilter]: true,
-  [dependencyTypes.minCount]: true,
   [dependencyTypes.maxCount]: true,
+  [dependencyTypes.minCount]: true,
+  [dependencyTypes.parentCode]: false,
+  [dependencyTypes.validations]: false,
 }
 
 export const selfReferenceAllowedByDependencyType = {
-  [dependencyTypes.defaultValues]: false,
   [dependencyTypes.applicable]: false,
-  [dependencyTypes.validations]: true,
+  [dependencyTypes.defaultValues]: false,
+  [dependencyTypes.fileName]: false,
   [dependencyTypes.formula]: false,
   [dependencyTypes.itemsFilter]: false,
-  [dependencyTypes.minCount]: false,
   [dependencyTypes.maxCount]: false,
+  [dependencyTypes.minCount]: false,
+  [dependencyTypes.parentCode]: false,
+  [dependencyTypes.validations]: true,
 }

@@ -15,6 +15,8 @@ import { FormItem } from '@webapp/components/form/Input'
 
 import { SurveyDependencyTreeChart } from './SurveyDependencyTreeChart'
 
+const { dependencyTypes: surveyDependencyTypes } = Survey
+
 const generateExtraLinks = ({ dependencyGraph, selectedNodeDefUuid }) =>
   Object.entries(dependencyGraph).reduce((acc, [source, dependentNodeDefUuids]) => {
     if (selectedNodeDefUuid && source !== selectedNodeDefUuid && !dependentNodeDefUuids.includes(selectedNodeDefUuid)) {
@@ -52,22 +54,29 @@ const calculateDependentNodeDefsByUuid = ({ survey, dependencyGraph, selectedNod
   }, {})
 
 const colorByDependencyType = {
-  [Survey.dependencyTypes.applicable]: 'green',
-  [Survey.dependencyTypes.defaultValues]: 'blue',
-  [Survey.dependencyTypes.validations]: 'red',
-  [Survey.dependencyTypes.itemsFilter]: 'brown',
-  [Survey.dependencyTypes.minCount]: 'orange',
-  [Survey.dependencyTypes.maxCount]: 'yellow',
+  [surveyDependencyTypes.applicable]: 'green',
+  [surveyDependencyTypes.defaultValues]: 'blue',
+  [surveyDependencyTypes.fileName]: 'gray',
+  [surveyDependencyTypes.itemsFilter]: 'brown',
+  [surveyDependencyTypes.maxCount]: 'yellow',
+  [surveyDependencyTypes.minCount]: 'orange',
+  [surveyDependencyTypes.parentCode]: 'purple',
+  [surveyDependencyTypes.validations]: 'red',
 }
 
-const dependencyTypesItems = [
-  Survey.dependencyTypes.applicable,
-  Survey.dependencyTypes.defaultValues,
-  Survey.dependencyTypes.validations,
-  Survey.dependencyTypes.itemsFilter,
-  Survey.dependencyTypes.minCount,
-  Survey.dependencyTypes.maxCount,
-].map((key) => ({
+// The order of dependency types in the UI is determined by the order of items in this array
+const dependencyTypesShown = [
+  surveyDependencyTypes.applicable,
+  surveyDependencyTypes.defaultValues,
+  surveyDependencyTypes.validations,
+  surveyDependencyTypes.minCount,
+  surveyDependencyTypes.maxCount,
+  surveyDependencyTypes.parentCode,
+  surveyDependencyTypes.itemsFilter,
+  surveyDependencyTypes.fileName,
+]
+
+const dependencyTypesItems = dependencyTypesShown.map((key) => ({
   key,
   label: `surveyDependencyTreeView.dependencyTypes.${key}`,
   icon: <span className="dependency-icon" style={{ backgroundColor: colorByDependencyType[key] }} />,
@@ -84,7 +93,7 @@ export const SurveyDependencyTree = () => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
-  const [dependencyTypes, setDependencyTypes] = useState([Survey.dependencyTypes.defaultValues])
+  const [dependencyTypes, setDependencyTypes] = useState([])
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
 
   const hierarchy = useMemo(() => {

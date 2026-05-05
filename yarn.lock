@@ -3796,13 +3796,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@file:../arena-core::locator=open-foris-arena%40workspace%3A.":
-  version: 1.1.4
-  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=0b6054&locator=open-foris-arena%40workspace%3A."
+"@openforis/arena-core@npm:^1.1.5":
+  version: 1.1.6
+  resolution: "@openforis/arena-core@npm:1.1.6::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.1.6%2F9a5a825d8b9129e2e94b0895bcfd1d5b9cba1424"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
-    "@turf/destination": "npm:^7.3.4"
-    bignumber.js: "npm:^10.0.2"
+    "@turf/destination": "npm:^7.3.5"
+    bignumber.js: "npm:^11.1.1"
     change-case: "npm:^5.4.4"
     jsep: "npm:^1.4.0"
     lodash.differencewith: "npm:^4.5.0"
@@ -3810,38 +3810,18 @@ __metadata:
     lodash.isequal: "npm:^4.5.0"
     lodash.topairs: "npm:^4.3.0"
     moment: "npm:^2.30.1"
-    proj4: "npm:^2.20.4"
-    uuid: "npm:^13.0.0"
-  checksum: 10c0/733c89f5f9f383489d5cc33d80683212c9be05c97541edef56f82d010a8b079997a7cdf1954a8b41830a9ee6b7b628a83ef94cfb3974b1a86d17df08f9b3ca4d
+    proj4: "npm:^2.20.8"
+    uuid: "npm:^14.0.0"
+  checksum: 10c0/09a9d0bd5fa22f328cb6497a1dff7e5a5985d8086eeef355881f7cca79bfcdc2b74f9d37653dddcc6328a8cd3985d2465f8bc9d393a942c95e85327513da10d2
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^1.1.4":
-  version: 1.1.4
-  resolution: "@openforis/arena-core@npm:1.1.4::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.1.4%2Fb881a094bb63dae6178de06ca03f1a7c4f2e7e87"
-  dependencies:
-    "@jsep-plugin/regex": "npm:^1.0.4"
-    "@turf/destination": "npm:^7.3.4"
-    bignumber.js: "npm:^10.0.2"
-    change-case: "npm:^5.4.4"
-    jsep: "npm:^1.4.0"
-    lodash.differencewith: "npm:^4.5.0"
-    lodash.frompairs: "npm:^4.0.1"
-    lodash.isequal: "npm:^4.5.0"
-    lodash.topairs: "npm:^4.3.0"
-    moment: "npm:^2.30.1"
-    proj4: "npm:^2.20.4"
-    uuid: "npm:^13.0.0"
-  checksum: 10c0/3403d3cd2d6642f90e09423400879fee4a1034c217974bcff6cabfc01439d61323f110ce4f24dd690162f26e43ff7cdf1550bb8e1050635638c860c7de293af6
-  languageName: node
-  linkType: hard
-
-"@openforis/arena-server@npm:^1.3.2":
-  version: 1.3.2
-  resolution: "@openforis/arena-server@npm:1.3.2::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.3.2%2F120d8529a08182d22bb7295652fed7c7ffa8e7e9"
+"@openforis/arena-server@npm:^1.3.3":
+  version: 1.3.3
+  resolution: "@openforis/arena-server@npm:1.3.3::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.3.3%2Fe8b4d71a8944d6548b2ed1462d365470fc20a046"
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^1.1.4"
+    "@openforis/arena-core": "npm:^1.1.5"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.1"
     cookie-parser: "npm:^1.4.7"
@@ -3860,7 +3840,7 @@ __metadata:
     passport-local: "npm:^1.0.0"
     pg-promise: "npm:^12.6.2"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/fedff4de16fc5546ed3393d9f9b591acb94e73be9cdb05fc984050ebfb3915e8c9cc3e5c87fc76c1e433c0cade7ef00b8668520c81387607d1ccd8f0590bb99e
+  checksum: 10c0/35a9d100f09526bd5ac985c9b6ffc269d1d56b4d30ae3866126bf4d79a9af845a73c08eefbe1f057ce13b6e4715f7fd867a69a8a9780a2ada11fd12f3d8b0792
   languageName: node
   linkType: hard
 
@@ -5109,7 +5089,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/destination@npm:7.3.4, @turf/destination@npm:^7.3.4":
+"@turf/destination@npm:7.3.4":
   version: 7.3.4
   resolution: "@turf/destination@npm:7.3.4"
   dependencies:
@@ -5118,6 +5098,18 @@ __metadata:
     "@types/geojson": "npm:^7946.0.10"
     tslib: "npm:^2.8.1"
   checksum: 10c0/9eb087e7dc1b3aef56fa4199ea419134688623af16b8dfa186ab36da6fa5e860ac10f368fb9ce31b39e1e038476e031ff1a899d971165215a5d2969650c8e420
+  languageName: node
+  linkType: hard
+
+"@turf/destination@npm:^7.3.5":
+  version: 7.3.5
+  resolution: "@turf/destination@npm:7.3.5"
+  dependencies:
+    "@turf/helpers": "npm:7.3.5"
+    "@turf/invariant": "npm:7.3.5"
+    "@types/geojson": "npm:^7946.0.10"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/3d0ba945cd1b81f3c636e343fe4d57f0ce8d57d7e07e1e481a81aebe83f0500ef68aa6ce1a13eaf2500a1582efdcac1126a5b1098e33f9139a4e993c5cea8435
   languageName: node
   linkType: hard
 
@@ -5143,6 +5135,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@turf/helpers@npm:7.3.5":
+  version: 7.3.5
+  resolution: "@turf/helpers@npm:7.3.5"
+  dependencies:
+    "@types/geojson": "npm:^7946.0.10"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/bd8ff4fce1a007999d5059cf8676da3287fbb0ddc9e803cf3a38522205bf857e982a6fa4049ac2f0b42113e1ada844712e4c3642007e3448ab41d22f1463e335
+  languageName: node
+  linkType: hard
+
 "@turf/invariant@npm:7.3.4":
   version: 7.3.4
   resolution: "@turf/invariant@npm:7.3.4"
@@ -5151,6 +5153,17 @@ __metadata:
     "@types/geojson": "npm:^7946.0.10"
     tslib: "npm:^2.8.1"
   checksum: 10c0/8c5c420981d42304ebf32a984892b15150c6dcafabacefd165a5950eaf16024551272071426bfa23e5198b03c7c9495a2547ea9ee455ce3ff77d6449f51df1b3
+  languageName: node
+  linkType: hard
+
+"@turf/invariant@npm:7.3.5":
+  version: 7.3.5
+  resolution: "@turf/invariant@npm:7.3.5"
+  dependencies:
+    "@turf/helpers": "npm:7.3.5"
+    "@types/geojson": "npm:^7946.0.10"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/e036a2f7276555c9882d1d6f144a8fb191ced223160b94e32c8ce89f09499e8a9f70d1f27d2fcf451bca2ae0ecc53a6978ebbe38f654aba8f2b7de51336ad77e
   languageName: node
   linkType: hard
 
@@ -7247,10 +7260,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bignumber.js@npm:^10.0.2":
-  version: 10.0.2
-  resolution: "bignumber.js@npm:10.0.2"
-  checksum: 10c0/471a17d851d275e458156d090c028b8851c84389dc41db79b08dd584b4df1e4d24f70b1684705a5974aec6c59dc8511337007e01bd78d8ed8d93e1a541356a7f
+"bignumber.js@npm:^11.1.1":
+  version: 11.1.1
+  resolution: "bignumber.js@npm:11.1.1"
+  checksum: 10c0/03ae69b83b89b78008b600e00bbae0feda587f4a863bcc56bdc817b38490c1a4eefb65d553b0542029d6f877fc6c07dc66e7f60faf112a49f529a7b80862c06f
   languageName: node
   linkType: hard
 
@@ -15635,8 +15648,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
-    "@openforis/arena-core": ../arena-core
-    "@openforis/arena-server": "npm:^1.3.2"
+    "@openforis/arena-server": "npm:^1.3.3"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
@@ -17114,13 +17126,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proj4@npm:^2.20.4":
-  version: 2.20.4
-  resolution: "proj4@npm:2.20.4"
+"proj4@npm:^2.20.8":
+  version: 2.20.8
+  resolution: "proj4@npm:2.20.8"
   dependencies:
     mgrs: "npm:1.0.0"
-    wkt-parser: "npm:^1.5.3"
-  checksum: 10c0/bb83915ae7973068f02ca440099faca7efd6b1add3cd2903fe8ce816f4d589bd72ac77c9a882d3d60c7beff2cb9d9fb38924590978a87a7165156cb120c8328c
+    wkt-parser: "npm:^1.5.5"
+  checksum: 10c0/a4488c5229d25260697ca925d06fc251e772d033e7d081f97ab8b01a37854378d4a48903c667c39aa9305febff59ad09dddc019be8866977cdd2767d3a774239
   languageName: node
   linkType: hard
 
@@ -20722,12 +20734,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^13.0.0":
-  version: 13.0.0
-  resolution: "uuid@npm:13.0.0"
+"uuid@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "uuid@npm:14.0.0"
   bin:
     uuid: dist-node/bin/uuid
-  checksum: 10c0/950e4c18d57fef6c69675344f5700a08af21e26b9eff2bf2180427564297368c538ea11ac9fb2e6528b17fc3966a9fd2c5049361b0b63c7d654f3c550c9b3d67
+  checksum: 10c0/a57ae7794c45005c1a9208989196c5baf79a7679c30f43c1bee9033a2c4d113a2cea216fa6fcc9663b08b0d55635df1a7c6eb7e7f3d21c3e50688c698fa39a50
   languageName: node
   linkType: hard
 
@@ -21302,10 +21314,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wkt-parser@npm:^1.5.3":
-  version: 1.5.4
-  resolution: "wkt-parser@npm:1.5.4"
-  checksum: 10c0/70d85e2a4abea83c94021ffc5e11a8d25e9b70b0989d762c470a57600a4ee930d537366b608b26f3fba7f371c4e6d8d814a074831e7cc2914efa4e3cbddc8913
+"wkt-parser@npm:^1.5.5":
+  version: 1.5.5
+  resolution: "wkt-parser@npm:1.5.5"
+  checksum: 10c0/4ed71c407a7f13b2ea49441f3e9607eb421fac513c384b71a52a33abbeafeeb67ab32ffce327894a2b276fadaa352f204c21d0a02e34183644fe41d3282fd735
   languageName: node
   linkType: hard
 
