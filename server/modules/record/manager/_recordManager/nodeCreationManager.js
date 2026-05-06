@@ -89,13 +89,13 @@ export const insertNode = async (
   const nodesCreated = {
     [Node.getUuid(node)]: node,
   }
-  let recordUpdated = record
+  let recordUpdated = Record.assocNode(node, { sideEffect })(record)
 
   if (NodeDef.isEntity(nodeDef)) {
     const descendantsCreateResult = await RecordNodesUpdater.createDescendants({
       user,
       survey,
-      record,
+      record: recordUpdated,
       parentNode: node,
       nodeDef,
       timezoneOffset,
