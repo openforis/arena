@@ -280,6 +280,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
       t
     )
     recordUpdated = recordUpdated2
+
     await _afterNodesUpdate(
       {
         survey,
