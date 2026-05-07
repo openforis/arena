@@ -12,6 +12,8 @@ import { ScriptEditor } from '@webapp/components/ScriptEditor'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 
+const codesTextPrefix = '# __CODES__'
+
 const getDefaultScript = ({ survey, nodeDef }) => {
   const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
   const parentDefName = NodeDef.getName(parentDef)
@@ -20,9 +22,10 @@ const getDefaultScript = ({ survey, nodeDef }) => {
 }
 
 const RScriptEditor = (props) => {
+  const { state, Actions, nodeDef } = props
+
   const [localScript, setLocalScript] = useState('')
 
-  const { state, Actions, nodeDef } = props
   const survey = useSurvey()
 
   const lang = useSurveyPreferredLang()
@@ -63,10 +66,8 @@ const RScriptEditor = (props) => {
   )
 
   const generateLocalScript = useCallback(async () => {
-    const currentScript = NodeDef.getScript(nodeDef)
-    if (currentScript) {
-      return currentScript
-    }
+    const nodeDefScript = NodeDef.getScript(nodeDef)
+
     if (categoryUuid) {
       const { request } = API.fetchCategoryItems({
         surveyId: Survey.getId(survey),
@@ -82,18 +83,23 @@ const RScriptEditor = (props) => {
           .map((_item) => `'${CategoryItem.getCode(_item)}', ${CategoryItem.getLabel(lang)(_item)} `)
           .join('; ')
 
-      if (NodeDef.getParentUuid(nodeDef) && categoryUuid) {
-        const scriptOrDefault = currentScript || getDefaultScript({ survey, nodeDef })
-        if (/^# __CODES__/.test(currentScript)) {
-          const scriptSplitted = currentScript.split('\n')
-          scriptSplitted[0] = `# __CODES__ ${generateCodesText(items)}`
+      if (NodeDef.getParentUuid(nodeDef)) {
+        const scriptOrDefault = nodeDefScript || getDefaultScript({ survey, nodeDef })
+        const codesText = generateCodesText(items)
+
+        if (new RegExp(`^${codesTextPrefix}`).test(scriptOrDefault)) {
+          // replace existing codes text
+          const scriptSplitted = scriptOrDefault.split('\n')
+          scriptSplitted[0] = `${codesTextPrefix} ${codesText}`
           newScript = scriptSplitted.join('\n')
         } else {
-          newScript = `# __CODES__ ${generateCodesText(items)}\n${scriptOrDefault}`
+          // add codes text at the beginning of the script
+          newScript = `${codesTextPrefix} ${codesText}\n${scriptOrDefault}`
         }
       }
       return newScript
     }
+    return nodeDefScript
   }, [categoryUuid, lang, nodeDef, survey])
 
   useEffect(() => {
