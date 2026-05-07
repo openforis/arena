@@ -95,6 +95,12 @@ const BasicProps = (props) => {
             <Checkbox
               id={TestId.nodeDefDetails.nodeDefKey}
               checked={NodeDef.isKey(nodeDef)}
+              info={
+                !NodeDef.isKey(nodeDef) && maxKeysCountReached
+                  ? 'nodeDefEdit.basicProps.maxKeysCountReached'
+                  : undefined
+              }
+              infoParams={maxKeysCountReached ? { maxKeysCount: NodeDef.maxKeyAttributes } : undefined}
               disabled={keyEditDisabled}
               onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.key, value })}
             />
@@ -102,11 +108,6 @@ const BasicProps = (props) => {
               <span className="info-label">
                 {i18n.t('nodeDefEdit.basicProps.enumerator.label')}
                 <ButtonIconInfo title="nodeDefEdit.basicProps.enumerator.info" />
-              </span>
-            )}
-            {!NodeDef.isKey(nodeDef) && maxKeysCountReached && (
-              <span className="info-label">
-                {i18n.t('nodeDefEdit.basicProps.maxKeysCountReached', { maxKeysCount: NodeDef.maxKeyAttributes })}
               </span>
             )}
             {canHaveAutoIncrementalKey && (
