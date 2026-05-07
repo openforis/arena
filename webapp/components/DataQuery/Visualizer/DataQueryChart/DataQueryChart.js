@@ -7,7 +7,7 @@ import { DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExpl
 import { useI18n } from '@webapp/store/system'
 
 import { ButtonDownload } from '@webapp/components/buttons'
-import { downloadSvgToPng } from '@webapp/utils/domUtils'
+import { downloadMultipleSvgsToPng } from '@webapp/utils/chartExportUtils'
 
 import { DataQueryAreaChart } from './DataQueryAreaChart'
 import { DataQueryBarChart } from './DataQueryBarChart'
@@ -32,10 +32,11 @@ export const DataQueryChart = (props) => {
   const wrapperRef = useRef()
 
   const downloadChartToPng = () => {
-    const chartWrapper = wrapperRef.current
-    const svgElement = chartWrapper.querySelector('svg')
-    if (svgElement) {
-      downloadSvgToPng(svgElement)
+    const chartWrapperEl = wrapperRef.current
+    const svgElements = Array.from(chartWrapperEl.querySelectorAll('svg'))
+
+    if (svgElements.length > 0) {
+      downloadMultipleSvgsToPng(svgElements, chartWrapperEl)
     }
   }
 
