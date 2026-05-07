@@ -915,6 +915,7 @@ $t(common.appNameFull)
         info: `Хэрэв тэмдэглэсэн бол уг шинж чанар нь бүртгэлийн жагсаалтад харагдах болно`,
       },
       key: 'Түлхүүр',
+      maxKeysCountReached: 'Түлхүүрийн дээд тоо хүрсэн ({{maxKeysCount}})',
       multiple: 'Олон',
       ownPage: 'Өөрийн хуудас',
       parentPage: 'Эцэг хуудас ({{parentPage}})',

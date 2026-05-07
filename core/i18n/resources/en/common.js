@@ -946,6 +946,7 @@ $t(common.appNameFull)
         info: `If marked, the attribute will be visible in records list`,
       },
       key: 'Key',
+      maxKeysCountReached: 'Max keys count reached ({{maxKeysCount}})',
       multiple: 'Multiple',
       ownPage: 'Its own page',
       parentPage: 'Parent page ({{parentPage}})',

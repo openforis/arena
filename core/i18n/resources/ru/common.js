@@ -922,6 +922,7 @@ $t(common.appNameFull)
         info: `Если отмечено, атрибут будет виден в списке записей`,
       },
       key: 'Ключ',
+      maxKeysCountReached: 'Достигнуто максимальное количество ключей ({{maxKeysCount}})',
       multiple: 'Множественный',
       ownPage: 'Собственная страница',
       parentPage: 'Родительская страница ({{parentPage}})',

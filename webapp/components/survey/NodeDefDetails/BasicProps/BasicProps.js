@@ -56,6 +56,7 @@ const BasicProps = (props) => {
     displayAsTableDisabled,
     displayInParentPageDisabled,
     keyEditDisabled,
+    maxKeysCountReached,
     multipleEditDisabled,
     entitySourceHierarchy,
     renderType,
@@ -98,9 +99,14 @@ const BasicProps = (props) => {
               onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.key, value })}
             />
             {enumerator && (
-              <span>
+              <span className="info-label">
                 {i18n.t('nodeDefEdit.basicProps.enumerator.label')}
                 <ButtonIconInfo title="nodeDefEdit.basicProps.enumerator.info" />
+              </span>
+            )}
+            {!NodeDef.isKey(nodeDef) && maxKeysCountReached && (
+              <span className="info-label">
+                {i18n.t('nodeDefEdit.basicProps.maxKeysCountReached', { maxKeysCount: NodeDef.maxKeyAttributes })}
               </span>
             )}
             {canHaveAutoIncrementalKey && (

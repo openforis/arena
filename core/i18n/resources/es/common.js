@@ -797,6 +797,7 @@ $t(common.appNameFull)
         info: `Si está marcado, el atributo será visible en la lista de registros`,
       },
       key: 'Clave',
+      maxKeysCountReached: 'Número máximo de claves alcanzado ({{maxKeysCount}})',
       multiple: 'Múltiple',
       ownPage: 'Su propia página',
       parentPage: 'Página padre ({{parentPage}})',
