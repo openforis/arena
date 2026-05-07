@@ -16,9 +16,9 @@ const codesTextPrefix = '# __CODES__'
 
 const getDefaultScript = ({ survey, nodeDef }) => {
   const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
-  const parentDefName = NodeDef.getName(parentDef)
-  const nodeDefName = NodeDef.getName(nodeDef)
-  return `${parentDefName ?? 'PARENT'}$${nodeDefName ?? 'NAME'} <- NA`
+  const parentDefName = NodeDef.getName(parentDef) || 'PARENT'
+  const nodeDefName = NodeDef.getName(nodeDef) || 'NAME'
+  return `${parentDefName}$${nodeDefName} <- NA`
 }
 
 const RScriptEditor = (props) => {
