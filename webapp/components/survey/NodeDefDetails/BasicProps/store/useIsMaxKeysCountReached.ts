@@ -10,5 +10,8 @@ export const useIsMaxKeysCountReached = ({ nodeDef }: { nodeDef: any }): boolean
     return false
   }
   const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
-  return parentDef && Survey.getNodeDefKeys(parentDef)(survey).length >= NodeDef.maxKeyAttributes
+  if (!parentDef) {
+    return false
+  }
+  return Survey.getNodeDefKeys(parentDef)(survey).length >= NodeDef.maxKeyAttributes
 }
