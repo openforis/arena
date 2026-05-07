@@ -87,7 +87,7 @@ const RScriptEditor = (props) => {
         const scriptOrDefault = nodeDefScript || getDefaultScript({ survey, nodeDef })
         const codesText = generateCodesText(items)
 
-        if (new RegExp(`^${codesTextPrefix}`).test(scriptOrDefault)) {
+        if (scriptOrDefault.startsWith(codesTextPrefix)) {
           // replace existing codes text
           const scriptSplitted = scriptOrDefault.split('\n')
           scriptSplitted[0] = `${codesTextPrefix} ${codesText}`
