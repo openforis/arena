@@ -12,13 +12,22 @@ import { ScriptEditor } from '@webapp/components/ScriptEditor'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 
+const getDefaultScript = ({ survey, nodeDef }) => {
+  const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+  const parentDefName = NodeDef.getName(parentDef)
+  const nodeDefName = NodeDef.getName(nodeDef)
+  return `${parentDefName ?? 'PARENT'}$${nodeDefName ?? 'NAME'} <- NA`
+}
+
 const RScriptEditor = (props) => {
-  const [defaultLocalScript, setDefaultLocalScript] = useState('')
+  const [localScript, setLocalScript] = useState('')
 
   const { state, Actions, nodeDef } = props
   const survey = useSurvey()
 
   const lang = useSurveyPreferredLang()
+
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
 
   const nodeDefItems = useMemo(
     () =>
@@ -45,6 +54,7 @@ const RScriptEditor = (props) => {
       )
     },
   }
+
   const onChange = useCallback(
     (newValue) => {
       Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.script, value: newValue })
@@ -52,30 +62,53 @@ const RScriptEditor = (props) => {
     [Actions, state]
   )
 
-  const getDefaultScript = useMemo(
-    () =>
-      `${NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)) || 'PARENT'}$${
-        NodeDef.getName(nodeDef) || 'NAME'
-      } <- NA`,
-    [nodeDef, survey]
-  )
+  const generateLocalScript = useCallback(async () => {
+    const currentScript = NodeDef.getScript(nodeDef)
+    if (currentScript) {
+      return currentScript
+    }
+    if (categoryUuid) {
+      const { request } = API.fetchCategoryItems({
+        surveyId: Survey.getId(survey),
+        categoryUuid,
+      })
+      const {
+        data: { items },
+      } = await request
 
-  const getScriptOrDefault = useCallback(
-    () => NodeDef.getScript(nodeDef) || getDefaultScript(),
-    [getDefaultScript, nodeDef]
-  )
+      let newScript = ''
+      const generateCodesText = (_items) =>
+        Object.values(_items)
+          .map((_item) => `'${CategoryItem.getCode(_item)}', ${CategoryItem.getLabel(lang)(_item)} `)
+          .join('; ')
+
+      if (NodeDef.getParentUuid(nodeDef) && categoryUuid) {
+        const scriptOrDefault = currentScript || getDefaultScript({ survey, nodeDef })
+        if (/^# __CODES__/.test(currentScript)) {
+          const scriptSplitted = currentScript.split('\n')
+          scriptSplitted[0] = `# __CODES__ ${generateCodesText(items)}`
+          newScript = scriptSplitted.join('\n')
+        } else {
+          newScript = `# __CODES__ ${generateCodesText(items)}\n${scriptOrDefault}`
+        }
+      }
+      return newScript
+    }
+  }, [categoryUuid, lang, nodeDef, survey])
 
   useEffect(() => {
-    setDefaultLocalScript(getScriptOrDefault())
-  }, [])
+    generateLocalScript().then((script) => {
+      setLocalScript(script)
+    })
+  }, [generateLocalScript])
 
   return (
     <FormItem label="nodeDefEdit.advancedProps.script" className="script-form">
       <ScriptEditor
-        key={defaultLocalScript}
+        key={localScript}
         name="node_def_analysis_script"
         mode="r"
-        script={defaultLocalScript}
+        script={localScript}
         onChange={onChange}
         completer={variableNamesCompleter}
         readOnly
