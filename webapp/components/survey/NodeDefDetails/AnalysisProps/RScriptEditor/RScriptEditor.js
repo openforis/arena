@@ -1,6 +1,6 @@
 import './RScriptEditor.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -20,14 +20,18 @@ const RScriptEditor = (props) => {
 
   const lang = useSurveyPreferredLang()
 
-  const nodeDefItems = Survey.getNodeDefsArray(survey).map((_nodeDef) => {
-    const parent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(_nodeDef))(survey)
-    return {
-      name: NodeDef.getName(_nodeDef),
-      label: NodeDef.getLabel(_nodeDef, lang),
-      parent,
-    }
-  })
+  const nodeDefItems = useMemo(
+    () =>
+      Survey.getNodeDefsArray(survey).map((_nodeDef) => {
+        const parent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(_nodeDef))(survey)
+        return {
+          name: NodeDef.getName(_nodeDef),
+          label: NodeDef.getLabel(_nodeDef, lang),
+          parent,
+        }
+      }),
+    [survey, lang]
+  )
 
   const variableNamesCompleter = {
     getCompletions: (_editor, _session, _pos, _prefix, callback) => {
@@ -41,52 +45,25 @@ const RScriptEditor = (props) => {
       )
     },
   }
-  const onChange = (newValue) => {
-    Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.script, value: newValue })
-  }
+  const onChange = useCallback(
+    (newValue) => {
+      Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.script, value: newValue })
+    },
+    [Actions, state]
+  )
 
-  const getDefaultScript = () =>
-    `${NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)) || 'PARENT'}$${
-      NodeDef.getName(nodeDef) || 'NAME'
-    } <- NA`
+  const getDefaultScript = useMemo(
+    () =>
+      `${NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)) || 'PARENT'}$${
+        NodeDef.getName(nodeDef) || 'NAME'
+      } <- NA`,
+    [nodeDef, survey]
+  )
 
-  const getScriptOrDefault = () => NodeDef.getScript(nodeDef) || getDefaultScript()
-
-  const generatePreScriptWithCategories = async () => {
-    const { request } = API.fetchCategoryItems({
-      surveyId: Survey.getId(survey),
-      categoryUuid: NodeDef.getCategoryUuid(nodeDef),
-    })
-    const {
-      data: { items },
-    } = await request
-
-    const currentScript = NodeDef.getScript(nodeDef)
-    let newScript = ''
-    const generateCodesText = (_items) =>
-      Object.values(_items)
-        .map((_item) => `'${CategoryItem.getCode(_item)}', ${CategoryItem.getLabel(lang)(_item)} `)
-        .join('; ')
-
-    if (NodeDef.getParentUuid(nodeDef) && NodeDef.getCategoryUuid(nodeDef)) {
-      if (/^# __CODES__/.test(currentScript)) {
-        const scriptSplitted = currentScript.split('\n')
-        scriptSplitted[0] = `# __CODES__ ${generateCodesText(items)}`
-        newScript = scriptSplitted.join('\n')
-      } else {
-        newScript = `# __CODES__ ${generateCodesText(items)}\n${getScriptOrDefault()}`
-      }
-    }
-
-    onChange(newScript)
-    setDefaultLocalScript(newScript)
-  }
-
-  useEffect(() => {
-    if (NodeDef.getCategoryUuid(nodeDef)) {
-      generatePreScriptWithCategories()
-    }
-  }, [NodeDef.getCategoryUuid(nodeDef), NodeDef.getParentUuid(nodeDef)])
+  const getScriptOrDefault = useCallback(
+    () => NodeDef.getScript(nodeDef) || getDefaultScript(),
+    [getDefaultScript, nodeDef]
+  )
 
   useEffect(() => {
     setDefaultLocalScript(getScriptOrDefault())
