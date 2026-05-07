@@ -29,7 +29,7 @@ const applyComputedStylesToSvg = (svgElement) => {
     const clonedEl = clonedElements[index]
     if (!clonedEl) return
 
-    const computedStyle = window.getComputedStyle(originalEl)
+    const computedStyle = globalThis.getComputedStyle(originalEl)
 
     // Apply important computed styles as inline attributes
     if (computedStyle.fill && !clonedEl.hasAttribute('fill')) {
@@ -48,7 +48,7 @@ const applyComputedStylesToSvg = (svgElement) => {
       setAttributeIfNotEmpty(clonedEl, 'font-weight', computedStyle.fontWeight)
 
       // Ensure text is not transparent
-      const opacity = parseFloat(computedStyle.opacity || 1)
+      const opacity = Number.parseFloat(computedStyle.opacity || 1)
       if (opacity < 1 && opacity > 0) {
         clonedEl.setAttribute('opacity', opacity)
       } else if (opacity >= 1) {
@@ -83,7 +83,7 @@ const drawLegendTextOnCanvas = (ctx, wrapperElement, minX, minY) => {
     const svgText = item.querySelector('text')
     if (svgText) {
       textContent = svgText.textContent || ''
-      const style = window.getComputedStyle(svgText)
+      const style = globalThis.getComputedStyle(svgText)
       textColor = style.fill || style.color || '#000'
       fontSize = style.fontSize || '12px'
       fontFamily = style.fontFamily || 'Arial'
@@ -94,7 +94,7 @@ const drawLegendTextOnCanvas = (ctx, wrapperElement, minX, minY) => {
       const span = item.querySelector('span')
       if (span) {
         textContent = span.textContent || ''
-        const style = window.getComputedStyle(span)
+        const style = globalThis.getComputedStyle(span)
         textColor = style.color || '#000'
         fontSize = style.fontSize || '12px'
         fontFamily = style.fontFamily || 'Arial'
@@ -116,7 +116,7 @@ const drawLegendTextOnCanvas = (ctx, wrapperElement, minX, minY) => {
         const indWidth = indRect.width
         const indHeight = indRect.height
 
-        const indStyle = window.getComputedStyle(indicator)
+        const indStyle = globalThis.getComputedStyle(indicator)
         const indColor = indStyle.color || indStyle.backgroundColor || '#8884d8'
         ctx.fillStyle = indColor
         ctx.fillRect(indX, indY, indWidth, indHeight)
@@ -158,7 +158,7 @@ export const downloadMultipleSvgsToPng = (svgElements, wrapperElement) => {
   }
 
   // Fallback to wrapper bounds if no SVGs found
-  if (!isFinite(minX)) {
+  if (!Number.isFinite(minX)) {
     minX = wrapperRect.x
     minY = wrapperRect.y
     maxX = wrapperRect.right
