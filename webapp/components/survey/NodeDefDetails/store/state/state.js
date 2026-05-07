@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
@@ -27,13 +29,12 @@ export const getValidation = A.propOr(Validation.newInstance(), keys.validation)
 // ===== UTILS
 /**
  * Determines if the nodeDef in the state has been updated.
- *
  * @param {!object} state - The node def state object.
  * @returns {boolean} - True when nodeDef and nodeDefOriginal are not equals.
  */
 export const isDirty = (state) => {
   const nodeDef = getNodeDef(state)
-  return nodeDef && (NodeDef.isTemporary(nodeDef) || !R.equals(nodeDef, getNodeDefOriginal(state)))
+  return nodeDef && (NodeDef.isTemporary(nodeDef) || !Objects.isEqual(nodeDef, getNodeDefOriginal(state)))
 }
 
 export const getPropsUpdated = (state) => {
