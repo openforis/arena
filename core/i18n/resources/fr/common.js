@@ -951,6 +951,7 @@ $t(common.appNameFull)
         info: `Si coché, l'attribut sera visible dans la liste des enregistrements`,
       },
       key: 'Clé',
+      maxKeysCountReached: 'Nombre maximum de clés atteint ({{maxKeysCount}})',
       multiple: 'Multiple',
       ownPage: 'Sa propre page',
       parentPage: 'Page parente ({{parentPage}})',
