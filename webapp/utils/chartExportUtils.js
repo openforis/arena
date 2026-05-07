@@ -1,8 +1,24 @@
 import { downloadToFile } from './domUtils'
 
+const setAttributeIfMissing = (element, attributeName, value) => {
+  if (!element.hasAttribute(attributeName)) {
+    element.setAttribute(attributeName, value)
+  }
+}
+
+const setAttributeIfNotEmpty = (element, attributeName, value) => {
+  if (value) {
+    element.setAttribute(attributeName, value)
+  }
+}
+
 const applyComputedStylesToSvg = (svgElement) => {
   // Clone the SVG to avoid modifying the original
   const clonedSvg = svgElement.cloneNode(true)
+
+  // Ensure required namespaces are present for reliable standalone SVG serialization.
+  setAttributeIfMissing(clonedSvg, 'xmlns', 'http://www.w3.org/2000/svg')
+  setAttributeIfMissing(clonedSvg, 'xmlns:xlink', 'http://www.w3.org/1999/xlink')
 
   // Get all elements from both original and cloned SVG
   const originalElements = svgElement.querySelectorAll('*')
@@ -25,20 +41,11 @@ const applyComputedStylesToSvg = (svgElement) => {
 
     // For text elements, ensure they have a visible color
     if (clonedEl.tagName === 'text') {
-      if (!clonedEl.hasAttribute('fill')) {
-        const textFill = computedStyle.color || computedStyle.fill || '#000'
-        clonedEl.setAttribute('fill', textFill)
-      }
+      setAttributeIfMissing(clonedEl, 'fill', computedStyle.color || computedStyle.fill || '#000')
 
-      if (computedStyle.fontSize) {
-        clonedEl.setAttribute('font-size', computedStyle.fontSize)
-      }
-      if (computedStyle.fontFamily) {
-        clonedEl.setAttribute('font-family', computedStyle.fontFamily)
-      }
-      if (computedStyle.fontWeight) {
-        clonedEl.setAttribute('font-weight', computedStyle.fontWeight)
-      }
+      setAttributeIfNotEmpty(clonedEl, 'font-size', computedStyle.fontSize)
+      setAttributeIfNotEmpty(clonedEl, 'font-family', computedStyle.fontFamily)
+      setAttributeIfNotEmpty(clonedEl, 'font-weight', computedStyle.fontWeight)
 
       // Ensure text is not transparent
       const opacity = parseFloat(computedStyle.opacity || 1)
@@ -174,6 +181,12 @@ export const downloadMultipleSvgsToPng = (svgElements, wrapperElement) => {
   const images = []
   const blobUrls = []
 
+  const revokeUrls = () => {
+    blobUrls.forEach((blobUrl) => {
+      URL.revokeObjectURL(blobUrl)
+    })
+  }
+
   svgElements.forEach((svgElement, index) => {
     // Apply computed styles to the cloned SVG
     const styledSvg = applyComputedStylesToSvg(svgElement)
@@ -209,10 +222,11 @@ export const downloadMultipleSvgsToPng = (svgElements, wrapperElement) => {
         downloadToFile(pngUrl, 'chart.png')
 
         // Clean up URLs
-        blobUrls.forEach((blobUrl) => {
-          URL.revokeObjectURL(blobUrl)
-        })
+        revokeUrls()
       }
+    }
+    img.onerror = () => {
+      revokeUrls()
     }
   })
 }
