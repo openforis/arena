@@ -19,7 +19,15 @@ const loadSurveyDefs =
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
     try {
-      const survey = await API.fetchSurveyFull({ surveyId, draft, advanced: true, validate, cycle, includeAnalysis })
+      const survey = await API.fetchSurveyFull({
+        surveyId,
+        draft,
+        advanced: true,
+        validate,
+        cycle,
+        includeAnalysis,
+        updateUserPrefs: true,
+      })
 
       const surveyUpdated = await fetchAndAssocCategoryItemsCounts({ survey, draft })
 

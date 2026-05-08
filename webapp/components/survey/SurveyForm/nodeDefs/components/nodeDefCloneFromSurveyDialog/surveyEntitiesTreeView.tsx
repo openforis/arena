@@ -257,14 +257,18 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
     [i18n, lang, surveyLoadedById, surveys]
   )
 
-  const selectedSourceEntityTreeItemKey = selectedSourceEntity
-    ? [
-        toSourceEntityTreeItemKey({
-          surveyId: selectedSourceEntity.surveyId,
-          nodeDefUuid: selectedSourceEntity.nodeDefUuid,
-        }),
-      ]
-    : []
+  const selectedSourceEntityTreeItemKey = useMemo(
+    () =>
+      selectedSourceEntity
+        ? [
+            toSourceEntityTreeItemKey({
+              surveyId: selectedSourceEntity.surveyId,
+              nodeDefUuid: selectedSourceEntity.nodeDefUuid,
+            }),
+          ]
+        : [],
+    [selectedSourceEntity]
+  )
 
   const onSelectedTreeItemKeysChange = useCallback(
     (selectedTreeItemKeys: string | string[]) => {
