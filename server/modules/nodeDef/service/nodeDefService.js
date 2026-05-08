@@ -165,9 +165,11 @@ export const cloneNodeDefFromSurvey = async (
     const sourceNodeDefs = ObjectUtils.toUuidIndexedObj([sourceNodeDef, ...sourceDescendants])
     const mergedSurvey = Survey.mergeNodeDefs(sourceNodeDefs)(targetSurvey)
 
+    const existingNodeDefNames = Survey.getNodeDefsArray(targetSurvey).map((nd) => NodeDef.getName(nd))
     const { clonedNodeDefs, rootClonedNodeDef } = Survey.cloneNodeDef({
       nodeDefUuid: sourceNodeDefUuid,
       targetParentNodeDefUuid,
+      existingNodeDefNames,
     })(mergedSurvey)
 
     return _insertClonedNodeDefsAndUpdateLayout({
