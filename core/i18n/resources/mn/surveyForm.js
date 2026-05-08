@@ -125,6 +125,7 @@ Arena Mobile дээр:
     analysis: 'Шинжилгээ',
   },
   cloneFromAnotherSurvey: {
+    title: 'Өөр судалгаанаас нэгжийг хуулбарлах',
     expandToLoadEntities: 'Нэгжүүдийг ачаалахын тулд дэлгэнэ үү',
     loadingSurveyEntities: 'Судалгааны нэгжүүдийг ачаалж байна...',
     errorLoadingSurveyEntities: 'Судалгааны нэгжүүдийг ачаалахад алдаа гарлаа',

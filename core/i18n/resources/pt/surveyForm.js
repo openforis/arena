@@ -124,6 +124,7 @@ No Arena Mobile:
     analysis: 'Análise',
   },
   cloneFromAnotherSurvey: {
+    title: 'Clonar entidade de outro formulário',
     expandToLoadEntities: 'Expandir para carregar entidades',
     loadingSurveyEntities: 'Carregando entidades do formulário...',
     errorLoadingSurveyEntities: 'Erro ao carregar entidades do formulário',

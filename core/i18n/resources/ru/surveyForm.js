@@ -121,6 +121,7 @@ export default {
     analysis: 'Анализ данных',
   },
   cloneFromAnotherSurvey: {
+    title: 'Клонировать объект из другой анкеты',
     expandToLoadEntities: 'Разверните, чтобы загрузить объекты',
     loadingSurveyEntities: 'Загрузка объектов анкеты...',
     errorLoadingSurveyEntities: 'Ошибка загрузки объектов анкеты',

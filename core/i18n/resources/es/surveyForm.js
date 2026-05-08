@@ -124,6 +124,7 @@ En Arena Mobile:
     analysis: 'Análisis',
   },
   cloneFromAnotherSurvey: {
+    title: 'Clonar entidad desde otro formulario',
     expandToLoadEntities: 'Expandir para cargar entidades',
     loadingSurveyEntities: 'Cargando entidades del formulario...',
     errorLoadingSurveyEntities: 'Error al cargar las entidades del formulario',

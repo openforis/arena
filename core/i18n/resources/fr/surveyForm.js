@@ -124,6 +124,7 @@ Dans Arena Mobile :
     analysis: 'Analyse',
   },
   cloneFromAnotherSurvey: {
+    title: 'Cloner une entité depuis un autre formulaire',
     expandToLoadEntities: 'Développer pour charger les entités',
     loadingSurveyEntities: 'Chargement des entités du formulaire...',
     errorLoadingSurveyEntities: 'Erreur lors du chargement des entités du formulaire',

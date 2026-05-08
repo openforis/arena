@@ -124,6 +124,7 @@ In Arena Mobile:
     analysis: 'Analysis',
   },
   cloneFromAnotherSurvey: {
+    title: 'Clone Entity From Another Survey',
     expandToLoadEntities: 'Expand to load entities',
     loadingSurveyEntities: 'Loading survey entities...',
     errorLoadingSurveyEntities: 'Error loading survey entities',
