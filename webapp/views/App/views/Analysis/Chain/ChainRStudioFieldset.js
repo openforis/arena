@@ -35,7 +35,7 @@ export const ChainRStudioFieldset = (props) => {
       <legend>RStudio</legend>
       <div className="content">
         <div>
-          {analysisRecordsAvailable && (
+          {(analysisRecordsAvailable || Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)) && (
             <Checkbox
               label="chainView.submitOnlyAnalysisStepDataIntoR"
               checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
