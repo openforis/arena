@@ -1,5 +1,5 @@
 import './formHeader.scss'
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -43,6 +43,7 @@ import FormEditActions from '../components/formEditActions'
 import { usePath } from './usePath'
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
 import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+import { NodeDefCloneFromSurveyDialog } from '../nodeDefs/components/nodeDefCloneFromSurveyDialog'
 
 const labelsExportAllowedFileFormats = [FileFormats.csv, FileFormats.xlsx]
 
@@ -66,6 +67,7 @@ const FormHeader = (props) => {
   const canEditSurvey = useAuthCanEditSurvey()
   const path = usePath(entry)
   const treeViewMode = useTreeSelectViewMode()
+  const [cloneFromSurveyDialogOpen, setCloneFromSurveyDialogOpen] = useState(false)
 
   const onLabelsImportFileSelected = useCallback(
     async (file) => {
@@ -81,6 +83,22 @@ const FormHeader = (props) => {
       )
     },
     [dispatch, surveyId]
+  )
+
+  const openCloneFromSurveyDialog = useCallback(() => {
+    setCloneFromSurveyDialogOpen(true)
+  }, [])
+
+  const closeCloneFromSurveyDialog = useCallback(() => {
+    setCloneFromSurveyDialogOpen(false)
+  }, [])
+
+  const onCloneFromSurveyConfirm = useCallback(
+    ({ sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid }) => {
+      closeCloneFromSurveyDialog()
+      dispatch(NodeDefsActions.cloneNodeDefFromSurvey({ sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid }))
+    },
+    [closeCloneFromSurveyDialog, dispatch]
   )
 
   return (
@@ -144,6 +162,21 @@ const FormHeader = (props) => {
               },
               ...(experimentalFeatures
                 ? [
+                    ...(canEditDef
+                      ? [
+                          {
+                            key: 'node-clone-from-other-survey',
+                            content: (
+                              <Button
+                                iconClassName="icon-copy"
+                                label="surveyForm:cloneFromAnotherSurvey.title"
+                                onClick={openCloneFromSurveyDialog}
+                                variant="text"
+                              />
+                            ),
+                          },
+                        ]
+                      : []),
                     {
                       key: 'survey-docx-export',
                       content: (
@@ -206,6 +239,13 @@ const FormHeader = (props) => {
           disableValidationReport={disableValidationReport}
           preview={preview}
           entry={entry}
+        />
+      )}
+      {cloneFromSurveyDialogOpen && (
+        <NodeDefCloneFromSurveyDialog
+          currentNodeDef={nodeDefPage}
+          onClose={closeCloneFromSurveyDialog}
+          onConfirm={onCloneFromSurveyConfirm}
         />
       )}
     </div>

@@ -12,7 +12,6 @@ import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 
 import { NodeDefEntitySelectorDialog } from './nodeDefEntitySelectorDialog'
 import { NodeDefConversionDialog } from './nodeDefConversionDialog'
-import { NodeDefCloneFromSurveyDialog } from './nodeDefCloneFromSurveyDialog'
 import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 const actionsWithEntitySelection = { clone: 'clone', move: 'move' }
@@ -82,10 +81,9 @@ export const NodeDefEditButtonsMenu = (props) => {
     action: null,
     entitySelectDialogOpen: false,
     conversionDialogOpen: false,
-    cloneFromSurveyDialogOpen: false,
   })
 
-  const { entitySelectDialogOpen, conversionDialogOpen, cloneFromSurveyDialogOpen, action } = state
+  const { entitySelectDialogOpen, conversionDialogOpen, action } = state
 
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
@@ -106,14 +104,6 @@ export const NodeDefEditButtonsMenu = (props) => {
 
   const closeConversionDialog = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, conversionDialogOpen: false }))
-  }, [])
-
-  const openCloneFromSurveyDialog = useCallback(() => {
-    setState((statePrev) => ({ ...statePrev, cloneFromSurveyDialogOpen: true }))
-  }, [])
-
-  const closeCloneFromSurveyDialog = useCallback(() => {
-    setState((statePrev) => ({ ...statePrev, cloneFromSurveyDialogOpen: false }))
   }, [])
 
   const entitySelectConfirmByAction = useMemo(
@@ -142,14 +132,6 @@ export const NodeDefEditButtonsMenu = (props) => {
     [action, closeEntitySelectDialog, entitySelectConfirmByAction]
   )
 
-  const onCloneFromSurveyConfirm = useCallback(
-    ({ sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid }) => {
-      closeCloneFromSurveyDialog()
-      dispatch(NodeDefsActions.cloneNodeDefFromSurvey({ sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid }))
-    },
-    [closeCloneFromSurveyDialog, dispatch]
-  )
-
   const menuItems = useMemo(() => {
     const _menuItems = []
     // items with entity selection (clone or move actions)
@@ -172,22 +154,6 @@ export const NodeDefEditButtonsMenu = (props) => {
         ),
       }))
     )
-    if (NodeDef.isEntity(nodeDef)) {
-      _menuItems.push({
-        key: 'node-clone-from-other-survey',
-        content: (
-          <Button
-            iconClassName="icon-copy"
-            label="Clone from another survey"
-            labelIsI18nKey={false}
-            onClick={openCloneFromSurveyDialog}
-            onMouseDown={(e) => e.stopPropagation()}
-            size="small"
-            variant="text"
-          />
-        ),
-      })
-    }
     // convert action (only for attributes)
     if (NodeDef.isAttribute(nodeDef) && !NodeDef.isPublished(nodeDef)) {
       _menuItems.push({
@@ -227,7 +193,6 @@ export const NodeDefEditButtonsMenu = (props) => {
     experimentalFeatures,
     nodeDef,
     nodeDefLabel,
-    openCloneFromSurveyDialog,
     openConvertIntoDialog,
     openEntitySelectDialog,
     survey,
@@ -248,13 +213,6 @@ export const NodeDefEditButtonsMenu = (props) => {
           onConfirm={onEntitySelectConfirm}
           onClose={closeEntitySelectDialog}
           title={`nodeDefEdit.${action}Dialog.title`}
-        />
-      )}
-      {cloneFromSurveyDialogOpen && (
-        <NodeDefCloneFromSurveyDialog
-          currentNodeDef={nodeDef}
-          onClose={closeCloneFromSurveyDialog}
-          onConfirm={onCloneFromSurveyConfirm}
         />
       )}
       {conversionDialogOpen && <NodeDefConversionDialog nodeDef={nodeDef} onClose={closeConversionDialog} />}
