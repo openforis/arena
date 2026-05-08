@@ -1,0 +1,16 @@
+.survey-form__node-def-clone-from-survey-dialog {
+  .clone-from-survey-dialog__tree-view-container {
+    max-height: 24rem;
+    min-height: 10rem;
+    overflow: auto;
+    border: 1px solid var(--mui-palette-divider);
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+
+  .clone-from-survey-dialog__message {
+    color: var(--text-color);
+    font-size: 0.85rem;
+    padding: 0.25rem 0.1rem;
+  }
+}

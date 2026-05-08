@@ -64,7 +64,7 @@ export const status = {
   publishedDraft: 'published-draft',
 }
 
-export const getInfo = (survey) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
+export const getInfo = (survey: any) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
 
 export const isRdbInitialized = R.propOr(false, keys.rdbInitialized)
 
@@ -72,7 +72,7 @@ export const isRdbInitialized = R.propOr(false, keys.rdbInitialized)
 export const { getId, getUuid, getProps, getPropsDraft, isPublished, getDescription, getDescriptions, getLabels } =
   ObjectUtils
 
-export const getName = ObjectUtils.getProp(keys.name, '')
+export const getName = (survey) => ObjectUtils.getProp(keys.name, '')(survey)
 
 export const getOwnerUuid = R.propOr(null, keys.ownerUuid)
 
@@ -120,13 +120,13 @@ export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled
 )
 export const getSamplingPolygon = (surveyInfo) => {
-  const samplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})(surveyInfo)
+  const samplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})(surveyInfo) as object
   return { ...SamplingPolygon.getSamplingPolygonDefaults(), ...samplingPolygon }
 }
 
 export const getSecurity = Surveys.getSecurity
 
-export const getSRS = ObjectUtils.getProp(keys.srs, [])
+export const getSRS = (surveyInfo): any[] => ObjectUtils.getProp(keys.srs, [])(surveyInfo) as any[]
 
 export const getSRSCodes = (survey) => getSRS(survey).map((srs) => srs.code)
 
