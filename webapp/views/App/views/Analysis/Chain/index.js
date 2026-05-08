@@ -1,1 +1,1 @@
-export { default } from './Chain'
+export { default } from './ChainDetails'

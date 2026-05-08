@@ -1,4 +1,4 @@
-import './Chain.scss'
+import './ChainDetails.scss'
 
 import React, { useCallback, useEffect } from 'react'
 import { useParams } from 'react-router'
@@ -23,7 +23,7 @@ import { ChainBasicProps } from './ChainBasicProps'
 import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
 import { ChainStatisticalAnalysisProps } from './StatisticalAnalysis/ChainStatisticalAnalysisProps'
 
-const ChainComponent = () => {
+const ChainDetails = () => {
   const dispatch = useDispatch()
   const { chainUuid } = useParams()
   const chain = useChain()
@@ -97,4 +97,4 @@ const ChainComponent = () => {
   )
 }
 
-export default ChainComponent
+export default ChainDetails
