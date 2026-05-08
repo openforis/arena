@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import * as Record from '@core/record/record'
-import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
