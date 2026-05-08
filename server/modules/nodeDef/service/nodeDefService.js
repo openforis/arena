@@ -148,51 +148,105 @@ export const convertNodeDef = async ({ user, surveyId, nodeDefUuid, toType }, cl
     return afterNodeDefUpdate({ survey, nodeDef, nodeDefsDependentsUuids })
   })
 
+export const cloneNodeDefFromSurvey = async (
+  { sourceSurveyId, sourceNodeDefUuid, targetSurveyId, targetParentNodeDefUuid },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const [sourceSurvey, targetSurvey] = await Promise.all([
+      fetchSurvey({ surveyId: sourceSurveyId }, t),
+      fetchSurvey({ surveyId: targetSurveyId }, t),
+    ])
+
+    // Temporarily inject the source node def subtree into the target survey so
+    // Survey.cloneNodeDef can resolve references within a single survey object.
+    const sourceNodeDef = Survey.getNodeDefByUuid(sourceNodeDefUuid)(sourceSurvey)
+    const sourceDescendants = Survey.getNodeDefDescendants({ nodeDef: sourceNodeDef })(sourceSurvey)
+    const sourceNodeDefs = ObjectUtils.toUuidIndexedObj([sourceNodeDef, ...sourceDescendants])
+    const mergedSurvey = Survey.mergeNodeDefs(sourceNodeDefs)(targetSurvey)
+
+    const existingNodeDefNames = Survey.getNodeDefsArray(targetSurvey).map((nd) => NodeDef.getName(nd))
+    const { clonedNodeDefs, rootClonedNodeDef } = Survey.cloneNodeDef({
+      nodeDefUuid: sourceNodeDefUuid,
+      targetParentNodeDefUuid,
+      existingNodeDefNames,
+    })(mergedSurvey)
+
+    return _insertClonedNodeDefsAndUpdateLayout({
+      survey: targetSurvey,
+      surveyId: targetSurveyId,
+      clonedNodeDefs,
+      rootClonedNodeDef,
+      layoutRefParentNodeDefUuid: targetParentNodeDefUuid,
+      layoutRefNodeDefUuid: sourceNodeDefUuid,
+      t,
+    })
+  })
+
+const _insertClonedNodeDefsAndUpdateLayout = async ({
+  survey,
+  surveyId,
+  clonedNodeDefs,
+  rootClonedNodeDef,
+  layoutRefParentNodeDefUuid,
+  layoutRefNodeDefUuid,
+  t,
+}) => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const cycleKeys = Survey.getCycleKeys(survey)
+  const defaultCycle = Survey.getDefaultCycleKey(surveyInfo)
+  const layoutRefParentNodeDef = Survey.getNodeDefByUuid(layoutRefParentNodeDefUuid)(survey)
+  const isLayoutRefParentForm = NodeDefLayout.isRenderForm(defaultCycle)(layoutRefParentNodeDef)
+  const layoutRefParentChildren = NodeDefLayout.getLayoutChildren(defaultCycle)(layoutRefParentNodeDef)
+  const layoutRefPosition = isLayoutRefParentForm
+    ? layoutRefParentChildren.find((item) => item.i === layoutRefNodeDefUuid)
+    : null
+
+  const insertedNodeDefs = await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: clonedNodeDefs }, t)
+
+  const preferredLayoutByCycle = layoutRefPosition
+    ? cycleKeys.reduce((acc, cycle) => {
+        const { minH, minW, h, w } = layoutRefPosition
+        acc[cycle] = { minH, minW, h, w }
+        return acc
+      }, {})
+    : null
+  const parentNodeDefUpdated = await NodeDefManager.addOrRemoveNodeDefInParentLayout(
+    {
+      survey,
+      nodeDef: rootClonedNodeDef,
+      add: true,
+      layoutInParentByCycle: preferredLayoutByCycle,
+    },
+    t
+  )
+
+  const nodeDefsUpdatedByUuid = ObjectUtils.toUuidIndexedObj(insertedNodeDefs)
+  if (parentNodeDefUpdated) {
+    nodeDefsUpdatedByUuid[NodeDef.getUuid(parentNodeDefUpdated)] = parentNodeDefUpdated
+  }
+
+  return afterNodeDefUpdate({ survey, nodeDefsUpdated: nodeDefsUpdatedByUuid })
+}
+
 export const cloneNodeDef = async ({ surveyId, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
   client.tx(async (t) => {
     const survey = await fetchSurvey({ surveyId }, t)
 
     const { clonedNodeDefs, rootClonedNodeDef } = Survey.cloneNodeDef({ nodeDefUuid, targetParentNodeDefUuid })(survey)
 
-    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    const originalNodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-    const surveyInfo = Survey.getSurveyInfo(survey)
-    const cycleKeys = Survey.getCycleKeys(survey)
-    const defaultCycle = Survey.getDefaultCycleKey(surveyInfo)
-    const isOriginalNodeDefParentForm = NodeDefLayout.isRenderForm(defaultCycle)(originalNodeDefParent)
-    const originalNodeDefParentLayoutChildren = NodeDefLayout.getLayoutChildren(defaultCycle)(originalNodeDefParent)
-    const originalNodeDefLayoutPosition = isOriginalNodeDefParentForm
-      ? originalNodeDefParentLayoutChildren.find((item) => item.i === nodeDefUuid)
-      : null
+    const originalNodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    const originalNodeDefParent = Survey.getNodeDefParent(originalNodeDef)(survey)
 
-    // Insert and get inserted nodeDefs with DB ids
-    const insertedNodeDefs = await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: clonedNodeDefs }, t)
-
-    // update parent layout with new node def
-    // keep the same layout position for the cloned node def if the original node def had a layout position (i.e. if the original parent is a form and the cloned node def is in the form layout)
-    const preferredRootClonedDefLayoutParentByCycle = originalNodeDefLayoutPosition
-      ? cycleKeys.reduce((acc, cycle) => {
-          const { minH, minW, h, w } = originalNodeDefLayoutPosition
-          acc[cycle] = { minH, minW, h, w }
-          return acc
-        }, {})
-      : null
-    const parentNodeDefUpdated = await NodeDefManager.addOrRemoveNodeDefInParentLayout(
-      {
-        survey,
-        nodeDef: rootClonedNodeDef,
-        add: true,
-        layoutInParentByCycle: preferredRootClonedDefLayoutParentByCycle,
-      },
-      t
-    )
-
-    const nodeDefsUpdatedByUuid = ObjectUtils.toUuidIndexedObj(insertedNodeDefs)
-    if (parentNodeDefUpdated) {
-      nodeDefsUpdatedByUuid[NodeDef.getUuid(parentNodeDefUpdated)] = parentNodeDefUpdated
-    }
-
-    return afterNodeDefUpdate({ survey, nodeDefsUpdated: nodeDefsUpdatedByUuid })
+    return _insertClonedNodeDefsAndUpdateLayout({
+      survey,
+      surveyId,
+      clonedNodeDefs,
+      rootClonedNodeDef,
+      layoutRefParentNodeDefUuid: NodeDef.getUuid(originalNodeDefParent),
+      layoutRefNodeDefUuid: nodeDefUuid,
+      t,
+    })
   })
 
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {

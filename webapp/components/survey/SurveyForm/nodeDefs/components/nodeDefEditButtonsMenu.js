@@ -77,7 +77,11 @@ export const NodeDefEditButtonsMenu = (props) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
-  const [state, setState] = useState({ action: null, entitySelectDialogOpen: false, conversionDialogOpen: false })
+  const [state, setState] = useState({
+    action: null,
+    entitySelectDialogOpen: false,
+    conversionDialogOpen: false,
+  })
 
   const { entitySelectDialogOpen, conversionDialogOpen, action } = state
 

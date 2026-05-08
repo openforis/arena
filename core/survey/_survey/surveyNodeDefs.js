@@ -323,12 +323,13 @@ export const cloneNodeDef =
     ignoreDefaultValues = true,
     ignoreApplicability = true,
     ignoreValidations = true,
+    existingNodeDefNames: existingNodeDefNamesParam = null,
   }) =>
   (survey) => {
     const nodeDef = getNodeDefByUuid(nodeDefUuid)(survey)
     const nodeDefParent = getNodeDefByUuid(targetParentNodeDefUuid)(survey)
     const allNodeDefs = getNodeDefs(survey)
-    const existingNodeDefNames = getNodeDefsArray(survey).map((nd) => NodeDef.getName(nd))
+    const existingNodeDefNames = existingNodeDefNamesParam ?? getNodeDefsArray(survey).map((nd) => NodeDef.getName(nd))
 
     // Gather all descendants (including nested entities)
     const nodeDefDescendants = getNodeDefDescendants({ nodeDef })(survey)

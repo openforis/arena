@@ -186,10 +186,18 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/full', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, draft, advanced, includeAnalysis, validate } = Request.getParams(req)
+      const {
+        surveyId,
+        cycle,
+        draft,
+        advanced,
+        includeAnalysis,
+        validate,
+        updateUserPrefs = false,
+      } = Request.getParams(req)
       const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
-      const [survey] = await Promise.all([
+      const promises = [
         SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
           surveyId,
           cycle,
@@ -198,8 +206,11 @@ export const init = (app) => {
           includeAnalysis,
           validate,
         }),
-        UserService.updateUserPrefs(user),
-      ])
+      ]
+      if (updateUserPrefs) {
+        promises.push(UserService.updateUserPrefs(user))
+      }
+      const [survey] = await Promise.all(promises)
       await _sendSurvey({ survey, user, res })
     } catch (error) {
       next(error)
