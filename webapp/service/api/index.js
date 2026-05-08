@@ -95,6 +95,7 @@ export {
   getSurveyFileDownloadUrl,
 } from './survey'
 export {
+  cloneNodeDefFromSurvey,
   convertNodeDef,
   cloneNodeDef,
   fetchNodeDef,

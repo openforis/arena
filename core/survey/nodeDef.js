@@ -539,6 +539,7 @@ export const cloneIntoEntityDef =
 
     const propsAdvancedCloned = ObjectUtils.clone(getPropsAdvanced(nodeDef))
     if (ignoreDefaultValues) {
+      delete propsCloned[propKeys.readOnly]
       delete propsAdvancedCloned[keysPropsAdvanced.defaultValues]
       delete propsAdvancedCloned[keysPropsAdvanced.defaultValueEvaluatedOneTime]
       delete propsAdvancedCloned[keysPropsAdvanced.fileNameExpression]

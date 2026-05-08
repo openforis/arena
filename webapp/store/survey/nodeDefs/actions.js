@@ -74,6 +74,24 @@ export const createNodeDef = (parent, type, props, navigate) => async (dispatch,
   return nodeDef
 }
 
+export const cloneNodeDefFromSurvey =
+  ({ sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+    const surveyId = Survey.getId(survey)
+
+    const { nodeDefsValidation, nodeDefsUpdated } = await API.cloneNodeDefFromSurvey({
+      surveyId,
+      sourceSurveyId,
+      sourceNodeDefUuid,
+      targetParentNodeDefUuid,
+    })
+
+    dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
+    dispatch(_onNodeDefsIndexUpdate({ survey, nodeDefsUpdated }))
+  }
+
 export const cloneNodeDefIntoEntityDef =
   ({ nodeDef, targetParentNodeDefUuid, navigate }) =>
   async (dispatch, getState) => {

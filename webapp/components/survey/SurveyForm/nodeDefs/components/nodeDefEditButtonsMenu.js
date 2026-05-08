@@ -143,12 +143,11 @@ export const NodeDefEditButtonsMenu = (props) => {
   )
 
   const onCloneFromSurveyConfirm = useCallback(
-    (cloneParams) => {
+    ({ sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid }) => {
       closeCloneFromSurveyDialog()
-      // UI-only implementation for now; API integration will be added next.
-      void cloneParams
+      dispatch(NodeDefsActions.cloneNodeDefFromSurvey({ sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid }))
     },
-    [closeCloneFromSurveyDialog]
+    [closeCloneFromSurveyDialog, dispatch]
   )
 
   const menuItems = useMemo(() => {
