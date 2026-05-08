@@ -5,6 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { TreeView } from '@webapp/components/TreeView'
 import * as API from '@webapp/service/api'
+import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 export interface SourceEntitySelection {
@@ -91,6 +92,7 @@ const toEntityTreeItems = ({
 export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): React.ReactElement | null => {
   const { selectedSourceEntity, onSourceEntitySelectionChange } = props
 
+  const i18n = useI18n()
   const currentSurvey = useSurvey()
   const currentSurveyId = Survey.getId(currentSurvey)
   const lang = useSurveyPreferredLang()
@@ -159,12 +161,12 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
         const surveysFiltered = Object.values(surveysById)
           .filter((surveyInfo) => Survey.getIdSurveyInfo(surveyInfo) !== currentSurveyId)
           .sort((surveyA, surveyB) => {
-            const surveyALabel = Survey.getDefaultLabel(surveyA) ?? ''
-            const surveyBLabel = Survey.getDefaultLabel(surveyB) ?? ''
-            const labelCompare = surveyALabel.localeCompare(surveyBLabel)
-            if (labelCompare !== 0) return labelCompare
             const surveyAName = Survey.getName(surveyA)
             const surveyBName = Survey.getName(surveyB)
+            const surveyLabelOrNameA = Survey.getDefaultLabel(surveyA) ?? surveyAName
+            const surveyLabelOrNameB = Survey.getDefaultLabel(surveyB) ?? surveyBName
+            const labelOrNameCompare = surveyLabelOrNameA.localeCompare(surveyLabelOrNameB)
+            if (labelOrNameCompare !== 0) return labelOrNameCompare
             return surveyAName.localeCompare(surveyBName)
           })
 
@@ -202,13 +204,29 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
         const surveyLoaded = surveyLoadedById[surveyId]
 
         let items: TreeItem[] = [
-          { key: `${surveyTreeItemKey}:placeholder`, label: 'Expand to load entities', disabled: true },
+          {
+            key: `${surveyTreeItemKey}:placeholder`,
+            label: i18n.t('surveyForm:cloneFromAnotherSurvey.expandToLoadEntities'),
+            disabled: true,
+          },
         ]
 
         if (surveyLoaded?.loading) {
-          items = [{ key: `${surveyTreeItemKey}:loading`, label: 'Loading survey entities...', disabled: true }]
+          items = [
+            {
+              key: `${surveyTreeItemKey}:loading`,
+              label: i18n.t('surveyForm:cloneFromAnotherSurvey.loadingSurveyEntities'),
+              disabled: true,
+            },
+          ]
         } else if (surveyLoaded?.error) {
-          items = [{ key: `${surveyTreeItemKey}:error`, label: 'Error loading survey entities', disabled: true }]
+          items = [
+            {
+              key: `${surveyTreeItemKey}:error`,
+              label: i18n.t('surveyForm:cloneFromAnotherSurvey.errorLoadingSurveyEntities'),
+              disabled: true,
+            },
+          ]
         } else if (surveyLoaded?.survey) {
           const rootNodeDef = Survey.getNodeDefRoot(surveyLoaded.survey)
           const rootEntityChildren = getEntityChildren({ survey: surveyLoaded.survey, nodeDef: rootNodeDef })
@@ -221,7 +239,13 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
                   surveyId,
                   surveyLoaded: surveyLoaded.survey,
                 })
-              : [{ key: `${surveyTreeItemKey}:empty`, label: 'No entities available', disabled: true }]
+              : [
+                  {
+                    key: `${surveyTreeItemKey}:empty`,
+                    label: i18n.t('surveyForm:cloneFromAnotherSurvey.noEntitiesAvailable'),
+                    disabled: true,
+                  },
+                ]
         }
 
         return {
@@ -230,7 +254,7 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
           items,
         }
       }),
-    [lang, surveyLoadedById, surveys]
+    [i18n, lang, surveyLoadedById, surveys]
   )
 
   const selectedSourceEntityTreeItemKey = selectedSourceEntity
@@ -256,11 +280,19 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
   )
 
   if (surveysLoading) {
-    return <div className="clone-from-survey-dialog__message">Loading surveys...</div>
+    return (
+      <div className="clone-from-survey-dialog__message">
+        {i18n.t('surveyForm:cloneFromAnotherSurvey.loadingSurveys')}
+      </div>
+    )
   }
 
   if (treeItems.length === 0) {
-    return <div className="clone-from-survey-dialog__message">No surveys available</div>
+    return (
+      <div className="clone-from-survey-dialog__message">
+        {i18n.t('surveyForm:cloneFromAnotherSurvey.noSurveysAvailable')}
+      </div>
+    )
   }
 
   return (
