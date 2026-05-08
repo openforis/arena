@@ -36,7 +36,6 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
   const surveyCurrent = useSurvey()
 
   const surveyCurrentHierarchy = Survey.getHierarchy()(surveyCurrent)
-  const currentSurveyId = Survey.getId(surveyCurrent)
 
   const [sourceEntitySelection, setSourceEntitySelection] = useState<SourceEntitySelection | null>(null)
   const [targetEntityDefUuid, setTargetEntityDefUuid] = useState<string>(NodeDef.getUuid(currentNodeDef))
@@ -62,7 +61,6 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
         <FormItem label={<span>Source entity</span>}>
           <div className="clone-from-survey-dialog__tree-view-container">
             <SurveyEntitiesTreeView
-              currentSurveyId={currentSurveyId}
               selectedSourceEntity={sourceEntitySelection}
               onSourceEntitySelectionChange={setSourceEntitySelection}
             />

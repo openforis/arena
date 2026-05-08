@@ -72,7 +72,7 @@ export const isRdbInitialized = R.propOr(false, keys.rdbInitialized)
 export const { getId, getUuid, getProps, getPropsDraft, isPublished, getDescription, getDescriptions, getLabels } =
   ObjectUtils
 
-export const getName = (survey) => ObjectUtils.getProp(keys.name, '')(survey)
+export const getName = (survey): string => ObjectUtils.getProp(keys.name, '')(survey) as string
 
 export const getOwnerUuid = R.propOr(null, keys.ownerUuid)
 

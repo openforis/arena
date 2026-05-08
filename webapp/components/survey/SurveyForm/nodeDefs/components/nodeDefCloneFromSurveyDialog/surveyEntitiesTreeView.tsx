@@ -5,10 +5,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { TreeView } from '@webapp/components/TreeView'
 import * as API from '@webapp/service/api'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 export interface SourceEntitySelection {
-  surveyId: number | string
+  surveyId: number
   nodeDefUuid: string
 }
 
@@ -26,7 +26,6 @@ interface TreeItem {
 }
 
 interface SurveyEntitiesTreeViewProps {
-  currentSurveyId: number | string
   selectedSourceEntity: SourceEntitySelection | null
   onSourceEntitySelectionChange: (selection: SourceEntitySelection | null) => void
 }
@@ -34,7 +33,7 @@ interface SurveyEntitiesTreeViewProps {
 const surveyTreeItemPrefix = 'survey:'
 const sourceEntityTreeItemPrefix = 'source-entity:'
 
-const toSurveyTreeItemKey = (surveyId: number | string): string => `${surveyTreeItemPrefix}${surveyId}`
+const toSurveyTreeItemKey = (surveyId: number): string => `${surveyTreeItemPrefix}${surveyId}`
 
 const toSourceEntityTreeItemKey = ({ surveyId, nodeDefUuid }: SourceEntitySelection): string =>
   `${sourceEntityTreeItemPrefix}${surveyId}:${nodeDefUuid}`
@@ -45,12 +44,13 @@ const isSurveyTreeItemKey = (treeItemKey: string | undefined): boolean =>
 const isSourceEntityTreeItemKey = (treeItemKey: string | undefined): boolean =>
   treeItemKey?.startsWith(sourceEntityTreeItemPrefix) ?? false
 
-const getSurveyIdFromSurveyTreeItemKey = (treeItemKey: string): string => treeItemKey.replace(surveyTreeItemPrefix, '')
+const getSurveyIdFromSurveyTreeItemKey = (treeItemKey: string): number =>
+  Number(treeItemKey.replace(surveyTreeItemPrefix, ''))
 
 const parseSourceEntityTreeItemKey = (treeItemKey: string): SourceEntitySelection => {
   const value = treeItemKey.replace(sourceEntityTreeItemPrefix, '')
-  const [surveyId, nodeDefUuid] = value.split(':')
-  return { surveyId, nodeDefUuid }
+  const [surveyIdString, nodeDefUuid] = value.split(':')
+  return { surveyId: Number(surveyIdString), nodeDefUuid }
 }
 
 const surveyInfoToLabel = (surveyInfo: object): string => {
@@ -70,7 +70,7 @@ const toEntityTreeItems = ({
 }: {
   nodeDefs: object[]
   lang: string
-  surveyId: number | string
+  surveyId: number
   surveyLoaded: object
 }): TreeItem[] =>
   nodeDefs.map((nodeDef) => {
@@ -89,8 +89,10 @@ const toEntityTreeItems = ({
   })
 
 export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): React.ReactElement | null => {
-  const { currentSurveyId, selectedSourceEntity, onSourceEntitySelectionChange } = props
+  const { selectedSourceEntity, onSourceEntitySelectionChange } = props
 
+  const currentSurvey = useSurvey()
+  const currentSurveyId = Survey.getId(currentSurvey)
   const lang = useSurveyPreferredLang()
 
   const [surveys, setSurveys] = useState<object[]>([])
@@ -109,7 +111,7 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
   )
 
   const loadSurvey = useCallback(
-    async (surveyId: string) => {
+    async (surveyId: number) => {
       if (surveyLoadedById[surveyId]?.loading || surveyLoadedById[surveyId]?.survey) {
         return
       }
@@ -130,7 +132,7 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
           advanced: true,
           includeAnalysis: false,
           validate: false,
-        })
+        } as any)
 
         setSurveyLoadedById((statePrev) => ({
           ...statePrev,
