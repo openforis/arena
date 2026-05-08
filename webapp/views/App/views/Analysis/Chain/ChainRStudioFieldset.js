@@ -35,14 +35,12 @@ export const ChainRStudioFieldset = (props) => {
       <legend>RStudio</legend>
       <div className="content">
         <div>
-          {(analysisRecordsAvailable || Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)) && (
-            <Checkbox
-              label="chainView.submitOnlyAnalysisStepDataIntoR"
-              checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
-              validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
-              onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
-            />
-          )}
+          <Checkbox
+            label="chainView.submitOnlyAnalysisStepDataIntoR"
+            checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
+            validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
+            onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
+          />
           <Checkbox
             label="chainView.submitOnlySelectedRecordsIntoR"
             checked={Chain.isSubmitOnlySelectedRecordsIntoR(chain)}
