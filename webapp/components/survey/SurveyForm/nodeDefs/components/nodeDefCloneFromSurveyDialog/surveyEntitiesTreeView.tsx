@@ -89,6 +89,16 @@ const toEntityTreeItems = ({
     }
   })
 
+const compareSurveysByLabelOrName = (surveyA: object, surveyB: object): any => {
+  const surveyAName = Survey.getName(surveyA)
+  const surveyBName = Survey.getName(surveyB)
+  const surveyLabelOrNameA = Survey.getDefaultLabel(surveyA) ?? surveyAName
+  const surveyLabelOrNameB = Survey.getDefaultLabel(surveyB) ?? surveyBName
+  const labelOrNameCompare = surveyLabelOrNameA.localeCompare(surveyLabelOrNameB)
+  if (labelOrNameCompare !== 0) return labelOrNameCompare
+  return surveyAName.localeCompare(surveyBName)
+}
+
 export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): React.ReactElement | null => {
   const { selectedSourceEntity, onSourceEntitySelectionChange } = props
 
@@ -160,15 +170,7 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
 
         const surveysFiltered = Object.values(surveysById)
           .filter((surveyInfo) => Survey.getIdSurveyInfo(surveyInfo) !== currentSurveyId)
-          .sort((surveyA, surveyB) => {
-            const surveyAName = Survey.getName(surveyA)
-            const surveyBName = Survey.getName(surveyB)
-            const surveyLabelOrNameA = Survey.getDefaultLabel(surveyA) ?? surveyAName
-            const surveyLabelOrNameB = Survey.getDefaultLabel(surveyB) ?? surveyBName
-            const labelOrNameCompare = surveyLabelOrNameA.localeCompare(surveyLabelOrNameB)
-            if (labelOrNameCompare !== 0) return labelOrNameCompare
-            return surveyAName.localeCompare(surveyBName)
-          })
+          .sort(compareSurveysByLabelOrName)
 
         setSurveys(surveysFiltered)
       })
@@ -203,13 +205,7 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
         const surveyTreeItemKey = toSurveyTreeItemKey(surveyId)
         const surveyLoaded = surveyLoadedById[surveyId]
 
-        let items: TreeItem[] = [
-          {
-            key: `${surveyTreeItemKey}:placeholder`,
-            label: i18n.t('surveyForm:cloneFromAnotherSurvey.expandToLoadEntities'),
-            disabled: true,
-          },
-        ]
+        let items: TreeItem[]
 
         if (surveyLoaded?.loading) {
           items = [
@@ -246,6 +242,14 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
                     disabled: true,
                   },
                 ]
+        } else {
+          items = [
+            {
+              key: `${surveyTreeItemKey}:placeholder`,
+              label: i18n.t('surveyForm:cloneFromAnotherSurvey.expandToLoadEntities'),
+              disabled: true,
+            },
+          ]
         }
 
         return {
