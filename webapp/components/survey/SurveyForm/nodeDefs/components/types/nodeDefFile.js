@@ -34,10 +34,12 @@ const FileInput = (props) => {
   const [showMap, setShowMap] = useState(false)
   const [imageFileMarkerPoint, setImageFileMarkerPoint] = useState(null)
 
+  const fileUuid = Node.getFileUuid(node)
   const isImage = NodeDef.getFileType(nodeDef) === NodeDef.fileTypeValues.image
   const originalFileName = Node.getFileName(node)
-  const fileName = Node.getFileNameCalculated(node) ?? originalFileName
-  const fileReady = !edit && originalFileName
+  const fileName = Node.getFileNameCalculated(node) || originalFileName
+  const fileNameDisplayed = fileName || fileUuid
+  const fileReady = !edit && fileUuid
   const fileUrl = API.getRecordNodeFileUrl({ surveyId, node })
 
   const updateDisabled = edit || !canEditRecord || readOnly
@@ -79,9 +81,9 @@ const FileInput = (props) => {
     <ButtonDownload
       fileName={fileName}
       href={fileUrl}
-      label={fileName}
+      label={fileNameDisplayed}
       labelIsI18nKey={false}
-      title={isImage ? undefined : fileName}
+      title={isImage ? undefined : fileNameDisplayed}
       className="btn-s ellipsis"
     />
   )
