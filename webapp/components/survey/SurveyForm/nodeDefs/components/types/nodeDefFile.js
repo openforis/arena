@@ -37,7 +37,8 @@ const FileInput = (props) => {
   const fileUuid = Node.getFileUuid(node)
   const isImage = NodeDef.getFileType(nodeDef) === NodeDef.fileTypeValues.image
   const originalFileName = Node.getFileName(node)
-  const fileName = Node.getFileNameCalculated(node) || originalFileName || fileUuid
+  const fileName = Node.getFileNameCalculated(node) || originalFileName
+  const fileNameDisplayed = fileName || fileUuid
   const fileReady = !edit && fileUuid
   const fileUrl = API.getRecordNodeFileUrl({ surveyId, node })
 
@@ -80,9 +81,9 @@ const FileInput = (props) => {
     <ButtonDownload
       fileName={fileName}
       href={fileUrl}
-      label={fileName}
+      label={fileNameDisplayed}
       labelIsI18nKey={false}
-      title={isImage ? undefined : fileName}
+      title={isImage ? undefined : fileNameDisplayed}
       className="btn-s ellipsis"
     />
   )
