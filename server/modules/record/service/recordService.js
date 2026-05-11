@@ -492,6 +492,7 @@ export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lan
     record,
     lang: langToUse,
     i18n,
+    fileProvider: async (fileUuid) => SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileUuid }),
   })
   const fileName = ExportFileNameGenerator.generate({
     surveyName,
