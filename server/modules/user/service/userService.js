@@ -19,6 +19,7 @@ import * as ValidationResult from '@core/validation/validationResult'
 import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
 import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
 import SystemError from '@core/systemError'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as Mailer from '@server/utils/mailer'
@@ -353,9 +354,28 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
 export const updateUser = async (user, surveyId, userToUpdate, file) => {
   await _checkCanUpdateUser({ user, surveyId, userToUpdate })
 
+  const userToUpdateUuid = User.getUuid(userToUpdate)
+  const userToUpdateOld = surveyId ? await UserManager.fetchUserByUuid(userToUpdateUuid) : null
+
   // Get profile picture
   const profilePicture = file ? fs.readFileSync(file.tempFilePath) : null
-  return UserManager.updateUser(user, surveyId, userToUpdate, profilePicture)
+  const updatedUser = await UserManager.updateUser(user, surveyId, userToUpdate, profilePicture)
+
+  if (surveyId) {
+    const survey = await SurveyManager.fetchSurveyById({ surveyId })
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const surveyUuid = Survey.getUuid(surveyInfo)
+    const userToUpdateUpdated = await UserManager.fetchUserByUuid(userToUpdateUuid)
+
+    const authGroupOld = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdateOld)
+    const authGroupUpdated = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdateUpdated)
+
+    if (AuthGroup.getUuid(authGroupOld) !== AuthGroup.getUuid(authGroupUpdated)) {
+      WebSocketServer.notifyUser(userToUpdateUuid, WebSocketEvents.userRoleUpdate, { surveyId, userRoleChanged: true })
+    }
+  }
+
+  return updatedUser
 }
 
 export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, title }) => {
