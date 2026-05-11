@@ -157,6 +157,7 @@ export default {
     required: 'Шаардлагатай',
     requiredField: 'шаардлагатай талбар',
     reset: 'Дахин тохируулах',
+    refresh: 'Шинэчлэх',
     resume: 'Үргэлжлүүлэх',
     retry: 'Дахин оролдох',
     role: 'Үүрэг',

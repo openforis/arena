@@ -157,6 +157,7 @@ export default {
     required: 'Обязательно',
     requiredField: 'обязательное поле',
     reset: 'Сброс',
+    refresh: 'Обновить',
     resume: 'Возобновить',
     retry: 'Повторить',
     role: 'Роль',

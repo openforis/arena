@@ -142,6 +142,7 @@ export default {
     required: 'Requerido',
     requiredField: 'campo requerido',
     reset: 'Reiniciar',
+    refresh: 'Refrescar',
     resume: 'Reanudar',
     retry: 'Reintentar',
     role: 'Rol',
