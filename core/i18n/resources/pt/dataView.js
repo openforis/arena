@@ -68,7 +68,6 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
     exportList: 'Exportar lista',
     exportData: 'Exportar dados',
     exportDataSummary: 'Exportar resumo dos dados',
-    exportRecordDocx: 'Exportar registro (Word)',
     filterPlaceholder: 'Filtrar por chaves ou proprietário',
     merge: {
       label: 'Mesclar',

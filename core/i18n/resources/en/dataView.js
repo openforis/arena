@@ -69,7 +69,6 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     exportList: 'Export list',
     exportData: 'Export data',
     exportDataSummary: 'Export data summary',
-    exportRecordDocx: 'Export record (Word)',
     filterPlaceholder: 'Filter by keys or owner',
     merge: {
       label: 'Merge',

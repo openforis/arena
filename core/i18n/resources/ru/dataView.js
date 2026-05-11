@@ -69,7 +69,6 @@ export default {
     exportList: 'Экспортировать список',
     exportData: 'Экспортировать данные',
     exportDataSummary: 'Экспортировать сводку данных',
-    exportRecordDocx: 'Экспорт записи (Word)',
     filterPlaceholder: 'Фильтровать по ключам или владельцу',
     merge: {
       label: 'Объединить',
