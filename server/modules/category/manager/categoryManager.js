@@ -85,7 +85,7 @@ export const validateCategory = async (
 }
 
 const _fetchSurvey = async ({ surveyId }, client = db) => {
-  let survey = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
+  const survey = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const srsCodes = Survey.getSRSCodes(survey)
   const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
   return Survey.assocSrs(srss)(survey)
@@ -249,7 +249,6 @@ export const insertItem = async (user, surveyId, categoryUuid, itemParam, client
 /**
  * Bulk insert of category items.
  * Items can belong to different categories and validation is not performed.
- *
  * @param {!object} user - The user performing this operation.
  * @param {!number} surveyId - The id of the survey.
  * @param {!any} items - Category items to be inserted.
@@ -348,9 +347,10 @@ const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, item
     if (R.isNil(CategoryItem.getExtraProp(name)(item))) {
       return acc
     }
+    const nameNew = ExtraPropDef.getName(itemExtraDef)
     const itemUpdated = deleted
       ? CategoryItem.dissocExtraProp(name)(item)
-      : CategoryItem.renameExtraProp({ nameOld: name, nameNew: ExtraPropDef.getName(itemExtraDef) })(item)
+      : CategoryItem.renameExtraProp({ nameOld: name, nameNew })(item)
 
     return [...acc, itemUpdated]
   }, [])
@@ -623,7 +623,6 @@ export const deleteLevel = async (user, surveyId, categoryUuid, levelUuid, clien
 /**
  * Deletes all levels without items.
  * Category validation is not performed.
- *
  * @param {!object} user - The user performing this operation.
  * @param {!number} surveyId - The id of the survey.
  * @param {!object} category - The category to filter by.
@@ -652,13 +651,11 @@ export const deleteLevelsEmptyByCategory = async (user, surveyId, category, clie
 /**
  * Deletes all levels and creates new ones with the specified names.
  * Category validation is not performed.
- *
  * @param {!object} user - The user performing this operation.
  * @param {!number} surveyId - The id of the survey.
  * @param {!object} category - The category of interest.
  * @param {string[]} levelNamesNew - Array of new level names.
  * @param {pgPromise.IDatabase} client - The database client.
- *
  * @returns {Promise<Category>} - Category with updated levels.
  */
 export const replaceLevels = async (user, surveyId, category, levelNamesNew, client = db) =>
