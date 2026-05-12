@@ -437,8 +437,13 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
   db.tx(async (t) => {
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, t)
     const userToDelete = await UserManager.fetchUserByUuid(userUuidToRemove, t)
+    const userPreferredSurveyId = User.getPrefSurveyCurrent(userToDelete)
 
     await UserManager.deleteUserFromSurvey({ user, userUuidToRemove, survey }, t)
+
+    if (String(userPreferredSurveyId) === String(surveyId)) {
+      await UserManager.deleteUserPrefsSurvey({ userUuid: userUuidToRemove, surveyId }, t)
+    }
 
     WebSocketServer.notifyUser(userUuidToRemove, WebSocketEvents.userRemovedFromSurvey, { surveyId, userRemoved: true })
 
