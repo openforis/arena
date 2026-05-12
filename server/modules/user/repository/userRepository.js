@@ -443,6 +443,19 @@ export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
 `)
 }
 
+export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db) => {
+  const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
+  await client.query(
+    `
+    UPDATE "user"
+    SET prefs = jsonb_set(prefs #- '{${User.keysPrefs.surveys},${surveyId}}', ${surveyCurrentJsonbPath}, 'null')
+    WHERE uuid = $1
+      AND prefs #>> ${surveyCurrentJsonbPath} = $2
+  `,
+    [userUuid, String(surveyId)]
+  )
+}
+
 /**.
  * Sets survey cycle user pref to Survey.cycleOneKey if the preferred cycle is among the specified (deleted) ones
  *
