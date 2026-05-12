@@ -30,6 +30,8 @@ export default {
   },
   surveysDraft: 'Encuestas (borrador)',
   surveysPublished: 'Encuestas (publicadas)',
+  userRoleUpdatedRefreshRequired: `Tu rol en esta encuesta se ha actualizado.  
+Pulsa Actualizar para recargar la página.`,
   updateUserConfirmation: 'El usuario {{name}} ha sido actualizado',
   userNotInvitedToAnySurvey: 'Usuario no invitado a ninguna encuesta',
   userSurveys: 'Encuestas de usuario',

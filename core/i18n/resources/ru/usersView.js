@@ -34,6 +34,8 @@ export default {
   },
   surveysDraft: 'Опросы (черновик)',
   surveysPublished: 'Опросы (опубликовано)',
+  userRoleUpdatedRefreshRequired: `Ваша роль в этом опросе была обновлена.  
+Нажмите «Обновить», чтобы перезагрузить страницу.`,
   updateUserConfirmation: 'Пользователь {{name}} обновлен',
   userNotInvitedToAnySurvey: `Пользователь не приглашен ни в один опрос`,
   userSurveys: 'Опросы пользователя',

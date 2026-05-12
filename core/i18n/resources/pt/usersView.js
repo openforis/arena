@@ -33,6 +33,8 @@ Copiar o link de redefinição de senha para a área de transferência?`,
   },
   surveysDraft: 'Inventários (rascunho)',
   surveysPublished: 'Inventários (publicados)',
+  userRoleUpdatedRefreshRequired: `Sua função neste inventário foi atualizada.  
+Pressione Atualizar para recarregar a página.`,
   updateUserConfirmation: 'Usuário {{name}} foi atualizado',
   userNotInvitedToAnySurvey: `Usuário não foi convidado para nenhum inventário`,
   userSurveys: 'Inventários do usuário',

@@ -33,6 +33,8 @@ export default {
   },
   surveysDraft: 'Судалгаанууд (ноорог)',
   surveysPublished: 'Судалгаанууд (нийтлэгдсэн)',
+  userRoleUpdatedRefreshRequired: `Таны энэ судалгаан дахь үүрэг шинэчлэгдлээ.  
+Хуудсыг дахин ачаалахын тулд Шинэчлэх товчийг дарна уу.`,
   updateUserConfirmation: 'Хэрэглэгч {{name}} шинэчлэгдсэн',
   userNotInvitedToAnySurvey: `Хэрэглэгчийг ямар ч судалгаанд уриагүй байна`,
   userSurveys: 'Хэрэглэгчийн судалгаанууд',

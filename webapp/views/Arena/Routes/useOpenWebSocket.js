@@ -21,7 +21,7 @@ export const useOpenWebSocket = () => {
     () =>
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'usersView.userRoleUpdatedRefreshRequired',
+          key: 'usersView:userRoleUpdatedRefreshRequired',
           okButtonLabel: 'common.refresh',
           dismissable: false,
           onOk: () => {

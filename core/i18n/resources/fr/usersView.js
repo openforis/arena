@@ -34,6 +34,8 @@ Copier le lien de réinitialisation du mot de passe dans le presse-papiers ?`,
   },
   surveysDraft: 'Formulaires (brouillon)',
   surveysPublished: 'Formulaires (publiés)',
+  userRoleUpdatedRefreshRequired: `Votre rôle dans ce formulaire a été mis à jour.  
+Appuyez sur Actualiser pour recharger la page.`,
   updateUserConfirmation: "L'utilisateur {{name}} a été mis à jour",
   userNotInvitedToAnySurvey: `Utilisateur non invité à aucun formulaire`,
   userSurveys: "Formulaires de l'utilisateur",
