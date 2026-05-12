@@ -25,6 +25,7 @@ export const WebSocketEvents = {
 
   // User events
   userRoleUpdate: 'userRoleUpdate',
+  userRemovedFromSurvey: 'userRemovedFromSurvey',
 
   // temp auth token events
   tempLoginSuccessful: 'tempLoginSuccessful',

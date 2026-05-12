@@ -440,6 +440,8 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
 
     await UserManager.deleteUserFromSurvey({ user, userUuidToRemove, survey }, t)
 
+    WebSocketServer.notifyUser(userUuidToRemove, WebSocketEvents.userRemovedFromSurvey, { surveyId, userRemoved: true })
+
     await RecordManager.updateRecordsOwner(
       { surveyId, fromOwnerUuid: userUuidToRemove, toOwnerUuid: User.getUuid(user) },
       t
