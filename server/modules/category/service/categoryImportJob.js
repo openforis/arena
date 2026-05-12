@@ -143,11 +143,22 @@ export class CategoryImportInternalJob extends Job {
 
     for (const [key, extraPropDef] of Object.entries(itemExtraDef)) {
       const extraPropValue = extra[key]
-      if (Objects.isNotEmpty(extraPropValue) && extraPropDef.dataType === ExtraPropDef.dataTypes.number) {
+      if (Objects.isEmpty(extraPropValue)) {
+        delete result[key]
+      }
+      if (extraPropDef.dataType === ExtraPropDef.dataTypes.number) {
         const parsedValue = toNumber(extraPropValue)
         if (Number.isFinite(parsedValue)) {
           result[key] = parsedValue
+        } else {
+          this._addError(Validation.messageKeys.categoryEdit.itemExtraPropInvalidNumber, {
+            key,
+            value: extraPropValue,
+          })
         }
+      } else if (extraPropDef.dataType === ExtraPropDef.dataTypes.geometryPoint) {
+        //  const point = Points.parse(extra[key])
+        //     if (point && Points.isValid(point, srsIndex)) {
       }
     }
 
