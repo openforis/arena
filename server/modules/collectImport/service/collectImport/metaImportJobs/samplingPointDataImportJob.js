@@ -14,7 +14,7 @@ import * as CategoryImportJobParams from '../../../../category/service/categoryI
 const keysExtra = {
   x: 'x',
   y: 'y',
-  // eslint-disable-next-line camelcase
+
   srs_id: 'srs_id',
 }
 
@@ -91,6 +91,11 @@ class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
     return itemExtraDefUpdated
   }
 
+  /**
+   * Extracts the extra properties of an item from the imported data, including the location property which is constructed from the x, y and srs_id properties.
+   * @param extra The extra properties of the item as extracted from the imported data
+   * @returns The extra properties of the item, including the location property
+   */
   extractItemExtraProps(extra) {
     const { srs_id: srs, x, y } = extra
 

@@ -1,6 +1,8 @@
 import * as fs from 'fs'
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import Job from '@server/job/job'
@@ -117,20 +119,36 @@ export class CategoryImportInternalJob extends Job {
   extractItemExtraDef() {
     const items = CategoryImportSummary.getItems(this.summary)
 
-    return items.reduce((accExtraDef, item) => {
+    const extraDefs = {}
+    let index = 0
+    for (const item of items) {
       if (CategoryImportSummary.isItemExtra(item)) {
         const itemKey = CategoryImportSummary.getItemKey(item)
-        accExtraDef[itemKey] = ExtraPropDef.newItem({
+        extraDefs[itemKey] = ExtraPropDef.newItem({
           dataType: CategoryImportSummary.getItemDataType(item),
-          index: Object.values(accExtraDef).length,
+          index,
         })
+        index++
       }
-      return accExtraDef
-    }, {})
+    }
+    return extraDefs
   }
 
   extractItemExtraProps(extra) {
-    return extra
+    const itemExtraDef = Category.getItemExtraDef(this.category)
+    if (!itemExtraDef || !extra) return {}
+
+    const result = extra // do side effect on passed extra object
+    const toNumber = (value) => Number(typeof value === 'string' ? value.replaceAll(',', '') : value) // remove thousand separator if any
+
+    for (const [key, extraPropDef] of Object.entries(itemExtraDef)) {
+      const extraPropValue = extra[key]
+      if (Objects.isNotEmpty(extraPropValue) && extraPropDef.dataType === ExtraPropDef.dataTypes.number) {
+        result[key] = toNumber(extraPropValue)
+      }
+    }
+
+    return result
   }
 
   // End of methods that can be overridden by subclasses
