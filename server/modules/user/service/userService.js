@@ -304,18 +304,18 @@ export const insertUser = async ({ user, userToInsert, profilePicture = null }) 
 
 // ====== UPDATE
 
-const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
-  const userToUpdateOld = await UserManager.fetchUserByUuid(User.getUuid(userToUpdate))
+const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate, userToUpdateOld = null }) => {
+  const userToUpdateOldData = userToUpdateOld || (await UserManager.fetchUserByUuid(User.getUuid(userToUpdate)))
   const authGroupsNew = await AuthManager.fetchGroupsByUuids(User.getAuthGroupsUuids(userToUpdate))
 
-  const userToUpdateWasSurveyManager = User.isSurveyManager(userToUpdateOld)
+  const userToUpdateWasSurveyManager = User.isSurveyManager(userToUpdateOldData)
   const userToUpdateWillBeSystemAdmin = authGroupsNew.some(AuthGroup.isSystemAdminGroup)
   const userToUpdateWillBeSurveyManager = authGroupsNew.some(AuthGroup.isSurveyManagerGroup)
 
   if (
     !User.isSystemAdmin(user) &&
     (userToUpdateWillBeSystemAdmin || // only system admins can assign system admin role
-      User.isSystemAdmin(userToUpdateOld) || // only system admins can edit other system admins
+      User.isSystemAdmin(userToUpdateOldData) || // only system admins can edit other system admins
       (!userToUpdateWasSurveyManager && userToUpdateWillBeSurveyManager && !User.isSurveyManager(user))) // only a survey manager can assign the survey manager role
   ) {
     throw new UnauthorizedError(User.getName(user))
@@ -331,19 +331,19 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
     const authGroupNew = surveyAuthGroupsNew.length > 0 ? surveyAuthGroupsNew[0] : null
     const survey = await SurveyManager.fetchSurveyById({ surveyId })
     const surveyInfo = Survey.getSurveyInfo(survey)
-    const authGroupOld = User.getAuthGroupBySurveyUuid({ surveyUuid: Survey.getUuid(surveyInfo) })(userToUpdateOld)
+    const authGroupOld = User.getAuthGroupBySurveyUuid({ surveyUuid: Survey.getUuid(surveyInfo) })(userToUpdateOldData)
     // Check if group has changed and user can edit group
     if (
       AuthGroup.getUuid(authGroupOld) !== AuthGroup.getUuid(authGroupNew) &&
-      !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdateOld)
+      !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdateOldData)
     ) {
       throw new UnauthorizedError(User.getName(user))
     }
 
     // Check if email has changed and user can edit email
-    if (User.getEmail(userToUpdateOld) !== User.getEmail(userToUpdate)) {
+    if (User.getEmail(userToUpdateOldData) !== User.getEmail(userToUpdate)) {
       // Throw exception if user is not allowed to edit the email
-      const canEditEmail = Authorizer.canEditUserEmail(user, surveyInfo, userToUpdateOld)
+      const canEditEmail = Authorizer.canEditUserEmail(user, surveyInfo, userToUpdateOldData)
       if (!canEditEmail) {
         throw new UnauthorizedError(User.getName(user))
       }
@@ -352,10 +352,10 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
 }
 
 export const updateUser = async (user, surveyId, userToUpdate, file) => {
-  await _checkCanUpdateUser({ user, surveyId, userToUpdate })
-
   const userToUpdateUuid = User.getUuid(userToUpdate)
   const userToUpdateOld = surveyId ? await UserManager.fetchUserByUuid(userToUpdateUuid) : null
+
+  await _checkCanUpdateUser({ user, surveyId, userToUpdate, userToUpdateOld })
 
   // Get profile picture
   const profilePicture = file ? fs.readFileSync(file.tempFilePath) : null
