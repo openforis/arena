@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 
 import { NodeValues, Objects } from '@openforis/arena-core'
-import { SurveyDocxGenerator } from '@openforis/arena-server'
+import { DocxConverter, SurveyDocxGenerator } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
@@ -476,7 +476,7 @@ export const mergeRecords = async (
     }
   })
 
-export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lang = null }) => {
+const generateRecordDocx = async ({ surveyId, recordUuid, lang = null }) => {
   const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true })
   const cycle = Record.getCycle(record)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
@@ -494,6 +494,13 @@ export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lan
     i18n,
     fileProvider: async (fileUuid) => SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileUuid }),
   })
+
+  return { buffer, cycle, surveyName }
+}
+
+export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lang = null }) => {
+  const { buffer, cycle, surveyName } = await generateRecordDocx({ surveyId, recordUuid, lang })
+
   const fileName = ExportFileNameGenerator.generate({
     surveyName,
     cycle,
@@ -508,4 +515,31 @@ export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lan
     contentSize: fileSize,
     contentType: Response.contentTypes.docx,
   })
+}
+
+export const exportRecordPdf = async ({ surveyId, recordUuid, outputStream, lang = null }) => {
+  const { buffer: docxBuffer, cycle, surveyName } = await generateRecordDocx({ surveyId, recordUuid, lang })
+  const pdfPath = await DocxConverter.convertDocxToPdf(docxBuffer)
+
+  try {
+    const pdfBuffer = await FileUtils.readBinaryFile(pdfPath)
+    const fileName = ExportFileNameGenerator.generate({
+      surveyName,
+      cycle,
+      fileType: 'RecordForm',
+      extension: 'pdf',
+    })
+    const fileSize = Buffer.byteLength(pdfBuffer)
+    Response.sendFileContent({
+      res: outputStream,
+      fileName,
+      content: pdfBuffer,
+      contentSize: fileSize,
+      contentType: Response.contentTypes.pdf,
+    })
+  } finally {
+    if (FileUtils.exists(pdfPath)) {
+      await FileUtils.deleteFileAsync(pdfPath)
+    }
+  }
 }

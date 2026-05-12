@@ -51,6 +51,7 @@ export {
   fetchRecordSummary,
   fetchRecordsSummary,
   getRecordDocxExportUrl,
+  getRecordPdfExportUrl,
   startExportDataJob,
   startExportDataSummaryJob,
   downloadExportedDataSummaryUrl,

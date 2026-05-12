@@ -134,6 +134,7 @@ No Arena Mobile:
   },
   confirmNodeDelete: 'Tem certeza de que deseja excluir este(a) {{nodeDefType}} ({{nodeDefLabel}})?',
   downloadPrintableDocument: 'Baixar documento imprimível (Word)',
+  downloadPrintableDocumentPdf: 'Baixar documento imprimível (PDF)',
   exportLabels_csv: 'Exportar rótulos (CSV)',
   exportLabels_xlsx: 'Exportar rótulos (Excel)',
   importLabels: 'Importar rótulos de Excel ou CSV',

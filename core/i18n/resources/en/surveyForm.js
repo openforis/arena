@@ -134,6 +134,7 @@ In Arena Mobile:
   },
   confirmNodeDelete: 'Are you sure you want to delete this {{nodeDefType}} ({{nodeDefLabel}})?',
   downloadPrintableDocument: 'Download printable document (Word)',
+  downloadPrintableDocumentPdf: 'Download printable document (PDF)',
   exportLabels_csv: 'Export labels (CSV)',
   exportLabels_xlsx: 'Export labels (Excel)',
   importLabels: 'Import labels from Excel or CSV',

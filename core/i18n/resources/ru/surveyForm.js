@@ -131,6 +131,7 @@ export default {
   },
   confirmNodeDelete: 'Вы уверены, что хотите удалить этот {{nodeDefType}} ({{nodeDefLabel}})?',
   downloadPrintableDocument: 'Скачать печатный документ (Word)',
+  downloadPrintableDocumentPdf: 'Скачать печатный документ (PDF)',
   exportLabels_csv: 'Экспорт меток (CSV)',
   exportLabels_xlsx: 'Экспорт меток (Excel)',
   importLabels: 'Импорт меток из Excel или CSV',
