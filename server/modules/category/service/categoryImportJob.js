@@ -144,7 +144,10 @@ export class CategoryImportInternalJob extends Job {
     for (const [key, extraPropDef] of Object.entries(itemExtraDef)) {
       const extraPropValue = extra[key]
       if (Objects.isNotEmpty(extraPropValue) && extraPropDef.dataType === ExtraPropDef.dataTypes.number) {
-        result[key] = toNumber(extraPropValue)
+        const parsedValue = toNumber(extraPropValue)
+        if (Number.isFinite(parsedValue)) {
+          result[key] = parsedValue
+        }
       }
     }
 
