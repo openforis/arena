@@ -37,55 +37,69 @@ const AdvancedProps = (props) => {
     <div className="form">
       {NodeDef.canHaveDefaultValue(nodeDef) && (
         <>
-          <FormItem label="nodeDefEdit.advancedProps.readOnly">
-            <div className="form-item_body">
-              <Checkbox
-                checked={NodeDef.isReadOnly(nodeDef)}
-                disabled={readOnly || NodeDef.isMultiple(nodeDef)}
-                validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
-                onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
-              />
-              {(NodeDef.canBeHidden(nodeDef) || NodeDef.isHidden(nodeDef)) && ( // show "hidden" checkbox control in case the attribute was set as hidden but it's not read-only anymore
-                <FormItem label="nodeDefEdit.advancedProps.hidden">
-                  <Checkbox
-                    checked={NodeDef.isHidden(nodeDef)}
-                    disabled={readOnly}
-                    validation={Validation.getFieldValidation(NodeDef.propKeys.hidden)(validation)}
-                    onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.hidden, value })}
-                  />
-                </FormItem>
-              )}
-            </div>
-          </FormItem>
-
-          <NodeDefExpressionsProp
-            qualifier={TestId.nodeDefDetails.defaultValues}
-            state={state}
-            Actions={Actions}
-            info={autoIncrementalKey ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey' : null}
-            label="nodeDefEdit.advancedProps.defaultValues"
-            readOnly={readOnly || autoIncrementalKey}
-            propName={NodeDef.keysPropsAdvanced.defaultValues}
-            nodeDefUuidContext={nodeDefUuidContext}
-            canBeConstant
-            isBoolean={NodeDef.isBoolean(nodeDef)}
-            excludeCurrentNodeDef
-          />
-          {(defaultValueEvaluatedOneTime || Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))) && (
-            <div className="form_row without-label">
-              <Checkbox
-                checked={defaultValueEvaluatedOneTime}
-                disabled={readOnly || autoIncrementalKey}
-                label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
-                validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
-                  validation
+          <NodeDefSettingsSection
+            titleKey="nodeDefEdit.advancedSections.fieldBehavior.title"
+            descriptionKey="nodeDefEdit.advancedSections.fieldBehavior.description"
+            testId={TestId.nodeDefDetails.advancedSectionFieldBehavior}
+          >
+            <FormItem label="nodeDefEdit.advancedProps.readOnly">
+              <div className="form-item_body">
+                <Checkbox
+                  checked={NodeDef.isReadOnly(nodeDef)}
+                  disabled={readOnly || NodeDef.isMultiple(nodeDef)}
+                  validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
+                  onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
+                />
+                {(NodeDef.canBeHidden(nodeDef) || NodeDef.isHidden(nodeDef)) && ( // show "hidden" checkbox control in case the attribute was set as hidden but it's not read-only anymore
+                  <FormItem label="nodeDefEdit.advancedProps.hidden">
+                    <Checkbox
+                      checked={NodeDef.isHidden(nodeDef)}
+                      disabled={readOnly}
+                      validation={Validation.getFieldValidation(NodeDef.propKeys.hidden)(validation)}
+                      onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.hidden, value })}
+                    />
+                  </FormItem>
                 )}
-                onChange={(value) =>
-                  Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime, value })
-                }
-              />
-            </div>
-          )}
+              </div>
+            </FormItem>
+          </NodeDefSettingsSection>
+
+          <NodeDefSettingsSection
+            titleKey="nodeDefEdit.advancedSections.defaultValue.title"
+            descriptionKey="nodeDefEdit.advancedSections.defaultValue.description"
+            testId={TestId.nodeDefDetails.advancedSectionDefaultValue}
+          >
+            <NodeDefExpressionsProp
+              qualifier={TestId.nodeDefDetails.defaultValues}
+              state={state}
+              Actions={Actions}
+              info={
+                autoIncrementalKey ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey' : null
+              }
+              label="nodeDefEdit.advancedProps.defaultValues"
+              readOnly={readOnly || autoIncrementalKey}
+              propName={NodeDef.keysPropsAdvanced.defaultValues}
+              nodeDefUuidContext={nodeDefUuidContext}
+              canBeConstant
+              isBoolean={NodeDef.isBoolean(nodeDef)}
+              excludeCurrentNodeDef
+            />
+            {(defaultValueEvaluatedOneTime || Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))) && (
+              <div className="form_row without-label">
+                <Checkbox
+                  checked={defaultValueEvaluatedOneTime}
+                  disabled={readOnly || autoIncrementalKey}
+                  label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
+                  validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
+                    validation
+                  )}
+                  onChange={(value) =>
+                    Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime, value })
+                  }
+                />
+              </div>
+            )}
+          </NodeDefSettingsSection>
         </>
       )}
 
@@ -124,23 +138,38 @@ const AdvancedProps = (props) => {
       </NodeDefSettingsSection>
 
       {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (
-        <FormItem label="nodeDefEdit.advancedProps.itemsFilter" info="nodeDefEdit.advancedProps.itemsFilterInfo">
-          <Input
-            onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.itemsFilter, value })}
-            validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.itemsFilter)(validation)}
-            value={NodeDef.getItemsFilter(nodeDef)}
-          />
-        </FormItem>
+        <NodeDefSettingsSection
+          titleKey="nodeDefEdit.advancedSections.answerLists.title"
+          descriptionKey="nodeDefEdit.advancedSections.answerLists.description"
+          testId={TestId.nodeDefDetails.advancedSectionAnswerLists}
+        >
+          <FormItem label="nodeDefEdit.advancedProps.itemsFilter" info="nodeDefEdit.advancedProps.itemsFilterInfo">
+            <Input
+              onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.itemsFilter, value })}
+              validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.itemsFilter)(validation)}
+              value={NodeDef.getItemsFilter(nodeDef)}
+            />
+          </FormItem>
+        </NodeDefSettingsSection>
       )}
       {experimentalFeatures && NodeDef.canBeHiddenInReport(nodeDef) && (
-        <FormItem label="nodeDefEdit.advancedProps.hiddenInReport" info="nodeDefEdit.advancedProps.hiddenInReportInfo">
-          <Checkbox
-            checked={NodeDef.isHiddenInReport(nodeDef)}
-            disabled={readOnly}
-            validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.hiddenInReport)(validation)}
-            onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.hiddenInReport, value })}
-          />
-        </FormItem>
+        <NodeDefSettingsSection
+          titleKey="nodeDefEdit.advancedSections.reporting.title"
+          descriptionKey="nodeDefEdit.advancedSections.reporting.description"
+          testId={TestId.nodeDefDetails.advancedSectionReporting}
+        >
+          <FormItem
+            label="nodeDefEdit.advancedProps.hiddenInReport"
+            info="nodeDefEdit.advancedProps.hiddenInReportInfo"
+          >
+            <Checkbox
+              checked={NodeDef.isHiddenInReport(nodeDef)}
+              disabled={readOnly}
+              validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.hiddenInReport)(validation)}
+              onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.hiddenInReport, value })}
+            />
+          </FormItem>
+        </NodeDefSettingsSection>
       )}
     </div>
   )

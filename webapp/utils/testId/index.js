@@ -101,6 +101,10 @@ export const TestId = {
   },
   nodeDefDetails: {
     deleteBtn: 'node-def-delete-btn',
+    advancedSectionAnswerLists: 'advanced-section-answer-lists',
+    advancedSectionDefaultValue: 'advanced-section-default-value',
+    advancedSectionFieldBehavior: 'advanced-section-field-behavior',
+    advancedSectionReporting: 'advanced-section-reporting',
     advancedSectionWhenApplies: 'advanced-section-when-applies',
     advanced: 'advanced',
     applyIf: (id) => `${id}-apply-if`,

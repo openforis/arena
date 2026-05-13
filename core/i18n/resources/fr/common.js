@@ -958,10 +958,30 @@ $t(common.appNameFull)
       table: 'Tableau',
     },
     advancedSections: {
+      fieldBehavior: {
+        title: 'Comportement du champ dans le formulaire',
+        description:
+          'Contrôlez si les répondants peuvent modifier les valeurs et si le champ est masqué dans le formulaire de saisie.',
+      },
+      defaultValue: {
+        title: 'Valeur par défaut',
+        description:
+          'Définissez des expressions ou constantes utilisées lors de la création d’un nouvel enregistrement. Vous pouvez évaluer la valeur par défaut une seule fois.',
+      },
       whenApplies: {
         title: 'Quand ce champ s\'applique',
         description:
           "Définissez quand ce champ est pertinent pour le parcours du répondant. Vous pouvez également le masquer dans le formulaire de saisie lorsqu'il n'est pas pertinent.",
+      },
+      answerLists: {
+        title: 'Listes de réponses',
+        description:
+          'Pour les attributs code et taxon, filtrez éventuellement les éléments sélectionnables à l’aide d’une expression (voir l’aide du champ pour la syntaxe).',
+      },
+      reporting: {
+        title: 'Rapports et tableaux de bord',
+        description:
+          'Contrôlez la visibilité de cet attribut dans le tableau de bord analytique lorsque l’option expérimentale est activée.',
       },
     },
     advancedProps: {

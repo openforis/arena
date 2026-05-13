@@ -953,10 +953,30 @@ $t(common.appNameFull)
       table: 'Table',
     },
     advancedSections: {
+      fieldBehavior: {
+        title: 'How the field behaves in the form',
+        description:
+          'Control whether respondents can edit values and whether the field is hidden in the data entry form.',
+      },
+      defaultValue: {
+        title: 'Default value',
+        description:
+          'Set expressions or constants used when a new record is created. You can optionally evaluate the default only once.',
+      },
       whenApplies: {
         title: 'When this field applies',
         description:
           "Define when this field is relevant to the respondent's path. You can also hide it in the entry form when it is not relevant.",
+      },
+      answerLists: {
+        title: 'Answer lists',
+        description:
+          'For code and taxon attributes, optionally filter selectable items using an expression (see the field help for syntax).',
+      },
+      reporting: {
+        title: 'Reporting and dashboards',
+        description:
+          'Control visibility of this attribute in the Analytical Dashboard when the experimental option is enabled.',
       },
     },
     advancedProps: {

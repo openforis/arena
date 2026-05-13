@@ -954,10 +954,30 @@ $t(common.appNameFull)
       table: 'Tabela',
     },
     advancedSections: {
+      fieldBehavior: {
+        title: 'Comportamento do campo no formulário',
+        description:
+          'Controle se os respondentes podem editar valores e se o campo fica oculto no formulário de entrada de dados.',
+      },
+      defaultValue: {
+        title: 'Valor padrão',
+        description:
+          'Defina expressões ou constantes usadas ao criar um novo registro. Opcionalmente, avalie o valor padrão apenas uma vez.',
+      },
       whenApplies: {
         title: 'Quando este campo se aplica',
         description:
           'Defina quando este campo é relevante para o percurso do respondente. Você também pode ocultá-lo no formulário de entrada quando não for relevante.',
+      },
+      answerLists: {
+        title: 'Listas de respostas',
+        description:
+          'Para atributos de código e taxon, filtre opcionalmente os itens selecionáveis com uma expressão (veja a ajuda do campo para a sintaxe).',
+      },
+      reporting: {
+        title: 'Relatórios e painéis',
+        description:
+          'Controle a visibilidade deste atributo no painel analítico quando a opção experimental estiver ativada.',
       },
     },
     advancedProps: {
