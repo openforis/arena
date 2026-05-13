@@ -12,16 +12,21 @@ import { JobActions } from '@webapp/store/app'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useUser } from '@webapp/store/user'
+import { useSurveyId } from '@webapp/store/survey'
 
 export const useOpenWebSocket = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const user = useUser()
   const userUuid = User.getUuid(user)
+  const surveyIdCurrent = useSurveyId()
 
   const onJobUpdate = useCallback((job) => dispatch(JobActions.updateJob({ job })), [dispatch])
   const onUserRoleUpdate = useCallback(
-    () =>
+    ({ surveyId } = {}) => {
+      if (String(surveyId) !== String(surveyIdCurrent)) {
+        return
+      }
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'usersView:userRoleUpdatedRefreshRequired',
@@ -31,11 +36,15 @@ export const useOpenWebSocket = () => {
             globalThis.location.reload()
           },
         })
-      ),
-    [dispatch]
+      )
+    },
+    [dispatch, surveyIdCurrent]
   )
   const onUserRemovedFromSurvey = useCallback(
-    () =>
+    ({ surveyId } = {}) => {
+      if (String(surveyId) !== String(surveyIdCurrent)) {
+        return
+      }
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'usersView:userRemovedFromSurveyGoToSurveysRequired',
@@ -45,8 +54,9 @@ export const useOpenWebSocket = () => {
             navigate(appModuleUri(homeModules.surveyList))
           },
         })
-      ),
-    [dispatch, navigate]
+      )
+    },
+    [dispatch, navigate, surveyIdCurrent]
   )
 
   const openSocket = useCallback(async () => {
