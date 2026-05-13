@@ -1,12 +1,13 @@
 import * as fs from 'fs'
 import * as R from 'ramda'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, Points } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import Job from '@server/job/job'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -22,6 +23,25 @@ import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryItemsUpdater from './categoryItemsUpdater'
 import { CategoryValidationJob } from './CategoryValidationJob'
 import * as CategoryService from './categoryService'
+
+const toNumber = (value) => Number(typeof value === 'string' ? value.replaceAll(',', '') : value)
+
+const extraPropProcessorByDataType = {
+  [ExtraPropDef.dataTypes.number]: ({ value }) => {
+    const parsedValue = toNumber(value)
+    if (Number.isFinite(parsedValue)) {
+      return { valid: true, valueProcessed: parsedValue }
+    }
+    return { valid: false, errorKey: Validation.messageKeys.categoryEdit.itemExtraPropInvalidNumber }
+  },
+  [ExtraPropDef.dataTypes.geometryPoint]: ({ value, srsIndex }) => {
+    const point = Points.parse(value)
+    if (!point || !Points.isValid(point, srsIndex)) {
+      return { valid: false, errorKey: Validation.messageKeys.categoryEdit.itemExtraPropInvalidGeometryPoint }
+    }
+    return { valid: true, valueProcessed: value }
+  },
+}
 
 export class CategoryImportInternalJob extends Job {
   constructor(params, type = 'CategoryImportInternalJob') {
@@ -135,33 +155,30 @@ export class CategoryImportInternalJob extends Job {
   }
 
   extractItemExtraProps(extra) {
-    const itemExtraDef = Category.getItemExtraDef(this.category)
+    const { category, survey } = this
+    const itemExtraDef = Category.getItemExtraDef(category)
     if (!itemExtraDef || !extra) return {}
 
     const result = extra // do side effect on passed extra object
-    const toNumber = (value) => Number(typeof value === 'string' ? value.replaceAll(',', '') : value) // remove thousand separator if any
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const srsIndex = Survey.getSRSIndex(surveyInfo)
 
     for (const [key, extraPropDef] of Object.entries(itemExtraDef)) {
       const extraPropValue = extra[key]
       if (Objects.isEmpty(extraPropValue)) {
         delete result[key]
+        continue
       }
-      if (extraPropDef.dataType === ExtraPropDef.dataTypes.number) {
-        const parsedValue = toNumber(extraPropValue)
-        if (Number.isFinite(parsedValue)) {
-          result[key] = parsedValue
+      const processExtraProp = extraPropProcessorByDataType[extraPropDef.dataType]
+      if (processExtraProp) {
+        const { valid, valueProcessed, errorKey } = processExtraProp({ value: extraPropValue, srsIndex })
+        if (valid) {
+          result[key] = valueProcessed
         } else {
-          this._addError(Validation.messageKeys.categoryEdit.itemExtraPropInvalidNumber, {
-            key,
-            value: extraPropValue,
-          })
+          this._addError(errorKey, { key, value: extraPropValue })
         }
-      } else if (extraPropDef.dataType === ExtraPropDef.dataTypes.geometryPoint) {
-        //  const point = Points.parse(extra[key])
-        //     if (point && Points.isValid(point, srsIndex)) {
       }
     }
-
     return result
   }
 
