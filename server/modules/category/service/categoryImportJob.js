@@ -52,6 +52,7 @@ export class CategoryImportInternalJob extends Job {
     this.itemsByCodes = {} // Cache of category items by ancestor codes
     this.category = null
     this.totalItemsInserted = 0
+    this.srsIndex = null
 
     this.itemsUpdater = null
   }
@@ -61,6 +62,8 @@ export class CategoryImportInternalJob extends Job {
 
     this.survey =
       this.contextSurvey ?? (await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx))
+    const surveyInfo = Survey.getSurveyInfo(this.survey)
+    this.srsIndex = Survey.getSRSIndex(surveyInfo)
 
     // 1. initialize summary (get it from params by default)
     this.summary = await this.getOrCreateSummary()
@@ -155,13 +158,11 @@ export class CategoryImportInternalJob extends Job {
   }
 
   extractItemExtraProps(extra) {
-    const { category, survey } = this
+    const { category, srsIndex } = this
     const itemExtraDef = Category.getItemExtraDef(category)
     if (!itemExtraDef || !extra) return {}
 
     const result = extra // do side effect on passed extra object
-    const surveyInfo = Survey.getSurveyInfo(survey)
-    const srsIndex = Survey.getSRSIndex(surveyInfo)
 
     for (const [key, extraPropDef] of Object.entries(itemExtraDef)) {
       const extraPropValue = extra[key]
