@@ -30,6 +30,10 @@ export default {
   },
   surveysDraft: 'Encuestas (borrador)',
   surveysPublished: 'Encuestas (publicadas)',
+  userRemovedFromSurveyGoToSurveysRequired: `Has sido eliminado de esta encuesta.  
+Pulsa Ir a encuestas para abrir la lista de encuestas.`,
+  userRoleUpdatedRefreshRequired: `Tu rol en esta encuesta se ha actualizado.  
+$t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: 'El usuario {{name}} ha sido actualizado',
   userNotInvitedToAnySurvey: 'Usuario no invitado a ninguna encuesta',
   userSurveys: 'Encuestas de usuario',

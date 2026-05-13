@@ -1,34 +1,87 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { SystemErrorActions } from '@webapp/store/system'
 import { JobActions } from '@webapp/store/app'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { useUser } from '@webapp/store/user'
+import { useSurveyId } from '@webapp/store/survey'
 
 export const useOpenWebSocket = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const navigateRef = useRef(navigate)
   const user = useUser()
   const userUuid = User.getUuid(user)
+  const surveyIdCurrent = useSurveyId()
 
-  const onJobUpdate = useCallback((job) => dispatch(JobActions.updateJob({ job })), [])
+  useEffect(() => {
+    navigateRef.current = navigate
+  }, [navigate])
+
+  const onJobUpdate = useCallback((job) => dispatch(JobActions.updateJob({ job })), [dispatch])
+  const onUserRoleUpdate = useCallback(
+    ({ surveyId } = {}) => {
+      if (String(surveyId) !== String(surveyIdCurrent)) {
+        return
+      }
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'usersView:userRoleUpdatedRefreshRequired',
+          okButtonLabel: 'common.refresh',
+          dismissable: false,
+          onOk: () => {
+            globalThis.location.reload()
+          },
+        })
+      )
+    },
+    [dispatch, surveyIdCurrent]
+  )
+  const onUserRemovedFromSurvey = useCallback(
+    ({ surveyId } = {}) => {
+      if (String(surveyId) !== String(surveyIdCurrent)) {
+        return
+      }
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'usersView:userRemovedFromSurveyGoToSurveysRequired',
+          okButtonLabel: 'common.goToSurveys',
+          dismissable: false,
+          onOk: () => {
+            navigateRef.current(appModuleUri(homeModules.surveyList))
+          },
+        })
+      )
+    },
+    [dispatch, surveyIdCurrent]
+  )
 
   const openSocket = useCallback(async () => {
     await AppWebSocket.openSocket((error) => dispatch(SystemErrorActions.throwSystemError({ error })))
     AppWebSocket.on(WebSocketEvents.jobUpdate, onJobUpdate)
-  }, [onJobUpdate])
+    AppWebSocket.on(WebSocketEvents.userRoleUpdate, onUserRoleUpdate)
+    AppWebSocket.on(WebSocketEvents.userRemovedFromSurvey, onUserRemovedFromSurvey)
+  }, [dispatch, onJobUpdate, onUserRoleUpdate, onUserRemovedFromSurvey])
 
   const closeSocket = useCallback(() => {
     AppWebSocket.closeSocket()
     AppWebSocket.off(WebSocketEvents.jobUpdate, onJobUpdate)
-  }, [onJobUpdate])
+    AppWebSocket.off(WebSocketEvents.userRoleUpdate, onUserRoleUpdate)
+    AppWebSocket.off(WebSocketEvents.userRemovedFromSurvey, onUserRemovedFromSurvey)
+  }, [onJobUpdate, onUserRoleUpdate, onUserRemovedFromSurvey])
 
   useEffect(() => {
-    return () => closeSocket()
+    return () => {
+      closeSocket()
+    }
   }, [closeSocket])
 
   useEffect(() => {

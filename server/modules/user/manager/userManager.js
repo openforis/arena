@@ -36,6 +36,7 @@ export const {
   fetchUsersWithExpiredInvitation,
   updateNamePasswordAndStatus,
   updatePassword,
+  deleteUserPrefsSurvey,
   resetUsersPrefsSurveyCycle,
   importNewUser,
   deleteUser,
