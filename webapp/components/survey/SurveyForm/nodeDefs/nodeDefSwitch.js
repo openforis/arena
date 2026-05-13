@@ -209,7 +209,10 @@ const NodeDefSwitch = (props) => {
 
   const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode })
 
-  const applicable = parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true
+  const applicable = parentNode ? Node.isChildApplicable(nodeDefUuid)(parentNode) : true
+  const editable = parentNode ? Node.isChildEditable(nodeDefUuid)(parentNode) : true
+  const visible = parentNode ? Node.isChildVisible(nodeDefUuid)(parentNode) : true
+
   const { canAddNode, nodes, nodesHaveValue } = entryProps
   const { isHovering, onMouseEnter, onMouseLeave } = useHovering({ canEditDef, edit })
   const {
@@ -263,7 +266,7 @@ const NodeDefSwitch = (props) => {
     ...props,
     ...entryProps,
     surveyInfo,
-    readOnly: readOnly || keyFieldLocked,
+    readOnly: readOnly || keyFieldLocked || !editable,
     label,
     lang,
     createNodePlaceholder,

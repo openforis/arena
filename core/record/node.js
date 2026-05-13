@@ -115,7 +115,16 @@ export const isValid = R.pipe(getValidation, Validation.isValid)
 
 // ===== READ metadata
 
-export const { metaKeys, getMeta, isChildApplicable, isDefaultValueApplied, getHierarchy, getHierarchyCode } = NodeMeta
+export const {
+  metaKeys,
+  getMeta,
+  isChildApplicable,
+  isChildEditable,
+  isChildVisible,
+  isDefaultValueApplied,
+  getHierarchy,
+  getHierarchyCode,
+} = NodeMeta
 
 // Hierarchy
 export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancestor), getHierarchy(node))
