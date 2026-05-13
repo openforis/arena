@@ -37,7 +37,7 @@ export default {
   userRemovedFromSurveyGoToSurveysRequired: `Вы были удалены из этого опроса.  
 Нажмите «Перейти к опросам», чтобы открыть список опросов.`,
   userRoleUpdatedRefreshRequired: `Ваша роль в этом опросе была обновлена.  
-  $t(common.pressRefreshToReloadPage)`,
+$t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: 'Пользователь {{name}} обновлен',
   userNotInvitedToAnySurvey: `Пользователь не приглашен ни в один опрос`,
   userSurveys: 'Опросы пользователя',

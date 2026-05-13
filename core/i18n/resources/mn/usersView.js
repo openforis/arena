@@ -36,7 +36,7 @@ export default {
   userRemovedFromSurveyGoToSurveysRequired: `Та энэ судалгаанаас хасагдсан байна.  
 Судалгааны жагсаалтыг нээхийн тулд Судалгааны жагсаалт руу очих товчийг дарна уу.`,
   userRoleUpdatedRefreshRequired: `Таны энэ судалгаан дахь үүрэг шинэчлэгдлээ.  
-  $t(common.pressRefreshToReloadPage)`,
+$t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: 'Хэрэглэгч {{name}} шинэчлэгдсэн',
   userNotInvitedToAnySurvey: `Хэрэглэгчийг ямар ч судалгаанд уриагүй байна`,
   userSurveys: 'Хэрэглэгчийн судалгаанууд',

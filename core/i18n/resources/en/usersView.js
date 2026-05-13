@@ -36,7 +36,7 @@ Copy the reset password link to the clipboard?`,
   userRemovedFromSurveyGoToSurveysRequired: `You have been removed from this survey.  
 Press Go to surveys to open the surveys list.`,
   userRoleUpdatedRefreshRequired: `Your role in this survey has been updated.  
-  $t(common.pressRefreshToReloadPage)`,
+$t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: 'User {{name}} has been updated',
   userNotInvitedToAnySurvey: `User not invited to any survey`,
   userSurveys: 'User Surveys',

@@ -28,6 +28,8 @@ const orderByFieldBySortBy = {
 
 const usersSearchCondition = `(u.email ILIKE $/search/ OR u.name ILIKE $/search/)`
 
+const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
+
 // CREATE
 
 export const importNewUser = async (
@@ -251,8 +253,6 @@ export const fetchUsersBySurveyId = async (
   )
 
 export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, client = db) => {
-  const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
-
   return client.map(
     `SELECT u.uuid 
     FROM "user" u 
@@ -426,7 +426,6 @@ export const updateUserPrefs = async (user, client = db) =>
   )
 
 export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
-  const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
   // Remove from surveys current pref
   await client.query(
     `
@@ -443,18 +442,24 @@ export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
 `)
 }
 
-export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db) => {
-  const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
-  await client.query(
+export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db) =>
+  client.query(
     `
     UPDATE "user"
-    SET prefs = jsonb_set(prefs #- '{${User.keysPrefs.surveys},${surveyId}}', ${surveyCurrentJsonbPath}, 'null')
-    WHERE uuid = $1
-      AND prefs #>> ${surveyCurrentJsonbPath} = $2
+    SET prefs = jsonb_set(
+      prefs #- ARRAY[$/surveysKey/, $/surveyId/]::text[],
+      ${surveyCurrentJsonbPath},
+      'null'
+    )
+    WHERE uuid = $/userUuid/
+      AND prefs #>> ${surveyCurrentJsonbPath} = $/surveyId/
   `,
-    [userUuid, String(surveyId)]
+    {
+      userUuid,
+      surveysKey: User.keysPrefs.surveys,
+      surveyId: String(surveyId),
+    }
   )
-}
 
 /**.
  * Sets survey cycle user pref to Survey.cycleOneKey if the preferred cycle is among the specified (deleted) ones
@@ -469,7 +474,7 @@ export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, cli
     `
       UPDATE "user" u
       SET prefs = jsonb_set(prefs, ${surveyCyclePath}, '"${Survey.cycleOneKey}"')
-      WHERE prefs #>>  ${surveyCyclePath} IN ($1:csv)
+      WHERE prefs #>> ${surveyCyclePath} IN ($1:csv)
     `,
     [cycleKeysDeleted]
   )
