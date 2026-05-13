@@ -322,6 +322,7 @@ NodeDefSwitch.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   parentNode: PropTypes.object,
   preview: PropTypes.bool,
+  readOnly: PropTypes.bool,
   renderType: PropTypes.string,
 }
 
