@@ -30,7 +30,9 @@ const _getItemValue = ({ survey, item, row }) => {
       CategoryImportSummary.getItemDataType(item) === ExtraPropDef.dataTypes.geometryPoint
     ) {
       const point = Points.parse(itemValue)
-      _checkSrs({ survey, srs: point.srs, columnName: itemColumn })
+      if (point) {
+        _checkSrs({ survey, srs: point.srs, columnName: itemColumn })
+      }
     }
     return itemValue
   }
@@ -43,10 +45,11 @@ const _getItemValue = ({ survey, item, row }) => {
     const itemKey = CategoryImportSummary.getItemKey(item)
     const x = row[itemKey + '_x']
     const y = row[itemKey + '_y']
-    let srs = row[itemKey + '_srs']
-    if (!Objects.isEmpty(x) && !Objects.isEmpty(y) && !Objects.isEmpty(srs)) {
+    const srsColumnName = itemKey + '_srs'
+    let srs = row[srsColumnName]
+    if (Objects.isNotEmpty(x) && Objects.isNotEmpty(y) && Objects.isNotEmpty(srs)) {
       srs = StringUtils.removePrefix(Srs.idPrefix)(srs)
-      _checkSrs({ survey, srs, columnName: itemKey + '_srs' })
+      _checkSrs({ survey, srs, columnName: srsColumnName })
       return Points.toString(PointFactory.createInstance({ x, y, srs }))
     }
   }
@@ -69,8 +72,6 @@ export const createRowsReaderFromStream = async ({ stream, survey, summary, onRo
 
         items.forEach((item) => {
           const itemValue = _getItemValue({ survey, item, row })
-          const itemKey = CategoryImportSummary.getItemKey(item)
-
           if (CategoryImportSummary.isItemCode(item)) {
             codes.push(String(itemValue ?? ''))
           }
@@ -78,6 +79,7 @@ export const createRowsReaderFromStream = async ({ stream, survey, summary, onRo
             return
           }
           if (CategoryImportSummary.isItemExtra(item)) {
+            const itemKey = CategoryImportSummary.getItemKey(item)
             extra[itemKey] = itemValue
           } else {
             // Label or description
