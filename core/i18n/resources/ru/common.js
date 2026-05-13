@@ -928,6 +928,13 @@ $t(common.appNameFull)
       parentPage: 'Родительская страница ({{parentPage}})',
       table: 'Таблица',
     },
+    advancedSections: {
+      whenApplies: {
+        title: 'Когда это поле применимо',
+        description:
+          'Задайте условие, при котором поле актуально для респондента. При необходимости скройте его в форме ввода, когда условие ложно.',
+      },
+    },
     advancedProps: {
       areaBasedEstimate: 'Оценка по площади',
       defaultValues: 'Значения по умолчанию',

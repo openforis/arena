@@ -952,6 +952,13 @@ $t(common.appNameFull)
       parentPage: 'Parent page ({{parentPage}})',
       table: 'Table',
     },
+    advancedSections: {
+      whenApplies: {
+        title: 'When this field applies',
+        description:
+          "Define when this field is relevant to the respondent's path. You can also hide it in the entry form when it is not relevant.",
+      },
+    },
     advancedProps: {
       areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',

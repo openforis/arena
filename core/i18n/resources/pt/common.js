@@ -953,6 +953,13 @@ $t(common.appNameFull)
       parentPage: 'Página pai ({{parentPage}})',
       table: 'Tabela',
     },
+    advancedSections: {
+      whenApplies: {
+        title: 'Quando este campo se aplica',
+        description:
+          'Defina quando este campo é relevante para o percurso do respondente. Você também pode ocultá-lo no formulário de entrada quando não for relevante.',
+      },
+    },
     advancedProps: {
       areaBasedEstimate: 'Estimativa baseada em área',
       defaultValues: 'Valores padrão',

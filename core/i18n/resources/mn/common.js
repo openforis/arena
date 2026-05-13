@@ -921,6 +921,13 @@ $t(common.appNameFull)
       parentPage: 'Эцэг хуудас ({{parentPage}})',
       table: 'Хүснэгт',
     },
+    advancedSections: {
+      whenApplies: {
+        title: 'Энэ талбар хэзээ хамааралтай вэ',
+        description:
+          'Асуулгаар явагчийн замд энэ талбар хэзээ хамааралтайг тодорхойлно. Хамааралгүй үед оруулах маягтаас нуух боломжтой.',
+      },
+    },
     advancedProps: {
       areaBasedEstimate: 'Талбай дээр суурилсан тооцоо',
       defaultValues: 'Үндсэн утгууд',

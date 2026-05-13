@@ -15,6 +15,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
+import NodeDefSettingsSection from './NodeDefSettingsSection'
 import { State } from './store'
 import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
@@ -88,31 +89,39 @@ const AdvancedProps = (props) => {
         </>
       )}
 
-      <NodeDefExpressionsProp
-        qualifier={TestId.nodeDefDetails.relevantIf}
-        state={state}
-        Actions={Actions}
-        label="nodeDefEdit.advancedProps.relevantIf"
-        readOnly={readOnly}
-        propName={NodeDef.keysPropsAdvanced.applicable}
-        applyIf={false}
-        multiple={false}
-        nodeDefUuidContext={nodeDefUuidContext}
-        isContextParent
-        excludeCurrentNodeDef
-      />
+      <NodeDefSettingsSection
+        titleKey="nodeDefEdit.advancedSections.whenApplies.title"
+        descriptionKey="nodeDefEdit.advancedSections.whenApplies.description"
+        testId={TestId.nodeDefDetails.advancedSectionWhenApplies}
+      >
+        <NodeDefExpressionsProp
+          qualifier={TestId.nodeDefDetails.relevantIf}
+          state={state}
+          Actions={Actions}
+          label="nodeDefEdit.advancedProps.relevantIf"
+          readOnly={readOnly}
+          propName={NodeDef.keysPropsAdvanced.applicable}
+          applyIf={false}
+          multiple={false}
+          nodeDefUuidContext={nodeDefUuidContext}
+          isContextParent
+          excludeCurrentNodeDef
+        />
 
-      {(hiddenWhenNotRelevant || Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))) && (
-        <div className="form_row without-label">
-          <Checkbox
-            checked={hiddenWhenNotRelevant}
-            disabled={readOnly}
-            label="nodeDefEdit.advancedProps.hiddenWhenNotRelevant"
-            validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenWhenNotRelevant)(validation)}
-            onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })}
-          />
-        </div>
-      )}
+        {(hiddenWhenNotRelevant || Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))) && (
+          <div className="form_row without-label">
+            <Checkbox
+              checked={hiddenWhenNotRelevant}
+              disabled={readOnly}
+              label="nodeDefEdit.advancedProps.hiddenWhenNotRelevant"
+              validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenWhenNotRelevant)(validation)}
+              onChange={(value) =>
+                Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })
+              }
+            />
+          </div>
+        )}
+      </NodeDefSettingsSection>
 
       {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (
         <FormItem label="nodeDefEdit.advancedProps.itemsFilter" info="nodeDefEdit.advancedProps.itemsFilterInfo">

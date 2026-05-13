@@ -1,0 +1,35 @@
+@use '~@webapp/style/vars' as *;
+
+.node-def-settings-section {
+  border: 1px solid $greyBorder;
+  border-radius: 4px;
+  background-color: rgba($greyAppBg, 0.6);
+  padding: 0.75rem 1rem 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.node-def-settings-section__header {
+  margin-bottom: 0.65rem;
+}
+
+.node-def-settings-section__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: $black;
+}
+
+.node-def-settings-section__description {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: rgba($black, 0.75);
+  max-width: 52rem;
+}
+
+.node-def-settings-section__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}

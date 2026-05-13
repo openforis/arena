@@ -101,6 +101,7 @@ export const TestId = {
   },
   nodeDefDetails: {
     deleteBtn: 'node-def-delete-btn',
+    advancedSectionWhenApplies: 'advanced-section-when-applies',
     advanced: 'advanced',
     applyIf: (id) => `${id}-apply-if`,
     backBtn: 'node-def-back',

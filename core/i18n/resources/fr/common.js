@@ -957,6 +957,13 @@ $t(common.appNameFull)
       parentPage: 'Page parente ({{parentPage}})',
       table: 'Tableau',
     },
+    advancedSections: {
+      whenApplies: {
+        title: 'Quand ce champ s\'applique',
+        description:
+          "Définissez quand ce champ est pertinent pour le parcours du répondant. Vous pouvez également le masquer dans le formulaire de saisie lorsqu'il n'est pas pertinent.",
+      },
+    },
     advancedProps: {
       areaBasedEstimate: 'Estimation basée sur la surface',
       defaultValues: 'Valeurs par défaut',
