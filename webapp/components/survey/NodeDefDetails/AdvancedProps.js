@@ -13,6 +13,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
+import Radiobox from '@webapp/components/form/radiobox'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State } from './store'
@@ -32,6 +33,13 @@ const AdvancedProps = (props) => {
   const defaultValueEvaluatedOneTime = NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
   const hiddenWhenNotRelevant = NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)
 
+  // --- Default Values Radio Logic ---
+  const defaultValuesDefined = Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))
+  const [defaultValuesMode, setDefaultValuesMode] = React.useState(defaultValuesDefined ? 'defined' : 'none')
+  React.useEffect(() => {
+    setDefaultValuesMode(defaultValuesDefined ? 'defined' : 'none')
+  }, [defaultValuesDefined])
+
   return (
     <div className="form">
       {NodeDef.canHaveDefaultValue(nodeDef) && (
@@ -44,7 +52,7 @@ const AdvancedProps = (props) => {
                 validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
                 onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
               />
-              {(NodeDef.canBeHidden(nodeDef) || NodeDef.isHidden(nodeDef)) && ( // show "hidden" checkbox control in case the attribute was set as hidden but it's not read-only anymore
+              {(NodeDef.canBeHidden(nodeDef) || NodeDef.isHidden(nodeDef)) && (
                 <FormItem label="nodeDefEdit.advancedProps.hidden">
                   <Checkbox
                     checked={NodeDef.isHidden(nodeDef)}
@@ -57,19 +65,49 @@ const AdvancedProps = (props) => {
             </div>
           </FormItem>
 
-          <NodeDefExpressionsProp
-            qualifier={TestId.nodeDefDetails.defaultValues}
-            state={state}
-            Actions={Actions}
-            info={autoIncrementalKey ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey' : null}
-            label="nodeDefEdit.advancedProps.defaultValues"
-            readOnly={readOnly || autoIncrementalKey}
-            propName={NodeDef.keysPropsAdvanced.defaultValues}
-            nodeDefUuidContext={nodeDefUuidContext}
-            canBeConstant
-            isBoolean={NodeDef.isBoolean(nodeDef)}
-            excludeCurrentNodeDef
-          />
+          {/* Default Values Radio Buttons */}
+          <FormItem label="nodeDefEdit.advancedProps.defaultValues">
+            <div className="form-item_body" style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
+              <div className="row">
+                <Radiobox
+                  name="defaultValuesMode"
+                  checked={defaultValuesMode === 'none'}
+                  onChange={() => setDefaultValuesMode('none')}
+                  disabled={readOnly || autoIncrementalKey || defaultValuesDefined}
+                  label="No default value defined"
+                  data-testid="default-values-none-radio"
+                />
+                <Radiobox
+                  name="defaultValuesMode"
+                  checked={defaultValuesMode === 'defined'}
+                  onChange={() => setDefaultValuesMode('defined')}
+                  disabled={readOnly || autoIncrementalKey}
+                  label="Define default values"
+                  data-testid="default-values-define-radio"
+                />
+              </div>
+              {/* Show NodeDefExpressionsProp only if 'define default values' is selected */}
+              {defaultValuesMode === 'defined' && (
+                <NodeDefExpressionsProp
+                  qualifier={TestId.nodeDefDetails.defaultValues}
+                  state={state}
+                  Actions={Actions}
+                  info={
+                    autoIncrementalKey
+                      ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey'
+                      : null
+                  }
+                  readOnly={readOnly || autoIncrementalKey}
+                  propName={NodeDef.keysPropsAdvanced.defaultValues}
+                  nodeDefUuidContext={nodeDefUuidContext}
+                  canBeConstant
+                  isBoolean={NodeDef.isBoolean(nodeDef)}
+                  excludeCurrentNodeDef
+                />
+              )}
+            </div>
+          </FormItem>
+
           {(defaultValueEvaluatedOneTime || Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))) && (
             <div className="form_row without-label">
               <Checkbox
