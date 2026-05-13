@@ -57,7 +57,7 @@ const _isNodesCountBelowMax = ({ parentNode, nodeDef, nodes }) => {
   return Objects.isEmpty(maxCount) || nodes.length < Number(maxCount)
 }
 
-const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
+const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode, editable }) =>
   useSelector((state) => {
     const record = RecordState.getRecord(state)
     const rootNode = record ? Record.getRootNode(record) : null
@@ -72,7 +72,7 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
         : []
 
     const canAddOrDeleteNodeCommon =
-      canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)
+      editable && canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)
 
     const canAddNode =
       canAddOrDeleteNodeCommon &&
@@ -207,10 +207,11 @@ const NodeDefSwitch = (props) => {
     [dispatch]
   )
 
-  const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode })
+  const editable = parentNode ? Node.isChildEditable(nodeDefUuid)(parentNode) : true
+
+  const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode, editable })
 
   const applicable = parentNode ? Node.isChildApplicable(nodeDefUuid)(parentNode) : true
-  const editable = parentNode ? Node.isChildEditable(nodeDefUuid)(parentNode) : true
   const visible = parentNode ? Node.isChildVisible(nodeDefUuid)(parentNode) : true
 
   const { canAddNode, nodes, nodesHaveValue } = entryProps
