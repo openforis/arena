@@ -304,50 +304,95 @@ export const insertUser = async ({ user, userToInsert, profilePicture = null }) 
 
 // ====== UPDATE
 
+/**
+ * Checks if user has permission to assign global roles (system admin, survey manager).
+ * @param {!object} params - Parameters object.
+ * @param {!object} params.user - The user performing the update.
+ * @param {!object} params.userToUpdateOld - The user being updated before changes.
+ * @param {!Array} params.authGroupsNew - The new auth groups for the user being updated.
+ * @returns {boolean} True if user can assign the given roles, false otherwise.
+ */
+const _canAssignGlobalRoles = ({ user, userToUpdateOld, authGroupsNew }) => {
+  if (User.isSystemAdmin(user)) {
+    return true
+  }
+
+  const userToUpdateWasSurveyManager = User.isSurveyManager(userToUpdateOld)
+  const userToUpdateWillBeSystemAdmin = authGroupsNew.some(AuthGroup.isSystemAdminGroup)
+  const userToUpdateWillBeSurveyManager = authGroupsNew.some(AuthGroup.isSurveyManagerGroup)
+
+  // Non-system admins cannot assign system admin role
+  if (userToUpdateWillBeSystemAdmin) {
+    return false
+  }
+
+  // Non-system admins cannot edit other system admins
+  if (User.isSystemAdmin(userToUpdateOld)) {
+    return false
+  }
+
+  // Only survey managers can promote users to survey manager
+  if (!userToUpdateWasSurveyManager && userToUpdateWillBeSurveyManager) {
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Checks if user has permission to edit survey-specific role and email.
+ * @param {!object} params - Parameters object.
+ * @param {!object} params.user - The user performing the update.
+ * @param {!number} params.surveyId - The survey ID.
+ * @param {!object} params.userToUpdateOld - The user being updated before changes.
+ * @param {!object} params.userToUpdate - The user being updated with new values.
+ * @param {!Array} params.authGroupsNew - The new auth groups for the user being updated.
+ * @throws {SystemError} If more than one survey group found for the user.
+ * @throws {UnauthorizedError} If user lacks permission to edit group or email.
+ */
+const _checkCanUpdateSurveyRoleAndEmail = async ({ user, surveyId, userToUpdateOld, userToUpdate, authGroupsNew }) => {
+  const surveyAuthGroupsNew = authGroupsNew.filter((authGroup) => AuthGroup.getSurveyId(authGroup) === surveyId)
+  if (surveyAuthGroupsNew.length > 1) {
+    throw new SystemError(`cannot have more than 1 survey group for user (${surveyAuthGroupsNew.length} found)`)
+  }
+
+  const survey = await SurveyManager.fetchSurveyById({ surveyId })
+  const surveyInfo = Survey.getSurveyInfo(survey)
+
+  const authGroupNew = surveyAuthGroupsNew.length > 0 ? surveyAuthGroupsNew[0] : null
+  const authGroupOld = User.getAuthGroupBySurveyUuid({ surveyUuid: Survey.getUuid(surveyInfo) })(userToUpdateOld)
+
+  // Check if group has changed and user can edit group
+  const groupChanged = AuthGroup.getUuid(authGroupOld) !== AuthGroup.getUuid(authGroupNew)
+  if (groupChanged && !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdateOld)) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+
+  // Check if email has changed and user can edit email
+  const emailChanged = User.getEmail(userToUpdateOld) !== User.getEmail(userToUpdate)
+  if (emailChanged && !Authorizer.canEditUserEmail(user, surveyInfo, userToUpdateOld)) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+}
+
 const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate, userToUpdateOld = null }) => {
   const userToUpdateOldData = userToUpdateOld || (await UserManager.fetchUserByUuid(User.getUuid(userToUpdate)))
   const authGroupsNew = await AuthManager.fetchGroupsByUuids(User.getAuthGroupsUuids(userToUpdate))
 
-  const userToUpdateWasSurveyManager = User.isSurveyManager(userToUpdateOldData)
-  const userToUpdateWillBeSystemAdmin = authGroupsNew.some(AuthGroup.isSystemAdminGroup)
-  const userToUpdateWillBeSurveyManager = authGroupsNew.some(AuthGroup.isSurveyManagerGroup)
-
-  if (
-    !User.isSystemAdmin(user) &&
-    (userToUpdateWillBeSystemAdmin || // only system admins can assign system admin role
-      User.isSystemAdmin(userToUpdateOldData) || // only system admins can edit other system admins
-      (!userToUpdateWasSurveyManager && userToUpdateWillBeSurveyManager && !User.isSurveyManager(user))) // only a survey manager can assign the survey manager role
-  ) {
+  // Check global role assignment permissions
+  if (!_canAssignGlobalRoles({ user, userToUpdateOld: userToUpdateOldData, authGroupsNew })) {
     throw new UnauthorizedError(User.getName(user))
   }
 
+  // Check survey-specific permissions if updating survey membership
   if (surveyId) {
-    // If surveyId is not specified, update only user props and picture
-    const surveyAuthGroupsNew = authGroupsNew.filter((authGroup) => AuthGroup.getSurveyId(authGroup) === surveyId)
-    if (surveyAuthGroupsNew.length > 1) {
-      throw new SystemError(`cannot have more than 1 survey group for user (${surveyAuthGroupsNew.length} found)`)
-    }
-
-    const authGroupNew = surveyAuthGroupsNew.length > 0 ? surveyAuthGroupsNew[0] : null
-    const survey = await SurveyManager.fetchSurveyById({ surveyId })
-    const surveyInfo = Survey.getSurveyInfo(survey)
-    const authGroupOld = User.getAuthGroupBySurveyUuid({ surveyUuid: Survey.getUuid(surveyInfo) })(userToUpdateOldData)
-    // Check if group has changed and user can edit group
-    if (
-      AuthGroup.getUuid(authGroupOld) !== AuthGroup.getUuid(authGroupNew) &&
-      !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdateOldData)
-    ) {
-      throw new UnauthorizedError(User.getName(user))
-    }
-
-    // Check if email has changed and user can edit email
-    if (User.getEmail(userToUpdateOldData) !== User.getEmail(userToUpdate)) {
-      // Throw exception if user is not allowed to edit the email
-      const canEditEmail = Authorizer.canEditUserEmail(user, surveyInfo, userToUpdateOldData)
-      if (!canEditEmail) {
-        throw new UnauthorizedError(User.getName(user))
-      }
-    }
+    await _checkCanUpdateSurveyRoleAndEmail({
+      user,
+      surveyId,
+      userToUpdateOld: userToUpdateOldData,
+      userToUpdate,
+      authGroupsNew,
+    })
   }
 }
 
@@ -433,11 +478,11 @@ export const updateUserPassword = async ({ user, passwordChangeForm }) => {
 // DELETE
 export const { deleteUserResetPasswordExpired } = UserManager
 
-export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId }) =>
-  db.tx(async (t) => {
+export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId }) => {
+  const userToDelete = await db.tx(async (t) => {
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, t)
-    const userToDelete = await UserManager.fetchUserByUuid(userUuidToRemove, t)
-    const userPreferredSurveyId = User.getPrefSurveyCurrent(userToDelete)
+    const userToDeleteData = await UserManager.fetchUserByUuid(userUuidToRemove, t)
+    const userPreferredSurveyId = User.getPrefSurveyCurrent(userToDeleteData)
 
     await UserManager.deleteUserFromSurvey({ user, userUuidToRemove, survey }, t)
 
@@ -445,25 +490,29 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
       await UserManager.deleteUserPrefsSurvey({ userUuid: userUuidToRemove, surveyId }, t)
     }
 
-    WebSocketServer.notifyUser(userUuidToRemove, WebSocketEvents.userRemovedFromSurvey, { surveyId, userRemoved: true })
-
     await RecordManager.updateRecordsOwner(
       { surveyId, fromOwnerUuid: userUuidToRemove, toOwnerUuid: User.getUuid(user) },
       t
     )
 
-    if (User.hasAccepted(userToDelete)) {
+    if (User.hasAccepted(userToDeleteData)) {
       // Send email
       const surveyInfo = Survey.getSurveyInfo(survey)
       const msgParams = {
-        name: User.getName(userToDelete),
+        name: User.getName(userToDeleteData),
         surveyName: Survey.getName(surveyInfo),
         surveyLabel: Survey.getDefaultLabel(surveyInfo),
       }
       const lang = User.getLang(user)
-      await Mailer.sendEmail({ to: User.getEmail(userToDelete), msgKey: 'emails:userDeleted', msgParams, lang })
+      await Mailer.sendEmail({ to: User.getEmail(userToDeleteData), msgKey: 'emails:userDeleted', msgParams, lang })
     }
+
+    return userToDeleteData
   })
+
+  // Notify user only if transaction commits successfully
+  WebSocketServer.notifyUser(userUuidToRemove, WebSocketEvents.userRemovedFromSurvey, { surveyId, userRemoved: true })
+}
 
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
@@ -508,7 +557,7 @@ export const { inviteUsers } = UserInviteService
 // ==== WebSocket events
 export const notifyActiveUsersAboutSurveyUpdate = async ({ surveyId }) => {
   const activeUserUuidsUsingSurvey = await UserManager.fetchActiveUserUuidsWithPreferredSurveyId({ surveyId })
-  activeUserUuidsUsingSurvey.forEach((userUuid) => {
+  for (const userUuid of activeUserUuidsUsingSurvey) {
     WebSocketServer.notifyUser(userUuid, WebSocketEvent.surveyUpdate, { surveyId })
-  })
+  }
 }
