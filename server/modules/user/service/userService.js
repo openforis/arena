@@ -512,6 +512,8 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
 
   // Notify user only if transaction commits successfully
   WebSocketServer.notifyUser(userUuidToRemove, WebSocketEvents.userRemovedFromSurvey, { surveyId, userRemoved: true })
+
+  return userToDelete
 }
 
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
