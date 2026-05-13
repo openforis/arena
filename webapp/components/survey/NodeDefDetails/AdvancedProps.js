@@ -114,6 +114,28 @@ const AdvancedProps = (props) => {
         </div>
       )}
 
+      <NodeDefExpressionsProp
+        qualifier={TestId.nodeDefDetails.editableIf}
+        state={state}
+        Actions={Actions}
+        label="nodeDefEdit.advancedProps.editableIf"
+        readOnly={readOnly}
+        propName={NodeDef.keysPropsAdvanced.editableIf}
+        nodeDefUuidContext={nodeDefUuidContext}
+        excludeCurrentNodeDef
+      />
+
+      <NodeDefExpressionsProp
+        qualifier={TestId.nodeDefDetails.visibleIf}
+        state={state}
+        Actions={Actions}
+        label="nodeDefEdit.advancedProps.visibleIf"
+        readOnly={readOnly}
+        propName={NodeDef.keysPropsAdvanced.visibleIf}
+        nodeDefUuidContext={nodeDefUuidContext}
+        excludeCurrentNodeDef
+      />
+
       {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (
         <FormItem label="nodeDefEdit.advancedProps.itemsFilter" info="nodeDefEdit.advancedProps.itemsFilterInfo">
           <Input

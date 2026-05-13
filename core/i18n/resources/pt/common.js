@@ -959,6 +959,7 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Valor padrão avaliado apenas uma vez',
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valores padrão não editáveis porque a chave auto incremental está definida',
+      editableIf: 'Editável se',
       hidden: 'Ocultar no formulário de entrada',
       hiddenInReport: 'Ocultar no Painel Analítico',
       hiddenInReportInfo: `Se marcado, o atributo não ficará visível no Painel Analítico`,
@@ -971,6 +972,7 @@ $t(common.appNameFull)
       readOnly: 'Somente leitura',
       relevantIf: 'Relevante se',
       script: 'Script',
+      visibleIf: 'Visível se',
     },
     mobileAppProps: {
       hiddenInMobile: {

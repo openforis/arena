@@ -963,6 +963,7 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Valeur par défaut évaluée une seule fois',
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valeurs par défaut non modifiables car la clé auto-incrémentielle est définie',
+      editableIf: 'Modifiable si',
       hidden: 'Masquer dans le formulaire de saisie',
       hiddenInReport: 'Masquer dans le tableau de bord analytique',
       hiddenInReportInfo: `Si coché, l'attribut ne sera pas visible dans le tableau de bord analytique`,
@@ -975,6 +976,7 @@ Ex. this.region = nom_attribut_region
       readOnly: 'Lecture seule',
       relevantIf: 'Pertinent si',
       script: 'Script',
+      visibleIf: 'Visible si',
     },
     mobileAppProps: {
       hiddenInMobile: {

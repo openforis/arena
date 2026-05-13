@@ -934,6 +934,7 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Значение по умолчанию оценивается только один раз',
       defaultValuesNotEditableForAutoIncrementalKey:
         'Значения по умолчанию нередактируемы, так как установлен автоинкрементный ключ',
+      editableIf: 'Редактируемо, если',
       hidden: 'Скрыть в форме ввода',
       hiddenInReport: 'Скрыть в аналитической панели',
       hiddenInReportInfo: `Если отмечено, атрибут не будет виден в аналитической панели`,
@@ -946,6 +947,7 @@ $t(common.appNameFull)
       readOnly: 'Только для чтения',
       relevantIf: 'Актуально, если',
       script: 'Скрипт',
+      visibleIf: 'Видимо, если',
     },
     mobileAppProps: {
       hiddenInMobile: {

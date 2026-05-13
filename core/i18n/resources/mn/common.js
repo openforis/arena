@@ -927,6 +927,7 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Үндсэн утга нэг удаа үнэлэгдсэн',
       defaultValuesNotEditableForAutoIncrementalKey:
         'Автоматаар өсөн нэмэгдэх түлхүүр тохируулагдсан тул үндсэн утгуудыг засах боломжгүй',
+      editableIf: 'Хэрэв засварлах боломжтой бол',
       hidden: 'Оролтын маягтанд нуух',
       hiddenInReport: 'Аналитик хяналтын самбарт нуух',
       hiddenInReportInfo: `Хэрэв тэмдэглэгдсэн бол шинж чанар Аналитик хяналтын самбарт харагдахгүй`,
@@ -939,6 +940,7 @@ $t(common.appNameFull)
       readOnly: 'Зөвхөн унших',
       relevantIf: 'Хэрэв хамааралтай бол',
       script: 'Скрипт',
+      visibleIf: 'Хэрэв харагдах бол',
     },
     mobileAppProps: {
       hiddenInMobile: {
