@@ -27,6 +27,7 @@ const NodeDefEntityTableRows = (props) => {
     nodes = [],
     parentNode = null,
     preview = false,
+    readOnly = false,
     recordUuid = null,
     surveyCycleKey,
     surveyInfo,
@@ -137,6 +138,7 @@ const NodeDefEntityTableRows = (props) => {
         nodes={null}
         parentNode={parentNode}
         preview={preview}
+        readOnly={readOnly}
         recordUuid={recordUuid}
         renderType={renderType}
         siblingEntities={nodes}
@@ -190,6 +192,7 @@ NodeDefEntityTableRows.propTypes = {
   nodes: PropTypes.array,
   parentNode: PropTypes.any,
   preview: PropTypes.bool,
+  readOnly: PropTypes.bool,
   recordUuid: PropTypes.string,
   surveyCycleKey: PropTypes.string.isRequired,
   surveyInfo: PropTypes.any.isRequired,

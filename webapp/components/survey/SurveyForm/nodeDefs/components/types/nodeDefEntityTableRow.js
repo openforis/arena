@@ -23,6 +23,7 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
     node = null,
     nodeDef,
     nodeDefColumns = [],
+    readOnly = false,
     renderType,
     siblingEntities,
   } = props
@@ -191,6 +192,7 @@ NodeDefEntityTableRow.propTypes = {
   canDelete: PropTypes.bool,
   canEditDef: PropTypes.bool.isRequired,
   canEditRecord: PropTypes.bool.isRequired,
+  readOnly: PropTypes.bool,
   renderType: PropTypes.string.isRequired,
   i: PropTypes.any,
   siblingEntities: PropTypes.array,

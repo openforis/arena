@@ -183,7 +183,17 @@ const getClassName = ({ applicable, empty, keyFieldLocked, nodeDef, readOnly, re
 }
 
 const NodeDefSwitch = (props) => {
-  const { canEditDef, canEditRecord, edit, empty, entry, nodeDef, parentNode, renderType } = props
+  const {
+    canEditDef,
+    canEditRecord,
+    edit,
+    empty,
+    entry,
+    nodeDef,
+    parentNode,
+    readOnly: readOnlyProp,
+    renderType,
+  } = props
 
   const dispatch = useDispatch()
   const containerRef = useRef(null)
@@ -267,7 +277,7 @@ const NodeDefSwitch = (props) => {
     ...props,
     ...entryProps,
     surveyInfo,
-    readOnly: readOnly || keyFieldLocked || !editable,
+    readOnly: readOnlyProp || readOnly || keyFieldLocked || !editable,
     label,
     lang,
     createNodePlaceholder,
