@@ -40,6 +40,13 @@ const AdvancedProps = (props) => {
     setDefaultValuesMode(defaultValuesDefined ? 'defined' : 'none')
   }, [defaultValuesDefined])
 
+  // --- Relevant If Radio Logic ---
+  const relevantIfDefined = Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))
+  const [relevantIfMode, setRelevantIfMode] = React.useState(relevantIfDefined ? 'defined' : 'always')
+  React.useEffect(() => {
+    setRelevantIfMode(relevantIfDefined ? 'defined' : 'always')
+  }, [relevantIfDefined])
+
   return (
     <div className="form">
       {NodeDef.canHaveDefaultValue(nodeDef) && (
@@ -126,19 +133,50 @@ const AdvancedProps = (props) => {
         </>
       )}
 
-      <NodeDefExpressionsProp
-        qualifier={TestId.nodeDefDetails.relevantIf}
-        state={state}
-        Actions={Actions}
-        label="nodeDefEdit.advancedProps.relevantIf"
-        readOnly={readOnly}
-        propName={NodeDef.keysPropsAdvanced.applicable}
-        applyIf={false}
-        multiple={false}
-        nodeDefUuidContext={nodeDefUuidContext}
-        isContextParent
-        excludeCurrentNodeDef
-      />
+      {/* Relevant If Radio Buttons */}
+      <FormItem label="nodeDefEdit.advancedProps.relevantIf">
+        <div className="form-item_body" style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
+          <div className="row">
+            <Radiobox
+              name="relevantIfMode"
+              checked={relevantIfMode === 'always'}
+              onChange={() => {
+                setRelevantIfMode('always')
+                if (relevantIfDefined) {
+                  Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.applicable, value: [] })
+                }
+              }}
+              disabled={readOnly}
+              label="Always relevant"
+              data-testid="relevant-if-always-radio"
+            />
+            <Radiobox
+              name="relevantIfMode"
+              checked={relevantIfMode === 'defined'}
+              onChange={() => setRelevantIfMode('defined')}
+              disabled={readOnly}
+              label="Define relevant condition"
+              data-testid="relevant-if-define-radio"
+            />
+          </div>
+          {/* Show NodeDefExpressionsProp only if 'define relevant condition' is selected */}
+          {relevantIfMode === 'defined' && (
+            <NodeDefExpressionsProp
+              qualifier={TestId.nodeDefDetails.relevantIf}
+              state={state}
+              Actions={Actions}
+              label="nodeDefEdit.advancedProps.relevantIf"
+              readOnly={readOnly}
+              propName={NodeDef.keysPropsAdvanced.applicable}
+              applyIf={false}
+              multiple={false}
+              nodeDefUuidContext={nodeDefUuidContext}
+              isContextParent
+              excludeCurrentNodeDef
+            />
+          )}
+        </div>
+      </FormItem>
 
       {(hiddenWhenNotRelevant || Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))) && (
         <div className="form_row without-label">
