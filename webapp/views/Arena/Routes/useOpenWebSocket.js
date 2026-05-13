@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
@@ -17,9 +17,14 @@ import { useSurveyId } from '@webapp/store/survey'
 export const useOpenWebSocket = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const navigateRef = useRef(navigate)
   const user = useUser()
   const userUuid = User.getUuid(user)
   const surveyIdCurrent = useSurveyId()
+
+  useEffect(() => {
+    navigateRef.current = navigate
+  }, [navigate])
 
   const onJobUpdate = useCallback((job) => dispatch(JobActions.updateJob({ job })), [dispatch])
   const onUserRoleUpdate = useCallback(
@@ -51,12 +56,12 @@ export const useOpenWebSocket = () => {
           okButtonLabel: 'common.goToSurveys',
           dismissable: false,
           onOk: () => {
-            navigate(appModuleUri(homeModules.surveyList))
+            navigateRef.current(appModuleUri(homeModules.surveyList))
           },
         })
       )
     },
-    [dispatch, navigate, surveyIdCurrent]
+    [dispatch, surveyIdCurrent]
   )
 
   const openSocket = useCallback(async () => {
@@ -74,7 +79,9 @@ export const useOpenWebSocket = () => {
   }, [onJobUpdate, onUserRoleUpdate, onUserRemovedFromSurvey])
 
   useEffect(() => {
-    return () => closeSocket()
+    return () => {
+      closeSocket()
+    }
   }, [closeSocket])
 
   useEffect(() => {
