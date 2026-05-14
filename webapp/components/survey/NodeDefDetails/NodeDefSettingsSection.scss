@@ -12,20 +12,19 @@
   margin-bottom: 0.65rem;
 }
 
+.node-def-settings-section__title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+}
+
 .node-def-settings-section__title {
   margin: 0;
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: $black;
-}
-
-.node-def-settings-section__description {
-  margin: 0.35rem 0 0;
-  font-size: 0.8rem;
-  line-height: 1.35;
-  color: rgba($black, 0.75);
-  max-width: 52rem;
 }
 
 .node-def-settings-section__body {
