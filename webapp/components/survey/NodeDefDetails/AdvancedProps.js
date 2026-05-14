@@ -16,12 +16,10 @@ import Checkbox from '@webapp/components/form/checkbox'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State } from './store'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 const AdvancedProps = (props) => {
   const { state, Actions } = props
 
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const readOnly = !useAuthCanEditSurvey()
   const cycle = useSurveyCycleKey()
 
@@ -123,7 +121,7 @@ const AdvancedProps = (props) => {
           />
         </FormItem>
       )}
-      {experimentalFeatures && NodeDef.canBeHiddenInReport(nodeDef) && (
+      {NodeDef.canBeHiddenInReport(nodeDef) && (
         <FormItem label="nodeDefEdit.advancedProps.hiddenInReport" info="nodeDefEdit.advancedProps.hiddenInReportInfo">
           <Checkbox
             checked={NodeDef.isHiddenInReport(nodeDef)}
