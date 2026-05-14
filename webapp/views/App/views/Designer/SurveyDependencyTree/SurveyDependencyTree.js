@@ -54,20 +54,24 @@ const calculateDependentNodeDefsByUuid = ({ survey, dependencyGraph, selectedNod
   }, {})
 
 const colorByDependencyType = {
-  [surveyDependencyTypes.validations]: 'red',
-  [surveyDependencyTypes.minCount]: 'orange',
-  [surveyDependencyTypes.maxCount]: 'yellow',
-  [surveyDependencyTypes.defaultValues]: 'blue',
-  [surveyDependencyTypes.itemsFilter]: 'green',
   [surveyDependencyTypes.applicable]: 'lightgrey',
+  [surveyDependencyTypes.defaultValues]: 'blue',
+  [surveyDependencyTypes.editable]: 'purple',
   [surveyDependencyTypes.fileName]: 'lightgreen',
+  [surveyDependencyTypes.itemsFilter]: 'green',
+  [surveyDependencyTypes.maxCount]: 'yellow',
+  [surveyDependencyTypes.minCount]: 'orange',
   [surveyDependencyTypes.parentCode]: 'lightblue',
+  [surveyDependencyTypes.validations]: 'red',
+  [surveyDependencyTypes.visible]: 'pink',
 }
 
 // The order of dependency types in the UI is determined by the order of items in this array
 const dependencyTypesShown = [
   surveyDependencyTypes.applicable,
   surveyDependencyTypes.defaultValues,
+  surveyDependencyTypes.editable,
+  surveyDependencyTypes.visible,
   surveyDependencyTypes.validations,
   surveyDependencyTypes.minCount,
   surveyDependencyTypes.maxCount,
