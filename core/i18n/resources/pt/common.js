@@ -957,6 +957,10 @@ $t(common.appNameFull)
       table: 'Tabela',
     },
     advancedProps: {
+      defaultValuesRadioNone: 'Nenhum valor padrão definido',
+      defaultValuesRadioDefined: 'Valores padrão especificados',
+      relevantIfRadioNone: 'Sempre relevante',
+      relevantIfRadioDefined: 'Relevante quando a condição é atendida',
       areaBasedEstimate: 'Estimativa baseada em área',
       defaultValues: 'Valores padrão',
       defaultValueEvaluatedOneTime: 'Valor padrão avaliado apenas uma vez',

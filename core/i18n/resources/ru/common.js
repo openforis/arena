@@ -932,6 +932,10 @@ $t(common.appNameFull)
       table: 'Таблица',
     },
     advancedProps: {
+      defaultValuesRadioNone: 'Нет значения по умолчанию',
+      defaultValuesRadioDefined: 'Значения по умолчанию указаны',
+      relevantIfRadioNone: 'Всегда актуально',
+      relevantIfRadioDefined: 'Актуально при выполнении условия',
       areaBasedEstimate: 'Оценка по площади',
       defaultValues: 'Значения по умолчанию',
       defaultValueEvaluatedOneTime: 'Значение по умолчанию оценивается только один раз',

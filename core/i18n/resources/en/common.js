@@ -956,6 +956,10 @@ $t(common.appNameFull)
       table: 'Table',
     },
     advancedProps: {
+      defaultValuesRadioNone: 'No default value defined',
+      defaultValuesRadioDefined: 'Default values specified',
+      relevantIfRadioNone: 'Always relevant',
+      relevantIfRadioDefined: 'Relevant when condition is met',
       areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',

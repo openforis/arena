@@ -72,123 +72,75 @@ const AdvancedProps = (props) => {
             </div>
           </FormItem>
 
-          {/* Default Values Radio Buttons */}
-          <FormItem label="nodeDefEdit.advancedProps.defaultValues">
-            <div className="form-item_body" style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
-              <div className="row">
-                <Radiobox
-                  name="defaultValuesMode"
-                  checked={defaultValuesMode === 'none'}
-                  onChange={() => setDefaultValuesMode('none')}
-                  disabled={readOnly || autoIncrementalKey || defaultValuesDefined}
-                  label="No default value defined"
-                  data-testid="default-values-none-radio"
-                />
-                <Radiobox
-                  name="defaultValuesMode"
-                  checked={defaultValuesMode === 'defined'}
-                  onChange={() => setDefaultValuesMode('defined')}
+          <NodeDefExpressionsProp
+            qualifier={TestId.nodeDefDetails.defaultValues}
+            state={state}
+            Actions={Actions}
+            info={autoIncrementalKey ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey' : null}
+            label="nodeDefEdit.advancedProps.defaultValues"
+            readOnly={readOnly || autoIncrementalKey}
+            propName={NodeDef.keysPropsAdvanced.defaultValues}
+            nodeDefUuidContext={nodeDefUuidContext}
+            canBeConstant
+            isBoolean={NodeDef.isBoolean(nodeDef)}
+            excludeCurrentNodeDef
+            radioMode
+            radioLabels={{
+              none: 'nodeDefEdit.advancedProps.defaultValuesRadioNone',
+              defined: 'nodeDefEdit.advancedProps.defaultValuesRadioDefined',
+            }}
+          >
+            {(defaultValueEvaluatedOneTime || Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))) && (
+              <div className="form_row without-label">
+                <Checkbox
+                  checked={defaultValueEvaluatedOneTime}
                   disabled={readOnly || autoIncrementalKey}
-                  label="Define default values"
-                  data-testid="default-values-define-radio"
+                  label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
+                  validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
+                    validation
+                  )}
+                  onChange={(value) =>
+                    Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime, value })
+                  }
                 />
               </div>
-              {/* Show NodeDefExpressionsProp only if 'define default values' is selected */}
-              {defaultValuesMode === 'defined' && (
-                <NodeDefExpressionsProp
-                  qualifier={TestId.nodeDefDetails.defaultValues}
-                  state={state}
-                  Actions={Actions}
-                  info={
-                    autoIncrementalKey
-                      ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey'
-                      : null
-                  }
-                  readOnly={readOnly || autoIncrementalKey}
-                  propName={NodeDef.keysPropsAdvanced.defaultValues}
-                  nodeDefUuidContext={nodeDefUuidContext}
-                  canBeConstant
-                  isBoolean={NodeDef.isBoolean(nodeDef)}
-                  excludeCurrentNodeDef
-                />
-              )}
-            </div>
-          </FormItem>
-
-          {(defaultValueEvaluatedOneTime || Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))) && (
-            <div className="form_row without-label">
-              <Checkbox
-                checked={defaultValueEvaluatedOneTime}
-                disabled={readOnly || autoIncrementalKey}
-                label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
-                validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
-                  validation
-                )}
-                onChange={(value) =>
-                  Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime, value })
-                }
-              />
-            </div>
-          )}
+            )}
+          </NodeDefExpressionsProp>
         </>
       )}
 
-      {/* Relevant If Radio Buttons */}
-      <FormItem label="nodeDefEdit.advancedProps.relevantIf">
-        <div className="form-item_body" style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
-          <div className="row">
-            <Radiobox
-              name="relevantIfMode"
-              checked={relevantIfMode === 'always'}
-              onChange={() => {
-                setRelevantIfMode('always')
-                if (relevantIfDefined) {
-                  Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.applicable, value: [] })
-                }
-              }}
+      <NodeDefExpressionsProp
+        qualifier={TestId.nodeDefDetails.relevantIf}
+        state={state}
+        Actions={Actions}
+        readOnly={readOnly}
+        propName={NodeDef.keysPropsAdvanced.applicable}
+        applyIf={false}
+        multiple={false}
+        nodeDefUuidContext={nodeDefUuidContext}
+        isContextParent
+        label="nodeDefEdit.advancedProps.relevantIf"
+        excludeCurrentNodeDef
+        radioMode
+        radioLabels={{
+          none: 'nodeDefEdit.advancedProps.relevantIfRadioNone',
+          defined: 'nodeDefEdit.advancedProps.relevantIfRadioDefined',
+        }}
+      >
+        {(hiddenWhenNotRelevant || Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))) && (
+          <div className="form_row without-label">
+            <Checkbox
+              checked={hiddenWhenNotRelevant}
               disabled={readOnly}
-              label="Always relevant"
-              data-testid="relevant-if-always-radio"
-            />
-            <Radiobox
-              name="relevantIfMode"
-              checked={relevantIfMode === 'defined'}
-              onChange={() => setRelevantIfMode('defined')}
-              disabled={readOnly}
-              label="Define relevant condition"
-              data-testid="relevant-if-define-radio"
+              label="nodeDefEdit.advancedProps.hiddenWhenNotRelevant"
+              validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenWhenNotRelevant)(validation)}
+              onChange={(value) =>
+                Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })
+              }
             />
           </div>
-          {/* Show NodeDefExpressionsProp only if 'define relevant condition' is selected */}
-          {relevantIfMode === 'defined' && (
-            <NodeDefExpressionsProp
-              qualifier={TestId.nodeDefDetails.relevantIf}
-              state={state}
-              Actions={Actions}
-              label="nodeDefEdit.advancedProps.relevantIf"
-              readOnly={readOnly}
-              propName={NodeDef.keysPropsAdvanced.applicable}
-              applyIf={false}
-              multiple={false}
-              nodeDefUuidContext={nodeDefUuidContext}
-              isContextParent
-              excludeCurrentNodeDef
-            />
-          )}
-        </div>
-      </FormItem>
-
-      {(hiddenWhenNotRelevant || Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))) && (
-        <div className="form_row without-label">
-          <Checkbox
-            checked={hiddenWhenNotRelevant}
-            disabled={readOnly}
-            label="nodeDefEdit.advancedProps.hiddenWhenNotRelevant"
-            validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenWhenNotRelevant)(validation)}
-            onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })}
-          />
-        </div>
-      )}
+        )}
+      </NodeDefExpressionsProp>
 
       {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (
         <FormItem label="nodeDefEdit.advancedProps.itemsFilter" info="nodeDefEdit.advancedProps.itemsFilterInfo">

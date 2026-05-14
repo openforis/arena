@@ -925,6 +925,10 @@ $t(common.appNameFull)
       table: 'Хүснэгт',
     },
     advancedProps: {
+      defaultValuesRadioNone: 'Үндсэн утга тодорхойлоогүй',
+      defaultValuesRadioDefined: 'Үндсэн утгууд тодорхойлогдсон',
+      relevantIfRadioNone: 'Үргэлж хамааралтай',
+      relevantIfRadioDefined: 'Нөхцөл биелсэн үед хамааралтай',
       areaBasedEstimate: 'Талбай дээр суурилсан тооцоо',
       defaultValues: 'Үндсэн утгууд',
       defaultValueEvaluatedOneTime: 'Үндсэн утга нэг удаа үнэлэгдсэн',

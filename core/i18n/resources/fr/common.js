@@ -961,6 +961,10 @@ $t(common.appNameFull)
       table: 'Tableau',
     },
     advancedProps: {
+      defaultValuesRadioNone: 'Aucune valeur par défaut définie',
+      defaultValuesRadioDefined: 'Valeurs par défaut spécifiées',
+      relevantIfRadioNone: 'Toujours pertinent',
+      relevantIfRadioDefined: 'Pertinent lorsque la condition est remplie',
       areaBasedEstimate: 'Estimation basée sur la surface',
       defaultValues: 'Valeurs par défaut',
       defaultValueEvaluatedOneTime: 'Valeur par défaut évaluée une seule fois',

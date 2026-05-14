@@ -52,6 +52,20 @@
 
   .form {
     grid-row-gap: 0.5rem;
+
+    fieldset {
+      width: 80%;
+      justify-self: center;
+
+      .form-item {
+        display: flex;
+        width: 100%;
+
+        .node-def-edit_expressions-wrapper {
+          flex: 1;
+        }
+      }
+    }
   }
 
   .form-item,
