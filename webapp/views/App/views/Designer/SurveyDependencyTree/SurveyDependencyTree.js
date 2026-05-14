@@ -167,6 +167,7 @@ export const SurveyDependencyTree = () => {
       <div className="survey-dependency-tree__button-bar">
         <FormItem label="surveyDependencyTreeView.dependencyTypesLabel">
           <ButtonGroup
+            className="survey-dependency-tree__dependency-types-group"
             multiple
             onChange={setDependencyTypes}
             selectedItemKey={dependencyTypes}
