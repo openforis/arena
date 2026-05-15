@@ -38,7 +38,7 @@ const NodeDefExpressionsProp = (props) => {
     valueTypeSelection = false,
     determineValueType = null,
     valueConstantEditorNumberFormat = null,
-    radioMode = false,
+    radioMode = true,
     radioLabels = { none: 'None', defined: 'Define' },
   } = props
 
@@ -123,6 +123,8 @@ const NodeDefExpressionsProp = (props) => {
 }
 
 NodeDefExpressionsProp.propTypes = {
+  children: PropTypes.node,
+
   radioMode: PropTypes.bool,
   radioLabels: PropTypes.object,
   qualifier: PropTypes.string.isRequired, // used to generate test ids

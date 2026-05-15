@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Nodes } from '@openforis/arena-core'
+
 const keys = {
   meta: 'meta',
 }
@@ -19,6 +21,10 @@ const isChildApplicable = (childDefUuid) => R.pathOr(true, [keys.meta, metaKeys.
 const isDefaultValueApplied = R.pathOr(false, [keys.meta, metaKeys.defaultValue])
 
 const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
+
+const isChildEditable = (childDefUuid) => (node) => Nodes.isChildEditable(node, childDefUuid)
+
+const isChildVisible = (childDefUuid) => (node) => Nodes.isChildVisible(node, childDefUuid)
 
 // Code metadata
 const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode])
@@ -77,6 +83,8 @@ export const NodeMeta = {
   isDefaultValueApplied,
   getHierarchy,
   getHierarchyCode,
+  isChildEditable,
+  isChildVisible,
 
   assocMeta,
   mergeMeta,

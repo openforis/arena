@@ -9,6 +9,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyCycleKey } from '@webapp/store/survey'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -17,7 +18,6 @@ import Radiobox from '@webapp/components/form/radiobox'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State } from './store'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 const AdvancedProps = (props) => {
   const { state, Actions } = props
@@ -142,6 +142,42 @@ const AdvancedProps = (props) => {
         )}
       </NodeDefExpressionsProp>
 
+      {experimentalFeatures && (
+        <>
+          <NodeDefExpressionsProp
+            Actions={Actions}
+            excludeCurrentNodeDef
+            isContextParent
+            label="nodeDefEdit.advancedProps.editableIf"
+            nodeDefUuidContext={nodeDefUuidContext}
+            propName={NodeDef.keysPropsAdvanced.editableIf}
+            qualifier={TestId.nodeDefDetails.editableIf}
+            radioLabels={{
+              none: 'nodeDefEdit.advancedProps.editableIfRadioNone',
+              defined: 'nodeDefEdit.advancedProps.editableIfRadioDefined',
+            }}
+            readOnly={readOnly}
+            state={state}
+          />
+
+          <NodeDefExpressionsProp
+            Actions={Actions}
+            excludeCurrentNodeDef
+            isContextParent
+            label="nodeDefEdit.advancedProps.visibleIf"
+            nodeDefUuidContext={nodeDefUuidContext}
+            propName={NodeDef.keysPropsAdvanced.visibleIf}
+            qualifier={TestId.nodeDefDetails.visibleIf}
+            radioLabels={{
+              none: 'nodeDefEdit.advancedProps.visibleIfRadioNone',
+              defined: 'nodeDefEdit.advancedProps.visibleIfRadioDefined',
+            }}
+            readOnly={readOnly}
+            state={state}
+          />
+        </>
+      )}
+
       {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (
         <FormItem label="nodeDefEdit.advancedProps.itemsFilter" info="nodeDefEdit.advancedProps.itemsFilterInfo">
           <Input
@@ -151,7 +187,7 @@ const AdvancedProps = (props) => {
           />
         </FormItem>
       )}
-      {experimentalFeatures && NodeDef.canBeHiddenInReport(nodeDef) && (
+      {NodeDef.canBeHiddenInReport(nodeDef) && (
         <FormItem label="nodeDefEdit.advancedProps.hiddenInReport" info="nodeDefEdit.advancedProps.hiddenInReportInfo">
           <Checkbox
             checked={NodeDef.isHiddenInReport(nodeDef)}

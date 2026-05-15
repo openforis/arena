@@ -67,6 +67,10 @@ const CountProp = (props) => {
         valueTypeSelection
         determineValueType={determineValueType}
         valueConstantEditorNumberFormat={countPropNumberFormat}
+        radioLabels={{
+          none: 'nodeDefEdit.validationsProps.validationsRadioNone',
+          defined: 'nodeDefEdit.validationsProps.validationsRadioDefined',
+        }}
       />
     </div>
   )

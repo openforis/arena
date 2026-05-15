@@ -88,6 +88,7 @@ export default () =>
           'maxFileSize',
           'hiddenInForm',
           'hiddenInMobile',
+          'hiddenInAnalyticalDashboard',
           'includedInMultipleEntitySummary',
           'allowOnlyDeviceCoordinate',
           'relevantIf',

@@ -106,6 +106,7 @@ export const TestId = {
     backBtn: 'node-def-back',
     basic: 'basic',
     defaultValues: 'default-values',
+    editableIf: 'editable-if',
     expressionDeleteBtn: (id) => `${id}-delete-btn`,
     formula: 'formula',
     maxCount: 'max-count',
@@ -127,6 +128,7 @@ export const TestId = {
     taxonomySelector: 'taxonomy-selector',
     taxonomySelectorAddBtn: 'taxonomy-selector-add-btn',
     validations: 'validations',
+    visibleIf: 'visible-if',
   },
   panelRight: {
     closeBtn: 'panel-right-close-btn',

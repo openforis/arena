@@ -57,7 +57,7 @@ const _isNodesCountBelowMax = ({ parentNode, nodeDef, nodes }) => {
   return Objects.isEmpty(maxCount) || nodes.length < Number(maxCount)
 }
 
-const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
+const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode, editable }) =>
   useSelector((state) => {
     const record = RecordState.getRecord(state)
     const rootNode = record ? Record.getRootNode(record) : null
@@ -72,7 +72,7 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
         : []
 
     const canAddOrDeleteNodeCommon =
-      canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)
+      editable && canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)
 
     const canAddNode =
       canAddOrDeleteNodeCommon &&
@@ -183,7 +183,17 @@ const getClassName = ({ applicable, empty, keyFieldLocked, nodeDef, readOnly, re
 }
 
 const NodeDefSwitch = (props) => {
-  const { canEditDef, canEditRecord, edit, empty, entry, nodeDef, parentNode, renderType } = props
+  const {
+    canEditDef,
+    canEditRecord,
+    edit,
+    empty,
+    entry,
+    nodeDef,
+    parentNode,
+    readOnly: readOnlyProp,
+    renderType,
+  } = props
 
   const dispatch = useDispatch()
   const containerRef = useRef(null)
@@ -207,9 +217,12 @@ const NodeDefSwitch = (props) => {
     [dispatch]
   )
 
-  const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode })
+  const editable = parentNode ? Node.isChildEditable(nodeDefUuid)(parentNode) : true
 
-  const applicable = parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true
+  const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode, editable })
+
+  const applicable = parentNode ? Node.isChildApplicable(nodeDefUuid)(parentNode) : true
+
   const { canAddNode, nodes, nodesHaveValue } = entryProps
   const { isHovering, onMouseEnter, onMouseLeave } = useHovering({ canEditDef, edit })
   const {
@@ -263,7 +276,7 @@ const NodeDefSwitch = (props) => {
     ...props,
     ...entryProps,
     surveyInfo,
-    readOnly: readOnly || keyFieldLocked,
+    readOnly: readOnlyProp || readOnly || keyFieldLocked || !editable,
     label,
     lang,
     createNodePlaceholder,
@@ -308,6 +321,7 @@ NodeDefSwitch.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   parentNode: PropTypes.object,
   preview: PropTypes.bool,
+  readOnly: PropTypes.bool,
   renderType: PropTypes.string,
 }
 

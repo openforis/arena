@@ -44,6 +44,16 @@ const NodeDefEntityTableCellContent = (props) => {
   )
 }
 
+NodeDefEntityTableCellContent.propTypes = {
+  children: PropTypes.node.isRequired,
+  fieldsLength: PropTypes.number.isRequired,
+  nodeDef: PropTypes.object.isRequired,
+  onResizeStart: PropTypes.func.isRequired,
+  onResizeStop: PropTypes.func.isRequired,
+  resizable: PropTypes.bool.isRequired,
+  width: PropTypes.number.isRequired,
+}
+
 const NodeDefEntityTableCell = (props) => {
   const {
     draggable,
