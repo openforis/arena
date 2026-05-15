@@ -149,7 +149,7 @@ const AdvancedProps = (props) => {
           />
         </FormItem>
       )}
-      {experimentalFeatures && NodeDef.canBeHiddenInReport(nodeDef) && (
+      {NodeDef.canBeHiddenInReport(nodeDef) && (
         <FormItem label="nodeDefEdit.advancedProps.hiddenInReport" info="nodeDefEdit.advancedProps.hiddenInReportInfo">
           <Checkbox
             checked={NodeDef.isHiddenInReport(nodeDef)}
