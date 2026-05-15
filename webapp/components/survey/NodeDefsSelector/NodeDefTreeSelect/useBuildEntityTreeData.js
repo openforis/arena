@@ -20,7 +20,7 @@ const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) => {
   return (
     // root always visible
     NodeDef.isRoot(pageNodeDef) ||
-    // child is visible and applicable (or not applible but not hidden-when-not-relevant)
+    // child is visible and applicable (or not applicable but not hidden-when-not-relevant)
     (Node.isChildVisible(pageDefUuid)(parentNode) &&
       (!NodeDefLayout.isHiddenWhenNotRelevant(cycle)(pageNodeDef) ||
         Node.isChildApplicable(pageDefUuid)(parentNode))) ||

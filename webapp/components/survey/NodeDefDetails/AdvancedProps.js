@@ -117,25 +117,27 @@ const AdvancedProps = (props) => {
       {experimentalFeatures && (
         <>
           <NodeDefExpressionsProp
-            qualifier={TestId.nodeDefDetails.editableIf}
-            state={state}
             Actions={Actions}
-            label="nodeDefEdit.advancedProps.editableIf"
-            readOnly={readOnly}
-            propName={NodeDef.keysPropsAdvanced.editableIf}
-            nodeDefUuidContext={nodeDefUuidContext}
             excludeCurrentNodeDef
+            isContextParent
+            label="nodeDefEdit.advancedProps.editableIf"
+            nodeDefUuidContext={nodeDefUuidContext}
+            propName={NodeDef.keysPropsAdvanced.editableIf}
+            qualifier={TestId.nodeDefDetails.editableIf}
+            readOnly={readOnly}
+            state={state}
           />
 
           <NodeDefExpressionsProp
-            qualifier={TestId.nodeDefDetails.visibleIf}
-            state={state}
             Actions={Actions}
-            label="nodeDefEdit.advancedProps.visibleIf"
-            readOnly={readOnly}
-            propName={NodeDef.keysPropsAdvanced.visibleIf}
-            nodeDefUuidContext={nodeDefUuidContext}
             excludeCurrentNodeDef
+            isContextParent
+            label="nodeDefEdit.advancedProps.visibleIf"
+            nodeDefUuidContext={nodeDefUuidContext}
+            propName={NodeDef.keysPropsAdvanced.visibleIf}
+            qualifier={TestId.nodeDefDetails.visibleIf}
+            readOnly={readOnly}
+            state={state}
           />
         </>
       )}
