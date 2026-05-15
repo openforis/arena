@@ -67,10 +67,7 @@ const CountProp = (props) => {
         valueTypeSelection
         determineValueType={determineValueType}
         valueConstantEditorNumberFormat={countPropNumberFormat}
-        radioLabels={{
-          none: 'nodeDefEdit.validationsProps.validationsRadioNone',
-          defined: 'nodeDefEdit.validationsProps.validationsRadioDefined',
-        }}
+        radioMode={false}
       />
     </div>
   )
@@ -143,7 +140,6 @@ const ValidationsProps = (props) => {
           qualifier={TestId.nodeDefDetails.validations}
           label="nodeDefEdit.validationsProps.expressions"
           readOnly={readOnly}
-          applyIf
           showLabels
           severity
           values={NodeDefValidations.getExpressions(nodeDefValidations)}
