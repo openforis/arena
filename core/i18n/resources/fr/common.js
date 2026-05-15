@@ -1285,11 +1285,13 @@ Les niveaux seront renommés en niveau_1, niveau_2... niveau_N et une propriét�
     qualifier: {
       'default-values': 'valeur par défaut',
       'default-values-apply-if': 'valeur par défaut appliquer si',
+      'editable-if': 'modifiable si',
       'max-count': 'nombre maximum',
       'min-count': 'nombre minimum',
       'relevant-if': 'pertinent si',
       validations: 'règle de validation',
       'validations-apply-if': 'règle de validation appliquer si',
+      'visible-if': 'visible si',
     },
 
     selectAFunction: 'Sélectionnez une fonction',

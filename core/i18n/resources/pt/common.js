@@ -1278,11 +1278,13 @@ $t(common.cantUndoWarning)`,
     qualifier: {
       'default-values': 'valor padrão',
       'default-values-apply-if': 'aplicar valor padrão se',
+      'editable-if': 'editável se',
       'max-count': 'contagem máxima',
       'min-count': 'contagem mínima',
       'relevant-if': 'relevante se',
       validations: 'regra de validação',
       'validations-apply-if': 'aplicar regra de validação se',
+      'visible-if': 'visível se',
     },
 
     selectAFunction: 'Selecione uma função',

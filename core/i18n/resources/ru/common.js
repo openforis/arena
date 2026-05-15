@@ -1255,11 +1255,13 @@ $t(common.cantUndoWarning)`,
     qualifier: {
       'default-values': 'значение по умолчанию',
       'default-values-apply-if': 'применить значение по умолчанию, если',
+      'editable-if': 'редактируемо, если',
       'max-count': 'максимальное количество',
       'min-count': 'минимальное количество',
       'relevant-if': 'актуально, если',
       validations: 'правило проверки',
       'validations-apply-if': 'применить правило проверки, если',
+      'visible-if': 'видимо, если',
     },
 
     selectAFunction: 'Выберите функцию',

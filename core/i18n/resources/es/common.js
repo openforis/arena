@@ -1102,11 +1102,13 @@ $t(common.appNameFull)
     qualifier: {
       'default-values': 'valor predeterminado',
       'default-values-apply-if': 'aplicar si el valor predeterminado',
+      'editable-if': 'editable si',
       'max-count': 'recuento máximo',
       'min-count': 'recuento mínimo',
       'relevant-if': 'relevante si',
       validations: 'regla de validación',
       'validations-apply-if': 'aplicar si la regla de validación',
+      'visible-if': 'visible si',
     },
     selectAFunction: 'Seleccionar una función',
     valueType: {

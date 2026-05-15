@@ -1246,11 +1246,13 @@ $t(common.cantUndoWarning)`,
     qualifier: {
       'default-values': 'үндсэн утга',
       'default-values-apply-if': 'үндсэн утга хэрэглэх бол',
+      'editable-if': 'хэрэв засварлах боломжтой бол',
       'max-count': 'хамгийн их тоо',
       'min-count': 'хамгийн бага тоо',
       'relevant-if': 'хэрэв хамааралтай бол',
       validations: 'баталгаажуулалтын дүрэм',
       'validations-apply-if': 'баталгаажуулалтын дүрэм хэрэглэх бол',
+      'visible-if': 'хэрэв харагдах бол',
     },
 
     selectAFunction: 'Функц сонгох',

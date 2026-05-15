@@ -1276,11 +1276,13 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     qualifier: {
       'default-values': 'default value',
       'default-values-apply-if': 'default value apply if',
+      'editable-if': 'editable if',
       'max-count': 'max count',
       'min-count': 'min count',
       'relevant-if': 'relevant if',
       validations: 'validation rule',
       'validations-apply-if': 'validation rule apply if',
+      'visible-if': 'visible if',
     },
 
     selectAFunction: 'Select a function',
