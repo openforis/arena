@@ -153,6 +153,7 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
             nodeDef={nodeDefChild}
             parentNode={node}
             draggable={draggable}
+            readOnly={readOnly}
             renderType={renderType}
             resizable={resizable}
             onDragStart={dragStart}

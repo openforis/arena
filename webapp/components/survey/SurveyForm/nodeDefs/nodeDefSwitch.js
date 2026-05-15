@@ -222,7 +222,6 @@ const NodeDefSwitch = (props) => {
   const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode, editable })
 
   const applicable = parentNode ? Node.isChildApplicable(nodeDefUuid)(parentNode) : true
-  const visible = parentNode ? Node.isChildVisible(nodeDefUuid)(parentNode) : true
 
   const { canAddNode, nodes, nodesHaveValue } = entryProps
   const { isHovering, onMouseEnter, onMouseLeave } = useHovering({ canEditDef, edit })
