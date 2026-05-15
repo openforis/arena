@@ -436,10 +436,14 @@ Merci et profitez de **$t(common.appNameFull)** !`,
     dependencyTypes: {
       applicable: 'Applicabilité',
       defaultValues: 'Valeur par défaut',
+      editable: 'Éditable',
+      fileName: 'Nom du fichier',
       itemsFilter: "Filtre d'éléments",
-      minCount: 'Nombre minimum',
       maxCount: 'Nombre maximum',
+      minCount: 'Nombre minimum',
+      parentCode: 'Code parent',
       validations: 'Validations',
+      visible: 'Visible',
     },
     selectAtLeastOneDependencyType: 'Sélectionnez au moins un type de dépendance',
     noDependenciesToDisplay: 'Aucune dépendance à afficher',
@@ -966,6 +970,7 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Valeur par défaut évaluée une seule fois',
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valeurs par défaut non modifiables car la clé auto-incrémentielle est définie',
+      editableIf: 'Modifiable si',
       hidden: 'Masquer dans le formulaire de saisie',
       hiddenInReport: 'Masquer dans le tableau de bord analytique',
       hiddenInReportInfo: `Si coché, l'attribut ne sera pas visible dans le tableau de bord analytique`,
@@ -978,6 +983,7 @@ Ex. this.region = nom_attribut_region
       readOnly: 'Lecture seule',
       relevantIf: 'Pertinent si',
       script: 'Script',
+      visibleIf: 'Visible si',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1279,11 +1285,13 @@ Les niveaux seront renommés en niveau_1, niveau_2... niveau_N et une propriét�
     qualifier: {
       'default-values': 'valeur par défaut',
       'default-values-apply-if': 'valeur par défaut appliquer si',
+      'editable-if': 'modifiable si',
       'max-count': 'nombre maximum',
       'min-count': 'nombre minimum',
       'relevant-if': 'pertinent si',
       validations: 'règle de validation',
       'validations-apply-if': 'règle de validation appliquer si',
+      'visible-if': 'visible si',
     },
 
     selectAFunction: 'Sélectionnez une fonction',

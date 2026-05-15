@@ -148,8 +148,10 @@ export const keysPropsAdvanced = {
   applicable: 'applicable',
   defaultValues: 'defaultValues',
   defaultValueEvaluatedOneTime: 'defaultValueEvaluatedOneTime',
+  editableIf: 'editableIf',
   excludedInClone: 'excludedInClone',
   validations: 'validations',
+  visibleIf: 'visibleIf',
   formula: 'formula',
 
   // Analisys

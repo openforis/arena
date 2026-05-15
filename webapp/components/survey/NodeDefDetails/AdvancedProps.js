@@ -13,6 +13,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State } from './store'
@@ -20,6 +21,7 @@ import { State } from './store'
 const AdvancedProps = (props) => {
   const { state, Actions } = props
 
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const readOnly = !useAuthCanEditSurvey()
   const cycle = useSurveyCycleKey()
 
@@ -110,6 +112,34 @@ const AdvancedProps = (props) => {
             onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })}
           />
         </div>
+      )}
+
+      {experimentalFeatures && (
+        <>
+          <NodeDefExpressionsProp
+            Actions={Actions}
+            excludeCurrentNodeDef
+            isContextParent
+            label="nodeDefEdit.advancedProps.editableIf"
+            nodeDefUuidContext={nodeDefUuidContext}
+            propName={NodeDef.keysPropsAdvanced.editableIf}
+            qualifier={TestId.nodeDefDetails.editableIf}
+            readOnly={readOnly}
+            state={state}
+          />
+
+          <NodeDefExpressionsProp
+            Actions={Actions}
+            excludeCurrentNodeDef
+            isContextParent
+            label="nodeDefEdit.advancedProps.visibleIf"
+            nodeDefUuidContext={nodeDefUuidContext}
+            propName={NodeDef.keysPropsAdvanced.visibleIf}
+            qualifier={TestId.nodeDefDetails.visibleIf}
+            readOnly={readOnly}
+            state={state}
+          />
+        </>
       )}
 
       {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (

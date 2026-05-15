@@ -15,15 +15,22 @@ const getPageNode = ({ record, pagesUuidMap, nodeDefUuid }) => {
   return record && nodeUuid ? Record.getNodeByUuid(nodeUuid)(record) : null
 }
 
-const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) =>
-  NodeDef.isRoot(pageNodeDef) ||
-  !NodeDefLayout.isHiddenWhenNotRelevant(cycle)(pageNodeDef) ||
-  Node.isChildApplicable(NodeDef.getUuid(pageNodeDef))(parentNode) ||
-  // has some non-empty descendant
-  Record.getNodeChildrenByDefUuid(
-    parentNode,
-    NodeDef.getUuid(pageNodeDef)
-  )(record).some((pageChildNode) => Record.isNodeFilledByUser(pageChildNode)(record))
+const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) => {
+  const pageDefUuid = NodeDef.getUuid(pageNodeDef)
+  return (
+    // root always visible
+    NodeDef.isRoot(pageNodeDef) ||
+    // child is visible and applicable (or not applicable but not hidden-when-not-relevant)
+    (Node.isChildVisible(pageDefUuid)(parentNode) &&
+      (!NodeDefLayout.isHiddenWhenNotRelevant(cycle)(pageNodeDef) ||
+        Node.isChildApplicable(pageDefUuid)(parentNode))) ||
+    // has some non-empty descendant
+    Record.getNodeChildrenByDefUuid(
+      parentNode,
+      pageDefUuid
+    )(record).some((pageChildNode) => Record.isNodeFilledByUser(pageChildNode)(record))
+  )
+}
 
 const getNodeDefAvailableChildren = ({
   survey,

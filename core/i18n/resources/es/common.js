@@ -383,10 +383,14 @@ export default {
     dependencyTypes: {
       applicable: 'Aplicabilidad',
       defaultValues: 'Valor predeterminado',
+      editable: 'Editable',
+      fileName: 'Nombre de archivo',
       itemsFilter: 'Filtro de elementos',
-      minCount: 'Conteo mínimo',
       maxCount: 'Conteo máximo',
+      minCount: 'Conteo mínimo',
+      parentCode: 'Código padre',
       validations: 'Validaciones',
+      visible: 'Visible',
     },
     selectAtLeastOneDependencyType: 'Seleccione al menos un tipo de dependencia',
     noDependenciesToDisplay: 'No hay dependencias para mostrar',
@@ -812,6 +816,7 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Valor predeterminado evaluado solo una vez',
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valores predeterminados no editables porque la clave auto incremental está configurada',
+      editableIf: 'Editable si',
       hidden: 'Ocultar en el formulario de entrada',
       hiddenInReport: 'Ocultar en el Panel Analítico',
       hiddenInReportInfo: `Si está marcado, el atributo no será visible en el Panel Analítico`,
@@ -822,6 +827,7 @@ $t(common.appNameFull)
       readOnly: 'Solo lectura',
       relevantIf: 'Relevante si',
       script: 'Script',
+      visibleIf: 'Visible si',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1096,11 +1102,13 @@ $t(common.appNameFull)
     qualifier: {
       'default-values': 'valor predeterminado',
       'default-values-apply-if': 'aplicar si el valor predeterminado',
+      'editable-if': 'editable si',
       'max-count': 'recuento máximo',
       'min-count': 'recuento mínimo',
       'relevant-if': 'relevante si',
       validations: 'regla de validación',
       'validations-apply-if': 'aplicar si la regla de validación',
+      'visible-if': 'visible si',
     },
     selectAFunction: 'Seleccionar una función',
     valueType: {

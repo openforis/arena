@@ -427,10 +427,14 @@ $t(common.raiseTicketInSupportForum)
     dependencyTypes: {
       applicable: 'Применимость',
       defaultValues: 'Значение по умолчанию',
+      editable: 'Редактируемый',
+      fileName: 'Имя файла',
       itemsFilter: 'Фильтр элементов',
-      minCount: 'Мин. количество',
       maxCount: 'Макс. количество',
+      minCount: 'Мин. количество',
+      parentCode: 'Код родителя',
       validations: 'Проверки',
+      visible: 'Видимый',
     },
     selectAtLeastOneDependencyType: 'Выберите хотя бы один тип зависимости',
     noDependenciesToDisplay: 'Нет зависимостей для отображения',
@@ -937,6 +941,7 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Значение по умолчанию оценивается только один раз',
       defaultValuesNotEditableForAutoIncrementalKey:
         'Значения по умолчанию нередактируемы, так как установлен автоинкрементный ключ',
+      editableIf: 'Редактируемо, если',
       hidden: 'Скрыть в форме ввода',
       hiddenInReport: 'Скрыть в аналитической панели',
       hiddenInReportInfo: `Если отмечено, атрибут не будет виден в аналитической панели`,
@@ -949,6 +954,7 @@ $t(common.appNameFull)
       readOnly: 'Только для чтения',
       relevantIf: 'Актуально, если',
       script: 'Скрипт',
+      visibleIf: 'Видимо, если',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1249,11 +1255,13 @@ $t(common.cantUndoWarning)`,
     qualifier: {
       'default-values': 'значение по умолчанию',
       'default-values-apply-if': 'применить значение по умолчанию, если',
+      'editable-if': 'редактируемо, если',
       'max-count': 'максимальное количество',
       'min-count': 'минимальное количество',
       'relevant-if': 'актуально, если',
       validations: 'правило проверки',
       'validations-apply-if': 'применить правило проверки, если',
+      'visible-if': 'видимо, если',
     },
 
     selectAFunction: 'Выберите функцию',

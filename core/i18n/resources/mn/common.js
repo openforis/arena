@@ -427,10 +427,14 @@ $t(common.raiseTicketInSupportForum)
     dependencyTypes: {
       applicable: 'Хэрэглэх боломжтой',
       defaultValues: 'Үндсэн утгууд',
+      editable: 'Засах боломжтой',
+      fileName: 'Файлын нэр',
       itemsFilter: 'Элементүүдийн шүүлтүүр',
-      minCount: 'Хамгийн бага тоо',
       maxCount: 'Хамгийн их тоо',
+      minCount: 'Хамгийн бага тоо',
+      parentCode: 'Эх кодекс',
       validations: 'Баталгаажуулалтууд',
+      visible: 'Харагдах',
     },
     selectAtLeastOneDependencyType: 'Наад зах нь нэг хамаарлын төрлийг сонгоно уу',
     noDependenciesToDisplay: 'Харуулах хамаарал байхгүй',
@@ -930,6 +934,7 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Үндсэн утга нэг удаа үнэлэгдсэн',
       defaultValuesNotEditableForAutoIncrementalKey:
         'Автоматаар өсөн нэмэгдэх түлхүүр тохируулагдсан тул үндсэн утгуудыг засах боломжгүй',
+      editableIf: 'Хэрэв засварлах боломжтой бол',
       hidden: 'Оролтын маягтанд нуух',
       hiddenInReport: 'Аналитик хяналтын самбарт нуух',
       hiddenInReportInfo: `Хэрэв тэмдэглэгдсэн бол шинж чанар Аналитик хяналтын самбарт харагдахгүй`,
@@ -942,6 +947,7 @@ $t(common.appNameFull)
       readOnly: 'Зөвхөн унших',
       relevantIf: 'Хэрэв хамааралтай бол',
       script: 'Скрипт',
+      visibleIf: 'Хэрэв харагдах бол',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1240,11 +1246,13 @@ $t(common.cantUndoWarning)`,
     qualifier: {
       'default-values': 'үндсэн утга',
       'default-values-apply-if': 'үндсэн утга хэрэглэх бол',
+      'editable-if': 'хэрэв засварлах боломжтой бол',
       'max-count': 'хамгийн их тоо',
       'min-count': 'хамгийн бага тоо',
       'relevant-if': 'хэрэв хамааралтай бол',
       validations: 'баталгаажуулалтын дүрэм',
       'validations-apply-if': 'баталгаажуулалтын дүрэм хэрэглэх бол',
+      'visible-if': 'хэрэв харагдах бол',
     },
 
     selectAFunction: 'Функц сонгох',
