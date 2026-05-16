@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -45,7 +45,7 @@ const NodeDefExpressionsProp = (props) => {
     determineValueType = null,
     valueConstantEditorNumberFormat = null,
     radioMode = true,
-    radioLabels = { none: 'None', defined: 'Define' },
+    radioLabels = { none: 'common.none', defined: 'common.defined' },
   } = props
 
   const i18n = useI18n()
@@ -56,9 +56,9 @@ const NodeDefExpressionsProp = (props) => {
 
   // Radio logic (if enabled)
   const valuesDefined = !R.isEmpty(values)
-  const [modeRadio, setModeRadio] = React.useState(valuesDefined ? 'defined' : 'none')
-  React.useEffect(() => {
-    setModeRadio(valuesDefined ? 'defined' : 'none')
+  const [selectedRadioMode, setSelectedRadioMode] = useState(valuesDefined ? 'defined' : 'none')
+  useEffect(() => {
+    setSelectedRadioMode(valuesDefined ? radioModes.defined : radioModes.none)
   }, [valuesDefined])
 
   const onChange = (expressions) =>
@@ -73,24 +73,21 @@ const NodeDefExpressionsProp = (props) => {
       <legend>{label}</legend>
       <div className="content">
         {radioMode && (
-          <div
-            className="form-item_body"
-            style={{ display: 'flex', flexDirection: 'row', gap: '1em', marginBottom: '0.5em' }}
-          >
-            {Object.values(radioModes).map((mode) => (
+          <div className="form-item_body node-def-edit__expression-radio-mode">
+            {Object.values(radioModes).map((rm) => (
               <Radiobox
-                key={mode}
-                checked={modeRadio === mode}
-                disabled={readOnly || (mode === radioModes.none && valuesDefined)}
-                label={i18n.t(radioLabels[mode])}
+                key={rm}
+                checked={selectedRadioMode === rm}
+                disabled={readOnly || (rm === radioModes.none && valuesDefined)}
+                label={i18n.t(radioLabels[rm])}
                 name={`radio-${qualifier}`}
-                onChange={() => (valuesDefined ? undefined : setModeRadio(mode))}
-                testId={TestId.expressionEditor.modeRadio(qualifier, mode)}
+                onChange={() => (valuesDefined ? undefined : setSelectedRadioMode(rm))}
+                testId={TestId.expressionEditor.modeRadio(qualifier, rm)}
               />
             ))}
           </div>
         )}
-        {(!radioMode || modeRadio === 'defined') && (
+        {(!radioMode || selectedRadioMode === radioModes.defined) && (
           <ExpressionsProp
             qualifier={qualifier}
             info={info}

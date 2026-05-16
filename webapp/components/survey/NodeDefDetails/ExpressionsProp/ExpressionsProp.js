@@ -21,6 +21,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import ExpressionProp from './ExpressionProp'
+import { ButtonNew } from '@webapp/components/buttons'
 
 export const ValueType = {
   constant: 'constant',
@@ -167,13 +168,15 @@ const ExpressionsProp = (props) => {
     [getExpressionIndex, onChange, onDelete, values]
   )
 
-  const uiValues = useMemo(() => {
-    const _uiValues = [...values]
-    if (!readOnly && (multiple || valuesIsEmpty)) {
-      _uiValues.push(NodeDefExpression.createExpressionPlaceholder())
-    }
-    return _uiValues
-  }, [multiple, readOnly, values, valuesIsEmpty])
+  const uiValues = values
+
+  // const uiValues = useMemo(() => {
+  //   const _uiValues = [...values]
+  //   if (!readOnly && (multiple || valuesIsEmpty)) {
+  //     _uiValues.push(NodeDefExpression.createExpressionPlaceholder())
+  //   }
+  //   return _uiValues
+  // }, [multiple, readOnly, values, valuesIsEmpty])
 
   return (
     <FormItem info={info} label={label} className={classNames({ error: Validation.isNotValid(validation) })}>
@@ -221,6 +224,7 @@ const ExpressionsProp = (props) => {
                 validation={Validation.getFieldValidation(index)(validation)}
               />
             ))}
+            {!readOnly && (multiple || valuesIsEmpty) && <ButtonNew />}
           </div>
         )}
       </ExpressionsWrapper>

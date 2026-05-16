@@ -61,8 +61,19 @@
         display: flex;
         width: 100%;
 
+        .node-def-edit__expression-radio-mode {
+          display: flex;
+          flex-direction: row;
+          gap: 1em;
+          margin-bottom: 0.5em;
+        }
+
         .node-def-edit_expressions-wrapper {
           flex: 1;
+
+          .btn-new {
+            align-self: flex-start;
+          }
         }
       }
     }
