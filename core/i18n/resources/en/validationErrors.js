@@ -127,6 +127,7 @@ export default {
     validationsInvalid: 'Invalid "Validations"',
     countMaxInvalid: 'Invalid "Max count"',
     countMinInvalid: 'Invalid "Min count"',
+    readOnlyCannotHaveEditableIf: 'Read-only node cannot have "Editable if" condition',
   },
 
   record: {

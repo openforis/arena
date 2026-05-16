@@ -144,21 +144,23 @@ const AdvancedProps = (props) => {
 
       {experimentalFeatures && (
         <>
-          <NodeDefExpressionsProp
-            Actions={Actions}
-            excludeCurrentNodeDef
-            isContextParent
-            label="nodeDefEdit.advancedProps.editableIf"
-            nodeDefUuidContext={nodeDefUuidContext}
-            propName={NodeDef.keysPropsAdvanced.editableIf}
-            qualifier={TestId.nodeDefDetails.editableIf}
-            radioLabels={{
-              none: 'nodeDefEdit.advancedProps.editableIfRadioNone',
-              defined: 'nodeDefEdit.advancedProps.editableIfRadioDefined',
-            }}
-            readOnly={readOnly}
-            state={state}
-          />
+          {(!NodeDef.isReadOnly(nodeDef) || !NodeDef.isAlwaysEditable(nodeDef)) && (
+            <NodeDefExpressionsProp
+              Actions={Actions}
+              excludeCurrentNodeDef
+              isContextParent
+              label="nodeDefEdit.advancedProps.editableIf"
+              nodeDefUuidContext={nodeDefUuidContext}
+              propName={NodeDef.keysPropsAdvanced.editableIf}
+              qualifier={TestId.nodeDefDetails.editableIf}
+              radioLabels={{
+                none: 'nodeDefEdit.advancedProps.editableIfRadioNone',
+                defined: 'nodeDefEdit.advancedProps.editableIfRadioDefined',
+              }}
+              readOnly={readOnly}
+              state={state}
+            />
+          )}
 
           <NodeDefExpressionsProp
             Actions={Actions}

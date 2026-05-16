@@ -9,9 +9,14 @@ import * as Expression from '@core/expressionParser/expression'
 
 import ExpressionsProp from './ExpressionsProp'
 import Radiobox from '@webapp/components/form/radiobox'
+import { useI18n } from '@webapp/store/system'
 
 import { State } from '../store'
-import { useI18n } from '@webapp/store/system'
+
+const radioModes = {
+  none: 'none',
+  defined: 'defined',
+}
 
 const NodeDefExpressionsProp = (props) => {
   const {
@@ -49,11 +54,11 @@ const NodeDefExpressionsProp = (props) => {
   const values = propExtractor ? propExtractor(nodeDef) : NodeDef.getPropAdvanced(propName, [])(nodeDef)
 
   // Radio logic (if enabled)
-  const defined = !R.isEmpty(values)
-  const [modeRadio, setModeRadio] = React.useState(defined ? 'defined' : 'none')
+  const valuesDefined = !R.isEmpty(values)
+  const [modeRadio, setModeRadio] = React.useState(valuesDefined ? 'defined' : 'none')
   React.useEffect(() => {
-    setModeRadio(defined ? 'defined' : 'none')
-  }, [defined])
+    setModeRadio(valuesDefined ? 'defined' : 'none')
+  }, [valuesDefined])
 
   const onChange = (expressions) =>
     onChangeProp
@@ -71,25 +76,17 @@ const NodeDefExpressionsProp = (props) => {
             className="form-item_body"
             style={{ display: 'flex', flexDirection: 'row', gap: '1em', marginBottom: '0.5em' }}
           >
-            <Radiobox
-              name={`radio-${qualifier}`}
-              checked={modeRadio === 'none'}
-              onChange={() => {
-                setModeRadio('none')
-                if (defined) onChange([])
-              }}
-              label={i18n.t(radioLabels.none)}
-              data-testid={`${qualifier}-none-radio`}
-              disabled={readOnly}
-            />
-            <Radiobox
-              name={`radio-${qualifier}`}
-              checked={modeRadio === 'defined'}
-              onChange={() => setModeRadio('defined')}
-              label={i18n.t(radioLabels.defined)}
-              data-testid={`${qualifier}-define-radio`}
-              disabled={readOnly}
-            />
+            {Object.values(radioModes).map((mode) => (
+              <Radiobox
+                key={mode}
+                checked={modeRadio === mode}
+                disabled={readOnly || (mode === radioModes.none && valuesDefined)}
+                name={`radio-${qualifier}`}
+                onChange={() => (valuesDefined ? undefined : setModeRadio(mode))}
+                label={i18n.t(radioLabels[mode])}
+                data-testid={`${qualifier}-${mode}-radio`}
+              />
+            ))}
           </div>
         )}
         {(!radioMode || modeRadio === 'defined') && (
