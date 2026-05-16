@@ -33,20 +33,6 @@ const AdvancedProps = (props) => {
   const defaultValueEvaluatedOneTime = NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
   const hiddenWhenNotRelevant = NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)
 
-  // --- Default Values Radio Logic ---
-  const defaultValuesDefined = Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))
-  const [defaultValuesMode, setDefaultValuesMode] = React.useState(defaultValuesDefined ? 'defined' : 'none')
-  React.useEffect(() => {
-    setDefaultValuesMode(defaultValuesDefined ? 'defined' : 'none')
-  }, [defaultValuesDefined])
-
-  // --- Relevant If Radio Logic ---
-  const relevantIfDefined = Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))
-  const [relevantIfMode, setRelevantIfMode] = React.useState(relevantIfDefined ? 'defined' : 'always')
-  React.useEffect(() => {
-    setRelevantIfMode(relevantIfDefined ? 'defined' : 'always')
-  }, [relevantIfDefined])
-
   return (
     <div className="form">
       {NodeDef.canHaveDefaultValue(nodeDef) && (
