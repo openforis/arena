@@ -10,6 +10,7 @@ import * as Expression from '@core/expressionParser/expression'
 import ExpressionsProp from './ExpressionsProp'
 import Radiobox from '@webapp/components/form/radiobox'
 import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 import { State } from '../store'
 
@@ -81,10 +82,10 @@ const NodeDefExpressionsProp = (props) => {
                 key={mode}
                 checked={modeRadio === mode}
                 disabled={readOnly || (mode === radioModes.none && valuesDefined)}
+                label={i18n.t(radioLabels[mode])}
                 name={`radio-${qualifier}`}
                 onChange={() => (valuesDefined ? undefined : setModeRadio(mode))}
-                label={i18n.t(radioLabels[mode])}
-                data-testid={`${qualifier}-${mode}-radio`}
+                testId={TestId.expressionEditor.modeRadio(qualifier, mode)}
               />
             ))}
           </div>
