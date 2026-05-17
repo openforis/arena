@@ -1,6 +1,6 @@
 import './ExpressionsProp.scss'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
@@ -13,16 +13,15 @@ import * as Validation from '@core/validation/validation'
 import * as Expression from '@core/expressionParser/expression'
 import * as StringUtils from '@core/stringUtils'
 
-import { DialogConfirmActions } from '@webapp/store/ui'
-
-import { useConfirmAsync } from '@webapp/components/hooks'
+import { ButtonNew } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import { useConfirmAsync } from '@webapp/components/hooks'
 import ValidationTooltip from '@webapp/components/validationTooltip'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { TestId } from '@webapp/utils/testId'
 
 import ExpressionProp from './ExpressionProp'
-import { ButtonNew } from '@webapp/components/buttons'
-import { TestId } from '@webapp/utils/testId'
 
 export const ValueType = {
   constant: 'constant',
@@ -100,6 +99,7 @@ const ExpressionsProp = (props) => {
   const confirm = useConfirmAsync()
 
   const [valueType, setValueType] = useState(determineValueType?.())
+  const [expressionPlaceholder, setExpressionPlaceholder] = useState(null)
 
   const valuesIsEmpty = R.isEmpty(values) || values.every(NodeDefExpression.isEmpty)
 
@@ -138,14 +138,28 @@ const ExpressionsProp = (props) => {
     [values]
   )
 
+  const removePlaceholder = useCallback(
+    (expression, callback = null) => {
+      if (NodeDefExpression.getUuid(expressionPlaceholder) === NodeDefExpression.getUuid(expression)) {
+        setExpressionPlaceholder(null)
+      }
+      callback?.()
+    },
+    [expressionPlaceholder]
+  )
+
   const removeExpression = useCallback(
     ({ expression, callback = null }) => {
       const index = getExpressionIndex(expression)
-      const newValues = R.remove(index, 1, values)
-      onChange(newValues)
-      callback?.()
+      if (index >= 0) {
+        const newValues = R.remove(index, 1, values)
+        onChange(newValues)
+        callback?.()
+      } else {
+        removePlaceholder(expression, callback)
+      }
     },
-    [getExpressionIndex, onChange, values]
+    [getExpressionIndex, onChange, removePlaceholder, values]
   )
 
   const onDelete = useCallback(
@@ -171,20 +185,27 @@ const ExpressionsProp = (props) => {
       if (NodeDefExpression.isEmpty(expression)) {
         onDelete(expression, callback)
       } else {
+        removePlaceholder(expression)
         const index = getExpressionIndex(expression)
         const newValues = index >= 0 ? R.update(index, expression, values) : R.append(expression, values)
         onChange(newValues)
         callback?.()
       }
     },
-    [getExpressionIndex, onChange, onDelete, values]
+    [getExpressionIndex, onChange, onDelete, removePlaceholder, values]
   )
 
-  const uiValues = values
+  const uiValues = useMemo(
+    () => (Objects.isEmpty(expressionPlaceholder) ? values : R.append(expressionPlaceholder, values)),
+    [expressionPlaceholder, values]
+  )
+  const uiValuesIsEmpty = R.isEmpty(uiValues) || uiValues.every(NodeDefExpression.isEmpty)
 
   const onAddPlaceholder = useCallback(() => {
-    onChange(R.append(NodeDefExpression.createExpressionPlaceholder(), values))
-  }, [onChange, values])
+    if (Objects.isEmpty(expressionPlaceholder)) {
+      setExpressionPlaceholder(NodeDefExpression.createExpressionPlaceholder())
+    }
+  }, [expressionPlaceholder])
 
   return (
     <FormItem info={info} label={label} className={classNames({ error: Validation.isNotValid(validation) })}>
@@ -232,7 +253,7 @@ const ExpressionsProp = (props) => {
                 validation={Validation.getFieldValidation(index)(validation)}
               />
             ))}
-            {!readOnly && (multiple || valuesIsEmpty) && (
+            {!readOnly && (multiple || uiValuesIsEmpty) && (
               <ButtonNew onClick={onAddPlaceholder} testId={TestId.expressionEditor.newBtn(qualifier)} />
             )}
           </div>

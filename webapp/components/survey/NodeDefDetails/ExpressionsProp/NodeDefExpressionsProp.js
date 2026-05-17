@@ -76,7 +76,7 @@ const NodeDefExpressionsProp = (props) => {
                 key={rm}
                 checked={selectedRadioMode === rm}
                 disabled={readOnly || (rm === radioModes.none && valuesDefined)}
-                label={i18n.t(radioLabels[rm])}
+                label={radioLabels[rm]}
                 name={`radio-${qualifier}`}
                 onChange={() => (valuesDefined ? undefined : setSelectedRadioMode(rm))}
                 testId={TestId.expressionEditor.modeRadio(qualifier, rm)}
