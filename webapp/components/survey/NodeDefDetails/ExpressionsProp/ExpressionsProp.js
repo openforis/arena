@@ -22,6 +22,7 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import ExpressionProp from './ExpressionProp'
 import { ButtonNew } from '@webapp/components/buttons'
+import { TestId } from '@webapp/utils/testId'
 
 export const ValueType = {
   constant: 'constant',
@@ -231,7 +232,9 @@ const ExpressionsProp = (props) => {
                 validation={Validation.getFieldValidation(index)(validation)}
               />
             ))}
-            {!readOnly && (multiple || valuesIsEmpty) && <ButtonNew onClick={onAddPlaceholder} />}
+            {!readOnly && (multiple || valuesIsEmpty) && (
+              <ButtonNew onClick={onAddPlaceholder} testId={TestId.expressionEditor.newBtn(qualifier)} />
+            )}
           </div>
         )}
       </ExpressionsWrapper>

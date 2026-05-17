@@ -45,11 +45,17 @@ export const editNodeDefExpression = (nodeDef, expressions) => {
       }
 
       // goto expression editor
-      const modeRadio = await page.$(getSelector(TestId.expressionEditor.modeRadio(qualifier, 'defined')))
-      await modeRadio.click()
-      const button = (await page.$$(getSelector(TestId.expressionEditor.editBtn(expression.type), 'button')))[idx]
-      await button.click()
-
+      const modeRadioDefinedLocator = page.locator(getSelector(TestId.expressionEditor.modeRadio(qualifier, 'defined')))
+      if (await modeRadioDefinedLocator.isVisible()) {
+        await modeRadioDefinedLocator.click()
+      }
+      const editButtonLocator = page.locator(getSelector(TestId.expressionEditor.editBtn(qualifier), 'button')).nth(idx)
+      if (await editButtonLocator.isVisible()) {
+        await editButtonLocator.click()
+      } else {
+        const newBtnLocator = page.locator(getSelector(TestId.expressionEditor.newBtn(qualifier), 'button')).nth(idx)
+        await newBtnLocator.click()
+      }
       const editFn = editFns[nodeDef.type] || editAdvanced
       await editFn(expression.expression)
 
