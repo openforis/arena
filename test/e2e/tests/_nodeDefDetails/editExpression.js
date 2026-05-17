@@ -49,11 +49,11 @@ export const editNodeDefExpression = (nodeDef, expressions) => {
       if (await modeRadioDefinedLocator.isVisible()) {
         await modeRadioDefinedLocator.click()
       }
-      const editButtonLocator = page.locator(getSelector(TestId.expressionEditor.editBtn(qualifier), 'button')).nth(idx)
+      const editButtonLocator = page.locator(getSelector(TestId.expressionEditor.editBtn(qualifier, idx), 'button'))
       if (await editButtonLocator.isVisible()) {
         await editButtonLocator.click()
       } else {
-        const newBtnLocator = page.locator(getSelector(TestId.expressionEditor.newBtn(qualifier), 'button')).nth(idx)
+        const newBtnLocator = page.locator(getSelector(TestId.expressionEditor.newBtn(qualifier, idx), 'button'))
         await newBtnLocator.click()
       }
       const editFn = editFns[nodeDef.type] || editAdvanced
@@ -64,9 +64,9 @@ export const editNodeDefExpression = (nodeDef, expressions) => {
 
     if (expression.applyIf) {
       test(`${nodeDef.label} edit expression ${expression.expression} applyIf ${expression.applyIf}`, async () => {
-        const btnId = TestId.expressionEditor.editBtn(TestId.nodeDefDetails.applyIf(expression.type))
-        const button = (await page.$$(getSelector(btnId, 'button')))[idx]
-        await button.click()
+        const btnId = TestId.expressionEditor.editBtn(TestId.nodeDefDetails.applyIf(expression.type), idx)
+        const buttonLocator = page.locator(getSelector(btnId, 'button'))
+        await buttonLocator.click()
 
         await editAdvanced(expression.applyIf)
 

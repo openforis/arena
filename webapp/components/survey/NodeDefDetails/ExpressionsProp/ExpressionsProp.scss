@@ -21,6 +21,10 @@
   flex-direction: column;
   gap: 0.4rem;
 
+  .btn-new {
+    align-self: flex-start;
+  }
+
   //custom tooltip error
   .tooltip-error {
     .node-def-edit__expression {

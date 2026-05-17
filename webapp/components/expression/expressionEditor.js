@@ -107,7 +107,7 @@ const ExpressionEditor = (props) => {
               iconClassName="icon-pencil2 icon-14px"
               id={`${idPrefix}-edit-btn`}
               onClick={() => setEdit(true)}
-              testId={TestId.expressionEditor.editBtn(qualifier)}
+              testId={TestId.expressionEditor.editBtn(qualifier, index)}
             />
           )}
         </div>

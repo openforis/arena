@@ -72,10 +72,10 @@ export const TestId = {
   },
   expressionEditor: {
     applyBtn: 'expression-apply-btn',
-    editBtn: (id) => `${id}-edit-btn`,
+    editBtn: (qualifier, index) => `${qualifier}-edit-btn-${index}`,
     literalDropdown: 'expression-literal-dropdown',
     modeRadio: (qualifier, mode) => `${qualifier}-${mode}-radio`,
-    newBtn: (qualifier) => `${qualifier}-new-btn`,
+    newBtn: (qualifier, index) => `${qualifier}-new-btn-${index}`,
     query: (id) => `${id}-query`,
     toggleModeBtn: 'expression-mode-btn',
   },
