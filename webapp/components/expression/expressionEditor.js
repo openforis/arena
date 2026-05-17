@@ -44,25 +44,25 @@ const ExpressionEditor = (props) => {
     onEditChange?.(edit)
   }, [edit, onEditChange])
 
-  const onClose = useCallback(() => setEdit(false), [])
+  const closeEditor = useCallback(() => setEdit(false), [])
 
-  const onCancelEditor = useCallback(() => {
+  // Unified handler for both cancel and close actions.
+  const handleClose = useCallback(() => {
     if (placeholder && onCancel) {
       onCancel()
-    } else {
-      onClose()
     }
-  }, [onCancel, onClose, placeholder])
+    closeEditor()
+  }, [closeEditor, onCancel, placeholder])
 
   const applyChange = useCallback(
     ({ query }) => {
       if (onChange) {
-        onChange({ query, callback: onClose })
+        onChange({ query, callback: closeEditor })
       } else {
-        onClose()
+        handleClose()
       }
     },
-    [onChange, onClose]
+    [closeEditor, handleClose, onChange]
   )
 
   const idPrefix = `expression-editor-${placeholder ? 'placeholder' : index}-${qualifier}`
@@ -89,8 +89,7 @@ const ExpressionEditor = (props) => {
           canBeCall={canBeCall}
           canBeConstant={canBeConstant}
           isBoolean={isBoolean}
-          onClose={onClose}
-          onCancel={onCancelEditor}
+          onClose={handleClose}
           onChange={applyChange}
           types={types}
           header={popupHeader}

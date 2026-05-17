@@ -30,7 +30,6 @@ const ExpressionEditorPopup = (props) => {
     nodeDefUuidContext = null,
     nodeDefUuidCurrent = null,
     onChange = () => {},
-    onCancel = onClose,
     onClose = () => {},
     query = '',
     types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
@@ -118,7 +117,7 @@ const ExpressionEditorPopup = (props) => {
             testId={TestId.expressionEditor.applyBtn}
           />
 
-          <Button label="common.cancel" onClick={onCancel} size="small" variant="outlined" />
+          <Button label="common.cancel" onClick={onClose} size="small" variant="outlined" />
         </div>
       </div>
     </PanelRight>
