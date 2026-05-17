@@ -51,9 +51,11 @@ export const editNodeDefExpression = (nodeDef, expressions) => {
       }
       const editButtonLocator = page.locator(getSelector(TestId.expressionEditor.editBtn(qualifier, idx), 'button'))
       if (await editButtonLocator.isVisible()) {
+        // edit existing expression
         await editButtonLocator.click()
       } else {
-        const newBtnLocator = page.locator(getSelector(TestId.expressionEditor.newBtn(qualifier, idx), 'button'))
+        // add new expression
+        const newBtnLocator = page.locator(getSelector(TestId.expressionEditor.newBtn(qualifier), 'button'))
         await newBtnLocator.click()
       }
       const editFn = editFns[nodeDef.type] || editAdvanced

@@ -75,7 +75,7 @@ export const TestId = {
     editBtn: (qualifier, index) => `${qualifier}-edit-btn-${index}`,
     literalDropdown: 'expression-literal-dropdown',
     modeRadio: (qualifier, mode) => `${qualifier}-${mode}-radio`,
-    newBtn: (qualifier, index) => `${qualifier}-new-btn-${index}`,
+    newBtn: (qualifier) => `${qualifier}-new-btn`,
     query: (id) => `${id}-query`,
     toggleModeBtn: 'expression-mode-btn',
   },

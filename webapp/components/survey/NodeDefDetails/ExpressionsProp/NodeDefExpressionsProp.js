@@ -55,7 +55,7 @@ const NodeDefExpressionsProp = (props) => {
 
   // Radio logic (if enabled)
   const valuesDefined = !R.isEmpty(values)
-  const [selectedRadioMode, setSelectedRadioMode] = useState(valuesDefined ? 'defined' : 'none')
+  const [selectedRadioMode, setSelectedRadioMode] = useState(valuesDefined ? radioModes.defined : radioModes.none)
   useEffect(() => {
     setSelectedRadioMode(valuesDefined ? radioModes.defined : radioModes.none)
   }, [valuesDefined])
