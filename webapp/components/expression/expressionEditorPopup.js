@@ -138,7 +138,6 @@ ExpressionEditorPopup.propTypes = {
   nodeDefUuidContext: PropTypes.string, // Entity
   nodeDefUuidCurrent: PropTypes.string, // Attribute
   onChange: PropTypes.func,
-  onCancel: PropTypes.func,
   onClose: PropTypes.func,
   query: PropTypes.string, // String representing the expression
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
