@@ -35,7 +35,7 @@ const CountProp = (props) => {
   }
 
   const onChange = (value) => {
-    const valueUpdated = Array.isArray(value) ? R.reject(NodeDefExpression.isPlaceholder, value) : value
+    const valueUpdated = value
     const validations = NodeDef.getValidations(nodeDef)
     const validationsUpdated = NodeDefValidations.assocCountProp(countType)(valueUpdated)(validations)
     Actions.setProp({

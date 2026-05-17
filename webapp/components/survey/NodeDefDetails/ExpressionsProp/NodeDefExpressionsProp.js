@@ -62,9 +62,7 @@ const NodeDefExpressionsProp = (props) => {
   }, [valuesDefined])
 
   const onChange = (expressions) =>
-    onChangeProp
-      ? onChangeProp(expressions)
-      : Actions.setProp({ state, key: propName, value: R.reject(NodeDefExpression.isPlaceholder, expressions) })
+    onChangeProp ? onChangeProp(expressions) : Actions.setProp({ state, key: propName, value: expressions })
 
   const label = labelProp ? i18n.t(labelProp) : null
 

@@ -1,6 +1,6 @@
 import './expressionEditor.scss'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -26,6 +26,8 @@ const ExpressionEditor = (props) => {
     nodeDefUuidContext = '',
     nodeDefUuidCurrent = null,
     onChange = () => {},
+    onCancel = null,
+    onEditChange = null,
     placeholder = false,
     qualifier,
     query = '',
@@ -36,9 +38,21 @@ const ExpressionEditor = (props) => {
   const i18n = useI18n()
   const nodeDefCurrent = useNodeDefByUuid(nodeDefUuidCurrent)
 
-  const [edit, setEdit] = useState(false)
+  const [edit, setEdit] = useState(placeholder)
+
+  useEffect(() => {
+    onEditChange?.(edit)
+  }, [edit, onEditChange])
 
   const onClose = useCallback(() => setEdit(false), [])
+
+  const onCancelEditor = useCallback(() => {
+    if (placeholder && onCancel) {
+      onCancel()
+    } else {
+      onClose()
+    }
+  }, [onCancel, onClose, placeholder])
 
   const applyChange = useCallback(
     ({ query }) => {
@@ -76,6 +90,7 @@ const ExpressionEditor = (props) => {
           canBeConstant={canBeConstant}
           isBoolean={isBoolean}
           onClose={onClose}
+          onCancel={onCancelEditor}
           onChange={applyChange}
           types={types}
           header={popupHeader}
@@ -117,6 +132,8 @@ ExpressionEditor.propTypes = {
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   onChange: PropTypes.func,
+  onCancel: PropTypes.func,
+  onEditChange: PropTypes.func,
   readOnly: PropTypes.bool,
 }
 

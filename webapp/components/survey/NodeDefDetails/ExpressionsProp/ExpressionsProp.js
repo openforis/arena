@@ -137,21 +137,32 @@ const ExpressionsProp = (props) => {
     [values]
   )
 
+  const removeExpression = useCallback(
+    ({ expression, callback = null }) => {
+      const index = getExpressionIndex(expression)
+      const newValues = R.remove(index, 1, values)
+      onChange(newValues)
+      callback?.()
+    },
+    [getExpressionIndex, onChange, values]
+  )
+
   const onDelete = useCallback(
-    (expression, callback = null) => {
+    (expression, callback = null, { confirm = true } = {}) => {
+      if (!confirm) {
+        removeExpression({ expression, callback })
+        return
+      }
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'nodeDefEdit.expressionsProp.confirmDelete',
           onOk: () => {
-            const index = getExpressionIndex(expression)
-            const newValues = R.remove(index, 1, values)
-            onChange(newValues)
-            callback?.()
+            removeExpression({ expression, callback })
           },
         })
       )
     },
-    [dispatch, getExpressionIndex, onChange, values]
+    [dispatch, removeExpression]
   )
 
   const onUpdate = useCallback(
@@ -170,13 +181,9 @@ const ExpressionsProp = (props) => {
 
   const uiValues = values
 
-  // const uiValues = useMemo(() => {
-  //   const _uiValues = [...values]
-  //   if (!readOnly && (multiple || valuesIsEmpty)) {
-  //     _uiValues.push(NodeDefExpression.createExpressionPlaceholder())
-  //   }
-  //   return _uiValues
-  // }, [multiple, readOnly, values, valuesIsEmpty])
+  const onAddPlaceholder = useCallback(() => {
+    onChange(R.append(NodeDefExpression.createExpressionPlaceholder(), values))
+  }, [onChange, values])
 
   return (
     <FormItem info={info} label={label} className={classNames({ error: Validation.isNotValid(validation) })}>
@@ -224,7 +231,7 @@ const ExpressionsProp = (props) => {
                 validation={Validation.getFieldValidation(index)(validation)}
               />
             ))}
-            {!readOnly && (multiple || valuesIsEmpty) && <ButtonNew />}
+            {!readOnly && (multiple || valuesIsEmpty) && <ButtonNew onClick={onAddPlaceholder} />}
           </div>
         )}
       </ExpressionsWrapper>

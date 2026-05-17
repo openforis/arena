@@ -30,6 +30,7 @@ const ExpressionEditorPopup = (props) => {
     nodeDefUuidContext = null,
     nodeDefUuidCurrent = null,
     onChange = () => {},
+    onCancel = onClose,
     onClose = () => {},
     query = '',
     types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
@@ -104,6 +105,7 @@ const ExpressionEditorPopup = (props) => {
             label="common.reset"
             onClick={() => onChange('')}
             size="small"
+            variant="outlined"
           />
 
           <Button
@@ -116,7 +118,7 @@ const ExpressionEditorPopup = (props) => {
             testId={TestId.expressionEditor.applyBtn}
           />
 
-          <Button label="common.cancel" onClick={onClose} size="small" />
+          <Button label="common.cancel" onClick={onCancel} size="small" variant="outlined" />
         </div>
       </div>
     </PanelRight>
@@ -137,6 +139,7 @@ ExpressionEditorPopup.propTypes = {
   nodeDefUuidContext: PropTypes.string, // Entity
   nodeDefUuidCurrent: PropTypes.string, // Attribute
   onChange: PropTypes.func,
+  onCancel: PropTypes.func,
   onClose: PropTypes.func,
   query: PropTypes.string, // String representing the expression
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
