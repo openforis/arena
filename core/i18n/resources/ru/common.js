@@ -1056,7 +1056,9 @@ $t(common.appNameFull)
     validationsProps: {
       minCount: 'Минимальное количество',
       maxCount: 'Максимальное количество',
-      expressions: 'Выражения',
+      expressions: 'Выражения валидации',
+      attributeAlwaysValid: 'Атрибут всегда корректен',
+      attributeValidWhenConditionIsMet: 'Атрибут корректен при выполнении условия',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Этот узел не может быть преобразован в множественный, потому что у него есть значения по умолчанию.',

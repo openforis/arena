@@ -66,7 +66,7 @@ const NodeDefExpressionsProp = (props) => {
   const label = labelProp ? i18n.t(labelProp) : null
 
   return (
-    <fieldset>
+    <fieldset className="node-def-edit__expressions-fieldset">
       <legend>{label}</legend>
       <div className="content">
         {radioMode && (

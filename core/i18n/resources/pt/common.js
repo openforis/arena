@@ -1081,7 +1081,9 @@ $t(common.appNameFull)
     validationsProps: {
       minCount: 'Contagem mínima',
       maxCount: 'Contagem máxima',
-      expressions: 'Expressões',
+      expressions: 'Expressões de validação',
+      attributeAlwaysValid: 'Atributo sempre válido',
+      attributeValidWhenConditionIsMet: 'Atributo válido quando a condição é atendida',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Este nó não pode ser convertido para múltiplo porque possui valores padrão.',

@@ -1049,7 +1049,9 @@ $t(common.appNameFull)
     validationsProps: {
       minCount: 'Хамгийн бага тоо',
       maxCount: 'Хамгийн их тоо',
-      expressions: 'Илэрхийлэл',
+      expressions: 'Баталгаажуулалтын илэрхийлэл',
+      attributeAlwaysValid: 'Шинж чанар үргэлж хүчинтэй',
+      attributeValidWhenConditionIsMet: 'Нөхцөл биелсэн үед шинж чанар хүчинтэй',
     },
     cannotChangeIntoMultipleWithDefaultValues: 'Энэ зангилааг үндсэн утгуудтай олон болгох боломжгүй.',
     cannotDeleteNodeDefReferenced: `Зангилааны тодорхойлолт "{{nodeDef}}"-г устгах боломжгүй: энэ нь дараах зангилааны тодорхойлолтуудаар холбогдсон байна: {{nodeDefDependents}}`,

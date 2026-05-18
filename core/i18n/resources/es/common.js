@@ -930,7 +930,9 @@ $t(common.appNameFull)
     validationsProps: {
       minCount: 'Conteo mínimo',
       maxCount: 'Conteo máximo',
-      expressions: 'Expresiones',
+      expressions: 'Expresiones de validación',
+      attributeAlwaysValid: 'Atributo siempre válido',
+      attributeValidWhenConditionIsMet: 'Atributo válido cuando se cumple la condición',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Este nodo no se puede convertir a múltiple porque tiene valores predeterminados.',

@@ -53,10 +53,10 @@ const ExpressionsWrapper = (props) => {
   const { validation, children } = props
 
   const hasFieldValidations = Objects.isNotEmpty(Validation.getFieldValidations(validation))
-  const className = 'node-def-edit_expressions-wrapper'
+  const className = 'node-def-edit__expressions-wrapper'
 
   return hasFieldValidations ? (
-    <div className="node-def-edit_expressions-wrapper">{children}</div>
+    <div className={className}>{children}</div>
   ) : (
     <ValidationTooltip className={className} validation={validation}>
       {children}

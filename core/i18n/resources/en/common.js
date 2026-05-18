@@ -1077,9 +1077,9 @@ E.g. this.region = region_attribute_name
     validationsProps: {
       minCount: 'Min count',
       maxCount: 'Max count',
-      expressions: 'Expressions',
-      validationsRadioNone: 'Always valid',
-      validationsRadioDefined: 'Valid when condition is met',
+      expressions: 'Validation expressions',
+      attributeAlwaysValid: 'Attribute always valid',
+      attributeValidWhenConditionIsMet: 'Attribute valid when condition is met',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'This node cannot be converted to multiple because it has default values.',
