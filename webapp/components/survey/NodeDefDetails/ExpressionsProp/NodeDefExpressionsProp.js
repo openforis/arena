@@ -7,8 +7,8 @@ import * as Validation from '@core/validation/validation'
 import * as Expression from '@core/expressionParser/expression'
 
 import ExpressionsProp from './ExpressionsProp'
+import { Fieldset } from '@webapp/components/Fieldset'
 import Radiobox from '@webapp/components/form/radiobox'
-import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { State } from '../store'
@@ -29,7 +29,7 @@ const NodeDefExpressionsProp = (props) => {
     info = null,
     isBoolean = true,
     isContextParent = false,
-    label: labelProp = '',
+    label = '',
     mode = Expression.modes.json,
     multiple = true,
     nodeDefUuidContext = null,
@@ -47,8 +47,6 @@ const NodeDefExpressionsProp = (props) => {
     radioLabels = { none: 'common.none', defined: 'common.defined' },
   } = props
 
-  const i18n = useI18n()
-
   const nodeDef = State.getNodeDef(state)
   const nodeDefValidation = State.getValidation(state)
   const values = propExtractor ? propExtractor(nodeDef) : NodeDef.getPropAdvanced(propName, [])(nodeDef)
@@ -63,11 +61,8 @@ const NodeDefExpressionsProp = (props) => {
   const onChange = (expressions) =>
     onChangeProp ? onChangeProp(expressions) : Actions.setProp({ state, key: propName, value: expressions })
 
-  const label = labelProp ? i18n.t(labelProp) : null
-
   return (
-    <fieldset className="node-def-edit__expressions-fieldset">
-      <legend>{label}</legend>
+    <Fieldset className="node-def-edit__expressions-fieldset" label={label}>
       <div className="content">
         {radioMode && (
           <div className="form-item_body node-def-edit__expression-radio-mode">
@@ -110,7 +105,7 @@ const NodeDefExpressionsProp = (props) => {
         )}
         {children}
       </div>
-    </fieldset>
+    </Fieldset>
   )
 }
 
