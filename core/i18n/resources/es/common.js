@@ -811,17 +811,23 @@ $t(common.appNameFull)
       table: 'Tabla',
     },
     advancedProps: {
-      defaultValuesRadioNone: 'Valores predeterminados no especificados',
-      defaultValuesRadioDefined: 'Valores predeterminados especificados',
-      editableIfRadioNone: 'Siempre editable',
-      editableIfRadioDefined: 'Editable cuando se cumple la condición',
+      defaultValuesNotSpecified: 'Valores predeterminados no especificados',
+      defaultValuesSpecified: 'Valores predeterminados especificados',
+      editableAlways: 'Siempre editable',
+      editableIfConditionIsMet: 'Editable cuando se cumple la condición',
       relevantIfRadioNone: 'Siempre relevante',
       relevantIfRadioDefined: 'Relevante cuando se cumple la condición',
-      visibleIfRadioNone: 'Siempre visible',
-      visibleIfRadioDefined: 'Visible cuando se cumple la condición',
+      visibleAlways: 'Siempre visible',
+      visibleIfConditionIsMet: 'Visible cuando se cumple la condición',
       areaBasedEstimate: 'Estimación basada en el área',
       defaultValues: 'Valores predeterminados',
+      defaultValuesInfo: `Los valores predeterminados se asignarán al atributo según las condiciones/expresiones especificadas.
+    Cuando se especifican múltiples condiciones/expresiones, se aplicará la primera que cumpla la condición "Aplicar si"
+    y el resultado de la evaluación de su expresión se asignará al valor del atributo.`,
       defaultValueEvaluatedOneTime: 'Valor predeterminado evaluado solo una vez',
+      defaultValueEvaluatedOneTimeInfo: `El valor predeterminado se evaluará solo una vez, cuando se cree el atributo.
+    Si no está marcado, el valor predeterminado se volverá a evaluar cada vez que se actualice el registro.
+    Debe marcarse al usar expresiones como now() o uuid(), que deben evaluarse solo una vez, cuando el valor del atributo se genera por primera vez.`,
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valores predeterminados no editables porque la clave auto incremental está configurada',
       editableIf: 'Editable si',
@@ -834,8 +840,16 @@ $t(common.appNameFull)
         'Expresión utilizada para filtrar elementos seleccionables. En la expresión, la palabra "this" se referirá al elemento en sí. Ej.: this.region = region_attribute_name (donde "region" es el nombre de una propiedad extra definida para el elemento y region_attribute_name es el nombre de un atributo en la encuesta)',
       readOnly: 'Solo lectura',
       relevantIf: 'Relevante si',
+      relevantIfInfo: `Por defecto, los nodos siempre son relevantes.
+    Si no se cumple una condición de relevancia, el nodo se muestra en gris (o se oculta) y se ignoran los valores predeterminados.
+    Esto permite ocultar secciones del formulario de encuesta de forma condicional, independientemente de los roles de usuario; por ejemplo, mostrar un campo de texto "Especifique" solo cuando un usuario seleccione "Otro" en una pregunta anterior.`,
       script: 'Script',
       visibleIf: 'Visible si',
+      visibleIfInfo: `Si no se especifica, el nodo siempre será visible.
+    Si la condición/expresión se evalúa como verdadera, el nodo será visible;
+    de lo contrario, estará oculto.
+    A diferencia de "Oculto cuando no es relevante", un atributo oculto tendrá asignado su valor predeterminado (si se especifica).
+    Esta función puede utilizarse para ocultar partes completas del formulario de encuesta según condiciones específicas (por ejemplo, el rol del usuario).`,
     },
     mobileAppProps: {
       hiddenInMobile: {

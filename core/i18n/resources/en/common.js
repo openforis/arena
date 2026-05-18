@@ -960,13 +960,20 @@ $t(common.appNameFull)
     advancedProps: {
       areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
+      defaultValuesInfo: `Default values will be assigned to the attribute depending on the specified conditions/expressions.  
+When multiple conditions/expressions are specified, the first one that meets the "Apply if" condition will be applied  
+and the result of the evaluation of its expression will be assigned to the attribute value.`,
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
+      defaultValueEvaluatedOneTimeInfo: `The default value will be evaluated only one time, when the attribute is created.
+If not marked, the default value will be re-evaluated every time the record is updated.
+It should be marked when using expressions like now() or uuid() that should be evaluated only once, when the attribute value is generated for the first time.`,
       defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
-      defaultValuesRadioNone: 'Default values not specified',
-      defaultValuesRadioDefined: 'Default values specified',
+      defaultValuesNotSpecified: 'Default values not specified',
+      defaultValuesSpecified: 'Default values specified',
       editableIf: 'Editable if',
-      editableIfRadioNone: 'Always editable',
-      editableIfRadioDefined: 'Editable if condition is met',
+      editableIfInfo: `If the condition/expression evaluates to true, the attribute will be editable; otherwise, it will be read-only.`,
+      editableAlways: 'Always editable',
+      editableIfConditionIsMet: 'Editable if condition is met',
       hidden: 'Hide in entry form',
       hiddenInReport: 'Hidden in Analytical Dashboard',
       hiddenInReportInfo: `If marked, the attribute won't be visible in the Analytical Dashboard`,
@@ -978,12 +985,20 @@ E.g. this.region = region_attribute_name
 (where "region" is the name of an extra property defined for the item and region_attribute_name is the name of an attribute in the survey)`,
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
+      relevantIfInfo: `By default, nodes are always relevant.  
+If a relevance condition is not met, the node is shown in grey (or hidden), and any default values are ignored.  
+This allows you to conditionally hide survey sections regardless of user roles—such as revealing a "Please specify" text field only when a user selects "Other" in a previous question.`,
       relevantIfRadioNone: 'Always relevant',
       relevantIfRadioDefined: 'Relevant if condition is met',
       script: 'Script',
       visibleIf: 'Visible if',
-      visibleIfRadioNone: 'Always visible',
-      visibleIfRadioDefined: 'Visible if condition is met',
+      visibleIfInfo: `If not specified, the node will always be visible.  
+If the condition/expression evaluates to true, the node will be visible;  
+otherwise, it will be hidden.  
+Differently from "Hidden when not relevant", an hidden attribute will have its default value (if specified) assigned.  
+This function can be used to hide entire parts of the survey form based on specific conditions (for example, user role)`,
+      visibleAlways: 'Always visible',
+      visibleIfConditionIsMet: 'Visible if condition is met',
     },
     mobileAppProps: {
       hiddenInMobile: {

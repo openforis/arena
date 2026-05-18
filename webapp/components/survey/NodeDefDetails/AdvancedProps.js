@@ -61,7 +61,11 @@ const AdvancedProps = (props) => {
             qualifier={TestId.nodeDefDetails.defaultValues}
             state={state}
             Actions={Actions}
-            info={autoIncrementalKey ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey' : null}
+            info={
+              autoIncrementalKey
+                ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey'
+                : 'nodeDefEdit.advancedProps.defaultValuesInfo'
+            }
             label="nodeDefEdit.advancedProps.defaultValues"
             readOnly={readOnly || autoIncrementalKey}
             propName={NodeDef.keysPropsAdvanced.defaultValues}
@@ -71,8 +75,8 @@ const AdvancedProps = (props) => {
             excludeCurrentNodeDef
             radioMode
             radioLabels={{
-              none: 'nodeDefEdit.advancedProps.defaultValuesRadioNone',
-              defined: 'nodeDefEdit.advancedProps.defaultValuesRadioDefined',
+              none: 'nodeDefEdit.advancedProps.defaultValuesNotSpecified',
+              defined: 'nodeDefEdit.advancedProps.defaultValuesSpecified',
             }}
           >
             {(defaultValueEvaluatedOneTime || Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))) && (
@@ -80,6 +84,7 @@ const AdvancedProps = (props) => {
                 <Checkbox
                   checked={defaultValueEvaluatedOneTime}
                   disabled={readOnly || autoIncrementalKey}
+                  info="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTimeInfo"
                   label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
                   validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
                     validation
@@ -103,6 +108,7 @@ const AdvancedProps = (props) => {
         applyIf={false}
         multiple={false}
         nodeDefUuidContext={nodeDefUuidContext}
+        info="nodeDefEdit.advancedProps.relevantIfInfo"
         isContextParent
         label="nodeDefEdit.advancedProps.relevantIf"
         excludeCurrentNodeDef
@@ -133,14 +139,15 @@ const AdvancedProps = (props) => {
             <NodeDefExpressionsProp
               Actions={Actions}
               excludeCurrentNodeDef
+              info="nodeDefEdit.advancedProps.editableIfInfo"
               isContextParent
               label="nodeDefEdit.advancedProps.editableIf"
               nodeDefUuidContext={nodeDefUuidContext}
               propName={NodeDef.keysPropsAdvanced.editableIf}
               qualifier={TestId.nodeDefDetails.editableIf}
               radioLabels={{
-                none: 'nodeDefEdit.advancedProps.editableIfRadioNone',
-                defined: 'nodeDefEdit.advancedProps.editableIfRadioDefined',
+                none: 'nodeDefEdit.advancedProps.editableAlways',
+                defined: 'nodeDefEdit.advancedProps.editableIfConditionIsMet',
               }}
               readOnly={readOnly}
               state={state}
@@ -150,14 +157,15 @@ const AdvancedProps = (props) => {
           <NodeDefExpressionsProp
             Actions={Actions}
             excludeCurrentNodeDef
+            info="nodeDefEdit.advancedProps.visibleIfInfo"
             isContextParent
             label="nodeDefEdit.advancedProps.visibleIf"
             nodeDefUuidContext={nodeDefUuidContext}
             propName={NodeDef.keysPropsAdvanced.visibleIf}
             qualifier={TestId.nodeDefDetails.visibleIf}
             radioLabels={{
-              none: 'nodeDefEdit.advancedProps.visibleIfRadioNone',
-              defined: 'nodeDefEdit.advancedProps.visibleIfRadioDefined',
+              none: 'nodeDefEdit.advancedProps.visibleAlways',
+              defined: 'nodeDefEdit.advancedProps.visibleIfConditionIsMet',
             }}
             readOnly={readOnly}
             state={state}

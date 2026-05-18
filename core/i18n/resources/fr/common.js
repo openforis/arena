@@ -965,17 +965,23 @@ $t(common.appNameFull)
       table: 'Tableau',
     },
     advancedProps: {
-      defaultValuesRadioNone: 'Valeurs par défaut non spécifiées',
-      defaultValuesRadioDefined: 'Valeurs par défaut spécifiées',
-      editableIfRadioNone: 'Toujours modifiable',
-      editableIfRadioDefined: 'Modifiable lorsque la condition est remplie',
+      defaultValuesNotSpecified: 'Valeurs par défaut non spécifiées',
+      defaultValuesSpecified: 'Valeurs par défaut spécifiées',
+      editableAlways: 'Toujours modifiable',
+      editableIfConditionIsMet: 'Modifiable lorsque la condition est remplie',
       relevantIfRadioNone: 'Toujours pertinent',
       relevantIfRadioDefined: 'Pertinent lorsque la condition est remplie',
-      visibleIfRadioNone: 'Toujours visible',
-      visibleIfRadioDefined: 'Visible lorsque la condition est remplie',
+      visibleAlways: 'Toujours visible',
+      visibleIfConditionIsMet: 'Visible lorsque la condition est remplie',
       areaBasedEstimate: 'Estimation basée sur la surface',
       defaultValues: 'Valeurs par défaut',
+      defaultValuesInfo: `Les valeurs par défaut seront attribuées à l'attribut en fonction des conditions/expressions spécifiées.
+    Lorsque plusieurs conditions/expressions sont définies, la première qui satisfait la condition "Appliquer si" sera appliquée
+    et le résultat de l'évaluation de son expression sera affecté à la valeur de l'attribut.`,
       defaultValueEvaluatedOneTime: 'Valeur par défaut évaluée une seule fois',
+      defaultValueEvaluatedOneTimeInfo: `La valeur par défaut sera évaluée une seule fois, lorsque l'attribut est créé.
+    Si ce n'est pas coché, la valeur par défaut sera réévaluée à chaque mise à jour de l'enregistrement.
+    Cela doit être coché lors de l'utilisation d'expressions comme now() ou uuid(), qui doivent être évaluées une seule fois, lors de la première génération de la valeur de l'attribut.`,
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valeurs par défaut non modifiables car la clé auto-incrémentielle est définie',
       editableIf: 'Modifiable si',
@@ -990,8 +996,16 @@ Ex. this.region = nom_attribut_region
 (où "region" est le nom d'une propriété supplémentaire définie pour l'élément et nom_attribut_region est le nom d'un attribut dans le formulaire)`,
       readOnly: 'Lecture seule',
       relevantIf: 'Pertinent si',
+      relevantIfInfo: `Par défaut, les nœuds sont toujours pertinents.
+    Si une condition de pertinence n'est pas remplie, le nœud est affiché en gris (ou masqué) et les valeurs par défaut sont ignorées.
+    Cela permet de masquer conditionnellement des sections du formulaire d'enquête, indépendamment des rôles utilisateurs, par exemple en affichant un champ "Veuillez préciser" uniquement lorsqu'un utilisateur choisit "Autre" dans une question précédente.`,
       script: 'Script',
       visibleIf: 'Visible si',
+      visibleIfInfo: `Si non spécifié, le nœud sera toujours visible.
+    Si la condition/l'expression est vraie, le nœud sera visible;
+    sinon, il sera masqué.
+    Contrairement à "Masqué quand non pertinent", un attribut masqué recevra sa valeur par défaut (si elle est spécifiée).
+    Cette fonction peut être utilisée pour masquer des parties entières du formulaire d'enquête selon des conditions spécifiques (par exemple, le rôle de l'utilisateur).`,
     },
     mobileAppProps: {
       hiddenInMobile: {

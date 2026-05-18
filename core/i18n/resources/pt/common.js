@@ -961,17 +961,23 @@ $t(common.appNameFull)
       table: 'Tabela',
     },
     advancedProps: {
-      defaultValuesRadioNone: 'Valores padrão não especificados',
-      defaultValuesRadioDefined: 'Valores padrão especificados',
-      editableIfRadioNone: 'Sempre editável',
-      editableIfRadioDefined: 'Editável quando a condição é atendida',
+      defaultValuesNotSpecified: 'Valores padrão não especificados',
+      defaultValuesSpecified: 'Valores padrão especificados',
+      editableAlways: 'Sempre editável',
+      editableIfConditionIsMet: 'Editável quando a condição é atendida',
       relevantIfRadioNone: 'Sempre relevante',
       relevantIfRadioDefined: 'Relevante quando a condição é atendida',
-      visibleIfRadioNone: 'Sempre visível',
-      visibleIfRadioDefined: 'Visível quando a condição é atendida',
+      visibleAlways: 'Sempre visível',
+      visibleIfConditionIsMet: 'Visível quando a condição é atendida',
       areaBasedEstimate: 'Estimativa baseada em área',
       defaultValues: 'Valores padrão',
+      defaultValuesInfo: `Os valores padrão serão atribuídos ao atributo dependendo das condições/expressões especificadas.
+    Quando várias condições/expressões forem especificadas, a primeira que atender à condição "Aplicar se" será aplicada
+    e o resultado da avaliação da sua expressão será atribuído ao valor do atributo.`,
       defaultValueEvaluatedOneTime: 'Valor padrão avaliado apenas uma vez',
+      defaultValueEvaluatedOneTimeInfo: `O valor padrão será avaliado apenas uma vez, quando o atributo for criado.
+    Se não estiver marcado, o valor padrão será reavaliado toda vez que o registro for atualizado.
+    Deve ser marcado ao usar expressões como now() ou uuid(), que devem ser avaliadas apenas uma vez, quando o valor do atributo for gerado pela primeira vez.`,
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valores padrão não editáveis porque a chave auto incremental está definida',
       editableIf: 'Editável se',
@@ -986,8 +992,16 @@ $t(common.appNameFull)
     (onde "region" é o nome de uma propriedade extra definida para o item e region_attribute_name é o nome de um atributo no inventário)`,
       readOnly: 'Somente leitura',
       relevantIf: 'Relevante se',
+      relevantIfInfo: `Por padrão, os nós são sempre relevantes.
+    Se uma condição de relevância não for atendida, o nó será exibido em cinza (ou oculto), e quaisquer valores padrão serão ignorados.
+    Isso permite ocultar seções do formulário de inventário de forma condicional, independentemente dos papéis de usuário, por exemplo, exibindo um campo "Especifique" apenas quando o usuário selecionar "Outro" em uma pergunta anterior.`,
       script: 'Script',
       visibleIf: 'Visível se',
+      visibleIfInfo: `Se não for especificado, o nó será sempre visível.
+    Se a condição/expressão for avaliada como verdadeira, o nó ficará visível;
+    caso contrário, ficará oculto.
+    Diferentemente de "Oculto quando não relevante", um atributo oculto terá seu valor padrão (se especificado) atribuído.
+    Essa função pode ser usada para ocultar partes inteiras do formulário de inventário com base em condições específicas (por exemplo, papel do usuário).`,
     },
     mobileAppProps: {
       hiddenInMobile: {
