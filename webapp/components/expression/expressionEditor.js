@@ -59,10 +59,10 @@ const ExpressionEditor = (props) => {
       if (onChange) {
         onChange({ query, callback: closeEditor })
       } else {
-        handleClose()
+        closeEditor()
       }
     },
-    [closeEditor, handleClose, onChange]
+    [closeEditor, onChange]
   )
 
   const idPrefix = `expression-editor-${placeholder ? 'placeholder' : index}-${qualifier}`

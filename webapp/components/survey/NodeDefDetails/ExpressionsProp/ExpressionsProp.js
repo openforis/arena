@@ -163,8 +163,8 @@ const ExpressionsProp = (props) => {
   )
 
   const onDelete = useCallback(
-    (expression, callback = null, { confirm = true } = {}) => {
-      if (!confirm) {
+    (expression, callback = null, { confirm: requireConfirmation = true } = {}) => {
+      if (!requireConfirmation) {
         removeExpression({ expression, callback })
         return
       }
