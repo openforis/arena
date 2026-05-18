@@ -974,7 +974,7 @@ It should be marked when using expressions like now() or uuid() that should be e
       editableIfInfo: `If the condition/expression evaluates to true, the attribute will be editable; otherwise, it will be read-only.`,
       editableAlways: 'Always editable',
       editableIfConditionIsMet: 'Editable if condition is met',
-      hidden: 'Hide in entry form',
+      hidden: 'Always hidden',
       hiddenInReport: 'Hidden in Analytical Dashboard',
       hiddenInReportInfo: `If marked, the attribute won't be visible in the Analytical Dashboard`,
       hiddenWhenNotRelevant: 'Hidden when not relevant',

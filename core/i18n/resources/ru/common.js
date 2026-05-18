@@ -956,7 +956,7 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Значения по умолчанию нередактируемы, так как установлен автоинкрементный ключ',
       editableIf: 'Редактируемо, если',
-      hidden: 'Скрыть в форме ввода',
+      hidden: 'Всегда скрыто',
       hiddenInReport: 'Скрыть в аналитической панели',
       hiddenInReportInfo: `Если отмечено, атрибут не будет виден в аналитической панели`,
       hiddenWhenNotRelevant: 'Скрыто, когда неактуально',

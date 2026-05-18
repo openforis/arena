@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -13,7 +13,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { State } from '../store'
 
-const radioModes = {
+const defaultRadioModes = {
   none: 'none',
   defined: 'defined',
 }
@@ -44,42 +44,77 @@ const NodeDefExpressionsProp = (props) => {
     determineValueType = null,
     valueConstantEditorNumberFormat = null,
     radioMode = true,
+    radioModes = Object.values(defaultRadioModes),
+    radioModeDefined = defaultRadioModes.defined,
     radioLabels = { none: 'common.none', defined: 'common.defined' },
+    determineRadioMode = null,
+    onRadioModeChange = null,
+    isRadioModeDisabled = null,
   } = props
 
-  const nodeDef = State.getNodeDef(state)
+  const nodeDef = useMemo(() => State.getNodeDef(state), [state])
   const nodeDefValidation = State.getValidation(state)
   const values = propExtractor ? propExtractor(nodeDef) : NodeDef.getPropAdvanced(propName, [])(nodeDef)
 
   // Radio logic (if enabled)
   const valuesDefined = !R.isEmpty(values)
-  const [selectedRadioMode, setSelectedRadioMode] = useState(valuesDefined ? radioModes.defined : radioModes.none)
-  useEffect(() => {
-    setSelectedRadioMode(valuesDefined ? radioModes.defined : radioModes.none)
-  }, [valuesDefined])
+  const getSelectedRadioMode = useCallback(() => {
+    if (determineRadioMode) {
+      return determineRadioMode({ nodeDef, values, valuesDefined })
+    }
+    if (valuesDefined) {
+      return defaultRadioModes.defined
+    }
+    return defaultRadioModes.none
+  }, [determineRadioMode, nodeDef, values, valuesDefined])
 
-  const onChange = (expressions) =>
-    onChangeProp ? onChangeProp(expressions) : Actions.setProp({ state, key: propName, value: expressions })
+  const [manualRadioMode, setManualRadioMode] = useState(null)
+  const selectedRadioMode = useMemo(
+    () => manualRadioMode ?? getSelectedRadioMode(),
+    [manualRadioMode, getSelectedRadioMode]
+  )
+
+  const onChange = useCallback(
+    (expressions) => {
+      setManualRadioMode(null)
+      if (onChangeProp) {
+        onChangeProp(expressions)
+      } else {
+        Actions.setProp({ state, key: propName, value: expressions })
+      }
+    },
+    [Actions, onChangeProp, propName, state]
+  )
 
   return (
     <Fieldset className="node-def-edit__expressions-fieldset" info={info} label={label}>
       <div className="content">
         {radioMode && (
           <div className="form-item_body node-def-edit__expression-radio-mode">
-            {Object.values(radioModes).map((rm) => (
-              <Radiobox
-                key={rm}
-                checked={selectedRadioMode === rm}
-                disabled={readOnly || (rm === radioModes.none && valuesDefined)}
-                label={radioLabels[rm]}
-                name={`radio-${qualifier}`}
-                onChange={() => (valuesDefined ? undefined : setSelectedRadioMode(rm))}
-                testId={TestId.expressionEditor.modeRadio(qualifier, rm)}
-              />
-            ))}
+            {radioModes.map((rm) => {
+              const modeDisabled = isRadioModeDisabled
+                ? isRadioModeDisabled({ mode: rm, readOnly, valuesDefined, selectedRadioMode })
+                : readOnly || (rm === defaultRadioModes.none && valuesDefined)
+
+              return (
+                <Radiobox
+                  key={rm}
+                  checked={selectedRadioMode === rm}
+                  disabled={modeDisabled}
+                  label={radioLabels[rm]}
+                  name={`radio-${qualifier}`}
+                  onChange={() => {
+                    if (modeDisabled) return
+                    onRadioModeChange?.(rm)
+                    setManualRadioMode(rm)
+                  }}
+                  testId={TestId.expressionEditor.modeRadio(qualifier, rm)}
+                />
+              )
+            })}
           </div>
         )}
-        {(!radioMode || selectedRadioMode === radioModes.defined) && (
+        {(!radioMode || selectedRadioMode === radioModeDefined) && (
           <ExpressionsProp
             qualifier={qualifier}
             readOnly={readOnly}
@@ -112,7 +147,12 @@ NodeDefExpressionsProp.propTypes = {
   children: PropTypes.node,
 
   radioMode: PropTypes.bool,
+  radioModes: PropTypes.array,
+  radioModeDefined: PropTypes.string,
   radioLabels: PropTypes.object,
+  determineRadioMode: PropTypes.func,
+  onRadioModeChange: PropTypes.func,
+  isRadioModeDisabled: PropTypes.func,
   qualifier: PropTypes.string.isRequired, // used to generate test ids
 
   state: PropTypes.object.isRequired,

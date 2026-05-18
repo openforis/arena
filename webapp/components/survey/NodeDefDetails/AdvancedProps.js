@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
@@ -18,6 +18,33 @@ import Checkbox from '@webapp/components/form/checkbox'
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State } from './store'
 
+const editableIfRadioModes = {
+  none: 'none',
+  readOnly: 'readOnly',
+  defined: 'defined',
+}
+
+const visibleIfRadioModes = {
+  none: 'none',
+  alwaysHidden: 'alwaysHidden',
+  defined: 'defined',
+}
+
+const getEditableIfRadioModes = ({ nodeDef }) =>
+  NodeDef.isAttribute(nodeDef)
+    ? Object.values(editableIfRadioModes)
+    : [editableIfRadioModes.none, editableIfRadioModes.defined]
+
+const canSetAlwaysHiddenMode = ({ nodeDef }) =>
+  NodeDef.isAttribute(nodeDef) &&
+  NodeDef.isReadOnly(nodeDef) &&
+  (NodeDef.canBeHidden(nodeDef) || NodeDef.isHidden(nodeDef))
+
+const getVisibleIfRadioModes = ({ nodeDef }) =>
+  canSetAlwaysHiddenMode({ nodeDef })
+    ? [visibleIfRadioModes.none, visibleIfRadioModes.alwaysHidden, visibleIfRadioModes.defined]
+    : [visibleIfRadioModes.none, visibleIfRadioModes.defined]
+
 const AdvancedProps = (props) => {
   const { state, Actions } = props
 
@@ -25,38 +52,89 @@ const AdvancedProps = (props) => {
   const readOnly = !useAuthCanEditSurvey()
   const cycle = useSurveyCycleKey()
 
-  const nodeDef = State.getNodeDef(state)
+  const nodeDef = useMemo(() => State.getNodeDef(state), [state])
+
   const validation = State.getValidation(state)
+
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
   const autoIncrementalKey = NodeDef.isAutoIncrementalKey(nodeDef)
   const defaultValueEvaluatedOneTime = NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
   const hiddenWhenNotRelevant = NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)
 
+  const onEditableIfModeChange = useCallback(
+    (mode) => {
+      if (mode === editableIfRadioModes.none || mode === editableIfRadioModes.readOnly) {
+        Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.editableIf, value: [] })
+      }
+      Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value: mode === editableIfRadioModes.readOnly })
+    },
+    [Actions, state]
+  )
+
+  const determineEditableIfMode = useCallback(() => {
+    const editableIfValues = NodeDef.getEditableIf(nodeDef)
+    if (Objects.isNotEmpty(editableIfValues)) {
+      return editableIfRadioModes.defined
+    }
+    if (NodeDef.isAttribute(nodeDef) && NodeDef.isReadOnly(nodeDef)) {
+      return editableIfRadioModes.readOnly
+    }
+    return editableIfRadioModes.none
+  }, [nodeDef])
+
+  const onVisibleIfModeChange = useCallback(
+    (mode) => {
+      if (mode === visibleIfRadioModes.none || mode === visibleIfRadioModes.alwaysHidden) {
+        Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.visibleIf, value: [] })
+      }
+      Actions.setProp({ state, key: NodeDef.propKeys.hidden, value: mode === visibleIfRadioModes.alwaysHidden })
+    },
+    [Actions, state]
+  )
+
+  const determineVisibleIfMode = useCallback(() => {
+    const visibleIfValues = NodeDef.getPropAdvanced(NodeDef.keysPropsAdvanced.visibleIf, [])(nodeDef)
+    if (Objects.isNotEmpty(visibleIfValues)) {
+      return visibleIfRadioModes.defined
+    }
+    if (canSetAlwaysHiddenMode({ nodeDef }) && NodeDef.isHidden(nodeDef)) {
+      return visibleIfRadioModes.alwaysHidden
+    }
+    return visibleIfRadioModes.none
+  }, [nodeDef])
+
   return (
     <div className="form">
+      {experimentalFeatures && (
+        <NodeDefExpressionsProp
+          Actions={Actions}
+          excludeCurrentNodeDef
+          info="nodeDefEdit.advancedProps.editableIfInfo"
+          isContextParent
+          label="nodeDefEdit.advancedProps.editableIf"
+          nodeDefUuidContext={nodeDefUuidContext}
+          propName={NodeDef.keysPropsAdvanced.editableIf}
+          qualifier={TestId.nodeDefDetails.editableIf}
+          radioMode
+          radioModes={getEditableIfRadioModes({ nodeDef })}
+          radioModeDefined={editableIfRadioModes.defined}
+          radioLabels={{
+            [editableIfRadioModes.none]: 'nodeDefEdit.advancedProps.editableAlways',
+            [editableIfRadioModes.readOnly]: 'nodeDefEdit.advancedProps.readOnly',
+            [editableIfRadioModes.defined]: 'nodeDefEdit.advancedProps.editableIfConditionIsMet',
+          }}
+          determineRadioMode={determineEditableIfMode}
+          onRadioModeChange={onEditableIfModeChange}
+          isRadioModeDisabled={({ mode }) =>
+            readOnly || (mode === editableIfRadioModes.readOnly && NodeDef.isMultiple(nodeDef))
+          }
+          readOnly={readOnly}
+          state={state}
+        />
+      )}
+
       {NodeDef.canHaveDefaultValue(nodeDef) && (
         <>
-          <FormItem label="nodeDefEdit.advancedProps.readOnly">
-            <div className="form-item_body">
-              <Checkbox
-                checked={NodeDef.isReadOnly(nodeDef)}
-                disabled={readOnly || NodeDef.isMultiple(nodeDef)}
-                validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
-                onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
-              />
-              {(NodeDef.canBeHidden(nodeDef) || NodeDef.isHidden(nodeDef)) && (
-                <FormItem label="nodeDefEdit.advancedProps.hidden">
-                  <Checkbox
-                    checked={NodeDef.isHidden(nodeDef)}
-                    disabled={readOnly}
-                    validation={Validation.getFieldValidation(NodeDef.propKeys.hidden)(validation)}
-                    onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.hidden, value })}
-                  />
-                </FormItem>
-              )}
-            </div>
-          </FormItem>
-
           <NodeDefExpressionsProp
             qualifier={TestId.nodeDefDetails.defaultValues}
             state={state}
@@ -134,43 +212,28 @@ const AdvancedProps = (props) => {
       </NodeDefExpressionsProp>
 
       {experimentalFeatures && (
-        <>
-          {(!NodeDef.isReadOnly(nodeDef) || !NodeDef.isAlwaysEditable(nodeDef)) && (
-            <NodeDefExpressionsProp
-              Actions={Actions}
-              excludeCurrentNodeDef
-              info="nodeDefEdit.advancedProps.editableIfInfo"
-              isContextParent
-              label="nodeDefEdit.advancedProps.editableIf"
-              nodeDefUuidContext={nodeDefUuidContext}
-              propName={NodeDef.keysPropsAdvanced.editableIf}
-              qualifier={TestId.nodeDefDetails.editableIf}
-              radioLabels={{
-                none: 'nodeDefEdit.advancedProps.editableAlways',
-                defined: 'nodeDefEdit.advancedProps.editableIfConditionIsMet',
-              }}
-              readOnly={readOnly}
-              state={state}
-            />
-          )}
-
-          <NodeDefExpressionsProp
-            Actions={Actions}
-            excludeCurrentNodeDef
-            info="nodeDefEdit.advancedProps.visibleIfInfo"
-            isContextParent
-            label="nodeDefEdit.advancedProps.visibleIf"
-            nodeDefUuidContext={nodeDefUuidContext}
-            propName={NodeDef.keysPropsAdvanced.visibleIf}
-            qualifier={TestId.nodeDefDetails.visibleIf}
-            radioLabels={{
-              none: 'nodeDefEdit.advancedProps.visibleAlways',
-              defined: 'nodeDefEdit.advancedProps.visibleIfConditionIsMet',
-            }}
-            readOnly={readOnly}
-            state={state}
-          />
-        </>
+        <NodeDefExpressionsProp
+          Actions={Actions}
+          excludeCurrentNodeDef
+          info="nodeDefEdit.advancedProps.visibleIfInfo"
+          isContextParent
+          label="nodeDefEdit.advancedProps.visibleIf"
+          nodeDefUuidContext={nodeDefUuidContext}
+          propName={NodeDef.keysPropsAdvanced.visibleIf}
+          qualifier={TestId.nodeDefDetails.visibleIf}
+          radioMode
+          radioModes={getVisibleIfRadioModes({ nodeDef })}
+          radioModeDefined={visibleIfRadioModes.defined}
+          radioLabels={{
+            [visibleIfRadioModes.none]: 'nodeDefEdit.advancedProps.visibleAlways',
+            [visibleIfRadioModes.alwaysHidden]: 'nodeDefEdit.advancedProps.hidden',
+            [visibleIfRadioModes.defined]: 'nodeDefEdit.advancedProps.visibleIfConditionIsMet',
+          }}
+          determineRadioMode={determineVisibleIfMode}
+          onRadioModeChange={onVisibleIfModeChange}
+          readOnly={readOnly}
+          state={state}
+        />
       )}
 
       {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (

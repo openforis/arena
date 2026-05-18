@@ -985,7 +985,7 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valeurs par défaut non modifiables car la clé auto-incrémentielle est définie',
       editableIf: 'Modifiable si',
-      hidden: 'Masquer dans le formulaire de saisie',
+      hidden: 'Toujours masqué',
       hiddenInReport: 'Masquer dans le tableau de bord analytique',
       hiddenInReportInfo: `Si coché, l'attribut ne sera pas visible dans le tableau de bord analytique`,
       hiddenWhenNotRelevant: 'Masqué quand non pertinent',

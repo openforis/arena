@@ -949,7 +949,7 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Автоматаар өсөн нэмэгдэх түлхүүр тохируулагдсан тул үндсэн утгуудыг засах боломжгүй',
       editableIf: 'Хэрэв засварлах боломжтой бол',
-      hidden: 'Оролтын маягтанд нуух',
+      hidden: 'Үргэлж нуух',
       hiddenInReport: 'Аналитик хяналтын самбарт нуух',
       hiddenInReportInfo: `Хэрэв тэмдэглэгдсэн бол шинж чанар Аналитик хяналтын самбарт харагдахгүй`,
       hiddenWhenNotRelevant: 'Хамааралгүй үед нуух',
