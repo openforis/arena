@@ -62,7 +62,7 @@ const NodeDefExpressionsProp = (props) => {
     onChangeProp ? onChangeProp(expressions) : Actions.setProp({ state, key: propName, value: expressions })
 
   return (
-    <Fieldset className="node-def-edit__expressions-fieldset" label={label}>
+    <Fieldset className="node-def-edit__expressions-fieldset" info={info} label={label}>
       <div className="content">
         {radioMode && (
           <div className="form-item_body node-def-edit__expression-radio-mode">
@@ -82,7 +82,6 @@ const NodeDefExpressionsProp = (props) => {
         {(!radioMode || selectedRadioMode === radioModes.defined) && (
           <ExpressionsProp
             qualifier={qualifier}
-            info={info}
             readOnly={readOnly}
             applyIf={applyIf}
             multiple={multiple}
