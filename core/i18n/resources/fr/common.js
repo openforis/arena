@@ -907,10 +907,12 @@ $t(common.appNameFull)
       now: "Renvoie la date ou l'heure actuelle",
       parent: "Renvoie l'entité parente du nœud spécifié",
       pow: "Renvoie la valeur d'une base élevée à une puissance",
+      prevCycleNote:
+        'Fonctionne uniquement dans Arena Mobile lorsque plusieurs cycles sont définis et que le lien au cycle précédent est activé',
       prevCycleValue:
-        "Retourne la valeur du même attribut dans l'enregistrement du cycle précédent (fonctionne uniquement sur Arena Mobile, si plusieurs cycles sont définis et lorsque le lien au cycle précédent est activé)",
+        "Retourne la valeur du même attribut dans l'enregistrement du cycle précédent. $t(nodeDefEdit.functionDescriptions.prevCycleNote)",
       prevCycleValues:
-        "Retourne les valeurs des mêmes attributs dans l'enregistrement des cycles précédents (fonctionne uniquement sur Arena Mobile, si plusieurs cycles sont définis et lorsque le lien au cycle précédent est activé)",
+        "Retourne les valeurs des mêmes attributs dans l'enregistrement du cycle précédent. $t(nodeDefEdit.functionDescriptions.prevCycleNote)",
       recordCycle: "Renvoie le cycle de l'enregistrement actuel",
       recordDateCreated:
         "Renvoie la date et l'heure de création de l'enregistrement actuel sous forme de valeur datetime. Peut être utilisé dans un attribut texte, date ou heure",

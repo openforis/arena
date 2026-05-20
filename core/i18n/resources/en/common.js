@@ -900,10 +900,12 @@ $t(common.appNameFull)
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
       pow: 'Returns the value of a base raised to a power',
+      prevCycleNote:
+        'Works only in Arena Mobile when multiple cycles are defined and the previous-cycle link is enabled',
       prevCycleValue:
-        'Returns the value of the same attribute in the record in the previous cycle (it works only in Arena Mobile, if multiple cycles are defined and when linking to previous cycle is enabled)',
+        'Returns the value of the same attribute in the record of the previous cycle. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
       prevCycleValues:
-        'Returns the values of the same attributes in the record in the previous cycles (it works only in Arena Mobile, if multiple cycles are defined and when linking to previous cycle is enabled)',
+        'Returns the values of the same attributes in the record of the previous cycle. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
       recordCycle: 'Returns the cycle of the current record',
       recordDateCreated:
         'Returns the creation date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
