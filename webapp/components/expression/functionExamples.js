@@ -24,6 +24,8 @@ const functionExamples = {
     [functionNames.now]: 'now()',
     [functionNames.parent]: `parent(this), parent($context), parent(node_name)`,
     [functionNames.pow]: 'pow(2,3) = 2³ = 8',
+    [functionNames.prevCycleValue]: `prevCycleValue(attribute_name)`,
+    [functionNames.prevCycleValues]: `prevCycleValues(multiple_attribute_name)`,
     [functionNames.recordCycle]: 'recordCycle()',
     [functionNames.recordDateCreated]: 'recordDateCreated()',
     [functionNames.recordDateLastModified]: 'recordDateLastModified()',
@@ -45,7 +47,7 @@ const functionExamples = {
   },
 }
 
-const experimentalFunctions = new Set()
+const experimentalFunctions = new Set([functionNames.prevCycleValue, functionNames.prevCycleValues])
 
 const isFunctionAvailable =
   ({ experimentalFeatures }) =>
