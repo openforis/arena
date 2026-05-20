@@ -27,6 +27,7 @@ import { useEditUser } from './store'
 import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
+import UserAiSettingsPanel from '@webapp/components/ai/UserAiSettingsPanel'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -211,6 +212,7 @@ const UserEdit = () => {
           </FormItem>
         </fieldset>
       )}
+      {editingLoggedInUser && hideSurveyGroup && <UserAiSettingsPanel />}
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">
           {userUuid && (

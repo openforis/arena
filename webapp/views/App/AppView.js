@@ -11,6 +11,8 @@ import { useAuthCanUseAnalysis, useAuthCanUseMessages } from '@webapp/store/user
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
+import ChatbotFab from '@webapp/components/ai/Chatbot'
+
 import Header from './Header'
 import JobMonitor from './JobMonitor'
 import { FileUploadDialog } from './FileUploadDialog'
@@ -83,6 +85,7 @@ const AppView = () => {
       <JobMonitor />
       <FileUploadDialog />
       <ServiceErrors />
+      <ChatbotFab />
     </>
   )
 }

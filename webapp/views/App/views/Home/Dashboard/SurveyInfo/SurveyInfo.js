@@ -10,9 +10,11 @@ import { Objects } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as ProcessUtils from '@core/processUtils'
 
+import * as API from '@webapp/service/api'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useChains, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
@@ -21,6 +23,7 @@ import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 
 const SurveyInfo = (props) => {
   const { firstTime = false } = props
@@ -36,6 +39,7 @@ const SurveyInfo = (props) => {
   const canExportSurvey = useAuthCanExportSurvey()
   const chains = useChains()
   const hasChains = chains?.length > 0
+  const aiAnalysisEnabled = useAiFeatureEnabled('analysis')
 
   const surveyName = Survey.getName(surveyInfo)
   const surveyLabel = Survey.getLabel(surveyInfo, lang, false)
@@ -43,6 +47,30 @@ const SurveyInfo = (props) => {
 
   const confirm = useConfirm()
   const confirmDelete = useConfirmDelete()
+  const notifyInfo = useNotifyInfo()
+  const notifyError = useNotifyError()
+
+  const downloadDataDictionary = useCallback(
+    async (format) => {
+      try {
+        const surveyId = Survey.getId(surveyInfo)
+        notifyInfo({ key: 'aiDataDictionary.generating' })
+        const meta = await API.aiDataDictionary.generateAndDownload({
+          surveyId,
+          format,
+          lang,
+          fillMissingDescriptions: true,
+        })
+        notifyInfo({
+          key: 'aiDataDictionary.generated',
+          params: { count: meta.totalEntries, ai: meta.aiCount, filename: meta.filename },
+        })
+      } catch (err) {
+        notifyError({ key: 'aiDataDictionary.failed', params: { message: err?.message || 'unknown' } })
+      }
+    },
+    [lang, notifyError, notifyInfo, surveyInfo]
+  )
 
   const navigateToSurveyInfo = useCallback(() => navigate(appModuleUri(homeModules.surveyInfo)), [navigate])
 
@@ -130,6 +158,18 @@ const SurveyInfo = (props) => {
         testId: TestId.dashboard.surveyExportOnlySurveyBtn,
       },
     ]
+    if (aiAnalysisEnabled) {
+      items.push({
+        key: 'ai-data-dictionary-html',
+        label: 'aiDataDictionary.menuHtml',
+        onClick: () => downloadDataDictionary('html'),
+      })
+      items.push({
+        key: 'ai-data-dictionary-md',
+        label: 'aiDataDictionary.menuMd',
+        onClick: () => downloadDataDictionary('md'),
+      })
+    }
     if (!Survey.isTemplate(surveyInfo)) {
       items.push({
         key: 'survey-export-with-data',
@@ -162,7 +202,7 @@ const SurveyInfo = (props) => {
       }
     }
     return items
-  }, [dispatch, hasChains, surveyInfo])
+  }, [aiAnalysisEnabled, dispatch, hasChains, surveyInfo, downloadDataDictionary])
 
   return (
     <>

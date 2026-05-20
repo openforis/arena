@@ -107,6 +107,9 @@
     "yarn-audit-fix": "^10.1.1"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^2",
+    "@ai-sdk/google": "^2",
+    "@ai-sdk/openai": "^2",
     "@aws-sdk/client-s3": "^3.975.0",
     "@codemirror/autocomplete": "^6.20.0",
     "@codemirror/lang-javascript": "^6.2.4",
@@ -130,6 +133,7 @@
     "@uiw/react-codemirror": "^4.25.4",
     "ace-builds": "^1.43.6",
     "adm-zip": "^0.5.16",
+    "ai": "^5",
     "archiver": "^7.0.1",
     "axios": "^1.13.4",
     "buffer": "^6.0.3",
@@ -201,7 +205,8 @@
     "to-snake-case": "^1.0.0",
     "use-supercluster": "^1.2.0",
     "uuid": "^10.0.0",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "zod": "^3.23.8"
   },
   "arenaClientPackages": {
     "META": "This exists to minimize the final Docker server image",
