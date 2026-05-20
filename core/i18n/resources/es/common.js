@@ -753,6 +753,12 @@ $t(common.appNameFull)
       now: 'Devuelve la fecha u hora actual',
       parent: 'Devuelve la entidad padre del nodo especificado',
       pow: 'Devuelve el valor de una base elevada a una potencia',
+      prevCycleNote:
+        'Funciona solo en Arena Mobile cuando se definen múltiples ciclos y el enlace al ciclo anterior está habilitado',
+      prevCycleValue:
+        'Devuelve el valor del mismo atributo en el registro del ciclo anterior. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
+      prevCycleValues:
+        'Devuelve los valores de los mismos atributos en el registro del ciclo anterior. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
       recordCycle: 'Devuelve el ciclo del registro actual',
       recordDateCreated:
         'Devuelve la fecha y hora de creación del registro actual como un valor de fecha y hora. Se puede usar en un atributo de texto, fecha u hora',
