@@ -20,6 +20,8 @@ export const functionNames = {
   now: 'now',
   parent: 'parent',
   pow: 'pow',
+  prevCycleValue: 'prevCycleValue',
+  prevCycleValues: 'prevCycleValues',
   recordCycle: 'recordCycle',
   recordDateCreated: 'recordDateCreated',
   recordDateLastModified: 'recordDateLastModified',
