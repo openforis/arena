@@ -8,6 +8,30 @@
 const MAX_MESSAGES = 40
 const MAX_MESSAGE_CHARS = 8000
 
+const ALLOWED_ROLES = new Set(['user', 'assistant', 'system'])
+
+const badRequest = (message) => {
+  const err = new Error(message)
+  err.key = 'aiChatbotPayloadTooLarge'
+  err.statusCode = 400
+  return err
+}
+
+const isTextPart = (p) => p && typeof p === 'object' && p.type === 'text' && typeof p.text === 'string'
+
+const validateMessage = (m, i) => {
+  if (!m || typeof m !== 'object') throw badRequest(`message ${i} is not an object`)
+  if (!ALLOWED_ROLES.has(m.role)) throw badRequest(`message ${i} has invalid role`)
+  if (!Array.isArray(m.parts) || m.parts.length === 0) throw badRequest(`message ${i} is missing parts`)
+
+  let totalChars = 0
+  for (const p of m.parts) {
+    if (!isTextPart(p)) throw badRequest(`message ${i} has a non-text or malformed part`)
+    totalChars += p.text.length
+  }
+  if (totalChars > MAX_MESSAGE_CHARS) throw badRequest(`message ${i} exceeds ${MAX_MESSAGE_CHARS} chars`)
+}
+
 /**
  * Validate the v5 message array. Returns the validated array or throws an
  * Error whose `key` matches an `appErrors` translation key.
@@ -16,53 +40,11 @@ const MAX_MESSAGE_CHARS = 8000
  */
 export const validateMessages = (messages) => {
   if (!Array.isArray(messages) || messages.length === 0) {
-    const err = new Error('messages must be a non-empty array')
-    err.key = 'aiChatbotPayloadTooLarge'
-    err.statusCode = 400
-    throw err
+    throw badRequest('messages must be a non-empty array')
   }
   if (messages.length > MAX_MESSAGES) {
-    const err = new Error(`messages length ${messages.length} exceeds ${MAX_MESSAGES}`)
-    err.key = 'aiChatbotPayloadTooLarge'
-    err.statusCode = 400
-    throw err
+    throw badRequest(`messages length ${messages.length} exceeds ${MAX_MESSAGES}`)
   }
-  for (let i = 0; i < messages.length; i += 1) {
-    const m = messages[i]
-    if (!m || typeof m !== 'object') {
-      const err = new Error(`message ${i} is not an object`)
-      err.key = 'aiChatbotPayloadTooLarge'
-      err.statusCode = 400
-      throw err
-    }
-    if (m.role !== 'user' && m.role !== 'assistant' && m.role !== 'system') {
-      const err = new Error(`message ${i} has invalid role`)
-      err.key = 'aiChatbotPayloadTooLarge'
-      err.statusCode = 400
-      throw err
-    }
-    if (!Array.isArray(m.parts) || m.parts.length === 0) {
-      const err = new Error(`message ${i} is missing parts`)
-      err.key = 'aiChatbotPayloadTooLarge'
-      err.statusCode = 400
-      throw err
-    }
-    let totalChars = 0
-    for (const p of m.parts) {
-      if (!p || typeof p !== 'object' || p.type !== 'text' || typeof p.text !== 'string') {
-        const err = new Error(`message ${i} has a non-text or malformed part`)
-        err.key = 'aiChatbotPayloadTooLarge'
-        err.statusCode = 400
-        throw err
-      }
-      totalChars += p.text.length
-    }
-    if (totalChars > MAX_MESSAGE_CHARS) {
-      const err = new Error(`message ${i} exceeds ${MAX_MESSAGE_CHARS} chars`)
-      err.key = 'aiChatbotPayloadTooLarge'
-      err.statusCode = 400
-      throw err
-    }
-  }
+  messages.forEach(validateMessage)
   return messages
 }

@@ -7,10 +7,10 @@
 
 const escapeHtml = (s) =>
   String(s == null ? '' : s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replaceAll(/&/g, '&amp;')
+    .replaceAll(/</g, '&lt;')
+    .replaceAll(/>/g, '&gt;')
+    .replaceAll(/"/g, '&quot;')
 
 /**
  * Renders the dictionary as Markdown.
@@ -25,7 +25,7 @@ export const renderMarkdown = ({ surveyName, lang, entries }) => {
   const tableHead = '| Path | Name | Type | Label | Description |\n' + '|---|---|---|---|---|\n'
   const rows = entries
     .map((e) => {
-      const desc = (e.description || '').replace(/\|/g, '\\|').replace(/\n/g, ' ')
+      const desc = (e.description || '').replaceAll(/\|/g, '\\|').replaceAll(/\n/g, ' ')
       const aiSuffix = e.aiGenerated ? ' _(AI)_' : ''
       return `| ${e.parentPath || '-'} | \`${e.name}\` | ${e.type} | ${e.label || ''} | ${desc}${aiSuffix} |`
     })

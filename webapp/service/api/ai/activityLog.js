@@ -21,6 +21,8 @@ export const summarizeStream = ({ surveyId, from, to, userUuid, onChunk, onDone,
   if (from) params.set('from', from)
   if (to) params.set('to', to)
   if (userUuid) params.set('userUuid', userUuid)
-  const url = `/api/ai/survey/${surveyId}/activityLog/summarize${params.toString() ? `?${params.toString()}` : ''}`
+  const qs = params.toString()
+  const suffix = qs ? `?${qs}` : ''
+  const url = `/api/ai/survey/${surveyId}/activityLog/summarize${suffix}`
   return streamSse(url, { onChunk, onDone, onError })
 }

@@ -104,9 +104,36 @@ export const createV5StreamParser = ({ onEvent, onDone }) => {
 const flattenContent = (content) => {
   if (typeof content === 'string') return content
   if (!Array.isArray(content)) return ''
-  return content
-    .map((part) => (part && part.type === 'text' && typeof part.text === 'string' ? part.text : ''))
-    .join('')
+  return content.map((part) => (part?.type === 'text' && typeof part.text === 'string' ? part.text : '')).join('')
+}
+
+const toV5Message = (role, text) => ({ role, parts: [{ type: 'text', text }] })
+
+// Tool messages are skipped — no tool-calling in this adapter.
+const partitionByRole = (prompt) => {
+  const systemTexts = []
+  const rest = []
+  for (const msg of prompt) {
+    if (!msg) continue
+    const text = flattenContent(msg.content)
+    if (!text) continue
+    if (msg.role === 'system') systemTexts.push(text)
+    else if (msg.role === 'user' || msg.role === 'assistant') rest.push({ role: msg.role, text })
+  }
+  return { systemTexts, rest }
+}
+
+const prependPreamble = (rest, preamble) => {
+  const messages = []
+  let preambleApplied = !preamble
+  for (const m of rest) {
+    const isFirstUser = !preambleApplied && m.role === 'user'
+    const text = isFirstUser ? `${preamble}\n\n${m.text}` : m.text
+    if (isFirstUser) preambleApplied = true
+    messages.push(toV5Message(m.role, text))
+  }
+  if (!preambleApplied) messages.push(toV5Message('user', preamble))
+  return messages
 }
 
 /**
@@ -118,35 +145,9 @@ const flattenContent = (content) => {
  */
 const vercelAiSdkMessagesFromPrompt = (prompt) => {
   if (!Array.isArray(prompt)) return []
-  const systemTexts = []
-  const rest = []
-  for (const msg of prompt) {
-    if (!msg) continue
-    if (msg.role === 'system') {
-      const text = flattenContent(msg.content)
-      if (text) systemTexts.push(text)
-    } else if (msg.role === 'user' || msg.role === 'assistant') {
-      const text = flattenContent(msg.content)
-      if (text) rest.push({ role: msg.role, text })
-    }
-    // tool messages are skipped — no tool-calling here.
-  }
-
-  const systemPreamble = systemTexts.join('\n\n').trim()
-  const messages = []
-  let preambleApplied = !systemPreamble
-  for (const m of rest) {
-    let text = m.text
-    if (!preambleApplied && m.role === 'user') {
-      text = `${systemPreamble}\n\n${text}`
-      preambleApplied = true
-    }
-    messages.push({ role: m.role, parts: [{ type: 'text', text }] })
-  }
-  if (!preambleApplied && systemPreamble) {
-    messages.push({ role: 'user', parts: [{ type: 'text', text: systemPreamble }] })
-  }
-  return messages
+  const { systemTexts, rest } = partitionByRole(prompt)
+  const preamble = systemTexts.join('\n\n').trim()
+  return prependPreamble(rest, preamble)
 }
 
 /**

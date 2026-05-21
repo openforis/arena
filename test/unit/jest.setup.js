@@ -1,5 +1,5 @@
-const crypto = require('crypto')
-const streamWeb = require('stream/web')
+const crypto = require('node:crypto')
+const streamWeb = require('node:stream/web')
 
 if (typeof global.crypto === 'undefined') {
   global.crypto = crypto.webcrypto

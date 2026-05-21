@@ -22,8 +22,8 @@ const allowedFunctions = Object.keys(ExpressionParser.functionNames || {})
  * @returns {{ system: string, prompt: string }} The pair for `stream`.
  */
 export const buildExpressionExplainPrompt = ({ survey, nodeDef, expression, errorMessage }) => {
-  const nodeName = NodeDef.getName(nodeDef)
-  const nodeType = NodeDef.getType(nodeDef)
+  const nodeName = String(NodeDef.getName(nodeDef) || '')
+  const nodeType = String(NodeDef.getType(nodeDef) || '')
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
   const siblings = parentNodeDef
     ? Survey.getNodeDefChildren({ nodeDef: parentNodeDef })(survey).filter(

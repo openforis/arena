@@ -49,10 +49,77 @@ const getParentPath = (nodeDef, survey) => {
   const parts = []
   let cur = Survey.getNodeDefParent(nodeDef)(survey)
   while (cur && !NodeDef.isRoot(cur)) {
-    parts.unshift(NodeDef.getName(cur))
+    parts.unshift(String(NodeDef.getName(cur) || ''))
     cur = Survey.getNodeDefParent(cur)(survey)
   }
   return parts.join('/')
+}
+
+const buildEntries = (survey, langToUse) =>
+  Survey.getNodeDefsArray(survey)
+    .filter((nd) => !NodeDef.isDeleted(nd) && !NodeDef.isRoot(nd))
+    .map((nd) => ({
+      uuid: NodeDef.getUuid(nd),
+      name: NodeDef.getName(nd),
+      type: NodeDef.getType(nd),
+      label: NodeDef.getLabel(nd, langToUse) || '',
+      description: NodeDef.getDescription(langToUse)(nd) || '',
+      parentPath: getParentPath(nd, survey),
+      aiGenerated: false,
+    }))
+
+const runDescriptionBatch = async ({ user, surveyName, batch, previousError }) => {
+  const batchNodeDefs = batch.map((e) => ({ uuid: e.uuid, name: e.name, type: e.type, parentPath: e.parentPath }))
+  const { system, prompt } = buildDataDictionaryPrompt({ surveyName, nodeDefs: batchNodeDefs, previousError })
+  const { text } = await ModelClient.generate({ user, feature: 'dataDictionary', prompt, system })
+  const json = parseJsonResponse(text)
+  return DescriptionsSchema.parse(json)
+}
+
+const runDescriptionBatchWithRetry = async ({ user, surveyName, batch, batchIndex }) => {
+  try {
+    return await runDescriptionBatch({ user, surveyName, batch })
+  } catch (firstError) {
+    logger.info(
+      `dataDictionary batch ${batchIndex} parse/validate failed on first try: ${firstError?.message || firstError}; retrying once with feedback`
+    )
+    return runDescriptionBatch({
+      user,
+      surveyName,
+      batch,
+      previousError: { message: firstError?.message || String(firstError) },
+    })
+  }
+}
+
+const applyDescriptions = (batch, descriptions) => {
+  const byUuid = new Map(descriptions.map((d) => [d.uuid, d.description]))
+  let filled = 0
+  for (const entry of batch) {
+    const desc = byUuid.get(entry.uuid)
+    if (desc) {
+      entry.description = desc
+      entry.aiGenerated = true
+      filled += 1
+    }
+  }
+  return filled
+}
+
+const fillMissingDescriptions = async ({ user, surveyName, entries }) => {
+  const missing = entries.filter((e) => !e.description.trim()).slice(0, MAX_AI_DESCRIPTIONS)
+  let aiCount = 0
+  for (let i = 0; i < missing.length; i += AI_BATCH_SIZE) {
+    const batch = missing.slice(i, i + AI_BATCH_SIZE)
+    try {
+      const result = await runDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex: i })
+      aiCount += applyDescriptions(batch, result.descriptions)
+    } catch (error) {
+      logger.warn(`dataDictionary batch ${i}: ${error?.message || error}`)
+      // keep going with whatever filled successfully
+    }
+  }
+  return aiCount
 }
 
 /**
@@ -67,7 +134,7 @@ const getParentPath = (nodeDef, survey) => {
  * @returns {Promise<{filename: string, contentType: string, content: string, aiCount: number}>}
  *   The rendered dictionary plus metadata for the download.
  */
-export const generate = async ({ user, surveyId, format, lang, fillMissingDescriptions = true }) => {
+export const generate = async ({ user, surveyId, format, lang, fillMissingDescriptions: shouldFill = true }) => {
   if (!SUPPORTED_FORMATS.has(format)) {
     throw new SystemError('aiDataDictionaryFormatInvalid', { format })
   }
@@ -80,76 +147,8 @@ export const generate = async ({ user, surveyId, format, lang, fillMissingDescri
   const surveyName = Survey.getName(Survey.getSurveyInfo(survey)) || `survey-${surveyId}`
   const langToUse = lang || Survey.getDefaultLanguage(survey) || 'en'
 
-  // Flatten node defs in document order, skipping deleted and root
-  const nodeDefs = Survey.getNodeDefsArray(survey).filter((nd) => !NodeDef.isDeleted(nd) && !NodeDef.isRoot(nd))
-
-  const entries = nodeDefs.map((nd) => ({
-    uuid: NodeDef.getUuid(nd),
-    name: NodeDef.getName(nd),
-    type: NodeDef.getType(nd),
-    label: NodeDef.getLabel(nd, langToUse) || '',
-    description: NodeDef.getDescription(langToUse)(nd) || '',
-    parentPath: getParentPath(nd, survey),
-    aiGenerated: false,
-  }))
-
-  let aiCount = 0
-
-  // AI fill-in: pick the first MAX_AI_DESCRIPTIONS entries lacking a
-  // description; batch them through the model.
-  if (fillMissingDescriptions) {
-    const missing = entries.filter((e) => !e.description.trim()).slice(0, MAX_AI_DESCRIPTIONS)
-
-    for (let i = 0; i < missing.length; i += AI_BATCH_SIZE) {
-      const batch = missing.slice(i, i + AI_BATCH_SIZE)
-      const batchNodeDefs = batch.map((e) => ({
-        uuid: e.uuid,
-        name: e.name,
-        type: e.type,
-        parentPath: e.parentPath,
-      }))
-
-      const runOnce = async (previousError) => {
-        const { system, prompt } = buildDataDictionaryPrompt({
-          surveyName,
-          nodeDefs: batchNodeDefs,
-          previousError,
-        })
-        const { text } = await ModelClient.generate({
-          user,
-          feature: 'dataDictionary',
-          prompt,
-          system,
-        })
-        const json = parseJsonResponse(text)
-        return DescriptionsSchema.parse(json)
-      }
-
-      try {
-        let result
-        try {
-          result = await runOnce()
-        } catch (firstError) {
-          logger.info(
-            `dataDictionary batch ${i} parse/validate failed on first try: ${firstError?.message || firstError}; retrying once with feedback`
-          )
-          result = await runOnce({ message: firstError?.message || String(firstError) })
-        }
-        const byUuid = new Map(result.descriptions.map((d) => [d.uuid, d.description]))
-        for (const entry of batch) {
-          const desc = byUuid.get(entry.uuid)
-          if (desc) {
-            entry.description = desc
-            entry.aiGenerated = true
-            aiCount += 1
-          }
-        }
-      } catch (error) {
-        logger.warn(`dataDictionary batch ${i}: ${error?.message || error}`)
-        // keep going with whatever filled successfully
-      }
-    }
-  }
+  const entries = buildEntries(survey, langToUse)
+  const aiCount = shouldFill ? await fillMissingDescriptions({ user, surveyName, entries }) : 0
 
   const content =
     format === 'html'
@@ -157,7 +156,7 @@ export const generate = async ({ user, surveyId, format, lang, fillMissingDescri
       : renderMarkdown({ surveyName, lang: langToUse, entries })
 
   const ext = format === 'html' ? 'html' : 'md'
-  const safeName = surveyName.replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 60) || 'survey'
+  const safeName = surveyName.replaceAll(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 60) || 'survey'
   const filename = `data_dictionary_${safeName}_${langToUse}.${ext}`
 
   return {

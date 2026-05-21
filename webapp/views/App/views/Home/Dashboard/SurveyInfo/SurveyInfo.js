@@ -14,12 +14,11 @@ import * as API from '@webapp/service/api'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useChains, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
+import { useConfirm, useConfirmDelete, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
-import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
@@ -159,16 +158,18 @@ const SurveyInfo = (props) => {
       },
     ]
     if (aiAnalysisEnabled) {
-      items.push({
-        key: 'ai-data-dictionary-html',
-        label: 'aiDataDictionary.menuHtml',
-        onClick: () => downloadDataDictionary('html'),
-      })
-      items.push({
-        key: 'ai-data-dictionary-md',
-        label: 'aiDataDictionary.menuMd',
-        onClick: () => downloadDataDictionary('md'),
-      })
+      items.push(
+        {
+          key: 'ai-data-dictionary-html',
+          label: 'aiDataDictionary.menuHtml',
+          onClick: () => downloadDataDictionary('html'),
+        },
+        {
+          key: 'ai-data-dictionary-md',
+          label: 'aiDataDictionary.menuMd',
+          onClick: () => downloadDataDictionary('md'),
+        }
+      )
     }
     if (!Survey.isTemplate(surveyInfo)) {
       items.push({

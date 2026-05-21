@@ -44,35 +44,14 @@ const EXPLANATION_TAG_RE = /<explanation>([\s\S]*?)<\/explanation>/i
 const FENCE_RE = /^```[a-zA-Z]*\s*([\s\S]*?)\s*```$/
 
 /**
- * Strip a single wrapping ``` code fence if the model decided to add one
- * despite being told not to.
- *
+ * Strip a single wrapping triple-backtick code fence if the model decided
+ * to add one despite being told not to.
  * @param {string} value - Raw extracted text.
  * @returns {string} Cleaned text.
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
- * @param value
  */
 const stripFence = (value) => {
   const trimmed = value.trim()
-  const match = trimmed.match(FENCE_RE)
+  const match = FENCE_RE.exec(trimmed)
   return (match ? match[1] : trimmed).trim()
 }
 
@@ -86,8 +65,8 @@ const stripFence = (value) => {
  */
 const parseTaggedResponse = (text) => {
   const stripped = stripFence(text || '')
-  const exprMatch = stripped.match(EXPRESSION_TAG_RE)
-  const explMatch = stripped.match(EXPLANATION_TAG_RE)
+  const exprMatch = EXPRESSION_TAG_RE.exec(stripped)
+  const explMatch = EXPLANATION_TAG_RE.exec(stripped)
   const expression = exprMatch ? stripFence(exprMatch[1]) : stripped
   const explanation = explMatch ? explMatch[1].trim() : ''
   return { expression, explanation }
@@ -119,7 +98,7 @@ const tryParse = (expression) => {
  *   The generated expression and validation status.
  */
 export const generate = async ({ user, surveyId, nodeDefUuid, expressionType, description }) => {
-  if (!description || !description.trim()) {
+  if (!description?.trim()) {
     throw new SystemError('aiExpressionDescriptionMissing')
   }
   if (description.length > MAX_DESCRIPTION_LEN) {

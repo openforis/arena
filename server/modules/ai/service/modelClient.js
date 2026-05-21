@@ -38,7 +38,7 @@ const assertFeaturesEnabled = (feature, user) => {
     throw new SystemError('aiFeaturesDisabled', { feature })
   }
   const flags = ENV.aiFeatureFlags
-  if (flags && Object.prototype.hasOwnProperty.call(flags, feature) && !flags[feature]) {
+  if (flags && Object.hasOwn(flags, feature) && !flags[feature]) {
     throw new SystemError('aiFeatureDisabled', { feature })
   }
   // User-level master + category gating (defense in depth: the UI hides

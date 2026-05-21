@@ -11,17 +11,6 @@ const makeNodeDef = ({ uuid, name, type = 'decimal' }) => ({
   type,
 })
 
-const surveyWith = ({ targetUuid, parentUuid, siblings }) => {
-  const target = makeNodeDef({ uuid: targetUuid, name: 'tree_height' })
-  const parent = makeNodeDef({ uuid: parentUuid, name: 'plot', type: 'entity' })
-  const allDefs = [target, parent, ...siblings]
-  return {
-    nodeDefs: Object.fromEntries(allDefs.map((nd) => [nd.uuid, nd])),
-    target,
-    parent,
-  }
-}
-
 describe('buildExpressionGeneratePrompt', () => {
   test('emits a non-empty system prompt and references the function list', () => {
     const target = makeNodeDef({ uuid: 'a', name: 'tree_height' })

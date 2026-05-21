@@ -38,7 +38,7 @@ const adminDefaultConfig = () =>
  * @throws {SystemError} `aiNotConfigured` when no provider is available.
  */
 export const resolveModelForUser = async ({ user, feature }) => {
-  const userCfg = await AiSettingsService.getEffectiveUserConfig(user)
+  const userCfg = AiSettingsService.getEffectiveUserConfig(user)
   if (userCfg) {
     return {
       model: ProviderRegistry.buildModel(userCfg),
@@ -72,7 +72,7 @@ export const resolveModelForUser = async ({ user, feature }) => {
  * @returns {Promise<{source: string, provider: ?string, model: ?string}>} Provenance info.
  */
 export const describeEffectiveSource = async (user) => {
-  const userCfg = await AiSettingsService.getEffectiveUserConfig(user, { decrypt: false })
+  const userCfg = AiSettingsService.getEffectiveUserConfig(user, { decrypt: false })
   if (userCfg) {
     return { source: sources.user, provider: userCfg.provider, model: userCfg.model }
   }

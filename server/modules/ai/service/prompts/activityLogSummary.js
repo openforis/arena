@@ -36,7 +36,7 @@ Style:
     .map(
       (a) =>
         `  - user=${pq(a.user, 64)} type=${pq(a.type, 64)} count=${a.count}` +
-        (a.samples && a.samples.length ? ` samples=${a.samples.slice(0, 3).join(', ')}` : '')
+        (a.samples?.length ? ` samples=${a.samples.slice(0, 3).join(', ')}` : '')
     )
     .join('\n')
 

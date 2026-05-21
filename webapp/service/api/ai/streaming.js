@@ -83,6 +83,78 @@ const drainFrames = (buffer, handlers) => {
 }
 
 /**
+ * Read the response body and try to extract the server's translation key
+ * from a JSON `{ error }` envelope. Returns null on any failure so the
+ * caller can fall back to the HTTP status text.
+ * @param {Response} response - Failed fetch response.
+ * @returns {Promise<?string>} Translation key, or null.
+ */
+const parseErrorKey = async (response) => {
+  let bodyText = ''
+  try {
+    bodyText = await response.text()
+  } catch {
+    return null
+  }
+  try {
+    const parsed = JSON.parse(bodyText)
+    return parsed?.error || null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Drive the SSE reader loop on a successful response, dispatching frames
+ * to `handlers` until the server closes the stream, the consumer cancels,
+ * or a terminal frame (`[DONE]` / error) is observed.
+ * @param {Response} response - Successful fetch response.
+ * @param {object} handlers - Same shape as `streamSse`'s handlers.
+ * @param {{ cancelled: boolean }} state - Shared cancellation flag.
+ * @param {Function} cancel - Cancel callback (invoked on terminal frame).
+ * @returns {Promise<void>} Resolves when the loop ends.
+ */
+const pumpResponse = async (response, handlers, state, cancel) => {
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  while (!state.cancelled) {
+    const { value, done } = await reader.read()
+    if (done) break
+    buffer += decoder.decode(value, { stream: true })
+    const drained = drainFrames(buffer, handlers)
+    buffer = drained.remainder
+    if (drained.terminated) {
+      cancel()
+      return
+    }
+  }
+  // Server closed the stream without an explicit [DONE] marker — treat
+  // as a clean finish so the panel stops the spinner.
+  if (!state.cancelled) handlers.onDone?.()
+}
+
+const makeCanceller = () => {
+  const controller = new AbortController()
+  const state = { cancelled: false }
+  const cancel = () => {
+    if (state.cancelled) return
+    state.cancelled = true
+    controller.abort()
+  }
+  return { controller, state, cancel }
+}
+
+const authHeaders = (extra = {}) => {
+  const token = ApiConstants.getAuthToken()
+  return {
+    ...extra,
+    Accept: 'text/event-stream',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }
+}
+
+/**
  * Opens an authenticated SSE-over-fetch connection and forwards `data:`
  * events to the supplied callbacks. Returns a `cancel` function the
  * caller MUST invoke to abort the underlying request when the consumer
@@ -95,28 +167,16 @@ const drainFrames = (buffer, handlers) => {
  * @returns {Function} A cancel function that aborts the fetch and stops dispatching events.
  */
 export const streamSse = (url, handlers = {}) => {
-  const controller = new AbortController()
-  let cancelled = false
-
-  const cancel = () => {
-    if (cancelled) return
-    cancelled = true
-    controller.abort()
-  }
+  const { controller, state, cancel } = makeCanceller()
 
   const run = async () => {
     try {
-      const token = ApiConstants.getAuthToken()
       const response = await fetch(url, {
         method: 'GET',
-        headers: {
-          Accept: 'text/event-stream',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        headers: authHeaders(),
         signal: controller.signal,
         credentials: 'same-origin',
       })
-
       if (!response.ok) {
         handlers.onError?.(new Error(`HTTP ${response.status} ${response.statusText || ''}`.trim()))
         return
@@ -125,27 +185,9 @@ export const streamSse = (url, handlers = {}) => {
         handlers.onError?.(new Error('Streaming response has no body'))
         return
       }
-
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
-
-      while (!cancelled) {
-        const { value, done } = await reader.read()
-        if (done) break
-        buffer += decoder.decode(value, { stream: true })
-        const drained = drainFrames(buffer, handlers)
-        buffer = drained.remainder
-        if (drained.terminated) {
-          cancel()
-          return
-        }
-      }
-      // Server closed the stream without an explicit [DONE] marker — treat
-      // as a clean finish so the panel stops the spinner.
-      if (!cancelled) handlers.onDone?.()
+      await pumpResponse(response, handlers, state, cancel)
     } catch (err) {
-      if (cancelled || err?.name === 'AbortError') return
+      if (state.cancelled || err?.name === 'AbortError') return
       handlers.onError?.(err)
     }
   }
@@ -165,70 +207,29 @@ export const streamSse = (url, handlers = {}) => {
  * @returns {Function} A cancel function.
  */
 export const streamSsePost = (url, body, handlers = {}) => {
-  const controller = new AbortController()
-  let cancelled = false
-
-  const cancel = () => {
-    if (cancelled) return
-    cancelled = true
-    controller.abort()
-  }
+  const { controller, state, cancel } = makeCanceller()
 
   const run = async () => {
     try {
-      const token = ApiConstants.getAuthToken()
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'text/event-stream',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(body),
         signal: controller.signal,
         credentials: 'same-origin',
       })
-
       if (!response.ok) {
-        let bodyText = ''
-        try {
-          bodyText = await response.text()
-        } catch {
-          // ignore body read failures
-        }
-        let parsedKey = null
-        try {
-          const parsed = JSON.parse(bodyText)
-          if (parsed?.error) parsedKey = parsed.error
-        } catch {
-          // not JSON — fall back to status text
-        }
-        handlers.onError?.(new Error(parsedKey || `HTTP ${response.status} ${response.statusText || ''}`.trim()))
+        const errorKey = await parseErrorKey(response)
+        handlers.onError?.(new Error(errorKey || `HTTP ${response.status} ${response.statusText || ''}`.trim()))
         return
       }
       if (!response.body) {
         handlers.onError?.(new Error('Streaming response has no body'))
         return
       }
-
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
-
-      while (!cancelled) {
-        const { value, done } = await reader.read()
-        if (done) break
-        buffer += decoder.decode(value, { stream: true })
-        const drained = drainFrames(buffer, handlers)
-        buffer = drained.remainder
-        if (drained.terminated) {
-          cancel()
-          return
-        }
-      }
-      if (!cancelled) handlers.onDone?.()
+      await pumpResponse(response, handlers, state, cancel)
     } catch (err) {
-      if (cancelled || err?.name === 'AbortError') return
+      if (state.cancelled || err?.name === 'AbortError') return
       handlers.onError?.(err)
     }
   }

@@ -124,7 +124,7 @@ export const areFeaturesEnabledForUser = (user) => !!getRawPrefs(user)?.features
  */
 export const isCategoryEnabledForUser = (user, category) => {
   const raw = getRawPrefs(user)
-  if (!raw || !raw.featuresEnabled) return false
+  if (!raw?.featuresEnabled) return false
   const toggles = sanitiseFeatureToggles(raw.featureToggles)
   return !!toggles[category]
 }
@@ -147,7 +147,7 @@ export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
     provider: raw.provider,
     model: raw.model,
     baseUrl: raw.baseUrl || null,
-    apiKey: decrypt && raw.apiKeyEncrypted ? SecretBox.decrypt(raw.apiKeyEncrypted) : raw.apiKeyEncrypted ? null : null,
+    apiKey: decrypt && raw.apiKeyEncrypted ? SecretBox.decrypt(raw.apiKeyEncrypted) : null,
   }
 }
 

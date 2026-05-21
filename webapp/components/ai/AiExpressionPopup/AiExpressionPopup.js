@@ -60,7 +60,12 @@ const AiExpressionPopup = ({ qualifier, nodeDefUuid, onCancel, onApply }) => {
 
   return (
     <>
-      <div className="ai-expression-popup__backdrop" onClick={onCancel} />
+      <button
+        type="button"
+        className="ai-expression-popup__backdrop"
+        aria-label={i18n.t('common.cancel')}
+        onClick={onCancel}
+      />
       <div className="ai-expression-popup" role="dialog" aria-modal="true">
         <div className="ai-expression-popup__title">{i18n.t('aiExpression.title')}</div>
         <div className="ai-expression-popup__hint">{i18n.t('aiExpression.hint')}</div>
