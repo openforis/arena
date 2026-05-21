@@ -2,6 +2,7 @@ import { format } from '@fast-csv/format'
 
 import { FlatDataWriterUtils } from './flatDataWriterUtils'
 import { CsvField } from './csvField'
+import { StreamUtils } from '../streamUtils'
 
 const transformJsonToCsv = ({ fields, options: optionsParam = FlatDataWriterUtils.defaultOptions }) => {
   const options = { ...FlatDataWriterUtils.defaultOptions, ...optionsParam }
@@ -26,9 +27,13 @@ export const writeItemsToStream = ({
   new Promise((resolve, reject) => {
     const fields = fieldsParam ?? Object.keys(items[0] ?? {})
     const transform = transformJsonToCsv({ fields, options })
+    const outputCompletePromise = StreamUtils.waitForWritableStreamComplete(outputStream)
     transform.pipe(outputStream)
     transform.on('error', reject)
-    transform.on('finish', resolve)
+    outputStream.on('error', reject)
+    transform.on('finish', () => {
+      outputCompletePromise.then(resolve).catch(reject)
+    })
 
     for (const row of items) {
       transform.write(row)
@@ -36,7 +41,9 @@ export const writeItemsToStream = ({
     transform.end()
   })
 
-export const pipeDataStreamToStream = ({ stream, fields, options, outputStream }) => {
+export const pipeDataStreamToStream = async ({ stream, fields, options, outputStream }) => {
   const csvTransform = transformJsonToCsv({ fields, options })
-  return stream.pipe(csvTransform).pipe(outputStream)
+  const outputCompletePromise = StreamUtils.waitForWritableStreamComplete(outputStream)
+  stream.pipe(csvTransform).pipe(outputStream)
+  return outputCompletePromise
 }

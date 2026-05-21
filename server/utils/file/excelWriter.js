@@ -4,6 +4,7 @@ import { Objects } from '@openforis/arena-core'
 
 import { FlatDataWriterUtils } from './flatDataWriterUtils'
 import { CsvField } from './csvField'
+import { StreamUtils } from '../streamUtils'
 
 const headerCellStyle = { font: { bold: true } }
 
@@ -82,5 +83,7 @@ export const writeItemsToStream = async ({
     column.width = maxLength < 10 ? 10 : maxLength
   }
 
-  return workbook.xlsx.write(outputStream)
+  const outputCompletePromise = StreamUtils.waitForWritableStreamComplete(outputStream)
+  await workbook.xlsx.write(outputStream)
+  return outputCompletePromise
 }

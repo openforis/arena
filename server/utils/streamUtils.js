@@ -17,6 +17,26 @@ const waitForStreamClose = async (stream) =>
     stream.on('error', reject)
   })
 
+const waitForWritableStreamComplete = async (stream) =>
+  new Promise((resolve, reject) => {
+    let settled = false
+    const resolveOnce = () => {
+      if (!settled) {
+        settled = true
+        resolve()
+      }
+    }
+    const rejectOnce = (error) => {
+      if (!settled) {
+        settled = true
+        reject(error)
+      }
+    }
+    stream.on('finish', resolveOnce)
+    stream.on('close', resolveOnce)
+    stream.on('error', rejectOnce)
+  })
+
 const readStreamToItems = async ({ stream, maxCellsLimit = defaultMaxCellsLimit, onData = null }) => {
   const items = []
   let cellsCount = 0
@@ -50,4 +70,5 @@ export const StreamUtils = {
   readStreamToBuffer,
   readStreamToItems,
   waitForStreamClose,
+  waitForWritableStreamComplete,
 }
