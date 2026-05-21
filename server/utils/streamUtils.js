@@ -13,28 +13,38 @@ const readStreamToBuffer = async (stream) => {
 
 const waitForStreamClose = async (stream) =>
   new Promise((resolve, reject) => {
-    stream.on('close', resolve)
-    stream.on('error', reject)
+    const onClose = () => {
+      stream.off('error', onError)
+      resolve()
+    }
+    const onError = (error) => {
+      stream.off('close', onClose)
+      reject(error)
+    }
+    stream.once('close', onClose)
+    stream.once('error', onError)
   })
 
 const waitForWritableStreamComplete = async (stream) =>
   new Promise((resolve, reject) => {
-    let settled = false
+    const cleanup = () => {
+      stream.off('finish', onFinish)
+      stream.off('close', onClose)
+      stream.off('error', onError)
+    }
     const resolveOnce = () => {
-      if (!settled) {
-        settled = true
-        resolve()
-      }
+      cleanup()
+      resolve()
     }
-    const rejectOnce = (error) => {
-      if (!settled) {
-        settled = true
-        reject(error)
-      }
+    const onFinish = () => resolveOnce()
+    const onClose = () => resolveOnce()
+    const onError = (error) => {
+      cleanup()
+      reject(error)
     }
-    stream.on('finish', resolveOnce)
-    stream.on('close', resolveOnce)
-    stream.on('error', rejectOnce)
+    stream.once('finish', onFinish)
+    stream.once('close', onClose)
+    stream.once('error', onError)
   })
 
 const readStreamToItems = async ({ stream, maxCellsLimit = defaultMaxCellsLimit, onData = null }) => {
