@@ -28,11 +28,13 @@ export const writeItemsToStream = ({
     const fields = fieldsParam ?? Object.keys(items[0] ?? {})
     const transform = transformJsonToCsv({ fields, options })
     const outputCompletePromise = StreamUtils.waitForWritableStreamComplete(outputStream)
+    // attach error handlers before piping to catch any errors that may occur during the transformation or writing process
+    outputCompletePromise.catch(reject)
     transform.pipe(outputStream)
     transform.on('error', reject)
     outputStream.on('error', reject)
     transform.on('finish', () => {
-      outputCompletePromise.then(resolve).catch(reject)
+      outputCompletePromise.then(resolve)
     })
 
     for (const row of items) {
@@ -41,7 +43,7 @@ export const writeItemsToStream = ({
     transform.end()
   })
 
-export const pipeDataStreamToStream = async ({ stream, fields, options, outputStream }) => {
+export const pipeDataStreamToStream = ({ stream, fields, options, outputStream }) => {
   const csvTransform = transformJsonToCsv({ fields, options })
   const outputCompletePromise = StreamUtils.waitForWritableStreamComplete(outputStream)
   stream.pipe(csvTransform).pipe(outputStream)

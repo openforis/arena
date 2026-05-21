@@ -84,6 +84,7 @@ export const writeItemsToStream = async ({
   }
 
   const outputCompletePromise = StreamUtils.waitForWritableStreamComplete(outputStream)
-  await workbook.xlsx.write(outputStream)
-  return outputCompletePromise
+  // wait for both the workbook to be written and the output stream to be complete
+  const [, outputCompleteResult] = await Promise.all([workbook.xlsx.write(outputStream), outputCompletePromise])
+  return outputCompleteResult
 }
