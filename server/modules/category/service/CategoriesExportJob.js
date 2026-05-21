@@ -3,6 +3,7 @@ import * as Category from '@core/survey/category'
 import Job from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { ZipArchiver } from '@server/utils/file/zipArchiver'
+import { StreamUtils } from '@server/utils/streamUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '../manager/categoryManager'
@@ -48,6 +49,7 @@ export default class CategoriesExportJob extends Job {
 
     // export category into temp file
     const outputStream = FileUtils.createWriteStream(categoryTempFilePath)
+    const outputStreamClosePromise = StreamUtils.waitForStreamClose(outputStream)
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
     await CategoryManager.exportCategoryToStream({
       survey,
@@ -56,6 +58,8 @@ export default class CategoriesExportJob extends Job {
       fileFormat,
       outputStream,
     })
+    // wait for the stream to be fully flushed and closed before adding the file to the archive
+    await outputStreamClosePromise
 
     // write to archive
     const zipEntryName = Category.getName(category) || `category_${index}`
