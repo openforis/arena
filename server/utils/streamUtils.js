@@ -11,6 +11,42 @@ const readStreamToBuffer = async (stream) => {
   return Buffer.concat(chunks)
 }
 
+const waitForStreamClose = async (stream) =>
+  new Promise((resolve, reject) => {
+    const onClose = () => {
+      stream.off('error', onError)
+      resolve()
+    }
+    const onError = (error) => {
+      stream.off('close', onClose)
+      reject(error)
+    }
+    stream.once('close', onClose)
+    stream.once('error', onError)
+  })
+
+const waitForWritableStreamComplete = async (stream) =>
+  new Promise((resolve, reject) => {
+    const cleanup = () => {
+      stream.off('finish', onFinish)
+      stream.off('close', onClose)
+      stream.off('error', onError)
+    }
+    const resolveOnce = () => {
+      cleanup()
+      resolve()
+    }
+    const onFinish = () => resolveOnce()
+    const onClose = () => resolveOnce()
+    const onError = (error) => {
+      cleanup()
+      reject(error)
+    }
+    stream.once('finish', onFinish)
+    stream.once('close', onClose)
+    stream.once('error', onError)
+  })
+
 const readStreamToItems = async ({ stream, maxCellsLimit = defaultMaxCellsLimit, onData = null }) => {
   const items = []
   let cellsCount = 0
@@ -43,4 +79,6 @@ export const StreamUtils = {
   defaultMaxCellsLimit,
   readStreamToBuffer,
   readStreamToItems,
+  waitForStreamClose,
+  waitForWritableStreamComplete,
 }
