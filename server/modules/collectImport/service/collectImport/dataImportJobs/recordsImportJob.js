@@ -204,22 +204,21 @@ export default class RecordsImportJob extends Job {
 
           let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
 
-          const valueAndMeta =
-            NodeDef.isAttribute(nodeDef) && !NodeDef.isReadOnly(nodeDef)
-              ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
-                  survey,
-                  categoryItemProvider,
-                  taxonProvider,
-                  nodeDef,
-                  record: recordUpdated,
-                  node: nodeToInsert,
-                  collectSurveyFileZip,
-                  collectNodeDef,
-                  collectNode,
-                  collectNodeField: field,
-                  tx: this.tx,
-                })
-              : {}
+          const valueAndMeta = NodeDef.isAttribute(nodeDef)
+            ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
+                survey,
+                categoryItemProvider,
+                taxonProvider,
+                nodeDef,
+                record: recordUpdated,
+                node: nodeToInsert,
+                collectSurveyFileZip,
+                collectNodeDef,
+                collectNode,
+                collectNodeField: field,
+                tx: this.tx,
+              })
+            : {}
 
           const { value = null, meta = {} } = valueAndMeta || {}
 
