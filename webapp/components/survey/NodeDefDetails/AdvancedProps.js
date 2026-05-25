@@ -20,14 +20,14 @@ import { State } from './store'
 
 const editableIfRadioModes = {
   none: 'none',
-  readOnly: 'readOnly',
   defined: 'defined',
+  readOnly: 'readOnly',
 }
 
 const visibleIfRadioModes = {
   none: 'none',
-  alwaysHidden: 'alwaysHidden',
   defined: 'defined',
+  alwaysHidden: 'alwaysHidden',
 }
 
 const getEditableIfRadioModes = ({ nodeDef }) =>
@@ -42,7 +42,7 @@ const canSetAlwaysHiddenMode = ({ nodeDef }) =>
 
 const getVisibleIfRadioModes = ({ nodeDef }) =>
   canSetAlwaysHiddenMode({ nodeDef })
-    ? [visibleIfRadioModes.none, visibleIfRadioModes.alwaysHidden, visibleIfRadioModes.defined]
+    ? Object.values(visibleIfRadioModes)
     : [visibleIfRadioModes.none, visibleIfRadioModes.defined]
 
 const AdvancedProps = (props) => {
@@ -120,8 +120,8 @@ const AdvancedProps = (props) => {
           radioModeDefined={editableIfRadioModes.defined}
           radioLabels={{
             [editableIfRadioModes.none]: 'nodeDefEdit.advancedProps.editableAlways',
-            [editableIfRadioModes.readOnly]: 'nodeDefEdit.advancedProps.readOnly',
             [editableIfRadioModes.defined]: 'nodeDefEdit.advancedProps.editableIfConditionIsMet',
+            [editableIfRadioModes.readOnly]: 'nodeDefEdit.advancedProps.readOnly',
           }}
           determineRadioMode={determineEditableIfMode}
           onRadioModeChange={onEditableIfModeChange}
@@ -224,8 +224,8 @@ const AdvancedProps = (props) => {
           radioModeDefined={visibleIfRadioModes.defined}
           radioLabels={{
             [visibleIfRadioModes.none]: 'nodeDefEdit.advancedProps.visibleAlways',
-            [visibleIfRadioModes.alwaysHidden]: 'nodeDefEdit.advancedProps.hidden',
             [visibleIfRadioModes.defined]: 'nodeDefEdit.advancedProps.visibleIfConditionIsMet',
+            [visibleIfRadioModes.alwaysHidden]: 'nodeDefEdit.advancedProps.hidden',
           }}
           determineRadioMode={determineVisibleIfMode}
           onRadioModeChange={onVisibleIfModeChange}

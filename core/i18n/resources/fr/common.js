@@ -981,9 +981,9 @@ $t(common.appNameFull)
       visibleIfConditionIsMet: 'Visible lorsque la condition est remplie',
       areaBasedEstimate: 'Estimation basée sur la surface',
       defaultValues: 'Valeurs par défaut',
-      defaultValuesInfo: `Les valeurs par défaut seront attribuées à l'attribut en fonction des conditions/expressions spécifiées.
-    Lorsque plusieurs conditions/expressions sont définies, la première qui satisfait la condition "Appliquer si" sera appliquée
-    et le résultat de l'évaluation de son expression sera affecté à la valeur de l'attribut.`,
+      defaultValuesInfo: `Cela permet de renseigner automatiquement une réponse selon des règles précises.
+    Si vous configurez plusieurs règles, le système les vérifie dans l'ordre, de haut en bas.
+    Il applique la première règle qui correspond aux conditions et utilise ce résultat comme réponse.`,
       defaultValueEvaluatedOneTime: 'Valeur par défaut évaluée une seule fois',
       defaultValueEvaluatedOneTimeInfo: `La valeur par défaut sera évaluée une seule fois, lorsque l'attribut est créé.
     Si ce n'est pas coché, la valeur par défaut sera réévaluée à chaque mise à jour de l'enregistrement.
@@ -991,6 +991,8 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valeurs par défaut non modifiables car la clé auto-incrémentielle est définie',
       editableIf: 'Modifiable si',
+      editableIfInfo: `Cela détermine si un utilisateur peut saisir ou modifier ce champ.
+    Si les conditions définies sont remplies, le champ est modifiable. Sinon, il devient « lecture seule » (verrouillé).`,
       hidden: 'Toujours masqué',
       hiddenInReport: 'Masquer dans le tableau de bord analytique',
       hiddenInReportInfo: `Si coché, l'attribut ne sera pas visible dans le tableau de bord analytique`,
@@ -1002,16 +1004,16 @@ Ex. this.region = nom_attribut_region
 (où "region" est le nom d'une propriété supplémentaire définie pour l'élément et nom_attribut_region est le nom d'un attribut dans le formulaire)`,
       readOnly: 'Lecture seule',
       relevantIf: 'Pertinent si',
-      relevantIfInfo: `Par défaut, les nœuds sont toujours pertinents.
-    Si une condition de pertinence n'est pas remplie, le nœud est affiché en gris (ou masqué) et les valeurs par défaut sont ignorées.
-    Cela permet de masquer conditionnellement des sections du formulaire d'enquête, indépendamment des rôles utilisateurs, par exemple en affichant un champ "Veuillez préciser" uniquement lorsqu'un utilisateur choisit "Autre" dans une question précédente.`,
+      relevantIfInfo: `Par défaut, tous les champs sont actifs.
+    Si vous définissez une règle de pertinence et qu'elle n'est pas respectée, le champ devient grisé ou complètement masqué,
+    et les réponses automatiques sont ignorées.
+    Utilisez cela pour afficher ou masquer dynamiquement des parties du formulaire ; par exemple, afficher « Veuillez préciser » seulement si l'utilisateur choisit « Autre ».`,
       script: 'Script',
       visibleIf: 'Visible si',
-      visibleIfInfo: `Si non spécifié, le nœud sera toujours visible.
-    Si la condition/l'expression est vraie, le nœud sera visible;
-    sinon, il sera masqué.
-    Contrairement à "Masqué quand non pertinent", un attribut masqué recevra sa valeur par défaut (si elle est spécifiée).
-    Cette fonction peut être utilisée pour masquer des parties entières du formulaire d'enquête selon des conditions spécifiques (par exemple, le rôle de l'utilisateur).`,
+      visibleIfInfo: `Par défaut, un champ est toujours visible.
+    Si vous définissez une règle, il ne sera visible que lorsque cette règle est respectée ; sinon, il sera masqué.
+    Remarque : contrairement à un champ masqué car « non pertinent », un champ masqué peut quand même enregistrer une réponse automatique.
+    C'est pratique pour masquer des sections entières du formulaire selon la personne connectée (par exemple, selon le rôle).`,
     },
     mobileAppProps: {
       hiddenInMobile: {

@@ -977,9 +977,9 @@ $t(common.appNameFull)
       visibleIfConditionIsMet: 'Visível quando a condição é atendida',
       areaBasedEstimate: 'Estimativa baseada em área',
       defaultValues: 'Valores padrão',
-      defaultValuesInfo: `Os valores padrão serão atribuídos ao atributo dependendo das condições/expressões especificadas.
-    Quando várias condições/expressões forem especificadas, a primeira que atender à condição "Aplicar se" será aplicada
-    e o resultado da avaliação da sua expressão será atribuído ao valor do atributo.`,
+      defaultValuesInfo: `Isto permite preencher automaticamente uma resposta com base em regras específicas.
+    Se você configurar várias regras, o sistema irá verificá-las em ordem, de cima para baixo.
+    Ele aplicará a primeira regra que atender às condições e usará esse resultado como resposta.`,
       defaultValueEvaluatedOneTime: 'Valor padrão avaliado apenas uma vez',
       defaultValueEvaluatedOneTimeInfo: `O valor padrão será avaliado apenas uma vez, quando o atributo for criado.
     Se não estiver marcado, o valor padrão será reavaliado toda vez que o registro for atualizado.
@@ -987,6 +987,8 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valores padrão não editáveis porque a chave auto incremental está definida',
       editableIf: 'Editável se',
+      editableIfInfo: `Isto define se um usuário pode digitar ou alterar este campo.
+    Se as condições definidas forem atendidas, o campo pode ser editado. Caso contrário, ele fica somente leitura (bloqueado).`,
       hidden: 'Sempre oculto',
       hiddenInReport: 'Ocultar no Painel Analítico',
       hiddenInReportInfo: `Se marcado, o atributo não ficará visível no Painel Analítico`,
@@ -998,16 +1000,16 @@ $t(common.appNameFull)
     (onde "region" é o nome de uma propriedade extra definida para o item e region_attribute_name é o nome de um atributo no inventário)`,
       readOnly: 'Somente leitura',
       relevantIf: 'Relevante se',
-      relevantIfInfo: `Por padrão, os nós são sempre relevantes.
-    Se uma condição de relevância não for atendida, o nó será exibido em cinza (ou oculto), e quaisquer valores padrão serão ignorados.
-    Isso permite ocultar seções do formulário de inventário de forma condicional, independentemente dos papéis de usuário, por exemplo, exibindo um campo "Especifique" apenas quando o usuário selecionar "Outro" em uma pergunta anterior.`,
+      relevantIfInfo: `Por padrão, todos os campos ficam ativos.
+    Se você definir uma regra de relevância e ela não for atendida, o campo ficará cinza ou será ocultado por completo,
+    e respostas automáticas serão ignoradas.
+    Use isso para mostrar ou ocultar partes do formulário dinamicamente; por exemplo, mostrar "Especifique" apenas quando o usuário selecionar "Outro".`,
       script: 'Script',
       visibleIf: 'Visível se',
-      visibleIfInfo: `Se não for especificado, o nó será sempre visível.
-    Se a condição/expressão for avaliada como verdadeira, o nó ficará visível;
-    caso contrário, ficará oculto.
-    Diferentemente de "Oculto quando não relevante", um atributo oculto terá seu valor padrão (se especificado) atribuído.
-    Essa função pode ser usada para ocultar partes inteiras do formulário de inventário com base em condições específicas (por exemplo, papel do usuário).`,
+      visibleIfInfo: `Por padrão, um campo é sempre visível.
+    Se você definir uma regra, ele só será visível quando essa regra for atendida; caso contrário, ficará oculto.
+    Observação: diferente de ocultar um campo "não relevante", um campo oculto ainda pode salvar uma resposta automática.
+    Isso é útil para ocultar seções inteiras do formulário com base em quem está logado (por exemplo, por função).`,
     },
     mobileAppProps: {
       hiddenInMobile: {
