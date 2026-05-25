@@ -22,6 +22,7 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as AiSettingsService from '../service/aiSettingsService'
 import * as ModelClient from '../service/modelClient'
 import { validateMessages } from '../service/chatbotService'
+import { closeSseStream, createSseEventWriter, openSseStream } from './serverSentEvents'
 import { formatStreamErrorForLog, formatStreamErrorForWire } from './sseErrorHelpers'
 
 const logger = Log.getLogger('AiChatbotApi')
@@ -80,16 +81,12 @@ export const init = (app) => {
         return
       }
 
-      res.setHeader('Content-Type', 'text/event-stream')
-      res.setHeader('Cache-Control', 'no-cache, no-transform')
-      res.setHeader('Connection', 'keep-alive')
-      res.setHeader('X-Accel-Buffering', 'no')
-      res.flushHeaders?.()
+      openSseStream(res)
 
       const abortController = new AbortController()
       req.on('close', () => abortController.abort())
 
-      const writeEvent = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`)
+      const writeEvent = createSseEventWriter(res)
 
       const timeoutHandle = setTimeout(() => abortController.abort(), ENV.aiRequestTimeoutMs)
 
@@ -115,8 +112,7 @@ export const init = (app) => {
         clearTimeout(timeoutHandle)
       }
 
-      res.write('data: [DONE]\n\n')
-      res.end()
+      closeSseStream(res)
     } catch (error) {
       next(error)
     }

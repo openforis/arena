@@ -20,6 +20,7 @@ import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as ExpressionService from '../service/expressionService'
+import { closeSseStream, createSseEventWriter, openSseStream } from './serverSentEvents'
 import { formatStreamErrorForLog, formatStreamErrorForWire } from './sseErrorHelpers'
 
 const logger = Log.getLogger('AiExpressionApi')
@@ -66,16 +67,12 @@ export const init = (app) => {
         const { surveyId, nodeDefUuid, expression, errorMessage } = Request.getParams(req)
 
         // Set up SSE response
-        res.setHeader('Content-Type', 'text/event-stream')
-        res.setHeader('Cache-Control', 'no-cache, no-transform')
-        res.setHeader('Connection', 'keep-alive')
-        res.setHeader('X-Accel-Buffering', 'no')
-        res.flushHeaders?.()
+        openSseStream(res)
 
         const abortController = new AbortController()
         req.on('close', () => abortController.abort())
 
-        const writeEvent = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`)
+        const writeEvent = createSseEventWriter(res)
 
         try {
           const result = await ExpressionService.explain({
@@ -95,8 +92,7 @@ export const init = (app) => {
           writeEvent({ error: formatStreamErrorForWire(error) })
         }
 
-        res.write('data: [DONE]\n\n')
-        res.end()
+        closeSseStream(res)
       } catch (error) {
         next(error)
       }
