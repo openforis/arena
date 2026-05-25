@@ -180,11 +180,11 @@ arena.login = function(tentative) {
 
   promptTwoFactorToken <- function(twoFactorTentative = 1) {
     if (twoFactorTentative > 1) {
-      message <- "Invalid verification code specified, try again!\r\nVerification code:"
+      message <- "Invalid verification code specified, try again!"
     } else {
-      message <- "Verification code:"
+      message <- "Enter your verification code:"
     }
-    token <- rstudioapi::showPrompt(title = "Enter authenticator app code", message = message)
+    token <- rstudioapi::askForPassword(prompt = message)
     if (is.null(token)) {
       return(NULL)
     }
