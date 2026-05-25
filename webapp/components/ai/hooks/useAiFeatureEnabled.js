@@ -77,9 +77,9 @@ export const onAiSettingsInvalidated = (cb) => {
  * @returns {boolean} Whether this category's UI should render.
  */
 export const useAiFeatureEnabled = (category) => {
-  const [, force] = useState(0)
+  const [_counter, setCounter] = useState(0)
   useEffect(() => {
-    const onChange = () => force((n) => n + 1)
+    const onChange = () => setCounter((n) => n + 1)
     listeners.add(onChange)
     if (!cache && !inflight) fetchOnce()
     return () => {
