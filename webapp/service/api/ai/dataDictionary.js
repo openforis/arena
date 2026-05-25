@@ -26,7 +26,7 @@ export const generateAndDownload = async ({ surveyId, format, lang, fillMissingD
   // Pull filename from Content-Disposition; fall back to a sensible default.
   const disposition = response.headers['content-disposition'] || ''
   const match = /filename="?([^"]+)"?/i.exec(disposition)
-  const filename = (match && match[1]) || `data_dictionary.${format === 'md' ? 'md' : 'html'}`
+  const filename = match?.[1] || `data_dictionary.${format === 'md' ? 'md' : 'html'}`
 
   // Trigger the download via a temporary anchor.
   const url = URL.createObjectURL(response.data)
