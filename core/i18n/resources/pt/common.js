@@ -987,8 +987,10 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valores padrão não editáveis porque a chave auto incremental está definida',
       editableIf: 'Editável se',
-      editableIfInfo: `Isto define se um usuário pode digitar ou alterar este campo.
-    Se as condições definidas forem atendidas, o campo pode ser editado. Caso contrário, ele fica somente leitura (bloqueado).`,
+      editableIfInfo: `Por padrão, um usuário sempre pode acessar um campo relevante.
+Aqui podemos definir uma regra para indicar se o usuário pode digitar ou alterar este campo.
+Isto define se um usuário pode digitar ou alterar este campo.
+Se as condições definidas forem atendidas, o campo pode ser editado. Caso contrário, ele fica somente leitura (bloqueado).`,
       hidden: 'Sempre oculto',
       hiddenInReport: 'Ocultar no Painel Analítico',
       hiddenInReportInfo: `Se marcado, o atributo não ficará visível no Painel Analítico`,

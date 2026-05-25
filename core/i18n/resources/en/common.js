@@ -977,7 +977,8 @@ It should be marked when using expressions like now() or uuid() that should be e
       defaultValuesNotSpecified: 'Default values not specified',
       defaultValuesSpecified: 'Default values specified',
       editableIf: 'Editability',
-      editableIfInfo: `This decides whether a user can type into or change this field.  
+      editableIfInfo: `By default, a user can always access a relevant field.  
+Here we can set a rule whether a user can type into or change this field.  
 If the conditions you set are met, the field can be edited. If not, it becomes "read-only" (locked).`,
       editableAlways: 'Always editable',
       editableIfConditionIsMet: 'Editable if condition is met',

@@ -27,6 +27,7 @@ const editableIfRadioModes = {
 const visibleIfRadioModes = {
   none: 'none',
   defined: 'defined',
+  hiddenWhenNotRelevant: 'hiddenWhenNotRelevant',
   alwaysHidden: 'alwaysHidden',
 }
 
@@ -40,10 +41,19 @@ const canSetAlwaysHiddenMode = ({ nodeDef }) =>
   NodeDef.isReadOnly(nodeDef) &&
   (NodeDef.canBeHidden(nodeDef) || NodeDef.isHidden(nodeDef))
 
-const getVisibleIfRadioModes = ({ nodeDef }) =>
-  canSetAlwaysHiddenMode({ nodeDef })
-    ? Object.values(visibleIfRadioModes)
-    : [visibleIfRadioModes.none, visibleIfRadioModes.defined]
+const getVisibleIfRadioModes = ({ nodeDef, hasRelevantIfRule }) => {
+  const radioModes = [visibleIfRadioModes.none, visibleIfRadioModes.defined]
+
+  if (hasRelevantIfRule) {
+    radioModes.push(visibleIfRadioModes.hiddenWhenNotRelevant)
+  }
+
+  if (canSetAlwaysHiddenMode({ nodeDef })) {
+    radioModes.push(visibleIfRadioModes.alwaysHidden)
+  }
+
+  return radioModes
+}
 
 const AdvancedProps = (props) => {
   const { state, Actions } = props
@@ -60,6 +70,7 @@ const AdvancedProps = (props) => {
   const autoIncrementalKey = NodeDef.isAutoIncrementalKey(nodeDef)
   const defaultValueEvaluatedOneTime = NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
   const hiddenWhenNotRelevant = NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)
+  const hasRelevantIfRule = Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))
 
   const onEditableIfModeChange = useCallback(
     (mode) => {
@@ -84,10 +95,19 @@ const AdvancedProps = (props) => {
 
   const onVisibleIfModeChange = useCallback(
     (mode) => {
-      if (mode === visibleIfRadioModes.none || mode === visibleIfRadioModes.alwaysHidden) {
+      if (
+        mode === visibleIfRadioModes.none ||
+        mode === visibleIfRadioModes.alwaysHidden ||
+        mode === visibleIfRadioModes.hiddenWhenNotRelevant
+      ) {
         Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.visibleIf, value: [] })
       }
       Actions.setProp({ state, key: NodeDef.propKeys.hidden, value: mode === visibleIfRadioModes.alwaysHidden })
+      Actions.setLayoutProp({
+        state,
+        key: NodeDefLayout.keys.hiddenWhenNotRelevant,
+        value: mode === visibleIfRadioModes.hiddenWhenNotRelevant,
+      })
     },
     [Actions, state]
   )
@@ -100,8 +120,11 @@ const AdvancedProps = (props) => {
     if (canSetAlwaysHiddenMode({ nodeDef }) && NodeDef.isHidden(nodeDef)) {
       return visibleIfRadioModes.alwaysHidden
     }
+    if (hasRelevantIfRule && hiddenWhenNotRelevant) {
+      return visibleIfRadioModes.hiddenWhenNotRelevant
+    }
     return visibleIfRadioModes.none
-  }, [nodeDef])
+  }, [hasRelevantIfRule, hiddenWhenNotRelevant, nodeDef])
 
   return (
     <div className="form">
@@ -193,21 +216,7 @@ const AdvancedProps = (props) => {
           none: 'nodeDefEdit.advancedProps.relevantIfRadioNone',
           defined: 'nodeDefEdit.advancedProps.relevantIfRadioDefined',
         }}
-      >
-        {(hiddenWhenNotRelevant || Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))) && (
-          <div className="form_row without-label">
-            <Checkbox
-              checked={hiddenWhenNotRelevant}
-              disabled={readOnly}
-              label="nodeDefEdit.advancedProps.hiddenWhenNotRelevant"
-              validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenWhenNotRelevant)(validation)}
-              onChange={(value) =>
-                Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })
-              }
-            />
-          </div>
-        )}
-      </NodeDefExpressionsProp>
+      />
 
       {experimentalFeatures && (
         <NodeDefExpressionsProp
@@ -220,11 +229,12 @@ const AdvancedProps = (props) => {
           propName={NodeDef.keysPropsAdvanced.visibleIf}
           qualifier={TestId.nodeDefDetails.visibleIf}
           radioMode
-          radioModes={getVisibleIfRadioModes({ nodeDef })}
+          radioModes={getVisibleIfRadioModes({ nodeDef, hasRelevantIfRule })}
           radioModeDefined={visibleIfRadioModes.defined}
           radioLabels={{
             [visibleIfRadioModes.none]: 'nodeDefEdit.advancedProps.visibleAlways',
             [visibleIfRadioModes.defined]: 'nodeDefEdit.advancedProps.visibleIfConditionIsMet',
+            [visibleIfRadioModes.hiddenWhenNotRelevant]: 'nodeDefEdit.advancedProps.hiddenWhenNotRelevant',
             [visibleIfRadioModes.alwaysHidden]: 'nodeDefEdit.advancedProps.hidden',
           }}
           determineRadioMode={determineVisibleIfMode}

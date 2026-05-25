@@ -991,8 +991,10 @@ $t(common.appNameFull)
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valeurs par défaut non modifiables car la clé auto-incrémentielle est définie',
       editableIf: 'Modifiable si',
-      editableIfInfo: `Cela détermine si un utilisateur peut saisir ou modifier ce champ.
-    Si les conditions définies sont remplies, le champ est modifiable. Sinon, il devient « lecture seule » (verrouillé).`,
+      editableIfInfo: `Par défaut, un utilisateur peut toujours accéder à un champ pertinent.
+Ici, nous pouvons définir une règle indiquant si l'utilisateur peut saisir ou modifier ce champ.
+Cela détermine si un utilisateur peut saisir ou modifier ce champ.
+Si les conditions définies sont remplies, le champ est modifiable. Sinon, il devient « lecture seule » (verrouillé).`,
       hidden: 'Toujours masqué',
       hiddenInReport: 'Masquer dans le tableau de bord analytique',
       hiddenInReportInfo: `Si coché, l'attribut ne sera pas visible dans le tableau de bord analytique`,
