@@ -222,7 +222,18 @@ arena.login = function(tentative) {
   }
 
   respParsed <- arena.parseResponse(resp)
-  
+  loginSucceeded <- !is.null(respParsed$authToken) && nchar(respParsed$authToken) > 0
+  if (!loginSucceeded && !is.null(respParsed$user)) {
+    loginSucceeded <- TRUE
+  }
+
+  if (loginSucceeded) {
+    .arena.authToken <<- respParsed$authToken
+    .arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')
+    print(paste('*** User', username, 'successfully logged in', sep = ' '))
+    return(TRUE)
+  }
+
   if ("message" %in% names(respParsed) && (
     (respParsed$message == 'validationErrors:user.userNotFound') || 
     (respParsed$message == 'validationErrors:user.emailInvalid') || 
@@ -237,10 +248,13 @@ arena.login = function(tentative) {
       return(FALSE)
     }
   } else {
-    .arena.authToken <<- respParsed$authToken
-    .arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')
-    print(paste('*** User', username, 'successfully logged in', sep = ' '))
-    return(TRUE)
+    failureMessage <- if ("message" %in% names(respParsed) && !is.na(respParsed$message)) {
+      respParsed$message
+    } else {
+      'Login failed'
+    }
+    print(paste("***", failureMessage))
+    return(FALSE)
   }
 }
 
