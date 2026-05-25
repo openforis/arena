@@ -22,23 +22,21 @@ const getDefaultScript = ({ survey, nodeDef }) => {
   return `${parentDefName}$${nodeDefName} <- NA`
 }
 
-const generateCodesText = ({ items, lang }) =>
-  Object.values(items)
-    .map((item) => `'${CategoryItem.getCode(item)}', ${CategoryItem.getLabel(lang)(item)}`)
-    .join('; ')
+const generateCodesPairs = ({ items, lang }) =>
+  Object.values(items).map((item) => `'${CategoryItem.getCode(item)}', ${CategoryItem.getLabel(lang)(item)}`)
 
-const wrapTextWithPrefix = ({ text, prefix, maxLineLength }) => {
+const wrapTextWithPrefix = ({ chunks, prefix, maxLineLength, separator = ' ' }) => {
   const maxContentLength = maxLineLength - prefix.length - 1
 
   if (maxContentLength <= 0) {
-    return `${prefix} ${text}`
+    return `${prefix} ${chunks.join(separator)}`
   }
 
   const lines = []
   let currentLine = ''
 
-  text.split(' ').forEach((word) => {
-    const token = currentLine ? ` ${word}` : word
+  chunks.forEach((chunk) => {
+    const token = currentLine ? `${separator}${chunk}` : chunk
 
     if (currentLine.length + token.length <= maxContentLength) {
       currentLine += token
@@ -50,21 +48,7 @@ const wrapTextWithPrefix = ({ text, prefix, maxLineLength }) => {
       currentLine = ''
     }
 
-    if (word.length <= maxContentLength) {
-      currentLine = word
-      return
-    }
-
-    for (let i = 0; i < word.length; i += maxContentLength) {
-      const chunk = word.slice(i, i + maxContentLength)
-      const isLastChunk = i + maxContentLength >= word.length
-
-      if (isLastChunk) {
-        currentLine = chunk
-      } else {
-        lines.push(`${prefix} ${chunk}`)
-      }
-    }
+    currentLine = chunk
   })
 
   if (currentLine) {
@@ -75,8 +59,13 @@ const wrapTextWithPrefix = ({ text, prefix, maxLineLength }) => {
 }
 
 const generateCodesCommentBlock = ({ items, lang }) => {
-  const codesText = generateCodesText({ items, lang })
-  return wrapTextWithPrefix({ text: codesText, prefix: codesTextPrefix, maxLineLength: maxCodesLineLength })
+  const codesPairs = generateCodesPairs({ items, lang })
+  return wrapTextWithPrefix({
+    chunks: codesPairs,
+    prefix: codesTextPrefix,
+    maxLineLength: maxCodesLineLength,
+    separator: '; ',
+  })
 }
 
 const RScriptEditor = (props) => {
