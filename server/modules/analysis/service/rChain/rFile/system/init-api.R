@@ -55,16 +55,35 @@ arena.refreshAuthTokens = function() {
   return(FALSE)
 }
 
+arena.handleUnauthorizedAndRetry = function(requestFn) {
+  resp <- requestFn()
+
+  if (resp$status != 401) {
+    return(resp)
+  }
+
+  if (arena.refreshAuthTokens()) {
+    resp <- requestFn()
+    if (resp$status != 401) {
+      return(resp)
+    }
+  }
+
+  print('*** Session expired or unauthorized request, login required')
+  if (!arena.login()) {
+    return(resp)
+  }
+
+  return(requestFn())
+}
+
 arena._getInternal = function(url, query = NULL) {
   resp <- httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query), arena.createHeadersConfig())
   return(resp)
 }
 
 arena.get = function(url, query = NULL) {
-  resp <- arena._getInternal(url, query)
-  if (resp$status == 401 && arena.refreshAuthTokens()) {
-    resp <- arena._getInternal(url, query)
-  }
+  resp <- arena.handleUnauthorizedAndRetry(function() arena._getInternal(url, query))
   return(arena.parseResponse(resp))
 }
 
@@ -79,10 +98,8 @@ arena._getToFileInternal = function (url, query = NULL, file) {
  }
 
 arena.getToFile = function (url, query = NULL, file) {
-  resp <- arena._getToFileInternal(url, query, file)
-  if (resp$status == 401 && arena.refreshAuthTokens()) {
-    resp <- arena._getToFileInternal(url, query, file)
-  }
+  resp <- arena.handleUnauthorizedAndRetry(function() arena._getToFileInternal(url, query, file))
+  return(resp)
 }
 
 arena.getCSV = function (url, query = NULL) {
@@ -103,10 +120,7 @@ arena._postInternal = function(url, body) {
 }
 
 arena.post = function(url, body) {
-  resp <- arena._postInternal(url, body)
-  if (resp$status == 401 && arena.refreshAuthTokens()) {
-    resp <- arena._postInternal(url, body)
-  }
+  resp <- arena.handleUnauthorizedAndRetry(function() arena._postInternal(url, body))
   return(arena.parseResponse(resp))
 }
 
@@ -116,10 +130,7 @@ arena._putInternal = function(url, body) {
 }
 
 arena.put = function(url, body) {
-  resp <- arena._putInternal(url, body)
-  if (resp$status == 401 && arena.refreshAuthTokens()) {
-    resp <- arena._putInternal(url, body)
-  }
+  resp <- arena.handleUnauthorizedAndRetry(function() arena._putInternal(url, body))
   return(arena.parseResponse(resp))
 }
 
@@ -135,10 +146,7 @@ arena._deleteInternal = function(url, body) {
 }
 
 arena.delete = function(url, body) {
-  resp <- arena._deleteInternal(url, body)
-  if (resp$status == 401 && arena.refreshAuthTokens()) {
-    resp <- arena._deleteInternal(url, body)
-  }
+  resp <- arena.handleUnauthorizedAndRetry(function() arena._deleteInternal(url, body))
   return(arena.parseResponse(resp))
 }
 
@@ -161,11 +169,58 @@ arena.login = function(tentative) {
   if (is.null(password)) return(FALSE)
   
   password <- trimws(password)
+
+  loginRequest <- function(twoFactorToken = NULL) {
+    body <- list(email = username, password = password)
+    if (!is.null(twoFactorToken) && nchar(twoFactorToken) > 0) {
+      body$twoFactorToken <- twoFactorToken
+    }
+    httr::POST(paste0(arena.host, 'auth/login'), body = body)
+  }
+
+  promptTwoFactorToken <- function(twoFactorTentative = 1) {
+    if (twoFactorTentative > 1) {
+      message <- "Invalid verification code specified, try again!\r\nVerification code:"
+    } else {
+      message <- "Verification code:"
+    }
+    token <- rstudioapi::showPrompt(title = "Enter your verification code", message = message)
+    if (is.null(token)) {
+      return(NULL)
+    }
+    trimws(token)
+  }
+
+  getLoginResponseJson <- function(resp) {
+    respText <- httr::content(resp, as = "text")
+    return(tryCatch(jsonlite::fromJSON(respText), error = function(e) list()))
+  }
   
-  resp <- httr::POST(
-    paste0(arena.host, 'auth/login'),
-    body = list(email = username, password = password)
-  )
+  resp <- loginRequest()
+  respJson <- getLoginResponseJson(resp)
+
+  if (isTRUE(respJson$twoFactorRequired)) {
+    twoFactorTentative <- 1
+    repeat {
+      twoFactorToken <- promptTwoFactorToken(twoFactorTentative)
+      if (is.null(twoFactorToken) || nchar(twoFactorToken) == 0) {
+        return(FALSE)
+      }
+
+      resp <- loginRequest(twoFactorToken)
+      respJson <- getLoginResponseJson(resp)
+      if (!isTRUE(respJson$twoFactorRequired)) {
+        break
+      }
+
+      if (twoFactorTentative >= 3) {
+        print('*** Login failed: invalid verification code')
+        return(FALSE)
+      }
+      twoFactorTentative <- twoFactorTentative + 1
+    }
+  }
+
   respParsed <- arena.parseResponse(resp)
   
   if ("message" %in% names(respParsed) && (
