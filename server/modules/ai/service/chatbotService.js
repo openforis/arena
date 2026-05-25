@@ -45,6 +45,8 @@ export const validateMessages = (messages) => {
   if (messages.length > MAX_MESSAGES) {
     throw badRequest(`messages length ${messages.length} exceeds ${MAX_MESSAGES}`)
   }
-  messages.forEach(validateMessage)
+  for (let i = 0; i < messages.length; i++) {
+    validateMessage(messages[i], i)
+  }
   return messages
 }
