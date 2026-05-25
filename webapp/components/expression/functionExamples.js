@@ -47,7 +47,9 @@ const functionExamples = {
   },
 }
 
-const experimentalFunctions = new Set([functionNames.prevCycleValue, functionNames.prevCycleValues])
+const experimentalFunctions = new Set([
+  // no experimental functions for now, but we can use this set to filter out functions that are not yet ready to be used in production
+])
 
 const isFunctionAvailable =
   ({ experimentalFeatures }) =>
