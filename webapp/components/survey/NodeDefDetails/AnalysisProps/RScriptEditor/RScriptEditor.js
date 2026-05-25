@@ -13,6 +13,7 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 
 const codesTextPrefix = '# __CODES__'
+const maxCodesLineLength = 200
 
 const getDefaultScript = ({ survey, nodeDef }) => {
   const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
@@ -21,10 +22,51 @@ const getDefaultScript = ({ survey, nodeDef }) => {
   return `${parentDefName}$${nodeDefName} <- NA`
 }
 
-const generateCodesText = ({ items, lang }) =>
-  Object.values(items)
-    .map((item) => `'${CategoryItem.getCode(item)}', ${CategoryItem.getLabel(lang)(item)} `)
-    .join('; ')
+const generateCodesPairs = ({ items, lang }) =>
+  Object.values(items).map((item) => `'${CategoryItem.getCode(item)}', ${CategoryItem.getLabel(lang)(item)}`)
+
+const wrapTextWithPrefix = ({ chunks, prefix, maxLineLength, separator = ' ' }) => {
+  const maxContentLength = maxLineLength - prefix.length - 1
+
+  if (maxContentLength <= 0) {
+    return `${prefix} ${chunks.join(separator)}`
+  }
+
+  const lines = []
+  let currentLine = ''
+
+  chunks.forEach((chunk) => {
+    const token = currentLine ? `${separator}${chunk}` : chunk
+
+    if (currentLine.length + token.length <= maxContentLength) {
+      currentLine += token
+      return
+    }
+
+    if (currentLine) {
+      lines.push(`${prefix} ${currentLine}`)
+      currentLine = ''
+    }
+
+    currentLine = chunk
+  })
+
+  if (currentLine) {
+    lines.push(`${prefix} ${currentLine}`)
+  }
+
+  return lines.join('\n')
+}
+
+const generateCodesCommentBlock = ({ items, lang }) => {
+  const codesPairs = generateCodesPairs({ items, lang })
+  return wrapTextWithPrefix({
+    chunks: codesPairs,
+    prefix: codesTextPrefix,
+    maxLineLength: maxCodesLineLength,
+    separator: '; ',
+  })
+}
 
 const RScriptEditor = (props) => {
   const { state, Actions, nodeDef } = props
@@ -83,16 +125,24 @@ const RScriptEditor = (props) => {
         data: { items },
       } = await request
 
-      const codesText = generateCodesText({ items, lang })
+      const codesCommentBlock = generateCodesCommentBlock({ items, lang })
 
       if (scriptOrDefault.startsWith(codesTextPrefix)) {
-        // replace existing codes text
+        // replace existing codes comment block
         const scriptSplitted = scriptOrDefault.split('\n')
-        scriptSplitted[0] = `${codesTextPrefix} ${codesText}`
-        return scriptSplitted.join('\n')
+        let firstNonCodesLineIndex = 0
+
+        while (
+          firstNonCodesLineIndex < scriptSplitted.length &&
+          scriptSplitted[firstNonCodesLineIndex].startsWith(codesTextPrefix)
+        ) {
+          firstNonCodesLineIndex += 1
+        }
+
+        return [codesCommentBlock, ...scriptSplitted.slice(firstNonCodesLineIndex)].join('\n')
       } else {
         // add codes text at the beginning of the script
-        return `${codesTextPrefix} ${codesText}\n${scriptOrDefault}`
+        return `${codesCommentBlock}\n\n${scriptOrDefault}`
       }
     }
     return scriptOrDefault
