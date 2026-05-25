@@ -184,7 +184,7 @@ arena.login = function(tentative) {
     } else {
       message <- "Verification code:"
     }
-    token <- rstudioapi::showPrompt(title = "Enter your verification code", message = message)
+    token <- rstudioapi::showPrompt(title = "Enter authenticator app code", message = message)
     if (is.null(token)) {
       return(NULL)
     }
