@@ -262,6 +262,22 @@ const UserAiSettingsPanel = () => {
     }
   }
 
+  const testResultView = useMemo(() => {
+    if (testResult) {
+      if (testResult.pending) {
+        return <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings.testing')}</div>
+      } else {
+        const testResultMessage = testResult.ok
+          ? i18n.t('userAiSettings.testOk', { latencyMs: testResult.latencyMs })
+          : i18n.t('userAiSettings.testFailed', { message: testResult.errorMessage || 'unknown' })
+        return (
+          <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>{testResultMessage}</div>
+        )
+      }
+    }
+    return null
+  }, [i18n, testResult])
+
   if (loading) return null
 
   if (settings?.aiFeaturesDisabled) {
@@ -436,17 +452,7 @@ const UserAiSettingsPanel = () => {
         )}
       </div>
 
-      {testResult ? (
-        testResult.pending ? (
-          <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings.testing')}</div>
-        ) : (
-          <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>
-            {testResult.ok
-              ? i18n.t('userAiSettings.testOk', { latencyMs: testResult.latencyMs })
-              : i18n.t('userAiSettings.testFailed', { message: testResult.errorMessage || 'unknown' })}
-          </div>
-        )
-      ) : null}
+      {testResultView}
     </fieldset>
   )
 }
