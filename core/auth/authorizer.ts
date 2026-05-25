@@ -78,7 +78,7 @@ export const canViewNotOwnedRecords = (user: ArenaUser, surveyInfo: ArenaSurvey)
     Surveys.isDataEditorViewNotOwnedRecordsAllowed(surveyInfo as any)
   )
 }
-export const canExportRecordsList = _hasSurveyPermission(permissions.surveyEdit)
+export const canExportRecordsList = _hasSurveyPermission(permissions.recordAnalyse)
 
 export const canEditRecord = (user: ArenaUser, record: ArenaRecord, ignoreRecordStep: boolean = false): boolean => {
   if (!user || !record || (!ignoreRecordStep && Record.isInAnalysisStep(record))) {
