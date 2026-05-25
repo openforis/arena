@@ -93,7 +93,7 @@ const UserAiSettingsPanel = () => {
       setSettings(data)
       setForm({
         featuresEnabled: !!data.featuresEnabled,
-        featureToggles: { ...defaultFeatureToggles(), ...(data.featureToggles || {}) },
+        featureToggles: { ...defaultFeatureToggles(), ...data.featureToggles },
         // When the user has an active override (`enabled`), show their
         // provider; otherwise show "Default" (= admin-configured).
         provider: data.enabled && data.provider ? data.provider : DEFAULT_PROVIDER_VALUE,
