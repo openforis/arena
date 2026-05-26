@@ -29,13 +29,16 @@ const buildResponseBody = async (user) => {
   }
 }
 
+const respondAiFeaturesDisabled = (res) => {
+  if (ENV.aiFeaturesEnabled) return false
+  res.status(404).json({ error: 'aiFeaturesDisabled' })
+  return true
+}
+
 export const init = (app) => {
   app.get('/ai/settings', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
-      if (!ENV.aiFeaturesEnabled) {
-        res.status(404).json({ error: 'aiFeaturesDisabled' })
-        return
-      }
+      if (respondAiFeaturesDisabled(res)) return
       const user = Request.getUser(req)
       res.json(await buildResponseBody(user))
     } catch (error) {
@@ -45,10 +48,7 @@ export const init = (app) => {
 
   app.put('/ai/settings', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
-      if (!ENV.aiFeaturesEnabled) {
-        res.status(404).json({ error: 'aiFeaturesDisabled' })
-        return
-      }
+      if (respondAiFeaturesDisabled(res)) return
       const user = Request.getUser(req)
       const update = Request.getBody(req)
       const userUpdated = await AiSettingsService.saveSettings({ user, update })
@@ -60,10 +60,7 @@ export const init = (app) => {
 
   app.post('/ai/settings/test', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
-      if (!ENV.aiFeaturesEnabled) {
-        res.status(404).json({ error: 'aiFeaturesDisabled' })
-        return
-      }
+      if (respondAiFeaturesDisabled(res)) return
       const user = Request.getUser(req)
       const result = await AiSettingsService.testConnection({ user })
       res.json(result)
@@ -74,10 +71,7 @@ export const init = (app) => {
 
   app.post('/ai/settings/models', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
-      if (!ENV.aiFeaturesEnabled) {
-        res.status(404).json({ error: 'aiFeaturesDisabled' })
-        return
-      }
+      if (respondAiFeaturesDisabled(res)) return
       const user = Request.getUser(req)
       const { provider, baseUrl, apiKey } = Request.getBody(req) || {}
       const result = await AiSettingsService.listModels({ user, provider, baseUrl, apiKey })
@@ -89,10 +83,7 @@ export const init = (app) => {
 
   app.delete('/ai/settings', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
-      if (!ENV.aiFeaturesEnabled) {
-        res.status(404).json({ error: 'aiFeaturesDisabled' })
-        return
-      }
+      if (respondAiFeaturesDisabled(res)) return
       const user = Request.getUser(req)
       const userUpdated = await AiSettingsService.clearSettings({ user })
       res.json(await buildResponseBody(userUpdated))
