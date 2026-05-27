@@ -131,7 +131,7 @@ const ExpressionEditor = (props) => {
               iconClassName="icon-magic-wand icon-14px"
               id={`${idPrefix}-ai-btn`}
               onClick={() => setAiOpen(true)}
-              title={i18n.t('aiExpression.title')}
+              title="aiExpression.title"
             />
           )}
           {aiExpressionsEnabled && !R.isEmpty(query) && nodeDefUuidCurrent && (
@@ -140,7 +140,7 @@ const ExpressionEditor = (props) => {
               iconClassName="icon-question icon-14px"
               id={`${idPrefix}-ai-explain-btn`}
               onClick={() => setExplainOpen(true)}
-              title={i18n.t('aiExpression.explain.title')}
+              title="aiExpression.explain.title"
             />
           )}
         </div>
