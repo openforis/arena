@@ -43,8 +43,12 @@ export const createAlias = (name) =>
     StringUtils.hashCode(name)
   }`
 
+const quoteIdentifier = (identifier) =>
+  // do not quote '*' (used in count(*)) or identifiers starting with '_' (used for aliases), to avoid breaking queries
+  identifier === '*' || identifier.startsWith('_') ? identifier : StringUtils.quoteDouble(identifier)
+
 export const addAlias = (alias, ...columnNames) =>
-  columnNames.map((columnName) => `${StringUtils.quoteDouble(alias)}.${StringUtils.quoteDouble(columnName)}`)
+  columnNames.map((columnName) => `${quoteIdentifier(alias)}.${quoteIdentifier(columnName)}`)
 
 // Json
 export const jsonAgg = (expression, orderByColumns = []) => {
