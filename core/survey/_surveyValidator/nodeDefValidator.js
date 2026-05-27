@@ -79,10 +79,18 @@ const validateKey = (survey) => (propName, nodeDef) => {
   return null
 }
 
-const validateReadOnly = (propName, nodeDef) =>
-  NodeDef.isReadOnly(nodeDef) && R.isEmpty(NodeDef.getDefaultValues(nodeDef))
-    ? { key: Validation.messageKeys.nodeDefEdit.defaultValuesNotSpecified }
-    : null
+const validateReadOnly = (propName, nodeDef) => {
+  if (!NodeDef.isReadOnly(nodeDef)) {
+    return null
+  }
+  if (R.isEmpty(NodeDef.getDefaultValues(nodeDef))) {
+    return { key: Validation.messageKeys.nodeDefEdit.defaultValuesNotSpecified }
+  }
+  if (!R.isEmpty(NodeDef.getEditableIf(nodeDef))) {
+    return { key: Validation.messageKeys.nodeDefEdit.readOnlyCannotHaveEditableIf }
+  }
+  return null
+}
 
 const validateParentEntityUuid = (_propName, nodeDef) => {
   if (NodeDef.isAnalysis(nodeDef) && R.isNil(NodeDef.getParentUuid(nodeDef))) {

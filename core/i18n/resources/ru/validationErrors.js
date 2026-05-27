@@ -128,6 +128,7 @@ export default {
     validationsInvalid: 'Неверные "Проверки"',
     countMaxInvalid: 'Неверное "Максимальное количество"',
     countMinInvalid: 'Неверное "Минимальное количество"',
+    readOnlyCannotHaveEditableIf: 'Узел только для чтения не может иметь условие "Editable if"',
   },
 
   record: {

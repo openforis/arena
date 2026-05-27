@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -17,7 +17,7 @@ import { TestId } from '@webapp/utils/testId'
 import { FormItem, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 
-import ExpressionsProp, { NodeDefExpressionsProp, ValueType } from './ExpressionsProp'
+import { NodeDefExpressionsProp, ValueType } from './ExpressionsProp'
 import { State } from './store'
 
 const countTypes = [NodeDefValidations.keys.min, NodeDefValidations.keys.max]
@@ -35,7 +35,7 @@ const CountProp = (props) => {
   }
 
   const onChange = (value) => {
-    const valueUpdated = Array.isArray(value) ? R.reject(NodeDefExpression.isPlaceholder, value) : value
+    const valueUpdated = value
     const validations = NodeDef.getValidations(nodeDef)
     const validationsUpdated = NodeDefValidations.assocCountProp(countType)(valueUpdated)(validations)
     Actions.setProp({
@@ -67,6 +67,7 @@ const CountProp = (props) => {
         valueTypeSelection
         determineValueType={determineValueType}
         valueConstantEditorNumberFormat={countPropNumberFormat}
+        radioMode={false}
       />
     </div>
   )
@@ -87,14 +88,21 @@ const ValidationsProps = (props) => {
   const readOnly = !useAuthCanEditSurvey()
   const survey = useSurvey()
 
-  const nodeDef = State.getNodeDef(state)
-  const validation = State.getValidation(state)
-  const nodeDefValidations = NodeDef.getValidations(nodeDef)
-  const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const nodeDef = useMemo(() => State.getNodeDef(state), [state])
+  const validation = useMemo(() => State.getValidation(state), [state])
+  const nodeDefUuidContext = useMemo(() => NodeDef.getParentUuid(nodeDef), [nodeDef])
+  const nodeDefParent = useMemo(() => Survey.getNodeDefParent(nodeDef)(survey), [nodeDef, survey])
+  const nodeDefValidations = useMemo(() => NodeDef.getValidations(nodeDef), [nodeDef])
 
-  const onValidationsUpdate = (validations) =>
-    Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.validations, value: validations })
+  const onValidationsUpdate = useCallback(
+    (validations) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.validations, value: validations }),
+    [state, Actions]
+  )
+
+  const onValidationExpressionsUpdate = useCallback(
+    (expressions) => onValidationsUpdate(NodeDefValidations.assocExpressions(expressions)(nodeDefValidations)),
+    [nodeDefValidations, onValidationsUpdate]
+  )
 
   return (
     <div className="form">
@@ -135,24 +143,28 @@ const ValidationsProps = (props) => {
           </FormItem>
         )}
       {NodeDef.isAttribute(nodeDef) && (
-        <ExpressionsProp
-          qualifier={TestId.nodeDefDetails.validations}
+        <NodeDefExpressionsProp
+          Actions={Actions}
+          excludeCurrentNodeDef={false}
+          isBoolean={false}
           label="nodeDefEdit.validationsProps.expressions"
+          nodeDefUuidContext={nodeDefUuidContext}
+          onChange={onValidationExpressionsUpdate}
+          propExtractor={() => NodeDefValidations.getExpressions(nodeDefValidations)}
+          propName={`validations.expressions`}
+          qualifier={TestId.nodeDefDetails.validations}
+          radioLabels={{
+            none: 'nodeDefEdit.validationsProps.attributeAlwaysValid',
+            defined: 'nodeDefEdit.validationsProps.attributeValidWhenConditionIsMet',
+          }}
           readOnly={readOnly}
-          applyIf
-          showLabels
           severity
-          values={NodeDefValidations.getExpressions(nodeDefValidations)}
+          showLabels
+          state={state}
           validation={R.pipe(
             Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
             Validation.getFieldValidation(NodeDefValidations.keys.expressions)
           )(validation)}
-          onChange={(expressions) =>
-            onValidationsUpdate(NodeDefValidations.assocExpressions(expressions)(nodeDefValidations))
-          }
-          nodeDefUuidContext={nodeDefUuidContext}
-          nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}
-          excludeCurrentNodeDef={false}
         />
       )}
     </div>

@@ -52,6 +52,31 @@
 
   .form {
     grid-row-gap: 0.5rem;
+
+    fieldset.node-def-edit__expressions-fieldset {
+      width: 80%;
+      justify-self: center;
+
+      .form-item {
+        display: flex;
+        width: 100%;
+
+        .node-def-edit__expression-radio-mode {
+          display: flex;
+          flex-direction: row;
+          gap: 1em;
+          margin-bottom: 0.5em;
+        }
+
+        .node-def-edit__expressions-wrapper {
+          flex: 1;
+
+          .btn-new {
+            align-self: flex-start;
+          }
+        }
+      }
+    }
   }
 
   .form-item,
