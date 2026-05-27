@@ -13,9 +13,6 @@ $headerHeight: 45px;
 $footerHeight: 45px;
 
 // colors
-
-$colorError: #ed5b46;
-
 $red: #ed5b46;
 $pink: #f7dfe3;
 $green: #84ac67;
@@ -35,6 +32,8 @@ $orangeLight: #f9ccb2;
 $black: #2f3138;
 $yellowHighlight: #f8f6cc;
 $white: #ffffff;
+
+$colorError: $red;
 
 $colorTextPrimary: color.adjust($blue, $lightness: -20%);
 $borderColorFocussed: color.adjust($blue, $lightness: -20%);
