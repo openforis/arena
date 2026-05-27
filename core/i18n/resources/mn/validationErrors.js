@@ -127,6 +127,7 @@ export default {
     validationsInvalid: 'Хүчингүй "Баталгаажуулалтууд"',
     countMaxInvalid: 'Хүчингүй "Хамгийн их тоо"',
     countMinInvalid: 'Хүчингүй "Хамгийн бага тоо"',
+    readOnlyCannotHaveEditableIf: 'Зөвхөн унших зангилаа "Editable if" нөхцөлтэй байж болохгүй',
   },
 
   record: {

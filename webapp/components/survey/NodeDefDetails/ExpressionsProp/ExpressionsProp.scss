@@ -1,6 +1,6 @@
 @use '~@webapp/style/vars' as *;
 
-.node-def-edit_expressions-wrapper {
+.node-def-edit__expressions-wrapper {
   display: flex;
   flex-direction: row;
   gap: 1rem;
@@ -20,6 +20,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+
+  .btn-new {
+    align-self: flex-start;
+  }
 
   //custom tooltip error
   .tooltip-error {

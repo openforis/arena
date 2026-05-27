@@ -35,6 +35,7 @@ export { Dropzone, ExpansionPanel, ImageProgressive, Markdown, LoadingBar, Panel
 
 export { Alert } from './Alert'
 export { ColorInput } from './ColorInput'
+export { Fieldset } from './Fieldset'
 export { Link } from './Link'
 export { MapContainer } from './MapContainer'
 export { Modal, ModalBody, ModalHeader, ModalFooter } from './modal'

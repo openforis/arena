@@ -104,6 +104,7 @@ const ExpressionEditorPopup = (props) => {
             label="common.reset"
             onClick={() => onChange('')}
             size="small"
+            variant="outlined"
           />
 
           <Button
@@ -116,7 +117,7 @@ const ExpressionEditorPopup = (props) => {
             testId={TestId.expressionEditor.applyBtn}
           />
 
-          <Button label="common.cancel" onClick={onClose} size="small" />
+          <Button label="common.cancel" onClick={onClose} size="small" variant="outlined" />
         </div>
       </div>
     </PanelRight>

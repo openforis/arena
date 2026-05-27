@@ -817,13 +817,31 @@ $t(common.appNameFull)
       table: 'Tabla',
     },
     advancedProps: {
+      defaultValuesNotSpecified: 'Valores predeterminados no especificados',
+      defaultValuesSpecified: 'Valores predeterminados especificados',
+      editableAlways: 'Siempre editable',
+      editableIfConditionIsMet: 'Editable cuando se cumple la condición',
+      relevantIfRadioNone: 'Siempre relevante',
+      relevantIfRadioDefined: 'Relevante cuando se cumple la condición',
+      visibleAlways: 'Siempre visible',
+      visibleIfConditionIsMet: 'Visible cuando se cumple la condición',
       areaBasedEstimate: 'Estimación basada en el área',
       defaultValues: 'Valores predeterminados',
+      defaultValuesInfo: `Esto permite completar automáticamente una respuesta según reglas específicas.
+    Si configura varias reglas, el sistema las comprobará en orden, de arriba hacia abajo.
+    Aplicará la primera regla que cumpla las condiciones y usará ese resultado como respuesta.`,
       defaultValueEvaluatedOneTime: 'Valor predeterminado evaluado solo una vez',
+      defaultValueEvaluatedOneTimeInfo: `El valor predeterminado se evaluará solo una vez, cuando se cree el atributo.
+    Si no está marcado, el valor predeterminado se volverá a evaluar cada vez que se actualice el registro.
+    Debe marcarse al usar expresiones como now() o uuid(), que deben evaluarse solo una vez, cuando el valor del atributo se genera por primera vez.`,
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valores predeterminados no editables porque la clave auto incremental está configurada',
       editableIf: 'Editable si',
-      hidden: 'Ocultar en el formulario de entrada',
+      editableIfInfo: `Por defecto, un usuario siempre puede acceder a un campo relevante.
+Aquí se puede definir una regla para indicar si el usuario puede escribir o modificar este campo.
+Esto decide si un usuario puede escribir o cambiar este campo.
+Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será de solo lectura (bloqueado).`,
+      hidden: 'Siempre oculto',
       hiddenInReport: 'Ocultar en el Panel Analítico',
       hiddenInReportInfo: `Si está marcado, el atributo no será visible en el Panel Analítico`,
       hiddenWhenNotRelevant: 'Oculto cuando no es relevante',
@@ -832,8 +850,16 @@ $t(common.appNameFull)
         'Expresión utilizada para filtrar elementos seleccionables. En la expresión, la palabra "this" se referirá al elemento en sí. Ej.: this.region = region_attribute_name (donde "region" es el nombre de una propiedad extra definida para el elemento y region_attribute_name es el nombre de un atributo en la encuesta)',
       readOnly: 'Solo lectura',
       relevantIf: 'Relevante si',
+      relevantIfInfo: `Por defecto, todos los campos están activos.
+    Si define una regla de relevancia y no se cumple, el campo se mostrará en gris o se ocultará por completo,
+    y las respuestas automáticas se ignorarán.
+    Úselo para mostrar u ocultar partes de la encuesta de forma dinámica; por ejemplo, mostrar "Especifique" solo cuando el usuario elige "Otro".`,
       script: 'Script',
       visibleIf: 'Visible si',
+      visibleIfInfo: `Por defecto, un campo siempre es visible.
+    Si define una regla, solo será visible cuando esa regla se cumpla; en caso contrario, quedará oculto.
+    Nota: a diferencia de ocultar un campo "no relevante", un campo oculto puede seguir guardando una respuesta automática.
+    Esto es útil para ocultar secciones completas de la encuesta según quién haya iniciado sesión (por ejemplo, por rol).`,
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -928,7 +954,9 @@ $t(common.appNameFull)
     validationsProps: {
       minCount: 'Conteo mínimo',
       maxCount: 'Conteo máximo',
-      expressions: 'Expresiones',
+      expressions: 'Expresiones de validación',
+      attributeAlwaysValid: 'Atributo siempre válido',
+      attributeValidWhenConditionIsMet: 'Atributo válido cuando se cumple la condición',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Este nodo no se puede convertir a múltiple porque tiene valores predeterminados.',
