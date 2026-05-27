@@ -1,6 +1,6 @@
 import './expressionEditor.scss'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -26,6 +26,8 @@ const ExpressionEditor = (props) => {
     nodeDefUuidContext = '',
     nodeDefUuidCurrent = null,
     onChange = () => {},
+    onCancel = null,
+    onEditChange = null,
     placeholder = false,
     qualifier,
     query = '',
@@ -36,19 +38,31 @@ const ExpressionEditor = (props) => {
   const i18n = useI18n()
   const nodeDefCurrent = useNodeDefByUuid(nodeDefUuidCurrent)
 
-  const [edit, setEdit] = useState(false)
+  const [edit, setEdit] = useState(placeholder)
 
-  const onClose = useCallback(() => setEdit(false), [])
+  useEffect(() => {
+    onEditChange?.(edit)
+  }, [edit, onEditChange])
+
+  const closeEditor = useCallback(() => setEdit(false), [])
+
+  // Unified handler for both cancel and close actions.
+  const handleClose = useCallback(() => {
+    if (placeholder && onCancel) {
+      onCancel()
+    }
+    closeEditor()
+  }, [closeEditor, onCancel, placeholder])
 
   const applyChange = useCallback(
     ({ query }) => {
       if (onChange) {
-        onChange({ query, callback: onClose })
+        onChange({ query, callback: closeEditor })
       } else {
-        onClose()
+        closeEditor()
       }
     },
-    [onChange, onClose]
+    [closeEditor, onChange]
   )
 
   const idPrefix = `expression-editor-${placeholder ? 'placeholder' : index}-${qualifier}`
@@ -75,7 +89,7 @@ const ExpressionEditor = (props) => {
           canBeCall={canBeCall}
           canBeConstant={canBeConstant}
           isBoolean={isBoolean}
-          onClose={onClose}
+          onClose={handleClose}
           onChange={applyChange}
           types={types}
           header={popupHeader}
@@ -93,7 +107,7 @@ const ExpressionEditor = (props) => {
               iconClassName="icon-pencil2 icon-14px"
               id={`${idPrefix}-edit-btn`}
               onClick={() => setEdit(true)}
-              testId={TestId.expressionEditor.editBtn(qualifier)}
+              testId={TestId.expressionEditor.editBtn(qualifier, index)}
             />
           )}
         </div>
@@ -117,6 +131,8 @@ ExpressionEditor.propTypes = {
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   onChange: PropTypes.func,
+  onCancel: PropTypes.func,
+  onEditChange: PropTypes.func,
   readOnly: PropTypes.bool,
 }
 

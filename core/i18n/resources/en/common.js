@@ -966,10 +966,23 @@ $t(common.appNameFull)
     advancedProps: {
       areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
+      defaultValuesInfo: `This allows you to automatically fill in an answer based on specific rules.  
+If you set up multiple rules, the system will check them in order from top to bottom.  
+It will apply the very first rule that matches your conditions and use that as the answer.`,
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
+      defaultValueEvaluatedOneTimeInfo: `The default value will be evaluated only one time, when the attribute is created.
+If not marked, the default value will be re-evaluated every time the record is updated.
+It should be marked when using expressions like now() or uuid() that should be evaluated only once, when the attribute value is generated for the first time.`,
       defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
-      editableIf: 'Editable if',
-      hidden: 'Hide in entry form',
+      defaultValuesNotSpecified: 'Default values not specified',
+      defaultValuesSpecified: 'Default values specified',
+      editableIf: 'Editability',
+      editableIfInfo: `By default, a user can always access a relevant field.  
+Here we can set a rule whether a user can type into or change this field.  
+If the conditions you set are met, the field can be edited. If not, it becomes "read-only" (locked).`,
+      editableAlways: 'Always editable',
+      editableIfConditionIsMet: 'Editable if condition is met',
+      hidden: 'Always hidden',
       hiddenInReport: 'Hidden in Analytical Dashboard',
       hiddenInReportInfo: `If marked, the attribute won't be visible in the Analytical Dashboard`,
       hiddenWhenNotRelevant: 'Hidden when not relevant',
@@ -979,9 +992,21 @@ In the expression, the word "this" will refer to the item itself.
 E.g. this.region = region_attribute_name 
 (where "region" is the name of an extra property defined for the item and region_attribute_name is the name of an attribute in the survey)`,
       readOnly: 'Read only',
-      relevantIf: 'Relevant if',
+      relevantIf: 'Relevance',
+      relevantIfInfo: `By default, all fields are always active.  
+If you set a relevance rule and it isn't met, the field will either turn grey or be hidden entirely,  
+and any automatic answers will be ignored.  
+Use this to dynamically show or hide parts of your survey; e.g. only revealing a "Please specify" text box if a user selects "Other" in the previous question.`,
+      relevantIfRadioNone: 'Always relevant',
+      relevantIfRadioDefined: 'Relevant if condition is met',
       script: 'Script',
-      visibleIf: 'Visible if',
+      visibleIf: 'Visibility',
+      visibleIfInfo: `By default, a field is always visible.  
+If you set a rule, it will only be visible when that rule is met; otherwise, it will be hidden.  
+Note: unlike hiding an "inactive" (irrelevant) field, a hidden field can still have an automatic answer saved behind the scenes.  
+This is perfect for hiding entire parts of a survey based on who is logged in (like user roles).`,
+      visibleAlways: 'Always visible',
+      visibleIfConditionIsMet: 'Visible if condition is met',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1075,7 +1100,9 @@ E.g. this.region = region_attribute_name
     validationsProps: {
       minCount: 'Min count',
       maxCount: 'Max count',
-      expressions: 'Expressions',
+      expressions: 'Validation expressions',
+      attributeAlwaysValid: 'Attribute always valid',
+      attributeValidWhenConditionIsMet: 'Attribute valid when condition is met',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'This node cannot be converted to multiple because it has default values.',
@@ -1288,7 +1315,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       'relevant-if': 'relevant if',
       validations: 'validation rule',
       'validations-apply-if': 'validation rule apply if',
-      'visible-if': 'visible if',
+      'visible-if': 'visibility',
     },
 
     selectAFunction: 'Select a function',

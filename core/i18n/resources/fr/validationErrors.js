@@ -128,6 +128,7 @@ export default {
     validationsInvalid: '"Validations" invalides',
     countMaxInvalid: '"Nombre maximum" invalide',
     countMinInvalid: '"Nombre minimum" invalide',
+    readOnlyCannotHaveEditableIf: 'Un noeud en lecture seule ne peut pas avoir de condition "Editable if"',
   },
 
   record: {

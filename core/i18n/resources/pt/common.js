@@ -967,13 +967,31 @@ $t(common.appNameFull)
       table: 'Tabela',
     },
     advancedProps: {
+      defaultValuesNotSpecified: 'Valores padrão não especificados',
+      defaultValuesSpecified: 'Valores padrão especificados',
+      editableAlways: 'Sempre editável',
+      editableIfConditionIsMet: 'Editável quando a condição é atendida',
+      relevantIfRadioNone: 'Sempre relevante',
+      relevantIfRadioDefined: 'Relevante quando a condição é atendida',
+      visibleAlways: 'Sempre visível',
+      visibleIfConditionIsMet: 'Visível quando a condição é atendida',
       areaBasedEstimate: 'Estimativa baseada em área',
       defaultValues: 'Valores padrão',
+      defaultValuesInfo: `Isto permite preencher automaticamente uma resposta com base em regras específicas.
+    Se você configurar várias regras, o sistema irá verificá-las em ordem, de cima para baixo.
+    Ele aplicará a primeira regra que atender às condições e usará esse resultado como resposta.`,
       defaultValueEvaluatedOneTime: 'Valor padrão avaliado apenas uma vez',
+      defaultValueEvaluatedOneTimeInfo: `O valor padrão será avaliado apenas uma vez, quando o atributo for criado.
+    Se não estiver marcado, o valor padrão será reavaliado toda vez que o registro for atualizado.
+    Deve ser marcado ao usar expressões como now() ou uuid(), que devem ser avaliadas apenas uma vez, quando o valor do atributo for gerado pela primeira vez.`,
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valores padrão não editáveis porque a chave auto incremental está definida',
       editableIf: 'Editável se',
-      hidden: 'Ocultar no formulário de entrada',
+      editableIfInfo: `Por padrão, um usuário sempre pode acessar um campo relevante.
+Aqui podemos definir uma regra para indicar se o usuário pode digitar ou alterar este campo.
+Isto define se um usuário pode digitar ou alterar este campo.
+Se as condições definidas forem atendidas, o campo pode ser editado. Caso contrário, ele fica somente leitura (bloqueado).`,
+      hidden: 'Sempre oculto',
       hiddenInReport: 'Ocultar no Painel Analítico',
       hiddenInReportInfo: `Se marcado, o atributo não ficará visível no Painel Analítico`,
       hiddenWhenNotRelevant: 'Oculto quando não relevante',
@@ -984,8 +1002,16 @@ $t(common.appNameFull)
     (onde "region" é o nome de uma propriedade extra definida para o item e region_attribute_name é o nome de um atributo no inventário)`,
       readOnly: 'Somente leitura',
       relevantIf: 'Relevante se',
+      relevantIfInfo: `Por padrão, todos os campos ficam ativos.
+    Se você definir uma regra de relevância e ela não for atendida, o campo ficará cinza ou será ocultado por completo,
+    e respostas automáticas serão ignoradas.
+    Use isso para mostrar ou ocultar partes do formulário dinamicamente; por exemplo, mostrar "Especifique" apenas quando o usuário selecionar "Outro".`,
       script: 'Script',
       visibleIf: 'Visível se',
+      visibleIfInfo: `Por padrão, um campo é sempre visível.
+    Se você definir uma regra, ele só será visível quando essa regra for atendida; caso contrário, ficará oculto.
+    Observação: diferente de ocultar um campo "não relevante", um campo oculto ainda pode salvar uma resposta automática.
+    Isso é útil para ocultar seções inteiras do formulário com base em quem está logado (por exemplo, por função).`,
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1079,7 +1105,9 @@ $t(common.appNameFull)
     validationsProps: {
       minCount: 'Contagem mínima',
       maxCount: 'Contagem máxima',
-      expressions: 'Expressões',
+      expressions: 'Expressões de validação',
+      attributeAlwaysValid: 'Atributo sempre válido',
+      attributeValidWhenConditionIsMet: 'Atributo válido quando a condição é atendida',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Este nó não pode ser convertido para múltiplo porque possui valores padrão.',

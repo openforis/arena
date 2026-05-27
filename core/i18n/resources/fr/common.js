@@ -971,13 +971,31 @@ $t(common.appNameFull)
       table: 'Tableau',
     },
     advancedProps: {
+      defaultValuesNotSpecified: 'Valeurs par défaut non spécifiées',
+      defaultValuesSpecified: 'Valeurs par défaut spécifiées',
+      editableAlways: 'Toujours modifiable',
+      editableIfConditionIsMet: 'Modifiable lorsque la condition est remplie',
+      relevantIfRadioNone: 'Toujours pertinent',
+      relevantIfRadioDefined: 'Pertinent lorsque la condition est remplie',
+      visibleAlways: 'Toujours visible',
+      visibleIfConditionIsMet: 'Visible lorsque la condition est remplie',
       areaBasedEstimate: 'Estimation basée sur la surface',
       defaultValues: 'Valeurs par défaut',
+      defaultValuesInfo: `Cela permet de renseigner automatiquement une réponse selon des règles précises.
+    Si vous configurez plusieurs règles, le système les vérifie dans l'ordre, de haut en bas.
+    Il applique la première règle qui correspond aux conditions et utilise ce résultat comme réponse.`,
       defaultValueEvaluatedOneTime: 'Valeur par défaut évaluée une seule fois',
+      defaultValueEvaluatedOneTimeInfo: `La valeur par défaut sera évaluée une seule fois, lorsque l'attribut est créé.
+    Si ce n'est pas coché, la valeur par défaut sera réévaluée à chaque mise à jour de l'enregistrement.
+    Cela doit être coché lors de l'utilisation d'expressions comme now() ou uuid(), qui doivent être évaluées une seule fois, lors de la première génération de la valeur de l'attribut.`,
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valeurs par défaut non modifiables car la clé auto-incrémentielle est définie',
       editableIf: 'Modifiable si',
-      hidden: 'Masquer dans le formulaire de saisie',
+      editableIfInfo: `Par défaut, un utilisateur peut toujours accéder à un champ pertinent.
+Ici, nous pouvons définir une règle indiquant si l'utilisateur peut saisir ou modifier ce champ.
+Cela détermine si un utilisateur peut saisir ou modifier ce champ.
+Si les conditions définies sont remplies, le champ est modifiable. Sinon, il devient « lecture seule » (verrouillé).`,
+      hidden: 'Toujours masqué',
       hiddenInReport: 'Masquer dans le tableau de bord analytique',
       hiddenInReportInfo: `Si coché, l'attribut ne sera pas visible dans le tableau de bord analytique`,
       hiddenWhenNotRelevant: 'Masqué quand non pertinent',
@@ -988,8 +1006,16 @@ Ex. this.region = nom_attribut_region
 (où "region" est le nom d'une propriété supplémentaire définie pour l'élément et nom_attribut_region est le nom d'un attribut dans le formulaire)`,
       readOnly: 'Lecture seule',
       relevantIf: 'Pertinent si',
+      relevantIfInfo: `Par défaut, tous les champs sont actifs.
+    Si vous définissez une règle de pertinence et qu'elle n'est pas respectée, le champ devient grisé ou complètement masqué,
+    et les réponses automatiques sont ignorées.
+    Utilisez cela pour afficher ou masquer dynamiquement des parties du formulaire ; par exemple, afficher « Veuillez préciser » seulement si l'utilisateur choisit « Autre ».`,
       script: 'Script',
       visibleIf: 'Visible si',
+      visibleIfInfo: `Par défaut, un champ est toujours visible.
+    Si vous définissez une règle, il ne sera visible que lorsque cette règle est respectée ; sinon, il sera masqué.
+    Remarque : contrairement à un champ masqué car « non pertinent », un champ masqué peut quand même enregistrer une réponse automatique.
+    C'est pratique pour masquer des sections entières du formulaire selon la personne connectée (par exemple, selon le rôle).`,
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1083,7 +1109,9 @@ Ex. this.region = nom_attribut_region
     validationsProps: {
       minCount: 'Nombre minimum',
       maxCount: 'Nombre maximum',
-      expressions: 'Expressions',
+      expressions: 'Expressions de validation',
+      attributeAlwaysValid: 'Attribut toujours valide',
+      attributeValidWhenConditionIsMet: 'Attribut valide lorsque la condition est remplie',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Ce nœud ne peut pas être converti en multiple car il a des valeurs par défaut.',
