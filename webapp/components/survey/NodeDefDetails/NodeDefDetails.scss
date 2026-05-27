@@ -53,8 +53,20 @@
   .form {
     grid-row-gap: 0.5rem;
 
+    .validation-tooltip__default-values {
+      justify-self: center;
+    }
+
+    .validation-tooltip__default-values,
     fieldset.node-def-edit__expressions-fieldset {
       width: 80%;
+    }
+
+    .validation-tooltip__default-values > fieldset.node-def-edit__expressions-fieldset {
+      width: 100%;
+    }
+
+    fieldset.node-def-edit__expressions-fieldset {
       justify-self: center;
 
       .form-item {
@@ -75,6 +87,14 @@
             align-self: flex-start;
           }
         }
+      }
+    }
+
+    .tooltip-error .node-def-edit__expressions-fieldset {
+      border: 2px solid $colorError;
+
+      legend {
+        color: $colorError;
       }
     }
   }

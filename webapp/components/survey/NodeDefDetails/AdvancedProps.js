@@ -14,6 +14,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State } from './store'
@@ -65,6 +66,10 @@ const AdvancedProps = (props) => {
   const nodeDef = useMemo(() => State.getNodeDef(state), [state])
 
   const validation = State.getValidation(state)
+  const readOnlyValidation = useMemo(
+    () => Validation.getFieldValidation(NodeDef.propKeys.readOnly, null)(validation),
+    [validation]
+  )
 
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
   const autoIncrementalKey = NodeDef.isAutoIncrementalKey(nodeDef)
@@ -157,45 +162,47 @@ const AdvancedProps = (props) => {
       )}
 
       {NodeDef.canHaveDefaultValue(nodeDef) && (
-        <NodeDefExpressionsProp
-          qualifier={TestId.nodeDefDetails.defaultValues}
-          state={state}
-          Actions={Actions}
-          info={
-            autoIncrementalKey
-              ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey'
-              : 'nodeDefEdit.advancedProps.defaultValuesInfo'
-          }
-          label="nodeDefEdit.advancedProps.defaultValues"
-          readOnly={readOnly || autoIncrementalKey}
-          propName={NodeDef.keysPropsAdvanced.defaultValues}
-          nodeDefUuidContext={nodeDefUuidContext}
-          canBeConstant
-          isBoolean={NodeDef.isBoolean(nodeDef)}
-          excludeCurrentNodeDef
-          radioMode
-          radioLabels={{
-            none: 'nodeDefEdit.advancedProps.defaultValuesNotSpecified',
-            defined: 'nodeDefEdit.advancedProps.defaultValuesSpecified',
-          }}
-        >
-          {(defaultValueEvaluatedOneTime || Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))) && (
-            <div className="form_row without-label">
-              <Checkbox
-                checked={defaultValueEvaluatedOneTime}
-                disabled={readOnly || autoIncrementalKey}
-                info="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTimeInfo"
-                label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
-                validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
-                  validation
-                )}
-                onChange={(value) =>
-                  Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime, value })
-                }
-              />
-            </div>
-          )}
-        </NodeDefExpressionsProp>
+        <ValidationTooltip className="validation-tooltip__default-values" validation={readOnlyValidation}>
+          <NodeDefExpressionsProp
+            qualifier={TestId.nodeDefDetails.defaultValues}
+            state={state}
+            Actions={Actions}
+            info={
+              autoIncrementalKey
+                ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey'
+                : 'nodeDefEdit.advancedProps.defaultValuesInfo'
+            }
+            label="nodeDefEdit.advancedProps.defaultValues"
+            readOnly={readOnly || autoIncrementalKey}
+            propName={NodeDef.keysPropsAdvanced.defaultValues}
+            nodeDefUuidContext={nodeDefUuidContext}
+            canBeConstant
+            isBoolean={NodeDef.isBoolean(nodeDef)}
+            excludeCurrentNodeDef
+            radioMode
+            radioLabels={{
+              none: 'nodeDefEdit.advancedProps.defaultValuesNotSpecified',
+              defined: 'nodeDefEdit.advancedProps.defaultValuesSpecified',
+            }}
+          >
+            {(defaultValueEvaluatedOneTime || Objects.isNotEmpty(NodeDef.getDefaultValues(nodeDef))) && (
+              <div className="form_row without-label">
+                <Checkbox
+                  checked={defaultValueEvaluatedOneTime}
+                  disabled={readOnly || autoIncrementalKey}
+                  info="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTimeInfo"
+                  label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
+                  validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
+                    validation
+                  )}
+                  onChange={(value) =>
+                    Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime, value })
+                  }
+                />
+              </div>
+            )}
+          </NodeDefExpressionsProp>
+        </ValidationTooltip>
       )}
 
       <NodeDefExpressionsProp
