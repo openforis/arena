@@ -9,7 +9,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
-import { Checkbox } from '@webapp/components/form'
+import { Checkbox, Dropdown } from '@webapp/components/form'
 
 const FEATURE_CATEGORIES = ['chat', 'expressions', 'translation', 'analysis']
 
@@ -123,8 +123,9 @@ const UserAiSettingsPanel = () => {
     fetchSettings()
   }, [fetchSettings])
 
-  const onProviderChange = useCallback((e) => {
-    const provider = e.target.value
+  const onProviderChange = useCallback((providerItem) => {
+    const provider = providerItem?.value
+    if (!provider) return
     setForm((prev) => ({ ...prev, provider, baseUrl: '', model: '', modelFreeText: false }))
     setModels([])
     setModelsError(null)
@@ -138,10 +139,10 @@ const UserAiSettingsPanel = () => {
     []
   )
   const onFeatureToggleChange = useCallback(
-    (category) => (e) =>
+    (category) => (checked) =>
       setForm((prev) => ({
         ...prev,
-        featureToggles: { ...prev.featureToggles, [category]: e.target.checked },
+        featureToggles: { ...prev.featureToggles, [category]: checked },
       })),
     []
   )
@@ -390,11 +391,7 @@ const UserAiSettingsPanel = () => {
                 label={`userAiSettings:categories.${category}`}
                 info={i18n.t(`userAiSettings:categories.${category}Hint`)}
               >
-                <input
-                  type="checkbox"
-                  checked={!!form.featureToggles[category]}
-                  onChange={onFeatureToggleChange(category)}
-                />
+                <Checkbox checked={!!form.featureToggles[category]} onChange={onFeatureToggleChange(category)} />
               </FormItem>
             ))}
           </fieldset>
@@ -409,13 +406,16 @@ const UserAiSettingsPanel = () => {
             )}
 
             <FormItem label="userAiSettings:provider">
-              <select value={form.provider} onChange={onProviderChange}>
-                {PROVIDERS.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    {i18n.t(`userAiSettings:providers.${p.value}`)}
-                  </option>
-                ))}
-              </select>
+              <Dropdown
+                className="form-input-container"
+                items={PROVIDERS}
+                itemValue="value"
+                itemLabel={(provider) => i18n.t(`userAiSettings:providers.${provider.value}`)}
+                onChange={onProviderChange}
+                selection={PROVIDERS.find((provider) => provider.value === form.provider) || PROVIDERS[0]}
+                clearable={false}
+                searchable={false}
+              />
             </FormItem>
 
             {providerSpec.isDefault ? (
