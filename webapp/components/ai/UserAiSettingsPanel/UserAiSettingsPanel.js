@@ -7,9 +7,10 @@ import * as API from '@webapp/service/api'
 import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
-import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { Fieldset } from '@webapp/components/Fieldset'
 import { Checkbox, Dropdown } from '@webapp/components/form'
+import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { useI18n } from '@webapp/store/system'
 
 const FEATURE_CATEGORIES = ['chat', 'expressions', 'translation', 'analysis']
 
@@ -368,9 +369,7 @@ const UserAiSettingsPanel = () => {
   }
 
   return (
-    <fieldset className="user-ai-settings-panel">
-      <legend>{i18n.t('userAiSettings:section')}</legend>
-
+    <Fieldset className="user-ai-settings-panel" label="userAiSettings:section">
       {encryptionMissing && (
         <div className="user-ai-settings-panel__status user-ai-settings-panel__status--missing">
           {i18n.t('userAiSettings:encryptionMissing')}
@@ -383,8 +382,7 @@ const UserAiSettingsPanel = () => {
 
       {form.featuresEnabled && (
         <>
-          <fieldset className="user-ai-settings-panel__categories">
-            <legend>{i18n.t('userAiSettings:categoriesSection')}</legend>
+          <Fieldset className="user-ai-settings-panel__categories" label="userAiSettings:categoriesSection">
             {FEATURE_CATEGORIES.map((category) => (
               <FormItem
                 key={category}
@@ -394,11 +392,9 @@ const UserAiSettingsPanel = () => {
                 <Checkbox checked={!!form.featureToggles[category]} onChange={onFeatureToggleChange(category)} />
               </FormItem>
             ))}
-          </fieldset>
+          </Fieldset>
 
-          <fieldset className="user-ai-settings-panel__provider">
-            <legend>{i18n.t('userAiSettings:providerSection')}</legend>
-
+          <Fieldset className="user-ai-settings-panel__provider" label="userAiSettings:providerSection">
             {effective && (
               <div className="user-ai-settings-panel__effective">
                 {settings.effectiveProvider} / {settings.effectiveModel}
@@ -456,7 +452,7 @@ const UserAiSettingsPanel = () => {
                 )}
               </>
             )}
-          </fieldset>
+          </Fieldset>
         </>
       )}
 
@@ -487,7 +483,7 @@ const UserAiSettingsPanel = () => {
       </div>
 
       {testResultView}
-    </fieldset>
+    </Fieldset>
   )
 }
 
