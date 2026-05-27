@@ -57,7 +57,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
     <div className="ai-explain-panel" role="dialog" aria-modal="false">
       <div className="ai-explain-panel__header">
         <div className="ai-explain-panel__title">{i18n.t('aiExpression.explain.title')}</div>
-        <Button className="btn-s" iconClassName="icon-close icon-14px" onClick={onCancel} title="common.close" />
+        <Button className="btn-s" iconClassName="icon-cross icon-14px" onClick={onCancel} title="common.close" />
       </div>
 
       <div className="ai-explain-panel__expression">{expression}</div>
@@ -69,10 +69,6 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
       {error ? (
         <div className="ai-explain-panel__error">{tUnescaped('aiExpression.explain.error', { message: error })}</div>
       ) : null}
-
-      <div className="ai-explain-panel__buttons">
-        <Button label="common.close" onClick={onCancel} />
-      </div>
     </div>
   )
 }

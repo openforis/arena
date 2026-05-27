@@ -59,7 +59,7 @@ const AiActivityLogSummary = ({ from, to, userUuid, onClose }) => {
     <div className="ai-activity-log-summary" role="dialog" aria-modal="false">
       <div className="ai-activity-log-summary__header">
         <div className="ai-activity-log-summary__title">{i18n.t('aiActivityLog.title')}</div>
-        <Button className="btn-s" iconClassName="icon-close icon-14px" onClick={onCancel} title="common.close" />
+        <Button className="btn-s" iconClassName="icon-cross icon-14px" onClick={onCancel} title="common.close" />
       </div>
 
       <div className={`ai-activity-log-summary__body${done ? '' : ' ai-activity-log-summary__cursor'}`}>

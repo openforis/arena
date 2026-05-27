@@ -232,7 +232,7 @@ const ChatbotPanel = ({ onClose }) => {
             onClick={onClear}
             disabled={streaming || messages.length === 0}
           />
-          <Button className="btn-s" iconClassName="icon-close icon-14px" onClick={onClose} title="common.close" />
+          <Button className="btn-s" iconClassName="icon-cross icon-14px" onClick={onClose} title="common.close" />
         </div>
       </div>
 
