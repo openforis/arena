@@ -13,6 +13,7 @@
 import { useEffect, useState } from 'react'
 
 import * as API from '@webapp/service/api'
+import { useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
 
 let cache = null
 let inflight = null
@@ -77,15 +78,22 @@ export const onAiSettingsInvalidated = (cb) => {
  * @returns {boolean} Whether this category's UI should render.
  */
 export const useAiFeatureEnabled = (category) => {
+  const aiFeaturesEnabledInSystemConfig = useSystemConfigAiFeaturesEnabled()
   const [_counter, setCounter] = useState(0)
+
   useEffect(() => {
     const onChange = () => setCounter((n) => n + 1)
     listeners.add(onChange)
-    if (!cache && !inflight) fetchOnce()
+
+    if (aiFeaturesEnabledInSystemConfig && !cache && !inflight) {
+      fetchOnce()
+    }
     return () => {
       listeners.delete(onChange)
     }
-  }, [])
+  }, [aiFeaturesEnabledInSystemConfig])
+
+  if (!aiFeaturesEnabledInSystemConfig) return false
   if (!cache) return false
   return !!cache.featuresEnabled && !!cache.featureToggles?.[category]
 }
