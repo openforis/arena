@@ -127,6 +127,7 @@ export default {
     validationsInvalid: '"Validações" inválidas',
     countMaxInvalid: '"Contagem máxima" inválida',
     countMinInvalid: '"Contagem mínima" inválida',
+    readOnlyCannotHaveEditableIf: 'Um nó somente leitura não pode ter a condição "Editable if"',
   },
 
   record: {

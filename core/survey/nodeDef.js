@@ -408,6 +408,11 @@ export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues,
 export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
 export const isDefaultValueEvaluatedOneTime = getPropAdvanced(keysPropsAdvanced.defaultValueEvaluatedOneTime, false)
 
+export const getEditableIf = getPropAdvanced(keysPropsAdvanced.editableIf, [])
+export const isAlwaysEditable = R.pipe(getEditableIf, R.isEmpty)
+export const getVisibleIf = getPropAdvanced(keysPropsAdvanced.visibleIf, [])
+export const isAlwaysVisible = R.pipe(getVisibleIf, R.isEmpty)
+
 export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
 
@@ -418,6 +423,8 @@ export const getAllExpressions = (nodeDef) => {
     ...getDefaultValues(nodeDef),
     ...getValidationExpressions(nodeDef),
     ...getApplicable(nodeDef),
+    ...getEditableIf(nodeDef),
+    ...getVisibleIf(nodeDef),
   ]
   const expressions = nodeDefExpressions.reduce((acc, nodeDefExpression) => {
     ArrayUtils.addIfNotEmpty(NodeDefExpression.getExpression(nodeDefExpression))(acc)
