@@ -47,7 +47,6 @@ const ExpressionEditor = (props) => {
   const [explainOpen, setExplainOpen] = useState(false)
 
   const closeEditor = useCallback(() => setEdit(false), [])
-  const onClose = useCallback(() => setEdit(false), [])
   const onAiCancel = useCallback(() => setAiOpen(false), [])
   const onAiApply = useCallback(
     (expression) => {
