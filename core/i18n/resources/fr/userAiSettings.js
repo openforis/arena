@@ -1,0 +1,59 @@
+export default {
+  title: 'Parametres IA',
+  section: 'Fonctionnalites IA',
+  enableFeatures: 'Activer les fonctionnalites IA',
+  categoriesSection: 'Niveaux d integration IA',
+  categories: {
+    chat: 'Chatbot de documentation',
+    chatHint: 'Bouton d aide flottant qui repond aux questions sur Arena, alimente par votre fournisseur IA configure.',
+    expressions: 'Generation et validation d expressions',
+    expressionsHint: 'Assistance IA pour rediger et expliquer les expressions de validation de formulaire.',
+    translation: 'Traduction des libelles',
+    translationHint: 'Traduction automatique des libelles multilingues via votre fournisseur IA.',
+    analysis: 'Analyse et rapports',
+    analysisHint: 'Resumes du journal d activite et exports de dictionnaire de donnees rediges par IA.',
+  },
+  providerSection: 'Fournisseur IA',
+  currentlyUsing: 'Utilise actuellement : {{source}} - {{provider}} / {{model}}',
+  sourceUser: 'votre fournisseur personnel',
+  'sourceAdmin-default': 'la configuration par defaut de la plateforme',
+  notConfigured:
+    'L IA n est pas configuree pour votre compte ou ce deploiement. Configurez un fournisseur personnel ci-dessous ou contactez votre administrateur.',
+  featuresDisabled: 'Les fonctionnalites IA sont desactivees sur ce deploiement.',
+  encryptionMissing:
+    'Le deploiement ne dispose pas de AI_USER_KEY_ENCRYPTION_SECRET ; les cles API personnelles ne peuvent pas etre enregistrees tant qu un administrateur ne l a pas configure.',
+
+  provider: 'Fournisseur',
+  providers: {
+    default: 'Par defaut',
+    openai: 'OpenAI',
+    anthropic: 'Anthropic (Claude)',
+    google: 'Google (Gemini)',
+    'openai-compatible': 'Compatible OpenAI (Azure, OpenRouter, Ollama, ...)',
+    'vercel-ai-sdk': 'Vercel AI SDK (endpoint de chat)',
+  },
+  defaultProviderHint: 'Utilise le fournisseur IA configure par votre administrateur Arena.',
+  model: 'Modele',
+  modelOther: 'Autre (saisir un identifiant de modele)...',
+  baseUrl: 'URL de base',
+  apiKey: 'Cle API',
+  apiKeyPlaceholder: 'Collez la cle API de votre fournisseur',
+  apiKeyKept: 'Laissez vide pour conserver la cle existante.',
+  vercelAiSdkHint:
+    'Un endpoint chat Vercel AI SDK est traite comme un agent fixe - la selection du modele et la cle API ne s appliquent pas. La generation de texte libre fonctionne ; les fonctionnalites de sortie structuree peuvent ne pas fonctionner.',
+  fetchModels: 'Recuperer les modeles',
+  fetchingModels: 'Recuperation des modeles...',
+  modelsFetchFailed: 'Impossible de recuperer les modeles : {{message}}',
+
+  save: 'Enregistrer',
+  testConnection: 'Tester la connexion',
+  clear: 'Effacer',
+
+  testing: 'Test de connexion...',
+  testOk: 'Connexion OK ({{latencyMs}} ms).',
+  testFailed: 'Echec de connexion : {{message}}',
+
+  savedSuccessfully: 'Parametres IA enregistres.',
+  saveFailed: 'Echec de l enregistrement des parametres IA : {{message}}',
+  cleared: 'Parametres IA personnels supprimes.',
+}

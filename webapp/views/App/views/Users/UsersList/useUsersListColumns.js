@@ -17,7 +17,7 @@ export const useUsersListColumns = () => {
   const i18n = useI18n()
 
   const goToUserDetails = useCallback(
-    (user) => navigate(`${appModuleUri(userModules.user)}${User.getUuid(user)}?hideSurveyGroup=true`),
+    (user) => navigate(`${appModuleUri(userModules.user)}${User.getUuid(user)}`),
     [navigate]
   )
 

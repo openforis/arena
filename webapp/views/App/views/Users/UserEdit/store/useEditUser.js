@@ -68,7 +68,7 @@ export const useEditUser = ({ userUuid }) => {
   const [userToUpdate, setUserToUpdate] = useState({})
   const dispatch = useDispatch()
 
-  const { hideSurveyGroup = false } = useQuery()
+  const { showSurveyGroup = false } = useQuery()
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
 
@@ -150,7 +150,7 @@ export const useEditUser = ({ userUuid }) => {
   }, [navigate])
 
   return {
-    hideSurveyGroup,
+    showSurveyGroup,
     ready,
     dirty,
     user,

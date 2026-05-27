@@ -1,6 +1,6 @@
 import './UserAiSettingsPanel.scss'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as API from '@webapp/service/api'
 
@@ -9,6 +9,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { Checkbox } from '@webapp/components/form'
 
 const FEATURE_CATEGORIES = ['chat', 'expressions', 'translation', 'analysis']
 
@@ -86,7 +87,7 @@ const UserAiSettingsPanel = () => {
 
   const providerSpec = useMemo(() => PROVIDERS.find((p) => p.value === form.provider) || PROVIDERS[0], [form.provider])
 
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     setLoading(true)
     try {
       const data = await API.aiSettings.fetchSettings()
@@ -116,37 +117,43 @@ const UserAiSettingsPanel = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [notifyError])
 
   useEffect(() => {
     fetchSettings()
-  }, [])
+  }, [fetchSettings])
 
-  const onProviderChange = (e) => {
+  const onProviderChange = useCallback((e) => {
     const provider = e.target.value
     setForm((prev) => ({ ...prev, provider, baseUrl: '', model: '', modelFreeText: false }))
     setModels([])
     setModelsError(null)
     setLastModelsKey(null)
-  }
-  const onModelChange = (value) => setForm((prev) => ({ ...prev, model: value }))
-  const onBaseUrlChange = (value) => setForm((prev) => ({ ...prev, baseUrl: value }))
-  const onApiKeyChange = (value) => setForm((prev) => ({ ...prev, apiKey: value, apiKeyDirty: true }))
-  const onFeaturesEnabledChange = (e) => setForm((prev) => ({ ...prev, featuresEnabled: e.target.checked }))
-  const onFeatureToggleChange = (category) => (e) =>
-    setForm((prev) => ({
-      ...prev,
-      featureToggles: { ...prev.featureToggles, [category]: e.target.checked },
-    }))
+  }, [])
+  const onModelChange = useCallback((value) => setForm((prev) => ({ ...prev, model: value })), [])
+  const onBaseUrlChange = useCallback((value) => setForm((prev) => ({ ...prev, baseUrl: value })), [])
+  const onApiKeyChange = useCallback((value) => setForm((prev) => ({ ...prev, apiKey: value, apiKeyDirty: true })), [])
+  const onFeaturesEnabledChange = useCallback(
+    (checked) => setForm((prev) => ({ ...prev, featuresEnabled: checked })),
+    []
+  )
+  const onFeatureToggleChange = useCallback(
+    (category) => (e) =>
+      setForm((prev) => ({
+        ...prev,
+        featureToggles: { ...prev.featureToggles, [category]: e.target.checked },
+      })),
+    []
+  )
 
-  const onModelSelectChange = (e) => {
+  const onModelSelectChange = useCallback((e) => {
     const value = e.target.value
     if (value === OTHER_MODEL_VALUE) {
       setForm((prev) => ({ ...prev, modelFreeText: true }))
     } else {
       setForm((prev) => ({ ...prev, model: value, modelFreeText: false }))
     }
-  }
+  }, [])
 
   /**
    * Fetch the model list when we have enough credentials. Called on blur of
@@ -156,56 +163,70 @@ const UserAiSettingsPanel = () => {
    * @param {boolean} [opts.force] - Bypass the dedupe key check.
    * @returns {Promise<void>} Nothing.
    */
-  const fetchModels = async ({ force = false } = {}) => {
-    if (!providerSpec.supportsModelList) return
-    const hasBaseUrl = !providerSpec.requiresBaseUrl || form.baseUrl.trim().length > 0
-    const hasApiKey = !providerSpec.requiresApiKey || form.apiKeyDirty || !!settings?.hasApiKey
-    if (!hasBaseUrl || !hasApiKey) return
+  const fetchModels = useCallback(
+    async ({ force = false } = {}) => {
+      if (!providerSpec.supportsModelList) return
+      const hasBaseUrl = !providerSpec.requiresBaseUrl || form.baseUrl.trim().length > 0
+      const hasApiKey = !providerSpec.requiresApiKey || form.apiKeyDirty || !!settings?.hasApiKey
+      if (!hasBaseUrl || !hasApiKey) return
 
-    const key = buildModelsKey({
-      provider: form.provider,
-      baseUrl: form.baseUrl,
-      apiKey: form.apiKey,
-      apiKeyDirty: form.apiKeyDirty,
-      hasSavedApiKey: !!settings?.hasApiKey,
-    })
-    if (!force && key === lastModelsKey) return
-
-    setModelsFetching(true)
-    setModelsError(null)
-    setLastModelsKey(key)
-    try {
-      const data = await API.aiSettings.fetchModels({
+      const key = buildModelsKey({
         provider: form.provider,
-        baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
-        apiKey: form.apiKeyDirty ? form.apiKey : null,
+        baseUrl: form.baseUrl,
+        apiKey: form.apiKey,
+        apiKeyDirty: form.apiKeyDirty,
+        hasSavedApiKey: !!settings?.hasApiKey,
       })
-      const list = Array.isArray(data?.models) ? data.models : []
-      setModels(list)
-      if (list.length > 0) {
-        // Show the dropdown after fetching. If the current model isn't in
-        // the list (empty, stale, or a hand-typed id), preselect the first
-        // returned model so the user immediately sees the available choices;
-        // they can still pick "Other (type a model id)…" to free-text.
-        const currentInList = !!form.model && list.some((m) => m.id === form.model)
-        if (currentInList) {
-          setForm((prev) => ({ ...prev, modelFreeText: false }))
-        } else {
-          setForm((prev) => ({ ...prev, model: list[0].id, modelFreeText: false }))
+      if (!force && key === lastModelsKey) return
+
+      setModelsFetching(true)
+      setModelsError(null)
+      setLastModelsKey(key)
+      try {
+        const data = await API.aiSettings.fetchModels({
+          provider: form.provider,
+          baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
+          apiKey: form.apiKeyDirty ? form.apiKey : null,
+        })
+        const list = Array.isArray(data?.models) ? data.models : []
+        setModels(list)
+        if (list.length > 0) {
+          // Show the dropdown after fetching. If the current model isn't in
+          // the list (empty, stale, or a hand-typed id), preselect the first
+          // returned model so the user immediately sees the available choices;
+          // they can still pick "Other (type a model id)…" to free-text.
+          const currentInList = !!form.model && list.some((m) => m.id === form.model)
+          if (currentInList) {
+            setForm((prev) => ({ ...prev, modelFreeText: false }))
+          } else {
+            setForm((prev) => ({ ...prev, model: list[0].id, modelFreeText: false }))
+          }
         }
+      } catch (error) {
+        setModels([])
+        setModelsError(error?.response?.data?.error || error?.message || 'unknown')
+      } finally {
+        setModelsFetching(false)
       }
-    } catch (error) {
-      setModels([])
-      setModelsError(error?.response?.data?.error || error?.message || 'unknown')
-    } finally {
-      setModelsFetching(false)
-    }
-  }
+    },
+    [
+      providerSpec.supportsModelList,
+      providerSpec.requiresBaseUrl,
+      providerSpec.requiresApiKey,
+      form.baseUrl,
+      form.apiKeyDirty,
+      form.provider,
+      form.apiKey,
+      form.model,
+      settings?.hasApiKey,
+      lastModelsKey,
+    ]
+  )
 
-  const onBaseUrlBlur = () => fetchModels()
-  const onApiKeyBlur = () => fetchModels()
+  const onBaseUrlBlur = useCallback(() => fetchModels(), [fetchModels])
+  const onApiKeyBlur = useCallback(() => fetchModels(), [fetchModels])
 
-  const onSave = async () => {
+  const onSave = useCallback(async () => {
     setSaving(true)
     setTestResult(null)
     try {
@@ -225,15 +246,28 @@ const UserAiSettingsPanel = () => {
       setSettings(data)
       setForm((prev) => ({ ...prev, apiKey: '', apiKeyDirty: false }))
       invalidateAiSettingsCache()
-      notifyInfo({ key: 'userAiSettings.savedSuccessfully' })
+      notifyInfo({ key: 'userAiSettings:savedSuccessfully' })
     } catch (error) {
-      notifyError({ key: 'userAiSettings.saveFailed', params: { message: error?.message || 'unknown' } })
+      notifyError({ key: 'userAiSettings:saveFailed', params: { message: error?.message || 'unknown' } })
     } finally {
       setSaving(false)
     }
-  }
+  }, [
+    providerSpec.isDefault,
+    providerSpec.supportsModelList,
+    providerSpec.requiresBaseUrl,
+    form.featuresEnabled,
+    form.featureToggles,
+    form.provider,
+    form.model,
+    form.baseUrl,
+    form.apiKeyDirty,
+    form.apiKey,
+    notifyInfo,
+    notifyError,
+  ])
 
-  const onTest = async () => {
+  const onTest = useCallback(async () => {
     setTestResult({ pending: true })
     try {
       const result = await API.aiSettings.testConnection()
@@ -241,9 +275,9 @@ const UserAiSettingsPanel = () => {
     } catch (error) {
       setTestResult({ ok: false, errorMessage: error?.message || 'unknown' })
     }
-  }
+  }, [])
 
-  const onClear = async () => {
+  const onClear = useCallback(async () => {
     setSaving(true)
     setTestResult(null)
     try {
@@ -254,22 +288,22 @@ const UserAiSettingsPanel = () => {
       setModelsError(null)
       setLastModelsKey(null)
       invalidateAiSettingsCache()
-      notifyInfo({ key: 'userAiSettings.cleared' })
+      notifyInfo({ key: 'userAiSettings:cleared' })
     } catch (error) {
-      notifyError({ key: 'userAiSettings.saveFailed', params: { message: error?.message || 'unknown' } })
+      notifyError({ key: 'userAiSettings:saveFailed', params: { message: error?.message || 'unknown' } })
     } finally {
       setSaving(false)
     }
-  }
+  }, [notifyError, notifyInfo])
 
   const testResultView = useMemo(() => {
     if (testResult) {
       if (testResult.pending) {
-        return <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings.testing')}</div>
+        return <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings:testing')}</div>
       } else {
         const testResultMessage = testResult.ok
-          ? i18n.t('userAiSettings.testOk', { latencyMs: testResult.latencyMs })
-          : i18n.t('userAiSettings.testFailed', { message: testResult.errorMessage || 'unknown' })
+          ? i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs })
+          : i18n.t('userAiSettings:testFailed', { message: testResult.errorMessage || 'unknown' })
         return (
           <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>{testResultMessage}</div>
         )
@@ -283,9 +317,9 @@ const UserAiSettingsPanel = () => {
   if (settings?.aiFeaturesDisabled) {
     return (
       <fieldset className="user-ai-settings-panel">
-        <legend>{i18n.t('userAiSettings.section')}</legend>
+        <legend>{i18n.t('userAiSettings:section')}</legend>
         <div className="user-ai-settings-panel__status user-ai-settings-panel__status--missing">
-          {i18n.t('userAiSettings.featuresDisabled')}
+          {i18n.t('userAiSettings:featuresDisabled')}
         </div>
       </fieldset>
     )
@@ -298,7 +332,7 @@ const UserAiSettingsPanel = () => {
     if (!providerSpec.supportsModelList) return null
     const useDropdown = models.length > 0 && !form.modelFreeText
     return (
-      <FormItem label="userAiSettings.model">
+      <FormItem label="userAiSettings:model">
         {useDropdown ? (
           <div className="user-ai-settings-panel__model-row">
             <select className="user-ai-settings-panel__model-select" value={form.model} onChange={onModelSelectChange}>
@@ -307,7 +341,7 @@ const UserAiSettingsPanel = () => {
                   {m.description ? `${m.id} — ${m.description}` : m.id}
                 </option>
               ))}
-              <option value={OTHER_MODEL_VALUE}>{i18n.t('userAiSettings.modelOther')}</option>
+              <option value={OTHER_MODEL_VALUE}>{i18n.t('userAiSettings:modelOther')}</option>
             </select>
           </div>
         ) : (
@@ -319,13 +353,13 @@ const UserAiSettingsPanel = () => {
               onClick={() => fetchModels({ force: true })}
               disabled={modelsFetching}
             >
-              {modelsFetching ? i18n.t('userAiSettings.fetchingModels') : i18n.t('userAiSettings.fetchModels')}
+              {modelsFetching ? i18n.t('userAiSettings:fetchingModels') : i18n.t('userAiSettings:fetchModels')}
             </button>
           </div>
         )}
         {modelsError && (
           <div className="user-ai-settings-panel__hint user-ai-settings-panel__hint--error">
-            {i18n.t('userAiSettings.modelsFetchFailed', { message: modelsError })}
+            {i18n.t('userAiSettings:modelsFetchFailed', { message: modelsError })}
           </div>
         )}
       </FormItem>
@@ -334,27 +368,27 @@ const UserAiSettingsPanel = () => {
 
   return (
     <fieldset className="user-ai-settings-panel">
-      <legend>{i18n.t('userAiSettings.section')}</legend>
+      <legend>{i18n.t('userAiSettings:section')}</legend>
 
       {encryptionMissing && (
         <div className="user-ai-settings-panel__status user-ai-settings-panel__status--missing">
-          {i18n.t('userAiSettings.encryptionMissing')}
+          {i18n.t('userAiSettings:encryptionMissing')}
         </div>
       )}
 
-      <FormItem label="userAiSettings.enableFeatures">
-        <input type="checkbox" checked={form.featuresEnabled} onChange={onFeaturesEnabledChange} />
+      <FormItem label="userAiSettings:enableFeatures">
+        <Checkbox checked={form.featuresEnabled} onChange={onFeaturesEnabledChange} />
       </FormItem>
 
       {form.featuresEnabled && (
         <>
           <fieldset className="user-ai-settings-panel__categories">
-            <legend>{i18n.t('userAiSettings.categoriesSection')}</legend>
+            <legend>{i18n.t('userAiSettings:categoriesSection')}</legend>
             {FEATURE_CATEGORIES.map((category) => (
               <FormItem
                 key={category}
-                label={`userAiSettings.categories.${category}`}
-                info={i18n.t(`userAiSettings.categories.${category}Hint`)}
+                label={`userAiSettings:categories.${category}`}
+                info={i18n.t(`userAiSettings:categories.${category}Hint`)}
               >
                 <input
                   type="checkbox"
@@ -366,7 +400,7 @@ const UserAiSettingsPanel = () => {
           </fieldset>
 
           <fieldset className="user-ai-settings-panel__provider">
-            <legend>{i18n.t('userAiSettings.providerSection')}</legend>
+            <legend>{i18n.t('userAiSettings:providerSection')}</legend>
 
             {effective && (
               <div className="user-ai-settings-panel__effective">
@@ -374,22 +408,22 @@ const UserAiSettingsPanel = () => {
               </div>
             )}
 
-            <FormItem label="userAiSettings.provider">
+            <FormItem label="userAiSettings:provider">
               <select value={form.provider} onChange={onProviderChange}>
                 {PROVIDERS.map((p) => (
                   <option key={p.value} value={p.value}>
-                    {i18n.t(`userAiSettings.providers.${p.value}`)}
+                    {i18n.t(`userAiSettings:providers.${p.value}`)}
                   </option>
                 ))}
               </select>
             </FormItem>
 
             {providerSpec.isDefault ? (
-              <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings.defaultProviderHint')}</div>
+              <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:defaultProviderHint')}</div>
             ) : (
               <>
                 {providerSpec.requiresBaseUrl && (
-                  <FormItem label="userAiSettings.baseUrl">
+                  <FormItem label="userAiSettings:baseUrl">
                     <Input
                       value={form.baseUrl}
                       onChange={onBaseUrlChange}
@@ -400,25 +434,25 @@ const UserAiSettingsPanel = () => {
                 )}
 
                 {form.provider !== 'vercel-ai-sdk' && (
-                  <FormItem label="userAiSettings.apiKey">
+                  <FormItem label="userAiSettings:apiKey">
                     <Input
                       type="password"
                       value={form.apiKey}
                       onChange={onApiKeyChange}
                       onBlur={onApiKeyBlur}
-                      placeholder={settings?.hasApiKey ? '•'.repeat(16) : i18n.t('userAiSettings.apiKeyPlaceholder')}
+                      placeholder={settings?.hasApiKey ? '•'.repeat(16) : i18n.t('userAiSettings:apiKeyPlaceholder')}
                       disabled={encryptionMissing}
                     />
                   </FormItem>
                 )}
                 {settings?.hasApiKey && !form.apiKeyDirty && form.provider !== 'vercel-ai-sdk' && (
-                  <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings.apiKeyKept')}</div>
+                  <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:apiKeyKept')}</div>
                 )}
 
                 {renderModelField()}
 
                 {form.provider === 'vercel-ai-sdk' && (
-                  <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings.vercelAiSdkHint')}</div>
+                  <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:vercelAiSdkHint')}</div>
                 )}
               </>
             )}
@@ -429,13 +463,13 @@ const UserAiSettingsPanel = () => {
       <div className="user-ai-settings-panel__buttons">
         <Button
           className="btn-primary"
-          label="userAiSettings.save"
+          label="userAiSettings:save"
           onClick={onSave}
           disabled={saving || encryptionMissing}
         />
         {form.featuresEnabled && !providerSpec.isDefault && (
           <Button
-            label="userAiSettings.testConnection"
+            label="userAiSettings:testConnection"
             onClick={onTest}
             disabled={
               saving || encryptionMissing || (providerSpec.requiresApiKey && !settings?.hasApiKey && !form.apiKeyDirty)
@@ -445,7 +479,7 @@ const UserAiSettingsPanel = () => {
         {form.featuresEnabled && (
           <Button
             className="btn-danger"
-            label="userAiSettings.clear"
+            label="userAiSettings:clear"
             onClick={onClear}
             disabled={saving || (!settings?.hasApiKey && !settings?.provider)}
           />

@@ -11,6 +11,7 @@ import jobs from './jobs'
 import messageView from './messageView'
 import surveyCreate from './surveyCreate'
 import surveyForm from './surveyForm'
+import userAiSettings from './userAiSettings'
 import user2FADevice from './user2FADevice'
 import usersView from './usersView'
 import validationErrors from './validationErrors'
@@ -29,6 +30,7 @@ export default {
   messageView,
   surveyCreate,
   surveyForm,
+  userAiSettings,
   user2FADevice,
   usersView,
   validationErrors,

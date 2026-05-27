@@ -1313,67 +1313,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     arenaRScriptsInGitHub: `<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>`,
   },
 
-  // ===== AI Tier 1 =====
-  userAiSettings: {
-    title: 'AI Settings',
-    section: 'AI features',
-    enableFeatures: 'Enable AI features',
-    categoriesSection: 'AI integration levels',
-    categories: {
-      chat: 'Documentation chatbot',
-      chatHint: 'Floating help button that answers questions about Arena, powered by your configured AI provider.',
-      expressions: 'Expression generation & validation',
-      expressionsHint: 'AI assistance to draft and explain survey validation expressions.',
-      translation: 'Label translation',
-      translationHint: 'Auto-translate multilingual survey field labels via your AI provider.',
-      analysis: 'Analysis & reporting',
-      analysisHint: 'Activity-log summaries and AI-drafted data dictionary exports.',
-    },
-    providerSection: 'AI provider',
-    currentlyUsing: 'Currently using: {{source}} — {{provider}} / {{model}}',
-    sourceUser: 'your personal provider',
-    'sourceAdmin-default': 'the platform default',
-    notConfigured:
-      'AI is not configured for your account or this deployment. Configure a personal provider below or contact your administrator.',
-    featuresDisabled: 'AI features are disabled on this deployment.',
-    encryptionMissing:
-      'The deployment is missing AI_USER_KEY_ENCRYPTION_SECRET; personal API keys cannot be saved until an administrator configures it.',
-
-    provider: 'Provider',
-    providers: {
-      default: 'Default',
-      openai: 'OpenAI',
-      anthropic: 'Anthropic (Claude)',
-      google: 'Google (Gemini)',
-      'openai-compatible': 'OpenAI-compatible (Azure, OpenRouter, Ollama, …)',
-      'vercel-ai-sdk': 'Vercel AI SDK (chat endpoint)',
-    },
-    defaultProviderHint: 'Uses the AI provider configured by your Arena administrator.',
-    model: 'Model',
-    modelOther: 'Other (type a model id)…',
-    baseUrl: 'Base URL',
-    apiKey: 'API key',
-    apiKeyPlaceholder: 'Paste your provider API key',
-    apiKeyKept: 'Leave blank to keep the existing key.',
-    vercelAiSdkHint:
-      'A Vercel AI SDK chat endpoint is treated as a fixed agent — model selection and API key do not apply. Free-text generation works; structured-output features may not.',
-    fetchModels: 'Fetch models',
-    fetchingModels: 'Fetching models…',
-    modelsFetchFailed: 'Could not fetch models: {{message}}',
-
-    save: 'Save',
-    testConnection: 'Test connection',
-    clear: 'Clear',
-
-    testing: 'Testing connection…',
-    testOk: 'Connection OK ({{latencyMs}} ms).',
-    testFailed: 'Connection failed: {{message}}',
-
-    savedSuccessfully: 'AI settings saved.',
-    saveFailed: 'Failed to save AI settings: {{message}}',
-    cleared: 'Personal AI settings removed.',
-  },
-
   aiExpression: {
     title: 'Generate expression from description',
     hint: 'Describe in plain language what the expression should do. The AI will translate it into Arena syntax. Press Ctrl+Enter to generate.',
