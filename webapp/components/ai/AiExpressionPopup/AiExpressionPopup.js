@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 
 import * as API from '@webapp/service/api'
 import { Button } from '@webapp/components/buttons'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 
@@ -59,15 +60,8 @@ const AiExpressionPopup = ({ qualifier, nodeDefUuid, onCancel, onApply }) => {
   }
 
   return (
-    <>
-      <button
-        type="button"
-        className="ai-expression-popup__backdrop"
-        aria-label={i18n.t('common.cancel')}
-        onClick={onCancel}
-      />
-      <div className="ai-expression-popup" role="dialog" aria-modal="true">
-        <div className="ai-expression-popup__title">{i18n.t('aiExpression.title')}</div>
+    <Modal className="ai-expression-popup" title="aiExpression.title" showCloseButton onClose={onCancel}>
+      <ModalBody>
         <div className="ai-expression-popup__hint">{i18n.t('aiExpression.hint')}</div>
 
         <textarea
@@ -99,30 +93,30 @@ const AiExpressionPopup = ({ qualifier, nodeDefUuid, onCancel, onApply }) => {
         ) : null}
 
         {error ? <div className="ai-expression-popup__error">{error}</div> : null}
+      </ModalBody>
 
-        <div className="ai-expression-popup__buttons">
-          <Button label="common.cancel" onClick={onCancel} disabled={busy} />
-          {result ? (
-            <>
-              <Button label="aiExpression.tryAgain" onClick={() => setResult(null)} disabled={busy} />
-              <Button
-                className="btn-primary"
-                label={result.isValid ? 'aiExpression.use' : 'aiExpression.useAnyway'}
-                onClick={onUse}
-                disabled={busy}
-              />
-            </>
-          ) : (
+      <ModalFooter>
+        <Button label="common.cancel" onClick={onCancel} disabled={busy} variant="outlined" />
+        {result ? (
+          <>
+            <Button label="aiExpression.tryAgain" onClick={() => setResult(null)} disabled={busy} />
             <Button
               className="btn-primary"
-              label={busy ? 'aiExpression.generating' : 'aiExpression.generate'}
-              onClick={onGenerate}
-              disabled={busy || !description.trim()}
+              label={result.isValid ? 'aiExpression.use' : 'aiExpression.useAnyway'}
+              onClick={onUse}
+              disabled={busy}
             />
-          )}
-        </div>
-      </div>
-    </>
+          </>
+        ) : (
+          <Button
+            className="btn-primary"
+            label={busy ? 'aiExpression.generating' : 'aiExpression.generate'}
+            onClick={onGenerate}
+            disabled={busy || !description.trim()}
+          />
+        )}
+      </ModalFooter>
+    </Modal>
   )
 }
 

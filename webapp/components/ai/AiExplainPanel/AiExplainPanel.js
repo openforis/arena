@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as API from '@webapp/service/api'
-import { Button } from '@webapp/components/buttons'
+import { Modal, ModalBody } from '@webapp/components/modal'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 
@@ -54,22 +54,19 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
   }
 
   return (
-    <div className="ai-explain-panel" role="dialog" aria-modal="false">
-      <div className="ai-explain-panel__header">
-        <div className="ai-explain-panel__title">{i18n.t('aiExpression.explain.title')}</div>
-        <Button className="btn-s" iconClassName="icon-cross icon-14px" onClick={onCancel} title="common.close" />
-      </div>
+    <Modal className="ai-explain-panel" title="aiExpression.explain.title" showCloseButton onClose={onCancel}>
+      <ModalBody>
+        <div className="ai-explain-panel__expression">{expression}</div>
 
-      <div className="ai-explain-panel__expression">{expression}</div>
+        <div className={`ai-explain-panel__body${done ? '' : ' ai-explain-panel__cursor'}`}>
+          {text || (done ? '' : i18n.t('aiExpression.explain.thinking'))}
+        </div>
 
-      <div className={`ai-explain-panel__body${done ? '' : ' ai-explain-panel__cursor'}`}>
-        {text || (done ? '' : i18n.t('aiExpression.explain.thinking'))}
-      </div>
-
-      {error ? (
-        <div className="ai-explain-panel__error">{tUnescaped('aiExpression.explain.error', { message: error })}</div>
-      ) : null}
-    </div>
+        {error ? (
+          <div className="ai-explain-panel__error">{tUnescaped('aiExpression.explain.error', { message: error })}</div>
+        ) : null}
+      </ModalBody>
+    </Modal>
   )
 }
 
