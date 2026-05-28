@@ -10,24 +10,20 @@
  * fill-in at 50 fields per call to keep response time bounded; a future
  * sprint can move this to a background Job for very large surveys.
  */
-import { ENV } from '@core/processUtils'
-
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as DataDictionaryService from '../service/dataDictionaryService'
+import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 export const init = (app) => {
   app.post(
     '/ai/survey/:surveyId/dataDictionary/generate',
     AuthMiddleware.requireLoggedInUser,
     AuthMiddleware.requireSurveyEditPermission,
+    requireAiFeaturesEnabled,
     async (req, res, next) => {
       try {
-        if (!ENV.aiFeaturesEnabled) {
-          res.status(404).json({ error: 'aiFeaturesDisabled' })
-          return
-        }
         const user = Request.getUser(req)
         const { surveyId, format = 'html', lang, fillMissingDescriptions = true } = Request.getParams(req)
         const result = await DataDictionaryService.generate({

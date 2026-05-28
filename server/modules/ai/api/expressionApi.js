@@ -13,8 +13,6 @@
  * Designer surface; only users who could write the expression manually can
  * ask the AI to draft it).
  */
-import { ENV } from '@core/processUtils'
-
 import * as Log from '@server/log/log'
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
@@ -22,6 +20,7 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as ExpressionService from '../service/expressionService'
 import { closeSseStream, createSseEventWriter, openSseStream } from './serverSentEvents'
 import { formatStreamErrorForLog, formatStreamErrorForWire } from './sseErrorHelpers'
+import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 const logger = Log.getLogger('AiExpressionApi')
 
@@ -30,12 +29,9 @@ export const init = (app) => {
     '/ai/survey/:surveyId/expression/generate',
     AuthMiddleware.requireLoggedInUser,
     AuthMiddleware.requireSurveyEditPermission,
+    requireAiFeaturesEnabled,
     async (req, res, next) => {
       try {
-        if (!ENV.aiFeaturesEnabled) {
-          res.status(404).json({ error: 'aiFeaturesDisabled' })
-          return
-        }
         const user = Request.getUser(req)
         const { surveyId, description, nodeDefUuid, expressionType } = Request.getParams(req)
         const result = await ExpressionService.generate({
@@ -57,12 +53,9 @@ export const init = (app) => {
     '/ai/survey/:surveyId/expression/explain',
     AuthMiddleware.requireLoggedInUser,
     AuthMiddleware.requireSurveyEditPermission,
+    requireAiFeaturesEnabled,
     async (req, res, next) => {
       try {
-        if (!ENV.aiFeaturesEnabled) {
-          res.status(404).json({ error: 'aiFeaturesDisabled' })
-          return
-        }
         const user = Request.getUser(req)
         const { surveyId, nodeDefUuid, expression, errorMessage } = Request.getParams(req)
 

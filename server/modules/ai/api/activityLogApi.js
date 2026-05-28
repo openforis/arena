@@ -3,8 +3,6 @@
  *
  *   GET /api/ai/survey/:surveyId/activityLog/summarize?from=...&to=...&userUuid=...
  */
-import { ENV } from '@core/processUtils'
-
 import * as Log from '@server/log/log'
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
@@ -12,6 +10,7 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as ActivityLogSummarizerService from '../service/activityLogSummarizerService'
 import { closeSseStream, createSseEventWriter, openSseStream } from './serverSentEvents'
 import { formatStreamErrorForLog, formatStreamErrorForWire } from './sseErrorHelpers'
+import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 const logger = Log.getLogger('AiActivityLogApi')
 
@@ -20,12 +19,9 @@ export const init = (app) => {
     '/ai/survey/:surveyId/activityLog/summarize',
     AuthMiddleware.requireLoggedInUser,
     AuthMiddleware.requireSurveyViewPermission,
+    requireAiFeaturesEnabled,
     async (req, res, next) => {
       try {
-        if (!ENV.aiFeaturesEnabled) {
-          res.status(404).json({ error: 'aiFeaturesDisabled' })
-          return
-        }
         const user = Request.getUser(req)
         const { surveyId, from, to, userUuid } = Request.getParams(req)
 

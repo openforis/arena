@@ -6,13 +6,12 @@
  */
 import { z } from 'zod'
 
-import { ENV } from '@core/processUtils'
-
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as ModelClient from '../service/modelClient'
 import * as ProviderResolver from '../service/providerResolver'
+import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 const PingSchema = z.object({
   reply: z.string().describe('Reply with the literal word "ok".'),
@@ -23,12 +22,9 @@ export const init = (app) => {
     '/ai/_internal/ping',
     AuthMiddleware.requireLoggedInUser,
     AuthMiddleware.requireAdminPermission,
+    requireAiFeaturesEnabled,
     async (req, res, next) => {
       try {
-        if (!ENV.aiFeaturesEnabled) {
-          res.status(404).json({ error: 'aiFeaturesDisabled' })
-          return
-        }
         const user = Request.getUser(req)
         const start = Date.now()
         const effective = await ProviderResolver.describeEffectiveSource(user)
