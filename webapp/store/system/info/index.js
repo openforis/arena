@@ -9,4 +9,5 @@ export {
   useSystemConfigFileUploadLimit,
   useSystemConfigFileUploadLimitMB,
   useSystemConfigExperimentalFeatures,
+  useSystemConfigAiFeaturesEnabled,
 } from './hooks'

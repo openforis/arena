@@ -1,0 +1,48 @@
+.ai-expression-popup {
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__hint {
+    font-size: 0.85rem;
+    color: var(--colorGrey700);
+  }
+
+  &__textarea {
+    width: 100%;
+    min-height: 5rem;
+    resize: vertical;
+    font: inherit;
+    padding: 0.5rem;
+    border: 1px solid var(--colorGrey500);
+    border-radius: 4px;
+  }
+
+  &__result {
+    background: var(--colorGrey300);
+    border-left: 3px solid #2e7d32;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.95rem;
+    word-break: break-all;
+  }
+
+  &__result--invalid {
+    border-left-color: #c62828;
+    background: #ffebee;
+  }
+
+  &__explanation {
+    font-size: 0.9rem;
+    color: var(--colorGrey700);
+  }
+
+  &__error {
+    color: #c62828;
+    font-size: 0.9rem;
+  }
+
+}

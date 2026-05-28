@@ -13,6 +13,9 @@ import ExpressionEditorPopup from './expressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
 import { useNodeDefByUuid } from '@webapp/store/survey'
 import { Button } from '../buttons'
+import AiExpressionPopup from '@webapp/components/ai/AiExpressionPopup'
+import AiExplainPanel from '@webapp/components/ai/AiExplainPanel'
+import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 
 const ExpressionEditor = (props) => {
   const {
@@ -37,14 +40,26 @@ const ExpressionEditor = (props) => {
 
   const i18n = useI18n()
   const nodeDefCurrent = useNodeDefByUuid(nodeDefUuidCurrent)
+  const aiExpressionsEnabled = useAiFeatureEnabled('expressions')
 
   const [edit, setEdit] = useState(placeholder)
+  const [aiOpen, setAiOpen] = useState(false)
+  const [explainOpen, setExplainOpen] = useState(false)
+
+  const closeEditor = useCallback(() => setEdit(false), [])
+  const onAiCancel = useCallback(() => setAiOpen(false), [])
+  const onAiApply = useCallback(
+    (expression) => {
+      setAiOpen(false)
+      onChange?.({ query: expression })
+    },
+    [onChange]
+  )
+  const onExplainClose = useCallback(() => setExplainOpen(false), [])
 
   useEffect(() => {
     onEditChange?.(edit)
   }, [edit, onEditChange])
-
-  const closeEditor = useCallback(() => setEdit(false), [])
 
   // Unified handler for both cancel and close actions.
   const handleClose = useCallback(() => {
@@ -110,8 +125,35 @@ const ExpressionEditor = (props) => {
               testId={TestId.expressionEditor.editBtn(qualifier, index)}
             />
           )}
+          {aiExpressionsEnabled && !readOnly && nodeDefUuidCurrent && (
+            <Button
+              className="btn-s btn-ai"
+              iconClassName="icon-magic-wand icon-14px"
+              id={`${idPrefix}-ai-btn`}
+              onClick={() => setAiOpen(true)}
+              title="aiExpression.title"
+            />
+          )}
+          {aiExpressionsEnabled && !R.isEmpty(query) && nodeDefUuidCurrent && (
+            <Button
+              className="btn-s btn-ai-explain"
+              iconClassName="icon-question icon-14px"
+              id={`${idPrefix}-ai-explain-btn`}
+              onClick={() => setExplainOpen(true)}
+              title="aiExpression.explain.title"
+            />
+          )}
         </div>
       )}
+      {aiOpen && (
+        <AiExpressionPopup
+          qualifier={qualifier}
+          nodeDefUuid={nodeDefUuidCurrent}
+          onCancel={onAiCancel}
+          onApply={onAiApply}
+        />
+      )}
+      {explainOpen && <AiExplainPanel expression={query} nodeDefUuid={nodeDefUuidCurrent} onClose={onExplainClose} />}
     </div>
   )
 }

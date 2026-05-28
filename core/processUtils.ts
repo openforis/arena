@@ -90,6 +90,22 @@ export const ENV = {
   activityLogDisabled: isTrue(process.env.ACTIVITY_LOG_DISABLED),
   // Experimental features
   experimentalFeatures: isTrue(process.env.EXPERIMENTAL_FEATURES),
+  // ===== AI =====
+  // Master kill switch for all AI features
+  aiFeaturesEnabled: isTrue(process.env.AI_FEATURES_ENABLED ?? 'false'),
+  // Per-feature flags as a JSON object, e.g.
+  // {"translation":true,"expressionGenerate":true,"expressionExplain":true,"activityLogSummary":true,"dataDictionary":true}
+  aiFeatureFlags: getJson(process.env.AI_FEATURE_FLAGS),
+  // Default provider (used when user has no override)
+  aiDefaultProvider: process.env.AI_DEFAULT_PROVIDER, // openai | anthropic | google | openai-compatible
+  aiDefaultModel: process.env.AI_DEFAULT_MODEL,
+  aiDefaultApiKey: process.env.AI_DEFAULT_API_KEY,
+  aiDefaultBaseUrl: process.env.AI_DEFAULT_BASE_URL,
+  // Master encryption key for user-stored API keys (32-byte hex)
+  aiUserKeyEncryptionSecret: process.env.AI_USER_KEY_ENCRYPTION_SECRET,
+  // Limits
+  aiMaxPromptChars: Number(process.env.AI_MAX_PROMPT_CHARS) || 200000,
+  aiRequestTimeoutMs: Number(process.env.AI_REQUEST_TIMEOUT_MS) || 60000,
 }
 
 export const isEnvDevelopment = ENV.nodeEnv === environments.development
