@@ -42,7 +42,7 @@ const ExpressionEditor = (props) => {
   const nodeDefCurrent = useNodeDefByUuid(nodeDefUuidCurrent)
   const aiExpressionsEnabled = useAiFeatureEnabled('expressions')
 
-  const [edit, setEdit] = useState(false)
+  const [edit, setEdit] = useState(placeholder)
   const [aiOpen, setAiOpen] = useState(false)
   const [explainOpen, setExplainOpen] = useState(false)
 
