@@ -20,6 +20,7 @@ import * as rstudioApi from '@server/modules/rstudio/api/rstudioApi'
 import * as mobileApi from '@server/modules/mobile/api/mobileApi'
 import * as messageApi from '@server/modules/message/api'
 import * as fileDownloadApi from '@server/modules/fileDownload/api/fileDownloadApi'
+import * as aiApi from '@server/modules/ai/api/aiApi'
 
 export const router = expressRouter()
 
@@ -55,3 +56,5 @@ mobileApi.init(router)
 messageApi.init(router)
 
 fileDownloadApi.init(router)
+
+aiApi.init(router)

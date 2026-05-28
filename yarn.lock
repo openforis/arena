@@ -12,6 +12,77 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ai-sdk/anthropic@npm:^2":
+  version: 2.0.79
+  resolution: "@ai-sdk/anthropic@npm:2.0.79"
+  dependencies:
+    "@ai-sdk/provider": "npm:2.0.3"
+    "@ai-sdk/provider-utils": "npm:3.0.25"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/d88e9f861ea33653feac891272ea41f399bb68ed42600babf275b5e6b1aa96df87a8994e80023db5841acf1a0a14754de13362c67ef665088ae8651fb20782a0
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/gateway@npm:2.0.89":
+  version: 2.0.89
+  resolution: "@ai-sdk/gateway@npm:2.0.89"
+  dependencies:
+    "@ai-sdk/provider": "npm:2.0.3"
+    "@ai-sdk/provider-utils": "npm:3.0.25"
+    "@vercel/oidc": "npm:3.1.0"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/c48795966d5fb56d8cd4a7d96a0ef4c1fed15a7c321dcfe6bb67820b5716a7752315cb15e986e8b332a9a85d5f6bc61fb66d146ef5989672571b79174cf68a9e
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/google@npm:^2":
+  version: 2.0.72
+  resolution: "@ai-sdk/google@npm:2.0.72"
+  dependencies:
+    "@ai-sdk/provider": "npm:2.0.3"
+    "@ai-sdk/provider-utils": "npm:3.0.25"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/501df88a0cea33d296ac926f131512d525e46064ad436180cfe35003426080e80740428c3749f12e7b83d5c2f4e5b78e91b9ca31a1190a700bec034fc1b61fe2
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/openai@npm:^2":
+  version: 2.0.106
+  resolution: "@ai-sdk/openai@npm:2.0.106"
+  dependencies:
+    "@ai-sdk/provider": "npm:2.0.3"
+    "@ai-sdk/provider-utils": "npm:3.0.25"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/dafe065c2a2f2b7a069e4264ebad97150e47dee8340bfdcdaca1fe7e9bb6b6d1789ecc4294b2eb796eedf05d11a4fe9c777b6786891ae9481562a47b94bd1897
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/provider-utils@npm:3.0.25":
+  version: 3.0.25
+  resolution: "@ai-sdk/provider-utils@npm:3.0.25"
+  dependencies:
+    "@ai-sdk/provider": "npm:2.0.3"
+    "@standard-schema/spec": "npm:^1.0.0"
+    eventsource-parser: "npm:^3.0.6"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/6de8874c2b1459517a2d2a71a6a899b75a31d46312626b7ee1480363a085c07d95400bcc86a4bc768cc719ad91166435b2183566ce9985276be03b3a49ed20f9
+  languageName: node
+  linkType: hard
+
+"@ai-sdk/provider@npm:2.0.3":
+  version: 2.0.3
+  resolution: "@ai-sdk/provider@npm:2.0.3"
+  dependencies:
+    json-schema: "npm:^0.4.0"
+  checksum: 10c0/f0f663a2d2226d3cb447a3bcc13c70333c1957953237c5583681f26b0d4109f7136ce234499ba730c63bba97243e127b7763d8d962571377d1d9b5193506232c
+  languageName: node
+  linkType: hard
+
 "@apidevtools/json-schema-ref-parser@npm:^9.0.6":
   version: 9.1.2
   resolution: "@apidevtools/json-schema-ref-parser@npm:9.1.2"
@@ -3818,9 +3889,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^1.3.9":
-  version: 1.3.9
-  resolution: "@openforis/arena-server@npm:1.3.9::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.3.9%2Fc643da4a7e406d761572b2ae74a6cc027842789d"
+"@openforis/arena-server@npm:^1.3.10":
+  version: 1.3.10
+  resolution: "@openforis/arena-server@npm:1.3.10::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.3.10%2Fa29e28f7b08f13b8110b77476161fac7a7acb4c8"
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
     "@openforis/arena-core": "npm:^1.2.4"
@@ -3844,7 +3915,14 @@ __metadata:
     passport-local: "npm:^1.0.0"
     pg-promise: "npm:^12.6.2"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/4ed3936b44f87f951a334784fa023ba5944518a3baabb8a90222b3af4310a3502110d48cdd92411fefbb28bc40073666d6e6c61893b7bbd0b53be3bf001d43ec
+  checksum: 10c0/f431b7cacdc6dbb855fdfb723ed3f90f0329c56e72dd3e861d3d96a3e8cc6348d5cf2ffcf707d1e5ea90667e76f5b056f2f0247c6662c420b76db7611493db83
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/api@npm:1.9.0":
+  version: 1.9.0
+  resolution: "@opentelemetry/api@npm:1.9.0"
+  checksum: 10c0/9aae2fe6e8a3a3eeb6c1fdef78e1939cf05a0f37f8a4fae4d6bf2e09eb1e06f966ece85805626e01ba5fab48072b94f19b835449e58b6d26720ee19a58298add
   languageName: node
   linkType: hard
 
@@ -6074,6 +6152,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vercel/oidc@npm:3.1.0":
+  version: 3.1.0
+  resolution: "@vercel/oidc@npm:3.1.0"
+  checksum: 10c0/f57278ed4b4c022c7ca85e8baa5f9bdb2623397abfa0e5dbfd75de283c8e5dc534d64dac1364b5ad8c96d00eb2d469886e6f7b640f6f195def5766950ad8ce71
+  languageName: node
+  linkType: hard
+
 "@webassemblyjs/ast@npm:1.14.1, @webassemblyjs/ast@npm:^1.14.1":
   version: 1.14.1
   resolution: "@webassemblyjs/ast@npm:1.14.1"
@@ -6441,6 +6526,20 @@ __metadata:
     clean-stack: "npm:^2.0.0"
     indent-string: "npm:^4.0.0"
   checksum: 10c0/a42f67faa79e3e6687a4923050e7c9807db3848a037076f791d10e092677d65c1d2d863b7848560699f40fc0502c19f40963fb1cd1fb3d338a7423df8e45e039
+  languageName: node
+  linkType: hard
+
+"ai@npm:^5":
+  version: 5.0.187
+  resolution: "ai@npm:5.0.187"
+  dependencies:
+    "@ai-sdk/gateway": "npm:2.0.89"
+    "@ai-sdk/provider": "npm:2.0.3"
+    "@ai-sdk/provider-utils": "npm:3.0.25"
+    "@opentelemetry/api": "npm:1.9.0"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/abb6857f0d9e2614a44943a6febf626ea36843b416c5496b61b4db23dc2efa688324c05b514858621ee3a82921f42c5b9a60b2dad8447328cd9f926d05bd5e92
   languageName: node
   linkType: hard
 
@@ -10685,6 +10784,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eventsource-parser@npm:^3.0.6":
+  version: 3.0.8
+  resolution: "eventsource-parser@npm:3.0.8"
+  checksum: 10c0/3a73eee85311f33b12fa558381a477c1bdcf8c024a429a9d48f87b043e328c26d24ed280fd7ca92e2fdd4c8c37f749b758420c1533778aaca2beabf895024efa
+  languageName: node
+  linkType: hard
+
 "exceljs@npm:^4.4.0":
   version: 4.4.0
   resolution: "exceljs@npm:4.4.0"
@@ -13773,6 +13879,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json-schema@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "json-schema@npm:0.4.0"
+  checksum: 10c0/d4a637ec1d83544857c1c163232f3da46912e971d5bf054ba44fdb88f07d8d359a462b4aec46f2745efbc57053365608d88bc1d7b1729f7b4fc3369765639ed3
+  languageName: node
+  linkType: hard
+
 "json-stable-stringify-without-jsonify@npm:^1.0.1":
   version: 1.0.1
   resolution: "json-stable-stringify-without-jsonify@npm:1.0.1"
@@ -15671,6 +15784,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "open-foris-arena@workspace:."
   dependencies:
+    "@ai-sdk/anthropic": "npm:^2"
+    "@ai-sdk/google": "npm:^2"
+    "@ai-sdk/openai": "npm:^2"
     "@aws-sdk/client-s3": "npm:^3.975.0"
     "@babel/cli": "npm:^7.28.6"
     "@babel/core": "npm:^7.28.6"
@@ -15692,7 +15808,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
-    "@openforis/arena-server": "npm:^1.3.9"
+    "@openforis/arena-server": "npm:^1.3.10"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
@@ -15712,6 +15828,7 @@ __metadata:
     "@uiw/react-codemirror": "npm:^4.25.4"
     ace-builds: "npm:^1.43.6"
     adm-zip: "npm:^0.5.16"
+    ai: "npm:^5"
     archiver: "npm:^7.0.1"
     axios: "npm:^1.13.4"
     babel-loader: "npm:^10.0.0"
@@ -15832,6 +15949,7 @@ __metadata:
     webpack-node-externals: "npm:^3.0.0"
     xml-js: "npm:^1.6.11"
     yarn-audit-fix: "npm:^10.1.1"
+    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -21744,6 +21862,13 @@ __metadata:
   peerDependencies:
     zod: ^3.25.0 || ^4.0.0
   checksum: 10c0/0ccfec48c46de1be440b719cd02044d4abb89ed0e14c13e637cd55bf29102f67ccdba373f25def0fc7130e5f15025be4d557a7edcc95d5a3811599aade689e1b
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.23.8":
+  version: 3.25.76
+  resolution: "zod@npm:3.25.76"
+  checksum: 10c0/5718ec35e3c40b600316c5b4c5e4976f7fee68151bc8f8d90ec18a469be9571f072e1bbaace10f1e85cf8892ea12d90821b200e980ab46916a6166a4260a983c
   languageName: node
   linkType: hard
 

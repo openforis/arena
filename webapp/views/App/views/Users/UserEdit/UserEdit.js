@@ -16,6 +16,7 @@ import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import ProfilePicture from '@webapp/components/profilePicture'
+import UserAiSettingsPanel from '@webapp/components/ai/UserAiSettingsPanel'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
@@ -49,7 +50,7 @@ const UserEdit = () => {
     canViewSurveyManager,
     canEditSurveyManager,
     canManageTwoFactorDevices,
-    hideSurveyGroup,
+    showSurveyGroup,
 
     onChangePasswordClick,
     onExtraChange,
@@ -84,7 +85,7 @@ const UserEdit = () => {
   const invitationExpired = User.isInvitationExpired(userToUpdate)
   const editingLoggedInUser = User.isEqual(user)(userToUpdate)
   const newUser = !userUuid
-  const surveyGroupsVisible = !newUser && !hideSurveyGroup
+  const surveyGroupsVisible = !newUser && showSurveyGroup
   const surveyHasExtraProps = Objects.isNotEmpty(Survey.getUserExtraPropDefs(surveyInfo))
 
   return (
@@ -188,29 +189,38 @@ const UserEdit = () => {
       {!userUuid && (
         <UserPasswordSetForm form={userToUpdate} onFieldChange={onPasswordFormFieldChange} validation={validation} />
       )}
-      {editingLoggedInUser && hideSurveyGroup && canUseMap && (
-        // show map api keys only when editing the current user
-        <fieldset className="map-api-keys">
-          <legend>{i18n.t('user.mapApiKeys.title')}</legend>
-          <FormItem label="user.mapApiKeys.mapProviders.planet">
-            <Input
-              disabled={!canEditEmail}
-              value={User.getMapApiKey({ provider: 'planet' })(userToUpdate)}
-              validation={Validation.getFieldValidation(`${User.keysProps.mapApiKeyByProvider}.planet`)(validation)}
-              onChange={(value) => onUpdate(User.assocMapApiKey({ provider: 'planet', apiKey: value })(userToUpdate))}
-            />
-            <Button
-              label="common.test"
-              onClick={() =>
-                onMapApiKeyTest({
-                  provider: 'planet',
-                  apiKey: User.getMapApiKey({ provider: 'planet' })(userToUpdate),
-                })
-              }
-            />
-          </FormItem>
-        </fieldset>
+
+      {editingLoggedInUser && !showSurveyGroup && (
+        <>
+          {canUseMap && (
+            // show map api keys only when editing the current user
+            <fieldset className="map-api-keys">
+              <legend>{i18n.t('user.mapApiKeys.title')}</legend>
+              <FormItem label="user.mapApiKeys.mapProviders.planet">
+                <Input
+                  disabled={!canEditEmail}
+                  value={User.getMapApiKey({ provider: 'planet' })(userToUpdate)}
+                  validation={Validation.getFieldValidation(`${User.keysProps.mapApiKeyByProvider}.planet`)(validation)}
+                  onChange={(value) =>
+                    onUpdate(User.assocMapApiKey({ provider: 'planet', apiKey: value })(userToUpdate))
+                  }
+                />
+                <Button
+                  label="common.test"
+                  onClick={() =>
+                    onMapApiKeyTest({
+                      provider: 'planet',
+                      apiKey: User.getMapApiKey({ provider: 'planet' })(userToUpdate),
+                    })
+                  }
+                />
+              </FormItem>
+            </fieldset>
+          )}
+          <UserAiSettingsPanel />
+        </>
       )}
+
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">
           {userUuid && (

@@ -22,7 +22,7 @@ const UsersListSurvey = () => {
   const [surveyExtraPropsEditorUser, setSurveyExtraPropsEditorUser] = useState(null)
 
   const onRowClick = useCallback(
-    (user) => navigate(`${appModuleUri(userModules.user)}${User.getUuid(user)}`),
+    (user) => navigate(`${appModuleUri(userModules.user)}${User.getUuid(user)}?showSurveyGroup=true`),
     [navigate]
   )
 

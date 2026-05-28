@@ -129,3 +129,13 @@ export {
 export { getDevices, getDevice, addDevice, verifyDevice, regenerateBackupCodes, removeDevice } from './user2FA'
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
+
+export {
+  aiSettings,
+  aiExpression,
+  aiTranslation,
+  aiActivityLog,
+  aiDataDictionary,
+  aiChatbot,
+  streamSse as aiStreamSse,
+} from './ai'

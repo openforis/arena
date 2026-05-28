@@ -40,13 +40,13 @@ const prepareFormData = ({ userToUpdate }) => {
   return formData
 }
 
-const updateUser = async ({ dispatch, formData, user, userToUpdate, setUserToUpdate, hideSurveyGroup, surveyId }) => {
+const updateUser = async ({ dispatch, formData, user, userToUpdate, setUserToUpdate, showSurveyGroup, surveyId }) => {
   const userToUpdateUuid = User.getUuid(userToUpdate)
   const editingSelf = User.isEqual(user)(userToUpdate)
   const {
     data: { user: userUpdated, validation },
   } = await axios.put(
-    editingSelf || hideSurveyGroup
+    editingSelf || showSurveyGroup
       ? `/api/user/${userToUpdateUuid}`
       : `/api/survey/${surveyId}/user/${userToUpdateUuid}`,
     formData
@@ -70,7 +70,7 @@ const insertUser = async ({ dispatch, navigate, formData, userToUpdate, setUserT
   } = await axios.post('/api/user', formData)
   if (userCreated) {
     const userCreatedUuid = User.getUuid(userCreated)
-    navigate(`${appModuleUri(userModules.user)}${userCreatedUuid}?hideSurveyGroup=true`, { replace: true })
+    navigate(`${appModuleUri(userModules.user)}${userCreatedUuid}`, { replace: true })
     return true
   } else {
     const userToUpdateValidated = Validation.assocValidation(validation)(userToUpdate)
@@ -88,7 +88,7 @@ export const useOnSave = ({
 }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { hideSurveyGroup } = useQuery()
+  const { showSurveyGroup } = useQuery()
   const user = useUser()
   const surveyId = useSurveyId()
 
@@ -108,7 +108,7 @@ export const useOnSave = ({
           user,
           userToUpdate,
           setUserToUpdate,
-          hideSurveyGroup,
+          showSurveyGroup,
           surveyId,
         })
       } else {
@@ -126,7 +126,7 @@ export const useOnSave = ({
     } finally {
       dispatch(LoaderActions.hideLoader())
     }
-  }, [dispatch, hideSurveyGroup, navigate, setUserToUpdate, setUserToUpdateOriginal, surveyId, user, userToUpdate])
+  }, [dispatch, navigate, setUserToUpdate, setUserToUpdateOriginal, showSurveyGroup, surveyId, user, userToUpdate])
 
   return useCallback(async () => {
     const userUpdatedValidated = await validateUserEdit(userToUpdate)

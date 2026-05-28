@@ -1339,4 +1339,65 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     arenaInGitHub: `<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>`,
     arenaRScriptsInGitHub: `<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>`,
   },
+
+  aiExpression: {
+    title: 'Generate expression from description',
+    hint: 'Describe in plain language what the expression should do. The AI will translate it into Arena syntax. Press Ctrl+Enter to generate.',
+    placeholder: 'e.g. tree height must be greater than 0 and less than 200',
+
+    generate: 'Generate',
+    generating: 'Generating…',
+    use: 'Use this expression',
+    useAnyway: 'Use anyway',
+    tryAgain: 'Try a different description',
+    parseError:
+      'The generated expression did not parse cleanly: {{message}}. You can still apply it and edit by hand, or try rephrasing.',
+
+    explain: {
+      title: 'Explain this expression',
+      thinking: 'Asking the AI to explain this expression…',
+      error: 'Failed to fetch explanation: {{message}}',
+    },
+  },
+
+  aiTranslation: {
+    translateButton_one: 'Translate to {{count}} other language',
+    translateButton_other: 'Translate to {{count}} other languages',
+    translateButton: 'Translate to other languages',
+
+    success_one: 'Translated to {{count}} language. Review and save.',
+    success_other: 'Translated to {{count}} languages. Review and save.',
+    success: 'Translated. Review and save.',
+
+    failed: 'Translation failed: {{message}}',
+  },
+
+  aiActivityLog: {
+    title: 'Activity log summary',
+    summarizeButton: 'Summarize',
+    thinking: 'Aggregating events and asking the AI to summarize…',
+    error: 'Failed to fetch summary: {{message}}',
+  },
+
+  aiDataDictionary: {
+    menuHtml: 'AI data dictionary (HTML)',
+    menuMd: 'AI data dictionary (Markdown)',
+
+    generating: 'Generating data dictionary…',
+    generated: 'Data dictionary downloaded ({{filename}}): {{count}} fields, {{ai}} AI-generated descriptions.',
+    failed: 'Could not generate data dictionary: {{message}}',
+  },
+
+  aiChatbot: {
+    open: 'Help & documentation',
+    title: 'Help & documentation',
+    empty: 'Ask me anything about Open Foris Arena.',
+    placeholder: 'Type your question…',
+    send: 'Send',
+    stop: 'Stop',
+    clear: 'Clear',
+    showReasoning: 'Show reasoning',
+    error: 'Chatbot error: {{message}}',
+    language: 'Response language',
+  },
 }

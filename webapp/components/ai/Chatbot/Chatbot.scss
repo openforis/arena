@@ -1,0 +1,294 @@
+.ai-chatbot-fab {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9998;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--colorPrimary, #1565c0);
+  color: #fff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+
+  &__icon::before {
+    content: '?';
+    font-weight: 700;
+  }
+}
+
+.ai-chatbot-panel {
+  position: fixed;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  width: 28rem;
+  max-width: calc(100vw - 2rem);
+  height: 80vh;
+  max-height: 80vh;
+  background: #fff;
+  border: 1px solid var(--colorGrey500);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__header-actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  &__body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.25rem;
+    background: var(--colorGrey200, #f5f5f5);
+    border-radius: 4px;
+  }
+
+  &__empty {
+    color: var(--colorGrey600, #757575);
+    font-size: 0.9rem;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  &__error {
+    color: #c62828;
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  &__input {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    textarea {
+      width: 100%;
+      min-height: 3.5rem;
+      max-height: 8rem;
+      resize: vertical;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--colorGrey500);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    &-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+  }
+}
+
+// The language picker uses MUI <Menu>, which portals to <body> and renders
+// its root container (.MuiModal-root / .MuiPopover-root) at MUI's default
+// z-index of 1300 (this app installs no MUI ThemeProvider). The chatbot
+// panel above sits at z-index 9999, so without this override the menu —
+// together with its focus-trap and invisible click-catching backdrop —
+// stacks BEHIND the panel: the dropdown is invisible and the trap blocks
+// all panel interaction (the textarea becomes untypeable).
+//
+// MUI applies `menuClassName` directly onto that portal root element
+// (Menu -> Popover -> Modal root), so this class targets exactly the node
+// carrying z-index: 1300. !important wins regardless of the order in which
+// MUI injects its runtime <style> relative to this stylesheet.
+.ai-chatbot-panel__language-menu {
+  z-index: 10000 !important;
+}
+
+.ai-chatbot-message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+
+  &--user {
+    align-items: flex-end;
+  }
+
+  &--assistant {
+    align-items: flex-start;
+  }
+
+  &__bubble {
+    max-width: 90%;
+    // Flex items default to min-width: auto (= content's min-content size).
+    // A `<pre>` block with long unbreakable lines would otherwise push the
+    // bubble past max-width. min-width: 0 lets max-width actually cap us.
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  &--user &__bubble {
+    background: var(--colorPrimary, #1565c0);
+    color: #fff;
+    white-space: pre-wrap;
+  }
+
+  &--assistant &__bubble {
+    background: #fff;
+    border: 1px solid var(--colorGrey400, #e0e0e0);
+
+    // Tame the rendered markdown so it fits inside a narrow bubble.
+    p,
+    ul,
+    ol,
+    pre,
+    table,
+    blockquote {
+      margin: 0.35rem 0;
+    }
+
+    p:first-child,
+    h1:first-child,
+    h2:first-child,
+    h3:first-child {
+      margin-top: 0;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-size: 1rem;
+      margin: 0.5rem 0 0.25rem;
+      font-weight: 700;
+    }
+
+    ul,
+    ol {
+      padding-left: 1.25rem;
+    }
+
+    code {
+      background: var(--colorGrey300, #eee);
+      padding: 0.05rem 0.25rem;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+
+    pre {
+      background: var(--colorGrey300, #eee);
+      padding: 0.5rem;
+      border-radius: 4px;
+      max-width: 100%;
+      overflow-x: auto;
+      // marked emits fenced code blocks with white-space: pre. We want
+      // them to wrap when possible (prose-y text in code fences is common
+      // for chat answers) and only scroll for genuinely long tokens.
+      white-space: pre-wrap;
+      word-break: break-word;
+
+      code {
+        background: transparent;
+        padding: 0;
+        white-space: inherit;
+      }
+    }
+
+    table {
+      border-collapse: collapse;
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
+      font-size: 0.85em;
+
+      th,
+      td {
+        border: 1px solid var(--colorGrey400, #e0e0e0);
+        padding: 0.2rem 0.4rem;
+        text-align: left;
+      }
+
+      th {
+        background: var(--colorGrey200, #f5f5f5);
+        font-weight: 600;
+      }
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--colorGrey400, #e0e0e0);
+      margin: 0.5rem 0;
+    }
+
+    a {
+      color: var(--colorPrimary, #1565c0);
+      text-decoration: underline;
+    }
+  }
+
+  &__cursor::after {
+    content: '▋';
+    animation: ai-chatbot-blink 1s infinite;
+    margin-left: 2px;
+  }
+
+  &__reasoning {
+    max-width: 90%;
+    font-size: 0.8rem;
+    color: var(--colorGrey700, #616161);
+
+    summary {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    &-content {
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.6rem;
+      background: var(--colorGrey300, #eee);
+      border-radius: 4px;
+      white-space: pre-wrap;
+    }
+  }
+}
+
+@keyframes ai-chatbot-blink {
+  50% {
+    opacity: 0;
+  }
+}
