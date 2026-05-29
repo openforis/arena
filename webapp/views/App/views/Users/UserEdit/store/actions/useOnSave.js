@@ -46,7 +46,7 @@ const updateUser = async ({ dispatch, formData, user, userToUpdate, setUserToUpd
   const {
     data: { user: userUpdated, validation },
   } = await axios.put(
-    editingSelf || showSurveyGroup
+    editingSelf || !showSurveyGroup
       ? `/api/user/${userToUpdateUuid}`
       : `/api/survey/${surveyId}/user/${userToUpdateUuid}`,
     formData
