@@ -4,10 +4,15 @@
  *   POST /api/ai/survey/:surveyId/translate
  *
  * Body:
- *   { sourceLang, targetLangs: [...], items: [{id,text,kind?}], glossary?: [...] }
+ *   { requestId, sourceLang, targetLangs: [...], items: [{id,text,kind?}], glossary?: [...] }
+ *
+ * Responds immediately with 202; result is pushed via WebSocket (translationUpdate event).
  *
  * Permission: survey edit.
  */
+import { WebSocketServer } from '@openforis/arena-server'
+
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
@@ -23,15 +28,21 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { sourceLang, targetLangs, items, glossary } = Request.getBody(req)
-        const result = await TranslationService.translate({
-          user,
-          sourceLang,
-          targetLangs,
-          items,
-          glossary,
-        })
-        res.json(result)
+        const socketId = Request.getSocketId(req)
+        const { requestId, sourceLang, targetLangs, items, glossary } = Request.getBody(req)
+
+        res.status(202).json({ requestId })
+
+        TranslationService.translate({ user, sourceLang, targetLangs, items, glossary })
+          .then((result) => {
+            WebSocketServer.notifySocket(socketId, WebSocketEvents.translationUpdate, { requestId, result })
+          })
+          .catch((error) => {
+            WebSocketServer.notifySocket(socketId, WebSocketEvents.translationUpdate, {
+              requestId,
+              error: error.message,
+            })
+          })
       } catch (error) {
         next(error)
       }
