@@ -19,7 +19,7 @@ const sendSurveyCreateRequest = async ({ dispatch, newSurvey, user }) => {
   } catch (e) {
     let errorKey = null,
       errorParams = null
-    if (e.status === StatusCodes.UNAUTHORIZED) {
+    if (e.status === StatusCodes.FORBIDDEN) {
       const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
       errorKey = 'surveyCreate:errorMaxSurveysCountExceeded'
       errorParams = { maxSurveysCount }
@@ -42,7 +42,7 @@ export const useOnCreate = ({ newSurvey, setNewSurvey }) => {
     if (!data) {
       return
     }
-    const { job, survey, validation } = data
+    const { job, survey, validation, errorCode } = data
     if (job) {
       dispatch(
         JobActions.showJobMonitor({
@@ -56,7 +56,19 @@ export const useOnCreate = ({ newSurvey, setNewSurvey }) => {
     } else if (survey) {
       dispatch(SurveyActions.createSurvey({ survey }))
     } else {
-      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
+      const notificationKey = !errorCode
+        ? 'common.formContainsErrorsCannotContinue'
+        : errorCode === StatusCodes.FORBIDDEN
+          ? 'surveyCreate:errorMaxSurveysCountExceeded'
+          : 'surveyCreate:error'
+      const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
+
+      dispatch(
+        NotificationActions.notifyWarning({
+          key: notificationKey,
+          params: { maxSurveysCount },
+        })
+      )
 
       setNewSurvey({
         ...newSurvey,

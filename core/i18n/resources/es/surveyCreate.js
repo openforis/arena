@@ -21,7 +21,7 @@ export default {
   template_other: 'Plantillas',
   error: 'Error al crear nueva encuesta',
   errorMaxSurveysCountExceeded:
-    'Error al crear la encuesta; verifique que no se haya excedido el número máximo de encuestas que puede crear ({{maxSurveysCount}}).',
+    'Error al crear la encuesta; ha alcanzado el número máximo de encuestas que puede crear ({{maxSurveysCount}}).',
   options: {
     includeData: 'Incluir datos',
   },
