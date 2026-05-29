@@ -50,7 +50,7 @@ export const {
 const sendError = ({ errorCode, res, req = null }) => {
   const userName = req ? User.getName(Request.getUser(req)) : null
   const error = new UnauthorizedError(userName)
-  res.send({ errorCode, error: JSON.stringify(error) })
+  res.status(errorCode).send(JSON.stringify(error))
 }
 
 const sendUnauthorizedError = ({ res, req = null }) => {
