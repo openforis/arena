@@ -4,20 +4,23 @@
 import axios from 'axios'
 
 /**
- * Translates a batch of labels from `sourceLang` into all `targetLangs`.
+ * Enqueues a translation request. The server responds immediately with 202; the
+ * result is delivered via the WebSocket `translationUpdate` event carrying the same `requestId`.
  * @param {object} args - Args.
  * @param {number} args.surveyId - Survey ID.
+ * @param {string} args.requestId - Client-generated correlation ID.
  * @param {string} args.sourceLang - 2-letter source language code.
  * @param {string[]} args.targetLangs - Target language codes.
  * @param {Array<{id:string, text:string, kind?:string}>} args.items - Items to translate.
- * @returns {Promise<{translations: Array<{id:string, byLang: Record<string,string>}>}>}
- *   The translations, keyed by item id.
+ * @param {Array} [args.glossary] - Optional glossary entries.
+ * @returns {Promise<void>}
  */
-export const translate = async ({ surveyId, sourceLang, targetLangs, items }) => {
-  const { data } = await axios.post(`/api/ai/survey/${surveyId}/translate`, {
+export const translate = async ({ surveyId, requestId, sourceLang, targetLangs, items, glossary }) => {
+  await axios.post(`/api/ai/survey/${surveyId}/translate`, {
+    requestId,
     sourceLang,
     targetLangs,
     items,
+    glossary,
   })
-  return data
 }

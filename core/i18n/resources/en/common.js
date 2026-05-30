@@ -1370,6 +1370,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     success: 'Translated. Review and save.',
 
     failed: 'Translation failed: {{message}}',
+    timeout: 'Translation request timed out. Please try again.',
   },
 
   aiActivityLog: {
