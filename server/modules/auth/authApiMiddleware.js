@@ -47,10 +47,18 @@ export const {
   requireDownloadToken,
 } = ApiAuthMiddleware
 
-const sendUnauthorizedError = ({ res, req = null }) => {
+const sendError = ({ errorCode, res, req = null }) => {
   const userName = req ? User.getName(Request.getUser(req)) : null
   const error = new UnauthorizedError(userName)
-  res.send(StatusCodes.UNAUTHORIZED, JSON.stringify(error))
+  res.status(errorCode).send(JSON.stringify(error))
+}
+
+const sendUnauthorizedError = ({ res, req = null }) => {
+  sendError({ errorCode: StatusCodes.UNAUTHORIZED, res, req })
+}
+
+const sendForbiddenError = ({ res, req = null }) => {
+  sendError({ errorCode: StatusCodes.FORBIDDEN, res, req })
 }
 
 export const requireLoggedInUser = async (req, res, next) => {
@@ -68,6 +76,9 @@ export const requireSurveyCreatePermission = async (req, res, next) => {
       next()
       return
     }
+    // User is allowed to create surveys but has exceeded their quota
+    sendForbiddenError({ req, res })
+    return
   }
   sendUnauthorizedError({ req, res })
 }

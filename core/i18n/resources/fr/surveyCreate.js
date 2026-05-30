@@ -20,7 +20,7 @@ export default {
   template: 'Modèle',
   template_other: 'Modèles',
   error: 'Erreur lors de la création du nouveau formulaire',
-  errorMaxSurveysCountExceeded: `Erreur lors de la création du formulaire ; veuillez vérifier que le nombre maximum de formulaires que vous pouvez créer ({{maxSurveysCount}}) n'a pas été dépassé.`,
+  errorMaxSurveysCountExceeded: `Erreur lors de la création du formulaire ; vous avez atteint le nombre maximum de formulaires que vous pouvez créer ({{maxSurveysCount}}).`,
   options: {
     includeData: 'Inclure les données',
   },
