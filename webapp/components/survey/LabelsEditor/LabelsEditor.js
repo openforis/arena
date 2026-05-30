@@ -57,7 +57,7 @@ const LabelsEditor = (props) => {
   const pendingRequestIdRef = useRef(null)
   const surveyLanguages = useSurveyLangs()
   const languages = useMemo(
-    () => (!A.isEmpty(languagesFromProps) ? languagesFromProps : surveyLanguages),
+    () => (A.isEmpty(languagesFromProps) ? surveyLanguages : languagesFromProps),
     [languagesFromProps, surveyLanguages]
   )
   const preferredLanguage = useSurveyPreferredLang()
@@ -110,7 +110,9 @@ const LabelsEditor = (props) => {
       pendingRequestIdRef.current = null
       setTranslating(false)
       if (data.error) {
-        notifyError({ key: 'aiTranslation.failed', params: { message: data.error } })
+        const { key: errKey, params: errParams } = data.error
+        const message = errKey ? i18n.t(errKey, errParams ?? {}) : String(data.error)
+        notifyError({ key: 'aiTranslation.failed', params: { message } })
       } else {
         const byLang = data.result?.translations?.[0]?.byLang || {}
         const merged = { ...labels }
@@ -123,7 +125,7 @@ const LabelsEditor = (props) => {
         notifyInfo({ key: 'aiTranslation.success', params: { count: Object.keys(byLang).length } })
       }
     },
-    [labels, emptyLangs, onChange, notifyInfo, notifyError]
+    [i18n, notifyError, labels, onChange, notifyInfo, emptyLangs]
   )
 
   useOnWebSocketEvent({ eventName: WebSocketEvents.translationUpdate, eventHandler: onTranslationUpdate })

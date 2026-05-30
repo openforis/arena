@@ -38,9 +38,12 @@ export const init = (app) => {
             WebSocketServer.notifySocket(socketId, WebSocketEvents.translationUpdate, { requestId, result })
           })
           .catch((error) => {
+            const errorPayload = error?.key
+              ? { key: error.key, params: error.params }
+              : { key: 'appErrors:generic', params: { text: error?.message ?? 'unknown' } }
             WebSocketServer.notifySocket(socketId, WebSocketEvents.translationUpdate, {
               requestId,
-              error: error.message,
+              error: errorPayload,
             })
           })
       } catch (error) {
