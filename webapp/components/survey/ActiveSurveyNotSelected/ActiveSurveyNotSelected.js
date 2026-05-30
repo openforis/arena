@@ -3,17 +3,16 @@ import './ActiveSurveyNotSelected.scss'
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { Trans } from 'react-i18next'
 
 import * as Authorizer from '@core/auth/authorizer'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-import { useI18nTrans } from '@webapp/store/system/i18n/hooks'
 import { NotificationActions } from '@webapp/store/ui'
 import { useAuthIsMaxSurveysCountReached, useUser } from '@webapp/store/user/hooks'
 
 export const ActiveSurveyNotSelected = () => {
   const dispatch = useDispatch()
-  const Trans = useI18nTrans()
   const user = useUser()
   const isMaxSurveysCountReached = useAuthIsMaxSurveysCountReached()
 
