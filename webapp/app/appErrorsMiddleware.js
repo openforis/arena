@@ -12,6 +12,7 @@ const tokenRefreshUrlRegExp = /^\/auth\/token\/refresh$/
 const errorIgnoredUrlRegExps = [
   loginUrlRegExp, // login
   /^\/auth\/user$/, // user (if not logged in or authorized)
+  /^\/api\/survey$/, // survey create (errors handled locally)
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/query$/, // data query
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/export\/start$/, // data query export
   /^\/api\/mobile\/survey\/\d+$/, // data import (Arena format)

@@ -20,7 +20,7 @@ export default {
   template: 'Template',
   template_other: 'Templates',
   error: 'Error creating new survey',
-  errorMaxSurveysCountExceeded: `Error creating survey; please check that the maximum number of surveys that you can creeate ({{maxSurveysCount}}) has not been exceeded.`,
+  errorMaxSurveysCountExceeded: `Error creating survey; you have reached the maximum number of surveys you can create ({{maxSurveysCount}}).`,
   options: {
     includeData: 'Include data',
   },
