@@ -29,6 +29,12 @@ export const init = (app) => {
       try {
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
+
+        if (!socketId || !WebSocketServer.isSocketConnected(socketId)) {
+          res.status(400).json({ error: { key: 'appErrors:aiTranslationSocketMissing' } })
+          return
+        }
+
         const { requestId, sourceLang, targetLangs, items, glossary } = Request.getBody(req)
 
         res.status(202).json({ requestId })

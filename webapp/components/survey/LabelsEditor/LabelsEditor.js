@@ -1,6 +1,6 @@
 import './LabelsEditor.scss'
 
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 import classNames from 'classnames'
@@ -55,6 +55,7 @@ const LabelsEditor = (props) => {
   const [editingLabels, setEditingLabels] = useState(false)
   const [translating, setTranslating] = useState(false)
   const pendingRequestIdRef = useRef(null)
+  const translationTimeoutRef = useRef(null)
   const surveyLanguages = useSurveyLangs()
   const languages = useMemo(
     () => (A.isEmpty(languagesFromProps) ? surveyLanguages : languagesFromProps),
@@ -83,6 +84,15 @@ const LabelsEditor = (props) => {
     emptyLangs.length > 0 &&
     onChange
 
+  const clearTranslationTimeout = useCallback(() => {
+    if (translationTimeoutRef.current) {
+      clearTimeout(translationTimeoutRef.current)
+      translationTimeoutRef.current = null
+    }
+  }, [])
+
+  useEffect(() => clearTranslationTimeout, [clearTranslationTimeout])
+
   const onTranslate = useCallback(async () => {
     if (!canTranslate) return
     const requestId = uuidv4()
@@ -96,17 +106,28 @@ const LabelsEditor = (props) => {
         targetLangs: emptyLangs,
         items: [{ id: 'label', text: labels[populatedLang], kind: 'nodeDefLabel' }],
       })
+      clearTranslationTimeout()
+      translationTimeoutRef.current = setTimeout(() => {
+        if (pendingRequestIdRef.current === requestId) {
+          pendingRequestIdRef.current = null
+          setTranslating(false)
+          notifyError({ key: 'aiTranslation.timeout' })
+        }
+      }, 60_000)
     } catch (err) {
+      clearTranslationTimeout()
       pendingRequestIdRef.current = null
       setTranslating(false)
-      const message = err?.response?.data?.error?.key || err?.message || 'unknown'
+      const errKey = err?.response?.data?.error?.key
+      const message = errKey ? i18n.t(errKey) : err?.message || 'unknown'
       notifyError({ key: 'aiTranslation.failed', params: { message } })
     }
-  }, [canTranslate, emptyLangs, labels, notifyError, populatedLang, surveyId])
+  }, [canTranslate, clearTranslationTimeout, emptyLangs, i18n, labels, notifyError, populatedLang, surveyId])
 
   const onTranslationUpdate = useCallback(
     (data) => {
       if (data.requestId !== pendingRequestIdRef.current) return
+      clearTranslationTimeout()
       pendingRequestIdRef.current = null
       setTranslating(false)
       if (data.error) {
@@ -125,7 +146,7 @@ const LabelsEditor = (props) => {
         notifyInfo({ key: 'aiTranslation.success', params: { count: Object.keys(byLang).length } })
       }
     },
-    [i18n, notifyError, labels, onChange, notifyInfo, emptyLangs]
+    [clearTranslationTimeout, i18n, notifyError, labels, onChange, notifyInfo, emptyLangs]
   )
 
   useOnWebSocketEvent({ eventName: WebSocketEvents.translationUpdate, eventHandler: onTranslationUpdate })
