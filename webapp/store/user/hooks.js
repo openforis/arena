@@ -20,6 +20,13 @@ export const useUserIsSystemAdmin = () => User.isSystemAdmin(useUser())
 // ====== Auth
 // ====== Auth / Surveys
 export const useAuthCanCreateSurvey = () => Authorizer.canCreateSurvey(useUser(), useSurveyInfo())
+export const useAuthIsMaxSurveysCountReached = () => {
+  const user = useUser()
+  const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
+  if (Number.isNaN(maxSurveysCount)) return false
+  const surveysCount = (User.getSurveysCountDraft(user) ?? 0) + (User.getSurveysCountPublished(user) ?? 0)
+  return surveysCount >= maxSurveysCount
+}
 export const useAuthCanEditSurvey = () => Authorizer.canEditSurvey(useUser(), useSurveyInfo())
 export const useAuthCanExportSurvey = () => Authorizer.canExportSurvey(useUser(), useSurveyInfo())
 export const useAuthCanViewTemplates = () => Authorizer.canViewTemplates(useUser())
