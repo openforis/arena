@@ -1,36 +1,14 @@
 import './ActiveSurveyNotSelected.scss'
 
-import React, { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { Trans } from 'react-i18next'
 
-import * as Authorizer from '@core/auth/authorizer'
-
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-import { NotificationActions } from '@webapp/store/ui'
-import { useAuthIsMaxSurveysCountReached, useUser } from '@webapp/store/user/hooks'
+import { useOnNewSurveyClick } from '@webapp/store/user/hooks'
 
 export const ActiveSurveyNotSelected = () => {
-  const dispatch = useDispatch()
-  const user = useUser()
-  const isMaxSurveysCountReached = useAuthIsMaxSurveysCountReached()
-
-  const onNewSurveyClick = useCallback(
-    (e) => {
-      if (isMaxSurveysCountReached) {
-        e.preventDefault()
-        const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
-        dispatch(
-          NotificationActions.notifyError({
-            key: 'surveyCreate:errorMaxSurveysCountExceeded',
-            params: { maxSurveysCount },
-          })
-        )
-      }
-    },
-    [isMaxSurveysCountReached, user, dispatch]
-  )
+  const onNewSurveyClick = useOnNewSurveyClick()
 
   return (
     <div className="active-survey-not-selected">

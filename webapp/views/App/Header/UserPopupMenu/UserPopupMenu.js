@@ -1,13 +1,12 @@
 import './UserPopupMenu.scss'
 
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
-import * as Authorizer from '@core/auth/authorizer'
 import * as ProcessUtils from '@core/processUtils'
 
 import { clickedOutside } from '@webapp/utils/domUtils'
@@ -26,9 +25,8 @@ import {
   useAuthCanEditTemplates,
   useAuthCanViewAllUsers,
   useAuthCanViewUsersAccessRequests,
-  useAuthIsMaxSurveysCountReached,
+  useOnNewSurveyClick,
 } from '@webapp/store/user/hooks'
-import { NotificationActions } from '@webapp/store/ui'
 
 const Separator = () => <div className="user-popup-menu__sep" />
 
@@ -60,11 +58,11 @@ const UserPopupMenu = (props) => {
 
   const user = useUser()
   const canCreateSurvey = useAuthCanCreateSurvey()
-  const isMaxSurveysCountReached = useAuthIsMaxSurveysCountReached()
   const canCreateTemplate = useAuthCanCreateTemplate()
   const canEditTemplates = useAuthCanEditTemplates()
   const canViewUsersAccessRequests = useAuthCanViewUsersAccessRequests() && ProcessUtils.ENV.allowUserAccessRequest
   const canViewAllUsers = useAuthCanViewAllUsers()
+  const onNewSurveyClick = useOnNewSurveyClick({ onAfterClick: onClose })
 
   useEffect(() => {
     const onClickListener = (e) => {
@@ -79,23 +77,6 @@ const UserPopupMenu = (props) => {
       window.removeEventListener('click', onClickListener)
     }
   }, [onClose])
-
-  const onNewSurveyClick = useCallback(
-    (e) => {
-      if (isMaxSurveysCountReached) {
-        e.preventDefault()
-        const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
-        dispatch(
-          NotificationActions.notifyError({
-            key: 'surveyCreate:errorMaxSurveysCountExceeded',
-            params: { maxSurveysCount },
-          })
-        )
-      }
-      onClose()
-    },
-    [isMaxSurveysCountReached, user, dispatch, onClose]
-  )
 
   return (
     <div className="user-popup-menu" ref={elementRef} onMouseLeave={onClose}>
