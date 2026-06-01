@@ -60,6 +60,10 @@
     gap: 0.5rem;
     margin-top: 0.5rem;
     flex-wrap: wrap;
+
+    &-spacer {
+      flex: 1;
+    }
   }
 
   &__categories,

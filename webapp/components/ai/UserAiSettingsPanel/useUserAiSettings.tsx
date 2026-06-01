@@ -6,9 +6,18 @@ import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useI18n } from '@webapp/store/system'
 
-export const FEATURE_CATEGORIES = ['chat', 'expressions', 'translation', 'analysis']
+export type FeatureCategory = 'chat' | 'expressions' | 'translation' | 'analysis'
 
-const defaultFeatureToggles = () => ({ chat: false, expressions: false, translation: false, analysis: false })
+export const FEATURE_CATEGORIES: FeatureCategory[] = ['chat', 'expressions', 'translation', 'analysis']
+
+type FeatureToggles = Record<FeatureCategory, boolean>
+
+const defaultFeatureToggles = (): FeatureToggles => ({
+  chat: false,
+  expressions: false,
+  translation: false,
+  analysis: false,
+})
 
 export const OTHER_MODEL_VALUE = '__other__'
 
@@ -17,7 +26,15 @@ export const DEFAULT_PROVIDER_VALUE = 'default'
 // "default" is a UI-only sentinel meaning "use the admin-configured
 // provider". When the user picks it, we save `enabled: false` so the
 // backend resolver falls through to the admin default.
-export const PROVIDERS = [
+export type ProviderSpec = {
+  value: string
+  isDefault?: boolean
+  requiresBaseUrl: boolean
+  requiresApiKey: boolean
+  supportsModelList: boolean
+}
+
+export const PROVIDERS: ProviderSpec[] = [
   {
     value: DEFAULT_PROVIDER_VALUE,
     isDefault: true,
@@ -32,19 +49,66 @@ export const PROVIDERS = [
   { value: 'vercel-ai-sdk', requiresBaseUrl: true, requiresApiKey: false, supportsModelList: false },
 ]
 
-export const BASE_URL_PLACEHOLDERS = {
+export const BASE_URL_PLACEHOLDERS: Record<string, string> = {
   'openai-compatible': 'https://openrouter.ai/api/v1',
   'vercel-ai-sdk': 'https://your-app.example.com/api/chat',
 }
 
-export const MODEL_PLACEHOLDERS = {
+export const MODEL_PLACEHOLDERS: Record<string, string> = {
   openai: 'gpt-4o-mini',
   anthropic: 'claude-haiku-4-5',
   google: 'gemini-2.0-flash',
   'openai-compatible': 'llama3.3:70b',
 }
 
-const emptyForm = {
+type AiSettings = {
+  featuresEnabled?: boolean
+  featureToggles?: Partial<FeatureToggles>
+  enabled?: boolean
+  provider?: string
+  model?: string
+  baseUrl?: string
+  hasApiKey?: boolean
+  aiFeaturesDisabled?: boolean
+  effectiveSource?: string
+  effectiveProvider?: string
+  effectiveModel?: string
+  encryptionConfigured?: boolean
+}
+
+type AiModel = {
+  id: string
+  description?: string
+}
+
+type TestResult = {
+  ok: boolean
+  latencyMs?: number
+  errorMessage?: string
+}
+
+type SettingsUpdate = {
+  featuresEnabled: boolean
+  featureToggles: FeatureToggles
+  enabled: boolean
+  provider?: string
+  model?: string | null
+  baseUrl?: string | null
+  apiKey?: string
+}
+
+type FormState = {
+  featuresEnabled: boolean
+  featureToggles: FeatureToggles
+  provider: string
+  model: string
+  baseUrl: string
+  apiKey: string
+  apiKeyDirty: boolean
+  modelFreeText: boolean
+}
+
+const emptyForm: FormState = {
   featuresEnabled: false,
   featureToggles: defaultFeatureToggles(),
   provider: DEFAULT_PROVIDER_VALUE,
@@ -55,7 +119,19 @@ const emptyForm = {
   modelFreeText: false,
 }
 
-const buildModelsKey = ({ provider, baseUrl, apiKey, apiKeyDirty, hasSavedApiKey }) =>
+const buildModelsKey = ({
+  provider,
+  baseUrl,
+  apiKey,
+  apiKeyDirty,
+  hasSavedApiKey,
+}: {
+  provider: string
+  baseUrl: string
+  apiKey: string
+  apiKeyDirty: boolean
+  hasSavedApiKey: boolean
+}): string =>
   [provider, baseUrl || '', apiKeyDirty ? `dirty:${apiKey || ''}` : `saved:${hasSavedApiKey ? '1' : '0'}`].join('|')
 
 /**
@@ -68,23 +144,27 @@ export const useUserAiSettings = () => {
   const notifyError = useNotifyError()
 
   const [loading, setLoading] = useState(true)
-  const [settings, setSettings] = useState(null)
-  const [form, setForm] = useState(emptyForm)
+  const [settings, setSettings] = useState<AiSettings | null>(null)
+  const [form, setForm] = useState<FormState>(emptyForm)
+  const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
-  const [testResult, setTestResult] = useState(null)
+  const [testResult, setTestResult] = useState<TestResult | null>(null)
 
-  const [models, setModels] = useState([])
+  const [models, setModels] = useState<AiModel[]>([])
   const [modelsFetching, setModelsFetching] = useState(false)
-  const [modelsError, setModelsError] = useState(null)
-  const [lastModelsKey, setLastModelsKey] = useState(null)
+  const [modelsError, setModelsError] = useState<string | null>(null)
+  const [lastModelsKey, setLastModelsKey] = useState<string | null>(null)
 
-  const providerSpec = useMemo(() => PROVIDERS.find((p) => p.value === form.provider) || PROVIDERS[0], [form.provider])
+  const providerSpec = useMemo(
+    (): ProviderSpec => PROVIDERS.find((p) => p.value === form.provider) ?? PROVIDERS[0],
+    [form.provider]
+  )
 
   const fetchSettings = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await API.aiSettings.fetchSettings()
+      const data: AiSettings = await API.aiSettings.fetchSettings()
       setSettings(data)
       setForm({
         featuresEnabled: !!data.featuresEnabled,
@@ -101,7 +181,8 @@ export const useUserAiSettings = () => {
       setModels([])
       setModelsError(null)
       setLastModelsKey(null)
-    } catch (error) {
+      setDirty(false)
+    } catch (error: any) {
       const code = error?.response?.data?.error
       if (code === 'aiFeaturesDisabled' || error?.response?.status === 404) {
         setSettings({ aiFeaturesDisabled: true })
@@ -117,37 +198,51 @@ export const useUserAiSettings = () => {
     fetchSettings()
   }, [fetchSettings])
 
-  const onProviderChange = useCallback((providerItem) => {
+  const onProviderChange = useCallback((providerItem: ProviderSpec | null) => {
     const provider = providerItem?.value
     if (!provider) return
     setForm((prev) => ({ ...prev, provider, baseUrl: '', model: '', modelFreeText: false }))
     setModels([])
     setModelsError(null)
     setLastModelsKey(null)
+    setDirty(true)
   }, [])
-  const onModelChange = useCallback((value) => setForm((prev) => ({ ...prev, model: value })), [])
-  const onBaseUrlChange = useCallback((value) => setForm((prev) => ({ ...prev, baseUrl: value })), [])
-  const onApiKeyChange = useCallback((value) => setForm((prev) => ({ ...prev, apiKey: value, apiKeyDirty: true })), [])
-  const onFeaturesEnabledChange = useCallback(
-    (checked) => setForm((prev) => ({ ...prev, featuresEnabled: checked })),
-    []
-  )
+
+  const onModelChange = useCallback((value: string) => {
+    setForm((prev) => ({ ...prev, model: value }))
+    setDirty(true)
+  }, [])
+  const onBaseUrlChange = useCallback((value: string) => {
+    setForm((prev) => ({ ...prev, baseUrl: value }))
+    setDirty(true)
+  }, [])
+  const onApiKeyChange = useCallback((value: string) => {
+    setForm((prev) => ({ ...prev, apiKey: value, apiKeyDirty: true }))
+    setDirty(true)
+  }, [])
+  const onFeaturesEnabledChange = useCallback((checked: boolean) => {
+    setForm((prev) => ({ ...prev, featuresEnabled: checked }))
+    setDirty(true)
+  }, [])
   const onFeatureToggleChange = useCallback(
-    (category) => (checked) =>
+    (category: FeatureCategory) => (checked: boolean) => {
       setForm((prev) => ({
         ...prev,
         featureToggles: { ...prev.featureToggles, [category]: checked },
-      })),
+      }))
+      setDirty(true)
+    },
     []
   )
 
-  const onModelSelectChange = useCallback((e) => {
+  const onModelSelectChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value
     if (value === OTHER_MODEL_VALUE) {
       setForm((prev) => ({ ...prev, modelFreeText: true }))
     } else {
       setForm((prev) => ({ ...prev, model: value, modelFreeText: false }))
     }
+    setDirty(true)
   }, [])
 
   /**
@@ -159,7 +254,7 @@ export const useUserAiSettings = () => {
    * @returns {Promise<void>} Nothing.
    */
   const fetchModels = useCallback(
-    async ({ force = false } = {}) => {
+    async ({ force = false }: { force?: boolean } = {}) => {
       if (!providerSpec.supportsModelList) return
       const hasBaseUrl = !providerSpec.requiresBaseUrl || form.baseUrl.trim().length > 0
       const hasApiKey = !providerSpec.requiresApiKey || form.apiKeyDirty || !!settings?.hasApiKey
@@ -183,7 +278,7 @@ export const useUserAiSettings = () => {
           baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
           apiKey: form.apiKeyDirty ? form.apiKey : null,
         })
-        const list = Array.isArray(data?.models) ? data.models : []
+        const list: AiModel[] = Array.isArray(data?.models) ? data.models : []
         setModels(list)
         if (list.length > 0) {
           // Show the dropdown after fetching. If the current model isn't in
@@ -197,7 +292,7 @@ export const useUserAiSettings = () => {
             setForm((prev) => ({ ...prev, model: list[0].id, modelFreeText: false }))
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         setModels([])
         setModelsError(error?.response?.data?.error || error?.message || 'unknown')
       } finally {
@@ -226,23 +321,26 @@ export const useUserAiSettings = () => {
     setTestResult(null)
     try {
       const useAdminDefault = providerSpec.isDefault
-      const update = {
+      const update: SettingsUpdate = {
         featuresEnabled: form.featuresEnabled,
         featureToggles: form.featureToggles,
         enabled: !useAdminDefault,
+        ...(useAdminDefault
+          ? {}
+          : {
+              provider: form.provider,
+              model: providerSpec.supportsModelList ? form.model : null,
+              baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
+              ...(form.apiKeyDirty ? { apiKey: form.apiKey } : {}),
+            }),
       }
-      if (!useAdminDefault) {
-        update.provider = form.provider
-        update.model = providerSpec.supportsModelList ? form.model : null
-        update.baseUrl = providerSpec.requiresBaseUrl ? form.baseUrl : null
-        if (form.apiKeyDirty) update.apiKey = form.apiKey
-      }
-      const data = await API.aiSettings.saveSettings(update)
+      const data: AiSettings = await API.aiSettings.saveSettings(update as any)
       setSettings(data)
       setForm((prev) => ({ ...prev, apiKey: '', apiKeyDirty: false }))
+      setDirty(false)
       invalidateAiSettingsCache()
       notifyInfo({ key: 'userAiSettings:savedSuccessfully' })
-    } catch (error) {
+    } catch (error: any) {
       notifyError({ key: 'userAiSettings:saveFailed', params: { message: error?.message || 'unknown' } })
     } finally {
       setSaving(false)
@@ -274,9 +372,9 @@ export const useUserAiSettings = () => {
             baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : undefined,
             apiKey: form.apiKeyDirty ? form.apiKey : undefined,
           }
-      const result = await API.aiSettings.testConnection(draft)
+      const result: TestResult = await API.aiSettings.testConnection(draft)
       setTestResult(result)
-    } catch (error) {
+    } catch (error: any) {
       setTestResult({ ok: false, errorMessage: error?.message || 'unknown' })
     } finally {
       setTesting(false)
@@ -287,22 +385,23 @@ export const useUserAiSettings = () => {
     setSaving(true)
     setTestResult(null)
     try {
-      const data = await API.aiSettings.clearSettings()
+      const data: AiSettings = await API.aiSettings.clearSettings()
       setSettings(data)
       setForm({ ...emptyForm, featureToggles: defaultFeatureToggles() })
       setModels([])
       setModelsError(null)
       setLastModelsKey(null)
+      setDirty(false)
       invalidateAiSettingsCache()
       notifyInfo({ key: 'userAiSettings:cleared' })
-    } catch (error) {
+    } catch (error: any) {
       notifyError({ key: 'userAiSettings:saveFailed', params: { message: error?.message || 'unknown' } })
     } finally {
       setSaving(false)
     }
   }, [notifyError, notifyInfo])
 
-  const testResultView = useMemo(() => {
+  const testResultView = useMemo((): React.ReactElement | null => {
     if (testing) {
       return <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings:testing')}</div>
     }
@@ -320,6 +419,7 @@ export const useUserAiSettings = () => {
     loading,
     settings,
     form,
+    dirty,
     saving,
     testing,
     models,
