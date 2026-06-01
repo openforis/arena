@@ -202,7 +202,7 @@ export const saveSettings = async ({ user, update }) => {
     // appropriate for the override flag.
     provider = sanitiseProvider(update.provider)
     const isFixedEndpoint = provider === ProviderRegistry.providers.vercelAiSdk
-    model = isFixedEndpoint ? 'vercel-ai-sdk' : (update.model || '').trim() || null
+    model = isFixedEndpoint ? ProviderRegistry.providers.vercelAiSdk : (update.model || '').trim() || null
     baseUrl = update.baseUrl ? String(update.baseUrl).trim() : null
     if (overrideEnabled) {
       if (!model && !isFixedEndpoint) throw new SystemError('aiModelMissing', { provider })

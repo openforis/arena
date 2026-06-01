@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { AiProvider } from '@common/ai/aiProvider'
+
 import * as API from '@webapp/service/api'
 
 import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
@@ -42,23 +44,23 @@ export const PROVIDERS: ProviderSpec[] = [
     requiresApiKey: false,
     supportsModelList: false,
   },
-  { value: 'openai', requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: 'anthropic', requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: 'google', requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: 'openai-compatible', requiresBaseUrl: true, requiresApiKey: false, supportsModelList: true },
-  { value: 'vercel-ai-sdk', requiresBaseUrl: true, requiresApiKey: false, supportsModelList: false },
+  { value: AiProvider.openai, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
+  { value: AiProvider.anthropic, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
+  { value: AiProvider.google, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
+  { value: AiProvider.openaiCompatible, requiresBaseUrl: true, requiresApiKey: false, supportsModelList: true },
+  { value: AiProvider.vercelAiSdk, requiresBaseUrl: true, requiresApiKey: false, supportsModelList: false },
 ]
 
 export const BASE_URL_PLACEHOLDERS: Record<string, string> = {
-  'openai-compatible': 'https://openrouter.ai/api/v1',
-  'vercel-ai-sdk': 'https://your-app.example.com/api/chat',
+  [AiProvider.openaiCompatible]: 'https://openrouter.ai/api/v1',
+  [AiProvider.vercelAiSdk]: 'https://your-app.example.com/api/chat',
 }
 
 export const MODEL_PLACEHOLDERS: Record<string, string> = {
-  openai: 'gpt-4o-mini',
-  anthropic: 'claude-haiku-4-5',
-  google: 'gemini-2.0-flash',
-  'openai-compatible': 'llama3.3:70b',
+  [AiProvider.openai]: 'gpt-4o-mini',
+  [AiProvider.anthropic]: 'claude-haiku-4-5',
+  [AiProvider.google]: 'gemini-2.0-flash',
+  [AiProvider.openaiCompatible]: 'llama3.3:70b',
 }
 
 type AiSettings = {

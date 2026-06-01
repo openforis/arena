@@ -65,13 +65,13 @@ const listOpenAiCompatible = async ({ baseUrl, apiKey }) => {
 }
 
 const listOpenAi = async ({ apiKey }) => {
-  if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: 'openai' })
+  if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.openai })
   const all = await listOpenAiCompatible({ baseUrl: 'https://api.openai.com/v1', apiKey })
   return all.filter((m) => isLikelyChatModel(m.id))
 }
 
 const listAnthropic = async ({ apiKey }) => {
-  if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: 'anthropic' })
+  if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.anthropic })
   const json = await fetchWithTimeout('https://api.anthropic.com/v1/models', {
     headers: {
       Accept: 'application/json',
@@ -90,7 +90,7 @@ const listAnthropic = async ({ apiKey }) => {
 }
 
 const listGoogle = async ({ apiKey }) => {
-  if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: 'google' })
+  if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.google })
   const json = await fetchWithTimeout(
     `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`,
     { headers: { Accept: 'application/json' } }

@@ -2,6 +2,8 @@ import './UserAiSettingsPanel.scss'
 
 import React, { useEffect, useImperativeHandle } from 'react'
 
+import { AiProvider } from '@common/ai/aiProvider'
+
 import { Spinner } from '@webapp/components/Spinner'
 import { Button as ButtonJS } from '@webapp/components/buttons'
 import { FormItem, Input as InputJS } from '@webapp/components/form/Input'
@@ -187,7 +189,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
                     </FormItem>
                   )}
 
-                  {form.provider !== 'vercel-ai-sdk' && (
+                  {form.provider !== AiProvider.vercelAiSdk && (
                     <FormItem label="userAiSettings:apiKey">
                       <Input
                         type="password"
@@ -199,13 +201,13 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
                       />
                     </FormItem>
                   )}
-                  {settings?.hasApiKey && !form.apiKeyDirty && form.provider !== 'vercel-ai-sdk' && (
+                  {settings?.hasApiKey && !form.apiKeyDirty && form.provider !== AiProvider.vercelAiSdk && (
                     <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:apiKeyKept')}</div>
                   )}
 
                   {renderModelField()}
 
-                  {form.provider === 'vercel-ai-sdk' && (
+                  {form.provider === AiProvider.vercelAiSdk && (
                     <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:vercelAiSdkHint')}</div>
                   )}
                 </>
