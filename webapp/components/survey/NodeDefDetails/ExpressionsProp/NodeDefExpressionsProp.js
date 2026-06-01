@@ -87,7 +87,7 @@ const NodeDefExpressionsProp = (props) => {
   )
 
   return (
-    <Fieldset className="node-def-edit__expressions-fieldset" info={info} label={label}>
+    <Fieldset className="node-def-edit__expressions-fieldset" info={info} legend={label}>
       <div className="content">
         {radioMode && (
           <div className="form-item_body node-def-edit__expression-radio-mode">

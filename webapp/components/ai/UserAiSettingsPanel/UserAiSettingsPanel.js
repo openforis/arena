@@ -55,12 +55,11 @@ const UserAiSettingsPanel = () => {
 
   if (settings?.aiFeaturesDisabled) {
     return (
-      <fieldset className="user-ai-settings-panel">
-        <legend>{i18n.t('userAiSettings:section')}</legend>
+      <Fieldset className="user-ai-settings-panel" legend="userAiSettings:section">
         <div className="user-ai-settings-panel__status user-ai-settings-panel__status--missing">
           {i18n.t('userAiSettings:featuresDisabled')}
         </div>
-      </fieldset>
+      </Fieldset>
     )
   }
 
@@ -106,7 +105,7 @@ const UserAiSettingsPanel = () => {
   }
 
   return (
-    <Fieldset className="user-ai-settings-panel" label="userAiSettings:section">
+    <Fieldset className="user-ai-settings-panel" legend="userAiSettings:section">
       {encryptionMissing && (
         <div className="user-ai-settings-panel__status user-ai-settings-panel__status--missing">
           {i18n.t('userAiSettings:encryptionMissing')}
@@ -119,7 +118,7 @@ const UserAiSettingsPanel = () => {
 
       {form.featuresEnabled && (
         <>
-          <Fieldset className="user-ai-settings-panel__categories" label="userAiSettings:categoriesSection">
+          <Fieldset className="user-ai-settings-panel__categories" legend="userAiSettings:categoriesSection">
             {FEATURE_CATEGORIES.map((category) => (
               <FormItem
                 key={category}
@@ -131,7 +130,7 @@ const UserAiSettingsPanel = () => {
             ))}
           </Fieldset>
 
-          <Fieldset className="user-ai-settings-panel__provider" label="userAiSettings:providerSection">
+          <Fieldset className="user-ai-settings-panel__provider" legend="userAiSettings:providerSection">
             {effective && (
               <div className="user-ai-settings-panel__effective">
                 {settings.effectiveProvider} / {settings.effectiveModel}
