@@ -71,9 +71,11 @@ const UserEdit = () => {
   const aiSaveRef = useRef(null)
   const [aiSettingsDirty, setAiSettingsDirty] = useState(false)
   const onSaveAll = useCallback(async () => {
-    await onSave()
-    await aiSaveRef.current?.()
-  }, [onSave])
+    const saves = []
+    if (dirty) saves.push(onSave())
+    if (aiSettingsDirty) saves.push(aiSaveRef.current?.())
+    await Promise.allSettled(saves)
+  }, [aiSettingsDirty, dirty, onSave])
 
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
