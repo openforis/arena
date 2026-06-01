@@ -134,15 +134,43 @@ const buildModelsKey = ({
   apiKeyDirty: boolean
   hasSavedApiKey: boolean
 }): string => {
-  const apiKeySegment = apiKeyDirty ? `dirty:${apiKey || ''}` : `saved:${hasSavedApiKey ? '1' : '0'}`
+  const savedKeyFlag = hasSavedApiKey ? '1' : '0'
+  const apiKeySegment = apiKeyDirty ? `dirty:len${apiKey.length}` : `saved:${savedKeyFlag}`
   return [provider, baseUrl || '', apiKeySegment].join('|')
+}
+
+type UseUserAiSettingsResult = {
+  i18n: ReturnType<typeof useI18n>
+  loading: boolean
+  settings: AiSettings | null
+  form: FormState
+  dirty: boolean
+  saving: boolean
+  testing: boolean
+  models: AiModel[]
+  modelsFetching: boolean
+  modelsError: string | null
+  providerSpec: ProviderSpec
+  onProviderChange: (providerItem: ProviderSpec | null) => void
+  onModelChange: (value: string) => void
+  onBaseUrlChange: (value: string) => void
+  onApiKeyChange: (value: string) => void
+  onFeaturesEnabledChange: (checked: boolean) => void
+  onFeatureToggleChange: (category: FeatureCategory) => (checked: boolean) => void
+  onModelSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
+  fetchModels: (opts?: { force?: boolean }) => Promise<void>
+  onBaseUrlBlur: () => void
+  onApiKeyBlur: () => void
+  onSave: () => Promise<void>
+  onTest: () => Promise<void>
+  onClear: () => Promise<void>
+  testResultView: React.ReactElement | null
 }
 
 /**
  * Encapsulates all state and logic for the UserAiSettingsPanel component.
- * @returns {object} State values, handlers, and derived UI elements for the panel.
  */
-export const useUserAiSettings = () => {
+export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const i18n = useI18n()
   const notifyInfo = useNotifyInfo()
   const notifyError = useNotifyError()
