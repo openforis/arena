@@ -133,8 +133,10 @@ const buildModelsKey = ({
   apiKey: string
   apiKeyDirty: boolean
   hasSavedApiKey: boolean
-}): string =>
-  [provider, baseUrl || '', apiKeyDirty ? `dirty:${apiKey || ''}` : `saved:${hasSavedApiKey ? '1' : '0'}`].join('|')
+}): string => {
+  const apiKeySegment = apiKeyDirty ? `dirty:${apiKey || ''}` : `saved:${hasSavedApiKey ? '1' : '0'}`
+  return [provider, baseUrl || '', apiKeySegment].join('|')
+}
 
 /**
  * Encapsulates all state and logic for the UserAiSettingsPanel component.
