@@ -294,7 +294,12 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
     const trimmedModel = model ? String(model).trim() : null
     const trimmedBaseUrl = baseUrl ? String(baseUrl).trim() : null
     const effectiveApiKey = resolveApiKey({ user, apiKey })
-    cfg = { provider: providerSanitised, model: trimmedModel || null, baseUrl: trimmedBaseUrl, apiKey: effectiveApiKey }
+    cfg = {
+      provider: providerSanitised,
+      model: trimmedModel || null,
+      baseUrl: trimmedBaseUrl || null,
+      apiKey: effectiveApiKey,
+    }
   } else {
     cfg = getEffectiveUserConfig(user)
   }

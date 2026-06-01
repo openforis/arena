@@ -74,7 +74,7 @@ const UserEdit = () => {
     const saves = []
     if (dirty) saves.push(onSave())
     if (aiSettingsDirty) saves.push(aiSaveRef.current?.())
-    await Promise.allSettled(saves)
+    await Promise.all(saves)
   }, [aiSettingsDirty, dirty, onSave])
 
   const i18n = useI18n()
