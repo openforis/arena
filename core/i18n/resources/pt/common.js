@@ -837,6 +837,7 @@ $t(common.cantUndoWarning)`,
       'Nome de propriedade de valor de atributo inválido: {{attributeName}}.{{propName}}',
     invalidCategoryExtraProp: 'Nome de propriedade extra inválido: {{propName}}',
     invalidCategotyName: 'Nome de categoria inválido: {{name}}',
+    invalidTaxonomyExtraProp: 'Nome de propriedade extra de taxonomia inválido: {{propName}}',
     invalidTaxonomyName: 'Nome de taxonomia inválido: {{name}}',
     invalidTaxonVernacularNameLanguageCode:
       'Código de idioma do nome vernacular do táxon inválido: {{vernacularLangCode}}',
