@@ -16,6 +16,8 @@
  *     usage shape (undefined input/output/total tokens).
  */
 
+import { AiProvider } from '@common/ai/aiProvider'
+
 const DEFAULT_TIMEOUT_MS = 60000
 const SSE_FRAME_DELIMITER = '\n\n'
 const DATA_PREFIX = 'data:'
@@ -219,8 +221,8 @@ const drainChatStreamToText = async (response, signal) => {
  */
 export const createVercelAiSdkModel = ({ baseUrl, timeoutMs = DEFAULT_TIMEOUT_MS } = {}) => {
   const endpoint = baseUrl
-  const provider = 'vercel-ai-sdk'
-  const modelId = 'vercel-ai-sdk'
+  const provider = AiProvider.vercelAiSdk
+  const modelId = AiProvider.vercelAiSdk
 
   const linkSignals = (externalSignal) => {
     const controller = new AbortController()

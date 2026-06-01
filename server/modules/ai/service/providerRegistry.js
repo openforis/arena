@@ -17,20 +17,15 @@ import { createOpenAI } from '@ai-sdk/openai'
 
 import SystemError from '@core/systemError'
 
+import { AiProvider } from '@common/ai/aiProvider'
 import { createVercelAiSdkModel } from './vercelAiSdkProvider'
 
-export const providers = {
-  openai: 'openai',
-  anthropic: 'anthropic',
-  google: 'google',
-  openaiCompatible: 'openai-compatible',
-  vercelAiSdk: 'vercel-ai-sdk',
-}
+export const providers = AiProvider
 
 // Providers whose endpoint is a fixed agent rather than a generic LLM
 // API. They have no concept of a user-chosen model, so the registry skips
 // the usual model-required validation.
-const FIXED_ENDPOINT_PROVIDERS = new Set(['vercel-ai-sdk'])
+const FIXED_ENDPOINT_PROVIDERS = new Set([AiProvider.vercelAiSdk])
 
 const validProviders = new Set(Object.values(providers))
 

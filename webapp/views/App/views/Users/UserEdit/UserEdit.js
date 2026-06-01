@@ -1,6 +1,6 @@
 import './UserEdit.scss'
 
-import React from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useParams } from 'react-router'
 
 import { Objects } from '@openforis/arena-core'
@@ -67,6 +67,13 @@ const UserEdit = () => {
     onUpdate,
     onUpdateProfilePicture,
   } = useEditUser({ userUuid })
+
+  const aiSaveRef = useRef(null)
+  const [aiSettingsDirty, setAiSettingsDirty] = useState(false)
+  const onSaveAll = useCallback(async () => {
+    await onSave()
+    await aiSaveRef.current?.()
+  }, [onSave])
 
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
@@ -217,7 +224,7 @@ const UserEdit = () => {
               </FormItem>
             </fieldset>
           )}
-          <UserAiSettingsPanel />
+          <UserAiSettingsPanel ref={aiSaveRef} onDirtyChange={setAiSettingsDirty} />
         </>
       )}
 
@@ -240,7 +247,9 @@ const UserEdit = () => {
             />
           )}
 
-          {canEdit && <ButtonSave onClick={onSave} disabled={!canSave || !dirty} className="btn-save" />}
+          {canEdit && (
+            <ButtonSave onClick={onSaveAll} disabled={!canSave || (!dirty && !aiSettingsDirty)} className="btn-save" />
+          )}
 
           {surveyGroupsVisible && invitationExpired && (
             <ButtonInvite onClick={onInviteRepeat} className="btn btn-invite" />

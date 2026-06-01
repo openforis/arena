@@ -74,6 +74,25 @@ const getRawPrefs = (user) => {
 }
 
 /**
+ * Returns the effective API key to use: the draft value when supplied,
+ * otherwise decrypts and returns the user's saved key (null on failure).
+ * @param {object} args - Args.
+ * @param {object} args.user - Arena user.
+ * @param {string} [args.apiKey] - Draft API key from the form.
+ * @returns {string|null} Decrypted key, or null when unavailable.
+ */
+const resolveApiKey = ({ user, apiKey }) => {
+  if (typeof apiKey === 'string' && apiKey.length > 0) return apiKey
+  const raw = getRawPrefs(user)
+  if (!raw?.apiKeyEncrypted) return null
+  try {
+    return SecretBox.decrypt(raw.apiKeyEncrypted)
+  } catch {
+    return null
+  }
+}
+
+/**
  * Returns the user-facing settings shape (no secrets) for the AI Settings
  * page.
  * @param {object} user - Arena user.
@@ -202,7 +221,7 @@ export const saveSettings = async ({ user, update }) => {
     // appropriate for the override flag.
     provider = sanitiseProvider(update.provider)
     const isFixedEndpoint = provider === ProviderRegistry.providers.vercelAiSdk
-    model = isFixedEndpoint ? 'vercel-ai-sdk' : (update.model || '').trim() || null
+    model = isFixedEndpoint ? ProviderRegistry.providers.vercelAiSdk : (update.model || '').trim() || null
     baseUrl = update.baseUrl ? String(update.baseUrl).trim() : null
     if (overrideEnabled) {
       if (!model && !isFixedEndpoint) throw new SystemError('aiModelMissing', { provider })
@@ -256,12 +275,26 @@ export const clearSettings = async ({ user }) => {
  * Issues a tiny "say ok" call to the configured provider so the user knows
  * their key works before relying on it. Stamps `lastTestOk` / `lastTestAt`
  * on success and on failure so the AI Settings UI can surface staleness.
+ *
+ * When draft params (provider, model, baseUrl, apiKey) are supplied they take
+ * precedence over the persisted config so the UI can test unsaved changes.
+ * If apiKey is omitted the saved encrypted key is used as a fallback.
  * @param {object} args - Args.
  * @param {object} args.user - The user.
+ * @param {string} [args.provider] - Draft provider (overrides saved config).
+ * @param {string} [args.model] - Draft model.
+ * @param {string} [args.baseUrl] - Draft base URL.
+ * @param {string} [args.apiKey] - Draft API key (falls back to saved key when omitted).
  * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string}>} Test result.
  */
-export const testConnection = async ({ user }) => {
-  const cfg = getEffectiveUserConfig(user)
+export const testConnection = async ({ user, provider, model, baseUrl, apiKey }) => {
+  let cfg
+  if (provider) {
+    sanitiseProvider(provider)
+    cfg = { provider, model: model || null, baseUrl: baseUrl || null, apiKey: resolveApiKey({ user, apiKey }) }
+  } else {
+    cfg = getEffectiveUserConfig(user)
+  }
   if (!cfg) {
     return { ok: false, latencyMs: 0, errorMessage: 'No personal provider configured' }
   }
@@ -300,17 +333,7 @@ export const testConnection = async ({ user }) => {
  */
 export const listModels = async ({ user, provider, baseUrl, apiKey }) => {
   sanitiseProvider(provider)
-  let effectiveApiKey = typeof apiKey === 'string' && apiKey.length > 0 ? apiKey : null
-  if (!effectiveApiKey) {
-    const raw = getRawPrefs(user)
-    if (raw?.apiKeyEncrypted) {
-      try {
-        effectiveApiKey = SecretBox.decrypt(raw.apiKeyEncrypted)
-      } catch {
-        effectiveApiKey = null
-      }
-    }
-  }
+  const effectiveApiKey = resolveApiKey({ user, apiKey })
   const trimmedBaseUrl = baseUrl ? String(baseUrl).trim() : null
   const models = await ModelDiscovery.listForProvider({
     provider,
