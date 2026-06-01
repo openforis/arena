@@ -107,6 +107,7 @@ type FormState = {
   baseUrl: string
   apiKey: string
   apiKeyDirty: boolean
+  apiKeyVersion: number
   modelFreeText: boolean
 }
 
@@ -118,24 +119,25 @@ const emptyForm: FormState = {
   baseUrl: '',
   apiKey: '',
   apiKeyDirty: false,
+  apiKeyVersion: 0,
   modelFreeText: false,
 }
 
 const buildModelsKey = ({
   provider,
   baseUrl,
-  apiKey,
   apiKeyDirty,
+  apiKeyVersion,
   hasSavedApiKey,
 }: {
   provider: string
   baseUrl: string
-  apiKey: string
   apiKeyDirty: boolean
+  apiKeyVersion: number
   hasSavedApiKey: boolean
 }): string => {
   const savedKeyFlag = hasSavedApiKey ? '1' : '0'
-  const apiKeySegment = apiKeyDirty ? `dirty:len${apiKey.length}` : `saved:${savedKeyFlag}`
+  const apiKeySegment = apiKeyDirty ? `dirty:v${apiKeyVersion}` : `saved:${savedKeyFlag}`
   return [provider, baseUrl || '', apiKeySegment].join('|')
 }
 
@@ -208,6 +210,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
         baseUrl: data.baseUrl || '',
         apiKey: '',
         apiKeyDirty: false,
+        apiKeyVersion: 0,
         modelFreeText: false,
       })
       setModels([])
@@ -249,7 +252,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     setDirty(true)
   }, [])
   const onApiKeyChange = useCallback((value: string) => {
-    setForm((prev) => ({ ...prev, apiKey: value, apiKeyDirty: true }))
+    setForm((prev) => ({ ...prev, apiKey: value, apiKeyDirty: true, apiKeyVersion: prev.apiKeyVersion + 1 }))
     setDirty(true)
   }, [])
   const onFeaturesEnabledChange = useCallback((checked: boolean) => {
@@ -295,8 +298,8 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       const key = buildModelsKey({
         provider: form.provider,
         baseUrl: form.baseUrl,
-        apiKey: form.apiKey,
         apiKeyDirty: form.apiKeyDirty,
+        apiKeyVersion: form.apiKeyVersion,
         hasSavedApiKey: !!settings?.hasApiKey,
       })
       if (!force && key === lastModelsKey) return
@@ -337,6 +340,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       providerSpec.requiresApiKey,
       form.baseUrl,
       form.apiKeyDirty,
+      form.apiKeyVersion,
       form.provider,
       form.apiKey,
       form.model,

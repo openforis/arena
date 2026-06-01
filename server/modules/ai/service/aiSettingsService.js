@@ -290,8 +290,16 @@ export const clearSettings = async ({ user }) => {
 export const testConnection = async ({ user, provider, model, baseUrl, apiKey }) => {
   let cfg
   if (provider) {
-    sanitiseProvider(provider)
-    cfg = { provider, model: model || null, baseUrl: baseUrl || null, apiKey: resolveApiKey({ user, apiKey }) }
+    const providerSanitised = sanitiseProvider(String(provider))
+    const trimmedModel = model ? String(model).trim() : null
+    const trimmedBaseUrl = baseUrl ? String(baseUrl).trim() : null
+    const effectiveApiKey = resolveApiKey({ user, apiKey })
+    cfg = {
+      provider: providerSanitised,
+      model: trimmedModel || null,
+      baseUrl: trimmedBaseUrl || null,
+      apiKey: effectiveApiKey,
+    }
   } else {
     cfg = getEffectiveUserConfig(user)
   }
