@@ -74,6 +74,25 @@ const getRawPrefs = (user) => {
 }
 
 /**
+ * Returns the effective API key to use: the draft value when supplied,
+ * otherwise decrypts and returns the user's saved key (null on failure).
+ * @param {object} args - Args.
+ * @param {object} args.user - Arena user.
+ * @param {string} [args.apiKey] - Draft API key from the form.
+ * @returns {string|null} Decrypted key, or null when unavailable.
+ */
+const resolveApiKey = ({ user, apiKey }) => {
+  if (typeof apiKey === 'string' && apiKey.length > 0) return apiKey
+  const raw = getRawPrefs(user)
+  if (!raw?.apiKeyEncrypted) return null
+  try {
+    return SecretBox.decrypt(raw.apiKeyEncrypted)
+  } catch {
+    return null
+  }
+}
+
+/**
  * Returns the user-facing settings shape (no secrets) for the AI Settings
  * page.
  * @param {object} user - Arena user.
@@ -272,18 +291,7 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
   let cfg
   if (provider) {
     sanitiseProvider(provider)
-    let effectiveApiKey = typeof apiKey === 'string' && apiKey.length > 0 ? apiKey : null
-    if (!effectiveApiKey) {
-      const raw = getRawPrefs(user)
-      if (raw?.apiKeyEncrypted) {
-        try {
-          effectiveApiKey = SecretBox.decrypt(raw.apiKeyEncrypted)
-        } catch {
-          effectiveApiKey = null
-        }
-      }
-    }
-    cfg = { provider, model: model || null, baseUrl: baseUrl || null, apiKey: effectiveApiKey }
+    cfg = { provider, model: model || null, baseUrl: baseUrl || null, apiKey: resolveApiKey({ user, apiKey }) }
   } else {
     cfg = getEffectiveUserConfig(user)
   }
@@ -325,17 +333,7 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
  */
 export const listModels = async ({ user, provider, baseUrl, apiKey }) => {
   sanitiseProvider(provider)
-  let effectiveApiKey = typeof apiKey === 'string' && apiKey.length > 0 ? apiKey : null
-  if (!effectiveApiKey) {
-    const raw = getRawPrefs(user)
-    if (raw?.apiKeyEncrypted) {
-      try {
-        effectiveApiKey = SecretBox.decrypt(raw.apiKeyEncrypted)
-      } catch {
-        effectiveApiKey = null
-      }
-    }
-  }
+  const effectiveApiKey = resolveApiKey({ user, apiKey })
   const trimmedBaseUrl = baseUrl ? String(baseUrl).trim() : null
   const models = await ModelDiscovery.listForProvider({
     provider,
