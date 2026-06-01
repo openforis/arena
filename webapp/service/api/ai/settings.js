@@ -34,12 +34,19 @@ export const saveSettings = async (update) => {
 }
 
 /**
- * Issues a tiny test call to the configured provider to verify the saved
- * API key.
+ * Issues a tiny test call to the provider to verify connectivity. When draft
+ * params are supplied they are used instead of the persisted config, allowing
+ * the UI to test unsaved changes. `apiKey` is optional — the server falls back
+ * to the user's saved encrypted key when omitted.
+ * @param {object} [draft] - Draft form values to test.
+ * @param {string} [draft.provider] - Provider key.
+ * @param {string} [draft.model] - Model identifier.
+ * @param {string} [draft.baseUrl] - Base URL (openai-compatible only).
+ * @param {string} [draft.apiKey] - API key from the form, if changed.
  * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string}>} The test result.
  */
-export const testConnection = async () => {
-  const { data } = await axios.post(`${BASE}/test`)
+export const testConnection = async (draft = {}) => {
+  const { data } = await axios.post(`${BASE}/test`, draft)
   return data
 }
 
