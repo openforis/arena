@@ -56,7 +56,8 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const result = await AiSettingsService.testConnection({ user })
+        const { provider, model, baseUrl, apiKey } = Request.getBody(req) || {}
+        const result = await AiSettingsService.testConnection({ user, provider, model, baseUrl, apiKey })
         res.json(result)
       } catch (error) {
         next(error)

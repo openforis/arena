@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { Dictionary } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 import { ButtonIconInfo } from './buttons'
@@ -6,12 +7,13 @@ import { ButtonIconInfo } from './buttons'
 type FieldsetProps = {
   children: React.ReactNode
   className?: string
-  label?: string
   info?: string
   infoTitleClassName?: string
   infoTitleMarkdownClassName?: string
   infoTitleMaxWidth?: string
   isInfoMarkdown?: boolean
+  legend?: string
+  legendParams?: Dictionary<any>
   onInfoClick?: ((event: any) => void) | null
 }
 
@@ -24,12 +26,16 @@ export const Fieldset = (props: FieldsetProps) => {
     infoTitleMarkdownClassName = undefined,
     infoTitleMaxWidth = undefined,
     isInfoMarkdown = false,
-    label,
+    legend,
+    legendParams,
     onInfoClick = null,
   } = props
   const i18n = useI18n()
 
-  const legendText = useMemo(() => (label ? i18n.t(label) : null), [i18n, label])
+  const legendText: string | null = useMemo(
+    () => (legend ? (i18n.t(legend, legendParams) as string) : null),
+    [i18n, legend, legendParams]
+  )
 
   return (
     <fieldset className={className}>
