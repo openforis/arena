@@ -71,10 +71,9 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       onDirtyChange?.(dirty)
     }, [dirty, onDirtyChange])
 
-    if (loading) return null
+    if (loading || !settings) return null
 
-    if (settings?.aiFeaturesDisabled) {
-      return (
+    if (settings.aiFeaturesDisabled) {
         <Fieldset className="user-ai-settings-panel" legend="userAiSettings:section">
           <div className="user-ai-settings-panel__status user-ai-settings-panel__status--missing">
             {i18n.t('userAiSettings:featuresDisabled')}
