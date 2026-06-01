@@ -2,6 +2,7 @@ import './UserAiSettingsPanel.scss'
 
 import React from 'react'
 
+import { Spinner } from '@webapp/components/Spinner'
 import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Fieldset } from '@webapp/components/Fieldset'
@@ -29,6 +30,7 @@ const UserAiSettingsPanel = () => {
     settings,
     form,
     saving,
+    testing,
     models,
     modelsFetching,
     modelsError,
@@ -203,8 +205,12 @@ const UserAiSettingsPanel = () => {
             label="userAiSettings:testConnection"
             onClick={onTest}
             disabled={
-              saving || encryptionMissing || (providerSpec.requiresApiKey && !settings?.hasApiKey && !form.apiKeyDirty)
+              saving ||
+              testing ||
+              encryptionMissing ||
+              (providerSpec.requiresApiKey && !settings?.hasApiKey && !form.apiKeyDirty)
             }
+            icon={testing ? <Spinner size={16} /> : null}
           />
         )}
         {form.featuresEnabled && (

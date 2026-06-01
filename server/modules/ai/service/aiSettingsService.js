@@ -256,12 +256,37 @@ export const clearSettings = async ({ user }) => {
  * Issues a tiny "say ok" call to the configured provider so the user knows
  * their key works before relying on it. Stamps `lastTestOk` / `lastTestAt`
  * on success and on failure so the AI Settings UI can surface staleness.
+ *
+ * When draft params (provider, model, baseUrl, apiKey) are supplied they take
+ * precedence over the persisted config so the UI can test unsaved changes.
+ * If apiKey is omitted the saved encrypted key is used as a fallback.
  * @param {object} args - Args.
  * @param {object} args.user - The user.
+ * @param {string} [args.provider] - Draft provider (overrides saved config).
+ * @param {string} [args.model] - Draft model.
+ * @param {string} [args.baseUrl] - Draft base URL.
+ * @param {string} [args.apiKey] - Draft API key (falls back to saved key when omitted).
  * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string}>} Test result.
  */
-export const testConnection = async ({ user }) => {
-  const cfg = getEffectiveUserConfig(user)
+export const testConnection = async ({ user, provider, model, baseUrl, apiKey }) => {
+  let cfg
+  if (provider) {
+    sanitiseProvider(provider)
+    let effectiveApiKey = typeof apiKey === 'string' && apiKey.length > 0 ? apiKey : null
+    if (!effectiveApiKey) {
+      const raw = getRawPrefs(user)
+      if (raw?.apiKeyEncrypted) {
+        try {
+          effectiveApiKey = SecretBox.decrypt(raw.apiKeyEncrypted)
+        } catch {
+          effectiveApiKey = null
+        }
+      }
+    }
+    cfg = { provider, model: model || null, baseUrl: baseUrl || null, apiKey: effectiveApiKey }
+  } else {
+    cfg = getEffectiveUserConfig(user)
+  }
   if (!cfg) {
     return { ok: false, latencyMs: 0, errorMessage: 'No personal provider configured' }
   }

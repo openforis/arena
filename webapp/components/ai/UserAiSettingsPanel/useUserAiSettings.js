@@ -71,6 +71,7 @@ export const useUserAiSettings = () => {
   const [settings, setSettings] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState(null)
 
   const [models, setModels] = useState([])
@@ -262,14 +263,25 @@ export const useUserAiSettings = () => {
   ])
 
   const onTest = useCallback(async () => {
-    setTestResult({ pending: true })
+    setTesting(true)
+    setTestResult(null)
     try {
-      const result = await API.aiSettings.testConnection()
+      const draft = providerSpec.isDefault
+        ? {}
+        : {
+            provider: form.provider,
+            model: providerSpec.supportsModelList ? form.model : undefined,
+            baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : undefined,
+            apiKey: form.apiKeyDirty ? form.apiKey : undefined,
+          }
+      const result = await API.aiSettings.testConnection(draft)
       setTestResult(result)
     } catch (error) {
       setTestResult({ ok: false, errorMessage: error?.message || 'unknown' })
+    } finally {
+      setTesting(false)
     }
-  }, [])
+  }, [form.apiKey, form.apiKeyDirty, form.baseUrl, form.model, form.provider, providerSpec])
 
   const onClear = useCallback(async () => {
     setSaving(true)
@@ -291,20 +303,17 @@ export const useUserAiSettings = () => {
   }, [notifyError, notifyInfo])
 
   const testResultView = useMemo(() => {
+    if (testing) {
+      return <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings:testing')}</div>
+    }
     if (testResult) {
-      if (testResult.pending) {
-        return <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings:testing')}</div>
-      } else {
-        const testResultMessage = testResult.ok
-          ? i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs })
-          : i18n.t('userAiSettings:testFailed', { message: testResult.errorMessage || 'unknown' })
-        return (
-          <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>{testResultMessage}</div>
-        )
-      }
+      const testResultMessage = testResult.ok
+        ? i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs })
+        : i18n.t('userAiSettings:testFailed', { message: testResult.errorMessage || 'unknown' })
+      return <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>{testResultMessage}</div>
     }
     return null
-  }, [i18n, testResult])
+  }, [i18n, testResult, testing])
 
   return {
     i18n,
@@ -312,6 +321,7 @@ export const useUserAiSettings = () => {
     settings,
     form,
     saving,
+    testing,
     models,
     modelsFetching,
     modelsError,
