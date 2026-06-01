@@ -690,6 +690,7 @@ export default {
       'Nombre de propiedad de valor de atributo no válido: {{attributeName}}.{{propName}}',
     invalidCategoryExtraProp: 'Nombre de propiedad extra de categoría no válido: {{propName}}',
     invalidCategotyName: 'Nombre de categoría no válido: {{name}}',
+    invalidTaxonomyExtraProp: 'Nombre de propiedad extra de taxonomía no válido: {{propName}}',
     invalidTaxonomyName: 'Nombre de taxonomía no válido: {{name}}',
     invalidTaxonVernacularNameLanguageCode:
       'Código de idioma de nombre vernáculo de taxón no válido: {{vernacularLangCode}}',
