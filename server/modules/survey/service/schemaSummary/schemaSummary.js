@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import { Objects, Surveys } from '@openforis/arena-core'
 
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
@@ -13,8 +15,70 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import { RecordCycle } from '@core/record/recordCycle'
 import * as ValidationResult from '@core/validation/validationResult'
 
+import * as Log from '@server/log/log'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as ModelClient from '@server/modules/ai/service/modelClient'
+import { buildDataDictionaryPrompt } from '@server/modules/ai/service/prompts/dataDictionary'
+import { parseJsonResponse } from '@server/modules/ai/service/responseParsers'
+
+const logger = Log.getLogger('SchemaSummary')
+
+const MAX_AI_DESCRIPTIONS = 50
+const AI_BATCH_SIZE = 10
+
+const AiDescriptionsSchema = z.object({
+  descriptions: z.array(z.object({ uuid: z.string(), description: z.string() })),
+})
+
+const getParentPath = (nodeDef, survey) => {
+  const parts = []
+  let cur = Survey.getNodeDefParent(nodeDef)(survey)
+  while (cur && !NodeDef.isRoot(cur)) {
+    parts.unshift(String(NodeDef.getName(cur) || ''))
+    cur = Survey.getNodeDefParent(cur)(survey)
+  }
+  return parts.join('/')
+}
+
+const runAiDescriptionBatch = async ({ user, surveyName, batch, previousError }) => {
+  const batchNodeDefs = batch.map((e) => ({ uuid: e.uuid, name: e.name, type: e.type, parentPath: e.parentPath }))
+  const { system, prompt } = buildDataDictionaryPrompt({ surveyName, nodeDefs: batchNodeDefs, previousError })
+  const { text } = await ModelClient.generate({ user, feature: 'schemaSummary', prompt, system })
+  const json = parseJsonResponse(text)
+  return AiDescriptionsSchema.parse(json)
+}
+
+const runAiDescriptionBatchWithRetry = async ({ user, surveyName, batch, batchIndex }) => {
+  try {
+    return await runAiDescriptionBatch({ user, surveyName, batch })
+  } catch (firstError) {
+    logger.info(`schemaSummary AI batch ${batchIndex} failed: ${firstError?.message || firstError}; retrying`)
+    return runAiDescriptionBatch({
+      user,
+      surveyName,
+      batch,
+      previousError: { message: firstError?.message || String(firstError) },
+    })
+  }
+}
+
+const generateAiDescriptions = async ({ user, surveyName, entries }) => {
+  const missing = entries.filter((e) => !e._descriptionForAi.trim()).slice(0, MAX_AI_DESCRIPTIONS)
+  const aiByUuid = new Map()
+  for (let i = 0; i < missing.length; i += AI_BATCH_SIZE) {
+    const batch = missing.slice(i, i + AI_BATCH_SIZE)
+    try {
+      const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex: i })
+      for (const d of result.descriptions) {
+        aiByUuid.set(d.uuid, d.description)
+      }
+    } catch (error) {
+      logger.warn(`schemaSummary AI batch ${i}: ${error?.message || error}`)
+    }
+  }
+  return aiByUuid
+}
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
   const pathParts = []
@@ -85,7 +149,7 @@ const getValidationMessages = ({ nodeDef, lang }) => {
     .join('\n')
 }
 
-export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
+export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null, includeAiDescriptions = false }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
   const nodeDefs = []
   Survey.visitDescendantsAndSelf({
@@ -135,10 +199,13 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
     return Taxonomy.getName(taxonomy) || ''
   }
 
-  return nodeDefs.map((nodeDef) => {
-    const { uuid, type } = nodeDef
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const languages = Survey.getLanguages(surveyInfo)
+  const defaultLang = Survey.getDefaultLanguage(survey) || languages[0] || 'en'
+  const surveyName = Survey.getName(surveyInfo) || `survey-${surveyId}`
 
-    const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
+  const items = nodeDefs.map((nodeDef) => {
+    const { uuid, type } = nodeDef
 
     const relevantExpressions = NodeDef.getApplicable(nodeDef)
     const relevantIf = relevantExpressions.length > 0 ? NodeDefExpression.getExpression(relevantExpressions[0]) : ''
@@ -202,11 +269,39 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
         {}
       ),
       cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
+      _isRoot: NodeDef.isRoot(nodeDef),
+      _descriptionForAi: NodeDef.getDescription(defaultLang)(nodeDef) || '',
+      _parentPath: getParentPath(nodeDef, survey),
     }
   })
+
+  if (includeAiDescriptions) {
+    const aiEntries = items
+      .filter((item) => !item._isRoot)
+      .map((item) => ({
+        uuid: item.uuid,
+        name: item.name,
+        type: item.type,
+        parentPath: item._parentPath,
+        _descriptionForAi: item._descriptionForAi,
+      }))
+    const aiByUuid = await generateAiDescriptions({ user, surveyName, entries: aiEntries })
+    for (const item of items) {
+      item.aiDescription = aiByUuid.get(item.uuid) || ''
+    }
+  }
+
+  return items.map(({ _isRoot, _descriptionForAi, _parentPath, ...rest }) => rest)
 }
 
-export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileFormat }) => {
-  const items = await generateSchemaSummaryItems({ surveyId, cycle })
+export const exportSchemaSummary = async ({
+  surveyId,
+  cycle,
+  outputStream,
+  fileFormat,
+  user = null,
+  includeAiDescriptions = false,
+}) => {
+  const items = await generateSchemaSummaryItems({ surveyId, cycle, user, includeAiDescriptions })
   await FlatDataWriter.writeItemsToStream({ items, options: { removeNewLines: false }, outputStream, fileFormat })
 }

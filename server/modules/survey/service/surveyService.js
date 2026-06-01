@@ -110,8 +110,14 @@ export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) 
   return JobUtils.jobToJSON(job)
 }
 
-export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileFormat }) =>
-  SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream, fileFormat })
+export const exportSchemaSummary = async ({
+  surveyId,
+  cycle,
+  outputStream,
+  fileFormat,
+  user = null,
+  includeAiDescriptions = false,
+}) => SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream, fileFormat, user, includeAiDescriptions })
 
 export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })

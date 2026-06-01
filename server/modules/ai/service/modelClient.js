@@ -30,7 +30,7 @@ const featureToCategory = {
   expressionGenerate: AiSettingsService.featureCategories.expressions,
   expressionExplain: AiSettingsService.featureCategories.expressions,
   activityLogSummary: AiSettingsService.featureCategories.analysis,
-  dataDictionary: AiSettingsService.featureCategories.analysis,
+  schemaSummary: AiSettingsService.featureCategories.analysis,
 }
 
 const assertFeaturesEnabled = (feature, user) => {

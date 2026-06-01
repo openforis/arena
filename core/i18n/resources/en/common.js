@@ -1381,15 +1381,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     error: 'Failed to fetch summary: {{message}}',
   },
 
-  aiDataDictionary: {
-    menuHtml: 'AI data dictionary (HTML)',
-    menuMd: 'AI data dictionary (Markdown)',
-
-    generating: 'Generating data dictionary…',
-    generated: 'Data dictionary downloaded ({{filename}}): {{count}} fields, {{ai}} AI-generated descriptions.',
-    failed: 'Could not generate data dictionary: {{message}}',
-  },
-
   aiChatbot: {
     open: 'Help & documentation',
     title: 'Help & documentation',

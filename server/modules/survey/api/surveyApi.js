@@ -285,7 +285,8 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+      const { surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = Request.getParams(req)
+      const user = Request.getUser(req)
 
       const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
       const fileName = ExportFileNameGenerator.generate({
@@ -296,7 +297,14 @@ export const init = (app) => {
       })
       Response.setContentTypeFile({ res, fileName, fileFormat })
 
-      await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res, fileFormat })
+      await SurveyService.exportSchemaSummary({
+        surveyId,
+        cycle,
+        outputStream: res,
+        fileFormat,
+        user,
+        includeAiDescriptions,
+      })
     } catch (error) {
       next(error)
     }
