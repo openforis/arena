@@ -233,7 +233,7 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null,
         }),
         {}
       ),
-      aiDescription: '', // to be filled later if includeAiDescriptions is true
+      ...(includeAiDescriptions ? { aiDescription: '' } : {}),
       type,
       key: String(NodeDef.isKey(nodeDef)),
       categoryName: getCategoryName(nodeDef),
@@ -270,9 +270,13 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null,
         {}
       ),
       cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
-      _isRoot: NodeDef.isRoot(nodeDef),
-      _descriptionForAi: NodeDef.getDescription(defaultLang)(nodeDef) || '',
-      _parentPath: getParentPath(nodeDef, survey),
+      ...(includeAiDescriptions
+        ? {
+            _isRoot: NodeDef.isRoot(nodeDef),
+            _descriptionForAi: NodeDef.getDescription(defaultLang)(nodeDef) || '',
+            _parentPath: getParentPath(nodeDef, survey),
+          }
+        : {}),
     }
   })
 
@@ -292,10 +296,7 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null,
     }
   }
 
-  return items.map(({ _isRoot, _descriptionForAi, _parentPath, aiDescription, ...rest }) => ({
-    ...rest,
-    ...(includeAiDescriptions ? { aiDescription } : {}),
-  }))
+  return items.map(({ _isRoot, _descriptionForAi, _parentPath, ...rest }) => rest)
 }
 
 export const exportSchemaSummary = async ({
