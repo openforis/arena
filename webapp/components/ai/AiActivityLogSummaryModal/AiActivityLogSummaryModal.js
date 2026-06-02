@@ -1,6 +1,6 @@
 import './AiActivityLogSummaryModal.scss'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as API from '@webapp/service/api'
@@ -56,11 +56,20 @@ const AiActivityLogSummaryModal = ({ from, to, userUuid, onClose }) => {
     onClose()
   }
 
+  const bodyContent = useMemo(() => {
+    if (text) {
+      return <Markdown source={text} />
+    } else if (!done) {
+      return i18n.t('aiActivityLog.thinking')
+    }
+    return null
+  }, [text, done, i18n])
+
   return (
     <Modal className="ai-activity-log-summary-modal" title="aiActivityLog.title" showCloseButton onClose={onCancel}>
       <ModalBody>
         <div className={`ai-activity-log-summary-modal__body${done ? '' : ' ai-activity-log-summary-modal__cursor'}`}>
-          {text ? <Markdown source={text} /> : done ? null : i18n.t('aiActivityLog.thinking')}
+          {bodyContent}
         </div>
 
         {error ? (
