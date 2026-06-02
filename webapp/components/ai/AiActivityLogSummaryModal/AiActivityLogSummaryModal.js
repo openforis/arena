@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 
 import * as API from '@webapp/service/api'
 import { Modal, ModalBody } from '@webapp/components/modal'
-import { Button } from '@webapp/components/buttons'
 import Markdown from '@webapp/components/markdown'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
