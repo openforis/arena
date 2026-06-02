@@ -29,8 +29,8 @@ const featureToCategory = {
   translation: AiSettingsService.featureCategories.translation,
   expressionGenerate: AiSettingsService.featureCategories.expressions,
   expressionExplain: AiSettingsService.featureCategories.expressions,
-  activityLogSummary: AiSettingsService.featureCategories.analysis,
-  schemaSummary: AiSettingsService.featureCategories.analysis,
+  activityLogSummary: AiSettingsService.featureCategories.userActivity,
+  schemaSummary: AiSettingsService.featureCategories.dataDictionary,
 }
 
 const assertFeaturesEnabled = (feature, user) => {

@@ -233,6 +233,7 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null,
         }),
         {}
       ),
+      aiDescription: '', // to be filled later if includeAiDescriptions is true
       type,
       key: String(NodeDef.isKey(nodeDef)),
       categoryName: getCategoryName(nodeDef),
@@ -291,7 +292,10 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null,
     }
   }
 
-  return items.map(({ _isRoot, _descriptionForAi, _parentPath, ...rest }) => rest)
+  return items.map(({ _isRoot, _descriptionForAi, _parentPath, aiDescription, ...rest }) => ({
+    ...rest,
+    ...(includeAiDescriptions ? { aiDescription } : {}),
+  }))
 }
 
 export const exportSchemaSummary = async ({

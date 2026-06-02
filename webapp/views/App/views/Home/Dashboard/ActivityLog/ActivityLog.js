@@ -29,7 +29,7 @@ const ActivityLog = () => {
   const activityLogSizeText = FileUtils.toHumanReadableFileSize(activityLogSize)
 
   const [summaryOpen, setSummaryOpen] = useState(false)
-  const aiAnalysisEnabled = useAiFeatureEnabled('analysis')
+  const aiAnalysisEnabled = useAiFeatureEnabled('userActivity')
 
   return (
     <div className="activity-log__container">

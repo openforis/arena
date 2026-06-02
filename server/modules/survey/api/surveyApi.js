@@ -1,24 +1,27 @@
 import * as R from 'ramda'
 
 import { Authorizer } from '@openforis/arena-core'
+
 import * as DateUtils from '@core/dateUtils'
-import * as FileUtils from '@server/utils/file/fileUtils'
-import * as ProcessUtils from '@core/processUtils'
 import { FileFormats } from '@core/fileFormats'
+import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as User from '@core/user/user'
+import * as Validation from '@core/validation/validation'
 
-import * as Response from '../../../utils/response'
-import * as Request from '../../../utils/request'
-import * as JobUtils from '../../../job/jobUtils'
-
-import * as Survey from '../../../../core/survey/survey'
-import * as SurveyFile from '../../../../core/survey/surveyFile'
-import * as Validation from '../../../../core/validation/validation'
-import * as User from '../../../../core/user/user'
-
-import * as AuthMiddleware from '../../auth/authApiMiddleware'
-import * as SurveyService from '../service/surveyService'
-import * as UserService from '../../user/service/userService'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+
+import * as FileUtils from '@server/utils/file/fileUtils'
+
+import * as JobUtils from '../../../job/jobUtils'
+import * as Request from '../../../utils/request'
+import * as Response from '../../../utils/response'
+
+import * as AiSettingsService from '../../ai/service/aiSettingsService'
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import * as UserService from '../../user/service/userService'
+import * as SurveyService from '../service/surveyService'
 
 export const init = (app) => {
   // ==== CREATE
@@ -285,8 +288,12 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = Request.getParams(req)
+      const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
       const user = Request.getUser(req)
+      const includeAiDescriptions = AiSettingsService.isCategoryEnabledForUser(
+        user,
+        AiSettingsService.featureCategories.dataDictionary
+      )
 
       const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
       const fileName = ExportFileNameGenerator.generate({
