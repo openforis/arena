@@ -13,7 +13,7 @@ import { useActivityLog, ActivityLogMessage } from './store'
 import Message from './Message'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { useI18n } from '@webapp/store/system'
-import AiActivityLogSummary from '@webapp/components/ai/AiActivityLogSummary'
+import AiActivityLogSummaryModal from '@webapp/components/ai/AiActivityLogSummaryModal'
 import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 
 const minSizeToDisplayMessages = 1024 * 10 // 10KB
@@ -54,7 +54,7 @@ const ActivityLog = () => {
           })}
         </div>
       )}
-      {summaryOpen && <AiActivityLogSummary onClose={() => setSummaryOpen(false)} />}
+      {summaryOpen && <AiActivityLogSummaryModal onClose={() => setSummaryOpen(false)} />}
     </div>
   )
 }

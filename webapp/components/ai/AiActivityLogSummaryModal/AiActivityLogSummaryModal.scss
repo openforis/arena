@@ -1,0 +1,37 @@
+.ai-activity-log-summary-modal {
+  .modal-content {
+    max-height: 80vh;
+  }
+
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  &__body {
+    white-space: pre-wrap;
+    line-height: 1.5;
+    font-size: 0.95rem;
+  }
+
+  &__cursor::after {
+    content: '▋';
+    animation: ai-activity-log-summary-blink 1s infinite;
+    margin-left: 2px;
+  }
+
+  &__error {
+    color: #c62828;
+    font-size: 0.9rem;
+  }
+}
+
+@keyframes ai-activity-log-summary-blink {
+  50% {
+    opacity: 0;
+  }
+}
