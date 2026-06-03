@@ -9,6 +9,29 @@ import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
 
+const SchemaSummaryExportCloseButton = ({ job, surveyId, cycle, fileFormat }) => {
+  const { tempFileName } = job.result
+  const dispatch = useDispatch()
+
+  const onDownload = useCallback(() => dispatch(JobActions.hideJobMonitor()), [dispatch])
+
+  return (
+    <ButtonDownload
+      href={`/api/survey/${surveyId}/schema-summary/export/download`}
+      requestParams={{ tempFileName, cycle, fileFormat }}
+      onClick={onDownload}
+      variant="contained"
+    />
+  )
+}
+
+SchemaSummaryExportCloseButton.propTypes = {
+  job: PropTypes.object.isRequired,
+  surveyId: PropTypes.number.isRequired,
+  cycle: PropTypes.string.isRequired,
+  fileFormat: PropTypes.string.isRequired,
+}
+
 const SurveySchemaSummaryDownloadButton = (props) => {
   const { className, fileFormat = FileFormats.xlsx, includeAiDescriptions = false, testId } = props
 
@@ -22,17 +45,14 @@ const SurveySchemaSummaryDownloadButton = (props) => {
     dispatch(
       JobActions.showJobMonitor({
         job,
-        closeButton: ({ job: jobCompleted }) => {
-          const { tempFileName } = jobCompleted.result
-          return (
-            <ButtonDownload
-              href={`/api/survey/${surveyId}/schema-summary/export/download`}
-              requestParams={{ tempFileName, cycle, fileFormat }}
-              onClick={() => dispatch(JobActions.hideJobMonitor())}
-              variant="contained"
-            />
-          )
-        },
+        closeButton: ({ job: jobCompleted }) => (
+          <SchemaSummaryExportCloseButton
+            job={jobCompleted}
+            surveyId={surveyId}
+            cycle={cycle}
+            fileFormat={fileFormat}
+          />
+        ),
       })
     )
   }, [cycle, dispatch, fileFormat, surveyId])
