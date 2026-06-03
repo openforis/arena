@@ -24,6 +24,9 @@ import { parseJsonResponse } from '@server/modules/ai/service/responseParsers'
 
 const logger = Log.getLogger('SchemaSummary')
 
+const AI_DESCRIPTION_BATCH_SIZE = 10
+const MAX_AI_DESCRIPTIONS = 200
+
 const AiDescriptionsSchema = z.object({
   descriptions: z.array(z.object({ uuid: z.string(), description: z.string() })),
 })
@@ -57,17 +60,6 @@ const runAiDescriptionBatchWithRetry = async ({ user, surveyName, batch, batchIn
       batch,
       previousError: { message: firstError?.message || String(firstError) },
     })
-  }
-}
-
-const generateAiDescription = async ({ user, surveyName, entry }) => {
-  if (entry._descriptionForAi.trim()) return ''
-  try {
-    const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch: [entry], batchIndex: 0 })
-    return result.descriptions[0]?.description ?? ''
-  } catch (error) {
-    logger.warn(`schemaSummary AI description for ${entry.uuid}: ${error?.message || error}`)
-    return ''
   }
 }
 
@@ -212,7 +204,13 @@ export const generateSchemaSummaryItems = async ({
   const defaultLang = Survey.getDefaultLanguage(surveyInfo) || languages[0] || 'en'
   const surveyName = Survey.getName(surveyInfo) || `survey-${surveyId}`
 
-  const total = nodeDefs.length
+  const aiDescNeedingCount = includeAiDescriptions
+    ? Math.min(
+        nodeDefs.filter((nd) => !NodeDef.isRoot(nd) && !(NodeDef.getDescription(defaultLang)(nd) || '').trim()).length,
+        MAX_AI_DESCRIPTIONS
+      )
+    : 0
+  const total = nodeDefs.length + aiDescNeedingCount
   let processed = 0
 
   const items = []
@@ -294,16 +292,41 @@ export const generateSchemaSummaryItems = async ({
       cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
     }
     items.push(item)
-    if (includeAiDescriptions && !item._isRoot) {
-      item.aiDescription = await generateAiDescription({
-        user,
-        surveyName,
-        entry: { uuid, name, type, parentPath: item._parentPath, _descriptionForAi: item._descriptionForAi },
-      })
-    }
     processed += 1
     onProgress?.({ total, processed })
   }
+
+  if (includeAiDescriptions) {
+    const entriesNeedingDesc = items
+      .filter((item) => !item._isRoot && !item._descriptionForAi?.trim())
+      .map(({ uuid, name, type, _parentPath }) => ({ uuid, name, type, parentPath: _parentPath }))
+
+    if (entriesNeedingDesc.length > MAX_AI_DESCRIPTIONS) {
+      logger.warn(
+        `schemaSummary: ${entriesNeedingDesc.length} node defs need AI descriptions; capping at ${MAX_AI_DESCRIPTIONS}`
+      )
+    }
+    const capped = entriesNeedingDesc.slice(0, MAX_AI_DESCRIPTIONS)
+
+    const itemByUuid = Object.fromEntries(items.map((item) => [item.uuid, item]))
+
+    for (let i = 0; i < capped.length; i += AI_DESCRIPTION_BATCH_SIZE) {
+      if (stopIfFunction?.()) break
+      const batch = capped.slice(i, i + AI_DESCRIPTION_BATCH_SIZE)
+      const batchIndex = Math.floor(i / AI_DESCRIPTION_BATCH_SIZE)
+      try {
+        const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex })
+        for (const { uuid, description } of result.descriptions) {
+          if (itemByUuid[uuid]) itemByUuid[uuid].aiDescription = description
+        }
+      } catch (error) {
+        logger.warn(`schemaSummary AI batch ${batchIndex}: ${error?.message || error}`)
+      }
+      processed += batch.length
+      onProgress?.({ total, processed })
+    }
+  }
+
   return items.map(({ _isRoot, _descriptionForAi, _parentPath, ...rest }) => rest)
 }
 
