@@ -8,7 +8,7 @@ export const ButtonIconClose = (props) => {
     <Button
       {...props}
       className={className}
-      iconClassName="icon-cross icon-10px"
+      iconClassName="icon-cross icon-12px"
       label={label}
       showLabel={showLabel}
       variant={variant}

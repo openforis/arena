@@ -228,12 +228,14 @@ const ChatbotPanel = ({ onClose }) => {
           />
           <Button
             className="btn-s"
+            disabled={streaming || messages.length === 0}
+            iconClassName="icon-bin2 icon-12px"
             label="aiChatbot.clear"
             onClick={onClear}
-            disabled={streaming || messages.length === 0}
+            showLabel={false}
             variant="text"
           />
-          <ButtonIconClose onClick={onClose} />
+          <ButtonIconClose className="close-btn" onClick={onClose} />
         </div>
       </div>
 
