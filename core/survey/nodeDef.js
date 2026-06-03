@@ -224,7 +224,7 @@ export const {
 } = ObjectUtils
 
 export const getType = R.prop(keys.type)
-export const getName = getProp(propKeys.name, '')
+export const getName = (nodeDef) => getProp(propKeys.name, '')(nodeDef)
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)

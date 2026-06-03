@@ -93,6 +93,7 @@ export {
   getSurveyListExportedFileDownloadUrl,
   getSurveyDocxExportUrl,
   getSurveyFileDownloadUrl,
+  startSchemaSummaryExportJob,
 } from './survey'
 export {
   cloneNodeDefFromSurvey,
@@ -130,12 +131,4 @@ export { getDevices, getDevice, addDevice, verifyDevice, regenerateBackupCodes, 
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
 
-export {
-  aiSettings,
-  aiExpression,
-  aiTranslation,
-  aiActivityLog,
-  aiDataDictionary,
-  aiChatbot,
-  streamSse as aiStreamSse,
-} from './ai'
+export { aiSettings, aiExpression, aiTranslation, aiActivityLog, aiChatbot, streamSse as aiStreamSse } from './ai'

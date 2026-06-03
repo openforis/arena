@@ -14,16 +14,16 @@ import InnerJobs from './InnerJobs'
 import JobErrors from './JobErrors'
 import JobProgress from './JobProgress'
 
-const getCustomCloseButtonComponent = ({ closeButton, job }) => {
+const getCustomCloseButtonComponent = ({ closeButton, closeButtonProps, job }) => {
   if (!closeButton || !JobSerialized.isSucceeded(job)) return null
-  if (closeButton instanceof Function) return React.createElement(closeButton, { job })
+  if (closeButton instanceof Function) return React.createElement(closeButton, { job, ...closeButtonProps })
   if (closeButton instanceof Object) return closeButton
   return null
 }
 
 const JobMonitor = () => {
   const dispatch = useDispatch()
-  const { job, closeButton, errorKeyHeaderName, errorsExportFileName } = useJob()
+  const { job, closeButton, closeButtonProps, errorKeyHeaderName, errorsExportFileName } = useJob()
 
   if (!job || JobSerialized.isCanceled(job)) return null
 
@@ -61,7 +61,7 @@ const JobMonitor = () => {
           />
         )}
         {JobSerialized.isEnded(job) &&
-          (getCustomCloseButtonComponent({ closeButton, job }) ?? (
+          (getCustomCloseButtonComponent({ closeButton, closeButtonProps, job }) ?? (
             <Button
               className="modal-footer__item"
               onClick={() => dispatch(JobActions.hideJobMonitor())}

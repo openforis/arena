@@ -19,7 +19,7 @@ import * as SurveyManager from '../manager/surveyManager'
 import * as SurveyFileManager from '../manager/surveyFileManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
-import { SchemaSummary } from './schemaSummary'
+import { SchemaSummaryExportJob } from './schemaSummary'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import { SurveyLabelsExport } from './surveyLabelsExport'
@@ -110,8 +110,11 @@ export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) 
   return JobUtils.jobToJSON(job)
 }
 
-export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileFormat }) =>
-  SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream, fileFormat })
+export const startSchemaSummaryExportJob = ({ user, surveyId, cycle, fileFormat, includeAiDescriptions = false }) => {
+  const job = new SchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, includeAiDescriptions })
+  JobManager.enqueueJob(job)
+  return job
+}
 
 export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })

@@ -5,7 +5,7 @@ import { getLanguageLabel } from '@core/app/languages'
 import { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
 
 import * as API from '@webapp/service/api'
-import { Button, ButtonMenu } from '@webapp/components/buttons'
+import { Button, ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
 import { useI18n, useI18nT, useLang } from '@webapp/store/system'
 
 import ChatbotMessage from './ChatbotMessage'
@@ -228,11 +228,14 @@ const ChatbotPanel = ({ onClose }) => {
           />
           <Button
             className="btn-s"
+            disabled={streaming || messages.length === 0}
+            iconClassName="icon-bin2 icon-12px"
             label="aiChatbot.clear"
             onClick={onClear}
-            disabled={streaming || messages.length === 0}
+            showLabel={false}
+            variant="text"
           />
-          <Button className="btn-s" iconClassName="icon-cross icon-14px" onClick={onClose} title="common.close" />
+          <ButtonIconClose className="close-btn" onClick={onClose} />
         </div>
       </div>
 

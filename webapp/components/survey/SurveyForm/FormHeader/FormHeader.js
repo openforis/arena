@@ -1,27 +1,15 @@
 import './formHeader.scss'
-import React, { useCallback, useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
-import { FileFormats } from '@core/fileFormats'
 
 import { TreeSelectViewMode } from '@webapp/model'
-import { JobActions } from '@webapp/store/app'
-import {
-  NodeDefsActions,
-  SurveyActions,
-  useIsSurveyDirty,
-  useSurveyCycleKey,
-  useSurveyId,
-  useSurveyInfo,
-  useSurveyPreferredLang,
-} from '@webapp/store/survey'
-import { FileUploadDialogActions } from '@webapp/store/ui'
+import { NodeDefsActions, useIsSurveyDirty, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
   SurveyFormActions,
@@ -32,20 +20,13 @@ import {
 } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
-import * as API from '@webapp/service/api'
-
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
-import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
-import { OpenFileUploadDialogButton } from '@webapp/components/form'
+import { Button } from '@webapp/components/buttons'
 
 import FormEntryActions from '../components/formEntryActions'
 import FormEditActions from '../components/formEditActions'
 import { usePath } from './usePath'
-import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
-import { NodeDefCloneFromSurveyDialog } from '../nodeDefs/components/nodeDefCloneFromSurveyDialog'
-
-const labelsExportAllowedFileFormats = [FileFormats.csv, FileFormats.xlsx]
+import FormHeaderAdvancedButton from './FormHeaderAdvancedButton'
 
 const FormHeader = (props) => {
   const { disableLockUnlock, disableValidationReport, edit, entry, preview, canEditDef, analysis } = props
@@ -53,13 +34,6 @@ const FormHeader = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
-
-  const surveyId = useSurveyId()
-  const surveyInfo = useSurveyInfo()
-  const surveyIsDraft = Survey.isDraft(surveyInfo)
-  const cycle = useSurveyCycleKey()
-  const lang = useSurveyPreferredLang()
   const surveyIsDirty = useIsSurveyDirty()
   const nodeDefLabelType = useNodeDefLabelType()
   const nodeDefPage = useNodeDefPage()
@@ -67,39 +41,7 @@ const FormHeader = (props) => {
   const canEditSurvey = useAuthCanEditSurvey()
   const path = usePath(entry)
   const treeViewMode = useTreeSelectViewMode()
-  const [cloneFromSurveyDialogOpen, setCloneFromSurveyDialogOpen] = useState(false)
-
-  const onLabelsImportFileSelected = useCallback(
-    async (file) => {
-      const job = await API.startImportLabelsJob({ surveyId, file })
-      dispatch(
-        JobActions.showJobMonitor({
-          job,
-          onComplete: () => {
-            dispatch(FileUploadDialogActions.close())
-            dispatch(SurveyActions.resetSurveyDefs())
-          },
-        })
-      )
-    },
-    [dispatch, surveyId]
-  )
-
-  const openCloneFromSurveyDialog = useCallback(() => {
-    setCloneFromSurveyDialogOpen(true)
-  }, [])
-
-  const closeCloneFromSurveyDialog = useCallback(() => {
-    setCloneFromSurveyDialogOpen(false)
-  }, [])
-
-  const onCloneFromSurveyConfirm = useCallback(
-    ({ sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid }) => {
-      closeCloneFromSurveyDialog()
-      dispatch(NodeDefsActions.cloneNodeDefFromSurvey({ sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid }))
-    },
-    [closeCloneFromSurveyDialog, dispatch]
-  )
+  const cycle = useSurveyCycleKey()
 
   return (
     <div className="survey-form-header">
@@ -140,82 +82,7 @@ const FormHeader = (props) => {
       </div>
 
       <div className="survey-form-header__options">
-        {edit && canEditSurvey && (
-          <ButtonMenu
-            className="btn-menu-advanced"
-            disabled={surveyIsDirty}
-            iconClassName="icon-cog icon-14px"
-            label="common.advancedFunctions"
-            items={[
-              {
-                key: 'schema-summary-csv',
-                content: (
-                  <SurveySchemaSummaryDownloadButton
-                    fileFormat={FileFormats.csv}
-                    testId={TestId.surveyForm.schemaSummary}
-                  />
-                ),
-              },
-              {
-                key: 'schema-summary-excel',
-                content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} />,
-              },
-              ...(experimentalFeatures
-                ? [
-                    ...(canEditDef
-                      ? [
-                          {
-                            key: 'node-clone-from-other-survey',
-                            content: (
-                              <Button
-                                iconClassName="icon-copy"
-                                label="surveyForm:cloneFromAnotherSurvey.title"
-                                onClick={openCloneFromSurveyDialog}
-                                variant="text"
-                              />
-                            ),
-                          },
-                        ]
-                      : []),
-                    {
-                      key: 'survey-docx-export',
-                      content: (
-                        <ButtonDownload
-                          href={API.getSurveyDocxExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
-                          label="surveyForm:downloadPrintableDocument"
-                          variant="text"
-                        />
-                      ),
-                    },
-                  ]
-                : []),
-              ...labelsExportAllowedFileFormats.map((fileFormat) => ({
-                key: `labels-export-${fileFormat}`,
-                content: (
-                  <ButtonDownload
-                    href={`/api/survey/${surveyId}/labels`}
-                    label={`surveyForm:exportLabels_${fileFormat}`}
-                    requestParams={{ fileFormat }}
-                    variant="text"
-                  />
-                ),
-              })),
-              {
-                key: 'labels-import',
-                content: (
-                  <OpenFileUploadDialogButton
-                    label="surveyForm:importLabels"
-                    accept=".csv,.xlsx"
-                    onOk={({ files }) => onLabelsImportFileSelected(files[0])}
-                    variant="text"
-                  />
-                ),
-              },
-            ]}
-            size="small"
-            testId={TestId.surveyForm.advancedFunctionBtn}
-          />
-        )}
+        {edit && canEditSurvey && <FormHeaderAdvancedButton canEditDef={canEditDef} />}
         <NodeDefLabelSwitch
           labelType={nodeDefLabelType}
           onChange={() => {
@@ -239,13 +106,6 @@ const FormHeader = (props) => {
           disableValidationReport={disableValidationReport}
           preview={preview}
           entry={entry}
-        />
-      )}
-      {cloneFromSurveyDialogOpen && (
-        <NodeDefCloneFromSurveyDialog
-          currentNodeDef={nodeDefPage}
-          onClose={closeCloneFromSurveyDialog}
-          onConfirm={onCloneFromSurveyConfirm}
         />
       )}
     </div>

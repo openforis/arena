@@ -1,14 +1,15 @@
-import './AiActivityLogSummary.scss'
+import './AiActivityLogSummaryModal.scss'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as API from '@webapp/service/api'
-import { Button } from '@webapp/components/buttons'
+import { Modal, ModalBody } from '@webapp/components/modal'
+import Markdown from '@webapp/components/markdown'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 
-const AiActivityLogSummary = ({ from, to, userUuid, onClose }) => {
+const AiActivityLogSummaryModal = ({ from, to, userUuid, onClose }) => {
   const i18n = useI18n()
   // Server-side error messages may contain quoted identifiers (Postgres
   // column names, etc.) which i18next escapes by default — appears as
@@ -55,33 +56,37 @@ const AiActivityLogSummary = ({ from, to, userUuid, onClose }) => {
     onClose()
   }
 
+  const bodyContent = useMemo(() => {
+    if (text) {
+      return <Markdown source={text} />
+    } else if (!done) {
+      return i18n.t('aiActivityLog.thinking')
+    }
+    return null
+  }, [text, done, i18n])
+
   return (
-    <div className="ai-activity-log-summary" role="dialog" aria-modal="false">
-      <div className="ai-activity-log-summary__header">
-        <div className="ai-activity-log-summary__title">{i18n.t('aiActivityLog.title')}</div>
-        <Button className="btn-s" iconClassName="icon-cross icon-14px" onClick={onCancel} title="common.close" />
-      </div>
+    <Modal className="ai-activity-log-summary-modal" title="aiActivityLog.title" showCloseButton onClose={onCancel}>
+      <ModalBody>
+        <div className={`ai-activity-log-summary-modal__body${done ? '' : ' ai-activity-log-summary-modal__cursor'}`}>
+          {bodyContent}
+        </div>
 
-      <div className={`ai-activity-log-summary__body${done ? '' : ' ai-activity-log-summary__cursor'}`}>
-        {text || (done ? '' : i18n.t('aiActivityLog.thinking'))}
-      </div>
-
-      {error ? (
-        <div className="ai-activity-log-summary__error">{tUnescaped('aiActivityLog.error', { message: error })}</div>
-      ) : null}
-
-      <div className="ai-activity-log-summary__buttons">
-        <Button label="common.close" onClick={onCancel} />
-      </div>
-    </div>
+        {error ? (
+          <div className="ai-activity-log-summary-modal__error">
+            {tUnescaped('aiActivityLog.error', { message: error })}
+          </div>
+        ) : null}
+      </ModalBody>
+    </Modal>
   )
 }
 
-AiActivityLogSummary.propTypes = {
+AiActivityLogSummaryModal.propTypes = {
   from: PropTypes.string,
   to: PropTypes.string,
   userUuid: PropTypes.string,
   onClose: PropTypes.func.isRequired,
 }
 
-export default AiActivityLogSummary
+export default AiActivityLogSummaryModal

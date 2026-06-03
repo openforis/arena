@@ -1,24 +1,27 @@
 import * as R from 'ramda'
 
 import { Authorizer } from '@openforis/arena-core'
+
 import * as DateUtils from '@core/dateUtils'
-import * as FileUtils from '@server/utils/file/fileUtils'
-import * as ProcessUtils from '@core/processUtils'
 import { FileFormats } from '@core/fileFormats'
+import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as User from '@core/user/user'
+import * as Validation from '@core/validation/validation'
 
-import * as Response from '../../../utils/response'
-import * as Request from '../../../utils/request'
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+
+import * as FileUtils from '@server/utils/file/fileUtils'
+
 import * as JobUtils from '../../../job/jobUtils'
-
-import * as Survey from '../../../../core/survey/survey'
-import * as SurveyFile from '../../../../core/survey/surveyFile'
-import * as Validation from '../../../../core/validation/validation'
-import * as User from '../../../../core/user/user'
+import * as Request from '../../../utils/request'
+import * as Response from '../../../utils/response'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
-import * as SurveyService from '../service/surveyService'
 import * as UserService from '../../user/service/userService'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { SchemaSummary } from '../service/schemaSummary'
+import * as SurveyService from '../service/surveyService'
 
 export const init = (app) => {
   // ==== CREATE
@@ -283,24 +286,60 @@ export const init = (app) => {
     }
   })
 
+  // schema summary export (used by R chain — direct synchronous download without AI descriptions)
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
       const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-      const fileName = ExportFileNameGenerator.generate({
-        survey,
-        cycle,
-        fileType: 'SchemaSummary',
-        fileFormat,
-      })
+      const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary', fileFormat })
       Response.setContentTypeFile({ res, fileName, fileFormat })
 
-      await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res, fileFormat })
+      await SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream: res, fileFormat })
     } catch (error) {
       next(error)
     }
   })
+
+  // schema summary export (start job)
+  app.post(
+    '/survey/:surveyId/schema-summary/export',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const job = SurveyService.startSchemaSummaryExportJob({
+          user,
+          surveyId,
+          cycle,
+          fileFormat,
+          includeAiDescriptions,
+        })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // schema summary export (download generated file)
+  app.get(
+    '/survey/:surveyId/schema-summary/export/download',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, fileFormat = FileFormats.xlsx, tempFileName } = Request.getParams(req)
+        FileUtils.checkIsValidTempFileName(tempFileName)
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+        const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary', fileFormat })
+        const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+        Response.sendFile({ res, path: exportedFilePath, name: fileName, fileFormat })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   app.get('/survey/:surveyId/labels', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {

@@ -11,7 +11,7 @@
  *
  *   user.prefs.ai = {
  *     featuresEnabled,        // master switch — user wants AI at all
- *     featureToggles,         // { chat, expressions, analysis } booleans
+ *     featureToggles,         // { chat, expressions, translation, dataDictionary, userActivity } booleans
  *     provider, model, baseUrl, apiKeyEncrypted,
  *     enabled,                // use OWN provider vs. admin default
  *     lastTestOk, lastTestAt,
@@ -37,14 +37,16 @@ export const featureCategories = {
   chat: 'chat',
   expressions: 'expressions',
   translation: 'translation',
-  analysis: 'analysis',
+  dataDictionary: 'dataDictionary',
+  userActivity: 'userActivity',
 }
 
 const defaultFeatureToggles = () => ({
   [featureCategories.chat]: false,
   [featureCategories.expressions]: false,
   [featureCategories.translation]: false,
-  [featureCategories.analysis]: false,
+  [featureCategories.dataDictionary]: false,
+  [featureCategories.userActivity]: false,
 })
 
 const sanitiseFeatureToggles = (input) => {

@@ -23,6 +23,7 @@ import SurveyActivityLogClearJob from '@server/modules/survey/service/surveyActi
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 import SurveyLabelsImportJob from '@server/modules/survey/service/surveyLabelsImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
+import SchemaSummaryExportJob from '@server/modules/survey/service/schemaSummary/SchemaSummaryExportJob'
 import SurveysListExportJob from '@server/modules/survey/service/SurveysListExportJob'
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
 import SurveyUnpublishJob from '@server/modules/survey/service/unpublish/surveyUnpublishJob'
@@ -53,6 +54,7 @@ const jobClasses = [
   SurveyExportJob,
   SurveyLabelsImportJob,
   SurveyPublishJob,
+  SchemaSummaryExportJob,
   SurveysListExportJob,
   SurveysRdbRefreshJob,
   SurveyUnpublishJob,

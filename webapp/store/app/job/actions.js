@@ -13,11 +13,21 @@ export const showJobMonitor =
     onComplete = null,
     autoHide = false,
     closeButton = null,
+    closeButtonProps = null,
     errorKeyHeaderName = undefined,
     errorsExportFileName = undefined,
   }) =>
   (dispatch) =>
-    dispatch({ type: JOB_START, job, onComplete, autoHide, closeButton, errorKeyHeaderName, errorsExportFileName })
+    dispatch({
+      type: JOB_START,
+      job,
+      onComplete,
+      autoHide,
+      closeButton,
+      closeButtonProps,
+      errorKeyHeaderName,
+      errorsExportFileName,
+    })
 
 export const updateJob =
   ({ job }) =>

@@ -74,7 +74,7 @@ export const onAiSettingsInvalidated = (cb) => {
  * Returns true when the master toggle is on AND the given category toggle
  * is on for the current user. Returns false while the initial fetch is in
  * flight so AI buttons don't flash in then disappear.
- * @param {string} category - One of "chat", "expressions", "analysis".
+ * @param {string} category - One of "chat", "expressions", "translation", "dataDictionary", "userActivity".
  * @returns {boolean} Whether this category's UI should render.
  */
 export const useAiFeatureEnabled = (category) => {
