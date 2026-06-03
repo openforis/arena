@@ -188,6 +188,105 @@ const extractSchemaSummaryNodeDefs = (survey, cycle) => {
   return nodeDefs
 }
 
+const buildNodeDefItem = ({ survey, nodeDef, languages, defaultLang, cycle, includeAiDescriptions }) => {
+  const { uuid, type } = nodeDef
+  const name = NodeDef.getName(nodeDef)
+  const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef }) ? 'true' : ''
+  const labelsByLang = languages.reduce(
+    (acc, lang) => ({
+      ...acc,
+      [`label_${lang}`]: NodeDef.getLabel(nodeDef, lang, NodeDef.NodeDefLabelTypes.label, false),
+    }),
+    {}
+  )
+  const descriptionsByLang = languages.reduce(
+    (acc, lang) => ({ ...acc, [`description_${lang}`]: NodeDef.getDescription(lang)(nodeDef) }),
+    {}
+  )
+  const validationMessagesByLang = languages.reduce(
+    (acc, lang) => ({ ...acc, [`validation_message_${lang}`]: getValidationMessages({ nodeDef, lang }) }),
+    {}
+  )
+  const aiFields = includeAiDescriptions
+    ? {
+        aiDescription: '',
+        _isRoot: NodeDef.isRoot(nodeDef),
+        _descriptionForAi: NodeDef.getDescription(defaultLang)(nodeDef) || '',
+        _parentPath: getParentPath(nodeDef, survey),
+      }
+    : {}
+
+  return {
+    uuid,
+    name,
+    path: getNodeDefPath({ survey, nodeDef }),
+    parentEntity: NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)),
+    ...labelsByLang,
+    ...descriptionsByLang,
+    ...aiFields,
+    type,
+    key: String(NodeDef.isKey(nodeDef)),
+    categoryName: getCategoryName(survey, nodeDef),
+    parentCode: getParentCodeAttribute(survey, nodeDef),
+    categoryLevel: getCodeAttributeCategoryLevel(survey, nodeDef),
+    enumerator,
+    taxonomyName: getTaxonomyName(survey, nodeDef),
+    multiple: String(NodeDef.isMultiple(nodeDef)),
+    readOnly: String(NodeDef.isReadOnly(nodeDef)),
+    fileType: NodeDef.isFile(nodeDef) ? NodeDef.getFileType(nodeDef) : '',
+    maxFileSize: NodeDef.isFile(nodeDef) ? String(NodeDef.getMaxFileSize(nodeDef)) : '',
+    hiddenInForm: String(NodeDef.isHidden(nodeDef)),
+    hiddenInMobile: String(NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)),
+    hiddenInAnalyticalDashboard: String(NodeDef.isHiddenInReport(nodeDef)),
+    includedInMultipleEntitySummary: String(NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(nodeDef)),
+    allowOnlyDeviceCoordinate: String(NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)),
+    relevantIf: getRelevantIf(nodeDef),
+    hiddenWhenNotRelevant: String(NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)),
+    itemsFilter: NodeDef.getItemsFilter(nodeDef),
+    defaultValue: getDefaultValuesSummary({ nodeDef }),
+    defaultValueApplyIf: getDefaultValueApplyIf({ nodeDef }),
+    defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),
+    required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
+    unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
+    minCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.min }),
+    maxCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.max }),
+    validations: getValidationsSummary({ nodeDef }),
+    ...validationMessagesByLang,
+    cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
+  }
+}
+
+const addAiDescriptions = async ({ user, surveyName, items, processed, total, onProgress, stopIfFunction }) => {
+  const entriesNeedingDesc = items
+    .filter((item) => !item._isRoot && !item._descriptionForAi?.trim())
+    .map(({ uuid, name, type, _parentPath }) => ({ uuid, name, type, parentPath: _parentPath }))
+
+  if (entriesNeedingDesc.length > MAX_AI_DESCRIPTIONS) {
+    logger.warn(
+      `schemaSummary: ${entriesNeedingDesc.length} node defs need AI descriptions; capping at ${MAX_AI_DESCRIPTIONS}`
+    )
+  }
+  const capped = entriesNeedingDesc.slice(0, MAX_AI_DESCRIPTIONS)
+  const itemByUuid = Object.fromEntries(items.map((item) => [item.uuid, item]))
+
+  let processedCount = processed
+  for (let i = 0; i < capped.length; i += AI_DESCRIPTION_BATCH_SIZE) {
+    if (stopIfFunction?.()) break
+    const batch = capped.slice(i, i + AI_DESCRIPTION_BATCH_SIZE)
+    const batchIndex = Math.floor(i / AI_DESCRIPTION_BATCH_SIZE)
+    try {
+      const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex })
+      for (const { uuid, description } of result.descriptions) {
+        if (itemByUuid[uuid]) itemByUuid[uuid].aiDescription = description
+      }
+    } catch (error) {
+      logger.warn(`schemaSummary AI batch ${batchIndex}: ${error?.message || error}`)
+    }
+    processedCount += batch.length
+    onProgress?.({ total, processed: processedCount })
+  }
+}
+
 export const generateSchemaSummaryItems = async ({
   surveyId,
   cycle,
@@ -216,115 +315,13 @@ export const generateSchemaSummaryItems = async ({
   const items = []
   for (const nodeDef of nodeDefs) {
     if (stopIfFunction?.()) break
-
-    const { uuid, type } = nodeDef
-
-    const relevantIf = getRelevantIf(nodeDef)
-
-    const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef }) ? 'true' : ''
-
-    const name = NodeDef.getName(nodeDef)
-
-    const item = {
-      uuid,
-      name,
-      path: getNodeDefPath({ survey, nodeDef }),
-      parentEntity: NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)),
-      // labels
-      ...languages.reduce(
-        (acc, lang) => ({
-          ...acc,
-          [`label_${lang}`]: NodeDef.getLabel(nodeDef, lang, NodeDef.NodeDefLabelTypes.label, false),
-        }),
-        {}
-      ),
-      // descriptions
-      ...languages.reduce(
-        (acc, lang) => ({
-          ...acc,
-          [`description_${lang}`]: NodeDef.getDescription(lang)(nodeDef),
-        }),
-        {}
-      ),
-      ...(includeAiDescriptions
-        ? {
-            aiDescription: '',
-            _isRoot: NodeDef.isRoot(nodeDef),
-            _descriptionForAi: NodeDef.getDescription(defaultLang)(nodeDef) || '',
-            _parentPath: getParentPath(nodeDef, survey),
-          }
-        : {}),
-      type,
-      key: String(NodeDef.isKey(nodeDef)),
-      categoryName: getCategoryName(survey, nodeDef),
-      parentCode: getParentCodeAttribute(survey, nodeDef),
-      categoryLevel: getCodeAttributeCategoryLevel(survey, nodeDef),
-      enumerator,
-      taxonomyName: getTaxonomyName(survey, nodeDef),
-      multiple: String(NodeDef.isMultiple(nodeDef)),
-      readOnly: String(NodeDef.isReadOnly(nodeDef)),
-      fileType: NodeDef.isFile(nodeDef) ? NodeDef.getFileType(nodeDef) : '',
-      maxFileSize: NodeDef.isFile(nodeDef) ? String(NodeDef.getMaxFileSize(nodeDef)) : '',
-      hiddenInForm: String(NodeDef.isHidden(nodeDef)),
-      hiddenInMobile: String(NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)),
-      hiddenInAnalyticalDashboard: String(NodeDef.isHiddenInReport(nodeDef)),
-      includedInMultipleEntitySummary: String(NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(nodeDef)),
-      allowOnlyDeviceCoordinate: String(NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)),
-      relevantIf,
-      hiddenWhenNotRelevant: String(NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)),
-      itemsFilter: NodeDef.getItemsFilter(nodeDef),
-      defaultValue: getDefaultValuesSummary({ nodeDef }),
-      defaultValueApplyIf: getDefaultValueApplyIf({ nodeDef }),
-      defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),
-      required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
-      unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
-      minCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.min }),
-      maxCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.max }),
-      validations: getValidationsSummary({ nodeDef }),
-      // validation messages
-      ...languages.reduce(
-        (acc, lang) => ({
-          ...acc,
-          [`validation_message_${lang}`]: getValidationMessages({ nodeDef, lang }),
-        }),
-        {}
-      ),
-      cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
-    }
-    items.push(item)
+    items.push(buildNodeDefItem({ survey, nodeDef, languages, defaultLang, cycle, includeAiDescriptions }))
     processed += 1
     onProgress?.({ total, processed })
   }
 
   if (includeAiDescriptions) {
-    const entriesNeedingDesc = items
-      .filter((item) => !item._isRoot && !item._descriptionForAi?.trim())
-      .map(({ uuid, name, type, _parentPath }) => ({ uuid, name, type, parentPath: _parentPath }))
-
-    if (entriesNeedingDesc.length > MAX_AI_DESCRIPTIONS) {
-      logger.warn(
-        `schemaSummary: ${entriesNeedingDesc.length} node defs need AI descriptions; capping at ${MAX_AI_DESCRIPTIONS}`
-      )
-    }
-    const capped = entriesNeedingDesc.slice(0, MAX_AI_DESCRIPTIONS)
-
-    const itemByUuid = Object.fromEntries(items.map((item) => [item.uuid, item]))
-
-    for (let i = 0; i < capped.length; i += AI_DESCRIPTION_BATCH_SIZE) {
-      if (stopIfFunction?.()) break
-      const batch = capped.slice(i, i + AI_DESCRIPTION_BATCH_SIZE)
-      const batchIndex = Math.floor(i / AI_DESCRIPTION_BATCH_SIZE)
-      try {
-        const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex })
-        for (const { uuid, description } of result.descriptions) {
-          if (itemByUuid[uuid]) itemByUuid[uuid].aiDescription = description
-        }
-      } catch (error) {
-        logger.warn(`schemaSummary AI batch ${batchIndex}: ${error?.message || error}`)
-      }
-      processed += batch.length
-      onProgress?.({ total, processed })
-    }
+    await addAiDescriptions({ user, surveyName, items, processed, total, onProgress, stopIfFunction })
   }
 
   return items.map(({ _isRoot, _descriptionForAi, _parentPath, ...rest }) => rest)
