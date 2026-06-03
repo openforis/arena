@@ -9,9 +9,11 @@ import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
 
-const SchemaSummaryExportCloseButton = ({ job, surveyId, cycle, fileFormat }) => {
+const SchemaSummaryExportCloseButton = ({ job, fileFormat }) => {
   const { tempFileName } = job.result
   const dispatch = useDispatch()
+  const surveyId = useSurveyId()
+  const cycle = useSurveyCycleKey()
 
   const onDownload = useCallback(() => dispatch(JobActions.hideJobMonitor()), [dispatch])
 
@@ -27,8 +29,6 @@ const SchemaSummaryExportCloseButton = ({ job, surveyId, cycle, fileFormat }) =>
 
 SchemaSummaryExportCloseButton.propTypes = {
   job: PropTypes.object.isRequired,
-  surveyId: PropTypes.number.isRequired,
-  cycle: PropTypes.string.isRequired,
   fileFormat: PropTypes.string.isRequired,
 }
 
@@ -46,12 +46,7 @@ const SurveySchemaSummaryDownloadButton = (props) => {
       JobActions.showJobMonitor({
         job,
         closeButton: ({ job: jobCompleted }) => (
-          <SchemaSummaryExportCloseButton
-            job={jobCompleted}
-            surveyId={surveyId}
-            cycle={cycle}
-            fileFormat={fileFormat}
-          />
+          <SchemaSummaryExportCloseButton job={jobCompleted} fileFormat={fileFormat} />
         ),
       })
     )
