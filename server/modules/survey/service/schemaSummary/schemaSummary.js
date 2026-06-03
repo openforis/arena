@@ -24,9 +24,6 @@ import { parseJsonResponse } from '@server/modules/ai/service/responseParsers'
 
 const logger = Log.getLogger('SchemaSummary')
 
-const MAX_AI_DESCRIPTIONS = 50
-const AI_BATCH_SIZE = 10
-
 const AiDescriptionsSchema = z.object({
   descriptions: z.array(z.object({ uuid: z.string(), description: z.string() })),
 })
@@ -63,21 +60,15 @@ const runAiDescriptionBatchWithRetry = async ({ user, surveyName, batch, batchIn
   }
 }
 
-const generateAiDescriptions = async ({ user, surveyName, entries }) => {
-  const missing = entries.filter((e) => !e._descriptionForAi.trim()).slice(0, MAX_AI_DESCRIPTIONS)
-  const aiByUuid = new Map()
-  for (let i = 0; i < missing.length; i += AI_BATCH_SIZE) {
-    const batch = missing.slice(i, i + AI_BATCH_SIZE)
-    try {
-      const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex: i })
-      for (const d of result.descriptions) {
-        aiByUuid.set(d.uuid, d.description)
-      }
-    } catch (error) {
-      logger.warn(`schemaSummary AI batch ${i}: ${error?.message || error}`)
-    }
+const generateAiDescription = async ({ user, surveyName, entry }) => {
+  if (entry._descriptionForAi.trim()) return ''
+  try {
+    const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch: [entry], batchIndex: 0 })
+    return result.descriptions[0]?.description ?? ''
+  } catch (error) {
+    logger.warn(`schemaSummary AI description for ${entry.uuid}: ${error?.message || error}`)
+    return ''
   }
-  return aiByUuid
 }
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
@@ -204,7 +195,8 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null,
   const defaultLang = Survey.getDefaultLanguage(survey) || languages[0] || 'en'
   const surveyName = Survey.getName(surveyInfo) || `survey-${surveyId}`
 
-  const items = nodeDefs.map((nodeDef) => {
+  const items = []
+  for (const nodeDef of nodeDefs) {
     const { uuid, type } = nodeDef
 
     const relevantExpressions = NodeDef.getApplicable(nodeDef)
@@ -212,9 +204,11 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null,
 
     const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef }) ? 'true' : ''
 
-    return {
+    const name = NodeDef.getName(nodeDef)
+
+    const item = {
       uuid,
-      name: NodeDef.getName(nodeDef),
+      name,
       path: getNodeDefPath({ survey, nodeDef }),
       parentEntity: NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)),
       // labels
@@ -278,24 +272,15 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null,
           }
         : {}),
     }
-  })
-
-  if (includeAiDescriptions) {
-    const aiEntries = items
-      .filter((item) => !item._isRoot)
-      .map((item) => ({
-        uuid: item.uuid,
-        name: item.name,
-        type: item.type,
-        parentPath: item._parentPath,
-        _descriptionForAi: item._descriptionForAi,
-      }))
-    const aiByUuid = await generateAiDescriptions({ user, surveyName, entries: aiEntries })
-    for (const item of items) {
-      item.aiDescription = aiByUuid.get(item.uuid) || ''
+    items.push(item)
+    if (includeAiDescriptions && !item._isRoot) {
+      item.aiDescription = await generateAiDescription({
+        user,
+        surveyName,
+        entry: { uuid, name, type, parentPath: item._parentPath, _descriptionForAi: item._descriptionForAi },
+      })
     }
   }
-
   return items.map(({ _isRoot, _descriptionForAi, _parentPath, ...rest }) => rest)
 }
 
