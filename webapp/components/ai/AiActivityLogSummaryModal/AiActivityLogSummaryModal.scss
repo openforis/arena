@@ -13,9 +13,17 @@
   }
 
   &__body {
+    min-width: 0;
     white-space: pre-wrap;
+    overflow-wrap: break-word;
     line-height: 1.5;
     font-size: 0.95rem;
+
+    pre,
+    code {
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
   }
 
   &__cursor::after {
