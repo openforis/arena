@@ -49,12 +49,14 @@ export const init = (app) => {
   app.get('/auth/user', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
+      const surveysCount = await UserService.fetchUserSurveysCount(User.getUuid(user))
+      const userWithCounts = { ...user, ...surveysCount }
       const surveyId = User.getPrefSurveyCurrent(user)
 
       if (surveyId) {
-        await sendUserSurvey(res, user, surveyId)
+        await sendUserSurvey(res, userWithCounts, surveyId)
       } else {
-        sendResponse(res, user)
+        sendResponse(res, userWithCounts)
       }
     } catch (error) {
       next(error)

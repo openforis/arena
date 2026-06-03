@@ -9,6 +9,7 @@ const getState = R.pipe(AppState.getState, R.propOr(initialState, stateKey))
 
 export const keys = {
   closeButton: 'closeButton',
+  closeButtonProps: 'closeButtonProps',
   autoHide: 'autoHide',
   onComplete: 'onComplete',
   errorKeyHeaderName: 'errorKeyHeaderName',
@@ -19,6 +20,8 @@ export const keys = {
 export const getJob = getState
 
 export const getCloseButton = R.pipe(getJob, R.propOr(null, keys.closeButton))
+
+export const getCloseButtonProps = R.pipe(getJob, R.propOr(null, keys.closeButtonProps))
 
 export const getOnComplete = R.pipe(getJob, R.propOr(null, keys.onComplete))
 
@@ -35,6 +38,7 @@ export const startJob = ({
   job,
   onComplete = null,
   closeButton = null,
+  closeButtonProps = null,
   autoHide = false,
   errorKeyHeaderName = undefined,
   errorsExportFileName = null,
@@ -42,6 +46,7 @@ export const startJob = ({
   ...job,
   [keys.autoHide]: autoHide,
   [keys.closeButton]: closeButton,
+  [keys.closeButtonProps]: closeButtonProps,
   [keys.onComplete]: onComplete,
   [keys.errorKeyHeaderName]: errorKeyHeaderName,
   [keys.errorsExportFileName]: errorsExportFileName,

@@ -2,12 +2,14 @@ import './ActiveSurveyNotSelected.scss'
 
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { Trans } from 'react-i18next'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-import { useI18nTrans } from '@webapp/store/system/i18n/hooks'
+import { useOnNewSurveyClick } from '@webapp/store/user/hooks'
 
 export const ActiveSurveyNotSelected = () => {
-  const Trans = useI18nTrans()
+  const onNewSurveyClick = useOnNewSurveyClick()
+
   return (
     <div className="active-survey-not-selected">
       <Trans
@@ -16,7 +18,13 @@ export const ActiveSurveyNotSelected = () => {
           title: <h2 />,
           label: <span />,
           linkToSurveys: <Link to={appModuleUri(homeModules.surveyList)} className="btn-s btn-transparent" />,
-          linkToNewSurvey: <Link to={appModuleUri(homeModules.surveyNew)} className="btn-s btn-transparent" />,
+          linkToNewSurvey: (
+            <Link
+              to={appModuleUri(homeModules.surveyNew)}
+              className="btn-s btn-transparent"
+              onClick={onNewSurveyClick}
+            />
+          ),
         }}
       ></Trans>
     </div>

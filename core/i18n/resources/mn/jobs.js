@@ -29,6 +29,7 @@ export default {
   RecordsImportJob: 'Бичлэг импортлох',
   RecordsUniquenessValidationJob: 'Бичлэг давтагдахгүй байх баталгаажуулалт',
   SamplingPointDataImportJob: 'Дээж авах цэгийн өгөгдөл импортлох',
+  SchemaSummaryExportJob: 'Схемийн хураангуй экспортлох',
   SurveyActivityLogClearJob: 'Судалгааны үйл ажиллагааны бүртгэлийг цэвэрлэх ажил',
   SurveyCreatorJob: 'Судалгаа үүсгэх',
   SurveyDependencyGraphsGenerationJob: 'Судалгааны хамаарлын график үүсгэх',

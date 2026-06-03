@@ -28,6 +28,8 @@ eliminando los valores existentes insertados en ellas (si los hay).
   edit: `Editar '{{nodeDefLabel}}'`,
   schemaSummary_csv: 'Resumen del esquema (CSV)',
   schemaSummary_xlsx: 'Resumen del esquema (Excel)',
+  schemaSummaryAiDescriptions_csv: 'Resumen del esquema + descripciones IA (CSV)',
+  schemaSummaryAiDescriptions_xlsx: 'Resumen del esquema + descripciones IA (Excel)',
   hidePages: 'Ocultar páginas',
   showPages: 'Mostrar páginas',
   move: `Mover '{{nodeDefLabel}}'`,

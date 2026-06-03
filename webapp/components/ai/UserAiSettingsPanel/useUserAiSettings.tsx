@@ -8,9 +8,15 @@ import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useI18n } from '@webapp/store/system'
 
-export type FeatureCategory = 'chat' | 'expressions' | 'translation' | 'analysis'
+export type FeatureCategory = 'chat' | 'expressions' | 'translation' | 'dataDictionary' | 'userActivity'
 
-export const FEATURE_CATEGORIES: FeatureCategory[] = ['chat', 'expressions', 'translation', 'analysis']
+export const FEATURE_CATEGORIES: FeatureCategory[] = [
+  'chat',
+  'expressions',
+  'translation',
+  'dataDictionary',
+  'userActivity',
+]
 
 type FeatureToggles = Record<FeatureCategory, boolean>
 
@@ -18,7 +24,8 @@ const defaultFeatureToggles = (): FeatureToggles => ({
   chat: false,
   expressions: false,
   translation: false,
-  analysis: false,
+  dataDictionary: false,
+  userActivity: false,
 })
 
 export const OTHER_MODEL_VALUE = '__other__'

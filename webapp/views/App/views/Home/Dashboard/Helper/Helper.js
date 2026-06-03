@@ -2,18 +2,17 @@ import './Helper.scss'
 
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { Trans } from 'react-i18next'
 
 import * as Survey from '@core/survey/survey'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 import { appModuleUri, homeModules, designerModules } from '@webapp/app/appModules'
-import { useI18nTrans } from '@webapp/store/system/i18n/hooks'
 
 import SurveyInfo from '../SurveyInfo'
 
 const HelperFirstTimeSurvey = () => {
   const surveyInfo = useSurveyInfo()
-  const Trans = useI18nTrans()
   return (
     <div className="helper__first_time_help">
       <div className="helper__first_time_help__container with-background">
@@ -47,7 +46,6 @@ const HelperFirstTimeSurvey = () => {
 
 const HelperWithoutAttributes = () => {
   const surveyInfo = useSurveyInfo()
-  const Trans = useI18nTrans()
   return (
     <>
       <div className="helper__survey_info">
