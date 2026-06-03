@@ -209,7 +209,7 @@ export const generateSchemaSummaryItems = async ({
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const languages = Survey.getLanguages(surveyInfo)
-  const defaultLang = Survey.getDefaultLanguage(survey) || languages[0] || 'en'
+  const defaultLang = Survey.getDefaultLanguage(surveyInfo) || languages[0] || 'en'
   const surveyName = Survey.getName(surveyInfo) || `survey-${surveyId}`
 
   const total = nodeDefs.length

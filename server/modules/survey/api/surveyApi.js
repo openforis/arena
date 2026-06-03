@@ -316,7 +316,7 @@ export const init = (app) => {
           fileFormat,
           includeAiDescriptions,
         })
-        res.json({ job })
+        res.json({ job: JobUtils.jobToJSON(job) })
       } catch (error) {
         next(error)
       }
@@ -330,6 +330,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, cycle, fileFormat = FileFormats.xlsx, tempFileName } = Request.getParams(req)
+        FileUtils.checkIsValidTempFileName(tempFileName)
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
         const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary', fileFormat })
         const exportedFilePath = FileUtils.tempFilePath(tempFileName)

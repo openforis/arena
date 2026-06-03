@@ -16,8 +16,8 @@ const SurveySchemaSummaryDownloadButton = (props) => {
   const cycle = useSurveyCycleKey()
   const dispatch = useDispatch()
 
-  const onClick = useCallback(async () => {
-    const { job } = await API.startSchemaSummaryExportJob({ surveyId, cycle, fileFormat, includeAiDescriptions })
+  const onClickAi = useCallback(async () => {
+    const { job } = await API.startSchemaSummaryExportJob({ surveyId, cycle, fileFormat, includeAiDescriptions: true })
 
     dispatch(
       JobActions.showJobMonitor({
@@ -35,13 +35,35 @@ const SurveySchemaSummaryDownloadButton = (props) => {
         },
       })
     )
-  }, [cycle, dispatch, fileFormat, includeAiDescriptions, surveyId])
+  }, [cycle, dispatch, fileFormat, surveyId])
 
   const labelKey = includeAiDescriptions
     ? `surveyForm:schemaSummaryAiDescriptions_${fileFormat}`
     : `surveyForm:schemaSummary_${fileFormat}`
 
-  return <Button className={className} testId={testId} onClick={onClick} label={labelKey} variant="text" />
+  if (includeAiDescriptions) {
+    return (
+      <Button
+        className={className}
+        iconClassName="icon-download2 icon-14px"
+        testId={testId}
+        onClick={onClickAi}
+        label={labelKey}
+        variant="text"
+      />
+    )
+  }
+
+  return (
+    <ButtonDownload
+      className={className}
+      testId={testId}
+      href={`/api/survey/${surveyId}/schema-summary`}
+      requestParams={{ cycle, fileFormat }}
+      label={labelKey}
+      variant="text"
+    />
+  )
 }
 
 SurveySchemaSummaryDownloadButton.propTypes = {
