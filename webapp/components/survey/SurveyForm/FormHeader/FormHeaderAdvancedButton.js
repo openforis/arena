@@ -31,12 +31,6 @@ import { NodeDefCloneFromSurveyDialog } from '../nodeDefs/components/nodeDefClon
 
 const labelsExportAllowedFileFormats = [FileFormats.csv, FileFormats.xlsx]
 
-/**
- * Advanced functions ButtonMenu for the survey form header.
- * @param {object} props - Component props.
- * @param {boolean} props.canEditDef - Whether the current user can edit the survey definition.
- * @returns {React.JSX.Element} - The rendered component.
- */
 const FormHeaderAdvancedButton = ({ canEditDef }) => {
   const dispatch = useDispatch()
 
