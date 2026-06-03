@@ -45,9 +45,8 @@ const SurveySchemaSummaryDownloadButton = (props) => {
     dispatch(
       JobActions.showJobMonitor({
         job,
-        closeButton: ({ job: jobCompleted }) => (
-          <SchemaSummaryExportCloseButton job={jobCompleted} fileFormat={fileFormat} />
-        ),
+        closeButton: SchemaSummaryExportCloseButton,
+        closeButtonProps: { fileFormat },
       })
     )
   }, [cycle, dispatch, fileFormat, surveyId])
