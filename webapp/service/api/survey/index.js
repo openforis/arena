@@ -92,3 +92,10 @@ export const startSurveysListExportJob = async ({ draft = true, template = false
 
 export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }) =>
   `/api/surveys/export/download?${new URLSearchParams({ tempFileName })}`
+
+export const startSchemaSummaryExportJob = async ({ surveyId, cycle, fileFormat }) => {
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/schema-summary/export`, { cycle, fileFormat })
+  return { job }
+}

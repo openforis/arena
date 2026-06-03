@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
 import { FileFormats } from '@core/fileFormats'
 
-import { ButtonDownload } from '@webapp/components/buttons'
+import { Button, ButtonDownload } from '@webapp/components/buttons'
+import * as API from '@webapp/service/api'
+import { JobActions } from '@webapp/store/app'
 import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
 
 const SurveySchemaSummaryDownloadButton = (props) => {
@@ -11,13 +14,34 @@ const SurveySchemaSummaryDownloadButton = (props) => {
 
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
+  const dispatch = useDispatch()
+
+  const onClick = useCallback(async () => {
+    const { job } = await API.startSchemaSummaryExportJob({ surveyId, cycle, fileFormat })
+
+    dispatch(
+      JobActions.showJobMonitor({
+        job,
+        closeButton: ({ job: jobCompleted }) => {
+          const { tempFileName } = jobCompleted.result
+          return (
+            <ButtonDownload
+              href={`/api/survey/${surveyId}/schema-summary/export/download`}
+              requestParams={{ tempFileName, cycle, fileFormat }}
+              onClick={() => dispatch(JobActions.hideJobMonitor())}
+              variant="contained"
+            />
+          )
+        },
+      })
+    )
+  }, [cycle, dispatch, fileFormat, surveyId])
 
   return (
-    <ButtonDownload
+    <Button
       className={className}
       testId={testId}
-      href={`/api/survey/${surveyId}/schema-summary/`}
-      requestParams={{ cycle, fileFormat }}
+      onClick={onClick}
       label={`surveyForm:schemaSummary_${fileFormat}`}
       variant="text"
     />

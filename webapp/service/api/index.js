@@ -93,6 +93,7 @@ export {
   getSurveyListExportedFileDownloadUrl,
   getSurveyDocxExportUrl,
   getSurveyFileDownloadUrl,
+  startSchemaSummaryExportJob,
 } from './survey'
 export {
   cloneNodeDefFromSurvey,

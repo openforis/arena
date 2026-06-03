@@ -29,6 +29,7 @@ export default {
   RecordsImportJob: 'Importação de registros',
   RecordsUniquenessValidationJob: 'Validação de unicidade de registros',
   SamplingPointDataImportJob: 'Importação de dados de pontos amostrais',
+  SchemaSummaryExportJob: 'Exportação do resumo do esquema',
   SurveyActivityLogClearJob: 'Limpeza do log de atividades do inventário',
   SurveyCreatorJob: 'Criação de inventário',
   SurveyDependencyGraphsGenerationJob: 'Geração de grafos de dependência do inventário',

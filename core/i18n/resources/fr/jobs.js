@@ -29,6 +29,7 @@ export default {
   RecordsImportJob: "Importation d'enregistrements",
   RecordsUniquenessValidationJob: "Validation de l'unicité des enregistrements",
   SamplingPointDataImportJob: "Importation de données de points d'échantillonnage",
+  SchemaSummaryExportJob: 'Exportation du résumé du schéma',
   SurveyActivityLogClearJob: "Effacement du journal d'activité du formulaire",
   SurveyCreatorJob: 'Création de formulaire',
   SurveyDependencyGraphsGenerationJob: 'Génération du graphe de dépendances du formulaire',

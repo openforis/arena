@@ -18,9 +18,9 @@ import * as JobUtils from '../../../job/jobUtils'
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 
-import * as AiSettingsService from '../../ai/service/aiSettingsService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as UserService from '../../user/service/userService'
+import { SchemaSummary } from '../service/schemaSummary'
 import * as SurveyService from '../service/surveyService'
 
 export const init = (app) => {
@@ -286,36 +286,53 @@ export const init = (app) => {
     }
   })
 
+  // schema summary export (used by R chain — direct synchronous download without AI descriptions)
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const includeAiDescriptions = AiSettingsService.isCategoryEnabledForUser(
-        user,
-        AiSettingsService.featureCategories.dataDictionary
-      )
 
       const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-      const fileName = ExportFileNameGenerator.generate({
-        survey,
-        cycle,
-        fileType: 'SchemaSummary',
-        fileFormat,
-      })
+      const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary', fileFormat })
       Response.setContentTypeFile({ res, fileName, fileFormat })
 
-      await SurveyService.exportSchemaSummary({
-        surveyId,
-        cycle,
-        outputStream: res,
-        fileFormat,
-        user,
-        includeAiDescriptions,
-      })
+      await SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream: res, fileFormat })
     } catch (error) {
       next(error)
     }
   })
+
+  // schema summary export (start job)
+  app.post(
+    '/survey/:surveyId/schema-summary/export',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const job = SurveyService.startSchemaSummaryExportJob({ user, surveyId, cycle, fileFormat })
+        res.json({ job })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // schema summary export (download generated file)
+  app.get(
+    '/survey/:surveyId/schema-summary/export/download',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, fileFormat = FileFormats.xlsx, tempFileName } = Request.getParams(req)
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+        const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary', fileFormat })
+        const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+        Response.sendFile({ res, path: exportedFilePath, name: fileName, fileFormat })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   app.get('/survey/:surveyId/labels', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {

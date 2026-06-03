@@ -140,7 +140,14 @@ const getValidationMessages = ({ nodeDef, lang }) => {
     .join('\n')
 }
 
-export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null, includeAiDescriptions = false }) => {
+export const generateSchemaSummaryItems = async ({
+  surveyId,
+  cycle,
+  user = null,
+  includeAiDescriptions = false,
+  onProgress = null,
+  stopIfFunction = null,
+}) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
   const nodeDefs = []
   Survey.visitDescendantsAndSelf({
@@ -195,8 +202,13 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null,
   const defaultLang = Survey.getDefaultLanguage(survey) || languages[0] || 'en'
   const surveyName = Survey.getName(surveyInfo) || `survey-${surveyId}`
 
+  const total = nodeDefs.length
+  let processed = 0
+
   const items = []
   for (const nodeDef of nodeDefs) {
+    if (stopIfFunction?.()) break
+
     const { uuid, type } = nodeDef
 
     const relevantExpressions = NodeDef.getApplicable(nodeDef)
@@ -280,6 +292,8 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle, user = null,
         entry: { uuid, name, type, parentPath: item._parentPath, _descriptionForAi: item._descriptionForAi },
       })
     }
+    processed += 1
+    onProgress?.({ total, processed })
   }
   return items.map(({ _isRoot, _descriptionForAi, _parentPath, ...rest }) => rest)
 }
