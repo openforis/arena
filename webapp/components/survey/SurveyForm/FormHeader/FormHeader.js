@@ -9,7 +9,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
 import { TreeSelectViewMode } from '@webapp/model'
-import { NodeDefsActions, useIsSurveyDirty } from '@webapp/store/survey'
+import { NodeDefsActions, useIsSurveyDirty, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
   SurveyFormActions,
@@ -17,7 +17,6 @@ import {
   useNodeDefPage,
   useShowPageNavigation,
   useTreeSelectViewMode,
-  useSurveyCycleKey,
 } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
