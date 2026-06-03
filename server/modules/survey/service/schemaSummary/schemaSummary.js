@@ -126,6 +126,11 @@ const getValidationCountSummary = ({ nodeDef, countType }) => {
   return String(count)
 }
 
+const getRelevantIf = (nodeDef) => {
+  const relevantExpressions = NodeDef.getApplicable(nodeDef)
+  return relevantExpressions.length > 0 ? NodeDefExpression.getExpression(relevantExpressions[0]) : ''
+}
+
 const getValidationMessages = ({ nodeDef, lang }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const expressions = NodeDefValidations.getExpressions(validations)
@@ -140,15 +145,42 @@ const getValidationMessages = ({ nodeDef, lang }) => {
     .join('\n')
 }
 
-export const generateSchemaSummaryItems = async ({
-  surveyId,
-  cycle,
-  user = null,
-  includeAiDescriptions = false,
-  onProgress = null,
-  stopIfFunction = null,
-}) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
+const getCategoryName = (survey, nodeDef) => {
+  if (!NodeDef.isCode(nodeDef)) return ''
+
+  const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+  if (!category) return ''
+  const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+  let levelNameSuffix = ''
+  if (levelIndex > 0) {
+    const level = Category.getLevelByIndex(levelIndex)(category)
+    const levelName = CategoryLevel.getName(level)
+    levelNameSuffix = `[${levelName}]`
+  }
+  const categoryName = Category.getName(category)
+  return `${categoryName}${levelNameSuffix}`
+}
+
+const getTaxonomyName = (survey, nodeDef) => {
+  if (!NodeDef.isTaxon(nodeDef)) return ''
+
+  const taxonomy = Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey)
+  return Taxonomy.getName(taxonomy) || ''
+}
+
+const getParentCodeAttribute = (survey, nodeDef) => {
+  if (!NodeDef.isCode(nodeDef)) return ''
+  const parentCodeAttribute = Survey.getNodeDefParentCode(nodeDef)(survey)
+  return parentCodeAttribute ? NodeDef.getName(parentCodeAttribute) : ''
+}
+
+const getCodeAttributeCategoryLevel = (survey, nodeDef) => {
+  if (!NodeDef.isCode(nodeDef)) return ''
+  const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+  return String(categoryLevelIndex + 1)
+}
+
+const extractSchemaSummaryNodeDefs = (survey, cycle) => {
   const nodeDefs = []
   Survey.visitDescendantsAndSelf({
     cycle,
@@ -161,41 +193,19 @@ export const generateSchemaSummaryItems = async ({
       }
     },
   })(survey)
+  return nodeDefs
+}
 
-  const getCategoryName = (nodeDef) => {
-    if (!NodeDef.isCode(nodeDef)) return ''
-
-    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
-    if (!category) return ''
-    const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-    let levelNameSuffix = ''
-    if (levelIndex > 0) {
-      const level = Category.getLevelByIndex(levelIndex)(category)
-      const levelName = CategoryLevel.getName(level)
-      levelNameSuffix = `[${levelName}]`
-    }
-    const categoryName = Category.getName(category)
-    return `${categoryName}${levelNameSuffix}`
-  }
-
-  const getParentCodeAttribute = (nodeDef) => {
-    if (!NodeDef.isCode(nodeDef)) return ''
-    const parentCodeAttribute = Survey.getNodeDefParentCode(nodeDef)(survey)
-    return parentCodeAttribute ? NodeDef.getName(parentCodeAttribute) : ''
-  }
-
-  const getCodeAttributeCategoryLevel = (nodeDef) => {
-    if (!NodeDef.isCode(nodeDef)) return ''
-    const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-    return String(categoryLevelIndex + 1)
-  }
-
-  const getTaxonomyName = (nodeDef) => {
-    if (!NodeDef.isTaxon(nodeDef)) return ''
-
-    const taxonomy = Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey)
-    return Taxonomy.getName(taxonomy) || ''
-  }
+export const generateSchemaSummaryItems = async ({
+  surveyId,
+  cycle,
+  user = null,
+  includeAiDescriptions = false,
+  onProgress = null,
+  stopIfFunction = null,
+}) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
+  const nodeDefs = extractSchemaSummaryNodeDefs(survey, cycle)
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const languages = Survey.getLanguages(surveyInfo)
@@ -211,8 +221,7 @@ export const generateSchemaSummaryItems = async ({
 
     const { uuid, type } = nodeDef
 
-    const relevantExpressions = NodeDef.getApplicable(nodeDef)
-    const relevantIf = relevantExpressions.length > 0 ? NodeDefExpression.getExpression(relevantExpressions[0]) : ''
+    const relevantIf = getRelevantIf(nodeDef)
 
     const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef }) ? 'true' : ''
 
@@ -239,14 +248,21 @@ export const generateSchemaSummaryItems = async ({
         }),
         {}
       ),
-      ...(includeAiDescriptions ? { aiDescription: '' } : {}),
+      ...(includeAiDescriptions
+        ? {
+            aiDescription: '',
+            _isRoot: NodeDef.isRoot(nodeDef),
+            _descriptionForAi: NodeDef.getDescription(defaultLang)(nodeDef) || '',
+            _parentPath: getParentPath(nodeDef, survey),
+          }
+        : {}),
       type,
       key: String(NodeDef.isKey(nodeDef)),
-      categoryName: getCategoryName(nodeDef),
-      parentCode: getParentCodeAttribute(nodeDef),
-      categoryLevel: getCodeAttributeCategoryLevel(nodeDef),
+      categoryName: getCategoryName(survey, nodeDef),
+      parentCode: getParentCodeAttribute(survey, nodeDef),
+      categoryLevel: getCodeAttributeCategoryLevel(survey, nodeDef),
       enumerator,
-      taxonomyName: getTaxonomyName(nodeDef),
+      taxonomyName: getTaxonomyName(survey, nodeDef),
       multiple: String(NodeDef.isMultiple(nodeDef)),
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
       fileType: NodeDef.isFile(nodeDef) ? NodeDef.getFileType(nodeDef) : '',
@@ -276,13 +292,6 @@ export const generateSchemaSummaryItems = async ({
         {}
       ),
       cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
-      ...(includeAiDescriptions
-        ? {
-            _isRoot: NodeDef.isRoot(nodeDef),
-            _descriptionForAi: NodeDef.getDescription(defaultLang)(nodeDef) || '',
-            _parentPath: getParentPath(nodeDef, survey),
-          }
-        : {}),
     }
     items.push(item)
     if (includeAiDescriptions && !item._isRoot) {
