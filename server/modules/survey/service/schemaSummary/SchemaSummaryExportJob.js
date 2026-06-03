@@ -3,7 +3,6 @@ import { FileFormats } from '@core/fileFormats'
 import Job from '@server/job/job'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
-import * as AiSettingsService from '@server/modules/ai/service/aiSettingsService'
 
 import { generateSchemaSummaryItems } from './schemaSummary'
 
@@ -13,12 +12,7 @@ export default class SchemaSummaryExportJob extends Job {
   }
 
   async execute() {
-    const { user, surveyId, cycle, fileFormat = FileFormats.xlsx } = this.context
-
-    const includeAiDescriptions = AiSettingsService.isCategoryEnabledForUser(
-      user,
-      AiSettingsService.featureCategories.dataDictionary
-    )
+    const { user, surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = this.context
 
     const items = await generateSchemaSummaryItems({
       surveyId,

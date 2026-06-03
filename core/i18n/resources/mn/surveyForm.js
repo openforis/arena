@@ -29,6 +29,8 @@ export default {
   edit: `'{{nodeDefLabel}}' засах`,
   schemaSummary_csv: 'Схемийн хураангуй (CSV)',
   schemaSummary_xlsx: 'Схемийн хураангуй (Excel)',
+  schemaSummaryAiDescriptions_csv: 'Схемийн хураангуй + ХОС тайлбар (CSV)',
+  schemaSummaryAiDescriptions_xlsx: 'Схемийн хураангуй + ХОС тайлбар (Excel)',
   hidePages: 'Хуудсыг нуух',
   showPages: 'Хуудсыг харуулах',
   move: `'{{nodeDefLabel}}' зөөх`,

@@ -307,9 +307,15 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+        const { surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = Request.getParams(req)
         const user = Request.getUser(req)
-        const job = SurveyService.startSchemaSummaryExportJob({ user, surveyId, cycle, fileFormat })
+        const job = SurveyService.startSchemaSummaryExportJob({
+          user,
+          surveyId,
+          cycle,
+          fileFormat,
+          includeAiDescriptions,
+        })
         res.json({ job })
       } catch (error) {
         next(error)

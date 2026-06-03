@@ -110,8 +110,8 @@ export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) 
   return JobUtils.jobToJSON(job)
 }
 
-export const startSchemaSummaryExportJob = ({ user, surveyId, cycle, fileFormat }) => {
-  const job = new SchemaSummaryExportJob({ user, surveyId, cycle, fileFormat })
+export const startSchemaSummaryExportJob = ({ user, surveyId, cycle, fileFormat, includeAiDescriptions = false }) => {
+  const job = new SchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, includeAiDescriptions })
   JobManager.enqueueJob(job)
   return job
 }

@@ -10,14 +10,14 @@ import { JobActions } from '@webapp/store/app'
 import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
 
 const SurveySchemaSummaryDownloadButton = (props) => {
-  const { className, fileFormat = FileFormats.xlsx, testId } = props
+  const { className, fileFormat = FileFormats.xlsx, includeAiDescriptions = false, testId } = props
 
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
   const dispatch = useDispatch()
 
   const onClick = useCallback(async () => {
-    const { job } = await API.startSchemaSummaryExportJob({ surveyId, cycle, fileFormat })
+    const { job } = await API.startSchemaSummaryExportJob({ surveyId, cycle, fileFormat, includeAiDescriptions })
 
     dispatch(
       JobActions.showJobMonitor({
@@ -35,22 +35,19 @@ const SurveySchemaSummaryDownloadButton = (props) => {
         },
       })
     )
-  }, [cycle, dispatch, fileFormat, surveyId])
+  }, [cycle, dispatch, fileFormat, includeAiDescriptions, surveyId])
 
-  return (
-    <Button
-      className={className}
-      testId={testId}
-      onClick={onClick}
-      label={`surveyForm:schemaSummary_${fileFormat}`}
-      variant="text"
-    />
-  )
+  const labelKey = includeAiDescriptions
+    ? `surveyForm:schemaSummaryAiDescriptions_${fileFormat}`
+    : `surveyForm:schemaSummary_${fileFormat}`
+
+  return <Button className={className} testId={testId} onClick={onClick} label={labelKey} variant="text" />
 }
 
 SurveySchemaSummaryDownloadButton.propTypes = {
   className: PropTypes.string,
   fileFormat: PropTypes.string,
+  includeAiDescriptions: PropTypes.bool,
   testId: PropTypes.string,
 }
 

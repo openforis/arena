@@ -93,9 +93,9 @@ export const startSurveysListExportJob = async ({ draft = true, template = false
 export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }) =>
   `/api/surveys/export/download?${new URLSearchParams({ tempFileName })}`
 
-export const startSchemaSummaryExportJob = async ({ surveyId, cycle, fileFormat }) => {
+export const startSchemaSummaryExportJob = async ({ surveyId, cycle, fileFormat, includeAiDescriptions = false }) => {
   const {
     data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/schema-summary/export`, { cycle, fileFormat })
+  } = await axios.post(`/api/survey/${surveyId}/schema-summary/export`, { cycle, fileFormat, includeAiDescriptions })
   return { job }
 }

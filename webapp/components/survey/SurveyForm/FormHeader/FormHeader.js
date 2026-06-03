@@ -30,6 +30,7 @@ import {
   useShowPageNavigation,
   useTreeSelectViewMode,
 } from '@webapp/store/ui/surveyForm'
+import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { TestId } from '@webapp/utils/testId'
 
 import * as API from '@webapp/service/api'
@@ -67,6 +68,7 @@ const FormHeader = (props) => {
   const canEditSurvey = useAuthCanEditSurvey()
   const path = usePath(entry)
   const treeViewMode = useTreeSelectViewMode()
+  const dataDictionaryAiEnabled = useAiFeatureEnabled('dataDictionary')
   const [cloneFromSurveyDialogOpen, setCloneFromSurveyDialogOpen] = useState(false)
 
   const onLabelsImportFileSelected = useCallback(
@@ -160,6 +162,20 @@ const FormHeader = (props) => {
                 key: 'schema-summary-excel',
                 content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} />,
               },
+              ...(dataDictionaryAiEnabled
+                ? [
+                    {
+                      key: 'schema-summary-csv-ai',
+                      content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.csv} includeAiDescriptions />,
+                    },
+                    {
+                      key: 'schema-summary-excel-ai',
+                      content: (
+                        <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} includeAiDescriptions />
+                      ),
+                    },
+                  ]
+                : []),
               ...(experimentalFeatures
                 ? [
                     ...(canEditDef
