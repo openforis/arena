@@ -298,6 +298,15 @@ export const fetchUserByEmail = async (email, client = db) =>
     camelize
   )
 
+export const fetchUserSurveysCount = async (uuid, client = db) =>
+  client.one(
+    `SELECT
+      (SELECT COUNT(*) FROM survey s WHERE s.owner_uuid = $1 AND s.published)::int AS surveys_count_published,
+      (SELECT COUNT(*) FROM survey s WHERE s.owner_uuid = $1 AND NOT s.published)::int AS surveys_count_draft`,
+    [uuid],
+    camelize
+  )
+
 export const fetchUserAndPasswordByEmail = async (email, client = db) =>
   client.oneOrNone(
     `

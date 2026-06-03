@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { initReactI18next, Trans as i18nTrans } from 'react-i18next'
+import { initReactI18next } from 'react-i18next'
 import detector from 'i18next-browser-languagedetector'
 
 import i18nInstance, { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
@@ -24,7 +24,5 @@ export const useI18nT = ({ unescapeHtml = false } = {}) =>
     },
     [unescapeHtml]
   )
-
-export const useI18nTrans = () => i18nTrans
 
 export const useLang = () => browserI18n.language

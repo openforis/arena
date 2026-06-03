@@ -257,6 +257,8 @@ export const {
   fetchUserAccessRequests,
 } = UserManager
 
+export { fetchUserSurveysCount } from '../repository/userRepository'
+
 export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
   const userUuid = await UserManager.findResetPasswordUserUuidByUuid(resetPasswordUuid)
   return userUuid ? UserManager.fetchUserByUuid(userUuid) : null
