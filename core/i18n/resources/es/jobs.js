@@ -21,6 +21,7 @@ export default {
   EntitiesDeleteJob: 'Eliminación de entidades existentes',
   FilesImportJob: 'Importación de archivos',
   MessageSendJob: 'Enviar mensaje',
+  NodeDefsTranslationJob: 'Traducción de etiquetas de definiciones de nodos',
   NodeDefsImportJob: 'Importación de definiciones de nodos',
   NodeDefsValidationJob: 'Validación de definiciones de nodos',
   chainsCyclesCheckJob: 'Verificación de ciclos de cadenas',
