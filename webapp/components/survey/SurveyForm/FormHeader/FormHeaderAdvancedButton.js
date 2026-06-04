@@ -13,6 +13,7 @@ import {
   useSurveyCycleKey,
   useSurveyId,
   useSurveyInfo,
+  useSurveyLangs,
   useSurveyPreferredLang,
 } from '@webapp/store/survey'
 import { FileUploadDialogActions } from '@webapp/store/ui'
@@ -28,6 +29,7 @@ import { OpenFileUploadDialogButton } from '@webapp/components/form'
 
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
 import { NodeDefCloneFromSurveyDialog } from '../nodeDefs/components/nodeDefCloneFromSurveyDialog'
+import { NodeDefsTranslationModal } from './NodeDefsTranslationModal'
 
 const labelsExportAllowedFileFormats = [FileFormats.csv, FileFormats.xlsx]
 
@@ -43,8 +45,11 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
   const surveyIsDirty = useIsSurveyDirty()
   const nodeDefPage = useNodeDefPage()
   const dataDictionaryAiEnabled = useAiFeatureEnabled('dataDictionary')
+  const aiTranslationEnabled = useAiFeatureEnabled('translation')
+  const surveyLangs = useSurveyLangs()
 
   const [cloneFromSurveyDialogOpen, setCloneFromSurveyDialogOpen] = useState(false)
+  const [translationResult, setTranslationResult] = useState(null)
 
   const onLabelsImportFileSelected = useCallback(
     async (file) => {
@@ -61,6 +66,16 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
     },
     [dispatch, surveyId]
   )
+
+  const onStartTranslation = useCallback(async () => {
+    const { job } = await API.startNodeDefsTranslationJob({ surveyId })
+    dispatch(
+      JobActions.showJobMonitor({
+        job,
+        onComplete: (completedJob) => setTranslationResult(completedJob.result),
+      })
+    )
+  }, [dispatch, surveyId])
 
   const openCloneFromSurveyDialog = useCallback(() => {
     setCloneFromSurveyDialogOpen(true)
@@ -153,17 +168,35 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
           />
         ),
       },
+      ...(aiTranslationEnabled && surveyLangs.length > 1 && canEditDef
+        ? [
+            {
+              key: 'translate-labels-ai',
+              content: (
+                <Button
+                  iconClassName="icon-earth icon-14px"
+                  label="surveyForm:aiTranslateLabels"
+                  onClick={onStartTranslation}
+                  variant="text"
+                />
+              ),
+            },
+          ]
+        : []),
     ],
     [
+      aiTranslationEnabled,
       canEditDef,
       cycle,
       dataDictionaryAiEnabled,
       experimentalFeatures,
       lang,
       onLabelsImportFileSelected,
+      onStartTranslation,
       openCloneFromSurveyDialog,
       surveyId,
       surveyIsDraft,
+      surveyLangs,
     ]
   )
 
@@ -184,6 +217,9 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
           onClose={closeCloneFromSurveyDialog}
           onConfirm={onCloneFromSurveyConfirm}
         />
+      )}
+      {translationResult && (
+        <NodeDefsTranslationModal result={translationResult} onClose={() => setTranslationResult(null)} />
       )}
     </>
   )

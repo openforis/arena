@@ -19,6 +19,7 @@ import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import { requireAiFeaturesEnabled } from '../../ai/api/aiMiddleware'
 import * as UserService from '../../user/service/userService'
 import { SchemaSummary } from '../service/schemaSummary'
 import * as SurveyService from '../service/surveyService'
@@ -423,6 +424,23 @@ export const init = (app) => {
       next(error)
     }
   })
+
+  // node defs AI translation (start job)
+  app.post(
+    '/survey/:surveyId/nodeDefs/translation/start',
+    AuthMiddleware.requireSurveyEditPermission,
+    requireAiFeaturesEnabled,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const job = SurveyService.startNodeDefsTranslationJob({ user, surveyId })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   app.put('/survey/:surveyId/config', AuthMiddleware.requireSurveyConfigEditPermission, async (req, res, next) => {
     try {

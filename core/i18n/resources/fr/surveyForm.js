@@ -139,4 +139,17 @@ Dans Arena Mobile :
   exportLabels_csv: 'Exporter les étiquettes (CSV)',
   exportLabels_xlsx: 'Exporter les étiquettes (Excel)',
   importLabels: 'Importer les étiquettes depuis Excel ou CSV',
+  aiTranslateLabels: 'IA : Traduire les étiquettes',
+  nodeDefsTranslation: {
+    apply: 'Appliquer les traductions',
+    applySuccess: 'Traductions appliquées avec succès',
+    aiSuggestion: 'IA',
+    current: 'Actuel',
+    custom: 'Personnalisé',
+    defaultDescription: 'Description par défaut',
+    defaultLabel: 'Étiquette par défaut',
+    path: 'Chemin',
+    showDescriptions: 'Afficher les descriptions',
+    title: 'Traduire les étiquettes des définitions de nœuds',
+  },
 }

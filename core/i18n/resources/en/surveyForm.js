@@ -139,4 +139,17 @@ In Arena Mobile:
   exportLabels_csv: 'Export labels (CSV)',
   exportLabels_xlsx: 'Export labels (Excel)',
   importLabels: 'Import labels from Excel or CSV',
+  aiTranslateLabels: 'AI: Translate labels',
+  nodeDefsTranslation: {
+    apply: 'Apply Translations',
+    applySuccess: 'Translations applied successfully',
+    aiSuggestion: 'AI',
+    current: 'Current',
+    custom: 'Custom',
+    defaultDescription: 'Default description',
+    defaultLabel: 'Default label',
+    path: 'Path',
+    showDescriptions: 'Show descriptions',
+    title: 'Translate Node Definition Labels',
+  },
 }

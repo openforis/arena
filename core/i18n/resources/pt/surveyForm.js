@@ -139,4 +139,17 @@ No Arena Mobile:
   exportLabels_csv: 'Exportar rótulos (CSV)',
   exportLabels_xlsx: 'Exportar rótulos (Excel)',
   importLabels: 'Importar rótulos de Excel ou CSV',
+  aiTranslateLabels: 'IA: Traduzir rótulos',
+  nodeDefsTranslation: {
+    apply: 'Aplicar traduções',
+    applySuccess: 'Traduções aplicadas com sucesso',
+    aiSuggestion: 'IA',
+    current: 'Atual',
+    custom: 'Personalizado',
+    defaultDescription: 'Descrição padrão',
+    defaultLabel: 'Rótulo padrão',
+    path: 'Caminho',
+    showDescriptions: 'Mostrar descrições',
+    title: 'Traduzir rótulos de definições de nós',
+  },
 }

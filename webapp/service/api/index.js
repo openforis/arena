@@ -86,6 +86,7 @@ export {
   insertSurvey,
   insertSurveyFile,
   startImportLabelsJob,
+  startNodeDefsTranslationJob,
   updateSurveyConfigurationProp,
   updateSurveyOwner,
   updateSurveyProps,
