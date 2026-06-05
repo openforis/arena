@@ -1,6 +1,5 @@
 import './ColorInput.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import { MuiColorInput } from 'mui-color-input'
 

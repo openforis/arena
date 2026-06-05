@@ -1,6 +1,5 @@
 import './SurveyInfo.scss'
 
-import React from 'react'
 
 import { useAuthCanEditSurvey, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'

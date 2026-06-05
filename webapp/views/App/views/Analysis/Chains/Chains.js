@@ -1,5 +1,4 @@
 import './Chains.scss'
-import React from 'react'
 import { useNavigate } from 'react-router'
 
 import * as Chain from '@common/analysis/chain'

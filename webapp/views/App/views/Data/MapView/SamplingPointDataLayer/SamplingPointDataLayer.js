@@ -1,4 +1,3 @@
-import React from 'react'
 import { LayersControl, LayerGroup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 

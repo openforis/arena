@@ -7,7 +7,11 @@ module.exports = function (api) {
   global._isProd = api.cache(() => process.env.NODE_ENV === 'production')
 
   return {
-    presets: [['@babel/preset-env', { targets: { node: '12' } }], '@babel/preset-react', '@babel/preset-typescript'],
+    presets: [
+      ['@babel/preset-env', { targets: { node: '12' } }],
+      ['@babel/preset-react', { runtime: 'automatic' }],
+      '@babel/preset-typescript',
+    ],
     plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import'],
   }
 }

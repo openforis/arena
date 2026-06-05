@@ -1,4 +1,3 @@
-import React from 'react'
 import { FormControlLabel, Radio } from '@mui/material'
 
 import { useI18n } from '@webapp/store/system'

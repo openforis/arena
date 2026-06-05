@@ -1,6 +1,5 @@
 import './dropdown.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import ReactSelect, { components, createFilter } from 'react-select'
 import classNames from 'classnames'

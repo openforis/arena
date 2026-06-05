@@ -1,6 +1,5 @@
 import './ImportSummary.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'

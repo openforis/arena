@@ -1,6 +1,5 @@
 import './Accordion.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import MuiAccordion from '@mui/material/Accordion'
 import MuiAccordionSummary from '@mui/material/AccordionSummary'

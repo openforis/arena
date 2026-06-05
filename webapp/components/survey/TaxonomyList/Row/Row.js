@@ -1,5 +1,4 @@
 import './Row.scss'
-import React from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'

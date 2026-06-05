@@ -1,6 +1,5 @@
 import './Paginator.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'

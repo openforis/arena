@@ -1,6 +1,5 @@
 import './validationFieldMessages.scss'
 
-import React from 'react'
 
 import { ValidationUtils } from '@core/validation/validationUtils'
 

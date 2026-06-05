@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { Button, ButtonProps } from './Button'
 
 export const ButtonAdd = (props: ButtonProps) => {

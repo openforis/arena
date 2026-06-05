@@ -1,6 +1,5 @@
 import './UsersList.scss'
 
-import React from 'react'
 
 import * as User from '@core/user/user'
 

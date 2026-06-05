@@ -82,8 +82,7 @@ export const SimpleTextInput = forwardRef<HTMLDivElement, Props>((props, ref) =>
       disabled={disabled || readOnly}
       label={label}
       id={id}
-      inputProps={{ 'data-testid': testId }}
-      InputProps={{ startAdornment, endAdornment }}
+      slotProps={{ input: { startAdornment, endAdornment }, htmlInput: { 'data-testid': testId } }}
       inputRef={ref}
       margin="none"
       multiline={multiline}

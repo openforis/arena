@@ -1,6 +1,5 @@
 import './ExtraPropDefsEditor.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { ExtraPropDef } from '@core/survey/extraPropDef'

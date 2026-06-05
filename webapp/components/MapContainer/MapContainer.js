@@ -1,6 +1,5 @@
 import './Map.scss'
 
-import React from 'react'
 import { GeoJSON, MapContainer as RLMapContainer, ScaleControl, ZoomControl } from 'react-leaflet'
 import Ruler from 'react-leaflet-ruler'
 import PropTypes from 'prop-types'

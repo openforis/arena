@@ -1,4 +1,3 @@
-import React from 'react'
 
 import { appModules, messageModules } from '@webapp/app/appModules'
 

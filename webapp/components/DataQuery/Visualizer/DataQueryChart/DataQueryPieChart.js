@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { Numbers, Objects } from '@openforis/arena-core'

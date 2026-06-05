@@ -1,6 +1,5 @@
 import './GaugeChart.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { PieChart } from '../PieChart'
