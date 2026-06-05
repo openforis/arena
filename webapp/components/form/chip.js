@@ -1,4 +1,3 @@
-import React from 'react'
 import MuiChip from '@mui/material/Chip'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'

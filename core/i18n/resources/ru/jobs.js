@@ -21,6 +21,7 @@ export default {
   EntitiesDeleteJob: 'Удаление существующих объектов',
   FilesImportJob: 'Импорт файлов',
   MessageSendJob: 'Отправка сообщения',
+  NodeDefsTranslationJob: 'Перевод меток определений узлов',
   NodeDefsImportJob: 'Импорт определений узлов',
   NodeDefsValidationJob: 'Валидация определений узлов',
   chainsCyclesCheckJob: 'Проверка циклов цепочек',

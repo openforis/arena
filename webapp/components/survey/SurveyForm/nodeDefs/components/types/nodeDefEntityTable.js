@@ -1,5 +1,4 @@
 import './nodeDefEntityTable.scss'
-import React from 'react'
 
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'

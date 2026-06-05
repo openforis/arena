@@ -1,6 +1,5 @@
 import './ValidationReport.scss'
 
-import React from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'

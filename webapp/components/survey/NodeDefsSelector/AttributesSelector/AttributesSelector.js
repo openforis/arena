@@ -1,5 +1,4 @@
 import './AttributesSelector.scss'
-import React from 'react'
 import * as PropTypes from 'prop-types'
 import classNames from 'classnames'
 

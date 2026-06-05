@@ -21,6 +21,7 @@ export default {
   EntitiesDeleteJob: 'Exclusão de entidades existentes',
   FilesImportJob: 'Importação de arquivos',
   MessageSendJob: 'Envio de mensagem',
+  NodeDefsTranslationJob: 'Tradução de rótulos de definições de nós',
   NodeDefsImportJob: 'Importação de definições de nós',
   NodeDefsValidationJob: 'Validação de definições de nós',
   chainsCyclesCheckJob: `Verificação de ciclos das cadeias`,

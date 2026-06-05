@@ -1,4 +1,3 @@
-import React from 'react'
 import { useSelector } from 'react-redux'
 
 import { RecordState } from '@webapp/store/ui/record'

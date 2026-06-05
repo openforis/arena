@@ -1,4 +1,3 @@
-import React from 'react'
 import { Marker } from 'react-leaflet'
 
 import { MapMarkerPopup } from './MapMarkerPopup'

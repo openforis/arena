@@ -21,6 +21,7 @@ export default {
   EntitiesDeleteJob: 'Existing Entities Delete',
   FilesImportJob: 'Files Import',
   MessageSendJob: 'Message Send',
+  NodeDefsTranslationJob: 'Node Definitions Labels Translation',
   NodeDefsImportJob: 'Node Definitions Import',
   NodeDefsValidationJob: 'Node Definitions Validation',
   chainsCyclesCheckJob: `Chains Cycles Check`,

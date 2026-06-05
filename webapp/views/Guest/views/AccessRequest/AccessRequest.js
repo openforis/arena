@@ -1,6 +1,5 @@
 import './AccessRequest.scss'
 
-import React from 'react'
 
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 

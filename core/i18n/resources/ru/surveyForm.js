@@ -136,4 +136,17 @@ export default {
   exportLabels_csv: 'Экспорт меток (CSV)',
   exportLabels_xlsx: 'Экспорт меток (Excel)',
   importLabels: 'Импорт меток из Excel или CSV',
+  aiTranslateLabels: 'ИИ: Перевести метки',
+  nodeDefsTranslation: {
+    apply: 'Применить переводы',
+    applySuccess: 'Переводы успешно применены',
+    aiSuggestion: 'ИИ',
+    current: 'Текущий',
+    custom: 'Пользовательский',
+    defaultDescription: 'Описание по умолчанию',
+    defaultLabel: 'Метка по умолчанию',
+    path: 'Путь',
+    showDescriptions: 'Показать описания',
+    title: 'Перевести метки определений узлов',
+  },
 }

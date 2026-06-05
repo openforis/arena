@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { forwardRef } from 'react'
-import { Button as MuiButton } from '@mui/material'
-import PropTypes from 'prop-types'
+import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/material'
 import classNames from 'classnames'
 
 import { Objects } from '@openforis/arena-core'
@@ -9,7 +9,65 @@ import { useI18nT } from '@webapp/store/system'
 
 import { TooltipNew } from '../TooltipNew'
 
-const getTitle = (props, t) => {
+export type ButtonProps = Omit<MuiButtonProps, 'color' | 'title' | 'variant' | 'size'> & {
+  active?: boolean
+  closeTooltipOnClick?: boolean
+  color?: string
+  icon?: React.ReactNode
+  iconAlt?: string
+  iconClassName?: string
+  iconHeight?: number
+  iconSrc?: string
+  iconEnd?: React.ReactNode
+  iconEndClassName?: string
+  iconEndSrc?: string
+  iconWidth?: number
+  isTitleMarkdown?: boolean
+  label?: string
+  labelIsI18nKey?: boolean
+  labelParams?: Record<string, unknown>
+  primary?: boolean
+  secondary?: boolean
+  showIcon?: boolean
+  showLabel?: boolean
+  size?: 'small' | 'medium' | 'large'
+  testId?: string
+  title?: string
+  titleClassName?: string
+  titleIsI18nKey?: boolean
+  titleMarkdownClassName?: string
+  titleMaxWidth?: string | number
+  titleParams?: Record<string, unknown>
+  variant?: 'contained' | 'outlined' | 'text'
+}
+
+type IconProps = {
+  alignLeft?: boolean
+  alignRight?: boolean
+  icon?: React.ReactNode
+  iconAlt?: string
+  iconClassName?: string
+  iconHeight?: number
+  iconSrc?: string
+  iconWidth?: number
+}
+
+const Icon = (props: IconProps) => {
+  const { icon, iconAlt, iconClassName, iconHeight, iconSrc, iconWidth, alignLeft, alignRight } = props
+  return (
+    <>
+      {iconClassName && (
+        <span className={classNames('icon', iconClassName, { 'icon-left': alignLeft, 'icon-right': alignRight })} />
+      )}
+      {iconSrc && <img alt={iconAlt} height={iconHeight} src={iconSrc} width={iconWidth} />}
+      {icon}
+    </>
+  )
+}
+
+type I18nT = (key: string, params?: Record<string, unknown>) => string
+
+const getTitle = (props: ButtonProps, t: I18nT): string | null => {
   const {
     label,
     labelIsI18nKey = true,
@@ -30,38 +88,14 @@ const getTitle = (props, t) => {
   return null
 }
 
-const getLabel = (props, t) => {
+const getLabel = (props: ButtonProps, t: I18nT): string | null => {
   const { label, labelIsI18nKey = true, labelParams, showLabel = true } = props
   if (!showLabel || !label) return null
   if (labelIsI18nKey) return t(label, labelParams)
   return label
 }
 
-const Icon = (props) => {
-  const { icon, iconAlt, iconClassName, iconHeight, iconSrc, iconWidth, alignLeft, alignRight } = props
-  return (
-    <>
-      {iconClassName && (
-        <span className={classNames('icon', iconClassName, { 'icon-left': alignLeft, 'icon-right': alignRight })} />
-      )}
-      {iconSrc && <img alt={iconAlt} height={iconHeight} src={iconSrc} width={iconWidth} />}
-      {icon}
-    </>
-  )
-}
-
-Icon.propTypes = {
-  alignLeft: PropTypes.bool,
-  alignRight: PropTypes.bool,
-  icon: PropTypes.node,
-  iconAlt: PropTypes.string,
-  iconClassName: PropTypes.string,
-  iconHeight: PropTypes.number,
-  iconSrc: PropTypes.string,
-  iconWidth: PropTypes.number,
-}
-
-export const Button = forwardRef((props, ref) => {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const {
     active,
     children,
@@ -80,20 +114,20 @@ export const Button = forwardRef((props, ref) => {
     iconWidth,
     id,
     isTitleMarkdown = false,
-    labelIsI18nKey: _labelIsI18nKey, // exclude it from otherProps
-    labelParams: _labelParams, // exclude it from otherProps
+    labelIsI18nKey: _labelIsI18nKey,
+    labelParams: _labelParams,
     onClick,
     primary,
     secondary,
     showIcon = true,
-    showLabel: _showLabel, // exclude it from otherProps
+    showLabel: _showLabel,
     size = 'medium',
     testId,
     titleClassName,
     titleMarkdownClassName,
     titleMaxWidth,
-    titleIsI18nKey: _titleIsI18nKey, // exclude it from otherProps
-    titleParams: _titleParams, // exclude it from otherProps
+    titleIsI18nKey: _titleIsI18nKey,
+    titleParams: _titleParams,
     variant: variantProp = 'contained',
     ...otherProps
   } = props
@@ -101,33 +135,31 @@ export const Button = forwardRef((props, ref) => {
   const t = useI18nT({ unescapeHtml: true })
 
   const label = getLabel(props, t)
-
   const title = getTitle(props, t)
-
   const variant = active ? 'contained' : variantProp
 
   const btn = (
     <MuiButton
       ref={ref}
       id={id}
-      aria-label={label ?? title}
+      aria-label={label ?? title ?? undefined}
       className={classNames('btn', className, {
         'btn-s': size === 'small',
         'btn-primary': primary,
         'btn-secondary': secondary,
       })}
-      color={color}
+      color={color as MuiButtonProps['color']}
       data-testid={testId}
-      disabled={disabled ? disabled : undefined}
+      disabled={disabled || undefined}
       endIcon={
         showIcon &&
         (iconEnd || iconEndClassName || iconEndSrc) && (
           <Icon
             icon={iconEnd}
             iconAlt={iconAlt}
-            iconClassName={iconEndClassName}
+            iconClassName={iconEndClassName ?? undefined}
             iconHeight={iconHeight}
-            iconSrc={iconEndSrc}
+            iconSrc={iconEndSrc ?? undefined}
             iconWidth={iconWidth}
             alignRight={Boolean(label)}
           />
@@ -150,12 +182,13 @@ export const Button = forwardRef((props, ref) => {
       }
       variant={variant}
       {...otherProps}
-      title={undefined} // title is handled by TooltipNew
+      title={undefined}
     >
       {label}
       {children}
     </MuiButton>
   )
+
   if (Objects.isEmpty(title) || disabled) {
     return btn
   }
@@ -173,39 +206,4 @@ export const Button = forwardRef((props, ref) => {
   )
 })
 
-Button.propTypes = {
-  active: PropTypes.bool,
-  children: PropTypes.node,
-  className: PropTypes.string,
-  closeTooltipOnClick: PropTypes.bool,
-  color: PropTypes.string,
-  disabled: PropTypes.bool,
-  id: PropTypes.string,
-  icon: PropTypes.node,
-  iconAlt: PropTypes.string,
-  iconClassName: PropTypes.string,
-  iconHeight: PropTypes.number,
-  iconSrc: PropTypes.string,
-  iconWidth: PropTypes.number,
-  iconEnd: PropTypes.node,
-  iconEndClassName: PropTypes.string,
-  iconEndSrc: PropTypes.string,
-  isTitleMarkdown: PropTypes.bool,
-  label: PropTypes.string,
-  labelIsI18nKey: PropTypes.bool,
-  labelParams: PropTypes.object,
-  onClick: PropTypes.func,
-  primary: PropTypes.bool,
-  secondary: PropTypes.bool,
-  showIcon: PropTypes.bool,
-  showLabel: PropTypes.bool,
-  size: PropTypes.oneOf(['small', 'medium', 'large']),
-  testId: PropTypes.string,
-  title: PropTypes.string,
-  titleClassName: PropTypes.string,
-  titleIsI18nKey: PropTypes.bool,
-  titleMarkdownClassName: PropTypes.string,
-  titleMaxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  titleParams: PropTypes.object,
-  variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
-}
+Button.displayName = 'Button'

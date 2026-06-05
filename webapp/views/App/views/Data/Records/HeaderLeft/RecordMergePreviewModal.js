@@ -1,6 +1,5 @@
 import './RecordMergePreviewModal.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'

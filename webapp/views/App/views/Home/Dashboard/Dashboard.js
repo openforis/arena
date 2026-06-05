@@ -1,6 +1,5 @@
 import './Dashboard.scss'
 
-import React from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as ProcessUtils from '@core/processUtils'

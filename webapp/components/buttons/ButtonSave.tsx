@@ -1,9 +1,8 @@
-import React from 'react'
 import classNames from 'classnames'
 
-import { Button } from './Button'
+import { Button, ButtonProps } from './Button'
 
-export const ButtonSave = (props) => {
+export const ButtonSave = (props: ButtonProps) => {
   const { label = 'common.save' } = props
   return (
     <Button
@@ -13,8 +12,4 @@ export const ButtonSave = (props) => {
       label={label}
     />
   )
-}
-
-ButtonSave.propTypes = {
-  ...Button.propTypes,
 }

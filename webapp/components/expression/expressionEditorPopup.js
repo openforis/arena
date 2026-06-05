@@ -1,6 +1,5 @@
 import './expressionEditorPopup.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 

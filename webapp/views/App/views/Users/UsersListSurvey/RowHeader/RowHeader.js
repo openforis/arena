@@ -1,4 +1,3 @@
-import React from 'react'
 
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanViewOtherUsersEmail } from '@webapp/store/user'
