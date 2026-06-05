@@ -34,32 +34,45 @@ const resolveValue = (selection, existingValue, aiValue) => {
 }
 
 /**
+ * Builds the initial selection state for a single cell.
+ * @param {string} existingValue - The existing translation.
+ * @param {string} aiValue - The AI-generated translation.
+ * @returns {{ mode: string, customValue: string }} The cell selection.
+ */
+const buildCellSelection = (existingValue, aiValue) => {
+  const existing = existingValue || ''
+  const ai = aiValue || ''
+  if (existing) return { mode: translationModes.existing, customValue: existing }
+  if (ai) return { mode: translationModes.ai, customValue: ai }
+  return { mode: translationModes.custom, customValue: '' }
+}
+
+/**
  * Builds the initial per-cell selection state from the job result items.
  * @param {Array} items - Job result items.
  * @param {string[]} otherLangs - Non-default language codes.
  * @returns {object} Selection state keyed by nodeDefUuid.
  */
-const buildInitialSelections = (items, otherLangs) => {
-  const state = {}
-  for (const item of items) {
-    state[item.nodeDefUuid] = { labels: {}, descs: {} }
-    for (const lang of otherLangs) {
-      const existingLabel = item.existingLabelsByLang[lang] || ''
-      const aiLabel = item.aiLabelsByLang[lang] || ''
-      state[item.nodeDefUuid].labels[lang] = {
-        mode: existingLabel ? translationModes.existing : aiLabel ? translationModes.ai : translationModes.custom,
-        customValue: existingLabel || aiLabel,
-      }
-      const existingDesc = item.existingDescriptionsByLang[lang] || ''
-      const aiDesc = item.aiDescriptionsByLang[lang] || ''
-      state[item.nodeDefUuid].descs[lang] = {
-        mode: existingDesc ? translationModes.existing : aiDesc ? translationModes.ai : translationModes.custom,
-        customValue: existingDesc || aiDesc,
-      }
-    }
-  }
-  return state
-}
+const buildInitialSelections = (items, otherLangs) =>
+  Object.fromEntries(
+    items.map((item) => [
+      item.nodeDefUuid,
+      {
+        labels: Object.fromEntries(
+          otherLangs.map((lang) => [
+            lang,
+            buildCellSelection(item.existingLabelsByLang[lang], item.aiLabelsByLang[lang]),
+          ])
+        ),
+        descs: Object.fromEntries(
+          otherLangs.map((lang) => [
+            lang,
+            buildCellSelection(item.existingDescriptionsByLang[lang], item.aiDescriptionsByLang[lang]),
+          ])
+        ),
+      },
+    ])
+  )
 
 /**
  * Single translation choice cell with radio options (existing / AI / custom).
