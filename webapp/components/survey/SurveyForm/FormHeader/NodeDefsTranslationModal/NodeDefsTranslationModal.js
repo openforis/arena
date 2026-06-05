@@ -73,7 +73,6 @@ const buildInitialSelections = (items, otherLangs) => {
  * @returns {React.ReactElement} The translation cell.
  */
 const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }) => {
-  const i18n = useI18n()
   const { mode, customValue } = selection
   const [isEditing, setIsEditing] = useState(false)
 

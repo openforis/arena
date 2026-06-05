@@ -71,6 +71,7 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
     const { job } = await API.startNodeDefsTranslationJob({ surveyId })
     dispatch(
       JobActions.showJobMonitor({
+        autoHide: true,
         job,
         onComplete: (completedJob) => setTranslationResult(completedJob.result),
       })
