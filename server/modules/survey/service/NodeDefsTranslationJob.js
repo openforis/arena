@@ -23,6 +23,58 @@ const chunkArray = (array, size) => {
 }
 
 /**
+ * Builds the flat list of translatable items and an index mapping each item id back to its node def.
+ * @param {Array} nodeDefs - Array of node definitions.
+ * @param {string} defaultLang - Survey default language code.
+ * @returns {{ items: Array, itemInfoById: object }} Items to translate and their metadata.
+ */
+const buildTranslationItems = (nodeDefs, defaultLang) => {
+  const items = []
+  const itemInfoById = {}
+
+  for (const nodeDef of nodeDefs) {
+    const uuid = NodeDef.getUuid(nodeDef)
+    const defaultLabel = NodeDef.getLabels(nodeDef)[defaultLang]
+    const defaultDesc = NodeDef.getDescription(defaultLang)(nodeDef)
+
+    if (StringUtils.isNotBlank(defaultLabel)) {
+      const id = `${uuid}_label`
+      items.push({ id, text: defaultLabel, kind: 'nodeDefLabel' })
+      itemInfoById[id] = { uuid, field: 'label' }
+    }
+    if (StringUtils.isNotBlank(defaultDesc)) {
+      const id = `${uuid}_desc`
+      items.push({ id, text: defaultDesc, kind: 'nodeDefDescription' })
+      itemInfoById[id] = { uuid, field: 'description' }
+    }
+  }
+
+  return { items, itemInfoById }
+}
+
+/**
+ * Merges a batch of translation results into the accumulated aiByNodeDef map.
+ * @param {Array} translations - Translations returned by the AI service for one batch.
+ * @param {object} itemInfoById - Index built by buildTranslationItems.
+ * @param {object} aiByNodeDef - Accumulator object (mutated in place).
+ * @returns {void}
+ */
+const applyBatchResult = (translations, itemInfoById, aiByNodeDef) => {
+  for (const { id, byLang } of translations) {
+    const info = itemInfoById[id]
+    if (!info) continue
+    if (!aiByNodeDef[info.uuid]) {
+      aiByNodeDef[info.uuid] = { aiLabels: {}, aiDescs: {} }
+    }
+    if (info.field === 'label') {
+      aiByNodeDef[info.uuid].aiLabels = byLang
+    } else {
+      aiByNodeDef[info.uuid].aiDescs = byLang
+    }
+  }
+}
+
+/**
  * Background job that translates all node definition labels and descriptions
  * from the survey's default language into every other survey language using AI.
  *
@@ -52,27 +104,7 @@ export default class NodeDefsTranslationJob extends Job {
     if (otherLangs.length === 0) return
 
     const nodeDefs = Survey.getNodeDefsArray(survey)
-
-    // Build flat list of translation items across all node defs
-    const items = []
-    const itemInfoById = {}
-
-    for (const nodeDef of nodeDefs) {
-      const uuid = NodeDef.getUuid(nodeDef)
-      const defaultLabel = NodeDef.getLabels(nodeDef)[defaultLang]
-      const defaultDesc = NodeDef.getDescription(defaultLang)(nodeDef)
-
-      if (StringUtils.isNotBlank(defaultLabel)) {
-        const id = `${uuid}_label`
-        items.push({ id, text: defaultLabel, kind: 'nodeDefLabel' })
-        itemInfoById[id] = { uuid, field: 'label' }
-      }
-      if (StringUtils.isNotBlank(defaultDesc)) {
-        const id = `${uuid}_desc`
-        items.push({ id, text: defaultDesc, kind: 'nodeDefDescription' })
-        itemInfoById[id] = { uuid, field: 'description' }
-      }
-    }
+    const { items, itemInfoById } = buildTranslationItems(nodeDefs, defaultLang)
 
     const batches = chunkArray(items, BATCH_SIZE)
     this.total = batches.length
@@ -88,18 +120,7 @@ export default class NodeDefsTranslationJob extends Job {
         targetLangs: otherLangs,
         items: batch,
       })
-      for (const { id, byLang } of result.translations) {
-        const info = itemInfoById[id]
-        if (!info) continue
-        if (!aiByNodeDef[info.uuid]) {
-          aiByNodeDef[info.uuid] = { aiLabels: {}, aiDescs: {} }
-        }
-        if (info.field === 'label') {
-          aiByNodeDef[info.uuid].aiLabels = byLang
-        } else {
-          aiByNodeDef[info.uuid].aiDescs = byLang
-        }
-      }
+      applyBatchResult(result.translations, itemInfoById, aiByNodeDef)
       this.incrementProcessedItems()
     }
 
@@ -111,35 +132,29 @@ export default class NodeDefsTranslationJob extends Job {
 
     const nodeDefs = Survey.getNodeDefDescendantsAndSelf()(survey)
 
-    const resultItems = nodeDefs
-      .filter((nd) => {
-        const defaultLabel = NodeDef.getLabels(nd)[defaultLang]
-        const defaultDesc = NodeDef.getDescription(defaultLang)(nd)
-        return StringUtils.isNotBlank(defaultLabel) || StringUtils.isNotBlank(defaultDesc)
-      })
-      .map((nd) => {
-        const uuid = NodeDef.getUuid(nd)
-        const path = Survey.getNodeDefPath({ nodeDef: nd })(survey)
-        const ai = aiByNodeDef[uuid] || {}
+    const resultItems = nodeDefs.map((nd) => {
+      const uuid = NodeDef.getUuid(nd)
+      const path = Survey.getNodeDefPath({ nodeDef: nd })(survey)
+      const ai = aiByNodeDef[uuid] || {}
 
-        const existingLabelsByLang = {}
-        const existingDescriptionsByLang = {}
-        for (const lang of otherLangs) {
-          existingLabelsByLang[lang] = NodeDef.getLabels(nd)[lang] || ''
-          existingDescriptionsByLang[lang] = NodeDef.getDescription(lang)(nd) || ''
-        }
+      const existingLabelsByLang = {}
+      const existingDescriptionsByLang = {}
+      for (const lang of otherLangs) {
+        existingLabelsByLang[lang] = NodeDef.getLabels(nd)[lang] || ''
+        existingDescriptionsByLang[lang] = NodeDef.getDescription(lang)(nd) || ''
+      }
 
-        return {
-          nodeDefUuid: uuid,
-          path,
-          defaultLangLabel: NodeDef.getLabels(nd)[defaultLang] || '',
-          defaultLangDescription: NodeDef.getDescription(defaultLang)(nd) || '',
-          existingLabelsByLang,
-          existingDescriptionsByLang,
-          aiLabelsByLang: ai.aiLabels || {},
-          aiDescriptionsByLang: ai.aiDescs || {},
-        }
-      })
+      return {
+        nodeDefUuid: uuid,
+        path,
+        defaultLangLabel: NodeDef.getLabels(nd)[defaultLang] || '',
+        defaultLangDescription: NodeDef.getDescription(defaultLang)(nd) || '',
+        existingLabelsByLang,
+        existingDescriptionsByLang,
+        aiLabelsByLang: ai.aiLabels || {},
+        aiDescriptionsByLang: ai.aiDescs || {},
+      }
+    })
 
     this.setResult({ defaultLang, languages, otherLangs, items: resultItems })
   }

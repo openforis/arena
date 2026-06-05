@@ -1,6 +1,6 @@
 import './NodeDefsTranslationModal.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
@@ -44,13 +44,13 @@ const buildInitialSelections = (items, otherLangs) => {
       const existingLabel = item.existingLabelsByLang[lang] || ''
       const aiLabel = item.aiLabelsByLang[lang] || ''
       state[item.nodeDefUuid].labels[lang] = {
-        mode: existingLabel ? translationModes.existing : translationModes.ai,
+        mode: existingLabel ? translationModes.existing : aiLabel ? translationModes.ai : translationModes.custom,
         customValue: existingLabel || aiLabel,
       }
       const existingDesc = item.existingDescriptionsByLang[lang] || ''
       const aiDesc = item.aiDescriptionsByLang[lang] || ''
       state[item.nodeDefUuid].descs[lang] = {
-        mode: existingDesc ? translationModes.existing : translationModes.ai,
+        mode: existingDesc ? translationModes.existing : aiDesc ? translationModes.ai : translationModes.custom,
         customValue: existingDesc || aiDesc,
       }
     }
@@ -169,8 +169,17 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
   const [isSaving, setIsSaving] = useState(false)
   const [showDescriptions, setShowDescriptions] = useState(false)
   const [selections, setSelections] = useState(() => buildInitialSelections(items, otherLangs))
+  const [defaultLangValues, setDefaultLangValues] = useState(() => {
+    const state = {}
+    for (const item of items) {
+      state[item.nodeDefUuid] = { label: item.defaultLangLabel || '', description: item.defaultLangDescription || '' }
+    }
+    return state
+  })
 
-  const hasDescriptions = useMemo(() => items.some((item) => item.defaultLangDescription), [items])
+  const updateDefaultLangValue = useCallback((nodeDefUuid, field, value) => {
+    setDefaultLangValues((prev) => ({ ...prev, [nodeDefUuid]: { ...prev[nodeDefUuid], [field]: value } }))
+  }, [])
 
   const updateSelection = useCallback((nodeDefUuid, field, lang, newSelection) => {
     setSelections((prev) => ({
@@ -189,22 +198,17 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
     setIsSaving(true)
     try {
       const nodeDefs = items.map((item) => {
-        const {
-          nodeDefUuid,
-          defaultLangLabel,
-          defaultLangDescription,
-          existingLabelsByLang,
-          existingDescriptionsByLang,
-          aiLabelsByLang,
-          aiDescriptionsByLang,
-        } = item
+        const { nodeDefUuid, existingLabelsByLang, existingDescriptionsByLang, aiLabelsByLang, aiDescriptionsByLang } =
+          item
         const itemSelections = selections[nodeDefUuid]
+        const effectiveDefaultLabel = defaultLangValues[nodeDefUuid].label
+        const effectiveDefaultDesc = defaultLangValues[nodeDefUuid].description
 
-        const labels = { [defaultLang]: defaultLangLabel }
+        const labels = { [defaultLang]: effectiveDefaultLabel }
         const descriptions = {}
 
-        if (defaultLangDescription) {
-          descriptions[defaultLang] = defaultLangDescription
+        if (effectiveDefaultDesc) {
+          descriptions[defaultLang] = effectiveDefaultDesc
         }
 
         for (const lang of otherLangs) {
@@ -214,7 +218,7 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
             existingDescriptionsByLang[lang],
             aiDescriptionsByLang[lang]
           )
-          if (defaultLangDescription || descValue) {
+          if (effectiveDefaultDesc || descValue) {
             descriptions[lang] = descValue
           }
         }
@@ -236,7 +240,19 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
     } finally {
       setIsSaving(false)
     }
-  }, [cycle, defaultLang, dispatch, items, notifyError, notifyInfo, onClose, otherLangs, selections, surveyId])
+  }, [
+    cycle,
+    defaultLang,
+    defaultLangValues,
+    dispatch,
+    items,
+    notifyError,
+    notifyInfo,
+    onClose,
+    otherLangs,
+    selections,
+    surveyId,
+  ])
 
   const onToggleDescriptions = useCallback((e) => setShowDescriptions(e.target.checked), [])
 
@@ -248,14 +264,12 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
       title="surveyForm:nodeDefsTranslation.title"
     >
       <ModalBody>
-        {hasDescriptions && (
-          <div className="node-defs-translation-modal__toolbar">
-            <label className="node-defs-translation-modal__show-descriptions">
-              <input type="checkbox" checked={showDescriptions} onChange={onToggleDescriptions} />
-              {i18n.t('surveyForm:nodeDefsTranslation.showDescriptions')}
-            </label>
-          </div>
-        )}
+        <div className="node-defs-translation-modal__toolbar">
+          <label className="node-defs-translation-modal__show-descriptions">
+            <input type="checkbox" checked={showDescriptions} onChange={onToggleDescriptions} />
+            {i18n.t('surveyForm:nodeDefsTranslation.showDescriptions')}
+          </label>
+        </div>
         <div className="node-defs-translation-modal__table-wrapper">
           <table className="node-defs-translation-modal__table">
             <thead>
@@ -296,10 +310,20 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
                   aiDescriptionsByLang,
                 } = item
                 const itemSels = selections[nodeDefUuid]
+                const defaultValues = defaultLangValues[nodeDefUuid]
                 return (
                   <tr key={nodeDefUuid}>
                     <td className="path-cell">{path}</td>
-                    <td className="default-value-cell">{defaultLangLabel}</td>
+                    <td className="default-value-cell">
+                      {defaultLangLabel || (
+                        <input
+                          className="default-lang-input"
+                          type="text"
+                          value={defaultValues.label}
+                          onChange={(e) => updateDefaultLangValue(nodeDefUuid, 'label', e.target.value)}
+                        />
+                      )}
+                    </td>
                     {otherLangs.map((lang) => (
                       <td key={`label-${nodeDefUuid}-${lang}`}>
                         <TranslationCell
@@ -313,7 +337,16 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
                     ))}
                     {showDescriptions && (
                       <>
-                        <td className="default-value-cell">{defaultLangDescription}</td>
+                        <td className="default-value-cell">
+                          {defaultLangDescription || (
+                            <input
+                              className="default-lang-input"
+                              type="text"
+                              value={defaultValues.description}
+                              onChange={(e) => updateDefaultLangValue(nodeDefUuid, 'description', e.target.value)}
+                            />
+                          )}
+                        </td>
                         {otherLangs.map((lang) => (
                           <td key={`desc-${nodeDefUuid}-${lang}`}>
                             <TranslationCell
