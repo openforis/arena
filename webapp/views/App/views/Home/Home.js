@@ -1,4 +1,3 @@
-import React from 'react'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 

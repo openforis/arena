@@ -9,6 +9,7 @@ import PropTypes from 'prop-types'
 import { Objects } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
+
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 import { SimpleTextInput } from '../SimpleTextInput'
@@ -87,7 +88,6 @@ export const Input = React.forwardRef((props, ref) => {
           disabled={disabled || readOnly}
           className={className}
           customInput={TextField}
-          data-testid={id}
           getInputRef={(el) => {
             inputRef.current = el
           }}
@@ -97,6 +97,7 @@ export const Input = React.forwardRef((props, ref) => {
           onFocus={onFocus}
           onValueChange={onFormattedValueChange}
           placeholder={placeholder}
+          slotProps={{ htmlInput: { 'data-testid': id } }}
           title={title}
           type={type}
           value={value}

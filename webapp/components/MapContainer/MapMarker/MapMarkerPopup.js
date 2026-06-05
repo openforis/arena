@@ -1,4 +1,3 @@
-import React from 'react'
 import { Popup } from 'react-leaflet'
 
 import Markdown from '@webapp/components/markdown'

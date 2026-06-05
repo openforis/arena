@@ -1,4 +1,3 @@
-import React from 'react'
 
 import { noHeaderModules } from '@webapp/app/appModules'
 import ModuleSwitch from '@webapp/components/moduleSwitch'

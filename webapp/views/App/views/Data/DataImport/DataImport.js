@@ -1,6 +1,5 @@
 import './DataImport.scss'
 
-import React from 'react'
 
 import { useI18n } from '@webapp/store/system'
 

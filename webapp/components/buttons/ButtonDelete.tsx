@@ -1,9 +1,8 @@
-import React from 'react'
 import classNames from 'classnames'
 
-import { Button } from './Button'
+import { Button, ButtonProps } from './Button'
 
-export const ButtonDelete = (props) => {
+export const ButtonDelete = (props: ButtonProps) => {
   const { className, label = 'common.delete' } = props
   return (
     <Button
@@ -14,8 +13,4 @@ export const ButtonDelete = (props) => {
       variant="text"
     />
   )
-}
-
-ButtonDelete.propTypes = {
-  ...Button.propTypes,
 }

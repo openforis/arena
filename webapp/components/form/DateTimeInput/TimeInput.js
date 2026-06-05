@@ -1,6 +1,5 @@
 import './TimeInput.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import { TimePicker } from '@mui/x-date-pickers/TimePicker'
 

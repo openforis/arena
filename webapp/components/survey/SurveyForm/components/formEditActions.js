@@ -1,4 +1,3 @@
-import React from 'react'
 import { useDispatch } from 'react-redux'
 
 import { RecordActions } from '@webapp/store/ui/record'

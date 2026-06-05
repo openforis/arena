@@ -139,4 +139,17 @@ En Arena Mobile:
   exportLabels_csv: 'Exportar etiquetas (CSV)',
   exportLabels_xlsx: 'Exportar etiquetas (Excel)',
   importLabels: 'Importar etiquetas desde Excel o CSV',
+  aiTranslateLabels: 'IA: Traducir etiquetas',
+  nodeDefsTranslation: {
+    apply: 'Aplicar traducciones',
+    applySuccess: 'Traducciones aplicadas correctamente',
+    aiSuggestion: 'IA',
+    current: 'Actual',
+    custom: 'Personalizado',
+    defaultDescription: 'Descripción por defecto',
+    defaultLabel: 'Etiqueta por defecto',
+    path: 'Ruta',
+    showDescriptions: 'Mostrar descripciones',
+    title: 'Traducir etiquetas de definiciones de nodos',
+  },
 }

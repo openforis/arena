@@ -1,6 +1,5 @@
 import './nodeDefText.scss'
 
-import React from 'react'
 import classNames from 'classnames'
 
 import { Strings } from '@openforis/arena-core'

@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'

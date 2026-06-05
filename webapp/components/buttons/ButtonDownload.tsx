@@ -1,11 +1,18 @@
 import React, { forwardRef, useCallback } from 'react'
 import axios from 'axios'
-import PropTypes from 'prop-types'
 
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonProps } from '@webapp/components/buttons'
 import * as DomUtils from '@webapp/utils/domUtils'
 
-export const ButtonDownload = forwardRef((props, ref) => {
+type ButtonDownloadProps = Omit<ButtonProps, 'onClick'> & {
+  downloadInMemory?: boolean
+  fileName?: string | null
+  href?: string | null
+  onClick?: () => boolean | void | Promise<boolean | void>
+  requestParams?: Record<string, unknown> | null
+}
+
+export const ButtonDownload = forwardRef<HTMLButtonElement, ButtonDownloadProps>((props, ref) => {
   const {
     downloadInMemory = true,
     fileName = null,
@@ -24,16 +31,14 @@ export const ButtonDownload = forwardRef((props, ref) => {
       responseType: 'blob',
     })
 
-    // Extract filename from Content-Disposition header if not provided
-    const contentDisposition = response.headers['content-disposition']
-    const extractedFileName = contentDisposition?.split('filename=')[1]?.replace(/"/g, '')
+    const contentDisposition: string | undefined = response.headers['content-disposition']
+    const extractedFileName = contentDisposition?.split('filename=')[1]?.replaceAll('"', '')
 
-    // Use response.data directly (it's already a Blob from axios)
     DomUtils.downloadBlobToFile(response.data, fileName ?? extractedFileName ?? 'download')
   }, [href, requestParams, fileName])
 
   const onClick = useCallback(async () => {
-    let onClickResult
+    let onClickResult: boolean | void
     if (onClickProp) {
       onClickResult = await onClickProp()
     }
@@ -41,10 +46,9 @@ export const ButtonDownload = forwardRef((props, ref) => {
       if (downloadInMemory) {
         await handleDownloadInMemory()
       } else {
-        // direct link download
         let url = href
         if (requestParams) {
-          const params = new URLSearchParams(requestParams)
+          const params = new URLSearchParams(requestParams as Record<string, string>)
           url += `?${params.toString()}`
         }
         globalThis.open(url, '_blank')
@@ -57,11 +61,4 @@ export const ButtonDownload = forwardRef((props, ref) => {
   )
 })
 
-ButtonDownload.propTypes = {
-  ...Button.propTypes,
-  downloadInMemory: PropTypes.bool, // if true, downloads the file in memory and then triggers the download. If false, uses direct link download
-  fileName: PropTypes.string, // required if href is specified
-  href: PropTypes.string, // specify href, onClick or both
-  onClick: PropTypes.func, // specify href, onClick or both. If onClick is specified and returns false, href will not be used
-  requestParams: PropTypes.object,
-}
+ButtonDownload.displayName = 'ButtonDownload'

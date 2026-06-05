@@ -1,6 +1,5 @@
 import './SortToggle.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 const SortToggle = ({ sort, field, handleSortBy }) => {

@@ -1,4 +1,3 @@
-import React from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 import PropTypes from 'prop-types'
 

@@ -1,5 +1,4 @@
 import './Notification.scss'
-import React from 'react'
 import { useDispatch } from 'react-redux'
 import { CSSTransition } from 'react-transition-group'
 

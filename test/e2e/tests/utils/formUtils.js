@@ -2,11 +2,11 @@ import { Objects } from '@openforis/arena-core'
 
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 
-const getInputSelector = (id) => `${getSelector(id)} input`
-const getTextAreaSelector = (id) => `${getSelector(id)} textarea`
+const getInputSelector = (id) => `input${getSelector(id)}`
+const getTextAreaSelector = (id) => `textarea${getSelector(id)}`
 
 const fillInput = async (id, value) => {
-  const selector = `${getSelector(id)} input`
+  const selector = getInputSelector(id)
   await page.fill(selector, value)
 }
 

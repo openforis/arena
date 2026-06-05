@@ -1,4 +1,3 @@
-import React from 'react'
 import { useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'

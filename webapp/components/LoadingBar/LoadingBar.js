@@ -1,5 +1,4 @@
 import './loadingBar.scss'
-import React from 'react'
 
 import ProgressBar from '@webapp/components/progressBar'
 

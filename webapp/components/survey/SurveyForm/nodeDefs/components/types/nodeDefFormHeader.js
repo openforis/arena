@@ -1,6 +1,5 @@
 import './nodeDefFormHeader.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'

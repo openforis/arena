@@ -1,8 +1,7 @@
-import React from 'react'
 
-import { Button } from './Button'
+import { Button, ButtonProps } from './Button'
 
-export const ButtonIconAdd = (props) => {
+export const ButtonIconAdd = (props: ButtonProps) => {
   const { className = 'btn-add', label = 'common.add', showLabel = false, variant = 'text' } = props
   return (
     <Button
@@ -14,8 +13,4 @@ export const ButtonIconAdd = (props) => {
       variant={variant}
     />
   )
-}
-
-ButtonIconAdd.propTypes = {
-  ...Button.propTypes,
 }

@@ -1,5 +1,4 @@
 import './Guest.scss'
-import React from 'react'
 
 import * as ProcessUtils from '@core/processUtils'
 

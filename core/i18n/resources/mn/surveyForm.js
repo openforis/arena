@@ -140,4 +140,17 @@ Arena Mobile дээр:
   exportLabels_csv: 'Шошгыг экспортлох (CSV)',
   exportLabels_xlsx: 'Шошгыг экспортлох (Excel)',
   importLabels: 'Шошгыг Excel эсвэл CSV-ээс импортлох',
+  aiTranslateLabels: 'AI: Шошгыг орчуулах',
+  nodeDefsTranslation: {
+    apply: 'Орчуулга хэрэгжүүлэх',
+    applySuccess: 'Орчуулга амжилттай хэрэгжлээ',
+    aiSuggestion: 'AI',
+    current: 'Одоогийн',
+    custom: 'Захиалгат',
+    defaultDescription: 'Үндсэн тайлбар',
+    defaultLabel: 'Үндсэн шошго',
+    path: 'Зам',
+    showDescriptions: 'Тайлбар харуулах',
+    title: 'Зангилааны тодорхойлолтын шошгыг орчуулах',
+  },
 }

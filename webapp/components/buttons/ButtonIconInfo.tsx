@@ -1,9 +1,8 @@
-import React from 'react'
 import classNames from 'classnames'
 
-import { Button } from './Button'
+import { Button, ButtonProps } from './Button'
 
-export const ButtonIconInfo = (props) => {
+export const ButtonIconInfo = (props: ButtonProps) => {
   const { className: classNameProp, onClick, variant = 'text', ...otherProps } = props
 
   const className = classNames('btn-info', classNameProp)
@@ -17,9 +16,4 @@ export const ButtonIconInfo = (props) => {
       variant={variant}
     />
   )
-}
-
-ButtonIconInfo.propTypes = {
-  ...Button.propTypes,
-  onClick: Button.propTypes.onClick,
 }
