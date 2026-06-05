@@ -117,8 +117,9 @@ const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }
         <div className="translation-option">
           <RadioButton
             checked={mode === translationModes.existing}
-            onClick={() => onModeChange(translationModes.existing)}
             label="surveyForm:nodeDefsTranslation.current"
+            onClick={() => onModeChange(translationModes.existing)}
+            value={translationModes.existing}
           />
           <span className="option-text">{existingValue}</span>
         </div>
@@ -127,8 +128,9 @@ const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }
         <div className="translation-option">
           <RadioButton
             checked={mode === translationModes.ai}
-            onClick={() => onModeChange(translationModes.ai)}
             label="surveyForm:nodeDefsTranslation.aiSuggestion"
+            onClick={() => onModeChange(translationModes.ai)}
+            value={translationModes.ai}
           />
           <span className="option-text">{aiValue}</span>
         </div>
@@ -136,8 +138,9 @@ const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }
       <div className="translation-option translation-option--custom">
         <RadioButton
           checked={mode === translationModes.custom}
-          onClick={() => onModeChange(translationModes.custom)}
           label="surveyForm:nodeDefsTranslation.custom"
+          onClick={() => onModeChange(translationModes.custom)}
+          value={translationModes.custom}
         />
         <SimpleTextInput
           className="translation-custom-input"

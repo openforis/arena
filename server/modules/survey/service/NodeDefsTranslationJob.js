@@ -101,7 +101,10 @@ export default class NodeDefsTranslationJob extends Job {
     const languages = Survey.getLanguages(surveyInfo)
     const otherLangs = languages.filter((l) => l !== defaultLang)
 
-    if (otherLangs.length === 0) return
+    if (otherLangs.length === 0) {
+      this.setContext({ survey, defaultLang, languages, otherLangs, aiByNodeDef: {} })
+      return
+    }
 
     const nodeDefs = Survey.getNodeDefsArray(survey)
     const { items, itemInfoById } = buildTranslationItems(nodeDefs, defaultLang)
