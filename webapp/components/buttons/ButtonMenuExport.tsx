@@ -61,7 +61,7 @@ export const ButtonMenuExport = (props: ButtonMenuExportProps) => {
           label={labelByFileFormat[fileFormat]}
           href={href}
           onClick={onClick}
-          requestParams={href ? { ...(requestParams ?? {}), fileFormat } : null}
+          requestParams={href ? { ...requestParams, fileFormat } : null}
           variant="text"
         />
       ),

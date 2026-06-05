@@ -61,11 +61,10 @@ const resolveValue = (selection: CellSelection, existingValue: string, aiValue: 
   return selection.customValue
 }
 
-const buildCellSelection = (existingValue: string, aiValue: string): CellSelection => {
+const buildCellSelection = (existingValue: string, aiValue: string = ''): CellSelection => {
   const existing = existingValue || ''
-  const ai = aiValue || ''
   if (existing) return { mode: translationModes.existing, customValue: existing }
-  if (ai) return { mode: translationModes.ai, customValue: ai }
+  if (aiValue) return { mode: translationModes.ai, customValue: aiValue }
   return { mode: translationModes.custom, customValue: '' }
 }
 

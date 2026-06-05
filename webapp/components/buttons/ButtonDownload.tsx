@@ -26,13 +26,13 @@ export const ButtonDownload = forwardRef<HTMLButtonElement, ButtonDownloadProps>
   } = props
 
   const handleDownloadInMemory = useCallback(async () => {
-    const response = await axios.get(href!, {
+    const response = await axios.get(href, {
       params: requestParams,
       responseType: 'blob',
     })
 
-    const contentDisposition = response.headers['content-disposition']
-    const extractedFileName = contentDisposition?.split('filename=')[1]?.replace(/"/g, '')
+    const contentDisposition: string | undefined = response.headers['content-disposition']
+    const extractedFileName = contentDisposition?.split('filename=')[1]?.replaceAll('"', '')
 
     DomUtils.downloadBlobToFile(response.data, fileName ?? extractedFileName ?? 'download')
   }, [href, requestParams, fileName])

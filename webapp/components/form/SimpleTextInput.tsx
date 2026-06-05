@@ -93,7 +93,7 @@ export const SimpleTextInput = forwardRef<HTMLDivElement, Props>((props, ref) =>
       onFocus={onFocus}
       placeholder={placeholder}
       rows={rows}
-      title={title !== undefined ? String(title) : undefined}
+      title={title === undefined ? undefined : String(title)}
       type={type}
       value={value}
     />
