@@ -8,7 +8,7 @@ import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
 import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonIconEdit } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 
 const translationModes = {
@@ -60,6 +60,7 @@ const buildInitialSelections = (items, otherLangs) => {
 
 /**
  * Single translation choice cell with radio options (existing / AI / custom).
+ * Starts in view mode showing the resolved value; an edit icon switches to full edit mode.
  * @param {object} props - Component props.
  * @param {string} props.cellId - Unique radio group name.
  * @param {string} props.existingValue - Existing translation value.
@@ -71,6 +72,7 @@ const buildInitialSelections = (items, otherLangs) => {
 const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }) => {
   const i18n = useI18n()
   const { mode, customValue } = selection
+  const [isEditing, setIsEditing] = useState(false)
 
   const onModeChange = useCallback((newMode) => onChange({ mode: newMode, customValue }), [customValue, onChange])
 
@@ -80,6 +82,19 @@ const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }
   )
 
   const onCustomClick = useCallback(() => onModeChange(translationModes.custom), [onModeChange])
+
+  const resolvedValue = resolveValue(selection, existingValue, aiValue)
+
+  if (!isEditing) {
+    return (
+      <div className="translation-cell translation-cell--view">
+        <span className="translation-cell__value">
+          {resolvedValue || <em className="translation-cell__empty">—</em>}
+        </span>
+        <ButtonIconEdit onClick={() => setIsEditing(true)} />
+      </div>
+    )
+  }
 
   return (
     <div className="translation-cell">
@@ -131,6 +146,38 @@ const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }
       </label>
     </div>
   )
+}
+
+/**
+ * Editable cell for the default-language label/description.
+ * Starts in view mode; clicking the edit icon reveals the text input.
+ * @param {object} props - Component props.
+ * @param {string} props.value - Current text value.
+ * @param {Function} props.onChange - Callback invoked with the synthetic event.
+ * @returns {React.ReactElement} The cell.
+ */
+const DefaultLangCell = ({ value, onChange }) => {
+  const [isEditing, setIsEditing] = useState(false)
+
+  if (!isEditing) {
+    return (
+      <div className="default-lang-cell--view">
+        <span className="default-lang-cell__value">{value || <em className="translation-cell__empty">—</em>}</span>
+        <ButtonIconEdit onClick={() => setIsEditing(true)} />
+      </div>
+    )
+  }
+
+  return <input className="default-lang-input" type="text" value={value} onChange={onChange} autoFocus />
+}
+
+DefaultLangCell.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+}
+
+DefaultLangCell.defaultProps = {
+  value: '',
 }
 
 TranslationCell.propTypes = {
@@ -313,9 +360,7 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
                   <tr key={nodeDefUuid}>
                     <td className="path-cell">{path}</td>
                     <td className="default-value-cell">
-                      <input
-                        className="default-lang-input"
-                        type="text"
+                      <DefaultLangCell
                         value={defaultValues.label}
                         onChange={(e) => updateDefaultLangValue(nodeDefUuid, 'label', e.target.value)}
                       />
@@ -334,9 +379,7 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
                     {showDescriptions && (
                       <>
                         <td className="default-value-cell">
-                          <input
-                            className="default-lang-input"
-                            type="text"
+                          <DefaultLangCell
                             value={defaultValues.description}
                             onChange={(e) => updateDefaultLangValue(nodeDefUuid, 'description', e.target.value)}
                           />

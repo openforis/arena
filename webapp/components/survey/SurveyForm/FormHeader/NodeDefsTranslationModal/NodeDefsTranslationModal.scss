@@ -81,11 +81,64 @@
   }
 }
 
+.default-lang-cell--view {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  .default-lang-cell__value {
+    flex: 1;
+    word-break: break-word;
+    font-size: 0.8rem;
+    color: var(--c-neutral-700, #444);
+  }
+
+  button {
+    flex-shrink: 0;
+    padding: 0;
+    min-width: 0;
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
 .translation-cell {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   min-width: 220px;
+
+  &--view {
+    flex-direction: row;
+    align-items: flex-start;
+    min-width: 150px;
+    gap: 0.3rem;
+
+    button {
+      flex-shrink: 0;
+      padding: 0;
+      min-width: 0;
+      opacity: 0.5;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__value {
+    flex: 1;
+    word-break: break-word;
+    color: var(--c-neutral-700, #444);
+  }
+
+  &__empty {
+    color: var(--c-neutral-400, #bdbdbd);
+    font-style: normal;
+  }
 }
 
 .translation-option {
