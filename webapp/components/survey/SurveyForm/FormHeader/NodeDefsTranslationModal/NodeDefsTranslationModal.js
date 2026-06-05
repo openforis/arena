@@ -10,6 +10,9 @@ import { SurveyActions, useSurveyId, useSurveyCycleKey } from '@webapp/store/sur
 import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { Button, ButtonIconEdit } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { RadioButton } from '@webapp/components/RadioButton'
+import Checkbox from '@webapp/components/form/checkbox'
+import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
 const translationModes = {
   existing: 'existing',
@@ -77,7 +80,7 @@ const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }
   const onModeChange = useCallback((newMode) => onChange({ mode: newMode, customValue }), [customValue, onChange])
 
   const onCustomValueChange = useCallback(
-    (e) => onChange({ mode: translationModes.custom, customValue: e.target.value }),
+    (value) => onChange({ mode: translationModes.custom, customValue: value }),
     [onChange]
   )
 
@@ -99,51 +102,39 @@ const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }
   return (
     <div className="translation-cell">
       {existingValue && (
-        <label className="translation-option">
-          <input
-            type="radio"
-            name={cellId}
-            value={translationModes.existing}
+        <div className="translation-option">
+          <RadioButton
             checked={mode === translationModes.existing}
-            onChange={() => onModeChange(translationModes.existing)}
+            onClick={() => onModeChange(translationModes.existing)}
+            label="surveyForm:nodeDefsTranslation.current"
           />
-          <span className="option-badge option-badge--existing">
-            {i18n.t('surveyForm:nodeDefsTranslation.current')}
-          </span>
           <span className="option-text">{existingValue}</span>
-        </label>
+        </div>
       )}
       {aiValue && (
-        <label className="translation-option">
-          <input
-            type="radio"
-            name={cellId}
-            value={translationModes.ai}
+        <div className="translation-option">
+          <RadioButton
             checked={mode === translationModes.ai}
-            onChange={() => onModeChange(translationModes.ai)}
+            onClick={() => onModeChange(translationModes.ai)}
+            label="surveyForm:nodeDefsTranslation.aiSuggestion"
           />
-          <span className="option-badge option-badge--ai">{i18n.t('surveyForm:nodeDefsTranslation.aiSuggestion')}</span>
           <span className="option-text">{aiValue}</span>
-        </label>
+        </div>
       )}
-      <label className="translation-option translation-option--custom">
-        <input
-          type="radio"
-          name={cellId}
-          value={translationModes.custom}
+      <div className="translation-option translation-option--custom">
+        <RadioButton
           checked={mode === translationModes.custom}
-          onChange={() => onModeChange(translationModes.custom)}
+          onClick={() => onModeChange(translationModes.custom)}
+          label="surveyForm:nodeDefsTranslation.custom"
         />
-        <span className="option-badge">{i18n.t('surveyForm:nodeDefsTranslation.custom')}</span>
-        <input
+        <SimpleTextInput
           className="translation-custom-input"
-          type="text"
           value={mode === translationModes.custom ? customValue : ''}
           disabled={mode !== translationModes.custom}
-          onClick={onCustomClick}
+          onFocus={onCustomClick}
           onChange={onCustomValueChange}
         />
-      </label>
+      </div>
     </div>
   )
 }
@@ -168,7 +159,7 @@ const DefaultLangCell = ({ value, onChange }) => {
     )
   }
 
-  return <input className="default-lang-input" type="text" value={value} onChange={onChange} autoFocus />
+  return <SimpleTextInput value={value} onChange={onChange} autoFocus />
 }
 
 DefaultLangCell.propTypes = {
@@ -205,6 +196,10 @@ TranslationCell.defaultProps = {
  */
 const NodeDefsTranslationModal = ({ result, onClose }) => {
   const { defaultLang, otherLangs, items } = result
+
+  const rootPrefix = items.find((item) => !item.path.includes(' / '))?.path
+  const displayPath = (path) =>
+    rootPrefix && path !== rootPrefix && path.startsWith(`${rootPrefix} / `) ? path.slice(rootPrefix.length + 3) : path
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -301,7 +296,7 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
     surveyId,
   ])
 
-  const onToggleDescriptions = useCallback((e) => setShowDescriptions(e.target.checked), [])
+  const onToggleDescriptions = useCallback((checked) => setShowDescriptions(checked), [])
 
   return (
     <Modal
@@ -312,10 +307,11 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
     >
       <ModalBody>
         <div className="node-defs-translation-modal__toolbar">
-          <label className="node-defs-translation-modal__show-descriptions">
-            <input type="checkbox" checked={showDescriptions} onChange={onToggleDescriptions} />
-            {i18n.t('surveyForm:nodeDefsTranslation.showDescriptions')}
-          </label>
+          <Checkbox
+            checked={showDescriptions}
+            label="surveyForm:nodeDefsTranslation.showDescriptions"
+            onChange={onToggleDescriptions}
+          />
         </div>
         <div className="node-defs-translation-modal__table-wrapper">
           <table className="node-defs-translation-modal__table">
@@ -358,11 +354,11 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
                 const defaultValues = defaultLangValues[nodeDefUuid]
                 return (
                   <tr key={nodeDefUuid}>
-                    <td className="path-cell">{path}</td>
+                    <td className="path-cell">{displayPath(path)}</td>
                     <td className="default-value-cell">
                       <DefaultLangCell
                         value={defaultValues.label}
-                        onChange={(e) => updateDefaultLangValue(nodeDefUuid, 'label', e.target.value)}
+                        onChange={(value) => updateDefaultLangValue(nodeDefUuid, 'label', value)}
                       />
                     </td>
                     {otherLangs.map((lang) => (
@@ -381,7 +377,7 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
                         <td className="default-value-cell">
                           <DefaultLangCell
                             value={defaultValues.description}
-                            onChange={(e) => updateDefaultLangValue(nodeDefUuid, 'description', e.target.value)}
+                            onChange={(value) => updateDefaultLangValue(nodeDefUuid, 'description', value)}
                           />
                         </td>
                         {otherLangs.map((lang) => (

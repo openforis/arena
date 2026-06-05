@@ -23,14 +23,6 @@
     margin-bottom: 0.5rem;
   }
 
-  &__show-descriptions {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    cursor: pointer;
-    font-size: 0.875rem;
-  }
-
   &__table-wrapper {
     flex: 1;
     overflow: auto;
@@ -69,14 +61,6 @@
       max-width: 180px;
       white-space: normal;
       word-break: break-word;
-
-      .default-lang-input {
-        width: 100%;
-        padding: 0.2rem 0.3rem;
-        border: 1px solid var(--c-neutral-400, #bdbdbd);
-        border-radius: 3px;
-        font-size: 0.8rem;
-      }
     }
   }
 }
@@ -106,13 +90,15 @@
 }
 
 .translation-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.5rem;
+  row-gap: 0.1rem;
+  align-items: center;
   min-width: 220px;
 
   &--view {
-    flex-direction: row;
+    display: flex;
     align-items: flex-start;
     min-width: 150px;
     gap: 0.3rem;
@@ -142,48 +128,25 @@
 }
 
 .translation-option {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  cursor: pointer;
-  font-size: 0.8rem;
-  white-space: normal;
+  display: contents;
 
-  input[type='radio'] {
-    flex-shrink: 0;
-    cursor: pointer;
+  .radio-button-group-item {
+    margin: 0;
+
+    .MuiRadio-root {
+      padding: 2px;
+    }
+
+    .MuiFormControlLabel-label {
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
   }
 
   .option-text {
-    flex: 1;
     word-break: break-word;
     color: var(--c-neutral-700, #444);
-  }
-
-  &--custom {
-    align-items: center;
-  }
-}
-
-.option-badge {
-  flex-shrink: 0;
-  font-size: 0.65rem;
-  font-weight: 600;
-  padding: 0.1rem 0.3rem;
-  border-radius: 3px;
-  background: var(--c-neutral-200, #ebebeb);
-  color: var(--c-neutral-600, #666);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-
-  &--existing {
-    background: var(--c-secondary-100, #e8f5e9);
-    color: var(--c-secondary-700, #2e7d32);
-  }
-
-  &--ai {
-    background: var(--c-primary-100, #e3f2fd);
-    color: var(--c-primary-700, #1565c0);
+    font-size: 0.8rem;
   }
 }
 
@@ -191,14 +154,5 @@
   flex: 1;
   min-width: 0;
   width: 100%;
-  padding: 0.2rem 0.3rem;
-  border: 1px solid var(--c-neutral-400, #bdbdbd);
-  border-radius: 3px;
   font-size: 0.8rem;
-
-  &:disabled {
-    background: var(--c-neutral-100, #f5f5f5);
-    color: var(--c-neutral-400, #bdbdbd);
-    cursor: not-allowed;
-  }
 }
