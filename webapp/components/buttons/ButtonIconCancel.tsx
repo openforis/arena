@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { Button } from './Button'
+import { Button, ButtonProps } from './Button'
 
-export const ButtonIconCancel = (props) => {
+export const ButtonIconCancel = (props: ButtonProps) => {
   const { className = 'btn-cancel', label = 'common.cancel', showLabel = false, variant = 'text' } = props
   return (
     <Button
@@ -14,8 +14,4 @@ export const ButtonIconCancel = (props) => {
       variant={variant}
     />
   )
-}
-
-ButtonIconCancel.propTypes = {
-  ...Button.propTypes,
 }

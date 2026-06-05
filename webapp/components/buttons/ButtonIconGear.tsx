@@ -1,12 +1,8 @@
 import React from 'react'
 
-import { Button } from './Button'
+import { Button, ButtonProps } from './Button'
 
-export const ButtonIconGear = (props) => {
+export const ButtonIconGear = (props: ButtonProps) => {
   const { variant = 'text' } = props
   return <Button {...props} iconClassName="icon-cog icon-14px" variant={variant} />
-}
-
-ButtonIconGear.propTypes = {
-  ...Button.propTypes,
 }

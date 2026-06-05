@@ -1,11 +1,35 @@
 import React, { forwardRef, useCallback } from 'react'
-import PropTypes from 'prop-types'
 import { TextField as MuiTextField } from '@mui/material'
 import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 
-export const SimpleTextInput = forwardRef((props, ref) => {
+type Props = {
+  autoComplete?: string
+  autoFocus?: boolean
+  className?: string
+  defaultValue?: string
+  disabled?: boolean
+  endAdornment?: React.ReactNode
+  id?: string
+  label?: string
+  maxLength?: number
+  name?: string
+  onBlur?: React.FocusEventHandler<HTMLInputElement>
+  onChange?: (value: string) => void
+  onFocus?: React.FocusEventHandler<HTMLInputElement>
+  placeholder?: string
+  readOnly?: boolean
+  rows?: number
+  startAdornment?: React.ReactNode
+  testId?: string
+  textTransformFunction?: (value: string) => string
+  title?: string | number
+  type?: string
+  value?: string | number
+}
+
+export const SimpleTextInput = forwardRef<HTMLDivElement, Props>((props, ref) => {
   const {
     autoComplete = 'off',
     autoFocus,
@@ -34,20 +58,20 @@ export const SimpleTextInput = forwardRef((props, ref) => {
   const i18n = useI18n()
 
   const onChange = useCallback(
-    (e) => {
-      const value = e.target.value
-      let valueTransformed = textTransformFunction ? textTransformFunction(value) : value
-      if (valueTransformed && maxLength > 0) {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const val = e.target.value
+      let valueTransformed = textTransformFunction ? textTransformFunction(val) : val
+      if (valueTransformed && maxLength && maxLength > 0) {
         valueTransformed = valueTransformed.substring(0, maxLength)
       }
-      onChangeProp(valueTransformed)
+      onChangeProp?.(valueTransformed)
     },
     [maxLength, onChangeProp, textTransformFunction]
   )
 
   const label = labelProp ? i18n.t(labelProp) : labelProp
   const placeholder = placeholderProp ? i18n.t(placeholderProp) : placeholderProp
-  const multiline = rows > 1
+  const multiline = rows !== undefined && rows > 1
 
   return (
     <MuiTextField
@@ -58,11 +82,8 @@ export const SimpleTextInput = forwardRef((props, ref) => {
       disabled={disabled || readOnly}
       label={label}
       id={id}
-      InputProps={{
-        'data-testid': testId,
-        startAdornment,
-        endAdornment,
-      }}
+      inputProps={{ 'data-testid': testId }}
+      InputProps={{ startAdornment, endAdornment }}
       inputRef={ref}
       margin="none"
       multiline={multiline}
@@ -72,34 +93,11 @@ export const SimpleTextInput = forwardRef((props, ref) => {
       onFocus={onFocus}
       placeholder={placeholder}
       rows={rows}
-      title={title}
+      title={title !== undefined ? String(title) : undefined}
       type={type}
       value={value}
     />
   )
 })
 
-SimpleTextInput.propTypes = {
-  autoComplete: PropTypes.string,
-  autoFocus: PropTypes.bool,
-  className: PropTypes.string,
-  defaultValue: PropTypes.string,
-  disabled: PropTypes.bool,
-  endAdornment: PropTypes.any,
-  id: PropTypes.string,
-  label: PropTypes.string,
-  maxLength: PropTypes.number,
-  name: PropTypes.string,
-  onBlur: PropTypes.func,
-  onChange: PropTypes.func,
-  onFocus: PropTypes.func,
-  placeholder: PropTypes.string,
-  readOnly: PropTypes.bool,
-  rows: PropTypes.number,
-  startAdornment: PropTypes.any,
-  testId: PropTypes.string,
-  textTransformFunction: PropTypes.func,
-  title: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  type: PropTypes.string,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-}
+SimpleTextInput.displayName = 'SimpleTextInput'

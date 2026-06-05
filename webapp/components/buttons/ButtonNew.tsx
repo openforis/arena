@@ -1,9 +1,9 @@
 import React from 'react'
 import classNames from 'classnames'
 
-import { Button } from './Button'
+import { Button, ButtonProps } from './Button'
 
-export const ButtonNew = (props) => {
+export const ButtonNew = (props: ButtonProps) => {
   const { label = 'common.new' } = props
   return (
     <Button
@@ -13,8 +13,4 @@ export const ButtonNew = (props) => {
       label={label}
     />
   )
-}
-
-ButtonNew.propTypes = {
-  ...Button.propTypes,
 }

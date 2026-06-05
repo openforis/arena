@@ -1,7 +1,6 @@
 import './NodeDefsTranslationModal.scss'
 
 import React, { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
 import * as API from '@webapp/service/api'
@@ -14,32 +13,55 @@ import { RadioButton } from '@webapp/components/RadioButton'
 import Checkbox from '@webapp/components/form/checkbox'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
-const translationModes = {
+type TranslationMode = 'existing' | 'ai' | 'custom'
+
+const translationModes: Record<TranslationMode, TranslationMode> = {
   existing: 'existing',
   ai: 'ai',
   custom: 'custom',
 }
 
-/**
- * Resolves the translated string from a cell selection.
- * @param {object} selection - Cell selection state.
- * @param {string} existingValue - The existing translation.
- * @param {string} aiValue - The AI-generated translation.
- * @returns {string} The resolved translation string.
- */
-const resolveValue = (selection, existingValue, aiValue) => {
+type CellSelection = {
+  mode: TranslationMode
+  customValue: string
+}
+
+type TranslationItem = {
+  nodeDefUuid: string
+  path: string
+  defaultLangLabel: string
+  defaultLangDescription: string
+  existingLabelsByLang: Record<string, string>
+  existingDescriptionsByLang: Record<string, string>
+  aiLabelsByLang: Record<string, string>
+  aiDescriptionsByLang: Record<string, string>
+}
+
+type JobResult = {
+  defaultLang: string
+  languages: string[]
+  otherLangs: string[]
+  items: TranslationItem[]
+}
+
+type PerLangSelections = Record<string, CellSelection>
+
+type ItemSelections = {
+  labels: PerLangSelections
+  descs: PerLangSelections
+}
+
+type SelectionsState = Record<string, ItemSelections>
+
+type DefaultLangValuesState = Record<string, { label: string; description: string }>
+
+const resolveValue = (selection: CellSelection, existingValue: string, aiValue: string): string => {
   if (selection.mode === translationModes.existing) return existingValue || ''
   if (selection.mode === translationModes.ai) return aiValue || ''
   return selection.customValue
 }
 
-/**
- * Builds the initial selection state for a single cell.
- * @param {string} existingValue - The existing translation.
- * @param {string} aiValue - The AI-generated translation.
- * @returns {{ mode: string, customValue: string }} The cell selection.
- */
-const buildCellSelection = (existingValue, aiValue) => {
+const buildCellSelection = (existingValue: string, aiValue: string): CellSelection => {
   const existing = existingValue || ''
   const ai = aiValue || ''
   if (existing) return { mode: translationModes.existing, customValue: existing }
@@ -47,13 +69,7 @@ const buildCellSelection = (existingValue, aiValue) => {
   return { mode: translationModes.custom, customValue: '' }
 }
 
-/**
- * Builds the initial per-cell selection state from the job result items.
- * @param {Array} items - Job result items.
- * @param {string[]} otherLangs - Non-default language codes.
- * @returns {object} Selection state keyed by nodeDefUuid.
- */
-const buildInitialSelections = (items, otherLangs) =>
+const buildInitialSelections = (items: TranslationItem[], otherLangs: string[]): SelectionsState =>
   Object.fromEntries(
     items.map((item) => [
       item.nodeDefUuid,
@@ -74,25 +90,31 @@ const buildInitialSelections = (items, otherLangs) =>
     ])
   )
 
-/**
- * Single translation choice cell with radio options (existing / AI / custom).
- * Starts in view mode showing the resolved value; an edit icon switches to full edit mode.
- * @param {object} props - Component props.
- * @param {string} props.cellId - Unique radio group name.
- * @param {string} props.existingValue - Existing translation value.
- * @param {string} props.aiValue - AI-generated translation value.
- * @param {object} props.selection - Current selection state {mode, customValue}.
- * @param {Function} props.onChange - Callback invoked with updated selection.
- * @returns {React.ReactElement} The translation cell.
- */
-const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }) => {
+type TranslationCellProps = {
+  cellId: string
+  existingValue?: string
+  aiValue?: string
+  selection: CellSelection
+  onChange: (selection: CellSelection) => void
+}
+
+const TranslationCell = ({
+  cellId: _cellId,
+  existingValue = '',
+  aiValue = '',
+  selection,
+  onChange,
+}: TranslationCellProps) => {
   const { mode, customValue } = selection
   const [isEditing, setIsEditing] = useState(false)
 
-  const onModeChange = useCallback((newMode) => onChange({ mode: newMode, customValue }), [customValue, onChange])
+  const onModeChange = useCallback(
+    (newMode: TranslationMode) => onChange({ mode: newMode, customValue }),
+    [customValue, onChange]
+  )
 
   const onCustomValueChange = useCallback(
-    (value) => onChange({ mode: translationModes.custom, customValue: value }),
+    (value: string) => onChange({ mode: translationModes.custom, customValue: value }),
     [onChange]
   )
 
@@ -144,25 +166,22 @@ const TranslationCell = ({ cellId, existingValue, aiValue, selection, onChange }
         />
         <SimpleTextInput
           className="translation-custom-input"
-          value={mode === translationModes.custom ? customValue : ''}
           disabled={mode !== translationModes.custom}
           onFocus={onCustomClick}
           onChange={onCustomValueChange}
+          value={mode === translationModes.custom ? customValue : ''}
         />
       </div>
     </div>
   )
 }
 
-/**
- * Editable cell for the default-language label/description.
- * Starts in view mode; clicking the edit icon reveals the text input.
- * @param {object} props - Component props.
- * @param {string} props.value - Current text value.
- * @param {Function} props.onChange - Callback invoked with the synthetic event.
- * @returns {React.ReactElement} The cell.
- */
-const DefaultLangCell = ({ value, onChange }) => {
+type DefaultLangCellProps = {
+  value?: string
+  onChange: (value: string) => void
+}
+
+const DefaultLangCell = ({ value = '', onChange }: DefaultLangCellProps) => {
   const [isEditing, setIsEditing] = useState(false)
 
   if (!isEditing) {
@@ -177,43 +196,16 @@ const DefaultLangCell = ({ value, onChange }) => {
   return <SimpleTextInput value={value} onChange={onChange} autoFocus />
 }
 
-DefaultLangCell.propTypes = {
-  value: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
+type NodeDefsTranslationModalProps = {
+  result: JobResult
+  onClose: () => void
 }
 
-DefaultLangCell.defaultProps = {
-  value: '',
-}
-
-TranslationCell.propTypes = {
-  cellId: PropTypes.string.isRequired,
-  existingValue: PropTypes.string,
-  aiValue: PropTypes.string,
-  selection: PropTypes.shape({ mode: PropTypes.string, customValue: PropTypes.string }).isRequired,
-  onChange: PropTypes.func.isRequired,
-}
-
-TranslationCell.defaultProps = {
-  existingValue: '',
-  aiValue: '',
-}
-
-/**
- * Modal that displays the AI-generated node definition label/description
- * translations for user review. The user can choose among the existing
- * translation, the AI suggestion, or a custom value per cell, then apply
- * all confirmed translations in one bulk request.
- * @param {object} props - Component props.
- * @param {object} props.result - Job result from NodeDefsTranslationJob.
- * @param {Function} props.onClose - Callback invoked to close the modal.
- * @returns {React.ReactElement} The modal component.
- */
-const NodeDefsTranslationModal = ({ result, onClose }) => {
+const NodeDefsTranslationModal = ({ result, onClose }: NodeDefsTranslationModalProps) => {
   const { defaultLang, otherLangs, items } = result
 
   const rootPrefix = items.find((item) => !item.path.includes(' / '))?.path
-  const displayPath = (path) =>
+  const displayPath = (path: string) =>
     rootPrefix && path !== rootPrefix && path.startsWith(`${rootPrefix} / `) ? path.slice(rootPrefix.length + 3) : path
 
   const dispatch = useDispatch()
@@ -225,31 +217,34 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
 
   const [isSaving, setIsSaving] = useState(false)
   const [showDescriptions, setShowDescriptions] = useState(false)
-  const [selections, setSelections] = useState(() => buildInitialSelections(items, otherLangs))
-  const [defaultLangValues, setDefaultLangValues] = useState(() => {
-    const state = {}
+  const [selections, setSelections] = useState<SelectionsState>(() => buildInitialSelections(items, otherLangs))
+  const [defaultLangValues, setDefaultLangValues] = useState<DefaultLangValuesState>(() => {
+    const state: DefaultLangValuesState = {}
     for (const item of items) {
       state[item.nodeDefUuid] = { label: item.defaultLangLabel || '', description: item.defaultLangDescription || '' }
     }
     return state
   })
 
-  const updateDefaultLangValue = useCallback((nodeDefUuid, field, value) => {
+  const updateDefaultLangValue = useCallback((nodeDefUuid: string, field: 'label' | 'description', value: string) => {
     setDefaultLangValues((prev) => ({ ...prev, [nodeDefUuid]: { ...prev[nodeDefUuid], [field]: value } }))
   }, [])
 
-  const updateSelection = useCallback((nodeDefUuid, field, lang, newSelection) => {
-    setSelections((prev) => ({
-      ...prev,
-      [nodeDefUuid]: {
-        ...prev[nodeDefUuid],
-        [field]: {
-          ...prev[nodeDefUuid][field],
-          [lang]: newSelection,
+  const updateSelection = useCallback(
+    (nodeDefUuid: string, field: 'labels' | 'descs', lang: string, newSelection: CellSelection) => {
+      setSelections((prev) => ({
+        ...prev,
+        [nodeDefUuid]: {
+          ...prev[nodeDefUuid],
+          [field]: {
+            ...prev[nodeDefUuid][field],
+            [lang]: newSelection,
+          },
         },
-      },
-    }))
-  }, [])
+      }))
+    },
+    []
+  )
 
   const onApply = useCallback(async () => {
     setIsSaving(true)
@@ -261,8 +256,8 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
         const effectiveDefaultLabel = defaultLangValues[nodeDefUuid].label
         const effectiveDefaultDesc = defaultLangValues[nodeDefUuid].description
 
-        const labels = { [defaultLang]: effectiveDefaultLabel }
-        const descriptions = {}
+        const labels: Record<string, string> = { [defaultLang]: effectiveDefaultLabel }
+        const descriptions: Record<string, string> = {}
 
         if (effectiveDefaultDesc) {
           descriptions[defaultLang] = effectiveDefaultDesc
@@ -280,7 +275,7 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
           }
         }
 
-        const props = { labels }
+        const props: { labels: Record<string, string>; descriptions?: Record<string, string> } = { labels }
         if (Object.keys(descriptions).length > 0) {
           props.descriptions = descriptions
         }
@@ -292,8 +287,9 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
       notifyInfo({ key: 'surveyForm:nodeDefsTranslation.applySuccess' })
       dispatch(SurveyActions.resetSurveyDefs())
       onClose()
-    } catch (error) {
-      notifyError({ key: 'appErrors:generic', params: { text: error?.message ?? 'unknown' } })
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'unknown'
+      notifyError({ key: 'appErrors:generic', params: { text: message } })
     } finally {
       setIsSaving(false)
     }
@@ -311,7 +307,7 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
     surveyId,
   ])
 
-  const onToggleDescriptions = useCallback((checked) => setShowDescriptions(checked), [])
+  const onToggleDescriptions = useCallback((checked: boolean) => setShowDescriptions(checked), [])
 
   return (
     <Modal
@@ -427,16 +423,6 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
       </ModalFooter>
     </Modal>
   )
-}
-
-NodeDefsTranslationModal.propTypes = {
-  result: PropTypes.shape({
-    defaultLang: PropTypes.string.isRequired,
-    languages: PropTypes.arrayOf(PropTypes.string).isRequired,
-    otherLangs: PropTypes.arrayOf(PropTypes.string).isRequired,
-    items: PropTypes.arrayOf(PropTypes.object).isRequired,
-  }).isRequired,
-  onClose: PropTypes.func.isRequired,
 }
 
 export default NodeDefsTranslationModal

@@ -1,29 +1,49 @@
 import './ButtonMenu.scss'
 
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
-import { Button } from './Button'
+import { Button, ButtonProps } from './Button'
 
-export const ButtonMenu = (props) => {
+export type ButtonMenuItem = {
+  key: string
+  className?: string
+  content?: React.ReactNode
+  icon?: React.ReactNode
+  iconClassName?: string
+  label?: string
+  labelIsI18nKey?: boolean
+  labelParams?: Record<string, unknown>
+  onClick?: () => void
+  testId?: string
+}
+
+type ButtonMenuProps = ButtonProps & {
+  closeMenuOnItemClick?: boolean
+  items: ButtonMenuItem[]
+  menuClassName?: string
+  onItemClick?: (item: ButtonMenuItem) => void
+  selectedItemKey?: string
+}
+
+export const ButtonMenu = (props: ButtonMenuProps) => {
   const {
     className,
     closeMenuOnItemClick = true,
     menuClassName,
     items,
-    onItemClick: onItemClickProp = undefined,
-    selectedItemKey = undefined,
+    onItemClick: onItemClickProp,
+    selectedItemKey,
     testId = null,
     variant = 'text',
     ...otherProps
   } = props
 
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
-  const onButtonClick = (event) => {
+  const onButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
 
@@ -31,7 +51,7 @@ export const ButtonMenu = (props) => {
     setAnchorEl(null)
   }
 
-  const onItemClick = (item) => () => {
+  const onItemClick = (item: ButtonMenuItem) => () => {
     item.onClick?.()
     onItemClickProp?.(item)
     if (closeMenuOnItemClick) {
@@ -50,7 +70,6 @@ export const ButtonMenu = (props) => {
         variant={variant}
         {...otherProps}
       >
-        {/* show small arrow down icon on the right */}
         <span className="icon icon-ctrl button-menu__button-icon" />
       </Button>
 
@@ -78,26 +97,4 @@ export const ButtonMenu = (props) => {
       </Menu>
     </>
   )
-}
-
-ButtonMenu.propTypes = {
-  ...Button.propTypes,
-  closeMenuOnItemClick: PropTypes.bool,
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      className: PropTypes.string,
-      content: PropTypes.node,
-      icon: PropTypes.node,
-      iconClassName: PropTypes.string,
-      label: PropTypes.string,
-      labelIsI18nKey: PropTypes.bool,
-      labelParams: PropTypes.object,
-      onClick: PropTypes.func,
-      testId: PropTypes.string,
-    })
-  ),
-  onItemClick: PropTypes.func,
-  menuClassName: PropTypes.string,
-  selectedItemKey: PropTypes.string,
 }
