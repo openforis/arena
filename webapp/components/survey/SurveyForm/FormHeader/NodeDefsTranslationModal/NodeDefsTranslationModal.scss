@@ -1,8 +1,13 @@
 .node-defs-translation-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   .modal-content {
     width: 90vw;
     max-width: 1600px;
     height: 85vh;
+    margin: 0;
     display: flex;
     flex-direction: column;
   }
@@ -47,10 +52,12 @@
       position: sticky;
       top: 0;
       z-index: 1;
+      resize: horizontal;
+      overflow: hidden;
+      min-width: 80px;
     }
 
     .path-cell {
-      max-width: 200px;
       white-space: normal;
       word-break: break-word;
       font-family: monospace;
@@ -58,7 +65,6 @@
     }
 
     .default-value-cell {
-      max-width: 180px;
       white-space: normal;
       word-break: break-word;
     }
