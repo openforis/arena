@@ -302,8 +302,6 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
                 const {
                   nodeDefUuid,
                   path,
-                  defaultLangLabel,
-                  defaultLangDescription,
                   existingLabelsByLang,
                   existingDescriptionsByLang,
                   aiLabelsByLang,
@@ -315,14 +313,12 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
                   <tr key={nodeDefUuid}>
                     <td className="path-cell">{path}</td>
                     <td className="default-value-cell">
-                      {defaultLangLabel || (
-                        <input
-                          className="default-lang-input"
-                          type="text"
-                          value={defaultValues.label}
-                          onChange={(e) => updateDefaultLangValue(nodeDefUuid, 'label', e.target.value)}
-                        />
-                      )}
+                      <input
+                        className="default-lang-input"
+                        type="text"
+                        value={defaultValues.label}
+                        onChange={(e) => updateDefaultLangValue(nodeDefUuid, 'label', e.target.value)}
+                      />
                     </td>
                     {otherLangs.map((lang) => (
                       <td key={`label-${nodeDefUuid}-${lang}`}>
@@ -338,14 +334,12 @@ const NodeDefsTranslationModal = ({ result, onClose }) => {
                     {showDescriptions && (
                       <>
                         <td className="default-value-cell">
-                          {defaultLangDescription || (
-                            <input
-                              className="default-lang-input"
-                              type="text"
-                              value={defaultValues.description}
-                              onChange={(e) => updateDefaultLangValue(nodeDefUuid, 'description', e.target.value)}
-                            />
-                          )}
+                          <input
+                            className="default-lang-input"
+                            type="text"
+                            value={defaultValues.description}
+                            onChange={(e) => updateDefaultLangValue(nodeDefUuid, 'description', e.target.value)}
+                          />
                         </td>
                         {otherLangs.map((lang) => (
                           <td key={`desc-${nodeDefUuid}-${lang}`}>
