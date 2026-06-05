@@ -86,8 +86,7 @@ export const Input = React.forwardRef((props, ref) => {
           autoFocus={autoFocus}
           disabled={disabled || readOnly}
           className={className}
-          customInput={TextField}
-          data-testid={id}
+          customInput={SimpleTextInput}
           getInputRef={(el) => {
             inputRef.current = el
           }}
@@ -97,6 +96,7 @@ export const Input = React.forwardRef((props, ref) => {
           onFocus={onFocus}
           onValueChange={onFormattedValueChange}
           placeholder={placeholder}
+          testId={id}
           title={title}
           type={type}
           value={value}
