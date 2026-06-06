@@ -145,7 +145,16 @@ const _adaptValue = async ({
 }
 
 const _addOrUpdateAttribute =
-  ({ survey, categoryItemProvider, taxonProvider, entity, attributeDef, value: valueParam, sideEffect = false }) =>
+  ({
+    survey,
+    categoryItemProvider,
+    taxonProvider,
+    entity,
+    attributeDef,
+    value: valueParam,
+    refData = null,
+    sideEffect = false,
+  }) =>
   async (record) => {
     const attributeDefUuid = NodeDef.getUuid(attributeDef)
     const attribute = RecordReader.getNodeChildByDefUuid(entity, attributeDefUuid)(record)
@@ -163,10 +172,20 @@ const _addOrUpdateAttribute =
       // create new attribute
       const updateResult = new RecordUpdateResult({ record })
       const attributeCreated = Node.newNode(attributeDefUuid, record.uuid, entity, value)
-      updateResult.addNode(attributeCreated, { sideEffect })
+      const attributeToAdd = refData ? NodeRefData.assocRefData(refData)(attributeCreated) : attributeCreated
+      updateResult.addNode(attributeToAdd, { sideEffect })
       return updateResult
     }
-    return updateAttributeValue({ survey, record, entity, attributeDef, attribute, value, sideEffect })
+    return updateAttributeValue({
+      survey,
+      record,
+      entity,
+      attributeDef,
+      attribute,
+      value,
+      refData,
+      sideEffect,
+    })
   }
 
 const _addEntityAndKeyValues =
@@ -347,6 +366,7 @@ const updateAttributesInEntityWithValues =
     survey,
     entity,
     valuesByDefUuid,
+    refDataByDefUuid = null,
     categoryItemProvider,
     taxonProvider,
     timezoneOffset,
@@ -386,6 +406,8 @@ const updateAttributesInEntityWithValues =
           nodeDefUuid: attributeDefUuid,
         })(currentRecord)
 
+        const refData = refDataByDefUuid?.[attributeDefUuid] ?? null
+
         const attributeUpdateResult = await _addOrUpdateAttribute({
           survey,
           categoryItemProvider,
@@ -393,6 +415,7 @@ const updateAttributesInEntityWithValues =
           entity: attributeParentEntity,
           attributeDef,
           value,
+          refData,
           sideEffect,
         })(currentRecord)
 

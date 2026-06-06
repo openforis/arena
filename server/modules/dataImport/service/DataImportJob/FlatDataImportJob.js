@@ -199,7 +199,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     })
   }
 
-  async onRowItem({ valuesByDefUuid, errors }) {
+  async onRowItem({ valuesByDefUuid, refDataByDefUuid, errors }) {
     const { context } = this
     const { survey, includeFiles, insertMissingNodes, user } = context
 
@@ -235,6 +235,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         survey,
         entityDefUuid: this.ancestorMultipleEntityDefUuid,
         valuesByDefUuid,
+        refDataByDefUuid,
         categoryItemProvider,
         taxonProvider,
         insertMissingNodes,
@@ -258,6 +259,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         survey,
         entity,
         valuesByDefUuid,
+        refDataByDefUuid,
         sideEffect,
         categoryItemProvider,
         taxonProvider,

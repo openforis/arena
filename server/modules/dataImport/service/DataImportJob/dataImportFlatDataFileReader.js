@@ -8,6 +8,7 @@ import * as Category from '@core/survey/category'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
 import * as DateUtils from '@core/dateUtils'
 import * as StringUtils from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
@@ -79,15 +80,15 @@ const extractVernacularNameUuid = ({ taxon, vernacularName }) => {
   return TaxonVernacularName.getUuid(vernacularNameObj)
 }
 
-const findCategoryItemUuid = async ({ survey, categoryItemProvider, nodeDef, code }) => {
-  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
-  if (itemUuid) {
-    return itemUuid
-  }
+const findCategoryItem = async ({ survey, categoryItemProvider, nodeDef, code }) => {
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const codePaths = [code] // only first level items are supported at this stage
-  const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
-  return item ? item.uuid : null
+  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
+  if (itemUuid) {
+    const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
+    return item ?? { uuid: itemUuid }
+  }
+  return categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
 }
 
 const findTaxon = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
@@ -98,28 +99,31 @@ const findTaxon = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
   )
 }
 
-const valueConverterByNodeDefType = {
+const nodeValueAndRefDataExtractorByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ value, headers }) => {
     const val = singlePropValueConverter({ value })
     if (!allowedBooleanValues.includes(String(val).toLocaleLowerCase())) {
       throw new SystemError('validationErrors:dataImport.invalidBoolean', { value: val, headers })
     }
-    return String(booleanTrueValues.includes(String(val).toLocaleLowerCase()))
+    return { value: String(booleanTrueValues.includes(String(val).toLocaleLowerCase())), refData: null }
   },
   [NodeDef.nodeDefType.code]: async ({ survey, categoryItemProvider, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]
 
     const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     if (Category.isFlat(category) || !NodeDef.getParentCodeDefUuid(nodeDef)) {
-      const itemUuid = await findCategoryItemUuid({ survey, categoryItemProvider, nodeDef, code })
-      if (!itemUuid) {
+      const item = await findCategoryItem({ survey, categoryItemProvider, nodeDef, code })
+      if (!item) {
         const attributeName = NodeDef.getName(nodeDef)
         throw new SystemError('validationErrors:dataImport.invalidCode', { code, attributeName })
       }
-      return Node.newNodeValueCode({ itemUuid, code })
+      return {
+        value: Node.newNodeValueCode({ itemUuid: item.uuid, code }),
+        refData: { [NodeRefData.keys.categoryItem]: item },
+      }
     }
     // cannot determine itemUuid for hiearachical category items at this stage; item can depend on selected parent item;
-    return Node.newNodeValueCode({ code })
+    return { value: Node.newNodeValueCode({ code }), refData: null }
   },
   [NodeDef.nodeDefType.coordinate]: ({ nodeDef, value }) => {
     const srsId = StringUtils.removePrefix(Srs.idPrefix)(value[Node.valuePropsCoordinate.srs])
@@ -133,17 +137,19 @@ const valueConverterByNodeDefType = {
       }
       return acc
     }, {})
-    return Node.newNodeValueCoordinate({ x, y, srsId, ...additionalValuesByField })
+    return { value: Node.newNodeValueCoordinate({ x, y, srsId, ...additionalValuesByField }), refData: null }
   },
-  [NodeDef.nodeDefType.date]: ({ value, headers }) =>
-    extractDateOrTime({
+  [NodeDef.nodeDefType.date]: ({ value, headers }) => ({
+    value: extractDateOrTime({
       value,
       allowedFormats: allowedDateFormats,
       formatTo: DateUtils.formats.dateISO,
       headers,
       errorKey: 'validationErrors:dataImport.invalidDate',
     }),
-  [NodeDef.nodeDefType.decimal]: numericValueConverter,
+    refData: null,
+  }),
+  [NodeDef.nodeDefType.decimal]: (params) => ({ value: numericValueConverter(params), refData: null }),
   [NodeDef.nodeDefType.file]: ({ value, headers }) => {
     const { fileName, fileUuid: fileUuidInValue } = value
     if (Objects.isEmpty(fileName)) {
@@ -151,11 +157,14 @@ const valueConverterByNodeDefType = {
     }
     const fileUuid = fileUuidInValue ?? uuidv4()
     return {
-      [Node.valuePropsFile.fileUuid]: fileUuid,
-      [Node.valuePropsFile.fileName]: fileName,
+      value: {
+        [Node.valuePropsFile.fileUuid]: fileUuid,
+        [Node.valuePropsFile.fileName]: fileName,
+      },
+      refData: null,
     }
   },
-  [NodeDef.nodeDefType.integer]: numericValueConverter,
+  [NodeDef.nodeDefType.integer]: (params) => ({ value: numericValueConverter(params), refData: null }),
   [NodeDef.nodeDefType.taxon]: async ({ survey, taxonProvider, nodeDef, value, headers }) => {
     const taxonCode = value[Node.valuePropsTaxon.code]
     const taxon = await findTaxon({ survey, taxonProvider, nodeDef, taxonCode })
@@ -168,9 +177,12 @@ const valueConverterByNodeDefType = {
 
     if (taxonCode === Taxon.unlistedCode) {
       return {
-        [Node.valuePropsTaxon.taxonUuid]: taxonUuid,
-        [Node.valuePropsTaxon.scientificName]: scientificName,
-        [Node.valuePropsTaxon.vernacularName]: vernacularName,
+        value: {
+          [Node.valuePropsTaxon.taxonUuid]: taxonUuid,
+          [Node.valuePropsTaxon.scientificName]: scientificName,
+          [Node.valuePropsTaxon.vernacularName]: vernacularName,
+        },
+        refData: { [NodeRefData.keys.taxon]: taxon },
       }
     }
     const vernacularNameUuid = extractVernacularNameUuid({ taxon, vernacularName })
@@ -178,20 +190,22 @@ const valueConverterByNodeDefType = {
     if (vernacularNameUuid) {
       nodeValue[Node.valuePropsTaxon.vernacularNameUuid] = vernacularNameUuid
     }
-    return nodeValue
+    return { value: nodeValue, refData: { [NodeRefData.keys.taxon]: taxon } }
   },
   [NodeDef.nodeDefType.text]: ({ value }) => {
     const val = singlePropValueConverter({ value })
-    return val === null || val === undefined ? null : String(val)
+    return { value: val === null || val === undefined ? null : String(val), refData: null }
   },
-  [NodeDef.nodeDefType.time]: ({ value, headers }) =>
-    extractDateOrTime({
+  [NodeDef.nodeDefType.time]: ({ value, headers }) => ({
+    value: extractDateOrTime({
       value,
       allowedFormats: allowedTimeFormats,
       formatTo: DateUtils.formats.timeStorage,
       headers,
       errorKey: 'validationErrors:dataImport.invalidTime',
     }),
+    refData: null,
+  }),
 }
 
 const checkAllHeadersAreValid =
@@ -223,7 +237,6 @@ const _validateHeaders =
 
 /**
  * Creates a reader that transforms every row extracting a node value for each column associated to a node definition.
- *
  * @param {!object} params - The parameters object.
  * @param {!string} [params.stream] - File stream to be read.
  * @param {!string} [params.fileFormat] - Format of the input file (csv or xlsx).
@@ -233,10 +246,10 @@ const _validateHeaders =
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!string} [params.nodeDefUuid] - The UUID of the node definition where data will be imported.
  * @param {!Function} [params.onRowItem] - Function invoked when a row is read.
- * @param {boolean} [params.includeAnalysis = false] - Whether to include analysis attributes or not.
- * @param {boolean} [params.validateHeaders = true] - Whether to validate input file headers or not.
- * @param {boolean} [params.includeFiles = false] - Whether to include file attributes or not.
- * @param {Function} [params.onTotalChange = null] - Function invoked when total number of rows is calculated.
+ * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes or not.
+ * @param {boolean} [params.validateHeaders] - Whether to validate input file headers or not.
+ * @param {boolean} [params.includeFiles] - Whether to include file attributes or not.
+ * @param {Function} [params.onTotalChange] - Function invoked when total number of rows is calculated.
  * @returns {object} - Object with start and cancel functions to control the reader.
  */
 const createReaderFromStream = ({
@@ -276,16 +289,17 @@ const createReaderFromStream = ({
     },
     onRow: async (row) => {
       // combine several columns into single values for every attribute definition
-      const valuesByDefUuidTemp = csvDataExportModel.columns.reduce((valuesByDefUuidAcc, column) => {
+      const valuesByDefUuidTemp = {}
+      for (const column of csvDataExportModel.columns) {
         const { header, nodeDef, valueProp = VALUE_PROP_DEFAULT } = column
 
-        if (!Object.hasOwn(row, header)) return valuesByDefUuidAcc
+        if (!Object.hasOwn(row, header)) continue
 
         const cellValue = row[header]
-        if (Objects.isEmpty(cellValue)) return valuesByDefUuidAcc
+        if (Objects.isEmpty(cellValue)) continue
 
         const nodeDefUuid = NodeDef.getUuid(nodeDef)
-        const valueTemp = valuesByDefUuidAcc[nodeDefUuid] ?? {}
+        const valueTemp = valuesByDefUuidTemp[nodeDefUuid] ?? {}
         let valueHeaders = valueTemp._headers
         if (!valueHeaders) {
           valueHeaders = []
@@ -293,28 +307,29 @@ const createReaderFromStream = ({
         }
         valueHeaders.push(header)
         valueTemp[valueProp] = cellValue
-        valuesByDefUuidAcc[nodeDefUuid] = valueTemp
-        return valuesByDefUuidAcc
-      }, {})
+        valuesByDefUuidTemp[nodeDefUuid] = valueTemp
+      }
 
       // prepare attribute values
       const errors = []
       const valuesByDefUuid = {}
+      const refDataByDefUuid = {}
       for (const [nodeDefUuid, valueTemp] of Object.entries(valuesByDefUuidTemp)) {
         const headers = valueTemp._headers
         delete valueTemp._headers
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-        const valueConverter = valueConverterByNodeDefType[NodeDef.getType(nodeDef)]
+        const extractor = nodeValueAndRefDataExtractorByNodeDefType[NodeDef.getType(nodeDef)]
         try {
-          const nodeValue = Objects.isEmpty(valueTemp)
-            ? null
-            : await valueConverter({ survey, categoryItemProvider, taxonProvider, nodeDef, value: valueTemp, headers })
+          const { value: nodeValue, refData } = Objects.isEmpty(valueTemp)
+            ? { value: null, refData: null }
+            : await extractor({ survey, categoryItemProvider, taxonProvider, nodeDef, value: valueTemp, headers })
           valuesByDefUuid[nodeDefUuid] = nodeValue
+          refDataByDefUuid[nodeDefUuid] = refData
         } catch (error) {
           errors.push(error)
         }
       }
-      await onRowItem({ row, valuesByDefUuid, errors })
+      await onRowItem({ row, valuesByDefUuid, refDataByDefUuid, errors })
     },
     onTotalChange,
   })
