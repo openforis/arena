@@ -8,7 +8,9 @@ import { getChunkFileName } from '../tempFileUtils'
 
 export { checkCanAccessS3Bucket } from './fileRepositoryS3BucketCommon'
 
-const getTempFileKey = ({ fileUuid }) => `temp/${fileUuid}`
+const tempPrefix = 'temp/'
+
+const getTempFileKey = ({ fileUuid }) => `${tempPrefix}${fileUuid}`
 
 const {
   uploadFileContent,
@@ -16,6 +18,7 @@ const {
   getFileContentAsStream,
   getFileSize,
   deleteFile: deleteFileCommon,
+  listFiles,
 } = createS3BucketRepository({
   getFileKey: getTempFileKey,
 })
@@ -103,6 +106,20 @@ export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = nul
     await FileUtils.deleteFileAsync(finalFilePath).catch(() => null)
     throw error
   }
+}
+
+export const deleteOldTempFiles = async ({ olderThanHours }) => {
+  const files = await listFiles({ prefix: tempPrefix })
+  const cutoff = new Date(Date.now() - olderThanHours * 60 * 60 * 1000)
+  const oldFiles = files.filter((file) => {
+    const fileUuid = file.Key?.slice(tempPrefix.length)
+    return fileUuid && file.LastModified && file.LastModified < cutoff
+  })
+  for (const file of oldFiles) {
+    const fileUuid = file.Key.slice(tempPrefix.length)
+    await deleteFileCommon({ fileUuid })
+  }
+  return oldFiles.length
 }
 
 export { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream }
