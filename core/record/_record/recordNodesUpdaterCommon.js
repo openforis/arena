@@ -16,11 +16,6 @@ import * as NodeRefData from '@core/record/nodeRefData'
 
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
-// For big categories/taxonomies, items are not stored in the survey index.
-// The expression evaluator (NodeValueExtractor) resolves code/taxon values via node.refData or the survey index.
-// Without refData, isNotEmpty(attr) returns false even when the node has a value,
-// causing dependent relevancy rules to be evaluated incorrectly.
-// We populate refData for affected nodes before dependent evaluation runs.
 const _populateRefDataForCodeNode = async ({ survey, node, nodeDef, value, categoryItemProvider }) => {
   if (!categoryItemProvider || NodeRefData.getCategoryItem(node)) return
 
@@ -53,6 +48,11 @@ const _populateRefDataForTaxonNode = async ({ survey, node, nodeDef, value, taxo
   }
 }
 
+// For big categories/taxonomies, items are not stored in the survey index.
+// The expression evaluator (NodeValueExtractor) resolves code/taxon values via node.refData or the survey index.
+// Without refData, isNotEmpty(attr) returns false even when the node has a value,
+// causing dependent relevancy rules to be evaluated incorrectly.
+// We populate refData for affected nodes before dependent evaluation runs.
 const _populateRefDataForBigNodes = async ({ survey, nodes, categoryItemProvider, taxonProvider }) => {
   for (const node of Object.values(nodes)) {
     if (Node.isValueBlank(node)) continue
