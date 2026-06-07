@@ -85,9 +85,10 @@ const findCategoryItem = async ({ survey, categoryItemProvider, nodeDef, code })
   const codePaths = [code] // only first level items are supported at this stage
   const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
   if (itemUuid) {
-    const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
-    return item ?? { uuid: itemUuid }
+    // Item is in the survey index (non-big category); no DB call needed
+    return Survey.getCategoryItemByUuid(itemUuid)(survey) ?? { uuid: itemUuid }
   }
+  // Big category — not indexed in memory, must query the provider
   return categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
 }
 
