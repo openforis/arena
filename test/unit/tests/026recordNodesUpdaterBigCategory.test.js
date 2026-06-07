@@ -2,7 +2,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { RecordNodesUpdater } from '@core/record/_record/recordNodesUpdater'
 
@@ -85,7 +84,7 @@ describe('RecordNodesUpdater - big category relevancy', () => {
 
   it('dep attribute is NOT applicable when big category code attr has no value', async () => {
     const user = getContextUser()
-    const { survey, item } = await buildSurveyAndItem(user)
+    const { survey } = await buildSurveyAndItem(user)
 
     const categoryItemProvider = { getItemByUuid: async () => null }
 

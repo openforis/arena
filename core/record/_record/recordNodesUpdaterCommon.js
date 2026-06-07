@@ -21,37 +21,48 @@ const { updateNodesDependents } = CoreRecordNodesUpdater
 // Without refData, isNotEmpty(attr) returns false even when the node has a value,
 // causing dependent relevancy rules to be evaluated incorrectly.
 // We populate refData for affected nodes before dependent evaluation runs.
+const _populateRefDataForCodeNode = async ({ survey, node, nodeDef, value, categoryItemProvider }) => {
+  if (!categoryItemProvider || NodeRefData.getCategoryItem(node)) return
+
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  const category = categoryUuid ? Survey.getCategoryByUuid(categoryUuid)(survey) : null
+  if (!category || !Category.isBigCategory(category)) return
+
+  const itemUuid = NodeValues.getValueItemUuid(value)
+  if (!itemUuid) return
+
+  const item = await categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
+  if (item) {
+    node[NodeRefData.keys.refData] = { [NodeRefData.keys.categoryItem]: item }
+  }
+}
+
+const _populateRefDataForTaxonNode = async ({ survey, node, nodeDef, value, taxonProvider }) => {
+  if (!taxonProvider || NodeRefData.getTaxon(node)) return
+
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  const taxonomy = taxonomyUuid ? Survey.getTaxonomyByUuid(taxonomyUuid)(survey) : null
+  if (!taxonomy || !Taxonomy.isBigTaxonomy(taxonomy)) return
+
+  const taxonUuid = NodeValues.getTaxonUuid(value)
+  if (!taxonUuid) return
+
+  const taxon = await taxonProvider.getTaxonByUuid({ survey, taxonomyUuid, taxonUuid })
+  if (taxon) {
+    node[NodeRefData.keys.refData] = { [NodeRefData.keys.taxon]: taxon }
+  }
+}
+
 const _populateRefDataForBigNodes = async ({ survey, nodes, categoryItemProvider, taxonProvider }) => {
   for (const node of Object.values(nodes)) {
     if (Node.isValueBlank(node)) continue
 
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const value = Node.getValue(node)
-
-    if (NodeDef.isCode(nodeDef) && categoryItemProvider && !NodeRefData.getCategoryItem(node)) {
-      const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-      const category = categoryUuid ? Survey.getCategoryByUuid(categoryUuid)(survey) : null
-      if (!category || !Category.isBigCategory(category)) continue
-
-      const itemUuid = NodeValues.getValueItemUuid(value)
-      if (!itemUuid) continue
-
-      const item = await categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
-      if (item) {
-        node[NodeRefData.keys.refData] = { [NodeRefData.keys.categoryItem]: item }
-      }
-    } else if (NodeDef.isTaxon(nodeDef) && taxonProvider && !NodeRefData.getTaxon(node)) {
-      const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-      const taxonomy = taxonomyUuid ? Survey.getTaxonomyByUuid(taxonomyUuid)(survey) : null
-      if (!taxonomy || !Taxonomy.isBigTaxonomy(taxonomy)) continue
-
-      const taxonUuid = NodeValues.getTaxonUuid(value)
-      if (!taxonUuid) continue
-
-      const taxon = await taxonProvider.getTaxonByUuid({ survey, taxonomyUuid, taxonUuid })
-      if (taxon) {
-        node[NodeRefData.keys.refData] = { [NodeRefData.keys.taxon]: taxon }
-      }
+    if (NodeDef.isCode(nodeDef)) {
+      await _populateRefDataForCodeNode({ survey, node, nodeDef, value, categoryItemProvider })
+    } else if (NodeDef.isTaxon(nodeDef)) {
+      await _populateRefDataForTaxonNode({ survey, node, nodeDef, value, taxonProvider })
     }
   }
 }
