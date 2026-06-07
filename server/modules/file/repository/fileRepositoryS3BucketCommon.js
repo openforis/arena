@@ -81,6 +81,9 @@ export const createS3BucketRepository = ({ getFileKey }) => {
   }
 
   const listFiles = async ({ prefix }) => {
+    if (prefix === undefined || prefix === null) {
+      throw new TypeError('Missing S3 list prefix')
+    }
     const results = []
     let continuationToken
     do {

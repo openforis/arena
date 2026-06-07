@@ -111,9 +111,11 @@ export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = nul
 export const deleteOldTempFiles = async ({ olderThanHours }) => {
   const files = await listFiles({ prefix: tempPrefix })
   const cutoff = new Date(Date.now() - olderThanHours * 60 * 60 * 1000)
-  const oldFiles = files.filter((file) => file.LastModified < cutoff)
+  const oldFiles = files.filter((file) => {
+    const fileUuid = file.Key?.slice(tempPrefix.length)
+    return fileUuid && file.LastModified && file.LastModified < cutoff
+  })
   for (const file of oldFiles) {
-    // Key is like "temp/{fileUuid}" — strip the prefix to get the fileUuid
     const fileUuid = file.Key.slice(tempPrefix.length)
     await deleteFileCommon({ fileUuid })
   }
