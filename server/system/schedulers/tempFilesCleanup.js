@@ -32,7 +32,7 @@ const cleanupFileSystemTempFiles = async (olderThanHours = 4) => {
       for (const file of files) {
         const filePath = path.join(tempFolder, file)
         const stat = await fs.statSync(filePath)
-        if (stat.isFile() && (!olderThanHours || DateUtils.diffInHours(now, new Date(stat.ctime)) >= olderThanHours)) {
+        if (stat.isFile() && DateUtils.diffInHours(now, new Date(stat.ctime)) >= olderThanHours) {
           await fs.unlinkSync(filePath)
           Logger.debug('Temp file deleted', filePath)
           count++
