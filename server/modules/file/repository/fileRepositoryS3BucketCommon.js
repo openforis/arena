@@ -3,6 +3,7 @@ import {
   GetObjectCommand,
   HeadBucketCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3'
@@ -79,5 +80,29 @@ export const createS3BucketRepository = ({ getFileKey }) => {
     }
   }
 
-  return { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream, getFileSize, deleteFile, deleteFiles }
+  const listFiles = async ({ prefix }) => {
+    const results = []
+    let continuationToken
+    do {
+      const command = new ListObjectsV2Command({
+        Bucket,
+        Prefix: prefix,
+        ...(continuationToken ? { ContinuationToken: continuationToken } : {}),
+      })
+      const response = await _sendCommand(command)
+      results.push(...(response.Contents ?? []))
+      continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined
+    } while (continuationToken)
+    return results
+  }
+
+  return {
+    uploadFileContent,
+    uploadFileContentAsStream,
+    getFileContentAsStream,
+    getFileSize,
+    deleteFile,
+    deleteFiles,
+    listFiles,
+  }
 }
