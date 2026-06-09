@@ -1028,6 +1028,9 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
         info: `Se marcado, o valor do ciclo anterior será exibido no formulário de entrada de dados (quando o link para o ciclo anterior estiver ativo no app móvel)`,
       },
     },
+    numericProps: {
+      unit: 'Unidade',
+    },
     decimalProps: {
       maxNumberDecimalDigits: 'Número máximo de casas decimais',
     },

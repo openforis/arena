@@ -876,6 +876,9 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
         info: 'Si está marcado, el valor del ciclo anterior se mostrará en el formulario de entrada de datos (cuando el enlace al ciclo anterior esté activo en la aplicación móvil)',
       },
     },
+    numericProps: {
+      unit: 'Unidad',
+    },
     decimalProps: {
       maxNumberDecimalDigits: 'Número máximo de dígitos decimales',
     },
