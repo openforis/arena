@@ -69,8 +69,9 @@ export const propKeys = {
   textInputType: 'textInputType',
   textTransform: 'textTransform',
 
-  // Decimal
+  // Decimal / Integer
   maxNumberDecimalDigits: 'maxNumberDecimalDigits',
+  unit: 'unit',
 
   // Boolean
   labelValue: 'labelValue',
@@ -286,6 +287,8 @@ export const isAltitudeIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitud
 export const isAltitudeAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitudeAccuracy)
 export const getMapMarkerColor = getProp(propKeys.mapMarkerColor)
 export const getCoordinateAdditionalFields = NodeDefs.getCoordinateAdditionalFields
+// decimal / integer
+export const getUnit = getProp(propKeys.unit, '')
 // decimal
 export const getMaxNumberDecimalDigits = (nodeDef) => {
   const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef)

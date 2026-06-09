@@ -38,6 +38,7 @@ const generateResultVariableSummary = ({ survey, analysisNodeDef, lang }) => {
     entityPath: Survey.getNodeDefPath({ nodeDef: entity, separator: '/' })(survey),
     label: NodeDef.getLabel(analysisNodeDef, lang),
     description: NodeDef.getDescription(lang)(analysisNodeDef),
+    unit: NodeDef.getUnit(analysisNodeDef),
     areaBased: Boolean(Survey.getNodeDefAreaBasedEstimate(analysisNodeDef)(survey)),
     type: NodeDef.isCode(analysisNodeDef) ? 'C' : 'Q',
     categoryName,

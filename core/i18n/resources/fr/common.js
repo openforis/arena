@@ -1032,6 +1032,9 @@ Ex. this.region = nom_attribut_region
         info: `Si coché, la valeur du cycle précédent sera affichée dans le formulaire de saisie de données (lorsque le lien vers le cycle précédent est activé dans l'application mobile)`,
       },
     },
+    numericProps: {
+      unit: 'Unité',
+    },
     decimalProps: {
       maxNumberDecimalDigits: 'Nombre maximum de décimales',
     },
