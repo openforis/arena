@@ -14,7 +14,7 @@ const IntegerProps = (props) => {
   if (!NodeDef.isAnalysis(nodeDef)) return null
 
   return (
-    <FormItem label="nodeDefEdit.decimalProps.unit">
+    <FormItem label="nodeDefEdit.numericProps.unit">
       <div style={{ width: '10rem' }}>
         <Input
           value={NodeDef.getUnit(nodeDef)}

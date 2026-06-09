@@ -1023,9 +1023,11 @@ This is perfect for hiding entire parts of a survey based on who is logged in (l
         info: `If marked, the value from the previous cycle will be shown on the data entry form (when the link to the previous cycle is set active in the mobile app)`,
       },
     },
+    numericProps: {
+      unit: 'Unit',
+    },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
-      unit: 'Unit',
     },
     fileProps: {
       fileNameExpression: 'File name expression',
