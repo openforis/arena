@@ -15,13 +15,25 @@ const DecimalProps = (props) => {
   const decimalDigitsString = Number.isNaN(decimalDigits) ? '' : String(decimalDigits)
 
   return (
-    <FormItem label="nodeDefEdit.decimalProps.maxNumberDecimalDigits">
-      <Input
-        value={decimalDigitsString}
-        numberFormat={NumberFormats.integer({ allowNegative: false })}
-        onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.maxNumberDecimalDigits, value })}
-      />
-    </FormItem>
+    <>
+      {NodeDef.isAnalysis(nodeDef) && (
+        <FormItem label="nodeDefEdit.decimalProps.unit">
+          <Input
+            className="node-def-unit-input"
+            value={NodeDef.getUnit(nodeDef)}
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.unit, value })}
+          />
+        </FormItem>
+      )}
+      <FormItem label="nodeDefEdit.decimalProps.maxNumberDecimalDigits">
+        <Input
+          className="node-def-decimal-digits-input"
+          value={decimalDigitsString}
+          numberFormat={NumberFormats.integer({ allowNegative: false })}
+          onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.maxNumberDecimalDigits, value })}
+        />
+      </FormItem>
+    </>
   )
 }
 

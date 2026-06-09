@@ -1025,6 +1025,7 @@ This is perfect for hiding entire parts of a survey based on who is logged in (l
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
+      unit: 'Unit',
     },
     fileProps: {
       fileNameExpression: 'File name expression',
