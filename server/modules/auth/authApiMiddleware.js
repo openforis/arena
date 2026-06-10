@@ -73,13 +73,13 @@ export const requireSurveyUserExtraPropsEditPermission = async (req, res, next) 
     const user = Request.getUser(req)
     const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
     const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
-    if (Authorizer.canEditUserAuthGroupExtraProps(user, surveyInfo, userToUpdate)) {
+    if (userToUpdate && Authorizer.canEditUserAuthGroupExtraProps(user, surveyInfo, userToUpdate)) {
       next()
       return
     }
-    sendForbiddenError({ req, res })
-  } catch {
-    sendForbiddenError({ req, res })
+    return sendForbiddenError({ req, res })
+  } catch (error) {
+    next(error)
   }
 }
 
