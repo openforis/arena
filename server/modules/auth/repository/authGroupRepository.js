@@ -164,7 +164,7 @@ export const updateUserGroupExtraProps = async ({ surveyId, userUuid, extraProps
   client.one(
     `
     UPDATE auth_group_user gu
-      SET props = props || $/props/
+      SET props = COALESCE(gu.props, '{}'::jsonb) || $/props/
     FROM auth_group g
       JOIN survey s ON s.id = $/surveyId/
     WHERE gu.user_uuid = $/userUuid/
