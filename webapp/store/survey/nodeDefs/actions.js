@@ -238,12 +238,7 @@ export const putNodeDefsProps =
 
     const { nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefsProps({ surveyId, nodeDefs, cycle })
 
-    dispatch(
-      _onNodeDefsUpdate({
-        nodeDefsUpdated: nodeDefsUpdated.reduce((acc, nodeDef) => ({ ...acc, [nodeDef.uuid]: nodeDef }), {}),
-        nodeDefsValidation,
-      })
-    )
+    dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
   }
 
 export const postNodeDef =

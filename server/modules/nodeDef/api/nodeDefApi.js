@@ -4,6 +4,7 @@ import * as Request from '@server/utils/request'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ObjectUtils from '@core/objectUtils'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
 import * as SurveyService from '../../survey/service/surveyService'
@@ -148,7 +149,8 @@ export const init = (app) => {
       const { surveyId } = Request.getParams(req)
       const { nodeDefs, cycle } = Request.getBody(req)
 
-      const _nodeDefsUpdated = await NodeDefService.updateNodeDefsProps({ nodeDefs, cycle, surveyId })
+      const _nodeDefsUpdatedArray = await NodeDefService.updateNodeDefsProps({ nodeDefs, cycle, surveyId })
+      const _nodeDefsUpdated = ObjectUtils.toUuidIndexedObj(_nodeDefsUpdatedArray)
 
       const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.fetchNodeDefsUpdatedAndValidated({
         cycle,
