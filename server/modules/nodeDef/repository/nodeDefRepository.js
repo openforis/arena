@@ -191,7 +191,7 @@ export const updateNodeDefProps = async (
 export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client = DB) =>
   client.tx(async (tx) => {
     const schema = getSchemaSurvey(surveyId)
-    const nodedefsUpdated = await tx.batch(
+    const nodeDefsUpdated = await tx.batch(
       nodeDefs.map(async (nodeDef) => {
         const { nodeDefUuid, props = {}, propsAdvanced = {} } = nodeDef
         return tx.one(
@@ -209,7 +209,7 @@ export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client =
         )
       })
     )
-    return nodedefsUpdated
+    return nodeDefsUpdated
   })
 
 export const updateNodeDefTypeAndProps = async (
