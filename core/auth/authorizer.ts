@@ -181,6 +181,14 @@ export const canRemoveUser = (user: ArenaUser, surveyInfo: ArenaSurvey, userToRe
 export const canEditUserSurveyManager = (user: ArenaUser): boolean => User.isSystemAdmin(user)
 export const canEditUserMaxSurveys = (user: ArenaUser): boolean => User.isSystemAdmin(user)
 
+export const canEditUserAuthGroupExtraProps = (
+  user: ArenaUser,
+  surveyInfo: ArenaSurvey,
+  userToUpdate: ArenaUser
+): boolean =>
+  User.isSystemAdmin(user) ||
+  (canInviteUsers(user, surveyInfo) && _hasAuthGroupForSurvey({ user: userToUpdate, surveyInfo }))
+
 export const canViewUsersAccessRequests = (user: ArenaUser): boolean => User.isSystemAdmin(user)
 export const canEditUsersAccessRequests = (user: ArenaUser): boolean => User.isSystemAdmin(user)
 
