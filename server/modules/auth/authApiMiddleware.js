@@ -78,7 +78,7 @@ export const requireSurveyUserExtraPropsEditPermission = async (req, res, next) 
       return
     }
     sendForbiddenError({ req, res })
-  } catch (error) {
+  } catch {
     sendForbiddenError({ req, res })
   }
 }
