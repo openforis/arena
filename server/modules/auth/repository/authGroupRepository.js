@@ -164,14 +164,14 @@ export const updateUserGroupExtraProps = async ({ surveyId, userUuid, extraProps
   client.one(
     `
     UPDATE auth_group_user gu
-      SET props = $/props/
+      SET props = props || $/props/
     FROM auth_group g
       JOIN survey s ON s.id = $/surveyId/
     WHERE gu.user_uuid = $/userUuid/
       AND g.survey_uuid = s.uuid
       AND g.uuid = gu.group_uuid
     RETURNING 1`,
-    { surveyId, userUuid, props: extraProps ? { extra: extraProps } : null },
+    { surveyId, userUuid, props: extraProps ? { extra: extraProps } : {} },
     dbTransformCallback
   )
 
