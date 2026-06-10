@@ -25,21 +25,23 @@ export const useGetSiblingNodeDefUuid = () => {
       const analysis = NodeDef.isAnalysis(nodeDef)
 
       let siblingUuids = null
-      if (analysis) {
+      if (analysis && chain) {
         const analysisDefs = Survey.getAnalysisNodeDefs({ chain })(survey)
         siblingUuids = analysisDefs.map((nodeDef) => NodeDef.getUuid(nodeDef))
-      } else if (NodeDefLayout.isRenderTable(cycle)(nodeDefParent)) {
-        siblingUuids = NodeDefLayout.getLayoutChildren(cycle)(nodeDefParent)
       } else {
-        const layoutChildren = NodeDefLayout.getLayoutChildrenSorted(cycle)(nodeDefParent)
-        siblingUuids = layoutChildren.map((layoutItem) => layoutItem.i)
+        if (NodeDefLayout.isRenderTable(cycle)(nodeDefParent)) {
+          siblingUuids = NodeDefLayout.getLayoutChildren(cycle)(nodeDefParent)
+        } else {
+          const layoutChildren = NodeDefLayout.getLayoutChildrenSorted(cycle)(nodeDefParent)
+          siblingUuids = layoutChildren.map((layoutItem) => layoutItem.i)
+        }
+        // filter out not existing and not analysis siblings when the current node def is an analysis node def
+        // or not analysis siblings when the current node def is not an analysis node def
+        siblingUuids = siblingUuids.filter((siblingUuid) => {
+          const siblingNodeDef = Survey.getNodeDefByUuid(siblingUuid)(survey)
+          return siblingNodeDef && !NodeDef.isAnalysis(siblingNodeDef)
+        })
       }
-      // filter out not existing and not analysis siblings when the current node def is an analysis node def
-      // or not analysis siblings when the current node def is not an analysis node def
-      siblingUuids = siblingUuids.filter((siblingUuid) => {
-        const siblingNodeDef = Survey.getNodeDefByUuid(siblingUuid)(survey)
-        return siblingNodeDef && NodeDef.isAnalysis(siblingNodeDef) === analysis
-      })
       return siblingUuids
     },
     [survey, cycle, chain]
