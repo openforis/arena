@@ -341,6 +341,21 @@ export const init = (app) => {
     }
   }
 
+  app.put(
+    '/survey/:surveyId/user/:userUuid/extraProps',
+    AuthMiddleware.requireSurveyUserExtraPropsEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, userUuid } = Request.getParams(req)
+        const { extraProps } = Request.getBody(req)
+        await UserService.updateUserAuthGroupExtraProps({ surveyId, userUuid, extraProps })
+        Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
       await _insertOrUpdateUser(req, res)
