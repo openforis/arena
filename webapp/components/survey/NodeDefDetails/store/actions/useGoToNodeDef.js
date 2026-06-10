@@ -35,6 +35,6 @@ export const useGoToNodeDef = ({ setState }) => {
         },
       })
     },
-    [editingNodeDefInFullScreen]
+    [cancelEdits, dispatch, editingNodeDefInFullScreen, getSiblingNodeDefUuid, navigate]
   )
 }
