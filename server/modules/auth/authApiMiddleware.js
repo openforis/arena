@@ -7,6 +7,7 @@ import { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as UserManager from '@server/modules/user/manager/userManager'
 import UnauthorizedError from '@server/utils/unauthorizedError'
 
 export const {
@@ -64,6 +65,22 @@ const sendForbiddenError = ({ res, req = null }) => {
 export const requireLoggedInUser = async (req, res, next) => {
   const user = Request.getUser(req)
   return user ? next() : sendUnauthorizedError({ res })
+}
+
+export const requireSurveyUserExtraPropsEditPermission = async (req, res, next) => {
+  try {
+    const { surveyId, userUuid } = Request.getParams(req)
+    const user = Request.getUser(req)
+    const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
+    const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
+    if (Authorizer.canEditUserAuthGroupExtraProps(user, surveyInfo, userToUpdate)) {
+      next()
+      return
+    }
+    sendForbiddenError({ req, res })
+  } catch (error) {
+    sendForbiddenError({ req, res })
+  }
 }
 
 // Survey

@@ -384,6 +384,9 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
 
 export const updateUser = _userFetcher(_updateUser)
 
+export const updateUserAuthGroupExtraProps = async ({ surveyId, userUuid, extraProps }) =>
+  AuthGroupRepository.updateUserGroupExtraProps({ surveyId, userUuid, extraProps })
+
 export const updateUserPrefs = async (user) => UserRepository.updateUserPrefs(user)
 
 export const updateUserPrefsAndFetchGroups = async (user) => ({

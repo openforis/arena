@@ -441,6 +441,9 @@ export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, t
   }
 }
 
+export const updateUserAuthGroupExtraProps = async ({ surveyId, userUuid, extraProps }) =>
+  UserManager.updateUserAuthGroupExtraProps({ surveyId, userUuid, extraProps })
+
 export const updateUserPassword = async ({ user, passwordChangeForm }) => {
   const userUuid = User.getUuid(user)
   const userToUpdateUuid = UserPasswordChangeForm.getUserUuid(passwordChangeForm) ?? userUuid
