@@ -60,7 +60,6 @@ const UserEdit = () => {
     onSave,
     onSurveyAuthGroupChange,
     onSurveyManagerChange,
-    onSurveyExtraPropsChange,
     onUpdate,
     onUpdateProfilePicture,
   } = useEditUser({ userUuid })
