@@ -1,33 +1,30 @@
 import './UserEdit.scss'
 
-import React, { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useParams } from 'react-router'
-
-import { Objects } from '@openforis/arena-core'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
-import { Button, ButtonDelete, ButtonInvite, ButtonSave, ExpansionPanel } from '@webapp/components'
+import { Button, ButtonDelete, ButtonInvite, ButtonSave } from '@webapp/components'
+import UserAiSettingsPanel from '@webapp/components/ai/UserAiSettingsPanel'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import ProfilePicture from '@webapp/components/profilePicture'
-import UserAiSettingsPanel from '@webapp/components/ai/UserAiSettingsPanel'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 import DropdownUserRole from '../DropdownUserRole'
+import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
 import ProfilePictureEditor from './ProfilePictureEditor'
 import { useEditUser } from './store'
-import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
-import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
