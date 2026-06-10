@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as User from '@core/user/user'
@@ -14,14 +14,12 @@ export const SurveyUserExtraPropsEditor = (props) => {
   const { onClose, onUserUpdate, userToUpdate } = props
 
   const surveyUuid = useSurveyUuid()
-  const [userUpdated, setUserUpdated] = useState(userToUpdate)
-  const saveUser = useOnSaveExtraProps({ userToUpdate: userUpdated })
-
-  useEffect(() => {
+  const [userUpdated, setUserUpdated] = useState(() => {
     const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
     const groupExtraProps = groupInCurrentSurvey?.props?.extra
-    setUserUpdated(User.assocAuthGroupExtraProps(groupExtraProps)(userToUpdate))
-  }, [surveyUuid, userToUpdate])
+    return User.assocAuthGroupExtraProps(groupExtraProps)(userToUpdate)
+  })
+  const saveUser = useOnSaveExtraProps({ userToUpdate: userUpdated })
 
   const onSurveyExtraPropsChange = useCallback((extraPropsNew) => {
     setUserUpdated((userPrev) => User.assocAuthGroupExtraProps(extraPropsNew)(userPrev))

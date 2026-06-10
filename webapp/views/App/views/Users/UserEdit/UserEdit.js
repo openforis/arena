@@ -95,7 +95,6 @@ const UserEdit = () => {
   const editingLoggedInUser = User.isEqual(user)(userToUpdate)
   const newUser = !userUuid
   const surveyGroupsVisible = !newUser && showSurveyGroup
-  const surveyHasExtraProps = Objects.isNotEmpty(Survey.getUserExtraPropDefs(surveyInfo))
 
   return (
     <div className="user-edit" key={userUuid}>
@@ -183,15 +182,6 @@ const UserEdit = () => {
                 showOnlySurveyGroups
               />
             </FormItem>
-          )}
-          {surveyHasExtraProps && (
-            <ExpansionPanel
-              buttonLabel="usersView:surveyExtraProp.label_other"
-              className="extra-props"
-              startClosed={Objects.isEmpty(User.getAuthGroupExtraProps(userToUpdate))}
-            >
-              <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
-            </ExpansionPanel>
           )}
         </>
       )}
