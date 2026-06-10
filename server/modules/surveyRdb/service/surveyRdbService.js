@@ -31,7 +31,7 @@ const _fetchSurvey = async ({ surveyId, cycle }) => {
 
 const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
-  return Authorizer.canExportAllRecords(user, surveyInfo)
+  return Authorizer.canViewNotOwnedRecords(user, surveyInfo)
     ? null // fetch all records' data
     : User.getUuid(user) // fetch only owned records' data
 }
