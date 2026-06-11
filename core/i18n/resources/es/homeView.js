@@ -90,6 +90,7 @@ export default {
     security: {
       title: 'Seguridad',
       dataEditorViewNotOwnedRecordsAllowed: 'El editor de datos puede ver registros no propios',
+      dataAnalystViewNotOwnedRecordsAllowed: 'El analista de datos puede ver registros no propios',
       visibleInMobile: 'Visible en Arena Mobile',
       allowRecordsDownloadInMobile: 'Permitir la descarga de registros del servidor a Arena Mobile',
       allowRecordsUploadFromMobile: 'Permitir la carga de registros de Arena Mobile al servidor',

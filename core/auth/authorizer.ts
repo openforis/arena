@@ -70,13 +70,20 @@ export const canViewRecord = _hasSurveyPermission(permissions.recordView)
 export const canExportAllRecords = _hasSurveyPermission(permissions.recordCleanse)
 export const canViewNotOwnedRecords = (user: ArenaUser, surveyInfo: ArenaSurvey): boolean => {
   if (!canViewSurvey(user, surveyInfo)) return false
-  if (canExportAllRecords(user, surveyInfo)) return true
+
   const surveyUuid = Survey.getUuid(surveyInfo)
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
-  return (
-    AuthGroup.getName(groupInCurrentSurvey as ArenaAuthGroup) === AuthGroup.groupNames.dataEditor &&
-    Surveys.isDataEditorViewNotOwnedRecordsAllowed(surveyInfo as any)
-  )
+  const groupName = AuthGroup.getName(groupInCurrentSurvey as ArenaAuthGroup)
+
+  if (groupName === AuthGroup.groupNames.dataEditor) {
+    return Surveys.isDataEditorViewNotOwnedRecordsAllowed(surveyInfo as any)
+  }
+  if (groupName === AuthGroup.groupNames.dataAnalyst) {
+    return Surveys.isDataAnalystViewNotOwnedRecordsAllowed(surveyInfo as any)
+  }
+  if (canExportAllRecords(user, surveyInfo)) return true
+
+  return false
 }
 export const canExportRecordsList = _hasSurveyPermission(permissions.recordAnalyse)
 

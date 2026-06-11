@@ -104,6 +104,8 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
       title: 'Sécurité',
       dataEditorViewNotOwnedRecordsAllowed:
         "L'éditeur de données peut voir les enregistrements qui ne lui appartiennent pas",
+      dataAnalystViewNotOwnedRecordsAllowed:
+        "L'analyste de données peut voir les enregistrements qui ne lui appartiennent pas",
       visibleInMobile: 'Visible dans Arena Mobile',
       allowRecordsDownloadInMobile: 'Autoriser le téléchargement des enregistrements du serveur vers Arena Mobile',
       allowRecordsUploadFromMobile:

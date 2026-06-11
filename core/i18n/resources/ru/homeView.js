@@ -103,6 +103,7 @@ export default {
     security: {
       title: 'Безопасность',
       dataEditorViewNotOwnedRecordsAllowed: 'Редактор данных может просматривать не свои записи',
+      dataAnalystViewNotOwnedRecordsAllowed: 'Аналитик данных может просматривать не свои записи',
       visibleInMobile: 'Видно в Arena Mobile',
       allowRecordsDownloadInMobile: 'Разрешить загрузку записей с сервера в Arena Mobile',
       allowRecordsUploadFromMobile: 'Разрешить загрузку записей из Arena Mobile на сервер',
