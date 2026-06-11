@@ -103,6 +103,7 @@ export default {
     security: {
       title: 'Аюулгүй байдал',
       dataEditorViewNotOwnedRecordsAllowed: 'Өгөгдөл засварлагч өөрийн бус бичлэгүүдийг үзэх боломжтой',
+      dataAnalystViewNotOwnedRecordsAllowed: 'Өгөгдөл шинжилэгч өөрийн бус бичлэгүүдийг үзэх боломжтой',
       visibleInMobile: 'Арена Мобайл-д харагдана',
       allowRecordsDownloadInMobile: 'Серверээс Арена Мобайл руу бичлэг татахыг зөвшөөрөх',
       allowRecordsUploadFromMobile: 'Арена Мобайл-аас сервер руу бичлэг байршуулахыг зөвшөөрөх',

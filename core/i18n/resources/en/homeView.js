@@ -104,6 +104,7 @@ If there are records associated to this cycle, they will be deleted.`,
     security: {
       title: 'Security',
       dataEditorViewNotOwnedRecordsAllowed: 'Data Editor can view not owned records',
+      dataAnalystViewNotOwnedRecordsAllowed: 'Data Analyst can view not owned records',
       visibleInMobile: 'Visible in Arena Mobile',
       allowRecordsDownloadInMobile: 'Allow downloading records from server to Arena Mobile',
       allowRecordsUploadFromMobile: 'Allow uploading records from Arena Mobile to server',

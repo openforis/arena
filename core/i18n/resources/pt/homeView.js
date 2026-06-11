@@ -102,6 +102,7 @@ Se houver registros associados a este ciclo, eles serão excluídos.`,
     security: {
       title: 'Segurança',
       dataEditorViewNotOwnedRecordsAllowed: 'Editor de dados pode visualizar registros que não possui',
+      dataAnalystViewNotOwnedRecordsAllowed: 'Analista de dados pode visualizar registros que não possui',
       visibleInMobile: 'Visível no Arena Mobile',
       allowRecordsDownloadInMobile: 'Permitir download de registros do servidor para o Arena Mobile',
       allowRecordsUploadFromMobile: 'Permitir upload de registros do Arena Mobile para o servidor',
