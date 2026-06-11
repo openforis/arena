@@ -77,10 +77,11 @@ const AdvancedProps = (props) => {
 
   const onEditableIfModeChange = useCallback(
     (mode) => {
-      if (mode === editableIfRadioModes.none || mode === editableIfRadioModes.readOnly) {
-        Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.editableIf, value: [] })
-      }
-      Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value: mode === editableIfRadioModes.readOnly })
+      Actions.setEditableIfMode({
+        state,
+        clearEditableIf: mode !== editableIfRadioModes.defined,
+        readOnly: mode === editableIfRadioModes.readOnly,
+      })
     },
     [Actions, state]
   )
@@ -98,18 +99,11 @@ const AdvancedProps = (props) => {
 
   const onVisibleIfModeChange = useCallback(
     (mode) => {
-      if (
-        mode === visibleIfRadioModes.none ||
-        mode === visibleIfRadioModes.alwaysHidden ||
-        mode === visibleIfRadioModes.hiddenWhenNotRelevant
-      ) {
-        Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.visibleIf, value: [] })
-      }
-      Actions.setProp({ state, key: NodeDef.propKeys.hidden, value: mode === visibleIfRadioModes.alwaysHidden })
-      Actions.setLayoutProp({
+      Actions.setVisibleIfMode({
         state,
-        key: NodeDefLayout.keys.hiddenWhenNotRelevant,
-        value: mode === visibleIfRadioModes.hiddenWhenNotRelevant,
+        clearVisibleIf: mode !== visibleIfRadioModes.defined,
+        hidden: mode === visibleIfRadioModes.alwaysHidden,
+        hiddenWhenNotRelevant: mode === visibleIfRadioModes.hiddenWhenNotRelevant,
       })
     },
     [Actions, state]
