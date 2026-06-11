@@ -104,29 +104,32 @@ export const useSetProp = ({ setState }) => {
   const lang = useSelector(SurveyState.getSurveyPreferredLang)
   const validateNodeDef = useValidate({ setState })
 
-  return useCallback(({ state, key, value = null }) => {
-    const nodeDef = State.getNodeDef(state)
+  return useCallback(
+    async ({ state, key, value = null }) => {
+      const nodeDef = State.getNodeDef(state)
 
-    if (!_checkCanChangeProp({ dispatch, nodeDef, key, value })) {
-      return
-    }
+      if (!_checkCanChangeProp({ dispatch, nodeDef, key, value })) {
+        return
+      }
 
-    let nodeDefUpdated = NodeDef.assocProp({ key, value })(nodeDef)
+      let nodeDefUpdated = NodeDef.assocProp({ key, value })(nodeDef)
 
-    const propUpdater = updateFunctionByProp[key]
-    if (propUpdater) {
-      nodeDefUpdated = propUpdater({
-        survey,
-        surveyCycleKey,
-        lang,
-        nodeDef: nodeDefUpdated,
-        nodeDefPrev: nodeDef,
-        value,
-      })
-    }
+      const propUpdater = updateFunctionByProp[key]
+      if (propUpdater) {
+        nodeDefUpdated = propUpdater({
+          survey,
+          surveyCycleKey,
+          lang,
+          nodeDef: nodeDefUpdated,
+          nodeDefPrev: nodeDef,
+          value,
+        })
+      }
 
-    nodeDefUpdated = NodeDef.clearNotApplicableProps(surveyCycleKey)(nodeDefUpdated)
+      nodeDefUpdated = NodeDef.clearNotApplicableProps(surveyCycleKey)(nodeDefUpdated)
 
-    validateNodeDef({ nodeDef, nodeDefUpdated })
-  }, [])
+      await validateNodeDef({ nodeDef, nodeDefUpdated })
+    },
+    [dispatch, lang, survey, surveyCycleKey, validateNodeDef]
+  )
 }
