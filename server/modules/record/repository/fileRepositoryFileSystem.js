@@ -6,10 +6,16 @@ export const getStorageFolderPath = () => ProcessUtils.ENV.fileStoragePath
 export const getSurveyFilesStorageFolderPath = ({ surveyId }) =>
   FileUtils.join(ProcessUtils.ENV.fileStoragePath, surveyId)
 
-const getFilePath = ({ surveyId, fileUuid }) => {
-  const storageFolderPath = getSurveyFilesStorageFolderPath({ surveyId })
-  return FileUtils.join(storageFolderPath, fileUuid)
-}
+const getSubfolder = ({ recordUuid }) => (recordUuid ? 'record_files' : 'survey_files')
+
+const getSubfolderPath = ({ surveyId, recordUuid }) =>
+  FileUtils.join(ProcessUtils.ENV.fileStoragePath, surveyId, getSubfolder({ recordUuid }))
+
+const getFilePath = ({ surveyId, fileUuid, recordUuid = null }) =>
+  FileUtils.join(getSubfolderPath({ surveyId, recordUuid }), fileUuid)
+
+const getLegacyFilePath = ({ surveyId, fileUuid }) =>
+  FileUtils.join(ProcessUtils.ENV.fileStoragePath, surveyId, fileUuid)
 
 export const checkCanAccessStorageFolder = async () => {
   const storageFolderPath = getStorageFolderPath()
@@ -22,24 +28,36 @@ export const checkCanAccessStorageFolder = async () => {
   throw new Error('Cannot access files storage path: ' + getStorageFolderPath())
 }
 
-export const writeFileContent = async ({ surveyId, fileUuid, content }) => {
-  const storageFolderPath = getSurveyFilesStorageFolderPath({ surveyId })
-  await FileUtils.mkdir(storageFolderPath)
-  const filePath = getFilePath({ surveyId, fileUuid })
+export const writeFileContent = async ({ surveyId, fileUuid, content, recordUuid = null }) => {
+  const subfolderPath = getSubfolderPath({ surveyId, recordUuid })
+  await FileUtils.mkdir(subfolderPath)
+  const filePath = getFilePath({ surveyId, fileUuid, recordUuid })
   await FileUtils.writeFile(filePath, content)
 }
 
-export const getFileContentAsStream = ({ surveyId, fileUuid }) => {
-  const filePath = getFilePath({ surveyId, fileUuid })
+export const getFileContentAsStream = ({ surveyId, fileUuid, recordUuid = null }) => {
+  const filePath = getFilePath({ surveyId, fileUuid, recordUuid })
   if (!FileUtils.exists(filePath)) {
     throw new Error(`File not found: ${filePath}`)
   }
   return FileUtils.createReadStream(filePath)
 }
 
-export const deleteFiles = async ({ surveyId, fileUuids }) => {
-  for (const fileUuid of fileUuids) {
-    const filePath = getFilePath({ surveyId, fileUuid })
+export const deleteFiles = async ({ surveyId, files }) => {
+  for (const { fileUuid, recordUuid } of files) {
+    const filePath = getFilePath({ surveyId, fileUuid, recordUuid })
     await FileUtils.deleteFileAsync(filePath)
   }
+}
+
+export const migrateFileToNewPath = async ({ surveyId, fileUuid, recordUuid }) => {
+  const legacyPath = getLegacyFilePath({ surveyId, fileUuid })
+  if (!FileUtils.exists(legacyPath)) {
+    return false
+  }
+  const subfolderPath = getSubfolderPath({ surveyId, recordUuid })
+  await FileUtils.mkdir(subfolderPath)
+  const newPath = getFilePath({ surveyId, fileUuid, recordUuid })
+  await FileUtils.rename(legacyPath, newPath)
+  return true
 }

@@ -46,6 +46,28 @@ export const fetchFilesStatistics = async ({ surveyId }) => {
   return { availableSpace, totalSpace, usedSpace }
 }
 
+export const migrateAllSurveysFilesToNewPathFormat = async ({ logger }) => {
+  const surveyIds = await SurveyRepository.fetchAllSurveyIds()
+  let allMigrated = false
+  let errorsFound = false
+  for (const surveyId of surveyIds) {
+    try {
+      const migrated = await SurveyFileManager.migrateFilesToNewPathFormat({ surveyId })
+      allMigrated = allMigrated || migrated
+    } catch (error) {
+      errorsFound = true
+      logger.error(`Error migrating file paths for survey ${surveyId}`, error)
+    }
+  }
+  if (errorsFound) {
+    logger.error('There were errors migrating survey files to new path format')
+  } else if (allMigrated) {
+    logger.debug('Survey files migrated to new path format successfully')
+  } else {
+    logger.debug('Survey files path migration not necessary')
+  }
+}
+
 export const cleanupAllSurveysFilesProps = async () => {
   const surveyIds = await SurveyRepository.fetchAllSurveyIds()
   let count = 0
