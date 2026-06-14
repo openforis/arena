@@ -476,7 +476,15 @@ export const mergeRecords = async (
     }
   })
 
-export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lang = null }) => {
+const exportRecordDocument = async ({
+  surveyId,
+  recordUuid,
+  outputStream,
+  lang,
+  generator,
+  extension,
+  contentType,
+}) => {
   const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true })
   const cycle = Record.getCycle(record)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
@@ -486,7 +494,7 @@ export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lan
   })
   const langToUse = lang ?? Survey.getDefaultLanguage(survey)
   const i18n = await i18nFactory.createI18nAsync(langToUse)
-  const { buffer, surveyName } = await SurveyDocxGenerator.generateSurveyDocx({
+  const { buffer, surveyName } = await generator({
     survey,
     cycle,
     record,
@@ -498,56 +506,34 @@ export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lan
     },
     readOnly: true,
   })
-  const fileName = ExportFileNameGenerator.generate({
-    surveyName,
-    cycle,
-    fileType: 'RecordForm',
-    extension: 'docx',
-  })
-  const fileSize = Buffer.byteLength(buffer)
+  const fileName = ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'RecordForm', extension })
   Response.sendFileContent({
     res: outputStream,
     fileName,
     content: buffer,
-    contentSize: fileSize,
-    contentType: Response.contentTypes.docx,
+    contentSize: Buffer.byteLength(buffer),
+    contentType,
   })
 }
 
-export const exportRecordPdf = async ({ surveyId, recordUuid, outputStream, lang = null }) => {
-  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true })
-  const cycle = Record.getCycle(record)
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+export const exportRecordDocx = ({ surveyId, recordUuid, outputStream, lang = null }) =>
+  exportRecordDocument({
     surveyId,
-    cycle,
-    includeAnalysis: false,
+    recordUuid,
+    outputStream,
+    lang,
+    generator: SurveyDocxGenerator.generateSurveyDocx,
+    extension: 'docx',
+    contentType: Response.contentTypes.docx,
   })
-  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
-  const i18n = await i18nFactory.createI18nAsync(langToUse)
-  const { buffer, surveyName } = await SurveyPdfGenerator.generateSurveyPdf({
-    survey,
-    cycle,
-    record,
-    lang: langToUse,
-    i18n,
-    fileProvider: async (fileUuid) => {
-      const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
-      return SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary })
-    },
-    readOnly: true,
-  })
-  const fileName = ExportFileNameGenerator.generate({
-    surveyName,
-    cycle,
-    fileType: 'RecordForm',
+
+export const exportRecordPdf = ({ surveyId, recordUuid, outputStream, lang = null }) =>
+  exportRecordDocument({
+    surveyId,
+    recordUuid,
+    outputStream,
+    lang,
+    generator: SurveyPdfGenerator.generateSurveyPdf,
     extension: 'pdf',
-  })
-  const fileSize = Buffer.byteLength(buffer)
-  Response.sendFileContent({
-    res: outputStream,
-    fileName,
-    content: buffer,
-    contentSize: fileSize,
     contentType: Response.contentTypes.pdf,
   })
-}
