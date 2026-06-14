@@ -1,4 +1,4 @@
-import { Schemata, SurveyDocxGenerator } from '@openforis/arena-server'
+import { Schemata, SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
@@ -158,6 +158,34 @@ export const exportSurveyDocx = async ({ surveyId, cycle, outputStream, lang = n
     content: buffer,
     contentSize: fileSize,
     contentType: Response.contentTypes.docx,
+  })
+}
+
+export const exportSurveyPdf = async ({ surveyId, cycle, outputStream, lang = null, draft = true }) => {
+  const survey = await fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    draft,
+    advanced: false,
+    includeDeleted: false,
+    includeAnalysis: false,
+  })
+  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+  const i18n = await i18nFactory.createI18nAsync(langToUse)
+  const { buffer, surveyName } = await SurveyPdfGenerator.generateSurveyPdf({ survey, cycle, lang: langToUse, i18n })
+  const fileName = ExportFileNameGenerator.generate({
+    surveyName,
+    cycle,
+    fileType: 'SurveyForm',
+    extension: 'pdf',
+  })
+  const fileSize = Buffer.byteLength(buffer)
+  Response.sendFileContent({
+    res: outputStream,
+    fileName,
+    content: buffer,
+    contentSize: fileSize,
+    contentType: Response.contentTypes.pdf,
   })
 }
 

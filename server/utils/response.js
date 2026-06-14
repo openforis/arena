@@ -19,6 +19,7 @@ export const contentTypes = {
   csv: 'text/csv',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   json: 'application/json',
+  pdf: 'application/pdf',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   zip: 'application/zip',
 }

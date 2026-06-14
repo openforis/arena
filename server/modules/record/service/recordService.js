@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 
 import { NodeValues, Objects } from '@openforis/arena-core'
-import { SurveyDocxGenerator } from '@openforis/arena-server'
+import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
@@ -511,5 +511,43 @@ export const exportRecordDocx = async ({ surveyId, recordUuid, outputStream, lan
     content: buffer,
     contentSize: fileSize,
     contentType: Response.contentTypes.docx,
+  })
+}
+
+export const exportRecordPdf = async ({ surveyId, recordUuid, outputStream, lang = null }) => {
+  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true })
+  const cycle = Record.getCycle(record)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    includeAnalysis: false,
+  })
+  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+  const i18n = await i18nFactory.createI18nAsync(langToUse)
+  const { buffer, surveyName } = await SurveyPdfGenerator.generateSurveyPdf({
+    survey,
+    cycle,
+    record,
+    lang: langToUse,
+    i18n,
+    fileProvider: async (fileUuid) => {
+      const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+      return SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary })
+    },
+    readOnly: true,
+  })
+  const fileName = ExportFileNameGenerator.generate({
+    surveyName,
+    cycle,
+    fileType: 'RecordForm',
+    extension: 'pdf',
+  })
+  const fileSize = Buffer.byteLength(buffer)
+  Response.sendFileContent({
+    res: outputStream,
+    fileName,
+    content: buffer,
+    contentSize: fileSize,
+    contentType: Response.contentTypes.pdf,
   })
 }

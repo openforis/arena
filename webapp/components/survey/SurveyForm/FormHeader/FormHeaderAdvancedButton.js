@@ -145,6 +145,16 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
                 />
               ),
             },
+            {
+              key: 'survey-pdf-export',
+              content: (
+                <ButtonDownload
+                  href={API.getSurveyPdfExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
+                  label="surveyForm:downloadPrintableDocumentPdf"
+                  variant="text"
+                />
+              ),
+            },
           ]
         : []),
       ...labelsExportAllowedFileFormats.map((fileFormat) => ({

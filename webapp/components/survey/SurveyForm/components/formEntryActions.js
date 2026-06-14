@@ -68,13 +68,22 @@ const RecordEntryButtons = (props) => {
         </Link>
       )}
       {experimentalFeatures && (
-        <ButtonDownload
-          iconClassName="icon-file-word"
-          href={API.getRecordDocxExportUrl({ surveyId, recordUuid, lang })}
-          showLabel={false}
-          title="surveyForm:downloadPrintableDocument"
-          variant="text"
-        />
+        <div className="survey-form-header__download-buttons">
+          <ButtonDownload
+            iconClassName="icon-file-word"
+            href={API.getRecordDocxExportUrl({ surveyId, recordUuid, lang })}
+            showLabel={false}
+            title="surveyForm:downloadPrintableDocument"
+            variant="text"
+          />
+          <ButtonDownload
+            iconClassName="icon-file-pdf"
+            href={API.getRecordPdfExportUrl({ surveyId, recordUuid, lang })}
+            showLabel={false}
+            title="surveyForm:downloadPrintableDocumentPdf"
+            variant="text"
+          />
+        </div>
       )}
       <div className="survey-form-header__record-actions-steps">
         {canDemote && (
