@@ -388,6 +388,16 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/record/:recordUuid/export/pdf', requireRecordViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, recordUuid, lang } = Request.getParams(req)
+
+      await RecordService.exportRecordPdf({ surveyId, recordUuid, lang, outputStream: res })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== UPDATE
 
   // RECORD promote / demote
