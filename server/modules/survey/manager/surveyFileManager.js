@@ -43,17 +43,19 @@ const contentDeleteFunctionByStorageType = {
   [fileContentStorageTypes.s3Bucket]: FileRepositoryS3Bucket.deleteFiles,
 }
 
-export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = db) => {
+export const fetchFileContentAsStream = async ({ surveyId, fileSummary }, client = db) => {
   const storageType = getFileContentStorageType()
   const fetchFn = contentAsStreamFetchFunctionByStorageType[storageType]
   if (fetchFn) {
-    return fetchFn({ surveyId, fileUuid }, client)
+    const fileUuid = SurveyFile.getUuid(fileSummary)
+    const recordUuid = SurveyFile.getRecordUuid(fileSummary)
+    return fetchFn({ surveyId, fileUuid, recordUuid }, client)
   }
   return null
 }
 
-export const fetchFileContentAsBuffer = async ({ surveyId, fileUuid }, client = db) => {
-  const contentStream = await fetchFileContentAsStream({ surveyId, fileUuid }, client)
+export const fetchFileContentAsBuffer = async ({ surveyId, fileSummary }, client = db) => {
+  const contentStream = await fetchFileContentAsStream({ surveyId, fileSummary }, client)
   return StreamUtils.readStreamToBuffer(contentStream)
 }
 
@@ -69,7 +71,8 @@ export const insertFile = async (surveyId, file, client = db) => {
   if (contentStoreFunction) {
     const fileUuid = SurveyFile.getUuid(file)
     const content = SurveyFile.getContent(file)
-    await contentStoreFunction({ surveyId, fileUuid, content })
+    const recordUuid = SurveyFile.getRecordUuid(file)
+    await contentStoreFunction({ surveyId, fileUuid, content, recordUuid })
     // clear content in file object so it won't be stored into DB
     file.content = null
   }
@@ -101,7 +104,8 @@ export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db
 
       const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
       const content = SurveyFile.getContent(file)
-      await contentStoreFunction({ surveyId, fileUuid, content })
+      const recordUuid = SurveyFile.getRecordUuid(file)
+      await contentStoreFunction({ surveyId, fileUuid, content, recordUuid })
     }
     logger.debug(`Files moved from DB; clearing 'content' column in DB 'file' table`)
     await FileRepository.clearAllSurveyFilesContent({ surveyId }, tx)
@@ -119,31 +123,62 @@ export const deleteFileByUuid = async ({ surveyId, fileUuid }, client = db) => {
   // do not delete content if not in DB: deletion out of transaction
 }
 
-export const deleteFilesContentByUuids = async ({ surveyId, fileUuids }) => {
+export const deleteFilesContentByUuids = async ({ surveyId, fileSummaries }) => {
   const storageType = getFileContentStorageType()
   const deleteFn = contentDeleteFunctionByStorageType[storageType]
   if (deleteFn) {
-    await deleteFn({ surveyId, fileUuids })
+    const files = fileSummaries.map((s) => ({
+      fileUuid: SurveyFile.getUuid(s),
+      recordUuid: SurveyFile.getRecordUuid(s),
+    }))
+    await deleteFn({ surveyId, files })
   }
 }
 
-export const deleteFilesAndContentByUuids = async ({ surveyId, fileUuids }, client = db) => {
-  await deleteFilesContentByUuids({ surveyId, fileUuids })
+export const deleteFilesAndContent = async ({ surveyId, fileSummaries }, client = db) => {
+  await deleteFilesContentByUuids({ surveyId, fileSummaries })
+  const fileUuids = fileSummaries.map(SurveyFile.getUuid)
   await FileRepository.deleteFilesByUuids(surveyId, fileUuids, client)
+}
+
+export const migrateFilesToNewPathFormat = async ({ surveyId }) => {
+  const storageType = getFileContentStorageType()
+  if (storageType === fileContentStorageTypes.db) {
+    return false
+  }
+
+  const fileSummaries = await FileRepository.fetchFileSummariesBySurveyId(surveyId)
+  if (fileSummaries.length === 0) {
+    return false
+  }
+
+  let migratedCount = 0
+  for (const fileSummary of fileSummaries) {
+    const fileUuid = SurveyFile.getUuid(fileSummary)
+    const recordUuid = SurveyFile.getRecordUuid(fileSummary)
+    let migrated = false
+    if (storageType === fileContentStorageTypes.fileSystem) {
+      migrated = await FileRepositoryFileSystem.migrateFileToNewPath({ surveyId, fileUuid, recordUuid })
+    } else if (storageType === fileContentStorageTypes.s3Bucket) {
+      migrated = await FileRepositoryS3Bucket.migrateFileToNewKey({ surveyId, fileUuid, recordUuid })
+    }
+    if (migrated) {
+      migratedCount++
+    }
+  }
+
+  if (migratedCount > 0) {
+    logger.debug(`Survey ${surveyId}: migrated ${migratedCount} files to new path format`)
+  }
+  return migratedCount > 0
 }
 
 export const deleteTemporaryFiles = async (surveyId, client = db) => {
   const fileSummaries = await FileRepository.fetchFileSummariesBySurveyId(surveyId, client)
-  const temporaryFileUuids = []
-  for (const fileSummary of fileSummaries) {
-    const fileUuid = SurveyFile.getUuid(fileSummary)
-    if (SurveyFile.isTemporary(fileSummary)) {
-      temporaryFileUuids.push(fileUuid)
-    }
-  }
-  if (temporaryFileUuids.length > 0) {
-    logger.debug(`Deleting ${temporaryFileUuids.length} temporary files of survey ${surveyId}`)
-    await deleteFilesAndContentByUuids({ surveyId, fileUuids: temporaryFileUuids }, client)
+  const temporaryFileSummaries = fileSummaries.filter(SurveyFile.isTemporary)
+  if (temporaryFileSummaries.length > 0) {
+    logger.debug(`Deleting ${temporaryFileSummaries.length} temporary files of survey ${surveyId}`)
+    await deleteFilesAndContent({ surveyId, fileSummaries: temporaryFileSummaries }, client)
   }
 }
 

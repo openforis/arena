@@ -122,7 +122,7 @@ export default class RecordsCloneJob extends Job {
     for (const [fileUuid, newFileUuid] of Object.entries(newFileUuidsByOldUuid)) {
       const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
       if (fileSummary) {
-        const content = await SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileUuid }, tx)
+        const content = await SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary }, tx)
         const oldNodeUuid = SurveyFile.getNodeUuid(fileSummary)
         const newNodeUuid = oldNodeUuid ? newNodeUuidsByOldUuid[oldNodeUuid] : null
         const newFile = SurveyFile.createFile({
