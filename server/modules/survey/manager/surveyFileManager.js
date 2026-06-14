@@ -43,22 +43,19 @@ const contentDeleteFunctionByStorageType = {
   [fileContentStorageTypes.s3Bucket]: FileRepositoryS3Bucket.deleteFiles,
 }
 
-export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = db) => {
+export const fetchFileContentAsStream = async ({ surveyId, fileSummary }, client = db) => {
   const storageType = getFileContentStorageType()
   const fetchFn = contentAsStreamFetchFunctionByStorageType[storageType]
   if (fetchFn) {
-    let recordUuid = null
-    if (storageType !== fileContentStorageTypes.db) {
-      const fileSummary = await FileRepository.fetchFileSummaryByUuid(surveyId, fileUuid, client)
-      recordUuid = SurveyFile.getRecordUuid(fileSummary)
-    }
+    const fileUuid = SurveyFile.getUuid(fileSummary)
+    const recordUuid = SurveyFile.getRecordUuid(fileSummary)
     return fetchFn({ surveyId, fileUuid, recordUuid }, client)
   }
   return null
 }
 
-export const fetchFileContentAsBuffer = async ({ surveyId, fileUuid }, client = db) => {
-  const contentStream = await fetchFileContentAsStream({ surveyId, fileUuid }, client)
+export const fetchFileContentAsBuffer = async ({ surveyId, fileSummary }, client = db) => {
+  const contentStream = await fetchFileContentAsStream({ surveyId, fileSummary }, client)
   return StreamUtils.readStreamToBuffer(contentStream)
 }
 
