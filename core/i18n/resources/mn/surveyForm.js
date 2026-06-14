@@ -137,6 +137,7 @@ Arena Mobile дээр:
   },
   confirmNodeDelete: 'Та энэ {{nodeDefType}} ({{nodeDefLabel}})-г устгахыг хүсч байгаадаа итгэлтэй байна уу?',
   downloadPrintableDocument: 'Хэвлэх баримт бичиг татах (Word)',
+  downloadPrintableDocumentPdf: 'Хэвлэх баримт бичиг татах (PDF)',
   exportLabels_csv: 'Шошгыг экспортлох (CSV)',
   exportLabels_xlsx: 'Шошгыг экспортлох (Excel)',
   importLabels: 'Шошгыг Excel эсвэл CSV-ээс импортлох',
