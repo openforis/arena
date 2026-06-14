@@ -140,6 +140,7 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
               content: (
                 <ButtonDownload
                   href={API.getSurveyDocxExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
+                  iconClassName="icon-file-word"
                   label="surveyForm:downloadPrintableDocument"
                   variant="text"
                 />
@@ -150,6 +151,7 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
               content: (
                 <ButtonDownload
                   href={API.getSurveyPdfExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
+                  iconClassName="icon-file-pdf"
                   label="surveyForm:downloadPrintableDocumentPdf"
                   variant="text"
                 />

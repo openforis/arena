@@ -3905,7 +3905,7 @@ __metadata:
 
 "@openforis/arena-server@file:../arena-server::locator=open-foris-arena%40workspace%3A.":
   version: 1.3.12
-  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=6b287c&locator=open-foris-arena%40workspace%3A."
+  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=774bc6&locator=open-foris-arena%40workspace%3A."
   dependencies:
     "@godaddy/terminus": "npm:^4.12.1"
     "@openforis/arena-core": "npm:^1.3.0"
@@ -3930,7 +3930,7 @@ __metadata:
     pdfkit: "npm:^0.19.1"
     pg-promise: "npm:^12.6.2"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/e30c2817c1ff86eca9808f2b39cba9f8499195f29b45166e677ce9d929e472a10512be5dfa8a02586d35a8cd02804062f0d1ffc63490a0486284a76e3a9585e3
+  checksum: 10c0/99ef8a120426995808f579b8c53c693b7cc633198c62a07052d053c7aef850d3a5d96c7a535b1a4846f81c5dc783064690b35c5789e1fcd1c236fb4846248319
   languageName: node
   linkType: hard
 
