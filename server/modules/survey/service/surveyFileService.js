@@ -46,7 +46,7 @@ export const fetchFilesStatistics = async ({ surveyId }) => {
   return { availableSpace, totalSpace, usedSpace }
 }
 
-export const migrateAllSurveysFilesToNewPathFormat = async ({ logger: loggerParam = logger } = { logger }) => {
+export const migrateAllSurveysFilesToNewPathFormat = async ({ logger: loggerParam = logger } = {}) => {
   const surveyIds = await SurveyRepository.fetchAllSurveyIds()
   let anyMigrated = false
   let errorsFound = false
