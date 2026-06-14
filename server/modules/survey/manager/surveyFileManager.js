@@ -126,11 +126,10 @@ export const deleteFileByUuid = async ({ surveyId, fileUuid }, client = db) => {
   // do not delete content if not in DB: deletion out of transaction
 }
 
-export const deleteFilesContentByUuids = async ({ surveyId, fileUuids }) => {
+export const deleteFilesContentByUuids = async ({ surveyId, fileSummaries }) => {
   const storageType = getFileContentStorageType()
   const deleteFn = contentDeleteFunctionByStorageType[storageType]
   if (deleteFn) {
-    const fileSummaries = await FileRepository.fetchFileSummariesByUuids({ surveyId, fileUuids })
     const files = fileSummaries.map((s) => ({
       fileUuid: SurveyFile.getUuid(s),
       recordUuid: SurveyFile.getRecordUuid(s),
@@ -139,8 +138,9 @@ export const deleteFilesContentByUuids = async ({ surveyId, fileUuids }) => {
   }
 }
 
-export const deleteFilesAndContentByUuids = async ({ surveyId, fileUuids }, client = db) => {
-  await deleteFilesContentByUuids({ surveyId, fileUuids })
+export const deleteFilesAndContent = async ({ surveyId, fileSummaries }, client = db) => {
+  await deleteFilesContentByUuids({ surveyId, fileSummaries })
+  const fileUuids = fileSummaries.map(SurveyFile.getUuid)
   await FileRepository.deleteFilesByUuids(surveyId, fileUuids, client)
 }
 
@@ -178,16 +178,10 @@ export const migrateFilesToNewPathFormat = async ({ surveyId }) => {
 
 export const deleteTemporaryFiles = async (surveyId, client = db) => {
   const fileSummaries = await FileRepository.fetchFileSummariesBySurveyId(surveyId, client)
-  const temporaryFileUuids = []
-  for (const fileSummary of fileSummaries) {
-    const fileUuid = SurveyFile.getUuid(fileSummary)
-    if (SurveyFile.isTemporary(fileSummary)) {
-      temporaryFileUuids.push(fileUuid)
-    }
-  }
-  if (temporaryFileUuids.length > 0) {
-    logger.debug(`Deleting ${temporaryFileUuids.length} temporary files of survey ${surveyId}`)
-    await deleteFilesAndContentByUuids({ surveyId, fileUuids: temporaryFileUuids }, client)
+  const temporaryFileSummaries = fileSummaries.filter(SurveyFile.isTemporary)
+  if (temporaryFileSummaries.length > 0) {
+    logger.debug(`Deleting ${temporaryFileSummaries.length} temporary files of survey ${surveyId}`)
+    await deleteFilesAndContent({ surveyId, fileSummaries: temporaryFileSummaries }, client)
   }
 }
 

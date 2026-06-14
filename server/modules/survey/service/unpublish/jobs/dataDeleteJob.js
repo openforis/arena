@@ -29,8 +29,7 @@ export default class DataDeleteJob extends Job {
     const recordFileSummaries = fileSummaries.filter((fileSummary) => !!SurveyFile.getRecordUuid(fileSummary))
 
     if (recordFileSummaries.length > 0) {
-      const filesToDeleteUuids = recordFileSummaries.map(SurveyFile.getUuid)
-      await SurveyFileManager.deleteFilesAndContentByUuids({ surveyId, fileUuids: filesToDeleteUuids }, tx)
+      await SurveyFileManager.deleteFilesAndContent({ surveyId, fileSummaries: recordFileSummaries }, tx)
     }
     this.incrementProcessedItems()
   }
