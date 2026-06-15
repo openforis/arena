@@ -40,6 +40,11 @@
   flex: 1;
 }
 
+.survey-form-header__download-buttons {
+  display: flex;
+  align-items: center;
+}
+
 .survey-form-header__record-actions-steps {
   border: 1px solid $greyBorder;
 

@@ -1,4 +1,4 @@
-import { Schemata, SurveyDocxGenerator } from '@openforis/arena-server'
+import { Schemata, SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
@@ -133,7 +133,16 @@ export const startSchemaSummaryExportJob = ({ user, surveyId, cycle, fileFormat,
 export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
 
-export const exportSurveyDocx = async ({ surveyId, cycle, outputStream, lang = null, draft = true }) => {
+const exportSurveyDocument = async ({
+  surveyId,
+  cycle,
+  outputStream,
+  lang,
+  draft,
+  generator,
+  extension,
+  contentType,
+}) => {
   const survey = await fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
     cycle,
@@ -144,22 +153,40 @@ export const exportSurveyDocx = async ({ surveyId, cycle, outputStream, lang = n
   })
   const langToUse = lang ?? Survey.getDefaultLanguage(survey)
   const i18n = await i18nFactory.createI18nAsync(langToUse)
-  const { buffer, surveyName } = await SurveyDocxGenerator.generateSurveyDocx({ survey, cycle, lang: langToUse, i18n })
-  const fileName = ExportFileNameGenerator.generate({
-    surveyName,
-    cycle,
-    fileType: 'SurveyForm',
-    extension: 'docx',
-  })
-  const fileSize = Buffer.byteLength(buffer)
+  const { buffer, surveyName } = await generator({ survey, cycle, lang: langToUse, i18n })
+  const fileName = ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'SurveyForm', extension })
   Response.sendFileContent({
     res: outputStream,
     fileName,
     content: buffer,
-    contentSize: fileSize,
-    contentType: Response.contentTypes.docx,
+    contentSize: Buffer.byteLength(buffer),
+    contentType,
   })
 }
+
+export const exportSurveyDocx = ({ surveyId, cycle, outputStream, lang = null, draft = true }) =>
+  exportSurveyDocument({
+    surveyId,
+    cycle,
+    outputStream,
+    lang,
+    draft,
+    generator: SurveyDocxGenerator.generateSurveyDocx,
+    extension: 'docx',
+    contentType: Response.contentTypes.docx,
+  })
+
+export const exportSurveyPdf = ({ surveyId, cycle, outputStream, lang = null, draft = true }) =>
+  exportSurveyDocument({
+    surveyId,
+    cycle,
+    outputStream,
+    lang,
+    draft,
+    generator: SurveyPdfGenerator.generateSurveyPdf,
+    extension: 'pdf',
+    contentType: Response.contentTypes.pdf,
+  })
 
 export const deleteSurvey = async (surveyId) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
