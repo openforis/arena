@@ -51,6 +51,7 @@ export {
   fetchRecordSummary,
   fetchRecordsSummary,
   getRecordDocxExportUrl,
+  getRecordPdfExportUrl,
   startExportDataJob,
   startExportDataSummaryJob,
   downloadExportedDataSummaryUrl,
@@ -94,6 +95,7 @@ export {
   getSurveyListExportedFileDownloadUrl,
   getSurveyDocxExportUrl,
   getSurveyFileDownloadUrl,
+  getSurveyPdfExportUrl,
   startSchemaSummaryExportJob,
 } from './survey'
 export {

@@ -34,6 +34,9 @@ export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
 export const getRecordDocxExportUrl = ({ surveyId, recordUuid, lang }) =>
   `/api/survey/${surveyId}/record/${recordUuid}/export/docx?${new URLSearchParams({ lang })}`
 
+export const getRecordPdfExportUrl = ({ surveyId, recordUuid, lang }) =>
+  `/api/survey/${surveyId}/record/${recordUuid}/export/pdf?${new URLSearchParams({ lang })}`
+
 // ==== RECORD FILE
 export const getRecordNodeFileUrl = ({ surveyId, node }) =>
   `/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`

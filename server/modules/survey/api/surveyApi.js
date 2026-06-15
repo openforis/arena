@@ -287,6 +287,16 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/export/pdf', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, draft, cycle, lang } = Request.getParams(req)
+
+      await SurveyService.exportSurveyPdf({ surveyId, draft, cycle, lang, outputStream: res })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // schema summary export (used by R chain — direct synchronous download without AI descriptions)
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
