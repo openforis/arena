@@ -136,6 +136,7 @@ export default {
       showPanel: 'Mostrar panel',
       sortAsc: 'Ordenar ascendente',
       sortDesc: 'Ordenar descendente',
+      sort: 'Ordenar',
       sortNone: 'Quitar orden',
     },
   },

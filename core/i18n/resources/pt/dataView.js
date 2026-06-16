@@ -145,6 +145,10 @@ A mesclagem não pode ser realizada.`,
     layersPanel: {
       hidePanel: 'Ocultar painel',
       showPanel: 'Mostrar painel',
+      sort: 'Ordenar',
+      sortAsc: 'Ordenar ascendente',
+      sortDesc: 'Ordenar descendente',
+      sortNone: 'Remover ordem',
     },
   },
 }

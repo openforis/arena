@@ -76,15 +76,42 @@ const PointListItem: FC<PointListItemProps> = ({ point, isSelected, onClick }) =
   )
 }
 
-const determineSortTooltipKey = (sortOrder: string) => {
-  switch (sortOrder) {
-    case 'asc':
-      return 'dataView:mapView.layersPanel.sortDesc'
-    case 'desc':
-      return 'dataView:mapView.layersPanel.sortNone'
-    default:
-      return 'dataView:mapView.layersPanel.sortAsc'
+type SortButtonProps = {
+  sortOrder: SortOrder
+  onClick: (e: React.MouseEvent) => void
+}
+
+const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
+  const i18n = useI18n()
+  const tooltipKeyBySortOrder: Record<SortOrder, string> = {
+    asc: 'dataView:mapView.layersPanel.sortDesc',
+    desc: 'dataView:mapView.layersPanel.sortNone',
+    none: 'dataView:mapView.layersPanel.sortAsc',
   }
+  const tooltipKey = tooltipKeyBySortOrder[sortOrder]
+  const iconClass = sortOrder === 'desc' ? 'icon-sort-alpha-desc' : 'icon-sort-alpha-asc'
+  return (
+    <Tooltip title={i18n.t(tooltipKey)} placement="right">
+      <IconButton
+        size="small"
+        onClick={onClick}
+        sx={{
+          p: 0.25,
+          ml: 0.5,
+          borderRadius: 1,
+          gap: 0.25,
+          color: sortOrder === 'none' ? SIDEBAR_BLACK : SIDEBAR_BLUE,
+          opacity: sortOrder === 'none' ? 0.4 : 1,
+          '&:hover': { bgcolor: 'rgba(56, 133, 202, 0.12)', opacity: 1 },
+        }}
+      >
+        <span className={`icon icon-12px ${iconClass}`} />
+        <Typography component="span" sx={{ fontSize: '0.68rem', lineHeight: 1, color: 'inherit' }}>
+          {i18n.t('dataView:mapView.layersPanel.sort')}
+        </Typography>
+      </IconButton>
+    </Tooltip>
+  )
 }
 
 type VirtualPointsListProps = {
@@ -108,7 +135,6 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
   isExpanded,
   onToggleExpand,
 }) => {
-  const i18n = useI18n()
   const { layerSortOrders, setLayerSortOrder } = useMapLayersPanel()
   const sortOrder: SortOrder = layerSortOrders[layerKey] ?? 'none'
   const containerRef = useRef<HTMLElement | null>(null)
@@ -149,9 +175,6 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
     [onItemClick, onSelect]
   )
 
-  const sortTooltipKey = determineSortTooltipKey(sortOrder)
-  const sortIconClass = sortOrder === 'desc' ? 'icon-sort-alpha-desc' : 'icon-sort-alpha-asc'
-
   return (
     <Accordion
       component="li"
@@ -189,30 +212,15 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
           '&:hover': { bgcolor: '#dde3ed' },
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.3 }}>
-            {layerName}
-          </Typography>
-          <Tooltip title={i18n.t(sortTooltipKey)} placement="right">
-            <IconButton
-              size="small"
-              onClick={handleSortToggle}
-              sx={{
-                p: 0.25,
-                ml: 0.5,
-                borderRadius: 1,
-                color: sortOrder === 'none' ? SIDEBAR_BLACK : SIDEBAR_BLUE,
-                opacity: sortOrder === 'none' ? 0.4 : 1,
-                '&:hover': { bgcolor: 'rgba(56, 133, 202, 0.12)', opacity: 1 },
-              }}
-            >
-              <span className={`icon icon-12px ${sortIconClass}`} />
-            </IconButton>
-          </Tooltip>
-        </Box>
-        <Typography variant="caption" sx={{ color: SIDEBAR_BLACK, opacity: 0.7, fontSize: '0.72rem', lineHeight: 1 }}>
-          {points.length} markers
+        <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.3 }}>
+          {layerName}
         </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography variant="caption" sx={{ color: SIDEBAR_BLACK, opacity: 0.7, fontSize: '0.72rem', lineHeight: 1 }}>
+            {points.length} markers
+          </Typography>
+          <SortButton sortOrder={sortOrder} onClick={handleSortToggle} />
+        </Box>
       </AccordionSummary>
       <AccordionDetails sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, p: 0 }}>
         <Box ref={containerRef} sx={{ flex: 1, minHeight: 0, overflowY: 'auto' }} onScroll={onScroll}>

@@ -148,6 +148,7 @@ export default {
       showPanel: 'Самбарыг харуулах',
       sortAsc: 'Өсөх эрэмбэ',
       sortDesc: 'Буурах эрэмбэ',
+      sort: 'Эрэмбэлэх',
       sortNone: 'Эрэмбэ арилгах',
     },
   },
