@@ -114,7 +114,7 @@ const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
   )
 }
 
-type VirtualPointsListProps = {
+type LayerAccordionProps = {
   layerKey: string
   layerName: string
   points: MapLayerPoint[]
@@ -126,7 +126,7 @@ type VirtualPointsListProps = {
   isSingleLayer: boolean
 }
 
-const VirtualPointsList: FC<VirtualPointsListProps> = ({
+const LayerAccordion: FC<LayerAccordionProps> = ({
   layerKey,
   layerName,
   points,
@@ -181,7 +181,7 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
     <Accordion
       component="li"
       expanded={isExpanded}
-      onChange={onToggleExpand}
+      onChange={isSingleLayer ? undefined : onToggleExpand}
       disableGutters
       elevation={0}
       slots={{ transition: NoTransition as any }}
@@ -211,7 +211,9 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
           px: 1.5,
           flexShrink: 0,
           '& .MuiAccordionSummary-content': { my: 0.75, flexDirection: 'column', gap: 0.25, mr: 0.5 },
-          '&:hover': { bgcolor: '#dde3ed' },
+          ...(isSingleLayer
+            ? { cursor: 'default', '&:hover': {} }
+            : { '&:hover': { bgcolor: '#dde3ed' } }),
         }}
       >
         <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.3 }}>
@@ -362,7 +364,7 @@ export const MapLayersPanel: FC = () => {
     >
       <PanelHeader onToggle={togglePanelVisible} />
       {activeLayers.map(({ key, layerName, points, flyToPoint }) => (
-        <VirtualPointsList
+        <LayerAccordion
           key={key}
           layerKey={key}
           layerName={layerName}
@@ -371,7 +373,15 @@ export const MapLayersPanel: FC = () => {
           selectedPointKey={selectedPointKey}
           onSelect={setSelectedPointKey}
           isExpanded={expandedLayerKey === key}
-          onToggleExpand={(_, expanded) => setExpandedLayerKey(expanded ? key : null)}
+          onToggleExpand={(_, expanded) => {
+            if (expanded) {
+              setExpandedLayerKey(key)
+            } else {
+              const currentIndex = activeLayers.findIndex((l) => l.key === key)
+              const nextLayer = activeLayers[currentIndex + 1]
+              setExpandedLayerKey(nextLayer ? nextLayer.key : null)
+            }
+          }}
           isSingleLayer={activeLayers.length === 1}
         />
       ))}
