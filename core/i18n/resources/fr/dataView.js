@@ -146,6 +146,9 @@ La fusion ne peut pas être effectuée.`,
     layersPanel: {
       hidePanel: 'Masquer le panneau',
       showPanel: 'Afficher le panneau',
+      sortAsc: 'Trier croissant',
+      sortDesc: 'Trier décroissant',
+      sortNone: 'Supprimer le tri',
     },
   },
 }

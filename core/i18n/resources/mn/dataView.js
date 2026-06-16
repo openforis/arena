@@ -146,6 +146,9 @@ export default {
     layersPanel: {
       hidePanel: 'Самбарыг нуух',
       showPanel: 'Самбарыг харуулах',
+      sortAsc: 'Өсөх эрэмбэ',
+      sortDesc: 'Буурах эрэмбэ',
+      sortNone: 'Эрэмбэ арилгах',
     },
   },
 }

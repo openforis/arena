@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { ClusterMarker, useFlyToPoint } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
-import { useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
+import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 
 export const GeoAttributeDataLayer = (props) => {
   const { attributeDef, onRecordEditClick } = props
@@ -23,6 +23,11 @@ export const GeoAttributeDataLayer = (props) => {
     points,
   } = useGeoAttributeDataLayer(props)
 
+  const { registerLayer, unregisterLayer, selectPoint, layerSortOrders } = useMapLayersPanel()
+  const layerKey = NodeDef.getUuid(attributeDef)
+  const sortOrder = layerSortOrders[layerKey] ?? 'none'
+  const sortedPoints = useMemo(() => applySortOrder(points, sortOrder), [points, sortOrder])
+
   const {
     currentPointShown,
     currentPointPopupOpen,
@@ -32,10 +37,7 @@ export const GeoAttributeDataLayer = (props) => {
     onCurrentPointPopupClose,
     openPopupOfPoint,
     setMarkerByKey,
-  } = useFlyToPoint({ points, onRecordEditClick, zoomToMaxLevel: NodeDef.isCoordinate(attributeDef) })
-
-  const { registerLayer, unregisterLayer, selectPoint } = useMapLayersPanel()
-  const layerKey = NodeDef.getUuid(attributeDef)
+  } = useFlyToPoint({ points: sortedPoints, onRecordEditClick, zoomToMaxLevel: NodeDef.isCoordinate(attributeDef) })
 
   const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
   const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])

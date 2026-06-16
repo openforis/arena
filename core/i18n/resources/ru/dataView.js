@@ -146,6 +146,9 @@ export default {
     layersPanel: {
       hidePanel: 'Скрыть панель',
       showPanel: 'Показать панель',
+      sortAsc: 'Сортировать по возрастанию',
+      sortDesc: 'Сортировать по убыванию',
+      sortNone: 'Убрать сортировку',
     },
   },
 }

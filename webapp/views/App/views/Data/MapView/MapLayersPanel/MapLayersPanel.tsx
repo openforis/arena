@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
+import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Accordion,
   AccordionDetails,
@@ -13,7 +13,13 @@ import {
 } from '@mui/material'
 
 import { useI18n } from '@webapp/store/system'
-import { type MapLayerPoint, useMapLayersPanel } from './MapLayersPanelContext'
+import {
+  applySortOrder,
+  type MapLayerPoint,
+  SORT_ORDER_NEXT,
+  type SortOrder,
+  useMapLayersPanel,
+} from './MapLayersPanelContext'
 
 // Colors from SideBar: $blue #3885ca, $grey #e7e9ee, $greyBorder #d1d1dd, $black #2f3138
 const SIDEBAR_BLUE = '#3885ca'
@@ -71,6 +77,7 @@ const PointListItem: FC<PointListItemProps> = ({ point, isSelected, onClick }) =
 }
 
 type VirtualPointsListProps = {
+  layerKey: string
   layerName: string
   points: MapLayerPoint[]
   onItemClick: (point: MapLayerPoint) => void
@@ -81,6 +88,7 @@ type VirtualPointsListProps = {
 }
 
 const VirtualPointsList: FC<VirtualPointsListProps> = ({
+  layerKey,
   layerName,
   points,
   onItemClick,
@@ -89,6 +97,9 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
   isExpanded,
   onToggleExpand,
 }) => {
+  const i18n = useI18n()
+  const { layerSortOrders, setLayerSortOrder } = useMapLayersPanel()
+  const sortOrder: SortOrder = layerSortOrders[layerKey] ?? 'none'
   const containerRef = useRef<HTMLElement | null>(null)
   const [scrollTop, setScrollTop] = useState(0)
   const [containerHeight, setContainerHeight] = useState(400)
@@ -104,10 +115,20 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
 
   const onScroll = useCallback((e: React.UIEvent<HTMLElement>) => setScrollTop(e.currentTarget.scrollTop), [])
 
-  const totalHeight = points.length * ITEM_HEIGHT
+  const handleSortToggle = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      setLayerSortOrder(layerKey, SORT_ORDER_NEXT[sortOrder])
+    },
+    [layerKey, setLayerSortOrder, sortOrder]
+  )
+
+  const sortedPoints = useMemo(() => applySortOrder(points, sortOrder), [points, sortOrder])
+
+  const totalHeight = sortedPoints.length * ITEM_HEIGHT
   const startIndex = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - OVERSCAN)
-  const endIndex = Math.min(points.length - 1, Math.ceil((scrollTop + containerHeight) / ITEM_HEIGHT) + OVERSCAN)
-  const visiblePoints = points.slice(startIndex, endIndex + 1)
+  const endIndex = Math.min(sortedPoints.length - 1, Math.ceil((scrollTop + containerHeight) / ITEM_HEIGHT) + OVERSCAN)
+  const visiblePoints = sortedPoints.slice(startIndex, endIndex + 1)
 
   const handleItemClick = useCallback(
     (point: MapLayerPoint) => {
@@ -116,6 +137,14 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
     },
     [onItemClick, onSelect]
   )
+
+  const sortTooltipKey =
+    sortOrder === 'none'
+      ? 'dataView:mapView.layersPanel.sortAsc'
+      : sortOrder === 'asc'
+        ? 'dataView:mapView.layersPanel.sortDesc'
+        : 'dataView:mapView.layersPanel.sortNone'
+  const sortIconClass = sortOrder === 'desc' ? 'icon-sort-alpha-desc' : 'icon-sort-alpha-asc'
 
   return (
     <Accordion
@@ -146,13 +175,31 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
           minHeight: '0 !important',
           px: 1.5,
           flexShrink: 0,
-          '& .MuiAccordionSummary-content': { my: 0.75, flexDirection: 'column', gap: 0.25 },
+          '& .MuiAccordionSummary-content': { my: 0.75, flexDirection: 'column', gap: 0.25, mr: 0.5 },
           '&:hover': { bgcolor: '#dde3ed' },
         }}
       >
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.3 }}>
-          {layerName}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.3 }}>
+            {layerName}
+          </Typography>
+          <Tooltip title={i18n.t(sortTooltipKey)} placement="right">
+            <IconButton
+              size="small"
+              onClick={handleSortToggle}
+              sx={{
+                p: 0.25,
+                ml: 0.5,
+                borderRadius: 1,
+                color: sortOrder !== 'none' ? SIDEBAR_BLUE : SIDEBAR_BLACK,
+                opacity: sortOrder !== 'none' ? 1 : 0.4,
+                '&:hover': { bgcolor: 'rgba(56, 133, 202, 0.12)', opacity: 1 },
+              }}
+            >
+              <span className={`icon icon-12px ${sortIconClass}`} />
+            </IconButton>
+          </Tooltip>
+        </Box>
         <Typography variant="caption" sx={{ color: SIDEBAR_BLACK, opacity: 0.7, fontSize: '0.72rem', lineHeight: 1 }}>
           {points.length} markers
         </Typography>
@@ -288,6 +335,7 @@ export const MapLayersPanel: FC = () => {
       {activeLayers.map(({ key, layerName, points, flyToPoint }) => (
         <VirtualPointsList
           key={key}
+          layerKey={key}
           layerName={layerName}
           points={points}
           onItemClick={flyToPoint}

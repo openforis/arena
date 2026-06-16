@@ -146,6 +146,9 @@ Merge cannot be performed.`,
     layersPanel: {
       hidePanel: 'Hide panel',
       showPanel: 'Show panel',
+      sortAsc: 'Sort ascending',
+      sortDesc: 'Sort descending',
+      sortNone: 'Remove sort',
     },
   },
 }
