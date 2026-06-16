@@ -114,6 +114,25 @@ const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
   )
 }
 
+const scrollSelectedPointIntoView = ({
+  container,
+  selectedPointKey,
+  sortedPoints,
+}: {
+  container: HTMLElement | null
+  selectedPointKey: string | null
+  sortedPoints: MapLayerPoint[]
+}) => {
+  if (!selectedPointKey || !container) return
+  const idx = sortedPoints.findIndex((p) => p.properties.key === selectedPointKey)
+  if (idx === -1) return
+  const itemTop = idx * ITEM_HEIGHT
+  const itemBottom = itemTop + ITEM_HEIGHT
+  if (itemTop < container.scrollTop || itemBottom > container.scrollTop + container.clientHeight) {
+    container.scrollTop = Math.max(0, itemTop - container.clientHeight / 2 + ITEM_HEIGHT / 2)
+  }
+}
+
 type LayerAccordionProps = {
   layerKey: string
   layerName: string
@@ -164,6 +183,10 @@ const LayerAccordion: FC<LayerAccordionProps> = ({
 
   const sortedPoints = useMemo(() => applySortOrder(points, sortOrder), [points, sortOrder])
 
+  useEffect(() => {
+    scrollSelectedPointIntoView({ container: containerRef.current, selectedPointKey, sortedPoints })
+  }, [selectedPointKey, sortedPoints])
+
   const totalHeight = sortedPoints.length * ITEM_HEIGHT
   const startIndex = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - OVERSCAN)
   const endIndex = Math.min(sortedPoints.length - 1, Math.ceil((scrollTop + containerHeight) / ITEM_HEIGHT) + OVERSCAN)
@@ -211,9 +234,7 @@ const LayerAccordion: FC<LayerAccordionProps> = ({
           px: 1.5,
           flexShrink: 0,
           '& .MuiAccordionSummary-content': { my: 0.75, flexDirection: 'column', gap: 0.25, mr: 0.5 },
-          ...(isSingleLayer
-            ? { cursor: 'default', '&:hover': {} }
-            : { '&:hover': { bgcolor: '#dde3ed' } }),
+          ...(isSingleLayer ? { cursor: 'default', '&:hover': {} } : { '&:hover': { bgcolor: '#dde3ed' } }),
         }}
       >
         <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.3 }}>
