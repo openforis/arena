@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 type Params = {
   containerRef: React.RefObject<HTMLElement | null>
@@ -9,6 +9,7 @@ type Params = {
 
 type Result = {
   width: number
+  maxWidth: number
   onGutterMouseDown: (e: React.MouseEvent) => void
   onGutterKeyDown: (e: React.KeyboardEvent) => void
   onGutterTouchStart: (e: React.TouchEvent) => void
@@ -23,7 +24,17 @@ export const useHorizontalResize = ({
   minRightWidth = 0,
 }: Params): Result => {
   const [width, setWidth] = useState(initialWidth)
+  const [containerWidth, setContainerWidth] = useState(0)
   const widthRef = useRef(initialWidth)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    setContainerWidth(container.clientWidth)
+    const observer = new ResizeObserver(() => setContainerWidth(container.clientWidth))
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [containerRef])
 
   const clampWidth = useCallback(
     (newWidth: number): number => {
@@ -116,5 +127,7 @@ export const useHorizontalResize = ({
     [clampWidth]
   )
 
-  return { width, onGutterMouseDown, onGutterKeyDown, onGutterTouchStart }
+  const maxWidth = Math.max(0, containerWidth - minRightWidth)
+
+  return { width, maxWidth, onGutterMouseDown, onGutterKeyDown, onGutterTouchStart }
 }

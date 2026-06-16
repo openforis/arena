@@ -42,6 +42,7 @@ const MapViewContent = ({ layers }: MapViewContentProps) => {
 
   const {
     width: panelWidth,
+    maxWidth: panelMaxWidth,
     onGutterMouseDown,
     onGutterKeyDown,
     onGutterTouchStart,
@@ -62,10 +63,11 @@ const MapViewContent = ({ layers }: MapViewContentProps) => {
       </div>
       {panelOpen && (
         <div
-          role="separator"
+          role="slider"
           aria-orientation="vertical"
           aria-valuenow={panelWidth}
           aria-valuemin={PANEL_MIN_WIDTH}
+          aria-valuemax={panelMaxWidth}
           tabIndex={0}
           className="map-view-content__gutter"
           onMouseDown={onGutterMouseDown}
