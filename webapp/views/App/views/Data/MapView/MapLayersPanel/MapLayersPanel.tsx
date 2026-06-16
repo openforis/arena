@@ -123,6 +123,7 @@ type VirtualPointsListProps = {
   onSelect: (key: string | null) => void
   isExpanded: boolean
   onToggleExpand: (event: React.SyntheticEvent, expanded: boolean) => void
+  isSingleLayer: boolean
 }
 
 const VirtualPointsList: FC<VirtualPointsListProps> = ({
@@ -134,6 +135,7 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
   onSelect,
   isExpanded,
   onToggleExpand,
+  isSingleLayer,
 }) => {
   const { layerSortOrders, setLayerSortOrder } = useMapLayersPanel()
   const sortOrder: SortOrder = layerSortOrders[layerKey] ?? 'none'
@@ -200,7 +202,7 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
       }}
     >
       <AccordionSummary
-        expandIcon={<span className="icon icon-12px icon-arrow-down" />}
+        expandIcon={isSingleLayer ? null : <span className="icon icon-12px icon-arrow-down" />}
         sx={{
           bgcolor: SIDEBAR_GREY,
           color: SIDEBAR_BLACK,
@@ -301,12 +303,22 @@ export const MapLayersPanel: FC = () => {
   } = useMapLayersPanel()
 
   const [expandedLayerKey, setExpandedLayerKey] = useState<string | null>(null)
+  const prevLayerKeysRef = useRef<string[]>([])
 
   useEffect(() => {
+    const currentKeys = activeLayers.map((l) => l.key)
+    const prevKeys = prevLayerKeysRef.current
+    prevLayerKeysRef.current = currentKeys
+
     if (activeLayers.length === 0) {
       setExpandedLayerKey(null)
-    } else if (expandedLayerKey === null || !activeLayers.some((l) => l.key === expandedLayerKey)) {
-      setExpandedLayerKey(activeLayers[0].key)
+    } else {
+      const newKey = currentKeys.find((k) => !prevKeys.includes(k))
+      if (newKey) {
+        setExpandedLayerKey(newKey)
+      } else if (expandedLayerKey === null || !activeLayers.some((l) => l.key === expandedLayerKey)) {
+        setExpandedLayerKey(activeLayers[0].key)
+      }
     }
   }, [activeLayers, expandedLayerKey])
 
@@ -360,6 +372,7 @@ export const MapLayersPanel: FC = () => {
           onSelect={setSelectedPointKey}
           isExpanded={expandedLayerKey === key}
           onToggleExpand={(_, expanded) => setExpandedLayerKey(expanded ? key : null)}
+          isSingleLayer={activeLayers.length === 1}
         />
       ))}
     </List>
