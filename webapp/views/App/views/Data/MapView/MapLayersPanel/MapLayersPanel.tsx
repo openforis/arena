@@ -111,7 +111,7 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
     const ro = new ResizeObserver(() => setContainerHeight(el.clientHeight))
     ro.observe(el)
     return () => ro.disconnect()
-  }, [])
+  }, [isExpanded])
 
   const onScroll = useCallback((e: React.UIEvent<HTMLElement>) => setScrollTop(e.currentTarget.scrollTop), [])
 
@@ -155,11 +155,16 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
       elevation={0}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       slots={{ transition: NoTransition as any }}
+      slotProps={{
+        heading: { sx: { flexShrink: 0 } },
+        region: { sx: { display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' } },
+      }}
       sx={{
         display: 'flex',
         flexDirection: 'column',
         flex: isExpanded ? 1 : 'none',
         minHeight: 0,
+        overflow: 'hidden',
         listStyle: 'none',
         borderRadius: '0 !important',
         borderBottom: `1px solid #d1d1dd`,
