@@ -1,6 +1,6 @@
 import './MapView.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -13,6 +13,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
 
+import { useHorizontalResize } from '@webapp/components/hooks'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { MapContainer } from '@webapp/components/MapContainer'
 
@@ -21,6 +22,42 @@ import { RecordEditModal } from '../common/RecordEditModal'
 import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
 import { PreloadedLayer } from './PreloadedLayer/PreloadedLayer'
 import { MapLayersPanel, MapLayersPanelProvider } from './MapLayersPanel'
+import { useMapLayersPanel } from './MapLayersPanel/MapLayersPanelContext'
+
+const PANEL_DEFAULT_WIDTH = 260
+const PANEL_MIN_WIDTH = 100
+const MAP_MIN_WIDTH = 300
+
+// MapContainer must always occupy the same position in the React tree so Leaflet never
+// unmounts. We achieve this with a stable flex layout where only the panel-pane width
+// changes — no conditional Split mount/unmount.
+const MapViewContent = ({ layers }) => {
+  const { activeLayers, isPanelVisible } = useMapLayersPanel()
+  const containerRef = useRef(null)
+  const panelOpen = isPanelVisible && activeLayers.length > 0
+
+  const { width: panelWidth, onGutterMouseDown } = useHorizontalResize({
+    containerRef,
+    initialWidth: PANEL_DEFAULT_WIDTH,
+    minLeftWidth: PANEL_MIN_WIDTH,
+    minRightWidth: MAP_MIN_WIDTH,
+  })
+
+  return (
+    <div ref={containerRef} className="map-view-content">
+      <div
+        className="map-view-content__panel"
+        style={{ width: panelOpen ? panelWidth : 0, overflow: panelOpen ? 'hidden' : 'visible' }}
+      >
+        <MapLayersPanel />
+      </div>
+      {panelOpen && <div className="map-view-content__gutter" onMouseDown={onGutterMouseDown} />}
+      <div className="map-view-content__map">
+        <MapContainer layers={layers} />
+      </div>
+    </div>
+  )
+}
 
 const getGeoAttributeLayerMarkersColor = ({ attributeDef, defaultColor }) => {
   if (!NodeDef.isCoordinate(attributeDef)) return defaultColor
@@ -136,8 +173,7 @@ const MapWrapper = () => {
   return (
     <MapLayersPanelProvider>
       <div className="map-view-layout">
-        <MapLayersPanel />
-        <MapContainer layers={layers} />
+        <MapViewContent layers={layers} />
       </div>
       {editingRecordUuid && (
         <RecordEditModal

@@ -130,4 +130,10 @@ export default {
       'Por favor, haga su selección usando el panel lateral izquierdo o seleccione una consulta existente de "Administrar consultas"',
   },
   viewSelectedRecord: 'Ver registro seleccionado',
+  mapView: {
+    layersPanel: {
+      hidePanel: 'Ocultar panel',
+      showPanel: 'Mostrar panel',
+    },
+  },
 }

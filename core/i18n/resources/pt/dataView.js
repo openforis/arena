@@ -141,4 +141,10 @@ A mesclagem não pode ser realizada.`,
       'Faça sua seleção usando o painel esquerdo ou selecione uma consulta existente em "Gerenciar consultas"',
   },
   viewSelectedRecord: 'Visualizar registro selecionado',
+  mapView: {
+    layersPanel: {
+      hidePanel: 'Ocultar painel',
+      showPanel: 'Mostrar painel',
+    },
+  },
 }

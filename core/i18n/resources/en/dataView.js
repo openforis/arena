@@ -142,4 +142,10 @@ Merge cannot be performed.`,
       'Please make your selection using the left side panel or select an existing query from "Manage queries"',
   },
   viewSelectedRecord: 'View selected record',
+  mapView: {
+    layersPanel: {
+      hidePanel: 'Hide panel',
+      showPanel: 'Show panel',
+    },
+  },
 }

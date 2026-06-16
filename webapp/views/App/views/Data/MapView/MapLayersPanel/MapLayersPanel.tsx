@@ -1,18 +1,35 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Box, List, ListItemButton, ListItemText, ListSubheader, Typography } from '@mui/material'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
+import { Box, IconButton, List, ListItemButton, ListItemText, ListSubheader, Tooltip, Typography } from '@mui/material'
 
-import { useMapLayersPanel } from './MapLayersPanelContext'
+import { useI18n } from '@webapp/store/system'
+import { type MapLayerPoint, useMapLayersPanel } from './MapLayersPanelContext'
 
 // Colors from SideBar: $blue #3885ca, $grey #e7e9ee, $greyBorder #d1d1dd, $black #2f3138
 const SIDEBAR_BLUE = '#3885ca'
 const SIDEBAR_GREY = '#e7e9ee'
 const SIDEBAR_BLACK = '#2f3138'
 
+export const PANEL_WIDTH = 260
+
 const ITEM_HEIGHT = 36
 const OVERSCAN = 4
 
-const VirtualPointsList = ({ layerName, points, onItemClick, selectedPointKey, onSelect }) => {
-  const containerRef = useRef(null)
+type VirtualPointsListProps = {
+  layerName: string
+  points: MapLayerPoint[]
+  onItemClick: (point: MapLayerPoint) => void
+  selectedPointKey: string | null
+  onSelect: (key: string) => void
+}
+
+const VirtualPointsList: FC<VirtualPointsListProps> = ({
+  layerName,
+  points,
+  onItemClick,
+  selectedPointKey,
+  onSelect,
+}) => {
+  const containerRef = useRef<HTMLElement | null>(null)
   const [scrollTop, setScrollTop] = useState(0)
   const [containerHeight, setContainerHeight] = useState(400)
 
@@ -25,7 +42,7 @@ const VirtualPointsList = ({ layerName, points, onItemClick, selectedPointKey, o
     return () => ro.disconnect()
   }, [])
 
-  const onScroll = useCallback((e) => setScrollTop(e.currentTarget.scrollTop), [])
+  const onScroll = useCallback((e: React.UIEvent<HTMLElement>) => setScrollTop(e.currentTarget.scrollTop), [])
 
   const totalHeight = points.length * ITEM_HEIGHT
   const startIndex = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - OVERSCAN)
@@ -33,7 +50,7 @@ const VirtualPointsList = ({ layerName, points, onItemClick, selectedPointKey, o
   const visiblePoints = points.slice(startIndex, endIndex + 1)
 
   const handleItemClick = useCallback(
-    (point) => {
+    (point: MapLayerPoint) => {
       onSelect(point.properties.key)
       onItemClick(point)
     },
@@ -113,29 +130,95 @@ const VirtualPointsList = ({ layerName, points, onItemClick, selectedPointKey, o
   )
 }
 
-export const MapLayersPanel = () => {
-  const { activeLayers, selectedPointKey, selectPoint: setSelectedPointKey } = useMapLayersPanel()
+type ToggleButtonProps = {
+  isPanelVisible: boolean
+  onClick: () => void
+}
+
+const ToggleButton: FC<ToggleButtonProps> = ({ isPanelVisible, onClick }) => {
+  const i18n = useI18n()
+  return (
+    <Tooltip
+      title={i18n.t(
+        isPanelVisible ? 'dataView:mapView.layersPanel.hidePanel' : 'dataView:mapView.layersPanel.showPanel'
+      )}
+      placement="right"
+    >
+      <IconButton
+        size="small"
+        onClick={onClick}
+        sx={{
+          p: 0.5,
+          borderRadius: 1,
+          color: SIDEBAR_BLACK,
+          '&:hover': { bgcolor: `rgba(56, 133, 202, 0.08)` },
+        }}
+      >
+        <span className={`icon icon-12px ${isPanelVisible ? 'icon-arrow-left' : 'icon-arrow-right'}`} />
+      </IconButton>
+    </Tooltip>
+  )
+}
+
+export const MapLayersPanel: FC = () => {
+  const {
+    activeLayers,
+    isPanelVisible,
+    selectedPointKey,
+    selectPoint: setSelectedPointKey,
+    togglePanelVisible,
+  } = useMapLayersPanel()
 
   if (activeLayers.length === 0) return null
+
+  if (!isPanelVisible) {
+    return (
+      <Box
+        sx={{
+          position: 'absolute',
+          left: 0,
+          top: 8,
+          zIndex: 1000,
+          bgcolor: 'rgba(255,255,255,0.96)',
+          border: `1px solid #d1d1dd`,
+          borderLeft: 'none',
+          borderRadius: '0 4px 4px 0',
+          boxShadow: 2,
+          p: 0.25,
+        }}
+      >
+        <ToggleButton isPanelVisible={false} onClick={togglePanelVisible} />
+      </Box>
+    )
+  }
 
   return (
     <List
       dense
       disablePadding
       sx={{
-        position: 'absolute',
-        left: 0,
-        top: 0,
         height: '100%',
-        width: 260,
-        zIndex: 1000,
+        width: '100%',
         bgcolor: 'rgba(255,255,255,0.96)',
         borderRight: `1px solid #d1d1dd`,
         boxShadow: 2,
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
       }}
     >
+      <Box
+        component="li"
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          px: 0.5,
+          py: 0.25,
+          borderBottom: `1px solid #d1d1dd`,
+        }}
+      >
+        <ToggleButton isPanelVisible onClick={togglePanelVisible} />
+      </Box>
       {activeLayers.map(({ key, layerName, points, flyToPoint }) => (
         <VirtualPointsList
           key={key}
