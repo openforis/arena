@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useCallback, useContext, useState } from 'react'
+import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react'
 
 export type MapLayerPoint = {
   geometry: {
@@ -109,23 +109,32 @@ export const MapLayersPanelProvider = ({ children }: MapLayersPanelProviderProps
     setIsPanelVisible((prev) => !prev)
   }, [])
 
-  return (
-    <MapLayersPanelContext.Provider
-      value={{
-        activeLayers,
-        isPanelVisible,
-        layerSortOrders,
-        selectedPointKey,
-        registerLayer,
-        unregisterLayer,
-        selectPoint,
-        setLayerSortOrder,
-        togglePanelVisible,
-      }}
-    >
-      {children}
-    </MapLayersPanelContext.Provider>
+  const mapLayersContextValue = useMemo(
+    () => ({
+      activeLayers,
+      isPanelVisible,
+      layerSortOrders,
+      selectedPointKey,
+      registerLayer,
+      unregisterLayer,
+      selectPoint,
+      setLayerSortOrder,
+      togglePanelVisible,
+    }),
+    [
+      activeLayers,
+      isPanelVisible,
+      layerSortOrders,
+      selectedPointKey,
+      registerLayer,
+      unregisterLayer,
+      selectPoint,
+      setLayerSortOrder,
+      togglePanelVisible,
+    ]
   )
+
+  return <MapLayersPanelContext.Provider value={mapLayersContextValue}>{children}</MapLayersPanelContext.Provider>
 }
 
 export const useMapLayersPanel = () => useContext(MapLayersPanelContext)

@@ -76,6 +76,17 @@ const PointListItem: FC<PointListItemProps> = ({ point, isSelected, onClick }) =
   )
 }
 
+const determineSortTooltipKey = (sortOrder: string) => {
+  switch (sortOrder) {
+    case 'asc':
+      return 'dataView:mapView.layersPanel.sortDesc'
+    case 'desc':
+      return 'dataView:mapView.layersPanel.sortNone'
+    default:
+      return 'dataView:mapView.layersPanel.sortAsc'
+  }
+}
+
 type VirtualPointsListProps = {
   layerKey: string
   layerName: string
@@ -138,12 +149,7 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
     [onItemClick, onSelect]
   )
 
-  const sortTooltipKey =
-    sortOrder === 'none'
-      ? 'dataView:mapView.layersPanel.sortAsc'
-      : sortOrder === 'asc'
-        ? 'dataView:mapView.layersPanel.sortDesc'
-        : 'dataView:mapView.layersPanel.sortNone'
+  const sortTooltipKey = determineSortTooltipKey(sortOrder)
   const sortIconClass = sortOrder === 'desc' ? 'icon-sort-alpha-desc' : 'icon-sort-alpha-asc'
 
   return (
@@ -153,7 +159,6 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
       onChange={onToggleExpand}
       disableGutters
       elevation={0}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       slots={{ transition: NoTransition as any }}
       slotProps={{
         heading: { sx: { flexShrink: 0 } },
@@ -196,8 +201,8 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
                 p: 0.25,
                 ml: 0.5,
                 borderRadius: 1,
-                color: sortOrder !== 'none' ? SIDEBAR_BLUE : SIDEBAR_BLACK,
-                opacity: sortOrder !== 'none' ? 1 : 0.4,
+                color: sortOrder === 'none' ? SIDEBAR_BLACK : SIDEBAR_BLUE,
+                opacity: sortOrder === 'none' ? 0.4 : 1,
                 '&:hover': { bgcolor: 'rgba(56, 133, 202, 0.12)', opacity: 1 },
               }}
             >
@@ -296,7 +301,6 @@ export const MapLayersPanel: FC = () => {
       setExpandedLayerKey(activeLayers[0].key)
     }
   }, [activeLayers, expandedLayerKey])
-
 
   if (activeLayers.length === 0) return null
 

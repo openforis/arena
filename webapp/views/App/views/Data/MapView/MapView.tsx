@@ -28,12 +28,16 @@ const PANEL_DEFAULT_WIDTH = 260
 const PANEL_MIN_WIDTH = 100
 const MAP_MIN_WIDTH = 300
 
+type MapViewContentProps = {
+  layers: React.ReactElement[]
+}
+
 // MapContainer must always occupy the same position in the React tree so Leaflet never
 // unmounts. We achieve this with a stable flex layout where only the panel-pane width
 // changes — no conditional Split mount/unmount.
-const MapViewContent = ({ layers }) => {
+const MapViewContent = ({ layers }: MapViewContentProps) => {
   const { activeLayers, isPanelVisible } = useMapLayersPanel()
-  const containerRef = useRef(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const panelOpen = isPanelVisible && activeLayers.length > 0
 
   const { width: panelWidth, onGutterMouseDown } = useHorizontalResize({
@@ -59,14 +63,20 @@ const MapViewContent = ({ layers }) => {
   )
 }
 
-const getGeoAttributeLayerMarkersColor = ({ attributeDef, defaultColor }) => {
+const getGeoAttributeLayerMarkersColor = ({
+  attributeDef,
+  defaultColor,
+}: {
+  attributeDef: any
+  defaultColor: string
+}): string => {
   if (!NodeDef.isCoordinate(attributeDef)) return defaultColor
 
-  const mapMarkerColor = NodeDef.getMapMarkerColor(attributeDef)
+  const mapMarkerColor = NodeDef.getMapMarkerColor(attributeDef) as string
   return Objects.isEmpty(mapMarkerColor) ? defaultColor : mapMarkerColor
 }
 
-const getSamplingPointDataLevels = (survey) => {
+const getSamplingPointDataLevels = (survey: any): any[] => {
   const samplingPointDataCategory = Survey.getSamplingPointDataCategory(survey)
   const samplingPointDataCoordinatesDefined =
     Category.getItemExtraDefKeys(samplingPointDataCategory).includes('location')
@@ -74,12 +84,19 @@ const getSamplingPointDataLevels = (survey) => {
   return samplingPointDataCoordinatesDefined ? Category.getLevelsArray(samplingPointDataCategory) : []
 }
 
+type MapWrapperState = {
+  editingRecordUuid: string | null
+  editingParentNodeUuid: string | null
+  lastRecordEditModalState: unknown
+}
+
 const MapWrapper = () => {
-  const survey = useSurvey()
-  const surveyInfo = useSurveyInfo()
+  const survey = useSurvey() as any
+
+  const surveyInfo = useSurveyInfo() as any
   const surveyId = Survey.getId(survey)
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<MapWrapperState>({
     editingRecordUuid: null,
     editingParentNodeUuid: null,
     lastRecordEditModalState: null,
@@ -87,35 +104,41 @@ const MapWrapper = () => {
   const { editingRecordUuid, editingParentNodeUuid, lastRecordEditModalState } = state
 
   const geoAttributeDefs = useMemo(
-    () => Survey.getNodeDefsArray(survey).filter((nodeDef) => NodeDef.isGeo(nodeDef) || NodeDef.isCoordinate(nodeDef)),
+    () =>
+      Survey.getNodeDefsArray(survey).filter((nodeDef: any) => NodeDef.isGeo(nodeDef) || NodeDef.isCoordinate(nodeDef)),
     [survey]
   )
   const samplingPointDataLevels = useMemo(() => getSamplingPointDataLevels(survey), [survey])
 
   const preloadedLayerSummaries = useMemo(() => {
     if (!Survey.isPreloadedMapLayersEnabled(surveyInfo)) return []
-    return Survey.getPreloadedMapLayers(surveyInfo)
+
+    return Survey.getPreloadedMapLayers(surveyInfo) as any[]
   }, [surveyInfo])
 
   const layerColors = useRandomColors(
     samplingPointDataLevels.length + geoAttributeDefs.length + preloadedLayerSummaries.length
   )
 
-  const onRecordEditClick = useCallback((params) => {
-    const { recordUuid, parentUuid } = params || {}
-    setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid, editingParentNodeUuid: parentUuid }))
+  const onRecordEditClick = useCallback((params?: { recordUuid?: string; parentUuid?: string }) => {
+    const { recordUuid, parentUuid } = params ?? {}
+    setState((statePrev) => ({
+      ...statePrev,
+      editingRecordUuid: recordUuid ?? null,
+      editingParentNodeUuid: parentUuid ?? null,
+    }))
   }, [])
 
   const closeRecordEditor = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, editingRecordUuid: null, editingParentNodeUuid: null }))
   }, [])
 
-  const onRecordEditorClose = useCallback(({ modalState: lastRecordEditModalState }) => {
-    setState(({ statePrev }) => ({ ...statePrev, lastRecordEditModalState }))
+  const onRecordEditorClose = useCallback(({ modalState: lastRecordEditModalState }: { modalState: unknown }) => {
+    setState((statePrev) => ({ ...statePrev, lastRecordEditModalState }))
   }, [])
 
   const createRecordFromSamplingPointDataItem = useCallback(
-    async ({ itemUuid, callback }) => {
+    async ({ itemUuid, callback }: { itemUuid: string; callback?: (params: { recordUuid: string }) => void }) => {
       const recordUuid = await API.createRecordFromSamplingPointDataItem({ surveyId, itemUuid })
       setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid }))
       callback?.({ recordUuid })
@@ -125,14 +148,11 @@ const MapWrapper = () => {
 
   const layers = useMemo(
     () => [
-      ...preloadedLayerSummaries.map((preloadedLayerSummary, index) => (
-        <PreloadedLayer
-          key={SurveyFile.getUuid(preloadedLayerSummary)}
-          preloadedMapLayer={preloadedLayerSummary}
-          color={layerColors[index]}
-        />
+      ...preloadedLayerSummaries.map((preloadedLayerSummary: any) => (
+        <PreloadedLayer key={SurveyFile.getUuid(preloadedLayerSummary)} preloadedMapLayer={preloadedLayerSummary} />
       )),
-      ...samplingPointDataLevels.map((level, index) => (
+
+      ...samplingPointDataLevels.map((level: any, index: number) => (
         <SamplingPointDataLayer
           key={CategoryLevel.getUuid(level)}
           levelIndex={CategoryLevel.getIndex(level)}
@@ -141,7 +161,8 @@ const MapWrapper = () => {
           createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
         />
       )),
-      ...geoAttributeDefs.map((attributeDef, index) => (
+
+      ...geoAttributeDefs.map((attributeDef: any, index: number) => (
         <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}
@@ -150,13 +171,11 @@ const MapWrapper = () => {
             defaultColor: layerColors[preloadedLayerSummaries.length + samplingPointDataLevels.length + index],
           })}
           onRecordEditClick={onRecordEditClick}
-          editingRecordUuid={editingRecordUuid}
         />
       )),
     ],
     [
       createRecordFromSamplingPointDataItem,
-      editingRecordUuid,
       geoAttributeDefs,
       layerColors,
       onRecordEditClick,
@@ -177,7 +196,7 @@ const MapWrapper = () => {
       </div>
       {editingRecordUuid && (
         <RecordEditModal
-          initialState={lastRecordEditModalState}
+          initialState={lastRecordEditModalState as object}
           onClose={onRecordEditorClose}
           onRequestClose={closeRecordEditor}
           recordUuid={editingRecordUuid}
