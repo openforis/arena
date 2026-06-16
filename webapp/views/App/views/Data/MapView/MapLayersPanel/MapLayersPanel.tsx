@@ -1,5 +1,16 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
-import { Box, IconButton, List, ListItemButton, ListItemText, ListSubheader, Tooltip, Typography } from '@mui/material'
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemText,
+  Tooltip,
+  Typography,
+} from '@mui/material'
 
 import { useI18n } from '@webapp/store/system'
 import { type MapLayerPoint, useMapLayersPanel } from './MapLayersPanelContext'
@@ -13,6 +24,10 @@ export const PANEL_WIDTH = 260
 
 const ITEM_HEIGHT = 36
 const OVERSCAN = 4
+
+// Bypasses MUI's Collapse so flex layout propagates cleanly to AccordionDetails.
+const NoTransition: FC<{ children?: React.ReactNode; in?: boolean }> = ({ children, in: inProp }) =>
+  inProp ? <>{children}</> : null
 
 type PointListItemProps = {
   point: MapLayerPoint
@@ -60,7 +75,9 @@ type VirtualPointsListProps = {
   points: MapLayerPoint[]
   onItemClick: (point: MapLayerPoint) => void
   selectedPointKey: string | null
-  onSelect: (key: string) => void
+  onSelect: (key: string | null) => void
+  isExpanded: boolean
+  onToggleExpand: (event: React.SyntheticEvent, expanded: boolean) => void
 }
 
 const VirtualPointsList: FC<VirtualPointsListProps> = ({
@@ -69,6 +86,8 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
   onItemClick,
   selectedPointKey,
   onSelect,
+  isExpanded,
+  onToggleExpand,
 }) => {
   const containerRef = useRef<HTMLElement | null>(null)
   const [scrollTop, setScrollTop] = useState(0)
@@ -99,19 +118,36 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
   )
 
   return (
-    <>
-      <ListSubheader
-        disableGutters
+    <Accordion
+      component="li"
+      expanded={isExpanded}
+      onChange={onToggleExpand}
+      disableGutters
+      elevation={0}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      slots={{ transition: NoTransition as any }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        flex: isExpanded ? 1 : 'none',
+        minHeight: 0,
+        listStyle: 'none',
+        borderRadius: '0 !important',
+        borderBottom: `1px solid #d1d1dd`,
+        '&:before': { display: 'none' },
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<span className="icon icon-12px icon-arrow-down" />}
         sx={{
           bgcolor: SIDEBAR_GREY,
           color: SIDEBAR_BLACK,
           borderLeft: `3px solid ${SIDEBAR_BLUE}`,
+          minHeight: '0 !important',
           px: 1.5,
-          py: 0.75,
-          lineHeight: 1.3,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 0.25,
+          flexShrink: 0,
+          '& .MuiAccordionSummary-content': { my: 0.75, flexDirection: 'column', gap: 0.25 },
+          '&:hover': { bgcolor: '#dde3ed' },
         }}
       >
         <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.3 }}>
@@ -120,27 +156,24 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
         <Typography variant="caption" sx={{ color: SIDEBAR_BLACK, opacity: 0.7, fontSize: '0.72rem', lineHeight: 1 }}>
           {points.length} markers
         </Typography>
-      </ListSubheader>
-      <Box
-        component="li"
-        ref={containerRef}
-        sx={{ flex: 1, minHeight: 0, overflowY: 'auto', listStyle: 'none', p: 0 }}
-        onScroll={onScroll}
-      >
-        <Box sx={{ height: totalHeight, position: 'relative' }}>
-          <List dense disablePadding sx={{ position: 'absolute', top: startIndex * ITEM_HEIGHT, width: '100%' }}>
-            {visiblePoints.map((point) => (
-              <PointListItem
-                key={point.properties.key}
-                point={point}
-                isSelected={point.properties.key === selectedPointKey}
-                onClick={handleItemClick}
-              />
-            ))}
-          </List>
+      </AccordionSummary>
+      <AccordionDetails sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, p: 0 }}>
+        <Box ref={containerRef} sx={{ flex: 1, minHeight: 0, overflowY: 'auto' }} onScroll={onScroll}>
+          <Box sx={{ height: totalHeight, position: 'relative' }}>
+            <List dense disablePadding sx={{ position: 'absolute', top: startIndex * ITEM_HEIGHT, width: '100%' }}>
+              {visiblePoints.map((point) => (
+                <PointListItem
+                  key={point.properties.key}
+                  point={point}
+                  isSelected={point.properties.key === selectedPointKey}
+                  onClick={handleItemClick}
+                />
+              ))}
+            </List>
+          </Box>
         </Box>
-      </Box>
-    </>
+      </AccordionDetails>
+    </Accordion>
   )
 }
 
@@ -202,6 +235,17 @@ export const MapLayersPanel: FC = () => {
     togglePanelVisible,
   } = useMapLayersPanel()
 
+  const [expandedLayerKey, setExpandedLayerKey] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (activeLayers.length === 0) {
+      setExpandedLayerKey(null)
+    } else if (expandedLayerKey === null || !activeLayers.some((l) => l.key === expandedLayerKey)) {
+      setExpandedLayerKey(activeLayers[0].key)
+    }
+  }, [activeLayers, expandedLayerKey])
+
+
   if (activeLayers.length === 0) return null
 
   if (!isPanelVisible) {
@@ -249,6 +293,8 @@ export const MapLayersPanel: FC = () => {
           onItemClick={flyToPoint}
           selectedPointKey={selectedPointKey}
           onSelect={setSelectedPointKey}
+          isExpanded={expandedLayerKey === key}
+          onToggleExpand={(_, expanded) => setExpandedLayerKey(expanded ? key : null)}
         />
       ))}
     </List>
