@@ -55,6 +55,15 @@
         background-image: radial-gradient(circle, rgba(255, 255, 255, 0.9) 1.5px, transparent 1.5px);
       }
     }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #3885ca;
+      outline-offset: -2px;
+    }
   }
 
   &__map {

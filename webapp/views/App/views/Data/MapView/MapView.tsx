@@ -40,7 +40,12 @@ const MapViewContent = ({ layers }: MapViewContentProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const panelOpen = isPanelVisible && activeLayers.length > 0
 
-  const { width: panelWidth, onGutterMouseDown } = useHorizontalResize({
+  const {
+    width: panelWidth,
+    onGutterMouseDown,
+    onGutterKeyDown,
+    onGutterTouchStart,
+  } = useHorizontalResize({
     containerRef,
     initialWidth: PANEL_DEFAULT_WIDTH,
     minLeftWidth: PANEL_MIN_WIDTH,
@@ -55,7 +60,19 @@ const MapViewContent = ({ layers }: MapViewContentProps) => {
       >
         <MapLayersPanel />
       </div>
-      {panelOpen && <div className="map-view-content__gutter" onMouseDown={onGutterMouseDown} />}
+      {panelOpen && (
+        <div
+          role="separator"
+          aria-orientation="vertical"
+          aria-valuenow={panelWidth}
+          aria-valuemin={PANEL_MIN_WIDTH}
+          tabIndex={0}
+          className="map-view-content__gutter"
+          onMouseDown={onGutterMouseDown}
+          onKeyDown={onGutterKeyDown}
+          onTouchStart={onGutterTouchStart}
+        />
+      )}
       <div className="map-view-content__map">
         <MapContainer layers={layers} />
       </div>
