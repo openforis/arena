@@ -38,6 +38,7 @@ export const GeoAttributeDataLayer = (props) => {
   const layerKey = NodeDef.getUuid(attributeDef)
 
   const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
+  const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])
 
   // Stable wrapper so the panel always calls the latest flyToPoint without re-registering on popup state changes
   const flyToPointRef = useRef(flyToPoint)
@@ -89,6 +90,7 @@ export const GeoAttributeDataLayer = (props) => {
               flyToNextPoint={flyToNextPoint}
               flyToPreviousPoint={flyToPreviousPoint}
               markersColor={currentMarkersColor}
+              onPopupClose={onMarkerPopupClose}
               onPopupOpen={onMarkerPopupOpen}
               onRecordEditClick={onRecordEditClick}
               setMarkerByKey={setMarkerByKey}
@@ -102,7 +104,10 @@ export const GeoAttributeDataLayer = (props) => {
             flyToNextPoint={flyToNextPoint}
             flyToPreviousPoint={flyToPreviousPoint}
             markersColor={currentMarkersColor}
-            onPopupClose={onCurrentPointPopupClose}
+            onPopupClose={() => {
+              onCurrentPointPopupClose()
+              onMarkerPopupClose()
+            }}
             onPopupOpen={onMarkerPopupOpen}
             onRecordEditClick={onRecordEditClick}
             popupOpen={currentPointPopupOpen}

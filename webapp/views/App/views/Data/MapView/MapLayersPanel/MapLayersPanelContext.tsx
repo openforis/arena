@@ -26,7 +26,7 @@ type MapLayersPanelContextType = {
   selectedPointKey: string | null
   registerLayer: (layer: ActiveLayer) => void
   unregisterLayer: (params: { key: string }) => void
-  selectPoint: (key: string) => void
+  selectPoint: (key: string | null) => void
   togglePanelVisible: () => void
 }
 
@@ -60,7 +60,7 @@ export const MapLayersPanelProvider = ({ children }: MapLayersPanelProviderProps
     setActiveLayers((prev) => prev.filter((l) => l.key !== key))
   }, [])
 
-  const selectPoint = useCallback((key: string) => {
+  const selectPoint = useCallback((key: string | null) => {
     setSelectedPointKey(key)
   }, [])
 
