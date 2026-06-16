@@ -2,6 +2,12 @@
   z-index: 1000;
 }
 
+.map-view-layout {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
 .map-wrapper {
   .leaflet-container {
     .cluster-marker__clustered-points-popup {

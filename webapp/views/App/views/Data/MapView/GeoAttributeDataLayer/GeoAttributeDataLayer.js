@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef } from 'react'
 import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -5,12 +6,14 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { ClusterMarker, useFlyToPoint } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
+import { useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 
 export const GeoAttributeDataLayer = (props) => {
   const { attributeDef, onRecordEditClick } = props
 
   const {
     layerName,
+    layerInnerName,
     currentMarkersColor,
     clusters,
     clusterExpansionZoomExtractor,
@@ -30,6 +33,26 @@ export const GeoAttributeDataLayer = (props) => {
     openPopupOfPoint,
     setMarkerByKey,
   } = useFlyToPoint({ points, onRecordEditClick, zoomToMaxLevel: NodeDef.isCoordinate(attributeDef) })
+
+  const { registerLayer, unregisterLayer, selectPoint } = useMapLayersPanel()
+  const layerKey = NodeDef.getUuid(attributeDef)
+
+  const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
+
+  // Stable wrapper so the panel always calls the latest flyToPoint without re-registering on popup state changes
+  const flyToPointRef = useRef(flyToPoint)
+  useEffect(() => {
+    flyToPointRef.current = flyToPoint
+  }, [flyToPoint])
+  const stableFlyToPoint = useCallback((point) => flyToPointRef.current(point), [])
+
+  useEffect(() => {
+    if (points.length === 0) {
+      unregisterLayer({ key: layerKey })
+      return
+    }
+    registerLayer({ key: layerKey, layerName: layerInnerName, points, flyToPoint: stableFlyToPoint })
+  }, [layerKey, layerInnerName, points, registerLayer, stableFlyToPoint, unregisterLayer])
 
   return (
     <LayersControl.Overlay name={layerName}>
@@ -66,6 +89,7 @@ export const GeoAttributeDataLayer = (props) => {
               flyToNextPoint={flyToNextPoint}
               flyToPreviousPoint={flyToPreviousPoint}
               markersColor={currentMarkersColor}
+              onPopupOpen={onMarkerPopupOpen}
               onRecordEditClick={onRecordEditClick}
               setMarkerByKey={setMarkerByKey}
             />
@@ -79,6 +103,7 @@ export const GeoAttributeDataLayer = (props) => {
             flyToPreviousPoint={flyToPreviousPoint}
             markersColor={currentMarkersColor}
             onPopupClose={onCurrentPointPopupClose}
+            onPopupOpen={onMarkerPopupOpen}
             onRecordEditClick={onRecordEditClick}
             popupOpen={currentPointPopupOpen}
             setMarkerByKey={setMarkerByKey}

@@ -99,7 +99,7 @@ export const useGeoAttributeDataLayer = (props) => {
     return () => earthMapButton.removeEventListener('click', onEarthMapButtonClick)
   }, [earthMapButton, onEarthMapButtonClick])
 
-  // on layer add, create query and fetch data
+  // on layer add, create query and fetch data; on layer remove, clear points
   useMapLayerToggle({
     layerName,
     onAdd: () => {
@@ -108,6 +108,9 @@ export const useGeoAttributeDataLayer = (props) => {
         attributeDefUuids: [...ancestorsKeyAttributeDefs.map((nd) => NodeDef.getUuid(nd)), attributeDefUuid],
       })
       setState((statePrev) => ({ ...statePrev, query }))
+    },
+    onRemove: () => {
+      setState((statePrev) => ({ ...statePrev, query: Query.create(), points: [] }))
     },
   })
 
@@ -170,6 +173,7 @@ export const useGeoAttributeDataLayer = (props) => {
 
   return {
     layerName,
+    layerInnerName,
     currentMarkersColor,
     clusters,
     clusterExpansionZoomExtractor,

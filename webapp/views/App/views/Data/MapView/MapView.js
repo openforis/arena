@@ -20,6 +20,7 @@ import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { RecordEditModal } from '../common/RecordEditModal'
 import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
 import { PreloadedLayer } from './PreloadedLayer/PreloadedLayer'
+import { MapLayersPanel, MapLayersPanelProvider } from './MapLayersPanel'
 
 const getGeoAttributeLayerMarkersColor = ({ attributeDef, defaultColor }) => {
   if (!NodeDef.isCoordinate(attributeDef)) return defaultColor
@@ -133,8 +134,11 @@ const MapWrapper = () => {
   }
 
   return (
-    <>
-      <MapContainer layers={layers} />
+    <MapLayersPanelProvider>
+      <div className="map-view-layout">
+        <MapLayersPanel />
+        <MapContainer layers={layers} />
+      </div>
       {editingRecordUuid && (
         <RecordEditModal
           initialState={lastRecordEditModalState}
@@ -144,7 +148,7 @@ const MapWrapper = () => {
           parentNodeUuid={editingParentNodeUuid}
         />
       )}
-    </>
+    </MapLayersPanelProvider>
   )
 }
 
