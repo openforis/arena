@@ -14,6 +14,47 @@ export const PANEL_WIDTH = 260
 const ITEM_HEIGHT = 36
 const OVERSCAN = 4
 
+type PointListItemProps = {
+  point: MapLayerPoint
+  isSelected: boolean
+  onClick: (point: MapLayerPoint) => void
+}
+
+const PointListItem: FC<PointListItemProps> = ({ point, isSelected, onClick }) => {
+  const { key, ancestorsKeys } = point.properties
+  const label = ancestorsKeys.join(' - ')
+  return (
+    <ListItemButton
+      key={key}
+      dense
+      onClick={() => onClick(point)}
+      sx={{
+        height: ITEM_HEIGHT,
+        borderLeft: `3px solid ${isSelected ? SIDEBAR_BLUE : 'transparent'}`,
+        bgcolor: isSelected ? `rgba(56, 133, 202, 0.1)` : 'transparent',
+        pl: isSelected ? 1.25 : 1.5,
+        '&:hover': {
+          bgcolor: isSelected ? `rgba(56, 133, 202, 0.15)` : `rgba(56, 133, 202, 0.06)`,
+        },
+      }}
+    >
+      <ListItemText
+        primary={label}
+        slotProps={{
+          primary: {
+            noWrap: true,
+            sx: {
+              fontSize: '0.8rem',
+              fontWeight: isSelected ? 600 : 400,
+              color: isSelected ? SIDEBAR_BLUE : SIDEBAR_BLACK,
+            },
+          },
+        }}
+      />
+    </ListItemButton>
+  )
+}
+
 type VirtualPointsListProps = {
   layerName: string
   points: MapLayerPoint[]
@@ -88,47 +129,39 @@ const VirtualPointsList: FC<VirtualPointsListProps> = ({
       >
         <Box sx={{ height: totalHeight, position: 'relative' }}>
           <List dense disablePadding sx={{ position: 'absolute', top: startIndex * ITEM_HEIGHT, width: '100%' }}>
-            {visiblePoints.map((point) => {
-              const { key, ancestorsKeys } = point.properties
-              const label = ancestorsKeys.join(' - ')
-              const isSelected = key === selectedPointKey
-              return (
-                <ListItemButton
-                  key={key}
-                  dense
-                  onClick={() => handleItemClick(point)}
-                  sx={{
-                    height: ITEM_HEIGHT,
-                    borderLeft: `3px solid ${isSelected ? SIDEBAR_BLUE : 'transparent'}`,
-                    bgcolor: isSelected ? `rgba(56, 133, 202, 0.1)` : 'transparent',
-                    pl: isSelected ? 1.25 : 1.5,
-                    '&:hover': {
-                      bgcolor: isSelected ? `rgba(56, 133, 202, 0.15)` : `rgba(56, 133, 202, 0.06)`,
-                    },
-                  }}
-                >
-                  <ListItemText
-                    primary={label}
-                    slotProps={{
-                      primary: {
-                        noWrap: true,
-                        sx: {
-                          fontSize: '0.8rem',
-                          fontWeight: isSelected ? 600 : 400,
-                          color: isSelected ? SIDEBAR_BLUE : SIDEBAR_BLACK,
-                        },
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              )
-            })}
+            {visiblePoints.map((point) => (
+              <PointListItem
+                key={point.properties.key}
+                point={point}
+                isSelected={point.properties.key === selectedPointKey}
+                onClick={handleItemClick}
+              />
+            ))}
           </List>
         </Box>
       </Box>
     </>
   )
 }
+
+type PanelHeaderProps = {
+  onToggle: () => void
+}
+
+const PanelHeader: FC<PanelHeaderProps> = ({ onToggle }) => (
+  <Box
+    component="li"
+    sx={{
+      display: 'flex',
+      justifyContent: 'flex-end',
+      px: 0.5,
+      py: 0.25,
+      borderBottom: `1px solid #d1d1dd`,
+    }}
+  >
+    <ToggleButton isPanelVisible onClick={onToggle} />
+  </Box>
+)
 
 type ToggleButtonProps = {
   isPanelVisible: boolean
@@ -207,18 +240,7 @@ export const MapLayersPanel: FC = () => {
         overflow: 'hidden',
       }}
     >
-      <Box
-        component="li"
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          px: 0.5,
-          py: 0.25,
-          borderBottom: `1px solid #d1d1dd`,
-        }}
-      >
-        <ToggleButton isPanelVisible onClick={togglePanelVisible} />
-      </Box>
+      <PanelHeader onToggle={togglePanelVisible} />
       {activeLayers.map(({ key, layerName, points, flyToPoint }) => (
         <VirtualPointsList
           key={key}
