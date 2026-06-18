@@ -156,6 +156,7 @@ const LayerAccordion: FC<LayerAccordionProps> = ({
   onToggleExpand,
   isSingleLayer,
 }) => {
+  const i18n = useI18n()
   const { layerSortOrders, setLayerSortOrder } = useMapLayersPanel()
   const sortOrder: SortOrder = layerSortOrders[layerKey] ?? 'none'
   const containerRef = useRef<HTMLElement | null>(null)
@@ -242,7 +243,7 @@ const LayerAccordion: FC<LayerAccordionProps> = ({
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="caption" sx={{ color: SIDEBAR_BLACK, opacity: 0.7, fontSize: '0.72rem', lineHeight: 1 }}>
-            {points.length} markers
+            {i18n.t('dataView:mapView.layersPanel.markers', { count: points.length })}
           </Typography>
           <SortButton sortOrder={sortOrder} onClick={handleSortToggle} />
         </Box>

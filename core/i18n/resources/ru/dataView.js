@@ -146,6 +146,9 @@ export default {
     layersPanel: {
       hidePanel: 'Скрыть панель',
       showPanel: 'Показать панель',
+      markers: '{{count}} маркеров',
+      markers_one: '{{count}} маркер',
+      markers_other: '{{count}} маркеров',
       sortAsc: 'Сортировать по возрастанию',
       sortDesc: 'Сортировать по убыванию',
       sort: 'Сортировка',

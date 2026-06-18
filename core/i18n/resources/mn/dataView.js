@@ -146,6 +146,9 @@ export default {
     layersPanel: {
       hidePanel: 'Самбарыг нуух',
       showPanel: 'Самбарыг харуулах',
+      markers: '{{count}} маркер',
+      markers_one: '{{count}} маркер',
+      markers_other: '{{count}} маркер',
       sortAsc: 'Өсөх эрэмбэ',
       sortDesc: 'Буурах эрэмбэ',
       sort: 'Эрэмбэлэх',
