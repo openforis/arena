@@ -142,4 +142,17 @@ export default {
       'Зүүн талын самбараас сонголт хийнэ үү эсвэл "Хүсэлтүүдийг удирдах"-аас одоо байгаа хүсэлтийг сонгоно уу',
   },
   viewSelectedRecord: 'Сонгогдсон бичлэгийг харах',
+  mapView: {
+    layersPanel: {
+      hidePanel: 'Самбарыг нуух',
+      showPanel: 'Самбарыг харуулах',
+      markers: '{{count}} маркер',
+      markers_one: '{{count}} маркер',
+      markers_other: '{{count}} маркер',
+      sortAsc: 'Өсөх эрэмбэ',
+      sortDesc: 'Буурах эрэмбэ',
+      sort: 'Эрэмбэлэх',
+      sortNone: 'Эрэмбэ арилгах',
+    },
+  },
 }

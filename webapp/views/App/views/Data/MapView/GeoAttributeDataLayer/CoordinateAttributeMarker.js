@@ -23,6 +23,7 @@ export const CoordinateAttributeMarker = (props) => {
     flyToPreviousPoint,
     markersColor,
     onPopupClose,
+    onPopupOpen,
     onRecordEditClick,
     popupOpen,
     setMarkerByKey,
@@ -37,6 +38,10 @@ export const CoordinateAttributeMarker = (props) => {
   const onDoubleClick = useCallback(() => {
     flyToPoint(data)
   }, [flyToPoint, data])
+
+  const handlePopupOpen = useCallback(() => {
+    onPopupOpen?.(key)
+  }, [key, onPopupOpen])
 
   const content = useMemo(
     () => (
@@ -73,8 +78,8 @@ export const CoordinateAttributeMarker = (props) => {
   )
 
   const eventHandlers = useMemo(
-    () => ObjectUtils.keepNonEmptyProps({ dblclick: onDoubleClick, popupclose: onPopupClose }),
-    [onDoubleClick, onPopupClose]
+    () => ObjectUtils.keepNonEmptyProps({ dblclick: onDoubleClick, popupclose: onPopupClose, popupopen: handlePopupOpen }),
+    [handlePopupOpen, onDoubleClick, onPopupClose]
   )
 
   const circleMarkerPathOptions = useMemo(
@@ -118,6 +123,7 @@ CoordinateAttributeMarker.propTypes = {
   flyToPreviousPoint: PropTypes.func,
   markersColor: PropTypes.any,
   onPopupClose: PropTypes.func,
+  onPopupOpen: PropTypes.func,
   onRecordEditClick: PropTypes.any,
   popupOpen: PropTypes.bool,
   setMarkerByKey: PropTypes.func,

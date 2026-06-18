@@ -142,4 +142,17 @@ La fusion ne peut pas être effectuée.`,
       'Veuillez faire votre sélection dans le panneau de gauche ou sélectionner une requête existante depuis "Gérer les requêtes"',
   },
   viewSelectedRecord: "Voir l'enregistrement sélectionné",
+  mapView: {
+    layersPanel: {
+      hidePanel: 'Masquer le panneau',
+      showPanel: 'Afficher le panneau',
+      markers: '{{count}} marqueurs',
+      markers_one: '{{count}} marqueur',
+      markers_other: '{{count}} marqueurs',
+      sortAsc: 'Trier croissant',
+      sortDesc: 'Trier décroissant',
+      sort: 'Trier',
+      sortNone: 'Supprimer le tri',
+    },
+  },
 }
