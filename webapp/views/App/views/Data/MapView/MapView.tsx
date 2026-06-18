@@ -12,6 +12,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 import { useHorizontalResize } from '@webapp/components/hooks'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
@@ -37,8 +38,9 @@ type MapViewContentProps = {
 // changes — no conditional Split mount/unmount.
 const MapViewContent = ({ layers }: MapViewContentProps) => {
   const { activeLayers, isPanelVisible } = useMapLayersPanel()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const panelOpen = isPanelVisible && activeLayers.length > 0
+  const panelOpen = experimentalFeatures && isPanelVisible && activeLayers.length > 0
 
   const {
     width: panelWidth,

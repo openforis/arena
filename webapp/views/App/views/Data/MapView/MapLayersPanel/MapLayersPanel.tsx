@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/material'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import {
   applySortOrder,
   type MapLayerPoint,
@@ -318,6 +318,7 @@ const ToggleButton: FC<ToggleButtonProps> = ({ isPanelVisible, onClick }) => {
 }
 
 export const MapLayersPanel: FC = () => {
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const {
     activeLayers,
     isPanelVisible,
@@ -346,6 +347,7 @@ export const MapLayersPanel: FC = () => {
     }
   }, [activeLayers, expandedLayerKey])
 
+  if (!experimentalFeatures) return null
   if (activeLayers.length === 0) return null
 
   if (!isPanelVisible) {
