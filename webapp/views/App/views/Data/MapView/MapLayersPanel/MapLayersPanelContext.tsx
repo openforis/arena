@@ -84,8 +84,13 @@ export const MapLayersPanelProvider = ({ children }: MapLayersPanelProviderProps
 
   const registerLayer = useCallback(({ key, layerName, points, flyToPoint }: ActiveLayer) => {
     setActiveLayers((prev) => {
-      const filtered = prev.filter((l) => l.key !== key)
-      return [...filtered, { key, layerName, points, flyToPoint }]
+      const existingIndex = prev.findIndex((l) => l.key === key)
+      if (existingIndex !== -1) {
+        const updated = [...prev]
+        updated[existingIndex] = { key, layerName, points, flyToPoint }
+        return updated
+      }
+      return [...prev, { key, layerName, points, flyToPoint }]
     })
   }, [])
 

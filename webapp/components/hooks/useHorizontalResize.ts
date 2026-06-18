@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 type Params = {
   containerRef: React.RefObject<HTMLElement | null>
@@ -43,6 +43,14 @@ export const useHorizontalResize = ({
     },
     [containerRef, minLeftWidth, minRightWidth]
   )
+
+  useEffect(() => {
+    const clamped = clampWidth(widthRef.current)
+    if (clamped !== widthRef.current) {
+      widthRef.current = clamped
+      setWidth(clamped)
+    }
+  }, [clampWidth, containerWidth])
 
   const onGutterMouseDown = useCallback(
     (e: React.MouseEvent) => {
