@@ -1,6 +1,13 @@
 import './Map.scss'
 
-import { GeoJSON, MapContainer as RLMapContainer, ScaleControl, ZoomControl } from 'react-leaflet'
+import { useEffect } from 'react'
+import {
+  GeoJSON,
+  MapContainer as RLMapContainer,
+  ScaleControl,
+  ZoomControl,
+  useMap as useLeafletMap,
+} from 'react-leaflet'
 import Ruler from 'react-leaflet-ruler'
 import PropTypes from 'prop-types'
 
@@ -31,6 +38,26 @@ L.Marker.prototype.options.icon = L.icon({
 
 const INITIAL_ZOOM_LEVEL = 3
 
+const MapResizeHandler = () => {
+  const map = useLeafletMap()
+
+  useEffect(() => {
+    const container = map.getContainer()
+    let rafId
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => map.invalidateSize())
+    })
+    observer.observe(container)
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(rafId)
+    }
+  }, [map])
+
+  return null
+}
+
 export const MapContainer = (props) => {
   const { editable = false, geoJson = null, layers = [], markerPoint, markerTitle, showOptions = true } = props
   const { centerPositionLatLon, markerPointUpdated, markerPointUpdatedToString, onMarkerPointUpdated, onSaveClick } =
@@ -58,6 +85,7 @@ export const MapContainer = (props) => {
           zoomControl={false}
           zoom={INITIAL_ZOOM_LEVEL}
         >
+          <MapResizeHandler />
           <MapLayersControl layers={layers} />
           <MapMarker
             editable={editable}
