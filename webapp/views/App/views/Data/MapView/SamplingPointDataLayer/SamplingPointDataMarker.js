@@ -15,6 +15,7 @@ export const SamplingPointDataMarker = (props) => {
     flyToPreviousPoint,
     markersColor,
     onPopupClose,
+    onPopupOpen,
     onRecordEditClick,
     pointFeature,
     popupOpen,
@@ -30,6 +31,10 @@ export const SamplingPointDataMarker = (props) => {
     flyToPoint(pointFeature)
   }, [flyToPoint, pointFeature])
 
+  const handlePopupOpen = useCallback(() => {
+    onPopupOpen?.(key)
+  }, [key, onPopupOpen])
+
   const pathOptions = useMemo(
     () => ({ color: markersColor, fillColor: markersColor, fillOpacity: 0.5 }),
     [markersColor]
@@ -44,7 +49,7 @@ export const SamplingPointDataMarker = (props) => {
         markerRef.current = ref
         setMarkerByKey({ key, marker: ref })
       }}
-      eventHandlers={{ dblclick: onDoubleClick, popupclose: onPopupClose }}
+      eventHandlers={{ dblclick: onDoubleClick, popupclose: onPopupClose, popupopen: handlePopupOpen }}
     >
       {showMarkersLabels && <MarkerTooltip color={markersColor}>{itemCodes.join(' - ')}</MarkerTooltip>}
 
@@ -66,6 +71,7 @@ SamplingPointDataMarker.propTypes = {
   flyToPreviousPoint: PropTypes.func.isRequired,
   markersColor: PropTypes.string,
   onPopupClose: PropTypes.func,
+  onPopupOpen: PropTypes.func,
   onRecordEditClick: PropTypes.func.isRequired,
   pointFeature: PropTypes.object.isRequired,
   popupOpen: PropTypes.bool,

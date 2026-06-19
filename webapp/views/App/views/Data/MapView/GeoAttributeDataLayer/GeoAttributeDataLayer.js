@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { ClusterMarker, useFlyToPoint } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
@@ -23,6 +24,7 @@ export const GeoAttributeDataLayer = (props) => {
     points,
   } = useGeoAttributeDataLayer(props)
 
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const { registerLayer, unregisterLayer, selectPoint, layerSortOrders } = useMapLayersPanel()
   const layerKey = NodeDef.getUuid(attributeDef)
   const sortOrder = layerSortOrders[layerKey] ?? 'none'
@@ -42,20 +44,13 @@ export const GeoAttributeDataLayer = (props) => {
   const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
   const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])
 
-  // Stable wrapper so the panel always calls the latest flyToPoint without re-registering on popup state changes
-  const flyToPointRef = useRef(flyToPoint)
   useEffect(() => {
-    flyToPointRef.current = flyToPoint
-  }, [flyToPoint])
-  const stableFlyToPoint = useCallback((point) => flyToPointRef.current(point), [])
-
-  useEffect(() => {
-    if (points.length === 0) {
+    if (!experimentalFeatures || points.length === 0) {
       unregisterLayer({ key: layerKey })
       return
     }
-    registerLayer({ key: layerKey, layerName: layerInnerName, points, flyToPoint: stableFlyToPoint })
-  }, [layerKey, layerInnerName, points, registerLayer, stableFlyToPoint, unregisterLayer])
+    registerLayer({ key: layerKey, layerName: layerInnerName, points, flyToPoint })
+  }, [experimentalFeatures, flyToPoint, layerKey, layerInnerName, points, registerLayer, unregisterLayer])
 
   return (
     <LayersControl.Overlay name={layerName}>
