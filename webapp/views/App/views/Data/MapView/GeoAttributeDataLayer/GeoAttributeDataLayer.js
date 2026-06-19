@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
-import { ClusterMarker, useFlyToPoint } from '../common'
+import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
@@ -24,9 +23,8 @@ export const GeoAttributeDataLayer = (props) => {
     points,
   } = useGeoAttributeDataLayer(props)
 
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
-  const { registerLayer, unregisterLayer, selectPoint, layerSortOrders } = useMapLayersPanel()
   const layerKey = NodeDef.getUuid(attributeDef)
+  const { selectPoint, layerSortOrders } = useMapLayersPanel()
   const sortOrder = layerSortOrders[layerKey] ?? 'none'
   const sortedPoints = useMemo(() => applySortOrder(points, sortOrder), [points, sortOrder])
 
@@ -44,13 +42,7 @@ export const GeoAttributeDataLayer = (props) => {
   const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
   const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])
 
-  useEffect(() => {
-    if (!experimentalFeatures || points.length === 0) {
-      unregisterLayer({ key: layerKey })
-      return
-    }
-    registerLayer({ key: layerKey, layerName: layerInnerName, points, flyToPoint })
-  }, [experimentalFeatures, flyToPoint, layerKey, layerInnerName, points, registerLayer, unregisterLayer])
+  useLayerRegistration({ layerKey, layerName: layerInnerName, points, flyToPoint })
 
   return (
     <LayersControl.Overlay name={layerName}>

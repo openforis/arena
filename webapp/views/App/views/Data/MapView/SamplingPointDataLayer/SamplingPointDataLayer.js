@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { LayersControl, LayerGroup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
-import { ClusterMarker, useFlyToPoint } from '../common'
+import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 import { SamplingPointDataMarker } from './SamplingPointDataMarker'
@@ -24,10 +23,8 @@ export const SamplingPointDataLayer = (props) => {
     points,
   } = useSamplingPointDataLayer(props)
 
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
-  const { registerLayer, unregisterLayer, selectPoint, layerSortOrders } = useMapLayersPanel()
-
   const layerKey = `sampling-point-data-${levelIndex}`
+  const { selectPoint, layerSortOrders } = useMapLayersPanel()
   const sortOrder = layerSortOrders[layerKey] ?? 'none'
   const sortedPoints = useMemo(() => applySortOrder(points, sortOrder), [points, sortOrder])
 
@@ -45,22 +42,7 @@ export const SamplingPointDataLayer = (props) => {
   const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
   const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])
 
-  useEffect(() => {
-    if (!experimentalFeatures || !isLayerActive || points.length === 0) {
-      unregisterLayer({ key: layerKey })
-      return
-    }
-    registerLayer({ key: layerKey, layerName: overlayInnerName, points, flyToPoint })
-  }, [
-    experimentalFeatures,
-    flyToPoint,
-    isLayerActive,
-    layerKey,
-    overlayInnerName,
-    points,
-    registerLayer,
-    unregisterLayer,
-  ])
+  useLayerRegistration({ active: isLayerActive, layerKey, layerName: overlayInnerName, points, flyToPoint })
 
   return (
     <LayersControl.Overlay name={overlayName}>
