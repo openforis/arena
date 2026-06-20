@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useMemo } from 'react'
 import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import { ClusterMarker, useFlyToPoint } from '../common'
+import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
@@ -23,8 +23,8 @@ export const GeoAttributeDataLayer = (props) => {
     points,
   } = useGeoAttributeDataLayer(props)
 
-  const { registerLayer, unregisterLayer, selectPoint, layerSortOrders } = useMapLayersPanel()
   const layerKey = NodeDef.getUuid(attributeDef)
+  const { selectPoint, layerSortOrders } = useMapLayersPanel()
   const sortOrder = layerSortOrders[layerKey] ?? 'none'
   const sortedPoints = useMemo(() => applySortOrder(points, sortOrder), [points, sortOrder])
 
@@ -42,20 +42,7 @@ export const GeoAttributeDataLayer = (props) => {
   const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
   const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])
 
-  // Stable wrapper so the panel always calls the latest flyToPoint without re-registering on popup state changes
-  const flyToPointRef = useRef(flyToPoint)
-  useEffect(() => {
-    flyToPointRef.current = flyToPoint
-  }, [flyToPoint])
-  const stableFlyToPoint = useCallback((point) => flyToPointRef.current(point), [])
-
-  useEffect(() => {
-    if (points.length === 0) {
-      unregisterLayer({ key: layerKey })
-      return
-    }
-    registerLayer({ key: layerKey, layerName: layerInnerName, points, flyToPoint: stableFlyToPoint })
-  }, [layerKey, layerInnerName, points, registerLayer, stableFlyToPoint, unregisterLayer])
+  useLayerRegistration({ layerKey, layerName: layerInnerName, points, flyToPoint })
 
   return (
     <LayersControl.Overlay name={layerName}>
