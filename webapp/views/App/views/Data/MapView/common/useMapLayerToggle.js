@@ -1,14 +1,16 @@
 import { useMapEvents } from 'react-leaflet'
 
-export const useMapLayerToggle = ({ layerName, onAdd, onRemove }) => {
+export const useMapLayerToggle = ({ layerName, layerKey, onAdd, onRemove }) => {
+  const matchesLayer = (eventName) => (layerKey ? eventName.includes(layerKey) : eventName === layerName)
+
   useMapEvents({
     overlayadd(event) {
-      if (event.name === layerName && onAdd) {
+      if (onAdd && matchesLayer(event.name)) {
         onAdd()
       }
     },
     overlayremove(event) {
-      if (event.name === layerName && onRemove) {
+      if (onRemove && matchesLayer(event.name)) {
         onRemove()
       }
     },

@@ -115,10 +115,10 @@ export const useSamplingPointDataLayer = (props) => {
     { level: levelIndex + 1 }
   )
 
-  const layerColorPickerId = `sampling-point-data-layer-color-picker-${levelIndex}`
+  const layerKey = `sampling-point-data-layer-color-picker-${levelIndex}`
 
   const { layerName: overlayName, currentMarkersColor } = useLayerColorPicker({
-    colorPickerId: layerColorPickerId,
+    colorPickerId: layerKey,
     innerName: overlayInnerName,
     initialColor: markersColor,
   })
@@ -141,6 +141,7 @@ export const useSamplingPointDataLayer = (props) => {
 
   useMapLayerToggle({
     layerName: overlayName,
+    layerKey,
     onAdd: () => {
       setIsLayerActive(true)
       const shouldLoadItems = !loaded && !loading
