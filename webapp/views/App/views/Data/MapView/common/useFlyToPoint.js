@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useMap } from 'react-leaflet'
 
 import { Numbers } from '@openforis/arena-core'
@@ -87,10 +87,17 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel
     []
   )
 
+  // Stable wrapper so the panel always calls the latest flyToPoint without re-registering on popup state changes
+  const flyToPointRef = useRef(flyToPoint)
+  useEffect(() => {
+    flyToPointRef.current = flyToPoint
+  }, [flyToPoint])
+  const stableFlyToPoint = useCallback((point) => flyToPointRef.current(point), [])
+
   return {
     currentPointShown,
     currentPointPopupOpen,
-    flyToPoint,
+    flyToPoint: stableFlyToPoint,
     flyToNextPoint,
     flyToPreviousPoint,
     onCurrentPointPopupClose,
