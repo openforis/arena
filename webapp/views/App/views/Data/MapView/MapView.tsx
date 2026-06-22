@@ -222,9 +222,7 @@ const MapWrapper = () => {
         { label: i18n.t('dataView:mapView.layersControl.samplingPointData'), count: samplingPointDataLevels.length },
         { label: i18n.t('dataView:mapView.layersControl.inputData'), count: geoAttributeDefs.length },
       ].filter((g) => g.count > 0),
-    // i18n is stable (same ref unless language changes); counts are primitives
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [geoAttributeDefs.length, preloadedLayerSummaries.length, samplingPointDataLevels.length]
+    [geoAttributeDefs.length, i18n, preloadedLayerSummaries.length, samplingPointDataLevels.length]
   )
 
   if (layers.length > 0 && layerColors.length === 0) {
