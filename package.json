@@ -52,6 +52,7 @@
     "@babel/runtime-corejs3": "^7.28.6",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
     "@types/jest": "^27.5.2",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^24.10.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
