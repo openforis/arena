@@ -60,7 +60,16 @@ const MapResizeHandler = () => {
 }
 
 export const MapContainer = (props) => {
-  const { editable = false, geoJson = null, layers = [], markerPoint, markerTitle, showOptions = true } = props
+  const {
+    baseLayersLabel,
+    editable = false,
+    geoJson = null,
+    layers = [],
+    markerPoint,
+    markerTitle,
+    overlayGroups,
+    showOptions = true,
+  } = props
   const { centerPositionLatLon, markerPointUpdated, markerPointUpdatedToString, onMarkerPointUpdated, onSaveClick } =
     useMap(props)
 
@@ -87,7 +96,7 @@ export const MapContainer = (props) => {
           zoom={INITIAL_ZOOM_LEVEL}
         >
           <MapResizeHandler />
-          <MapLayersControl layers={layers} />
+          <MapLayersControl layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
           <MapMarker
             editable={editable}
             point={markerPoint}
@@ -128,6 +137,7 @@ export const MapContainer = (props) => {
 }
 
 MapContainer.propTypes = {
+  baseLayersLabel: PropTypes.string,
   centerPoint: PropTypes.object,
   editable: PropTypes.bool,
   geoJson: PropTypes.object,
@@ -135,5 +145,6 @@ MapContainer.propTypes = {
   markerPoint: PropTypes.object,
   markerTitle: PropTypes.string,
   onMarkerPointChange: PropTypes.func,
+  overlayGroups: PropTypes.array,
   showOptions: PropTypes.bool,
 }
