@@ -143,6 +143,12 @@ La fusion ne peut pas être effectuée.`,
   },
   viewSelectedRecord: "Voir l'enregistrement sélectionné",
   mapView: {
+    layersControl: {
+      baseLayers: 'Couches de base',
+      inputData: "Données d'entrée",
+      preloadedLayers: 'Couches préchargées',
+      samplingPointData: "Données de points d'échantillonnage",
+    },
     layersPanel: {
       hidePanel: 'Masquer le panneau',
       showPanel: 'Afficher le panneau',

@@ -131,6 +131,12 @@ export default {
   },
   viewSelectedRecord: 'Ver registro seleccionado',
   mapView: {
+    layersControl: {
+      baseLayers: 'Capas base',
+      inputData: 'Datos de entrada',
+      preloadedLayers: 'Capas precargadas',
+      samplingPointData: 'Datos de puntos de muestreo',
+    },
     layersPanel: {
       hidePanel: 'Ocultar panel',
       showPanel: 'Mostrar panel',

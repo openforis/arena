@@ -143,6 +143,12 @@ export default {
   },
   viewSelectedRecord: 'Просмотреть выбранную запись',
   mapView: {
+    layersControl: {
+      baseLayers: 'Базовые слои',
+      inputData: 'Входные данные',
+      preloadedLayers: 'Предзагруженные слои',
+      samplingPointData: 'Данные точек выборки',
+    },
     layersPanel: {
       hidePanel: 'Скрыть панель',
       showPanel: 'Показать панель',
