@@ -215,15 +215,19 @@ const MapWrapper = () => {
 
   const baseLayersLabel = i18n.t('dataView:mapView.layersControl.baseLayers')
 
-  const overlayGroups = useMemo(
-    () =>
-      [
-        { label: i18n.t('dataView:mapView.layersControl.preloadedLayers'), count: preloadedLayerSummaries.length },
-        { label: i18n.t('dataView:mapView.layersControl.samplingPointData'), count: samplingPointDataLevels.length },
-        { label: i18n.t('dataView:mapView.layersControl.inputData'), count: geoAttributeDefs.length },
-      ].filter((g) => g.count > 0),
-    [geoAttributeDefs.length, i18n, preloadedLayerSummaries.length, samplingPointDataLevels.length]
-  )
+  const overlayGroups = useMemo(() => {
+    const layersCountByGroup = {
+      preloadedLayers: preloadedLayerSummaries.length,
+      samplingPointData: samplingPointDataLevels.length,
+      inputData: geoAttributeDefs.length,
+    }
+    return Object.entries(layersCountByGroup)
+      .map(([groupKey, groupLayersCount]) => ({
+        label: i18n.t(`dataView:mapView.layersControl.${groupKey}`),
+        count: groupLayersCount,
+      }))
+      .filter((g) => g.count > 0)
+  }, [geoAttributeDefs.length, i18n, preloadedLayerSummaries.length, samplingPointDataLevels.length])
 
   if (layers.length > 0 && layerColors.length === 0) {
     // layer colors not generated yet
