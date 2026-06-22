@@ -8,11 +8,11 @@ import { useSurveyId } from '@webapp/store/survey'
 
 import { baseLayers } from './baseLayers'
 import { useMapContext } from './MapContext'
-import { MapLayersSeparator } from './MapLayersSeparator'
+import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
 import { WmtsComponent } from './WmtsComponent'
 
 export const MapLayersControl = (props) => {
-  const { layers = [], preloadedLayersCount = 0 } = props
+  const { layers = [], baseLayersLabel, overlayGroups = [] } = props
 
   const user = useUser()
   const surveyId = useSurveyId()
@@ -63,6 +63,8 @@ export const MapLayersControl = (props) => {
     return result
   }, [contextBaseLayer, getTileUrl, user])
 
+  const showGroupsInjector = baseLayersLabel || overlayGroups.length > 0
+
   return (
     <>
       <LayersControl autoZIndex position="topright">
@@ -70,12 +72,20 @@ export const MapLayersControl = (props) => {
         <WmtsComponent />
         {layers}
       </LayersControl>
-      {preloadedLayersCount > 0 && <MapLayersSeparator count={preloadedLayersCount} />}
+      {showGroupsInjector && (
+        <MapLayersGroupsInjector baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
+      )}
     </>
   )
 }
 
 MapLayersControl.propTypes = {
+  baseLayersLabel: PropTypes.string,
   layers: PropTypes.array,
-  preloadedLayersCount: PropTypes.number,
+  overlayGroups: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      count: PropTypes.number.isRequired,
+    })
+  ),
 }

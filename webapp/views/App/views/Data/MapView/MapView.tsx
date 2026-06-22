@@ -12,7 +12,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 import { useHorizontalResize } from '@webapp/components/hooks'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
@@ -29,15 +29,21 @@ const PANEL_DEFAULT_WIDTH = 260
 const PANEL_MIN_WIDTH = 100
 const MAP_MIN_WIDTH = 300
 
+type LayerGroup = {
+  label: string
+  count: number
+}
+
 type MapViewContentProps = {
+  baseLayersLabel: string
   layers: React.ReactElement[]
-  preloadedLayersCount: number
+  overlayGroups: LayerGroup[]
 }
 
 // MapContainer must always occupy the same position in the React tree so Leaflet never
 // unmounts. We achieve this with a stable flex layout where only the panel-pane width
 // changes — no conditional Split mount/unmount.
-const MapViewContent = ({ layers, preloadedLayersCount }: MapViewContentProps) => {
+const MapViewContent = ({ baseLayersLabel, layers, overlayGroups }: MapViewContentProps) => {
   const { activeLayers, isPanelVisible } = useMapLayersPanel()
   const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -79,7 +85,7 @@ const MapViewContent = ({ layers, preloadedLayersCount }: MapViewContentProps) =
         />
       )}
       <div className="map-view-content__map">
-        <MapContainer layers={layers} preloadedLayersCount={preloadedLayersCount} />
+        <MapContainer layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
       </div>
     </div>
   )
@@ -113,6 +119,7 @@ type MapWrapperState = {
 }
 
 const MapWrapper = () => {
+  const i18n = useI18n()
   const survey = useSurvey() as any
 
   const surveyInfo = useSurveyInfo() as any
@@ -206,6 +213,20 @@ const MapWrapper = () => {
     ]
   )
 
+  const baseLayersLabel = i18n.t('dataView:mapView.layersControl.baseLayers')
+
+  const overlayGroups = useMemo(
+    () =>
+      [
+        { label: i18n.t('dataView:mapView.layersControl.preloadedLayers'), count: preloadedLayerSummaries.length },
+        { label: i18n.t('dataView:mapView.layersControl.samplingPointData'), count: samplingPointDataLevels.length },
+        { label: i18n.t('dataView:mapView.layersControl.inputData'), count: geoAttributeDefs.length },
+      ].filter((g) => g.count > 0),
+    // i18n is stable (same ref unless language changes); counts are primitives
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [geoAttributeDefs.length, preloadedLayerSummaries.length, samplingPointDataLevels.length]
+  )
+
   if (layers.length > 0 && layerColors.length === 0) {
     // layer colors not generated yet
     return null
@@ -214,7 +235,7 @@ const MapWrapper = () => {
   return (
     <MapLayersPanelProvider>
       <div className="map-view-layout">
-        <MapViewContent layers={layers} preloadedLayersCount={preloadedLayerSummaries.length} />
+        <MapViewContent layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
       </div>
       {editingRecordUuid && (
         <RecordEditModal
