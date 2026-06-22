@@ -22,14 +22,14 @@ export const MapLayersGroupsInjector = ({ baseLayersLabel, overlayGroups }) => {
     const container = map.getContainer()
     const injected = []
 
-    const injectLabel = (parent, label, referenceNode) => {
+    const injectLabel = (label, referenceNode, parentNode) => {
       const el = document.createElement('div')
       el.className = GROUP_LABEL_CLASS
       el.textContent = label
       if (referenceNode) {
-        parent.insertBefore(el, referenceNode)
+        referenceNode.before(el)
       } else {
-        parent.appendChild(el)
+        parentNode.appendChild(el)
       }
       injected.push(el)
     }
@@ -37,7 +37,7 @@ export const MapLayersGroupsInjector = ({ baseLayersLabel, overlayGroups }) => {
     if (baseLayersLabel) {
       const baseList = container.querySelector('.leaflet-control-layers-base')
       if (baseList) {
-        injectLabel(baseList, baseLayersLabel, baseList.firstChild)
+        injectLabel(baseLayersLabel, baseList.firstChild, baseList)
       }
     }
 
@@ -46,14 +46,14 @@ export const MapLayersGroupsInjector = ({ baseLayersLabel, overlayGroups }) => {
       let offset = 0
       for (const group of overlayGroups) {
         if (group.count > 0) {
-          injectLabel(overlaysList, group.label, overlaysList.children[offset])
+          injectLabel(group.label, overlaysList.children[offset])
           offset += group.count + 1 // +1 to account for the header we just inserted
         }
       }
     }
 
     return () => {
-      injected.forEach((el) => el.parentNode?.removeChild(el))
+      injected.forEach((el) => el.remove())
     }
     // groupsKey is a stable serialisation of overlayGroups used as dep to avoid object reference churn
     // eslint-disable-next-line react-hooks/exhaustive-deps
