@@ -143,6 +143,12 @@ Merge cannot be performed.`,
   },
   viewSelectedRecord: 'View selected record',
   mapView: {
+    layersControl: {
+      baseLayers: 'Base layers',
+      inputData: 'Input data',
+      preloadedLayers: 'Preloaded layers',
+      samplingPointData: 'Sampling point data',
+    },
     layersPanel: {
       hidePanel: 'Hide panel',
       showPanel: 'Show panel',
