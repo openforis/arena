@@ -93,7 +93,7 @@ const SurveyDocImageEditor = (props: Props) => {
       draft = createSurveyDocImage({ labels, name, size, temporary: true })
     }
     if (documentPlace) draft = assocDocumentPlace(documentPlace)(draft)
-    if (expression) draft = assocExpression(expression)(draft)
+    draft = assocExpression(expression)(draft)
 
     SurveyDocImageValidator.validate({ surveyDocImages, surveyDocImage: draft }).then((v) => {
       setState((prev) => ({ ...prev, draftSurveyDocImage: draft, validation: v }))
@@ -134,7 +134,7 @@ const SurveyDocImageEditor = (props: Props) => {
             <Input
               onChange={onExpressionChange}
               value={expression}
-              validation={Validation.getFieldValidation(SurveyFile.propKeys.expression)(validation)}
+              validation={Validation.getFieldValidation(docImagePropKeys.expression)(validation)}
             />
           </FormItem>
           {editedSurveyDocImage && !file && (
