@@ -62,7 +62,7 @@ const SurveyDocImagesEditor = (props: Props) => {
   )
 
   const onDeleteClick = useCallback(
-    ({ surveyDocImage }: { surveyDocImage: object }) =>
+    ({ surveyDocImage }) =>
       async () => {
         if (await confirm({ key: 'homeView:surveyInfo.surveyDocImages.confirmDelete' })) {
           setSurveyDocImages(
@@ -73,7 +73,7 @@ const SurveyDocImagesEditor = (props: Props) => {
     [confirm, setSurveyDocImages, surveyDocImages]
   )
 
-  const onRowDoubleClick = useCallback(({ row }: { row: object }) => {
+  const onRowDoubleClick = useCallback(({ row }) => {
     setEditedSurveyDocImage(row)
     setDialogVisible(true)
   }, [])
@@ -91,21 +91,21 @@ const SurveyDocImagesEditor = (props: Props) => {
                 field: 'edit',
                 width: 60,
                 headerName: '',
-                renderCell: ({ row }: { row: object }) => <ButtonIconEdit onClick={() => onRowDoubleClick({ row })} />,
+                renderCell: ({ row }) => <ButtonIconEdit onClick={() => onRowDoubleClick({ row })} />,
                 sortable: false,
               },
               {
                 field: 'fileName',
                 flex: 0.35,
                 headerName: i18n.t('common:files.fileName'),
-                renderCell: ({ row }: { row: object }) => <LabelWithTooltip label={SurveyFile.getName(row)} />,
+                renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getName(row)} />,
                 sortable: false,
               },
               {
                 field: 'download',
                 width: 60,
                 headerName: '',
-                renderCell: ({ row: surveyDocImage }: { row: object }) => (
+                renderCell: ({ row: surveyDocImage }) => (
                   <ButtonDownload
                     href={API.getSurveyFileDownloadUrl({ surveyId, fileUuid: SurveyFile.getUuid(surveyDocImage) })}
                     showLabel={false}
@@ -118,14 +118,14 @@ const SurveyDocImagesEditor = (props: Props) => {
                 field: 'label',
                 flex: 0.3,
                 headerName: i18n.t('common.label'),
-                renderCell: ({ row }: { row: object }) => <LabelWithTooltip label={SurveyFile.getLabel(lang)(row)} />,
+                renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getLabel(lang)(row)} />,
                 sortable: false,
               },
               {
                 field: 'documentPlace',
                 width: 100,
                 headerName: i18n.t('homeView:surveyInfo.surveyDocImages.documentPlace'),
-                renderCell: ({ row }: { row: object }) => {
+                renderCell: ({ row }) => {
                   const place = getDocumentPlace(row)
                   return place ? i18n.t(`homeView:surveyInfo.surveyDocImages.documentPlaceValues.${place}`) : ''
                 },
@@ -135,28 +135,27 @@ const SurveyDocImagesEditor = (props: Props) => {
                 field: 'expression',
                 flex: 0.3,
                 headerName: i18n.t('homeView:surveyInfo.surveyDocImages.expression'),
-                renderCell: ({ row }: { row: object }) => <LabelWithTooltip label={getExpression(row)} />,
+                renderCell: ({ row }) => <LabelWithTooltip label={getExpression(row)} />,
                 sortable: false,
               },
               {
                 field: 'fileSize',
                 width: 100,
                 headerName: i18n.t('common:files.fileSize'),
-                renderCell: ({ row }: { row: object }) => FileUtils.toHumanReadableFileSize(SurveyFile.getSize(row)),
+                renderCell: ({ row }) => FileUtils.toHumanReadableFileSize(SurveyFile.getSize(row)),
                 sortable: false,
               },
               {
                 field: 'dateCreated',
                 width: 180,
                 headerName: i18n.t('common.dateCreated'),
-                renderCell: ({ row }: { row: object }) =>
-                  DateUtils.formatDateTimeDisplay(SurveyFile.getDateCreated(row)),
+                renderCell: ({ row }) => DateUtils.formatDateTimeDisplay(SurveyFile.getDateCreated(row)),
               },
               {
                 field: 'delete',
                 width: 60,
                 headerName: '',
-                renderCell: ({ row: surveyDocImage }: { row: object }) =>
+                renderCell: ({ row: surveyDocImage }) =>
                   !readOnly && <ButtonIconDelete onClick={onDeleteClick({ surveyDocImage })} />,
                 sortable: false,
               },

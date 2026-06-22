@@ -78,8 +78,9 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const selectionInitial =
     Objects.isNotEmpty(value) && selectionAllowed ? [String(value).length, String(value).length] : []
   const selectionRef = useRef<number[]>(selectionInitial)
-  const valueText = Objects.isEmpty(value) ? '' : String(value)
-  const title = titleProp ?? valueText
+  const valueTextOrUndefined = Objects.isEmpty(value) ? undefined : String(value)
+  const valueText = valueTextOrUndefined ?? ''
+  const title = titleProp ?? valueTextOrUndefined
 
   const handleValueChange = useCallback(
     (newValue: string) => {
@@ -107,7 +108,9 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   useOnUpdate(() => {
     if (!selectionAllowed) return
     const input = inputRef.current
-    if (!input) return
+    if (!input) {
+      return
+    }
     ;[input.selectionStart, input.selectionEnd] = selectionRef.current
   }, [selectionAllowed, value])
 
