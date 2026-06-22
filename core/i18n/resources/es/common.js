@@ -230,6 +230,8 @@ export default {
     header: 'Archivos',
     missing: ' Archivos faltantes: {{count}}',
     totalSize: 'Tamaño total: {{size}}',
+    fileName: 'Nombre del archivo',
+    fileSize: 'Tamaño del archivo',
   },
   sidebar: {
     logout: 'Cerrar sesión',

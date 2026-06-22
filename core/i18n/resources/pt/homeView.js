@@ -96,6 +96,21 @@ Se houver registros associados a este ciclo, eles serão excluídos.`,
         title: 'Camada de mapa pré-carregada',
       },
     },
+
+    surveyDocImages: {
+      title: 'Imagens do documento',
+      documentPlace: 'Local',
+      documentPlaceValues: {
+        header: 'Cabeçalho',
+        footer: 'Rodapé',
+      },
+      expression: 'Aplicar se condição',
+      confirmDelete: 'Tem certeza de que deseja excluir esta imagem do documento?',
+      editor: {
+        title: 'Imagem do documento',
+      },
+    },
+
     preferredLanguage: 'Idioma preferido',
     sampleBasedImageInterpretation: 'Interpretação de imagem baseada em amostra',
     sampleBasedImageInterpretationEnabled: 'Interpretação de imagem baseada em amostra habilitada',

@@ -97,6 +97,21 @@ export default {
         title: 'Предзагруженный слой карты',
       },
     },
+
+    surveyDocImages: {
+      title: 'Изображения документа',
+      documentPlace: 'Место',
+      documentPlaceValues: {
+        header: 'Верхний колонтитул',
+        footer: 'Нижний колонтитул',
+      },
+      expression: 'Применить если условие',
+      confirmDelete: 'Вы уверены, что хотите удалить это изображение документа?',
+      editor: {
+        title: 'Изображение документа',
+      },
+    },
+
     preferredLanguage: 'Предпочитаемый язык',
     sampleBasedImageInterpretation: 'Интерпретация изображений на основе образцов',
     sampleBasedImageInterpretationEnabled: 'Интерпретация изображений на основе образцов включена',

@@ -97,6 +97,21 @@ export default {
         title: 'Урьдчилан ачаалсан газрын зургийн давхарга',
       },
     },
+
+    surveyDocImages: {
+      title: 'Баримт бичгийн зургууд',
+      documentPlace: 'Байршил',
+      documentPlaceValues: {
+        header: 'Толгой хэсэг',
+        footer: 'Хөл хэсэг',
+      },
+      expression: 'Нөхцөл байвал хэрэглэх',
+      confirmDelete: 'Энэ баримт бичгийн зургийг устгахдаа итгэлтэй байна уу?',
+      editor: {
+        title: 'Баримт бичгийн зураг',
+      },
+    },
+
     preferredLanguage: 'Хүссэн хэл',
     sampleBasedImageInterpretation: 'Дээж дээр суурилсан зураг тайлбарлах',
     sampleBasedImageInterpretationEnabled: 'Дээж дээр суурилсан зураг тайлбарлах идэвхжсэн',

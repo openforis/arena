@@ -167,6 +167,13 @@ export default {
     labelsRequired: 'Требуется хотя бы одна метка',
   },
 
+  surveyDocImage: {
+    documentPlaceRequired: 'Место в документе обязательно',
+    fileRequired: 'Файл обязателен',
+    fileNameDuplicate: 'Другой файл с таким же именем уже существует',
+    labelsRequired: 'Требуется хотя бы одна метка',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Неверные столбцы: {{invalidHeaders}}',
     cannotFindNodeDef: "Невозможно найти определение атрибута или сущности с именем '{{name}}'",

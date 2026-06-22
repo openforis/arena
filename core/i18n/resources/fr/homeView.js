@@ -97,6 +97,21 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
         title: 'Couche de carte préchargée',
       },
     },
+
+    surveyDocImages: {
+      title: 'Images du document',
+      documentPlace: 'Emplacement',
+      documentPlaceValues: {
+        header: 'En-tête',
+        footer: 'Pied de page',
+      },
+      expression: 'Appliquer si condition',
+      confirmDelete: 'Êtes-vous sûr de vouloir supprimer cette image du document ?',
+      editor: {
+        title: 'Image du document',
+      },
+    },
+
     preferredLanguage: 'Langue préférée',
     sampleBasedImageInterpretation: "Interprétation d'images basée sur des échantillons",
     sampleBasedImageInterpretationEnabled: "Interprétation d'images basée sur des échantillons activée",

@@ -84,6 +84,21 @@ export default {
         title: 'Capa de mapa precargada',
       },
     },
+
+    surveyDocImages: {
+      title: 'Imágenes del documento',
+      documentPlace: 'Ubicación',
+      documentPlaceValues: {
+        header: 'Encabezado',
+        footer: 'Pie de página',
+      },
+      expression: 'Aplicar si condición',
+      confirmDelete: '¿Está seguro de que desea eliminar esta imagen del documento?',
+      editor: {
+        title: 'Imagen del documento',
+      },
+    },
+
     preferredLanguage: 'Idioma preferido',
     sampleBasedImageInterpretation: 'Interpretación de imágenes basada en muestras',
     sampleBasedImageInterpretationEnabled: 'Interpretación de imágenes basada en muestras habilitada',

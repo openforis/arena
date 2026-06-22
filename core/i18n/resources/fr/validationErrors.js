@@ -169,6 +169,13 @@ export default {
     labelsRequired: 'Au moins une étiquette est requise',
   },
 
+  surveyDocImage: {
+    documentPlaceRequired: "L'emplacement du document est requis",
+    fileRequired: 'Le fichier est requis',
+    fileNameDuplicate: 'Un autre fichier avec le même nom existe déjà',
+    labelsRequired: 'Au moins une étiquette est requise',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Colonnes invalides : {{invalidHeaders}}',
     cannotFindNodeDef: "Impossible de trouver la définition d'attribut ou d'entité avec le nom '{{name}}'",
