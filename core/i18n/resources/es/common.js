@@ -433,6 +433,7 @@ export default {
       showSamplingPolygon: 'Polígono de muestreo',
       showControlPoints: 'Puntos de control',
       showPlotReferencePoint: 'Punto de referencia de parcela',
+      showUtmGrid: 'Mostrar cuadrícula UTM',
     },
     samplingPointDataLayerName: 'Datos de puntos de muestreo - nivel {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (cargando...)',

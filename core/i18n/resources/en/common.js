@@ -489,6 +489,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       showSamplingPolygon: `Sampling polygon`,
       showControlPoints: `Control points`,
       showPlotReferencePoint: `Plot reference point`,
+      showUtmGrid: 'Show UTM grid',
     },
     rulerTooltip: `Press the button to start measuring distances.
 - click multiple times to measure paths

@@ -24,6 +24,7 @@ import { useMap } from './useMap'
 import { MapBaseLayerPeriodSelector } from './MapBaseLayerPeriodSelector'
 import { KmlUploader } from './KmlUploader'
 import { ZoomLevel } from './ZoomLevel'
+import { UtmGrid } from './UtmGrid'
 
 // start of workaround to show leaflet marker icon
 import L from 'leaflet'
@@ -110,6 +111,7 @@ export const MapContainer = (props) => {
               <MapBaseLayerPeriodSelector />
             </>
           )}
+          <UtmGrid />
           <ScaleControl position="bottomright" />
           <ZoomControl position="bottomright" />
           <ZoomLevel />
