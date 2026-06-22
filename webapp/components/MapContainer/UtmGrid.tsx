@@ -29,9 +29,8 @@ const getCanonicalBoundaries = (bandSouthLat: number): number[] => {
     for (let lng = -180; lng <= 180; lng += 6) {
       if (!skip.has(lng)) boundaries.push(lng)
     }
-    for (const lng of [9, 21, 33, 42]) {
-      boundaries.push(lng)
-    }
+    // Add the extra boundaries for the wider zones
+    boundaries.push(9, 21, 33)
     return boundaries.sort((a, b) => a - b)
   }
   // Standard: every 6°
@@ -145,7 +144,12 @@ export const UtmGrid = (): null => {
 
       const bounds = map.getBounds()
       const west = bounds.getWest()
-      const east = bounds.getEast()
+      let east = bounds.getEast()
+      // Unwrap antimeridian-crossing bounds: east < west means the viewport spans ±180°.
+      // Adding 360 gives a continuous [west, east] interval that expandBoundaries handles correctly.
+      if (east < west) {
+        east += 360
+      }
       const south = Math.max(-80, bounds.getSouth())
       const north = Math.min(84, bounds.getNorth())
       const viewport: Viewport = { layerGroup, west, east, south, north }
