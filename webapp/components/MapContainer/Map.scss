@@ -180,6 +180,17 @@
     border: none !important;
   }
 
+  .utm-grid-label {
+    background: none;
+    border: none;
+    color: #ffd900;
+    font-size: 10px;
+    font-weight: bold;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
   .cluster-marker {
     color: #fff;
     border-radius: 50%;

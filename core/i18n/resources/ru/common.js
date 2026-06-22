@@ -481,6 +481,7 @@ $t(common.raiseTicketInSupportForum)
       showSamplingPolygon: `Полигон выборки`,
       showControlPoints: `Контрольные точки`,
       showPlotReferencePoint: `Точка привязки участка`,
+      showUtmGrid: 'Показать сетку UTM',
     },
     samplingPointDataLayerName: 'Данные точки выборки - уровень {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (загрузка...)',
