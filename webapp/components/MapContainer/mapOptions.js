@@ -4,6 +4,7 @@ const keys = {
   showLocationMarkers: 'showLocationMarkers',
   showPlotReferencePoint: 'showPlotReferencePoint',
   showSamplingPolygon: 'showSamplingPolygon',
+  showUtmGrid: 'showUtmGrid',
 }
 
 const isOnlyForSampleBasedImageInterpretation = (key) =>
@@ -17,6 +18,7 @@ const createDefaultOptions = ({ sampleBasedImageInterpretationEnabled = false } 
   [keys.showLocationMarkers]: true,
   [keys.showPlotReferencePoint]: sampleBasedImageInterpretationEnabled,
   [keys.showSamplingPolygon]: sampleBasedImageInterpretationEnabled,
+  [keys.showUtmGrid]: false,
 })
 
 const assocOption =

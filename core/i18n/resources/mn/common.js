@@ -481,6 +481,7 @@ $t(common.raiseTicketInSupportForum)
       showSamplingPolygon: `Түүвэрлэх олон өнцөгт`,
       showControlPoints: `Хяналтын цэгүүд`,
       showPlotReferencePoint: `Газрын зургийн лавлах цэг`,
+      showUtmGrid: 'UTM торыг харуулах',
     },
     samplingPointDataLayerName: 'Түүвэрлэх цэгийн өгөгдөл - түвшин {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (ачаалж байна...)',

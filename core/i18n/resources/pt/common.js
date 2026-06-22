@@ -489,6 +489,7 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       showSamplingPolygon: `Polígono amostral`,
       showControlPoints: `Pontos de controle`,
       showPlotReferencePoint: `Ponto de referência da parcela`,
+      showUtmGrid: 'Mostrar grade UTM',
     },
     rulerTooltip: `Pressione o botão para começar a medir distâncias.
   - clique várias vezes para medir percursos
