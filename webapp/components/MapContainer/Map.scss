@@ -122,6 +122,21 @@
       }
     }
 
+    .leaflet-control-layers-group-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #888;
+      padding: 5px 0 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+
+      &:not(:first-child) {
+        margin-top: 4px;
+        padding-top: 6px;
+        border-top: 1px solid #ddd;
+      }
+    }
+
     .leaflet-control-layers-overlays {
       label span,
       label span span {
