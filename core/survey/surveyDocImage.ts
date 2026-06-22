@@ -14,7 +14,7 @@ export const propKeys = {
   expression: 'expression',
 } as const
 
-export const getDocumentPlace = ObjectUtils.getProp<DocumentPlace | undefined>(propKeys.documentPlace, undefined)
+export const getDocumentPlace = ObjectUtils.getProp<DocumentPlace | undefined>(propKeys.documentPlace)
 export const getExpression = ObjectUtils.getProp<string>(propKeys.expression, '')
 
 export const assocDocumentPlace = (place: DocumentPlace) => ObjectUtils.setProp(propKeys.documentPlace, place)

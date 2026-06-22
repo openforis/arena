@@ -108,8 +108,7 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
     if (!selectionAllowed) return
     const input = inputRef.current
     if (!input) return
-    ;(input as HTMLInputElement).selectionStart = selectionRef.current[0]
-    ;(input as HTMLInputElement).selectionEnd = selectionRef.current[1]
+    ;[input.selectionStart, input.selectionEnd] = selectionRef.current
   }, [selectionAllowed, value])
 
   const className = classNames('form-input', classNameProp)

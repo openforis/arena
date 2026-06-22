@@ -29,6 +29,8 @@ export const keysProps = {
   extra: 'extra',
 } as const
 
+type ObjectType = Record<string, unknown> | object
+
 // ====== READ
 export const getId = R.prop(keys.id)
 export const getUuid = (obj: any): string => R.propOr(null, keys.uuid)(obj)
@@ -37,24 +39,24 @@ export const getProps = R.propOr({}, keys.props)
 export const getPropsDraft = R.propOr({}, keys.propsDraft)
 export const getProp =
   <T>(prop: string, defaultTo: unknown = null) =>
-  (obj: object | Record<string, unknown>): T =>
+  (obj: ObjectType): T =>
     R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))(obj)
 export const isKeyTrue =
   (key: string) =>
-  (obj: Record<string, unknown>): boolean =>
+  (obj: ObjectType): boolean =>
     !!R.propOr(false, key)(obj)
 export const isPropTrue =
   (prop: string) =>
-  (obj: Record<string, unknown>): boolean =>
+  (obj: ObjectType): boolean =>
     !!getProp(prop)(obj)
 
 export const getParentUuid = R.propOr(null, keys.parentUuid)
 
-export const getLabels = (obj: any): Record<string, string> =>
+export const getLabels = (obj: ObjectType): Record<string, string> =>
   getProp<Record<string, string>>(keysProps.labels, {})(obj)
 export const getLabel = (lang: string, defaultTo: unknown = null) => R.pipe(getLabels, R.propOr(defaultTo, lang))
 
-export const getDescriptions = (obj: any): Record<string, string> =>
+export const getDescriptions = (obj: ObjectType): Record<string, string> =>
   getProp<Record<string, string>>(keysProps.descriptions, {})(obj)
 export const getDescription = (lang: string, defaultTo: unknown = null) =>
   R.pipe(getDescriptions, R.propOr(defaultTo, lang))
@@ -64,7 +66,7 @@ export const getExtraProp = (extraPropKey: string) => R.pipe(getExtra, R.propOr(
 
 export const getDate =
   (prop: string) =>
-  (obj: Record<string, unknown>): unknown =>
+  (obj: ObjectType): unknown =>
     R.pipe(R.propOr(null, prop), R.unless(R.isNil, DateUtils.parseISO))(obj)
 export const getDateCreated = getDate(keys.dateCreated)
 export const getDateModified = getDate(keys.dateModified)
@@ -83,15 +85,15 @@ export const isDraft = isKeyTrue(keys.draft)
 const isBlank = (value: unknown): boolean =>
   value === null || value === undefined || R.isEmpty(value) || StringUtils.isBlank(value)
 export const isEqual =
-  (other: Record<string, unknown>) =>
-  (self: Record<string, unknown>): boolean =>
+  (other: ObjectType) =>
+  (self: ObjectType): boolean =>
     getUuid(other) === getUuid(self)
 
 // ===== Props
 
 export const getPropsDiff =
-  (other: Record<string, unknown>) =>
-  (obj: Record<string, unknown>): Record<string, unknown> => {
+  (other: ObjectType) =>
+  (obj: ObjectType): Record<string, unknown> => {
     const propsSelf = getProps(obj) as Record<string, unknown>
     const propsOther = getProps(other) as Record<string, unknown>
     return R.fromPairs(R.difference(R.toPairs(propsOther), R.toPairs(propsSelf)))
@@ -102,7 +104,7 @@ export const assocIndex = R.assoc(keys.index)
 
 export const mergeProps =
   (props: Record<string, unknown>) =>
-  (obj: Record<string, unknown>): Record<string, unknown> =>
+  (obj: ObjectType): ObjectType =>
     R.pipe(getProps, R.mergeLeft(props), (propsUpdate: Record<string, unknown>) =>
       R.assoc(keys.props, propsUpdate, obj)
     )(obj)

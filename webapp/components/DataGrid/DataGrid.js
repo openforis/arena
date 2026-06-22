@@ -15,6 +15,7 @@ const FooterWithExport =
 const DataGrid = (props) => {
   const {
     allowExportToCsv = false,
+    autoHeight = false,
     autoPageSize = false,
     autoRowHeight = false,
     checkboxSelection = false,
@@ -37,6 +38,7 @@ const DataGrid = (props) => {
 
   return (
     <MuiDataGrid
+      autoHeight={autoHeight}
       autoPageSize={autoPageSize}
       checkboxSelection={checkboxSelection}
       className={classNames('data-grid', className)}
@@ -57,6 +59,7 @@ const DataGrid = (props) => {
 
 DataGrid.propTypes = {
   allowExportToCsv: PropTypes.bool,
+  autoHeight: PropTypes.bool,
   autoPageSize: PropTypes.bool,
   autoRowHeight: PropTypes.bool,
   checkboxSelection: PropTypes.bool,

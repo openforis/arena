@@ -1,3 +1,5 @@
+import './SurveyDocImagesEditor.scss'
+
 import React, { useCallback, useState } from 'react'
 
 import * as SurveyFile from '@core/survey/surveyFile'
@@ -83,6 +85,7 @@ const SurveyDocImagesEditor = (props: Props) => {
         <div className="container">
           {!readOnly && <ButtonAdd onClick={onAddClick} size="small" />}
           <DataGrid
+            autoHeight
             columns={[
               {
                 field: 'edit',
