@@ -256,6 +256,8 @@ Try again?`,
     header: 'Files',
     missing: ' Missing files: {{count}}',
     totalSize: 'Total size: {{size}}',
+    fileName: 'File name',
+    fileSize: 'File size',
   },
 
   sidebar: {

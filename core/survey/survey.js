@@ -112,6 +112,7 @@ export const {
   getSamplingPolygon,
   isPreloadedMapLayersEnabled,
   getPreloadedMapLayers,
+  getSurveyDocImages,
   getSecurity,
   getSRS,
   getSRSCodes,

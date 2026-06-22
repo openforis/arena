@@ -441,6 +441,11 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
       const fileUuid = SurveyFile.getUuid(preloadedMapLayer)
       await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t)
     }
+    const surveyDocImagesUpdated = Survey.getSurveyDocImages(surveyInfoUpdated)
+    for (const surveyDocImage of surveyDocImagesUpdated) {
+      const fileUuid = SurveyFile.getUuid(surveyDocImage)
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t)
+    }
     await SurveyFileManager.deleteTemporaryFiles(surveyId, t)
 
     return surveyUpdated
@@ -458,10 +463,30 @@ export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
   const preloadedMapLayerFileSummariesToDelete = preloadedMapLayerFileSummaries.filter(
     (fileSummary) => !preloadedMapLayerFileUuids.has(SurveyFile.getUuid(fileSummary))
   )
-  const fileUuidsToDelete = preloadedMapLayerFileSummariesToDelete.map(SurveyFile.getUuid)
-  if (fileUuidsToDelete.length > 0) {
-    await SurveyFileManager.deleteFilesAndContentByUuids({ surveyId, fileUuids: fileUuidsToDelete }, client)
-    Logger.debug(`Deleted ${fileUuidsToDelete.length} unused preloaded map layer files of survey ${surveyId}`)
+  const preloadedMapLayerUuidsToDelete = preloadedMapLayerFileSummariesToDelete.map(SurveyFile.getUuid)
+  if (preloadedMapLayerUuidsToDelete.length > 0) {
+    await SurveyFileManager.deleteFilesAndContentByUuids(
+      { surveyId, fileUuids: preloadedMapLayerUuidsToDelete },
+      client
+    )
+    Logger.debug(
+      `Deleted ${preloadedMapLayerUuidsToDelete.length} unused preloaded map layer files of survey ${surveyId}`
+    )
+  }
+
+  const surveyDocImages = Survey.getSurveyDocImages(surveyInfo)
+  const surveyDocImageFileUuids = new Set(surveyDocImages.map(SurveyFile.getUuid))
+  const surveyDocImageFileSummaries = await SurveyFileManager.fetchFileSummariesByType(
+    { surveyId, type: SurveyFile.SurveyFileType.surveyDocImage },
+    client
+  )
+  const surveyDocImageFileSummariesToDelete = surveyDocImageFileSummaries.filter(
+    (fileSummary) => !surveyDocImageFileUuids.has(SurveyFile.getUuid(fileSummary))
+  )
+  const surveyDocImageUuidsToDelete = surveyDocImageFileSummariesToDelete.map(SurveyFile.getUuid)
+  if (surveyDocImageUuidsToDelete.length > 0) {
+    await SurveyFileManager.deleteFilesAndContentByUuids({ surveyId, fileUuids: surveyDocImageUuidsToDelete }, client)
+    Logger.debug(`Deleted ${surveyDocImageUuidsToDelete.length} unused survey doc image files of survey ${surveyId}`)
   }
 }
 

@@ -31,13 +31,13 @@ export const keysProps = {
 
 // ====== READ
 export const getId = R.prop(keys.id)
-export const getUuid = R.propOr(null, keys.uuid)
+export const getUuid = (obj: any): string => R.propOr(null, keys.uuid)(obj)
 
 export const getProps = R.propOr({}, keys.props)
 export const getPropsDraft = R.propOr({}, keys.propsDraft)
 export const getProp =
-  (prop: string, defaultTo: unknown = null) =>
-  (obj: Record<string, unknown>): unknown =>
+  <T>(prop: string, defaultTo: unknown = null) =>
+  (obj: object | Record<string, unknown>): T =>
     R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))(obj)
 export const isKeyTrue =
   (key: string) =>
@@ -50,10 +50,12 @@ export const isPropTrue =
 
 export const getParentUuid = R.propOr(null, keys.parentUuid)
 
-export const getLabels = getProp(keysProps.labels, {})
+export const getLabels = (obj: any): Record<string, string> =>
+  getProp<Record<string, string>>(keysProps.labels, {})(obj)
 export const getLabel = (lang: string, defaultTo: unknown = null) => R.pipe(getLabels, R.propOr(defaultTo, lang))
 
-export const getDescriptions = getProp(keysProps.descriptions, {})
+export const getDescriptions = (obj: any): Record<string, string> =>
+  getProp<Record<string, string>>(keysProps.descriptions, {})(obj)
 export const getDescription = (lang: string, defaultTo: unknown = null) =>
   R.pipe(getDescriptions, R.propOr(defaultTo, lang))
 

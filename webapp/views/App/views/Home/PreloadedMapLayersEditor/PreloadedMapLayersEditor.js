@@ -88,7 +88,7 @@ const PreloadedMapLayersEditor = (props) => {
               {
                 field: 'fileName',
                 flex: 0.4,
-                headerName: i18n.t('homeView:surveyInfo.preloadedMapLayers.fileName'),
+                headerName: i18n.t('common:files.fileName'),
                 renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getName(row)} />,
                 sortable: false,
               },
@@ -115,7 +115,7 @@ const PreloadedMapLayersEditor = (props) => {
               {
                 field: 'fileSize',
                 width: 120,
-                headerName: i18n.t('homeView:surveyInfo.preloadedMapLayers.fileSize'),
+                headerName: i18n.t('common:files.fileSize'),
                 renderCell: ({ row }) => FileUtils.toHumanReadableFileSize(SurveyFile.getSize(row)),
                 sortable: false,
               },

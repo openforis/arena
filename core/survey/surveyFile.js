@@ -34,6 +34,7 @@ export const invalidPropKeys = {
 export const SurveyFileType = {
   preloadedMapLayer: 'preloadedMapLayer',
   recordAttachment: 'recordAttachment',
+  surveyDocImage: 'surveyDocImage',
 }
 
 export const createFile = ({
