@@ -8,10 +8,11 @@ import { useSurveyId } from '@webapp/store/survey'
 
 import { baseLayers } from './baseLayers'
 import { useMapContext } from './MapContext'
+import { MapLayersSeparator } from './MapLayersSeparator'
 import { WmtsComponent } from './WmtsComponent'
 
 export const MapLayersControl = (props) => {
-  const { layers = [] } = props
+  const { layers = [], preloadedLayersCount = 0 } = props
 
   const user = useUser()
   const surveyId = useSurveyId()
@@ -63,14 +64,18 @@ export const MapLayersControl = (props) => {
   }, [contextBaseLayer, getTileUrl, user])
 
   return (
-    <LayersControl autoZIndex position="topright">
-      {baseLayersControls}
-      <WmtsComponent />
-      {layers}
-    </LayersControl>
+    <>
+      <LayersControl autoZIndex position="topright">
+        {baseLayersControls}
+        <WmtsComponent />
+        {layers}
+      </LayersControl>
+      {preloadedLayersCount > 0 && <MapLayersSeparator count={preloadedLayersCount} />}
+    </>
   )
 }
 
 MapLayersControl.propTypes = {
   layers: PropTypes.array,
+  preloadedLayersCount: PropTypes.number,
 }

@@ -59,7 +59,15 @@ const MapResizeHandler = () => {
 }
 
 export const MapContainer = (props) => {
-  const { editable = false, geoJson = null, layers = [], markerPoint, markerTitle, showOptions = true } = props
+  const {
+    editable = false,
+    geoJson = null,
+    layers = [],
+    markerPoint,
+    markerTitle,
+    preloadedLayersCount = 0,
+    showOptions = true,
+  } = props
   const { centerPositionLatLon, markerPointUpdated, markerPointUpdatedToString, onMarkerPointUpdated, onSaveClick } =
     useMap(props)
 
@@ -86,7 +94,7 @@ export const MapContainer = (props) => {
           zoom={INITIAL_ZOOM_LEVEL}
         >
           <MapResizeHandler />
-          <MapLayersControl layers={layers} />
+          <MapLayersControl layers={layers} preloadedLayersCount={preloadedLayersCount} />
           <MapMarker
             editable={editable}
             point={markerPoint}
@@ -133,5 +141,6 @@ MapContainer.propTypes = {
   markerPoint: PropTypes.object,
   markerTitle: PropTypes.string,
   onMarkerPointChange: PropTypes.func,
+  preloadedLayersCount: PropTypes.number,
   showOptions: PropTypes.bool,
 }

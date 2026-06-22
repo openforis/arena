@@ -31,12 +31,13 @@ const MAP_MIN_WIDTH = 300
 
 type MapViewContentProps = {
   layers: React.ReactElement[]
+  preloadedLayersCount: number
 }
 
 // MapContainer must always occupy the same position in the React tree so Leaflet never
 // unmounts. We achieve this with a stable flex layout where only the panel-pane width
 // changes — no conditional Split mount/unmount.
-const MapViewContent = ({ layers }: MapViewContentProps) => {
+const MapViewContent = ({ layers, preloadedLayersCount }: MapViewContentProps) => {
   const { activeLayers, isPanelVisible } = useMapLayersPanel()
   const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -78,7 +79,7 @@ const MapViewContent = ({ layers }: MapViewContentProps) => {
         />
       )}
       <div className="map-view-content__map">
-        <MapContainer layers={layers} />
+        <MapContainer layers={layers} preloadedLayersCount={preloadedLayersCount} />
       </div>
     </div>
   )
@@ -213,7 +214,7 @@ const MapWrapper = () => {
   return (
     <MapLayersPanelProvider>
       <div className="map-view-layout">
-        <MapViewContent layers={layers} />
+        <MapViewContent layers={layers} preloadedLayersCount={preloadedLayerSummaries.length} />
       </div>
       {editingRecordUuid && (
         <RecordEditModal
