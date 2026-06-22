@@ -143,6 +143,12 @@ export default {
   },
   viewSelectedRecord: 'Сонгогдсон бичлэгийг харах',
   mapView: {
+    layersControl: {
+      baseLayers: 'Үндсэн давхаргууд',
+      inputData: 'Оруулах өгөгдөл',
+      preloadedLayers: 'Урьдчилан ачаалсан давхаргууд',
+      samplingPointData: 'Дээж цэгийн өгөгдөл',
+    },
     layersPanel: {
       hidePanel: 'Самбарыг нуух',
       showPanel: 'Самбарыг харуулах',

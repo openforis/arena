@@ -142,6 +142,12 @@ A mesclagem não pode ser realizada.`,
   },
   viewSelectedRecord: 'Visualizar registro selecionado',
   mapView: {
+    layersControl: {
+      baseLayers: 'Camadas base',
+      inputData: 'Dados de entrada',
+      preloadedLayers: 'Camadas pré-carregadas',
+      samplingPointData: 'Dados de pontos de amostragem',
+    },
     layersPanel: {
       hidePanel: 'Ocultar painel',
       showPanel: 'Mostrar painel',
