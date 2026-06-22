@@ -458,10 +458,14 @@ export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
   const preloadedMapLayerFileSummariesToDelete = preloadedMapLayerFileSummaries.filter(
     (fileSummary) => !preloadedMapLayerFileUuids.has(SurveyFile.getUuid(fileSummary))
   )
-  const fileUuidsToDelete = preloadedMapLayerFileSummariesToDelete.map(SurveyFile.getUuid)
-  if (fileUuidsToDelete.length > 0) {
-    await SurveyFileManager.deleteFilesAndContentByUuids({ surveyId, fileUuids: fileUuidsToDelete }, client)
-    Logger.debug(`Deleted ${fileUuidsToDelete.length} unused preloaded map layer files of survey ${surveyId}`)
+  if (preloadedMapLayerFileSummariesToDelete.length > 0) {
+    await SurveyFileManager.deleteFilesAndContent(
+      { surveyId, fileSummaries: preloadedMapLayerFileSummariesToDelete },
+      client
+    )
+    Logger.debug(
+      `Deleted ${preloadedMapLayerFileSummariesToDelete.length} unused preloaded map layer files of survey ${surveyId}`
+    )
   }
 }
 
@@ -510,10 +514,10 @@ export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = Surve
 
 // ====== DELETE
 export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, client = db) => {
-  // fetch file uuids to delete before survey schema is dropped
-  const filesToDeleteUuids = SurveyFileManager.isFileContentStoredInDB()
+  // fetch file summaries to delete before survey schema is dropped
+  const filesToDelete = SurveyFileManager.isFileContentStoredInDB()
     ? []
-    : await SurveyFileManager.fetchFileUuidsBySurveyId({ surveyId }, client)
+    : await SurveyFileManager.fetchFileSummariesBySurveyId(surveyId, client)
 
   await client.tx(async (t) => {
     if (deleteUserPrefs) {
@@ -523,8 +527,8 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
     await SurveyRepository.dropSurveySchema(surveyId, t)
     await SchemaRdbRepository.dropSchema(surveyId, t)
   })
-  if (filesToDeleteUuids.length > 0) {
-    await SurveyFileManager.deleteFilesContentByUuids({ surveyId, fileUuids: filesToDeleteUuids })
+  if (filesToDelete.length > 0) {
+    await SurveyFileManager.deleteFilesContentByUuids({ surveyId, fileSummaries: filesToDelete })
   }
 }
 

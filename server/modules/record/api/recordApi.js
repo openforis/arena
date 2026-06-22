@@ -42,7 +42,7 @@ const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
   const fileUuid = Node.getFileUuid(node)
   const file = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
   const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
-  const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid })
+  const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary: file })
   return { fileName, file, contentStream }
 }
 

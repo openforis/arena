@@ -104,6 +104,7 @@ export const getBaseName = (file) => {
 
 export const deleteFile = (path) => fs.unlinkSync(path)
 export const deleteFileAsync = (path) => fsp.unlink(path)
+export const rename = (oldPath, newPath) => fsp.rename(oldPath, newPath)
 
 // ======= Temp Files
 export const newTempFileName = () => `${uuidv4()}.tmp`
