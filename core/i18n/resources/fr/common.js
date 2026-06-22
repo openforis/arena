@@ -490,6 +490,7 @@ Merci et profitez de **$t(common.appNameFull)** !`,
       showSamplingPolygon: `Polygone d'échantillonnage`,
       showControlPoints: `Points de contrôle`,
       showPlotReferencePoint: `Point de référence de la parcelle`,
+      showUtmGrid: 'Afficher la grille UTM',
     },
     rulerTooltip: `Appuyez sur le bouton pour commencer à mesurer des distances.
 - cliquez plusieurs fois pour mesurer des chemins
