@@ -29,6 +29,7 @@ import NodeDefsTranslationJob from './NodeDefsTranslationJob'
 import SurveyLabelsImportJob from './surveyLabelsImportJob'
 import SurveysListExportJob from './SurveysListExportJob'
 import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
+import { findSurveyDocImageApplicable } from './surveyDocImageUtils'
 
 const dbMaxAvailableSpace = 1024 * 1024 * 1024 * 5 // 4GB
 
@@ -146,18 +147,6 @@ const isSurveyDocImageApplicable = async ({ user, survey, imageFile }) => {
   }
 }
 
-const findSurveyDocImageApplicable = async ({ user, survey, surveyDocImages, documentPlace }) => {
-  for (const imageFile of surveyDocImages) {
-    if (
-      SurveyDocImage.getDocumentPlace(imageFile) === documentPlace &&
-      (await isSurveyDocImageApplicable({ user, survey, imageFile }))
-    ) {
-      return imageFile
-    }
-  }
-  return null
-}
-
 const exportSurveyDocument = async ({
   user,
   surveyId,
@@ -177,21 +166,18 @@ const exportSurveyDocument = async ({
     includeDeleted: false,
     includeAnalysis: false,
   })
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const surveyDocImages = Survey.getSurveyDocImages(surveyInfo)
-  const langToUse = lang ?? Survey.getDefaultLanguage(surveyInfo)
+  const surveyDocImages = Survey.getSurveyDocImages(survey)
+  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
 
   const headerImageFileSummary = await findSurveyDocImageApplicable({
-    user,
-    survey,
     surveyDocImages,
     documentPlace: SurveyDocImage.DocumentPlace.header,
+    isApplicable: (imageFile) => isSurveyDocImageApplicable({ user, survey, imageFile }),
   })
   const footerImageFileSummary = await findSurveyDocImageApplicable({
-    user,
-    survey,
     surveyDocImages,
     documentPlace: SurveyDocImage.DocumentPlace.footer,
+    isApplicable: (imageFile) => isSurveyDocImageApplicable({ user, survey, imageFile }),
   })
 
   const i18n = await i18nFactory.createI18nAsync(langToUse)

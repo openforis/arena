@@ -380,9 +380,10 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/record/:recordUuid/export/docx', requireRecordViewPermission, async (req, res, next) => {
     try {
+      const user = Request.getUser(req)
       const { surveyId, recordUuid, lang } = Request.getParams(req)
 
-      await RecordService.exportRecordDocx({ surveyId, recordUuid, lang, outputStream: res })
+      await RecordService.exportRecordDocx({ user, surveyId, recordUuid, lang, outputStream: res })
     } catch (error) {
       next(error)
     }
@@ -390,9 +391,10 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/record/:recordUuid/export/pdf', requireRecordViewPermission, async (req, res, next) => {
     try {
+      const user = Request.getUser(req)
       const { surveyId, recordUuid, lang } = Request.getParams(req)
 
-      await RecordService.exportRecordPdf({ surveyId, recordUuid, lang, outputStream: res })
+      await RecordService.exportRecordPdf({ user, surveyId, recordUuid, lang, outputStream: res })
     } catch (error) {
       next(error)
     }
