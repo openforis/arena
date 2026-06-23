@@ -1,8 +1,10 @@
 import { Schemata, SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
+import { NodeDefExpressionEvaluator } from '@openforis/arena-core'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
+import * as SurveyDocImage from '@core/survey/surveyDocImage'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
@@ -133,7 +135,31 @@ export const startSchemaSummaryExportJob = ({ user, surveyId, cycle, fileFormat,
 export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
 
+const isSurveyDocImageApplicable = async ({ user, survey, imageFile }) => {
+  const expression = SurveyDocImage.getExpression(imageFile)
+  if (!expression) return true
+  try {
+    const result = await new NodeDefExpressionEvaluator().evalExpression({ user, survey, expression })
+    return !!result
+  } catch {
+    return false
+  }
+}
+
+const findSurveyDocImageApplicable = async ({ user, survey, surveyDocImages, documentPlace }) => {
+  for (const imageFile of surveyDocImages) {
+    if (
+      SurveyDocImage.getDocumentPlace(imageFile) === documentPlace &&
+      (await isSurveyDocImageApplicable({ user, survey, imageFile }))
+    ) {
+      return imageFile
+    }
+  }
+  return null
+}
+
 const exportSurveyDocument = async ({
+  user,
   surveyId,
   cycle,
   outputStream,
@@ -151,9 +177,33 @@ const exportSurveyDocument = async ({
     includeDeleted: false,
     includeAnalysis: false,
   })
-  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyDocImages = Survey.getSurveyDocImages(surveyInfo)
+  const langToUse = lang ?? Survey.getDefaultLanguage(surveyInfo)
+
+  const headerImageFileSummary = await findSurveyDocImageApplicable({
+    user,
+    survey,
+    surveyDocImages,
+    documentPlace: SurveyDocImage.DocumentPlace.header,
+  })
+  const footerImageFileSummary = await findSurveyDocImageApplicable({
+    user,
+    survey,
+    surveyDocImages,
+    documentPlace: SurveyDocImage.DocumentPlace.footer,
+  })
+
   const i18n = await i18nFactory.createI18nAsync(langToUse)
-  const { buffer, surveyName } = await generator({ survey, cycle, lang: langToUse, i18n })
+  const { buffer, surveyName } = await generator({
+    survey,
+    cycle,
+    lang: langToUse,
+    i18n,
+    fileProvider: async (fileUuid) => SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileUuid }),
+    headerImageFileUuid: headerImageFileSummary?.uuid,
+    footerImageFileUuid: footerImageFileSummary?.uuid,
+  })
   const fileName = ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'SurveyForm', extension })
   Response.sendFileContent({
     res: outputStream,
@@ -164,8 +214,9 @@ const exportSurveyDocument = async ({
   })
 }
 
-export const exportSurveyDocx = ({ surveyId, cycle, outputStream, lang = null, draft = true }) =>
+export const exportSurveyDocx = ({ user, surveyId, cycle, outputStream, lang = null, draft = true }) =>
   exportSurveyDocument({
+    user,
     surveyId,
     cycle,
     outputStream,
@@ -176,8 +227,9 @@ export const exportSurveyDocx = ({ surveyId, cycle, outputStream, lang = null, d
     contentType: Response.contentTypes.docx,
   })
 
-export const exportSurveyPdf = ({ surveyId, cycle, outputStream, lang = null, draft = true }) =>
+export const exportSurveyPdf = ({ user, surveyId, cycle, outputStream, lang = null, draft = true }) =>
   exportSurveyDocument({
+    user,
     surveyId,
     cycle,
     outputStream,
