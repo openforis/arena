@@ -1,6 +1,6 @@
 import './SurveyDocImagesEditor.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
