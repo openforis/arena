@@ -6,7 +6,7 @@ import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
 import { getDocumentPlace, getExpression } from '@core/survey/surveyDocImage'
 
-import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit } from '@webapp/components'
+import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, Fieldset } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
@@ -80,8 +80,7 @@ const SurveyDocImagesEditor = (props: Props) => {
 
   return (
     <>
-      <fieldset className="survey-doc-images-editor">
-        <legend>{i18n.t('homeView:surveyInfo.surveyDocImages.title')}</legend>
+      <Fieldset className="survey-doc-images-editor" legend="homeView:surveyInfo.surveyDocImages.title">
         <div className="container">
           {!readOnly && <ButtonAdd onClick={onAddClick} size="small" />}
           <DataGrid
@@ -167,7 +166,7 @@ const SurveyDocImagesEditor = (props: Props) => {
             rows={surveyDocImages ?? []}
           />
         </div>
-      </fieldset>
+      </Fieldset>
 
       {dialogVisible && (
         <SurveyDocImageEditor
