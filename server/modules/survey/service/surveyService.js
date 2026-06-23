@@ -140,7 +140,7 @@ const isSurveyDocImageApplicable = async ({ user, survey, imageFile }) => {
   if (!expression) return true
   try {
     const result = await new NodeDefExpressionEvaluator().evalExpression({ user, survey, expression })
-    return !!result
+    return result === true
   } catch {
     return false
   }
