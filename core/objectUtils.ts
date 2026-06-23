@@ -33,7 +33,7 @@ type ObjectType = Record<string, unknown> | object
 
 // ====== READ
 export const getId = R.prop(keys.id)
-export const getUuid = (obj: any): string => R.propOr(null, keys.uuid)(obj)
+export const getUuid = (obj: any): string | null => R.propOr(null, keys.uuid)(obj)
 
 export const getProps = R.propOr({}, keys.props)
 export const getPropsDraft = R.propOr({}, keys.propsDraft)

@@ -49,12 +49,16 @@ export const EditableColumn = <T extends object>(props: Props<T>) => {
 
   const onContainerKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === KeyboardKeys.Space) {
+      if (e.key === KeyboardKeys.Space || e.key === KeyboardKeys.Enter) {
+        e.preventDefault()
         setEditing(true)
       }
     },
     [setEditing]
   )
+
+  const onContainerTouchStart = useCallback(() => setHovering(true), [setHovering])
+  const onContainerTouchEnd = useCallback(() => setHovering(false), [setHovering])
 
   const onEditClick = useCallback(
     (e: React.MouseEvent) => {
@@ -72,11 +76,15 @@ export const EditableColumn = <T extends object>(props: Props<T>) => {
   return (
     <div
       className={classNames(className, { editing })}
+      role="button"
+      tabIndex={0}
       onClick={onContainerClick}
       onFocus={onContainerFocus}
       onKeyDown={onContainerKeyDown}
       onMouseOver={onContainerMouseOver}
       onMouseLeave={onContainerMouseLeave}
+      onTouchStart={onContainerTouchStart}
+      onTouchEnd={onContainerTouchEnd}
     >
       {editing && renderItemEditing({ item })}
       {!editing && renderItem({ item })}

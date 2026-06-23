@@ -86,13 +86,17 @@ const SurveyDocImagesEditor = (props: Props) => {
           <DataGrid
             autoHeight
             columns={[
-              {
-                field: 'edit',
-                width: 60,
-                headerName: '',
-                renderCell: ({ row }) => <ButtonIconEdit onClick={() => onRowDoubleClick({ row })} />,
-                sortable: false,
-              },
+              ...(readOnly
+                ? []
+                : [
+                    {
+                      field: 'edit',
+                      width: 60,
+                      headerName: '',
+                      renderCell: ({ row }) => <ButtonIconEdit onClick={() => onRowDoubleClick({ row })} />,
+                      sortable: false,
+                    },
+                  ]),
               {
                 field: 'fileName',
                 flex: 0.35,
@@ -162,7 +166,7 @@ const SurveyDocImagesEditor = (props: Props) => {
             density="compact"
             getRowId={(row: object) => SurveyFile.getUuid(row)}
             hideFooterPagination
-            onRowDoubleClick={onRowDoubleClick}
+            onRowDoubleClick={readOnly ? undefined : onRowDoubleClick}
             rows={surveyDocImages ?? []}
           />
         </div>
