@@ -256,6 +256,8 @@ Deseja prosseguir?`,
     header: 'Arquivos',
     missing: ' Arquivos ausentes: {{count}}',
     totalSize: 'Tamanho total: {{size}}',
+    fileName: 'Nome do arquivo',
+    fileSize: 'Tamanho do arquivo',
   },
 
   sidebar: {

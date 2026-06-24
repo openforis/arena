@@ -139,6 +139,13 @@ export const ValidatorErrorKeys = {
     labelsRequired: 'validationErrors:surveyPreloadedMapLayer.labelsRequired',
   },
 
+  surveyDocImage: {
+    documentPlaceRequired: 'validationErrors:surveyDocImage.documentPlaceRequired',
+    fileRequired: 'validationErrors:surveyDocImage.fileRequired',
+    fileNameDuplicate: 'validationErrors:surveyDocImage.fileNameDuplicate',
+    labelsRequired: 'validationErrors:surveyDocImage.labelsRequired',
+  },
+
   taxonomyEdit: {
     codeChangedAfterPublishing: 'validationErrors:taxonomyEdit.codeChangedAfterPublishing',
     codeDuplicate: 'validationErrors:taxonomyEdit.codeDuplicate',

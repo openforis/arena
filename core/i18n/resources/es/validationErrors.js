@@ -167,6 +167,13 @@ export default {
     labelsRequired: 'Se requiere al menos una etiqueta',
   },
 
+  surveyDocImage: {
+    documentPlaceRequired: 'La ubicación del documento es obligatoria',
+    fileRequired: 'El archivo es obligatorio',
+    fileNameDuplicate: 'Otro archivo con el mismo nombre ya existe',
+    labelsRequired: 'Se requiere al menos una etiqueta',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Columnas no válidas: {{invalidHeaders}}',
     cannotFindNodeDef: "No se puede encontrar la definición de atributo o entidad con el nombre '{{name}}'",

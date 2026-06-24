@@ -1,18 +1,25 @@
 import React, { useCallback, useState } from 'react'
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 
 import { ButtonIconEdit } from '@webapp/components'
 import { KeyboardKeys } from '@webapp/utils/keyboardKeys'
 
-export const EditableColumn = (props) => {
+type Props<T> = {
+  canEdit?: boolean
+  className?: string
+  item: T
+  renderItem: (params: { item: T }) => React.ReactNode
+  renderItemEditing: (params: { item: T }) => React.ReactNode
+}
+
+export const EditableColumn = <T extends object>(props: Props<T>) => {
   const { canEdit, className, item, renderItem, renderItemEditing } = props
 
   const [state, setState] = useState({ editing: false, hovering: false })
   const { editing, hovering } = state
 
   const setHovering = useCallback(
-    (hoveringNew) => {
+    (hoveringNew: boolean) => {
       if (hoveringNew !== hovering) {
         setState((statePrev) => ({ ...statePrev, hovering: hoveringNew }))
       }
@@ -21,7 +28,7 @@ export const EditableColumn = (props) => {
   )
 
   const setEditing = useCallback(
-    (editingNew) => {
+    (editingNew: boolean) => {
       if (editingNew !== editing) {
         setState((statePrev) => ({ ...statePrev, editing: editingNew }))
       }
@@ -32,7 +39,7 @@ export const EditableColumn = (props) => {
   const onContainerMouseOver = useCallback(() => setHovering(true), [setHovering])
   const onContainerMouseLeave = useCallback(() => setHovering(false), [setHovering])
 
-  const onContainerClick = useCallback((e) => {
+  const onContainerClick = useCallback((e: React.MouseEvent) => {
     // prevent table row selection on click
     e.stopPropagation()
     e.preventDefault()
@@ -41,16 +48,20 @@ export const EditableColumn = (props) => {
   const onContainerFocus = useCallback(() => setHovering(true), [setHovering])
 
   const onContainerKeyDown = useCallback(
-    (e) => {
-      if (e.key === KeyboardKeys.Space) {
+    (e: React.KeyboardEvent) => {
+      if (e.key === KeyboardKeys.Space || e.key === KeyboardKeys.Enter) {
+        e.preventDefault()
         setEditing(true)
       }
     },
     [setEditing]
   )
 
+  const onContainerTouchStart = useCallback(() => setHovering(true), [setHovering])
+  const onContainerTouchEnd = useCallback(() => setHovering(false), [setHovering])
+
   const onEditClick = useCallback(
-    (e) => {
+    (e: React.MouseEvent) => {
       e.stopPropagation()
       e.preventDefault()
       setEditing(true)
@@ -65,23 +76,19 @@ export const EditableColumn = (props) => {
   return (
     <div
       className={classNames(className, { editing })}
+      role="button"
+      tabIndex={0}
       onClick={onContainerClick}
       onFocus={onContainerFocus}
       onKeyDown={onContainerKeyDown}
       onMouseOver={onContainerMouseOver}
       onMouseLeave={onContainerMouseLeave}
+      onTouchStart={onContainerTouchStart}
+      onTouchEnd={onContainerTouchEnd}
     >
       {editing && renderItemEditing({ item })}
       {!editing && renderItem({ item })}
       {hovering && !editing && <ButtonIconEdit onClick={onEditClick} />}
     </div>
   )
-}
-
-EditableColumn.propTypes = {
-  canEdit: PropTypes.bool,
-  className: PropTypes.string,
-  item: PropTypes.object.isRequired,
-  renderItem: PropTypes.func.isRequired,
-  renderItemEditing: PropTypes.func.isRequired,
 }

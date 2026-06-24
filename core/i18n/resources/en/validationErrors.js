@@ -166,6 +166,13 @@ export default {
     labelsRequired: 'At least one label is required',
   },
 
+  surveyDocImage: {
+    documentPlaceRequired: 'Document place is required',
+    fileRequired: 'File is required',
+    fileNameDuplicate: 'Another file with the same name already exists',
+    labelsRequired: 'At least one label is required',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
     cannotFindNodeDef: "Cannot find attribute or entity definition with name '{{name}}'",

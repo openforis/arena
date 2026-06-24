@@ -1,0 +1,209 @@
+import './SurveyDocImagesEditor.scss'
+
+import { useCallback, useState } from 'react'
+
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as DateUtils from '@core/dateUtils'
+import { getDocumentPlace, getApplyIf, type SurveyDocImage } from '@core/survey/surveyDocImage'
+
+import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, Fieldset } from '@webapp/components'
+import { useConfirmAsync } from '@webapp/components/hooks'
+import { DataGrid } from '@webapp/components/DataGrid'
+import { Checkbox } from '@webapp/components/form'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
+import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { FileUtils } from '@webapp/utils/fileUtils'
+import * as API from '@webapp/service/api'
+
+import SurveyDocImageEditor from './SurveyDocImageEditor'
+
+type Props = {
+  surveyDocImages: SurveyDocImage[]
+  setSurveyDocImages: (images: SurveyDocImage[]) => void
+  surveyDocOptions?: Record<string, unknown>
+  setSurveyDocOptions?: (options: Record<string, unknown>) => void
+  readOnly?: boolean
+}
+
+const SurveyDocImagesEditor = (props: Props) => {
+  const { surveyDocImages, setSurveyDocImages, surveyDocOptions = {}, setSurveyDocOptions, readOnly } = props
+
+  const i18n = useI18n()
+  const surveyId = useSurveyId()
+  const lang = useSurveyPreferredLang()
+  const confirm = useConfirmAsync()
+
+  const [dialogVisible, setDialogVisible] = useState(false)
+  const [editedSurveyDocImage, setEditedSurveyDocImage] = useState<SurveyDocImage | null>(null)
+
+  const onAddClick = useCallback(() => {
+    setDialogVisible(true)
+  }, [])
+
+  const onDialogClose = useCallback(() => {
+    setDialogVisible(false)
+    setEditedSurveyDocImage(null)
+  }, [])
+
+  const onDialogOk = useCallback(
+    async ({ file, surveyDocImage }: { file: File | null; surveyDocImage: SurveyDocImage }) => {
+      setDialogVisible(false)
+      setEditedSurveyDocImage(null)
+
+      const surveyDocImagesNext = editedSurveyDocImage
+        ? surveyDocImages.map((img) =>
+            SurveyFile.getUuid(img) === SurveyFile.getUuid(editedSurveyDocImage) ? surveyDocImage : img
+          )
+        : [...(surveyDocImages ?? []), surveyDocImage]
+      if (!editedSurveyDocImage || file) {
+        await API.insertSurveyFile({ surveyId, file, surveyFile: surveyDocImage })
+      }
+      setSurveyDocImages(surveyDocImagesNext)
+    },
+    [editedSurveyDocImage, surveyDocImages, setSurveyDocImages, surveyId]
+  )
+
+  const onDeleteClick = useCallback(
+    ({ surveyDocImage }) =>
+      async () => {
+        if (await confirm({ key: 'homeView:surveyInfo.surveyDocLayout.confirmDelete' })) {
+          setSurveyDocImages(
+            surveyDocImages.filter((img) => SurveyFile.getUuid(img) !== SurveyFile.getUuid(surveyDocImage))
+          )
+        }
+      },
+    [confirm, setSurveyDocImages, surveyDocImages]
+  )
+
+  const onRowDoubleClick = useCallback(({ row }) => {
+    setEditedSurveyDocImage(row)
+    setDialogVisible(true)
+  }, [])
+
+  const onHeaderOnFirstPageOnlyChange = useCallback(
+    (value: boolean) => {
+      setSurveyDocOptions?.({ ...surveyDocOptions, headerOnFirstPageOnly: value })
+    },
+    [setSurveyDocOptions, surveyDocOptions]
+  )
+
+  return (
+    <>
+      <Fieldset className="survey-doc-images-editor" legend="homeView:surveyInfo.surveyDocLayout.title">
+        <div className="container">
+          {!readOnly && <ButtonAdd onClick={onAddClick} size="small" />}
+          <DataGrid
+            autoHeight
+            columns={[
+              ...(readOnly
+                ? []
+                : [
+                    {
+                      field: 'edit',
+                      width: 60,
+                      headerName: '',
+                      renderCell: ({ row }) => <ButtonIconEdit onClick={() => onRowDoubleClick({ row })} />,
+                      sortable: false,
+                    },
+                  ]),
+              {
+                field: 'fileName',
+                flex: 0.35,
+                headerName: i18n.t('common:files.fileName'),
+                renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getName(row)} />,
+                sortable: false,
+              },
+              {
+                field: 'download',
+                width: 60,
+                headerName: '',
+                renderCell: ({ row: surveyDocImage }) => (
+                  <ButtonDownload
+                    href={API.getSurveyFileDownloadUrl({ surveyId, fileUuid: SurveyFile.getUuid(surveyDocImage) })}
+                    showLabel={false}
+                    variant="text"
+                  />
+                ),
+                sortable: false,
+              },
+              {
+                field: 'label',
+                flex: 0.3,
+                headerName: i18n.t('common.label'),
+                renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getLabel(lang)(row)} />,
+                sortable: false,
+              },
+              {
+                field: 'documentPlace',
+                width: 100,
+                headerName: i18n.t('homeView:surveyInfo.surveyDocLayout.documentPlace'),
+                renderCell: ({ row }) => {
+                  const place = getDocumentPlace(row)
+                  return place ? i18n.t(`homeView:surveyInfo.surveyDocLayout.documentPlaceValues.${place}`) : ''
+                },
+                sortable: false,
+              },
+              {
+                field: 'applyIf',
+                flex: 0.3,
+                headerName: i18n.t('homeView:surveyInfo.surveyDocLayout.applyIf'),
+                renderCell: ({ row }) => <LabelWithTooltip label={getApplyIf(row)} />,
+                sortable: false,
+              },
+              {
+                field: 'fileSize',
+                width: 100,
+                headerName: i18n.t('common:files.fileSize'),
+                renderCell: ({ row }) => FileUtils.toHumanReadableFileSize(SurveyFile.getSize(row)),
+                sortable: false,
+              },
+              {
+                field: 'dateCreated',
+                width: 180,
+                headerName: i18n.t('common.dateCreated'),
+                renderCell: ({ row }) => DateUtils.formatDateTimeDisplay(SurveyFile.getDateCreated(row)),
+              },
+              {
+                field: 'delete',
+                width: 60,
+                headerName: '',
+                renderCell: ({ row: surveyDocImage }) =>
+                  !readOnly && <ButtonIconDelete onClick={onDeleteClick({ surveyDocImage })} />,
+                sortable: false,
+              },
+            ]}
+            density="compact"
+            getRowId={(row: SurveyDocImage) => SurveyFile.getUuid(row)}
+            hideFooterPagination
+            onRowDoubleClick={readOnly ? undefined : onRowDoubleClick}
+            rows={surveyDocImages ?? []}
+          />
+        </div>
+      </Fieldset>
+
+      <Fieldset className="survey-doc-layout-options" legend="homeView:surveyInfo.surveyDocLayout.layoutOptions.title">
+        <Checkbox
+          checked={surveyDocOptions.headerOnFirstPageOnly !== false}
+          disabled={readOnly}
+          label="homeView:surveyInfo.surveyDocLayout.layoutOptions.headerOnFirstPageOnly"
+          onChange={onHeaderOnFirstPageOnlyChange}
+        />
+      </Fieldset>
+
+      {dialogVisible && (
+        <SurveyDefsLoader draft>
+          <SurveyDocImageEditor
+            editedSurveyDocImage={editedSurveyDocImage}
+            onClose={onDialogClose}
+            onOk={onDialogOk}
+            surveyDocImages={surveyDocImages ?? []}
+          />
+        </SurveyDefsLoader>
+      )}
+    </>
+  )
+}
+
+export default SurveyDocImagesEditor

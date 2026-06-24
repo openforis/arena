@@ -90,11 +90,28 @@ If there are records associated to this cycle, they will be deleted.`,
     preloadedMapLayers: {
       enabledMessage: 'Preloaded map layers enabled',
       title: 'Preloaded map layers',
-      fileName: 'File name',
-      fileSize: 'File size',
       confirmDelete: 'Are you sure you want to delete this preloaded map layer?',
       editor: {
         title: 'Preloaded map layer',
+      },
+    },
+
+    surveyDocLayout: {
+      tabTitle: 'Document Layout',
+      title: 'Document images',
+      layoutOptions: {
+        title: 'Layout options',
+        headerOnFirstPageOnly: 'Header on first page only',
+      },
+      documentPlace: 'Place',
+      documentPlaceValues: {
+        header: 'Header',
+        footer: 'Footer',
+      },
+      applyIf: 'Apply if condition',
+      confirmDelete: 'Are you sure you want to delete this document image?',
+      editor: {
+        title: 'Document image',
       },
     },
 
