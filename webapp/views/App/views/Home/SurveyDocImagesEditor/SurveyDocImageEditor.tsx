@@ -10,6 +10,7 @@ import {
   propKeys as docImagePropKeys,
   getDocumentPlace,
   getExpression,
+  type SurveyDocImage,
 } from '@core/survey/surveyDocImage'
 import { SurveyDocImageValidator } from '@core/survey/surveyDocImageValidator'
 import * as SurveyFile from '@core/survey/surveyFile'
@@ -21,7 +22,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import * as API from '@webapp/service/api'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurvey, useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 const accept = {
@@ -32,14 +33,14 @@ const accept = {
 const maxSize = 5 // 5MB
 
 type Props = {
-  editedSurveyDocImage: object | null
+  editedSurveyDocImage: SurveyDocImage | null
   onClose: () => void
-  onOk: (params: { file: File | null; surveyDocImage: object }) => Promise<void>
-  surveyDocImages: object[]
+  onOk: (params: { file: File | null; surveyDocImage: SurveyDocImage }) => Promise<void>
+  surveyDocImages: SurveyDocImage[]
 }
 
 type State = {
-  draftSurveyDocImage: object
+  draftSurveyDocImage: SurveyDocImage
   file: File | null
   labels: Record<string, string>
   documentPlace: DocumentPlace | undefined
@@ -51,6 +52,7 @@ const SurveyDocImageEditor = (props: Props) => {
   const { editedSurveyDocImage, onClose, onOk: onOkProp, surveyDocImages } = props
 
   const i18n = useI18n()
+  const survey = useSurvey()
   const surveyId = useSurveyId()
 
   const [state, setState] = useState<State>({
@@ -83,7 +85,7 @@ const SurveyDocImageEditor = (props: Props) => {
 
   useEffect(() => {
     const { name, size } = file ?? {}
-    let draft: object
+    let draft: SurveyDocImage
     if (editedSurveyDocImage && file) {
       // New file uploaded during edit: fresh UUID so the old file becomes an orphan and is cleaned up on save
       draft = createSurveyDocImage({ labels, name, size, temporary: true })
@@ -95,10 +97,10 @@ const SurveyDocImageEditor = (props: Props) => {
     if (documentPlace) draft = assocDocumentPlace(documentPlace)(draft)
     draft = assocExpression(expression)(draft)
 
-    SurveyDocImageValidator.validate({ surveyDocImages, surveyDocImage: draft }).then((v) => {
+    SurveyDocImageValidator.validate({ survey, surveyDocImages, surveyDocImage: draft }).then((v) => {
       setState((prev) => ({ ...prev, draftSurveyDocImage: draft, validation: v }))
     })
-  }, [editedSurveyDocImage, file, labels, documentPlace, expression, surveyDocImages])
+  }, [editedSurveyDocImage, file, labels, documentPlace, expression, survey, surveyDocImages])
 
   const onOkClick = useCallback(async () => {
     await onOkProp({ file, surveyDocImage: draftSurveyDocImage })

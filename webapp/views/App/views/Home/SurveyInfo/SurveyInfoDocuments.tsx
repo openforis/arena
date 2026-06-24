@@ -1,12 +1,12 @@
-import React from 'react'
+import { type SurveyDocImage } from '@core/survey/surveyDocImage'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import SurveyDocImagesEditor from '../SurveyDocImagesEditor'
 
 type Props = {
-  surveyDocImages: object[]
-  setSurveyDocImages: (images: object[]) => void
+  surveyDocImages: SurveyDocImage[]
+  setSurveyDocImages: (images: SurveyDocImage[]) => void
 }
 
 export const SurveyInfoDocuments = (props: Props) => {

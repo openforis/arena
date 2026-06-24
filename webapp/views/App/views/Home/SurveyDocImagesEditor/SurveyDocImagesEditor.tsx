@@ -4,12 +4,13 @@ import { useCallback, useState } from 'react'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
-import { getDocumentPlace, getExpression } from '@core/survey/surveyDocImage'
+import { getDocumentPlace, getExpression, type SurveyDocImage } from '@core/survey/surveyDocImage'
 
 import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, Fieldset } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
@@ -18,8 +19,8 @@ import * as API from '@webapp/service/api'
 import SurveyDocImageEditor from './SurveyDocImageEditor'
 
 type Props = {
-  surveyDocImages: object[]
-  setSurveyDocImages: (images: object[]) => void
+  surveyDocImages: SurveyDocImage[]
+  setSurveyDocImages: (images: SurveyDocImage[]) => void
   readOnly?: boolean
 }
 
@@ -32,7 +33,7 @@ const SurveyDocImagesEditor = (props: Props) => {
   const confirm = useConfirmAsync()
 
   const [dialogVisible, setDialogVisible] = useState(false)
-  const [editedSurveyDocImage, setEditedSurveyDocImage] = useState<object | null>(null)
+  const [editedSurveyDocImage, setEditedSurveyDocImage] = useState<SurveyDocImage | null>(null)
 
   const onAddClick = useCallback(() => {
     setDialogVisible(true)
@@ -44,7 +45,7 @@ const SurveyDocImagesEditor = (props: Props) => {
   }, [])
 
   const onDialogOk = useCallback(
-    async ({ file, surveyDocImage }: { file: File | null; surveyDocImage: object }) => {
+    async ({ file, surveyDocImage }: { file: File | null; surveyDocImage: SurveyDocImage }) => {
       setDialogVisible(false)
       setEditedSurveyDocImage(null)
 
@@ -164,7 +165,7 @@ const SurveyDocImagesEditor = (props: Props) => {
               },
             ]}
             density="compact"
-            getRowId={(row: object) => SurveyFile.getUuid(row)}
+            getRowId={(row: SurveyDocImage) => SurveyFile.getUuid(row)}
             hideFooterPagination
             onRowDoubleClick={readOnly ? undefined : onRowDoubleClick}
             rows={surveyDocImages ?? []}
@@ -173,12 +174,14 @@ const SurveyDocImagesEditor = (props: Props) => {
       </Fieldset>
 
       {dialogVisible && (
-        <SurveyDocImageEditor
-          editedSurveyDocImage={editedSurveyDocImage}
-          onClose={onDialogClose}
-          onOk={onDialogOk}
-          surveyDocImages={surveyDocImages ?? []}
-        />
+        <SurveyDefsLoader draft>
+          <SurveyDocImageEditor
+            editedSurveyDocImage={editedSurveyDocImage}
+            onClose={onDialogClose}
+            onOk={onDialogOk}
+            surveyDocImages={surveyDocImages ?? []}
+          />
+        </SurveyDefsLoader>
       )}
     </>
   )
