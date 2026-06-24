@@ -95,7 +95,7 @@ const SurveyInfo = () => {
     tabs.push({
       key: 'documents',
       component: SurveyInfoDocuments,
-      label: 'homeView:surveyInfo.surveyDocImages.tabTitle',
+      label: 'homeView:surveyInfo.surveyDocLayout.tabTitle',
       props: {
         surveyDocImages,
         setSurveyDocImages,

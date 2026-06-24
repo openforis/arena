@@ -96,7 +96,7 @@ If there are records associated to this cycle, they will be deleted.`,
       },
     },
 
-    surveyDocImages: {
+    surveyDocLayout: {
       tabTitle: 'Document Layout',
       title: 'Document images',
       layoutOptions: {

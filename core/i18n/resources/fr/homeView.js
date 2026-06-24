@@ -98,7 +98,7 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
       },
     },
 
-    surveyDocImages: {
+    surveyDocLayout: {
       tabTitle: 'Mise en page du document',
       title: 'Images du document',
       layoutOptions: {

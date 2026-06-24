@@ -68,7 +68,7 @@ const SurveyDocImagesEditor = (props: Props) => {
   const onDeleteClick = useCallback(
     ({ surveyDocImage }) =>
       async () => {
-        if (await confirm({ key: 'homeView:surveyInfo.surveyDocImages.confirmDelete' })) {
+        if (await confirm({ key: 'homeView:surveyInfo.surveyDocLayout.confirmDelete' })) {
           setSurveyDocImages(
             surveyDocImages.filter((img) => SurveyFile.getUuid(img) !== SurveyFile.getUuid(surveyDocImage))
           )
@@ -91,7 +91,7 @@ const SurveyDocImagesEditor = (props: Props) => {
 
   return (
     <>
-      <Fieldset className="survey-doc-images-editor" legend="homeView:surveyInfo.surveyDocImages.title">
+      <Fieldset className="survey-doc-images-editor" legend="homeView:surveyInfo.surveyDocLayout.title">
         <div className="container">
           {!readOnly && <ButtonAdd onClick={onAddClick} size="small" />}
           <DataGrid
@@ -138,17 +138,17 @@ const SurveyDocImagesEditor = (props: Props) => {
               {
                 field: 'documentPlace',
                 width: 100,
-                headerName: i18n.t('homeView:surveyInfo.surveyDocImages.documentPlace'),
+                headerName: i18n.t('homeView:surveyInfo.surveyDocLayout.documentPlace'),
                 renderCell: ({ row }) => {
                   const place = getDocumentPlace(row)
-                  return place ? i18n.t(`homeView:surveyInfo.surveyDocImages.documentPlaceValues.${place}`) : ''
+                  return place ? i18n.t(`homeView:surveyInfo.surveyDocLayout.documentPlaceValues.${place}`) : ''
                 },
                 sortable: false,
               },
               {
                 field: 'expression',
                 flex: 0.3,
-                headerName: i18n.t('homeView:surveyInfo.surveyDocImages.expression'),
+                headerName: i18n.t('homeView:surveyInfo.surveyDocLayout.expression'),
                 renderCell: ({ row }) => <LabelWithTooltip label={getExpression(row)} />,
                 sortable: false,
               },
@@ -183,11 +183,11 @@ const SurveyDocImagesEditor = (props: Props) => {
         </div>
       </Fieldset>
 
-      <Fieldset className="survey-doc-layout-options" legend="homeView:surveyInfo.surveyDocImages.layoutOptions.title">
+      <Fieldset className="survey-doc-layout-options" legend="homeView:surveyInfo.surveyDocLayout.layoutOptions.title">
         <Checkbox
           checked={surveyDocOptions.headerOnFirstPageOnly !== false}
           disabled={readOnly}
-          label="homeView:surveyInfo.surveyDocImages.layoutOptions.headerOnFirstPageOnly"
+          label="homeView:surveyInfo.surveyDocLayout.layoutOptions.headerOnFirstPageOnly"
           onChange={onHeaderOnFirstPageOnlyChange}
         />
       </Fieldset>

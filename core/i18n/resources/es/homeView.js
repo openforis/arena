@@ -85,7 +85,7 @@ export default {
       },
     },
 
-    surveyDocImages: {
+    surveyDocLayout: {
       tabTitle: 'Diseño del documento',
       title: 'Imágenes del documento',
       layoutOptions: {

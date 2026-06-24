@@ -98,7 +98,7 @@ export default {
       },
     },
 
-    surveyDocImages: {
+    surveyDocLayout: {
       tabTitle: 'Макет документа',
       title: 'Изображения документа',
       layoutOptions: {

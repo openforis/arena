@@ -98,7 +98,7 @@ export default {
       },
     },
 
-    surveyDocImages: {
+    surveyDocLayout: {
       tabTitle: 'Баримт бичгийн загвар',
       title: 'Баримт бичгийн зургууд',
       layoutOptions: {

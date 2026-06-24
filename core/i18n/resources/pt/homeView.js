@@ -97,7 +97,7 @@ Se houver registros associados a este ciclo, eles serão excluídos.`,
       },
     },
 
-    surveyDocImages: {
+    surveyDocLayout: {
       tabTitle: 'Layout do documento',
       title: 'Imagens do documento',
       layoutOptions: {

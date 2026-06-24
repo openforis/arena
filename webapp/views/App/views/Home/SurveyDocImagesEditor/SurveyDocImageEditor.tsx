@@ -108,7 +108,7 @@ const SurveyDocImageEditor = (props: Props) => {
 
   const documentPlaceItems = Object.values(DocumentPlace).map((value) => ({
     key: value,
-    label: i18n.t(`homeView:surveyInfo.surveyDocImages.documentPlaceValues.${value}`),
+    label: i18n.t(`homeView:surveyInfo.surveyDocLayout.documentPlaceValues.${value}`),
   }))
 
   const okButtonDisabled = !Validation.isValid(validation) || (!editedSurveyDocImage && !file)
@@ -116,7 +116,7 @@ const SurveyDocImageEditor = (props: Props) => {
   return (
     <Modal
       className="file-upload-dialog"
-      title="homeView:surveyInfo.surveyDocImages.editor.title"
+      title="homeView:surveyInfo.surveyDocLayout.editor.title"
       onClose={onClose}
       showCloseButton
     >
@@ -127,12 +127,12 @@ const SurveyDocImageEditor = (props: Props) => {
             onChange={onLabelsChange}
             validation={Validation.getFieldValidation(SurveyFile.propKeys.labels)(validation)}
           />
-          <FormItem label="homeView:surveyInfo.surveyDocImages.documentPlace">
+          <FormItem label="homeView:surveyInfo.surveyDocLayout.documentPlace">
             <ValidationTooltip validation={Validation.getFieldValidation(docImagePropKeys.documentPlace)(validation)}>
               <RadioButtonGroup items={documentPlaceItems} onChange={onDocumentPlaceChange} row value={documentPlace} />
             </ValidationTooltip>
           </FormItem>
-          <FormItem label="homeView:surveyInfo.surveyDocImages.expression">
+          <FormItem label="homeView:surveyInfo.surveyDocLayout.expression">
             <Input
               onChange={onExpressionChange}
               value={expression}
