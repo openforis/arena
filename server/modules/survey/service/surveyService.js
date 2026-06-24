@@ -1,10 +1,9 @@
 import { Schemata, SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
-import { NodeDefExpressionEvaluator } from '@openforis/arena-core'
+import { NodeDefExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
-import * as SurveyDocImage from '@core/survey/surveyDocImage'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
@@ -137,7 +136,7 @@ export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
 
 const isSurveyDocImageApplicable = async ({ user, survey, imageFile }) => {
-  const applyIf = SurveyDocImage.getApplyIf(imageFile)
+  const applyIf = SurveyDocImages.getApplyIf(imageFile)
   if (!applyIf) return true
   try {
     const nodeDef = Survey.getNodeDefRoot(survey)
@@ -172,12 +171,12 @@ const exportSurveyDocument = async ({
 
   const headerImageFileSummary = await findSurveyDocImageApplicable({
     surveyDocImages,
-    documentPlace: SurveyDocImage.DocumentPlace.header,
+    documentPlace: SurveyDocPlace.header,
     isApplicable: (imageFile) => isSurveyDocImageApplicable({ user, survey, imageFile }),
   })
   const footerImageFileSummary = await findSurveyDocImageApplicable({
     surveyDocImages,
-    documentPlace: SurveyDocImage.DocumentPlace.footer,
+    documentPlace: SurveyDocPlace.footer,
     isApplicable: (imageFile) => isSurveyDocImageApplicable({ user, survey, imageFile }),
   })
 

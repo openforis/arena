@@ -15,7 +15,7 @@ import * as DateUtils from '@core/dateUtils'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Record from '@core/record/record'
-import * as SurveyDocImage from '@core/survey/surveyDocImage'
+import { SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -500,7 +500,7 @@ const exportRecordDocument = async ({
 
   const rootNode = Record.getRootNode(record)
   const isApplicable = async (imageFile) => {
-    const applyIf = SurveyDocImage.getApplyIf(imageFile)
+    const applyIf = SurveyDocImages.getApplyIf(imageFile)
     if (!applyIf) return true
     try {
       const result = await new RecordExpressionEvaluator().evalExpression({
@@ -518,12 +518,12 @@ const exportRecordDocument = async ({
 
   const headerImageFileSummary = await findSurveyDocImageApplicable({
     surveyDocImages,
-    documentPlace: SurveyDocImage.DocumentPlace.header,
+    documentPlace: SurveyDocPlace.header,
     isApplicable,
   })
   const footerImageFileSummary = await findSurveyDocImageApplicable({
     surveyDocImages,
-    documentPlace: SurveyDocImage.DocumentPlace.footer,
+    documentPlace: SurveyDocPlace.footer,
     isApplicable,
   })
 
