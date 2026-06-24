@@ -1,20 +1,20 @@
-import { NodeDefExpressionValidator } from '@openforis/arena-core'
+import { NodeDefExpressionValidator, ValidationResult } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
-import type { ValidatorResult } from '@core/validation/_validator/validatorFunctions'
 
 import { propKeys, getExpression, type SurveyDocImage } from './surveyDocImage'
+import { ValidationResultInstance } from '@core/validation/validationResult'
 
 const nodeDefExpressionValidator = new NodeDefExpressionValidator()
 
 const validateExpression =
   (survey: unknown) =>
-  async (_propName: string, surveyDocImage: unknown): Promise<ValidatorResult> => {
+  async (_propName: string, surveyDocImage: SurveyDocImage): Promise<ValidationResult> => {
     if (!survey) return null
-    const expression = getExpression(surveyDocImage as SurveyDocImage)
+    const expression = getExpression(surveyDocImage)
     if (!expression) return null
 
     const nodeDefCurrent = Survey.getNodeDefRoot(survey as object) as any
@@ -27,7 +27,7 @@ const validateExpression =
       selfReferenceAllowed: true,
     })
     return validationResult && !validationResult.valid
-      ? (Validation.newInstance(false, {}, [validationResult as any]) as any)
+      ? (Validation.newInstance(false, {}, [validationResult as ValidationResultInstance]) as any)
       : null
   }
 
@@ -43,9 +43,7 @@ const validate = async ({
   Validator.validate(surveyDocImage, {
     [`${SurveyFile.keys.props}.${SurveyFile.propKeys.name}`]: [
       Validator.validateRequired(Validation.messageKeys.surveyDocImage.fileRequired),
-      Validator.validateItemPropUniqueness(Validation.messageKeys.surveyDocImage.fileNameDuplicate)(
-        surveyDocImages as Record<string, unknown>[]
-      ),
+      Validator.validateItemPropUniqueness(Validation.messageKeys.surveyDocImage.fileNameDuplicate)(surveyDocImages),
     ],
     [`${SurveyFile.keys.props}.${SurveyFile.propKeys.labels}`]: [
       Validator.validateRequired(Validation.messageKeys.surveyDocImage.labelsRequired),
