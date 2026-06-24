@@ -1,10 +1,40 @@
-import React, { useMemo } from 'react'
-import { DataGrid as MuiDataGrid, GridFooter, GridFooterContainer, GridToolbarExport } from '@mui/x-data-grid'
-import PropTypes from 'prop-types'
+import { useMemo } from 'react'
+import {
+  DataGrid as MuiDataGrid,
+  DataGridProps,
+  GridColDef,
+  GridDensity,
+  GridFooter,
+  GridFooterContainer,
+  GridInitialState,
+  GridRowClassNameParams,
+  GridRowIdGetter,
+  GridRowsProp,
+  GridToolbarExport,
+} from '@mui/x-data-grid'
 import classNames from 'classnames'
 
+type Props = {
+  allowExportToCsv?: boolean
+  autoHeight?: boolean
+  autoPageSize?: boolean
+  autoRowHeight?: boolean
+  checkboxSelection?: boolean
+  className?: string
+  columns: GridColDef[]
+  density?: GridDensity
+  disableSelectionOnClick?: boolean
+  exportFileName?: string
+  getRowClassName?: (params: GridRowClassNameParams) => string
+  getRowId?: GridRowIdGetter
+  hideFooterPagination?: boolean
+  initialState?: GridInitialState
+  onRowDoubleClick?: DataGridProps['onRowDoubleClick']
+  rows: GridRowsProp
+}
+
 const FooterWithExport =
-  ({ exportFileName }) =>
+  ({ exportFileName }: { exportFileName?: string }) =>
   () => (
     <GridFooterContainer>
       <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
@@ -12,9 +42,10 @@ const FooterWithExport =
     </GridFooterContainer>
   )
 
-const DataGrid = (props) => {
+const DataGrid = (props: Props) => {
   const {
     allowExportToCsv = false,
+    autoHeight = false,
     autoPageSize = false,
     autoRowHeight = false,
     checkboxSelection = false,
@@ -33,10 +64,11 @@ const DataGrid = (props) => {
 
   const columns = useMemo(() => columnsProp.map((col) => ({ ...col, disableColumnMenu: true })), [columnsProp])
 
-  const getRowHeight = useMemo(() => (autoRowHeight ? () => 'auto' : undefined), [autoRowHeight])
+  const getRowHeight = useMemo(() => (autoRowHeight ? () => 'auto' as const : undefined), [autoRowHeight])
 
   return (
     <MuiDataGrid
+      autoHeight={autoHeight}
       autoPageSize={autoPageSize}
       checkboxSelection={checkboxSelection}
       className={classNames('data-grid', className)}
@@ -53,24 +85,6 @@ const DataGrid = (props) => {
       slots={allowExportToCsv ? { footer: FooterWithExport({ exportFileName }) } : undefined}
     />
   )
-}
-
-DataGrid.propTypes = {
-  allowExportToCsv: PropTypes.bool,
-  autoPageSize: PropTypes.bool,
-  autoRowHeight: PropTypes.bool,
-  checkboxSelection: PropTypes.bool,
-  className: PropTypes.string,
-  columns: PropTypes.array.isRequired,
-  density: PropTypes.oneOf(['comfortable', 'compact', 'standard']),
-  disableSelectionOnClick: PropTypes.bool,
-  exportFileName: PropTypes.string,
-  getRowClassName: PropTypes.func,
-  getRowId: PropTypes.func,
-  hideFooterPagination: PropTypes.bool,
-  initialState: PropTypes.object,
-  onRowDoubleClick: PropTypes.func,
-  rows: PropTypes.array.isRequired,
 }
 
 export default DataGrid

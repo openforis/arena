@@ -257,6 +257,8 @@ Réessayer ?`,
     header: 'Fichiers',
     missing: ' Fichiers manquants : {{count}}',
     totalSize: 'Taille totale : {{size}}',
+    fileName: 'Nom du fichier',
+    fileSize: 'Taille du fichier',
   },
 
   sidebar: {

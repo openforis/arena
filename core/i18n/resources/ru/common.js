@@ -250,6 +250,8 @@ export default {
     header: 'Файлы',
     missing: ' Отсутствующие файлы: {{count}}',
     totalSize: 'Общий размер: {{size}}',
+    fileName: 'Имя файла',
+    fileSize: 'Размер файла',
   },
 
   sidebar: {

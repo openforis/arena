@@ -167,6 +167,13 @@ export default {
     labelsRequired: 'Наад зах нь нэг шошго шаардлагатай',
   },
 
+  surveyDocImage: {
+    documentPlaceRequired: 'Баримт бичгийн байршил шаардлагатай',
+    fileRequired: 'Файл шаардлагатай',
+    fileNameDuplicate: 'Ижил нэртэй файл аль хэдийн орсон байна',
+    labelsRequired: 'Наад зах нь нэг шошго шаардлагатай',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Хүчингүй баганууд: {{invalidHeaders}}',
     cannotFindNodeDef: "'{{name}}' нэртэй шинж чанар эсвэл объектын тодорхойлолтыг олох боломжгүй",

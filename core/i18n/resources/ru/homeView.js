@@ -97,6 +97,26 @@ export default {
         title: 'Предзагруженный слой карты',
       },
     },
+
+    surveyDocLayout: {
+      tabTitle: 'Макет документа',
+      title: 'Изображения документа',
+      layoutOptions: {
+        title: 'Параметры макета',
+        headerOnFirstPageOnly: 'Верхний колонтитул только на первой странице',
+      },
+      documentPlace: 'Место',
+      documentPlaceValues: {
+        header: 'Верхний колонтитул',
+        footer: 'Нижний колонтитул',
+      },
+      applyIf: 'Применить если условие',
+      confirmDelete: 'Вы уверены, что хотите удалить это изображение документа?',
+      editor: {
+        title: 'Изображение документа',
+      },
+    },
+
     preferredLanguage: 'Предпочитаемый язык',
     sampleBasedImageInterpretation: 'Интерпретация изображений на основе образцов',
     sampleBasedImageInterpretationEnabled: 'Интерпретация изображений на основе образцов включена',

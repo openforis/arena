@@ -251,6 +251,8 @@ export default {
     header: 'Файлууд',
     missing: ' Дутуу файлууд: {{count}}',
     totalSize: 'Нийт хэмжээ: {{size}}',
+    fileName: 'Файлын нэр',
+    fileSize: 'Файлын хэмжээ',
   },
 
   sidebar: {

@@ -35,6 +35,8 @@ export const keys = {
   languages: 'languages',
   preloadedMapLayers: 'preloadedMapLayers',
   preloadedMapLayersEnabled: 'preloadedMapLayersEnabled',
+  surveyDocImages: 'surveyDocImages',
+  surveyDocOptions: 'surveyDocOptions',
   sampleBasedImageInterpretationEnabled: 'sampleBasedImageInterpretationEnabled',
   samplingPolygon: 'samplingPolygon',
   security: 'security',
@@ -115,6 +117,13 @@ export const getLabel = (surveyInfo, lang, defaultToName = true) => {
 export const isPreloadedMapLayersEnabled = ObjectUtils.isPropTrue(keys.preloadedMapLayersEnabled)
 
 export const getPreloadedMapLayers = ObjectUtils.getProp(keys.preloadedMapLayers, [])
+
+export const getSurveyDocImages = ObjectUtils.getProp(keys.surveyDocImages, [])
+
+export const getSurveyDocOptions = ObjectUtils.getProp(keys.surveyDocOptions, {})
+
+export const isHeaderOnFirstPageOnly = (surveyInfo: any): boolean =>
+  (getSurveyDocOptions(surveyInfo) as Record<string, unknown>)?.headerOnFirstPageOnly !== false
 
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled

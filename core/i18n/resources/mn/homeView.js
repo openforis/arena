@@ -97,6 +97,26 @@ export default {
         title: 'Урьдчилан ачаалсан газрын зургийн давхарга',
       },
     },
+
+    surveyDocLayout: {
+      tabTitle: 'Баримт бичгийн загвар',
+      title: 'Баримт бичгийн зургууд',
+      layoutOptions: {
+        title: 'Загварын тохиргоо',
+        headerOnFirstPageOnly: 'Толгой хэсгийг зөвхөн эхний хуудсанд харуулах',
+      },
+      documentPlace: 'Байршил',
+      documentPlaceValues: {
+        header: 'Толгой хэсэг',
+        footer: 'Хөл хэсэг',
+      },
+      applyIf: 'Нөхцөл байвал хэрэглэх',
+      confirmDelete: 'Энэ баримт бичгийн зургийг устгахдаа итгэлтэй байна уу?',
+      editor: {
+        title: 'Баримт бичгийн зураг',
+      },
+    },
+
     preferredLanguage: 'Хүссэн хэл',
     sampleBasedImageInterpretation: 'Дээж дээр суурилсан зураг тайлбарлах',
     sampleBasedImageInterpretationEnabled: 'Дээж дээр суурилсан зураг тайлбарлах идэвхжсэн',
