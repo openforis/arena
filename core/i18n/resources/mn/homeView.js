@@ -99,7 +99,12 @@ export default {
     },
 
     surveyDocImages: {
+      tabTitle: 'Баримт бичгийн загвар',
       title: 'Баримт бичгийн зургууд',
+      layoutOptions: {
+        title: 'Загварын тохиргоо',
+        headerOnFirstPageOnly: 'Толгой хэсгийг зөвхөн эхний хуудсанд харуулах',
+      },
       documentPlace: 'Байршил',
       documentPlaceValues: {
         header: 'Толгой хэсэг',

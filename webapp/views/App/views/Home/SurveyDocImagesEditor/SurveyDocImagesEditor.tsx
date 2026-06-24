@@ -9,6 +9,7 @@ import { getDocumentPlace, getExpression, type SurveyDocImage } from '@core/surv
 import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, Fieldset } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import { DataGrid } from '@webapp/components/DataGrid'
+import { Checkbox } from '@webapp/components/form'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -21,11 +22,13 @@ import SurveyDocImageEditor from './SurveyDocImageEditor'
 type Props = {
   surveyDocImages: SurveyDocImage[]
   setSurveyDocImages: (images: SurveyDocImage[]) => void
+  surveyDocOptions?: Record<string, unknown>
+  setSurveyDocOptions?: (options: Record<string, unknown>) => void
   readOnly?: boolean
 }
 
 const SurveyDocImagesEditor = (props: Props) => {
-  const { surveyDocImages, setSurveyDocImages, readOnly } = props
+  const { surveyDocImages, setSurveyDocImages, surveyDocOptions = {}, setSurveyDocOptions, readOnly } = props
 
   const i18n = useI18n()
   const surveyId = useSurveyId()
@@ -78,6 +81,13 @@ const SurveyDocImagesEditor = (props: Props) => {
     setEditedSurveyDocImage(row)
     setDialogVisible(true)
   }, [])
+
+  const onHeaderOnFirstPageOnlyChange = useCallback(
+    (value: boolean) => {
+      setSurveyDocOptions?.({ ...surveyDocOptions, headerOnFirstPageOnly: value })
+    },
+    [setSurveyDocOptions, surveyDocOptions]
+  )
 
   return (
     <>
@@ -171,6 +181,15 @@ const SurveyDocImagesEditor = (props: Props) => {
             rows={surveyDocImages ?? []}
           />
         </div>
+      </Fieldset>
+
+      <Fieldset className="survey-doc-layout-options" legend="homeView:surveyInfo.surveyDocImages.layoutOptions.title">
+        <Checkbox
+          checked={surveyDocOptions.headerOnFirstPageOnly !== false}
+          disabled={readOnly}
+          label="homeView:surveyInfo.surveyDocImages.layoutOptions.headerOnFirstPageOnly"
+          onChange={onHeaderOnFirstPageOnlyChange}
+        />
       </Fieldset>
 
       {dialogVisible && (

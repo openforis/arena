@@ -98,7 +98,12 @@ Se houver registros associados a este ciclo, eles serão excluídos.`,
     },
 
     surveyDocImages: {
+      tabTitle: 'Layout do documento',
       title: 'Imagens do documento',
+      layoutOptions: {
+        title: 'Opções de layout',
+        headerOnFirstPageOnly: 'Cabeçalho somente na primeira página',
+      },
       documentPlace: 'Local',
       documentPlaceValues: {
         header: 'Cabeçalho',

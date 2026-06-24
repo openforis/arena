@@ -99,7 +99,12 @@ export default {
     },
 
     surveyDocImages: {
+      tabTitle: 'Макет документа',
       title: 'Изображения документа',
+      layoutOptions: {
+        title: 'Параметры макета',
+        headerOnFirstPageOnly: 'Верхний колонтитул только на первой странице',
+      },
       documentPlace: 'Место',
       documentPlaceValues: {
         header: 'Верхний колонтитул',

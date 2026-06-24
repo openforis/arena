@@ -113,6 +113,7 @@ export const {
   isPreloadedMapLayersEnabled,
   getPreloadedMapLayers,
   getSurveyDocImages,
+  isHeaderOnFirstPageOnly,
   getSecurity,
   getSRS,
   getSRSCodes,

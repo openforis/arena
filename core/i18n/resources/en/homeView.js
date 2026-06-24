@@ -97,7 +97,12 @@ If there are records associated to this cycle, they will be deleted.`,
     },
 
     surveyDocImages: {
+      tabTitle: 'Document Layout',
       title: 'Document images',
+      layoutOptions: {
+        title: 'Layout options',
+        headerOnFirstPageOnly: 'Header on first page only',
+      },
       documentPlace: 'Place',
       documentPlaceValues: {
         header: 'Header',

@@ -29,6 +29,7 @@ const SurveyInfo = () => {
     samplingPolygon,
     security,
     surveyDocImages,
+    surveyDocOptions,
     userExtraPropDefs,
 
     setCycles,
@@ -45,6 +46,7 @@ const SurveyInfo = () => {
     setSecurity,
     setSrs,
     setSurveyDocImages,
+    setSurveyDocOptions,
     setUserExtraPropDefs,
     getFieldValidation,
     saveProps,
@@ -93,10 +95,12 @@ const SurveyInfo = () => {
     tabs.push({
       key: 'documents',
       component: SurveyInfoDocuments,
-      label: 'homeView:surveyInfo.surveyDocImages.title',
+      label: 'homeView:surveyInfo.surveyDocImages.tabTitle',
       props: {
         surveyDocImages,
         setSurveyDocImages,
+        surveyDocOptions,
+        setSurveyDocOptions,
       },
     })
   }

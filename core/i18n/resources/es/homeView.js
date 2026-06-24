@@ -86,7 +86,12 @@ export default {
     },
 
     surveyDocImages: {
+      tabTitle: 'Diseño del documento',
       title: 'Imágenes del documento',
+      layoutOptions: {
+        title: 'Opciones de diseño',
+        headerOnFirstPageOnly: 'Encabezado solo en la primera página',
+      },
       documentPlace: 'Ubicación',
       documentPlaceValues: {
         header: 'Encabezado',

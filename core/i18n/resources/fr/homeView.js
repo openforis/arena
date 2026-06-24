@@ -99,7 +99,12 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
     },
 
     surveyDocImages: {
+      tabTitle: 'Mise en page du document',
       title: 'Images du document',
+      layoutOptions: {
+        title: 'Options de mise en page',
+        headerOnFirstPageOnly: 'En-tête sur la première page uniquement',
+      },
       documentPlace: 'Emplacement',
       documentPlaceValues: {
         header: 'En-tête',

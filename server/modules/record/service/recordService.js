@@ -527,6 +527,7 @@ const exportRecordDocument = async ({
     isApplicable,
   })
 
+  const headerOnFirstPageOnly = Survey.isHeaderOnFirstPageOnly(survey)
   const i18n = await i18nFactory.createI18nAsync(langToUse)
   const { buffer, surveyName } = await generator({
     survey,
@@ -537,6 +538,7 @@ const exportRecordDocument = async ({
     fileProvider: async (fileUuid) => SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileUuid }),
     headerImageFileUuid: headerImageFileSummary?.uuid,
     footerImageFileUuid: footerImageFileSummary?.uuid,
+    headerOnFirstPageOnly,
     readOnly: true,
   })
   const fileName = ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'RecordForm', extension })
