@@ -97,7 +97,7 @@ export default {
         header: 'Encabezado',
         footer: 'Pie de página',
       },
-      expression: 'Aplicar si condición',
+      applyIf: 'Aplicar si condición',
       confirmDelete: '¿Está seguro de que desea eliminar esta imagen del documento?',
       editor: {
         title: 'Imagen del documento',

@@ -500,15 +500,15 @@ const exportRecordDocument = async ({
 
   const rootNode = Record.getRootNode(record)
   const isApplicable = async (imageFile) => {
-    const expression = SurveyDocImage.getExpression(imageFile)
-    if (!expression) return true
+    const applyIf = SurveyDocImage.getApplyIf(imageFile)
+    if (!applyIf) return true
     try {
       const result = await new RecordExpressionEvaluator().evalExpression({
         user,
         survey,
         record,
         node: rootNode,
-        query: expression,
+        query: applyIf,
       })
       return result === true
     } catch {

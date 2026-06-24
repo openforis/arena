@@ -109,7 +109,7 @@ Se houver registros associados a este ciclo, eles serão excluídos.`,
         header: 'Cabeçalho',
         footer: 'Rodapé',
       },
-      expression: 'Aplicar se condição',
+      applyIf: 'Aplicar se condição',
       confirmDelete: 'Tem certeza de que deseja excluir esta imagem do documento?',
       editor: {
         title: 'Imagem do documento',

@@ -5,11 +5,11 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   DocumentPlace,
   assocDocumentPlace,
-  assocExpression,
+  assocApplyIf,
   createSurveyDocImage,
   propKeys as docImagePropKeys,
   getDocumentPlace,
-  getExpression,
+  getApplyIf,
   type SurveyDocImage,
 } from '@core/survey/surveyDocImage'
 import { SurveyDocImageValidator } from '@core/survey/surveyDocImageValidator'
@@ -44,7 +44,7 @@ type State = {
   file: File | null
   labels: Record<string, string>
   documentPlace: DocumentPlace | undefined
-  expression: string
+  applyIf: string
   validation: ValidationInstance | null
 }
 
@@ -60,11 +60,11 @@ const SurveyDocImageEditor = (props: Props) => {
     file: null,
     labels: editedSurveyDocImage ? SurveyFile.getLabels(editedSurveyDocImage) : {},
     documentPlace: editedSurveyDocImage ? getDocumentPlace(editedSurveyDocImage) : undefined,
-    expression: editedSurveyDocImage ? getExpression(editedSurveyDocImage) : '',
+    applyIf: editedSurveyDocImage ? getApplyIf(editedSurveyDocImage) : '',
     validation: null,
   })
 
-  const { draftSurveyDocImage, file, labels, documentPlace, expression, validation } = state
+  const { draftSurveyDocImage, file, labels, documentPlace, applyIf, validation } = state
 
   const onLabelsChange = useCallback(
     (newLabels: Record<string, string>) => setState((prev) => ({ ...prev, labels: newLabels })),
@@ -79,15 +79,15 @@ const SurveyDocImageEditor = (props: Props) => {
     setState((prev) => ({ ...prev, documentPlace: value as DocumentPlace }))
   }, [])
 
-  const onExpressionChange = useCallback((value: string) => {
-    setState((prev) => ({ ...prev, expression: value }))
+  const onApplyIfChange = useCallback((value: string) => {
+    setState((prev) => ({ ...prev, applyIf: value }))
   }, [])
 
   useEffect(() => {
     const { name, size } = file ?? {}
     let draft: SurveyDocImage
     if (editedSurveyDocImage && file) {
-      // New file uploaded during edit: fresh UUID so the old file becomes an orphan and is cleaned up on save
+      // New file uploaded during edit: fresh UUID so the old file becomes an orphan (removed when unused files are cleaned up, e.g. on publish)
       draft = createSurveyDocImage({ labels, name, size, temporary: true })
     } else if (editedSurveyDocImage) {
       draft = SurveyFile.assocLabels(labels)(editedSurveyDocImage)
@@ -95,12 +95,12 @@ const SurveyDocImageEditor = (props: Props) => {
       draft = createSurveyDocImage({ labels, name, size, temporary: true })
     }
     if (documentPlace) draft = assocDocumentPlace(documentPlace)(draft)
-    draft = assocExpression(expression)(draft)
+    draft = assocApplyIf(applyIf)(draft)
 
     SurveyDocImageValidator.validate({ survey, surveyDocImages, surveyDocImage: draft }).then((v) => {
       setState((prev) => ({ ...prev, draftSurveyDocImage: draft, validation: v }))
     })
-  }, [editedSurveyDocImage, file, labels, documentPlace, expression, survey, surveyDocImages])
+  }, [editedSurveyDocImage, file, labels, documentPlace, applyIf, survey, surveyDocImages])
 
   const onOkClick = useCallback(async () => {
     await onOkProp({ file, surveyDocImage: draftSurveyDocImage })
@@ -132,11 +132,11 @@ const SurveyDocImageEditor = (props: Props) => {
               <RadioButtonGroup items={documentPlaceItems} onChange={onDocumentPlaceChange} row value={documentPlace} />
             </ValidationTooltip>
           </FormItem>
-          <FormItem label="homeView:surveyInfo.surveyDocLayout.expression">
+          <FormItem label="homeView:surveyInfo.surveyDocLayout.applyIf">
             <Input
-              onChange={onExpressionChange}
-              value={expression}
-              validation={Validation.getFieldValidation(docImagePropKeys.expression)(validation)}
+              onChange={onApplyIfChange}
+              value={applyIf}
+              validation={Validation.getFieldValidation(docImagePropKeys.applyIf)(validation)}
             />
           </FormItem>
           {editedSurveyDocImage && !file && (

@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
-import { getDocumentPlace, getExpression, type SurveyDocImage } from '@core/survey/surveyDocImage'
+import { getDocumentPlace, getApplyIf, type SurveyDocImage } from '@core/survey/surveyDocImage'
 
 import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, Fieldset } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
@@ -146,10 +146,10 @@ const SurveyDocImagesEditor = (props: Props) => {
                 sortable: false,
               },
               {
-                field: 'expression',
+                field: 'applyIf',
                 flex: 0.3,
-                headerName: i18n.t('homeView:surveyInfo.surveyDocLayout.expression'),
-                renderCell: ({ row }) => <LabelWithTooltip label={getExpression(row)} />,
+                headerName: i18n.t('homeView:surveyInfo.surveyDocLayout.applyIf'),
+                renderCell: ({ row }) => <LabelWithTooltip label={getApplyIf(row)} />,
                 sortable: false,
               },
               {

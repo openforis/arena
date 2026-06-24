@@ -137,10 +137,11 @@ export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
 
 const isSurveyDocImageApplicable = async ({ user, survey, imageFile }) => {
-  const expression = SurveyDocImage.getExpression(imageFile)
-  if (!expression) return true
+  const applyIf = SurveyDocImage.getApplyIf(imageFile)
+  if (!applyIf) return true
   try {
-    const result = await new NodeDefExpressionEvaluator().evalExpression({ user, survey, expression })
+    const nodeDef = Survey.getNodeDefRoot(survey)
+    const result = await new NodeDefExpressionEvaluator().evalExpression({ user, survey, expression: applyIf, nodeDef })
     return result === true
   } catch {
     return false

@@ -5,7 +5,7 @@ import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
 
-import { propKeys, getExpression, type SurveyDocImage } from './surveyDocImage'
+import { propKeys, getApplyIf, type SurveyDocImage } from './surveyDocImage'
 import { ValidationResultInstance } from '@core/validation/validationResult'
 
 const nodeDefExpressionValidator = new NodeDefExpressionValidator()
@@ -14,8 +14,8 @@ const validateExpression =
   (survey: unknown) =>
   async (_propName: string, surveyDocImage: SurveyDocImage): Promise<ValidationResult> => {
     if (!survey) return null
-    const expression = getExpression(surveyDocImage)
-    if (!expression) return null
+    const applyIf = getApplyIf(surveyDocImage)
+    if (!applyIf) return null
 
     const nodeDefCurrent = Survey.getNodeDefRoot(survey as object) as any
     if (!nodeDefCurrent) return null
@@ -23,7 +23,7 @@ const validateExpression =
     const { validationResult } = await nodeDefExpressionValidator.validate({
       survey: survey as any,
       nodeDefCurrent,
-      expression,
+      expression: applyIf,
       selfReferenceAllowed: true,
     })
     return validationResult && !validationResult.valid
@@ -51,7 +51,7 @@ const validate = async ({
     [`${SurveyFile.keys.props}.${propKeys.documentPlace}`]: [
       Validator.validateRequired(Validation.messageKeys.surveyDocImage.documentPlaceRequired),
     ],
-    [`${SurveyFile.keys.props}.${propKeys.expression}`]: [validateExpression(survey)],
+    [`${SurveyFile.keys.props}.${propKeys.applyIf}`]: [validateExpression(survey)],
   })
 
 export const SurveyDocImageValidator = { validate }

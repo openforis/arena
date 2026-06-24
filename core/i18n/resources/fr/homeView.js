@@ -110,7 +110,7 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
         header: 'En-tête',
         footer: 'Pied de page',
       },
-      expression: 'Appliquer si condition',
+      applyIf: 'Appliquer si condition',
       confirmDelete: 'Êtes-vous sûr de vouloir supprimer cette image du document ?',
       editor: {
         title: 'Image du document',

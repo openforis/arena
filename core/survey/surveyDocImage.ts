@@ -11,12 +11,12 @@ export enum DocumentPlace {
 
 export const propKeys = {
   documentPlace: 'documentPlace',
-  expression: 'expression',
+  applyIf: 'applyIf',
 } as const
 
 export type SurveyDocImageProps = {
   documentPlace?: DocumentPlace
-  expression?: string
+  applyIf?: string
   labels?: Record<string, string>
   name?: string
   size?: number | null
@@ -27,32 +27,31 @@ export type SurveyDocImageProps = {
 export type SurveyDocImage = {
   uuid: string
   props: SurveyDocImageProps
-  content: unknown | null
+  content?: Buffer | null
   dateCreated: string
 }
 
 export const getDocumentPlace = (image: SurveyDocImage): DocumentPlace | undefined =>
   ObjectUtils.getProp<DocumentPlace | undefined>(propKeys.documentPlace)(image)
 
-export const getExpression = (image: SurveyDocImage): string =>
-  ObjectUtils.getProp<string>(propKeys.expression, '')(image)
+export const getApplyIf = (image: SurveyDocImage): string => ObjectUtils.getProp<string>(propKeys.applyIf, '')(image)
 
 export const assocDocumentPlace =
   (place: DocumentPlace) =>
   (image: SurveyDocImage): SurveyDocImage =>
     ObjectUtils.setProp(propKeys.documentPlace, place)(image) as SurveyDocImage
 
-export const assocExpression =
+export const assocApplyIf =
   (expr: string) =>
   (image: SurveyDocImage): SurveyDocImage =>
-    ObjectUtils.setProp(propKeys.expression, expr)(image) as SurveyDocImage
+    ObjectUtils.setProp(propKeys.applyIf, expr)(image) as SurveyDocImage
 
 type CreateSurveyDocImageParams = {
   name?: string
   labels?: Record<string, string> | null
   size?: number | null
   documentPlace?: DocumentPlace | null
-  expression?: string
+  applyIf?: string
   temporary?: boolean
 }
 
@@ -61,7 +60,7 @@ export const createSurveyDocImage = ({
   labels,
   size,
   documentPlace,
-  expression,
+  applyIf,
   temporary = false,
 }: CreateSurveyDocImageParams): SurveyDocImage => {
   let file = SurveyFile.createFile({
@@ -72,7 +71,7 @@ export const createSurveyDocImage = ({
     temporary,
   }) as SurveyDocImage
   if (documentPlace) file = assocDocumentPlace(documentPlace)(file)
-  if (expression) file = assocExpression(expression)(file)
+  if (applyIf) file = assocApplyIf(applyIf)(file)
   return file
 }
 

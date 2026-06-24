@@ -108,7 +108,7 @@ If there are records associated to this cycle, they will be deleted.`,
         header: 'Header',
         footer: 'Footer',
       },
-      expression: 'Apply if condition',
+      applyIf: 'Apply if condition',
       confirmDelete: 'Are you sure you want to delete this document image?',
       editor: {
         title: 'Document image',
