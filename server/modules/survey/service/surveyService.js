@@ -180,7 +180,8 @@ const exportSurveyDocument = async ({
     isApplicable: (imageFile) => isSurveyDocImageApplicable({ user, survey, imageFile }),
   })
 
-  const headerOnFirstPageOnly = Survey.isHeaderOnFirstPageOnly(survey)
+  const headerOnFirstPageOnly = Survey.isDocHeaderOnFirstPageOnly(survey)
+  const pageNumbering = Survey.isDocPageNumberingEnabled(survey)
   const i18n = await i18nFactory.createI18nAsync(langToUse)
   const { buffer, surveyName } = await generator({
     survey,
@@ -191,6 +192,7 @@ const exportSurveyDocument = async ({
     headerImageFileUuid: headerImageFileSummary?.uuid,
     footerImageFileUuid: footerImageFileSummary?.uuid,
     headerOnFirstPageOnly,
+    pageNumbering,
   })
   const fileName = ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'SurveyForm', extension })
   Response.sendFileContent({

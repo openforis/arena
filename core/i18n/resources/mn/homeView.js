@@ -104,6 +104,7 @@ export default {
       layoutOptions: {
         title: 'Загварын тохиргоо',
         headerOnFirstPageOnly: 'Толгой хэсгийг зөвхөн эхний хуудсанд харуулах',
+        pageNumbering: 'Хуудасны дугаарлалт',
       },
       documentPlace: 'Байршил',
       documentPlaceValues: {

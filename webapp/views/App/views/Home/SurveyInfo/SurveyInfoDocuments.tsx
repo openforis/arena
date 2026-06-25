@@ -2,7 +2,7 @@ import { type SurveyDocImage } from '@openforis/arena-core'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import SurveyDocImagesEditor from '../SurveyDocImagesEditor'
+import SurveyDocLayoutEditor from '../SurveyDocLayoutEditor'
 
 type Props = {
   surveyDocImages: SurveyDocImage[]
@@ -18,7 +18,7 @@ export const SurveyInfoDocuments = (props: Props) => {
 
   return (
     <div className="survey-info__documents">
-      <SurveyDocImagesEditor
+      <SurveyDocLayoutEditor
         surveyDocImages={surveyDocImages}
         setSurveyDocImages={setSurveyDocImages}
         surveyDocOptions={surveyDocOptions}

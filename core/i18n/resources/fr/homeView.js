@@ -104,6 +104,7 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
       layoutOptions: {
         title: 'Options de mise en page',
         headerOnFirstPageOnly: 'En-tête sur la première page uniquement',
+        pageNumbering: 'Numérotation des pages',
       },
       documentPlace: 'Emplacement',
       documentPlaceValues: {
