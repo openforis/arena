@@ -1,8 +1,9 @@
 import './chainCloneFromSurveyDialog.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
+import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import * as Chain from '@common/analysis/chain'
 import * as Survey from '@core/survey/survey'
@@ -41,7 +42,7 @@ type ChainCloneFromSurveyDialogProps = {
 }
 
 export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDialogProps): React.ReactElement => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
   const navigate = useNavigate()
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -56,8 +57,9 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
   const [loadingEntityCheck, setLoadingEntityCheck] = useState(false)
 
   // Collect entity names from the current (target) survey.
-  const targetEntityNames = new Set(
-    Survey.getNodeDefsArray(currentSurvey).filter(NodeDef.isEntity).map(NodeDef.getName)
+  const targetEntityNames = useMemo(
+    () => new Set(Survey.getNodeDefsArray(currentSurvey).filter(NodeDef.isEntity).map(NodeDef.getName)),
+    [currentSurvey]
   )
 
   const toChainItem = useCallback(
@@ -71,56 +73,56 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
 
   // Load all surveys (published + draft) excluding current, then fetch their chains in
   // parallel and keep only the surveys that have at least one chain.
-  useEffect(() => {
-    const loadSurveys = async () => {
-      setLoadingSurveys(true)
-      try {
-        const [publishedSurveys, draftSurveys] = await Promise.all([
-          API.fetchSurveys({ draft: false }),
-          API.fetchSurveys({ draft: true }),
-        ])
+  const loadSurveys = useCallback(async () => {
+    setLoadingSurveys(true)
+    try {
+      const [publishedSurveys, draftSurveys] = await Promise.all([
+        API.fetchSurveys({ draft: false }),
+        API.fetchSurveys({ draft: true }),
+      ])
 
-        // Deduplicate by survey id, exclude current survey.
-        const byId: Record<number, object> = {}
-        ;[...publishedSurveys, ...draftSurveys].forEach((surveyInfo) => {
-          const id = Survey.getIdSurveyInfo(surveyInfo)
-          if (id !== currentSurveyId) byId[id] = surveyInfo
+      // Deduplicate by survey id, exclude current survey.
+      const byId: Record<number, object> = {}
+      ;[...publishedSurveys, ...draftSurveys].forEach((surveyInfo) => {
+        const id = Survey.getIdSurveyInfo(surveyInfo)
+        if (id !== currentSurveyId) byId[id] = surveyInfo
+      })
+
+      const otherSurveyInfos = Object.values(byId)
+
+      // Fetch chains for all candidate surveys in parallel.
+      const chainsPerSurvey = await Promise.all(
+        otherSurveyInfos.map(async (surveyInfo) => {
+          const { chains } = await API.fetchChains({ surveyId: Survey.getIdSurveyInfo(surveyInfo) as number } as any)
+          return chains as object[]
         })
+      )
 
-        const otherSurveyInfos = Object.values(byId)
+      // Build survey items, filtering out surveys with no chains.
+      const items: SurveyItem[] = otherSurveyInfos
+        .map((surveyInfo, i) => {
+          const surveyLabel = Survey.getLabel(surveyInfo, lang)
+          const surveyName = Survey.getName(surveyInfo)
+          const label = surveyLabel && surveyLabel !== surveyName ? `${surveyLabel} [${surveyName}]` : surveyName
+          return {
+            value: Survey.getIdSurveyInfo(surveyInfo) as number,
+            label,
+            surveyInfo,
+            chainItems: chainsPerSurvey[i].map((surveyChain) => toChainItem(surveyChain)),
+          }
+        })
+        .filter((item) => item.chainItems.length > 0)
+        .sort((a, b) => a.label.localeCompare(b.label))
 
-        // Fetch chains for all candidate surveys in parallel.
-        const chainsPerSurvey = await Promise.all(
-          otherSurveyInfos.map((surveyInfo) =>
-            API.fetchChains({ surveyId: Survey.getIdSurveyInfo(surveyInfo) as number } as any).then(
-              ({ chains }) => chains
-            )
-          )
-        )
-
-        // Build survey items, filtering out surveys with no chains.
-        const items: SurveyItem[] = otherSurveyInfos
-          .map((surveyInfo, i) => {
-            const surveyLabel = Survey.getLabel(surveyInfo, lang)
-            const surveyName = Survey.getName(surveyInfo)
-            const label = surveyLabel && surveyLabel !== surveyName ? `${surveyLabel} [${surveyName}]` : surveyName
-            return {
-              value: Survey.getIdSurveyInfo(surveyInfo) as number,
-              label,
-              surveyInfo,
-              chainItems: (chainsPerSurvey[i] as object[]).map(toChainItem),
-            }
-          })
-          .filter((item) => item.chainItems.length > 0)
-          .sort((a, b) => a.label.localeCompare(b.label))
-
-        setSurveyItems(items)
-      } finally {
-        setLoadingSurveys(false)
-      }
+      setSurveyItems(items)
+    } finally {
+      setLoadingSurveys(false)
     }
-    loadSurveys()
   }, [currentSurveyId, lang, toChainItem])
+
+  useEffect(() => {
+    loadSurveys()
+  }, [loadSurveys])
 
   const onSurveyChange = useCallback((item: SurveyItem | null) => {
     setSelectedSurveyItem(item)
@@ -141,7 +143,7 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
           surveyId: selectedSurveyItem.value,
           advanced: true,
           includeAnalysis: true,
-        })
+        } as any)
         const chainUuid = item.value
         const sourceAnalysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(
           (nd: object) => NodeDef.isAnalysis(nd) && NodeDef.getChainUuid(nd) === chainUuid
@@ -168,7 +170,7 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
     [selectedSurveyItem, targetEntityNames]
   )
 
-  const allEntitiesFound = entityCheckItems.length === 0 || entityCheckItems.every((c) => c.found)
+  const allEntitiesFound = entityCheckItems.every((c) => c.found)
   const confirmDisabled = !selectedSurveyItem || !selectedChainItem || loadingEntityCheck || !allEntitiesFound
 
   const onConfirm = useCallback(() => {
