@@ -1,4 +1,4 @@
-import './SurveyDocImagesEditor.scss'
+import './SurveyDocLayoutEditor.scss'
 
 import { useCallback, useState } from 'react'
 
@@ -27,7 +27,7 @@ type Props = {
   readOnly?: boolean
 }
 
-const SurveyDocImagesEditor = (props: Props) => {
+const SurveyDocLayoutEditor = (props: Props) => {
   const { surveyDocImages, setSurveyDocImages, surveyDocOptions = {}, setSurveyDocOptions, readOnly } = props
 
   const i18n = useI18n()
@@ -85,6 +85,13 @@ const SurveyDocImagesEditor = (props: Props) => {
   const onHeaderOnFirstPageOnlyChange = useCallback(
     (value: boolean) => {
       setSurveyDocOptions?.({ ...surveyDocOptions, headerOnFirstPageOnly: value })
+    },
+    [setSurveyDocOptions, surveyDocOptions]
+  )
+
+  const onPageNumberingChange = useCallback(
+    (value: boolean) => {
+      setSurveyDocOptions?.({ ...surveyDocOptions, pageNumbering: value })
     },
     [setSurveyDocOptions, surveyDocOptions]
   )
@@ -190,6 +197,12 @@ const SurveyDocImagesEditor = (props: Props) => {
           label="homeView:surveyInfo.surveyDocLayout.layoutOptions.headerOnFirstPageOnly"
           onChange={onHeaderOnFirstPageOnlyChange}
         />
+        <Checkbox
+          checked={surveyDocOptions.pageNumbering !== false}
+          disabled={readOnly}
+          label="homeView:surveyInfo.surveyDocLayout.layoutOptions.pageNumbering"
+          onChange={onPageNumberingChange}
+        />
       </Fieldset>
 
       {dialogVisible && (
@@ -206,4 +219,4 @@ const SurveyDocImagesEditor = (props: Props) => {
   )
 }
 
-export default SurveyDocImagesEditor
+export default SurveyDocLayoutEditor

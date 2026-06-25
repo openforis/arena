@@ -103,6 +103,7 @@ Se houver registros associados a este ciclo, eles serão excluídos.`,
       layoutOptions: {
         title: 'Opções de layout',
         headerOnFirstPageOnly: 'Cabeçalho somente na primeira página',
+        pageNumbering: 'Numeração de páginas',
       },
       documentPlace: 'Local',
       documentPlaceValues: {
