@@ -3,15 +3,13 @@ import './SurveyDocImageEditor.scss'
 import { useCallback, useEffect, useState } from 'react'
 
 import {
-  DocumentPlace,
-  assocDocumentPlace,
-  assocApplyIf,
-  createSurveyDocImage,
-  propKeys as docImagePropKeys,
-  getDocumentPlace,
-  getApplyIf,
+  SurveyDocImages,
+  SurveyDocImageFactory,
+  SurveyDocPlace,
+  surveyDocImagePropKeys,
   type SurveyDocImage,
-} from '@core/survey/surveyDocImage'
+} from '@openforis/arena-core'
+
 import { SurveyDocImageValidator } from '@core/survey/surveyDocImageValidator'
 import * as SurveyFile from '@core/survey/surveyFile'
 import type { ValidationInstance } from '@core/validation/validation'
@@ -43,7 +41,7 @@ type State = {
   draftSurveyDocImage: SurveyDocImage
   file: File | null
   labels: Record<string, string>
-  documentPlace: DocumentPlace | undefined
+  documentPlace: SurveyDocPlace | undefined
   applyIf: string
   validation: ValidationInstance | null
 }
@@ -56,11 +54,11 @@ const SurveyDocImageEditor = (props: Props) => {
   const surveyId = useSurveyId()
 
   const [state, setState] = useState<State>({
-    draftSurveyDocImage: editedSurveyDocImage ?? createSurveyDocImage({}),
+    draftSurveyDocImage: editedSurveyDocImage ?? SurveyDocImageFactory.createInstance({}),
     file: null,
     labels: editedSurveyDocImage ? SurveyFile.getLabels(editedSurveyDocImage) : {},
-    documentPlace: editedSurveyDocImage ? getDocumentPlace(editedSurveyDocImage) : undefined,
-    applyIf: editedSurveyDocImage ? getApplyIf(editedSurveyDocImage) : '',
+    documentPlace: editedSurveyDocImage ? SurveyDocImages.getDocumentPlace(editedSurveyDocImage) : undefined,
+    applyIf: editedSurveyDocImage ? SurveyDocImages.getApplyIf(editedSurveyDocImage) : '',
     validation: null,
   })
 
@@ -76,7 +74,7 @@ const SurveyDocImageEditor = (props: Props) => {
   }, [])
 
   const onDocumentPlaceChange = useCallback((value: string) => {
-    setState((prev) => ({ ...prev, documentPlace: value as DocumentPlace }))
+    setState((prev) => ({ ...prev, documentPlace: value as SurveyDocPlace }))
   }, [])
 
   const onApplyIfChange = useCallback((value: string) => {
@@ -88,14 +86,14 @@ const SurveyDocImageEditor = (props: Props) => {
     let draft: SurveyDocImage
     if (editedSurveyDocImage && file) {
       // New file uploaded during edit: fresh UUID so the old file becomes an orphan (removed when unused files are cleaned up, e.g. on publish)
-      draft = createSurveyDocImage({ labels, name, size, temporary: true })
+      draft = SurveyDocImageFactory.createInstance({ labels, name, size, temporary: true })
     } else if (editedSurveyDocImage) {
       draft = SurveyFile.assocLabels(labels)(editedSurveyDocImage)
     } else {
-      draft = createSurveyDocImage({ labels, name, size, temporary: true })
+      draft = SurveyDocImageFactory.createInstance({ labels, name, size, temporary: true })
     }
-    if (documentPlace) draft = assocDocumentPlace(documentPlace)(draft)
-    draft = assocApplyIf(applyIf)(draft)
+    if (documentPlace) draft = SurveyDocImages.assocDocumentPlace(documentPlace)(draft)
+    draft = SurveyDocImages.assocApplyIf(applyIf)(draft)
 
     SurveyDocImageValidator.validate({ survey, surveyDocImages, surveyDocImage: draft }).then((v) => {
       setState((prev) => ({ ...prev, draftSurveyDocImage: draft, validation: v }))
@@ -106,7 +104,7 @@ const SurveyDocImageEditor = (props: Props) => {
     await onOkProp({ file, surveyDocImage: draftSurveyDocImage })
   }, [file, draftSurveyDocImage, onOkProp])
 
-  const documentPlaceItems = Object.values(DocumentPlace).map((value) => ({
+  const documentPlaceItems = Object.values(SurveyDocPlace).map((value) => ({
     key: value,
     label: i18n.t(`homeView:surveyInfo.surveyDocLayout.documentPlaceValues.${value}`),
   }))
@@ -128,7 +126,9 @@ const SurveyDocImageEditor = (props: Props) => {
             validation={Validation.getFieldValidation(SurveyFile.propKeys.labels)(validation)}
           />
           <FormItem label="homeView:surveyInfo.surveyDocLayout.documentPlace">
-            <ValidationTooltip validation={Validation.getFieldValidation(docImagePropKeys.documentPlace)(validation)}>
+            <ValidationTooltip
+              validation={Validation.getFieldValidation(surveyDocImagePropKeys.documentPlace)(validation)}
+            >
               <RadioButtonGroup items={documentPlaceItems} onChange={onDocumentPlaceChange} row value={documentPlace} />
             </ValidationTooltip>
           </FormItem>
@@ -136,7 +136,7 @@ const SurveyDocImageEditor = (props: Props) => {
             <Input
               onChange={onApplyIfChange}
               value={applyIf}
-              validation={Validation.getFieldValidation(docImagePropKeys.applyIf)(validation)}
+              validation={Validation.getFieldValidation(surveyDocImagePropKeys.applyIf)(validation)}
             />
           </FormItem>
           {editedSurveyDocImage && !file && (

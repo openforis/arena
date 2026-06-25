@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
-import { getDocumentPlace, getApplyIf, type SurveyDocImage } from '@core/survey/surveyDocImage'
+import { SurveyDocImages, type SurveyDocImage } from '@openforis/arena-core'
 
 import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, Fieldset } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
@@ -140,7 +140,7 @@ const SurveyDocImagesEditor = (props: Props) => {
                 width: 100,
                 headerName: i18n.t('homeView:surveyInfo.surveyDocLayout.documentPlace'),
                 renderCell: ({ row }) => {
-                  const place = getDocumentPlace(row)
+                  const place = SurveyDocImages.getDocumentPlace(row)
                   return place ? i18n.t(`homeView:surveyInfo.surveyDocLayout.documentPlaceValues.${place}`) : ''
                 },
                 sortable: false,
@@ -149,7 +149,7 @@ const SurveyDocImagesEditor = (props: Props) => {
                 field: 'applyIf',
                 flex: 0.3,
                 headerName: i18n.t('homeView:surveyInfo.surveyDocLayout.applyIf'),
-                renderCell: ({ row }) => <LabelWithTooltip label={getApplyIf(row)} />,
+                renderCell: ({ row }) => <LabelWithTooltip label={SurveyDocImages.getApplyIf(row)} />,
                 sortable: false,
               },
               {
