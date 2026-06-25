@@ -315,6 +315,7 @@ export const fetchUserSurveysInfo = async ({
   includeCounts = false,
   includeOwnerEmailAddress = false,
   onlyOwn = false,
+  withChains = false,
   onProgress = null,
   stopIfFunction = null,
 }) => {
@@ -342,6 +343,19 @@ export const fetchUserSurveysInfo = async ({
       onlyOwn,
     })
   ).map(assocSurveyInfo)
+
+  if (withChains) {
+    const chainCounts = await Promise.all(
+      surveys.map(async (survey) => {
+        try {
+          return await ChainRepository.countChains({ surveyId: Survey.getId(survey) })
+        } catch {
+          return 0
+        }
+      })
+    )
+    return surveys.filter((_survey, i) => chainCounts[i] > 0)
+  }
 
   onProgress?.({ total: surveys.length, processed: 0 })
 
