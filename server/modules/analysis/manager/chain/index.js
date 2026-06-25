@@ -4,6 +4,8 @@ import * as R from 'ramda'
 
 import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
+import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
@@ -145,6 +147,92 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
 
 // ====== CLONE FROM SURVEY
 
+/**
+ * Remaps nodeDef UUID from source survey to target survey by node name.
+ * Returns undefined when the nodeDef cannot be found in the target.
+ *
+ * @param {object} params - Parameters.
+ * @param {string} params.uuid - NodeDef UUID in the source survey.
+ * @param {object} params.sourceSurvey - Source survey object.
+ * @param {object} params.targetSurvey - Target survey object.
+ * @returns {string|undefined} Corresponding UUID in the target survey, or undefined.
+ */
+const _remapNodeDefUuid = ({ uuid, sourceSurvey, targetSurvey }) => {
+  if (!uuid) return undefined
+  const sourceNodeDef = Survey.getNodeDefByUuid(uuid)(sourceSurvey)
+  if (!sourceNodeDef) return undefined
+  const targetNodeDef = Survey.getNodeDefByName(NodeDef.getName(sourceNodeDef))(targetSurvey)
+  return targetNodeDef ? NodeDef.getUuid(targetNodeDef) : undefined
+}
+
+/**
+ * Sanitizes chain props before inserting into a different survey.
+ * Remaps nodeDef UUIDs by name where possible, clears category UUIDs and
+ * selected record UUIDs that are meaningless outside the source survey.
+ *
+ * @param {object} params - Parameters.
+ * @param {object} params.sourceChain - The chain being cloned.
+ * @param {object} params.sourceSurvey - Survey the chain belongs to.
+ * @param {object} params.targetSurvey - Survey receiving the clone.
+ * @returns {object} Sanitized props object safe to insert into the target survey.
+ */
+const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }) => {
+  const remap = (uuid) => _remapNodeDefUuid({ uuid, sourceSurvey, targetSurvey })
+
+  const sourceSamplingDesign = Chain.getSamplingDesign(sourceChain)
+  const sanitizedSamplingDesign = Object.fromEntries(
+    Object.entries({
+      ...sourceSamplingDesign,
+      // Remap nodeDef UUIDs by name; undefined entries are filtered below
+      [ChainSamplingDesign.keysProps.baseUnitNodeDefUuid]: remap(
+        ChainSamplingDesign.getBaseUnitNodeDefUuid(sourceSamplingDesign)
+      ),
+      [ChainSamplingDesign.keysProps.clusteringNodeDefUuid]: remap(
+        ChainSamplingDesign.getClusteringNodeDefUuid(sourceSamplingDesign)
+      ),
+      [ChainSamplingDesign.keysProps.stratumNodeDefUuid]: remap(
+        ChainSamplingDesign.getStratumNodeDefUuid(sourceSamplingDesign)
+      ),
+      [ChainSamplingDesign.keysProps.postStratificationAttributeDefUuid]: remap(
+        ChainSamplingDesign.getPostStratificationAttributeDefUuid(sourceSamplingDesign)
+      ),
+      [ChainSamplingDesign.keysProps.firstPhaseCommonAttributeUuid]: remap(
+        ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(sourceSamplingDesign)
+      ),
+      // Category UUIDs are survey-specific and cannot be remapped; clear them
+      [ChainSamplingDesign.keysProps.firstPhaseCategoryUuid]: undefined,
+      [ChainSamplingDesign.keysProps.reportingDataCategoryUuid]: undefined,
+      [ChainSamplingDesign.keysProps.reportingDataAttributeDefsByLevelUuid]: undefined,
+    }).filter(([, v]) => v !== undefined)
+  )
+
+  const sourceStatisticalAnalysis = Chain.getStatisticalAnalysis(sourceChain)
+  const sanitizedStatisticalAnalysis = Object.fromEntries(
+    Object.entries({
+      ...sourceStatisticalAnalysis,
+      [ChainStatisticalAnalysis.keys.entityDefUuid]: remap(
+        ChainStatisticalAnalysis.getEntityDefUuid(sourceStatisticalAnalysis)
+      ),
+      [ChainStatisticalAnalysis.keys.dimensionUuids]: ChainStatisticalAnalysis.getDimensionUuids(
+        sourceStatisticalAnalysis
+      )
+        .map(remap)
+        .filter(Boolean),
+    }).filter(([, v]) => v !== undefined)
+  )
+
+  return Object.fromEntries(
+    Object.entries({
+      ...Chain.getProps(sourceChain),
+      [Chain.keysProps.samplingDesign]: sanitizedSamplingDesign,
+      [Chain.keysProps.statisticalAnalysis]: sanitizedStatisticalAnalysis,
+      // Selected record UUIDs are meaningless in the target survey
+      [Chain.keysProps.submitOnlySelectedRecordsIntoR]: undefined,
+      [Chain.keysProps.selectedRecordUuids]: undefined,
+    }).filter(([, v]) => v !== undefined)
+  )
+}
+
 export const cloneChainFromSurvey = async (
   { user, surveyId, sourceSurveyId, sourceChainUuid },
   client = DB.client
@@ -190,8 +278,11 @@ export const cloneChainFromSurvey = async (
       })
     }
 
-    // Create new chain with a new UUID, copying props and scripts from source.
-    const newChain = { [Chain.keys.uuid]: uuidv4(), [Chain.keys.props]: Chain.getProps(sourceChain) }
+    // Create new chain with a new UUID, copying props from source with UUID references sanitized.
+    const newChain = {
+      [Chain.keys.uuid]: uuidv4(),
+      [Chain.keys.props]: _sanitizeChainPropsForClone({ sourceChain, sourceSurvey, targetSurvey }),
+    }
     const insertedChain = await ChainRepository.insertChainFull({
       surveyId,
       chain: newChain,
