@@ -5,7 +5,7 @@ import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
 
-import { propKeys, getApplyIf, type SurveyDocImage } from './surveyDocImage'
+import { SurveyDocImages, surveyDocImagePropKeys as propKeys, type SurveyDocImage } from '@openforis/arena-core'
 import { ValidationResultInstance } from '@core/validation/validationResult'
 
 const nodeDefExpressionValidator = new NodeDefExpressionValidator()
@@ -14,7 +14,7 @@ const validateExpression =
   (survey: unknown) =>
   async (_propName: string, surveyDocImage: SurveyDocImage): Promise<ValidationResult> => {
     if (!survey) return null
-    const applyIf = getApplyIf(surveyDocImage)
+    const applyIf = SurveyDocImages.getApplyIf(surveyDocImage)
     if (!applyIf) return null
 
     const nodeDefCurrent = Survey.getNodeDefRoot(survey as object) as any

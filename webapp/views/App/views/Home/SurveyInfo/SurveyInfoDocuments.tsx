@@ -1,4 +1,4 @@
-import { type SurveyDocImage } from '@core/survey/surveyDocImage'
+import { type SurveyDocImage } from '@openforis/arena-core'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
