@@ -118,7 +118,7 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
       setLoadingChains(true)
       try {
         const { chains } = await API.fetchChains({ surveyId: item.value } as any)
-        setChainItems((chains as object[]).map(toChainItem))
+        setChainItems((chains as object[]).map((chain) => toChainItem(chain)))
       } finally {
         setLoadingChains(false)
       }
