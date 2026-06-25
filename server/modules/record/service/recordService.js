@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 
-import { NodeValues, Objects, RecordExpressionEvaluator } from '@openforis/arena-core'
+import { NodeValues, Objects, RecordExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
 import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
@@ -15,7 +15,6 @@ import * as DateUtils from '@core/dateUtils'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Record from '@core/record/record'
-import { SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
