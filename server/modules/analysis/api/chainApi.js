@@ -20,6 +20,26 @@ export const init = (app) => {
     }
   })
 
+  // ====== CLONE - Chain from another survey
+
+  app.post(
+    '/survey/:surveyId/chain/clone-from-survey',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const { sourceSurveyId, sourceChainUuid } = Request.getBody(req)
+        const user = Request.getUser(req)
+
+        const chain = await AnalysisService.cloneChainFromSurvey({ user, surveyId, sourceSurveyId, sourceChainUuid })
+
+        res.json(chain)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ====== READ - Chains
 
   app.get(

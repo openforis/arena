@@ -1,9 +1,14 @@
 import { ChainFactory } from '@openforis/arena-core'
 
+import * as R from 'ramda'
+
 import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
+import { uuidv4 } from '@core/uuid'
+import SystemError from '@core/systemError'
 
 import { TableChain } from '@common/model/db'
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -11,6 +16,7 @@ import * as ChainValidator from '@common/analysis/chainValidator'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
@@ -135,4 +141,94 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainDelete, content, false, tx),
       markSurveyDraft(surveyId, tx),
     ])
+  })
+
+// ====== CLONE FROM SURVEY
+
+export const cloneChainFromSurvey = async (
+  { user, surveyId, sourceSurveyId, sourceChainUuid },
+  client = DB.client
+) =>
+  client.tx(async (tx) => {
+    const fetchSurveyFull = (sid) =>
+      SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+        { surveyId: sid, draft: true, advanced: true, includeAnalysis: true },
+        tx
+      )
+
+    const [sourceSurvey, targetSurvey] = await Promise.all([fetchSurveyFull(sourceSurveyId), fetchSurveyFull(surveyId)])
+
+    const sourceChain = await ChainRepository.fetchChain(
+      { surveyId: sourceSurveyId, chainUuid: sourceChainUuid, includeScript: true },
+      tx
+    )
+
+    const sourceAnalysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(
+      (nd) => NodeDef.isAnalysis(nd) && NodeDef.getChainUuid(nd) === sourceChainUuid
+    )
+
+    // Build map of entity name → nodeDef for the target survey.
+    const targetEntityByName = {}
+    Survey.getNodeDefsArray(targetSurvey)
+      .filter(NodeDef.isEntity)
+      .forEach((nd) => {
+        targetEntityByName[NodeDef.getName(nd)] = nd
+      })
+
+    // Validate: every entity that holds a source analysis attribute must exist in target survey by name.
+    const missingEntityNames = []
+    sourceAnalysisNodeDefs.forEach((nd) => {
+      const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey)
+      const parentName = NodeDef.getName(parentEntity)
+      if (!targetEntityByName[parentName] && !missingEntityNames.includes(parentName)) {
+        missingEntityNames.push(parentName)
+      }
+    })
+    if (missingEntityNames.length > 0) {
+      throw new SystemError('chainView.cloneFromAnotherSurveyDialog.missingEntities', {
+        entities: missingEntityNames.join(', '),
+      })
+    }
+
+    // Create new chain with a new UUID, copying props and scripts from source.
+    const newChain = { [Chain.keys.uuid]: uuidv4(), [Chain.keys.props]: Chain.getProps(sourceChain) }
+    const insertedChain = await ChainRepository.insertChainFull({
+      surveyId,
+      chain: newChain,
+      scriptCommon: Chain.getScriptCommon(sourceChain),
+      scriptEnd: Chain.getScriptEnd(sourceChain),
+    }, tx)
+
+    const newChainUuid = Chain.getUuid(insertedChain)
+
+    // Clone analysis node defs, remapping parent entity to target survey and updating chainUuid.
+    const usedNames = new Set(Survey.getNodeDefsArray(targetSurvey).map(NodeDef.getName))
+    const clonedNodeDefs = sourceAnalysisNodeDefs.map((nd) => {
+      const sourceParentName = NodeDef.getName(Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey))
+      const targetParentEntity = targetEntityByName[sourceParentName]
+      const uniqueName = UniqueNameGenerator.generateUniqueName({
+        startingName: NodeDef.getName(nd),
+        existingNames: usedNames,
+      })
+      usedNames.add(uniqueName)
+      const cloned = NodeDef.cloneIntoEntityDef({
+        nodeDefParent: targetParentEntity,
+        clonedNodeDefName: uniqueName,
+        ignoreDefaultValues: false,
+        ignoreApplicability: false,
+        ignoreValidations: false,
+      })(nd)
+      return R.assocPath([NodeDef.keys.propsAdvanced, NodeDef.keysPropsAdvanced.chainUuid], newChainUuid)(cloned)
+    })
+
+    if (clonedNodeDefs.length > 0) {
+      await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: clonedNodeDefs }, tx)
+    }
+
+    await tx.batch([
+      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, insertedChain, false, tx),
+      markSurveyDraft(surveyId, tx),
+    ])
+
+    return insertedChain
   })
