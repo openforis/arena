@@ -102,6 +102,7 @@ If there are records associated to this cycle, they will be deleted.`,
       layoutOptions: {
         title: 'Layout options',
         headerOnFirstPageOnly: 'Header on first page only',
+        pageNumbering: 'Page numbering',
       },
       documentPlace: 'Place',
       documentPlaceValues: {

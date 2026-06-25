@@ -55,10 +55,10 @@ export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
   return response
 }
 
-export const getSurveyDocxExportUrl = ({ surveyId, cycle, lang, draft = false }) =>
+export const getSurveyDocxExportUrl = ({ surveyId, cycle, lang, draft = true }) =>
   `/api/survey/${surveyId}/export/docx?${new URLSearchParams({ draft, cycle, lang })}`
 
-export const getSurveyPdfExportUrl = ({ surveyId, cycle, lang, draft = false }) =>
+export const getSurveyPdfExportUrl = ({ surveyId, cycle, lang, draft = true }) =>
   `/api/survey/${surveyId}/export/pdf?${new URLSearchParams({ draft, cycle, lang })}`
 
 // ==== UPDATE

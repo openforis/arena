@@ -122,8 +122,11 @@ export const getSurveyDocImages = ObjectUtils.getProp(keys.surveyDocImages, [])
 
 export const getSurveyDocOptions = ObjectUtils.getProp(keys.surveyDocOptions, {})
 
-export const isHeaderOnFirstPageOnly = (surveyInfo: any): boolean =>
+export const isDocHeaderOnFirstPageOnly = (surveyInfo: any): boolean =>
   (getSurveyDocOptions(surveyInfo) as Record<string, unknown>)?.headerOnFirstPageOnly !== false
+
+export const isDocPageNumberingEnabled = (surveyInfo: any): boolean =>
+  (getSurveyDocOptions(surveyInfo) as Record<string, unknown>)?.pageNumbering !== false
 
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled

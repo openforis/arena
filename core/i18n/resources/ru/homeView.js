@@ -104,6 +104,7 @@ export default {
       layoutOptions: {
         title: 'Параметры макета',
         headerOnFirstPageOnly: 'Верхний колонтитул только на первой странице',
+        pageNumbering: 'Нумерация страниц',
       },
       documentPlace: 'Место',
       documentPlaceValues: {

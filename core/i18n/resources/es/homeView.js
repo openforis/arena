@@ -91,6 +91,7 @@ export default {
       layoutOptions: {
         title: 'Opciones de diseño',
         headerOnFirstPageOnly: 'Encabezado solo en la primera página',
+        pageNumbering: 'Numeración de páginas',
       },
       documentPlace: 'Ubicación',
       documentPlaceValues: {
