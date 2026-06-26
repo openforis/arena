@@ -347,9 +347,11 @@ export const fetchUserSurveysInfo = async ({
   if (withChains) {
     const chainCounts = await Promise.all(
       surveys.map(async (survey) => {
+        const surveyId = Survey.getId(survey)
         try {
-          return await ChainRepository.countChains({ surveyId: Survey.getId(survey) })
-        } catch {
+          return await ChainRepository.countChains({ surveyId })
+        } catch (error) {
+          Logger.error(`fetchUserSurveysInfo: error counting chains for survey ${surveyId}: ${error}`)
           return 0
         }
       })
