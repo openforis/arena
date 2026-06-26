@@ -20,7 +20,7 @@ const JobTiming = ({ job = {} }) => {
   if (!elapsedFormatted) return null
 
   const remainingMillis = JobSerialized.getRemainingMillis(job)
-  const remainingFormatted = remainingMillis !== null ? formatDuration(remainingMillis) : null
+  const remainingFormatted = remainingMillis === null ? null : formatDuration(remainingMillis)
 
   return (
     <div className="job-timing">
