@@ -9,10 +9,7 @@ export const keys = {
   customErrorMessageKey: 'custom',
 } as const
 
-export const severity = {
-  error: 'error',
-  warning: 'warning',
-} as const
+export const severity = ValidationSeverity
 
 export type Severity = ValidationSeverity
 
