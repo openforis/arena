@@ -1,4 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { Objects } from '@openforis/arena-core'
+
+import { useState, useEffect, useMemo, useCallback } from 'react'
 
 import * as Validation from '@core/validation/validation'
 
@@ -13,24 +15,23 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
 
   const initialValidation = useMemo(() => Validation.getValidation(obj), [obj])
 
-  const objectValid = Validation.isValid(state.validation)
+  const objectValid = Validation.isValid(validation)
 
-  const setValidation = (validation) =>
-    setState((statePrev) => ({
-      ...statePrev,
-      validation,
-    }))
+  const setValidation = useCallback(
+    (validationNext) =>
+      setState((statePrev) =>
+        Objects.isEqual(statePrev.validation, validationNext) ? statePrev : { ...statePrev, validation: validationNext }
+      ),
+    []
+  )
 
   // Validation effect
   useEffect(() => {
     ;(async () => {
-      if (validatorFn) {
-        setValidation(await validatorFn(object))
-      } else {
-        setValidation(initialValidation)
-      }
+      const validationNext = validatorFn ? await validatorFn(object) : initialValidation
+      setValidation(validationNext)
     })()
-  }, [initialValidation, object, validatorFn])
+  }, [initialValidation, object, validatorFn, setValidation])
 
   const setObjectFields = (fieldValuePairs) => {
     setState((statePrev) => ({
