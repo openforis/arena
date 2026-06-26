@@ -320,10 +320,16 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
       await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: clonedNodeDefs }, tx)
     }
 
+    const updatedTargetSurvey = await fetchSurveyFull(surveyId)
+    const targetSurveyInfo = Survey.getSurveyInfo(updatedTargetSurvey)
+    const defaultLang = Survey.getDefaultLanguage(targetSurveyInfo)
+    const validation = await ChainValidator.validateChain({ chain: insertedChain, defaultLang, survey: updatedTargetSurvey })
+
     await tx.batch([
+      updateChainValidation({ surveyId, chainUuid: newChainUuid, validation }, tx),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, insertedChain, false, tx),
       markSurveyDraft(surveyId, tx),
     ])
 
-    return insertedChain
+    return Chain.assocValidation(validation)(insertedChain)
   })
