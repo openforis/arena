@@ -4,6 +4,11 @@
   .modal-body {
     padding-top: 0;
   }
+
+  .job-timing {
+    font-size: 0.8rem;
+    color: rgba($black, 0.55);
+  }
 }
 
 .app-job-monitor__job-errors {
@@ -52,9 +57,4 @@
       padding: 0 1rem 2rem 1rem;
     }
   }
-}
-
-.job-timing {
-  font-size: 0.8rem;
-  color: rgba($black, 0.55);
 }

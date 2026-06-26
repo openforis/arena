@@ -52,7 +52,7 @@ export const getProcessed = R.propOr(0, keys.processed)
  * @returns {number|null} Estimated remaining milliseconds, or null.
  */
 export const getRemainingMillis = (job) => {
-  const progress = getProgressPercent(job)
+  const progress = Math.min(100, Math.max(0, getProgressPercent(job)))
   if (progress <= 0 || isEnded(job)) return null
 
   const simpleEstimate = Math.round((getElapsedMillis(job) / progress) * (100 - progress))
