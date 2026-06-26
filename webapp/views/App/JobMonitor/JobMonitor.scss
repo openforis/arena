@@ -37,7 +37,8 @@
 
     .job {
       display: grid;
-      grid-template-columns: 0.5fr 0.5fr;
+      grid-template-columns: 1fr 1fr auto;
+      align-items: center;
       margin-bottom: 1rem;
 
       .name {
@@ -48,5 +49,15 @@
     .app-job-monitor__job-errors {
       padding: 0 1rem 2rem 1rem;
     }
+  }
+}
+
+.job-timing {
+  font-size: 0.8rem;
+  color: rgba($black, 0.55);
+
+  &--compact {
+    text-align: right;
+    white-space: nowrap;
   }
 }
