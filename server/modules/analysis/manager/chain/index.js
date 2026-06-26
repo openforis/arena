@@ -248,6 +248,10 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
       tx
     )
 
+    if (!sourceChain) {
+      throw new SystemError('chainNotFound', { chainUuid: sourceChainUuid })
+    }
+
     const sourceAnalysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(
       (nd) => NodeDef.isAnalysis(nd) && NodeDef.getChainUuid(nd) === sourceChainUuid
     )
@@ -323,7 +327,11 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
     const updatedTargetSurvey = await fetchSurveyFull(surveyId)
     const targetSurveyInfo = Survey.getSurveyInfo(updatedTargetSurvey)
     const defaultLang = Survey.getDefaultLanguage(targetSurveyInfo)
-    const validation = await ChainValidator.validateChain({ chain: insertedChain, defaultLang, survey: updatedTargetSurvey })
+    const validation = await ChainValidator.validateChain({
+      chain: insertedChain,
+      defaultLang,
+      survey: updatedTargetSurvey,
+    })
 
     await tx.batch([
       updateChainValidation({ surveyId, chainUuid: newChainUuid, validation }, tx),
