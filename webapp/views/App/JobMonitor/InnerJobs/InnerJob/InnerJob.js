@@ -30,7 +30,7 @@ const InnerJob = ({ isCurrentJob = false, innerJob, index }) => {
         {(isCurrentJob || JobSerialized.isEnded(innerJob)) && (
           <JobProgress isCurrentJob={isCurrentJob} job={innerJob} />
         )}
-        <JobTiming job={innerJob} compact />
+        <JobTiming job={innerJob} />
       </div>
       <JobErrors job={innerJob} />
     </>

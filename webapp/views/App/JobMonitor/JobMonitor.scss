@@ -37,12 +37,14 @@
 
     .job {
       display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      align-items: center;
-      margin-bottom: 1rem;
+      grid-template-columns: 1fr 1fr;
 
       .name {
         font-size: 0.9rem;
+      }
+
+      .job-timing {
+        grid-column: 2;
       }
     }
 
@@ -55,9 +57,4 @@
 .job-timing {
   font-size: 0.8rem;
   color: rgba($black, 0.55);
-
-  &--compact {
-    text-align: right;
-    white-space: nowrap;
-  }
 }
