@@ -98,6 +98,8 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
         .sort((a, b) => a.label.localeCompare(b.label))
 
       setSurveyItems(items)
+    } catch {
+      setSurveyItems([])
     } finally {
       setLoadingSurveys(false)
     }
