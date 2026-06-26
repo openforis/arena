@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 
 import * as JobSerialized from '@common/job/jobSerialized'
+import { useI18n } from '@webapp/store/system'
 
 import formatDuration from './formatDuration'
 
@@ -13,6 +14,7 @@ import formatDuration from './formatDuration'
  * @returns {React.ReactElement|null} Timing display, or null when there is nothing to show.
  */
 const JobTiming = ({ compact = false, job = {} }) => {
+  const i18n = useI18n()
   const elapsedMillis = JobSerialized.getElapsedMillis(job)
   const elapsedFormatted = formatDuration(elapsedMillis)
 
@@ -27,8 +29,8 @@ const JobTiming = ({ compact = false, job = {} }) => {
 
   return (
     <div className="job-timing">
-      {`Elapsed: ${elapsedFormatted}`}
-      {remainingFormatted && ` · Remaining: ~${remainingFormatted}`}
+      {`${i18n.t('jobs:elapsed')}: ${elapsedFormatted}`}
+      {remainingFormatted && ` · ${i18n.t('jobs:remaining')}: ~${remainingFormatted}`}
     </div>
   )
 }
