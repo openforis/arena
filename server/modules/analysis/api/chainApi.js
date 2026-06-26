@@ -35,6 +35,9 @@ export const init = (app) => {
         const { sourceSurveyId, sourceChainUuid } = Request.getBody(req)
         const user = Request.getUser(req)
 
+        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
+        if (!sourceChainUuid) throw new Error('sourceChainUuid is required')
+
         const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId })
         if (!Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
           throw new UnauthorizedError(user?.name)

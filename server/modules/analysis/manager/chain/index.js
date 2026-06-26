@@ -233,10 +233,7 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
   )
 }
 
-export const cloneChainFromSurvey = async (
-  { user, surveyId, sourceSurveyId, sourceChainUuid },
-  client = DB.client
-) =>
+export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sourceChainUuid }, client = DB.client) =>
   client.tx(async (tx) => {
     const fetchSurveyFull = (sid) =>
       SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
@@ -265,13 +262,17 @@ export const cloneChainFromSurvey = async (
 
     // Validate: every entity that holds a source analysis attribute must exist in target survey by name.
     const missingEntityNames = []
-    sourceAnalysisNodeDefs.forEach((nd) => {
-      const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey)
+    for (const nd of sourceAnalysisNodeDefs) {
+      const parentUuid = NodeDef.getParentUuid(nd)
+      const parentEntity = parentUuid ? Survey.getNodeDefByUuid(parentUuid)(sourceSurvey) : null
+      if (!parentEntity) {
+        throw new Error(`cloneChainFromSurvey: parent entity not found in source survey (parentUuid=${parentUuid})`)
+      }
       const parentName = NodeDef.getName(parentEntity)
       if (!targetEntityByName[parentName] && !missingEntityNames.includes(parentName)) {
         missingEntityNames.push(parentName)
       }
-    })
+    }
     if (missingEntityNames.length > 0) {
       throw new SystemError('chainView.cloneFromAnotherSurveyDialog.missingEntities', {
         entities: missingEntityNames.join(', '),
@@ -283,12 +284,15 @@ export const cloneChainFromSurvey = async (
       [Chain.keys.uuid]: uuidv4(),
       [Chain.keys.props]: _sanitizeChainPropsForClone({ sourceChain, sourceSurvey, targetSurvey }),
     }
-    const insertedChain = await ChainRepository.insertChainFull({
-      surveyId,
-      chain: newChain,
-      scriptCommon: Chain.getScriptCommon(sourceChain),
-      scriptEnd: Chain.getScriptEnd(sourceChain),
-    }, tx)
+    const insertedChain = await ChainRepository.insertChainFull(
+      {
+        surveyId,
+        chain: newChain,
+        scriptCommon: Chain.getScriptCommon(sourceChain),
+        scriptEnd: Chain.getScriptEnd(sourceChain),
+      },
+      tx
+    )
 
     const newChainUuid = Chain.getUuid(insertedChain)
 
