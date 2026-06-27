@@ -1,4 +1,4 @@
-import { Validation, ValidationFactory, Validations } from '@openforis/arena-core'
+import { Validation, ValidationFactory, ValidationFields, ValidationResult, Validations } from '@openforis/arena-core'
 
 import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
 
@@ -29,7 +29,12 @@ export const messageKeys = ValidatorErrorKeys
 
 // ====== CREATE
 
-export const newInstance = ValidationFactory.createInstance
+export const newInstance = (
+  valid: boolean = true,
+  fields: ValidationFields = {},
+  errors: ValidationResult[] = [],
+  warnings: ValidationResult[] = []
+) => ValidationFactory.createInstance({ valid, fields, errors, warnings })
 
 export const {
   isValid,
