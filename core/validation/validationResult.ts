@@ -1,4 +1,5 @@
 import { ValidationResult, ValidationResults, ValidationSeverity } from '@openforis/arena-core'
+export { ValidationSeverity as severity } from '@openforis/arena-core'
 
 export const keys = {
   key: 'key',
@@ -8,8 +9,6 @@ export const keys = {
 
   customErrorMessageKey: 'custom',
 } as const
-
-export const severity = ValidationSeverity
 
 export type Severity = ValidationSeverity
 
