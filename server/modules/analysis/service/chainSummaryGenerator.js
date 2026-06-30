@@ -201,7 +201,6 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     resultVariables: analysisNodeDefs.map((analysisNodeDef) =>
       generateResultVariableSummary({ survey, analysisNodeDef, lang })
     ),
-    ...statisticalAnalysisSummary,
   }
 }
 
