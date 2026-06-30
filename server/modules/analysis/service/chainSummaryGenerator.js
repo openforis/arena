@@ -1,6 +1,5 @@
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
