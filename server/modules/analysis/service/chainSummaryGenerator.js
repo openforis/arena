@@ -51,29 +51,6 @@ const generateResultVariableSummary = ({ survey, analysisNodeDef, lang }) => {
   return result
 }
 
-const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
-  const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
-  if (ChainStatisticalAnalysis.isEmpty(statisticalAnalysis)) return {}
-
-  const entity = Survey.getNodeDefByUuid(ChainStatisticalAnalysis.getEntityDefUuid(statisticalAnalysis))(survey)
-  const dimensions = Survey.getNodeDefsByUuids(ChainStatisticalAnalysis.getDimensionUuids(statisticalAnalysis))(survey)
-  const chainSamplingDesign = Chain.getSamplingDesign(chain)
-  const samplingStrategySpecified = !!ChainSamplingDesign.getSamplingStrategy(chainSamplingDesign)
-
-  return {
-    analysis: {
-      entity: NodeDef.getName(entity),
-      dimensions: dimensions.map(NodeDef.getName),
-      filter: ChainStatisticalAnalysis.getFilter(statisticalAnalysis),
-      reportingMethod: ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis),
-      clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
-      nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
-      ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
-      reportingArea: ChainStatisticalAnalysis.getReportingArea(statisticalAnalysis),
-    },
-  }
-}
-
 const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
   const hierarchicalCategories = Survey.getCategoriesArray(survey).filter(Category.isHierarchical)
   if (hierarchicalCategories.length === 0) {
@@ -155,8 +132,6 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     }),
     [`${key}CategoryLevel`]: codeAttrDef ? Survey.getNodeDefCategoryLevelIndex(codeAttrDef)(survey) + 1 : '',
   })
-
-  const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })
 
   return {
     ...surveySummary,
