@@ -6,6 +6,8 @@ import { heicTo } from 'heic-to'
 import { useI18n } from '@webapp/store/system'
 import LoadingBar from '@webapp/components/LoadingBar'
 
+import './ImagePreview.scss'
+
 const initialState = { error: false, loading: true }
 
 const mimeTypes = {
@@ -93,10 +95,19 @@ export const ImagePreview = ({ path, onLoadComplete = null, file = null }) => {
     <div className="survey-form__node-def-file__preview-image">
       {loading && <LoadingBar />}
       {!error && (
-        <img ref={imgRef} alt="" onLoad={onLoad} style={{ display: loading ? 'none' : 'block' }} onError={onError} />
+        <img
+          ref={imgRef}
+          alt=""
+          className={`image-preview__img${loading ? ' image-preview__img--hidden' : ''}`}
+          onLoad={onLoad}
+          onError={onError}
+        />
       )}
       {error && (
-        <span className="icon error icon-warning" title={i18n.t('surveyForm:nodeDefFile.errorLoadingPreview')} />
+        <span className="image-preview__error">
+          <span className="icon error icon-warning" />
+          {i18n.t('surveyForm:nodeDefFile.errorLoadingPreview')}
+        </span>
       )}
     </div>
   )
