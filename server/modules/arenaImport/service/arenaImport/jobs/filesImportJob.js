@@ -43,12 +43,12 @@ export default class FilesImportJob extends FileImportBaseJob {
           await this.persistFile(file)
         } else {
           const missingFileContentMessage = `Record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`
-          if (!skipMissingFiles) {
-            throw new Error(missingFileContentMessage)
-          } else {
+          if (skipMissingFiles) {
             const detailedMessage = `Survey ${surveyId} - ${missingFileContentMessage}`
             this.logWarn(detailedMessage)
             this.missingFileSummaries.push(fileSummary)
+          } else {
+            throw new Error(missingFileContentMessage)
           }
         }
         this.incrementProcessedItems()
