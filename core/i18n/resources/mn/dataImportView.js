@@ -95,6 +95,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
     preventAddingNewEntityData: 'Шинэ объектын өгөгдөл нэмэхийг хориглох',
     preventUpdatingRecordsInAnalysis: 'Шинжилгээний алхамд бичлэгүүдийг шинэчлэхийг хориглох',
     includeFiles: 'Файлуудыг оруулах',
+    skipMissingFiles: 'Дутуу файлуудыг алгасах',
     deleteExistingEntities: `Сонгогдсон объектын өгөгдлийг бүх бичлэгээс устгах`,
   },
   optionsInfo: {

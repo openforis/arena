@@ -21,6 +21,7 @@ export default class ArenaMobileDataImportJob extends Job {
    * @param {!number} [params.surveyId] - The id of the survey in which data will be imported.
    * @param {!string} [params.filePath] - The file path of the file to import.
    * @param {!string} [params.conflictResolutionStrategy] - How to resolve conflicting records (duplicate keys).
+   * @param {boolean} [params.skipMissingFiles] - When true, missing file content is logged as a warning instead of aborting.
    * @returns {ArenaMobileDataImportJob} - The import job.
    */
   constructor(params) {
