@@ -13,8 +13,6 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
 
   const { obj: object, validation } = state
 
-  const initialValidation = useMemo(() => Validation.getValidation(obj), [obj])
-
   const objectValid = Validation.isValid(validation)
 
   const setValidation = useCallback(
@@ -28,10 +26,10 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
   // Validation effect
   useEffect(() => {
     ;(async () => {
-      const validationNext = validatorFn ? await validatorFn(object) : initialValidation
+      const validationNext = validatorFn ? await validatorFn(object) : Validation.getValidation(object)
       setValidation(validationNext)
     })()
-  }, [initialValidation, object, validatorFn, setValidation])
+  }, [object, validatorFn, setValidation])
 
   const setObjectFields = (fieldValuePairs) => {
     setState((statePrev) => ({

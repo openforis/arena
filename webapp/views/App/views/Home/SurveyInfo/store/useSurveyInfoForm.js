@@ -26,7 +26,7 @@ export const useSurveyInfoForm = () => {
 
   useEffect(() => {
     setValidation(Validation.getValidation(surveyInfo))
-  }, [surveyInfo])
+  }, [setValidation, surveyInfo])
 
   // Setters
   const setCycles = (value) => {
