@@ -53,7 +53,11 @@ export const init = (app) => {
   app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting } = Request.getParams(req)
+      const {
+        surveyId,
+        conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting,
+        skipMissingFiles = false,
+      } = Request.getParams(req)
 
       const tempFile = await processChunkedFileForBackgroundMerge({ req })
       if (tempFile) {
@@ -62,6 +66,7 @@ export const init = (app) => {
           ...tempFile,
           surveyId,
           conflictResolutionStrategy,
+          skipMissingFiles,
         })
         res.json({ job: JobUtils.jobToJSON(job) })
       } else {

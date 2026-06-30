@@ -10,6 +10,7 @@ export const startArenaMobileImportJob = ({
   totalFileSize,
   surveyId,
   conflictResolutionStrategy,
+  skipMissingFiles = false,
 }) => {
   const job = new ArenaMobileDataImportJob({
     user,
@@ -19,6 +20,7 @@ export const startArenaMobileImportJob = ({
     totalFileSize,
     surveyId,
     conflictResolutionStrategy,
+    skipMissingFiles,
   })
 
   JobManager.enqueueJob(job)
