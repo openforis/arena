@@ -127,6 +127,7 @@ export const startDataImportFromArenaJob = ({
   chunkSize,
   onUploadProgress,
   dryRun = false,
+  skipMissingFiles = false,
   startFromChunk = 1,
 }) => {
   const commonParameters = {
@@ -134,6 +135,7 @@ export const startDataImportFromArenaJob = ({
     cycle,
     dryRun,
     conflictResolutionStrategy,
+    skipMissingFiles,
   }
   if (chunkSize > 0) {
     let fileProcessor = null
