@@ -41,9 +41,13 @@ const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
   const fileUuid = Node.getFileUuid(node)
   const file = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
-  const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
-  const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid })
-  return { fileName, file, contentStream }
+  if (file) {
+    const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
+    const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid })
+    return { fileName, file, contentStream }
+  } else {
+    throw new Error(`File not found for node ${nodeUuid}`)
+  }
 }
 
 export const init = (app) => {

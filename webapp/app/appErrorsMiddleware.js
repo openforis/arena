@@ -17,6 +17,7 @@ const errorIgnoredUrlRegExps = [
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/export\/start$/, // data query export
   /^\/api\/mobile\/survey\/\d+$/, // data import (Arena format)
   /^\/api\/2fa\/device\/[\w-]+\/verify$/, // 2FA device verification
+  /^\/api\/survey\/\d+\/record\/[\w-]+\/nodes\/[\w-]+\/file$/, // node file preview (errors handled locally in ImagePreview)
 ]
 
 const authorizationIgnoredUrlRegExps = [loginUrlRegExp, tokenRefreshUrlRegExp]

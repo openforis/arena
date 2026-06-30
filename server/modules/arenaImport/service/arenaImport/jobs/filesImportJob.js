@@ -33,9 +33,7 @@ export default class FilesImportJob extends FileImportBaseJob {
         const fileUuid = SurveyFile.getUuid(fileSummary)
         const fileName = SurveyFile.getName(fileSummary)
         const fileContent = await this.fetchFileContent({ fileName, fileUuid })
-        if (!fileContent && !skipMissingFiles) {
-          throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
-        }
+        const recordUuid = SurveyFile.getRecordUuid(fileSummary)
         if (fileContent) {
           file = SurveyFile.assocContent(fileContent)(file)
 
@@ -44,9 +42,14 @@ export default class FilesImportJob extends FileImportBaseJob {
 
           await this.persistFile(file)
         } else {
-          const recordUuid = SurveyFile.getRecordUuid(fileSummary)
-          this.logWarn(`Survey ${surveyId} record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`)
-          this.missingFileSummaries.push(fileSummary)
+          const missingFileContentMessage = `Record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`
+          if (!skipMissingFiles) {
+            throw new Error(missingFileContentMessage)
+          } else {
+            const detailedMessage = `Survey ${surveyId} - ${missingFileContentMessage}`
+            this.logWarn(detailedMessage)
+            this.missingFileSummaries.push(fileSummary)
+          }
         }
         this.incrementProcessedItems()
       }
