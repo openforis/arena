@@ -11,6 +11,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ChainManager from '../manager'
 import { Objects } from '@openforis/arena-core'
 import { ArrayUtils } from '@core/arrayUtils'
+import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
@@ -81,6 +82,29 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
   }
 }
 
+const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
+  const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
+  if (ChainStatisticalAnalysis.isEmpty(statisticalAnalysis)) return {}
+
+  const entity = Survey.getNodeDefByUuid(ChainStatisticalAnalysis.getEntityDefUuid(statisticalAnalysis))(survey)
+  const dimensions = Survey.getNodeDefsByUuids(ChainStatisticalAnalysis.getDimensionUuids(statisticalAnalysis))(survey)
+  const chainSamplingDesign = Chain.getSamplingDesign(chain)
+  const samplingStrategySpecified = !!ChainSamplingDesign.getSamplingStrategy(chainSamplingDesign)
+
+  return {
+    analysis: {
+      entity: NodeDef.getName(entity),
+      dimensions: dimensions.map(NodeDef.getName),
+      filter: ChainStatisticalAnalysis.getFilter(statisticalAnalysis),
+      reportingMethod: ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis),
+      clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
+      nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
+      ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
+      reportingArea: ChainStatisticalAnalysis.getReportingArea(statisticalAnalysis),
+    },
+  }
+}
+
 const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
   const chain = await ChainManager.fetchChain({ surveyId, chainUuid })
   if (!chain) {
@@ -131,6 +155,8 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     }),
     [`${key}CategoryLevel`]: codeAttrDef ? Survey.getNodeDefCategoryLevelIndex(codeAttrDef)(survey) + 1 : '',
   })
+
+  const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })
 
   return {
     ...surveySummary,
