@@ -96,6 +96,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
     preventAddingNewEntityData: 'Impedir a adição de novos dados de entidade',
     preventUpdatingRecordsInAnalysis: 'Impedir a atualização de registros na etapa Análise',
     includeFiles: 'Incluir arquivos',
+    skipMissingFiles: 'Ignorar arquivos ausentes',
     deleteExistingEntities: `Excluir os dados da entidade selecionada em todos os registros`,
   },
   optionsInfo: {

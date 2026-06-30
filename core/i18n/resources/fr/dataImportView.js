@@ -98,6 +98,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
     preventAddingNewEntityData: "Empêcher l'ajout de nouvelles données d'entité",
     preventUpdatingRecordsInAnalysis: "Empêcher la mise à jour des enregistrements à l'étape d'analyse",
     includeFiles: 'Inclure les fichiers',
+    skipMissingFiles: 'Ignorer les fichiers manquants',
     deleteExistingEntities: `Supprimer les données de l'entité sélectionnée dans tous les enregistrements`,
   },
   optionsInfo: {

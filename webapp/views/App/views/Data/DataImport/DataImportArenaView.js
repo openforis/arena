@@ -1,5 +1,3 @@
-import './ImportStartButton.scss'
-
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
@@ -14,8 +12,8 @@ import { JobActions } from '@webapp/store/app'
 import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
-import { Dropzone } from '@webapp/components'
-import { Dropdown } from '@webapp/components/form'
+import { Dropzone, Fieldset } from '@webapp/components'
+import { Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
@@ -63,9 +61,10 @@ export const DataImportArenaView = () => {
     file: null,
     fileId: null,
     chunkSize: defaultChunkSize,
+    skipMissingFiles: false,
   })
 
-  const { cycle, conflictResolutionStrategy, file, fileId, chunkSize } = state
+  const { cycle, conflictResolutionStrategy, file, fileId, chunkSize, skipMissingFiles } = state
 
   const onImportJobComplete = useCallback(
     async (jobCompleted) => {
@@ -101,28 +100,33 @@ export const DataImportArenaView = () => {
   return (
     <div className="data-import">
       <div className="form">
-        {surveyCycleKeys.length > 1 && (
-          <fieldset>
-            <legend>{i18n.t('dataImportView:options.header')}</legend>
-            <FormItem className="display-flex" label="dataImportView:importIntoCycle">
+        <Fieldset legend="dataImportView:options.header" className="data-import-options">
+          {surveyCycleKeys.length > 1 && (
+            <FormItem label="dataImportView:importIntoCycle">
               <CycleSelector selectedCycle={cycle} onChange={(cycle) => setState((state) => ({ ...state, cycle }))} />
             </FormItem>
-          </fieldset>
-        )}
+          )}
 
-        <FormItem
-          className="display-flex"
-          info="dataImportView:conflictResolutionStrategy.info"
-          label="dataImportView:conflictResolutionStrategy.label"
-        >
-          <Dropdown
-            itemLabel={(strategy) => i18n.t(`dataImportView:conflictResolutionStrategy.${strategy}`)}
-            itemValue={(item) => item}
-            items={Object.values(ConflictResolutionStrategy)}
-            onChange={(conflictResolutionStrategy) => setState((state) => ({ ...state, conflictResolutionStrategy }))}
-            selection={conflictResolutionStrategy}
-          />
-        </FormItem>
+          <FormItem
+            info="dataImportView:conflictResolutionStrategy.info"
+            label="dataImportView:conflictResolutionStrategy.label"
+          >
+            <Dropdown
+              itemLabel={(strategy) => i18n.t(`dataImportView:conflictResolutionStrategy.${strategy}`)}
+              itemValue={(item) => item}
+              items={Object.values(ConflictResolutionStrategy)}
+              onChange={(conflictResolutionStrategy) => setState((state) => ({ ...state, conflictResolutionStrategy }))}
+              selection={conflictResolutionStrategy}
+            />
+          </FormItem>
+
+          <FormItem label="dataImportView:options.skipMissingFiles">
+            <Checkbox
+              checked={skipMissingFiles}
+              onChange={(skipMissingFiles) => setState((state) => ({ ...state, skipMissingFiles }))}
+            />
+          </FormItem>
+        </Fieldset>
 
         <Dropzone maxSize={fileMaxSizeMB} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
 
@@ -137,7 +141,15 @@ export const DataImportArenaView = () => {
           disabled={!file}
           showConfirm
           startFunction={API.startDataImportFromArenaJob}
-          startFunctionParams={{ surveyId, cycle, conflictResolutionStrategy, file, fileId, chunkSize }}
+          startFunctionParams={{
+            surveyId,
+            cycle,
+            conflictResolutionStrategy,
+            file,
+            fileId,
+            chunkSize,
+            skipMissingFiles,
+          }}
           onUploadComplete={onImportJobStart}
         />
       </div>

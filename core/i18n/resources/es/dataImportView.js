@@ -73,6 +73,7 @@ export default {
     preventAddingNewEntityData: 'Prevenir la adición de nuevos datos de entidad',
     preventUpdatingRecordsInAnalysis: 'Prevenir la actualización de registros en el paso de análisis',
     includeFiles: 'Incluir archivos',
+    skipMissingFiles: 'Ignorar archivos faltantes',
     deleteExistingEntities: 'Eliminar los datos de la entidad seleccionada en todos los registros',
   },
   optionsInfo: {
