@@ -1,6 +1,6 @@
 import { Objects } from '@openforis/arena-core'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import * as Validation from '@core/validation/validation'
 
