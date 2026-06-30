@@ -17,8 +17,8 @@ export default class RFileStatisticalAnalysis extends RFileSystem {
       await super.init()
 
       await this.appendContent(
-        source('https://raw.githubusercontent.com/openforis/r-arena/master/arena_survey_analysis.R'),
-        setVar('arena_process_response', 'arenaAnalytics( )'),
+        source('https://raw.githubusercontent.com/openforis/r-arena/master/arena_analysis_for_Shiny.R'),
+        setVar('arena_process_response', 'arenaAnalytics_LowAggData()'),
         print('arena_process_response')
       )
     }
