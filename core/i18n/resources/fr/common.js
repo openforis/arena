@@ -1170,6 +1170,8 @@ Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un att
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Synonyme / Latin',
       extraPropsNotDefined: 'Propriétés supplémentaires non définies pour cette taxonomie',
+      importMissingPublishedTaxa:
+        '{{count}} taxon(s) publié(s) introuvable(s) dans le fichier importé et laissé(s) inchangé(s). Codes : {{codes}}',
     },
     taxaCount: 'Nombre de taxons',
     vernacularNameLabel: 'Étiquette du nom vernaculaire',
