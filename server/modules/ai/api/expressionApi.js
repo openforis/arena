@@ -88,6 +88,8 @@ export const init = (app) => {
             if (abortController.signal.aborted) break
             writeEvent({ chunk })
           }
+          // Stream may exit cleanly when aborted (no exception thrown) — check here too.
+          if (timedOut) writeEvent({ error: 'aiRequestTimeout' })
         } catch (error) {
           if (error?.name === 'AbortError') {
             if (timedOut) writeEvent({ error: 'aiRequestTimeout' })
