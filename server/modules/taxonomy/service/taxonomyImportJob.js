@@ -42,6 +42,7 @@ export default class TaxonomyImportJob extends Job {
     this.extraPropsDefs = null
     this.taxonCSVParser = null
     this.currentRow = 0
+    this.missingPublishedTaxaCodes = []
   }
 
   async execute() {
@@ -92,7 +93,8 @@ export default class TaxonomyImportJob extends Job {
       } else {
         this.logDebug('no errors found, finalizing import')
         try {
-          await this.taxonomyImportManager.finalizeImport()
+          const { missingPublishedCodes } = await this.taxonomyImportManager.finalizeImport()
+          this.missingPublishedTaxaCodes = missingPublishedCodes
         } catch (error) {
           if (error instanceof SystemError) {
             const { key, params } = error
@@ -109,6 +111,14 @@ export default class TaxonomyImportJob extends Job {
         }
       }
     }
+  }
+
+  generateResult() {
+    const result = super.generateResult()
+    if (this.missingPublishedTaxaCodes.length > 0) {
+      result.missingPublishedTaxaCodes = this.missingPublishedTaxaCodes
+    }
+    return result
   }
 
   async cancel() {

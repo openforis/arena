@@ -1140,6 +1140,9 @@ $t(common.appNameFull)
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Синоним / Латинское название',
       extraPropsNotDefined: 'Дополнительные свойства не определены для этой таксономии',
+      importMissingPublishedTaxa:
+        '{{count}} опубликованный таксон/таксона не найден(ы) в импортируемом файле и оставлен(ы) без изменений. Коды: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (ещё {{extra}})',
     },
     taxaCount: 'Количество таксонов',
     vernacularNameLabel: 'Метка местного названия',
