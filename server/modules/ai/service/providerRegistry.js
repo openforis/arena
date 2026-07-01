@@ -75,7 +75,9 @@ export const buildModel = (cfg) => {
     case providers.openaiCompatible: {
       if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })
       // apiKey is optional for some local servers (e.g. Ollama with no auth)
-      return createOpenAI({ apiKey: apiKey || 'not-used', baseURL: baseUrl })(model)
+      // Use .chat() explicitly — the default call now routes to the OpenAI Responses API
+      // (/v1/responses), which most OpenAI-compatible providers don't implement.
+      return createOpenAI({ apiKey: apiKey || 'not-used', baseURL: baseUrl }).chat(model)
     }
     case providers.vercelAiSdk: {
       if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })
