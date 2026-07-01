@@ -1367,6 +1367,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Explain this expression',
       thinking: 'Asking the AI to explain this expression…',
       error: 'Failed to fetch explanation: {{message}}',
+      timeout: 'The AI took too long to respond. Please try again.',
     },
   },
 
