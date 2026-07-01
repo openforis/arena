@@ -13,6 +13,7 @@ import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import InnerJobs from './InnerJobs'
 import JobErrors from './JobErrors'
 import JobProgress from './JobProgress'
+import JobTiming from './JobTiming'
 
 const getCustomCloseButtonComponent = ({ closeButton, closeButtonProps, job }) => {
   if (!closeButton || !JobSerialized.isSucceeded(job)) return null
@@ -35,6 +36,7 @@ const JobMonitor = () => {
     <Modal className="app-job-monitor" closeOnEsc={false} title={`jobs:${JobSerialized.getType(job)}`}>
       <ModalBody>
         <JobProgress job={job} />
+        <JobTiming job={job} />
         <JobErrors
           errorKeyHeaderName={errorKeyHeaderName}
           exportFileName={errorsExportFileName}

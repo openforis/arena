@@ -7,6 +7,7 @@ import { useI18n } from '@webapp/store/system'
 
 import JobProgress from '../../JobProgress'
 import JobErrors from '../../JobErrors'
+import JobTiming from '../../JobTiming'
 
 const InnerJob = ({ isCurrentJob = false, innerJob, index }) => {
   const i18n = useI18n()
@@ -29,6 +30,7 @@ const InnerJob = ({ isCurrentJob = false, innerJob, index }) => {
         {(isCurrentJob || JobSerialized.isEnded(innerJob)) && (
           <JobProgress isCurrentJob={isCurrentJob} job={innerJob} />
         )}
+        <JobTiming job={innerJob} />
       </div>
       <JobErrors job={innerJob} />
     </>
