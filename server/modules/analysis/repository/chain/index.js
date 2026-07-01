@@ -1,4 +1,4 @@
-export { insertChain } from './create'
+export { insertChain, insertChainFull } from './create'
 export { insertMany } from './insert'
 
 export { countChains, fetchChains, fetchChain } from './read'
