@@ -30,10 +30,15 @@ export const useUpload = ({ setState }) => {
       dispatch(SurveyActions.metaUpdated())
       const missingPublishedTaxaCodes = JobSerialized.getResult(job)?.missingPublishedTaxaCodes
       if (missingPublishedTaxaCodes?.length > 0) {
+        const maxDisplayCodes = 10
+        const codes = missingPublishedTaxaCodes.slice(0, maxDisplayCodes).join(', ')
+        const extra = missingPublishedTaxaCodes.length - maxDisplayCodes
+        const key =
+          extra > 0 ? 'taxonomy.edit.importMissingPublishedTaxaTruncated' : 'taxonomy.edit.importMissingPublishedTaxa'
         dispatch(
           NotificationActions.notifyWarning({
-            key: 'taxonomy.edit.importMissingPublishedTaxa',
-            params: { count: missingPublishedTaxaCodes.length, codes: missingPublishedTaxaCodes.join(', ') },
+            key,
+            params: { count: missingPublishedTaxaCodes.length, codes, extra },
             autoHide: false,
           })
         )

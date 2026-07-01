@@ -1133,6 +1133,7 @@ $t(common.appNameFull)
       extraPropsNotDefined: 'Энэ таксономын нэмэлт шинж чанарууд тодорхойлогдоогүй',
       importMissingPublishedTaxa:
         '{{count}} нийтлэгдсэн таксон импортлосон файлд олдоогүй тул өөрчлөгдөлгүй үлдлээ. Кодууд: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} дахин)',
     },
     taxaCount: 'Таксоны тоо',
     vernacularNameLabel: 'Нутгийн нэрийн шошго',
