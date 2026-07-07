@@ -112,18 +112,3 @@ export const isSucceeded = _isPropTrue(keys.succeeded)
 export const isFailed = _isPropTrue(keys.failed)
 export const isEnded = _isPropTrue(keys.ended)
 export const isCanceled = _isPropTrue(keys.canceled)
-
-/**
- * Determines the CSS icon class representing an inner job's status, for at-a-glance
- * progress display in a sequential inner-jobs list.
- * @param {object} innerJob - Serialized inner job object.
- * @param {boolean} [isCurrentJob] - Whether this inner job is the one currently running.
- * @returns {string} Icon class name, one of "icon-checkbox-checked", "icon-cross",
- *   "icon-spinner" or "icon-checkbox-unchecked".
- */
-export const getInnerJobStatusIconClass = (innerJob, isCurrentJob = false) => {
-  if (isSucceeded(innerJob)) return 'icon-checkbox-checked'
-  if (isFailed(innerJob)) return 'icon-cross'
-  if (isCurrentJob) return 'icon-spinner'
-  return 'icon-checkbox-unchecked'
-}

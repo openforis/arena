@@ -9,12 +9,19 @@ import JobProgress from '../../JobProgress'
 import JobErrors from '../../JobErrors'
 import JobTiming from '../../JobTiming'
 
+const getStatusIconClass = (innerJob, isCurrentJob) => {
+  if (JobSerialized.isSucceeded(innerJob)) return 'icon-checkbox-checked'
+  if (JobSerialized.isFailed(innerJob)) return 'icon-cross'
+  if (isCurrentJob) return 'icon-spinner'
+  return 'icon-checkbox-unchecked'
+}
+
 const InnerJob = ({ isCurrentJob = false, innerJob, index }) => {
   const i18n = useI18n()
   const elementRef = useRef(null)
 
   const isRunning = JobSerialized.isRunning(innerJob)
-  const statusIconClass = JobSerialized.getInnerJobStatusIconClass(innerJob, isCurrentJob)
+  const statusIconClass = getStatusIconClass(innerJob, isCurrentJob)
 
   useEffect(() => {
     if (isRunning && elementRef.current) {

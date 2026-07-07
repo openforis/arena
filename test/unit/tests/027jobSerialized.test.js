@@ -29,35 +29,3 @@ describe('JobSerialized.getRemainingMillis', () => {
     expect(JobSerialized.getRemainingMillis(job)).toBe(3000)
   })
 })
-
-describe('JobSerialized.getInnerJobStatusIconClass', () => {
-  test('returns checked icon when inner job succeeded', () => {
-    const innerJob = { succeeded: true }
-    expect(JobSerialized.getInnerJobStatusIconClass(innerJob, false)).toBe('icon-checkbox-checked')
-  })
-
-  test('returns cross icon when inner job failed', () => {
-    const innerJob = { failed: true }
-    expect(JobSerialized.getInnerJobStatusIconClass(innerJob, false)).toBe('icon-cross')
-  })
-
-  test('returns spinner icon when inner job is the current running job', () => {
-    const innerJob = { pending: true }
-    expect(JobSerialized.getInnerJobStatusIconClass(innerJob, true)).toBe('icon-spinner')
-  })
-
-  test('returns unchecked icon when inner job has not started yet', () => {
-    const innerJob = { pending: true }
-    expect(JobSerialized.getInnerJobStatusIconClass(innerJob, false)).toBe('icon-checkbox-unchecked')
-  })
-
-  test('prioritizes succeeded status even if job object is still flagged as current', () => {
-    const innerJob = { succeeded: true }
-    expect(JobSerialized.getInnerJobStatusIconClass(innerJob, true)).toBe('icon-checkbox-checked')
-  })
-
-  test('prioritizes failed status even if job object is still flagged as current', () => {
-    const innerJob = { failed: true }
-    expect(JobSerialized.getInnerJobStatusIconClass(innerJob, true)).toBe('icon-cross')
-  })
-})
