@@ -27,6 +27,8 @@ const filterExtraPropsColumns = (columns) =>
   columns.filter((column) => !fixedColumns.includes(column) && !languageCodesISO639part2.includes(column))
 
 export default class TaxonomyImportJob extends Job {
+  static maxMissingPublishedTaxaCodesPreview = 10
+
   constructor(params) {
     super(TaxonomyImportJob.type, params)
 
@@ -115,8 +117,13 @@ export default class TaxonomyImportJob extends Job {
 
   generateResult() {
     const result = super.generateResult()
-    if (this.missingPublishedTaxaCodes.length > 0) {
-      result.missingPublishedTaxaCodes = this.missingPublishedTaxaCodes
+    const { missingPublishedTaxaCodes } = this
+    if (missingPublishedTaxaCodes.length > 0) {
+      result.missingPublishedTaxaCodes = missingPublishedTaxaCodes.slice(
+        0,
+        TaxonomyImportJob.maxMissingPublishedTaxaCodesPreview
+      )
+      result.missingPublishedTaxaCodesTotal = missingPublishedTaxaCodes.length
     }
     return result
   }

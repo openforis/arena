@@ -28,17 +28,21 @@ export const useUpload = ({ setState }) => {
     async ({ taxonomyUuid, job }) => {
       await refreshTaxonomy({ taxonomyUuid })
       dispatch(SurveyActions.metaUpdated())
-      const missingPublishedTaxaCodes = JobSerialized.getResult(job)?.missingPublishedTaxaCodes
-      if (missingPublishedTaxaCodes?.length > 0) {
-        const maxDisplayCodes = 10
-        const codes = missingPublishedTaxaCodes.slice(0, maxDisplayCodes).join(', ')
-        const extra = missingPublishedTaxaCodes.length - maxDisplayCodes
+      const jobResult = JobSerialized.getResult(job)
+      const missingPublishedTaxaCodes = jobResult?.missingPublishedTaxaCodes
+      const missingPublishedTaxaCodesTotal = jobResult?.missingPublishedTaxaCodesTotal
+      if (missingPublishedTaxaCodesTotal > 0) {
+        dispatch(JobActions.hideJobMonitor())
+
+        const codes = missingPublishedTaxaCodes.join(', ')
+        const extra = missingPublishedTaxaCodesTotal - missingPublishedTaxaCodes.length
         const key =
           extra > 0 ? 'taxonomy.edit.importMissingPublishedTaxaTruncated' : 'taxonomy.edit.importMissingPublishedTaxa'
+
         dispatch(
           NotificationActions.notifyWarning({
             key,
-            params: { count: missingPublishedTaxaCodes.length, codes, extra },
+            params: { count: missingPublishedTaxaCodesTotal, codes, extra },
             autoHide: false,
           })
         )
