@@ -18,6 +18,12 @@
     font-size: 0.8rem;
     color: rgba($black, 0.55);
   }
+
+  .job-long-running-message {
+    font-size: 0.8rem;
+    color: $orange;
+    margin-top: 0.25rem;
+  }
 }
 
 .app-job-monitor__job-errors {
