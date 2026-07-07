@@ -15,6 +15,7 @@
 - Message stays visible once shown, for as long as the job is running; disappears once `JobSerialized.isEnded(job)` is true (spec section "2.").
 - Example message text (English only — other locales are an explicit follow-up, not part of this plan): `This import is taking a while. Try splitting the file into smaller chunks.`
 - This codebase has no React component test infra (no `@testing-library/react`, no `enzyme`/`react-test-renderer` in `package.json`) — existing components like `JobTiming`/`JobProgress` have no unit tests; only pure functions (e.g. `formatDuration`, `JobSerialized` selectors) are unit tested under `test/unit/tests/`. Follow that convention: no new component test is added; verification of `JobLongRunningMessage` is manual (Task 6).
+- New component files use TypeScript (`.tsx`), per user preference — the codebase already mixes `.tsx` and `.js` components (see `webapp/components/buttons/ButtonDelete.tsx`), so this is consistent with existing conventions. Existing files being modified (not created) stay in their current language.
 
 ---
 
@@ -192,35 +193,35 @@ git commit -m "Thread longRunningMessageKey through job monitor redux slice"
 ### Task 2: `JobLongRunningMessage` component
 
 **Files:**
-- Create: `webapp/views/App/JobMonitor/JobLongRunningMessage.js`
+- Create: `webapp/views/App/JobMonitor/JobLongRunningMessage.tsx`
 
 **Interfaces:**
 - Consumes: `JobSerialized.isEnded(job)` from `@common/job/jobSerialized` (existing export, confirmed at `common/job/jobSerialized.js:113`); `useI18n()` from `@webapp/store/system` (existing export, used the same way in `webapp/views/App/JobMonitor/JobTiming/JobTiming.js`).
-- Produces: default export `JobLongRunningMessage` React component with props `{ job, messageKey }` where `job` is a serialized job object and `messageKey` is `string | undefined`. Renders `null` unless the 60s timer has fired and `!JobSerialized.isEnded(job)`. Consumed by Task 3 (`JobMonitor.js`).
+- Produces: default export `JobLongRunningMessage` React component with typed props `{ job: Record<string, any>, messageKey?: string }`. Renders `null` unless the 60s timer has fired and `!JobSerialized.isEnded(job)`. Consumed by Task 3 (`JobMonitor.js`).
 
 - [ ] **Step 1: Create the component**
 
-Create `webapp/views/App/JobMonitor/JobLongRunningMessage.js`:
+Create `webapp/views/App/JobMonitor/JobLongRunningMessage.tsx`:
 
-```js
+```tsx
 import { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 import { useI18n } from '@webapp/store/system'
 
 const showMessageDelayMillis = 60 * 1000 // 1 minute
 
+type Props = {
+  job: Record<string, any>
+  messageKey?: string
+}
+
 /**
  * Displays a caller-specified message once a job has been running for
  * more than 1 minute without ending. Renders nothing if no messageKey
  * is provided, before the delay has elapsed, or once the job has ended.
- * @param {object} props - Component props.
- * @param {object} props.job - Serialized job object.
- * @param {string} [props.messageKey] - i18next key for the message to display.
- * @returns {React.ReactElement|null} The long-running message, or null when there is nothing to show.
  */
-const JobLongRunningMessage = ({ job, messageKey = undefined }) => {
+const JobLongRunningMessage = ({ job, messageKey = undefined }: Props) => {
   const i18n = useI18n()
   const [showMessage, setShowMessage] = useState(false)
 
@@ -238,23 +239,18 @@ const JobLongRunningMessage = ({ job, messageKey = undefined }) => {
   return <div className="job-long-running-message">{i18n.t(messageKey)}</div>
 }
 
-JobLongRunningMessage.propTypes = {
-  job: PropTypes.object.isRequired,
-  messageKey: PropTypes.string,
-}
-
 export default JobLongRunningMessage
 ```
 
 - [ ] **Step 2: Lint the new file**
 
-Run: `npx eslint --cache --fix webapp/views/App/JobMonitor/JobLongRunningMessage.js`
+Run: `npx eslint --cache --fix webapp/views/App/JobMonitor/JobLongRunningMessage.tsx`
 Expected: no errors.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add webapp/views/App/JobMonitor/JobLongRunningMessage.js
+git add webapp/views/App/JobMonitor/JobLongRunningMessage.tsx
 git commit -m "Add JobLongRunningMessage component"
 ```
 
@@ -328,7 +324,7 @@ git commit -m "Render JobLongRunningMessage in JobMonitor"
 
 **Interfaces:**
 - Consumes: `$orange` SCSS variable (existing, defined in `webapp/style/_vars.scss`, confirmed present via `cssVars.scss` re-export `--orange: #{$orange}`).
-- Produces: `.job-long-running-message` CSS class consumed by the `className` set in Task 2's `JobLongRunningMessage.js`.
+- Produces: `.job-long-running-message` CSS class consumed by the `className` set in Task 2's `JobLongRunningMessage.tsx`.
 
 - [ ] **Step 1: Add the style rule**
 
@@ -473,7 +469,7 @@ Expected: webpack dev server on port 9000, backend on port 9090, no compile erro
 
 - [ ] **Step 2: Temporarily lower the delay for a fast manual check**
 
-Locally edit `webapp/views/App/JobMonitor/JobLongRunningMessage.js`, changing:
+Locally edit `webapp/views/App/JobMonitor/JobLongRunningMessage.tsx`, changing:
 
 ```js
 const showMessageDelayMillis = 60 * 1000 // 1 minute
@@ -500,8 +496,8 @@ Trigger any other job that does not pass `longRunningMessageKey` (e.g. a Collect
 - [ ] **Step 5: Revert the temporary delay change**
 
 ```bash
-git checkout -- webapp/views/App/JobMonitor/JobLongRunningMessage.js
+git checkout -- webapp/views/App/JobMonitor/JobLongRunningMessage.tsx
 ```
 
 Run: `git status`
-Expected: `webapp/views/App/JobMonitor/JobLongRunningMessage.js` shows no diff (clean), all other files from Tasks 1-5 remain committed.
+Expected: `webapp/views/App/JobMonitor/JobLongRunningMessage.tsx` shows no diff (clean), all other files from Tasks 1-5 remain committed.
