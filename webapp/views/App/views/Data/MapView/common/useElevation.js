@@ -14,15 +14,23 @@ export const useElevation = ({ point, active = true }) => {
   const [elevation, setElevation] = useState('...')
 
   useEffect(() => {
+    let cancelled = false
+
     const fetchElevation = async () => {
       const { y: lat, x: lng } = pointLatLng ?? {}
       const _elevation = await API.fetchElevation({ surveyId, lat, lng })
-      setElevation(_elevation === null ? 'error' : _elevation)
+      if (!cancelled) {
+        setElevation(_elevation === null ? 'error' : _elevation)
+      }
     }
-    if (active && pointLatLng) {
+    if (active && surveyId && pointLatLng) {
       fetchElevation()
     } else {
       setElevation('...')
+    }
+
+    return () => {
+      cancelled = true
     }
   }, [active, pointLatLng, surveyId])
 
