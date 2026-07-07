@@ -1,5 +1,14 @@
 @use '~@webapp/style/vars' as *;
 
+@keyframes app-job-monitor-inner-job-spinner-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .app-job-monitor {
   .modal-body {
     padding-top: 0;
@@ -46,6 +55,25 @@
 
       .name {
         font-size: 0.9rem;
+
+        .status-icon {
+          display: inline-block;
+          width: 1rem;
+          margin-right: 0.3rem;
+          text-align: center;
+
+          &.icon-checkbox-checked {
+            color: $green;
+          }
+
+          &.icon-cross {
+            color: $red;
+          }
+
+          &.icon-spinner {
+            animation: app-job-monitor-inner-job-spinner-spin 1s linear infinite;
+          }
+        }
       }
 
       .job-timing {
