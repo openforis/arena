@@ -8,10 +8,10 @@ import { MapMarkerPopup } from './MapMarkerPopup'
 export const MapMarker = (props) => {
   const { editable, point, title } = props
 
-  const { markerEventHandlers, markerRef, pointLatLon, pointUpdated } = useMapMarker(props)
+  const { markerEventHandlers, markerRef, pointLatLon, popupOpen, pointUpdated } = useMapMarker(props)
 
   const actualPoint = pointUpdated ?? point
-  const elevation = useElevation({ point: actualPoint, active: !!actualPoint })
+  const elevation = useElevation({ point: actualPoint, active: !!actualPoint && popupOpen })
 
   if (!pointLatLon) {
     // invalid location
