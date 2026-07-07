@@ -55,7 +55,7 @@ export default {
       importWithFilesCompleteSuccessfully:
         '$t(dataImportView:jobs.DataImportJob.importCompleteSuccessfully)\n        - {{insertedFiles}} archivos insertados\n        - {{updatedFiles}} archivos actualizados\n        - {{deletedFiles}} archivos eliminados',
       importCompleteWithErrors: '## Importación completada (con errores):\n        - {{processed}} filas procesadas',
-      tooLong: 'Esta importación está tardando bastante. Intente dividir el archivo en partes más pequeñas.',
+      tooLong: 'Esta importación está tardando bastante. $t(common.trySplittingFileIntoSmallerChunks)',
     },
     DataImportValidationJob: {
       validationCompleteWithErrors:
@@ -66,6 +66,7 @@ export default {
         '## Validación completada sin errores\n        - {{processed}} filas procesadas\n        - {{insertedRecords}} registros se crearían\n        - {{updatedRecords}} registros se actualizarían\n        - {{entitiesCreated}} entidades se crearían\n        - {{entitiesDeleted}} entidades se eliminarían\n        - {{updatedValues}} valores se actualizarían',
       validationWithFilesCompleteSuccessfully:
         '$t(dataImportView:jobs.DataImportValidationJob.validationCompleteSuccessfully)\n        - {{insertedFiles}} archivos se insertarían\n        - {{updatedFiles}} archivos se actualizarían\n        - {{deletedFiles}} archivos se eliminarían',
+      tooLong: 'Esta validación está tardando bastante. $t(common.trySplittingFileIntoSmallerChunks)',
     },
   },
   options: {

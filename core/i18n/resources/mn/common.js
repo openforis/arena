@@ -182,6 +182,7 @@ export default {
     to: 'Хүртэл',
     totalItems: 'Нийт элемент',
     true: 'Үнэн',
+    trySplittingFileIntoSmallerChunks: 'Файлыг жижиг хэсгүүдэд хуваахыг оролдоно уу.',
     type: 'Төрөл',
     undefinedName: 'Тодорхойгүй нэр',
     unique: 'Өвөрмөц',
