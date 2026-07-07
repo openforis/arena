@@ -14,6 +14,7 @@ const InnerJob = ({ isCurrentJob = false, innerJob, index }) => {
   const elementRef = useRef(null)
 
   const isRunning = JobSerialized.isRunning(innerJob)
+  const statusIconClass = JobSerialized.getInnerJobStatusIconClass(innerJob, isCurrentJob)
 
   useEffect(() => {
     if (isRunning && elementRef.current) {
@@ -25,6 +26,7 @@ const InnerJob = ({ isCurrentJob = false, innerJob, index }) => {
     <>
       <div className="job" ref={elementRef}>
         <div className="name">
+          <span className={`icon status-icon ${statusIconClass}`} />
           {index + 1}. {i18n.t(`jobs:${JobSerialized.getType(innerJob)}`)}
         </div>
         {(isCurrentJob || JobSerialized.isEnded(innerJob)) && (
