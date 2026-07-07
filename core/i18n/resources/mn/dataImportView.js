@@ -71,6 +71,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{deletedFiles}} файл устгагдсан`,
       importCompleteWithErrors: `## Импорт дууссан (алдаатай):
         - {{processed}} мөр боловсруулагдсан`,
+      tooLong: `Энэ импорт удаж байна. Файлыг жижиг хэсгүүдэд хуваахыг оролдоно уу.`,
     },
     DataImportValidationJob: {
       validationCompleteWithErrors: `## Баталгаажуулалт дууссан ({{errorsFoundMessage}})

@@ -72,6 +72,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{deletedFiles}} arquivos excluídos`,
       importCompleteWithErrors: `## Importação concluída (com erros):
         - {{processed}} linhas processadas`,
+      tooLong: `Esta importação está demorando um pouco. Tente dividir o arquivo em partes menores.`,
     },
     DataImportValidationJob: {
       validationCompleteWithErrors: `## Validação concluída ({{errorsFoundMessage}})

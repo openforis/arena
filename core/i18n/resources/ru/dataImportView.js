@@ -71,6 +71,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{deletedFiles}} файлов удалено`,
       importCompleteWithErrors: `## Импорт завершен (с ошибками):
         - {{processed}} строк обработано`,
+      tooLong: `Импорт занимает много времени. Попробуйте разбить файл на меньшие части.`,
     },
     DataImportValidationJob: {
       validationCompleteWithErrors: `## Проверка завершена ({{errorsFoundMessage}})

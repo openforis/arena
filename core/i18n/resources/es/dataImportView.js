@@ -55,6 +55,7 @@ export default {
       importWithFilesCompleteSuccessfully:
         '$t(dataImportView:jobs.DataImportJob.importCompleteSuccessfully)\n        - {{insertedFiles}} archivos insertados\n        - {{updatedFiles}} archivos actualizados\n        - {{deletedFiles}} archivos eliminados',
       importCompleteWithErrors: '## Importación completada (con errores):\n        - {{processed}} filas procesadas',
+      tooLong: 'Esta importación está tardando bastante. Intente dividir el archivo en partes más pequeñas.',
     },
     DataImportValidationJob: {
       validationCompleteWithErrors:
