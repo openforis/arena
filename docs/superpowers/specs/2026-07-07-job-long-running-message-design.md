@@ -19,8 +19,7 @@ content chosen by the code that dispatched the job.
 - No behavior change for existing callers that don't supply the new option.
 - Demonstrate the feature on the CSV/flat-data import job
   (`DataImportFlatDataView.js`) with the message:
-  > The data import is taking too long; try to split the imported file into
-  > smaller chunks and try it again.
+  > This import is taking a while. Try splitting the file into smaller chunks.
 
 ## Non-goals
 
@@ -106,7 +105,7 @@ In `core/i18n/resources/en/dataImportView.js`, add under the existing
 `jobs.DataImportJob` object:
 
 ```js
-tooLong: 'The data import is taking too long; try to split the imported file into smaller chunks and try it again.',
+tooLong: 'This import is taking a while. Try splitting the file into smaller chunks.',
 ```
 
 Other locale files (`fr`, `es`, `pt`, `ru`, `mn`) are left untouched for
