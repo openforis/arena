@@ -143,10 +143,6 @@ export default {
       markers: '{{count}} marcadores',
       markers_one: '{{count}} marcador',
       markers_other: '{{count}} marcadores',
-      sortAsc: 'Ordenar ascendente',
-      sortDesc: 'Ordenar descendente',
-      sort: 'Ordenar',
-      sortNone: 'Quitar orden',
     },
   },
 }
