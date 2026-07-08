@@ -43,12 +43,27 @@ export const useQuerySortableVariables = ({ query }) => {
   const cycle = useSurveyCycleKey()
   const entityDef = useNodeDefByUuid(entityDefUuid)
 
+  const prerequisitesReady = Boolean(survey && entityDef && attributeDefUuids && lang)
+
   const [variables, setVariables] = useState([])
   useEffect(() => {
-    if (survey && entityDef && attributeDefUuids && lang) {
-      fetchVariables({ survey, cycle, entityDef, attributeDefUuids, lang }).then(setVariables)
-    }
-  }, [survey, cycle, entityDef, attributeDefUuids, lang])
+    if (!prerequisitesReady) return undefined
 
-  return variables
+    let active = true
+
+    fetchVariables({ survey, cycle, entityDef, attributeDefUuids, lang }).then(
+      (variablesFetched) => {
+        if (active) setVariables(variablesFetched)
+      },
+      (error) => {
+        if (active) setVariables([])
+      }
+    )
+
+    return () => {
+      active = false
+    }
+  }, [prerequisitesReady, survey, cycle, entityDef, attributeDefUuids, lang])
+
+  return prerequisitesReady ? variables : []
 }
