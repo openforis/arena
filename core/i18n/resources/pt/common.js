@@ -1168,6 +1168,9 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Sinônimo / Latim',
       extraPropsNotDefined: 'Propriedades extras não definidas para esta taxonomia',
+      importMissingPublishedTaxa:
+        '{{count}} táxon/taxa publicado(s) não encontrado(s) no arquivo importado e mantido(s) sem alterações. Códigos: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} mais)',
     },
     taxaCount: 'Contagem de táxons',
     vernacularNameLabel: 'Rótulo do nome vernacular',
