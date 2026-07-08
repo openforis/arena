@@ -2,12 +2,12 @@ import './Notification.scss'
 import { useDispatch } from 'react-redux'
 import { CSSTransition } from 'react-transition-group'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18nT } from '@webapp/store/system'
 import { NotificationActions, useNotification } from '@webapp/store/ui'
 
 const Notification = () => {
   const dispatch = useDispatch()
-  const i18n = useI18n()
+  const t = useI18nT({ unescapeHtml: true })
   const { messageParams, messageKey, severity, visible } = useNotification()
 
   return (
@@ -21,7 +21,7 @@ const Notification = () => {
           <span className="icon icon-cross icon-8px" />
         </button>
 
-        <div className="notification-content">{i18n.t(messageKey, messageParams)}</div>
+        <div className="notification-content">{t(messageKey, messageParams)}</div>
       </div>
     </CSSTransition>
   )

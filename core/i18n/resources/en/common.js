@@ -1165,6 +1165,9 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Synonym / Latin',
       extraPropsNotDefined: 'Extra properties not defined for this taxonomy',
+      importMissingPublishedTaxa:
+        '{{count}} published taxon/taxa not found in the imported file and left unchanged. Codes: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} more)',
     },
     taxaCount: 'Taxa count',
     vernacularNameLabel: 'Vernacular name label',
