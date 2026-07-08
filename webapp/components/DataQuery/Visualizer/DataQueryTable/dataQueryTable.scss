@@ -35,6 +35,10 @@ $rowHeaderHeight: 45px;
       .table__cell-content-wrapper {
         display: flex;
         justify-content: center;
+
+        .btn-sort-toggle {
+          margin-right: 0.3rem;
+        }
       }
     }
 
