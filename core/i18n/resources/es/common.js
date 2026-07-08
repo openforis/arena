@@ -1024,6 +1024,9 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Sinónimo / Latín',
       extraPropsNotDefined: 'Propiedades extra no definidas para esta taxonomía',
+      importMissingPublishedTaxa:
+        '{{count}} taxón/taxa publicado/s no encontrado/s en el archivo importado y dejado/s sin cambios. Códigos: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} más)',
     },
     taxaCount: 'Recuento de taxones',
     vernacularNameLabel: 'Etiqueta de nombre vernáculo',
