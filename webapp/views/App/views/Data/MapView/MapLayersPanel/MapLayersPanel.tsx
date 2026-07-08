@@ -84,9 +84,9 @@ type SortButtonProps = {
 const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
   const i18n = useI18n()
   const tooltipKeyBySortOrder: Record<SortOrder, string> = {
-    asc: 'dataView:mapView.layersPanel.sortDesc',
-    desc: 'dataView:mapView.layersPanel.sortNone',
-    none: 'dataView:mapView.layersPanel.sortAsc',
+    asc: 'common.sortDesc',
+    desc: 'common.sortNone',
+    none: 'common.sortAsc',
   }
   const tooltipKey = tooltipKeyBySortOrder[sortOrder]
   const iconClass = sortOrder === 'desc' ? 'icon-sort-alpha-desc' : 'icon-sort-alpha-asc'
@@ -107,7 +107,7 @@ const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
       >
         <span className={`icon icon-12px ${iconClass}`} />
         <Typography component="span" sx={{ fontSize: '0.68rem', lineHeight: 1, color: 'inherit' }}>
-          {i18n.t('dataView:mapView.layersPanel.sort')}
+          {i18n.t('common.sort')}
         </Typography>
       </IconButton>
     </Tooltip>
