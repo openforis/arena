@@ -4,9 +4,11 @@ import { useI18n } from '@webapp/store/system'
 
 const buildLayerNameHtml = ({ innerName, extraButtons = '', colorPickerId, markersColor, changeMarkerColorTitle }) =>
   `<div class="layer-selector-row">
-      <span class="layer-selector-name">${innerName}</span>
       <span class="layer-selector-button-bar">
         <input type="color" id="${colorPickerId}" value="${markersColor}" class="layer-color-picker" title="${changeMarkerColorTitle}" />
+      </span>
+      <span class="layer-selector-name">${innerName}</span>
+      <span class="layer-selector-button-bar">
         ${extraButtons}
       </span>
     </div>`
