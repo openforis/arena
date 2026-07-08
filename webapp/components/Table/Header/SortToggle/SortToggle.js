@@ -2,7 +2,7 @@ import './SortToggle.scss'
 
 import PropTypes from 'prop-types'
 
-const SortToggle = ({ sort, field, handleSortBy }) => {
+const SortToggle = ({ disabled = false, sort, field, handleSortBy }) => {
   return (
     <button
       type="button"
@@ -11,6 +11,7 @@ const SortToggle = ({ sort, field, handleSortBy }) => {
         ${sort.order || ''}
         ${sort.by === field ? '' : 'inactive'}
       `}
+      disabled={disabled}
       onClick={() => handleSortBy(field)}
     >
       <span className="icon icon-play3 icon-10px arrow-toggle" />
@@ -19,6 +20,7 @@ const SortToggle = ({ sort, field, handleSortBy }) => {
 }
 
 SortToggle.propTypes = {
+  disabled: PropTypes.bool,
   sort: PropTypes.object.isRequired,
   field: PropTypes.string.isRequired,
   handleSortBy: PropTypes.func.isRequired,

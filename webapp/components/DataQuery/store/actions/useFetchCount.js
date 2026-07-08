@@ -14,7 +14,7 @@ export const useFetchCount = ({ setCount }) => {
   return {
     fetchCount: useCallback(
       async ({ query }) => {
-        setCount({ ...initialState, loading: true, loaded: false })
+        setCount((prevCount) => ({ ...prevCount, loading: true, loaded: false, error: false }))
         try {
           const { data } = await axios.post(`${getUrl({ surveyId, query })}/count`, {
             cycle,

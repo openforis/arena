@@ -39,6 +39,7 @@ const DataQueryTable = (props) => {
         codesVisible={codesVisible}
         colWidth={colWidth}
         colIndexWidth={colIndexWidth}
+        dataLoading={dataLoading}
         nodeDefCols={nodeDefCols}
         nodeDefLabelType={nodeDefLabelType}
         onChangeQuery={onChangeQuery}

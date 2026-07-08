@@ -38,7 +38,16 @@ const getColLabelKey = ({ columnName, nodeDef }) => {
 }
 
 const ColumnHeader = (props) => {
-  const { codesVisible, colWidth, nodeDef, nodeDefLabelType, onChangeQuery, query, sortableVariablesByUuid } = props
+  const {
+    codesVisible,
+    colWidth,
+    dataLoading,
+    nodeDef,
+    nodeDefLabelType,
+    onChangeQuery,
+    query,
+    sortableVariablesByUuid,
+  } = props
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -71,6 +80,8 @@ const ColumnHeader = (props) => {
   }
 
   const handleSortBy = () => {
+    if (dataLoading) return
+
     let sortUpdated
     if (!sortCriteria) {
       const newSortCriteria = SortCriteria.assocOrderAsc(
@@ -95,7 +106,12 @@ const ColumnHeader = (props) => {
         ) : (
           <>
             {sortable && (
-              <SortToggle sort={sortToggleSort} field={sortableVariable.value} handleSortBy={handleSortBy} />
+              <SortToggle
+                disabled={dataLoading}
+                sort={sortToggleSort}
+                field={sortableVariable.value}
+                handleSortBy={handleSortBy}
+              />
             )}
             <span className="ellipsis">{nodeDefLabel}</span>
             {isMeasure && canEditMeasure && (
@@ -153,6 +169,7 @@ const ColumnHeader = (props) => {
 ColumnHeader.propTypes = {
   codesVisible: PropTypes.bool.isRequired,
   colWidth: PropTypes.number.isRequired,
+  dataLoading: PropTypes.bool,
   nodeDef: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
