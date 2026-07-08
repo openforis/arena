@@ -13,7 +13,8 @@ const SortToggle = ({ disabled = false, sort, field, handleSortBy }) => {
   const i18n = useI18n()
 
   const active = sort.by === field
-  const tooltipKey = active ? tooltipKeyByOrder[sort.order] : 'common.sortAsc'
+  const tooltipKey = (active && tooltipKeyByOrder[sort.order]) || 'common.sortAsc'
+  const tooltip = i18n.t(tooltipKey)
 
   return (
     <button
@@ -25,7 +26,9 @@ const SortToggle = ({ disabled = false, sort, field, handleSortBy }) => {
       `}
       disabled={disabled}
       onClick={() => handleSortBy(field)}
-      title={i18n.t(tooltipKey)}
+      title={tooltip}
+      aria-label={tooltip}
+      aria-pressed={active}
     >
       <span className="icon icon-play3 icon-10px arrow-toggle" />
     </button>
