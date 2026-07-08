@@ -28,6 +28,8 @@ const createPredefinedTaxa = (taxonomy) => [
   }),
 ]
 
+const predefinedCodes = new Set([Taxon.unknownCode, Taxon.unlistedCode])
+
 export default class TaxonomyImportManager {
   constructor({ user, surveyId, taxonomy, vernacularLanguageCodes, extraPropsDefs, tx }) {
     this.user = user
@@ -45,6 +47,7 @@ export default class TaxonomyImportManager {
     )
     this.insertedCodes = new Set() // Inserted taxa codes
     this.insertedScientificNames = new Set() // Inserted taxa scientific names
+    this.seenCodes = new Set() // All codes seen in the imported file
     this.existingTaxaByCode = {} // Existing taxa (indexed by code)
     this.existingTaxaByScientificName = {} // Existing taxa (indexed by scientific name)
   }
@@ -103,7 +106,10 @@ export default class TaxonomyImportManager {
   }
 
   async addTaxonToUpdateBuffer(taxon) {
+    const code = Taxon.getCode(taxon)
+
     if (await this.updateExistingTaxonWithSameCodeIfAny(taxon)) {
+      this.seenCodes.add(code)
       return { success: true }
     }
 
@@ -115,7 +121,8 @@ export default class TaxonomyImportManager {
     // Insert new one
     await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon))
 
-    this.insertedCodes.add(Taxon.getCode(taxon))
+    this.insertedCodes.add(code)
+    this.seenCodes.add(code)
     this.insertedScientificNames.add(Taxon.getScientificName(taxon))
 
     return { success: true }
@@ -123,6 +130,11 @@ export default class TaxonomyImportManager {
 
   async finalizeImport() {
     const { user, surveyId } = this
+
+    // Compute published taxa codes absent from the imported file (before adding predefined taxa)
+    const missingPublishedCodes = Object.keys(this.existingTaxaByCode).filter(
+      (code) => !this.seenCodes.has(code) && !predefinedCodes.has(code)
+    )
 
     // Insert predefined taxa (UNL - UNK)
     const predefinedTaxaToInsert = R.pipe(
@@ -172,5 +184,7 @@ export default class TaxonomyImportManager {
       true,
       this.tx
     )
+
+    return { missingPublishedCodes }
   }
 }
