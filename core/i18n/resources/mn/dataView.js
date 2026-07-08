@@ -155,10 +155,6 @@ export default {
       markers: '{{count}} маркер',
       markers_one: '{{count}} маркер',
       markers_other: '{{count}} маркер',
-      sortAsc: 'Өсөх эрэмбэ',
-      sortDesc: 'Буурах эрэмбэ',
-      sort: 'Эрэмбэлэх',
-      sortNone: 'Эрэмбэ арилгах',
     },
   },
 }
