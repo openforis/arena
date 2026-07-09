@@ -108,6 +108,8 @@ export default {
 Вы хотите продолжить?`,
     local: 'Локально',
     loading: 'Загрузка...',
+    lock: 'Заблокировать',
+    unlock: 'Разблокировать',
     max: 'Максимум',
     med: 'Медиана',
     manage: 'Управление',
@@ -460,8 +462,6 @@ $t(common.raiseTicketInSupportForum)
       lock: 'Заблокировать редактирование ключевого атрибута',
       unlock: 'Разрешить редактирование ключевого атрибута',
     },
-    lock: 'Заблокировать',
-    unlock: 'Разблокировать',
   },
 
   dataExplorerView: {
@@ -790,8 +790,6 @@ $t(common.cantUndoWarning)`,
     reportingDataAttribute: 'Атрибут для {{level}}',
     reportingDataTableAndJoinsWithAttributes: 'Таблица отчетных данных и соединения с атрибутами',
     showSamplingAttributes: 'Показать атрибуты выборки',
-    lock: 'Заблокировать',
-    unlock: 'Разблокировать',
   },
 
   instancesView: {

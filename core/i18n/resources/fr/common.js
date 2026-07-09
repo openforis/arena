@@ -110,6 +110,8 @@ En confirmant, toutes les modifications seront perdues.
 Voulez-vous continuer ?`,
     local: 'Local',
     loading: 'Chargement...',
+    lock: 'Verrouiller',
+    unlock: 'Déverrouiller',
     max: 'Maximum',
     med: 'Médiane',
     manage: 'Gérer',
@@ -469,8 +471,6 @@ Merci et profitez de **$t(common.appNameFull)** !`,
       lock: "Verrouiller la modification de l'attribut clé",
       unlock: "Autoriser la modification de l'attribut clé",
     },
-    lock: 'Verrouiller',
-    unlock: 'Déverrouiller',
   },
 
   dataExplorerView: {
@@ -814,8 +814,6 @@ $t(common.cantUndoWarning)`,
     reportingDataAttribute: 'Attribut pour {{level}}',
     reportingDataTableAndJoinsWithAttributes: 'Table de données de rapport et jointures avec les attributs',
     showSamplingAttributes: "Afficher les attributs d'échantillonnage",
-    lock: 'Verrouiller',
-    unlock: 'Déverrouiller',
   },
 
   instancesView: {

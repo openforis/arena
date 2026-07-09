@@ -108,6 +108,8 @@ export default {
 Үргэлжлүүлэх үү?`,
     local: 'Орон нутгийн',
     loading: 'Ачаалж байна...',
+    lock: 'Түгжих',
+    unlock: 'Түгжээг тайлах',
     max: 'Хамгийн их',
     med: 'Дундаж',
     manage: 'Удирдах',
@@ -460,8 +462,6 @@ $t(common.raiseTicketInSupportForum)
       lock: 'Түлхүүр атрибутын засварыг түгжих',
       unlock: 'Түлхүүр атрибутыг засахыг зөвшөөрөх',
     },
-    lock: 'Түгжих',
-    unlock: 'Түгжээг тайлах',
   },
 
   dataExplorerView: {
@@ -783,8 +783,6 @@ $t(common.cantUndoWarning)`,
     reportingDataAttribute: '{{level}}-д зориулсан шинж чанар',
     reportingDataTableAndJoinsWithAttributes: 'Тайлагнах өгөгдлийн хүснэгт болон шинж чанаруудтай нэгдэл',
     showSamplingAttributes: 'Түүвэрлэх шинж чанаруудыг харуулах',
-    lock: 'Түгжих',
-    unlock: 'Түгжээг тайлах',
   },
 
   instancesView: {
