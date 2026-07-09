@@ -1189,6 +1189,16 @@ Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un att
     batchImportCompleteSuccessfully: `{{importedCategories}} catégories importées avec succès !
 {{insertedCategories}} nouvelles
 {{updatedCategories}} mises à jour`,
+    cloneFromAnotherSurvey: {
+      title: 'Cloner une catégorie depuis une autre enquête',
+      sourceSurvey: 'Enquête source',
+      sourceCategory: 'Catégorie source',
+      loadingSurveys: 'Chargement des enquêtes...',
+      noSurveysAvailable: 'Aucune enquête disponible',
+      selectSurveyFirst: "Sélectionnez d'abord une enquête",
+      loadingCategories: 'Chargement des catégories...',
+      noCategoriesAvailable: "Aucune catégorie disponible dans l'enquête sélectionnée",
+    },
     itemsCount: "Nombre d'éléments",
     types: {
       flat: 'Plat',

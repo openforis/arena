@@ -178,6 +178,7 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
 
 export const {
   insertCategory,
+  cloneCategoryFromSurvey,
   createImportSummary,
   createImportSummaryFromStream,
   insertLevel,
