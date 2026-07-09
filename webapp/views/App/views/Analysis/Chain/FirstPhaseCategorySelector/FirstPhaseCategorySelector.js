@@ -5,12 +5,13 @@ import * as Category from '@core/survey/category'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import { FormItem } from '@webapp/components/form/Input'
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 
 export const FirstPhaseCategorySelector = () => {
   const dispatch = useDispatch()
   const chain = useChain()
+  const editable = useChainEditable()
   const samplingDesign = Chain.getSamplingDesign(chain)
 
   const onChange = (category) => {
@@ -28,6 +29,7 @@ export const FirstPhaseCategorySelector = () => {
         showAdd={false}
         showEdit
         showManage={false}
+        disabled={!editable}
       />
     </FormItem>
   )
