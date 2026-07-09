@@ -9,6 +9,7 @@ import { ChainActionTypes } from './actions'
 const initialState = {
   chain: null,
   recordsCountByStep: RecordStep.steps.reduce((acc, { id }) => ({ ...acc, [id]: '...' }), {}),
+  chainEditLocked: false,
 }
 
 const reset = () => initialState
@@ -30,6 +31,11 @@ const actionHandlers = {
   [ChainActionTypes.chainRecordsCountUpdate]: (state, { recordsCountByStep }) => ({
     ...state,
     recordsCountByStep,
+  }),
+
+  [ChainActionTypes.chainEditLock]: (state, { locked }) => ({
+    ...state,
+    chainEditLocked: locked,
   }),
 }
 

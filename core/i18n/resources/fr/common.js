@@ -812,6 +812,8 @@ $t(common.cantUndoWarning)`,
     reportingDataAttribute: 'Attribut pour {{level}}',
     reportingDataTableAndJoinsWithAttributes: 'Table de données de rapport et jointures avec les attributs',
     showSamplingAttributes: "Afficher les attributs d'échantillonnage",
+    lock: 'Verrouiller',
+    unlock: 'Déverrouiller',
   },
 
   instancesView: {

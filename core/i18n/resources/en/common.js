@@ -807,6 +807,8 @@ $t(common.cantUndoWarning)`,
     reportingDataAttribute: 'Attribute for {{level}}',
     reportingDataTableAndJoinsWithAttributes: 'Reporting data table and joins with attributes',
     showSamplingAttributes: 'Show sampling attributes',
+    lock: 'Lock',
+    unlock: 'Unlock',
   },
 
   instancesView: {

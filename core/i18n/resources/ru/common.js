@@ -788,6 +788,8 @@ $t(common.cantUndoWarning)`,
     reportingDataAttribute: 'Атрибут для {{level}}',
     reportingDataTableAndJoinsWithAttributes: 'Таблица отчетных данных и соединения с атрибутами',
     showSamplingAttributes: 'Показать атрибуты выборки',
+    lock: 'Заблокировать',
+    unlock: 'Разблокировать',
   },
 
   instancesView: {

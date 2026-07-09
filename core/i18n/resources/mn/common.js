@@ -781,6 +781,8 @@ $t(common.cantUndoWarning)`,
     reportingDataAttribute: '{{level}}-д зориулсан шинж чанар',
     reportingDataTableAndJoinsWithAttributes: 'Тайлагнах өгөгдлийн хүснэгт болон шинж чанаруудтай нэгдэл',
     showSamplingAttributes: 'Түүвэрлэх шинж чанаруудыг харуулах',
+    lock: 'Түгжих',
+    unlock: 'Түгжээг тайлах',
   },
 
   instancesView: {

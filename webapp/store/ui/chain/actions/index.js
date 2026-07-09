@@ -6,6 +6,7 @@ import { resetChainStore } from './resetChainStore'
 import { createNodeDef } from './createNodeDef'
 import { openRStudio } from './openRStudio'
 import { fetchRecordsCountByStep } from './fetchRecordsCountByStep'
+import { toggleEditLock } from './editLock'
 
 export { ChainActionTypes } from './actionTypes'
 
@@ -18,4 +19,5 @@ export const ChainActions = {
   createNodeDef,
   openRStudio,
   fetchRecordsCountByStep,
+  toggleEditLock,
 }

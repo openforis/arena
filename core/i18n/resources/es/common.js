@@ -662,6 +662,8 @@ export default {
     reportingDataAttribute: 'Atributo para {{level}}',
     reportingDataTableAndJoinsWithAttributes: 'Tabla de datos de informes y uniones con atributos',
     showSamplingAttributes: 'Mostrar atributos de muestreo',
+    lock: 'Bloquear',
+    unlock: 'Desbloquear',
   },
   instancesView: {
     title: 'Instancias',
