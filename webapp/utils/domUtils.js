@@ -122,3 +122,15 @@ export const extractPreElementContentFromHtml = (htmlText) => {
     return null
   }
 }
+
+export const makeElementInert = (el, inert) => {
+  if (!el) {
+    return
+  }
+  const inertAttrName = 'inert'
+  if (inert) {
+    el.setAttribute(inertAttrName, '')
+  } else {
+    el.removeAttribute(inertAttrName)
+  }
+}

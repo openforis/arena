@@ -13,6 +13,7 @@ import { TestId } from '@webapp/utils/testId'
 import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import * as DomUtils from '@webapp/utils/domUtils'
 
 import ButtonBar from './ButtonBar'
 import BasicProps from './BasicProps'
@@ -79,9 +80,7 @@ const NodeDefDetails = (props) => {
   }, [Actions, canHaveMobileProps, editingFromDesigner, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
 
   useLayoutEffect(() => {
-    if (fieldsRef.current) {
-      fieldsRef.current.inert = readOnly
-    }
+    DomUtils.makeElementInert(fieldsRef.current, readOnly)
   }, [readOnly])
 
   if (!nodeDef) return null
