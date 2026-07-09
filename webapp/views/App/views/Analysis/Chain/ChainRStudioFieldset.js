@@ -6,7 +6,7 @@ import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 import { Checkbox } from '@webapp/components/form'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
 import RecordsDropdown from './RecordsDropdown'
@@ -16,6 +16,7 @@ export const ChainRStudioFieldset = (props) => {
 
   const dispatch = useDispatch()
   const chain = useChain()
+  const editable = useChainEditable()
   const validation = Chain.getValidation(chain)
 
   const _openRStudio = useCallback(
@@ -36,12 +37,14 @@ export const ChainRStudioFieldset = (props) => {
             checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
             validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
             onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
+            disabled={!editable}
           />
           <Checkbox
             label="chainView.submitOnlySelectedRecordsIntoR"
             checked={Chain.isSubmitOnlySelectedRecordsIntoR(chain)}
             validation={Validation.getFieldValidation(Chain.keysProps.submitOnlySelectedRecordsIntoR)(validation)}
             onChange={(value) => updateChain(Chain.assocSubmitOnlySelectedRecordsIntoR(value)(chain))}
+            disabled={!editable}
           />
           {Chain.isSubmitOnlySelectedRecordsIntoR(chain) && (
             <RecordsDropdown
@@ -49,6 +52,7 @@ export const ChainRStudioFieldset = (props) => {
                 updateChain(Chain.assocSelectedRecordUuids(selectedRecords.map(Record.getUuid))(chain))
               }
               selectedUuids={Chain.getSelectedRecordUuids(chain)}
+              disabled={!editable}
             />
           )}
           <Checkbox
@@ -56,6 +60,7 @@ export const ChainRStudioFieldset = (props) => {
             checked={Chain.isResultsBackFromRStudio(chain)}
             validation={Validation.getFieldValidation(Chain.keysProps.resultsBackFromRStudio)(validation)}
             onChange={(value) => updateChain(Chain.assocResultsBackFromRStudio(value)(chain))}
+            disabled={!editable}
           />
         </div>
         <ButtonRStudio onClick={openRStudio} />
