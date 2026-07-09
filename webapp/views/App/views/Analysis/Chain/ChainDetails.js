@@ -52,8 +52,7 @@ const ChainDetails = () => {
       }
     }
     init()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, chainUuid, canHaveRecords])
+  }, [dispatch, chainUuid, canHaveRecords, justCreated, navigate])
 
   const locationPathMatcher = useLocationPathMatcher()
   // un unmount, if changing location into node def edit, keep chain store, otherwise reset it
