@@ -10,6 +10,7 @@ import * as Survey from '@core/survey/survey'
 import { useSurvey, NodeDefsActions, useSurveyPreferredLang, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import { useChainEditable } from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'
 
 import InputSwitch from '@webapp/components/form/InputSwitch'
@@ -21,6 +22,7 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
+  const editable = useChainEditable()
 
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const nodeDefType = NodeDef.getType(nodeDef)
@@ -46,12 +48,12 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }) => {
     )
 
     dispatch(NodeDefsActions.updateNodeDef({ nodeDef: newNodeDef }))
-  }, [nodeDef])
+  }, [nodeDef, dispatch])
 
   return (
     <div className={classNames('analysis-node-def', { deleted: nodeDefDeleted })}>
       <div>
-        <button className="analysis-node-def__btn-move" type="button">
+        <button className="analysis-node-def__btn-move" type="button" disabled={!editable}>
           <span className="icon icon-menu" />
         </button>
       </div>
@@ -77,7 +79,7 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }) => {
       <div>
         <InputSwitch
           checked={!nodeDefDeleted && NodeDef.isActive(nodeDef)}
-          disabled={nodeDefDeleted || NodeDef.isSampling(nodeDef)}
+          disabled={nodeDefDeleted || NodeDef.isSampling(nodeDef) || !editable}
           onChange={handleSetActive}
         />
       </div>
@@ -86,8 +88,8 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }) => {
           className="btn btn-xs btn-transparent"
           to={`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
         >
-          <span className="icon icon-pencil2 icon-10px icon-left" />
-          {i18n.t('common.edit')}
+          <span className={`icon ${editable ? 'icon-pencil2' : 'icon-eye'} icon-10px icon-left`} />
+          {i18n.t(editable ? 'common.edit' : 'common.view')}
         </Link>
       </div>
     </div>

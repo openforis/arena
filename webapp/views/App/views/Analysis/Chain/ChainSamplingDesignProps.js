@@ -9,7 +9,7 @@ import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 import { useSurvey } from '@webapp/store/survey'
-import { useChain } from '@webapp/store/ui/chain'
+import { useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
@@ -26,6 +26,7 @@ export const ChainSamplingDesignProps = (props) => {
 
   const survey = useSurvey()
   const chain = useChain()
+  const editable = useChainEditable()
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const hasBaseUnit = Boolean(baseUnitNodeDef)
@@ -88,6 +89,7 @@ export const ChainSamplingDesignProps = (props) => {
                 validation
               )}
               onChange={onClusteringOnlyVariancesChange}
+              disabled={!editable}
             />
           </FormItem>
         )}
@@ -99,6 +101,7 @@ export const ChainSamplingDesignProps = (props) => {
               validation
             )}
             onChange={onNonResponseBiasCorrectionChange}
+            disabled={!editable}
           />
         </FormItem>
 
@@ -111,6 +114,7 @@ export const ChainSamplingDesignProps = (props) => {
             numberFormat={NumberFormats.decimal()}
             onChange={onReportingAreaChange}
             value={ChainStatisticalAnalysis.getReportingArea(chainStatisticalAnalysis)}
+            readOnly={!editable}
           />
         </FormItem>
       </div>

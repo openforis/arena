@@ -110,6 +110,8 @@ By confirming, all changes will be lost.
 Do you want to proceed?`,
     local: 'Local',
     loading: 'Loading...',
+    lock: 'Lock',
+    unlock: 'Unlock',
     max: 'Maximum',
     med: 'Median',
     manage: 'Manage',
@@ -469,8 +471,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       lock: 'Lock key attribute editing',
       unlock: 'Allow editing of key attribute',
     },
-    lock: 'Lock',
-    unlock: 'Unlock',
   },
 
   dataExplorerView: {

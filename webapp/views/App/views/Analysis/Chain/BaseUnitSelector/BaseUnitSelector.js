@@ -9,7 +9,7 @@ import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 import { useSurvey } from '@webapp/store/survey'
 
@@ -39,6 +39,7 @@ const BaseUnitSelector = () => {
   const survey = useSurvey()
 
   const chain = useChain()
+  const editable = useChainEditable()
   const samplingDesign = Chain.getSamplingDesign(chain)
 
   const onBaseUnitChange = useCallback(
@@ -63,6 +64,7 @@ const BaseUnitSelector = () => {
           showSingleEntities={false}
           useNameAsLabel={true}
           allowEmptySelection={true}
+          disabled={!editable}
         />
       </div>
     </FormItem>
