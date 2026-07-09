@@ -6,3 +6,5 @@ export const toggleEditLock = (dispatch, getState) => {
   const lockedPrev = ChainState.isChainEditLocked(state)
   dispatch({ type: ChainActionTypes.chainEditLock, locked: !lockedPrev })
 }
+
+export const setEditLocked = (locked) => ({ type: ChainActionTypes.chainEditLock, locked })

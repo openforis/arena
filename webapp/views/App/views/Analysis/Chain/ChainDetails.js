@@ -1,7 +1,7 @@
 import './ChainDetails.scss'
 
 import React, { useCallback, useEffect } from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
@@ -14,7 +14,7 @@ import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useSurvey } from '@webapp/store/survey'
 
-import { useLocationPathMatcher, useOnPageUnload } from '@webapp/components/hooks'
+import { useLocationPathMatcher, useOnPageUnload, useQuery } from '@webapp/components/hooks'
 import TabBar from '@webapp/components/tabBar'
 
 import ButtonBar from './ButtonBar'
@@ -24,7 +24,9 @@ import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
 
 const ChainDetails = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { chainUuid } = useParams()
+  const { new: justCreated } = useQuery()
   const chain = useChain()
   const survey = useSurvey()
 
@@ -44,8 +46,13 @@ const ChainDetails = () => {
       if (canHaveRecords) {
         dispatch(ChainActions.fetchRecordsCountByStep)
       }
+      if (justCreated === 'true') {
+        dispatch(ChainActions.setEditLocked(false))
+        navigate(`${appModuleUri(analysisModules.chain)}${chainUuid}/`, { replace: true })
+      }
     }
     init()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, chainUuid, canHaveRecords])
 
   const locationPathMatcher = useLocationPathMatcher()

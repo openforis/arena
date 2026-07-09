@@ -9,7 +9,7 @@ import { ChainActionTypes } from './actions'
 const initialState = {
   chain: null,
   recordsCountByStep: RecordStep.steps.reduce((acc, { id }) => ({ ...acc, [id]: '...' }), {}),
-  chainEditLocked: false,
+  chainEditLocked: true,
 }
 
 const reset = () => initialState
