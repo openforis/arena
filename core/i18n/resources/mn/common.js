@@ -1150,6 +1150,16 @@ $t(common.appNameFull)
     batchImportCompleteSuccessfully: `{{importedCategories}} ангилал амжилттай импортлогдлоо!
 {{insertedCategories}} шинэ
 {{updatedCategories}} шинэчлэгдсэн`,
+    cloneFromAnotherSurvey: {
+      title: 'Өөр судалгаанаас ангилал хуулах',
+      sourceSurvey: 'Эх сурвалж судалгаа',
+      sourceCategory: 'Эх сурвалж ангилал',
+      loadingSurveys: 'Судалгаанууд ачаалж байна...',
+      noSurveysAvailable: 'Судалгаа алга байна',
+      selectSurveyFirst: 'Эхлээд судалгаа сонгоно уу',
+      loadingCategories: 'Ангилал ачаалж байна...',
+      noCategoriesAvailable: 'Сонгосон судалгаанд ангилал алга байна',
+    },
     itemsCount: 'Элементүүдийн тоо',
     types: {
       flat: 'Хавтгай',

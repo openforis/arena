@@ -51,6 +51,8 @@ export default {
     invalidParentItemOrder: 'Код {{parentItemCodes}}-тэй элемент нь хүүхдүүдийнхээ өмнө байх ёстой',
     nameDuplicate: 'Ижил нэртэй ангилал аль хэдийн байна: {{name}}',
     srsNotDefined: 'Судалгаанд код {{srs}}-тэй SRS тодорхойлогдоогүй',
+    uuidDuplicate:
+      'Энэ ангилал энэ судалгаанд аль хэдийн хуулагдсан байна (одоогийн нэр нь "{{name}}"). Дахин хуулах боломжгүй.',
   },
 
   dataImport: {

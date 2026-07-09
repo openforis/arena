@@ -1159,6 +1159,16 @@ $t(common.appNameFull)
     batchImportCompleteSuccessfully: `{{importedCategories}} категорий успешно импортировано!
 {{insertedCategories}} новых
 {{updatedCategories}} обновленных`,
+    cloneFromAnotherSurvey: {
+      title: 'Клонировать категорию из другого опроса',
+      sourceSurvey: 'Исходный опрос',
+      sourceCategory: 'Исходная категория',
+      loadingSurveys: 'Загрузка опросов...',
+      noSurveysAvailable: 'Нет доступных опросов',
+      selectSurveyFirst: 'Сначала выберите опрос',
+      loadingCategories: 'Загрузка категорий...',
+      noCategoriesAvailable: 'В выбранном опросе нет доступных категорий',
+    },
     itemsCount: 'Количество элементов',
     types: {
       flat: 'Плоская',

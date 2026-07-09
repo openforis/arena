@@ -133,6 +133,8 @@ In Arena Mobile:
     noEntitiesAvailable: 'No entities available',
     loadingSurveys: 'Loading surveys...',
     noSurveysAvailable: 'No surveys available',
+    sourceEntity: 'Source entity',
+    targetEntityCurrentSurvey: 'Target entity (current survey)',
   },
   confirmNodeDelete: 'Are you sure you want to delete this {{nodeDefType}} ({{nodeDefLabel}})?',
   downloadPrintableDocument: 'Download printable document (Word)',
