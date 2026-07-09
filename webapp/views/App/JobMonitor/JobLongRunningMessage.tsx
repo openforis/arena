@@ -19,22 +19,20 @@ const JobLongRunningMessage = ({ job, messageKey = undefined }: Props) => {
   const i18n = useI18n()
   const [showMessage, setShowMessage] = useState(false)
 
+  const jobUuid = JobSerialized.getUuid(job)
+  const jobEnded = JobSerialized.isEnded(job)
+
   useEffect(() => {
-    if (!messageKey || JobSerialized.isEnded(job)) return undefined
+    setShowMessage(false)
 
-    let isMounted = true
-    const timeoutId = setTimeout(() => {
-      if (isMounted) setShowMessage(true)
-    }, showMessageDelayMillis)
-    return () => {
-      isMounted = false
-      clearTimeout(timeoutId)
-    }
-    // Timer is started once, when the job monitor for this job is first mounted.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    if (!messageKey || jobEnded) return undefined
 
-  if (!showMessage || JobSerialized.isEnded(job)) return null
+    const timeoutId = setTimeout(() => setShowMessage(true), showMessageDelayMillis)
+
+    return () => clearTimeout(timeoutId)
+  }, [jobUuid, jobEnded, messageKey])
+
+  if (!showMessage || jobEnded) return null
 
   return <div className="job-long-running-message">{i18n.t(messageKey)}</div>
 }
