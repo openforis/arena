@@ -60,7 +60,7 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
       title={i18n.t('surveyForm.cloneFromAnotherSurvey.title')}
     >
       <ModalBody>
-        <FormItem label={<span>Source entity</span>}>
+        <FormItem label="surveyForm.cloneFromAnotherSurvey.sourceEntity">
           <div className="clone-from-survey-dialog__tree-view-container">
             <SurveyEntitiesTreeView
               selectedSourceEntity={sourceEntitySelection}
@@ -69,7 +69,7 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
           </div>
         </FormItem>
 
-        <FormItem label={<span>Target entity (current survey)</span>}>
+        <FormItem label="surveyForm.cloneFromAnotherSurvey.targetEntityCurrentSurvey">
           <EntitySelector
             filterFn={(entityDef: object) => targetEntityFilterFn({ cycle, entityDef })}
             hierarchy={surveyCurrentHierarchy}
