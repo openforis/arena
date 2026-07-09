@@ -744,6 +744,8 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     nonResponseBiasCorrectionInfo: `To implement Weighting Class Adjustment method, add 'design_psu' and 'design_ssu' into the stratum category table as extra numeric properties`,
     pValue: 'P-value',
     resultsBackFromRStudio: 'Results read back from RStudio',
+    resultsBackFromRStudioInfo: `Enable this option if the result attributes calculated in RStudio should be imported back into the Arena server.
+This might be a slow process.`,
     samplingDesign: 'Sampling Design',
     samplingDesignDetails: 'Sampling Design Details',
     samplingStrategyLabel: 'Sampling strategy',

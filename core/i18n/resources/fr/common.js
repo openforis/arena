@@ -748,6 +748,8 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
     nonResponseBiasCorrectionInfo: `Pour implémenter la méthode d'ajustement par classes de pondération, ajoutez 'design_psu' et 'design_ssu' dans la table de catégories de strate comme propriétés numériques supplémentaires.`,
     pValue: 'Valeur P',
     resultsBackFromRStudio: 'Résultats relus depuis RStudio',
+    resultsBackFromRStudioInfo: `Activez cette option si les attributs de résultat calculés dans RStudio doivent être réimportés dans le serveur Arena.
+Ce processus peut être lent.`,
     samplingDesign: "Plan d'échantillonnage",
     samplingDesignDetails: "Détails du plan d'échantillonnage",
     samplingStrategyLabel: "Stratégie d'échantillonnage",

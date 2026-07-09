@@ -615,6 +615,8 @@ export default {
       "Para implementar el método de ajuste por clases de ponderación, agregue 'design_psu' y 'design_ssu' a la tabla de categorías del estrato como propiedades numéricas adicionales.",
     pValue: 'Valor P',
     resultsBackFromRStudio: 'Resultados leídos de RStudio',
+    resultsBackFromRStudioInfo:
+      'Habilite esta opción si los atributos de resultado calculados en RStudio deben importarse de vuelta al servidor de Arena. Este proceso puede ser lento.',
     samplingDesign: 'Diseño de muestreo',
     samplingDesignDetails: 'Detalles del diseño de muestreo',
     samplingStrategyLabel: 'Estrategia de muestreo',

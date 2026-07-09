@@ -725,6 +725,8 @@ $t(common.raiseTicketInSupportForum)
     nonResponseBiasCorrectionInfo: `Чтобы реализовать метод корректировки по весовым классам, добавьте 'design_psu' и 'design_ssu' в таблицу категорий страты как дополнительные числовые свойства.`,
     pValue: 'P-значение',
     resultsBackFromRStudio: 'Результаты получены из RStudio',
+    resultsBackFromRStudioInfo: `Включите эту опцию, если атрибуты результатов, вычисленные в RStudio, должны быть импортированы обратно на сервер Arena.
+Этот процесс может быть медленным.`,
     samplingDesign: 'Дизайн выборки',
     samplingDesignDetails: 'Детали дизайна выборки',
     samplingStrategyLabel: 'Стратегия выборки',

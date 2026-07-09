@@ -726,6 +726,8 @@ $t(common.raiseTicketInSupportForum)
     nonResponseBiasCorrectionInfo: `Жинлэлтийн ангиллын тохируулгын аргыг хэрэгжүүлэхийн тулд 'design_psu' болон 'design_ssu'-г давхаргын ангиллын хүснэгтэд нэмэлт тоон шинж чанар болгон нэмнэ үү.`,
     pValue: 'P-утга',
     resultsBackFromRStudio: 'RStudio-оос үр дүнг буцааж уншсан',
+    resultsBackFromRStudioInfo: `RStudio-д тооцоолсон үр дүнгийн шинж чанаруудыг Arena сервер рүү буцааж импортлох шаардлагатай бол энэ сонголтыг идэвхжүүлнэ үү.
+Энэ үйл явц удаан байж болзошгүй.`,
     samplingDesign: 'Түүвэрлэлтийн загвар',
     samplingDesignDetails: 'Түүвэрлэлтийн загварын дэлгэрэнгүй мэдээлэл',
     samplingStrategyLabel: 'Түүвэрлэлтийн стратеги',
