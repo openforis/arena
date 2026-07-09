@@ -2,6 +2,8 @@ import './CategoryCloneFromSurveyDialog.scss'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { Category as ArenaCategory } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
@@ -19,7 +21,7 @@ import { getCategoryDuplicateCheck } from './categoryCloneDuplicateCheck'
 
 type CategoryCloneFromSurveyDialogProps = {
   onClose: () => void
-  onConfirm: (params: { sourceSurveyId: number; sourceCategoryUuid: string }) => void
+  onConfirm: (params: { sourceSurveyId: number; sourceCategoryUuid: string }) => Promise<void>
 }
 
 export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDialogProps): React.ReactElement => {
@@ -34,9 +36,9 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
 
   const [categoriesBySurveyId, setCategoriesBySurveyId] = useState<Record<string, object[]>>({})
   const [categoriesLoading, setCategoriesLoading] = useState(false)
-  const [sourceCategory, setSourceCategory] = useState<object | null>(null)
+  const [sourceCategory, setSourceCategory] = useState<ArenaCategory | null>(null)
 
-  const [currentSurveyCategories, setCurrentSurveyCategories] = useState<object[]>([])
+  const [currentSurveyCategories, setCurrentSurveyCategories] = useState<ArenaCategory[]>([])
 
   const [cloning, setCloning] = useState(false)
 

@@ -1,3 +1,5 @@
+import { Category as ArenaCategory } from '@openforis/arena-core'
+
 import * as Category from '@core/survey/category'
 
 export type CategoryDuplicateCheckResult = {
@@ -17,8 +19,8 @@ export const getCategoryDuplicateCheck = ({
   currentSurveyCategories,
   sourceCategory,
 }: {
-  currentSurveyCategories: object[]
-  sourceCategory: object | null
+  currentSurveyCategories: ArenaCategory[]
+  sourceCategory: ArenaCategory | null
 }): CategoryDuplicateCheckResult => {
   if (!sourceCategory) return null
 
@@ -28,7 +30,7 @@ export const getCategoryDuplicateCheck = ({
   // category uuids are preserved when cloning: if this exact category has already been cloned
   // into the current survey before (even if renamed since), cloning it again is not allowed
   const categoryWithSameUuid = currentSurveyCategories.find(
-    (category: object) => Category.getUuid(category) === sourceCategoryUuid
+    (category: ArenaCategory) => Category.getUuid(category) === sourceCategoryUuid
   )
   if (categoryWithSameUuid) {
     return {
@@ -37,10 +39,7 @@ export const getCategoryDuplicateCheck = ({
     }
   }
 
-  const categoryWithSameName = currentSurveyCategories.find(
-    (category: object) => Category.getName(category) === sourceCategoryName
-  )
-  if (categoryWithSameName) {
+  if (currentSurveyCategories.some((category: ArenaCategory) => Category.getName(category) === sourceCategoryName)) {
     return {
       key: 'validationErrors:categoryImport.nameDuplicate',
       params: { name: sourceCategoryName },
