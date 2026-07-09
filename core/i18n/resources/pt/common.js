@@ -744,6 +744,8 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     nonResponseBiasCorrectionInfo: `Para implementar o método de ajuste por classes de ponderação, adicione 'design_psu' e 'design_ssu' à tabela de categorias do estrato como propriedades numéricas extras.`,
     pValue: 'Valor-p',
     resultsBackFromRStudio: 'Resultados lidos de volta do RStudio',
+    resultsBackFromRStudioInfo: `Ative esta opção se os atributos de resultado calculados no RStudio devem ser importados de volta para o servidor Arena.
+Este processo pode ser lento.`,
     samplingDesign: 'Desenho amostral',
     samplingDesignDetails: 'Detalhes do desenho amostral',
     samplingStrategyLabel: 'Estratégia amostral',

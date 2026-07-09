@@ -7,8 +7,10 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
 import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
+import { Fieldset } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
+
 import RecordsDropdown from './RecordsDropdown'
 
 export const ChainRStudioFieldset = (props) => {
@@ -28,8 +30,7 @@ export const ChainRStudioFieldset = (props) => {
   const openRStudioLocal = useCallback(() => _openRStudio({ isLocal: true }), [_openRStudio])
 
   return (
-    <fieldset className="rstudio-fieldset">
-      <legend>RStudio</legend>
+    <Fieldset className="rstudio-fieldset" legend="RStudio">
       <div className="content">
         <div>
           <Checkbox
@@ -56,6 +57,7 @@ export const ChainRStudioFieldset = (props) => {
             />
           )}
           <Checkbox
+            info="chainView.resultsBackFromRStudioInfo"
             label="chainView.resultsBackFromRStudio"
             checked={Chain.isResultsBackFromRStudio(chain)}
             validation={Validation.getFieldValidation(Chain.keysProps.resultsBackFromRStudio)(validation)}
@@ -66,7 +68,7 @@ export const ChainRStudioFieldset = (props) => {
         <ButtonRStudio onClick={openRStudio} />
         <ButtonRStudio isLocal onClick={openRStudioLocal} />
       </div>
-    </fieldset>
+    </Fieldset>
   )
 }
 
