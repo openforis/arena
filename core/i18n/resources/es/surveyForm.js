@@ -133,6 +133,8 @@ En Arena Mobile:
     noEntitiesAvailable: 'No hay entidades disponibles',
     loadingSurveys: 'Cargando formularios...',
     noSurveysAvailable: 'No hay formularios disponibles',
+    sourceEntity: 'Entidad de origen',
+    targetEntityCurrentSurvey: 'Entidad de destino (formulario actual)',
   },
   confirmNodeDelete: '¿Está seguro de que desea eliminar este {{nodeDefType}} ({{nodeDefLabel}})?',
   downloadPrintableDocument: 'Descargar documento imprimible (Word)',
