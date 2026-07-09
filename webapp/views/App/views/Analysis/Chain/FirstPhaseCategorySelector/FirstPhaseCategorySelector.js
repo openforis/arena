@@ -27,7 +27,7 @@ export const FirstPhaseCategorySelector = () => {
         categoryUuid={ChainSamplingDesign.getFirstPhaseCategoryUuid(samplingDesign)}
         onChange={onChange}
         showAdd={false}
-        showEdit
+        showEdit={editable}
         showManage={false}
         disabled={!editable}
       />

@@ -1775,7 +1775,7 @@ export const FirstPhaseCategorySelector = () => {
         categoryUuid={ChainSamplingDesign.getFirstPhaseCategoryUuid(samplingDesign)}
         onChange={onChange}
         showAdd={false}
-        showEdit
+        showEdit={editable}
         showManage={false}
         disabled={!editable}
       />
@@ -1784,7 +1784,7 @@ export const FirstPhaseCategorySelector = () => {
 }
 ```
 
-Note: `CategorySelector`'s own implementation already hides its "edit" and "add" affordances when `disabled` is true (`webapp/components/survey/CategorySelector/CategorySelector.js:123,139`) — this is how the "edit category" navigation gets blocked while locked, without us needing to touch the shared `CategoryDetails` page (see Global Constraints for why that page itself is out of scope).
+Note: `CategorySelector`'s own implementation only auto-hides its "add" affordance and gates `CategoryList.canSelect` when `disabled` is true (`webapp/components/survey/CategorySelector/CategorySelector.js:123,139`) — the "edit" pencil (`CategorySelector.js:119-121`) is gated solely on `showEdit && category`, with no `disabled` check. This was discovered during Task 3's review (an earlier version of this note incorrectly claimed the edit affordance auto-hid too). The fix is `showEdit={editable}` instead of a bare `showEdit`, shown above — this is how the "edit category" navigation gets blocked while locked, without us needing to touch the shared `CategoryDetails` page (see Global Constraints for why that page itself is out of scope).
 
 - [ ] **Step 6: Disable `ClusteringEntitySelector.js`**
 
