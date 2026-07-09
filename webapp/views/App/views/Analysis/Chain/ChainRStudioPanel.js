@@ -7,7 +7,7 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
 import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
-import { Accordion, Fieldset } from '@webapp/components'
+import { Accordion } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
 
