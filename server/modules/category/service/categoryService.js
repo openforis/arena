@@ -206,7 +206,7 @@ const _validateSurveyId = ({ surveyId, paramName }) => {
  * @returns {Promise<Category>} The cloned and validated category.
  * @throws {UnauthorizedError} If the user is not allowed to view the source survey.
  */
-const cloneCategoryFromSurvey = async ({ user, sourceSurveyId, sourceCategoryUuid, targetSurveyId }) => {
+export const cloneCategoryFromSurvey = async ({ user, sourceSurveyId, sourceCategoryUuid, targetSurveyId }) => {
   const sourceSurveyIdValidated = _validateSurveyId({ surveyId: sourceSurveyId, paramName: 'sourceSurveyId' })
   const targetSurveyIdValidated = _validateSurveyId({ surveyId: targetSurveyId, paramName: 'targetSurveyId' })
 
