@@ -1,6 +1,5 @@
 import './ChainNodeDefDetails.scss'
 
-import React from 'react'
 import classNames from 'classnames'
 
 import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'

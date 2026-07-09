@@ -2554,3 +2554,7 @@ EOF
 **Placeholder scan:** no TBD/TODO; every step shows complete before/after code.
 
 **Type consistency:** `useChainEditable()` returns a boolean everywhere it's consumed; `ChainActions.toggleEditLock` is dispatched the same way (`dispatch(ChainActions.toggleEditLock)`) in its only call site (Task 1); `disabled`/`readOnly` prop names match what each underlying component actually declares (verified per-component: `Checkbox`/`Dropdown`/`EntitySelector`/`CategorySelector`/`RecordsDropdown`/`ButtonRStudio`/`Button`/`ButtonDelete`/`InputSwitch` all use `disabled`; `LabelsEditor`/`Input` use `readOnly`/`disabled` respectively as shown).
+
+## Post-implementation note
+
+Task 5's `ChainNodeDefDetails.js` was written as plain `.js` to match its sibling files in `webapp/views/App/views/Analysis/` (all `.js`). Per the user's standing preference that new webapp React components be `.tsx`, it was converted to `ChainNodeDefDetails.tsx` immediately after Task 5's review (no logic change — same content, `.js` → `.tsx` extension only; `tsconfig.json` has `allowJs`/`checkJs: false`/`strict: false`, so no typing changes were needed).
