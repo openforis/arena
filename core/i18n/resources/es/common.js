@@ -105,6 +105,8 @@ export default {
       'Hay cambios sin guardar en el formulario. \nAl confirmar, todos los cambios se perderán. \n¿Desea continuar?',
     local: 'Local',
     loading: 'Cargando...',
+    lock: 'Bloquear',
+    unlock: 'Desbloquear',
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Administrar',
@@ -414,8 +416,6 @@ export default {
       lock: 'Bloquear edición del atributo clave',
       unlock: 'Permitir editar el atributo clave',
     },
-    lock: 'Bloquear',
-    unlock: 'Desbloquear',
   },
   dataExplorerView: {
     customAggregateFunction: {

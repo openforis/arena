@@ -1,16 +1,28 @@
 import './Accordion.scss'
 
-import PropTypes from 'prop-types'
+import React from 'react'
 import MuiAccordion from '@mui/material/Accordion'
 import MuiAccordionSummary from '@mui/material/AccordionSummary'
 import MuiAccordionDetails from '@mui/material/AccordionDetails'
 import MuiTypography from '@mui/material/Typography'
 
-export const Accordion = (props) => {
-  const { items } = props
+type AccordionItem = {
+  key: string
+  defaultExpanded?: boolean
+  title: React.ReactNode
+  content: React.ReactNode
+}
+
+type AccordionProps = {
+  className?: string
+  items: Array<AccordionItem>
+}
+
+export const Accordion = (props: AccordionProps) => {
+  const { className, items } = props
 
   return (
-    <div className="accordion">
+    <div className={`accordion ${className}`}>
       {items.map((item) => (
         <MuiAccordion key={item.key} defaultExpanded={item.defaultExpanded}>
           <MuiAccordionSummary
@@ -25,15 +37,4 @@ export const Accordion = (props) => {
       ))}
     </div>
   )
-}
-
-Accordion.propTypes = {
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      key: PropTypes.string.isRequired,
-      defaultExpanded: PropTypes.bool,
-      title: PropTypes.node.isRequired,
-      content: PropTypes.node.isRequired,
-    })
-  ).isRequired,
 }
