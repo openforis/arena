@@ -1,8 +1,8 @@
 import './NodeDefDetails.scss'
 
-import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
+import { useLayoutEffect, useMemo, useRef } from 'react'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,17 +10,17 @@ import * as Validation from '@core/validation/validation'
 
 import { TestId } from '@webapp/utils/testId'
 
-import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import TabBar from '@webapp/components/tabBar'
 import * as DomUtils from '@webapp/utils/domUtils'
 
-import ButtonBar from './ButtonBar'
-import BasicProps from './BasicProps'
 import AdvancedProps from './AdvancedProps'
+import AnalysisEntitySelector from './AnalysisEntitySelector'
+import BasicProps from './BasicProps'
+import ButtonBar from './ButtonBar'
 import { MobileAppProps } from './MobileAppProps'
 import ValidationsProps from './ValidationsProps'
-import AnalysisEntitySelector from './AnalysisEntitySelector'
 
 import { useSurveyCycleKey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
@@ -79,7 +79,7 @@ const NodeDefDetails = (props) => {
     return _tabs
   }, [Actions, canHaveMobileProps, editingFromDesigner, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     DomUtils.makeElementInert(fieldsRef.current, readOnly)
   }, [readOnly, nodeDefNull])
 
