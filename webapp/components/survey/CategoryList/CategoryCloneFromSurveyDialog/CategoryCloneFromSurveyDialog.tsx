@@ -35,7 +35,7 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
   const [sourceSurvey, setSourceSurvey] = useState<object | null>(null)
 
   const [categoriesBySurveyId, setCategoriesBySurveyId] = useState<Record<string, object[]>>({})
-  const [categoriesLoading, setCategoriesLoading] = useState(false)
+  const [loadingSurveyId, setLoadingSurveyId] = useState<string | number | null>(null)
   const [sourceCategory, setSourceCategory] = useState<ArenaCategory | null>(null)
 
   const [currentSurveyCategories, setCurrentSurveyCategories] = useState<ArenaCategory[]>([])
@@ -50,6 +50,7 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
 
   const sourceSurveyId = sourceSurvey ? Survey.getIdSurveyInfo(sourceSurvey) : null
   const categories = sourceSurveyId ? categoriesBySurveyId[sourceSurveyId] : null
+  const categoriesLoading = sourceSurveyId !== null && loadingSurveyId === sourceSurveyId
 
   const onSourceSurveyChange = useCallback(
     (surveyInfo: object | null) => {
@@ -59,7 +60,7 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
       const surveyId = surveyInfo ? Survey.getIdSurveyInfo(surveyInfo) : null
       if (!surveyId || categoriesBySurveyId[surveyId]) return
 
-      setCategoriesLoading(true)
+      setLoadingSurveyId(surveyId)
       API.fetchCategories({ surveyId, draft: true })
         .then((categoriesFetched: object[]) => {
           setCategoriesBySurveyId((statePrev) => ({ ...statePrev, [surveyId]: categoriesFetched }))
@@ -67,7 +68,7 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
         .catch(() => {
           setCategoriesBySurveyId((statePrev) => ({ ...statePrev, [surveyId]: [] }))
         })
-        .finally(() => setCategoriesLoading(false))
+        .finally(() => setLoadingSurveyId((prev) => (prev === surveyId ? null : prev)))
     },
     [categoriesBySurveyId]
   )
