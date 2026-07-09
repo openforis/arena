@@ -130,6 +130,8 @@ export default {
     noEntitiesAvailable: 'Объекты недоступны',
     loadingSurveys: 'Загрузка анкет...',
     noSurveysAvailable: 'Анкеты недоступны',
+    sourceEntity: 'Исходный объект',
+    targetEntityCurrentSurvey: 'Целевой объект (текущая анкета)',
   },
   confirmNodeDelete: 'Вы уверены, что хотите удалить этот {{nodeDefType}} ({{nodeDefLabel}})?',
   downloadPrintableDocument: 'Скачать печатный документ (Word)',

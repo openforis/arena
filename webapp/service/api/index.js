@@ -7,6 +7,7 @@ export {
   fetchItemsCountIndexedByCategoryUuid,
   fetchCategory,
   createCategory,
+  cloneCategoryFromSurvey,
   countCategoryItems,
   fetchCategoryItems,
   fetchCategoryItemsInLevelRequest,
