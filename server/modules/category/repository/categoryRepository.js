@@ -86,6 +86,42 @@ export const insertItems = async ({ surveyId, items, backup = false }, client = 
   )
 }
 
+export const cloneCategoryFromSurvey = async ({ sourceSurveyId, targetSurveyId, categoryUuid }, client = db) => {
+  const sourceSchema = getSurveyDBSchema(sourceSurveyId)
+  const targetSchema = getSurveyDBSchema(targetSurveyId)
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.category (uuid, props, props_draft)
+    SELECT uuid, '{}'::jsonb, COALESCE(props, '{}'::jsonb) || COALESCE(props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.category
+    WHERE uuid = $1
+  `,
+    [categoryUuid]
+  )
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.category_level (uuid, category_uuid, index, props, props_draft)
+    SELECT uuid, category_uuid, index, '{}'::jsonb, COALESCE(props, '{}'::jsonb) || COALESCE(props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.category_level
+    WHERE category_uuid = $1
+  `,
+    [categoryUuid]
+  )
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.category_item (uuid, level_uuid, parent_uuid, props, props_draft)
+    SELECT i.uuid, i.level_uuid, i.parent_uuid, '{}'::jsonb, COALESCE(i.props, '{}'::jsonb) || COALESCE(i.props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.category_item i
+    JOIN ${sourceSchema}.category_level l ON l.uuid = i.level_uuid
+    WHERE l.category_uuid = $1
+  `,
+    [categoryUuid]
+  )
+}
+
 // ============== READ
 
 const _getFetchCategoriesAndLevelsQuery = ({

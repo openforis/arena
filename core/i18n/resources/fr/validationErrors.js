@@ -51,6 +51,8 @@ export default {
     invalidParentItemOrder: "L'élément avec les codes {{parentItemCodes}} doit précéder ses enfants",
     nameDuplicate: 'Une catégorie avec le même nom existe déjà : {{name}}',
     srsNotDefined: 'SRS avec le code {{srs}} non défini dans le formulaire',
+    uuidDuplicate:
+      'Cette catégorie a déjà été clonée dans ce formulaire (actuellement nommée "{{name}}"). Elle ne peut pas être clonée à nouveau.',
   },
 
   dataImport: {

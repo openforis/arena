@@ -1,12 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { TreeView } from '@webapp/components/TreeView'
 import * as API from '@webapp/service/api'
+import { surveyInfoToLabel, useOtherSurveysList } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 export interface SourceEntitySelection {
   surveyId: number
@@ -54,12 +55,6 @@ const parseSourceEntityTreeItemKey = (treeItemKey: string): SourceEntitySelectio
   return { surveyId: Number(surveyIdString), nodeDefUuid }
 }
 
-const surveyInfoToLabel = (surveyInfo: object): string => {
-  const surveyName = Survey.getName(surveyInfo)
-  const surveyLabel = Survey.getDefaultLabel(surveyInfo)
-  return surveyLabel ? `${surveyLabel} [${surveyName}]` : surveyName
-}
-
 const getEntityChildren = ({ survey, nodeDef }: { survey: object; nodeDef: object }): object[] =>
   Survey.getNodeDefChildrenSorted({ nodeDef })(survey).filter((childNodeDef: object) => NodeDef.isEntity(childNodeDef))
 
@@ -89,26 +84,13 @@ const toEntityTreeItems = ({
     }
   })
 
-const compareSurveysByLabelOrName = (surveyA: object, surveyB: object): any => {
-  const surveyAName = Survey.getName(surveyA)
-  const surveyBName = Survey.getName(surveyB)
-  const surveyLabelOrNameA = Survey.getDefaultLabel(surveyA) ?? surveyAName
-  const surveyLabelOrNameB = Survey.getDefaultLabel(surveyB) ?? surveyBName
-  const labelOrNameCompare = surveyLabelOrNameA.localeCompare(surveyLabelOrNameB)
-  if (labelOrNameCompare !== 0) return labelOrNameCompare
-  return surveyAName.localeCompare(surveyBName)
-}
-
 export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): React.ReactElement | null => {
   const { selectedSourceEntity, onSourceEntitySelectionChange } = props
 
   const i18n = useI18n()
-  const currentSurvey = useSurvey()
-  const currentSurveyId = Survey.getId(currentSurvey)
   const lang = useSurveyPreferredLang()
 
-  const [surveys, setSurveys] = useState<object[]>([])
-  const [surveysLoading, setSurveysLoading] = useState(true)
+  const { surveys, surveysLoading } = useOtherSurveysList()
   const [expandedTreeItemKeys, setExpandedTreeItemKeys] = useState<string[]>([])
   const [surveyLoadedById, setSurveyLoadedById] = useState<Record<string, SurveyLoadState>>({})
 
@@ -159,28 +141,6 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
     },
     [surveyById, surveyLoadedById]
   )
-
-  useEffect(() => {
-    Promise.all([API.fetchSurveys({ draft: false }), API.fetchSurveys({ draft: true })])
-      .then(([surveysPublished, surveysDraft]) => {
-        const surveysById = [...surveysPublished, ...surveysDraft].reduce<Record<string, object>>((acc, surveyInfo) => {
-          acc[Survey.getIdSurveyInfo(surveyInfo)] = surveyInfo
-          return acc
-        }, {})
-
-        const surveysFiltered = Object.values(surveysById)
-          .filter((surveyInfo) => Survey.getIdSurveyInfo(surveyInfo) !== currentSurveyId)
-          .sort(compareSurveysByLabelOrName)
-
-        setSurveys(surveysFiltered)
-      })
-      .catch(() => {
-        setSurveys([])
-      })
-      .finally(() => {
-        setSurveysLoading(false)
-      })
-  }, [currentSurveyId])
 
   const onExpandedTreeItemKeysChange = useCallback(
     (treeItemKeys: string[]) => {
