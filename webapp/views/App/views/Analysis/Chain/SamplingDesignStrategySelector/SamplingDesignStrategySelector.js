@@ -5,12 +5,14 @@ import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import { useChainEditable } from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'
 
 export const SamplingDesignStrategySelector = (props) => {
   const { chain, updateChain } = props
 
   const i18n = useI18n()
+  const editable = useChainEditable()
 
   const samplingStrategyCodeToItem = (samplingStrategyCode) => ({
     value: samplingStrategyCode,
@@ -33,6 +35,7 @@ export const SamplingDesignStrategySelector = (props) => {
         onChange={(item) =>
           updateChain(Chain.updateSamplingDesign(ChainSamplingDesign.assocSamplingStrategy(item?.value))(chain))
         }
+        disabled={!editable}
       />
     </FormItem>
   )
