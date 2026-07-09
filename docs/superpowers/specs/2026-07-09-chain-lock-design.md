@@ -38,7 +38,6 @@ The lock affects the entire chain editing surface:
 
 - `ChainDetails` tabs: `ChainBasicProps`, `ChainSamplingDesignProps` (and its
   selector sub-components), `ChainRStudioFieldset`
-- `StatisticalAnalysis` props/selectors
 - `AnalysisNodeDefs` tree: add-entity buttons in `AnalysisNodeDefsHeader`,
   and per-row drag handle / active toggle in `AnalysisNodeDef`
 - `ButtonBar`'s Delete button
@@ -153,6 +152,15 @@ Because chain Redux state is not reset when navigating from `ChainDetails`
 to the node-def editor (see `ChainDetails.js`'s unmount effect, which only
 resets on paths other than the node-def route), `chainEditLocked` persists
 correctly across that navigation — no extra state plumbing needed.
+
+## Scope discovery: statistical analysis UI is dead code
+
+`StatisticalAnalysis/ChainStatisticalAnalysisProps.js` (and its only
+consumers, `StatisticalAnalysis/DimensionsSelector` and `PValueSelector`)
+are not rendered anywhere in the current app — `ChainDetails.js`'s tab bar
+only wires up `ChainBasicProps` and `ChainSamplingDesignProps` (see commit
+"Chain details: hide statistical analysis tab"). These files are excluded
+from this feature's scope; there is no reachable UI to make read-only.
 
 ## Non-goals
 
