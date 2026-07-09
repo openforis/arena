@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import * as API from '@webapp/service/api'
-import { useNotifyError } from '@webapp/components/hooks'
+import { surveyInfoToLabel, useNotifyError, useOtherSurveysList } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 
@@ -15,29 +15,11 @@ import { Dropdown } from '@webapp/components/form'
 import { Button, ButtonCancel } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 
-type DuplicateCheckResult = {
-  key: string
-  params: { name: string }
-} | null
+import { getCategoryDuplicateCheck } from './categoryCloneDuplicateCheck'
 
 type CategoryCloneFromSurveyDialogProps = {
   onClose: () => void
   onConfirm: (params: { sourceSurveyId: number; sourceCategoryUuid: string }) => void
-}
-
-const surveyInfoToLabel = (surveyInfo: object): string => {
-  const surveyName = Survey.getName(surveyInfo)
-  const surveyLabel = Survey.getDefaultLabel(surveyInfo)
-  return surveyLabel ? `${surveyLabel} [${surveyName}]` : surveyName
-}
-
-const compareSurveysByLabelOrName = (surveyA: object, surveyB: object): number => {
-  const nameA = Survey.getName(surveyA)
-  const nameB = Survey.getName(surveyB)
-  const labelOrNameA = Survey.getDefaultLabel(surveyA) ?? nameA
-  const labelOrNameB = Survey.getDefaultLabel(surveyB) ?? nameB
-  const labelOrNameCompare = labelOrNameA.localeCompare(labelOrNameB)
-  return labelOrNameCompare !== 0 ? labelOrNameCompare : nameA.localeCompare(nameB)
 }
 
 export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDialogProps): React.ReactElement => {
@@ -47,8 +29,7 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
   const currentSurveyId = useSurveyId()
   const notifyError = useNotifyError()
 
-  const [surveys, setSurveys] = useState<object[]>([])
-  const [surveysLoading, setSurveysLoading] = useState(true)
+  const { surveys, surveysLoading } = useOtherSurveysList()
   const [sourceSurvey, setSourceSurvey] = useState<object | null>(null)
 
   const [categoriesBySurveyId, setCategoriesBySurveyId] = useState<Record<string, object[]>>({})
@@ -58,23 +39,6 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
   const [currentSurveyCategories, setCurrentSurveyCategories] = useState<object[]>([])
 
   const [cloning, setCloning] = useState(false)
-
-  useEffect(() => {
-    Promise.all([API.fetchSurveys({ draft: false }), API.fetchSurveys({ draft: true })])
-      .then(([surveysPublished, surveysDraft]) => {
-        const surveysById = [...surveysPublished, ...surveysDraft].reduce<Record<string, object>>((acc, surveyInfo) => {
-          acc[Survey.getIdSurveyInfo(surveyInfo)] = surveyInfo
-          return acc
-        }, {})
-        const surveysFiltered = Object.values(surveysById)
-          .filter((surveyInfo) => Survey.getIdSurveyInfo(surveyInfo) !== currentSurveyId)
-          .sort(compareSurveysByLabelOrName)
-
-        setSurveys(surveysFiltered)
-      })
-      .catch(() => setSurveys([]))
-      .finally(() => setSurveysLoading(false))
-  }, [currentSurveyId])
 
   useEffect(() => {
     API.fetchCategories({ surveyId: currentSurveyId, draft: true })
@@ -106,36 +70,10 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
     [categoriesBySurveyId]
   )
 
-  const duplicateCheck: DuplicateCheckResult = useMemo(() => {
-    if (!sourceCategory) return null
-
-    const sourceCategoryUuid = Category.getUuid(sourceCategory)
-    const sourceCategoryName = Category.getName(sourceCategory)
-
-    // category uuids are preserved when cloning: if this exact category has already been cloned
-    // into the current survey before (even if renamed since), cloning it again is not allowed
-    const categoryWithSameUuid = currentSurveyCategories.find(
-      (category: object) => Category.getUuid(category) === sourceCategoryUuid
-    )
-    if (categoryWithSameUuid) {
-      return {
-        key: 'validationErrors:categoryImport.uuidDuplicate',
-        params: { name: Category.getName(categoryWithSameUuid) },
-      }
-    }
-
-    const categoryWithSameName = currentSurveyCategories.find(
-      (category: object) => Category.getName(category) === sourceCategoryName
-    )
-    if (categoryWithSameName) {
-      return {
-        key: 'validationErrors:categoryImport.nameDuplicate',
-        params: { name: sourceCategoryName },
-      }
-    }
-
-    return null
-  }, [currentSurveyCategories, sourceCategory])
+  const duplicateCheck = useMemo(
+    () => getCategoryDuplicateCheck({ currentSurveyCategories, sourceCategory }),
+    [currentSurveyCategories, sourceCategory]
+  )
 
   const onConfirmClick = useCallback(async () => {
     if (duplicateCheck) {

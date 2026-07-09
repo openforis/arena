@@ -1,4 +1,5 @@
 export { useHorizontalResize } from './useHorizontalResize'
+export { useOtherSurveysList, surveyInfoToLabel } from './useOtherSurveysList'
 export { default as usePrevious } from './usePrevious'
 export { default as useOnUpdate } from './useOnUpdate'
 export { default as useIsMountedRef } from './useIsMountedRef'
