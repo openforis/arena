@@ -1,6 +1,6 @@
 import './NodeDefDetails.scss'
 
-import React, { useLayoutEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -79,9 +79,9 @@ const NodeDefDetails = (props) => {
     return _tabs
   }, [Actions, canHaveMobileProps, editingFromDesigner, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     DomUtils.makeElementInert(fieldsRef.current, readOnly)
-  }, [readOnly])
+  }, [readOnly, nodeDefNull])
 
   if (!nodeDef) return null
 
