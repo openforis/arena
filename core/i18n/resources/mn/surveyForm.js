@@ -134,6 +134,8 @@ Arena Mobile дээр:
     noEntitiesAvailable: 'Нэгж байхгүй байна',
     loadingSurveys: 'Судалгаануудыг ачаалж байна...',
     noSurveysAvailable: 'Судалгаа байхгүй байна',
+    sourceEntity: 'Эх нэгж',
+    targetEntityCurrentSurvey: 'Зорилтот нэгж (одоогийн судалгаа)',
   },
   confirmNodeDelete: 'Та энэ {{nodeDefType}} ({{nodeDefLabel}})-г устгахыг хүсч байгаадаа итгэлтэй байна уу?',
   downloadPrintableDocument: 'Хэвлэх баримт бичиг татах (Word)',

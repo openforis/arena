@@ -1026,6 +1026,16 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     batchImport: 'Importar categorías en lote (desde ZIP)',
     batchImportCompleteSuccessfully:
       '¡{{importedCategories}} categorías importadas correctamente!\n{{insertedCategories}} nuevas\n{{updatedCategories}} actualizadas',
+    cloneFromAnotherSurvey: {
+      title: 'Clonar categoría de otra encuesta',
+      sourceSurvey: 'Encuesta de origen',
+      sourceCategory: 'Categoría de origen',
+      loadingSurveys: 'Cargando encuestas...',
+      noSurveysAvailable: 'No hay encuestas disponibles',
+      selectSurveyFirst: 'Seleccione primero una encuesta',
+      loadingCategories: 'Cargando categorías...',
+      noCategoriesAvailable: 'No hay categorías disponibles en la encuesta seleccionada',
+    },
     itemsCount: 'Recuento de elementos',
     types: {
       flat: 'Plana',
