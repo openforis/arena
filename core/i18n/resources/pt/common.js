@@ -110,6 +110,8 @@ Ao confirmar, todas as alterações serão perdidas.
 Deseja prosseguir?`,
     local: 'Local',
     loading: 'Carregando...',
+    lock: 'Bloquear',
+    unlock: 'Desbloquear',
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Gerenciar',
@@ -468,8 +470,6 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       lock: 'Bloquear edição do atributo-chave',
       unlock: 'Permitir editar o atributo-chave',
     },
-    lock: 'Bloquear',
-    unlock: 'Desbloquear',
   },
 
   dataExplorerView: {
