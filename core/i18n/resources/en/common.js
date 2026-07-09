@@ -1181,6 +1181,16 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     batchImportCompleteSuccessfully: `{{importedCategories}} categories imported successfully!
 {{insertedCategories}} new
 {{updatedCategories}} updated`,
+    cloneFromAnotherSurvey: {
+      title: 'Clone Category From Another Survey',
+      sourceSurvey: 'Source survey',
+      sourceCategory: 'Source category',
+      loadingSurveys: 'Loading surveys...',
+      noSurveysAvailable: 'No surveys available',
+      selectSurveyFirst: 'Select a survey first',
+      loadingCategories: 'Loading categories...',
+      noCategoriesAvailable: 'No categories available in the selected survey',
+    },
     itemsCount: 'Items count',
     types: {
       flat: 'Flat',

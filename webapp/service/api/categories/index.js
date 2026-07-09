@@ -105,6 +105,17 @@ export const createCategory = async ({ surveyId }) => {
   return category
 }
 
+export const cloneCategoryFromSurvey = async ({ surveyId, sourceSurveyId, sourceCategoryUuid }) => {
+  const {
+    data: { category },
+  } = await axios.post(`/api/survey/${surveyId}/categories/clone-from-survey`, {
+    sourceSurveyId,
+    sourceCategoryUuid,
+  })
+
+  return category
+}
+
 // UPDATE
 export const updateCategoryProp = async ({ surveyId, categoryUuid, key, value }) => {
   const {

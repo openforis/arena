@@ -51,6 +51,8 @@ export default {
     invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
     nameDuplicate: 'A category with the same name already exists: {{name}}',
     srsNotDefined: 'SRS with code {{srs}} not defined in survey',
+    uuidDuplicate:
+      'This category has already been cloned into this survey (currently named "{{name}}"). It cannot be cloned again.',
   },
 
   dataImport: {

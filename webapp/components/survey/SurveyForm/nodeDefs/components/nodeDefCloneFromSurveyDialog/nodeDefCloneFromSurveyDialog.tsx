@@ -11,7 +11,6 @@ import { Button, ButtonCancel } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 
 import { SurveyEntitiesTreeView, SourceEntitySelection } from './surveyEntitiesTreeView'
 
@@ -34,7 +33,6 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
   const { currentNodeDef, onClose, onConfirm } = props
 
   const cycle = useSurveyCycleKey()
-  const i18n = useI18n()
   const surveyCurrent = useSurvey()
 
   const surveyCurrentHierarchy = Survey.getHierarchy()(surveyCurrent)
@@ -57,10 +55,10 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
       className="survey-form__node-def-clone-from-survey-dialog"
       onClose={onClose}
       showCloseButton
-      title={i18n.t('surveyForm.cloneFromAnotherSurvey.title')}
+      title="surveyForm:cloneFromAnotherSurvey.title"
     >
       <ModalBody>
-        <FormItem label={<span>Source entity</span>}>
+        <FormItem label="surveyForm:cloneFromAnotherSurvey.sourceEntity">
           <div className="clone-from-survey-dialog__tree-view-container">
             <SurveyEntitiesTreeView
               selectedSourceEntity={sourceEntitySelection}
@@ -69,7 +67,7 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
           </div>
         </FormItem>
 
-        <FormItem label={<span>Target entity (current survey)</span>}>
+        <FormItem label="surveyForm:cloneFromAnotherSurvey.targetEntityCurrentSurvey">
           <EntitySelector
             filterFn={(entityDef: object) => targetEntityFilterFn({ cycle, entityDef })}
             hierarchy={surveyCurrentHierarchy}

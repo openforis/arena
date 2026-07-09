@@ -51,6 +51,8 @@ export default {
     invalidParentItemOrder: 'O item com códigos {{parentItemCodes}} deve vir antes de seus filhos',
     nameDuplicate: 'Já existe uma categoria com o mesmo nome: {{name}}',
     srsNotDefined: 'SRS com código {{srs}} não definido no inventário',
+    uuidDuplicate:
+      'Esta categoria já foi clonada neste inventário (atualmente chamada "{{name}}"). Não pode ser clonada novamente.',
   },
 
   dataImport: {

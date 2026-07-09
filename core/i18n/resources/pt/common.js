@@ -1184,6 +1184,16 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
     batchImportCompleteSuccessfully: `{{importedCategories}} categorias importadas com sucesso!
   {{insertedCategories}} novas
   {{updatedCategories}} atualizadas`,
+    cloneFromAnotherSurvey: {
+      title: 'Clonar categoria de outro inquérito',
+      sourceSurvey: 'Inquérito de origem',
+      sourceCategory: 'Categoria de origem',
+      loadingSurveys: 'A carregar inquéritos...',
+      noSurveysAvailable: 'Nenhum inquérito disponível',
+      selectSurveyFirst: 'Selecione primeiro um inquérito',
+      loadingCategories: 'A carregar categorias...',
+      noCategoriesAvailable: 'Nenhuma categoria disponível no inquérito selecionado',
+    },
     itemsCount: 'Contagem de itens',
     types: {
       flat: 'Plano',
