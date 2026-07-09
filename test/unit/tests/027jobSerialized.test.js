@@ -28,4 +28,36 @@ describe('JobSerialized.getRemainingMillis', () => {
     const job = { progressPercent: 75, elapsedMillis: 9000, ended: false }
     expect(JobSerialized.getRemainingMillis(job)).toBe(3000)
   })
+
+  test('estimates remaining time with inner jobs using completed avg duration', () => {
+    const job = {
+      progressPercent: 50,
+      elapsedMillis: 10000,
+      ended: false,
+      innerJobs: [
+        { progressPercent: 100, elapsedMillis: 10000, ended: true },
+        { progressPercent: 50, elapsedMillis: 5000, ended: false, running: true },
+        { progressPercent: 0, elapsedMillis: 0, ended: false },
+      ],
+      currentInnerJobIndex: 1,
+    }
+
+    expect(JobSerialized.getRemainingMillis(job)).toBe(15000)
+  })
+
+  test('estimates remaining time with inner jobs using current job rate when no completed jobs exist', () => {
+    const job = {
+      progressPercent: 10,
+      elapsedMillis: 5000,
+      ended: false,
+      innerJobs: [
+        { progressPercent: 25, elapsedMillis: 5000, ended: false, running: true },
+        { progressPercent: 0, elapsedMillis: 0, ended: false },
+        { progressPercent: 0, elapsedMillis: 0, ended: false },
+      ],
+      currentInnerJobIndex: 0,
+    }
+
+    expect(JobSerialized.getRemainingMillis(job)).toBe(55000)
+  })
 })
