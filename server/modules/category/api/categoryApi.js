@@ -36,7 +36,6 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const { sourceSurveyId, sourceCategoryUuid } = Request.getBody(req)
 
-        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
         if (!sourceCategoryUuid) throw new Error('sourceCategoryUuid is required')
 
         const category = await CategoryService.cloneCategoryFromSurvey({
