@@ -1,6 +1,6 @@
 import './ChainDetails.scss'
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
 
@@ -11,11 +11,13 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/chain'
 import { useSurvey } from '@webapp/store/survey'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 import { useLocationPathMatcher, useOnPageUnload, useQuery } from '@webapp/components/hooks'
 import TabBar from '@webapp/components/tabBar'
+import { ButtonEditLockToggle } from '@webapp/components'
 
 import ButtonBar from './ButtonBar'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
@@ -29,6 +31,11 @@ const ChainDetails = () => {
   const { new: justCreated } = useQuery()
   const chain = useChain()
   const survey = useSurvey()
+  const canEditChain = useAuthCanUseAnalysis()
+  const chainEditLocked = useChainEditLocked()
+
+  // chain has just been created: keep it unlocked/editable and hide the lock toggle for the whole time this page stays mounted
+  const [isNewChain] = useState(justCreated === 'true')
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const canHaveRecords = Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)
@@ -39,6 +46,8 @@ const ChainDetails = () => {
     (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate })),
     [dispatch]
   )
+
+  const toggleEditLock = useCallback(() => dispatch(ChainActions.toggleEditLock), [dispatch])
 
   useEffect(() => {
     const init = async () => {
@@ -74,21 +83,27 @@ const ChainDetails = () => {
 
   return (
     <div className="chain">
-      <TabBar
-        tabs={[
-          {
-            label: 'chainView.basic',
-            component: ChainBasicProps,
-            props: { updateChain },
-          },
-          {
-            label: 'chainView.samplingDesign',
-            component: ChainSamplingDesignProps,
-            props: { updateChain },
-          },
-        ]}
-        showTabs={Chain.hasSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
-      />
+      <div className="chain-top-bar">
+        <TabBar
+          tabs={[
+            {
+              label: 'chainView.basic',
+              component: ChainBasicProps,
+              props: { updateChain },
+            },
+            {
+              label: 'chainView.samplingDesign',
+              component: ChainSamplingDesignProps,
+              props: { updateChain },
+            },
+          ]}
+          showTabs={Chain.hasSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
+        />
+
+        {canEditChain && !isNewChain && (
+          <ButtonEditLockToggle className="chain-edit-lock-toggle" locked={chainEditLocked} onClick={toggleEditLock} />
+        )}
+      </div>
 
       <AnalysisNodeDefs />
 

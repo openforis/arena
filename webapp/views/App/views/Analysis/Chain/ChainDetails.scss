@@ -7,6 +7,20 @@
     gap: 2rem;
     padding-bottom: 2rem;
 
+    .chain-top-bar {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+
+      .tab-bar {
+        flex: 1;
+      }
+
+      .chain-edit-lock-toggle {
+        flex-shrink: 0;
+      }
+    }
+
     .form-item,
     .labels-editor.with-label {
       height: auto;

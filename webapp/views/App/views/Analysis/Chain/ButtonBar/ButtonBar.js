@@ -5,9 +5,8 @@ import * as Chain from '@common/analysis/chain'
 
 import * as API from '@webapp/service/api'
 import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/chain'
-import { ButtonDelete, ButtonDownload, ButtonEditLockToggle } from '@webapp/components'
+import { ButtonDelete, ButtonDownload } from '@webapp/components'
 import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 const ButtonBar = () => {
   const dispatch = useDispatch()
@@ -16,11 +15,9 @@ const ButtonBar = () => {
   const chain = useChain()
   const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
-  const canEditChain = useAuthCanUseAnalysis()
   const chainEditLocked = useChainEditLocked()
 
   const deleteChain = () => dispatch(ChainActions.deleteChain({ chain, navigate }))
-  const toggleEditLock = () => dispatch(ChainActions.toggleEditLock)
 
   return (
     <div className="button-bar">
@@ -31,7 +28,6 @@ const ButtonBar = () => {
         label="chainView.downloadSummaryJSON"
         requestParams={{ cycle, lang }}
       />
-      {canEditChain && <ButtonEditLockToggle locked={chainEditLocked} onClick={toggleEditLock} />}
       <ButtonDelete disabled={chainEditLocked} label="chainView.deleteChain" onClick={deleteChain} />
     </div>
   )
