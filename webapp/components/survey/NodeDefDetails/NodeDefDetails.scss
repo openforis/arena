@@ -13,6 +13,10 @@
     z-index: $zIndex10TopOfApp;
   }
 
+  &.read-only .node-def-edit__fields > * {
+    opacity: 0.6;
+  }
+
   .form_row,
   .form-item_body {
     display: flex;
@@ -49,6 +53,10 @@
   padding-top: 1.5rem;
   grid-template-rows: auto auto 0.9fr 0.1fr;
   grid-row-gap: 1.5rem;
+
+  .node-def-edit__fields {
+    display: contents;
+  }
 
   .form {
     grid-row-gap: 0.5rem;
