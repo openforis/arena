@@ -88,8 +88,8 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }) => {
           className="btn btn-xs btn-transparent"
           to={`${appModuleUri(analysisModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
         >
-          <span className="icon icon-pencil2 icon-10px icon-left" />
-          {i18n.t('common.edit')}
+          <span className={`icon ${editable ? 'icon-pencil2' : 'icon-eye'} icon-10px icon-left`} />
+          {i18n.t(editable ? 'common.edit' : 'common.view')}
         </Link>
       </div>
     </div>
