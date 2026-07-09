@@ -13,7 +13,7 @@ import { useChain, useChainEditable, useChainRecordsCountByStep } from '@webapp/
 import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import { ChainRStudioFieldset } from './ChainRStudioFieldset'
+import { ChainRStudioPanel } from './ChainRStudioPanel'
 
 export const ChainBasicProps = (props) => {
   const { updateChain } = props
@@ -79,7 +79,7 @@ export const ChainBasicProps = (props) => {
         </div>
       </FormItem>
 
-      <ChainRStudioFieldset updateChain={updateChain} />
+      <ChainRStudioPanel updateChain={updateChain} />
     </div>
   )
 }
