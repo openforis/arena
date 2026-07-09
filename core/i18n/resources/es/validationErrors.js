@@ -50,6 +50,8 @@ export default {
     invalidParentItemOrder: 'El elemento con códigos {{parentItemCodes}} debe ir antes que sus hijos',
     nameDuplicate: 'Ya existe una categoría con el mismo nombre: {{name}}',
     srsNotDefined: 'SRS con código {{srs}} no definido en la encuesta',
+    uuidDuplicate:
+      'Esta categoría ya ha sido clonada en esta encuesta (actualmente llamada "{{name}}"). No se puede clonar de nuevo.',
   },
 
   dataImport: {
