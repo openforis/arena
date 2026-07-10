@@ -6,6 +6,8 @@ import { taxonomies } from '../../mock/taxonomies'
 import { getProps } from './_surveyUtils'
 import { parseCsvAsync } from '../../../utils/csvUtils'
 
+const vernacularLanguageCodeMap = { en: 'eng', sw: 'swa' }
+
 export const verifyTaxonomies = (survey) =>
   test('Verify taxonomies', async () => {
     const taxonomiesExport = Object.values(getSurveyEntry(survey, ExportFile.taxonomies))
@@ -32,7 +34,8 @@ export const verifyTaxonomies = (survey) =>
         for (const vernacularNameExport of Object.values(taxonExport.vernacularNames ?? {}).flat()) {
           const vernacularNameExportProps = getProps(vernacularNameExport)
           const vernacularLangCode = vernacularNameExportProps.code
-          const expectedVernacularName = taxonExpected[vernacularLangCode]
+          const expectedVernacularName =
+            taxonExpected[vernacularLangCode] ?? taxonExpected[vernacularLanguageCodeMap[vernacularLangCode]]
           await expect(vernacularNameExportProps.name).toBe(expectedVernacularName)
         }
       }
