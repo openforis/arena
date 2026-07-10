@@ -2,10 +2,10 @@ import '../../cloneFromSurveyDialog.scss'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Category as ArenaCategory } from '@openforis/arena-core'
+import { Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 import * as API from '@webapp/service/api'
 import { surveyInfoToLabel, useNotifyError, useOtherSurveysList } from '@webapp/components/hooks'
@@ -17,14 +17,14 @@ import { Dropdown } from '@webapp/components/form'
 import { Button, ButtonCancel } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 
-import { getCategoryDuplicateCheck } from './categoryCloneDuplicateCheck'
+import { getTaxonomyDuplicateCheck } from './taxonomyCloneDuplicateCheck'
 
-type CategoryCloneFromSurveyDialogProps = {
+type TaxonomyCloneFromSurveyDialogProps = {
   onClose: () => void
-  onConfirm: (params: { sourceSurveyId: number; sourceCategoryUuid: string }) => Promise<void>
+  onConfirm: (params: { sourceSurveyId: number; sourceTaxonomyUuid: string }) => Promise<void>
 }
 
-export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDialogProps): React.ReactElement => {
+export const TaxonomyCloneFromSurveyDialog = (props: TaxonomyCloneFromSurveyDialogProps): React.ReactElement => {
   const { onClose, onConfirm } = props
 
   const i18n = useI18n()
@@ -34,48 +34,48 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
   const { surveys, surveysLoading } = useOtherSurveysList()
   const [sourceSurvey, setSourceSurvey] = useState<object | null>(null)
 
-  const [categoriesBySurveyId, setCategoriesBySurveyId] = useState<Record<string, object[]>>({})
+  const [taxonomiesBySurveyId, setTaxonomiesBySurveyId] = useState<Record<string, object[]>>({})
   const [loadingSurveyId, setLoadingSurveyId] = useState<string | number | null>(null)
-  const [sourceCategory, setSourceCategory] = useState<ArenaCategory | null>(null)
+  const [sourceTaxonomy, setSourceTaxonomy] = useState<ArenaTaxonomy | null>(null)
 
-  const [currentSurveyCategories, setCurrentSurveyCategories] = useState<ArenaCategory[]>([])
+  const [currentSurveyTaxonomies, setCurrentSurveyTaxonomies] = useState<ArenaTaxonomy[]>([])
 
   const [cloning, setCloning] = useState(false)
 
   useEffect(() => {
-    API.fetchCategories({ surveyId: currentSurveyId, draft: true })
-      .then(setCurrentSurveyCategories)
-      .catch(() => setCurrentSurveyCategories([]))
+    API.fetchTaxonomies({ surveyId: currentSurveyId, draft: true })
+      .then(setCurrentSurveyTaxonomies)
+      .catch(() => setCurrentSurveyTaxonomies([]))
   }, [currentSurveyId])
 
   const sourceSurveyId = sourceSurvey ? Survey.getIdSurveyInfo(sourceSurvey) : null
-  const categories = sourceSurveyId ? categoriesBySurveyId[sourceSurveyId] : null
-  const categoriesLoading = sourceSurveyId !== null && loadingSurveyId === sourceSurveyId
+  const taxonomies = sourceSurveyId ? taxonomiesBySurveyId[sourceSurveyId] : null
+  const taxonomiesLoading = sourceSurveyId !== null && loadingSurveyId === sourceSurveyId
 
   const onSourceSurveyChange = useCallback(
     (surveyInfo: object | null) => {
       setSourceSurvey(surveyInfo)
-      setSourceCategory(null)
+      setSourceTaxonomy(null)
 
       const surveyId = surveyInfo ? Survey.getIdSurveyInfo(surveyInfo) : null
-      if (!surveyId || categoriesBySurveyId[surveyId]) return
+      if (!surveyId || taxonomiesBySurveyId[surveyId]) return
 
       setLoadingSurveyId(surveyId)
-      API.fetchCategories({ surveyId, draft: true })
-        .then((categoriesFetched: object[]) => {
-          setCategoriesBySurveyId((statePrev) => ({ ...statePrev, [surveyId]: categoriesFetched }))
+      API.fetchTaxonomies({ surveyId, draft: true })
+        .then((taxonomiesFetched: object[]) => {
+          setTaxonomiesBySurveyId((statePrev) => ({ ...statePrev, [surveyId]: taxonomiesFetched }))
         })
         .catch(() => {
-          setCategoriesBySurveyId((statePrev) => ({ ...statePrev, [surveyId]: [] }))
+          setTaxonomiesBySurveyId((statePrev) => ({ ...statePrev, [surveyId]: [] }))
         })
         .finally(() => setLoadingSurveyId((prev) => (prev === surveyId ? null : prev)))
     },
-    [categoriesBySurveyId]
+    [taxonomiesBySurveyId]
   )
 
   const duplicateCheck = useMemo(
-    () => getCategoryDuplicateCheck({ currentSurveyCategories, sourceCategory }),
-    [currentSurveyCategories, sourceCategory]
+    () => getTaxonomyDuplicateCheck({ currentSurveyTaxonomies, sourceTaxonomy }),
+    [currentSurveyTaxonomies, sourceTaxonomy]
   )
 
   const onConfirmClick = useCallback(async () => {
@@ -87,7 +87,7 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
     try {
       await onConfirm({
         sourceSurveyId: Survey.getIdSurveyInfo(sourceSurvey),
-        sourceCategoryUuid: Category.getUuid(sourceCategory),
+        sourceTaxonomyUuid: Taxonomy.getUuid(sourceTaxonomy),
       })
     } catch (error: any) {
       const { key, params } = error?.response?.data ?? {}
@@ -95,32 +95,32 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
     } finally {
       setCloning(false)
     }
-  }, [duplicateCheck, notifyError, onConfirm, sourceCategory, sourceSurvey])
+  }, [duplicateCheck, notifyError, onConfirm, sourceTaxonomy, sourceSurvey])
 
   const sourceSurveyDropdownPlaceholder = useMemo(() => {
-    if (surveysLoading) return i18n.t('categoryList.cloneFromAnotherSurvey.loadingSurveys')
-    if (surveys.length === 0) return i18n.t('categoryList.cloneFromAnotherSurvey.noSurveysAvailable')
+    if (surveysLoading) return i18n.t('taxonomy.cloneFromAnotherSurvey.loadingSurveys')
+    if (surveys.length === 0) return i18n.t('taxonomy.cloneFromAnotherSurvey.noSurveysAvailable')
     return i18n.t('common.selectOne')
   }, [surveysLoading, surveys, i18n])
 
-  const categoryDropdownPlaceholder = useMemo(() => {
-    if (!sourceSurvey) return i18n.t('categoryList.cloneFromAnotherSurvey.selectSurveyFirst')
-    if (categoriesLoading) return i18n.t('categoryList.cloneFromAnotherSurvey.loadingCategories')
-    if (categories?.length === 0) return i18n.t('categoryList.cloneFromAnotherSurvey.noCategoriesAvailable')
+  const taxonomyDropdownPlaceholder = useMemo(() => {
+    if (!sourceSurvey) return i18n.t('taxonomy.cloneFromAnotherSurvey.selectSurveyFirst')
+    if (taxonomiesLoading) return i18n.t('taxonomy.cloneFromAnotherSurvey.loadingTaxonomies')
+    if (taxonomies?.length === 0) return i18n.t('taxonomy.cloneFromAnotherSurvey.noTaxonomiesAvailable')
     return undefined
-  }, [categories, categoriesLoading, i18n, sourceSurvey])
+  }, [taxonomies, taxonomiesLoading, i18n, sourceSurvey])
 
-  const confirmButtonDisabled = !sourceSurvey || !sourceCategory || cloning || !!duplicateCheck
+  const confirmButtonDisabled = !sourceSurvey || !sourceTaxonomy || cloning || !!duplicateCheck
 
   return (
     <Modal
-      className="category-list__category-clone-from-survey-dialog clone-from-survey-dialog"
+      className="taxonomy-list__taxonomy-clone-from-survey-dialog clone-from-survey-dialog"
       onClose={onClose}
       showCloseButton
-      title="categoryList.cloneFromAnotherSurvey.title"
+      title="taxonomy.cloneFromAnotherSurvey.title"
     >
       <ModalBody>
-        <FormItem label="categoryList.cloneFromAnotherSurvey.sourceSurvey">
+        <FormItem label="taxonomy.cloneFromAnotherSurvey.sourceSurvey">
           <Dropdown
             items={surveys}
             itemLabel={surveyInfoToLabel}
@@ -132,16 +132,16 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
           />
         </FormItem>
 
-        <FormItem label="categoryList.cloneFromAnotherSurvey.sourceCategory">
+        <FormItem label="taxonomy.cloneFromAnotherSurvey.sourceTaxonomy">
           <Dropdown
             disabled={!sourceSurvey}
-            items={categories ?? []}
-            itemLabel={(category: object) => Category.getName(category)}
-            itemValue={(category: object) => Category.getUuid(category)}
-            loading={categoriesLoading}
-            onChange={setSourceCategory}
-            placeholder={categoryDropdownPlaceholder}
-            selection={sourceCategory}
+            items={taxonomies ?? []}
+            itemLabel={(taxonomy: object) => Taxonomy.getName(taxonomy)}
+            itemValue={(taxonomy: object) => Taxonomy.getUuid(taxonomy)}
+            loading={taxonomiesLoading}
+            onChange={setSourceTaxonomy}
+            placeholder={taxonomyDropdownPlaceholder}
+            selection={sourceTaxonomy}
           />
         </FormItem>
 

@@ -193,6 +193,12 @@ export default {
     vernacularNamesDuplicate: `Дублирующее местное название '{{name}}' для языка '{{lang}}'`,
   },
 
+  taxonomyImport: {
+    nameDuplicate: 'Таксономия с таким именем уже существует: {{name}}',
+    uuidDuplicate:
+      'Эта таксономия уже была клонирована в этот опрос (в настоящее время называется "{{name}}"). Её нельзя клонировать снова.',
+  },
+
   taxonomyImportJob: {
     duplicateExtraPropsColumns: 'Дублирующие столбцы дополнительной информации: {{duplicateColumns}}',
     invalidExtraPropColumn:

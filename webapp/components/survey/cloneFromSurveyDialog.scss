@@ -1,7 +1,7 @@
 @use '~@webapp/style/vars' as *;
 
-.category-list__category-clone-from-survey-dialog {
-  .clone-from-survey-dialog__message {
+.clone-from-survey-dialog {
+  &__message {
     color: var(--text-color);
     font-size: 0.85rem;
     padding: 0.25rem 0.1rem;
