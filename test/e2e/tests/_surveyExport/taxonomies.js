@@ -29,7 +29,7 @@ export const verifyTaxonomies = (survey) =>
         await expect(taxonExportProps.family).toBe(taxonExpected.family)
         await expect(taxonExportProps.scientificName).toBe(taxonExpected.scientific_name)
 
-        for (const vernacularNameExport of Object.values(taxonExportProps.vernacularNames ?? {}).flat()) {
+        for (const vernacularNameExport of Object.values(taxonExport.vernacularNames ?? {}).flat()) {
           const vernacularNameExportProps = getProps(vernacularNameExport)
           const vernacularLangCode = vernacularNameExportProps.code
           const expectedVernacularName = taxonExpected[vernacularLangCode]
