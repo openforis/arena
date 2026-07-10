@@ -56,4 +56,12 @@ export class CategoryBuilder {
       await CategoryManager.insertItems(user, surveyId, items, t)
     }
   }
+
+  async buildAndStore(user, surveyId, t) {
+    const { category, items } = this.build()
+    await CategoryManager.insertCategory({ user, surveyId, category, system: false, validate: false }, t)
+    if (items.length > 0) {
+      await CategoryManager.insertItems(user, surveyId, items, t)
+    }
+  }
 }
