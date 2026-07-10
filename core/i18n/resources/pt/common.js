@@ -1152,6 +1152,8 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
 
 Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo *tree_species* marcado como **Único**, poderá ter apenas uma árvore por espécie dentro do mesmo *plot*.`,
     },
+    categoriesClonedFromSurvey: 'As seguintes categorias também foram clonadas do inventário de origem: {{names}}',
+    taxonomiesClonedFromSurvey: 'As seguintes taxonomias também foram clonadas do inventário de origem: {{names}}',
   },
 
   languagesEditor: {

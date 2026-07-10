@@ -999,6 +999,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       label: 'Único',
       info: 'Cuando un atributo está marcado como **Único**, su valor debe ser único dentro de la entidad múltiple más cercana (se mostrará un error en caso contrario). \n\n---\n\nEj.: en una estructura como *clúster -> parcela -> árbol*, si tiene un atributo *tree_species* marcado como **Único**, solo puede tener un árbol por especie dentro de la misma *parcela*.',
     },
+    categoriesClonedFromSurvey: 'Las siguientes categorías también se clonaron desde la encuesta de origen: {{names}}',
+    taxonomiesClonedFromSurvey: 'Las siguientes taxonomías también se clonaron desde la encuesta de origen: {{names}}',
   },
   languagesEditor: {
     languages: 'Idioma(s)',

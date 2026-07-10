@@ -1158,6 +1158,10 @@ Ex. this.region = nom_attribut_region
 
 Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un attribut *espece_arbre* marqué comme **Unique**, vous ne pouvez avoir qu'un seul arbre par espèce dans la même *parcelle*.`,
     },
+    categoriesClonedFromSurvey:
+      "Les catégories suivantes ont également été clonées depuis l'enquête source : {{names}}",
+    taxonomiesClonedFromSurvey:
+      "Les taxonomies suivantes ont également été clonées depuis l'enquête source : {{names}}",
   },
 
   languagesEditor: {
