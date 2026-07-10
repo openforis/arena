@@ -1,4 +1,3 @@
-import * as PromiseUtils from '../../../../core/promiseUtils'
 import * as DateUtils from '../../../../core/dateUtils'
 
 import { getSelector, TestId } from '../../../../webapp/utils/testId'
@@ -61,11 +60,11 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
   // try to fill the code and select an item from the autocomplete 2 times:
   // autocomplete dialog could have been closed after record update
   let valueSet = false
-  await PromiseUtils.each([...new Array(2).keys()], async () => {
+  for (const _i of [...new Array(2).keys()]) {
     if (!valueSet) {
       if (await fillCodeAndSelectItem()) valueSet = true
     }
-  })
+  }
   expect(valueSet).toBeTruthy()
 }
 

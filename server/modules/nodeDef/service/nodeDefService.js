@@ -6,7 +6,6 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 import * as ObjectUtils from '@core/objectUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -183,12 +182,18 @@ export const cloneNodeDefFromSurvey = async (
       taxonomyUuidsToClone,
     } = Survey.resolveClonedNodeDefsCategoriesAndTaxonomies({ sourceSurvey, targetSurvey, clonedNodeDefs })
 
-    const categoriesCloned = await PromiseUtils.each(categoryUuidsToClone, (sourceCategoryUuid) =>
-      CategoryManager.cloneCategoryFromSurvey({ user, sourceSurveyId, sourceCategoryUuid, targetSurveyId }, t)
-    )
-    const taxonomiesCloned = await PromiseUtils.each(taxonomyUuidsToClone, (sourceTaxonomyUuid) =>
-      TaxonomyManager.cloneTaxonomyFromSurvey({ user, sourceSurveyId, sourceTaxonomyUuid, targetSurveyId }, t)
-    )
+    const categoriesCloned = []
+    for (const sourceCategoryUuid of categoryUuidsToClone) {
+      categoriesCloned.push(
+        await CategoryManager.cloneCategoryFromSurvey({ user, sourceSurveyId, sourceCategoryUuid, targetSurveyId }, t)
+      )
+    }
+    const taxonomiesCloned = []
+    for (const sourceTaxonomyUuid of taxonomyUuidsToClone) {
+      taxonomiesCloned.push(
+        await TaxonomyManager.cloneTaxonomyFromSurvey({ user, sourceSurveyId, sourceTaxonomyUuid, targetSurveyId }, t)
+      )
+    }
 
     const rootClonedNodeDefResolved = resolvedClonedNodeDefs.find(
       (nd) => NodeDef.getUuid(nd) === NodeDef.getUuid(rootClonedNodeDef)
