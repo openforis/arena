@@ -29,6 +29,7 @@ export {
   fetchTaxonomies,
   fetchTaxonomy,
   createTaxonomy,
+  cloneTaxonomyFromSurvey,
   uploadTaxa,
   updateTaxonomy,
   updateTaxonomyExtraPropDef,

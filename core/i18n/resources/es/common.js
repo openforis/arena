@@ -1018,6 +1018,16 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     header: 'Taxonomía',
     cantBeDeleted: "$t(common.cantBeDeletedUsedItem, {'item': 'taxonomía'})",
     confirmDelete: '¿Eliminar la taxonomía {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clonar taxonomía de otra encuesta',
+      sourceSurvey: 'Encuesta de origen',
+      sourceTaxonomy: 'Taxonomía de origen',
+      loadingSurveys: 'Cargando encuestas...',
+      noSurveysAvailable: 'No hay encuestas disponibles',
+      selectSurveyFirst: 'Seleccione primero una encuesta',
+      loadingTaxonomies: 'Cargando taxonomías...',
+      noTaxonomiesAvailable: 'No hay taxonomías disponibles en la encuesta seleccionada',
+    },
     edit: {
       taxonomyListName: 'Nombre de la lista de taxonomía',
       taxaNotImported: 'Taxones no importados',

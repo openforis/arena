@@ -1140,6 +1140,16 @@ $t(common.appNameFull)
     header: 'Таксоном',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Таксоном {{taxonomyName}}-г устгах уу?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Өөр судалгаанаас таксоном хуулах',
+      sourceSurvey: 'Эх сурвалж судалгаа',
+      sourceTaxonomy: 'Эх сурвалж таксоном',
+      loadingSurveys: 'Судалгаанууд ачаалж байна...',
+      noSurveysAvailable: 'Судалгаа алга байна',
+      selectSurveyFirst: 'Эхлээд судалгаа сонгоно уу',
+      loadingTaxonomies: 'Таксоном ачаалж байна...',
+      noTaxonomiesAvailable: 'Сонгосон судалгаанд таксоном алга байна',
+    },
     edit: {
       taxonomyListName: 'Таксономын жагсаалтын нэр',
       taxaNotImported: 'Таксонуудыг импортлоогүй',

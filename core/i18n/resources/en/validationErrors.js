@@ -192,6 +192,12 @@ export default {
     vernacularNamesDuplicate: `Duplicate vernacular name '{{name}}' for language '{{lang}}'`,
   },
 
+  taxonomyImport: {
+    nameDuplicate: 'A taxonomy with the same name already exists: {{name}}',
+    uuidDuplicate:
+      'This taxonomy has already been cloned into this survey (currently named "{{name}}"). It cannot be cloned again.',
+  },
+
   taxonomyImportJob: {
     duplicateExtraPropsColumns: 'Duplicate Extra Info columns: {{duplicateColumns}}',
     invalidExtraPropColumn: 'Invalid Extra Info column name "{{columnName}}": it cannot be a reserved word',
