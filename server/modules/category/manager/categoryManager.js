@@ -7,6 +7,7 @@ import SystemError from '@core/systemError'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
+import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -260,19 +261,16 @@ export const cloneCategoryFromSurvey = async (
       { surveyId: targetSurveyId, draft: true },
       t
     )
-    // category uuids are preserved when cloning (see doc above): if this category has already been
-    // cloned into the target survey before (and possibly renamed since), cloning it again would
-    // violate the uuid uniqueness constraint in the target survey schema.
-    const targetCategoryWithSameUuid = targetCategories.find(
-      (targetCategory) => Category.getUuid(targetCategory) === sourceCategoryUuid
-    )
-    if (targetCategoryWithSameUuid) {
-      throw new SystemError('validationErrors:categoryImport.uuidDuplicate', {
-        name: Category.getName(targetCategoryWithSameUuid),
-      })
-    }
-    if (targetCategories.some((targetCategory) => Category.getName(targetCategory) === categoryName)) {
-      throw new SystemError('validationErrors:categoryImport.nameDuplicate', { name: categoryName })
+    const duplicateCheck = checkCloneFromSurveyDuplicate({
+      targetSurveyItems: targetCategories,
+      sourceItem: sourceCategory,
+      getUuid: Category.getUuid,
+      getName: Category.getName,
+      uuidDuplicateErrorKey: 'validationErrors:categoryImport.uuidDuplicate',
+      nameDuplicateErrorKey: 'validationErrors:categoryImport.nameDuplicate',
+    })
+    if (duplicateCheck) {
+      throw new SystemError(duplicateCheck.key, duplicateCheck.params)
     }
 
     await CategoryRepository.cloneCategoryFromSurvey(

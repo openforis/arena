@@ -1,11 +1,12 @@
 import { Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
 
 import * as Taxonomy from '@core/survey/taxonomy'
+import {
+  checkCloneFromSurveyDuplicate,
+  CloneFromSurveyDuplicateCheckResult,
+} from '@core/survey/cloneFromSurveyDuplicateCheck'
 
-export type TaxonomyDuplicateCheckResult = {
-  key: string
-  params: { name: string }
-} | null
+export type TaxonomyDuplicateCheckResult = CloneFromSurveyDuplicateCheckResult
 
 /**
  * Checks whether the source taxonomy to be cloned would clash (by uuid or name) with an existing taxonomy in the current survey.
@@ -24,27 +25,12 @@ export const getTaxonomyDuplicateCheck = ({
 }): TaxonomyDuplicateCheckResult => {
   if (!sourceTaxonomy) return null
 
-  const sourceTaxonomyUuid = Taxonomy.getUuid(sourceTaxonomy)
-  const sourceTaxonomyName = Taxonomy.getName(sourceTaxonomy)
-
-  // taxonomy uuids are preserved when cloning: if this exact taxonomy has already been cloned
-  // into the current survey before (even if renamed since), cloning it again is not allowed
-  const taxonomyWithSameUuid = currentSurveyTaxonomies.find(
-    (taxonomy: ArenaTaxonomy) => Taxonomy.getUuid(taxonomy) === sourceTaxonomyUuid
-  )
-  if (taxonomyWithSameUuid) {
-    return {
-      key: 'validationErrors:taxonomyImport.uuidDuplicate',
-      params: { name: Taxonomy.getName(taxonomyWithSameUuid) },
-    }
-  }
-
-  if (currentSurveyTaxonomies.some((taxonomy: ArenaTaxonomy) => Taxonomy.getName(taxonomy) === sourceTaxonomyName)) {
-    return {
-      key: 'validationErrors:taxonomyImport.nameDuplicate',
-      params: { name: sourceTaxonomyName },
-    }
-  }
-
-  return null
+  return checkCloneFromSurveyDuplicate({
+    targetSurveyItems: currentSurveyTaxonomies,
+    sourceItem: sourceTaxonomy,
+    getUuid: Taxonomy.getUuid,
+    getName: Taxonomy.getName,
+    uuidDuplicateErrorKey: 'validationErrors:taxonomyImport.uuidDuplicate',
+    nameDuplicateErrorKey: 'validationErrors:taxonomyImport.nameDuplicate',
+  })
 }

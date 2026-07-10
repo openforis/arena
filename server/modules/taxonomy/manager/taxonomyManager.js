@@ -7,6 +7,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
 import * as Taxon from '@core/survey/taxon'
 import * as Taxonomy from '@core/survey/taxonomy'
+import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
 
 import { db } from '@server/db/db'
 
@@ -93,19 +94,16 @@ export const cloneTaxonomyFromSurvey = async (
       t
     )
 
-    // taxonomy uuids are preserved when cloning (see doc above): if this taxonomy has already been
-    // cloned into the target survey before (and possibly renamed since), cloning it again would
-    // violate the uuid uniqueness constraint in the target survey schema.
-    const targetTaxonomyWithSameUuid = targetTaxonomies.find(
-      (targetTaxonomy) => Taxonomy.getUuid(targetTaxonomy) === sourceTaxonomyUuid
-    )
-    if (targetTaxonomyWithSameUuid) {
-      throw new SystemError('validationErrors:taxonomyImport.uuidDuplicate', {
-        name: Taxonomy.getName(targetTaxonomyWithSameUuid),
-      })
-    }
-    if (targetTaxonomies.some((targetTaxonomy) => Taxonomy.getName(targetTaxonomy) === taxonomyName)) {
-      throw new SystemError('validationErrors:taxonomyImport.nameDuplicate', { name: taxonomyName })
+    const duplicateCheck = checkCloneFromSurveyDuplicate({
+      targetSurveyItems: targetTaxonomies,
+      sourceItem: sourceTaxonomy,
+      getUuid: Taxonomy.getUuid,
+      getName: Taxonomy.getName,
+      uuidDuplicateErrorKey: 'validationErrors:taxonomyImport.uuidDuplicate',
+      nameDuplicateErrorKey: 'validationErrors:taxonomyImport.nameDuplicate',
+    })
+    if (duplicateCheck) {
+      throw new SystemError(duplicateCheck.key, duplicateCheck.params)
     }
 
     await TaxonomyRepository.cloneTaxonomyFromSurvey(
