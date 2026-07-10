@@ -1160,6 +1160,16 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     header: 'Taxonomy',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Delete the taxonomy {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clone Taxonomy From Another Survey',
+      sourceSurvey: 'Source survey',
+      sourceTaxonomy: 'Source taxonomy',
+      loadingSurveys: 'Loading surveys...',
+      noSurveysAvailable: 'No surveys available',
+      selectSurveyFirst: 'Select a survey first',
+      loadingTaxonomies: 'Loading taxonomies...',
+      noTaxonomiesAvailable: 'No taxonomies available in the selected survey',
+    },
     edit: {
       taxonomyListName: 'Taxonomy list name',
       taxaNotImported: 'Taxa not imported',

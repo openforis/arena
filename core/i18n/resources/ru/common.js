@@ -1139,6 +1139,16 @@ $t(common.appNameFull)
     header: 'Таксономия',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Удалить таксономию {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Клонировать таксономию из другого опроса',
+      sourceSurvey: 'Исходный опрос',
+      sourceTaxonomy: 'Исходная таксономия',
+      loadingSurveys: 'Загрузка опросов...',
+      noSurveysAvailable: 'Нет доступных опросов',
+      selectSurveyFirst: 'Сначала выберите опрос',
+      loadingTaxonomies: 'Загрузка таксономий...',
+      noTaxonomiesAvailable: 'В выбранном опросе нет доступных таксономий',
+    },
     edit: {
       taxonomyListName: 'Название списка таксономии',
       taxaNotImported: 'Таксоны не импортированы',

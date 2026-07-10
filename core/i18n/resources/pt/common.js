@@ -1163,6 +1163,16 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
     header: 'Taxonomia',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Excluir a taxonomia {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clonar taxonomia de outro inquérito',
+      sourceSurvey: 'Inquérito de origem',
+      sourceTaxonomy: 'Taxonomia de origem',
+      loadingSurveys: 'A carregar inquéritos...',
+      noSurveysAvailable: 'Nenhum inquérito disponível',
+      selectSurveyFirst: 'Selecione primeiro um inquérito',
+      loadingTaxonomies: 'A carregar taxonomias...',
+      noTaxonomiesAvailable: 'Nenhuma taxonomia disponível no inquérito selecionado',
+    },
     edit: {
       taxonomyListName: 'Nome da lista de taxonomia',
       taxaNotImported: 'Táxons não importados',

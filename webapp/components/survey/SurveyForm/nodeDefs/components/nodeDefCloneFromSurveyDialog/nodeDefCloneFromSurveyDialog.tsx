@@ -1,3 +1,4 @@
+import '../../../../cloneFromSurveyDialog.scss'
 import './nodeDefCloneFromSurveyDialog.scss'
 
 import React, { useCallback, useState } from 'react'
@@ -52,7 +53,7 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
 
   return (
     <Modal
-      className="survey-form__node-def-clone-from-survey-dialog"
+      className="survey-form__node-def-clone-from-survey-dialog clone-from-survey-dialog"
       onClose={onClose}
       showCloseButton
       title="surveyForm:cloneFromAnotherSurvey.title"
