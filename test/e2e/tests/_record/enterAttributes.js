@@ -60,10 +60,8 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
   // try to fill the code and select an item from the autocomplete 2 times:
   // autocomplete dialog could have been closed after record update
   let valueSet = false
-  for (const _i of [...new Array(2).keys()]) {
-    if (!valueSet) {
-      if (await fillCodeAndSelectItem()) valueSet = true
-    }
+  for (let attempt = 0; attempt < 2 && !valueSet; attempt++) {
+    if (await fillCodeAndSelectItem()) valueSet = true
   }
   expect(valueSet).toBeTruthy()
 }
