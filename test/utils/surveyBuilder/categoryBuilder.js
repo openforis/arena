@@ -1,5 +1,6 @@
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
 export class CategoryBuilder {
   constructor(name) {
@@ -40,6 +41,14 @@ export class CategoryBuilder {
     return {
       category,
       items,
+    }
+  }
+
+  async buildAndStore(user, surveyId, t) {
+    const { category, items } = this.build()
+    await CategoryManager.insertCategory({ user, surveyId, category, system: false, validate: false }, t)
+    if (items.length > 0) {
+      await CategoryManager.insertItems(user, surveyId, items, t)
     }
   }
 }
