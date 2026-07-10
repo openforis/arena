@@ -23,15 +23,18 @@ export const verifyTaxonomies = (survey) =>
       await expect(taxaExport.length).toBe(taxa.length)
 
       for (const taxonExport of taxaExport) {
+        console.error('===taxon export', JSON.stringify(taxonExport, null, 2))
         const taxonExportProps = getProps(taxonExport)
         const taxonExpected = taxa.find((_taxon) => _taxon.code === taxonExportProps.code)
+        console.error('===taxon expected', JSON.stringify(taxonExpected, null, 2))
         await expect(taxonExportProps.genus).toBe(taxonExpected.genus)
         await expect(taxonExportProps.family).toBe(taxonExpected.family)
         await expect(taxonExportProps.scientificName).toBe(taxonExpected.scientific_name)
 
         for (const vernacularNameExport of Object.values(taxonExport.vernacularNames ?? {}).flat()) {
+          console.error('===vernacular name export', JSON.stringify(vernacularNameExport, null, 2))
           const vernacularNameExportProps = getProps(vernacularNameExport)
-          const vernacularLangCode = vernacularNameExportProps.code
+          const vernacularLangCode = vernacularNameExportProps.lang
           const expectedVernacularName = taxonExpected[vernacularLangCode]
           await expect(vernacularNameExportProps.name).toBe(expectedVernacularName)
         }
