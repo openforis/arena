@@ -29,7 +29,7 @@ export const each = async <T>(
     }
   }
 
-  return resolveGenerator(generator())
+  return handleGeneratorNext([])(generator())
 }
 
 export const waitFor = (seconds: number): Promise<void> =>
