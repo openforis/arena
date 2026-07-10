@@ -1168,6 +1168,16 @@ Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un att
     header: 'Taxonomie',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomie'})`,
     confirmDelete: 'Supprimer la taxonomie {{taxonomyName}} ?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Cloner une taxonomie depuis une autre enquête',
+      sourceSurvey: 'Enquête source',
+      sourceTaxonomy: 'Taxonomie source',
+      loadingSurveys: 'Chargement des enquêtes...',
+      noSurveysAvailable: 'Aucune enquête disponible',
+      selectSurveyFirst: "Sélectionnez d'abord une enquête",
+      loadingTaxonomies: 'Chargement des taxonomies...',
+      noTaxonomiesAvailable: "Aucune taxonomie disponible dans l'enquête sélectionnée",
+    },
     edit: {
       taxonomyListName: 'Nom de la liste de taxonomie',
       taxaNotImported: 'Taxons non importés',

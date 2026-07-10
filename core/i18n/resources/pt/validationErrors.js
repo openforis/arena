@@ -193,6 +193,12 @@ export default {
     vernacularNamesDuplicate: `Nome vernacular duplicado '{{name}}' para o idioma '{{lang}}'`,
   },
 
+  taxonomyImport: {
+    nameDuplicate: 'Já existe uma taxonomia com o mesmo nome: {{name}}',
+    uuidDuplicate:
+      'Esta taxonomia já foi clonada neste inventário (atualmente chamada "{{name}}"). Não pode ser clonada novamente.',
+  },
+
   taxonomyImportJob: {
     duplicateExtraPropsColumns: 'Colunas de informação extra duplicadas: {{duplicateColumns}}',
     invalidExtraPropColumn:

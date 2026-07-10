@@ -193,6 +193,12 @@ export default {
     vernacularNamesDuplicate: `'{{name}}' гэсэн нутгийн нэр давхцсан '{{lang}}' хэлээр`,
   },
 
+  taxonomyImport: {
+    nameDuplicate: 'Ижил нэртэй таксоном аль хэдийн байна: {{name}}',
+    uuidDuplicate:
+      'Энэ таксоном энэ судалгаанд аль хэдийн хуулагдсан байна (одоогийн нэр нь "{{name}}"). Дахин хуулах боломжгүй.',
+  },
+
   taxonomyImportJob: {
     duplicateExtraPropsColumns: 'Нэмэлт мэдээллийн баганууд давхцсан: {{duplicateColumns}}',
     invalidExtraPropColumn:
