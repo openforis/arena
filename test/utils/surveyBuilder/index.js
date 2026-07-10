@@ -97,9 +97,8 @@ class SurveyBuilder {
 
   /**
    * Builds the survey and saves it as draft or publish it.
-   *
-   * @param {boolean} [publish=true] - Whether to publish the survey.
-   * @param {pgPromise.IDatabase} [client=db] - The database client.
+   * @param {boolean} [publish] - Whether to publish the survey.
+   * @param {pgPromise.IDatabase} [client] - The database client.
    * @returns {Promise<Survey>} - The newly created survey object.
    */
   async buildAndStore(publish = true, client = db) {
@@ -120,6 +119,11 @@ class SurveyBuilder {
       const nodeDefRoot = Survey.getNodeDefRoot(surveyParam)
 
       await _insertNodeDefRecursively(surveyId, surveyParam, t)(nodeDefRoot)
+
+      // Categories
+      await Promise.all(
+        this.categoryBuilders.map((categoryBuilder) => categoryBuilder.buildAndStore(this.user, surveyId, t))
+      )
 
       // Taxonomies
       await Promise.all(
