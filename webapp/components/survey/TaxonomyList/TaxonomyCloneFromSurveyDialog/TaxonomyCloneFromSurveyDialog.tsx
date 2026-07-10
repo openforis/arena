@@ -1,4 +1,4 @@
-import './TaxonomyCloneFromSurveyDialog.scss'
+import '../../cloneFromSurveyDialog.scss'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -114,7 +114,7 @@ export const TaxonomyCloneFromSurveyDialog = (props: TaxonomyCloneFromSurveyDial
 
   return (
     <Modal
-      className="taxonomy-list__taxonomy-clone-from-survey-dialog"
+      className="taxonomy-list__taxonomy-clone-from-survey-dialog clone-from-survey-dialog"
       onClose={onClose}
       showCloseButton
       title="taxonomy.cloneFromAnotherSurvey.title"

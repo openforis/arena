@@ -1,4 +1,4 @@
-import './CategoryCloneFromSurveyDialog.scss'
+import '../../cloneFromSurveyDialog.scss'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
@@ -114,7 +114,7 @@ export const CategoryCloneFromSurveyDialog = (props: CategoryCloneFromSurveyDial
 
   return (
     <Modal
-      className="category-list__category-clone-from-survey-dialog"
+      className="category-list__category-clone-from-survey-dialog clone-from-survey-dialog"
       onClose={onClose}
       showCloseButton
       title="categoryList.cloneFromAnotherSurvey.title"
