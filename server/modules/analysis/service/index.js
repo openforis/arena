@@ -14,6 +14,8 @@ export {
   updateChainStatusExec,
   // ======  DELETE - Chain
   deleteChain,
+  // ======  CLONE - Chain
+  cloneChainFromSurvey,
   // ======  UTILS
   cleanChains,
 } from '../manager'

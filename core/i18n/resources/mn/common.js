@@ -762,6 +762,17 @@ $t(common.raiseTicketInSupportForum)
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Боловсруулах гинж устгагдсан',
+    cloneFromAnotherSurvey: 'Өөр судалгаанаас хуулах',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Өөр судалгаанаас гинжийг хуулах',
+      sourceSurvey: 'Эх судалгаа',
+      sourceChain: 'Эх гинж',
+      entityCheck: 'Объектын нийцтэй байдал',
+      entityMissing: 'зорилтот судалгаанд байхгүй',
+      noAnalysisAttributes: 'Энэ гинж шинжилгээний шинж чанаргүй байна',
+      cloneComplete: 'Гинж амжилттай хуулагдсан',
+      missingEntities: 'Хуулах боломжгүй: дараах объектууд зорилтот судалгаанд байхгүй байна: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `Зангилааны тодорхойлолт "{{label}}" нь боловсруулах гинжийн бүх мөчлөгт хамаарахгүй тул сонгох боломжгүй.`,
     cannotSelectCycle:
       'Энэ мөчлөгийг сонгох боломжгүй, учир нь зарим зангилааны тодорхойлолтууд энэ мөчлөгт хамаарахгүй.',

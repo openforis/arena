@@ -761,6 +761,17 @@ $t(common.raiseTicketInSupportForum)
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Цепочка обработки удалена',
+    cloneFromAnotherSurvey: 'Клонировать из другого опроса',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Клонировать цепочку из другого опроса',
+      sourceSurvey: 'Исходный опрос',
+      sourceChain: 'Исходная цепочка',
+      entityCheck: 'Совместимость сущностей',
+      entityMissing: 'отсутствует в целевом опросе',
+      noAnalysisAttributes: 'Эта цепочка не имеет атрибутов анализа',
+      cloneComplete: 'Цепочка успешно клонирована',
+      missingEntities: 'Невозможно клонировать: следующие сущности не существуют в целевом опросе: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `Определение узла "{{label}}" не может быть выбрано, поскольку оно не принадлежит всем циклам цепочки обработки`,
     cannotSelectCycle: 'Этот цикл не может быть выбран, так как некоторые определения узлов не принадлежат этому циклу',
     copyRStudioCode: `#### Вы собираетесь открыть RStudio Server ####
