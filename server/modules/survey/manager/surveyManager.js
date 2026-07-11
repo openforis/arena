@@ -308,8 +308,10 @@ const _validateFetchUserSurveysInfoSortParams = ({ sortBy, sortOrder }) => {
     throw new SystemError(`Invalid sortBy specified: ${sortBy}`)
   }
   // check sortOrder is valid
-  if (sortOrder && !['asc', 'desc'].includes(sortOrder.toLowerCase())) {
-    throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
+  if (sortOrder) {
+    const sortOrderStr = typeof sortOrder === 'string' ? sortOrder.toLowerCase() : null
+    if (!sortOrderStr || !['asc', 'desc'].includes(sortOrderStr))
+      throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
   }
 }
 
