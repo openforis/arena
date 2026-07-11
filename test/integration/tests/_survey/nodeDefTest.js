@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import { getContextSurvey } from '../../config/context'
@@ -29,17 +28,16 @@ export const createNodeDefsTest = async () => {
 
   const rootDef = await fetchRootNodeDef()
 
-  await PromiseUtils.each(Object.keys(NodeDef.nodeDefType), async (nodeType) => {
+  for (const nodeType of Object.keys(NodeDef.nodeDefType)) {
     const nodeDefReq = createNodeDef(rootDef, nodeType, `node_def_${nodeType}`)
     const nodeDefDb = await NodeDefRepository.insertNodeDef(surveyId, nodeDefReq)
 
-    /* eslint-disable no-unused-expressions */
     expect(nodeDefDb.id).toBeDefined()
     expect(nodeDefDb.type).toBe(nodeType)
     expect(nodeDefDb.parentUuid).toBe(NodeDef.getParentUuid(nodeDefReq))
     expect(nodeDefDb.uuid).toBe(NodeDef.getUuid(nodeDefReq))
     expect(nodeDefDb.props).toEqual(nodeDefReq.props)
-  })
+  }
 }
 
 export const updateNodeDefTest = async () => {
