@@ -2,6 +2,8 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
@@ -15,6 +17,7 @@ import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
 import { NotificationActions } from '@webapp/store/ui/notification'
 
+import * as SurveyActions from '../actions'
 import * as SurveyState from '../state'
 import { surveyDefsIndexUpdate } from '../actions/actionTypes'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui'
@@ -81,15 +84,39 @@ export const cloneNodeDefFromSurvey =
     const survey = SurveyState.getSurvey(state)
     const surveyId = Survey.getId(survey)
 
-    const { nodeDefsValidation, nodeDefsUpdated } = await API.cloneNodeDefFromSurvey({
-      surveyId,
-      sourceSurveyId,
-      sourceNodeDefUuid,
-      targetParentNodeDefUuid,
-    })
+    const { nodeDefsValidation, nodeDefsUpdated, categoriesCloned, taxonomiesCloned } =
+      await API.cloneNodeDefFromSurvey({
+        surveyId,
+        sourceSurveyId,
+        sourceNodeDefUuid,
+        targetParentNodeDefUuid,
+      })
 
     dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
     dispatch(_onNodeDefsIndexUpdate({ survey, nodeDefsUpdated }))
+
+    if (categoriesCloned.length > 0 || taxonomiesCloned.length > 0) {
+      categoriesCloned.forEach((category) => dispatch(SurveyActions.surveyCategoryInserted(category)))
+      taxonomiesCloned.forEach((taxonomy) => dispatch(SurveyActions.surveyTaxonomyInserted(taxonomy)))
+      dispatch(SurveyActions.metaUpdated())
+
+      if (categoriesCloned.length > 0) {
+        dispatch(
+          NotificationActions.notifyInfo({
+            key: 'nodeDefEdit.categoriesClonedFromSurvey',
+            params: { names: categoriesCloned.map((category) => Category.getName(category)).join(', ') },
+          })
+        )
+      }
+      if (taxonomiesCloned.length > 0) {
+        dispatch(
+          NotificationActions.notifyInfo({
+            key: 'nodeDefEdit.taxonomiesClonedFromSurvey',
+            params: { names: taxonomiesCloned.map((taxonomy) => Taxonomy.getName(taxonomy)).join(', ') },
+          })
+        )
+      }
+    }
   }
 
 export const cloneNodeDefIntoEntityDef =
