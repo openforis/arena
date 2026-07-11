@@ -13,7 +13,7 @@ import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
-import { SurveyEntitiesTreeView, SourceEntitySelection } from './surveyEntitiesTreeView'
+import { SurveyNodeDefsTreeView, SourceNodeDefSelection } from './surveyNodeDefsTreeView'
 
 type ConfirmParams = {
   sourceSurveyId: number | string
@@ -38,18 +38,18 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
 
   const surveyCurrentHierarchy = Survey.getHierarchy()(surveyCurrent)
 
-  const [sourceEntitySelection, setSourceEntitySelection] = useState<SourceEntitySelection | null>(null)
+  const [sourceNodeDefSelection, setSourceNodeDefSelection] = useState<SourceNodeDefSelection | null>(null)
   const [targetEntityDefUuid, setTargetEntityDefUuid] = useState<string>(NodeDef.getUuid(currentNodeDef))
 
   const onConfirmClick = useCallback(() => {
     onConfirm({
-      sourceSurveyId: sourceEntitySelection!.surveyId,
-      sourceNodeDefUuid: sourceEntitySelection!.nodeDefUuid,
+      sourceSurveyId: sourceNodeDefSelection!.surveyId,
+      sourceNodeDefUuid: sourceNodeDefSelection!.nodeDefUuid,
       targetParentNodeDefUuid: targetEntityDefUuid,
     })
-  }, [onConfirm, sourceEntitySelection, targetEntityDefUuid])
+  }, [onConfirm, sourceNodeDefSelection, targetEntityDefUuid])
 
-  const confirmButtonDisabled = !sourceEntitySelection || !targetEntityDefUuid
+  const confirmButtonDisabled = !sourceNodeDefSelection || !targetEntityDefUuid
 
   return (
     <Modal
@@ -59,11 +59,11 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
       title="surveyForm:cloneFromAnotherSurvey.title"
     >
       <ModalBody>
-        <FormItem label="surveyForm:cloneFromAnotherSurvey.sourceEntity">
+        <FormItem label="surveyForm:cloneFromAnotherSurvey.sourceNode">
           <div className="clone-from-survey-dialog__tree-view-container">
-            <SurveyEntitiesTreeView
-              selectedSourceEntity={sourceEntitySelection}
-              onSourceEntitySelectionChange={setSourceEntitySelection}
+            <SurveyNodeDefsTreeView
+              selectedSourceNodeDef={sourceNodeDefSelection}
+              onSourceNodeDefSelectionChange={setSourceNodeDefSelection}
             />
           </div>
         </FormItem>

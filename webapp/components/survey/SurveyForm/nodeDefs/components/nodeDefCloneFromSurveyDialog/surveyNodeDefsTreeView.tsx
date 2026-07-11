@@ -8,8 +8,9 @@ import * as API from '@webapp/service/api'
 import { surveyInfoToLabel, useOtherSurveysList } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
-export interface SourceEntitySelection {
+export interface SourceNodeDefSelection {
   surveyId: number
   nodeDefUuid: string
 }
@@ -23,69 +24,77 @@ interface SurveyLoadState {
 interface TreeItem {
   key: string
   label: string
+  icon?: React.ReactNode
   disabled?: boolean
   items?: TreeItem[]
 }
 
-interface SurveyEntitiesTreeViewProps {
-  selectedSourceEntity: SourceEntitySelection | null
-  onSourceEntitySelectionChange: (selection: SourceEntitySelection | null) => void
+interface SurveyNodeDefsTreeViewProps {
+  selectedSourceNodeDef: SourceNodeDefSelection | null
+  onSourceNodeDefSelectionChange: (selection: SourceNodeDefSelection | null) => void
 }
 
 const surveyTreeItemPrefix = 'survey:'
-const sourceEntityTreeItemPrefix = 'source-entity:'
+const sourceNodeDefTreeItemPrefix = 'source-node-def:'
 
 const toSurveyTreeItemKey = (surveyId: number): string => `${surveyTreeItemPrefix}${surveyId}`
 
-const toSourceEntityTreeItemKey = ({ surveyId, nodeDefUuid }: SourceEntitySelection): string =>
-  `${sourceEntityTreeItemPrefix}${surveyId}:${nodeDefUuid}`
+const toSourceNodeDefTreeItemKey = ({ surveyId, nodeDefUuid }: SourceNodeDefSelection): string =>
+  `${sourceNodeDefTreeItemPrefix}${surveyId}:${nodeDefUuid}`
 
 const isSurveyTreeItemKey = (treeItemKey: string | undefined): boolean =>
   treeItemKey?.startsWith(surveyTreeItemPrefix) ?? false
 
-const isSourceEntityTreeItemKey = (treeItemKey: string | undefined): boolean =>
-  treeItemKey?.startsWith(sourceEntityTreeItemPrefix) ?? false
+const isSourceNodeDefTreeItemKey = (treeItemKey: string | undefined): boolean =>
+  treeItemKey?.startsWith(sourceNodeDefTreeItemPrefix) ?? false
 
 const getSurveyIdFromSurveyTreeItemKey = (treeItemKey: string): number =>
   Number(treeItemKey.replace(surveyTreeItemPrefix, ''))
 
-const parseSourceEntityTreeItemKey = (treeItemKey: string): SourceEntitySelection => {
-  const value = treeItemKey.replace(sourceEntityTreeItemPrefix, '')
+const parseSourceNodeDefTreeItemKey = (treeItemKey: string): SourceNodeDefSelection => {
+  const value = treeItemKey.replace(sourceNodeDefTreeItemPrefix, '')
   const [surveyIdString, nodeDefUuid] = value.split(':')
   return { surveyId: Number(surveyIdString), nodeDefUuid }
 }
 
-const getEntityChildren = ({ survey, nodeDef }: { survey: object; nodeDef: object }): object[] =>
-  Survey.getNodeDefChildrenSorted({ nodeDef })(survey).filter((childNodeDef: object) => NodeDef.isEntity(childNodeDef))
+const getChildNodeDefs = ({ survey, nodeDef }: { survey: object; nodeDef: object }): object[] =>
+  Survey.getNodeDefChildrenSorted({ nodeDef })(survey)
 
-const toEntityTreeItems = ({
+const toNodeDefTreeItems = ({
   nodeDefs,
   lang,
+  cycle,
   surveyId,
   surveyLoaded,
 }: {
   nodeDefs: object[]
   lang: string
+  cycle: string
   surveyId: number
   surveyLoaded: object
 }): TreeItem[] =>
   nodeDefs.map((nodeDef) => {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    const isEntity = NodeDef.isEntity(nodeDef)
 
     return {
-      key: toSourceEntityTreeItemKey({ surveyId, nodeDefUuid }),
+      key: toSourceNodeDefTreeItemKey({ surveyId, nodeDefUuid }),
       label: NodeDef.getLabelWithType({ nodeDef, lang, type: NodeDef.NodeDefLabelTypes.labelAndName }),
-      items: toEntityTreeItems({
-        nodeDefs: getEntityChildren({ survey: surveyLoaded, nodeDef }),
-        lang,
-        surveyId,
-        surveyLoaded,
-      }),
+      icon: NodeDefUIProps.getIconByNodeDef({ nodeDef, cycle, includeKey: true }),
+      items: isEntity
+        ? toNodeDefTreeItems({
+            nodeDefs: getChildNodeDefs({ survey: surveyLoaded, nodeDef }),
+            lang,
+            cycle,
+            surveyId,
+            surveyLoaded,
+          })
+        : undefined,
     }
   })
 
-export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): React.ReactElement | null => {
-  const { selectedSourceEntity, onSourceEntitySelectionChange } = props
+export const SurveyNodeDefsTreeView = (props: SurveyNodeDefsTreeViewProps): React.ReactElement | null => {
+  const { selectedSourceNodeDef, onSourceNodeDefSelectionChange } = props
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -171,7 +180,7 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
           items = [
             {
               key: `${surveyTreeItemKey}:loading`,
-              label: i18n.t('surveyForm:cloneFromAnotherSurvey.loadingSurveyEntities'),
+              label: i18n.t('surveyForm:cloneFromAnotherSurvey.loadingSurveyNodes'),
               disabled: true,
             },
           ]
@@ -179,26 +188,28 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
           items = [
             {
               key: `${surveyTreeItemKey}:error`,
-              label: i18n.t('surveyForm:cloneFromAnotherSurvey.errorLoadingSurveyEntities'),
+              label: i18n.t('surveyForm:cloneFromAnotherSurvey.errorLoadingSurveyNodes'),
               disabled: true,
             },
           ]
         } else if (surveyLoaded?.survey) {
           const rootNodeDef = Survey.getNodeDefRoot(surveyLoaded.survey)
-          const rootEntityChildren = getEntityChildren({ survey: surveyLoaded.survey, nodeDef: rootNodeDef })
+          const rootNodeDefChildren = getChildNodeDefs({ survey: surveyLoaded.survey, nodeDef: rootNodeDef })
+          const cycle = Survey.getDefaultCycleKey(Survey.getSurveyInfo(surveyLoaded.survey))
 
           items =
-            rootEntityChildren.length > 0
-              ? toEntityTreeItems({
-                  nodeDefs: rootEntityChildren,
+            rootNodeDefChildren.length > 0
+              ? toNodeDefTreeItems({
+                  nodeDefs: rootNodeDefChildren,
                   lang,
+                  cycle,
                   surveyId,
                   surveyLoaded: surveyLoaded.survey,
                 })
               : [
                   {
                     key: `${surveyTreeItemKey}:empty`,
-                    label: i18n.t('surveyForm:cloneFromAnotherSurvey.noEntitiesAvailable'),
+                    label: i18n.t('surveyForm:cloneFromAnotherSurvey.noNodesAvailable'),
                     disabled: true,
                   },
                 ]
@@ -206,7 +217,7 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
           items = [
             {
               key: `${surveyTreeItemKey}:placeholder`,
-              label: i18n.t('surveyForm:cloneFromAnotherSurvey.expandToLoadEntities'),
+              label: i18n.t('surveyForm:cloneFromAnotherSurvey.expandToLoadNodes'),
               disabled: true,
             },
           ]
@@ -221,30 +232,30 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
     [i18n, lang, surveyLoadedById, surveys]
   )
 
-  const selectedSourceEntityTreeItemKey = useMemo(
+  const selectedSourceNodeDefTreeItemKey = useMemo(
     () =>
-      selectedSourceEntity
+      selectedSourceNodeDef
         ? [
-            toSourceEntityTreeItemKey({
-              surveyId: selectedSourceEntity.surveyId,
-              nodeDefUuid: selectedSourceEntity.nodeDefUuid,
+            toSourceNodeDefTreeItemKey({
+              surveyId: selectedSourceNodeDef.surveyId,
+              nodeDefUuid: selectedSourceNodeDef.nodeDefUuid,
             }),
           ]
         : [],
-    [selectedSourceEntity]
+    [selectedSourceNodeDef]
   )
 
   const onSelectedTreeItemKeysChange = useCallback(
     (selectedTreeItemKeys: string | string[]) => {
       const selectedTreeItemKey = Array.isArray(selectedTreeItemKeys) ? selectedTreeItemKeys[0] : selectedTreeItemKeys
 
-      if (!isSourceEntityTreeItemKey(selectedTreeItemKey)) {
+      if (!isSourceNodeDefTreeItemKey(selectedTreeItemKey)) {
         return
       }
 
-      onSourceEntitySelectionChange(parseSourceEntityTreeItemKey(selectedTreeItemKey))
+      onSourceNodeDefSelectionChange(parseSourceNodeDefTreeItemKey(selectedTreeItemKey))
     },
-    [onSourceEntitySelectionChange]
+    [onSourceNodeDefSelectionChange]
   )
 
   if (surveysLoading) {
@@ -269,7 +280,7 @@ export const SurveyEntitiesTreeView = (props: SurveyEntitiesTreeViewProps): Reac
       items={treeItems}
       onExpandedItemKeysChange={onExpandedTreeItemKeysChange}
       onSelectedItemKeysChange={onSelectedTreeItemKeysChange}
-      selectedItemKeys={selectedSourceEntityTreeItemKey}
+      selectedItemKeys={selectedSourceNodeDefTreeItemKey}
     />
   )
 }

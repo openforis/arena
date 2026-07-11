@@ -42,6 +42,11 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
     return this
   }
 
+  taxonomy(taxonomyName) {
+    this._taxonomyName = taxonomyName
+    return this
+  }
+
   build(survey, parentDef = null) {
     const def = this._createNodeDef(parentDef)
 
@@ -50,6 +55,10 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
     if (this._categoryName) {
       const category = Survey.getCategoryByName(this._categoryName)(survey)
       def.props[NodeDef.propKeys.categoryUuid] = category?.uuid
+    }
+    if (this._taxonomyName) {
+      const taxonomy = Survey.getTaxonomyByName(this._taxonomyName)(survey)
+      def.props[NodeDef.propKeys.taxonomyUuid] = taxonomy?.uuid
     }
     return {
       [NodeDef.getUuid(def)]: def,
