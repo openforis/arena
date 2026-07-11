@@ -1149,6 +1149,8 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     },
     nodeDefClonedSuccessfully:
       'Node definition "{{nodeDefName}}" cloned successfully into "{{targetParentNodeDefName}}"',
+    categoriesClonedFromSurvey: 'The following categories were also cloned from the source survey: {{names}}',
+    taxonomiesClonedFromSurvey: 'The following taxonomies were also cloned from the source survey: {{names}}',
   },
 
   languagesEditor: {

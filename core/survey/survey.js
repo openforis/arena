@@ -5,6 +5,8 @@ import { uuidv4 } from '@core/uuid'
 import * as Srs from '@core/geo/srs'
 
 import * as NodeDef from './nodeDef'
+import * as Category from './category'
+import * as Taxonomy from './taxonomy'
 
 import * as SurveySortKeys from './_survey/surveySortKeys'
 
@@ -344,3 +346,103 @@ export const {
   getSamplingNodeDefChild,
   getAvailableReportingDataNodeDefs,
 } = SurveyAnalysis
+
+// ====== Clone node defs from another survey: category/taxonomy references resolution
+
+const _resolveClonedNodeDefsRefs = ({
+  clonedNodeDefs,
+  sourceSurvey,
+  targetSurvey,
+  isRefNodeDef,
+  getRefUuid,
+  propKey,
+  getItemByUuidInSurvey,
+  getItemByNameInSurvey,
+  getItemName,
+  getItemUuid,
+}) => {
+  const uuidsToClone = []
+  const rewriteByOldUuid = {}
+  const processedUuids = new Set()
+
+  clonedNodeDefs.filter(isRefNodeDef).forEach((nodeDef) => {
+    const refUuid = getRefUuid(nodeDef)
+    if (!refUuid || processedUuids.has(refUuid)) return
+    processedUuids.add(refUuid)
+
+    if (getItemByUuidInSurvey(refUuid)(targetSurvey)) {
+      // Already present in the target survey with the same uuid: reuse as-is.
+      return
+    }
+    const sourceItem = getItemByUuidInSurvey(refUuid)(sourceSurvey)
+    if (!sourceItem) {
+      // Dangling reference in the source survey: leave the cloned attribute as-is.
+      return
+    }
+    const existingItemByName = getItemByNameInSurvey(getItemName(sourceItem))(targetSurvey)
+    if (existingItemByName) {
+      rewriteByOldUuid[refUuid] = getItemUuid(existingItemByName)
+      return
+    }
+    uuidsToClone.push(refUuid)
+  })
+
+  const clonedNodeDefsUpdated =
+    Object.keys(rewriteByOldUuid).length === 0
+      ? clonedNodeDefs
+      : clonedNodeDefs.map((nodeDef) => {
+          const refUuid = getRefUuid(nodeDef)
+          const newRefUuid = rewriteByOldUuid[refUuid]
+          return newRefUuid ? NodeDef.assocProp({ key: propKey, value: newRefUuid })(nodeDef) : nodeDef
+        })
+
+  return { clonedNodeDefs: clonedNodeDefsUpdated, uuidsToClone }
+}
+
+/**
+ * Given the node defs cloned from another survey (see Survey.cloneNodeDef), for every code/taxon
+ * attribute in the cloned subtree, resolves the category/taxonomy it should be associated with in
+ * the target survey: an already existing one (matched by uuid or by name), or one that still needs
+ * to be cloned from the source survey. Cloned attributes associated with an existing item matched
+ * by name (different uuid) get their categoryUuid/taxonomyUuid prop rewritten accordingly.
+ * @param {!object} params - The params.
+ * @param {!object} params.sourceSurvey - The survey the node defs have been cloned from.
+ * @param {!object} params.targetSurvey - The survey the node defs have been cloned into.
+ * @param {!Array.<object>} params.clonedNodeDefs - The cloned node defs (subtree).
+ * @returns {object} - { clonedNodeDefs, categoryUuidsToClone, taxonomyUuidsToClone }.
+ */
+export const resolveClonedNodeDefsCategoriesAndTaxonomies = ({ sourceSurvey, targetSurvey, clonedNodeDefs }) => {
+  const { clonedNodeDefs: clonedNodeDefsAfterCategories, uuidsToClone: categoryUuidsToClone } =
+    _resolveClonedNodeDefsRefs({
+      clonedNodeDefs,
+      sourceSurvey,
+      targetSurvey,
+      isRefNodeDef: NodeDef.isCode,
+      getRefUuid: NodeDef.getCategoryUuid,
+      propKey: NodeDef.propKeys.categoryUuid,
+      getItemByUuidInSurvey: SurveyCategories.getCategoryByUuid,
+      getItemByNameInSurvey: SurveyCategories.getCategoryByName,
+      getItemName: Category.getName,
+      getItemUuid: Category.getUuid,
+    })
+
+  const { clonedNodeDefs: clonedNodeDefsAfterTaxonomies, uuidsToClone: taxonomyUuidsToClone } =
+    _resolveClonedNodeDefsRefs({
+      clonedNodeDefs: clonedNodeDefsAfterCategories,
+      sourceSurvey,
+      targetSurvey,
+      isRefNodeDef: NodeDef.isTaxon,
+      getRefUuid: NodeDef.getTaxonomyUuid,
+      propKey: NodeDef.propKeys.taxonomyUuid,
+      getItemByUuidInSurvey: SurveyTaxonomies.getTaxonomyByUuid,
+      getItemByNameInSurvey: SurveyTaxonomies.getTaxonomyByName,
+      getItemName: Taxonomy.getName,
+      getItemUuid: Taxonomy.getUuid,
+    })
+
+  return {
+    clonedNodeDefs: clonedNodeDefsAfterTaxonomies,
+    categoryUuidsToClone,
+    taxonomyUuidsToClone,
+  }
+}
