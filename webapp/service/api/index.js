@@ -23,7 +23,7 @@ export {
   updateCategoryItemProp,
   updateCategoryItemIndexes,
 } from './categories'
-export { fetchChains, getChainSummaryExportUrl } from './analysis'
+export { fetchChains, getChainSummaryExportUrl, cloneChainFromSurvey } from './analysis'
 
 export {
   fetchTaxonomies,

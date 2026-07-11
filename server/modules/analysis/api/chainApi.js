@@ -1,6 +1,10 @@
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import UnauthorizedError from '@server/utils/unauthorizedError'
+
+import * as Authorizer from '@core/auth/authorizer'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as AnalysisService from '../service'
 
@@ -19,6 +23,34 @@ export const init = (app) => {
       next(error)
     }
   })
+
+  // ====== CLONE - Chain from another survey
+
+  app.post(
+    '/survey/:surveyId/chain/clone-from-survey',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const { sourceSurveyId, sourceChainUuid } = Request.getBody(req)
+        const user = Request.getUser(req)
+
+        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
+        if (!sourceChainUuid) throw new Error('sourceChainUuid is required')
+
+        const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId })
+        if (!Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
+          throw new UnauthorizedError(user?.name)
+        }
+
+        const chain = await AnalysisService.cloneChainFromSurvey({ user, surveyId, sourceSurveyId, sourceChainUuid })
+
+        res.json(chain)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   // ====== READ - Chains
 

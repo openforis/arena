@@ -17,10 +17,10 @@ export const insertSurveyFile = async ({ surveyId, file, surveyFile }) => {
 }
 
 // ==== READ
-export const fetchSurveys = async ({ draft = true, template = false } = {}) => {
+export const fetchSurveys = async ({ draft = true, template = false, withChains = false } = {}) => {
   const {
     data: { list: surveys },
-  } = await axios.get(`/api/surveys`, { params: { draft, template } })
+  } = await axios.get(`/api/surveys`, { params: { draft, template, withChains } })
   return surveys.map(Survey.getSurveyInfo)
 }
 
