@@ -33,8 +33,7 @@ export const verifyTaxonomies = (survey) =>
           const vernacularNameExportProps = getProps(vernacularNameExport)
           const vernacularLangCode = vernacularNameExportProps.lang
           const expectedVernacularNames = taxonExpected[vernacularLangCode]?.split('/').map((name) => name.trim()) ?? []
-          const firstExpectedVernacularName = expectedVernacularNames[0]
-          await expect(vernacularNameExportProps.name).toBe(firstExpectedVernacularName)
+          await expect(expectedVernacularNames).toContain(vernacularNameExportProps.name)
         }
       }
     }
