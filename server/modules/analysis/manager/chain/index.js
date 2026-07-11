@@ -320,8 +320,16 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
       return R.assocPath([NodeDef.keys.propsAdvanced, NodeDef.keysPropsAdvanced.chainUuid], newChainUuid)(cloned)
     })
 
-    if (clonedNodeDefs.length > 0) {
-      await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: clonedNodeDefs }, tx)
+    // Resolve categories/taxonomies referenced by cloned code/taxon analysis attributes:
+    // reuse an existing one in the target survey (by uuid or name), or clone it from the source survey.
+    const { clonedNodeDefs: resolvedClonedNodeDefs } =
+      await NodeDefService.resolveAndCloneNodeDefsCategoriesAndTaxonomies(
+        { user, sourceSurveyId, sourceSurvey, targetSurveyId: surveyId, targetSurvey, clonedNodeDefs },
+        tx
+      )
+
+    if (resolvedClonedNodeDefs.length > 0) {
+      await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: resolvedClonedNodeDefs }, tx)
     }
 
     const updatedTargetSurvey = await fetchSurveyFull(surveyId)
