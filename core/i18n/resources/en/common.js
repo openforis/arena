@@ -781,6 +781,17 @@ This might be a slow process.`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Processing chain deleted',
+    cloneFromAnotherSurvey: 'Clone from another survey',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Clone chain from another survey',
+      sourceSurvey: 'Source survey',
+      sourceChain: 'Source chain',
+      entityCheck: 'Entity compatibility',
+      entityMissing: 'missing in target survey',
+      noAnalysisAttributes: 'This chain has no analysis attributes',
+      cloneComplete: 'Chain cloned successfully',
+      missingEntities: 'Cannot clone: the following entities do not exist in the target survey: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
     copyRStudioCode: `#### You are about to open an RStudio Server ####  

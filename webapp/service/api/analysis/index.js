@@ -14,3 +14,13 @@ export const fetchChains = async ({ surveyId, surveyCycleKey = null } = {}) => {
 
 export const getChainSummaryExportUrl = ({ surveyId, chainUuid }) =>
   `/api/survey/${surveyId}/chain/${chainUuid}/summary`
+
+// ==== CLONE
+
+export const cloneChainFromSurvey = async ({ targetSurveyId, sourceSurveyId, sourceChainUuid }) => {
+  const { data: chain } = await axios.post(`/api/survey/${targetSurveyId}/chain/clone-from-survey`, {
+    sourceSurveyId,
+    sourceChainUuid,
+  })
+  return chain
+}

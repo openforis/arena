@@ -785,6 +785,18 @@ Ce processus peut être lent.`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Chaîne de traitement supprimée',
+    cloneFromAnotherSurvey: 'Cloner depuis une autre enquête',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Cloner la chaîne depuis une autre enquête',
+      sourceSurvey: 'Enquête source',
+      sourceChain: 'Chaîne source',
+      entityCheck: 'Compatibilité des entités',
+      entityMissing: "absente dans l'enquête cible",
+      noAnalysisAttributes: "Cette chaîne n'a pas d'attributs d'analyse",
+      cloneComplete: 'Chaîne clonée avec succès',
+      missingEntities:
+        "Impossible de cloner : les entités suivantes n'existent pas dans l'enquête cible : {{entities}}",
+    },
     cannotSelectNodeDefNotBelongingToCycles: `La définition de nœud "{{label}}" ne peut pas être sélectionnée car elle n'appartient pas à tous les cycles de la chaîne de traitement`,
     cannotSelectCycle:
       "Ce cycle ne peut pas être sélectionné car certaines définitions de nœud n'appartiennent pas à ce cycle",

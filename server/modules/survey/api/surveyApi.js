@@ -82,6 +82,7 @@ export const init = (app) => {
         sortOrder,
         includeCounts = false,
         onlyOwn = false,
+        withChains = false,
       } = Request.getParams(req)
 
       const list = await SurveyService.fetchUserSurveysInfo({
@@ -96,6 +97,7 @@ export const init = (app) => {
         sortOrder,
         includeCounts,
         onlyOwn,
+        withChains,
       })
 
       res.json({ list })

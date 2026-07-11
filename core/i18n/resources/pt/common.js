@@ -782,6 +782,17 @@ Este processo pode ser lento.`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Cadeia de processamento excluída',
+    cloneFromAnotherSurvey: 'Clonar de outro estudo',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Clonar cadeia de outro estudo',
+      sourceSurvey: 'Estudo de origem',
+      sourceChain: 'Cadeia de origem',
+      entityCheck: 'Compatibilidade de entidades',
+      entityMissing: 'ausente no estudo destino',
+      noAnalysisAttributes: 'Esta cadeia não tem atributos de análise',
+      cloneComplete: 'Cadeia clonada com sucesso',
+      missingEntities: 'Não é possível clonar: as seguintes entidades não existem no estudo destino: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `A definição de nó "{{label}}" não pode ser selecionada porque não pertence a todos os ciclos da cadeia de processamento`,
     cannotSelectCycle: 'Este ciclo não pode ser selecionado porque algumas definições de nó não pertencem a este ciclo',
     copyRStudioCode: `#### Você está prestes a abrir um servidor RStudio ####  
