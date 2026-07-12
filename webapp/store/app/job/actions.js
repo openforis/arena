@@ -16,6 +16,7 @@ export const showJobMonitor =
     closeButtonProps = null,
     errorKeyHeaderName = undefined,
     errorsExportFileName = undefined,
+    longRunningMessageKey = undefined,
   }) =>
   (dispatch) =>
     dispatch({
@@ -27,6 +28,7 @@ export const showJobMonitor =
       closeButtonProps,
       errorKeyHeaderName,
       errorsExportFileName,
+      longRunningMessageKey,
     })
 
 export const updateJob =

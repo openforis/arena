@@ -173,6 +173,7 @@ export default {
     to: 'A',
     totalItems: 'Total de elementos',
     true: 'Verdadero',
+    trySplittingFileIntoSmallerChunks: 'Intente dividir el archivo en partes más pequeñas.',
     type: 'Tipo',
     undefinedName: 'Nombre indefinido',
     unique: 'Único',

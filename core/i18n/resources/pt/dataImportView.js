@@ -72,6 +72,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{deletedFiles}} arquivos excluídos`,
       importCompleteWithErrors: `## Importação concluída (com erros):
         - {{processed}} linhas processadas`,
+      tooLong: `Esta importação está demorando um pouco. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
     DataImportValidationJob: {
       validationCompleteWithErrors: `## Validação concluída ({{errorsFoundMessage}})
@@ -88,6 +89,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{insertedFiles}} arquivos seriam inseridos
         - {{updatedFiles}} arquivos seriam atualizados
         - {{deletedFiles}} arquivos seriam excluídos`,
+      tooLong: `Esta validação está demorando um pouco. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
   },
   options: {

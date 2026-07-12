@@ -188,6 +188,7 @@ export default {
     to: 'Кому',
     totalItems: 'Всего элементов',
     true: 'Истина',
+    trySplittingFileIntoSmallerChunks: 'Попробуйте разбить файл на меньшие части.',
     type: 'Тип',
     undefinedName: 'Неопределенное имя',
     unique: 'Уникальный',

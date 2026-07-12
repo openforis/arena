@@ -71,6 +71,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{deletedFiles}} файл устгагдсан`,
       importCompleteWithErrors: `## Импорт дууссан (алдаатай):
         - {{processed}} мөр боловсруулагдсан`,
+      tooLong: `Энэ импорт удаж байна. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
     DataImportValidationJob: {
       validationCompleteWithErrors: `## Баталгаажуулалт дууссан ({{errorsFoundMessage}})
@@ -87,6 +88,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{insertedFiles}} файл оруулах байсан
         - {{updatedFiles}} файл шинэчлэх байсан
         - {{deletedFiles}} файл устгах байсан`,
+      tooLong: `Энэ баталгаажуулалт удаж байна. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
   },
   options: {
