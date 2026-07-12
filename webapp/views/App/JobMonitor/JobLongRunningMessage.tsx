@@ -1,0 +1,40 @@
+import { useEffect, useState } from 'react'
+
+import * as JobSerialized from '@common/job/jobSerialized'
+import { useI18n } from '@webapp/store/system'
+
+const showMessageDelayMillis = 60 * 1000 // 1 minute
+
+type Props = {
+  job: Record<string, any>
+  messageKey?: string
+}
+
+/**
+ * Displays a caller-specified message once a job has been running for
+ * more than 1 minute without ending. Renders nothing if no messageKey
+ * is provided, before the delay has elapsed, or once the job has ended.
+ */
+const JobLongRunningMessage = ({ job, messageKey = undefined }: Props) => {
+  const i18n = useI18n()
+  const [showMessage, setShowMessage] = useState(false)
+
+  const jobUuid = JobSerialized.getUuid(job)
+  const jobEnded = JobSerialized.isEnded(job)
+
+  useEffect(() => {
+    setShowMessage(false)
+
+    if (!messageKey || jobEnded) return undefined
+
+    const timeoutId = setTimeout(() => setShowMessage(true), showMessageDelayMillis)
+
+    return () => clearTimeout(timeoutId)
+  }, [jobUuid, jobEnded, messageKey])
+
+  if (!showMessage || jobEnded) return null
+
+  return <div className="job-long-running-message">{i18n.t(messageKey)}</div>
+}
+
+export default JobLongRunningMessage
