@@ -207,6 +207,58 @@ describe('SamplingNodeDefs.determinePlotAreaNodeDefs', () => {
     expect(NodeDef.getParentUuid(plotAreaCreated)).toBe(NodeDef.getUuid(treeDef))
   })
 
+  it('creates a weight node def for the current chain when the base unit already has one belonging to another chain', async () => {
+    const survey = await SB.survey(user, SB.entity('plot', quantitativeAnalysisAttribute('volume'))).build()
+
+    const { survey: surveyWithHa } = addAreaBasedEstimateNodeDef({ survey, estimatedOfNodeDefName: 'volume' })
+
+    const plotDef = Survey.getNodeDefByName('plot')(surveyWithHa)
+
+    // another chain already has its own weight node def under the same base unit
+    const otherChainWeightNodeDef = newSamplingNodeDefFixture({
+      nodeDefParent: plotDef,
+      name: 'weight',
+      chainUuid: OTHER_CHAIN_UUID,
+    })
+    const surveyWithOtherChainWeight = Survey.assocNodeDef({ nodeDef: otherChainWeightNodeDef })(surveyWithHa)
+
+    const chain = newChain({ chainUuid: CHAIN_UUID, baseUnitNodeDefUuid: NodeDef.getUuid(plotDef) })
+    const { nodeDefsToCreate, nodeDefsToDelete } = SamplingNodeDefs.determinePlotAreaNodeDefs({
+      survey: surveyWithOtherChainWeight,
+      chain,
+    })
+
+    // the other chain's weight node def must not be reused nor deleted
+    expect(nodeDefsToDelete.map(NodeDef.getUuid)).not.toContain(NodeDef.getUuid(otherChainWeightNodeDef))
+
+    const weightCreated = findCreated(nodeDefsToCreate, 'weight')
+    expect(weightCreated).toBeDefined()
+    expect(NodeDef.getParentUuid(weightCreated)).toBe(NodeDef.getUuid(plotDef))
+    expect(NodeDef.getChainUuid(weightCreated)).toBe(CHAIN_UUID)
+  })
+
+  it('AreaBasedEstimatedOfNodeDef.updateNodeDef syncs the active state from the estimated attribute', async () => {
+    const survey = await SB.survey(user, SB.entity('plot', quantitativeAnalysisAttribute('volume'))).build()
+
+    const { survey: surveyWithHa, nodeDef: nodeDefAreaBasedEstimate } = addAreaBasedEstimateNodeDef({
+      survey,
+      estimatedOfNodeDefName: 'volume',
+    })
+    expect(NodeDef.isActive(nodeDefAreaBasedEstimate)).toBe(true)
+
+    // deactivate the estimated attribute ("volume") itself
+    const volumeDef = Survey.getNodeDefByName('volume')(surveyWithHa)
+    const volumeDefInactive = NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.active, value: false })(volumeDef)
+
+    const nodeDefAreaBasedEstimateUpdated = AreaBasedEstimatedOfNodeDef.updateNodeDef({
+      survey: surveyWithHa,
+      nodeDefAreaBasedEstimate,
+      areaBasedEstimatedOfNodeDef: volumeDefInactive,
+    })
+
+    expect(NodeDef.isActive(nodeDefAreaBasedEstimateUpdated)).toBe(false)
+  })
+
   it('deletes a stale weight node def when the base unit is reassigned to another entity', async () => {
     const survey = await SB.survey(
       user,
