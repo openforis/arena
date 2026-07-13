@@ -82,11 +82,6 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
   const chainUuid = Chain.getUuid(chain)
   const cycleKeys = Survey.getCycleKeys(survey)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-  const baseUnitDescendants = Survey.getNodeDefDescendantsAndSelf({ nodeDef: baseUnitNodeDef })(survey)
-  const baseUnitDescendantEntities = baseUnitDescendants.filter(
-    (descendantEntity) =>
-      NodeDef.isEntity(descendantEntity) && (NodeDef.isMultiple(descendantEntity) || NodeDef.isRoot(descendantEntity))
-  )
 
   const createAreaNodeDefIfNecessary = ({ existingNodeDef, nodeDefParent, isWeight }) => {
     if (existingNodeDef) {
@@ -104,28 +99,45 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
     }
   }
 
-  for (const nodeDefParent of baseUnitDescendantEntities) {
+  // the weight node def is tied only to the base unit entity itself, regardless of its position in the hierarchy
+  if (baseUnitNodeDef) {
+    const baseUnitChildDefs = Survey.getNodeDefChildren({
+      nodeDef: baseUnitNodeDef,
+      includeSamplingDefsWithoutSiblings: true,
+    })(survey)
+    const existingWeightNodeDef = baseUnitChildDefs.find(
+      (childDef) => isWeightNodeDef(childDef) && NodeDef.getChainUuid(childDef) === chainUuid
+    )
+    createAreaNodeDefIfNecessary({
+      existingNodeDef: existingWeightNodeDef,
+      nodeDefParent: baseUnitNodeDef,
+      isWeight: true,
+    })
+  }
+
+  // plot area node defs are determined independently of the base unit's position in the hierarchy:
+  // any analysis entity with an active area based estimated attribute belonging to this chain gets one
+  const analysisEntities = Survey.getAnalysisEntities({ chain })(survey)
+
+  for (const nodeDefParent of analysisEntities) {
     const childDefs = Survey.getNodeDefChildren({ nodeDef: nodeDefParent, includeSamplingDefsWithoutSiblings: true })(
       survey
     )
     const existingEntityAreaNodeDef = childDefs.find((childDef) =>
       isEntityAreaNodeDef({ nodeDef: childDef, nodeDefParent })
     )
-    const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
-    const hasAreaBasedDef = childDefs.some(NodeDef.isAreaBasedEstimatedOf)
+    const hasAreaBasedDef = childDefs.some(
+      (childDef) =>
+        NodeDef.isAreaBasedEstimatedOf(childDef) &&
+        NodeDef.isActive(childDef) &&
+        NodeDef.getChainUuid(childDef) === chainUuid
+    )
 
-    if (hasAreaBasedDef || isBaseUnit) {
-      if (isBaseUnit) {
-        const existingNodeDef = childDefs.find(isWeightNodeDef)
-        // create new weight node def only for base unit entity
-        createAreaNodeDefIfNecessary({ existingNodeDef, nodeDefParent, isWeight: true })
-      }
-      if (hasAreaBasedDef) {
-        // create new plot_area node def only if there is an area based node def
-        createAreaNodeDefIfNecessary({ existingNodeDef: existingEntityAreaNodeDef, nodeDefParent, isWeight: false })
-      }
+    if (hasAreaBasedDef) {
+      // create new plot_area node def only if there is an active area based node def in the same chain
+      createAreaNodeDefIfNecessary({ existingNodeDef: existingEntityAreaNodeDef, nodeDefParent, isWeight: false })
     } else if (existingEntityAreaNodeDef) {
-      // delete entity area node defs when entity doesn't have any area based node def
+      // delete entity area node defs when entity doesn't have any active area based node def anymore
       nodeDefsToDelete.push(existingEntityAreaNodeDef)
     }
   }
