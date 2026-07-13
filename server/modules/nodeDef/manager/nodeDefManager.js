@@ -244,13 +244,16 @@ export const updateNodeDefProps = async (
           await NodeDefAreaBasedEstimateManager.insertOrDeleteNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
         _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
       } else {
-        // node def name or label changed => update node def area based estimate generated name or label
+        // node def name, label or active state changed => update node def area based estimate accordingly
         const nameOrLabelChanged =
           (NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)) ||
           (NodeDef.propKeys.labels in props &&
             !Objects.isEqual(NodeDef.getLabels(nodeDefPrev), NodeDef.getLabels(nodeDef)))
+        const activeChanged =
+          NodeDef.keysPropsAdvanced.active in propsAdvanced &&
+          NodeDef.isActive(nodeDefPrev) !== NodeDef.isActive(nodeDef)
 
-        if (nameOrLabelChanged) {
+        if (nameOrLabelChanged || activeChanged) {
           const nodeDefAreaBasedEstimateUpdated = await NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate(
             { survey, nodeDef },
             t
