@@ -105,7 +105,9 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
       nodeDef: baseUnitNodeDef,
       includeSamplingDefsWithoutSiblings: true,
     })(survey)
-    const existingWeightNodeDef = baseUnitChildDefs.find(isWeightNodeDef)
+    const existingWeightNodeDef = baseUnitChildDefs.find(
+      (childDef) => isWeightNodeDef(childDef) && NodeDef.getChainUuid(childDef) === chainUuid
+    )
     createAreaNodeDefIfNecessary({
       existingNodeDef: existingWeightNodeDef,
       nodeDefParent: baseUnitNodeDef,
