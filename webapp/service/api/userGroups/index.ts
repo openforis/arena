@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 type UserGroup = Record<string, unknown>
+type UserGroupMember = Record<string, unknown>
 
 const getUserGroupsApiPath = (surveyId: string): string => `/api/survey/${surveyId}/user-groups`
 const getUserGroupApiPath = ({ surveyId, groupUuid }: { surveyId: string; groupUuid: string }): string =>
@@ -31,7 +32,7 @@ export const fetchUserGroupMembers = async ({
 }: {
   surveyId: string
   groupUuid: string
-}): Promise<UserGroup[]> => {
+}): Promise<UserGroupMember[]> => {
   const {
     data: { list },
   } = await axios.get(`${getUserGroupApiPath({ surveyId, groupUuid })}/members`)
