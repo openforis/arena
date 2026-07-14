@@ -39,7 +39,10 @@ const _qualifiersAreValid = async (qualifiers: Array<Record<string, unknown>>): 
   return validations.every((validation) => Validation.isValid(validation))
 }
 
-export const validateUserGroup = async (userGroup: Record<string, unknown>, otherGroupsInSurvey: object[] = []) => {
+export const validateUserGroup = async (
+  userGroup: Record<string, unknown>,
+  otherGroupsInSurvey: Array<Record<string, unknown>> = []
+) => {
   const qualifiers = UserGroup.getQualifiers(userGroup)
   const qualifiersValid = await _qualifiersAreValid(qualifiers)
 
@@ -66,7 +69,7 @@ export const validateUserGroupQualifier = async ({
   qualifiers,
 }: {
   qualifier: Record<string, unknown>
-  qualifiers: object[]
+  qualifiers: Array<Record<string, unknown>>
 }) =>
   Validator.validate(qualifier, {
     [UserGroupQualifier.keys.name]: [
