@@ -125,7 +125,7 @@ export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) =>
     if (userUuid) {
       fetchUserProfilePicture()
     }
-  }, [userUuid, forceUpdateKey, fetchUserProfilePicture])
+  }, [userUuid, forceUpdateKey])
 
   const profilePicture = useMemo(() => {
     if (data && data.size > 0) {
