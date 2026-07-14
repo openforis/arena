@@ -25,6 +25,15 @@ interface FetchedData {
   surveyUsers: SurveyUserType[]
 }
 
+/**
+ * A different group a user currently belongs to: carries both the uuid (needed to remove the user
+ * from it on reassignment) and the name (shown in the reassignment confirmation dialog).
+ */
+interface OtherGroupMembership {
+  groupUuid: string
+  groupName: string
+}
+
 interface UseUserGroupMembersEditorParams {
   groupUuid: string
 }
@@ -39,8 +48,9 @@ interface UseUserGroupMembersEditorResult {
 /**
  * Loads the members of a user group together with the survey's full user list (to build the
  * "add member" dropdown) and, for every user already assigned to a *different* group in the
- * survey, the name of that other group (used to show a reassignment confirmation before moving
- * them). Exposes handlers to add (with reassignment confirmation when needed) and remove members.
+ * survey, that other group's uuid and name (used to actually move them - remove from the old
+ * group, then add to this one - and to show a reassignment confirmation before doing so).
+ * Exposes handlers to add (with reassignment confirmation when needed) and remove members.
  *
  * @param params - The hook params.
  * @param params.groupUuid - Uuid of the group being edited.
@@ -63,7 +73,7 @@ export const useUserGroupMembersEditor = ({
   const [members, setMembers] = useState<UserGroupMemberType[]>([])
   const [surveyUsers, setSurveyUsers] = useState<SurveyUserType[]>([])
   const [otherGroups, setOtherGroups] = useState<UserGroupType[]>([])
-  const [otherGroupsMembersByUser, setOtherGroupsMembersByUser] = useState<Record<string, string>>({})
+  const [otherGroupsMembersByUser, setOtherGroupsMembersByUser] = useState<Record<string, OtherGroupMembership>>({})
 
   // Pure data fetcher: never sets state itself, so it's safe to call both from the reactive effect
   // below (via a staleness-guarded `.then()`) and from the imperative `reload` used by the
@@ -112,20 +122,24 @@ export const useUserGroupMembersEditor = ({
     setSurveyUsers(data.surveyUsers)
   }, [fetchData])
 
-  // Builds a userUuid -> group name map, for users already in a *different* group in the survey.
+  // Builds a userUuid -> { groupUuid, groupName } map, for users already in a *different* group in
+  // the survey. The uuid is needed so the reassignment path (onAddMember/addMember below) can
+  // remove the user from their old group; the name is only for the confirmation dialog's wording.
   // Same staleness-guard reasoning as the effect above: `otherGroups` can change again before the
   // per-group member fetches resolve.
-  const loadOtherGroupsMembers = useCallback((): Promise<Record<string, string>> => {
+  const loadOtherGroupsMembers = useCallback((): Promise<Record<string, OtherGroupMembership>> => {
     if (otherGroups.length === 0) {
       return Promise.resolve({})
     }
     return Promise.all(
       otherGroups.map((group) => API.fetchUserGroupMembers({ surveyId, groupUuid: UserGroup.getUuid(group) as string }))
     ).then((membersByGroup) => {
-      const map: Record<string, string> = {}
+      const map: Record<string, OtherGroupMembership> = {}
       otherGroups.forEach((group, index) => {
+        const groupUuid = UserGroup.getUuid(group) as string
+        const groupName = UserGroup.getName(group)
         membersByGroup[index].forEach((member) => {
-          map[User.getUuid(member) as string] = UserGroup.getName(group)
+          map[User.getUuid(member) as string] = { groupUuid, groupName }
         })
       })
       return map
@@ -149,10 +163,17 @@ export const useUserGroupMembersEditor = ({
   const memberUuids = members.map((member) => User.getUuid(member))
   const availableUsers = surveyUsers.filter((user) => !memberUuids.includes(User.getUuid(user)))
 
+  // Adds the user to this group. When `oldGroupUuid` is given (reassignment case), removes them
+  // from that other group FIRST, then adds them to this one, so the user never ends up (even
+  // momentarily as far as the persisted end-state is concerned) in both groups at once, matching
+  // the remove-then-add sequencing in useUserGroupsSummary.ts's onChangeUserGroup.
   const addMember = useCallback(
-    async (userUuid: string) => {
+    async (userUuid: string, oldGroupUuid?: string) => {
       try {
         dispatch(LoaderActions.showLoader())
+        if (oldGroupUuid) {
+          await API.removeUserGroupMember({ surveyId, groupUuid: oldGroupUuid, userUuid })
+        }
         await API.addUserGroupMember({ surveyId, groupUuid, userUuid })
         await reload()
       } finally {
@@ -164,13 +185,13 @@ export const useUserGroupMembersEditor = ({
 
   const onAddMember = useCallback(
     (userUuid: string) => {
-      const otherGroupName = otherGroupsMembersByUser[userUuid]
+      const otherGroupMembership = otherGroupsMembersByUser[userUuid]
       const user = surveyUsers.find((_user) => User.getUuid(_user) === userUuid)
-      if (otherGroupName) {
+      if (otherGroupMembership) {
         confirm({
           key: 'usersView:userGroup.confirmReassign',
-          params: { userName: user ? User.getName(user) : '', groupName: otherGroupName },
-          onOk: () => addMember(userUuid),
+          params: { userName: user ? User.getName(user) : '', groupName: otherGroupMembership.groupName },
+          onOk: () => addMember(userUuid, otherGroupMembership.groupUuid),
           onCancel: undefined,
         })
       } else {

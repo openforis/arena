@@ -73,20 +73,55 @@ export const useEditUserGroup = ({ groupUuid }: UseEditUserGroupParams): UseEdit
   const canDelete = canManage && Boolean(groupUuid)
   const canSave = canManage && Validation.isValid(UserGroup.getValidation(userGroup))
 
-  const loadGroups = useCallback(async () => {
-    const allGroups = await API.fetchUserGroups({ surveyId })
-    setOtherGroupsInSurvey(allGroups.filter((group) => UserGroup.getUuid(group) !== groupUuid))
-    if (groupUuid) {
-      const found = allGroups.find((group) => UserGroup.getUuid(group) === groupUuid)
-      setUserGroup(found)
-      setUserGroupOriginal(found)
-      setReady(true)
-    }
-  }, [groupUuid, surveyId])
+  // Pure data fetcher: never sets state itself, so it's safe to call from the reactive effect below
+  // via a staleness-guarded `.then()`, following the pattern established in
+  // UserGroupQualifiersEditor.tsx / Task 11 and reused in useUserGroupMembersEditor.ts /
+  // useUserGroupsSummary.ts.
+  const fetchGroups = useCallback(() => API.fetchUserGroups({ surveyId }), [surveyId])
 
+  // Reactive load: re-fetches whenever the group or survey changes. Uses the `.then()`-callback
+  // shape with a closure-local staleness guard (not `await` directly in the effect body) so that if
+  // `groupUuid`/`surveyId` change again before this fetch resolves (e.g. `onSave`'s `navigate(...,
+  // { replace: true })` after creating a group swaps `groupUuid` without remounting the component),
+  // the stale response is discarded instead of overwriting newer state - same pattern established
+  // in UserGroupQualifiersEditor.tsx / Task 11. Also handles the two gaps the bare `await` version
+  // had: a failed fetch (notify + still flip `ready` so the UI shows an error state instead of
+  // staying blank forever) and a `groupUuid` that doesn't match any loaded group (stale bookmark or
+  // concurrently deleted group: notify + navigate back to the group list instead of leaving
+  // `userGroup` as `undefined`, which would throw downstream in UserGroupEdit.tsx).
   useEffect(() => {
-    loadGroups()
-  }, [loadGroups])
+    let ignore = false
+
+    fetchGroups()
+      .then((allGroups) => {
+        if (ignore) return
+        setOtherGroupsInSurvey(allGroups.filter((group) => UserGroup.getUuid(group) !== groupUuid))
+        if (groupUuid) {
+          const found = allGroups.find((group) => UserGroup.getUuid(group) === groupUuid)
+          if (found) {
+            setUserGroup(found)
+            setUserGroupOriginal(found)
+            setReady(true)
+          } else {
+            // NotificationActions.notifyError's untyped implementation destructures `params` with
+            // no default, so TS infers it as a required property; pass an empty object explicitly
+            // (equivalent to the action creator's own runtime default), following the
+            // onRemoveMember precedent in useUserGroupMembersEditor.ts.
+            dispatch(NotificationActions.notifyError({ key: 'usersView:userGroup.notFound', params: {} }))
+            navigate(appModuleUri(userModules.userGroups as AppModule))
+          }
+        }
+      })
+      .catch(() => {
+        if (ignore) return
+        dispatch(NotificationActions.notifyError({ key: 'appErrors:networkError', params: {} }))
+        setReady(true)
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [dispatch, fetchGroups, groupUuid, navigate])
 
   const updateAndValidate = useCallback(
     async (userGroupUpdated: UserGroupType) => {
