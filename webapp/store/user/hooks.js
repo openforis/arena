@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
@@ -106,6 +106,7 @@ export const useAuthCanUseMessages = useUserIsSystemAdmin
 export const useAuthCanCreateUsers = () => Authorizer.canCreateUsers(useUser())
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
 export const useAuthCanInviteUser = () => Authorizer.canInviteUsers(useUser(), useSurveyInfo())
+export const useAuthCanManageUserGroups = () => Authorizer.canManageUserGroups(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersName = () =>
   Authorizer.canViewOtherUsersNameInSameSurvey(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersEmail = () =>
@@ -115,8 +116,6 @@ export const useAuthCanViewAllUsers = () => Authorizer.canViewAllUsers(useUser()
 
 // ====== Profile picture
 export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) => {
-  const [profilePicture, setProfilePicture] = useState(null)
-
   const { data = null, dispatch: fetchUserProfilePicture } = useAsyncGetRequest(
     `/api/user/${userUuid}/profilePicture`,
     { responseType: 'blob' }
@@ -126,12 +125,13 @@ export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) =>
     if (userUuid) {
       fetchUserProfilePicture()
     }
-  }, [userUuid, forceUpdateKey])
+  }, [userUuid, forceUpdateKey, fetchUserProfilePicture])
 
-  useEffect(() => {
+  const profilePicture = useMemo(() => {
     if (data && data.size > 0) {
-      setProfilePicture(URL.createObjectURL(data))
+      return URL.createObjectURL(data)
     }
+    return null
   }, [data])
 
   return profilePicture
