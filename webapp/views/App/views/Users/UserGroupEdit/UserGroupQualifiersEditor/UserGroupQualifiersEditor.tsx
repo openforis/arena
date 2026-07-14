@@ -43,21 +43,28 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
 
   const [validations, setValidations] = useState<ValidationInstance[]>([])
 
-  const validateAll = useCallback(async (qualifiersToValidate: UserGroupQualifierItem[]) => {
-    const results = await Promise.all(
-      qualifiersToValidate.map((qualifier) =>
-        validateUserGroupQualifier({ qualifier, qualifiers: qualifiersToValidate })
-      )
-    )
-    setValidations(results)
-  }, [])
+  const validateAll = useCallback(
+    (qualifiersToValidate: UserGroupQualifierItem[]): Promise<ValidationInstance[]> =>
+      Promise.all(
+        qualifiersToValidate.map((qualifier) =>
+          validateUserGroupQualifier({ qualifier, qualifiers: qualifiersToValidate })
+        )
+      ),
+    []
+  )
 
   useEffect(() => {
-    // Row-level validation is derived from an async validator (`validateUserGroupQualifier`), so this
-    // effect must set state once the async result comes back; there's no synchronous alternative, similar
-    // to the stream-reset pattern in AiExplainPanel.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    validateAll(qualifiers)
+    let ignore = false
+
+    validateAll(qualifiers).then((results) => {
+      if (!ignore) {
+        setValidations(results)
+      }
+    })
+
+    return () => {
+      ignore = true
+    }
   }, [qualifiers, validateAll])
 
   const updateQualifierAt = (index: number, qualifierUpdated: UserGroupQualifierItem) => {
