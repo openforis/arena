@@ -5,22 +5,31 @@ import * as Validation from '@core/validation/validation'
 import type { ValidatorFn } from '@core/validation/_validator/validatorFunctions'
 
 /**
- * Like `Validator.validateItemPropUniqueness`, but excludes "self" from the comparison by object
- * reference rather than by `uuid`. User groups (before being saved) and user group qualifiers (which
+ * Like `Validator.validateItemPropUniqueness`, but excludes "self" from the comparison by occurrence
+ * count rather than by `uuid`. User groups (before being saved) and user group qualifiers (which
  * are plain `{ name, value }` pairs stored inline in the group's props, never assigned a `uuid`) don't
  * have a stable `uuid` to compare against, so the uuid-based exclusion in the shared validator would
  * treat any two distinct uuid-less items as "the same item" and never flag real duplicates.
  *
+ * Counting occurrences of the item's own prop value within `items` avoids self-exclusion altogether:
+ * as long as `items` includes an entry for `item` itself (by value, not necessarily by object
+ * reference), that entry always contributes 1 to the count, so only a genuine duplicate pushes the
+ * count to 2 or more. This is correct whether or not `item` is the same object reference as its
+ * counterpart in `items` - unlike reference-equality-based self-exclusion, it stays correct even if
+ * a caller validates a freshly-constructed/cloned item (e.g. `{ ...qualifier, name: newValue }`)
+ * against the list it logically belongs to.
+ *
  * @param errorKey - Validation error key to return when a duplicate is found.
- * @returns A function that takes the list of items to compare against and returns a `ValidatorFn`.
+ * @returns A function that takes the list of items (including `item` itself) to compare against and
+ *   returns a `ValidatorFn`.
  */
-const _validateItemPropUniquenessByReference =
+const _validateItemPropUniquenessByOccurrenceCount =
   (errorKey: string) =>
   (items: Array<Record<string, unknown>>): ValidatorFn =>
   (propName: string, item: unknown) => {
     const value = Validator.getProp(propName)(item)
-    const hasDuplicates = items.some((other) => other !== item && Validator.getProp(propName)(other) === value)
-    return hasDuplicates ? { key: errorKey } : null
+    const occurrences = items && items.filter((other) => Validator.getProp(propName)(other) === value).length
+    return occurrences > 1 ? { key: errorKey } : null
   }
 
 const _qualifiersAreValid = async (qualifiers: Array<Record<string, unknown>>): Promise<boolean> => {
@@ -38,7 +47,13 @@ export const validateUserGroup = async (userGroup: Record<string, unknown>, othe
     [`${UserGroup.keys.props}.${UserGroup.keysProps.name}`]: [
       Validator.validateRequired(Validation.messageKeys.nameRequired),
       Validator.validateName(Validation.messageKeys.nameInvalid),
-      _validateItemPropUniquenessByReference(Validation.messageKeys.userGroupEdit.nameDuplicate)(otherGroupsInSurvey),
+      // `otherGroupsInSurvey` excludes the group being validated, but the occurrence-count check
+      // relies on `items` including an entry for `item` itself (see helper doc above), so the
+      // group being validated is added to the comparison list here.
+      _validateItemPropUniquenessByOccurrenceCount(Validation.messageKeys.userGroupEdit.nameDuplicate)([
+        ...otherGroupsInSurvey,
+        userGroup,
+      ]),
     ],
     [`${UserGroup.keys.props}.${UserGroup.keysProps.qualifiers}`]: [
       () => (qualifiersValid ? null : { key: Validation.messageKeys.userGroupEdit.qualifiersInvalid }),
@@ -57,6 +72,8 @@ export const validateUserGroupQualifier = async ({
     [UserGroupQualifier.keys.name]: [
       Validator.validateRequired(Validation.messageKeys.userGroupEdit.qualifierNameRequired),
       Validator.validateName(Validation.messageKeys.userGroupEdit.qualifierNameInvalid),
-      _validateItemPropUniquenessByReference(Validation.messageKeys.userGroupEdit.qualifierNameDuplicate)(qualifiers),
+      _validateItemPropUniquenessByOccurrenceCount(Validation.messageKeys.userGroupEdit.qualifierNameDuplicate)(
+        qualifiers
+      ),
     ],
   })
