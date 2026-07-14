@@ -1,0 +1,11 @@
+.user-group-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+
+  &__buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+}

@@ -1,3 +1,1 @@
-const UserGroupEdit = (): null => null
-
-export default UserGroupEdit
+export { default } from './UserGroupEdit'
