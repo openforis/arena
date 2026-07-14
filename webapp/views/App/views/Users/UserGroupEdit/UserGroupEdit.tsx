@@ -12,11 +12,13 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor/LabelsEditor'
 import { useSurveyLangs } from '@webapp/store/survey'
 
 import { useEditUserGroup } from './useEditUserGroup'
+import { UserGroupMembersEditor } from './UserGroupMembersEditor'
 import { UserGroupQualifiersEditor } from './UserGroupQualifiersEditor'
 
 /**
  * Create/edit/delete page for a single User Group, reading `groupUuid` from the route params.
- * Renders the name, label and qualifiers fields; members are added by a later task.
+ * Renders the name, label and qualifiers fields, plus the members panel once the group has been
+ * saved (i.e. has a `groupUuid`).
  *
  * @returns {React.ReactElement | null} - The UserGroupEdit component, or null while loading.
  */
@@ -71,6 +73,8 @@ const UserGroupEdit = (): React.ReactElement | null => {
         onChange={onQualifiersChange}
         readOnly={!canEdit}
       />
+
+      {groupUuid && <UserGroupMembersEditor groupUuid={groupUuid} canEdit={canEdit} />}
 
       <div className="user-group-edit__buttons">
         {canEdit && <ButtonSave onClick={onSave} disabled={!canSave || !dirty} className="btn-save" />}
