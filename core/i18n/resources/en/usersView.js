@@ -35,7 +35,7 @@ Copy the reset password link to the clipboard?`,
   surveysPublished: 'Surveys (published)',
   userRemovedFromSurveyGoToSurveysRequired: `You have been removed from this survey.  
 Press Go to surveys to open the surveys list.`,
-  userRoleUpdatedRefreshRequired: `Your role in this survey has been updated.
+  userRoleUpdatedRefreshRequired: `Your role in this survey has been updated.  
 $t(common.pressRefreshToReloadPage)`,
   userGroups: 'User Groups',
   userGroup: {
