@@ -203,6 +203,14 @@ export const ValidatorErrorKeys = {
     surveyNameRequired: 'validationErrors:userAccessRequestAccept.surveyNameRequired',
   },
 
+  userGroupEdit: {
+    nameDuplicate: 'validationErrors:userGroupEdit.nameDuplicate',
+    qualifiersInvalid: 'validationErrors:userGroupEdit.qualifiersInvalid',
+    qualifierNameDuplicate: 'validationErrors:userGroupEdit.qualifierNameDuplicate',
+    qualifierNameInvalid: 'validationErrors:userGroupEdit.qualifierNameInvalid',
+    qualifierNameRequired: 'validationErrors:userGroupEdit.qualifierNameRequired',
+  },
+
   userPasswordChange: {
     oldPasswordRequired: 'validationErrors:userPasswordChange.oldPasswordRequired',
     oldPasswordWrong: 'validationErrors:userPasswordChange.oldPasswordWrong',
