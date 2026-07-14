@@ -8,21 +8,28 @@ import * as Validation from '@core/validation/validation'
 
 import { ButtonDelete, ButtonSave } from '@webapp/components'
 import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor/LabelsEditor'
+import { useSurveyLangs } from '@webapp/store/survey'
 
 import { useEditUserGroup } from './useEditUserGroup'
 
 /**
  * Create/edit/delete page for a single User Group, reading `groupUuid` from the route params.
- * Renders the name field only; labels, qualifiers and members are added by later tasks.
+ * Renders the name and label fields; qualifiers and members are added by later tasks.
  *
  * @returns {React.ReactElement | null} - The UserGroupEdit component, or null while loading.
  */
 const UserGroupEdit = (): React.ReactElement | null => {
   const { groupUuid } = useParams()
 
-  const { ready, dirty, canEdit, canSave, canDelete, userGroup, onNameChange, onSave, onDelete } = useEditUserGroup({
-    groupUuid,
-  })
+  const { ready, dirty, canEdit, canSave, canDelete, userGroup, onNameChange, onLabelsChange, onSave, onDelete } =
+    useEditUserGroup({
+      groupUuid,
+    })
+  // useSurveyLangs's untyped implementation makes TS infer its return type as `{}`; cast to the
+  // `string[]` shape LabelsEditor's `languages` prop expects, following the `useSurveyId() as string`
+  // precedent in useEditUserGroup.ts.
+  const languages = useSurveyLangs() as string[]
 
   if (!ready) return null
 
@@ -36,6 +43,15 @@ const UserGroupEdit = (): React.ReactElement | null => {
         onChange={onNameChange}
         validation={Validation.getFieldValidation('name')(validation)}
         value={UserGroup.getName(userGroup)}
+      />
+
+      <LabelsEditor
+        formLabelKey="usersView:userGroup.label"
+        labels={UserGroup.getLabels(userGroup)}
+        languages={languages}
+        onChange={onLabelsChange}
+        readOnly={!canEdit}
+        validation={Validation.getFieldValidation('labels')(validation)}
       />
 
       <div className="user-group-edit__buttons">
