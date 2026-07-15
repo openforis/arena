@@ -115,11 +115,11 @@ export const countNodeDefsBySurveyId = async ({ surveyId, draft = true }, client
 // only ever need it against published survey state (e.g. checkIn).
 export const fetchSurveyHasUserDependentExpressions = async (surveyId, client = DB) => {
   const functionsPattern = userDependentFunctionNames.join('|')
-  const { exists } = await client.one(`
+  const { exists } = await client.one(String.raw`
     SELECT EXISTS (
       SELECT 1 FROM ${getSchemaSurvey(surveyId)}.node_def
       WHERE deleted = false
-        AND (props_advanced)::text ~ '\\y(${functionsPattern})\\s*\\('
+        AND (props_advanced)::text ~ '\y(${functionsPattern})\s*\('
     ) AS exists
   `)
   return exists
