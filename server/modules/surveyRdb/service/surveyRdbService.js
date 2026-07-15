@@ -170,7 +170,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
   const cycle = includeDataFromAllCycles ? null : cycleParam
 
   const surveyId = Survey.getId(survey)
-  const hasUserDependentExpressions = await NodeDefManager.fetchSurveyHasUserDependentExpressions(surveyId)
+  const hasUserDependentExpressions = await NodeDefManager.fetchSurveyHasUserDependentExpressions({ surveyId })
   if (hasUserDependentExpressions) {
     // KNOWN LIMITATION: exported values reflect the applicability persisted by whichever
     // user last edited each record, not necessarily the current exporting user's view.

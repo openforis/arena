@@ -109,17 +109,18 @@ export const countNodeDefsBySurveyId = async ({ surveyId, draft = true }, client
     (row) => Number(row.count)
   )
 
-// Cheap survey-level check for whether any (published) node def expression references a
-// function whose result depends on the currently logged in user (e.g. userProp).
-// Only published (props_advanced) expressions are checked, since callers of this function
-// only ever need it against published survey state (e.g. checkIn).
-export const fetchSurveyHasUserDependentExpressions = async (surveyId, client = DB) => {
+// Cheap survey-level check for whether any node def expression references a function whose
+// result depends on the currently logged in user (e.g. userProp).
+// By default, only published (props_advanced) expressions are checked; pass draft = true to
+// also consider draft (props_advanced_draft) expressions.
+export const fetchSurveyHasUserDependentExpressions = async ({ surveyId, draft = false }, client = DB) => {
   const functionsPattern = userDependentFunctionNames.join('|')
+  const propsAdvancedExpr = draft ? '(props_advanced || props_advanced_draft)' : 'props_advanced'
   const { exists } = await client.one(String.raw`
     SELECT EXISTS (
       SELECT 1 FROM ${getSchemaSurvey(surveyId)}.node_def
       WHERE deleted = false
-        AND (props_advanced)::text ~ '\y(${functionsPattern})\s*\('
+        AND (${propsAdvancedExpr})::text ~ '\y(${functionsPattern})\s*\('
     ) AS exists
   `)
   return exists

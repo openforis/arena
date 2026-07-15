@@ -187,7 +187,10 @@ const _fetchAndSetRecordOwner = async ({ ownerUuid, record }, client = db) => {
 // lives in core (Record.recomputeUserDependentNodeState) - this only handles the DB-dependent
 // parts: the cheap gate to skip survey-wide expression scanning, and loading node defs.
 const _recomputeUserDependentNodeState = async ({ user, surveyId, draft, record }, client) => {
-  const hasUserDependentExpressions = await NodeDefRepository.fetchSurveyHasUserDependentExpressions(surveyId, client)
+  const hasUserDependentExpressions = await NodeDefRepository.fetchSurveyHasUserDependentExpressions(
+    { surveyId, draft },
+    client
+  )
   if (!hasUserDependentExpressions) return record
 
   const cycle = Record.getCycle(record)
