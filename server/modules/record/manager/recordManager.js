@@ -180,6 +180,25 @@ const _fetchAndSetRecordOwner = async ({ ownerUuid, record }, client = db) => {
   record[Record.keys.ownerRole] = AuthGroup.getName(ownerAuthGroup)
 }
 
+// Re-evaluates applicability/relevance, visibility, editability and default values for node
+// defs whose expressions depend on the given user (e.g. userProp), without persisting
+// anything: the DB keeps whatever was computed by the last editing user, and each fetch (for
+// a given user) recomputes it fresh in memory for that user. The pure recompute algorithm
+// lives in core (Record.recomputeUserDependentNodeState) - this only handles the DB-dependent
+// parts: the cheap gate to skip survey-wide expression scanning, and loading node defs.
+const _recomputeUserDependentNodeState = async ({ user, surveyId, draft, record }, client) => {
+  const hasUserDependentExpressions = await NodeDefRepository.fetchSurveyHasUserDependentExpressions(surveyId, client)
+  if (!hasUserDependentExpressions) return record
+
+  const cycle = Record.getCycle(record)
+  const surveyWithDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+    { surveyId, cycle, draft, advanced: true },
+    client
+  )
+
+  return Record.recomputeUserDependentNodeState({ user, survey: surveyWithDefs, record })
+}
+
 export const fetchRecordAndNodesByUuid = async (
   {
     surveyId,
@@ -189,6 +208,7 @@ export const fetchRecordAndNodesByUuid = async (
     includeRefData = true,
     includeSurveyUuid = true,
     includeRecordUuid = true,
+    user = null,
   },
   client = db
 ) => {
@@ -211,7 +231,17 @@ export const fetchRecordAndNodesByUuid = async (
     client
   )
   const indexedNodes = ObjectUtils.toUuidIndexedObj(nodes)
-  return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate, sideEffect: true })(record)
+  let recordWithNodes = Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate, sideEffect: true })(
+    record
+  )
+
+  // Preview records are always initialized from scratch with the requesting user's context,
+  // so their applicability is already up to date and doesn't need recomputing here.
+  if (user && !R.isEmpty(indexedNodes) && !Record.isPreview(recordWithNodes)) {
+    recordWithNodes = await _recomputeUserDependentNodeState({ user, surveyId, draft, record: recordWithNodes }, client)
+  }
+
+  return recordWithNodes
 }
 
 export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'

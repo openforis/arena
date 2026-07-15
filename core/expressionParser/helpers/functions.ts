@@ -37,3 +37,12 @@ export const functionNames = {
   userProp: 'userProp',
   uuid: 'uuid',
 }
+
+// Functions whose result depends on the currently logged in user;
+// expressions using them must be re-evaluated for the current user on every record fetch.
+export const userDependentFunctionNames = [
+  functionNames.userEmail,
+  functionNames.userIsRecordOwner,
+  functionNames.userName,
+  functionNames.userProp,
+]

@@ -8,6 +8,7 @@ import {
 } from '@openforis/arena-server'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
 import * as DbUtils from '@server/db/dbUtils'
 
 const { getSchemaSurvey } = Schemata
@@ -107,6 +108,22 @@ export const countNodeDefsBySurveyId = async ({ surveyId, draft = true }, client
     {},
     (row) => Number(row.count)
   )
+
+// Cheap survey-level check for whether any (published) node def expression references a
+// function whose result depends on the currently logged in user (e.g. userProp).
+// Only published (props_advanced) expressions are checked, since callers of this function
+// only ever need it against published survey state (e.g. checkIn).
+export const fetchSurveyHasUserDependentExpressions = async (surveyId, client = DB) => {
+  const functionsPattern = userDependentFunctionNames.join('|')
+  const { exists } = await client.one(`
+    SELECT EXISTS (
+      SELECT 1 FROM ${getSchemaSurvey(surveyId)}.node_def
+      WHERE deleted = false
+        AND (props_advanced)::text ~ '\\y(${functionsPattern})\\s*\\('
+    ) AS exists
+  `)
+  return exists
+}
 
 export const fetchNodeDefsBySurveyId = async (
   { surveyId, cycle, draft, advanced = false, includeDeleted = false, backup = false, includeAnalysis = true },

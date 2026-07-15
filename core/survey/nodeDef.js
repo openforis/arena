@@ -7,6 +7,7 @@ import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import { ArrayUtils } from '@core/arrayUtils'
+import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
 
 import * as TextUtils from '@webapp/utils/textUtils'
 
@@ -438,6 +439,13 @@ export const getAllExpressions = (nodeDef) => {
   ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
   return expressions
 }
+
+const userDependentFunctionsRegExp = new RegExp(`\\b(${userDependentFunctionNames.join('|')})\\s*\\(`)
+
+// Returns true if any of the node def's expressions references a function whose
+// result depends on the currently logged in user (e.g. userProp).
+export const hasUserDependentExpressions = (nodeDef) =>
+  getAllExpressions(nodeDef).some((expression) => userDependentFunctionsRegExp.test(expression))
 
 export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClone, false)
 
