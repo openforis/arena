@@ -440,7 +440,7 @@ export const getAllExpressions = (nodeDef) => {
   return expressions
 }
 
-const userDependentFunctionsRegExp = new RegExp(`\\b(${userDependentFunctionNames.join('|')})\\s*\\(`)
+const userDependentFunctionsRegExp = new RegExp(String.raw`\b(${userDependentFunctionNames.join('|')})\s*\(`)
 
 // Returns true if any of the node def's expressions references a function whose
 // result depends on the currently logged in user (e.g. userProp).
