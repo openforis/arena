@@ -33,9 +33,9 @@ interface UseUserGroupsSummaryResult {
 /**
  * Loads every user group defined in the current survey together with the survey's full user
  * list and, for every user already assigned to a group, that group's uuid (building a
- * userUuid -> groupUuid map used to drive each row's group dropdown). Exposes a handler to move
- * a user to a different group (or unassign them) by removing/adding group membership and
- * reloading.
+ * userUuid -> groupUuid map used to drive the Kanban board's columns and cards). Exposes a
+ * handler to move a user to a different group (or unassign them) by removing/adding group
+ * membership and reloading.
  *
  * @returns {UseUserGroupsSummaryResult} The groups, survey users, the userUuid -> groupUuid map,
  *   and the handler to change a user's group.
