@@ -1,70 +1,69 @@
-import React from 'react'
+import './UserGroupsSummary.scss'
 
-import * as UserGroup from '@core/user/userGroup/userGroup'
+import React, { useMemo } from 'react'
+
 import * as User from '@core/user/user'
+import * as UserGroup from '@core/user/userGroup/userGroup'
 
-import { Dropdown } from '@webapp/components/form'
-import { useI18n } from '@webapp/store/system'
 import { useAuthCanManageUserGroups } from '@webapp/store/user'
 
+import { UNASSIGNED_GROUP_KEY } from './kanbanConstants'
+import type { SurveyUserType, UserGroupType } from './useUserGroupsSummary'
 import { useUserGroupsSummary } from './useUserGroupsSummary'
+import { useUserGroupsKanbanDnd } from './useUserGroupsKanbanDnd'
+import UserGroupColumn from './UserGroupColumn'
 
-const UNASSIGNED = '__unassigned__'
-
-type UserGroupType = Record<string, unknown>
+interface ColumnData {
+  key: string
+  group: UserGroupType | null
+  members: SurveyUserType[]
+}
 
 /**
- * Summary/overview table of every survey user, with a dropdown to view and change their user
- * group assignment.
+ * Kanban board overview of every survey user's group assignment: one column per user group plus
+ * a leading "Unassigned" column, each user shown as a draggable card. Dragging a card into a
+ * different column assigns, reassigns or unassigns that user.
  *
  * @returns {React.ReactElement} - The UserGroupsSummary component.
  */
 const UserGroupsSummary = (): React.ReactElement => {
-  const i18n = useI18n()
   const canManage = useAuthCanManageUserGroups()
-  const { groups, users, groupUuidByUserUuid, onChangeUserGroup } = useUserGroupsSummary()
+  const { groups, users, groupUuidByUserUuid, onChangeUserGroup, reload } = useUserGroupsSummary()
 
-  const dropdownItems: UserGroupType[] = [
-    { uuid: UNASSIGNED, name: i18n.t('usersView:userGroup.unassigned') },
-    ...groups,
-  ]
+  const columns: ColumnData[] = useMemo(() => {
+    const unassignedMembers = users.filter((user) => !groupUuidByUserUuid[User.getUuid(user) as string])
+    const groupColumns = groups.map((group) => {
+      const groupUuid = UserGroup.getUuid(group) as string
+      return {
+        key: groupUuid,
+        group,
+        members: users.filter((user) => groupUuidByUserUuid[User.getUuid(user) as string] === groupUuid),
+      }
+    })
+    return [{ key: UNASSIGNED_GROUP_KEY, group: null, members: unassignedMembers }, ...groupColumns]
+  }, [groups, users, groupUuidByUserUuid])
+
+  const { registerColumnRef } = useUserGroupsKanbanDnd({
+    enabled: canManage,
+    columnKeys: columns.map((column) => column.key),
+    onChangeUserGroup,
+    reload,
+    unassignedGroupKey: UNASSIGNED_GROUP_KEY,
+  })
 
   return (
-    <table className="user-groups-summary">
-      <thead>
-        <tr>
-          <th>{i18n.t('common.name')}</th>
-          <th>{i18n.t('common.email')}</th>
-          <th>{i18n.t('usersView:userGroups')}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.map((user) => {
-          const userUuid = User.getUuid(user) as string
-          const currentGroupUuid = groupUuidByUserUuid[userUuid] ?? UNASSIGNED
-          return (
-            <tr key={userUuid}>
-              <td>{User.getName(user)}</td>
-              <td>{User.getEmail(user)}</td>
-              <td>
-                <Dropdown
-                  clearable={false}
-                  disabled={!canManage}
-                  items={dropdownItems}
-                  itemValue="uuid"
-                  itemLabel={(group: UserGroupType) => UserGroup.getName(group) || (group.name as string)}
-                  searchable={false}
-                  selection={dropdownItems.find((group) => group.uuid === currentGroupUuid)}
-                  onChange={(group: UserGroupType) =>
-                    onChangeUserGroup(userUuid, group.uuid === UNASSIGNED ? null : (group.uuid as string))
-                  }
-                />
-              </td>
-            </tr>
-          )
-        })}
-      </tbody>
-    </table>
+    <div className="user-groups-summary">
+      {columns.map((column) => (
+        <UserGroupColumn
+          key={column.key}
+          groupKey={column.key}
+          group={column.group}
+          members={column.members}
+          draggable={canManage}
+          containerRef={registerColumnRef(column.key)}
+        />
+      ))}
+    </div>
   )
 }
 
