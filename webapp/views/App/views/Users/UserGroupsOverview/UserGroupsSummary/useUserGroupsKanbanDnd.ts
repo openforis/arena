@@ -73,6 +73,54 @@ export const useUserGroupsKanbanDnd = (params: UseUserGroupsKanbanDndParams): Us
     []
   )
 
+  // If onChangeUserGroup rejects, force a state-driven re-render (via reload) to reconcile the
+  // DOM; a failed reload is swallowed since there's nothing further to fall back to.
+  const handleChangeUserGroupError = (): void => {
+    reloadRef.current().catch(() => {})
+  }
+
+  // Sortable has now physically moved cardElement into newContainer as part of finishing the drag
+  // gesture, independent of React. React still believes the card belongs to oldContainer (nothing
+  // has re-rendered yet), so its next reconciliation - triggered by the reload() that
+  // onChangeUserGroup runs internally on success, or by handleChangeUserGroupError's reload() on
+  // failure - would try to remove the card from oldContainer by calling oldContainer.removeChild()
+  // on a node whose actual DOM parent is now newContainer, which throws. Moving the card back to
+  // oldContainer here, before React gets a chance to reconcile, keeps the DOM consistent with what
+  // React last rendered; the resulting state update then drives the real move.
+  const reconcileCrossColumnDrop = (params: {
+    oldContainer: HTMLElement
+    cardElement: HTMLElement
+    userUuid: string
+    groupKeyNew: string
+  }): void => {
+    const { oldContainer, cardElement, userUuid, groupKeyNew } = params
+    oldContainer.appendChild(cardElement)
+
+    const groupUuidNew = groupKeyNew === unassignedGroupKey ? null : groupKeyNew
+
+    onChangeUserGroupRef.current(userUuid, groupUuidNew).catch(handleChangeUserGroupError)
+  }
+
+  const handleSortableStop = (event: SortableStopEvent): void => {
+    const { oldContainer, newContainer } = event
+    if (newContainer === oldContainer) return
+
+    const cardElement = event.dragEvent.originalSource
+    const userUuid = cardElement.dataset.userUuid
+    const groupKeyNew = newContainer.dataset.groupUuid
+    if (!userUuid || !groupKeyNew) return
+
+    // Deferred to a microtask: Sortable's own drag-stop handling (Draggable's base class)
+    // synchronously continues running after this listener returns, and it's that trailing
+    // code - not anything that already happened before this listener fired - that physically
+    // moves cardElement's real DOM node into newContainer. Reverting the move here, before that
+    // continuation runs, would revert nothing: the move hasn't happened yet, and the library
+    // would immediately redo it right after, undoing the revert. Queuing a microtask guarantees
+    // this code runs only once that synchronous continuation (and any other same-tick 'drag:stop'
+    // subscribers) has fully finished, i.e. once the move has actually happened.
+    queueMicrotask(() => reconcileCrossColumnDrop({ oldContainer, cardElement, userUuid, groupKeyNew }))
+  }
+
   useLayoutEffect(() => {
     if (!enabled) return undefined
 
@@ -87,48 +135,15 @@ export const useUserGroupsKanbanDnd = (params: UseUserGroupsKanbanDndParams): Us
       },
     })
 
-    sortable.on('sortable:stop', (event: SortableStopEvent) => {
-      const { oldContainer, newContainer } = event
-      if (newContainer === oldContainer) return
-
-      const cardElement = event.dragEvent.originalSource
-      const userUuid = cardElement.dataset.userUuid
-      const groupKeyNew = newContainer.dataset.groupUuid
-      if (!userUuid || !groupKeyNew) return
-
-      // Deferred to a microtask: Sortable's own drag-stop handling (Draggable's base class)
-      // synchronously continues running after this listener returns, and it's that trailing
-      // code - not anything that already happened before this listener fired - that physically
-      // moves cardElement's real DOM node into newContainer. Reverting the move here, before that
-      // continuation runs, would revert nothing: the move hasn't happened yet, and the library
-      // would immediately redo it right after, undoing the revert. Queuing a microtask guarantees
-      // this code runs only once that synchronous continuation (and any other same-tick 'drag:stop'
-      // subscribers) has fully finished, i.e. once the move has actually happened.
-      queueMicrotask(() => {
-        // Sortable has now physically moved cardElement into newContainer as part of finishing the
-        // drag gesture, independent of React. React still believes the card belongs to oldContainer
-        // (nothing has re-rendered yet), so its next reconciliation - triggered by the reload()
-        // that onChangeUserGroup runs internally on success, or by the reload() below on failure -
-        // would try to remove the card from oldContainer by calling oldContainer.removeChild() on
-        // a node whose actual DOM parent is now newContainer, which throws. Moving the card back
-        // to oldContainer here, before React gets a chance to reconcile, keeps the DOM consistent
-        // with what React last rendered; the resulting state update then drives the real move.
-        oldContainer.appendChild(cardElement)
-
-        const groupUuidNew = groupKeyNew === unassignedGroupKey ? null : groupKeyNew
-
-        onChangeUserGroupRef.current(userUuid, groupUuidNew).catch(() => {
-          reloadRef.current().catch(() => {})
-        })
-      })
-    })
+    sortable.on('sortable:stop', handleSortableStop)
 
     return () => {
       sortable.destroy()
     }
     // columnKeys is read via its joined form so the effect only reinitializes Sortable when the
-    // set of columns actually changes shape, not on every unrelated re-render. onChangeUserGroup/
-    // reload are intentionally excluded too - see onChangeUserGroupRef/reloadRef above.
+    // set of columns actually changes shape, not on every unrelated re-render. handleSortableStop
+    // reads onChangeUserGroup/reload through refs kept current every render (see
+    // onChangeUserGroupRef/reloadRef above), so it's intentionally excluded too.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, columnKeys.join('|')])
 
