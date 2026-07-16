@@ -29,7 +29,7 @@ const _validateItemPropUniquenessByOccurrenceCount =
   (propName: string, item: unknown) => {
     const value = Validator.getProp(propName)(item)
     const occurrences = items && items.filter((other) => Validator.getProp(propName)(other) === value).length
-    return occurrences > 1 ? { key: errorKey } : null
+    return occurrences > 1 ? { key: errorKey, params: { name: value } } : null
   }
 
 const _qualifiersAreValid = async (qualifiers: Array<Record<string, unknown>>): Promise<boolean> => {

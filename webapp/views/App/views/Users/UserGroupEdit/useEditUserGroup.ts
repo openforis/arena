@@ -70,7 +70,7 @@ export const useEditUserGroup = ({ groupUuid }: UseEditUserGroupParams): UseEdit
 
   const dirty = JSON.stringify(userGroup) !== JSON.stringify(userGroupOriginal)
   const canEdit = canManage
-  const canDelete = canManage && Boolean(groupUuid)
+  const canDelete = canManage && Boolean(UserGroup.getUuid(userGroup))
   const canSave = canManage && Validation.isValid(UserGroup.getValidation(userGroup))
 
   // Pure data fetcher: never sets state itself, so it's safe to call from the reactive effect below
