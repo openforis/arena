@@ -117,7 +117,7 @@ export const insertNodeDef = async (
 
 // ======= READ
 
-export { fetchNodeDefByUuid } from '../repository/nodeDefRepository'
+export { fetchNodeDefByUuid, fetchSurveyHasUserDependentExpressions } from '../repository/nodeDefRepository'
 
 export const fetchNodeDefsBySurveyId = async (
   {

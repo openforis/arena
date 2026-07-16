@@ -155,8 +155,9 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, recordUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-      const record = await RecordService.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+      const record = await RecordService.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user })
       res.json(record)
     } catch (error) {
       next(error)
