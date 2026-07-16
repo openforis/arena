@@ -9,8 +9,8 @@ import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 import { LoaderActions } from '@webapp/store/ui'
 
-type SurveyUserType = Record<string, unknown>
-type UserGroupType = Record<string, unknown>
+export type SurveyUserType = Record<string, unknown>
+export type UserGroupType = Record<string, unknown>
 
 interface SurveyUsersResponse {
   list: SurveyUserType[]
@@ -27,6 +27,7 @@ interface UseUserGroupsSummaryResult {
   users: SurveyUserType[]
   groupUuidByUserUuid: Record<string, string>
   onChangeUserGroup: (userUuid: string, groupUuidNew: string | null) => Promise<void>
+  reload: () => Promise<void>
 }
 
 /**
@@ -125,5 +126,5 @@ export const useUserGroupsSummary = (): UseUserGroupsSummaryResult => {
     [dispatch, groupUuidByUserUuid, reload, surveyId]
   )
 
-  return { groups, users, groupUuidByUserUuid, onChangeUserGroup }
+  return { groups, users, groupUuidByUserUuid, onChangeUserGroup, reload }
 }
