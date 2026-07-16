@@ -37,7 +37,7 @@ const Row = (props: Props): React.ReactElement => {
   return (
     <>
       <div>{UserGroup.getName(userGroup)}</div>
-      <div>{UserGroup.getLabel(preferredLang, UserGroup.getName(userGroup))(userGroup)}</div>
+      <div>{UserGroup.getLabel(preferredLang)(userGroup)}</div>
       <div>{UserGroup.getQualifiers(userGroup).length}</div>
       <div>{userGroup.membersCount ?? 0}</div>
     </>
