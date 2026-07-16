@@ -305,6 +305,8 @@ export default {
     userInvite: 'Invitar usuario',
     userNew: 'Nuevo usuario',
     usersSurvey: 'Lista de usuarios',
+    userGroups: 'Grupos de usuarios',
+    userGroupNew: 'Nuevo grupo de usuarios',
     usersList: 'Lista de usuarios (todos)',
     user2FADevice: 'Dispositivo 2FA',
     user2FADevice_plural: 'Dispositivos 2FA',

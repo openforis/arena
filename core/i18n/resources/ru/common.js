@@ -334,6 +334,8 @@ export default {
     userInvite: 'Пригласить пользователя',
     userNew: 'Новый пользователь',
     usersSurvey: 'Список пользователей',
+    userGroups: 'Группы пользователей',
+    userGroupNew: 'Новая группа пользователей',
     usersList: 'Список пользователей (все)',
     user2FADevice: 'Устройство 2FA',
     user2FADevice_plural: 'Устройства 2FA',

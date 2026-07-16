@@ -335,6 +335,8 @@ export default {
     userInvite: 'Хэрэглэгч урих',
     userNew: 'Шинэ хэрэглэгч',
     usersSurvey: 'Хэрэглэгчдийн жагсаалт',
+    userGroups: 'Хэрэглэгчийн бүлгүүд',
+    userGroupNew: 'Шинэ хэрэглэгчийн бүлэг',
     usersList: 'Хэрэглэгчдийн жагсаалт (бүгд)',
     user2FADevice: '2FA төхөөрөмж',
     user2FADevice_plural: '2FA төхөөрөмжүүд',
