@@ -23,12 +23,12 @@ const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) => {
     // child is visible and applicable (or not applicable but not hidden-when-not-relevant)
     (Node.isChildVisible(pageDefUuid)(parentNode) &&
       (!NodeDefLayout.isHiddenWhenNotRelevant(cycle)(pageNodeDef) ||
-        Node.isChildApplicable(pageDefUuid)(parentNode))) ||
-    // has some non-empty descendant
-    Record.getNodeChildrenByDefUuid(
-      parentNode,
-      pageDefUuid
-    )(record).some((pageChildNode) => Record.isNodeFilledByUser(pageChildNode)(record))
+        Node.isChildApplicable(pageDefUuid)(parentNode) ||
+        // has some non-empty descendant
+        Record.getNodeChildrenByDefUuid(
+          parentNode,
+          pageDefUuid
+        )(record).some((pageChildNode) => Record.isNodeFilledByUser(pageChildNode)(record))))
   )
 }
 

@@ -198,9 +198,14 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
 export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft })
+  // Passing `user` re-evaluates user-dependent applicability/relevance (e.g. userProp) for
+  // the current viewer/editor in memory, without persisting it - see RecordManager.fetchRecordAndNodesByUuid.
+  // This happens regardless of edit permission: existing persisted records - even when only
+  // viewed, not edited - must reflect visibility for the current viewer, not whoever last edited them.
+  const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft, user })
   const preview = Record.isPreview(record)
   const cycle = Record.getCycle(record)
+  const nodesEmpty = Record.getNodesArray(record).length === 0
 
   RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
 
@@ -208,7 +213,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
     // Create record thread
     const thread = RecordsUpdateThreadService.getOrCreatedThread()
     // initialize record if empty
-    if (Record.getNodesArray(record).length === 0) {
+    if (nodesEmpty) {
       thread.postMessage({
         type: RecordsUpdateThreadMessageTypes.recordInit,
         user,
@@ -220,6 +225,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
       })
     }
   }
+
   return record
 }
 
@@ -433,8 +439,8 @@ export const mergeRecords = async (
   client = db
 ) =>
   client.tx(async (tx) => {
-    const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid }, tx)
-    const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid }, tx)
+    const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid, user }, tx)
+    const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid, user }, tx)
 
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
@@ -487,7 +493,7 @@ const exportRecordDocument = async ({
   extension,
   contentType,
 }) => {
-  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true })
+  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true, user })
   const cycle = Record.getCycle(record)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
