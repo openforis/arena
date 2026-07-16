@@ -46,6 +46,34 @@ interface UseUserGroupMembersEditorResult {
 }
 
 /**
+ * Builds a userUuid -> { groupUuid, groupName } map out of a list of other groups and, for each one
+ * (same index), its members - used by loadOtherGroupsMembers below. Kept as a standalone function
+ * (rather than nested in the hook) to keep function-nesting depth shallow.
+ *
+ * @param params - The function params.
+ * @param params.otherGroups - The groups other than the one being edited.
+ * @param params.membersByGroup - Each entry in `otherGroups`' members, at the same index.
+ * @returns {Record<string, OtherGroupMembership>} The userUuid -> other group membership map.
+ */
+const buildOtherGroupsMembersByUserMap = ({
+  otherGroups,
+  membersByGroup,
+}: {
+  otherGroups: UserGroupType[]
+  membersByGroup: UserGroupMemberType[][]
+}): Record<string, OtherGroupMembership> => {
+  const map: Record<string, OtherGroupMembership> = {}
+  otherGroups.forEach((group, index) => {
+    const groupUuid = UserGroup.getUuid(group) as string
+    const groupName = UserGroup.getName(group)
+    membersByGroup[index].forEach((member) => {
+      map[User.getUuid(member) as string] = { groupUuid, groupName }
+    })
+  })
+  return map
+}
+
+/**
  * Loads the members of a user group together with the survey's full user list (to build the
  * "add member" dropdown) and, for every user already assigned to a *different* group in the
  * survey, that other group's uuid and name (used to actually move them - remove from the old
@@ -127,23 +155,14 @@ export const useUserGroupMembersEditor = ({
   // remove the user from their old group; the name is only for the confirmation dialog's wording.
   // Same staleness-guard reasoning as the effect above: `otherGroups` can change again before the
   // per-group member fetches resolve.
-  const loadOtherGroupsMembers = useCallback((): Promise<Record<string, OtherGroupMembership>> => {
+  const loadOtherGroupsMembers = useCallback(async (): Promise<Record<string, OtherGroupMembership>> => {
     if (otherGroups.length === 0) {
-      return Promise.resolve({})
+      return {}
     }
-    return Promise.all(
+    const membersByGroup = await Promise.all(
       otherGroups.map((group) => API.fetchUserGroupMembers({ surveyId, groupUuid: UserGroup.getUuid(group) as string }))
-    ).then((membersByGroup) => {
-      const map: Record<string, OtherGroupMembership> = {}
-      otherGroups.forEach((group, index) => {
-        const groupUuid = UserGroup.getUuid(group) as string
-        const groupName = UserGroup.getName(group)
-        membersByGroup[index].forEach((member) => {
-          map[User.getUuid(member) as string] = { groupUuid, groupName }
-        })
-      })
-      return map
-    })
+    )
+    return buildOtherGroupsMembersByUserMap({ otherGroups, membersByGroup })
   }, [otherGroups, surveyId])
 
   useEffect(() => {
@@ -160,8 +179,8 @@ export const useUserGroupMembersEditor = ({
     }
   }, [loadOtherGroupsMembers])
 
-  const memberUuids = members.map((member) => User.getUuid(member))
-  const availableUsers = surveyUsers.filter((user) => !memberUuids.includes(User.getUuid(user)))
+  const memberUuids: Set<string> = new Set(members.map((member) => User.getUuid(member)))
+  const availableUsers = surveyUsers.filter((user) => !memberUuids.has(User.getUuid(user)))
 
   // Adds the user to this group. When `oldGroupUuid` is given (reassignment case), removes them
   // from that other group FIRST, then adds them to this one, so the user never ends up (even

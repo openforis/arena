@@ -1,7 +1,7 @@
-import * as UserActions from './actions'
-import * as UserState from './state'
-import UserReducer from './reducer'
-import {
+export * as UserActions from './actions'
+export * as UserState from './state'
+export { default as UserReducer } from './reducer'
+export {
   useUser,
   useAuthCanEditSurvey,
   useAuthCanCreateRecord,
@@ -18,24 +18,3 @@ import {
   useUserIsSystemAdmin,
   useProfilePicture,
 } from './hooks'
-
-export {
-  UserActions,
-  UserState,
-  UserReducer,
-  useUser,
-  useAuthCanEditSurvey,
-  useAuthCanCreateRecord,
-  useAuthCanEditRecord,
-  useAuthCanCleanseRecords,
-  useAuthCanDeleteAllRecords,
-  useAuthCanCreateUsers,
-  useAuthCanEditUser,
-  useAuthCanInviteUser,
-  useAuthCanManageUserGroups,
-  useAuthCanViewOtherUsersEmail,
-  useAuthCanUseAnalysis,
-  useAuthCanUseMessages,
-  useUserIsSystemAdmin,
-  useProfilePicture,
-}

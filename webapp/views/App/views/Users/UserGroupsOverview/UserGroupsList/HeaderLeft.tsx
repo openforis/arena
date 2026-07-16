@@ -1,7 +1,7 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
-import { useI18n } from '@webapp/store/system'
+import { ButtonIconAdd } from '@webapp/components'
 import { useAuthCanManageUserGroups } from '@webapp/store/user'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
@@ -17,16 +17,18 @@ type AppModule = Parameters<typeof appModuleUri>[0]
  * @returns {React.ReactElement} - The HeaderLeft component.
  */
 const HeaderLeft = (): React.ReactElement => {
-  const i18n = useI18n()
+  const navigate = useNavigate()
   const canManage = useAuthCanManageUserGroups()
 
   return (
     <div>
       {canManage && (
-        <Link to={appModuleUri(userModules.userGroupNew as AppModule)} className="btn btn-s">
-          <span className="icon icon-plus icon-12px icon-left" />
-          {i18n.t('usersView:userGroup.new')}
-        </Link>
+        <ButtonIconAdd
+          showLabel
+          label="usersView:userGroup.new"
+          onClick={() => navigate(appModuleUri(userModules.userGroupNew as AppModule))}
+          variant="contained"
+        />
       )}
     </div>
   )

@@ -28,7 +28,7 @@ const _validateItemPropUniquenessByOccurrenceCount =
   (items: Array<Record<string, unknown>>): ValidatorFn =>
   (propName: string, item: unknown) => {
     const value = Validator.getProp(propName)(item)
-    const occurrences = items && items.filter((other) => Validator.getProp(propName)(other) === value).length
+    const occurrences = items?.filter((other) => Validator.getProp(propName)(other) === value).length ?? 0
     return occurrences > 1 ? { key: errorKey, params: { name: value } } : null
   }
 
