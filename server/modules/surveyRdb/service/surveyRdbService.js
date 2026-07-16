@@ -8,7 +8,9 @@ import * as User from '@core/user/user'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../manager/surveyRdbManager'
+import * as NodeDefManager from '../../nodeDef/manager/nodeDefManager'
 
+import * as Log from '@server/log/log'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as JobManager from '@server/job/jobManager'
@@ -16,6 +18,8 @@ import * as JobUtils from '@server/job/jobUtils'
 
 import SurveysRdbRefreshJob from './SurveysRdbRefreshJob'
 import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
+
+const Logger = Log.getLogger('SurveyRdbService')
 
 const _fetchSurvey = async ({ surveyId, cycle }) => {
   const draft = true // always load draft node defs (needed for custom aggregate functions)
@@ -38,15 +42,13 @@ const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
 
 /**
  * Executes a select query on an entity definition data view.
- *
  * @param {!object} params - The query parameters.
  * @param {!string} [params.surveyId] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query to execute.
- * @param {number} [params.offset=null] - The query offset.
- * @param {number} [params.limit=null] - The query limit.
- * @param {Stream.Writable} [params.outputStream=null] - The output to be used to stream the data (if specified).
- *
+ * @param {number} [params.offset] - The query offset.
+ * @param {number} [params.limit] - The query limit.
+ * @param {Stream.Writable} [params.outputStream] - The output to be used to stream the data (if specified).
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params) => {
@@ -99,12 +101,10 @@ export const fetchViewData = async (params) => {
 
 /**
  * Counts the number of rows in an entity definition data view, filtered by the given filter object.
- *
  * @param {!object} params - The query parameters.
  * @param {!string} [params.surveyId] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query used to filter the records.
- *
  * @returns {Promise<number>} - The count of rows.
  */
 export const countTable = async (params) => {
@@ -168,6 +168,18 @@ export const fetchEntitiesDataToCsvFiles = async ({
 
   const { includeDataFromAllCycles } = options
   const cycle = includeDataFromAllCycles ? null : cycleParam
+
+  const surveyId = Survey.getId(survey)
+  const hasUserDependentExpressions = await NodeDefManager.fetchSurveyHasUserDependentExpressions({ surveyId })
+  if (hasUserDependentExpressions) {
+    // KNOWN LIMITATION: exported values reflect the applicability persisted by whichever
+    // user last edited each record, not necessarily the current exporting user's view.
+    // A full per-record, per-exporting-user correction is not implemented yet.
+    Logger.warn(
+      `survey ${surveyId} uses user-dependent expressions (e.g. userProp); ` +
+        'exported data reflects persisted applicability from the last editing user, not the exporting user'
+    )
+  }
 
   return SurveyRdbManager.fetchEntitiesDataToCsvFiles({
     survey,
