@@ -216,7 +216,7 @@ export const userModules = {
     path: 'usersAccessRequest',
   },
   userGroups: {
-    key: 'userGroups',
+    key: 'userGroup_plural',
     path: 'userGroups',
   },
   userGroupNew: {

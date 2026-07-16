@@ -7,9 +7,8 @@ import { validateUserGroupQualifier } from '@core/user/userGroup/userGroupValida
 import * as Validation from '@core/validation/validation'
 import type { ValidationInstance } from '@core/validation/validation'
 
-import { Button, ButtonAdd } from '@webapp/components'
+import { Button, ButtonAdd, Fieldset } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { useI18n } from '@webapp/store/system'
 
 /**
  * A single group qualifier: a key/value pair stored inline in the group's props.
@@ -39,7 +38,6 @@ type Props = {
  */
 export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
   const { qualifiers, onChange, readOnly = false } = props
-  const i18n = useI18n()
 
   const [validations, setValidations] = useState<ValidationInstance[]>([])
 
@@ -79,11 +77,11 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
     onChange(ArrayUtils.removeItemAtIndex<UserGroupQualifierItem>({ index })(qualifiers))
 
   return (
-    <div className="user-group-qualifiers-editor">
+    <Fieldset className="user-group-qualifiers-editor" legend="usersView:userGroup.qualifier_plural">
       {qualifiers.map((qualifier, index) => (
-        <FormItem key={index} label={`${i18n.t('usersView:userGroup.qualifiers')} ${index + 1}`}>
+        <FormItem key={index} label="usersView:userGroup.qualifier" labelParams={{ index: index + 1 }}>
           <Input
-            placeholder={i18n.t('usersView:userGroup.qualifierKey')}
+            placeholder="usersView:userGroup.qualifierKey"
             readOnly={readOnly}
             value={UserGroupQualifier.getName(qualifier)}
             onChange={(value: string) =>
@@ -95,7 +93,7 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
             validation={Validation.getFieldValidation(UserGroupQualifier.keys.name)(validations[index])}
           />
           <Input
-            placeholder={i18n.t('usersView:userGroup.qualifierValue')}
+            placeholder="usersView:userGroup.qualifierValue"
             readOnly={readOnly}
             value={UserGroupQualifier.getValue(qualifier)}
             onChange={(value: string) =>
@@ -106,6 +104,6 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
         </FormItem>
       ))}
       {!readOnly && <ButtonAdd label="usersView:userGroup.addQualifier" onClick={onAdd} />}
-    </div>
+    </Fieldset>
   )
 }

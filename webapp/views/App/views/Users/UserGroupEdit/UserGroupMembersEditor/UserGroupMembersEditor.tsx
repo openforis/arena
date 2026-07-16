@@ -13,6 +13,8 @@ type Props = {
   canEdit?: boolean
 }
 
+const getUserLabel = (user: Record<string, unknown>): string => `${User.getName(user)} (${User.getEmail(user)})`
+
 /**
  * Member-management panel for an existing user group: lists current members, allows adding a
  * member from the survey's user list (with a reassignment confirmation if they're already in a
@@ -37,8 +39,7 @@ export const UserGroupMembersEditor = (props: Props): React.ReactElement => {
         const userUuid = User.getUuid(member) as string
         return (
           <div key={userUuid} className="user-group-members-editor__row">
-            <span>{User.getName(member)}</span>
-            <span>{User.getEmail(member)}</span>
+            <span>{getUserLabel(member)}</span>
             {canEdit && (
               <Button iconClassName="icon-cross icon-12px" variant="text" onClick={() => onRemoveMember(userUuid)} />
             )}
@@ -50,7 +51,7 @@ export const UserGroupMembersEditor = (props: Props): React.ReactElement => {
           clearable={false}
           items={availableUsers}
           itemValue={(user: Record<string, unknown>) => User.getUuid(user)}
-          itemLabel={(user: Record<string, unknown>) => User.getName(user)}
+          itemLabel={getUserLabel}
           placeholder={i18n.t('usersView:userGroup.addMember')}
           selection={null}
           onChange={(user: Record<string, unknown>) => onAddMember(User.getUuid(user) as string)}

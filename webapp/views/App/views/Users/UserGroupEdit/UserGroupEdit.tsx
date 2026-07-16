@@ -3,6 +3,7 @@ import './UserGroupEdit.scss'
 import React from 'react'
 import { useParams } from 'react-router'
 
+import * as StringUtils from '@core/stringUtils'
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import * as Validation from '@core/validation/validation'
 
@@ -55,6 +56,7 @@ const UserGroupEdit = (): React.ReactElement | null => {
         disabled={!canEdit}
         label="usersView:userGroup.name"
         onChange={onNameChange}
+        textTransformFunction={StringUtils.normalizeName}
         validation={Validation.getFieldValidation('name')(validation)}
         value={UserGroup.getName(userGroup)}
       />
