@@ -230,7 +230,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     )
 
     const recordTarget = await RecordManager.fetchRecordAndNodesByUuid(
-      { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true },
+      { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true, user },
       tx
     )
     // check can update record
