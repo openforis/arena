@@ -46,10 +46,10 @@ const valueFormattersByType = {
 const extractKeyOrSummaryValue = ({ nodeDef, record, srsIndex, categoryItemsByCodeDefUuid = null, lang = null }) => {
   const name = NodeDef.getName(nodeDef)
   let field = name
-  if (NodeDef.isCode(nodeDef) && !categoryItemsByCodeDefUuid) {
+  const keysOrSummaryFields = { ...Record.getKeysObj(record), ...Record.getSummaryAttributesObj(record) }
+  if (NodeDef.isCode(nodeDef) && (!categoryItemsByCodeDefUuid || !!keysOrSummaryFields[field])) {
     field = `${field}_label`
   }
-  const keysOrSummaryFields = { ...Record.getKeysObj(record), ...Record.getSummaryAttributesObj(record) }
   const value = keysOrSummaryFields[field]
   if (Objects.isEmpty(value)) {
     return ''
