@@ -79,13 +79,13 @@ export default class FilesImportJob extends FileImportBaseJob {
   }
 
   async checkFileUuidsAreValid(filesSummaries) {
-    const { recordsFileUuids } = this.context
+    const { recordsFileUuids, skipMissingFiles } = this.context
 
     if (Objects.isEmpty(recordsFileUuids)) {
       this.logDebug('no files to restore in the records')
       return
     }
-    if (Objects.isEmpty(filesSummaries)) {
+    if (Objects.isEmpty(filesSummaries) && !skipMissingFiles) {
       // files data in records but not in the files folder being restored
       throw new Error('missing files summary file')
     }
