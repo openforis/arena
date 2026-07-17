@@ -1,13 +1,9 @@
-import { NodePointers, Objects, Records, ServiceRegistry, SurveyDependencyType } from '@openforis/arena-core'
-import { ServerServiceType } from '@openforis/arena-server'
+import { NodePointers, Records, SurveyDependencyType } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
-import * as User from '@core/user/user'
-import * as UserGroup from '@core/user/userGroup/userGroup'
-import * as UserGroupQualifier from '@core/user/userGroup/userGroupQualifier'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
@@ -27,6 +23,7 @@ import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
+import * as RecordQualifierMatcher from './recordQualifierMatcher'
 import * as RecordValidationManager from './recordValidationManager'
 import * as NodeCreationManager from './nodeCreationManager'
 import * as NodeUpdateManager from './nodeUpdateManager'
@@ -84,31 +81,14 @@ const _applyGroupQualifierValues = async (
   { user, survey, record, timezoneOffset, nodesUpdateListener, nodesValidationListener },
   client
 ) => {
-  const qualifierNodeDefs = Survey.getNodeDefsArray(survey).filter(NodeDef.isQualifier)
-  if (qualifierNodeDefs.length === 0) return record
-
-  const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
-  const userGroups = await userGroupService.getManyByUser({
-    userUuid: User.getUuid(user),
-    surveyUuid: Survey.getUuid(survey),
-  })
-  const userGroup = userGroups[0]
-  if (!userGroup) return record
-
-  const qualifiers = UserGroup.getQualifiers(userGroup)
-  if (qualifiers.length === 0) return record
+  const qualifierFilters = await RecordQualifierMatcher.fetchUserQualifierFilters({ user, survey }, client)
+  if (qualifierFilters.length === 0) return record
 
   const rootNode = Record.getRootNode(record)
 
   let recordUpdated = record
 
-  for (const nodeDef of qualifierNodeDefs) {
-    const qualifier = qualifiers.find((q) => UserGroupQualifier.getName(q) === NodeDef.getName(nodeDef))
-    if (!qualifier) continue
-
-    const qualifierValue = UserGroupQualifier.getValue(qualifier)
-    if (Objects.isEmpty(qualifierValue)) continue
-
+  for (const { nodeDef, value: qualifierValue } of qualifierFilters) {
     let value = null
     if (NodeDef.isCode(nodeDef)) {
       const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
