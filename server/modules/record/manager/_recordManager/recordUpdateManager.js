@@ -1,12 +1,17 @@
-import { NodePointers, Records, SurveyDependencyType } from '@openforis/arena-core'
+import { NodePointers, Objects, Records, ServiceRegistry, SurveyDependencyType } from '@openforis/arena-core'
+import { ServerServiceType } from '@openforis/arena-server'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
+import * as User from '@core/user/user'
+import * as UserGroup from '@core/user/userGroup/userGroup'
+import * as UserGroupQualifier from '@core/user/userGroup/userGroupQualifier'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Node from '@core/record/node'
@@ -20,6 +25,7 @@ import * as RecordFileManager from '@server/modules/record/manager/recordFileMan
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
 import * as RecordValidationManager from './recordValidationManager'
 import * as NodeCreationManager from './nodeCreationManager'
@@ -50,7 +56,7 @@ export const initNewRecord = async (
 
   const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
-  return persistNode(
+  const recordWithRootEntity = await persistNode(
     {
       user,
       survey,
@@ -64,6 +70,76 @@ export const initNewRecord = async (
     },
     client
   )
+
+  return _applyGroupQualifierValues(
+    { user, survey, record: recordWithRootEntity, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+    client
+  )
+}
+
+// Auto-fills attributes flagged as "qualifier" with the value specified for them
+// in the qualifiers of the current user's group for this survey, and marks
+// the affected node as non-editable in the UI.
+const _applyGroupQualifierValues = async (
+  { user, survey, record, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+  client
+) => {
+  const qualifierNodeDefs = Survey.getNodeDefsArray(survey).filter(NodeDef.isQualifier)
+  if (qualifierNodeDefs.length === 0) return record
+
+  const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
+  const userGroups = await userGroupService.getManyByUser({
+    userUuid: User.getUuid(user),
+    surveyUuid: Survey.getUuid(survey),
+  })
+  const userGroup = userGroups[0]
+  if (!userGroup) return record
+
+  const qualifiers = UserGroup.getQualifiers(userGroup)
+  if (qualifiers.length === 0) return record
+
+  const rootNode = Record.getRootNode(record)
+
+  let recordUpdated = record
+
+  for (const nodeDef of qualifierNodeDefs) {
+    const qualifier = qualifiers.find((q) => UserGroupQualifier.getName(q) === NodeDef.getName(nodeDef))
+    if (!qualifier) continue
+
+    const qualifierValue = UserGroupQualifier.getValue(qualifier)
+    if (Objects.isEmpty(qualifierValue)) continue
+
+    let value = null
+    if (NodeDef.isCode(nodeDef)) {
+      const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+      const item = await CategoryItemProviderDefault.getItemByCode({ survey, categoryUuid, code: qualifierValue })
+      if (!item) continue
+      value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item), code: qualifierValue })
+    } else {
+      value = qualifierValue
+    }
+
+    const existingNode = Record.getNodeChildrenByDefUuid(rootNode, NodeDef.getUuid(nodeDef))(recordUpdated)[0]
+    const nodeToPersist =
+      existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(recordUpdated), rootNode)
+    const nodeWithValue = Node.assocIsQualifierValueApplied(true)(Node.assocValue(value)(nodeToPersist))
+
+    recordUpdated = await persistNode(
+      {
+        user,
+        survey,
+        record: recordUpdated,
+        node: nodeWithValue,
+        timezoneOffset,
+        nodesUpdateListener,
+        nodesValidationListener,
+        system: true,
+      },
+      client
+    )
+  }
+
+  return recordUpdated
 }
 
 // ==== UPDATE
