@@ -989,6 +989,10 @@ $t(common.appNameFull)
       multiple: 'Múltiplo',
       ownPage: 'Página própria',
       parentPage: 'Página pai ({{parentPage}})',
+      qualifier: {
+        label: 'Qualificador',
+        info: `Quando um novo registro é criado por um usuário pertencente a um grupo, este atributo será automaticamente preenchido com o valor especificado para ele nos qualificadores do grupo do usuário. Os usuários só poderão ver e modificar registros pertencentes ao seu próprio grupo, se pertencerem a um (ainda não implementado).`,
+      },
       table: 'Tabela',
     },
     advancedProps: {
