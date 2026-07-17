@@ -2,13 +2,15 @@ import './UserGroupsSummary.scss'
 
 import React, { useMemo } from 'react'
 
+import { UserGroup as UserGroupType } from '@openforis/arena-core'
+
 import * as User from '@core/user/user'
 import * as UserGroup from '@core/user/userGroup/userGroup'
 
 import { useAuthCanManageUserGroups } from '@webapp/store/user'
 
 import { UNASSIGNED_GROUP_KEY } from './kanbanConstants'
-import type { SurveyUserType, UserGroupType } from './useUserGroupsSummary'
+import type { SurveyUserType } from './useUserGroupsSummary'
 import { useUserGroupsSummary } from './useUserGroupsSummary'
 import { useUserGroupsKanbanDnd } from './useUserGroupsKanbanDnd'
 import UserGroupColumn from './UserGroupColumn'

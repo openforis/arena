@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { UserGroup as UserGroupType } from '@openforis/arena-core'
+
 import * as UserGroup from '@core/user/userGroup/userGroup'
 
 import { useSurveyPreferredLang } from '@webapp/store/survey'
@@ -9,13 +11,7 @@ import { useSurveyPreferredLang } from '@webapp/store/survey'
  * Note: `membersCount` is not currently returned by that endpoint (it only returns rows with `props`),
  * so it defaults to 0 below; this is a known, accepted limitation, out of scope to fix here.
  */
-type UserGroupRow = {
-  uuid: string
-  props?: {
-    name?: string
-    labels?: Record<string, string>
-    qualifiers?: { name: string; value: string }[]
-  }
+type UserGroupRow = UserGroupType & {
   membersCount?: number
 }
 
