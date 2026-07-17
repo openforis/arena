@@ -996,7 +996,7 @@ $t(common.appNameFull)
       parentPage: 'Page parente ({{parentPage}})',
       qualifier: {
         label: 'Qualificateur',
-        info: `Lorsqu'un nouvel enregistrement est créé par un utilisateur appartenant à un groupe, cet attribut sera automatiquement rempli avec la valeur spécifiée pour celui-ci dans les qualificateurs du groupe de l'utilisateur. Les utilisateurs ne pourront voir et modifier que les enregistrements appartenant à leur propre groupe, s'ils appartiennent à un groupe (pas encore implémenté).`,
+        info: `Lorsqu'un nouvel enregistrement est créé par un utilisateur appartenant à un groupe, cet attribut sera automatiquement rempli avec la valeur spécifiée pour celui-ci dans les qualificateurs du groupe de l'utilisateur. Les utilisateurs ne pourront voir et modifier que les enregistrements appartenant à leur propre groupe, s'ils appartiennent à un groupe.`,
       },
       table: 'Tableau',
     },

@@ -841,7 +841,7 @@ $t(common.appNameFull)
       parentPage: 'Página padre ({{parentPage}})',
       qualifier: {
         label: 'Calificador',
-        info: `Cuando un usuario que pertenece a un grupo crea un nuevo registro, este atributo se completará automáticamente con el valor especificado para él en los calificadores del grupo del usuario. Los usuarios solo podrán ver y modificar los registros que pertenezcan a su propio grupo, si pertenecen a uno (aún no implementado).`,
+        info: `Cuando un usuario que pertenece a un grupo crea un nuevo registro, este atributo se completará automáticamente con el valor especificado para él en los calificadores del grupo del usuario. Los usuarios solo podrán ver y modificar los registros que pertenezcan a su propio grupo, si pertenecen a uno.`,
       },
       table: 'Tabla',
     },

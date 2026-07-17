@@ -988,7 +988,7 @@ $t(common.appNameFull)
       parentPage: 'Parent page ({{parentPage}})',
       qualifier: {
         label: 'Qualifier',
-        info: `When a new record is created by a user belonging to a group, this attribute will be automatically filled with the value specified for it in the qualifiers of the user's group. Users will only be able to see and modify records belonging to their own group, if they belong to one (not yet implemented).`,
+        info: `When a new record is created by a user belonging to a group, this attribute will be automatically filled with the value specified for it in the qualifiers of the user's group. Users will only be able to see and modify records belonging to their own group, if they belong to one.`,
       },
       table: 'Table',
     },
