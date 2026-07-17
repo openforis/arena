@@ -1,6 +1,6 @@
 import axios from 'axios'
+import { UserGroup } from '@openforis/arena-core'
 
-type UserGroup = Record<string, unknown>
 type UserGroupMember = Record<string, unknown>
 
 const getUserGroupsApiPath = (surveyId: string): string => `/api/survey/${surveyId}/user-groups`

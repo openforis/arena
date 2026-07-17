@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux'
 import axios from 'axios'
 import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
+import { UserGroup as UserGroupType } from '@openforis/arena-core'
+
 import * as User from '@core/user/user'
 import * as UserGroup from '@core/user/userGroup/userGroup'
 
@@ -13,7 +15,6 @@ import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 type SurveyUserType = Record<string, unknown>
 type UserGroupMemberType = Record<string, unknown>
-type UserGroupType = Record<string, unknown>
 
 interface SurveyUsersResponse {
   list: SurveyUserType[]
