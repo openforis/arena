@@ -50,7 +50,7 @@ const valueFormattersByType = {
     if (!categoryItemsByCodeDefUuid) return code
 
     const item = _findCategoryItem({ survey, nodeDef, code, categoryItemsByCodeDefUuid, keysOrSummaryFields })
-    if (!item) return null
+    if (!item) return code
 
     const result = NodeDefLayout.isCodeShown(cycle)(nodeDef)
       ? CategoryItem.getLabelWithCode(lang)(item)
@@ -111,9 +111,11 @@ const extractKeyOrSummaryValue = ({
     keysOrSummaryFields,
     lang,
   })
-  if (result === null && NodeDef.isCode(nodeDef)) {
+  if ((result === null || result === value) && NodeDef.isCode(nodeDef)) {
     const label = keysOrSummaryFields[`${name}_label`]
-    if (!Objects.isEmpty(label)) return label
+    if (!Objects.isEmpty(label)) {
+      return label
+    }
   }
   return result
 }
