@@ -59,6 +59,7 @@ export const propKeys = {
   autoIncrementalKey: 'autoIncrementalKey',
   labels: ObjectUtils.keysProps.labels,
   multiple: 'multiple',
+  qualifier: 'qualifier',
   name: ObjectUtils.keys.name,
   readOnly: 'readOnly',
   layout: 'layout',
@@ -113,6 +114,7 @@ const commonAttributePropsKeys = [
   propKeys.layout,
   propKeys.multiple,
   propKeys.name,
+  propKeys.qualifier,
   propKeys.readOnly,
 ]
 
@@ -230,6 +232,7 @@ export const getName = (nodeDef) => getProp(propKeys.name, '')(nodeDef)
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
+export const isQualifier = ObjectUtils.isPropTrue(propKeys.qualifier)
 export const isAutoIncrementalKey = ObjectUtils.isPropTrue(propKeys.autoIncrementalKey)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const isMultiple = ObjectUtils.isPropTrue(propKeys.multiple)

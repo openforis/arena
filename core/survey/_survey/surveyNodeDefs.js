@@ -244,6 +244,11 @@ export const getRootSummaryDefs =
 export const isNodeDefRootKey = (nodeDef) => (survey) =>
   NodeDef.isKey(nodeDef) && NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
 
+export const canNodeDefBeQualifier = (nodeDef) => (survey) =>
+  (NodeDef.isText(nodeDef) || NodeDef.isCode(nodeDef)) &&
+  !NodeDef.isMultiple(nodeDef) &&
+  NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
+
 export const getNodeDefsRootUnique = (survey) => {
   const nodeDefRoot = getNodeDefRoot(survey)
   return getNodeDefChildren({ nodeDef: nodeDefRoot })(survey).filter(

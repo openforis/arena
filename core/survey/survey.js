@@ -189,6 +189,7 @@ export const {
   getSummaryDefs,
   getRootSummaryDefs,
   isNodeDefRootKey,
+  canNodeDefBeQualifier,
   findNodeDef,
   findNodeDefByName,
   getNodeDefAreaBasedEstimate,
