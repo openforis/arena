@@ -155,7 +155,7 @@ const BasicProps = (props) => {
         </>
       )}
 
-      {canBeQualifier && hasUserGroups && (
+      {((canBeQualifier && hasUserGroups) || NodeDef.isQualifier(nodeDef)) && ( // allow to edit qualifier if it is already set, even if not applicable, so it can be unset
         <FormItem label="nodeDefEdit.basicProps.qualifier.label">
           <Checkbox
             checked={NodeDef.isQualifier(nodeDef)}
