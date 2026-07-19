@@ -67,5 +67,5 @@ export const sendEmail = async ({ to, msgKey, msgParams = {}, i18n: i18nParam = 
   const subject = i18n.t(`${msgKey}.subject`, msgParams)
   const html = i18n.t(`${msgKey}.body`, msgParams)
 
-  // return sendCustomEmail({ to, subject, html })
+  return sendCustomEmail({ to, subject, html })
 }
