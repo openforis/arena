@@ -8,11 +8,13 @@ import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useSurveyId } from '@webapp/store/survey'
 import Table from '@webapp/components/Table/Table'
 
-import HeaderLeft from './HeaderLeft'
 import RowHeader from './RowHeader'
 import Row from './Row'
 
-// See HeaderLeft.tsx for why userModules entries need casting when passed to appModuleUri.
+// appModules.js is a plain JS module without explicit types: TS infers appModuleUri's parameter shape
+// from its default value (appModules.home), which happens to include an `icon` field that userModules
+// entries don't have (and that appModuleUri never reads). Cast to the function's own inferred parameter
+// type rather than editing that shared, out-of-scope module.
 type AppModule = Parameters<typeof appModuleUri>[0]
 
 /**
@@ -33,7 +35,6 @@ const UserGroupsList = (): React.ReactElement => {
       moduleApiUri={`/api/survey/${surveyId}/user-groups`}
       className="user-groups-list"
       gridTemplateColumns="2fr 2fr 1fr 1fr"
-      headerLeftComponent={HeaderLeft}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}
       onRowClick={onRowClick}
