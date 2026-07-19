@@ -7,7 +7,6 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Node from '@core/record/node'
@@ -21,7 +20,6 @@ import * as RecordFileManager from '@server/modules/record/manager/recordFileMan
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
-import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
 import * as RecordQualifierMatcher from './recordQualifierMatcher'
 import * as RecordValidationManager from './recordValidationManager'
@@ -88,17 +86,7 @@ const _applyGroupQualifierValues = async (
 
   let recordUpdated = record
 
-  for (const { nodeDef, value: qualifierValue } of qualifierFilters) {
-    let value = null
-    if (NodeDef.isCode(nodeDef)) {
-      const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-      const item = await CategoryItemProviderDefault.getItemByCode({ survey, categoryUuid, code: qualifierValue })
-      if (!item) continue
-      value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item), code: qualifierValue })
-    } else {
-      value = qualifierValue
-    }
-
+  for (const { nodeDef, value } of qualifierFilters) {
     const existingNode = Record.getNodeChildrenByDefUuid(rootNode, NodeDef.getUuid(nodeDef))(recordUpdated)[0]
     const nodeToPersist =
       existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(recordUpdated), rootNode)
