@@ -53,6 +53,7 @@ const UserGroupEdit = (): React.ReactElement | null => {
   return (
     <div className="user-group-edit">
       <FormItemWithInput
+        autoFocus={!groupUuid}
         disabled={!canEdit}
         label="usersView:userGroup.name"
         onChange={onNameChange}

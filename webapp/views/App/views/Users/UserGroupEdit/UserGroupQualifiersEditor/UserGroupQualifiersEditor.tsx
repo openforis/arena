@@ -34,6 +34,7 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
   const { qualifiers, onChange, readOnly = false } = props
 
   const [validations, setValidations] = useState<ValidationInstance[]>([])
+  const [addedIndex, setAddedIndex] = useState<number | null>(null)
 
   const validateAll = useCallback(
     (qualifiersToValidate: UserGroupQualifierType[]): Promise<ValidationInstance[]> =>
@@ -65,7 +66,10 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
     onChange(qualifiersUpdated)
   }
 
-  const onAdd = () => onChange([...qualifiers, UserGroupQualifier.newQualifier() as UserGroupQualifierType])
+  const onAdd = () => {
+    setAddedIndex(qualifiers.length)
+    onChange([...qualifiers, UserGroupQualifier.newQualifier() as UserGroupQualifierType])
+  }
 
   const onRemove = (index: number) =>
     onChange(ArrayUtils.removeItemAtIndex<UserGroupQualifierType>({ index })(qualifiers))
@@ -75,6 +79,7 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
       {qualifiers.map((qualifier, index) => (
         <FormItem key={index} label="usersView:userGroup.qualifier" labelParams={{ index: index + 1 }}>
           <Input
+            autoFocus={index === addedIndex}
             placeholder="usersView:userGroup.qualifierKey"
             readOnly={readOnly}
             value={UserGroupQualifier.getName(qualifier)}
