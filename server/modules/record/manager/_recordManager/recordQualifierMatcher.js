@@ -57,11 +57,14 @@ export const fetchUserQualifierFilters = async ({ user, survey }, client = db) =
  * @param {object} params.record - The record (with nodes loaded) to check.
  * @param {Array<{nodeDef: object, value: string}>} params.qualifierFilters - The qualifier filters,
  * as returned by fetchUserQualifierFilters.
- * @returns {boolean} - True if qualifierFilters is empty (unrestricted), or every filter matches
- * the record's corresponding attribute value; false otherwise.
+ * @returns {boolean} - True if qualifierFilters is empty (unrestricted), if the record has not been
+ * initialized yet (no nodes: checkin will auto-fill qualifier attributes to match, see
+ * _applyGroupQualifierValues in recordUpdateManager.js), or every filter matches the record's
+ * corresponding attribute value; false otherwise.
  */
 export const recordMatchesQualifierFilters = ({ survey, record, qualifierFilters }) => {
   if (qualifierFilters.length === 0) return true
+  if (Record.getNodesArray(record).length === 0) return true
 
   const rootNode = Record.getRootNode(record)
 
