@@ -8,7 +8,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as Validation from '@core/validation/validation'
 
 import { useSurvey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -89,7 +88,6 @@ const ValidationsProps = (props) => {
   const survey = useSurvey()
 
   const nodeDef = useMemo(() => State.getNodeDef(state), [state])
-  const validation = useMemo(() => State.getValidation(state), [state])
   const nodeDefUuidContext = useMemo(() => NodeDef.getParentUuid(nodeDef), [nodeDef])
   const nodeDefParent = useMemo(() => Survey.getNodeDefParent(nodeDef)(survey), [nodeDef, survey])
   const nodeDefValidations = useMemo(() => NodeDef.getValidations(nodeDef), [nodeDef])
@@ -151,7 +149,7 @@ const ValidationsProps = (props) => {
           nodeDefUuidContext={nodeDefUuidContext}
           onChange={onValidationExpressionsUpdate}
           propExtractor={() => NodeDefValidations.getExpressions(nodeDefValidations)}
-          propName={`validations.expressions`}
+          propName={`${NodeDef.keysPropsAdvanced.validations}.${NodeDefValidations.keys.expressions}`}
           qualifier={TestId.nodeDefDetails.validations}
           radioLabels={{
             none: 'nodeDefEdit.validationsProps.attributeAlwaysValid',
@@ -161,10 +159,6 @@ const ValidationsProps = (props) => {
           severity
           showLabels
           state={state}
-          validation={R.pipe(
-            Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
-            Validation.getFieldValidation(NodeDefValidations.keys.expressions)
-          )(validation)}
         />
       )}
     </div>
