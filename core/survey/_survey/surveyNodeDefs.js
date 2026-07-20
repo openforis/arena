@@ -23,6 +23,8 @@ export const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
 export const getNodeDefRoot = (survey) => Surveys.getNodeDefRoot({ survey })
 
+export const getQualifierNodeDefs = (survey) => Surveys.getQualifierDefs({ survey })
+
 export const getNodeDefByUuid = (uuid) => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
 export const getNodeDefsByUuids =

@@ -32,7 +32,7 @@ import { CategoryItemProviderDefault } from '@server/modules/category/manager/ca
  * filters to apply.
  */
 export const fetchUserQualifierFilters = async ({ user, survey }, client = db) => {
-  const qualifierNodeDefs = Survey.getNodeDefsArray(survey).filter(NodeDef.isQualifier)
+  const qualifierNodeDefs = Survey.getQualifierNodeDefs(survey)
   if (qualifierNodeDefs.length === 0) return []
 
   const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
