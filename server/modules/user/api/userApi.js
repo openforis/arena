@@ -5,6 +5,7 @@ import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
+import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
@@ -119,6 +120,23 @@ export const init = (app) => {
       next(error)
     }
   })
+
+  app.get(
+    '/survey/:surveyId/user/:userUuid/group',
+    AuthMiddleware.requireUserViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const user = await _fetchUser(req)
+        const survey = await SurveyManager.fetchSurveyById({ surveyId })
+        const surveyUuid = Survey.getUuid(survey)
+        const userGroup = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
+        res.json({ user, userGroup })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   app.get('/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {
