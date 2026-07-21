@@ -83,6 +83,12 @@ export const requireRecordsMatchUserGroupQualifiers = async (req, res, next) => 
   try {
     const { surveyId } = Request.getParams(req)
     const recordUuids = Requests.getArrayParam('recordUuids')(req)
+
+    if (recordUuids.length === 0) {
+      next()
+      return
+    }
+
     const user = Request.getUser(req)
 
     const surveysByCycle = new Map()

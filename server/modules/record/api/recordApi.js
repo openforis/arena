@@ -272,22 +272,27 @@ export const init = (app) => {
   })
 
   // records export (only specified uuids)
-  app.post('/survey/:surveyId/records/export', requireRecordsExportPermission, async (req, res, next) => {
-    try {
-      const { surveyId } = Request.getParams(req)
-      const recordUuids = Request.getJsonParam(req, 'recordUuids')
-      const user = Request.getUser(req)
+  app.post(
+    '/survey/:surveyId/records/export',
+    requireRecordsExportPermission,
+    requireRecordsMatchUserGroupQualifiers,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const recordUuids = Request.getJsonParam(req, 'recordUuids')
+        const user = Request.getUser(req)
 
-      if (Objects.isEmpty(recordUuids)) {
-        throw new Error('record uuids not specified')
+        if (Objects.isEmpty(recordUuids)) {
+          throw new Error('record uuids not specified')
+        }
+
+        const job = RecordService.startRecordsExportJob({ user, surveyId, recordUuids })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } catch (error) {
+        next(error)
       }
-
-      const job = RecordService.startRecordsExportJob({ user, surveyId, recordUuids })
-      res.json({ job: JobUtils.jobToJSON(job) })
-    } catch (error) {
-      next(error)
     }
-  })
+  )
 
   // download generated record export file
   app.get('/survey/:surveyId/records/export/download', requireRecordsExportPermission, async (req, res, next) => {
