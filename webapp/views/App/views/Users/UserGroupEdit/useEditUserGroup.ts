@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
+import { UserGroup as UserGroupType } from '@openforis/arena-core'
+
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import { validateUserGroup } from '@core/user/userGroup/userGroupValidator'
 import * as Validation from '@core/validation/validation'
@@ -19,8 +21,6 @@ import { useAuthCanManageUserGroups } from '@webapp/store/user'
 // entries don't have (and that appModuleUri never reads). Cast to the function's own inferred parameter
 // type rather than editing that shared, out-of-scope module.
 type AppModule = Parameters<typeof appModuleUri>[0]
-
-type UserGroupType = Record<string, unknown>
 
 interface UseEditUserGroupParams {
   groupUuid?: string

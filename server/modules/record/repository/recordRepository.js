@@ -121,10 +121,11 @@ export const countRecordsBySurveyId = async (
     search = null,
     ownerUuid = null,
     includeMerged = false,
+    qualifierNodeDefFilters = [],
   },
   client = db
 ) => {
-  if (!A.isEmpty(search)) {
+  if (!A.isEmpty(search) || !A.isEmpty(qualifierNodeDefFilters)) {
     const recordsWithSearch = await fetchRecordsSummaryBySurveyId({
       surveyId,
       cycle,
@@ -132,6 +133,7 @@ export const countRecordsBySurveyId = async (
       nodeDefKeys,
       summaryDefs,
       search,
+      qualifierNodeDefFilters,
     })
     return recordsWithSearch.length
   }
@@ -260,6 +262,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     recordUuids = null,
     includePreview = false,
     includeMerged = false,
+    qualifierNodeDefFilters = [],
   },
   client = db
 ) => {
@@ -270,6 +273,20 @@ export const fetchRecordsSummaryBySurveyId = async (
       const colNames = NodeDefTable.getColumnNames(nodeDefKey)
       return colNames.map((keyColName) => `${rootEntityTableAlias}.${keyColName} AS ${keyColName}`)
     })
+    .join(', ')
+
+  const nodeDefKeysColumnNames = new Set(
+    (nodeDefKeys ?? []).flatMap((nodeDefKey) => NodeDefTable.getColumnNames(nodeDefKey))
+  )
+  const qualifierColumnNames = [
+    ...new Set(
+      qualifierNodeDefFilters
+        .map(({ nodeDef }) => NodeDefTable.getColumnName(nodeDef))
+        .filter((colName) => !nodeDefKeysColumnNames.has(colName))
+    ),
+  ]
+  const qualifierNodeDefsSelect = qualifierColumnNames
+    .map((colName) => `${rootEntityTableAlias}.${colName} AS ${colName}`)
     .join(', ')
 
   const nodeDefKeysJsonSelect = nodeDefsToJsonb({
@@ -317,6 +334,16 @@ export const fetchRecordsSummaryBySurveyId = async (
   }
   if (!A.isNull(ownerUuid)) recordsSelectWhereConditions.push('owner_uuid = $/ownerUuid/')
 
+  // note: qualifier columns are selected (unqualified) in the "records" CTE below, since the
+  // WHERE clause here applies to the outer query, where the root entity table alias is out of scope
+  const qualifierFilterParams = {}
+  qualifierNodeDefFilters.forEach(({ nodeDef, value }, index) => {
+    const paramName = `qualifierValue${index}`
+    const colName = NodeDefTable.getColumnName(nodeDef)
+    recordsSelectWhereConditions.push(`"${colName}" = $/${paramName}/`)
+    qualifierFilterParams[paramName] = value
+  })
+
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
   const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
 
@@ -338,6 +365,7 @@ export const fetchRecordsSummaryBySurveyId = async (
         ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
         ${nodeDefKeysJsonSelect ? `, ${nodeDefKeysJsonSelect}` : ''}
         ${summaryAttributesJsonSelect ? `, ${summaryAttributesJsonSelect}` : ''}
+        ${qualifierNodeDefsSelect ? `, ${qualifierNodeDefsSelect}` : ''}
       FROM ${getSchemaSurvey(surveyId)}.record r
       -- GET SURVEY UUID
       JOIN survey s
@@ -346,8 +374,8 @@ export const fetchRecordsSummaryBySurveyId = async (
       JOIN "user" u
         ON r.owner_uuid = u.uuid
         ${
-          nodeDefRoot && nodeDefKeys?.length > 0
-            ? `-- join with root entity table to get node key values 
+          nodeDefRoot && (nodeDefKeys?.length > 0 || qualifierNodeDefFilters.length > 0)
+            ? `-- join with root entity table to get node key values
         LEFT OUTER JOIN
           ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
         ON r.uuid = ${rootEntityTableAlias}.record_uuid`
@@ -364,7 +392,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
     OFFSET $/offset:value/
   `,
-    { surveyId, cycle, step, search, limit, offset, recordUuids, ownerUuid },
+    { surveyId, cycle, step, search, limit, offset, recordUuids, ownerUuid, ...qualifierFilterParams },
     dbTransformCallback(surveyId, false)
   )
 }

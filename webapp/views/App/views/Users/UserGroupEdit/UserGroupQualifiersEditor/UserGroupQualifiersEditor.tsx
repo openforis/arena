@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
+import { UserGroupQualifier as UserGroupQualifierType } from '@openforis/arena-core'
+
 import { ArrayUtils } from '@core/arrayUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as UserGroupQualifier from '@core/user/userGroup/userGroupQualifier'
@@ -10,17 +12,9 @@ import type { ValidationInstance } from '@core/validation/validation'
 import { Button, ButtonAdd, Fieldset } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 
-/**
- * A single group qualifier: a key/value pair stored inline in the group's props.
- */
-export type UserGroupQualifierItem = {
-  name: string
-  value: string
-}
-
 type Props = {
-  qualifiers: UserGroupQualifierItem[]
-  onChange: (qualifiers: UserGroupQualifierItem[]) => void
+  qualifiers: UserGroupQualifierType[]
+  onChange: (qualifiers: UserGroupQualifierType[]) => void
   readOnly?: boolean
 }
 
@@ -40,9 +34,10 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
   const { qualifiers, onChange, readOnly = false } = props
 
   const [validations, setValidations] = useState<ValidationInstance[]>([])
+  const [addedIndex, setAddedIndex] = useState<number | null>(null)
 
   const validateAll = useCallback(
-    (qualifiersToValidate: UserGroupQualifierItem[]): Promise<ValidationInstance[]> =>
+    (qualifiersToValidate: UserGroupQualifierType[]): Promise<ValidationInstance[]> =>
       Promise.all(
         qualifiersToValidate.map((qualifier) =>
           validateUserGroupQualifier({ qualifier, qualifiers: qualifiersToValidate })
@@ -65,29 +60,33 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
     }
   }, [qualifiers, validateAll])
 
-  const updateQualifierAt = (index: number, qualifierUpdated: UserGroupQualifierItem) => {
+  const updateQualifierAt = (index: number, qualifierUpdated: UserGroupQualifierType) => {
     const qualifiersUpdated = [...qualifiers]
     qualifiersUpdated[index] = qualifierUpdated
     onChange(qualifiersUpdated)
   }
 
-  const onAdd = () => onChange([...qualifiers, UserGroupQualifier.newQualifier() as UserGroupQualifierItem])
+  const onAdd = () => {
+    setAddedIndex(qualifiers.length)
+    onChange([...qualifiers, UserGroupQualifier.newQualifier() as UserGroupQualifierType])
+  }
 
   const onRemove = (index: number) =>
-    onChange(ArrayUtils.removeItemAtIndex<UserGroupQualifierItem>({ index })(qualifiers))
+    onChange(ArrayUtils.removeItemAtIndex<UserGroupQualifierType>({ index })(qualifiers))
 
   return (
     <Fieldset className="user-group-qualifiers-editor" legend="usersView:userGroup.qualifier_plural">
       {qualifiers.map((qualifier, index) => (
         <FormItem key={index} label="usersView:userGroup.qualifier" labelParams={{ index: index + 1 }}>
           <Input
+            autoFocus={index === addedIndex}
             placeholder="usersView:userGroup.qualifierKey"
             readOnly={readOnly}
             value={UserGroupQualifier.getName(qualifier)}
             onChange={(value: string) =>
               updateQualifierAt(
                 index,
-                UserGroupQualifier.assocName(StringUtils.normalizeName(value))(qualifier) as UserGroupQualifierItem
+                UserGroupQualifier.assocName(StringUtils.normalizeName(value))(qualifier) as UserGroupQualifierType
               )
             }
             validation={Validation.getFieldValidation(UserGroupQualifier.keys.name)(validations[index])}
@@ -97,7 +96,7 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
             readOnly={readOnly}
             value={UserGroupQualifier.getValue(qualifier)}
             onChange={(value: string) =>
-              updateQualifierAt(index, UserGroupQualifier.assocValue(value)(qualifier) as UserGroupQualifierItem)
+              updateQualifierAt(index, UserGroupQualifier.assocValue(value)(qualifier) as UserGroupQualifierType)
             }
           />
           {!readOnly && <Button iconClassName="icon-cross icon-12px" variant="text" onClick={() => onRemove(index)} />}

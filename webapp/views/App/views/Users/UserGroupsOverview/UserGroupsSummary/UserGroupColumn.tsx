@@ -1,12 +1,14 @@
 import React from 'react'
 
+import type { UserGroup as UserGroupType } from '@openforis/arena-core'
+
 import * as User from '@core/user/user'
 import * as UserGroup from '@core/user/userGroup/userGroup'
 
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-import type { SurveyUserType, UserGroupType } from './useUserGroupsSummary'
+import type { SurveyUserType } from './useUserGroupsSummary'
 import UserCard from './UserCard'
 
 type Props = {

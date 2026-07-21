@@ -170,6 +170,7 @@ export const {
   getNodeDefsArray,
   getNodeDefsByUuids,
   getNodeDefRoot,
+  getQualifierNodeDefs,
   getNodeDefRootKeys,
   getNodeDefRootKeysSorted,
   getNodeDefsRootUnique,

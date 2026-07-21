@@ -35,6 +35,11 @@
     justify-content: center;
     margin-top: 0.5rem;
 
+    .btn-back {
+      position: absolute;
+      left: 0;
+    }
+
     .btn-danger {
       position: absolute;
       right: 0;

@@ -7,7 +7,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import * as Validation from '@core/validation/validation'
 
-import { ButtonDelete, ButtonSave } from '@webapp/components'
+import { ButtonBack, ButtonDelete, ButtonSave } from '@webapp/components'
 import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor/LabelsEditor'
 import { useSurveyLangs } from '@webapp/store/survey'
@@ -53,6 +53,7 @@ const UserGroupEdit = (): React.ReactElement | null => {
   return (
     <div className="user-group-edit">
       <FormItemWithInput
+        autoFocus={!groupUuid}
         disabled={!canEdit}
         label="usersView:userGroup.name"
         onChange={onNameChange}
@@ -79,6 +80,7 @@ const UserGroupEdit = (): React.ReactElement | null => {
       {groupUuid && <UserGroupMembersEditor groupUuid={groupUuid} canEdit={canEdit} />}
 
       <div className="user-group-edit__buttons">
+        <ButtonBack className="btn-back" />
         {canEdit && <ButtonSave onClick={onSave} disabled={!canSave || !dirty} className="btn-save" />}
         {canDelete && <ButtonDelete onClick={onDelete} className="btn-s btn-danger" />}
       </div>
