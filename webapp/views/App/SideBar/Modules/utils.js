@@ -83,7 +83,7 @@ export const getModulesHierarchy = (user, surveyInfo) => {
     // users
     getModule({
       module: appModules.users,
-      children: [userModules.usersSurvey],
+      children: [userModules.usersSurvey, userModules.userGroups],
       hidden: !Authorizer.canViewSurveyUsers(user, surveyInfo) || Survey.isTemplate(surveyInfo),
     }),
     // message

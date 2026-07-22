@@ -21,6 +21,7 @@ import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRe
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
 
+import * as RecordQualifierMatcher from './recordQualifierMatcher'
 import * as RecordValidationManager from './recordValidationManager'
 import * as NodeCreationManager from './nodeCreationManager'
 import * as NodeUpdateManager from './nodeUpdateManager'
@@ -50,7 +51,7 @@ export const initNewRecord = async (
 
   const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
-  return persistNode(
+  const recordWithRootEntity = await persistNode(
     {
       user,
       survey,
@@ -64,6 +65,49 @@ export const initNewRecord = async (
     },
     client
   )
+
+  return _applyGroupQualifierValues(
+    { user, survey, record: recordWithRootEntity, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+    client
+  )
+}
+
+// Auto-fills attributes flagged as "qualifier" with the value specified for them
+// in the qualifiers of the current user's group for this survey, and marks
+// the affected node as non-editable in the UI.
+const _applyGroupQualifierValues = async (
+  { user, survey, record, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+  client
+) => {
+  const qualifierFilters = await RecordQualifierMatcher.fetchUserQualifierFilters({ user, survey }, client)
+  if (qualifierFilters.length === 0) return record
+
+  const rootNode = Record.getRootNode(record)
+
+  let recordUpdated = record
+
+  for (const { nodeDef, value } of qualifierFilters) {
+    const existingNode = Record.getNodeChildrenByDefUuid(rootNode, NodeDef.getUuid(nodeDef))(recordUpdated)[0]
+    const nodeToPersist =
+      existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(recordUpdated), rootNode)
+    const nodeWithValue = Node.assocIsQualifierValueApplied(true)(Node.assocValue(value)(nodeToPersist))
+
+    recordUpdated = await persistNode(
+      {
+        user,
+        survey,
+        record: recordUpdated,
+        node: nodeWithValue,
+        timezoneOffset,
+        nodesUpdateListener,
+        nodesValidationListener,
+        system: true,
+      },
+      client
+    )
+  }
+
+  return recordUpdated
 }
 
 // ==== UPDATE

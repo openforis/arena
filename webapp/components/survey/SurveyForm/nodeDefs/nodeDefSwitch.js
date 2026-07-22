@@ -221,6 +221,8 @@ const NodeDefSwitch = (props) => {
 
   const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode, editable })
 
+  const qualifierValueApplied = Boolean(entryProps.nodes?.[0] && Node.isQualifierValueApplied(entryProps.nodes[0]))
+
   const applicable = parentNode ? Node.isChildApplicable(nodeDefUuid)(parentNode) : true
 
   const { canAddNode, nodes, nodesHaveValue } = entryProps
@@ -276,7 +278,7 @@ const NodeDefSwitch = (props) => {
     ...props,
     ...entryProps,
     surveyInfo,
-    readOnly: readOnlyProp || readOnly || keyFieldLocked || !editable,
+    readOnly: readOnlyProp || readOnly || keyFieldLocked || !editable || qualifierValueApplied,
     label,
     lang,
     createNodePlaceholder,

@@ -11,6 +11,7 @@ const metaKeys = {
   childApplicability: 'childApplicability', // Applicability by child def uuid
   defaultValue: 'defaultValueApplied', // True if default value has been applied, false if the value is user defined
   hierarchyCode: 'hCode', // Hierarchy of code attribute ancestors (according to the parent code defs specified)
+  qualifierValueApplied: 'qualifierValueApplied', // True if the value has been auto-filled from the user group qualifier
 }
 
 // READ
@@ -19,6 +20,7 @@ const getMeta = R.propOr({}, keys.meta)
 
 const isChildApplicable = (childDefUuid) => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])
 const isDefaultValueApplied = R.pathOr(false, [keys.meta, metaKeys.defaultValue])
+const isQualifierValueApplied = R.pathOr(false, [keys.meta, metaKeys.qualifierValueApplied])
 
 const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
 
@@ -54,6 +56,19 @@ const assocIsDefaultValueApplied = (value) =>
     return metaUpdated
   })
 
+const assocIsQualifierValueApplied = (value) =>
+  _updateMeta((metaOld) => {
+    const metaKey = metaKeys.qualifierValueApplied
+    const metaUpdated = { ...metaOld }
+    if (value) {
+      metaUpdated[metaKey] = true
+    } else {
+      // qualifier value applied is false by default
+      delete metaUpdated[metaKey]
+    }
+    return metaUpdated
+  })
+
 const assocChildApplicability = ({ nodeDefUuid, applicable }) =>
   _updateMeta((metaOld) => {
     const metaKey = metaKeys.childApplicability
@@ -81,6 +96,7 @@ export const NodeMeta = {
   getMeta,
   isChildApplicable,
   isDefaultValueApplied,
+  isQualifierValueApplied,
   getHierarchy,
   getHierarchyCode,
   isChildEditable,
@@ -89,5 +105,6 @@ export const NodeMeta = {
   assocMeta,
   mergeMeta,
   assocIsDefaultValueApplied,
+  assocIsQualifierValueApplied,
   assocChildApplicability,
 }
