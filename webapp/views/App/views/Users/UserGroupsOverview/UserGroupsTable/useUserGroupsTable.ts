@@ -36,6 +36,102 @@ interface UseUserGroupsTableResult {
 
 const EMPTY_MEMBER_KEY = 'empty'
 
+type UsersByUuid = Record<string, Record<string, unknown>>
+
+interface GroupInfo {
+  groupUuid: string
+  groupName: string
+  groupLabel: string
+  qualifiers: string
+}
+
+const fetchUsersByUuid = async (surveyId: string): Promise<UsersByUuid> => {
+  const { data: usersRes } = await axios.get<SurveyUsersResponse>(`/api/survey/${surveyId}/users`)
+  const usersByUuid: UsersByUuid = {}
+  usersRes.list.forEach((user) => {
+    usersByUuid[User.getUuid(user) as string] = user
+  })
+  return usersByUuid
+}
+
+const getGroupInfo = (group: UserGroupType, preferredLang: string): GroupInfo => ({
+  groupUuid: UserGroup.getUuid(group) as string,
+  groupName: UserGroup.getName(group),
+  groupLabel: UserGroup.getLabel(preferredLang)(group),
+  qualifiers: UserGroup.getQualifiers(group)
+    .map((qualifier) => `${UserGroupQualifier.getName(qualifier)}=${UserGroupQualifier.getValue(qualifier)}`)
+    .join(', '),
+})
+
+const buildEmptyMemberRow = (groupInfo: GroupInfo): UserGroupTableRow => ({
+  ...groupInfo,
+  id: `${groupInfo.groupUuid}-${EMPTY_MEMBER_KEY}`,
+  memberUuid: null,
+  memberName: '',
+  memberEmail: '',
+  memberRole: '',
+  memberStatus: '',
+})
+
+// The members endpoint only returns {uuid, name, email}; look up the full survey user record
+// (fetched separately) to read role and status, avoiding a per-member API call.
+const buildMemberRow = (params: {
+  groupInfo: GroupInfo
+  member: Record<string, unknown>
+  usersByUuid: UsersByUuid
+  surveyUuid: string
+}): UserGroupTableRow => {
+  const { groupInfo, member, usersByUuid, surveyUuid } = params
+  const memberUuid = member.uuid as string
+  const fullUser = usersByUuid[memberUuid]
+  const authGroup = fullUser ? User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup: true })(fullUser) : null
+
+  return {
+    ...groupInfo,
+    id: `${groupInfo.groupUuid}-${memberUuid}`,
+    memberUuid,
+    memberName: (member.name as string) ?? '',
+    memberEmail: (member.email as string) ?? '',
+    memberRole: authGroup ? AuthGroup.getName(authGroup) : '',
+    memberStatus: fullUser ? ((User.getStatus(fullUser) as string) ?? '') : '',
+  }
+}
+
+const buildGroupRows = (params: {
+  group: UserGroupType
+  members: Record<string, unknown>[]
+  usersByUuid: UsersByUuid
+  surveyUuid: string
+  preferredLang: string
+}): UserGroupTableRow[] => {
+  const { group, members, usersByUuid, surveyUuid, preferredLang } = params
+  const groupInfo = getGroupInfo(group, preferredLang)
+
+  if (members.length === 0) return [buildEmptyMemberRow(groupInfo)]
+
+  return members.map((member) => buildMemberRow({ groupInfo, member, usersByUuid, surveyUuid }))
+}
+
+const fetchUserGroupsTableRows = async (params: {
+  surveyId: string
+  surveyUuid: string
+  preferredLang: string
+}): Promise<UserGroupTableRow[]> => {
+  const { surveyId, surveyUuid, preferredLang } = params
+
+  const [groups, usersByUuid] = await Promise.all([API.fetchUserGroups({ surveyId }), fetchUsersByUuid(surveyId)])
+
+  const membersByGroup = await Promise.all(
+    groups.map((group: UserGroupType) =>
+      API.fetchUserGroupMembers({ surveyId, groupUuid: UserGroup.getUuid(group) as string })
+    )
+  )
+
+  return groups.flatMap((group: UserGroupType, groupIndex: number) =>
+    buildGroupRows({ group, members: membersByGroup[groupIndex], usersByUuid, surveyUuid, preferredLang })
+  )
+}
+
 /**
  * Loads every user group defined in the current survey together with their members (name, email,
  * survey role and account status), and flattens them into one row per group-member pair, suited
@@ -58,78 +154,7 @@ export const useUserGroupsTable = (): UseUserGroupsTableResult => {
   useEffect(() => {
     let ignore = false
 
-    const fetchData = async (): Promise<UserGroupTableRow[]> => {
-      const [groups, { data: usersRes }] = await Promise.all([
-        API.fetchUserGroups({ surveyId }),
-        axios.get<SurveyUsersResponse>(`/api/survey/${surveyId}/users`),
-      ])
-      const usersByUuid: Record<string, Record<string, unknown>> = {}
-      usersRes.list.forEach((user) => {
-        usersByUuid[User.getUuid(user) as string] = user
-      })
-
-      const membersByGroup = await Promise.all(
-        groups.map((group: UserGroupType) =>
-          API.fetchUserGroupMembers({ surveyId, groupUuid: UserGroup.getUuid(group) as string })
-        )
-      )
-
-      const result: UserGroupTableRow[] = []
-      groups.forEach((group: UserGroupType, groupIndex: number) => {
-        const groupUuid = UserGroup.getUuid(group) as string
-        const groupName = UserGroup.getName(group)
-        const groupLabel = UserGroup.getLabel(preferredLang)(group)
-        const qualifiers = UserGroup.getQualifiers(group)
-          .map((qualifier) => `${UserGroupQualifier.getName(qualifier)}=${UserGroupQualifier.getValue(qualifier)}`)
-          .join(', ')
-
-        const members = membersByGroup[groupIndex]
-
-        if (members.length === 0) {
-          result.push({
-            id: `${groupUuid}-${EMPTY_MEMBER_KEY}`,
-            groupUuid,
-            groupName,
-            groupLabel,
-            qualifiers,
-            memberUuid: null,
-            memberName: '',
-            memberEmail: '',
-            memberRole: '',
-            memberStatus: '',
-          })
-          return
-        }
-
-        members.forEach((member) => {
-          const memberUuid = member.uuid as string
-          // The members endpoint only returns {uuid, name, email}; look up the full survey user
-          // record (fetched separately) to read role and status, avoiding a per-member API call.
-          const fullUser = usersByUuid[memberUuid]
-          const authGroup = fullUser
-            ? User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup: true })(fullUser)
-            : null
-          const memberRole = authGroup ? AuthGroup.getName(authGroup) : ''
-          const memberStatus = fullUser ? ((User.getStatus(fullUser) as string) ?? '') : ''
-
-          result.push({
-            id: `${groupUuid}-${memberUuid}`,
-            groupUuid,
-            groupName,
-            groupLabel,
-            qualifiers,
-            memberUuid,
-            memberName: (member.name as string) ?? '',
-            memberEmail: (member.email as string) ?? '',
-            memberRole,
-            memberStatus,
-          })
-        })
-      })
-      return result
-    }
-
-    fetchData().then((data) => {
+    fetchUserGroupsTableRows({ surveyId, surveyUuid, preferredLang }).then((data) => {
       if (!ignore) {
         setRows(data)
         setLoading(false)
