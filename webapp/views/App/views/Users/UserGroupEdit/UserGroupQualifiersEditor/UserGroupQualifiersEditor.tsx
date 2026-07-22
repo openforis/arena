@@ -4,6 +4,7 @@ import { UserGroupQualifier as UserGroupQualifierType } from '@openforis/arena-c
 
 import { ArrayUtils } from '@core/arrayUtils'
 import * as StringUtils from '@core/stringUtils'
+import { uuidv4 } from '@core/uuid'
 import * as UserGroupQualifier from '@core/user/userGroup/userGroupQualifier'
 import { validateUserGroupQualifier } from '@core/user/userGroup/userGroupValidator'
 import * as Validation from '@core/validation/validation'
@@ -17,6 +18,14 @@ type Props = {
   onChange: (qualifiers: UserGroupQualifierType[]) => void
   readOnly?: boolean
 }
+
+// A qualifier annotated with a client-only uuid, used as a stable list key (qualifiers themselves have no id).
+type QualifierUi = UserGroupQualifierType & { uuid: string }
+
+const toQualifier = (qualifierUi: QualifierUi): UserGroupQualifierType => ({
+  name: qualifierUi.name,
+  value: qualifierUi.value,
+})
 
 /**
  * Dynamic list editor for a user group's qualifiers (key/value pairs).
@@ -35,6 +44,9 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
 
   const [validations, setValidations] = useState<ValidationInstance[]>([])
   const [addedIndex, setAddedIndex] = useState<number | null>(null)
+  const [qualifiersUi, setQualifiersUi] = useState<QualifierUi[]>(() =>
+    qualifiers.map((qualifier) => ({ ...qualifier, uuid: uuidv4() }))
+  )
 
   const validateAll = useCallback(
     (qualifiersToValidate: UserGroupQualifierType[]): Promise<ValidationInstance[]> =>
@@ -60,24 +72,28 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
     }
   }, [qualifiers, validateAll])
 
+  const emitChange = (qualifiersUiUpdated: QualifierUi[]) => {
+    setQualifiersUi(qualifiersUiUpdated)
+    onChange(qualifiersUiUpdated.map(toQualifier))
+  }
+
   const updateQualifierAt = (index: number, qualifierUpdated: UserGroupQualifierType) => {
-    const qualifiersUpdated = [...qualifiers]
-    qualifiersUpdated[index] = qualifierUpdated
-    onChange(qualifiersUpdated)
+    const qualifiersUiUpdated = [...qualifiersUi]
+    qualifiersUiUpdated[index] = { ...qualifierUpdated, uuid: qualifiersUi[index].uuid }
+    emitChange(qualifiersUiUpdated)
   }
 
   const onAdd = () => {
-    setAddedIndex(qualifiers.length)
-    onChange([...qualifiers, UserGroupQualifier.newQualifier() as UserGroupQualifierType])
+    setAddedIndex(qualifiersUi.length)
+    emitChange([...qualifiersUi, { ...UserGroupQualifier.newQualifier(), uuid: uuidv4() } as QualifierUi])
   }
 
-  const onRemove = (index: number) =>
-    onChange(ArrayUtils.removeItemAtIndex<UserGroupQualifierType>({ index })(qualifiers))
+  const onRemove = (index: number) => emitChange(ArrayUtils.removeItemAtIndex<QualifierUi>({ index })(qualifiersUi))
 
   return (
     <Fieldset className="user-group-qualifiers-editor" legend="usersView:userGroup.qualifier_plural">
-      {qualifiers.map((qualifier, index) => (
-        <FormItem key={index} label="usersView:userGroup.qualifier" labelParams={{ index: index + 1 }}>
+      {qualifiersUi.map((qualifier, index) => (
+        <FormItem key={qualifier.uuid} label="usersView:userGroup.qualifier" labelParams={{ index: index + 1 }}>
           <Input
             autoFocus={index === addedIndex}
             placeholder="usersView:userGroup.qualifierKey"
