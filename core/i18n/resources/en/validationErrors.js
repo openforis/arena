@@ -249,6 +249,14 @@ export default {
     surveyNameRequired: 'Survey name is required',
   },
 
+  userGroupEdit: {
+    nameDuplicate: 'A group with the same name already exists: {{name}}',
+    qualifiersInvalid: 'One or more qualifiers have an invalid or duplicate key',
+    qualifierNameDuplicate: 'A qualifier with the same name already exists in this group: {{name}}',
+    qualifierNameInvalid: 'Invalid qualifier name',
+    qualifierNameRequired: 'Qualifier name is required',
+  },
+
   userPasswordChange: {
     oldPasswordRequired: 'Old password is required',
     oldPasswordWrong: 'Old password is wrong',

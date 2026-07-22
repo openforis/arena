@@ -27,6 +27,7 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as RecordRepository from '../repository/recordRepository'
 import * as FileRepository from '../repository/fileRepository'
 import * as NodeRepository from '../repository/nodeRepository'
+import * as RecordQualifierMatcher from './_recordManager/recordQualifierMatcher'
 import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
 
@@ -55,6 +56,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     includeRootKeyValues = true,
     includePreview = false,
     includeCounts = false,
+    user = null,
   },
   client = db
 ) => {
@@ -68,12 +70,16 @@ export const fetchRecordsSummaryBySurveyId = async (
   let nodeDefKeys = null
   let summaryDefs = null
   let survey = null
+  let qualifierNodeDefFilters = []
   if (includeRootKeyValues) {
     // when fetching summary defs, use the cycle param if provided, otherwise use the survey default cycle
     const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
     survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: nodeDefsDraft }, client)
     summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
     nodeDefKeys = Survey.getNodeDefRootKeysSorted({ cycle })(survey)
+    if (user) {
+      qualifierNodeDefFilters = await RecordQualifierMatcher.fetchUserQualifierFilters({ user, survey }, client)
+    }
   }
 
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
@@ -92,6 +98,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       ownerUuid,
       recordUuids: recordUuid ? [recordUuid] : null,
       includePreview,
+      qualifierNodeDefFilters,
     },
     client
   )
@@ -141,7 +148,10 @@ export const fetchRecordSummary = async (
   return list[0]
 }
 
-export const countRecordsBySurveyId = async ({ surveyId, cycle: cycleParam, search, ownerUuid }, client = db) => {
+export const countRecordsBySurveyId = async (
+  { surveyId, cycle: cycleParam, search, ownerUuid, user = null },
+  client = db
+) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
@@ -150,9 +160,12 @@ export const countRecordsBySurveyId = async ({ surveyId, cycle: cycleParam, sear
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: nodeDefsDraft }, client)
   const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
   const summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
+  const qualifierNodeDefFilters = user
+    ? await RecordQualifierMatcher.fetchUserQualifierFilters({ user, survey }, client)
+    : []
 
   return RecordRepository.countRecordsBySurveyId(
-    { surveyId, cycle, search, nodeDefKeys, summaryDefs, nodeDefRoot, ownerUuid },
+    { surveyId, cycle, search, nodeDefKeys, summaryDefs, nodeDefRoot, ownerUuid, qualifierNodeDefFilters },
     client
   )
 }
@@ -248,6 +261,8 @@ export const fetchRecordAndNodesByUuid = async (
 }
 
 export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
+
+export { fetchUserQualifierFilters, recordMatchesQualifierFilters } from './_recordManager/recordQualifierMatcher'
 
 const fetchNodeRefData = async ({ survey, node, isCode }, client) => {
   const surveyId = Survey.getId(survey)
