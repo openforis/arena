@@ -31,6 +31,7 @@ export default {
   functionHasTooFewArguments: 'La fonction {{fnName}} nécessite au moins {{minArity}} arguments (reçu {{numArgs}})',
   functionHasTooManyArguments: 'La fonction {{fnName}} accepte au maximum {{maxArity}} arguments (reçu {{numArgs}})',
   generic: 'Erreur inattendue : {{text}}',
+  geoWhispApiError: 'Le service Whisp est temporairement indisponible.',
   importingDataIntoWrongCollectSurvey:
     'Importation de données dans le mauvais formulaire. URI attendu : {{collectSurveyUri}}',
   invalidType: 'Type invalide {{type}}',
