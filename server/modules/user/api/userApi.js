@@ -124,20 +124,24 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/user/group', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const survey = await SurveyManager.fetchSurveyById({ surveyId })
-      const surveyUuid = Survey.getUuid(survey)
-      const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
-      const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
-      const userGroup = userGroups[0]
-      res.json({ user, userGroup })
-    } catch (error) {
-      next(error)
+  app.get(
+    '/survey/:surveyId/current-user-group',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const survey = await SurveyManager.fetchSurveyById({ surveyId })
+        const surveyUuid = Survey.getUuid(survey)
+        const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
+        const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
+        const userGroup = userGroups[0]
+        res.json({ user, userGroup })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
   app.get('/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {
