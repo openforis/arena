@@ -38,6 +38,10 @@ export default class NodeDefsValidationJob extends Job {
     this.setContext({ surveyPublishedPrevious })
 
     await NodeDefManager.deleteOrphaneNodeDefs(surveyId, tx)
+    // self-heal node defs left with an empty cycles array by past bugs (e.g. narrowing an
+    // ancestor entity's cycles), which would otherwise remain invisible ghosts blocking publish
+    // with false duplicate-name errors
+    await NodeDefManager.markNodeDefsWithoutCyclesDeleted(surveyId, tx)
 
     const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
     const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(surveySummary)
