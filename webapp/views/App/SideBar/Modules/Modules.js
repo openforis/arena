@@ -1,6 +1,8 @@
 import React, { useCallback, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+
 import * as SideBarModule from './utils'
 
 import Module from './Module'
@@ -15,7 +17,9 @@ const Modules = (props) => {
   // Popup menu module
   const [modulePopupMenu, setModulePopupMenu] = useState(null)
 
-  const modulesHierarchy = SideBarModule.getModulesHierarchy(user, surveyInfo).filter(
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
+
+  const modulesHierarchy = SideBarModule.getModulesHierarchy(user, surveyInfo, { experimentalFeatures }).filter(
     (module) => !SideBarModule.isHidden(module)
   )
 
