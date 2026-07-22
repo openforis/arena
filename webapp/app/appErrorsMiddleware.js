@@ -40,6 +40,8 @@ const processFailedRequestsQueue = ({ error = null, authToken = null }) => {
     if (error) {
       reject(error)
     } else if (authToken) {
+      // Mark as retried so a further 401 on this request doesn't re-enter the refresh flow.
+      config._retry = true
       setAuthorizationHeader({ config, authToken })
       resolve(axios.request(config))
     }
