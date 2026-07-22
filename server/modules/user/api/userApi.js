@@ -1,3 +1,6 @@
+import { ServiceRegistry } from '@openforis/arena-core'
+import { ServerServiceType } from '@openforis/arena-server'
+
 import * as A from '@core/arena'
 import { FileFormats } from '@core/fileFormats'
 
@@ -127,7 +130,9 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const survey = await SurveyManager.fetchSurveyById({ surveyId })
       const surveyUuid = Survey.getUuid(survey)
-      const userGroup = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
+      const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
+      const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
+      const userGroup = userGroups[0]
       res.json({ user, userGroup })
     } catch (error) {
       next(error)
