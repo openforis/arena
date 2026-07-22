@@ -70,6 +70,13 @@ const generateData = async ({ geojson }) => {
     throw wrapWhispApiError(error)
   }
   const token = processStartData?.data?.token
+  if (!token) {
+    throw new SystemError(
+      'appErrors:geoWhispApiError',
+      { message: 'Missing token in Whisp response' },
+      StatusCodes.BAD_GATEWAY
+    )
+  }
   const data = await waitForProcessing({ token })
   return { token, data }
 }
