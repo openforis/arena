@@ -46,7 +46,7 @@ export const sendErr = (res, err) => {
   } else if (err instanceof SystemError || err instanceof CoreSystemError) {
     res.status(err.statusCode).json(_getErr(err))
   } else {
-    res.status(err.statusCode).json(
+    res.status(err.statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR).json(
       _getErr({
         key: 'appErrors:generic',
         params: { text: `Could not serve: ${err.toString()}` },
