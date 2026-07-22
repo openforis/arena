@@ -28,6 +28,7 @@ export default {
   functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
   functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
   generic: 'Unexpected error: {{text}}',
+  geoWhispApiError: 'The Whisp service is temporarily unavailable.',
   importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
   invalidType: 'Invalid type {{type}}',
   jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
