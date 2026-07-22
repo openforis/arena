@@ -44,11 +44,11 @@ const waitForProcessing = async ({ token }) => {
     const { data: responseData } = response
     const { code, data } = responseData
 
-    console.log(`===> Processing status: ${code}`)
     switch (code) {
       case 'analysis_completed':
         // Exit the async function (and the loop) and resolve with data
         return data
+      case 'analysis_queued':
       case 'analysis_processing':
         // The loop continues after the await
         break
@@ -63,20 +63,14 @@ const waitForProcessing = async ({ token }) => {
 const generateData = async ({ geojson }) => {
   const requestPayload = { ...geojson, analysisOptions: { async: true } }
   const headers = getRequestHeaders()
-  console.log('===> Sending request to Whisp API for processing')
   let processStartData
   try {
     ;({ data: processStartData } = await axios.post(whispApiPostGeojsonUrl, requestPayload, { headers }))
   } catch (error) {
     throw wrapWhispApiError(error)
   }
-
-  console.log('===> Received response from Whisp API, waiting for processing to complete')
   const token = processStartData?.data?.token
-
-  console.log(`===> Processing token: ${token}, waiting for processing to complete...`)
   const data = await waitForProcessing({ token })
-  console.log('===> Processing completed, received data from Whisp API')
   return { token, data }
 }
 
