@@ -288,3 +288,8 @@ modules.xml
 .idea/sonarlint
 
 # End of https://www.toptal.com/developers/gitignore/api/node,linux,macos,terraform,webstorm+all,visualstudiocode
+
+# Custom additions
+
+# Ignore local settings for claude
+.claude/settings.local.json
