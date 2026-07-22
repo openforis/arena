@@ -19,6 +19,8 @@ import UserEdit from './UserEdit'
 import { UsersAccessRequest } from './UsersAccessRequest'
 import UserPasswordChange from './UserPasswordChange'
 import User2FADevice from './User2FADevice'
+import UserGroupsOverview from './UserGroupsOverview'
+import UserGroupEdit from './UserGroupEdit'
 
 const Users = () => {
   const user = useUser()
@@ -51,6 +53,18 @@ const Users = () => {
         {
           component: UserInvite,
           path: userModules.userInvite.path,
+        },
+        {
+          component: UserGroupsOverview,
+          path: userModules.userGroups.path,
+        },
+        {
+          component: UserGroupEdit,
+          path: userModules.userGroupNew.path,
+        },
+        {
+          component: UserGroupEdit,
+          path: `${userModules.userGroup.path}/:groupUuid`,
         }
       )
     }

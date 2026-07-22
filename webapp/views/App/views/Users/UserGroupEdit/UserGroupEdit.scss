@@ -1,0 +1,48 @@
+.user-group-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  max-width: 50rem;
+  margin: 0 auto;
+
+  // share a single fixed label column width between form-item and labels-editor (they use
+  // different grid ratios by default) so labels and input fields line up across rows.
+  .form-item,
+  .labels-editor.with-label {
+    grid-template-columns: 10rem 1fr;
+    align-items: start;
+    height: auto;
+  }
+
+  .user-group-qualifiers-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .form-item {
+      grid-template-columns: 10rem 1fr 1fr auto;
+    }
+
+    > .btn {
+      align-self: flex-start;
+    }
+  }
+
+  &__buttons {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+
+    .btn-back {
+      position: absolute;
+      left: 0;
+    }
+
+    .btn-danger {
+      position: absolute;
+      right: 0;
+    }
+  }
+}

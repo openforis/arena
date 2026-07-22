@@ -215,6 +215,18 @@ export const userModules = {
     key: 'usersAccessRequest',
     path: 'usersAccessRequest',
   },
+  userGroups: {
+    key: 'userGroup_plural',
+    path: 'userGroups',
+  },
+  userGroupNew: {
+    key: 'userGroupNew',
+    path: 'userGroupNew',
+  },
+  userGroup: {
+    key: 'userGroup',
+    path: 'userGroup',
+  },
 }
 
 export const analysisModules = {

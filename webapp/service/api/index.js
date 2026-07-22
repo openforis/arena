@@ -35,6 +35,16 @@ export {
   updateTaxonomyExtraPropDef,
   deleteTaxonomyIfEmpty,
 } from './taxonomies'
+export {
+  fetchUserGroups,
+  fetchUserGroup,
+  fetchUserGroupMembers,
+  createUserGroup,
+  updateUserGroup,
+  deleteUserGroup,
+  addUserGroupMember,
+  removeUserGroupMember,
+} from './userGroups'
 export { fetchActivityLogs } from './activityLog'
 export {
   getRecordNodeFileUrl,

@@ -73,6 +73,8 @@ const BasicProps = (props) => {
     includeInCloneDisabled,
     canHaveAutoIncrementalKey,
     canIncludeInMultipleEntitySummary,
+    canBeQualifier,
+    hasUserGroups,
   } = useBasicProps(props)
 
   return (
@@ -151,6 +153,16 @@ const BasicProps = (props) => {
             </div>
           </FormItem>
         </>
+      )}
+
+      {((canBeQualifier && hasUserGroups) || NodeDef.isQualifier(nodeDef)) && ( // allow to edit qualifier if it is already set, even if not applicable, so it can be unset
+        <FormItem label="nodeDefEdit.basicProps.qualifier.label">
+          <Checkbox
+            checked={NodeDef.isQualifier(nodeDef)}
+            info="nodeDefEdit.basicProps.qualifier.info"
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.qualifier, value })}
+          />
+        </FormItem>
       )}
 
       {NodeDef.getType(nodeDef) in basicPropsComponentByType &&
