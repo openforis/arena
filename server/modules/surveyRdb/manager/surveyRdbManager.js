@@ -15,8 +15,8 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import { StreamUtils } from '@server/utils/streamUtils'
@@ -192,7 +192,7 @@ const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter
   // requireRecordsMatchUserGroupQualifiers, at the API layer
   if (recordUuids) return recordUuids
 
-  const qualifierNodeDefFilters = user ? await RecordManager.fetchUserQualifierFilters({ user, survey }) : []
+  const qualifierNodeDefFilters = user ? await SurveyManager.fetchUserQualifierFilters({ user, survey }) : []
 
   if (Objects.isEmpty(search) && !recordsModifiedAfter && qualifierNodeDefFilters.length === 0) return null
 

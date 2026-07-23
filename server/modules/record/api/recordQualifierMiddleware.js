@@ -38,7 +38,7 @@ const _recordMatchesUserGroupQualifiers = async ({ user, surveyId, recordUuid, p
 
   const survey = await fetchSurveyByCycle(Record.getCycle(record))
 
-  const qualifierFilters = await RecordManager.fetchUserQualifierFilters({ user, survey })
+  const qualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey })
 
   // pendingNode is passed through rather than merged into the record via Record.assocNode: the record
   // was fetched with fetchForUpdate: false, so its _nodesIndex hasn't been built, and assocNode would

@@ -20,8 +20,8 @@ import * as RecordFileManager from '@server/modules/record/manager/recordFileMan
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
-import * as RecordQualifierMatcher from './recordQualifierMatcher'
 import * as RecordValidationManager from './recordValidationManager'
 import * as NodeCreationManager from './nodeCreationManager'
 import * as NodeUpdateManager from './nodeUpdateManager'
@@ -79,7 +79,7 @@ const _applyGroupQualifierValues = async (
   { user, survey, record, timezoneOffset, nodesUpdateListener, nodesValidationListener },
   client
 ) => {
-  const qualifierFilters = await RecordQualifierMatcher.fetchUserQualifierFilters({ user, survey }, client)
+  const qualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey }, client)
   if (qualifierFilters.length === 0) return record
 
   const rootNode = Record.getRootNode(record)
