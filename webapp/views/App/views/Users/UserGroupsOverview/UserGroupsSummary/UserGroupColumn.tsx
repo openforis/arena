@@ -16,6 +16,7 @@ type Props = {
   groupKey: string
   members: SurveyUserType[]
   draggable: boolean
+  pendingUserUuids: Set<string>
   containerRef: (el: HTMLUListElement | null) => void
 }
 
@@ -28,11 +29,12 @@ type Props = {
  * @param props0.groupKey - The group's uuid, or the UNASSIGNED_GROUP_KEY sentinel; set as the column's data-group-uuid attribute.
  * @param props0.members - The survey users currently assigned to this column.
  * @param props0.draggable - Whether the cards in this column can be dragged.
+ * @param props0.pendingUserUuids - Uuids of users with a group change currently in flight; their cards render as non-draggable until it settles.
  * @param props0.containerRef - Callback ref registering this column's drop-target list element with the drag-and-drop hook.
  * @returns {React.ReactElement} - The UserGroupColumn component.
  */
 const UserGroupColumn = (props: Props): React.ReactElement => {
-  const { group, groupKey, members, draggable, containerRef } = props
+  const { group, groupKey, members, draggable, pendingUserUuids, containerRef } = props
   const i18n = useI18n()
   const preferredLang = useSurveyPreferredLang() as string
 
@@ -50,9 +52,11 @@ const UserGroupColumn = (props: Props): React.ReactElement => {
         {members.length === 0 && (
           <li className="user-group-column__empty">{i18n.t('usersView:userGroup.noMembers')}</li>
         )}
-        {members.map((user) => (
-          <UserCard key={User.getUuid(user) as string} user={user} draggable={draggable} />
-        ))}
+        {members.map((user) => {
+          const userUuid = User.getUuid(user) as string
+          const pending = pendingUserUuids.has(userUuid)
+          return <UserCard key={userUuid} user={user} draggable={draggable && !pending} pending={pending} />
+        })}
       </ul>
     </div>
   )

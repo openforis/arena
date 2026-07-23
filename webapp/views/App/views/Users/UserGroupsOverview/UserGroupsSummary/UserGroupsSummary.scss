@@ -84,6 +84,11 @@
     cursor: grab;
   }
 
+  &--pending {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
   &.draggable-source--is-dragging {
     opacity: 0.4;
   }
