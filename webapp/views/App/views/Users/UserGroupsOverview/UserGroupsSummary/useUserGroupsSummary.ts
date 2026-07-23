@@ -9,7 +9,7 @@ import * as UserGroup from '@core/user/userGroup/userGroup'
 
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
-import { LoaderActions } from '@webapp/store/ui'
+import { NotificationActions } from '@webapp/store/ui'
 
 export type SurveyUserType = Record<string, unknown>
 
@@ -28,22 +28,22 @@ interface UseUserGroupsSummaryResult {
   users: SurveyUserType[]
   groupUuidByUserUuid: Record<string, string>
   onChangeUserGroup: (userUuid: string, groupUuidNew: string | null) => Promise<void>
-  reload: () => Promise<void>
+  pendingUserUuids: ReadonlySet<string>
 }
 
 /**
  * Loads every user group defined in the current survey together with the survey's full user
  * list and, for every user already assigned to a group, that group's uuid (building a
  * userUuid -> groupUuid map used to drive the Kanban board's columns and cards). Exposes a
- * handler to move a user to a different group (or unassign them) by removing/adding group
- * membership and reloading.
+ * handler to move a user to a different group (or unassign them) by optimistically updating that
+ * map and then removing/adding group membership on the server.
  *
  * @returns {UseUserGroupsSummaryResult} The groups, survey users, the userUuid -> groupUuid map,
  *   and the handler to change a user's group.
  */
 export const useUserGroupsSummary = (): UseUserGroupsSummaryResult => {
-  // LoaderActions dispatches thunks (functions), not plain actions, but the untyped store JS
-  // modules make useDispatch() infer the plain redux `Dispatch<UnknownAction>` type; type it
+  // NotificationActions dispatches a thunk (function), not a plain action, but the untyped store
+  // JS modules make useDispatch() infer the plain redux `Dispatch<UnknownAction>` type; type it
   // explicitly as a thunk dispatch here, following the precedent in useEditUserGroup.ts /
   // useUserGroupMembersEditor.ts.
   const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
@@ -54,10 +54,12 @@ export const useUserGroupsSummary = (): UseUserGroupsSummaryResult => {
   const [groups, setGroups] = useState<UserGroupType[]>([])
   const [users, setUsers] = useState<SurveyUserType[]>([])
   const [groupUuidByUserUuid, setGroupUuidByUserUuid] = useState<Record<string, string>>({})
+  // Users with a group change currently in flight; used to keep their cards from being dragged
+  // again until the pending request settles, so overlapping requests for the same user can't race.
+  const [pendingUserUuids, setPendingUserUuids] = useState<Set<string>>(new Set())
 
-  // Pure data fetcher: never sets state itself, so it's safe to call both from the reactive effect
-  // below (via a staleness-guarded `.then()`) and from the imperative `reload` used by
-  // onChangeUserGroup, following the useUserGroupMembersEditor.ts precedent.
+  // Pure data fetcher: never sets state itself, so it's safe to call from the reactive effect below
+  // via a staleness-guarded `.then()`, following the useUserGroupMembersEditor.ts precedent.
   const fetchData = useCallback(async (): Promise<FetchedData> => {
     const [groupsList, { data: usersRes }] = await Promise.all([
       API.fetchUserGroups({ surveyId }),
@@ -79,9 +81,7 @@ export const useUserGroupsSummary = (): UseUserGroupsSummaryResult => {
   // a closure-local staleness guard (not `await` directly in the effect body) so that if `surveyId`
   // changes again before this fetch resolves, the stale response is discarded instead of
   // overwriting newer state - same pattern established in UserGroupQualifiersEditor.tsx / Task 11,
-  // reused in useUserGroupMembersEditor.ts / Task 12. No loader dispatch here (matching the
-  // useUserGroupMembersEditor.ts precedent): the loader is only shown around the imperative
-  // add/remove-driven reload below, not the initial reactive load.
+  // reused in useUserGroupMembersEditor.ts / Task 12.
   useEffect(() => {
     let ignore = false
 
@@ -98,34 +98,78 @@ export const useUserGroupsSummary = (): UseUserGroupsSummaryResult => {
     }
   }, [fetchData])
 
-  // Reload used by the imperative onChangeUserGroup handler below: called from an event handler
-  // (not directly from an effect body), so there's no risk of setting state after a superseded
-  // effect run - matches the reload precedent in useUserGroupMembersEditor.ts.
-  const reload = useCallback(async (): Promise<void> => {
-    const data = await fetchData()
-    setGroups(data.groups)
-    setUsers(data.users)
-    setGroupUuidByUserUuid(data.groupUuidByUserUuid)
-  }, [fetchData])
+  // Applies (or reverts) a userUuid -> groupUuid mapping change without touching any other entry;
+  // shared by the optimistic update below and its error rollback.
+  const applyGroupUuidChange = useCallback((userUuid: string, groupUuid: string | null) => {
+    setGroupUuidByUserUuid((prev) => {
+      const next = { ...prev }
+      if (groupUuid) {
+        next[userUuid] = groupUuid
+      } else {
+        delete next[userUuid]
+      }
+      return next
+    })
+  }, [])
 
+  const setUserPending = useCallback((userUuid: string, pending: boolean) => {
+    setPendingUserUuids((prev) => {
+      const next = new Set(prev)
+      if (pending) {
+        next.add(userUuid)
+      } else {
+        next.delete(userUuid)
+      }
+      return next
+    })
+  }, [])
+
+  // Updates groupUuidByUserUuid optimistically, before the remove/add requests even start, so the
+  // dragged card shows in its destination column immediately instead of sitting back in the origin
+  // column (see useUserGroupsKanbanDnd's reconcileCrossColumnDrop) for as long as the requests take
+  // - which, on a slow connection, used to be very noticeable since it previously waited for a full
+  // reload (groups + users + every group's members) on top of the two mutation requests. On failure,
+  // the mapping is rolled back to groupUuidOld so the card returns to its original column. Also
+  // marks the user pending for the duration of the request (cleared in `finally`, so it's cleared
+  // on both success and failure): UserGroupsSummary uses pendingUserUuids to keep the card from
+  // being dragged again until this call settles, since a second concurrent call for the same user
+  // would race its remove/add requests against this one and could leave the two calls' optimistic
+  // updates/rollbacks stomping on each other.
   const onChangeUserGroup = useCallback(
     async (userUuid: string, groupUuidNew: string | null): Promise<void> => {
-      const groupUuidOld = groupUuidByUserUuid[userUuid]
+      const groupUuidOld = groupUuidByUserUuid[userUuid] ?? null
+      if (groupUuidOld === groupUuidNew) return
+
+      applyGroupUuidChange(userUuid, groupUuidNew)
+      setUserPending(userUuid, true)
+
+      // Tracks whether the old membership was actually removed on the server, so that if the
+      // subsequent add fails, the rollback below reflects the user's real server-side state
+      // (unassigned) instead of incorrectly restoring them to the old group in the UI.
+      let removedOld = false
+
       try {
-        dispatch(LoaderActions.showLoader())
         if (groupUuidOld) {
           await API.removeUserGroupMember({ surveyId, groupUuid: groupUuidOld, userUuid })
+          removedOld = true
         }
         if (groupUuidNew) {
           await API.addUserGroupMember({ surveyId, groupUuid: groupUuidNew, userUuid })
         }
-        await reload()
+      } catch (error) {
+        applyGroupUuidChange(userUuid, removedOld ? null : groupUuidOld)
+        // NotificationActions.notifyError's untyped implementation destructures `params` with no
+        // default, so TS infers it as a required property; pass an empty object explicitly
+        // (equivalent to the action creator's own runtime default), following the
+        // useEditUserGroup.ts precedent.
+        dispatch(NotificationActions.notifyError({ key: 'appErrors:networkError', params: {} }))
+        throw error
       } finally {
-        dispatch(LoaderActions.hideLoader())
+        setUserPending(userUuid, false)
       }
     },
-    [dispatch, groupUuidByUserUuid, reload, surveyId]
+    [applyGroupUuidChange, dispatch, groupUuidByUserUuid, setUserPending, surveyId]
   )
 
-  return { groups, users, groupUuidByUserUuid, onChangeUserGroup, reload }
+  return { groups, users, groupUuidByUserUuid, onChangeUserGroup, pendingUserUuids }
 }

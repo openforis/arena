@@ -85,11 +85,12 @@ export const {
   updateRecordOwner,
 } = RecordManager
 
-export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat }) => {
+export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, user }) => {
   const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({
     surveyId,
     cycle,
     includeCounts: true,
+    user,
   })
 
   const valueFormattersByType = {

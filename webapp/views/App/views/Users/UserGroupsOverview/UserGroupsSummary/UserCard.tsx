@@ -9,6 +9,7 @@ import type { SurveyUserType } from './useUserGroupsSummary'
 type Props = {
   user: SurveyUserType
   draggable: boolean
+  pending?: boolean
 }
 
 /**
@@ -19,14 +20,19 @@ type Props = {
  * @param props0 - The component props.
  * @param props0.user - The survey user to render.
  * @param props0.draggable - Whether the card can be dragged; false renders a static, non-interactive card.
+ * @param props0.pending - Whether a group change for this user is currently being saved; renders a dimmed, non-interactive card regardless of `draggable`, so it can't be dragged again until the change settles.
  * @returns {React.ReactElement} - The UserCard component.
  */
 const UserCard = (props: Props): React.ReactElement => {
-  const { user, draggable } = props
+  const { user, draggable, pending = false } = props
   const userUuid = User.getUuid(user) as string
 
+  const className = ['user-card', draggable && 'user-card--draggable', pending && 'user-card--pending']
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <li className={`user-card${draggable ? ' user-card--draggable' : ''}`} data-user-uuid={userUuid}>
+    <li className={className} data-user-uuid={userUuid}>
       <ProfilePicture userUuid={userUuid} thumbnail />
       <div className="user-card__details">
         <div className="user-card__name">{User.getName(user)}</div>

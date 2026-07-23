@@ -27,7 +27,6 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as RecordRepository from '../repository/recordRepository'
 import * as FileRepository from '../repository/fileRepository'
 import * as NodeRepository from '../repository/nodeRepository'
-import * as RecordQualifierMatcher from './_recordManager/recordQualifierMatcher'
 import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
 
@@ -78,7 +77,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
     nodeDefKeys = Survey.getNodeDefRootKeysSorted({ cycle })(survey)
     if (user) {
-      qualifierNodeDefFilters = await RecordQualifierMatcher.fetchUserQualifierFilters({ user, survey }, client)
+      qualifierNodeDefFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey }, client)
     }
   }
 
@@ -160,9 +159,7 @@ export const countRecordsBySurveyId = async (
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: nodeDefsDraft }, client)
   const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
   const summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
-  const qualifierNodeDefFilters = user
-    ? await RecordQualifierMatcher.fetchUserQualifierFilters({ user, survey }, client)
-    : []
+  const qualifierNodeDefFilters = user ? await SurveyManager.fetchUserQualifierFilters({ user, survey }, client) : []
 
   return RecordRepository.countRecordsBySurveyId(
     { surveyId, cycle, search, nodeDefKeys, summaryDefs, nodeDefRoot, ownerUuid, qualifierNodeDefFilters },
@@ -262,7 +259,7 @@ export const fetchRecordAndNodesByUuid = async (
 
 export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
 
-export { fetchUserQualifierFilters, recordMatchesQualifierFilters } from './_recordManager/recordQualifierMatcher'
+export { recordMatchesQualifierFilters } from './_recordManager/recordQualifierMatcher'
 
 const fetchNodeRefData = async ({ survey, node, isCode }, client) => {
   const surveyId = Survey.getId(survey)

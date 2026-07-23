@@ -239,8 +239,9 @@ export const init = (app) => {
   app.get('/survey/:surveyId/records/summary/export', requireRecordListExportPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-      await RecordService.exportRecordsSummary({ res, surveyId, cycle, fileFormat })
+      await RecordService.exportRecordsSummary({ res, surveyId, cycle, fileFormat, user })
     } catch (error) {
       next(error)
     }

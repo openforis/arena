@@ -30,7 +30,7 @@ interface ColumnData {
  */
 const UserGroupsSummary = (): React.ReactElement => {
   const canManage = useAuthCanManageUserGroups()
-  const { groups, users, groupUuidByUserUuid, onChangeUserGroup, reload } = useUserGroupsSummary()
+  const { groups, users, groupUuidByUserUuid, onChangeUserGroup, pendingUserUuids } = useUserGroupsSummary()
 
   const columns: ColumnData[] = useMemo(() => {
     const unassignedMembers = users.filter((user) => !groupUuidByUserUuid[User.getUuid(user) as string])
@@ -49,7 +49,6 @@ const UserGroupsSummary = (): React.ReactElement => {
     enabled: canManage,
     columnKeys: columns.map((column) => column.key),
     onChangeUserGroup,
-    reload,
     unassignedGroupKey: UNASSIGNED_GROUP_KEY,
   })
 
@@ -62,6 +61,7 @@ const UserGroupsSummary = (): React.ReactElement => {
           group={column.group}
           members={column.members}
           draggable={canManage}
+          pendingUserUuids={pendingUserUuids}
           containerRef={registerColumnRef(column.key)}
         />
       ))}

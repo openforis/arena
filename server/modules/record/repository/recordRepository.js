@@ -341,7 +341,8 @@ export const fetchRecordsSummaryBySurveyId = async (
     const paramName = `qualifierValue${index}`
     const colName = NodeDefTable.getColumnName(nodeDef)
     recordsSelectWhereConditions.push(`"${colName}" = $/${paramName}/`)
-    qualifierFilterParams[paramName] = value
+    const columnValue = NodeDef.isCode(nodeDef) ? value?.code : value
+    qualifierFilterParams[paramName] = columnValue
   })
 
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')

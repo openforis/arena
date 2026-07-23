@@ -8,7 +8,6 @@ interface UseUserGroupsKanbanDndParams {
   enabled: boolean
   columnKeys: string[]
   onChangeUserGroup: OnChangeUserGroup
-  reload: () => Promise<void>
   unassignedGroupKey: string
 }
 
@@ -29,37 +28,35 @@ interface UseUserGroupsKanbanDndResult {
  * cross-column handling below is therefore deferred to a microtask, so it runs once that
  * synchronous continuation has completed and the element has actually been relocated; only then
  * is it safe to move it back to its original column so the DOM still matches what React currently
- * believes is true, letting the subsequent state-driven re-render (whether onChangeUserGroup
- * succeeds or, via the reload fallback, if it fails) reconcile the real move safely instead of
- * crashing on a stale DOM parent reference.
+ * believes is true, letting the subsequent state-driven re-render - triggered by onChangeUserGroup
+ * optimistically updating group membership before it even calls the server, and again if it later
+ * rolls that back on failure - reconcile the real move safely instead of crashing on a stale DOM
+ * parent reference.
  *
  * @param params0 - The hook parameters.
  * @param params0.enabled - Whether drag-and-drop should be active; when false, Sortable is never instantiated and cards render inert.
  * @param params0.columnKeys - The current ordered list of column keys (group uuids plus the unassigned sentinel); Sortable is reinitialized whenever this list changes shape.
- * @param params0.onChangeUserGroup - Called with the dragged user's uuid and the destination column's group uuid (or null) on a cross-column drop.
- * @param params0.reload - Re-fetches board data; called if onChangeUserGroup rejects, to force a state-driven re-render that reconciles the DOM.
+ * @param params0.onChangeUserGroup - Called with the dragged user's uuid and the destination column's group uuid (or null) on a cross-column drop; expected to update membership state optimistically and roll it back itself on failure.
  * @param params0.unassignedGroupKey - The sentinel value used as the Unassigned column's data-group-uuid, mapped to null before calling onChangeUserGroup.
  * @returns {UseUserGroupsKanbanDndResult} An object exposing registerColumnRef, used to obtain a stable callback ref for each column's drop-target element.
  */
 export const useUserGroupsKanbanDnd = (params: UseUserGroupsKanbanDndParams): UseUserGroupsKanbanDndResult => {
-  const { enabled, columnKeys, onChangeUserGroup, reload, unassignedGroupKey } = params
+  const { enabled, columnKeys, onChangeUserGroup, unassignedGroupKey } = params
 
   const containersByKeyRef = useRef<Map<string, HTMLUListElement>>(new Map())
 
   // Sortable's `sortable:stop` listener is registered once, when the Sortable instance is
   // constructed (see the effect below) - it does NOT re-run on every render, only when the set
   // of columns changes shape. onChangeUserGroup's identity, however, changes on every successful
-  // drag (it depends on groupUuidByUserUuid). Reading onChangeUserGroup/reload through refs kept
-  // current on every render means the listener always calls the latest version, instead of a
-  // closure captured once and frozen until the next column-shape change - without this, a second
-  // drag of the same card in one session would use a stale membership snapshot and silently leave
-  // the user in both their old and new group.
+  // drag (it depends on groupUuidByUserUuid). Reading it through a ref kept current on every render
+  // means the listener always calls the latest version, instead of a closure captured once and
+  // frozen until the next column-shape change - without this, a second drag of the same card in one
+  // session would use a stale membership snapshot and silently leave the user in both their old and
+  // new group.
   const onChangeUserGroupRef = useRef(onChangeUserGroup)
-  const reloadRef = useRef(reload)
   useLayoutEffect(() => {
     onChangeUserGroupRef.current = onChangeUserGroup
-    reloadRef.current = reload
-  }, [onChangeUserGroup, reload])
+  }, [onChangeUserGroup])
 
   const registerColumnRef = useCallback(
     (groupKey: string) =>
@@ -73,20 +70,16 @@ export const useUserGroupsKanbanDnd = (params: UseUserGroupsKanbanDndParams): Us
     []
   )
 
-  // If onChangeUserGroup rejects, force a state-driven re-render (via reload) to reconcile the
-  // DOM; a failed reload is swallowed since there's nothing further to fall back to.
-  const handleChangeUserGroupError = (): void => {
-    reloadRef.current().catch(() => {})
-  }
-
   // Sortable has now physically moved cardElement into newContainer as part of finishing the drag
   // gesture, independent of React. React still believes the card belongs to oldContainer (nothing
-  // has re-rendered yet), so its next reconciliation - triggered by the reload() that
-  // onChangeUserGroup runs internally on success, or by handleChangeUserGroupError's reload() on
-  // failure - would try to remove the card from oldContainer by calling oldContainer.removeChild()
-  // on a node whose actual DOM parent is now newContainer, which throws. Moving the card back to
-  // oldContainer here, before React gets a chance to reconcile, keeps the DOM consistent with what
-  // React last rendered; the resulting state update then drives the real move.
+  // has re-rendered yet), so its next reconciliation - triggered by onChangeUserGroup's optimistic
+  // state update, fired synchronously below before the server request even starts - would try to
+  // remove the card from oldContainer by calling oldContainer.removeChild() on a node whose actual
+  // DOM parent is now newContainer, which throws. Moving the card back to oldContainer here, before
+  // React gets a chance to reconcile, keeps the DOM consistent with what React last rendered; the
+  // resulting state update then drives the real move. onChangeUserGroup rolls its own state update
+  // back on failure (and reports the error), so no further handling is needed here - the rejection
+  // is caught only to avoid an unhandled promise rejection.
   const reconcileCrossColumnDrop = (params: {
     oldContainer: HTMLElement
     cardElement: HTMLElement
@@ -98,7 +91,7 @@ export const useUserGroupsKanbanDnd = (params: UseUserGroupsKanbanDndParams): Us
 
     const groupUuidNew = groupKeyNew === unassignedGroupKey ? null : groupKeyNew
 
-    onChangeUserGroupRef.current(userUuid, groupUuidNew).catch(handleChangeUserGroupError)
+    onChangeUserGroupRef.current(userUuid, groupUuidNew).catch(() => {})
   }
 
   const handleSortableStop = (event: SortableStopEvent): void => {
@@ -142,8 +135,8 @@ export const useUserGroupsKanbanDnd = (params: UseUserGroupsKanbanDndParams): Us
     }
     // columnKeys is read via its joined form so the effect only reinitializes Sortable when the
     // set of columns actually changes shape, not on every unrelated re-render. handleSortableStop
-    // reads onChangeUserGroup/reload through refs kept current every render (see
-    // onChangeUserGroupRef/reloadRef above), so it's intentionally excluded too.
+    // reads onChangeUserGroup through a ref kept current every render (see onChangeUserGroupRef
+    // above), so it's intentionally excluded too.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, columnKeys.join('|')])
 
