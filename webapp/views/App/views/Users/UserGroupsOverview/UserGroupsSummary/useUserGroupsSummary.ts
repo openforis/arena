@@ -28,7 +28,7 @@ interface UseUserGroupsSummaryResult {
   users: SurveyUserType[]
   groupUuidByUserUuid: Record<string, string>
   onChangeUserGroup: (userUuid: string, groupUuidNew: string | null) => Promise<void>
-  pendingUserUuids: Set<string>
+  pendingUserUuids: ReadonlySet<string>
 }
 
 /**
@@ -143,15 +143,21 @@ export const useUserGroupsSummary = (): UseUserGroupsSummaryResult => {
       applyGroupUuidChange(userUuid, groupUuidNew)
       setUserPending(userUuid, true)
 
+      // Tracks whether the old membership was actually removed on the server, so that if the
+      // subsequent add fails, the rollback below reflects the user's real server-side state
+      // (unassigned) instead of incorrectly restoring them to the old group in the UI.
+      let removedOld = false
+
       try {
         if (groupUuidOld) {
           await API.removeUserGroupMember({ surveyId, groupUuid: groupUuidOld, userUuid })
+          removedOld = true
         }
         if (groupUuidNew) {
           await API.addUserGroupMember({ surveyId, groupUuid: groupUuidNew, userUuid })
         }
       } catch (error) {
-        applyGroupUuidChange(userUuid, groupUuidOld)
+        applyGroupUuidChange(userUuid, removedOld ? null : groupUuidOld)
         // NotificationActions.notifyError's untyped implementation destructures `params` with no
         // default, so TS infers it as a required property; pass an empty object explicitly
         // (equivalent to the action creator's own runtime default), following the
