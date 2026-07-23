@@ -15,6 +15,7 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
@@ -58,21 +59,19 @@ const maxExcelCellsLimit = 1000000
 
 /**
  * Executes a select query on an entity definition data view.
- *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query to execute.
- * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
- * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
+ * @param {boolean} [params.columnNodeDefs] - Whether to select only columnNodes.
+ * @param {boolean} [params.includeFileAttributeDefs] - Whether to include file attribute column node defs.
  * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
- * @param {number} [params.offset=null] - The query offset.
- * @param {number} [params.limit=null] - The query limit.
- * @param {boolean|object} [params.outputStream=null] - The output to be used to stream the data (if specified).
- * @param {string} [params.fileFormat=null] - The format of the output file (csv or xlsx).
- *
- * @param {pgPromise.IDatabase} [client=db] - The database client.
+ * @param {number} [params.offset] - The query offset.
+ * @param {number} [params.limit] - The query limit.
+ * @param {boolean|object} [params.outputStream] - The output to be used to stream the data (if specified).
+ * @param {string} [params.fileFormat] - The format of the output file (csv or xlsx).
+ * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params, client = db) => {
@@ -154,16 +153,15 @@ export const fetchViewData = async (params, client = db) => {
 /**
  * Runs a select query on a data view associated to an entity node definition,
  * aggregating the rows by the given measures aggregate functions and grouping by the given dimensions.
- *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query object.
- * @param {number} [params.offset=null] - The query offset.
+ * @param {number} [params.offset] - The query offset.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
- * @param {number} [params.limit=null] - The query limit.
- * @param {boolean} [params.outputStream=null] - The output to be used to stream the data (if specified).
- * @param {object} [params.options=null] - Export options object (e.g. {fileFormat: 'csv'}).
+ * @param {number} [params.limit] - The query limit.
+ * @param {boolean} [params.outputStream] - The output to be used to stream the data (if specified).
+ * @param {object} [params.options] - Export options object (e.g. {fileFormat: 'csv'}).
  * @param {object} client - DB client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
@@ -189,10 +187,14 @@ export const fetchViewDataAgg = async (params, client = db) => {
   return result
 }
 
-const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuids, search }) => {
+const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuids, search, user }) => {
+  // recordUuids explicitly selected by the user are already checked against qualifiers by
+  // requireRecordsMatchUserGroupQualifiers, at the API layer
   if (recordUuids) return recordUuids
 
-  if (Objects.isEmpty(search) && !recordsModifiedAfter) return null
+  const qualifierNodeDefFilters = user ? await RecordManager.fetchUserQualifierFilters({ user, survey }) : []
+
+  if (Objects.isEmpty(search) && !recordsModifiedAfter && qualifierNodeDefFilters.length === 0) return null
 
   const surveyId = Survey.getId(survey)
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
@@ -203,6 +205,7 @@ const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter
     nodeDefKeys,
     cycle,
     search,
+    qualifierNodeDefFilters,
   })
   if (recordsModifiedAfter) {
     recordsSummaries = recordsSummaries.filter((recordSummary) =>
@@ -340,6 +343,7 @@ const checkCanExportEntitiesData = async ({ fileFormat, nodeDefs, fetchParamsByN
 
 export const fetchEntitiesDataToCsvFiles = async (
   {
+    user = null,
     survey,
     cycle,
     search = null,
@@ -361,6 +365,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     recordsModifiedAfter,
     recordUuids: recordUuidsParam,
     search,
+    user,
   })
 
   if (filterRecordUuids?.length === 0) {
@@ -451,7 +456,6 @@ export const fetchEntitiesFileUuidsByCycle = async (
 
 /**
  * Counts the number of rows in the data view related to the specified query object.
- *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
@@ -470,7 +474,6 @@ export const countTable = async ({ survey, cycle, recordOwnerUuid, query }, clie
 /**
  * Returns the count of rows in the data views of the specified entity defs, indexed by entity def UUID.
  * If entityDefUuids is not specified, all the entity defs will be considered.
- *
  * @param {!object} params - The parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
