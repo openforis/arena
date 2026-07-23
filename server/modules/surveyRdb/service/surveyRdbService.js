@@ -182,6 +182,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
   }
 
   return SurveyRdbManager.fetchEntitiesDataToCsvFiles({
+    user,
     survey,
     cycle,
     outputDir,
