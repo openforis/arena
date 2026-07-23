@@ -115,6 +115,23 @@ describe('recordMatchesQualifierFilters', () => {
     ).toBe(false)
   })
 
+  it('is false when pendingNode clears an already matching qualifier attribute value', async () => {
+    const survey = await buildSurvey()
+    const teamDef = Survey.getNodeDefByName('team')(survey)
+    const record = RB.record(user, survey, RB.entity('plot', RB.attribute('team', 'north'))).build()
+    const rootNode = Record.getRootNode(record)
+    const pendingNode = Node.newNode(NodeDef.getUuid(teamDef), Record.getUuid(record), rootNode, null)
+
+    expect(
+      recordMatchesQualifierFilters({
+        survey,
+        record,
+        qualifierFilters: [{ nodeDef: teamDef, value: 'north' }],
+        pendingNode,
+      })
+    ).toBe(false)
+  })
+
   it('is true when pendingNode sets the qualifier attribute to a value matching the qualifier filters', async () => {
     const survey = await buildSurvey()
     const teamDef = Survey.getNodeDefByName('team')(survey)
