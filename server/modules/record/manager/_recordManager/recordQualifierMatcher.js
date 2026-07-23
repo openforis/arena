@@ -10,7 +10,7 @@ import { NodeValues } from '@core/record/nodeValues'
  * @param {object} params - The function parameters.
  * @param {object} params.survey - The survey, with node defs and categories loaded.
  * @param {object} params.record - The record (with nodes loaded) to check.
- * @param {Array<{nodeDef: object, value: string}>} params.qualifierFilters - The qualifier filters,
+ * @param {Array<{nodeDef: object, value: *}>} params.qualifierFilters - The qualifier filters,
  * as returned by SurveyManager.fetchUserQualifierFilters.
  * @param {object} [params.pendingNode] - A node carried by the current request but not yet persisted
  * (e.g. a create/update of some attribute), applied on top of the record's own nodes when checking, so

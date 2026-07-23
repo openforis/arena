@@ -16,7 +16,7 @@ type Props = {
   groupKey: string
   members: SurveyUserType[]
   draggable: boolean
-  pendingUserUuids: Set<string>
+  pendingUserUuids: ReadonlySet<string>
   containerRef: (el: HTMLUListElement | null) => void
 }
 
