@@ -40,12 +40,11 @@ const _recordMatchesUserGroupQualifiers = async ({ user, surveyId, recordUuid, p
 
   const qualifierFilters = await RecordManager.fetchUserQualifierFilters({ user, survey })
 
-  // apply the node value carried by the request (if any) before checking, so an edit that sets
-  // a qualifier attribute to a value outside the user's group qualifiers is rejected too, not just
-  // records that already mismatch before the edit is applied
-  const recordWithPendingNode = pendingNode ? Record.assocNode(pendingNode)(record) : record
-
-  return RecordManager.recordMatchesQualifierFilters({ survey, record: recordWithPendingNode, qualifierFilters })
+  // pendingNode is passed through rather than merged into the record via Record.assocNode: the record
+  // was fetched with fetchForUpdate: false, so its _nodesIndex hasn't been built, and assocNode would
+  // initialize one containing only pendingNode, shadowing every other already-persisted node (see
+  // recordMatchesQualifierFilters' jsdoc for details)
+  return RecordManager.recordMatchesQualifierFilters({ survey, record, qualifierFilters, pendingNode })
 }
 
 /**
