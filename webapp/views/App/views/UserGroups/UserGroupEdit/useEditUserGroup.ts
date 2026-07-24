@@ -76,7 +76,7 @@ export const useEditUserGroup = ({ groupUuid }: UseEditUserGroupParams): UseEdit
   // Pure data fetcher: never sets state itself, so it's safe to call from the reactive effect below
   // via a staleness-guarded `.then()`, following the pattern established in
   // UserGroupQualifiersEditor.tsx / Task 11 and reused in useUserGroupMembersEditor.ts /
-  // useUserGroupsSummary.ts.
+  // useUserGroupsOverview.ts.
   const fetchGroups = useCallback(() => API.fetchUserGroups({ surveyId }), [surveyId])
 
   // Reactive load: re-fetches whenever the group or survey changes. Uses the `.then()`-callback
