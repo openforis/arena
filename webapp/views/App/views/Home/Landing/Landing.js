@@ -11,6 +11,7 @@ import { Button } from '@webapp/components'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import * as API from '@webapp/service/api'
 import { useSurveyId, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 const LandingContent = () => {
   const navigate = useNavigate()
@@ -49,10 +50,14 @@ const LandingContent = () => {
   )
 }
 
-const Landing = () => (
-  <SurveyDefsLoader>
-    <LandingContent />
-  </SurveyDefsLoader>
-)
+const Landing = () => {
+  const canEditSurvey = useAuthCanEditSurvey()
+
+  return (
+    <SurveyDefsLoader draft={canEditSurvey}>
+      <LandingContent />
+    </SurveyDefsLoader>
+  )
+}
 
 export default Landing

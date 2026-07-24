@@ -8,8 +8,11 @@ describe('buildCssVarMap', () => {
   })
 
   it('overrides blue with survey primary when provided', () => {
-    const map = buildCssVarMap({ tokens: defaultTokens, primaryColor: '#112233' })
-    expect(map['--blue']).toBe('#112233')
-    expect(map['--colorTextPrimary']).toBeTruthy()
+    const primaryColor = '#112233'
+    const map = buildCssVarMap({ tokens: defaultTokens, primaryColor })
+    expect(map['--blue']).toBe(primaryColor)
+    expect(map['--colorTextPrimary']).toBe(primaryColor)
+    expect(map['--blueDark']).toBe(primaryColor)
+    expect(map['--borderColorFocussed']).toBe(primaryColor)
   })
 })
