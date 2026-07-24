@@ -4,6 +4,47 @@ import * as SurveyBranding from '@core/survey/surveyBranding'
 
 import * as API from '@webapp/service/api'
 
+const MIME_BY_EXTENSION = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  svg: 'image/svg+xml',
+  webp: 'image/webp',
+}
+
+/**
+ * Infers an image MIME type from a Content-Disposition filename.
+ * @param {string|undefined|null} contentDisposition
+ * @returns {string|null}
+ */
+const mimeTypeFromContentDisposition = (contentDisposition) => {
+  if (!contentDisposition) return null
+  const fileNameMatch = /filename\*?=(?:UTF-8''|")?([^";]+)/i.exec(contentDisposition)
+  const fileName = fileNameMatch?.[1] ? decodeURIComponent(fileNameMatch[1].replace(/"/g, '')) : null
+  if (!fileName) return null
+  const extension = fileName.split('.').pop()?.toLowerCase()
+  return MIME_BY_EXTENSION[extension] || null
+}
+
+/**
+ * Ensures the blob has a usable image MIME type (survey file API often omits Content-Type).
+ * @param {import('axios').AxiosResponse} response
+ * @returns {Blob}
+ */
+const toDisplayableImageBlob = (response) => {
+  const blob = response.data
+  if (blob?.type && blob.type !== 'application/octet-stream') {
+    return blob
+  }
+  const headerType = response.headers?.['content-type']
+  const mimeType =
+    (headerType && headerType !== 'application/octet-stream' ? headerType : null) ||
+    mimeTypeFromContentDisposition(response.headers?.['content-disposition']) ||
+    'application/octet-stream'
+  return new Blob([blob], { type: mimeType })
+}
+
 /**
  * Resolves a displayable image src for a branding logo.
  * External HTTPS URLs are used directly; survey file UUIDs are fetched as blobs
@@ -40,7 +81,7 @@ export const useBrandingLogoSrc = ({ surveyId, logo, localObjectUrl = null }) =>
       try {
         const response = await API.fetchSurveyFile({ surveyId, fileUuid })
         if (cancelled) return
-        blobUrlToRevoke = URL.createObjectURL(response.data)
+        blobUrlToRevoke = URL.createObjectURL(toDisplayableImageBlob(response))
         setSrc(blobUrlToRevoke)
       } catch {
         if (!cancelled) setSrc(null)

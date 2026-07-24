@@ -77,6 +77,7 @@ export default {
       preview: 'Preview',
       invalidPrimaryColor: 'Enter a valid #RRGGBB color or leave empty',
       invalidLogoUrl: 'Enter a valid https URL or leave empty',
+      invalidSaveBlocked: 'Fix invalid branding fields before saving survey info',
     },
     configuration: {
       title: 'Configuration',

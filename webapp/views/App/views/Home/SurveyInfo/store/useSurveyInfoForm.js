@@ -9,6 +9,7 @@ import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as Validation from '@core/validation/validation'
 
 import { SurveyInfoActions, useSurveyInfo } from '@webapp/store/survey'
+import { NotificationActions } from '@webapp/store/ui'
 
 import { useFormObject } from '@webapp/components/hooks'
 
@@ -59,6 +60,11 @@ export const useSurveyInfoForm = () => {
   const saveProps = () => {
     enableValidation()
     if (!SurveyBranding.isBrandingValid(object.branding)) {
+      dispatch(
+        NotificationActions.notifyWarning({
+          key: 'homeView:surveyInfo.branding.invalidSaveBlocked',
+        })
+      )
       return
     }
     dispatch(SurveyInfoActions.updateSurveyInfoProps(object))

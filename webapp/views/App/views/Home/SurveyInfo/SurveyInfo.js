@@ -81,7 +81,6 @@ const SurveyInfo = () => {
       props: {
         branding: surveyInfoObject.branding || {},
         setBranding,
-        getFieldValidation,
         readOnly,
       },
     },

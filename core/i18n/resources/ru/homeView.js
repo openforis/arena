@@ -88,6 +88,7 @@ export default {
       preview: 'Предпросмотр',
       invalidPrimaryColor: 'Введите допустимый цвет #RRGGBB или оставьте пустым',
       invalidLogoUrl: 'Введите допустимый https URL или оставьте пустым',
+      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
     },
     configuration: {
       title: 'Конфигурация',

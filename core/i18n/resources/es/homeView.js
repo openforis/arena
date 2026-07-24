@@ -75,6 +75,7 @@ export default {
       preview: 'Vista previa',
       invalidPrimaryColor: 'Introduzca un color #RRGGBB válido o déjelo vacío',
       invalidLogoUrl: 'Introduzca una URL https válida o déjela vacía',
+      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
     },
     configuration: {
       title: 'Configuración',

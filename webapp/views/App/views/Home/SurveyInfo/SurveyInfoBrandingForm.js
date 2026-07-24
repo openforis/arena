@@ -108,7 +108,7 @@ BrandingLogoSection.propTypes = {
 }
 
 export const SurveyInfoBrandingForm = (props) => {
-  const { branding = {}, setBranding, getFieldValidation, readOnly } = props
+  const { branding = {}, setBranding, readOnly } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -162,10 +162,10 @@ export const SurveyInfoBrandingForm = (props) => {
   }, [])
 
   const primaryColorValidation = useMemo(() => {
-    if (!primaryColor) return getFieldValidation(Survey.infoKeys.branding)
+    if (!primaryColor) return null
     if (SurveyBranding.isValidPrimaryColor(primaryColor)) return null
     return fieldErrorValidation('homeView:surveyInfo.branding.invalidPrimaryColor')
-  }, [getFieldValidation, primaryColor])
+  }, [primaryColor])
 
   const surveyLogoUrlValidation = useMemo(() => {
     const url = surveyLogo[brandingKeys.url]
@@ -340,6 +340,5 @@ export const SurveyInfoBrandingForm = (props) => {
 SurveyInfoBrandingForm.propTypes = {
   branding: PropTypes.object,
   setBranding: PropTypes.func.isRequired,
-  getFieldValidation: PropTypes.func.isRequired,
   readOnly: PropTypes.bool,
 }

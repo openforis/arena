@@ -88,6 +88,7 @@ export default {
       preview: 'Урьдчилан харах',
       invalidPrimaryColor: 'Зөв #RRGGBB өнгө оруулна уу эсвэл хоосон үлдээнэ үү',
       invalidLogoUrl: 'Зөв https URL оруулна уу эсвэл хоосон үлдээнэ үү',
+      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
     },
     configuration: {
       title: 'Тохиргоо',
