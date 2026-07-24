@@ -66,6 +66,35 @@ describe('SurveyBranding', () => {
     })
   })
 
+  describe('isBrandingValid', () => {
+    it('accepts empty branding', () => {
+      expect(SurveyBranding.isBrandingValid({})).toBe(true)
+    })
+
+    it('accepts valid primary color and logo URLs', () => {
+      expect(
+        SurveyBranding.isBrandingValid({
+          primaryColor: '#112233',
+          surveyLogo: { url: 'https://example.com/a.png' },
+          countryLogo: { url: 'https://example.com/b.png' },
+        })
+      ).toBe(true)
+    })
+
+    it('rejects invalid primary color when non-empty', () => {
+      expect(SurveyBranding.isBrandingValid({ primaryColor: 'nope' })).toBe(false)
+    })
+
+    it('rejects invalid logo URL when non-empty', () => {
+      expect(SurveyBranding.isBrandingValid({ surveyLogo: { url: 'http://insecure' } })).toBe(false)
+      expect(SurveyBranding.isBrandingValid({ countryLogo: { url: 'javascript:alert(1)' } })).toBe(false)
+    })
+
+    it('allows fileUuid logos without url', () => {
+      expect(SurveyBranding.isBrandingValid({ surveyLogo: { fileUuid: 'abc' } })).toBe(true)
+    })
+  })
+
   describe('getBrandingFileUuids', () => {
     it('collects fileUuids from survey and country logos', () => {
       const uuids = SurveyBranding.getBrandingFileUuids({

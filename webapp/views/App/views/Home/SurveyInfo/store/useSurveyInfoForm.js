@@ -5,6 +5,7 @@ import { ArrayUtils } from '@core/arrayUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
+import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as Validation from '@core/validation/validation'
 
 import { SurveyInfoActions, useSurveyInfo } from '@webapp/store/survey'
@@ -57,6 +58,9 @@ export const useSurveyInfoForm = () => {
 
   const saveProps = () => {
     enableValidation()
+    if (!SurveyBranding.isBrandingValid(object.branding)) {
+      return
+    }
     dispatch(SurveyInfoActions.updateSurveyInfoProps(object))
   }
 

@@ -34,6 +34,24 @@ export const isValidLogoUrl = (value) => {
 }
 
 /**
+ * Returns whether branding props are valid for save.
+ * Empty primaryColor and empty logo URLs are allowed.
+ * @param {object} branding
+ * @returns {boolean}
+ */
+export const isBrandingValid = (branding = {}) => {
+  const primaryColor = branding[keys.primaryColor]
+  if (primaryColor && !isValidPrimaryColor(primaryColor)) return false
+
+  for (const logoKey of [keys.surveyLogo, keys.countryLogo]) {
+    const url = branding[logoKey]?.[keys.url]
+    if (url && !isValidLogoUrl(url)) return false
+  }
+
+  return true
+}
+
+/**
  * Returns branding object from survey info props.
  * @param {object} surveyInfo
  * @returns {object}
