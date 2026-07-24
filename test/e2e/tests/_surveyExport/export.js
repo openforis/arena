@@ -2,12 +2,15 @@ import AdmZip from 'adm-zip'
 import fs from 'fs'
 
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
+import { BASE_URL } from '../../config'
 import { getSurveyDirPath, getSurveyZipPath } from '../../paths'
 
 export const exportSurvey = (survey) =>
   test(`Export survey ${survey?.name}`, async () => {
     const surveyZipPath = getSurveyZipPath(survey)
     const surveyDirPath = getSurveyDirPath(survey)
+
+    await page.goto(`${BASE_URL}/app/dashboard/`)
 
     const exportButtonMenuSelector = getSelector(TestId.dashboard.surveyExportBtn, 'button')
     await page.click(exportButtonMenuSelector)

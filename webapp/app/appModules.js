@@ -39,6 +39,11 @@ export const appModules = {
     path: 'home',
     icon: 'home2',
   },
+  dashboard: {
+    key: 'dashboard',
+    path: 'dashboard',
+    icon: 'stats-bars',
+  },
   designer: {
     key: 'designer',
     path: 'designer',
@@ -77,10 +82,6 @@ export const homeModules = {
   landing: {
     key: 'landing',
     path: 'landing',
-  },
-  dashboard: {
-    key: 'dashboard',
-    path: 'dashboard',
   },
   surveyInfo: {
     key: 'surveyInfo',

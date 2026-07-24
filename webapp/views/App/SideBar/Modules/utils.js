@@ -46,6 +46,7 @@ export const getModulesHierarchy = (user, surveyInfo, { experimentalFeatures = f
   return [
     // home
     getModule({ module: appModules.home }),
+    getModule({ module: appModules.dashboard }),
     // designer
     getModule({
       module: appModules.designer,

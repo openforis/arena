@@ -1,6 +1,12 @@
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { BASE_URL } from '../../config'
 
+export const gotoDashboard = () =>
+  test('Goto dashboard', async () => {
+    await page.goto(`${BASE_URL}/app/dashboard/`)
+    expect(page.url()).toBe(`${BASE_URL}/app/dashboard/`)
+  })
+
 // ===== Header
 export const gotoSurveyCreate = () =>
   test('Goto survey create', async () => {
@@ -33,7 +39,7 @@ export const gotoTemplateList = () =>
 // ==== Dashboard
 export const gotoSurveyInfo = () =>
   test('Goto survey info', async () => {
-    await page.goto(`${BASE_URL}/app/home/dashboard/`)
+    await page.goto(`${BASE_URL}/app/dashboard/`)
     await page.click(getSelector(TestId.dashboard.surveyInfoBtn, 'button'))
     expect(page.url()).toBe(`${BASE_URL}/app/home/surveyInfo/`)
   })
@@ -43,12 +49,11 @@ export const gotoHome = () =>
   test('Goto home', async () => {
     const currentUrl = await page.url()
     const homeUrl = `${BASE_URL}/app/home/`
-    const dashboardUrl = `${homeUrl}dashboard/`
-    if (currentUrl !== dashboardUrl) {
+    const landingUrl = `${homeUrl}landing/`
+    if (currentUrl !== landingUrl) {
       await page.click(getSelector(TestId.sidebar.moduleBtn('home'), 'a'))
     }
-    // page url could be /home/dashboard or /home (redirection to dashboard not performed yet)
-    expect([homeUrl, dashboardUrl]).toContain(page.url())
+    expect([homeUrl, landingUrl]).toContain(page.url())
   })
 
 const _gotoSubModule =

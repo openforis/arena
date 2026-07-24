@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router'
 import * as Survey from '@core/survey/survey'
 import * as SurveyBranding from '@core/survey/surveyBranding'
 
-import { appModuleUri, dataModules, homeModules } from '@webapp/app/appModules'
+import { appModuleUri, dataModules, appModules } from '@webapp/app/appModules'
 import { Button } from '@webapp/components'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import * as API from '@webapp/service/api'
@@ -43,7 +43,7 @@ const LandingContent = () => {
       {description ? <p className="survey-landing__description">{description}</p> : null}
       <div className="survey-landing__actions">
         <Button primary label="homeView:landing.enter" onClick={() => navigate(appModuleUri(dataModules.records))} />
-        <Button label="homeView:landing.openDashboard" onClick={() => navigate(appModuleUri(homeModules.dashboard))} />
+        <Button label="homeView:landing.openDashboard" onClick={() => navigate(appModuleUri(appModules.dashboard))} />
       </div>
     </div>
   )

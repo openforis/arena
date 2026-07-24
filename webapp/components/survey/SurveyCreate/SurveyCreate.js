@@ -88,9 +88,9 @@ const SurveyCreate = (props) => {
     uploading,
   } = newSurvey
 
-  // Redirect to dashboard on survey change
+  // Redirect to landing on survey change
   useOnUpdate(() => {
-    navigate(appModuleUri(homeModules.dashboard))
+    navigate(appModuleUri(homeModules.landing))
   }, [Survey.getUuid(surveyInfo)])
 
   const fileUploadLimitMB = useSystemConfigFileUploadLimitMB()
