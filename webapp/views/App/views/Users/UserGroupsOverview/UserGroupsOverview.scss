@@ -1,3 +1,9 @@
+.app__container .app-module > .user-groups-overview--fill {
+  // the Kanban summary manages its own inner scroll regions (one per column),
+  // so the outer page-level scroll set up generically in AppView.scss must be disabled here
+  overflow: hidden;
+}
+
 .user-groups-overview {
   &__bar {
     display: flex;
@@ -9,5 +15,20 @@
   &__tabs {
     display: flex;
     gap: 0.5rem;
+  }
+
+  &--fill {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .user-groups-overview__bar {
+      flex: 0 0 auto;
+    }
+
+    .user-groups-summary {
+      flex: 1;
+      min-height: 0;
+    }
   }
 }

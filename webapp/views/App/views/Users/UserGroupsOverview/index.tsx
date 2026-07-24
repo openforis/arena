@@ -58,8 +58,10 @@ const UserGroupsOverview = (): React.ReactElement => {
     navigate({ pathname: location.pathname, search }, { replace: true })
   }
 
+  const fillHeight = effectiveViewMode === ViewMode.overview
+
   return (
-    <div className="user-groups-overview">
+    <div className={`user-groups-overview${fillHeight ? ' user-groups-overview--fill' : ''}`}>
       <div className="user-groups-overview__bar">
         <div className="user-groups-overview__tabs">
           <button
