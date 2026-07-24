@@ -1,22 +1,32 @@
-.app__container .app-module > .user-groups-editor--fill {
-  // the Kanban overview manages its own inner scroll regions (one per column),
-  // so the outer page-level scroll set up generically in AppView.scss must be disabled here
+.app__container .app-module > .user-groups-editor {
+  // every tab manages its own internal scrolling instead (the DataGrid's built-in row scroller,
+  // header and pagination staying fixed, for the groups list/report tabs; the Kanban board's own
+  // per-column scroller for the assignments tab), so the outer page-level scroll set up
+  // generically in AppView.scss must be disabled here.
   overflow: hidden;
 }
 
 .user-groups-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
   &__bar {
     display: flex;
-    // default (stretch) alignment, not top/center: the fill case (see below) needs .tabs-wrapper
-    // stretched to this row's full height so it can pass a definite height down to the Kanban
-    // board, which is what lets its columns compute their own max height and scroll internally.
     gap: 1rem;
+    // fills the page's remaining height (below), stretching .tabs-wrapper (default alignment)
+    // to that same height so it can pass a definite height down to whichever tab is active.
+    flex: 1;
+    min-height: 0;
 
     .tabs-wrapper {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
       // flex items default to a min-width based on their content's intrinsic width, so a wide
       // tab (e.g. the members report table) would otherwise force this row - and the tab strip
-      // with it - wider than the page instead of scrolling.
+      // with it - wider than the page instead of scrolling internally.
       min-width: 0;
     }
   }
@@ -27,40 +37,19 @@
     align-self: flex-start;
   }
 
-  .tab-content {
-    // scroll a tab's own content independently of the tab strip above it, so a tall or wide tab
-    // (e.g. the members report table) never pushes the strip out of view with no way back to it.
-    overflow: auto;
+  .MuiTabs-root {
+    flex: 0 0 auto;
   }
 
-  &--fill {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  .tab-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 
-    .user-groups-editor__bar {
-      flex: 1;
-      min-height: 0;
-    }
-
-    .tabs-wrapper {
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .MuiTabs-root {
-      flex: 0 0 auto;
-    }
-
-    .tab-content {
-      flex: 1;
-      min-height: 0;
-      // the Kanban board manages its own inner scroll regions (one per column) instead
-      overflow: hidden;
-    }
-
-    .user-groups-overview {
+    // fills the tab-content area so the DataGrid/Kanban board computes its own scrollable
+    // height instead of growing to fit all of its rows/members.
+    .user-groups-overview,
+    .data-grid {
       height: 100%;
     }
   }

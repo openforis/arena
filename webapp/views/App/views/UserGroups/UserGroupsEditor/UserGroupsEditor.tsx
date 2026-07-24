@@ -39,7 +39,11 @@ const isViewMode = (value: unknown): value is ViewModeType =>
  * button is shown in every view mode to users allowed to manage groups. The active view mode is
  * kept in the URL's `view` query param (replacing history rather than pushing) so that the "Back"
  * button on the create/edit group page - a plain `navigate(-1)` - lands back on whichever tab the
- * user came from.
+ * user came from. The page fills the full available height (see UserGroupsEditor.scss) so that
+ * every tab's content can scroll internally within its own bounds - the groups list/report
+ * DataGrids scroll their rows with the header and pagination footer staying fixed in place, and
+ * the assignments Kanban board scrolls each column independently - instead of growing the whole
+ * page.
  *
  * @returns {React.ReactElement} - The UserGroupsEditor component.
  */
@@ -59,8 +63,6 @@ const UserGroupsEditor = (): React.ReactElement => {
     navigate({ pathname: location.pathname, search }, { replace: true })
   }
 
-  const fillHeight = effectiveViewMode === ViewMode.assignments
-
   // The assignments and report tabs are only offered to users who can manage user groups; other
   // users only ever see the groups list, so its tab is the only one always present.
   const tabItems = [
@@ -78,7 +80,7 @@ const UserGroupsEditor = (): React.ReactElement => {
   ]
 
   return (
-    <div className={`user-groups-editor${fillHeight ? ' user-groups-editor--fill' : ''}`}>
+    <div className="user-groups-editor">
       <div className="user-groups-editor__bar">
         <Tabs fullWidth items={tabItems} selectedItemKey={effectiveViewMode} onChange={setViewMode} />
         {canManage && (

@@ -73,7 +73,6 @@ const UserGroupsList = (): React.ReactElement => {
       rows={rows}
       getRowId={(row) => UserGroup.getUuid(row) as string}
       onRowClick={onRowClick}
-      autoHeight
     />
   )
 }
