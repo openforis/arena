@@ -1,15 +1,17 @@
 import './UserGroupsList.scss'
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { GridColDef, GridRowParams } from '@mui/x-data-grid'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
-import { useSurveyId } from '@webapp/store/survey'
-import Table from '@webapp/components/Table/Table'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { DataGrid } from '@webapp/components/DataGrid'
+import LoadingBar from '@webapp/components/LoadingBar'
 
-import RowHeader from './RowHeader'
-import Row from './Row'
+import { useUserGroupsList } from './useUserGroupsList'
 
 // appModules.js is a plain JS module without explicit types: TS infers appModuleUri's parameter shape
 // from its default value (appModules.home), which happens to include an `icon` field that userModules
@@ -23,21 +25,58 @@ type AppModule = Parameters<typeof appModuleUri>[0]
  * @returns {React.ReactElement} - The UserGroupsList component.
  */
 const UserGroupsList = (): React.ReactElement => {
+  const i18n = useI18n()
   const navigate = useNavigate()
-  const surveyId = useSurveyId()
+  const preferredLang = useSurveyPreferredLang() as string
+  const { rows, loading } = useUserGroupsList()
 
-  const onRowClick = (userGroup: Record<string, unknown>): void =>
-    navigate(`${appModuleUri(userModules.userGroup as AppModule)}${UserGroup.getUuid(userGroup)}`)
+  const columns: GridColDef[] = useMemo(
+    () => [
+      {
+        field: 'name',
+        headerName: i18n.t('usersView:userGroup.name'),
+        flex: 1,
+        valueGetter: (_value, row) => UserGroup.getName(row),
+      },
+      {
+        field: 'label',
+        headerName: i18n.t('usersView:userGroup.label'),
+        flex: 1,
+        valueGetter: (_value, row) => UserGroup.getLabel(preferredLang)(row),
+      },
+      {
+        field: 'qualifiers',
+        headerName: i18n.t('usersView:userGroup.qualifier_plural'),
+        flex: 1,
+        valueGetter: (_value, row) => UserGroup.getQualifiers(row).length,
+      },
+      {
+        field: 'membersCount',
+        headerName: i18n.t('usersView:userGroup.members'),
+        flex: 1,
+        // The user groups list endpoint doesn't return membersCount (it only returns rows with
+        // props), so it defaults to 0 below; this is a known, accepted limitation, out of scope to fix here.
+        valueGetter: (_value, row) => row.membersCount ?? 0,
+      },
+    ],
+    [i18n, preferredLang]
+  )
+
+  const onRowClick = (params: GridRowParams): void =>
+    navigate(`${appModuleUri(userModules.userGroup as AppModule)}${UserGroup.getUuid(params.row)}`)
+
+  if (loading) {
+    return <LoadingBar />
+  }
 
   return (
-    <Table
-      module="user-groups"
-      moduleApiUri={`/api/survey/${surveyId}/user-groups`}
+    <DataGrid
       className="user-groups-list"
-      gridTemplateColumns="2fr 2fr 1fr 1fr"
-      rowHeaderComponent={RowHeader}
-      rowComponent={Row}
+      columns={columns}
+      rows={rows}
+      getRowId={(row) => UserGroup.getUuid(row) as string}
       onRowClick={onRowClick}
+      autoHeight
     />
   )
 }
