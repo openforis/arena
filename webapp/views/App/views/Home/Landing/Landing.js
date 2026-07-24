@@ -8,8 +8,8 @@ import * as SurveyBranding from '@core/survey/surveyBranding'
 
 import { appModuleUri, dataModules, appModules } from '@webapp/app/appModules'
 import { Button } from '@webapp/components'
+import { useBrandingLogoSrc } from '@webapp/components/survey/useBrandingLogoSrc'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import * as API from '@webapp/service/api'
 import { useSurveyId, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
@@ -21,13 +21,13 @@ const LandingContent = () => {
 
   const title = Survey.getLabel(surveyInfo, lang)
   const description = Survey.getDescription(lang, '')(surveyInfo)
-  const surveyLogoSrc = SurveyBranding.resolveLogoSrc(SurveyBranding.getSurveyLogo(surveyInfo), {
+  const surveyLogoSrc = useBrandingLogoSrc({
     surveyId,
-    getFileDownloadUrl: API.getSurveyFileDownloadUrl,
+    logo: SurveyBranding.getSurveyLogo(surveyInfo),
   })
-  const countryLogoSrc = SurveyBranding.resolveLogoSrc(SurveyBranding.getCountryLogo(surveyInfo), {
+  const countryLogoSrc = useBrandingLogoSrc({
     surveyId,
-    getFileDownloadUrl: API.getSurveyFileDownloadUrl,
+    logo: SurveyBranding.getCountryLogo(surveyInfo),
   })
 
   return (
