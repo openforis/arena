@@ -1,39 +1,101 @@
+@use '~@webapp/style/vars' as *;
+
 .survey-info-branding-form {
-  max-width: 40rem;
+  width: min(56rem, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0 1rem;
+
+  > .form-item {
+    grid-template-columns: 12rem 1fr;
+    align-items: start;
+  }
+
+  &__field-error {
+    display: block;
+    margin-top: 0.35rem;
+    color: $red;
+    font-size: 0.85rem;
+  }
+
+  &__logos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
 
   &__logo-section {
-    margin-top: 1.5rem;
-    border: none;
-    padding: 0;
+    margin: 0;
+    border: 1px solid $greyBorder;
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    background: $white;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    legend {
+      padding: 0 0.35rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+  }
+
+  &__logo-controls {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+
+    .form-input-container {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
   }
 
   &__upload {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
   }
 
   &__file-input {
     display: none;
   }
 
-  &__logo-preview img {
-    max-height: 4rem;
-    max-width: 12rem;
-    object-fit: contain;
+  &__logo-preview {
+    display: flex;
+    align-items: center;
+    min-height: 3.5rem;
+    padding: 0.5rem;
+    background: $greyAppBg;
+    border-radius: 4px;
+
+    img {
+      max-height: 4rem;
+      max-width: 100%;
+      object-fit: contain;
+    }
   }
 
   &__preview {
-    margin-top: 2rem;
-    border: 1px solid var(--color-border, #ddd);
+    margin: 0;
+    border: 1px solid $greyBorder;
     border-radius: 4px;
-    padding: 1rem;
+    padding: 1rem 1.25rem;
+    background: $white;
+
+    legend {
+      padding: 0 0.35rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
   }
 
   &__preview-content {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.25rem;
     flex-wrap: wrap;
   }
 
@@ -41,5 +103,17 @@
     max-height: 3rem;
     max-width: 10rem;
     object-fit: contain;
+  }
+}
+
+@media (max-width: 900px) {
+  .survey-info-branding-form {
+    &__logos {
+      grid-template-columns: 1fr;
+    }
+
+    &__logo-controls {
+      flex-direction: column;
+    }
   }
 }

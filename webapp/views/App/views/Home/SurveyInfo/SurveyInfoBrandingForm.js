@@ -9,7 +9,7 @@ import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 
-import { Button } from '@webapp/components'
+import { Button, ColorInput } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
@@ -83,7 +83,7 @@ export const SurveyInfoBrandingForm = (props) => {
   const onPrimaryColorChange = useCallback(
     (value) => {
       const next = { ...branding }
-      if (!value.trim()) {
+      if (!value?.trim()) {
         delete next[brandingKeys.primaryColor]
       } else {
         next[brandingKeys.primaryColor] = value
@@ -163,16 +163,15 @@ export const SurveyInfoBrandingForm = (props) => {
   const renderLogoSection = ({ logoKey, labelKey, urlValue, urlValidation, logoSrc, inputRef, onFileChange }) => (
     <fieldset className="survey-info-branding-form__logo-section" key={logoKey}>
       <legend>{i18n.t(labelKey)}</legend>
-      <FormItem label="homeView:surveyInfo.branding.logoUrl">
+      <div className="survey-info-branding-form__logo-controls">
         <Input
           value={urlValue}
           onChange={(value) => onLogoUrlChange(logoKey, value)}
           readOnly={readOnly}
           validation={urlValidation}
+          placeholder={i18n.t('homeView:surveyInfo.branding.logoUrl')}
         />
-      </FormItem>
-      {!readOnly && (
-        <FormItem label="homeView:surveyInfo.branding.uploadLogo">
+        {!readOnly && (
           <div className="survey-info-branding-form__upload">
             <input
               ref={inputRef}
@@ -188,8 +187,8 @@ export const SurveyInfoBrandingForm = (props) => {
               size="small"
             />
           </div>
-        </FormItem>
-      )}
+        )}
+      </div>
       {logoSrc && (
         <div className="survey-info-branding-form__logo-preview">
           <img alt="" src={logoSrc} />
@@ -201,34 +200,35 @@ export const SurveyInfoBrandingForm = (props) => {
   return (
     <div className="form survey-info-branding-form">
       <FormItem label="homeView:surveyInfo.branding.primaryColor">
-        <Input
-          value={primaryColor}
-          onChange={onPrimaryColorChange}
-          readOnly={readOnly}
-          validation={primaryColorValidation}
-          placeholder="#RRGGBB"
-        />
+        <ColorInput disabled={readOnly} onChange={onPrimaryColorChange} value={primaryColor || ''} />
+        {primaryColorValidation && (
+          <span className="survey-info-branding-form__field-error">
+            {i18n.t('homeView:surveyInfo.branding.invalidPrimaryColor')}
+          </span>
+        )}
       </FormItem>
 
-      {renderLogoSection({
-        logoKey: brandingKeys.surveyLogo,
-        labelKey: 'homeView:surveyInfo.branding.surveyLogo',
-        urlValue: surveyLogo[brandingKeys.url] ?? '',
-        urlValidation: surveyLogoUrlValidation,
-        logoSrc: surveyLogoSrc,
-        inputRef: surveyLogoInputRef,
-        onFileChange: onSurveyLogoFileChange,
-      })}
+      <div className="survey-info-branding-form__logos">
+        {renderLogoSection({
+          logoKey: brandingKeys.surveyLogo,
+          labelKey: 'homeView:surveyInfo.branding.surveyLogo',
+          urlValue: surveyLogo[brandingKeys.url] ?? '',
+          urlValidation: surveyLogoUrlValidation,
+          logoSrc: surveyLogoSrc,
+          inputRef: surveyLogoInputRef,
+          onFileChange: onSurveyLogoFileChange,
+        })}
 
-      {renderLogoSection({
-        logoKey: brandingKeys.countryLogo,
-        labelKey: 'homeView:surveyInfo.branding.countryLogo',
-        urlValue: countryLogo[brandingKeys.url] ?? '',
-        urlValidation: countryLogoUrlValidation,
-        logoSrc: countryLogoSrc,
-        inputRef: countryLogoInputRef,
-        onFileChange: onCountryLogoFileChange,
-      })}
+        {renderLogoSection({
+          logoKey: brandingKeys.countryLogo,
+          labelKey: 'homeView:surveyInfo.branding.countryLogo',
+          urlValue: countryLogo[brandingKeys.url] ?? '',
+          urlValidation: countryLogoUrlValidation,
+          logoSrc: countryLogoSrc,
+          inputRef: countryLogoInputRef,
+          onFileChange: onCountryLogoFileChange,
+        })}
+      </div>
 
       <fieldset className="survey-info-branding-form__preview">
         <legend>{i18n.t('homeView:surveyInfo.branding.preview')}</legend>
