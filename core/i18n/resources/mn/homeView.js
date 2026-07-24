@@ -72,8 +72,23 @@ export default {
     noRecordsAddedInSelectedPeriod: 'Сонгогдсон хугацаанд бичлэг нэмэгдээгүй',
   },
   surveyDeleted: 'Судалгаа {{surveyName}} устгагдсан',
+  landing: {
+    enter: 'Орох',
+    openDashboard: 'Хяналтын самбар нээх',
+  },
   surveyInfo: {
     basic: 'Үндсэн мэдээлэл',
+    branding: {
+      title: 'Брэнд',
+      primaryColor: 'Үндсэн өнгө',
+      surveyLogo: 'Судалгааны лого',
+      countryLogo: 'Улс / яамны лого',
+      logoUrl: 'Логоны URL (https)',
+      uploadLogo: 'Лого байршуулах',
+      preview: 'Урьдчилан харах',
+      invalidPrimaryColor: 'Зөв #RRGGBB өнгө оруулна уу эсвэл хоосон үлдээнэ үү',
+      invalidLogoUrl: 'Зөв https URL оруулна уу эсвэл хоосон үлдээнэ үү',
+    },
     configuration: {
       title: 'Тохиргоо',
       filesTotalSpace: 'Файлуудын нийт зай (ГБ)',

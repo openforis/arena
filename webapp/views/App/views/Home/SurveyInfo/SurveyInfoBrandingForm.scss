@@ -1,0 +1,45 @@
+.survey-info-branding-form {
+  max-width: 40rem;
+
+  &__logo-section {
+    margin-top: 1.5rem;
+    border: none;
+    padding: 0;
+  }
+
+  &__upload {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__file-input {
+    display: none;
+  }
+
+  &__logo-preview img {
+    max-height: 4rem;
+    max-width: 12rem;
+    object-fit: contain;
+  }
+
+  &__preview {
+    margin-top: 2rem;
+    border: 1px solid var(--color-border, #ddd);
+    border-radius: 4px;
+    padding: 1rem;
+  }
+
+  &__preview-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__preview-logo {
+    max-height: 3rem;
+    max-width: 10rem;
+    object-fit: contain;
+  }
+}

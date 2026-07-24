@@ -60,8 +60,23 @@ export default {
     noRecordsAddedInSelectedPeriod: 'Nenhum registro adicionado no período selecionado',
   },
   surveyDeleted: 'O inventário {{surveyName}} foi excluído',
+  landing: {
+    enter: 'Entrar',
+    openDashboard: 'Abrir painel',
+  },
   surveyInfo: {
     basic: 'Informações básicas',
+    branding: {
+      title: 'Marca',
+      primaryColor: 'Cor primária',
+      surveyLogo: 'Logo do inventário',
+      countryLogo: 'Logo do país / ministério',
+      logoUrl: 'URL do logo (https)',
+      uploadLogo: 'Enviar logo',
+      preview: 'Pré-visualização',
+      invalidPrimaryColor: 'Insira uma cor #RRGGBB válida ou deixe em branco',
+      invalidLogoUrl: 'Insira uma URL https válida ou deixe em branco',
+    },
     configuration: {
       title: 'Configuração',
       filesTotalSpace: 'Espaço total para arquivos (GB)',

@@ -61,8 +61,23 @@ export default {
     noRecordsAddedInSelectedPeriod: 'Aucun enregistrement ajouté dans la période sélectionnée',
   },
   surveyDeleted: 'Le formulaire {{surveyName}} a été supprimé',
+  landing: {
+    enter: 'Entrer',
+    openDashboard: 'Ouvrir le tableau de bord',
+  },
   surveyInfo: {
     basic: 'Informations de base',
+    branding: {
+      title: 'Image de marque',
+      primaryColor: 'Couleur principale',
+      surveyLogo: 'Logo du formulaire',
+      countryLogo: 'Logo pays / ministère',
+      logoUrl: 'URL du logo (https)',
+      uploadLogo: 'Téléverser le logo',
+      preview: 'Aperçu',
+      invalidPrimaryColor: 'Saisissez une couleur #RRGGBB valide ou laissez vide',
+      invalidLogoUrl: 'Saisissez une URL https valide ou laissez vide',
+    },
     configuration: {
       title: 'Configuration',
       filesTotalSpace: 'Espace total des fichiers (Go)',

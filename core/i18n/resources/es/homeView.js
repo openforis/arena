@@ -59,8 +59,23 @@ export default {
     noRecordsAddedInSelectedPeriod: 'No se añadieron registros en el período seleccionado',
   },
   surveyDeleted: 'La encuesta {{surveyName}} ha sido eliminada',
+  landing: {
+    enter: 'Entrar',
+    openDashboard: 'Abrir panel',
+  },
   surveyInfo: {
     basic: 'Información básica',
+    branding: {
+      title: 'Marca',
+      primaryColor: 'Color primario',
+      surveyLogo: 'Logo de la encuesta',
+      countryLogo: 'Logo del país / ministerio',
+      logoUrl: 'URL del logo (https)',
+      uploadLogo: 'Subir logo',
+      preview: 'Vista previa',
+      invalidPrimaryColor: 'Introduzca un color #RRGGBB válido o déjelo vacío',
+      invalidLogoUrl: 'Introduzca una URL https válida o déjela vacía',
+    },
     configuration: {
       title: 'Configuración',
       filesTotalSpace: 'Espacio total de archivos (GB)',

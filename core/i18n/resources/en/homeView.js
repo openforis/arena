@@ -61,8 +61,23 @@ export default {
     noRecordsAddedInSelectedPeriod: 'No records added in the selected period',
   },
   surveyDeleted: 'Survey {{surveyName}} has been deleted',
+  landing: {
+    enter: 'Enter',
+    openDashboard: 'Open dashboard',
+  },
   surveyInfo: {
     basic: 'Basic info',
+    branding: {
+      title: 'Branding',
+      primaryColor: 'Primary color',
+      surveyLogo: 'Survey logo',
+      countryLogo: 'Country / ministry logo',
+      logoUrl: 'Logo URL (https)',
+      uploadLogo: 'Upload logo',
+      preview: 'Preview',
+      invalidPrimaryColor: 'Enter a valid #RRGGBB color or leave empty',
+      invalidLogoUrl: 'Enter a valid https URL or leave empty',
+    },
     configuration: {
       title: 'Configuration',
       filesTotalSpace: 'Files total space (GB)',

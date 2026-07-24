@@ -72,8 +72,23 @@ export default {
     noRecordsAddedInSelectedPeriod: 'Нет записей, добавленных в выбранный период',
   },
   surveyDeleted: 'Опрос {{surveyName}} был удален',
+  landing: {
+    enter: 'Войти',
+    openDashboard: 'Открыть панель',
+  },
   surveyInfo: {
     basic: 'Основная информация',
+    branding: {
+      title: 'Брендинг',
+      primaryColor: 'Основной цвет',
+      surveyLogo: 'Логотип опроса',
+      countryLogo: 'Логотип страны / министерства',
+      logoUrl: 'URL логотипа (https)',
+      uploadLogo: 'Загрузить логотип',
+      preview: 'Предпросмотр',
+      invalidPrimaryColor: 'Введите допустимый цвет #RRGGBB или оставьте пустым',
+      invalidLogoUrl: 'Введите допустимый https URL или оставьте пустым',
+    },
     configuration: {
       title: 'Конфигурация',
       filesTotalSpace: 'Общий объем файлов (ГБ)',
