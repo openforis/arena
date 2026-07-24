@@ -299,6 +299,7 @@ export default {
 
   appModules: {
     home: 'Нүүр хуудас',
+    landing: 'Тавтай морил',
     dashboard: 'Хяналтын самбар',
     surveyNew: 'Шинэ судалгаа',
     surveys: 'Судалгаанууд',

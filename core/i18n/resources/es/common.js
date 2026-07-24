@@ -272,6 +272,7 @@ export default {
   },
   appModules: {
     home: 'Inicio',
+    landing: 'Bienvenida',
     dashboard: 'Panel de control',
     surveyNew: 'Nueva encuesta',
     surveys: 'Encuestas',

@@ -304,6 +304,7 @@ Deseja prosseguir?`,
 
   appModules: {
     home: 'Início',
+    landing: 'Boas-vindas',
     dashboard: 'Painel',
     surveyNew: 'Novo inventário',
     surveys: 'Inventários',
