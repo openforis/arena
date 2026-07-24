@@ -54,9 +54,6 @@ const UserGroupsList = (): React.ReactElement => {
         field: 'membersCount',
         headerName: i18n.t('usersView:userGroup.members'),
         flex: 1,
-        // The user groups list endpoint doesn't return membersCount (it only returns rows with
-        // props), so it defaults to 0 below; this is a known, accepted limitation, out of scope to fix here.
-        valueGetter: (_value, row) => row.membersCount ?? 0,
       },
     ],
     [i18n, preferredLang]
