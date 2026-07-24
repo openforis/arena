@@ -38,7 +38,6 @@ export default {
 Нажмите «Перейти к опросам», чтобы открыть список опросов.`,
   userRoleUpdatedRefreshRequired: `Ваша роль в этом опросе была обновлена.  
 $t(common.pressRefreshToReloadPage)`,
-  userGroups: 'Группы пользователей',
   userGroup: {
     new: 'Новая группа',
     edit: 'Редактировать группу',
@@ -53,8 +52,11 @@ $t(common.pressRefreshToReloadPage)`,
     addMember: 'Добавить участника',
     noMembers: 'Пока нет участников',
     memberAlreadyInGroup: 'В настоящее время в "{{groupName}}"',
-    overview: 'Обзор',
-    table: 'Таблица',
+    tabs: {
+      groups: 'Группы пользователей',
+      assignments: 'Распределение по группам',
+      report: 'Отчёт по участникам',
+    },
     memberName: 'Имя участника',
     memberEmail: 'Email участника',
     memberRole: 'Роль в опросе',

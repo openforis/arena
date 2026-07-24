@@ -16,7 +16,7 @@ interface UseUserGroupsKanbanDndResult {
 }
 
 /**
- * Wires up cross-column drag-and-drop for the UserGroupsSummary Kanban board, using
+ * Wires up cross-column drag-and-drop for the UserGroupsOverview Kanban board, using
  * @shopify/draggable's Sortable (which natively supports multiple containers). Dropping a user
  * card into a different column calls onChangeUserGroup with the target column's group uuid (or
  * null for the Unassigned column). Dropping within the same column is a no-op, since group

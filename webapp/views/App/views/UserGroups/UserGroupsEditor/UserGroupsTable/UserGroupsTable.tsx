@@ -46,7 +46,7 @@ const UserGroupsTable = (): React.ReactElement => {
     return <LoadingBar />
   }
 
-  return <DataGrid className="user-groups-table" columns={columns} rows={rows} autoHeight />
+  return <DataGrid className="user-groups-table" columns={columns} rows={rows} />
 }
 
 export default UserGroupsTable

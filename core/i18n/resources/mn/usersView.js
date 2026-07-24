@@ -37,7 +37,6 @@ export default {
 Судалгааны жагсаалтыг нээхийн тулд Судалгааны жагсаалт руу очих товчийг дарна уу.`,
   userRoleUpdatedRefreshRequired: `Таны энэ судалгаан дахь үүрэг шинэчлэгдлээ.  
 $t(common.pressRefreshToReloadPage)`,
-  userGroups: 'Хэрэглэгчийн бүлгүүд',
   userGroup: {
     new: 'Шинэ бүлэг',
     edit: 'Бүлэг засах',
@@ -52,8 +51,11 @@ $t(common.pressRefreshToReloadPage)`,
     addMember: 'Гишүүн нэмэх',
     noMembers: 'Гишүүн байхгүй байна',
     memberAlreadyInGroup: '"{{groupName}}" бүлэгт байна',
-    overview: 'Тойм',
-    table: 'Хүснэгт',
+    tabs: {
+      groups: 'Хэрэглэгчийн бүлгүүд',
+      assignments: 'Гишүүдийн хуваарилалт',
+      report: 'Гишүүдийн тайлан',
+    },
     memberName: 'Гишүүний нэр',
     memberEmail: 'Гишүүний имэйл',
     memberRole: 'Судалгаан дахь үүрэг',
