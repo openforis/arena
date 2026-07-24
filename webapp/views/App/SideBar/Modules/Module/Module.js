@@ -13,21 +13,23 @@ const Module = forwardRef((props, ref) => {
 
   const isModuleHome = SideBarModule.isHome(module)
   const isSurveySelectionRequired = SideBarModule.isSurveySelectionRequired(module)
+  const hasChildren = SideBarModule.getChildren(module).length > 0
 
   const active = SideBarModule.isActive(pathname)(module)
   // All modules except home require the survey
   const disabledRequiredSurvey = isSurveySelectionRequired && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo))
   // Module home is disabled when page is on landing, other modules are disabled when there's no active survey
   const disabledModule = disabled || (isModuleHome ? active : disabledRequiredSurvey)
-  // Link to home is disabled when page is on landing, other root module links are always disabled
-  const disabledModuleLink = disabled || (isModuleHome ? active : true)
+  // Home link disabled when already on landing; root modules with children navigate via children/popup;
+  // leaf root modules (e.g. Dashboard) keep a clickable root link.
+  const disabledModuleLink = disabled || (isModuleHome ? active : hasChildren)
 
   return (
     <div
       className={`sidebar__module${active ? ' active' : ''}${isOver ? ' over' : ''}`}
       data-testid={TestId.sidebar.module(SideBarModule.getKey(module))}
       ref={ref}
-      onMouseEnter={isModuleHome || sideBarOpened ? null : () => onMouseEnter(module)}
+      onMouseEnter={isModuleHome || sideBarOpened || !hasChildren ? null : () => onMouseEnter(module)}
       aria-disabled={disabledModule}
     >
       <ModuleLink
