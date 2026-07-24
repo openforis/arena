@@ -1,0 +1,55 @@
+@use '~@webapp/style/vars' as *;
+
+.survey-landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  min-height: calc(100vh - #{$headerHeight});
+  padding: 2rem;
+  text-align: center;
+
+  &__logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  &__logo {
+    max-height: 6rem;
+    max-width: 16rem;
+    object-fit: contain;
+
+    &--country {
+      max-height: 5rem;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+    max-width: 48rem;
+  }
+
+  &__description {
+    margin: 0;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--colorGrey700, #616161);
+    max-width: 40rem;
+    white-space: pre-wrap;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+}

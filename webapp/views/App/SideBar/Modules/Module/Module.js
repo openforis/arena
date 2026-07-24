@@ -17,9 +17,9 @@ const Module = forwardRef((props, ref) => {
   const active = SideBarModule.isActive(pathname)(module)
   // All modules except home require the survey
   const disabledRequiredSurvey = isSurveySelectionRequired && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo))
-  // Module home is disabled when page is on dashboard, other modules are disabled when there's no active survey
+  // Module home is disabled when page is on landing, other modules are disabled when there's no active survey
   const disabledModule = disabled || (isModuleHome ? active : disabledRequiredSurvey)
-  // Link to home is disabled when page is on dashboard, other root module links are always disabled
+  // Link to home is disabled when page is on landing, other root module links are always disabled
   const disabledModuleLink = disabled || (isModuleHome ? active : true)
 
   return (

@@ -1,11 +1,11 @@
-
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import { appModules, homeModules } from '@webapp/app/appModules'
 import { useAuthCanCreateSurvey, useAuthCanCreateTemplate } from '@webapp/store/user/hooks'
 
-import Dashboard from './Dashboard'
 import CollectImportReport from './CollectImportReport'
+import Dashboard from './Dashboard'
+import Landing from './Landing'
 import SurveyList from './SurveyList'
 import SurveyCreate from './SurveyCreate'
 import SurveyInfo from './SurveyInfo'
@@ -19,8 +19,12 @@ const Home = () => {
   return (
     <ModuleSwitch
       moduleRoot={appModules.home}
-      moduleDefault={homeModules.dashboard}
+      moduleDefault={homeModules.landing}
       modules={[
+        {
+          component: Landing,
+          path: homeModules.landing.path,
+        },
         {
           component: Dashboard,
           path: homeModules.dashboard.path,

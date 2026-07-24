@@ -74,6 +74,10 @@ export const appModules = {
 // ==== Inner modules
 
 export const homeModules = {
+  landing: {
+    key: 'landing',
+    path: 'landing',
+  },
   dashboard: {
     key: 'dashboard',
     path: 'dashboard',
