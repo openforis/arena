@@ -62,17 +62,17 @@ const UserGroupsEditor = (): React.ReactElement => {
   const fillHeight = effectiveViewMode === ViewMode.assignments
 
   // The assignments and report tabs are only offered to users who can manage user groups; other
-  // users only ever see the groups list, so its tab is the only one always present. Content isn't
-  // rendered via each item's renderContent - it's kept as a sibling of the bar below (see return)
-  // instead of nested inside it, so the assignments tab's Kanban board can still fill the page's
-  // remaining height; Tabs nests renderContent's output inside the bar's row, which would defeat
-  // that layout.
+  // users only ever see the groups list, so its tab is the only one always present.
   const tabItems = [
-    { key: ViewMode.groups, label: 'usersView:userGroup.tabs.groups' },
+    { key: ViewMode.groups, label: 'usersView:userGroup.tabs.groups', renderContent: () => <UserGroupsList /> },
     ...(canManage
       ? [
-          { key: ViewMode.assignments, label: 'usersView:userGroup.tabs.assignments' },
-          { key: ViewMode.report, label: 'usersView:userGroup.tabs.report' },
+          {
+            key: ViewMode.assignments,
+            label: 'usersView:userGroup.tabs.assignments',
+            renderContent: () => <UserGroupsOverview />,
+          },
+          { key: ViewMode.report, label: 'usersView:userGroup.tabs.report', renderContent: () => <UserGroupsTable /> },
         ]
       : []),
   ]
@@ -83,6 +83,7 @@ const UserGroupsEditor = (): React.ReactElement => {
         <Tabs fullWidth items={tabItems} selectedItemKey={effectiveViewMode} onChange={setViewMode} />
         {canManage && (
           <ButtonIconAdd
+            className="btn-add user-groups-editor__add"
             showLabel
             label="usersView:userGroup.new"
             onClick={() => navigate(appModuleUri(userModules.userGroupNew as AppModule))}
@@ -90,9 +91,6 @@ const UserGroupsEditor = (): React.ReactElement => {
           />
         )}
       </div>
-      {effectiveViewMode === ViewMode.assignments && <UserGroupsOverview />}
-      {effectiveViewMode === ViewMode.report && <UserGroupsTable />}
-      {effectiveViewMode === ViewMode.groups && <UserGroupsList />}
     </div>
   )
 }

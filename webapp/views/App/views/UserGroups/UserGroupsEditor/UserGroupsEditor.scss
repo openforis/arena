@@ -7,13 +7,30 @@
 .user-groups-editor {
   &__bar {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    // default (stretch) alignment, not top/center: the fill case (see below) needs .tabs-wrapper
+    // stretched to this row's full height so it can pass a definite height down to the Kanban
+    // board, which is what lets its columns compute their own max height and scroll internally.
     gap: 1rem;
 
     .tabs-wrapper {
       flex: 1;
+      // flex items default to a min-width based on their content's intrinsic width, so a wide
+      // tab (e.g. the members report table) would otherwise force this row - and the tab strip
+      // with it - wider than the page instead of scrolling.
+      min-width: 0;
     }
+  }
+
+  &__add {
+    // opt out of the bar's stretch alignment so the button keeps its natural height and stays
+    // pinned to the top-right corner instead of stretching down the full height of the row.
+    align-self: flex-start;
+  }
+
+  .tab-content {
+    // scroll a tab's own content independently of the tab strip above it, so a tall or wide tab
+    // (e.g. the members report table) never pushes the strip out of view with no way back to it.
+    overflow: auto;
   }
 
   &--fill {
@@ -22,12 +39,29 @@
     height: 100%;
 
     .user-groups-editor__bar {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .tabs-wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .MuiTabs-root {
       flex: 0 0 auto;
     }
 
-    .user-groups-overview {
+    .tab-content {
       flex: 1;
       min-height: 0;
+      // the Kanban board manages its own inner scroll regions (one per column) instead
+      overflow: hidden;
+    }
+
+    .user-groups-overview {
+      height: 100%;
     }
   }
 }
