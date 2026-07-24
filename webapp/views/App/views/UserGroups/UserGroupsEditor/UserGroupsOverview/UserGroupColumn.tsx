@@ -8,7 +8,7 @@ import * as UserGroup from '@core/user/userGroup/userGroup'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-import type { SurveyUserType } from './useUserGroupsSummary'
+import type { SurveyUserType } from './useUserGroupsOverview'
 import UserCard from './UserCard'
 
 type Props = {
@@ -21,7 +21,7 @@ type Props = {
 }
 
 /**
- * One column of the UserGroupsSummary Kanban board: either a user group or the "Unassigned"
+ * One column of the UserGroupsOverview Kanban board: either a user group or the "Unassigned"
  * bucket (when group is null), listing the survey users currently assigned to it as cards.
  *
  * @param props0 - The component props.

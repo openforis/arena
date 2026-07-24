@@ -23,7 +23,7 @@ interface FetchedData {
   groupUuidByUserUuid: Record<string, string>
 }
 
-interface UseUserGroupsSummaryResult {
+interface UseUserGroupsOverviewResult {
   groups: UserGroupType[]
   users: SurveyUserType[]
   groupUuidByUserUuid: Record<string, string>
@@ -38,10 +38,10 @@ interface UseUserGroupsSummaryResult {
  * handler to move a user to a different group (or unassign them) by optimistically updating that
  * map and then removing/adding group membership on the server.
  *
- * @returns {UseUserGroupsSummaryResult} The groups, survey users, the userUuid -> groupUuid map,
+ * @returns {UseUserGroupsOverviewResult} The groups, survey users, the userUuid -> groupUuid map,
  *   and the handler to change a user's group.
  */
-export const useUserGroupsSummary = (): UseUserGroupsSummaryResult => {
+export const useUserGroupsOverview = (): UseUserGroupsOverviewResult => {
   // NotificationActions dispatches a thunk (function), not a plain action, but the untyped store
   // JS modules make useDispatch() infer the plain redux `Dispatch<UnknownAction>` type; type it
   // explicitly as a thunk dispatch here, following the precedent in useEditUserGroup.ts /
@@ -131,7 +131,7 @@ export const useUserGroupsSummary = (): UseUserGroupsSummaryResult => {
   // reload (groups + users + every group's members) on top of the two mutation requests. On failure,
   // the mapping is rolled back to groupUuidOld so the card returns to its original column. Also
   // marks the user pending for the duration of the request (cleared in `finally`, so it's cleared
-  // on both success and failure): UserGroupsSummary uses pendingUserUuids to keep the card from
+  // on both success and failure): UserGroupsOverview uses pendingUserUuids to keep the card from
   // being dragged again until this call settles, since a second concurrent call for the same user
   // would race its remove/add requests against this one and could leave the two calls' optimistic
   // updates/rollbacks stomping on each other.

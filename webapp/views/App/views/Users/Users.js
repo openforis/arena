@@ -19,8 +19,8 @@ import UserEdit from './UserEdit'
 import { UsersAccessRequest } from './UsersAccessRequest'
 import UserPasswordChange from './UserPasswordChange'
 import User2FADevice from './User2FADevice'
-import UserGroupsOverview from './UserGroupsOverview'
-import UserGroupEdit from './UserGroupEdit'
+import UserGroupsEditor from '../UserGroups'
+import UserGroupEdit from '../UserGroups/UserGroupEdit'
 
 const Users = () => {
   const user = useUser()
@@ -55,7 +55,7 @@ const Users = () => {
           path: userModules.userInvite.path,
         },
         {
-          component: UserGroupsOverview,
+          component: UserGroupsEditor,
           path: userModules.userGroups.path,
         },
         {

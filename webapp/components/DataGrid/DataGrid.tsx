@@ -29,6 +29,7 @@ type Props = {
   getRowId?: GridRowIdGetter
   hideFooterPagination?: boolean
   initialState?: GridInitialState
+  onRowClick?: DataGridProps['onRowClick']
   onRowDoubleClick?: DataGridProps['onRowDoubleClick']
   rows: GridRowsProp
 }
@@ -58,6 +59,7 @@ const DataGrid = (props: Props) => {
     getRowId,
     hideFooterPagination = false,
     initialState,
+    onRowClick,
     onRowDoubleClick,
     rows,
   } = props
@@ -80,6 +82,7 @@ const DataGrid = (props: Props) => {
       getRowId={getRowId}
       hideFooterPagination={hideFooterPagination}
       initialState={initialState}
+      onRowClick={onRowClick}
       onRowDoubleClick={onRowDoubleClick}
       rows={rows}
       slots={allowExportToCsv ? { footer: FooterWithExport({ exportFileName }) } : undefined}
