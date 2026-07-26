@@ -22,9 +22,23 @@ const NodeDefFormItem = (props) => {
     onKeyFieldBlur = undefined,
     onKeyFieldFocus = undefined,
     onKeyFieldLockToggle = undefined,
+    onQualifierFieldBlur = undefined,
+    onQualifierFieldFocus = undefined,
+    onQualifierFieldLockToggle = undefined,
     parentNode = null,
+    qualifierFieldLocked = false,
+    qualifierFieldLockVisible = false,
     ...otherProps
   } = props
+
+  const onFieldFocus = (event) => {
+    onKeyFieldFocus?.(event)
+    onQualifierFieldFocus?.(event)
+  }
+  const onFieldBlur = (event) => {
+    onKeyFieldBlur?.(event)
+    onQualifierFieldBlur?.(event)
+  }
 
   const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), {
     edit,
@@ -64,6 +78,9 @@ const NodeDefFormItem = (props) => {
           keyFieldLocked={keyFieldLocked}
           keyFieldLockVisible={keyFieldLockVisible}
           onKeyFieldLockToggle={onKeyFieldLockToggle}
+          qualifierFieldLocked={qualifierFieldLocked}
+          qualifierFieldLockVisible={qualifierFieldLockVisible}
+          onQualifierFieldLockToggle={onQualifierFieldLockToggle}
         />
       }
       className="survey-form__node-def-form-item"
@@ -71,8 +88,8 @@ const NodeDefFormItem = (props) => {
       <fieldset
         aria-label={label}
         className="survey-form__node-def-fieldset survey-form__node-def-form-item-content"
-        onFocus={onKeyFieldFocus}
-        onBlur={onKeyFieldBlur}
+        onFocus={onFieldFocus}
+        onBlur={onFieldBlur}
       >
         {formItemContent}
       </fieldset>
@@ -92,7 +109,12 @@ NodeDefFormItem.propTypes = {
   onKeyFieldBlur: PropTypes.func,
   onKeyFieldFocus: PropTypes.func,
   onKeyFieldLockToggle: PropTypes.func,
+  onQualifierFieldBlur: PropTypes.func,
+  onQualifierFieldFocus: PropTypes.func,
+  onQualifierFieldLockToggle: PropTypes.func,
   parentNode: PropTypes.object,
+  qualifierFieldLocked: PropTypes.bool,
+  qualifierFieldLockVisible: PropTypes.bool,
 }
 
 export default NodeDefFormItem
