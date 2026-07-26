@@ -130,6 +130,11 @@ export default {
     countMaxInvalid: '"Contagem máxima" inválida',
     countMinInvalid: '"Contagem mínima" inválida',
     readOnlyCannotHaveEditableIf: 'Um nó somente leitura não pode ter a condição "Editable if"',
+    qualifierCannotHaveApplicableExpression:
+      'O atributo qualificador não pode ter a condição "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    qualifierCannotHaveEditabilityRule: 'O atributo qualificador não pode ter regras de editabilidade definidas',
+    qualifierCannotHaveDefaultValues: 'O atributo qualificador não pode ter valores padrão',
+    qualifierCannotHaveValidations: 'O atributo qualificador não pode ter regras de validação definidas',
   },
 
   record: {
