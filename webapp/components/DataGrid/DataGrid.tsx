@@ -9,6 +9,7 @@ import {
   GridInitialState,
   GridRowClassNameParams,
   GridRowIdGetter,
+  GridRowSelectionModel,
   GridRowsProp,
   GridToolbarExport,
 } from '@mui/x-data-grid'
@@ -29,19 +30,22 @@ type Props = {
   getRowId?: GridRowIdGetter
   hideFooterPagination?: boolean
   initialState?: GridInitialState
+  isRowSelectable?: DataGridProps['isRowSelectable']
   onRowClick?: DataGridProps['onRowClick']
   onRowDoubleClick?: DataGridProps['onRowDoubleClick']
+  onRowSelectionModelChange?: (model: GridRowSelectionModel) => void
   rows: GridRowsProp
+  rowSelectionModel?: GridRowSelectionModel
 }
 
 const FooterWithExport =
   ({ exportFileName }: { exportFileName?: string }) =>
-  () => (
-    <GridFooterContainer>
-      <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
-      <GridFooter />
-    </GridFooterContainer>
-  )
+    () => (
+      <GridFooterContainer>
+        <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
+        <GridFooter />
+      </GridFooterContainer>
+    )
 
 const DataGrid = (props: Props) => {
   const {
@@ -59,9 +63,12 @@ const DataGrid = (props: Props) => {
     getRowId,
     hideFooterPagination = false,
     initialState,
+    isRowSelectable,
     onRowClick,
     onRowDoubleClick,
+    onRowSelectionModelChange,
     rows,
+    rowSelectionModel,
   } = props
 
   const columns = useMemo(() => columnsProp.map((col) => ({ ...col, disableColumnMenu: true })), [columnsProp])
@@ -82,9 +89,12 @@ const DataGrid = (props: Props) => {
       getRowId={getRowId}
       hideFooterPagination={hideFooterPagination}
       initialState={initialState}
+      isRowSelectable={isRowSelectable}
       onRowClick={onRowClick}
       onRowDoubleClick={onRowDoubleClick}
+      onRowSelectionModelChange={onRowSelectionModelChange}
       rows={rows}
+      rowSelectionModel={rowSelectionModel}
       slots={allowExportToCsv ? { footer: FooterWithExport({ exportFileName }) } : undefined}
     />
   )
