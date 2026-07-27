@@ -1,3 +1,5 @@
+import './ArenaImportPreviewDialog.scss'
+
 import { useMemo, useState } from 'react'
 import { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid'
 
@@ -88,15 +90,17 @@ export const ArenaImportPreviewDialog = (props: Props) => {
     >
       <ModalBody>
         <p>{i18n.t('dataImportView:importPreview.skipInfo')}</p>
-        <DataGrid
-          autoHeight
-          checkboxSelection
-          columns={columns}
-          getRowId={(row: any) => row.recordUuid}
-          onRowSelectionModelChange={setSelectionModel}
-          rows={items}
-          rowSelectionModel={selectionModel}
-        />
+        <div className="arena-import-preview-dialog__grid-wrapper">
+          <DataGrid
+            checkboxSelection
+            columns={columns}
+            getRowId={(row: any) => row.recordUuid}
+            isRowSelectable={(params) => params.row.action !== RecordImportAction.skip}
+            onRowSelectionModelChange={setSelectionModel}
+            rows={items}
+            rowSelectionModel={selectionModel}
+          />
+        </div>
       </ModalBody>
       <ModalFooter>
         <Button label="common.cancel" onClick={onCancel} variant="outlined" />

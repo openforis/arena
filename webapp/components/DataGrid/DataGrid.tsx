@@ -30,6 +30,7 @@ type Props = {
   getRowId?: GridRowIdGetter
   hideFooterPagination?: boolean
   initialState?: GridInitialState
+  isRowSelectable?: DataGridProps['isRowSelectable']
   onRowDoubleClick?: DataGridProps['onRowDoubleClick']
   onRowSelectionModelChange?: (model: GridRowSelectionModel) => void
   rows: GridRowsProp
@@ -61,6 +62,7 @@ const DataGrid = (props: Props) => {
     getRowId,
     hideFooterPagination = false,
     initialState,
+    isRowSelectable,
     onRowDoubleClick,
     onRowSelectionModelChange,
     rows,
@@ -85,6 +87,7 @@ const DataGrid = (props: Props) => {
       getRowId={getRowId}
       hideFooterPagination={hideFooterPagination}
       initialState={initialState}
+      isRowSelectable={isRowSelectable}
       onRowDoubleClick={onRowDoubleClick}
       onRowSelectionModelChange={onRowSelectionModelChange}
       rows={rows}

@@ -41,7 +41,7 @@ export default {
     title: 'Import preview',
     generatePreview: 'Generate preview',
     skipInfo:
-      'Records marked as "Skip" will not be imported even if selected, since an existing, more recently modified record already exists.',
+      'Records marked as "Skip" cannot be selected: an existing, more recently modified record already exists, so they will not be imported.',
     confirmImport: 'Import selected records ({{count}})',
     columns: {
       exists: 'Exists',
