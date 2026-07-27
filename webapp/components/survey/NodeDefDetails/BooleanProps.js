@@ -38,7 +38,7 @@ const BooleanProps = (props) => {
     if (A.isEmpty(NodeDef.getLabelValue(nodeDef))) {
       selectLabelValue(NodeDef.booleanLabelValues.trueFalse)
     }
-  }, [nodeDef])
+  }, [nodeDef, selectLabelValue])
 
   return (
     <FormItem label="nodeDefEdit.booleanProps.labelValue">
