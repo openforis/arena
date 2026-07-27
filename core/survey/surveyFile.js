@@ -37,6 +37,7 @@ export const SurveyFileType = {
   surveyDocImage: 'surveyDocImage',
   brandingSurveyLogo: 'brandingSurveyLogo',
   brandingCountryLogo: 'brandingCountryLogo',
+  brandingLandingBackground: 'brandingLandingBackground',
 }
 
 export const createFile = ({

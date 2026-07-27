@@ -5,10 +5,32 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
   min-height: calc(100vh - #{$headerHeight});
   padding: 2rem;
   text-align: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+
+  &--with-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba($white, 0.88);
+    pointer-events: none;
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    max-width: 48rem;
+    width: 100%;
+  }
 
   &__logos {
     display: flex;
@@ -30,14 +52,12 @@
 
   &__title {
     margin: 0;
-    font-size: 2rem;
     font-weight: 600;
     max-width: 48rem;
   }
 
   &__description {
     margin: 0;
-    font-size: 1.125rem;
     line-height: 1.6;
     color: var(--colorGrey700, #616161);
     max-width: 40rem;

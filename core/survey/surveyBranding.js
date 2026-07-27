@@ -5,11 +5,48 @@ export const keys = {
   primaryColor: 'primaryColor',
   surveyLogo: 'surveyLogo',
   countryLogo: 'countryLogo',
+  landingBackground: 'landingBackground',
+  titleFontSize: 'titleFontSize',
+  descriptionFontSize: 'descriptionFontSize',
   fileUuid: 'fileUuid',
   url: 'url',
 }
 
+export const fontSizePreset = {
+  small: 'small',
+  default: 'default',
+  large: 'large',
+}
+
+/** @type {readonly string[]} */
+export const fontSizePresetValues = Object.freeze(Object.values(fontSizePreset))
+
+/** Maximum landing background upload size in bytes (5 MiB). */
+export const LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
+
 const HEX_COLOR_REGEXP = /^#[0-9A-Fa-f]{6}$/
+
+const titleFontSizeRemByPreset = {
+  [fontSizePreset.small]: '1.5rem',
+  [fontSizePreset.default]: '2rem',
+  [fontSizePreset.large]: '2.5rem',
+}
+
+const descriptionFontSizeRemByPreset = {
+  [fontSizePreset.small]: '1rem',
+  [fontSizePreset.default]: '1.125rem',
+  [fontSizePreset.large]: '1.25rem',
+}
+
+const imageDescriptorKeys = [keys.surveyLogo, keys.countryLogo, keys.landingBackground]
+
+/**
+ * Returns whether value is a valid font size preset.
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export const isValidFontSizePreset = (value) =>
+  typeof value === 'string' && fontSizePresetValues.includes(value)
 
 /**
  * Returns whether value is a valid #RRGGBB primary color.
@@ -35,7 +72,7 @@ export const isValidLogoUrl = (value) => {
 
 /**
  * Returns whether branding props are valid for save.
- * Empty primaryColor and empty logo URLs are allowed.
+ * Empty optional fields are allowed.
  * @param {object} branding
  * @returns {boolean}
  */
@@ -43,8 +80,14 @@ export const isBrandingValid = (branding = {}) => {
   const primaryColor = branding[keys.primaryColor]
   if (primaryColor && !isValidPrimaryColor(primaryColor)) return false
 
-  for (const logoKey of [keys.surveyLogo, keys.countryLogo]) {
-    const url = branding[logoKey]?.[keys.url]
+  const titleFontSize = branding[keys.titleFontSize]
+  if (titleFontSize && !isValidFontSizePreset(titleFontSize)) return false
+
+  const descriptionFontSize = branding[keys.descriptionFontSize]
+  if (descriptionFontSize && !isValidFontSizePreset(descriptionFontSize)) return false
+
+  for (const imageKey of imageDescriptorKeys) {
+    const url = branding[imageKey]?.[keys.url]
     if (url && !isValidLogoUrl(url)) return false
   }
 
@@ -68,8 +111,44 @@ export const getPrimaryColor = (surveyInfo) => {
   return isValidPrimaryColor(color) ? color : null
 }
 
+/**
+ * Returns title font size preset or default.
+ * @param {object} surveyInfo
+ * @returns {string}
+ */
+export const getTitleFontSizePreset = (surveyInfo) => {
+  const preset = getBranding(surveyInfo)[keys.titleFontSize]
+  return isValidFontSizePreset(preset) ? preset : fontSizePreset.default
+}
+
+/**
+ * Returns description font size preset or default.
+ * @param {object} surveyInfo
+ * @returns {string}
+ */
+export const getDescriptionFontSizePreset = (surveyInfo) => {
+  const preset = getBranding(surveyInfo)[keys.descriptionFontSize]
+  return isValidFontSizePreset(preset) ? preset : fontSizePreset.default
+}
+
+/**
+ * Returns CSS font-size for the landing title.
+ * @param {object} surveyInfo
+ * @returns {string}
+ */
+export const getTitleFontSizeRem = (surveyInfo) => titleFontSizeRemByPreset[getTitleFontSizePreset(surveyInfo)]
+
+/**
+ * Returns CSS font-size for the landing description.
+ * @param {object} surveyInfo
+ * @returns {string}
+ */
+export const getDescriptionFontSizeRem = (surveyInfo) =>
+  descriptionFontSizeRemByPreset[getDescriptionFontSizePreset(surveyInfo)]
+
 export const getSurveyLogo = (surveyInfo) => getBranding(surveyInfo)[keys.surveyLogo] || null
 export const getCountryLogo = (surveyInfo) => getBranding(surveyInfo)[keys.countryLogo] || null
+export const getLandingBackground = (surveyInfo) => getBranding(surveyInfo)[keys.landingBackground] || null
 
 /**
  * Resolves display src for a logo descriptor.
@@ -88,14 +167,14 @@ export const resolveLogoSrc = (logo, { surveyId, getFileDownloadUrl }) => {
 }
 
 /**
- * Returns file UUIDs referenced by branding logos.
+ * Returns file UUIDs referenced by branding image descriptors.
  * @param {object} branding
  * @returns {string[]}
  */
 export const getBrandingFileUuids = (branding = {}) => {
   const uuids = []
-  for (const logoKey of [keys.surveyLogo, keys.countryLogo]) {
-    const fileUuid = branding?.[logoKey]?.[keys.fileUuid]
+  for (const imageKey of imageDescriptorKeys) {
+    const fileUuid = branding?.[imageKey]?.[keys.fileUuid]
     if (typeof fileUuid === 'string' && fileUuid.length > 0) uuids.push(fileUuid)
   }
   return uuids

@@ -61,7 +61,6 @@ export default {
   },
   surveyDeleted: 'O inventário {{surveyName}} foi excluído',
   landing: {
-    enter: 'Entrar',
     openDashboard: 'Abrir painel',
   },
   surveyInfo: {
@@ -69,11 +68,22 @@ export default {
     branding: {
       title: 'Marca',
       primaryColor: 'Cor primária',
+      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
+      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      fontSizePreset: {
+        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
+        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
+        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+      },
       surveyLogo: 'Logo do inventário',
       countryLogo: 'Logo do país / ministério',
+      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
       logoUrl: 'URL do logo (https)',
       uploadLogo: 'Enviar logo',
       preview: 'Pré-visualização',
+      previewTitle: '$t(homeView:surveyInfo.branding.previewTitle)',
+      previewDescription: '$t(homeView:surveyInfo.branding.previewDescription)',
+      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
       invalidPrimaryColor: 'Insira uma cor #RRGGBB válida ou deixe em branco',
       invalidLogoUrl: 'Insira uma URL https válida ou deixe em branco',
       invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',

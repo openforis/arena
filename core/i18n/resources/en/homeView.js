@@ -62,7 +62,6 @@ export default {
   },
   surveyDeleted: 'Survey {{surveyName}} has been deleted',
   landing: {
-    enter: 'Enter',
     openDashboard: 'Open dashboard',
   },
   surveyInfo: {
@@ -70,11 +69,22 @@ export default {
     branding: {
       title: 'Branding',
       primaryColor: 'Primary color',
+      titleFontSize: 'Title font size',
+      descriptionFontSize: 'Description font size',
+      fontSizePreset: {
+        small: 'Small',
+        default: 'Default',
+        large: 'Large',
+      },
       surveyLogo: 'Survey logo',
       countryLogo: 'Country / ministry logo',
+      landingBackground: 'Landing background image',
       logoUrl: 'Logo URL (https)',
-      uploadLogo: 'Upload logo',
+      uploadLogo: 'Upload image',
       preview: 'Preview',
+      previewTitle: 'Survey title',
+      previewDescription: 'Survey description preview text.',
+      backgroundFileTooLarge: 'Background image must be {{maxMb}} MB or smaller',
       invalidPrimaryColor: 'Enter a valid #RRGGBB color or leave empty',
       invalidLogoUrl: 'Enter a valid https URL or leave empty',
       invalidSaveBlocked: 'Fix invalid branding fields before saving survey info',

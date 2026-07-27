@@ -103,5 +103,53 @@ describe('SurveyBranding', () => {
       })
       expect(uuids.sort()).toEqual(['a', 'b'])
     })
+
+    it('collects landing background fileUuid', () => {
+      const uuids = SurveyBranding.getBrandingFileUuids({
+        landingBackground: { fileUuid: 'bg' },
+      })
+      expect(uuids).toEqual(['bg'])
+    })
+  })
+
+  describe('font size presets', () => {
+    it('validates preset values', () => {
+      expect(SurveyBranding.isValidFontSizePreset('small')).toBe(true)
+      expect(SurveyBranding.isValidFontSizePreset('default')).toBe(true)
+      expect(SurveyBranding.isValidFontSizePreset('large')).toBe(true)
+      expect(SurveyBranding.isValidFontSizePreset('huge')).toBe(false)
+    })
+
+    it('returns rem sizes for title and description', () => {
+      const surveyInfo = {
+        props: {
+          branding: {
+            titleFontSize: 'large',
+            descriptionFontSize: 'small',
+          },
+        },
+      }
+      expect(SurveyBranding.getTitleFontSizeRem(surveyInfo)).toBe('2.5rem')
+      expect(SurveyBranding.getDescriptionFontSizeRem(surveyInfo)).toBe('1rem')
+    })
+
+    it('defaults to default preset when unset', () => {
+      expect(SurveyBranding.getTitleFontSizeRem({ props: { branding: {} } })).toBe('2rem')
+      expect(SurveyBranding.getDescriptionFontSizeRem({ props: { branding: {} } })).toBe('1.125rem')
+    })
+  })
+
+  describe('isBrandingValid font sizes and background', () => {
+    it('rejects invalid font size preset', () => {
+      expect(SurveyBranding.isBrandingValid({ titleFontSize: 'xl' })).toBe(false)
+    })
+
+    it('accepts valid landing background url', () => {
+      expect(
+        SurveyBranding.isBrandingValid({
+          landingBackground: { url: 'https://example.com/bg.jpg' },
+        })
+      ).toBe(true)
+    })
   })
 })

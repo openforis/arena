@@ -73,7 +73,6 @@ export default {
   },
   surveyDeleted: 'Судалгаа {{surveyName}} устгагдсан',
   landing: {
-    enter: 'Орох',
     openDashboard: 'Хяналтын самбар нээх',
   },
   surveyInfo: {
@@ -81,11 +80,22 @@ export default {
     branding: {
       title: 'Брэнд',
       primaryColor: 'Үндсэн өнгө',
+      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
+      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      fontSizePreset: {
+        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
+        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
+        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+      },
       surveyLogo: 'Судалгааны лого',
       countryLogo: 'Улс / яамны лого',
+      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
       logoUrl: 'Логоны URL (https)',
       uploadLogo: 'Лого байршуулах',
       preview: 'Урьдчилан харах',
+      previewTitle: '$t(homeView:surveyInfo.branding.previewTitle)',
+      previewDescription: '$t(homeView:surveyInfo.branding.previewDescription)',
+      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
       invalidPrimaryColor: 'Зөв #RRGGBB өнгө оруулна уу эсвэл хоосон үлдээнэ үү',
       invalidLogoUrl: 'Зөв https URL оруулна уу эсвэл хоосон үлдээнэ үү',
       invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',

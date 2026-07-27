@@ -73,7 +73,6 @@ export default {
   },
   surveyDeleted: 'Опрос {{surveyName}} был удален',
   landing: {
-    enter: 'Войти',
     openDashboard: 'Открыть панель',
   },
   surveyInfo: {
@@ -81,11 +80,22 @@ export default {
     branding: {
       title: 'Брендинг',
       primaryColor: 'Основной цвет',
+      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
+      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      fontSizePreset: {
+        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
+        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
+        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+      },
       surveyLogo: 'Логотип опроса',
       countryLogo: 'Логотип страны / министерства',
+      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
       logoUrl: 'URL логотипа (https)',
       uploadLogo: 'Загрузить логотип',
       preview: 'Предпросмотр',
+      previewTitle: '$t(homeView:surveyInfo.branding.previewTitle)',
+      previewDescription: '$t(homeView:surveyInfo.branding.previewDescription)',
+      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
       invalidPrimaryColor: 'Введите допустимый цвет #RRGGBB или оставьте пустым',
       invalidLogoUrl: 'Введите допустимый https URL или оставьте пустым',
       invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',

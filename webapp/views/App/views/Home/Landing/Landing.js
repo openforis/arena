@@ -1,6 +1,7 @@
 import './Landing.scss'
 
 import React from 'react'
+import classNames from 'classnames'
 import { useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
@@ -29,22 +30,42 @@ const LandingContent = () => {
     surveyId,
     logo: SurveyBranding.getCountryLogo(surveyInfo),
   })
+  const landingBackgroundSrc = useBrandingLogoSrc({
+    surveyId,
+    logo: SurveyBranding.getLandingBackground(surveyInfo),
+  })
 
   return (
-    <div className="survey-landing">
-      <div className="survey-landing__logos">
-        {countryLogoSrc && (
-          <img alt="" className="survey-landing__logo survey-landing__logo--country" src={countryLogoSrc} />
-        )}
-        {surveyLogoSrc && (
-          <img alt="" className="survey-landing__logo survey-landing__logo--survey" src={surveyLogoSrc} />
-        )}
-      </div>
-      <h1 className="survey-landing__title">{title}</h1>
-      {description ? <p className="survey-landing__description">{description}</p> : null}
-      <div className="survey-landing__actions">
-        <Button primary label="homeView:landing.enter" onClick={() => navigate(appModuleUri(dataModules.records))} />
-        <Button label="homeView:landing.openDashboard" onClick={() => navigate(appModuleUri(appModules.dashboard))} />
+    <div
+      className={classNames('survey-landing', {
+        'survey-landing--with-background': Boolean(landingBackgroundSrc),
+      })}
+      style={landingBackgroundSrc ? { backgroundImage: `url(${landingBackgroundSrc})` } : undefined}
+    >
+      <div className="survey-landing__content">
+        <div className="survey-landing__logos">
+          {countryLogoSrc && (
+            <img alt="" className="survey-landing__logo survey-landing__logo--country" src={countryLogoSrc} />
+          )}
+          {surveyLogoSrc && (
+            <img alt="" className="survey-landing__logo survey-landing__logo--survey" src={surveyLogoSrc} />
+          )}
+        </div>
+        <h1 className="survey-landing__title" style={{ fontSize: SurveyBranding.getTitleFontSizeRem(surveyInfo) }}>
+          {title}
+        </h1>
+        {description ? (
+          <p
+            className="survey-landing__description"
+            style={{ fontSize: SurveyBranding.getDescriptionFontSizeRem(surveyInfo) }}
+          >
+            {description}
+          </p>
+        ) : null}
+        <div className="survey-landing__actions">
+          <Button primary label="common:appModules.records" onClick={() => navigate(appModuleUri(dataModules.records))} />
+          <Button label="homeView:landing.openDashboard" onClick={() => navigate(appModuleUri(appModules.dashboard))} />
+        </div>
       </div>
     </div>
   )

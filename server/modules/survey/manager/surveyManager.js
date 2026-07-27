@@ -532,6 +532,7 @@ export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
   for (const brandingFileType of [
     SurveyFile.SurveyFileType.brandingSurveyLogo,
     SurveyFile.SurveyFileType.brandingCountryLogo,
+    SurveyFile.SurveyFileType.brandingLandingBackground,
   ]) {
     const brandingFileSummaries = await SurveyFileManager.fetchFileSummariesByType(
       { surveyId, type: brandingFileType },

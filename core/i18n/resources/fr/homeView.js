@@ -62,7 +62,6 @@ export default {
   },
   surveyDeleted: 'Le formulaire {{surveyName}} a été supprimé',
   landing: {
-    enter: 'Entrer',
     openDashboard: 'Ouvrir le tableau de bord',
   },
   surveyInfo: {
@@ -70,11 +69,22 @@ export default {
     branding: {
       title: 'Image de marque',
       primaryColor: 'Couleur principale',
+      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
+      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      fontSizePreset: {
+        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
+        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
+        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+      },
       surveyLogo: 'Logo du formulaire',
       countryLogo: 'Logo pays / ministère',
+      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
       logoUrl: 'URL du logo (https)',
       uploadLogo: 'Téléverser le logo',
       preview: 'Aperçu',
+      previewTitle: '$t(homeView:surveyInfo.branding.previewTitle)',
+      previewDescription: '$t(homeView:surveyInfo.branding.previewDescription)',
+      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
       invalidPrimaryColor: 'Saisissez une couleur #RRGGBB valide ou laissez vide',
       invalidLogoUrl: 'Saisissez une URL https valide ou laissez vide',
       invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',

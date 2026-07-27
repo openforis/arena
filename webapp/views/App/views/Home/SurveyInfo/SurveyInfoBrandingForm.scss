@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 .survey-info-branding-form {
@@ -25,7 +26,7 @@
     gap: 1.5rem;
   }
 
-  &__logo-section {
+  &__image-section {
     margin: 0;
     border: 1px solid $greyBorder;
     border-radius: 4px;
@@ -42,7 +43,7 @@
     }
   }
 
-  &__logo-controls {
+  &__image-controls {
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
@@ -53,8 +54,15 @@
     }
   }
 
-  &__upload {
+  &__upload-actions {
     flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  &__upload {
     display: flex;
     align-items: center;
   }
@@ -63,7 +71,7 @@
     display: none;
   }
 
-  &__logo-preview {
+  &__image-preview {
     display: flex;
     align-items: center;
     min-height: 3.5rem;
@@ -72,9 +80,23 @@
     border-radius: 4px;
 
     img {
-      max-height: 4rem;
       max-width: 100%;
       object-fit: contain;
+    }
+
+    &--logo img {
+      max-height: 4rem;
+    }
+
+    &--background {
+      min-height: 6rem;
+
+      img {
+        width: 100%;
+        max-height: 8rem;
+        object-fit: cover;
+        border-radius: 4px;
+      }
     }
   }
 
@@ -92,11 +114,45 @@
     }
   }
 
+  &__preview-landing {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 1.5rem;
+
+    &--with-background::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba($white, 0.88);
+      pointer-events: none;
+    }
+  }
+
   &__preview-content {
+    position: relative;
+    z-index: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 1.25rem;
-    flex-wrap: wrap;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  &__preview-title {
+    margin: 0;
+    font-weight: 600;
+    max-width: 100%;
+  }
+
+  &__preview-description {
+    margin: 0;
+    line-height: 1.5;
+    color: color.adjust($black, $lightness: 25%);
+    max-width: 100%;
   }
 
   &__preview-logo {
@@ -113,6 +169,10 @@
     }
 
     &__logo-controls {
+      flex-direction: column;
+    }
+
+    &__image-controls {
       flex-direction: column;
     }
   }

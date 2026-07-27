@@ -60,7 +60,6 @@ export default {
   },
   surveyDeleted: 'La encuesta {{surveyName}} ha sido eliminada',
   landing: {
-    enter: 'Entrar',
     openDashboard: 'Abrir panel',
   },
   surveyInfo: {
@@ -68,11 +67,22 @@ export default {
     branding: {
       title: 'Marca',
       primaryColor: 'Color primario',
+      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
+      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      fontSizePreset: {
+        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
+        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
+        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+      },
       surveyLogo: 'Logo de la encuesta',
       countryLogo: 'Logo del país / ministerio',
+      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
       logoUrl: 'URL del logo (https)',
       uploadLogo: 'Subir logo',
       preview: 'Vista previa',
+      previewTitle: '$t(homeView:surveyInfo.branding.previewTitle)',
+      previewDescription: '$t(homeView:surveyInfo.branding.previewDescription)',
+      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
       invalidPrimaryColor: 'Introduzca un color #RRGGBB válido o déjelo vacío',
       invalidLogoUrl: 'Introduzca una URL https válida o déjela vacía',
       invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
