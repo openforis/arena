@@ -101,7 +101,7 @@ const BrandingImageSection = (props) => {
               />
             </div>
             {hasImage && onRemove && (
-              <Button label="common:actions.delete" onClick={() => onRemove(imageKey)} size="small" />
+              <Button label="common:delete" onClick={() => onRemove(imageKey)} size="small" />
             )}
           </div>
         )}
