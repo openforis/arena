@@ -122,22 +122,3 @@ export const extractPreElementContentFromHtml = (htmlText) => {
     return null
   }
 }
-
-export const toggleElementAttribute = (el, attrName, value = null) => {
-  if (!el) {
-    return
-  }
-  if (value === null) {
-    el.removeAttribute(attrName)
-  } else {
-    el.setAttribute(attrName, value)
-  }
-}
-
-export const makeElementInert = (el, inert = true) => {
-  if (!el) {
-    return
-  }
-  el.inert = inert
-  toggleElementAttribute(el, 'inert', inert ? '' : null)
-}
