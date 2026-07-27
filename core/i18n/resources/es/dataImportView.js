@@ -26,6 +26,25 @@ export default {
     '### Pasos de importación\n1. Seleccione la entidad de destino\n2. Descargue una plantilla\n3. Rellene la plantilla y guárdela (si es CSV, use UTF-8 como codificación)\n4. Verifique las opciones\n5. Suba el archivo CSV/Excel\n6. Valide el archivo\n7. Inicie la importación\n',
   importIntoCycle: 'Importar al ciclo',
   importIntoMultipleEntityOrAttribute: 'Importar a entidad o atributo múltiple',
+  importPreview: {
+    title: 'Vista previa de la importación',
+    generatePreview: 'Generar vista previa',
+    skipInfo:
+      'Los registros marcados como "Omitir" no se pueden seleccionar: ya existe un registro existente modificado más recientemente, por lo que no se importarán.',
+    confirmImport: 'Importar registros seleccionados ({{count}})',
+    columns: {
+      exists: 'Existe',
+      action: 'Acción',
+      dateModified: 'Registro importado modificado',
+      existingDateModified: 'Registro existente modificado',
+    },
+    action: {
+      insert: 'Insertar',
+      overwrite: 'Sobrescribir',
+      merge: 'Fusionar',
+      skip: 'Omitir',
+    },
+  },
   importType: {
     label: 'Tipo de importación',
     insertNewRecords: 'Insertar nuevos registros',

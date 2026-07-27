@@ -203,6 +203,8 @@ Voulez-vous continuer ?`,
       message: `Erreur lors du téléversement du fichier : {{error}}.\n
 Réessayer ?`,
     },
+    uploadFileChangedError:
+      'Le fichier sélectionné semble avoir été modifié depuis sa sélection. Veuillez le sélectionner à nouveau.',
     uploadingFile: 'Téléversement du fichier ({{progressPercent}}%)',
     value: 'Valeur',
     view: 'Voir',

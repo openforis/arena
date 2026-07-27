@@ -36,6 +36,25 @@ export default {
 7. Inicie a importação`,
   importIntoCycle: 'Importar para o ciclo',
   importIntoMultipleEntityOrAttribute: 'Importar para múltiplas entidades ou atributos',
+  importPreview: {
+    title: 'Pré-visualização da importação',
+    generatePreview: 'Gerar pré-visualização',
+    skipInfo:
+      'Os registros marcados como "Ignorar" não podem ser selecionados: já existe um registro existente modificado mais recentemente, portanto eles não serão importados.',
+    confirmImport: 'Importar registros selecionados ({{count}})',
+    columns: {
+      exists: 'Existe',
+      action: 'Ação',
+      dateModified: 'Registro importado modificado',
+      existingDateModified: 'Registro existente modificado',
+    },
+    action: {
+      insert: 'Inserir',
+      overwrite: 'Sobrescrever',
+      merge: 'Mesclar',
+      skip: 'Ignorar',
+    },
+  },
   importType: {
     label: 'Tipo de importação',
     insertNewRecords: 'Inserir novos registros',
