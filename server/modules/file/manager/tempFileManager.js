@@ -119,3 +119,19 @@ export const getKeptFilePath = ({ fileId }) => {
   }
   return filePath
 }
+
+/**
+ * Deletes a file previously kept with keepFileForLaterUse, e.g. when the user cancels an import preview
+ * without confirming the import. Does nothing if the file was already consumed, expired and cleaned up,
+ * or never kept in the first place.
+ * @param {!object} params - The params.
+ * @param {!string} params.fileId - The uuid the file was originally uploaded with.
+ * @returns {Promise<void>} - A promise resolved when the file has been deleted (or found to not exist).
+ */
+export const deletePendingImportFileIfAny = async ({ fileId }) => {
+  checkFileIdIsValid(fileId)
+  const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
+  if (FileUtils.exists(filePath)) {
+    await FileUtils.deleteFileAsync(filePath)
+  }
+}

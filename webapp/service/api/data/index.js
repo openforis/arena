@@ -232,6 +232,10 @@ export const startArenaImportSummaryJob = ({
   }
 }
 
+export const cancelArenaImportSummary = async ({ surveyId, fileId }) => {
+  await axios.delete(`/api/mobile/survey/${surveyId}/import-summary/${fileId}`)
+}
+
 export const getDataImportFromCsvTemplateUrl = ({ surveyId }) =>
   `/api/survey/${surveyId}/data-import/flat-data/template`
 

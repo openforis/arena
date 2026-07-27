@@ -110,7 +110,10 @@ export const DataImportArenaView = () => {
 
   const onPreviewCancel = useCallback(() => {
     setState((state) => ({ ...state, previewItems: null }))
-  }, [])
+    API.cancelArenaImportSummary({ surveyId, fileId }).catch(() => {
+      // best effort cleanup: the temp file will be removed anyway by the periodic temp files cleanup job
+    })
+  }, [fileId, surveyId])
 
   const onPreviewJobComplete = useCallback((jobCompleted) => {
     const { items } = JobSerialized.getResult(jobCompleted)

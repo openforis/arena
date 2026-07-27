@@ -3,6 +3,7 @@ import { ConflictResolutionStrategy } from '@common/dataImport'
 import * as JobUtils from '@server/job/jobUtils'
 import * as Log from '@server/log/log'
 import * as CategoryService from '@server/modules/category/service/categoryService'
+import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
@@ -106,6 +107,22 @@ export const init = (app) => {
         } else {
           res.json({ chunkProcessing: true })
         }
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
+
+  // ====== PREVIEW CANCEL - deletes a file previously uploaded to generate an import preview,
+  // when the user cancels the import instead of confirming it.
+  app.delete(
+    '/mobile/survey/:surveyId/import-summary/:fileId',
+    AuthMiddleware.requireRecordCreatePermission,
+    async (req, res, next) => {
+      try {
+        const { fileId } = Request.getParams(req)
+        await TempFileManager.deletePendingImportFileIfAny({ fileId })
+        res.json({})
       } catch (e) {
         next(e)
       }

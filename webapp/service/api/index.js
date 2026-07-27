@@ -53,6 +53,7 @@ export {
   startCollectRecordsImportJob,
   startDataImportFromArenaJob,
   startArenaImportSummaryJob,
+  cancelArenaImportSummary,
   startDataImportFromCsvJob,
   getDataImportFromCsvTemplateUrl,
   getDataImportFromCsvTemplatesUrl,
