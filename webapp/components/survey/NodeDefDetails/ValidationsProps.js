@@ -19,7 +19,7 @@ import Checkbox from '@webapp/components/form/checkbox'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { NodeDefExpressionsProp, ValueType } from './ExpressionsProp'
-import { State } from './store'
+import { State, useNodeDefEditReadOnly } from './store'
 
 const countTypes = [NodeDefValidations.keys.min, NodeDefValidations.keys.max]
 
@@ -86,7 +86,9 @@ CountProp.propTypes = {
 const ValidationsProps = (props) => {
   const { state, Actions } = props
 
-  const readOnly = !useAuthCanEditSurvey()
+  const readOnlyLocked = useNodeDefEditReadOnly()
+  const canEditSurvey = useAuthCanEditSurvey()
+  const readOnly = readOnlyLocked || !canEditSurvey
   const survey = useSurvey()
 
   const nodeDef = useMemo(() => State.getNodeDef(state), [state])

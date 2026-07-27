@@ -16,7 +16,7 @@ import Checkbox from '@webapp/components/form/checkbox'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
-import { State } from './store'
+import { State, useNodeDefEditReadOnly } from './store'
 
 const editableIfRadioModes = {
   none: 'none',
@@ -58,7 +58,9 @@ const getVisibleIfRadioModes = ({ nodeDef, hasRelevantIfRule }) => {
 const AdvancedProps = (props) => {
   const { state, Actions } = props
 
-  const readOnly = !useAuthCanEditSurvey()
+  const readOnlyLocked = useNodeDefEditReadOnly()
+  const canEditSurvey = useAuthCanEditSurvey()
+  const readOnly = readOnlyLocked || !canEditSurvey
   const cycle = useSurveyCycleKey()
 
   const nodeDef = useMemo(() => State.getNodeDef(state), [state])
@@ -277,6 +279,7 @@ const AdvancedProps = (props) => {
         <FormItem label="nodeDefEdit.advancedProps.itemsFilter" info="nodeDefEdit.advancedProps.itemsFilterInfo">
           <Input
             onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.itemsFilter, value })}
+            readOnly={readOnly}
             validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.itemsFilter)(validation)}
             value={NodeDef.getItemsFilter(nodeDef)}
           />
