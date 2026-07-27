@@ -474,6 +474,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       lock: 'Lock key attribute editing',
       unlock: 'Allow editing of key attribute',
     },
+    qualifierAttributeEditing: {
+      lock: 'Lock qualifier attribute editing',
+      unlock: 'Allow editing of qualifier attribute',
+    },
   },
 
   dataExplorerView: {

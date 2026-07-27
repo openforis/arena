@@ -474,6 +474,10 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       lock: 'Bloquear edição do atributo-chave',
       unlock: 'Permitir editar o atributo-chave',
     },
+    qualifierAttributeEditing: {
+      lock: 'Bloquear edição do atributo qualificador',
+      unlock: 'Permitir editar o atributo qualificador',
+    },
   },
 
   dataExplorerView: {

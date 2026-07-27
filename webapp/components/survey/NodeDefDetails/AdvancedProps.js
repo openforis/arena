@@ -68,12 +68,38 @@ const AdvancedProps = (props) => {
     () => Validation.getFieldValidation(NodeDef.propKeys.readOnly, null)(validation),
     [validation]
   )
+  const qualifierApplicableValidation = useMemo(
+    () => Validation.getFieldValidation('qualifierApplicable', null)(validation),
+    [validation]
+  )
+  const qualifierEditableIfValidation = useMemo(
+    () => Validation.getFieldValidation('qualifierEditableIf', null)(validation),
+    [validation]
+  )
+  const qualifierDefaultValuesValidation = useMemo(
+    () => Validation.getFieldValidation('qualifierDefaultValues', null)(validation),
+    [validation]
+  )
+  // readOnlyValidation and qualifierDefaultValuesValidation can never both be non-null at once (the
+  // former requires default values to be empty, the latter requires them to be non-empty), so either
+  // one can be used interchangeably to feed the same tooltip
+  const defaultValuesValidation = qualifierDefaultValuesValidation ?? readOnlyValidation
 
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
   const autoIncrementalKey = NodeDef.isAutoIncrementalKey(nodeDef)
   const defaultValueEvaluatedOneTime = NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
   const hiddenWhenNotRelevant = NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)
   const hasRelevantIfRule = Objects.isNotEmpty(NodeDef.getApplicable(nodeDef))
+
+  // a qualifier attribute is always managed by the system (auto-filled, then only survey admins may
+  // correct it), so applicable/editability rules make no sense for it; still show the section when one
+  // is already defined (e.g. set before the attribute became a qualifier), so it can be cleared
+  const isQualifier = NodeDef.isQualifier(nodeDef)
+  const showEditableIfSection =
+    !isQualifier || NodeDef.isReadOnly(nodeDef) || Objects.isNotEmpty(NodeDef.getEditableIf(nodeDef))
+  const showApplicableSection = !isQualifier || hasRelevantIfRule
+  const showDefaultValuesSection =
+    NodeDef.canHaveDefaultValue(nodeDef) && (!isQualifier || NodeDef.hasDefaultValues(nodeDef))
 
   const onEditableIfModeChange = useCallback(
     (mode) => {
@@ -125,34 +151,38 @@ const AdvancedProps = (props) => {
 
   return (
     <div className="form">
-      <NodeDefExpressionsProp
-        Actions={Actions}
-        excludeCurrentNodeDef
-        info="nodeDefEdit.advancedProps.editableIfInfo"
-        isContextParent
-        label="nodeDefEdit.advancedProps.editableIf"
-        nodeDefUuidContext={nodeDefUuidContext}
-        propName={NodeDef.keysPropsAdvanced.editableIf}
-        qualifier={TestId.nodeDefDetails.editableIf}
-        radioMode
-        radioModes={getEditableIfRadioModes({ nodeDef })}
-        radioModeDefined={editableIfRadioModes.defined}
-        radioLabels={{
-          [editableIfRadioModes.none]: 'nodeDefEdit.advancedProps.editableAlways',
-          [editableIfRadioModes.defined]: 'nodeDefEdit.advancedProps.editableIfConditionIsMet',
-          [editableIfRadioModes.readOnly]: 'nodeDefEdit.advancedProps.readOnly',
-        }}
-        determineRadioMode={determineEditableIfMode}
-        onRadioModeChange={onEditableIfModeChange}
-        isRadioModeDisabled={({ mode }) =>
-          readOnly || (mode === editableIfRadioModes.readOnly && NodeDef.isMultiple(nodeDef))
-        }
-        readOnly={readOnly}
-        state={state}
-      />
+      {showEditableIfSection && (
+        <ValidationTooltip validation={qualifierEditableIfValidation}>
+          <NodeDefExpressionsProp
+            Actions={Actions}
+            excludeCurrentNodeDef
+            info="nodeDefEdit.advancedProps.editableIfInfo"
+            isContextParent
+            label="nodeDefEdit.advancedProps.editableIf"
+            nodeDefUuidContext={nodeDefUuidContext}
+            propName={NodeDef.keysPropsAdvanced.editableIf}
+            qualifier={TestId.nodeDefDetails.editableIf}
+            radioMode
+            radioModes={getEditableIfRadioModes({ nodeDef })}
+            radioModeDefined={editableIfRadioModes.defined}
+            radioLabels={{
+              [editableIfRadioModes.none]: 'nodeDefEdit.advancedProps.editableAlways',
+              [editableIfRadioModes.defined]: 'nodeDefEdit.advancedProps.editableIfConditionIsMet',
+              [editableIfRadioModes.readOnly]: 'nodeDefEdit.advancedProps.readOnly',
+            }}
+            determineRadioMode={determineEditableIfMode}
+            onRadioModeChange={onEditableIfModeChange}
+            isRadioModeDisabled={({ mode }) =>
+              readOnly || (mode === editableIfRadioModes.readOnly && NodeDef.isMultiple(nodeDef))
+            }
+            readOnly={readOnly}
+            state={state}
+          />
+        </ValidationTooltip>
+      )}
 
-      {NodeDef.canHaveDefaultValue(nodeDef) && (
-        <ValidationTooltip className="validation-tooltip__default-values" validation={readOnlyValidation}>
+      {showDefaultValuesSection && (
+        <ValidationTooltip className="validation-tooltip__default-values" validation={defaultValuesValidation}>
           <NodeDefExpressionsProp
             qualifier={TestId.nodeDefDetails.defaultValues}
             state={state}
@@ -195,25 +225,29 @@ const AdvancedProps = (props) => {
         </ValidationTooltip>
       )}
 
-      <NodeDefExpressionsProp
-        qualifier={TestId.nodeDefDetails.relevantIf}
-        state={state}
-        Actions={Actions}
-        readOnly={readOnly}
-        propName={NodeDef.keysPropsAdvanced.applicable}
-        applyIf={false}
-        multiple={false}
-        nodeDefUuidContext={nodeDefUuidContext}
-        info="nodeDefEdit.advancedProps.relevantIfInfo"
-        isContextParent
-        label="nodeDefEdit.advancedProps.relevantIf"
-        excludeCurrentNodeDef
-        radioMode
-        radioLabels={{
-          none: 'nodeDefEdit.advancedProps.relevantIfRadioNone',
-          defined: 'nodeDefEdit.advancedProps.relevantIfRadioDefined',
-        }}
-      />
+      {showApplicableSection && (
+        <ValidationTooltip validation={qualifierApplicableValidation}>
+          <NodeDefExpressionsProp
+            qualifier={TestId.nodeDefDetails.relevantIf}
+            state={state}
+            Actions={Actions}
+            readOnly={readOnly}
+            propName={NodeDef.keysPropsAdvanced.applicable}
+            applyIf={false}
+            multiple={false}
+            nodeDefUuidContext={nodeDefUuidContext}
+            info="nodeDefEdit.advancedProps.relevantIfInfo"
+            isContextParent
+            label="nodeDefEdit.advancedProps.relevantIf"
+            excludeCurrentNodeDef
+            radioMode
+            radioLabels={{
+              none: 'nodeDefEdit.advancedProps.relevantIfRadioNone',
+              defined: 'nodeDefEdit.advancedProps.relevantIfRadioDefined',
+            }}
+          />
+        </ValidationTooltip>
+      )}
 
       <NodeDefExpressionsProp
         Actions={Actions}

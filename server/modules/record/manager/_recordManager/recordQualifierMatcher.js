@@ -21,6 +21,11 @@ import { NodeValues } from '@core/record/nodeValues'
  * list for every other lookup (`Record.getNodeChildrenByDefUuid` and friends trust a present index
  * instead of falling back to a full scan), making every other already-persisted node - including the
  * qualifier attribute - invisible.
+ * @param {boolean} [params.canEditQualifierValue] - Whether the requesting user is allowed to edit an
+ * already applied qualifier attribute value (survey admins, see `canEditQualifierAttributeValue` in
+ * authorizer.ts and the lock toggle in nodeDefSwitch.js). When true, a `pendingNode` explicitly
+ * targeting a qualifier attribute is trusted as-is instead of being checked against the filter, since
+ * the edit is a deliberate, authorized correction rather than an attempt to drop the restriction.
  * @returns {boolean} - True if qualifierFilters is empty (unrestricted), if the record has not been
  * initialized yet (no nodes), if a qualifier attribute node is missing or not yet given a value
  * (record creation will auto-fill qualifier attributes to match, see _applyGroupQualifierValues in
@@ -28,11 +33,17 @@ import { NodeValues } from '@core/record/nodeValues'
  * just-created record may briefly have the node without its value yet), or every filter matches the
  * record's corresponding attribute value; false when a qualifier attribute has an actual value that
  * differs from the expected one, or when `pendingNode` explicitly targets a qualifier attribute with
- * an empty value: the UI never lets a user edit an already-applied qualifier node (see
- * `isQualifierValueApplied` in nodeDefSwitch.js), so a request clearing it can only be a deliberate
- * attempt to drop the restriction, not an in-progress record still being initialized.
+ * an empty value: the UI only lets a survey admin edit an already-applied qualifier node (see
+ * `isQualifierValueApplied` in nodeDefSwitch.js), so a request from any other user clearing it can only
+ * be a deliberate attempt to drop the restriction, not an in-progress record still being initialized.
  */
-export const recordMatchesQualifierFilters = ({ survey, record, qualifierFilters, pendingNode = null }) => {
+export const recordMatchesQualifierFilters = ({
+  survey,
+  record,
+  qualifierFilters,
+  pendingNode = null,
+  canEditQualifierValue = false,
+}) => {
   if (qualifierFilters.length === 0) return true
   if (Record.getNodesArray(record).length === 0) return true
 
@@ -41,6 +52,9 @@ export const recordMatchesQualifierFilters = ({ survey, record, qualifierFilters
   return qualifierFilters.every(({ nodeDef, value }) => {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
     const isPendingNode = pendingNode && Node.getNodeDefUuid(pendingNode) === nodeDefUuid
+
+    if (isPendingNode && canEditQualifierValue) return true
+
     const node = isPendingNode ? pendingNode : Record.getNodeChildByDefUuid(rootNode, nodeDefUuid)(record)
 
     if (!node) return true
