@@ -34,7 +34,6 @@ export default {
 Pulsa Ir a encuestas para abrir la lista de encuestas.`,
   userRoleUpdatedRefreshRequired: `Tu rol en esta encuesta se ha actualizado.  
 $t(common.pressRefreshToReloadPage)`,
-  userGroups: 'Grupos de usuarios',
   userGroup: {
     new: 'Nuevo grupo',
     edit: 'Editar grupo',
@@ -49,8 +48,11 @@ $t(common.pressRefreshToReloadPage)`,
     addMember: 'Añadir miembro',
     noMembers: 'Aún no hay miembros',
     memberAlreadyInGroup: 'Actualmente en "{{groupName}}"',
-    overview: 'Resumen',
-    table: 'Tabla',
+    tabs: {
+      groups: 'Grupos de usuarios',
+      assignments: 'Asignación de grupos',
+      report: 'Informe de miembros',
+    },
     memberName: 'Nombre del miembro',
     memberEmail: 'Correo electrónico del miembro',
     memberRole: 'Rol en la encuesta',

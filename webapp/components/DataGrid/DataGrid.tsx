@@ -31,6 +31,7 @@ type Props = {
   hideFooterPagination?: boolean
   initialState?: GridInitialState
   isRowSelectable?: DataGridProps['isRowSelectable']
+  onRowClick?: DataGridProps['onRowClick']
   onRowDoubleClick?: DataGridProps['onRowDoubleClick']
   onRowSelectionModelChange?: (model: GridRowSelectionModel) => void
   rows: GridRowsProp
@@ -39,12 +40,12 @@ type Props = {
 
 const FooterWithExport =
   ({ exportFileName }: { exportFileName?: string }) =>
-  () => (
-    <GridFooterContainer>
-      <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
-      <GridFooter />
-    </GridFooterContainer>
-  )
+    () => (
+      <GridFooterContainer>
+        <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
+        <GridFooter />
+      </GridFooterContainer>
+    )
 
 const DataGrid = (props: Props) => {
   const {
@@ -63,6 +64,7 @@ const DataGrid = (props: Props) => {
     hideFooterPagination = false,
     initialState,
     isRowSelectable,
+    onRowClick,
     onRowDoubleClick,
     onRowSelectionModelChange,
     rows,
@@ -88,6 +90,7 @@ const DataGrid = (props: Props) => {
       hideFooterPagination={hideFooterPagination}
       initialState={initialState}
       isRowSelectable={isRowSelectable}
+      onRowClick={onRowClick}
       onRowDoubleClick={onRowDoubleClick}
       onRowSelectionModelChange={onRowSelectionModelChange}
       rows={rows}

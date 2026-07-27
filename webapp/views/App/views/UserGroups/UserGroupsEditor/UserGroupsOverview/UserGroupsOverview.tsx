@@ -1,4 +1,4 @@
-import './UserGroupsSummary.scss'
+import './UserGroupsOverview.scss'
 
 import React, { useMemo } from 'react'
 
@@ -10,8 +10,8 @@ import * as UserGroup from '@core/user/userGroup/userGroup'
 import { useAuthCanManageUserGroups } from '@webapp/store/user'
 
 import { UNASSIGNED_GROUP_KEY } from './kanbanConstants'
-import type { SurveyUserType } from './useUserGroupsSummary'
-import { useUserGroupsSummary } from './useUserGroupsSummary'
+import type { SurveyUserType } from './useUserGroupsOverview'
+import { useUserGroupsOverview } from './useUserGroupsOverview'
 import { useUserGroupsKanbanDnd } from './useUserGroupsKanbanDnd'
 import UserGroupColumn from './UserGroupColumn'
 
@@ -26,11 +26,11 @@ interface ColumnData {
  * a leading "Unassigned" column, each user shown as a draggable card. Dragging a card into a
  * different column assigns, reassigns or unassigns that user.
  *
- * @returns {React.ReactElement} - The UserGroupsSummary component.
+ * @returns {React.ReactElement} - The UserGroupsOverview component.
  */
-const UserGroupsSummary = (): React.ReactElement => {
+const UserGroupsOverview = (): React.ReactElement => {
   const canManage = useAuthCanManageUserGroups()
-  const { groups, users, groupUuidByUserUuid, onChangeUserGroup, pendingUserUuids } = useUserGroupsSummary()
+  const { groups, users, groupUuidByUserUuid, onChangeUserGroup, pendingUserUuids } = useUserGroupsOverview()
 
   const columns: ColumnData[] = useMemo(() => {
     const unassignedMembers = users.filter((user) => !groupUuidByUserUuid[User.getUuid(user) as string])
@@ -53,7 +53,7 @@ const UserGroupsSummary = (): React.ReactElement => {
   })
 
   return (
-    <div className="user-groups-summary">
+    <div className="user-groups-overview">
       {columns.map((column) => (
         <UserGroupColumn
           key={column.key}
@@ -69,4 +69,4 @@ const UserGroupsSummary = (): React.ReactElement => {
   )
 }
 
-export default UserGroupsSummary
+export default UserGroupsOverview

@@ -468,6 +468,10 @@ $t(common.raiseTicketInSupportForum)
       lock: 'Түлхүүр атрибутын засварыг түгжих',
       unlock: 'Түлхүүр атрибутыг засахыг зөвшөөрөх',
     },
+    qualifierAttributeEditing: {
+      lock: 'Квалификатор атрибутын засварыг түгжих',
+      unlock: 'Квалификатор атрибутыг засахыг зөвшөөрөх',
+    },
   },
 
   dataExplorerView: {

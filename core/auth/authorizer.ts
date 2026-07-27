@@ -181,6 +181,10 @@ export const canManageUserGroups = (user: ArenaUser, surveyInfo: ArenaSurvey): b
   return authGroup?.name === AuthGroup.groupNames.surveyAdmin
 }
 
+// only survey admins (or system admins) can edit an already applied qualifier attribute value,
+// mirroring the group management permission since qualifiers are tied to user groups
+export const canEditQualifierAttributeValue = canManageUserGroups
+
 export const canRemoveUser = (user: ArenaUser, surveyInfo: ArenaSurvey, userToRemove: ArenaUser): boolean =>
   !User.isEqual(user as Record<string, any>)(userToRemove as Record<string, any>) &&
   !User.isSystemAdmin(userToRemove) &&

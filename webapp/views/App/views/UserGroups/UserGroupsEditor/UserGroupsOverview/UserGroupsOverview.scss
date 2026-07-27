@@ -1,10 +1,11 @@
 @use '~@webapp/style/vars' as *;
 
-.user-groups-summary {
+.user-groups-overview {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 1rem;
   overflow-x: auto;
+  overflow-y: hidden;
   padding: 0.5rem 0 1rem;
 }
 
@@ -16,6 +17,7 @@
   background-color: $greyAppBg;
   border: 1px solid $greyBorder;
   border-radius: 4px;
+  min-height: 0;
 
   &__header {
     display: flex;
@@ -46,7 +48,6 @@
   &__list {
     flex: 1;
     min-height: 3rem;
-    max-height: 28rem;
     overflow-y: auto;
     margin: 0;
     padding: 0.5rem;

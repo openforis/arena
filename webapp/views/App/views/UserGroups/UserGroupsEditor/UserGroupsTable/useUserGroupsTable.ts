@@ -142,7 +142,7 @@ const fetchUserGroupsTableRows = async (params: {
  */
 export const useUserGroupsTable = (): UseUserGroupsTableResult => {
   // useSurveyId's untyped implementation makes TS infer its return type as `unknown`; cast to the
-  // `string` shape the API service functions declare, following the useUserGroupsSummary.ts precedent.
+  // `string` shape the API service functions declare, following the useUserGroupsOverview.ts precedent.
   const surveyId = useSurveyId() as string
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)

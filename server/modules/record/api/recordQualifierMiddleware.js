@@ -1,7 +1,9 @@
 import { Requests } from '@openforis/arena-server'
 
 import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
+import * as Authorizer from '@core/auth/authorizer'
 import { StatusCodes } from '@core/systemError'
 
 import * as Request from '@server/utils/request'
@@ -40,11 +42,19 @@ const _recordMatchesUserGroupQualifiers = async ({ user, surveyId, recordUuid, p
 
   const qualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey })
 
+  const canEditQualifierValue = Authorizer.canEditQualifierAttributeValue(user, Survey.getSurveyInfo(survey))
+
   // pendingNode is passed through rather than merged into the record via Record.assocNode: the record
   // was fetched with fetchForUpdate: false, so its _nodesIndex hasn't been built, and assocNode would
   // initialize one containing only pendingNode, shadowing every other already-persisted node (see
   // recordMatchesQualifierFilters' jsdoc for details)
-  return RecordManager.recordMatchesQualifierFilters({ survey, record, qualifierFilters, pendingNode })
+  return RecordManager.recordMatchesQualifierFilters({
+    survey,
+    record,
+    qualifierFilters,
+    pendingNode,
+    canEditQualifierValue,
+  })
 }
 
 /**

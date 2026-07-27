@@ -4,7 +4,7 @@ import * as User from '@core/user/user'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 
-import type { SurveyUserType } from './useUserGroupsSummary'
+import type { SurveyUserType } from './useUserGroupsOverview'
 
 type Props = {
   user: SurveyUserType
@@ -13,7 +13,7 @@ type Props = {
 }
 
 /**
- * A single card representing a survey user inside a UserGroupColumn of the UserGroupsSummary
+ * A single card representing a survey user inside a UserGroupColumn of the UserGroupsOverview
  * Kanban board. Draggable cards (draggable=true) can be dragged between columns to assign,
  * reassign or unassign the user's group.
  *

@@ -186,7 +186,7 @@ export const useUserGroupMembersEditor = ({
   // Adds the user to this group. When `oldGroupUuid` is given (reassignment case), removes them
   // from that other group FIRST, then adds them to this one, so the user never ends up (even
   // momentarily as far as the persisted end-state is concerned) in both groups at once, matching
-  // the remove-then-add sequencing in useUserGroupsSummary.ts's onChangeUserGroup.
+  // the remove-then-add sequencing in useUserGroupsOverview.ts's onChangeUserGroup.
   const addMember = useCallback(
     async (userUuid: string, oldGroupUuid?: string) => {
       try {

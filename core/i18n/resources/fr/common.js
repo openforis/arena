@@ -477,6 +477,10 @@ Merci et profitez de **$t(common.appNameFull)** !`,
       lock: "Verrouiller la modification de l'attribut clé",
       unlock: "Autoriser la modification de l'attribut clé",
     },
+    qualifierAttributeEditing: {
+      lock: "Verrouiller la modification de l'attribut qualificatif",
+      unlock: "Autoriser la modification de l'attribut qualificatif",
+    },
   },
 
   dataExplorerView: {
