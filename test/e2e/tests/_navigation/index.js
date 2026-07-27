@@ -45,15 +45,21 @@ export const gotoSurveyInfo = () =>
   })
 
 // ==== Sidebar
+const homeUrl = `${BASE_URL}/app/home/`
+const landingUrl = `${homeUrl}landing/`
+
+const isHomeUrl = (url) => url === homeUrl || url === landingUrl
+
 export const gotoHome = () =>
   test('Goto home', async () => {
-    const currentUrl = await page.url()
-    const homeUrl = `${BASE_URL}/app/home/`
-    const landingUrl = `${homeUrl}landing/`
-    if (currentUrl !== landingUrl) {
-      await page.click(getSelector(TestId.sidebar.moduleBtn('home'), 'a'))
+    const currentUrl = page.url()
+    if (!isHomeUrl(currentUrl)) {
+      await Promise.all([
+        page.waitForURL((url) => isHomeUrl(url.href)),
+        page.click(getSelector(TestId.sidebar.moduleBtn('home'), 'a')),
+      ])
     }
-    expect([homeUrl, landingUrl]).toContain(page.url())
+    expect(isHomeUrl(page.url())).toBe(true)
   })
 
 const _gotoSubModule =
@@ -81,7 +87,13 @@ const _gotoSubModule =
       expect(page.url()).toBe(`${BASE_URL}/app/${module}/${subModule}/`)
     })
 
-export const gotoFormDesigner = _gotoSubModule('designer', 'formDesigner')
+export const gotoFormDesigner = () => {
+  _gotoSubModule('designer', 'formDesigner')()
+
+  test('Wait for form designer to load', async () => {
+    await page.waitForSelector(getSelector(TestId.surveyForm.surveyForm))
+  })
+}
 
 export const gotoRecords = _gotoSubModule('data', 'records')
 

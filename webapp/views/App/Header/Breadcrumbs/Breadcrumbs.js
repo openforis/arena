@@ -21,8 +21,7 @@ export const Breadcrumbs = () => {
   const pathPartsWithModules = validPathParts.filter((pathPart, levelIndex) => {
     const module = AppModules.getModuleByPathPart({ levelIndex, pathPart })
     // Landing is Home's default page — keep the crumb as "Home" only.
-    if (!module || module.key === homeModules.landing.key) return false
-    return true
+    return Boolean(module && module.key !== homeModules.landing.key)
   })
 
   const pathComponents = pathPartsWithModules.reduce((acc, pathPart, levelIndex) => {

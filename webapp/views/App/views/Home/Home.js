@@ -13,6 +13,8 @@ import SurveyInfo from './SurveyInfo'
 import TemplateList from './TemplateList'
 import TemplateCreate from './TemplateCreate'
 
+const HomeDashboardRedirect = () => <Navigate to={appModuleUri(appModules.dashboard)} replace />
+
 const Home = () => {
   const canCreateSurvey = useAuthCanCreateSurvey()
   const canCreateTemplate = useAuthCanCreateTemplate()
@@ -27,7 +29,7 @@ const Home = () => {
           path: homeModules.landing.path,
         },
         {
-          component: () => <Navigate to={appModuleUri(appModules.dashboard)} replace />,
+          component: HomeDashboardRedirect,
           path: 'dashboard',
         },
         {

@@ -1,7 +1,7 @@
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { getSurveyZipPath } from '../paths'
 import { survey, surveyImport } from '../mock/survey'
-import { gotoHome, gotoSurveyCreate, gotoSurveyList } from './_navigation'
+import { gotoDashboard, gotoSurveyCreate, gotoSurveyList } from './_navigation'
 import {
   exportSurvey,
   verifyCategories,
@@ -42,7 +42,7 @@ export default () =>
       await page.reload()
     })
 
-    gotoHome()
+    gotoDashboard()
 
     exportSurvey(surveyImport)
 

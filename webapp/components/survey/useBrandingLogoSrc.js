@@ -21,7 +21,7 @@ const MIME_BY_EXTENSION = {
 const mimeTypeFromContentDisposition = (contentDisposition) => {
   if (!contentDisposition) return null
   const fileNameMatch = /filename\*?=(?:UTF-8''|")?([^";]+)/i.exec(contentDisposition)
-  const fileName = fileNameMatch?.[1] ? decodeURIComponent(fileNameMatch[1].replace(/"/g, '')) : null
+  const fileName = fileNameMatch?.[1] ? decodeURIComponent(fileNameMatch[1].replaceAll('"', '')) : null
   if (!fileName) return null
   const extension = fileName.split('.').pop()?.toLowerCase()
   return MIME_BY_EXTENSION[extension] || null

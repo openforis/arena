@@ -6,13 +6,14 @@ export const clickSurvey = async (survey) => {
   await page.waitForSelector(surveyRowSelector, { timeout: 5000 })
 
   await Promise.all([
-    page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
+    page.waitForURL((url) => url.href.startsWith(`${BASE_URL}/app/home/`)),
     page.click(surveyRowSelector),
   ])
 
   await page.goto(`${BASE_URL}/app/dashboard/`)
 
   const surveyNameSelector = getSelector(TestId.dashboard.surveyName, 'h3')
+  await page.waitForSelector(surveyNameSelector)
   expect(await page.innerText(surveyNameSelector)).toBe(survey.name)
 }
 

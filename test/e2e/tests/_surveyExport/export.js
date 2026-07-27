@@ -13,6 +13,7 @@ export const exportSurvey = (survey) =>
     await page.goto(`${BASE_URL}/app/dashboard/`)
 
     const exportButtonMenuSelector = getSelector(TestId.dashboard.surveyExportBtn, 'button')
+    await page.waitForSelector(exportButtonMenuSelector)
     await page.click(exportButtonMenuSelector)
 
     const exportWithDataButtonSelector = getSelector(
