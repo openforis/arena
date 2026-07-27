@@ -197,6 +197,7 @@ export default {
       message: `Файл хуулах явцад алдаа гарлаа: {{error}}.\n
 Дахин оролдох уу?`,
     },
+    uploadFileChangedError: 'Сонгосон файл сонгосноос хойш өөрчлөгдсөн бололтой байна. Түүнийг дахин сонгоно уу.',
     uploadingFile: 'Файл байршуулж байна ({{progressPercent}}%)',
     value: 'Утга',
     view: 'Харах',

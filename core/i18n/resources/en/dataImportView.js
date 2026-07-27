@@ -37,6 +37,25 @@ export default {
 `,
   importIntoCycle: 'Import into cycle',
   importIntoMultipleEntityOrAttribute: 'Import into multiple entity or attribute',
+  importPreview: {
+    title: 'Import preview',
+    generatePreview: 'Generate preview',
+    skipInfo:
+      'Records marked as "Skip" cannot be selected: an existing, more recently modified record already exists, so they will not be imported.',
+    confirmImport: 'Import selected records ({{count}})',
+    columns: {
+      exists: 'Exists',
+      action: 'Action',
+      dateModified: 'Imported record modified',
+      existingDateModified: 'Existing record modified',
+    },
+    action: {
+      insert: 'Insert',
+      overwrite: 'Overwrite',
+      merge: 'Merge',
+      skip: 'Skip',
+    },
+  },
   importType: {
     label: 'Import type',
     insertNewRecords: 'Insert new records',
