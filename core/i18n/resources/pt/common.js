@@ -203,6 +203,8 @@ Deseja prosseguir?`,
       message: `Erro durante o envio do arquivo: {{error}}.\n
     Tentar novamente?`,
     },
+    uploadFileChangedError:
+      'O arquivo selecionado parece ter sido modificado desde que foi selecionado. Selecione-o novamente.',
     uploadingFile: 'Enviando arquivo ({{progressPercent}}%)',
     value: 'Valor',
     view: 'Visualizar',

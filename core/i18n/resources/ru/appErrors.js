@@ -19,6 +19,8 @@ export default {
     invalidNodeInRecord:
       'Недопустимый узел в записи "{{recordUuid}}", узел "{{nodeUuid}}" с определением узла "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'В файле импорта не найдено записей или неверный формат файла',
+    pendingImportFileNotFoundOrExpired:
+      'Ранее загруженный файл не найден; возможно, срок его действия истек. Пожалуйста, загрузите его снова.',
     recordOwnedByAnotherUser:
       'Невозможно обновить запись "{{recordKeyValues}}", так как она принадлежит другому пользователю',
   },

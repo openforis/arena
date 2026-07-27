@@ -19,6 +19,8 @@ export default {
     invalidNodeInRecord:
       '"{{recordUuid}}" бичлэгт буруу зангилаа байна, "{{nodeUuid}}" зангилаа, "{{nodeDefName}}" зангилааны тодорхойлолт (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'Импортын файлд бичлэг олдсонгүй эсвэл буруу файлын формат',
+    pendingImportFileNotFoundOrExpired:
+      'Өмнө оруулсан файл олдсонгүй; хугацаа нь дууссан байж магадгүй. Дахин оруулна уу.',
     recordOwnedByAnotherUser: '"{{recordKeyValues}}" бичлэг өөр хэрэглэгчид харьяалагддаг тул шинэчлэх боломжгүй',
   },
   entryDataNotFound: 'Оролтын өгөгдөл олдсонгүй: {{entryName}}',

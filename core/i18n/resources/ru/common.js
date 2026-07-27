@@ -197,6 +197,7 @@ export default {
       message: `Ошибка при загрузке файла: {{error}}.\n
 Попробовать снова?`,
     },
+    uploadFileChangedError: 'Похоже, что выбранный файл был изменен после выбора. Пожалуйста, выберите его снова.',
     uploadingFile: 'Загрузка файла ({{progressPercent}}%)',
     value: 'Значение',
     view: 'Просмотр',
