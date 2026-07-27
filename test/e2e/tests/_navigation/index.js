@@ -3,8 +3,13 @@ import { BASE_URL } from '../../config'
 
 export const gotoDashboard = () =>
   test('Goto dashboard', async () => {
-    await page.goto(`${BASE_URL}/app/dashboard/`)
-    expect(page.url()).toBe(`${BASE_URL}/app/dashboard/`)
+    const dashboardUrl = `${BASE_URL}/app/dashboard/`
+    if (!page.url().startsWith(dashboardUrl)) {
+      await page.goto(dashboardUrl)
+    }
+    expect(page.url()).toBe(dashboardUrl)
+    // Wait until survey dashboard content is ready (not only the URL).
+    await page.waitForSelector(getSelector(TestId.dashboard.surveyInfoBtn, 'button'), { timeout: 30000 })
   })
 
 // ===== Header
