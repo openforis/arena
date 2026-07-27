@@ -34,6 +34,25 @@ export default {
 `,
   importIntoCycle: 'Мөчлөгт импортлох',
   importIntoMultipleEntityOrAttribute: 'Олон объектод эсвэл шинж чанарт импортлох',
+  importPreview: {
+    title: 'Импортын урьдчилан харах',
+    generatePreview: 'Урьдчилан харах үүсгэх',
+    skipInfo:
+      '"Алгасах" гэж тэмдэглэгдсэн бичлэгүүдийг сонгох боломжгүй: сүүлд өөрчлөгдсөн, одоо байгаа бичлэг аль хэдийн байгаа тул тэдгээрийг импортлохгүй.',
+    confirmImport: 'Сонгосон бичлэгүүдийг импортлох ({{count}})',
+    columns: {
+      exists: 'Байгаа эсэх',
+      action: 'Үйлдэл',
+      dateModified: 'Импортлосон бичлэг өөрчлөгдсөн',
+      existingDateModified: 'Одоо байгаа бичлэг өөрчлөгдсөн',
+    },
+    action: {
+      insert: 'Оруулах',
+      overwrite: 'Дахин бичих',
+      merge: 'Нэгтгэх',
+      skip: 'Алгасах',
+    },
+  },
   importType: {
     label: 'Импортын төрөл',
     insertNewRecords: 'Шинэ бичлэгүүдийг оруулах',

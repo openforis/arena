@@ -37,6 +37,25 @@ export default {
 `,
   importIntoCycle: 'Importer dans le cycle',
   importIntoMultipleEntityOrAttribute: 'Importer dans une entité multiple ou un attribut',
+  importPreview: {
+    title: "Aperçu de l'importation",
+    generatePreview: "Générer l'aperçu",
+    skipInfo:
+      'Les enregistrements marqués comme « Ignorer » ne peuvent pas être sélectionnés : un enregistrement existant, modifié plus récemment, existe déjà, ils ne seront donc pas importés.',
+    confirmImport: 'Importer les enregistrements sélectionnés ({{count}})',
+    columns: {
+      exists: 'Existe',
+      action: 'Action',
+      dateModified: 'Enregistrement importé modifié',
+      existingDateModified: 'Enregistrement existant modifié',
+    },
+    action: {
+      insert: 'Insérer',
+      overwrite: 'Écraser',
+      merge: 'Fusionner',
+      skip: 'Ignorer',
+    },
+  },
   importType: {
     label: "Type d'importation",
     insertNewRecords: 'Insérer de nouveaux enregistrements',

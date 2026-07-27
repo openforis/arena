@@ -82,16 +82,26 @@ export const DataImportArenaView = () => {
 
   const startImport = useCallback(
     async (selectedRecordsUuids) => {
-      const { promise } = API.startDataImportFromArenaJob({
-        surveyId,
-        conflictResolutionStrategy,
-        fileId,
-        skipMissingFiles,
-        reuseUploadedFile: true,
-        selectedRecordsUuids,
-      })
-      const job = await promise
-      dispatch(JobActions.showJobMonitor({ job, autoHide: true, onComplete: onImportJobComplete }))
+      try {
+        const { promise } = API.startDataImportFromArenaJob({
+          surveyId,
+          conflictResolutionStrategy,
+          fileId,
+          skipMissingFiles,
+          reuseUploadedFile: true,
+          selectedRecordsUuids,
+        })
+        const job = await promise
+        dispatch(JobActions.showJobMonitor({ job, autoHide: true, onComplete: onImportJobComplete }))
+      } catch (error) {
+        const { key, params } = error?.response?.data ?? {}
+        dispatch(
+          NotificationActions.notifyError({
+            key: key ?? 'appErrors:generic',
+            params: params ?? { text: error?.message },
+          })
+        )
+      }
     },
     [conflictResolutionStrategy, dispatch, fileId, onImportJobComplete, skipMissingFiles, surveyId]
   )
