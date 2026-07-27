@@ -130,6 +130,11 @@ export default {
     countMaxInvalid: 'Хүчингүй "Хамгийн их тоо"',
     countMinInvalid: 'Хүчингүй "Хамгийн бага тоо"',
     readOnlyCannotHaveEditableIf: 'Зөвхөн унших зангилаа "Editable if" нөхцөлтэй байж болохгүй',
+    qualifierCannotHaveApplicableExpression:
+      'Квалификатор шинж чанар "$t(nodeDefEdit.advancedProps.relevantIf)" нөхцөлтэй байж болохгүй',
+    qualifierCannotHaveEditabilityRule: 'Квалификатор шинж чанар засварлах дүрэмтэй байж болохгүй',
+    qualifierCannotHaveDefaultValues: 'Квалификатор шинж чанар өгөгдмөл утгатай байж болохгүй',
+    qualifierCannotHaveValidations: 'Квалификатор шинж чанар баталгаажуулах дүрэмтэй байж болохгүй',
   },
 
   record: {

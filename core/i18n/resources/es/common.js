@@ -421,6 +421,10 @@ export default {
       lock: 'Bloquear edición del atributo clave',
       unlock: 'Permitir editar el atributo clave',
     },
+    qualifierAttributeEditing: {
+      lock: 'Bloquear edición del atributo calificador',
+      unlock: 'Permitir editar el atributo calificador',
+    },
   },
   dataExplorerView: {
     customAggregateFunction: {

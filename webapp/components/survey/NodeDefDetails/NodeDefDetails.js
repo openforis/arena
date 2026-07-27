@@ -67,7 +67,12 @@ const NodeDefDetails = (props) => {
           props: tabProps,
         })
       }
-      if (NodeDefUIProps.getValidationsEnabledByType(nodeDefType)) {
+      // a qualifier attribute is always system-managed and effectively read-only, so validation rules
+      // make no sense for it; still show the tab if some are already defined, so they can be cleared
+      if (
+        NodeDefUIProps.getValidationsEnabledByType(nodeDefType) &&
+        (!NodeDef.isQualifier(nodeDef) || NodeDef.hasValidationsDefined(nodeDef))
+      ) {
         _tabs.push({
           label: 'nodeDefEdit.validations',
           component: ValidationsProps,
@@ -77,7 +82,7 @@ const NodeDefDetails = (props) => {
       }
     }
     return _tabs
-  }, [Actions, canHaveMobileProps, editingFromDesigner, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
+  }, [Actions, canHaveMobileProps, editingFromDesigner, nodeDef, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
 
   useLayoutEffect(() => {
     DomUtils.makeElementInert(fieldsRef.current, readOnly)
