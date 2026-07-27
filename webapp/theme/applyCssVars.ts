@@ -1,14 +1,20 @@
-import { defaultTokens } from './tokens'
+import { defaultTokens, type ArenaTokens } from './tokens'
 
 export { defaultTokens }
+
+type BuildCssVarMapParams = {
+  tokens?: ArenaTokens
+  primaryColor?: string | null
+}
 
 /**
  * Builds CSS custom property map for :root.
  * When primaryColor is set, maps it onto the blue brand family used by SCSS.
- * @param {{tokens?: object, primaryColor?: string|null}} params
- * @returns {Record<string, string>}
  */
-export const buildCssVarMap = ({ tokens = defaultTokens, primaryColor = null } = {}) => {
+export const buildCssVarMap = ({ tokens = defaultTokens, primaryColor = null }: BuildCssVarMapParams = {}): Record<
+  string,
+  string
+> => {
   const c = tokens.colors
   const blue = primaryColor || c.blue
   return {
@@ -33,10 +39,8 @@ export const buildCssVarMap = ({ tokens = defaultTokens, primaryColor = null } =
 
 /**
  * Applies CSS variables on documentElement.
- * @param {Record<string, string>} varMap
- * @returns {void}
  */
-export const applyCssVars = (varMap) => {
+export const applyCssVars = (varMap: Record<string, string>): void => {
   const root = document.documentElement
   Object.entries(varMap).forEach(([key, value]) => {
     root.style.setProperty(key, value)

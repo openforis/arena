@@ -82,6 +82,9 @@ const SurveyInfo = () => {
         branding: surveyInfoObject.branding || {},
         setBranding,
         readOnly,
+        labels: surveyInfoObject.labels,
+        descriptions: surveyInfoObject.descriptions,
+        name: surveyInfoObject.name,
       },
     },
   ]

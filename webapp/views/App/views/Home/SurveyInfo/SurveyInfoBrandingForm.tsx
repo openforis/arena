@@ -1,20 +1,27 @@
 import './SurveyInfoBrandingForm.scss'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import PropTypes from 'prop-types'
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type RefObject } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
+import * as Survey from '@core/survey/survey'
 import * as SurveyBranding from '@core/survey/surveyBranding'
+import type {
+  BrandingImageDescriptor,
+  FontSizePreset,
+  SurveyBranding as SurveyBrandingData,
+  SurveyLogoKey,
+} from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
+import type { ValidationResultInstance } from '@core/validation/validationResult'
 
-import { Button, ColorInput } from '@webapp/components'
+import { Button, ButtonIconDelete, ColorInput } from '@webapp/components'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { useBrandingLogoSrc } from '@webapp/components/survey/useBrandingLogoSrc'
 import * as API from '@webapp/service/api'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { NotificationActions } from '@webapp/store/ui'
 import { FileUtils } from '@webapp/utils/fileUtils'
@@ -31,7 +38,15 @@ const BACKGROUND_FILE_INPUT_ACCEPT = 'image/png,image/jpeg,image/webp,.png,.jpg,
 
 const LANDING_BACKGROUND_MAX_SIZE_MB = SurveyBranding.LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES / (1024 * 1024)
 
-const LOGO_SLOTS = [
+type BrandingImageKey = SurveyLogoKey | typeof brandingKeys.landingBackground
+
+type LogoSlotConfig = {
+  imageKey: SurveyLogoKey
+  labelKey: string
+  fileType: string
+}
+
+const LOGO_SLOTS: LogoSlotConfig[] = [
   {
     imageKey: brandingKeys.surveyLogo1,
     labelKey: 'homeView:surveyInfo.branding.surveyLogo1',
@@ -49,22 +64,47 @@ const LOGO_SLOTS = [
   },
 ]
 
-const fieldErrorValidation = (errorKey) => Validation.newInstance(false, {}, [{ key: errorKey }])
-
-const resolvePreviewColor = (primaryColor) => (SurveyBranding.isValidPrimaryColor(primaryColor) ? primaryColor : null)
-
-const isAcceptedFile = (file, acceptedTypes, acceptedExtensions) => {
-  if (acceptedTypes.has(file.type)) return true
-  const extension = FileUtils.getExtension(file)?.toLowerCase()
-  return acceptedExtensions.has(extension)
+type FileValidationError = {
+  key: string
+  params?: Record<string, unknown>
 }
 
-const isAcceptedLogoFile = (file) => isAcceptedFile(file, ACCEPTED_LOGO_TYPES, ACCEPTED_LOGO_EXTENSIONS)
+const fieldErrorValidation = (errorKey: string): ValidationResultInstance =>
+  Validation.newInstance(false, {}, [{ key: errorKey }]) as ValidationResultInstance
 
-const isAcceptedBackgroundFile = (file) =>
+const resolvePreviewColor = (primaryColor: string): string | null =>
+  SurveyBranding.isValidPrimaryColor(primaryColor) ? primaryColor : null
+
+const isAcceptedFile = (file: File, acceptedTypes: Set<string>, acceptedExtensions: Set<string>): boolean => {
+  if (acceptedTypes.has(file.type)) return true
+  const extension = FileUtils.getExtension(file)?.toLowerCase()
+  return extension ? acceptedExtensions.has(extension) : false
+}
+
+const isAcceptedLogoFile = (file: File): boolean => isAcceptedFile(file, ACCEPTED_LOGO_TYPES, ACCEPTED_LOGO_EXTENSIONS)
+
+const isAcceptedBackgroundFile = (file: File): boolean =>
   isAcceptedFile(file, ACCEPTED_BACKGROUND_TYPES, ACCEPTED_BACKGROUND_EXTENSIONS)
 
-const BrandingImageSection = (props) => {
+type BrandingImageSectionProps = {
+  imageKey: BrandingImageKey
+  labelKey: string
+  image?: BrandingImageDescriptor
+  urlValue: string
+  urlValidation: ValidationResultInstance | null
+  localObjectUrl?: string | null
+  inputRef: RefObject<HTMLInputElement>
+  onFileChange: (event: ChangeEvent<HTMLInputElement>) => void
+  onImageUrlChange: (imageKey: BrandingImageKey, value: string) => void
+  onRemove?: ((imageKey: BrandingImageKey) => void) | null
+  readOnly?: boolean
+  surveyId: number | string | null
+  uploading?: boolean
+  fileInputAccept: string
+  previewVariant?: 'logo' | 'background'
+}
+
+const BrandingImageSection = (props: BrandingImageSectionProps) => {
   const {
     imageKey,
     labelKey,
@@ -117,14 +157,14 @@ const BrandingImageSection = (props) => {
                 size="small"
               />
             </div>
-            {hasImage && onRemove && (
-              <Button label="common:delete" onClick={() => onRemove(imageKey)} size="small" />
-            )}
+            {hasImage && onRemove && <ButtonIconDelete onClick={() => onRemove(imageKey)} />}
           </div>
         )}
       </div>
       {imageSrc && (
-        <div className={`survey-info-branding-form__image-preview survey-info-branding-form__image-preview--${previewVariant}`}>
+        <div
+          className={`survey-info-branding-form__image-preview survey-info-branding-form__image-preview--${previewVariant}`}
+        >
           <img alt="" src={imageSrc} />
         </div>
       )}
@@ -132,25 +172,13 @@ const BrandingImageSection = (props) => {
   )
 }
 
-BrandingImageSection.propTypes = {
-  imageKey: PropTypes.string.isRequired,
-  labelKey: PropTypes.string.isRequired,
-  image: PropTypes.object,
-  urlValue: PropTypes.string,
-  urlValidation: PropTypes.object,
-  localObjectUrl: PropTypes.string,
-  inputRef: PropTypes.object.isRequired,
-  onFileChange: PropTypes.func.isRequired,
-  onImageUrlChange: PropTypes.func.isRequired,
-  onRemove: PropTypes.func,
-  readOnly: PropTypes.bool,
-  surveyId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  uploading: PropTypes.bool,
-  fileInputAccept: PropTypes.string.isRequired,
-  previewVariant: PropTypes.oneOf(['logo', 'background']),
+type BrandingPreviewLogoProps = {
+  surveyId: number | string | null
+  logo?: BrandingImageDescriptor
+  localObjectUrl?: string | null
 }
 
-const BrandingPreviewLogo = (props) => {
+const BrandingPreviewLogo = (props: BrandingPreviewLogoProps) => {
   const { surveyId, logo, localObjectUrl } = props
   const src = useBrandingLogoSrc({ surveyId, logo, localObjectUrl })
 
@@ -159,46 +187,63 @@ const BrandingPreviewLogo = (props) => {
   return <img alt="" className="survey-info-branding-form__preview-logo" src={src} />
 }
 
-BrandingPreviewLogo.propTypes = {
-  surveyId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  logo: PropTypes.object,
-  localObjectUrl: PropTypes.string,
-}
-
-const getLogoUrlValidation = (logo) => {
+const getLogoUrlValidation = (logo: BrandingImageDescriptor): ValidationResultInstance | null => {
   const url = logo?.[brandingKeys.url]
   if (!url) return null
   if (SurveyBranding.isValidLogoUrl(url)) return null
   return fieldErrorValidation('homeView:surveyInfo.branding.invalidLogoUrl')
 }
 
-export const SurveyInfoBrandingForm = (props) => {
-  const { branding = {}, setBranding, readOnly } = props
+type SurveyInfoBrandingFormProps = {
+  branding?: SurveyBrandingData
+  setBranding: (branding: SurveyBrandingData) => void
+  readOnly?: boolean
+  labels?: Record<string, string>
+  descriptions?: Record<string, string>
+  name?: string
+}
+
+export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
+  const { branding = {}, setBranding, readOnly, labels, descriptions, name } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
   const surveyId = useSurveyId()
+  const lang = useSurveyPreferredLang()
 
-  const surveyLogo1InputRef = useRef(null)
-  const surveyLogo2InputRef = useRef(null)
-  const surveyLogo3InputRef = useRef(null)
-  const landingBackgroundInputRef = useRef(null)
-  const logoInputRefByKey = useMemo(
+  const previewSurveyInfo = useMemo(
     () => ({
+      props: {
+        labels,
+        descriptions,
+        name,
+      },
+    }),
+    [descriptions, labels, name]
+  )
+  const previewTitle = Survey.getLabel(previewSurveyInfo, lang)
+  const previewDescription = Survey.getDescription(lang, '')(previewSurveyInfo)
+
+  const surveyLogo1InputRef = useRef<HTMLInputElement>(null)
+  const surveyLogo2InputRef = useRef<HTMLInputElement>(null)
+  const surveyLogo3InputRef = useRef<HTMLInputElement>(null)
+  const landingBackgroundInputRef = useRef<HTMLInputElement>(null)
+  const logoInputRefByKey = useMemo(
+    (): Record<SurveyLogoKey, RefObject<HTMLInputElement>> => ({
       [brandingKeys.surveyLogo1]: surveyLogo1InputRef,
       [brandingKeys.surveyLogo2]: surveyLogo2InputRef,
       [brandingKeys.surveyLogo3]: surveyLogo3InputRef,
     }),
     []
   )
-  const [uploadingImageKey, setUploadingImageKey] = useState(null)
-  const [localObjectUrls, setLocalObjectUrls] = useState({})
+  const [uploadingImageKey, setUploadingImageKey] = useState<BrandingImageKey | null>(null)
+  const [localObjectUrls, setLocalObjectUrls] = useState<Partial<Record<BrandingImageKey, string>>>({})
 
   const {
-    primaryColor = '',
-    landingBackground = {},
-    titleFontSize = fontSizePreset.default,
-    descriptionFontSize = fontSizePreset.default,
+    [brandingKeys.primaryColor]: primaryColor = '',
+    [brandingKeys.landingBackground]: landingBackground = {},
+    [brandingKeys.titleFontSize]: titleFontSize = fontSizePreset.default,
+    [brandingKeys.descriptionFontSize]: descriptionFontSize = fontSizePreset.default,
   } = branding
 
   const landingBackgroundSrc = useBrandingLogoSrc({
@@ -224,14 +269,14 @@ export const SurveyInfoBrandingForm = (props) => {
     []
   )
 
-  const setLocalObjectUrl = useCallback((imageKey, file) => {
+  const setLocalObjectUrl = useCallback((imageKey: BrandingImageKey, file: File) => {
     setLocalObjectUrls((prev) => {
       if (prev[imageKey]) URL.revokeObjectURL(prev[imageKey])
       return { ...prev, [imageKey]: URL.createObjectURL(file) }
     })
   }, [])
 
-  const clearLocalObjectUrl = useCallback((imageKey) => {
+  const clearLocalObjectUrl = useCallback((imageKey: BrandingImageKey) => {
     setLocalObjectUrls((prev) => {
       if (prev[imageKey]) URL.revokeObjectURL(prev[imageKey])
       const next = { ...prev }
@@ -256,8 +301,8 @@ export const SurveyInfoBrandingForm = (props) => {
   const fontSizePresetOptions = useMemo(() => SurveyBranding.fontSizePresetValues, [])
 
   const onPrimaryColorChange = useCallback(
-    (value) => {
-      const next = { ...branding }
+    (value: string) => {
+      const next: SurveyBrandingData = { ...branding }
       if (!value?.trim()) {
         delete next[brandingKeys.primaryColor]
       } else {
@@ -269,9 +314,9 @@ export const SurveyInfoBrandingForm = (props) => {
   )
 
   const onImageUrlChange = useCallback(
-    (imageKey, value) => {
+    (imageKey: BrandingImageKey, value: string) => {
       clearLocalObjectUrl(imageKey)
-      const next = { ...branding }
+      const next: SurveyBrandingData = { ...branding }
       if (!value.trim()) {
         next[imageKey] = {}
       } else {
@@ -283,8 +328,8 @@ export const SurveyInfoBrandingForm = (props) => {
   )
 
   const onFontSizePresetChange = useCallback(
-    (fieldKey, value) => {
-      const next = { ...branding }
+    (fieldKey: typeof brandingKeys.titleFontSize | typeof brandingKeys.descriptionFontSize, value: FontSizePreset) => {
+      const next: SurveyBrandingData = { ...branding }
       if (!value || value === fontSizePreset.default) {
         delete next[fieldKey]
       } else {
@@ -296,9 +341,9 @@ export const SurveyInfoBrandingForm = (props) => {
   )
 
   const onImageRemove = useCallback(
-    (imageKey) => {
+    (imageKey: BrandingImageKey) => {
       clearLocalObjectUrl(imageKey)
-      const next = { ...branding }
+      const next: SurveyBrandingData = { ...branding }
       delete next[imageKey]
       setBranding(next)
     },
@@ -306,7 +351,17 @@ export const SurveyInfoBrandingForm = (props) => {
   )
 
   const onImageFileSelected = useCallback(
-    async ({ imageKey, fileType, file, validateFile }) => {
+    async ({
+      imageKey,
+      fileType,
+      file,
+      validateFile,
+    }: {
+      imageKey: BrandingImageKey
+      fileType: string
+      file: File | undefined
+      validateFile: (file: File) => FileValidationError | null
+    }) => {
       if (!file) return
 
       const validationError = validateFile(file)
@@ -339,7 +394,7 @@ export const SurveyInfoBrandingForm = (props) => {
         dispatch(
           NotificationActions.notifyError({
             key: 'appErrors:generic',
-            params: { text: String(error?.message || error) },
+            params: { text: String((error as Error)?.message || error) },
           })
         )
       } finally {
@@ -349,7 +404,7 @@ export const SurveyInfoBrandingForm = (props) => {
     [branding, clearLocalObjectUrl, dispatch, setBranding, setLocalObjectUrl, surveyId]
   )
 
-  const validateLogoFile = useCallback((file) => {
+  const validateLogoFile = useCallback((file: File): FileValidationError | null => {
     if (!isAcceptedLogoFile(file)) {
       return {
         key: 'dropzone.error.invalidFileExtension',
@@ -359,7 +414,7 @@ export const SurveyInfoBrandingForm = (props) => {
     return null
   }, [])
 
-  const validateBackgroundFile = useCallback((file) => {
+  const validateBackgroundFile = useCallback((file: File): FileValidationError | null => {
     if (!isAcceptedBackgroundFile(file)) {
       return {
         key: 'dropzone.error.invalidFileExtension',
@@ -376,7 +431,7 @@ export const SurveyInfoBrandingForm = (props) => {
   }, [])
 
   const createLogoFileChangeHandler = useCallback(
-    (imageKey, fileType) => (event) => {
+    (imageKey: SurveyLogoKey, fileType: string) => (event: ChangeEvent<HTMLInputElement>) => {
       onImageFileSelected({
         imageKey,
         fileType,
@@ -389,7 +444,7 @@ export const SurveyInfoBrandingForm = (props) => {
   )
 
   const onLandingBackgroundFileChange = useCallback(
-    (event) => {
+    (event: ChangeEvent<HTMLInputElement>) => {
       onImageFileSelected({
         imageKey: brandingKeys.landingBackground,
         fileType: SurveyFile.SurveyFileType.brandingLandingBackground,
@@ -415,10 +470,10 @@ export const SurveyInfoBrandingForm = (props) => {
       <FormItem label="homeView:surveyInfo.branding.titleFontSize">
         <Dropdown
           disabled={readOnly}
-          items={fontSizePresetOptions}
+          items={[...fontSizePresetOptions]}
           itemLabel={(preset) => i18n.t(`homeView:surveyInfo.branding.fontSizePreset.${preset}`)}
           itemValue={A.identity}
-          onChange={(value) => onFontSizePresetChange(brandingKeys.titleFontSize, value)}
+          onChange={(value) => onFontSizePresetChange(brandingKeys.titleFontSize, value as FontSizePreset)}
           readOnly={readOnly}
           selection={titleFontSize}
         />
@@ -427,10 +482,10 @@ export const SurveyInfoBrandingForm = (props) => {
       <FormItem label="homeView:surveyInfo.branding.descriptionFontSize">
         <Dropdown
           disabled={readOnly}
-          items={fontSizePresetOptions}
+          items={[...fontSizePresetOptions]}
           itemLabel={(preset) => i18n.t(`homeView:surveyInfo.branding.fontSizePreset.${preset}`)}
           itemValue={A.identity}
-          onChange={(value) => onFontSizePresetChange(brandingKeys.descriptionFontSize, value)}
+          onChange={(value) => onFontSizePresetChange(brandingKeys.descriptionFontSize, value as FontSizePreset)}
           readOnly={readOnly}
           selection={descriptionFontSize}
         />
@@ -499,11 +554,13 @@ export const SurveyInfoBrandingForm = (props) => {
               ))}
             </div>
             <p className="survey-info-branding-form__preview-title" style={previewTitleStyle}>
-              {i18n.t('homeView:surveyInfo.branding.previewTitle')}
+              {previewTitle}
             </p>
-            <p className="survey-info-branding-form__preview-description" style={previewDescriptionStyle}>
-              {i18n.t('homeView:surveyInfo.branding.previewDescription')}
-            </p>
+            {previewDescription ? (
+              <p className="survey-info-branding-form__preview-description" style={previewDescriptionStyle}>
+                {previewDescription}
+              </p>
+            ) : null}
             <Button
               color="primary"
               label="common:appModules.records"
@@ -521,10 +578,4 @@ export const SurveyInfoBrandingForm = (props) => {
       </fieldset>
     </div>
   )
-}
-
-SurveyInfoBrandingForm.propTypes = {
-  branding: PropTypes.object,
-  setBranding: PropTypes.func.isRequired,
-  readOnly: PropTypes.bool,
 }

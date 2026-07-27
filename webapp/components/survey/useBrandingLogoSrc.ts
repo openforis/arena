@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import type { AxiosResponse } from 'axios'
 
 import * as SurveyBranding from '@core/survey/surveyBranding'
+import type { BrandingImageDescriptor } from '@core/survey/surveyBranding'
 
 import * as API from '@webapp/service/api'
 
-const MIME_BY_EXTENSION = {
+const MIME_BY_EXTENSION: Record<string, string> = {
   png: 'image/png',
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
@@ -15,24 +17,20 @@ const MIME_BY_EXTENSION = {
 
 /**
  * Infers an image MIME type from a Content-Disposition filename.
- * @param {string|undefined|null} contentDisposition
- * @returns {string|null}
  */
-const mimeTypeFromContentDisposition = (contentDisposition) => {
+const mimeTypeFromContentDisposition = (contentDisposition: string | undefined | null): string | null => {
   if (!contentDisposition) return null
   const fileNameMatch = /filename\*?=(?:UTF-8''|")?([^";]+)/i.exec(contentDisposition)
   const fileName = fileNameMatch?.[1] ? decodeURIComponent(fileNameMatch[1].replaceAll('"', '')) : null
   if (!fileName) return null
   const extension = fileName.split('.').pop()?.toLowerCase()
-  return MIME_BY_EXTENSION[extension] || null
+  return extension ? MIME_BY_EXTENSION[extension] || null : null
 }
 
 /**
  * Ensures the blob has a usable image MIME type (survey file API often omits Content-Type).
- * @param {import('axios').AxiosResponse} response
- * @returns {Blob}
  */
-const toDisplayableImageBlob = (response) => {
+const toDisplayableImageBlob = (response: AxiosResponse<Blob>): Blob => {
   const blob = response.data
   if (blob?.type && blob.type !== 'application/octet-stream') {
     return blob
@@ -45,20 +43,27 @@ const toDisplayableImageBlob = (response) => {
   return new Blob([blob], { type: mimeType })
 }
 
+type UseBrandingLogoSrcParams = {
+  surveyId: number | string | null
+  logo: BrandingImageDescriptor | null | undefined
+  localObjectUrl?: string | null
+}
+
 /**
  * Resolves a displayable image src for a branding logo.
  * External HTTPS URLs are used directly; survey file UUIDs are fetched as blobs
  * because the file API serves Content-Disposition: attachment (not usable as img src).
- *
- * @param {{surveyId: number|string|null, logo: {fileUuid?: string, url?: string}|null|undefined, localObjectUrl?: string|null}} params
- * @returns {string|null}
  */
-export const useBrandingLogoSrc = ({ surveyId, logo, localObjectUrl = null }) => {
-  const [src, setSrc] = useState(null)
+export const useBrandingLogoSrc = ({
+  surveyId,
+  logo,
+  localObjectUrl = null,
+}: UseBrandingLogoSrcParams): string | null => {
+  const [src, setSrc] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    let blobUrlToRevoke = null
+    let blobUrlToRevoke: string | null = null
 
     const resolve = async () => {
       if (localObjectUrl) {

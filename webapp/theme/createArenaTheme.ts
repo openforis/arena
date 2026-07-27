@@ -1,13 +1,15 @@
-import { createTheme } from '@mui/material/styles'
+import { createTheme, type Theme } from '@mui/material/styles'
 
 import { defaultTokens } from './tokens'
 
+type CreateArenaThemeParams = {
+  primaryColor?: string | null
+}
+
 /**
  * Creates the Arena MUI theme.
- * @param {{primaryColor?: string|null}} [params]
- * @returns {import('@mui/material/styles').Theme}
  */
-export const createArenaTheme = ({ primaryColor = null } = {}) => {
+export const createArenaTheme = ({ primaryColor = null }: CreateArenaThemeParams = {}): Theme => {
   const main = primaryColor || defaultTokens.colors.blue
   return createTheme({
     typography: {

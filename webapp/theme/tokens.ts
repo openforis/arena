@@ -22,4 +22,6 @@ export const defaultTokens = {
     white: '#ffffff',
     colorTextPrimary: '#21507b',
   },
-}
+} as const
+
+export type ArenaTokens = typeof defaultTokens
