@@ -14,6 +14,15 @@ import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { useSurveyId, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
+const LandingLogo = (props) => {
+  const { surveyId, logo, logoKey } = props
+  const src = useBrandingLogoSrc({ surveyId, logo })
+
+  if (!src) return null
+
+  return <img alt="" className="survey-landing__logo" data-logo-slot={logoKey} src={src} />
+}
+
 const LandingContent = () => {
   const navigate = useNavigate()
   const surveyInfo = useSurveyInfo()
@@ -22,14 +31,7 @@ const LandingContent = () => {
 
   const title = Survey.getLabel(surveyInfo, lang)
   const description = Survey.getDescription(lang, '')(surveyInfo)
-  const surveyLogoSrc = useBrandingLogoSrc({
-    surveyId,
-    logo: SurveyBranding.getSurveyLogo(surveyInfo),
-  })
-  const countryLogoSrc = useBrandingLogoSrc({
-    surveyId,
-    logo: SurveyBranding.getCountryLogo(surveyInfo),
-  })
+  const branding = SurveyBranding.getBranding(surveyInfo)
   const landingBackgroundSrc = useBrandingLogoSrc({
     surveyId,
     logo: SurveyBranding.getLandingBackground(surveyInfo),
@@ -44,12 +46,11 @@ const LandingContent = () => {
     >
       <div className="survey-landing__content">
         <div className="survey-landing__logos">
-          {countryLogoSrc && (
-            <img alt="" className="survey-landing__logo survey-landing__logo--country" src={countryLogoSrc} />
-          )}
-          {surveyLogoSrc && (
-            <img alt="" className="survey-landing__logo survey-landing__logo--survey" src={surveyLogoSrc} />
-          )}
+          {SurveyBranding.surveyLogoKeys.map((logoKey) => {
+            const logo = branding[logoKey]
+            if (!SurveyBranding.hasLogoDescriptor(logo)) return null
+            return <LandingLogo key={logoKey} logo={logo} logoKey={logoKey} surveyId={surveyId} />
+          })}
         </div>
         <h1 className="survey-landing__title" style={{ fontSize: SurveyBranding.getTitleFontSizeRem(surveyInfo) }}>
           {title}

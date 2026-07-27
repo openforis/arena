@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
 import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
@@ -31,6 +30,24 @@ const LOGO_FILE_INPUT_ACCEPT = 'image/png,image/jpeg,image/webp,image/svg+xml,.p
 const BACKGROUND_FILE_INPUT_ACCEPT = 'image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp'
 
 const LANDING_BACKGROUND_MAX_SIZE_MB = SurveyBranding.LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES / (1024 * 1024)
+
+const LOGO_SLOTS = [
+  {
+    imageKey: brandingKeys.surveyLogo1,
+    labelKey: 'homeView:surveyInfo.branding.surveyLogo1',
+    fileType: SurveyFile.SurveyFileType.brandingSurveyLogo1,
+  },
+  {
+    imageKey: brandingKeys.surveyLogo2,
+    labelKey: 'homeView:surveyInfo.branding.surveyLogo2',
+    fileType: SurveyFile.SurveyFileType.brandingSurveyLogo2,
+  },
+  {
+    imageKey: brandingKeys.surveyLogo3,
+    labelKey: 'homeView:surveyInfo.branding.surveyLogo3',
+    fileType: SurveyFile.SurveyFileType.brandingSurveyLogo3,
+  },
+]
 
 const fieldErrorValidation = (errorKey) => Validation.newInstance(false, {}, [{ key: errorKey }])
 
@@ -133,6 +150,28 @@ BrandingImageSection.propTypes = {
   previewVariant: PropTypes.oneOf(['logo', 'background']),
 }
 
+const BrandingPreviewLogo = (props) => {
+  const { surveyId, logo, localObjectUrl } = props
+  const src = useBrandingLogoSrc({ surveyId, logo, localObjectUrl })
+
+  if (!src) return null
+
+  return <img alt="" className="survey-info-branding-form__preview-logo" src={src} />
+}
+
+BrandingPreviewLogo.propTypes = {
+  surveyId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  logo: PropTypes.object,
+  localObjectUrl: PropTypes.string,
+}
+
+const getLogoUrlValidation = (logo) => {
+  const url = logo?.[brandingKeys.url]
+  if (!url) return null
+  if (SurveyBranding.isValidLogoUrl(url)) return null
+  return fieldErrorValidation('homeView:surveyInfo.branding.invalidLogoUrl')
+}
+
 export const SurveyInfoBrandingForm = (props) => {
   const { branding = {}, setBranding, readOnly } = props
 
@@ -140,31 +179,28 @@ export const SurveyInfoBrandingForm = (props) => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
 
-  const surveyLogoInputRef = useRef(null)
-  const countryLogoInputRef = useRef(null)
+  const surveyLogo1InputRef = useRef(null)
+  const surveyLogo2InputRef = useRef(null)
+  const surveyLogo3InputRef = useRef(null)
   const landingBackgroundInputRef = useRef(null)
+  const logoInputRefByKey = useMemo(
+    () => ({
+      [brandingKeys.surveyLogo1]: surveyLogo1InputRef,
+      [brandingKeys.surveyLogo2]: surveyLogo2InputRef,
+      [brandingKeys.surveyLogo3]: surveyLogo3InputRef,
+    }),
+    []
+  )
   const [uploadingImageKey, setUploadingImageKey] = useState(null)
   const [localObjectUrls, setLocalObjectUrls] = useState({})
 
   const {
     primaryColor = '',
-    surveyLogo = {},
-    countryLogo = {},
     landingBackground = {},
     titleFontSize = fontSizePreset.default,
     descriptionFontSize = fontSizePreset.default,
   } = branding
 
-  const surveyLogoSrc = useBrandingLogoSrc({
-    surveyId,
-    logo: surveyLogo,
-    localObjectUrl: localObjectUrls[brandingKeys.surveyLogo] ?? null,
-  })
-  const countryLogoSrc = useBrandingLogoSrc({
-    surveyId,
-    logo: countryLogo,
-    localObjectUrl: localObjectUrls[brandingKeys.countryLogo] ?? null,
-  })
   const landingBackgroundSrc = useBrandingLogoSrc({
     surveyId,
     logo: landingBackground,
@@ -209,20 +245,6 @@ export const SurveyInfoBrandingForm = (props) => {
     if (SurveyBranding.isValidPrimaryColor(primaryColor)) return null
     return fieldErrorValidation('homeView:surveyInfo.branding.invalidPrimaryColor')
   }, [primaryColor])
-
-  const surveyLogoUrlValidation = useMemo(() => {
-    const url = surveyLogo[brandingKeys.url]
-    if (!url) return null
-    if (SurveyBranding.isValidLogoUrl(url)) return null
-    return fieldErrorValidation('homeView:surveyInfo.branding.invalidLogoUrl')
-  }, [surveyLogo])
-
-  const countryLogoUrlValidation = useMemo(() => {
-    const url = countryLogo[brandingKeys.url]
-    if (!url) return null
-    if (SurveyBranding.isValidLogoUrl(url)) return null
-    return fieldErrorValidation('homeView:surveyInfo.branding.invalidLogoUrl')
-  }, [countryLogo])
 
   const landingBackgroundUrlValidation = useMemo(() => {
     const url = landingBackground[brandingKeys.url]
@@ -276,7 +298,9 @@ export const SurveyInfoBrandingForm = (props) => {
   const onImageRemove = useCallback(
     (imageKey) => {
       clearLocalObjectUrl(imageKey)
-      setBranding({ ...branding, [imageKey]: {} })
+      const next = { ...branding }
+      delete next[imageKey]
+      setBranding(next)
     },
     [branding, clearLocalObjectUrl, setBranding]
   )
@@ -351,24 +375,11 @@ export const SurveyInfoBrandingForm = (props) => {
     return null
   }, [])
 
-  const onSurveyLogoFileChange = useCallback(
-    (event) => {
+  const createLogoFileChangeHandler = useCallback(
+    (imageKey, fileType) => (event) => {
       onImageFileSelected({
-        imageKey: brandingKeys.surveyLogo,
-        fileType: SurveyFile.SurveyFileType.brandingSurveyLogo,
-        file: event.target.files?.[0],
-        validateFile: validateLogoFile,
-      })
-      event.target.value = ''
-    },
-    [onImageFileSelected, validateLogoFile]
-  )
-
-  const onCountryLogoFileChange = useCallback(
-    (event) => {
-      onImageFileSelected({
-        imageKey: brandingKeys.countryLogo,
-        fileType: SurveyFile.SurveyFileType.brandingCountryLogo,
+        imageKey,
+        fileType,
         file: event.target.files?.[0],
         validateFile: validateLogoFile,
       })
@@ -426,37 +437,28 @@ export const SurveyInfoBrandingForm = (props) => {
       </FormItem>
 
       <div className="survey-info-branding-form__logos">
-        <BrandingImageSection
-          imageKey={brandingKeys.surveyLogo}
-          labelKey="homeView:surveyInfo.branding.surveyLogo"
-          image={surveyLogo}
-          urlValue={surveyLogo[brandingKeys.url] ?? ''}
-          urlValidation={surveyLogoUrlValidation}
-          localObjectUrl={localObjectUrls[brandingKeys.surveyLogo] ?? null}
-          inputRef={surveyLogoInputRef}
-          onFileChange={onSurveyLogoFileChange}
-          onImageUrlChange={onImageUrlChange}
-          readOnly={readOnly}
-          surveyId={surveyId}
-          uploading={uploadingImageKey === brandingKeys.surveyLogo}
-          fileInputAccept={LOGO_FILE_INPUT_ACCEPT}
-        />
-
-        <BrandingImageSection
-          imageKey={brandingKeys.countryLogo}
-          labelKey="homeView:surveyInfo.branding.countryLogo"
-          image={countryLogo}
-          urlValue={countryLogo[brandingKeys.url] ?? ''}
-          urlValidation={countryLogoUrlValidation}
-          localObjectUrl={localObjectUrls[brandingKeys.countryLogo] ?? null}
-          inputRef={countryLogoInputRef}
-          onFileChange={onCountryLogoFileChange}
-          onImageUrlChange={onImageUrlChange}
-          readOnly={readOnly}
-          surveyId={surveyId}
-          uploading={uploadingImageKey === brandingKeys.countryLogo}
-          fileInputAccept={LOGO_FILE_INPUT_ACCEPT}
-        />
+        {LOGO_SLOTS.map(({ imageKey, labelKey, fileType }) => {
+          const logo = branding[imageKey] || {}
+          return (
+            <BrandingImageSection
+              key={imageKey}
+              imageKey={imageKey}
+              labelKey={labelKey}
+              image={logo}
+              urlValue={logo[brandingKeys.url] ?? ''}
+              urlValidation={getLogoUrlValidation(logo)}
+              localObjectUrl={localObjectUrls[imageKey] ?? null}
+              inputRef={logoInputRefByKey[imageKey]}
+              onFileChange={createLogoFileChangeHandler(imageKey, fileType)}
+              onImageUrlChange={onImageUrlChange}
+              onRemove={readOnly ? null : onImageRemove}
+              readOnly={readOnly}
+              surveyId={surveyId}
+              uploading={uploadingImageKey === imageKey}
+              fileInputAccept={LOGO_FILE_INPUT_ACCEPT}
+            />
+          )
+        })}
       </div>
 
       <BrandingImageSection
@@ -486,8 +488,16 @@ export const SurveyInfoBrandingForm = (props) => {
           style={landingBackgroundSrc ? { backgroundImage: `url(${landingBackgroundSrc})` } : undefined}
         >
           <div className="survey-info-branding-form__preview-content">
-            {countryLogoSrc && <img alt="" className="survey-info-branding-form__preview-logo" src={countryLogoSrc} />}
-            {surveyLogoSrc && <img alt="" className="survey-info-branding-form__preview-logo" src={surveyLogoSrc} />}
+            <div className="survey-info-branding-form__preview-logos">
+              {LOGO_SLOTS.map(({ imageKey }) => (
+                <BrandingPreviewLogo
+                  key={imageKey}
+                  localObjectUrl={localObjectUrls[imageKey] ?? null}
+                  logo={branding[imageKey] || {}}
+                  surveyId={surveyId}
+                />
+              ))}
+            </div>
             <p className="survey-info-branding-form__preview-title" style={previewTitleStyle}>
               {i18n.t('homeView:surveyInfo.branding.previewTitle')}
             </p>

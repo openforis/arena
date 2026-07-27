@@ -22,7 +22,7 @@
 
   &__logos {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.5rem;
   }
 
@@ -142,6 +142,15 @@
     text-align: center;
   }
 
+  &__preview-logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
   &__preview-title {
     margin: 0;
     font-weight: 600;
@@ -162,7 +171,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .survey-info-branding-form {
     &__logos {
       grid-template-columns: 1fr;

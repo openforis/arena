@@ -35,8 +35,9 @@ export const SurveyFileType = {
   preloadedMapLayer: 'preloadedMapLayer',
   recordAttachment: 'recordAttachment',
   surveyDocImage: 'surveyDocImage',
-  brandingSurveyLogo: 'brandingSurveyLogo',
-  brandingCountryLogo: 'brandingCountryLogo',
+  brandingSurveyLogo1: 'brandingSurveyLogo1',
+  brandingSurveyLogo2: 'brandingSurveyLogo2',
+  brandingSurveyLogo3: 'brandingSurveyLogo3',
   brandingLandingBackground: 'brandingLandingBackground',
 }
 

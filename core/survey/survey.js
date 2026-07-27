@@ -153,8 +153,9 @@ export const {
 export {
   getBranding,
   getPrimaryColor,
-  getSurveyLogo,
-  getCountryLogo,
+  getSurveyLogoBySlot,
+  getSurveyLogos,
+  surveyLogoKeys,
   getLandingBackground,
   getTitleFontSizeRem,
   getDescriptionFontSizeRem,
