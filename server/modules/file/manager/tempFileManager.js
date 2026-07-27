@@ -1,3 +1,7 @@
+import { isUuid } from '@core/uuid'
+import SystemError from '@core/systemError'
+import * as FileUtils from '@server/utils/file/fileUtils'
+
 import { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 import * as TempFileRepositoryFileSystem from '../repository/tempFileRepositoryFileSystem'
 import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3Bucket'
@@ -68,4 +72,50 @@ export const mergeTempChunks = async ({ fileId, totalChunks, totalFileSize, onCh
     mergeChunksFunction = chunkMergeFunctionByStorageType[fileContentStorageTypes.fileSystem]
   }
   return mergeChunksFunction({ fileId, totalChunks, onChunkMerged })
+}
+
+// Whatever the chunk storage type, mergeTempChunks always produces its final merged file on the local
+// file system (see tempFileRepositoryFileSystem/tempFileRepositoryS3Bucket implementations), so these
+// two functions only need to deal with local files.
+
+const pendingImportFilePrefix = 'pendingImport_'
+const getPendingImportFileName = (fileId) => `${pendingImportFilePrefix}${fileId}`
+
+const checkFileIdIsValid = (fileId) => {
+  if (!isUuid(fileId)) {
+    throw new Error(`Invalid file id: ${fileId}`)
+  }
+}
+
+/**
+ * Moves a previously merged temp file to a location that can be found again later using only its fileId,
+ * so it can be reused by a later request instead of being uploaded again (e.g. confirming an import after
+ * previewing it). The file keeps living in the temp folder, so it's still covered by the periodic temp
+ * files cleanup.
+ * @param {!object} params - The params.
+ * @param {!string} params.fileId - The uuid the file was originally uploaded with.
+ * @param {!string} params.filePath - The current path of the merged temp file.
+ * @returns {Promise<string>} - The new path of the file.
+ */
+export const keepFileForLaterUse = async ({ fileId, filePath }) => {
+  checkFileIdIsValid(fileId)
+  const destPath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
+  await FileUtils.renameFile(filePath, destPath)
+  return destPath
+}
+
+/**
+ * Resolves the path of a file previously kept with keepFileForLaterUse.
+ * Throws if the fileId is invalid or the file cannot be found anymore (e.g. it expired and got cleaned up).
+ * @param {!object} params - The params.
+ * @param {!string} params.fileId - The uuid the file was originally uploaded with.
+ * @returns {string} - The path of the kept file.
+ */
+export const getKeptFilePath = ({ fileId }) => {
+  checkFileIdIsValid(fileId)
+  const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
+  if (!FileUtils.exists(filePath)) {
+    throw new SystemError('dataImport.pendingImportFileNotFoundOrExpired', { fileId })
+  }
+  return filePath
 }

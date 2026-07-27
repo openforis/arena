@@ -9,6 +9,7 @@ import {
   GridInitialState,
   GridRowClassNameParams,
   GridRowIdGetter,
+  GridRowSelectionModel,
   GridRowsProp,
   GridToolbarExport,
 } from '@mui/x-data-grid'
@@ -30,7 +31,9 @@ type Props = {
   hideFooterPagination?: boolean
   initialState?: GridInitialState
   onRowDoubleClick?: DataGridProps['onRowDoubleClick']
+  onRowSelectionModelChange?: (model: GridRowSelectionModel) => void
   rows: GridRowsProp
+  rowSelectionModel?: GridRowSelectionModel
 }
 
 const FooterWithExport =
@@ -59,7 +62,9 @@ const DataGrid = (props: Props) => {
     hideFooterPagination = false,
     initialState,
     onRowDoubleClick,
+    onRowSelectionModelChange,
     rows,
+    rowSelectionModel,
   } = props
 
   const columns = useMemo(() => columnsProp.map((col) => ({ ...col, disableColumnMenu: true })), [columnsProp])
@@ -81,7 +86,9 @@ const DataGrid = (props: Props) => {
       hideFooterPagination={hideFooterPagination}
       initialState={initialState}
       onRowDoubleClick={onRowDoubleClick}
+      onRowSelectionModelChange={onRowSelectionModelChange}
       rows={rows}
+      rowSelectionModel={rowSelectionModel}
       slots={allowExportToCsv ? { footer: FooterWithExport({ exportFileName }) } : undefined}
     />
   )

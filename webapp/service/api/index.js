@@ -52,6 +52,7 @@ export {
   createRecordFromSamplingPointDataItem,
   startCollectRecordsImportJob,
   startDataImportFromArenaJob,
+  startArenaImportSummaryJob,
   startDataImportFromCsvJob,
   getDataImportFromCsvTemplateUrl,
   getDataImportFromCsvTemplatesUrl,

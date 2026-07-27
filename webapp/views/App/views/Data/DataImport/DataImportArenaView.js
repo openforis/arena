@@ -11,7 +11,7 @@ import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
-import { NotificationActions } from '@webapp/store/ui'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { Dropzone, Fieldset } from '@webapp/components'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
@@ -20,6 +20,7 @@ import { FileUtils } from '@webapp/utils/fileUtils'
 
 import { defaultChunkSize, FileUploadChunkSizeDropdown } from './FileUploadChunkSizeDropdown'
 import { ImportStartButton } from './ImportStartButton'
+import { ArenaImportPreviewDialog } from './ArenaImportPreviewDialog'
 
 const acceptedFileExtensions = ['zip']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
@@ -62,13 +63,14 @@ export const DataImportArenaView = () => {
     fileId: null,
     chunkSize: defaultChunkSize,
     skipMissingFiles: false,
+    previewItems: null,
   })
 
-  const { cycle, conflictResolutionStrategy, file, fileId, chunkSize, skipMissingFiles } = state
+  const { cycle, conflictResolutionStrategy, file, fileId, chunkSize, skipMissingFiles, previewItems } = state
 
   const onImportJobComplete = useCallback(
     async (jobCompleted) => {
-      setState((state) => ({ ...state, file: null, fileId: null }))
+      setState((state) => ({ ...state, file: null, fileId: null, previewItems: null }))
       const result = JobSerialized.getResult(jobCompleted)
       const summary = generateImportSummary({ result, i18n })
       dispatch(
@@ -82,11 +84,49 @@ export const DataImportArenaView = () => {
     [dispatch, i18n]
   )
 
-  const onImportJobStart = useCallback(
-    (job) => {
+  const startImport = useCallback(
+    async (selectedRecordsUuids) => {
+      const { promise } = API.startDataImportFromArenaJob({
+        surveyId,
+        cycle,
+        conflictResolutionStrategy,
+        fileId,
+        skipMissingFiles,
+        reuseUploadedFile: true,
+        selectedRecordsUuids,
+      })
+      const job = await promise
       dispatch(JobActions.showJobMonitor({ job, autoHide: true, onComplete: onImportJobComplete }))
     },
-    [dispatch, onImportJobComplete]
+    [conflictResolutionStrategy, cycle, dispatch, fileId, onImportJobComplete, skipMissingFiles, surveyId]
+  )
+
+  const onPreviewConfirm = useCallback(
+    (selectedRecordsUuids) => {
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'dataImportView:startImportConfirm',
+          onOk: () => startImport(selectedRecordsUuids),
+        })
+      )
+    },
+    [dispatch, startImport]
+  )
+
+  const onPreviewCancel = useCallback(() => {
+    setState((state) => ({ ...state, previewItems: null }))
+  }, [])
+
+  const onPreviewJobComplete = useCallback((jobCompleted) => {
+    const { items } = JobSerialized.getResult(jobCompleted)
+    setState((state) => ({ ...state, previewItems: items }))
+  }, [])
+
+  const onPreviewJobStart = useCallback(
+    (job) => {
+      dispatch(JobActions.showJobMonitor({ job, autoHide: true, onComplete: onPreviewJobComplete }))
+    },
+    [dispatch, onPreviewJobComplete]
   )
 
   const onFilesDrop = useCallback(async (files) => {
@@ -94,7 +134,7 @@ export const DataImportArenaView = () => {
       const extension = FileUtils.getExtension(file)
       return acceptedFileExtensions.includes(extension)
     })[0]
-    setState((state) => ({ ...state, file: _file, fileId: UUIDs.v4() }))
+    setState((state) => ({ ...state, file: _file, fileId: UUIDs.v4(), previewItems: null }))
   }, [])
 
   return (
@@ -112,6 +152,7 @@ export const DataImportArenaView = () => {
             label="dataImportView:conflictResolutionStrategy.label"
           >
             <Dropdown
+              disabled={Boolean(previewItems)}
               itemLabel={(strategy) => i18n.t(`dataImportView:conflictResolutionStrategy.${strategy}`)}
               itemValue={(item) => item}
               items={Object.values(ConflictResolutionStrategy)}
@@ -137,22 +178,22 @@ export const DataImportArenaView = () => {
         />
 
         <ImportStartButton
-          confirmMessageKey="dataImportView:startImportConfirm"
           disabled={!file}
-          showConfirm
-          startFunction={API.startDataImportFromArenaJob}
+          label="dataImportView:importPreview.generatePreview"
+          startFunction={API.startArenaImportSummaryJob}
           startFunctionParams={{
             surveyId,
-            cycle,
             conflictResolutionStrategy,
             file,
             fileId,
             chunkSize,
-            skipMissingFiles,
           }}
-          onUploadComplete={onImportJobStart}
+          onUploadComplete={onPreviewJobStart}
         />
       </div>
+      {previewItems && (
+        <ArenaImportPreviewDialog items={previewItems} onCancel={onPreviewCancel} onConfirm={onPreviewConfirm} />
+      )}
     </div>
   )
 }

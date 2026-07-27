@@ -57,9 +57,13 @@ export const init = (app) => {
         surveyId,
         conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting,
         skipMissingFiles = false,
+        fileId,
+        reuseUploadedFile = false,
+        selectedRecordsUuids,
       } = Request.getParams(req)
 
-      const tempFile = await processChunkedFileForBackgroundMerge({ req })
+      // when reusing a file previously uploaded to generate an import preview/summary, no new file is sent
+      const tempFile = reuseUploadedFile ? { fileId } : await processChunkedFileForBackgroundMerge({ req })
       if (tempFile) {
         const job = ArenaMobileImportService.startArenaMobileImportJob({
           user,
@@ -67,6 +71,8 @@ export const init = (app) => {
           surveyId,
           conflictResolutionStrategy,
           skipMissingFiles,
+          reuseUploadedFile,
+          selectedRecordsUuids,
         })
         res.json({ job: JobUtils.jobToJSON(job) })
       } else {
@@ -76,4 +82,33 @@ export const init = (app) => {
       next(e)
     }
   })
+
+  // ====== PREVIEW - generates a summary of what would happen if the given Arena format file was imported,
+  // without writing anything to the database. The uploaded file is kept for a subsequent, real import request.
+  app.post(
+    '/mobile/survey/:surveyId/import-summary',
+    AuthMiddleware.requireRecordCreatePermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting } =
+          Request.getParams(req)
+
+        const tempFile = await processChunkedFileForBackgroundMerge({ req })
+        if (tempFile) {
+          const job = ArenaMobileImportService.startArenaMobileImportSummaryJob({
+            user,
+            ...tempFile,
+            surveyId,
+            conflictResolutionStrategy,
+          })
+          res.json({ job: JobUtils.jobToJSON(job) })
+        } else {
+          res.json({ chunkProcessing: true })
+        }
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
 }
