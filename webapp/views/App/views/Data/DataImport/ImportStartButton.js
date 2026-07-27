@@ -5,9 +5,10 @@ import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import { Button, ProgressBar } from '@webapp/components'
-import { DialogConfirmActions } from '@webapp/store/ui'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { ButtonIconCancel } from '@webapp/components/buttons'
 import { useConfirmAsync } from '@webapp/components/hooks'
+import { FileUtils } from '@webapp/utils/fileUtils'
 
 const stata = {
   running: 'running',
@@ -67,6 +68,12 @@ export const ImportStartButton = (props) => {
   }, [])
 
   const onStartConfirmed = useCallback(async () => {
+    const { file } = startFunctionParams
+    if (file && !(await FileUtils.checkFileIsReadable(file))) {
+      dispatch(NotificationActions.notifyError({ key: 'common.uploadFileChangedError' }))
+      return
+    }
+
     let retry = true
     while (retry) {
       retry = false
@@ -98,7 +105,7 @@ export const ImportStartButton = (props) => {
         }
       }
     }
-  }, [confirm, onUploadComplete, onUploadProgress, reset, startFunction, startFunctionParams])
+  }, [confirm, dispatch, onUploadComplete, onUploadProgress, reset, startFunction, startFunctionParams])
 
   const onStartClick = useCallback(async () => {
     if (showConfirm) {

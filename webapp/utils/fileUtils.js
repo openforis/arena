@@ -65,6 +65,23 @@ const readAsText = async (file, ignoreErrors = true) =>
     reader.readAsText(file)
   })
 
+/**
+ * Checks that a previously selected file can still actually be read from disk.
+ * Browsers snapshot a file's size/last-modified metadata at selection time but read its bytes lazily;
+ * if the underlying file was modified/moved/deleted afterwards, reading it fails (e.g. Chrome's
+ * net::ERR_UPLOAD_FILE_CHANGED), which otherwise only surfaces later as a generic upload/network error.
+ * Reading a single byte is enough to trigger the same check the browser would do on actual upload.
+ * @param {!File} file - The file to check.
+ * @returns {Promise<boolean>} - True if the file can still be read, false otherwise.
+ */
+const checkFileIsReadable = async (file) =>
+  new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(true)
+    reader.onerror = () => resolve(false)
+    reader.readAsArrayBuffer(file.slice(0, 1))
+  })
+
 const determineFileFormatFromFileName = (fileName) => {
   const extension = getExtension(fileName)
   return extension ? fileFormatByExtension[extension.toLocaleLowerCase()] : undefined
@@ -76,5 +93,6 @@ export const FileUtils = {
   toHumanReadableFileSize,
   acceptByExtension,
   readAsText,
+  checkFileIsReadable,
   determineFileFormatFromFileName,
 }
