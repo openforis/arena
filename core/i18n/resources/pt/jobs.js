@@ -1,6 +1,7 @@
 export default {
   ActivityLogImportJob: 'Importação de log de atividades',
-  ArenaMobileDataImportJob: 'Importação de dados do Arena Mobile',
+  ArenaMobileDataImportJob: 'Importação de dados do Arena',
+  ArenaMobileDataImportSummaryJob: 'Resumo da importação de dados do Arena',
   CategoriesImportJob: 'Importação de categorias',
   CategoriesValidationJob: 'Validação de categorias',
   CategoriesBatchImportJob: 'Importação de categorias',
