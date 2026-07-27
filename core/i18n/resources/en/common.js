@@ -203,6 +203,8 @@ Do you want to proceed?`,
       message: `Error during file upload: {{error}}.\n
 Try again?`,
     },
+    uploadFileChangedError:
+      'The selected file appears to have been modified since it was selected. Please remove it and select it again.',
     uploadingFile: 'Uploading file ({{progressPercent}}%)',
     value: 'Value',
     view: 'View',
