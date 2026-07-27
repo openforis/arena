@@ -34,6 +34,25 @@ export default {
 `,
   importIntoCycle: 'Импортировать в цикл',
   importIntoMultipleEntityOrAttribute: 'Импортировать в множественную сущность или атрибут',
+  importPreview: {
+    title: 'Предварительный просмотр импорта',
+    generatePreview: 'Создать предварительный просмотр',
+    skipInfo:
+      'Записи, отмеченные как «Пропустить», нельзя выбрать: уже существует более недавно измененная запись, поэтому они не будут импортированы.',
+    confirmImport: 'Импортировать выбранные записи ({{count}})',
+    columns: {
+      exists: 'Существует',
+      action: 'Действие',
+      dateModified: 'Импортируемая запись изменена',
+      existingDateModified: 'Существующая запись изменена',
+    },
+    action: {
+      insert: 'Вставить',
+      overwrite: 'Перезаписать',
+      merge: 'Объединить',
+      skip: 'Пропустить',
+    },
+  },
   importType: {
     label: 'Тип импорта',
     insertNewRecords: 'Вставить новые записи',

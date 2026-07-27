@@ -21,6 +21,8 @@ export default {
     invalidNodeInRecord:
       'Nodo inválido en el registro "{{recordUuid}}", nodo "{{nodeUuid}}" con la definición de nodo "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'No se encontraron registros en el archivo de importación o formato de archivo incorrecto',
+    pendingImportFileNotFoundOrExpired:
+      'No se puede encontrar el archivo subido anteriormente; puede haber expirado. Por favor, súbalo de nuevo.',
     recordOwnedByAnotherUser:
       'No se puede actualizar el registro "{{recordKeyValues}}" porque pertenece a otro usuario',
   },

@@ -20,6 +20,8 @@ export default {
     invalidNodeInRecord:
       'Nœud invalide dans l\'enregistrement "{{recordUuid}}", nœud "{{nodeUuid}}" avec la définition de nœud "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: "Aucun enregistrement trouvé dans le fichier d'importation ou format de fichier incorrect",
+    pendingImportFileNotFoundOrExpired:
+      'Le fichier précédemment téléchargé est introuvable ; il a peut-être expiré. Veuillez le télécharger à nouveau.',
     recordOwnedByAnotherUser:
       'Impossible de mettre à jour l’enregistrement "{{recordKeyValues}}" car il appartient à un autre utilisateur',
   },

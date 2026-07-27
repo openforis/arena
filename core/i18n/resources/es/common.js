@@ -182,6 +182,8 @@ export default {
       message: `Error durante la carga del archivo: {{error}}.\n
 ¿Intentar de nuevo?`,
     },
+    uploadFileChangedError:
+      'El archivo seleccionado parece haber sido modificado desde que fue seleccionado. Por favor, selecciónelo de nuevo.',
     uploadingFile: 'Subiendo archivo ({{progressPercent}}%)',
     value: 'Valor',
     view: 'Ver',
