@@ -17,7 +17,7 @@ import RecordsImportSummaryJob from './jobs/recordsImportSummaryJob'
  * subsequent, real import request can reuse it instead of re-uploading it.
  */
 export default class ArenaMobileDataImportSummaryJob extends Job {
-  static type = 'ArenaMobileDataImportSummaryJob'
+  static readonly type = 'ArenaMobileDataImportSummaryJob'
 
   constructor(params?: any) {
     super(ArenaMobileDataImportSummaryJob.type, params, [

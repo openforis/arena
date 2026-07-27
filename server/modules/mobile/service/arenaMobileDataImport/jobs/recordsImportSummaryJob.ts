@@ -17,7 +17,7 @@ import {
  * without persisting anything. Used to generate an import preview/summary.
  */
 export default class RecordsImportSummaryJob extends Job {
-  static type = 'RecordsImportSummaryJob'
+  static readonly type = 'RecordsImportSummaryJob'
 
   items: any[]
 

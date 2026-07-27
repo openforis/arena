@@ -60,11 +60,10 @@ const findExistingRecordSummaryWithSameKeys = ({
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
   const recordSummaryKeyProps = keyDefs.map((keyDef: any) => A.camelize(NodeDef.getName(keyDef)))
   const recordKeyValues = getRecordFormattedKeyValues({ survey, record })
-  const recordSummariesWithSameKeys = existingRecordsSummary.filter((recordSummary: any) => {
+  return existingRecordsSummary.find((recordSummary: any) => {
     const recordSummaryKeyValues = recordSummaryKeyProps.map((key: string) => recordSummary[key])
     return Objects.isEqual(recordKeyValues, recordSummaryKeyValues)
   })
-  return recordSummariesWithSameKeys[0]
 }
 
 /**

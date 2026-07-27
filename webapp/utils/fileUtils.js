@@ -74,13 +74,14 @@ const readAsText = async (file, ignoreErrors = true) =>
  * @param {!File} file - The file to check.
  * @returns {Promise<boolean>} - True if the file can still be read, false otherwise.
  */
-const checkFileIsReadable = async (file) =>
-  new Promise((resolve) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(true)
-    reader.onerror = () => resolve(false)
-    reader.readAsArrayBuffer(file.slice(0, 1))
-  })
+const checkFileIsReadable = async (file) => {
+  try {
+    await file.slice(0, 1).arrayBuffer()
+    return true
+  } catch {
+    return false
+  }
+}
 
 const determineFileFormatFromFileName = (fileName) => {
   const extension = getExtension(fileName)
