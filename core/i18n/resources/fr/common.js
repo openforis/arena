@@ -204,7 +204,7 @@ Voulez-vous continuer ?`,
 Réessayer ?`,
     },
     uploadFileChangedError:
-      'Le fichier sélectionné semble avoir été modifié depuis sa sélection. Veuillez le retirer et le sélectionner à nouveau.',
+      'Le fichier sélectionné semble avoir été modifié depuis sa sélection. Veuillez le sélectionner à nouveau.',
     uploadingFile: 'Téléversement du fichier ({{progressPercent}}%)',
     value: 'Valeur',
     view: 'Voir',

@@ -204,7 +204,7 @@ Deseja prosseguir?`,
     Tentar novamente?`,
     },
     uploadFileChangedError:
-      'O arquivo selecionado parece ter sido modificado desde que foi selecionado. Remova-o e selecione-o novamente.',
+      'O arquivo selecionado parece ter sido modificado desde que foi selecionado. Selecione-o novamente.',
     uploadingFile: 'Enviando arquivo ({{progressPercent}}%)',
     value: 'Valor',
     view: 'Visualizar',

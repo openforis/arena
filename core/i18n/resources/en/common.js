@@ -204,7 +204,7 @@ Do you want to proceed?`,
 Try again?`,
     },
     uploadFileChangedError:
-      'The selected file appears to have been modified since it was selected. Please remove it and select it again.',
+      'The selected file appears to have been modified since it was selected. Please select it again.',
     uploadingFile: 'Uploading file ({{progressPercent}}%)',
     value: 'Value',
     view: 'View',

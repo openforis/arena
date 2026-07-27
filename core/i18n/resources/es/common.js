@@ -183,7 +183,7 @@ export default {
 ¿Intentar de nuevo?`,
     },
     uploadFileChangedError:
-      'El archivo seleccionado parece haber sido modificado desde que fue seleccionado. Elimínelo y selecciónelo de nuevo.',
+      'El archivo seleccionado parece haber sido modificado desde que fue seleccionado. Por favor, selecciónelo de nuevo.',
     uploadingFile: 'Subiendo archivo ({{progressPercent}}%)',
     value: 'Valor',
     view: 'Ver',
