@@ -107,6 +107,8 @@ export const useAuthCanCreateUsers = () => Authorizer.canCreateUsers(useUser())
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
 export const useAuthCanInviteUser = () => Authorizer.canInviteUsers(useUser(), useSurveyInfo())
 export const useAuthCanManageUserGroups = () => Authorizer.canManageUserGroups(useUser(), useSurveyInfo())
+export const useAuthCanEditQualifierAttributeValue = () =>
+  Authorizer.canEditQualifierAttributeValue(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersName = () =>
   Authorizer.canViewOtherUsersNameInSameSurvey(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersEmail = () =>

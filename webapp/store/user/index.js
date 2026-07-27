@@ -12,6 +12,7 @@ export {
   useAuthCanEditUser,
   useAuthCanInviteUser,
   useAuthCanManageUserGroups,
+  useAuthCanEditQualifierAttributeValue,
   useAuthCanViewOtherUsersEmail,
   useAuthCanUseAnalysis,
   useAuthCanUseMessages,

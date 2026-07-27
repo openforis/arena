@@ -422,6 +422,16 @@ export const isAlwaysVisible = R.pipe(getVisibleIf, R.isEmpty)
 
 export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
+export const hasValidationsDefined = (nodeDef) => {
+  const validations = getValidations(nodeDef)
+  return (
+    NodeDefValidations.isRequired(validations) ||
+    NodeDefValidations.isUnique(validations) ||
+    !R.isEmpty(NodeDefValidations.getMinCount(validations)) ||
+    !R.isEmpty(NodeDefValidations.getMaxCount(validations)) ||
+    !R.isEmpty(NodeDefValidations.getExpressions(validations))
+  )
+}
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 

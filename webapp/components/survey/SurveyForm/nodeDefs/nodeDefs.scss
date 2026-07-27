@@ -64,7 +64,8 @@
     }
   }
   // === page / page item - key field locked
-  &.key-field-locked {
+  &.key-field-locked,
+  &.qualifier-field-locked {
     input,
     .survey-form__node-def-code,
     .dropdown__control {
@@ -104,7 +105,7 @@
     cursor: pointer;
   }
 
-  .survey-form__node-def-key-lock-btn {
+  .survey-form__node-def-attribute-lock-btn {
     margin-left: 0.25rem;
   }
 

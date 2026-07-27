@@ -131,6 +131,11 @@ export default {
     countMaxInvalid: 'Неверное "Максимальное количество"',
     countMinInvalid: 'Неверное "Минимальное количество"',
     readOnlyCannotHaveEditableIf: 'Узел только для чтения не может иметь условие "Editable if"',
+    qualifierCannotHaveApplicableExpression:
+      'Атрибут-квалификатор не может иметь условие "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    qualifierCannotHaveEditabilityRule: 'Атрибут-квалификатор не может иметь правил редактируемости',
+    qualifierCannotHaveDefaultValues: 'Атрибут-квалификатор не может иметь значения по умолчанию',
+    qualifierCannotHaveValidations: 'Атрибут-квалификатор не может иметь правил проверки',
   },
 
   record: {
