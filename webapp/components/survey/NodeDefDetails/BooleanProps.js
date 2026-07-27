@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
@@ -8,7 +8,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import * as NodeDef from '@core/survey/nodeDef'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 
-import { State } from './store'
+import { State, useNodeDefEditReadOnly } from './store'
 
 const booleanAnswerTypes = [
   {
@@ -24,24 +24,26 @@ const booleanAnswerTypes = [
 const BooleanProps = (props) => {
   const { state, Actions } = props
 
-  const nodeDef = State.getNodeDef(state)
+  const readOnly = useNodeDefEditReadOnly()
+  const nodeDef = useMemo(() => State.getNodeDef(state), [state])
 
   const selectLabelValue = useCallback(
     (value) => {
       Actions.setProp({ state, key: NodeDef.propKeys.labelValue, value })
     },
-    [state]
+    [Actions, state]
   )
 
   useEffect(() => {
     if (A.isEmpty(NodeDef.getLabelValue(nodeDef))) {
       selectLabelValue(NodeDef.booleanLabelValues.trueFalse)
     }
-  }, [])
+  }, [nodeDef])
 
   return (
     <FormItem label="nodeDefEdit.booleanProps.labelValue">
       <ButtonGroup
+        disabled={readOnly}
         selectedItemKey={NodeDef.getLabelValue(nodeDef)}
         onChange={selectLabelValue}
         items={booleanAnswerTypes}
