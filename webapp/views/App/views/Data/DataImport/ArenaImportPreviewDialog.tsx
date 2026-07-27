@@ -11,10 +11,11 @@ import { Button } from '@webapp/components'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { useI18n } from '@webapp/store/system'
-import { useNodeDefRootKeys, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useNodeDefRootKeys, useSurveyCycleKeys, useSurveyPreferredLang } from '@webapp/store/survey'
 
 type PreviewItem = {
   recordUuid: string
+  cycle: string
   keyValues: { [nodeDefUuid: string]: any }
   existingRecordUuid: string | null
   action: string
@@ -36,6 +37,7 @@ export const ArenaImportPreviewDialog = (props: Props) => {
   const i18n = useI18n()
   const nodeDefKeys = useNodeDefRootKeys()
   const lang = useSurveyPreferredLang()
+  const surveyCycleKeys = useSurveyCycleKeys()
 
   const [selectionModel, setSelectionModel] = useState<GridRowSelectionModel>(() => ({
     type: 'include',
@@ -50,6 +52,16 @@ export const ArenaImportPreviewDialog = (props: Props) => {
         flex: 1,
         valueGetter: (_value: any, row: PreviewItem) => row.keyValues[NodeDef.getUuid(nodeDef)],
       })),
+      ...(surveyCycleKeys.length > 1
+        ? [
+            {
+              field: 'cycle',
+              headerName: i18n.t('common.cycle'),
+              flex: 0.5,
+              valueGetter: (_value: any, row: PreviewItem) => Number(row.cycle) + 1,
+            },
+          ]
+        : []),
       {
         field: 'exists',
         headerName: i18n.t('dataImportView:importPreview.columns.exists'),
@@ -75,7 +87,7 @@ export const ArenaImportPreviewDialog = (props: Props) => {
         valueGetter: (_value: any, row: PreviewItem) => formatDate(row.dateModified),
       },
     ],
-    [i18n, lang, nodeDefKeys]
+    [i18n, lang, nodeDefKeys, surveyCycleKeys]
   )
 
   const selectedCount =

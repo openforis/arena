@@ -120,7 +120,6 @@ export const startDataImportFromCsvJob = ({
 
 export const startDataImportFromArenaJob = ({
   surveyId,
-  cycle,
   conflictResolutionStrategy,
   file,
   fileId,
@@ -134,7 +133,6 @@ export const startDataImportFromArenaJob = ({
 }) => {
   const commonParameters = {
     fileId,
-    cycle,
     dryRun,
     conflictResolutionStrategy,
     skipMissingFiles,

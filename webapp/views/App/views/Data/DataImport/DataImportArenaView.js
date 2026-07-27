@@ -10,12 +10,11 @@ import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
 import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
-import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
+import { useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { Dropzone, Fieldset } from '@webapp/components'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
 import { defaultChunkSize, FileUploadChunkSizeDropdown } from './FileUploadChunkSizeDropdown'
@@ -51,13 +50,10 @@ const generateImportSummary = ({ result, i18n }) =>
 export const DataImportArenaView = () => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
-  const surveyCycle = useSurveyCycleKey()
-  const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
   const fileMaxSizeMB = useSystemConfigFileUploadLimitMB()
 
   const [state, setState] = useState({
-    cycle: surveyCycle,
     conflictResolutionStrategy: ConflictResolutionStrategy.skipExisting,
     file: null,
     fileId: null,
@@ -66,7 +62,7 @@ export const DataImportArenaView = () => {
     previewItems: null,
   })
 
-  const { cycle, conflictResolutionStrategy, file, fileId, chunkSize, skipMissingFiles, previewItems } = state
+  const { conflictResolutionStrategy, file, fileId, chunkSize, skipMissingFiles, previewItems } = state
 
   const onImportJobComplete = useCallback(
     async (jobCompleted) => {
@@ -88,7 +84,6 @@ export const DataImportArenaView = () => {
     async (selectedRecordsUuids) => {
       const { promise } = API.startDataImportFromArenaJob({
         surveyId,
-        cycle,
         conflictResolutionStrategy,
         fileId,
         skipMissingFiles,
@@ -98,7 +93,7 @@ export const DataImportArenaView = () => {
       const job = await promise
       dispatch(JobActions.showJobMonitor({ job, autoHide: true, onComplete: onImportJobComplete }))
     },
-    [conflictResolutionStrategy, cycle, dispatch, fileId, onImportJobComplete, skipMissingFiles, surveyId]
+    [conflictResolutionStrategy, dispatch, fileId, onImportJobComplete, skipMissingFiles, surveyId]
   )
 
   const onPreviewConfirm = useCallback(
@@ -141,12 +136,6 @@ export const DataImportArenaView = () => {
     <div className="data-import">
       <div className="form">
         <Fieldset legend="dataImportView:options.header" className="data-import-options">
-          {surveyCycleKeys.length > 1 && (
-            <FormItem label="dataImportView:importIntoCycle">
-              <CycleSelector selectedCycle={cycle} onChange={(cycle) => setState((state) => ({ ...state, cycle }))} />
-            </FormItem>
-          )}
-
           <FormItem
             info="dataImportView:conflictResolutionStrategy.info"
             label="dataImportView:conflictResolutionStrategy.label"

@@ -70,6 +70,7 @@ export default class RecordsImportSummaryJob extends Job {
 
       this.items.push({
         recordUuid,
+        cycle: Record.getCycle(record),
         keyValues,
         existingRecordUuid: existingRecordSummary ? Record.getUuid(existingRecordSummary) : null,
         action,
