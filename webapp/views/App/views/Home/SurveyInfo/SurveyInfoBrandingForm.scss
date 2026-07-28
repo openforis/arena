@@ -16,7 +16,7 @@
   &__settings-row {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.25rem;
+    gap: 1.5rem;
     width: 100%;
 
     > .form-item {
@@ -29,10 +29,20 @@
         text-align: start;
       }
     }
-  }
 
-  &__font-size-dropdown {
-    width: 8rem;
+    .color-input {
+      width: 100%;
+
+      .MuiColorInput-TextField {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto;
+      }
+    }
+
+    .survey-info-branding-form__settings-control {
+      width: 100%;
+    }
   }
 
   &__field-error {

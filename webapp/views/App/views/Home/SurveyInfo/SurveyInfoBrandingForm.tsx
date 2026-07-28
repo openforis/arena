@@ -446,7 +446,7 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
 
         <FormItem label="homeView:surveyInfo.branding.titleFontSize">
           <Dropdown
-            className="survey-info-branding-form__font-size-dropdown"
+            className="survey-info-branding-form__settings-control"
             disabled={readOnly}
             items={[...fontSizePresetOptions]}
             itemLabel={(preset) => i18n.t(`homeView:surveyInfo.branding.fontSizePreset.${preset}`)}
@@ -459,7 +459,7 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
 
         <FormItem label="homeView:surveyInfo.branding.descriptionFontSize">
           <Dropdown
-            className="survey-info-branding-form__font-size-dropdown"
+            className="survey-info-branding-form__settings-control"
             disabled={readOnly}
             items={[...fontSizePresetOptions]}
             itemLabel={(preset) => i18n.t(`homeView:surveyInfo.branding.fontSizePreset.${preset}`)}
