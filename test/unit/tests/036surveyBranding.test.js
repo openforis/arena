@@ -132,4 +132,13 @@ describe('SurveyBranding', () => {
       ).toBe(true)
     })
   })
+
+  describe('BRANDING_IMAGE_MAX_FILE_SIZE_BYTES', () => {
+    it('matches landing background limit', () => {
+      expect(SurveyBranding.BRANDING_IMAGE_MAX_FILE_SIZE_BYTES).toBe(5 * 1024 * 1024)
+      expect(SurveyBranding.LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES).toBe(
+        SurveyBranding.BRANDING_IMAGE_MAX_FILE_SIZE_BYTES
+      )
+    })
+  })
 })
