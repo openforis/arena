@@ -307,6 +307,7 @@ Réessayer ?`,
 
   appModules: {
     home: 'Accueil',
+    landing: 'Bienvenue',
     dashboard: 'Tableau de bord',
     surveyNew: 'Nouveau formulaire',
     surveys: 'Formulaires',

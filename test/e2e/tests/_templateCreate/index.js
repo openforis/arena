@@ -27,14 +27,14 @@ export const createTemplate = (template) => {
       })
       await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))
       await Promise.all([
-        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
+        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
         page.click(TestId.modal.close),
       ])
     } else {
       await FormUtils.fillInput(TestId.surveyCreate.surveyLabel, label)
 
       await Promise.all([
-        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
+        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
         page.click(getSelector(TestId.surveyCreate.submitBtn, 'button')),
       ])
     }

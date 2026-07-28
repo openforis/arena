@@ -23,6 +23,7 @@ const Analysis = React.lazy(() => import('./views/Analysis'))
 const Data = React.lazy(() => import('./views/Data'))
 const Designer = React.lazy(() => import('./views/Designer'))
 const Home = React.lazy(() => import('./views/Home'))
+const Dashboard = React.lazy(() => import('./views/Dashboard'))
 const Users = React.lazy(() => import('./views/Users'))
 const Message = React.lazy(() => import('./views/Message'))
 const Help = React.lazy(() => import('./views/Help'))
@@ -41,6 +42,10 @@ const AppView = () => {
       {
         component: Home,
         path: `${appModules.home.path}/*`,
+      },
+      {
+        component: Dashboard,
+        path: `${appModules.dashboard.path}/*`,
       },
       {
         component: Designer,

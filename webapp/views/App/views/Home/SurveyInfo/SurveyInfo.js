@@ -9,6 +9,7 @@ import TabBar from '@webapp/components/tabBar'
 import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyUserExtraPropDefsEditor'
 
 import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
+import { SurveyInfoBrandingForm } from './SurveyInfoBrandingForm'
 import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
 import { SurveyInfoDocuments } from './SurveyInfoDocuments'
 import { SurveyInfoMap } from './SurveyInfoMap'
@@ -48,6 +49,7 @@ const SurveyInfo = () => {
     setSurveyDocImages,
     setSurveyDocOptions,
     setUserExtraPropDefs,
+    setBranding,
     getFieldValidation,
     saveProps,
 
@@ -70,6 +72,19 @@ const SurveyInfo = () => {
         setName,
         setSrs,
         surveyInfoObject,
+      },
+    },
+    {
+      key: 'branding',
+      component: SurveyInfoBrandingForm,
+      label: 'homeView:surveyInfo.branding.title',
+      props: {
+        branding: surveyInfoObject.branding || {},
+        setBranding,
+        readOnly,
+        labels: surveyInfoObject.labels,
+        descriptions: surveyInfoObject.descriptions,
+        name: surveyInfoObject.name,
       },
     },
   ]

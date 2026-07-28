@@ -150,6 +150,18 @@ export const {
   canHaveRecords,
 } = SurveyInfo
 
+export {
+  getBranding,
+  getPrimaryColor,
+  getSurveyLogoBySlot,
+  getSurveyLogos,
+  surveyLogoKeys,
+  getLandingBackground,
+  getTitleFontSizeRem,
+  getDescriptionFontSizeRem,
+  fontSizePreset,
+} from './surveyBranding'
+
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
