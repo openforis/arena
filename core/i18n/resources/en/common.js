@@ -417,13 +417,17 @@ $t(common.raiseTicketInSupportForum)
 **Once you send the request, please wait for an invitation email to access Arena.**`,
     reCaptchaNotAnswered: 'ReCaptcha not answered',
     requestSent: 'Access Request sent correctly',
-    requestSentMessage: `Please give us a couple of days to process your request.
-We will send soon an email to **{{email}}** with the instructions on how to access $t(common.appName).
+    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
+$t(accessRequestView.whitelistSenderSuggestion)
+
+Please give us a couple of days to process your request.
+We will send you another email to **{{email}}** with the instructions on how to access $t(common.appName), once it's accepted.
 Thank you and enjoy **$t(common.appNameFull)**!`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
     templateNotSelected: 'Not selected (start from scratch)',
     title: 'Requesting access to $t(common.appNameFull)',
+    whitelistSenderSuggestion: `If you find it in the Spam/Junk folder, please add **{{senderEmail}}** to your contacts (address book) or mark it as safe/not spam, so that future emails from us reach your inbox directly.`,
   },
 
   resetPasswordView: {

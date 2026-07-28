@@ -40,7 +40,10 @@ const _generateResetPasswordAndSendEmail = async ({ email, emailParams, i18n }, 
     urlResetPassword: getResetPasswordUrl({ serverUrl, uuid }),
   }
   // Send email
-  await Mailer.sendEmail({ to: email, msgKey: 'emails:userInvite', msgParams, i18n })
+  const { rejected } = await Mailer.sendEmail({ to: email, msgKey: 'emails:userInvite', msgParams, i18n })
+  if (rejected.length > 0) {
+    throw new SystemError('appErrors:userEmailInvalid', { email })
+  }
 }
 
 const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
