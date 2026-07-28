@@ -10,7 +10,6 @@ export const keys = {
   titleFontSize: 'titleFontSize',
   descriptionFontSize: 'descriptionFontSize',
   fileUuid: 'fileUuid',
-  url: 'url',
 } as const
 
 export type SurveyLogoKey = typeof keys.surveyLogo1 | typeof keys.surveyLogo2 | typeof keys.surveyLogo3
@@ -49,7 +48,6 @@ const imageDescriptorKeys = [...surveyLogoKeys, keys.landingBackground] as const
 
 export type BrandingImageDescriptor = {
   [keys.fileUuid]?: string
-  [keys.url]?: string
 }
 
 export type SurveyBranding = {
@@ -82,19 +80,6 @@ export const isValidPrimaryColor = (value: unknown): value is string =>
   typeof value === 'string' && HEX_COLOR_REGEXP.test(value)
 
 /**
- * Returns whether value is an https logo URL.
- */
-export const isValidLogoUrl = (value: unknown): value is string => {
-  if (typeof value !== 'string' || value.length === 0) return false
-  try {
-    const parsed = new URL(value)
-    return parsed.protocol === 'https:'
-  } catch {
-    return false
-  }
-}
-
-/**
  * Returns whether branding props are valid for save.
  * Empty optional fields are allowed.
  */
@@ -107,11 +92,6 @@ export const isBrandingValid = (branding: SurveyBranding = {}): boolean => {
 
   const descriptionFontSize = branding[keys.descriptionFontSize]
   if (descriptionFontSize && !isValidFontSizePreset(descriptionFontSize)) return false
-
-  for (const imageKey of imageDescriptorKeys) {
-    const url = branding[imageKey]?.[keys.url]
-    if (url && !isValidLogoUrl(url)) return false
-  }
 
   return true
 }
@@ -176,34 +156,12 @@ export const getLandingBackground = (surveyInfo: SurveyInfoLike): BrandingImageD
   getBranding(surveyInfo)[keys.landingBackground] || null
 
 /**
- * Returns whether a logo descriptor has a file UUID or valid https URL.
+ * Returns whether a logo descriptor has a file UUID.
  */
 export const hasLogoDescriptor = (logo: BrandingImageDescriptor | null | undefined): boolean => {
   if (!logo || typeof logo !== 'object') return false
   const fileUuid = logo[keys.fileUuid]
-  if (typeof fileUuid === 'string' && fileUuid.length > 0) return true
-  return isValidLogoUrl(logo[keys.url])
-}
-
-type ResolveLogoSrcParams = {
-  surveyId: number | string
-  getFileDownloadUrl: (params: { surveyId: number | string; fileUuid: string }) => string
-}
-
-/**
- * Resolves display src for a logo descriptor.
- */
-export const resolveLogoSrc = (
-  logo: BrandingImageDescriptor | null | undefined,
-  { surveyId, getFileDownloadUrl }: ResolveLogoSrcParams
-): string | null => {
-  if (!logo || typeof logo !== 'object') return null
-  const fileUuid = logo[keys.fileUuid]
-  if (typeof fileUuid === 'string' && fileUuid.length > 0) {
-    return getFileDownloadUrl({ surveyId, fileUuid })
-  }
-  const url = logo[keys.url]
-  return isValidLogoUrl(url) ? url : null
+  return typeof fileUuid === 'string' && fileUuid.length > 0
 }
 
 /**

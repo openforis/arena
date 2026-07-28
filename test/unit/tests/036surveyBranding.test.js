@@ -15,45 +15,6 @@ describe('SurveyBranding', () => {
     })
   })
 
-  describe('isValidLogoUrl', () => {
-    test.each([
-      ['https://example.com/logo.png', true],
-      ['http://example.com/logo.png', false],
-      ['javascript:alert(1)', false],
-      ['', false],
-      [null, false],
-    ])('%s → %s', (value, expected) => {
-      expect(SurveyBranding.isValidLogoUrl(value)).toBe(expected)
-    })
-  })
-
-  describe('resolveLogoSrc', () => {
-    const getFileDownloadUrl = ({ surveyId, fileUuid }) => `/api/survey/${surveyId}/file/${fileUuid}`
-
-    it('prefers fileUuid over url', () => {
-      const src = SurveyBranding.resolveLogoSrc(
-        { fileUuid: 'abc', url: 'https://example.com/x.png' },
-        { surveyId: 1, getFileDownloadUrl }
-      )
-      expect(src).toBe('/api/survey/1/file/abc')
-    })
-
-    it('uses https url when no fileUuid', () => {
-      const src = SurveyBranding.resolveLogoSrc(
-        { url: 'https://example.com/x.png' },
-        { surveyId: 1, getFileDownloadUrl }
-      )
-      expect(src).toBe('https://example.com/x.png')
-    })
-
-    it('returns null for invalid logo', () => {
-      expect(SurveyBranding.resolveLogoSrc(null, { surveyId: 1, getFileDownloadUrl })).toBeNull()
-      expect(
-        SurveyBranding.resolveLogoSrc({ url: 'http://insecure' }, { surveyId: 1, getFileDownloadUrl })
-      ).toBeNull()
-    })
-  })
-
   describe('getPrimaryColor', () => {
     it('returns valid color from branding prop', () => {
       const surveyInfo = { props: { branding: { primaryColor: '#112233' } } }
@@ -71,13 +32,13 @@ describe('SurveyBranding', () => {
       expect(SurveyBranding.isBrandingValid({})).toBe(true)
     })
 
-    it('accepts valid primary color and logo URLs', () => {
+    it('accepts valid primary color and file-based logos', () => {
       expect(
         SurveyBranding.isBrandingValid({
           primaryColor: '#112233',
-          surveyLogo1: { url: 'https://example.com/a.png' },
-          surveyLogo2: { url: 'https://example.com/b.png' },
-          surveyLogo3: { url: 'https://example.com/c.png' },
+          surveyLogo1: { fileUuid: 'a' },
+          surveyLogo2: { fileUuid: 'b' },
+          surveyLogo3: { fileUuid: 'c' },
         })
       ).toBe(true)
     })
@@ -86,12 +47,7 @@ describe('SurveyBranding', () => {
       expect(SurveyBranding.isBrandingValid({ primaryColor: 'nope' })).toBe(false)
     })
 
-    it('rejects invalid logo URL when non-empty', () => {
-      expect(SurveyBranding.isBrandingValid({ surveyLogo1: { url: 'http://insecure' } })).toBe(false)
-      expect(SurveyBranding.isBrandingValid({ surveyLogo2: { url: 'javascript:alert(1)' } })).toBe(false)
-    })
-
-    it('allows fileUuid logos without url', () => {
+    it('allows fileUuid logos', () => {
       expect(SurveyBranding.isBrandingValid({ surveyLogo1: { fileUuid: 'abc' } })).toBe(true)
     })
   })
@@ -100,7 +56,7 @@ describe('SurveyBranding', () => {
     it('collects fileUuids from all survey logos', () => {
       const uuids = SurveyBranding.getBrandingFileUuids({
         surveyLogo1: { fileUuid: 'a' },
-        surveyLogo2: { fileUuid: 'b', url: 'https://x.com/y.png' },
+        surveyLogo2: { fileUuid: 'b' },
         surveyLogo3: { fileUuid: 'c' },
       })
       expect(uuids.sort()).toEqual(['a', 'b', 'c'])
@@ -120,23 +76,18 @@ describe('SurveyBranding', () => {
         props: {
           branding: {
             surveyLogo1: { fileUuid: '1' },
-            surveyLogo3: { url: 'https://example.com/3.png' },
+            surveyLogo3: { fileUuid: '3' },
           },
         },
       }
-      expect(SurveyBranding.getSurveyLogos(surveyInfo)).toEqual([
-        { fileUuid: '1' },
-        null,
-        { url: 'https://example.com/3.png' },
-      ])
+      expect(SurveyBranding.getSurveyLogos(surveyInfo)).toEqual([{ fileUuid: '1' }, null, { fileUuid: '3' }])
     })
   })
 
   describe('hasLogoDescriptor', () => {
-    it('detects fileUuid and valid https url', () => {
+    it('detects fileUuid', () => {
       expect(SurveyBranding.hasLogoDescriptor({ fileUuid: 'a' })).toBe(true)
-      expect(SurveyBranding.hasLogoDescriptor({ url: 'https://example.com/x.png' })).toBe(true)
-      expect(SurveyBranding.hasLogoDescriptor({ url: 'http://insecure' })).toBe(false)
+      expect(SurveyBranding.hasLogoDescriptor({})).toBe(false)
       expect(SurveyBranding.hasLogoDescriptor(null)).toBe(false)
     })
   })
@@ -173,10 +124,10 @@ describe('SurveyBranding', () => {
       expect(SurveyBranding.isBrandingValid({ titleFontSize: 'xl' })).toBe(false)
     })
 
-    it('accepts valid landing background url', () => {
+    it('accepts landing background fileUuid', () => {
       expect(
         SurveyBranding.isBrandingValid({
-          landingBackground: { url: 'https://example.com/bg.jpg' },
+          landingBackground: { fileUuid: 'bg' },
         })
       ).toBe(true)
     })

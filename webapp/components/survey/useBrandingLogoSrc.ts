@@ -51,8 +51,8 @@ type UseBrandingLogoSrcParams = {
 
 /**
  * Resolves a displayable image src for a branding logo.
- * External HTTPS URLs are used directly; survey file UUIDs are fetched as blobs
- * because the file API serves Content-Disposition: attachment (not usable as img src).
+ * Survey file UUIDs are fetched as blobs because the file API serves Content-Disposition: attachment
+ * (not usable as img src).
  */
 export const useBrandingLogoSrc = ({
   surveyId,
@@ -68,12 +68,6 @@ export const useBrandingLogoSrc = ({
     const resolve = async () => {
       if (localObjectUrl) {
         setSrc(localObjectUrl)
-        return
-      }
-
-      const externalUrl = logo?.[SurveyBranding.keys.url]
-      if (SurveyBranding.isValidLogoUrl(externalUrl)) {
-        setSrc(externalUrl)
         return
       }
 
@@ -101,7 +95,7 @@ export const useBrandingLogoSrc = ({
         URL.revokeObjectURL(blobUrlToRevoke)
       }
     }
-  }, [localObjectUrl, logo?.[SurveyBranding.keys.fileUuid], logo?.[SurveyBranding.keys.url], surveyId])
+  }, [localObjectUrl, logo?.[SurveyBranding.keys.fileUuid], surveyId])
 
   return src
 }
