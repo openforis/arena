@@ -12,6 +12,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 
 import { store } from '@webapp/store'
 import Arena from '@webapp/views/Arena'
+import { SurveyThemeBridge } from '@webapp/theme/SurveyThemeBridge'
 
 import i18nInstance from '@core/i18n/i18nFactory'
 
@@ -23,12 +24,14 @@ const container = document.getElementById('main')
 const root = createRoot(container)
 root.render(
   <Provider store={store}>
-    <I18nextProvider i18n={i18nInstance}>
-      <BrowserRouter>
-        <LocalizationProvider dateAdapter={AdapterMoment}>
-          <Arena />
-        </LocalizationProvider>
-      </BrowserRouter>
-    </I18nextProvider>
+    <SurveyThemeBridge>
+      <I18nextProvider i18n={i18nInstance}>
+        <BrowserRouter>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <Arena />
+          </LocalizationProvider>
+        </BrowserRouter>
+      </I18nextProvider>
+    </SurveyThemeBridge>
   </Provider>
 )

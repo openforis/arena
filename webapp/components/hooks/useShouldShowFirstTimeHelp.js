@@ -37,6 +37,11 @@ export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) =>
   }, [surveyInfo])
 
   useEffect(() => {
+    if (numberOfNodeDefs > 1) {
+      setHelp(false)
+      return
+    }
+
     if (
       numberOfNodeDefs === 1 && // only root entity def
       messages.length > 0 &&
@@ -45,7 +50,7 @@ export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) =>
       const helperType = determineHelperType({ survey, messages, helperTypes })
       setHelp(helperType)
     }
-  }, [numberOfNodeDefs, messages])
+  }, [helperTypes, messages, numberOfNodeDefs, survey])
 
   return help
 }

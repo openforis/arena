@@ -41,9 +41,9 @@ const Surveys = (props) => {
   const [requestedAt, setRequestedAt] = useState(Date.now())
   const [onlyOwn, setOnlyOwn] = useState(isSystemAdmin)
 
-  // Redirect to dashboard on survey change
+  // Redirect to landing on survey change
   useOnUpdate(() => {
-    navigate(appModuleUri(homeModules.dashboard))
+    navigate(appModuleUri(homeModules.landing))
   }, [Survey.getUuid(surveyInfo)])
 
   // reload table data on survey publish

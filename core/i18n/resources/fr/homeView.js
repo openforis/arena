@@ -61,8 +61,31 @@ export default {
     noRecordsAddedInSelectedPeriod: 'Aucun enregistrement ajouté dans la période sélectionnée',
   },
   surveyDeleted: 'Le formulaire {{surveyName}} a été supprimé',
+  landing: {
+    openDashboard: 'Ouvrir le tableau de bord',
+  },
   surveyInfo: {
     basic: 'Informations de base',
+    branding: {
+      title: 'Image de marque',
+      primaryColor: 'Couleur principale',
+      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
+      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      fontSizePreset: {
+        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
+        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
+        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+      },
+      surveyLogo1: '$t(homeView:surveyInfo.branding.surveyLogo1)',
+      surveyLogo2: '$t(homeView:surveyInfo.branding.surveyLogo2)',
+      surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
+      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
+      uploadLogo: 'Téléverser le logo',
+      preview: 'Aperçu',
+      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
+      invalidPrimaryColor: 'Saisissez une couleur #RRGGBB valide ou laissez vide',
+      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
+    },
     configuration: {
       title: 'Configuration',
       filesTotalSpace: 'Espace total des fichiers (Go)',

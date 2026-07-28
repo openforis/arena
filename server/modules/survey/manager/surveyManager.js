@@ -12,6 +12,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Survey from '@core/survey/survey'
+import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import SystemError from '@core/systemError'
@@ -479,6 +480,10 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
       const fileUuid = SurveyFile.getUuid(surveyDocImage)
       await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t)
     }
+    const branding = SurveyBranding.getBranding(surveyInfoUpdated)
+    for (const fileUuid of SurveyBranding.getBrandingFileUuids(branding)) {
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t)
+    }
     await SurveyFileManager.deleteTemporaryFiles(surveyId, t)
 
     return surveyUpdated
@@ -520,6 +525,28 @@ export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
   if (surveyDocImageUuidsToDelete.length > 0) {
     await SurveyFileManager.deleteFilesAndContentByUuids({ surveyId, fileUuids: surveyDocImageUuidsToDelete }, client)
     Logger.debug(`Deleted ${surveyDocImageUuidsToDelete.length} unused survey doc image files of survey ${surveyId}`)
+  }
+
+  const branding = SurveyBranding.getBranding(surveyInfo)
+  const brandingFileUuids = new Set(SurveyBranding.getBrandingFileUuids(branding))
+  for (const brandingFileType of [
+    SurveyFile.SurveyFileType.brandingSurveyLogo1,
+    SurveyFile.SurveyFileType.brandingSurveyLogo2,
+    SurveyFile.SurveyFileType.brandingSurveyLogo3,
+    SurveyFile.SurveyFileType.brandingLandingBackground,
+  ]) {
+    const brandingFileSummaries = await SurveyFileManager.fetchFileSummariesByType(
+      { surveyId, type: brandingFileType },
+      client
+    )
+    const brandingFileSummariesToDelete = brandingFileSummaries.filter(
+      (fileSummary) => !brandingFileUuids.has(SurveyFile.getUuid(fileSummary))
+    )
+    const brandingUuidsToDelete = brandingFileSummariesToDelete.map(SurveyFile.getUuid)
+    if (brandingUuidsToDelete.length > 0) {
+      await SurveyFileManager.deleteFilesAndContentByUuids({ surveyId, fileUuids: brandingUuidsToDelete }, client)
+      Logger.debug(`Deleted ${brandingUuidsToDelete.length} unused ${brandingFileType} files of survey ${surveyId}`)
+    }
   }
 }
 

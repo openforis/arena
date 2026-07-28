@@ -46,6 +46,7 @@ export const getModulesHierarchy = (user, surveyInfo) => {
   return [
     // home
     getModule({ module: appModules.home }),
+    getModule({ module: appModules.dashboard }),
     // designer
     getModule({
       module: appModules.designer,
@@ -117,6 +118,6 @@ export const isHome = (module) => getKey(module) === appModules.home.key
 export const isSurveySelectionRequired = (module) =>
   ![appModules.home.key, appModules.help.key].includes(getKey(module))
 export const isActive = (pathname) => (module) => {
-  // Module home is active when page is on dashboard
-  return isHome(module) ? pathname === appModuleUri(homeModules.dashboard) : R.startsWith(module.uri, pathname)
+  // Module home is active when page is on landing
+  return isHome(module) ? pathname === appModuleUri(homeModules.landing) : R.startsWith(module.uri, pathname)
 }

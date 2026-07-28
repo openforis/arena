@@ -59,8 +59,31 @@ export default {
     noRecordsAddedInSelectedPeriod: 'No se añadieron registros en el período seleccionado',
   },
   surveyDeleted: 'La encuesta {{surveyName}} ha sido eliminada',
+  landing: {
+    openDashboard: 'Abrir panel',
+  },
   surveyInfo: {
     basic: 'Información básica',
+    branding: {
+      title: 'Marca',
+      primaryColor: 'Color primario',
+      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
+      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      fontSizePreset: {
+        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
+        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
+        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+      },
+      surveyLogo1: '$t(homeView:surveyInfo.branding.surveyLogo1)',
+      surveyLogo2: '$t(homeView:surveyInfo.branding.surveyLogo2)',
+      surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
+      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
+      uploadLogo: 'Subir logo',
+      preview: 'Vista previa',
+      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
+      invalidPrimaryColor: 'Introduzca un color #RRGGBB válido o déjelo vacío',
+      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
+    },
     configuration: {
       title: 'Configuración',
       filesTotalSpace: 'Espacio total de archivos (GB)',

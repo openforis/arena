@@ -306,6 +306,7 @@ Try again?`,
 
   appModules: {
     home: 'Home',
+    landing: 'Landing',
     dashboard: 'Dashboard',
     surveyNew: 'New Survey',
     surveys: 'Surveys',
