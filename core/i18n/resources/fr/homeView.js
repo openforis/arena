@@ -81,6 +81,8 @@ export default {
       surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
       landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
       uploadLogo: 'Téléverser le logo',
+      logoFileFormatHint: '$t(homeView:surveyInfo.branding.logoFileFormatHint)',
+      logoFileTooLarge: '$t(homeView:surveyInfo.branding.logoFileTooLarge)',
       preview: 'Aperçu',
       backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
       invalidPrimaryColor: 'Saisissez une couleur #RRGGBB valide ou laissez vide',
