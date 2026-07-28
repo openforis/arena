@@ -37,6 +37,7 @@ export const keys = {
   preloadedMapLayersEnabled: 'preloadedMapLayersEnabled',
   surveyDocImages: 'surveyDocImages',
   surveyDocOptions: 'surveyDocOptions',
+  branding: 'branding',
   sampleBasedImageInterpretationEnabled: 'sampleBasedImageInterpretationEnabled',
   samplingPolygon: 'samplingPolygon',
   security: 'security',

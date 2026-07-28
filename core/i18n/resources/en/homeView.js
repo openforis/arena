@@ -61,8 +61,31 @@ export default {
     noRecordsAddedInSelectedPeriod: 'No records added in the selected period',
   },
   surveyDeleted: 'Survey {{surveyName}} has been deleted',
+  landing: {
+    openDashboard: 'Open dashboard',
+  },
   surveyInfo: {
     basic: 'Basic info',
+    branding: {
+      title: 'Branding',
+      primaryColor: 'Primary color',
+      titleFontSize: 'Title font size',
+      descriptionFontSize: 'Description font size',
+      fontSizePreset: {
+        small: 'Small',
+        default: 'Default',
+        large: 'Large',
+      },
+      surveyLogo1: 'Survey logo 1',
+      surveyLogo2: 'Survey logo 2',
+      surveyLogo3: 'Survey logo 3',
+      landingBackground: 'Landing background image',
+      uploadLogo: 'Upload image',
+      preview: 'Preview',
+      backgroundFileTooLarge: 'Background image must be {{maxMb}} MB or smaller',
+      invalidPrimaryColor: 'Enter a valid #RRGGBB color or leave empty',
+      invalidSaveBlocked: 'Fix invalid branding fields before saving survey info',
+    },
     configuration: {
       title: 'Configuration',
       filesTotalSpace: 'Files total space (GB)',

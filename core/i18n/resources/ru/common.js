@@ -299,6 +299,7 @@ export default {
 
   appModules: {
     home: 'Главная',
+    landing: 'Приветствие',
     dashboard: 'Панель управления',
     surveyNew: 'Новый опрос',
     surveys: 'Опросы',

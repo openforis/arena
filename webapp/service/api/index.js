@@ -100,6 +100,7 @@ export {
   fetchSurveyTemplatesPublished,
   insertSurvey,
   insertSurveyFile,
+  fetchSurveyFile,
   startImportLabelsJob,
   startNodeDefsTranslationJob,
   updateSurveyConfigurationProp,

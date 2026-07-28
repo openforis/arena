@@ -5,9 +5,11 @@ import { ArrayUtils } from '@core/arrayUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
+import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as Validation from '@core/validation/validation'
 
 import { SurveyInfoActions, useSurveyInfo } from '@webapp/store/survey'
+import { NotificationActions } from '@webapp/store/ui'
 
 import { useFormObject } from '@webapp/components/hooks'
 
@@ -53,9 +55,18 @@ export const useSurveyInfoForm = () => {
   const setSecurity = (value) => setObjectField(Survey.infoKeys.security, value)
   const setSrs = (value) => setObjectField(Survey.infoKeys.srs, value)
   const setUserExtraPropDefs = (value) => setObjectField(Survey.infoKeys.userExtraPropDefs, value)
+  const setBranding = (value) => setObjectField(Survey.infoKeys.branding, value)
 
   const saveProps = () => {
     enableValidation()
+    if (!SurveyBranding.isBrandingValid(object.branding)) {
+      dispatch(
+        NotificationActions.notifyWarning({
+          key: 'homeView:surveyInfo.branding.invalidSaveBlocked',
+        })
+      )
+      return
+    }
     dispatch(SurveyInfoActions.updateSurveyInfoProps(object))
   }
 
@@ -80,5 +91,6 @@ export const useSurveyInfoForm = () => {
     setSecurity,
     setSrs,
     setUserExtraPropDefs,
+    setBranding,
   }
 }

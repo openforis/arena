@@ -34,7 +34,7 @@ export const useResetPassword = () => {
     { name, title, password }
   )
 
-  const navigateToHomePage = () => navigate(appModuleUri(homeModules.dashboard))
+  const navigateToHomePage = () => navigate(appModuleUri(homeModules.landing))
 
   const onChangeUser = ({ prop, value }) => actions.updateUser({ prop, value })(dispatch)
   const onChangeUserTitle = (userWithTitle) => actions.updateUserTitle(userWithTitle)(dispatch)

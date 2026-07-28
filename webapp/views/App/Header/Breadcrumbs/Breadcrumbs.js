@@ -4,6 +4,7 @@ import { useLocation } from 'react-router'
 import { Link } from 'react-router-dom'
 
 import * as AppModules from '@webapp/app/appModules'
+import { homeModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
 import { useIsSurveyDirty } from '@webapp/store/survey'
@@ -17,9 +18,11 @@ export const Breadcrumbs = () => {
   const pathParts = pathname.split('/')
 
   const validPathParts = pathParts.filter((pathPart) => pathPart && pathPart !== AppModules.app)
-  const pathPartsWithModules = validPathParts.filter((pathPart, levelIndex) =>
-    Boolean(AppModules.getModuleByPathPart({ levelIndex, pathPart }))
-  )
+  const pathPartsWithModules = validPathParts.filter((pathPart, levelIndex) => {
+    const module = AppModules.getModuleByPathPart({ levelIndex, pathPart })
+    // Landing is Home's default page — keep the crumb as "Home" only.
+    return Boolean(module && module.key !== homeModules.landing.key)
+  })
 
   const pathComponents = pathPartsWithModules.reduce((acc, pathPart, levelIndex) => {
     const module = AppModules.getModuleByPathPart({ levelIndex, pathPart })
