@@ -27,8 +27,11 @@ export type FontSizePreset = (typeof fontSizePreset)[keyof typeof fontSizePreset
 
 export const fontSizePresetValues = Object.freeze(Object.values(fontSizePreset)) as readonly FontSizePreset[]
 
+/** Maximum branding image upload size in bytes (5 MiB). */
+export const BRANDING_IMAGE_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
+
 /** Maximum landing background upload size in bytes (5 MiB). */
-export const LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
+export const LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES = BRANDING_IMAGE_MAX_FILE_SIZE_BYTES
 
 const HEX_COLOR_REGEXP = /^#[0-9A-Fa-f]{6}$/
 

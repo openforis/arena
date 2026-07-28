@@ -38,6 +38,7 @@ const LOGO_FILE_INPUT_ACCEPT = 'image/png,image/jpeg,image/webp,image/svg+xml,.p
 const BACKGROUND_FILE_INPUT_ACCEPT = 'image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp'
 
 const LANDING_BACKGROUND_MAX_SIZE_MB = SurveyBranding.LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES / (1024 * 1024)
+const LOGO_MAX_SIZE_MB = SurveyBranding.BRANDING_IMAGE_MAX_FILE_SIZE_BYTES / (1024 * 1024)
 
 type BrandingImageKey = SurveyLogoKey | typeof brandingKeys.landingBackground
 
@@ -120,24 +121,28 @@ const BrandingImageSection = (props: BrandingImageSectionProps) => {
   const i18n = useI18n()
   const imageSrc = useBrandingLogoSrc({ surveyId, logo: image, localObjectUrl })
   const hasImage = Boolean(imageSrc || image?.[brandingKeys.fileUuid])
+  const showLogoFormatHint = previewVariant === 'logo'
 
   return (
     <fieldset
       className={`survey-info-branding-form__image-section survey-info-branding-form__image-section--${previewVariant}`}
     >
       <legend>{i18n.t(labelKey)}</legend>
-      {!readOnly && (
-        <div className="survey-info-branding-form__upload-actions">
-          <input
-            ref={inputRef}
-            accept={fileInputAccept}
-            className="survey-info-branding-form__file-input"
-            onChange={onFileChange}
-            type="file"
-          />
-          {hasImage && onRemove ? (
-            <ButtonIconDelete onClick={onRemove} />
-          ) : (
+      {!readOnly && !hasImage && (
+        <>
+          {showLogoFormatHint && (
+            <p className="survey-info-branding-form__file-hint">
+              {i18n.t('homeView:surveyInfo.branding.logoFileFormatHint', { maxMb: LOGO_MAX_SIZE_MB })}
+            </p>
+          )}
+          <div className="survey-info-branding-form__upload-actions">
+            <input
+              ref={inputRef}
+              accept={fileInputAccept}
+              className="survey-info-branding-form__file-input"
+              onChange={onFileChange}
+              type="file"
+            />
             <div className="survey-info-branding-form__upload">
               <Button
                 disabled={uploading}
@@ -146,14 +151,17 @@ const BrandingImageSection = (props: BrandingImageSectionProps) => {
                 size="small"
               />
             </div>
-          )}
-        </div>
+          </div>
+        </>
       )}
       {imageSrc && (
-        <div
-          className={`survey-info-branding-form__image-preview survey-info-branding-form__image-preview--${previewVariant}`}
-        >
-          <img alt="" src={imageSrc} />
+        <div className="survey-info-branding-form__image-preview-row">
+          <div
+            className={`survey-info-branding-form__image-preview survey-info-branding-form__image-preview--${previewVariant}`}
+          >
+            <img alt="" src={imageSrc} />
+          </div>
+          {!readOnly && onRemove && <ButtonIconDelete onClick={onRemove} />}
         </div>
       )}
     </fieldset>
@@ -373,6 +381,12 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
         params: { extension: FileUtils.getExtension(file) },
       }
     }
+    if (file.size > SurveyBranding.BRANDING_IMAGE_MAX_FILE_SIZE_BYTES) {
+      return {
+        key: 'homeView:surveyInfo.branding.logoFileTooLarge',
+        params: { maxMb: LOGO_MAX_SIZE_MB },
+      }
+    }
     return null
   }, [])
 
@@ -420,38 +434,42 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
 
   return (
     <div className="form survey-info-branding-form">
-      <FormItem label="homeView:surveyInfo.branding.primaryColor">
-        <ColorInput disabled={readOnly} onChange={onPrimaryColorChange} value={primaryColor || ''} />
-        {primaryColorValidation && (
-          <span className="survey-info-branding-form__field-error">
-            {i18n.t('homeView:surveyInfo.branding.invalidPrimaryColor')}
-          </span>
-        )}
-      </FormItem>
+      <div className="survey-info-branding-form__settings-row">
+        <FormItem label="homeView:surveyInfo.branding.primaryColor">
+          <ColorInput disabled={readOnly} onChange={onPrimaryColorChange} value={primaryColor || ''} />
+          {primaryColorValidation && (
+            <span className="survey-info-branding-form__field-error">
+              {i18n.t('homeView:surveyInfo.branding.invalidPrimaryColor')}
+            </span>
+          )}
+        </FormItem>
 
-      <FormItem label="homeView:surveyInfo.branding.titleFontSize">
-        <Dropdown
-          disabled={readOnly}
-          items={[...fontSizePresetOptions]}
-          itemLabel={(preset) => i18n.t(`homeView:surveyInfo.branding.fontSizePreset.${preset}`)}
-          itemValue={A.identity}
-          onChange={(value) => onFontSizePresetChange(brandingKeys.titleFontSize, value as FontSizePreset)}
-          readOnly={readOnly}
-          selection={titleFontSize}
-        />
-      </FormItem>
+        <FormItem label="homeView:surveyInfo.branding.titleFontSize">
+          <Dropdown
+            className="survey-info-branding-form__font-size-dropdown"
+            disabled={readOnly}
+            items={[...fontSizePresetOptions]}
+            itemLabel={(preset) => i18n.t(`homeView:surveyInfo.branding.fontSizePreset.${preset}`)}
+            itemValue={A.identity}
+            onChange={(value) => onFontSizePresetChange(brandingKeys.titleFontSize, value as FontSizePreset)}
+            readOnly={readOnly}
+            selection={titleFontSize}
+          />
+        </FormItem>
 
-      <FormItem label="homeView:surveyInfo.branding.descriptionFontSize">
-        <Dropdown
-          disabled={readOnly}
-          items={[...fontSizePresetOptions]}
-          itemLabel={(preset) => i18n.t(`homeView:surveyInfo.branding.fontSizePreset.${preset}`)}
-          itemValue={A.identity}
-          onChange={(value) => onFontSizePresetChange(brandingKeys.descriptionFontSize, value as FontSizePreset)}
-          readOnly={readOnly}
-          selection={descriptionFontSize}
-        />
-      </FormItem>
+        <FormItem label="homeView:surveyInfo.branding.descriptionFontSize">
+          <Dropdown
+            className="survey-info-branding-form__font-size-dropdown"
+            disabled={readOnly}
+            items={[...fontSizePresetOptions]}
+            itemLabel={(preset) => i18n.t(`homeView:surveyInfo.branding.fontSizePreset.${preset}`)}
+            itemValue={A.identity}
+            onChange={(value) => onFontSizePresetChange(brandingKeys.descriptionFontSize, value as FontSizePreset)}
+            readOnly={readOnly}
+            selection={descriptionFontSize}
+          />
+        </FormItem>
+      </div>
 
       <div className="survey-info-branding-form__logos">
         {LOGO_SLOTS.map(({ imageKey, labelKey, fileType }) => {
@@ -518,6 +536,7 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
               </p>
             ) : null}
             <Button
+              key={previewColor ?? 'default'}
               color="primary"
               label="common:appModules.records"
               sx={
