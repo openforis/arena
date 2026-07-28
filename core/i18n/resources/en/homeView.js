@@ -81,6 +81,8 @@ export default {
       surveyLogo3: 'Survey logo 3',
       landingBackground: 'Landing background image',
       uploadLogo: 'Upload image',
+      logoFileFormatHint: 'PNG, JPEG, WebP or SVG (max {{maxMb}} MB)',
+      logoFileTooLarge: 'Logo image must be {{maxMb}} MB or smaller',
       preview: 'Preview',
       backgroundFileTooLarge: 'Background image must be {{maxMb}} MB or smaller',
       invalidPrimaryColor: 'Enter a valid #RRGGBB color or leave empty',

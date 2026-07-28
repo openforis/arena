@@ -13,6 +13,38 @@
     align-items: start;
   }
 
+  &__settings-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+
+    > .form-item {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      gap: 0.35rem;
+
+      .form-label {
+        justify-self: start;
+        text-align: start;
+      }
+    }
+
+    .color-input {
+      width: 100%;
+
+      .MuiColorInput-TextField {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto;
+      }
+    }
+
+    .survey-info-branding-form__settings-control {
+      width: 100%;
+    }
+  }
+
   &__field-error {
     display: block;
     margin-top: 0.35rem;
@@ -50,6 +82,13 @@
     gap: 0.25rem;
   }
 
+  &__file-hint {
+    margin: 0;
+    font-size: 0.85rem;
+    color: color.adjust($black, $lightness: 35%);
+    line-height: 1.4;
+  }
+
   &__upload {
     display: flex;
     align-items: center;
@@ -59,9 +98,17 @@
     display: none;
   }
 
+  &__image-preview-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
   &__image-preview {
     display: flex;
     align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
     min-height: 3.5rem;
     padding: 0.5rem;
     background: $greyAppBg;
@@ -161,9 +208,12 @@
 
 @media (max-width: 1100px) {
   .survey-info-branding-form {
-    &__logos {
+    &__settings-row {
       grid-template-columns: 1fr;
     }
 
+    &__logos {
+      grid-template-columns: 1fr;
+    }
   }
 }
