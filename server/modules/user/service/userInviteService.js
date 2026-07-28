@@ -204,6 +204,7 @@ export const inviteUsers = async (
 
   const invitedUsers = []
   const skippedEmails = []
+  const invalidEmails = []
   for (const email of emails) {
     try {
       const invitedUser = await _inviteUser(
@@ -227,8 +228,14 @@ export const inviteUsers = async (
       }
       // when inviting multiple users, do not insert them in a single transaction; just skip that emails
       // (emails to invited users could be sent but data won't be in the DB if transaction is rolled back)
-      skippedEmails.push(email)
+      if (e.key === 'appErrors:userEmailInvalid') {
+        // keep track of invalid email addresses separately: the user can fix/remove them and retry,
+        // as opposed to other skip reasons that are not related to the email address itself
+        invalidEmails.push(email)
+      } else {
+        skippedEmails.push(email)
+      }
     }
   }
-  return { invitedUsers, skippedEmails }
+  return { invitedUsers, skippedEmails, invalidEmails }
 }

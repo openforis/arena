@@ -42,7 +42,7 @@ const _showInvitationSuccessfulMessage = ({ dispatch, userInvite, skippedEmails 
 }
 
 const _performInvite =
-  ({ dispatch, navigate, surveyId, surveyCycleKey, userInvite, repeatInvitation }) =>
+  ({ dispatch, navigate, setUserInvite, surveyId, surveyCycleKey, userInvite, repeatInvitation }) =>
   async () => {
     try {
       dispatch(LoaderActions.showLoader())
@@ -54,20 +54,38 @@ const _performInvite =
       )(userInvite)
 
       const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
-      const { errorKey, errorParams, skippedEmails } = data
+      const { errorKey, errorParams, skippedEmails = [], invalidEmails = [] } = data
 
       const emails = UserInvite.getEmails(userInvite)
-      const invitedEmails = emails.filter((email) => !skippedEmails?.includes(email))
+      const invitedEmails = emails.filter((email) => !skippedEmails.includes(email) && !invalidEmails.includes(email))
 
       if (errorKey) {
         dispatch(NotificationActions.notifyError({ key: errorKey, params: errorParams }))
-      } else if (invitedEmails.length === 0) {
+      } else if (invitedEmails.length === 0 && invalidEmails.length === 0) {
         dispatch(
           NotificationActions.notifyError({ key: 'appErrors:userHasRole', params: { count: skippedEmails.length } })
         )
       } else {
-        _showInvitationSuccessfulMessage({ dispatch, userInvite, skippedEmails })
-        navigate(appModuleUri(userModules.usersSurvey))
+        if (invitedEmails.length > 0 || skippedEmails.length > 0) {
+          _showInvitationSuccessfulMessage({ dispatch, userInvite, skippedEmails })
+        }
+        if (invalidEmails.length > 0) {
+          // keep only the invalid addresses in the form, so the user can fix or remove them and retry
+          const userInviteWithInvalidEmailsOnly = UserInvite.assocProp(
+            UserInvite.keys.emails,
+            invalidEmails
+          )(userInvite)
+          setUserInvite(await validateUserInvite(userInviteWithInvalidEmailsOnly))
+          dispatch(
+            NotificationActions.notifyWarning({
+              key: 'userInviteView.invalidEmailsWarning',
+              params: { emails: invalidEmails.join(', '), count: invalidEmails.length },
+              timeout: 0,
+            })
+          )
+        } else {
+          navigate(appModuleUri(userModules.usersSurvey))
+        }
       }
     } finally {
       dispatch(LoaderActions.hideLoader())
@@ -91,7 +109,15 @@ export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = fals
       const groupUuid = UserInvite.getGroupUuid(userInvite)
       const group = groups.find((group) => group.uuid === groupUuid)
 
-      const invite = _performInvite({ dispatch, navigate, surveyId, surveyCycleKey, userInvite, repeatInvitation })
+      const invite = _performInvite({
+        dispatch,
+        navigate,
+        setUserInvite,
+        surveyId,
+        surveyCycleKey,
+        userInvite,
+        repeatInvitation,
+      })
 
       if (AuthGroup.isSystemAdminGroup(group)) {
         // ask for a confirmation when user is inviting someone else as system administrator
@@ -110,5 +136,5 @@ export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = fals
       setUserInvite(userInviteValidated)
       dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
     }
-  }, [userInvite])
+  }, [dispatch, groups, navigate, repeatInvitation, setUserInvite, surveyCycleKey, surveyId, userInvite])
 }

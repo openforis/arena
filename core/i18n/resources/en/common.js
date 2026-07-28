@@ -631,8 +631,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
     confirmInviteSystemAdmin_other: 'Invite the users {{email}} as System Administrators?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
+
     {{skppedEmailsCount}} addresses have been skipped (they have been already invited to this survey previously): {{skippedEmails}}`,
+    invalidEmailsWarning: `The email address {{emails}} could not be reached and may not exist. It has been kept in the list below: please correct it or remove it and try inviting again.`,
+    invalidEmailsWarning_other: `The email addresses {{emails}} could not be reached and may not exist. They have been kept in the list below: please correct or remove them and try inviting again.`,
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `
