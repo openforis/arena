@@ -53,20 +53,24 @@ const Users = () => {
         {
           component: UserInvite,
           path: userModules.userInvite.path,
-        },
-        {
-          component: UserGroupsEditor,
-          path: userModules.userGroups.path,
-        },
-        {
-          component: UserGroupEdit,
-          path: userModules.userGroupNew.path,
-        },
-        {
-          component: UserGroupEdit,
-          path: `${userModules.userGroup.path}/:groupUuid`,
         }
       )
+      if (Authorizer.canManageUserGroups(user, surveyInfo)) {
+        _modules.push(
+          {
+            component: UserGroupsEditor,
+            path: userModules.userGroups.path,
+          },
+          {
+            component: UserGroupEdit,
+            path: userModules.userGroupNew.path,
+          },
+          {
+            component: UserGroupEdit,
+            path: `${userModules.userGroup.path}/:groupUuid`,
+          }
+        )
+      }
     }
     if (ProcessUtils.ENV.allowUserAccessRequest && Authorizer.canViewUsersAccessRequests(user)) {
       _modules.push({
