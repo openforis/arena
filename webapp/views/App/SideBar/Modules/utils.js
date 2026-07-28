@@ -37,7 +37,7 @@ const getModule = ({ module, children = null, root = true, hidden = false }) => 
   [keys.external]: module.external,
 })
 
-export const getModulesHierarchy = (user, surveyInfo, { experimentalFeatures = false } = {}) => {
+export const getModulesHierarchy = (user, surveyInfo) => {
   const canEditSurvey = Authorizer.canEditSurvey(user, surveyInfo)
   const canAnalyzeRecords = Authorizer.canAnalyzeRecords(user, surveyInfo)
   const canExportRecords = Authorizer.canExportRecords(user, surveyInfo)
@@ -83,7 +83,10 @@ export const getModulesHierarchy = (user, surveyInfo, { experimentalFeatures = f
     // users
     getModule({
       module: appModules.users,
-      children: [userModules.usersSurvey, ...(experimentalFeatures ? [userModules.userGroups] : [])],
+      children: [
+        userModules.usersSurvey,
+        ...(Authorizer.canManageUserGroups(user, surveyInfo) ? [userModules.userGroups] : []),
+      ],
       hidden: !Authorizer.canViewSurveyUsers(user, surveyInfo) || Survey.isTemplate(surveyInfo),
     }),
     // message
