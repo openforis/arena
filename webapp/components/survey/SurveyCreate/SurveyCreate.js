@@ -11,7 +11,7 @@ import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 import { RecordCycle } from '@core/record/recordCycle'
 
-import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import { appModuleUri, appModules, homeModules } from '@webapp/app/appModules'
 
 import { contentTypes } from '@webapp/service/api'
 import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
@@ -88,9 +88,9 @@ const SurveyCreate = (props) => {
     uploading,
   } = newSurvey
 
-  // Redirect to landing on survey change
+  // Redirect to dashboard after creating a survey; keep templates on Home.
   useOnUpdate(() => {
-    navigate(appModuleUri(homeModules.landing))
+    navigate(appModuleUri(template ? homeModules.landing : appModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
 
   const fileUploadLimitMB = useSystemConfigFileUploadLimitMB()

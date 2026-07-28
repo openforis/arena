@@ -19,6 +19,7 @@ import type { ValidationResultInstance } from '@core/validation/validationResult
 import { Button, ButtonIconDelete, ColorInput } from '@webapp/components'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import { useConfirmAsync } from '@webapp/components/hooks'
 import { useBrandingLogoSrc } from '@webapp/components/survey/useBrandingLogoSrc'
 import * as API from '@webapp/service/api'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -93,7 +94,7 @@ type BrandingImageSectionProps = {
   localObjectUrl?: string | null
   inputRef: RefObject<HTMLInputElement>
   onFileChange: (event: ChangeEvent<HTMLInputElement>) => void
-  onRemove?: ((imageKey: BrandingImageKey) => void) | null
+  onRemove?: (() => void) | null
   readOnly?: boolean
   surveyId: number | string | null
   uploading?: boolean
@@ -103,7 +104,6 @@ type BrandingImageSectionProps = {
 
 const BrandingImageSection = (props: BrandingImageSectionProps) => {
   const {
-    imageKey,
     labelKey,
     image,
     localObjectUrl,
@@ -128,22 +128,25 @@ const BrandingImageSection = (props: BrandingImageSectionProps) => {
       <legend>{i18n.t(labelKey)}</legend>
       {!readOnly && (
         <div className="survey-info-branding-form__upload-actions">
-          <div className="survey-info-branding-form__upload">
-            <input
-              ref={inputRef}
-              accept={fileInputAccept}
-              className="survey-info-branding-form__file-input"
-              onChange={onFileChange}
-              type="file"
-            />
-            <Button
-              disabled={uploading}
-              label="homeView:surveyInfo.branding.uploadLogo"
-              onClick={() => inputRef.current?.click()}
-              size="small"
-            />
-          </div>
-          {hasImage && onRemove && <ButtonIconDelete onClick={() => onRemove(imageKey)} />}
+          <input
+            ref={inputRef}
+            accept={fileInputAccept}
+            className="survey-info-branding-form__file-input"
+            onChange={onFileChange}
+            type="file"
+          />
+          {hasImage && onRemove ? (
+            <ButtonIconDelete onClick={onRemove} />
+          ) : (
+            <div className="survey-info-branding-form__upload">
+              <Button
+                disabled={uploading}
+                label="homeView:surveyInfo.branding.uploadLogo"
+                onClick={() => inputRef.current?.click()}
+                size="small"
+              />
+            </div>
+          )}
         </div>
       )}
       {imageSrc && (
@@ -188,6 +191,7 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
+  const confirm = useConfirmAsync()
 
   const previewSurveyInfo = useMemo(
     () => ({
@@ -298,13 +302,14 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
   )
 
   const onImageRemove = useCallback(
-    (imageKey: BrandingImageKey) => {
+    (imageKey: BrandingImageKey) => async () => {
+      if (!(await confirm({ key: 'homeView:surveyInfo.surveyDocLayout.confirmDelete' }))) return
       clearLocalObjectUrl(imageKey)
       const next: SurveyBrandingData = { ...branding }
       delete next[imageKey]
       setBranding(next)
     },
-    [branding, clearLocalObjectUrl, setBranding]
+    [branding, clearLocalObjectUrl, confirm, setBranding]
   )
 
   const onImageFileSelected = useCallback(
@@ -460,7 +465,7 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
               localObjectUrl={localObjectUrls[imageKey] ?? null}
               inputRef={logoInputRefByKey[imageKey]}
               onFileChange={createLogoFileChangeHandler(imageKey, fileType)}
-              onRemove={readOnly ? null : onImageRemove}
+              onRemove={readOnly ? null : onImageRemove(imageKey)}
               readOnly={readOnly}
               surveyId={surveyId}
               uploading={uploadingImageKey === imageKey}
@@ -477,7 +482,7 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
         localObjectUrl={localObjectUrls[brandingKeys.landingBackground] ?? null}
         inputRef={landingBackgroundInputRef}
         onFileChange={onLandingBackgroundFileChange}
-        onRemove={readOnly ? null : onImageRemove}
+        onRemove={readOnly ? null : onImageRemove(brandingKeys.landingBackground)}
         readOnly={readOnly}
         surveyId={surveyId}
         uploading={uploadingImageKey === brandingKeys.landingBackground}
