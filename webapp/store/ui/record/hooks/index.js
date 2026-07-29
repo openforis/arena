@@ -56,3 +56,5 @@ export const useNodesMaxCount = ({ parentNodeUuid, nodeDefUuid }) =>
 
 export const useNodesMinCount = ({ parentNodeUuid, nodeDefUuid }) =>
   useNodesCount({ parentNodeUuid, nodeDefUuid, countType: NodeDefValidations.keys.min })
+
+export { useRecordCompletionPercent } from './useRecordCompletionPercent'

@@ -35,6 +35,7 @@ import { TreeSelectViewMode } from '@webapp/model'
 
 import NodeDefDetails from '../NodeDefDetails'
 import { FormPagesEditButtons } from './components/FormPageEditButtons'
+import { RecordCompletionBar } from './components/RecordCompletionBar'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 import FormHeader from './FormHeader'
@@ -201,6 +202,7 @@ const SurveyForm = (props) => {
         {showPageNavigation && (
           <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
+              {entry && <RecordCompletionBar />}
               <NodeDefTreeSelect
                 disableSelection={surveyIsDirty}
                 isNodeDefIncluded={(nodeDefArg) =>
