@@ -138,7 +138,7 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
         msgKey: 'emails:userAccessRequestConfirmation',
         msgParams: { firstName, serverUrl, supportEmail: ProcessUtils.ENV.supportEmail },
       }))
-    } catch (error) {
+    } catch {
       // sending failed outright (transport error, provider rejection, etc.): treat like a rejected recipient
       rejected = [email]
     }
