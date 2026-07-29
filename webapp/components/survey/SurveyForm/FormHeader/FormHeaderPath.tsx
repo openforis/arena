@@ -45,19 +45,20 @@ const breadcrumbsSx = {
   },
   '& .MuiBreadcrumbs-li': {
     minWidth: 0,
-    maxWidth: '100%',
+    overflow: 'hidden',
+    flexShrink: 1,
   },
 }
 
-const getCrumbTypographySx = (isLast: boolean) => ({
+const crumbTypographySx = {
   fontSize: '0.9rem',
   fontWeight: 600,
   display: 'block',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  maxWidth: isLast ? 280 : 200,
-})
+  minWidth: 0,
+}
 
 const menuItemSx = {
   maxWidth: 360,
@@ -85,7 +86,7 @@ const CrumbLabel = ({ crumb, isLast }: { crumb: FormPathCrumb; isLast: boolean }
     color={isLast ? 'text.primary' : 'text.secondary'}
     variant="body2"
     component="span"
-    sx={getCrumbTypographySx(isLast)}
+    sx={crumbTypographySx}
   >
     {crumb.label}
   </Typography>
