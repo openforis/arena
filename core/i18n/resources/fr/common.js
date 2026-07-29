@@ -110,6 +110,8 @@ En confirmant, toutes les modifications seront perdues.
 Voulez-vous continuer ?`,
     local: 'Local',
     loading: 'Chargement...',
+    lock: 'Verrouiller',
+    unlock: 'Déverrouiller',
     max: 'Maximum',
     med: 'Médiane',
     manage: 'Gérer',
@@ -181,6 +183,10 @@ Voulez-vous continuer ?`,
     showLabels: 'Afficher les étiquettes',
     showLabelsAndNames: 'Afficher les étiquettes et les noms',
     showNames: 'Afficher les noms',
+    sort: 'Trier',
+    sortAsc: 'Trier croissant',
+    sortDesc: 'Trier décroissant',
+    sortNone: 'Supprimer le tri',
     srs: 'SRS',
     status: 'Statut',
     sum: 'Somme',
@@ -188,6 +194,7 @@ Voulez-vous continuer ?`,
     to: 'À',
     totalItems: 'Total des éléments',
     true: 'Vrai',
+    trySplittingFileIntoSmallerChunks: 'Essayez de diviser le fichier en morceaux plus petits.',
     type: 'Type',
     undefinedName: 'Nom non défini',
     unique: 'Unique',
@@ -196,6 +203,8 @@ Voulez-vous continuer ?`,
       message: `Erreur lors du téléversement du fichier : {{error}}.\n
 Réessayer ?`,
     },
+    uploadFileChangedError:
+      'Le fichier sélectionné semble avoir été modifié depuis sa sélection. Veuillez le sélectionner à nouveau.',
     uploadingFile: 'Téléversement du fichier ({{progressPercent}}%)',
     value: 'Valeur',
     view: 'Voir',
@@ -257,6 +266,8 @@ Réessayer ?`,
     header: 'Fichiers',
     missing: ' Fichiers manquants : {{count}}',
     totalSize: 'Taille totale : {{size}}',
+    fileName: 'Nom du fichier',
+    fileSize: 'Taille du fichier',
   },
 
   sidebar: {
@@ -296,6 +307,7 @@ Réessayer ?`,
 
   appModules: {
     home: 'Accueil',
+    landing: 'Bienvenue',
     dashboard: 'Tableau de bord',
     surveyNew: 'Nouveau formulaire',
     surveys: 'Formulaires',
@@ -332,6 +344,9 @@ Réessayer ?`,
     userInvite: 'Inviter un utilisateur',
     userNew: 'Nouvel utilisateur',
     usersSurvey: 'Liste des utilisateurs',
+    userGroup: "Groupe d'utilisateurs",
+    userGroup_plural: "Groupes d'utilisateurs",
+    userGroupNew: "Nouveau groupe d'utilisateurs",
     usersList: 'Liste des utilisateurs (tous)',
     user2FADevice: 'Appareil 2FA',
     user2FADevice_plural: 'Appareils 2FA',
@@ -463,8 +478,10 @@ Merci et profitez de **$t(common.appNameFull)** !`,
       lock: "Verrouiller la modification de l'attribut clé",
       unlock: "Autoriser la modification de l'attribut clé",
     },
-    lock: 'Verrouiller',
-    unlock: 'Déverrouiller',
+    qualifierAttributeEditing: {
+      lock: "Verrouiller la modification de l'attribut qualificatif",
+      unlock: "Autoriser la modification de l'attribut qualificatif",
+    },
   },
 
   dataExplorerView: {
@@ -613,8 +630,9 @@ Merci et profitez de **$t(common.appNameFull)** !`,
     confirmInviteSystemAdmin: "Inviter l'utilisateur {{email}} en tant qu'Administrateur système ?",
     confirmInviteSystemAdmin_other: "Inviter les utilisateurs {{email}} en tant qu'Administrateurs système ?",
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} adresses ont été ignorées (elles ont déjà été invitées à ce formulaire précédemment) : {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} adresses ont été ignorées (elles ont déjà été invitées à ce formulaire précédemment) : {{skippedEmails}}`,
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `
@@ -741,6 +759,8 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
     nonResponseBiasCorrectionInfo: `Pour implémenter la méthode d'ajustement par classes de pondération, ajoutez 'design_psu' et 'design_ssu' dans la table de catégories de strate comme propriétés numériques supplémentaires.`,
     pValue: 'Valeur P',
     resultsBackFromRStudio: 'Résultats relus depuis RStudio',
+    resultsBackFromRStudioInfo: `Activez cette option si les attributs de résultat calculés dans RStudio doivent être réimportés dans le serveur Arena.
+Ce processus peut être lent.`,
     samplingDesign: "Plan d'échantillonnage",
     samplingDesignDetails: "Détails du plan d'échantillonnage",
     samplingStrategyLabel: "Stratégie d'échantillonnage",
@@ -776,6 +796,18 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Chaîne de traitement supprimée',
+    cloneFromAnotherSurvey: 'Cloner depuis une autre enquête',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Cloner la chaîne depuis une autre enquête',
+      sourceSurvey: 'Enquête source',
+      sourceChain: 'Chaîne source',
+      entityCheck: 'Compatibilité des entités',
+      entityMissing: "absente dans l'enquête cible",
+      noAnalysisAttributes: "Cette chaîne n'a pas d'attributs d'analyse",
+      cloneComplete: 'Chaîne clonée avec succès',
+      missingEntities:
+        "Impossible de cloner : les entités suivantes n'existent pas dans l'enquête cible : {{entities}}",
+    },
     cannotSelectNodeDefNotBelongingToCycles: `La définition de nœud "{{label}}" ne peut pas être sélectionnée car elle n'appartient pas à tous les cycles de la chaîne de traitement`,
     cannotSelectCycle:
       "Ce cycle ne peut pas être sélectionné car certaines définitions de nœud n'appartiennent pas à ce cycle",
@@ -970,6 +1002,10 @@ $t(common.appNameFull)
       multiple: 'Multiple',
       ownPage: 'Sa propre page',
       parentPage: 'Page parente ({{parentPage}})',
+      qualifier: {
+        label: 'Qualificateur',
+        info: `Lorsqu'un nouvel enregistrement est créé par un utilisateur appartenant à un groupe, cet attribut sera automatiquement rempli avec la valeur spécifiée pour celui-ci dans les qualificateurs du groupe de l'utilisateur. Les utilisateurs ne pourront voir et modifier que les enregistrements appartenant à leur propre groupe, s'ils appartiennent à un groupe.`,
+      },
       table: 'Tableau',
     },
     advancedProps: {
@@ -1150,6 +1186,10 @@ Ex. this.region = nom_attribut_region
 
 Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un attribut *espece_arbre* marqué comme **Unique**, vous ne pouvez avoir qu'un seul arbre par espèce dans la même *parcelle*.`,
     },
+    categoriesClonedFromSurvey:
+      "Les catégories suivantes ont également été clonées depuis l'enquête source : {{names}}",
+    taxonomiesClonedFromSurvey:
+      "Les taxonomies suivantes ont également été clonées depuis l'enquête source : {{names}}",
   },
 
   languagesEditor: {
@@ -1160,6 +1200,16 @@ Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un att
     header: 'Taxonomie',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomie'})`,
     confirmDelete: 'Supprimer la taxonomie {{taxonomyName}} ?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Cloner une taxonomie depuis une autre enquête',
+      sourceSurvey: 'Enquête source',
+      sourceTaxonomy: 'Taxonomie source',
+      loadingSurveys: 'Chargement des enquêtes...',
+      noSurveysAvailable: 'Aucune enquête disponible',
+      selectSurveyFirst: "Sélectionnez d'abord une enquête",
+      loadingTaxonomies: 'Chargement des taxonomies...',
+      noTaxonomiesAvailable: "Aucune taxonomie disponible dans l'enquête sélectionnée",
+    },
     edit: {
       taxonomyListName: 'Nom de la liste de taxonomie',
       taxaNotImported: 'Taxons non importés',
@@ -1168,6 +1218,9 @@ Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un att
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Synonyme / Latin',
       extraPropsNotDefined: 'Propriétés supplémentaires non définies pour cette taxonomie',
+      importMissingPublishedTaxa:
+        '{{count}} taxon(s) publié(s) introuvable(s) dans le fichier importé et laissé(s) inchangé(s). Codes : {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} de plus)',
     },
     taxaCount: 'Nombre de taxons',
     vernacularNameLabel: 'Étiquette du nom vernaculaire',
@@ -1178,6 +1231,16 @@ Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un att
     batchImportCompleteSuccessfully: `{{importedCategories}} catégories importées avec succès !
 {{insertedCategories}} nouvelles
 {{updatedCategories}} mises à jour`,
+    cloneFromAnotherSurvey: {
+      title: 'Cloner une catégorie depuis une autre enquête',
+      sourceSurvey: 'Enquête source',
+      sourceCategory: 'Catégorie source',
+      loadingSurveys: 'Chargement des enquêtes...',
+      noSurveysAvailable: 'Aucune enquête disponible',
+      selectSurveyFirst: "Sélectionnez d'abord une enquête",
+      loadingCategories: 'Chargement des catégories...',
+      noCategoriesAvailable: "Aucune catégorie disponible dans l'enquête sélectionnée",
+    },
     itemsCount: "Nombre d'éléments",
     types: {
       flat: 'Plat',

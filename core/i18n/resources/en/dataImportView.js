@@ -37,6 +37,25 @@ export default {
 `,
   importIntoCycle: 'Import into cycle',
   importIntoMultipleEntityOrAttribute: 'Import into multiple entity or attribute',
+  importPreview: {
+    title: 'Import preview',
+    generatePreview: 'Generate preview',
+    skipInfo:
+      'Records marked as "Skip" cannot be selected: an existing, more recently modified record already exists, so they will not be imported.',
+    confirmImport: 'Import selected records ({{count}})',
+    columns: {
+      exists: 'Exists',
+      action: 'Action',
+      dateModified: 'Imported record modified',
+      existingDateModified: 'Existing record modified',
+    },
+    action: {
+      insert: 'Insert',
+      overwrite: 'Overwrite',
+      merge: 'Merge',
+      skip: 'Skip',
+    },
+  },
   importType: {
     label: 'Import type',
     insertNewRecords: 'Insert new records',
@@ -74,6 +93,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{deletedFiles}} files deleted`,
       importCompleteWithErrors: `## Import complete (with errors):
         - {{processed}} rows processed`,
+      tooLong: 'This import is taking a while. $t(common.trySplittingFileIntoSmallerChunks)',
     },
     DataImportValidationJob: {
       validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
@@ -90,6 +110,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{insertedFiles}} files would be inserted
         - {{updatedFiles}} files would be updated
         - {{deletedFiles}} files would be deleted`,
+      tooLong: 'This validation is taking a while. $t(common.trySplittingFileIntoSmallerChunks)',
     },
   },
   options: {
@@ -98,6 +119,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
     preventAddingNewEntityData: 'Prevent adding new entity data',
     preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
     includeFiles: 'Include files',
+    skipMissingFiles: 'Ignore missing files',
     deleteExistingEntities: `Delete selected entity's data in all records`,
   },
   optionsInfo: {

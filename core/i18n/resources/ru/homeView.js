@@ -72,8 +72,33 @@ export default {
     noRecordsAddedInSelectedPeriod: 'Нет записей, добавленных в выбранный период',
   },
   surveyDeleted: 'Опрос {{surveyName}} был удален',
+  landing: {
+    openDashboard: 'Открыть панель',
+  },
   surveyInfo: {
     basic: 'Основная информация',
+    branding: {
+      title: 'Брендинг',
+      primaryColor: 'Основной цвет',
+      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
+      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      fontSizePreset: {
+        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
+        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
+        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+      },
+      surveyLogo1: '$t(homeView:surveyInfo.branding.surveyLogo1)',
+      surveyLogo2: '$t(homeView:surveyInfo.branding.surveyLogo2)',
+      surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
+      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
+      uploadLogo: 'Загрузить логотип',
+      logoFileFormatHint: '$t(homeView:surveyInfo.branding.logoFileFormatHint)',
+      logoFileTooLarge: '$t(homeView:surveyInfo.branding.logoFileTooLarge)',
+      preview: 'Предпросмотр',
+      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
+      invalidPrimaryColor: 'Введите допустимый цвет #RRGGBB или оставьте пустым',
+      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
+    },
     configuration: {
       title: 'Конфигурация',
       filesTotalSpace: 'Общий объем файлов (ГБ)',
@@ -97,6 +122,27 @@ export default {
         title: 'Предзагруженный слой карты',
       },
     },
+
+    surveyDocLayout: {
+      tabTitle: 'Макет документа',
+      title: 'Изображения документа',
+      layoutOptions: {
+        title: 'Параметры макета',
+        headerOnFirstPageOnly: 'Верхний колонтитул только на первой странице',
+        pageNumbering: 'Нумерация страниц',
+      },
+      documentPlace: 'Место',
+      documentPlaceValues: {
+        header: 'Верхний колонтитул',
+        footer: 'Нижний колонтитул',
+      },
+      applyIf: 'Применить если условие',
+      confirmDelete: 'Вы уверены, что хотите удалить это изображение документа?',
+      editor: {
+        title: 'Изображение документа',
+      },
+    },
+
     preferredLanguage: 'Предпочитаемый язык',
     sampleBasedImageInterpretation: 'Интерпретация изображений на основе образцов',
     sampleBasedImageInterpretationEnabled: 'Интерпретация изображений на основе образцов включена',

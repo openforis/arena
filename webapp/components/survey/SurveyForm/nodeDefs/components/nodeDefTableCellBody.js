@@ -11,7 +11,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefErrorBadge from './nodeDefErrorBadge'
-import NodeDefKeyLockToggle from './NodeDefKeyLockToggle'
+import NodeDefAttributeLockToggle from './NodeDefAttributeLockToggle'
 import NodeDefMultipleTableCell from './nodeDefMultipleTableCell'
 
 const NodeDefTableCellBody = (props) => {
@@ -26,10 +26,24 @@ const NodeDefTableCellBody = (props) => {
     onKeyFieldBlur = undefined,
     onKeyFieldFocus = undefined,
     onKeyFieldLockToggle = undefined,
+    onQualifierFieldBlur = undefined,
+    onQualifierFieldFocus = undefined,
+    onQualifierFieldLockToggle = undefined,
     parentNode,
+    qualifierFieldLocked = false,
+    qualifierFieldLockVisible = false,
     readOnly: readOnlyProp = false,
     surveyCycleKey,
   } = props
+
+  const onFieldFocus = (event) => {
+    onKeyFieldFocus?.(event)
+    onQualifierFieldFocus?.(event)
+  }
+  const onFieldBlur = (event) => {
+    onKeyFieldBlur?.(event)
+    onQualifierFieldBlur?.(event)
+  }
 
   const surveyLanguage = useSurveyPreferredLang()
   const readOnly = readOnlyProp || NodeDef.isReadOnlyOrAnalysis(nodeDef) || (entryDataQuery && NodeDef.isKey(nodeDef))
@@ -51,23 +65,32 @@ const NodeDefTableCellBody = (props) => {
     React.createElement(NodeDefUiProps.getComponent(nodeDef), propsNodeDefComponent)
   )
 
-  const controlsVisible = keyFieldLockVisible
+  const controlsVisible = keyFieldLockVisible || qualifierFieldLockVisible
 
   return (
     <fieldset
       aria-label={label}
       className="survey-form__node-def-fieldset survey-form__node-def-table-cell-body"
-      onFocus={onKeyFieldFocus}
-      onBlur={onKeyFieldBlur}
+      onFocus={onFieldFocus}
+      onBlur={onFieldBlur}
     >
       <div className="survey-form__node-def-table-cell-body-inner">
         <div className="survey-form__node-def-table-cell-controls">
           {keyFieldLockVisible && (
-            <NodeDefKeyLockToggle
+            <NodeDefAttributeLockToggle
               className="survey-form__node-def-table-cell-lock-btn"
-              keyFieldLocked={keyFieldLocked}
+              locked={keyFieldLocked}
               onClick={onKeyFieldLockToggle}
               testId={TestId.surveyForm.keyLockToggle(NodeDef.getName(nodeDef))}
+            />
+          )}
+          {qualifierFieldLockVisible && (
+            <NodeDefAttributeLockToggle
+              className="survey-form__node-def-table-cell-lock-btn"
+              locked={qualifierFieldLocked}
+              onClick={onQualifierFieldLockToggle}
+              testId={TestId.surveyForm.qualifierLockToggle(NodeDef.getName(nodeDef))}
+              titleKeyPrefix="recordView.qualifierAttributeEditing"
             />
           )}
           <NodeDefErrorBadge
@@ -100,7 +123,12 @@ NodeDefTableCellBody.propTypes = {
   onKeyFieldBlur: PropTypes.func,
   onKeyFieldFocus: PropTypes.func,
   onKeyFieldLockToggle: PropTypes.func,
+  onQualifierFieldBlur: PropTypes.func,
+  onQualifierFieldFocus: PropTypes.func,
+  onQualifierFieldLockToggle: PropTypes.func,
   parentNode: PropTypes.object.isRequired,
+  qualifierFieldLocked: PropTypes.bool,
+  qualifierFieldLockVisible: PropTypes.bool,
   readOnly: PropTypes.bool,
   renderType: PropTypes.string.isRequired,
   surveyCycleKey: PropTypes.string.isRequired,

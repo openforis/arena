@@ -36,6 +36,25 @@ export default {
 7. Inicie a importação`,
   importIntoCycle: 'Importar para o ciclo',
   importIntoMultipleEntityOrAttribute: 'Importar para múltiplas entidades ou atributos',
+  importPreview: {
+    title: 'Pré-visualização da importação',
+    generatePreview: 'Gerar pré-visualização',
+    skipInfo:
+      'Os registros marcados como "Ignorar" não podem ser selecionados: já existe um registro existente modificado mais recentemente, portanto eles não serão importados.',
+    confirmImport: 'Importar registros selecionados ({{count}})',
+    columns: {
+      exists: 'Existe',
+      action: 'Ação',
+      dateModified: 'Registro importado modificado',
+      existingDateModified: 'Registro existente modificado',
+    },
+    action: {
+      insert: 'Inserir',
+      overwrite: 'Sobrescrever',
+      merge: 'Mesclar',
+      skip: 'Ignorar',
+    },
+  },
   importType: {
     label: 'Tipo de importação',
     insertNewRecords: 'Inserir novos registros',
@@ -72,6 +91,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{deletedFiles}} arquivos excluídos`,
       importCompleteWithErrors: `## Importação concluída (com erros):
         - {{processed}} linhas processadas`,
+      tooLong: `Esta importação está demorando um pouco. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
     DataImportValidationJob: {
       validationCompleteWithErrors: `## Validação concluída ({{errorsFoundMessage}})
@@ -88,6 +108,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{insertedFiles}} arquivos seriam inseridos
         - {{updatedFiles}} arquivos seriam atualizados
         - {{deletedFiles}} arquivos seriam excluídos`,
+      tooLong: `Esta validação está demorando um pouco. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
   },
   options: {
@@ -96,6 +117,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
     preventAddingNewEntityData: 'Impedir a adição de novos dados de entidade',
     preventUpdatingRecordsInAnalysis: 'Impedir a atualização de registros na etapa Análise',
     includeFiles: 'Incluir arquivos',
+    skipMissingFiles: 'Ignorar arquivos ausentes',
     deleteExistingEntities: `Excluir os dados da entidade selecionada em todos os registros`,
   },
   optionsInfo: {

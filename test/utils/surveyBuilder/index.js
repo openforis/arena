@@ -9,7 +9,6 @@ import * as NodeDef from '../../../core/survey/nodeDef'
 import * as Category from '../../../core/survey/category'
 import * as Taxonomy from '../../../core/survey/taxonomy'
 import * as User from '../../../core/user/user'
-import * as PromiseUtils from '../../../core/promiseUtils'
 
 import * as SurveyManager from '../../../server/modules/survey/manager/surveyManager'
 import * as NodeDefRepository from '../../../server/modules/nodeDef/repository/nodeDefRepository'
@@ -32,7 +31,9 @@ const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
     children.sort((nodeDefA, nodeDefB) => NodeDef.isVirtual(nodeDefA) - NodeDef.isVirtual(nodeDefB))
 
     // insert node defs in order to avoid foreign keys violations
-    await PromiseUtils.each(children, _insertNodeDefRecursively(surveyId, survey, t))
+    for (const child of children) {
+      await _insertNodeDefRecursively(surveyId, survey, t)(child)
+    }
   }
 }
 
@@ -97,9 +98,8 @@ class SurveyBuilder {
 
   /**
    * Builds the survey and saves it as draft or publish it.
-   *
-   * @param {boolean} [publish=true] - Whether to publish the survey.
-   * @param {pgPromise.IDatabase} [client=db] - The database client.
+   * @param {boolean} [publish] - Whether to publish the survey.
+   * @param {pgPromise.IDatabase} [client] - The database client.
    * @returns {Promise<Survey>} - The newly created survey object.
    */
   async buildAndStore(publish = true, client = db) {
@@ -120,6 +120,11 @@ class SurveyBuilder {
       const nodeDefRoot = Survey.getNodeDefRoot(surveyParam)
 
       await _insertNodeDefRecursively(surveyId, surveyParam, t)(nodeDefRoot)
+
+      // Categories
+      await Promise.all(
+        this.categoryBuilders.map((categoryBuilder) => categoryBuilder.buildAndStore(this.user, surveyId, t))
+      )
 
       // Taxonomies
       await Promise.all(

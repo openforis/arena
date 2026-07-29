@@ -106,6 +106,9 @@ export const useAuthCanUseMessages = useUserIsSystemAdmin
 export const useAuthCanCreateUsers = () => Authorizer.canCreateUsers(useUser())
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
 export const useAuthCanInviteUser = () => Authorizer.canInviteUsers(useUser(), useSurveyInfo())
+export const useAuthCanManageUserGroups = () => Authorizer.canManageUserGroups(useUser(), useSurveyInfo())
+export const useAuthCanEditQualifierAttributeValue = () =>
+  Authorizer.canEditQualifierAttributeValue(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersName = () =>
   Authorizer.canViewOtherUsersNameInSameSurvey(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersEmail = () =>
@@ -115,8 +118,6 @@ export const useAuthCanViewAllUsers = () => Authorizer.canViewAllUsers(useUser()
 
 // ====== Profile picture
 export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) => {
-  const [profilePicture, setProfilePicture] = useState(null)
-
   const { data = null, dispatch: fetchUserProfilePicture } = useAsyncGetRequest(
     `/api/user/${userUuid}/profilePicture`,
     { responseType: 'blob' }
@@ -128,10 +129,18 @@ export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) =>
     }
   }, [userUuid, forceUpdateKey])
 
+  const [profilePicture, setProfilePicture] = useState(null)
+
   useEffect(() => {
     if (data && data.size > 0) {
-      setProfilePicture(URL.createObjectURL(data))
+      const objectUrl = URL.createObjectURL(data)
+      setProfilePicture(objectUrl)
+      return () => {
+        URL.revokeObjectURL(objectUrl)
+      }
     }
+    setProfilePicture(null)
+    return undefined
   }, [data])
 
   return profilePicture

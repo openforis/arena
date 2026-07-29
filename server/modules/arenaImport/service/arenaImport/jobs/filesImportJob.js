@@ -33,9 +33,7 @@ export default class FilesImportJob extends FileImportBaseJob {
         const fileUuid = SurveyFile.getUuid(fileSummary)
         const fileName = SurveyFile.getName(fileSummary)
         const fileContent = await this.fetchFileContent({ fileName, fileUuid })
-        if (!fileContent && !skipMissingFiles) {
-          throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
-        }
+        const recordUuid = SurveyFile.getRecordUuid(fileSummary)
         if (fileContent) {
           file = SurveyFile.assocContent(fileContent)(file)
 
@@ -44,9 +42,14 @@ export default class FilesImportJob extends FileImportBaseJob {
 
           await this.persistFile(file)
         } else {
-          const recordUuid = SurveyFile.getRecordUuid(fileSummary)
-          this.logWarn(`Survey ${surveyId} record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`)
-          this.missingFileSummaries.push(fileSummary)
+          const missingFileContentMessage = `Record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`
+          if (skipMissingFiles) {
+            const detailedMessage = `Survey ${surveyId} - ${missingFileContentMessage}`
+            this.logWarn(detailedMessage)
+            this.missingFileSummaries.push(fileSummary)
+          } else {
+            throw new Error(missingFileContentMessage)
+          }
         }
         this.incrementProcessedItems()
       }
@@ -76,13 +79,13 @@ export default class FilesImportJob extends FileImportBaseJob {
   }
 
   async checkFileUuidsAreValid(filesSummaries) {
-    const { recordsFileUuids } = this.context
+    const { recordsFileUuids, skipMissingFiles } = this.context
 
     if (Objects.isEmpty(recordsFileUuids)) {
       this.logDebug('no files to restore in the records')
       return
     }
-    if (Objects.isEmpty(filesSummaries)) {
+    if (Objects.isEmpty(filesSummaries) && !skipMissingFiles) {
       // files data in records but not in the files folder being restored
       throw new Error('missing files summary file')
     }

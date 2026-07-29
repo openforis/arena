@@ -5,8 +5,9 @@
   row-gap: 2rem;
 
   .form-item {
-    height: 2rem;
     width: 55rem;
+    min-height: 2rem;
+    height: auto;
   }
 
   .row {

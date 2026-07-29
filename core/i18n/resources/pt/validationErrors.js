@@ -51,6 +51,8 @@ export default {
     invalidParentItemOrder: 'O item com códigos {{parentItemCodes}} deve vir antes de seus filhos',
     nameDuplicate: 'Já existe uma categoria com o mesmo nome: {{name}}',
     srsNotDefined: 'SRS com código {{srs}} não definido no inventário',
+    uuidDuplicate:
+      'Esta categoria já foi clonada neste inventário (atualmente chamada "{{name}}"). Não pode ser clonada novamente.',
   },
 
   dataImport: {
@@ -128,6 +130,11 @@ export default {
     countMaxInvalid: '"Contagem máxima" inválida',
     countMinInvalid: '"Contagem mínima" inválida',
     readOnlyCannotHaveEditableIf: 'Um nó somente leitura não pode ter a condição "Editable if"',
+    qualifierCannotHaveApplicableExpression:
+      'O atributo qualificador não pode ter a condição "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    qualifierCannotHaveEditabilityRule: 'O atributo qualificador não pode ter regras de editabilidade definidas',
+    qualifierCannotHaveDefaultValues: 'O atributo qualificador não pode ter valores padrão',
+    qualifierCannotHaveValidations: 'O atributo qualificador não pode ter regras de validação definidas',
   },
 
   record: {
@@ -167,6 +174,13 @@ export default {
     labelsRequired: 'Pelo menos uma etiqueta é obrigatória',
   },
 
+  surveyDocImage: {
+    documentPlaceRequired: 'Local do documento obrigatório',
+    fileRequired: 'Arquivo obrigatório',
+    fileNameDuplicate: 'Outro arquivo com o mesmo nome já existe',
+    labelsRequired: 'Pelo menos uma etiqueta é obrigatória',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Colunas inválidas: {{invalidHeaders}}',
     cannotFindNodeDef: "Não foi possível encontrar definição de atributo ou entidade com nome '{{name}}'",
@@ -182,6 +196,12 @@ export default {
     scientificNameRequired: 'Nome científico obrigatório',
     taxaEmpty: 'Táxons vazios',
     vernacularNamesDuplicate: `Nome vernacular duplicado '{{name}}' para o idioma '{{lang}}'`,
+  },
+
+  taxonomyImport: {
+    nameDuplicate: 'Já existe uma taxonomia com o mesmo nome: {{name}}',
+    uuidDuplicate:
+      'Esta taxonomia já foi clonada neste inventário (atualmente chamada "{{name}}"). Não pode ser clonada novamente.',
   },
 
   taxonomyImportJob: {

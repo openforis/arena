@@ -32,6 +32,17 @@ export const createTaxonomy = async ({ surveyId }) => {
   return taxonomy
 }
 
+export const cloneTaxonomyFromSurvey = async ({ surveyId, sourceSurveyId, sourceTaxonomyUuid }) => {
+  const {
+    data: { taxonomy },
+  } = await axios.post(`/api/survey/${surveyId}/taxonomies/clone-from-survey`, {
+    sourceSurveyId,
+    sourceTaxonomyUuid,
+  })
+
+  return taxonomy
+}
+
 export const uploadTaxa = async ({ surveyId, taxonomyUuid, formData }) =>
   axios.post(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/upload`, formData)
 

@@ -181,12 +181,12 @@ class RecordsUpdateThread extends Thread {
   }
 
   async processRecordReloadMsg(msg) {
-    const { surveyId, recordUuid } = msg
+    const { surveyId, recordUuid, user } = msg
 
     const { recordsCache } = await this.getOrFetchSurveyData(msg)
 
     if (recordsCache.has(recordUuid)) {
-      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user })
       recordsCache.set(recordUuid, record)
     }
   }
@@ -243,7 +243,7 @@ class RecordsUpdateThread extends Thread {
   async processSurveyClearMsg(msg) {
     const { surveyId, cycle } = msg
 
-    let keysToDelete = []
+    const keysToDelete = []
 
     if (!Objects.isNil(cycle)) {
       const key = this.getSurveyDataKey(msg)
@@ -258,14 +258,14 @@ class RecordsUpdateThread extends Thread {
   }
 
   async getOrFetchRecord({ msg, recordUuid }) {
-    const { surveyId } = msg
+    const { surveyId, user } = msg
 
     const { recordsCache } = await this.getOrFetchSurveyData(msg)
 
     let record = recordsCache.get(recordUuid)
 
     if (!record) {
-      record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+      record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user })
       recordsCache.set(recordUuid, record)
     }
     return record

@@ -48,6 +48,7 @@ export const writeFile = async (path, data = '') => fsp.writeFile(path, data)
 export const appendFile = async (path, data = '') => fsp.appendFile(path, data)
 
 export const copyFile = async (src, dest) => fsp.copyFile(src, dest)
+export const renameFile = async (src, dest) => fsp.rename(src, dest)
 
 export const { createWriteStream, createReadStream } = fs
 

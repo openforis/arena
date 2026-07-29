@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 
 import * as API from '@webapp/service/api'
 import { Modal, ModalBody } from '@webapp/components/modal'
+import Markdown from '@webapp/components/markdown'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 
@@ -59,11 +60,16 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
         <div className="ai-explain-panel__expression">{expression}</div>
 
         <div className={`ai-explain-panel__body${done ? '' : ' ai-explain-panel__cursor'}`}>
-          {text || (done ? '' : i18n.t('aiExpression.explain.thinking'))}
+          {text && <Markdown source={text} />}
+          {!text && !done && i18n.t('aiExpression.explain.thinking')}
         </div>
 
         {error ? (
-          <div className="ai-explain-panel__error">{tUnescaped('aiExpression.explain.error', { message: error })}</div>
+          <div className="ai-explain-panel__error">
+            {error === 'aiRequestTimeout'
+              ? i18n.t('aiExpression.explain.timeout')
+              : tUnescaped('aiExpression.explain.error', { message: error })}
+          </div>
         ) : null}
       </ModalBody>
     </Modal>

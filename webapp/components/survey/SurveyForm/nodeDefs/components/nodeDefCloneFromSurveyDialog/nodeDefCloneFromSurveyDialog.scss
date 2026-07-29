@@ -6,11 +6,11 @@
     border: 1px solid var(--mui-palette-divider);
     border-radius: 4px;
     padding: 0.5rem;
-  }
 
-  .clone-from-survey-dialog__message {
-    color: var(--text-color);
-    font-size: 0.85rem;
-    padding: 0.25rem 0.1rem;
+    // survey (root) items: make them stand out from the nested entity items
+    > .MuiSimpleTreeView-root > .MuiTreeItem-root > .MuiTreeItem-content .tree-item-label {
+      font-size: 1rem;
+      font-weight: 600;
+    }
   }
 }

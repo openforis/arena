@@ -38,6 +38,7 @@ const NodeDefExpressionsProp = (props) => {
     propExtractor = null,
     qualifier,
     readOnly = false,
+    severity = false,
     showLabels = false,
     state,
     valueTypeSelection = false,
@@ -121,6 +122,7 @@ const NodeDefExpressionsProp = (props) => {
             applyIf={applyIf}
             multiple={multiple}
             values={values}
+            severity={severity}
             showLabels={showLabels}
             validation={Validation.getFieldValidation(propName)(nodeDefValidation)}
             mode={mode}
@@ -167,6 +169,7 @@ NodeDefExpressionsProp.propTypes = {
   mode: PropTypes.string,
 
   applyIf: PropTypes.bool,
+  severity: PropTypes.bool,
   showLabels: PropTypes.bool,
   multiple: PropTypes.bool,
   readOnly: PropTypes.bool,

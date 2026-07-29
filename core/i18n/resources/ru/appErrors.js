@@ -19,6 +19,8 @@ export default {
     invalidNodeInRecord:
       'Недопустимый узел в записи "{{recordUuid}}", узел "{{nodeUuid}}" с определением узла "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'В файле импорта не найдено записей или неверный формат файла',
+    pendingImportFileNotFoundOrExpired:
+      'Ранее загруженный файл не найден; возможно, срок его действия истек. Пожалуйста, загрузите его снова.',
     recordOwnedByAnotherUser:
       'Невозможно обновить запись "{{recordKeyValues}}", так как она принадлежит другому пользователю',
   },
@@ -30,6 +32,7 @@ export default {
   functionHasTooFewArguments: 'Функция {{fnName}} требует как минимум {{minArity}} (получено {{numArgs}})',
   functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} (получено {{numArgs}})',
   generic: 'Неожиданная ошибка: {{text}}',
+  geoWhispApiError: 'Сервис Whisp временно недоступен.',
   importingDataIntoWrongCollectSurvey: 'Импорт данных в неверный опрос Collect. Ожидаемый URI: {{collectSurveyUri}}',
   invalidType: 'Неверный тип {{type}}',
   jobCanceledOrErrorsFound: 'Задача отменена или обнаружены ошибки; откат транзакции',

@@ -7,6 +7,7 @@ export {
   fetchItemsCountIndexedByCategoryUuid,
   fetchCategory,
   createCategory,
+  cloneCategoryFromSurvey,
   countCategoryItems,
   fetchCategoryItems,
   fetchCategoryItemsInLevelRequest,
@@ -22,17 +23,28 @@ export {
   updateCategoryItemProp,
   updateCategoryItemIndexes,
 } from './categories'
-export { fetchChains, getChainSummaryExportUrl } from './analysis'
+export { fetchChains, getChainSummaryExportUrl, cloneChainFromSurvey } from './analysis'
 
 export {
   fetchTaxonomies,
   fetchTaxonomy,
   createTaxonomy,
+  cloneTaxonomyFromSurvey,
   uploadTaxa,
   updateTaxonomy,
   updateTaxonomyExtraPropDef,
   deleteTaxonomyIfEmpty,
 } from './taxonomies'
+export {
+  fetchUserGroups,
+  fetchUserGroup,
+  fetchUserGroupMembers,
+  createUserGroup,
+  updateUserGroup,
+  deleteUserGroup,
+  addUserGroupMember,
+  removeUserGroupMember,
+} from './userGroups'
 export { fetchActivityLogs } from './activityLog'
 export {
   getRecordNodeFileUrl,
@@ -40,6 +52,8 @@ export {
   createRecordFromSamplingPointDataItem,
   startCollectRecordsImportJob,
   startDataImportFromArenaJob,
+  startArenaImportSummaryJob,
+  cancelArenaImportSummary,
   startDataImportFromCsvJob,
   getDataImportFromCsvTemplateUrl,
   getDataImportFromCsvTemplatesUrl,
@@ -86,6 +100,7 @@ export {
   fetchSurveyTemplatesPublished,
   insertSurvey,
   insertSurveyFile,
+  fetchSurveyFile,
   startImportLabelsJob,
   startNodeDefsTranslationJob,
   updateSurveyConfigurationProp,

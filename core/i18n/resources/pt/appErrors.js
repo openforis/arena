@@ -19,6 +19,8 @@ export default {
     invalidNodeInRecord:
       'Nó inválido no registro "{{recordUuid}}", nó "{{nodeUuid}}" com a definição de nó "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'Nenhum registro encontrado no arquivo de importação ou formato de arquivo incorreto',
+    pendingImportFileNotFoundOrExpired:
+      'O arquivo enviado anteriormente não foi encontrado; ele pode ter expirado. Por favor, envie-o novamente.',
     recordOwnedByAnotherUser: 'Não é possível atualizar o registro "{{recordKeyValues}}" pois pertence a outro usuário',
   },
   entryDataNotFound: 'Dados de entrada não encontrados: {{entryName}}',
@@ -29,6 +31,7 @@ export default {
   functionHasTooFewArguments: 'A função {{fnName}} requer no mínimo {{minArity}} (recebido {{numArgs}})',
   functionHasTooManyArguments: 'A função {{fnName}} aceita no máximo {{maxArity}} (recebido {{numArgs}})',
   generic: 'Erro inesperado: {{text}}',
+  geoWhispApiError: 'O serviço Whisp está temporariamente indisponível.',
   importingDataIntoWrongCollectSurvey: 'Importando dados no inventário errado. URI esperada: {{collectSurveyUri}}',
   invalidType: 'Tipo inválido {{type}}',
   jobCanceledOrErrorsFound: 'Job cancelado ou erros encontrados; revertendo transação',

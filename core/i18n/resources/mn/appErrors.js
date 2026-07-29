@@ -19,6 +19,8 @@ export default {
     invalidNodeInRecord:
       '"{{recordUuid}}" бичлэгт буруу зангилаа байна, "{{nodeUuid}}" зангилаа, "{{nodeDefName}}" зангилааны тодорхойлолт (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'Импортын файлд бичлэг олдсонгүй эсвэл буруу файлын формат',
+    pendingImportFileNotFoundOrExpired:
+      'Өмнө оруулсан файл олдсонгүй; хугацаа нь дууссан байж магадгүй. Дахин оруулна уу.',
     recordOwnedByAnotherUser: '"{{recordKeyValues}}" бичлэг өөр хэрэглэгчид харьяалагддаг тул шинэчлэх боломжгүй',
   },
   entryDataNotFound: 'Оролтын өгөгдөл олдсонгүй: {{entryName}}',
@@ -29,6 +31,7 @@ export default {
   functionHasTooFewArguments: 'Функц {{fnName}} нь дор хаяж {{minArity}} шаарддаг ({{numArgs}} авсан)',
   functionHasTooManyArguments: 'Функц {{fnName}} нь хамгийн ихдээ {{maxArity}} зөвшөөрдөг ({{numArgs}} авсан)',
   generic: 'Гэнэтийн алдаа: {{text}}',
+  geoWhispApiError: 'Whisp үйлчилгээ түр хугацаанд ажиллахгүй байна.',
   importingDataIntoWrongCollectSurvey:
     'Буруу цуглуулгын судалгаанд өгөгдөл импортлож байна. Хүлээгдэж буй URI: {{collectSurveyUri}}',
   invalidType: 'Буруу төрөл {{type}}',

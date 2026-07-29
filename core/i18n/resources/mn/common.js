@@ -108,6 +108,8 @@ export default {
 Үргэлжлүүлэх үү?`,
     local: 'Орон нутгийн',
     loading: 'Ачаалж байна...',
+    lock: 'Түгжих',
+    unlock: 'Түгжээг тайлах',
     max: 'Хамгийн их',
     med: 'Дундаж',
     manage: 'Удирдах',
@@ -175,6 +177,10 @@ export default {
     showLabels: 'Шошго харуулах',
     showLabelsAndNames: 'Шошго ба нэр харуулах',
     showNames: 'Нэр харуулах',
+    sort: 'Эрэмбэлэх',
+    sortAsc: 'Өсөх эрэмбэ',
+    sortDesc: 'Буурах эрэмбэ',
+    sortNone: 'Эрэмбэ арилгах',
     srs: 'SRS',
     status: 'Төлөв',
     sum: 'Нийлбэр',
@@ -182,6 +188,7 @@ export default {
     to: 'Хүртэл',
     totalItems: 'Нийт элемент',
     true: 'Үнэн',
+    trySplittingFileIntoSmallerChunks: 'Файлыг жижиг хэсгүүдэд хуваахыг оролдоно уу.',
     type: 'Төрөл',
     undefinedName: 'Тодорхойгүй нэр',
     unique: 'Өвөрмөц',
@@ -190,6 +197,7 @@ export default {
       message: `Файл хуулах явцад алдаа гарлаа: {{error}}.\n
 Дахин оролдох уу?`,
     },
+    uploadFileChangedError: 'Сонгосон файл сонгосноос хойш өөрчлөгдсөн бололтой байна. Түүнийг дахин сонгоно уу.',
     uploadingFile: 'Файл байршуулж байна ({{progressPercent}}%)',
     value: 'Утга',
     view: 'Харах',
@@ -251,6 +259,8 @@ export default {
     header: 'Файлууд',
     missing: ' Дутуу файлууд: {{count}}',
     totalSize: 'Нийт хэмжээ: {{size}}',
+    fileName: 'Файлын нэр',
+    fileSize: 'Файлын хэмжээ',
   },
 
   sidebar: {
@@ -290,6 +300,7 @@ export default {
 
   appModules: {
     home: 'Нүүр хуудас',
+    landing: 'Тавтай морил',
     dashboard: 'Хяналтын самбар',
     surveyNew: 'Шинэ судалгаа',
     surveys: 'Судалгаанууд',
@@ -326,6 +337,9 @@ export default {
     userInvite: 'Хэрэглэгч урих',
     userNew: 'Шинэ хэрэглэгч',
     usersSurvey: 'Хэрэглэгчдийн жагсаалт',
+    userGroup: 'Хэрэглэгчийн бүлэг',
+    userGroup_plural: 'Хэрэглэгчийн бүлгүүд',
+    userGroupNew: 'Шинэ хэрэглэгчийн бүлэг',
     usersList: 'Хэрэглэгчдийн жагсаалт (бүгд)',
     user2FADevice: '2FA төхөөрөмж',
     user2FADevice_plural: '2FA төхөөрөмжүүд',
@@ -454,8 +468,10 @@ $t(common.raiseTicketInSupportForum)
       lock: 'Түлхүүр атрибутын засварыг түгжих',
       unlock: 'Түлхүүр атрибутыг засахыг зөвшөөрөх',
     },
-    lock: 'Түгжих',
-    unlock: 'Түгжээг тайлах',
+    qualifierAttributeEditing: {
+      lock: 'Квалификатор атрибутын засварыг түгжих',
+      unlock: 'Квалификатор атрибутыг засахыг зөвшөөрөх',
+    },
   },
 
   dataExplorerView: {
@@ -591,8 +607,9 @@ $t(common.raiseTicketInSupportForum)
     confirmInviteSystemAdmin: 'Хэрэглэгч {{email}}-г Систем Администратороор урих уу?',
     confirmInviteSystemAdmin_other: 'Хэрэглэгч {{email}}-г Систем Администратороор урих уу?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} хаяг алгассан (тэдгээр нь энэ судалгаанд өмнө нь уригдсан байсан): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} хаяг алгассан (тэдгээр нь энэ судалгаанд өмнө нь уригдсан байсан): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Эрхүүд',
       systemAdmin: `
@@ -719,6 +736,8 @@ $t(common.raiseTicketInSupportForum)
     nonResponseBiasCorrectionInfo: `Жинлэлтийн ангиллын тохируулгын аргыг хэрэгжүүлэхийн тулд 'design_psu' болон 'design_ssu'-г давхаргын ангиллын хүснэгтэд нэмэлт тоон шинж чанар болгон нэмнэ үү.`,
     pValue: 'P-утга',
     resultsBackFromRStudio: 'RStudio-оос үр дүнг буцааж уншсан',
+    resultsBackFromRStudioInfo: `RStudio-д тооцоолсон үр дүнгийн шинж чанаруудыг Arena сервер рүү буцааж импортлох шаардлагатай бол энэ сонголтыг идэвхжүүлнэ үү.
+Энэ үйл явц удаан байж болзошгүй.`,
     samplingDesign: 'Түүвэрлэлтийн загвар',
     samplingDesignDetails: 'Түүвэрлэлтийн загварын дэлгэрэнгүй мэдээлэл',
     samplingStrategyLabel: 'Түүвэрлэлтийн стратеги',
@@ -754,6 +773,17 @@ $t(common.raiseTicketInSupportForum)
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Боловсруулах гинж устгагдсан',
+    cloneFromAnotherSurvey: 'Өөр судалгаанаас хуулах',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Өөр судалгаанаас гинжийг хуулах',
+      sourceSurvey: 'Эх судалгаа',
+      sourceChain: 'Эх гинж',
+      entityCheck: 'Объектын нийцтэй байдал',
+      entityMissing: 'зорилтот судалгаанд байхгүй',
+      noAnalysisAttributes: 'Энэ гинж шинжилгээний шинж чанаргүй байна',
+      cloneComplete: 'Гинж амжилттай хуулагдсан',
+      missingEntities: 'Хуулах боломжгүй: дараах объектууд зорилтот судалгаанд байхгүй байна: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `Зангилааны тодорхойлолт "{{label}}" нь боловсруулах гинжийн бүх мөчлөгт хамаарахгүй тул сонгох боломжгүй.`,
     cannotSelectCycle:
       'Энэ мөчлөгийг сонгох боломжгүй, учир нь зарим зангилааны тодорхойлолтууд энэ мөчлөгт хамаарахгүй.',
@@ -934,6 +964,10 @@ $t(common.appNameFull)
       multiple: 'Олон',
       ownPage: 'Өөрийн хуудас',
       parentPage: 'Эцэг хуудас ({{parentPage}})',
+      qualifier: {
+        label: 'Тодорхойлогч',
+        info: `Бүлэгт харьяалагддаг хэрэглэгч шинэ бичлэг үүсгэхэд энэ атрибут нь хэрэглэгчийн бүлгийн тодорхойлогчид заасан утгаар автоматаар бөглөгдөнө. Хэрэглэгчид зөвхөн өөрийн бүлэгт хамаарах бичлэгүүдийг харах, засах боломжтой байх болно, хэрэв тэд бүлэгт харьяалагддаг бол.`,
+      },
       table: 'Хүснэгт',
     },
     advancedProps: {
@@ -1111,6 +1145,8 @@ $t(common.appNameFull)
 
 Жишээ нь, *бүлэглэл -> талбай -> мод* гэсэн бүтэцтэй бол, хэрэв танд **Өвөрмөц** гэж тэмдэглэгдсэн *tree_species* гэсэн шинж чанар байвал, нэг *талбай* дотор зөвхөн нэг төрлийн мод байж болно.`,
     },
+    categoriesClonedFromSurvey: 'Дараах ангилалууд эх судалгаанаас мөн хувилагдсан: {{names}}',
+    taxonomiesClonedFromSurvey: 'Дараах таксономууд эх судалгаанаас мөн хувилагдсан: {{names}}',
   },
 
   languagesEditor: {
@@ -1121,6 +1157,16 @@ $t(common.appNameFull)
     header: 'Таксоном',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Таксоном {{taxonomyName}}-г устгах уу?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Өөр судалгаанаас таксоном хуулах',
+      sourceSurvey: 'Эх сурвалж судалгаа',
+      sourceTaxonomy: 'Эх сурвалж таксоном',
+      loadingSurveys: 'Судалгаанууд ачаалж байна...',
+      noSurveysAvailable: 'Судалгаа алга байна',
+      selectSurveyFirst: 'Эхлээд судалгаа сонгоно уу',
+      loadingTaxonomies: 'Таксоном ачаалж байна...',
+      noTaxonomiesAvailable: 'Сонгосон судалгаанд таксоном алга байна',
+    },
     edit: {
       taxonomyListName: 'Таксономын жагсаалтын нэр',
       taxaNotImported: 'Таксонуудыг импортлоогүй',
@@ -1129,6 +1175,9 @@ $t(common.appNameFull)
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Ижил нэр / Латин',
       extraPropsNotDefined: 'Энэ таксономын нэмэлт шинж чанарууд тодорхойлогдоогүй',
+      importMissingPublishedTaxa:
+        '{{count}} нийтлэгдсэн таксон импортлосон файлд олдоогүй тул өөрчлөгдөлгүй үлдлээ. Кодууд: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} дахин)',
     },
     taxaCount: 'Таксоны тоо',
     vernacularNameLabel: 'Нутгийн нэрийн шошго',
@@ -1139,6 +1188,16 @@ $t(common.appNameFull)
     batchImportCompleteSuccessfully: `{{importedCategories}} ангилал амжилттай импортлогдлоо!
 {{insertedCategories}} шинэ
 {{updatedCategories}} шинэчлэгдсэн`,
+    cloneFromAnotherSurvey: {
+      title: 'Өөр судалгаанаас ангилал хуулах',
+      sourceSurvey: 'Эх сурвалж судалгаа',
+      sourceCategory: 'Эх сурвалж ангилал',
+      loadingSurveys: 'Судалгаанууд ачаалж байна...',
+      noSurveysAvailable: 'Судалгаа алга байна',
+      selectSurveyFirst: 'Эхлээд судалгаа сонгоно уу',
+      loadingCategories: 'Ангилал ачаалж байна...',
+      noCategoriesAvailable: 'Сонгосон судалгаанд ангилал алга байна',
+    },
     itemsCount: 'Элементүүдийн тоо',
     types: {
       flat: 'Хавтгай',

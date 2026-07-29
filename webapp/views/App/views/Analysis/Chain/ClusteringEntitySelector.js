@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 import { useSurvey } from '@webapp/store/survey'
 
 import { FormItem } from '@webapp/components/form/Input'
@@ -15,6 +15,7 @@ export const ClusteringEntitySelector = () => {
   const dispatch = useDispatch()
 
   const chain = useChain()
+  const editable = useChainEditable()
   const survey = useSurvey()
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
@@ -41,6 +42,7 @@ export const ClusteringEntitySelector = () => {
         showSingleEntities={false}
         useNameAsLabel={true}
         allowEmptySelection={true}
+        disabled={!editable}
       />
     </FormItem>
   )

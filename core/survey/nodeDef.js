@@ -7,6 +7,7 @@ import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import { ArrayUtils } from '@core/arrayUtils'
+import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
 
 import * as TextUtils from '@webapp/utils/textUtils'
 
@@ -58,6 +59,7 @@ export const propKeys = {
   autoIncrementalKey: 'autoIncrementalKey',
   labels: ObjectUtils.keysProps.labels,
   multiple: 'multiple',
+  qualifier: 'qualifier',
   name: ObjectUtils.keys.name,
   readOnly: 'readOnly',
   layout: 'layout',
@@ -112,6 +114,7 @@ const commonAttributePropsKeys = [
   propKeys.layout,
   propKeys.multiple,
   propKeys.name,
+  propKeys.qualifier,
   propKeys.readOnly,
 ]
 
@@ -229,6 +232,7 @@ export const getName = (nodeDef) => getProp(propKeys.name, '')(nodeDef)
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
+export const isQualifier = ObjectUtils.isPropTrue(propKeys.qualifier)
 export const isAutoIncrementalKey = ObjectUtils.isPropTrue(propKeys.autoIncrementalKey)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const isMultiple = ObjectUtils.isPropTrue(propKeys.multiple)
@@ -418,6 +422,16 @@ export const isAlwaysVisible = R.pipe(getVisibleIf, R.isEmpty)
 
 export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
+export const hasValidationsDefined = (nodeDef) => {
+  const validations = getValidations(nodeDef)
+  return (
+    NodeDefValidations.isRequired(validations) ||
+    NodeDefValidations.isUnique(validations) ||
+    !R.isEmpty(NodeDefValidations.getMinCount(validations)) ||
+    !R.isEmpty(NodeDefValidations.getMaxCount(validations)) ||
+    !R.isEmpty(NodeDefValidations.getExpressions(validations))
+  )
+}
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 
@@ -438,6 +452,13 @@ export const getAllExpressions = (nodeDef) => {
   ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
   return expressions
 }
+
+const userDependentFunctionsRegExp = new RegExp(String.raw`\b(${userDependentFunctionNames.join('|')})\s*\(`)
+
+// Returns true if any of the node def's expressions references a function whose
+// result depends on the currently logged in user (e.g. userProp).
+export const hasUserDependentExpressions = (nodeDef) =>
+  getAllExpressions(nodeDef).some((expression) => userDependentFunctionsRegExp.test(expression))
 
 export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClone, false)
 

@@ -1,4 +1,3 @@
-import { each } from '../../../../core/promiseUtils'
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { FormUtils } from '../utils/formUtils'
 import { persistNodeDefChanges } from './editDetails'
@@ -13,9 +12,9 @@ const editAdvanced = async (expressionStr) => {
   await page.waitForSelector(advancedTextEditorSelector)
   const textEditorLocator = page.locator(advancedTextEditorSelector)
   await textEditorLocator.click()
-  await each(expressionStr, async (char) => {
+  for (const char of expressionStr) {
     await textEditorLocator.press(char)
-  })
+  }
 }
 
 const editBoolean = async (expressionStr) => page.click(`text="${expressionStr}"`)

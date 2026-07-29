@@ -26,8 +26,14 @@ const hasRecordsToProcess = (state) => {
   return totalRecords > 0
 }
 
+const isChainEditLocked = (state) => {
+  const chainState = getChainState(state)
+  return Boolean(chainState.chainEditLocked)
+}
+
 export const ChainState = {
   getChain,
   getRecordsCountByStep,
   hasRecordsToProcess,
+  isChainEditLocked,
 }

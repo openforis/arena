@@ -7,6 +7,7 @@ import PrepareImportFileJob from '@server/modules/file/service/prepareImportFile
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesImportJob'
@@ -21,6 +22,7 @@ export default class ArenaMobileDataImportJob extends Job {
    * @param {!number} [params.surveyId] - The id of the survey in which data will be imported.
    * @param {!string} [params.filePath] - The file path of the file to import.
    * @param {!string} [params.conflictResolutionStrategy] - How to resolve conflicting records (duplicate keys).
+   * @param {boolean} [params.skipMissingFiles] - When true, missing file content is logged as a warning instead of aborting.
    * @returns {ArenaMobileDataImportJob} - The import job.
    */
   constructor(params) {
@@ -36,7 +38,12 @@ export default class ArenaMobileDataImportJob extends Job {
     await super.onStart()
 
     const { context, tx } = this
-    const { surveyId } = context
+    const { surveyId, reuseUploadedFile, fileId } = context
+
+    if (reuseUploadedFile) {
+      const filePath = TempFileManager.getKeptFilePath({ fileId })
+      this.setContext({ filePath })
+    }
 
     const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true }, tx)
     const surveyInfo = Survey.getSurveyInfo(survey)

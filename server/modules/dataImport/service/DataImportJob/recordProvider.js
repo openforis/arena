@@ -105,7 +105,7 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback
   if (Record.getUuid(currentRecord) !== recordUuid) {
     // fetch record
     await flushCallback() // flush before fetching a record: nodes could have been inserted/updated/deleted before
-    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx)
+    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user }, tx)
 
     return {
       newRecord: false,

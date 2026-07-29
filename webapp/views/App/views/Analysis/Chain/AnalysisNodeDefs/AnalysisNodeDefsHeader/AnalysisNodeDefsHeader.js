@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import * as Chain from '@common/analysis/chain'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { Button } from '@webapp/components'
@@ -15,6 +15,7 @@ const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDe
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const chain = useChain()
+  const editable = useChainEditable()
 
   const createNodeDef = (type) => dispatch(ChainActions.createNodeDef({ navigate, type }))
 
@@ -34,12 +35,14 @@ const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDe
             iconEnd={NodeDefUIProps.getIconByType(NodeDef.nodeDefType.decimal)}
             label="common:chain.addQuantitative"
             onClick={() => createNodeDef(NodeDef.nodeDefType.decimal)}
+            disabled={!editable}
           />
           <Button
             iconClassName="icon-plus"
             iconEnd={NodeDefUIProps.getIconByType(NodeDef.nodeDefType.code)}
             label="common:chain.addCategorical"
             onClick={() => createNodeDef(NodeDef.nodeDefType.code)}
+            disabled={!editable}
           />
         </div>
       </div>

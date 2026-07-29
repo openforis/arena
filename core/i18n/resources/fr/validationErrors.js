@@ -51,6 +51,8 @@ export default {
     invalidParentItemOrder: "L'élément avec les codes {{parentItemCodes}} doit précéder ses enfants",
     nameDuplicate: 'Une catégorie avec le même nom existe déjà : {{name}}',
     srsNotDefined: 'SRS avec le code {{srs}} non défini dans le formulaire',
+    uuidDuplicate:
+      'Cette catégorie a déjà été clonée dans ce formulaire (actuellement nommée "{{name}}"). Elle ne peut pas être clonée à nouveau.',
   },
 
   dataImport: {
@@ -129,6 +131,11 @@ export default {
     countMaxInvalid: '"Nombre maximum" invalide',
     countMinInvalid: '"Nombre minimum" invalide',
     readOnlyCannotHaveEditableIf: 'Un noeud en lecture seule ne peut pas avoir de condition "Editable if"',
+    qualifierCannotHaveApplicableExpression:
+      'Un attribut qualificatif ne peut pas avoir de condition "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    qualifierCannotHaveEditabilityRule: "Un attribut qualificatif ne peut pas avoir de règles d'éditabilité définies",
+    qualifierCannotHaveDefaultValues: 'Un attribut qualificatif ne peut pas avoir de valeurs par défaut',
+    qualifierCannotHaveValidations: 'Un attribut qualificatif ne peut pas avoir de règles de validation définies',
   },
 
   record: {
@@ -169,6 +176,13 @@ export default {
     labelsRequired: 'Au moins une étiquette est requise',
   },
 
+  surveyDocImage: {
+    documentPlaceRequired: "L'emplacement du document est requis",
+    fileRequired: 'Le fichier est requis',
+    fileNameDuplicate: 'Un autre fichier avec le même nom existe déjà',
+    labelsRequired: 'Au moins une étiquette est requise',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Colonnes invalides : {{invalidHeaders}}',
     cannotFindNodeDef: "Impossible de trouver la définition d'attribut ou d'entité avec le nom '{{name}}'",
@@ -184,6 +198,12 @@ export default {
     scientificNameRequired: 'Le nom scientifique est requis',
     taxaEmpty: 'Taxons vides',
     vernacularNamesDuplicate: `Nom vernaculaire en double '{{name}}' pour la langue '{{lang}}'`,
+  },
+
+  taxonomyImport: {
+    nameDuplicate: 'Une taxonomie avec le même nom existe déjà : {{name}}',
+    uuidDuplicate:
+      'Cette taxonomie a déjà été clonée dans ce formulaire (actuellement nommée "{{name}}"). Elle ne peut pas être clonée à nouveau.',
   },
 
   taxonomyImportJob: {

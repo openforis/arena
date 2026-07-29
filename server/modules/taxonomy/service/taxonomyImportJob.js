@@ -27,6 +27,8 @@ const filterExtraPropsColumns = (columns) =>
   columns.filter((column) => !fixedColumns.includes(column) && !languageCodesISO639part2.includes(column))
 
 export default class TaxonomyImportJob extends Job {
+  static maxMissingPublishedTaxaCodesPreview = 10
+
   constructor(params) {
     super(TaxonomyImportJob.type, params)
 
@@ -42,6 +44,7 @@ export default class TaxonomyImportJob extends Job {
     this.extraPropsDefs = null
     this.taxonCSVParser = null
     this.currentRow = 0
+    this.missingPublishedTaxaCodes = []
   }
 
   async execute() {
@@ -92,7 +95,8 @@ export default class TaxonomyImportJob extends Job {
       } else {
         this.logDebug('no errors found, finalizing import')
         try {
-          await this.taxonomyImportManager.finalizeImport()
+          const { missingPublishedCodes } = await this.taxonomyImportManager.finalizeImport()
+          this.missingPublishedTaxaCodes = missingPublishedCodes
         } catch (error) {
           if (error instanceof SystemError) {
             const { key, params } = error
@@ -109,6 +113,19 @@ export default class TaxonomyImportJob extends Job {
         }
       }
     }
+  }
+
+  generateResult() {
+    const result = super.generateResult()
+    const { missingPublishedTaxaCodes } = this
+    if (missingPublishedTaxaCodes.length > 0) {
+      result.missingPublishedTaxaCodes = missingPublishedTaxaCodes.slice(
+        0,
+        TaxonomyImportJob.maxMissingPublishedTaxaCodesPreview
+      )
+      result.missingPublishedTaxaCodesTotal = missingPublishedTaxaCodes.length
+    }
+    return result
   }
 
   async cancel() {

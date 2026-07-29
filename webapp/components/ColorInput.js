@@ -13,8 +13,10 @@ export const ColorInput = (props) => {
   return (
     <div className="color-input">
       <MuiColorInput
+        key={value ? 'filled' : 'empty'}
         disabled={disabled}
         format="hex"
+        isAlphaHidden
         slotProps={{
           input: { readOnly: true },
         }}

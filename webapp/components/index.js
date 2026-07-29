@@ -6,6 +6,7 @@ export {
   ButtonCancel,
   ButtonDownload,
   ButtonDelete,
+  ButtonEditLockToggle,
   ButtonIconAdd,
   ButtonIconDelete,
   ButtonIconEdit,

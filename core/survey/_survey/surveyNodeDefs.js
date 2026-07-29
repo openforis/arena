@@ -23,6 +23,8 @@ export const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
 export const getNodeDefRoot = (survey) => Surveys.getNodeDefRoot({ survey })
 
+export const getQualifierNodeDefs = (survey) => Surveys.getQualifierDefs({ survey })
+
 export const getNodeDefByUuid = (uuid) => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
 export const getNodeDefsByUuids =
@@ -244,6 +246,11 @@ export const getRootSummaryDefs =
 export const isNodeDefRootKey = (nodeDef) => (survey) =>
   NodeDef.isKey(nodeDef) && NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
 
+export const canNodeDefBeQualifier = (nodeDef) => (survey) =>
+  (NodeDef.isText(nodeDef) || NodeDef.isCode(nodeDef)) &&
+  !NodeDef.isMultiple(nodeDef) &&
+  NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
+
 export const getNodeDefsRootUnique = (survey) => {
   const nodeDefRoot = getNodeDefRoot(survey)
   return getNodeDefChildren({ nodeDef: nodeDefRoot })(survey).filter(
@@ -328,7 +335,6 @@ export const cloneNodeDef =
   (survey) => {
     const nodeDef = getNodeDefByUuid(nodeDefUuid)(survey)
     const nodeDefParent = getNodeDefByUuid(targetParentNodeDefUuid)(survey)
-    const allNodeDefs = getNodeDefs(survey)
     const existingNodeDefNames = existingNodeDefNamesParam ?? getNodeDefsArray(survey).map((nd) => NodeDef.getName(nd))
 
     // Gather all descendants (including nested entities)
@@ -351,11 +357,14 @@ export const cloneNodeDef =
     // 1. Clone all nodeDefs (entity + descendants), assign new UUIDs and unique names
     const nodeDefsToClone = [nodeDef, ...nodeDefDescendants]
     for (const nd of nodeDefsToClone) {
-      const parentUuid =
-        nd.uuid === nodeDef.uuid ? targetParentNodeDefUuid : newUuidByOldUuid[NodeDef.getParentUuid(nd)]
+      const isRoot = nd.uuid === nodeDef.uuid
+      // clone descendants are visited in parent-first (BFS) order, so the cloned parent is already available
+      const clonedNodeDefParent = isRoot
+        ? nodeDefParent
+        : clonedNodeDefsByNewUuid[newUuidByOldUuid[NodeDef.getParentUuid(nd)]]
       const clonedName = getUniqueName(NodeDef.getName(nd))
       const cloned = NodeDef.cloneIntoEntityDef({
-        nodeDefParent: parentUuid ? { ...allNodeDefs[parentUuid], uuid: parentUuid } : nodeDefParent,
+        nodeDefParent: clonedNodeDefParent,
         clonedNodeDefName: clonedName,
         ignoreDefaultValues,
         ignoreApplicability,

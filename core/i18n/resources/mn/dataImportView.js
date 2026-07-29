@@ -34,6 +34,25 @@ export default {
 `,
   importIntoCycle: 'Мөчлөгт импортлох',
   importIntoMultipleEntityOrAttribute: 'Олон объектод эсвэл шинж чанарт импортлох',
+  importPreview: {
+    title: 'Импортын урьдчилан харах',
+    generatePreview: 'Урьдчилан харах үүсгэх',
+    skipInfo:
+      '"Алгасах" гэж тэмдэглэгдсэн бичлэгүүдийг сонгох боломжгүй: сүүлд өөрчлөгдсөн, одоо байгаа бичлэг аль хэдийн байгаа тул тэдгээрийг импортлохгүй.',
+    confirmImport: 'Сонгосон бичлэгүүдийг импортлох ({{count}})',
+    columns: {
+      exists: 'Байгаа эсэх',
+      action: 'Үйлдэл',
+      dateModified: 'Импортлосон бичлэг өөрчлөгдсөн',
+      existingDateModified: 'Одоо байгаа бичлэг өөрчлөгдсөн',
+    },
+    action: {
+      insert: 'Оруулах',
+      overwrite: 'Дахин бичих',
+      merge: 'Нэгтгэх',
+      skip: 'Алгасах',
+    },
+  },
   importType: {
     label: 'Импортын төрөл',
     insertNewRecords: 'Шинэ бичлэгүүдийг оруулах',
@@ -71,6 +90,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{deletedFiles}} файл устгагдсан`,
       importCompleteWithErrors: `## Импорт дууссан (алдаатай):
         - {{processed}} мөр боловсруулагдсан`,
+      tooLong: `Энэ импорт удаж байна. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
     DataImportValidationJob: {
       validationCompleteWithErrors: `## Баталгаажуулалт дууссан ({{errorsFoundMessage}})
@@ -87,6 +107,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{insertedFiles}} файл оруулах байсан
         - {{updatedFiles}} файл шинэчлэх байсан
         - {{deletedFiles}} файл устгах байсан`,
+      tooLong: `Энэ баталгаажуулалт удаж байна. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
   },
   options: {
@@ -95,6 +116,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
     preventAddingNewEntityData: 'Шинэ объектын өгөгдөл нэмэхийг хориглох',
     preventUpdatingRecordsInAnalysis: 'Шинжилгээний алхамд бичлэгүүдийг шинэчлэхийг хориглох',
     includeFiles: 'Файлуудыг оруулах',
+    skipMissingFiles: 'Дутуу файлуудыг алгасах',
     deleteExistingEntities: `Сонгогдсон объектын өгөгдлийг бүх бичлэгээс устгах`,
   },
   optionsInfo: {

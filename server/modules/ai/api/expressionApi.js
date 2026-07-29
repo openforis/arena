@@ -13,6 +13,8 @@
  * Designer surface; only users who could write the expression manually can
  * ask the AI to draft it).
  */
+import { ENV } from '@core/processUtils'
+
 import * as Log from '@server/log/log'
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
@@ -67,6 +69,12 @@ export const init = (app) => {
 
         const writeEvent = createSseEventWriter(res)
 
+        let timedOut = false
+        const timeoutHandle = setTimeout(() => {
+          timedOut = true
+          abortController.abort()
+        }, ENV.aiRequestTimeoutMs)
+
         try {
           const result = await ExpressionService.explain({
             user,
@@ -80,9 +88,18 @@ export const init = (app) => {
             if (abortController.signal.aborted) break
             writeEvent({ chunk })
           }
+          // Stream may exit cleanly when aborted (no exception thrown) — check here too.
+          if (timedOut) writeEvent({ error: 'aiRequestTimeout' })
         } catch (error) {
-          logger.error(formatStreamErrorForLog('expressionExplain', error))
-          writeEvent({ error: formatStreamErrorForWire(error) })
+          if (error?.name === 'AbortError') {
+            if (timedOut) writeEvent({ error: 'aiRequestTimeout' })
+            // client disconnect: swallow silently
+          } else {
+            logger.error(formatStreamErrorForLog('expressionExplain', error))
+            writeEvent({ error: formatStreamErrorForWire(error) })
+          }
+        } finally {
+          clearTimeout(timeoutHandle)
         }
 
         closeSseStream(res)

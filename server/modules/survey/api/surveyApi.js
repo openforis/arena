@@ -82,6 +82,7 @@ export const init = (app) => {
         sortOrder,
         includeCounts = false,
         onlyOwn = false,
+        withChains = false,
       } = Request.getParams(req)
 
       const list = await SurveyService.fetchUserSurveysInfo({
@@ -96,6 +97,7 @@ export const init = (app) => {
         sortOrder,
         includeCounts,
         onlyOwn,
+        withChains,
       })
 
       res.json({ list })
@@ -279,9 +281,10 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/export/docx', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
+      const user = Request.getUser(req)
       const { surveyId, draft, cycle, lang } = Request.getParams(req)
 
-      await SurveyService.exportSurveyDocx({ surveyId, draft, cycle, lang, outputStream: res })
+      await SurveyService.exportSurveyDocx({ user, surveyId, draft, cycle, lang, outputStream: res })
     } catch (error) {
       next(error)
     }
@@ -289,9 +292,10 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/export/pdf', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
+      const user = Request.getUser(req)
       const { surveyId, draft, cycle, lang } = Request.getParams(req)
 
-      await SurveyService.exportSurveyPdf({ surveyId, draft, cycle, lang, outputStream: res })
+      await SurveyService.exportSurveyPdf({ user, surveyId, draft, cycle, lang, outputStream: res })
     } catch (error) {
       next(error)
     }

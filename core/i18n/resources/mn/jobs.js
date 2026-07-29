@@ -1,6 +1,7 @@
 export default {
   ActivityLogImportJob: 'Үйл ажиллагааны бүртгэл импортлох',
-  ArenaMobileDataImportJob: 'Arena Mobile өгөгдөл импортлох',
+  ArenaMobileDataImportJob: 'Arena өгөгдөл импортлох',
+  ArenaMobileDataImportSummaryJob: 'Arena өгөгдөл импортлох хураангуй',
   CategoriesImportJob: 'Ангилал импортлох',
   CategoriesValidationJob: 'Ангилал баталгаажуулах',
   CategoriesBatchImportJob: 'Ангилал импортлох',
@@ -83,4 +84,6 @@ export default {
   RecordsValidationJob: 'Бичлэгүүдийн баталгаажуулалт',
   // analysis
   PersistResultsJob: 'Шинжилгээний үр дүнг хадгалах',
+  elapsed: 'Өнгөрсөн хугацаа',
+  remaining: 'Үлдсэн хугацаа',
 }

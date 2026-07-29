@@ -110,6 +110,8 @@ By confirming, all changes will be lost.
 Do you want to proceed?`,
     local: 'Local',
     loading: 'Loading...',
+    lock: 'Lock',
+    unlock: 'Unlock',
     max: 'Maximum',
     med: 'Median',
     manage: 'Manage',
@@ -181,6 +183,10 @@ Do you want to proceed?`,
     showLabels: 'Show labels',
     showLabelsAndNames: 'Show labels and names',
     showNames: 'Show names',
+    sort: 'Sort',
+    sortAsc: 'Sort ascending',
+    sortDesc: 'Sort descending',
+    sortNone: 'Remove sort',
     srs: 'SRS',
     status: 'Status',
     sum: 'Sum',
@@ -188,6 +194,7 @@ Do you want to proceed?`,
     to: 'To',
     totalItems: 'Total items',
     true: 'True',
+    trySplittingFileIntoSmallerChunks: 'Try splitting the file into smaller chunks.',
     type: 'Type',
     undefinedName: 'Undefined name',
     unique: 'Unique',
@@ -196,6 +203,8 @@ Do you want to proceed?`,
       message: `Error during file upload: {{error}}.\n
 Try again?`,
     },
+    uploadFileChangedError:
+      'The selected file appears to have been modified since it was selected. Please select it again.',
     uploadingFile: 'Uploading file ({{progressPercent}}%)',
     value: 'Value',
     view: 'View',
@@ -256,6 +265,8 @@ Try again?`,
     header: 'Files',
     missing: ' Missing files: {{count}}',
     totalSize: 'Total size: {{size}}',
+    fileName: 'File name',
+    fileSize: 'File size',
   },
 
   sidebar: {
@@ -295,6 +306,7 @@ Try again?`,
 
   appModules: {
     home: 'Home',
+    landing: 'Landing',
     dashboard: 'Dashboard',
     surveyNew: 'New Survey',
     surveys: 'Surveys',
@@ -331,6 +343,9 @@ Try again?`,
     userInvite: 'Invite user',
     userNew: 'New User',
     usersSurvey: 'Users list',
+    userGroup: 'User Group',
+    userGroup_plural: 'User Groups',
+    userGroupNew: 'New User Group',
     usersList: 'Users list (all)',
     user2FADevice: '2FA device',
     user2FADevice_plural: '2FA devices',
@@ -402,13 +417,17 @@ $t(common.raiseTicketInSupportForum)
 **Once you send the request, please wait for an invitation email to access Arena.**`,
     reCaptchaNotAnswered: 'ReCaptcha not answered',
     requestSent: 'Access Request sent correctly',
-    requestSentMessage: `Please give us a couple of days to process your request.
-We will send soon an email to **{{email}}** with the instructions on how to access $t(common.appName).
+    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
+$t(accessRequestView.whitelistSenderSuggestion)
+
+Please give us a couple of days to process your request.
+We will send you another email to **{{email}}** with the instructions on how to access $t(common.appName), once it's accepted.
 Thank you and enjoy **$t(common.appNameFull)**!`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
     templateNotSelected: 'Not selected (start from scratch)',
     title: 'Requesting access to $t(common.appNameFull)',
+    whitelistSenderSuggestion: `If you find it in the Spam/Junk folder, please add **{{senderEmail}}** to your contacts (address book) or mark it as safe/not spam, so that future emails from us reach your inbox directly.`,
   },
 
   resetPasswordView: {
@@ -462,8 +481,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       lock: 'Lock key attribute editing',
       unlock: 'Allow editing of key attribute',
     },
-    lock: 'Lock',
-    unlock: 'Unlock',
+    qualifierAttributeEditing: {
+      lock: 'Lock qualifier attribute editing',
+      unlock: 'Allow editing of qualifier attribute',
+    },
   },
 
   dataExplorerView: {
@@ -610,8 +631,11 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
     confirmInviteSystemAdmin_other: 'Invite the users {{email}} as System Administrators?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} addresses have been skipped (they have been already invited to this survey previously): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} addresses have been skipped (they have been already invited to this survey previously): {{skippedEmails}}`,
+    invalidEmailsWarning: `The email address {{emails}} could not be reached and may not exist. It has been kept in the list below: please correct it or remove it and try inviting again.`,
+    invalidEmailsWarning_other: `The email addresses {{emails}} could not be reached and may not exist. They have been kept in the list below: please correct or remove them and try inviting again.`,
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `
@@ -737,6 +761,8 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     nonResponseBiasCorrectionInfo: `To implement Weighting Class Adjustment method, add 'design_psu' and 'design_ssu' into the stratum category table as extra numeric properties`,
     pValue: 'P-value',
     resultsBackFromRStudio: 'Results read back from RStudio',
+    resultsBackFromRStudioInfo: `Enable this option if the result attributes calculated in RStudio should be imported back into the Arena server.
+This might be a slow process.`,
     samplingDesign: 'Sampling Design',
     samplingDesignDetails: 'Sampling Design Details',
     samplingStrategyLabel: 'Sampling strategy',
@@ -772,6 +798,17 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Processing chain deleted',
+    cloneFromAnotherSurvey: 'Clone from another survey',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Clone chain from another survey',
+      sourceSurvey: 'Source survey',
+      sourceChain: 'Source chain',
+      entityCheck: 'Entity compatibility',
+      entityMissing: 'missing in target survey',
+      noAnalysisAttributes: 'This chain has no analysis attributes',
+      cloneComplete: 'Chain cloned successfully',
+      missingEntities: 'Cannot clone: the following entities do not exist in the target survey: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
     copyRStudioCode: `#### You are about to open an RStudio Server ####  
@@ -963,6 +1000,10 @@ $t(common.appNameFull)
       multiple: 'Multiple',
       ownPage: 'Its own page',
       parentPage: 'Parent page ({{parentPage}})',
+      qualifier: {
+        label: 'Qualifier',
+        info: `When a new record is created by a user belonging to a group, this attribute will be automatically filled with the value specified for it in the qualifiers of the user's group. Users will only be able to see and modify records belonging to their own group, if they belong to one.`,
+      },
       table: 'Table',
     },
     advancedProps: {
@@ -1141,6 +1182,8 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     },
     nodeDefClonedSuccessfully:
       'Node definition "{{nodeDefName}}" cloned successfully into "{{targetParentNodeDefName}}"',
+    categoriesClonedFromSurvey: 'The following categories were also cloned from the source survey: {{names}}',
+    taxonomiesClonedFromSurvey: 'The following taxonomies were also cloned from the source survey: {{names}}',
   },
 
   languagesEditor: {
@@ -1151,6 +1194,16 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     header: 'Taxonomy',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Delete the taxonomy {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clone Taxonomy From Another Survey',
+      sourceSurvey: 'Source survey',
+      sourceTaxonomy: 'Source taxonomy',
+      loadingSurveys: 'Loading surveys...',
+      noSurveysAvailable: 'No surveys available',
+      selectSurveyFirst: 'Select a survey first',
+      loadingTaxonomies: 'Loading taxonomies...',
+      noTaxonomiesAvailable: 'No taxonomies available in the selected survey',
+    },
     edit: {
       taxonomyListName: 'Taxonomy list name',
       taxaNotImported: 'Taxa not imported',
@@ -1159,6 +1212,9 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Synonym / Latin',
       extraPropsNotDefined: 'Extra properties not defined for this taxonomy',
+      importMissingPublishedTaxa:
+        '{{count}} published taxon/taxa not found in the imported file and left unchanged. Codes: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} more)',
     },
     taxaCount: 'Taxa count',
     vernacularNameLabel: 'Vernacular name label',
@@ -1169,6 +1225,16 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     batchImportCompleteSuccessfully: `{{importedCategories}} categories imported successfully!
 {{insertedCategories}} new
 {{updatedCategories}} updated`,
+    cloneFromAnotherSurvey: {
+      title: 'Clone Category From Another Survey',
+      sourceSurvey: 'Source survey',
+      sourceCategory: 'Source category',
+      loadingSurveys: 'Loading surveys...',
+      noSurveysAvailable: 'No surveys available',
+      selectSurveyFirst: 'Select a survey first',
+      loadingCategories: 'Loading categories...',
+      noCategoriesAvailable: 'No categories available in the selected survey',
+    },
     itemsCount: 'Items count',
     types: {
       flat: 'Flat',
@@ -1362,6 +1428,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Explain this expression',
       thinking: 'Asking the AI to explain this expression…',
       error: 'Failed to fetch explanation: {{message}}',
+      timeout: 'The AI took too long to respond. Please try again.',
     },
   },
 

@@ -3,9 +3,11 @@ import * as pgPromise from 'pg-promise'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import SystemError from '@core/systemError'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
+import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -225,6 +227,67 @@ export const insertCategory = async (
     ])
 
     return validate ? _validateCategory({ surveyId, categoryUuid: Category.getUuid(categoryDb) }, t) : categoryDb
+  })
+
+/**
+ * Clones a category (levels and items included) from another survey into the given survey.
+ * Category, level and item uuids are preserved: each survey lives in its own db schema,
+ * so there is no risk of uuid collision, and levels/items can keep referencing each other as-is.
+ * Levels and items are cloned with a single INSERT...SELECT statement per table, entirely on the db side,
+ * to avoid loading potentially large item collections into memory.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user performing this operation.
+ * @param {!number} params.sourceSurveyId - The id of the survey the category is cloned from.
+ * @param {!string} params.sourceCategoryUuid - The uuid of the category to clone.
+ * @param {!number} params.targetSurveyId - The id of the survey the category is cloned into.
+ * @param {pgPromise.IDatabase} client - The database client.
+ * @returns {Promise<Category>} - The cloned and validated category.
+ */
+export const cloneCategoryFromSurvey = async (
+  { user, sourceSurveyId, sourceCategoryUuid, targetSurveyId },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const sourceCategory = await CategoryRepository.fetchCategoryAndLevelsByUuid(
+      { surveyId: sourceSurveyId, categoryUuid: sourceCategoryUuid, draft: true },
+      t
+    )
+    if (!sourceCategory) {
+      throw new Error(`Category with uuid ${sourceCategoryUuid} not found in survey ${sourceSurveyId}`)
+    }
+    const categoryName = Category.getName(sourceCategory)
+
+    const targetCategories = await CategoryRepository.fetchCategoriesBySurveyId(
+      { surveyId: targetSurveyId, draft: true },
+      t
+    )
+    const duplicateCheck = checkCloneFromSurveyDuplicate({
+      targetSurveyItems: targetCategories,
+      sourceItem: sourceCategory,
+      getUuid: Category.getUuid,
+      getName: Category.getName,
+      uuidDuplicateErrorKey: 'validationErrors:categoryImport.uuidDuplicate',
+      nameDuplicateErrorKey: 'validationErrors:categoryImport.nameDuplicate',
+    })
+    if (duplicateCheck) {
+      throw new SystemError(duplicateCheck.key, duplicateCheck.params)
+    }
+
+    await CategoryRepository.cloneCategoryFromSurvey(
+      { sourceSurveyId, targetSurveyId, categoryUuid: sourceCategoryUuid },
+      t
+    )
+
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: sourceCategoryUuid,
+      [ActivityLog.keysContent.categoryName]: categoryName,
+    }
+    await Promise.all([
+      markSurveyDraft(targetSurveyId, t),
+      ActivityLogRepository.insert(user, targetSurveyId, ActivityLog.type.categoryInsert, logContent, false, t),
+    ])
+
+    return _validateCategory({ surveyId: targetSurveyId, categoryUuid: sourceCategoryUuid }, t)
   })
 
 export const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) =>

@@ -51,6 +51,8 @@ export default {
     invalidParentItemOrder: 'Код {{parentItemCodes}}-тэй элемент нь хүүхдүүдийнхээ өмнө байх ёстой',
     nameDuplicate: 'Ижил нэртэй ангилал аль хэдийн байна: {{name}}',
     srsNotDefined: 'Судалгаанд код {{srs}}-тэй SRS тодорхойлогдоогүй',
+    uuidDuplicate:
+      'Энэ ангилал энэ судалгаанд аль хэдийн хуулагдсан байна (одоогийн нэр нь "{{name}}"). Дахин хуулах боломжгүй.',
   },
 
   dataImport: {
@@ -128,6 +130,11 @@ export default {
     countMaxInvalid: 'Хүчингүй "Хамгийн их тоо"',
     countMinInvalid: 'Хүчингүй "Хамгийн бага тоо"',
     readOnlyCannotHaveEditableIf: 'Зөвхөн унших зангилаа "Editable if" нөхцөлтэй байж болохгүй',
+    qualifierCannotHaveApplicableExpression:
+      'Квалификатор шинж чанар "$t(nodeDefEdit.advancedProps.relevantIf)" нөхцөлтэй байж болохгүй',
+    qualifierCannotHaveEditabilityRule: 'Квалификатор шинж чанар засварлах дүрэмтэй байж болохгүй',
+    qualifierCannotHaveDefaultValues: 'Квалификатор шинж чанар өгөгдмөл утгатай байж болохгүй',
+    qualifierCannotHaveValidations: 'Квалификатор шинж чанар баталгаажуулах дүрэмтэй байж болохгүй',
   },
 
   record: {
@@ -167,6 +174,13 @@ export default {
     labelsRequired: 'Наад зах нь нэг шошго шаардлагатай',
   },
 
+  surveyDocImage: {
+    documentPlaceRequired: 'Баримт бичгийн байршил шаардлагатай',
+    fileRequired: 'Файл шаардлагатай',
+    fileNameDuplicate: 'Ижил нэртэй файл аль хэдийн орсон байна',
+    labelsRequired: 'Наад зах нь нэг шошго шаардлагатай',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Хүчингүй баганууд: {{invalidHeaders}}',
     cannotFindNodeDef: "'{{name}}' нэртэй шинж чанар эсвэл объектын тодорхойлолтыг олох боломжгүй",
@@ -182,6 +196,12 @@ export default {
     scientificNameRequired: 'Шинжлэх ухааны нэр шаардлагатай',
     taxaEmpty: 'Хоосон таксонууд',
     vernacularNamesDuplicate: `'{{name}}' гэсэн нутгийн нэр давхцсан '{{lang}}' хэлээр`,
+  },
+
+  taxonomyImport: {
+    nameDuplicate: 'Ижил нэртэй таксоном аль хэдийн байна: {{name}}',
+    uuidDuplicate:
+      'Энэ таксоном энэ судалгаанд аль хэдийн хуулагдсан байна (одоогийн нэр нь "{{name}}"). Дахин хуулах боломжгүй.',
   },
 
   taxonomyImportJob: {

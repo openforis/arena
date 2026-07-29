@@ -10,7 +10,7 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import { TableConstants } from '../../constants'
 
 const Paginator = (props) => {
-  const { count, limit, offset, setLimit, setOffset } = props
+  const { count, disabled = false, limit, offset, setLimit, setOffset } = props
   const pageNo = offset / limit + 1
   const totalNoPages = Math.ceil(count / limit)
   const isFirstPage = pageNo === 1
@@ -24,6 +24,7 @@ const Paginator = (props) => {
         <div className="label">{i18n.t('common.paginator.itemsPerPage')}:</div>
         <Dropdown
           clearable={false}
+          disabled={disabled}
           items={TableConstants.itemsPerPageValues}
           itemValue={A.identity}
           itemLabel={A.identity}
@@ -37,7 +38,7 @@ const Paginator = (props) => {
         />
       </div>
       <Button
-        disabled={count < limit || isFirstPage}
+        disabled={disabled || count < limit || isFirstPage}
         iconClassName="icon-backward2 icon-14px"
         onClick={() => setOffset(0)}
         title="common.paginator.firstPage"
@@ -45,7 +46,7 @@ const Paginator = (props) => {
       />
 
       <Button
-        disabled={isFirstPage}
+        disabled={disabled || isFirstPage}
         iconClassName="icon-play3 icon-14px"
         onClick={() => setOffset(offset - limit)}
         style={{ transform: 'scaleX(-1)' }}
@@ -58,7 +59,7 @@ const Paginator = (props) => {
       </span>
 
       <Button
-        disabled={isLastPage}
+        disabled={disabled || isLastPage}
         iconClassName="icon-play3 icon-14px"
         onClick={() => setOffset(offset + limit)}
         title="common.paginator.nextPage"
@@ -66,7 +67,7 @@ const Paginator = (props) => {
       />
 
       <Button
-        disabled={isLastPage}
+        disabled={disabled || isLastPage}
         iconClassName="icon-forward3 icon-14px"
         onClick={() => setOffset((totalNoPages - 1) * limit)}
         title="common.paginator.lastPage"
@@ -78,6 +79,7 @@ const Paginator = (props) => {
 
 Paginator.propTypes = {
   count: PropTypes.number.isRequired,
+  disabled: PropTypes.bool,
   limit: PropTypes.number.isRequired,
   offset: PropTypes.number.isRequired,
   setLimit: PropTypes.func.isRequired,

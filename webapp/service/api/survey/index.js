@@ -17,10 +17,10 @@ export const insertSurveyFile = async ({ surveyId, file, surveyFile }) => {
 }
 
 // ==== READ
-export const fetchSurveys = async ({ draft = true, template = false } = {}) => {
+export const fetchSurveys = async ({ draft = true, template = false, withChains = false } = {}) => {
   const {
     data: { list: surveys },
-  } = await axios.get(`/api/surveys`, { params: { draft, template } })
+  } = await axios.get(`/api/surveys`, { params: { draft, template, withChains } })
   return surveys.map(Survey.getSurveyInfo)
 }
 
@@ -55,10 +55,10 @@ export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
   return response
 }
 
-export const getSurveyDocxExportUrl = ({ surveyId, cycle, lang, draft = false }) =>
+export const getSurveyDocxExportUrl = ({ surveyId, cycle, lang, draft = true }) =>
   `/api/survey/${surveyId}/export/docx?${new URLSearchParams({ draft, cycle, lang })}`
 
-export const getSurveyPdfExportUrl = ({ surveyId, cycle, lang, draft = false }) =>
+export const getSurveyPdfExportUrl = ({ surveyId, cycle, lang, draft = true }) =>
   `/api/survey/${surveyId}/export/pdf?${new URLSearchParams({ draft, cycle, lang })}`
 
 // ==== UPDATE

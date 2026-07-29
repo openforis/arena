@@ -10,12 +10,14 @@ import { Checkbox } from '@webapp/components/form'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyCycleKey, useIsAncestorMultipleEntityRoot } from '@webapp/store/survey'
 
-import { State } from './store'
+import { State, useNodeDefEditReadOnly } from './store'
 
 export const MobileAppProps = (props) => {
   const { state, Actions } = props
 
-  const readOnly = !useAuthCanEditSurvey()
+  const readOnlyLocked = useNodeDefEditReadOnly()
+  const canEditSurvey = useAuthCanEditSurvey()
+  const readOnly = readOnlyLocked || !canEditSurvey
 
   const cycle = useSurveyCycleKey()
 

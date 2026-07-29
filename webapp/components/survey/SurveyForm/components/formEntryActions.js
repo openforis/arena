@@ -15,7 +15,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 
 import { TestId } from '@webapp/utils/testId'
-import { Button, ButtonDownload } from '@webapp/components/buttons'
+import { Button, ButtonDownload, ButtonEditLockToggle } from '@webapp/components/buttons'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
 
@@ -48,12 +48,10 @@ const RecordEntryButtons = (props) => {
   return (
     <>
       {!disableLockUnlock && canEdit && (
-        <Button
-          iconClassName={recordEditLocked ? 'icon-lock' : 'icon-unlocked'}
-          label={`recordView.${recordEditLocked ? 'unlock' : 'lock'}`}
+        <ButtonEditLockToggle
+          locked={recordEditLocked}
           onClick={() => dispatch(RecordActions.toggleEditLock)}
           testId={TestId.record.editLockToggleBtn}
-          variant="text"
         />
       )}
       {!disableValidationReport && !valid && (

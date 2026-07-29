@@ -16,9 +16,10 @@ import { TestId } from '@webapp/utils/testId'
 
 import { FormItem, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { NodeDefExpressionsProp, ValueType } from './ExpressionsProp'
-import { State } from './store'
+import { State, useNodeDefEditReadOnly } from './store'
 
 const countTypes = [NodeDefValidations.keys.min, NodeDefValidations.keys.max]
 
@@ -85,14 +86,21 @@ CountProp.propTypes = {
 const ValidationsProps = (props) => {
   const { state, Actions } = props
 
-  const readOnly = !useAuthCanEditSurvey()
+  const readOnlyLocked = useNodeDefEditReadOnly()
+  const canEditSurvey = useAuthCanEditSurvey()
+  const readOnly = readOnlyLocked || !canEditSurvey
   const survey = useSurvey()
 
   const nodeDef = useMemo(() => State.getNodeDef(state), [state])
-  const validation = useMemo(() => State.getValidation(state), [state])
   const nodeDefUuidContext = useMemo(() => NodeDef.getParentUuid(nodeDef), [nodeDef])
   const nodeDefParent = useMemo(() => Survey.getNodeDefParent(nodeDef)(survey), [nodeDef, survey])
   const nodeDefValidations = useMemo(() => NodeDef.getValidations(nodeDef), [nodeDef])
+
+  const validation = State.getValidation(state)
+  const qualifierValidationsValidation = useMemo(
+    () => Validation.getFieldValidation('qualifierValidations', null)(validation),
+    [validation]
+  )
 
   const onValidationsUpdate = useCallback(
     (validations) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.validations, value: validations }),
@@ -105,69 +113,67 @@ const ValidationsProps = (props) => {
   )
 
   return (
-    <div className="form">
-      {NodeDef.isMultiple(nodeDef) && (
-        <>
-          {countTypes.map((countType) => (
-            <CountProp
-              key={countType}
-              Actions={Actions}
-              countType={countType}
-              nodeDef={nodeDef}
-              nodeDefUuidContext={nodeDefUuidContext}
-              readOnly={readOnly}
-              state={state}
-            />
-          ))}
-        </>
-      )}
-      {NodeDef.isSingle(nodeDef) && !NodeDef.isKey(nodeDef) && (
-        <FormItem label="common.required">
-          <Checkbox
-            checked={NodeDefValidations.isRequired(nodeDefValidations)}
-            disabled={readOnly}
-            onChange={(checked) => onValidationsUpdate(NodeDefValidations.assocRequired(checked)(nodeDefValidations))}
-          />
-        </FormItem>
-      )}
-      {NodeDef.isAttribute(nodeDef) &&
-        !NodeDef.isKey(nodeDef) &&
-        (NodeDef.isRoot(nodeDefParent) || NodeDef.isMultiple(nodeDefParent) || NodeDef.isMultiple(nodeDef)) && (
-          <FormItem isInfoMarkdown info="nodeDefEdit.unique.info" label="nodeDefEdit.unique.label">
+    <ValidationTooltip validation={qualifierValidationsValidation}>
+      <div className="form">
+        {NodeDef.isMultiple(nodeDef) && (
+          <>
+            {countTypes.map((countType) => (
+              <CountProp
+                key={countType}
+                Actions={Actions}
+                countType={countType}
+                nodeDef={nodeDef}
+                nodeDefUuidContext={nodeDefUuidContext}
+                readOnly={readOnly}
+                state={state}
+              />
+            ))}
+          </>
+        )}
+        {NodeDef.isSingle(nodeDef) && !NodeDef.isKey(nodeDef) && (
+          <FormItem label="common.required">
             <Checkbox
-              id={TestId.nodeDefDetails.nodeDefUnique}
-              checked={NodeDefValidations.isUnique(nodeDefValidations)}
+              checked={NodeDefValidations.isRequired(nodeDefValidations)}
               disabled={readOnly}
-              onChange={(checked) => onValidationsUpdate(NodeDefValidations.assocUnique(checked)(nodeDefValidations))}
+              onChange={(checked) => onValidationsUpdate(NodeDefValidations.assocRequired(checked)(nodeDefValidations))}
             />
           </FormItem>
         )}
-      {NodeDef.isAttribute(nodeDef) && (
-        <NodeDefExpressionsProp
-          Actions={Actions}
-          excludeCurrentNodeDef={false}
-          isBoolean={false}
-          label="nodeDefEdit.validationsProps.expressions"
-          nodeDefUuidContext={nodeDefUuidContext}
-          onChange={onValidationExpressionsUpdate}
-          propExtractor={() => NodeDefValidations.getExpressions(nodeDefValidations)}
-          propName={`validations.expressions`}
-          qualifier={TestId.nodeDefDetails.validations}
-          radioLabels={{
-            none: 'nodeDefEdit.validationsProps.attributeAlwaysValid',
-            defined: 'nodeDefEdit.validationsProps.attributeValidWhenConditionIsMet',
-          }}
-          readOnly={readOnly}
-          severity
-          showLabels
-          state={state}
-          validation={R.pipe(
-            Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
-            Validation.getFieldValidation(NodeDefValidations.keys.expressions)
-          )(validation)}
-        />
-      )}
-    </div>
+        {NodeDef.isAttribute(nodeDef) &&
+          !NodeDef.isKey(nodeDef) &&
+          (NodeDef.isRoot(nodeDefParent) || NodeDef.isMultiple(nodeDefParent) || NodeDef.isMultiple(nodeDef)) && (
+            <FormItem isInfoMarkdown info="nodeDefEdit.unique.info" label="nodeDefEdit.unique.label">
+              <Checkbox
+                id={TestId.nodeDefDetails.nodeDefUnique}
+                checked={NodeDefValidations.isUnique(nodeDefValidations)}
+                disabled={readOnly}
+                onChange={(checked) => onValidationsUpdate(NodeDefValidations.assocUnique(checked)(nodeDefValidations))}
+              />
+            </FormItem>
+          )}
+        {NodeDef.isAttribute(nodeDef) && (
+          <NodeDefExpressionsProp
+            Actions={Actions}
+            excludeCurrentNodeDef={false}
+            isBoolean={false}
+            label="nodeDefEdit.validationsProps.expressions"
+            nodeDefUuidContext={nodeDefUuidContext}
+            onChange={onValidationExpressionsUpdate}
+            propExtractor={() => NodeDefValidations.getExpressions(nodeDefValidations)}
+            propName={`${NodeDef.keysPropsAdvanced.validations}.${NodeDefValidations.keys.expressions}`}
+            qualifier={TestId.nodeDefDetails.validations}
+            radioLabels={{
+              none: 'nodeDefEdit.validationsProps.attributeAlwaysValid',
+              defined: 'nodeDefEdit.validationsProps.attributeValidWhenConditionIsMet',
+            }}
+            readOnly={readOnly}
+            severity
+            showLabels
+            state={state}
+          />
+        )}
+      </div>
+    </ValidationTooltip>
   )
 }
 

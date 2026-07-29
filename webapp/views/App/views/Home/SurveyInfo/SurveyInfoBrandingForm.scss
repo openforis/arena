@@ -1,0 +1,219 @@
+@use 'sass:color';
+@use '~@webapp/style/vars' as *;
+
+.survey-info-branding-form {
+  width: min(56rem, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0 1rem;
+
+  > .form-item {
+    grid-template-columns: 12rem 1fr;
+    align-items: start;
+  }
+
+  &__settings-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+
+    > .form-item {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      gap: 0.35rem;
+
+      .form-label {
+        justify-self: start;
+        text-align: start;
+      }
+    }
+
+    .color-input {
+      width: 100%;
+
+      .MuiColorInput-TextField {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto;
+      }
+    }
+
+    .survey-info-branding-form__settings-control {
+      width: 100%;
+    }
+  }
+
+  &__field-error {
+    display: block;
+    margin-top: 0.35rem;
+    color: $red;
+    font-size: 0.85rem;
+  }
+
+  &__logos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  &__image-section {
+    margin: 0;
+    border: 1px solid $greyBorder;
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    background: $white;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    legend {
+      padding: 0 0.35rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+  }
+
+  &__upload-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &__file-hint {
+    margin: 0;
+    font-size: 0.85rem;
+    color: color.adjust($black, $lightness: 35%);
+    line-height: 1.4;
+  }
+
+  &__upload {
+    display: flex;
+    align-items: center;
+  }
+
+  &__file-input {
+    display: none;
+  }
+
+  &__image-preview-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__image-preview {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 3.5rem;
+    padding: 0.5rem;
+    background: $greyAppBg;
+    border-radius: 4px;
+
+    img {
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    &--logo img {
+      max-height: 4rem;
+    }
+
+    &--background {
+      min-height: 6rem;
+
+      img {
+        width: 100%;
+        max-height: 8rem;
+        object-fit: cover;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  &__preview {
+    margin: 0;
+    border: 1px solid $greyBorder;
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    background: $white;
+
+    legend {
+      padding: 0 0.35rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+  }
+
+  &__preview-landing {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 1.5rem;
+
+    &--with-background::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba($white, 0.88);
+      pointer-events: none;
+    }
+  }
+
+  &__preview-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  &__preview-logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  &__preview-title {
+    margin: 0;
+    font-weight: 600;
+    max-width: 100%;
+  }
+
+  &__preview-description {
+    margin: 0;
+    line-height: 1.5;
+    color: color.adjust($black, $lightness: 25%);
+    max-width: 100%;
+  }
+
+  &__preview-logo {
+    max-height: 3rem;
+    max-width: 10rem;
+    object-fit: contain;
+  }
+}
+
+@media (max-width: 1100px) {
+  .survey-info-branding-form {
+    &__settings-row {
+      grid-template-columns: 1fr;
+    }
+
+    &__logos {
+      grid-template-columns: 1fr;
+    }
+  }
+}

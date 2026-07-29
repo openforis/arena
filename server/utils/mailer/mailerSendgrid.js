@@ -22,4 +22,7 @@ export const sendEmail = async ({ to, from, subject, html }) => {
   } else {
     await sgMail.send({ to, from, subject, html })
   }
+  // SendGrid accepts the message via API immediately; it cannot report an invalid recipient synchronously
+  // (bounces are reported later, asynchronously, via webhooks that are not handled here).
+  return { accepted: Array.isArray(to) ? to : [to], rejected: [] }
 }

@@ -2,10 +2,12 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import SystemError from '@core/systemError'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
 import * as Taxon from '@core/survey/taxon'
 import * as Taxonomy from '@core/survey/taxonomy'
+import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
 
 import { db } from '@server/db/db'
 
@@ -61,6 +63,66 @@ export const insertTaxa = async ({ user, surveyId, taxa, addLogs = true, backup 
         : []),
     ])
   )
+
+/**
+ * Clones a taxonomy (taxa and vernacular names included) from another survey into the given survey.
+ * Taxonomy, taxon and vernacular name uuids are preserved: each survey lives in its own db schema,
+ * so there is no risk of uuid collision. Taxa and vernacular names are cloned with a single
+ * INSERT...SELECT statement per table, entirely on the db side, to avoid loading potentially large
+ * taxa collections into memory.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user performing this operation.
+ * @param {!number} params.sourceSurveyId - The id of the survey the taxonomy is cloned from.
+ * @param {!string} params.sourceTaxonomyUuid - The uuid of the taxonomy to clone.
+ * @param {!number} params.targetSurveyId - The id of the survey the taxonomy is cloned into.
+ * @param {pgPromise.IDatabase} client - The database client.
+ * @returns {Promise<Taxonomy>} - The cloned taxonomy.
+ */
+export const cloneTaxonomyFromSurvey = async (
+  { user, sourceSurveyId, sourceTaxonomyUuid, targetSurveyId },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const sourceTaxonomy = await TaxonomyRepository.fetchTaxonomyByUuid(sourceSurveyId, sourceTaxonomyUuid, true, t)
+    if (!sourceTaxonomy) {
+      throw new Error(`Taxonomy with uuid ${sourceTaxonomyUuid} not found in survey ${sourceSurveyId}`)
+    }
+    const taxonomyName = Taxonomy.getName(sourceTaxonomy)
+
+    const targetTaxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(
+      { surveyId: targetSurveyId, draft: true },
+      t
+    )
+
+    const duplicateCheck = checkCloneFromSurveyDuplicate({
+      targetSurveyItems: targetTaxonomies,
+      sourceItem: sourceTaxonomy,
+      getUuid: Taxonomy.getUuid,
+      getName: Taxonomy.getName,
+      uuidDuplicateErrorKey: 'validationErrors:taxonomyImport.uuidDuplicate',
+      nameDuplicateErrorKey: 'validationErrors:taxonomyImport.nameDuplicate',
+    })
+    if (duplicateCheck) {
+      throw new SystemError(duplicateCheck.key, duplicateCheck.params)
+    }
+
+    await TaxonomyRepository.cloneTaxonomyFromSurvey(
+      { sourceSurveyId, targetSurveyId, taxonomyUuid: sourceTaxonomyUuid },
+      t
+    )
+
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: sourceTaxonomyUuid,
+      [ActivityLog.keysContent.taxonomyName]: taxonomyName,
+    }
+    await Promise.all([
+      markSurveyDraft(targetSurveyId, t),
+      ActivityLogRepository.insert(user, targetSurveyId, ActivityLog.type.taxonomyCreate, logContent, false, t),
+    ])
+
+    const taxonomyCloned = await TaxonomyRepository.fetchTaxonomyByUuid(targetSurveyId, sourceTaxonomyUuid, true, t)
+    return validateTaxonomy(targetSurveyId, [], taxonomyCloned, true, t)
+  })
 
 /**.
  * ====== READ

@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 
-import { NodeValues, Objects } from '@openforis/arena-core'
+import { NodeValues, Objects, RecordExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
 import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
@@ -35,6 +35,7 @@ import * as Response from '@server/utils/response'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
+import { findSurveyDocImageApplicable } from '../../survey/service/surveyDocImageUtils'
 
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
@@ -84,11 +85,12 @@ export const {
   updateRecordOwner,
 } = RecordManager
 
-export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat }) => {
+export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, user }) => {
   const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({
     surveyId,
     cycle,
     includeCounts: true,
+    user,
   })
 
   const valueFormattersByType = {
@@ -197,9 +199,14 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
 export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft })
+  // Passing `user` re-evaluates user-dependent applicability/relevance (e.g. userProp) for
+  // the current viewer/editor in memory, without persisting it - see RecordManager.fetchRecordAndNodesByUuid.
+  // This happens regardless of edit permission: existing persisted records - even when only
+  // viewed, not edited - must reflect visibility for the current viewer, not whoever last edited them.
+  const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft, user })
   const preview = Record.isPreview(record)
   const cycle = Record.getCycle(record)
+  const nodesEmpty = Record.getNodesArray(record).length === 0
 
   RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
 
@@ -207,7 +214,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
     // Create record thread
     const thread = RecordsUpdateThreadService.getOrCreatedThread()
     // initialize record if empty
-    if (Record.getNodesArray(record).length === 0) {
+    if (nodesEmpty) {
       thread.postMessage({
         type: RecordsUpdateThreadMessageTypes.recordInit,
         user,
@@ -219,6 +226,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
       })
     }
   }
+
   return record
 }
 
@@ -432,8 +440,8 @@ export const mergeRecords = async (
   client = db
 ) =>
   client.tx(async (tx) => {
-    const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid }, tx)
-    const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid }, tx)
+    const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid, user }, tx)
+    const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid, user }, tx)
 
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
@@ -477,6 +485,7 @@ export const mergeRecords = async (
   })
 
 const exportRecordDocument = async ({
+  user,
   surveyId,
   recordUuid,
   outputStream,
@@ -485,14 +494,48 @@ const exportRecordDocument = async ({
   extension,
   contentType,
 }) => {
-  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true })
+  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true, user })
   const cycle = Record.getCycle(record)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
     cycle,
     includeAnalysis: false,
   })
+  const surveyDocImages = Survey.getSurveyDocImages(survey)
   const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+
+  const rootNode = Record.getRootNode(record)
+  const isApplicable = async (imageFile) => {
+    const applyIf = SurveyDocImages.getApplyIf(imageFile)
+    if (!applyIf) return true
+    try {
+      const result = await new RecordExpressionEvaluator().evalExpression({
+        user,
+        survey,
+        record,
+        node: rootNode,
+        query: applyIf,
+      })
+      return result === true
+    } catch {
+      return false
+    }
+  }
+
+  const headerImageFileSummary = await findSurveyDocImageApplicable({
+    surveyDocImages,
+    documentPlace: SurveyDocPlace.header,
+    isApplicable,
+  })
+  const footerImageFileSummary = await findSurveyDocImageApplicable({
+    surveyDocImages,
+    documentPlace: SurveyDocPlace.footer,
+    isApplicable,
+  })
+
+  const headerOnFirstPageOnly = Survey.isDocHeaderOnFirstPageOnly(survey)
+  const pageNumbering = Survey.isDocPageNumberingEnabled(survey)
+
   const i18n = await i18nFactory.createI18nAsync(langToUse)
   const { buffer, surveyName } = await generator({
     survey,
@@ -504,6 +547,10 @@ const exportRecordDocument = async ({
       const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
       return SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary })
     },
+    headerImageFileUuid: headerImageFileSummary?.uuid,
+    footerImageFileUuid: footerImageFileSummary?.uuid,
+    headerOnFirstPageOnly,
+    pageNumbering,
     readOnly: true,
   })
   const fileName = ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'RecordForm', extension })
@@ -516,8 +563,9 @@ const exportRecordDocument = async ({
   })
 }
 
-export const exportRecordDocx = ({ surveyId, recordUuid, outputStream, lang = null }) =>
+export const exportRecordDocx = ({ user, surveyId, recordUuid, outputStream, lang = null }) =>
   exportRecordDocument({
+    user,
     surveyId,
     recordUuid,
     outputStream,
@@ -527,8 +575,9 @@ export const exportRecordDocx = ({ surveyId, recordUuid, outputStream, lang = nu
     contentType: Response.contentTypes.docx,
   })
 
-export const exportRecordPdf = ({ surveyId, recordUuid, outputStream, lang = null }) =>
+export const exportRecordPdf = ({ user, surveyId, recordUuid, outputStream, lang = null }) =>
   exportRecordDocument({
+    user,
     surveyId,
     recordUuid,
     outputStream,

@@ -9,8 +9,16 @@ export const useJob = () => {
   const closeButtonProps = useSelector(JobState.getCloseButtonProps)
   const errorKeyHeaderName = useSelector(JobState.getErrorKeyHeaderName)
   const errorsExportFileName = useSelector(JobState.getErrorsExportFileName)
+  const longRunningMessageKey = useSelector(JobState.getLongRunningMessageKey)
 
   if (!hasJob) return {}
 
-  return { job, closeButton, closeButtonProps, errorKeyHeaderName, errorsExportFileName }
+  return {
+    job,
+    closeButton,
+    closeButtonProps,
+    errorKeyHeaderName,
+    errorsExportFileName,
+    longRunningMessageKey,
+  }
 }

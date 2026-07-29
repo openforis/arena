@@ -155,10 +155,6 @@ export default {
       markers: '{{count}} маркеров',
       markers_one: '{{count}} маркер',
       markers_other: '{{count}} маркеров',
-      sortAsc: 'Сортировать по возрастанию',
-      sortDesc: 'Сортировать по убыванию',
-      sort: 'Сортировка',
-      sortNone: 'Убрать сортировку',
     },
   },
 }

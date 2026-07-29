@@ -14,6 +14,7 @@ export const keys = {
   onComplete: 'onComplete',
   errorKeyHeaderName: 'errorKeyHeaderName',
   errorsExportFileName: 'errorsExportFileName',
+  longRunningMessageKey: 'longRunningMessageKey',
 }
 
 // ====== READ
@@ -31,6 +32,8 @@ export const getErrorKeyHeaderName = R.pipe(getJob, R.prop(keys.errorKeyHeaderNa
 
 export const getErrorsExportFileName = R.pipe(getJob, R.prop(keys.errorsExportFileName))
 
+export const getLongRunningMessageKey = R.pipe(getJob, R.prop(keys.longRunningMessageKey))
+
 export const hasJob = (state) => Object.keys(getJob(state)).length > 0
 
 // ====== UPDATE
@@ -42,6 +45,7 @@ export const startJob = ({
   autoHide = false,
   errorKeyHeaderName = undefined,
   errorsExportFileName = null,
+  longRunningMessageKey = undefined,
 }) => ({
   ...job,
   [keys.autoHide]: autoHide,
@@ -50,6 +54,7 @@ export const startJob = ({
   [keys.onComplete]: onComplete,
   [keys.errorKeyHeaderName]: errorKeyHeaderName,
   [keys.errorsExportFileName]: errorsExportFileName,
+  [keys.longRunningMessageKey]: longRunningMessageKey,
 })
 
 export const updateJob =

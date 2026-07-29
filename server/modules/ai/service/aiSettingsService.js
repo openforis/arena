@@ -314,7 +314,7 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
     await generateText({
       model,
       prompt: 'Reply with the single word: ok',
-      maxOutputTokens: 5,
+      maxOutputTokens: 16,
     })
     const latencyMs = Date.now() - start
     await stampTestResult({ user, ok: true })

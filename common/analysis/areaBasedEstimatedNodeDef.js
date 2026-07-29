@@ -60,7 +60,8 @@ const updateNodeDef = ({ survey, chain, nodeDefAreaBasedEstimate, areaBasedEstim
   return A.pipe(
     NodeDef.assocProp({ key: NodeDef.propKeys.name, value: name }),
     NodeDef.assocProp({ key: NodeDef.propKeys.labels, value: labels }),
-    NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.script, value: script })
+    NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.script, value: script }),
+    NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.active, value: NodeDef.isActive(areaBasedEstimatedOfNodeDef) })
   )(nodeDefAreaBasedEstimate)
 }
 

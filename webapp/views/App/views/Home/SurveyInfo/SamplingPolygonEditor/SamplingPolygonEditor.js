@@ -1,23 +1,21 @@
 import './SamplingPolygonEditor.scss'
 
-import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
+import { useCallback } from 'react'
 
 import { Numbers, Objects } from '@openforis/arena-core'
 
-import { useI18n } from '@webapp/store/system'
+import { getSamplingPolygonDefaults } from '@core/survey/SamplingPolygon'
+
+import { Fieldset } from '@webapp/components'
 
 import SamplingPolygonShapeEditor from '../SamplingPolygonShapeEditor'
-import { FormPropertyItem } from './FormPropertyItem'
 import { CircleOnlyItems } from './CircleOnlyItems'
+import { FormPropertyItem } from './FormPropertyItem'
 import { RectangleOnlyItems } from './RectangleOnlyItems'
-
-import { getSamplingPolygonDefaults } from '@core/survey/SamplingPolygon'
 
 const SamplingPolygonEditor = (props) => {
   const { readOnly, samplingPolygon, getFieldValidation, setSamplingPolygon } = props
-
-  const i18n = useI18n()
 
   const samplingPolygonObject = Objects.isEmpty(samplingPolygon) ? getSamplingPolygonDefaults() : samplingPolygon
 
@@ -46,9 +44,7 @@ const SamplingPolygonEditor = (props) => {
   }
 
   return (
-    <fieldset className="sampling-polygon">
-      <legend>{i18n.t('samplingPolygonOptions.samplingPolygon')}</legend>
-
+    <Fieldset className="sampling-polygon" legend="samplingPolygonOptions.samplingPolygon">
       <div className="props-editor-wrapper">
         <SamplingPolygonShapeEditor
           isCircle={samplingPolygonObject.isCircle}
@@ -85,7 +81,7 @@ const SamplingPolygonEditor = (props) => {
           />
         ))}
       </div>
-    </fieldset>
+    </Fieldset>
   )
 }
 

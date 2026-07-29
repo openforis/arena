@@ -122,6 +122,7 @@ export const {
   isChildEditable,
   isChildVisible,
   isDefaultValueApplied,
+  isQualifierValueApplied,
   getHierarchy,
   getHierarchyCode,
 } = NodeMeta
@@ -165,7 +166,13 @@ export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
 export const assocValue = R.assoc(keys.value)
 export const { assocValidation } = Validation
 
-export const { assocMeta, mergeMeta, assocChildApplicability, assocIsDefaultValueApplied } = NodeMeta
+export const {
+  assocMeta,
+  mergeMeta,
+  assocChildApplicability,
+  assocIsDefaultValueApplied,
+  assocIsQualifierValueApplied,
+} = NodeMeta
 
 export const assocCreated = R.assoc(keys.created)
 export const setCreated = (node) => {

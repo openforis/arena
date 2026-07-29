@@ -18,6 +18,8 @@ export default {
     invalidNodeInRecord:
       'Invalid node in record "{{recordUuid}}", node "{{nodeUuid}}" with node definition "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'No records found in the import file or wrong file format',
+    pendingImportFileNotFoundOrExpired:
+      'The previously uploaded file cannot be found anymore; it may have expired. Please upload it again.',
     recordOwnedByAnotherUser: 'Cannot update record "{{recordKeyValues}}" as it is owned by another user',
   },
   entryDataNotFound: 'Entry data not found: {{entryName}}',
@@ -28,6 +30,7 @@ export default {
   functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
   functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
   generic: 'Unexpected error: {{text}}',
+  geoWhispApiError: 'The Whisp service is temporarily unavailable.',
   importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
   invalidType: 'Invalid type {{type}}',
   jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
@@ -77,6 +80,8 @@ Try to refresh the page.`,
   aiChatbotDisabled: 'The documentation chatbot is disabled on this deployment.',
   aiChatbotUpstreamError: 'The documentation chatbot is temporarily unavailable. Please try again in a moment.',
   aiChatbotPayloadTooLarge: 'Your conversation is too large. Clear the chat and try a shorter question.',
+  userEmailInvalid:
+    'The invitation email could not be delivered to {{email}}; please check that the address is correct',
   userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
   userHasRole: 'The given user has already a role in this survey',
   userHasRole_other: 'The given users have already a role in this survey',

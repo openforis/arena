@@ -1,7 +1,7 @@
 import './SurveyInfo.scss'
 
-
 import { useAuthCanEditSurvey, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonSave } from '@webapp/components'
@@ -9,7 +9,9 @@ import TabBar from '@webapp/components/tabBar'
 import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyUserExtraPropDefsEditor'
 
 import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
+import { SurveyInfoBrandingForm } from './SurveyInfoBrandingForm'
 import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
+import { SurveyInfoDocuments } from './SurveyInfoDocuments'
 import { SurveyInfoMap } from './SurveyInfoMap'
 
 import { useSurveyInfoForm } from './store'
@@ -19,6 +21,7 @@ const SurveyInfo = () => {
   const readOnly = !useAuthCanEditSurvey()
   const isSystemAdmin = useUserIsSystemAdmin()
   const canUseAnalysis = useAuthCanUseAnalysis()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   const {
     preloadedMapLayers,
@@ -26,6 +29,8 @@ const SurveyInfo = () => {
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
     security,
+    surveyDocImages,
+    surveyDocOptions,
     userExtraPropDefs,
 
     setCycles,
@@ -41,7 +46,10 @@ const SurveyInfo = () => {
     setSampleBasedImageInterpretationEnabled,
     setSecurity,
     setSrs,
+    setSurveyDocImages,
+    setSurveyDocOptions,
     setUserExtraPropDefs,
+    setBranding,
     getFieldValidation,
     saveProps,
 
@@ -66,6 +74,19 @@ const SurveyInfo = () => {
         surveyInfoObject,
       },
     },
+    {
+      key: 'branding',
+      component: SurveyInfoBrandingForm,
+      label: 'homeView:surveyInfo.branding.title',
+      props: {
+        branding: surveyInfoObject.branding || {},
+        setBranding,
+        readOnly,
+        labels: surveyInfoObject.labels,
+        descriptions: surveyInfoObject.descriptions,
+        name: surveyInfoObject.name,
+      },
+    },
   ]
   if (canUseAnalysis) {
     tabs.push({
@@ -82,6 +103,19 @@ const SurveyInfo = () => {
         preloadedMapLayersEnabled,
         setPreloadedMapLayers,
         setPreloadedMapLayersEnabled,
+      },
+    })
+  }
+  if (experimentalFeatures) {
+    tabs.push({
+      key: 'documents',
+      component: SurveyInfoDocuments,
+      label: 'homeView:surveyInfo.surveyDocLayout.tabTitle',
+      props: {
+        surveyDocImages,
+        setSurveyDocImages,
+        surveyDocOptions,
+        setSurveyDocOptions,
       },
     })
   }

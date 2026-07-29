@@ -5,9 +5,11 @@ import { ArrayUtils } from '@core/arrayUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
+import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as Validation from '@core/validation/validation'
 
 import { SurveyInfoActions, useSurveyInfo } from '@webapp/store/survey'
+import { NotificationActions } from '@webapp/store/ui'
 
 import { useFormObject } from '@webapp/components/hooks'
 
@@ -26,7 +28,7 @@ export const useSurveyInfoForm = () => {
 
   useEffect(() => {
     setValidation(Validation.getValidation(surveyInfo))
-  }, [surveyInfo])
+  }, [setValidation, surveyInfo])
 
   // Setters
   const setCycles = (value) => {
@@ -45,15 +47,26 @@ export const useSurveyInfoForm = () => {
   const setLanguages = (value) => setObjectField(Survey.infoKeys.languages, value)
   const setPreloadedMapLayers = (value) => setObjectField(Survey.infoKeys.preloadedMapLayers, value)
   const setPreloadedMapLayersEnabled = (value) => setObjectField(Survey.infoKeys.preloadedMapLayersEnabled, value)
+  const setSurveyDocImages = (value) => setObjectField(Survey.infoKeys.surveyDocImages, value)
+  const setSurveyDocOptions = (value) => setObjectField(Survey.infoKeys.surveyDocOptions, value)
   const setSampleBasedImageInterpretationEnabled = (value) =>
     setObjectField(Survey.infoKeys.sampleBasedImageInterpretationEnabled, value)
   const setSamplingPolygon = (value) => setObjectField(Survey.infoKeys.samplingPolygon, value)
   const setSecurity = (value) => setObjectField(Survey.infoKeys.security, value)
   const setSrs = (value) => setObjectField(Survey.infoKeys.srs, value)
   const setUserExtraPropDefs = (value) => setObjectField(Survey.infoKeys.userExtraPropDefs, value)
+  const setBranding = (value) => setObjectField(Survey.infoKeys.branding, value)
 
   const saveProps = () => {
     enableValidation()
+    if (!SurveyBranding.isBrandingValid(object.branding)) {
+      dispatch(
+        NotificationActions.notifyWarning({
+          key: 'homeView:surveyInfo.branding.invalidSaveBlocked',
+        })
+      )
+      return
+    }
     dispatch(SurveyInfoActions.updateSurveyInfoProps(object))
   }
 
@@ -72,9 +85,12 @@ export const useSurveyInfoForm = () => {
     setPreloadedMapLayers,
     setPreloadedMapLayersEnabled,
     setSampleBasedImageInterpretationEnabled,
+    setSurveyDocImages,
+    setSurveyDocOptions,
     setSamplingPolygon,
     setSecurity,
     setSrs,
     setUserExtraPropDefs,
+    setBranding,
   }
 }

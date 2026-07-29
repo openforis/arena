@@ -1,8 +1,8 @@
 import './NodeDefDetails.scss'
 
-import React, { useMemo } from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
+import { useMemo } from 'react'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,24 +10,24 @@ import * as Validation from '@core/validation/validation'
 
 import { TestId } from '@webapp/utils/testId'
 
-import TabBar from '@webapp/components/tabBar'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import TabBar from '@webapp/components/tabBar'
 
-import ButtonBar from './ButtonBar'
-import BasicProps from './BasicProps'
 import AdvancedProps from './AdvancedProps'
+import AnalysisEntitySelector from './AnalysisEntitySelector'
+import BasicProps from './BasicProps'
+import ButtonBar from './ButtonBar'
 import { MobileAppProps } from './MobileAppProps'
 import ValidationsProps from './ValidationsProps'
-import AnalysisEntitySelector from './AnalysisEntitySelector'
 
 import { useSurveyCycleKey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-import { State, useNodeDefDetails } from './store'
+import { NodeDefEditReadOnlyContext, State, useNodeDefDetails } from './store'
 
 const NodeDefDetails = (props) => {
-  const { nodeDefUuid = null } = props
+  const { nodeDefUuid = null, readOnly = false } = props
 
   const i18n = useI18n()
 
@@ -65,7 +65,12 @@ const NodeDefDetails = (props) => {
           props: tabProps,
         })
       }
-      if (NodeDefUIProps.getValidationsEnabledByType(nodeDefType)) {
+      // a qualifier attribute is always system-managed and effectively read-only, so validation rules
+      // make no sense for it; still show the tab if some are already defined, so they can be cleared
+      if (
+        NodeDefUIProps.getValidationsEnabledByType(nodeDefType) &&
+        (!NodeDef.isQualifier(nodeDef) || NodeDef.hasValidationsDefined(nodeDef))
+      ) {
         _tabs.push({
           label: 'nodeDefEdit.validations',
           component: ValidationsProps,
@@ -75,53 +80,58 @@ const NodeDefDetails = (props) => {
       }
     }
     return _tabs
-  }, [Actions, canHaveMobileProps, editingFromDesigner, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
+  }, [Actions, canHaveMobileProps, editingFromDesigner, nodeDef, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
 
   if (!nodeDef) return null
 
   const validation = State.getValidation(state)
 
-  const className = classNames('node-def-edit', { 'full-screen': !nodeDefUuid })
+  const className = classNames('node-def-edit', { 'full-screen': !nodeDefUuid, 'read-only': readOnly })
 
   return (
-    <div className={className}>
-      <div className="node-def-edit__container">
-        {NodeDef.isAnalysis(nodeDef) && (
-          <AnalysisEntitySelector
-            onChange={(parentUuid) => Actions.setParentUuid({ state, parentUuid })}
-            validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
-            nodeDef={nodeDef}
-          />
-        )}
+    <NodeDefEditReadOnlyContext.Provider value={readOnly}>
+      <div className={className}>
+        <div className="node-def-edit__container">
+          <div className="node-def-edit__fields">
+            {NodeDef.isAnalysis(nodeDef) && (
+              <AnalysisEntitySelector
+                onChange={(parentUuid) => Actions.setParentUuid({ state, parentUuid })}
+                validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
+                nodeDef={nodeDef}
+              />
+            )}
 
-        <FormItem label="common.name" className="node-def-edit__title">
-          <Input
-            id={TestId.nodeDefDetails.nodeDefName}
-            autoFocus
-            value={NodeDef.getName(nodeDef)}
-            validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.name, value })}
-            readOnly={!NodeDef.canNameBeEdited(nodeDef)}
-            textTransformFunction={StringUtils.normalizeName}
-          />
-          <div className="attribute-selector">
-            {i18n.t(`surveyForm:addChildToTypes.${nodeDefType}`)} {NodeDefUIProps.getIconByType(nodeDefType)}
+            <FormItem label="common.name" className="node-def-edit__title">
+              <Input
+                id={TestId.nodeDefDetails.nodeDefName}
+                autoFocus={!readOnly}
+                value={NodeDef.getName(nodeDef)}
+                validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
+                onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.name, value })}
+                readOnly={readOnly || !NodeDef.canNameBeEdited(nodeDef)}
+                textTransformFunction={StringUtils.normalizeName}
+              />
+              <div className="attribute-selector">
+                {i18n.t(`surveyForm:addChildToTypes.${nodeDefType}`)} {NodeDefUIProps.getIconByType(nodeDefType)}
+              </div>
+            </FormItem>
+
+            <TabBar
+              showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isRoot(nodeDef) && !NodeDef.isLayoutElement(nodeDef)}
+              tabs={tabs}
+            />
           </div>
-        </FormItem>
 
-        <TabBar
-          showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isRoot(nodeDef) && !NodeDef.isLayoutElement(nodeDef)}
-          tabs={tabs}
-        />
-
-        <ButtonBar state={state} Actions={Actions} />
+          <ButtonBar state={state} Actions={Actions} readOnly={readOnly} />
+        </div>
       </div>
-    </div>
+    </NodeDefEditReadOnlyContext.Provider>
   )
 }
 
 NodeDefDetails.propTypes = {
   nodeDefUuid: PropTypes.string,
+  readOnly: PropTypes.bool,
 }
 
 export default NodeDefDetails

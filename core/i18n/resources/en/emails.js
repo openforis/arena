@@ -30,6 +30,13 @@ export default {
              <p>If the link doesn't work, please copy and paste this address into your browser: {{serverUrl}}</p>
              $t(emails:signature)`,
   },
+  userAccessRequestConfirmation: {
+    subject: '$t(common.appNameFull) - Access request received',
+    body: `<p>Hello {{firstName}},</p>
+      <p>We have received your request to access $t(common.appNameFull). It will be evaluated and you will be contacted as soon as possible.</p>
+      <p><i>You have received this email because this address was submitted in an access request on {{serverUrl}}. If you did not make this request, please let us know by writing to <a href="mailto:{{supportEmail}}">{{supportEmail}}</a>.</i></p>
+      $t(emails:signature)`,
+  },
   userAccessRequest: {
     subject: '$t(common.appNameFull) - User Access Request',
     body: `<p>Hello,</p>

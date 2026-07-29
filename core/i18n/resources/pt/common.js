@@ -110,6 +110,8 @@ Ao confirmar, todas as alterações serão perdidas.
 Deseja prosseguir?`,
     local: 'Local',
     loading: 'Carregando...',
+    lock: 'Bloquear',
+    unlock: 'Desbloquear',
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Gerenciar',
@@ -181,6 +183,10 @@ Deseja prosseguir?`,
     showLabels: 'Mostrar rótulos',
     showLabelsAndNames: 'Mostrar rótulos e nomes',
     showNames: 'Mostrar nomes',
+    sort: 'Ordenar',
+    sortAsc: 'Ordenar ascendente',
+    sortDesc: 'Ordenar descendente',
+    sortNone: 'Remover ordem',
     srs: 'SRS',
     status: 'Status',
     sum: 'Soma',
@@ -188,6 +194,7 @@ Deseja prosseguir?`,
     to: 'Para',
     totalItems: 'Total de itens',
     true: 'Verdadeiro',
+    trySplittingFileIntoSmallerChunks: 'Tente dividir o arquivo em partes menores.',
     type: 'Tipo',
     undefinedName: 'Nome indefinido',
     unique: 'Único',
@@ -196,6 +203,8 @@ Deseja prosseguir?`,
       message: `Erro durante o envio do arquivo: {{error}}.\n
     Tentar novamente?`,
     },
+    uploadFileChangedError:
+      'O arquivo selecionado parece ter sido modificado desde que foi selecionado. Selecione-o novamente.',
     uploadingFile: 'Enviando arquivo ({{progressPercent}}%)',
     value: 'Valor',
     view: 'Visualizar',
@@ -256,6 +265,8 @@ Deseja prosseguir?`,
     header: 'Arquivos',
     missing: ' Arquivos ausentes: {{count}}',
     totalSize: 'Tamanho total: {{size}}',
+    fileName: 'Nome do arquivo',
+    fileSize: 'Tamanho do arquivo',
   },
 
   sidebar: {
@@ -295,6 +306,7 @@ Deseja prosseguir?`,
 
   appModules: {
     home: 'Início',
+    landing: 'Boas-vindas',
     dashboard: 'Painel',
     surveyNew: 'Novo inventário',
     surveys: 'Inventários',
@@ -331,6 +343,9 @@ Deseja prosseguir?`,
     userInvite: 'Convidar usuário',
     userNew: 'Novo usuário',
     usersSurvey: 'Lista de usuários',
+    userGroup: 'Grupo de usuários',
+    userGroup_plural: 'Grupos de usuários',
+    userGroupNew: 'Novo grupo de usuários',
     usersList: 'Lista de usuários (todos)',
     user2FADevice: 'Dispositivo 2FA',
     user2FADevice_plural: 'Dispositivos 2FA',
@@ -462,8 +477,10 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       lock: 'Bloquear edição do atributo-chave',
       unlock: 'Permitir editar o atributo-chave',
     },
-    lock: 'Bloquear',
-    unlock: 'Desbloquear',
+    qualifierAttributeEditing: {
+      lock: 'Bloquear edição do atributo qualificador',
+      unlock: 'Permitir editar o atributo qualificador',
+    },
   },
 
   dataExplorerView: {
@@ -610,8 +627,9 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     confirmInviteSystemAdmin: 'Convidar o usuário {{email}} como Administrador do Sistema?',
     confirmInviteSystemAdmin_other: 'Convidar os usuários {{email}} como Administradores do Sistema?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Permissões',
       systemAdmin: `
@@ -738,6 +756,8 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     nonResponseBiasCorrectionInfo: `Para implementar o método de ajuste por classes de ponderação, adicione 'design_psu' e 'design_ssu' à tabela de categorias do estrato como propriedades numéricas extras.`,
     pValue: 'Valor-p',
     resultsBackFromRStudio: 'Resultados lidos de volta do RStudio',
+    resultsBackFromRStudioInfo: `Ative esta opção se os atributos de resultado calculados no RStudio devem ser importados de volta para o servidor Arena.
+Este processo pode ser lento.`,
     samplingDesign: 'Desenho amostral',
     samplingDesignDetails: 'Detalhes do desenho amostral',
     samplingStrategyLabel: 'Estratégia amostral',
@@ -773,6 +793,17 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Cadeia de processamento excluída',
+    cloneFromAnotherSurvey: 'Clonar de outro estudo',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Clonar cadeia de outro estudo',
+      sourceSurvey: 'Estudo de origem',
+      sourceChain: 'Cadeia de origem',
+      entityCheck: 'Compatibilidade de entidades',
+      entityMissing: 'ausente no estudo destino',
+      noAnalysisAttributes: 'Esta cadeia não tem atributos de análise',
+      cloneComplete: 'Cadeia clonada com sucesso',
+      missingEntities: 'Não é possível clonar: as seguintes entidades não existem no estudo destino: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `A definição de nó "{{label}}" não pode ser selecionada porque não pertence a todos os ciclos da cadeia de processamento`,
     cannotSelectCycle: 'Este ciclo não pode ser selecionado porque algumas definições de nó não pertencem a este ciclo',
     copyRStudioCode: `#### Você está prestes a abrir um servidor RStudio ####  
@@ -966,6 +997,10 @@ $t(common.appNameFull)
       multiple: 'Múltiplo',
       ownPage: 'Página própria',
       parentPage: 'Página pai ({{parentPage}})',
+      qualifier: {
+        label: 'Qualificador',
+        info: `Quando um novo registro é criado por um usuário pertencente a um grupo, este atributo será automaticamente preenchido com o valor especificado para ele nos qualificadores do grupo do usuário. Os usuários só poderão ver e modificar registros pertencentes ao seu próprio grupo, se pertencerem a um.`,
+      },
       table: 'Tabela',
     },
     advancedProps: {
@@ -1144,6 +1179,8 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
 
 Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo *tree_species* marcado como **Único**, poderá ter apenas uma árvore por espécie dentro do mesmo *plot*.`,
     },
+    categoriesClonedFromSurvey: 'As seguintes categorias também foram clonadas do inventário de origem: {{names}}',
+    taxonomiesClonedFromSurvey: 'As seguintes taxonomias também foram clonadas do inventário de origem: {{names}}',
   },
 
   languagesEditor: {
@@ -1154,6 +1191,16 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
     header: 'Taxonomia',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Excluir a taxonomia {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clonar taxonomia de outro inquérito',
+      sourceSurvey: 'Inquérito de origem',
+      sourceTaxonomy: 'Taxonomia de origem',
+      loadingSurveys: 'A carregar inquéritos...',
+      noSurveysAvailable: 'Nenhum inquérito disponível',
+      selectSurveyFirst: 'Selecione primeiro um inquérito',
+      loadingTaxonomies: 'A carregar taxonomias...',
+      noTaxonomiesAvailable: 'Nenhuma taxonomia disponível no inquérito selecionado',
+    },
     edit: {
       taxonomyListName: 'Nome da lista de taxonomia',
       taxaNotImported: 'Táxons não importados',
@@ -1162,6 +1209,9 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Sinônimo / Latim',
       extraPropsNotDefined: 'Propriedades extras não definidas para esta taxonomia',
+      importMissingPublishedTaxa:
+        '{{count}} táxon/taxa publicado(s) não encontrado(s) no arquivo importado e mantido(s) sem alterações. Códigos: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} mais)',
     },
     taxaCount: 'Contagem de táxons',
     vernacularNameLabel: 'Rótulo do nome vernacular',
@@ -1172,6 +1222,16 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
     batchImportCompleteSuccessfully: `{{importedCategories}} categorias importadas com sucesso!
   {{insertedCategories}} novas
   {{updatedCategories}} atualizadas`,
+    cloneFromAnotherSurvey: {
+      title: 'Clonar categoria de outro inquérito',
+      sourceSurvey: 'Inquérito de origem',
+      sourceCategory: 'Categoria de origem',
+      loadingSurveys: 'A carregar inquéritos...',
+      noSurveysAvailable: 'Nenhum inquérito disponível',
+      selectSurveyFirst: 'Selecione primeiro um inquérito',
+      loadingCategories: 'A carregar categorias...',
+      noCategoriesAvailable: 'Nenhuma categoria disponível no inquérito selecionado',
+    },
     itemsCount: 'Contagem de itens',
     types: {
       flat: 'Plano',

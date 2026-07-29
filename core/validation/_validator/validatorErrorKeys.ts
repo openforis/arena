@@ -106,6 +106,10 @@ export const ValidatorErrorKeys = {
     keysExceedingMax: 'validationErrors:nodeDefEdit.keysExceedingMax',
     maxFileSizeInvalid: 'validationErrors:nodeDefEdit.maxFileSizeInvalid',
     nameInvalid: 'validationErrors:nodeDefEdit.nameInvalid',
+    qualifierCannotHaveApplicableExpression: 'validationErrors:nodeDefEdit.qualifierCannotHaveApplicableExpression',
+    qualifierCannotHaveDefaultValues: 'validationErrors:nodeDefEdit.qualifierCannotHaveDefaultValues',
+    qualifierCannotHaveEditabilityRule: 'validationErrors:nodeDefEdit.qualifierCannotHaveEditabilityRule',
+    qualifierCannotHaveValidations: 'validationErrors:nodeDefEdit.qualifierCannotHaveValidations',
     readOnlyCannotHaveEditableIf: 'validationErrors:nodeDefEdit.readOnlyCannotHaveEditableIf',
     taxonomyRequired: 'validationErrors:nodeDefEdit.taxonomyRequired',
     validationsInvalid: 'validationErrors:nodeDefEdit.validationsInvalid',
@@ -137,6 +141,13 @@ export const ValidatorErrorKeys = {
     fileRequired: 'validationErrors:surveyPreloadedMapLayer.fileRequired',
     fileNameDuplicate: 'validationErrors:surveyPreloadedMapLayer.fileNameDuplicate',
     labelsRequired: 'validationErrors:surveyPreloadedMapLayer.labelsRequired',
+  },
+
+  surveyDocImage: {
+    documentPlaceRequired: 'validationErrors:surveyDocImage.documentPlaceRequired',
+    fileRequired: 'validationErrors:surveyDocImage.fileRequired',
+    fileNameDuplicate: 'validationErrors:surveyDocImage.fileNameDuplicate',
+    labelsRequired: 'validationErrors:surveyDocImage.labelsRequired',
   },
 
   taxonomyEdit: {
@@ -194,6 +205,14 @@ export const ValidatorErrorKeys = {
     emailInvalid: 'validationErrors:userAccessRequestAccept.emailInvalid',
     roleRequired: 'validationErrors:userAccessRequestAccept.roleRequired',
     surveyNameRequired: 'validationErrors:userAccessRequestAccept.surveyNameRequired',
+  },
+
+  userGroupEdit: {
+    nameDuplicate: 'validationErrors:userGroupEdit.nameDuplicate',
+    qualifiersInvalid: 'validationErrors:userGroupEdit.qualifiersInvalid',
+    qualifierNameDuplicate: 'validationErrors:userGroupEdit.qualifierNameDuplicate',
+    qualifierNameInvalid: 'validationErrors:userGroupEdit.qualifierNameInvalid',
+    qualifierNameRequired: 'validationErrors:userGroupEdit.qualifierNameRequired',
   },
 
   userPasswordChange: {

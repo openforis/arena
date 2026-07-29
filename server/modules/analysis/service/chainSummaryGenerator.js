@@ -1,6 +1,5 @@
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,6 +11,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ChainManager from '../manager'
 import { Objects } from '@openforis/arena-core'
 import { ArrayUtils } from '@core/arrayUtils'
+import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
@@ -51,29 +51,6 @@ const generateResultVariableSummary = ({ survey, analysisNodeDef, lang }) => {
   return result
 }
 
-const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
-  const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
-  if (ChainStatisticalAnalysis.isEmpty(statisticalAnalysis)) return {}
-
-  const entity = Survey.getNodeDefByUuid(ChainStatisticalAnalysis.getEntityDefUuid(statisticalAnalysis))(survey)
-  const dimensions = Survey.getNodeDefsByUuids(ChainStatisticalAnalysis.getDimensionUuids(statisticalAnalysis))(survey)
-  const chainSamplingDesign = Chain.getSamplingDesign(chain)
-  const samplingStrategySpecified = !!ChainSamplingDesign.getSamplingStrategy(chainSamplingDesign)
-
-  return {
-    analysis: {
-      entity: NodeDef.getName(entity),
-      dimensions: dimensions.map(NodeDef.getName),
-      filter: ChainStatisticalAnalysis.getFilter(statisticalAnalysis),
-      reportingMethod: ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis),
-      clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
-      nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
-      ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
-      reportingArea: ChainStatisticalAnalysis.getReportingArea(statisticalAnalysis),
-    },
-  }
-}
-
 const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
   const hierarchicalCategories = Survey.getCategoriesArray(survey).filter(Category.isHierarchical)
   if (hierarchicalCategories.length === 0) {
@@ -102,6 +79,29 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
 
   return {
     categoryAttributeAncestors,
+  }
+}
+
+const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
+  const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
+  if (ChainStatisticalAnalysis.isEmpty(statisticalAnalysis)) return {}
+
+  const entity = Survey.getNodeDefByUuid(ChainStatisticalAnalysis.getEntityDefUuid(statisticalAnalysis))(survey)
+  const dimensions = Survey.getNodeDefsByUuids(ChainStatisticalAnalysis.getDimensionUuids(statisticalAnalysis))(survey)
+  const chainSamplingDesign = Chain.getSamplingDesign(chain)
+  const samplingStrategySpecified = !!ChainSamplingDesign.getSamplingStrategy(chainSamplingDesign)
+
+  return {
+    analysis: {
+      entity: NodeDef.getName(entity),
+      dimensions: dimensions.map(NodeDef.getName),
+      filter: ChainStatisticalAnalysis.getFilter(statisticalAnalysis),
+      reportingMethod: ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis),
+      clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
+      nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
+      ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
+      reportingArea: ChainStatisticalAnalysis.getReportingArea(statisticalAnalysis),
+    },
   }
 }
 
@@ -201,7 +201,6 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     resultVariables: analysisNodeDefs.map((analysisNodeDef) =>
       generateResultVariableSummary({ survey, analysisNodeDef, lang })
     ),
-    ...statisticalAnalysisSummary,
   }
 }
 

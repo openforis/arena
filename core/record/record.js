@@ -12,6 +12,7 @@ import { keys, infoKeys } from './_record/recordKeys'
 import * as RecordReader from './_record/recordReader'
 import * as RecordUpdater from './_record/recordUpdater'
 import { RecordNodesUpdater } from './_record/recordNodesUpdater'
+import { RecordUserDependentStateUpdater } from './_record/recordUserDependentStateUpdater'
 
 export { keys, infoKeys } from './_record/recordKeys'
 
@@ -98,6 +99,7 @@ export const {
   deleteNodesInEntityByNodeDefUuid,
 } = RecordNodesUpdater
 export { replaceUpdatedNodes, mergeRecords } from './_record/recordsCombiner'
+export const { recomputeUserDependentNodeState } = RecordUserDependentStateUpdater
 export const assocOwnerUuid = R.assoc(keys.ownerUuid)
 
 // ====== DELETE

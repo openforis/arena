@@ -105,6 +105,8 @@ export default {
       'Hay cambios sin guardar en el formulario. \nAl confirmar, todos los cambios se perderán. \n¿Desea continuar?',
     local: 'Local',
     loading: 'Cargando...',
+    lock: 'Bloquear',
+    unlock: 'Desbloquear',
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Administrar',
@@ -160,6 +162,10 @@ export default {
     showLabels: 'Mostrar etiquetas',
     showLabelsAndNames: 'Mostrar etiquetas y nombres',
     showNames: 'Mostrar nombres',
+    sort: 'Ordenar',
+    sortAsc: 'Ordenar ascendente',
+    sortDesc: 'Ordenar descendente',
+    sortNone: 'Quitar orden',
     srs: 'SRS',
     status: 'Estado',
     sum: 'Suma',
@@ -167,6 +173,7 @@ export default {
     to: 'A',
     totalItems: 'Total de elementos',
     true: 'Verdadero',
+    trySplittingFileIntoSmallerChunks: 'Intente dividir el archivo en partes más pequeñas.',
     type: 'Tipo',
     undefinedName: 'Nombre indefinido',
     unique: 'Único',
@@ -175,6 +182,8 @@ export default {
       message: `Error durante la carga del archivo: {{error}}.\n
 ¿Intentar de nuevo?`,
     },
+    uploadFileChangedError:
+      'El archivo seleccionado parece haber sido modificado desde que fue seleccionado. Por favor, selecciónelo de nuevo.',
     uploadingFile: 'Subiendo archivo ({{progressPercent}}%)',
     value: 'Valor',
     view: 'Ver',
@@ -230,6 +239,8 @@ export default {
     header: 'Archivos',
     missing: ' Archivos faltantes: {{count}}',
     totalSize: 'Tamaño total: {{size}}',
+    fileName: 'Nombre del archivo',
+    fileSize: 'Tamaño del archivo',
   },
   sidebar: {
     logout: 'Cerrar sesión',
@@ -263,6 +274,7 @@ export default {
   },
   appModules: {
     home: 'Inicio',
+    landing: 'Bienvenida',
     dashboard: 'Panel de control',
     surveyNew: 'Nueva encuesta',
     surveys: 'Encuestas',
@@ -296,6 +308,9 @@ export default {
     userInvite: 'Invitar usuario',
     userNew: 'Nuevo usuario',
     usersSurvey: 'Lista de usuarios',
+    userGroup: 'Grupo de usuarios',
+    userGroup_plural: 'Grupos de usuarios',
+    userGroupNew: 'Nuevo grupo de usuarios',
     usersList: 'Lista de usuarios (todos)',
     user2FADevice: 'Dispositivo 2FA',
     user2FADevice_plural: 'Dispositivos 2FA',
@@ -408,8 +423,10 @@ export default {
       lock: 'Bloquear edición del atributo clave',
       unlock: 'Permitir editar el atributo clave',
     },
-    lock: 'Bloquear',
-    unlock: 'Desbloquear',
+    qualifierAttributeEditing: {
+      lock: 'Bloquear edición del atributo calificador',
+      unlock: 'Permitir editar el atributo calificador',
+    },
   },
   dataExplorerView: {
     customAggregateFunction: {
@@ -535,7 +552,9 @@ export default {
     confirmInviteSystemAdmin: '¿Invitar al usuario {{email}} como Administrador del Sistema?',
     confirmInviteSystemAdmin_other: '¿Invitar a los usuarios {{email}} como Administradores del Sistema?',
     emailSentConfirmationWithSkippedEmails:
-      '$t(common.emailSentConfirmation)\n    \n    Se han omitido {{skppedEmailsCount}} direcciones (ya fueron invitadas a esta encuesta anteriormente): {{skippedEmails}}',
+      '$t(common.emailSentConfirmation)\n\n    $t(userInviteView.skippedEmailsNotice)',
+    skippedEmailsNotice:
+      'Se han omitido {{skppedEmailsCount}} direcciones (ya fueron invitadas a esta encuesta anteriormente): {{skippedEmails}}',
     groupPermissions: {
       label: 'Permisos',
       systemAdmin: '        <li>Derechos de acceso completos al sistema</li>',
@@ -608,6 +627,8 @@ export default {
       "Para implementar el método de ajuste por clases de ponderación, agregue 'design_psu' y 'design_ssu' a la tabla de categorías del estrato como propiedades numéricas adicionales.",
     pValue: 'Valor P',
     resultsBackFromRStudio: 'Resultados leídos de RStudio',
+    resultsBackFromRStudioInfo:
+      'Habilite esta opción si los atributos de resultado calculados en RStudio deben importarse de vuelta al servidor de Arena. Este proceso puede ser lento.',
     samplingDesign: 'Diseño de muestreo',
     samplingDesignDetails: 'Detalles del diseño de muestreo',
     samplingStrategyLabel: 'Estrategia de muestreo',
@@ -641,6 +662,17 @@ export default {
     deleteChain: 'Eliminar cadena',
     deleteConfirm: '¿Eliminar esta cadena de procesamiento?\n\n$t(common.cantUndoWarning)',
     deleteComplete: 'Cadena de procesamiento eliminada',
+    cloneFromAnotherSurvey: 'Clonar desde otro estudio',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Clonar cadena desde otro estudio',
+      sourceSurvey: 'Estudio de origen',
+      sourceChain: 'Cadena de origen',
+      entityCheck: 'Compatibilidad de entidades',
+      entityMissing: 'falta en el estudio destino',
+      noAnalysisAttributes: 'Esta cadena no tiene atributos de análisis',
+      cloneComplete: 'Cadena clonada correctamente',
+      missingEntities: 'No se puede clonar: las siguientes entidades no existen en el estudio destino: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles:
       'La definición de nodo "{{label}}" no se puede seleccionar porque no pertenece a todos los ciclos de la cadena de procesamiento',
     cannotSelectCycle:
@@ -816,6 +848,10 @@ $t(common.appNameFull)
       multiple: 'Múltiple',
       ownPage: 'Su propia página',
       parentPage: 'Página padre ({{parentPage}})',
+      qualifier: {
+        label: 'Calificador',
+        info: `Cuando un usuario que pertenece a un grupo crea un nuevo registro, este atributo se completará automáticamente con el valor especificado para él en los calificadores del grupo del usuario. Los usuarios solo podrán ver y modificar los registros que pertenezcan a su propio grupo, si pertenecen a uno.`,
+      },
       table: 'Tabla',
     },
     advancedProps: {
@@ -991,6 +1027,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       label: 'Único',
       info: 'Cuando un atributo está marcado como **Único**, su valor debe ser único dentro de la entidad múltiple más cercana (se mostrará un error en caso contrario). \n\n---\n\nEj.: en una estructura como *clúster -> parcela -> árbol*, si tiene un atributo *tree_species* marcado como **Único**, solo puede tener un árbol por especie dentro de la misma *parcela*.',
     },
+    categoriesClonedFromSurvey: 'Las siguientes categorías también se clonaron desde la encuesta de origen: {{names}}',
+    taxonomiesClonedFromSurvey: 'Las siguientes taxonomías también se clonaron desde la encuesta de origen: {{names}}',
   },
   languagesEditor: {
     languages: 'Idioma(s)',
@@ -999,6 +1037,16 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     header: 'Taxonomía',
     cantBeDeleted: "$t(common.cantBeDeletedUsedItem, {'item': 'taxonomía'})",
     confirmDelete: '¿Eliminar la taxonomía {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clonar taxonomía de otra encuesta',
+      sourceSurvey: 'Encuesta de origen',
+      sourceTaxonomy: 'Taxonomía de origen',
+      loadingSurveys: 'Cargando encuestas...',
+      noSurveysAvailable: 'No hay encuestas disponibles',
+      selectSurveyFirst: 'Seleccione primero una encuesta',
+      loadingTaxonomies: 'Cargando taxonomías...',
+      noTaxonomiesAvailable: 'No hay taxonomías disponibles en la encuesta seleccionada',
+    },
     edit: {
       taxonomyListName: 'Nombre de la lista de taxonomía',
       taxaNotImported: 'Taxones no importados',
@@ -1007,6 +1055,9 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Sinónimo / Latín',
       extraPropsNotDefined: 'Propiedades extra no definidas para esta taxonomía',
+      importMissingPublishedTaxa:
+        '{{count}} taxón/taxa publicado/s no encontrado/s en el archivo importado y dejado/s sin cambios. Códigos: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} más)',
     },
     taxaCount: 'Recuento de taxones',
     vernacularNameLabel: 'Etiqueta de nombre vernáculo',
@@ -1015,6 +1066,16 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     batchImport: 'Importar categorías en lote (desde ZIP)',
     batchImportCompleteSuccessfully:
       '¡{{importedCategories}} categorías importadas correctamente!\n{{insertedCategories}} nuevas\n{{updatedCategories}} actualizadas',
+    cloneFromAnotherSurvey: {
+      title: 'Clonar categoría de otra encuesta',
+      sourceSurvey: 'Encuesta de origen',
+      sourceCategory: 'Categoría de origen',
+      loadingSurveys: 'Cargando encuestas...',
+      noSurveysAvailable: 'No hay encuestas disponibles',
+      selectSurveyFirst: 'Seleccione primero una encuesta',
+      loadingCategories: 'Cargando categorías...',
+      noCategoriesAvailable: 'No hay categorías disponibles en la encuesta seleccionada',
+    },
     itemsCount: 'Recuento de elementos',
     types: {
       flat: 'Plana',

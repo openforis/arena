@@ -108,6 +108,8 @@ export default {
 Вы хотите продолжить?`,
     local: 'Локально',
     loading: 'Загрузка...',
+    lock: 'Заблокировать',
+    unlock: 'Разблокировать',
     max: 'Максимум',
     med: 'Медиана',
     manage: 'Управление',
@@ -175,6 +177,10 @@ export default {
     showLabels: 'Показать метки',
     showLabelsAndNames: 'Показать метки и имена',
     showNames: 'Показать имена',
+    sort: 'Сортировка',
+    sortAsc: 'Сортировать по возрастанию',
+    sortDesc: 'Сортировать по убыванию',
+    sortNone: 'Убрать сортировку',
     srs: 'SRS',
     status: 'Статус',
     sum: 'Сумма',
@@ -182,6 +188,7 @@ export default {
     to: 'Кому',
     totalItems: 'Всего элементов',
     true: 'Истина',
+    trySplittingFileIntoSmallerChunks: 'Попробуйте разбить файл на меньшие части.',
     type: 'Тип',
     undefinedName: 'Неопределенное имя',
     unique: 'Уникальный',
@@ -190,6 +197,7 @@ export default {
       message: `Ошибка при загрузке файла: {{error}}.\n
 Попробовать снова?`,
     },
+    uploadFileChangedError: 'Похоже, что выбранный файл был изменен после выбора. Пожалуйста, выберите его снова.',
     uploadingFile: 'Загрузка файла ({{progressPercent}}%)',
     value: 'Значение',
     view: 'Просмотр',
@@ -250,6 +258,8 @@ export default {
     header: 'Файлы',
     missing: ' Отсутствующие файлы: {{count}}',
     totalSize: 'Общий размер: {{size}}',
+    fileName: 'Имя файла',
+    fileSize: 'Размер файла',
   },
 
   sidebar: {
@@ -289,6 +299,7 @@ export default {
 
   appModules: {
     home: 'Главная',
+    landing: 'Приветствие',
     dashboard: 'Панель управления',
     surveyNew: 'Новый опрос',
     surveys: 'Опросы',
@@ -325,6 +336,9 @@ export default {
     userInvite: 'Пригласить пользователя',
     userNew: 'Новый пользователь',
     usersSurvey: 'Список пользователей',
+    userGroup: 'Группа пользователей',
+    userGroup_plural: 'Группы пользователей',
+    userGroupNew: 'Новая группа пользователей',
     usersList: 'Список пользователей (все)',
     user2FADevice: 'Устройство 2FA',
     user2FADevice_plural: 'Устройства 2FA',
@@ -454,8 +468,10 @@ $t(common.raiseTicketInSupportForum)
       lock: 'Заблокировать редактирование ключевого атрибута',
       unlock: 'Разрешить редактирование ключевого атрибута',
     },
-    lock: 'Заблокировать',
-    unlock: 'Разблокировать',
+    qualifierAttributeEditing: {
+      lock: 'Заблокировать редактирование атрибута-квалификатора',
+      unlock: 'Разрешить редактирование атрибута-квалификатора',
+    },
   },
 
   dataExplorerView: {
@@ -591,8 +607,9 @@ $t(common.raiseTicketInSupportForum)
     confirmInviteSystemAdmin: 'Пригласить пользователя {{email}} в качестве системного администратора?',
     confirmInviteSystemAdmin_other: 'Пригласить пользователей {{email}} в качестве системных администраторов?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} адресов были пропущены (они уже были приглашены в этот опрос ранее): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} адресов были пропущены (они уже были приглашены в этот опрос ранее): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Разрешения',
       systemAdmin: `
@@ -718,6 +735,8 @@ $t(common.raiseTicketInSupportForum)
     nonResponseBiasCorrectionInfo: `Чтобы реализовать метод корректировки по весовым классам, добавьте 'design_psu' и 'design_ssu' в таблицу категорий страты как дополнительные числовые свойства.`,
     pValue: 'P-значение',
     resultsBackFromRStudio: 'Результаты получены из RStudio',
+    resultsBackFromRStudioInfo: `Включите эту опцию, если атрибуты результатов, вычисленные в RStudio, должны быть импортированы обратно на сервер Arena.
+Этот процесс может быть медленным.`,
     samplingDesign: 'Дизайн выборки',
     samplingDesignDetails: 'Детали дизайна выборки',
     samplingStrategyLabel: 'Стратегия выборки',
@@ -753,6 +772,17 @@ $t(common.raiseTicketInSupportForum)
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Цепочка обработки удалена',
+    cloneFromAnotherSurvey: 'Клонировать из другого опроса',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Клонировать цепочку из другого опроса',
+      sourceSurvey: 'Исходный опрос',
+      sourceChain: 'Исходная цепочка',
+      entityCheck: 'Совместимость сущностей',
+      entityMissing: 'отсутствует в целевом опросе',
+      noAnalysisAttributes: 'Эта цепочка не имеет атрибутов анализа',
+      cloneComplete: 'Цепочка успешно клонирована',
+      missingEntities: 'Невозможно клонировать: следующие сущности не существуют в целевом опросе: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `Определение узла "{{label}}" не может быть выбрано, поскольку оно не принадлежит всем циклам цепочки обработки`,
     cannotSelectCycle: 'Этот цикл не может быть выбран, так как некоторые определения узлов не принадлежат этому циклу',
     copyRStudioCode: `#### Вы собираетесь открыть RStudio Server ####
@@ -941,6 +971,10 @@ $t(common.appNameFull)
       multiple: 'Множественный',
       ownPage: 'Собственная страница',
       parentPage: 'Родительская страница ({{parentPage}})',
+      qualifier: {
+        label: 'Квалификатор',
+        info: `Когда пользователь, принадлежащий к группе, создаёт новую запись, этот атрибут будет автоматически заполнен значением, указанным для него в квалификаторах группы пользователя. Пользователи смогут видеть и изменять только записи, принадлежащие их собственной группе, если они входят в какую-либо группу.`,
+      },
       table: 'Таблица',
     },
     advancedProps: {
@@ -1120,6 +1154,8 @@ $t(common.appNameFull)
 
 Например, в структуре *кластер -> участок -> дерево*, если у вас есть атрибут *tree_species*, помеченный как **Уникальный**, вы можете иметь только одно дерево каждого вида внутри одного и того же *участка*.`,
     },
+    categoriesClonedFromSurvey: 'Следующие категории также были клонированы из исходного опроса: {{names}}',
+    taxonomiesClonedFromSurvey: 'Следующие таксономии также были клонированы из исходного опроса: {{names}}',
   },
 
   languagesEditor: {
@@ -1130,6 +1166,16 @@ $t(common.appNameFull)
     header: 'Таксономия',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Удалить таксономию {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Клонировать таксономию из другого опроса',
+      sourceSurvey: 'Исходный опрос',
+      sourceTaxonomy: 'Исходная таксономия',
+      loadingSurveys: 'Загрузка опросов...',
+      noSurveysAvailable: 'Нет доступных опросов',
+      selectSurveyFirst: 'Сначала выберите опрос',
+      loadingTaxonomies: 'Загрузка таксономий...',
+      noTaxonomiesAvailable: 'В выбранном опросе нет доступных таксономий',
+    },
     edit: {
       taxonomyListName: 'Название списка таксономии',
       taxaNotImported: 'Таксоны не импортированы',
@@ -1138,6 +1184,9 @@ $t(common.appNameFull)
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Синоним / Латинское название',
       extraPropsNotDefined: 'Дополнительные свойства не определены для этой таксономии',
+      importMissingPublishedTaxa:
+        '{{count}} опубликованный таксон/таксона не найден(ы) в импортируемом файле и оставлен(ы) без изменений. Коды: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (ещё {{extra}})',
     },
     taxaCount: 'Количество таксонов',
     vernacularNameLabel: 'Метка местного названия',
@@ -1148,6 +1197,16 @@ $t(common.appNameFull)
     batchImportCompleteSuccessfully: `{{importedCategories}} категорий успешно импортировано!
 {{insertedCategories}} новых
 {{updatedCategories}} обновленных`,
+    cloneFromAnotherSurvey: {
+      title: 'Клонировать категорию из другого опроса',
+      sourceSurvey: 'Исходный опрос',
+      sourceCategory: 'Исходная категория',
+      loadingSurveys: 'Загрузка опросов...',
+      noSurveysAvailable: 'Нет доступных опросов',
+      selectSurveyFirst: 'Сначала выберите опрос',
+      loadingCategories: 'Загрузка категорий...',
+      noCategoriesAvailable: 'В выбранном опросе нет доступных категорий',
+    },
     itemsCount: 'Количество элементов',
     types: {
       flat: 'Плоская',

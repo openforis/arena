@@ -26,6 +26,25 @@ export default {
     '### Pasos de importación\n1. Seleccione la entidad de destino\n2. Descargue una plantilla\n3. Rellene la plantilla y guárdela (si es CSV, use UTF-8 como codificación)\n4. Verifique las opciones\n5. Suba el archivo CSV/Excel\n6. Valide el archivo\n7. Inicie la importación\n',
   importIntoCycle: 'Importar al ciclo',
   importIntoMultipleEntityOrAttribute: 'Importar a entidad o atributo múltiple',
+  importPreview: {
+    title: 'Vista previa de la importación',
+    generatePreview: 'Generar vista previa',
+    skipInfo:
+      'Los registros marcados como "Omitir" no se pueden seleccionar: ya existe un registro existente modificado más recientemente, por lo que no se importarán.',
+    confirmImport: 'Importar registros seleccionados ({{count}})',
+    columns: {
+      exists: 'Existe',
+      action: 'Acción',
+      dateModified: 'Registro importado modificado',
+      existingDateModified: 'Registro existente modificado',
+    },
+    action: {
+      insert: 'Insertar',
+      overwrite: 'Sobrescribir',
+      merge: 'Fusionar',
+      skip: 'Omitir',
+    },
+  },
   importType: {
     label: 'Tipo de importación',
     insertNewRecords: 'Insertar nuevos registros',
@@ -55,6 +74,7 @@ export default {
       importWithFilesCompleteSuccessfully:
         '$t(dataImportView:jobs.DataImportJob.importCompleteSuccessfully)\n        - {{insertedFiles}} archivos insertados\n        - {{updatedFiles}} archivos actualizados\n        - {{deletedFiles}} archivos eliminados',
       importCompleteWithErrors: '## Importación completada (con errores):\n        - {{processed}} filas procesadas',
+      tooLong: 'Esta importación está tardando bastante. $t(common.trySplittingFileIntoSmallerChunks)',
     },
     DataImportValidationJob: {
       validationCompleteWithErrors:
@@ -65,6 +85,7 @@ export default {
         '## Validación completada sin errores\n        - {{processed}} filas procesadas\n        - {{insertedRecords}} registros se crearían\n        - {{updatedRecords}} registros se actualizarían\n        - {{entitiesCreated}} entidades se crearían\n        - {{entitiesDeleted}} entidades se eliminarían\n        - {{updatedValues}} valores se actualizarían',
       validationWithFilesCompleteSuccessfully:
         '$t(dataImportView:jobs.DataImportValidationJob.validationCompleteSuccessfully)\n        - {{insertedFiles}} archivos se insertarían\n        - {{updatedFiles}} archivos se actualizarían\n        - {{deletedFiles}} archivos se eliminarían',
+      tooLong: 'Esta validación está tardando bastante. $t(common.trySplittingFileIntoSmallerChunks)',
     },
   },
   options: {
@@ -73,6 +94,7 @@ export default {
     preventAddingNewEntityData: 'Prevenir la adición de nuevos datos de entidad',
     preventUpdatingRecordsInAnalysis: 'Prevenir la actualización de registros en el paso de análisis',
     includeFiles: 'Incluir archivos',
+    skipMissingFiles: 'Ignorar archivos faltantes',
     deleteExistingEntities: 'Eliminar los datos de la entidad seleccionada en todos los registros',
   },
   optionsInfo: {

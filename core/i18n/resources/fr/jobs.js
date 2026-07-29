@@ -1,6 +1,7 @@
 export default {
   ActivityLogImportJob: "Importation du journal d'activité",
-  ArenaMobileDataImportJob: 'Importation de données Arena Mobile',
+  ArenaMobileDataImportJob: 'Importation de données Arena',
+  ArenaMobileDataImportSummaryJob: "Résumé de l'importation de données Arena",
   CategoriesImportJob: 'Importation des catégories',
   CategoriesValidationJob: 'Validation des catégories',
   CategoriesBatchImportJob: 'Importation des catégories',
@@ -83,4 +84,6 @@ export default {
   RecordsValidationJob: `Validation des enregistrements`,
   // analyse
   PersistResultsJob: "Persistance des résultats d'analyse",
+  elapsed: 'Écoulé',
+  remaining: 'Restant',
 }

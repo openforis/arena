@@ -51,6 +51,8 @@ export default {
     invalidParentItemOrder: 'Элемент с кодами {{parentItemCodes}} должен стоять перед своими дочерними элементами',
     nameDuplicate: 'Категория с таким именем уже существует: {{name}}',
     srsNotDefined: 'SRS с кодом {{srs}} не определено в опросе',
+    uuidDuplicate:
+      'Эта категория уже была клонирована в этот опрос (в настоящее время называется "{{name}}"). Её нельзя клонировать снова.',
   },
 
   dataImport: {
@@ -129,6 +131,11 @@ export default {
     countMaxInvalid: 'Неверное "Максимальное количество"',
     countMinInvalid: 'Неверное "Минимальное количество"',
     readOnlyCannotHaveEditableIf: 'Узел только для чтения не может иметь условие "Editable if"',
+    qualifierCannotHaveApplicableExpression:
+      'Атрибут-квалификатор не может иметь условие "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    qualifierCannotHaveEditabilityRule: 'Атрибут-квалификатор не может иметь правил редактируемости',
+    qualifierCannotHaveDefaultValues: 'Атрибут-квалификатор не может иметь значения по умолчанию',
+    qualifierCannotHaveValidations: 'Атрибут-квалификатор не может иметь правил проверки',
   },
 
   record: {
@@ -167,6 +174,13 @@ export default {
     labelsRequired: 'Требуется хотя бы одна метка',
   },
 
+  surveyDocImage: {
+    documentPlaceRequired: 'Место в документе обязательно',
+    fileRequired: 'Файл обязателен',
+    fileNameDuplicate: 'Другой файл с таким же именем уже существует',
+    labelsRequired: 'Требуется хотя бы одна метка',
+  },
+
   surveyLabelsImport: {
     invalidHeaders: 'Неверные столбцы: {{invalidHeaders}}',
     cannotFindNodeDef: "Невозможно найти определение атрибута или сущности с именем '{{name}}'",
@@ -182,6 +196,12 @@ export default {
     scientificNameRequired: 'Научное название обязательно',
     taxaEmpty: 'Пустые таксоны',
     vernacularNamesDuplicate: `Дублирующее местное название '{{name}}' для языка '{{lang}}'`,
+  },
+
+  taxonomyImport: {
+    nameDuplicate: 'Таксономия с таким именем уже существует: {{name}}',
+    uuidDuplicate:
+      'Эта таксономия уже была клонирована в этот опрос (в настоящее время называется "{{name}}"). Её нельзя клонировать снова.',
   },
 
   taxonomyImportJob: {

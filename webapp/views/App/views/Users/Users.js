@@ -19,6 +19,8 @@ import UserEdit from './UserEdit'
 import { UsersAccessRequest } from './UsersAccessRequest'
 import UserPasswordChange from './UserPasswordChange'
 import User2FADevice from './User2FADevice'
+import UserGroupsEditor from '../UserGroups'
+import UserGroupEdit from '../UserGroups/UserGroupEdit'
 
 const Users = () => {
   const user = useUser()
@@ -53,6 +55,22 @@ const Users = () => {
           path: userModules.userInvite.path,
         }
       )
+      if (Authorizer.canManageUserGroups(user, surveyInfo)) {
+        _modules.push(
+          {
+            component: UserGroupsEditor,
+            path: userModules.userGroups.path,
+          },
+          {
+            component: UserGroupEdit,
+            path: userModules.userGroupNew.path,
+          },
+          {
+            component: UserGroupEdit,
+            path: `${userModules.userGroup.path}/:groupUuid`,
+          }
+        )
+      }
     }
     if (ProcessUtils.ENV.allowUserAccessRequest && Authorizer.canViewUsersAccessRequests(user)) {
       _modules.push({

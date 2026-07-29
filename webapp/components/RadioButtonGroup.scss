@@ -1,0 +1,10 @@
+@use '~@webapp/style/vars' as *;
+
+.tooltip-error {
+  .radio-button-group {
+    .MuiRadio-root,
+    .MuiFormControlLabel-label {
+      color: $red;
+    }
+  }
+}

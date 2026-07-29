@@ -1,3 +1,6 @@
+import { ServiceRegistry } from '@openforis/arena-core'
+import { ServerServiceType } from '@openforis/arena-server'
+
 import * as A from '@core/arena'
 import { FileFormats } from '@core/fileFormats'
 
@@ -5,6 +8,7 @@ import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
+import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
@@ -36,7 +40,7 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const serverUrl = Request.getServerUrl(req)
       try {
-        const { skippedEmails } = await UserService.inviteUsers({
+        const { skippedEmails, invalidEmails } = await UserService.inviteUsers({
           user,
           surveyId,
           surveyCycleKey,
@@ -44,7 +48,7 @@ export const init = (app) => {
           serverUrl,
           repeatInvitation,
         })
-        res.json({ skippedEmails })
+        res.json({ skippedEmails, invalidEmails })
       } catch (e) {
         const errorKey = e.key || 'appErrors:generic'
         const errorParams = e.params || { text: e.message }
@@ -119,6 +123,25 @@ export const init = (app) => {
       next(error)
     }
   })
+
+  app.get(
+    '/survey/:surveyId/current-user-group',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const survey = await SurveyManager.fetchSurveyById({ surveyId })
+        const surveyUuid = Survey.getUuid(survey)
+        const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
+        const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
+        const userGroup = userGroups[0]
+        res.json({ user, userGroup })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   app.get('/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {

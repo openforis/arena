@@ -26,7 +26,7 @@ export const createSurvey = (surveyToAdd) => {
 
       // close the job dialog and wait fot the navigation to the survey dashboard
       await Promise.all([
-        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
+        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
         page.click(TestId.modal.close),
       ])
     } else {
@@ -34,7 +34,7 @@ export const createSurvey = (surveyToAdd) => {
 
       // press "Create survey" and wait for the navigation to the survey dashboard
       await Promise.all([
-        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
+        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
         page.click(getSelector(TestId.surveyCreate.submitBtn, 'button')),
       ])
     }
