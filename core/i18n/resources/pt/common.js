@@ -627,8 +627,9 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     confirmInviteSystemAdmin: 'Convidar o usuário {{email}} como Administrador do Sistema?',
     confirmInviteSystemAdmin_other: 'Convidar os usuários {{email}} como Administradores do Sistema?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Permissões',
       systemAdmin: `

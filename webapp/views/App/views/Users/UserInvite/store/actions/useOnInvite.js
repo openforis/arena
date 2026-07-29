@@ -13,36 +13,52 @@ import * as Validation from '@core/validation/validation'
 import * as UserInvite from '@core/user/userGroupInvitation'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
+import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { DialogConfirmActions, LoaderActions, NotificationActions, NotificationState } from '@webapp/store/ui'
 import { useUser } from '@webapp/store/user'
 
 import { validateUserInvite } from './validate'
 
-const _showInvitationSuccessfulMessage = ({ dispatch, userInvite, skippedEmails }) => {
+// builds one notification message out of the same text blocks used elsewhere (invited/skipped/invalid),
+// so the user only ever sees a single notification for the outcome of an invite, however many addresses it covers
+const _notifyInvitationResult = ({ dispatch, i18n, invitedEmails, skippedEmails, invalidEmails }) => {
   const hasSkippedEmails = !Objects.isEmpty(skippedEmails)
-  const severity = hasSkippedEmails ? NotificationState.severityType.warning : NotificationState.severityType.info
-  const emails = UserInvite.getEmails(userInvite)
-  const invitedEmails = emails.filter((email) => !skippedEmails.includes(email))
-  const infoMessageKey = hasSkippedEmails
-    ? 'userInviteView.emailSentConfirmationWithSkippedEmails'
-    : 'common.emailSentConfirmation'
-  dispatch(
-    NotificationActions.showNotification({
-      key: infoMessageKey,
-      params: {
-        email: invitedEmails.join(', '),
+  const hasInvalidEmails = !Objects.isEmpty(invalidEmails)
+  const hasIssues = hasSkippedEmails || hasInvalidEmails
+
+  const messageParts = []
+  if (invitedEmails.length > 0) {
+    messageParts.push(i18n.t('common.emailSentConfirmation', { email: invitedEmails.join(', ') }))
+  }
+  if (hasSkippedEmails) {
+    messageParts.push(
+      i18n.t('userInviteView.skippedEmailsNotice', {
         skppedEmailsCount: skippedEmails.length,
         skippedEmails: skippedEmails.join(', '),
-      },
-      severity,
-      timeout: hasSkippedEmails ? 0 : 10000,
+      })
+    )
+  }
+  if (hasInvalidEmails) {
+    messageParts.push(
+      i18n.t('userInviteView.invalidEmailsWarning', {
+        count: invalidEmails.length,
+        emails: invalidEmails.join(', '),
+      })
+    )
+  }
+
+  dispatch(
+    NotificationActions.showNotification({
+      text: messageParts.join('\n\n'),
+      severity: hasIssues ? NotificationState.severityType.warning : NotificationState.severityType.info,
+      timeout: hasIssues ? 0 : 10000,
     })
   )
 }
 
 const _performInvite =
-  ({ dispatch, navigate, setUserInvite, surveyId, surveyCycleKey, userInvite, repeatInvitation }) =>
+  ({ dispatch, i18n, navigate, setUserInvite, surveyId, surveyCycleKey, userInvite, repeatInvitation }) =>
   async () => {
     try {
       dispatch(LoaderActions.showLoader())
@@ -66,9 +82,8 @@ const _performInvite =
           NotificationActions.notifyError({ key: 'appErrors:userHasRole', params: { count: skippedEmails.length } })
         )
       } else {
-        if (invitedEmails.length > 0 || skippedEmails.length > 0) {
-          _showInvitationSuccessfulMessage({ dispatch, userInvite, skippedEmails })
-        }
+        _notifyInvitationResult({ dispatch, i18n, invitedEmails, skippedEmails, invalidEmails })
+
         if (invalidEmails.length > 0) {
           // keep only the invalid addresses in the form, so the user can fix or remove them and retry
           const userInviteWithInvalidEmailsOnly = UserInvite.assocProp(
@@ -76,13 +91,6 @@ const _performInvite =
             invalidEmails
           )(userInvite)
           setUserInvite(await validateUserInvite(userInviteWithInvalidEmailsOnly))
-          dispatch(
-            NotificationActions.notifyWarning({
-              key: 'userInviteView.invalidEmailsWarning',
-              params: { emails: invalidEmails.join(', '), count: invalidEmails.length },
-              timeout: 0,
-            })
-          )
         } else {
           navigate(appModuleUri(userModules.usersSurvey))
         }
@@ -94,6 +102,7 @@ const _performInvite =
 
 export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = false }) => {
   const dispatch = useDispatch()
+  const i18n = useI18n()
   const navigate = useNavigate()
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
@@ -111,6 +120,7 @@ export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = fals
 
       const invite = _performInvite({
         dispatch,
+        i18n,
         navigate,
         setUserInvite,
         surveyId,
@@ -136,5 +146,5 @@ export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = fals
       setUserInvite(userInviteValidated)
       dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
     }
-  }, [dispatch, groups, navigate, repeatInvitation, setUserInvite, surveyCycleKey, surveyId, userInvite])
+  }, [dispatch, groups, i18n, navigate, repeatInvitation, setUserInvite, surveyCycleKey, surveyId, userInvite])
 }
