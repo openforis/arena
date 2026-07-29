@@ -8,9 +8,23 @@ import { SurveyState } from '@webapp/store/survey'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
 import * as RecordState from '../state'
 
+type EntityCompletionParams = {
+  survey: ReturnType<typeof SurveyState.getSurvey>
+  record: NonNullable<ReturnType<typeof RecordState.getRecord>>
+  entity: ReturnType<ReturnType<typeof Record.getNodeByUuid>>
+}
+
+type GetEntityCompletionPercent = (params: EntityCompletionParams) => number
+
+const getEntityCompletionPercent = (): GetEntityCompletionPercent | undefined => {
+  const fn = (Records as Record<string, unknown>).getEntityCompletionPercent
+  return typeof fn === 'function' ? (fn as GetEntityCompletionPercent) : undefined
+}
+
 /**
  * Returns the completion percentage of a page entity identified by its node
- * def UUID, or null when the page entity is not yet present in the record.
+ * def UUID, or null when the page entity is not yet present in the record or
+ * the arena-core completion API is unavailable.
  *
  * @param pageNodeDefUuid - UUID of the page-entity node definition
  * @returns {number | null} Completion percentage in [0, 100], or null if unavailable
@@ -20,6 +34,9 @@ export const useRecordPageCompletionPercent = (pageNodeDefUuid: string): number 
     const record = RecordState.getRecord(state)
     if (!record) return null
 
+    const getCompletionPercent = getEntityCompletionPercent()
+    if (!getCompletionPercent) return null
+
     const pagesUuidMap = SurveyFormState.getPagesUuidMap(state)
     const pageNodeUuid = pagesUuidMap?.[pageNodeDefUuid]
     if (!pageNodeUuid) return null
@@ -28,6 +45,6 @@ export const useRecordPageCompletionPercent = (pageNodeDefUuid: string): number 
     if (!entity) return null
 
     const survey = SurveyState.getSurvey(state)
-    return Records.getEntityCompletionPercent({ survey, record, entity })
+    return getCompletionPercent({ survey, record, entity })
   })
 }
