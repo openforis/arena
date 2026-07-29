@@ -37,6 +37,8 @@ const computeMaxItems = (containerWidth: number, itemCount: number): number => {
  * App-level breadcrumb navigation bar.
  * Uses MUI Breadcrumbs with a ResizeObserver-driven maxItems so crumbs
  * never overflow their container regardless of label length or screen size.
+ *
+ * @returns {React.ReactElement} The rendered breadcrumb bar.
  */
 export const Breadcrumbs = () => {
   const location = useLocation()
@@ -49,20 +51,18 @@ export const Breadcrumbs = () => {
   const pathParts = pathname.split('/')
   const validPathParts = pathParts.filter((part) => part && part !== AppModules.app)
 
-  const crumbs: CrumbItem[] = validPathParts
-    .filter((part, idx) => {
-      const mod = AppModules.getModuleByPathPart({ levelIndex: idx, pathPart: part })
-      return Boolean(mod && mod.key !== homeModules.landing.key)
+  const crumbs: CrumbItem[] = validPathParts.reduce<CrumbItem[]>((acc, part, idx) => {
+    const mod = AppModules.getModuleByPathPart({ levelIndex: idx, pathPart: part })
+    if (!mod || mod.key === homeModules.landing.key) return acc
+    acc.push({
+      key: mod.key,
+      label: i18n.t(`appModules.${mod.key}`),
+      uri: AppModules.appModuleUri(mod),
+      isLast: false,
     })
-    .map((part, idx, arr) => {
-      const mod = AppModules.getModuleByPathPart({ levelIndex: idx, pathPart: part })
-      return {
-        key: mod!.key,
-        label: i18n.t(`appModules.${mod!.key}`),
-        uri: AppModules.appModuleUri(mod!),
-        isLast: idx === arr.length - 1,
-      }
-    })
+    return acc
+  }, [])
+  if (crumbs.length > 0) crumbs[crumbs.length - 1].isLast = true
 
   const updateMaxItems = useCallback(() => {
     if (containerRef.current) {
