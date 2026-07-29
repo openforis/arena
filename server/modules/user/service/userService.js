@@ -131,11 +131,17 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
     const country = countryCode ? Countries.getCountryName({ code: countryCode }) : ''
 
     // send a confirmation email to the requester first, to verify that the given email address can be reached
-    const { rejected } = await Mailer.sendEmail({
-      to: email,
-      msgKey: 'emails:userAccessRequestConfirmation',
-      msgParams: { firstName, serverUrl, supportEmail: ProcessUtils.ENV.supportEmail },
-    })
+    let rejected = []
+    try {
+      ;({ rejected } = await Mailer.sendEmail({
+        to: email,
+        msgKey: 'emails:userAccessRequestConfirmation',
+        msgParams: { firstName, serverUrl, supportEmail: ProcessUtils.ENV.supportEmail },
+      }))
+    } catch (error) {
+      // sending failed outright (transport error, provider rejection, etc.): treat like a rejected recipient
+      rejected = [email]
+    }
     if (rejected.length > 0) {
       await UserManager.deleteUserAccessRequestsByEmail({ emails: [email] })
       return { error: 'validationErrors:userAccessRequest.emailNotReachable', errorParams: { email } }
