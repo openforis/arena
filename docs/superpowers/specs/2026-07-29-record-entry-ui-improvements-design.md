@@ -82,8 +82,7 @@ The sidebar (`.survey-form__sidebar`) keeps its default white background. The vi
 </Breadcrumbs>
 ```
 
-- `maxItems={3}` — when there are more than 3 crumbs, MUI renders a `…` expander in the middle.
-- `itemsBeforeCollapse={1}` / `itemsAfterCollapse={1}` — always show first and last crumb, collapse the rest.
+- `maxItems` is **not hardcoded**. Instead, `itemsBeforeCollapse={1}` and `itemsAfterCollapse={1}` are fixed (always show root and current), and `maxItems` is derived dynamically: the component measures the available container width and the rendered label widths, then computes the maximum number of items that fit. On first render all items are shown; if overflow is detected, `maxItems` is reduced until the breadcrumb fits. This is implemented with a `ResizeObserver` on the container ref.
 - The MUI `Link` wraps React Router's `Link` via the `component` prop (standard MUI pattern).
 - The `aria-disabled` behaviour when `surveyIsDirty` is preserved by conditionally rendering a `<Typography>` instead of `<MuiLink>` for non-last items.
 - `Breadcrumbs.scss` is deleted if no overrides remain after the conversion; otherwise it retains only height/alignment rules that cannot be expressed in `sx`.
