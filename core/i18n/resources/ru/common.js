@@ -607,8 +607,9 @@ $t(common.raiseTicketInSupportForum)
     confirmInviteSystemAdmin: 'Пригласить пользователя {{email}} в качестве системного администратора?',
     confirmInviteSystemAdmin_other: 'Пригласить пользователей {{email}} в качестве системных администраторов?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} адресов были пропущены (они уже были приглашены в этот опрос ранее): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} адресов были пропущены (они уже были приглашены в этот опрос ранее): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Разрешения',
       systemAdmin: `

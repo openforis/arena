@@ -552,7 +552,9 @@ export default {
     confirmInviteSystemAdmin: '¿Invitar al usuario {{email}} como Administrador del Sistema?',
     confirmInviteSystemAdmin_other: '¿Invitar a los usuarios {{email}} como Administradores del Sistema?',
     emailSentConfirmationWithSkippedEmails:
-      '$t(common.emailSentConfirmation)\n    \n    Se han omitido {{skppedEmailsCount}} direcciones (ya fueron invitadas a esta encuesta anteriormente): {{skippedEmails}}',
+      '$t(common.emailSentConfirmation)\n\n    $t(userInviteView.skippedEmailsNotice)',
+    skippedEmailsNotice:
+      'Se han omitido {{skppedEmailsCount}} direcciones (ya fueron invitadas a esta encuesta anteriormente): {{skippedEmails}}',
     groupPermissions: {
       label: 'Permisos',
       systemAdmin: '        <li>Derechos de acceso completos al sistema</li>',

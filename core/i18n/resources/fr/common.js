@@ -630,8 +630,9 @@ Merci et profitez de **$t(common.appNameFull)** !`,
     confirmInviteSystemAdmin: "Inviter l'utilisateur {{email}} en tant qu'Administrateur système ?",
     confirmInviteSystemAdmin_other: "Inviter les utilisateurs {{email}} en tant qu'Administrateurs système ?",
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} adresses ont été ignorées (elles ont déjà été invitées à ce formulaire précédemment) : {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} adresses ont été ignorées (elles ont déjà été invitées à ce formulaire précédemment) : {{skippedEmails}}`,
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `
