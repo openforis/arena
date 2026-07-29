@@ -5,6 +5,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: $formHeaderHeight;
   height: $formHeaderHeight;
 }
 
@@ -12,13 +13,19 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .survey-form-header__path {
   margin-left: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  overflow-x: auto;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .survey-form-header__actions {
