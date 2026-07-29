@@ -37,7 +37,7 @@ export const logTransportOptionsType = () => (ProcessUtils.ENV.emailTransportOpt
 export const sendEmail = async ({ to, from, subject, html, text = null }) => {
   const transporter = nodemailer.createTransport(getTransportOptions())
 
-  await transporter.sendMail({
+  const info = await transporter.sendMail({
     from,
     to,
     replyTo: from,
@@ -45,4 +45,5 @@ export const sendEmail = async ({ to, from, subject, html, text = null }) => {
     html,
     text,
   })
+  return { accepted: info.accepted, rejected: info.rejected }
 }
