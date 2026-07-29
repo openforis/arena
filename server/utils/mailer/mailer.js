@@ -15,7 +15,7 @@ const emailServices = {
 }
 
 const emailService = ProcessUtils.ENV.emailService
-const from = ProcessUtils.ENV.emailFrom || ProcessUtils.ENV.adminEmail || ProcessUtils.ENV.emailAuthUser
+const from = ProcessUtils.ENV.emailFromResolved
 
 const emailProviders = {
   [emailServices.sendgrid]: MailerSendgrid,
@@ -51,10 +51,11 @@ export const sendCustomEmail = async ({ to, subject, html, log = true }) => {
     logger.debug(`sending ${logMessageCommonPart}`)
   }
   try {
-    await emailProvider.sendEmail({ to, from, subject, html })
+    const result = await emailProvider.sendEmail({ to, from, subject, html })
     if (log) {
       logger.debug(`sent ${logMessageCommonPart}`)
     }
+    return result ?? { accepted: Array.isArray(to) ? to : [to], rejected: [] }
   } catch (error) {
     logger.error(`error sending ${logMessageCommonPart}: ${error.message}`)
     throw error

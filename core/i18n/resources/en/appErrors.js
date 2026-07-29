@@ -80,6 +80,8 @@ Try to refresh the page.`,
   aiChatbotDisabled: 'The documentation chatbot is disabled on this deployment.',
   aiChatbotUpstreamError: 'The documentation chatbot is temporarily unavailable. Please try again in a moment.',
   aiChatbotPayloadTooLarge: 'Your conversation is too large. Clear the chat and try a shorter question.',
+  userEmailInvalid:
+    'The invitation email could not be delivered to {{email}}; please check that the address is correct',
   userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
   userHasRole: 'The given user has already a role in this survey',
   userHasRole_other: 'The given users have already a role in this survey',

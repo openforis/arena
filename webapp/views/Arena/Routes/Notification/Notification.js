@@ -8,7 +8,7 @@ import { NotificationActions, useNotification } from '@webapp/store/ui'
 const Notification = () => {
   const dispatch = useDispatch()
   const t = useI18nT({ unescapeHtml: true })
-  const { messageParams, messageKey, severity, visible } = useNotification()
+  const { messageParams, messageKey, messageText, severity, visible } = useNotification()
 
   return (
     <CSSTransition in={visible} timeout={250} unmountOnExit>
@@ -21,7 +21,7 @@ const Notification = () => {
           <span className="icon icon-cross icon-8px" />
         </button>
 
-        <div className="notification-content">{t(messageKey, messageParams)}</div>
+        <div className="notification-content">{messageText ?? t(messageKey, messageParams)}</div>
       </div>
     </CSSTransition>
   )

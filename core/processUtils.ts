@@ -47,6 +47,13 @@ export const ENV = {
   emailAuthUser: process.env.EMAIL_AUTH_USER,
   emailAuthPassword: process.env.EMAIL_AUTH_PASSWORD,
   emailTransportOptions: getJson(process.env.EMAIL_TRANSPORT_OPTIONS),
+  // the actual sender address used when sending emails (see server/utils/mailer/mailer.js);
+  // EMAIL_FROM_RESOLVED is only ever set by the client webpack bundle (see webpack.config.babel.js),
+  // where it carries this same resolved value across to the browser
+  emailFromResolved:
+    process.env.EMAIL_FROM_RESOLVED || process.env.EMAIL_FROM || process.env.ADMIN_EMAIL || process.env.EMAIL_AUTH_USER,
+  // address shown to users in emails, to contact in case of problems (e.g. an access request they didn't make)
+  supportEmail: process.env.SUPPORT_EMAIL || process.env.ADMIN_EMAIL,
   sendGridApiKey: process.env.SENDGRID_API_KEY,
   emailAmazonSESHost: process.env.EMAIL_AMAZON_SES_HOST,
   emailAmazonSESPort: Number(process.env.EMAIL_AMAZON_SES_PORT) || 465,

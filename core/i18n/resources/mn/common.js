@@ -607,8 +607,9 @@ $t(common.raiseTicketInSupportForum)
     confirmInviteSystemAdmin: 'Хэрэглэгч {{email}}-г Систем Администратороор урих уу?',
     confirmInviteSystemAdmin_other: 'Хэрэглэгч {{email}}-г Систем Администратороор урих уу?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} хаяг алгассан (тэдгээр нь энэ судалгаанд өмнө нь уригдсан байсан): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} хаяг алгассан (тэдгээр нь энэ судалгаанд өмнө нь уригдсан байсан): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Эрхүүд',
       systemAdmin: `
