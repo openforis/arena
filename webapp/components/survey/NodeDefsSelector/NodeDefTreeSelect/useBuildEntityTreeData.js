@@ -77,11 +77,16 @@ const getNodeDefAvailableChildren = ({
     }
   })
 
-  const visibleChildren = pageNode
-    ? childrenFiltered.filter((childDef) =>
-        isPageVisible({ cycle, record, pageNodeDef: childDef, parentNode: pageNode })
-      )
-    : childrenFiltered
+  // When building the page-only tree, always include structural children so
+  // MUI renders the expand toggle for items that have sub-pages. The record-
+  // based visibility filter is entry-only and would hide the arrow before the
+  // user has navigated to a page.
+  const visibleChildren =
+    onlyPages || !pageNode
+      ? childrenFiltered
+      : childrenFiltered.filter((childDef) =>
+          isPageVisible({ cycle, record, pageNodeDef: childDef, parentNode: pageNode })
+        )
 
   return visibleChildren.filter((childDef) => !hidden && isNodeDefIncluded(childDef))
 }
