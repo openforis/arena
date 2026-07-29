@@ -242,6 +242,8 @@ export default {
     invalidRequest: 'Invalid user access request',
     userAlreadyExisting: 'User with email {{email}} already existing',
     requestAlreadySent: `Access request for user with email {{email}} already sent`,
+    emailNotReachable:
+      'The confirmation email could not be delivered to {{email}}; please check that the address is correct',
     invalidReCaptcha: 'Invalid ReCaptcha',
   },
 
