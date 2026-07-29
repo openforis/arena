@@ -77,16 +77,11 @@ const getNodeDefAvailableChildren = ({
     }
   })
 
-  // When building the page-only tree, always include structural children so
-  // MUI renders the expand toggle for items that have sub-pages. The record-
-  // based visibility filter is entry-only and would hide the arrow before the
-  // user has navigated to a page.
-  const visibleChildren =
-    onlyPages || !pageNode
-      ? childrenFiltered
-      : childrenFiltered.filter((childDef) =>
-          isPageVisible({ cycle, record, pageNodeDef: childDef, parentNode: pageNode })
-        )
+  const visibleChildren = pageNode
+    ? childrenFiltered.filter((childDef) =>
+        isPageVisible({ cycle, record, pageNodeDef: childDef, parentNode: pageNode })
+      )
+    : childrenFiltered
 
   return visibleChildren.filter((childDef) => !hidden && isNodeDefIncluded(childDef))
 }
@@ -117,12 +112,15 @@ export const useBuildTreeData = ({
   const buildTreeItem = ({ nodeDef }) => {
     const nodeDefLabel = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
     const suffix = getLabelSuffix(nodeDef)
+    const structuralChildren = Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
+    const hasSubPages = structuralChildren.length > 0
     return {
       key: NodeDef.getUuid(nodeDef),
       disabled: isNodeDefDisabled(nodeDef),
       icon: NodeDefUIProps.getIconByNodeDef({ nodeDef, cycle, includeKey: true }),
       label: `${nodeDefLabel}${suffix}`,
       testId: TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef)),
+      hasSubPages,
     }
   }
 

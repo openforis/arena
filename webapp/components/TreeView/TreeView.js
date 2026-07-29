@@ -14,6 +14,7 @@ import { LabelWithTooltip } from '../form/LabelWithTooltip'
 const TreeItemPropTypes = PropTypes.shape({
   key: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  hasSubPages: PropTypes.bool,
   icon: PropTypes.any,
   items: PropTypes.array,
   label: PropTypes.string.isRequired,
@@ -22,7 +23,7 @@ const TreeItemPropTypes = PropTypes.shape({
 
 const TreeItemView = (props) => {
   const { item } = props
-  const { key, disabled, icon, label, items, testId } = item
+  const { key, disabled, hasSubPages, icon, label, items, testId } = item
   return (
     <MuiTreeItem
       key={key}
@@ -36,9 +37,11 @@ const TreeItemView = (props) => {
       }
       data-testid={testId}
     >
-      {items?.map((childItem) => (
-        <TreeItemView key={childItem.key} item={childItem} />
-      ))}
+      {hasSubPages && !items?.length ? (
+        <MuiTreeItem key={`${key}__placeholder`} itemId={`${key}__placeholder`} label="" sx={{ display: 'none' }} />
+      ) : (
+        items?.map((childItem) => <TreeItemView key={childItem.key} item={childItem} />)
+      )}
     </MuiTreeItem>
   )
 }

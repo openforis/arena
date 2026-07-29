@@ -79,12 +79,7 @@ export const Breadcrumbs = () => {
 
   return (
     <div ref={containerRef} className="breadcrumbs">
-      <MuiBreadcrumbs
-        maxItems={maxItems}
-        itemsBeforeCollapse={1}
-        itemsAfterCollapse={1}
-        aria-label="breadcrumb"
-      >
+      <MuiBreadcrumbs maxItems={maxItems} itemsBeforeCollapse={1} itemsAfterCollapse={1} aria-label="breadcrumb">
         {crumbs.map(({ key, label, uri, isLast }) =>
           isLast ? (
             <Typography key={key} color="text.primary" variant="body2" noWrap>
@@ -95,15 +90,7 @@ export const Breadcrumbs = () => {
               {label}
             </Typography>
           ) : (
-            <MuiLink
-              key={key}
-              component={Link}
-              to={uri}
-              underline="hover"
-              color="inherit"
-              variant="body2"
-              noWrap
-            >
+            <MuiLink key={key} component={Link} to={uri} underline="hover" color="inherit" variant="body2" noWrap>
               {label}
             </MuiLink>
           )

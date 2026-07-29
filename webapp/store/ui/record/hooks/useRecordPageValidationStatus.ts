@@ -1,5 +1,7 @@
 import { useSelector } from 'react-redux'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
@@ -55,5 +57,5 @@ export const useRecordPageValidationStatus = (pageNodeDefUuid: string): PageVali
     }
 
     return { hasErrors, hasWarnings }
-  })
+  }, Objects.isEqual)
 }

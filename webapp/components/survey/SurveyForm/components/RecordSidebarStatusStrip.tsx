@@ -18,18 +18,6 @@ type StatusIconProps = {
   pageNodeDefUuid: string
 }
 
-const ErrorStatusIcon = () => (
-  <SvgIcon sx={{ fontSize: 16, color: defaultTokens.colors.red }}>
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-  </SvgIcon>
-)
-
-const WarningStatusIcon = () => (
-  <SvgIcon sx={{ fontSize: 16, color: defaultTokens.colors.orange }}>
-    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
-  </SvgIcon>
-)
-
 /**
  * Renders a single validation status icon for one page node def.
  */
@@ -40,14 +28,18 @@ const StatusIcon = ({ pageNodeDefUuid }: StatusIconProps) => {
   if (hasErrors) {
     return (
       <Tooltip title={i18n.t('common.error_plural')}>
-        <ErrorStatusIcon />
+        <SvgIcon sx={{ fontSize: 16, color: defaultTokens.colors.red }}>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+        </SvgIcon>
       </Tooltip>
     )
   }
   if (hasWarnings) {
     return (
       <Tooltip title={i18n.t('common.warning_plural')}>
-        <WarningStatusIcon />
+        <SvgIcon sx={{ fontSize: 16, color: defaultTokens.colors.orange }}>
+          <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+        </SvgIcon>
       </Tooltip>
     )
   }
@@ -71,7 +63,6 @@ export const RecordSidebarStatusStrip = ({ pageNodeDefUuids }: Props) => {
         flexDirection: 'column',
         width: 24,
         flexShrink: 0,
-        overflowY: 'hidden',
       }}
     >
       {pageNodeDefUuids.map((uuid) => (

@@ -165,6 +165,11 @@ const SurveyForm = (props) => {
     [dispatch, survey, surveyCycleKey, viewOnlyPages]
   )
 
+  const isNodeDefIncluded = useCallback(
+    (nodeDefArg) => !notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg)),
+    [notAvailablePageEntityDefsUuids]
+  )
+
   const allPageNodeDefUuids = useMemo(() => {
     if (!entry || !survey || !surveyCycleKey) return []
     const root = Survey.getNodeDefRoot(survey)
@@ -172,12 +177,14 @@ const SurveyForm = (props) => {
     const stack = [root]
     while (stack.length > 0) {
       const nd = stack.pop()
-      result.push(NodeDef.getUuid(nd))
+      if (isNodeDefIncluded(nd)) {
+        result.push(NodeDef.getUuid(nd))
+      }
       const children = Survey.getNodeDefChildrenInOwnPage({ nodeDef: nd, cycle: surveyCycleKey })(survey)
       stack.push(...[...children].reverse())
     }
     return result
-  }, [entry, survey, surveyCycleKey])
+  }, [entry, survey, surveyCycleKey, isNodeDefIncluded])
 
   if (!activePageNodeDef) {
     return null
@@ -221,9 +228,7 @@ const SurveyForm = (props) => {
               <div className="survey-form__sidebar-tree-row">
                 <NodeDefTreeSelect
                   disableSelection={surveyIsDirty}
-                  isNodeDefIncluded={(nodeDefArg) =>
-                    !notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))
-                  }
+                  isNodeDefIncluded={isNodeDefIncluded}
                   nodeDefUuidActive={viewOnlyPages ? NodeDef.getUuid(activePageNodeDef) : selectedNodeDefUuid}
                   onlyPages={viewOnlyPages}
                   includeMultipleAttributes={!viewOnlyPages}

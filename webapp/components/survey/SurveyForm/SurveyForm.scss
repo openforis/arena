@@ -95,11 +95,10 @@
     .survey-form__sidebar-tree-row {
       display: flex;
       flex: 1;
-      overflow: hidden;
+      overflow-y: auto;
 
       .nodedef-tree-select {
         flex: 1;
-        overflow-y: auto;
       }
     }
   }
