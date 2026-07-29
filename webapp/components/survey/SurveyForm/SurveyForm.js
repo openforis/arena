@@ -1,7 +1,7 @@
 import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
@@ -36,6 +36,7 @@ import { TreeSelectViewMode } from '@webapp/model'
 import NodeDefDetails from '../NodeDefDetails'
 import { FormPagesEditButtons } from './components/FormPageEditButtons'
 import { RecordCompletionBar } from './components/RecordCompletionBar'
+import { RecordSidebarStatusStrip } from './components/RecordSidebarStatusStrip'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 import FormHeader from './FormHeader'
@@ -164,6 +165,20 @@ const SurveyForm = (props) => {
     [dispatch, survey, surveyCycleKey, viewOnlyPages]
   )
 
+  const allPageNodeDefUuids = useMemo(() => {
+    if (!entry || !survey || !surveyCycleKey) return []
+    const root = Survey.getNodeDefRoot(survey)
+    const result = []
+    const stack = [root]
+    while (stack.length > 0) {
+      const nd = stack.pop()
+      result.push(NodeDef.getUuid(nd))
+      const children = Survey.getNodeDefChildrenInOwnPage({ nodeDef: nd, cycle: surveyCycleKey })(survey)
+      stack.push(...[...children].reverse())
+    }
+    return result
+  }, [entry, survey, surveyCycleKey])
+
   if (!activePageNodeDef) {
     return null
   }
@@ -203,18 +218,21 @@ const SurveyForm = (props) => {
           <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
               {entry && <RecordCompletionBar />}
-              <NodeDefTreeSelect
-                disableSelection={surveyIsDirty}
-                isNodeDefIncluded={(nodeDefArg) =>
-                  !notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))
-                }
-                nodeDefUuidActive={viewOnlyPages ? NodeDef.getUuid(activePageNodeDef) : selectedNodeDefUuid}
-                onlyPages={viewOnlyPages}
-                includeMultipleAttributes={!viewOnlyPages}
-                includeSingleAttributes={!viewOnlyPages}
-                includeSingleEntities
-                onSelect={onNodeDefTreeSelect}
-              />
+              <div className="survey-form__sidebar-tree-row">
+                <NodeDefTreeSelect
+                  disableSelection={surveyIsDirty}
+                  isNodeDefIncluded={(nodeDefArg) =>
+                    !notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))
+                  }
+                  nodeDefUuidActive={viewOnlyPages ? NodeDef.getUuid(activePageNodeDef) : selectedNodeDefUuid}
+                  onlyPages={viewOnlyPages}
+                  includeMultipleAttributes={!viewOnlyPages}
+                  includeSingleAttributes={!viewOnlyPages}
+                  includeSingleEntities
+                  onSelect={onNodeDefTreeSelect}
+                />
+                {entry && <RecordSidebarStatusStrip pageNodeDefUuids={allPageNodeDefUuids} />}
+              </div>
               {edit && (
                 <div className="display-flex sidebar-bottom-bar">
                   <ButtonGroup
