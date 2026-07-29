@@ -9,5 +9,6 @@ export {
   useNodesMaxCount,
   useNodesMinCount,
   useRecordCompletionPercent,
+  useRecordPageCompletionPercent,
   useRecordPageValidationStatus,
 } from './hooks'

@@ -1,5 +1,6 @@
 export default {
   completion: '{{percent}}% complete',
+  pageComplete: 'Complete',
   subPage: 'Sub page',
   addChildTo: 'Add to {{nodeDefLabel}}',
   addChildToTitle: 'Add new node to {{nodeDefLabel}}',

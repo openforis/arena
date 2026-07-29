@@ -3903,6 +3903,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openforis/arena-core@npm:^1.3.13":
+  version: 1.3.13
+  resolution: "@openforis/arena-core@npm:1.3.13::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F1.3.13%2F36ab97c88c10ab0bf6cc60ec3591abfb097d0364"
+  dependencies:
+    "@jsep-plugin/regex": "npm:^1.0.4"
+    "@turf/bearing": "npm:^7.3.5"
+    "@turf/destination": "npm:^7.3.5"
+    "@turf/distance": "npm:^7.3.5"
+    bignumber.js: "npm:^11.1.4"
+    change-case: "npm:^5.4.4"
+    jsep: "npm:^1.4.0"
+    lodash.differencewith: "npm:^4.5.0"
+    lodash.frompairs: "npm:^4.0.1"
+    lodash.isequal: "npm:^4.5.0"
+    lodash.topairs: "npm:^4.3.0"
+    moment: "npm:^2.30.1"
+    proj4: "npm:^2.20.9"
+    uuid: "npm:^14.0.1"
+  checksum: 10c0/936d1c947c41f19cbd88572b01f8faece427f6dbb57a8b258fc641d78f1efe7652cb7f9d52fc1e54a7e772276386821e42f9633dcfecda749fa7a3f913fd6475
+  languageName: node
+  linkType: hard
+
 "@openforis/arena-server@npm:^1.3.22":
   version: 1.3.22
   resolution: "@openforis/arena-server@npm:1.3.22::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F1.3.22%2F4b69a58e02da994e8ba282e7fd9f807aec162b40"
@@ -15914,6 +15936,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
+    "@openforis/arena-core": "npm:^1.3.13"
     "@openforis/arena-server": "npm:^1.3.22"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"

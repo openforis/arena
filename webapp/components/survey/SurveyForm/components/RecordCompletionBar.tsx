@@ -9,8 +9,9 @@ import { useRecordCompletionPercent } from '@webapp/store/ui/record'
 
 /**
  * Displays a linear progress bar and percentage label for the current record's
- * completion. Renders nothing when the arena-core completion API is unavailable
- * or no record is loaded.
+ * completion. Renders nothing when no record is loaded.
+ *
+ * @returns {React.ReactElement | null} The progress bar, or null when no record is loaded.
  */
 export const RecordCompletionBar = () => {
   const i18n = useI18n()

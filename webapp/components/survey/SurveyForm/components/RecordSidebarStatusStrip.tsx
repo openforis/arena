@@ -5,7 +5,7 @@ import SvgIcon from '@mui/material/SvgIcon'
 import Tooltip from '@mui/material/Tooltip'
 
 import { useI18n } from '@webapp/store/system'
-import { useRecordPageValidationStatus } from '@webapp/store/ui/record'
+import { useRecordPageCompletionPercent, useRecordPageValidationStatus } from '@webapp/store/ui/record'
 import { defaultTokens } from '@webapp/theme/tokens'
 
 type Props = {
@@ -19,11 +19,12 @@ type StatusIconProps = {
 }
 
 /**
- * Renders a single validation status icon for one page node def.
+ * Renders a single validation and completion status icon for one page node def.
  */
 const StatusIcon = ({ pageNodeDefUuid }: StatusIconProps) => {
   const i18n = useI18n()
   const { hasErrors, hasWarnings } = useRecordPageValidationStatus(pageNodeDefUuid)
+  const completionPercent = useRecordPageCompletionPercent(pageNodeDefUuid)
 
   if (hasErrors) {
     return (
@@ -39,6 +40,15 @@ const StatusIcon = ({ pageNodeDefUuid }: StatusIconProps) => {
       <Tooltip title={i18n.t('common.warning_plural')}>
         <SvgIcon sx={{ fontSize: 16, color: defaultTokens.colors.orange }}>
           <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+        </SvgIcon>
+      </Tooltip>
+    )
+  }
+  if (completionPercent === 100) {
+    return (
+      <Tooltip title={i18n.t('surveyForm:pageComplete')}>
+        <SvgIcon sx={{ fontSize: 16, color: defaultTokens.colors.green }}>
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
         </SvgIcon>
       </Tooltip>
     )
