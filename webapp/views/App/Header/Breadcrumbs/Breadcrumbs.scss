@@ -1,8 +1,6 @@
 .breadcrumbs {
   margin-left: 20px;
-  display: flex;
-
-  .breadcrumbs-item {
-    white-space: nowrap;
-  }
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
