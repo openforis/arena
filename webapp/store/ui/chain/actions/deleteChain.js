@@ -26,15 +26,18 @@ export const deleteChain =
     const action = async () => {
       if (!silent) dispatch(LoaderActions.showLoader())
 
-      await API.deleteChain({ surveyId, chainUuid: chain.uuid })
+      try {
+        await API.deleteChain({ surveyId, chainUuid: chain.uuid })
 
-      dispatch(SurveyActions.metaUpdated())
-      dispatch(ChainActions.updateChain({ chain: { ...chain, isDeleted: true } }))
+        dispatch(SurveyActions.metaUpdated())
+        dispatch(ChainActions.updateChain({ chain: { ...chain, isDeleted: true } }))
 
-      if (!silent) {
-        dispatch(NotificationActions.notifyInfo({ key: 'chainView.deleteComplete' }))
-        dispatch(LoaderActions.hideLoader())
-        navigate(appModuleUri(analysisModules.chains))
+        if (!silent) {
+          dispatch(NotificationActions.notifyInfo({ key: 'chainView.deleteComplete' }))
+          navigate(appModuleUri(analysisModules.chains))
+        }
+      } finally {
+        if (!silent) dispatch(LoaderActions.hideLoader())
       }
     }
 
