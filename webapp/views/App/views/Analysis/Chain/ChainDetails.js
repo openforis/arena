@@ -15,7 +15,7 @@ import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/cha
 import { useSurvey } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
-import { useLocationPathMatcher, useOnPageUnload, useQuery } from '@webapp/components/hooks'
+import { useLocationPathMatcher, useOnBrowserBack, useOnPageUnload, useQuery } from '@webapp/components/hooks'
 import TabBar from '@webapp/components/tabBar'
 import { ButtonEditLockToggle } from '@webapp/components'
 
@@ -73,10 +73,23 @@ const ChainDetails = () => {
     }
   }, [])
 
+  const labelMissing =
+    !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain.isDeleted
+
   // prevent page unload if label is not specified and chain is not deleted
   useOnPageUnload({
-    active: !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain.isDeleted,
+    active: labelMissing,
     confirmMessageKey: 'chainView.errorNoLabel',
+  })
+
+  // if chain has just been created and user navigates back without specifying a label, delete it and go back
+  useOnBrowserBack({
+    active: isNewChain && labelMissing,
+    onBack: useCallback(async () => {
+      await dispatch(ChainActions.deleteChain({ chain, silent: true }))
+      navigate(-1)
+      return true
+    }, [dispatch, chain, navigate]),
   })
 
   if (!chain || A.isEmpty(chain)) return null
