@@ -6,9 +6,12 @@ import { ArenaServer } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
 
+import * as JobManager from '@server/job/jobManager'
 import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
+import AllSurveysDataMigrationJob from '@server/modules/survey/service/dataMigration/allSurveysDataMigrationJob'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as apiRouter from './apiRouter'
@@ -52,11 +55,19 @@ export const run = async () => {
 
   SwaggerInitializer.init(app)
 
+  // ====== System Admin user creation
+  await UserService.insertSystemAdminUserIfNotExisting()
+
   // Data migrations
   await DataMigrator.migrateData({ logger, serviceRegistry })
 
-  // ====== System Admin user creation
-  await UserService.insertSystemAdminUserIfNotExisting()
+  // Migrate surveys data in the background, without blocking server startup
+  const adminUser = await UserManager.fetchUserByEmail(ProcessUtils.ENV.adminEmail)
+  if (adminUser) {
+    JobManager.enqueueJob(new AllSurveysDataMigrationJob({ user: adminUser }))
+  } else {
+    logger.warn('cannot start surveys data migration job: system admin user not found')
+  }
 
   // run files storage check after DB migrations
   await SurveyFileService.checkFilesStorage()
