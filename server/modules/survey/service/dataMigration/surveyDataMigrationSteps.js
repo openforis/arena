@@ -1,3 +1,5 @@
+import { Versions } from '@openforis/arena-core'
+
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 
 /**
@@ -20,3 +22,13 @@ export const surveyDataMigrationSteps = [
  * @type {string}
  */
 export const latestSurveyDataMigrationVersion = surveyDataMigrationSteps.at(-1).version
+
+/**
+ * Determines whether a survey's per-survey data migration is still pending, given the app version
+ * it was last migrated to.
+ * @param {object} params - The parameters object.
+ * @param {string} [params.appVersion] - The app version the survey was last migrated to (null/undefined is treated as '0.0.0').
+ * @returns {boolean} - True if the survey's stored app version is older than the latest survey data migration version.
+ */
+export const isSurveyDataMigrationPending = ({ appVersion }) =>
+  Versions.isLessThan(appVersion ?? '0.0.0', latestSurveyDataMigrationVersion)

@@ -15,7 +15,7 @@ import * as Survey from '@core/survey/survey'
 import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as SurveyValidator from '@core/survey/surveyValidator'
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
@@ -32,6 +32,7 @@ import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRe
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
+import { isSurveyDataMigrationPending } from '@server/modules/survey/service/dataMigration/surveyDataMigrationSteps'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as UserManager from '@server/modules/user/manager/userManager'
@@ -210,11 +211,26 @@ export const {
  */
 export const fetchSurveyIdsAndAppVersions = async (client = db) => SurveyRepository.fetchSurveyIdsAndAppVersions(client)
 
+/**
+ * Throws a service-unavailable SystemError if the given survey's per-survey data migration hasn't
+ * completed yet, i.e. its stored app version is older than the latest survey data migration version.
+ * @param {object} surveyInfo - The survey info object.
+ * @returns {void}
+ */
+const assertSurveyDataMigrated = (surveyInfo) => {
+  const surveyId = Survey.getId(surveyInfo)
+  const appVersion = Survey.getAppVersion(surveyInfo)
+  if (isSurveyDataMigrationPending({ appVersion })) {
+    throw new SystemError('survey.dataMigrationInProgress', { surveyId }, StatusCodes.SERVICE_UNAVAILABLE)
+  }
+}
+
 export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
   const [surveyInfo, authGroups] = await Promise.all([
     SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
     AuthGroupRepository.fetchSurveyGroups(surveyId, client),
   ])
+  assertSurveyDataMigrated(surveyInfo)
 
   let surveyInfoUpdated = Survey.assocAuthGroups(authGroups)(surveyInfo)
   surveyInfoUpdated = await _fetchAndAssocAdditionalInfo({ surveyInfo: surveyInfoUpdated }, client)
