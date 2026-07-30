@@ -1,5 +1,6 @@
 export default {
   completion: '{{percent}}% complete',
+  pagesValidationProgress: '{{valid}}/{{total}} pages valid ({{percent}}%)',
   pageComplete: 'Complete',
   subPage: 'Sub page',
   addChildTo: 'Add to {{nodeDefLabel}}',

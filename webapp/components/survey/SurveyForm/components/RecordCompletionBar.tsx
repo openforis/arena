@@ -5,26 +5,27 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Typography from '@mui/material/Typography'
 
 import { useI18n } from '@webapp/store/system'
-import { useRecordCompletionPercent } from '@webapp/store/ui/record'
+import { useRecordPagesValidationProgress } from '@webapp/store/ui/record'
 
 /**
- * Displays a linear progress bar and percentage label for the current record's
- * completion. Renders nothing when the arena-core completion API is unavailable
- * or no record is loaded.
+ * Displays progress of pages without validation errors over all survey pages.
+ * Aligns with sidebar red status icons (errors only).
  *
- * @returns {React.ReactElement | null} The progress bar, or null when unavailable.
+ * @returns Progress bar, or null when no record / no pages
  */
 export const RecordCompletionBar = () => {
   const i18n = useI18n()
-  const percent = useRecordCompletionPercent()
+  const progress = useRecordPagesValidationProgress()
 
-  if (percent === null) return null
+  if (!progress) return null
+
+  const { percent, validCount, totalCount } = progress
 
   return (
     <Box sx={{ px: 1, pt: 1, pb: 0.5 }}>
       <LinearProgress variant="determinate" value={percent} />
       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-        {i18n.t('surveyForm:completion', { percent: Math.round(percent) })}
+        {i18n.t('surveyForm:pagesValidationProgress', { valid: validCount, total: totalCount, percent })}
       </Typography>
     </Box>
   )
