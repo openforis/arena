@@ -22,17 +22,21 @@ const TreeItemPropTypes = PropTypes.shape({
 })
 
 const TreeItemView = (props) => {
-  const { item } = props
+  const { item, renderItemSuffix, expandedItemKeys } = props
   const { key, disabled, hasSubPages, icon, label, items, testId } = item
+  const isExpanded = Boolean(expandedItemKeys?.includes(key))
+  const suffix = renderItemSuffix?.(item, { isExpanded })
+
   return (
     <MuiTreeItem
       key={key}
       disabled={disabled}
       itemId={key}
       label={
-        <div className="tree-item-label display-flex">
+        <div className="tree-item-label display-flex" style={{ width: '100%', minWidth: 0, gap: 4 }}>
           {icon}
           <LabelWithTooltip label={label} />
+          {suffix}
         </div>
       }
       data-testid={testId}
@@ -40,7 +44,14 @@ const TreeItemView = (props) => {
       {hasSubPages && !items?.length ? (
         <MuiTreeItem key={`${key}__placeholder`} itemId={`${key}__placeholder`} label="" sx={{ display: 'none' }} />
       ) : (
-        items?.map((childItem) => <TreeItemView key={childItem.key} item={childItem} />)
+        items?.map((childItem) => (
+          <TreeItemView
+            key={childItem.key}
+            item={childItem}
+            renderItemSuffix={renderItemSuffix}
+            expandedItemKeys={expandedItemKeys}
+          />
+        ))
       )}
     </MuiTreeItem>
   )
@@ -48,6 +59,8 @@ const TreeItemView = (props) => {
 
 TreeItemView.propTypes = {
   item: TreeItemPropTypes,
+  renderItemSuffix: PropTypes.func,
+  expandedItemKeys: PropTypes.array,
 }
 
 export const TreeView = (props) => {
@@ -58,6 +71,7 @@ export const TreeView = (props) => {
     onExpandedItemKeysChange = undefined,
     selectedItemKeys = undefined,
     onSelectedItemKeysChange = undefined,
+    renderItemSuffix = undefined,
   } = props
 
   const onExpandedItemsChange = useCallback(
@@ -93,7 +107,12 @@ export const TreeView = (props) => {
       selectedItems={selectedItemKeys}
     >
       {items.map((childItem) => (
-        <TreeItemView key={childItem.key} item={childItem} />
+        <TreeItemView
+          key={childItem.key}
+          item={childItem}
+          renderItemSuffix={renderItemSuffix}
+          expandedItemKeys={expadedItemKeys}
+        />
       ))}
     </SimpleTreeView>
   )
@@ -106,4 +125,5 @@ TreeView.propTypes = {
   onExpandedItemKeysChange: PropTypes.func,
   onSelectedItemKeysChange: PropTypes.func,
   selectedItemKeys: PropTypes.array,
+  renderItemSuffix: PropTypes.func,
 }
