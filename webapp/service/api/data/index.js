@@ -31,6 +31,10 @@ export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
   const list = await fetchRecordsSummary({ surveyId, cycle, recordUuid })
   return list?.[0]
 }
+export const fetchRecordAndNodes = async ({ surveyId, recordUuid }) => {
+  const { data: record } = await axios.get(`/api/survey/${surveyId}/record`, { params: { recordUuid } })
+  return record
+}
 export const getRecordDocxExportUrl = ({ surveyId, recordUuid, lang }) =>
   `/api/survey/${surveyId}/record/${recordUuid}/export/docx?${new URLSearchParams({ lang })}`
 
