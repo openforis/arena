@@ -74,7 +74,9 @@ const SurveyInfo = () => {
         surveyInfoObject,
       },
     },
-    {
+  ]
+  if (!readOnly) {
+    tabs.push({
       key: 'branding',
       component: SurveyInfoBrandingForm,
       label: 'homeView:surveyInfo.branding.title',
@@ -86,8 +88,8 @@ const SurveyInfo = () => {
         descriptions: surveyInfoObject.descriptions,
         name: surveyInfoObject.name,
       },
-    },
-  ]
+    })
+  }
   if (canUseAnalysis) {
     tabs.push({
       key: 'sampleBasedInterpretation',
@@ -106,7 +108,7 @@ const SurveyInfo = () => {
       },
     })
   }
-  if (experimentalFeatures) {
+  if (experimentalFeatures && !readOnly) {
     tabs.push({
       key: 'documents',
       component: SurveyInfoDocuments,
