@@ -64,6 +64,7 @@ export {
   fetchRecordsCountByStep,
   fetchRecordSummary,
   fetchRecordsSummary,
+  fetchRecordAndNodes,
   getRecordDocxExportUrl,
   getRecordPdfExportUrl,
   startExportDataJob,
