@@ -70,7 +70,9 @@ export const run = async () => {
   if (adminUser) {
     JobManager.enqueueJob(new AllSurveysDataMigrationJob({ user: adminUser }))
   } else {
-    logger.warn('cannot start surveys data migration job: system admin user not found')
+    const message = `cannot start surveys data migration job: system admin user not found for ADMIN_EMAIL "${ProcessUtils.ENV.adminEmail}"; check that ADMIN_EMAIL is correctly configured and that a matching system admin user exists`
+    logger.error(message)
+    throw new Error(message)
   }
 
   // ====== Update app version in DB
