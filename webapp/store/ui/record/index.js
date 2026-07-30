@@ -11,4 +11,5 @@ export {
   useRecordCompletionPercent,
   useRecordPageCompletionPercent,
   useRecordPageValidationStatus,
+  useRecordTreeItemStatus,
 } from './hooks'

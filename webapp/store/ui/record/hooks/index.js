@@ -60,3 +60,4 @@ export const useNodesMinCount = ({ parentNodeUuid, nodeDefUuid }) =>
 export { useRecordCompletionPercent } from './useRecordCompletionPercent'
 export { useRecordPageCompletionPercent } from './useRecordPageCompletionPercent'
 export { useRecordPageValidationStatus } from './useRecordPageValidationStatus'
+export { useRecordTreeItemStatus } from './useRecordTreeItemStatus'
