@@ -70,9 +70,7 @@ const NodeDefTreeSelect = (props) => {
       {expandButtonPlacement === 'above' && expandButton && (
         <div className="nodedef-tree-select__toolbar">{expandButton}</div>
       )}
-      {expandButtonPlacement === 'inline' && expandButton && (
-        <div className="display-flex">{expandButton}</div>
-      )}
+      {expandButtonPlacement === 'inline' && expandButton && <div className="display-flex">{expandButton}</div>}
 
       <TreeView
         disableSelection={disableSelection}

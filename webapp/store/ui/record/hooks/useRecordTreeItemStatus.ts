@@ -23,7 +23,9 @@ type Params = {
   isTreeItemExpanded: boolean
 }
 
-const nodeBelongsToPage = (node: object, pageNodeDefUuid: string, record: object) => {
+type RecordType = NonNullable<ReturnType<typeof RecordState.getRecord>>
+
+const nodeBelongsToPage = (node: object, pageNodeDefUuid: string, record: RecordType) => {
   if (Node.getNodeDefUuid(node) === pageNodeDefUuid) return true
   return Node.getHierarchy(node).some((ancestorUuid: string) => {
     const ancestor = Record.getNodeByUuid(ancestorUuid)(record)
@@ -31,7 +33,7 @@ const nodeBelongsToPage = (node: object, pageNodeDefUuid: string, record: object
   })
 }
 
-const getPageValidation = (pageNodeDefUuid: string, record: object) => {
+const getPageValidation = (pageNodeDefUuid: string, record: RecordType) => {
   const recordValidation = Record.getValidation(record)
   const fields = Validation.getFieldValidations(recordValidation)
   let hasErrors = false
