@@ -8,4 +8,17 @@
     top: 4px;
     z-index: 2;
   }
+
+  &--expand-above {
+    .btn-expand {
+      position: static;
+    }
+  }
+
+  .nodedef-tree-select__toolbar {
+    display: flex;
+    align-items: center;
+    padding: 0 0.25rem;
+    min-height: 28px;
+  }
 }
