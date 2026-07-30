@@ -61,16 +61,17 @@ export const run = async () => {
   // Data migrations
   await DataMigrator.migrateData({ logger, serviceRegistry })
 
-  // Migrate surveys data in the background, without blocking server startup
+  // run files storage check after DB migrations
+  await SurveyFileService.checkFilesStorage()
+
+  // Migrate surveys data in the background, without blocking server startup;
+  // enqueued after checkFilesStorage (above) completes, so the two do not concurrently move the same survey files
   const adminUser = await UserManager.fetchUserByEmail(ProcessUtils.ENV.adminEmail)
   if (adminUser) {
     JobManager.enqueueJob(new AllSurveysDataMigrationJob({ user: adminUser }))
   } else {
     logger.warn('cannot start surveys data migration job: system admin user not found')
   }
-
-  // run files storage check after DB migrations
-  await SurveyFileService.checkFilesStorage()
 
   // ====== Update app version in DB
   const infoService = serviceRegistry.getService(ServiceType.info)

@@ -49,4 +49,10 @@ describe('getSurveysToMigrate', () => {
     const surveys = [{ id: 1, appVersion: latestSurveyDataMigrationVersion }]
     expect(getSurveysToMigrate(surveys)).toEqual([])
   })
+
+  it('uses the same predicate as isSurveyDataMigrationPending, so an unparseable stored app version fails safe (included, not thrown)', () => {
+    const surveys = [{ id: 1, appVersion: 'not-a-version' }]
+    expect(() => getSurveysToMigrate(surveys)).not.toThrow()
+    expect(getSurveysToMigrate(surveys).map(({ id }) => id)).toEqual([1])
+  })
 })

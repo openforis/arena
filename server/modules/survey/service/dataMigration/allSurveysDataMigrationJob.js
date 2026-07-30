@@ -1,8 +1,6 @@
-import { Versions } from '@openforis/arena-core'
-
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { latestSurveyDataMigrationVersion } from './surveyDataMigrationSteps'
+import { isSurveyDataMigrationPending } from './surveyDataMigrationSteps'
 import SurveyDataMigrationJob from './surveyDataMigrationJob'
 
 /**
@@ -12,7 +10,7 @@ import SurveyDataMigrationJob from './surveyDataMigrationJob'
  * @returns {Array<{ id: number, appVersion: string }>} - The surveys that still need to be migrated.
  */
 export const getSurveysToMigrate = (surveys) =>
-  surveys.filter(({ appVersion }) => Versions.isLessThan(appVersion ?? '0.0.0', latestSurveyDataMigrationVersion))
+  surveys.filter(({ appVersion }) => isSurveyDataMigrationPending({ appVersion }))
 
 /**
  * Job that migrates every survey whose stored app version is behind the latest survey data migration
@@ -43,11 +41,11 @@ export default class AllSurveysDataMigrationJob extends Job {
           this.incrementProcessedItems()
         } else {
           surveyIdsWithErrors.push(surveyId)
-          this.logDebug(`something went wrong migrating data for survey ${surveyId}`)
+          this.logWarn(`could not migrate data for survey ${surveyId}: inner job did not succeed`)
         }
       } catch (error) {
         surveyIdsWithErrors.push(surveyId)
-        this.logDebug(`something went wrong migrating data for survey ${surveyId}`)
+        this.logError(`error migrating data for survey ${surveyId}: ${error.stack || error}`)
       }
     }
     this.result = { surveyIdsWithErrors }

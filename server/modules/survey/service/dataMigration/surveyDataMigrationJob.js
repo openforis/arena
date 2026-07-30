@@ -1,9 +1,8 @@
 import { Versions } from '@openforis/arena-core'
 
 import Job from '@server/job/job'
-import * as ProcessUtils from '@core/processUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { surveyDataMigrationSteps } from './surveyDataMigrationSteps'
+import { getCurrentAppVersionStamp, surveyDataMigrationSteps } from './surveyDataMigrationSteps'
 
 /**
  * Determines the data migration steps that still need to be applied to a survey, given the app version
@@ -37,7 +36,7 @@ export default class SurveyDataMigrationJob extends Job {
       this.incrementProcessedItems()
     }
 
-    await SurveyManager.updateSurveyAppVersion({ surveyId, version: ProcessUtils.ENV.applicationVersion }, this.tx)
+    await SurveyManager.updateSurveyAppVersion({ surveyId, version: getCurrentAppVersionStamp() }, this.tx)
   }
 }
 

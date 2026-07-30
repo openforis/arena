@@ -32,7 +32,10 @@ import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRe
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
-import { isSurveyDataMigrationPending } from '@server/modules/survey/service/dataMigration/surveyDataMigrationSteps'
+import {
+  getCurrentAppVersionStamp,
+  isSurveyDataMigrationPending,
+} from '@server/modules/survey/service/dataMigration/surveyDataMigrationSteps'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as UserManager from '@server/modules/user/manager/userManager'
@@ -119,7 +122,12 @@ export const insertSurvey = async (params, client = db) => {
     if (temporary) {
       surveyProps.temporary = true
     }
-    const surveyInfo = await SurveyRepository.insertSurvey({ survey: surveyInfoParam, propsDraft: surveyProps }, t)
+    // a brand-new survey has no legacy file paths to migrate, so it's trivially "fully migrated" already
+    const appVersion = getCurrentAppVersionStamp()
+    const surveyInfo = await SurveyRepository.insertSurvey(
+      { survey: surveyInfoParam, propsDraft: surveyProps, appVersion },
+      t
+    )
     const survey = assocSurveyInfo(surveyInfo)
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
@@ -167,11 +175,14 @@ export const importSurvey = async (params, client = db) => {
 
   return client.tx(async (t) => {
     // Insert survey into db
+    // a brand-new (imported or cloned) survey has no legacy file paths to migrate, so it's trivially "fully migrated" already
+    const appVersion = getCurrentAppVersionStamp()
     let surveyInfo = await SurveyRepository.insertSurvey(
       {
         survey: surveyInfoParam,
         props: backup ? Survey.getProps(surveyInfoParam) : {},
         propsDraft: backup ? Survey.getPropsDraft(surveyInfoParam) : Survey.getProps(surveyInfoParam),
+        appVersion,
       },
       t
     )
