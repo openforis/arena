@@ -43,14 +43,14 @@ const useRecordOrFetchByParentNode = ({ nodeDef, parentNode }) => {
   const needsParentCodeAttribute = Boolean(NodeDefs.getParentCodeDefUuid(nodeDef))
   const recordUuid =
     !isRecordInStateUsable && needsParentCodeAttribute && parentNode ? Node.getRecordUuid(parentNode) : null
-  // renderTick itself is not read: its only purpose is to force a re-render once the on-demand fetch resolves.
-  const [renderTick, setRenderTick] = useState(0)
+  // Used only to force a re-render once the on-demand fetch resolves (its value is never read).
+  const [, forceRenderAfterFetch] = useState(0)
 
   useEffect(() => {
     if (!recordUuid || getResolvedRecord(recordUuid)) return
     let cancelled = false
     fetchRecordAndNodesOnce({ surveyId, recordUuid }).then(() => {
-      if (!cancelled) setRenderTick((tick) => tick + 1)
+      if (!cancelled) forceRenderAfterFetch((n) => n + 1)
     })
     return () => {
       cancelled = true
