@@ -11,8 +11,14 @@ import { useNodeDefLabelType, usePagesUuidMap } from '@webapp/store/ui/surveyFor
 import { TestId } from '@webapp/utils/testId'
 
 const getPageNode = ({ record, pagesUuidMap, nodeDefUuid }) => {
+  if (!record) return null
   const nodeUuid = pagesUuidMap[nodeDefUuid]
-  return record && nodeUuid ? Record.getNodeByUuid(nodeUuid)(record) : null
+  if (nodeUuid) {
+    const mapped = Record.getNodeByUuid(nodeUuid)(record)
+    if (mapped) return mapped
+  }
+  // Fallback when the page has not been visited yet (not in pagesUuidMap).
+  return Record.getNodesByDefUuid(nodeDefUuid)(record)?.[0] ?? null
 }
 
 const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) => {

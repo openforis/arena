@@ -101,7 +101,16 @@ export const getFormPageParentNode = (nodeDef) => (state) => {
     }
 
     const parentNodeUuid = getFormPageNodeUuid(nodeDefParent)(state)
-    return Record.getNodeByUuid(parentNodeUuid)(record)
+    if (parentNodeUuid) {
+      const mappedParent = Record.getNodeByUuid(parentNodeUuid)(record)
+      if (mappedParent) return mappedParent
+    }
+
+    // Fallback: parent entity may exist in the record before its page is visited
+    // (pagesUuidMap only fills in on navigation). Needed so the page tree can
+    // show nested pages without visiting each ancestor first.
+    const parentNodes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDefParent))(record)
+    return parentNodes?.[0] ?? null
   }
 
   return null

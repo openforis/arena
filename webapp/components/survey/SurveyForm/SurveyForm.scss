@@ -101,13 +101,26 @@
 }
 
 .survey-form.entry {
-  .survey-form__node-def-entity-wrapper {
-    background-color: $white;
-    border-radius: 4px;
+  .survey-form__internal-container-wrapper {
+    box-sizing: border-box;
+    background-color: $greyAppBg;
+    // Margin on the page (not padding here) so height:100% children cannot
+    // paint over the grey gutter.
+    overflow: auto;
   }
 
-  .survey-form__internal-container-wrapper {
-    padding: 8px;
+  .survey-form__node-def-page {
+    box-sizing: border-box;
+    margin: 12px;
+    height: calc(100% - 24px) !important;
+    width: calc(100% - 24px) !important;
+    background-color: $white;
+    border-radius: 4px;
+    border: 1px solid $greyBorder;
+  }
+
+  .survey-form__node-def-entity-wrapper {
+    background-color: $white;
   }
 }
 
