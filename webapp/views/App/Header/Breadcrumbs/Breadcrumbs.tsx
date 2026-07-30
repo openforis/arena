@@ -11,6 +11,7 @@ import * as AppModules from '@webapp/app/appModules'
 import { homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { useIsSurveyDirty } from '@webapp/store/survey'
+import { computeBreadcrumbsMaxItems } from '@webapp/utils/breadcrumbsUtils'
 import { useLocation } from 'react-router'
 
 type CrumbItem = {
@@ -21,17 +22,6 @@ type CrumbItem = {
 }
 
 const CRUMB_MIN_WIDTH_PX = 60
-
-/**
- * Computes how many breadcrumb items fit in the container width.
- * Always keeps at least the first and the last item visible.
- */
-const computeMaxItems = (containerWidth: number, itemCount: number): number => {
-  if (containerWidth <= 0 || itemCount <= 2) return itemCount
-  const available = containerWidth - CRUMB_MIN_WIDTH_PX * 2 // reserve space for first + last
-  const middleCount = Math.max(0, Math.floor(available / CRUMB_MIN_WIDTH_PX))
-  return Math.min(itemCount, 2 + middleCount)
-}
 
 /**
  * App-level breadcrumb navigation bar.
@@ -66,7 +56,13 @@ export const Breadcrumbs = () => {
 
   const updateMaxItems = useCallback(() => {
     if (containerRef.current) {
-      setMaxItems(computeMaxItems(containerRef.current.offsetWidth, crumbs.length))
+      setMaxItems(
+        computeBreadcrumbsMaxItems({
+          containerWidth: containerRef.current.offsetWidth,
+          itemCount: crumbs.length,
+          crumbMinWidthPx: CRUMB_MIN_WIDTH_PX,
+        })
+      )
     }
   }, [crumbs.length])
 

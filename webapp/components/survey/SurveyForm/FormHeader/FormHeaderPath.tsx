@@ -12,6 +12,7 @@ import * as Survey from '@core/survey/survey'
 
 import { useSurvey } from '@webapp/store/survey'
 import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+import { computeBreadcrumbsMaxItems } from '@webapp/utils/breadcrumbsUtils'
 
 import { usePathCrumbs, type FormPathCrumb } from './usePathCrumbs'
 
@@ -24,18 +25,6 @@ const MENU_BUTTON_WIDTH_PX = 36
 const ITEMS_BEFORE_COLLAPSE = 1
 
 const ITEMS_AFTER_COLLAPSE = 1
-
-/**
- * Computes how many breadcrumb items fit in the container width.
- * Always keeps at least the first and the last item visible.
- */
-const computeMaxItems = (containerWidth: number, itemCount: number): number => {
-  if (itemCount <= 2) return itemCount
-  if (containerWidth <= 0) return 2
-  const available = containerWidth - CRUMB_MIN_WIDTH_PX * 2 - MENU_BUTTON_WIDTH_PX
-  const middleCount = Math.max(0, Math.floor(available / CRUMB_MIN_WIDTH_PX))
-  return Math.min(itemCount, Math.max(2, 2 + middleCount))
-}
 
 const breadcrumbsSx = {
   width: '100%',
@@ -110,7 +99,15 @@ export const FormHeaderPath = ({ entry, nodeDefPageName }: Props) => {
 
   const updateMaxItems = useCallback(() => {
     if (containerRef.current) {
-      setMaxItems(computeMaxItems(containerRef.current.offsetWidth, crumbs.length))
+      setMaxItems(
+        computeBreadcrumbsMaxItems({
+          containerWidth: containerRef.current.offsetWidth,
+          itemCount: crumbs.length,
+          crumbMinWidthPx: CRUMB_MIN_WIDTH_PX,
+          reservedWidthPx: MENU_BUTTON_WIDTH_PX,
+          fallbackMaxItems: 2,
+        })
+      )
     }
   }, [crumbs.length])
 
