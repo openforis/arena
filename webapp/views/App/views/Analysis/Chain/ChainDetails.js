@@ -73,8 +73,10 @@ const ChainDetails = () => {
     }
   }, [])
 
+  const chainLoaded = Boolean(chain) && !A.isEmpty(chain)
+
   const labelMissing =
-    !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain.isDeleted
+    !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain?.isDeleted
 
   // prevent page unload if label is not specified and chain is not deleted
   useOnPageUnload({
@@ -82,14 +84,27 @@ const ChainDetails = () => {
     confirmMessageKey: 'chainView.errorNoLabel',
   })
 
-  // if chain has just been created and user navigates back without specifying a label, delete it and go back
+  // chain has no description, no sampling design and no analysis attribute defined yet
+  const chainEmpty =
+    !chainLoaded ||
+    (!Chain.getDescription(chain) &&
+      !Chain.hasSamplingDesign(chain) &&
+      Survey.getAnalysisNodeDefs({
+        chain,
+        showSamplingNodeDefs: true,
+        hideAreaBasedEstimate: false,
+        showInactiveResultVariables: true,
+      })(survey).length === 0)
+
+  // if chain has just been created and user navigates back before it has any content, delete it and go back.
+  // active while the chain is still loading too (chainLoaded false), so a back press right after creation is still caught.
   useOnBrowserBack({
-    active: isNewChain && labelMissing,
+    active: isNewChain && (!chainLoaded || labelMissing) && chainEmpty,
     onBack: useCallback(async () => {
-      await dispatch(ChainActions.deleteChain({ chain, silent: true }))
+      await dispatch(ChainActions.deleteChain({ chain: chain ?? { uuid: chainUuid }, silent: true }))
       navigate(-1)
       return true
-    }, [dispatch, chain, navigate]),
+    }, [dispatch, chain, chainUuid, navigate]),
   })
 
   if (!chain || A.isEmpty(chain)) return null
