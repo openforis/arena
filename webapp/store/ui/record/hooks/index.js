@@ -20,6 +20,7 @@ export const useRecordParentCategoryItemUuid = ({ nodeDef, parentNode }) =>
   useSelector((state) => {
     const survey = SurveyState.getSurvey(state)
     const record = RecordState.getRecord(state)
+    if (!record) return undefined
     const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
     return Node.getCategoryItemUuid(nodeParentCode)
   })
@@ -28,6 +29,7 @@ export const useRecordCodeAttributesUuidsHierarchy = ({ nodeDef, parentNode }) =
   useSelector((state) => {
     const survey = SurveyState.getSurvey(state)
     const record = RecordState.getRecord(state)
+    if (!record) return []
     const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
     return parentCodeAttribute ? [...Node.getHierarchyCode(parentCodeAttribute), Node.getUuid(parentCodeAttribute)] : []
   }, Objects.isEqual)
