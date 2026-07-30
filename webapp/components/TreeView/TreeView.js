@@ -79,8 +79,10 @@ export const TreeView = (props) => {
       const treeItemKeysBeingCollapsed = expadedItemKeys.filter(
         (oldExpandedItemId) => !itemIds.includes(oldExpandedItemId)
       )
-      const targetClass = String(event?.target?.className)
-      if (treeItemKeysBeingCollapsed.length > 0 && targetClass.includes('label')) {
+      // Use closest() so clicks on SVG status icons inside the label are treated
+      // as label clicks (SVG className is SVGAnimatedString, not a plain string).
+      const isLabelClick = Boolean(event?.target?.closest?.('.MuiTreeItem-label, .tree-item-label'))
+      if (treeItemKeysBeingCollapsed.length > 0 && isLabelClick) {
         // do not collapse item if it is expanded and label is clicked; handle only selection;
         return false
       }

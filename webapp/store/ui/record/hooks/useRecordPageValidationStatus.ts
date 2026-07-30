@@ -2,26 +2,10 @@ import { useSelector } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as RecordValidation from '@core/record/recordValidation'
-import * as Validation from '@core/validation/validation'
-
 import * as RecordState from '../state'
+import { getPageValidationStatus, type PageValidationStatus } from './recordPageValidation'
 
-export type PageValidationStatus = {
-  hasErrors: boolean
-  hasWarnings: boolean
-}
-
-const nodeBelongsToPage = (node, pageNodeDefUuid, record) => {
-  if (Node.getNodeDefUuid(node) === pageNodeDefUuid) return true
-
-  return Node.getHierarchy(node).some((ancestorUuid) => {
-    const ancestor = Record.getNodeByUuid(ancestorUuid)(record)
-    return ancestor && Node.getNodeDefUuid(ancestor) === pageNodeDefUuid
-  })
-}
+export type { PageValidationStatus }
 
 /**
  * Returns aggregated validation status (errors / warnings) for all nodes
@@ -34,28 +18,6 @@ export const useRecordPageValidationStatus = (pageNodeDefUuid: string): PageVali
   return useSelector((state): PageValidationStatus => {
     const record = RecordState.getRecord(state)
     if (!record) return { hasErrors: false, hasWarnings: false }
-
-    const recordValidation = Record.getValidation(record)
-    const fields = Validation.getFieldValidations(recordValidation)
-
-    let hasErrors = false
-    let hasWarnings = false
-
-    for (const nodeUuid of Object.keys(fields)) {
-      const node = Record.getNodeByUuid(nodeUuid)(record)
-      if (!node) continue
-
-      if (!nodeBelongsToPage(node, pageNodeDefUuid, record)) continue
-
-      const nodeValidation = RecordValidation.getNodeValidation(node)(recordValidation)
-      if (!nodeValidation) continue
-
-      if (Validation.isError(nodeValidation)) hasErrors = true
-      if (Validation.isWarning(nodeValidation)) hasWarnings = true
-
-      if (hasErrors && hasWarnings) break
-    }
-
-    return { hasErrors, hasWarnings }
+    return getPageValidationStatus({ pageNodeDefUuid, record })
   }, Objects.isEqual)
 }

@@ -11,6 +11,11 @@ import * as RecordState from '../state'
 type RecordType = NonNullable<ReturnType<typeof RecordState.getRecord>>
 type SurveyType = ReturnType<typeof SurveyState.getSurvey>
 
+export type PageValidationStatus = {
+  hasErrors: boolean
+  hasWarnings: boolean
+}
+
 /**
  * Whether a node belongs under a page entity (itself or any descendant of that page).
  *
@@ -32,9 +37,9 @@ export const nodeBelongsToPage = (node: object, pageNodeDefUuid: string, record:
  *
  * @param node - Record node
  * @param pageNodeDefUuid - Page entity node def UUID
- * @param descendantPageUuids - Descendant page node def UUIDs
+ * @param descendantPageUuids - Descendant page node def UUIDs (empty = full page scope)
  * @param record - Record
- * @returns True when the node is in this page's own field scope
+ * @returns True when the node is in this page's field scope
  */
 export const nodeBelongsToOwnPage = (
   node: object,
@@ -45,6 +50,42 @@ export const nodeBelongsToOwnPage = (
   if (!nodeBelongsToPage(node, pageNodeDefUuid, record)) return false
   if (descendantPageUuids.includes(Node.getNodeDefUuid(node))) return false
   return !descendantPageUuids.some((descendantUuid) => nodeBelongsToPage(node, descendantUuid, record))
+}
+
+/**
+ * Aggregates error/warning flags for a page. When descendantPageUuids is non-empty,
+ * nested page entities are excluded (own-page scope). With an empty list, all nodes
+ * under the page hierarchy are included.
+ *
+ * @param params - Page scope and record
+ * @returns Aggregated validation status
+ */
+export const getPageValidationStatus = ({
+  pageNodeDefUuid,
+  descendantPageUuids = [],
+  record,
+}: {
+  pageNodeDefUuid: string
+  descendantPageUuids?: string[]
+  record: RecordType
+}): PageValidationStatus => {
+  const recordValidation = Record.getValidation(record)
+  const fields = Validation.getFieldValidations(recordValidation)
+  let hasErrors = false
+  let hasWarnings = false
+
+  for (const nodeUuid of Object.keys(fields)) {
+    const node = Record.getNodeByUuid(nodeUuid)(record)
+    if (!node) continue
+    if (!nodeBelongsToOwnPage(node, pageNodeDefUuid, descendantPageUuids, record)) continue
+    const nodeValidation = RecordValidation.getNodeValidation(node)(recordValidation)
+    if (!nodeValidation) continue
+    if (Validation.isError(nodeValidation)) hasErrors = true
+    if (Validation.isWarning(nodeValidation)) hasWarnings = true
+    if (hasErrors && hasWarnings) break
+  }
+
+  return { hasErrors, hasWarnings }
 }
 
 /**
@@ -106,16 +147,4 @@ export const pageHasOwnErrors = ({
   pageNodeDefUuid: string
   descendantPageUuids: string[]
   record: RecordType
-}): boolean => {
-  const recordValidation = Record.getValidation(record)
-  const fields = Validation.getFieldValidations(recordValidation)
-
-  for (const nodeUuid of Object.keys(fields)) {
-    const node = Record.getNodeByUuid(nodeUuid)(record)
-    if (!node) continue
-    if (!nodeBelongsToOwnPage(node, pageNodeDefUuid, descendantPageUuids, record)) continue
-    const nodeValidation = RecordValidation.getNodeValidation(node)(recordValidation)
-    if (nodeValidation && Validation.isError(nodeValidation)) return true
-  }
-  return false
-}
+}): boolean => getPageValidationStatus({ pageNodeDefUuid, descendantPageUuids, record }).hasErrors

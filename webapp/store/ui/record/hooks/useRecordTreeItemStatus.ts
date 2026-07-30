@@ -6,13 +6,11 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as RecordValidation from '@core/record/recordValidation'
-import * as Validation from '@core/validation/validation'
 
 import { SurveyState } from '@webapp/store/survey'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
 import * as RecordState from '../state'
+import { getPageValidationStatus } from './recordPageValidation'
 
 export type TreeItemStatus = {
   hasErrors: boolean
@@ -31,60 +29,6 @@ type Params = {
    */
   descendantPageUuidsByPage: Record<string, string[]>
   isTreeItemExpanded: boolean
-}
-
-type RecordType = NonNullable<ReturnType<typeof RecordState.getRecord>>
-
-/**
- * Whether a node belongs under a page entity (itself or any descendant of that page).
- */
-const nodeBelongsToPage = (node: object, pageNodeDefUuid: string, record: RecordType) => {
-  if (Node.getNodeDefUuid(node) === pageNodeDefUuid) return true
-  return Node.getHierarchy(node).some((ancestorUuid: string) => {
-    const ancestor = Record.getNodeByUuid(ancestorUuid)(record)
-    return ancestor && Node.getNodeDefUuid(ancestor) === pageNodeDefUuid
-  })
-}
-
-/**
- * Whether a node belongs to this page only — not to a nested descendant page entity.
- * Used so expanded parents do not inherit child-page errors/completion.
- */
-const nodeBelongsToOwnPage = (
-  node: object,
-  pageNodeDefUuid: string,
-  descendantPageUuids: string[],
-  record: RecordType
-) => {
-  if (!nodeBelongsToPage(node, pageNodeDefUuid, record)) return false
-  if (descendantPageUuids.includes(Node.getNodeDefUuid(node))) return false
-  return !descendantPageUuids.some((descendantUuid) => nodeBelongsToPage(node, descendantUuid, record))
-}
-
-const getPageValidation = ({
-  pageNodeDefUuid,
-  descendantPageUuids,
-  record,
-}: {
-  pageNodeDefUuid: string
-  descendantPageUuids: string[]
-  record: RecordType
-}) => {
-  const recordValidation = Record.getValidation(record)
-  const fields = Validation.getFieldValidations(recordValidation)
-  let hasErrors = false
-  let hasWarnings = false
-  for (const nodeUuid of Object.keys(fields)) {
-    const node = Record.getNodeByUuid(nodeUuid)(record)
-    if (!node) continue
-    if (!nodeBelongsToOwnPage(node, pageNodeDefUuid, descendantPageUuids, record)) continue
-    const nodeValidation = RecordValidation.getNodeValidation(node)(recordValidation)
-    if (!nodeValidation) continue
-    if (Validation.isError(nodeValidation)) hasErrors = true
-    if (Validation.isWarning(nodeValidation)) hasWarnings = true
-    if (hasErrors && hasWarnings) break
-  }
-  return { hasErrors, hasWarnings }
 }
 
 type GetEntityCompletionPercent = (params: { survey: unknown; record: unknown; entity: unknown }) => number
@@ -200,7 +144,7 @@ export const useRecordTreeItemStatus = ({
 
     const evaluatePage = (uuid: string) => {
       const pageDescendants = descendantPageUuidsByPage[uuid] ?? []
-      const { hasErrors, hasWarnings } = getPageValidation({
+      const { hasErrors, hasWarnings } = getPageValidationStatus({
         pageNodeDefUuid: uuid,
         descendantPageUuids: pageDescendants,
         record,
