@@ -203,6 +203,13 @@ export const {
   fetchFilesTotalSpace,
 } = SurveyRepository
 
+/**
+ * Fetches the id and app version of every survey.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
+ */
+export const fetchSurveyIdsAndAppVersions = async (client = db) => SurveyRepository.fetchSurveyIdsAndAppVersions(client)
+
 export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
   const [surveyInfo, authGroups] = await Promise.all([
     SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
@@ -522,6 +529,17 @@ export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
 
 export const unpublishSurveyProps = async (surveyId, client = db) =>
   SurveyRepository.unpublishSurveyProps(surveyId, client)
+
+/**
+ * Updates the app version associated to the specified survey.
+ * @param {object} params - The update parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.version - The app version to associate to the survey.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<null>} - The result promise.
+ */
+export const updateSurveyAppVersion = async ({ surveyId, version }, client = db) =>
+  SurveyRepository.updateSurveyAppVersion({ surveyId, version }, client)
 
 export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, client = db) => {
   if (key !== Survey.configKeys.filesTotalSpace) {
