@@ -106,9 +106,10 @@ export const getFormPageParentNode = (nodeDef) => (state) => {
       if (mappedParent) return mappedParent
     }
 
-    // Fallback: parent entity may exist in the record before its page is visited
-    // (pagesUuidMap only fills in on navigation). Needed so the page tree can
-    // show nested pages without visiting each ancestor first.
+    // Fallback only for single parents: using [0] on a multiple entity would
+    // bind the form to an arbitrary instance. Multiples must be in pagesUuidMap.
+    if (NodeDef.isMultiple(nodeDefParent)) return null
+
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDefParent))(record)
     return parentNodes?.[0] ?? null
   }

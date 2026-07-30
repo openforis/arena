@@ -92,6 +92,7 @@ type GetEntityCompletionPercent = (params: { survey: unknown; record: unknown; e
 /**
  * Resolves the page entity node without requiring the page to have been visited
  * (pagesUuidMap may be empty until the user opens that page).
+ * Falls back to the first record instance only for single entities — never for multiples.
  */
 const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
   const record = RecordState.getRecord(state)
@@ -104,23 +105,29 @@ const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
     if (mappedEntity) return mappedEntity
   }
 
-  // Prefer a child under a known parent page entity when the page itself is unmapped.
   const survey = SurveyState.getSurvey(state)
   const pageNodeDef = Survey.getNodeDefByUuid(pageNodeDefUuid)(survey)
-  const parentDefUuid = pageNodeDef ? NodeDef.getParentUuid(pageNodeDef) : null
+  if (!pageNodeDef) return null
+
+  const parentDefUuid = NodeDef.getParentUuid(pageNodeDef)
   if (parentDefUuid) {
+    const parentDef = Survey.getNodeDefByUuid(parentDefUuid)(survey)
     const parentMappedUuid = pagesUuidMap?.[parentDefUuid]
-    const parentEntity = parentMappedUuid
-      ? Record.getNodeByUuid(parentMappedUuid)(record)
-      : Record.getNodesByDefUuid(parentDefUuid)(record)?.[0]
+    let parentEntity = parentMappedUuid ? Record.getNodeByUuid(parentMappedUuid)(record) : null
+    // Only guess first parent instance when the parent is single.
+    if (!parentEntity && parentDef && !NodeDef.isMultiple(parentDef)) {
+      parentEntity = Record.getNodesByDefUuid(parentDefUuid)(record)?.[0] ?? null
+    }
     if (parentEntity) {
       const children = Record.getNodeChildrenByDefUuid(parentEntity, pageNodeDefUuid)(record)
-      if (children?.[0]) return children[0]
+      // Multiple page entities under a parent must be selected via pagesUuidMap.
+      if (NodeDef.isMultiple(pageNodeDef)) return null
+      return children?.[0] ?? null
     }
   }
 
-  const nodesByDef = Record.getNodesByDefUuid(pageNodeDefUuid)(record)
-  return nodesByDef?.[0] ?? null
+  if (NodeDef.isMultiple(pageNodeDef)) return null
+  return Record.getNodesByDefUuid(pageNodeDefUuid)(record)?.[0] ?? null
 }
 
 /**

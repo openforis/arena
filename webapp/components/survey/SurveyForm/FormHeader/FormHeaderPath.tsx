@@ -115,19 +115,16 @@ export const FormHeaderPath = ({ entry, nodeDefPageName }: Props) => {
   }, [crumbs.length])
 
   useLayoutEffect(() => {
-    setMaxItems(crumbs.length <= 2 ? crumbs.length : 2)
     updateMaxItems()
     const observer = new ResizeObserver(updateMaxItems)
     if (containerRef.current) observer.observe(containerRef.current)
     return () => observer.disconnect()
-  }, [updateMaxItems, crumbs.length])
+  }, [updateMaxItems])
 
   const needsCollapse = crumbs.length > maxItems
   const beforeCrumbs = needsCollapse ? crumbs.slice(0, ITEMS_BEFORE_COLLAPSE) : crumbs
   const afterCrumbs = needsCollapse ? crumbs.slice(crumbs.length - ITEMS_AFTER_COLLAPSE) : []
-  const menuCrumbs = needsCollapse
-    ? crumbs.slice(ITEMS_BEFORE_COLLAPSE, crumbs.length - ITEMS_AFTER_COLLAPSE)
-    : []
+  const menuCrumbs = needsCollapse ? crumbs.slice(ITEMS_BEFORE_COLLAPSE, crumbs.length - ITEMS_AFTER_COLLAPSE) : []
 
   const openMenu = Boolean(menuAnchorEl)
 
