@@ -1,7 +1,7 @@
 import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
@@ -36,7 +36,7 @@ import { TreeSelectViewMode } from '@webapp/model'
 import NodeDefDetails from '../NodeDefDetails'
 import { FormPagesEditButtons } from './components/FormPageEditButtons'
 import { RecordCompletionBar } from './components/RecordCompletionBar'
-import { RecordSidebarStatusStrip } from './components/RecordSidebarStatusStrip'
+import { RecordTreeItemStatusSuffix } from './components/RecordTreeItemStatusSuffix'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 import FormHeader from './FormHeader'
@@ -92,6 +92,7 @@ const SurveyForm = (props) => {
 
   const className = classNames('survey-form', {
     edit: editAllowed,
+    entry,
     'form-actions-off': !hasNodeDefAddChildTo,
     'page-navigation-off': !showPageNavigation,
     'form-preview': preview,
@@ -170,22 +171,6 @@ const SurveyForm = (props) => {
     [notAvailablePageEntityDefsUuids]
   )
 
-  const allPageNodeDefUuids = useMemo(() => {
-    if (!entry || !survey || !surveyCycleKey) return []
-    const root = Survey.getNodeDefRoot(survey)
-    const result = []
-    const stack = [root]
-    while (stack.length > 0) {
-      const nd = stack.pop()
-      if (isNodeDefIncluded(nd)) {
-        result.push(NodeDef.getUuid(nd))
-      }
-      const children = Survey.getNodeDefChildrenInOwnPage({ nodeDef: nd, cycle: surveyCycleKey })(survey)
-      stack.push(...[...children].reverse())
-    }
-    return result
-  }, [entry, survey, surveyCycleKey, isNodeDefIncluded])
-
   if (!activePageNodeDef) {
     return null
   }
@@ -225,19 +210,22 @@ const SurveyForm = (props) => {
           <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
               {entry && <RecordCompletionBar />}
-              <div className="survey-form__sidebar-tree-row">
-                <NodeDefTreeSelect
-                  disableSelection={surveyIsDirty}
-                  isNodeDefIncluded={isNodeDefIncluded}
-                  nodeDefUuidActive={viewOnlyPages ? NodeDef.getUuid(activePageNodeDef) : selectedNodeDefUuid}
-                  onlyPages={viewOnlyPages}
-                  includeMultipleAttributes={!viewOnlyPages}
-                  includeSingleAttributes={!viewOnlyPages}
-                  includeSingleEntities
-                  onSelect={onNodeDefTreeSelect}
-                />
-                {entry && <RecordSidebarStatusStrip pageNodeDefUuids={allPageNodeDefUuids} />}
-              </div>
+              <NodeDefTreeSelect
+                disableSelection={surveyIsDirty}
+                isNodeDefIncluded={isNodeDefIncluded}
+                nodeDefUuidActive={viewOnlyPages ? NodeDef.getUuid(activePageNodeDef) : selectedNodeDefUuid}
+                onlyPages={viewOnlyPages}
+                includeMultipleAttributes={!viewOnlyPages}
+                includeSingleAttributes={!viewOnlyPages}
+                includeSingleEntities
+                onSelect={onNodeDefTreeSelect}
+                expandButtonPlacement={entry ? 'above' : 'inline'}
+                renderItemSuffix={
+                  entry
+                    ? (item, { isExpanded }) => <RecordTreeItemStatusSuffix item={item} isExpanded={isExpanded} />
+                    : undefined
+                }
+              />
               {edit && (
                 <div className="display-flex sidebar-bottom-bar">
                   <ButtonGroup

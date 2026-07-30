@@ -91,22 +91,18 @@
       width: 100%;
       justify-content: space-between;
     }
-
-    .survey-form__sidebar-tree-row {
-      display: flex;
-      flex: 1;
-      overflow-y: auto;
-
-      .nodedef-tree-select {
-        flex: 1;
-      }
-    }
   }
 
   &.edit {
     .nodedef-tree-select {
       border: $formBorderEdit;
     }
+  }
+}
+
+.survey-form.entry {
+  .survey-form__node-def-entity-wrapper {
+    background-color: $white;
   }
 }
 
