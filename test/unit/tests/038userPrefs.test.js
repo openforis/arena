@@ -1,6 +1,12 @@
 import * as User from '@core/user/user'
 
 describe('User prefs - notifyOnUserAccessRequest', () => {
+  // the stored JSONB key is persisted in the db and referenced by
+  // userRepository.fetchSystemAdministratorsEmail: renaming it would orphan existing prefs
+  it('keeps the persisted pref key stable', () => {
+    expect(User.keysPrefs.notifyOnUserAccessRequest).toBe('notifyOnUserAccessRequest')
+  })
+
   describe('getPrefNotifyOnUserAccessRequest', () => {
     it('defaults to true when user has no prefs at all', () => {
       expect(User.getPrefNotifyOnUserAccessRequest({})).toBe(true)
