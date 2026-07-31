@@ -10,7 +10,6 @@ import * as Record from '@core/record/record'
 import { SurveyState } from '@webapp/store/survey'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
 import * as RecordState from '../state'
-import { getPageValidationStatus } from './recordPageValidation'
 
 export type TreeItemStatus = {
   hasErrors: boolean
@@ -33,10 +32,23 @@ type Params = {
 
 type GetEntityCompletionPercent = (params: { survey: unknown; record: unknown; entity: unknown }) => number
 
+type PageEvalResult = {
+  hasErrors: boolean
+  hasWarnings: boolean
+  hasCompletableContent: boolean
+  isComplete: boolean
+}
+
+const EMPTY_STATUS: TreeItemStatus = { hasErrors: false, hasWarnings: false, isComplete: false }
+
 /**
  * Resolves the page entity node without requiring the page to have been visited
  * (pagesUuidMap may be empty until the user opens that page).
  * Falls back to the first record instance only for single entities — never for multiples.
+ *
+ * @param pageNodeDefUuid - Page entity node def UUID
+ * @param state - Redux state
+ * @returns Page entity node, or null when unresolved
  */
 const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
   const record = RecordState.getRecord(state)
@@ -55,19 +67,7 @@ const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
 
   const parentDefUuid = NodeDef.getParentUuid(pageNodeDef)
   if (parentDefUuid) {
-    const parentDef = Survey.getNodeDefByUuid(parentDefUuid)(survey)
-    const parentMappedUuid = pagesUuidMap?.[parentDefUuid]
-    let parentEntity = parentMappedUuid ? Record.getNodeByUuid(parentMappedUuid)(record) : null
-    // Only guess first parent instance when the parent is single.
-    if (!parentEntity && parentDef && !NodeDef.isMultiple(parentDef)) {
-      parentEntity = Record.getNodesByDefUuid(parentDefUuid)(record)?.[0] ?? null
-    }
-    if (parentEntity) {
-      const children = Record.getNodeChildrenByDefUuid(parentEntity, pageNodeDefUuid)(record)
-      // Multiple page entities under a parent must be selected via pagesUuidMap.
-      if (NodeDef.isMultiple(pageNodeDef)) return null
-      return children?.[0] ?? null
-    }
+    return getPageEntityFromParent({ pageNodeDef, pageNodeDefUuid, parentDefUuid, pagesUuidMap, record, survey })
   }
 
   if (NodeDef.isMultiple(pageNodeDef)) return null
@@ -75,8 +75,48 @@ const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
 }
 
 /**
+ * Resolves a page entity via its parent entity in the record.
+ *
+ * @param params - Parent and page context
+ * @returns Child page entity, or null
+ */
+const getPageEntityFromParent = ({
+  pageNodeDef,
+  pageNodeDefUuid,
+  parentDefUuid,
+  pagesUuidMap,
+  record,
+  survey,
+}: {
+  pageNodeDef: object
+  pageNodeDefUuid: string
+  parentDefUuid: string
+  pagesUuidMap: Record<string, string> | undefined
+  record: object
+  survey: object
+}) => {
+  const parentDef = Survey.getNodeDefByUuid(parentDefUuid)(survey)
+  const parentMappedUuid = pagesUuidMap?.[parentDefUuid]
+  let parentEntity = parentMappedUuid ? Record.getNodeByUuid(parentMappedUuid)(record) : null
+  // Only guess first parent instance when the parent is single.
+  if (!parentEntity && parentDef && !NodeDef.isMultiple(parentDef)) {
+    parentEntity = Record.getNodesByDefUuid(parentDefUuid)(record)?.[0] ?? null
+  }
+  if (!parentEntity) return null
+
+  const children = Record.getNodeChildrenByDefUuid(parentEntity, pageNodeDefUuid)(record)
+  // Multiple page entities under a parent must be selected via pagesUuidMap.
+  if (NodeDef.isMultiple(pageNodeDef)) return null
+  return children?.[0] ?? null
+}
+
+/**
  * Whether the page entity definition has any own (non-nested-entity) attributes that
  * count toward completion. Matches arena-core empty-stats → 100% behavior.
+ *
+ * @param pageNodeDefUuid - Page entity node def UUID
+ * @param state - Redux state
+ * @returns True when the page has own key/required attributes
  */
 const pageHasOwnCompletableAttributes = (pageNodeDefUuid: string, state: unknown): boolean => {
   const survey = SurveyState.getSurvey(state)
@@ -89,6 +129,12 @@ const pageHasOwnCompletableAttributes = (pageNodeDefUuid: string, state: unknown
   })
 }
 
+/**
+ * Returns own-page completion percent for a page entity, or null when unavailable.
+ *
+ * @param params - Page scope and Redux state
+ * @returns Completion percent, or null
+ */
 const getPageCompletionPercent = ({
   pageNodeDefUuid,
   ownOnly,
@@ -121,6 +167,73 @@ const getPageCompletionPercent = ({
 }
 
 /**
+ * Evaluates validation and completion for a single page with own-page scope.
+ *
+ * @param uuid - Page node def UUID
+ * @param descendantPageUuidsByPage - Per-page descendant lists
+ * @param record - Active record
+ * @param state - Redux state
+ * @returns Page evaluation flags
+ */
+const evaluatePage = (
+  uuid: string,
+  descendantPageUuidsByPage: Record<string, string[]>,
+  record: object,
+  state: unknown
+): PageEvalResult => {
+  const pageDescendants = descendantPageUuidsByPage[uuid] ?? []
+  const { hasErrors, hasWarnings } = Records.getPageValidationStatus({
+    pageNodeDefUuid: uuid,
+    descendantPageUuids: pageDescendants,
+    record,
+  })
+  const hasCompletableContent = pageHasOwnCompletableAttributes(uuid, state)
+  const percent = getPageCompletionPercent({ pageNodeDefUuid: uuid, ownOnly: true, state })
+  // Vacuous 100% (no own key/required fields) must not show a complete icon.
+  const isComplete = hasCompletableContent && percent === 100 && !hasErrors && !hasWarnings
+  return { hasErrors, hasWarnings, hasCompletableContent, isComplete }
+}
+
+/**
+ * Rolls up status across a collapsed tree item and its descendant pages.
+ *
+ * @param scopedUuids - Page UUIDs in the collapsed subtree
+ * @param descendantPageUuidsByPage - Per-page descendant lists
+ * @param record - Active record
+ * @param state - Redux state
+ * @returns Aggregated tree item status
+ */
+const rollupCollapsedStatus = (
+  scopedUuids: string[],
+  descendantPageUuidsByPage: Record<string, string[]>,
+  record: object,
+  state: unknown
+): TreeItemStatus => {
+  let hasErrors = false
+  let hasWarnings = false
+  let allCompletableComplete = true
+  let anyCompletableContent = false
+
+  for (const uuid of scopedUuids) {
+    const status = evaluatePage(uuid, descendantPageUuidsByPage, record, state)
+    if (status.hasErrors) hasErrors = true
+    if (status.hasWarnings) hasWarnings = true
+    // Empty/container pages stay out of the rollup complete check so they
+    // neither show a lone check nor block a parent that has real fields.
+    if (status.hasCompletableContent) {
+      anyCompletableContent = true
+      if (!status.isComplete) allCompletableComplete = false
+    }
+  }
+
+  return {
+    hasErrors,
+    hasWarnings,
+    isComplete: anyCompletableContent && allCompletableComplete && !hasErrors && !hasWarnings,
+  }
+}
+
+/**
  * Returns status for a sidebar tree page item. When the item is expanded,
  * only that page's own fields are considered (nested page entities excluded).
  * When collapsed, status rolls up across the page and all descendant pages,
@@ -142,50 +255,18 @@ export const useRecordTreeItemStatus = ({
 }: Params): TreeItemStatus => {
   return useSelector((state): TreeItemStatus => {
     const record = RecordState.getRecord(state)
-    if (!record) return { hasErrors: false, hasWarnings: false, isComplete: false }
-
-    const evaluatePage = (uuid: string) => {
-      const pageDescendants = descendantPageUuidsByPage[uuid] ?? []
-      const { hasErrors, hasWarnings } = getPageValidationStatus({
-        pageNodeDefUuid: uuid,
-        descendantPageUuids: pageDescendants,
-        record,
-      })
-      const hasCompletableContent = pageHasOwnCompletableAttributes(uuid, state)
-      const percent = getPageCompletionPercent({ pageNodeDefUuid: uuid, ownOnly: true, state })
-      // Vacuous 100% (no own key/required fields) must not show a complete icon.
-      const isComplete =
-        hasCompletableContent && percent === 100 && !hasErrors && !hasWarnings
-      return { hasErrors, hasWarnings, hasCompletableContent, isComplete }
-    }
+    if (!record) return EMPTY_STATUS
 
     if (isTreeItemExpanded) {
-      const { hasErrors, hasWarnings, isComplete } = evaluatePage(pageNodeDefUuid)
+      const { hasErrors, hasWarnings, isComplete } = evaluatePage(
+        pageNodeDefUuid,
+        descendantPageUuidsByPage,
+        record,
+        state
+      )
       return { hasErrors, hasWarnings, isComplete }
     }
 
-    const scopedUuids = [pageNodeDefUuid, ...descendantPageUuids]
-    let hasErrors = false
-    let hasWarnings = false
-    let allCompletableComplete = true
-    let anyCompletableContent = false
-
-    for (const uuid of scopedUuids) {
-      const status = evaluatePage(uuid)
-      if (status.hasErrors) hasErrors = true
-      if (status.hasWarnings) hasWarnings = true
-      // Empty/container pages stay out of the rollup complete check so they
-      // neither show a lone check nor block a parent that has real fields.
-      if (status.hasCompletableContent) {
-        anyCompletableContent = true
-        if (!status.isComplete) allCompletableComplete = false
-      }
-    }
-
-    return {
-      hasErrors,
-      hasWarnings,
-      isComplete: anyCompletableContent && allCompletableComplete && !hasErrors && !hasWarnings,
-    }
+    return rollupCollapsedStatus([pageNodeDefUuid, ...descendantPageUuids], descendantPageUuidsByPage, record, state)
   }, Objects.isEqual)
 }

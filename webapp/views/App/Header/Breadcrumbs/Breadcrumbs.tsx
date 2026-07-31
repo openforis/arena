@@ -52,7 +52,8 @@ export const Breadcrumbs = () => {
     })
     return acc
   }, [])
-  if (crumbs.length > 0) crumbs[crumbs.length - 1].isLast = true
+  const lastCrumb = crumbs.at(-1)
+  if (lastCrumb) lastCrumb.isLast = true
 
   const updateMaxItems = useCallback(() => {
     if (containerRef.current) {
@@ -73,24 +74,38 @@ export const Breadcrumbs = () => {
     return () => observer.disconnect()
   }, [updateMaxItems])
 
+  /**
+   * Renders one breadcrumb item as plain text or a link.
+   *
+   * @param crumb - Breadcrumb item to render
+   * @returns Crumb element
+   */
+  const renderCrumb = ({ key, label, uri, isLast }: CrumbItem) => {
+    if (isLast) {
+      return (
+        <Typography key={key} color="text.primary" variant="body2" noWrap>
+          {label}
+        </Typography>
+      )
+    }
+    if (surveyIsDirty) {
+      return (
+        <Typography key={key} color="text.secondary" variant="body2" noWrap>
+          {label}
+        </Typography>
+      )
+    }
+    return (
+      <MuiLink key={key} component={Link} to={uri} underline="hover" color="inherit" variant="body2" noWrap>
+        {label}
+      </MuiLink>
+    )
+  }
+
   return (
     <div ref={containerRef} className="breadcrumbs">
       <MuiBreadcrumbs maxItems={maxItems} itemsBeforeCollapse={1} itemsAfterCollapse={1} aria-label="breadcrumb">
-        {crumbs.map(({ key, label, uri, isLast }) =>
-          isLast ? (
-            <Typography key={key} color="text.primary" variant="body2" noWrap>
-              {label}
-            </Typography>
-          ) : surveyIsDirty ? (
-            <Typography key={key} color="text.secondary" variant="body2" noWrap>
-              {label}
-            </Typography>
-          ) : (
-            <MuiLink key={key} component={Link} to={uri} underline="hover" color="inherit" variant="body2" noWrap>
-              {label}
-            </MuiLink>
-          )
-        )}
+        {crumbs.map(renderCrumb)}
       </MuiBreadcrumbs>
     </div>
   )

@@ -106,7 +106,7 @@ export const FormHeaderPath = ({ entry, nodeDefPageName }: Props) => {
   const i18n = useI18n()
   const notifyInfo = useNotifyInfo()
   const containerRef = useRef<HTMLDivElement>(null)
-  const [maxItems, setMaxItems] = useState(() => (crumbs.length <= 2 ? crumbs.length : 2))
+  const [maxItems, setMaxItems] = useState(() => Math.min(crumbs.length, 2))
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null)
 
   const updateMaxItems = useCallback(() => {
