@@ -219,7 +219,7 @@ const SurveyForm = (props) => {
                 includeSingleAttributes={!viewOnlyPages}
                 includeSingleEntities
                 onSelect={onNodeDefTreeSelect}
-                expandButtonPlacement={entry ? 'above' : 'inline'}
+                showExpandButton={!entry}
                 renderItemSuffix={
                   entry
                     ? (item, { isExpanded }) => <RecordTreeItemStatusSuffix item={item} isExpanded={isExpanded} />

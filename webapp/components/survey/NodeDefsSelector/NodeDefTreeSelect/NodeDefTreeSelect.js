@@ -20,7 +20,7 @@ const NodeDefTreeSelect = (props) => {
     nodeDefUuidActive = null,
     onlyPages = false,
     onSelect,
-    expandButtonPlacement = 'inline',
+    showExpandButton = true,
     renderItemSuffix = undefined,
   } = props
 
@@ -45,32 +45,25 @@ const NodeDefTreeSelect = (props) => {
     onSelect,
   })
 
-  const collapseButtonVisible = treeItems?.length >= 1 && treeItems[0].items?.length > 0
-
-  const expandButton = collapseButtonVisible ? (
-    <Button
-      className="btn-toggle btn-expand"
-      iconClassName={classNames('icon icon-12px', {
-        'icon-shrink2': expanded,
-        'icon-enlarge2': !expanded,
-      })}
-      onClick={toggleExpanded}
-      size="small"
-      title={expanded ? 'common.collapse' : 'common.expand'}
-      variant="text"
-    />
-  ) : null
+  const collapseButtonVisible = showExpandButton && treeItems?.length >= 1 && treeItems[0].items?.length > 0
 
   return (
-    <div
-      className={classNames('nodedef-tree-select', {
-        'nodedef-tree-select--expand-above': expandButtonPlacement === 'above',
-      })}
-    >
-      {expandButtonPlacement === 'above' && expandButton && (
-        <div className="nodedef-tree-select__toolbar">{expandButton}</div>
+    <div className="nodedef-tree-select">
+      {collapseButtonVisible && (
+        <div className="display-flex">
+          <Button
+            className="btn-toggle btn-expand"
+            iconClassName={classNames('icon icon-12px', {
+              'icon-shrink2': expanded,
+              'icon-enlarge2': !expanded,
+            })}
+            onClick={toggleExpanded}
+            size="small"
+            title={expanded ? 'common.collapse' : 'common.expand'}
+            variant="text"
+          />
+        </div>
       )}
-      {expandButtonPlacement === 'inline' && expandButton && <div className="display-flex">{expandButton}</div>}
 
       <TreeView
         disableSelection={disableSelection}
@@ -97,7 +90,7 @@ NodeDefTreeSelect.propTypes = {
   includeSingleEntities: PropTypes.bool,
   onlyPages: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
-  expandButtonPlacement: PropTypes.oneOf(['inline', 'above']),
+  showExpandButton: PropTypes.bool,
   renderItemSuffix: PropTypes.func,
 }
 
