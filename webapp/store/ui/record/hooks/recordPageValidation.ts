@@ -75,6 +75,7 @@ export const getPageValidationStatus = ({
   let hasWarnings = false
 
   for (const nodeUuid of Object.keys(fields)) {
+    if (RecordValidation.isValidationFieldKeyChildrenCount(nodeUuid)) continue
     const node = Record.getNodeByUuid(nodeUuid)(record)
     if (!node) continue
     if (!nodeBelongsToOwnPage(node, pageNodeDefUuid, descendantPageUuids, record)) continue
