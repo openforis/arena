@@ -20,6 +20,10 @@ export default {
   notAcceptedYet: 'Invitación aún no aceptada',
   passwordResetLinkCopiedToClipboard: 'Enlace de restablecimiento de contraseña copiado en el portapapeles',
   passwordResetLink: 'Enlace de restablecimiento de contraseña',
+  prefs: {
+    title: 'Preferencias de notificación',
+    notifyOnUserAccessRequest: 'Nuevas solicitudes de acceso de usuarios',
+  },
   roleInCurrentSurvey: 'Rol en la encuesta actual',
   roleInSurvey: 'Rol en la encuesta',
   filterPlaceholder: 'Filtrar por nombre o correo electrónico',

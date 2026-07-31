@@ -24,6 +24,10 @@ export default {
   notAcceptedYet: 'Приглашение еще не принято',
   passwordResetLinkCopiedToClipboard: 'Ссылка для сброса пароля скопирована в буфер обмена',
   passwordResetLink: 'Ссылка для сброса пароля',
+  prefs: {
+    title: 'Настройки уведомлений',
+    notifyOnUserAccessRequest: 'Новые запросы на доступ',
+  },
   roleInCurrentSurvey: 'Роль в текущем опросе',
   roleInSurvey: 'Роль в опросе',
   filterPlaceholder: 'Фильтровать по имени или email',
