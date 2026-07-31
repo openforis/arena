@@ -92,6 +92,8 @@ export default {
       surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
       landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
       uploadLogo: 'Лого байршуулах',
+      logoFileFormatHint: '$t(homeView:surveyInfo.branding.logoFileFormatHint)',
+      logoFileTooLarge: '$t(homeView:surveyInfo.branding.logoFileTooLarge)',
       preview: 'Урьдчилан харах',
       backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
       invalidPrimaryColor: 'Зөв #RRGGBB өнгө оруулна уу эсвэл хоосон үлдээнэ үү',
