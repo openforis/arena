@@ -354,12 +354,14 @@ export const fetchUsersWithExpiredInvitation = (client = db) =>
 export const fetchSystemAdministratorsEmail = async (client = db) =>
   client.map(
     `
-    SELECT u.email 
-    FROM "user" u 
+    SELECT u.email
+    FROM "user" u
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
     WHERE g.name = $1
+      -- users who haven't set the pref (NULL) still get notified
+      AND COALESCE((u.prefs ->> 'notifyOnUserAccessRequest')::boolean, true) = true
   `,
     [AuthGroup.groupNames.systemAdmin],
     (row) => row.email
