@@ -117,6 +117,22 @@ in this file:
 No changes to `prepareFormData`, `useOnSave.js`, or any server PUT `/api/user/:uuid`
 code — the prefs save is fully independent, using the already-existing prefs endpoint.
 
+#### Adjacent cleanup: map API keys fieldset
+
+The map API keys block in the same self-only section still uses a raw `<fieldset>` with
+a manually translated `<legend>`. Convert it to `Fieldset` for consistency with the new
+block:
+
+```jsx
+<Fieldset className="map-api-keys" legend="user.mapApiKeys.title">
+  <FormItem label="user.mapApiKeys.mapProviders.planet">…</FormItem>
+</Fieldset>
+```
+
+That `<legend>{i18n.t('user.mapApiKeys.title')}</legend>` is the **only** use of `i18n`
+in `UserEdit.js`, so the conversion also requires removing `const i18n = useI18n()` and
+the now-unused `useI18n` import — otherwise ESLint `no-unused-vars` fails.
+
 ### 4. i18n
 
 Add to `core/i18n/resources/en/usersView.js`:
@@ -135,6 +151,7 @@ later — not blocking for this change.
 ## Out of scope
 
 - Editing this preference on behalf of another system admin.
+- Any wider refactoring of `UserEdit.js` beyond the `Fieldset` conversion noted above.
 - Any other notification types besides "new access request" (the fieldset is
   structured to allow adding more checkboxes later, but none are added now).
 - DB migration (not needed — `prefs` JSONB already supports arbitrary keys).
