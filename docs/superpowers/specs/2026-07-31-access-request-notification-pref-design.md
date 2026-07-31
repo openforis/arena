@@ -76,14 +76,17 @@ unrelated (used for "last admin" checks) and is not touched.
 
 ### 3. Frontend — `webapp/views/App/views/Users/UserEdit/UserEdit.js`
 
-Add a new fieldset inside the existing self-only block
+Add a new group inside the existing self-only block
 (`editingLoggedInUser && !showSurveyGroup`, which already hosts map API keys and
-`UserAiSettingsPanel`), gated additionally on `systemAdmin`:
+`UserAiSettingsPanel`), gated additionally on `systemAdmin`. Use the shared
+`Fieldset` component (`webapp/components/Fieldset.tsx`, exported from
+`@webapp/components`) rather than a raw `<fieldset>` tag — it renders the
+`<fieldset>`/`<legend>` markup and translates the `legend` prop internally via
+`useI18n`, so an i18n key is passed directly:
 
 ```jsx
 {systemAdmin && (
-  <fieldset className="notification-prefs">
-    <legend>{i18n.t('usersView:prefs.title')}</legend>
+  <Fieldset className="notification-prefs" legend="usersView:prefs.title">
     <Checkbox
       checked={notifyOnUserAccessRequest}
       label="usersView:prefs.notifyOnUserAccessRequest"
@@ -92,9 +95,12 @@ Add a new fieldset inside the existing self-only block
         setNotificationPrefsDirty(true)
       }}
     />
-  </fieldset>
+  </Fieldset>
 )}
 ```
+
+`Fieldset` is added to the existing `@webapp/components` import in `UserEdit.js`
+(which already imports `Button`, `ButtonDelete`, `ButtonInvite`, `ButtonSave`).
 
 State/save wiring mirrors the existing `aiSettingsDirty` / `aiSaveRef` pattern already
 in this file:
