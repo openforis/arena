@@ -24,3 +24,9 @@ export const cloneChainFromSurvey = async ({ targetSurveyId, sourceSurveyId, sou
   })
   return chain
 }
+
+// ==== DELETE
+
+export const deleteChain = async ({ surveyId, chainUuid }) => {
+  await axios.delete(`/api/survey/${surveyId}/chain/${chainUuid}`)
+}
