@@ -6,13 +6,17 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import MuiBreadcrumbs from '@mui/material/Breadcrumbs'
 import SvgIcon from '@mui/material/SvgIcon'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import * as Survey from '@core/survey/survey'
 
+import { useNotifyInfo } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { computeBreadcrumbsMaxItems } from '@webapp/utils/breadcrumbsUtils'
+import { copyToClipboard } from '@webapp/utils/domUtils'
 
 import { usePathCrumbs, type FormPathCrumb } from './usePathCrumbs'
 
@@ -22,12 +26,19 @@ const CRUMB_MIN_WIDTH_PX = 140
 /** Width reserved for the condensed-menu trigger button. */
 const MENU_BUTTON_WIDTH_PX = 36
 
+/** Width reserved for the copy-path icon button. */
+const COPY_BUTTON_WIDTH_PX = 36
+
 const ITEMS_BEFORE_COLLAPSE = 1
 
 const ITEMS_AFTER_COLLAPSE = 1
 
+/** Matches survey location paths used elsewhere (e.g. map attribute popups). */
+const PATH_SEPARATOR = ' -> '
+
 const breadcrumbsSx = {
-  width: '100%',
+  flex: 1,
+  minWidth: 0,
   overflow: 'hidden',
   '& .MuiBreadcrumbs-ol': {
     flexWrap: 'nowrap',
@@ -62,6 +73,12 @@ const MoreHorizIcon = () => (
   </SvgIcon>
 )
 
+const ContentCopyIcon = () => (
+  <SvgIcon fontSize="small">
+    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+  </SvgIcon>
+)
+
 type Props = {
   entry: boolean
   nodeDefPageName: string
@@ -93,6 +110,8 @@ export const FormHeaderPath = ({ entry, nodeDefPageName }: Props) => {
   const crumbs = usePathCrumbs(entry)
   const survey = useSurvey()
   const dispatch = useDispatch()
+  const i18n = useI18n()
+  const notifyInfo = useNotifyInfo()
   const containerRef = useRef<HTMLDivElement>(null)
   const [maxItems, setMaxItems] = useState(() => (crumbs.length <= 2 ? crumbs.length : 2))
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLButtonElement | null>(null)
@@ -104,7 +123,7 @@ export const FormHeaderPath = ({ entry, nodeDefPageName }: Props) => {
           containerWidth: containerRef.current.offsetWidth,
           itemCount: crumbs.length,
           crumbMinWidthPx: CRUMB_MIN_WIDTH_PX,
-          reservedWidthPx: MENU_BUTTON_WIDTH_PX,
+          reservedWidthPx: MENU_BUTTON_WIDTH_PX + COPY_BUTTON_WIDTH_PX,
           fallbackMaxItems: 2,
         })
       )
@@ -141,6 +160,14 @@ export const FormHeaderPath = ({ entry, nodeDefPageName }: Props) => {
     handleMenuClose()
   }
 
+  const handleCopyPath = async () => {
+    const pathText = crumbs.map((crumb) => crumb.label).join(PATH_SEPARATOR)
+    if (!pathText) return
+    if (await copyToClipboard(pathText)) {
+      notifyInfo({ key: 'surveyForm:pathCopiedToClipboard' })
+    }
+  }
+
   return (
     <div
       ref={containerRef}
@@ -173,6 +200,20 @@ export const FormHeaderPath = ({ entry, nodeDefPageName }: Props) => {
           <CrumbLabel key={crumb.key} crumb={crumb} isLast={index === afterCrumbs.length - 1} />
         ))}
       </MuiBreadcrumbs>
+
+      <Tooltip title={i18n.t('surveyForm:copyPath')}>
+        <span>
+          <IconButton
+            color="inherit"
+            size="small"
+            aria-label={i18n.t('surveyForm:copyPath')}
+            disabled={crumbs.length === 0}
+            onClick={handleCopyPath}
+          >
+            <ContentCopyIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
     </div>
   )
 }
