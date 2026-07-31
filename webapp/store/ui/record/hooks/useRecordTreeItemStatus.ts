@@ -125,6 +125,8 @@ const getPageCompletionPercent = ({
  * only that page's own fields are considered (nested page entities excluded).
  * When collapsed, status rolls up across the page and all descendant pages,
  * each evaluated with its own-page scope.
+ * Pages with no own key/required fields never get a complete icon (vacuous 100%
+ * from arena-core is ignored for display); errors/warnings still surface.
  *
  * @param pageNodeDefUuid - UUID of this tree item's page node def
  * @param descendantPageUuids - Page node def UUIDs under this item in the tree
@@ -149,30 +151,41 @@ export const useRecordTreeItemStatus = ({
         descendantPageUuids: pageDescendants,
         record,
       })
+      const hasCompletableContent = pageHasOwnCompletableAttributes(uuid, state)
       const percent = getPageCompletionPercent({ pageNodeDefUuid: uuid, ownOnly: true, state })
-      return { hasErrors, hasWarnings, isComplete: percent === 100 && !hasErrors && !hasWarnings }
+      // Vacuous 100% (no own key/required fields) must not show a complete icon.
+      const isComplete =
+        hasCompletableContent && percent === 100 && !hasErrors && !hasWarnings
+      return { hasErrors, hasWarnings, hasCompletableContent, isComplete }
     }
 
     if (isTreeItemExpanded) {
-      return evaluatePage(pageNodeDefUuid)
+      const { hasErrors, hasWarnings, isComplete } = evaluatePage(pageNodeDefUuid)
+      return { hasErrors, hasWarnings, isComplete }
     }
 
     const scopedUuids = [pageNodeDefUuid, ...descendantPageUuids]
     let hasErrors = false
     let hasWarnings = false
-    let allComplete = scopedUuids.length > 0
+    let allCompletableComplete = true
+    let anyCompletableContent = false
 
     for (const uuid of scopedUuids) {
       const status = evaluatePage(uuid)
       if (status.hasErrors) hasErrors = true
       if (status.hasWarnings) hasWarnings = true
-      if (!status.isComplete) allComplete = false
+      // Empty/container pages stay out of the rollup complete check so they
+      // neither show a lone check nor block a parent that has real fields.
+      if (status.hasCompletableContent) {
+        anyCompletableContent = true
+        if (!status.isComplete) allCompletableComplete = false
+      }
     }
 
     return {
       hasErrors,
       hasWarnings,
-      isComplete: allComplete && !hasErrors && !hasWarnings,
+      isComplete: anyCompletableContent && allCompletableComplete && !hasErrors && !hasWarnings,
     }
   }, Objects.isEqual)
 }
