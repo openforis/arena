@@ -33,7 +33,7 @@ const TreeItemView = (props) => {
       disabled={disabled}
       itemId={key}
       label={
-        <div className="tree-item-label display-flex" style={{ width: '100%', minWidth: 0, gap: 4 }}>
+        <div className="tree-item-label display-flex">
           {icon}
           <LabelWithTooltip label={label} />
           {suffix}

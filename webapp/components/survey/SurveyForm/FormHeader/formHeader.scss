@@ -25,8 +25,16 @@
   overflow: hidden;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
   height: 100%;
+}
+
+.survey-form-header__path-trail {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  max-width: 100%;
+  width: fit-content;
 }
 
 .survey-form-header__actions {

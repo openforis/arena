@@ -37,7 +37,6 @@ const ITEMS_AFTER_COLLAPSE = 1
 const PATH_SEPARATOR = ' -> '
 
 const breadcrumbsSx = {
-  flex: 1,
   minWidth: 0,
   overflow: 'hidden',
   '& .MuiBreadcrumbs-ol': {
@@ -70,12 +69,6 @@ const menuItemSx = {
 const MoreHorizIcon = () => (
   <SvgIcon fontSize="small">
     <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-  </SvgIcon>
-)
-
-const ContentCopyIcon = () => (
-  <SvgIcon fontSize="small">
-    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
   </SvgIcon>
 )
 
@@ -185,35 +178,37 @@ export const FormHeaderPath = ({ entry, nodeDefPageName }: Props) => {
         </Menu>
       )}
 
-      <MuiBreadcrumbs aria-label="form page path" sx={breadcrumbsSx}>
-        {beforeCrumbs.map((crumb, index) => (
-          <CrumbLabel key={crumb.key} crumb={crumb} isLast={!needsCollapse && index === crumbs.length - 1} />
-        ))}
+      <div className="survey-form-header__path-trail">
+        <MuiBreadcrumbs aria-label="form page path" sx={breadcrumbsSx}>
+          {beforeCrumbs.map((crumb, index) => (
+            <CrumbLabel key={crumb.key} crumb={crumb} isLast={!needsCollapse && index === crumbs.length - 1} />
+          ))}
 
-        {needsCollapse && (
-          <IconButton color="inherit" size="small" aria-label="Show path" onClick={handleMenuOpen}>
-            <MoreHorizIcon />
-          </IconButton>
-        )}
+          {needsCollapse && (
+            <IconButton color="inherit" size="small" aria-label="Show path" onClick={handleMenuOpen}>
+              <MoreHorizIcon />
+            </IconButton>
+          )}
 
-        {afterCrumbs.map((crumb, index) => (
-          <CrumbLabel key={crumb.key} crumb={crumb} isLast={index === afterCrumbs.length - 1} />
-        ))}
-      </MuiBreadcrumbs>
+          {afterCrumbs.map((crumb, index) => (
+            <CrumbLabel key={crumb.key} crumb={crumb} isLast={index === afterCrumbs.length - 1} />
+          ))}
+        </MuiBreadcrumbs>
 
-      <Tooltip title={i18n.t('surveyForm:copyPath')}>
-        <span>
-          <IconButton
-            color="inherit"
-            size="small"
-            aria-label={i18n.t('surveyForm:copyPath')}
-            disabled={crumbs.length === 0}
-            onClick={handleCopyPath}
-          >
-            <ContentCopyIcon />
-          </IconButton>
-        </span>
-      </Tooltip>
+        <Tooltip title={i18n.t('surveyForm:copyPath')}>
+          <span>
+            <IconButton
+              color="inherit"
+              size="small"
+              aria-label={i18n.t('surveyForm:copyPath')}
+              disabled={crumbs.length === 0}
+              onClick={handleCopyPath}
+            >
+              <span className="icon icon-copy icon-12px" />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </div>
     </div>
   )
 }
