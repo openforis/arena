@@ -23,6 +23,10 @@ export default {
   lastLogin: 'Сүүлийн нэвтрэлт',
   moreThan30DaysAgo: '30 гаруй хоногийн өмнө',
   notAcceptedYet: 'Урилгыг хараахан хүлээн аваагүй байна',
+  prefs: {
+    title: 'Мэдэгдлийн тохиргоо',
+    notifyOnUserAccessRequest: 'Шинэ хэрэглэгчийн хандалтын хүсэлт',
+  },
   roleInCurrentSurvey: 'Одоогийн судалгаан дахь үүрэг',
   roleInSurvey: 'Судалгаан дахь үүрэг',
   filterPlaceholder: 'Нэр эсвэл имэйлээр шүүх',

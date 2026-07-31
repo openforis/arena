@@ -11,6 +11,7 @@ export const keysPrefs = {
   surveys: 'surveys',
   current: 'current',
   language: 'language',
+  notifyOnUserAccessRequest: 'notifyOnUserAccessRequest',
 } as const
 
 export const keysSurveyPrefs = {
@@ -27,6 +28,7 @@ const surveyPrefPath = ({ surveyId, key }: { surveyId: unknown; key: string }) =
   key,
 ]
 const pathLanguage = [keys.prefs, keysPrefs.language]
+const pathNotifyOnUserAccessRequest = [keys.prefs, keysPrefs.notifyOnUserAccessRequest]
 
 const surveyCyclePrefPath = (surveyId: unknown) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.cycle })
 const surveyLangPrefPath = (surveyId: unknown) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.language })
@@ -67,6 +69,10 @@ export const getPrefSurveyCurrentLanguage = (user: Record<string, unknown>) => {
 
 export const getPrefLanguage = R.path(pathLanguage)
 
+// defaults to true: an unset pref must behave like "notify", preserving pre-existing behaviour
+export const getPrefNotifyOnUserAccessRequest = (user: Record<string, unknown>): boolean =>
+  R.pathOr(true, pathNotifyOnUserAccessRequest, user) as boolean
+
 // ====== UPDATE
 export const assocPrefSurveyCycle = (surveyId: unknown, cycle: unknown) =>
   R.assocPath(surveyCyclePrefPath(surveyId), cycle)
@@ -84,6 +90,8 @@ export const assocPrefSurveyCurrentAndCycle = (surveyId: unknown, cycle: unknown
   R.pipe(assocPrefSurveyCurrent(surveyId), assocPrefSurveyCycle(surveyId, cycle))
 
 export const assocPrefLanguage = ({ lang }: { lang: string }) => R.assocPath(pathLanguage, lang)
+
+export const assocPrefNotifyOnUserAccessRequest = (value: boolean) => R.assocPath(pathNotifyOnUserAccessRequest, value)
 
 // ====== DELETE
 export const deletePrefSurvey = (surveyId: unknown) => (user: Record<string, unknown>) => {
