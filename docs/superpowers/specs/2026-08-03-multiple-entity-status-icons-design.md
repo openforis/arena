@@ -79,7 +79,7 @@ If core lag blocks Arena, a thin Arena-local helper with the **same signatures**
 |------------|--------|-----------|
 | **Page status (scoped)** | `pageNodeDefUuid`, optional `scopeEntityUuid`, `descendantPageUuids` | Tree child / single pages (1). Node must belong to the page **and** lie under `scopeEntityUuid` in the hierarchy when scope is set. |
 | **Entity subtree status** | `entityUuid` (+ survey/record as needed for completion) | Dropdown options (3); building block for (2) |
-| **Multiple parent status** | Multiple page’s `pageNodeDefUuid` | For each record instance of that def, compute subtree status (own page + descendant pages under that instance); aggregate across instances as in §4.1 |
+| **Multiple parent status** | Multiple page’s `pageNodeDefUuid` + optional `scopeEntityUuid` (resolved parent entity) | For each record instance of that def **under the scope entity** (or all instances if no scope), compute subtree status; aggregate across those instances as in §4.1 |
 | **Unscoped page status** | Existing `getPageValidationStatus` | Progress bar only (unchanged) |
 
 Prefer **one optional `scopeEntityUuid`** over passing full `pagesUuidMap` into core. Arena resolves the scope entity from `pagesUuidMap` before calling core.
@@ -111,7 +111,7 @@ Prefer **one optional `scopeEntityUuid`** over passing full `pagesUuidMap` into 
 |------|----------|
 | Unvisited child page (missing from `pagesUuidMap`) | Resolve scope via selected ancestor when possible (same spirit as today’s `getPageEntity`). If a **multiple** ancestor cannot be resolved, do **not** guess the first instance — show **none**. |
 | Multiple parent with 0 instances | Icon **none** (unless own children-count validation applies). |
-| Nested multiples (e.g. Tree under Plot) | Child icons scoped to nearest resolved ancestor on the path. Tree dropdown = instances under the **currently selected** Plot. Plot’s all-instance rollup includes errors under every plot’s nested multiples. |
+| Nested multiples (e.g. Tree under Plot) | Child icons scoped to nearest resolved ancestor on the path. Tree dropdown = instances under the **currently selected** Plot. Plot’s all-instance rollup includes errors under every plot’s nested multiples. **Nested multiple page rows** (e.g. Tree in the sidebar) aggregate only instances under the resolved parent entity (`scopeEntityUuid` = selected Plot); if that parent is unresolved, show no icon. |
 | Single entities | Unchanged (no all-instance special case). |
 | Designer / non-entry | Unchanged (entry-only status suffixes). |
 | Warnings | Same priority as tree everywhere. |

@@ -27,7 +27,8 @@
         display: flex;
         align-items: center;
         min-height: unset;
-        padding: 0;
+        // Leave room for MUI's dropdown arrow so status icons don't overlap it.
+        padding: 0 1.75rem 0 0;
       }
     }
   }

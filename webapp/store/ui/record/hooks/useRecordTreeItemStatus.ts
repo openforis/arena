@@ -349,6 +349,23 @@ const legacyTreeItemStatus = (state: unknown, params: Params): TreeItemStatus =>
 }
 
 /**
+ * Resolves the ancestor entity UUID that scopes aggregation for a multiple page.
+ * Nested multiples (e.g. Tree under Plot) must only aggregate instances under the
+ * currently selected parent entity from pagesUuidMap — never sibling parents.
+ *
+ * @param pageNodeDef - Multiple page node def
+ * @param state - Redux state
+ * @returns Parent entity UUID, or null when the parent cannot be resolved
+ */
+const getMultiplePageScopeEntityUuid = (pageNodeDef: object, state: unknown): string | null => {
+  const parentDefUuid = NodeDef.getParentUuid(pageNodeDef)
+  if (!parentDefUuid) return null
+
+  const parentEntity = getPageEntity(parentDefUuid, state)
+  return parentEntity?.uuid ?? null
+}
+
+/**
  * Returns status for a sidebar tree page item. When the item is expanded,
  * only that page's own fields are considered (nested page entities excluded).
  * When collapsed, status rolls up across the page and all descendant pages,
@@ -385,11 +402,20 @@ export const useRecordTreeItemStatus = ({
     const survey = SurveyState.getSurvey(state)
     const pageNodeDef = Survey.getNodeDefByUuid(pageNodeDefUuid)(survey)
     if (pageNodeDef && NodeDef.isMultiple(pageNodeDef)) {
+      const parentDefUuid = NodeDef.getParentUuid(pageNodeDef)
+      // Nested under a parent page: require a resolved parent scope (selected Plot, etc.).
+      // Top-level multiples under root still resolve the single root via getPageEntity.
+      const scopeEntityUuid = parentDefUuid ? getMultiplePageScopeEntityUuid(pageNodeDef, state) : null
+      if (parentDefUuid && !scopeEntityUuid) {
+        return EMPTY_STATUS
+      }
+
       const status = Records.getMultiplePageEntitiesStatus({
         survey,
         record,
         pageNodeDefUuid,
         cycle: Record.getCycle(record),
+        ...(scopeEntityUuid ? { scopeEntityUuid } : {}),
       })
       return {
         hasErrors: status.hasErrors,
