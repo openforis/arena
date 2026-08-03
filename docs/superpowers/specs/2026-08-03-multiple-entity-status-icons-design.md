@@ -86,9 +86,9 @@ Prefer **one optional `scopeEntityUuid`** over passing full `pagesUuidMap` into 
 
 ### 5.3 Webapp wiring
 
-1. **`useRecordTreeItemStatus`**
-   - If page node def is **multiple** → all-instances aggregation (**2**), for both expanded and collapsed (do **not** use expanded = own-only for multiples).
-   - Else if expanded → own page, **scoped** to current instance path (**1**).
+1. **`useRecordTreeItemStatus`**  
+   - If page node def is **multiple** → aggregate instances under the resolved **parent** entity (`scopeEntityUuid`), for both expanded and collapsed (do **not** use expanded = own-only for multiples). If the parent cannot be resolved, show no icon.  
+   - Else if expanded → own page, **scoped** to current instance path (**1**).  
    - Else collapsed → rollup descendants; each page eval **scoped** to current path (**1**).
 
 2. **`nodeDefEntityFormNodeSelect`**
