@@ -5,7 +5,7 @@ import { Objects, Records } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as Record from '@core/record/record'
+import * as RecordCore from '@core/record/record'
 
 import { SurveyState } from '@webapp/store/survey'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
@@ -65,7 +65,7 @@ const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
   const pagesUuidMap = SurveyFormState.getPagesUuidMap(state)
   const mappedUuid = pagesUuidMap?.[pageNodeDefUuid]
   if (mappedUuid) {
-    const mappedEntity = Record.getNodeByUuid(mappedUuid)(record)
+    const mappedEntity = RecordCore.getNodeByUuid(mappedUuid)(record)
     if (mappedEntity) return mappedEntity
   }
 
@@ -79,7 +79,7 @@ const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
   }
 
   if (NodeDef.isMultiple(pageNodeDef)) return null
-  return Record.getNodesByDefUuid(pageNodeDefUuid)(record)?.[0] ?? null
+  return RecordCore.getNodesByDefUuid(pageNodeDefUuid)(record)?.[0] ?? null
 }
 
 /**
@@ -105,14 +105,14 @@ const getPageEntityFromParent = ({
 }) => {
   const parentDef = Survey.getNodeDefByUuid(parentDefUuid)(survey)
   const parentMappedUuid = pagesUuidMap?.[parentDefUuid]
-  let parentEntity = parentMappedUuid ? Record.getNodeByUuid(parentMappedUuid)(record) : null
+  let parentEntity = parentMappedUuid ? RecordCore.getNodeByUuid(parentMappedUuid)(record) : null
   // Only guess first parent instance when the parent is single.
   if (!parentEntity && parentDef && !NodeDef.isMultiple(parentDef)) {
-    parentEntity = Record.getNodesByDefUuid(parentDefUuid)(record)?.[0] ?? null
+    parentEntity = RecordCore.getNodesByDefUuid(parentDefUuid)(record)?.[0] ?? null
   }
   if (!parentEntity) return null
 
-  const children = Record.getNodeChildrenByDefUuid(parentEntity, pageNodeDefUuid)(record)
+  const children = RecordCore.getNodeChildrenByDefUuid(parentEntity, pageNodeDefUuid)(record)
   // Multiple page entities under a parent must be selected via pagesUuidMap.
   if (NodeDef.isMultiple(pageNodeDef)) return null
   return children?.[0] ?? null
@@ -405,7 +405,7 @@ export const useRecordTreeItemStatus = ({
         survey,
         record,
         pageNodeDefUuid,
-        cycle: Record.getCycle(record),
+        cycle: RecordCore.getCycle(record),
         ...(scopeEntityUuid ? { scopeEntityUuid } : {}),
       })
       return {
