@@ -10,9 +10,28 @@ import { useRecord } from '@webapp/store/ui/record'
 import { useNodeDefLabelType, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
-const getPageNode = ({ record, pagesUuidMap, nodeDefUuid }) => {
+/**
+ * Resolves the record node for a page entity def.
+ * Uses pagesUuidMap when the page was visited; otherwise falls back to the
+ * first instance only for single entities (never for multiples).
+ * @param {object} params - Lookup params
+ * @param {object} params.record - Record
+ * @param {object} params.pagesUuidMap - Page node def UUID → node UUID map
+ * @param {string} params.nodeDefUuid - Page entity node def UUID
+ * @param {object} params.survey - Survey
+ * @returns {object|null} Page entity node or null
+ */
+const getPageNode = ({ record, pagesUuidMap, nodeDefUuid, survey }) => {
+  if (!record || !nodeDefUuid) return null
   const nodeUuid = pagesUuidMap[nodeDefUuid]
-  return record && nodeUuid ? Record.getNodeByUuid(nodeUuid)(record) : null
+  if (nodeUuid) {
+    const mapped = Record.getNodeByUuid(nodeUuid)(record)
+    if (mapped) return mapped
+  }
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  // Do not guess an instance for multiple entities.
+  if (!nodeDef || NodeDef.isMultiple(nodeDef)) return null
+  return Record.getNodesByDefUuid(nodeDefUuid)(record)?.[0] ?? null
 }
 
 const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) => {
@@ -44,8 +63,13 @@ const getNodeDefAvailableChildren = ({
   includeSingleEntities,
   isNodeDefIncluded,
 }) => {
-  const pageNode = getPageNode({ record, pagesUuidMap, nodeDefUuid: NodeDef.getUuid(nodeDef) })
-  const parentPageNode = getPageNode({ record, pagesUuidMap, nodeDefUuid: NodeDef.getParentUuid(nodeDef) })
+  const pageNode = getPageNode({ record, pagesUuidMap, nodeDefUuid: NodeDef.getUuid(nodeDef), survey })
+  const parentPageNode = getPageNode({
+    record,
+    pagesUuidMap,
+    nodeDefUuid: NodeDef.getParentUuid(nodeDef),
+    survey,
+  })
 
   const hidden =
     !NodeDef.isRoot(nodeDef) &&
@@ -112,12 +136,15 @@ export const useBuildTreeData = ({
   const buildTreeItem = ({ nodeDef }) => {
     const nodeDefLabel = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
     const suffix = getLabelSuffix(nodeDef)
+    const structuralChildren = Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
+    const hasSubPages = structuralChildren.length > 0
     return {
       key: NodeDef.getUuid(nodeDef),
       disabled: isNodeDefDisabled(nodeDef),
       icon: NodeDefUIProps.getIconByNodeDef({ nodeDef, cycle, includeKey: true }),
       label: `${nodeDefLabel}${suffix}`,
       testId: TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef)),
+      hasSubPages,
     }
   }
 

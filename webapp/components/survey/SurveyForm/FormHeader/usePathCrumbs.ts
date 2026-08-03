@@ -9,7 +9,24 @@ import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/st
 import { useNodeDefLabelType, useNodeDefPage, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
 import { useRecord } from '@webapp/store/ui/record'
 
-const getNodeValue = ({ survey, cycle, nodeDef, node, lang }) =>
+export type FormPathCrumb = {
+  key: string
+  label: string
+}
+
+const getNodeValue = ({
+  survey,
+  cycle,
+  nodeDef,
+  node,
+  lang,
+}: {
+  survey: ReturnType<typeof useSurvey>
+  cycle: string
+  nodeDef: object
+  node: object
+  lang: string
+}) =>
   NodeValueFormatter.format({
     survey,
     cycle,
@@ -21,7 +38,13 @@ const getNodeValue = ({ survey, cycle, nodeDef, node, lang }) =>
     lang,
   })
 
-export const usePath = (entry) => {
+/**
+ * Builds the ordered list of breadcrumb labels for the current form page path.
+ *
+ * @param entry - Whether the form is in data entry mode
+ * @returns Ordered breadcrumb items from root to the active page
+ */
+export const usePathCrumbs = (entry: boolean): FormPathCrumb[] => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   let nodeDefCurrent = useNodeDefPage()
@@ -30,16 +53,15 @@ export const usePath = (entry) => {
   const labelType = useNodeDefLabelType()
   const record = useRecord()
 
-  const labels = []
+  const crumbs: FormPathCrumb[] = []
+
   while (nodeDefCurrent) {
     let label = NodeDef.getLabel(nodeDefCurrent, lang, labelType)
 
     if (entry && record && (NodeDef.isRoot(nodeDefCurrent) || NodeDef.isMultipleEntity(nodeDefCurrent))) {
-      // get page node
       const nodeDefUuidCurrent = NodeDef.getUuid(nodeDefCurrent)
       const nodeUuidCurrent = pagesUuidMap[nodeDefUuidCurrent]
 
-      // if entry mode add node key values
       const nodeCurrent = NodeDef.isSingle(nodeDefCurrent)
         ? Record.getNodesByDefUuid(nodeDefUuidCurrent)(record)[0]
         : Record.getNodeByUuid(nodeUuidCurrent)(record)
@@ -53,9 +75,14 @@ export const usePath = (entry) => {
         label += ` [${keys.flat().join(', ')}]`
       }
     }
-    labels.unshift(label)
+
+    crumbs.unshift({
+      key: NodeDef.getUuid(nodeDefCurrent),
+      label,
+    })
 
     nodeDefCurrent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
   }
-  return labels.join(' &#8594; ')
+
+  return crumbs
 }
