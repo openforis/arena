@@ -36,8 +36,6 @@ type Params = {
   isTreeItemExpanded: boolean
 }
 
-type GetEntityCompletionPercent = (params: { survey: unknown; record: unknown; entity: unknown }) => number
-
 type PageEvalResult = {
   hasErrors: boolean
   hasWarnings: boolean
@@ -109,13 +107,6 @@ const getPageCompletionPercent = ({
   const record = RecordState.getRecord(state)
   if (!record) return null
 
-  const recordsApi = Records as Record<string, unknown>
-  const preferred = ownOnly ? recordsApi.getEntityOwnCompletionPercent : recordsApi.getEntityCompletionPercent
-  const completionFn = (typeof preferred === 'function' ? preferred : recordsApi.getEntityCompletionPercent) as
-    | GetEntityCompletionPercent
-    | undefined
-  if (typeof completionFn !== 'function') return null
-
   const entity = getPageEntity(pageNodeDefUuid, state)
   if (!entity) {
     // Unvisited pages with no own required/key attributes are complete (arena-core returns 100
@@ -125,6 +116,7 @@ const getPageCompletionPercent = ({
   }
 
   const survey = SurveyState.getSurvey(state)
+  const completionFn = ownOnly ? Records.getEntityOwnCompletionPercent : Records.getEntityCompletionPercent
   return completionFn({ survey, record, entity })
 }
 
