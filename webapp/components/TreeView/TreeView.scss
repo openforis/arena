@@ -1,5 +1,11 @@
 @use '~@webapp/style/vars' as *;
 
+.tree-item-label {
+  width: 100%;
+  min-width: 0;
+  gap: 4px;
+}
+
 .MuiTreeItem-root {
   .MuiTreeItem-content.Mui-selected {
     background-color: $blueLight;
