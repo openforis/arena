@@ -10,4 +10,5 @@ export {
   useNodesMinCount,
   useRecordPagesValidationProgress,
   useRecordTreeItemStatus,
+  useEntitySubtreeStatus,
 } from './hooks'

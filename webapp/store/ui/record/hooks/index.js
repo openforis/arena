@@ -108,3 +108,4 @@ export const useNodesMinCount = ({ parentNodeUuid, nodeDefUuid }) =>
 
 export { useRecordPagesValidationProgress } from './useRecordPagesValidationProgress'
 export { useRecordTreeItemStatus } from './useRecordTreeItemStatus'
+export { useEntitySubtreeStatus } from './useEntitySubtreeStatus'
