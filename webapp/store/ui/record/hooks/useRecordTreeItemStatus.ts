@@ -11,6 +11,11 @@ import { SurveyState } from '@webapp/store/survey'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
 import * as SystemInfoState from '@webapp/store/system/info/state'
 import * as RecordState from '../state'
+import {
+  getMultiplePageScopeEntityUuid as resolveMultiplePageScopeEntityUuid,
+  getPageEntity as resolvePageEntity,
+  hasUnresolvedMultipleAncestor,
+} from '../recordPageEntity'
 
 export type TreeItemStatus = {
   hasErrors: boolean
@@ -50,9 +55,7 @@ const EMPTY_PAGE_EVAL: PageEvalResult = {
 }
 
 /**
- * Resolves the page entity node without requiring the page to have been visited
- * (pagesUuidMap may be empty until the user opens that page).
- * Falls back to the first record instance only for single entities — never for multiples.
+ * Resolves the page entity for a page def from Redux state.
  *
  * @param pageNodeDefUuid - Page entity node def UUID
  * @param state - Redux state
@@ -61,61 +64,12 @@ const EMPTY_PAGE_EVAL: PageEvalResult = {
 const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
   const record = RecordState.getRecord(state)
   if (!record) return null
-
-  const pagesUuidMap = SurveyFormState.getPagesUuidMap(state)
-  const mappedUuid = pagesUuidMap?.[pageNodeDefUuid]
-  if (mappedUuid) {
-    const mappedEntity = RecordCore.getNodeByUuid(mappedUuid)(record)
-    if (mappedEntity) return mappedEntity
-  }
-
-  const survey = SurveyState.getSurvey(state)
-  const pageNodeDef = Survey.getNodeDefByUuid(pageNodeDefUuid)(survey)
-  if (!pageNodeDef) return null
-
-  const parentDefUuid = NodeDef.getParentUuid(pageNodeDef)
-  if (parentDefUuid) {
-    return getPageEntityFromParent({ pageNodeDef, pageNodeDefUuid, parentDefUuid, pagesUuidMap, record, survey })
-  }
-
-  if (NodeDef.isMultiple(pageNodeDef)) return null
-  return RecordCore.getNodesByDefUuid(pageNodeDefUuid)(record)?.[0] ?? null
-}
-
-/**
- * Resolves a page entity via its parent entity in the record.
- *
- * @param params - Parent and page context
- * @returns Child page entity, or null
- */
-const getPageEntityFromParent = ({
-  pageNodeDef,
-  pageNodeDefUuid,
-  parentDefUuid,
-  pagesUuidMap,
-  record,
-  survey,
-}: {
-  pageNodeDef: object
-  pageNodeDefUuid: string
-  parentDefUuid: string
-  pagesUuidMap: Record<string, string> | undefined
-  record: object
-  survey: object
-}) => {
-  const parentDef = Survey.getNodeDefByUuid(parentDefUuid)(survey)
-  const parentMappedUuid = pagesUuidMap?.[parentDefUuid]
-  let parentEntity = parentMappedUuid ? RecordCore.getNodeByUuid(parentMappedUuid)(record) : null
-  // Only guess first parent instance when the parent is single.
-  if (!parentEntity && parentDef && !NodeDef.isMultiple(parentDef)) {
-    parentEntity = RecordCore.getNodesByDefUuid(parentDefUuid)(record)?.[0] ?? null
-  }
-  if (!parentEntity) return null
-
-  const children = RecordCore.getNodeChildrenByDefUuid(parentEntity, pageNodeDefUuid)(record)
-  // Multiple page entities under a parent must be selected via pagesUuidMap.
-  if (NodeDef.isMultiple(pageNodeDef)) return null
-  return children?.[0] ?? null
+  return resolvePageEntity({
+    survey: SurveyState.getSurvey(state),
+    record,
+    pagesUuidMap: SurveyFormState.getPagesUuidMap(state),
+    pageNodeDefUuid,
+  })
 }
 
 /**
@@ -172,34 +126,6 @@ const getPageCompletionPercent = ({
 
   const survey = SurveyState.getSurvey(state)
   return completionFn({ survey, record, entity })
-}
-
-/**
- * True when entity is unresolved because a multiple ancestor lacks a pagesUuidMap entry.
- *
- * @param pageNodeDef - Page node def
- * @param survey - Survey
- * @param pagesUuidMap - Active page entity map
- * @returns True when scope cannot be resolved
- */
-const hasUnresolvedMultipleAncestor = (
-  pageNodeDef: object,
-  survey: object,
-  pagesUuidMap: Record<string, string> | undefined
-): boolean => {
-  let currentDef: object | null | undefined = pageNodeDef
-  while (currentDef) {
-    const parentDef = Survey.getNodeDefParent(currentDef)(survey)
-    if (!parentDef) break
-    if (NodeDef.isMultiple(parentDef)) {
-      const parentDefUuid = NodeDef.getUuid(parentDef)
-      if (!pagesUuidMap?.[parentDefUuid]) {
-        return true
-      }
-    }
-    currentDef = parentDef
-  }
-  return false
 }
 
 /**
@@ -339,19 +265,20 @@ const getNonMultipleTreeItemStatus = (
 
 /**
  * Resolves the ancestor entity UUID that scopes aggregation for a multiple page.
- * Nested multiples (e.g. Tree under Plot) must only aggregate instances under the
- * currently selected parent entity from pagesUuidMap — never sibling parents.
  *
  * @param pageNodeDef - Multiple page node def
  * @param state - Redux state
  * @returns Parent entity UUID, or null when the parent cannot be resolved
  */
 const getMultiplePageScopeEntityUuid = (pageNodeDef: object, state: unknown): string | null => {
-  const parentDefUuid = NodeDef.getParentUuid(pageNodeDef)
-  if (!parentDefUuid) return null
-
-  const parentEntity = getPageEntity(parentDefUuid, state)
-  return parentEntity?.uuid ?? null
+  const record = RecordState.getRecord(state)
+  if (!record) return null
+  return resolveMultiplePageScopeEntityUuid({
+    survey: SurveyState.getSurvey(state),
+    record,
+    pagesUuidMap: SurveyFormState.getPagesUuidMap(state),
+    pageNodeDef,
+  })
 }
 
 /**
