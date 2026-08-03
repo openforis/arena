@@ -293,3 +293,6 @@ modules.xml
 
 # Ignore local settings for claude
 .claude/settings.local.json
+
+# Superpowers subagent-driven-development scratch workspace
+.superpowers/

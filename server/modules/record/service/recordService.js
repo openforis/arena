@@ -543,7 +543,10 @@ const exportRecordDocument = async ({
     record,
     lang: langToUse,
     i18n,
-    fileProvider: async (fileUuid) => SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileUuid }),
+    fileProvider: async (fileUuid) => {
+      const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+      return SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary })
+    },
     headerImageFileUuid: headerImageFileSummary?.uuid,
     footerImageFileUuid: footerImageFileSummary?.uuid,
     headerOnFirstPageOnly,

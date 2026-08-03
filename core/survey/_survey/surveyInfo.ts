@@ -19,6 +19,7 @@ export const keys = {
   draft: 'draft',
   published: ObjectUtils.keys.published,
   datePublished: 'datePublished',
+  appVersion: 'appVersion',
   authGroups: 'authGroups',
   props: ObjectUtils.keys.props,
   rdbInitialized: 'rdbInitialized',
@@ -80,6 +81,8 @@ export const getName = (survey): string => ObjectUtils.getProp(keys.name, '')(su
 export const getOwnerUuid = R.propOr(null, keys.ownerUuid)
 
 export const getOwnerName = R.propOr('', keys.ownerName)
+
+export const getAppVersion = R.propOr(null, keys.appVersion)
 
 export const isDraft = R.propEq(keys.draft, true)
 
