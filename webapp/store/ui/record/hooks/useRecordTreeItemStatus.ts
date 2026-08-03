@@ -40,13 +40,6 @@ type PageEvalResult = {
   isComplete: boolean
 }
 
-type EvaluatePageFn = (
-  uuid: string,
-  descendantPageUuidsByPage: Record<string, string[]>,
-  record: object,
-  state: unknown
-) => PageEvalResult
-
 const EMPTY_STATUS: TreeItemStatus = { hasErrors: false, hasWarnings: false, isComplete: false }
 
 const EMPTY_PAGE_EVAL: PageEvalResult = {
@@ -210,65 +203,47 @@ const hasUnresolvedMultipleAncestor = (
 }
 
 /**
- * Evaluates validation and completion for a single page with own-page scope (legacy).
+ * Evaluates validation and completion for a single page with own-page scope.
+ * When `instanceScoped` is true, validation is limited to the resolved page entity
+ * (or empty when a multiple ancestor is unresolved).
  *
  * @param uuid - Page node def UUID
  * @param descendantPageUuidsByPage - Per-page descendant lists
  * @param record - Active record
  * @param state - Redux state
+ * @param options - Evaluation options
+ * @param options.instanceScoped - Whether to scope validation to the current entity instance
  * @returns Page evaluation flags
  */
 const evaluatePage = (
   uuid: string,
   descendantPageUuidsByPage: Record<string, string[]>,
   record: object,
-  state: unknown
+  state: unknown,
+  { instanceScoped = false }: { instanceScoped?: boolean } = {}
 ): PageEvalResult => {
-  const pageDescendants = descendantPageUuidsByPage[uuid] ?? []
-  const { hasErrors, hasWarnings } = Records.getPageValidationStatus({
-    pageNodeDefUuid: uuid,
-    descendantPageUuids: pageDescendants,
-    record,
-  })
-  const hasCompletableContent = pageHasOwnCompletableAttributes(uuid, state)
-  const percent = getPageCompletionPercent({ pageNodeDefUuid: uuid, ownOnly: true, state })
-  // Vacuous 100% (no own key/required fields) must not show a complete icon.
-  const isComplete = hasCompletableContent && percent === 100 && !hasErrors && !hasWarnings
-  return { hasErrors, hasWarnings, hasCompletableContent, isComplete }
-}
+  let scopeEntityUuid: string | undefined
 
-/**
- * Evaluates validation and completion for a single page with instance scope (experimental).
- *
- * @param uuid - Page node def UUID
- * @param descendantPageUuidsByPage - Per-page descendant lists
- * @param record - Active record
- * @param state - Redux state
- * @returns Page evaluation flags
- */
-const evaluatePageScoped = (
-  uuid: string,
-  descendantPageUuidsByPage: Record<string, string[]>,
-  record: object,
-  state: unknown
-): PageEvalResult => {
-  const survey = SurveyState.getSurvey(state)
-  const pageNodeDef = Survey.getNodeDefByUuid(uuid)(survey)
-  const entity = getPageEntity(uuid, state)
+  if (instanceScoped) {
+    const survey = SurveyState.getSurvey(state)
+    const pageNodeDef = Survey.getNodeDefByUuid(uuid)(survey)
+    const entity = getPageEntity(uuid, state)
 
-  if (!entity && pageNodeDef) {
-    const parentDef = Survey.getNodeDefParent(pageNodeDef)(survey)
-    if (parentDef && NodeDef.isMultiple(parentDef)) {
-      return EMPTY_PAGE_EVAL
+    if (!entity && pageNodeDef) {
+      const parentDef = Survey.getNodeDefParent(pageNodeDef)(survey)
+      if (parentDef && NodeDef.isMultiple(parentDef)) {
+        return EMPTY_PAGE_EVAL
+      }
+      const pagesUuidMap = SurveyFormState.getPagesUuidMap(state)
+      if (hasUnresolvedMultipleAncestor(pageNodeDef, survey, pagesUuidMap)) {
+        return EMPTY_PAGE_EVAL
+      }
     }
-    const pagesUuidMap = SurveyFormState.getPagesUuidMap(state)
-    if (hasUnresolvedMultipleAncestor(pageNodeDef, survey, pagesUuidMap)) {
-      return EMPTY_PAGE_EVAL
-    }
+
+    scopeEntityUuid = entity?.uuid
   }
 
   const pageDescendants = descendantPageUuidsByPage[uuid] ?? []
-  const scopeEntityUuid = entity?.uuid
   const { hasErrors, hasWarnings } = Records.getPageValidationStatus({
     pageNodeDefUuid: uuid,
     descendantPageUuids: pageDescendants,
@@ -277,6 +252,7 @@ const evaluatePageScoped = (
   })
   const hasCompletableContent = pageHasOwnCompletableAttributes(uuid, state)
   const percent = getPageCompletionPercent({ pageNodeDefUuid: uuid, ownOnly: true, state })
+  // Vacuous 100% (no own key/required fields) must not show a complete icon.
   const isComplete = hasCompletableContent && percent === 100 && !hasErrors && !hasWarnings
   return { hasErrors, hasWarnings, hasCompletableContent, isComplete }
 }
@@ -288,7 +264,7 @@ const evaluatePageScoped = (
  * @param descendantPageUuidsByPage - Per-page descendant lists
  * @param record - Active record
  * @param state - Redux state
- * @param evaluatePageFn - Page evaluator (legacy or scoped)
+ * @param instanceScoped - Whether page evaluation uses instance scoping
  * @returns Aggregated tree item status
  */
 const rollupCollapsedStatus = (
@@ -296,7 +272,7 @@ const rollupCollapsedStatus = (
   descendantPageUuidsByPage: Record<string, string[]>,
   record: object,
   state: unknown,
-  evaluatePageFn: EvaluatePageFn = evaluatePage
+  instanceScoped = false
 ): TreeItemStatus => {
   let hasErrors = false
   let hasWarnings = false
@@ -304,7 +280,7 @@ const rollupCollapsedStatus = (
   let anyCompletableContent = false
 
   for (const uuid of scopedUuids) {
-    const status = evaluatePageFn(uuid, descendantPageUuidsByPage, record, state)
+    const status = evaluatePage(uuid, descendantPageUuidsByPage, record, state, { instanceScoped })
     if (status.hasErrors) hasErrors = true
     if (status.hasWarnings) hasWarnings = true
     // Empty/container pages stay out of the rollup complete check so they
@@ -323,13 +299,19 @@ const rollupCollapsedStatus = (
 }
 
 /**
- * Legacy tree item status (record-wide validation, no instance scoping).
+ * Status for a non-multiple tree page: own page when expanded, subtree rollup when collapsed.
  *
  * @param state - Redux state
  * @param params - Tree item parameters
+ * @param options - Evaluation options
+ * @param options.instanceScoped - Whether to use instance-scoped page validation
  * @returns Aggregated tree item status
  */
-const legacyTreeItemStatus = (state: unknown, params: Params): TreeItemStatus => {
+const getNonMultipleTreeItemStatus = (
+  state: unknown,
+  params: Params,
+  { instanceScoped }: { instanceScoped: boolean }
+): TreeItemStatus => {
   const record = RecordState.getRecord(state)
   if (!record) return EMPTY_STATUS
 
@@ -340,12 +322,19 @@ const legacyTreeItemStatus = (state: unknown, params: Params): TreeItemStatus =>
       pageNodeDefUuid,
       descendantPageUuidsByPage,
       record,
-      state
+      state,
+      { instanceScoped }
     )
     return { hasErrors, hasWarnings, isComplete }
   }
 
-  return rollupCollapsedStatus([pageNodeDefUuid, ...descendantPageUuids], descendantPageUuidsByPage, record, state)
+  return rollupCollapsedStatus(
+    [pageNodeDefUuid, ...descendantPageUuids],
+    descendantPageUuidsByPage,
+    record,
+    state,
+    instanceScoped
+  )
 }
 
 /**
@@ -389,14 +378,16 @@ export const useRecordTreeItemStatus = ({
     const record = RecordState.getRecord(state)
     if (!record) return EMPTY_STATUS
 
+    const params: Params = {
+      pageNodeDefUuid,
+      descendantPageUuids,
+      descendantPageUuidsByPage,
+      isTreeItemExpanded,
+    }
+
     const experimentalFeatures = SystemInfoState.getConfigExperimentalFeatures(state)
     if (!experimentalFeatures) {
-      return legacyTreeItemStatus(state, {
-        pageNodeDefUuid,
-        descendantPageUuids,
-        descendantPageUuidsByPage,
-        isTreeItemExpanded,
-      })
+      return getNonMultipleTreeItemStatus(state, params, { instanceScoped: false })
     }
 
     const survey = SurveyState.getSurvey(state)
@@ -424,22 +415,6 @@ export const useRecordTreeItemStatus = ({
       }
     }
 
-    if (isTreeItemExpanded) {
-      const { hasErrors, hasWarnings, isComplete } = evaluatePageScoped(
-        pageNodeDefUuid,
-        descendantPageUuidsByPage,
-        record,
-        state
-      )
-      return { hasErrors, hasWarnings, isComplete }
-    }
-
-    return rollupCollapsedStatus(
-      [pageNodeDefUuid, ...descendantPageUuids],
-      descendantPageUuidsByPage,
-      record,
-      state,
-      evaluatePageScoped
-    )
+    return getNonMultipleTreeItemStatus(state, params, { instanceScoped: true })
   }, Objects.isEqual)
 }
