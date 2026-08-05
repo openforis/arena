@@ -3,7 +3,8 @@
 **Date:** 2026-08-05  
 **Branch:** `feat/record-printable-export-options` (from `master`)  
 **Reference:** https://trello.com/c/Sg5rV9qc  
-**Repos:** `arena` (UI + thin API) and sibling `arena-server` (document generation)
+**Repos:** `arena` (UI + thin API) and sibling `arena-server` (document generation)  
+**Style predecessor:** `docs/superpowers/specs/2026-07-29-record-entry-ui-improvements-design.md` (and follow-on record-entry UI specs)
 
 ---
 
@@ -13,9 +14,27 @@ Augment record printable export (PDF and DOCX) so users can export either the fu
 
 Today both record PDF and Word downloads are direct (`ButtonDownload` → blob) with no options. Generation is portrait A4 only and always walks the full survey tree from the root (`SurveyDocWalker.walkSurvey` in `@openforis/arena-server`).
 
+All new Arena UI work follows the same coding/style conventions as the recent record-entry UI work (see §2).
+
 ---
 
-## 2. Scope
+## 2. Coding style & UI conventions
+
+Align with the latest Arena frontend decisions (record-entry / landing / theme work):
+
+| Rule | Detail |
+|------|--------|
+| **New files = TypeScript** | New components and hooks are `.tsx` / `.ts` only. Do not add new `.js` / `.jsx` files. |
+| **No new SCSS/CSS** | Prefer MUI `sx`, `styled`, and theme tokens. Do **not** add new `.scss` / `.css` files unless strictly necessary (legacy layout that cannot be expressed in `sx`). |
+| **Existing JS files** | Large legacy modules (e.g. `formEntryActions.js`, `NodeDefDetails.js`) may receive small JS patches; converting them wholesale to TS is out of scope unless a focused rename is already natural. |
+| **Theme / colour** | Use `webapp/theme/tokens.ts` (`defaultTokens`) or MUI `useTheme()` / `sx` — not hard-coded one-off palettes. |
+| **Components** | Prefer existing Arena + MUI building blocks (`Modal`, `Button`, `RadioButtonGroup`, `FormItem`, `@mui/icons-material`, etc.) over custom markup. |
+| **Types** | No `any`; prop types as TypeScript interfaces/types; nullability explicit. |
+| **Logging** | No `console.log` (server: log4js). |
+
+---
+
+## 3. Scope
 
 ### In scope
 
@@ -25,7 +44,7 @@ Today both record PDF and Word downloads are direct (`ButtonDownload` → blob) 
 | Export scope | Full survey **or** Current page only |
 | Document default orientation | Portrait / Landscape chosen in the modal |
 | Entity Print props | Per-entity print orientation in a new **Print** tab of the node def editor |
-| Orientation resolution | Refined A (see §4) |
+| Orientation resolution | Refined A (see §5) |
 | Formats | PDF **and** DOCX parity |
 | arena-server | Extend `SurveyDocOptions`, walker, PDF and DOCX generators |
 | Arena backend | Pass new query params through `exportRecordDocument` |
@@ -47,7 +66,7 @@ Today both record PDF and Word downloads are direct (`ButtonDownload` → blob) 
 
 ---
 
-## 3. Architecture
+## 4. Architecture
 
 **Approach:** Extend the shared survey-doc pipeline (Approach 1), not a PDF-only fork or client-side print capture.
 
@@ -55,7 +74,7 @@ Today both record PDF and Word downloads are direct (`ButtonDownload` → blob) 
 Record form header (PDF | Word)
         │
         ▼
-RecordPrintableExportModal
+RecordPrintableExportModal.tsx
   format · scope · document default orientation
         │
         ▼
@@ -74,14 +93,14 @@ PDF (pdfkit) / DOCX (docx) with resolved per-section orientation
 
 **Reuse:**
 
-- Modal shell pattern from `RecordsDataExportModal`
+- Modal shell pattern from `RecordsDataExportModal` (new modal is TypeScript; no new SCSS)
 - Shared `exportRecordDocument` in `recordService.js` for both formats
 - Shared `SurveyDocWalker` for PDF and DOCX
 - Form context: `useNodeDefPage()`, `usePagesUuidMap()` for current entity + instance
 
 ---
 
-## 4. Orientation rules (refined A)
+## 5. Orientation rules (refined A)
 
 Designer Print props are the source of truth for each entity. The modal orientation is the **document default** for this download.
 
@@ -99,7 +118,7 @@ Designer Print props are the source of truth for each entity. The modal orientat
 
 ---
 
-## 5. Entity Print props + designer UI
+## 6. Entity Print props + designer UI
 
 ### Storage
 
@@ -111,20 +130,20 @@ Designer Print props are the source of truth for each entity. The modal orientat
 ### Domain model
 
 - **arena-core:** add optional `printOrientation` on `NodeDefEntityProps`
-- **Arena `core/survey/nodeDef.js`:** add `propKeys.printOrientation` + getter (e.g. `getPrintOrientation`)
+- **Arena `core/survey/nodeDef.js`:** add `propKeys.printOrientation` + getter (e.g. `getPrintOrientation`); prefer a small `.ts` helper only if splitting new typed API is cleaner — otherwise patch existing `nodeDef.js`
 - Persist via existing `Actions.setProp` / `NodeDef.assocProp`
 
 ### Editor UI
 
-- New tab **Print** in `NodeDefDetails.js` for entities (mirror Mobile App tab registration)
-- New component `PrintProps.js` (or `.tsx`) under `webapp/components/survey/NodeDefDetails/`
-- v1 control: select — Portrait / Landscape / Default (inherit document)
+- New tab **Print** in `NodeDefDetails.js` for entities (mirror Mobile App tab registration; JS patch only)
+- New component **`PrintProps.tsx`** under `webapp/components/survey/NodeDefDetails/` (TypeScript; layout via MUI `sx` / existing form components — **no new SCSS**)
+- v1 control: MUI select or `RadioButtonGroup` — Portrait / Landscape / Default (inherit document)
 - i18n: `nodeDefEdit.print` (+ option labels)
 - TestId: `nodeDefDetails.print`
 
 ---
 
-## 6. Current page export semantics
+## 7. Current page export semantics
 
 When `exportScope === 'currentPage'`:
 
@@ -134,24 +153,26 @@ When `exportScope === 'currentPage'`:
 4. **Do not** recurse into child entities that have their own form page (`entityDefsInOwnPage`).
 5. Export **only the currently open instance** (not all multiples of that entity type).
 
-When `exportScope === 'full'` (or omitted): existing full-tree behavior from root; survey label as title; each entity section uses orientation resolution from §4.
+When `exportScope === 'full'` (or omitted): existing full-tree behavior from root; survey label as title; each entity section uses orientation resolution from §5.
 
 ---
 
-## 7. Arena frontend
+## 8. Arena frontend
 
 ### Modal
 
-- Component: `RecordPrintableExportModal` (near form entry actions / SurveyForm components)
-- Pattern: `Modal` + options + primary Download (like `RecordsDataExportModal`)
+- Component: **`RecordPrintableExportModal.tsx`** (under `SurveyForm/components/` or adjacent printable-export folder)
+- Optional helper: `useRecordPrintableExport.ts` if URL/state logic warrants a hook
+- Pattern: existing Arena `Modal` + options + primary Download (like `RecordsDataExportModal`)
+- **Styling:** MUI `sx` / theme tokens only — **do not add** `RecordPrintableExportModal.scss`
 - Options:
-  1. **Format** — PDF / Word (pre-selected from clicked button)
+  1. **Format** — PDF / Word (pre-selected from clicked button); use existing `RadioButtonGroup` or equivalent
   2. **Scope** — Full survey / Current page only; when Current page, show read-only hint with entity label
-  3. **Orientation** — Portrait / Landscape icon toggle (document default)
+  3. **Orientation** — Portrait / Landscape toggle with `@mui/icons-material` (or existing icon set) as document default
 
 ### `formEntryActions.js`
 
-- PDF and Word buttons: `onClick` opens modal with `initialFormat`; remove direct `href` downloads.
+- PDF and Word buttons: `onClick` opens modal with `initialFormat`; remove direct `href` downloads (small JS patch; full TS conversion out of scope).
 
 ### Client context for Current page
 
@@ -164,13 +185,15 @@ Update `getRecordPdfExportUrl` / `getRecordDocxExportUrl` in `webapp/service/api
 
 - `exportScope`, `entityDefUuid`, `entityNodeUuid`, `orientation`, `lang`
 
+Prefer extracting typed URL helpers to a small `.ts` module if the builders grow; otherwise patch the existing API module.
+
 ### i18n
 
 Keys under `surveyForm:` (e.g. `printableExport.title`, `scope.full`, `scope.currentPage`, `orientation.portrait`, `orientation.landscape`) plus `nodeDefEdit.print*`.
 
 ---
 
-## 8. Arena backend
+## 9. Arena backend
 
 ### Endpoints
 
@@ -209,7 +232,7 @@ Omitting new params preserves today’s behavior: full survey, portrait.
 
 ---
 
-## 9. arena-server changes
+## 10. arena-server changes
 
 ### `SurveyDocOptions` (`docExport/types.ts`)
 
@@ -244,7 +267,7 @@ Bump published `@openforis/arena-server` and update Arena `package.json` depende
 
 ---
 
-## 10. Error handling & edge cases
+## 11. Error handling & edge cases
 
 | Case | Behavior |
 |------|----------|
@@ -258,7 +281,7 @@ Bump published `@openforis/arena-server` and update Arena `package.json` depende
 
 ---
 
-## 11. Testing
+## 12. Testing
 
 ### arena-server
 
@@ -273,17 +296,17 @@ Bump published `@openforis/arena-server` and update Arena `package.json` depende
 
 ---
 
-## 12. Implementation order (suggested)
+## 13. Implementation order (suggested)
 
-1. arena-core / Arena domain: `printOrientation` prop + Print tab UI  
+1. arena-core / Arena domain: `printOrientation` prop + **`PrintProps.tsx`** Print tab UI  
 2. arena-server: options + walker scope + orientation in PDF/DOCX → publish bump  
 3. Arena API + `exportRecordDocument` pass-through  
-4. Record printable export modal + wire form entry buttons  
+4. **`RecordPrintableExportModal.tsx`** + wire form entry buttons (JS patch)  
 5. Tests + i18n  
 
 ---
 
-## 13. Decisions log
+## 14. Decisions log
 
 | Decision | Choice |
 |----------|--------|
@@ -295,4 +318,5 @@ Bump published `@openforis/arena-server` and update Arena `package.json` depende
 | Orientation model | Refined A: entity Print prop → else modal document default |
 | Print props location | Entity node def props + Print tab in node def editor |
 | Generation changes | In `@openforis/arena-server` (not Arena-only workaround) |
+| Frontend style | New files TypeScript only; no new SCSS/CSS; MUI `sx` + theme tokens |
 | Branch | `feat/record-printable-export-options` from `master` |
