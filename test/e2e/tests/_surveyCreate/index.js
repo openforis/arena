@@ -27,7 +27,7 @@ export const createSurvey = (surveyToAdd) => {
     await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))
     await page.waitForSelector(getSelector(TestId.modal.modal))
 
-    // close the job dialog and wait fot the navigation to the survey dashboard
+    // close the job dialog and wait for the navigation to the survey dashboard
     await Promise.all([
       page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
       page.click(TestId.modal.close),
