@@ -56,9 +56,8 @@ export const init = (app) => {
           res.json({ job })
           return
         }
-        const survey = await SurveyService.insertSurvey({ user, surveyInfo: surveyInfoTarget })
-
-        res.json({ survey })
+        const job = SurveyService.startCreateSurveyJob({ user, surveyInfo: surveyInfoTarget })
+        res.json({ job })
       } else {
         res.json({ validation })
       }

@@ -19,6 +19,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '../manager/surveyManager'
 import * as SurveyFileManager from '../manager/surveyFileManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
+import SurveyCreateJob from './surveyCreateJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
 import { SchemaSummaryExportJob } from './schemaSummary'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
@@ -109,6 +110,12 @@ export const startSurveysListExport = ({ user, draft, template }) => {
 
 export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) => {
   const job = new SurveyCloneJob({ user, surveyId, surveyInfoTarget, cycle })
+  JobManager.enqueueJob(job)
+  return JobUtils.jobToJSON(job)
+}
+
+export const startCreateSurveyJob = ({ user, surveyInfo }) => {
+  const job = new SurveyCreateJob({ user, surveyInfo })
   JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
 }

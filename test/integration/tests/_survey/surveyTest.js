@@ -24,3 +24,25 @@ export const createSurveyTest = async () => {
   expect(Survey.getDefaultLanguage(surveyInfo)).toEqual(expectedDefaultLanguage)
   expect(Survey.getDefaultLabel(surveyInfo)).toEqual(Survey.getDefaultLabel(surveyInfoTest))
 }
+
+// Regression test: SurveyManager.insertSurvey used to hold a db transaction open while
+// DBMigrator.migrateSurveySchema acquired another connection from the same pool; concurrent survey
+// creations could then exhaust the pool and hang the whole server (no connectionTimeoutMillis is set).
+export const createSurveysConcurrentlyTest = async () => {
+  const user = getContextUser()
+
+  const newSurveyInfo = () =>
+    Survey.newSurvey({
+      ownerUuid: User.getUuid(user),
+      name: `do_not_use__test_survey_concurrent_${uuidv4()}`,
+      label: 'DO NOT USE! Test Survey (concurrent)',
+      languages: ['en'],
+    })
+
+  const [surveyA, surveyB] = await Promise.all([
+    SurveyManager.insertSurvey({ user, surveyInfo: newSurveyInfo() }),
+    SurveyManager.insertSurvey({ user, surveyInfo: newSurveyInfo() }),
+  ])
+
+  expect(Survey.getId(surveyA)).not.toEqual(Survey.getId(surveyB))
+}

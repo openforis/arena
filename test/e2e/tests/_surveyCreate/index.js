@@ -19,25 +19,19 @@ export const createSurvey = (surveyToAdd) => {
         testId: TestId.surveyCreate.surveyCloneFrom,
         label: `${cloneFrom} - ${cloneFromLabel}`,
       })
-
-      // press "Create survey" and wait for the job to complete
-      await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))
-      await page.waitForSelector(getSelector(TestId.modal.modal))
-
-      // close the job dialog and wait fot the navigation to the survey dashboard
-      await Promise.all([
-        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
-        page.click(TestId.modal.close),
-      ])
     } else {
       await FormUtils.fillInput(TestId.surveyCreate.surveyLabel, label)
-
-      // press "Create survey" and wait for the navigation to the survey dashboard
-      await Promise.all([
-        page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
-        page.click(getSelector(TestId.surveyCreate.submitBtn, 'button')),
-      ])
     }
+
+    // press "Create survey" and wait for the job to complete (survey creation runs as a job too, to bound concurrency)
+    await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))
+    await page.waitForSelector(getSelector(TestId.modal.modal))
+
+    // close the job dialog and wait fot the navigation to the survey dashboard
+    await Promise.all([
+      page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
+      page.click(TestId.modal.close),
+    ])
 
     const surveyTitleSelector = getSelector(TestId.header.surveyTitle)
     await expect(await page.innerText(surveyTitleSelector)).toBe(`${label} [${name}]`)

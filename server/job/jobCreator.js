@@ -22,6 +22,7 @@ import RecordsValidationJob from '@server/modules/record/service/recordsValidati
 import SelectedRecordsExportJob from '@server/modules/record/service/selectedRecordsExportJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import SurveyActivityLogClearJob from '@server/modules/survey/service/surveyActivityLogClearJob'
+import SurveyCreateJob from '@server/modules/survey/service/surveyCreateJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 import SurveyLabelsImportJob from '@server/modules/survey/service/surveyLabelsImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
@@ -55,6 +56,7 @@ const jobClasses = [
   SelectedRecordsExportJob,
   SurveyCloneJob,
   SurveyActivityLogClearJob,
+  SurveyCreateJob,
   SurveyExportJob,
   SurveyLabelsImportJob,
   SurveyPublishJob,
