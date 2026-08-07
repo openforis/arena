@@ -4,9 +4,9 @@ import * as Survey from '@core/survey/survey'
 
 import * as SurveyManager from '../manager/surveyManager'
 
-export default class SurveyCreateJob extends Job {
+export default class SurveyCreatorJob extends Job {
   constructor(params) {
-    super(SurveyCreateJob.type, params)
+    super(SurveyCreatorJob.type, params)
   }
 
   async execute() {
@@ -33,4 +33,4 @@ export default class SurveyCreateJob extends Job {
   }
 }
 
-SurveyCreateJob.type = 'SurveyCreateJob'
+SurveyCreatorJob.type = 'SurveyCreatorJob'
