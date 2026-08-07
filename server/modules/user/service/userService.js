@@ -167,7 +167,7 @@ const _fetchSurveyTemplateId = async ({ user, templateUuid }) => {
   return template ? Survey.getId(template) : null
 }
 
-const _insertOrCloneSurvey = async ({ user, surveyInfoTarget, templateUuid }, t) => {
+const _insertOrCloneSurvey = async ({ user, surveyInfoTarget, templateUuid }) => {
   const templateId = templateUuid ? await _fetchSurveyTemplateId({ user, templateUuid }) : null
   if (templateId) {
     const job = new SurveyCloneJob({ user, surveyId: templateId, surveyInfoTarget })
@@ -179,84 +179,102 @@ const _insertOrCloneSurvey = async ({ user, surveyInfoTarget, templateUuid }, t)
       return await SurveyManager.fetchSurveyById({ surveyId, draft: true })
     }
   }
-  return await SurveyManager.insertSurvey({ user, surveyInfo: surveyInfoTarget, updateUserPrefs: false }, t)
+  // Insert survey out of the caller's transaction: SurveyManager.insertSurvey creates the survey data
+  // schema using its own separate db connections, so it must not run inside a transaction held open by
+  // the caller (same connection-pool starvation risk migrateSurveySchema was fixed for elsewhere).
+  return await SurveyManager.insertSurvey({ user, surveyInfo: surveyInfoTarget, updateUserPrefs: false })
 }
 
-export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAccept }) =>
-  db.tx(async (t) => {
-    const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
+export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAccept }) => {
+  const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
 
-    // 1) validation
-    // check access request exists
-    const accessRequestDb = await UserManager.fetchUserAccessRequestByUuid({ uuid: accessRequestUuid }, t)
-    if (!accessRequestDb) {
-      return {
-        validation: Validation.newInstance(false, {}, [
-          Validation.messageKeys.userAccessRequestAccept.accessRequestNotFound,
-        ]),
-      }
+  // 1) validation
+  // check access request exists
+  const accessRequestDb = await UserManager.fetchUserAccessRequestByUuid({ uuid: accessRequestUuid })
+  if (!accessRequestDb) {
+    return {
+      validation: Validation.newInstance(false, {}, [
+        Validation.messageKeys.userAccessRequestAccept.accessRequestNotFound,
+      ]),
     }
+  }
 
-    const { email, status: accessRequestStatus } = accessRequestDb
+  const { email, status: accessRequestStatus } = accessRequestDb
 
-    // check access request not processed already
-    if (accessRequestStatus !== UserAccessRequest.status.CREATED) {
-      return {
-        validation: Validation.newInstance(false, {}, [
-          ValidationResult.newInstance(Validation.messageKeys.userAccessRequestAccept.accessRequestAlreadyProcessed),
-        ]),
-      }
+  // check access request not processed already
+  if (accessRequestStatus !== UserAccessRequest.status.CREATED) {
+    return {
+      validation: Validation.newInstance(false, {}, [
+        ValidationResult.newInstance(Validation.messageKeys.userAccessRequestAccept.accessRequestAlreadyProcessed),
+      ]),
     }
+  }
 
-    // validate survey name
-    const surveyInfosWithSameName = await SurveyManager.fetchSurveysByName(surveyName, t)
-    const validation = await UserAccessRequestAcceptValidator.validateUserAccessRequestAccept({
-      accessRequestAccept,
-      surveyInfosWithSameName,
-    })
-    if (Validation.isNotValid(validation)) {
-      return { validation }
-    }
-
-    // 2) insert survey
-    const surveyInfoTarget = Survey.newSurvey({
-      ownerUuid: User.getUuid(user),
-      name: surveyName,
-      label: surveyLabel,
-      languages: ['en'],
-    })
-
-    let survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid }, t)
-
-    // 3) find group to associate to the user
-    let group = null
-    if ([AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager].includes(role)) {
-      group = await AuthManager.fetchGroupByName({ name: role }, t)
-    } else {
-      const surveyGroups = await AuthManager.fetchSurveyGroups(Survey.getId(survey), t)
-      group = surveyGroups.find((surveyGroup) => AuthGroup.getName(surveyGroup) === role)
-    }
-
-    // 4) invite user to that group and send email
-    const surveyId = Survey.getId(survey)
-    const { invitedUsers } = await UserInviteService.inviteUsers(
-      {
-        user,
-        surveyId,
-        surveyCycleKey: Survey.cycleOneKey,
-        invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
-        serverUrl,
-      },
-      t
-    )
-    const userInvited = invitedUsers[0]
-    const surveyOwnerUuid = User.getUuid(userInvited)
-
-    await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
-    survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
-
-    return { survey, userInvited }
+  // validate survey name
+  const surveyInfosWithSameName = await SurveyManager.fetchSurveysByName(surveyName)
+  const validation = await UserAccessRequestAcceptValidator.validateUserAccessRequestAccept({
+    accessRequestAccept,
+    surveyInfosWithSameName,
   })
+  if (Validation.isNotValid(validation)) {
+    return { validation }
+  }
+
+  // 2) insert or clone survey (out of the transaction below; see _insertOrCloneSurvey)
+  const surveyInfoTarget = Survey.newSurvey({
+    ownerUuid: User.getUuid(user),
+    name: surveyName,
+    label: surveyLabel,
+    languages: ['en'],
+  })
+
+  let survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid })
+  const surveyId = Survey.getId(survey)
+
+  try {
+    return await db.tx(async (t) => {
+      // 3) find group to associate to the user
+      let group = null
+      if ([AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager].includes(role)) {
+        group = await AuthManager.fetchGroupByName({ name: role }, t)
+      } else {
+        const surveyGroups = await AuthManager.fetchSurveyGroups(surveyId, t)
+        group = surveyGroups.find((surveyGroup) => AuthGroup.getName(surveyGroup) === role)
+      }
+
+      // 4) invite user to that group and send email
+      const { invitedUsers } = await UserInviteService.inviteUsers(
+        {
+          user,
+          surveyId,
+          surveyCycleKey: Survey.cycleOneKey,
+          invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
+          serverUrl,
+        },
+        t
+      )
+      const userInvited = invitedUsers[0]
+      const surveyOwnerUuid = User.getUuid(userInvited)
+
+      await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
+      survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
+
+      return { survey, userInvited }
+    })
+  } catch (error) {
+    // The survey was already created (committed) outside of this failed transaction; clean it up so a
+    // failed access request acceptance doesn't leave an orphaned survey/schema behind.
+    Logger.error(`error accepting user access request, cleaning up survey ${surveyId}: ${error.stack || error}`)
+    await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }).catch((cleanupError) => {
+      Logger.error(
+        `error cleaning up survey ${surveyId} after failed access request acceptance: ${
+          cleanupError.stack || cleanupError
+        }`
+      )
+    })
+    throw error
+  }
+}
 
 // ====== READ
 
