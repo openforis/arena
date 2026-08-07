@@ -178,32 +178,43 @@ export const insertSurvey = async (params, client = db) => {
 export const importSurvey = async (params, client = db) => {
   const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups(), backup } = params
 
-  return client.tx(async (t) => {
-    // Insert survey into db
-    let surveyInfo = await SurveyRepository.insertSurvey(
-      {
-        survey: surveyInfoParam,
-        props: backup ? Survey.getProps(surveyInfoParam) : {},
-        propsDraft: backup ? Survey.getPropsDraft(surveyInfoParam) : Survey.getProps(surveyInfoParam),
-      },
-      t
-    )
-    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+  // See insertSurvey above: migrateSurveySchema opens its own separate db connections, so it must not
+  // run inside a transaction held open by this function (same connection-pool starvation risk).
+  const surveyInfo = await SurveyRepository.insertSurvey(
+    {
+      survey: surveyInfoParam,
+      props: backup ? Survey.getProps(surveyInfoParam) : {},
+      propsDraft: backup ? Survey.getPropsDraft(surveyInfoParam) : Survey.getProps(surveyInfoParam),
+    },
+    client
+  )
+  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
-    // Create survey data schema
+  try {
+    // Create survey data schema (runs outside of any transaction held by this function; see insertSurvey above)
     await DBMigrator.migrateSurveySchema(surveyId)
 
-    // Create default groups for this survey
-    surveyInfo = Survey.assocAuthGroups(await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t))(
-      surveyInfo
-    )
+    return await client.tx(async (t) => {
+      // Create default groups for this survey
+      let surveyInfoUpdated = Survey.assocAuthGroups(
+        await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t)
+      )(surveyInfo)
 
-    surveyInfo = await _fetchAndAssocAdditionalInfo({ surveyInfo }, t)
+      surveyInfoUpdated = await _fetchAndAssocAdditionalInfo({ surveyInfo: surveyInfoUpdated }, t)
 
-    await _addUserToSurveyAdmins({ user, surveyInfo }, t)
+      await _addUserToSurveyAdmins({ user, surveyInfo: surveyInfoUpdated }, t)
 
-    return assocSurveyInfo(surveyInfo)
-  })
+      return assocSurveyInfo(surveyInfoUpdated)
+    })
+  } catch (error) {
+    // Survey row (and possibly the schema) were already created outside of this failed step;
+    // clean them up so a failed import doesn't leave an orphaned survey/schema behind.
+    Logger.error(`error importing survey ${surveyId}, cleaning up: ${error.stack || error}`)
+    await deleteSurvey(surveyId, { deleteUserPrefs: true }, client).catch((cleanupError) => {
+      Logger.error(`error cleaning up survey ${surveyId} after failed import: ${cleanupError.stack || cleanupError}`)
+    })
+    throw error
+  }
 }
 
 // ====== READ

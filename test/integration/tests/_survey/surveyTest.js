@@ -46,3 +46,24 @@ export const createSurveysConcurrentlyTest = async () => {
 
   expect(Survey.getId(surveyA)).not.toEqual(Survey.getId(surveyB))
 }
+
+// Regression test: SurveyManager.importSurvey (used when restoring an Arena backup file, and when
+// cloning a survey) had the same transaction-held-open-during-migration bug as insertSurvey above.
+export const importSurveysConcurrentlyTest = async () => {
+  const user = getContextUser()
+
+  const newSurveyInfo = () =>
+    Survey.newSurvey({
+      ownerUuid: User.getUuid(user),
+      name: `do_not_use__test_survey_import_concurrent_${uuidv4()}`,
+      label: 'DO NOT USE! Test Survey (import concurrent)',
+      languages: ['en'],
+    })
+
+  const [surveyA, surveyB] = await Promise.all([
+    SurveyManager.importSurvey({ user, surveyInfo: newSurveyInfo(), backup: true }),
+    SurveyManager.importSurvey({ user, surveyInfo: newSurveyInfo(), backup: true }),
+  ])
+
+  expect(Survey.getId(surveyA)).not.toEqual(Survey.getId(surveyB))
+}

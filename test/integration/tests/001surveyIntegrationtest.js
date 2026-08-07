@@ -9,6 +9,8 @@ describe('Survey Test', () => {
 
   test('Create Surveys Concurrently', async () => SurveyIntegrationTest.createSurveysConcurrentlyTest())
 
+  test('Import Surveys Concurrently', async () => SurveyIntegrationTest.importSurveysConcurrentlyTest())
+
   // ==== CATEGORY
 
   test('Create Category', async () => CategoryTest.createCategoryTest())
