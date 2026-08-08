@@ -31,10 +31,8 @@ export const getRecordPrintableExportUrl = ({
   return `/api/survey/${surveyId}/record/${recordUuid}/export/${format}?${query}`
 }
 
-export const getRecordPdfExportUrl = (
-  params: Omit<RecordPrintableExportUrlParams, 'format'>
-): string => getRecordPrintableExportUrl({ ...params, format: 'pdf' })
+export const getRecordPdfExportUrl = (params: Omit<RecordPrintableExportUrlParams, 'format'>): string =>
+  getRecordPrintableExportUrl({ ...params, format: 'pdf' })
 
-export const getRecordDocxExportUrl = (
-  params: Omit<RecordPrintableExportUrlParams, 'format'>
-): string => getRecordPrintableExportUrl({ ...params, format: 'docx' })
+export const getRecordDocxExportUrl = (params: Omit<RecordPrintableExportUrlParams, 'format'>): string =>
+  getRecordPrintableExportUrl({ ...params, format: 'docx' })

@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Box, IconButton, Tooltip } from '@mui/material'
-import CropPortraitIcon from '@mui/icons-material/CropPortrait'
-import CropLandscapeIcon from '@mui/icons-material/CropLandscape'
+import { Box } from '@mui/material'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -15,7 +13,11 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useNodeDefPage, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
 import { useRecord } from '@webapp/store/ui/record'
-import { getPageEntity, hasUnresolvedMultipleAncestor } from '@webapp/store/ui/record/recordPageEntity'
+import {
+  getPageEntity,
+  hasUnresolvedMultipleAncestor,
+  type PagesUuidMap,
+} from '@webapp/store/ui/record/recordPageEntity'
 import {
   getRecordPrintableExportUrl,
   PrintableExportFormat,
@@ -31,12 +33,12 @@ type Props = {
 
 export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Props) => {
   const i18n = useI18n()
-  const survey = useSurvey()
-  const surveyId = useSurveyId()
-  const lang = useSurveyPreferredLang()
-  const record = useRecord()
-  const nodeDefPage = useNodeDefPage()
-  const pagesUuidMap = usePagesUuidMap()
+  const survey = useSurvey() as object
+  const surveyId = useSurveyId() as string | number
+  const lang = useSurveyPreferredLang() as string
+  const record = useRecord() as object | null | undefined
+  const nodeDefPage = useNodeDefPage() as object
+  const pagesUuidMap = usePagesUuidMap() as PagesUuidMap
 
   const [format, setFormat] = useState<PrintableExportFormat>(initialFormat)
   const [exportScope, setExportScope] = useState<PrintableExportScope>('currentPage')
@@ -120,26 +122,15 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
             )}
           </FormItem>
           <FormItem label="surveyForm:printableExport.orientation">
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Tooltip title={i18n.t('surveyForm:printableExport.orientations.portrait')}>
-                <IconButton
-                  color={orientation === 'portrait' ? 'primary' : 'default'}
-                  onClick={() => setOrientation('portrait')}
-                  aria-label={i18n.t('surveyForm:printableExport.orientations.portrait')}
-                >
-                  <CropPortraitIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={i18n.t('surveyForm:printableExport.orientations.landscape')}>
-                <IconButton
-                  color={orientation === 'landscape' ? 'primary' : 'default'}
-                  onClick={() => setOrientation('landscape')}
-                  aria-label={i18n.t('surveyForm:printableExport.orientations.landscape')}
-                >
-                  <CropLandscapeIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+            <RadioButtonGroup
+              row
+              value={orientation}
+              onChange={(value) => setOrientation(value as PrintOrientation)}
+              items={[
+                { key: 'portrait', label: 'surveyForm:printableExport.orientations.portrait' },
+                { key: 'landscape', label: 'surveyForm:printableExport.orientations.landscape' },
+              ]}
+            />
           </FormItem>
         </Box>
       </ModalBody>
