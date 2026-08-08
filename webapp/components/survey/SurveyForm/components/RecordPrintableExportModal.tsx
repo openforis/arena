@@ -12,9 +12,10 @@ import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { FormItem } from '@webapp/components/form/Input'
 import { RadioButtonGroup } from '@webapp/components/RadioButtonGroup'
 import { useI18n } from '@webapp/store/system'
-import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useNodeDefPage, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
 import { useRecord } from '@webapp/store/ui/record'
+import { getPageEntity, hasUnresolvedMultipleAncestor } from '@webapp/store/ui/record/recordPageEntity'
 import {
   getRecordPrintableExportUrl,
   PrintableExportFormat,
@@ -30,6 +31,7 @@ type Props = {
 
 export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Props) => {
   const i18n = useI18n()
+  const survey = useSurvey()
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
   const record = useRecord()
@@ -48,13 +50,20 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
   const entityLabel = NodeDef.getLabel(nodeDefPage, lang) || NodeDef.getName(nodeDefPage)
 
   const entityNodeUuid = useMemo(() => {
-    const mapped = pagesUuidMap?.[entityDefUuid]
-    if (mapped) return mapped
     if (!record) return null
-    const nodes = Record.getNodesByDefUuid(entityDefUuid)(record)
-    if (nodes.length === 1) return Node.getUuid(nodes[0])
-    return null
-  }, [entityDefUuid, pagesUuidMap, record])
+    const pageEntity = getPageEntity({
+      survey,
+      record,
+      pagesUuidMap,
+      pageNodeDefUuid: entityDefUuid,
+    })
+    return pageEntity ? Node.getUuid(pageEntity) : null
+  }, [survey, record, pagesUuidMap, entityDefUuid])
+
+  const unresolvedMultipleAncestor = useMemo(
+    () => hasUnresolvedMultipleAncestor(nodeDefPage, survey, pagesUuidMap),
+    [nodeDefPage, survey, pagesUuidMap]
+  )
 
   const href = useMemo(() => {
     if (!record) return null
@@ -71,8 +80,8 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
 
   if (!open) return null
 
-  const canDownload = exportScope === 'full' || Boolean(entityDefUuid && entityNodeUuid)
-  const showCurrentPageUnavailable = exportScope === 'currentPage' && !entityNodeUuid
+  const canDownload = exportScope === 'full' || Boolean(entityDefUuid && entityNodeUuid && !unresolvedMultipleAncestor)
+  const showCurrentPageUnavailable = exportScope === 'currentPage' && (!entityNodeUuid || unresolvedMultipleAncestor)
 
   return (
     <Modal onClose={onClose} title="surveyForm:printableExport.title">
