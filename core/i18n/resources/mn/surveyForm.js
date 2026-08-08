@@ -140,6 +140,28 @@ Arena Mobile дээр:
   confirmNodeDelete: 'Та энэ {{nodeDefType}} ({{nodeDefLabel}})-г устгахыг хүсч байгаадаа итгэлтэй байна уу?',
   downloadPrintableDocument: 'Хэвлэх баримт бичиг татах (Word)',
   downloadPrintableDocumentPdf: 'Хэвлэх баримт бичиг татах (PDF)',
+  printableExport: {
+    title: 'Export printable document',
+    format: 'Format',
+    formats: {
+      pdf: 'PDF',
+      docx: 'Word',
+    },
+    scope: 'Content',
+    scopes: {
+      full: 'Full survey',
+      currentPage: 'Current page only',
+    },
+    currentPageHint: 'Current page: {{entityLabel}}',
+    currentPageUnavailable:
+      'Unable to determine the current page instance. Navigate to a specific page or export the full survey.',
+    orientation: 'Page orientation',
+    orientations: {
+      portrait: 'Portrait',
+      landscape: 'Landscape',
+    },
+    download: 'Download',
+  },
   exportLabels_csv: 'Шошгыг экспортлох (CSV)',
   exportLabels_xlsx: 'Шошгыг экспортлох (Excel)',
   importLabels: 'Шошгыг Excel эсвэл CSV-ээс импортлох',

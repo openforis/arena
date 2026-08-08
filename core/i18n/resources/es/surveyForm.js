@@ -139,6 +139,28 @@ En Arena Mobile:
   confirmNodeDelete: '¿Está seguro de que desea eliminar este {{nodeDefType}} ({{nodeDefLabel}})?',
   downloadPrintableDocument: 'Descargar documento imprimible (Word)',
   downloadPrintableDocumentPdf: 'Descargar documento imprimible (PDF)',
+  printableExport: {
+    title: 'Exportar documento imprimible',
+    format: 'Formato',
+    formats: {
+      pdf: 'PDF',
+      docx: 'Word',
+    },
+    scope: 'Contenido',
+    scopes: {
+      full: 'Encuesta completa',
+      currentPage: 'Solo página actual',
+    },
+    currentPageHint: 'Página actual: {{entityLabel}}',
+    currentPageUnavailable:
+      'No se puede determinar la instancia de la página actual. Navegue a una página específica o exporte la encuesta completa.',
+    orientation: 'Orientación de página',
+    orientations: {
+      portrait: 'Vertical',
+      landscape: 'Horizontal',
+    },
+    download: 'Descargar',
+  },
   exportLabels_csv: 'Exportar etiquetas (CSV)',
   exportLabels_xlsx: 'Exportar etiquetas (Excel)',
   importLabels: 'Importar etiquetas desde Excel o CSV',
