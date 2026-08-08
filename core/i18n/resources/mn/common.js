@@ -877,6 +877,17 @@ $t(common.appNameFull)
     advanced: 'Нарийвчилсан',
     mobileApp: 'Мобайл апп',
     print: 'Хэвлэх',
+    printProps: {
+      printOrientation: {
+        label: 'Хуудасны чиглэл',
+        info: 'Энэ объект өөрийн хэвлэх хэсгийг эхлүүлэхэд ашиглагдах чиглэл. Анхдагчаар экспортод сонгосон баримтын чиглэлийг дагана.',
+      },
+      orientations: {
+        default: 'Анхдагч (баримт)',
+        portrait: 'Босоо',
+        landscape: 'Хэвтээ',
+      },
+    },
     validations: 'Баталгаажуулалтууд',
     function: 'Функц',
     editingFunction: 'Функц {{functionName}}-г засах',

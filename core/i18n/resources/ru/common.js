@@ -883,6 +883,17 @@ $t(common.appNameFull)
     advanced: 'Расширенные',
     mobileApp: 'Мобильное приложение',
     print: 'Печать',
+    printProps: {
+      printOrientation: {
+        label: 'Ориентация страницы',
+        info: 'Ориентация, используемая когда эта сущность начинает свою собственную печатную секцию. По умолчанию наследуется ориентация документа, выбранная при экспорте.',
+      },
+      orientations: {
+        default: 'По умолчанию (документ)',
+        portrait: 'Портретная',
+        landscape: 'Альбомная',
+      },
+    },
     validations: 'Проверки',
     function: 'Функция',
     editingFunction: 'Редактирование функции {{functionName}}',
