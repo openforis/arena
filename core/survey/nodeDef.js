@@ -103,6 +103,9 @@ export const propKeys = {
 
   // layout elements
   headerColor: 'headerColor',
+
+  // print
+  printOrientation: 'printOrientation',
 }
 
 const commonAttributePropsKeys = [
@@ -325,6 +328,13 @@ export const getTextTransformFunction = (nodeDef) =>
 
 export const getHeaderColor = getProp(propKeys.headerColor)
 export const isLayoutElement = isFormHeader
+
+/**
+ * Returns the entity printable orientation, if set.
+ * @param {!object} nodeDef - Entity node definition.
+ * @returns {string|undefined} 'portrait' | 'landscape' | undefined.
+ */
+export const getPrintOrientation = getProp(propKeys.printOrientation)
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)

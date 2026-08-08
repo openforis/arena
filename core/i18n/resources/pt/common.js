@@ -906,6 +906,7 @@ $t(common.appNameFull)
     basic: 'Básico',
     advanced: 'Avançado',
     mobileApp: 'Aplicativo móvel',
+    print: 'Impressão',
     validations: 'Validações',
     function: 'Função',
     editingFunction: 'Editando função {{functionName}}',

@@ -876,6 +876,7 @@ $t(common.appNameFull)
     basic: 'Үндсэн',
     advanced: 'Нарийвчилсан',
     mobileApp: 'Мобайл апп',
+    print: 'Хэвлэх',
     validations: 'Баталгаажуулалтууд',
     function: 'Функц',
     editingFunction: 'Функц {{functionName}}-г засах',

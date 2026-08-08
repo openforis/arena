@@ -882,6 +882,7 @@ $t(common.appNameFull)
     basic: 'Основное',
     advanced: 'Расширенные',
     mobileApp: 'Мобильное приложение',
+    print: 'Печать',
     validations: 'Проверки',
     function: 'Функция',
     editingFunction: 'Редактирование функции {{functionName}}',
