@@ -19,6 +19,7 @@ import AnalysisEntitySelector from './AnalysisEntitySelector'
 import BasicProps from './BasicProps'
 import ButtonBar from './ButtonBar'
 import { MobileAppProps } from './MobileAppProps'
+import { PrintProps } from './PrintProps'
 import ValidationsProps from './ValidationsProps'
 
 import { useSurveyCycleKey } from '@webapp/store/survey'
@@ -57,6 +58,16 @@ const NodeDefDetails = (props) => {
         id: TestId.nodeDefDetails.advanced,
         props: tabProps,
       })
+    }
+    if (NodeDef.isEntity(nodeDef)) {
+      _tabs.push({
+        label: 'nodeDefEdit.print',
+        component: PrintProps,
+        id: TestId.nodeDefDetails.print,
+        props: tabProps,
+      })
+    }
+    if (!nodeDefIsRoot) {
       if (canHaveMobileProps) {
         _tabs.push({
           label: 'nodeDefEdit.mobileApp',
@@ -117,7 +128,7 @@ const NodeDefDetails = (props) => {
             </FormItem>
 
             <TabBar
-              showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isRoot(nodeDef) && !NodeDef.isLayoutElement(nodeDef)}
+              showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isLayoutElement(nodeDef) && tabs.length > 1}
               tabs={tabs}
             />
           </div>
