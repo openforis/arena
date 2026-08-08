@@ -47,6 +47,10 @@ export default {
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating); error evaluating expression in node {{nodeDefName}}: {{details}}',
   },
+  recordPrintableExport: {
+    missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',
+    entityNotFound: 'Entity not found for the specified export',
+  },
   sessionExpiredRefreshPage: `Session could have expired.
 Try to refresh the page.`,
   survey: {
