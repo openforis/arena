@@ -16832,15 +16832,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:>=1.2.0":
-  version: 1.58.2
-  resolution: "playwright-core@npm:1.58.2"
-  bin:
-    playwright-core: cli.js
-  checksum: 10c0/5aa15b2b764e6ffe738293a09081a6f7023847a0dbf4cd05fe10eed2e25450d321baf7482f938f2d2eb330291e197fa23e57b29a5b552b89927ceb791266225b
-  languageName: node
-  linkType: hard
-
 "playwright@npm:1.24.2":
   version: 1.24.2
   resolution: "playwright@npm:1.24.2"

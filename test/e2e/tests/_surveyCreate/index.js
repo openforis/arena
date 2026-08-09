@@ -27,11 +27,8 @@ export const createSurvey = (surveyToAdd) => {
     await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))
     await page.waitForSelector(getSelector(TestId.modal.modal))
 
-    // close the job dialog and wait for the navigation to the survey dashboard
-    await Promise.all([
-      page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
-      page.click(TestId.modal.close),
-    ])
+    // the job dialog auto-hides on completion (see useOnCreate.js); just wait for the navigation
+    await page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */)
 
     const surveyTitleSelector = getSelector(TestId.header.surveyTitle)
     await expect(await page.innerText(surveyTitleSelector)).toBe(`${label} [${name}]`)

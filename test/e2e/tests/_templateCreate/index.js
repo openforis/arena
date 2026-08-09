@@ -25,10 +25,10 @@ export const createTemplate = (template) => {
         testId: TestId.surveyCreate.surveyCloneFrom,
         label: `${cloneFrom} - ${cloneFromLabel}`,
       })
-      await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))
+      // the job dialog auto-hides on completion (see useOnCreate.js); just wait for the navigation
       await Promise.all([
         page.waitForNavigation(/* { url: `{BASE_URL}/app/home/landing/` } */),
-        page.click(TestId.modal.close),
+        page.click(getSelector(TestId.surveyCreate.submitBtn, 'button')),
       ])
     } else {
       await FormUtils.fillInput(TestId.surveyCreate.surveyLabel, label)
