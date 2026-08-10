@@ -39,12 +39,10 @@ const formatSummary = ({ results, totalDurationMs }) => {
     lines.push(`  ${outcome}: ${byOutcome[outcome] || 0}`)
   })
   lines.push('')
-  lines.push(
-    `Accept latency  (min/avg/max/p95): ${formatMs(acceptStats.min)} / ${formatMs(acceptStats.avg)} / ${formatMs(acceptStats.max)} / ${formatMs(acceptStats.p95)}`
-  )
-  lines.push(
-    `Job latency     (min/avg/max/p95): ${formatMs(jobStats.min)} / ${formatMs(jobStats.avg)} / ${formatMs(jobStats.max)} / ${formatMs(jobStats.p95)}`
-  )
+  const acceptLatencies = [acceptStats.min, acceptStats.avg, acceptStats.max, acceptStats.p95].map(formatMs).join(' / ')
+  lines.push(`Accept latency  (min/avg/max/p95): ${acceptLatencies}`)
+  const jobLatencies = [jobStats.min, jobStats.avg, jobStats.max, jobStats.p95].map(formatMs).join(' / ')
+  lines.push(`Job latency     (min/avg/max/p95): ${jobLatencies}`)
 
   const failures = results.filter((result) => result.outcome !== 'succeeded')
   if (failures.length > 0) {
