@@ -5,34 +5,86 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { parseConfig, HELP_TEXT } = require('./lib/config')
-const { login, importSurveyZip, getJobStatus, deleteSurvey } = require('./lib/httpApi')
+const { login, importSurveyZip, getJobStatus, deleteSurvey, createUser } = require('./lib/httpApi')
+const { buildLoadTestUserCredentials } = require('./lib/userProvisioning')
 const { formatSummary } = require('./lib/report')
 
 const JOB_POLL_INTERVAL_MS = 1000
+const MAX_CONSECUTIVE_POLL_ERRORS = 3
 const TERMINAL_STATUSES = new Set(['succeeded', 'failed', 'canceled'])
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 /**
- * Polls a job until it reaches a terminal status or the timeout elapses.
+ * Polls a job until it reaches a terminal status, the timeout elapses, or too many consecutive poll
+ * requests fail. Never rejects. surveyId/errors/result are backfilled from the last non-terminal read
+ * when the terminal read itself lacks them (the server's terminal job-status response omits them).
  * @param {object} params - Function parameters.
  * @param {string} params.baseUrl - Arena server base URL.
  * @param {string} params.authToken - JWT auth token.
  * @param {string} params.jobUuid - UUID of the job to poll.
  * @param {number} params.timeoutMs - Max time to wait, in milliseconds.
- * @returns {Promise<object>} The last fetched job summary; its status is 'timed-out' if the timeout elapsed first.
+ * @param {Function} [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @param {number} [params.pollIntervalMs] - Delay between polls, in milliseconds (defaults to 1000).
+ * @returns {Promise<object>} The last known job summary; status is 'timed-out' or 'rejected-at-http' if polling didn't reach a terminal status.
  */
-const pollJobUntilTerminal = async ({ baseUrl, authToken, jobUuid, timeoutMs }) => {
+const pollJobUntilTerminal = async ({
+  baseUrl,
+  authToken,
+  jobUuid,
+  timeoutMs,
+  fetchImpl = fetch,
+  pollIntervalMs = JOB_POLL_INTERVAL_MS,
+}) => {
   const startedAt = Date.now()
+  let lastKnownSurveyId = null
+  let lastKnownErrors = null
+  let lastKnownResult = null
+  let consecutivePollErrors = 0
+  let lastPollError = null
+
   for (;;) {
-    const job = await getJobStatus({ baseUrl, authToken, jobUuid })
-    if (TERMINAL_STATUSES.has(job.status)) {
-      return job
+    let job = null
+    try {
+      job = await getJobStatus({ baseUrl, authToken, jobUuid, fetchImpl })
+      consecutivePollErrors = 0
+    } catch (error) {
+      consecutivePollErrors += 1
+      lastPollError = error
+      if (consecutivePollErrors > MAX_CONSECUTIVE_POLL_ERRORS) {
+        return {
+          status: 'rejected-at-http',
+          surveyId: lastKnownSurveyId,
+          errors: lastKnownErrors,
+          result: lastKnownResult,
+          error: lastPollError.message,
+        }
+      }
     }
+
+    if (job && TERMINAL_STATUSES.has(job.status)) {
+      return {
+        ...job,
+        surveyId: job.surveyId || lastKnownSurveyId,
+        errors: job.errors || lastKnownErrors,
+        result: job.result || lastKnownResult,
+      }
+    }
+    if (job) {
+      lastKnownSurveyId = job.surveyId || lastKnownSurveyId
+      lastKnownErrors = job.errors || lastKnownErrors
+      lastKnownResult = job.result || lastKnownResult
+    }
+
     if (Date.now() - startedAt >= timeoutMs) {
-      return { ...job, status: 'timed-out' }
+      return {
+        status: 'timed-out',
+        surveyId: lastKnownSurveyId,
+        errors: lastKnownErrors,
+        result: lastKnownResult,
+      }
     }
-    await sleep(JOB_POLL_INTERVAL_MS)
+    await sleep(pollIntervalMs)
   }
 }
 
@@ -46,13 +98,23 @@ const pollJobUntilTerminal = async ({ baseUrl, authToken, jobUuid, timeoutMs }) 
  * @param {string} params.surveyName - The unique name for the new survey.
  * @param {number} params.index - Index of this request within the run (for reporting).
  * @param {number} params.jobTimeoutMs - Max time to wait for the job to finish.
+ * @param {Function} [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
  * @returns {Promise<object>} A result entry (see report.js for the shape).
  */
-const runSingleImport = async ({ baseUrl, authToken, zipBuffer, zipFileName, surveyName, index, jobTimeoutMs }) => {
+const runSingleImport = async ({
+  baseUrl,
+  authToken,
+  zipBuffer,
+  zipFileName,
+  surveyName,
+  index,
+  jobTimeoutMs,
+  fetchImpl = fetch,
+}) => {
   const acceptStartedAt = Date.now()
   let job
   try {
-    job = await importSurveyZip({ baseUrl, authToken, zipBuffer, zipFileName, surveyName })
+    job = await importSurveyZip({ baseUrl, authToken, zipBuffer, zipFileName, surveyName, fetchImpl })
   } catch (error) {
     return {
       index,
@@ -67,24 +129,20 @@ const runSingleImport = async ({ baseUrl, authToken, zipBuffer, zipFileName, sur
   const acceptMs = Date.now() - acceptStartedAt
 
   const jobStartedAt = Date.now()
-  let finalJob
-  try {
-    finalJob = await pollJobUntilTerminal({ baseUrl, authToken, jobUuid: job.uuid, timeoutMs: jobTimeoutMs })
-  } catch (error) {
-    return {
-      index,
-      name: surveyName,
-      outcome: 'rejected-at-http',
-      surveyId: null,
-      acceptMs,
-      jobMs: Date.now() - jobStartedAt,
-      error: error.message,
-    }
-  }
+  const finalJob = await pollJobUntilTerminal({
+    baseUrl,
+    authToken,
+    jobUuid: job.uuid,
+    timeoutMs: jobTimeoutMs,
+    fetchImpl,
+  })
   const jobMs = Date.now() - jobStartedAt
 
   const outcome = finalJob.status
-  const error = outcome === 'succeeded' ? null : JSON.stringify(finalJob.errors || finalJob.result || 'unknown error')
+  const error =
+    outcome === 'succeeded'
+      ? null
+      : finalJob.error || JSON.stringify(finalJob.errors || finalJob.result || 'unknown error')
 
   return {
     index,
@@ -98,23 +156,26 @@ const runSingleImport = async ({ baseUrl, authToken, zipBuffer, zipFileName, sur
 }
 
 /**
- * Deletes every survey referenced by the given results, best-effort.
+ * Deletes every survey referenced by the given results, sequentially and best-effort.
  * @param {object} params - Function parameters.
  * @param {string} params.baseUrl - Arena server base URL.
- * @param {string} params.authToken - JWT auth token.
+ * @param {string} params.authToken - JWT auth token (a system admin token can delete any survey).
  * @param {Array<object>} params.results - Result entries produced by runSingleImport.
- * @returns {Promise<void>} Resolves once every deletion attempt has settled.
+ * @param {Function} [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @returns {Promise<{deletedCount: number, totalCount: number}>} How many surveys were actually deleted.
  */
-const cleanupSurveys = async ({ baseUrl, authToken, results }) => {
+const cleanupSurveys = async ({ baseUrl, authToken, results, fetchImpl = fetch }) => {
   const surveyIds = results.map((result) => result.surveyId).filter(Boolean)
-  const cleanupResults = await Promise.allSettled(
-    surveyIds.map((surveyId) => deleteSurvey({ baseUrl, authToken, surveyId }))
-  )
-  cleanupResults.forEach((cleanupResult, i) => {
-    if (cleanupResult.status === 'rejected') {
-      console.error(`Failed to delete survey ${surveyIds[i]}: ${cleanupResult.reason.message}`)
+  let deletedCount = 0
+  for (const surveyId of surveyIds) {
+    try {
+      await deleteSurvey({ baseUrl, authToken, surveyId, fetchImpl })
+      deletedCount += 1
+    } catch (error) {
+      console.error(`Failed to delete survey ${surveyId}: ${error.message}`)
     }
-  })
+  }
+  return { deletedCount, totalCount: surveyIds.length }
 }
 
 /**
@@ -169,7 +230,8 @@ const main = async () => {
 
   if (!keep) {
     console.log('Cleaning up created surveys...')
-    await cleanupSurveys({ baseUrl: url, authToken, results })
+    const { deletedCount, totalCount } = await cleanupSurveys({ baseUrl: url, authToken, results })
+    console.log(`Deleted ${deletedCount}/${totalCount} surveys created by this run.`)
   }
 
   const anyFailed = results.some((result) => result.outcome !== 'succeeded')
