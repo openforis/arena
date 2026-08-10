@@ -1,7 +1,7 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
-const { login, buildImportFormData, importSurveyZip, getJobStatus, deleteSurvey } = require('./httpApi')
+const { login, buildImportFormData, importSurveyZip, getJobStatus, deleteSurvey, createUser } = require('./httpApi')
 
 const jsonResponse = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
@@ -123,5 +123,58 @@ test('deleteSurvey throws on a failed delete', async () => {
   await assert.rejects(
     () => deleteSurvey({ baseUrl: 'http://x', authToken: 'tok', surveyId: 42, fetchImpl }),
     /Delete survey 42 failed \(status 403\)/
+  )
+})
+
+test('login throws with status and raw text when the error body is not JSON', async () => {
+  const fetchImpl = async () => new Response('<html><body>Bad Gateway</body></html>', { status: 502 })
+
+  await assert.rejects(
+    () => login({ baseUrl: 'http://x', email: 'a@b.com', password: 'pw', fetchImpl }),
+    /Login failed \(status 502\).*Bad Gateway/
+  )
+})
+
+test('login throws with status when the error body is empty', async () => {
+  const fetchImpl = async () => new Response(null, { status: 504 })
+
+  await assert.rejects(
+    () => login({ baseUrl: 'http://x', email: 'a@b.com', password: 'pw', fetchImpl }),
+    /Login failed \(status 504\)/
+  )
+})
+
+test('importSurveyZip throws with status and raw text when the error body is not JSON', async () => {
+  const fetchImpl = async () => new Response('<html>Gateway Timeout</html>', { status: 504 })
+
+  await assert.rejects(
+    () =>
+      importSurveyZip({
+        baseUrl: 'http://x',
+        authToken: 'tok',
+        zipBuffer: Buffer.from('x'),
+        zipFileName: 'x.zip',
+        surveyName: 'n',
+        fetchImpl,
+      }),
+    /Import request failed \(status 504\).*Gateway Timeout/
+  )
+})
+
+test('getJobStatus throws with status and raw text when the error body is not JSON', async () => {
+  const fetchImpl = async () => new Response('Service Unavailable', { status: 503 })
+
+  await assert.rejects(
+    () => getJobStatus({ baseUrl: 'http://x', authToken: 'tok', jobUuid: 'job-1', fetchImpl }),
+    /Job status request failed \(status 503\).*Service Unavailable/
+  )
+})
+
+test('deleteSurvey throws with status and raw text when the error body is not JSON', async () => {
+  const fetchImpl = async () => new Response('<html>Forbidden</html>', { status: 403 })
+
+  await assert.rejects(
+    () => deleteSurvey({ baseUrl: 'http://x', authToken: 'tok', surveyId: 42, fetchImpl }),
+    /Delete survey 42 failed \(status 403\).*Forbidden/
   )
 })
