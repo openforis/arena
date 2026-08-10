@@ -67,7 +67,20 @@ const runSingleImport = async ({ baseUrl, authToken, zipBuffer, zipFileName, sur
   const acceptMs = Date.now() - acceptStartedAt
 
   const jobStartedAt = Date.now()
-  const finalJob = await pollJobUntilTerminal({ baseUrl, authToken, jobUuid: job.uuid, timeoutMs: jobTimeoutMs })
+  let finalJob
+  try {
+    finalJob = await pollJobUntilTerminal({ baseUrl, authToken, jobUuid: job.uuid, timeoutMs: jobTimeoutMs })
+  } catch (error) {
+    return {
+      index,
+      name: surveyName,
+      outcome: 'rejected-at-http',
+      surveyId: null,
+      acceptMs,
+      jobMs: Date.now() - jobStartedAt,
+      error: error.message,
+    }
+  }
   const jobMs = Date.now() - jobStartedAt
 
   const outcome = finalJob.status
