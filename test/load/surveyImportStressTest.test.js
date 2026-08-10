@@ -200,6 +200,7 @@ test('runSingleUserImport creates the user, logs in as them, then imports', asyn
   assert.equal(calls[0].url, 'http://x/api/user')
   assert.equal(calls[0].options.headers.Authorization, 'Bearer admin-tok')
   assert.equal(calls[1].url, 'http://x/auth/login')
+  assert.equal(calls[2].options.headers.Authorization, 'Bearer user-tok')
 })
 
 test('runSingleUserImport returns rejected-at-http when user creation fails, without attempting login or import', async () => {
