@@ -1,7 +1,12 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
-const { runSingleImport, pollJobUntilTerminal, cleanupSurveys } = require('./surveyImportStressTest')
+const {
+  runSingleImport,
+  runSingleUserImport,
+  pollJobUntilTerminal,
+  cleanupSurveys,
+} = require('./surveyImportStressTest')
 
 const jsonResponse = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
@@ -162,4 +167,56 @@ test('cleanupSurveys deletes only entries with a surveyId and tolerates individu
   assert.equal(summary.totalCount, 3)
   assert.equal(summary.deletedCount, 2)
   assert.equal(deleteCalls.length, 3)
+})
+
+test('runSingleUserImport creates the user, logs in as them, then imports', async () => {
+  const calls = []
+  const responses = [
+    new Response(null, { status: 200 }), // POST /api/user
+    jsonResponse({ authToken: 'user-tok' }), // POST /auth/login (as the new user)
+    jsonResponse({ job: { uuid: 'job-1', status: 'pending' } }), // import accept
+    jsonResponse({ uuid: 'job-1', status: 'succeeded', surveyId: 55 }), // poll (terminal, this server response does include surveyId)
+  ]
+  let call = 0
+  const fetchImpl = async (url, options) => {
+    calls.push({ url, options })
+    return responses[call++]
+  }
+
+  const result = await runSingleUserImport({
+    baseUrl: 'http://x',
+    adminAuthToken: 'admin-tok',
+    credentials: { name: 'Load Test User 1', email: 'stress_test_1_0@loadtest.local', password: 'LoadTestUser1Aa!' },
+    zipBuffer: Buffer.from('x'),
+    zipFileName: 'x.zip',
+    surveyName: 'stress_test_1_0',
+    index: 0,
+    jobTimeoutMs: 5000,
+    fetchImpl,
+  })
+
+  assert.equal(result.outcome, 'succeeded')
+  assert.equal(result.surveyId, 55)
+  assert.equal(calls[0].url, 'http://x/api/user')
+  assert.equal(calls[0].options.headers.Authorization, 'Bearer admin-tok')
+  assert.equal(calls[1].url, 'http://x/auth/login')
+})
+
+test('runSingleUserImport returns rejected-at-http when user creation fails, without attempting login or import', async () => {
+  const fetchImpl = async () => new Response('quota exceeded', { status: 403 })
+
+  const result = await runSingleUserImport({
+    baseUrl: 'http://x',
+    adminAuthToken: 'admin-tok',
+    credentials: { name: 'Load Test User 2', email: 'stress_test_1_1@loadtest.local', password: 'LoadTestUser1Aa!' },
+    zipBuffer: Buffer.from('x'),
+    zipFileName: 'x.zip',
+    surveyName: 'stress_test_1_1',
+    index: 1,
+    jobTimeoutMs: 5000,
+    fetchImpl,
+  })
+
+  assert.equal(result.outcome, 'rejected-at-http')
+  assert.match(result.error, /user setup failed/)
 })

@@ -156,6 +156,61 @@ const runSingleImport = async ({
 }
 
 /**
+ * Creates one throwaway user, logs in as them, then runs their single survey import end-to-end.
+ * If user creation or login fails, returns a rejected-at-http result without attempting the import.
+ * @param {object} params - Function parameters.
+ * @param {string} params.baseUrl - Arena server base URL.
+ * @param {string} params.adminAuthToken - JWT auth token of the system admin used to create the user.
+ * @param {{name: string, email: string, password: string}} params.credentials - Credentials for the throwaway user.
+ * @param {Buffer} params.zipBuffer - The survey zip file content.
+ * @param {string} params.zipFileName - The file name to send for the zip part.
+ * @param {string} params.surveyName - The unique name for the new survey.
+ * @param {number} params.index - Index of this request within the run (for reporting).
+ * @param {number} params.jobTimeoutMs - Max time to wait for the job to finish.
+ * @param {Function} [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @returns {Promise<object>} A result entry (see report.js for the shape).
+ */
+const runSingleUserImport = async ({
+  baseUrl,
+  adminAuthToken,
+  credentials,
+  zipBuffer,
+  zipFileName,
+  surveyName,
+  index,
+  jobTimeoutMs,
+  fetchImpl = fetch,
+}) => {
+  const setupStartedAt = Date.now()
+  let userAuthToken
+  try {
+    await createUser({ baseUrl, authToken: adminAuthToken, ...credentials, fetchImpl })
+    userAuthToken = await login({ baseUrl, email: credentials.email, password: credentials.password, fetchImpl })
+  } catch (error) {
+    return {
+      index,
+      name: surveyName,
+      outcome: 'rejected-at-http',
+      surveyId: null,
+      acceptMs: Date.now() - setupStartedAt,
+      jobMs: null,
+      error: `user setup failed: ${error.message}`,
+    }
+  }
+
+  return runSingleImport({
+    baseUrl,
+    authToken: userAuthToken,
+    zipBuffer,
+    zipFileName,
+    surveyName,
+    index,
+    jobTimeoutMs,
+    fetchImpl,
+  })
+}
+
+/**
  * Deletes every survey referenced by the given results, sequentially and best-effort.
  * @param {object} params - Function parameters.
  * @param {string} params.baseUrl - Arena server base URL.
@@ -205,17 +260,21 @@ const main = async () => {
   const zipFileName = path.basename(zipPath)
 
   console.log(`Logging in as ${email} at ${url}...`)
-  const authToken = await login({ baseUrl: url, email, password })
+  const adminAuthToken = await login({ baseUrl: url, email, password })
 
   const runId = Date.now()
-  console.log(`Firing ${count} concurrent survey imports (run ${runId})...`)
+  const credentialsList = buildLoadTestUserCredentials({ runId, count })
+  console.log(
+    `Provisioning ${count} throwaway load-test users and firing ${count} concurrent survey imports (run ${runId})...`
+  )
 
   const startedAt = Date.now()
-  const results = await Promise.all(
-    Array.from({ length: count }, (_, i) =>
-      runSingleImport({
+  const settled = await Promise.allSettled(
+    credentialsList.map((credentials, i) =>
+      runSingleUserImport({
         baseUrl: url,
-        authToken,
+        adminAuthToken,
+        credentials,
         zipBuffer,
         zipFileName,
         surveyName: `stress_test_${runId}_${i}`,
@@ -224,14 +283,30 @@ const main = async () => {
       })
     )
   )
+  const results = settled.map((settledResult, i) =>
+    settledResult.status === 'fulfilled'
+      ? settledResult.value
+      : {
+          index: i,
+          name: `stress_test_${runId}_${i}`,
+          outcome: 'rejected-at-http',
+          surveyId: null,
+          acceptMs: null,
+          jobMs: null,
+          error: settledResult.reason?.message || String(settledResult.reason),
+        }
+  )
   const totalDurationMs = Date.now() - startedAt
 
   console.log(formatSummary({ results, totalDurationMs }))
 
   if (!keep) {
     console.log('Cleaning up created surveys...')
-    const { deletedCount, totalCount } = await cleanupSurveys({ baseUrl: url, authToken, results })
+    const { deletedCount, totalCount } = await cleanupSurveys({ baseUrl: url, authToken: adminAuthToken, results })
     console.log(`Deleted ${deletedCount}/${totalCount} surveys created by this run.`)
+    console.log(
+      'Note: the throwaway user accounts created by this run (stress_test_*@loadtest.local) cannot be deleted via the API and remain in the database.'
+    )
   }
 
   const anyFailed = results.some((result) => result.outcome !== 'succeeded')
@@ -245,4 +320,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = { main, runSingleImport, pollJobUntilTerminal, cleanupSurveys }
+module.exports = { main, runSingleImport, runSingleUserImport, pollJobUntilTerminal, cleanupSurveys }
