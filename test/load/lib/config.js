@@ -54,6 +54,9 @@ const parseArgv = (argv) => {
       if (value === undefined) {
         throw new Error(`Missing value for argument: ${arg}`)
       }
+      if (value.startsWith('--')) {
+        throw new Error(`Missing value for argument: ${arg} (got another flag: ${value})`)
+      }
       parsed[flagDef.key] = value
       index += 2
     } else {

@@ -146,10 +146,12 @@ const runSingleImport = async ({
   const jobMs = Date.now() - jobStartedAt
 
   const outcome = finalJob.status
-  const error =
-    outcome === 'succeeded'
-      ? null
-      : finalJob.error || JSON.stringify(finalJob.errors || finalJob.result || 'unknown error')
+  let error = null
+  if (outcome === 'timed-out') {
+    error = `timed out after ${jobTimeoutMs}ms`
+  } else if (outcome !== 'succeeded') {
+    error = finalJob.error || JSON.stringify(finalJob.errors || finalJob.result || 'unknown error')
+  }
 
   return {
     index,
@@ -188,7 +190,6 @@ const runSingleUserImport = async ({
   jobTimeoutMs,
   fetchImpl = fetch,
 }) => {
-  const setupStartedAt = Date.now()
   let userAuthToken
   try {
     await createUser({ baseUrl, authToken: adminAuthToken, ...credentials, fetchImpl })
@@ -199,7 +200,7 @@ const runSingleUserImport = async ({
       name: surveyName,
       outcome: 'rejected-at-http',
       surveyId: null,
-      acceptMs: Date.now() - setupStartedAt,
+      acceptMs: null,
       jobMs: null,
       error: `user setup failed: ${error.message}`,
     }
@@ -265,6 +266,14 @@ const main = async () => {
   }
 
   const { zipPath, url, email, password, count, jobTimeoutMs, keep } = config
+
+  const targetHostname = new URL(url).hostname
+  if (targetHostname !== 'localhost' && targetHostname !== '127.0.0.1') {
+    console.warn(
+      `⚠️  Target is not localhost (${url}) — this run will create ${count} throwaway accounts with a ` +
+        'random password on that server, and (see test/load/README.md) they cannot be deleted afterward.'
+    )
+  }
 
   console.log(`Reading zip file: ${zipPath}`)
   const zipBuffer = fs.readFileSync(zipPath)

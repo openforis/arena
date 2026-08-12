@@ -150,6 +150,29 @@ test('runSingleImport succeeds end-to-end and carries the surveyId through even 
   assert.equal(result.surveyId, 99)
 })
 
+test('runSingleImport reports a helpful message and no jobMs-style acceptMs distortion when the job times out', async () => {
+  const fetchImpl = async (url) => {
+    if (url.includes('/api/survey/arena-import')) {
+      return jsonResponse({ job: { uuid: 'job-1', status: 'pending' } })
+    }
+    return jsonResponse({ uuid: 'job-1', status: 'running' })
+  }
+
+  const result = await runSingleImport({
+    baseUrl: 'http://x',
+    authToken: 'tok',
+    zipBuffer: Buffer.from('x'),
+    zipFileName: 'x.zip',
+    surveyName: 'stress_test_2',
+    index: 2,
+    jobTimeoutMs: 0,
+    fetchImpl,
+  })
+
+  assert.equal(result.outcome, 'timed-out')
+  assert.equal(result.error, 'timed out after 0ms')
+})
+
 test('cleanupSurveys queries the server authoritatively by name prefix and deletes everything it finds, tolerating individual failures', async () => {
   const calls = []
   const fetchImpl = async (url, options) => {
@@ -252,4 +275,7 @@ test('runSingleUserImport returns rejected-at-http when user creation fails, wit
 
   assert.equal(result.outcome, 'rejected-at-http')
   assert.match(result.error, /user setup failed/)
+  // acceptMs measures only the import POST's latency elsewhere; a setup failure never got that far, so it
+  // must report null (not user-creation+login time) to avoid distorting the report's accept-latency stat.
+  assert.equal(result.acceptMs, null)
 })

@@ -85,3 +85,10 @@ test('parseConfig short-circuits with help:true on --help', () => {
 test('parseConfig rejects unknown flags', () => {
   assert.throws(() => parseConfig({ argv: ['--bogus'], env: baseEnv }), /Unknown argument: --bogus/)
 })
+
+test('parseConfig rejects a flag value that is itself another flag, instead of silently swallowing it', () => {
+  assert.throws(
+    () => parseConfig({ argv: ['--zip', '--count', '--email', 'a@b.com', '--password', 'pw'], env: baseEnv }),
+    /Missing value for argument: --zip \(got another flag: --count\)/
+  )
+})

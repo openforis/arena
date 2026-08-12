@@ -27,7 +27,7 @@
     "test:e2e:codegen": "npx playwright --save-storage=test/e2e/resources/auth.json codegen http://localhost:9090",
     "test:e2e:watch": "cross-env PWDEBUG=1 jest --config=test/e2e/jest.config.js",
     "test:load": "node test/load/surveyImportStressTest.js",
-    "test:load:unit": "node --test test/load/lib/*.test.js",
+    "test:load:unit": "node --test test/load/**/*.test.js",
     "test": "run-s test:unit test:e2e",
     "typecheck": "tsc --noEmit",
     "test:docker": "test/bin/testExecDocker.sh",
