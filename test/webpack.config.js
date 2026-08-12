@@ -9,7 +9,9 @@ const getEntry = (type) =>
     .sort((fileA, fileB) => {
       const idxA = fileA.substr(0, 3)
       const idxB = fileB.substr(0, 3)
-      return idxA < idxB
+      if (idxA < idxB) return -1
+      if (idxA > idxB) return 1
+      return 0
     })
 
 const getOutput = (type) => ({
