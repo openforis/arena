@@ -1,7 +1,7 @@
-const test = require('node:test')
-const assert = require('node:assert/strict')
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
-const { buildLoadTestUserCredentials, generateLoadTestUserPassword } = require('./userProvisioning')
+import { buildLoadTestUserCredentials, generateLoadTestUserPassword } from './userProvisioning.ts'
 
 // Mirrors core/user/userPasswordValidator.ts's passwordStrengthRegExp (and validPasswordRegExp, implied by
 // \S+ matching within .{8,} here since no whitespace-containing password could match this shape anyway).

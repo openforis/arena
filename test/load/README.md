@@ -17,7 +17,7 @@ dev use against a running server.
 ## Usage
 
 ```bash
-node test/load/surveyImportStressTest.js --zip path/to/survey.zip --count 20
+node test/load/surveyImportStressTest.ts --zip path/to/survey.zip --count 20
 ```
 
 Requires a running Arena server and a system-admin login (`--email`/

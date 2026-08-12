@@ -1,61 +1,78 @@
 /* eslint-disable no-console -- this file's entire purpose is CLI reporting */
-require('dotenv').config()
+import 'dotenv/config'
 
-const fs = require('node:fs')
-const path = require('node:path')
+import fs from 'node:fs'
+import path from 'node:path'
 
-const { parseConfig, HELP_TEXT } = require('./lib/config')
-const {
+import { parseConfig, HELP_TEXT, type ParseConfigResult, type StressTestConfig } from './lib/config.ts'
+import {
   login,
   importSurveyZip,
   getJobStatus,
   deleteSurvey,
   fetchSurveysByNamePrefix,
   createUser,
-} = require('./lib/httpApi')
-const { buildLoadTestUserCredentials } = require('./lib/userProvisioning')
-const { formatSummary } = require('./lib/report')
+  type FetchImpl,
+  type Job,
+} from './lib/httpApi.ts'
+import { buildLoadTestUserCredentials, type UserCredentials } from './lib/userProvisioning.ts'
+import { formatSummary, type Outcome, type ResultEntry } from './lib/report.ts'
 
 const JOB_POLL_INTERVAL_MS = 1000
 const MAX_CONSECUTIVE_POLL_ERRORS = 3
 const TERMINAL_STATUSES = new Set(['succeeded', 'failed', 'canceled'])
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+
+interface PolledJob {
+  status: string
+  surveyId: number | null
+  errors: unknown
+  result: unknown
+  error?: string
+}
 
 /**
  * Polls a job until it reaches a terminal status, the timeout elapses, or too many consecutive poll
  * requests fail. Never rejects. surveyId/errors/result are backfilled from the last non-terminal read
  * when the terminal read itself lacks them (the server's terminal job-status response omits them).
- * @param {object} params - Function parameters.
- * @param {string} params.baseUrl - Arena server base URL.
- * @param {string} params.authToken - JWT auth token.
- * @param {string} params.jobUuid - UUID of the job to poll.
- * @param {number} params.timeoutMs - Max time to wait, in milliseconds.
- * @param {Function} [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
- * @param {number} [params.pollIntervalMs] - Delay between polls, in milliseconds (defaults to 1000).
- * @returns {Promise<object>} The last known job summary; status is 'timed-out' or 'rejected-at-http' if polling didn't reach a terminal status.
+ * @param params - Function parameters.
+ * @param params.baseUrl - Arena server base URL.
+ * @param params.authToken - JWT auth token.
+ * @param params.jobUuid - UUID of the job to poll.
+ * @param params.timeoutMs - Max time to wait, in milliseconds.
+ * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @param [params.pollIntervalMs] - Delay between polls, in milliseconds (defaults to 1000).
+ * @returns The last known job summary; status is 'timed-out' or 'rejected-at-http' if polling didn't reach a terminal status.
  */
-const pollJobUntilTerminal = async ({
+export const pollJobUntilTerminal = async ({
   baseUrl,
   authToken,
   jobUuid,
   timeoutMs,
   fetchImpl = fetch,
   pollIntervalMs = JOB_POLL_INTERVAL_MS,
-}) => {
+}: {
+  baseUrl: string
+  authToken: string
+  jobUuid: string
+  timeoutMs: number
+  fetchImpl?: FetchImpl
+  pollIntervalMs?: number
+}): Promise<PolledJob> => {
   const startedAt = Date.now()
-  let lastKnownSurveyId = null
-  let lastKnownErrors = null
-  let lastKnownResult = null
+  let lastKnownSurveyId: number | null = null
+  let lastKnownErrors: unknown = null
+  let lastKnownResult: unknown = null
   let consecutivePollErrors = 0
-  let lastPollError = null
+  let lastPollError: Error | null = null
 
   for (;;) {
-    let job = null
+    let job: Job | null = null
     try {
       job = await getJobStatus({ baseUrl, authToken, jobUuid, fetchImpl })
       consecutivePollErrors = 0
-    } catch (error) {
+    } catch (error: any) {
       consecutivePollErrors += 1
       lastPollError = error
       if (consecutivePollErrors > MAX_CONSECUTIVE_POLL_ERRORS) {
@@ -97,18 +114,18 @@ const pollJobUntilTerminal = async ({
 
 /**
  * Runs one survey import request end-to-end (accept + poll to completion) and reports its outcome.
- * @param {object} params - Function parameters.
- * @param {string} params.baseUrl - Arena server base URL.
- * @param {string} params.authToken - JWT auth token.
- * @param {Buffer} params.zipBuffer - The survey zip file content.
- * @param {string} params.zipFileName - The file name to send for the zip part.
- * @param {string} params.surveyName - The unique name for the new survey.
- * @param {number} params.index - Index of this request within the run (for reporting).
- * @param {number} params.jobTimeoutMs - Max time to wait for the job to finish.
- * @param {Function} [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
- * @returns {Promise<object>} A result entry (see report.js for the shape).
+ * @param params - Function parameters.
+ * @param params.baseUrl - Arena server base URL.
+ * @param params.authToken - JWT auth token.
+ * @param params.zipBuffer - The survey zip file content.
+ * @param params.zipFileName - The file name to send for the zip part.
+ * @param params.surveyName - The unique name for the new survey.
+ * @param params.index - Index of this request within the run (for reporting).
+ * @param params.jobTimeoutMs - Max time to wait for the job to finish.
+ * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @returns A result entry.
  */
-const runSingleImport = async ({
+export const runSingleImport = async ({
   baseUrl,
   authToken,
   zipBuffer,
@@ -117,12 +134,21 @@ const runSingleImport = async ({
   index,
   jobTimeoutMs,
   fetchImpl = fetch,
-}) => {
+}: {
+  baseUrl: string
+  authToken: string
+  zipBuffer: Buffer
+  zipFileName: string
+  surveyName: string
+  index: number
+  jobTimeoutMs: number
+  fetchImpl?: FetchImpl
+}): Promise<ResultEntry> => {
   const acceptStartedAt = Date.now()
-  let job
+  let job: Job
   try {
     job = await importSurveyZip({ baseUrl, authToken, zipBuffer, zipFileName, surveyName, fetchImpl })
-  } catch (error) {
+  } catch (error: any) {
     return {
       index,
       name: surveyName,
@@ -145,8 +171,8 @@ const runSingleImport = async ({
   })
   const jobMs = Date.now() - jobStartedAt
 
-  const outcome = finalJob.status
-  let error = null
+  const outcome = finalJob.status as Outcome
+  let error: string | null = null
   if (outcome === 'timed-out') {
     error = `timed out after ${jobTimeoutMs}ms`
   } else if (outcome !== 'succeeded') {
@@ -167,19 +193,19 @@ const runSingleImport = async ({
 /**
  * Creates one throwaway user, logs in as them, then runs their single survey import end-to-end.
  * If user creation or login fails, returns a rejected-at-http result without attempting the import.
- * @param {object} params - Function parameters.
- * @param {string} params.baseUrl - Arena server base URL.
- * @param {string} params.adminAuthToken - JWT auth token of the system admin used to create the user.
- * @param {{name: string, email: string, password: string}} params.credentials - Credentials for the throwaway user.
- * @param {Buffer} params.zipBuffer - The survey zip file content.
- * @param {string} params.zipFileName - The file name to send for the zip part.
- * @param {string} params.surveyName - The unique name for the new survey.
- * @param {number} params.index - Index of this request within the run (for reporting).
- * @param {number} params.jobTimeoutMs - Max time to wait for the job to finish.
- * @param {Function} [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
- * @returns {Promise<object>} A result entry (see report.js for the shape).
+ * @param params - Function parameters.
+ * @param params.baseUrl - Arena server base URL.
+ * @param params.adminAuthToken - JWT auth token of the system admin used to create the user.
+ * @param params.credentials - Credentials for the throwaway user.
+ * @param params.zipBuffer - The survey zip file content.
+ * @param params.zipFileName - The file name to send for the zip part.
+ * @param params.surveyName - The unique name for the new survey.
+ * @param params.index - Index of this request within the run (for reporting).
+ * @param params.jobTimeoutMs - Max time to wait for the job to finish.
+ * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @returns A result entry.
  */
-const runSingleUserImport = async ({
+export const runSingleUserImport = async ({
   baseUrl,
   adminAuthToken,
   credentials,
@@ -189,12 +215,22 @@ const runSingleUserImport = async ({
   index,
   jobTimeoutMs,
   fetchImpl = fetch,
-}) => {
-  let userAuthToken
+}: {
+  baseUrl: string
+  adminAuthToken: string
+  credentials: UserCredentials
+  zipBuffer: Buffer
+  zipFileName: string
+  surveyName: string
+  index: number
+  jobTimeoutMs: number
+  fetchImpl?: FetchImpl
+}): Promise<ResultEntry> => {
+  let userAuthToken: string
   try {
     await createUser({ baseUrl, authToken: adminAuthToken, ...credentials, fetchImpl })
     userAuthToken = await login({ baseUrl, email: credentials.email, password: credentials.password, fetchImpl })
-  } catch (error) {
+  } catch (error: any) {
     return {
       index,
       name: surveyName,
@@ -223,14 +259,24 @@ const runSingleUserImport = async ({
  * server for every survey whose name starts with namePrefix rather than relying on surveyIds observed
  * from run results, since a job that timed out while still queued (never observed running) never yields
  * a surveyId even though the server may create the survey once its turn comes.
- * @param {object} params - Function parameters.
- * @param {string} params.baseUrl - Arena server base URL.
- * @param {string} params.authToken - JWT auth token (a system admin token can delete any survey).
- * @param {string} params.namePrefix - Prefix shared by every survey name created by this run.
- * @param {Function} [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
- * @returns {Promise<{deletedCount: number, totalCount: number}>} How many surveys were actually deleted.
+ * @param params - Function parameters.
+ * @param params.baseUrl - Arena server base URL.
+ * @param params.authToken - JWT auth token (a system admin token can delete any survey).
+ * @param params.namePrefix - Prefix shared by every survey name created by this run.
+ * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @returns How many surveys were actually deleted.
  */
-const cleanupSurveys = async ({ baseUrl, authToken, namePrefix, fetchImpl = fetch }) => {
+export const cleanupSurveys = async ({
+  baseUrl,
+  authToken,
+  namePrefix,
+  fetchImpl = fetch,
+}: {
+  baseUrl: string
+  authToken: string
+  namePrefix: string
+  fetchImpl?: FetchImpl
+}): Promise<{ deletedCount: number; totalCount: number }> => {
   const surveys = await fetchSurveysByNamePrefix({ baseUrl, authToken, namePrefix, fetchImpl })
   const surveyIds = surveys.map((survey) => survey.id)
   let deletedCount = 0
@@ -238,7 +284,7 @@ const cleanupSurveys = async ({ baseUrl, authToken, namePrefix, fetchImpl = fetc
     try {
       await deleteSurvey({ baseUrl, authToken, surveyId, fetchImpl })
       deletedCount += 1
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to delete survey ${surveyId}: ${error.message}`)
     }
   }
@@ -247,13 +293,13 @@ const cleanupSurveys = async ({ baseUrl, authToken, namePrefix, fetchImpl = fetc
 
 /**
  * CLI entry point: parses config, runs the concurrent import burst, reports, and cleans up.
- * @returns {Promise<void>} Resolves when the run is complete; sets process.exitCode on failure.
+ * @returns Resolves when the run is complete; sets process.exitCode on failure.
  */
-const main = async () => {
-  let config
+export const main = async (): Promise<void> => {
+  let config: ParseConfigResult
   try {
     config = parseConfig({ argv: process.argv.slice(2), env: process.env })
-  } catch (error) {
+  } catch (error: any) {
     console.error(error.message)
     console.error(HELP_TEXT)
     process.exitCode = 1
@@ -265,7 +311,9 @@ const main = async () => {
     return
   }
 
-  const { zipPath, url, email, password, count, jobTimeoutMs, keep } = config
+  // TS doesn't narrow assignments made inside a try block, so the discriminated union above stays
+  // widened here even though the runtime check just proved it; see microsoft/TypeScript#9998.
+  const { zipPath, url, email, password, count, jobTimeoutMs, keep } = config as StressTestConfig
 
   const targetHostname = new URL(url).hostname
   if (targetHostname !== 'localhost' && targetHostname !== '127.0.0.1') {
@@ -303,7 +351,7 @@ const main = async () => {
       })
     )
   )
-  const results = settled.map((settledResult, i) =>
+  const results: ResultEntry[] = settled.map((settledResult, i) =>
     settledResult.status === 'fulfilled'
       ? settledResult.value
       : {
@@ -339,11 +387,9 @@ const main = async () => {
   process.exitCode = anyFailed ? 1 : 0
 }
 
-if (require.main === module) {
+if (import.meta.main) {
   main().catch((error) => {
     console.error('Stress test failed to run:', error)
     process.exitCode = 1
   })
 }
-
-module.exports = { main, runSingleImport, runSingleUserImport, pollJobUntilTerminal, cleanupSurveys }

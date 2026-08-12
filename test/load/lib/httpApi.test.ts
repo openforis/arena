@@ -1,7 +1,7 @@
-const test = require('node:test')
-const assert = require('node:assert/strict')
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
-const {
+import {
   login,
   buildImportFormData,
   importSurveyZip,
@@ -9,14 +9,14 @@ const {
   deleteSurvey,
   fetchSurveysByNamePrefix,
   createUser,
-} = require('./httpApi')
+} from './httpApi.ts'
 
-const jsonResponse = (body, status = 200) =>
+const jsonResponse = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
 
 test('login resolves the auth token and calls the right endpoint', async () => {
-  const calls = []
-  const fetchImpl = async (url, options) => {
+  const calls: Array<{ url: string; options: any }> = []
+  const fetchImpl = async (url: string, options?: RequestInit) => {
     calls.push({ url, options })
     return jsonResponse({ authToken: 'tok-123' })
   }
@@ -46,18 +46,18 @@ test('buildImportFormData sets the survey and file fields', async () => {
     surveyName: 'stress_test_1',
   })
 
-  const surveyField = JSON.parse(formData.get('survey'))
+  const surveyField = JSON.parse(formData.get('survey') as string)
   assert.deepEqual(surveyField, { name: 'stress_test_1', options: { includeData: false } })
 
-  const fileField = formData.get('file')
+  const fileField = formData.get('file') as File
   assert.equal(fileField.name, 'survey.zip')
   const content = Buffer.from(await fileField.arrayBuffer())
   assert.equal(content.toString(), 'zip-bytes')
 })
 
 test('importSurveyZip posts multipart form data with the bearer token', async () => {
-  const calls = []
-  const fetchImpl = async (url, options) => {
+  const calls: Array<{ url: string; options: any }> = []
+  const fetchImpl = async (url: string, options?: RequestInit) => {
     calls.push({ url, options })
     return jsonResponse({ job: { uuid: 'job-1', status: 'pending' } })
   }
@@ -113,8 +113,8 @@ test('getJobStatus throws on a non-ok response', async () => {
 })
 
 test('deleteSurvey resolves on a successful delete', async () => {
-  const calls = []
-  const fetchImpl = async (url, options) => {
+  const calls: Array<{ url: string; options: any }> = []
+  const fetchImpl = async (url: string, options?: RequestInit) => {
     calls.push({ url, options })
     return new Response(null, { status: 200 })
   }
@@ -188,8 +188,8 @@ test('deleteSurvey throws with status and raw text when the error body is not JS
 })
 
 test('fetchSurveysByNamePrefix calls the right endpoint and resolves the list', async () => {
-  const calls = []
-  const fetchImpl = async (url, options) => {
+  const calls: Array<{ url: string; options: any }> = []
+  const fetchImpl = async (url: string, options?: RequestInit) => {
     calls.push({ url, options })
     return jsonResponse({ list: [{ id: 1 }, { id: 2 }] })
   }
@@ -218,8 +218,8 @@ test('fetchSurveysByNamePrefix throws with status and body detail on failure', a
 })
 
 test('createUser resolves when the response is ok and has no validation field', async () => {
-  const calls = []
-  const fetchImpl = async (url, options) => {
+  const calls: Array<{ url: string; options: any }> = []
+  const fetchImpl = async (url: string, options?: RequestInit) => {
     calls.push({ url, options })
     return jsonResponse({ user: { id: 1 } })
   }

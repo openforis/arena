@@ -1,7 +1,7 @@
-const test = require('node:test')
-const assert = require('node:assert/strict')
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
-const { computeStats } = require('./stats')
+import { computeStats } from './stats.ts'
 
 test('computeStats returns nulls for an empty array', () => {
   assert.deepEqual(computeStats([]), { count: 0, min: null, max: null, avg: null, p95: null })

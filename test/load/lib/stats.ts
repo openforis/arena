@@ -1,9 +1,17 @@
+export interface Stats {
+  count: number
+  min: number | null
+  max: number | null
+  avg: number | null
+  p95: number | null
+}
+
 /**
  * Computes summary statistics (min, max, average, p95) for a list of numeric samples.
- * @param {Array<number>} values - Numeric samples (e.g. latencies in milliseconds).
- * @returns {{count: number, min: number|null, max: number|null, avg: number|null, p95: number|null}} Summary statistics; all fields are null when values is empty.
+ * @param values - Numeric samples (e.g. latencies in milliseconds).
+ * @returns Summary statistics; all fields are null (except count, which is 0) when values is empty.
  */
-const computeStats = (values) => {
+export const computeStats = (values: number[]): Stats => {
   if (!Array.isArray(values) || values.length === 0) {
     return { count: 0, min: null, max: null, avg: null, p95: null }
   }
@@ -20,5 +28,3 @@ const computeStats = (values) => {
     p95: sorted[p95Index],
   }
 }
-
-module.exports = { computeStats }

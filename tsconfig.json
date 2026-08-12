@@ -3,6 +3,7 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "node",
+    "moduleDetection": "force",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "allowJs": true,
     "checkJs": false,
@@ -22,7 +23,7 @@
     "skipLibCheck": true,
     "strict": false,
     "noEmit": true,
-    "allowImportingTsExtensions": false,
+    "allowImportingTsExtensions": true,
     "types": ["node", "jest"]
   },
   "include": ["common", "core", "server", "webapp", "test", "*.d.ts"],

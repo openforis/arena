@@ -1,12 +1,20 @@
-const test = require('node:test')
-const assert = require('node:assert/strict')
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
-const { formatSummary } = require('./report')
+import { formatSummary, type ResultEntry } from './report.ts'
 
-const baseResult = { index: 0, name: 'stress_test_0', outcome: 'succeeded', acceptMs: 100, jobMs: 500, error: null }
+const baseResult: ResultEntry = {
+  index: 0,
+  name: 'stress_test_0',
+  outcome: 'succeeded',
+  surveyId: null,
+  acceptMs: 100,
+  jobMs: 500,
+  error: null,
+}
 
 test('formatSummary counts outcomes and reports latency stats', () => {
-  const results = [
+  const results: ResultEntry[] = [
     { ...baseResult, index: 0, name: 's0' },
     { ...baseResult, index: 1, name: 's1', acceptMs: 200, jobMs: 1000 },
     { ...baseResult, index: 2, name: 's2', outcome: 'failed', error: 'boom', acceptMs: 150, jobMs: 300 },
@@ -20,7 +28,7 @@ test('formatSummary counts outcomes and reports latency stats', () => {
 })
 
 test('formatSummary lists failure detail lines', () => {
-  const results = [{ ...baseResult, index: 4, name: 's4', outcome: 'failed', error: 'pool exhausted' }]
+  const results: ResultEntry[] = [{ ...baseResult, index: 4, name: 's4', outcome: 'failed', error: 'pool exhausted' }]
   const summary = formatSummary({ results, totalDurationMs: 500 })
 
   assert.match(summary, /Failures:/)
@@ -28,7 +36,7 @@ test('formatSummary lists failure detail lines', () => {
 })
 
 test('formatSummary omits the Failures section when everything succeeded', () => {
-  const results = [{ ...baseResult }]
+  const results: ResultEntry[] = [{ ...baseResult }]
   const summary = formatSummary({ results, totalDurationMs: 500 })
 
   assert.doesNotMatch(summary, /Failures:/)

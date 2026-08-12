@@ -1,14 +1,9 @@
-const test = require('node:test')
-const assert = require('node:assert/strict')
+import test from 'node:test'
+import assert from 'node:assert/strict'
 
-const {
-  runSingleImport,
-  runSingleUserImport,
-  pollJobUntilTerminal,
-  cleanupSurveys,
-} = require('./surveyImportStressTest')
+import { runSingleImport, runSingleUserImport, pollJobUntilTerminal, cleanupSurveys } from './surveyImportStressTest.ts'
 
-const jsonResponse = (body, status = 200) =>
+const jsonResponse = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
 
 test('pollJobUntilTerminal carries surveyId forward from a non-terminal read when the terminal read lacks it', async () => {
@@ -56,7 +51,7 @@ test('pollJobUntilTerminal tolerates a transient poll error and then succeeds', 
 })
 
 test('pollJobUntilTerminal gives up after too many consecutive poll errors, well before the timeout', async () => {
-  const fetchImpl = async () => {
+  const fetchImpl = async (): Promise<Response> => {
     throw new Error('ECONNRESET')
   }
 
@@ -70,7 +65,7 @@ test('pollJobUntilTerminal gives up after too many consecutive poll errors, well
   })
 
   assert.equal(job.status, 'rejected-at-http')
-  assert.match(job.error, /ECONNRESET/)
+  assert.match(job.error as string, /ECONNRESET/)
 })
 
 test('pollJobUntilTerminal times out when the job never reaches a terminal status', async () => {
@@ -123,7 +118,7 @@ test('runSingleImport returns rejected-at-http when the import request itself fa
   assert.equal(result.outcome, 'rejected-at-http')
   assert.equal(result.surveyId, null)
   assert.equal(result.jobMs, null)
-  assert.ok(result.acceptMs >= 0)
+  assert.ok((result.acceptMs as number) >= 0)
 })
 
 test('runSingleImport succeeds end-to-end and carries the surveyId through even though the terminal poll lacks it', async () => {
@@ -151,7 +146,7 @@ test('runSingleImport succeeds end-to-end and carries the surveyId through even 
 })
 
 test('runSingleImport reports a helpful message and no jobMs-style acceptMs distortion when the job times out', async () => {
-  const fetchImpl = async (url) => {
+  const fetchImpl = async (url: string) => {
     if (url.includes('/api/survey/arena-import')) {
       return jsonResponse({ job: { uuid: 'job-1', status: 'pending' } })
     }
@@ -174,8 +169,8 @@ test('runSingleImport reports a helpful message and no jobMs-style acceptMs dist
 })
 
 test('cleanupSurveys queries the server authoritatively by name prefix and deletes everything it finds, tolerating individual failures', async () => {
-  const calls = []
-  const fetchImpl = async (url, options) => {
+  const calls: string[] = []
+  const fetchImpl = async (url: string) => {
     calls.push(url)
     if (url.includes('/api/surveys?')) {
       return jsonResponse({ list: [{ id: 1 }, { id: 2 }, { id: 3 }] })
@@ -203,8 +198,8 @@ test('cleanupSurveys deletes surveys the caller never observed a surveyId for (e
   // Simulates the leak this fix addresses: the run's results never learned this survey's ID (it was still
   // queued when the poll gave up), but the server created it anyway once its turn came. Authoritative
   // cleanup finds and deletes it purely from the name-prefix query, with zero surveyIds ever known locally.
-  const calls = []
-  const fetchImpl = async (url) => {
+  const calls: string[] = []
+  const fetchImpl = async (url: string) => {
     calls.push(url)
     if (url.includes('/api/surveys?')) {
       return jsonResponse({ list: [{ id: 99 }] })
@@ -225,7 +220,7 @@ test('cleanupSurveys deletes surveys the caller never observed a surveyId for (e
 })
 
 test('runSingleUserImport creates the user, logs in as them, then imports', async () => {
-  const calls = []
+  const calls: Array<{ url: string; options: any }> = []
   const responses = [
     jsonResponse({ user: { id: 1 } }), // POST /api/user
     jsonResponse({ authToken: 'user-tok' }), // POST /auth/login (as the new user)
@@ -233,7 +228,7 @@ test('runSingleUserImport creates the user, logs in as them, then imports', asyn
     jsonResponse({ uuid: 'job-1', status: 'succeeded', surveyId: 55 }), // poll (terminal, this server response does include surveyId)
   ]
   let call = 0
-  const fetchImpl = async (url, options) => {
+  const fetchImpl = async (url: string, options?: RequestInit) => {
     calls.push({ url, options })
     return responses[call++]
   }
@@ -253,9 +248,9 @@ test('runSingleUserImport creates the user, logs in as them, then imports', asyn
   assert.equal(result.outcome, 'succeeded')
   assert.equal(result.surveyId, 55)
   assert.equal(calls[0].url, 'http://x/api/user')
-  assert.equal(calls[0].options.headers.Authorization, 'Bearer admin-tok')
+  assert.equal((calls[0].options.headers as any).Authorization, 'Bearer admin-tok')
   assert.equal(calls[1].url, 'http://x/auth/login')
-  assert.equal(calls[2].options.headers.Authorization, 'Bearer user-tok')
+  assert.equal((calls[2].options.headers as any).Authorization, 'Bearer user-tok')
 })
 
 test('runSingleUserImport returns rejected-at-http when user creation fails, without attempting login or import', async () => {
@@ -274,7 +269,7 @@ test('runSingleUserImport returns rejected-at-http when user creation fails, wit
   })
 
   assert.equal(result.outcome, 'rejected-at-http')
-  assert.match(result.error, /user setup failed/)
+  assert.match(result.error as string, /user setup failed/)
   // acceptMs measures only the import POST's latency elsewhere; a setup failure never got that far, so it
   // must report null (not user-creation+login time) to avoid distorting the report's accept-latency stat.
   assert.equal(result.acceptMs, null)

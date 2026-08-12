@@ -1,34 +1,55 @@
-const { computeStats } = require('./stats')
+import { computeStats } from './stats.ts'
 
-const OUTCOME_ORDER = ['succeeded', 'failed', 'timed-out', 'canceled', 'rejected-at-http']
+export type Outcome = 'succeeded' | 'failed' | 'timed-out' | 'canceled' | 'rejected-at-http'
+
+export interface ResultEntry {
+  index: number
+  name: string
+  outcome: Outcome
+  surveyId: number | null
+  acceptMs: number | null
+  jobMs: number | null
+  error: string | null
+}
+
+const OUTCOME_ORDER: Outcome[] = ['succeeded', 'failed', 'timed-out', 'canceled', 'rejected-at-http']
 
 /**
  * Formats a millisecond duration for display, or 'n/a' when not available.
- * @param {number|null} value - Duration in milliseconds, or null.
- * @returns {string} Formatted duration.
+ * @param value - Duration in milliseconds, or null.
+ * @returns Formatted duration.
  */
-const formatMs = (value) => (value === null || value === undefined ? 'n/a' : `${Math.round(value)}ms`)
+const formatMs = (value: number | null | undefined): string =>
+  value === null || value === undefined ? 'n/a' : `${Math.round(value)}ms`
 
 /**
  * Builds a human-readable summary report for a stress test run.
- * @param {object} params - Function parameters.
- * @param {Array<object>} params.results - Per-request result objects (see report.test.js for the shape).
- * @param {number} params.totalDurationMs - Total wall-clock duration of the run, in milliseconds.
- * @returns {string} The formatted report.
+ * @param params - Function parameters.
+ * @param params.results - Per-request result objects.
+ * @param params.totalDurationMs - Total wall-clock duration of the run, in milliseconds.
+ * @returns The formatted report.
  */
-const formatSummary = ({ results, totalDurationMs }) => {
+export const formatSummary = ({
+  results,
+  totalDurationMs,
+}: {
+  results: ResultEntry[]
+  totalDurationMs: number
+}): string => {
   const total = results.length
-  const byOutcome = results.reduce((acc, result) => {
+  const byOutcome = results.reduce<Record<string, number>>((acc, result) => {
     acc[result.outcome] = (acc[result.outcome] || 0) + 1
     return acc
   }, {})
 
   const acceptStats = computeStats(
-    results.filter((result) => result.acceptMs !== null).map((result) => result.acceptMs)
+    results.filter((result) => result.acceptMs !== null).map((result) => result.acceptMs as number)
   )
-  const jobStats = computeStats(results.filter((result) => result.jobMs !== null).map((result) => result.jobMs))
+  const jobStats = computeStats(
+    results.filter((result) => result.jobMs !== null).map((result) => result.jobMs as number)
+  )
 
-  const lines = []
+  const lines: string[] = []
   lines.push(
     '',
     '==================== Survey Import Stress Test Summary ====================',
@@ -57,5 +78,3 @@ const formatSummary = ({ results, totalDurationMs }) => {
 
   return lines.join('\n')
 }
-
-module.exports = { formatSummary }

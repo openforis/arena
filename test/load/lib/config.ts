@@ -1,13 +1,13 @@
-const path = require('node:path')
+import path from 'node:path'
 
 /**
  * Strips trailing slashes from a URL. Avoids a regex (e.g. /\/+$/) since a trailing, unanchored-at-start
  * quantifier like that is flagged by static analysis (SonarCloud javascript:S8786) as having potentially
  * super-linear backtracking on pathological input.
- * @param {string} url - The URL to normalize.
- * @returns {string} The URL with any trailing slashes removed.
+ * @param url - The URL to normalize.
+ * @returns The URL with any trailing slashes removed.
  */
-const stripTrailingSlashes = (url) => {
+const stripTrailingSlashes = (url: string): string => {
   let result = url
   while (result.endsWith('/')) {
     result = result.slice(0, -1)
@@ -15,11 +15,17 @@ const stripTrailingSlashes = (url) => {
   return result
 }
 
-const DEFAULT_URL = 'http://localhost:9090'
-const DEFAULT_COUNT = 50
-const DEFAULT_JOB_TIMEOUT_MS = 120000
+export const DEFAULT_URL = 'http://localhost:9090'
+export const DEFAULT_COUNT = 50
+export const DEFAULT_JOB_TIMEOUT_MS = 120000
 
-const FLAG_DEFS = [
+interface FlagDef {
+  flag: string
+  key: string
+  hasValue: boolean
+}
+
+const FLAG_DEFS: FlagDef[] = [
   { flag: '--zip', key: 'zipPath', hasValue: true },
   { flag: '--count', key: 'count', hasValue: true },
   { flag: '--url', key: 'url', hasValue: true },
@@ -30,7 +36,7 @@ const FLAG_DEFS = [
   { flag: '--help', key: 'help', hasValue: false },
 ]
 
-const HELP_TEXT = `Usage: node test/load/surveyImportStressTest.js --zip <path> [options]
+export const HELP_TEXT = `Usage: node test/load/surveyImportStressTest.ts --zip <path> [options]
 
 Options:
   --zip <path>          Path to an Arena survey export/backup zip (required)
@@ -50,13 +56,15 @@ Notes:
   via the API and accumulate in the database across runs (see test/load/README.md).
 `
 
+type ParsedArgs = Record<string, string | boolean | undefined>
+
 /**
  * Parses raw CLI arguments into a flat object keyed by flag name.
- * @param {Array<string>} argv - Raw CLI arguments (without the node/script path entries).
- * @returns {object} Flag values keyed by their config key.
+ * @param argv - Raw CLI arguments (without the node/script path entries).
+ * @returns Flag values keyed by their config key.
  */
-const parseArgv = (argv) => {
-  const parsed = {}
+const parseArgv = (argv: string[]): ParsedArgs => {
+  const parsed: ParsedArgs = {}
   let index = 0
   while (index < argv.length) {
     const arg = argv[index]
@@ -84,12 +92,12 @@ const parseArgv = (argv) => {
 
 /**
  * Parses and validates a value as a positive integer.
- * @param {object} params - Function parameters.
- * @param {string|number} params.value - Raw value to parse.
- * @param {string} params.label - Label used in the error message when invalid.
- * @returns {number} The parsed positive integer.
+ * @param params - Function parameters.
+ * @param params.value - Raw value to parse.
+ * @param params.label - Label used in the error message when invalid.
+ * @returns The parsed positive integer.
  */
-const toPositiveInt = ({ value, label }) => {
+const toPositiveInt = ({ value, label }: { value: string | number; label: string }): number => {
   const parsed = Number(value)
   if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) {
     throw new Error(`${label} must be a positive integer, got: ${value}`)
@@ -97,37 +105,53 @@ const toPositiveInt = ({ value, label }) => {
   return parsed
 }
 
+export interface StressTestConfig {
+  help: false
+  zipPath: string
+  url: string
+  email: string
+  password: string
+  count: number
+  jobTimeoutMs: number
+  keep: boolean
+}
+
+export type ParseConfigResult = { help: true } | StressTestConfig
+
 /**
  * Builds the stress test configuration from CLI arguments and environment variables.
- * @param {object} params - Function parameters.
- * @param {Array<string>} params.argv - Raw CLI arguments (e.g. process.argv.slice(2)).
- * @param {object} params.env - Environment variables (e.g. process.env).
- * @returns {object} Resolved configuration, or { help: true } when --help was passed.
+ * @param params - Function parameters.
+ * @param params.argv - Raw CLI arguments (e.g. process.argv.slice(2)).
+ * @param params.env - Environment variables (e.g. process.env).
+ * @returns Resolved configuration, or { help: true } when --help was passed.
  */
-const parseConfig = ({ argv, env }) => {
+export const parseConfig = ({ argv, env }: { argv: string[]; env: NodeJS.ProcessEnv }): ParseConfigResult => {
   const args = parseArgv(argv)
 
   if (args.help) {
     return { help: true }
   }
 
-  const zipPath = args.zipPath
+  const zipPath = args.zipPath as string | undefined
   if (!zipPath) {
     throw new Error('Missing required argument: --zip <path-to-arena-survey-zip>')
   }
 
-  const url = args.url || env.ARENA_URL || DEFAULT_URL
-  const email = args.email || env.ARENA_EMAIL || env.ADMIN_EMAIL
+  const url = (args.url as string) || env.ARENA_URL || DEFAULT_URL
+  const email = (args.email as string) || env.ARENA_EMAIL || env.ADMIN_EMAIL
   if (!email) {
     throw new Error('Missing email: pass --email, or set ARENA_EMAIL / ADMIN_EMAIL')
   }
-  const password = args.password || env.ARENA_PASSWORD || env.ADMIN_PASSWORD
+  const password = (args.password as string) || env.ARENA_PASSWORD || env.ADMIN_PASSWORD
   if (!password) {
     throw new Error('Missing password: pass --password, or set ARENA_PASSWORD / ADMIN_PASSWORD')
   }
 
-  const count = toPositiveInt({ value: args.count ?? DEFAULT_COUNT, label: '--count' })
-  const jobTimeoutMs = toPositiveInt({ value: args.jobTimeoutMs ?? DEFAULT_JOB_TIMEOUT_MS, label: '--job-timeout' })
+  const count = toPositiveInt({ value: (args.count as string) ?? DEFAULT_COUNT, label: '--count' })
+  const jobTimeoutMs = toPositiveInt({
+    value: (args.jobTimeoutMs as string) ?? DEFAULT_JOB_TIMEOUT_MS,
+    label: '--job-timeout',
+  })
 
   return {
     help: false,
@@ -140,5 +164,3 @@ const parseConfig = ({ argv, env }) => {
     keep: Boolean(args.keep),
   }
 }
-
-module.exports = { parseConfig, HELP_TEXT, DEFAULT_URL, DEFAULT_COUNT, DEFAULT_JOB_TIMEOUT_MS }
