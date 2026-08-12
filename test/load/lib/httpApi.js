@@ -128,6 +128,29 @@ const deleteSurvey = async ({ baseUrl, authToken, surveyId, fetchImpl = fetch })
 }
 
 /**
+ * Fetches every survey whose name starts with the given prefix, visible to the authenticated user.
+ * @param {object} params - Function parameters.
+ * @param {string} params.baseUrl - Arena server base URL.
+ * @param {string} params.authToken - JWT auth token.
+ * @param {string} params.namePrefix - Prefix to match against survey names (server does a substring search).
+ * @param {Function} [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @returns {Promise<Array<object>>} The matching surveys.
+ */
+const fetchSurveysByNamePrefix = async ({ baseUrl, authToken, namePrefix, fetchImpl = fetch }) => {
+  const url = `${baseUrl}/api/surveys?search=${encodeURIComponent(namePrefix)}&draft=true&onlyOwn=false`
+  const response = await fetchImpl(url, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${authToken}` },
+  })
+  if (!response.ok) {
+    const body = await readBody(response)
+    throw new Error(`List surveys failed (status ${response.status}): ${JSON.stringify(body)}`)
+  }
+  const body = await response.json()
+  return body.list
+}
+
+/**
  * Creates a new user account. The caller must be a system admin.
  * @param {object} params - Function parameters.
  * @param {string} params.baseUrl - Arena server base URL.
@@ -150,6 +173,18 @@ const createUser = async ({ baseUrl, authToken, name, email, password, fetchImpl
     const body = await readBody(response)
     throw new Error(`Create user ${email} failed (status ${response.status}): ${JSON.stringify(body)}`)
   }
+  const body = await response.json()
+  if (body.validation) {
+    throw new Error(`Create user ${email} failed validation: ${JSON.stringify(body.validation)}`)
+  }
 }
 
-module.exports = { login, buildImportFormData, importSurveyZip, getJobStatus, deleteSurvey, createUser }
+module.exports = {
+  login,
+  buildImportFormData,
+  importSurveyZip,
+  getJobStatus,
+  deleteSurvey,
+  fetchSurveysByNamePrefix,
+  createUser,
+}

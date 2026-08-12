@@ -1,7 +1,15 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 
-const { login, buildImportFormData, importSurveyZip, getJobStatus, deleteSurvey, createUser } = require('./httpApi')
+const {
+  login,
+  buildImportFormData,
+  importSurveyZip,
+  getJobStatus,
+  deleteSurvey,
+  fetchSurveysByNamePrefix,
+  createUser,
+} = require('./httpApi')
 
 const jsonResponse = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
@@ -176,5 +184,59 @@ test('deleteSurvey throws with status and raw text when the error body is not JS
   await assert.rejects(
     () => deleteSurvey({ baseUrl: 'http://x', authToken: 'tok', surveyId: 42, fetchImpl }),
     /Delete survey 42 failed \(status 403\).*Forbidden/
+  )
+})
+
+test('fetchSurveysByNamePrefix calls the right endpoint and resolves the list', async () => {
+  const calls = []
+  const fetchImpl = async (url, options) => {
+    calls.push({ url, options })
+    return jsonResponse({ list: [{ id: 1 }, { id: 2 }] })
+  }
+
+  const surveys = await fetchSurveysByNamePrefix({
+    baseUrl: 'http://x',
+    authToken: 'tok',
+    namePrefix: 'stress_test_123_',
+    fetchImpl,
+  })
+
+  assert.deepEqual(surveys, [{ id: 1 }, { id: 2 }])
+  assert.equal(calls[0].url, 'http://x/api/surveys?search=stress_test_123_&draft=true&onlyOwn=false')
+  assert.equal(calls[0].options.method, 'GET')
+  assert.equal(calls[0].options.headers.Authorization, 'Bearer tok')
+})
+
+test('fetchSurveysByNamePrefix throws with status and body detail on failure', async () => {
+  const fetchImpl = async () => jsonResponse({ message: 'not authorized' }, 401)
+
+  await assert.rejects(
+    () =>
+      fetchSurveysByNamePrefix({ baseUrl: 'http://x', authToken: 'tok', namePrefix: 'stress_test_123_', fetchImpl }),
+    /List surveys failed \(status 401\).*not authorized/
+  )
+})
+
+test('createUser resolves when the response is ok and has no validation field', async () => {
+  const fetchImpl = async () => jsonResponse({ user: { id: 1 } })
+
+  await createUser({ baseUrl: 'http://x', authToken: 'tok', name: 'n', email: 'a@b.com', password: 'pw', fetchImpl })
+})
+
+test('createUser throws when a 200 response body carries a validation failure', async () => {
+  const fetchImpl = async () => jsonResponse({ validation: { fields: { email: { valid: false } } } })
+
+  await assert.rejects(
+    () => createUser({ baseUrl: 'http://x', authToken: 'tok', name: 'n', email: 'a@b.com', password: 'pw', fetchImpl }),
+    /failed validation/
+  )
+})
+
+test('createUser throws with status and body detail on a non-ok response', async () => {
+  const fetchImpl = async () => jsonResponse({ message: 'not authorized' }, 403)
+
+  await assert.rejects(
+    () => createUser({ baseUrl: 'http://x', authToken: 'tok', name: 'n', email: 'a@b.com', password: 'pw', fetchImpl }),
+    /Create user a@b.com failed \(status 403\).*not authorized/
   )
 })

@@ -5,7 +5,14 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const { parseConfig, HELP_TEXT } = require('./lib/config')
-const { login, importSurveyZip, getJobStatus, deleteSurvey, createUser } = require('./lib/httpApi')
+const {
+  login,
+  importSurveyZip,
+  getJobStatus,
+  deleteSurvey,
+  fetchSurveysByNamePrefix,
+  createUser,
+} = require('./lib/httpApi')
 const { buildLoadTestUserCredentials } = require('./lib/userProvisioning')
 const { formatSummary } = require('./lib/report')
 
@@ -211,16 +218,20 @@ const runSingleUserImport = async ({
 }
 
 /**
- * Deletes every survey referenced by the given results, sequentially and best-effort.
+ * Deletes every survey belonging to this run, sequentially and best-effort. Authoritative: queries the
+ * server for every survey whose name starts with namePrefix rather than relying on surveyIds observed
+ * from run results, since a job that timed out while still queued (never observed running) never yields
+ * a surveyId even though the server may create the survey once its turn comes.
  * @param {object} params - Function parameters.
  * @param {string} params.baseUrl - Arena server base URL.
  * @param {string} params.authToken - JWT auth token (a system admin token can delete any survey).
- * @param {Array<object>} params.results - Result entries produced by runSingleImport.
+ * @param {string} params.namePrefix - Prefix shared by every survey name created by this run.
  * @param {Function} [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
  * @returns {Promise<{deletedCount: number, totalCount: number}>} How many surveys were actually deleted.
  */
-const cleanupSurveys = async ({ baseUrl, authToken, results, fetchImpl = fetch }) => {
-  const surveyIds = results.map((result) => result.surveyId).filter(Boolean)
+const cleanupSurveys = async ({ baseUrl, authToken, namePrefix, fetchImpl = fetch }) => {
+  const surveys = await fetchSurveysByNamePrefix({ baseUrl, authToken, namePrefix, fetchImpl })
+  const surveyIds = surveys.map((survey) => survey.id)
   let deletedCount = 0
   for (const surveyId of surveyIds) {
     try {
@@ -302,12 +313,18 @@ const main = async () => {
 
   if (!keep) {
     console.log('Cleaning up created surveys...')
-    const { deletedCount, totalCount } = await cleanupSurveys({ baseUrl: url, authToken: adminAuthToken, results })
+    const { deletedCount, totalCount } = await cleanupSurveys({
+      baseUrl: url,
+      authToken: adminAuthToken,
+      namePrefix: `stress_test_${runId}_`,
+    })
     console.log(`Deleted ${deletedCount}/${totalCount} surveys created by this run.`)
-    console.log(
-      'Note: the throwaway user accounts created by this run (stress_test_*@loadtest.local) cannot be deleted via the API and remain in the database.'
-    )
+  } else {
+    console.log('Skipping survey cleanup (--keep passed); created surveys were left in place.')
   }
+  console.log(
+    'Note: the throwaway user accounts created by this run (stress_test_*@loadtest.local) cannot be deleted via the API and remain in the database.'
+  )
 
   const anyFailed = results.some((result) => result.outcome !== 'succeeded')
   process.exitCode = anyFailed ? 1 : 0

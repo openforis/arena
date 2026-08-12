@@ -150,29 +150,61 @@ test('runSingleImport succeeds end-to-end and carries the surveyId through even 
   assert.equal(result.surveyId, 99)
 })
 
-test('cleanupSurveys deletes only entries with a surveyId and tolerates individual failures', async () => {
-  const deleteCalls = []
+test('cleanupSurveys queries the server authoritatively by name prefix and deletes everything it finds, tolerating individual failures', async () => {
+  const calls = []
   const fetchImpl = async (url, options) => {
-    deleteCalls.push(url)
+    calls.push(url)
+    if (url.includes('/api/surveys?')) {
+      return jsonResponse({ list: [{ id: 1 }, { id: 2 }, { id: 3 }] })
+    }
     if (url.endsWith('/api/survey/2')) {
       return new Response('nope', { status: 500 })
     }
     return new Response(null, { status: 200 })
   }
 
-  const results = [{ surveyId: 1 }, { surveyId: null }, { surveyId: 2 }, { surveyId: 3 }]
-
-  const summary = await cleanupSurveys({ baseUrl: 'http://x', authToken: 'tok', results, fetchImpl })
+  const summary = await cleanupSurveys({
+    baseUrl: 'http://x',
+    authToken: 'tok',
+    namePrefix: 'stress_test_123_',
+    fetchImpl,
+  })
 
   assert.equal(summary.totalCount, 3)
   assert.equal(summary.deletedCount, 2)
-  assert.equal(deleteCalls.length, 3)
+  assert.equal(calls[0], 'http://x/api/surveys?search=stress_test_123_&draft=true&onlyOwn=false')
+  assert.equal(calls.length, 4)
+})
+
+test('cleanupSurveys deletes surveys the caller never observed a surveyId for (e.g. a job that timed out while still queued)', async () => {
+  // Simulates the leak this fix addresses: the run's results never learned this survey's ID (it was still
+  // queued when the poll gave up), but the server created it anyway once its turn came. Authoritative
+  // cleanup finds and deletes it purely from the name-prefix query, with zero surveyIds ever known locally.
+  const calls = []
+  const fetchImpl = async (url) => {
+    calls.push(url)
+    if (url.includes('/api/surveys?')) {
+      return jsonResponse({ list: [{ id: 99 }] })
+    }
+    return new Response(null, { status: 200 })
+  }
+
+  const summary = await cleanupSurveys({
+    baseUrl: 'http://x',
+    authToken: 'tok',
+    namePrefix: 'stress_test_456_',
+    fetchImpl,
+  })
+
+  assert.equal(summary.totalCount, 1)
+  assert.equal(summary.deletedCount, 1)
+  assert.ok(calls.some((url) => url.endsWith('/api/survey/99')))
 })
 
 test('runSingleUserImport creates the user, logs in as them, then imports', async () => {
   const calls = []
   const responses = [
-    new Response(null, { status: 200 }), // POST /api/user
+    jsonResponse({ user: { id: 1 } }), // POST /api/user
     jsonResponse({ authToken: 'user-tok' }), // POST /auth/login (as the new user)
     jsonResponse({ job: { uuid: 'job-1', status: 'pending' } }), // import accept
     jsonResponse({ uuid: 'job-1', status: 'succeeded', surveyId: 55 }), // poll (terminal, this server response does include surveyId)
