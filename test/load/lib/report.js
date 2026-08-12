@@ -29,12 +29,14 @@ const formatSummary = ({ results, totalDurationMs }) => {
   const jobStats = computeStats(results.filter((result) => result.jobMs !== null).map((result) => result.jobMs))
 
   const lines = []
-  lines.push('')
-  lines.push('==================== Survey Import Stress Test Summary ====================')
-  lines.push(`Total requests: ${total}`)
-  lines.push(`Total duration: ${formatMs(totalDurationMs)}`)
-  lines.push('')
-  lines.push('Outcomes:')
+  lines.push(
+    '',
+    '==================== Survey Import Stress Test Summary ====================',
+    `Total requests: ${total}`,
+    `Total duration: ${formatMs(totalDurationMs)}`,
+    '',
+    'Outcomes:'
+  )
   OUTCOME_ORDER.forEach((outcome) => {
     lines.push(`  ${outcome}: ${byOutcome[outcome] || 0}`)
   })
@@ -46,14 +48,12 @@ const formatSummary = ({ results, totalDurationMs }) => {
 
   const failures = results.filter((result) => result.outcome !== 'succeeded')
   if (failures.length > 0) {
-    lines.push('')
-    lines.push('Failures:')
+    lines.push('', 'Failures:')
     failures.forEach((failure) => {
       lines.push(`  [${failure.index}] ${failure.name} - ${failure.outcome}: ${failure.error || 'no error detail'}`)
     })
   }
-  lines.push('=============================================================================')
-  lines.push('')
+  lines.push('=============================================================================', '')
 
   return lines.join('\n')
 }

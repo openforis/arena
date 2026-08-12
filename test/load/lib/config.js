@@ -1,5 +1,20 @@
 const path = require('node:path')
 
+/**
+ * Strips trailing slashes from a URL. Avoids a regex (e.g. /\/+$/) since a trailing, unanchored-at-start
+ * quantifier like that is flagged by static analysis (SonarCloud javascript:S8786) as having potentially
+ * super-linear backtracking on pathological input.
+ * @param {string} url - The URL to normalize.
+ * @returns {string} The URL with any trailing slashes removed.
+ */
+const stripTrailingSlashes = (url) => {
+  let result = url
+  while (result.endsWith('/')) {
+    result = result.slice(0, -1)
+  }
+  return result
+}
+
 const DEFAULT_URL = 'http://localhost:9090'
 const DEFAULT_COUNT = 50
 const DEFAULT_JOB_TIMEOUT_MS = 120000
@@ -117,7 +132,7 @@ const parseConfig = ({ argv, env }) => {
   return {
     help: false,
     zipPath: path.resolve(zipPath),
-    url: url.replace(/\/+$/, ''),
+    url: stripTrailingSlashes(url),
     email,
     password,
     count,

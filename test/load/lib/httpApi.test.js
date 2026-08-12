@@ -218,9 +218,18 @@ test('fetchSurveysByNamePrefix throws with status and body detail on failure', a
 })
 
 test('createUser resolves when the response is ok and has no validation field', async () => {
-  const fetchImpl = async () => jsonResponse({ user: { id: 1 } })
+  const calls = []
+  const fetchImpl = async (url, options) => {
+    calls.push({ url, options })
+    return jsonResponse({ user: { id: 1 } })
+  }
 
   await createUser({ baseUrl: 'http://x', authToken: 'tok', name: 'n', email: 'a@b.com', password: 'pw', fetchImpl })
+
+  assert.equal(calls.length, 1)
+  assert.equal(calls[0].url, 'http://x/api/user')
+  assert.equal(calls[0].options.method, 'POST')
+  assert.equal(calls[0].options.headers.Authorization, 'Bearer tok')
 })
 
 test('createUser throws when a 200 response body carries a validation failure', async () => {

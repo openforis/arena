@@ -80,7 +80,7 @@ const importSurveyZip = async ({ baseUrl, authToken, zipBuffer, zipFileName, sur
     throw new Error(`Import request failed (status ${response.status}): ${JSON.stringify(body)}`)
   }
   const body = await response.json()
-  if (!body.job || !body.job.uuid) {
+  if (!body.job?.uuid) {
     throw new Error(`Import request failed (status ${response.status}): ${JSON.stringify(body)}`)
   }
   return body.job

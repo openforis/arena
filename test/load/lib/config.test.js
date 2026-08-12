@@ -45,6 +45,14 @@ test('parseConfig falls back to env vars for url/email/password', () => {
   assert.equal(config.password, 'secret')
 })
 
+test('parseConfig strips multiple trailing slashes from --url', () => {
+  const config = parseConfig({
+    argv: ['--zip', 'survey.zip', '--email', 'a@b.com', '--password', 'pw', '--url', 'http://example.test///'],
+    env: baseEnv,
+  })
+  assert.equal(config.url, 'http://example.test')
+})
+
 test('parseConfig reads --count, --job-timeout and --keep', () => {
   const config = parseConfig({
     argv: [
