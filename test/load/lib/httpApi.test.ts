@@ -9,6 +9,9 @@ import {
   deleteSurvey,
   fetchSurveysByNamePrefix,
   createUser,
+  LOGIN_RATE_LIMIT_MAX_RETRIES,
+  LOGIN_RATE_LIMIT_DEFAULT_RETRY_MS,
+  LOGIN_RATE_LIMIT_MAX_RETRY_MS,
 } from './httpApi.ts'
 
 const jsonResponse = (body: unknown, status = 200): Response =>
@@ -37,6 +40,89 @@ test('login throws with status and body detail on failure', async () => {
     () => login({ baseUrl: 'http://x', email: 'a@b.com', password: 'wrong', fetchImpl }),
     /Login failed \(status 401\).*bad creds/
   )
+})
+
+test('login retries a 429 honoring the Retry-After header, then succeeds', async () => {
+  let call = 0
+  const fetchImpl = async () => {
+    call += 1
+    if (call === 1) {
+      return new Response(JSON.stringify({ message: 'Too many requests' }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', 'Retry-After': '5' },
+      })
+    }
+    return jsonResponse({ authToken: 'tok-after-retry' })
+  }
+  const sleeps: number[] = []
+  const sleepImpl = async (ms: number) => {
+    sleeps.push(ms)
+  }
+
+  const authToken = await login({ baseUrl: 'http://x', email: 'a@b.com', password: 'pw', fetchImpl, sleepImpl })
+
+  assert.equal(authToken, 'tok-after-retry')
+  assert.equal(call, 2)
+  assert.deepEqual(sleeps, [5000])
+})
+
+test('login retries a 429 with no Retry-After header using the default delay', async () => {
+  let call = 0
+  const fetchImpl = async () => {
+    call += 1
+    if (call === 1) {
+      return new Response(JSON.stringify({ message: 'Too many requests' }), { status: 429 })
+    }
+    return jsonResponse({ authToken: 'tok-after-retry' })
+  }
+  const sleeps: number[] = []
+  const sleepImpl = async (ms: number) => {
+    sleeps.push(ms)
+  }
+
+  await login({ baseUrl: 'http://x', email: 'a@b.com', password: 'pw', fetchImpl, sleepImpl })
+
+  assert.deepEqual(sleeps, [LOGIN_RATE_LIMIT_DEFAULT_RETRY_MS])
+})
+
+test('login caps an absurdly large Retry-After instead of waiting the full amount', async () => {
+  let call = 0
+  const fetchImpl = async () => {
+    call += 1
+    if (call === 1) {
+      return new Response(JSON.stringify({ message: 'Too many requests' }), {
+        status: 429,
+        headers: { 'Retry-After': '3600' },
+      })
+    }
+    return jsonResponse({ authToken: 'tok-after-retry' })
+  }
+  const sleeps: number[] = []
+  const sleepImpl = async (ms: number) => {
+    sleeps.push(ms)
+  }
+
+  await login({ baseUrl: 'http://x', email: 'a@b.com', password: 'pw', fetchImpl, sleepImpl })
+
+  assert.deepEqual(sleeps, [LOGIN_RATE_LIMIT_MAX_RETRY_MS])
+})
+
+test('login gives up after the max retry count and throws the 429', async () => {
+  const fetchImpl = async () =>
+    new Response(JSON.stringify({ status: 429, message: 'Too many requests, please try again later.' }), {
+      status: 429,
+      headers: { 'Retry-After': '0' },
+    })
+  let sleepCalls = 0
+  const sleepImpl = async () => {
+    sleepCalls += 1
+  }
+
+  await assert.rejects(
+    () => login({ baseUrl: 'http://x', email: 'a@b.com', password: 'pw', fetchImpl, sleepImpl }),
+    /Login failed \(status 429\).*Too many requests/
+  )
+  assert.equal(sleepCalls, LOGIN_RATE_LIMIT_MAX_RETRIES)
 })
 
 test('buildImportFormData sets the survey and file fields', async () => {

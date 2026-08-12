@@ -1,4 +1,13 @@
 export type FetchImpl = (url: string, options?: RequestInit) => Promise<Response>
+export type SleepImpl = (ms: number) => Promise<void>
+
+const defaultSleep: SleepImpl = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+// The server rate-limits /auth/login (e.g. 10 requests/30s) to guard against brute-forcing -- expected,
+// deliberate behavior that a burst of many concurrent throwaway-user logins from one IP will trigger.
+export const LOGIN_RATE_LIMIT_MAX_RETRIES = 5
+export const LOGIN_RATE_LIMIT_DEFAULT_RETRY_MS = 2000
+export const LOGIN_RATE_LIMIT_MAX_RETRY_MS = 30000
 
 export interface Job {
   uuid: string
@@ -27,12 +36,29 @@ const readBody = async (response: Response): Promise<Record<string, unknown>> =>
 }
 
 /**
- * Logs in against the Arena API and returns a bearer auth token.
+ * Reads the Retry-After header (seconds) from a 429 response, falling back to a default when the header
+ * is absent, and capping the result so a server-supplied value can't stall the caller indefinitely.
+ * @param response - The 429 response.
+ * @returns The delay to wait before retrying, in milliseconds.
+ */
+const getRetryDelayMs = (response: Response): number => {
+  const retryAfterSeconds = Number(response.headers.get('retry-after'))
+  const retryAfterMs =
+    Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+      ? retryAfterSeconds * 1000
+      : LOGIN_RATE_LIMIT_DEFAULT_RETRY_MS
+  return Math.min(retryAfterMs, LOGIN_RATE_LIMIT_MAX_RETRY_MS)
+}
+
+/**
+ * Logs in against the Arena API and returns a bearer auth token. Retries on 429 (the server rate-limits
+ * this endpoint), honoring the Retry-After header, up to LOGIN_RATE_LIMIT_MAX_RETRIES times.
  * @param params - Function parameters.
  * @param params.baseUrl - Arena server base URL (no trailing slash).
  * @param params.email - Login email.
  * @param params.password - Login password.
  * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @param [params.sleepImpl] - Sleep implementation to use between retries (defaults to a real delay).
  * @returns The JWT auth token.
  */
 export const login = async ({
@@ -40,26 +66,35 @@ export const login = async ({
   email,
   password,
   fetchImpl = fetch,
+  sleepImpl = defaultSleep,
 }: {
   baseUrl: string
   email: string
   password: string
   fetchImpl?: FetchImpl
+  sleepImpl?: SleepImpl
 }): Promise<string> => {
-  const response = await fetchImpl(`${baseUrl}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
-  if (!response.ok) {
-    const body = await readBody(response)
-    throw new Error(`Login failed (status ${response.status}): ${JSON.stringify(body)}`)
+  for (let attempt = 0; ; attempt += 1) {
+    const response = await fetchImpl(`${baseUrl}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+
+    if (response.status === 429 && attempt < LOGIN_RATE_LIMIT_MAX_RETRIES) {
+      await sleepImpl(getRetryDelayMs(response))
+      continue
+    }
+    if (!response.ok) {
+      const body = await readBody(response)
+      throw new Error(`Login failed (status ${response.status}): ${JSON.stringify(body)}`)
+    }
+    const body = await response.json()
+    if (!body.authToken) {
+      throw new Error(`Login failed (status ${response.status}): ${JSON.stringify(body)}`)
+    }
+    return body.authToken
   }
-  const body = await response.json()
-  if (!body.authToken) {
-    throw new Error(`Login failed (status ${response.status}): ${JSON.stringify(body)}`)
-  }
-  return body.authToken
 }
 
 /**
