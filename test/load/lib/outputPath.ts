@@ -12,7 +12,7 @@ import path from 'node:path'
  * @param root - An already-resolved absolute directory to test containment against.
  * @returns True if resolvedPath is root or lies within it.
  */
-const isWithin = (resolvedPath: string, root: string): boolean => {
+export const isWithinAllowedRoot = (resolvedPath: string, root: string): boolean => {
   if (resolvedPath === root) return true
   const relative = path.relative(root, resolvedPath)
   return Boolean(relative) && !relative.startsWith('..') && !path.isAbsolute(relative)
@@ -31,7 +31,7 @@ const isWithin = (resolvedPath: string, root: string): boolean => {
 export const resolveValidatedOutputPath = (rawPath: string, cwd: string = process.cwd()): string => {
   const resolved = path.resolve(cwd, rawPath)
   const allowedRoots = [cwd, fs.realpathSync(os.tmpdir())].map((root) => path.resolve(root))
-  const isAllowed = allowedRoots.some((root) => isWithin(resolved, root))
+  const isAllowed = allowedRoots.some((root) => isWithinAllowedRoot(resolved, root))
   if (!isAllowed) {
     throw new Error(
       `Refusing to write outside the current directory or the OS temp directory: ${resolved} ` +
