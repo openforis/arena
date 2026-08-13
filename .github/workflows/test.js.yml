@@ -51,6 +51,7 @@ jobs:
           ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
           ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}
           SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
+          RATE_LIMIT_ENABLED: false
       - name: Wait for server to start
         run: while ! nc -z localhost 9090; do sleep 5; done;
       - name: Run tests
@@ -61,3 +62,10 @@ jobs:
           PGDATABASE: of-arena-test
           PGUSER: arena
           PGPASSWORD: arena
+      - name: Build sample survey zip for stress test
+        run: yarn test:load:build-fixture /tmp/sample-survey.zip
+      - name: Run survey import stress test
+        run: node --experimental-strip-types test/load/surveyImportStressTest.ts --zip /tmp/sample-survey.zip
+        env:
+          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
+          ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}
