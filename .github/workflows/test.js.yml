@@ -62,10 +62,13 @@ jobs:
           PGDATABASE: of-arena-test
           PGUSER: arena
           PGPASSWORD: arena
+      - name: Run load-test unit tests
+        run: yarn test:load:unit
       - name: Build sample survey zip for stress test
         run: yarn test:load:build-fixture /tmp/sample-survey.zip
       - name: Run survey import stress test
-        run: node --experimental-strip-types test/load/surveyImportStressTest.ts --zip /tmp/sample-survey.zip
+        timeout-minutes: 20
+        run: yarn test:load --zip /tmp/sample-survey.zip --job-timeout 600000
         env:
           ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
           ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}

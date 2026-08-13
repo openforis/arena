@@ -1,6 +1,6 @@
 # Survey Import Stress Test
 
-A standalone, manually-run Node CLI that fires concurrent
+A Node CLI that fires concurrent
 `POST /api/survey/arena-import` requests at a running Arena server. It exists
 to validate two DB connection-pool / lock fixes made on the
 `fix/survey-import-concurrency` branch (survey creation and import used to
@@ -13,9 +13,13 @@ concurrency, using a real Arena survey export zip as the import source.
 
 It runs as a CI step in `.github/workflows/test.js.yml`, after the main
 test suite, against the same server and database the rest of the suite
-already uses — with `RATE_LIMIT_ENABLED=false` for that CI server process
-(the login rate limiter would otherwise throttle the burst of throwaway-user
-logins this tool performs; see
+already uses. That CI server process explicitly sets
+`RATE_LIMIT_ENABLED=false` — the login rate limiter is already off there by
+default (no `.env` exists on the runner and the setting has no
+default-true fallback), but pinning it explicitly avoids relying on that
+default, and more importantly avoids the client-side login-retry backoff
+(see `test/load/lib/httpApi.ts`) that would otherwise slow the run down
+whenever a stricter local `.env` is in play (see
 `docs/superpowers/specs/2026-08-13-survey-stress-test-ci-design.md`). The
 sample survey zip it imports is generated at run time by
 `test/load/buildSampleSurveyZip.ts` (`yarn test:load:build-fixture`) rather

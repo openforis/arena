@@ -374,7 +374,7 @@ EOF
 **Files:** none (verification only — no commit at the end of this task).
 
 **Interfaces:**
-- Consumes: `yarn test:load:build-fixture` (Task 2), the pre-existing `test/load/surveyImportStressTest.ts` CLI (`yarn test:load -- --zip <path> --count <n>`).
+- Consumes: `yarn test:load:build-fixture` (Task 2), the pre-existing `test/load/surveyImportStressTest.ts` CLI (`yarn test:load --zip <path> --count <n>`).
 - Produces: confidence that Task 4's CI wiring will actually pass, and prints/output pasted into the task's completion notes for the next reviewer.
 
 - [ ] **Step 1: Start a local Postgres and the dev server**
@@ -398,7 +398,7 @@ Expected: same as Task 2 Step 3.
 - [ ] **Step 3: Run the stress test at low concurrency first**
 
 ```bash
-yarn test:load -- --zip /tmp/sample-survey.zip --count 3
+yarn test:load --zip /tmp/sample-survey.zip --count 3
 ```
 
 Expected: exit code 0, summary shows `succeeded: 3`, `failed: 0`, `timed-out: 0`, `rejected-at-http: 0`.
@@ -410,7 +410,7 @@ Log into the Arena UI as the admin, open the Designer for one of the `stress_tes
 - [ ] **Step 5: Run at the real default concurrency**
 
 ```bash
-yarn test:load -- --zip /tmp/sample-survey.zip
+yarn test:load --zip /tmp/sample-survey.zip
 ```
 
 (No `--count` — uses the default of 50.) Expected: exit code 0, summary shows `succeeded: 50` and completes in well under the default `--job-timeout` budget (120000ms × 50 worst case) — note the actual total duration printed in the summary for the CI step's own sanity-checking later.
