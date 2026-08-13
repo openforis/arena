@@ -360,7 +360,7 @@ export const main = async (): Promise<void> => {
   if (targetHostname !== 'localhost' && targetHostname !== '127.0.0.1') {
     console.warn(
       `⚠️  Target is not localhost (${url}) — this run will create ${count} throwaway accounts with a ` +
-        'random password on that server, and (see test/load/README.md) they cannot be deleted afterward.'
+        'random password on that server; they will be deleted afterward unless --keep is passed.'
     )
   }
 
