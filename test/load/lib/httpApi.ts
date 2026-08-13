@@ -268,7 +268,7 @@ export const fetchSurveysByNamePrefix = async ({
  * @param params.email - Email address for the new user (must be unique).
  * @param params.password - Password for the new user.
  * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
- * @returns Resolves when the user has been created.
+ * @returns The created user's uuid.
  */
 export const createUser = async ({
   baseUrl,
@@ -284,7 +284,7 @@ export const createUser = async ({
   email: string
   password: string
   fetchImpl?: FetchImpl
-}): Promise<void> => {
+}): Promise<string> => {
   const response = await fetchImpl(`${baseUrl}/api/user`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' },
@@ -299,5 +299,39 @@ export const createUser = async ({
   const body = await response.json()
   if (body.validation) {
     throw new Error(`Create user ${email} failed validation: ${JSON.stringify(body.validation)}`)
+  }
+  if (!body.user?.uuid) {
+    throw new Error(`Create user ${email} failed: response had no user uuid`)
+  }
+  return body.user.uuid
+}
+
+/**
+ * Deletes a user account. The caller must be a system admin.
+ * @param params - Function parameters.
+ * @param params.baseUrl - Arena server base URL.
+ * @param params.authToken - JWT auth token of a system admin user.
+ * @param params.userUuid - UUID of the user to delete.
+ * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @returns Resolves when the user has been deleted.
+ */
+export const deleteUser = async ({
+  baseUrl,
+  authToken,
+  userUuid,
+  fetchImpl = fetch,
+}: {
+  baseUrl: string
+  authToken: string
+  userUuid: string
+  fetchImpl?: FetchImpl
+}): Promise<void> => {
+  const response = await fetchImpl(`${baseUrl}/api/user/${userUuid}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${authToken}` },
+  })
+  if (!response.ok) {
+    const body = await readBody(response)
+    throw new Error(`Delete user ${userUuid} failed (status ${response.status}): ${JSON.stringify(body)}`)
   }
 }
