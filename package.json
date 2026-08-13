@@ -28,6 +28,7 @@
     "test:e2e:watch": "cross-env PWDEBUG=1 jest --config=test/e2e/jest.config.js",
     "test:load": "node --experimental-strip-types test/load/surveyImportStressTest.ts",
     "test:load:unit": "node --experimental-strip-types --test test/load/**/*.test.ts",
+    "test:load:build-fixture": "node --experimental-strip-types test/load/buildSampleSurveyZip.ts",
     "test": "run-s test:unit test:e2e",
     "typecheck": "tsc --noEmit",
     "test:docker": "test/bin/testExecDocker.sh",
