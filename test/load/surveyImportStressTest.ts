@@ -12,6 +12,7 @@ import {
   deleteSurvey,
   fetchSurveysByNamePrefix,
   createUser,
+  deleteUser,
   type FetchImpl,
   type Job,
 } from './lib/httpApi.ts'
@@ -226,9 +227,12 @@ export const runSingleUserImport = async ({
   jobTimeoutMs: number
   fetchImpl?: FetchImpl
 }): Promise<ResultEntry> => {
+  // Captured as soon as creation succeeds (not just on overall success) so a later failure (e.g. login)
+  // still reports the uuid -- the account already exists on the server and needs cleanup either way.
+  let userUuid: string | null = null
   let userAuthToken: string
   try {
-    await createUser({ baseUrl, authToken: adminAuthToken, ...credentials, fetchImpl })
+    userUuid = await createUser({ baseUrl, authToken: adminAuthToken, ...credentials, fetchImpl })
     userAuthToken = await login({ baseUrl, email: credentials.email, password: credentials.password, fetchImpl })
   } catch (error: any) {
     return {
@@ -236,13 +240,14 @@ export const runSingleUserImport = async ({
       name: surveyName,
       outcome: 'rejected-at-http',
       surveyId: null,
+      userUuid,
       acceptMs: null,
       jobMs: null,
       error: `user setup failed: ${error.message}`,
     }
   }
 
-  return runSingleImport({
+  const result = await runSingleImport({
     baseUrl,
     authToken: userAuthToken,
     zipBuffer,
@@ -252,6 +257,7 @@ export const runSingleUserImport = async ({
     jobTimeoutMs,
     fetchImpl,
   })
+  return { ...result, userUuid }
 }
 
 /**
@@ -289,6 +295,41 @@ export const cleanupSurveys = async ({
     }
   }
   return { deletedCount, totalCount: surveyIds.length }
+}
+
+/**
+ * Deletes every user account created by this run, sequentially and best-effort. A user whose survey
+ * failed to clean up earlier in the same run is expected to fail here too -- the server blocks deleting a
+ * user who still owns a survey -- so that failure is logged, not swallowed, since it signals the earlier
+ * survey cleanup didn't fully succeed.
+ * @param params - Function parameters.
+ * @param params.baseUrl - Arena server base URL.
+ * @param params.authToken - JWT auth token (a system admin token can delete any user).
+ * @param params.userUuids - UUIDs of the users to delete.
+ * @param [params.fetchImpl] - Fetch implementation to use (defaults to the global fetch).
+ * @returns How many users were actually deleted.
+ */
+export const cleanupUsers = async ({
+  baseUrl,
+  authToken,
+  userUuids,
+  fetchImpl = fetch,
+}: {
+  baseUrl: string
+  authToken: string
+  userUuids: string[]
+  fetchImpl?: FetchImpl
+}): Promise<{ deletedCount: number; totalCount: number }> => {
+  let deletedCount = 0
+  for (const userUuid of userUuids) {
+    try {
+      await deleteUser({ baseUrl, authToken, userUuid, fetchImpl })
+      deletedCount += 1
+    } catch (error: any) {
+      console.error(`Failed to delete user ${userUuid}: ${error.message}`)
+    }
+  }
+  return { deletedCount, totalCount: userUuids.length }
 }
 
 /**
@@ -370,18 +411,26 @@ export const main = async (): Promise<void> => {
 
   if (!keep) {
     console.log('Cleaning up created surveys...')
-    const { deletedCount, totalCount } = await cleanupSurveys({
+    const { deletedCount: deletedSurveysCount, totalCount: totalSurveysCount } = await cleanupSurveys({
       baseUrl: url,
       authToken: adminAuthToken,
       namePrefix: `stress_test_${runId}_`,
     })
-    console.log(`Deleted ${deletedCount}/${totalCount} surveys created by this run.`)
+    console.log(`Deleted ${deletedSurveysCount}/${totalSurveysCount} surveys created by this run.`)
+
+    console.log('Cleaning up created users...')
+    const userUuids = results
+      .map((result) => result.userUuid)
+      .filter((userUuid): userUuid is string => Boolean(userUuid))
+    const { deletedCount: deletedUsersCount, totalCount: totalUsersCount } = await cleanupUsers({
+      baseUrl: url,
+      authToken: adminAuthToken,
+      userUuids,
+    })
+    console.log(`Deleted ${deletedUsersCount}/${totalUsersCount} users created by this run.`)
   } else {
-    console.log('Skipping survey cleanup (--keep passed); created surveys were left in place.')
+    console.log('Skipping survey and user cleanup (--keep passed); created surveys and users were left in place.')
   }
-  console.log(
-    'Note: the throwaway user accounts created by this run (stress_test_*@loadtest.local) cannot be deleted via the API and remain in the database.'
-  )
 
   const anyFailed = results.some((result) => result.outcome !== 'succeeded')
   process.exitCode = anyFailed ? 1 : 0
