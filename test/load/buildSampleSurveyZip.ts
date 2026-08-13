@@ -1,8 +1,8 @@
 /* eslint-disable no-console -- this file's entire purpose is CLI output */
 import fs from 'node:fs'
-import path from 'node:path'
 
 import { buildSampleSurveyZipBuffer } from './lib/sampleSurveyZip.ts'
+import { resolveValidatedOutputPath } from './lib/outputPath.ts'
 
 const DEFAULT_OUTPUT_PATH = './sample-survey.zip'
 
@@ -12,7 +12,7 @@ const DEFAULT_OUTPUT_PATH = './sample-survey.zip'
  * @returns Resolves once the file has been written.
  */
 export const main = async (): Promise<void> => {
-  const outputPath = path.resolve(process.argv[2] || DEFAULT_OUTPUT_PATH)
+  const outputPath = resolveValidatedOutputPath(process.argv[2] || DEFAULT_OUTPUT_PATH)
   fs.writeFileSync(outputPath, buildSampleSurveyZipBuffer())
   console.log(`Sample survey zip written to ${outputPath}`)
 }
