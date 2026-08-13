@@ -11,8 +11,18 @@ only 2 concurrent calls; this tool drives the real HTTP API — JWT auth,
 multipart upload, the background job queue — at a higher, configurable
 concurrency, using a real Arena survey export zip as the import source.
 
-It is not wired into `yarn test` / CI. It's a load-testing tool for local
-dev use against a running server.
+It runs as a CI step in `.github/workflows/test.js.yml`, after the main
+test suite, against the same server and database the rest of the suite
+already uses — with `RATE_LIMIT_ENABLED=false` for that CI server process
+(the login rate limiter would otherwise throttle the burst of throwaway-user
+logins this tool performs; see
+`docs/superpowers/specs/2026-08-13-survey-stress-test-ci-design.md`). The
+sample survey zip it imports is generated at run time by
+`test/load/buildSampleSurveyZip.ts` (`yarn test:load:build-fixture`) rather
+than committed as a binary file.
+
+It's still usable standalone for local dev against any running server (see
+Usage below).
 
 ## Usage
 
@@ -43,6 +53,10 @@ one-job-per-user rule. There is no API to delete a user account, so these
 accumulate in the database across runs. Created *surveys* are cleaned up
 automatically after each run (unless `--keep` is passed); user accounts are
 not.
+
+This doesn't apply to the CI run: the Postgres service container backing
+each `test.js.yml` job is destroyed at the end of the run, so leftover
+`stress_test_*@loadtest.local` rows never persist.
 
 To remove them manually, run against the Arena database:
 
