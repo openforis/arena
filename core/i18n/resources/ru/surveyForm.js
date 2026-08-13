@@ -138,6 +138,7 @@ export default {
   downloadPrintableDocumentPdf: 'Скачать печатный документ (PDF)',
   printableExport: {
     title: 'Экспорт печатного документа',
+    exportDocument: 'Экспорт документа',
     format: 'Формат',
     formats: {
       pdf: 'PDF',

@@ -142,6 +142,7 @@ Arena Mobile дээр:
   downloadPrintableDocumentPdf: 'Хэвлэх баримт бичиг татах (PDF)',
   printableExport: {
     title: 'Export printable document',
+    exportDocument: 'Export Document',
     format: 'Format',
     formats: {
       pdf: 'PDF',

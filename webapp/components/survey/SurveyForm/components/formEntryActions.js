@@ -14,7 +14,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 
 import { TestId } from '@webapp/utils/testId'
-import { Button, ButtonEditLockToggle } from '@webapp/components/buttons'
+import { Button, ButtonDownload, ButtonEditLockToggle } from '@webapp/components/buttons'
 import { RecordPrintableExportModal } from './RecordPrintableExportModal'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
@@ -39,7 +39,7 @@ const RecordEntryButtons = (props) => {
   const canDemote = useAuthCanDemoteRecord(record) && !noHeader
   const canEdit = useAuthCanEditRecord(record)
 
-  const [printableExport, setPrintableExport] = useState({ open: false, format: 'pdf' })
+  const [printableExportOpen, setPrintableExportOpen] = useState(false)
 
   const getStepLabel = (_step) => i18n.t(`surveyForm:step.${RecordStep.getName(_step)}`)
 
@@ -66,29 +66,13 @@ const RecordEntryButtons = (props) => {
         </Link>
       )}
       {experimentalFeatures && (
-        <div className="survey-form-header__download-buttons">
-          <Button
-            iconClassName="icon-file-word"
-            onClick={() => setPrintableExport({ open: true, format: 'docx' })}
-            showLabel={false}
-            title="surveyForm:downloadPrintableDocument"
-            variant="text"
-          />
-          <Button
-            iconClassName="icon-file-pdf"
-            onClick={() => setPrintableExport({ open: true, format: 'pdf' })}
-            showLabel={false}
-            title="surveyForm:downloadPrintableDocumentPdf"
-            variant="text"
-          />
-        </div>
-      )}
-      {printableExport.open && (
-        <RecordPrintableExportModal
-          open
-          initialFormat={printableExport.format}
-          onClose={() => setPrintableExport((state) => ({ ...state, open: false }))}
+        <ButtonDownload
+          label="surveyForm:printableExport.exportDocument"
+          onClick={() => setPrintableExportOpen(true)}
         />
+      )}
+      {printableExportOpen && (
+        <RecordPrintableExportModal open initialFormat="pdf" onClose={() => setPrintableExportOpen(false)} />
       )}
       <div className="survey-form-header__record-actions-steps">
         {canDemote && (

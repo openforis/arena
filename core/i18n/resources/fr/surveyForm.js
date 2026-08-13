@@ -141,6 +141,7 @@ Dans Arena Mobile :
   downloadPrintableDocumentPdf: 'Télécharger le document imprimable (PDF)',
   printableExport: {
     title: 'Exporter le document imprimable',
+    exportDocument: 'Exporter le document',
     format: 'Format',
     formats: {
       pdf: 'PDF',
