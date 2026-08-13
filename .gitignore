@@ -293,3 +293,6 @@ modules.xml
 
 # Ignore local settings for claude
 .claude/settings.local.json
+
+# Default output path for test/load/buildSampleSurveyZip.ts
+sample-survey.zip
