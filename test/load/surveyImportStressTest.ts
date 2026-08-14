@@ -409,6 +409,7 @@ export const main = async (): Promise<void> => {
 
   console.log(formatSummary({ results, totalDurationMs }))
 
+  let cleanupIncomplete = false
   if (!keep) {
     console.log('Cleaning up created surveys...')
     const { deletedCount: deletedSurveysCount, totalCount: totalSurveysCount } = await cleanupSurveys({
@@ -428,12 +429,14 @@ export const main = async (): Promise<void> => {
       userUuids,
     })
     console.log(`Deleted ${deletedUsersCount}/${totalUsersCount} users created by this run.`)
+
+    cleanupIncomplete = deletedSurveysCount < totalSurveysCount || deletedUsersCount < totalUsersCount
   } else {
     console.log('Skipping survey and user cleanup (--keep passed); created surveys and users were left in place.')
   }
 
   const anyFailed = results.some((result) => result.outcome !== 'succeeded')
-  process.exitCode = anyFailed ? 1 : 0
+  process.exitCode = anyFailed || cleanupIncomplete ? 1 : 0
 }
 
 if (import.meta.main) {

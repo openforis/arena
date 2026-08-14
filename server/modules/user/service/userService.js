@@ -577,11 +577,13 @@ export const deleteUser = async ({ user, userUuidToDelete }) =>
 
     // Surveys the target owns block deletion at the DB level (survey.owner_uuid has no ON DELETE
     // action). Blocked, not auto-reassigned: transferring survey ownership is too significant to do
-    // silently as a side effect of deleting an account.
-    const ownedSurveys = await SurveyManager.fetchUserSurveys({ user: userToDelete, onlyOwn: true, draft: true }, t)
-    if (ownedSurveys.length > 0) {
-      const surveyNames = ownedSurveys.map((survey) => Survey.getName(Survey.getSurveyInfo(survey))).join(', ')
-      throw new SystemError('appErrors:userCannotDeleteOwnsSurveys', { surveyNames }, StatusCodes.CONFLICT)
+    // silently as a side effect of deleting an account. Use the unfiltered FK-scoped count (not the
+    // UI listing query), since that listing excludes templates/temporary surveys and can miss surveys
+    // the target owns but isn't a member of -- letting them slip past this check and hit the FK
+    // violation at DELETE time instead.
+    const ownedSurveysCount = await SurveyManager.countOwnedSurveys({ user: userToDelete }, t)
+    if (ownedSurveysCount > 0) {
+      throw new SystemError('appErrors:userCannotDeleteOwnsSurveys', { count: ownedSurveysCount }, StatusCodes.CONFLICT)
     }
 
     // Messages the target authored block deletion the same way (message.created_by_user_uuid has no
@@ -594,16 +596,25 @@ export const deleteUser = async ({ user, userUuidToDelete }) =>
     }
 
     // Records the target owns (record.owner_uuid) also block deletion, and can't be nulled out
-    // (NOT NULL) -- reassign them to the acting admin, across every survey the target belongs to.
-    // A no-op for surveys where they own no records, so safe to call unconditionally.
-    const memberSurveys = await SurveyManager.fetchUserSurveys({ user: userToDelete, draft: true }, t)
-    for (const survey of memberSurveys) {
-      const surveyId = Survey.getId(survey)
+    // (NOT NULL) -- reassign them to the acting admin. Iterate every survey in the instance rather
+    // than the membership-filtered listing query, since that listing can miss surveys the target owns
+    // (or owned) records in without being a current member -- e.g. a template/temporary survey, or a
+    // membership that was removed after the records were created. A no-op for surveys where the
+    // target owns no records, so safe to call unconditionally; no more expensive than the FK check
+    // Postgres already has to run against every survey schema to allow the delete at all.
+    const allSurveyIds = await SurveyManager.fetchAllSurveyIds(t)
+    for (const surveyId of allSurveyIds) {
       await RecordManager.updateRecordsOwner(
         { surveyId, fromOwnerUuid: userUuidToDelete, toOwnerUuid: User.getUuid(user) },
         t
       )
     }
+
+    Logger.info(
+      `user ${User.getEmail(user)} [${User.getUuid(user)}] deleted user ${User.getEmail(userToDelete)} ` +
+        `[${userUuidToDelete}]; records owned by the deleted user were reassigned to the acting admin, ` +
+        `checking ${allSurveyIds.length} surveys`
+    )
 
     // Everything else (sessions, tokens, 2FA, group membership, activity log, invitations this user
     // sent/received, access requests they processed) is cleaned up by the existing ON DELETE CASCADE

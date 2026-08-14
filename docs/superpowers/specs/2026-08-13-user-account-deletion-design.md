@@ -72,50 +72,68 @@ New export in `server/modules/user/service/userService.js`, run inside a
 single `db.tx` (validation and mutation both inside the transaction, so a
 concurrent change between the check and the delete can't slip through).
 
-Prerequisite plumbing: `surveyManager.js` currently only exposes the
-enriched `fetchUserSurveysInfo`, which hardcodes `client = db` internally
-and can't run inside our transaction. Add a plain passthrough re-export —
-`export const { fetchUserSurveys } = SurveyRepository` — next to the
-existing repository re-exports already in that file (e.g.
-`removeSurveyTemporaryFlag`, `updateSurveyDependencyGraphs`), so it can be
-called with the transaction client `t`.
+No prerequisite plumbing needed: `countOwnedSurveys` and `fetchAllSurveyIds`
+(used by steps 4 and 6 below) are both already plain passthrough
+re-exports on `SurveyManager` (`export const { countOwnedSurveys, ...,
+fetchAllSurveyIds, ... } = SurveyRepository`), and both accept a
+transaction client as their second/relevant argument, so they run inside
+our `db.tx` unmodified. (An earlier version of this implementation used
+the enriched `fetchUserSurveysInfo` / listing-query `fetchUserSurveys`
+instead, which required adding a re-export for the latter — see the
+"blind spot" note in step 4 for why that approach was replaced.)
 
 1. Reject if `userUuidToDelete === User.getUuid(user)` —
-   `SystemError('appErrors:user.cannotDeleteSelf', {}, StatusCodes.BAD_REQUEST)`.
+   `SystemError('appErrors:userCannotDeleteSelf', {}, StatusCodes.BAD_REQUEST)`.
 2. Fetch the target via `UserManager.fetchUserByUuid`; if missing,
-   `SystemError('appErrors:user.notFound', {}, StatusCodes.NOT_FOUND)`.
+   `SystemError('appErrors:userNotFound', { userUuid: userUuidToDelete }, StatusCodes.NOT_FOUND)`.
 3. If the target is a system admin, verify they're not the last one
    (`UserManager.countSystemAdministrators`); if so,
-   `SystemError('appErrors:user.cannotDeleteLastSystemAdmin', {}, StatusCodes.CONFLICT)`.
+   `SystemError('appErrors:userCannotDeleteLastSystemAdmin', {}, StatusCodes.CONFLICT)`.
    (Without this, deleting the last admin strands the app — the
    auto-provisioned bootstrap admin in `insertSystemAdminUserIfNotExisting`
    only runs at server startup, not on demand.)
-4. Fetch surveys owned by the target
-   (`SurveyManager.fetchUserSurveys({ user: target, onlyOwn: true, draft: true }, t)`).
-   If non-empty, `SystemError('appErrors:user.cannotDeleteOwnsSurveys', { surveyNames }, StatusCodes.CONFLICT)`
+4. Count surveys owned by the target, using the same unfiltered condition
+   as the `survey.owner_uuid` FK itself
+   (`SurveyManager.countOwnedSurveys({ user: target }, t)` —
+   `SELECT COUNT(*) FROM survey s WHERE s.owner_uuid = $1`, no other
+   filters). The UI listing query (`fetchUserSurveys`) was considered and
+   rejected here: it excludes templates and temporary surveys and, for a
+   non-system-admin target, also requires current `auth_group_user`
+   membership — none of which the FK cares about, so it could miss surveys
+   that still block the delete. If the count is non-zero,
+   `SystemError('appErrors:userCannotDeleteOwnsSurveys', { count }, StatusCodes.CONFLICT)`
    — blocked, not auto-reassigned (survey ownership transfer is a
-   significant action; see the earlier design decision).
+   significant action; see the earlier design decision). The error reports
+   only a count, not survey names, since the FK-scoped count query doesn't
+   fetch names and the UI listing query that does isn't safe to reuse here
+   (see above).
 5. Fetch messages authored by the target (message service `getAll(t)`,
    filtered client-side by `createdByUserUuid` — the `MessageService`
    interface has no dedicated by-author query, but does accept the
    transaction client). If non-empty,
-   `SystemError('appErrors:user.cannotDeleteHasMessages', { count }, StatusCodes.CONFLICT)`
+   `SystemError('appErrors:userCannotDeleteHasMessages', { count }, StatusCodes.CONFLICT)`
    — same reasoning, blocked.
-6. Reassign records: for every survey the target is associated with
-   (`SurveyManager.fetchUserSurveys({ user: target, draft: true }, t)` —
-   membership-based, same set the existing `/user/:userUuid/surveys`
-   endpoint already uses to answer "what surveys is this user related to"),
-   call the existing `RecordManager.updateRecordsOwner({ surveyId,
-   fromOwnerUuid: userUuidToDelete, toOwnerUuid: User.getUuid(user) }, t)` —
-   the same helper `UserService.deleteUserFromSurvey` already uses for the
-   single-survey case. Reassigns to the acting admin (the caller), per the
-   confirmed decision. A no-op (0 rows) for surveys where the target owns
+6. Reassign records: for every survey in the instance
+   (`SurveyManager.fetchAllSurveyIds(t)` — `SELECT id FROM survey`, no
+   filters), call the existing `RecordManager.updateRecordsOwner({
+   surveyId, fromOwnerUuid: userUuidToDelete, toOwnerUuid: User.getUuid(user)
+   }, t)` — the same helper `UserService.deleteUserFromSurvey` already uses
+   for the single-survey case. Reassigns to the acting admin (the caller),
+   per the confirmed decision. Iterating every survey (rather than the
+   membership-filtered `fetchUserSurveys` listing) avoids the same blind
+   spot as step 4: a target can own records in a survey without currently
+   being a member of it. A no-op (0 rows) for surveys where the target owns
    no records, so this is safe to call unconditionally rather than
-   pre-checking.
+   pre-checking, and no more expensive than the FK check Postgres already
+   runs against every survey schema to allow the delete at all.
 7. Delete the user row: `UserManager.deleteUser(userUuidToDelete, t)`
    (already exists, currently only used by the expired-invitation cleanup
    job). DB cascade handles everything in the second table above.
 8. Return the deleted user.
+
+All five error keys above are flat (`appErrors:userCannotDeleteSelf`, not a
+nested `appErrors:user.cannotDeleteSelf`), matching this codebase's existing
+`appErrors` convention (e.g. `appErrors:userInvalid`).
 
 No email/websocket notification — not requested, and reusing
 `deleteUserFromSurvey`'s "you were removed from a survey" email template
@@ -166,7 +184,7 @@ strictly more powerful than removing a user from one survey.
     mirroring `cleanupSurveys`: best-effort, sequential, catches and logs
     per-user failures rather than throwing (a user whose survey failed to
     clean up in the same run will still own that survey, so their deletion
-    is *expected* to fail with `appErrors:user.cannotDeleteOwnsSurveys` —
+    is *expected* to fail with `appErrors:userCannotDeleteOwnsSurveys` —
     that's a signal worth logging, not swallowing entirely).
   - `main()`: after survey cleanup, collect `userUuid`s from `results` and
     call `cleanupUsers`, gated by the same `--keep` flag survey cleanup

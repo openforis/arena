@@ -39,6 +39,14 @@ Requires a running Arena server and a system-admin login (`--email`/
 `ADMIN_PASSWORD` from `.env` — as fallbacks). See `--help` for the full flag
 list.
 
+Each run provisions `--count` new user accounts
+(`stress_test_<runId>_<i>@loadtest.local`, granted `surveyManager`
+privileges, random per-run password) to import through, one account per
+request, so the burst isn't serialized by the server's one-job-per-user
+rule. Both the surveys and the user accounts created by a run are deleted
+afterward (unless `--keep` is passed), via `DELETE /api/survey/:id` and
+`DELETE /api/user/:userUuid` respectively.
+
 ## Limitations
 
 **This is a burst-request test, not a true-concurrency test.**
@@ -49,15 +57,7 @@ tool targets), but the server processes the resulting jobs one after
 another. Expect run times to scale roughly linearly with `--count`, and
 `timed-out` outcomes if `--job-timeout` is too low for a large `--count`.
 
-**Throwaway user accounts are cleaned up automatically.** Each run
-provisions `--count` new user accounts (`stress_test_<runId>_<i>@loadtest.local`,
-granted `surveyManager` privileges, random per-run password) to import
-through, one account per request, so the burst isn't serialized by the
-server's one-job-per-user rule. Both the surveys and the user accounts
-created by a run are deleted afterward (unless `--keep` is passed), via
-`DELETE /api/survey/:id` and `DELETE /api/user/:userUuid` respectively.
-
-A user whose survey failed to clean up earlier in the same run will also
-fail to delete -- the server blocks deleting a user who still owns a survey
--- and that's logged as a per-user cleanup failure, not swallowed, since
-it's a signal the survey cleanup didn't fully succeed.
+**A user whose survey failed to clean up earlier in the same run will also
+fail to delete** — the server blocks deleting a user who still owns a
+survey — and that's logged as a per-user cleanup failure, not swallowed,
+since it's a signal the survey cleanup didn't fully succeed.
