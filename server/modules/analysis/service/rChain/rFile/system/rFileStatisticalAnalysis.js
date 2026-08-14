@@ -10,12 +10,12 @@ export default class RFileStatisticalAnalysis extends RFileSystem {
   }
 
   async init() {
+    await super.init()
+
     if (
       Chain.hasSamplingDesign(this.rChain.chain) &&
       ChainStatisticalAnalysis.getEntityDefUuid(Chain.getStatisticalAnalysis(this.rChain.chain))
     ) {
-      await super.init()
-
       await this.appendContent(
         source('https://raw.githubusercontent.com/openforis/r-arena/master/arena_analysis_for_Shiny.R'),
         setVar('arena_process_response', 'arenaAnalytics_LowAggData()'),
