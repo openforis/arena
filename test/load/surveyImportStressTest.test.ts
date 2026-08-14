@@ -1,7 +1,13 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { runSingleImport, runSingleUserImport, pollJobUntilTerminal, cleanupSurveys } from './surveyImportStressTest.ts'
+import {
+  runSingleImport,
+  runSingleUserImport,
+  pollJobUntilTerminal,
+  cleanupSurveys,
+  cleanupUsers,
+} from './surveyImportStressTest.ts'
 
 const jsonResponse = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
@@ -222,7 +228,7 @@ test('cleanupSurveys deletes surveys the caller never observed a surveyId for (e
 test('runSingleUserImport creates the user, logs in as them, then imports', async () => {
   const calls: Array<{ url: string; options: any }> = []
   const responses = [
-    jsonResponse({ user: { id: 1 } }), // POST /api/user
+    jsonResponse({ user: { uuid: 'user-uuid-1' } }), // POST /api/user
     jsonResponse({ authToken: 'user-tok' }), // POST /auth/login (as the new user)
     jsonResponse({ job: { uuid: 'job-1', status: 'pending' } }), // import accept
     jsonResponse({ uuid: 'job-1', status: 'succeeded', surveyId: 55 }), // poll (terminal, this server response does include surveyId)
@@ -247,6 +253,7 @@ test('runSingleUserImport creates the user, logs in as them, then imports', asyn
 
   assert.equal(result.outcome, 'succeeded')
   assert.equal(result.surveyId, 55)
+  assert.equal(result.userUuid, 'user-uuid-1')
   assert.equal(calls[0].url, 'http://x/api/user')
   assert.equal((calls[0].options.headers as any).Authorization, 'Bearer admin-tok')
   assert.equal(calls[1].url, 'http://x/auth/login')
@@ -273,4 +280,53 @@ test('runSingleUserImport returns rejected-at-http when user creation fails, wit
   // acceptMs measures only the import POST's latency elsewhere; a setup failure never got that far, so it
   // must report null (not user-creation+login time) to avoid distorting the report's accept-latency stat.
   assert.equal(result.acceptMs, null)
+  assert.equal(result.userUuid, null)
+})
+
+test('runSingleUserImport still reports the created userUuid when login fails after user creation succeeds', async () => {
+  // Regression coverage: the account already exists on the server at this point and must still be
+  // reported for cleanup, even though the overall result is a failure.
+  const responses = [
+    jsonResponse({ user: { uuid: 'user-uuid-3' } }), // POST /api/user succeeds
+    new Response('locked out', { status: 423 }), // POST /auth/login fails
+  ]
+  let call = 0
+  const fetchImpl = async () => responses[call++]
+
+  const result = await runSingleUserImport({
+    baseUrl: 'http://x',
+    adminAuthToken: 'admin-tok',
+    credentials: { name: 'Load Test User 3', email: 'stress_test_1_2@loadtest.local', password: 'LoadTestUser1Aa!' },
+    zipBuffer: Buffer.from('x'),
+    zipFileName: 'x.zip',
+    surveyName: 'stress_test_1_2',
+    index: 2,
+    jobTimeoutMs: 5000,
+    fetchImpl,
+  })
+
+  assert.equal(result.outcome, 'rejected-at-http')
+  assert.equal(result.userUuid, 'user-uuid-3')
+})
+
+test('cleanupUsers deletes every user it is given, tolerating individual failures', async () => {
+  const calls: string[] = []
+  const fetchImpl = async (url: string) => {
+    calls.push(url)
+    if (url.endsWith('/api/user/user-2')) {
+      return new Response('cannot delete', { status: 409 })
+    }
+    return new Response(null, { status: 200 })
+  }
+
+  const summary = await cleanupUsers({
+    baseUrl: 'http://x',
+    authToken: 'tok',
+    userUuids: ['user-1', 'user-2', 'user-3'],
+    fetchImpl,
+  })
+
+  assert.equal(summary.totalCount, 3)
+  assert.equal(summary.deletedCount, 2)
+  assert.equal(calls.length, 3)
 })
