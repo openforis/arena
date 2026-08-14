@@ -587,12 +587,10 @@ export const deleteUser = async ({ user, userUuidToDelete }) =>
     }
 
     // Messages the target authored block deletion the same way (message.created_by_user_uuid has no
-    // ON DELETE action). Avoid fetching all messages; just count by author.
-    const ownMessagesCount = await t.one(
-      'SELECT COUNT(*)::int AS count FROM "message" WHERE created_by_user_uuid = $1',
-      [userUuidToDelete],
-      (row) => Number(row.count)
-    )
+    // ON DELETE action). MessageService has no by-author query, so fetch all and filter.
+    const messageService = ServiceRegistry.getInstance().getService(ServerServiceType.message)
+    const messages = await messageService.getAll(t)
+    const ownMessagesCount = messages.filter((message) => message.createdByUserUuid === userUuidToDelete).length
     if (ownMessagesCount > 0) {
       throw new SystemError('appErrors:userCannotDeleteHasMessages', { count: ownMessagesCount }, StatusCodes.CONFLICT)
     }
