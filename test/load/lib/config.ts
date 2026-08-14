@@ -45,15 +45,15 @@ Options:
   --email <email>       Login email (env: ARENA_EMAIL / ADMIN_EMAIL)
   --password <password> Login password (env: ARENA_PASSWORD / ADMIN_PASSWORD)
   --job-timeout <ms>    Max time to wait for each import job (default: ${DEFAULT_JOB_TIMEOUT_MS})
-  --keep                Do not delete the surveys created by this run
+  --keep                Do not delete the surveys and users created by this run
   --help                Show this help message
 
 Notes:
   The server processes survey-creation/import jobs one at a time, globally,
   regardless of --count. This tool produces burst request concurrency, not
   concurrent execution; expect long runs and 'timed-out' outcomes at high
-  --count. The throwaway user accounts this tool creates cannot be deleted
-  via the API and accumulate in the database across runs (see test/load/README.md).
+  --count. Surveys and throwaway user accounts created by this run are
+  deleted afterward unless --keep is passed.
 `
 
 type ParsedArgs = Record<string, string | boolean | undefined>

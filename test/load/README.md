@@ -39,6 +39,14 @@ Requires a running Arena server and a system-admin login (`--email`/
 `ADMIN_PASSWORD` from `.env` — as fallbacks). See `--help` for the full flag
 list.
 
+Each run provisions `--count` new user accounts
+(`stress_test_<runId>_<i>@loadtest.local`, granted `surveyManager`
+privileges, random per-run password) to import through, one account per
+request, so the burst isn't serialized by the server's one-job-per-user
+rule. Both the surveys and the user accounts created by a run are deleted
+afterward (unless `--keep` is passed), via `DELETE /api/survey/:id` and
+`DELETE /api/user/:userUuid` respectively.
+
 ## Limitations
 
 **This is a burst-request test, not a true-concurrency test.**
@@ -49,28 +57,7 @@ tool targets), but the server processes the resulting jobs one after
 another. Expect run times to scale roughly linearly with `--count`, and
 `timed-out` outcomes if `--job-timeout` is too low for a large `--count`.
 
-**Throwaway user accounts are permanent.** Each run provisions `--count`
-new user accounts (`stress_test_<runId>_<i>@loadtest.local`, granted
-`surveyManager` privileges, random per-run password) to import through, one
-account per request, so the burst isn't serialized by the server's
-one-job-per-user rule. There is no API to delete a user account, so these
-accumulate in the database across runs. Created *surveys* are cleaned up
-automatically after each run (unless `--keep` is passed); user accounts are
-not.
-
-This doesn't apply to the CI run: the Postgres service container backing
-each `test.js.yml` job is destroyed at the end of the run, so leftover
-`stress_test_*@loadtest.local` rows never persist.
-
-To remove them manually, run against the Arena database:
-
-```sql
-DELETE FROM "user" WHERE email LIKE 'stress_test_%@loadtest.local';
-```
-
-Their `auth_group_user` rows are removed automatically by this — the FK has
-`ON DELETE CASCADE` on the `user` table (see
-`20181130124534-create-auth-tables-up.sql` in `@openforis/arena-server`) —
-but double-check that's still the case if you're running against an older
-schema version, and delete the matching `auth_group_user` rows by hand if
-not.
+**A user whose survey failed to clean up earlier in the same run will also
+fail to delete** — the server blocks deleting a user who still owns a
+survey — and that's logged as a per-user cleanup failure, not swallowed,
+since it's a signal the survey cleanup didn't fully succeed.

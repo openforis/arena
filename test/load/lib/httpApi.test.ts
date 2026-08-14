@@ -9,6 +9,7 @@ import {
   deleteSurvey,
   fetchSurveysByNamePrefix,
   createUser,
+  deleteUser,
   LOGIN_RATE_LIMIT_MAX_RETRIES,
   LOGIN_RATE_LIMIT_DEFAULT_RETRY_MS,
   LOGIN_RATE_LIMIT_MAX_RETRY_MS,
@@ -303,19 +304,36 @@ test('fetchSurveysByNamePrefix throws with status and body detail on failure', a
   )
 })
 
-test('createUser resolves when the response is ok and has no validation field', async () => {
+test('createUser resolves the created user uuid when the response is ok', async () => {
   const calls: Array<{ url: string; options: any }> = []
   const fetchImpl = async (url: string, options?: RequestInit) => {
     calls.push({ url, options })
-    return jsonResponse({ user: { id: 1 } })
+    return jsonResponse({ user: { uuid: 'user-uuid-1' } })
   }
 
-  await createUser({ baseUrl: 'http://x', authToken: 'tok', name: 'n', email: 'a@b.com', password: 'pw', fetchImpl })
+  const userUuid = await createUser({
+    baseUrl: 'http://x',
+    authToken: 'tok',
+    name: 'n',
+    email: 'a@b.com',
+    password: 'pw',
+    fetchImpl,
+  })
 
+  assert.equal(userUuid, 'user-uuid-1')
   assert.equal(calls.length, 1)
   assert.equal(calls[0].url, 'http://x/api/user')
   assert.equal(calls[0].options.method, 'POST')
   assert.equal(calls[0].options.headers.Authorization, 'Bearer tok')
+})
+
+test('createUser throws when the response has no user uuid', async () => {
+  const fetchImpl = async () => jsonResponse({ user: {} })
+
+  await assert.rejects(
+    () => createUser({ baseUrl: 'http://x', authToken: 'tok', name: 'n', email: 'a@b.com', password: 'pw', fetchImpl }),
+    /Create user a@b\.com failed: response had no user uuid/
+  )
 })
 
 test('createUser throws when a 200 response body carries a validation failure', async () => {
@@ -333,5 +351,28 @@ test('createUser throws with status and body detail on a non-ok response', async
   await assert.rejects(
     () => createUser({ baseUrl: 'http://x', authToken: 'tok', name: 'n', email: 'a@b.com', password: 'pw', fetchImpl }),
     /Create user a@b.com failed \(status 403\).*not authorized/
+  )
+})
+
+test('deleteUser resolves on a successful delete', async () => {
+  const calls: Array<{ url: string; options: any }> = []
+  const fetchImpl = async (url: string, options?: RequestInit) => {
+    calls.push({ url, options })
+    return new Response(null, { status: 200 })
+  }
+
+  await deleteUser({ baseUrl: 'http://x', authToken: 'tok', userUuid: 'user-uuid-1', fetchImpl })
+
+  assert.equal(calls[0].url, 'http://x/api/user/user-uuid-1')
+  assert.equal(calls[0].options.method, 'DELETE')
+  assert.equal(calls[0].options.headers.Authorization, 'Bearer tok')
+})
+
+test('deleteUser throws with status and body detail on a failed delete', async () => {
+  const fetchImpl = async () => jsonResponse({ key: 'appErrors:userCannotDeleteOwnsSurveys' }, 409)
+
+  await assert.rejects(
+    () => deleteUser({ baseUrl: 'http://x', authToken: 'tok', userUuid: 'user-uuid-1', fetchImpl }),
+    /Delete user user-uuid-1 failed \(status 409\).*userCannotDeleteOwnsSurveys/
   )
 })

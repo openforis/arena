@@ -7,6 +7,7 @@ export interface ResultEntry {
   name: string
   outcome: Outcome
   surveyId: number | null
+  userUuid?: string | null
   acceptMs: number | null
   jobMs: number | null
   error: string | null
