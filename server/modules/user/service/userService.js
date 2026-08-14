@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 
-import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+import { ServiceRegistry } from '@openforis/arena-core'
+import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { db } from '@server/db/db'
 
@@ -18,7 +19,7 @@ import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
 import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import UnauthorizedError from '@server/utils/unauthorizedError'
@@ -555,6 +556,71 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
 
   return userToDelete
 }
+
+export const deleteUser = async ({ user, userUuidToDelete }) =>
+  db.tx(async (t) => {
+    if (User.getUuid(user) === userUuidToDelete) {
+      throw new SystemError('appErrors:userCannotDeleteSelf', {}, StatusCodes.BAD_REQUEST)
+    }
+
+    const userToDelete = await UserManager.fetchUserByUuid(userUuidToDelete, t)
+    if (!userToDelete) {
+      throw new SystemError('appErrors:userNotFound', { userUuid: userUuidToDelete }, StatusCodes.NOT_FOUND)
+    }
+
+    if (User.isSystemAdmin(userToDelete)) {
+      const adminsCount = await UserManager.countSystemAdministrators(t)
+      if (adminsCount <= 1) {
+        throw new SystemError('appErrors:userCannotDeleteLastSystemAdmin', {}, StatusCodes.CONFLICT)
+      }
+    }
+
+    // Surveys the target owns block deletion at the DB level (survey.owner_uuid has no ON DELETE
+    // action). Blocked, not auto-reassigned: transferring survey ownership is too significant to do
+    // silently as a side effect of deleting an account. Use the unfiltered FK-scoped count (not the
+    // UI listing query), since that listing excludes templates/temporary surveys and can miss surveys
+    // the target owns but isn't a member of -- letting them slip past this check and hit the FK
+    // violation at DELETE time instead.
+    const ownedSurveysCount = await SurveyManager.countOwnedSurveys({ user: userToDelete }, t)
+    if (ownedSurveysCount > 0) {
+      throw new SystemError('appErrors:userCannotDeleteOwnsSurveys', { count: ownedSurveysCount }, StatusCodes.CONFLICT)
+    }
+
+    // Messages the target authored block deletion the same way (message.created_by_user_uuid has no
+    // ON DELETE action). MessageService has no by-author query, so fetch all and filter.
+    const messageService = ServiceRegistry.getInstance().getService(ServerServiceType.message)
+    const messages = await messageService.getAll(t)
+    const ownMessagesCount = messages.filter((message) => message.createdByUserUuid === userUuidToDelete).length
+    if (ownMessagesCount > 0) {
+      throw new SystemError('appErrors:userCannotDeleteHasMessages', { count: ownMessagesCount }, StatusCodes.CONFLICT)
+    }
+
+    // Records the target owns (record.owner_uuid) also block deletion, and can't be nulled out
+    // (NOT NULL) -- reassign them to the acting admin. Iterate every survey in the instance rather
+    // than the membership-filtered listing query, since that listing can miss surveys the target owns
+    // (or owned) records in without being a current member -- e.g. a template/temporary survey, or a
+    // membership that was removed after the records were created. A no-op for surveys where the
+    // target owns no records, so safe to call unconditionally; no more expensive than the FK check
+    // Postgres already has to run against every survey schema to allow the delete at all.
+    const allSurveyIds = await SurveyManager.fetchAllSurveyIds(t)
+    for (const surveyId of allSurveyIds) {
+      await RecordManager.updateRecordsOwner(
+        { surveyId, fromOwnerUuid: userUuidToDelete, toOwnerUuid: User.getUuid(user) },
+        t
+      )
+    }
+
+    Logger.info(
+      `user ${User.getEmail(user)} [${User.getUuid(user)}] deleted user ${User.getEmail(userToDelete)} ` +
+        `[${userUuidToDelete}]; records owned by the deleted user were reassigned to the acting admin, ` +
+        `checking ${allSurveyIds.length} surveys`
+    )
+
+    // Everything else (sessions, tokens, 2FA, group membership, activity log, invitations this user
+    // sent/received, access requests they processed) is cleaned up by the existing ON DELETE CASCADE
+    // foreign keys in arena-server's schema -- see the spec's "Cascade side effects" section.
+    return UserManager.deleteUser(userUuidToDelete, t)
+  })
 
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
