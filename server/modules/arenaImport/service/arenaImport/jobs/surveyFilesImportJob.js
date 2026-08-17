@@ -5,13 +5,6 @@ import * as SurveyFile from '@core/survey/surveyFile'
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 import { FileImportBaseJob } from './filesImportBaseJob'
 
-// preloadedMapLayer already existed (and was fully exported) before this feature, so a zip
-// missing its content is a genuine anomaly worth failing on (unless the caller opts out via
-// skipMissingFiles). surveyDocImage/branding* files are new: any zip exported before this
-// feature shipped legitimately has none of them, so their absence must never be fatal —
-// otherwise every pre-existing backup of a branded survey would fail to restore.
-const CONTENT_REQUIRED_FILE_TYPES = new Set([SurveyFile.SurveyFileType.preloadedMapLayer])
-
 export default class SurveyFilesImportJob extends FileImportBaseJob {
   constructor(params) {
     super('SurveyFilesImportJob', params)
@@ -59,9 +52,8 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
         const fileUuid = SurveyFile.getUuid(fileSummary)
         const fileName = SurveyFile.getName(fileSummary)
         const fileContent = await ArenaSurveyFileZip.getSurveyFile(arenaSurveyFileZip, fileUuid)
-        const contentRequired = CONTENT_REQUIRED_FILE_TYPES.has(SurveyFile.getType(fileSummary))
 
-        if (!fileContent && !skipMissingFiles && contentRequired) {
+        if (!fileContent && !skipMissingFiles) {
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
         }
         if (fileContent) {
