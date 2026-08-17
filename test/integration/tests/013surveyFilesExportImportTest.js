@@ -10,6 +10,7 @@ import * as SurveyFileService from '@server/modules/survey/service/surveyFileSer
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
+import { FileImportBaseJob } from '@server/modules/arenaImport/service/arenaImport/jobs/filesImportBaseJob'
 
 import * as SB from '../../utils/surveyBuilder'
 
@@ -138,5 +139,45 @@ describe('Survey files export/import - branding and doc-layout images', () => {
       fileUuid: headerFileUuid,
     })
     expect(Buffer.compare(clonedHeaderContent, headerContent)).toBe(0)
+  })
+
+  test('storage quota pre-check sees the real byte size of branding files, not the hardcoded 0', async () => {
+    const user = getContextUser()
+
+    const exportJob = new SurveyExportJob({ surveyId: sourceSurveyId, user, backup: true })
+    await exportJob.start()
+    expect(exportJob.isSucceeded()).toBe(true)
+
+    const { filePath } = exportJob.context
+
+    // SurveyBranding.getBrandingFileSummaries (Task 1) hardcodes props.size to 0 for every
+    // branding entry, since the branding descriptor stored in survey props never retains the
+    // real file size. SurveyFilesImportJob must resolve real sizes for those entries before
+    // calling FileImportBaseJob.checkFilesNotExceedingAvailableQuota, otherwise branding image
+    // bytes silently don't count towards the target survey's storage quota. Spy on the quota
+    // pre-check to inspect exactly what it was called with.
+    const quotaCheckSpy = jest.spyOn(FileImportBaseJob.prototype, 'checkFilesNotExceedingAvailableQuota')
+
+    const importJob = new ArenaImportJob({ filePath, user })
+    await importJob.start()
+    expect(importJob.isSucceeded()).toBe(true)
+
+    const { surveyId: importedSurveyId } = importJob.result
+    createdSurveyIds.push(importedSurveyId)
+
+    // Several file-import jobs share FileImportBaseJob (e.g. record files); find the call made
+    // by SurveyFilesImportJob by checking which one was given our branding logo's uuid.
+    const surveyFilesImportCall = quotaCheckSpy.mock.calls.find(([fileSummaries]) =>
+      fileSummaries.some((fileSummary) => SurveyFile.getUuid(fileSummary) === logoFileUuid)
+    )
+    expect(surveyFilesImportCall).toBeDefined()
+
+    const [fileSummariesPassedToQuotaCheck] = surveyFilesImportCall
+    const brandingSummaryPassedToQuotaCheck = fileSummariesPassedToQuotaCheck.find(
+      (fileSummary) => SurveyFile.getUuid(fileSummary) === logoFileUuid
+    )
+    expect(SurveyFile.getSize(brandingSummaryPassedToQuotaCheck)).toBe(logoContent.length)
+
+    quotaCheckSpy.mockRestore()
   })
 })

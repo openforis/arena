@@ -20,12 +20,29 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
 
     const fileSummaries = [...preloadedMapLayerFiles, ...surveyDocImageFiles, ...brandingFiles]
 
-    this.total = fileSummaries.length
+    // Branding file summaries (Task 1's SurveyBranding.getBrandingFileSummaries) hardcode
+    // props.size to 0, since the branding descriptor stored in survey props never retains the
+    // real file size. Resolve real sizes for any summary missing one (from the zip content)
+    // before the quota pre-check, so it sees real byte counts instead of silently treating
+    // branding files as zero-sized. preloadedMapLayerFiles/surveyDocImageFiles already carry
+    // accurate sizes and are left untouched.
+    const fileSummariesWithSizes = await Promise.all(
+      fileSummaries.map(async (fileSummary) => {
+        if (SurveyFile.getSize(fileSummary)) {
+          return fileSummary
+        }
+        const fileUuid = SurveyFile.getUuid(fileSummary)
+        const content = await ArenaSurveyFileZip.getSurveyFile(arenaSurveyFileZip, fileUuid)
+        return content ? SurveyFile.assocSize(Buffer.byteLength(content))(fileSummary) : fileSummary
+      })
+    )
+
+    this.total = fileSummariesWithSizes.length
 
     if (this.total > 0) {
       this.logDebug(`survey files to import: ${this.total}`)
-      await this.checkFilesNotExceedingAvailableQuota(fileSummaries)
-      for (const fileSummary of fileSummaries) {
+      await this.checkFilesNotExceedingAvailableQuota(fileSummariesWithSizes)
+      for (const fileSummary of fileSummariesWithSizes) {
         if (this.isCanceled()) {
           break
         }
