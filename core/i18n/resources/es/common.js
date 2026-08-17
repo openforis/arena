@@ -325,6 +325,7 @@ export default {
     instances: 'Instancias',
     help: 'Ayuda',
     about: 'Acerca de',
+    changelog: 'Registro de cambios',
     disclaimer: 'Descargo de responsabilidad',
     userManual: 'Manual de usuario',
   },
@@ -750,6 +751,9 @@ $t(common.appNameFull)
  * Arena en GitHub: $t(links.arenaInGitHub)
  * Scripts R de Arena en GitHub: $t(links.arenaRScriptsInGitHub)
 `,
+    },
+    changelog: {
+      title: '$t(appModules.changelog)',
     },
   },
   nodeDefEdit: {
