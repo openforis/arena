@@ -84,6 +84,16 @@ describe('SurveyBranding', () => {
     })
   })
 
+  describe('newBrandingImageDescriptor', () => {
+    it('builds a descriptor from fileUuid, size and name', () => {
+      expect(SurveyBranding.newBrandingImageDescriptor({ fileUuid: 'uuid-1', size: 100, name: 'logo.png' })).toEqual({
+        fileUuid: 'uuid-1',
+        size: 100,
+        name: 'logo.png',
+      })
+    })
+  })
+
   describe('hasLogoDescriptor', () => {
     it('detects fileUuid', () => {
       expect(SurveyBranding.hasLogoDescriptor({ fileUuid: 'a' })).toBe(true)

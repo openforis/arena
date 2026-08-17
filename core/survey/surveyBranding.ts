@@ -176,6 +176,23 @@ export const getLandingBackground = (surveyInfo: SurveyInfoLike): BrandingImageD
   getBranding(surveyInfo)[keys.landingBackground] || null
 
 /**
+ * Creates a branding image descriptor pointing at an uploaded file.
+ */
+export const newBrandingImageDescriptor = ({
+  fileUuid,
+  size,
+  name,
+}: {
+  fileUuid: string
+  size: number
+  name: string
+}): BrandingImageDescriptor => ({
+  [keys.fileUuid]: fileUuid,
+  [keys.size]: size,
+  [keys.name]: name,
+})
+
+/**
  * Returns whether a logo descriptor has a file UUID.
  */
 export const hasLogoDescriptor = (logo: BrandingImageDescriptor | null | undefined): boolean => {
