@@ -1,5 +1,4 @@
 import * as Chain from '@common/analysis/chain'
-import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 import { print, setVar, source } from '../../rFunctions'
 import RFileSystem from './rFileSystem'
@@ -10,12 +9,8 @@ export default class RFileStatisticalAnalysis extends RFileSystem {
   }
 
   async init() {
-    if (
-      Chain.hasSamplingDesign(this.rChain.chain) &&
-      ChainStatisticalAnalysis.getEntityDefUuid(Chain.getStatisticalAnalysis(this.rChain.chain))
-    ) {
+    if (Chain.hasSamplingDesign(this.rChain.chain)) {
       await super.init()
-
       await this.appendContent(
         source('https://raw.githubusercontent.com/openforis/r-arena/master/arena_analysis_for_Shiny.R'),
         setVar('arena_process_response', 'arenaAnalytics_LowAggData()'),
