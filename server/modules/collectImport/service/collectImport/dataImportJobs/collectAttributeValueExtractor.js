@@ -233,7 +233,7 @@ export const extractAttributeValueAndMeta = async ({
   const valueAndMetaExtractor = valueAndMetaExtractorByType[nodeDefType]
   if (!valueAndMetaExtractor) throw new Error(`Unknown NodeDef type: ${nodeDefType}`)
 
-  return valueAndMetaExtractor({
+  const valueAndMeta = await valueAndMetaExtractor({
     collectSurveyFileZip,
     collectNode,
     collectNodeDef,
@@ -246,4 +246,12 @@ export const extractAttributeValueAndMeta = async ({
     node,
     tx,
   })
+  if (valueAndMeta && Objects.isNotEmpty(valueAndMeta.value) && NodeDef.isReadOnly(nodeDef)) {
+    // set default value applied meta for read-only attributes
+    valueAndMeta.meta = {
+      ...valueAndMeta.meta,
+      [Node.metaKeys.defaultValue]: true,
+    }
+  }
+  return valueAndMeta
 }
