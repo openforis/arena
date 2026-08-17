@@ -1,5 +1,4 @@
 import * as Chain from '@common/analysis/chain'
-import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 import { print, setVar, source } from '../../rFunctions'
 import RFileSystem from './rFileSystem'
