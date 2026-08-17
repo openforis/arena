@@ -141,4 +141,33 @@ describe('SurveyBranding', () => {
       )
     })
   })
+
+  describe('getBrandingFileSummaries', () => {
+    it('returns a summary for every populated logo/background slot', () => {
+      const branding = {
+        surveyLogo1: { fileUuid: 'uuid-logo-1' },
+        surveyLogo2: { fileUuid: 'uuid-logo-2' },
+        surveyLogo3: { fileUuid: 'uuid-logo-3' },
+        landingBackground: { fileUuid: 'uuid-bg' },
+      }
+      expect(SurveyBranding.getBrandingFileSummaries(branding)).toEqual([
+        { uuid: 'uuid-logo-1', props: { type: 'brandingSurveyLogo1', size: 0 } },
+        { uuid: 'uuid-logo-2', props: { type: 'brandingSurveyLogo2', size: 0 } },
+        { uuid: 'uuid-logo-3', props: { type: 'brandingSurveyLogo3', size: 0 } },
+        { uuid: 'uuid-bg', props: { type: 'brandingLandingBackground', size: 0 } },
+      ])
+    })
+
+    it('skips slots without a fileUuid', () => {
+      const branding = { surveyLogo2: { fileUuid: 'uuid-logo-2' } }
+      expect(SurveyBranding.getBrandingFileSummaries(branding)).toEqual([
+        { uuid: 'uuid-logo-2', props: { type: 'brandingSurveyLogo2', size: 0 } },
+      ])
+    })
+
+    it('returns an empty array for empty branding', () => {
+      expect(SurveyBranding.getBrandingFileSummaries({})).toEqual([])
+      expect(SurveyBranding.getBrandingFileSummaries()).toEqual([])
+    })
+  })
 })

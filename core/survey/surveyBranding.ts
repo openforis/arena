@@ -1,4 +1,5 @@
 import * as ObjectUtils from '@core/objectUtils'
+import * as SurveyFile from '@core/survey/surveyFile'
 
 export const keys = {
   branding: 'branding',
@@ -48,6 +49,18 @@ const descriptionFontSizeRemByPreset: Record<FontSizePreset, string> = {
 }
 
 const imageDescriptorKeys = [...surveyLogoKeys, keys.landingBackground] as const
+
+const brandingImageFileTypeByKey: Record<(typeof imageDescriptorKeys)[number], string> = {
+  [keys.surveyLogo1]: SurveyFile.SurveyFileType.brandingSurveyLogo1,
+  [keys.surveyLogo2]: SurveyFile.SurveyFileType.brandingSurveyLogo2,
+  [keys.surveyLogo3]: SurveyFile.SurveyFileType.brandingSurveyLogo3,
+  [keys.landingBackground]: SurveyFile.SurveyFileType.brandingLandingBackground,
+}
+
+export type BrandingFileSummary = {
+  uuid: string
+  props: { type: string; size: number }
+}
 
 export type BrandingImageDescriptor = {
   [keys.fileUuid]?: string
@@ -177,4 +190,20 @@ export const getBrandingFileUuids = (branding: SurveyBranding = {}): string[] =>
     if (typeof fileUuid === 'string' && fileUuid.length > 0) uuids.push(fileUuid)
   }
   return uuids
+}
+
+/**
+ * Returns minimal file summaries ({ uuid, props: { type, size } }) for every branding image
+ * descriptor that has a fileUuid, keyed by the SurveyFileType matching its branding slot.
+ * Used by survey export/import to restore branding image file content.
+ */
+export const getBrandingFileSummaries = (branding: SurveyBranding = {}): BrandingFileSummary[] => {
+  const summaries: BrandingFileSummary[] = []
+  for (const imageKey of imageDescriptorKeys) {
+    const fileUuid = branding?.[imageKey]?.[keys.fileUuid]
+    if (typeof fileUuid === 'string' && fileUuid.length > 0) {
+      summaries.push({ uuid: fileUuid, props: { type: brandingImageFileTypeByKey[imageKey], size: 0 } })
+    }
+  }
+  return summaries
 }
