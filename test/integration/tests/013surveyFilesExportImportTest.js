@@ -54,7 +54,7 @@ describe('Survey files export/import - branding and doc-layout images', () => {
       })
     )
     await SurveyManager.updateSurveyProp(user, sourceSurveyId, 'branding', {
-      surveyLogo1: { fileUuid: logoFileUuid },
+      surveyLogo1: { fileUuid: logoFileUuid, size: logoContent.length, name: 'logo1.png' },
     })
 
     headerFileUuid = uuidv4()
@@ -172,7 +172,7 @@ describe('Survey files export/import - branding and doc-layout images', () => {
     expect(importJob.isFailed()).toBe(true)
   })
 
-  test('storage quota pre-check sees the real byte size of branding files, not the hardcoded 0', async () => {
+  test('storage quota pre-check sees the real byte size of branding files', async () => {
     const user = getContextUser()
 
     const exportJob = new SurveyExportJob({ surveyId: sourceSurveyId, user, backup: true })
@@ -181,12 +181,11 @@ describe('Survey files export/import - branding and doc-layout images', () => {
 
     const { filePath } = exportJob.context
 
-    // SurveyBranding.getBrandingFileSummaries (Task 1) hardcodes props.size to 0 for every
-    // branding entry, since the branding descriptor stored in survey props never retains the
-    // real file size. SurveyFilesImportJob must resolve real sizes for those entries before
-    // calling FileImportBaseJob.checkFilesNotExceedingAvailableQuota, otherwise branding image
-    // bytes silently don't count towards the target survey's storage quota. Spy on the quota
-    // pre-check to inspect exactly what it was called with.
+    // SurveyBranding.getBrandingFileSummaries reads size/name straight off the branding
+    // descriptor stored in survey props (set at upload time by SurveyInfoBrandingForm). Spy on
+    // the quota pre-check to confirm FileImportBaseJob.checkFilesNotExceedingAvailableQuota
+    // actually receives that real byte count for branding files, not just preloadedMapLayer/
+    // surveyDocImage entries.
     const quotaCheckSpy = jest.spyOn(FileImportBaseJob.prototype, 'checkFilesNotExceedingAvailableQuota')
 
     const importJob = new ArenaImportJob({ filePath, user })

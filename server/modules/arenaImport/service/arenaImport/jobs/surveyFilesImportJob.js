@@ -20,29 +20,12 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
 
     const fileSummaries = [...preloadedMapLayerFiles, ...surveyDocImageFiles, ...brandingFiles]
 
-    // Branding descriptors uploaded before size/name were added to BrandingImageDescriptor only
-    // ever stored a fileUuid, so SurveyBranding.getBrandingFileSummaries falls back to size: 0
-    // for those. Resolve real sizes for any summary still missing one (from the zip content)
-    // before the quota pre-check, so it sees real byte counts instead of silently treating
-    // legacy branding files as zero-sized. Summaries that already carry a real size (newly
-    // uploaded branding files, or preloadedMapLayerFiles/surveyDocImageFiles) are left untouched.
-    const fileSummariesWithSizes = await Promise.all(
-      fileSummaries.map(async (fileSummary) => {
-        if (SurveyFile.getSize(fileSummary)) {
-          return fileSummary
-        }
-        const fileUuid = SurveyFile.getUuid(fileSummary)
-        const content = await ArenaSurveyFileZip.getSurveyFile(arenaSurveyFileZip, fileUuid)
-        return content ? SurveyFile.assocSize(Buffer.byteLength(content))(fileSummary) : fileSummary
-      })
-    )
-
-    this.total = fileSummariesWithSizes.length
+    this.total = fileSummaries.length
 
     if (this.total > 0) {
       this.logDebug(`survey files to import: ${this.total}`)
-      await this.checkFilesNotExceedingAvailableQuota(fileSummariesWithSizes)
-      for (const fileSummary of fileSummariesWithSizes) {
+      await this.checkFilesNotExceedingAvailableQuota(fileSummaries)
+      for (const fileSummary of fileSummaries) {
         if (this.isCanceled()) {
           break
         }
