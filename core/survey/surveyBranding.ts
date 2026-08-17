@@ -11,6 +11,8 @@ export const keys = {
   titleFontSize: 'titleFontSize',
   descriptionFontSize: 'descriptionFontSize',
   fileUuid: 'fileUuid',
+  size: 'size',
+  name: 'name',
 } as const
 
 export type SurveyLogoKey = typeof keys.surveyLogo1 | typeof keys.surveyLogo2 | typeof keys.surveyLogo3
@@ -59,11 +61,13 @@ const brandingImageFileTypeByKey: Record<(typeof imageDescriptorKeys)[number], s
 
 export type BrandingFileSummary = {
   uuid: string
-  props: { type: string; size: number }
+  props: { type: string; size: number; name?: string }
 }
 
 export type BrandingImageDescriptor = {
   [keys.fileUuid]?: string
+  [keys.size]?: number
+  [keys.name]?: string
 }
 
 export type SurveyBranding = {
@@ -193,16 +197,28 @@ export const getBrandingFileUuids = (branding: SurveyBranding = {}): string[] =>
 }
 
 /**
- * Returns minimal file summaries ({ uuid, props: { type, size } }) for every branding image
+ * Returns file summaries ({ uuid, props: { type, size, name? } }) for every branding image
  * descriptor that has a fileUuid, keyed by the SurveyFileType matching its branding slot.
- * Used by survey export/import to restore branding image file content.
+ * size/name are read from the descriptor when present (uploaded after this field was added);
+ * descriptors from before then only ever stored fileUuid, so size falls back to 0 and name is
+ * omitted for those. Used by survey export/import to restore branding image file content.
  */
 export const getBrandingFileSummaries = (branding: SurveyBranding = {}): BrandingFileSummary[] => {
   const summaries: BrandingFileSummary[] = []
   for (const imageKey of imageDescriptorKeys) {
-    const fileUuid = branding?.[imageKey]?.[keys.fileUuid]
+    const descriptor = branding?.[imageKey]
+    const fileUuid = descriptor?.[keys.fileUuid]
     if (typeof fileUuid === 'string' && fileUuid.length > 0) {
-      summaries.push({ uuid: fileUuid, props: { type: brandingImageFileTypeByKey[imageKey], size: 0 } })
+      const size = descriptor?.[keys.size]
+      const name = descriptor?.[keys.name]
+      summaries.push({
+        uuid: fileUuid,
+        props: {
+          type: brandingImageFileTypeByKey[imageKey],
+          size: typeof size === 'number' ? size : 0,
+          ...(name ? { name } : {}),
+        },
+      })
     }
   }
   return summaries

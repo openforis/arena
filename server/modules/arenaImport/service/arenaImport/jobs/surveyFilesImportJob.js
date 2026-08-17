@@ -20,12 +20,12 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
 
     const fileSummaries = [...preloadedMapLayerFiles, ...surveyDocImageFiles, ...brandingFiles]
 
-    // Branding file summaries (Task 1's SurveyBranding.getBrandingFileSummaries) hardcode
-    // props.size to 0, since the branding descriptor stored in survey props never retains the
-    // real file size. Resolve real sizes for any summary missing one (from the zip content)
+    // Branding descriptors uploaded before size/name were added to BrandingImageDescriptor only
+    // ever stored a fileUuid, so SurveyBranding.getBrandingFileSummaries falls back to size: 0
+    // for those. Resolve real sizes for any summary still missing one (from the zip content)
     // before the quota pre-check, so it sees real byte counts instead of silently treating
-    // branding files as zero-sized. preloadedMapLayerFiles/surveyDocImageFiles already carry
-    // accurate sizes and are left untouched.
+    // legacy branding files as zero-sized. Summaries that already carry a real size (newly
+    // uploaded branding files, or preloadedMapLayerFiles/surveyDocImageFiles) are left untouched.
     const fileSummariesWithSizes = await Promise.all(
       fileSummaries.map(async (fileSummary) => {
         if (SurveyFile.getSize(fileSummary)) {

@@ -360,7 +360,11 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
         await API.insertSurveyFile({ surveyId, file, surveyFile })
         setBranding({
           ...branding,
-          [imageKey]: { [brandingKeys.fileUuid]: SurveyFile.getUuid(surveyFile) },
+          [imageKey]: {
+            [brandingKeys.fileUuid]: SurveyFile.getUuid(surveyFile),
+            [brandingKeys.size]: file.size,
+            [brandingKeys.name]: file.name,
+          },
         })
       } catch (error) {
         clearLocalObjectUrl(imageKey)

@@ -169,5 +169,23 @@ describe('SurveyBranding', () => {
       expect(SurveyBranding.getBrandingFileSummaries({})).toEqual([])
       expect(SurveyBranding.getBrandingFileSummaries()).toEqual([])
     })
+
+    it('preserves size and name when the descriptor carries them', () => {
+      const branding = {
+        surveyLogo1: { fileUuid: 'uuid-logo-1', size: 1234, name: 'logo1.svg' },
+        landingBackground: { fileUuid: 'uuid-bg', size: 5678, name: 'background.png' },
+      }
+      expect(SurveyBranding.getBrandingFileSummaries(branding)).toEqual([
+        { uuid: 'uuid-logo-1', props: { type: 'brandingSurveyLogo1', size: 1234, name: 'logo1.svg' } },
+        { uuid: 'uuid-bg', props: { type: 'brandingLandingBackground', size: 5678, name: 'background.png' } },
+      ])
+    })
+
+    it('falls back to size 0 and omits name for legacy descriptors without them', () => {
+      const branding = { surveyLogo2: { fileUuid: 'uuid-logo-2' } }
+      const [summary] = SurveyBranding.getBrandingFileSummaries(branding)
+      expect(summary.props.size).toBe(0)
+      expect(summary.props).not.toHaveProperty('name')
+    })
   })
 })
