@@ -142,34 +142,21 @@ describe('Survey files export/import - branding and doc-layout images', () => {
     expect(Buffer.compare(clonedHeaderContent, headerContent)).toBe(0)
   })
 
-  test('import warns and skips missing survey file content when skipMissingFiles is true', async () => {
+  test('import warns and skips missing branding/doc-layout image content regardless of skipMissingFiles (old zips predate these file types)', async () => {
     const surveyRefetched = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId, draft: true })
     const fakeZipMissingAllEntries = { getEntryData: async () => null }
 
-    const importJob = new SurveyFilesImportJob({
-      arenaSurveyFileZip: fakeZipMissingAllEntries,
-      survey: surveyRefetched,
-      surveyId: sourceSurveyId,
-      skipMissingFiles: true,
-    })
-    await importJob.start()
+    for (const skipMissingFiles of [true, false]) {
+      const importJob = new SurveyFilesImportJob({
+        arenaSurveyFileZip: fakeZipMissingAllEntries,
+        survey: surveyRefetched,
+        surveyId: sourceSurveyId,
+        skipMissingFiles,
+      })
+      await importJob.start()
 
-    expect(importJob.isSucceeded()).toBe(true)
-  })
-
-  test('import fails on missing survey file content when skipMissingFiles is false', async () => {
-    const surveyRefetched = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId, draft: true })
-    const fakeZipMissingAllEntries = { getEntryData: async () => null }
-
-    const importJob = new SurveyFilesImportJob({
-      arenaSurveyFileZip: fakeZipMissingAllEntries,
-      survey: surveyRefetched,
-      surveyId: sourceSurveyId,
-      skipMissingFiles: false,
-    })
-    await importJob.start()
-
-    expect(importJob.isFailed()).toBe(true)
+      expect(importJob.isSucceeded()).toBe(true)
+    }
   })
 
   test('storage quota pre-check sees the real byte size of branding files, not the hardcoded 0', async () => {
@@ -210,5 +197,44 @@ describe('Survey files export/import - branding and doc-layout images', () => {
     expect(SurveyFile.getSize(brandingSummaryPassedToQuotaCheck)).toBe(logoContent.length)
 
     quotaCheckSpy.mockRestore()
+  })
+
+  test('import still fails on missing preloadedMapLayer content when skipMissingFiles is false (pre-existing strict behavior preserved)', async () => {
+    const user = getContextUser()
+    const missingLayerFileUuid = uuidv4()
+    await SurveyManager.updateSurveyProp(user, sourceSurveyId, 'preloadedMapLayers', [
+      {
+        uuid: missingLayerFileUuid,
+        props: {
+          type: SurveyFile.SurveyFileType.preloadedMapLayer,
+          name: 'layer.json',
+          size: 10,
+        },
+      },
+    ])
+    const surveyRefetched = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId, draft: true })
+    const fakeZipMissingAllEntries = { getEntryData: async () => null }
+
+    const importJobStrict = new SurveyFilesImportJob({
+      arenaSurveyFileZip: fakeZipMissingAllEntries,
+      survey: surveyRefetched,
+      surveyId: sourceSurveyId,
+      skipMissingFiles: false,
+    })
+    await importJobStrict.start()
+    expect(importJobStrict.isFailed()).toBe(true)
+
+    const importJobSkip = new SurveyFilesImportJob({
+      arenaSurveyFileZip: fakeZipMissingAllEntries,
+      survey: surveyRefetched,
+      surveyId: sourceSurveyId,
+      skipMissingFiles: true,
+    })
+    await importJobSkip.start()
+    expect(importJobSkip.isSucceeded()).toBe(true)
+
+    // Restore sourceSurveyId's props: this test is the last one in the file and mutates a prop
+    // no other test reads, but reset it anyway so this file stays order-independent.
+    await SurveyManager.updateSurveyProp(user, sourceSurveyId, 'preloadedMapLayers', [])
   })
 })
