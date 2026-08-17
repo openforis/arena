@@ -48,13 +48,27 @@ background pass.
    `ArenaServer.init()` documenting why it still redundantly migrates
    every survey's schema at startup.
 
-**Out of scope:** any change to `@openforis/arena-server` itself. Today,
-`ArenaServer.init()` has no option to skip only the survey-schema loop
-while keeping the public-schema migration — the all-or-nothing
-`DISABLE_DB_MIGRATIONS` env var would also skip the public schema, which
-this app still needs migrated synchronously at startup. Removing the
-redundant startup-time survey-schema loop requires `arena-server` to
-expose that finer-grained control; this spec only prepares this repo's
+**Addendum (post-approval):** after this spec was approved, scope grew to
+also add the enabling capability to `arena-server` itself, on its own
+branch (`feat/survey-migration` in the sibling `arena-server` checkout):
+an optional `migrateSurveySchemas` flag on `ArenaServer.init()`, defaulting
+to `true` (unchanged behavior for every other consumer), that skips just
+the survey-schema loop when set to `false`. This is tracked in the
+implementation plan (`docs/superpowers/plans/2026-08-17-survey-schema-category-migration.md`),
+not here, and does not change anything below — `arena`'s own
+`appCluster.js` still does not flip that flag on; see "Out of scope" below,
+which otherwise remains accurate for this repo.
+
+**Out of scope:** any change to `arena`'s own consumption of
+`@openforis/arena-server` (i.e. this repo still calls `ArenaServer.init()`
+plainly, unchanged — see Addendum above for the separate `arena-server`-side
+capability). Today, `ArenaServer.init()` has no option to skip only the
+survey-schema loop while keeping the public-schema migration — the
+all-or-nothing `DISABLE_DB_MIGRATIONS` env var would also skip the public
+schema, which this app still needs migrated synchronously at startup.
+Removing the redundant startup-time survey-schema loop requires
+`arena-server` to expose that finer-grained control; this spec only
+prepares this repo's
 side (the per-survey job now does its own schema migration, so the
 switch-over will be a small, isolated change once that capability
 exists), it does not flip anything off yet.
