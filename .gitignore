@@ -294,5 +294,10 @@ modules.xml
 # Ignore local settings for claude
 .claude/settings.local.json
 
+<<<<<<< HEAD
 # Superpowers subagent-driven-development scratch workspace
 .superpowers/
+=======
+# Default output path for test/load/buildSampleSurveyZip.ts
+sample-survey.zip
+>>>>>>> cebdcf4b2182a6b7857d98412d9e2e632675cc3d

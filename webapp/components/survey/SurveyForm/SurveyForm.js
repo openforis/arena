@@ -35,6 +35,8 @@ import { TreeSelectViewMode } from '@webapp/model'
 
 import NodeDefDetails from '../NodeDefDetails'
 import { FormPagesEditButtons } from './components/FormPageEditButtons'
+import { RecordCompletionBar } from './components/RecordCompletionBar'
+import { RecordTreeItemStatusSuffix } from './components/RecordTreeItemStatusSuffix'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 import FormHeader from './FormHeader'
@@ -90,6 +92,7 @@ const SurveyForm = (props) => {
 
   const className = classNames('survey-form', {
     edit: editAllowed,
+    entry,
     'form-actions-off': !hasNodeDefAddChildTo,
     'page-navigation-off': !showPageNavigation,
     'form-preview': preview,
@@ -163,6 +166,11 @@ const SurveyForm = (props) => {
     [dispatch, survey, surveyCycleKey, viewOnlyPages]
   )
 
+  const isNodeDefIncluded = useCallback(
+    (nodeDefArg) => !notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg)),
+    [notAvailablePageEntityDefsUuids]
+  )
+
   if (!activePageNodeDef) {
     return null
   }
@@ -201,17 +209,22 @@ const SurveyForm = (props) => {
         {showPageNavigation && (
           <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
+              {entry && <RecordCompletionBar />}
               <NodeDefTreeSelect
                 disableSelection={surveyIsDirty}
-                isNodeDefIncluded={(nodeDefArg) =>
-                  !notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))
-                }
+                isNodeDefIncluded={isNodeDefIncluded}
                 nodeDefUuidActive={viewOnlyPages ? NodeDef.getUuid(activePageNodeDef) : selectedNodeDefUuid}
                 onlyPages={viewOnlyPages}
                 includeMultipleAttributes={!viewOnlyPages}
                 includeSingleAttributes={!viewOnlyPages}
                 includeSingleEntities
                 onSelect={onNodeDefTreeSelect}
+                showExpandButton={!entry}
+                renderItemSuffix={
+                  entry
+                    ? (item, { isExpanded }) => <RecordTreeItemStatusSuffix item={item} isExpanded={isExpanded} />
+                    : undefined
+                }
               />
               {edit && (
                 <div className="display-flex sidebar-bottom-bar">

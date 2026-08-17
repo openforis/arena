@@ -116,92 +116,118 @@ export const insertSurvey = async (params, client = db) => {
     temporary = false,
   } = params
 
-  return client.tx(async (t) => {
-    // Insert survey into db
-    const surveyProps = { ...Survey.getProps(surveyInfoParam) }
-    if (temporary) {
-      surveyProps.temporary = true
-    }
-    // a brand-new survey has no legacy file paths to migrate, so it's trivially "fully migrated" already
-    const appVersion = getCurrentAppVersionStamp()
-    const surveyInfo = await SurveyRepository.insertSurvey(
-      { survey: surveyInfoParam, propsDraft: surveyProps, appVersion },
-      t
-    )
-    const survey = assocSurveyInfo(surveyInfo)
-    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+  // Insert survey row on its own (not wrapped in a held-open transaction): DBMigrator.migrateSurveySchema
+  // below opens its own separate db connections (CREATE SCHEMA + db-migrate), so if it ran inside an open
+  // transaction here, that transaction's connection would sit idle while a second connection is acquired
+  // from the same pool. Under concurrent survey creation this starves the pool (no connectionTimeoutMillis
+  // is configured) and can hang the whole server, since every other request also needs a pool connection.
+  const surveyProps = { ...Survey.getProps(surveyInfoParam) }
+  if (temporary) {
+    surveyProps.temporary = true
+  }
+  // a brand-new survey has no legacy file paths to migrate, so it's trivially "fully migrated" already
+  const appVersion = getCurrentAppVersionStamp()
+  const surveyInfo = await SurveyRepository.insertSurvey(
+    { survey: surveyInfoParam, propsDraft: surveyProps, appVersion },
+    client
+  )
+  const survey = assocSurveyInfo(surveyInfo)
+  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
-    // Create survey data schema
+  try {
+    // Create survey data schema (runs outside of any transaction held by this function; see comment above)
     await DBMigrator.migrateSurveySchema(surveyId)
 
-    // Log survey create activity
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyCreate, surveyInfo, system, t)
+    return await client.tx(async (t) => {
+      // Log survey create activity
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyCreate, surveyInfo, system, t)
 
-    if (createRootEntityDef) {
-      // Insert root entity def
-      const rootEntityDef = NodeDef.newNodeDef(
-        null,
-        NodeDef.nodeDefType.entity,
-        [Survey.cycleOneKey], // Use first (and only) cycle
-        {
-          [NodeDef.propKeys.name]: 'root_entity',
-          [NodeDef.propKeys.multiple]: false,
-          [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
-            Survey.cycleOneKey,
-            NodeDefLayout.renderType.form,
-            uuidv4()
-          ),
-        }
-      )
-      await NodeDefManager.insertNodeDef({ user, survey, nodeDef: rootEntityDef, system: true }, t)
-    }
+      if (createRootEntityDef) {
+        // Insert root entity def
+        const rootEntityDef = NodeDef.newNodeDef(
+          null,
+          NodeDef.nodeDefType.entity,
+          [Survey.cycleOneKey], // Use first (and only) cycle
+          {
+            [NodeDef.propKeys.name]: 'root_entity',
+            [NodeDef.propKeys.multiple]: false,
+            [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
+              Survey.cycleOneKey,
+              NodeDefLayout.renderType.form,
+              uuidv4()
+            ),
+          }
+        )
+        await NodeDefManager.insertNodeDef({ user, survey, nodeDef: rootEntityDef, system: true }, t)
+      }
 
-    if (updateUserPrefs) {
-      const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
-      await UserRepository.updateUserPrefs(userUpdated, t)
-    }
+      if (updateUserPrefs) {
+        const userUpdated = User.assocPrefSurveyCurrentAndCycle(surveyId, Survey.cycleOneKey)(user)
+        await UserRepository.updateUserPrefs(userUpdated, t)
+      }
 
-    // Create default groups for this survey
-    surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
+      // Create default groups for this survey
+      surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
 
-    await _addUserToSurveyAdmins({ user, surveyInfo }, t)
+      await _addUserToSurveyAdmins({ user, surveyInfo }, t)
 
-    return assocSurveyInfo(surveyInfo)
-  })
+      return assocSurveyInfo(surveyInfo)
+    })
+  } catch (error) {
+    // Survey row (and possibly the schema) were already created outside of this failed step;
+    // clean them up so a failed creation doesn't leave an orphaned survey/schema behind.
+    Logger.error(`error creating survey ${surveyId}, cleaning up: ${error.stack || error}`)
+    await deleteSurvey(surveyId, { deleteUserPrefs: true }, client).catch((cleanupError) => {
+      Logger.error(`error cleaning up survey ${surveyId} after failed creation: ${cleanupError.stack || cleanupError}`)
+    })
+    throw error
+  }
 }
 
 export const importSurvey = async (params, client = db) => {
   const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups(), backup } = params
 
-  return client.tx(async (t) => {
-    // Insert survey into db
-    // a brand-new (imported or cloned) survey has no legacy file paths to migrate, so it's trivially "fully migrated" already
-    const appVersion = getCurrentAppVersionStamp()
-    let surveyInfo = await SurveyRepository.insertSurvey(
-      {
-        survey: surveyInfoParam,
-        props: backup ? Survey.getProps(surveyInfoParam) : {},
-        propsDraft: backup ? Survey.getPropsDraft(surveyInfoParam) : Survey.getProps(surveyInfoParam),
-        appVersion,
-      },
-      t
-    )
-    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+  // See insertSurvey above: migrateSurveySchema opens its own separate db connections, so it must not
+  // run inside a transaction held open by this function (same connection-pool starvation risk).
+  // Insert survey into db
+  // a brand-new (imported or cloned) survey has no legacy file paths to migrate, so it's trivially "fully migrated" already
+  const appVersion = getCurrentAppVersionStamp()
+  const surveyInfo = await SurveyRepository.insertSurvey(
+    {
+      survey: surveyInfoParam,
+      props: backup ? Survey.getProps(surveyInfoParam) : {},
+      propsDraft: backup ? Survey.getPropsDraft(surveyInfoParam) : Survey.getProps(surveyInfoParam),
+      appVersion,
+    },
+    client
+  )
+  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
 
-    // Create survey data schema
+  try {
+    // Create survey data schema (runs outside of any transaction held by this function; see insertSurvey above)
     await DBMigrator.migrateSurveySchema(surveyId)
 
-    // Create default groups for this survey
-    surveyInfo = Survey.assocAuthGroups(await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t))(
-      surveyInfo
-    )
+    return await client.tx(async (t) => {
+      // Create default groups for this survey
+      let surveyInfoUpdated = Survey.assocAuthGroups(
+        await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t)
+      )(surveyInfo)
 
-    surveyInfo = await _fetchAndAssocAdditionalInfo({ surveyInfo }, t)
+      surveyInfoUpdated = await _fetchAndAssocAdditionalInfo({ surveyInfo: surveyInfoUpdated }, t)
 
-    await _addUserToSurveyAdmins({ user, surveyInfo }, t)
+      await _addUserToSurveyAdmins({ user, surveyInfo: surveyInfoUpdated }, t)
 
-    return assocSurveyInfo(surveyInfo)
-  })
+      return assocSurveyInfo(surveyInfoUpdated)
+    })
+  } catch (error) {
+    // Survey row (and possibly the schema) were already created outside of this failed step;
+    // clean them up so a failed import doesn't leave an orphaned survey/schema behind.
+    Logger.error(`error importing survey ${surveyId}, cleaning up: ${error.stack || error}`)
+    await deleteSurvey(surveyId, { deleteUserPrefs: true }, client).catch((cleanupError) => {
+      Logger.error(`error cleaning up survey ${surveyId} after failed import: ${cleanupError.stack || cleanupError}`)
+    })
+    throw error
+  }
 }
 
 // ====== READ
@@ -213,6 +239,7 @@ export const {
   fetchSurveyIdsAndNames,
   fetchDependencies,
   fetchFilesTotalSpace,
+  fetchUserSurveys,
 } = SurveyRepository
 
 /**

@@ -446,4 +446,17 @@ export const init = (app) => {
       next(error)
     }
   })
+
+  app.delete('/user/:userUuid', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const { userUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await UserService.deleteUser({ user, userUuidToDelete: userUuid })
+
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
 }
