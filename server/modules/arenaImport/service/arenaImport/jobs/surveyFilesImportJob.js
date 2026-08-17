@@ -1,4 +1,5 @@
 import * as Survey from '@core/survey/survey'
+import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
@@ -14,13 +15,17 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
 
     const surveyInfo = Survey.getSurveyInfo(survey)
     const preloadedMapLayerFiles = Survey.getPreloadedMapLayers(surveyInfo)
+    const surveyDocImageFiles = Survey.getSurveyDocImages(surveyInfo)
+    const brandingFiles = SurveyBranding.getBrandingFileSummaries(SurveyBranding.getBranding(surveyInfo))
 
-    this.total = preloadedMapLayerFiles.length
+    const fileSummaries = [...preloadedMapLayerFiles, ...surveyDocImageFiles, ...brandingFiles]
+
+    this.total = fileSummaries.length
 
     if (this.total > 0) {
-      this.logDebug(`preloaded map layer files to import: ${this.total}`)
-      await this.checkFilesNotExceedingAvailableQuota(preloadedMapLayerFiles)
-      for (const fileSummary of preloadedMapLayerFiles) {
+      this.logDebug(`survey files to import: ${this.total}`)
+      await this.checkFilesNotExceedingAvailableQuota(fileSummaries)
+      for (const fileSummary of fileSummaries) {
         if (this.isCanceled()) {
           break
         }
