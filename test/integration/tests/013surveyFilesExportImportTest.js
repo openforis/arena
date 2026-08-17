@@ -11,6 +11,7 @@ import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyE
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import { FileImportBaseJob } from '@server/modules/arenaImport/service/arenaImport/jobs/filesImportBaseJob'
+import SurveyFilesImportJob from '@server/modules/arenaImport/service/arenaImport/jobs/surveyFilesImportJob'
 
 import * as SB from '../../utils/surveyBuilder'
 
@@ -139,6 +140,36 @@ describe('Survey files export/import - branding and doc-layout images', () => {
       fileUuid: headerFileUuid,
     })
     expect(Buffer.compare(clonedHeaderContent, headerContent)).toBe(0)
+  })
+
+  test('import warns and skips missing survey file content when skipMissingFiles is true', async () => {
+    const surveyRefetched = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId, draft: true })
+    const fakeZipMissingAllEntries = { getEntryData: async () => null }
+
+    const importJob = new SurveyFilesImportJob({
+      arenaSurveyFileZip: fakeZipMissingAllEntries,
+      survey: surveyRefetched,
+      surveyId: sourceSurveyId,
+      skipMissingFiles: true,
+    })
+    await importJob.start()
+
+    expect(importJob.isSucceeded()).toBe(true)
+  })
+
+  test('import fails on missing survey file content when skipMissingFiles is false', async () => {
+    const surveyRefetched = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId, draft: true })
+    const fakeZipMissingAllEntries = { getEntryData: async () => null }
+
+    const importJob = new SurveyFilesImportJob({
+      arenaSurveyFileZip: fakeZipMissingAllEntries,
+      survey: surveyRefetched,
+      surveyId: sourceSurveyId,
+      skipMissingFiles: false,
+    })
+    await importJob.start()
+
+    expect(importJob.isFailed()).toBe(true)
   })
 
   test('storage quota pre-check sees the real byte size of branding files, not the hardcoded 0', async () => {
