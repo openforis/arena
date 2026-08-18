@@ -5,13 +5,13 @@ import { latestSurveyDataMigrationVersion } from '@server/modules/survey/service
 describe('getPendingSurveyDataMigrationSteps', () => {
   it('returns all steps when the survey has no stored app version', () => {
     const steps = getPendingSurveyDataMigrationSteps({ surveyAppVersion: null })
-    expect(steps).toHaveLength(1)
-    expect(steps[0].version).toBe(latestSurveyDataMigrationVersion)
+    expect(steps).toHaveLength(2)
+    expect(steps.map((step) => step.version)).toEqual(['2.3.20', latestSurveyDataMigrationVersion])
   })
 
   it('returns all steps when the survey app version is older than every step', () => {
     const steps = getPendingSurveyDataMigrationSteps({ surveyAppVersion: '1.0.0' })
-    expect(steps).toHaveLength(1)
+    expect(steps).toHaveLength(2)
   })
 
   it('returns no steps when the survey app version is already at the latest migration version', () => {

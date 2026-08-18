@@ -9,8 +9,8 @@ import {
 } from '@server/modules/survey/service/dataMigration/surveyDataMigrationSteps'
 
 describe('surveyDataMigrationSteps', () => {
-  it('has exactly one entry', () => {
-    expect(surveyDataMigrationSteps).toHaveLength(1)
+  it('has exactly two entries', () => {
+    expect(surveyDataMigrationSteps).toHaveLength(2)
   })
 
   it('exposes the latest version as 2.5.6, computed via version comparison', () => {

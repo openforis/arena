@@ -1,6 +1,7 @@
 import { Versions } from '@openforis/arena-core'
 
 import * as ProcessUtils from '@core/processUtils'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 
 /**
@@ -9,6 +10,12 @@ import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileMan
  * @type {Array<{ version: string, migrate: (params: { surveyId: number }) => Promise<void> }>}
  */
 export const surveyDataMigrationSteps = [
+  {
+    version: '2.3.20', // formerly versionWithCategoryItemIndexFix in server/system/dataMigrator/index.js
+    migrate: async ({ surveyId }) => {
+      await CategoryManager.initializeCategoryItemIndexesForSurvey({ surveyId })
+    },
+  },
   {
     version: '2.5.6', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
     migrate: async ({ surveyId }) => {
