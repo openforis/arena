@@ -3,6 +3,8 @@ import { Box } from '@mui/material'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { PrintOrientations } from '@common/record/printableExport'
+
 import { FormItem } from '@webapp/components/form/Input'
 import { Dropdown } from '@webapp/components/form'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -34,8 +36,8 @@ export const PrintProps = (props: PrintPropsProps) => {
   const items = useMemo(
     () => [
       { value: ORIENTATION_DEFAULT, label: i18n.t('nodeDefEdit.printProps.orientations.default') },
-      { value: 'portrait', label: i18n.t('nodeDefEdit.printProps.orientations.portrait') },
-      { value: 'landscape', label: i18n.t('nodeDefEdit.printProps.orientations.landscape') },
+      { value: PrintOrientations.portrait, label: i18n.t('nodeDefEdit.printProps.orientations.portrait') },
+      { value: PrintOrientations.landscape, label: i18n.t('nodeDefEdit.printProps.orientations.landscape') },
     ],
     [i18n]
   )

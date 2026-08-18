@@ -1,4 +1,9 @@
-import { getRecordPrintableExportUrl } from '@webapp/service/api/data/recordPrintableExportUrl'
+import {
+  getRecordPrintableExportUrl,
+  PrintableExportFormats,
+  PrintableExportScopes,
+  PrintOrientations,
+} from '@webapp/service/api/data/recordPrintableExportUrl'
 
 describe('getRecordPrintableExportUrl', () => {
   test('includes scope, entity, and orientation query params', () => {
@@ -6,17 +11,17 @@ describe('getRecordPrintableExportUrl', () => {
       surveyId: 1,
       recordUuid: 'rec-1',
       lang: 'en',
-      format: 'pdf',
-      exportScope: 'currentPage',
+      format: PrintableExportFormats.pdf,
+      exportScope: PrintableExportScopes.currentPage,
       entityDefUuid: 'def-1',
       entityNodeUuid: 'node-1',
-      orientation: 'landscape',
+      orientation: PrintOrientations.landscape,
     })
     expect(url).toContain('/api/survey/1/record/rec-1/export/pdf?')
-    expect(url).toContain('exportScope=currentPage')
+    expect(url).toContain(`exportScope=${PrintableExportScopes.currentPage}`)
     expect(url).toContain('entityDefUuid=def-1')
     expect(url).toContain('entityNodeUuid=node-1')
-    expect(url).toContain('orientation=landscape')
+    expect(url).toContain(`orientation=${PrintOrientations.landscape}`)
     expect(url).toContain('lang=en')
   })
 
@@ -25,12 +30,12 @@ describe('getRecordPrintableExportUrl', () => {
       surveyId: 1,
       recordUuid: 'rec-1',
       lang: 'en',
-      format: 'docx',
-      exportScope: 'full',
-      orientation: 'portrait',
+      format: PrintableExportFormats.docx,
+      exportScope: PrintableExportScopes.full,
+      orientation: PrintOrientations.portrait,
     })
     expect(url).toContain('/export/docx?')
-    expect(url).toContain('exportScope=full')
+    expect(url).toContain(`exportScope=${PrintableExportScopes.full}`)
     expect(url).not.toContain('entityDefUuid')
   })
 })

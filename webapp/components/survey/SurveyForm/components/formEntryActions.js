@@ -15,6 +15,7 @@ import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord }
 
 import { TestId } from '@webapp/utils/testId'
 import { Button, ButtonDownload, ButtonEditLockToggle } from '@webapp/components/buttons'
+import { PrintableExportFormats } from '@common/record/printableExport'
 import { RecordPrintableExportModal } from './RecordPrintableExportModal'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
@@ -72,7 +73,11 @@ const RecordEntryButtons = (props) => {
         />
       )}
       {printableExportOpen && (
-        <RecordPrintableExportModal open initialFormat="pdf" onClose={() => setPrintableExportOpen(false)} />
+        <RecordPrintableExportModal
+          open
+          initialFormat={PrintableExportFormats.pdf}
+          onClose={() => setPrintableExportOpen(false)}
+        />
       )}
       <div className="survey-form-header__record-actions-steps">
         {canDemote && (

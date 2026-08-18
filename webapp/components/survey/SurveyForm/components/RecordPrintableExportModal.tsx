@@ -5,6 +5,15 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
+import {
+  PrintOrientations,
+  PrintableExportFormats,
+  PrintableExportScopes,
+  type PrintOrientation,
+  type PrintableExportFormat,
+  type PrintableExportScope,
+} from '@common/record/printableExport'
+
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { FormItem } from '@webapp/components/form/Input'
@@ -18,12 +27,7 @@ import {
   hasUnresolvedMultipleAncestor,
   type PagesUuidMap,
 } from '@webapp/store/ui/record/recordPageEntity'
-import {
-  getRecordPrintableExportUrl,
-  PrintableExportFormat,
-  PrintableExportScope,
-  PrintOrientation,
-} from '@webapp/service/api/data/recordPrintableExportUrl'
+import { getRecordPrintableExportUrl } from '@webapp/service/api/data/recordPrintableExportUrl'
 
 type Props = {
   open: boolean
@@ -41,8 +45,8 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
   const pagesUuidMap = usePagesUuidMap() as PagesUuidMap
 
   const [format, setFormat] = useState<PrintableExportFormat>(initialFormat)
-  const [exportScope, setExportScope] = useState<PrintableExportScope>('currentPage')
-  const [orientation, setOrientation] = useState<PrintOrientation>('portrait')
+  const [exportScope, setExportScope] = useState<PrintableExportScope>(PrintableExportScopes.currentPage)
+  const [orientation, setOrientation] = useState<PrintOrientation>(PrintOrientations.portrait)
 
   useEffect(() => {
     setFormat(initialFormat)
@@ -76,14 +80,19 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
       format,
       exportScope,
       orientation,
-      ...(exportScope === 'currentPage' ? { entityDefUuid, entityNodeUuid: entityNodeUuid ?? undefined } : {}),
+      ...(exportScope === PrintableExportScopes.currentPage
+        ? { entityDefUuid, entityNodeUuid: entityNodeUuid ?? undefined }
+        : {}),
     })
   }, [surveyId, record, lang, format, exportScope, orientation, entityDefUuid, entityNodeUuid])
 
   if (!open) return null
 
-  const canDownload = exportScope === 'full' || Boolean(entityDefUuid && entityNodeUuid && !unresolvedMultipleAncestor)
-  const showCurrentPageUnavailable = exportScope === 'currentPage' && (!entityNodeUuid || unresolvedMultipleAncestor)
+  const canDownload =
+    exportScope === PrintableExportScopes.full ||
+    Boolean(entityDefUuid && entityNodeUuid && !unresolvedMultipleAncestor)
+  const showCurrentPageUnavailable =
+    exportScope === PrintableExportScopes.currentPage && (!entityNodeUuid || unresolvedMultipleAncestor)
 
   return (
     <Modal onClose={onClose} title="surveyForm:printableExport.title">
@@ -95,8 +104,8 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
               value={format}
               onChange={(value) => setFormat(value as PrintableExportFormat)}
               items={[
-                { key: 'pdf', label: 'surveyForm:printableExport.formats.pdf' },
-                { key: 'docx', label: 'surveyForm:printableExport.formats.docx' },
+                { key: PrintableExportFormats.pdf, label: 'surveyForm:printableExport.formats.pdf' },
+                { key: PrintableExportFormats.docx, label: 'surveyForm:printableExport.formats.docx' },
               ]}
             />
           </FormItem>
@@ -106,11 +115,14 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
               value={exportScope}
               onChange={(value) => setExportScope(value as PrintableExportScope)}
               items={[
-                { key: 'full', label: 'surveyForm:printableExport.scopes.full' },
-                { key: 'currentPage', label: 'surveyForm:printableExport.scopes.currentPage' },
+                { key: PrintableExportScopes.full, label: 'surveyForm:printableExport.scopes.full' },
+                {
+                  key: PrintableExportScopes.currentPage,
+                  label: 'surveyForm:printableExport.scopes.currentPage',
+                },
               ]}
             />
-            {exportScope === 'currentPage' && (
+            {exportScope === PrintableExportScopes.currentPage && (
               <Box sx={{ mt: 1, typography: 'body2', color: 'text.secondary' }}>
                 {i18n.t('surveyForm:printableExport.currentPageHint', { entityLabel })}
               </Box>
@@ -127,8 +139,14 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
               value={orientation}
               onChange={(value) => setOrientation(value as PrintOrientation)}
               items={[
-                { key: 'portrait', label: 'surveyForm:printableExport.orientations.portrait' },
-                { key: 'landscape', label: 'surveyForm:printableExport.orientations.landscape' },
+                {
+                  key: PrintOrientations.portrait,
+                  label: 'surveyForm:printableExport.orientations.portrait',
+                },
+                {
+                  key: PrintOrientations.landscape,
+                  label: 'surveyForm:printableExport.orientations.landscape',
+                },
               ]}
             />
           </FormItem>

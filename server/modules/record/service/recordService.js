@@ -6,6 +6,7 @@ import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server
 import * as Log from '@server/log/log'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
+import { PrintableExportScopes, PrintOrientations } from '@common/record/printableExport'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
@@ -493,10 +494,10 @@ const exportRecordDocument = async ({
   generator,
   extension,
   contentType,
-  exportScope = 'full',
+  exportScope = PrintableExportScopes.full,
   entityDefUuid,
   entityNodeUuid,
-  orientation = 'portrait',
+  orientation = PrintOrientations.portrait,
 }) => {
   const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true, user })
   const cycle = Record.getCycle(record)
@@ -509,7 +510,7 @@ const exportRecordDocument = async ({
   const langToUse = lang ?? Survey.getDefaultLanguage(survey)
 
   let entityDef = null
-  if (exportScope === 'currentPage') {
+  if (exportScope === PrintableExportScopes.currentPage) {
     if (!entityDefUuid || !entityNodeUuid) {
       throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
     }
@@ -576,7 +577,7 @@ const exportRecordDocument = async ({
     orientation,
   })
   const fileName =
-    exportScope === 'currentPage'
+    exportScope === PrintableExportScopes.currentPage
       ? ExportFileNameGenerator.generate({
           surveyName,
           cycle,

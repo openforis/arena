@@ -1,6 +1,14 @@
-export type PrintableExportFormat = 'pdf' | 'docx'
-export type PrintableExportScope = 'full' | 'currentPage'
-export type PrintOrientation = 'portrait' | 'landscape'
+import {
+  PrintOrientations,
+  PrintableExportFormats,
+  PrintableExportScopes,
+  type PrintOrientation,
+  type PrintableExportFormat,
+  type PrintableExportScope,
+} from '@common/record/printableExport'
+
+export type { PrintableExportFormat, PrintableExportScope, PrintOrientation }
+export { PrintableExportFormats, PrintableExportScopes, PrintOrientations }
 
 export type RecordPrintableExportUrlParams = {
   surveyId: number | string
@@ -18,13 +26,13 @@ export const getRecordPrintableExportUrl = ({
   recordUuid,
   lang,
   format,
-  exportScope = 'full',
+  exportScope = PrintableExportScopes.full,
   entityDefUuid,
   entityNodeUuid,
-  orientation = 'portrait',
+  orientation = PrintOrientations.portrait,
 }: RecordPrintableExportUrlParams): string => {
   const query = new URLSearchParams({ lang, exportScope, orientation })
-  if (exportScope === 'currentPage') {
+  if (exportScope === PrintableExportScopes.currentPage) {
     if (entityDefUuid) query.set('entityDefUuid', entityDefUuid)
     if (entityNodeUuid) query.set('entityNodeUuid', entityNodeUuid)
   }
@@ -32,7 +40,7 @@ export const getRecordPrintableExportUrl = ({
 }
 
 export const getRecordPdfExportUrl = (params: Omit<RecordPrintableExportUrlParams, 'format'>): string =>
-  getRecordPrintableExportUrl({ ...params, format: 'pdf' })
+  getRecordPrintableExportUrl({ ...params, format: PrintableExportFormats.pdf })
 
 export const getRecordDocxExportUrl = (params: Omit<RecordPrintableExportUrlParams, 'format'>): string =>
-  getRecordPrintableExportUrl({ ...params, format: 'docx' })
+  getRecordPrintableExportUrl({ ...params, format: PrintableExportFormats.docx })

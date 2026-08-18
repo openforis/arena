@@ -39,6 +39,9 @@ export {
   getRecordPrintableExportUrl,
   getRecordDocxExportUrl,
   getRecordPdfExportUrl,
+  PrintableExportFormats,
+  PrintableExportScopes,
+  PrintOrientations,
 } from './recordPrintableExportUrl'
 
 // ==== RECORD FILE
