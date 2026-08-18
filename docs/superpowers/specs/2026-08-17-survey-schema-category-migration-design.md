@@ -51,37 +51,45 @@ background pass.
 **Addendum (post-approval):** after this spec was approved, scope grew to
 also add the enabling capability to `arena-server` itself, on its own
 branch (`feat/survey-migration` in the sibling `arena-server` checkout):
-an optional `migrateSurveySchemas` flag on `ArenaServer.init()`, defaulting
-to `true` (unchanged behavior for every other consumer), that skips just
-the survey-schema loop when set to `false`. This is tracked in the
-implementation plan (`docs/superpowers/plans/2026-08-17-survey-schema-category-migration.md`),
-not here, and does not change anything below — `arena`'s own
-`appCluster.js` still does not flip that flag on; see "Out of scope" below,
-which otherwise remains accurate for this repo.
+an optional flag on `ArenaServer.init()` to skip just the survey-schema
+loop while keeping the public-schema migration. That branch proposed
+`migrateSurveySchemas: false`; the version actually released
+(`@openforis/arena-server` `2.0.2`) shipped a different, more general
+shape instead — `skipSurveySchemaDbMigrations?: boolean` (alongside a
+symmetric `skipPublicSchemaDbMigrations?: boolean`, unused here) — not
+authored by this branch. This repo now consumes that real option (see
+"Cutover" below); the `feat/survey-migration` branch itself was never
+pushed/merged and can be considered superseded.
 
-**Out of scope:** any change to `arena`'s own consumption of
-`@openforis/arena-server` (i.e. this repo still calls `ArenaServer.init()`
-plainly, unchanged — see Addendum above for the separate `arena-server`-side
-capability). Today, `ArenaServer.init()` has no option to skip only the
-survey-schema loop while keeping the public-schema migration — the
-all-or-nothing `DISABLE_DB_MIGRATIONS` env var would also skip the public
-schema, which this app still needs migrated synchronously at startup.
-Removing the redundant startup-time survey-schema loop requires
-`arena-server` to expose that finer-grained control; this spec only
-prepares this repo's
-side (the per-survey job now does its own schema migration, so the
-switch-over will be a small, isolated change once that capability
-exists), it does not flip anything off yet.
+**Cutover (post-approval):** `arena`'s `appCluster.js` now calls
+`ArenaServer.init({ skipSurveySchemaDbMigrations: true })`, so
+arena-server's own startup-time survey-schema loop no longer runs (the
+public schema migration still runs synchronously as before). The
+redundancy described below no longer exists. This makes the "Known
+limitation" immediately below load-bearing rather than deferred — see
+its updated note.
 
-**Known limitation, explicitly not addressed here:** `AllSurveysDataMigrationJob`
+**Out of scope (historical — resolved by the Cutover above):** this
+section originally explained why `arena` couldn't yet skip arena-server's
+survey-schema loop. That capability now exists and is in use; kept here
+only as the historical record of the constraint before `2.0.2`.
+
+**Known limitation — now live, not deferred:** `AllSurveysDataMigrationJob`
 only selects surveys whose *data* migration is pending
 (`getSurveysToMigrate` / `isSurveyDataMigrationPending`, keyed off the
-per-survey data-migration version stamp). A survey already fully caught
-up on data migration that later needs a schema-only DDL change (no
-corresponding data step) would not be picked up by this job. This is
-harmless today because arena-server's blanket startup loop still covers
-every survey's schema unconditionally; it only becomes relevant once that
-startup loop is actually removed, and is deferred to that follow-up.
+per-survey data-migration version stamp, itself the same `survey.app_version`
+column arena-server's own schema-migration gate used to read). A survey
+already fully caught up on data migration that later needs a schema-only
+DDL change (a future arena-server migration with no corresponding new
+data-migration step) will **not** be picked up by this job — and, as of
+the Cutover above, nothing else picks it up either; arena-server's own
+blanket startup loop that used to be the safety net for this is now
+skipped. This was flagged as a deferred, harmless-for-now limitation when
+this spec was written; it is no longer harmless-for-now once the cutover
+ships. Not addressed by this spec — flagged for a human decision on
+whether/how to close it (e.g. running `DBMigrator.migrateSurveySchema`
+for every survey regardless of data-migration status, not just the ones
+`getSurveysToMigrate` selects).
 
 ## 1. `SurveyDataMigrationJob.execute()` — add schema migration
 
