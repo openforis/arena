@@ -22,20 +22,53 @@
 
 ---
 
-## Task 1: Bundle survey schema migration into `SurveyDataMigrationJob`
+## Task 1: Migrate each survey's schema right before its data migration job runs
+
+> **Revised after Task 1's task review** (see ledger): the original version of
+> this task put the `DBMigrator.migrateSurveySchema` call inside
+> `SurveyDataMigrationJob.execute()`. `Job.start()` unconditionally wraps
+> `execute()` in `client.tx(...)` (`server/job/job.js:74-82`, documented on
+> the class itself: "execute (in tx)"), so that call ran while the job's own
+> transaction held a pool connection open — the same anti-pattern
+> `SurveyManager.insertSurvey`/`importSurvey` were deliberately rewritten to
+> avoid (`server/modules/survey/manager/surveyManager.js:119-123`), with a
+> dedicated regression test guarding it
+> (`test/integration/tests/_survey/surveyTest.js:28-30`: "used to hold a db
+> transaction open while DBMigrator.migrateSurveySchema acquired another
+> connection from the same pool; concurrent survey creations could then
+> exhaust the pool and hang the whole server"). Confirmed with the human
+> partner: move the call out of `SurveyDataMigrationJob` entirely and into
+> `AllSurveysDataMigrationJob`'s per-survey loop, immediately before starting
+> the inner job — schema migration, then the data-migration job (which stamps
+> `appVersion` as its last, in-transaction step), strictly in that order per
+> survey, so a crash mid-loop leaves already-completed surveys correctly
+> stamped and not re-run, while the next survey in line is safely retried
+> from scratch (schema migration is idempotent).
+>
+> Note this still runs inside `AllSurveysDataMigrationJob`'s own transaction
+> (`Job.start()` wraps every job's `execute()`, with no subclass opt-out —
+> confirmed in `server/job/job.js`, there is no way around this within the
+> current `Job` base class). That is a deliberate, narrower tradeoff than the
+> original finding: this job runs as a single sequential background process
+> from one startup invocation, not on a concurrent request path the way
+> `insertSurvey`/`importSurvey` are, so it does not reproduce the original
+> concurrent-pool-exhaustion bug — but it is not a full elimination of the
+> nested-connection shape either. Flag this plainly when reporting rather
+> than treating it as fully resolved.
 
 **Repo:** `arena` (`/home/stefano/dev/projects/openforis/arena`)
 
 **Files:**
-- Modify: `server/modules/survey/service/dataMigration/surveyDataMigrationJob.js`
+- Modify: `server/modules/survey/service/dataMigration/surveyDataMigrationJob.js` (revert to its pre-Task-1 form — no schema migration call)
+- Modify: `server/modules/survey/service/dataMigration/allSurveysDataMigrationJob.js` (add the schema migration call to the per-survey loop)
 
 **Interfaces:**
 - Consumes: `DBMigrator.migrateSurveySchema(surveyId: number): Promise<void>` — already exported by `@openforis/arena-server` and already used the same way (unconditionally, no client/tx param) in `server/modules/survey/manager/surveyManager.js`'s `insertSurvey`/`importSurvey`.
-- Produces: no change to `SurveyDataMigrationJob`'s external shape (`execute()` still takes nothing, reads `this.context`/`this.tx` as today) — `AllSurveysDataMigrationJob`, which instantiates and starts it, needs no changes anywhere in this plan.
+- Produces: no change to either job's external shape — `AllSurveysDataMigrationJob` is still constructed and enqueued from `appCluster.js` exactly as today (Task 2 doesn't touch this).
 
-- [ ] **Step 1: Edit the file**
+- [ ] **Step 1: Revert `surveyDataMigrationJob.js` to its original form**
 
-Current content:
+If the commit from the previous attempt at this task is still present (`git log --oneline -- server/modules/survey/service/dataMigration/surveyDataMigrationJob.js`), revert its content to exactly this (no `DBMigrator` import, no schema-migration call — this file goes back to doing only what it did before this plan started):
 
 ```js
 import { Versions } from '@openforis/arena-core'
@@ -83,74 +116,151 @@ export default class SurveyDataMigrationJob extends Job {
 SurveyDataMigrationJob.type = 'SurveyDataMigrationJob'
 ```
 
+- [ ] **Step 2: Add the schema migration call to `allSurveysDataMigrationJob.js`**
+
+Current content:
+
+```js
+import Job from '@server/job/job'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { isSurveyDataMigrationPending } from './surveyDataMigrationSteps'
+import SurveyDataMigrationJob from './surveyDataMigrationJob'
+
+/**
+ * Filters the given surveys, keeping only the ones whose stored app version is lower than the latest
+ * survey data migration version, i.e. the ones that still need to be migrated.
+ * @param {Array<{ id: number, appVersion: string }>} surveys - The surveys to filter.
+ * @returns {Array<{ id: number, appVersion: string }>} - The surveys that still need to be migrated.
+ */
+export const getSurveysToMigrate = (surveys) =>
+  surveys.filter(({ appVersion }) => isSurveyDataMigrationPending({ appVersion }))
+
+/**
+ * Job that migrates every survey whose stored app version is behind the latest survey data migration
+ * version. For each survey to migrate, it runs a `SurveyDataMigrationJob` in its own transaction, tolerating
+ * and logging per-survey errors so that a single failing survey does not block the others. Modeled on
+ * `SurveysRdbRefreshJob`.
+ */
+export default class AllSurveysDataMigrationJob extends Job {
+  constructor(params) {
+    super(AllSurveysDataMigrationJob.type, params)
+  }
+
+  async execute() {
+    const surveys = await SurveyManager.fetchSurveyIdsAndAppVersions()
+    const surveysToMigrate = getSurveysToMigrate(surveys)
+    this.total = surveysToMigrate.length
+
+    const surveyIdsWithErrors = []
+    for (const { id: surveyId, appVersion } of surveysToMigrate) {
+      if (this.isCanceled()) return
+      try {
+        this.logDebug(`migrating data for survey ${surveyId}`)
+        const innerJob = new SurveyDataMigrationJob({ surveyId, surveyAppVersion: appVersion })
+        await innerJob.start() // own transaction, like SurveysRdbRefreshJob's inner job
+
+        if (innerJob.isSucceeded()) {
+          this.logDebug(`data for survey ${surveyId} migrated successfully`)
+          this.incrementProcessedItems()
+        } else {
+          surveyIdsWithErrors.push(surveyId)
+          this.logWarn(`could not migrate data for survey ${surveyId}: inner job did not succeed`)
+        }
+      } catch (error) {
+        surveyIdsWithErrors.push(surveyId)
+        this.logError(`error migrating data for survey ${surveyId}: ${error.stack || error}`)
+      }
+    }
+    this.result = { surveyIdsWithErrors }
+  }
+}
+
+AllSurveysDataMigrationJob.type = 'AllSurveysDataMigrationJob'
+```
+
 Replace it with:
 
 ```js
-import { Versions } from '@openforis/arena-core'
 import { DBMigrator } from '@openforis/arena-server'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { getCurrentAppVersionStamp, surveyDataMigrationSteps } from './surveyDataMigrationSteps'
+import { isSurveyDataMigrationPending } from './surveyDataMigrationSteps'
+import SurveyDataMigrationJob from './surveyDataMigrationJob'
 
 /**
- * Determines the data migration steps that still need to be applied to a survey, given the app version
- * it was last migrated to.
- * @param {object} params - The parameters object.
- * @param {string} [params.surveyAppVersion] - The app version the survey was last migrated to (null/undefined is treated as '0.0.0').
- * @returns {Array<{ version: string, migrate: (params: { surveyId: number }) => Promise<void> }>} - The pending migration steps, in order.
+ * Filters the given surveys, keeping only the ones whose stored app version is lower than the latest
+ * survey data migration version, i.e. the ones that still need to be migrated.
+ * @param {Array<{ id: number, appVersion: string }>} surveys - The surveys to filter.
+ * @returns {Array<{ id: number, appVersion: string }>} - The surveys that still need to be migrated.
  */
-export const getPendingSurveyDataMigrationSteps = ({ surveyAppVersion }) =>
-  surveyDataMigrationSteps.filter((step) => Versions.isLessThan(surveyAppVersion ?? '0.0.0', step.version))
+export const getSurveysToMigrate = (surveys) =>
+  surveys.filter(({ appVersion }) => isSurveyDataMigrationPending({ appVersion }))
 
 /**
- * Job that migrates a single survey's schema, then applies every pending data migration step to it, then
- * stamps the survey with the current application version. It is always run inside its own transaction (via
- * `start()`) and it is meant to be instantiated and started directly by `AllSurveysDataMigrationJob`, never
- * registered/created from a serialized job type.
+ * Job that migrates every survey whose stored app version is behind the latest survey data migration
+ * version. For each survey to migrate, it first brings the survey's DDL schema up to date
+ * (`DBMigrator.migrateSurveySchema`, idempotent), then runs a `SurveyDataMigrationJob` in its own transaction
+ * to apply the data-migration steps and stamp the survey's app version — strictly in that order, so a crash
+ * partway through leaves already-completed surveys correctly stamped (and not re-run) while the rest are
+ * safely retried on the next startup. Tolerates and logs per-survey errors so that a single failing survey
+ * does not block the others. Modeled on `SurveysRdbRefreshJob`.
  */
-export default class SurveyDataMigrationJob extends Job {
+export default class AllSurveysDataMigrationJob extends Job {
   constructor(params) {
-    super(SurveyDataMigrationJob.type, params)
+    super(AllSurveysDataMigrationJob.type, params)
   }
 
   async execute() {
-    const { surveyId, surveyAppVersion } = this.context
+    const surveys = await SurveyManager.fetchSurveyIdsAndAppVersions()
+    const surveysToMigrate = getSurveysToMigrate(surveys)
+    this.total = surveysToMigrate.length
 
-    // Bring the survey's DDL schema up to date first; idempotent (db-migrate tracks applied migrations per
-    // schema), so this is safe even though arena-server's own startup migration also still covers it today.
-    await DBMigrator.migrateSurveySchema(surveyId)
+    const surveyIdsWithErrors = []
+    for (const { id: surveyId, appVersion } of surveysToMigrate) {
+      if (this.isCanceled()) return
+      try {
+        this.logDebug(`migrating schema for survey ${surveyId}`)
+        await DBMigrator.migrateSurveySchema(surveyId)
 
-    const stepsToRun = getPendingSurveyDataMigrationSteps({ surveyAppVersion })
-    this.total = stepsToRun.length
+        this.logDebug(`migrating data for survey ${surveyId}`)
+        const innerJob = new SurveyDataMigrationJob({ surveyId, surveyAppVersion: appVersion })
+        await innerJob.start() // own transaction, like SurveysRdbRefreshJob's inner job
 
-    for (const step of stepsToRun) {
-      await step.migrate({ surveyId })
-      this.incrementProcessedItems()
+        if (innerJob.isSucceeded()) {
+          this.logDebug(`data for survey ${surveyId} migrated successfully`)
+          this.incrementProcessedItems()
+        } else {
+          surveyIdsWithErrors.push(surveyId)
+          this.logWarn(`could not migrate data for survey ${surveyId}: inner job did not succeed`)
+        }
+      } catch (error) {
+        surveyIdsWithErrors.push(surveyId)
+        this.logError(`error migrating survey ${surveyId}: ${error.stack || error}`)
+      }
     }
-
-    await SurveyManager.updateSurveyAppVersion({ surveyId, version: getCurrentAppVersionStamp() }, this.tx)
+    this.result = { surveyIdsWithErrors }
   }
 }
 
-SurveyDataMigrationJob.type = 'SurveyDataMigrationJob'
+AllSurveysDataMigrationJob.type = 'AllSurveysDataMigrationJob'
 ```
 
-- [ ] **Step 2: Lint**
+- [ ] **Step 3: Lint**
 
-Run: `npx eslint --cache --fix server/modules/survey/service/dataMigration/surveyDataMigrationJob.js`
+Run: `npx eslint --cache --fix server/modules/survey/service/dataMigration/surveyDataMigrationJob.js server/modules/survey/service/dataMigration/allSurveysDataMigrationJob.js`
 Expected: no errors.
 
-- [ ] **Step 3: Run the unit test suite**
+- [ ] **Step 4: Run the unit test suite**
 
 Run: `yarn test:unit`
-Expected: PASS — `test/unit/tests/040surveyDataMigrationJob.test.js` only exercises `getPendingSurveyDataMigrationSteps`, which is unchanged by this task.
+Expected: PASS — `test/unit/tests/040surveyDataMigrationJob.test.js` only exercises `getPendingSurveyDataMigrationSteps`/`getSurveysToMigrate`, which are unchanged by this task.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
-git add server/modules/survey/service/dataMigration/surveyDataMigrationJob.js
-git commit -m "feat: migrate survey schema alongside per-survey data migration"
+git add server/modules/survey/service/dataMigration/surveyDataMigrationJob.js server/modules/survey/service/dataMigration/allSurveysDataMigrationJob.js
+git commit -m "fix: migrate survey schema before starting its data migration job, not inside it"
 ```
 
 ---
@@ -377,6 +487,7 @@ git commit -m "refactor: replace all-surveys category item index initializer wit
 **Files:**
 - Modify: `server/modules/survey/service/dataMigration/surveyDataMigrationSteps.js`
 - Modify: `test/unit/tests/040surveyDataMigrationJob.test.js`
+- Modify: `test/unit/tests/039surveyDataMigrationSteps.test.js` — found during implementation, missed when this plan was written: it asserts `expect(surveyDataMigrationSteps).toHaveLength(1)`, which must become `toHaveLength(2)` for the same reason as the two assertions in Step 1 below. Its other assertion (`latestSurveyDataMigrationVersion` is `'2.5.6'`) is unaffected and stays as-is.
 
 **Interfaces:**
 - Consumes: `CategoryManager.initializeCategoryItemIndexesForSurvey({ surveyId })` from Task 3.

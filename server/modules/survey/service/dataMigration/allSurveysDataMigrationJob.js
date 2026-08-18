@@ -37,6 +37,12 @@ export default class AllSurveysDataMigrationJob extends Job {
     for (const { id: surveyId, appVersion } of surveysToMigrate) {
       if (this.isCanceled()) return
       try {
+        const stillExists = (await SurveyManager.fetchAllSurveyIds()).includes(surveyId)
+        if (!stillExists) {
+          this.logWarn(`skipping survey ${surveyId}: it no longer exists (deleted concurrently)`)
+          continue
+        }
+
         this.logDebug(`migrating schema for survey ${surveyId}`)
         await DBMigrator.migrateSurveySchema(surveyId)
 

@@ -5,10 +5,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import { db } from '@server/db/db'
-import * as Log from '@server/log/log'
 import * as CategoryRepository from '../repository/categoryRepository'
-
-const logger = Log.getLogger('CategoryItemIndexInitializer')
 
 const shouldItemIndexBeInitialized = (item) => item && Objects.isEmpty(CategoryItem.getIndex(item))
 

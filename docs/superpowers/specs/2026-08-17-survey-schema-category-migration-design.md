@@ -85,6 +85,21 @@ startup loop is actually removed, and is deferred to that follow-up.
 
 ## 1. `SurveyDataMigrationJob.execute()` — add schema migration
 
+> **Correction (post-approval):** this section originally specified putting
+> the `DBMigrator.migrateSurveySchema` call inside `SurveyDataMigrationJob.execute()`,
+> arguing the transaction-nesting tradeoff below was acceptable. A task-scoped
+> implementation review caught that this reintroduced a connection-pool-starvation
+> anti-pattern this codebase has a dedicated regression test against
+> (`test/integration/tests/_survey/surveyTest.js`, for the same call in
+> `SurveyManager.insertSurvey`/`importSurvey`). The corrected design — confirmed
+> with the human partner — moves the call to `AllSurveysDataMigrationJob`'s
+> per-survey loop instead, immediately before starting the inner
+> `SurveyDataMigrationJob`, so schema migration and the data-migration job still
+> run strictly in that order per survey. The rest of this section (below) is
+> preserved as the historical record of the original (rejected) reasoning;
+> read it as describing what was proposed, not what shipped. See the
+> implementation plan's Task 1 for the corrected code.
+
 `server/modules/survey/service/dataMigration/surveyDataMigrationJob.js`:
 import `DBMigrator` from `@openforis/arena-server` (same package/export
 already used by `SurveyManager.insertSurvey`/`importSurvey`) and call

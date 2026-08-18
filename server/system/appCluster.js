@@ -30,7 +30,7 @@ export const run = async () => {
 
   // ArenaServer.init() still synchronously migrates every survey's schema at startup, via arena-server's own
   // DBMigrator.migrateAll() (public schema + a loop over every survey's schema). That survey-schema loop is
-  // now redundant with SurveyDataMigrationJob's own DBMigrator.migrateSurveySchema call (below), but there's
+  // now redundant with AllSurveysDataMigrationJob's own DBMigrator.migrateSurveySchema call (below), but there's
   // currently no way to opt out of just that loop while keeping the public-schema migration this app still
   // needs synchronously here. arena-server's feat/survey-migration branch adds ArenaServer.init({
   // migrateSurveySchemas: false }) for exactly this; once a release containing it is published and this
