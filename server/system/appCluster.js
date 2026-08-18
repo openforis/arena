@@ -15,7 +15,6 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as apiRouter from './apiRouter'
-import { DataMigrator } from './dataMigrator'
 import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
@@ -29,6 +28,13 @@ export const run = async () => {
 
   logger.info('server initialization start')
 
+  // ArenaServer.init() still synchronously migrates every survey's schema at startup, via arena-server's own
+  // DBMigrator.migrateAll() (public schema + a loop over every survey's schema). That survey-schema loop is
+  // now redundant with SurveyDataMigrationJob's own DBMigrator.migrateSurveySchema call (below), but there's
+  // currently no way to opt out of just that loop while keeping the public-schema migration this app still
+  // needs synchronously here. arena-server's feat/survey-migration branch adds ArenaServer.init({
+  // migrateSurveySchemas: false }) for exactly this; once a release containing it is published and this
+  // repo's @openforis/arena-server dependency is bumped, switch to it here and remove this redundancy.
   const arenaApp = await ArenaServer.init()
   const { express: app, serviceRegistry } = arenaApp
 
@@ -57,9 +63,6 @@ export const run = async () => {
 
   // ====== System Admin user creation
   await UserService.insertSystemAdminUserIfNotExisting()
-
-  // Data migrations
-  await DataMigrator.migrateData({ logger, serviceRegistry })
 
   // run files storage check after DB migrations
   await SurveyFileService.checkFilesStorage()
