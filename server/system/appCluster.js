@@ -28,14 +28,10 @@ export const run = async () => {
 
   logger.info('server initialization start')
 
-  // ArenaServer.init() still synchronously migrates every survey's schema at startup, via arena-server's own
-  // DBMigrator.migrateAll() (public schema + a loop over every survey's schema). That survey-schema loop is
-  // now redundant with AllSurveysDataMigrationJob's own DBMigrator.migrateSurveySchema call (below), but there's
-  // currently no way to opt out of just that loop while keeping the public-schema migration this app still
-  // needs synchronously here. arena-server's feat/survey-migration branch adds ArenaServer.init({
-  // migrateSurveySchemas: false }) for exactly this; once a release containing it is published and this
-  // repo's @openforis/arena-server dependency is bumped, switch to it here and remove this redundancy.
-  const arenaApp = await ArenaServer.init()
+  // Skip arena-server's own startup-time survey-schema migration loop (still migrates the public schema
+  // synchronously here, as before): AllSurveysDataMigrationJob (below) now migrates each survey's schema
+  // itself, together with that survey's data migration, so the two no longer need to run twice.
+  const arenaApp = await ArenaServer.init({ skipSurveySchemaDbMigrations: true })
   const { express: app, serviceRegistry } = arenaApp
 
   if (ProcessUtils.isEnvDevelopment) {
