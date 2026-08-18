@@ -1,3 +1,5 @@
+import { DBMigrator } from '@openforis/arena-server'
+
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { isSurveyDataMigrationPending } from './surveyDataMigrationSteps'
@@ -14,9 +16,12 @@ export const getSurveysToMigrate = (surveys) =>
 
 /**
  * Job that migrates every survey whose stored app version is behind the latest survey data migration
- * version. For each survey to migrate, it runs a `SurveyDataMigrationJob` in its own transaction, tolerating
- * and logging per-survey errors so that a single failing survey does not block the others. Modeled on
- * `SurveysRdbRefreshJob`.
+ * version. For each survey to migrate, it first brings the survey's DDL schema up to date
+ * (`DBMigrator.migrateSurveySchema`, idempotent), then runs a `SurveyDataMigrationJob` in its own transaction
+ * to apply the data-migration steps and stamp the survey's app version — strictly in that order, so a crash
+ * partway through leaves already-completed surveys correctly stamped (and not re-run) while the rest are
+ * safely retried on the next startup. Tolerates and logs per-survey errors so that a single failing survey
+ * does not block the others. Modeled on `SurveysRdbRefreshJob`.
  */
 export default class AllSurveysDataMigrationJob extends Job {
   constructor(params) {
@@ -32,6 +37,9 @@ export default class AllSurveysDataMigrationJob extends Job {
     for (const { id: surveyId, appVersion } of surveysToMigrate) {
       if (this.isCanceled()) return
       try {
+        this.logDebug(`migrating schema for survey ${surveyId}`)
+        await DBMigrator.migrateSurveySchema(surveyId)
+
         this.logDebug(`migrating data for survey ${surveyId}`)
         const innerJob = new SurveyDataMigrationJob({ surveyId, surveyAppVersion: appVersion })
         await innerJob.start() // own transaction, like SurveysRdbRefreshJob's inner job
@@ -45,7 +53,7 @@ export default class AllSurveysDataMigrationJob extends Job {
         }
       } catch (error) {
         surveyIdsWithErrors.push(surveyId)
-        this.logError(`error migrating data for survey ${surveyId}: ${error.stack || error}`)
+        this.logError(`error migrating survey ${surveyId}: ${error.stack || error}`)
       }
     }
     this.result = { surveyIdsWithErrors }
