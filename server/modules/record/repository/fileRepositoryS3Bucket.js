@@ -10,7 +10,7 @@ export { checkCanAccessS3Bucket } from '@server/modules/file/repository/fileRepo
 const getSubfolder = ({ recordUuid }) => (recordUuid ? 'record_files' : 'survey_files')
 
 const getFileKey = ({ surveyId, fileUuid, recordUuid = null }) =>
-  `${surveyId}/${getSubfolder({ recordUuid })}/${fileUuid}`
+  `surveys/${surveyId}/${getSubfolder({ recordUuid })}/${fileUuid}`
 
 const getLegacyFileKey = ({ surveyId, fileUuid }) => `${surveyId}_${fileUuid}`
 
