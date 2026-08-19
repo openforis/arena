@@ -1,24 +1,32 @@
 import * as schedule from 'node-schedule'
 
+import { runWithClusterLock } from '@openforis/arena-server'
+
 import * as Log from '@server/log/log'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 const Logger = Log.getLogger('TemporarySurveysCleanup')
 
+const lockName = 'scheduler-temporary-surveys-cleanup'
 const items = 'stale temporary surveys'
 const task = `deleting ${items}`
 
 const deleteTemporarySurveys = async (olderThan24Hours = false) => {
-  try {
-    Logger.debug(task)
+  await runWithClusterLock({
+    lockName,
+    fn: async () => {
+      try {
+        Logger.debug(task)
 
-    const count = await SurveyService.deleteTemporarySurveys(olderThan24Hours)
+        const count = await SurveyService.deleteTemporarySurveys(olderThan24Hours)
 
-    Logger.debug(`${count} ${items} deleted`)
-  } catch (error) {
-    Logger.error(`Error ${task}: ${error.toString()}`)
-  }
+        Logger.debug(`${count} ${items} deleted`)
+      } catch (error) {
+        Logger.error(`Error ${task}: ${error.toString()}`)
+      }
+    },
+  })
 }
 
 export const init = async () => {
