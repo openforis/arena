@@ -2,7 +2,7 @@ import * as express from 'express'
 import morgan from 'morgan'
 
 import { ServiceType } from '@openforis/arena-core'
-import { ArenaServer } from '@openforis/arena-server'
+import { ArenaServer, runWithClusterLock } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
 
@@ -53,10 +53,16 @@ export const run = async () => {
   SwaggerInitializer.init(app)
 
   // Data migrations
-  await DataMigrator.migrateData({ logger, serviceRegistry })
+  await runWithClusterLock({
+    lockName: 'boot-data-migration',
+    fn: () => DataMigrator.migrateData({ logger, serviceRegistry }),
+  })
 
   // ====== System Admin user creation
-  await UserService.insertSystemAdminUserIfNotExisting()
+  await runWithClusterLock({
+    lockName: 'boot-insert-system-admin-user',
+    fn: () => UserService.insertSystemAdminUserIfNotExisting(),
+  })
 
   // run files storage check after DB migrations
   await SurveyFileService.checkFilesStorage()
