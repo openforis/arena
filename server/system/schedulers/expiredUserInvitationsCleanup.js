@@ -12,20 +12,20 @@ const lockName = 'scheduler-expired-user-invitations-cleanup'
 const entriesType = 'users with expired invitations and surveys'
 
 const deleteExpiredItems = async () => {
-  await runWithClusterLock({
-    lockName,
-    fn: async () => {
-      try {
+  try {
+    await runWithClusterLock({
+      lockName,
+      fn: async () => {
         Logger.debug(`Deleting ${entriesType}`)
 
         const { deletedUsers, deletedSurveyIds } = await UserService.deleteExpiredInvitationsUsersAndSurveys()
 
         Logger.debug(`${deletedUsers.length} users deleted, ${deletedSurveyIds.length} surveys could be deleted`)
-      } catch (error) {
-        Logger.error(`Error deleting ${entriesType}: ${error.toString()}`)
-      }
-    },
-  })
+      },
+    })
+  } catch (error) {
+    Logger.error(`Error deleting ${entriesType}: ${error.toString()}`)
+  }
 }
 
 export const init = async () => {

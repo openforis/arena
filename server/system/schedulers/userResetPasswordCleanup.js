@@ -12,20 +12,20 @@ const lockName = 'scheduler-user-reset-password-cleanup'
 const entriesType = 'expired user reset password entries'
 
 const deleteExpiredItems = async () => {
-  await runWithClusterLock({
-    lockName,
-    fn: async () => {
-      try {
+  try {
+    await runWithClusterLock({
+      lockName,
+      fn: async () => {
         Logger.debug(`Deleting ${entriesType}`)
 
         const count = await UserService.deleteUserResetPasswordExpired()
 
         Logger.debug(`${count} ${entriesType} deleted`)
-      } catch (error) {
-        Logger.error(`Error deleting ${entriesType}: ${error.toString()}`)
-      }
-    },
-  })
+      },
+    })
+  } catch (error) {
+    Logger.error(`Error deleting ${entriesType}: ${error.toString()}`)
+  }
 }
 
 export const init = async () => {

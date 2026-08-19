@@ -67,7 +67,11 @@ const cleanupTempFiles = async (olderThanHours = 4) => {
   await cleanupFileSystemTempFiles(olderThanHours)
 
   if (getFileContentStorageType() === fileContentStorageTypes.s3Bucket) {
-    await runWithClusterLock({ lockName, fn: () => cleanupS3TempFiles(olderThanHours) })
+    try {
+      await runWithClusterLock({ lockName, fn: () => cleanupS3TempFiles(olderThanHours) })
+    } catch (error) {
+      Logger.error('Error acquiring cluster lock for S3 temp files cleanup', error)
+    }
   }
 }
 

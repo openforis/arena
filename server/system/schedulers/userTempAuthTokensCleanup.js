@@ -13,21 +13,21 @@ const items = 'expired temporary user auth tokens'
 const task = `deleting ${items}`
 
 const deleteExpiredUserTempAuthTokens = async () => {
-  await runWithClusterLock({
-    lockName,
-    fn: async () => {
-      try {
+  try {
+    await runWithClusterLock({
+      lockName,
+      fn: async () => {
         Logger.debug(task)
 
         const serviceRegistry = ServiceRegistry.getInstance()
         const userTempAuthTokenService = serviceRegistry.getService(ServerServiceType.userTempAuthToken)
         const count = await userTempAuthTokenService.cleanupExpired()
         Logger.debug(`${count} ${items} deleted`)
-      } catch (error) {
-        Logger.error(`Error ${task}: ${error.toString()}`)
-      }
-    },
-  })
+      },
+    })
+  } catch (error) {
+    Logger.error(`Error ${task}: ${error.toString()}`)
+  }
 }
 
 export const init = async () => {

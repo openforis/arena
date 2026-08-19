@@ -13,20 +13,20 @@ const items = 'stale temporary surveys'
 const task = `deleting ${items}`
 
 const deleteTemporarySurveys = async (olderThan24Hours = false) => {
-  await runWithClusterLock({
-    lockName,
-    fn: async () => {
-      try {
+  try {
+    await runWithClusterLock({
+      lockName,
+      fn: async () => {
         Logger.debug(task)
 
         const count = await SurveyService.deleteTemporarySurveys(olderThan24Hours)
 
         Logger.debug(`${count} ${items} deleted`)
-      } catch (error) {
-        Logger.error(`Error ${task}: ${error.toString()}`)
-      }
-    },
-  })
+      },
+    })
+  } catch (error) {
+    Logger.error(`Error ${task}: ${error.toString()}`)
+  }
 }
 
 export const init = async () => {

@@ -11,20 +11,20 @@ import * as RecordService from '@server/modules/record/service/recordService'
 const lockName = 'scheduler-record-preview-cleanup'
 
 const deleteRecordsPreview = async (olderThan24Hours = false) => {
-  await runWithClusterLock({
-    lockName,
-    fn: async () => {
-      try {
+  try {
+    await runWithClusterLock({
+      lockName,
+      fn: async () => {
         Logger.debug('Deleting stale preview records')
 
         const count = await RecordService.deleteRecordsPreview(olderThan24Hours)
 
         Logger.debug(`${count} stale preview records deleted`)
-      } catch (error) {
-        Logger.error(`Error deleting stale preview records: ${error.toString()}`)
-      }
-    },
-  })
+      },
+    })
+  } catch (error) {
+    Logger.error(`Error deleting stale preview records: ${error.toString()}`)
+  }
 }
 
 export const init = async () => {
