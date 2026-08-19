@@ -1,66 +1,87 @@
-import * as FileManagerCommon from '@server/modules/file/manager/fileManagerCommon'
+import {
+  getStorageFunctionOrThrow,
+  chunkWriteFunctionByStorageType,
+  chunkMergeFunctionByStorageType,
+} from '@server/modules/file/manager/tempFileManager'
+import { fileContentStorageTypes } from '@server/modules/file/manager/fileManagerCommon'
+import * as TempFileRepositoryFileSystem from '@server/modules/file/repository/tempFileRepositoryFileSystem'
+import * as TempFileRepositoryS3Bucket from '@server/modules/file/repository/tempFileRepositoryS3Bucket'
 import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import * as ProcessUtils from '@core/processUtils'
 
 describe('TempFileManager storage routing', () => {
-  test('writeChunkToTempFile and mergeTempChunks do not have totalFileSize threshold', async () => {
-    // This test verifies that writeChunkToTempFile and mergeTempChunks no longer enforce a 10MB size threshold.
-    // The refactored code routes files based on configured storage type, not file size.
-    // We can't directly verify this with mocks in the bundled environment, but we can verify:
-    // 1. The functions exist and are callable
-    // 2. They have the expected signatures (no totalFileSize parameter required)
-    // 3. They call getFileContentStorageType to determine routing
+  test('routes to S3 functions when S3 storage is configured, regardless of file size', () => {
+    const writeFn = getStorageFunctionOrThrow({
+      functionByStorageType: chunkWriteFunctionByStorageType,
+      operation: 'writeChunkToTempFile',
+      storageType: fileContentStorageTypes.s3Bucket,
+    })
+    expect(writeFn).toBe(TempFileRepositoryS3Bucket.writeChunkToTempFile)
 
-    // Verify functions are exported
-    expect(typeof TempFileManager.writeChunkToTempFile).toBe('function')
-    expect(typeof TempFileManager.mergeTempChunks).toBe('function')
-
-    // Verify getFileContentStorageType exists and returns a valid storage type
-    const storageType = FileManagerCommon.getFileContentStorageType()
-    expect([
-      FileManagerCommon.fileContentStorageTypes.fileSystem,
-      FileManagerCommon.fileContentStorageTypes.s3Bucket,
-      FileManagerCommon.fileContentStorageTypes.db,
-    ]).toContain(storageType)
-
-    // Verify the function signatures - they should accept parameters without totalFileSize being required
-    // (though callers may still pass it for backward compatibility, it's no longer destructured)
-    // This is verified by checking that the functions are callable with minimal params
-    const writeChunkSig = TempFileManager.writeChunkToTempFile.toString()
-    const mergeChunksSig = TempFileManager.mergeTempChunks.toString()
-
-    expect(writeChunkSig).toContain('fileId')
-    expect(writeChunkSig).toContain('chunk')
-    expect(mergeChunksSig).toContain('fileId')
-    expect(mergeChunksSig).toContain('totalChunks')
-
-    // The old code would have had logic checking if totalFileSize > 10MB
-    // The new code should not have this check - it routes based on configured storage type
-    // We verify this by checking that the implementation calls getStorageFunctionOrThrow
-    expect(writeChunkSig).not.toContain('minFileSizeToUseAlternativeStorage')
-    expect(mergeChunksSig).not.toContain('minFileSizeToUseAlternativeStorage')
+    const mergeFn = getStorageFunctionOrThrow({
+      functionByStorageType: chunkMergeFunctionByStorageType,
+      operation: 'mergeTempChunks',
+      storageType: fileContentStorageTypes.s3Bucket,
+    })
+    expect(mergeFn).toBe(TempFileRepositoryS3Bucket.mergeTempChunks)
   })
 
-  test('writeChunkToTempFile signature does not require totalFileSize parameter', () => {
-    // Verify that totalFileSize is no longer a required parameter
-    // (it may still be passed by callers for backward compatibility, but it's ignored)
-    const sig = TempFileManager.writeChunkToTempFile.toString()
-    // The parameter list should not show totalFileSize as a required parameter
-    // Check that destructuring doesn't include totalFileSize being extracted
-    const destructureMatch = sig.match(/{\s*([^}]+)\s*}/)
-    expect(destructureMatch).toBeDefined()
-    const params = destructureMatch?.[1] ?? ''
-    // totalFileSize should not be in the extracted parameters
-    expect(params).not.toContain('totalFileSize')
+  test('routes to file-system functions when file-system storage is configured', () => {
+    const writeFn = getStorageFunctionOrThrow({
+      functionByStorageType: chunkWriteFunctionByStorageType,
+      operation: 'writeChunkToTempFile',
+      storageType: fileContentStorageTypes.fileSystem,
+    })
+    expect(writeFn).toBe(TempFileRepositoryFileSystem.writeChunkToTempFile)
+
+    const mergeFn = getStorageFunctionOrThrow({
+      functionByStorageType: chunkMergeFunctionByStorageType,
+      operation: 'mergeTempChunks',
+      storageType: fileContentStorageTypes.fileSystem,
+    })
+    expect(mergeFn).toBe(TempFileRepositoryFileSystem.mergeTempChunks)
   })
 
-  test('mergeTempChunks signature does not require totalFileSize parameter', () => {
-    // Verify that totalFileSize is no longer a required parameter
-    const sig = TempFileManager.mergeTempChunks.toString()
-    // The parameter list should not show totalFileSize as a required parameter
-    const destructureMatch = sig.match(/{\s*([^}]+)\s*}/)
-    expect(destructureMatch).toBeDefined()
-    const params = destructureMatch?.[1] ?? ''
-    // totalFileSize should not be in the extracted parameters
-    expect(params).not.toContain('totalFileSize')
+  test('routes db storage type to file-system functions (temp chunks always need a real location)', () => {
+    const writeFn = getStorageFunctionOrThrow({
+      functionByStorageType: chunkWriteFunctionByStorageType,
+      operation: 'writeChunkToTempFile',
+      storageType: fileContentStorageTypes.db,
+    })
+    expect(writeFn).toBe(TempFileRepositoryFileSystem.writeChunkToTempFile)
+
+    const mergeFn = getStorageFunctionOrThrow({
+      functionByStorageType: chunkMergeFunctionByStorageType,
+      operation: 'mergeTempChunks',
+      storageType: fileContentStorageTypes.db,
+    })
+    expect(mergeFn).toBe(TempFileRepositoryFileSystem.mergeTempChunks)
+  })
+
+  test('writeChunkToTempFile and mergeTempChunks succeed for a "large" file with no size-based branching left', async () => {
+    // No FILE_STORAGE_PATH/FILE_STORAGE_AWS_S3_BUCKET_NAME set in this environment, so
+    // getFileContentStorageType() resolves to 'db', which getStorageFunctionOrThrow maps to
+    // fileSystem for temp-chunk storage. These are the real, unmocked functions.
+    // Passing a totalFileSize far above the old 10MB threshold proves there's no lingering
+    // size-based branch that would route this elsewhere or fail.
+    // The real server creates this folder on startup (see server/server.js); unit tests don't run
+    // that startup path, so ensure it exists here too (this is the actual temp folder, not a mock).
+    await FileUtils.mkdir(ProcessUtils.ENV.tempFolder)
+
+    const fileId = 'test-file-no-size-branch'
+    await TempFileManager.writeChunkToTempFile({
+      fileId,
+      chunk: 1,
+      totalFileSize: 999999999999,
+      fileContent: Buffer.from('test content'),
+    })
+    const mergedPath = await TempFileManager.mergeTempChunks({
+      fileId,
+      totalChunks: 1,
+      totalFileSize: 999999999999,
+    })
+    expect(mergedPath).toBeTruthy()
+    await TempFileManager.deleteTempFile(mergedPath)
   })
 })

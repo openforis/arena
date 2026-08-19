@@ -8,25 +8,29 @@ import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3B
 
 export { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 
-const contentDeleteFunctionByStorageType = {
+export const contentDeleteFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.deleteFile,
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.deleteFile,
 }
 
-const chunkWriteFunctionByStorageType = {
+export const chunkWriteFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.writeChunkToTempFile,
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.writeChunkToTempFile,
 }
 
-const chunkMergeFunctionByStorageType = {
+export const chunkMergeFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.mergeTempChunks,
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.mergeTempChunks,
 }
 
-const getStorageFunctionOrThrow = ({ functionByStorageType, operation, defaultFn = null }) => {
-  const fileStorageType = getFileContentStorageType()
+export const getStorageFunctionOrThrow = ({
+  functionByStorageType,
+  operation,
+  defaultFn = null,
+  storageType = getFileContentStorageType(),
+}) => {
   const tempFileStorageType =
-    fileStorageType === fileContentStorageTypes.db ? fileContentStorageTypes.fileSystem : fileStorageType
+    storageType === fileContentStorageTypes.db ? fileContentStorageTypes.fileSystem : storageType
   const fn = functionByStorageType[tempFileStorageType] ?? defaultFn
   if (!fn) {
     throw new Error(`Operation '${operation}' not implemented for storage type '${tempFileStorageType}'`)
