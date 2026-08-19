@@ -2,6 +2,13 @@ module.exports = {
   roots: ['<rootDir>/'],
   testEnvironment: 'node',
   setupFiles: [require.resolve('./test/unit/jest.setup.js')],
+  moduleNameMapper: {
+    '^@common/(.*)$': '<rootDir>/common/$1',
+    '^@core/(.*)$': '<rootDir>/core/$1',
+    '^@server/(.*)$': '<rootDir>/server/$1',
+    '^@webapp/(.*)$': '<rootDir>/webapp/$1',
+    '^@test/(.*)$': '<rootDir>/test/$1',
+  },
   // The allowlist below only applies to a package's own (deepest) node_modules segment: the
   // `(?!.*/node_modules/)` guard forces the match position to be the LAST /node_modules/ in the
   // path, so a package that itself nests inside another, non-allowlisted package (e.g.
