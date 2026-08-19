@@ -10,7 +10,7 @@ module.exports = {
   // transformed based on its own immediate package name, instead of being skipped just because an
   // earlier, non-allowlisted wrapper package appears earlier in the path.
   transformIgnorePatterns: [
-    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@openforis/arena-core/node_modules/uuid/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/)',
+    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/)',
   ],
   verbose: true,
 }
