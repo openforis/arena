@@ -1,3 +1,5 @@
+import { runWithClusterLock } from '@openforis/arena-server'
+
 import * as Log from '@server/log/log'
 import * as SurveyRepository from '../repository/surveyRepository'
 import * as SurveyFileManager from '../manager/surveyFileManager'
@@ -16,26 +18,32 @@ export const checkFilesStorage = async () => {
   if (storageType === SurveyFileManager.fileContentStorageTypes.db) {
     return
   }
-  logger.debug(`Moving survey files to new storage (if necessary)`)
-  const surveyIds = await SurveyRepository.fetchAllSurveyIds()
-  let allSurveysFilesMoved = false
-  let errorsFound = false
-  for (const surveyId of surveyIds) {
-    try {
-      const surveyFilesMoved = await SurveyFileManager.moveFilesToNewStorageIfNecessary({ surveyId })
-      allSurveysFilesMoved = allSurveysFilesMoved || surveyFilesMoved
-    } catch (error) {
-      errorsFound = true
-      logger.error(`Error moving files for survey ${surveyId}`, error)
-    }
-  }
-  if (errorsFound) {
-    logger.error(`There were errors moving survey files to the new storage`)
-  } else if (allSurveysFilesMoved) {
-    logger.debug(`Survey files moved successfully`)
-  } else {
-    logger.debug('Survey files move not necessary')
-  }
+
+  await runWithClusterLock({
+    lockName: 'boot-survey-files-storage-migration',
+    fn: async () => {
+      logger.debug(`Moving survey files to new storage (if necessary)`)
+      const surveyIds = await SurveyRepository.fetchAllSurveyIds()
+      let allSurveysFilesMoved = false
+      let errorsFound = false
+      for (const surveyId of surveyIds) {
+        try {
+          const surveyFilesMoved = await SurveyFileManager.moveFilesToNewStorageIfNecessary({ surveyId })
+          allSurveysFilesMoved = allSurveysFilesMoved || surveyFilesMoved
+        } catch (error) {
+          errorsFound = true
+          logger.error(`Error moving files for survey ${surveyId}`, error)
+        }
+      }
+      if (errorsFound) {
+        logger.error(`There were errors moving survey files to the new storage`)
+      } else if (allSurveysFilesMoved) {
+        logger.debug(`Survey files moved successfully`)
+      } else {
+        logger.debug('Survey files move not necessary')
+      }
+    },
+  })
 }
 
 export const fetchFilesStatistics = async ({ surveyId }) => {

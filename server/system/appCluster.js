@@ -55,7 +55,16 @@ export const run = async () => {
   // Data migrations
   await runWithClusterLock({
     lockName: 'boot-data-migration',
-    fn: () => DataMigrator.migrateData({ logger, serviceRegistry }),
+    fn: async () => {
+      await DataMigrator.migrateData({ logger, serviceRegistry })
+
+      // ====== Update app version in DB
+      // Only the dyno that actually ran (or attempted) the migration should record the new version,
+      // so that a dyno that lost the lock (and therefore doesn't know if the migration completed)
+      // never marks it as done prematurely.
+      const infoService = serviceRegistry.getService(ServiceType.info)
+      await infoService.updateVersion()
+    },
   })
 
   // ====== System Admin user creation
@@ -66,10 +75,6 @@ export const run = async () => {
 
   // run files storage check after DB migrations
   await SurveyFileService.checkFilesStorage()
-
-  // ====== Update app version in DB
-  const infoService = serviceRegistry.getService(ServiceType.info)
-  await infoService.updateVersion()
 
   // ====== Start server
   await ArenaServer.start(arenaApp)
