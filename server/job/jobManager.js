@@ -1,26 +1,47 @@
 import { JobRepository } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
+import * as Log from '@server/log/log'
+
 import { JobQueue } from './JobQueue'
 import { jobRowToSummary } from './jobUtils'
+
+const logger = Log.getLogger('JobManager')
 
 const queue = new JobQueue({ concurrency: ProcessUtils.ENV.jobQueueConcurrency })
 
 // ====== READ
 
 export const getActiveJobSummary = async (userUuid) => {
-  const jobRow = await JobRepository.getActiveByUserUuid(userUuid)
-  if (jobRow) return jobRowToSummary(jobRow)
-  // Not every job is persisted (global jobs aren't - see job-queue-persistence plan's Global Constraints),
-  // and there's a brief window right after enqueue before the fire-and-forget insert lands - fall back to
-  // this dyno's own local state, which is always correct for a job this dyno actually knows about.
-  return queue.getRunningJobSummaryByUserUuid(userUuid)
+  // Check local state first: this dyno's own in-memory state is always more current than the DB
+  // for a job it actually knows about - no post-enqueue race window (the DB insert might not have
+  // landed yet), and no loss of composite-job detail (jobRowToSummary can't reconstruct
+  // innerJobs/currentInnerJobIndex, so a DB-first read degrades progress detail for the very dyno
+  // that's actually running the job). Fall back to the DB only when this dyno doesn't know about
+  // the job at all (e.g. it's running on a different dyno, or this dyno restarted).
+  const localSummary = queue.getRunningJobSummaryByUserUuid(userUuid)
+  if (localSummary) return localSummary
+
+  try {
+    const jobRow = await JobRepository.getActiveByUserUuid(userUuid)
+    return jobRow ? jobRowToSummary(jobRow) : null
+  } catch (error) {
+    logger.error(`error reading active job summary from DB: ${error}`)
+    return null
+  }
 }
 
 export const getJobSummary = async (jobUuid) => {
-  const jobRow = await JobRepository.getByUuid(jobUuid)
-  if (jobRow) return jobRowToSummary(jobRow)
-  return queue.getJobSummary(jobUuid)
+  const localSummary = queue.getJobSummary(jobUuid)
+  if (localSummary) return localSummary
+
+  try {
+    const jobRow = await JobRepository.getByUuid(jobUuid)
+    return jobRow ? jobRowToSummary(jobRow) : null
+  } catch (error) {
+    logger.error(`error reading job summary from DB: ${error}`)
+    return null
+  }
 }
 
 // ====== UPDATE
