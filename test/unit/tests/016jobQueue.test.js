@@ -183,5 +183,65 @@ describe('JobQueue test', () => {
       expect.anything(),
       expect.objectContaining({ status: jobStatus.failed })
     )
+    expect(updateStatusSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        uuid: job.uuid,
+        status: jobStatus.failed,
+        props: expect.objectContaining({
+          errors: expect.objectContaining({
+            generic: expect.objectContaining({
+              params: expect.objectContaining({ text: expect.stringContaining('already running') }),
+            }),
+          }),
+        }),
+      })
+    )
+  })
+
+  test('a job cancelled while its cluster-wide check is in flight is not executed and does not block a different queued job', async () => {
+    // Regression test for a race between cancelJobByUserUuid (which mutates the queue
+    // directly, synchronously, outside _startNextJob's serialization chain) and
+    // _startNextJobInternal's post-await splice: the index a job occupied before the
+    // async _hasActiveJobElsewhere check can go stale if something else mutates the
+    // queue while that check is in flight.
+    let releaseCheck
+    getActiveByUserUuidSpy.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseCheck = () => resolve(null)
+        })
+    )
+
+    class NoOpExecuteJobQueue extends JobQueue {
+      constructor() {
+        super()
+        this.executedUuids = []
+      }
+
+      _executeJob(jobInfo) {
+        this.executedUuids.push(jobInfo.uuid)
+      }
+    }
+
+    const queue = new NoOpExecuteJobQueue()
+    const job1 = new Job('SurveyJob', { surveyId: surveyId1, user: user1 })
+    const job2 = new Job('SurveyJob', { surveyId: surveyId2, user: user2 })
+
+    queue.enqueue(job1) // starts a traversal that will suspend on job1's delayed check
+    queue.enqueue(job2) // queued behind, chained after job1's in-flight traversal
+
+    // let the chain actually reach and suspend on the delayed getActiveByUserUuid call
+    await new Promise((resolve) => setImmediate(resolve))
+
+    // cancel job1 while its check is still pending - job1 is not yet "running" (the
+    // check hasn't resolved), so this hits cancelJobByUserUuid's queue-splice branch
+    await queue.cancelJobByUserUuid(user1.uuid)
+
+    // now let job1's suspended check resolve, and let the traversal run to completion
+    releaseCheck()
+    await queue._startNextJobChain
+
+    expect(queue.executedUuids).not.toContain(job1.uuid)
+    expect(queue.executedUuids).toContain(job2.uuid)
   })
 })

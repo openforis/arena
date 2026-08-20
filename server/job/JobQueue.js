@@ -26,6 +26,7 @@ export class JobQueue {
     this._runningJobUuidByUuid = {} // running jobs
     this._runningJobUuidBySurveyId = {} // running jobs by survey id
     this._runningJobUuidByUserUuid = {} // running jobs by user uuid
+    this._startNextJobChain = Promise.resolve() // serializes _startNextJob traversals; see _startNextJob
 
     this._logger.debug(`initializing job queue with ${concurrency} max concurrent jobs`)
   }
@@ -180,10 +181,14 @@ export class JobQueue {
     WebSocketServer.notifyUser(userUuid, WebSocketEvent.jobUpdate, jobInfo)
   }
 
-  // Public entry point: serializes concurrent external triggers (enqueue(), onJobEnd(),
-  // cancelJobByUserUuid()) so at most one logical traversal of the queue is ever in
-  // flight. Each external call chains onto whatever traversal is currently running (or
-  // starts a fresh one). Call sites intentionally do NOT await this (fire-and-forget).
+  // Public entry point: serializes concurrent external triggers (enqueue(), onJobEnd())
+  // so at most one logical traversal of the queue is ever in flight. Each external call
+  // chains onto whatever traversal is currently running (or starts a fresh one). Call
+  // sites intentionally do NOT await this (fire-and-forget).
+  // Note: cancelJobByUserUuid()/destroy() mutate this._queue directly and are NOT
+  // routed through this chain - that's exactly why _startNextJobInternal re-resolves a
+  // job's position by object identity (this._queue.indexOf(jobInfo)) after its await,
+  // instead of trusting a numeric index computed before the await.
   _startNextJob() {
     this._startNextJobChain = (this._startNextJobChain || Promise.resolve())
       .then(() => this._startNextJobInternal())
@@ -214,14 +219,24 @@ export class JobQueue {
       const { uuid: userUuid } = user
 
       const conflictsElsewhere = await this._hasActiveJobElsewhere({ uuid, userUuid, surveyId })
+
+      const currentIndex = this._queue.indexOf(jobInfo)
+      if (currentIndex < 0) {
+        // jobInfo was removed from the queue while the cluster-wide check was in flight
+        // (e.g. cancelled via cancelJobByUserUuid, which mutates the queue directly and
+        // is not routed through _startNextJob's serialization chain) - nothing to do for
+        // this job, move on to whatever's next.
+        return this._startNextJobInternal()
+      }
+
       if (conflictsElsewhere) {
         this._logger.debug(`job ${uuid} conflicts with an active job on another dyno; failing it`)
-        this._queue.splice(nextJobIndex, 1)
+        this._queue.splice(currentIndex, 1)
         await this._failQueuedJob({ jobInfo, message: 'Another job is already running for this user or survey' })
         return this._startNextJobInternal()
       }
 
-      this._queue.splice(nextJobIndex, 1)
+      this._queue.splice(currentIndex, 1)
 
       this._logger.debug(`starting next job: ${uuid} survey id: ${surveyId ?? ''} user uuid: ${userUuid}`)
 
@@ -256,7 +271,11 @@ export class JobQueue {
       // still applies at job-start time regardless, as the authoritative guard).
       const existingJobInfo = this._jobInfoByUuid[existingJobUuid]
       const existingSurveyId = existingJobInfo?.params?.surveyId
-      if (existingSurveyId === surveyId) {
+      if (existingSurveyId === surveyId || existingSurveyId === undefined || surveyId === undefined) {
+        // a global job (no surveyId) always conflicts with anything else for this user:
+        // global jobs are never persisted to the job table (survey_id is NOT NULL), so
+        // _hasActiveJobElsewhere's cluster-wide DB check has no row to find and can't
+        // catch this case either - this same-dyno guard is the only backstop for it.
         throw new Error('Only one job per user can run at a time')
       }
     }
