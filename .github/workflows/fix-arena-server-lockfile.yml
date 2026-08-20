@@ -1,7 +1,11 @@
 name: Fix arena-server lockfile
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - feat/record-printable-export-options
+    paths:
+      - '.github/workflows/fix-arena-server-lockfile.yml'
 
 jobs:
   resolve-lockfile:
