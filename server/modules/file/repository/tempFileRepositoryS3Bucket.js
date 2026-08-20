@@ -122,4 +122,34 @@ export const deleteOldTempFiles = async ({ olderThanHours }) => {
   return oldFiles.length
 }
 
+const pendingImportPrefix = 'pendingImport/'
+const getPendingImportFileKey = ({ fileId }) => `${pendingImportPrefix}${fileId}`
+
+export const keepFileForLaterUse = async ({ fileId, filePath }) => {
+  const fileUuid = getPendingImportFileKey({ fileId })
+  const contentStream = FileUtils.createReadStream(filePath)
+  const contentLength = FileUtils.getFileSize(filePath)
+  await uploadFileContentAsStream({ fileUuid, contentStream, contentLength })
+  await FileUtils.deleteFileAsync(filePath)
+}
+
+export const getKeptFilePath = async ({ fileId }) => {
+  const fileUuid = getPendingImportFileKey({ fileId })
+  const size = await getFileSize({ fileUuid })
+  if (!Number.isFinite(size)) {
+    return null
+  }
+  const localFilePath = FileUtils.tempFilePath(FileUtils.newTempFileName())
+  const contentStream = await getFileContentAsStream({ fileUuid })
+  const writeStream = FileUtils.createWriteStream(localFilePath)
+  await writeReadableToWritable({ readStream: contentStream, writeStream })
+  await endWriteStream(writeStream)
+  return localFilePath
+}
+
+export const deletePendingImportFileIfAny = async ({ fileId }) => {
+  const fileUuid = getPendingImportFileKey({ fileId })
+  await deleteFile({ fileNameOrPath: fileUuid })
+}
+
 export { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream }

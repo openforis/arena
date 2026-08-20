@@ -41,7 +41,7 @@ export default class ArenaMobileDataImportJob extends Job {
     const { surveyId, reuseUploadedFile, fileId } = context
 
     if (reuseUploadedFile) {
-      const filePath = TempFileManager.getKeptFilePath({ fileId })
+      const filePath = await TempFileManager.getKeptFilePath({ fileId })
       this.setContext({ filePath })
     }
 

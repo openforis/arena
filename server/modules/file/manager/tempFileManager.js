@@ -66,8 +66,15 @@ export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = nul
 // file system (see tempFileRepositoryFileSystem/tempFileRepositoryS3Bucket implementations), so these
 // two functions only need to deal with local files.
 
-const pendingImportFilePrefix = 'pendingImport_'
-const getPendingImportFileName = (fileId) => `${pendingImportFilePrefix}${fileId}`
+export const keepFileFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.keepFileForLaterUse,
+  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.keepFileForLaterUse,
+}
+
+export const getKeptFilePathFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.getKeptFilePath,
+  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.getKeptFilePath,
+}
 
 const checkFileIdIsValid = (fileId) => {
   if (!isUuid(fileId)) {
@@ -76,36 +83,47 @@ const checkFileIdIsValid = (fileId) => {
 }
 
 /**
- * Moves a previously merged temp file to a location that can be found again later using only its fileId,
- * so it can be reused by a later request instead of being uploaded again (e.g. confirming an import after
- * previewing it). The file keeps living in the temp folder, so it's still covered by the periodic temp
- * files cleanup.
+ * Moves a previously merged temp file to storage that can be found again later using only its fileId,
+ * so it can be reused by a later request instead of being uploaded again (e.g. confirming an import
+ * after previewing it). Uses the configured storage type, so the later request can land on any dyno.
  * @param {!object} params - The params.
  * @param {!string} params.fileId - The uuid the file was originally uploaded with.
- * @param {!string} params.filePath - The current path of the merged temp file.
- * @returns {Promise<string>} - The new path of the file.
+ * @param {!string} params.filePath - The current local path of the merged temp file.
+ * @returns {Promise<void>} - Resolved once the file has been moved.
  */
 export const keepFileForLaterUse = async ({ fileId, filePath }) => {
   checkFileIdIsValid(fileId)
-  const destPath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
-  await FileUtils.renameFile(filePath, destPath)
-  return destPath
+  const keepFn = getStorageFunctionOrThrow({
+    functionByStorageType: keepFileFunctionByStorageType,
+    operation: 'keepFileForLaterUse',
+  })
+  await keepFn({ fileId, filePath })
 }
 
 /**
- * Resolves the path of a file previously kept with keepFileForLaterUse.
+ * Resolves the local path of a file previously kept with keepFileForLaterUse, downloading it from
+ * external storage into a fresh local temp file first if it isn't already on local disk.
  * Throws if the fileId is invalid or the file cannot be found anymore (e.g. it expired and got cleaned up).
  * @param {!object} params - The params.
  * @param {!string} params.fileId - The uuid the file was originally uploaded with.
- * @returns {string} - The path of the kept file.
+ * @returns {Promise<string>} - The local path of the kept file.
  */
-export const getKeptFilePath = ({ fileId }) => {
+export const getKeptFilePath = async ({ fileId }) => {
   checkFileIdIsValid(fileId)
-  const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
-  if (!FileUtils.exists(filePath)) {
+  const getFn = getStorageFunctionOrThrow({
+    functionByStorageType: getKeptFilePathFunctionByStorageType,
+    operation: 'getKeptFilePath',
+  })
+  const filePath = await getFn({ fileId })
+  if (!filePath) {
     throw new SystemError('dataImport.pendingImportFileNotFoundOrExpired', { fileId })
   }
   return filePath
+}
+
+export const deletePendingImportFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.deletePendingImportFileIfAny,
+  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.deletePendingImportFileIfAny,
 }
 
 /**
@@ -118,8 +136,9 @@ export const getKeptFilePath = ({ fileId }) => {
  */
 export const deletePendingImportFileIfAny = async ({ fileId }) => {
   checkFileIdIsValid(fileId)
-  const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
-  if (FileUtils.exists(filePath)) {
-    await FileUtils.deleteFileAsync(filePath)
-  }
+  const deleteFn = getStorageFunctionOrThrow({
+    functionByStorageType: deletePendingImportFunctionByStorageType,
+    operation: 'deletePendingImportFileIfAny',
+  })
+  await deleteFn({ fileId })
 }
