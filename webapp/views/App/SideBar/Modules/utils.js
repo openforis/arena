@@ -101,7 +101,7 @@ export const getModulesHierarchy = (user, surveyInfo) => {
       : []),
     getModule({
       module: appModules.help,
-      children: [helpModules.userManual, helpModules.about, helpModules.disclaimer],
+      children: [helpModules.userManual, helpModules.about, helpModules.changelog, helpModules.disclaimer],
     }),
   ]
 }

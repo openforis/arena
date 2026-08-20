@@ -46,6 +46,15 @@ export const init = (app) => {
     }
   })
 
+  app.get('/api/changelog', async (_req, res, next) => {
+    try {
+      const content = await FileUtils.readFile('CHANGELOG.md')
+      res.json({ content })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/auth/user', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
