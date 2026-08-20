@@ -119,6 +119,7 @@ export const TestId = {
     nodeDefDescriptions: _withLang('node-def-descriptions'),
     nodeDefLabels: _withLang('node-def-labels'),
     nodeDefCodeParent: 'node-def-code-parent',
+    nodeDefAutoCreateMinCountItems: 'node-def-auto-create-min-count-items',
     nodeDefEnumerate: 'node-def-enumerate',
     nodeDefName: 'node-def-name',
     nodeDefKey: 'node-def-key',

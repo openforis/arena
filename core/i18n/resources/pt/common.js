@@ -990,6 +990,10 @@ $t(common.appNameFull)
         label: 'Auto incremental',
         info: 'O valor será gerado automaticamente',
       },
+      autoCreateMinCountItems: {
+        label: 'Criar mínimo de itens automaticamente',
+        info: 'Quando a entidade se torna relevante ou sua entidade pai é criada, um número de entidades igual ao mínimo será gerado automaticamente.',
+      },
       displayAs: 'Exibir como',
       displayIn: 'Exibir em',
       entitySource: 'Origem da entidade',
