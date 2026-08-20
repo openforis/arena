@@ -993,7 +993,7 @@ $t(common.appNameFull)
       },
       autoCreateMinCountItems: {
         label: "Créer automatiquement le minimum d'éléments",
-        info: "Lors de la création d'une nouvelle entité, les entités enfants avec un minimum seront créées automatiquement",
+        info: "Lorsque l'entité devient pertinente ou que son entité parente est créée, un nombre d'entités égal au minimum est généré automatiquement.",
       },
       displayAs: 'Afficher comme',
       displayIn: 'Afficher dans',

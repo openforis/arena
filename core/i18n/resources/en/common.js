@@ -991,7 +991,7 @@ $t(common.appNameFull)
       },
       autoCreateMinCountItems: {
         label: 'Auto-create minimum items',
-        info: 'When creating a new entity, minimum-count child entities will be created automatically',
+        info: 'When the entity becomes relevant or its parent entity is created, a number of entities equal to the minimum count will be generated automatically.',
       },
       displayAs: 'Display as',
       displayIn: 'Display in',
