@@ -913,6 +913,18 @@ $t(common.appNameFull)
     basic: 'Basic',
     advanced: 'Advanced',
     mobileApp: 'Mobile App',
+    print: 'Print',
+    printProps: {
+      printOrientation: {
+        label: 'Page orientation',
+        info: 'Orientation used when this entity starts its own printable section. Default inherits the document orientation chosen at export.',
+      },
+      orientations: {
+        default: 'Default (document)',
+        portrait: 'Portrait',
+        landscape: 'Landscape',
+      },
+    },
     validations: 'Validations',
     function: 'Function',
     editingFunction: 'Editing function {{functionName}}',

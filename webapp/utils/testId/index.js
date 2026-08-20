@@ -114,6 +114,7 @@ export const TestId = {
     maxCount: 'max-count',
     minCount: 'min-count',
     mobile: 'mobile',
+    print: 'print',
     nextBtn: 'node-def-next-btn',
     nodeDefDescriptions: _withLang('node-def-descriptions'),
     nodeDefLabels: _withLang('node-def-labels'),
