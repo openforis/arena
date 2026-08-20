@@ -1,9 +1,10 @@
 import { Objects } from '@openforis/arena-core'
-import { JobRepository } from '@openforis/arena-server'
+import { JobRepository, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
 import * as JobThreadExecutor from './jobThreadExecutor'
+import { jobStatus } from './jobUtils'
 
 const defaultConfiguration = {
   concurrency: 3,
@@ -142,7 +143,62 @@ export class JobQueue {
     JobThreadExecutor.executeJobThread(jobInfo, this.onJobUpdate.bind(this))
   }
 
+  async _hasActiveJobElsewhere({ uuid, userUuid, surveyId }) {
+    const activeByUser = await JobRepository.getActiveByUserUuid(userUuid).catch((error) => {
+      this._logger.error(`error checking active job by user: ${error}`)
+      return null
+    })
+    if (activeByUser && activeByUser.uuid !== uuid) return true
+
+    if (surveyId) {
+      const activeBySurvey = await JobRepository.getActiveBySurveyId(surveyId).catch((error) => {
+        this._logger.error(`error checking active job by survey: ${error}`)
+        return null
+      })
+      if (activeBySurvey && activeBySurvey.uuid !== uuid) return true
+    }
+    return false
+  }
+
+  async _failQueuedJob({ jobInfo, message }) {
+    const { uuid, params } = jobInfo
+    const { user, surveyId } = params ?? {}
+    const { uuid: userUuid } = user
+
+    jobInfo.status = jobStatus.failed
+    this.deleteJobInfo({ jobUuid: uuid })
+    delete this._jobUuidByUserUuid[userUuid]
+
+    if (surveyId) {
+      await JobRepository.updateStatus({
+        uuid,
+        status: jobStatus.failed,
+        props: { errors: { generic: { key: 'appErrors:generic', params: { text: message } } } },
+      }).catch((error) => this._logger.error(`error persisting failed status for job ${uuid}: ${error}`))
+    }
+
+    WebSocketServer.notifyUser(userUuid, WebSocketEvent.jobUpdate, jobInfo)
+  }
+
+  // Public entry point: serializes concurrent external triggers (enqueue(), onJobEnd(),
+  // cancelJobByUserUuid()) so at most one logical traversal of the queue is ever in
+  // flight. Each external call chains onto whatever traversal is currently running (or
+  // starts a fresh one). Call sites intentionally do NOT await this (fire-and-forget).
   _startNextJob() {
+    this._startNextJobChain = (this._startNextJobChain || Promise.resolve())
+      .then(() => this._startNextJobInternal())
+      .catch((error) => this._logger.error(`error in job queue loop: ${error}`))
+    return this._startNextJobChain
+  }
+
+  // Recursive draining of the queue for a single triggered traversal. This recurses
+  // into itself directly (NOT via _startNextJob()) so that a full drain resolves as one
+  // unit and the chain above only advances to the next external caller once this
+  // traversal has completely finished. Recursing through _startNextJob() instead would
+  // re-read this._startNextJobChain while it still points at this very call, creating a
+  // circular promise dependency that deadlocks the queue after the first job (verified
+  // via isolated repro during development - see task-4-report.md).
+  async _startNextJobInternal() {
     if (this._queue.length === 0) {
       return false
     }
@@ -152,10 +208,20 @@ export class JobQueue {
     }
     const nextJobIndex = this._findNextJobIndex()
     if (nextJobIndex >= 0) {
-      const jobInfo = this._queue.splice(nextJobIndex, 1)[0]
+      const jobInfo = this._queue[nextJobIndex]
       const { uuid, params } = jobInfo
       const { surveyId, user } = params ?? {}
       const { uuid: userUuid } = user
+
+      const conflictsElsewhere = await this._hasActiveJobElsewhere({ uuid, userUuid, surveyId })
+      if (conflictsElsewhere) {
+        this._logger.debug(`job ${uuid} conflicts with an active job on another dyno; failing it`)
+        this._queue.splice(nextJobIndex, 1)
+        await this._failQueuedJob({ jobInfo, message: 'Another job is already running for this user or survey' })
+        return this._startNextJobInternal()
+      }
+
+      this._queue.splice(nextJobIndex, 1)
 
       this._logger.debug(`starting next job: ${uuid} survey id: ${surveyId ?? ''} user uuid: ${userUuid}`)
 
@@ -168,7 +234,7 @@ export class JobQueue {
       }
       this._executeJob(jobInfo)
 
-      this._startNextJob()
+      return this._startNextJobInternal()
     } else {
       this._logger.debug('cannot run next job: wait for current one to complete.')
     }
@@ -180,9 +246,19 @@ export class JobQueue {
     const { user, surveyId } = params ?? {}
     const { uuid: userUuid } = user
 
-    if (this._runningJobUuidByUserUuid[userUuid]) {
-      // only one job per user and per survey
-      throw new Error('Only one job per user can run at a time')
+    const existingJobUuid = this._jobUuidByUserUuid[userUuid]
+    if (existingJobUuid) {
+      // Only one job per user and per survey (queued or running) - matches this
+      // dyno's existing behavior of letting a user have concurrently outstanding
+      // jobs for different surveys (see 'global jobs executed before survey ones'
+      // test), while synchronously rejecting a same-survey duplicate immediately,
+      // without waiting on the cluster-wide _hasActiveJobElsewhere DB check (which
+      // still applies at job-start time regardless, as the authoritative guard).
+      const existingJobInfo = this._jobInfoByUuid[existingJobUuid]
+      const existingSurveyId = existingJobInfo?.params?.surveyId
+      if (existingSurveyId === surveyId) {
+        throw new Error('Only one job per user can run at a time')
+      }
     }
     this._logger.debug(`enqueuing job ${type} (${uuid})`)
 
