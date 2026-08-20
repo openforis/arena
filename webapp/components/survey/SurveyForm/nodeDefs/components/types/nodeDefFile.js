@@ -39,6 +39,7 @@ const FileInput = (props) => {
   const originalFileName = Node.getFileName(node)
   const fileName = Node.getFileNameCalculated(node) || originalFileName
   const fileNameDisplayed = fileName || fileUuid
+  const buttonLabel = isImage ? undefined : fileNameDisplayed
   const fileReady = !edit && fileUuid
   const fileUrl = API.getRecordNodeFileUrl({ surveyId, node })
 
@@ -81,10 +82,11 @@ const FileInput = (props) => {
     <ButtonDownload
       fileName={fileName}
       href={fileUrl}
-      label={fileNameDisplayed}
+      label={buttonLabel}
       labelIsI18nKey={false}
       showLabel={false}
       title={isImage ? undefined : fileNameDisplayed}
+      titleIsI18nKey={false}
       className="btn-s survey-form__node-def-file__download-btn"
     >
       <span className="survey-form__node-def-file__download-btn-label">{fileNameDisplayed}</span>
