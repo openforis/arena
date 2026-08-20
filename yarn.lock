@@ -4160,7 +4160,7 @@ __metadata:
 
 "@openforis/arena-server@npm:^2.1.0":
   version: 2.1.0
-  resolution: "@openforis/arena-server@npm:2.1.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F2.1.0%2Fa026a27c7fcb095256458293958c9558eef2a8ca"
+  resolution: "@openforis/arena-server@npm:2.1.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F2.1.0%2F3079ccf676af62addf4832b9cf4ed8f08d97de1d"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1112.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -4186,7 +4186,7 @@ __metadata:
     pdfkit: "npm:^0.19.1"
     pg-promise: "npm:^12.7.0"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/c413e343eed95dc695c3a0074593762c97bffcaba586ab8c1f0fb722a173832b3d45a9565b106b44bf827c78d9775ad4efc3bd3653234f8127de7f2836538dbd
+  checksum: 10c0/e13abd9a67e0b4553d51e6114a653d1c582aabe10c0807888d598ccd2f08172bd3a3ae724bbe41eb11e5708977a477f30b5877c8008080bc00cd6839cd25022e
   languageName: node
   linkType: hard
 
