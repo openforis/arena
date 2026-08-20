@@ -1,4 +1,5 @@
 import { Objects } from '@openforis/arena-core'
+import { JobRepository } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
@@ -176,7 +177,7 @@ export class JobQueue {
   enqueue(job) {
     const { params, status, type, uuid } = job
     const jobInfo = { params, status, type, uuid }
-    const { user } = params ?? {}
+    const { user, surveyId } = params ?? {}
     const { uuid: userUuid } = user
 
     if (this._runningJobUuidByUserUuid[userUuid]) {
@@ -188,6 +189,14 @@ export class JobQueue {
     this._queue.push(jobInfo)
     this._jobInfoByUuid[uuid] = jobInfo
     this._jobUuidByUserUuid[userUuid] = uuid
+
+    if (surveyId) {
+      // Fire-and-forget: makes the job pollable from any dyno via JobManager.getJobSummary/getActiveJobSummary.
+      // Not persisted for global (no-surveyId) jobs - the job table's survey_id column is NOT NULL.
+      JobRepository.insert({ uuid, userUuid, surveyId, type }).catch((error) =>
+        this._logger.error(`error persisting job ${uuid}: ${error}`)
+      )
+    }
 
     this._startNextJob()
   }

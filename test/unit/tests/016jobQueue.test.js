@@ -1,4 +1,5 @@
 import { UUIDs } from '@openforis/arena-core'
+import { JobRepository } from '@openforis/arena-server'
 
 import Job from '../../../server/job/job'
 import { JobQueue } from '../../../server/job/JobQueue'
@@ -61,6 +62,16 @@ const user3 = { uuid: UUIDs.v4() }
 const user4 = { uuid: UUIDs.v4() }
 
 describe('JobQueue test', () => {
+  let jobRepositoryInsertSpy
+
+  beforeAll(() => {
+    jobRepositoryInsertSpy = jest.spyOn(JobRepository, 'insert').mockResolvedValue({})
+  })
+
+  afterAll(() => {
+    jobRepositoryInsertSpy.mockRestore()
+  })
+
   test('user can enqueue only one job', async () => {
     const job1 = new Job('SurveyJob', { surveyId: surveyId1, user: user1 })
     const job2 = new Job('SurveyJob', { surveyId: surveyId1, user: user1 })
@@ -93,5 +104,28 @@ describe('JobQueue test', () => {
     const expectedExecutedJobUuids = [job1.uuid, job3.uuid, job4.uuid, job2.uuid, job5.uuid]
 
     await enqueueJobsAndExpectExecutionOrder({ jobs, expectedExecutedJobUuids })
+  })
+
+  test('enqueue persists a job row for survey-scoped jobs', async () => {
+    jobRepositoryInsertSpy.mockClear()
+    const job = new Job('SurveyJob', { surveyId: surveyId1, user: user1 })
+
+    await enqueueJobs({ jobs: [job] })
+
+    expect(jobRepositoryInsertSpy).toHaveBeenCalledWith({
+      uuid: job.uuid,
+      userUuid: user1.uuid,
+      surveyId: surveyId1,
+      type: 'SurveyJob',
+    })
+  })
+
+  test('enqueue does not persist a job row for global (no-surveyId) jobs', async () => {
+    jobRepositoryInsertSpy.mockClear()
+    const job = new Job('GlobalJob', { user: user1 })
+
+    await enqueueJobs({ jobs: [job] })
+
+    expect(jobRepositoryInsertSpy).not.toHaveBeenCalled()
   })
 })
