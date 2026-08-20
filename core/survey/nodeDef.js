@@ -55,6 +55,7 @@ export const propKeys = {
   cycles: 'cycles',
   descriptions: ObjectUtils.keysProps.descriptions,
   enumerate: 'enumerate', // only for multiple entities
+  autoCreateMinCountItems: 'autoCreateMinCountItems', // only for multiple entities
   key: 'key',
   autoIncrementalKey: 'autoIncrementalKey',
   labels: ObjectUtils.keysProps.labels,
@@ -280,6 +281,7 @@ export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
 export const getDescriptions = getProp(propKeys.descriptions, {})
 
 export const isEnumerate = ObjectUtils.isPropTrue(propKeys.enumerate)
+export const isAutoCreateMinCountItems = ObjectUtils.isPropTrue(propKeys.autoCreateMinCountItems)
 
 // boolean
 export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
@@ -787,6 +789,9 @@ export const canBeHiddenInReport = (nodeDef) =>
 
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
+  if (!isMultipleEntity(nodeDefUpdated) && isAutoCreateMinCountItems(nodeDefUpdated)) {
+    nodeDefUpdated = assocProp({ key: propKeys.autoCreateMinCountItems, value: false })(nodeDefUpdated)
+  }
   // clear hidden if not applicable
   if (!canBeHidden(nodeDefUpdated) && isHidden(nodeDefUpdated)) {
     nodeDefUpdated = assocHidden(false)(nodeDefUpdated)

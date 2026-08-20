@@ -989,6 +989,10 @@ $t(common.appNameFull)
         label: 'Auto incremental',
         info: 'Value will be automatically generated',
       },
+      autoCreateMinCountItems: {
+        label: 'Auto-create minimum items',
+        info: 'When creating a new entity, minimum-count child entities will be created automatically',
+      },
       displayAs: 'Display as',
       displayIn: 'Display in',
       entitySource: 'Entity Source',

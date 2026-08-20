@@ -837,6 +837,10 @@ $t(common.appNameFull)
         label: 'Clave auto incremental',
         info: 'El valor se generará automáticamente',
       },
+      autoCreateMinCountItems: {
+        label: 'Crear mínimo de elementos automáticamente',
+        info: 'Al crear una nueva entidad, las entidades hijas con conteo mínimo se crearán automáticamente',
+      },
       displayAs: 'Mostrar como',
       displayIn: 'Mostrar en',
       entitySource: 'Fuente de la entidad',
