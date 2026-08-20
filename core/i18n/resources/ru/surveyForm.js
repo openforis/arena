@@ -136,6 +136,29 @@ export default {
   confirmNodeDelete: 'Вы уверены, что хотите удалить этот {{nodeDefType}} ({{nodeDefLabel}})?',
   downloadPrintableDocument: 'Скачать печатный документ (Word)',
   downloadPrintableDocumentPdf: 'Скачать печатный документ (PDF)',
+  printableExport: {
+    title: 'Экспорт печатного документа',
+    exportDocument: 'Экспорт документа',
+    format: 'Формат',
+    formats: {
+      pdf: 'PDF',
+      docx: 'Word',
+    },
+    scope: 'Содержимое',
+    scopes: {
+      full: 'Вся анкета',
+      currentPage: 'Только текущая страница',
+    },
+    currentPageHint: 'Текущая страница: {{entityLabel}}',
+    currentPageUnavailable:
+      'Не удалось определить экземпляр текущей страницы. Перейдите на конкретную страницу или экспортируйте всю анкету.',
+    orientation: 'Ориентация страницы',
+    orientations: {
+      portrait: 'Книжная',
+      landscape: 'Альбомная',
+    },
+    download: 'Скачать',
+  },
   exportLabels_csv: 'Экспорт меток (CSV)',
   exportLabels_xlsx: 'Экспорт меток (Excel)',
   importLabels: 'Импорт меток из Excel или CSV',

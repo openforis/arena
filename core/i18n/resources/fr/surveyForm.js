@@ -139,6 +139,29 @@ Dans Arena Mobile :
   confirmNodeDelete: 'Êtes-vous sûr(e) de vouloir supprimer ce {{nodeDefType}} ({{nodeDefLabel}}) ?',
   downloadPrintableDocument: 'Télécharger le document imprimable (Word)',
   downloadPrintableDocumentPdf: 'Télécharger le document imprimable (PDF)',
+  printableExport: {
+    title: 'Exporter le document imprimable',
+    exportDocument: 'Exporter le document',
+    format: 'Format',
+    formats: {
+      pdf: 'PDF',
+      docx: 'Word',
+    },
+    scope: 'Contenu',
+    scopes: {
+      full: 'Formulaire complet',
+      currentPage: 'Page actuelle uniquement',
+    },
+    currentPageHint: 'Page actuelle : {{entityLabel}}',
+    currentPageUnavailable:
+      "Impossible de déterminer l'instance de la page actuelle. Naviguez vers une page spécifique ou exportez le formulaire complet.",
+    orientation: 'Orientation de la page',
+    orientations: {
+      portrait: 'Portrait',
+      landscape: 'Paysage',
+    },
+    download: 'Télécharger',
+  },
   exportLabels_csv: 'Exporter les étiquettes (CSV)',
   exportLabels_xlsx: 'Exporter les étiquettes (Excel)',
   importLabels: 'Importer les étiquettes depuis Excel ou CSV',

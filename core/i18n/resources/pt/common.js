@@ -906,6 +906,18 @@ $t(common.appNameFull)
     basic: 'Básico',
     advanced: 'Avançado',
     mobileApp: 'Aplicativo móvel',
+    print: 'Impressão',
+    printProps: {
+      printOrientation: {
+        label: 'Orientação da página',
+        info: 'Orientação usada quando esta entidade inicia sua própria seção imprimível. Por padrão, herda a orientação do documento escolhida na exportação.',
+      },
+      orientations: {
+        default: 'Padrão (documento)',
+        portrait: 'Retrato',
+        landscape: 'Paisagem',
+      },
+    },
     validations: 'Validações',
     function: 'Função',
     editingFunction: 'Editando função {{functionName}}',

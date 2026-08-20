@@ -35,11 +35,14 @@ export const fetchRecordAndNodes = async ({ surveyId, recordUuid }) => {
   const { data: record } = await axios.get(`/api/survey/${surveyId}/record`, { params: { recordUuid } })
   return record
 }
-export const getRecordDocxExportUrl = ({ surveyId, recordUuid, lang }) =>
-  `/api/survey/${surveyId}/record/${recordUuid}/export/docx?${new URLSearchParams({ lang })}`
-
-export const getRecordPdfExportUrl = ({ surveyId, recordUuid, lang }) =>
-  `/api/survey/${surveyId}/record/${recordUuid}/export/pdf?${new URLSearchParams({ lang })}`
+export {
+  getRecordPrintableExportUrl,
+  getRecordDocxExportUrl,
+  getRecordPdfExportUrl,
+  PrintableExportFormats,
+  PrintableExportScopes,
+  PrintOrientations,
+} from './recordPrintableExportUrl'
 
 // ==== RECORD FILE
 export const getRecordNodeFileUrl = ({ surveyId, node }) =>
