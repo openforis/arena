@@ -23,6 +23,10 @@ export const chunkMergeFunctionByStorageType = {
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.mergeTempChunks,
 }
 
+// `storageType` defaults to the real, current storage type on every call it's omitted - this
+// param exists purely as a test seam (this repo's webpack-bundled unit tests can't jest.mock()
+// local modules, so tests call this directly with an explicit storageType instead). Production
+// code should never pass it explicitly.
 export const getStorageFunctionOrThrow = ({
   functionByStorageType,
   operation,
@@ -61,10 +65,6 @@ export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = nul
   })
   return mergeChunksFunction({ fileId, totalChunks, onChunkMerged })
 }
-
-// Whatever the chunk storage type, mergeTempChunks always produces its final merged file on the local
-// file system (see tempFileRepositoryFileSystem/tempFileRepositoryS3Bucket implementations), so these
-// two functions only need to deal with local files.
 
 export const keepFileFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.keepFileForLaterUse,
