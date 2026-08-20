@@ -244,4 +244,105 @@ describe('JobQueue test', () => {
     expect(queue.executedUuids).not.toContain(job1.uuid)
     expect(queue.executedUuids).toContain(job2.uuid)
   })
+
+  test('a job for the same survey is promoted, not failed, when the DB still shows the just-ended local job as active (throttle lag)', async () => {
+    // Regression test for _hasActiveJobElsewhere treating a global DB query as truly
+    // "elsewhere": onJobEnd() frees local locks synchronously the instant a job's thread
+    // posts its terminal update, but the DB write for that same terminal status goes
+    // through a 500ms per-job throttle (core/functionsDefer's throttle(), used in
+    // jobThreadExecutor.js), so there's a real window where a job has locally ended but
+    // its DB row still says 'running'. A same-dyno successor job for the same survey
+    // must not be failed for a conflict that already resolved on this exact dyno.
+    class NoOpExecuteJobQueue extends JobQueue {
+      constructor() {
+        super()
+        this.executedUuids = []
+      }
+
+      _executeJob(jobInfo) {
+        this.executedUuids.push(jobInfo.uuid)
+      }
+    }
+
+    const queue = new NoOpExecuteJobQueue()
+    const job1 = new Job('SurveyJob', { surveyId: surveyId1, user: user1 })
+    const job2 = new Job('SurveyJob', { surveyId: surveyId1, user: user2 })
+
+    queue.enqueue(job1)
+    await queue._startNextJobChain // job1 now running
+
+    queue.enqueue(job2)
+    await queue._startNextJobChain // job2 queued, blocked by survey1 (job1 still running)
+
+    // simulate the DB's terminal-status write for job1 still lagging behind (throttled):
+    // the row job2's cluster-wide check finds is job1's own, still-stale-'running' row
+    getActiveBySurveyIdSpy.mockResolvedValueOnce({ uuid: job1.uuid })
+
+    // job1 ends locally (this is what the real worker thread triggers via onJobUpdate)
+    queue.onJobEnd({ uuid: job1.uuid })
+    await queue._startNextJobChain
+
+    // job2 must have been promoted and actually executed, not failed as a false conflict
+    expect(queue.executedUuids).toContain(job2.uuid)
+    expect(notifyUserSpy).not.toHaveBeenCalledWith(
+      user2.uuid,
+      expect.anything(),
+      expect.objectContaining({ status: jobStatus.failed })
+    )
+  })
+
+  test('a user with two outstanding jobs (different surveys) does not lose track of either when acting on one', async () => {
+    // Regression test for _jobUuidByUserUuid being single-valued: enqueue() used to
+    // overwrite a user's single map entry on every enqueue, and onJobEnd/_failQueuedJob/
+    // cancelJobByUserUuid unconditionally worked off that single entry - so once a user
+    // has two concurrently outstanding jobs (allowed for different surveys), acting on
+    // one (ending it, cancelling it) could wipe out or misidentify the bookkeeping for
+    // the other, making it invisible to cancelJobByUserUuid/getRunningJobSummaryByUserUuid
+    // even though it's still very much outstanding.
+    // Note: JobThreadExecutor.cancelActiveJobByUserUuid is deliberately left unmocked
+    // here (rather than jest.spyOn, which fails with "Cannot redefine property" against
+    // this repo's bundled webpack/babel ESM export interop) - it's a safe no-op in this
+    // test since NoOpExecuteJobQueue never registers a real thread for it to find.
+    class NoOpExecuteJobQueue extends JobQueue {
+      _executeJob() {
+        // no-op: don't spawn a real thread
+      }
+    }
+
+    const queue = new NoOpExecuteJobQueue()
+    const jobA = new Job('SurveyJob', { surveyId: surveyId1, user: user1 })
+    const jobB = new Job('SurveyJob', { surveyId: surveyId2, user: user1 })
+
+    queue.enqueue(jobA)
+    await queue._startNextJobChain // jobA now running
+
+    queue.enqueue(jobB)
+    await queue._startNextJobChain // jobB queued (different survey; blocked from running by
+    // the local per-user guard while jobA is running, but still outstanding)
+
+    // both jobs should be tracked as outstanding for user1
+    expect(queue._jobUuidsByUserUuid[user1.uuid].has(jobA.uuid)).toBe(true)
+    expect(queue._jobUuidsByUserUuid[user1.uuid].has(jobB.uuid)).toBe(true)
+    expect(queue._queue.some((jobInfo) => jobInfo.uuid === jobB.uuid)).toBe(true)
+
+    // cancelling this user's jobs must correctly remove the QUEUED one (jobB) from the
+    // queue - with the old single-valued-map bug this would either silently no-op (if
+    // the single slot had already been overwritten/cleared) or evict the wrong job
+    await queue.cancelJobByUserUuid(user1.uuid)
+
+    expect(queue._queue.some((jobInfo) => jobInfo.uuid === jobB.uuid)).toBe(false)
+    expect(queue._jobUuidsByUserUuid[user1.uuid].has(jobB.uuid)).toBe(false)
+    // jobA (running) is untouched by this call itself - its own cleanup happens later,
+    // via onJobEnd, once its thread acknowledges the cancellation - but it must still be
+    // tracked, not accidentally swept away by jobB's cancellation
+    expect(queue._jobUuidsByUserUuid[user1.uuid].has(jobA.uuid)).toBe(true)
+
+    // simulate jobA's thread eventually acknowledging its cancellation
+    queue.onJobEnd({ uuid: jobA.uuid })
+    await queue._startNextJobChain
+
+    // once jobA is fully gone too, the user's bookkeeping should be cleared entirely (not
+    // left holding a stale/orphaned entry from either job)
+    expect(queue._jobUuidsByUserUuid[user1.uuid]).toBeUndefined()
+  })
 })
