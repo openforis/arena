@@ -15,6 +15,7 @@ import * as apiRouter from './apiRouter'
 import { DataMigrator } from './dataMigrator'
 import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
+import * as StaleJobsCleanup from './schedulers/staleJobsCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
@@ -87,6 +88,7 @@ export const run = async () => {
   // await SurveysFilesPropsCleanup.init()
   await ExpiredUserInvitationsCleanup.init()
   await UserTempAuthTokensCleanup.init()
+  await StaleJobsCleanup.init()
 
   logger.info('server initialization complete; server started.')
 }
