@@ -39,6 +39,7 @@ const FileInput = (props) => {
   const originalFileName = Node.getFileName(node)
   const fileName = Node.getFileNameCalculated(node) || originalFileName
   const fileNameDisplayed = fileName || fileUuid
+  const buttonLabel = isImage ? undefined : fileNameDisplayed
   const fileReady = !edit && fileUuid
   const fileUrl = API.getRecordNodeFileUrl({ surveyId, node })
 
@@ -81,11 +82,19 @@ const FileInput = (props) => {
     <ButtonDownload
       fileName={fileName}
       href={fileUrl}
-      label={fileNameDisplayed}
+      label={buttonLabel}
       labelIsI18nKey={false}
+      showLabel={false}
       title={isImage ? undefined : fileNameDisplayed}
-      className="btn-s ellipsis"
-    />
+      titleIsI18nKey={false}
+      className="btn-s survey-form__node-def-file__download-btn"
+    >
+      <span className="survey-form__node-def-file__download-btn-label">{fileNameDisplayed}</span>
+    </ButtonDownload>
+  )
+
+  const downloadButtonWrapper = (button) => (
+    <div className="survey-form__node-def-file__download-btn-wrapper">{button}</div>
   )
 
   return (
@@ -100,33 +109,31 @@ const FileInput = (props) => {
 
       {fileReady && (
         <>
-          {
+          {isImage &&
             // when file is an image, show the image preview in a tooltip
-            isImage && (
-              <>
-                <TooltipNew
-                  className="image-preview-tooltip"
-                  renderTitle={() => <ImagePreview path={fileUrl} file={fileUploaded} />}
-                >
-                  {downloadButton}
-                </TooltipNew>
-                {NodeDef.isGeotagInformationShown(nodeDef) && (
-                  <MapTriggerButton
-                    disabled={edit}
-                    insideTable={insideTable}
-                    showMap={showMap}
-                    onClick={onShowOnMapClick}
-                    mapMarkerPoint={imageFileMarkerPoint}
-                    mapMarkerTitle={fileName}
-                    onPanelClose={toggleShowMap}
-                    panelHeader={nodeDefLabel}
-                    title="surveyForm:nodeDefCoordinate.showOnMap"
-                  />
-                )}
-              </>
-            )
-          }
-          {!isImage && downloadButton}
+            downloadButtonWrapper(
+              <TooltipNew
+                className="image-preview-tooltip"
+                renderTitle={() => <ImagePreview path={fileUrl} file={fileUploaded} />}
+              >
+                {downloadButton}
+              </TooltipNew>
+            )}
+          {!isImage && downloadButtonWrapper(downloadButton)}
+
+          {isImage && NodeDef.isGeotagInformationShown(nodeDef) && (
+            <MapTriggerButton
+              disabled={edit}
+              insideTable={insideTable}
+              showMap={showMap}
+              onClick={onShowOnMapClick}
+              mapMarkerPoint={imageFileMarkerPoint}
+              mapMarkerTitle={fileName}
+              onPanelClose={toggleShowMap}
+              panelHeader={nodeDefLabel}
+              title="surveyForm:nodeDefCoordinate.showOnMap"
+            />
+          )}
 
           {!updateDisabled && (
             <NodeDeleteButton disabled={updateDisabled} nodeDef={nodeDef} node={node} removeNode={handleNodeDelete} />
