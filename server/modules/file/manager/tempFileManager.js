@@ -1,6 +1,5 @@
 import { isUuid } from '@core/uuid'
 import SystemError from '@core/systemError'
-import * as FileUtils from '@server/utils/file/fileUtils'
 
 import { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 import * as TempFileRepositoryFileSystem from '../repository/tempFileRepositoryFileSystem'
