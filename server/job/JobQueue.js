@@ -119,6 +119,16 @@ export class JobQueue {
         if (queueIndex >= 0) {
           this._queue.splice(queueIndex, 1)
         }
+        const queuedJobInfo = this._jobInfoByUuid[jobUuid]
+        const queuedJobSurveyId = queuedJobInfo?.params?.surveyId
+        if (queuedJobSurveyId) {
+          // without this, the row is left at 'pending' forever (until the stale-job reaper
+          // eventually reaps it), blocking this user/survey cluster-wide in the meantime -
+          // same reasoning as _failQueuedJob's persisted status write
+          await JobRepository.updateStatus({ uuid: jobUuid, status: jobStatus.canceled }).catch((error) =>
+            this._logger.error(`error persisting canceled status for job ${jobUuid}: ${error}`)
+          )
+        }
         this.deleteJobInfo({ jobUuid })
         this._removeJobUuidForUser({ userUuid, uuid: jobUuid })
       }

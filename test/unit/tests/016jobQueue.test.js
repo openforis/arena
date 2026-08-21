@@ -345,4 +345,35 @@ describe('JobQueue test', () => {
     // left holding a stale/orphaned entry from either job)
     expect(queue._jobUuidsByUserUuid[user1.uuid]).toBeUndefined()
   })
+
+  test('cancelling a queued survey-scoped job persists a canceled status to the DB', async () => {
+    // Regression test: cancelJobByUserUuid's queued-job branch used to only mutate local
+    // in-memory state, never writing a terminal status to the job's DB row. That left the
+    // row stuck at 'pending' forever (until the stale-job reaper eventually catches it up
+    // to an hour later), during which getActiveByUserUuid/getActiveBySurveyId would keep
+    // reporting it as the active job and block this user/survey cluster-wide.
+    class NoOpExecuteJobQueue extends JobQueue {
+      _executeJob() {
+        // no-op: don't spawn a real thread
+      }
+    }
+
+    const queue = new NoOpExecuteJobQueue()
+    const jobRunning = new Job('SurveyJob', { surveyId: surveyId1, user: user3 })
+    const jobQueued = new Job('SurveyJob', { surveyId: surveyId2, user: user3 })
+
+    queue.enqueue(jobRunning)
+    await queue._startNextJobChain // jobRunning now running
+
+    queue.enqueue(jobQueued)
+    await queue._startNextJobChain // jobQueued stays queued (blocked by the per-user guard)
+
+    updateStatusSpy.mockClear()
+
+    await queue.cancelJobByUserUuid(user3.uuid)
+
+    expect(updateStatusSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ uuid: jobQueued.uuid, status: jobStatus.canceled })
+    )
+  })
 })
