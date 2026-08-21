@@ -18,6 +18,7 @@ type JobInfo = {
   status: JobStatus
   params: JobParams
   persistPromise?: Promise<JobRow | void>
+  ended?: boolean
 }
 
 type ActiveJobRow = {
@@ -39,16 +40,16 @@ interface Logger {
  * Handles job scheduling, conflict detection, and status management across dynos.
  */
 export class JobQueue {
-  private _logger: Logger
-  private _queue: JobInfo[] = []
-  private _maxConcurrentJobs: number
+  private readonly _logger: Logger
+  private readonly _queue: JobInfo[] = []
+  private readonly _maxConcurrentJobs: number
   private _runningGlobalJob: boolean = false
-  private _jobInfoByUuid: Record<string, JobInfo> = {}
-  private _jobUuidsByUserUuid: Record<string, Set<string>> = {}
-  private _runningJobUuidByUuid: Record<string, string> = {}
-  private _runningJobUuidBySurveyId: Record<string, string> = {}
-  private _runningJobUuidByUserUuid: Record<string, string> = {}
-  private _startNextJobChain: Promise<any> | null = null
+  private readonly _jobInfoByUuid: Record<string, JobInfo> = {}
+  private readonly _jobUuidsByUserUuid: Record<string, Set<string>> = {}
+  private readonly _runningJobUuidByUuid: Record<string, string> = {}
+  private readonly _runningJobUuidBySurveyId: Record<string, string> = {}
+  private readonly _runningJobUuidByUserUuid: Record<string, string> = {}
+  private _startNextJobChain: Promise<boolean | void> | null = null
 
   constructor(configuration: JobQueueConfig = {}) {
     const defaultConfiguration: JobQueueConfig = { concurrency: 3 }
@@ -105,7 +106,7 @@ export class JobQueue {
    * @param jobUuid - The job UUID.
    * @returns Job summary or null if not found.
    */
-  getJobSummary(jobUuid: string): JobInfo | any {
+  getJobSummary(jobUuid: string): JobInfo | null {
     const jobInfo = this._jobInfoByUuid[jobUuid]
     if (!jobInfo) return null
     const { params } = jobInfo
@@ -123,7 +124,7 @@ export class JobQueue {
    * @param userUuid - The user UUID.
    * @returns Job summary or null if user has no running jobs.
    */
-  getRunningJobSummaryByUserUuid(userUuid: string): JobInfo | any {
+  getRunningJobSummaryByUserUuid(userUuid: string): JobInfo | null {
     const jobInfo = this._getJobInfoByUserUuid(userUuid)
     if (!jobInfo) {
       return null
@@ -196,7 +197,7 @@ export class JobQueue {
    * Callback when a job ends.
    * @param job - The job object.
    */
-  onJobEnd(job: any): void {
+  onJobEnd(job: JobInfo): void {
     const jobInfo = this._jobInfoByUuid[job.uuid]
 
     const { uuid, params, status } = jobInfo
@@ -222,7 +223,7 @@ export class JobQueue {
    * Callback when a job updates its status.
    * @param job - The job object.
    */
-  onJobUpdate(job: any): void {
+  onJobUpdate(job: JobInfo): void {
     // runs in main thread; can safely modify internal variables
     const { ended, status, uuid } = job
     const jobInfo = this._jobInfoByUuid[uuid]
@@ -400,7 +401,7 @@ export class JobQueue {
       const { surveyId, user } = params ?? {}
       const { uuid: userUuid } = user
 
-      if (jobInfo.persistPromise) {
+      if (jobInfo.persistPromise !== undefined) {
         // Wait for enqueue()'s fire-and-forget INSERT to land before this job's status/progress
         // can ever be persisted. Without this, a very fast job's terminal UPDATE (issued once
         // _executeJob below actually starts the job) could reach the DB before the INSERT
@@ -455,7 +456,7 @@ export class JobQueue {
    * @param job - The job to enqueue.
    * @throws Error if only one job per user is already running.
    */
-  enqueue(job: any): void {
+  enqueue(job: JobInfo): void {
     const { params, status, type, uuid } = job
     const jobInfo: JobInfo = { params, status, type, uuid }
     const { user, surveyId } = params ?? {}
