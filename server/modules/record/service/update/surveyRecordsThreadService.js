@@ -1,10 +1,13 @@
 import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
+import * as Log from '@server/log/log'
 import ThreadManager from '@server/threads/threadManager'
 
 import { RecordsUpdateThreadMessageTypes } from './thread/recordsThreadMessageTypes'
 import { SurveyRecordsThreadMap } from './surveyRecordsThreadMap'
 import * as RecordSocketsMap from './recordSocketsMap'
+
+const Logger = Log.getLogger('SurveyRecordsThreadService')
 
 const { get: getThreadByKey, getKey: getThreadKey } = SurveyRecordsThreadMap
 
@@ -32,7 +35,9 @@ const _createThread = () => {
         thread.terminate()
       }
     } else {
-      notifyRecordUpdateToSockets({ eventType: type, content })
+      notifyRecordUpdateToSockets({ eventType: type, content }).catch((error) =>
+        Logger.error(`error notifying record update to sockets: ${error}`)
+      )
     }
   }
 
@@ -106,28 +111,28 @@ const getOrCreatedThread = () => {
 
 const { assocSocket, dissocSocket, dissocSocketBySocketId } = RecordSocketsMap
 
-const notifyRecordUpdateToSockets = ({ eventType, content }) => {
+const notifyRecordUpdateToSockets = async ({ eventType, content }) => {
   const { recordUuid } = content
-  const socketIds = RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
-  socketIds.forEach((socketId) => {
-    if (WebSocketServer.isSocketConnected(socketId)) {
+  const socketIds = await RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
+  for (const socketId of socketIds) {
+    if (await WebSocketServer.isSocketConnected(socketId)) {
       WebSocketServer.notifySocket(socketId, eventType, content)
     } else {
       // socket has been disconnected without checking out the record
-      RecordSocketsMap.dissocSocket({ recordUuid, socketId })
+      await RecordSocketsMap.dissocSocket({ recordUuid, socketId })
     }
-  })
+  }
 }
 
-const notifyRecordDeleteToSockets = ({ socketIdUser, recordUuid, notifySameUser = true }) => {
+const notifyRecordDeleteToSockets = async ({ socketIdUser, recordUuid, notifySameUser = true }) => {
   // Notify other users viewing or editing the record it has been deleted
-  const socketIds = RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
+  const socketIds = await RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
   socketIds.forEach((socketId) => {
     if (socketId !== socketIdUser || notifySameUser) {
       WebSocketServer.notifySocket(socketId, WebSocketEvent.recordDelete, recordUuid)
     }
   })
-  RecordSocketsMap.dissocSocketsByRecordUuid(recordUuid)
+  await RecordSocketsMap.dissocSocketsByRecordUuid(recordUuid)
 }
 
 export const RecordsUpdateThreadService = {
