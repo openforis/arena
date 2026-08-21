@@ -3505,9 +3505,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@openforis/arena-core@npm:2.0.1::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F2.0.1%2F5d8e415d5d2ff219d17a10b61fe7a9f1fd415c12"
+"@openforis/arena-core@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "@openforis/arena-core@npm:2.1.1::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-core%2F2.1.1%2F299f3875319599f29e4d843261684beb48dbd742"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     "@turf/bearing": "npm:^7.3.5"
@@ -3523,17 +3523,17 @@ __metadata:
     moment: "npm:^2.30.1"
     proj4: "npm:^2.20.9"
     uuid: "npm:^14.0.1"
-  checksum: 10c0/631cc653e1d18919b99fd93b430661afb961ef1372e14d72482a41fa9bfb55e792c540c949e8754caf908900e46a09837ff6a20adc76c853b3e04606b27c8fdb
+  checksum: 10c0/cf1425c772e2abb27dd32b3c62dc8edee625b518144d6952e9197f0d781dac80cfde6a3de2c31f5451afc878a8a6d0e4b82173fc16da3020363fd60a73561cc0
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@portal:../arena-server::locator=open-foris-arena%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@openforis/arena-server@portal:../arena-server::locator=open-foris-arena%40workspace%3A."
+"@openforis/arena-server@file:../arena-server::locator=open-foris-arena%40workspace%3A.":
+  version: 2.1.1
+  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=fc1477&locator=open-foris-arena%40workspace%3A."
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1112.0"
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^2.0.1"
+    "@openforis/arena-core": "npm:^2.1.1"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.1"
     cookie-parser: "npm:^1.4.7"
@@ -3555,8 +3555,9 @@ __metadata:
     pdfkit: "npm:^0.19.1"
     pg-promise: "npm:^12.7.0"
     socket.io: "npm:^4.8.3"
+  checksum: 10c0/cf32c22245f3723ce59d9189ed7dbd6b3c26060ec8b23d21ef58e87304099f67da214fc5c50a7b9e24b95c00814a21212e2664f32fdcc371d62992352c9c3f75
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "@opentelemetry/api@npm:1.9.0":
   version: 1.9.0
@@ -14982,8 +14983,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
-    "@openforis/arena-core": "npm:^2.0.1"
-    "@openforis/arena-server": "portal:../arena-server"
+    "@openforis/arena-server": ../arena-server
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
