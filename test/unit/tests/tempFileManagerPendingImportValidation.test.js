@@ -26,6 +26,7 @@ describe('TempFileManager pending import file validation', () => {
 
   test('keepFileForLaterUse then deletePendingImportFileIfAny actually removes the kept file', async () => {
     const fileId = uuidv4()
+    await FileUtils.mkdir(FileUtils.tempFilePath(''))
     const sourceFilePath = FileUtils.newTempFilePath()
     await FileUtils.writeFile(sourceFilePath, 'pending import file content')
 
