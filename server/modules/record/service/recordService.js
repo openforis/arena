@@ -208,7 +208,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
   const cycle = Record.getCycle(record)
   const nodesEmpty = Record.getNodesArray(record).length === 0
 
-  RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
+  await RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
     // Create record thread
@@ -250,7 +250,7 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
       }
     }
   }
-  RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
+  await RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
 }
 
 export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSocketBySocketId
@@ -279,8 +279,8 @@ export const startRecordsValidationJob = ({ user, surveyId }) => {
 }
 
 // NODE
-const _sendNodeUpdateMessage = ({ socketId, user, recordUuid, msg }) => {
-  RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
+const _sendNodeUpdateMessage = async ({ socketId, user, recordUuid, msg }) => {
+  await RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
 
   const thread = RecordsUpdateThreadService.getOrCreatedThread()
   thread.postMessage(msg, user)
@@ -318,7 +318,7 @@ export const persistNode = async ({
     await SurveyFileService.insertFile(surveyId, fileObj)
   }
 
-  _sendNodeUpdateMessage({
+  await _sendNodeUpdateMessage({
     socketId,
     user,
     recordUuid,
