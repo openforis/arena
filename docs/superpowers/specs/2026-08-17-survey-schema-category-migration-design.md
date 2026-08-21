@@ -38,7 +38,7 @@ background pass.
    (`DBMigrator.migrateSurveySchema`) before its data-migration steps.
 2. The category-item-index fix becomes a step in
    `surveyDataMigrationSteps.js`, at its original version threshold
-   (`2.3.20`), the same way the file-path fix was ported at `2.5.6`.
+   (`2.3.20`), the same way the file-path fix was ported at `2.7.2`.
 3. `server/system/dataMigrator/index.js` is deleted — once the
    category-item-index migration moves out, it has nothing left to do.
 4. `initializeAllSurveysCategoryItemIndexes` (now dead once (2) lands) is
@@ -201,7 +201,7 @@ export const surveyDataMigrationSteps = [
     },
   },
   {
-    version: '2.5.6', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
+    version: '2.7.2', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
     migrate: async ({ surveyId }) => {
       await SurveyFileManager.migrateFilesToNewPathFormat({ surveyId })
     },
@@ -210,7 +210,7 @@ export const surveyDataMigrationSteps = [
 ]
 ```
 
-The new step is listed *before* the `2.5.6` step, keeping array order
+The new step is listed *before* the `2.7.2` step, keeping array order
 consistent with version order (steps run in array order, not sorted by
 version, per `SurveyDataMigrationJob.execute()`'s `for...of`).
 
@@ -219,7 +219,7 @@ existing file-path step's `SurveyFileManager` import — the data-migration
 steps registry consistently calls into managers, not services.
 
 The step is ported at its original historical version (`2.3.20`), the
-same convention already used for the file-path step (`2.5.6`) — kept
+same convention already used for the file-path step (`2.7.2`) — kept
 as-is rather than picking a new threshold, even though this per-survey
 registry's version stamp is a different (per-survey) value than the old
 global `info`-table stamp it's replacing. This means a survey already

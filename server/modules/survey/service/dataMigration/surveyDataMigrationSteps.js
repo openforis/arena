@@ -17,7 +17,7 @@ export const surveyDataMigrationSteps = [
     },
   },
   {
-    version: '2.5.6', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
+    version: '2.7.2', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
     migrate: async ({ surveyId }) => {
       await SurveyFileManager.migrateFilesToNewPathFormat({ surveyId })
     },

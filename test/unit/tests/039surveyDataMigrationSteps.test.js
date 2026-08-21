@@ -13,8 +13,8 @@ describe('surveyDataMigrationSteps', () => {
     expect(surveyDataMigrationSteps).toHaveLength(2)
   })
 
-  it('exposes the latest version as 2.5.6, computed via version comparison', () => {
-    expect(latestSurveyDataMigrationVersion).toBe('2.5.6')
+  it('exposes the latest version as 2.7.2, computed via version comparison', () => {
+    expect(latestSurveyDataMigrationVersion).toBe('2.7.2')
   })
 })
 

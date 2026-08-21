@@ -487,11 +487,11 @@ git commit -m "refactor: replace all-surveys category item index initializer wit
 **Files:**
 - Modify: `server/modules/survey/service/dataMigration/surveyDataMigrationSteps.js`
 - Modify: `test/unit/tests/040surveyDataMigrationJob.test.js`
-- Modify: `test/unit/tests/039surveyDataMigrationSteps.test.js` — found during implementation, missed when this plan was written: it asserts `expect(surveyDataMigrationSteps).toHaveLength(1)`, which must become `toHaveLength(2)` for the same reason as the two assertions in Step 1 below. Its other assertion (`latestSurveyDataMigrationVersion` is `'2.5.6'`) is unaffected and stays as-is.
+- Modify: `test/unit/tests/039surveyDataMigrationSteps.test.js` — found during implementation, missed when this plan was written: it asserts `expect(surveyDataMigrationSteps).toHaveLength(1)`, which must become `toHaveLength(2)` for the same reason as the two assertions in Step 1 below. Its other assertion (`latestSurveyDataMigrationVersion` is `'2.7.2'`) is unaffected and stays as-is.
 
 **Interfaces:**
 - Consumes: `CategoryManager.initializeCategoryItemIndexesForSurvey({ surveyId })` from Task 3.
-- Produces: `surveyDataMigrationSteps` now has 2 entries (`2.3.20`, `2.5.6`); `latestSurveyDataMigrationVersion` is unchanged (`2.5.6`, still the max).
+- Produces: `surveyDataMigrationSteps` now has 2 entries (`2.3.20`, `2.7.2`); `latestSurveyDataMigrationVersion` is unchanged (`2.7.2`, still the max).
 
 - [ ] **Step 1: Update the test first, to lock in the expected new step count**
 
@@ -551,7 +551,7 @@ import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileMan
  */
 export const surveyDataMigrationSteps = [
   {
-    version: '2.5.6', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
+    version: '2.7.2', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
     migrate: async ({ surveyId }) => {
       await SurveyFileManager.migrateFilesToNewPathFormat({ surveyId })
     },
@@ -582,7 +582,7 @@ export const surveyDataMigrationSteps = [
     },
   },
   {
-    version: '2.5.6', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
+    version: '2.7.2', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
     migrate: async ({ surveyId }) => {
       await SurveyFileManager.migrateFilesToNewPathFormat({ surveyId })
     },
@@ -721,7 +721,7 @@ Do not push this branch or open a PR — confirm with the user first (this repo'
 
 ## Manual Verification (both repos)
 
-1. In `arena`, with `yarn dev:server` against a dev DB containing at least one survey with a `NULL` or pre-`2.5.6` `app_version`: confirm the server logs show, for that survey, the schema migration running, then the category-item-index step, then the file-path step, in that order, and that the survey's `app_version` ends up stamped at `2.5.6` afterward.
+1. In `arena`, with `yarn dev:server` against a dev DB containing at least one survey with a `NULL` or pre-`2.7.2` `app_version`: confirm the server logs show, for that survey, the schema migration running, then the category-item-index step, then the file-path step, in that order, and that the survey's `app_version` ends up stamped at `2.7.2` afterward.
 2. Confirm a category with un-indexed items on an affected survey ends up with populated indexes after the job runs.
 3. Confirm `server/system/dataMigrator` no longer exists and the server still starts cleanly.
 4. In `arena-server`, on `feat/survey-migration`: confirm `yarn tsc:test` and `yarn lint` both pass on the whole tree (not just the two edited files), so the new option didn't break any other consumer of `InitAppOptions`/`ArenaServer.init`.

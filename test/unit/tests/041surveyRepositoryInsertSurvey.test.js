@@ -27,7 +27,7 @@ const newFakeClient = () => {
 describe('surveyRepository.insertSurvey', () => {
   it('includes app_version among the inserted columns', async () => {
     const client = newFakeClient()
-    await insertSurvey({ survey: newTestSurvey(), appVersion: '2.5.6' }, client)
+    await insertSurvey({ survey: newTestSurvey(), appVersion: '2.7.2' }, client)
 
     expect(client.calls).toHaveLength(1)
     const { query } = client.calls[0]
@@ -36,9 +36,9 @@ describe('surveyRepository.insertSurvey', () => {
 
   it('passes the given appVersion as one of the insert parameters (a newly created survey is stamped as fully migrated, not left NULL/pending)', async () => {
     const client = newFakeClient()
-    await insertSurvey({ survey: newTestSurvey(), appVersion: '2.5.6' }, client)
+    await insertSurvey({ survey: newTestSurvey(), appVersion: '2.7.2' }, client)
 
     const { params } = client.calls[0]
-    expect(params).toEqual(expect.arrayContaining(['2.5.6']))
+    expect(params).toEqual(expect.arrayContaining(['2.7.2']))
   })
 })
