@@ -143,6 +143,7 @@ export const RecordsUpdateThreadService = {
   clearRecordDataFromThread,
   // sockets
   assocSocket,
+  notifyRecordUpdateToSockets,
   notifyRecordDeleteToSockets,
   dissocSocket,
   dissocSocketBySocketId,
