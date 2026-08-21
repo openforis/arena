@@ -26,7 +26,10 @@ const handleClusterEvent = (event) => {
   const { targetType, eventType, message } = event
   if (targetType !== clusterEventTargetType) return
 
-  const thread = getThread()
+  // Every cluster event is delivered to every dyno, including events about surveys/records this dyno
+  // holds nothing for: use the plain lookup, not getThread(), which would reset the thread inactivity
+  // timeout (preventing the thread from ever idling out) and could revive a thread being terminated.
+  const thread = getThreadByKey(getThreadKey())
   if (!thread) return
 
   if (eventType === clusterEventTypes.surveyClear) {

@@ -52,6 +52,29 @@ const Logger = Log.getLogger('RecordService')
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
 
+// The socket-to-record association is only delivery bookkeeping ("which sockets should be notified
+// about updates to this record"): it must never make the record read/write it's attached to fail.
+// It is DB-backed (socket_id is NOT NULL and a FK to connected_socket), so a missing socket id
+// (e.g. a request sent while the client WebSocket is reconnecting) or an already-disconnected one
+// would otherwise throw where the previous in-memory implementation silently tolerated it.
+const _assocSocketBestEffort = async ({ recordUuid, socketId }) => {
+  if (!socketId) return
+  try {
+    await RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
+  } catch (error) {
+    Logger.warn(`could not associate socket ${socketId} to record ${recordUuid}: ${error}`)
+  }
+}
+
+const _dissocSocketBestEffort = async ({ recordUuid, socketId }) => {
+  if (!socketId) return
+  try {
+    await RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
+  } catch (error) {
+    Logger.warn(`could not dissociate socket ${socketId} from record ${recordUuid}: ${error}`)
+  }
+}
+
 // RECORD
 export const createRecord = async ({ user, surveyId, recordToCreate }) => {
   Logger.debug('creating record: ', recordToCreate)
@@ -208,7 +231,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
   const cycle = Record.getCycle(record)
   const nodesEmpty = Record.getNodesArray(record).length === 0
 
-  await RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
+  await _assocSocketBestEffort({ recordUuid, socketId })
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
     // Create record thread
@@ -250,7 +273,7 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
       }
     }
   }
-  await RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
+  await _dissocSocketBestEffort({ recordUuid, socketId })
 }
 
 export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSocketBySocketId
@@ -280,7 +303,7 @@ export const startRecordsValidationJob = ({ user, surveyId }) => {
 
 // NODE
 const _sendNodeUpdateMessage = async ({ socketId, user, recordUuid, msg }) => {
-  await RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
+  await _assocSocketBestEffort({ recordUuid, socketId })
 
   const thread = RecordsUpdateThreadService.getOrCreatedThread()
   thread.postMessage(msg, user)

@@ -9,4 +9,8 @@ describe('Record Concurrency Lock Test', () => {
     'fetchRecordDateModified reflects committed update',
     RecordConcurrencyLockTest.fetchRecordDateModifiedReflectsCommittedUpdateTest
   )
+  test(
+    'getOrFetchRecord uses the cache after its own write and refetches when the DB moves ahead',
+    RecordConcurrencyLockTest.getOrFetchRecordStalenessDecisionTest
+  )
 })

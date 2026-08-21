@@ -3,6 +3,8 @@ import {
   RecordsUpdateThreadService,
   _handleClusterEventForTest as handleClusterEvent,
 } from '../../../server/modules/record/service/update/surveyRecordsThreadService'
+import { SurveyRecordsThreadMap } from '../../../server/modules/record/service/update/surveyRecordsThreadMap'
+import { RecordsUpdateThreadMessageTypes } from '../../../server/modules/record/service/update/thread/recordsThreadMessageTypes'
 
 describe('RecordsUpdateThreadService notify functions', () => {
   let getSocketIdsByRecordUuidSpy
@@ -105,27 +107,75 @@ describe('RecordsUpdateThreadService cluster-bus integration', () => {
     })
   })
 
-  test("a received surveyClear cluster event posts to this dyno's local thread", () => {
-    // Call the exported handler directly - no local thread exists in this unit test
-    // (getThread() returns undefined when none was created), so this just needs to not
-    // throw; full end-to-end behavior is covered by the integration test in Step 7.
-    expect(() =>
+  describe('with a local thread registered', () => {
+    const threadKey = SurveyRecordsThreadMap.getKey()
+    let fakeThread
+
+    beforeEach(() => {
+      // register a fake thread in the real thread map, so the service's (non-side-effecting)
+      // thread lookup finds it, exactly as it would find a real one
+      fakeThread = { postMessage: jest.fn() }
+      SurveyRecordsThreadMap.put(threadKey, fakeThread)
+    })
+
+    afterEach(() => {
+      SurveyRecordsThreadMap.remove(threadKey)
+    })
+
+    test("a received surveyClear cluster event posts to this dyno's local thread", () => {
       handleClusterEvent({
         targetType: 'recordsUpdateThread',
         targetId: 'survey-42',
         eventType: 'surveyClear',
         message: { surveyId: 42, cycle: '0', draft: false },
       })
-    ).not.toThrow()
-  })
 
-  test('a cluster event with an unrelated targetType is ignored', () => {
-    expect(() =>
+      expect(fakeThread.postMessage).toHaveBeenCalledTimes(1)
+      expect(fakeThread.postMessage).toHaveBeenCalledWith({
+        type: RecordsUpdateThreadMessageTypes.surveyClear,
+        surveyId: 42,
+        cycle: '0',
+        draft: false,
+      })
+    })
+
+    test("a received recordClear cluster event posts to this dyno's local thread", () => {
+      handleClusterEvent({
+        targetType: 'recordsUpdateThread',
+        targetId: 'record-1',
+        eventType: 'recordClear',
+        message: { surveyId: 42, cycle: '0', draft: false, recordUuid: 'record-1' },
+      })
+
+      expect(fakeThread.postMessage).toHaveBeenCalledTimes(1)
+      expect(fakeThread.postMessage).toHaveBeenCalledWith({
+        type: RecordsUpdateThreadMessageTypes.recordClear,
+        surveyId: 42,
+        cycle: '0',
+        draft: false,
+        recordUuid: 'record-1',
+      })
+    })
+
+    test('a cluster event with an unrelated targetType does not reach the local thread', () => {
       handleClusterEvent({
         targetType: 'somethingElse',
         targetId: 'x',
         eventType: 'surveyClear',
         message: {},
+      })
+
+      expect(fakeThread.postMessage).not.toHaveBeenCalled()
+    })
+  })
+
+  test('a cluster event received when no local thread exists is a no-op', () => {
+    expect(() =>
+      handleClusterEvent({
+        targetType: 'recordsUpdateThread',
+        targetId: 'survey-42',
+        eventType: 'surveyClear',
+        message: { surveyId: 42, cycle: '0', draft: false },
       })
     ).not.toThrow()
   })
