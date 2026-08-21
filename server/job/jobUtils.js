@@ -80,7 +80,8 @@ export const jobToJSON = (job) => ({
 export const jobRowToSummary = (jobRow) => {
   const { uuid, userUuid, surveyId, type, status, processed, total, props, dateCreated, dateModified } = jobRow
   const ended = [jobStatus.succeeded, jobStatus.failed, jobStatus.canceled].includes(status)
-  const progressPercent = status === jobStatus.succeeded ? 100 : total > 0 ? Math.floor((100 * processed) / total) : 0
+  const baseProgressPercent = total > 0 ? Math.floor((100 * processed) / total) : 0
+  const progressPercent = status === jobStatus.succeeded ? 100 : baseProgressPercent
   const elapsedMillis = (ended ? new Date(dateModified) : new Date()).getTime() - new Date(dateCreated).getTime()
 
   return {

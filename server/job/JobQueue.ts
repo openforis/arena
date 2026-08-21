@@ -1,47 +1,83 @@
-import { Objects } from '@openforis/arena-core'
-import { JobRepository, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+import { JobStatus, Objects, User } from '@openforis/arena-core'
+import { JobRepository, JobRow, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
 import * as JobThreadExecutor from './jobThreadExecutor'
-import { jobRowToSummary, jobStatus } from './jobUtils'
+import { jobRowToSummary } from './jobUtils'
 
-const defaultConfiguration = {
-  concurrency: 3,
+type JobParams = {
+  user: User
+  surveyId?: number
+  [key: string]: any
 }
 
+type JobInfo = {
+  uuid: string
+  type: string
+  status: JobStatus
+  params: JobParams
+  persistPromise?: Promise<JobRow | void>
+}
+
+type ActiveJobRow = {
+  uuid: string
+  [key: string]: any
+}
+
+type JobQueueConfig = {
+  concurrency?: number
+}
+
+interface Logger {
+  debug(msg: string): void
+  error(msg: string): void
+}
+
+/**
+ * JobQueue manages enqueueing and executing jobs with concurrency control.
+ * Handles job scheduling, conflict detection, and status management across dynos.
+ */
 export class JobQueue {
-  constructor(configuration = defaultConfiguration) {
+  private _logger: Logger
+  private _queue: JobInfo[] = []
+  private _maxConcurrentJobs: number
+  private _runningGlobalJob: boolean = false
+  private _jobInfoByUuid: Record<string, JobInfo> = {}
+  private _jobUuidsByUserUuid: Record<string, Set<string>> = {}
+  private _runningJobUuidByUuid: Record<string, string> = {}
+  private _runningJobUuidBySurveyId: Record<string, string> = {}
+  private _runningJobUuidByUserUuid: Record<string, string> = {}
+  private _startNextJobChain: Promise<any> | null = null
+
+  constructor(configuration: JobQueueConfig = {}) {
+    const defaultConfiguration: JobQueueConfig = { concurrency: 3 }
     const { concurrency } = { ...defaultConfiguration, ...configuration }
 
     this._logger = Log.getLogger('JobQueue')
+    this._maxConcurrentJobs = concurrency ?? 3
 
-    this._queue = []
-
-    this._maxConcurrentJobs = concurrency
-
-    this._runningGlobalJob = false
-    this._jobInfoByUuid = {} // all jobs (running or queued)
-    this._jobUuidsByUserUuid = {} // Set<uuid> per user (running and/or queued) - a user can have
-    // multiple concurrently outstanding jobs (for different surveys), though at most one of them
-    // can actually be "running" on this dyno at a time (see _findNextJobIndex's local per-user guard)
-    this._runningJobUuidByUuid = {} // running jobs
-    this._runningJobUuidBySurveyId = {} // running jobs by survey id
-    this._runningJobUuidByUserUuid = {} // running jobs by user uuid
-    this._startNextJobChain = Promise.resolve() // serializes _startNextJob traversals; see _startNextJob
-
-    this._logger.debug(`initializing job queue with ${concurrency} max concurrent jobs`)
+    this._logger.debug(`initializing job queue with ${this._maxConcurrentJobs} max concurrent jobs`)
   }
 
-  isRunning() {
+  /**
+   * Checks if any jobs are currently running.
+   * @returns True if there are running jobs.
+   */
+  isRunning(): boolean {
     return Objects.isNotEmpty(this._runningJobUuidByUuid)
   }
 
-  // Picks a representative job for this user: the running one if there is one, otherwise the
-  // first (oldest) queued one. Used only for the "does this user have anything outstanding at
-  // all, and what does it look like" queries below - a user with multiple outstanding jobs is an
-  // inherently lossy case for these (the webapp's job monitor only ever shows one job at a time).
-  _getJobInfoByUserUuid(userUuid) {
+  /**
+   * Picks a representative job for this user: the running one if there is one, otherwise the
+   * first (oldest) queued one. Used only for the "does this user have anything outstanding at
+   * all, and what does it look like" queries below - a user with multiple outstanding jobs is an
+   * inherently lossy case for these (the webapp's job monitor only ever shows one job at a time).
+   *
+   * @param userUuid - The user UUID.
+   * @returns Job info for the user or null if none exists.
+   */
+  private _getJobInfoByUserUuid(userUuid: string): JobInfo | null {
     const jobUuids = this._jobUuidsByUserUuid[userUuid]
     if (!jobUuids || jobUuids.size === 0) return null
     const runningUuid = this._runningJobUuidByUserUuid[userUuid]
@@ -49,9 +85,13 @@ export class JobQueue {
     return this._jobInfoByUuid[targetUuid]
   }
 
-  // Removes a single job uuid from a user's outstanding-jobs set, cleaning up the set entirely
-  // once it's empty. Shared by onJobEnd and _failQueuedJob.
-  _removeJobUuidForUser({ userUuid, uuid }) {
+  /**
+   * Removes a single job uuid from a user's outstanding-jobs set, cleaning up the set entirely
+   * once it's empty. Shared by onJobEnd and _failQueuedJob.
+   *
+   * @param params - Object containing userUuid and job uuid.
+   */
+  private _removeJobUuidForUser({ userUuid, uuid }: { userUuid: string; uuid: string }): void {
     const jobUuids = this._jobUuidsByUserUuid[userUuid]
     if (!jobUuids) return
     jobUuids.delete(uuid)
@@ -60,7 +100,12 @@ export class JobQueue {
     }
   }
 
-  getJobSummary(jobUuid) {
+  /**
+   * Get the summary for a specific job.
+   * @param jobUuid - The job UUID.
+   * @returns Job summary or null if not found.
+   */
+  getJobSummary(jobUuid: string): JobInfo | any {
     const jobInfo = this._jobInfoByUuid[jobUuid]
     if (!jobInfo) return null
     const { params } = jobInfo
@@ -73,7 +118,12 @@ export class JobQueue {
     }
   }
 
-  getRunningJobSummaryByUserUuid(userUuid) {
+  /**
+   * Get the running job summary for a specific user.
+   * @param userUuid - The user UUID.
+   * @returns Job summary or null if user has no running jobs.
+   */
+  getRunningJobSummaryByUserUuid(userUuid: string): JobInfo | any {
     const jobInfo = this._getJobInfoByUserUuid(userUuid)
     if (!jobInfo) {
       return null
@@ -85,30 +135,37 @@ export class JobQueue {
     }
   }
 
-  deleteJobInfo({ jobUuid }) {
-    const $this = this
+  /**
+   * Delete job info after a delay to give clients time to fetch updated status.
+   * @param jobUuid - The job UUID.
+   */
+  private deleteJobInfo({ jobUuid }: { jobUuid: string }): void {
     // delay job info canceling; give time to clients to fetch the updated job
     setTimeout(() => {
-      delete $this._jobInfoByUuid[jobUuid]
+      delete this._jobInfoByUuid[jobUuid]
     }, 60000)
   }
 
-  // Cancels ALL of this user's outstanding jobs (queued and/or running), not just one. The
-  // webapp's cancel action (DELETE /jobs/active) has no concept of "which job" - it's a single
-  // userUuid-scoped call with no jobUuid - so the safest interpretation once a user can have
-  // multiple concurrently outstanding jobs (different surveys) is to clear all of them, rather
-  // than leaving an invisible one behind that the current UI has no way to see or separately
-  // cancel. NOTE: this mutates this._queue/this._jobUuidsByUserUuid directly and synchronously
-  // and is NOT routed through _startNextJob's serialization chain - see _startNextJobInternal's
-  // identity-based (indexOf) re-resolution, which exists specifically to stay correct in the
-  // face of that.
-  async cancelJobByUserUuid(userUuid) {
+  /**
+   * Cancels ALL of this user's outstanding jobs (queued and/or running), not just one. The
+   * webapp's cancel action (DELETE /jobs/active) has no concept of "which job" - it's a single
+   * userUuid-scoped call with no jobUuid - so the safest interpretation once a user can have
+   * multiple concurrently outstanding jobs (different surveys) is to clear all of them, rather
+   * than leaving an invisible one behind that the current UI has no way to see or separately
+   * cancel. NOTE: this mutates this._queue/this._jobUuidsByUserUuid directly and synchronously
+   * and is NOT routed through _startNextJob's serialization chain - see _startNextJobInternal's
+   * identity-based (indexOf) re-resolution, which exists specifically to stay correct in the
+   * face of that.
+   *
+   * @param userUuid - The user UUID.
+   */
+  async cancelJobByUserUuid(userUuid: string): Promise<void> {
     const jobUuids = this._jobUuidsByUserUuid[userUuid]
     if (!jobUuids || jobUuids.size === 0) return
 
     const runningJobUuid = this._runningJobUuidByUserUuid[userUuid]
 
-    for (const jobUuid of [...jobUuids]) {
+    for (const jobUuid of jobUuids) {
       if (jobUuid === runningJobUuid) {
         // cancel job thread; actual bookkeeping cleanup happens later via onJobEnd once the
         // thread acknowledges the cancellation
@@ -125,7 +182,7 @@ export class JobQueue {
           // without this, the row is left at 'pending' forever (until the stale-job reaper
           // eventually reaps it), blocking this user/survey cluster-wide in the meantime -
           // same reasoning as _failQueuedJob's persisted status write
-          await JobRepository.updateStatus({ uuid: jobUuid, status: jobStatus.canceled }).catch((error) =>
+          await JobRepository.updateStatus({ uuid: jobUuid, status: JobStatus.canceled }).catch((error) =>
             this._logger.error(`error persisting canceled status for job ${jobUuid}: ${error}`)
           )
         }
@@ -135,7 +192,11 @@ export class JobQueue {
     }
   }
 
-  onJobEnd(job) {
+  /**
+   * Callback when a job ends.
+   * @param job - The job object.
+   */
+  onJobEnd(job: any): void {
     const jobInfo = this._jobInfoByUuid[job.uuid]
 
     const { uuid, params, status } = jobInfo
@@ -157,7 +218,11 @@ export class JobQueue {
     this._startNextJob()
   }
 
-  onJobUpdate(job) {
+  /**
+   * Callback when a job updates its status.
+   * @param job - The job object.
+   */
+  onJobUpdate(job: any): void {
     // runs in main thread; can safely modify internal variables
     const { ended, status, uuid } = job
     const jobInfo = this._jobInfoByUuid[uuid]
@@ -167,7 +232,11 @@ export class JobQueue {
     }
   }
 
-  _findNextJobIndex() {
+  /**
+   * Find the index of the next job to execute.
+   * @returns The index of the next job or -1 if none available.
+   */
+  private _findNextJobIndex(): number {
     let firstGlobalJobIndex = -1
     let firstSurveyJobIndex = -1
     this._queue.some((jobInfo, index) => {
@@ -195,11 +264,28 @@ export class JobQueue {
     return !this._runningGlobalJob && firstGlobalJobIndex >= 0 ? firstGlobalJobIndex : firstSurveyJobIndex
   }
 
-  _executeJob(jobInfo) {
+  /**
+   * Execute a job thread.
+   * @param jobInfo - The job info.
+   */
+  private _executeJob(jobInfo: JobInfo): void {
     JobThreadExecutor.executeJobThread(jobInfo, this.onJobUpdate.bind(this))
   }
 
-  async _hasActiveJobElsewhere({ uuid, userUuid, surveyId }) {
+  /**
+   * Check if there's an active job elsewhere for this user or survey.
+   * @param params - Object with uuid, userUuid, and optional surveyId.
+   * @returns True if there's a conflicting active job elsewhere.
+   */
+  private async _hasActiveJobElsewhere({
+    uuid,
+    userUuid,
+    surveyId,
+  }: {
+    uuid: string
+    userUuid: string
+    surveyId?: number
+  }): Promise<boolean> {
     // A DB row is only a real conflict if it belongs to a job THIS dyno has never heard of - if
     // this dyno already tracks the row's uuid (this._jobInfoByUuid), its own local state is more
     // current than a possibly-stale DB read: onJobEnd() frees local locks synchronously the
@@ -210,8 +296,8 @@ export class JobQueue {
     // row and be failed for a conflict that already resolved on this exact dyno.
     // deleteJobInfo's existing 60-second delayed cleanup conveniently keeps a just-ended job
     // visible in _jobInfoByUuid for exactly the window that matters here.
-    const isConflict = (activeJob) =>
-      Boolean(activeJob) && activeJob.uuid !== uuid && !this._jobInfoByUuid[activeJob.uuid]
+    const isConflict = (activeJob: ActiveJobRow | null): boolean =>
+      Boolean(activeJob) && activeJob!.uuid !== uuid && !this._jobInfoByUuid[activeJob!.uuid]
 
     const activeByUser = await JobRepository.getActiveByUserUuid(userUuid).catch((error) => {
       this._logger.error(`error checking active job by user: ${error}`)
@@ -229,21 +315,25 @@ export class JobQueue {
     return false
   }
 
-  async _failQueuedJob({ jobInfo, message }) {
+  /**
+   * Fail a queued job.
+   * @param params - Object with jobInfo and error message.
+   */
+  private async _failQueuedJob({ jobInfo, message }: { jobInfo: JobInfo; message: string }): Promise<void> {
     const { uuid, type, params } = jobInfo
     const { user, surveyId } = params ?? {}
     const { uuid: userUuid } = user
 
     const errors = { generic: { key: 'appErrors:generic', params: { text: message } } }
 
-    jobInfo.status = jobStatus.failed
+    jobInfo.status = JobStatus.failed
     this.deleteJobInfo({ jobUuid: uuid })
     this._removeJobUuidForUser({ userUuid, uuid })
 
     if (surveyId) {
       await JobRepository.updateStatus({
         uuid,
-        status: jobStatus.failed,
+        status: JobStatus.failed,
         props: { errors },
       }).catch((error) => this._logger.error(`error persisting failed status for job ${uuid}: ${error}`))
     }
@@ -259,7 +349,7 @@ export class JobQueue {
       userUuid,
       surveyId,
       type,
-      status: jobStatus.failed,
+      status: JobStatus.failed,
       processed: 0,
       total: 0,
       props: { errors },
@@ -270,29 +360,32 @@ export class JobQueue {
     WebSocketServer.notifyUser(userUuid, WebSocketEvent.jobUpdate, summary)
   }
 
-  // Public entry point: serializes concurrent external triggers (enqueue(), onJobEnd())
-  // so at most one logical traversal of the queue is ever in flight. Each external call
-  // chains onto whatever traversal is currently running (or starts a fresh one). Call
-  // sites intentionally do NOT await this (fire-and-forget).
-  // Note: cancelJobByUserUuid()/destroy() mutate this._queue directly and are NOT
-  // routed through this chain - that's exactly why _startNextJobInternal re-resolves a
-  // job's position by object identity (this._queue.indexOf(jobInfo)) after its await,
-  // instead of trusting a numeric index computed before the await.
-  _startNextJob() {
+  /**
+   * Public entry point: serializes concurrent external triggers (enqueue(), onJobEnd())
+   * so at most one logical traversal of the queue is ever in flight. Each external call
+   * chains onto whatever traversal is currently running (or starts a fresh one). Call
+   * sites intentionally do NOT await this (fire-and-forget).
+   * Note: cancelJobByUserUuid()/destroy() mutate this._queue directly and are NOT
+   * routed through this chain - that's exactly why _startNextJobInternal re-resolves a
+   * job's position by object identity (this._queue.indexOf(jobInfo)) after its await,
+   * instead of trusting a numeric index computed before the await.
+   */
+  private _startNextJob(): void {
     this._startNextJobChain = (this._startNextJobChain || Promise.resolve())
       .then(() => this._startNextJobInternal())
       .catch((error) => this._logger.error(`error in job queue loop: ${error}`))
-    return this._startNextJobChain
   }
 
-  // Recursive draining of the queue for a single triggered traversal. This recurses
-  // into itself directly (NOT via _startNextJob()) so that a full drain resolves as one
-  // unit and the chain above only advances to the next external caller once this
-  // traversal has completely finished. Recursing through _startNextJob() instead would
-  // re-read this._startNextJobChain while it still points at this very call, creating a
-  // circular promise dependency that deadlocks the queue after the first job (verified
-  // via isolated repro during development - see task-4-report.md).
-  async _startNextJobInternal() {
+  /**
+   * Recursive draining of the queue for a single triggered traversal. This recurses
+   * into itself directly (NOT via _startNextJob()) so that a full drain resolves as one
+   * unit and the chain above only advances to the next external caller once this
+   * traversal has completely finished. Recursing through _startNextJob() instead would
+   * re-read this._startNextJobChain while it still points at this very call, creating a
+   * circular promise dependency that deadlocks the queue after the first job (verified
+   * via isolated repro during development - see task-4-report.md).
+   */
+  private async _startNextJobInternal(): Promise<boolean | void> {
     if (this._queue.length === 0) {
       return false
     }
@@ -331,7 +424,10 @@ export class JobQueue {
       if (conflictsElsewhere) {
         this._logger.debug(`job ${uuid} conflicts with an active job on another dyno; failing it`)
         this._queue.splice(currentIndex, 1)
-        await this._failQueuedJob({ jobInfo, message: 'Another job is already running for this user or survey' })
+        await this._failQueuedJob({
+          jobInfo,
+          message: 'Another job is already running for this user or survey',
+        })
         return this._startNextJobInternal()
       }
 
@@ -354,9 +450,14 @@ export class JobQueue {
     }
   }
 
-  enqueue(job) {
+  /**
+   * Enqueue a job for execution.
+   * @param job - The job to enqueue.
+   * @throws Error if only one job per user is already running.
+   */
+  enqueue(job: any): void {
     const { params, status, type, uuid } = job
-    const jobInfo = { params, status, type, uuid }
+    const jobInfo: JobInfo = { params, status, type, uuid }
     const { user, surveyId } = params ?? {}
     const { uuid: userUuid } = user
 
@@ -403,7 +504,10 @@ export class JobQueue {
     this._startNextJob()
   }
 
-  async destroy() {
+  /**
+   * Destroy the job queue by cancelling all outstanding jobs.
+   */
+  async destroy(): Promise<void> {
     for (const userUuid of Object.keys(this._jobUuidsByUserUuid)) {
       await this.cancelJobByUserUuid(userUuid)
     }
