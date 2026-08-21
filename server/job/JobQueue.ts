@@ -49,7 +49,7 @@ export class JobQueue {
   private readonly _runningJobUuidByUuid: Record<string, string> = {}
   private readonly _runningJobUuidBySurveyId: Record<string, string> = {}
   private readonly _runningJobUuidByUserUuid: Record<string, string> = {}
-  private _startNextJobChain: Promise<boolean | void> | null = null
+  private _startNextJobChain: Promise<void> | null = null
 
   constructor(configuration: JobQueueConfig = {}) {
     const defaultConfiguration: JobQueueConfig = { concurrency: 3 }
@@ -372,7 +372,7 @@ export class JobQueue {
    * instead of trusting a numeric index computed before the await.
    */
   private _startNextJob(): void {
-    this._startNextJobChain = (this._startNextJobChain || Promise.resolve())
+    this._startNextJobChain = (this._startNextJobChain ?? Promise.resolve())
       .then(() => this._startNextJobInternal())
       .catch((error) => this._logger.error(`error in job queue loop: ${error}`))
   }
@@ -386,7 +386,7 @@ export class JobQueue {
    * circular promise dependency that deadlocks the queue after the first job (verified
    * via isolated repro during development - see task-4-report.md).
    */
-  private async _startNextJobInternal(): Promise<boolean | void> {
+  private async _startNextJobInternal(): Promise<void> {
     if (this._queue.length === 0) {
       return false
     }
