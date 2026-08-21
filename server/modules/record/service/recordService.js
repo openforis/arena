@@ -6,6 +6,7 @@ import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server
 import * as Log from '@server/log/log'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
+import { PrintableExportScopes, PrintOrientations } from '@common/record/printableExport'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
@@ -18,7 +19,7 @@ import * as Record from '@core/record/record'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as Validation from '@core/validation/validation'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
@@ -493,6 +494,10 @@ const exportRecordDocument = async ({
   generator,
   extension,
   contentType,
+  exportScope = PrintableExportScopes.full,
+  entityDefUuid,
+  entityNodeUuid,
+  orientation = PrintOrientations.portrait,
 }) => {
   const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true, user })
   const cycle = Record.getCycle(record)
@@ -503,6 +508,23 @@ const exportRecordDocument = async ({
   })
   const surveyDocImages = Survey.getSurveyDocImages(survey)
   const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+
+  let entityDef = null
+  if (exportScope === PrintableExportScopes.currentPage) {
+    if (!entityDefUuid || !entityNodeUuid) {
+      throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
+    }
+    entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+    const entityNode = Record.getNodeByUuid(entityNodeUuid)(record)
+    if (
+      !entityDef ||
+      !NodeDef.isEntity(entityDef) ||
+      !entityNode ||
+      Node.getNodeDefUuid(entityNode) !== entityDefUuid
+    ) {
+      throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
+    }
+  }
 
   const rootNode = Record.getRootNode(record)
   const isApplicable = async (imageFile) => {
@@ -552,8 +574,21 @@ const exportRecordDocument = async ({
     headerOnFirstPageOnly,
     pageNumbering,
     readOnly: true,
+    exportScope,
+    entityDefUuid,
+    entityNodeUuid,
+    orientation,
   })
-  const fileName = ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'RecordForm', extension })
+  const fileName =
+    exportScope === PrintableExportScopes.currentPage
+      ? ExportFileNameGenerator.generate({
+          surveyName,
+          cycle,
+          itemName: NodeDef.getLabel(entityDef, langToUse) || NodeDef.getName(entityDef),
+          fileType: 'RecordForm',
+          extension,
+        })
+      : ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'RecordForm', extension })
   Response.sendFileContent({
     res: outputStream,
     fileName,
@@ -563,25 +598,53 @@ const exportRecordDocument = async ({
   })
 }
 
-export const exportRecordDocx = ({ user, surveyId, recordUuid, outputStream, lang = null }) =>
+export const exportRecordDocx = ({
+  user,
+  surveyId,
+  recordUuid,
+  outputStream,
+  lang = null,
+  exportScope,
+  entityDefUuid,
+  entityNodeUuid,
+  orientation,
+}) =>
   exportRecordDocument({
     user,
     surveyId,
     recordUuid,
     outputStream,
     lang,
+    exportScope,
+    entityDefUuid,
+    entityNodeUuid,
+    orientation,
     generator: SurveyDocxGenerator.generateSurveyDocx,
     extension: 'docx',
     contentType: Response.contentTypes.docx,
   })
 
-export const exportRecordPdf = ({ user, surveyId, recordUuid, outputStream, lang = null }) =>
+export const exportRecordPdf = ({
+  user,
+  surveyId,
+  recordUuid,
+  outputStream,
+  lang = null,
+  exportScope,
+  entityDefUuid,
+  entityNodeUuid,
+  orientation,
+}) =>
   exportRecordDocument({
     user,
     surveyId,
     recordUuid,
     outputStream,
     lang,
+    exportScope,
+    entityDefUuid,
+    entityNodeUuid,
+    orientation,
     generator: SurveyPdfGenerator.generateSurveyPdf,
     extension: 'pdf',
     contentType: Response.contentTypes.pdf,

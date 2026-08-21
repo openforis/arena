@@ -757,6 +757,18 @@ $t(common.appNameFull)
     basic: 'Básico',
     advanced: 'Avanzado',
     mobileApp: 'Aplicación móvil',
+    print: 'Impresión',
+    printProps: {
+      printOrientation: {
+        label: 'Orientación de página',
+        info: 'Orientación usada cuando esta entidad inicia su propia sección imprimible. Por defecto se hereda la orientación del documento elegida en la exportación.',
+      },
+      orientations: {
+        default: 'Predeterminada (documento)',
+        portrait: 'Vertical',
+        landscape: 'Horizontal',
+      },
+    },
     validations: 'Validaciones',
     function: 'Función',
     editingFunction: 'Editando función {{functionName}}',
@@ -824,6 +836,10 @@ $t(common.appNameFull)
       autoIncrementalKey: {
         label: 'Clave auto incremental',
         info: 'El valor se generará automáticamente',
+      },
+      autoCreateMinCountItems: {
+        label: 'Crear mínimo de elementos automáticamente',
+        info: 'Cuando la entidad se vuelve relevante o se crea su entidad padre, se generará automáticamente un número de entidades igual al mínimo requerido.',
       },
       displayAs: 'Mostrar como',
       displayIn: 'Mostrar en',
