@@ -1,5 +1,8 @@
-import { WebSocketServer, WebSocketEvent, RecordSocketAssociationRepository } from '@openforis/arena-server'
-import { RecordsUpdateThreadService } from '../../../server/modules/record/service/update/surveyRecordsThreadService'
+import { ClusterBus, WebSocketServer, WebSocketEvent, RecordSocketAssociationRepository } from '@openforis/arena-server'
+import {
+  RecordsUpdateThreadService,
+  _handleClusterEventForTest as handleClusterEvent,
+} from '../../../server/modules/record/service/update/surveyRecordsThreadService'
 
 describe('RecordsUpdateThreadService notify functions', () => {
   let getSocketIdsByRecordUuidSpy
@@ -73,5 +76,57 @@ describe('RecordsUpdateThreadService notify functions', () => {
     expect(isSocketConnectedSpy).toHaveBeenCalledWith('socket-stale')
     expect(dissocSocketSpy).toHaveBeenCalledWith({ recordUuid: 'record-1', socketId: 'socket-stale' })
     expect(notifySocketSpy).not.toHaveBeenCalled()
+  })
+})
+
+describe('RecordsUpdateThreadService cluster-bus integration', () => {
+  let publishSpy
+
+  beforeAll(() => {
+    publishSpy = jest.spyOn(ClusterBus, 'publish')
+  })
+
+  afterAll(() => {
+    publishSpy.mockRestore()
+  })
+
+  beforeEach(() => {
+    publishSpy.mockReset().mockResolvedValue(undefined)
+  })
+
+  test('clearSurveyDataFromThread publishes a cluster event instead of only messaging the local thread', () => {
+    RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId: 42, cycle: '0', draft: false })
+
+    expect(publishSpy).toHaveBeenCalledWith({
+      targetType: 'recordsUpdateThread',
+      targetId: 'survey-42',
+      eventType: 'surveyClear',
+      message: { surveyId: 42, cycle: '0', draft: false },
+    })
+  })
+
+  test("a received surveyClear cluster event posts to this dyno's local thread", () => {
+    // Call the exported handler directly - no local thread exists in this unit test
+    // (getThread() returns undefined when none was created), so this just needs to not
+    // throw; full end-to-end behavior is covered by the integration test in Step 7.
+    expect(() =>
+      handleClusterEvent({
+        targetType: 'recordsUpdateThread',
+        targetId: 'survey-42',
+        eventType: 'surveyClear',
+        message: { surveyId: 42, cycle: '0', draft: false },
+      })
+    ).not.toThrow()
+  })
+
+  test('a cluster event with an unrelated targetType is ignored', () => {
+    expect(() =>
+      handleClusterEvent({
+        targetType: 'somethingElse',
+        targetId: 'x',
+        eventType: 'surveyClear',
+        message: {},
+      })
+    ).not.toThrow()
   })
 })

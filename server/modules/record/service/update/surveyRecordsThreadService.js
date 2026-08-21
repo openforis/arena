@@ -1,4 +1,4 @@
-import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+import { ClusterBus, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 import ThreadManager from '@server/threads/threadManager'
@@ -18,6 +18,30 @@ const threadTimeouts = {}
 // ======
 // THREAD
 // ======
+
+const clusterEventTargetType = 'recordsUpdateThread'
+const clusterEventTypes = { surveyClear: 'surveyClear', recordClear: 'recordClear' }
+
+const handleClusterEvent = (event) => {
+  const { targetType, eventType, message } = event
+  if (targetType !== clusterEventTargetType) return
+
+  const thread = getThread()
+  if (!thread) return
+
+  if (eventType === clusterEventTypes.surveyClear) {
+    thread.postMessage({ type: RecordsUpdateThreadMessageTypes.surveyClear, ...message })
+  } else if (eventType === clusterEventTypes.recordClear) {
+    thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordClear, ...message })
+  }
+}
+
+// Exported under a test-only name so tests can invoke it directly, without needing to intercept
+// the ClusterBus.onEvent registration call below (which runs at module-load time, before any
+// test's jest.spyOn setup could possibly run).
+export const _handleClusterEventForTest = handleClusterEvent
+
+ClusterBus.onEvent(handleClusterEvent)
 
 // ====== CREATE
 const _createThread = () => {
@@ -67,13 +91,21 @@ const killThread = () => {
 }
 
 const clearSurveyDataFromThread = ({ surveyId, cycle = null, draft = false }) => {
-  const thread = getThread()
-  thread?.postMessage({ type: RecordsUpdateThreadMessageTypes.surveyClear, surveyId, cycle, draft })
+  ClusterBus.publish({
+    targetType: clusterEventTargetType,
+    targetId: `survey-${surveyId}`,
+    eventType: clusterEventTypes.surveyClear,
+    message: { surveyId, cycle, draft },
+  }).catch((error) => Logger.error(`error publishing surveyClear cluster event: ${error}`))
 }
 
 const clearRecordDataFromThread = ({ surveyId, cycle, draft, recordUuid }) => {
-  const thread = getThread()
-  thread?.postMessage({ type: RecordsUpdateThreadMessageTypes.recordClear, surveyId, cycle, draft, recordUuid })
+  ClusterBus.publish({
+    targetType: clusterEventTargetType,
+    targetId: recordUuid,
+    eventType: clusterEventTypes.recordClear,
+    message: { surveyId, cycle, draft, recordUuid },
+  }).catch((error) => Logger.error(`error publishing recordClear cluster event: ${error}`))
 }
 
 // ====== READ
