@@ -1,6 +1,7 @@
 import { Objects, SystemError } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
+import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 
 import Thread from '@server/threads/thread'
@@ -17,6 +18,15 @@ import * as RecordManager from '../../../manager/recordManager'
 import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
+
+// Serializes record mutations across dynos: acquires a transaction-scoped Postgres advisory
+// lock keyed by recordUuid, runs fn with that transaction's client, and lets the lock be
+// auto-released on commit/rollback.
+const acquireRecordLockAndRun = ({ recordUuid, fn }) =>
+  db.tx(async (t) => {
+    await t.any('SELECT pg_advisory_xact_lock(hashtext($1))', [recordUuid])
+    return fn(t)
+  })
 
 class RecordsUpdateThread extends Thread {
   constructor(paramsObj) {
@@ -167,17 +177,26 @@ class RecordsUpdateThread extends Thread {
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
-    let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+    await acquireRecordLockAndRun({
+      recordUuid,
+      fn: async (t) => {
+        let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, t)
 
-    record = await RecordManager.initNewRecord({
-      user,
-      survey,
-      record,
-      timezoneOffset,
-      nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
-      nodesValidationListener: (validations) => this.handleNodesValidationUpdated.bind(this)({ record, validations }),
+        record = await RecordManager.initNewRecord(
+          {
+            user,
+            survey,
+            record,
+            timezoneOffset,
+            nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
+            nodesValidationListener: (validations) =>
+              this.handleNodesValidationUpdated.bind(this)({ record, validations }),
+          },
+          t
+        )
+        recordsCache.set(recordUuid, record)
+      },
     })
-    recordsCache.set(recordUuid, record)
   }
 
   async processRecordReloadMsg(msg) {
@@ -185,10 +204,15 @@ class RecordsUpdateThread extends Thread {
 
     const { recordsCache } = await this.getOrFetchSurveyData(msg)
 
-    if (recordsCache.has(recordUuid)) {
-      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user })
-      recordsCache.set(recordUuid, record)
-    }
+    if (!recordsCache.has(recordUuid)) return
+
+    await acquireRecordLockAndRun({
+      recordUuid,
+      fn: async (t) => {
+        const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user }, t)
+        recordsCache.set(recordUuid, record)
+      },
+    })
   }
 
   async processRecordNodePersistMsg(msg) {
@@ -197,18 +221,27 @@ class RecordsUpdateThread extends Thread {
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
     const recordUuid = Node.getRecordUuid(node)
-    let record = await this.getOrFetchRecord({ msg, recordUuid })
 
-    record = await RecordManager.persistNode({
-      user,
-      survey,
-      record,
-      node,
-      timezoneOffset,
-      nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
-      nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
+    await acquireRecordLockAndRun({
+      recordUuid,
+      fn: async (t) => {
+        let record = await this.getOrFetchRecord({ msg, recordUuid, t })
+
+        record = await RecordManager.persistNode(
+          {
+            user,
+            survey,
+            record,
+            node,
+            timezoneOffset,
+            nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
+            nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
+          },
+          t
+        )
+        recordsCache.set(recordUuid, record)
+      },
     })
-    recordsCache.set(recordUuid, record)
   }
 
   async processRecordNodeDeleteMsg(msg) {
@@ -216,17 +249,23 @@ class RecordsUpdateThread extends Thread {
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
-    let record = await this.getOrFetchRecord({ msg, recordUuid })
-    record = await RecordManager.deleteNode(
-      user,
-      survey,
-      record,
-      nodeUuid,
-      timezoneOffset,
-      (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
-      (validations) => this.handleNodesValidationUpdated({ record, validations })
-    )
-    recordsCache.set(recordUuid, record)
+    await acquireRecordLockAndRun({
+      recordUuid,
+      fn: async (t) => {
+        let record = await this.getOrFetchRecord({ msg, recordUuid, t })
+        record = await RecordManager.deleteNode(
+          user,
+          survey,
+          record,
+          nodeUuid,
+          timezoneOffset,
+          (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
+          (validations) => this.handleNodesValidationUpdated({ record, validations }),
+          t
+        )
+        recordsCache.set(recordUuid, record)
+      },
+    })
   }
 
   async processRecordClearMsg(msg) {
@@ -257,17 +296,25 @@ class RecordsUpdateThread extends Thread {
     })
   }
 
-  async getOrFetchRecord({ msg, recordUuid }) {
+  async getOrFetchRecord({ msg, recordUuid, t }) {
     const { surveyId, user } = msg
 
     const { recordsCache } = await this.getOrFetchSurveyData(msg)
 
-    let record = recordsCache.get(recordUuid)
+    const cachedRecord = recordsCache.get(recordUuid)
+    const dbDateModified = await RecordManager.fetchRecordDateModified({ surveyId, recordUuid }, t)
 
-    if (!record) {
-      record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user })
-      recordsCache.set(recordUuid, record)
+    const cachedDateModified = cachedRecord ? Record.getDateModified(cachedRecord) : null
+    const isCacheFresh =
+      cachedRecord && dbDateModified && cachedDateModified && cachedDateModified.getTime() === dbDateModified.getTime()
+
+    if (isCacheFresh) {
+      return cachedRecord
     }
+
+    // No cached copy, or another dyno committed a change since this dyno cached the record - refetch.
+    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user }, t)
+    recordsCache.set(recordUuid, record)
     return record
   }
 }
