@@ -52,7 +52,7 @@ export default {
   sessionExpiredRefreshPage: 'Срок действия сеанса мог истечь.\nПопробуйте обновить страницу.',
   survey: {
     nodeDefNameNotFound: 'Определение узла не найдено: {{name}}',
-    dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
+    dataMigrationInProgress: 'Это анкетирование обновляется; повторите попытку через некоторое время.',
   },
   unsupportedFunctionType: 'Неподдерживаемый тип функции: {{exprType}}',
   userHasPendingInvitation:

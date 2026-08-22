@@ -52,7 +52,7 @@ export default {
   sessionExpiredRefreshPage: 'Сесс дууссан байж магадгүй.\nХуудсыг сэргээж үзнэ үү.',
   survey: {
     nodeDefNameNotFound: 'Зангилааны тодорхойлолт олдсонгүй: {{name}}',
-    dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
+    dataMigrationInProgress: 'Энэ судалгааг шинэчилж байна; түр хүлээгээд дахин оролдоно уу.',
   },
   unsupportedFunctionType: 'Дэмжигдээгүй функцийн төрөл: {{exprType}}',
   userHasPendingInvitation:

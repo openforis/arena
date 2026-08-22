@@ -55,7 +55,7 @@ export default {
 Essayez de rafraîchir la page.`,
   survey: {
     nodeDefNameNotFound: 'Définition de nœud introuvable : {{name}}',
-    dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
+    dataMigrationInProgress: 'Ce formulaire est en cours de mise à niveau ; veuillez réessayer sous peu.',
   },
   unsupportedFunctionType: 'Type de fonction non pris en charge : {{exprType}}',
   userHasPendingInvitation: `Il existe déjà une invitation en attente pour l'utilisateur avec l'email '{{email}}' ; il/elle ne peut pas être invité(e) à ce formulaire jusqu'à ce qu'elle soit acceptée`,
