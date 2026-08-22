@@ -1,4 +1,5 @@
 import {
+  CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
   HeadBucketCommand,
@@ -38,6 +39,33 @@ export const checkCanAccessS3Bucket = async () => {
 }
 
 const createCommandParams = ({ getFileKey, params }) => ({ Bucket, Key: getFileKey(params) })
+
+export const checkFileExistsInS3 = async ({ key }) => {
+  try {
+    const command = new HeadObjectCommand({ Bucket, Key: key })
+    await _sendCommand(command)
+    return true
+  } catch (error) {
+    if (error.$metadata?.httpStatusCode === 404) {
+      return false
+    }
+    throw error
+  }
+}
+
+export const copyObjectInS3 = async ({ sourceKey, destinationKey }) => {
+  const command = new CopyObjectCommand({
+    Bucket,
+    CopySource: `${Bucket}/${sourceKey}`,
+    Key: destinationKey,
+  })
+  return _sendCommand(command)
+}
+
+export const deleteObjectFromS3 = async ({ key }) => {
+  const command = new DeleteObjectCommand({ Bucket, Key: key })
+  return _sendCommand(command)
+}
 
 export const createS3BucketRepository = ({ getFileKey }) => {
   const uploadFileContent = async ({ content, ...params }) => {

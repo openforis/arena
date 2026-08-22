@@ -254,8 +254,8 @@ __metadata:
   linkType: hard
 
 "@aws-sdk/client-s3@npm:^3.1112.0":
-  version: 3.1114.0
-  resolution: "@aws-sdk/client-s3@npm:3.1114.0"
+  version: 3.1113.0
+  resolution: "@aws-sdk/client-s3@npm:3.1113.0"
   dependencies:
     "@aws-sdk/checksums": "npm:^3.1000.28"
     "@aws-sdk/core": "npm:^3.977.8"
@@ -268,7 +268,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.9.13"
     "@smithy/types": "npm:^4.16.1"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/1c703e88dfa339fa13a335894e2a39f416ef77d70a4da5ea77d07f43d7fe1427b2a7b4a75f5e114d9ccc87fa7c2efe74f8e35340d6c581aac7b9f3e2f23589ab
+  checksum: 10c0/a08a6999aec047f46da0ee3a30ad51fb1d43ade16c37f219649fba82daf64468d5e31008dcece4d7446f04cc886eb2ba4c662afe7ab2fbe3772c81a3343203c1
   languageName: node
   linkType: hard
 
@@ -7674,11 +7674,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.9.0":
-  version: 2.11.13
-  resolution: "baseline-browser-mapping@npm:2.11.13"
+  version: 2.10.0
+  resolution: "baseline-browser-mapping@npm:2.10.0"
   bin:
     baseline-browser-mapping: dist/cli.cjs
-  checksum: 10c0/a02511614ebe0311d4831e7ba11e88e5997d5bf0733e5eadd7d97b4bb69d76f468a982862108cb90721e1a41f4ef36c1a5f9fa18569923702ad2875ca3abfe58
+  checksum: 10c0/da9c3ec0fcd7f325226a47d2142794d41706b6e0a405718a2c15410bbdb72aacadd65738bedef558c6f1b106ed19458cb25b06f63b66df2c284799905dbbd003
   languageName: node
   linkType: hard
 
@@ -8239,9 +8239,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001759":
-  version: 1.0.30001809
-  resolution: "caniuse-lite@npm:1.0.30001809"
-  checksum: 10c0/cac2ed4e66cc6c4cbf126b94d2c02012566eb92f93c89949290f99edcd2bdc4ed1290b5c537ccb9b42c773936a479ed468e5d4e9b8938b126a0947090e42e008
+  version: 1.0.30001774
+  resolution: "caniuse-lite@npm:1.0.30001774"
+  checksum: 10c0/cc6a340a5421b9a67d8fa80889065ee27b2839ad62993571dded5296e18f02bbf685ce7094e93fe908cddc9fefdfad35d6c010b724cc3d22a6479b0d0b679f8c
   languageName: node
   linkType: hard
 

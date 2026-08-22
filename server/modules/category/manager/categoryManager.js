@@ -32,7 +32,7 @@ import * as CategoryRepository from '../repository/categoryRepository'
 
 export {
   initializeSurveyCategoryItemsIndexes,
-  initializeAllSurveysCategoryItemIndexes,
+  initializeCategoryItemIndexesForSurvey,
 } from './categoryItemIndexInitializer'
 
 // ====== VALIDATION

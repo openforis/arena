@@ -1,5 +1,6 @@
 import * as ObjectUtils from '@core/objectUtils'
 
+import AllSurveysDataMigrationJob from '@server/modules/survey/service/dataMigration/allSurveysDataMigrationJob'
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
 import ArenaMobileDataImportJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportJob'
 import ArenaMobileDataImportSummaryJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportSummaryJob'
@@ -34,6 +35,7 @@ import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJo
 import VaidationReportGenerationJob from '@server/modules/record/service/validationReportGenerationJob'
 
 const jobClasses = [
+  AllSurveysDataMigrationJob,
   ArenaImportJob,
   ArenaMobileDataImportJob,
   ArenaMobileDataImportSummaryJob,

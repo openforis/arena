@@ -55,6 +55,7 @@ export default {
   sessionExpiredRefreshPage: 'La sesión podría haber caducado.\nIntente actualizar la página.',
   survey: {
     nodeDefNameNotFound: 'Definición de nodo no encontrada: {{name}}',
+    dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
   },
   unsupportedFunctionType: 'Tipo de función no compatible: {{exprType}}',
   userHasPendingInvitation:
