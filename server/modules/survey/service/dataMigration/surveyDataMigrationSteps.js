@@ -7,19 +7,19 @@ import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileMan
 /**
  * Ordered list of per-survey data migration steps.
  * Each step is applied to a survey when its stored app version is lower than the step's version threshold.
- * @type {Array<{ version: string, migrate: (params: { surveyId: number }) => Promise<void> }>}
+ * @type {Array<{ version: string, migrate: (params: { surveyId: number, client: object }) => Promise<void> }>}
  */
 export const surveyDataMigrationSteps = [
   {
     version: '2.3.20', // formerly versionWithCategoryItemIndexFix in server/system/dataMigrator/index.js
-    migrate: async ({ surveyId }) => {
-      await CategoryManager.initializeCategoryItemIndexesForSurvey({ surveyId })
+    migrate: async ({ surveyId, client }) => {
+      await CategoryManager.initializeCategoryItemIndexesForSurvey({ surveyId }, client)
     },
   },
   {
     version: '2.7.2', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
-    migrate: async ({ surveyId }) => {
-      await SurveyFileManager.migrateFilesToNewPathFormat({ surveyId })
+    migrate: async ({ surveyId, client }) => {
+      await SurveyFileManager.migrateFilesToNewPathFormat({ surveyId }, client)
     },
   },
   // future per-survey migration steps are appended here, each with its own version threshold

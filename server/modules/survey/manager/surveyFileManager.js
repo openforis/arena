@@ -141,13 +141,13 @@ export const deleteFilesAndContent = async ({ surveyId, fileSummaries }, client 
   await FileRepository.deleteFilesByUuids(surveyId, fileUuids, client)
 }
 
-export const migrateFilesToNewPathFormat = async ({ surveyId }) => {
+export const migrateFilesToNewPathFormat = async ({ surveyId }, client = db) => {
   const storageType = getFileContentStorageType()
   if (storageType === fileContentStorageTypes.db) {
     return false
   }
 
-  const fileSummaries = await FileRepository.fetchFileSummariesBySurveyId(surveyId)
+  const fileSummaries = await FileRepository.fetchFileSummariesBySurveyId(surveyId, client)
   if (fileSummaries.length === 0) {
     return false
   }
