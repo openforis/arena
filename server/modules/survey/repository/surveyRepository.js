@@ -19,7 +19,8 @@ const _getLabelColumn = (tableAlias) => {
 
 const _getSurveySelectFields = (alias = '') => {
   const prefix = alias ? `${alias}.` : ''
-  const columns = ['id', 'uuid', 'published', 'draft', 'props', 'props_draft', 'owner_uuid', 'template']
+  // 'app_version' requires a migration from the separate `@openforis/arena-server` package to exist on the DB.
+  const columns = ['id', 'uuid', 'published', 'draft', 'props', 'props_draft', 'owner_uuid', 'template', 'app_version']
   return [
     ...columns.map((c) => `${prefix}${c}`),
     selectDate(`${prefix}date_created`, 'date_created'),
@@ -30,11 +31,24 @@ const _getSurveySelectFields = (alias = '') => {
 
 // ============== CREATE
 
-export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, client = db) =>
+/**
+ * Inserts a new survey row.
+ * @param {object} params - The insert parameters.
+ * @param {object} params.survey - The survey (or survey info) being inserted.
+ * @param {object} [params.props] - The survey published props.
+ * @param {object} [params.propsDraft] - The survey draft props.
+ * @param {string} [params.appVersion] - The app version to stamp the new survey with. A brand-new survey has no
+ *   legacy file paths to migrate, so callers should pass the "current fully-migrated" stamp value (see
+ *   `getCurrentAppVersionStamp` in `surveyDataMigrationSteps.js`) rather than leaving this unset, otherwise the
+ *   survey would be treated as pending a data migration and become unavailable (503) until the next migration run.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<object>} - The newly inserted survey row.
+ */
+export const insertSurvey = async ({ survey, props = {}, propsDraft = {}, appVersion = null }, client = db) =>
   client.one(
     `
-      INSERT INTO survey (uuid, props, props_draft, owner_uuid, published, draft, template)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO survey (uuid, props, props_draft, owner_uuid, published, draft, template, app_version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING ${_getSurveySelectFields()}
     `,
     [
@@ -45,6 +59,7 @@ export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, clie
       Survey.isPublished(survey),
       Survey.isDraft(survey),
       Survey.isTemplate(survey),
+      appVersion,
     ],
     (def) => DB.transformCallback(def, true)
   )
@@ -253,6 +268,14 @@ export const fetchSurveyIdsAndNames = async (client = db) =>
     camelize
   )
 
+/**
+ * Fetches the id and app version of every survey.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
+ */
+export const fetchSurveyIdsAndAppVersions = async (client = db) =>
+  client.map('SELECT id, app_version FROM survey', [], camelize)
+
 export const fetchSurveyById = async ({ surveyId, draft = false, backup = false }, client = db) =>
   client.one(`SELECT ${_getSurveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
     DB.transformCallback(def, draft, false, backup)
@@ -308,6 +331,22 @@ export const updateSurveyOwner = async ({ surveyId, ownerUuid }, client = db) =>
     SET owner_uuid = $/ownerUuid/
     WHERE id = $/surveyId/`,
     { surveyId, ownerUuid }
+  )
+
+/**
+ * Updates the app version associated to the specified survey.
+ * @param {object} params - The update parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.version - The app version to associate to the survey.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<null>} - The result promise.
+ */
+export const updateSurveyAppVersion = async ({ surveyId, version }, client = db) =>
+  client.none(
+    `UPDATE survey
+    SET app_version = $/version/
+    WHERE id = $/surveyId/`,
+    { surveyId, version }
   )
 
 export const publishSurveyProps = async (surveyId, client = db) =>
