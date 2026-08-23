@@ -1,5 +1,6 @@
 export default {
   ActivityLogImportJob: 'Үйл ажиллагааны бүртгэл импортлох',
+  AllSurveysDataMigrationJob: 'Бүх судалгааны өгөгдлийн шилжилт',
   ArenaMobileDataImportJob: 'Arena өгөгдөл импортлох',
   ArenaMobileDataImportSummaryJob: 'Arena өгөгдөл импортлох хураангуй',
   CategoriesImportJob: 'Ангилал импортлох',

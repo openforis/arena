@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -7,15 +8,15 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import * as API from '@webapp/service/api'
 import { RecordActions, RecordState, useRecord } from '@webapp/store/ui/record'
-import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 
 import { TestId } from '@webapp/utils/testId'
 import { Button, ButtonDownload, ButtonEditLockToggle } from '@webapp/components/buttons'
+import { PrintableExportFormats } from '@common/record/printableExport'
+import { RecordPrintableExportModal } from './RecordPrintableExportModal'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
 
@@ -25,8 +26,6 @@ const RecordEntryButtons = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const experimentalFeatures = useSystemConfigExperimentalFeatures()
-  const surveyId = useSurveyId()
-  const lang = useSurveyPreferredLang()
   const record = useRecord()
   const noHeader = useIsRecordViewWithoutHeader()
 
@@ -40,6 +39,8 @@ const RecordEntryButtons = (props) => {
   const canPromote = useAuthCanPromoteRecord(record) && !noHeader
   const canDemote = useAuthCanDemoteRecord(record) && !noHeader
   const canEdit = useAuthCanEditRecord(record)
+
+  const [printableExportOpen, setPrintableExportOpen] = useState(false)
 
   const getStepLabel = (_step) => i18n.t(`surveyForm:step.${RecordStep.getName(_step)}`)
 
@@ -66,22 +67,17 @@ const RecordEntryButtons = (props) => {
         </Link>
       )}
       {experimentalFeatures && (
-        <div className="survey-form-header__download-buttons">
-          <ButtonDownload
-            iconClassName="icon-file-word"
-            href={API.getRecordDocxExportUrl({ surveyId, recordUuid, lang })}
-            showLabel={false}
-            title="surveyForm:downloadPrintableDocument"
-            variant="text"
-          />
-          <ButtonDownload
-            iconClassName="icon-file-pdf"
-            href={API.getRecordPdfExportUrl({ surveyId, recordUuid, lang })}
-            showLabel={false}
-            title="surveyForm:downloadPrintableDocumentPdf"
-            variant="text"
-          />
-        </div>
+        <ButtonDownload
+          label="surveyForm:printableExport.exportDocument"
+          onClick={() => setPrintableExportOpen(true)}
+        />
+      )}
+      {printableExportOpen && (
+        <RecordPrintableExportModal
+          open
+          initialFormat={PrintableExportFormats.pdf}
+          onClose={() => setPrintableExportOpen(false)}
+        />
       )}
       <div className="survey-form-header__record-actions-steps">
         {canDemote && (

@@ -2,9 +2,14 @@ import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
+import * as StringUtils from '@core/stringUtils'
+
 import { ServiceErrorActions, useI18n } from '@webapp/store/system'
 
 import Markdown from '@webapp/components/markdown'
+
+const appErrorsNamespace = 'appErrors:'
+const _toMessageKey = (key) => [key, StringUtils.prependIfMissing(appErrorsNamespace)(key)]
 
 const defaultError = { key: 'appErrors:networkError' }
 
@@ -20,7 +25,7 @@ const ServiceError = React.forwardRef((props, ref) => {
     if (data) {
       const { key, params } = data
       if (key) {
-        return i18n.t(key, params)
+        return i18n.t(_toMessageKey(key), params)
       }
     }
     return errorMessage ?? i18n.t(defaultError.key, defaultError.params)

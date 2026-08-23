@@ -65,6 +65,16 @@ export const fetchFileUuidsBySurveyId = async ({ surveyId }, client = db) =>
     (row) => row.uuid
   )
 
+export const fetchFileSummariesByUuids = async ({ surveyId, fileUuids }, client = db) => {
+  if (fileUuids.length === 0) return []
+  return client.manyOrNone(
+    `SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.file
+    WHERE uuid IN ($1:csv)`,
+    [fileUuids]
+  )
+}
+
 export const fetchFileUuidsOfFilesWithContent = async ({ surveyId }, client = db) =>
   client.map(
     `

@@ -139,6 +139,7 @@ export const {
   hasCollectReportIssues,
   getOwnerName,
   getOwnerUuid,
+  getAppVersion,
   isTemplate,
   getProps,
   getPropsDraft,

@@ -3527,9 +3527,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@file:../arena-server::locator=open-foris-arena%40workspace%3A.":
-  version: 2.1.1
-  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=fc1477&locator=open-foris-arena%40workspace%3A."
+"@openforis/arena-server@portal:../arena-server::locator=open-foris-arena%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@openforis/arena-server@portal:../arena-server::locator=open-foris-arena%40workspace%3A."
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1112.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -3555,9 +3555,8 @@ __metadata:
     pdfkit: "npm:^0.19.1"
     pg-promise: "npm:^12.7.0"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/cf32c22245f3723ce59d9189ed7dbd6b3c26060ec8b23d21ef58e87304099f67da214fc5c50a7b9e24b95c00814a21212e2664f32fdcc371d62992352c9c3f75
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@opentelemetry/api@npm:1.9.0":
   version: 1.9.0
@@ -14983,7 +14982,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
-    "@openforis/arena-server": ../arena-server
+    "@openforis/arena-server": "portal:../arena-server"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
@@ -15898,15 +15897,6 @@ __metadata:
   bin:
     playwright: cli.js
   checksum: 10c0/ecd60ece818f1d57bf34685dd812c56f3b8cf7d8ca8e14074e1743fac56387f16791121901b34cf519d3ef5f9360968656ab661c7b589e55500144eb2cf69448
-  languageName: node
-  linkType: hard
-
-"playwright-core@npm:>=1.2.0":
-  version: 1.58.2
-  resolution: "playwright-core@npm:1.58.2"
-  bin:
-    playwright-core: cli.js
-  checksum: 10c0/5aa15b2b764e6ffe738293a09081a6f7023847a0dbf4cd05fe10eed2e25450d321baf7482f938f2d2eb330291e197fa23e57b29a5b552b89927ceb791266225b
   languageName: node
   linkType: hard
 

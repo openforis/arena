@@ -1,5 +1,6 @@
 import * as ObjectUtils from '@core/objectUtils'
 
+import AllSurveysDataMigrationJob from '@server/modules/survey/service/dataMigration/allSurveysDataMigrationJob'
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
 import ArenaMobileDataImportJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportJob'
 import ArenaMobileDataImportSummaryJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportSummaryJob'
@@ -22,6 +23,7 @@ import RecordsValidationJob from '@server/modules/record/service/recordsValidati
 import SelectedRecordsExportJob from '@server/modules/record/service/selectedRecordsExportJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import SurveyActivityLogClearJob from '@server/modules/survey/service/surveyActivityLogClearJob'
+import SurveyCreatorJob from '@server/modules/survey/service/surveyCreateJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 import SurveyLabelsImportJob from '@server/modules/survey/service/surveyLabelsImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
@@ -33,6 +35,7 @@ import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJo
 import VaidationReportGenerationJob from '@server/modules/record/service/validationReportGenerationJob'
 
 const jobClasses = [
+  AllSurveysDataMigrationJob,
   ArenaImportJob,
   ArenaMobileDataImportJob,
   ArenaMobileDataImportSummaryJob,
@@ -55,6 +58,7 @@ const jobClasses = [
   SelectedRecordsExportJob,
   SurveyCloneJob,
   SurveyActivityLogClearJob,
+  SurveyCreatorJob,
   SurveyExportJob,
   SurveyLabelsImportJob,
   SurveyPublishJob,

@@ -47,10 +47,15 @@ export default {
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating); error evaluating expression in node {{nodeDefName}}: {{details}}',
   },
+  recordPrintableExport: {
+    missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',
+    entityNotFound: 'Entity not found for the specified export',
+  },
   sessionExpiredRefreshPage: `Session could have expired.
 Try to refresh the page.`,
   survey: {
     nodeDefNameNotFound: 'Node definition not found: {{name}}',
+    dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
   },
   unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
   // AI gateway errors
@@ -80,6 +85,11 @@ Try to refresh the page.`,
   aiChatbotDisabled: 'The documentation chatbot is disabled on this deployment.',
   aiChatbotUpstreamError: 'The documentation chatbot is temporarily unavailable. Please try again in a moment.',
   aiChatbotPayloadTooLarge: 'Your conversation is too large. Clear the chat and try a shorter question.',
+  userCannotDeleteHasMessages:
+    'This user cannot be deleted: they authored {{count}} message(s); delete or reassign them first',
+  userCannotDeleteLastSystemAdmin: 'This user cannot be deleted: they are the last system administrator',
+  userCannotDeleteOwnsSurveys: 'This user cannot be deleted: they own {{count}} survey(s); transfer ownership first',
+  userCannotDeleteSelf: 'You cannot delete your own user account',
   userEmailInvalid:
     'The invitation email could not be delivered to {{email}}; please check that the address is correct',
   userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
@@ -89,4 +99,5 @@ Try to refresh the page.`,
   userIsAdmin: 'The given user is already a system administrator',
   userNotAllowedToChangePref: 'User not allowed to change pref',
   userNotAuthorized: 'User {{userName}} is not authorized',
+  userNotFound: 'User not found: {{userUuid}}',
 }

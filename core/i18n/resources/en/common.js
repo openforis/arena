@@ -909,6 +909,18 @@ $t(common.appNameFull)
     basic: 'Basic',
     advanced: 'Advanced',
     mobileApp: 'Mobile App',
+    print: 'Print',
+    printProps: {
+      printOrientation: {
+        label: 'Page orientation',
+        info: 'Orientation used when this entity starts its own printable section. Default inherits the document orientation chosen at export.',
+      },
+      orientations: {
+        default: 'Default (document)',
+        portrait: 'Portrait',
+        landscape: 'Landscape',
+      },
+    },
     validations: 'Validations',
     function: 'Function',
     editingFunction: 'Editing function {{functionName}}',
@@ -976,6 +988,10 @@ $t(common.appNameFull)
       autoIncrementalKey: {
         label: 'Auto incremental',
         info: 'Value will be automatically generated',
+      },
+      autoCreateMinCountItems: {
+        label: 'Auto-create minimum items',
+        info: 'When the entity becomes relevant or its parent entity is created, a number of entities equal to the minimum count will be generated automatically.',
       },
       displayAs: 'Display as',
       displayIn: 'Display in',

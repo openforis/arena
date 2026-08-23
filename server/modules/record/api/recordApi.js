@@ -47,7 +47,7 @@ const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
   const file = fileUuid ? await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid) : null
   if (file) {
     const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
-    const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid })
+    const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary: file })
     return { fileName, file, contentStream }
   } else {
     const error = new Error(`File not found for node ${nodeUuid}`)
@@ -411,9 +411,20 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record/:recordUuid/export/docx', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang } = Request.getParams(req)
+      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation } =
+        Request.getParams(req)
 
-      await RecordService.exportRecordDocx({ user, surveyId, recordUuid, lang, outputStream: res })
+      await RecordService.exportRecordDocx({
+        user,
+        surveyId,
+        recordUuid,
+        lang,
+        exportScope,
+        entityDefUuid,
+        entityNodeUuid,
+        orientation,
+        outputStream: res,
+      })
     } catch (error) {
       next(error)
     }
@@ -422,9 +433,20 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record/:recordUuid/export/pdf', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang } = Request.getParams(req)
+      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation } =
+        Request.getParams(req)
 
-      await RecordService.exportRecordPdf({ user, surveyId, recordUuid, lang, outputStream: res })
+      await RecordService.exportRecordPdf({
+        user,
+        surveyId,
+        recordUuid,
+        lang,
+        exportScope,
+        entityDefUuid,
+        entityNodeUuid,
+        orientation,
+        outputStream: res,
+      })
     } catch (error) {
       next(error)
     }

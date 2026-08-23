@@ -296,3 +296,6 @@ modules.xml
 
 # Subagent-driven-development scratch workspaces
 .superpowers/
+
+# Default output path for test/load/buildSampleSurveyZip.ts
+sample-survey.zip

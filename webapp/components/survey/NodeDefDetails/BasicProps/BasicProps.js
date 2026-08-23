@@ -74,6 +74,7 @@ const BasicProps = (props) => {
     includedInClone,
     includeInCloneDisabled,
     canHaveAutoIncrementalKey,
+    canAutoCreateMinCountItems,
     canIncludeInMultipleEntitySummary,
     canBeQualifier,
     hasUserGroups,
@@ -145,16 +146,35 @@ const BasicProps = (props) => {
                 onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
               />
               {NodeDef.isMultipleEntity(nodeDef) && (
-                <FormItem info="nodeDefEdit.basicProps.enumerate.info" label="nodeDefEdit.basicProps.enumerate.label">
-                  <div>
-                    <Checkbox
-                      id={TestId.nodeDefDetails.nodeDefEnumerate}
-                      checked={NodeDef.isEnumerate(nodeDef)}
-                      disabled={readOnly}
-                      onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.enumerate, value })}
-                    />
-                  </div>
-                </FormItem>
+                <>
+                  <FormItem info="nodeDefEdit.basicProps.enumerate.info" label="nodeDefEdit.basicProps.enumerate.label">
+                    <div>
+                      <Checkbox
+                        id={TestId.nodeDefDetails.nodeDefEnumerate}
+                        checked={NodeDef.isEnumerate(nodeDef)}
+                        disabled={readOnly}
+                        onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.enumerate, value })}
+                      />
+                    </div>
+                  </FormItem>
+                  {canAutoCreateMinCountItems && (
+                    <FormItem
+                      info="nodeDefEdit.basicProps.autoCreateMinCountItems.info"
+                      label="nodeDefEdit.basicProps.autoCreateMinCountItems.label"
+                    >
+                      <div>
+                        <Checkbox
+                          id={TestId.nodeDefDetails.nodeDefAutoCreateMinCountItems}
+                          checked={NodeDef.isAutoCreateMinCountItems(nodeDef)}
+                          disabled={readOnly}
+                          onChange={(value) =>
+                            Actions.setProp({ state, key: NodeDef.propKeys.autoCreateMinCountItems, value })
+                          }
+                        />
+                      </div>
+                    </FormItem>
+                  )}
+                </>
               )}
             </div>
           </FormItem>

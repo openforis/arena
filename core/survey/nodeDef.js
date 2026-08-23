@@ -55,6 +55,7 @@ export const propKeys = {
   cycles: 'cycles',
   descriptions: ObjectUtils.keysProps.descriptions,
   enumerate: 'enumerate', // only for multiple entities
+  autoCreateMinCountItems: 'autoCreateMinCountItems', // only for multiple entities
   key: 'key',
   autoIncrementalKey: 'autoIncrementalKey',
   labels: ObjectUtils.keysProps.labels,
@@ -103,6 +104,9 @@ export const propKeys = {
 
   // layout elements
   headerColor: 'headerColor',
+
+  // print
+  printOrientation: 'printOrientation',
 }
 
 const commonAttributePropsKeys = [
@@ -277,6 +281,7 @@ export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
 export const getDescriptions = getProp(propKeys.descriptions, {})
 
 export const isEnumerate = ObjectUtils.isPropTrue(propKeys.enumerate)
+export const isAutoCreateMinCountItems = ObjectUtils.isPropTrue(propKeys.autoCreateMinCountItems)
 
 // boolean
 export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
@@ -325,6 +330,13 @@ export const getTextTransformFunction = (nodeDef) =>
 
 export const getHeaderColor = getProp(propKeys.headerColor)
 export const isLayoutElement = isFormHeader
+
+/**
+ * Returns the entity printable orientation, if set.
+ * @param {!object} nodeDef - Entity node definition.
+ * @returns {string|undefined} 'portrait' | 'landscape' | undefined.
+ */
+export const getPrintOrientation = getProp(propKeys.printOrientation)
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -777,6 +789,9 @@ export const canBeHiddenInReport = (nodeDef) =>
 
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
+  if (!isMultipleEntity(nodeDefUpdated) && isAutoCreateMinCountItems(nodeDefUpdated)) {
+    nodeDefUpdated = assocProp({ key: propKeys.autoCreateMinCountItems, value: false })(nodeDefUpdated)
+  }
   // clear hidden if not applicable
   if (!canBeHidden(nodeDefUpdated) && isHidden(nodeDefUpdated)) {
     nodeDefUpdated = assocHidden(false)(nodeDefUpdated)

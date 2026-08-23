@@ -876,6 +876,18 @@ $t(common.appNameFull)
     basic: 'Үндсэн',
     advanced: 'Нарийвчилсан',
     mobileApp: 'Мобайл апп',
+    print: 'Хэвлэх',
+    printProps: {
+      printOrientation: {
+        label: 'Хуудасны чиглэл',
+        info: 'Энэ объект өөрийн хэвлэх хэсгийг эхлүүлэхэд ашиглагдах чиглэл. Анхдагчаар экспортод сонгосон баримтын чиглэлийг дагана.',
+      },
+      orientations: {
+        default: 'Анхдагч (баримт)',
+        portrait: 'Босоо',
+        landscape: 'Хэвтээ',
+      },
+    },
     validations: 'Баталгаажуулалтууд',
     function: 'Функц',
     editingFunction: 'Функц {{functionName}}-г засах',
@@ -940,6 +952,10 @@ $t(common.appNameFull)
       autoIncrementalKey: {
         label: 'Автомат өсөн нэмэгдэх түлхүүр',
         info: 'Утга автоматаар үүсгэгдэнэ',
+      },
+      autoCreateMinCountItems: {
+        label: 'Хамгийн бага элементийг автоматаар үүсгэх',
+        info: 'Объект хэрэгжиж эхлэх үед эсвэл түүний эцэг объект үүсгэгдэх үед хамгийн бага тооны объектууд автоматаар үүсгэгдэнэ.',
       },
       displayAs: 'Илэрхийлэх',
       displayIn: 'Илэрхийлэхдээ',

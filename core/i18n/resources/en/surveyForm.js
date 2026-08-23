@@ -144,6 +144,29 @@ In Arena Mobile:
   confirmNodeDelete: 'Are you sure you want to delete this {{nodeDefType}} ({{nodeDefLabel}})?',
   downloadPrintableDocument: 'Download printable document (Word)',
   downloadPrintableDocumentPdf: 'Download printable document (PDF)',
+  printableExport: {
+    title: 'Export printable document',
+    exportDocument: 'Export Document',
+    format: 'Format',
+    formats: {
+      pdf: 'PDF',
+      docx: 'Word',
+    },
+    scope: 'Content',
+    scopes: {
+      full: 'Full survey',
+      currentPage: 'Current page only',
+    },
+    currentPageHint: 'Current page: {{entityLabel}}',
+    currentPageUnavailable:
+      'Unable to determine the current page instance. Navigate to a specific page or export the full survey.',
+    orientation: 'Page orientation',
+    orientations: {
+      portrait: 'Portrait',
+      landscape: 'Landscape',
+    },
+    download: 'Download',
+  },
   exportLabels_csv: 'Export labels (CSV)',
   exportLabels_xlsx: 'Export labels (Excel)',
   importLabels: 'Import labels from Excel or CSV',
