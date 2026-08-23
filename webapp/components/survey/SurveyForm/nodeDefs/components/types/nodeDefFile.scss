@@ -12,8 +12,17 @@
 
   .survey-form__node-def-file__download-btn-wrapper {
     min-width: 0;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
+
+    // TooltipNew wraps its trigger in a bare inline <span>; force it to participate
+    // in the width-constrained/overflow chain so the file name button can shrink and ellipsize.
+    > span {
+      display: block;
+      min-width: 0;
+      overflow: hidden;
+    }
   }
 
   .survey-form__node-def-file__download-btn {

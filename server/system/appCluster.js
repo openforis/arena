@@ -6,13 +6,15 @@ import { ArenaServer } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
 
+import * as JobManager from '@server/job/jobManager'
 import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
+import AllSurveysDataMigrationJob from '@server/modules/survey/service/dataMigration/allSurveysDataMigrationJob'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as apiRouter from './apiRouter'
-import { DataMigrator } from './dataMigrator'
 import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
@@ -26,7 +28,10 @@ export const run = async () => {
 
   logger.info('server initialization start')
 
-  const arenaApp = await ArenaServer.init()
+  // Skip arena-server's own startup-time survey-schema migration loop (still migrates the public schema
+  // synchronously here, as before): AllSurveysDataMigrationJob (below) now migrates each survey's schema
+  // itself, together with that survey's data migration, so the two no longer need to run twice.
+  const arenaApp = await ArenaServer.init({ skipSurveySchemaDbMigrations: true })
   const { express: app, serviceRegistry } = arenaApp
 
   if (ProcessUtils.isEnvDevelopment) {
@@ -52,14 +57,22 @@ export const run = async () => {
 
   SwaggerInitializer.init(app)
 
-  // Data migrations
-  await DataMigrator.migrateData({ logger, serviceRegistry })
-
   // ====== System Admin user creation
   await UserService.insertSystemAdminUserIfNotExisting()
 
   // run files storage check after DB migrations
   await SurveyFileService.checkFilesStorage()
+
+  // Migrate surveys data in the background, without blocking server startup;
+  // enqueued after checkFilesStorage (above) completes, so the two do not concurrently move the same survey files
+  const adminUser = await UserManager.fetchUserByEmail(ProcessUtils.ENV.adminEmail)
+  if (adminUser) {
+    JobManager.enqueueJob(new AllSurveysDataMigrationJob({ user: adminUser }))
+  } else {
+    const message = `cannot start surveys data migration job: system admin user not found for ADMIN_EMAIL "${ProcessUtils.ENV.adminEmail}"; check that ADMIN_EMAIL is correctly configured and that a matching system admin user exists`
+    logger.error(message)
+    throw new Error(message)
+  }
 
   // ====== Update app version in DB
   const infoService = serviceRegistry.getService(ServiceType.info)

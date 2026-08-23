@@ -55,6 +55,7 @@ export default {
 Try to refresh the page.`,
   survey: {
     nodeDefNameNotFound: 'Node definition not found: {{name}}',
+    dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
   },
   unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
   // AI gateway errors
