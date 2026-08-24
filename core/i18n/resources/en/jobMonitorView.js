@@ -1,5 +1,6 @@
 export default {
   title: 'Job Monitor',
+  activeOnly: 'Active jobs only',
   noSurvey: '—',
   columns: {
     type: 'Type',

@@ -17,6 +17,12 @@
     gap: 1rem;
   }
 
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
   &__grid {
     // Fills the page's remaining height (below the header) and passes a definite height down to
     // the DataGrid so it computes its own scrollable height instead of growing to fit all rows -
