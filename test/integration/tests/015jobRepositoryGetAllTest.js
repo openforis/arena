@@ -53,7 +53,47 @@ describe('jobRepository.getAll', () => {
   })
 
   test('orders by date_created descending and respects limit', async () => {
-    const rows = await JobRepository.getAll({ limit: 1 })
-    expect(rows).toHaveLength(1)
+    // Insert jobs with explicit timestamps to verify descending order
+    const now = new Date()
+    const twoMinutesAgo = new Date(now.getTime() - 2 * 60 * 1000)
+    const oneMinuteAgo = new Date(now.getTime() - 1 * 60 * 1000)
+
+    // Insert older job first
+    await db.none(
+      `INSERT INTO job (uuid, user_uuid, survey_id, type, status, date_created) VALUES ($1, $2, $3, 'OldJob', 'pending', $4)`,
+      ['33333333-3333-3333-3333-333333333333', userUuid, surveyId, twoMinutesAgo]
+    )
+
+    // Insert newer job second
+    await db.none(
+      `INSERT INTO job (uuid, user_uuid, survey_id, type, status, date_created) VALUES ($1, $2, $3, 'NewJob', 'pending', $4)`,
+      ['44444444-4444-4444-4444-444444444444', userUuid, surveyId, oneMinuteAgo]
+    )
+
+    // Get all jobs (limit should return both our new jobs and previously inserted jobs)
+    const rows = await JobRepository.getAll({ limit: 10 })
+    expect(rows.length).toBeGreaterThanOrEqual(4) // At least the 4 jobs we've inserted
+
+    // Verify that rows are ordered by date_created descending
+    const newJobRow = rows.find((row) => row.uuid === '44444444-4444-4444-4444-444444444444')
+    const oldJobRow = rows.find((row) => row.uuid === '33333333-3333-3333-3333-333333333333')
+
+    expect(newJobRow).toBeDefined()
+    expect(oldJobRow).toBeDefined()
+    // Newer job should appear before older job in results (descending order)
+    const newJobIndex = rows.findIndex((row) => row.uuid === '44444444-4444-4444-4444-444444444444')
+    const oldJobIndex = rows.findIndex((row) => row.uuid === '33333333-3333-3333-3333-333333333333')
+    expect(newJobIndex).toBeLessThan(oldJobIndex)
+
+    // Verify all consecutive rows are in descending order
+    for (let i = 0; i < rows.length - 1; i++) {
+      const currentTimestamp = new Date(rows[i].dateCreated).getTime()
+      const nextTimestamp = new Date(rows[i + 1].dateCreated).getTime()
+      expect(currentTimestamp).toBeGreaterThanOrEqual(nextTimestamp)
+    }
+
+    // Also verify that limit is respected
+    const limitedRows = await JobRepository.getAll({ limit: 1 })
+    expect(limitedRows).toHaveLength(1)
   })
 })
