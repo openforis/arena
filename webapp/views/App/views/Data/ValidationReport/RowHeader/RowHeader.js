@@ -1,4 +1,3 @@
-
 import { useI18n } from '@webapp/store/system'
 
 const RowHeader = () => {
