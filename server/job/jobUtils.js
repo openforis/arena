@@ -106,3 +106,14 @@ export const jobRowToSummary = (jobRow) => {
     [JobSerialized.keys.result]: props?.result ?? null,
   }
 }
+
+export const jobRowToMonitorSummary = (jobRow) => {
+  const { dateCreated, userName, userEmail, surveyName } = jobRow
+  return {
+    ...jobRowToSummary(jobRow),
+    dateCreated,
+    userName,
+    userEmail,
+    surveyName,
+  }
+}
