@@ -470,11 +470,9 @@ export class JobQueue {
         // surveys (see 'global jobs executed before survey ones' test), while synchronously
         // rejecting a same-survey duplicate immediately, without waiting on the cluster-wide
         // _hasActiveJobElsewhere DB check (which still applies at job-start time regardless, as
-        // the authoritative guard). A global job (no surveyId) always conflicts with anything
-        // else for this user, in either direction: global jobs are never persisted to the job
-        // table (survey_id is NOT NULL), so _hasActiveJobElsewhere's cluster-wide DB check has no
-        // row to find and can't catch that combination either - this same-dyno guard is the only
-        // backstop for it.
+        // the authoritative guard - now equally applicable to global jobs, since they're
+        // persisted too). A global job (no surveyId) always conflicts with anything else for
+        // this user, in either direction.
         const existingJobInfo = this._jobInfoByUuid[existingUuid]
         const existingSurveyId = existingJobInfo?.params?.surveyId
         return existingSurveyId === surveyId || existingSurveyId === undefined || surveyId === undefined
@@ -492,15 +490,12 @@ export class JobQueue {
     }
     this._jobUuidsByUserUuid[userUuid].add(uuid)
 
-    if (surveyId) {
-      // Fire-and-forget: makes the job pollable from any dyno via JobManager.getJobSummary/getActiveJobSummary.
-      // Not persisted for global (no-surveyId) jobs - the job table's survey_id column is NOT NULL.
-      // Stashed on jobInfo so _startNextJobInternal can await it before this job's first status/
-      // progress write - see the comment there for why that matters.
-      jobInfo.persistPromise = JobRepository.insert({ uuid, userUuid, surveyId, type }).catch((error) => {
-        this._logger.error(`error persisting job ${uuid}: ${error}`)
-      })
-    }
+    // Fire-and-forget: makes the job pollable from any dyno via JobManager.getJobSummary/getActiveJobSummary.
+    // Stashed on jobInfo so _startNextJobInternal can await it before this job's first status/
+    // progress write - see the comment there for why that matters.
+    jobInfo.persistPromise = JobRepository.insert({ uuid, userUuid, surveyId, type }).catch((error) => {
+      this._logger.error(`error persisting job ${uuid}: ${error}`)
+    })
 
     this._startNextJob()
   }

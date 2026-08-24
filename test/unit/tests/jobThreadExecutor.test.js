@@ -57,7 +57,7 @@ describe('jobThreadExecutor DB persistence', () => {
     })
   })
 
-  test('does not persist anything for a global (no-surveyId) job', async () => {
+  test('persists progress and status for a global (no-surveyId) job too', async () => {
     await _notifyJobUpdate({
       uuid: 'job-2',
       userUuid: 'user-1',
@@ -69,7 +69,7 @@ describe('jobThreadExecutor DB persistence', () => {
       ended: false,
     })
 
-    expect(updateProgressSpy).not.toHaveBeenCalled()
-    expect(updateStatusSpy).not.toHaveBeenCalled()
+    expect(updateProgressSpy).toHaveBeenCalledWith({ uuid: 'job-2', processed: 0, total: 1 })
+    expect(updateStatusSpy).toHaveBeenCalledWith({ uuid: 'job-2', status: 'running' })
   })
 })

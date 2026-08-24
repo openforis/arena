@@ -152,13 +152,18 @@ describe('JobQueue test', () => {
     })
   })
 
-  test('enqueue does not persist a job row for global (no-surveyId) jobs', async () => {
+  test('enqueue persists a job row for global (no-surveyId) jobs too', async () => {
     jobRepositoryInsertSpy.mockClear()
     const job = new Job('GlobalJob', { user: user1 })
 
     await enqueueJobs({ jobs: [job] })
 
-    expect(jobRepositoryInsertSpy).not.toHaveBeenCalled()
+    expect(jobRepositoryInsertSpy).toHaveBeenCalledWith({
+      uuid: job.uuid,
+      userUuid: user1.uuid,
+      surveyId: undefined,
+      type: 'GlobalJob',
+    })
   })
 
   test('a job is failed fast when another dyno already has an active job for the same survey', async () => {

@@ -23,10 +23,7 @@ const activeJobSummariesByUserUuid = new DelayedDeleteCache({ deleteDelaySeconds
 const userJobThreads = new ThreadsCache()
 
 const _persistJobUpdate = async (jobSerialized) => {
-  const { uuid, surveyId, status, processed, total, result, errors, ended } = jobSerialized
-  // Global (no-surveyId) jobs aren't persisted - see job-queue-persistence plan's Global Constraints
-  // (the job table's survey_id column is NOT NULL).
-  if (!surveyId) return
+  const { uuid, status, processed, total, result, errors, ended } = jobSerialized
 
   try {
     await JobRepository.updateProgress({ uuid, processed, total })
