@@ -1,6 +1,7 @@
 import { Objects, SystemError } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
+import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 
 import Thread from '@server/threads/thread'
@@ -18,7 +19,39 @@ import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
 
-class RecordsUpdateThread extends Thread {
+// Maximum time to wait for another dyno to release a record's advisory lock.
+// There's a single RecordsUpdateThread per dyno processing messages one at a time, so an unbounded
+// wait would stall every record edit on this dyno behind one slow record held elsewhere.
+const recordLockTimeoutMs = 10000
+
+// Postgres error code for "lock_not_available" (raised when lock_timeout expires)
+const pgErrorCodeLockNotAvailable = '55P03'
+
+// Serializes record mutations across dynos: acquires a transaction-scoped Postgres advisory
+// lock keyed by recordUuid, runs fn with that transaction's client, and lets the lock be
+// auto-released on commit/rollback.
+const acquireRecordLockAndRun = ({ recordUuid, fn }) =>
+  db.tx(async (t) => {
+    await t.none('SET LOCAL lock_timeout = $1', [`${recordLockTimeoutMs}ms`])
+    try {
+      await t.any('SELECT pg_advisory_xact_lock(hashtext($1))', [recordUuid])
+      return await fn(t)
+    } catch (error) {
+      if (error?.code === pgErrorCodeLockNotAvailable) {
+        // Some other transaction (another dyno's records thread waiting on the advisory lock, or
+        // any other writer holding row locks on this record) kept this record locked for too long.
+        // The timeout applies to the whole transaction, so map it - wherever it comes from - to an
+        // expected, recoverable condition (see processNext's SystemError handling), so that only
+        // this message fails instead of crashing the whole thread.
+        throw new SystemError('record.lockTimeout', { recordUuid })
+      }
+      throw error
+    }
+  })
+
+// Exported only so that tests can instantiate the thread class directly (in the main thread,
+// overriding postMessage): the module still creates and initializes the real worker instance below.
+export class RecordsUpdateThread extends Thread {
   constructor(paramsObj) {
     super(paramsObj)
 
@@ -167,17 +200,26 @@ class RecordsUpdateThread extends Thread {
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
-    let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+    await acquireRecordLockAndRun({
+      recordUuid,
+      fn: async (t) => {
+        let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, t)
 
-    record = await RecordManager.initNewRecord({
-      user,
-      survey,
-      record,
-      timezoneOffset,
-      nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
-      nodesValidationListener: (validations) => this.handleNodesValidationUpdated.bind(this)({ record, validations }),
+        record = await RecordManager.initNewRecord(
+          {
+            user,
+            survey,
+            record,
+            timezoneOffset,
+            nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
+            nodesValidationListener: (validations) =>
+              this.handleNodesValidationUpdated.bind(this)({ record, validations }),
+          },
+          t
+        )
+        await this.cacheRecordWithDbDateModified({ surveyId, recordUuid, record, recordsCache, t })
+      },
     })
-    recordsCache.set(recordUuid, record)
   }
 
   async processRecordReloadMsg(msg) {
@@ -185,48 +227,68 @@ class RecordsUpdateThread extends Thread {
 
     const { recordsCache } = await this.getOrFetchSurveyData(msg)
 
-    if (recordsCache.has(recordUuid)) {
-      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user })
-      recordsCache.set(recordUuid, record)
-    }
+    if (!recordsCache.has(recordUuid)) return
+
+    await acquireRecordLockAndRun({
+      recordUuid,
+      fn: async (t) => {
+        const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user }, t)
+        recordsCache.set(recordUuid, record)
+      },
+    })
   }
 
   async processRecordNodePersistMsg(msg) {
-    const { node, user, timezoneOffset } = msg
+    const { surveyId, node, user, timezoneOffset } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
     const recordUuid = Node.getRecordUuid(node)
-    let record = await this.getOrFetchRecord({ msg, recordUuid })
 
-    record = await RecordManager.persistNode({
-      user,
-      survey,
-      record,
-      node,
-      timezoneOffset,
-      nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
-      nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
+    await acquireRecordLockAndRun({
+      recordUuid,
+      fn: async (t) => {
+        let record = await this.getOrFetchRecord({ msg, recordUuid, t })
+
+        record = await RecordManager.persistNode(
+          {
+            user,
+            survey,
+            record,
+            node,
+            timezoneOffset,
+            nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
+            nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
+          },
+          t
+        )
+        await this.cacheRecordWithDbDateModified({ surveyId, recordUuid, record, recordsCache, t })
+      },
     })
-    recordsCache.set(recordUuid, record)
   }
 
   async processRecordNodeDeleteMsg(msg) {
-    const { nodeUuid, recordUuid, user, timezoneOffset } = msg
+    const { surveyId, nodeUuid, recordUuid, user, timezoneOffset } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
-    let record = await this.getOrFetchRecord({ msg, recordUuid })
-    record = await RecordManager.deleteNode(
-      user,
-      survey,
-      record,
-      nodeUuid,
-      timezoneOffset,
-      (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
-      (validations) => this.handleNodesValidationUpdated({ record, validations })
-    )
-    recordsCache.set(recordUuid, record)
+    await acquireRecordLockAndRun({
+      recordUuid,
+      fn: async (t) => {
+        let record = await this.getOrFetchRecord({ msg, recordUuid, t })
+        record = await RecordManager.deleteNode(
+          user,
+          survey,
+          record,
+          nodeUuid,
+          timezoneOffset,
+          (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
+          (validations) => this.handleNodesValidationUpdated({ record, validations }),
+          t
+        )
+        await this.cacheRecordWithDbDateModified({ surveyId, recordUuid, record, recordsCache, t })
+      },
+    })
   }
 
   async processRecordClearMsg(msg) {
@@ -257,17 +319,46 @@ class RecordsUpdateThread extends Thread {
     })
   }
 
-  async getOrFetchRecord({ msg, recordUuid }) {
+  /**
+   * Caches a record that has just been written inside the current transaction, stamping onto it the
+   * authoritative date_modified produced by that write.
+   *
+   * The in-memory dateModified is stamped before validations and the RDB persistence run, while the
+   * DB one is written afterwards: without this reconciliation the two always differ and
+   * getOrFetchRecord's staleness check would consider the cached record stale on every single write,
+   * forcing a full record reload on the next message.
+   * @param {!object} params - The parameters.
+   * @param {!number} params.surveyId - The survey id.
+   * @param {!string} params.recordUuid - The record uuid.
+   * @param {!object} params.record - The record to cache.
+   * @param {!object} params.recordsCache - The cache to store the record into.
+   * @param {!object} params.t - The transaction client used by the write.
+   * @returns {Promise<void>} - A promise resolved when the record has been cached.
+   */
+  async cacheRecordWithDbDateModified({ surveyId, recordUuid, record, recordsCache, t }) {
+    const dateModified = await RecordManager.fetchRecordDateModified({ surveyId, recordUuid }, t)
+    recordsCache.set(recordUuid, dateModified ? Record.assocDateModified(dateModified)(record) : record)
+  }
+
+  async getOrFetchRecord({ msg, recordUuid, t }) {
     const { surveyId, user } = msg
 
     const { recordsCache } = await this.getOrFetchSurveyData(msg)
 
-    let record = recordsCache.get(recordUuid)
+    const cachedRecord = recordsCache.get(recordUuid)
+    const dbDateModified = await RecordManager.fetchRecordDateModified({ surveyId, recordUuid }, t)
 
-    if (!record) {
-      record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user })
-      recordsCache.set(recordUuid, record)
+    const cachedDateModified = cachedRecord ? Record.getDateModified(cachedRecord) : null
+    const isCacheFresh =
+      cachedRecord && dbDateModified && cachedDateModified && cachedDateModified.getTime() === dbDateModified.getTime()
+
+    if (isCacheFresh) {
+      return cachedRecord
     }
+
+    // No cached copy, or another dyno committed a change since this dyno cached the record - refetch.
+    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user }, t)
+    recordsCache.set(recordUuid, record)
     return record
   }
 }

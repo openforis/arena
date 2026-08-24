@@ -2,7 +2,7 @@ import * as express from 'express'
 import morgan from 'morgan'
 
 import { ServiceType } from '@openforis/arena-core'
-import { ArenaServer } from '@openforis/arena-server'
+import { ArenaServer, runWithClusterLock } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
 
@@ -17,6 +17,7 @@ import * as UserService from '@server/modules/user/service/userService'
 import * as apiRouter from './apiRouter'
 import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
+import * as StaleJobsCleanup from './schedulers/staleJobsCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
@@ -58,7 +59,10 @@ export const run = async () => {
   SwaggerInitializer.init(app)
 
   // ====== System Admin user creation
-  await UserService.insertSystemAdminUserIfNotExisting()
+  await runWithClusterLock({
+    lockName: 'boot-insert-system-admin-user',
+    fn: () => UserService.insertSystemAdminUserIfNotExisting(),
+  })
 
   // run files storage check after DB migrations
   await SurveyFileService.checkFilesStorage()
@@ -89,6 +93,7 @@ export const run = async () => {
   // await SurveysFilesPropsCleanup.init()
   await ExpiredUserInvitationsCleanup.init()
   await UserTempAuthTokensCleanup.init()
+  await StaleJobsCleanup.init()
 
   logger.info('server initialization complete; server started.')
 }

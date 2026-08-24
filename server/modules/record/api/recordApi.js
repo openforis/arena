@@ -637,13 +637,18 @@ export const init = (app) => {
     '/survey/:surveyId/record/:recordUuid/node/:nodeUuid',
     requireRecordEditPermission,
     requireRecordMatchesUserGroupQualifiers,
-    (req, res) => {
-      const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const socketId = Request.getSocketId(req)
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const socketId = Request.getSocketId(req)
 
-      RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset })
-      sendOk(res)
+        await RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset })
+
+        sendOk(res)
+      } catch (error) {
+        next(error)
+      }
     }
   )
 }

@@ -1,12 +1,15 @@
-import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+import { JobRepository, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { throttle } from '@core/functionsDefer'
 
 import ThreadManager from '@server/threads/threadManager'
 import ThreadsCache from '@server/threads/threadsCache'
 import DelayedDeleteCache from '@server/utils/DelayedDeleteCache'
+import * as Log from '@server/log/log'
 
 import { jobThreadMessageTypes } from './jobUtils'
+
+const logger = Log.getLogger('JobThreadExecutor')
 
 const threadCleanupDelay = 1000 // 1 sec
 const notificationThrottleLimit = 500
@@ -19,12 +22,27 @@ const activeJobSummariesByUserUuid = new DelayedDeleteCache({ deleteDelaySeconds
 
 const userJobThreads = new ThreadsCache()
 
+const _persistJobUpdate = async (jobSerialized) => {
+  const { uuid, status, processed, total, result, errors, ended } = jobSerialized
+
+  try {
+    await JobRepository.updateProgress({ uuid, processed, total })
+    await JobRepository.updateStatus(ended ? { uuid, status, props: { result, errors } } : { uuid, status })
+  } catch (error) {
+    logger.error(`error persisting job update for job ${uuid}: ${error}`)
+  }
+}
+
+export const _notifyJobUpdateForTest = _persistJobUpdate
+
 const _notifyJobUpdate = (jobSerialized) => {
   const { userUuid } = jobSerialized
 
   activeJobSummariesByUserUuid.set(userUuid, jobSerialized)
 
   WebSocketServer.notifyUser(userUuid, WebSocketEvent.jobUpdate, jobSerialized)
+  _persistJobUpdate(jobSerialized).catch((error) => logger.error(`error persisting job update: ${error}`))
+
   if (!jobSerialized.ended) {
     return
   }
