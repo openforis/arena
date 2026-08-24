@@ -354,6 +354,8 @@ export default {
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Жишээнүүд',
 
+    jobMonitor: 'Ажлын хяналт',
+
     help: 'Тусламж',
     about: 'Тухай',
     disclaimer: 'Хариуцлагаас татгалзах',

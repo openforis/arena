@@ -364,6 +364,8 @@ Réessayer ?`,
     message: 'Message',
     message_plural: '$t(common.message_plural)',
 
+    jobMonitor: 'Moniteur des tâches',
+
     help: 'Aide',
     about: 'À propos',
     disclaimer: 'Avertissement',
