@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { GridColDef } from '@mui/x-data-grid'
 
 import * as DateUtils from '@core/dateUtils'
 import * as JobSerialized from '@common/job/jobSerialized'
@@ -6,7 +7,9 @@ import * as JobSerialized from '@common/job/jobSerialized'
 import { useI18n } from '@webapp/store/system'
 import formatDuration from '@webapp/views/App/JobMonitor/JobTiming/formatDuration'
 
-export const useJobsMonitorColumns = () => {
+import { JobMonitorSummary } from './useJobsMonitor'
+
+export const useJobsMonitorColumns = (): GridColDef<JobMonitorSummary>[] => {
   const i18n = useI18n()
 
   return useMemo(
@@ -60,7 +63,7 @@ export const useJobsMonitorColumns = () => {
         field: 'dateCreated',
         headerName: i18n.t('jobMonitorView:columns.startedAt'),
         width: 180,
-        valueGetter: (_value, row) => DateUtils.convertDateTimeFromISOToDisplay(row.dateCreated),
+        valueGetter: (_value, row) => DateUtils.convertDateTimeFromISOToDisplay(row.dateCreated) as string,
       },
     ],
     [i18n]

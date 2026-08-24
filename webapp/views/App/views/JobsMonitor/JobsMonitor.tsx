@@ -1,6 +1,6 @@
 import './JobsMonitor.scss'
 
-import PropTypes from 'prop-types'
+import React from 'react'
 
 import { useI18n } from '@webapp/store/system'
 import { DataGrid } from '@webapp/components/DataGrid'
@@ -10,7 +10,7 @@ import { Button } from '@webapp/components/buttons'
 import { useJobsMonitor } from './useJobsMonitor'
 import { useJobsMonitorColumns } from './useJobsMonitorColumns'
 
-const JobsMonitor = () => {
+const JobsMonitor = (): React.ReactElement => {
   const i18n = useI18n()
   const { jobs, loading, refresh } = useJobsMonitor()
   const columns = useJobsMonitorColumns()
@@ -29,7 +29,5 @@ const JobsMonitor = () => {
     </div>
   )
 }
-
-JobsMonitor.propTypes = {}
 
 export default JobsMonitor
