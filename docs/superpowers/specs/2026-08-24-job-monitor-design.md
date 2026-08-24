@@ -58,8 +58,14 @@ from the main app's own DB connection rather than going through `JobRepository`.
 1. `server/job/JobQueue.ts`: remove the `if (surveyId)` guard that currently skips
    `JobRepository.insert(...)` for global jobs — every job is now persisted regardless of whether
    it's survey-scoped. Update the surrounding comments that describe the old NOT-NULL limitation
-   (in `enqueue()` and the comment inside `_hasActiveJobElsewhere`'s docblock referencing it).
-2. New `server/job/jobRepository.js` — one function, `getAll({ limit = 200 })`, running:
+   (in `enqueue()`, and the same-dyno-conflict-guard comment above it that calls persistence for
+   global jobs impossible).
+2. `server/job/jobThreadExecutor.js`: remove the matching `if (!surveyId) return` guard in
+   `_persistJobUpdate` — this is the second, separate choke point (progress/status updates, as
+   opposed to the initial insert) that currently skips DB writes for global jobs. Without this fix,
+   a global job would get inserted once as `pending` and then never move past that in the monitor.
+   Update its stale comment too.
+3. New `server/job/jobRepository.js` — one function, `getAll({ limit = 200 })`, running:
    ```sql
    SELECT j.uuid, j.type, j.status, j.processed, j.total, j.props,
           j.date_created, j.date_modified, j.user_uuid, j.survey_id,
@@ -74,12 +80,12 @@ from the main app's own DB connection rather than going through `JobRepository`.
    via `@server/db/db` (`db.map(...)`), mapping snake_case columns to a camelCase row shape
    (`{ uuid, type, status, processed, total, props, dateCreated, dateModified, userUuid, userName,
    userEmail, surveyId, surveyName }`).
-3. `server/job/jobUtils.js`: new `jobRowToMonitorSummary(row)` — calls the existing
+4. `server/job/jobUtils.js`: new `jobRowToMonitorSummary(row)` — calls the existing
    `jobRowToSummary(row)` (unchanged, still used by the per-user modal path) and merges in
    `dateCreated`, `userName`, `userEmail`, `surveyName`.
-4. `server/job/jobManager.js`: new `getAllJobsSummary()` — calls `jobRepository.getAll()` and maps
+5. `server/job/jobManager.js`: new `getAllJobsSummary()` — calls `jobRepository.getAll()` and maps
    each row through `jobRowToMonitorSummary`.
-5. `server/job/jobApi.js`: new route `GET /jobs`, gated with
+6. `server/job/jobApi.js`: new route `GET /jobs`, gated with
    `ApiAuthMiddleware.requireAdminPermission` (imported from `@openforis/arena-server`, same
    middleware already gating the Messages module's API — resolves to `Users.isSystemAdmin`).
    Returns the array from `JobManager.getAllJobsSummary()` as JSON.
@@ -136,10 +142,14 @@ five status labels. English only for this pass.
 
 - arena-server: existing job repository/queue unit tests updated for nullable `surveyId`; still
   cover insert/getActive/updateStatus paths.
-- arena main repo: unit test for `jobRowToMonitorSummary` (join-field passthrough) and for the new
-  `getAll` query shape if the existing job repository tests provide a harness to extend; otherwise
-  covered via integration test against a real DB (following the pattern of other repository tests
-  in `test/integration/`).
+- arena main repo: two existing unit tests currently assert the behavior this design reverses and
+  must be rewritten, not just extended — `test/unit/tests/016jobQueue.test.js`'s `'enqueue does not
+  persist a job row for global (no-surveyId) jobs'` and `test/unit/tests/jobThreadExecutor.test.js`'s
+  `'does not persist anything for a global (no-surveyId) job'`. New unit test for
+  `jobRowToMonitorSummary` (join-field passthrough), following `test/unit/tests/jobRowToSummary.test.js`'s
+  pattern.
+- `server/job/jobRepository.js`'s `getAll` query is exercised via integration test against a real DB
+  (following the pattern of `src/repository/job/tests/job.test.ts` in arena-server), not a unit test.
 - Manual verification: log in as a system admin, confirm the module is visible and the API route
   rejects non-admins with 401; trigger a job (e.g. category import) and confirm it appears in the
   grid with live progress, then confirm auto-refresh and the manual refresh button both work.
