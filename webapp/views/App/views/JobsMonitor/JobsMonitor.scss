@@ -1,0 +1,31 @@
+.app__container .app-module > .jobs-monitor {
+  // the grid manages its own internal scrolling (DataGrid's built-in row scroller, header and
+  // pagination staying fixed), so the outer page-level scroll set up generically in
+  // AppView.scss must be disabled here.
+  overflow: hidden;
+}
+
+.jobs-monitor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__grid {
+    // Fills the page's remaining height (below the header) and passes a definite height down to
+    // the DataGrid so it computes its own scrollable height instead of growing to fit all rows -
+    // same technique as UserGroupsEditor.scss's `.tab-content .data-grid { height: 100% }`, but
+    // this class is applied directly to the DataGrid component itself (it lands on the same
+    // element as the `.data-grid` class DataGrid.tsx always adds), rather than to a separate
+    // wrapping element, so the rule targets this class directly instead of as a descendant.
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+  }
+}

@@ -177,16 +177,11 @@ export class JobQueue {
         if (queueIndex >= 0) {
           this._queue.splice(queueIndex, 1)
         }
-        const queuedJobInfo = this._jobInfoByUuid[jobUuid]
-        const queuedJobSurveyId = queuedJobInfo?.params?.surveyId
-        if (queuedJobSurveyId) {
-          // without this, the row is left at 'pending' forever (until the stale-job reaper
-          // eventually reaps it), blocking this user/survey cluster-wide in the meantime -
-          // same reasoning as _failQueuedJob's persisted status write
-          await JobRepository.updateStatus({ uuid: jobUuid, status: JobStatus.canceled }).catch((error) =>
-            this._logger.error(`error persisting canceled status for job ${jobUuid}: ${error}`)
-          )
-        }
+        // without this, the row is left at 'pending' forever (until the stale-job reaper
+        // eventually reaps it), blocking this user/survey cluster-wide in the meantime
+        await JobRepository.updateStatus({ uuid: jobUuid, status: JobStatus.canceled }).catch((error) =>
+          this._logger.error(`error persisting canceled status for job ${jobUuid}: ${error}`)
+        )
         this.deleteJobInfo({ jobUuid })
         this._removeJobUuidForUser({ userUuid, uuid: jobUuid })
       }
@@ -331,13 +326,11 @@ export class JobQueue {
     this.deleteJobInfo({ jobUuid: uuid })
     this._removeJobUuidForUser({ userUuid, uuid })
 
-    if (surveyId) {
-      await JobRepository.updateStatus({
-        uuid,
-        status: JobStatus.failed,
-        props: { errors },
-      }).catch((error) => this._logger.error(`error persisting failed status for job ${uuid}: ${error}`))
-    }
+    await JobRepository.updateStatus({
+      uuid,
+      status: JobStatus.failed,
+      props: { errors },
+    }).catch((error) => this._logger.error(`error persisting failed status for job ${uuid}: ${error}`))
 
     // Build a proper job summary (not the raw internal jobInfo, which lacks ended/failed/
     // progressPercent/etc. and leaks the full params object including user) - the webapp's job

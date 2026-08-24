@@ -53,7 +53,7 @@ export const useJobsMonitorColumns = () => {
         width: 130,
         valueGetter: (_value, row) => {
           const remainingMillis = JobSerialized.getRemainingMillis(row)
-          return remainingMillis === null ? '-' : formatDuration(remainingMillis)
+          return remainingMillis === null ? '-' : (formatDuration(remainingMillis) ?? '-')
         },
       },
       {

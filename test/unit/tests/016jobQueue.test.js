@@ -60,6 +60,7 @@ const user1 = { uuid: UUIDs.v4() }
 const user2 = { uuid: UUIDs.v4() }
 const user3 = { uuid: UUIDs.v4() }
 const user4 = { uuid: UUIDs.v4() }
+const userGlobalTest = { uuid: UUIDs.v4() }
 
 describe('JobQueue test', () => {
   let jobRepositoryInsertSpy
@@ -380,5 +381,63 @@ describe('JobQueue test', () => {
     expect(updateStatusSpy).toHaveBeenCalledWith(
       expect.objectContaining({ uuid: jobQueued.uuid, status: jobStatus.canceled })
     )
+  })
+
+  test('cancelling a queued global (no-surveyId) job persists a canceled status to the DB too', async () => {
+    // Mirrors 'cancelling a queued survey-scoped job persists a canceled status to the DB' above,
+    // but for a global (no-surveyId) job: cancelJobByUserUuid's queued-job branch used to only
+    // persist the canceled status when the queued job had a surveyId, leaving a global job's row
+    // stuck at 'pending' forever if it was cancelled while still queued.
+    class NoOpExecuteJobQueue extends JobQueue {
+      _executeJob() {
+        // no-op: don't spawn a real thread
+      }
+    }
+
+    const queue = new NoOpExecuteJobQueue()
+    // Occupy the single system-wide "running global job" slot with a different user's global job,
+    // so that userGlobalTest's own global job below is forced to stay queued instead of being
+    // promoted to running immediately (only one global job runs at a time, cluster-wide per dyno).
+    const jobRunningGlobal = new Job('GlobalJob', { user: user1 })
+    const jobQueuedGlobal = new Job('GlobalJob', { user: userGlobalTest })
+
+    queue.enqueue(jobRunningGlobal)
+    await queue._startNextJobChain // jobRunningGlobal now running
+
+    queue.enqueue(jobQueuedGlobal)
+    await queue._startNextJobChain // jobQueuedGlobal stays queued (blocked: a global job is already running)
+
+    updateStatusSpy.mockClear()
+
+    await queue.cancelJobByUserUuid(userGlobalTest.uuid)
+
+    expect(updateStatusSpy).toHaveBeenCalledWith({ uuid: jobQueuedGlobal.uuid, status: jobStatus.canceled })
+  })
+
+  test('a global job is failed fast when another dyno already has an active job for the same user, and the failure is persisted', async () => {
+    // Mirrors 'a job is failed fast when another dyno already has an active job for the same
+    // survey' above, but for a global (no-surveyId) job: _failQueuedJob's terminal-status write
+    // used to only persist when the failed job had a surveyId, leaving a global job's row stuck
+    // at 'pending' forever after a cluster-wide conflict fail. _hasActiveJobElsewhere checks
+    // getActiveByUserUuid unconditionally (works the same for global and survey-scoped jobs), so
+    // that's the spy used here to simulate the conflict, rather than getActiveBySurveyId.
+    getActiveByUserUuidSpy.mockResolvedValueOnce({ uuid: 'other-dyno-job-uuid' })
+
+    const queue = new JobQueue()
+    const job = new Job('GlobalJob', { user: userGlobalTest })
+
+    queue.enqueue(job)
+    await queue._startNextJobChain
+
+    expect(notifyUserSpy).toHaveBeenCalledWith(
+      userGlobalTest.uuid,
+      expect.anything(),
+      expect.objectContaining({ status: jobStatus.failed })
+    )
+    expect(updateStatusSpy).toHaveBeenCalledWith({
+      uuid: job.uuid,
+      status: jobStatus.failed,
+      props: expect.objectContaining({ errors: expect.anything() }),
+    })
   })
 })

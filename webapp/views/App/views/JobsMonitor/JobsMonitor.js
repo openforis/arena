@@ -1,3 +1,5 @@
+import './JobsMonitor.scss'
+
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
