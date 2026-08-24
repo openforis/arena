@@ -1,7 +1,7 @@
 # Job Monitor — Design Spec
 
 Date: 2026-08-24
-Repos affected: `arena` (this repo, branch `feat/job-monitor`) and `arena-server` (sibling repo, branch `feat/auto-scaling`, unreleased)
+Repos affected: `arena` (this repo, branch `feat/auto-scaling`) and `arena-server` (sibling repo, branch `feat/auto-scaling`, unreleased)
 
 ## Problem
 
