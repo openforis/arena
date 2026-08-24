@@ -1,7 +1,7 @@
 import { JobRepository } from '@openforis/arena-server'
+import { db } from '@server/db/db'
+
 import * as JobManager from '../../../server/job/jobManager'
-import * as jobRepository from '../../../server/job/jobRepository'
-import * as jobUtils from '../../../server/job/jobUtils'
 import { jobStatus } from '../../../server/job/jobUtils'
 
 const jobRow = {
@@ -63,15 +63,70 @@ describe('JobManager DB-backed polling', () => {
     expect(summary.uuid).toBe('job-1')
   })
 
-  test('getAllJobsSummary exists and returns an array', async () => {
-    // Note: This is a minimal smoke test. Full behavior validation (mapping rows through
-    // jobRowToMonitorSummary, calling jobRepository.getAll) is covered by integration tests
-    // in test/integration/tests/015jobRepositoryGetAllTest.js and tested via API in e2e tests.
-    // Unit mocking of jobRepository.getAll is not possible in this bundled test environment
-    // due to webpack's ESM export handling.
+  test('getAllJobsSummary maps every row from the DB through jobRowToMonitorSummary', async () => {
+    const dbMapSpy = jest.spyOn(db, 'map').mockImplementation(async (query, params, rowMapper) => {
+      // Simulate what pg-promise returns: raw snake_case rows from the database.
+      // jobRepository.getAll will call rowMapper (rowToJob) on each, transforming to camelCase.
+      // Then jobRowToMonitorSummary adds user and survey display fields.
+      const rawRows = [
+        {
+          uuid: 'job-1',
+          type: 'DataExportJob',
+          status: jobStatus.running,
+          processed: 1,
+          total: 2,
+          props: {},
+          date_created: new Date('2026-08-24T10:00:00Z'),
+          date_modified: new Date('2026-08-24T10:05:00Z'),
+          user_uuid: 'user-1',
+          user_name: 'Jane Doe',
+          user_email: 'jane@example.org',
+          survey_id: 42,
+          survey_name: 'Survey A',
+        },
+        {
+          uuid: 'job-2',
+          type: 'MessageSendJob',
+          status: jobStatus.pending,
+          processed: 0,
+          total: 1,
+          props: {},
+          date_created: new Date('2026-08-24T09:00:00Z'),
+          date_modified: new Date('2026-08-24T09:00:00Z'),
+          user_uuid: 'user-1',
+          user_name: null,
+          user_email: 'no-name@example.org',
+          survey_id: null,
+          survey_name: null,
+        },
+      ]
+      // Invoke the real rowMapper callback provided by jobRepository.getAll
+      // to exercise the real snake_case -> camelCase transformation
+      return rawRows.map(rowMapper)
+    })
 
-    expect(typeof JobManager.getAllJobsSummary).toBe('function')
-    const result = await JobManager.getAllJobsSummary()
-    expect(Array.isArray(result)).toBe(true)
+    const summaries = await JobManager.getAllJobsSummary()
+
+    expect(dbMapSpy).toHaveBeenCalled()
+    expect(summaries).toHaveLength(2)
+    // Verify the transformation to camelCase and monitor summary fields (from jobRowToMonitorSummary)
+    expect(summaries[0]).toMatchObject({
+      uuid: 'job-1',
+      type: 'DataExportJob',
+      status: jobStatus.running,
+      userName: 'Jane Doe',
+      userEmail: 'jane@example.org',
+      surveyName: 'Survey A',
+    })
+    expect(summaries[1]).toMatchObject({
+      uuid: 'job-2',
+      type: 'MessageSendJob',
+      status: jobStatus.pending,
+      userName: null,
+      userEmail: 'no-name@example.org',
+      surveyName: null,
+    })
+
+    dbMapSpy.mockRestore()
   })
 })
