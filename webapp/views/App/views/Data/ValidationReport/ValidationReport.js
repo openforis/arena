@@ -1,5 +1,6 @@
 import './ValidationReport.scss'
 
+import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
@@ -19,6 +20,7 @@ const ValidationReport = () => {
   const surveyCycleKey = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
   const { recordUuid } = useParams()
+  const [query, setQuery] = useState(null)
 
   const onRowClick = (row) => {
     const pageNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
@@ -31,14 +33,22 @@ const ValidationReport = () => {
     navigate(recordEditUrl)
   }
 
-  const restParams = { cycle: surveyCycleKey, ...(recordUuid ? { recordUuid } : {}), lang }
+  const restParams = useMemo(
+    () => ({
+      cycle: surveyCycleKey,
+      ...(recordUuid ? { recordUuid } : {}),
+      ...(query ? { query: JSON.stringify(query) } : {}),
+      lang,
+    }),
+    [lang, query, recordUuid, surveyCycleKey]
+  )
 
   return (
     <div className="validation-report">
       <Table
         className="validation-report__table"
         headerLeftComponent={HeaderLeft}
-        headerProps={{ restParams }}
+        headerProps={{ onQueryChange: setQuery, query, restParams }}
         module="validationReport"
         restParams={restParams}
         gridTemplateColumns="50px 1fr 2fr 6rem 50px"

@@ -349,8 +349,9 @@ export const init = (app) => {
   app.get('/survey/:surveyId/validationReport', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, offset, limit, cycle, recordUuid } = Request.getParams(req)
+      const query = Request.getJsonParam(req, 'query')
 
-      const list = await RecordService.fetchValidationReport({ surveyId, cycle, offset, limit, recordUuid })
+      const list = await RecordService.fetchValidationReport({ surveyId, cycle, offset, limit, recordUuid, query })
 
       res.json({ list })
     } catch (error) {
@@ -361,8 +362,9 @@ export const init = (app) => {
   app.get('/survey/:surveyId/validationReport/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, recordUuid } = Request.getParams(req)
+      const query = Request.getJsonParam(req, 'query')
 
-      const count = await RecordService.countValidationReportItems({ surveyId, cycle, recordUuid })
+      const count = await RecordService.countValidationReportItems({ surveyId, cycle, recordUuid, query })
 
       res.json({ count })
     } catch (error) {
@@ -377,6 +379,7 @@ export const init = (app) => {
       try {
         const user = Request.getUser(req)
         const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+        const query = Request.getJsonParam(req, 'query')
 
         const job = RecordService.startValidationReportGenerationJob({
           user,
@@ -384,6 +387,7 @@ export const init = (app) => {
           cycle,
           lang,
           recordUuid,
+          query,
           fileFormat,
         })
         res.json(JobUtils.jobToJSON(job))

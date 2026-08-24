@@ -3,6 +3,7 @@ import { Transform } from 'stream'
 import * as A from '@core/arena'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
+import * as Expression from '@core/expressionParser/expression'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import { db } from '@server/db/db'
@@ -14,12 +15,27 @@ const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValida
 
 // ============== READ
 
-const query = ({ surveyId, recordUuid }) => {
+const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null }) => {
   const surveySchema = getSurveyDBSchema(surveyId)
   const surveyRdbSchema = SchemaRdb.getName(surveyId)
   const uuidLength = 36
+  const filter = filterBySurveyAttrs?.filter
+  const rootDataViewName = filterBySurveyAttrs?.rootDataViewName
+  const { clause: filterClause = null, params: filterParams = {} } = filter ? Expression.toSql(filter) : {}
 
-  return `WITH node_validation AS (
+  const filterBySurveyAttrsClause =
+    filterClause && rootDataViewName
+      ? `
+      AND EXISTS (
+        SELECT 1
+        FROM ${surveyRdbSchema}.$/rootDataViewName:name/ root_data
+        WHERE root_data.record_uuid = r.uuid
+          AND root_data.record_cycle = r.cycle
+          AND ${filterClause}
+      )`
+      : ''
+
+  const text = `WITH node_validation AS (
     SELECT 
       r.uuid AS record_uuid,
       -- node_uuid
@@ -84,30 +100,48 @@ const query = ({ surveyId, recordUuid }) => {
       -- exclude analysis variables
       AND n.node_def_uuid NOT IN (SELECT uuid FROM ${surveySchema}.node_def WHERE analysis IS TRUE)
       ${recordUuid ? 'AND r.uuid = $/recordUuid/' : ''}
+      ${filterBySurveyAttrsClause}
     ORDER BY r.date_created, n.id`
+
+  return {
+    text,
+    params: {
+      ...filterParams,
+      ...(rootDataViewName ? { rootDataViewName } : {}),
+    },
+  }
 }
 
 const _rowToItem = A.camelizePartial({ limitToLevel: 1, sideEffect: true })
 
 export const fetchValidationReport = async (
-  { surveyId, cycle, offset = 0, limit = null, recordUuid = null },
+  { surveyId, cycle, offset = 0, limit = null, recordUuid = null, filterBySurveyAttrs = null },
   client = db
-) =>
-  client.map(
-    `${query({ surveyId, recordUuid })}
+) => {
+  const { text, params } = query({ surveyId, recordUuid, filterBySurveyAttrs })
+  return client.map(
+    `${text}
       LIMIT $/limit/
       OFFSET $/offset/`,
-    { cycle, limit, offset, recordUuid },
+    { cycle, limit, offset, recordUuid, ...params },
     _rowToItem
   )
+}
 
-export const countValidationReportItems = async ({ surveyId, cycle, recordUuid = null }, client = db) =>
-  client.one(`SELECT COUNT(*) FROM(${query({ surveyId, recordUuid })}) AS v`, { cycle, recordUuid }, (row) =>
-    Number(row.count)
-  )
+export const countValidationReportItems = async (
+  { surveyId, cycle, recordUuid = null, filterBySurveyAttrs = null },
+  client = db
+) => {
+  const { text, params } = query({ surveyId, recordUuid, filterBySurveyAttrs })
+  return client.one(`SELECT COUNT(*) FROM(${text}) AS v`, { cycle, recordUuid, ...params }, (row) => Number(row.count))
+}
 
-export const getValidationReportAsStream = ({ surveyId, cycle, recordUuid = null, processor }, client = db) => {
-  const queryFormatted = DbUtils.formatQuery(query({ surveyId, recordUuid }), { cycle, recordUuid })
+export const getValidationReportAsStream = (
+  { surveyId, cycle, recordUuid = null, filterBySurveyAttrs = null, processor },
+  client = db
+) => {
+  const { text, params } = query({ surveyId, recordUuid, filterBySurveyAttrs })
+  const queryFormatted = DbUtils.formatQuery(text, { cycle, recordUuid, ...params })
 
   const rowsToItemsTransformer = new Transform({
     objectMode: true,
