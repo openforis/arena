@@ -99,6 +99,8 @@ export const getModulesHierarchy = (user, surveyInfo) => {
           }),
         ]
       : []),
+    // job monitor
+    ...(User.isSystemAdmin(user) ? [getModule({ module: appModules.jobs })] : []),
     getModule({
       module: appModules.help,
       children: [helpModules.userManual, helpModules.about, helpModules.changelog, helpModules.disclaimer],
@@ -116,7 +118,7 @@ export const isHidden = R.propEq(keys.hidden, true)
 export const isExternal = R.propEq(keys.external, true)
 export const isHome = (module) => getKey(module) === appModules.home.key
 export const isSurveySelectionRequired = (module) =>
-  ![appModules.home.key, appModules.help.key].includes(getKey(module))
+  ![appModules.home.key, appModules.help.key, appModules.jobs.key].includes(getKey(module))
 export const isActive = (pathname) => (module) => {
   // Module home is active when page is on landing
   return isHome(module) ? pathname === appModuleUri(homeModules.landing) : R.startsWith(module.uri, pathname)

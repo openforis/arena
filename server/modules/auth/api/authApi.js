@@ -84,7 +84,7 @@ export const init = (app) => {
     try {
       // Before logout checkOut record if there's an opened thread
       const socketId = Request.getSocketId(req)
-      RecordService.dissocSocketFromUpdateThread(socketId)
+      await RecordService.dissocSocketFromUpdateThread(socketId)
 
       res.clearCookie('refreshToken', {
         httpOnly: true,

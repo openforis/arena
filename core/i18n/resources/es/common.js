@@ -323,6 +323,9 @@ export default {
     entities: 'Entidades virtuales',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Instancias',
+
+    jobMonitor: 'Monitor de trabajos',
+
     help: 'Ayuda',
     about: 'Acerca de',
     changelog: 'Registro de cambios',

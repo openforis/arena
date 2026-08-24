@@ -363,6 +363,8 @@ Deseja prosseguir?`,
     message: 'Mensagem',
     message_plural: '$t(common.message_plural)',
 
+    jobMonitor: 'Monitor de tarefas',
+
     help: 'Ajuda',
     about: 'Sobre',
     changelog: 'Registo de alterações',

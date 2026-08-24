@@ -353,6 +353,8 @@ export default {
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Экземпляры',
 
+    jobMonitor: 'Монитор заданий',
+
     help: 'Помощь',
     about: 'О программе',
     changelog: 'Журнал изменений',

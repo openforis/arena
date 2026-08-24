@@ -69,6 +69,11 @@ export const appModules = {
     path: 'messages',
     icon: 'envelop',
   },
+  jobs: {
+    key: 'jobMonitor',
+    path: 'jobMonitor',
+    icon: 'cogs',
+  },
   help: {
     key: 'help',
     path: 'help',

@@ -363,6 +363,8 @@ Try again?`,
     message: 'Message',
     message_plural: '$t(common.message_plural)',
 
+    jobMonitor: 'Job Monitor',
+
     help: 'Help',
     about: 'About',
     changelog: 'Changelog',

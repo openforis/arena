@@ -1,0 +1,22 @@
+export default {
+  title: 'Монитор задач',
+  activeOnly: 'Только активные задачи',
+  noSurvey: '—',
+  columns: {
+    type: 'Тип',
+    status: 'Статус',
+    survey: 'Опрос',
+    user: 'Пользователь',
+    progress: 'Прогресс',
+    elapsed: 'Прошедшее время',
+    remaining: 'Осталось (примерно)',
+    startedAt: 'Начато',
+  },
+  status: {
+    pending: 'В ожидании',
+    running: 'Выполняется',
+    succeeded: 'Успешно',
+    failed: 'Ошибка',
+    canceled: 'Отменено',
+  },
+}
