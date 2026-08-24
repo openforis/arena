@@ -7,6 +7,8 @@ import * as Log from '@server/log/log'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import { PrintableExportScopes, PrintOrientations } from '@common/record/printableExport'
+import { Query } from '@common/model/query'
+import { ViewDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
@@ -257,7 +259,65 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
 export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSocketBySocketId
 
 // VALIDATION REPORT
-export const { fetchValidationReport, countValidationReportItems } = RecordManager
+const _resolveValidationReportFilterBySurveyAttrs = async ({ surveyId, cycle, query, attributeDefUuids = null }) => {
+  const filter = query ? Query.getFilter(query) : null
+  const hasAttributeFilter = Array.isArray(attributeDefUuids)
+  if (!filter && !hasAttributeFilter) return null
+
+  const output = {}
+
+  if (hasAttributeFilter) {
+    output.attributeDefUuids = attributeDefUuids
+  }
+
+  if (filter) {
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+    const rootNodeDef = Survey.getNodeDefRoot(survey)
+    output.filter = filter
+    output.rootDataViewName = new ViewDataNodeDef(survey, rootNodeDef).name
+  }
+
+  return output
+}
+
+export const fetchValidationReport = async ({
+  surveyId,
+  cycle,
+  offset,
+  limit,
+  recordUuid,
+  query,
+  attributeDefUuids = null,
+  sortBy,
+  sortOrder,
+}) => {
+  const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({
+    surveyId,
+    cycle,
+    query,
+    attributeDefUuids,
+  })
+  return RecordManager.fetchValidationReport({
+    surveyId,
+    cycle,
+    offset,
+    limit,
+    recordUuid,
+    filterBySurveyAttrs,
+    sortBy,
+    sortOrder,
+  })
+}
+
+export const countValidationReportItems = async ({ surveyId, cycle, recordUuid, query, attributeDefUuids = null }) => {
+  const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({
+    surveyId,
+    cycle,
+    query,
+    attributeDefUuids,
+  })
+  return RecordManager.countValidationReportItems({ surveyId, cycle, recordUuid, filterBySurveyAttrs })
+}
 
 // RECORDS CLONE
 export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recordsUuids }) => {
@@ -267,8 +327,26 @@ export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recor
 }
 
 // Validation Report
-export const startValidationReportGenerationJob = ({ user, surveyId, cycle, lang, recordUuid, fileFormat }) => {
-  const job = new VaidationReportGenerationJob({ user, surveyId, cycle, lang, recordUuid, fileFormat })
+export const startValidationReportGenerationJob = ({
+  user,
+  surveyId,
+  cycle,
+  lang,
+  recordUuid,
+  query,
+  attributeDefUuids,
+  fileFormat,
+}) => {
+  const job = new VaidationReportGenerationJob({
+    user,
+    surveyId,
+    cycle,
+    lang,
+    recordUuid,
+    query,
+    attributeDefUuids,
+    fileFormat,
+  })
   JobManager.enqueueJob(job)
   return job
 }
