@@ -22,9 +22,10 @@ const TreeItemPropTypes = PropTypes.shape({
 })
 
 const TreeItemView = (props) => {
-  const { item, renderItemSuffix, expandedItemKeys } = props
+  const { item, renderItemPrefix, renderItemSuffix, expandedItemKeys } = props
   const { key, disabled, hasSubPages, icon, label, items, testId } = item
   const isExpanded = Boolean(expandedItemKeys?.includes(key))
+  const prefix = renderItemPrefix?.(item, { isExpanded })
   const suffix = renderItemSuffix?.(item, { isExpanded })
 
   return (
@@ -34,6 +35,7 @@ const TreeItemView = (props) => {
       itemId={key}
       label={
         <div className="tree-item-label display-flex">
+          {prefix}
           {icon}
           <LabelWithTooltip label={label} />
           {suffix}
@@ -48,6 +50,7 @@ const TreeItemView = (props) => {
           <TreeItemView
             key={childItem.key}
             item={childItem}
+            renderItemPrefix={renderItemPrefix}
             renderItemSuffix={renderItemSuffix}
             expandedItemKeys={expandedItemKeys}
           />
@@ -59,6 +62,7 @@ const TreeItemView = (props) => {
 
 TreeItemView.propTypes = {
   item: TreeItemPropTypes,
+  renderItemPrefix: PropTypes.func,
   renderItemSuffix: PropTypes.func,
   expandedItemKeys: PropTypes.array,
 }
@@ -71,6 +75,7 @@ export const TreeView = (props) => {
     onExpandedItemKeysChange = undefined,
     selectedItemKeys = undefined,
     onSelectedItemKeysChange = undefined,
+    renderItemPrefix = undefined,
     renderItemSuffix = undefined,
   } = props
 
@@ -112,6 +117,7 @@ export const TreeView = (props) => {
         <TreeItemView
           key={childItem.key}
           item={childItem}
+          renderItemPrefix={renderItemPrefix}
           renderItemSuffix={renderItemSuffix}
           expandedItemKeys={expadedItemKeys}
         />
@@ -127,5 +133,6 @@ TreeView.propTypes = {
   onExpandedItemKeysChange: PropTypes.func,
   onSelectedItemKeysChange: PropTypes.func,
   selectedItemKeys: PropTypes.array,
+  renderItemPrefix: PropTypes.func,
   renderItemSuffix: PropTypes.func,
 }

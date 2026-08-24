@@ -22,15 +22,22 @@ export default class VaidationReportGenerationJob extends Job {
   }
 
   async execute() {
-    const { surveyId, cycle, fileFormat, recordUuid, lang, query } = this.context
+    const { surveyId, cycle, fileFormat, recordUuid, lang, query, attributeDefUuids = null } = this.context
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
     const filter = query ? Query.getFilter(query) : null
-    const filterBySurveyAttrs = filter
-      ? {
-          filter,
-          rootDataViewName: new ViewDataNodeDef(survey, Survey.getNodeDefRoot(survey)).name,
-        }
-      : null
+    const hasAttributeFilter = Array.isArray(attributeDefUuids)
+    const filterBySurveyAttrs =
+      filter || hasAttributeFilter
+        ? {
+            ...(filter
+              ? {
+                  filter,
+                  rootDataViewName: new ViewDataNodeDef(survey, Survey.getNodeDefRoot(survey)).name,
+                }
+              : {}),
+            ...(hasAttributeFilter ? { attributeDefUuids } : {}),
+          }
+        : null
 
     // create temp file
     const tempFileName = FileUtils.newTempFileName()

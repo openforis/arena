@@ -6,6 +6,7 @@ import * as Validation from '@core/validation/validation'
 import * as Expression from '@core/expressionParser/expression'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
+import { DbOrder } from '@server/db'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -13,14 +14,29 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 
 const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValidation
 
+const sortFieldBySortBy = {
+  dateCreated: 'record_date_created',
+  dateModified: 'record_date_modified',
+  message: 'validation',
+  owner: 'record_owner_name',
+  path: 'keys_hierarchy',
+}
+
+const getOrderByClause = ({ sortBy, sortOrder }) => {
+  const sortField = sortFieldBySortBy[sortBy] ?? sortFieldBySortBy.dateCreated
+  const sortOrderNormalized = DbOrder.normalize(sortOrder, DbOrder.desc).toUpperCase()
+  return `${sortField} ${sortOrderNormalized}, node_id ASC`
+}
+
 // ============== READ
 
-const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null }) => {
+const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortOrder }) => {
   const surveySchema = getSurveyDBSchema(surveyId)
   const surveyRdbSchema = SchemaRdb.getName(surveyId)
   const uuidLength = 36
   const filter = filterBySurveyAttrs?.filter
   const rootDataViewName = filterBySurveyAttrs?.rootDataViewName
+  const attributeDefUuids = filterBySurveyAttrs?.attributeDefUuids
   const { clause: filterClause = null, params: filterParams = {} } = filter ? Expression.toSql(filter) : {}
 
   const filterBySurveyAttrsClause =
@@ -34,6 +50,15 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null }) => {
           AND ${filterClause}
       )`
       : ''
+
+  const filterByAttributeDefsClause =
+    Array.isArray(attributeDefUuids) && attributeDefUuids.length === 0
+      ? 'AND 1 = 0'
+      : attributeDefUuids?.length > 0
+        ? 'AND n.node_def_uuid IN ($/attributeDefUuids:csv/)'
+        : ''
+
+  const orderByClause = getOrderByClause({ sortBy, sortOrder })
 
   const text = `WITH node_validation AS (
     SELECT 
@@ -101,12 +126,14 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null }) => {
       AND n.node_def_uuid NOT IN (SELECT uuid FROM ${surveySchema}.node_def WHERE analysis IS TRUE)
       ${recordUuid ? 'AND r.uuid = $/recordUuid/' : ''}
       ${filterBySurveyAttrsClause}
-    ORDER BY r.date_created, n.id`
+      ${filterByAttributeDefsClause}
+    ORDER BY ${orderByClause}`
 
   return {
     text,
     params: {
       ...filterParams,
+      ...(attributeDefUuids?.length > 0 ? { attributeDefUuids } : {}),
       ...(rootDataViewName ? { rootDataViewName } : {}),
     },
   }
@@ -115,10 +142,10 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null }) => {
 const _rowToItem = A.camelizePartial({ limitToLevel: 1, sideEffect: true })
 
 export const fetchValidationReport = async (
-  { surveyId, cycle, offset = 0, limit = null, recordUuid = null, filterBySurveyAttrs = null },
+  { surveyId, cycle, offset = 0, limit = null, recordUuid = null, filterBySurveyAttrs = null, sortBy, sortOrder },
   client = db
 ) => {
-  const { text, params } = query({ surveyId, recordUuid, filterBySurveyAttrs })
+  const { text, params } = query({ surveyId, recordUuid, filterBySurveyAttrs, sortBy, sortOrder })
   return client.map(
     `${text}
       LIMIT $/limit/

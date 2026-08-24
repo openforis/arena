@@ -348,10 +348,21 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/validationReport', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, offset, limit, cycle, recordUuid } = Request.getParams(req)
+      const { surveyId, offset, limit, cycle, recordUuid, sortBy, sortOrder } = Request.getParams(req)
       const query = Request.getJsonParam(req, 'query')
+      const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
 
-      const list = await RecordService.fetchValidationReport({ surveyId, cycle, offset, limit, recordUuid, query })
+      const list = await RecordService.fetchValidationReport({
+        surveyId,
+        cycle,
+        offset,
+        limit,
+        recordUuid,
+        query,
+        attributeDefUuids,
+        sortBy,
+        sortOrder,
+      })
 
       res.json({ list })
     } catch (error) {
@@ -363,8 +374,15 @@ export const init = (app) => {
     try {
       const { surveyId, cycle, recordUuid } = Request.getParams(req)
       const query = Request.getJsonParam(req, 'query')
+      const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
 
-      const count = await RecordService.countValidationReportItems({ surveyId, cycle, recordUuid, query })
+      const count = await RecordService.countValidationReportItems({
+        surveyId,
+        cycle,
+        recordUuid,
+        query,
+        attributeDefUuids,
+      })
 
       res.json({ count })
     } catch (error) {
@@ -380,6 +398,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
         const query = Request.getJsonParam(req, 'query')
+        const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
 
         const job = RecordService.startValidationReportGenerationJob({
           user,
@@ -388,6 +407,7 @@ export const init = (app) => {
           lang,
           recordUuid,
           query,
+          attributeDefUuids,
           fileFormat,
         })
         res.json(JobUtils.jobToJSON(job))

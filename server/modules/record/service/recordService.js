@@ -259,24 +259,63 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
 export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSocketBySocketId
 
 // VALIDATION REPORT
-const _resolveValidationReportFilterBySurveyAttrs = async ({ surveyId, cycle, query }) => {
+const _resolveValidationReportFilterBySurveyAttrs = async ({ surveyId, cycle, query, attributeDefUuids = null }) => {
   const filter = query ? Query.getFilter(query) : null
-  if (!filter) return null
+  const hasAttributeFilter = Array.isArray(attributeDefUuids)
+  if (!filter && !hasAttributeFilter) return null
 
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
-  const rootNodeDef = Survey.getNodeDefRoot(survey)
-  const rootDataViewName = new ViewDataNodeDef(survey, rootNodeDef).name
+  const output = {}
 
-  return { filter, rootDataViewName }
+  if (hasAttributeFilter) {
+    output.attributeDefUuids = attributeDefUuids
+  }
+
+  if (filter) {
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+    const rootNodeDef = Survey.getNodeDefRoot(survey)
+    output.filter = filter
+    output.rootDataViewName = new ViewDataNodeDef(survey, rootNodeDef).name
+  }
+
+  return output
 }
 
-export const fetchValidationReport = async ({ surveyId, cycle, offset, limit, recordUuid, query }) => {
-  const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({ surveyId, cycle, query })
-  return RecordManager.fetchValidationReport({ surveyId, cycle, offset, limit, recordUuid, filterBySurveyAttrs })
+export const fetchValidationReport = async ({
+  surveyId,
+  cycle,
+  offset,
+  limit,
+  recordUuid,
+  query,
+  attributeDefUuids = null,
+  sortBy,
+  sortOrder,
+}) => {
+  const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({
+    surveyId,
+    cycle,
+    query,
+    attributeDefUuids,
+  })
+  return RecordManager.fetchValidationReport({
+    surveyId,
+    cycle,
+    offset,
+    limit,
+    recordUuid,
+    filterBySurveyAttrs,
+    sortBy,
+    sortOrder,
+  })
 }
 
-export const countValidationReportItems = async ({ surveyId, cycle, recordUuid, query }) => {
-  const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({ surveyId, cycle, query })
+export const countValidationReportItems = async ({ surveyId, cycle, recordUuid, query, attributeDefUuids = null }) => {
+  const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({
+    surveyId,
+    cycle,
+    query,
+    attributeDefUuids,
+  })
   return RecordManager.countValidationReportItems({ surveyId, cycle, recordUuid, filterBySurveyAttrs })
 }
 
@@ -288,8 +327,26 @@ export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recor
 }
 
 // Validation Report
-export const startValidationReportGenerationJob = ({ user, surveyId, cycle, lang, recordUuid, query, fileFormat }) => {
-  const job = new VaidationReportGenerationJob({ user, surveyId, cycle, lang, recordUuid, query, fileFormat })
+export const startValidationReportGenerationJob = ({
+  user,
+  surveyId,
+  cycle,
+  lang,
+  recordUuid,
+  query,
+  attributeDefUuids,
+  fileFormat,
+}) => {
+  const job = new VaidationReportGenerationJob({
+    user,
+    surveyId,
+    cycle,
+    lang,
+    recordUuid,
+    query,
+    attributeDefUuids,
+    fileFormat,
+  })
   JobManager.enqueueJob(job)
   return job
 }
