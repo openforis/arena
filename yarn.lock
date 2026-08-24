@@ -3527,9 +3527,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@portal:../arena-server::locator=open-foris-arena%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "@openforis/arena-server@portal:../arena-server::locator=open-foris-arena%40workspace%3A."
+"@openforis/arena-server@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@openforis/arena-server@npm:2.2.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F2.2.0%2F4db1b94ec9a6f855bd2516556b93974155656194"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1112.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -3555,8 +3555,9 @@ __metadata:
     pdfkit: "npm:^0.19.1"
     pg-promise: "npm:^12.7.0"
     socket.io: "npm:^4.8.3"
+  checksum: 10c0/db322ca410e3d19dd170878a869676242c65098bb4aac09cb6577bfb6863fd745056ca8713a389f2ec51d7d8bc9080faeb725314ea3d52e001161895b20205c0
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "@opentelemetry/api@npm:1.9.0":
   version: 1.9.0
@@ -14982,7 +14983,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
-    "@openforis/arena-server": "portal:../arena-server"
+    "@openforis/arena-server": "npm:^2.2.0"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
