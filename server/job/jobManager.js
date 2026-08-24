@@ -4,7 +4,8 @@ import * as ProcessUtils from '@core/processUtils'
 import * as Log from '@server/log/log'
 
 import { JobQueue } from './JobQueue'
-import { jobRowToSummary } from './jobUtils'
+import { jobRowToSummary, jobRowToMonitorSummary } from './jobUtils'
+import * as jobRepository from './jobRepository'
 
 const logger = Log.getLogger('JobManager')
 
@@ -42,6 +43,11 @@ export const getJobSummary = async (jobUuid) => {
     logger.error(`error reading job summary from DB: ${error}`)
     return null
   }
+}
+
+export const getAllJobsSummary = async () => {
+  const rows = await jobRepository.getAll()
+  return rows.map(jobRowToMonitorSummary)
 }
 
 // ====== UPDATE
