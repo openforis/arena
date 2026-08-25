@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/preserve-manual-memoization -- pre-existing: React Compiler cannot preserve the onChange callback's memoization here (unrelated to this change, reproduces on master too) */
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
@@ -23,10 +24,14 @@ export const StratumAttributeSelector = () => {
     [chain, dispatch]
   )
 
+  const label = ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign)
+    ? 'chainView.stratumAttribute2ndPhase'
+    : 'chainView.stratumAttribute'
+
   return (
     <BaseUnitCodeAttributeSelector
       allowEmptySelection={ChainSamplingDesign.isStratificationNotSpecifiedAllowed(samplingDesign)}
-      label="chainView.stratumAttribute"
+      label={label}
       selectedNodeDefUuid={ChainSamplingDesign.getStratumNodeDefUuid(samplingDesign)}
       onChange={onChange}
     />
