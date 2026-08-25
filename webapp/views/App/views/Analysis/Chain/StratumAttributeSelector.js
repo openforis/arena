@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/preserve-manual-memoization -- pre-existing: React Compiler cannot preserve the onChange callback's memoization here (unrelated to this change, reproduces on master too) */
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
@@ -14,6 +13,7 @@ export const StratumAttributeSelector = () => {
   const chain = useChain()
   const samplingDesign = Chain.getSamplingDesign(chain)
 
+  /* eslint-disable react-hooks/preserve-manual-memoization -- pre-existing: React Compiler cannot preserve this callback's memoization here (unrelated to this task, reproduces on master too) */
   const onChange = useCallback(
     (stratumDefUuid) => {
       const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocStratumNodeDefUuid(stratumDefUuid))(
@@ -23,6 +23,7 @@ export const StratumAttributeSelector = () => {
     },
     [chain, dispatch]
   )
+  /* eslint-enable react-hooks/preserve-manual-memoization */
 
   const label = ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign)
     ? 'chainView.stratumAttribute2ndPhase'
