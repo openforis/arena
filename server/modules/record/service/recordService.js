@@ -38,6 +38,7 @@ import * as Response from '@server/utils/response'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
+import * as RecordFileManager from '../manager/recordFileManager'
 import { findSurveyDocImageApplicable } from '../../survey/service/surveyDocImageUtils'
 
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
@@ -514,6 +515,7 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
 }
 const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
   const surveyId = Survey.getId(survey)
+  const isPreview = Record.isPreview(record)
 
   const nodesDeleteBatchPersister = new NodesDeleteBatchPersister({ user, surveyId, tx })
   const nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
@@ -521,9 +523,21 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
 
   if (nodesArray.length === 0) return
 
+  // preview records: soft-deleted files are never purged, so hard-delete now the files of any
+  // file-type nodes among the ones being deleted (nodesArray already includes every individual
+  // descendant node explicitly - Record.updateNodesDependents flattens the whole subtree - so no
+  // separate subtree lookup is needed here)
+  const fileDeleteParams = []
+
   for (const node of nodesArray) {
     if (Node.isDeleted(node)) {
       await nodesDeleteBatchPersister.addItem(node)
+      if (isPreview) {
+        const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+        if (NodeDef.isFile(nodeDef) && Node.getFileUuid(node)) {
+          fileDeleteParams.push({ fileUuid: Node.getFileUuid(node), recordUuid: Node.getRecordUuid(node) })
+        }
+      }
     } else if (Node.isCreated(node)) {
       await nodesInsertBatchPersister.addItem(node)
     } else if (Node.isUpdated(node)) {
@@ -533,6 +547,10 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
   await nodesDeleteBatchPersister.flush()
   await nodesInsertBatchPersister.flush()
   await nodesUpdateBatchPersister.flush()
+
+  if (fileDeleteParams.length > 0) {
+    await RecordFileManager.deleteFiles({ surveyId, files: fileDeleteParams }, tx)
+  }
 
   await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
 }
