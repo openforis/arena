@@ -280,16 +280,8 @@ export const deleteNode = async (
 
 export const { deleteNodesByUuids } = NodeUpdateManager
 
-export const deleteNodesByNodeDefUuids = async ({ user, surveyId, nodeDefUuids, record }, client = db) => {
-  const { record: recordUpdated } = await NodeUpdateManager.deleteNodesByNodeDefUuids(
-    user,
-    surveyId,
-    nodeDefUuids,
-    record,
-    client
-  )
-  return recordUpdated
-}
+export const deleteNodesByNodeDefUuids = async ({ user, surveyId, nodeDefUuids }, client = db) =>
+  NodeUpdateManager.deleteNodesByNodeDefUuids(user, surveyId, nodeDefUuids, client)
 
 const _updateNodeAndValidateRecordUniqueness = async (
   {

@@ -334,21 +334,28 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   )
 }
 
-export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, record, client = db) =>
+// This delete is NOT scoped to a single record - it can affect nodes across many records of the
+// survey at once (e.g. RecordCheckJob runs it once per cycle, for a node def that no longer
+// exists, rather than once per record). On a large survey it can match millions of rows, so unlike
+// most node mutations here, it intentionally does not return or log the individual affected nodes:
+// pulling them all into memory (or logging one activity per node) is enough on its own to exhaust
+// a job worker's heap - see NodeRepository.deleteNodesByNodeDefUuids. Callers that need to reflect
+// the deletion in an already-loaded record should do so locally instead, filtering that record's
+// own nodes by nodeDefUuids (they're already in memory, so this needs no extra data from here).
+export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, client = db) =>
   client.tx(async (t) => {
-    // NOTE: this delete is NOT scoped to `record` - it can affect nodes across many records at once,
-    // so do not gate this on Record.isPreview(record) (that would wrongly skip cleanup of other preview
-    // records' files). Correctness relies entirely on the SQL-level `record.preview = true` join inside
-    // deleteFilesByNodeDefUuids/fetchFileValueNodesByNodeDefUuids.
+    // NOTE: do not gate this on Record.isPreview(record) (that would wrongly skip cleanup of other
+    // preview records' files). Correctness relies entirely on the SQL-level `record.preview = true`
+    // join inside deleteFilesByNodeDefUuids/fetchFileValueNodesByNodeDefUuids.
     await RecordFileManager.deleteFilesByNodeDefUuids({ surveyId, nodeDefUuids }, t)
-    const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefUuids, t)
-    const activities = nodesDeleted.map((node) =>
-      ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true)
+    const deletedCount = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefUuids, t)
+    // One activity per node def (matches the bulk-delete convention used by e.g.
+    // taxonomyTaxaDelete), not one per deleted node.
+    const activities = nodeDefUuids.map((nodeDefUuid) =>
+      ActivityLog.newActivity(ActivityLog.type.nodeDefNodesDelete, { uuid: nodeDefUuid }, true)
     )
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
-    const nodesDeletedByUuid = ObjectUtils.toUuidIndexedObj(nodesDeleted)
-    const recordUpdated = Record.mergeNodes(nodesDeletedByUuid, { sideEffect: true })(record)
-    return { record: recordUpdated, nodesDeleted }
+    return deletedCount
   })
 
 export const deleteNodesByUuids = async ({ user, surveyId, nodeUuids, systemActivity = false }, tx) => {
