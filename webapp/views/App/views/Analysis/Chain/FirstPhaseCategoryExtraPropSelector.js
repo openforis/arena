@@ -29,7 +29,9 @@ export const FirstPhaseCategoryExtraPropSelector = () => {
     const survey = SurveyState.getSurvey(state)
     const firstPhaseCategory = Survey.getCategoryByUuid(firstPhaseCategoryUuid)(survey)
     if (!firstPhaseCategory) return []
-    return Category.getItemExtraDefKeys(firstPhaseCategory)
+    return Category.getItemExtraDefKeys(firstPhaseCategory).filter(
+      (name) => name !== Category.reportingDataItemExtraDefKeys.area
+    )
   }, Objects.isEqual)
 
   const emptyItem = { value: null, label: i18n.t('common.notSpecified') }
