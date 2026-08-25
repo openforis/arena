@@ -39,6 +39,7 @@ export default {
     'Importando datos en la encuesta Collect incorrecta. URI esperado: {{collectSurveyUri}}',
   invalidType: 'Tipo no válido {{type}}',
   jobCanceledOrErrorsFound: 'Trabajo cancelado o errores encontrados; transacción de reversión',
+  jobOrphanedOnRestart: 'El trabajo se interrumpió por un reinicio del servidor. Vuelva a intentarlo.',
   paramIsRequired: 'El parámetro {{param}} es obligatorio',
   unableToFindParent: 'No se puede encontrar el padre de {{name}}',
   unableToFindNode: 'No se puede encontrar el nodo con el nombre {{name}}',

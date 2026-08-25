@@ -21,21 +21,23 @@ const lockName = 'scheduler-stale-jobs-cleanup'
 // export on a large survey - adjust if evidence emerges that jobs routinely run longer.
 const staleAfterMinutes = 60
 
+const staleJobErrorProps = {
+  errors: {
+    generic: {
+      error: {
+        valid: false,
+        errors: [{ key: 'appErrors:jobOrphanedOnRestart' }],
+      },
+    },
+  },
+}
+
 const cleanupStaleJobs = async () => {
   try {
     await runWithClusterLock({
       lockName,
       fn: async () => {
         Logger.debug('Marking stale job rows as failed')
-
-        const props = {
-          errors: {
-            generic: {
-              key: 'appErrors:generic',
-              params: { text: 'Job orphaned (likely a dyno restart) and marked failed by the stale-job reaper' },
-            },
-          },
-        }
 
         const result = await db.result(
           `UPDATE job
@@ -44,9 +46,14 @@ const cleanupStaleJobs = async () => {
                date_modified = (now() AT TIME ZONE 'UTC')
            WHERE status IN ($3, $4)
              AND date_modified < (now() AT TIME ZONE 'UTC') - ($5 || ' minutes')::interval`,
-          [jobStatus.failed, JSON.stringify(props), jobStatus.pending, jobStatus.running, staleAfterMinutes]
+          [
+            jobStatus.failed,
+            JSON.stringify(staleJobErrorProps),
+            jobStatus.pending,
+            jobStatus.running,
+            staleAfterMinutes,
+          ]
         )
-
         Logger.debug(`${result.rowCount} stale job rows marked failed`)
       },
     })

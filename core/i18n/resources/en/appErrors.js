@@ -34,6 +34,7 @@ export default {
   importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
   invalidType: 'Invalid type {{type}}',
   jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
+  jobOrphanedOnRestart: 'The job was interrupted by a server restart. Please try again.',
   paramIsRequired: 'Param {{param}} is required',
   unableToFindParent: 'Unable to find parent of {{name}}',
   unableToFindNode: 'Unable to find node with name {{name}}',
