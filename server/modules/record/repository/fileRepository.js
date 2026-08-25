@@ -46,14 +46,14 @@ export const fetchFileSummariesByType = async ({ surveyId, type }, client = db) 
     [type]
   )
 
-export const fetchFileUuidsByRecordUuids = async ({ surveyId, recordUuids }, client = db) =>
+export const fetchFilesByRecordUuids = async ({ surveyId, recordUuids }, client = db) =>
   client.map(
     `
-    SELECT uuid
+    SELECT uuid AS "fileUuid", props ->> '${SurveyFile.propKeys.recordUuid}' AS "recordUuid"
     FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE props ->> '${SurveyFile.propKeys.recordUuid}' IN ($1:csv)`,
     [recordUuids],
-    (row) => row.uuid
+    (row) => row
   )
 
 export const fetchFileUuidsBySurveyId = async ({ surveyId }, client = db) =>
