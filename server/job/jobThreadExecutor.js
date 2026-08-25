@@ -67,12 +67,12 @@ export const getActiveJobSummary = (userUuid) => activeJobSummariesByUserUuid.ge
 
 // ====== UPDATE
 
-export const cancelActiveJobByUserUuid = async (userUuid) => {
+export const cancelActiveJobByUserUuid = async (userUuid, { canceledByAdmin = false } = {}) => {
   const jobThread = userJobThreads.getThread(userUuid)
   if (!jobThread) {
     return
   }
-  jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob })
+  jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob, canceledByAdmin })
 }
 
 // ====== EXECUTE

@@ -5,11 +5,16 @@ import * as DateUtils from '@core/dateUtils'
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import { useI18n } from '@webapp/store/system'
+import { ButtonIconCancel } from '@webapp/components/buttons'
 import formatDuration from '@webapp/views/App/JobMonitor/JobTiming/formatDuration'
 
 import { JobMonitorSummary } from './useJobsMonitor'
 
-export const useJobsMonitorColumns = (): GridColDef<JobMonitorSummary>[] => {
+type Props = {
+  onCancelJob: (row: JobMonitorSummary) => void
+}
+
+export const useJobsMonitorColumns = ({ onCancelJob }: Props): GridColDef<JobMonitorSummary>[] => {
   const i18n = useI18n()
 
   return useMemo(
@@ -65,7 +70,14 @@ export const useJobsMonitorColumns = (): GridColDef<JobMonitorSummary>[] => {
         width: 180,
         valueGetter: (_value, row) => DateUtils.convertDateTimeFromISOToDisplay(row.dateCreated) as string,
       },
+      {
+        field: 'actions',
+        headerName: '',
+        width: 60,
+        sortable: false,
+        renderCell: ({ row }) => (row.pending || row.running) && <ButtonIconCancel onClick={() => onCancelJob(row)} />,
+      },
     ],
-    [i18n]
+    [i18n, onCancelJob]
   )
 }

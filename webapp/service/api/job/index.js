@@ -14,3 +14,7 @@ export const fetchAllJobs = async () => {
   const { data } = await axios.get('/api/jobs')
   return data
 }
+
+export const cancelJob = async (jobUuid) => {
+  await axios.delete(`/api/jobs/${jobUuid}`)
+}
