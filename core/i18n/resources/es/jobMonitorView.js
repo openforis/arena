@@ -19,4 +19,6 @@ export default {
     failed: 'Fallido',
     canceled: 'Cancelado',
   },
+  confirmCancelJob: '¿Está seguro de que desea cancelar este trabajo?',
+  jobCanceledByAdmin: 'Este trabajo fue cancelado por un administrador.',
 }

@@ -27,4 +27,10 @@ export const init = (app) => {
 
     Response.sendOk(res)
   })
+
+  app.delete('/jobs/:jobUuid', ApiAuthMiddleware.requireAdminPermission, async (req, res) => {
+    const { jobUuid } = Request.getParams(req)
+    await JobManager.cancelJobByUuid(jobUuid)
+    Response.sendOk(res)
+  })
 }

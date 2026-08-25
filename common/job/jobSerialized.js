@@ -14,6 +14,7 @@ export const keys = {
   running: 'running',
   succeeded: 'succeeded',
   canceled: 'canceled',
+  canceledByAdmin: 'canceledByAdmin',
   failed: 'failed',
   ended: 'ended',
 
@@ -112,3 +113,4 @@ export const isSucceeded = _isPropTrue(keys.succeeded)
 export const isFailed = _isPropTrue(keys.failed)
 export const isEnded = _isPropTrue(keys.ended)
 export const isCanceled = _isPropTrue(keys.canceled)
+export const isCanceledByAdmin = _isPropTrue(keys.canceledByAdmin)

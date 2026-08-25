@@ -2,7 +2,7 @@ import * as express from 'express'
 import morgan from 'morgan'
 
 import { ServiceType } from '@openforis/arena-core'
-import { ArenaServer, runWithClusterLock } from '@openforis/arena-server'
+import { ArenaServer, JobRepository, ProcessEnv, runWithClusterLock } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
 
@@ -34,6 +34,16 @@ export const run = async () => {
   // itself, together with that survey's data migration, so the two no longer need to run twice.
   const arenaApp = await ArenaServer.init({ skipSurveySchemaDbMigrations: true })
   const { express: app, serviceRegistry } = arenaApp
+
+  // Fail any pending/running job rows left behind by a previous incarnation of this exact process
+  // (crash or restart): must run before this process enqueues any job of its own, since a
+  // pending/running row still tagged with this instanceId at this point can only be orphaned - a
+  // fresh boot couldn't have created it yet. Cluster-wide staleness (a dyno that never comes back)
+  // is still covered by StaleJobsCleanup below.
+  const orphanedJobsCount = await JobRepository.failOrphanedByInstanceId(ProcessEnv.instanceId)
+  if (orphanedJobsCount > 0) {
+    logger.warn(`marked ${orphanedJobsCount} orphaned job(s) as failed (instanceId: ${ProcessEnv.instanceId})`)
+  }
 
   if (ProcessUtils.isEnvDevelopment) {
     app.use(morgan('dev'))

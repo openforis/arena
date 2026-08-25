@@ -83,7 +83,7 @@ export {
   updateDataQuerySummary,
   deleteDataQuerySummary,
 } from './dataQuery'
-export { fetchActiveJob, fetchAllJobs } from './job'
+export { cancelJob, fetchActiveJob, fetchAllJobs, fetchJob } from './job'
 export {
   fetchAvailableMapPeriods,
   fetchElevation,
