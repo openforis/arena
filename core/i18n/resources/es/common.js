@@ -610,7 +610,7 @@ export default {
     downloadSummaryJSON: 'Descargar resumen (JSON)',
     firstPhaseCategory: 'Categoría de primera fase',
     firstPhaseCategoryExtraProp: {
-      label: '1ª fase - atributo de estrato',
+      label: 'Atributo de estrato de 1ª fase',
     },
     firstPhaseCommonAttribute: {
       label: 'Atributo común',
