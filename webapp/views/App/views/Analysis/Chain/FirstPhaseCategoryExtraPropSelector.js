@@ -5,7 +5,6 @@ import { Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
@@ -30,14 +29,15 @@ export const FirstPhaseCategoryExtraPropSelector = () => {
     const survey = SurveyState.getSurvey(state)
     const firstPhaseCategory = Survey.getCategoryByUuid(firstPhaseCategoryUuid)(survey)
     if (!firstPhaseCategory) return []
-    return Category.getItemExtraDefsArray(firstPhaseCategory).map(ExtraPropDef.getName)
+    return Category.getItemExtraDefKeys(firstPhaseCategory)
   }, Objects.isEqual)
 
   const emptyItem = { value: null, label: i18n.t('common.notSpecified') }
   const items = [emptyItem, ...extraPropNames.map(extraPropNameToItem)]
 
   const selectedName = ChainSamplingDesign.getFirstPhaseCategoryExtraProp(samplingDesign)
-  const selectedItem = selectedName ? extraPropNameToItem(selectedName) : emptyItem
+  const selectedItem =
+    selectedName && extraPropNames.includes(selectedName) ? extraPropNameToItem(selectedName) : emptyItem
 
   const onChange = useCallback(
     (item) => {
@@ -51,7 +51,12 @@ export const FirstPhaseCategoryExtraPropSelector = () => {
 
   return (
     <FormItem label="chainView.firstPhaseCategoryExtraProp.label">
-      <Dropdown items={items} selection={selectedItem} onChange={onChange} disabled={!editable} />
+      <Dropdown
+        items={items}
+        selection={selectedItem}
+        onChange={onChange}
+        disabled={!editable || !firstPhaseCategoryUuid}
+      />
     </FormItem>
   )
 }
