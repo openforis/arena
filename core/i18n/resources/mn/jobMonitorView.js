@@ -19,4 +19,6 @@ export default {
     failed: 'Амжилтгүй',
     canceled: 'Цуцлагдсан',
   },
+  confirmCancelJob: 'Та энэ ажлыг цуцлахдаа итгэлтэй байна уу?',
+  jobCanceledByAdmin: 'Энэ ажлыг администратор цуцалсан байна.',
 }

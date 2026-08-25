@@ -63,6 +63,7 @@ export const jobToJSON = (job) => ({
   [JobSerialized.keys.running]: job.status === jobStatus.running,
   [JobSerialized.keys.succeeded]: job.status === jobStatus.succeeded,
   [JobSerialized.keys.canceled]: job.status === jobStatus.canceled,
+  [JobSerialized.keys.canceledByAdmin]: !!job.canceledByAdmin,
   [JobSerialized.keys.failed]: job.status === jobStatus.failed,
   [JobSerialized.keys.ended]: job.isEnded(),
 

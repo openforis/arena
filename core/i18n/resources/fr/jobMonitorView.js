@@ -19,4 +19,6 @@ export default {
     failed: 'Échoué',
     canceled: 'Annulé',
   },
+  confirmCancelJob: 'Voulez-vous vraiment annuler cette tâche ?',
+  jobCanceledByAdmin: 'Cette tâche a été annulée par un administrateur.',
 }

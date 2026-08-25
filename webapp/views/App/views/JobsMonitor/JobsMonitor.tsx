@@ -2,20 +2,30 @@ import './JobsMonitor.scss'
 
 import React, { useState } from 'react'
 
+import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
+import { useConfirmAsync } from '@webapp/components/hooks'
 import { DataGrid } from '@webapp/components/DataGrid'
 import LoadingBar from '@webapp/components/LoadingBar'
 import { Button } from '@webapp/components/buttons'
 import Checkbox from '@webapp/components/form/checkbox'
 
-import { useJobsMonitor } from './useJobsMonitor'
+import { JobMonitorSummary, useJobsMonitor } from './useJobsMonitor'
 import { useJobsMonitorColumns } from './useJobsMonitorColumns'
 
 const JobsMonitor = (): React.ReactElement => {
   const i18n = useI18n()
+  const confirm = useConfirmAsync()
   const { jobs, loading, refresh } = useJobsMonitor()
-  const columns = useJobsMonitorColumns()
   const [activeOnly, setActiveOnly] = useState(true)
+
+  const onCancelJob = async (row: JobMonitorSummary) => {
+    if (!(await confirm({ key: 'jobMonitorView:confirmCancelJob' }))) return
+    await API.cancelJob(row.uuid)
+    refresh()
+  }
+
+  const columns = useJobsMonitorColumns({ onCancelJob })
 
   if (loading) {
     return <LoadingBar />
