@@ -17,6 +17,7 @@ export const type = {
   nodeDefUpdate: 'nodeDefUpdate',
   nodeDefMarkDeleted: 'nodeDefMarkDeleted',
   nodeDefConversion: 'nodeDefConversion',
+  nodeDefNodesDelete: 'nodeDefNodesDelete', // System
 
   // Category
   categoryInsert: 'categoryInsert',

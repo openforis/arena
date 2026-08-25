@@ -9,10 +9,15 @@ import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
+import * as DbUtils from '@server/db/dbUtils'
 import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
 import * as SurveyManager from '../manager/surveyManager'
 import * as RecordManager from '../../record/manager/recordManager'
+
+// Per-record/per-step tracing is too noisy to leave on for routine runs, but invaluable when a
+// publish is slow or looks stuck. Flip to true to re-enable it.
+const VERBOSE_LOGGING = false
 
 export default class RecordCheckJob extends Job {
   constructor(params) {
@@ -23,12 +28,31 @@ export default class RecordCheckJob extends Job {
     this.nodesBatchUpdater = new BatchPersister(this.nodesBatchUpdateHandler.bind(this), 2500)
   }
 
+  // Like logDebug, but silenced unless VERBOSE_LOGGING is on - use for per-record/per-step tracing
+  // that would otherwise flood the logs on a survey with many records.
+  logDebugOptional(...msgs) {
+    if (VERBOSE_LOGGING) {
+      this.logDebug(...msgs)
+    }
+  }
+
   async execute() {
+    // Checking records against a large survey can make Postgres pick parallel query plans; parallel
+    // workers only help fetching/validating a single record's data, which is already small, so
+    // disable them for this job's transaction rather than requiring every deployment to raise its
+    // shm-size (see DbUtils.disableParallelQueryForTransaction for why).
+    await DbUtils.disableParallelQueryForTransaction(this.tx)
+
+    this.logDebugOptional('fetching records uuids and cycles...')
     const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle({ surveyId: this.surveyId }, this.tx)
 
     this.total = R.length(recordsUuidAndCycle)
+    this.logDebugOptional(`${this.total} records to check`)
 
+    let index = 0
     for (const { uuid: recordUuid, cycle } of recordsUuidAndCycle) {
+      const startTime = Date.now()
+
       const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
 
       const { requiresCheck } = surveyAndNodeDefs
@@ -37,6 +61,11 @@ export default class RecordCheckJob extends Job {
         await this._checkRecord({ surveyAndNodeDefs, recordUuid })
       }
 
+      this.logDebugOptional(
+        `record ${index + 1}/${this.total} (uuid=${recordUuid}, cycle=${cycle}) checked in ${Date.now() - startTime}ms (requiresCheck=${requiresCheck})`
+      )
+
+      index++
       this.incrementProcessedItems()
     }
   }
@@ -57,7 +86,7 @@ export default class RecordCheckJob extends Job {
     let result = this.surveyAndNodeDefsByCycle[cycle]
     if (!result) {
       // 1. fetch survey
-      this.logDebug(`fetching survey for cycle ${cycle}...`)
+      this.logDebugOptional(`fetching survey for cycle ${cycle}...`)
       let survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
         { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
         tx
@@ -91,10 +120,34 @@ export default class RecordCheckJob extends Job {
       const requiresCheck =
         cleanupRecords || nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
 
-      result = { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, requiresCheck }
+      // Delete nodes belonging to deleted node defs once per cycle: the delete is survey-wide (not
+      // scoped to a single record - see RecordManager.deleteNodesByNodeDefUuids), so running it again
+      // for every one of potentially thousands of records would repeat the same full-table delete over
+      // and over for no additional effect. Each record's own check below reflects this locally, from
+      // its own already-loaded nodes, rather than from anything returned here (on a large survey this
+      // delete can match millions of rows - see RecordManager.deleteNodesByNodeDefUuids for why we
+      // don't pull those back into memory).
+      // One node def at a time (rather than a single IN (...) delete for all of them) so a failure or
+      // a memory spike can be pinned to the specific node def responsible, from the logs.
+      for (const nodeDefDeletedUuid of nodeDefDeletedUuids) {
+        this.logDebugOptional(`deleting nodes for removed node def ${nodeDefDeletedUuid}...`)
+        const deletedCount = await RecordManager.deleteNodesByNodeDefUuids(
+          { user: this.user, surveyId, nodeDefUuids: [nodeDefDeletedUuid] },
+          tx
+        )
+        this.logDebugOptional(`${deletedCount} nodes deleted for node def ${nodeDefDeletedUuid}`)
+      }
+
+      result = {
+        survey,
+        nodeDefAddedUuids,
+        nodeDefUpdatedUuids,
+        nodeDefDeletedUuids,
+        requiresCheck,
+      }
 
       if (requiresCheck) {
-        this.logDebug('survey has been updated: record check necessary; fetching survey and ref data...')
+        this.logDebugOptional('survey has been updated: record check necessary; fetching survey and ref data...')
         // fetch survey reference data (used later for record validation)
         survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
           { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
@@ -106,7 +159,7 @@ export default class RecordCheckJob extends Job {
         const allNotDeletedNodeDefs = Survey.getNodeDefsArray(survey).filter((def) => !NodeDef.isDeleted(def))
         const allNotDeletedNodeDefUuids = allNotDeletedNodeDefs.map(NodeDef.getUuid)
         result.allNotDeletedNodeDefUuids = allNotDeletedNodeDefUuids
-        this.logDebug('survey with ref data fetched')
+        this.logDebugOptional('survey with ref data fetched')
       }
       this.surveyAndNodeDefsByCycle[cycle] = result
     }
@@ -120,27 +173,18 @@ export default class RecordCheckJob extends Job {
       surveyAndNodeDefs
     const { cleanupRecords } = context
 
-    // this.logDebug(`checking record ${recordUuid}`)
+    this.logDebugOptional(`checking record ${recordUuid}`)
 
-    // 1. fetch record and nodes
+    // 1. fetch record and nodes. Nodes belonging to deleted node defs are already gone at this point:
+    // the survey-wide delete for this cycle ran earlier in the same transaction (see
+    // _getOrFetchSurveyAndNodeDefsByCycle), and this fetch sees that transaction's own writes, so
+    // there's nothing left here to additionally remove for nodeDefDeletedUuids.
     let record = await RecordManager.fetchRecordAndNodesByUuid(
       { surveyId, recordUuid, includeSurveyUuid: false, includeRecordUuid: false },
       tx
     )
 
-    // this.logDebug(`record fetched`)
-
-    // 2. remove deleted nodes
-    if (!R.isEmpty(nodeDefDeletedUuids)) {
-      // this.logDebug(`remove deleted nodes`)
-      const recordDeletedNodes = await RecordManager.deleteNodesByNodeDefUuids(
-        { user, surveyId, nodeDefUuids: nodeDefDeletedUuids, record },
-        tx
-      )
-      record = recordDeletedNodes || record
-
-      // this.logDebug(`nodes deleted`)
-    }
+    this.logDebugOptional(`record fetched (${Object.keys(Record.getNodes(record) ?? {}).length} nodes)`)
 
     const nodesInsertedByUuid = {}
     const allUpdatedNodesByUuid = {}
@@ -148,7 +192,7 @@ export default class RecordCheckJob extends Job {
     // 3. insert missing nodes
     const nodeDefToCheckForMissingNodesUuids = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedUuids
     if (nodeDefToCheckForMissingNodesUuids.length > 0) {
-      // this.logDebug(`inserting missing nodes with node def uuids ${nodeDefToCheckForMissingNodesUuids}`)
+      this.logDebugOptional(`inserting missing nodes with node def uuids ${nodeDefToCheckForMissingNodesUuids}`)
       const { record: recordUpdateInsert, nodes: nodesUpdatedMissing = {} } = await this._insertMissingSingleNodes({
         survey,
         nodeDefUuids: nodeDefToCheckForMissingNodesUuids,
@@ -158,7 +202,7 @@ export default class RecordCheckJob extends Job {
       record = recordUpdateInsert || record
       Object.assign(nodesInsertedByUuid, nodesUpdatedMissing)
       Object.assign(allUpdatedNodesByUuid, nodesUpdatedMissing)
-      // this.logDebug('missing nodes inserted')
+      this.logDebugOptional('missing nodes inserted')
     }
 
     // 4. apply default values and recalculate applicability
@@ -168,7 +212,7 @@ export default class RecordCheckJob extends Job {
     }
     const nodeDefAddedOrUpdatedUuids = Array.from(nodeDefAddedOrUpdatedUuidsUnique)
     if (nodeDefAddedOrUpdatedUuids.length > 0) {
-      // this.logDebug('applying default values')
+      this.logDebugOptional('applying default values')
       const { record: recordUpdate, nodes: nodesUpdatedDefaultValues = {} } = await _applyDefaultValuesAndApplicability(
         survey,
         nodeDefAddedOrUpdatedUuids,
@@ -178,10 +222,11 @@ export default class RecordCheckJob extends Job {
       )
       record = recordUpdate || record
       Object.assign(allUpdatedNodesByUuid, nodesUpdatedDefaultValues)
+      this.logDebugOptional('default values applied')
     }
 
     // 4a. Persist nodes
-    // this.logDebug('persisting nodes')
+    this.logDebugOptional(`persisting ${Object.keys(allUpdatedNodesByUuid).length} nodes`)
     const allUpdatedNodesArray = Object.values(allUpdatedNodesByUuid)
     for (const node of allUpdatedNodesArray) {
       if (Node.isCreated(node)) {
@@ -202,13 +247,13 @@ export default class RecordCheckJob extends Job {
       !R.isEmpty(allUpdatedNodesByUuid)
     ) {
       const nodeDefUuidsToValidate = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedOrUpdatedUuids
-      // this.logDebug(`validating record ${recordUuid}`)
+      this.logDebugOptional(`validating record ${recordUuid} (${nodeDefUuidsToValidate.length} node defs)`)
       await _validateNodes(
         { user, survey, nodeDefUuids: nodeDefUuidsToValidate, record, nodes: allUpdatedNodesByUuid },
         this.tx
       )
     }
-    // this.logDebug('record check complete')
+    this.logDebugOptional('record check complete')
   }
 
   // Inserts all the missing single nodes in the specified records having the node def in the specified ones.
