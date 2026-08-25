@@ -742,6 +742,9 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     },
     downloadSummaryJSON: 'Download Summary (JSON)',
     firstPhaseCategory: '1st phase category',
+    firstPhaseCategoryExtraProp: {
+      label: '1st phase stratum attribute',
+    },
     firstPhaseCommonAttribute: {
       label: 'Common attribute',
       info: `Attribute in common between base unit and 1st phase table 
@@ -789,6 +792,7 @@ This might be a slow process.`,
       reportingAreaInfo: `With stratified sampling, give areas of strata within the stratum attribute's category table (column name 'area')`,
     },
     stratumAttribute: 'Stratum attribute',
+    stratumAttribute2ndPhase: '2nd phase stratum attribute',
     postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
     clusteringEntity: 'Clustering entity',
