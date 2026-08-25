@@ -52,7 +52,7 @@ export const FirstPhaseCategoryExtraPropSelector = () => {
   )
 
   return (
-    <FormItem label="chainView.firstPhaseCategoryExtraProp.label">
+    <FormItem label="chainView.firstPhaseCategoryExtraProp.label" info="chainView.firstPhaseCategoryExtraProp.info">
       <Dropdown
         items={items}
         selection={selectedItem}

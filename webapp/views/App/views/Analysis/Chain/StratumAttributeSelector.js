@@ -25,13 +25,14 @@ export const StratumAttributeSelector = () => {
   )
   /* eslint-enable react-hooks/preserve-manual-memoization */
 
-  const label = ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign)
-    ? 'chainView.stratumAttribute2ndPhase'
-    : 'chainView.stratumAttribute'
+  const isTwoPhase = ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign)
+  const label = isTwoPhase ? 'chainView.stratumAttribute2ndPhase' : 'chainView.stratumAttribute'
+  const info = isTwoPhase ? 'chainView.stratumAttribute2ndPhaseInfo' : 'chainView.stratumAttributeInfo'
 
   return (
     <BaseUnitCodeAttributeSelector
       allowEmptySelection={ChainSamplingDesign.isStratificationNotSpecifiedAllowed(samplingDesign)}
+      info={info}
       label={label}
       selectedNodeDefUuid={ChainSamplingDesign.getStratumNodeDefUuid(samplingDesign)}
       onChange={onChange}

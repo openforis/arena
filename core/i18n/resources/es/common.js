@@ -609,8 +609,10 @@ export default {
     },
     downloadSummaryJSON: 'Descargar resumen (JSON)',
     firstPhaseCategory: 'Categoría de primera fase',
+    firstPhaseCategoryInfo: 'Seleccione la categoría que contiene las muestras de la primera fase.',
     firstPhaseCategoryExtraProp: {
       label: 'Atributo de estrato de 1ª fase',
+      info: 'Seleccione la variable utilizada para dividir la población original en estratos amplios para la fase inicial de muestreo.',
     },
     firstPhaseCommonAttribute: {
       label: 'Atributo común',
@@ -659,10 +661,15 @@ export default {
       reportingAreaInfo: `Con muestreo estratificado, proporcione las áreas de los estratos en la tabla de categorías del atributo de estrato (nombre de la columna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
+    stratumAttributeInfo: 'Seleccione la variable utilizada para estratificar la muestra.',
     stratumAttribute2ndPhase: 'Atributo de estrato de 2ª fase',
+    stratumAttribute2ndPhaseInfo:
+      'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada.',
     postStratificationAttribute: 'Atributo de postestratificación',
     areaWeightingMethod: 'Método de ponderación de área',
     clusteringEntity: 'Entidad de agrupación',
+    clusteringEntityInfo:
+      'La entidad que define las unidades primarias de muestreo. Nota: se utiliza exclusivamente para el análisis de conglomerados dentro del marco del paquete R survey.',
     clusteringOnlyVariances: 'Agrupación solo para varianzas',
     errorNoLabel: 'La cadena debe tener una etiqueta válida',
     dateExecuted: 'Fecha de ejecución',
