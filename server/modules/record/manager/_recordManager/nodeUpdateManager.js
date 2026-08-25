@@ -15,11 +15,20 @@ import { CategoryItemProviderDefault } from '@server/modules/category/manager/ca
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import * as NodeRepository from '../../repository/nodeRepository'
 import * as FileRepository from '../../repository/fileRepository'
+import * as RecordFileManager from '../recordFileManager'
 
 const logger = Log.getLogger('NodeUpdateManager')
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
+
+const _isFileValueNode = (survey, node) => {
+  if (!Node.getFileUuid(node)) return false
+  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  return NodeDef.isFile(nodeDef)
+}
+
+const _toFileDeleteParams = (node) => ({ fileUuid: Node.getFileUuid(node), recordUuid: Node.getRecordUuid(node) })
 
 const _createUpdateResult = (record, node = null, nodes = {}) => {
   if (!node && R.isEmpty(nodes)) {
@@ -102,11 +111,20 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
 
   const value = Node.getValue(node)
   if (NodeDef.isFile(nodeDef)) {
-    // mark old file as deleted if changed
+    // mark/delete old file if changed
     const nodePrev = await NodeRepository.fetchNodeByUuid(surveyId, Node.getUuid(node), t)
     const fileUuidPrev = Node.getFileUuid(nodePrev)
     if (fileUuidPrev !== null && fileUuidPrev !== Node.getFileUuid(node)) {
-      await FileRepository.markFileAsDeleted(surveyId, fileUuidPrev, t)
+      if (Record.isPreview(record)) {
+        // preview records: hard-delete now, nothing ever purges soft-deleted preview files
+        await RecordFileManager.deleteFileByUuid(
+          { surveyId, fileUuid: fileUuidPrev, recordUuid: Node.getRecordUuid(nodePrev) },
+          t
+        )
+      } else {
+        // non-preview records: soft-delete (unchanged, out of scope for this fix)
+        await FileRepository.markFileAsDeleted(surveyId, fileUuidPrev, t)
+      }
     }
   }
 
@@ -163,7 +181,8 @@ const _groupNodesByFlags = (nodesArray) =>
     { nodesInserted: [], nodesUpdated: [], nodesDeleted: [] }
   )
 
-const _persistNodes = async ({ surveyId, nodesArray }, tx) => {
+const _persistNodes = async ({ survey, nodesArray, isPreview = false }, tx) => {
+  const surveyId = Survey.getId(survey)
   const { nodesInserted, nodesUpdated, nodesDeleted } = _groupNodesByFlags(nodesArray)
 
   if (nodesInserted.length) {
@@ -173,6 +192,15 @@ const _persistNodes = async ({ surveyId, nodesArray }, tx) => {
     await NodeRepository.updateNodes({ surveyId, nodes: nodesUpdated }, tx)
   }
   if (nodesDeleted.length) {
+    if (isPreview) {
+      // dependency/applicability-driven deletion: nodesDeleted already includes every individual
+      // descendant node explicitly (Record.updateNodesDependents flattens the whole subtree), so
+      // no separate subtree lookup is needed - just filter the nodes we already have in memory.
+      const files = nodesDeleted.filter((node) => _isFileValueNode(survey, node)).map(_toFileDeleteParams)
+      if (files.length > 0) {
+        await RecordFileManager.deleteFiles({ surveyId, files }, tx)
+      }
+    }
     await NodeRepository.deleteNodesByUuids(surveyId, nodesDeleted.map(Node.getUuid), tx)
   }
 }
@@ -200,7 +228,7 @@ export const updateNodesDependents = async (
     const nodesArray = Object.values(allNodesUpdated)
     const surveyId = Survey.getId(survey)
 
-    await _persistNodes({ surveyId, nodesArray }, tx)
+    await _persistNodes({ survey, nodesArray, isPreview: Record.isPreview(record) }, tx)
 
     // reload nodes to get nodes ref data
     const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: allNodesUpdated }, tx)
@@ -251,6 +279,21 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
 export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   const surveyId = Survey.getId(survey)
 
+  if (Record.isPreview(record)) {
+    // record is still fully loaded at this point (nothing has removed descendants from it yet),
+    // so the subtree can be found in memory instead of querying the DB - gather and hard-delete
+    // files of any file-type nodes in this subtree BEFORE the cascading DELETE removes descendant
+    // node rows silently
+    const rootNode = Record.getNodeByUuid(nodeUuid)(record)
+    const files = Record.getNodesArray(record)
+      .filter((n) => rootNode && (Node.getUuid(n) === nodeUuid || Node.isDescendantOf(rootNode)(n)))
+      .filter((n) => _isFileValueNode(survey, n))
+      .map(_toFileDeleteParams)
+    if (files.length > 0) {
+      await RecordFileManager.deleteFiles({ surveyId, files }, t)
+    }
+  }
+
   const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
   if (!Record.isPreview(record)) {
@@ -293,6 +336,11 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
 
 export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, record, client = db) =>
   client.tx(async (t) => {
+    // NOTE: this delete is NOT scoped to `record` - it can affect nodes across many records at once,
+    // so do not gate this on Record.isPreview(record) (that would wrongly skip cleanup of other preview
+    // records' files). Correctness relies entirely on the SQL-level `record.preview = true` join inside
+    // deleteFilesByNodeDefUuids/fetchFileValueNodesByNodeDefUuids.
+    await RecordFileManager.deleteFilesByNodeDefUuids({ surveyId, nodeDefUuids }, t)
     const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefUuids, t)
     const activities = nodesDeleted.map((node) =>
       ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true)
