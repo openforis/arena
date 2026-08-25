@@ -13,6 +13,7 @@ export const StratumAttributeSelector = () => {
   const chain = useChain()
   const samplingDesign = Chain.getSamplingDesign(chain)
 
+  /* eslint-disable react-hooks/preserve-manual-memoization -- pre-existing: React Compiler cannot preserve this callback's memoization here (unrelated to this task, reproduces on master too) */
   const onChange = useCallback(
     (stratumDefUuid) => {
       const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocStratumNodeDefUuid(stratumDefUuid))(
@@ -22,11 +23,17 @@ export const StratumAttributeSelector = () => {
     },
     [chain, dispatch]
   )
+  /* eslint-enable react-hooks/preserve-manual-memoization */
+
+  const isTwoPhase = ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign)
+  const label = isTwoPhase ? 'chainView.stratumAttribute2ndPhase' : 'chainView.stratumAttribute'
+  const info = isTwoPhase ? 'chainView.stratumAttribute2ndPhaseInfo' : 'chainView.stratumAttributeInfo'
 
   return (
     <BaseUnitCodeAttributeSelector
       allowEmptySelection={ChainSamplingDesign.isStratificationNotSpecifiedAllowed(samplingDesign)}
-      label="chainView.stratumAttribute"
+      info={info}
+      label={label}
       selectedNodeDefUuid={ChainSamplingDesign.getStratumNodeDefUuid(samplingDesign)}
       onChange={onChange}
     />

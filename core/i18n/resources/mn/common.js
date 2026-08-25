@@ -717,6 +717,11 @@ $t(common.raiseTicketInSupportForum)
     },
     downloadSummaryJSON: 'Хураангуй татах (JSON)',
     firstPhaseCategory: '1-р үе шатны ангилал',
+    firstPhaseCategoryInfo: '1-р үе шатны түүврийг агуулсан ангиллыг сонгоно уу.',
+    firstPhaseCategoryExtraProp: {
+      label: '1-р үе шатны давхаргын шинж чанар',
+      info: 'Анхны популяцийг эхний түүврийн шатанд өргөн давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.',
+    },
     firstPhaseCommonAttribute: {
       label: 'Нийтлэг шинж чанар',
       info: `Суурь нэгж ба 1-р үе шатны хүснэгтийн хоорондох нийтлэг шинж чанар
@@ -764,9 +769,13 @@ $t(common.raiseTicketInSupportForum)
       reportingAreaInfo: `Үечилсэн түүвэрлэлтийн хувьд үечилсэн шинж чанарын ангиллын хүснэгтэд давхаргуудын талбайг оруулна уу (баганын нэр 'area')`,
     },
     stratumAttribute: 'Үеийн шинж чанар',
+    stratumAttributeInfo: 'Түүврийг давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.',
+    stratumAttribute2ndPhase: '2-р үе шатны давхаргын шинж чанар',
+    stratumAttribute2ndPhaseInfo: `Эцсийн, дэлгэрэнгүй дэд түүврийг гаргаж авахаас өмнө 1-р үе шатны түүврийг дэд давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.`,
     postStratificationAttribute: 'Дараах үечилсэн шинж чанар',
     areaWeightingMethod: 'Талбайн жинлэх арга',
     clusteringEntity: 'Бүлэглэх объект',
+    clusteringEntityInfo: `Анхдагч түүврийн нэгжийг тодорхойлох объект. Тэмдэглэл: Энэ нь зөвхөн R survey багцын хүрээнд кластерийн шинжилгээнд ашиглагдана.`,
     clusteringOnlyVariances: 'Зөвхөн хэлбэлзэлд зориулсан бүлэглэлт',
     errorNoLabel: 'Гинж нь хүчинтэй шошготой байх ёстой',
     dateExecuted: 'Гүйцэтгэсэн огноо',
