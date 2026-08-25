@@ -68,9 +68,6 @@ export const ChainSamplingDesignProps = (props) => {
           <>
             <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
 
-            {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
-            {/* {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />} */}
-
             {ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign) && (
               <>
                 <FirstPhaseCategorySelector />
@@ -81,6 +78,9 @@ export const ChainSamplingDesignProps = (props) => {
             {ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(samplingDesign) && (
               <FirstPhaseCommonAttributeSelector />
             )}
+
+            {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
+            {/* {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />} */}
 
             <ClusteringEntitySelector />
           </>
