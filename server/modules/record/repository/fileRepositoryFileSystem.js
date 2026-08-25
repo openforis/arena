@@ -46,7 +46,11 @@ export const getFileContentAsStream = ({ surveyId, fileUuid, recordUuid = null }
 export const deleteFiles = async ({ surveyId, files }) => {
   for (const { fileUuid, recordUuid } of files) {
     const filePath = getFilePath({ surveyId, fileUuid, recordUuid })
-    await FileUtils.deleteFileAsync(filePath)
+    try {
+      await FileUtils.deleteFileAsync(filePath)
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error
+    }
   }
 }
 
