@@ -369,15 +369,25 @@ export const deleteNode = async (surveyId, nodeUuid, client = db) =>
     dbTransformCallback
   )
 
+/**
+ * Deletes all nodes belonging to the given node def uuids, survey-wide. Callers of this delete
+ * are cleaning up nodes for node defs that no longer exist (e.g. RecordCheckJob, at publish time),
+ * not tracking individual affected nodes, so this intentionally skips RETURNING: on a large survey
+ * this delete can match millions of rows, and pulling them all back (with their JSONB value/meta
+ * payloads) into memory at once is enough on its own to exhaust a job worker's heap.
+ * @param {number} surveyId - The survey ID.
+ * @param {Array<string>} nodeDefUuids - Node def UUIDs being purged wholesale.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<number>} - The number of nodes deleted.
+ */
 export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) =>
-  client.manyOrNone(
+  client.result(
     `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE node_def_uuid IN ($1:csv)
-    RETURNING *, true as ${Node.keys.deleted}
     `,
     [nodeDefUuids],
-    dbTransformCallback
+    R.prop('rowCount')
   )
 
 export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>

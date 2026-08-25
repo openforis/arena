@@ -205,6 +205,16 @@ export const getWhereClause = (...conditions) => {
   return nonEmptyConditions.length > 0 ? `WHERE ${nonEmptyConditions.join(' AND ')}` : ''
 }
 
+// Disables Postgres parallel query workers for the rest of the current transaction (SET LOCAL is
+// transaction-scoped, so this reverts automatically on commit/rollback). Parallel workers request
+// dynamic shared memory from /dev/shm, which some deployments cap well below what a worker may
+// need (e.g. Docker's default 64MB shm-size), failing with "could not resize shared memory
+// segment ... No space left on device". Use this in a transaction expected to run large/complex
+// queries where hitting that ceiling is a real risk and losing intra-query parallelism there is an
+// acceptable trade-off.
+export const disableParallelQueryForTransaction = async (client) =>
+  client.none('SET LOCAL max_parallel_workers_per_gather = 0')
+
 // VACUUM (removes dead tuples)
 export const vacuumTable = async ({ schema, table }, client = db) => client.query(`VACUUM ${schema}.${table}`)
 
