@@ -167,16 +167,17 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     baseUnit: NodeDef.getName(baseUnitNodeDef),
     baseUnitEntityKeys,
     ...(samplingStrategySpecified ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
-    ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
-      ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
-      : {}),
     ...(ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(chainSamplingDesign)
       ? {
           phase1Category: getCategoryNameByUuid({
             survey,
             categoryUuid: ChainSamplingDesign.getFirstPhaseCategoryUuid(chainSamplingDesign),
           }),
+          phase1StratumAttribute: ChainSamplingDesign.getFirstPhaseCategoryExtraProp(chainSamplingDesign),
         }
+      : {}),
+    ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
+      ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
       : {}),
     ...(ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(chainSamplingDesign)
       ? getCodeAttributeSummary('commonAttribute', firstPhaseCommonAttributeDef)

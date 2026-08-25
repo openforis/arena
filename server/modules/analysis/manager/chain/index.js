@@ -201,6 +201,7 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
       ),
       // Category UUIDs are survey-specific and cannot be remapped; clear them
       [ChainSamplingDesign.keysProps.firstPhaseCategoryUuid]: undefined,
+      [ChainSamplingDesign.keysProps.firstPhaseCategoryExtraProp]: undefined,
       [ChainSamplingDesign.keysProps.reportingDataCategoryUuid]: undefined,
       [ChainSamplingDesign.keysProps.reportingDataAttributeDefsByLevelUuid]: undefined,
     }).filter(([, v]) => v !== undefined)
