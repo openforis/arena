@@ -19,4 +19,6 @@ export default {
     failed: 'Failed',
     canceled: 'Canceled',
   },
+  confirmCancelJob: 'Are you sure you want to cancel this job?',
+  jobCanceledByAdmin: 'This job was canceled by an administrator.',
 }

@@ -38,6 +38,7 @@ export default {
     'Importation de données dans le mauvais formulaire. URI attendu : {{collectSurveyUri}}',
   invalidType: 'Type invalide {{type}}',
   jobCanceledOrErrorsFound: 'Tâche annulée ou erreurs trouvées ; annulation de la transaction',
+  jobOrphanedOnRestart: 'La tâche a été interrompue par un redémarrage du serveur. Veuillez réessayer.',
   paramIsRequired: 'Le paramètre {{param}} est requis',
   unableToFindParent: 'Impossible de trouver le parent de {{name}}',
   unableToFindNode: 'Impossible de trouver le nœud avec le nom {{name}}',

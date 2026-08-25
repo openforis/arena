@@ -19,4 +19,6 @@ export default {
     failed: 'Ошибка',
     canceled: 'Отменено',
   },
+  confirmCancelJob: 'Вы уверены, что хотите отменить эту задачу?',
+  jobCanceledByAdmin: 'Эта задача была отменена администратором.',
 }

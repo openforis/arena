@@ -69,7 +69,7 @@ export default class Job {
    * otherwise the "execute' method will be invoked.
    * This method should never be extended by subclasses;
    * extend the "process" method instead.
-   * @param {pgPromise.IDatabase} [client=db] - The database client.
+   * @param {pgPromise.IDatabase} [client] - The database client.
    */
   async start(client = db) {
     this.logDebug('start')
@@ -202,14 +202,15 @@ export default class Job {
   }
 
   // DO NOT OVERWRITE IT
-  async cancel() {
+  async cancel({ canceledByAdmin = false } = {}) {
     if (this.currentInnerJobIndex >= 0) {
       const innerJob = this.getCurrentInnerJob()
       if (innerJob.isRunning()) {
-        await innerJob.cancel()
+        await innerJob.cancel({ canceledByAdmin })
         // Parent job will be canceled by the inner job event listener
       }
     } else {
+      this.canceledByAdmin = canceledByAdmin
       await this.beforeEnd()
       await this._setStatus(jobStatus.canceled)
     }
@@ -381,6 +382,7 @@ export default class Job {
       case jobStatus.canceled:
         // Cancel or fail even parent job
         if (!this.isCanceled()) {
+          this.canceledByAdmin = this.getCurrentInnerJob()?.canceledByAdmin ?? false
           await this._setStatus(jobStatus.canceled)
         }
         break

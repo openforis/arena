@@ -189,6 +189,61 @@ export class JobQueue {
   }
 
   /**
+   * Cancels a single job by its uuid, regardless of which user owns it - the admin-scoped
+   * counterpart to cancelJobByUserUuid above (which cancels ALL of a user's outstanding jobs).
+   * Used by the Jobs Monitor's per-row cancel action.
+   * @param jobUuid - The job UUID.
+   * @param options - Object with canceledByAdmin, propagated to the client so the owning user's
+   *   Job Monitor dialog can explain why their job ended instead of silently closing.
+   */
+  async cancelJobByUuid(
+    jobUuid: string,
+    { canceledByAdmin = false }: { canceledByAdmin?: boolean } = {}
+  ): Promise<void> {
+    const jobInfo = this._jobInfoByUuid[jobUuid]
+    if (!jobInfo) return // already ended or unknown
+
+    const { params } = jobInfo
+    const { user, surveyId } = params
+    const { uuid: userUuid } = user
+    const runningJobUuid = this._runningJobUuidByUserUuid[userUuid]
+
+    if (jobUuid === runningJobUuid) {
+      // cancel job thread; actual bookkeeping cleanup happens later via onJobEnd once the
+      // thread acknowledges the cancellation
+      await JobThreadExecutor.cancelActiveJobByUserUuid(userUuid, { canceledByAdmin })
+    } else {
+      // remove queued job from the queue directly
+      const queueIndex = this._queue.findIndex((jobInfoQueued) => jobInfoQueued.uuid === jobUuid)
+      if (queueIndex >= 0) {
+        this._queue.splice(queueIndex, 1)
+      }
+      await JobRepository.updateStatus({ uuid: jobUuid, status: JobStatus.canceled }).catch((error) =>
+        this._logger.error(`error persisting canceled status for job ${jobUuid}: ${error}`)
+      )
+      this.deleteJobInfo({ jobUuid })
+      this._removeJobUuidForUser({ userUuid, uuid: jobUuid })
+
+      // a queued job never went through a worker thread, so nothing would otherwise notify its
+      // owner - build a synthetic summary the same way _failQueuedJob does, and push it
+      const now = new Date()
+      const summary = jobRowToSummary({
+        uuid: jobUuid,
+        userUuid,
+        surveyId,
+        type: jobInfo.type,
+        status: JobStatus.canceled,
+        processed: 0,
+        total: 0,
+        props: {},
+        dateCreated: now,
+        dateModified: now,
+      })
+      WebSocketServer.notifyUser(userUuid, WebSocketEvent.jobUpdate, { ...summary, canceledByAdmin })
+    }
+  }
+
+  /**
    * Callback when a job ends.
    * @param job - The job object.
    */

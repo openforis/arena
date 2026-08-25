@@ -54,6 +54,8 @@ export const getAllJobsSummary = async () => {
 
 export const cancelActiveJobByUserUuid = async (userUuid) => queue.cancelJobByUserUuid(userUuid)
 
+export const cancelJobByUuid = async (jobUuid) => queue.cancelJobByUuid(jobUuid, { canceledByAdmin: true })
+
 // ====== EXECUTE
 
 export const enqueueJob = (job) => {

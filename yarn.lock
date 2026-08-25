@@ -3527,9 +3527,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "@openforis/arena-server@npm:2.2.1::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F2.2.1%2Fa26d01501d1d67b82e15485262b139fe14a74c80"
+"@openforis/arena-server@npm:^2.2.2":
+  version: 2.2.2
+  resolution: "@openforis/arena-server@npm:2.2.2::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F2.2.2%2F41017434b753abc6bf843d92a4fa89770ce57e13"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1112.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -3555,7 +3555,7 @@ __metadata:
     pdfkit: "npm:^0.19.1"
     pg-promise: "npm:^12.7.0"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/96d29e1507300385e85c6dfebdd0c440697a2fbfe1b2c64012af5dbfdc9b3a91a1fa93f6c90ba199422e7378f8dbcf052005557e13d191bef5554bc38f3f2080
+  checksum: 10c0/3ca13c58651e327c6910b2230fb6f40c6ca6ad20b57767943a36b60a8fffb9936902a6464245e1f7106dec08fce3117ec569890bd7fe4135450169226f094fe1
   languageName: node
   linkType: hard
 
@@ -14983,7 +14983,7 @@ __metadata:
     "@mui/x-data-grid": "npm:^8.26.0"
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
-    "@openforis/arena-server": "npm:^2.2.1"
+    "@openforis/arena-server": "npm:^2.2.2"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"

@@ -36,6 +36,7 @@ export default {
     'Буруу цуглуулгын судалгаанд өгөгдөл импортлож байна. Хүлээгдэж буй URI: {{collectSurveyUri}}',
   invalidType: 'Буруу төрөл {{type}}',
   jobCanceledOrErrorsFound: 'Ажил цуцлагдсан эсвэл алдаа олдсон; гүйлгээг буцаах',
+  jobOrphanedOnRestart: 'Сервер дахин эхэлсний улмаас ажил тасалдлаа. Дахин оролдоно уу.',
   paramIsRequired: 'Парам {{param}} шаардлагатай',
   unableToFindParent: '{{name}}-н эцгийг олж чадахгүй байна',
   unableToFindNode: '{{name}} нэртэй зангилааг олж чадахгүй байна',
