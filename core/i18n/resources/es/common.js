@@ -609,6 +609,9 @@ export default {
     },
     downloadSummaryJSON: 'Descargar resumen (JSON)',
     firstPhaseCategory: 'Categoría de primera fase',
+    firstPhaseCategoryExtraProp: {
+      label: '1ª fase - atributo de estrato',
+    },
     firstPhaseCommonAttribute: {
       label: 'Atributo común',
       info: 'Atributo común entre la unidad base y la tabla de primera fase (debe ser un atributo de código con el mismo nombre que una propiedad extra definida para la categoría de primera fase)',
@@ -656,6 +659,7 @@ export default {
       reportingAreaInfo: `Con muestreo estratificado, proporcione las áreas de los estratos en la tabla de categorías del atributo de estrato (nombre de la columna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
+    stratumAttribute2ndPhase: 'Atributo de estrato de 2ª fase',
     postStratificationAttribute: 'Atributo de postestratificación',
     areaWeightingMethod: 'Método de ponderación de área',
     clusteringEntity: 'Entidad de agrupación',

@@ -737,6 +737,9 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     },
     downloadSummaryJSON: 'Baixar resumo (JSON)',
     firstPhaseCategory: 'Categoria da 1ª fase',
+    firstPhaseCategoryExtraProp: {
+      label: 'Atributo de estrato da 1ª fase',
+    },
     firstPhaseCommonAttribute: {
       label: 'Atributo comum',
       info: `Atributo em comum entre a unidade base e a tabela da 1ª fase 
@@ -784,6 +787,7 @@ Este processo pode ser lento.`,
       reportingAreaInfo: `Com amostragem estratificada, forneça as áreas dos estratos na tabela de categorias do atributo de estrato (nome da coluna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
+    stratumAttribute2ndPhase: 'Atributo de estrato da 2ª fase',
     postStratificationAttribute: 'Atributo de pós-estratificação',
     areaWeightingMethod: 'Método de ponderação por área',
     clusteringEntity: 'Entidade de agrupamento',

@@ -740,6 +740,9 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
     },
     downloadSummaryJSON: 'Télécharger le résumé (JSON)',
     firstPhaseCategory: 'Catégorie de 1ère phase',
+    firstPhaseCategoryExtraProp: {
+      label: 'Attribut de strate de 1ère phase',
+    },
     firstPhaseCommonAttribute: {
       label: 'Attribut commun',
       info: `Attribut en commun entre l'unité de base et la table de 1ère phase 
@@ -787,6 +790,7 @@ Ce processus peut être lent.`,
       reportingAreaInfo: `Avec un échantillonnage stratifié, indiquez les superficies des strates dans la table de catégories de l'attribut de strate (nom de la colonne 'area')`,
     },
     stratumAttribute: 'Attribut de strate',
+    stratumAttribute2ndPhase: 'Attribut de strate de 2ème phase',
     postStratificationAttribute: 'Attribut de post-stratification',
     areaWeightingMethod: 'Méthode de pondération par surface',
     clusteringEntity: 'Entité de regroupement',

@@ -717,6 +717,9 @@ $t(common.raiseTicketInSupportForum)
     },
     downloadSummaryJSON: 'Хураангуй татах (JSON)',
     firstPhaseCategory: '1-р үе шатны ангилал',
+    firstPhaseCategoryExtraProp: {
+      label: '1-р үе шатны давхаргын шинж чанар',
+    },
     firstPhaseCommonAttribute: {
       label: 'Нийтлэг шинж чанар',
       info: `Суурь нэгж ба 1-р үе шатны хүснэгтийн хоорондох нийтлэг шинж чанар
@@ -764,6 +767,7 @@ $t(common.raiseTicketInSupportForum)
       reportingAreaInfo: `Үечилсэн түүвэрлэлтийн хувьд үечилсэн шинж чанарын ангиллын хүснэгтэд давхаргуудын талбайг оруулна уу (баганын нэр 'area')`,
     },
     stratumAttribute: 'Үеийн шинж чанар',
+    stratumAttribute2ndPhase: '2-р үе шатны давхаргын шинж чанар',
     postStratificationAttribute: 'Дараах үечилсэн шинж чанар',
     areaWeightingMethod: 'Талбайн жинлэх арга',
     clusteringEntity: 'Бүлэглэх объект',

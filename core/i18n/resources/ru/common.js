@@ -716,6 +716,9 @@ $t(common.raiseTicketInSupportForum)
     },
     downloadSummaryJSON: 'Скачать сводку (JSON)',
     firstPhaseCategory: 'Категория 1-й фазы',
+    firstPhaseCategoryExtraProp: {
+      label: 'Атрибут страты 1-й фазы',
+    },
     firstPhaseCommonAttribute: {
       label: 'Общий атрибут',
       info: `Атрибут, общий для базовой единицы и таблицы 1-й фазы
@@ -763,6 +766,7 @@ $t(common.raiseTicketInSupportForum)
       reportingAreaInfo: `При стратифицированной выборке укажите площади страт в таблице категорий атрибута страты (название столбца 'area')`,
     },
     stratumAttribute: 'Атрибут страты',
+    stratumAttribute2ndPhase: 'Атрибут страты 2-й фазы',
     postStratificationAttribute: 'Атрибут послестратификации',
     areaWeightingMethod: 'Метод взвешивания по площади',
     clusteringEntity: 'Сущность кластеризации',
