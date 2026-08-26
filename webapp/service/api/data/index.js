@@ -328,11 +328,12 @@ export const mergeRecords = async ({ surveyId, sourceRecordUuid, targetRecordUui
 }
 
 // ==== Validation Report
-export const startValidationReportGeneration = async ({ surveyId, cycle, recordUuid, lang }) => {
+export const startValidationReportGeneration = async ({ surveyId, cycle, recordUuid, lang, messageTypeKeys }) => {
   const { data } = await axios.post(`/api/survey/${surveyId}/validationReport/start-export`, {
     cycle,
     recordUuid,
     lang,
+    messageTypeKeys,
   })
   return data
 }

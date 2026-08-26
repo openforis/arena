@@ -403,6 +403,7 @@ export const init = (app) => {
         const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
         const query = Request.getJsonParam(req, 'query')
         const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
+        const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
 
         const job = RecordService.startValidationReportGenerationJob({
           user,
@@ -412,6 +413,7 @@ export const init = (app) => {
           recordUuid,
           query,
           attributeDefUuids,
+          messageTypeKeys,
           fileFormat,
         })
         res.json(JobUtils.jobToJSON(job))

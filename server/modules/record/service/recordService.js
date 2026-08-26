@@ -380,6 +380,7 @@ export const startValidationReportGenerationJob = ({
   recordUuid,
   query,
   attributeDefUuids,
+  messageTypeKeys,
   fileFormat,
 }) => {
   const job = new VaidationReportGenerationJob({
@@ -390,6 +391,7 @@ export const startValidationReportGenerationJob = ({
     recordUuid,
     query,
     attributeDefUuids,
+    messageTypeKeys,
     fileFormat,
   })
   JobManager.enqueueJob(job)
