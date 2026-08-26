@@ -283,15 +283,26 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
 export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSocketBySocketId
 
 // VALIDATION REPORT
-const _resolveValidationReportFilterBySurveyAttrs = async ({ surveyId, cycle, query, attributeDefUuids = null }) => {
+const _resolveValidationReportFilterBySurveyAttrs = async ({
+  surveyId,
+  cycle,
+  query,
+  attributeDefUuids = null,
+  messageTypeKeys = null,
+}) => {
   const filter = query ? Query.getFilter(query) : null
   const hasAttributeFilter = Array.isArray(attributeDefUuids)
-  if (!filter && !hasAttributeFilter) return null
+  const hasMessageTypeFilter = Array.isArray(messageTypeKeys)
+  if (!filter && !hasAttributeFilter && !hasMessageTypeFilter) return null
 
   const output = {}
 
   if (hasAttributeFilter) {
     output.attributeDefUuids = attributeDefUuids
+  }
+
+  if (hasMessageTypeFilter) {
+    output.messageTypeKeys = messageTypeKeys
   }
 
   if (filter) {
@@ -312,6 +323,7 @@ export const fetchValidationReport = async ({
   recordUuid,
   query,
   attributeDefUuids = null,
+  messageTypeKeys = null,
   sortBy,
   sortOrder,
 }) => {
@@ -320,6 +332,7 @@ export const fetchValidationReport = async ({
     cycle,
     query,
     attributeDefUuids,
+    messageTypeKeys,
   })
   return RecordManager.fetchValidationReport({
     surveyId,
@@ -333,12 +346,20 @@ export const fetchValidationReport = async ({
   })
 }
 
-export const countValidationReportItems = async ({ surveyId, cycle, recordUuid, query, attributeDefUuids = null }) => {
+export const countValidationReportItems = async ({
+  surveyId,
+  cycle,
+  recordUuid,
+  query,
+  attributeDefUuids = null,
+  messageTypeKeys = null,
+}) => {
   const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({
     surveyId,
     cycle,
     query,
     attributeDefUuids,
+    messageTypeKeys,
   })
   return RecordManager.countValidationReportItems({ surveyId, cycle, recordUuid, filterBySurveyAttrs })
 }
