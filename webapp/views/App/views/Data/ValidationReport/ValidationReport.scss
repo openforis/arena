@@ -7,11 +7,6 @@
     position: absolute;
     bottom: 0;
   }
-
-  .btn-csv-export {
-    width: fit-content;
-    margin: auto;
-  }
 }
 
 .validation-report__table {
@@ -27,6 +22,22 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
+
+  button.highlight {
+    background-color: $yellowHighlight;
+  }
+
+  .btn-csv-export {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: fit-content;
+  }
+}
+
+.validation-report__attributes-filter {
+  position: relative;
 }
 
 .validation-report__attributes-filter-panel {
