@@ -80,7 +80,8 @@
   top: calc(100% + 6px);
   left: 0;
   z-index: 5;
-  width: 260px;
+  min-width: 260px;
+  width: max-content;
   background-color: $white;
   border: $tableRowBorder;
   border-radius: 4px;
@@ -94,6 +95,22 @@
     margin-left: 0;
     height: 20px;
     width: fit-content;
+  }
+
+  .btn-checkbox-label {
+    white-space: nowrap;
+  }
+
+  .validation-report__message-type-filter-panel-divider {
+    border-top: $tableRowBorder;
+    margin: 0.125rem 0;
+  }
+
+  .validation-report__message-type-filter-panel-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-left: 1rem;
   }
 }
 

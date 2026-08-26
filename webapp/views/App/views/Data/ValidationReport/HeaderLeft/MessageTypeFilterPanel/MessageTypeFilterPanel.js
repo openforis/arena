@@ -5,6 +5,9 @@ import { MessageTypeFilterCategoryIds } from '@core/validation/messageTypeFilter
 
 import { Checkbox } from '@webapp/components/form'
 
+const customValidationCategoryId = 'customValidation'
+const otherCategoryIds = MessageTypeFilterCategoryIds.filter((categoryId) => categoryId !== customValidationCategoryId)
+
 export const MessageTypeFilterPanel = ({
   allCategoriesSelected,
   containerRef,
@@ -21,6 +24,15 @@ export const MessageTypeFilterPanel = ({
     }
     onSelectedCategoryIdsChange([...next])
   }
+
+  const renderCategoryCheckbox = (categoryId) => (
+    <Checkbox
+      key={categoryId}
+      checked={selectedCategoryIds.includes(categoryId)}
+      label={`dataView:messageTypeFilter.${categoryId}`}
+      onChange={(selected) => onCategoryToggle(categoryId, selected)}
+    />
+  )
 
   // Close the panel when the user clicks outside of it (and outside of its toggle button).
   useEffect(() => {
@@ -42,14 +54,14 @@ export const MessageTypeFilterPanel = ({
         label="common.selectAll"
         onChange={(selected) => onSelectedCategoryIdsChange(selected ? MessageTypeFilterCategoryIds : [])}
       />
-      {MessageTypeFilterCategoryIds.map((categoryId) => (
-        <Checkbox
-          key={categoryId}
-          checked={selectedCategoryIds.includes(categoryId)}
-          label={`dataView:messageTypeFilter.${categoryId}`}
-          onChange={(selected) => onCategoryToggle(categoryId, selected)}
-        />
-      ))}
+      <div className="validation-report__message-type-filter-panel-divider" />
+      <div className="validation-report__message-type-filter-panel-items">
+        {otherCategoryIds.map(renderCategoryCheckbox)}
+      </div>
+      <div className="validation-report__message-type-filter-panel-divider" />
+      <div className="validation-report__message-type-filter-panel-items">
+        {renderCategoryCheckbox(customValidationCategoryId)}
+      </div>
     </div>
   )
 }
