@@ -37,6 +37,7 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
   const filter = filterBySurveyAttrs?.filter
   const rootDataViewName = filterBySurveyAttrs?.rootDataViewName
   const attributeDefUuids = filterBySurveyAttrs?.attributeDefUuids
+  const messageTypeKeys = filterBySurveyAttrs?.messageTypeKeys
   const { clause: filterClause = null, params: filterParams = {} } = filter ? Expression.toSql(filter) : {}
 
   const filterBySurveyAttrsClause =
@@ -51,12 +52,23 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
       )`
       : ''
 
-  const filterByAttributeDefsClause =
-    Array.isArray(attributeDefUuids) && attributeDefUuids.length === 0
-      ? 'AND 1 = 0'
-      : attributeDefUuids?.length > 0
-        ? 'AND n.node_def_uuid IN ($/attributeDefUuids:csv/)'
-        : ''
+  let filterByAttributeDefsClause
+  if (Array.isArray(attributeDefUuids) && attributeDefUuids.length === 0) {
+    filterByAttributeDefsClause = 'AND 1 = 0'
+  } else if (attributeDefUuids?.length > 0) {
+    filterByAttributeDefsClause = 'AND n.node_def_uuid IN ($/attributeDefUuids:csv/)'
+  } else {
+    filterByAttributeDefsClause = ''
+  }
+
+  let filterByMessageTypesClause
+  if (Array.isArray(messageTypeKeys) && messageTypeKeys.length === 0) {
+    filterByMessageTypesClause = 'AND 1 = 0'
+  } else if (messageTypeKeys?.length > 0) {
+    filterByMessageTypesClause = `AND jsonb_path_query_array(nv.validation, '$.**.key') ?| ARRAY[$/messageTypeKeys:csv/]::text[]`
+  } else {
+    filterByMessageTypesClause = ''
+  }
 
   const orderByClause = getOrderByClause({ sortBy, sortOrder })
 
@@ -127,6 +139,7 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
       ${recordUuid ? 'AND r.uuid = $/recordUuid/' : ''}
       ${filterBySurveyAttrsClause}
       ${filterByAttributeDefsClause}
+      ${filterByMessageTypesClause}
     ORDER BY ${orderByClause}`
 
   return {
@@ -134,6 +147,7 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
     params: {
       ...filterParams,
       ...(attributeDefUuids?.length > 0 ? { attributeDefUuids } : {}),
+      ...(messageTypeKeys?.length > 0 ? { messageTypeKeys } : {}),
       ...(rootDataViewName ? { rootDataViewName } : {}),
     },
   }
