@@ -59,7 +59,7 @@ the existing `uniqueDuplicate` category), which meant "all checked" silently omi
 text is identical ("Invalid value" in English) — otherwise the checkbox list would show two
 entries that look the same.
 
-Default: all 6 selected (= no filtering), same convention as the attribute filter.
+Default: all 7 selected (= no filtering), same convention as the attribute filter.
 
 ## Frontend changes
 
@@ -71,7 +71,7 @@ Default: all 6 selected (= no filtering), same convention as the attribute filte
 2. **`HeaderLeft.js`**: third button + own wrapper `<div className="validation-report__message-type-filter">`
    with its own ref, following the existing `validation-report__attributes-filter` wrapper pattern
    exactly (button toggles, panel conditionally renders, `highlight` class when not all selected).
-3. **`ValidationReport.js`**: new `selectedMessageTypeCategories` state (default: all 6 category
+3. **`ValidationReport.js`**: new `selectedMessageTypeCategories` state (default: all 7 category
    ids). A memo expands selected categories to the flat list of real message keys (`nodesCount` →
    3 keys) and computes `allMessageTypesSelected`. `restParams` gains
    `messageTypeKeys: JSON.stringify(expandedKeys)`, included only when not all categories are
