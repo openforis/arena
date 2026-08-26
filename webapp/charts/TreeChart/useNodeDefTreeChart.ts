@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, type MutableRefObject } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -6,35 +6,55 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
+interface TreeChartNode {
+  data: object
+}
+
+interface IconDescriptor {
+  className: string
+  text: string | null
+}
+
+interface Params {
+  ref: MutableRefObject<any>
+  nodeDefLabelType?: string
+}
+
+interface Result {
+  i18n: ReturnType<typeof useI18n>
+  wrapperRef: MutableRefObject<HTMLDivElement | null>
+  nodeLabelFunction: (d: TreeChartNode) => string
+  nodeTooltipFunction: (d: TreeChartNode) => string
+  nodeIconFunction: (d: TreeChartNode) => IconDescriptor | null
+}
+
 /**
  * Provides the label, tooltip and icon accessor functions shared by every TreeChart whose nodes wrap
  * node definitions, and takes care of the chart lifecycle common to all of them (destroy on unmount,
  * keep label/tooltip functions up to date when the language or label type change).
  * The lifecycle effects read the TreeChart instance lazily from `ref.current`, so this hook can be
  * called regardless of whether the chart creation effect runs before or after it.
- * @param {object} params - Parameters.
- * @param {object} params.ref - Ref holding the TreeChart instance.
- * @param {string} params.nodeDefLabelType - Node def label type to use (name, label...).
- * @returns {object} i18n instance, wrapper DOM ref, and nodeLabelFunction, nodeTooltipFunction, nodeIconFunction.
+ * @param {Params} params - Parameters.
+ * @returns {Result} i18n instance, wrapper DOM ref, and nodeLabelFunction, nodeTooltipFunction, nodeIconFunction.
  */
-export const useNodeDefTreeChart = ({ ref, nodeDefLabelType }) => {
+export const useNodeDefTreeChart = ({ ref, nodeDefLabelType }: Params): Result => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const cycle = useSurveyCycleKey()
 
   const nodeLabelFunction = useCallback(
-    (d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang, type: nodeDefLabelType }),
+    (d: TreeChartNode) => NodeDef.getLabelWithType({ nodeDef: d.data, lang, type: nodeDefLabelType }),
     [lang, nodeDefLabelType]
   )
 
-  const nodeTooltipFunction = useCallback((d) => NodeDef.getDescription(lang)(d.data), [lang])
+  const nodeTooltipFunction = useCallback((d: TreeChartNode) => NodeDef.getDescription(lang)(d.data), [lang])
 
   const nodeIconFunction = useCallback(
-    (d) => NodeDefUIProps.getIconDescriptorByNodeDef({ nodeDef: d.data, cycle }),
+    (d: TreeChartNode) => NodeDefUIProps.getIconDescriptorByNodeDef({ nodeDef: d.data, cycle }),
     [cycle]
   )
 
-  const wrapperRef = useRef()
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => () => ref.current?.destroy(), [ref])
 
