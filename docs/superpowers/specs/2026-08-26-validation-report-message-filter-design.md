@@ -88,8 +88,15 @@ Threads `messageTypeKeys` through the exact same path `attributeDefUuids` alread
    and pass it through.
 3. **`server/modules/record/service/validationReportGenerationJob.js`**: same addition to
    `this.context` destructuring and the `filterBySurveyAttrs` object construction, so an Excel
-   export started while a message-type filter is active respects it (matches existing
-   `attributeDefUuids` behavior).
+   export started while a message-type filter is active respects it.
+
+   Note: `webapp/service/api/data/index.js`'s `startValidationReportGeneration` currently only
+   forwards `{ cycle, recordUuid, lang }` to the backend in its POST body — it silently drops
+   `query` and `attributeDefUuids` even though `HeaderLeft.js`'s export button spreads the full
+   `restParams` into the call. This is a pre-existing bug (export today ignores both the record
+   filter and the attribute filter), out of scope for this change except that
+   `startValidationReportGeneration` must additionally forward the new `messageTypeKeys` field —
+   scoped narrowly to the new filter, not a fix for the other two.
 4. **`server/modules/record/repository/validationReportRepository.js`**: `query()` reads
    `filterBySurveyAttrs?.messageTypeKeys`, builds a new clause:
 
