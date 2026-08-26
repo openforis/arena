@@ -41,6 +41,7 @@ export default {
     uniqueDuplicate: 'Valor duplicado',
     customValidation: 'Validación personalizada',
     entityKeyDuplicate: 'Clave de entidad duplicada',
+    recordKeyDuplicate: 'Clave de registro duplicada',
     nodesCount: 'Recuento de nodos',
   },
   filterRecords: {

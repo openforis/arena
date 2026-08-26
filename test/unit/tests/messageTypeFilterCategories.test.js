@@ -12,6 +12,7 @@ describe('messageTypeFilterCategories', () => {
       'uniqueDuplicate',
       'customValidation',
       'entityKeyDuplicate',
+      'recordKeyDuplicate',
       'nodesCount',
     ])
   })
@@ -25,6 +26,13 @@ describe('messageTypeFilterCategories', () => {
       'record.nodes.count.invalid',
       'record.nodes.count.minNotReached',
       'record.nodes.count.maxExceeded',
+    ])
+  })
+
+  test('expandMessageTypeFilterCategoriesToKeys expands uniqueDuplicate to both the attribute-level and record-level duplicate-value keys', () => {
+    expect(expandMessageTypeFilterCategoriesToKeys(['uniqueDuplicate'])).toEqual([
+      'record.attribute.uniqueDuplicate',
+      'validationErrors:record.uniqueAttributeDuplicate',
     ])
   })
 

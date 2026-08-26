@@ -42,6 +42,7 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
     uniqueDuplicate: 'Valor duplicado',
     customValidation: 'Validação personalizada',
     entityKeyDuplicate: 'Chave de entidade duplicada',
+    recordKeyDuplicate: 'Chave de registro duplicada',
     nodesCount: 'Contagem de nós',
   },
   filterRecords: {

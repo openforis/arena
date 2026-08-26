@@ -43,10 +43,17 @@ filtering for count issues was considered and rejected as unnecessary detail for
 |---|---|---|
 | `valueRequired` | `record.attribute.valueRequired` | Required value |
 | `valueInvalid` | `record.attribute.valueInvalid` | Invalid value |
-| `uniqueDuplicate` | `record.attribute.uniqueDuplicate` | Duplicate value |
+| `uniqueDuplicate` | `record.attribute.uniqueDuplicate`, `validationErrors:record.uniqueAttributeDuplicate` | Duplicate value |
 | `customValidation` | `record.attribute.customValidation` | Custom validation |
 | `entityKeyDuplicate` | `record.entity.keyDuplicate` | Duplicate entity key |
+| `recordKeyDuplicate` | `validationErrors:record.keyDuplicate` | Duplicate record key |
 | `nodesCount` | `record.nodes.count.invalid`, `record.nodes.count.minNotReached`, `record.nodes.count.maxExceeded` | Node count |
+
+The table above was corrected post-implementation following a final-review finding: the original
+design listed only 6 categories and missed the two cross-record message keys produced by
+`recordUniquenessValidator` (`validationErrors:record.keyDuplicate`, folded into the new 7th
+category `recordKeyDuplicate`, and `validationErrors:record.uniqueAttributeDuplicate`, folded into
+the existing `uniqueDuplicate` category), which meant "all checked" silently omitted those rows.
 
 `customValidation` and `valueInvalid` get distinct labels even though their existing runtime i18n
 text is identical ("Invalid value" in English) — otherwise the checkbox list would show two

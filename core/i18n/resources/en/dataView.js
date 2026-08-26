@@ -43,6 +43,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     uniqueDuplicate: 'Duplicate value',
     customValidation: 'Custom validation',
     entityKeyDuplicate: 'Duplicate entity key',
+    recordKeyDuplicate: 'Duplicate record key',
     nodesCount: 'Node count',
   },
   filterRecords: {

@@ -43,6 +43,7 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     uniqueDuplicate: 'Valeur en double',
     customValidation: 'Validation personnalisée',
     entityKeyDuplicate: "Clé d'entité en double",
+    recordKeyDuplicate: "Clé d'enregistrement dupliquée",
     nodesCount: 'Nombre de nœuds',
   },
   filterRecords: {

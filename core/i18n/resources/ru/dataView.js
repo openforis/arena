@@ -43,6 +43,7 @@ export default {
     uniqueDuplicate: 'Дублирующее значение',
     customValidation: 'Пользовательская проверка',
     entityKeyDuplicate: 'Дублирующийся ключ сущности',
+    recordKeyDuplicate: 'Дубликат ключа записи',
     nodesCount: 'Количество узлов',
   },
   filterRecords: {

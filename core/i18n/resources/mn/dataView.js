@@ -43,6 +43,7 @@ export default {
     uniqueDuplicate: 'Давхцсан утга',
     customValidation: 'Тусгай баталгаажуулалт',
     entityKeyDuplicate: 'Объектын түлхүүр давхцсан',
+    recordKeyDuplicate: 'Бичлэгийн түлхүүр давхцсан',
     nodesCount: 'Зангилааны тоо',
   },
   filterRecords: {
