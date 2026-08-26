@@ -20,6 +20,9 @@ import { JobActions } from '@webapp/store/app'
 import { useSurvey, useSurveyCycleKey, useSurveyId, useSurveyName } from '@webapp/store/survey'
 
 import { AttributesFilterPanel } from './AttributesFilterPanel'
+import { MessageTypeFilterCategoryIds } from '@core/validation/messageTypeFilterCategories'
+
+import { MessageTypeFilterPanel } from './MessageTypeFilterPanel'
 
 const onExportComplete =
   ({ surveyId, surveyName, cycle }) =>
@@ -45,9 +48,11 @@ export const HeaderLeft = ({
   allAttributeDefUuids = [],
   onQueryChange,
   onSelectedAttributeDefUuidsChange,
+  onSelectedMessageTypeCategoryIdsChange,
   query,
   restParams = {},
   selectedAttributeDefUuids = [],
+  selectedMessageTypeCategoryIds = MessageTypeFilterCategoryIds,
 }) => {
   const dispatch = useDispatch()
   const survey = useSurvey()
@@ -57,6 +62,8 @@ export const HeaderLeft = ({
   const [filterEditorShown, setFilterEditorShown] = useState(false)
   const [attributeFilterShown, setAttributeFilterShown] = useState(false)
   const attributesFilterRef = useRef(null)
+  const [messageTypeFilterShown, setMessageTypeFilterShown] = useState(false)
+  const messageTypeFilterRef = useRef(null)
 
   const rootNodeDef = Survey.getNodeDefRoot(survey)
   const rootNodeDefUuid = NodeDef.getUuid(rootNodeDef)
@@ -68,6 +75,12 @@ export const HeaderLeft = ({
     const selectedAttributeDefUuidsSet = new Set(selectedAttributeDefUuids)
     return allAttributeDefUuids.every((attributeDefUuid) => selectedAttributeDefUuidsSet.has(attributeDefUuid))
   }, [allAttributeDefUuids, selectedAttributeDefUuids])
+
+  const allMessageTypesSelected = useMemo(() => {
+    if (selectedMessageTypeCategoryIds.length !== MessageTypeFilterCategoryIds.length) return false
+    const selectedSet = new Set(selectedMessageTypeCategoryIds)
+    return MessageTypeFilterCategoryIds.every((categoryId) => selectedSet.has(categoryId))
+  }, [selectedMessageTypeCategoryIds])
 
   const onExportButtonClick = useCallback(async () => {
     const job = await API.startValidationReportGeneration({ surveyId, ...restParams })
@@ -109,6 +122,24 @@ export const HeaderLeft = ({
           />
         )}
       </div>
+      <div className="validation-report__message-type-filter" ref={messageTypeFilterRef}>
+        <ButtonIconFilter
+          className={`btn btn-edit${!allMessageTypesSelected ? ' highlight' : ''}`}
+          iconClassName="icon icon-12px icon-warning"
+          onClick={() => setMessageTypeFilterShown((shown) => !shown)}
+          label="dataView:filterMessages"
+          variant="outlined"
+        />
+        {messageTypeFilterShown && (
+          <MessageTypeFilterPanel
+            allCategoriesSelected={allMessageTypesSelected}
+            containerRef={messageTypeFilterRef}
+            onClose={() => setMessageTypeFilterShown(false)}
+            onSelectedCategoryIdsChange={onSelectedMessageTypeCategoryIdsChange}
+            selectedCategoryIds={selectedMessageTypeCategoryIds}
+          />
+        )}
+      </div>
       <ButtonIconFilter
         className={`btn btn-edit${filter ? ' highlight' : ''}`}
         onClick={() => setFilterEditorShown(true)}
@@ -146,7 +177,9 @@ HeaderLeft.propTypes = {
   allAttributeDefUuids: PropTypes.array,
   onQueryChange: PropTypes.func.isRequired,
   onSelectedAttributeDefUuidsChange: PropTypes.func.isRequired,
+  onSelectedMessageTypeCategoryIdsChange: PropTypes.func.isRequired,
   query: PropTypes.object,
   restParams: PropTypes.object,
   selectedAttributeDefUuids: PropTypes.array,
+  selectedMessageTypeCategoryIds: PropTypes.array,
 }

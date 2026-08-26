@@ -71,6 +71,32 @@
   }
 }
 
+.validation-report__message-type-filter {
+  position: relative;
+}
+
+.validation-report__message-type-filter-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 5;
+  width: 260px;
+  background-color: $white;
+  border: $tableRowBorder;
+  border-radius: 4px;
+  box-shadow: 0 6px 14px rgba($black, 0.2);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  .btn-checkbox {
+    margin-left: 0;
+    height: 20px;
+    width: fit-content;
+  }
+}
+
 .validation-report__row-num-col {
   justify-self: right;
 }
