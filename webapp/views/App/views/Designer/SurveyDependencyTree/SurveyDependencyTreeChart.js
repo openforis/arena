@@ -1,20 +1,19 @@
-import React, { forwardRef, useCallback, useEffect, useRef } from 'react'
+import React, { forwardRef, useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
 import TreeChart from '@webapp/charts/TreeChart'
 import { highlightClassName } from '@webapp/charts/TreeChart/TreeChart'
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
+import { useNodeDefTreeChart } from '@webapp/charts/TreeChart/useNodeDefTreeChart'
 
 export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
   const { data, extraLinksGroups, nodeDefLabelType, onNodeClick, selectedNodeUuid } = props
 
-  const i18n = useI18n()
-  const lang = useSurveyPreferredLang()
-  const cycle = useSurveyCycleKey()
+  const { i18n, wrapperRef, nodeLabelFunction, nodeTooltipFunction, nodeIconFunction } = useNodeDefTreeChart({
+    ref,
+    nodeDefLabelType,
+  })
 
   const nodeClassFunction = useCallback(
     (d) => {
@@ -30,20 +29,6 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
     },
     [selectedNodeUuid]
   )
-
-  const nodeLabelFunction = useCallback(
-    (d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang, type: nodeDefLabelType }),
-    [lang, nodeDefLabelType]
-  )
-
-  const nodeTooltipFunction = useCallback((d) => NodeDef.getDescription(lang)(d.data), [lang])
-
-  const nodeIconFunction = useCallback(
-    (d) => NodeDefUIProps.getIconDescriptorByNodeDef({ nodeDef: d.data, cycle }),
-    [cycle]
-  )
-
-  const wrapperRef = useRef()
 
   useEffect(() => {
     const domElement = wrapperRef.current
@@ -69,18 +54,6 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
       selectedNodeUuid,
     })
   }, [data, extraLinksGroups, selectedNodeUuid])
-
-  useEffect(() => {
-    const tree = ref.current
-    return () => tree?.destroy()
-  }, [ref])
-
-  // force updating labels in TreeChart when label and tooltip function change (depending on lang and labelType)
-  useEffect(() => {
-    const tree = ref.current
-    tree.nodeLabelFunction = nodeLabelFunction
-    tree.nodeTooltipFunction = nodeTooltipFunction
-  }, [nodeLabelFunction, nodeTooltipFunction, ref])
 
   useEffect(() => {
     ref.current?.updateSelection()
