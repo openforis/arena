@@ -5,7 +5,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import TreeChart from '@webapp/charts/TreeChart'
 import { highlightClassName } from '@webapp/charts/TreeChart/TreeChart'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
@@ -13,6 +14,7 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
+  const cycle = useSurveyCycleKey()
 
   const nodeClassFunction = useCallback(
     (d) => {
@@ -36,6 +38,11 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
 
   const nodeTooltipFunction = useCallback((d) => NodeDef.getDescription(lang)(d.data), [lang])
 
+  const nodeIconFunction = useCallback(
+    (d) => NodeDefUIProps.getIconDescriptorByNodeDef({ nodeDef: d.data, cycle }),
+    [cycle]
+  )
+
   const wrapperRef = useRef()
 
   useEffect(() => {
@@ -48,6 +55,7 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
       extraLinksGroups,
       i18n,
       nodeClassFunction,
+      nodeIconFunction,
       nodeLabelFunction,
       nodeTooltipFunction,
       svgClass: 'survey-dependency-tree__svg',
