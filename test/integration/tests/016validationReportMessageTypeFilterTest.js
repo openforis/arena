@@ -70,6 +70,18 @@ describe('Validation Report - Message Type Filter', () => {
         )
       )
     ).buildAndStore()
+
+    // second record sharing the same root entity key value as the first one:
+    // triggers the cross-record key uniqueness check on both records' cluster_no
+    // -> validationErrors:record.keyDuplicate
+    await RB.record(
+      user,
+      survey,
+      RB.entity(
+        'cluster',
+        RB.attribute('cluster_no', '1') // same key as the first record -> validationErrors:record.keyDuplicate
+      )
+    ).buildAndStore()
   })
 
   afterAll(async () => {
@@ -77,6 +89,23 @@ describe('Validation Report - Message Type Filter', () => {
       await SurveyManager.deleteSurvey(surveyId)
     }
   })
+
+  // collects every "key" property value found anywhere in a (possibly deeply nested) validation object;
+  // mirrors the `jsonb_path_query_array(validation, '$.**.key')` expression used by the report query
+  const collectValidationMessageKeys = (value, keysAcc = []) => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => collectValidationMessageKeys(item, keysAcc))
+    } else if (value !== null && typeof value === 'object') {
+      Object.entries(value).forEach(([prop, propValue]) => {
+        if (prop === 'key' && typeof propValue === 'string') {
+          keysAcc.push(propValue)
+        } else {
+          collectValidationMessageKeys(propValue, keysAcc)
+        }
+      })
+    }
+    return keysAcc
+  }
 
   const countForCategories = async (categoryIds) =>
     RecordManager.countValidationReportItems({
@@ -127,7 +156,7 @@ describe('Validation Report - Message Type Filter', () => {
     })
     expect(rows.length).toBeGreaterThan(0)
     rows.forEach((row) => {
-      expect(JSON.stringify(row.validation)).toContain('record.entity.keyDuplicate')
+      expect(collectValidationMessageKeys(row.validation)).toContain('record.entity.keyDuplicate')
     })
   })
 })
