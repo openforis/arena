@@ -6,6 +6,10 @@ import { useNavigate, useParams } from 'react-router'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import {
+  MessageTypeFilterCategoryIds,
+  expandMessageTypeFilterCategoriesToKeys,
+} from '@core/validation/messageTypeFilterCategories'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -25,6 +29,7 @@ const ValidationReport = () => {
   const { recordUuid } = useParams()
   const [query, setQuery] = useState(null)
   const [selectedAttributeDefUuids, setSelectedAttributeDefUuids] = useState([])
+  const [selectedMessageTypeCategoryIds, setSelectedMessageTypeCategoryIds] = useState(MessageTypeFilterCategoryIds)
 
   const allAttributeDefUuids = useMemo(() => {
     const rootNodeDef = Survey.getNodeDefRoot(survey)
@@ -46,6 +51,12 @@ const ValidationReport = () => {
     return allAttributeDefUuids.every((attributeDefUuid) => selectedSet.has(attributeDefUuid))
   }, [allAttributeDefUuids, selectedAttributeDefUuids])
 
+  const allMessageTypesSelected = useMemo(() => {
+    if (selectedMessageTypeCategoryIds.length !== MessageTypeFilterCategoryIds.length) return false
+    const selectedSet = new Set(selectedMessageTypeCategoryIds)
+    return MessageTypeFilterCategoryIds.every((categoryId) => selectedSet.has(categoryId))
+  }, [selectedMessageTypeCategoryIds])
+
   const onRowClick = (row) => {
     const pageNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
     const pageNodeDefUuid = RecordValidationReportItem.getNodeDefContextUuid(row)
@@ -63,9 +74,23 @@ const ValidationReport = () => {
       ...(recordUuid ? { recordUuid } : {}),
       ...(query ? { query: JSON.stringify(query) } : {}),
       ...(!allAttributesSelected ? { attributeDefUuids: JSON.stringify(selectedAttributeDefUuids) } : {}),
+      ...(!allMessageTypesSelected
+        ? {
+            messageTypeKeys: JSON.stringify(expandMessageTypeFilterCategoriesToKeys(selectedMessageTypeCategoryIds)),
+          }
+        : {}),
       lang,
     }),
-    [allAttributesSelected, lang, query, recordUuid, selectedAttributeDefUuids, surveyCycleKey]
+    [
+      allAttributesSelected,
+      allMessageTypesSelected,
+      lang,
+      query,
+      recordUuid,
+      selectedAttributeDefUuids,
+      selectedMessageTypeCategoryIds,
+      surveyCycleKey,
+    ]
   )
 
   return (
@@ -77,9 +102,11 @@ const ValidationReport = () => {
           allAttributeDefUuids,
           onQueryChange: setQuery,
           onSelectedAttributeDefUuidsChange: setSelectedAttributeDefUuids,
+          onSelectedMessageTypeCategoryIdsChange: setSelectedMessageTypeCategoryIds,
           query,
           restParams,
           selectedAttributeDefUuids,
+          selectedMessageTypeCategoryIds,
         }}
         module="validationReport"
         restParams={restParams}
