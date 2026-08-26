@@ -69,6 +69,7 @@ export default class TreeChart {
     i18n,
     nodeClassFunction,
     nodeFilterFunction,
+    nodeIconFunction,
     nodeLabelFunction,
     nodeTooltipFunction,
     onNodeClick: onNodeClickProp,
@@ -85,6 +86,7 @@ export default class TreeChart {
     this.nodeWrapperClassName = 'node'
     this.nodeClassFunction = nodeClassFunction
     this.nodeFilterFunction = nodeFilterFunction
+    this.nodeIconFunction = nodeIconFunction
     this._nodeLabelFunction = nodeLabelFunction
     this._nodeTooltipFunction = nodeTooltipFunction
     this.svgClass = svgClass
@@ -166,7 +168,6 @@ export default class TreeChart {
     this.resizeObserver?.disconnect()
   }
 
-  /* eslint-disable no-param-reassign */
   collapseNode(node) {
     if (node.children) {
       node._children = node.children
@@ -175,7 +176,6 @@ export default class TreeChart {
     }
   }
 
-  /* eslint-disable no-param-reassign */
   toggleNode(node) {
     if (node.children) {
       this.collapseNode(node)
@@ -231,13 +231,10 @@ export default class TreeChart {
 
     // Store the old positions for transition
 
-    nodes.forEach(
-      /* eslint-disable no-param-reassign */
-      (d) => {
-        d.x0 = d.x
-        d.y0 = d.y
-      }
-    )
+    nodes.forEach((d) => {
+      d.x0 = d.x
+      d.y0 = d.y
+    })
   }
 
   updateNodes(treeData, source) {
@@ -270,6 +267,17 @@ export default class TreeChart {
       .append('xhtml:div')
       .attr('class', this.nodeClassFunction)
       .on('click', (_, d) => this.onNodeClick(d.data.uuid))
+
+    // node type icon element
+    if (this.nodeIconFunction) {
+      nodeGrid
+        .append('xhtml:span')
+        .attr('class', (d) => {
+          const icon = this.nodeIconFunction(d)
+          return icon ? `node-icon ${icon.className}` : 'node-icon'
+        })
+        .text((d) => this.nodeIconFunction(d)?.text ?? '')
+    }
 
     // node label element
     nodeGrid
