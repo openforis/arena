@@ -9,6 +9,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import { FileFormats } from '@core/fileFormats'
+import { MessageTypeFilterCategoryIds } from '@core/validation/messageTypeFilterCategories'
 
 import * as DomUtils from '@webapp/utils/domUtils'
 import { ButtonDownload } from '@webapp/components'
@@ -20,8 +21,6 @@ import { JobActions } from '@webapp/store/app'
 import { useSurvey, useSurveyCycleKey, useSurveyId, useSurveyName } from '@webapp/store/survey'
 
 import { AttributesFilterPanel } from './AttributesFilterPanel'
-import { MessageTypeFilterCategoryIds } from '@core/validation/messageTypeFilterCategories'
-
 import { MessageTypeFilterPanel } from './MessageTypeFilterPanel'
 
 const onExportComplete =
@@ -106,7 +105,6 @@ export const HeaderLeft = ({
       <div className="validation-report__attributes-filter" ref={attributesFilterRef}>
         <ButtonIconFilter
           className={`btn btn-edit${!allAttributesSelected ? ' highlight' : ''}`}
-          iconClassName="icon icon-12px icon-tree"
           onClick={() => setAttributeFilterShown((shown) => !shown)}
           label="dataView:filterAttributes"
           variant="outlined"
@@ -125,7 +123,6 @@ export const HeaderLeft = ({
       <div className="validation-report__message-type-filter" ref={messageTypeFilterRef}>
         <ButtonIconFilter
           className={`btn btn-edit${!allMessageTypesSelected ? ' highlight' : ''}`}
-          iconClassName="icon icon-12px icon-warning"
           onClick={() => setMessageTypeFilterShown((shown) => !shown)}
           label="dataView:filterMessages"
           variant="outlined"
