@@ -33,6 +33,7 @@ export default {
   },
   editSelectedRecord: 'Editar registro seleccionado',
   filterAttributeTypes: 'Filtrar tipos de atributos',
+  filterAttributes: 'Filtrar atributos',
   filterRecords: {
     buttonTitle: 'Filtrar registros',
     expressionEditorHeader: 'Expresión para filtrar registros',

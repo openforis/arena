@@ -143,17 +143,17 @@ export const HeaderLeft = ({
   return (
     <div className="validation-report__header-left">
       <ButtonIconFilter
+        className={`btn btn-edit${!allAttributesSelected ? ' highlight' : ''}`}
+        iconClassName="icon icon-12px icon-tree"
+        onClick={() => setAttributeFilterShown((shown) => !shown)}
+        label="dataView:filterAttributes"
+        variant="outlined"
+      />
+      <ButtonIconFilter
         className={`btn btn-edit${filter ? ' highlight' : ''}`}
         onClick={() => setFilterEditorShown(true)}
         label="dataView:filterRecords.buttonTitle"
         title={filter ? Expression.toString(filter, Expression.modes.sql) : undefined}
-        variant="outlined"
-      />
-      <ButtonIconFilter
-        className={`btn btn-edit${!allAttributesSelected ? ' highlight' : ''}`}
-        iconClassName="icon icon-12px icon-tree"
-        onClick={() => setAttributeFilterShown((shown) => !shown)}
-        label="common.attribute_other"
         variant="outlined"
       />
       <ButtonDownload className="btn-csv-export" onClick={onExportButtonClick} label="common.exportToExcel" />
