@@ -4,7 +4,8 @@ import PropTypes from 'prop-types'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import TreeChart from '@webapp/charts/TreeChart'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 const nodeClassFunction = (d) => `node-grid${NodeDef.isVirtual(d.data) ? ' node-virtual' : ''}`
@@ -14,6 +15,7 @@ export const SurveyHierarchyTree = forwardRef((props, ref) => {
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
+  const cycle = useSurveyCycleKey()
 
   const nodeLabelFunction = useCallback(
     (d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang, type: nodeDefLabelType }),
@@ -21,6 +23,11 @@ export const SurveyHierarchyTree = forwardRef((props, ref) => {
   )
 
   const nodeTooltipFunction = useCallback((d) => NodeDef.getDescription(lang)(d.data), [lang])
+
+  const nodeIconFunction = useCallback(
+    (d) => NodeDefUIProps.getIconDescriptorByNodeDef({ nodeDef: d.data, cycle }),
+    [cycle]
+  )
 
   const wrapperRef = useRef()
 
@@ -31,6 +38,7 @@ export const SurveyHierarchyTree = forwardRef((props, ref) => {
       data,
       i18n,
       nodeClassFunction,
+      nodeIconFunction,
       nodeLabelFunction,
       nodeTooltipFunction,
       onNodeClick: onEntityClick,
