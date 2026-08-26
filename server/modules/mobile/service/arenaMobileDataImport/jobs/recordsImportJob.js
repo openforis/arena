@@ -22,6 +22,7 @@ import { getRecordFormattedKeyValues, findExistingRecordSummary, determineRecord
 
 const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',
+  mergedSameRecordUuids: 'mergedSameRecordUuids',
 }
 
 const categoryItemProvider = CategoryItemProviderDefault
@@ -32,7 +33,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
     super(RecordsImportJob.type, params)
 
     this.recordsFileUuids = new Set() // used to check validity of file UUIDs in FilesImportJob
-    this.mergedRecordsMap = {} // maps the uuid of a record to the uuid of the record in which it has been merged
+    this.mergedRecordsMap = {} // maps the uuid of a record to the uuid of a *different* record it has been merged into (duplicate-key case)
+    this.mergedSameRecordUuids = new Set() // uuids of records merged node-by-node with their own existing (same-uuid) server record
   }
 
   async onStart() {
@@ -172,10 +174,10 @@ export default class RecordsImportJob extends DataImportBaseJob {
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
         break
       case RecordImportAction.overwrite:
-        await this.mergeWithExistingRecord()
+        await this.mergeWithExistingRecord({ merge: false })
         break
       case RecordImportAction.merge:
-        await this.mergeWithExistingRecord({ targetRecordUuid: existingRecordUuid })
+        await this.mergeWithExistingRecord({ targetRecordUuid: existingRecordUuid, merge: true })
         break
       case RecordImportAction.insert:
       default:
@@ -183,14 +185,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
     }
   }
 
-  async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null } = {}) {
+  async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null, merge = false } = {}) {
     const { context, currentRecord: record, tx, user } = this
     const { survey, surveyId } = context
 
     const recordUuid = Record.getUuid(record)
     const targetRecordUuid = targetRecordUuidParam ?? recordUuid
-
-    const merge = targetRecordUuid !== recordUuid
 
     this.logDebug(
       merge ? `merging record ${recordUuid} into existing record ${targetRecordUuid}` : `updating record ${recordUuid}`
@@ -215,7 +215,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     this.trackFileUuids({ nodes: nodesUpdated })
 
     const recordSourceDateModified = Record.getDateModified(record)
-    const recordTargetDateModified = Record.getDateCreated(recordTarget)
+    const recordTargetDateModified = Record.getDateModified(recordTarget)
     const dateModified =
       merge && Dates.isAfter(recordTargetDateModified, recordSourceDateModified)
         ? recordTargetDateModified
@@ -224,7 +224,15 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     this.updatedRecordsUuids.add(targetRecordUuid)
     if (merge) {
-      this.mergedRecordsMap[recordUuid] = targetRecordUuid
+      if (targetRecordUuid !== recordUuid) {
+        // duplicate-key merge into a *different* existing record: track the uuid mapping (used by clients to
+        // reconcile their local copy of the now-superseded record)
+        this.mergedRecordsMap[recordUuid] = targetRecordUuid
+      } else {
+        // same-uuid merge: the record was reconciled with its own newer server copy, not superseded by another
+        // record, so it must not be flagged via mergedRecordsMap (clients treat that as "hide this record")
+        this.mergedSameRecordUuids.add(recordUuid)
+      }
     }
     this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
   }
@@ -283,6 +291,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
   generateResult() {
     const result = super.generateResult()
     result[resultKeys.mergedRecordsMap] = this.mergedRecordsMap
+    result[resultKeys.mergedSameRecordUuids] = Array.from(this.mergedSameRecordUuids)
     return result
   }
 }
