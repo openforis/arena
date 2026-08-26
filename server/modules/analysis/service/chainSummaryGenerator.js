@@ -173,7 +173,7 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
             survey,
             categoryUuid: ChainSamplingDesign.getFirstPhaseCategoryUuid(chainSamplingDesign),
           }),
-          phase1StratumAttribute: ChainSamplingDesign.getFirstPhaseCategoryExtraProp(chainSamplingDesign),
+          phase1StratumAttribute: ChainSamplingDesign.getFirstPhaseCategoryExtraProp(chainSamplingDesign) ?? '',
         }
       : {}),
     ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
