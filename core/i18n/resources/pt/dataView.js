@@ -35,7 +35,7 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
   editSelectedRecord: 'Editar registro selecionado',
   filterAttributeTypes: 'Filtrar tipos de atributo',
   filterRecords: {
-    buttonTitle: 'Filtrar',
+    buttonTitle: 'Filtrar registros',
     expressionEditorHeader: 'Expressão para filtrar registros',
   },
   invalidRecord: 'Registro inválido',

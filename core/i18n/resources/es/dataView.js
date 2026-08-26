@@ -34,7 +34,7 @@ export default {
   editSelectedRecord: 'Editar registro seleccionado',
   filterAttributeTypes: 'Filtrar tipos de atributos',
   filterRecords: {
-    buttonTitle: 'Filtrar',
+    buttonTitle: 'Filtrar registros',
     expressionEditorHeader: 'Expresión para filtrar registros',
   },
   invalidRecord: 'Registro no válido',

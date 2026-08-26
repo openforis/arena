@@ -36,7 +36,7 @@ export default {
   editSelectedRecord: 'Редактировать выбранную запись',
   filterAttributeTypes: 'Фильтр типов атрибутов',
   filterRecords: {
-    buttonTitle: 'Фильтр',
+    buttonTitle: 'Фильтр записей',
     expressionEditorHeader: 'Выражение для фильтрации записей',
   },
   invalidRecord: 'Неверная запись',

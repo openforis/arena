@@ -36,7 +36,7 @@ export default {
   editSelectedRecord: 'Сонгогдсон бичлэгийг засах',
   filterAttributeTypes: 'Шинж чанарын төрлүүдийг шүүх',
   filterRecords: {
-    buttonTitle: 'Шүүх',
+    buttonTitle: 'Бичлэгүүдийг шүүх',
     expressionEditorHeader: 'Бичлэгүүдийг шүүх илэрхийлэл',
   },
   invalidRecord: 'Хүчингүй бичлэг',

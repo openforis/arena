@@ -36,7 +36,7 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
   editSelectedRecord: "Modifier l'enregistrement sélectionné",
   filterAttributeTypes: "Filtrer les types d'attributs",
   filterRecords: {
-    buttonTitle: 'Filtrer',
+    buttonTitle: 'Filtrer les enregistrements',
     expressionEditorHeader: 'Expression pour filtrer les enregistrements',
   },
   invalidRecord: 'Enregistrement invalide',

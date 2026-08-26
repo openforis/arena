@@ -36,7 +36,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
   editSelectedRecord: 'Edit selected record',
   filterAttributeTypes: 'Filter attribute types',
   filterRecords: {
-    buttonTitle: 'Filter',
+    buttonTitle: 'Filter records',
     expressionEditorHeader: 'Expression to filter records',
   },
   invalidRecord: 'Invalid record',
