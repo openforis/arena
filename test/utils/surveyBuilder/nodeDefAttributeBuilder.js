@@ -32,6 +32,14 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
     )
   }
 
+  unique(unique = true) {
+    return this._setProp(
+      NodeDef.keysPropsAdvanced.validations,
+      R.pipe(NodeDef.getValidations, NodeDefValidations.assocUnique(unique))(this),
+      true
+    )
+  }
+
   analysis() {
     this._analysis = true
     return this
