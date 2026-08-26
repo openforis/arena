@@ -184,7 +184,7 @@ describe('nodeDefEntityTableRowsSort', () => {
       })
 
       expect(sorted[sorted.length - 1]).toBe(placeholder)
-      expect(sorted.length).toBe(nodes.length)
+      expect(sorted).toHaveLength(nodes.length)
     })
 
     test('returns the nodes array unchanged when no sort criteria are active', () => {

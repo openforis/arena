@@ -123,7 +123,7 @@ export const sortNodes = ({
   }, {})
 
   const dataRows = nodes.filter((row) => !Node.isPlaceholder(row))
-  const placeholderRows = nodes.filter(Node.isPlaceholder)
+  const placeholderRows = nodes.filter((row) => Node.isPlaceholder(row))
 
   const comparators = sortCriteria.map((criterion) =>
     compareByCriterion({ criterion, columnDefByUuid, survey, cycle, lang, record })
