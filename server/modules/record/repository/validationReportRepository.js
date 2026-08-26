@@ -52,19 +52,23 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
       )`
       : ''
 
-  const filterByAttributeDefsClause =
-    Array.isArray(attributeDefUuids) && attributeDefUuids.length === 0
-      ? 'AND 1 = 0'
-      : attributeDefUuids?.length > 0
-        ? 'AND n.node_def_uuid IN ($/attributeDefUuids:csv/)'
-        : ''
+  let filterByAttributeDefsClause
+  if (Array.isArray(attributeDefUuids) && attributeDefUuids.length === 0) {
+    filterByAttributeDefsClause = 'AND 1 = 0'
+  } else if (attributeDefUuids?.length > 0) {
+    filterByAttributeDefsClause = 'AND n.node_def_uuid IN ($/attributeDefUuids:csv/)'
+  } else {
+    filterByAttributeDefsClause = ''
+  }
 
-  const filterByMessageTypesClause =
-    Array.isArray(messageTypeKeys) && messageTypeKeys.length === 0
-      ? 'AND 1 = 0'
-      : messageTypeKeys?.length > 0
-        ? `AND jsonb_path_query_array(nv.validation, '$.**.key') ?| ARRAY[$/messageTypeKeys:csv/]::text[]`
-        : ''
+  let filterByMessageTypesClause
+  if (Array.isArray(messageTypeKeys) && messageTypeKeys.length === 0) {
+    filterByMessageTypesClause = 'AND 1 = 0'
+  } else if (messageTypeKeys?.length > 0) {
+    filterByMessageTypesClause = `AND jsonb_path_query_array(nv.validation, '$.**.key') ?| ARRAY[$/messageTypeKeys:csv/]::text[]`
+  } else {
+    filterByMessageTypesClause = ''
+  }
 
   const orderByClause = getOrderByClause({ sortBy, sortOrder })
 
