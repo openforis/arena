@@ -36,6 +36,15 @@ export default {
   editSelectedRecord: 'Редактировать выбранную запись',
   filterAttributeTypes: 'Фильтр типов атрибутов',
   filterAttributes: 'Фильтр атрибутов',
+  filterMessages: 'Фильтр сообщений',
+  messageTypeFilter: {
+    valueRequired: 'Требуемое значение',
+    valueInvalid: 'Неверное значение',
+    uniqueDuplicate: 'Дублирующее значение',
+    customValidation: 'Пользовательская проверка',
+    entityKeyDuplicate: 'Дублирующийся ключ сущности',
+    nodesCount: 'Количество узлов',
+  },
   filterRecords: {
     buttonTitle: 'Фильтр записей',
     expressionEditorHeader: 'Выражение для фильтрации записей',

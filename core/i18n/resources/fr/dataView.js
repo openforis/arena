@@ -36,6 +36,15 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
   editSelectedRecord: "Modifier l'enregistrement sélectionné",
   filterAttributeTypes: "Filtrer les types d'attributs",
   filterAttributes: 'Filtrer les attributs',
+  filterMessages: 'Filtrer les messages',
+  messageTypeFilter: {
+    valueRequired: 'Valeur requise',
+    valueInvalid: 'Valeur invalide',
+    uniqueDuplicate: 'Valeur en double',
+    customValidation: 'Validation personnalisée',
+    entityKeyDuplicate: "Clé d'entité en double",
+    nodesCount: 'Nombre de nœuds',
+  },
   filterRecords: {
     buttonTitle: 'Filtrer les enregistrements',
     expressionEditorHeader: 'Expression pour filtrer les enregistrements',

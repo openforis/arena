@@ -34,6 +34,15 @@ export default {
   editSelectedRecord: 'Editar registro seleccionado',
   filterAttributeTypes: 'Filtrar tipos de atributos',
   filterAttributes: 'Filtrar atributos',
+  filterMessages: 'Filtrar mensajes',
+  messageTypeFilter: {
+    valueRequired: 'Valor obligatorio',
+    valueInvalid: 'Valor inválido',
+    uniqueDuplicate: 'Valor duplicado',
+    customValidation: 'Validación personalizada',
+    entityKeyDuplicate: 'Clave de entidad duplicada',
+    nodesCount: 'Recuento de nodos',
+  },
   filterRecords: {
     buttonTitle: 'Filtrar registros',
     expressionEditorHeader: 'Expresión para filtrar registros',
