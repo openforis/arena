@@ -22,12 +22,22 @@ export default class VaidationReportGenerationJob extends Job {
   }
 
   async execute() {
-    const { surveyId, cycle, fileFormat, recordUuid, lang, query, attributeDefUuids = null } = this.context
+    const {
+      surveyId,
+      cycle,
+      fileFormat,
+      recordUuid,
+      lang,
+      query,
+      attributeDefUuids = null,
+      messageTypeKeys = null,
+    } = this.context
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
     const filter = query ? Query.getFilter(query) : null
     const hasAttributeFilter = Array.isArray(attributeDefUuids)
+    const hasMessageTypeFilter = Array.isArray(messageTypeKeys)
     const filterBySurveyAttrs =
-      filter || hasAttributeFilter
+      filter || hasAttributeFilter || hasMessageTypeFilter
         ? {
             ...(filter
               ? {
@@ -36,6 +46,7 @@ export default class VaidationReportGenerationJob extends Job {
                 }
               : {}),
             ...(hasAttributeFilter ? { attributeDefUuids } : {}),
+            ...(hasMessageTypeFilter ? { messageTypeKeys } : {}),
           }
         : null
 

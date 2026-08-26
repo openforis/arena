@@ -351,6 +351,7 @@ export const init = (app) => {
       const { surveyId, offset, limit, cycle, recordUuid, sortBy, sortOrder } = Request.getParams(req)
       const query = Request.getJsonParam(req, 'query')
       const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
+      const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
 
       const list = await RecordService.fetchValidationReport({
         surveyId,
@@ -360,6 +361,7 @@ export const init = (app) => {
         recordUuid,
         query,
         attributeDefUuids,
+        messageTypeKeys,
         sortBy,
         sortOrder,
       })
@@ -375,6 +377,7 @@ export const init = (app) => {
       const { surveyId, cycle, recordUuid } = Request.getParams(req)
       const query = Request.getJsonParam(req, 'query')
       const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
+      const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
 
       const count = await RecordService.countValidationReportItems({
         surveyId,
@@ -382,6 +385,7 @@ export const init = (app) => {
         recordUuid,
         query,
         attributeDefUuids,
+        messageTypeKeys,
       })
 
       res.json({ count })
@@ -399,6 +403,7 @@ export const init = (app) => {
         const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
         const query = Request.getJsonParam(req, 'query')
         const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
+        const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
 
         const job = RecordService.startValidationReportGenerationJob({
           user,
@@ -408,6 +413,7 @@ export const init = (app) => {
           recordUuid,
           query,
           attributeDefUuids,
+          messageTypeKeys,
           fileFormat,
         })
         res.json(JobUtils.jobToJSON(job))
