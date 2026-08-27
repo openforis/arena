@@ -87,6 +87,14 @@ missing entity: *"Skip analysis attributes for entities missing in the target su
   sampling-design or statistical-analysis prop that references a node def not found by name in the
   target survey, which is exactly what happens to props pointing at skipped attributes.
 
+  > **Correction (post-implementation fix pass):** this premise was false as originally implemented.
+  > `_remapNodeDefUuid` called `Survey.getNodeDefByName`, which throws `SystemError` when the name
+  > isn't found in the target survey rather than returning `undefined`, so the "already tolerates
+  > dropped node defs" behavior described above did not actually hold — it broke exactly the
+  > `skipMissingEntityAttributes: true` scenario whenever a sampling-design/statistical-analysis prop
+  > referenced the skipped entity. Fixed by swapping it for the non-throwing
+  > `Survey.findNodeDefByName`, which does return `undefined` on a miss.
+
 ## Out of scope
 
 - Per-entity or per-attribute counts/summaries beyond the existing found/missing list (e.g., "3
