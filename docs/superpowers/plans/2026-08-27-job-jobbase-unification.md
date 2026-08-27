@@ -1123,8 +1123,19 @@ export default class Job extends JobBase {
     }
     return super.getErrorInfo(error)
   }
+
+  // JobBase only ever stores the transaction handle as `this.context.tx`, never as a flat
+  // `this.tx`. Arena's original Job class exposed it as `this.tx` directly, and ~50 existing Job
+  // subclasses (~108 call sites) read `this.tx` to pass the current transaction into
+  // manager/repository calls. Without this getter, every one of those call sites would silently
+  // receive `undefined`, breaking transactional atomicity for every job that touches the database.
+  get tx() {
+    return this.context.tx
+  }
 }
 ```
+
+**This `tx` getter was missing from the original version of this step** — found during implementation, not anticipated when this plan was written. It stays in `arena`'s adapter (not pushed into `arena-core`'s `JobBase`) because it's arena's own backward-compatibility convention: `arena-core`'s own consumers (`arena-server`'s `JobServer` and its subclasses) were always written against `this.context.tx` directly and never used a flat `this.tx`, so adding this to the generic `JobBase` would be an unrequested, arena-specific leak into a class meant to stay generic.
 
 - [ ] **Step 2: Delete the now-dead `JobEvent` class**
 
