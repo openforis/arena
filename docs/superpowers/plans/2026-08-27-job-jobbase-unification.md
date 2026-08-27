@@ -1257,6 +1257,56 @@ git commit -m "job: update test fixtures for JobBase's renamed generateResult/in
 
 ---
 
+## Task 11: Update `arena-mobile`'s real job subclasses (added after the fact — a 4th repo found late)
+
+Not part of the original 10-task plan or its spec — found only after the final whole-branch review's Critical findings prompted a full audit of every repo depending on `@openforis/arena-core`. `arena-mobile` (`/home/stefano/dev/projects/openforis/arena-mobile`) declares `@openforis/arena-core@^2.1.1` directly and has its own thin adapter, `src/model/JobMobile.ts` (`JobMobile<C> extends JobBase<C, any>`, overriding only `createLogger()` — the same minimal pattern as `arena-server`'s `JobServer`). Unlike `arena-server`, which only had *test fixtures* riding on the renamed API, `arena-mobile` has **7 real production job subclasses** doing so — this is live app code, not test infrastructure.
+
+**Files affected** (all confirmed via direct inspection, not just grep — every hit is a genuine reference on a `JobBase` subclass, no false positives):
+- `src/service/recordsExportFileGenerationJob.ts:240` — `override async prepareResult()`
+- `src/service/recordsUploadJob.ts:59` — `override async prepareResult()`
+- `src/service/backupJob/BackupJob.ts:25` — `override async prepareResult()`
+- `src/service/surveyImportJob.ts:21` — `this.jobs = [new SurveyDownloadJob({ id, user })]`
+- `src/service/dataExportJob/FlatDataExportJob.ts:331` — `protected override async prepareResult()`; `:337-338` — `protected override async cleanup() { await super.cleanup(); ... }`
+- `src/service/recordsAndFilesImportJob/recordsImportJob.ts:71` — `override async prepareResult()`
+- `src/service/recordsAndFilesImportJob/recordsAndFilesImportJob.ts:28` — `override async prepareResult()`; `:29` — `const recordsImportJob = this.jobs?.[0]`
+
+**Fix:** rename `prepareResult` → `generateResult` (6 sites), `cleanup` → `beforeEnd` including the `super.cleanup()` call (1 site), `this.jobs` → `this.innerJobs` (2 sites) — purely mechanical, matching Task 10's exact rename pattern. Since `arena-mobile` uses TypeScript's `override` keyword throughout, `tsc` will catch any missed site as a compile error — a stronger safety net than `arena-server`'s plain-JS-adjacent fixture had.
+
+`arena-mobile`'s current branch (`fix/records-merge`) is unrelated in-progress work, same situation as `arena-server` was — create a dedicated branch off `master` first, do not commit onto it.
+
+- [ ] **Step 1: Create a dedicated branch off `master`**
+```bash
+cd /home/stefano/dev/projects/openforis/arena-mobile
+git fetch origin master
+git checkout -b job/jobbase-unification-subclasses origin/master
+```
+
+- [ ] **Step 2: Link `@openforis/arena-core` and verify resolution**
+```bash
+cd /home/stefano/dev/projects/openforis/arena-mobile
+yarn link /home/stefano/dev/projects/openforis/arena-core
+node -e "console.log(require.resolve('@openforis/arena-core'))"
+```
+If it doesn't resolve to a path ending in `arena-core/dist/index.js` (the same hoisting quirk hit in `arena`), fix with a manual top-level symlink: `ln -s /home/stefano/dev/projects/openforis/arena-core node_modules/@openforis/arena-core` (untracked, no `package.json` changes; don't `yarn install` after).
+
+- [ ] **Step 3: Apply the renames** to all 7 sites across the 6 files listed above, exactly as described.
+
+- [ ] **Step 4: Verify**
+```bash
+cd /home/stefano/dev/projects/openforis/arena-mobile
+yarn test:types   # tsc — must be clean, this is the primary safety net here
+yarn test         # jest — confirm nothing regresses
+```
+
+- [ ] **Step 5: Commit**
+```bash
+cd /home/stefano/dev/projects/openforis/arena-mobile
+git add -u
+git commit -m "job: update job subclasses for JobBase's renamed generateResult/beforeEnd/innerJobs"
+```
+
+---
+
 ## Final verification checklist
 
 - [ ] `arena-core`: `yarn test` (full suite, not just `JobBase.test.ts`) passes — confirms nothing else in `arena-core` broke.
