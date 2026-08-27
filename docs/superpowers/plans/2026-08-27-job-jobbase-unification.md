@@ -18,7 +18,7 @@
 - Do not change arena's local `@core/systemError` class or any of the 34 files that throw it.
 - `arena-core` work happens on its existing local branch `refactor/job2` (already checked out at `/home/stefano/dev/projects/openforis/arena-core`, currently equal to `master`).
 - `arena` work happens on the current branch `fix/arena-mobile-data-import-errors`.
-- `arena-server` work happens directly on its current branch (small fixture fix only) at `/home/stefano/dev/projects/openforis/arena-server`.
+- `arena-server` work happens at `/home/stefano/dev/projects/openforis/arena-server`, on a new branch `job/jobbase-unification-test-fixtures` created off `master` — its current branch, `fix/job-error-props-shape`, is unrelated in-progress work and must not receive this commit.
 - Every `JobBase.ts` behavior change lands with a test in `arena-core/src/job/JobBase.test.ts` written and run red *before* the implementation, then green after.
 
 ---
@@ -1169,7 +1169,17 @@ Without this, `arena-server`'s existing `src/job/tests/job.test.ts` would silent
 **Interfaces:**
 - Consumes: `generateResult()` and `innerJobs` from Tasks 1 and (implicitly) the rename in Task 1.
 
-- [ ] **Step 1: Replace the file**
+- [ ] **Step 1: Create a dedicated branch off `master`**
+
+`arena-server`'s current branch (`fix/job-error-props-shape`) is unrelated in-progress work and must not receive this commit.
+
+```bash
+cd /home/stefano/dev/projects/openforis/arena-server
+git fetch origin master
+git checkout -b job/jobbase-unification-test-fixtures origin/master
+```
+
+- [ ] **Step 2: Replace the file**
 
 Replace `src/job/tests/testJobs.ts` with:
 
@@ -1214,7 +1224,7 @@ export class SimpleJobWithJobs extends SimpleJob {
 
 (The only changes from the original: both `prepareResult()` overrides are renamed to `generateResult()` and no longer call `super.prepareResult()` — no longer needed, since `generateResult()`'s new default in `JobBase` just returns `this.result`, which these overrides don't rely on. `this.jobs` becomes `this.innerJobs` in `SimpleJobWithJobs`.)
 
-- [ ] **Step 2: Run the test against the linked build**
+- [ ] **Step 3: Run the test against the linked build**
 
 ```bash
 cd /home/stefano/dev/projects/openforis/arena-server
@@ -1223,7 +1233,7 @@ yarn test src/job/tests/job.test.ts
 
 Expected: PASS — all three tests (`SimpleJob` returns `3`, `SimpleJobWithJobs` returns `6`, cancellation test still ends `canceled` with `result` undefined).
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 cd /home/stefano/dev/projects/openforis/arena-server
