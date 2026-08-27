@@ -1067,18 +1067,22 @@ cd /home/stefano/dev/projects/openforis/arena
 yarn link /home/stefano/dev/projects/openforis/arena-core
 ```
 
-Verify: `grep -A2 '"resolutions"' package.json` shows `@openforis/arena-core` pointing at `portal:/home/stefano/dev/projects/openforis/arena-core` (or similar), and `readlink -f node_modules/@openforis/arena-core` resolves into that path.
+`yarn why @openforis/arena-core` will confirm the *resolution* correctly points at the portal — but this alone is not enough. `arena` doesn't declare `@openforis/arena-core` as its own direct dependency (only `@openforis/arena-server` does, transitively), and Yarn's node-modules linker hoists the portal-resolved package nested under `node_modules/@openforis/arena-server/node_modules/@openforis/arena-core` rather than to the top level — which is **invisible** to `server/job/job.js`'s own direct `import ... from '@openforis/arena-core'`, since nested `node_modules` aren't reachable from outside that nested tree under normal Node resolution. This isn't hypothetical: it actively breaks the pre-existing import the moment the link is applied. Confirmed via `node -e "console.log(require.resolve('@openforis/arena-core', {paths: ['/home/stefano/dev/projects/openforis/arena/server/job']}))"` — fails with `MODULE_NOT_FOUND` right after `yarn link`/`yarn install`, until fixed.
 
-- [ ] **Step 3: Link it into `arena-server`**
-
+**Fix:** manually create the missing top-level symlink (this does not touch any tracked file):
 ```bash
-cd /home/stefano/dev/projects/openforis/arena-server
-yarn link /home/stefano/dev/projects/openforis/arena-core
+ln -s /home/stefano/dev/projects/openforis/arena-core node_modules/@openforis/arena-core
 ```
 
-Verify: `readlink -f node_modules/@openforis/arena-core` now prints `/home/stefano/dev/projects/openforis/arena-core`.
+Verify: rerun the `node -e "require.resolve(...)"` check above — it should now print `/home/stefano/dev/projects/openforis/arena-core/dist/index.js`.
 
-- [ ] **Step 4: No separate commit for the link itself** — `yarn link` adds a `resolutions` entry to `package.json` and updates the lockfile, which *are* tracked files; do not commit them as part of this plan's work (they're a local dev-time override, not a real dependency change). Remember to `yarn unlink /home/stefano/dev/projects/openforis/arena-core` in both `arena` and `arena-server` (which removes the `resolutions` entry and restores the published version on `yarn install`) once this work is done, unless asked to keep it linked. Run `git status` in both repos afterward to confirm `package.json`/`yarn.lock` are back to their pre-link state.
+**Caution for later steps:** this manual symlink is not tracked by Yarn's own linker state. If anything runs a fresh `yarn install` later in this plan's execution (nothing in Tasks 9-10 should — they only run `yarn build:test:unit`/`jest`, not `yarn install`), re-verify the symlink is still present and recreate it if Yarn's linker removed it.
+
+- [ ] **Step 3: Link it into `arena-server` — deferred to Task 10, Step 1**
+
+`arena-server`'s current branch is unrelated WIP (see Global Constraints); linking now would add the `resolutions` entry to that branch, not to the dedicated branch Task 10 creates off `master`. Apply the same two commands (`yarn link /home/stefano/dev/projects/openforis/arena-core`, then the same manual top-level symlink fix if `node_modules/@openforis/arena-core` doesn't resolve directly — check the same way as Step 2) as part of Task 10, immediately after creating its branch and before running its tests.
+
+- [ ] **Step 4: No separate commit for the link itself** — `yarn link` adds a `resolutions` entry to `package.json` and updates the lockfile, which *are* tracked files; do not commit them as part of this plan's work (they're a local dev-time override, not a real dependency change). Remember to `yarn unlink /home/stefano/dev/projects/openforis/arena-core` in both `arena` and `arena-server` (which removes the `resolutions` entry and restores the published version on `yarn install`) and remove the manual top-level symlink, once this work is done, unless asked to keep it linked. Run `git status` in both repos afterward to confirm `package.json`/`yarn.lock` are back to their pre-link state.
 
 ---
 
