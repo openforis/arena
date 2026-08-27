@@ -75,10 +75,14 @@ In `src/job/JobBase.test.ts`, make these three changes:
 const createTrackedClient = () => {
   let committed = false
   let rolledBack = false
+  // The tx handle needs its own `.tx()` so nested inner-job transactions (executeJobs() passes
+  // `this.context.tx` down as the inner job's own `client` argument, mirroring pg-promise's
+  // nested-transaction/savepoint support) don't throw before the inner job's onStart() even runs.
+  const fakeTx = { marker: 'fake-tx', tx: async (fn: (tx: any) => Promise<void>) => fn(fakeTx) }
   const client = {
     tx: async (fn: (tx: any) => Promise<void>) => {
       try {
-        await fn({ marker: 'fake-tx' })
+        await fn(fakeTx)
         committed = true
       } catch (error) {
         rolledBack = true
