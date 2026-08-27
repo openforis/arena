@@ -161,7 +161,7 @@ const _remapNodeDefUuid = ({ uuid, sourceSurvey, targetSurvey }) => {
   if (!uuid) return undefined
   const sourceNodeDef = Survey.getNodeDefByUuid(uuid)(sourceSurvey)
   if (!sourceNodeDef) return undefined
-  const targetNodeDef = Survey.getNodeDefByName(NodeDef.getName(sourceNodeDef))(targetSurvey)
+  const targetNodeDef = Survey.findNodeDefByName(NodeDef.getName(sourceNodeDef))(targetSurvey)
   return targetNodeDef ? NodeDef.getUuid(targetNodeDef) : undefined
 }
 
@@ -234,7 +234,10 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
   )
 }
 
-export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sourceChainUuid }, client = DB.client) =>
+export const cloneChainFromSurvey = async (
+  { user, surveyId, sourceSurveyId, sourceChainUuid, skipMissingEntityAttributes = false },
+  client = DB.client
+) =>
   client.tx(async (tx) => {
     const fetchSurveyFull = (sid) =>
       SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
@@ -278,11 +281,18 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
         missingEntityNames.push(parentName)
       }
     }
-    if (missingEntityNames.length > 0) {
+    if (missingEntityNames.length > 0 && !skipMissingEntityAttributes) {
       throw new SystemError('chainView.cloneFromAnotherSurveyDialog.missingEntities', {
         entities: missingEntityNames.join(', '),
       })
     }
+
+    // When skipping, drop analysis attributes whose parent entity is missing in the target survey.
+    const clonableAnalysisNodeDefs = sourceAnalysisNodeDefs.filter((nd) => {
+      const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey)
+      const parentName = NodeDef.getName(parentEntity)
+      return !missingEntityNames.includes(parentName)
+    })
 
     // Create new chain with a new UUID, copying props from source with UUID references sanitized.
     const newChain = {
@@ -303,7 +313,7 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
 
     // Clone analysis node defs, remapping parent entity to target survey and updating chainUuid.
     const usedNames = new Set(Survey.getNodeDefsArray(targetSurvey).map(NodeDef.getName))
-    const clonedNodeDefs = sourceAnalysisNodeDefs.map((nd) => {
+    const clonedNodeDefs = clonableAnalysisNodeDefs.map((nd) => {
       const sourceParentName = NodeDef.getName(Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey))
       const targetParentEntity = targetEntityByName[sourceParentName]
       const uniqueName = UniqueNameGenerator.generateUniqueName({

@@ -15,7 +15,7 @@ import { useI18n } from '@webapp/store/system'
 import { ChainActions } from '@webapp/store/ui/chain'
 
 import { Button, ButtonCancel } from '@webapp/components/buttons'
-import { Dropdown } from '@webapp/components/form'
+import { Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 
@@ -56,6 +56,7 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
   const [selectedChainItem, setSelectedChainItem] = useState<ChainItem | null>(null)
   const [entityCheckItems, setEntityCheckItems] = useState<EntityCheckItem[]>([])
   const [loadingEntityCheck, setLoadingEntityCheck] = useState(false)
+  const [skipMissingEntities, setSkipMissingEntities] = useState(false)
 
   // Collect entity names from the current (target) survey.
   const targetEntityNames = useMemo(
@@ -116,6 +117,7 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
       setSelectedChainItem(null)
       setChainItems([])
       setEntityCheckItems([])
+      setSkipMissingEntities(false)
       if (!item) return
       setLoadingChains(true)
       try {
@@ -134,6 +136,7 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
     async (item: ChainItem | null) => {
       setSelectedChainItem(item)
       setEntityCheckItems([])
+      setSkipMissingEntities(false)
       if (!item || !selectedSurveyItem) return
       setLoadingEntityCheck(true)
       try {
@@ -169,7 +172,8 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
   )
 
   const allEntitiesFound = entityCheckItems.every((c) => c.found)
-  const confirmDisabled = !selectedSurveyItem || !selectedChainItem || loadingEntityCheck || !allEntitiesFound
+  const confirmDisabled =
+    !selectedSurveyItem || !selectedChainItem || loadingEntityCheck || (!allEntitiesFound && !skipMissingEntities)
 
   const onConfirm = useCallback(() => {
     if (!selectedSurveyItem || !selectedChainItem) return
@@ -177,11 +181,12 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
       ChainActions.cloneChainFromSurvey({
         sourceSurveyId: selectedSurveyItem.value,
         sourceChainUuid: selectedChainItem.value,
+        skipMissingEntityAttributes: skipMissingEntities,
         navigate,
       })
     )
     onClose()
-  }, [dispatch, navigate, onClose, selectedChainItem, selectedSurveyItem])
+  }, [dispatch, navigate, onClose, selectedChainItem, selectedSurveyItem, skipMissingEntities])
 
   return (
     <Modal
@@ -213,25 +218,36 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
 
         {selectedChainItem && !loadingEntityCheck && entityCheckItems.length > 0 && (
           <FormItem label={i18n.t('chainView.cloneFromAnotherSurveyDialog.entityCheck')}>
-            <div className="chain-clone-from-survey-dialog__entity-check-list">
-              {entityCheckItems.map(({ entityName, found }) => (
-                <div key={entityName} className={found ? 'found' : 'missing'}>
-                  <span
-                    className={`icon icon-12px ${
-                      found
-                        ? 'icon-checkmark chain-clone-from-survey-dialog__entity-icon--found'
-                        : 'icon-cross chain-clone-from-survey-dialog__entity-icon--missing'
-                    }`}
+            <div className="chain-clone-from-survey-dialog__entity-check-content">
+              <div className="chain-clone-from-survey-dialog__entity-check-list">
+                {entityCheckItems.map(({ entityName, found }) => (
+                  <div key={entityName} className={found ? 'found' : 'missing'}>
+                    <span
+                      className={`icon icon-12px ${
+                        found
+                          ? 'icon-checkmark chain-clone-from-survey-dialog__entity-icon--found'
+                          : 'icon-cross chain-clone-from-survey-dialog__entity-icon--missing'
+                      }`}
+                    />
+                    {entityName}
+                    {!found && (
+                      <span className="chain-clone-from-survey-dialog__entity-missing-label">
+                        {' '}
+                        ({i18n.t('chainView.cloneFromAnotherSurveyDialog.entityMissing')})
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {!allEntitiesFound && (
+                <div className="chain-clone-from-survey-dialog__skip-missing-checkbox-wrapper">
+                  <Checkbox
+                    checked={skipMissingEntities}
+                    label="chainView.cloneFromAnotherSurveyDialog.skipMissingEntities"
+                    onChange={setSkipMissingEntities}
                   />
-                  {entityName}
-                  {!found && (
-                    <span className="chain-clone-from-survey-dialog__entity-missing-label">
-                      {' '}
-                      ({i18n.t('chainView.cloneFromAnotherSurveyDialog.entityMissing')})
-                    </span>
-                  )}
                 </div>
-              ))}
+              )}
             </div>
           </FormItem>
         )}

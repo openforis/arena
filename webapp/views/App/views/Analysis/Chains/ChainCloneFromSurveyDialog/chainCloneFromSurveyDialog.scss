@@ -12,4 +12,9 @@
   &__entity-icon--missing {
     color: #e53935;
   }
+
+  &__skip-missing-checkbox-wrapper {
+    display: flex;
+    margin-top: 0.5em;
+  }
 }
