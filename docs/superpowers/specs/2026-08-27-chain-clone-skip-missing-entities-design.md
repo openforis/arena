@@ -112,6 +112,12 @@ The existing `missingEntities` key is unchanged and still used for the blocking-
 language files are left with the English fallback text for the new key, consistent with how new
 keys are typically introduced in this codebase.
 
+> **Correction (post-implementation fix pass):** this premise was also wrong. This dialog's
+> `cloneFromAnotherSurveyDialog` block is already fully translated in all of `es`, `fr`, `mn`, `pt`,
+> and `ru`, so leaving one key English-only was inconsistent with the block's own convention, not a
+> generic fallback situation. All five locale files were given a translation of `skipMissingEntities`
+> during the fix pass.
+
 ## Testing
 
 Extend the integration tests alongside
