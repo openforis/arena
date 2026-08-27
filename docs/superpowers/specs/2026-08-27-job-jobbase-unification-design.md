@@ -1,8 +1,10 @@
 # Job / JobBase Unification — Design Spec
 
 Date: 2026-08-27
-Repos affected: `arena-core` (branch `refactor/job2`, unreleased) and `arena` (this repo, branch
-`fix/arena-mobile-data-import-errors`)
+Repos affected: `arena-core` (branch `refactor/job2`, unreleased), `arena` (this repo, branch
+`fix/arena-mobile-data-import-errors`), and `arena-server` (small, mechanical fixture-only fix —
+see its own section below; not part of the original ask, added after checking whether renaming
+`JobBase` hooks would silently break its existing test suite)
 
 ## Problem
 
@@ -143,14 +145,28 @@ All changes are to `src/job/JobBase.ts` (plus small, additive changes to `src/jo
 7. **Result-building hooks renamed, split, and moved pre-commit** (see point 1 — `beforeSuccess()`
    now runs inside the transaction, not after) to match the names 22 existing `Job` subclasses
    already override:
-   - `prepareResult()` → `beforeSuccess()`, which calls `this.setResult(await this.generateResult())`.
-   - `generateResult()` — new, defaults to returning `{}`.
-   - `setResult(result)` — new, merges into `this.result` (`Object.assign`, `this.result` starts as
-     `{}`) rather than replacing it wholesale, so multiple partial `setResult()` calls during
-     `execute()` accumulate correctly.
+   - `prepareResult()` → `generateResult()`, keeping its current role (`Promise<R | undefined>`,
+     default returns `this.result` — i.e. `undefined` unless something already set it). This default
+     is *not* `{}`: `JobBase`'s `R` isn't always object-shaped — `arena-server`'s own `SimpleJob` test
+     fixture uses a plain `number` — so a hardcoded `{}` default would silently corrupt non-object
+     results the moment `setResult()`'s merge logic (below) touched them.
+   - `beforeSuccess()` — new hook, default implementation is `this.setResult(await this.generateResult())`.
+     22 arena subclasses already override this name directly (calling `this.setResult(...)` one or
+     more times, sometimes via `super.beforeSuccess()` first) rather than going through `generateResult()`.
+   - `setResult(result)` — new, **merges only when both the current and incoming result are actual
+     objects** (`Object.assign`); otherwise it's a plain overwrite. This is what makes it safe for
+     both arena's convention (`Job`'s constructor seeds `this.result = {}`, so repeated `setResult()`
+     calls during `execute()` accumulate additively) and `arena-server`'s primitive-result convention
+     (`JobBase.result` starts `undefined`, so a single `setResult(3)` just overwrites it — the merge
+     branch never triggers because `undefined` isn't an object).
    - `cleanup()` → `beforeEnd()`, matching the 4 existing overrides (also now pre-commit).
    - New `combineInnerJobsResults()` / `combineInnerJobsErrors()` helpers (`Object.assign` over
      each inner job's `result`/`errors`), used by `DataImportJob` and the mobile import job.
+   - `JobBase` itself does **not** initialize `this.result` to `{}` — it keeps today's `undefined`
+     default, preserving the type-level meaning of `R = undefined` for consumers that never use
+     `setResult()`. Seeding `this.result = {}` becomes arena's `Job` adapter's own constructor
+     concern (see the `arena` changes section below), since it's arena's convention, not a universal
+     `JobBase` one.
 
 8. **Context helper methods and `keysContext`**, built on the existing `context`/`JobContext`:
    - `getContextProp(prop, defaultValue = null)`
@@ -193,6 +209,7 @@ All changes are to `src/job/JobBase.ts` (plus small, additive changes to `src/jo
      constructor(type, params = {}, innerJobs = []) {
        super({ ...params, type }, innerJobs)
        this.params = params // original reference, distinct from the (copied, shared) context
+       this.result = {} // arena's convention: generateResult()/setResult() build this up incrementally
      }
 
      createLogger() {
@@ -221,18 +238,40 @@ All changes are to `src/job/JobBase.ts` (plus small, additive changes to `src/jo
    `getContextProp`/`setContext`/`deleteContextProps`, `combineInnerJobsResults`/`combineInnerJobsErrors`,
    `addError`/`hasErrors`, `processed`/`incrementProcessedItems`, the `log*` methods).
 
+## `arena-server` changes (small, unplanned addition — see header)
+
+`arena-server`'s `JobServer` (`src/job/job.ts`) already extends `JobBase` directly, overriding only
+`createLogger()`. Its one real consumer is a test fixture, `src/job/tests/testJobs.ts`
+(`SimpleJob`/`SimpleJobWithJobs`), exercised by `src/job/tests/job.test.ts`, which asserts
+`job.result` equals specific numbers (`3`, `6`) after completion. That fixture overrides the
+soon-to-be-renamed `prepareResult()` and reads `this.jobs`. Left alone, both would silently stop
+doing anything once `JobBase` no longer has methods/fields by those names — no compile error (they'd
+just become unrelated dead methods), just quietly wrong test results (`job.result` would come back
+`undefined` instead of `3`/`6`).
+
+1. In `src/job/tests/testJobs.ts`: rename both `protected async prepareResult()` overrides to
+   `protected async generateResult()`, drop their `await super.prepareResult()` calls (no longer
+   needed — see `generateResult()`'s new default in the `arena-core` section above), and rename
+   `this.jobs` → `this.innerJobs` in `SimpleJobWithJobs`.
+2. No changes needed anywhere else in `arena-server` — confirmed via a full-repo search that nothing
+   else references `.jobs`, `prepareResult`, or `cleanup()`.
+
 ## Local verification (no publish required)
 
 Build `arena-core` on `refactor/job2`, `yarn link` it, then `yarn link @openforis/arena-core` from
-`arena` so the linked build is picked up immediately without touching either `package.json`. Unlink
-afterward unless asked to keep it linked.
+both `arena` and `arena-server` so each picks up the linked build immediately without touching any
+`package.json`. Unlink afterward unless asked to keep it linked.
 
 ## Testing
 
 - `arena-core`: extend `src/job/JobBase.test.ts` to cover `stopOnInnerJobFailure`, `canceledByAdmin`
-  propagation from an inner job, context merge-then-share, the `getErrorInfo` hook, and
-  `setResult`/`generateResult` merging.
+  propagation from an inner job, context merge-then-share, the `getErrorInfo` hook, the transaction
+  rollback-on-failure fix, and `setResult`/`generateResult` merging (including the non-object-result
+  case).
 - `arena`: run the existing job-related suites against the linked build —
   `test/unit/tests/jobManager.test.js`, `test/unit/tests/jobThreadExecutor.test.js`,
   `test/unit/tests/027jobSerialized.test.js`, `test/unit/tests/027taxonomyImportJob.test.js`,
   `test/unit/tests/040surveyDataMigrationJob.test.js` — to catch regressions across real subclasses.
+- `arena-server`: run `src/job/tests/job.test.ts` against the linked build, after updating
+  `testJobs.ts` — confirms the numeric-result (non-object) path through the new `setResult` still
+  works correctly end to end.
