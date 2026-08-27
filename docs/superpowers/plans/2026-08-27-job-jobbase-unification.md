@@ -1058,32 +1058,27 @@ yarn build
 
 Expected: TypeScript compiles cleanly to `dist/`.
 
-- [ ] **Step 2: Register the local `arena-core` build as a link target**
+All three repos run Yarn Berry (`arena` 4.18.0, `arena-server` 4.18.0, `arena-core` 4.17.0 — confirmed via each repo's `package.json` `packageManager` field), not classic Yarn 1.x. Berry's `yarn link` has no "register a target" step in the package being linked — it's a single command run from each *consumer*, pointing at the other project's path directly (it sets a `resolutions` entry in the consumer's own `package.json`, which `yarn install`/`yarn unlink` cleanly removes again). There is nothing to run inside `arena-core` itself beyond the build in Step 1.
 
-```bash
-cd /home/stefano/dev/projects/openforis/arena-core
-yarn link
-```
-
-- [ ] **Step 3: Link it into `arena`**
+- [ ] **Step 2: Link it into `arena`**
 
 ```bash
 cd /home/stefano/dev/projects/openforis/arena
-yarn link @openforis/arena-core
+yarn link /home/stefano/dev/projects/openforis/arena-core
 ```
 
-Verify: `readlink -f node_modules/@openforis/arena-core` now prints `/home/stefano/dev/projects/openforis/arena-core`.
+Verify: `grep -A2 '"resolutions"' package.json` shows `@openforis/arena-core` pointing at `portal:/home/stefano/dev/projects/openforis/arena-core` (or similar), and `readlink -f node_modules/@openforis/arena-core` resolves into that path.
 
-- [ ] **Step 4: Link it into `arena-server`**
+- [ ] **Step 3: Link it into `arena-server`**
 
 ```bash
 cd /home/stefano/dev/projects/openforis/arena-server
-yarn link @openforis/arena-core
+yarn link /home/stefano/dev/projects/openforis/arena-core
 ```
 
 Verify: `readlink -f node_modules/@openforis/arena-core` now prints `/home/stefano/dev/projects/openforis/arena-core`.
 
-- [ ] **Step 5: No commit** — linking is a local environment change only, not tracked by git. Remember to `yarn unlink @openforis/arena-core` in both `arena` and `arena-server` (and `yarn install` to restore the published version) once this work is done, unless asked to keep it linked.
+- [ ] **Step 4: No separate commit for the link itself** — `yarn link` adds a `resolutions` entry to `package.json` and updates the lockfile, which *are* tracked files; do not commit them as part of this plan's work (they're a local dev-time override, not a real dependency change). Remember to `yarn unlink /home/stefano/dev/projects/openforis/arena-core` in both `arena` and `arena-server` (which removes the `resolutions` entry and restores the published version on `yarn install`) once this work is done, unless asked to keep it linked. Run `git status` in both repos afterward to confirm `package.json`/`yarn.lock` are back to their pre-link state.
 
 ---
 
@@ -1252,5 +1247,6 @@ git commit -m "job: update test fixtures for JobBase's renamed generateResult/in
 - [ ] `arena-core`: `yarn test` (full suite, not just `JobBase.test.ts`) passes — confirms nothing else in `arena-core` broke.
 - [ ] `arena`: `yarn build:test:unit && npx jest dist/__tests__/bundle.unit.js` passes with zero failures.
 - [ ] `arena-server`: `yarn test` (full suite) passes.
-- [ ] `git diff --stat` in `arena` shows only `server/job/job.js` modified and `server/job/jobEvent.js` deleted (no accidental changes to any of the 83 subclasses).
-- [ ] Unlink `@openforis/arena-core` in `arena` and `arena-server` (`yarn unlink @openforis/arena-core && yarn install`) once done, unless asked to keep it linked for further work.
+- [ ] `git diff --stat` in `arena` shows only `server/job/job.js` modified and `server/job/jobEvent.js` deleted (no accidental changes to any of the 83 subclasses, and no `package.json`/`yarn.lock` changes leaked in from the Task 8 link).
+- [ ] `git diff --stat` in `arena-server` (on branch `job/jobbase-unification-test-fixtures`) shows only `src/job/tests/testJobs.ts` modified (no `package.json`/`yarn.lock` changes leaked in from the Task 8 link).
+- [ ] Unlink `@openforis/arena-core` in `arena` and `arena-server` (`yarn unlink /home/stefano/dev/projects/openforis/arena-core && yarn install`) once done, unless asked to keep it linked for further work.
