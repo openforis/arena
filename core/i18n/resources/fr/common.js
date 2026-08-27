@@ -815,6 +815,7 @@ $t(common.cantUndoWarning)`,
       sourceChain: 'Chaîne source',
       entityCheck: 'Compatibilité des entités',
       entityMissing: "absente dans l'enquête cible",
+      skipMissingEntities: "Ignorer les attributs d'analyse des entités absentes dans l'enquête cible",
       noAnalysisAttributes: "Cette chaîne n'a pas d'attributs d'analyse",
       cloneComplete: 'Chaîne clonée avec succès',
       missingEntities:

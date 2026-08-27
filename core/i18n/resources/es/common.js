@@ -684,6 +684,7 @@ export default {
       sourceChain: 'Cadena de origen',
       entityCheck: 'Compatibilidad de entidades',
       entityMissing: 'falta en el estudio destino',
+      skipMissingEntities: 'Omitir atributos de análisis de entidades que faltan en el estudio destino',
       noAnalysisAttributes: 'Esta cadena no tiene atributos de análisis',
       cloneComplete: 'Cadena clonada correctamente',
       missingEntities: 'No se puede clonar: las siguientes entidades no existen en el estudio destino: {{entities}}',

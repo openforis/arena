@@ -32,7 +32,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId } = Request.getParams(req)
-        const { sourceSurveyId, sourceChainUuid } = Request.getBody(req)
+        const { sourceSurveyId, sourceChainUuid, skipMissingEntityAttributes = false } = Request.getBody(req)
         const user = Request.getUser(req)
 
         if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
@@ -43,7 +43,13 @@ export const init = (app) => {
           throw new UnauthorizedError(user?.name)
         }
 
-        const chain = await AnalysisService.cloneChainFromSurvey({ user, surveyId, sourceSurveyId, sourceChainUuid })
+        const chain = await AnalysisService.cloneChainFromSurvey({
+          user,
+          surveyId,
+          sourceSurveyId,
+          sourceChainUuid,
+          skipMissingEntityAttributes,
+        })
 
         res.json(chain)
       } catch (error) {
