@@ -161,7 +161,7 @@ const _remapNodeDefUuid = ({ uuid, sourceSurvey, targetSurvey }) => {
   if (!uuid) return undefined
   const sourceNodeDef = Survey.getNodeDefByUuid(uuid)(sourceSurvey)
   if (!sourceNodeDef) return undefined
-  const targetNodeDef = Survey.getNodeDefByName(NodeDef.getName(sourceNodeDef))(targetSurvey)
+  const targetNodeDef = Survey.findNodeDefByName(NodeDef.getName(sourceNodeDef))(targetSurvey)
   return targetNodeDef ? NodeDef.getUuid(targetNodeDef) : undefined
 }
 
