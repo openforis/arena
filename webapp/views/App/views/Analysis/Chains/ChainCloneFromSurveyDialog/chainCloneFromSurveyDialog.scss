@@ -13,7 +13,9 @@
     color: #e53935;
   }
 
-  &__skip-missing-checkbox {
+  &__skip-missing-checkbox-wrapper {
+    display: flex;
+    justify-content: center;
     margin-top: 0.5em;
   }
 }
