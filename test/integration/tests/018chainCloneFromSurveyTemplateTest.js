@@ -25,10 +25,16 @@ describe('Clone chain from another survey - templates', () => {
     const user = getContextUser()
     chainUuid = uuidv4()
 
-    // Published template with one chain.
+    // Published template with one chain and one analysis attribute on its root entity.
     templateSurvey = await SB.survey(
       user,
-      SB.entity('cluster_tpl', SB.attribute('cluster_id_tpl', nodeDefType.integer).key())
+      SB.entity(
+        'cluster_tpl',
+        SB.attribute('cluster_id_tpl', nodeDefType.integer).key(),
+        SB.attribute('volume_analysis_tpl', nodeDefType.decimal)
+          .analysis()
+          .propAdvanced(NodeDef.keysPropsAdvanced.chainUuid, chainUuid)
+      )
     )
       .template()
       .buildAndStore()
@@ -73,5 +79,29 @@ describe('Clone chain from another survey - templates', () => {
     const list = await AnalysisManager.fetchChainsForCloneFromSurvey({ user, sourceSurveyId })
 
     expect(list.map(Chain.getUuid)).toContain(chainUuid)
+  })
+
+  test('a user with no auth group can fetch the analysis entity names of a published template chain', async () => {
+    const sourceSurveyId = Survey.getId(templateSurvey)
+
+    const entityNames = await AnalysisManager.fetchChainSourceEntityNames({
+      user: outsiderUser,
+      sourceSurveyId,
+      sourceChainUuid: chainUuid,
+    })
+
+    expect(entityNames).toEqual(['cluster_tpl'])
+  })
+
+  test('a user with no auth group cannot fetch entity names of a regular (non-template) survey chain', async () => {
+    const sourceSurveyId = Survey.getId(regularSurvey)
+
+    await expect(
+      AnalysisManager.fetchChainSourceEntityNames({
+        user: outsiderUser,
+        sourceSurveyId,
+        sourceChainUuid: chainUuid,
+      })
+    ).rejects.toThrow(UnauthorizedError)
   })
 })

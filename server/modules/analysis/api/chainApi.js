@@ -39,7 +39,7 @@ export const init = (app) => {
         if (!sourceChainUuid) throw new Error('sourceChainUuid is required')
 
         const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId })
-        if (!Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
+        if (!Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
           throw new UnauthorizedError(user?.name)
         }
 
@@ -71,6 +71,30 @@ export const init = (app) => {
         const list = await AnalysisService.fetchChainsForCloneFromSurvey({ user, sourceSurveyId })
 
         res.json({ list })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/chain/clone-from-survey/entities',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { sourceSurveyId, sourceChainUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
+        if (!sourceChainUuid) throw new Error('sourceChainUuid is required')
+
+        const entityNames = await AnalysisService.fetchChainSourceEntityNames({
+          user,
+          sourceSurveyId,
+          sourceChainUuid,
+        })
+
+        res.json({ entityNames })
       } catch (error) {
         next(error)
       }

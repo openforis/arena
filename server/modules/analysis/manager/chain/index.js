@@ -239,12 +239,39 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
 
 // ====== READ - Chains available to clone from another survey
 
-export const fetchChainsForCloneFromSurvey = async ({ user, sourceSurveyId }) => {
+const _checkCanViewSourceSurveyForClone = async ({ user, sourceSurveyId }) => {
   const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId })
-  if (!Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
+  if (!Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
     throw new UnauthorizedError(User.getName(user))
   }
+}
+
+export const fetchChainsForCloneFromSurvey = async ({ user, sourceSurveyId }) => {
+  await _checkCanViewSourceSurveyForClone({ user, sourceSurveyId })
   return fetchChains({ surveyId: sourceSurveyId })
+}
+
+export const fetchChainSourceEntityNames = async ({ user, sourceSurveyId, sourceChainUuid }) => {
+  await _checkCanViewSourceSurveyForClone({ user, sourceSurveyId })
+
+  const sourceSurvey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
+    surveyId: sourceSurveyId,
+    draft: true,
+    advanced: true,
+    includeAnalysis: true,
+  })
+  const sourceAnalysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(
+    (nd) => NodeDef.isAnalysis(nd) && NodeDef.getChainUuid(nd) === sourceChainUuid
+  )
+  const entityNames = []
+  sourceAnalysisNodeDefs.forEach((nd) => {
+    const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey)
+    if (parentEntity) {
+      const name = NodeDef.getName(parentEntity)
+      if (!entityNames.includes(name)) entityNames.push(name)
+    }
+  })
+  return entityNames
 }
 
 export const cloneChainFromSurvey = async (

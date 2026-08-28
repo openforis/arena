@@ -6,19 +6,65 @@
 the source of a chain clone in `ChainCloneFromSurveyDialog`, with the source-survey dropdown grouped
 into "Surveys" and "Templates".
 
-**Architecture:** (1) Broaden `arena`'s own local `canViewSurvey` copy the same way as the upstream
-`arena-core` fix, so the existing inline check in the clone POST route becomes template-aware for
-free. (2) Add one new manager function + GET route that lists a source survey's chains via that same
-(now template-aware) check, bypassing the generic `/processing-chains` route (which stays gated by
-the write-capable `canAnalyzeRecords` permission and must not be relaxed). (3) Update the dialog to
-fetch published templates alongside surveys and render them as two grouped dropdown sections, and to
-call the new endpoint instead of the generic one.
+**Architecture:** (1) Add a new, narrow `canViewSurveyOrPublishedTemplate` predicate alongside the
+existing `canViewSurvey` in `arena`'s local authorizer — additive, not a broadening of `canViewSurvey`
+itself. (2) Add two new manager functions + GET routes: one lists a source survey's chains, the other
+returns a source chain's analysis-attribute parent entity names — both gated by the new predicate,
+bypassing the generic `/processing-chains` and `/survey/:surveyId/full` routes (which stay exactly as
+membership-gated as today). (3) Update the dialog to fetch published templates alongside surveys,
+render them as two grouped dropdown sections, and call the two new endpoints instead of the generic
+ones.
 
 **Tech Stack:** Node.js/Express, React, TypeScript/JavaScript, Jest (unit + integration), Webpack.
 
-**Repo:** This plan targets the `arena` monorepo (this repo). It depends on the other two plans in
-this series only for one specific sub-behavior (see Task 1's note) — everything else here is fully
-independent and can be implemented and tested right now.
+**Repo:** This plan targets the `arena` monorepo (this repo) only. `arena-core` and `arena-server`
+need no changes — see the "Revision" note below and the design spec's "Rejected approach" section for
+why.
+
+## Revision (post Task-1/2 final review)
+
+Tasks 1 and 2 below were originally written to broaden the shared `canViewSurvey` (mirroring an
+`arena-core` fix in a sibling repo) and were implemented that way first. A final whole-branch review
+of the `arena-core` side of that approach caught a real problem before merge: `canViewSurvey`'s actual
+blast radius is much wider than "read-only structural metadata" — it also backs
+`requireRecordListViewPermission` in `arena-server`, gating record listing, RDB data queries, the
+activity log, full survey export, and a user-group-members endpoint that returns emails. Broadening it
+would have opened all of that to any authenticated user for any published template.
+
+**Decision:** don't touch `canViewSurvey` (in either repo) at all. The `arena-core` PR
+(`feat/can-view-survey-template`) is abandoned, unmerged. Everything moved into a new, narrow,
+*additive* predicate in `arena`'s own authorizer, used only by the three call sites this feature
+needs. The task text below has been corrected to match what was actually built:
+
+- `core/auth/authorizer.ts`: `canViewSurvey` is unchanged (back to its original form). A new sibling,
+  `canViewSurveyOrPublishedTemplate`, is exported alongside it:
+  ```ts
+  export const canViewSurveyOrPublishedTemplate = (user: ArenaUser, surveyInfo: ArenaSurvey): boolean =>
+    canViewSurvey(user, surveyInfo) || Boolean(user && Survey.isTemplate(surveyInfo) && Survey.isPublished(surveyInfo))
+  ```
+  (The `Boolean(user && ...)` guard closes a gap the reviewed-and-rejected `canViewSurvey` broadening
+  had: it returned `true` even for a falsy `user`.)
+- `chainApi.js`'s existing POST clone route's inline check swaps from `Authorizer.canViewSurvey` to
+  `Authorizer.canViewSurveyOrPublishedTemplate`.
+- The chains-list manager function/route (Task 2) uses the new predicate instead of `canViewSurvey`,
+  via a small shared private helper (`_checkCanViewSourceSurveyForClone`) in
+  `server/modules/analysis/manager/chain/index.js`.
+- A **second** new manager function + route was added to Task 2's scope:
+  `fetchChainSourceEntityNames({ user, sourceSurveyId, sourceChainUuid })` /
+  `GET /survey/:surveyId/chain/clone-from-survey/entities?sourceSurveyId=X&sourceChainUuid=Y`. This
+  wasn't needed under the broadened-`canViewSurvey` design (the existing `/survey/:surveyId/full`
+  route would have "just worked"), but is needed now since that route is unchanged and still requires
+  membership — so the entity-compatibility check needs its own dedicated, narrow-predicate-gated
+  endpoint too.
+- Task 3's `onChainChange` change (below) reflects this: it calls the new entities endpoint instead of
+  `API.fetchSurveyFull`.
+
+If you're re-reading Task 1 or Task 2's step-by-step text below for reference, mentally substitute
+`canViewSurveyOrPublishedTemplate` wherever it says `canViewSurvey`, and note the second manager
+function/route existed from the start of Task 2 rather than being added later. Both tasks' actual
+code is already implemented, tested, and committed — this note exists so Task 3's dispatch (and any
+future reader) has the accurate picture without re-deriving it from two supersede-in-place task
+bodies.
 
 ## Global Constraints
 
@@ -618,12 +664,14 @@ EOF
 - Modify: `webapp/views/App/views/Analysis/Chains/ChainCloneFromSurveyDialog/ChainCloneFromSurveyDialog.tsx`
 
 **Interfaces:**
-- Consumes: `Task 2`'s `GET /survey/:surveyId/chain/clone-from-survey/chains` route;
+- Consumes: Task 2's `GET /survey/:surveyId/chain/clone-from-survey/chains` route and (per the
+  Revision note above) its sibling `GET /survey/:surveyId/chain/clone-from-survey/entities` route;
   `API.fetchSurveys({ draft, template, withChains })` (already exists, `webapp/service/api/survey/index.js:20`).
-- Produces: `API.fetchChainsForCloneFromSurvey({ targetSurveyId, sourceSurveyId }): Promise<{ chains: object[] }>`.
-  No other file consumes this in this plan.
+- Produces: `API.fetchChainsForCloneFromSurvey({ targetSurveyId, sourceSurveyId }): Promise<{ chains: object[] }>`
+  and `API.fetchChainSourceEntityNames({ targetSurveyId, sourceSurveyId, sourceChainUuid }): Promise<{ entityNames: string[] }>`.
+  No other file consumes these in this plan.
 
-- [ ] **Step 1: Add the new API client function**
+- [ ] **Step 1: Add the new API client functions**
 
 Open `webapp/service/api/analysis/index.js`, currently:
 
@@ -664,11 +712,20 @@ export const fetchChainsForCloneFromSurvey = async ({ targetSurveyId, sourceSurv
   return { chains }
 }
 
+export const fetchChainSourceEntityNames = async ({ targetSurveyId, sourceSurveyId, sourceChainUuid }) => {
+  const {
+    data: { entityNames },
+  } = await axios.get(`/api/survey/${targetSurveyId}/chain/clone-from-survey/entities`, {
+    params: { sourceSurveyId, sourceChainUuid },
+  })
+  return { entityNames }
+}
+
 export const getChainSummaryExportUrl = ({ surveyId, chainUuid }) =>
   `/api/survey/${surveyId}/chain/${chainUuid}/summary`
 ```
 
-- [ ] **Step 2: Export it from the API barrel**
+- [ ] **Step 2: Export them from the API barrel**
 
 Open `webapp/service/api/index.js`, find:
 
@@ -682,6 +739,7 @@ Replace with:
 export {
   fetchChains,
   fetchChainsForCloneFromSurvey,
+  fetchChainSourceEntityNames,
   getChainSummaryExportUrl,
   cloneChainFromSurvey,
   deleteChain,
@@ -874,7 +932,93 @@ Replace with:
   )
 ```
 
-- [ ] **Step 6: Type-check**
+- [ ] **Step 6: Update `onChainChange` to fetch entity names from the new endpoint**
+
+Find `onChainChange` (search for "check entity compatibility by fetching"):
+
+```ts
+  // When a chain is selected, check entity compatibility by fetching the source survey's
+  // full node defs (including analysis attributes).
+  const onChainChange = useCallback(
+    async (item: ChainItem | null) => {
+      setSelectedChainItem(item)
+      setEntityCheckItems([])
+      setSkipMissingEntities(false)
+      if (!item || !selectedSurveyItem) return
+      setLoadingEntityCheck(true)
+      try {
+        const sourceSurvey = await API.fetchSurveyFull({
+          surveyId: selectedSurveyItem.value,
+          advanced: true,
+          includeAnalysis: true,
+        } as any)
+        const chainUuid = item.value
+        const sourceAnalysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(
+          (nd: object) => NodeDef.isAnalysis(nd) && NodeDef.getChainUuid(nd) === chainUuid
+        )
+        // Collect unique parent entity names.
+        const parentEntityNames: string[] = []
+        sourceAnalysisNodeDefs.forEach((nd: object) => {
+          const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey)
+          if (parentEntity) {
+            const name = NodeDef.getName(parentEntity)
+            if (!parentEntityNames.includes(name)) parentEntityNames.push(name)
+          }
+        })
+        setEntityCheckItems(
+          parentEntityNames.map((entityName) => ({
+            entityName,
+            found: targetEntityNames.has(entityName),
+          }))
+        )
+      } finally {
+        setLoadingEntityCheck(false)
+      }
+    },
+    [selectedSurveyItem, targetEntityNames]
+  )
+```
+
+Replace with (the only change is where `parentEntityNames` comes from — the found/missing computation
+against `targetEntityNames` is identical):
+
+```ts
+  // When a chain is selected, check entity compatibility using the source chain's analysis
+  // attributes' parent entity names (works for templates too, since fetching the source survey's
+  // full structure directly is membership-gated and unavailable for a non-member on a template).
+  const onChainChange = useCallback(
+    async (item: ChainItem | null) => {
+      setSelectedChainItem(item)
+      setEntityCheckItems([])
+      setSkipMissingEntities(false)
+      if (!item || !selectedSurveyItem) return
+      setLoadingEntityCheck(true)
+      try {
+        const { entityNames } = await API.fetchChainSourceEntityNames({
+          targetSurveyId: currentSurveyId,
+          sourceSurveyId: selectedSurveyItem.value,
+          sourceChainUuid: item.value,
+        } as any)
+        setEntityCheckItems(
+          (entityNames as string[]).map((entityName) => ({
+            entityName,
+            found: targetEntityNames.has(entityName),
+          }))
+        )
+      } finally {
+        setLoadingEntityCheck(false)
+      }
+    },
+    [currentSurveyId, selectedSurveyItem, targetEntityNames]
+  )
+```
+
+Note: `NodeDef` may no longer be used elsewhere in this file after this change — if `npx eslint` (Step
+8) flags it as an unused import, remove it; if `Survey.getNodeDefsArray`/`Survey.getNodeDefByUuid` are
+also now unused, leave the `Survey` import itself (it's still used elsewhere in this file, e.g.
+`Survey.getIdSurveyInfo`, `Survey.getLabel`, `Survey.getName`).
+
+- [ ] **Step 7: Type-check**
 
 ```bash
 npx tsc --noEmit -p .
@@ -883,15 +1027,16 @@ npx tsc --noEmit -p .
 Expected: no new type errors introduced by this file (pre-existing unrelated errors, if any, are not
 this task's concern).
 
-- [ ] **Step 7: Lint**
+- [ ] **Step 8: Lint**
 
 ```bash
 npx eslint --cache --fix webapp/service/api/analysis/index.js webapp/service/api/index.js webapp/views/App/views/Analysis/Chains/ChainCloneFromSurveyDialog/ChainCloneFromSurveyDialog.tsx
 ```
 
-Expected: no errors.
+Expected: no errors (this is also where an unused `NodeDef` import from Step 6, if any, gets caught —
+fix it here if so).
 
-- [ ] **Step 8: Manual verification in the browser**
+- [ ] **Step 9: Manual verification in the browser**
 
 ```bash
 yarn watch
@@ -916,7 +1061,7 @@ Report back what you observed (screenshots or a plain description of each step's
 just "it works" — this is the only verification this feature gets, since this codebase has no webapp
 component test suite for dialogs like this one.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add webapp/service/api/analysis/index.js webapp/service/api/index.js webapp/views/App/views/Analysis/Chains/ChainCloneFromSurveyDialog/ChainCloneFromSurveyDialog.tsx
@@ -927,9 +1072,10 @@ The source-survey dropdown in ChainCloneFromSurveyDialog now also offers
 published templates (fetched alongside regular surveys), grouped under
 "Surveys" and "Templates" headings using the Dropdown component's
 existing support for react-select's native grouped-options shape.
-Fetching a selected source survey's chains now goes through the new
-fetchChainsForCloneFromSurvey endpoint (added in the previous commit),
-which works for templates too.
+Fetching a selected source survey's chains and its entity-compatibility
+check now go through the new fetchChainsForCloneFromSurvey /
+fetchChainSourceEntityNames endpoints (added in a previous commit),
+which work for templates too.
 
 Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
 EOF
@@ -938,15 +1084,5 @@ EOF
 
 ---
 
-## Follow-up (not a task in this plan)
-
-Once the `arena-core` and `arena-server` PRs (see their own repos'
-`docs/superpowers/plans/2026-08-28-*.md`) are merged and published, bump this repo's
-`@openforis/arena-server` dependency in `package.json` (currently `^2.2.3`) to the newly published
-version and run `yarn install`, in a separate small commit/PR. This is what makes the
-entity-compatibility check (`GET /survey/:surveyId/full`, used by `onChainChange`) work for a
-non-member user browsing a published template — everything in this plan's three tasks works and is
-tested independently of that bump, but the feature is only fully end-to-end functional for non-admin
-users once it lands. The exact target version isn't known yet (`arena-core`'s automated CI version
-bump hasn't happened), so it isn't written here as a task — check `npm view @openforis/arena-server
-versions` once ready.
+Everything needed for this feature is now self-contained in this repo — there is no follow-up
+dependency on `arena-core` or `arena-server` (see the Revision note above).
