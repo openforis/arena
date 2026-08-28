@@ -112,7 +112,7 @@ GET /survey/:surveyId/chain/clone-from-survey/chains?sourceSurveyId=X
 **New API client — `webapp/service/api/analysis/index.js`:**
 
 ```js
-export const fetchChainsToCloneFromSurvey = async ({ targetSurveyId, sourceSurveyId }) => {
+export const fetchChainsForCloneFromSurvey = async ({ targetSurveyId, sourceSurveyId }) => {
   const {
     data: { list: chains },
   } = await axios.get(`/api/survey/${targetSurveyId}/chain/clone-from-survey/chains`, {
@@ -124,7 +124,7 @@ export const fetchChainsToCloneFromSurvey = async ({ targetSurveyId, sourceSurve
 
 **`ChainCloneFromSurveyDialog.tsx`:**
 
-- `onSurveyChange` calls `API.fetchChainsToCloneFromSurvey({ targetSurveyId: currentSurveyId,
+- `onSurveyChange` calls `API.fetchChainsForCloneFromSurvey({ targetSurveyId: currentSurveyId,
   sourceSurveyId: item.value })` instead of `API.fetchChains({ surveyId: item.value })`. This is used
   for every selected source survey, template or not — one code path, no branching on template-ness.
 - `onChainChange` (entity-compatibility check via `API.fetchSurveyFull`) is **unchanged** — it already
