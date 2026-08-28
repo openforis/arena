@@ -44,9 +44,8 @@ export const init = (app) => {
       try {
         const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
-        const { sourceSurveyId, sourceTaxonomyUuid } = Request.getBody(req)
-
-        if (!sourceTaxonomyUuid) throw new Error('sourceTaxonomyUuid is required')
+        const { sourceSurveyId } = Request.getBody(req)
+        const sourceTaxonomyUuid = Request.getRequiredParam(req, 'sourceTaxonomyUuid')
 
         const taxonomy = await TaxonomyService.cloneTaxonomyFromSurvey({
           user,

@@ -34,9 +34,8 @@ export const init = (app) => {
       try {
         const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
-        const { sourceSurveyId, sourceCategoryUuid } = Request.getBody(req)
-
-        if (!sourceCategoryUuid) throw new Error('sourceCategoryUuid is required')
+        const { sourceSurveyId } = Request.getBody(req)
+        const sourceCategoryUuid = Request.getRequiredParam(req, 'sourceCategoryUuid')
 
         const category = await CategoryService.cloneCategoryFromSurvey({
           user,

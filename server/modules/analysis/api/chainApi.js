@@ -1,10 +1,6 @@
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import UnauthorizedError from '@server/utils/unauthorizedError'
-
-import * as Authorizer from '@core/auth/authorizer'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as AnalysisService from '../service'
 
@@ -32,16 +28,11 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId } = Request.getParams(req)
-        const { sourceSurveyId, sourceChainUuid, skipMissingEntityAttributes = false } = Request.getBody(req)
+        const { skipMissingEntityAttributes = false } = Request.getBody(req)
         const user = Request.getUser(req)
 
-        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
-        if (!sourceChainUuid) throw new Error('sourceChainUuid is required')
-
-        const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId })
-        if (!Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
-          throw new UnauthorizedError(user?.name)
-        }
+        const sourceSurveyId = Request.getRequiredParam(req, 'sourceSurveyId')
+        const sourceChainUuid = Request.getRequiredParam(req, 'sourceChainUuid')
 
         const chain = await AnalysisService.cloneChainFromSurvey({
           user,
@@ -52,6 +43,45 @@ export const init = (app) => {
         })
 
         res.json(chain)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/chain/clone-from-survey/chains',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const sourceSurveyId = Request.getRequiredIntegerParam(req, 'sourceSurveyId')
+
+        const list = await AnalysisService.fetchChainsForCloneFromSurvey({ user, sourceSurveyId })
+
+        res.json({ list })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/chain/clone-from-survey/entities',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const sourceSurveyId = Request.getRequiredIntegerParam(req, 'sourceSurveyId')
+        const sourceChainUuid = Request.getRequiredParam(req, 'sourceChainUuid')
+
+        const entityNames = await AnalysisService.fetchChainSourceEntityNames({
+          user,
+          sourceSurveyId,
+          sourceChainUuid,
+        })
+
+        res.json({ entityNames })
       } catch (error) {
         next(error)
       }

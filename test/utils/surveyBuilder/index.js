@@ -47,6 +47,7 @@ class SurveyBuilder {
 
     this.categoryBuilders = []
     this.taxonomyBuilders = []
+    this.isTemplate = false
   }
 
   categories(...categoryBuilders) {
@@ -59,12 +60,18 @@ class SurveyBuilder {
     return this
   }
 
+  template(value = true) {
+    this.isTemplate = value
+    return this
+  }
+
   async build() {
     let survey = Survey.newSurvey({
       ownerUuid: User.getUuid(this.user),
       name: this.name,
       label: this.label,
       languages: [this.lang],
+      template: this.isTemplate,
     })
 
     // categories
