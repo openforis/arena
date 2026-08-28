@@ -53,7 +53,9 @@ export const getMaxSurveysUserCanCreate = (user: ArenaUser): number => {
 }
 
 export const canViewSurvey = (user: ArenaUser, surveyInfo: ArenaSurvey): boolean =>
-  User.isSystemAdmin(user) || _hasAuthGroupForSurvey({ user, surveyInfo })
+  User.isSystemAdmin(user) ||
+  _hasAuthGroupForSurvey({ user, surveyInfo }) ||
+  (Survey.isTemplate(surveyInfo) && Survey.isPublished(surveyInfo))
 export const canExportSurvey = _hasSurveyPermission(permissions.recordAnalyse)
 export const canExportSurveysList = (user: ArenaUser): boolean => User.isSystemAdmin(user)
 export const canViewTemplates = (user: ArenaUser): boolean => User.isSystemAdmin(user)
