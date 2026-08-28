@@ -58,6 +58,25 @@ export const init = (app) => {
     }
   )
 
+  app.get(
+    '/survey/:surveyId/chain/clone-from-survey/chains',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { sourceSurveyId } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
+
+        const list = await AnalysisService.fetchChainsForCloneFromSurvey({ user, sourceSurveyId })
+
+        res.json({ list })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ====== READ - Chains
 
   app.get(

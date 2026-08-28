@@ -8,6 +8,7 @@ export {
   updateChainStatusExec,
   deleteChain,
   cloneChainFromSurvey,
+  fetchChainsForCloneFromSurvey,
 } from './chain'
 
 export { cleanChains } from './chainsCleanManager'

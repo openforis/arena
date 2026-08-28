@@ -11,6 +11,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 import { uuidv4 } from '@core/uuid'
 import SystemError from '@core/systemError'
+import * as User from '@core/user/user'
+import * as Authorizer from '@core/auth/authorizer'
 
 import { TableChain } from '@common/model/db'
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -23,6 +25,7 @@ import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaR
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 import * as DB from '@server/db'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 
 import * as ChainRepository from '../../repository/chain'
 
@@ -232,6 +235,16 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
       [Chain.keysProps.selectedRecordUuids]: undefined,
     }).filter(([, v]) => v !== undefined)
   )
+}
+
+// ====== READ - Chains available to clone from another survey
+
+export const fetchChainsForCloneFromSurvey = async ({ user, sourceSurveyId }) => {
+  const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId })
+  if (!Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+  return fetchChains({ surveyId: sourceSurveyId })
 }
 
 export const cloneChainFromSurvey = async (

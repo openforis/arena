@@ -16,6 +16,7 @@ export {
   deleteChain,
   // ======  CLONE - Chain
   cloneChainFromSurvey,
+  fetchChainsForCloneFromSurvey,
   // ======  UTILS
   cleanChains,
 } from '../manager'
