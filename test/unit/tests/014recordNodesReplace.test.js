@@ -35,13 +35,17 @@ describe('RecordNodesUpdater (replace nodes) Test', () => {
     expect(clusterDef).not.toBeNull()
     const clusterNumDef = SurveyUtils.getNodeDefByPath({ survey, path: 'cluster/cluster_num' })
 
-    const { record: recordUpdated } = await Record.updateAttributesWithValues({
+    const { record: recordUpdatedRaw } = await Record.updateAttributesWithValues({
       survey,
       entityDefUuid: clusterDef.uuid,
       valuesByDefUuid: {
         [clusterNumDef.uuid]: 11,
       },
     })(record)
+    // replaceUpdatedNodes only replaces a value when its dateModified is after the target's:
+    // shift it into the future so the outcome doesn't depend on record and recordUpdated being
+    // built within the same millisecond (they're built back-to-back, synchronously).
+    const recordUpdated = RecordUtils.shiftDateModifiedIntoTheFuture(recordUpdatedRaw)
 
     const { record: recordTargetMerged } = await Record.replaceUpdatedNodes({
       survey,
