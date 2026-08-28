@@ -11,6 +11,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 import { uuidv4 } from '@core/uuid'
 import SystemError from '@core/systemError'
+import * as User from '@core/user/user'
+import * as Authorizer from '@core/auth/authorizer'
 
 import { TableChain } from '@common/model/db'
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -23,6 +25,7 @@ import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaR
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 import * as DB from '@server/db'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 
 import * as ChainRepository from '../../repository/chain'
 
@@ -234,11 +237,83 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
   )
 }
 
+// ====== READ - Chains available to clone from another survey
+
+/**
+ * Checks that the given user is allowed to view the source survey used as a chain-clone source
+ * (a survey they have access to, or a published template, per
+ * `Authorizer.canViewSurveyOrPublishedTemplate`). Throws when the check fails.
+ *
+ * @param {object} params - Parameters.
+ * @param {object} params.user - User requesting to view the source survey.
+ * @param {number} params.sourceSurveyId - Id of the survey to be used as a chain-clone source.
+ * @returns {Promise<void>} Resolves when the user is authorized.
+ * @throws {UnauthorizedError} If the user cannot view the source survey.
+ */
+const _checkCanViewSourceSurveyForClone = async ({ user, sourceSurveyId }) => {
+  const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId })
+  if (!Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+}
+
+/**
+ * Fetches the chains of a survey to be offered as clone sources, after checking that the user is
+ * allowed to view that source survey (own survey, membership survey, or published template).
+ *
+ * @param {object} params - Parameters.
+ * @param {object} params.user - User requesting the list of chains.
+ * @param {number} params.sourceSurveyId - Id of the source survey to fetch chains from.
+ * @returns {Promise<Array<object>>} The chains belonging to the source survey.
+ * @throws {UnauthorizedError} If the user is not allowed to view the source survey.
+ */
+export const fetchChainsForCloneFromSurvey = async ({ user, sourceSurveyId }) => {
+  await _checkCanViewSourceSurveyForClone({ user, sourceSurveyId })
+  return fetchChains({ surveyId: sourceSurveyId })
+}
+
+/**
+ * Fetches the distinct names of the entities holding analysis attributes of a source chain, after
+ * checking that the user is allowed to view the source survey (own survey, membership survey, or
+ * published template). Used to check entity compatibility with a target survey before cloning.
+ *
+ * @param {object} params - Parameters.
+ * @param {object} params.user - User requesting the entity names.
+ * @param {number} params.sourceSurveyId - Id of the source survey the chain belongs to.
+ * @param {string} params.sourceChainUuid - Uuid of the source chain to inspect.
+ * @returns {Promise<Array<string>>} Distinct entity names holding analysis attributes of the chain.
+ * @throws {UnauthorizedError} If the user is not allowed to view the source survey.
+ */
+export const fetchChainSourceEntityNames = async ({ user, sourceSurveyId, sourceChainUuid }) => {
+  await _checkCanViewSourceSurveyForClone({ user, sourceSurveyId })
+
+  const sourceSurvey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
+    surveyId: sourceSurveyId,
+    draft: true,
+    advanced: true,
+    includeAnalysis: true,
+  })
+  const sourceAnalysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(
+    (nd) => NodeDef.isAnalysis(nd) && NodeDef.getChainUuid(nd) === sourceChainUuid
+  )
+  const entityNames = []
+  sourceAnalysisNodeDefs.forEach((nd) => {
+    const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey)
+    if (parentEntity) {
+      const name = NodeDef.getName(parentEntity)
+      if (!entityNames.includes(name)) entityNames.push(name)
+    }
+  })
+  return entityNames
+}
+
 export const cloneChainFromSurvey = async (
   { user, surveyId, sourceSurveyId, sourceChainUuid, skipMissingEntityAttributes = false },
   client = DB.client
-) =>
-  client.tx(async (tx) => {
+) => {
+  await _checkCanViewSourceSurveyForClone({ user, sourceSurveyId })
+
+  return client.tx(async (tx) => {
     const fetchSurveyFull = (sid) =>
       SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
         { surveyId: sid, draft: true, advanced: true, includeAnalysis: true },
@@ -360,3 +435,4 @@ export const cloneChainFromSurvey = async (
 
     return Chain.assocValidation(validation)(insertedChain)
   })
+}

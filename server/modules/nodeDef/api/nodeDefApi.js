@@ -215,12 +215,11 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId } = Request.getParams(req)
-        const { sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid } = Request.getBody(req)
         const user = Request.getUser(req)
 
-        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
-        if (!sourceNodeDefUuid) throw new Error('sourceNodeDefUuid is required')
-        if (!targetParentNodeDefUuid) throw new Error('targetParentNodeDefUuid is required')
+        const sourceSurveyId = Request.getRequiredParam(req, 'sourceSurveyId')
+        const sourceNodeDefUuid = Request.getRequiredParam(req, 'sourceNodeDefUuid')
+        const targetParentNodeDefUuid = Request.getRequiredParam(req, 'targetParentNodeDefUuid')
 
         const { nodeDefsUpdated, nodeDefsValidation, categoriesCloned, taxonomiesCloned } =
           await NodeDefService.cloneNodeDefFromSurvey({
@@ -242,15 +241,11 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, nodeDefUuid } = Request.getParams(req)
-        const { targetParentNodeDefUuid } = Request.getBody(req)
+        const { surveyId } = Request.getParams(req)
 
-        if (!nodeDefUuid) {
-          throw new Error('nodeDefUuid is required')
-        }
-        if (!targetParentNodeDefUuid) {
-          throw new Error('targetParentNodeDefUuid is required')
-        }
+        const nodeDefUuid = Request.getRequiredParam(req, 'nodeDefUuid')
+        const targetParentNodeDefUuid = Request.getRequiredParam(req, 'targetParentNodeDefUuid')
+
         const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.cloneNodeDef({
           surveyId,
           nodeDefUuid,
