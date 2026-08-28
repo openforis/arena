@@ -42,7 +42,7 @@ export const getRequiredParam = (req, param) => {
 export const getRequiredIntegerParam = (req, param) => {
   const value = getRequiredParam(req, param)
   if (!Number.isInteger(Number(value))) {
-    throw new Error(`${param} must be a valid integer`)
+    throw new TypeError(`${param} must be a valid integer`)
   }
   return value
 }
