@@ -99,3 +99,31 @@ describe('Job start default client', () => {
     dbTxSpy.mockRestore()
   })
 })
+
+// Regression test for a production bug found after this whole migration shipped: arena's original
+// Job.execute() was a concrete, empty-body no-op ("to be extended by subclasses"), so any subclass
+// could safely call `super.execute()` defensively without knowing whether an ancestor overrides it.
+// JobBase.execute() is declared `protected abstract`, which TypeScript compiles to *no runtime
+// property at all* - so `super.execute()` throws "TypeError: (intermediate value).execute is not a
+// function" the moment it's reached, since nothing in the prototype chain provides a real function.
+// This crashed RecordsImportJob (server/modules/mobile/service/arenaMobileDataImport/jobs/) in
+// production; FlatDataImportJob.js has the identical pattern and would crash the same way.
+describe('Job execute default', () => {
+  test('is a real, concrete no-op that a subclass can safely call via super.execute()', async () => {
+    class IntermediateJob extends Job {
+      // Intentionally does not override execute() - matches DataImportBaseJob, which sits between
+      // RecordsImportJob and Job without its own execute() override, so super.execute() from the
+      // leaf subclass falls all the way through to Job/JobBase's own default.
+    }
+    class LeafJob extends IntermediateJob {
+      async execute() {
+        await super.execute()
+      }
+    }
+    const job = new LeafJob('LeafJob')
+
+    await job.start()
+
+    expect(job.isSucceeded()).toBe(true)
+  })
+})
