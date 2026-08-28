@@ -1,5 +1,6 @@
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as Request from '@server/utils/request'
+import * as RequestParamsUtils from '@server/utils/requestParamsUtils'
 import * as Response from '@server/utils/response'
 
 import * as AnalysisService from '../service'
@@ -28,11 +29,11 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId } = Request.getParams(req)
-        const { sourceSurveyId, sourceChainUuid, skipMissingEntityAttributes = false } = Request.getBody(req)
+        const { skipMissingEntityAttributes = false } = Request.getBody(req)
         const user = Request.getUser(req)
 
-        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
-        if (!sourceChainUuid) throw new Error('sourceChainUuid is required')
+        const sourceSurveyId = RequestParamsUtils.checkRequired(req, 'sourceSurveyId')
+        const sourceChainUuid = RequestParamsUtils.checkRequired(req, 'sourceChainUuid')
 
         const chain = await AnalysisService.cloneChainFromSurvey({
           user,
@@ -54,11 +55,8 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { sourceSurveyId } = Request.getParams(req)
         const user = Request.getUser(req)
-
-        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
-        if (!Number.isInteger(Number(sourceSurveyId))) throw new Error('sourceSurveyId must be a valid integer')
+        const sourceSurveyId = RequestParamsUtils.checkRequiredInteger(req, 'sourceSurveyId')
 
         const list = await AnalysisService.fetchChainsForCloneFromSurvey({ user, sourceSurveyId })
 
@@ -74,12 +72,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { sourceSurveyId, sourceChainUuid } = Request.getParams(req)
         const user = Request.getUser(req)
-
-        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
-        if (!Number.isInteger(Number(sourceSurveyId))) throw new Error('sourceSurveyId must be a valid integer')
-        if (!sourceChainUuid) throw new Error('sourceChainUuid is required')
+        const sourceSurveyId = RequestParamsUtils.checkRequiredInteger(req, 'sourceSurveyId')
+        const sourceChainUuid = RequestParamsUtils.checkRequired(req, 'sourceChainUuid')
 
         const entityNames = await AnalysisService.fetchChainSourceEntityNames({
           user,

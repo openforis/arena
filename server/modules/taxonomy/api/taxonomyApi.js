@@ -1,4 +1,5 @@
 import * as Request from '../../../utils/request'
+import * as RequestParamsUtils from '../../../utils/requestParamsUtils'
 import * as Response from '../../../utils/response'
 
 import { FileFormats } from '@core/fileFormats'
@@ -44,9 +45,8 @@ export const init = (app) => {
       try {
         const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
-        const { sourceSurveyId, sourceTaxonomyUuid } = Request.getBody(req)
-
-        if (!sourceTaxonomyUuid) throw new Error('sourceTaxonomyUuid is required')
+        const { sourceSurveyId } = Request.getBody(req)
+        const sourceTaxonomyUuid = RequestParamsUtils.checkRequired(req, 'sourceTaxonomyUuid')
 
         const taxonomy = await TaxonomyService.cloneTaxonomyFromSurvey({
           user,
