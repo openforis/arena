@@ -1,11 +1,13 @@
 import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as User from '@core/user/user'
 import * as Chain from '@common/analysis/chain'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as AnalysisManager from '@server/modules/analysis/manager'
+import * as UserRepository from '@server/modules/user/repository/userRepository'
 
 import UnauthorizedError from '@server/utils/unauthorizedError'
 
@@ -103,5 +105,65 @@ describe('Clone chain from another survey - templates', () => {
         sourceChainUuid: chainUuid,
       })
     ).rejects.toThrow(UnauthorizedError)
+  })
+
+  test('a user with no auth group can successfully clone a chain from a published template', async () => {
+    const adminUser = getContextUser()
+    const sourceSurveyId = Survey.getId(templateSurvey)
+
+    // A real, persisted user with no auth group on any survey. Unlike the plain `outsiderUser`
+    // object literal used by the read-only checks above, this test performs an actual clone,
+    // which writes an activity log entry referencing the acting user via a foreign key, so a
+    // user that only exists in memory (with no row in the "user" table) would fail on insert.
+    const outsiderRealUser = await UserRepository.insertUser({
+      email: `chain_clone_outsider_${uuidv4()}@openforis.org`,
+      password: 'test_password',
+      status: User.userStatus.ACCEPTED,
+      name: 'Chain Clone Outsider',
+    })
+
+    // Target survey the outsider clones the chain into; the outsider needs no permission on it
+    // for this test, which is only exercising the source-side authorization check.
+    const targetSurvey = await SB.survey(
+      adminUser,
+      SB.entity('cluster_tpl', SB.attribute('cluster_id_tpl', nodeDefType.integer).key())
+    ).buildAndStore()
+
+    try {
+      const targetSurveyId = Survey.getId(targetSurvey)
+
+      const clonedChain = await AnalysisManager.cloneChainFromSurvey({
+        user: outsiderRealUser,
+        surveyId: targetSurveyId,
+        sourceSurveyId,
+        sourceChainUuid: chainUuid,
+      })
+
+      expect(clonedChain).toBeDefined()
+      expect(Chain.getUuid(clonedChain)).not.toBe(chainUuid)
+    } finally {
+      await SurveyManager.deleteSurvey(Survey.getId(targetSurvey))
+      await UserRepository.deleteUser(User.getUuid(outsiderRealUser))
+    }
+  })
+
+  test('a user with no auth group cannot clone a chain from a draft (unpublished) template', async () => {
+    const user = getContextUser()
+    const draftTemplateSurvey = await SB.survey(
+      user,
+      SB.entity('cluster_draft_tpl', SB.attribute('cluster_id_draft_tpl', nodeDefType.integer).key())
+    )
+      .template()
+      .buildAndStore(false)
+
+    try {
+      const sourceSurveyId = Survey.getId(draftTemplateSurvey)
+
+      await expect(
+        AnalysisManager.fetchChainsForCloneFromSurvey({ user: outsiderUser, sourceSurveyId })
+      ).rejects.toThrow(UnauthorizedError)
+    } finally {
+      await SurveyManager.deleteSurvey(Survey.getId(draftTemplateSurvey))
+    }
   })
 })

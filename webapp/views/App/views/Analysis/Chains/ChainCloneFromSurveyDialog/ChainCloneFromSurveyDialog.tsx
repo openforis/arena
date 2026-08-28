@@ -99,7 +99,7 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
       const [publishedSurveys, draftSurveys, publishedTemplates] = await Promise.all([
         API.fetchSurveys({ draft: false, withChains: true }),
         API.fetchSurveys({ draft: true, withChains: true }),
-        API.fetchSurveys({ draft: false, template: true, withChains: true }),
+        API.fetchSurveys({ draft: false, template: true, withChains: true }).catch(() => []),
       ])
 
       // Deduplicate regular surveys by id, exclude current survey.

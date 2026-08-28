@@ -1,10 +1,6 @@
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import UnauthorizedError from '@server/utils/unauthorizedError'
-
-import * as Authorizer from '@core/auth/authorizer'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as AnalysisService from '../service'
 
@@ -38,11 +34,6 @@ export const init = (app) => {
         if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
         if (!sourceChainUuid) throw new Error('sourceChainUuid is required')
 
-        const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId })
-        if (!Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
-          throw new UnauthorizedError(user?.name)
-        }
-
         const chain = await AnalysisService.cloneChainFromSurvey({
           user,
           surveyId,
@@ -67,6 +58,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
 
         if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
+        if (!Number.isInteger(Number(sourceSurveyId))) throw new Error('sourceSurveyId must be a valid integer')
 
         const list = await AnalysisService.fetchChainsForCloneFromSurvey({ user, sourceSurveyId })
 
@@ -86,6 +78,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
 
         if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
+        if (!Number.isInteger(Number(sourceSurveyId))) throw new Error('sourceSurveyId must be a valid integer')
         if (!sourceChainUuid) throw new Error('sourceChainUuid is required')
 
         const entityNames = await AnalysisService.fetchChainSourceEntityNames({

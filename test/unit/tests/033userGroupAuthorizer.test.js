@@ -74,4 +74,10 @@ describe('Authorizer.canViewSurveyOrPublishedTemplate', () => {
     const templateSurveyInfo = { uuid: surveyUuid, template: true, published: true }
     expect(Authorizer.canViewSurveyOrPublishedTemplate(null, templateSurveyInfo)).toBe(false)
   })
+
+  test('user with an auth group can view even an unpublished template', () => {
+    const user = userWithGroup(AuthGroup.groupNames.dataEditor)
+    const templateSurveyInfo = { uuid: surveyUuid, template: true, published: false }
+    expect(Authorizer.canViewSurveyOrPublishedTemplate(user, templateSurveyInfo)).toBe(true)
+  })
 })
