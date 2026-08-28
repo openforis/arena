@@ -74,8 +74,8 @@ export const jobToJSON = (job) => ({
   [JobSerialized.keys.elapsedMillis]: calculatedElapsedMillis(job),
 
   // Output
-  [JobSerialized.keys.errors]: jobStatus.failed ? job.errors : null,
-  [JobSerialized.keys.result]: jobStatus.succeeded ? job.result : null,
+  [JobSerialized.keys.errors]: job.status === jobStatus.failed ? job.errors : null,
+  [JobSerialized.keys.result]: job.status === jobStatus.succeeded ? job.result : null,
 })
 
 export const jobRowToSummary = (jobRow) => {

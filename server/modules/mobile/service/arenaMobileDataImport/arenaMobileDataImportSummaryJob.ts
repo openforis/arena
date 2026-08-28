@@ -48,6 +48,8 @@ export default class ArenaMobileDataImportSummaryJob extends Job {
   async onEnd() {
     await super.onEnd()
 
+    this.errors = this.combineInnerJobsErrors()
+
     const context: any = this.context
     const { arenaSurveyFileZip, filePath, fileId } = context
 
