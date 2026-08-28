@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 
 import * as Request from '@server/utils/request'
-import * as RequestParamsUtils from '@server/utils/requestParamsUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -218,9 +217,9 @@ export const init = (app) => {
         const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const sourceSurveyId = RequestParamsUtils.checkRequired(req, 'sourceSurveyId')
-        const sourceNodeDefUuid = RequestParamsUtils.checkRequired(req, 'sourceNodeDefUuid')
-        const targetParentNodeDefUuid = RequestParamsUtils.checkRequired(req, 'targetParentNodeDefUuid')
+        const sourceSurveyId = Request.getRequiredParam(req, 'sourceSurveyId')
+        const sourceNodeDefUuid = Request.getRequiredParam(req, 'sourceNodeDefUuid')
+        const targetParentNodeDefUuid = Request.getRequiredParam(req, 'targetParentNodeDefUuid')
 
         const { nodeDefsUpdated, nodeDefsValidation, categoriesCloned, taxonomiesCloned } =
           await NodeDefService.cloneNodeDefFromSurvey({
@@ -244,8 +243,8 @@ export const init = (app) => {
       try {
         const { surveyId } = Request.getParams(req)
 
-        const nodeDefUuid = RequestParamsUtils.checkRequired(req, 'nodeDefUuid')
-        const targetParentNodeDefUuid = RequestParamsUtils.checkRequired(req, 'targetParentNodeDefUuid')
+        const nodeDefUuid = Request.getRequiredParam(req, 'nodeDefUuid')
+        const targetParentNodeDefUuid = Request.getRequiredParam(req, 'targetParentNodeDefUuid')
 
         const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.cloneNodeDef({
           surveyId,

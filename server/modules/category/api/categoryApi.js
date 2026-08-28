@@ -1,5 +1,4 @@
 import * as Request from '@server/utils/request'
-import * as RequestParamsUtils from '@server/utils/requestParamsUtils'
 import * as Response from '@server/utils/response'
 
 import * as Survey from '@core/survey/survey'
@@ -36,7 +35,7 @@ export const init = (app) => {
         const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
         const { sourceSurveyId } = Request.getBody(req)
-        const sourceCategoryUuid = RequestParamsUtils.checkRequired(req, 'sourceCategoryUuid')
+        const sourceCategoryUuid = Request.getRequiredParam(req, 'sourceCategoryUuid')
 
         const category = await CategoryService.cloneCategoryFromSurvey({
           user,
