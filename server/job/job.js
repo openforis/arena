@@ -47,6 +47,17 @@ export default class Job extends JobBase {
     return super.getErrorInfo(error)
   }
 
+  // Arena's original Job.execute() was a real, concrete no-op ("to be extended by subclasses"),
+  // so subclasses could safely call `super.execute()` defensively without knowing whether an
+  // ancestor overrides it. JobBase.execute() is declared `protected abstract`, which compiles to
+  // no runtime property at all - `super.execute()` then throws "(intermediate value).execute is
+  // not a function" the moment it's reached. This crashed RecordsImportJob (and would identically
+  // crash FlatDataImportJob) in production, since both call `super.execute()` from a subclass
+  // whose immediate parent (DataImportBaseJob) doesn't override execute() either.
+  async execute() {
+    // to be extended by subclasses
+  }
+
   // Deviation from the task-9 brief's exact code: JobBase only ever stores the transaction handle
   // as `this.context.tx`, never as a flat `this.tx`. Arena's original Job class exposed it as
   // `this.tx` directly, and ~50 existing Job subclasses (~108 call sites) read `this.tx` to pass
