@@ -83,6 +83,18 @@ export const findNodeByPath = (path) => (survey, record) => {
 
 export const findNodeValueByPath = (path) => (survey, record) => Node.getValue(findNodeByPath(path)(survey, record))
 
+// Record merge/replace conflict resolution (see recordsCombiner.js) picks the node with the most
+// recent dateModified. Records built back-to-back, synchronously, can land within the same
+// millisecond, making that comparison flaky; shifting one record's timestamps well into the
+// future removes the ambiguity.
+export const shiftDateModifiedIntoTheFuture = (record, offsetMillis = 60000) => ({
+  ...record,
+  nodes: R.map(
+    (node) => Node.assocDateModified(new Date(Node.getDateModified(node).getTime() + offsetMillis))(node),
+    record.nodes
+  ),
+})
+
 export const getValidationChildrenCount = (parentNode, childDef) =>
   R.pipe(
     Validation.getValidation,
