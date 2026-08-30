@@ -55,6 +55,7 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     hide: 'Masquer le sélecteur de définitions de nœud',
     show: 'Afficher le sélecteur de définitions de nœud',
     nodeDefFrequency: `{{nodeDefLabel}} (fréquence)`,
+    searchPlaceholder: 'Rechercher une variable par nom',
   },
   records: {
     clone: 'Cloner',
