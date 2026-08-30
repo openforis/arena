@@ -55,6 +55,7 @@ export default {
     hide: 'Зангилааны тодорхойлолтын сонгогчийг нуух',
     show: 'Зангилааны тодорхойлолтын сонгогчийг харуулах',
     nodeDefFrequency: `{{nodeDefLabel}} (давтамж)`,
+    searchPlaceholder: 'Хувьсагчийг нэрээр нь хайх',
   },
   records: {
     clone: 'Хувилах',
