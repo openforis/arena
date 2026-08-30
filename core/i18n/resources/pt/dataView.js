@@ -55,6 +55,7 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
     hide: 'Ocultar seletor de definições de nó',
     show: 'Mostrar seletor de definições de nó',
     nodeDefFrequency: `{{nodeDefLabel}} (frequência)`,
+    searchPlaceholder: 'Pesquisar variável por nome',
   },
   records: {
     clone: 'Clonar',

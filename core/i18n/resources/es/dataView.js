@@ -54,6 +54,7 @@ export default {
     hide: 'Ocultar selector de definiciones de nodo',
     show: 'Mostrar selector de definiciones de nodo',
     nodeDefFrequency: '{{nodeDefLabel}} (frecuencia)',
+    searchPlaceholder: 'Buscar variable por nombre',
   },
   records: {
     clone: 'Clonar',
