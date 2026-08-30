@@ -6,7 +6,6 @@ import { Query } from '@common/model/query'
 
 import { ButtonGroup } from '@webapp/components/form'
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
-import { NotificationActions } from '@webapp/store/ui'
 
 const { displayTypes, chartTypes, isChartTypeAvailable } = DataExplorerState
 
@@ -38,7 +37,7 @@ const getChartTypeItemByKey = (chartType) => ({
 const chartMaxItems = 5000
 
 export const ButtonGroupDisplayType = (props) => {
-  const { dataCount, setQueryLimit, setQueryOffset } = props
+  const { setQueryLimit, setQueryOffset, setQueryRandomize } = props
   const dispatch = useDispatch()
   const displayType = DataExplorerSelectors.useDisplayType()
   const chartType = DataExplorerSelectors.useChartType()
@@ -56,19 +55,13 @@ export const ButtonGroupDisplayType = (props) => {
         groupName="displayType"
         selectedItemKey={displayType}
         onChange={(type) => {
-          if (type === displayTypes.chart && dataCount > chartMaxItems) {
-            dispatch(
-              NotificationActions.showNotification({
-                key: 'dataView:charts.warning.tooManyItemsToShowChart',
-                params: { maxItems: chartMaxItems },
-              })
-            )
-            return
-          }
           dispatch(DataExplorerActions.setDisplayType(type))
           setQueryOffset(0)
-          const limitUpdated = type === displayTypes.chart ? null : 15
-          setQueryLimit(limitUpdated)
+          // raw (non-aggregate) charts fetch a bounded, randomly sampled set of rows instead of the whole
+          // filtered dataset, so large datasets no longer need to be filtered down before a chart can render
+          const isRawChart = type === displayTypes.chart && !Query.isModeAggregate(query)
+          setQueryLimit(type === displayTypes.chart ? (isRawChart ? chartMaxItems : null) : 15)
+          setQueryRandomize(isRawChart)
         }}
         items={displayTypeItems}
       />
@@ -85,7 +78,7 @@ export const ButtonGroupDisplayType = (props) => {
 }
 
 ButtonGroupDisplayType.propTypes = {
-  dataCount: PropTypes.number,
   setQueryLimit: PropTypes.func.isRequired,
   setQueryOffset: PropTypes.func.isRequired,
+  setQueryRandomize: PropTypes.func.isRequired,
 }

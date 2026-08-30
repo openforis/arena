@@ -15,7 +15,7 @@ export const useFetchData = ({ setData }) => {
 
   return {
     fetchData: useCallback(
-      async ({ offset, limit, query }) => {
+      async ({ offset, limit, randomize, query }) => {
         setData((dataPrev) => ({ ...dataPrev, loading: true, loaded: false, error: false }))
         try {
           const { data } = await axios.post(getUrl({ surveyId, query }), {
@@ -23,6 +23,7 @@ export const useFetchData = ({ setData }) => {
             query,
             limit,
             offset,
+            randomize,
           })
           setData({ data, loading: false, loaded: true })
         } catch (e) {

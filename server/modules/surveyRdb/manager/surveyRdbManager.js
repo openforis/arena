@@ -69,6 +69,7 @@ const maxExcelCellsLimit = 1000000
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.offset] - The query offset.
  * @param {number} [params.limit] - The query limit.
+ * @param {boolean} [params.randomize] - Whether to return a random sample of rows (up to limit) instead of the first ones, useful to visualize large datasets without fetching them entirely.
  * @param {boolean|object} [params.outputStream] - The output to be used to stream the data (if specified).
  * @param {string} [params.fileFormat] - The format of the output file (csv or xlsx).
  * @param {pgPromise.IDatabase} [client] - The database client.
@@ -85,6 +86,7 @@ export const fetchViewData = async (params, client = db) => {
     recordOwnerUuid = null,
     offset = 0,
     limit = null,
+    randomize = false,
     outputStream = null,
     fileFormat = null,
     addCycle = false,
@@ -109,6 +111,7 @@ export const fetchViewData = async (params, client = db) => {
       recordOwnerUuid,
       offset,
       limit,
+      randomize,
       stream: Boolean(outputStream),
     },
     client

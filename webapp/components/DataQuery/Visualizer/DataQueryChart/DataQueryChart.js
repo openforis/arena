@@ -24,7 +24,7 @@ const componentsByType = {
 }
 
 export const DataQueryChart = (props) => {
-  const { data, dataEmpty, dataLoading, nodeDefLabelType } = props
+  const { data, dataCount, dataEmpty, dataLoading, nodeDefLabelType } = props
 
   const i18n = useI18n()
   const chartType = DataExplorerSelectors.useChartType()
@@ -56,7 +56,7 @@ export const DataQueryChart = (props) => {
         title="dataView:charts.downloadToPng"
       />
       <div className="data-query-chart-wrapper" ref={wrapperRef}>
-        {React.createElement(componentsByType[chartType], { data, nodeDefLabelType })}
+        {React.createElement(componentsByType[chartType], { data, dataCount, nodeDefLabelType })}
       </div>
     </div>
   )
@@ -64,6 +64,7 @@ export const DataQueryChart = (props) => {
 
 DataQueryChart.propTypes = {
   data: PropTypes.array,
+  dataCount: PropTypes.number,
   dataEmpty: PropTypes.bool,
   dataLoading: PropTypes.bool,
   nodeDefLabelType: PropTypes.string,
