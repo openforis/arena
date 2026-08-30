@@ -55,6 +55,7 @@ export default {
     hide: 'Скрыть селектор определений узлов',
     show: 'Показать селектор определений узлов',
     nodeDefFrequency: `{{nodeDefLabel}} (частота)`,
+    searchPlaceholder: 'Поиск переменной по названию',
   },
   records: {
     clone: 'Клонировать',

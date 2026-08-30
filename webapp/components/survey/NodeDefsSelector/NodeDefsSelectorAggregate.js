@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -7,13 +7,15 @@ import * as Expression from '@core/expressionParser/expression'
 import { Query } from '@common/model/query'
 import * as StepVariable from '@common/analysis/stepVariable'
 
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
 
 import AttributesSelector from './AttributesSelector/AttributesSelector'
 import EntitySelector from './EntitySelector'
 import AttributeSelector from './AttributesSelector/AttributeSelector'
+import NodeDefsSelectorSearch from './NodeDefsSelectorSearch'
+import { combineNodeDefFilterFunctions, getNodeDefSearchFilterFunction } from './nodeDefsSelectorSearchUtils'
 
 const PREV_CALCULATIONS_ENABLED = false
 const getPrevCalculations = ({ nodeDefUuidEntity, survey }) => {
@@ -43,14 +45,20 @@ const NodeDefsSelectorAggregate = (props) => {
     onChangeMeasures,
     onChangeDimensions,
     showAnalysisAttributes = false,
+    showSearch = false,
   } = props
 
   const survey = useSurvey()
+  const lang = useSurveyPreferredLang()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)
+
+  const [search, setSearch] = useState('')
 
   const variablesPrevSteps = getPrevCalculations({ nodeDefUuidEntity, survey })
 
   const measuresNodeDefUuids = useMemo(() => Object.keys(measures), [measures])
+
+  const searchFilterFunction = useMemo(() => getNodeDefSearchFilterFunction({ search, lang }), [search, lang])
 
   const onToggleMeasure = (nodeDefUuid) => {
     const measuresUpdate = { ...measures }
@@ -92,15 +100,19 @@ const NodeDefsSelectorAggregate = (props) => {
 
       {nodeDefUuidEntity && (
         <>
+          {showSearch && <NodeDefsSelectorSearch search={search} setSearch={setSearch} />}
+
           <ExpansionPanel buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               onToggleAttribute={onToggleDimension}
-              filterFunction={(nodeDef) =>
-                NodeDef.isBoolean(nodeDef) ||
-                NodeDef.isCode(nodeDef) ||
-                NodeDef.isTaxon(nodeDef) ||
-                NodeDef.isKey(nodeDef)
-              }
+              filterFunction={combineNodeDefFilterFunctions(
+                (nodeDef) =>
+                  NodeDef.isBoolean(nodeDef) ||
+                  NodeDef.isCode(nodeDef) ||
+                  NodeDef.isTaxon(nodeDef) ||
+                  NodeDef.isKey(nodeDef),
+                searchFilterFunction
+              )}
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={dimensions}
@@ -114,7 +126,7 @@ const NodeDefsSelectorAggregate = (props) => {
           <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
-              filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef)}
+              filterFunction={combineNodeDefFilterFunctions((nodeDef) => !NodeDef.isKey(nodeDef), searchFilterFunction)}
               includeEntityFrequencySelector
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
@@ -159,6 +171,7 @@ NodeDefsSelectorAggregate.propTypes = {
   onChangeMeasures: PropTypes.func.isRequired,
   onChangeDimensions: PropTypes.func.isRequired,
   showAnalysisAttributes: PropTypes.bool,
+  showSearch: PropTypes.bool,
 }
 
 export default NodeDefsSelectorAggregate
