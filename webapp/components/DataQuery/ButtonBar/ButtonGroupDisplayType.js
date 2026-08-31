@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -49,20 +49,26 @@ export const ButtonGroupDisplayType = (props) => {
     return availableTypes.map(getChartTypeItemByKey)
   }, [queryMode])
 
+  const onDisplayTypeChange = useCallback(
+    (type) => {
+      dispatch(DataExplorerActions.setDisplayType(type))
+      setQueryOffset(0)
+      // raw (non-aggregate) charts fetch a bounded, randomly sampled set of rows instead of the whole
+      // filtered dataset, so large datasets no longer need to be filtered down before a chart can render
+      const isRawChart = type === displayTypes.chart && !Query.isModeAggregate(query)
+      const rawChartQueryLimit = isRawChart ? chartMaxItems : null
+      setQueryLimit(type === displayTypes.chart ? rawChartQueryLimit : 15)
+      setQueryRandomize(isRawChart)
+    },
+    [dispatch, query, setQueryLimit, setQueryOffset, setQueryRandomize]
+  )
+
   return (
     <div className="display-type-button-group-wrapper">
       <ButtonGroup
         groupName="displayType"
         selectedItemKey={displayType}
-        onChange={(type) => {
-          dispatch(DataExplorerActions.setDisplayType(type))
-          setQueryOffset(0)
-          // raw (non-aggregate) charts fetch a bounded, randomly sampled set of rows instead of the whole
-          // filtered dataset, so large datasets no longer need to be filtered down before a chart can render
-          const isRawChart = type === displayTypes.chart && !Query.isModeAggregate(query)
-          setQueryLimit(type === displayTypes.chart ? (isRawChart ? chartMaxItems : null) : 15)
-          setQueryRandomize(isRawChart)
-        }}
+        onChange={onDisplayTypeChange}
         items={displayTypeItems}
       />
       {displayType === displayTypes.chart && (
