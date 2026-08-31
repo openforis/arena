@@ -55,6 +55,8 @@ export default class RecordCheckJob extends Job {
 
       const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
 
+      await this._deleteNodesForDeletedNodeDefsOnce(surveyAndNodeDefs)
+
       const { requiresCheck } = surveyAndNodeDefs
 
       if (requiresCheck) {
@@ -120,30 +122,13 @@ export default class RecordCheckJob extends Job {
       const requiresCheck =
         cleanupRecords || nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
 
-      // Delete nodes belonging to deleted node defs once per cycle: the delete is survey-wide (not
-      // scoped to a single record - see RecordManager.deleteNodesByNodeDefUuids), so running it again
-      // for every one of potentially thousands of records would repeat the same full-table delete over
-      // and over for no additional effect. Each record's own check below reflects this locally, from
-      // its own already-loaded nodes, rather than from anything returned here (on a large survey this
-      // delete can match millions of rows - see RecordManager.deleteNodesByNodeDefUuids for why we
-      // don't pull those back into memory).
-      // One node def at a time (rather than a single IN (...) delete for all of them) so a failure or
-      // a memory spike can be pinned to the specific node def responsible, from the logs.
-      for (const nodeDefDeletedUuid of nodeDefDeletedUuids) {
-        this.logDebugOptional(`deleting nodes for removed node def ${nodeDefDeletedUuid}...`)
-        const deletedCount = await RecordManager.deleteNodesByNodeDefUuids(
-          { user: this.user, surveyId, nodeDefUuids: [nodeDefDeletedUuid] },
-          tx
-        )
-        this.logDebugOptional(`${deletedCount} nodes deleted for node def ${nodeDefDeletedUuid}`)
-      }
-
       result = {
         survey,
         nodeDefAddedUuids,
         nodeDefUpdatedUuids,
         nodeDefDeletedUuids,
         requiresCheck,
+        nodesForDeletedNodeDefsDeleted: false,
       }
 
       if (requiresCheck) {
@@ -167,6 +152,32 @@ export default class RecordCheckJob extends Job {
     return result
   }
 
+  // Deletes nodes belonging to deleted node defs once per cycle: the delete is survey-wide (not
+  // scoped to a single record - see RecordManager.deleteNodesByNodeDefUuids), so running it again
+  // for every one of potentially thousands of records would repeat the same full-table delete over
+  // and over for no additional effect. The `nodesForDeletedNodeDefsDeleted` flag on the cached
+  // surveyAndNodeDefs (shared across all records of the same cycle) guards that. Each record's own
+  // check reflects this locally, from its own already-loaded nodes, rather than from anything
+  // returned here (on a large survey this delete can match millions of rows - see
+  // RecordManager.deleteNodesByNodeDefUuids for why we don't pull those back into memory).
+  // One node def at a time (rather than a single IN (...) delete for all of them) so a failure or
+  // a memory spike can be pinned to the specific node def responsible, from the logs.
+  async _deleteNodesForDeletedNodeDefsOnce(surveyAndNodeDefs) {
+    const { nodeDefDeletedUuids, nodesForDeletedNodeDefsDeleted } = surveyAndNodeDefs
+    if (nodesForDeletedNodeDefsDeleted) return
+
+    const { surveyId, tx } = this
+    for (const nodeDefDeletedUuid of nodeDefDeletedUuids) {
+      this.logDebugOptional(`deleting nodes for removed node def ${nodeDefDeletedUuid}...`)
+      const deletedCount = await RecordManager.deleteNodesByNodeDefUuids(
+        { user: this.user, surveyId, nodeDefUuids: [nodeDefDeletedUuid] },
+        tx
+      )
+      this.logDebugOptional(`${deletedCount} nodes deleted for node def ${nodeDefDeletedUuid}`)
+    }
+    surveyAndNodeDefs.nodesForDeletedNodeDefsDeleted = true
+  }
+
   async _checkRecord({ surveyAndNodeDefs, recordUuid }) {
     const { context, surveyId, user, tx } = this
     const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, allNotDeletedNodeDefUuids } =
@@ -177,7 +188,7 @@ export default class RecordCheckJob extends Job {
 
     // 1. fetch record and nodes. Nodes belonging to deleted node defs are already gone at this point:
     // the survey-wide delete for this cycle ran earlier in the same transaction (see
-    // _getOrFetchSurveyAndNodeDefsByCycle), and this fetch sees that transaction's own writes, so
+    // _deleteNodesForDeletedNodeDefsOnce), and this fetch sees that transaction's own writes, so
     // there's nothing left here to additionally remove for nodeDefDeletedUuids.
     let record = await RecordManager.fetchRecordAndNodesByUuid(
       { surveyId, recordUuid, includeSurveyUuid: false, includeRecordUuid: false },
