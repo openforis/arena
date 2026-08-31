@@ -1014,6 +1014,10 @@ $t(common.appNameFull)
         label: 'Enumerate',
         info: `The rows will be automatically generated using the category items associated to a code attribute marked as Key defined inside the entity; rows cannot be added or deleted and the key code attribute won't be editable`,
       },
+      enumeratingItemsExpression: {
+        label: 'Enumerating items expression',
+        info: 'Optional expression that filters which category items are enumerated (e.g. unique(table_source.source_type)). When empty, all category items are used.',
+      },
       enumerator: {
         label: 'Enumerator',
         info: 'The items in the category will be used to generate the rows of the parent entity',

@@ -17,6 +17,7 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import { NodeDefExpressionsProp } from '../ExpressionsProp'
+import { NodeDefSingleExpressionProp } from '../ExpressionsProp/NodeDefSingleExpressionProp'
 import { useNodeDefEditReadOnly } from '../store'
 
 import { useBasicProps } from './store'
@@ -157,6 +158,26 @@ const BasicProps = (props) => {
                       />
                     </div>
                   </FormItem>
+                  {NodeDef.isEnumerate(nodeDef) && (
+                    <FormItem
+                      info="nodeDefEdit.basicProps.enumeratingItemsExpression.info"
+                      label="nodeDefEdit.basicProps.enumeratingItemsExpression.label"
+                    >
+                      <NodeDefSingleExpressionProp
+                        excludeCurrentNodeDef
+                        isBoolean={false}
+                        nodeDef={nodeDef}
+                        onChange={({ query: value }) =>
+                          Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.enumeratingItemsExpression, value })
+                        }
+                        qualifier="enumeratingItemsExpression"
+                        query={NodeDef.getEnumeratingItemsExpression(nodeDef)}
+                        validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.enumeratingItemsExpression)(
+                          validation
+                        )}
+                      />
+                    </FormItem>
+                  )}
                   {canAutoCreateMinCountItems && (
                     <FormItem
                       info="nodeDefEdit.basicProps.autoCreateMinCountItems.info"
