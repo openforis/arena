@@ -987,6 +987,7 @@ $t(common.appNameFull)
       taxonProp: "Renvoie la valeur de la $t(extraProp.label) spécifiée d'un taxon ayant le code spécifié",
       taxonVernacularName:
         "Renvoie le (premier) nom vernaculaire (ou local) dans la langue spécifiée d'un taxon ayant le code spécifié",
+      unique: "Renvoie les valeurs uniques d'un attribut ou d'une entité multiple",
       userEmail: "Renvoie l'e-mail de l'utilisateur connecté",
       userIsRecordOwner:
         'Renvoie la valeur booléenne "vrai" si l\'utilisateur modifiant l\'enregistrement en est également le propriétaire, "faux" sinon',

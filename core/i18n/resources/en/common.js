@@ -987,6 +987,7 @@ $t(common.appNameFull)
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       taxonVernacularName:
         'Returns the (first) vernacular (or local) name in the specified language of a taxon having the specified code',
+      unique: 'Returns the unique values of a multiple attribute or entity',
       userEmail: 'Returns the email of the logged in user',
       userIsRecordOwner:
         'Returns a boolean value "true" if the user editing the record is also its owner, "false" otherwise',
@@ -1017,6 +1018,10 @@ $t(common.appNameFull)
       enumerate: {
         label: 'Enumerate',
         info: `The rows will be automatically generated using the category items associated to a code attribute marked as Key defined inside the entity; rows cannot be added or deleted and the key code attribute won't be editable`,
+      },
+      enumeratingItemsExpression: {
+        label: 'Enumerating items expression',
+        info: 'Optional expression that filters which category items are enumerated (e.g. unique(table_source.source_type)). When empty, all category items are used.',
       },
       enumerator: {
         label: 'Enumerator',
