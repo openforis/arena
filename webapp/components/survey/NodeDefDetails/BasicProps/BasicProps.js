@@ -17,6 +17,7 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import { NodeDefExpressionsProp } from '../ExpressionsProp'
+import { NodeDefSingleExpressionProp } from '../ExpressionsProp/NodeDefSingleExpressionProp'
 import { useNodeDefEditReadOnly } from '../store'
 
 import { useBasicProps } from './store'
@@ -145,39 +146,58 @@ const BasicProps = (props) => {
                 disabled={readOnly || multipleEditDisabled}
                 onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
               />
-              {NodeDef.isMultipleEntity(nodeDef) && (
-                <>
-                  <FormItem info="nodeDefEdit.basicProps.enumerate.info" label="nodeDefEdit.basicProps.enumerate.label">
-                    <div>
-                      <Checkbox
-                        id={TestId.nodeDefDetails.nodeDefEnumerate}
-                        checked={NodeDef.isEnumerate(nodeDef)}
-                        disabled={readOnly}
-                        onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.enumerate, value })}
-                      />
-                    </div>
-                  </FormItem>
-                  {canAutoCreateMinCountItems && (
-                    <FormItem
-                      info="nodeDefEdit.basicProps.autoCreateMinCountItems.info"
-                      label="nodeDefEdit.basicProps.autoCreateMinCountItems.label"
-                    >
-                      <div>
-                        <Checkbox
-                          id={TestId.nodeDefDetails.nodeDefAutoCreateMinCountItems}
-                          checked={NodeDef.isAutoCreateMinCountItems(nodeDef)}
-                          disabled={readOnly}
-                          onChange={(value) =>
-                            Actions.setProp({ state, key: NodeDef.propKeys.autoCreateMinCountItems, value })
-                          }
-                        />
-                      </div>
-                    </FormItem>
-                  )}
-                </>
+              {canAutoCreateMinCountItems && (
+                <FormItem
+                  info="nodeDefEdit.basicProps.autoCreateMinCountItems.info"
+                  label="nodeDefEdit.basicProps.autoCreateMinCountItems.label"
+                >
+                  <div>
+                    <Checkbox
+                      id={TestId.nodeDefDetails.nodeDefAutoCreateMinCountItems}
+                      checked={NodeDef.isAutoCreateMinCountItems(nodeDef)}
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        Actions.setProp({ state, key: NodeDef.propKeys.autoCreateMinCountItems, value })
+                      }
+                    />
+                  </div>
+                </FormItem>
               )}
             </div>
           </FormItem>
+
+          {NodeDef.isMultipleEntity(nodeDef) && (
+            <FormItem info="nodeDefEdit.basicProps.enumerate.info" label="nodeDefEdit.basicProps.enumerate.label">
+              <div className="form-item_body">
+                <Checkbox
+                  id={TestId.nodeDefDetails.nodeDefEnumerate}
+                  checked={NodeDef.isEnumerate(nodeDef)}
+                  disabled={readOnly || !!NodeDef.getEnumeratingItemsExpression(nodeDef)}
+                  onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.enumerate, value })}
+                />
+                {NodeDef.isEnumerate(nodeDef) && (
+                  <FormItem
+                    info="nodeDefEdit.basicProps.enumeratingItemsExpression.info"
+                    label="nodeDefEdit.basicProps.enumeratingItemsExpression.label"
+                  >
+                    <NodeDefSingleExpressionProp
+                      excludeCurrentNodeDef
+                      isBoolean={false}
+                      nodeDef={nodeDef}
+                      onChange={({ query: value }) =>
+                        Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.enumeratingItemsExpression, value })
+                      }
+                      qualifier="enumeratingItemsExpression"
+                      query={NodeDef.getEnumeratingItemsExpression(nodeDef)}
+                      validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.enumeratingItemsExpression)(
+                        validation
+                      )}
+                    />
+                  </FormItem>
+                )}
+              </div>
+            </FormItem>
+          )}
         </>
       )}
 

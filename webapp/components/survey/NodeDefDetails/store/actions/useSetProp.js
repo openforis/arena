@@ -38,6 +38,9 @@ const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, value: multiple })
 
   if (NodeDef.isEntity(nodeDefUpdated) && !multiple) {
     nodeDefUpdated = NodeDef.dissocEnumerate(nodeDefUpdated)
+    nodeDefUpdated = NodeDef.mergePropsAdvanced({
+      [NodeDef.keysPropsAdvanced.enumeratingItemsExpression]: null,
+    })(nodeDefUpdated)
 
     if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefUpdated)) {
       const nodeDefsUpdated = Survey.updateLayoutProp({
@@ -90,9 +93,16 @@ const _onUpdateAutoIncrementalKey = ({ survey, nodeDef, value }) => {
   )(nodeDef)
 }
 
+const _onUpdateEnumerate = ({ nodeDef, value }) => {
+  if (value) return nodeDef
+
+  return NodeDef.mergePropsAdvanced({ [NodeDef.keysPropsAdvanced.enumeratingItemsExpression]: null })(nodeDef)
+}
+
 const updateFunctionByProp = {
   [NodeDef.propKeys.categoryUuid]: _onUpdateCategoryUuid,
   [NodeDef.propKeys.multiple]: _onUpdateMultiple,
+  [NodeDef.propKeys.enumerate]: _onUpdateEnumerate,
   [NodeDef.propKeys.name]: _onUpdateName,
   [NodeDef.propKeys.autoIncrementalKey]: _onUpdateAutoIncrementalKey,
 }
