@@ -790,9 +790,11 @@ export const canShowGeotagInformation = (nodeDef) => getFileType(nodeDef) === fi
 export const canBeHiddenInReport = (nodeDef) =>
   [NodeDefType.boolean, NodeDefType.code, NodeDefType.taxon].includes(getType(nodeDef))
 
+export const canHaveAutoCreateMinCountItems = (nodeDef) => isMultipleEntity(nodeDef) && !isEnumerate(nodeDef)
+
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
-  if (!isMultipleEntity(nodeDefUpdated) && isAutoCreateMinCountItems(nodeDefUpdated)) {
+  if (!canHaveAutoCreateMinCountItems(nodeDefUpdated) && isAutoCreateMinCountItems(nodeDefUpdated)) {
     nodeDefUpdated = assocProp({ key: propKeys.autoCreateMinCountItems, value: false })(nodeDefUpdated)
   }
   // clear hidden if not applicable
