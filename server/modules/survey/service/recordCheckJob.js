@@ -97,6 +97,13 @@ export default class RecordCheckJob extends Job {
       // 2. determine new, updated or deleted node defs
       const nodeDefAddedUuids = []
       const nodeDefUpdatedUuids = []
+      // Node defs whose validations alone changed: these need records re-validated against the new
+      // rules, but must NOT be treated as value-affecting (see below) - only applicable/default values/
+      // file name expression changes can affect stored node values (and, for code attributes, cascade
+      // into clearing dependent code attribute values). Folding a validations-only change (e.g. just
+      // editing a validation message) into that same bucket was wiping dependent code attribute values
+      // on every publish, even though the parent attribute's value never changed.
+      const nodeDefValidationUpdatedUuids = []
       const nodeDefDeletedUuids = []
 
       const nodeDefs = Survey.getNodeDefsArray(survey)
@@ -111,21 +118,29 @@ export default class RecordCheckJob extends Job {
           NodeDef.hasAdvancedPropsDraft(def) &&
           (NodeDef.hasAdvancedPropsApplicableDraft(def) ||
             NodeDef.hasAdvancedPropsDefaultValuesDraft(def) ||
-            NodeDef.hasAdvancedPropsFileNameExpressionDraft(def) ||
-            NodeDef.hasAdvancedPropsValidationsDraft(def))
+            NodeDef.hasAdvancedPropsFileNameExpressionDraft(def))
         ) {
-          // Already existing node def but applicable or default values or validations have been updated
+          // Already existing node def but applicable or default values or file name expression have been updated
           nodeDefUpdatedUuids.push(nodeDefUuid)
+        } else if (NodeDef.hasAdvancedPropsDraft(def) && NodeDef.hasAdvancedPropsValidationsDraft(def)) {
+          // Already existing node def but only validations have been updated
+          nodeDefValidationUpdatedUuids.push(nodeDefUuid)
         }
       }
 
       const requiresCheck =
-        cleanupRecords || nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
+        cleanupRecords ||
+        nodeDefAddedUuids.length +
+          nodeDefUpdatedUuids.length +
+          nodeDefValidationUpdatedUuids.length +
+          nodeDefDeletedUuids.length >
+          0
 
       result = {
         survey,
         nodeDefAddedUuids,
         nodeDefUpdatedUuids,
+        nodeDefValidationUpdatedUuids,
         nodeDefDeletedUuids,
         requiresCheck,
         nodesForDeletedNodeDefsDeleted: false,
@@ -180,8 +195,14 @@ export default class RecordCheckJob extends Job {
 
   async _checkRecord({ surveyAndNodeDefs, recordUuid }) {
     const { context, surveyId, user, tx } = this
-    const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, allNotDeletedNodeDefUuids } =
-      surveyAndNodeDefs
+    const {
+      survey,
+      nodeDefAddedUuids,
+      nodeDefUpdatedUuids,
+      nodeDefValidationUpdatedUuids,
+      nodeDefDeletedUuids,
+      allNotDeletedNodeDefUuids,
+    } = surveyAndNodeDefs
     const { cleanupRecords } = context
 
     this.logDebugOptional(`checking record ${recordUuid}`)
@@ -250,14 +271,19 @@ export default class RecordCheckJob extends Job {
     // 5. clear record keys validation (record keys validation performed after RDB generation)
     record = _clearRecordKeysValidation(record)
 
-    // 6. validate nodes
+    // 6. validate nodes (also re-validate node defs whose validations alone changed, even though their
+    // values were not recomputed above)
+    const nodeDefToValidateUuidsUnique = new Set(R.concat(nodeDefAddedOrUpdatedUuids, nodeDefValidationUpdatedUuids))
+    const nodeDefAddedOrUpdatedOrValidationUpdatedUuids = Array.from(nodeDefToValidateUuidsUnique)
     if (
       cleanupRecords ||
-      !R.isEmpty(nodeDefAddedOrUpdatedUuids) ||
+      !R.isEmpty(nodeDefAddedOrUpdatedOrValidationUpdatedUuids) ||
       !R.isEmpty(nodeDefDeletedUuids) ||
       !R.isEmpty(allUpdatedNodesByUuid)
     ) {
-      const nodeDefUuidsToValidate = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedOrUpdatedUuids
+      const nodeDefUuidsToValidate = cleanupRecords
+        ? allNotDeletedNodeDefUuids
+        : nodeDefAddedOrUpdatedOrValidationUpdatedUuids
       this.logDebugOptional(`validating record ${recordUuid} (${nodeDefUuidsToValidate.length} node defs)`)
       await _validateNodes(
         { user, survey, nodeDefUuids: nodeDefUuidsToValidate, record, nodes: allUpdatedNodesByUuid },
