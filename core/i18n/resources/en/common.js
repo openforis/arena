@@ -983,6 +983,7 @@ $t(common.appNameFull)
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       taxonVernacularName:
         'Returns the (first) vernacular (or local) name in the specified language of a taxon having the specified code',
+      unique: 'Returns the unique values of a multiple attribute or entity',
       userEmail: 'Returns the email of the logged in user',
       userIsRecordOwner:
         'Returns a boolean value "true" if the user editing the record is also its owner, "false" otherwise',

@@ -31,6 +31,7 @@ export const functionNames = {
   sum: 'sum',
   taxonProp: 'taxonProp',
   taxonVernacularName: 'taxonVernacularName',
+  unique: 'unique',
   userEmail: 'userEmail',
   userIsRecordOwner: 'userIsRecordOwner',
   userName: 'userName',

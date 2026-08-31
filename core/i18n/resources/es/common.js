@@ -833,6 +833,7 @@ $t(common.appNameFull)
         'Devuelve el valor de la $t(extraProp.label) especificada de un taxón que tiene el código especificado',
       taxonVernacularName:
         'Devuelve el (primer) nombre vernáculo (o local) en el idioma especificado de un taxón que tiene el código especificado',
+      unique: 'Devuelve los valores únicos de un atributo o entidad múltiple',
       userEmail: 'Devuelve el correo electrónico del usuario que ha iniciado sesión',
       userIsRecordOwner:
         'Devuelve un valor booleano "verdadero" si el usuario que edita el registro también es su propietario, "falso" en caso contrario',
