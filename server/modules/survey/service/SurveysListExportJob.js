@@ -19,6 +19,7 @@ export default class SurveysListExportJob extends Job {
       draft,
       template,
       includeCounts: true,
+      includeDbSize: true,
       includeOwnerEmailAddress: true,
       onProgress: ({ total, processed }) => {
         this.total = total
@@ -47,6 +48,8 @@ export default class SurveysListExportJob extends Job {
       'chainsCount',
       'filesCount',
       'filesSize',
+      'dbSize',
+      'dbDataSize',
       'filesMissing',
     ]
 
