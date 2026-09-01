@@ -40,7 +40,8 @@ const _updateNodeAndExpectValidationToBe = async (nodePath, value, validationExp
 
   await _persistNode(Node.assocValue(value)(node))
 
-  const nodeValidation = Validation.getFieldValidation(Node.getUuid(node))(Record.getValidation(record))
+  const { record: recordUpdated } = getContext()
+  const nodeValidation = Validation.getFieldValidation(Node.getUuid(node))(Record.getValidation(recordUpdated))
 
   expect(Validation.isValid(nodeValidation)).toBe(validationExpected)
 }
@@ -52,7 +53,8 @@ const _deleteNodeAndExpectCountToBe = async (parentNodePath, childNodeName, chil
 
   await _deleteNode(parentNode, childNodeName, childNodePosition)
 
-  const validationCount = RecordUtils.getValidationChildrenCount(parentNode, childDef)(record)
+  const { record: recordUpdated } = getContext()
+  const validationCount = RecordUtils.getValidationChildrenCount(parentNode, childDef)(recordUpdated)
 
   expect(Validation.isValid(validationCount)).toBe(expectedValidation)
 }
@@ -66,7 +68,8 @@ const _addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, expecte
 
   await _persistNode(node)
 
-  const validationCount = RecordUtils.getValidationChildrenCount(parentNode, childDef)(record)
+  const { record: recordUpdated } = getContext()
+  const validationCount = RecordUtils.getValidationChildrenCount(parentNode, childDef)(recordUpdated)
 
   expect(Validation.isValid(validationCount)).toBe(expectedValidation)
 }
@@ -84,14 +87,18 @@ const _addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
   const value = 2 // Duplicate value
   await _persistNode(Node.assocValue(value)(nodePlotNum))
 
+  const { record: recordUpdated } = getContext()
+
   // Expect validation to be invalid
-  const nodePlotNumValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNum))(Record.getValidation(record))
+  const nodePlotNumValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNum))(
+    Record.getValidation(recordUpdated)
+  )
   expect(Validation.isValid(nodePlotNumValidation)).toBe(false)
 
   // Expect duplicate node validation to be invalid
-  const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, record)
+  const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, recordUpdated)
   const nodePlotNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNumDuplicate))(
-    Record.getValidation(record)
+    Record.getValidation(recordUpdated)
   )
   expect(Validation.isValid(nodePlotNumDuplicateValidation)).toBe(false)
 }
@@ -100,11 +107,13 @@ const _removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () =
   const { survey, record } = getContext()
   await _addNodeWithDuplicateKeyAndExpect2ValidationErrors()
 
-  await _deleteNode(Record.getRootNode(record), 'plot', 4)
+  const { record: recordBeforeDelete } = getContext()
+  await _deleteNode(Record.getRootNode(recordBeforeDelete), 'plot', 4)
 
-  const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, record)
+  const { record: recordUpdated } = getContext()
+  const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, recordUpdated)
   const nodePlotNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNumDuplicate))(
-    Record.getValidation(record)
+    Record.getValidation(recordUpdated)
   )
   expect(Validation.isValid(nodePlotNumDuplicateValidation)).toBe(true)
 }
@@ -261,16 +270,17 @@ describe('Record Validation Test', () => {
 
     await _deleteNode(Record.getParentNode(nodeParent)(record), 'plot', 5)
 
+    const { record: recordUpdated } = getContext()
     const validationCountUpdated = R.path(
       [
         Validation.keys.validation,
         Validation.keys.fields,
         RecordValidation.getValidationChildrenCountKey(Node.getUuid(nodeParent), NodeDef.getUuid(nodeDefChild)),
       ],
-      record
+      recordUpdated
     )
     // Children count validation should be deleted
-    /* eslint-disable no-unused-expressions */
+
     expect(validationCountUpdated).toBeUndefined()
   })
 

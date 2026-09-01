@@ -51,7 +51,7 @@ describe('Applicable Test', () => {
 
   test('Applicable update', async () => {
     const survey = global.applicableSurvey
-    const record = global.applicableRecord
+    let record = global.applicableRecord
     const nodeSource = RecordUtils.findNodeByPath('cluster/num')(survey, record)
     const nodeDependent = RecordUtils.findNodeByPath('cluster/dependent_node')(survey, record)
     const nodeDependentParent = Record.getParentNode(nodeDependent)(record)
@@ -75,7 +75,8 @@ describe('Applicable Test', () => {
         [Node.getUuid(nodeSource)]: Node.assocValue(sourceValue)(nodeSource),
       }
 
-      global.applicableRecord = Record.mergeNodes(nodesUpdated)(record)
+      record = Record.mergeNodes(nodesUpdated)(record)
+      global.applicableRecord = record
 
       // Update dependent nodes
       const { record: recordUpdate } = await RecordManager.updateNodesDependents({
@@ -83,7 +84,8 @@ describe('Applicable Test', () => {
         record,
         nodes: nodesUpdated,
       })
-      global.applicableRecord = recordUpdate
+      record = recordUpdate
+      global.applicableRecord = record
 
       const nodeDependentParentUpdated = Record.getNodeByUuid(nodeDependentParentUuid)(record)
 
