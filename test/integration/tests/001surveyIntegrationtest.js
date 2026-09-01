@@ -11,6 +11,8 @@ describe('Survey Test', () => {
 
   test('Import Surveys Concurrently', async () => SurveyIntegrationTest.importSurveysConcurrentlyTest())
 
+  test('Fetch User Surveys Info - DB Size', async () => SurveyIntegrationTest.fetchUserSurveysInfoDbSizeTest())
+
   // ==== CATEGORY
 
   test('Create Category', async () => CategoryTest.createCategoryTest())

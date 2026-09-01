@@ -2,7 +2,7 @@ import pgPromise from 'pg-promise'
 import * as R from 'ramda'
 
 import { Numbers, Objects } from '@openforis/arena-core'
-import { DBMigrator } from '@openforis/arena-server'
+import { DBMigrator, Schemata } from '@openforis/arena-server'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -20,6 +20,7 @@ import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import * as Log from '@server/log/log'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
@@ -391,7 +392,7 @@ const _filterSurveysWithChains = async (surveys) => {
   return surveysWithChains
 }
 
-const _fetchSurveyWithCounts = async ({ survey, draft }) => {
+const _fetchSurveyWithCounts = async ({ survey, draft, includeDbSize = false }) => {
   const surveyId = Survey.getId(survey)
   const surveyWithCounts = {
     ...survey,
@@ -411,19 +412,26 @@ const _fetchSurveyWithCounts = async ({ survey, draft }) => {
       filesSize,
       filesMissing: await calculateFilesMissing({ surveyId, draft }),
     })
+
+    if (includeDbSize) {
+      Object.assign(surveyWithCounts, {
+        dbSize: await DbUtils.fetchSchemaTablesSize({ schema: Schemata.getSchemaSurvey(surveyId) }),
+        dbDataSize: await DbUtils.fetchSchemaTablesSize({ schema: Schemata.getSchemaSurveyRdb(surveyId) }),
+      })
+    }
   } catch (error) {
     Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}: ${error}`)
   }
   return surveyWithCounts
 }
 
-const _fetchSurveysWithCounts = async ({ surveys, draft, onProgress, stopIfFunction }) => {
+const _fetchSurveysWithCounts = async ({ surveys, draft, includeDbSize, onProgress, stopIfFunction }) => {
   const surveysWithCounts = []
   for (const survey of surveys) {
     if (stopIfFunction?.()) {
       break
     }
-    surveysWithCounts.push(await _fetchSurveyWithCounts({ survey, draft }))
+    surveysWithCounts.push(await _fetchSurveyWithCounts({ survey, draft, includeDbSize }))
     onProgress?.({ total: surveys.length, processed: surveysWithCounts.length })
   }
   return surveysWithCounts
@@ -440,6 +448,7 @@ export const fetchUserSurveysInfo = async ({
   sortBy,
   sortOrder,
   includeCounts = false,
+  includeDbSize = false,
   includeOwnerEmailAddress = false,
   onlyOwn = false,
   withChains = false,
@@ -473,7 +482,7 @@ export const fetchUserSurveysInfo = async ({
   if (!includeCounts) {
     return surveys
   }
-  return _fetchSurveysWithCounts({ surveys, draft, onProgress, stopIfFunction })
+  return _fetchSurveysWithCounts({ surveys, draft, includeDbSize, onProgress, stopIfFunction })
 }
 
 // ====== UPDATE

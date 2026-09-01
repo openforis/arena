@@ -67,3 +67,48 @@ export const importSurveysConcurrentlyTest = async () => {
 
   expect(Survey.getId(surveyA)).not.toEqual(Survey.getId(surveyB))
 }
+
+export const fetchUserSurveysInfoDbSizeTest = async () => {
+  const user = getContextUser()
+
+  const surveyName = `do_not_use__test_survey_dbsize_${uuidv4()}`
+  const surveyInfoTest = Survey.newSurvey({
+    ownerUuid: User.getUuid(user),
+    name: surveyName,
+    label: 'DO NOT USE! Test Survey (db size)',
+    languages: ['en'],
+  })
+  const survey = await SurveyManager.insertSurvey({ user, surveyInfo: surveyInfoTest })
+  const surveyId = Survey.getId(survey)
+
+  try {
+    const [itemWithDbSize] = await SurveyManager.fetchUserSurveysInfo({
+      user,
+      draft: true,
+      search: surveyName,
+      onlyOwn: true,
+      includeCounts: true,
+      includeDbSize: true,
+    })
+
+    expect(itemWithDbSize).toBeDefined()
+    expect(typeof itemWithDbSize.dbSize).toBe('number')
+    expect(itemWithDbSize.dbSize).toBeGreaterThan(0)
+    // RDB/data schema isn't created until the survey is published, so it should resolve to 0, not throw.
+    expect(itemWithDbSize.dbDataSize).toBe(0)
+
+    const [itemWithoutDbSize] = await SurveyManager.fetchUserSurveysInfo({
+      user,
+      draft: true,
+      search: surveyName,
+      onlyOwn: true,
+      includeCounts: true,
+    })
+
+    expect(itemWithoutDbSize).toBeDefined()
+    expect(itemWithoutDbSize.dbSize).toBeUndefined()
+    expect(itemWithoutDbSize.dbDataSize).toBeUndefined()
+  } finally {
+    await SurveyManager.deleteSurvey(surveyId)
+  }
+}
