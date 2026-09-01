@@ -1,0 +1,103 @@
+import { useMemo } from 'react'
+import {
+  DataGrid as MuiDataGrid,
+  DataGridProps,
+  GridColDef,
+  GridDensity,
+  GridFooter,
+  GridFooterContainer,
+  GridInitialState,
+  GridRowClassNameParams,
+  GridRowIdGetter,
+  GridRowSelectionModel,
+  GridRowsProp,
+  GridToolbarExport,
+} from '@mui/x-data-grid'
+import classNames from 'classnames'
+
+type Props = {
+  allowExportToCsv?: boolean
+  autoHeight?: boolean
+  autoPageSize?: boolean
+  autoRowHeight?: boolean
+  checkboxSelection?: boolean
+  className?: string
+  columns: GridColDef[]
+  density?: GridDensity
+  disableSelectionOnClick?: boolean
+  exportFileName?: string
+  getRowClassName?: (params: GridRowClassNameParams) => string
+  getRowId?: GridRowIdGetter
+  hideFooterPagination?: boolean
+  initialState?: GridInitialState
+  isRowSelectable?: DataGridProps['isRowSelectable']
+  onRowClick?: DataGridProps['onRowClick']
+  onRowDoubleClick?: DataGridProps['onRowDoubleClick']
+  onRowSelectionModelChange?: (model: GridRowSelectionModel) => void
+  rows: GridRowsProp
+  rowSelectionModel?: GridRowSelectionModel
+}
+
+const FooterWithExport =
+  ({ exportFileName }: { exportFileName?: string }) =>
+    () => (
+      <GridFooterContainer>
+        <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
+        <GridFooter />
+      </GridFooterContainer>
+    )
+
+const DataGrid = (props: Props) => {
+  const {
+    allowExportToCsv = false,
+    autoHeight = false,
+    autoPageSize = false,
+    autoRowHeight = false,
+    checkboxSelection = false,
+    className,
+    columns: columnsProp,
+    density = 'standard',
+    exportFileName,
+    disableSelectionOnClick = true,
+    getRowClassName,
+    getRowId,
+    hideFooterPagination = false,
+    initialState,
+    isRowSelectable,
+    onRowClick,
+    onRowDoubleClick,
+    onRowSelectionModelChange,
+    rows,
+    rowSelectionModel,
+  } = props
+
+  const columns = useMemo(() => columnsProp.map((col) => ({ ...col, disableColumnMenu: true })), [columnsProp])
+
+  const getRowHeight = useMemo(() => (autoRowHeight ? () => 'auto' as const : undefined), [autoRowHeight])
+
+  return (
+    <MuiDataGrid
+      autoHeight={autoHeight}
+      autoPageSize={autoPageSize}
+      checkboxSelection={checkboxSelection}
+      className={classNames('data-grid', className)}
+      columns={columns}
+      density={density}
+      disableRowSelectionOnClick={disableSelectionOnClick}
+      getRowClassName={getRowClassName}
+      getRowHeight={getRowHeight}
+      getRowId={getRowId}
+      hideFooterPagination={hideFooterPagination}
+      initialState={initialState}
+      isRowSelectable={isRowSelectable}
+      onRowClick={onRowClick}
+      onRowDoubleClick={onRowDoubleClick}
+      onRowSelectionModelChange={onRowSelectionModelChange}
+      rows={rows}
+      rowSelectionModel={rowSelectionModel}
+      slots={allowExportToCsv ? { footer: FooterWithExport({ exportFileName }) } : undefined}
+    />
+  )
+}
+
+export default DataGrid

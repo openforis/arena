@@ -1,4 +1,3 @@
-import React from 'react'
 import { PieChart as ReChartsPieChart, Pie, Cell, Tooltip, Legend } from 'recharts'
 import PropTypes from 'prop-types'
 

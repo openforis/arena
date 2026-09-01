@@ -5,9 +5,10 @@ import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import { Button, ProgressBar } from '@webapp/components'
-import { DialogConfirmActions } from '@webapp/store/ui'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { ButtonIconCancel } from '@webapp/components/buttons'
 import { useConfirmAsync } from '@webapp/components/hooks'
+import { FileUtils } from '@webapp/utils/fileUtils'
 
 const stata = {
   running: 'running',
@@ -16,10 +17,15 @@ const stata = {
 }
 
 const initialState = {
+  hasProcessor: false,
   uploadProgressPercent: -1,
   processedChunks: -1,
   status: stata.stopped,
 }
+
+const completedProgressVisibleMs = 200
+
+const wait = (timeout) => new Promise((resolve) => setTimeout(resolve, timeout))
 
 export const ImportStartButton = (props) => {
   const {
@@ -27,7 +33,7 @@ export const ImportStartButton = (props) => {
     confirmMessageKey,
     confirmMessageParams,
     disabled = false,
-    label = 'dataImportView.startImport',
+    label = 'dataImportView:startImport',
     onCancel = null,
     onUploadComplete,
     showConfirm = false,
@@ -44,7 +50,7 @@ export const ImportStartButton = (props) => {
   const confirm = useConfirmAsync()
   const [state, setState] = useState(initialState)
 
-  const { status, uploadProgressPercent } = state
+  const { hasProcessor, status, uploadProgressPercent } = state
 
   const reset = useCallback(() => {
     uploadingRef.current = false
@@ -56,38 +62,50 @@ export const ImportStartButton = (props) => {
   const onUploadProgress = useCallback((progressEvent) => {
     if (uploadingRef.current) {
       const { loaded: processedChunks, total } = progressEvent
-      const percent = Math.round((processedChunks / total) * 100)
-      setState((statePrev) => ({ ...statePrev, uploadProgressPercent: percent }))
+      const uploadProgressPercent = Math.round((processedChunks / total) * 100)
+      setState((statePrev) => ({ ...statePrev, uploadProgressPercent }))
     }
   }, [])
 
   const onStartConfirmed = useCallback(async () => {
-    uploadingRef.current = true
-    setState((statePrev) => ({ ...statePrev, status: stata.running, uploadProgressPercent: 0 }))
+    const { file } = startFunctionParams
+    if (file && !(await FileUtils.checkFileIsReadable(file))) {
+      dispatch(NotificationActions.notifyError({ key: 'common.uploadFileChangedError' }))
+      return
+    }
 
-    // when retrying, re-start from current chunk
-    const processorCurrentChunkNumber = processorRef.current?.currentChunkNumber
-    const startFromChunk = processorCurrentChunkNumber > 0 ? processorCurrentChunkNumber : 1
+    let retry = true
+    while (retry) {
+      retry = false
+      uploadingRef.current = true
+      setState((statePrev) => ({ ...statePrev, status: stata.running, uploadProgressPercent: 0 }))
 
-    const startRes = startFunction({
-      ...startFunctionParams,
-      onUploadProgress,
-      startFromChunk,
-    })
-    const promise = startRes.promise ?? startRes
-    processorRef.current = startRes.processor
-    try {
-      const result = await promise
-      onUploadComplete(result)
-      reset()
-    } catch (error) {
-      if (await confirm({ key: 'common.uploadErrorConfirm.message', params: { error } })) {
-        await onStartConfirmed()
-      } else {
+      // when retrying, re-start from current chunk
+      const processorCurrentChunkNumber = processorRef.current?.currentChunkNumber
+      const startFromChunk = processorCurrentChunkNumber > 0 ? processorCurrentChunkNumber : 1
+
+      const startRes = startFunction({
+        ...startFunctionParams,
+        onUploadProgress,
+        startFromChunk,
+      })
+      const promise = startRes.promise ?? startRes
+      processorRef.current = startRes.processor
+      setState((statePrev) => ({ ...statePrev, hasProcessor: Boolean(startRes.processor) }))
+      try {
+        const result = await promise
+        setState((statePrev) => ({ ...statePrev, uploadProgressPercent: 100 }))
+        await wait(completedProgressVisibleMs)
+        onUploadComplete(result)
         reset()
+      } catch (error) {
+        retry = await confirm({ key: 'common.uploadErrorConfirm.message', params: { error } })
+        if (!retry) {
+          reset()
+        }
       }
     }
-  }, [confirm, onUploadComplete, onUploadProgress, reset, startFunction, startFunctionParams])
+  }, [confirm, dispatch, onUploadComplete, onUploadProgress, reset, startFunction, startFunctionParams])
 
   const onStartClick = useCallback(async () => {
     if (showConfirm) {
@@ -132,7 +150,7 @@ export const ImportStartButton = (props) => {
   return uploadProgressPercent >= 0 ? (
     <div className="import-start-btn-progress-container">
       <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey={'common.uploadingFile'} />
-      {processorRef.current && (
+      {hasProcessor && (
         <>
           {status === stata.running ? (
             <Button

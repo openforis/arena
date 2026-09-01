@@ -16,9 +16,9 @@
 
 Arena is a cloud-based platform for storing and processing data collected in field inventories or questionnaires. It provides a fast and flexible way to set up a survey and start entering data for a team. It offers tools for data quality assurance with the help of data validation and reporting methods. Arena also offers multilingual data entry forms, multi-cycle data management, and computing of new result attributes and running statistical analysis with integrated connection to RStudio Server or local installation of RStudio.
 
-Arena also offers a map with access to very-high resolution satellite images. The Arena Map can be used, for example, for verifying locations of collected data, and for conducting sample-based image interpretation.
+Arena also offers a map with access to satellite images. The Arena Map can be used, for example, for verifying locations of collected data, and for conducting sample-based image interpretation.
 
-![logo](https://openforis.org/wp-content/uploads/2021/03/of-arena-picto-260px.png)
+![logo](https://www.openforis.org/wp-content/uploads/2025/07/OpenForis-arena-Logo.svg)
 
 # Installation
 
@@ -52,6 +52,8 @@ PGPORT=5444
 PGDATABASE=arena
 PGUSER=arena
 PGPASSWORD=arena
+# PGSSL=false
+# PGSSL_ALLOW_UNAUTHORIZED=false
 
 # temporary uploaded files folder
 TEMP_FOLDER=/home/your_user/openforis/arena/upload
@@ -70,13 +72,17 @@ FILE_STORAGE_PATH=
 # FILE_STORAGE_AWS_SECRET_ACCESS_KEY=
 
 # Email
-# email service; allowed values: sendgrid / office365
+# email service; allowed values: sendgrid / office365 / amazonSES
 # - sendgrid service, only SENDGRID_API_KEY is required
 # - office365 service: EMAIL_AUTH_USER and EMAIL_AUTH_PASSWORD are required
+# - amazonSES service: EMAIL_AMAZON_SES_HOST and optionally EMAIL_AMAZON_SES_PORT are required
 EMAIL_SERVICE=sendgrid
 SENDGRID_API_KEY= # get it from https://sendgrid.com/
+# EMAIL_FROM= # optional: custom sender email address; if not specified, ADMIN_EMAIL is used
 # EMAIL_AUTH_USER=
 # EMAIL_AUTH_PASSWORD=
+# EMAIL_AMAZON_SES_HOST=
+# EMAIL_AMAZON_SES_PORT=465
 # Optional: custom email transport options could be specified.
 # EMAIL_TRANSPORT_OPTIONS=
 # e.g. (for MS office365 service) EMAIL_TRANSPORT_OPTIONS={"host":"smtp.office365.com","port":"587","auth":{"user":"testuser@mydomain.org","pass":"yoursecretpassword"},"secure":true,"tls":{"ciphers":"SSLv3"}}
@@ -92,12 +98,29 @@ SESSION_ID_COOKIE_SECRET=my-cookie-secret-key
 ## Set to true if http requests must be forwarded to https
 USE_HTTPS=false
 
+## Maximum file upload size in bytes (default: 1GB)
+# FILE_UPLOAD_LIMIT=
+
+## Allow users to request access to surveys (default: true)
+# ALLOW_USER_ACCESS_REQUEST=true
+
+## Number of concurrent background jobs (default: 3)
+# JOB_QUEUE_CONCURRENCY=3
+
+## Set to true to disable activity logging
+# ACTIVITY_LOG_DISABLED=false
+
+## Set to true to enable experimental features
+# EXPERIMENTAL_FEATURES=false
+
 # RStudio Server (not mandatory)
 # RSTUDIO_DOWNLOAD_SERVER_URL=
 # RSTUDIO_SERVER_URL=
-# RSTUDIO_PROXY_SERVER_URL=
 # RSTUDIO_POOL_SERVER_URL=
 # RSTUDIO_POOL_SERVICE_KEY=
+
+# WHISP (geo data integration, not mandatory)
+# WHISP_API_KEY=
 
 # reCAPTCHA
 RECAPTCHA_ENABLED=false

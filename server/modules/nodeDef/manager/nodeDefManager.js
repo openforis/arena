@@ -117,7 +117,7 @@ export const insertNodeDef = async (
 
 // ======= READ
 
-export { fetchNodeDefByUuid } from '../repository/nodeDefRepository'
+export { fetchNodeDefByUuid, fetchSurveyHasUserDependentExpressions } from '../repository/nodeDefRepository'
 
 export const fetchNodeDefsBySurveyId = async (
   {
@@ -244,13 +244,16 @@ export const updateNodeDefProps = async (
           await NodeDefAreaBasedEstimateManager.insertOrDeleteNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
         _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
       } else {
-        // node def name or label changed => update node def area based estimate generated name or label
+        // node def name, label or active state changed => update node def area based estimate accordingly
         const nameOrLabelChanged =
           (NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)) ||
           (NodeDef.propKeys.labels in props &&
             !Objects.isEqual(NodeDef.getLabels(nodeDefPrev), NodeDef.getLabels(nodeDef)))
+        const activeChanged =
+          NodeDef.keysPropsAdvanced.active in propsAdvanced &&
+          NodeDef.isActive(nodeDefPrev) !== NodeDef.isActive(nodeDef)
 
-        if (nameOrLabelChanged) {
+        if (nameOrLabelChanged || activeChanged) {
           const nodeDefAreaBasedEstimateUpdated = await NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate(
             { survey, nodeDef },
             t
@@ -354,21 +357,35 @@ const getLayoutInParentEntityByCycles = ({ survey, nodeDef }) => {
   return nodeDefSourceLayoutPrevByCycle
 }
 
+export const addOrRemoveNodeDefInParentLayout = async (
+  { survey, nodeDef, add = true, layoutInParentByCycle = null },
+  client = db
+) => {
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  if (nodeDefParent) {
+    const cycles = NodeDef.getCycles(nodeDef)
+    const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
+      survey,
+      nodeDef,
+      cyclesAdded: add ? cycles : [],
+      cyclesDeleted: add ? [] : cycles,
+      layoutInParentByCycle,
+    })
+    if (parentUpdated) {
+      const surveyId = Survey.getId(survey)
+      await _persistNodeDefLayout({ surveyId, nodeDef: parentUpdated }, client)
+    }
+    return parentUpdated
+  }
+}
+
 export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
   client.tx(async (t) => {
     const result = {}
 
     const addOrRemoveInParentLayout = async ({ nodeDef, add = true, layoutInParentByCycle = null }) => {
-      const cycles = NodeDef.getCycles(nodeDef)
-      const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
-        survey,
-        nodeDef,
-        cyclesAdded: add ? cycles : [],
-        cyclesDeleted: add ? [] : cycles,
-        layoutInParentByCycle,
-      })
+      const parentUpdated = await addOrRemoveNodeDefInParentLayout({ survey, nodeDef, add, layoutInParentByCycle }, t)
       if (parentUpdated) {
-        await _persistNodeDefLayout({ surveyId, nodeDef: parentUpdated }, t)
         result[NodeDef.getUuid(parentUpdated)] = parentUpdated
       }
     }

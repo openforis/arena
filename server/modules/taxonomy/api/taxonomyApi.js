@@ -2,14 +2,16 @@ import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 
 import { FileFormats } from '@core/fileFormats'
+import { DataImportTemplateTypes } from '@core/dataImport'
 import * as ObjectUtils from '../../../../core/objectUtils'
 import * as Taxon from '../../../../core/survey/taxon'
 import * as Taxonomy from '../../../../core/survey/taxonomy'
 
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+
 import { jobToJSON } from '../../../job/jobUtils'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as TaxonomyService from '../service/taxonomyService'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
@@ -34,6 +36,29 @@ export const init = (app) => {
       next(error)
     }
   })
+
+  app.post(
+    '/survey/:surveyId/taxonomies/clone-from-survey',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const { sourceSurveyId } = Request.getBody(req)
+        const sourceTaxonomyUuid = Request.getRequiredParam(req, 'sourceTaxonomyUuid')
+
+        const taxonomy = await TaxonomyService.cloneTaxonomyFromSurvey({
+          user,
+          sourceSurveyId,
+          sourceTaxonomyUuid,
+          targetSurveyId: surveyId,
+        })
+        res.json({ taxonomy })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   // ====== READ
 
@@ -180,6 +205,26 @@ export const init = (app) => {
         Response.setContentTypeFile({ res, fileName, fileFormat })
 
         await TaxonomyService.exportTaxa({ surveyId, taxonomyUuid, draft, outputStream: res, fileFormat })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/taxonomies/:taxonomyUuid/import-template/',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const {
+          surveyId,
+          taxonomyUuid,
+          draft = true,
+          fileFormat = FileFormats.csv,
+          templateType = DataImportTemplateTypes.generic,
+        } = Request.getParams(req)
+
+        await TaxonomyService.exportTaxaImportTemplate({ surveyId, taxonomyUuid, draft, res, fileFormat, templateType })
       } catch (error) {
         next(error)
       }

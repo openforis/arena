@@ -1,5 +1,4 @@
 import './InputSwitch.scss'
-import React from 'react'
 import ReactSwitch from 'react-switch'
 import PropTypes from 'prop-types'
 

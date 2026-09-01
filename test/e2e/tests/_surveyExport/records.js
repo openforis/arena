@@ -105,6 +105,6 @@ export const verifyRecords = (survey, recordsMock = records) =>
     await expect(recordsExport.length).toBe(recordsMock.length)
 
     for (const recordExport of recordsExport) {
-      verifyRecord(survey, surveyExport, recordsMock, recordExport.uuid)
+      await verifyRecord(survey, surveyExport, recordsMock, recordExport.uuid)
     }
   })

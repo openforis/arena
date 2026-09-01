@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
@@ -10,12 +9,12 @@ import { useI18n } from '@webapp/store/system'
 
 import { useColumn } from './store'
 
-const getColValue = ({ survey, nodeDef, col, row, i18n }) => {
+const getColValue = ({ survey, nodeDef, col, row, i18n, isMeasure }) => {
   const value = Object.hasOwn(row, col) ? row[col] : null
   if (Objects.isEmpty(value)) return ''
   const values = Array.isArray(value) ? value : [value]
   return values
-    .map((val) => DataQueryValueFormatter.format({ i18n, survey, nodeDef, value: val }))
+    .map((val) => DataQueryValueFormatter.format({ i18n, survey, nodeDef, value: val, isMeasure }))
     .filter((val) => !Objects.isEmpty(val))
     .join(', ')
 }
@@ -25,14 +24,14 @@ const ColumnData = (props) => {
   const i18n = useI18n()
   const survey = useSurvey()
 
-  const { columnNames, widthInner, widthOuter } = useColumn({ codesVisible, nodeDef, query, colWidth })
+  const { columnNames, isMeasure, widthInner, widthOuter } = useColumn({ codesVisible, nodeDef, query, colWidth })
 
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
       <div className="table__inner-cell">
         {columnNames.map((col) => (
           <div key={col} style={{ width: widthInner }} className="ellipsis">
-            {getColValue({ survey, nodeDef, col, row, i18n })}
+            {getColValue({ survey, nodeDef, col, row, i18n, isMeasure })}
           </div>
         ))}
       </div>

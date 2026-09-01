@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
@@ -11,22 +11,25 @@ import * as Node from '@core/record/node'
 import { debounce } from '@core/functionsDefer'
 
 import { elementOffset } from '@webapp/utils/domUtils'
-import { useNodesMinCount } from '@webapp/store/ui/record'
-import { SurveyState } from '@webapp/store/survey'
+import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
+import { RecordState, useNodesMinCount } from '@webapp/store/ui/record'
 import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
+import { getNextSortCriteria, sortNodes } from './nodeDefEntityTableRowsSort'
 
 const NodeDefEntityTableRows = (props) => {
   const {
     canEditDef = false,
     canEditRecord = false,
+    canDeleteNode,
     entry = false,
     edit = false,
     nodeDef,
     nodes = [],
     parentNode = null,
     preview = false,
+    readOnly = false,
     recordUuid = null,
     surveyCycleKey,
     surveyInfo,
@@ -48,6 +51,23 @@ const NodeDefEntityTableRows = (props) => {
     },
     [],
     nodeDefColumnUuids
+  )
+
+  const record = useSelector(RecordState.getRecord)
+  const lang = useSurveyPreferredLang()
+
+  const [sortCriteria, setSortCriteria] = useState([])
+
+  const handleSortBy = useCallback((field) => {
+    setSortCriteria((prevSortCriteria) => getNextSortCriteria({ sortCriteria: prevSortCriteria, field }))
+  }, [])
+
+  const sortedNodes = useMemo(
+    () =>
+      sortCriteria.length === 0
+        ? nodes
+        : sortNodes({ nodes, sortCriteria, nodeDefColumns, survey, cycle: surveyCycleKey, lang, record }),
+    [nodes, sortCriteria, nodeDefColumns, survey, surveyCycleKey, lang, record]
   )
 
   const tableRowsHeaderRef = useRef(null)
@@ -137,11 +157,14 @@ const NodeDefEntityTableRows = (props) => {
         nodeDef={nodeDef}
         nodeDefColumns={nodeDefColumns}
         nodes={null}
+        onSortBy={entry ? handleSortBy : undefined}
         parentNode={parentNode}
         preview={preview}
+        readOnly={readOnly}
         recordUuid={recordUuid}
         renderType={renderType}
         siblingEntities={nodes}
+        sortCriteria={sortCriteria}
         surveyCycleKey={surveyCycleKey}
         surveyInfo={surveyInfo}
       />
@@ -151,7 +174,12 @@ const NodeDefEntityTableRows = (props) => {
   return (
     <div className={classNames('survey-form__node-def-entity-table-rows', { edit })}>
       {(edit || !R.isEmpty(nodes)) &&
-        createRow({ renderType: NodeDefLayout.renderType.tableHeader, ref: tableRowsHeaderRef })}
+        // eslint-disable-next-line react-hooks/refs -- pre-existing pattern: tableRowsHeaderRef is only forwarded to NodeDefEntityTableRow's `ref` prop (a forwardRef component), never dereferenced here.
+        createRow({
+          renderType: NodeDefLayout.renderType.tableHeader,
+          ref: tableRowsHeaderRef,
+          canDelete: canDeleteNode,
+        })}
 
       {entry && (
         <div
@@ -162,7 +190,7 @@ const NodeDefEntityTableRows = (props) => {
           <div className="survey-form__node-def-entity-table-data-rows">
             {gridSize.height > 0 &&
               gridSize.width > 0 &&
-              nodes.map((node, index) =>
+              sortedNodes.map((node, index) =>
                 createRow({
                   renderType: NodeDefLayout.renderType.tableBody,
                   node,
@@ -181,12 +209,14 @@ const NodeDefEntityTableRows = (props) => {
 NodeDefEntityTableRows.propTypes = {
   canEditDef: PropTypes.bool,
   canEditRecord: PropTypes.bool,
+  canDeleteNode: PropTypes.bool,
   entry: PropTypes.bool,
   edit: PropTypes.bool,
   nodeDef: PropTypes.any.isRequired,
   nodes: PropTypes.array,
   parentNode: PropTypes.any,
   preview: PropTypes.bool,
+  readOnly: PropTypes.bool,
   recordUuid: PropTypes.string,
   surveyCycleKey: PropTypes.string.isRequired,
   surveyInfo: PropTypes.any.isRequired,

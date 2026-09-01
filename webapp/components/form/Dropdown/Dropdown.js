@@ -1,6 +1,5 @@
 import './dropdown.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import ReactSelect, { components, createFilter } from 'react-select'
 import classNames from 'classnames'
@@ -43,7 +42,6 @@ const SingleValueComponent = (reactSelectProps) => {
 
 const Dropdown = (props) => {
   const {
-    minCharactersToAutocomplete = 0,
     className = undefined,
     clearable = true,
     defaultSelection = undefined,
@@ -58,6 +56,7 @@ const Dropdown = (props) => {
     loading: loadingProp = false,
     menuPlacement = 'auto',
     menuPosition = 'fixed',
+    minCharactersToAutocomplete = 0,
     multiple = false,
     onBeforeChange = null,
     onChange: onChangeProp,
@@ -136,7 +135,6 @@ const Dropdown = (props) => {
 }
 
 Dropdown.propTypes = {
-  minCharactersToAutocomplete: PropTypes.number,
   className: PropTypes.string,
   clearable: PropTypes.bool,
   defaultSelection: PropTypes.any,
@@ -151,6 +149,7 @@ Dropdown.propTypes = {
   loading: PropTypes.bool,
   menuPlacement: PropTypes.oneOf(['auto', 'top', 'bottom']),
   menuPosition: PropTypes.oneOf(['absolute', 'fixed']),
+  minCharactersToAutocomplete: PropTypes.number,
   multiple: PropTypes.bool,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: PropTypes.func.isRequired,

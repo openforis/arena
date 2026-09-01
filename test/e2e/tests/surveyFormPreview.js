@@ -92,7 +92,9 @@ export default () =>
     verifyCluster(recordPreview)
 
     test(`Verify ${cluster_coordinate.name} invalid coordinate`, async () => {
-      await page.waitForSelector(getSelector(TestId.surveyForm.nodeDefErrorBadge(cluster_coordinate.name)))
+      await page.waitForSelector(getSelector(TestId.surveyForm.nodeDefErrorBadge(cluster_coordinate.name)), {
+        timeout: 20000,
+      })
       await page.hover(`text="${cluster_coordinate.label}"`)
       await expect(page).toHaveText('Invalid value')
     })

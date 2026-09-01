@@ -24,6 +24,29 @@ export const getJsonParam = (req, param, defaultValue = null) => {
   return defaultValue
 }
 
+export const getNumericParam = (req, param, defaultValue = null) => {
+  const value = R.prop(param, getParams(req))
+  if (value === undefined) return defaultValue
+  const numericValue = Number(value)
+  return Number.isNaN(numericValue) ? defaultValue : numericValue
+}
+
+export const getRequiredParam = (req, param) => {
+  const value = R.prop(param, getParams(req))
+  if (!value) {
+    throw new Error(`${param} is required`)
+  }
+  return value
+}
+
+export const getRequiredIntegerParam = (req, param) => {
+  const value = getRequiredParam(req, param)
+  if (!Number.isInteger(Number(value))) {
+    throw new TypeError(`${param} must be a valid integer`)
+  }
+  return value
+}
+
 export const getFile = R.pathOr(null, ['files', 'file'])
 export const getFiles = (req) => req?.files || req?.file || null
 export const getFilePath = (req) => getFile(req)?.tempFilePath || null

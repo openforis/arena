@@ -1,6 +1,8 @@
 export default {
   ActivityLogImportJob: 'Үйл ажиллагааны бүртгэл импортлох',
-  ArenaMobileDataImportJob: 'Arena Mobile өгөгдөл импортлох',
+  AllSurveysDataMigrationJob: 'Бүх судалгааны өгөгдлийн шилжилт',
+  ArenaMobileDataImportJob: 'Arena өгөгдөл импортлох',
+  ArenaMobileDataImportSummaryJob: 'Arena өгөгдөл импортлох хураангуй',
   CategoriesImportJob: 'Ангилал импортлох',
   CategoriesValidationJob: 'Ангилал баталгаажуулах',
   CategoriesBatchImportJob: 'Ангилал импортлох',
@@ -18,8 +20,10 @@ export default {
   DataDeleteJob: 'Өгөгдөл устгах',
   DataImportJob: 'Өгөгдөл импортлох',
   DataImportValidationJob: 'Өгөгдөл импортлох файлын баталгаажуулалт',
+  EntitiesDeleteJob: 'Одоо байгаа объектуудыг устгах',
   FilesImportJob: 'Файл импортлох',
   MessageSendJob: 'Мессеж илгээх',
+  NodeDefsTranslationJob: 'Зангилааны тодорхойлолтын шошгыг орчуулах',
   NodeDefsImportJob: 'Зангилааны тодорхойлолт импортлох',
   NodeDefsValidationJob: 'Зангилааны тодорхойлолт баталгаажуулах',
   chainsCyclesCheckJob: 'Гинжин хэлхээний мөчлөгийг шалгах',
@@ -28,10 +32,12 @@ export default {
   RecordsImportJob: 'Бичлэг импортлох',
   RecordsUniquenessValidationJob: 'Бичлэг давтагдахгүй байх баталгаажуулалт',
   SamplingPointDataImportJob: 'Дээж авах цэгийн өгөгдөл импортлох',
+  SchemaSummaryExportJob: 'Схемийн хураангуй экспортлох',
   SurveyActivityLogClearJob: 'Судалгааны үйл ажиллагааны бүртгэлийг цэвэрлэх ажил',
   SurveyCreatorJob: 'Судалгаа үүсгэх',
   SurveyDependencyGraphsGenerationJob: 'Судалгааны хамаарлын график үүсгэх',
   SurveyExportJob: 'Судалгаа экспортлох',
+  SurveyFilesImportJob: 'Судалгааны файлуудыг импортлох',
   SurveyIndexGeneratorJob: 'Судалгааны индекс үүсгэгч',
   SurveyInfoValidationJob: 'Судалгааны мэдээлэл баталгаажуулах',
   SurveyLabelsImportJob: 'Судалгааны шошго импортлох',
@@ -46,10 +52,12 @@ export default {
   TaxonomiesValidationJob: 'Таксоном баталгаажуулах',
   TaxonomyImportJob: 'Таксоном импортлох',
   // data export
+  ArenaFileReadJob: 'Arena файл унших',
   DataExportJob: 'Өгөгдөл экспортлох',
   DataSummaryExportJob: 'Өгөгдлийн хураангуй экспортлох',
   ZipCreationJob: 'ZIP файл үүсгэх',
   CSVDataExtraction: 'Өгөгдөл задлах',
+  PrepareImportFileJob: 'Импортын файлыг бэлтгэх',
   // geo
   GeoJsonDataExportJob: 'GeoJson өгөгдөл экспортлох',
   // import arena survey
@@ -65,7 +73,8 @@ export default {
   CategoriesExportJob: 'Ангилал экспортлох',
   TaxonomiesExportJob: 'Таксоном экспортлох',
   RecordsExportJob: 'Бичлэг экспортлох',
-  FilesExportJob: 'Файл экспортлох',
+  RecordFilesExportJob: 'Бичлэгийн файлуудыг экспортлох',
+  SurveyFilesExportJob: 'Судалгааны файлуудыг экспортлох',
   ChainExportJob: 'Гинжин хэлхээ экспортлох',
   UsersExportJob: 'Хэрэглэгч экспортлох',
   ActivityLogExportJob: 'Үйл ажиллагааны бүртгэл экспортлох',
@@ -76,4 +85,6 @@ export default {
   RecordsValidationJob: 'Бичлэгүүдийн баталгаажуулалт',
   // analysis
   PersistResultsJob: 'Шинжилгээний үр дүнг хадгалах',
+  elapsed: 'Өнгөрсөн хугацаа',
+  remaining: 'Үлдсэн хугацаа',
 }

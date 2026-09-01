@@ -115,10 +115,20 @@ export const isValid = R.pipe(getValidation, Validation.isValid)
 
 // ===== READ metadata
 
-export const { metaKeys, getMeta, isChildApplicable, isDefaultValueApplied, getHierarchy, getHierarchyCode } = NodeMeta
+export const {
+  metaKeys,
+  getMeta,
+  isChildApplicable,
+  isChildEditable,
+  isChildVisible,
+  isDefaultValueApplied,
+  isQualifierValueApplied,
+  getHierarchy,
+  getHierarchyCode,
+} = NodeMeta
 
 // Hierarchy
-export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancestor), getHierarchy(node))
+export const isDescendantOf = (ancestor) => (node) => R.includes(getIId(ancestor), getHierarchy(node))
 
 //
 // ======
@@ -131,11 +141,11 @@ export const newNode = ({ record, nodeDefUuid, parentNode = null, value = null }
   return {
     [keys.nodeDefUuid]: nodeDefUuid,
     [keys.recordUuid]: ObjectUtils.getUuid(record),
-    [keys.iId]: record.lastInternalId + 1,
+    [keys.iId]: (record.lastNodeInternalId ?? 0) + 1,
     [keys.pIId]: getIId(parentNode),
     [keys.value]: value,
     [keys.meta]: {
-      [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
+      [metaKeys.hierarchy]: parentNode ? R.append(getIId(parentNode), getHierarchy(parentNode)) : [],
     },
     [keys.created]: true,
     [keys.dateCreated]: now,
@@ -144,7 +154,14 @@ export const newNode = ({ record, nodeDefUuid, parentNode = null, value = null }
 }
 
 export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
-  ...newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDef), parentNode, value }),
+  // Placeholders are never persisted, so there's no real record to draw the next internal id
+  // from; a negative, timestamp-derived one keeps it unique and clear of real (positive) ids.
+  ...newNode({
+    record: { lastNodeInternalId: -Date.now() },
+    nodeDefUuid: NodeDef.getUuid(nodeDef),
+    parentNode,
+    value,
+  }),
   [keys.placeholder]: true,
 })
 
@@ -157,7 +174,13 @@ export const assocIId = R.assoc(keys.iId)
 export const assocValue = R.assoc(keys.value)
 export const { assocValidation } = Validation
 
-export const { assocMeta, mergeMeta, assocChildApplicability, assocIsDefaultValueApplied } = NodeMeta
+export const {
+  assocMeta,
+  mergeMeta,
+  assocChildApplicability,
+  assocIsDefaultValueApplied,
+  assocIsQualifierValueApplied,
+} = NodeMeta
 
 export const assocCreated = R.assoc(keys.created)
 export const setCreated = (node) => {

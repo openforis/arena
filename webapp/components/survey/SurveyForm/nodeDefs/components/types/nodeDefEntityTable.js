@@ -1,5 +1,4 @@
 import './nodeDefEntityTable.scss'
-import React from 'react'
 
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -13,7 +12,7 @@ import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
 import NodeDefEntityTableRows from './nodeDefEntityTableRows'
 
 const NodeDefEntityTable = (props) => {
-  const { entry, edit, lang, nodeDef, nodes, parentNode, label, updateNode, canEditRecord, canAddNode } = props
+  const { edit, lang, nodeDef, nodes, parentNode, label, updateNode, canAddNode } = props
 
   return (
     <div className="survey-form__node-def-entity-table">
@@ -24,9 +23,8 @@ const NodeDefEntityTable = (props) => {
             <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
           </div>
 
-          {entry && canEditRecord && !NodeDef.isEnumerate(nodeDef) && (
+          {canAddNode && (
             <ButtonIconAdd
-              disabled={!canAddNode}
               onClick={() => {
                 const entity = Node.newNodePlaceholder(nodeDef, parentNode)
                 updateNode(nodeDef, entity)

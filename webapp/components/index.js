@@ -6,6 +6,7 @@ export {
   ButtonCancel,
   ButtonDownload,
   ButtonDelete,
+  ButtonEditLockToggle,
   ButtonIconAdd,
   ButtonIconDelete,
   ButtonIconEdit,
@@ -34,10 +35,13 @@ import Table from './Table'
 export { Dropzone, ExpansionPanel, ImageProgressive, Markdown, LoadingBar, PanelRight, ProgressBar, Stepper, Table }
 
 export { Alert } from './Alert'
+export { ColorInput } from './ColorInput'
+export { Fieldset } from './Fieldset'
 export { Link } from './Link'
 export { MapContainer } from './MapContainer'
 export { Modal, ModalBody, ModalHeader, ModalFooter } from './modal'
 export { QRCode } from './QRCode'
+export { RadioButton } from './RadioButton'
 export { RadioButtonGroup } from './RadioButtonGroup'
 export { ResizableModal } from './ResizableModal'
 export { Slider } from './Slider'

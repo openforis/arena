@@ -1,5 +1,3 @@
-import React from 'react'
-
 import * as Expression from '@core/expressionParser/expression'
 
 import { Button, ButtonDelete } from '@webapp/components/buttons'

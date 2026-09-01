@@ -9,10 +9,7 @@ import { GitRevisionPlugin } from 'git-revision-webpack-plugin'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
 
-import { uuidv4 } from './core/uuid'
-import * as ProcessUtils from './core/processUtils'
-
-const { buildReport } = ProcessUtils.ENV
+import { v4 as uuidv4 } from 'uuid'
 
 const config = {
   mode: process.env.NODE_ENV || 'development',
@@ -41,6 +38,8 @@ class CleanUpStatsPlugin {
 }
 
 // ==== init plugins
+const environment = process.env.NODE_ENV ?? 'development'
+
 const plugins = [
   ...(gitRevisionPlugin ? [gitRevisionPlugin] : []),
   new MiniCssExtractPlugin({
@@ -54,7 +53,7 @@ const plugins = [
     __BUST__: JSON.stringify(uuidv4()),
     process: {
       env: {
-        NODE_ENV: JSON.stringify(ProcessUtils.ENV.nodeEnv),
+        NODE_ENV: JSON.stringify(environment),
         ALLOW_USER_ACCESS_REQUEST: process.env.ALLOW_USER_ACCESS_REQUEST,
         APP_VERSION: gitRevisionPlugin
           ? JSON.stringify(gitRevisionPlugin.version())
@@ -62,6 +61,9 @@ const plugins = [
         RECAPTCHA_ENABLED: process.env.RECAPTCHA_ENABLED,
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
         RSTUDIO_DOWNLOAD_SERVER_URL: JSON.stringify(process.env.RSTUDIO_DOWNLOAD_SERVER_URL),
+        EMAIL_FROM_RESOLVED: JSON.stringify(
+          process.env.EMAIL_FROM || process.env.ADMIN_EMAIL || process.env.EMAIL_AUTH_USER
+        ),
       },
     },
   }),
@@ -73,17 +75,28 @@ if (isDevelopment) {
   plugins.push(new ReactRefreshWebpackPlugin())
 }
 
-if (buildReport) {
+if (process.env.BUILD_REPORT === 'true') {
   plugins.push(new BundleAnalyzerPlugin())
 }
 
 // ====== webpack config
 const webPackConfig = {
   entry: ['./webapp/Main.js'],
-  mode: ProcessUtils.ENV.nodeEnv,
+  mode: environment,
   devtool: 'source-map',
   resolve: {
-    extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
+    extensions: [
+      '.webpack-loader.js',
+      '.web-loader.js',
+      '.loader.js',
+      '.ts',
+      '.tsx',
+      '.js',
+      '.jsx',
+      '.scss',
+      '.sass',
+      '.css',
+    ],
     alias: {
       '@common': path.resolve(__dirname, 'common/'),
       '@core': path.resolve(__dirname, 'core/'),
@@ -130,7 +143,7 @@ const webPackConfig = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
         use: [
           {

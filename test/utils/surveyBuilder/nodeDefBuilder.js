@@ -24,6 +24,10 @@ export default class NodeDefBuilder {
     return NodeDef.newNodeDef(parentDef, this.type, [Survey.cycleOneKey], this.props, this.propsAdvanced)
   }
 
+  propAdvanced(key, value) {
+    return this._setProp(key, value, true)
+  }
+
   applyIf(expr) {
     return this._setProp(
       NodeDef.keysPropsAdvanced.applicable,

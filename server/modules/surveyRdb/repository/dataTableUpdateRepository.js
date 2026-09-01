@@ -6,6 +6,7 @@ import { Schemata, TableDataNodeDef } from '@common/model/db'
 import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/colUtils'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
+import * as DbUtils from '@server/db/dbUtils'
 import { RdbUpdateTypes, RdbUpdates } from './RdbUpdates'
 
 const types = RdbUpdateTypes
@@ -114,7 +115,7 @@ export const generateRdbUpdates = ({ survey, record, nodes }) => {
 
 const _update = (update, client) => {
   const { schema, table, valuesByColumnName, recordUuid, nodeIId } = update
-  const columnNames = Object.keys(valuesByColumnName)
+  const columnNames = Object.keys(valuesByColumnName).map((colName) => DbUtils.asName(colName))
   const values = Object.values(valuesByColumnName)
   return client.one(
     `UPDATE ${schema}.${table}
@@ -127,7 +128,7 @@ const _update = (update, client) => {
 
 const _insert = (update, client) => {
   const { schema, table, valuesByColumnName } = update
-  const columnNames = Object.keys(valuesByColumnName)
+  const columnNames = Object.keys(valuesByColumnName).map((colName) => DbUtils.asName(colName))
   const values = Object.values(valuesByColumnName)
   return client.one(
     `INSERT INTO ${schema}.${table}

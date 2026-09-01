@@ -48,7 +48,7 @@ export const SamplingPointDataItemPopup = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const elevation = useElevation({ survey, point, active: open })
+  const elevation = useElevation({ point, active: open })
 
   const content = generateContent({ i18n, itemCodes, locationPoint, elevation })
 

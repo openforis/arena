@@ -119,6 +119,42 @@ const insertTaxon = async ({ surveyId, taxon, backup = false, client = db }) => 
 export const insertTaxa = async ({ surveyId, taxa, backup = false, client = db }) =>
   client.batch(taxa.map((taxon) => insertTaxon({ surveyId, taxon, backup, client })))
 
+export const cloneTaxonomyFromSurvey = async ({ sourceSurveyId, targetSurveyId, taxonomyUuid }, client = db) => {
+  const sourceSchema = Schemata.getSchemaSurvey(sourceSurveyId)
+  const targetSchema = Schemata.getSchemaSurvey(targetSurveyId)
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.taxonomy (uuid, props, props_draft)
+    SELECT uuid, '{}'::jsonb, COALESCE(props, '{}'::jsonb) || COALESCE(props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.taxonomy
+    WHERE uuid = $1
+  `,
+    [taxonomyUuid]
+  )
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.taxon (uuid, taxonomy_uuid, props, props_draft)
+    SELECT uuid, taxonomy_uuid, '{}'::jsonb, COALESCE(props, '{}'::jsonb) || COALESCE(props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.taxon
+    WHERE taxonomy_uuid = $1
+  `,
+    [taxonomyUuid]
+  )
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.taxon_vernacular_name (uuid, taxon_uuid, props, props_draft)
+    SELECT vn.uuid, vn.taxon_uuid, '{}'::jsonb, COALESCE(vn.props, '{}'::jsonb) || COALESCE(vn.props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.taxon_vernacular_name vn
+    JOIN ${sourceSchema}.taxon t ON t.uuid = vn.taxon_uuid
+    WHERE t.taxonomy_uuid = $1
+  `,
+    [taxonomyUuid]
+  )
+}
+
 // ============== READ
 
 export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client = db) =>

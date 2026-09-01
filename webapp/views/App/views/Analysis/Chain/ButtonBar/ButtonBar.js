@@ -1,11 +1,10 @@
-import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import * as Chain from '@common/analysis/chain'
 
 import * as API from '@webapp/service/api'
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/chain'
 import { ButtonDelete, ButtonDownload } from '@webapp/components'
 import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 
@@ -16,6 +15,7 @@ const ButtonBar = () => {
   const chain = useChain()
   const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
+  const chainEditLocked = useChainEditLocked()
 
   const deleteChain = () => dispatch(ChainActions.deleteChain({ chain, navigate }))
 
@@ -24,11 +24,11 @@ const ButtonBar = () => {
       <ButtonDownload
         className="chain-summary-download-btn"
         fileName="chain_summary.json"
-        label="chainView.downloadSummaryJSON"
         href={API.getChainSummaryExportUrl({ surveyId, chainUuid: Chain.getUuid(chain) })}
+        label="chainView.downloadSummaryJSON"
         requestParams={{ cycle, lang }}
       />
-      <ButtonDelete label="chainView.deleteChain" onClick={deleteChain} />
+      <ButtonDelete disabled={chainEditLocked} label="chainView.deleteChain" onClick={deleteChain} />
     </div>
   )
 }

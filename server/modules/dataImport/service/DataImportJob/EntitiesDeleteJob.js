@@ -29,14 +29,14 @@ export default class EntitiesDeleteJob extends DataImportBaseJob {
 
   async deleteNotUpdatedEntities() {
     const { context, currentRecord } = this
-    const { entityUuidTouchedByRecordUuid, includeFiles, nodeDefUuid, survey, user } = context
+    const { entityIIdTouchedByRecordUuid, includeFiles, nodeDefUuid, survey, user } = context
 
     const recordUuid = Record.getUuid(currentRecord)
     const sideEffect = !includeFiles
     const nodes = Record.getNodesByDefUuid(nodeDefUuid)(currentRecord)
     const nodeIIdsToDelete = nodes.reduce((acc, node) => {
       const nodeIId = Node.getIId(node)
-      if (!entityUuidTouchedByRecordUuid[recordUuid]?.[nodeIId]) {
+      if (!entityIIdTouchedByRecordUuid[recordUuid]?.[nodeIId]) {
         acc.push(nodeIId)
       }
       return acc

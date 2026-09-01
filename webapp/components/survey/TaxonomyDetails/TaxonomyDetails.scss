@@ -7,17 +7,34 @@
   height: 100%;
 
   .taxonomy__header {
-    display: grid;
-    grid-template-columns: 0.1fr 0.6fr 0.3fr;
-    position: relative;
+    display: flex;
+    flex-direction: column;
 
-    .form-item {
-      height: inherit;
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
+    .form-item,
     .labels-editor.with-label {
-      grid-template-columns: 0.3fr 0.65fr;
-      grid-column-gap: 0.5rem;
+      display: flex;
+      height: inherit;
+      width: 40rem;
+
+      .form-label,
+      .labels-editor-label {
+        display: flex;
+        justify-content: flex-end;
+        white-space: nowrap;
+        width: 15rem;
+      }
+
+      .form-input-container,
+      .labels-editor__labels,
+      .labels-editor__label {
+        width: 20rem;
+      }
     }
   }
 
@@ -48,7 +65,6 @@
 
 .taxonomy.onlyRequiredColumns {
   .table__content {
-
     .table__row-header,
     .table__rows {
       width: calc(100% - 10px);

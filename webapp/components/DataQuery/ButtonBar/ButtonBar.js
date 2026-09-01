@@ -7,7 +7,7 @@ import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
-import { Switch } from '@webapp/components'
+import { Spinner, Switch } from '@webapp/components'
 import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
@@ -35,12 +35,12 @@ const modeButtonItems = [
   {
     key: modes.raw,
     iconClassName: 'icon-file-text2',
-    label: 'dataView.dataQuery.mode.raw',
+    label: 'dataView:dataQuery.mode.raw',
   },
   {
     key: modes.aggregate,
     iconClassName: 'icon-sigma',
-    label: 'dataView.dataQuery.mode.aggregate',
+    label: 'dataView:dataQuery.mode.aggregate',
   },
 ]
 
@@ -87,15 +87,16 @@ const ButtonBar = (props) => {
 
   return (
     <div className="data-query-button-bar">
-      <div className="display-flex">
+      <div className="data-query-button-bar__internal-container">
         <Button
           className={classNames('btn-toggle-node-defs-selector', 'btn-s', { highlight: nodeDefsSelectorVisible })}
           iconClassName="icon-tab icon-14px"
           onClick={() => dispatch(DataExplorerActions.setNodeDefsSelectorVisible(!nodeDefsSelectorVisible))}
-          title={nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show'}
+          title={nodeDefsSelectorVisible ? 'dataView:nodeDefsSelector.hide' : 'dataView:nodeDefsSelector.show'}
           variant="outlined"
         />
-        <FormItem className="mode-form-item" label="dataView.dataQuery.mode.label">
+        <div className="data-query-loading-spinner">{dataLoading && <Spinner size={18} />}</div>
+        <FormItem className="mode-form-item" label="dataView:dataQuery.mode.label">
           <ButtonGroup
             disabled={appSaving || !nodeDefsSelectorVisible}
             groupName="queryMode"
@@ -109,7 +110,7 @@ const ButtonBar = (props) => {
         </FormItem>
       </div>
       {hasSelection && (
-        <div>
+        <div className="data-query-button-bar__internal-container">
           <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />
           <ButtonSort disabled={queryChangeDisabled} state={state} Actions={Actions} />
           <ButtonDownload disabled={queryChangeDisabled} label="common.export" onClick={Actions.togglePanelExport} />
@@ -123,7 +124,7 @@ const ButtonBar = (props) => {
         <Checkbox
           checked={codesVisible}
           onChange={(val) => dispatch(DataExplorerActions.setCodesVisible(val))}
-          label="dataView.dataQuery.showCodes"
+          label="dataView:dataQuery.showCodes"
         />
       )}
 

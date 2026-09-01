@@ -73,7 +73,6 @@ button,
 button:disabled,
 *[aria-disabled='true'] {
   color: currentColor;
-  display: inline-block;
   /* For IE11/ MS Edge bug */
   pointer-events: none;
   text-decoration: none;
@@ -110,11 +109,11 @@ button:disabled,
 }
 
 .btn-primary {
-  background-color: $blue;
+  background-color: var(--blue);
   color: $white;
 
   &:hover {
-    background-color: color.adjust($blue, $lightness: 15%);
+    background-color: color-mix(in srgb, var(--blue) 85%, white);
   }
 }
 
@@ -127,7 +126,7 @@ button:disabled,
 }
 
 .btn-cancel {
-  color: $blue;
+  color: var(--blue);
 }
 
 .button-bar {
@@ -187,5 +186,10 @@ button:disabled,
   &.btn-s {
     padding: 0.5rem;
     font-size: 0.8rem;
+  }
+
+  .MuiButton-startIcon {
+    margin-right: -2px;
+    margin-left: -2px;
   }
 }

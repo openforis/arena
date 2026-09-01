@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { Numbers, Objects } from '@openforis/arena-core'
@@ -31,7 +30,7 @@ export const DataQueryPieChart = (props) => {
   const maxDecimalDigits = maxDecimalDigitsByMeasureNodeDefUuid[firstMeasureNodeDefUuid]
 
   if (data.length > maxItems) {
-    return i18n.t('dataView.charts.warning.tooManyItemsToShowChart', { maxItems })
+    return i18n.t('dataView:charts.warning.tooManyItemsToShowChart', { maxItems })
   }
 
   const firstDimensionDataColumn = dataColumnByDimensionNodeDefUuid[firstDimensionNodeDefUuid]

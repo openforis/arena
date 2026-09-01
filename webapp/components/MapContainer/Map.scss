@@ -52,6 +52,7 @@
         width: 100%;
         display: flex;
         align-items: center;
+        gap: 4px;
 
         .layer-selector-name {
           flex: 1;
@@ -59,13 +60,38 @@
         }
 
         .layer-selector-button-bar {
-          width: 2rem;
+          display: flex;
+          align-items: center;
+          width: auto;
 
           .layer-selector-earth-map-btn {
             width: 14px;
             height: 14px;
             padding: 0;
             border: none;
+          }
+
+          .layer-color-picker {
+            width: 14px;
+            height: 14px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
+            overflow: hidden;
+            &::-webkit-color-swatch-wrapper {
+              padding: 0;
+              border-radius: 50%;
+            }
+            &::-webkit-color-swatch {
+              border: none;
+              border-radius: 50%;
+            }
+            &::-moz-color-swatch {
+              border: none;
+              border-radius: 50%;
+            }
           }
         }
       }
@@ -93,6 +119,21 @@
     .leaflet-control-layers-overlays {
       label {
         padding: 0.3rem;
+      }
+    }
+
+    .leaflet-control-layers-group-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #888;
+      padding: 5px 0 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+
+      &:not(:first-child) {
+        margin-top: 4px;
+        padding-top: 6px;
+        border-top: 1px solid #ddd;
       }
     }
 
@@ -137,6 +178,17 @@
   .leaflet-div-icon {
     background: none !important;
     border: none !important;
+  }
+
+  .utm-grid-label {
+    background: none;
+    border: none;
+    color: #ffd900;
+    font-size: 10px;
+    font-weight: bold;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+    pointer-events: none;
   }
 
   .cluster-marker {

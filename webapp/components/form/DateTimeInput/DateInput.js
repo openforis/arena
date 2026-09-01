@@ -1,6 +1,5 @@
 import './DateInput.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 

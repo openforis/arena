@@ -1,4 +1,4 @@
-import i18n from '@core/i18n/i18nFactory'
+import i18nInstance from '@core/i18n/i18nFactory'
 import * as AuthGroup from '@core/auth/authGroup'
 import { Countries } from '@core/Countries'
 
@@ -10,12 +10,12 @@ const exportUsersIntoStream = async ({ outputStream, fileFormat }) => {
   const transformSurveyNames = (surveyNames) =>
     surveyNames
       ? Object.values(AuthGroup.groupNames).reduce(
-          (acc, groupName) => acc.replaceAll(groupName, i18n.t(`auth:authGroups.${groupName}.label`)),
+          (acc, groupName) => acc.replaceAll(groupName, i18nInstance.t(`auth:authGroups.${groupName}.label`)),
           surveyNames
         )
       : ''
 
-  const transformTitle = (title) => (title ? i18n.t(`user.titleValues.${title}`) : '')
+  const transformTitle = (title) => (title ? i18nInstance.t(`user.titleValues.${title}`) : '')
 
   const transformCountry = (countryCode) => (countryCode ? Countries.getCountryName({ code: countryCode }) : '')
 

@@ -58,20 +58,20 @@ const DataExport = (props) => {
     const _availableSources = [
       {
         key: sources.allRecords,
-        label: `dataView.dataExport.source.allRecords`,
+        label: `dataView:dataExport.source.allRecords`,
       },
     ]
     if (sourceSelectionAvailable && selectedRecordsCount > 0) {
       _availableSources.push({
         key: sources.selectedRecords,
-        label: `dataView.dataExport.source.selectedRecord`,
+        label: `dataView:dataExport.source.selectedRecord`,
         labelParams: { count: selectedRecordsCount },
       })
     }
     if (sourceSelectionAvailable && !Objects.isEmpty(search)) {
       _availableSources.push({
         key: sources.filteredRecords,
-        label: `dataView.dataExport.source.filteredRecords`,
+        label: `dataView:dataExport.source.filteredRecords`,
       })
     }
     return _availableSources
@@ -82,7 +82,7 @@ const DataExport = (props) => {
   return (
     <div className={classNames('data-export-container', { 'with-multiple-sources': multipleSources })}>
       {multipleSources && (
-        <FormItem className="source-form-item" label="dataView.dataExport.source.label">
+        <FormItem className="source-form-item" label="dataView:dataExport.source.label">
           <RadioButtonGroup onChange={onSourceChange} value={source} items={availableSources} />
         </FormItem>
       )}
@@ -91,7 +91,7 @@ const DataExport = (props) => {
 
       <Button
         className="btn-primary"
-        label="dataExportView.startExport"
+        label="dataExportView:startExport"
         onClick={onExportClick}
         testId={TestId.dataExport.startExport}
       />

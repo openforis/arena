@@ -8,10 +8,12 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
+import { useHasSurveyUserGroups } from './useHasSurveyUserGroups'
 import { useIsKeyEditDisabled } from './useIsKeyEditDisabled'
 import { useIsMultipleEditDisabled } from './useIsMultipleEditDisabled'
 
 import { State } from '../../store'
+import { useIsMaxKeysCountReached } from './useIsMaxKeysCountReached'
 
 export const useBasicProps = (props) => {
   const { state } = props
@@ -28,6 +30,7 @@ export const useBasicProps = (props) => {
   const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
   const displayInParentPageDisabled = NodeDefLayout.isRenderForm(cycle)(nodeDef)
   const keyEditDisabled = useIsKeyEditDisabled({ nodeDef })
+  const maxKeysCountReached = useIsMaxKeysCountReached({ nodeDef })
   const multipleEditDisabled = useIsMultipleEditDisabled({ nodeDef })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
   const hasAncestorExcludedInClone = !!Survey.findAncestor({ nodeDef, predicate: NodeDef.isExcludedInClone })(survey)
@@ -64,7 +67,10 @@ export const useBasicProps = (props) => {
     (NodeDef.canHaveAutoIncrementalKey({ nodeDef, nodeDefParent }) &&
       ancestorMultipleEntityDef &&
       !NodeDef.isRoot(ancestorMultipleEntityDef))
+  const canAutoCreateMinCountItems = NodeDef.canHaveAutoCreateMinCountItems(nodeDef)
   const canIncludeInMultipleEntitySummary = NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+  const canBeQualifier = Survey.canNodeDefBeQualifier(nodeDef)(survey)
+  const hasUserGroups = useHasSurveyUserGroups({ enabled: canBeQualifier })
 
   return {
     nodeDef,
@@ -74,6 +80,7 @@ export const useBasicProps = (props) => {
     displayAsTableDisabled,
     displayInParentPageDisabled,
     keyEditDisabled,
+    maxKeysCountReached,
     multipleEditDisabled,
     entitySourceHierarchy,
     renderType,
@@ -88,6 +95,9 @@ export const useBasicProps = (props) => {
     includedInClone,
     includeInCloneDisabled,
     canHaveAutoIncrementalKey,
+    canAutoCreateMinCountItems,
     canIncludeInMultipleEntitySummary,
+    canBeQualifier,
+    hasUserGroups,
   }
 }

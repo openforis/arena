@@ -1,5 +1,17 @@
 import { useSelector } from 'react-redux'
 
-export const useChain = () => useSelector((state) => state.ui.chain.chain)
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
-export const useChainRecordsCountByStep = () => useSelector((state) => state.ui.chain.recordsCountByStep)
+import { ChainState } from './state'
+
+export const useChain = () => useSelector((state) => ChainState.getChain(state))
+
+export const useChainRecordsCountByStep = () => useSelector((state) => ChainState.getRecordsCountByStep(state))
+
+export const useChainEditLocked = () => useSelector((state) => ChainState.isChainEditLocked(state))
+
+export const useChainEditable = () => {
+  const canUseAnalysis = useAuthCanUseAnalysis()
+  const chainEditLocked = useChainEditLocked()
+  return canUseAnalysis && !chainEditLocked
+}

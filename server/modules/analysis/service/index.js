@@ -14,6 +14,10 @@ export {
   updateChainStatusExec,
   // ======  DELETE - Chain
   deleteChain,
+  // ======  CLONE - Chain
+  cloneChainFromSurvey,
+  fetchChainsForCloneFromSurvey,
+  fetchChainSourceEntityNames,
   // ======  UTILS
   cleanChains,
 } from '../manager'

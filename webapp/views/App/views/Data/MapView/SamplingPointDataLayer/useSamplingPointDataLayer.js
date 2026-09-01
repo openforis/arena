@@ -15,7 +15,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { LoaderActions } from '@webapp/store/ui'
 
-import { useMapClusters, useMapLayerAdd } from '../common'
+import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../common'
 
 const itemsPageSize = 2000
 
@@ -38,6 +38,7 @@ const _convertItemsToPoints = (items) => {
         x: long,
         y: lat,
         properties: {
+          ancestorsKeys: itemCodes,
           cluster: false,
           itemUuid,
           itemCodes,
@@ -102,6 +103,7 @@ export const useSamplingPointDataLayer = (props) => {
   const map = useMap()
 
   const fetchCancelRef = useRef(null)
+  const [isLayerActive, setIsLayerActive] = useState(false)
   const [state, setState] = useState({ loaded: false, loading: false, points: [], items: [] })
   const { loaded, loading, points, items } = state
 
@@ -113,8 +115,13 @@ export const useSamplingPointDataLayer = (props) => {
     { level: levelIndex + 1 }
   )
 
-  // add icon close to name
-  const overlayName = `${overlayInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
+  const layerKey = `sampling-point-data-layer-color-picker-${levelIndex}`
+
+  const { layerName: overlayName, currentMarkersColor } = useLayerColorPicker({
+    colorPickerId: layerKey,
+    innerName: overlayInnerName,
+    initialColor: markersColor,
+  })
 
   const fetchItemsAndConvertIntoPoints = useCallback(async () => {
     dispatch(LoaderActions.showLoader())
@@ -132,14 +139,19 @@ export const useSamplingPointDataLayer = (props) => {
     }
   }, [dispatch, isMountedRef, levelIndex, map, surveyId])
 
-  useMapLayerAdd({
+  useMapLayerToggle({
     layerName: overlayName,
-    callback: () => {
+    layerKey,
+    onAdd: () => {
+      setIsLayerActive(true)
       const shouldLoadItems = !loaded && !loading
       if (shouldLoadItems) {
         fetchItemsAndConvertIntoPoints()
       }
       setState((statePrev) => ({ ...statePrev, loading: shouldLoadItems }))
+    },
+    onRemove: () => {
+      setIsLayerActive(false)
     },
   })
 
@@ -158,7 +170,10 @@ export const useSamplingPointDataLayer = (props) => {
     clusterExpansionZoomExtractor,
     clusterIconCreator,
     getClusterLeaves,
+    isLayerActive,
+    overlayInnerName,
     overlayName,
+    currentMarkersColor,
     totalPoints: points.length,
     items,
     points,

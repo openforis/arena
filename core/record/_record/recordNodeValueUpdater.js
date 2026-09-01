@@ -2,6 +2,7 @@ import { RecordUpdateResult } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
 
 import { NodeValues } from '../nodeValues'
 
@@ -12,6 +13,7 @@ export const updateAttributeValue = ({
   attributeDef,
   attribute,
   value,
+  refData = null,
   dateModified: dataModifiedParam = null,
   sideEffect = false,
 }) => {
@@ -35,7 +37,8 @@ export const updateAttributeValue = ({
       Node.assocDateModified(dataModifiedParam ?? new Date()),
       (nodeUpdated) =>
         // reset defaultValueApplied meta information
-        Node.isDefaultValueApplied(attribute) ? Node.assocIsDefaultValueApplied(false)(nodeUpdated) : nodeUpdated
+        Node.isDefaultValueApplied(attribute) ? Node.assocIsDefaultValueApplied(false)(nodeUpdated) : nodeUpdated,
+      (nodeUpdated) => (refData ? NodeRefData.assocRefData(refData)(nodeUpdated) : nodeUpdated)
     )(attribute)
 
     const updateResult = new RecordUpdateResult({ record })

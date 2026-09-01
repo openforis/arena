@@ -1,8 +1,7 @@
 import './SurveyInfo.scss'
 
-import React from 'react'
-
 import { useAuthCanEditSurvey, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonSave } from '@webapp/components'
@@ -10,8 +9,10 @@ import TabBar from '@webapp/components/tabBar'
 import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyUserExtraPropDefsEditor'
 
 import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
+import { SurveyInfoBrandingForm } from './SurveyInfoBrandingForm'
 import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
-import { SurveyInfoSampleBasedImageInterpretation } from './SurveyInfoSampleBasedImageInterpretation'
+import { SurveyInfoDocuments } from './SurveyInfoDocuments'
+import { SurveyInfoMap } from './SurveyInfoMap'
 
 import { useSurveyInfoForm } from './store'
 import { SurveySecurityEditor } from './surveySecurityEditor'
@@ -20,12 +21,18 @@ const SurveyInfo = () => {
   const readOnly = !useAuthCanEditSurvey()
   const isSystemAdmin = useUserIsSystemAdmin()
   const canUseAnalysis = useAuthCanUseAnalysis()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   const {
-    userExtraPropDefs,
+    preloadedMapLayers,
+    preloadedMapLayersEnabled,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
     security,
+    surveyDocImages,
+    surveyDocOptions,
+    userExtraPropDefs,
+
     setCycles,
     setDefaultCycleKey,
     setDescriptions,
@@ -33,13 +40,19 @@ const SurveyInfo = () => {
     setLabels,
     setLanguages,
     setName,
+    setPreloadedMapLayers,
+    setPreloadedMapLayersEnabled,
     setSamplingPolygon,
     setSampleBasedImageInterpretationEnabled,
     setSecurity,
     setSrs,
+    setSurveyDocImages,
+    setSurveyDocOptions,
     setUserExtraPropDefs,
+    setBranding,
     getFieldValidation,
     saveProps,
+
     ...surveyInfoObject
   } = useSurveyInfoForm()
 
@@ -62,17 +75,49 @@ const SurveyInfo = () => {
       },
     },
   ]
+  if (!readOnly) {
+    tabs.push({
+      key: 'branding',
+      component: SurveyInfoBrandingForm,
+      label: 'homeView:surveyInfo.branding.title',
+      props: {
+        branding: surveyInfoObject.branding || {},
+        setBranding,
+        readOnly,
+        labels: surveyInfoObject.labels,
+        descriptions: surveyInfoObject.descriptions,
+        name: surveyInfoObject.name,
+      },
+    })
+  }
   if (canUseAnalysis) {
     tabs.push({
       key: 'sampleBasedInterpretation',
-      component: SurveyInfoSampleBasedImageInterpretation,
-      label: 'homeView:surveyInfo.sampleBasedImageInterpretation',
+      component: SurveyInfoMap,
+      label: 'homeView:surveyInfo.map',
       props: {
         getFieldValidation,
         sampleBasedImageInterpretationEnabled,
         samplingPolygon,
         setSampleBasedImageInterpretationEnabled,
         setSamplingPolygon,
+        preloadedMapLayers,
+        preloadedMapLayersEnabled,
+        setPreloadedMapLayers,
+        setPreloadedMapLayersEnabled,
+      },
+    })
+  }
+  if (experimentalFeatures && !readOnly) {
+    tabs.push({
+      key: 'documents',
+      component: SurveyInfoDocuments,
+      label: 'homeView:surveyInfo.surveyDocLayout.tabTitle',
+      props: {
+        surveyDocImages,
+        setSurveyDocImages,
+        surveyDocOptions,
+        setSurveyDocOptions,
       },
     })
   }

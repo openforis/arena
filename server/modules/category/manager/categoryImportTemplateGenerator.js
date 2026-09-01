@@ -35,7 +35,7 @@ const generateSamplingPointDataCategoryTemplate = () => {
 }
 
 const templateExtraValueByType = {
-  [ExtraPropDef.dataTypes.number]: 100,
+  [ExtraPropDef.dataTypes.number]: 123,
   [ExtraPropDef.dataTypes.text]: 'Text Value',
   [ExtraPropDef.dataTypes.geometryPoint]: Points.toString(PointFactory.createInstance({ x: 12.48902, y: 41.88302 })),
 }

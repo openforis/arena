@@ -47,11 +47,14 @@ const ExpressionProp = (props) => {
 
   const isPlaceholder = NodeDefExpression.isPlaceholder(expression)
   const expressionEmpty = NodeDefExpression.isEmpty(expression)
+  const [isExpressionEditorOpen, setIsExpressionEditorOpen] = React.useState(isPlaceholder)
+  const [isApplyIfEditorOpen, setIsApplyIfEditorOpen] = React.useState(false)
+  const validationToShow = isExpressionEditorOpen || isApplyIfEditorOpen ? null : validation
 
   const expressionEditorTypes = [ExpressionEditorType.basic, ...(hideAdvanced ? [] : [ExpressionEditorType.advanced])]
 
   return (
-    <ValidationTooltip validation={validation} showKeys={false}>
+    <ValidationTooltip validation={validationToShow} showKeys={false}>
       <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
         {!isPlaceholder && !readOnly && (
           <ButtonIconDelete
@@ -73,6 +76,8 @@ const ExpressionProp = (props) => {
             excludeCurrentNodeDef={excludeCurrentNodeDef}
             query={NodeDefExpression.getExpression(expression)}
             onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocExpression(query)(expression), callback)}
+            onCancel={() => onDelete(expression, null, { confirm: false })}
+            onEditChange={setIsExpressionEditorOpen}
             isContextParent={isContextParent}
             canBeCall={canBeCall}
             canBeConstant={canBeConstant}
@@ -96,6 +101,7 @@ const ExpressionProp = (props) => {
               excludeCurrentNodeDef={excludeCurrentNodeDef}
               query={NodeDefExpression.getApplyIf(expression)}
               onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocApplyIf(query)(expression), callback)}
+              onEditChange={setIsApplyIfEditorOpen}
               isContextParent={isContextParent}
               canBeCall
               canBeConstant={false}

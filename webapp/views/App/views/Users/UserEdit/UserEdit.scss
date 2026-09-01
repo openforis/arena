@@ -61,10 +61,13 @@
     justify-self: center;
   }
 
-  .map-api-keys {
+  .map-api-keys,
+  .notification-prefs {
     width: 40rem;
     justify-self: center;
+  }
 
+  .map-api-keys {
     .form-item {
       grid-template-columns: 0.3fr 0.7fr 5rem;
     }

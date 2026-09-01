@@ -1,6 +1,6 @@
 import './SurveyCreate.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router'
 
@@ -11,7 +11,7 @@ import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 import { RecordCycle } from '@core/record/recordCycle'
 
-import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import { appModuleUri, appModules } from '@webapp/app/appModules'
 
 import { contentTypes } from '@webapp/service/api'
 import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
@@ -26,6 +26,10 @@ import { Checkbox, Dropdown } from '@webapp/components/form'
 import { Button, Dropzone, RadioButtonGroup } from '@webapp/components'
 import { SurveyType } from '@webapp/model'
 import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
+import {
+  defaultChunkSize,
+  FileUploadChunkSizeDropdown,
+} from '@webapp/views/App/views/Data/DataImport/FileUploadChunkSizeDropdown'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
@@ -53,6 +57,7 @@ const SurveyCreate = (props) => {
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
   const navigate = useNavigate()
+  const [chunkSize, setChunkSize] = useState(defaultChunkSize)
 
   const {
     newSurvey,
@@ -83,9 +88,9 @@ const SurveyCreate = (props) => {
     uploading,
   } = newSurvey
 
-  // Redirect to dashboard on survey change
+  // Redirect to dashboard after creating a survey or template.
   useOnUpdate(() => {
-    navigate(appModuleUri(homeModules.dashboard))
+    navigate(appModuleUri(appModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
 
   const fileUploadLimitMB = useSystemConfigFileUploadLimitMB()
@@ -227,6 +232,7 @@ const SurveyCreate = (props) => {
                   droppedFiles={file ? [file] : []}
                 />
               </div>
+              <FileUploadChunkSizeDropdown onChange={setChunkSize} value={chunkSize} />
             </>
           )}
           <div className="row">
@@ -236,6 +242,7 @@ const SurveyCreate = (props) => {
               onCancel={onImportUploadCancel}
               onUploadComplete={onImportJobStart}
               startFunction={onImport}
+              startFunctionParams={{ chunkSize }}
               testId={TestId.surveyCreate.startImportBtn}
             />
           </div>

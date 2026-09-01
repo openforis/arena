@@ -9,18 +9,16 @@ const excelRowsLimit = 10000
 
 const getExtension = (file) => {
   const fileName = typeof file === 'string' ? file : file.name
-  const extension = fileName.split('.').pop()
+  const extension = fileName.split('.').pop()?.toLocaleLowerCase()
   return extension
 }
 
 /**
  * Format bytes as human-readable text.
- *
  * @param {!number} bytes - Number of bytes.
  * @param {object} options - Options object.
  * @param {boolean} [options.si] - True to use metric (SI) units, aka powers of 1000. False to use binary (IEC), aka powers of 1024.
  * @param {number} [options.decimalPlaces] - Number of decimal places to display.
- *
  * @returns {string} - Formatted string.
  */
 const toHumanReadableFileSize = (bytes, { si = false, decimalPlaces = 1 } = {}) => {
@@ -67,6 +65,24 @@ const readAsText = async (file, ignoreErrors = true) =>
     reader.readAsText(file)
   })
 
+/**
+ * Checks that a previously selected file can still actually be read from disk.
+ * Browsers snapshot a file's size/last-modified metadata at selection time but read its bytes lazily;
+ * if the underlying file was modified/moved/deleted afterwards, reading it fails (e.g. Chrome's
+ * net::ERR_UPLOAD_FILE_CHANGED), which otherwise only surfaces later as a generic upload/network error.
+ * Reading a single byte is enough to trigger the same check the browser would do on actual upload.
+ * @param {!File} file - The file to check.
+ * @returns {Promise<boolean>} - True if the file can still be read, false otherwise.
+ */
+const checkFileIsReadable = async (file) => {
+  try {
+    await file.slice(0, 1).arrayBuffer()
+    return true
+  } catch {
+    return false
+  }
+}
+
 const determineFileFormatFromFileName = (fileName) => {
   const extension = getExtension(fileName)
   return extension ? fileFormatByExtension[extension.toLocaleLowerCase()] : undefined
@@ -78,5 +94,6 @@ export const FileUtils = {
   toHumanReadableFileSize,
   acceptByExtension,
   readAsText,
+  checkFileIsReadable,
   determineFileFormatFromFileName,
 }

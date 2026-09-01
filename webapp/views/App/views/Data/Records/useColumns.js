@@ -7,7 +7,7 @@ import * as Validation from '@core/validation/validation'
 import * as DateUtils from '@core/dateUtils'
 import * as Authorizer from '@core/auth/authorizer'
 
-import { useNodeDefRootKeys, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useNodeDefRootKeys, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { Button } from '@webapp/components'
 import { AppIcon } from '@webapp/components/AppIcon'
@@ -24,6 +24,7 @@ import { RecordDeleteButton } from './RecordDeleteButton'
 import { RecordOwnerColumn } from './RecordOwnerColumn'
 
 export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate }) => {
+  const survey = useSurvey()
   const lang = useSurveyPreferredLang()
   const srsIndex = useSurveySrsIndex()
   const user = useUser()
@@ -70,6 +71,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
           const name = NodeDef.getName(nodeDef)
           const uuid = NodeDef.getUuid(nodeDef)
           const value = RecordKeyValuesExtractor.extractKeyOrSummaryValue({
+            survey,
             nodeDef,
             record,
             categoryItemsByCodeDefUuid,
@@ -120,7 +122,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
       {
         key: Record.keys.ownerName,
         className: 'width100',
-        header: 'dataView.records.owner',
+        header: 'dataView:records.owner',
         hidden: true,
         renderItem: RecordOwnerColumn,
         sortable: true,
@@ -128,7 +130,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
       },
       {
         key: Record.keys.step,
-        header: 'dataView.records.step',
+        header: 'dataView:records.step',
         sortable: true,
         renderItem: ({ item: record }) => Record.getStep(record),
         width: '5rem',
@@ -155,7 +157,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
             <>
               <Button
                 iconClassName={`icon-16px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}
-                title={`dataView.records.${canEdit ? 'editRecord' : 'viewRecord'}`}
+                title={`dataView:records.${canEdit ? 'editRecord' : 'viewRecord'}`}
                 onClick={onRecordEditButtonClick(record)}
                 variant="text"
               />
@@ -182,6 +184,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
     onRecordsUpdate,
     srsIndex,
     summaryDefs,
+    survey,
     user,
   ])
 }

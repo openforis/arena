@@ -7,8 +7,27 @@ import * as JobState from './state'
 const actionHandlers = {
   [JobActions.JOB_START]: (
     _state,
-    { job, onComplete, autoHide, closeButton, errorKeyHeaderName, errorsExportFileName }
-  ) => JobState.startJob({ job, onComplete, autoHide, closeButton, errorKeyHeaderName, errorsExportFileName }),
+    {
+      job,
+      onComplete,
+      autoHide,
+      closeButton,
+      closeButtonProps,
+      errorKeyHeaderName,
+      errorsExportFileName,
+      longRunningMessageKey,
+    }
+  ) =>
+    JobState.startJob({
+      job,
+      onComplete,
+      autoHide,
+      closeButton,
+      closeButtonProps,
+      errorKeyHeaderName,
+      errorsExportFileName,
+      longRunningMessageKey,
+    }),
 
   [JobActions.JOB_UPDATE]: (state, { job }) => JobState.updateJob({ job })(state),
 }

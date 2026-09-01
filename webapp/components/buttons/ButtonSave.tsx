@@ -1,0 +1,15 @@
+import classNames from 'classnames'
+
+import { Button, ButtonProps } from './Button'
+
+export const ButtonSave = (props: ButtonProps) => {
+  const { label = 'common.save' } = props
+  return (
+    <Button
+      {...props}
+      className={classNames('btn-primary btn-save', props.className)}
+      iconClassName="icon-floppy-disk icon-12px"
+      label={label}
+    />
+  )
+}

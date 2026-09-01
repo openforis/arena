@@ -167,6 +167,47 @@ export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, re
   )
 }
 
+/**
+ * Finds file-attribute-value nodes belonging to PREVIEW records only, that either have one of the
+ * given node def UUIDs themselves, or are descendants of a node that does - found via the node's
+ * immutable meta.hierarchy ancestor-chain (no recursive query needed: hierarchy is set once at node
+ * creation and only ever merged, never overwritten, by updateNode).
+ * Used by deleteNodesByNodeDefUuids, whose delete is NOT scoped to a single record (it can affect
+ * nodes - and therefore files - across many records of the survey at once), which is why this needs
+ * a DB-wide query rather than filtering an in-memory record's nodes.
+ * Must be called BEFORE the node delete, since ON DELETE CASCADE silently removes descendant
+ * rows with no RETURNING visibility.
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey ID.
+ * @param {Array<string>} params.nodeDefUuids - Node def UUIDs being purged wholesale.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<Array<{fileUuid: string, recordUuid: string}>>} - The matching file-attribute nodes.
+ */
+export const fetchFileValueNodesByNodeDefUuids = async ({ surveyId, nodeDefUuids }, client = db) => {
+  if (A.isEmpty(nodeDefUuids)) return []
+
+  const schema = getSurveyDBSchema(surveyId)
+
+  return client.manyOrNone(
+    `
+    SELECT n.record_uuid AS "recordUuid", n.value ->> '${Node.valuePropsFile.fileUuid}' AS "fileUuid"
+    FROM ${schema}.node n
+    JOIN ${schema}.node_def nd ON nd.uuid = n.node_def_uuid AND nd.type = '${NodeDef.nodeDefType.file}'
+    JOIN ${schema}.record r ON r.uuid = n.record_uuid AND r.preview = true
+    WHERE n.value ->> '${Node.valuePropsFile.fileUuid}' IS NOT NULL
+      AND (
+        n.node_def_uuid IN ($/nodeDefUuids:csv/)
+        OR n.meta -> '${Node.metaKeys.hierarchy}' ?| (
+             SELECT coalesce(array_agg(root.uuid::text), ARRAY[]::text[])
+             FROM ${schema}.node root
+             WHERE root.node_def_uuid IN ($/nodeDefUuids:csv/)
+           )
+      )`,
+    { nodeDefUuids },
+    (row) => row
+  )
+}
+
 // ============== CREATE
 
 export const insertNode = async (surveyId, node, draft, client = db) => {
@@ -332,15 +373,25 @@ export const deleteNode = async ({ surveyId, recordUuid, nodeIId }, client = db)
     dbTransformCallback
   )
 
+/**
+ * Deletes all nodes belonging to the given node def uuids, survey-wide. Callers of this delete
+ * are cleaning up nodes for node defs that no longer exist (e.g. RecordCheckJob, at publish time),
+ * not tracking individual affected nodes, so this intentionally skips RETURNING: on a large survey
+ * this delete can match millions of rows, and pulling them all back (with their JSONB value/meta
+ * payloads) into memory at once is enough on its own to exhaust a job worker's heap.
+ * @param {number} surveyId - The survey ID.
+ * @param {Array<string>} nodeDefUuids - Node def UUIDs being purged wholesale.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<number>} - The number of nodes deleted.
+ */
 export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) =>
-  client.manyOrNone(
+  client.result(
     `
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE node_def_uuid IN ($1:csv)
-    RETURNING *, true as ${Node.keys.deleted}
     `,
     [nodeDefUuids],
-    dbTransformCallback
+    R.prop('rowCount')
   )
 
 export const deleteNodesByInternalIds = async ({ surveyId, recordUuid, nodeInternalIds }, client = db) =>

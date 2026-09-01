@@ -16,10 +16,11 @@ import SystemError from '@core/systemError'
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-import * as FileManager from '@server/modules/record/manager/fileManager'
+import * as RecordFileManager from '@server/modules/record/manager/recordFileManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as RecordValidationManager from './recordValidationManager'
 import * as NodeCreationManager from './nodeCreationManager'
@@ -50,7 +51,7 @@ export const initNewRecord = async (
 
   const rootNode = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(rootNodeDef) })
 
-  return persistNode(
+  const recordWithRootEntity = await persistNode(
     {
       user,
       survey,
@@ -64,6 +65,49 @@ export const initNewRecord = async (
     },
     client
   )
+
+  return _applyGroupQualifierValues(
+    { user, survey, record: recordWithRootEntity, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+    client
+  )
+}
+
+// Auto-fills attributes flagged as "qualifier" with the value specified for them
+// in the qualifiers of the current user's group for this survey, and marks
+// the affected node as non-editable in the UI.
+const _applyGroupQualifierValues = async (
+  { user, survey, record, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+  client
+) => {
+  const qualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey }, client)
+  if (qualifierFilters.length === 0) return record
+
+  const rootNode = Record.getRootNode(record)
+
+  let recordUpdated = record
+
+  for (const { nodeDef, value } of qualifierFilters) {
+    const existingNode = Record.getNodeChildrenByDefUuid(rootNode, NodeDef.getUuid(nodeDef))(recordUpdated)[0]
+    const nodeToPersist =
+      existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(recordUpdated), rootNode)
+    const nodeWithValue = Node.assocIsQualifierValueApplied(true)(Node.assocValue(value)(nodeToPersist))
+
+    recordUpdated = await persistNode(
+      {
+        user,
+        survey,
+        record: recordUpdated,
+        node: nodeWithValue,
+        timezoneOffset,
+        nodesUpdateListener,
+        nodesValidationListener,
+        system: true,
+      },
+      client
+    )
+  }
+
+  return recordUpdated
 }
 
 // ==== UPDATE
@@ -134,7 +178,7 @@ export const deleteRecord = async (user, survey, record, client = db) =>
     const surveyId = Survey.getId(survey)
     await Promise.all([
       RecordRepository.deleteRecord(surveyId, uuid, t),
-      FileManager.markRecordFilesAsDeleted(surveyId, uuid, t),
+      RecordFileManager.markRecordFilesAsDeleted(surveyId, uuid, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, logContent, false, t),
     ])
   })
@@ -142,14 +186,14 @@ export const deleteRecord = async (user, survey, record, client = db) =>
 export const deleteRecordPreview = async (surveyId, recordUuid) =>
   await db.tx(async (t) => {
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
-    await FileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
+    await RecordFileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
 export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
   db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!A.isEmpty(recordUuids)) {
-      await FileManager.deleteFilesByRecordUuids(surveyId, recordUuids, t)
+      await RecordFileManager.deleteFilesByRecordUuids(surveyId, recordUuids, t)
     }
     return recordUuids.length
   })
@@ -236,16 +280,8 @@ export const deleteNode = async (
 
 export const { deleteNodesByInternalIds } = NodeUpdateManager
 
-export const deleteNodesByNodeDefUuids = async ({ user, surveyId, nodeDefUuids, record }, client = db) => {
-  const { record: recordUpdated } = await NodeUpdateManager.deleteNodesByNodeDefUuids(
-    user,
-    surveyId,
-    nodeDefUuids,
-    record,
-    client
-  )
-  return recordUpdated
-}
+export const deleteNodesByNodeDefUuids = async ({ user, surveyId, nodeDefUuids }, client = db) =>
+  NodeUpdateManager.deleteNodesByNodeDefUuids(user, surveyId, nodeDefUuids, client)
 
 const _updateNodeAndValidateRecordUniqueness = async (
   {
@@ -280,6 +316,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
       t
     )
     recordUpdated = recordUpdated2
+
     await _afterNodesUpdate(
       {
         survey,

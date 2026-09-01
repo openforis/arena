@@ -1,62 +1,37 @@
 import {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  HeadBucketCommand,
-  PutObjectCommand,
-  S3Client,
-} from '@aws-sdk/client-s3'
+  checkFileExistsInS3,
+  copyObjectInS3,
+  createS3BucketRepository,
+  deleteObjectFromS3,
+} from '@server/modules/file/repository/fileRepositoryS3BucketCommon'
 
-import * as ProcessUtils from '@core/processUtils'
+export { checkCanAccessS3Bucket } from '@server/modules/file/repository/fileRepositoryS3BucketCommon'
 
-const requestTimeout = 5 * 60 * 1000 // 5 minutes
+const getSubfolder = ({ recordUuid }) => (recordUuid ? 'record_files' : 'survey_files')
 
-const Bucket = ProcessUtils.ENV.fileStorageAwsS3BucketName
+const getFileKey = ({ surveyId, fileUuid, recordUuid = null }) =>
+  `surveys/${surveyId}/${getSubfolder({ recordUuid })}/${fileUuid}`
 
-const s3Client = new S3Client({
-  credentials: {
-    accessKeyId: ProcessUtils.ENV.fileStorageAwsAccessKey,
-    secretAccessKey: ProcessUtils.ENV.fileStorageAwsSecretAccessKey,
-  },
-  region: ProcessUtils.ENV.fileStorageAwsS3BucketRegion,
-})
+const getLegacyFileKey = ({ surveyId, fileUuid }) => `${surveyId}_${fileUuid}`
 
-const getFileKey = ({ surveyId, fileUuid }) => `${surveyId}_${fileUuid}`
+const { uploadFileContent, getFileContentAsStream, deleteFile } = createS3BucketRepository({ getFileKey })
 
-const createCommandParams = ({ surveyId, fileUuid }) => ({
-  Bucket,
-  Key: getFileKey({ surveyId, fileUuid }),
-})
-
-const _sendCommand = async (command) => s3Client.send(command, { requestTimeout })
-
-export const checkCanAccessS3Bucket = async () => {
-  const command = new HeadBucketCommand({ Bucket })
-
-  try {
-    await _sendCommand(command)
-    return true
-  } catch (error) {
-    throw new Error(`Cannot access AWS S3 bucket: ${Bucket}; details: ${error}`)
+const deleteFiles = async ({ surveyId, files }) => {
+  for (const { fileUuid, recordUuid } of files) {
+    await deleteFile({ surveyId, fileUuid, recordUuid })
   }
 }
 
-export const uploadFileContent = async ({ surveyId, fileUuid, content }) => {
-  const command = new PutObjectCommand({
-    ...createCommandParams({ surveyId, fileUuid }),
-    Body: content,
-  })
-  return _sendCommand(command)
-}
-
-export const getFileContentAsStream = async ({ surveyId, fileUuid }) => {
-  const command = new GetObjectCommand(createCommandParams({ surveyId, fileUuid }))
-  const response = await _sendCommand(command)
-  return response.Body
-}
-
-export const deleteFiles = async ({ surveyId, fileUuids }) => {
-  for (const fileUuid of fileUuids) {
-    const command = new DeleteObjectCommand(createCommandParams({ surveyId, fileUuid }))
-    await _sendCommand(command)
+export const migrateFileToNewKey = async ({ surveyId, fileUuid, recordUuid }) => {
+  const legacyKey = getLegacyFileKey({ surveyId, fileUuid })
+  const exists = await checkFileExistsInS3({ key: legacyKey })
+  if (!exists) {
+    return false
   }
+  const newKey = getFileKey({ surveyId, fileUuid, recordUuid })
+  await copyObjectInS3({ sourceKey: legacyKey, destinationKey: newKey })
+  await deleteObjectFromS3({ key: legacyKey })
+  return true
 }
+
+export { uploadFileContent, getFileContentAsStream, deleteFiles }

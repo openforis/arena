@@ -152,7 +152,7 @@ export const useDataQueriesPanel = () => {
   const onDelete = useCallback(() => {
     dispatch(
       DialogConfirmActions.showDialogConfirm({
-        key: 'dataView.dataQuery.deleteConfirmMessage',
+        key: 'dataView:dataQuery.deleteConfirmMessage',
         params: { name: DataQuerySummaries.getName(editedQuerySummary) },
         onOk: doDelete,
       })
@@ -173,7 +173,7 @@ export const useDataQueriesPanel = () => {
       if (Query.hasSelection(query)) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
-            key: 'dataView.dataQuery.replaceQueryConfirmMessage',
+            key: 'dataView:dataQuery.replaceQueryConfirmMessage',
             params: { name: DataQuerySummaries.getName(editedQuerySummary) },
             onOk: async () => doQuerySummarySelection(selectedQuerySummary),
           })

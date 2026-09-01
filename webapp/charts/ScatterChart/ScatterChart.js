@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 import { Label, Legend, ScatterChart as ReChartsScatterChart, Scatter, Tooltip, XAxis, YAxis } from 'recharts'
 import { Objects } from '@openforis/arena-core'

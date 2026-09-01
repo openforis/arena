@@ -25,6 +25,7 @@ import {
   useAuthCanEditTemplates,
   useAuthCanViewAllUsers,
   useAuthCanViewUsersAccessRequests,
+  useOnNewSurveyClick,
 } from '@webapp/store/user/hooks'
 
 const Separator = () => <div className="user-popup-menu__sep" />
@@ -61,6 +62,7 @@ const UserPopupMenu = (props) => {
   const canEditTemplates = useAuthCanEditTemplates()
   const canViewUsersAccessRequests = useAuthCanViewUsersAccessRequests() && ProcessUtils.ENV.allowUserAccessRequest
   const canViewAllUsers = useAuthCanViewAllUsers()
+  const onNewSurveyClick = useOnNewSurveyClick({ onAfterClick: onClose })
 
   useEffect(() => {
     const onClickListener = (e) => {
@@ -113,7 +115,7 @@ const UserPopupMenu = (props) => {
         <Link
           data-testid={TestId.header.surveyCreateBtn}
           to={appModuleUri(homeModules.surveyNew)}
-          onClick={onClose}
+          onClick={onNewSurveyClick}
           className="btn-s btn-transparent"
         >
           <span className="icon icon-plus icon-12px icon-left" />

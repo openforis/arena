@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 import toSnakeCase from 'to-snake-case'
 
+import { NodeDefs, NodeValues } from '@openforis/arena-core'
+
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import { Query } from '../../../query'
 
@@ -23,7 +25,13 @@ const columnNamesSuffixGetterByType = {
     suffixes.push(...additionalFields.map((field) => `_${toSnakeCase(field)}`))
     return suffixes
   },
-  [nodeDefType.taxon]: () => ['', columnSuffixTaxonScientificName, columnSuffixTaxonVernacularName],
+  [nodeDefType.taxon]: ({ nodeDef }) => {
+    const colNames = ['', columnSuffixTaxonScientificName]
+    if (NodeDefs.isFieldVisible(NodeValues.ValuePropsTaxon.vernacularName)(nodeDef)) {
+      colNames.push(columnSuffixTaxonVernacularName)
+    }
+    return colNames
+  },
   [nodeDefType.file]: () => [columnSuffixFileUuid, columnSuffixFileName],
 }
 
@@ -42,7 +50,14 @@ const colTypesGetterByType = {
   [nodeDefType.entity]: () => [SQL.types.uuid],
   [nodeDefType.file]: () => [SQL.types.uuid, SQL.types.varchar],
   [nodeDefType.integer]: () => [SQL.types.bigint],
-  [nodeDefType.taxon]: () => [SQL.types.varchar, SQL.types.varchar, SQL.types.varchar, SQL.types.varchar],
+  [nodeDefType.taxon]: ({ nodeDef }) => {
+    const colTypes = [SQL.types.varchar, SQL.types.varchar]
+    if (NodeDefs.isFieldVisible(NodeValues.ValuePropsTaxon.vernacularName)(nodeDef)) {
+      colTypes.push(SQL.types.varchar)
+    }
+    return colTypes
+  },
+
   [nodeDefType.text]: () => [SQL.types.varchar],
   [nodeDefType.time]: () => [SQL.types.time],
 }

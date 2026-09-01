@@ -20,6 +20,74 @@ export const init = (app) => {
     }
   })
 
+  // ====== CLONE - Chain from another survey
+
+  app.post(
+    '/survey/:surveyId/chain/clone-from-survey',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const { skipMissingEntityAttributes = false } = Request.getBody(req)
+        const user = Request.getUser(req)
+
+        const sourceSurveyId = Request.getRequiredParam(req, 'sourceSurveyId')
+        const sourceChainUuid = Request.getRequiredParam(req, 'sourceChainUuid')
+
+        const chain = await AnalysisService.cloneChainFromSurvey({
+          user,
+          surveyId,
+          sourceSurveyId,
+          sourceChainUuid,
+          skipMissingEntityAttributes,
+        })
+
+        res.json(chain)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/chain/clone-from-survey/chains',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const sourceSurveyId = Request.getRequiredIntegerParam(req, 'sourceSurveyId')
+
+        const list = await AnalysisService.fetchChainsForCloneFromSurvey({ user, sourceSurveyId })
+
+        res.json({ list })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/chain/clone-from-survey/entities',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const sourceSurveyId = Request.getRequiredIntegerParam(req, 'sourceSurveyId')
+        const sourceChainUuid = Request.getRequiredParam(req, 'sourceChainUuid')
+
+        const entityNames = await AnalysisService.fetchChainSourceEntityNames({
+          user,
+          sourceSurveyId,
+          sourceChainUuid,
+        })
+
+        res.json({ entityNames })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ====== READ - Chains
 
   app.get(

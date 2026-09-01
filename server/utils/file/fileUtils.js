@@ -48,6 +48,7 @@ export const writeFile = async (path, data = '') => fsp.writeFile(path, data)
 export const appendFile = async (path, data = '') => fsp.appendFile(path, data)
 
 export const copyFile = async (src, dest) => fsp.copyFile(src, dest)
+export const renameFile = async (src, dest) => fsp.rename(src, dest)
 
 export const { createWriteStream, createReadStream } = fs
 
@@ -104,6 +105,7 @@ export const getBaseName = (file) => {
 
 export const deleteFile = (path) => fs.unlinkSync(path)
 export const deleteFileAsync = (path) => fsp.unlink(path)
+export const rename = (oldPath, newPath) => fsp.rename(oldPath, newPath)
 
 // ======= Temp Files
 export const newTempFileName = () => `${uuidv4()}.tmp`
@@ -132,33 +134,3 @@ export const writeStreamToTempFile = async (inputStream) =>
       reject(error)
     })
   })
-
-const _getChunkFileName = ({ fileId, chunk }) => `${fileId}_part${chunk}`
-
-export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
-  const destFileName = _getChunkFileName({ fileId, chunk })
-  const destFilePath = tempFilePath(destFileName)
-  if (filePath) {
-    await copyFile(filePath, destFilePath)
-  } else if (fileContent) {
-    await writeFile(destFilePath, fileContent)
-  } else {
-    throw new Error('Missing file path or content')
-  }
-}
-
-export const mergeTempChunks = async ({ fileId, totalChunks }) => {
-  const finalFilePath = newTempFilePath()
-  const writeStream = createWriteStream(finalFilePath)
-  for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
-    // extract temporary chunk content
-    const chunkFileName = _getChunkFileName({ fileId, chunk })
-    const chunkFilePath = tempFilePath(chunkFileName)
-    const chunkFileContent = await readBinaryFile(chunkFilePath)
-    writeStream.write(chunkFileContent)
-    // delete temporary chunk
-    await deleteFileAsync(chunkFilePath)
-  }
-  writeStream.end()
-  return finalFilePath
-}

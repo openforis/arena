@@ -3,7 +3,7 @@
 .service-errors {
   position: fixed;
   height: 98vh;
-  width: 20vw;
+  min-width: 10rem;
   right: 0;
   top: 2vh;
   z-index: $zIndex90AppError;

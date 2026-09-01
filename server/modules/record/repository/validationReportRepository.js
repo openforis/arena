@@ -3,8 +3,10 @@ import { Transform } from 'stream'
 import * as A from '@core/arena'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Validation from '@core/validation/validation'
+import * as Expression from '@core/expressionParser/expression'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
+import { DbOrder } from '@server/db'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -12,29 +14,82 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 
 const { prefixValidationFieldChildrenCount: prefixChildrenCount } = RecordValidation
 
+const sortFieldBySortBy = {
+  dateCreated: 'record_date_created',
+  dateModified: 'record_date_modified',
+  message: 'validation',
+  owner: 'record_owner_name',
+  path: 'keys_hierarchy',
+}
+
+const getOrderByClause = ({ sortBy, sortOrder }) => {
+  const sortField = sortFieldBySortBy[sortBy] ?? sortFieldBySortBy.dateCreated
+  const sortOrderNormalized = DbOrder.normalize(sortOrder, DbOrder.desc).toUpperCase()
+  return `${sortField} ${sortOrderNormalized}, node_id ASC`
+}
+
 // ============== READ
 
-const query = ({ surveyId, recordUuid }) => {
+const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortOrder }) => {
   const surveySchema = getSurveyDBSchema(surveyId)
   const surveyRdbSchema = SchemaRdb.getName(surveyId)
-  const uuidLength = 36
+  const childrenCountPrefixLength = prefixChildrenCount.length
+  const filter = filterBySurveyAttrs?.filter
+  const rootDataViewName = filterBySurveyAttrs?.rootDataViewName
+  const attributeDefUuids = filterBySurveyAttrs?.attributeDefUuids
+  const messageTypeKeys = filterBySurveyAttrs?.messageTypeKeys
+  const { clause: filterClause = null, params: filterParams = {} } = filter ? Expression.toSql(filter) : {}
 
-  return `WITH node_validation AS (
-    SELECT 
+  const filterBySurveyAttrsClause =
+    filterClause && rootDataViewName
+      ? `
+      AND EXISTS (
+        SELECT 1
+        FROM ${surveyRdbSchema}.$/rootDataViewName:name/ root_data
+        WHERE root_data.record_uuid = r.uuid
+          AND root_data.record_cycle = r.cycle
+          AND ${filterClause}
+      )`
+      : ''
+
+  let filterByAttributeDefsClause
+  if (Array.isArray(attributeDefUuids) && attributeDefUuids.length === 0) {
+    filterByAttributeDefsClause = 'AND 1 = 0'
+  } else if (attributeDefUuids?.length > 0) {
+    filterByAttributeDefsClause = 'AND n.node_def_uuid IN ($/attributeDefUuids:csv/)'
+  } else {
+    filterByAttributeDefsClause = ''
+  }
+
+  let filterByMessageTypesClause
+  if (Array.isArray(messageTypeKeys) && messageTypeKeys.length === 0) {
+    filterByMessageTypesClause = 'AND 1 = 0'
+  } else if (messageTypeKeys?.length > 0) {
+    filterByMessageTypesClause = `AND jsonb_path_query_array(nv.validation, '$.**.key') ?| ARRAY[$/messageTypeKeys:csv/]::text[]`
+  } else {
+    filterByMessageTypesClause = ''
+  }
+
+  const orderByClause = getOrderByClause({ sortBy, sortOrder })
+
+  const text = `WITH node_validation AS (
+    SELECT
       r.uuid AS record_uuid,
-      -- node_uuid
-      -- if the length of the key is ${uuidLength}, then it's a uuid
-      -- otherwise the key of the field validation starts with '${prefixChildrenCount}' followed by the child def uuid
+      -- node_i_id
+      -- if the key does not start with '${prefixChildrenCount}', it's a plain node internal id;
+      -- otherwise the key is '${prefixChildrenCount}' followed by the parent node internal id, an
+      -- underscore, and the child def uuid - the parent's internal id is what the report attaches
+      -- the children-count validation message to.
       (
-        CASE WHEN LENGTH(nv.key) = ${uuidLength}
-        THEN nv.key
-        ELSE SUBSTRING(nv.key, ${prefixChildrenCount.length + 1}, ${uuidLength})
+        CASE WHEN LEFT(nv.key, ${childrenCountPrefixLength}) = '${prefixChildrenCount}'
+        THEN split_part(nv.key, '_', 2)
+        ELSE nv.key
         END
-      )::uuid AS node_uuid,
+      )::int AS node_i_id,
       -- validation_count_child_def_uuid
       (
-        CASE WHEN LENGTH(nv.key) > ${uuidLength}
-        THEN SUBSTRING(nv.key, ${prefixChildrenCount.length + uuidLength + 2}, ${uuidLength})
+        CASE WHEN LEFT(nv.key, ${childrenCountPrefixLength}) = '${prefixChildrenCount}'
+        THEN split_part(nv.key, '_', 3)
         ELSE NULL
         END
       )::uuid AS validation_count_child_def_uuid,
@@ -42,9 +97,9 @@ const query = ({ surveyId, recordUuid }) => {
       nv.value::jsonb AS validation
     FROM
       ${surveySchema}.record r,
-      jsonb_each(r.validation #> '{${Validation.keys.fields}}' ) nv    
+      jsonb_each(r.validation #> '{${Validation.keys.fields}}' ) nv
   )
-    
+
   SELECT
       r.cycle AS record_cycle,
       r.owner_uuid AS record_owner_uuid,
@@ -58,56 +113,78 @@ const query = ({ surveyId, recordUuid }) => {
       n.node_def_uuid,
       nv.validation_count_child_def_uuid,
       nv.validation,
-      
+
       -- TODO: check why subquery is faster than outer join when joining _node_keys_hierarchy view
-      (SELECT h.keys_self 
+      (SELECT h.keys_self
         FROM ${surveyRdbSchema}._node_keys_hierarchy h
-        WHERE h.node_uuid = n.uuid
+        WHERE h.node_i_id = n.i_id AND h.record_uuid = n.record_uuid
       ),
-      (SELECT h.keys_hierarchy 
+      (SELECT h.keys_hierarchy
         FROM ${surveyRdbSchema}._node_keys_hierarchy h
-        WHERE h.node_uuid = n.uuid
+        WHERE h.node_i_id = n.i_id AND h.record_uuid = n.record_uuid
       )
     FROM
       ${surveySchema}.record r
       JOIN "user" u
         ON (r.owner_uuid = u.uuid)
-      JOIN 
+      JOIN
         node_validation nv
         ON (r.uuid = nv.record_uuid)
       JOIN
         ${surveySchema}.node n
-        ON n.uuid = nv.node_uuid
-    WHERE 
+        ON n.i_id = nv.node_i_id AND n.record_uuid = nv.record_uuid
+    WHERE
       r.cycle = $/cycle/
       AND NOT r.preview
       -- exclude analysis variables
       AND n.node_def_uuid NOT IN (SELECT uuid FROM ${surveySchema}.node_def WHERE analysis IS TRUE)
       ${recordUuid ? 'AND r.uuid = $/recordUuid/' : ''}
-    ORDER BY r.date_created, n.id`
+      ${filterBySurveyAttrsClause}
+      ${filterByAttributeDefsClause}
+      ${filterByMessageTypesClause}
+    ORDER BY ${orderByClause}`
+
+  return {
+    text,
+    params: {
+      ...filterParams,
+      ...(attributeDefUuids?.length > 0 ? { attributeDefUuids } : {}),
+      ...(messageTypeKeys?.length > 0 ? { messageTypeKeys } : {}),
+      ...(rootDataViewName ? { rootDataViewName } : {}),
+    },
+  }
 }
 
 const _rowToItem = A.camelizePartial({ limitToLevel: 1, sideEffect: true })
 
 export const fetchValidationReport = async (
-  { surveyId, cycle, offset = 0, limit = null, recordUuid = null },
+  { surveyId, cycle, offset = 0, limit = null, recordUuid = null, filterBySurveyAttrs = null, sortBy, sortOrder },
   client = db
-) =>
-  client.map(
-    `${query({ surveyId, recordUuid })}
+) => {
+  const { text, params } = query({ surveyId, recordUuid, filterBySurveyAttrs, sortBy, sortOrder })
+  return client.map(
+    `${text}
       LIMIT $/limit/
       OFFSET $/offset/`,
-    { cycle, limit, offset, recordUuid },
+    { cycle, limit, offset, recordUuid, ...params },
     _rowToItem
   )
+}
 
-export const countValidationReportItems = async ({ surveyId, cycle, recordUuid = null }, client = db) =>
-  client.one(`SELECT COUNT(*) FROM(${query({ surveyId, recordUuid })}) AS v`, { cycle, recordUuid }, (row) =>
-    Number(row.count)
-  )
+export const countValidationReportItems = async (
+  { surveyId, cycle, recordUuid = null, filterBySurveyAttrs = null },
+  client = db
+) => {
+  const { text, params } = query({ surveyId, recordUuid, filterBySurveyAttrs })
+  return client.one(`SELECT COUNT(*) FROM(${text}) AS v`, { cycle, recordUuid, ...params }, (row) => Number(row.count))
+}
 
-export const getValidationReportAsStream = ({ surveyId, cycle, recordUuid = null, processor }, client = db) => {
-  const queryFormatted = DbUtils.formatQuery(query({ surveyId, recordUuid }), { cycle, recordUuid })
+export const getValidationReportAsStream = (
+  { surveyId, cycle, recordUuid = null, filterBySurveyAttrs = null, processor },
+  client = db
+) => {
+  const { text, params } = query({ surveyId, recordUuid, filterBySurveyAttrs })
+  const queryFormatted = DbUtils.formatQuery(text, { cycle, recordUuid, ...params })
 
   const rowsToItemsTransformer = new Transform({
     objectMode: true,

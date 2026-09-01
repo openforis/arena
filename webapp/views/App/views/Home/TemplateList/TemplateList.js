@@ -1,4 +1,3 @@
-import React from 'react'
 
 import { Surveys } from '@webapp/components/survey/Surveys'
 

@@ -5,13 +5,13 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as Node from '@core/record/node'
 
 import Job from '@server/job/job'
-import * as FileService from '@server/modules/record/service/fileService'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
@@ -59,7 +59,7 @@ export default class RecordsCloneJob extends Job {
     )
 
     if (!Objects.isEqual(nodeDefKeysCycleFrom, nodeDefKeysCycleTo)) {
-      throw new SystemError('validationErrors.recordClone.differentKeyAttributes')
+      throw new SystemError('validationErrors:recordClone.differentKeyAttributes')
     }
 
     const keys = nodeDefKeysCycleFrom.map((nodeDefKey) => A.camelize(NodeDef.getName(nodeDefKey)))
@@ -116,18 +116,21 @@ export default class RecordsCloneJob extends Job {
     const { surveyId } = context
 
     for (const [fileUuid, newFileUuid] of Object.entries(newFileUuidsByOldUuid)) {
-      const fileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
+      const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
       if (fileSummary) {
-        const content = await FileService.fetchFileContentAsBuffer({ surveyId, fileUuid }, tx)
-        const newFile = RecordFile.createFile({
+        // node internal ids are stable across a clone (RecordCloner keeps them, only recordUuid
+        // and file uuids change), so the old file's nodeIId is still valid in the cloned record.
+        const content = await SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary }, tx)
+        const newFile = SurveyFile.createFile({
           content,
-          name: RecordFile.getName(fileSummary),
-          nodeIId: RecordFile.getNodeIId(fileSummary),
+          name: SurveyFile.getName(fileSummary),
+          nodeIId: SurveyFile.getNodeIId(fileSummary),
           recordUuid: newRecordUuid,
-          size: RecordFile.getSize(fileSummary),
+          size: SurveyFile.getSize(fileSummary),
+          type: SurveyFile.SurveyFileType.recordAttachment,
           uuid: newFileUuid,
         })
-        await FileService.insertFile(surveyId, newFile, tx)
+        await SurveyFileService.insertFile(surveyId, newFile, tx)
       }
     }
   }

@@ -1,6 +1,5 @@
 import './CategoryDetails.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import { useParams } from 'react-router'
 import classNames from 'classnames'
@@ -74,6 +73,7 @@ const CategoryDetails = (props) => {
           <div className="row">
             <FormItem label="categoryEdit.categoryName">
               <Input
+                autoFocus
                 id={TestId.categoryDetails.categoryName}
                 value={Category.getName(category)}
                 validation={Validation.getFieldValidation(Category.keysProps.name)(validation)}
@@ -96,7 +96,7 @@ const CategoryDetails = (props) => {
                 />
                 <ButtonMenu
                   className="date-import-template-menu-btn"
-                  label="categoryEdit.templateForImport"
+                  label="dataImportView:templateForImport"
                   iconClassName="icon-download2 icon-14px"
                   items={Object.keys(templateTypes).flatMap((templateType) =>
                     templateFileFormats.map((fileFormat) => ({
@@ -109,7 +109,11 @@ const CategoryDetails = (props) => {
                             generic: templateType === templateTypes.genericDataImport,
                             samplingPointData: templateType === templateTypes.samplingPointDataImport,
                           }}
-                          label={`categoryEdit.templateFor_${templateType}_${fileFormat}`}
+                          label={
+                            templateType === templateTypes.samplingPointDataImport
+                              ? `categoryEdit.templateFor_${templateType}_${fileFormat}`
+                              : `dataImportView:templateFor_${templateType}_${fileFormat}`
+                          }
                           variant="text"
                         />
                       ),

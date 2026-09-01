@@ -1,5 +1,4 @@
 import './AttributesSelector.scss'
-import React from 'react'
 import * as PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -98,7 +97,7 @@ const AttributesSelector = (props) => {
         <AttributeSelector
           key={NodeDef.getUuid(nodeDefAncestor)}
           labelFunction={(nodeDef) =>
-            i18n.t('dataView.nodeDefsSelector.nodeDefFrequency', {
+            i18n.t('dataView:nodeDefsSelector.nodeDefFrequency', {
               nodeDefLabel: NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType }),
             })
           }
@@ -111,7 +110,7 @@ const AttributesSelector = (props) => {
       )}
       {visibleChildDefs.length > 0 && (
         <ExpansionPanel buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
-          {onAttributesSelection && visibleChildDefs.length > minDefsToShowSelectAll && (
+          {canSelectAttributes && onAttributesSelection && visibleChildDefs.length > minDefsToShowSelectAll && (
             <Checkbox
               checked={allSelected}
               indeterminate={allSelectionIndeterminate}

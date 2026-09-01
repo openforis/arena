@@ -1,0 +1,139 @@
+import {
+  CopyObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadBucketCommand,
+  HeadObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
+
+import * as ProcessUtils from '@core/processUtils'
+
+const requestTimeout = 5 * 60 * 1000 // 5 minutes
+const requestStreamBufferSize = 64 * 1024
+
+const Bucket = ProcessUtils.ENV.fileStorageAwsS3BucketName
+
+const s3Client = new S3Client({
+  credentials: {
+    accessKeyId: ProcessUtils.ENV.fileStorageAwsAccessKey,
+    secretAccessKey: ProcessUtils.ENV.fileStorageAwsSecretAccessKey,
+  },
+  region: ProcessUtils.ENV.fileStorageAwsS3BucketRegion,
+  requestStreamBufferSize,
+})
+
+const _sendCommand = async (command) => s3Client.send(command, { requestTimeout })
+
+export const checkCanAccessS3Bucket = async () => {
+  const command = new HeadBucketCommand({ Bucket })
+
+  try {
+    await _sendCommand(command)
+    return true
+  } catch (error) {
+    throw new Error(`Cannot access AWS S3 bucket: ${Bucket}; details: ${error}`)
+  }
+}
+
+const createCommandParams = ({ getFileKey, params }) => ({ Bucket, Key: getFileKey(params) })
+
+export const checkFileExistsInS3 = async ({ key }) => {
+  try {
+    const command = new HeadObjectCommand({ Bucket, Key: key })
+    await _sendCommand(command)
+    return true
+  } catch (error) {
+    if (error.$metadata?.httpStatusCode === 404) {
+      return false
+    }
+    throw error
+  }
+}
+
+export const copyObjectInS3 = async ({ sourceKey, destinationKey }) => {
+  const command = new CopyObjectCommand({
+    Bucket,
+    CopySource: `${Bucket}/${sourceKey}`,
+    Key: destinationKey,
+  })
+  return _sendCommand(command)
+}
+
+export const deleteObjectFromS3 = async ({ key }) => {
+  const command = new DeleteObjectCommand({ Bucket, Key: key })
+  return _sendCommand(command)
+}
+
+export const createS3BucketRepository = ({ getFileKey }) => {
+  const uploadFileContent = async ({ content, ...params }) => {
+    const command = new PutObjectCommand({
+      ...createCommandParams({ getFileKey, params }),
+      Body: content,
+    })
+    return _sendCommand(command)
+  }
+
+  const uploadFileContentAsStream = async ({ contentStream, contentLength = null, ...params }) => {
+    const command = new PutObjectCommand({
+      ...createCommandParams({ getFileKey, params }),
+      Body: contentStream,
+      ...(Number.isFinite(contentLength) ? { ContentLength: contentLength } : {}),
+    })
+    return _sendCommand(command)
+  }
+
+  const getFileContentAsStream = async (params) => {
+    const command = new GetObjectCommand(createCommandParams({ getFileKey, params }))
+    const response = await _sendCommand(command)
+    return response.Body
+  }
+
+  const getFileSize = async (params) => {
+    const command = new HeadObjectCommand(createCommandParams({ getFileKey, params }))
+    const response = await _sendCommand(command)
+    return response.ContentLength
+  }
+
+  const deleteFile = async (params) => {
+    const command = new DeleteObjectCommand(createCommandParams({ getFileKey, params }))
+    return _sendCommand(command)
+  }
+
+  const deleteFiles = async ({ fileUuids, ...params }) => {
+    for (const fileUuid of fileUuids) {
+      await deleteFile({ ...params, fileUuid })
+    }
+  }
+
+  const listFiles = async ({ prefix }) => {
+    if (prefix === undefined || prefix === null) {
+      throw new TypeError('Missing S3 list prefix')
+    }
+    const results = []
+    let continuationToken
+    do {
+      const command = new ListObjectsV2Command({
+        Bucket,
+        Prefix: prefix,
+        ...(continuationToken ? { ContinuationToken: continuationToken } : {}),
+      })
+      const response = await _sendCommand(command)
+      results.push(...(response.Contents ?? []))
+      continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined
+    } while (continuationToken)
+    return results
+  }
+
+  return {
+    uploadFileContent,
+    uploadFileContentAsStream,
+    getFileContentAsStream,
+    getFileSize,
+    deleteFile,
+    deleteFiles,
+    listFiles,
+  }
+}

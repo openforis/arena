@@ -1,5 +1,5 @@
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
-import { gotoHome } from '../_navigation'
+import { gotoDashboard, gotoHome } from '../_navigation'
 
 const publish = async () => {
   await page.click(getSelector(TestId.header.surveyPublishBtn, 'button'))
@@ -31,6 +31,7 @@ export const publishWithoutErrors = ({ inHomePage = false } = {}) => {
 
   if (!inHomePage) {
     gotoHome()
+    gotoDashboard()
   }
 
   verifySurveyPublished()

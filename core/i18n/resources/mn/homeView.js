@@ -72,8 +72,33 @@ export default {
     noRecordsAddedInSelectedPeriod: 'Сонгогдсон хугацаанд бичлэг нэмэгдээгүй',
   },
   surveyDeleted: 'Судалгаа {{surveyName}} устгагдсан',
+  landing: {
+    openDashboard: 'Хяналтын самбар нээх',
+  },
   surveyInfo: {
     basic: 'Үндсэн мэдээлэл',
+    branding: {
+      title: 'Брэнд',
+      primaryColor: 'Үндсэн өнгө',
+      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
+      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      fontSizePreset: {
+        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
+        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
+        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+      },
+      surveyLogo1: '$t(homeView:surveyInfo.branding.surveyLogo1)',
+      surveyLogo2: '$t(homeView:surveyInfo.branding.surveyLogo2)',
+      surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
+      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
+      uploadLogo: 'Лого байршуулах',
+      logoFileFormatHint: '$t(homeView:surveyInfo.branding.logoFileFormatHint)',
+      logoFileTooLarge: '$t(homeView:surveyInfo.branding.logoFileTooLarge)',
+      preview: 'Урьдчилан харах',
+      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
+      invalidPrimaryColor: 'Зөв #RRGGBB өнгө оруулна уу эсвэл хоосон үлдээнэ үү',
+      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
+    },
     configuration: {
       title: 'Тохиргоо',
       filesTotalSpace: 'Файлуудын нийт зай (ГБ)',
@@ -83,14 +108,48 @@ export default {
 Хэрэв энэ мөчлөгтэй холбоотой бичлэгүүд байвал тэдгээр нь устгагдана.`,
     cycleForArenaMobile: 'Арена Мобайл-д зориулсан мөчлөг',
     fieldManualLink: 'Талбайн гарын авлагын холбоос',
+    map: 'Газрын зураг',
     editInfo: 'Мэдээллийг засах',
     viewInfo: 'Мэдээллийг харах',
+
+    preloadedMapLayers: {
+      enabledMessage: 'Урьдчилан ачаалсан газрын зургийн давхаргууд идэвхжсэн',
+      title: 'Урьдчилан ачаалсан газрын зургийн давхаргууд',
+      fileName: 'Файлын нэр',
+      fileSize: 'Файлын хэмжээ',
+      confirmDelete: 'Энэ урьдчилан ачаалсан газрын зургийн давхаргыг устгахдаа итгэлтэй байна уу?',
+      editor: {
+        title: 'Урьдчилан ачаалсан газрын зургийн давхарга',
+      },
+    },
+
+    surveyDocLayout: {
+      tabTitle: 'Баримт бичгийн загвар',
+      title: 'Баримт бичгийн зургууд',
+      layoutOptions: {
+        title: 'Загварын тохиргоо',
+        headerOnFirstPageOnly: 'Толгой хэсгийг зөвхөн эхний хуудсанд харуулах',
+        pageNumbering: 'Хуудасны дугаарлалт',
+      },
+      documentPlace: 'Байршил',
+      documentPlaceValues: {
+        header: 'Толгой хэсэг',
+        footer: 'Хөл хэсэг',
+      },
+      applyIf: 'Нөхцөл байвал хэрэглэх',
+      confirmDelete: 'Энэ баримт бичгийн зургийг устгахдаа итгэлтэй байна уу?',
+      editor: {
+        title: 'Баримт бичгийн зураг',
+      },
+    },
+
     preferredLanguage: 'Хүссэн хэл',
     sampleBasedImageInterpretation: 'Дээж дээр суурилсан зураг тайлбарлах',
     sampleBasedImageInterpretationEnabled: 'Дээж дээр суурилсан зураг тайлбарлах идэвхжсэн',
     security: {
       title: 'Аюулгүй байдал',
       dataEditorViewNotOwnedRecordsAllowed: 'Өгөгдөл засварлагч өөрийн бус бичлэгүүдийг үзэх боломжтой',
+      dataAnalystViewNotOwnedRecordsAllowed: 'Өгөгдөл шинжилэгч өөрийн бус бичлэгүүдийг үзэх боломжтой',
       visibleInMobile: 'Арена Мобайл-д харагдана',
       allowRecordsDownloadInMobile: 'Серверээс Арена Мобайл руу бичлэг татахыг зөвшөөрөх',
       allowRecordsUploadFromMobile: 'Арена Мобайл-аас сервер руу бичлэг байршуулахыг зөвшөөрөх',

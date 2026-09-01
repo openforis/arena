@@ -8,27 +8,29 @@ import { PanelRight } from '@webapp/components'
 import { useSurveyUuid } from '@webapp/store/survey/hooks'
 
 import { UserAuthGroupExtraPropsEditor } from '../../UserEdit/UserAuthGroupExtraPropsEditor'
-import { useOnSave } from '../../UserEdit/store/actions/useOnSave'
+import { useOnSaveExtraProps } from './useOnSaveExtraProps'
+
+const buildUserUpdated = ({ surveyUuid, userToUpdate }) => {
+  const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
+  const groupExtraProps = groupInCurrentSurvey?.props?.extra
+  return User.assocAuthGroupExtraProps(groupExtraProps)(userToUpdate)
+}
 
 export const SurveyUserExtraPropsEditor = (props) => {
   const { onClose, onUserUpdate, userToUpdate } = props
 
   const surveyUuid = useSurveyUuid()
-  const [userUpdated, setUserUpdated] = useState(userToUpdate)
-  const saveUser = useOnSave({ userToUpdate: userUpdated })
+  const [userUpdated, setUserUpdated] = useState(() => buildUserUpdated({ surveyUuid, userToUpdate }))
+  const saveUser = useOnSaveExtraProps({ userToUpdate: userUpdated })
 
+  // Update userUpdated when userToUpdate or surveyUuid changes
   useEffect(() => {
-    const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
-    const groupExtraProps = groupInCurrentSurvey?.props?.extra
-    setUserUpdated(User.assocAuthGroupExtraProps(groupExtraProps)(userToUpdate))
+    setUserUpdated(buildUserUpdated({ surveyUuid, userToUpdate }))
   }, [surveyUuid, userToUpdate])
 
-  const onSurveyExtraPropsChange = useCallback(
-    (extraPropsNew) => {
-      setUserUpdated(User.assocAuthGroupExtraProps(extraPropsNew)(userUpdated))
-    },
-    [userUpdated]
-  )
+  const onSurveyExtraPropsChange = useCallback((extraPropsNew) => {
+    setUserUpdated((userPrev) => User.assocAuthGroupExtraProps(extraPropsNew)(userPrev))
+  }, [])
 
   const onSave = useCallback(async () => {
     await saveUser()

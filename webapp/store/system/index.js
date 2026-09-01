@@ -8,6 +8,7 @@ export { SystemActions, SystemState, SystemReducer }
 export {
   useSystemAppInfo,
   useSystemConfig,
+  useSystemConfigAiFeaturesEnabled,
   useSystemConfigFileUploadLimit,
   useSystemConfigFileUploadLimitMB,
   useSystemConfigExperimentalFeatures,

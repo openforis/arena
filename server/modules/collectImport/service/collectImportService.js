@@ -10,8 +10,8 @@ import * as CollectImportReportManager from '../manager/collectImportReportManag
 import CollectImportJob from './collectImport/collectImportJob'
 
 // COLLECT SURVEY IMPORT
-export const startCollectImportJob = ({ user, filePath, newSurvey, options }) => {
-  const job = new CollectImportJob({ user, filePath, newSurvey, options })
+export const startCollectImportJob = ({ user, filePath, fileId, totalChunks, totalFileSize, newSurvey, options }) => {
+  const job = new CollectImportJob({ user, filePath, fileId, totalChunks, totalFileSize, newSurvey, options })
 
   JobManager.enqueueJob(job)
 

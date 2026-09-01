@@ -55,7 +55,9 @@ const moveEntityTableCellLeft = moveEntityTableCell({ x: -5, y: 2 })
 
 const verityEntityOrder = (nodeDef, expectedOrder) =>
   test(`Verify entity ${nodeDef.name} order`, async () => {
-    const entityEl = await page.$(`[data-node-def-name="${nodeDef.name}"]`)
+    const entitySelector = `[data-node-def-name="${nodeDef.name}"]`
+    await page.waitForSelector(entitySelector)
+    const entityEl = await page.$(entitySelector)
     const childNames = await entityEl.getAttribute('data-child-names')
     await expect(childNames).toBe(expectedOrder)
   })

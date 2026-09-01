@@ -1,0 +1,20 @@
+.chain-clone-from-survey-dialog {
+  &__entity-check-list {
+    .icon {
+      margin-right: 0.5em;
+    }
+  }
+
+  &__entity-icon--found {
+    color: #4caf50;
+  }
+
+  &__entity-icon--missing {
+    color: #e53935;
+  }
+
+  &__skip-missing-checkbox-wrapper {
+    display: flex;
+    margin-top: 0.5em;
+  }
+}

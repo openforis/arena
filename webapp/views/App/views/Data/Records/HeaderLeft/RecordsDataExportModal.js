@@ -1,6 +1,5 @@
 import './RecordsDataExportModal.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { Modal, ModalBody } from '@webapp/components/modal'
@@ -10,7 +9,7 @@ export const RecordsDataExportModal = (props) => {
   const { onClose, recordUuids, search } = props
 
   return (
-    <Modal className="records-data-export" onClose={onClose} showCloseButton title="dataView.dataExport.title">
+    <Modal className="records-data-export" onClose={onClose} showCloseButton title="dataView:dataExport.title">
       <ModalBody>
         <DataExport search={search} recordUuids={recordUuids} sourceSelectionAvailable />
       </ModalBody>

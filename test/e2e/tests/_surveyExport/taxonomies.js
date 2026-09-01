@@ -1,6 +1,5 @@
 import path from 'path'
 
-import * as PromiseUtils from '../../../../core/promiseUtils'
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 import { getSurveyEntry } from '../../paths'
 import { taxonomies } from '../../mock/taxonomies'
@@ -11,7 +10,7 @@ export const verifyTaxonomies = (survey) =>
   test('Verify taxonomies', async () => {
     const taxonomiesExport = Object.values(getSurveyEntry(survey, ExportFile.taxonomies))
     await expect(taxonomiesExport.length).toBe(Object.values(taxonomies).length)
-    await PromiseUtils.each(taxonomiesExport, async (taxonomyExport) => {
+    for (const taxonomyExport of taxonomiesExport) {
       const taxonomyExportProps = getProps(taxonomyExport)
       const taxonomy = taxonomies[taxonomyExportProps.name]
       await expect(taxonomyExportProps.descriptions.en).toBe(taxonomy.description)
@@ -23,19 +22,19 @@ export const verifyTaxonomies = (survey) =>
       const taxaExport = getSurveyEntry(survey, ExportFile.taxa({ taxonomyUuid: taxonomyExport.uuid }))
       await expect(taxaExport.length).toBe(taxa.length)
 
-      await PromiseUtils.each(taxaExport, async (taxonExport) => {
+      for (const taxonExport of taxaExport) {
         const taxonExportProps = getProps(taxonExport)
         const taxonExpected = taxa.find((_taxon) => _taxon.code === taxonExportProps.code)
         await expect(taxonExportProps.genus).toBe(taxonExpected.genus)
         await expect(taxonExportProps.family).toBe(taxonExpected.family)
         await expect(taxonExportProps.scientificName).toBe(taxonExpected.scientific_name)
 
-        await PromiseUtils.each(taxonExport.vernacularNames, async (vernacularNameExport) => {
+        for (const vernacularNameExport of Object.values(taxonExport.vernacularNames ?? {}).flat()) {
           const vernacularNameExportProps = getProps(vernacularNameExport)
-          const vernacularLangCode = vernacularNameExportProps.code
-          const expectedVernacularName = taxonExpected[vernacularLangCode]
-          await expect(vernacularNameExportProps.name).toBe(expectedVernacularName)
-        })
-      })
-    })
+          const vernacularLangCode = vernacularNameExportProps.lang
+          const expectedVernacularNames = taxonExpected[vernacularLangCode]?.split('/').map((name) => name.trim()) ?? []
+          await expect(expectedVernacularNames).toContain(vernacularNameExportProps.name)
+        }
+      }
+    }
   })

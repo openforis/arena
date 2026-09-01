@@ -7,6 +7,20 @@
     display: flex;
     justify-content: space-evenly;
 
+    .survey-dependency-tree__dependency-types-group {
+      display: flex;
+      flex-wrap: wrap;
+
+      .MuiButtonBase-root.MuiButton-root {
+        width: 8rem;
+        justify-content: flex-start;
+      }
+
+      .MuiButtonGroup-middleButton {
+        border-right-color: inherit;
+      }
+    }
+
     .spacer {
       flex: 1;
     }

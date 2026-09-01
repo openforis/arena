@@ -68,7 +68,7 @@ export const useEditUser = ({ userUuid }) => {
   const [userToUpdate, setUserToUpdate] = useState({})
   const dispatch = useDispatch()
 
-  const { hideSurveyGroup = false } = useQuery()
+  const { showSurveyGroup = false } = useQuery()
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
 
@@ -123,13 +123,6 @@ export const useEditUser = ({ userUuid }) => {
     [onUpdate, userToUpdate]
   )
 
-  const onSurveyExtraPropsChange = useCallback(
-    (extraPropsNew) => {
-      onUpdate(User.assocAuthGroupExtraProps(extraPropsNew)(userToUpdate))
-    },
-    [onUpdate, userToUpdate]
-  )
-
   const onNameChange = useCallback((value) => onUpdate(User.assocName(value)(userToUpdate)), [onUpdate, userToUpdate])
 
   const onPasswordFormFieldChange = useCallback(
@@ -150,7 +143,7 @@ export const useEditUser = ({ userUuid }) => {
   }, [navigate])
 
   return {
-    hideSurveyGroup,
+    showSurveyGroup,
     ready,
     dirty,
     user,
@@ -166,7 +159,6 @@ export const useEditUser = ({ userUuid }) => {
     onRemove,
     onSave,
     onSurveyAuthGroupChange,
-    onSurveyExtraPropsChange,
     onSurveyManagerChange,
     onUpdate,
     onUpdateProfilePicture,

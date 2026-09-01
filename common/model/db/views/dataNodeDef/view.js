@@ -53,6 +53,14 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return this.columnNodeDefIId.name
   }
 
+  get columnIId() {
+    return this.columnNodeDefIId.nameFull
+  }
+
+  get columnIIdName() {
+    return this.columnNodeDefIId.name
+  }
+
   get columnIdName() {
     const { nodeDef } = this.tableData
     return `_${NodeDef.getName(nodeDef)}_${TableDataNodeDef.columnSet.id}`

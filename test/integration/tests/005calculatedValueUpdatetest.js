@@ -3,7 +3,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
@@ -97,7 +96,7 @@ describe('Calculated value test', () => {
       [99, 'z'],
     ]
 
-    await PromiseUtils.each(testValues, async (testValue) => {
+    for (const testValue of testValues) {
       const [sourceValue, expectedValue] = testValue
 
       global.applicableRecord = await updateNodeAndExpectDependentNodeValueToBe(
@@ -106,7 +105,7 @@ describe('Calculated value test', () => {
         'cluster/num_range',
         expectedValue
       )
-    })
+    }
   })
 
   test('Calculated value cascade update', async () => {

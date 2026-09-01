@@ -49,8 +49,6 @@ export default class DataImportBaseJob extends Job {
     const { context, currentRecord: record, tx } = this
     const { dryRun, survey } = context
 
-    const nodesArray = Object.values(nodesUpdated)
-
     record.dateModified = dateModified
 
     if (dryRun) return
@@ -61,6 +59,7 @@ export default class DataImportBaseJob extends Job {
       await this.recordsDateModifiedBatchPersister.addItem(recordUuid, dateModified, tx)
     }
 
+    const nodesArray = Object.values(nodesUpdated)
     if (nodesArray.length === 0) return
 
     for (const node of nodesArray) {

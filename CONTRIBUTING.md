@@ -33,6 +33,8 @@ $ npm login --scope=@OWNER --registry=https://npm.pkg.github.com
 
 > For more information see [Authenticating to GitHub Packages](https://docs.github.com/en/packages/guides/configuring-npm-for-use-with-github-packages#authenticating-to-github-packages)
 
+On the `feat/auto-scaling` branch, `@openforis/arena-server` is temporarily linked via a yarn `portal:../arena-server` reference to a local sibling checkout, instead of a published npm version, so both repos' in-progress auto-scaling work can be developed together locally. There is no sibling checkout in CI, so CI and Docker builds will fail on this branch until the portal link is swapped back to a published `@openforis/arena-server` release before merging to `master`.
+
 ## Development
 
 To install local database:

@@ -14,7 +14,14 @@ import * as NodeDefValidationsValidator from './nodeDefValidationsValidator'
 
 const { keys, keysPropsAdvanced, propKeys } = NodeDef
 
-const keysValidationFields = { children: 'children', keyAttributes: 'keyAttributes' }
+const keysValidationFields = {
+  children: 'children',
+  keyAttributes: 'keyAttributes',
+  qualifierApplicable: 'qualifierApplicable',
+  qualifierEditableIf: 'qualifierEditableIf',
+  qualifierDefaultValues: 'qualifierDefaultValues',
+  qualifierValidations: 'qualifierValidations',
+}
 
 const MAX_FILE_SIZE_MAX = 100 // max size of files that can be uploaded using file attribute
 
@@ -79,10 +86,51 @@ const validateKey = (survey) => (propName, nodeDef) => {
   return null
 }
 
-const validateReadOnly = (propName, nodeDef) =>
-  NodeDef.isReadOnly(nodeDef) && R.isEmpty(NodeDef.getDefaultValues(nodeDef))
-    ? { key: Validation.messageKeys.nodeDefEdit.defaultValuesNotSpecified }
-    : null
+const validateReadOnly = (propName, nodeDef) => {
+  if (!NodeDef.isReadOnly(nodeDef)) {
+    return null
+  }
+  if (R.isEmpty(NodeDef.getDefaultValues(nodeDef))) {
+    return { key: Validation.messageKeys.nodeDefEdit.defaultValuesNotSpecified }
+  }
+  if (!R.isEmpty(NodeDef.getEditableIf(nodeDef))) {
+    return { key: Validation.messageKeys.nodeDefEdit.readOnlyCannotHaveEditableIf }
+  }
+  return null
+}
+
+// a qualifier attribute value is always managed by the system (auto-filled based on the user's group,
+// then only survey admins may correct it, see canEditQualifierAttributeValue in authorizer.ts), so
+// designer-configured applicable/editability rules for it are meaningless and must be cleared
+const validateQualifierApplicable = (_propName, nodeDef) => {
+  if (NodeDef.isQualifier(nodeDef) && !R.isEmpty(NodeDef.getApplicable(nodeDef))) {
+    return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveApplicableExpression }
+  }
+  return null
+}
+
+const validateQualifierEditableIf = (_propName, nodeDef) => {
+  if (NodeDef.isQualifier(nodeDef) && (NodeDef.isReadOnly(nodeDef) || !R.isEmpty(NodeDef.getEditableIf(nodeDef)))) {
+    return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveEditabilityRule }
+  }
+  return null
+}
+
+// a qualifier attribute value is always system-assigned, so a default value would never be applied,
+// and being effectively read-only, it can never be validated against required/unique/count/expression rules
+const validateQualifierDefaultValues = (_propName, nodeDef) => {
+  if (NodeDef.isQualifier(nodeDef) && NodeDef.hasDefaultValues(nodeDef)) {
+    return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveDefaultValues }
+  }
+  return null
+}
+
+const validateQualifierValidations = (_propName, nodeDef) => {
+  if (NodeDef.isQualifier(nodeDef) && NodeDef.hasValidationsDefined(nodeDef)) {
+    return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveValidations }
+  }
+  return null
+}
 
 const validateParentEntityUuid = (_propName, nodeDef) => {
   if (NodeDef.isAnalysis(nodeDef) && R.isNil(NodeDef.getParentUuid(nodeDef))) {
@@ -94,16 +142,16 @@ const validateParentEntityUuid = (_propName, nodeDef) => {
   return null
 }
 
-const validateVirtualEntityFormula = (survey, nodeDef) =>
+const validateVirtualEntityFormula = async (survey, nodeDef) =>
   NodeDef.isVirtual(nodeDef) && !R.isEmpty(NodeDef.getFormula(nodeDef))
     ? NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.formula)
     : null
 
-const validateItemsFilterExpression = (survey, nodeDef) => {
+const validateItemsFilterExpression = async (survey, nodeDef) => {
   const expression = NodeDef.getItemsFilter(nodeDef)
   if (R.isEmpty(expression)) return null
 
-  const { validationResult } = nodeDefExpressionValidator.validate({
+  const { validationResult } = await nodeDefExpressionValidator.validate({
     survey,
     nodeDefCurrent: nodeDef,
     expression,
@@ -114,11 +162,27 @@ const validateItemsFilterExpression = (survey, nodeDef) => {
   return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
 }
 
-const validateFileNameExpression = (survey, nodeDef) => {
+const validateFileNameExpression = async (survey, nodeDef) => {
   const expression = NodeDef.getFileNameExpression(nodeDef)
   if (R.isEmpty(expression)) return null
 
-  const { validationResult } = nodeDefExpressionValidator.validate({
+  const { validationResult } = await nodeDefExpressionValidator.validate({
+    survey,
+    nodeDefCurrent: nodeDef,
+    expression,
+    isContextParent: true,
+    selfReferenceAllowed: false,
+  })
+  return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
+}
+
+const validateEnumeratingItemsExpression = async (survey, nodeDef) => {
+  if (!NodeDef.isEntity(nodeDef) || !NodeDef.isEnumerate(nodeDef)) return null
+
+  const expression = NodeDef.getEnumeratingItemsExpression(nodeDef)
+  if (R.isEmpty(expression)) return null
+
+  const { validationResult } = await nodeDefExpressionValidator.validate({
     survey,
     nodeDefCurrent: nodeDef,
     expression,
@@ -178,6 +242,10 @@ const propsValidations = (survey) => ({
   ],
   [`${keys.props}.${propKeys.key}`]: [validateKey(survey)],
   [`${keys.props}.${propKeys.readOnly}`]: [validateReadOnly],
+  [keysValidationFields.qualifierApplicable]: [validateQualifierApplicable],
+  [keysValidationFields.qualifierEditableIf]: [validateQualifierEditableIf],
+  [keysValidationFields.qualifierDefaultValues]: [validateQualifierDefaultValues],
+  [keysValidationFields.qualifierValidations]: [validateQualifierValidations],
   [keysValidationFields.keyAttributes]: [validateKeyAttributes(survey)],
   [keysValidationFields.children]: [validateChildren(survey)],
   // Virtual Entity
@@ -212,6 +280,7 @@ const validateAdvancedProps = async (survey, nodeDef) => {
     [keysPropsAdvanced.formula]: validateVirtualEntityFormula(survey, nodeDef),
     [keysPropsAdvanced.itemsFilter]: validateItemsFilterExpression(survey, nodeDef),
     [keysPropsAdvanced.fileNameExpression]: validateFileNameExpression(survey, nodeDef),
+    [keysPropsAdvanced.enumeratingItemsExpression]: validateEnumeratingItemsExpression(survey, nodeDef),
   }
   const validationResultsArray = await Promise.all(Object.values(validatorsByProp))
   const validationResultsByProp = Object.keys(validatorsByProp).reduce((acc, prop, index) => {

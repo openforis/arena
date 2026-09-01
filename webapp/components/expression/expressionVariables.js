@@ -26,7 +26,9 @@ const getJsVariables = (nodeDef) => [
 ]
 
 const getSqlVariables = (nodeDef, lang) => {
-  const columnNames = ColumnNodeDef.getColumnNames(nodeDef)
+  const columnNames = NodeDef.isCode(nodeDef)
+    ? [ColumnNodeDef.getColumnName(nodeDef)]
+    : ColumnNodeDef.getColumnNames(nodeDef)
 
   // Returns the label of the nodeDef with the col name as suffix (when there are multiple columns)
   const getLabel = (col) =>

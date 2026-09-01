@@ -59,7 +59,7 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
       JOIN ${tableName} ${aliasA}
         ON r.uuid = ${aliasA}.${TableDataNodeDef.columnSet.recordUuid} 
     WHERE
-      r.cycle = $1 
+      r.cycle = $/cycle/
       AND EXISTS (
       --exists a node entity with the same key node values in the same record (if not root entity) and in the same parent node entity
       SELECT ${aliasB}.${TableDataNodeDef.columnSet.iId}

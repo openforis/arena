@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -33,7 +32,7 @@ const ButtonSort = (props) => {
         className={classNames('btn-edit', { highlight: !Sort.isEmpty(sort) })}
         disabled={disabled}
         iconClassName="icon-sort-amount-asc icon-16px"
-        label="dataView.sort"
+        label="dataView:sort"
         onClick={Actions.togglePanelSort}
         title={tooltipMessages.length > 0 ? tooltipMessages.join('\n') : undefined}
         variant="outlined"

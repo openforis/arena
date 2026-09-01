@@ -4,6 +4,8 @@ import * as _QueryStream from 'pg-query-stream'
 
 import { Objects, Strings } from '@openforis/arena-core'
 
+import * as StringUtils from '@core/stringUtils'
+
 import { db } from '@server/db/db'
 
 const pgp = pgPromise()
@@ -190,6 +192,8 @@ export const prepareParameterForFilter = (value, filterType = filterTypes.includ
 
 export const formatQuery = pgp.as.format
 
+export const asName = (name) => (name.startsWith('"') ? name : StringUtils.quoteDouble(name))
+
 export const getPublishedCondition = ({ draft, tableAlias = null }) => {
   if (draft) return ''
   const tableAliasPrefix = tableAlias ? `${tableAlias}.` : ''
@@ -201,11 +205,15 @@ export const getWhereClause = (...conditions) => {
   return nonEmptyConditions.length > 0 ? `WHERE ${nonEmptyConditions.join(' AND ')}` : ''
 }
 
-// USERS (ROLES)
-export const createUser = async (name, password, client = db) =>
-  client.query(`CREATE USER "${name}" WITH LOGIN PASSWORD '${password}'`)
-
-export const dropUser = async (name, client = db) => await client.query(`DROP USER IF EXISTS "${name}"`)
+// Disables Postgres parallel query workers for the rest of the current transaction (SET LOCAL is
+// transaction-scoped, so this reverts automatically on commit/rollback). Parallel workers request
+// dynamic shared memory from /dev/shm, which some deployments cap well below what a worker may
+// need (e.g. Docker's default 64MB shm-size), failing with "could not resize shared memory
+// segment ... No space left on device". Use this in a transaction expected to run large/complex
+// queries where hitting that ceiling is a real risk and losing intra-query parallelism there is an
+// acceptable trade-off.
+export const disableParallelQueryForTransaction = async (client) =>
+  client.none('SET LOCAL max_parallel_workers_per_gather = 0')
 
 // VACUUM (removes dead tuples)
 export const vacuumTable = async ({ schema, table }, client = db) => client.query(`VACUUM ${schema}.${table}`)
@@ -231,7 +239,18 @@ export const fetchTableSize = async ({ schema, table }, client = db) =>
     (row) => Number(row.size)
   )
 
-export const createColumnSet = ({ columns, schema = null, table = null }) =>
-  new pgp.helpers.ColumnSet(columns, table ? { table: { schema, table } } : undefined)
+export const createColumnSet = ({ pgp: pgpProp = pgp, columns, schema = null, table = null }) =>
+  new pgpProp.helpers.ColumnSet(
+    columns.map((col) => {
+      if (typeof col === 'string') {
+        if (col.startsWith('?')) {
+          return col
+        }
+        return { name: col, prop: col } // workaround to double quote column names
+      }
+      return col
+    }),
+    table ? { table: { schema, table } } : undefined
+  )
 
 export const createBulkUpdateValues = ({ columnSet, values }) => pgp.helpers.values(values, columnSet)

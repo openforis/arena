@@ -11,11 +11,16 @@ export const insertSurvey = async ({ newSurvey }) => {
   return data
 }
 
+export const insertSurveyFile = async ({ surveyId, file, surveyFile }) => {
+  const formData = objectToFormData({ surveyFile: JSON.stringify(surveyFile), file })
+  await axios.post(`/api/survey/${surveyId}/file`, formData)
+}
+
 // ==== READ
-export const fetchSurveys = async ({ draft = true, template = false } = {}) => {
+export const fetchSurveys = async ({ draft = true, template = false, withChains = false } = {}) => {
   const {
     data: { list: surveys },
-  } = await axios.get(`/api/surveys`, { params: { draft, template } })
+  } = await axios.get(`/api/surveys`, { params: { draft, template, withChains } })
   return surveys.map(Survey.getSurveyInfo)
 }
 
@@ -26,10 +31,13 @@ export const fetchSurveyFull = async ({
   advanced = false,
   includeAnalysis = false,
   validate = false,
+  updateUserPrefs = false,
 } = {}) => {
   const {
     data: { survey },
-  } = await axios.get(`/api/survey/${surveyId}/full`, { params: { cycle, draft, advanced, includeAnalysis, validate } })
+  } = await axios.get(`/api/survey/${surveyId}/full`, {
+    params: { cycle, draft, advanced, includeAnalysis, validate, updateUserPrefs },
+  })
   return survey
 }
 
@@ -39,6 +47,19 @@ export const fetchSurveyTemplatesPublished = async () => {
   } = await axios.get(`/api/surveyTemplates`)
   return surveys
 }
+
+export const getSurveyFileDownloadUrl = ({ surveyId, fileUuid }) => `/api/survey/${surveyId}/file/${fileUuid}`
+
+export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
+  const response = await axios.get(getSurveyFileDownloadUrl({ surveyId, fileUuid }), { responseType: 'blob' })
+  return response
+}
+
+export const getSurveyDocxExportUrl = ({ surveyId, cycle, lang, draft = true }) =>
+  `/api/survey/${surveyId}/export/docx?${new URLSearchParams({ draft, cycle, lang })}`
+
+export const getSurveyPdfExportUrl = ({ surveyId, cycle, lang, draft = true }) =>
+  `/api/survey/${surveyId}/export/pdf?${new URLSearchParams({ draft, cycle, lang })}`
 
 // ==== UPDATE
 export const startImportLabelsJob = async ({ surveyId, file }) => {
@@ -74,3 +95,23 @@ export const startSurveysListExportJob = async ({ draft = true, template = false
 
 export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }) =>
   `/api/surveys/export/download?${new URLSearchParams({ tempFileName })}`
+
+export const startSchemaSummaryExportJob = async ({ surveyId, cycle, fileFormat, includeAiDescriptions = false }) => {
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/schema-summary/export`, { cycle, fileFormat, includeAiDescriptions })
+  return { job }
+}
+
+/**
+ * Starts the AI node definitions translation job.
+ * @param {object} params - Params.
+ * @param {number} params.surveyId - Survey id.
+ * @returns {Promise<object>} The created job.
+ */
+export const startNodeDefsTranslationJob = async ({ surveyId }) => {
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/nodeDefs/translation/start`)
+  return { job }
+}

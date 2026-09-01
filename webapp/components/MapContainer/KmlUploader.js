@@ -8,7 +8,7 @@ import L from 'leaflet'
 require('./L.KML')
 
 import { useI18n } from '@webapp/store/system'
-import { ZipForEach } from '@webapp/utils/zipUtils'
+import { ZipUtils } from '@webapp/utils/zipUtils'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
 const generatePopupContent = (f, l) => {
@@ -57,7 +57,7 @@ export const KmlUploader = () => {
     async (file) => {
       const kmlList = []
       const promises = []
-      await ZipForEach(file, (relativePath, fileEntry) => {
+      await ZipUtils.forEachFileInZip(file, (relativePath, fileEntry) => {
         promises.push(
           new Promise((resolve) => {
             if (relativePath.endsWith('.kml')) {

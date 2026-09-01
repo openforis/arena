@@ -28,6 +28,8 @@ const orderByFieldBySortBy = {
 
 const usersSearchCondition = `(u.email ILIKE $/search/ OR u.name ILIKE $/search/)`
 
+const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
+
 // CREATE
 
 export const importNewUser = async (
@@ -251,8 +253,6 @@ export const fetchUsersBySurveyId = async (
   )
 
 export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, client = db) => {
-  const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
-
   return client.map(
     `SELECT u.uuid 
     FROM "user" u 
@@ -295,6 +295,15 @@ export const fetchUserByEmail = async (email, client = db) =>
     FROM "user" u
     WHERE u.email = $1`,
     [email],
+    camelize
+  )
+
+export const fetchUserSurveysCount = async (uuid, client = db) =>
+  client.one(
+    `SELECT
+      (SELECT COUNT(*) FROM survey s WHERE s.owner_uuid = $1 AND s.published)::int AS surveys_count_published,
+      (SELECT COUNT(*) FROM survey s WHERE s.owner_uuid = $1 AND NOT s.published)::int AS surveys_count_draft`,
+    [uuid],
     camelize
   )
 
@@ -345,14 +354,16 @@ export const fetchUsersWithExpiredInvitation = (client = db) =>
 export const fetchSystemAdministratorsEmail = async (client = db) =>
   client.map(
     `
-    SELECT u.email 
-    FROM "user" u 
+    SELECT u.email
+    FROM "user" u
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
     WHERE g.name = $1
+      -- users who haven't set the pref (NULL) still get notified
+      AND COALESCE((u.prefs ->> $2)::boolean, true) = true
   `,
-    [AuthGroup.groupNames.systemAdmin],
+    [AuthGroup.groupNames.systemAdmin, User.keysPrefs.notifyOnUserAccessRequest],
     (row) => row.email
   )
 
@@ -426,7 +437,6 @@ export const updateUserPrefs = async (user, client = db) =>
   )
 
 export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
-  const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
   // Remove from surveys current pref
   await client.query(
     `
@@ -443,6 +453,25 @@ export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
 `)
 }
 
+export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db) =>
+  client.query(
+    `
+    UPDATE "user"
+    SET prefs = jsonb_set(
+      prefs #- ARRAY[$/surveysKey/, $/surveyId/]::text[],
+      ${surveyCurrentJsonbPath},
+      'null'
+    )
+    WHERE uuid = $/userUuid/
+      AND prefs #>> ${surveyCurrentJsonbPath} = $/surveyId/
+  `,
+    {
+      userUuid,
+      surveysKey: User.keysPrefs.surveys,
+      surveyId: String(surveyId),
+    }
+  )
+
 /**.
  * Sets survey cycle user pref to Survey.cycleOneKey if the preferred cycle is among the specified (deleted) ones
  *
@@ -456,7 +485,7 @@ export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, cli
     `
       UPDATE "user" u
       SET prefs = jsonb_set(prefs, ${surveyCyclePath}, '"${Survey.cycleOneKey}"')
-      WHERE prefs #>>  ${surveyCyclePath} IN ($1:csv)
+      WHERE prefs #>> ${surveyCyclePath} IN ($1:csv)
     `,
     [cycleKeysDeleted]
   )

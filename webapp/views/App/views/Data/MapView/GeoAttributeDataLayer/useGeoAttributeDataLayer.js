@@ -15,7 +15,7 @@ import { useI18n } from '@webapp/store/system'
 import { JobActions } from '@webapp/store/app'
 import * as API from '@webapp/service/api'
 
-import { useMapClusters, useMapLayerAdd } from '../common'
+import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../common'
 import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
 
@@ -30,20 +30,6 @@ const onGeoJsonDataExportComplete =
     const earthMapUrl = API.getEarthMapJsonDownloadUrl(downloadUrl)
     window.open(earthMapUrl, '_blank')
   }
-
-const buildLayerNameComponent = ({
-  layerInnerName,
-  layerEarthMapButtonId,
-  markersColor,
-}) => `<div class="layer-selector-row">
-      <span class="layer-selector-name">${layerInnerName}</span>
-      <span class="layer-selector-button-bar">
-        <button id="${layerEarthMapButtonId}" class="layer-selector-earth-map-btn" title="Earth Map">
-          <img height="14" width="14" src="/img/of_earth_map_icon_small.png" />
-        </button>
-        <span class='layer-icon' style="border-color: ${markersColor}"></span>
-      </span>
-    </div>`
 
 export const useGeoAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, editingRecordUuid } = props
@@ -70,7 +56,7 @@ export const useGeoAttributeDataLayer = (props) => {
     () => Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey),
     [attributeDef, survey]
   )
-  const ancestorsKeyAttributes = useMemo(
+  const ancestorsKeyAttributeDefs = useMemo(
     () => Survey.getNodeDefAncestorsKeyAttributes(attributeDef)(survey),
     [attributeDef, survey]
   )
@@ -94,27 +80,39 @@ export const useGeoAttributeDataLayer = (props) => {
   }, [attributeDefUuid, dispatch, surveyId])
 
   const layerEarthMapButtonId = `geo-attribute-layer-earth-map-btn-${attributeDefUuid}`
+  const layerColorPickerId = `geo-attribute-layer-color-picker-${attributeDefUuid}`
 
-  // add icon close to layer name
-  const layerName = buildLayerNameComponent({ layerInnerName, layerEarthMapButtonId, markersColor })
+  const earthMapButtonHtml = `<button id="${layerEarthMapButtonId}" class="layer-selector-earth-map-btn" title="Earth Map"><img height="14" width="14" src="/img/of_earth_map_icon_small.png" /></button>`
 
-  // on layer add, create query and fetch data
-  useMapLayerAdd({
-    layerName,
-    callback: () => {
-      const query = Query.create({
-        entityDefUuid: NodeDef.getUuid(nodeDefParent),
-        attributeDefUuids: [...ancestorsKeyAttributes.map(NodeDef.getUuid), attributeDefUuid],
-      })
-      setState((statePrev) => ({ ...statePrev, query }))
-    },
+  const { layerName, currentMarkersColor } = useLayerColorPicker({
+    colorPickerId: layerColorPickerId,
+    innerName: layerInnerName,
+    extraButtons: earthMapButtonHtml,
+    initialColor: markersColor,
   })
 
   const earthMapButton = document.getElementById(layerEarthMapButtonId)
 
   useEffect(() => {
-    earthMapButton?.addEventListener('click', onEarthMapButtonClick)
+    if (!earthMapButton) return
+    earthMapButton.addEventListener('click', onEarthMapButtonClick)
+    return () => earthMapButton.removeEventListener('click', onEarthMapButtonClick)
   }, [earthMapButton, onEarthMapButtonClick])
+
+  // on layer add, create query and fetch data; on layer remove, clear points
+  useMapLayerToggle({
+    layerName,
+    onAdd: () => {
+      const query = Query.create({
+        entityDefUuid: NodeDef.getUuid(nodeDefParent),
+        attributeDefUuids: [...ancestorsKeyAttributeDefs.map((nd) => NodeDef.getUuid(nd)), attributeDefUuid],
+      })
+      setState((statePrev) => ({ ...statePrev, query }))
+    },
+    onRemove: () => {
+      setState((statePrev) => ({ ...statePrev, query: Query.create(), points: [] }))
+    },
+  })
 
   const {
     data: dataFetchedTemp,
@@ -175,6 +173,8 @@ export const useGeoAttributeDataLayer = (props) => {
 
   return {
     layerName,
+    layerInnerName,
+    currentMarkersColor,
     clusters,
     clusterExpansionZoomExtractor,
     clusterIconCreator,

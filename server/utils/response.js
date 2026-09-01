@@ -17,7 +17,9 @@ const status = {
 
 export const contentTypes = {
   csv: 'text/csv',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   json: 'application/json',
+  pdf: 'application/pdf',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   zip: 'application/zip',
 }
@@ -44,7 +46,7 @@ export const sendErr = (res, err) => {
   } else if (err instanceof SystemError || err instanceof CoreSystemError) {
     res.status(err.statusCode).json(_getErr(err))
   } else {
-    res.status(err.statusCode).json(
+    res.status(err.statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR).json(
       _getErr({
         key: 'appErrors:generic',
         params: { text: `Could not serve: ${err.toString()}` },
@@ -66,8 +68,8 @@ export const setContentTypeFile = ({ res, fileName, fileSize = null, contentType
   }
 }
 
-export const sendFileContent = (res, fileName, content, fileSize) => {
-  setContentTypeFile({ res, fileName, fileSize })
+export const sendFileContent = ({ res, fileName, content, contentSize, contentType = null }) => {
+  setContentTypeFile({ res, fileName, fileSize: contentSize, contentType })
   res.write(content, 'binary')
   res.end(null, 'binary')
 }

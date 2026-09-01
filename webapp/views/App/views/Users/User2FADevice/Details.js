@@ -3,7 +3,7 @@ import './Details.scss'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
-import i18n from '@core/i18n/i18nFactory'
+import i18nInstance from '@core/i18n/i18nFactory'
 import { User2FADevice } from '@core/user2FADevice'
 import * as Validation from '@core/validation/validation'
 
@@ -53,7 +53,7 @@ export const User2FADeviceDetails = () => {
         })
         .catch((error) => {
           if (isMounted) {
-            setError(i18n.t('user2FADevice:error.fetchDevice', { message: error.message }))
+            setError(i18nInstance.t('user2FADevice:error.fetchDevice', { message: error.message }))
           }
         })
     } else {
@@ -72,7 +72,7 @@ export const User2FADeviceDetails = () => {
         })
         .catch((error) => {
           if (isMounted) {
-            setError(i18n.t('user2FADevice:error.fetchDevice', { message: error.message }))
+            setError(i18nInstance.t('user2FADevice:error.fetchDevice', { message: error.message }))
           }
         })
     }
@@ -211,16 +211,16 @@ export const User2FADeviceDetails = () => {
       {isNew && deviceCreated && (
         <ol>
           <li>
-            <h3>{i18n.t('user2FADevice:validationSteps.installAuthenticatorApp.title')}</h3>
-            <p>{i18n.t('user2FADevice:validationSteps.installAuthenticatorApp.description')}</p>
+            <h3>{i18nInstance.t('user2FADevice:validationSteps.installAuthenticatorApp.title')}</h3>
+            <p>{i18nInstance.t('user2FADevice:validationSteps.installAuthenticatorApp.description')}</p>
           </li>
           <li>
-            <h3>{i18n.t('user2FADevice:validationSteps.scanCode.title')}</h3>
-            <p>{i18n.t('user2FADevice:validationSteps.scanCode.description')}</p>
+            <h3>{i18nInstance.t('user2FADevice:validationSteps.scanCode.title')}</h3>
+            <p>{i18nInstance.t('user2FADevice:validationSteps.scanCode.description')}</p>
             <div className="scan-qr-code-internal-container">
               <QRCode value={otpAuthUrl} />
               <div>
-                {i18n.t('user2FADevice:validationSteps.scanCode.descriptionAlternative')}
+                {i18nInstance.t('user2FADevice:validationSteps.scanCode.descriptionAlternative')}
                 <TooltipNew title={secret}>
                   <Button label="user2FADevice:showSecretKey" variant="text" />
                 </TooltipNew>
@@ -228,8 +228,8 @@ export const User2FADeviceDetails = () => {
             </div>
           </li>
           <li>
-            <h3>{i18n.t('user2FADevice:validationSteps.typeAuthenticatorCodes.title')}</h3>
-            <p>{i18n.t('user2FADevice:validationSteps.typeAuthenticatorCodes.description')}</p>
+            <h3>{i18nInstance.t('user2FADevice:validationSteps.typeAuthenticatorCodes.title')}</h3>
+            <p>{i18nInstance.t('user2FADevice:validationSteps.typeAuthenticatorCodes.description')}</p>
             <FormItem label="user2FADevice:authenticatorCodeOne">
               <Input
                 className="authenticator-code"

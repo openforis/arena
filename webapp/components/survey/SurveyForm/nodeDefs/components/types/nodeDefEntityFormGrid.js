@@ -69,20 +69,19 @@ const NodeDefEntityFormGrid = (props) => {
 
   const columns = NodeDefLayout.getColumnsNo(cycle)(nodeDef)
   const nodeDefsInnerPage = useMemo(() => NodeDefLayout.rejectNodeDefsWithPage(cycle)(childDefs), [childDefs, cycle])
-  const visibleNodeDefsInnerPage = useMemo(
-    () =>
-      entry
-        ? nodeDefsInnerPage.filter(
-            (nodeDefInnerPage) =>
-              // hide hidden read-only fields
-              !(NodeDef.isReadOnly(nodeDefInnerPage) && NodeDef.isHidden(nodeDefInnerPage)) &&
-              // hide not applicable fields marked as 'hidden when not applicable'
-              (!NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefInnerPage) ||
-                Node.isChildApplicable(nodeDefInnerPage.uuid)(node))
-          )
-        : nodeDefsInnerPage,
-    [cycle, entry, node, nodeDefsInnerPage]
-  )
+  const visibleNodeDefsInnerPage = useMemo(() => {
+    if (!entry) return nodeDefsInnerPage
+    return nodeDefsInnerPage.filter(
+      (nodeDefInnerPage) =>
+        // hide hidden read-only fields
+        !(NodeDef.isReadOnly(nodeDefInnerPage) && NodeDef.isHidden(nodeDefInnerPage)) &&
+        // hide not applicable fields marked as 'hidden when not applicable'
+        (!NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefInnerPage) ||
+          Node.isChildApplicable(nodeDefInnerPage.uuid)(node)) &&
+        // hide not visible fields
+        Node.isChildVisible(nodeDefInnerPage.uuid)(node)
+    )
+  }, [cycle, entry, node, nodeDefsInnerPage])
 
   const rdgLayoutOriginal = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
   const rdgLayout = useMemo(

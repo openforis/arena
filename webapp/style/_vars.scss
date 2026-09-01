@@ -13,7 +13,6 @@ $headerHeight: 45px;
 $footerHeight: 45px;
 
 // colors
-
 $red: #ed5b46;
 $pink: #f7dfe3;
 $green: #84ac67;
@@ -33,6 +32,8 @@ $orangeLight: #f9ccb2;
 $black: #2f3138;
 $yellowHighlight: #f8f6cc;
 $white: #ffffff;
+
+$colorError: $red;
 
 $colorTextPrimary: color.adjust($blue, $lightness: -20%);
 $borderColorFocussed: color.adjust($blue, $lightness: -20%);
@@ -54,6 +55,8 @@ $zIndex15UserMenu: 15;
 $zIndex18PanelRight: 18;
 $zIndex20AppModalConfirm: 20;
 $zIndex20Dropdown: 20;
+$zIndex20Tooltip: 20;
+$zIndex1300TooltipInModal: 1300;
 $zIndexAppNotification: 1400;
 $zIndex90AppError: 90;
 /* Policy: everything is below app loader to stop user action */

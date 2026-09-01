@@ -1,4 +1,3 @@
-import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -7,6 +6,17 @@ import { Objects } from '@openforis/arena-core'
 import { ButtonIconInfo } from '@webapp/components/buttons'
 import { useIsMobile } from '@webapp/components/hooks/useIsMobile'
 import { useI18n } from '@webapp/store/system'
+
+const getLabel = (props, i18n) => {
+  const { appendColonToLabel = false, label: labelProp, labelParams } = props
+
+  if (Objects.isNotEmpty(labelProp) && typeof labelProp === 'string') {
+    const label = i18n.t(labelProp, { ...labelParams, interpolation: { escapeValue: false } })
+    return appendColonToLabel && label ? `${label}:` : label
+  } else {
+    return labelProp
+  }
+}
 
 export const FormItem = (props) => {
   const {
@@ -18,17 +28,12 @@ export const FormItem = (props) => {
     infoTitleMarkdownClassName = undefined,
     infoTitleMaxWidth = undefined,
     isInfoMarkdown = false,
-    label: labelProp = null,
-    labelParams = null,
     onInfoClick = null,
     required = false,
   } = props
 
   const i18n = useI18n()
-  const label =
-    Objects.isNotEmpty(labelProp) && typeof labelProp === 'string'
-      ? i18n.t(labelProp, { ...labelParams, interpolation: { escapeValue: false } })
-      : labelProp
+  const label = getLabel(props, i18n)
   const isMobile = useIsMobile()
 
   const labelComponent =
@@ -60,6 +65,7 @@ export const FormItem = (props) => {
 }
 
 FormItem.propTypes = {
+  appendColonToLabel: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
   hideLabelInMobile: PropTypes.bool,

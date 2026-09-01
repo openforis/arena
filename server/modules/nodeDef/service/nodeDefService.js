@@ -2,12 +2,15 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import * as NodeDefManager from '../manager/nodeDefManager'
 
 const fetchSurvey = async ({ surveyId, cycle }, client = db) =>
@@ -95,7 +98,7 @@ export const insertNodeDefs = async ({ user, surveyId, cycle = Survey.cycleOneKe
 
     const surveyUpdated = Survey.assocNodeDefsSimple({ nodeDefs })(survey)
 
-    return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefs: nodeDefs[0], nodeDefsUpdated: nodeDefs })
+    return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefsUpdated: nodeDefs })
   })
 
 export const updateNodeDefProps = async (
@@ -145,6 +148,171 @@ export const convertNodeDef = async ({ user, surveyId, nodeDefUuid, toType }, cl
     const nodeDef = await NodeDefManager.convertNodeDef({ user, survey, nodeDefUuid, toType }, t)
 
     return afterNodeDefUpdate({ survey, nodeDef, nodeDefsDependentsUuids })
+  })
+
+/**
+ * Resolves categories/taxonomies referenced by code/taxon attributes among the given cloned node defs:
+ * reuses an existing category/taxonomy in the target survey (matched by uuid or name), or clones it from
+ * the source survey. Cloned node defs associated with an existing item matched by name (different uuid)
+ * get their categoryUuid/taxonomyUuid prop rewritten accordingly.
+ * @param {object} params - The params.
+ * @param {object} params.user - The user performing the clone.
+ * @param {string} params.sourceSurveyId - The source survey id.
+ * @param {object} params.sourceSurvey - The source survey.
+ * @param {string} params.targetSurveyId - The target survey id.
+ * @param {object} params.targetSurvey - The target survey.
+ * @param {Array.<object>} params.clonedNodeDefs - The node defs cloned from the source survey.
+ * @param {object} [client] - The db client.
+ * @returns {Promise<object>} - { clonedNodeDefs, categoriesCloned, taxonomiesCloned }.
+ */
+export const resolveAndCloneNodeDefsCategoriesAndTaxonomies = async (
+  { user, sourceSurveyId, sourceSurvey, targetSurveyId, targetSurvey, clonedNodeDefs },
+  client = db
+) => {
+  const {
+    clonedNodeDefs: resolvedClonedNodeDefs,
+    categoryUuidsToClone,
+    taxonomyUuidsToClone,
+  } = Survey.resolveClonedNodeDefsCategoriesAndTaxonomies({ sourceSurvey, targetSurvey, clonedNodeDefs })
+
+  const categoriesCloned = []
+  for (const sourceCategoryUuid of categoryUuidsToClone) {
+    categoriesCloned.push(
+      await CategoryManager.cloneCategoryFromSurvey(
+        { user, sourceSurveyId, sourceCategoryUuid, targetSurveyId },
+        client
+      )
+    )
+  }
+  const taxonomiesCloned = []
+  for (const sourceTaxonomyUuid of taxonomyUuidsToClone) {
+    taxonomiesCloned.push(
+      await TaxonomyManager.cloneTaxonomyFromSurvey(
+        { user, sourceSurveyId, sourceTaxonomyUuid, targetSurveyId },
+        client
+      )
+    )
+  }
+
+  return { clonedNodeDefs: resolvedClonedNodeDefs, categoriesCloned, taxonomiesCloned }
+}
+
+export const cloneNodeDefFromSurvey = async (
+  { user, sourceSurveyId, sourceNodeDefUuid, targetSurveyId, targetParentNodeDefUuid },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const [sourceSurvey, targetSurvey] = await Promise.all([
+      fetchSurvey({ surveyId: sourceSurveyId }, t),
+      fetchSurvey({ surveyId: targetSurveyId }, t),
+    ])
+
+    // Temporarily inject the source node def subtree into the target survey so
+    // Survey.cloneNodeDef can resolve references within a single survey object.
+    const sourceNodeDef = Survey.getNodeDefByUuid(sourceNodeDefUuid)(sourceSurvey)
+    const sourceDescendants = Survey.getNodeDefDescendants({ nodeDef: sourceNodeDef })(sourceSurvey)
+    const sourceNodeDefs = ObjectUtils.toUuidIndexedObj([sourceNodeDef, ...sourceDescendants])
+    const mergedSurvey = Survey.mergeNodeDefs(sourceNodeDefs)(targetSurvey)
+
+    const existingNodeDefNames = Survey.getNodeDefsArray(targetSurvey).map((nd) => NodeDef.getName(nd))
+    const { clonedNodeDefs, rootClonedNodeDef } = Survey.cloneNodeDef({
+      nodeDefUuid: sourceNodeDefUuid,
+      targetParentNodeDefUuid,
+      existingNodeDefNames,
+    })(mergedSurvey)
+
+    // Resolve categories/taxonomies referenced by code/taxon attributes in the cloned subtree:
+    // reuse an existing one (by uuid or name), or clone it from the source survey.
+    const {
+      clonedNodeDefs: resolvedClonedNodeDefs,
+      categoriesCloned,
+      taxonomiesCloned,
+    } = await resolveAndCloneNodeDefsCategoriesAndTaxonomies(
+      { user, sourceSurveyId, sourceSurvey, targetSurveyId, targetSurvey, clonedNodeDefs },
+      t
+    )
+
+    const rootClonedNodeDefResolved = resolvedClonedNodeDefs.find(
+      (nd) => NodeDef.getUuid(nd) === NodeDef.getUuid(rootClonedNodeDef)
+    )
+
+    const { nodeDefsUpdated, nodeDefsValidation } = await _insertClonedNodeDefsAndUpdateLayout({
+      survey: targetSurvey,
+      surveyId: targetSurveyId,
+      clonedNodeDefs: resolvedClonedNodeDefs,
+      rootClonedNodeDef: rootClonedNodeDefResolved,
+      layoutRefParentNodeDefUuid: targetParentNodeDefUuid,
+      layoutRefNodeDefUuid: sourceNodeDefUuid,
+      t,
+    })
+
+    return { nodeDefsUpdated, nodeDefsValidation, categoriesCloned, taxonomiesCloned }
+  })
+
+const _insertClonedNodeDefsAndUpdateLayout = async ({
+  survey,
+  surveyId,
+  clonedNodeDefs,
+  rootClonedNodeDef,
+  layoutRefParentNodeDefUuid,
+  layoutRefNodeDefUuid,
+  t,
+}) => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const cycleKeys = Survey.getCycleKeys(survey)
+  const defaultCycle = Survey.getDefaultCycleKey(surveyInfo)
+  const layoutRefParentNodeDef = Survey.getNodeDefByUuid(layoutRefParentNodeDefUuid)(survey)
+  const isLayoutRefParentForm = NodeDefLayout.isRenderForm(defaultCycle)(layoutRefParentNodeDef)
+  const layoutRefParentChildren = NodeDefLayout.getLayoutChildren(defaultCycle)(layoutRefParentNodeDef)
+  const layoutRefPosition = isLayoutRefParentForm
+    ? layoutRefParentChildren.find((item) => item.i === layoutRefNodeDefUuid)
+    : null
+
+  const insertedNodeDefs = await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: clonedNodeDefs }, t)
+
+  const preferredLayoutByCycle = layoutRefPosition
+    ? cycleKeys.reduce((acc, cycle) => {
+        const { minH, minW, h, w } = layoutRefPosition
+        acc[cycle] = { minH, minW, h, w }
+        return acc
+      }, {})
+    : null
+  const parentNodeDefUpdated = await NodeDefManager.addOrRemoveNodeDefInParentLayout(
+    {
+      survey,
+      nodeDef: rootClonedNodeDef,
+      add: true,
+      layoutInParentByCycle: preferredLayoutByCycle,
+    },
+    t
+  )
+
+  const nodeDefsUpdatedByUuid = ObjectUtils.toUuidIndexedObj(insertedNodeDefs)
+  if (parentNodeDefUpdated) {
+    nodeDefsUpdatedByUuid[NodeDef.getUuid(parentNodeDefUpdated)] = parentNodeDefUpdated
+  }
+
+  return afterNodeDefUpdate({ survey, nodeDefsUpdated: nodeDefsUpdatedByUuid })
+}
+
+export const cloneNodeDef = async ({ surveyId, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
+  client.tx(async (t) => {
+    const survey = await fetchSurvey({ surveyId }, t)
+
+    const { clonedNodeDefs, rootClonedNodeDef } = Survey.cloneNodeDef({ nodeDefUuid, targetParentNodeDefUuid })(survey)
+
+    const originalNodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    const originalNodeDefParent = Survey.getNodeDefParent(originalNodeDef)(survey)
+
+    return _insertClonedNodeDefsAndUpdateLayout({
+      survey,
+      surveyId,
+      clonedNodeDefs,
+      rootClonedNodeDef,
+      layoutRefParentNodeDefUuid: NodeDef.getUuid(originalNodeDefParent),
+      layoutRefNodeDefUuid: nodeDefUuid,
+      t,
+    })
   })
 
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {

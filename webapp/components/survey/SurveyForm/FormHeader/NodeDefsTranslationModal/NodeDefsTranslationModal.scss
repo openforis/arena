@@ -1,0 +1,164 @@
+.node-defs-translation-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .modal-content {
+    width: 90vw;
+    max-width: 1600px;
+    height: 85vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 1rem;
+  }
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--c-neutral-300, #e0e0e0);
+    margin-bottom: 0.5rem;
+  }
+
+  &__table-wrapper {
+    flex: 1;
+    overflow: auto;
+  }
+
+  &__table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.8rem;
+
+    th,
+    td {
+      border: 1px solid var(--c-neutral-300, #e0e0e0);
+      padding: 0.3rem 0.5rem;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    th {
+      background: var(--c-neutral-100, #f5f5f5);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      resize: horizontal;
+      overflow: hidden;
+      min-width: 80px;
+    }
+
+    .path-cell {
+      white-space: normal;
+      word-break: break-word;
+      font-family: monospace;
+      font-size: 0.75rem;
+    }
+
+    .default-value-cell {
+      white-space: normal;
+      word-break: break-word;
+    }
+  }
+}
+
+.default-lang-cell--view {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  .default-lang-cell__value {
+    flex: 1;
+    word-break: break-word;
+    font-size: 0.8rem;
+    color: var(--c-neutral-700, #444);
+  }
+
+  button {
+    flex-shrink: 0;
+    padding: 0;
+    min-width: 0;
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.translation-cell {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.5rem;
+  row-gap: 0.1rem;
+  align-items: center;
+  min-width: 220px;
+
+  &--view {
+    display: flex;
+    align-items: flex-start;
+    min-width: 150px;
+    gap: 0.3rem;
+
+    button {
+      flex-shrink: 0;
+      padding: 0;
+      min-width: 0;
+      opacity: 0.5;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__value {
+    flex: 1;
+    word-break: break-word;
+    color: var(--c-neutral-700, #444);
+  }
+
+  &__empty {
+    color: var(--c-neutral-400, #bdbdbd);
+    font-style: normal;
+  }
+}
+
+.translation-option {
+  display: contents;
+
+  .radio-button-group-item {
+    margin: 0;
+
+    .MuiRadio-root {
+      padding: 2px;
+    }
+
+    .MuiFormControlLabel-label {
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+  }
+
+  .option-text {
+    word-break: break-word;
+    color: var(--c-neutral-700, #444);
+    font-size: 0.8rem;
+  }
+}
+
+.translation-custom-input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  font-size: 0.8rem;
+}

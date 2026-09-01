@@ -1,5 +1,6 @@
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
 export class CategoryBuilder {
   constructor(name) {
@@ -25,6 +26,10 @@ export class CategoryBuilder {
   }
 
   build() {
+    // Memoized: build() can be called multiple times (once to wire the in-memory survey,
+    // once more from buildAndStore() to persist it) and must return the same category/uuid every time.
+    if (this._built) return this._built
+
     let category = Category.newCategory({
       [Category.keysProps.name]: this.name,
       [Category.keysProps.itemExtraDef]: this._extraProps,
@@ -37,9 +42,18 @@ export class CategoryBuilder {
     }
     const items = this.childItemBuilders.flatMap((itemBuilder) => itemBuilder.build(category))
 
-    return {
+    this._built = {
       category,
       items,
+    }
+    return this._built
+  }
+
+  async buildAndStore(user, surveyId, t) {
+    const { category, items } = this.build()
+    await CategoryManager.insertCategory({ user, surveyId, category, system: false, validate: false }, t)
+    if (items.length > 0) {
+      await CategoryManager.insertItems(user, surveyId, items, t)
     }
   }
 }

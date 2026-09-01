@@ -43,7 +43,7 @@ export const CollectDataImportView = () => {
       const { insertedRecords } = JobSerialized.getResult(jobCompleted)
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'dataImportView.jobs.CollectDataImportJob.importCompleteSuccessfully',
+          key: 'dataImportView:jobs.CollectDataImportJob.importCompleteSuccessfully',
           params: { insertedRecords },
           dismissable: false,
         })
@@ -77,24 +77,24 @@ export const CollectDataImportView = () => {
     <div className="data-import">
       <div className="form">
         <fieldset>
-          <legend>{i18n.t('dataImportView.options.header')}</legend>
+          <legend>{i18n.t('dataImportView:options.header')}</legend>
           {canDeleteAllRecords && (
             <Checkbox
               checked={deleteAllRecords}
-              label="dataImportView.deleteAllRecordsBeforeImport"
+              label="dataImportView:deleteAllRecordsBeforeImport"
               onChange={setDeleteAllRecords}
             />
           )}
 
           {surveyCycleKeys.length > 1 && (
-            <FormItem className="display-flex" label="dataImportView.importIntoCycle">
+            <FormItem className="display-flex" label="dataImportView:importIntoCycle">
               <CycleSelector selectedCycle={cycle} onChange={setCycle} />
             </FormItem>
           )}
 
           <Checkbox
             checked={forceImport}
-            label="dataImportView.forceImportFromAnotherSurvey"
+            label="dataImportView:forceImportFromAnotherSurvey"
             onChange={setForceImport}
           />
         </fieldset>
@@ -105,8 +105,8 @@ export const CollectDataImportView = () => {
           disabled={!file}
           confirmMessageKey={
             surveyCycleKeys.length > 1
-              ? 'dataImportView.confirmDeleteAllRecordsInCycle'
-              : 'dataImportView.confirmDeleteAllRecords'
+              ? 'dataImportView:confirmDeleteAllRecordsInCycle'
+              : 'dataImportView:confirmDeleteAllRecords'
           }
           confirmMessageParams={{ cycle: RecordCycle.getLabel(cycle) }}
           showConfirm={deleteAllRecords}

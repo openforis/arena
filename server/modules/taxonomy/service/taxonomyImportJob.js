@@ -18,6 +18,7 @@ import * as TaxonomyManager from '../manager/taxonomyManager'
 import TaxonomyImportManager from '../manager/taxonomyImportManager'
 
 import TaxonCSVParser from './taxonCSVParser'
+import SystemError from '@core/systemError'
 
 const requiredColumns = ['code', 'scientific_name']
 const fixedColumns = [...requiredColumns, 'family', 'genus']
@@ -26,6 +27,8 @@ const filterExtraPropsColumns = (columns) =>
   columns.filter((column) => !fixedColumns.includes(column) && !languageCodesISO639part2.includes(column))
 
 export default class TaxonomyImportJob extends Job {
+  static maxMissingPublishedTaxaCodesPreview = 10
+
   constructor(params) {
     super(TaxonomyImportJob.type, params)
 
@@ -41,6 +44,7 @@ export default class TaxonomyImportJob extends Job {
     this.extraPropsDefs = null
     this.taxonCSVParser = null
     this.currentRow = 0
+    this.missingPublishedTaxaCodes = []
   }
 
   async execute() {
@@ -90,9 +94,38 @@ export default class TaxonomyImportJob extends Job {
         await this.setStatusFailed()
       } else {
         this.logDebug('no errors found, finalizing import')
-        await this.taxonomyImportManager.finalizeImport()
+        try {
+          const { missingPublishedCodes } = await this.taxonomyImportManager.finalizeImport()
+          this.missingPublishedTaxaCodes = missingPublishedCodes
+        } catch (error) {
+          if (error instanceof SystemError) {
+            const { key, params } = error
+            this.addError({
+              [Taxon.propKeys.scientificName]: {
+                valid: false,
+                errors: [{ key, params }],
+              },
+            })
+            await this.setStatusFailed()
+          } else {
+            throw error
+          }
+        }
       }
     }
+  }
+
+  generateResult() {
+    const result = super.generateResult()
+    const { missingPublishedTaxaCodes } = this
+    if (missingPublishedTaxaCodes.length > 0) {
+      result.missingPublishedTaxaCodes = missingPublishedTaxaCodes.slice(
+        0,
+        TaxonomyImportJob.maxMissingPublishedTaxaCodesPreview
+      )
+      result.missingPublishedTaxaCodesTotal = missingPublishedTaxaCodes.length
+    }
+    return result
   }
 
   async cancel() {

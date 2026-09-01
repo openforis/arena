@@ -90,7 +90,7 @@ export const DataQueryScatterChart = (props) => {
   const colors = useRandomColors(categoricalAttributeDistinctValuesCount, { onlyDarkColors: true })
 
   if (data.length > maxItems) {
-    return i18n.t('dataView.charts.warning.tooManyItemsToShowChart', { maxItems })
+    return i18n.t('dataView:charts.warning.tooManyItemsToShowChart', { maxItems })
   }
 
   const numericAttributeDefs = attributeDefs.filter(
@@ -101,7 +101,7 @@ export const DataQueryScatterChart = (props) => {
   const [xAxisAttributeDefUuid, yAxisAttributeDefUuid] = numericAttributeDefs.map(NodeDef.getUuid)
 
   if (!xAxisAttributeDefUuid || !yAxisAttributeDefUuid) {
-    return i18n.t('dataView.charts.warning.selectAtLeast2NumericAttributes')
+    return i18n.t('dataView:charts.warning.selectAtLeast2NumericAttributes')
   }
 
   const categoricalAttributeDefLabel = categoricalAttributeDef

@@ -11,8 +11,11 @@ import { useSurvey } from '@webapp/store/survey'
 
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 
+import { useNodeDefEditReadOnly } from '../store'
+
 const AnalysisEntitySelector = (props) => {
   const survey = useSurvey()
+  const readOnly = useNodeDefEditReadOnly()
 
   const { nodeDef, onChange, validation } = props
   const [hadParent] = useState(A.isEmpty(NodeDef.getParentUuid(nodeDef)))
@@ -24,7 +27,7 @@ const AnalysisEntitySelector = (props) => {
         nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}
         onChange={onChange}
         showSingleEntities={false}
-        disabled={!hadParent}
+        disabled={readOnly || !hadParent}
         useNameAsLabel={true}
         validation={validation}
       />

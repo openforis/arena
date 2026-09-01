@@ -89,12 +89,7 @@ export const insertNode = async (
   const nodesCreatedByIId = {
     [nodeIId]: node,
   }
-  let recordUpdated = record
-  recordUpdated = Record.assocNode(node)(recordUpdated)
-
-  recordUpdated.lastInternalId = recordUpdated.lastInternalId
-    ? Math.max(recordUpdated.lastInternalId, nodeIId)
-    : nodeIId
+  let recordUpdated = Record.assocNode(node, { sideEffect })(record)
 
   if (NodeDef.isEntity(nodeDef)) {
     const descendantsCreateResult = await RecordNodesUpdater.createDescendants({

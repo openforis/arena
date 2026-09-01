@@ -1,7 +1,6 @@
-import * as PromiseUtils from '../../../../core/promiseUtils'
 import * as DateUtils from '../../../../core/dateUtils'
 
-import { TestId } from '../../../../webapp/utils/testId'
+import { getSelector, TestId } from '../../../../webapp/utils/testId'
 import { FormUtils } from '../utils/formUtils'
 import {
   getBooleanSelector,
@@ -61,11 +60,9 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
   // try to fill the code and select an item from the autocomplete 2 times:
   // autocomplete dialog could have been closed after record update
   let valueSet = false
-  await PromiseUtils.each([...new Array(2).keys()], async () => {
-    if (!valueSet) {
-      if (await fillCodeAndSelectItem()) valueSet = true
-    }
-  })
+  for (let attempt = 0; attempt < 2 && !valueSet; attempt++) {
+    if (await fillCodeAndSelectItem()) valueSet = true
+  }
   expect(valueSet).toBeTruthy()
 }
 
@@ -113,6 +110,17 @@ const enterFns = {
 
 export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
+    if (nodeDef.key) {
+      const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
+      const keyToggleLocator = page.locator(keyToggleSelector)
+      if (await keyToggleLocator.isVisible()) {
+        const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
+        if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
+          await keyToggleLocator.click()
+          await page.keyboard.press('Escape') // close potential tooltip
+        }
+      }
+    }
     await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
     await FormUtils.waitForHeaderLoaderToDisappear()
-  }, 30000)
+  }, 10000)

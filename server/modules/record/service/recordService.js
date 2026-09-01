@@ -1,53 +1,83 @@
 import * as fs from 'fs'
 
-import { NodeValues, Objects } from '@openforis/arena-core'
+import { NodeValues, Objects, RecordExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
+import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
+import { PrintableExportScopes, PrintOrientations } from '@common/record/printableExport'
+import { Query } from '@common/model/query'
+import { ViewDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
+import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Record from '@core/record/record'
-import * as RecordFile from '@core/record/recordFile'
+import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as Validation from '@core/validation/validation'
 
+import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { db } from '@server/db/db'
 import * as JobManager from '@server/job/jobManager'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
-import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as Response from '@server/utils/response'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
-import * as FileService from './fileService'
+import * as RecordFileManager from '../manager/recordFileManager'
+import { findSurveyDocImageApplicable } from '../../survey/service/surveyDocImageUtils'
 
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
+import RecordsCloneJob from './recordsCloneJob'
+import RecordsValidationJob from './recordsValidationJob'
+import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
-import RecordsCloneJob from './recordsCloneJob'
-import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
-import RecordsValidationJob from './recordsValidationJob'
 
 const Logger = Log.getLogger('RecordService')
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
+
+// The socket-to-record association is only delivery bookkeeping ("which sockets should be notified
+// about updates to this record"): it must never make the record read/write it's attached to fail.
+// It is DB-backed (socket_id is NOT NULL and a FK to connected_socket), so a missing socket id
+// (e.g. a request sent while the client WebSocket is reconnecting) or an already-disconnected one
+// would otherwise throw where the previous in-memory implementation silently tolerated it.
+const _assocSocketBestEffort = async ({ recordUuid, socketId }) => {
+  if (!socketId) return
+  try {
+    await RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
+  } catch (error) {
+    Logger.warn(`could not associate socket ${socketId} to record ${recordUuid}: ${error}`)
+  }
+}
+
+const _dissocSocketBestEffort = async ({ recordUuid, socketId }) => {
+  if (!socketId) return
+  try {
+    await RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
+  } catch (error) {
+    Logger.warn(`could not dissociate socket ${socketId} from record ${recordUuid}: ${error}`)
+  }
+}
 
 // RECORD
 export const createRecord = async ({ user, surveyId, recordToCreate }) => {
@@ -82,11 +112,12 @@ export const {
   updateRecordOwner,
 } = RecordManager
 
-export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat }) => {
+export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, user }) => {
   const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({
     surveyId,
     cycle,
     includeCounts: true,
+    user,
   })
 
   const valueFormattersByType = {
@@ -168,7 +199,7 @@ export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notif
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
   await RecordManager.deleteRecord(user, survey, record)
 
-  RecordsUpdateThreadService.notifyRecordDeleteToSockets({ socketIdUser: socketId, recordUuid, notifySameUser })
+  await RecordsUpdateThreadService.notifyRecordDeleteToSockets({ socketIdUser: socketId, recordUuid, notifySameUser })
   RecordsUpdateThreadService.clearRecordDataFromThread({ surveyId, cycle, draft: false, recordUuid })
 }
 
@@ -195,17 +226,22 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
 export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft })
+  // Passing `user` re-evaluates user-dependent applicability/relevance (e.g. userProp) for
+  // the current viewer/editor in memory, without persisting it - see RecordManager.fetchRecordAndNodesByUuid.
+  // This happens regardless of edit permission: existing persisted records - even when only
+  // viewed, not edited - must reflect visibility for the current viewer, not whoever last edited them.
+  const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft, user })
   const preview = Record.isPreview(record)
   const cycle = Record.getCycle(record)
+  const nodesEmpty = Record.getNodesArray(record).length === 0
 
-  RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
+  await _assocSocketBestEffort({ recordUuid, socketId })
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
     // Create record thread
     const thread = RecordsUpdateThreadService.getOrCreatedThread()
     // initialize record if empty
-    if (Record.getNodesArray(record).length === 0) {
+    if (nodesEmpty) {
       thread.postMessage({
         type: RecordsUpdateThreadMessageTypes.recordInit,
         user,
@@ -217,6 +253,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
       })
     }
   }
+
   return record
 }
 
@@ -240,13 +277,92 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
       }
     }
   }
-  RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
+  await _dissocSocketBestEffort({ recordUuid, socketId })
 }
 
 export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSocketBySocketId
 
 // VALIDATION REPORT
-export const { fetchValidationReport, countValidationReportItems } = RecordManager
+const _resolveValidationReportFilterBySurveyAttrs = async ({
+  surveyId,
+  cycle,
+  query,
+  attributeDefUuids = null,
+  messageTypeKeys = null,
+}) => {
+  const filter = query ? Query.getFilter(query) : null
+  const hasAttributeFilter = Array.isArray(attributeDefUuids)
+  const hasMessageTypeFilter = Array.isArray(messageTypeKeys)
+  if (!filter && !hasAttributeFilter && !hasMessageTypeFilter) return null
+
+  const output = {}
+
+  if (hasAttributeFilter) {
+    output.attributeDefUuids = attributeDefUuids
+  }
+
+  if (hasMessageTypeFilter) {
+    output.messageTypeKeys = messageTypeKeys
+  }
+
+  if (filter) {
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+    const rootNodeDef = Survey.getNodeDefRoot(survey)
+    output.filter = filter
+    output.rootDataViewName = new ViewDataNodeDef(survey, rootNodeDef).name
+  }
+
+  return output
+}
+
+export const fetchValidationReport = async ({
+  surveyId,
+  cycle,
+  offset,
+  limit,
+  recordUuid,
+  query,
+  attributeDefUuids = null,
+  messageTypeKeys = null,
+  sortBy,
+  sortOrder,
+}) => {
+  const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({
+    surveyId,
+    cycle,
+    query,
+    attributeDefUuids,
+    messageTypeKeys,
+  })
+  return RecordManager.fetchValidationReport({
+    surveyId,
+    cycle,
+    offset,
+    limit,
+    recordUuid,
+    filterBySurveyAttrs,
+    sortBy,
+    sortOrder,
+  })
+}
+
+export const countValidationReportItems = async ({
+  surveyId,
+  cycle,
+  recordUuid,
+  query,
+  attributeDefUuids = null,
+  messageTypeKeys = null,
+}) => {
+  const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({
+    surveyId,
+    cycle,
+    query,
+    attributeDefUuids,
+    messageTypeKeys,
+  })
+  return RecordManager.countValidationReportItems({ surveyId, cycle, recordUuid, filterBySurveyAttrs })
+}
 
 // RECORDS CLONE
 export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recordsUuids }) => {
@@ -256,8 +372,28 @@ export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recor
 }
 
 // Validation Report
-export const startValidationReportGenerationJob = ({ user, surveyId, cycle, lang, recordUuid, fileFormat }) => {
-  const job = new VaidationReportGenerationJob({ user, surveyId, cycle, lang, recordUuid, fileFormat })
+export const startValidationReportGenerationJob = ({
+  user,
+  surveyId,
+  cycle,
+  lang,
+  recordUuid,
+  query,
+  attributeDefUuids,
+  messageTypeKeys,
+  fileFormat,
+}) => {
+  const job = new VaidationReportGenerationJob({
+    user,
+    surveyId,
+    cycle,
+    lang,
+    recordUuid,
+    query,
+    attributeDefUuids,
+    messageTypeKeys,
+    fileFormat,
+  })
   JobManager.enqueueJob(job)
   return job
 }
@@ -269,8 +405,8 @@ export const startRecordsValidationJob = ({ user, surveyId }) => {
 }
 
 // NODE
-const _sendNodeUpdateMessage = ({ socketId, user, recordUuid, msg }) => {
-  RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
+const _sendNodeUpdateMessage = async ({ socketId, user, recordUuid, msg }) => {
+  await _assocSocketBestEffort({ recordUuid, socketId })
 
   const thread = RecordsUpdateThreadService.getOrCreatedThread()
   thread.postMessage(msg, user)
@@ -291,23 +427,24 @@ export const persistNode = async ({
   const recordUuid = Node.getRecordUuid(node)
 
   if (file) {
-    const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+    const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
     if (filesStatistics.availableSpace < file.size) {
       throw new SystemError('cannotInsertFileExceedingQuota') // do not provide details about available quota to the user
     }
     // Save file to "file" table and set fileUuid and fileName into node value
-    const fileObj = RecordFile.createFile({
+    const fileObj = SurveyFile.createFile({
       uuid: Node.getFileUuid(node),
       name: file.name,
       size: file.size,
       content: fs.readFileSync(file.tempFilePath),
       recordUuid,
       nodeIId: Node.getIId(node),
+      type: SurveyFile.SurveyFileType.recordAttachment,
     })
-    await FileService.insertFile(surveyId, fileObj)
+    await SurveyFileService.insertFile(surveyId, fileObj)
   }
 
-  _sendNodeUpdateMessage({
+  await _sendNodeUpdateMessage({
     socketId,
     user,
     recordUuid,
@@ -394,13 +531,14 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeIId, file 
     },
   })(record)
 
-  const fileName = RecordFile.getName(file)
+  const fileName = SurveyFile.getName(file)
   const extension = FileUtils.getFileExtension(fileName)
 
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`
 }
 const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
   const surveyId = Survey.getId(survey)
+  const isPreview = Record.isPreview(record)
 
   const nodesDeleteBatchPersister = new NodesDeleteBatchPersister({ user, surveyId, tx })
   const nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
@@ -408,9 +546,21 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
 
   if (nodesArray.length === 0) return
 
+  // preview records: soft-deleted files are never purged, so hard-delete now the files of any
+  // file-type nodes among the ones being deleted (nodesArray already includes every individual
+  // descendant node explicitly - Record.updateNodesDependents flattens the whole subtree - so no
+  // separate subtree lookup is needed here)
+  const fileDeleteParams = []
+
   for (const node of nodesArray) {
     if (Node.isDeleted(node)) {
       await nodesDeleteBatchPersister.addItem(node)
+      if (isPreview) {
+        const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+        if (NodeDef.isFile(nodeDef) && Node.getFileUuid(node)) {
+          fileDeleteParams.push({ fileUuid: Node.getFileUuid(node), recordUuid: Node.getRecordUuid(node) })
+        }
+      }
     } else if (Node.isCreated(node)) {
       await nodesInsertBatchPersister.addItem(node)
     } else if (Node.isUpdated(node)) {
@@ -421,6 +571,10 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
   await nodesInsertBatchPersister.flush()
   await nodesUpdateBatchPersister.flush()
 
+  if (fileDeleteParams.length > 0) {
+    await RecordFileManager.deleteFiles({ surveyId, files: fileDeleteParams }, tx)
+  }
+
   await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
 }
 
@@ -429,8 +583,8 @@ export const mergeRecords = async (
   client = db
 ) =>
   client.tx(async (tx) => {
-    const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid }, tx)
-    const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid }, tx)
+    const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid, user }, tx)
+    const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid, user }, tx)
 
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
@@ -471,4 +625,169 @@ export const mergeRecords = async (
       nodesCreated: nodesArray.filter(Node.isCreated).length,
       nodesUpdated: nodesArray.filter(Node.isUpdated).length,
     }
+  })
+
+const exportRecordDocument = async ({
+  user,
+  surveyId,
+  recordUuid,
+  outputStream,
+  lang,
+  generator,
+  extension,
+  contentType,
+  exportScope = PrintableExportScopes.full,
+  entityDefUuid,
+  entityNodeUuid,
+  orientation = PrintOrientations.portrait,
+}) => {
+  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true, user })
+  const cycle = Record.getCycle(record)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    includeAnalysis: false,
+  })
+  const surveyDocImages = Survey.getSurveyDocImages(survey)
+  const langToUse = lang ?? Survey.getDefaultLanguage(survey)
+
+  let entityDef = null
+  if (exportScope === PrintableExportScopes.currentPage) {
+    if (!entityDefUuid || !entityNodeUuid) {
+      throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
+    }
+    entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+    const entityNode = Record.getNodeByInternalId(entityNodeUuid)(record)
+    if (
+      !entityDef ||
+      !NodeDef.isEntity(entityDef) ||
+      !entityNode ||
+      Node.getNodeDefUuid(entityNode) !== entityDefUuid
+    ) {
+      throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
+    }
+  }
+
+  const rootNode = Record.getRootNode(record)
+  const isApplicable = async (imageFile) => {
+    const applyIf = SurveyDocImages.getApplyIf(imageFile)
+    if (!applyIf) return true
+    try {
+      const result = await new RecordExpressionEvaluator().evalExpression({
+        user,
+        survey,
+        record,
+        node: rootNode,
+        query: applyIf,
+      })
+      return result === true
+    } catch {
+      return false
+    }
+  }
+
+  const headerImageFileSummary = await findSurveyDocImageApplicable({
+    surveyDocImages,
+    documentPlace: SurveyDocPlace.header,
+    isApplicable,
+  })
+  const footerImageFileSummary = await findSurveyDocImageApplicable({
+    surveyDocImages,
+    documentPlace: SurveyDocPlace.footer,
+    isApplicable,
+  })
+
+  const headerOnFirstPageOnly = Survey.isDocHeaderOnFirstPageOnly(survey)
+  const pageNumbering = Survey.isDocPageNumberingEnabled(survey)
+
+  const i18n = await i18nFactory.createI18nAsync(langToUse)
+  const { buffer, surveyName } = await generator({
+    survey,
+    cycle,
+    record,
+    lang: langToUse,
+    i18n,
+    fileProvider: async (fileUuid) => {
+      const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+      return SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary })
+    },
+    headerImageFileUuid: headerImageFileSummary?.uuid,
+    footerImageFileUuid: footerImageFileSummary?.uuid,
+    headerOnFirstPageOnly,
+    pageNumbering,
+    readOnly: true,
+    exportScope,
+    entityDefUuid,
+    entityNodeUuid,
+    orientation,
+  })
+  const fileName =
+    exportScope === PrintableExportScopes.currentPage
+      ? ExportFileNameGenerator.generate({
+          surveyName,
+          cycle,
+          itemName: NodeDef.getLabel(entityDef, langToUse) || NodeDef.getName(entityDef),
+          fileType: 'RecordForm',
+          extension,
+        })
+      : ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'RecordForm', extension })
+  Response.sendFileContent({
+    res: outputStream,
+    fileName,
+    content: buffer,
+    contentSize: Buffer.byteLength(buffer),
+    contentType,
+  })
+}
+
+export const exportRecordDocx = ({
+  user,
+  surveyId,
+  recordUuid,
+  outputStream,
+  lang = null,
+  exportScope,
+  entityDefUuid,
+  entityNodeUuid,
+  orientation,
+}) =>
+  exportRecordDocument({
+    user,
+    surveyId,
+    recordUuid,
+    outputStream,
+    lang,
+    exportScope,
+    entityDefUuid,
+    entityNodeUuid,
+    orientation,
+    generator: SurveyDocxGenerator.generateSurveyDocx,
+    extension: 'docx',
+    contentType: Response.contentTypes.docx,
+  })
+
+export const exportRecordPdf = ({
+  user,
+  surveyId,
+  recordUuid,
+  outputStream,
+  lang = null,
+  exportScope,
+  entityDefUuid,
+  entityNodeUuid,
+  orientation,
+}) =>
+  exportRecordDocument({
+    user,
+    surveyId,
+    recordUuid,
+    outputStream,
+    lang,
+    exportScope,
+    entityDefUuid,
+    entityNodeUuid,
+    orientation,
+    generator: SurveyPdfGenerator.generateSurveyPdf,
+    extension: 'pdf',
+    contentType: Response.contentTypes.pdf,
   })

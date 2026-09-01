@@ -1,1 +1,1 @@
-export { evalApplicableExpression, evalApplicableExpressions, evalNodeQuery } from './recordExpressionParser'
+export { evalApplicableExpression, evalNodeQuery } from './recordExpressionParser'

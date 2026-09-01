@@ -1,6 +1,6 @@
 arena.dfColumnsAs = function (df, columns, mutateFunction) {
   return ( df %>% 
-    dplyr::mutate(across( all_of( columns), mutateFunction))
+    dplyr::mutate(across( any_of( columns), mutateFunction))
   )
 }
 

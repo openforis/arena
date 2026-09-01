@@ -25,6 +25,7 @@ Deseja ignorá-las?`,
     chain: 'Cadeia',
     chain_plural: 'Cadeias',
     childrenEmpty: 'Defina pelo menos um item filho',
+    clear: 'Limpar',
     clone: 'Clonar',
     close: 'Fechar',
     cloneFrom: 'Clonar de',
@@ -87,6 +88,7 @@ Deseja ignorá-las?`,
     from: 'De',
     function: 'Função',
     goToHomePage: 'Ir para a página inicial',
+    goToSurveys: 'Ir para inventários',
     group: 'Grupo',
     help: 'Ajuda',
     hide: 'Ocultar',
@@ -108,6 +110,8 @@ Ao confirmar, todas as alterações serão perdidas.
 Deseja prosseguir?`,
     local: 'Local',
     loading: 'Carregando...',
+    lock: 'Bloquear',
+    unlock: 'Desbloquear',
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Gerenciar',
@@ -162,6 +166,8 @@ Deseja prosseguir?`,
     required: 'Obrigatório',
     requiredField: 'campo obrigatório',
     reset: 'Redefinir',
+    refresh: 'Atualizar',
+    pressRefreshToReloadPage: 'Pressione Atualizar para recarregar a página.',
     resume: 'Retomar',
     retry: 'Tentar novamente',
     role: 'Função',
@@ -177,6 +183,10 @@ Deseja prosseguir?`,
     showLabels: 'Mostrar rótulos',
     showLabelsAndNames: 'Mostrar rótulos e nomes',
     showNames: 'Mostrar nomes',
+    sort: 'Ordenar',
+    sortAsc: 'Ordenar ascendente',
+    sortDesc: 'Ordenar descendente',
+    sortNone: 'Remover ordem',
     srs: 'SRS',
     status: 'Status',
     sum: 'Soma',
@@ -184,6 +194,7 @@ Deseja prosseguir?`,
     to: 'Para',
     totalItems: 'Total de itens',
     true: 'Verdadeiro',
+    trySplittingFileIntoSmallerChunks: 'Tente dividir o arquivo em partes menores.',
     type: 'Tipo',
     undefinedName: 'Nome indefinido',
     unique: 'Único',
@@ -192,6 +203,8 @@ Deseja prosseguir?`,
       message: `Erro durante o envio do arquivo: {{error}}.\n
     Tentar novamente?`,
     },
+    uploadFileChangedError:
+      'O arquivo selecionado parece ter sido modificado desde que foi selecionado. Selecione-o novamente.',
     uploadingFile: 'Enviando arquivo ({{progressPercent}}%)',
     value: 'Valor',
     view: 'Visualizar',
@@ -252,6 +265,8 @@ Deseja prosseguir?`,
     header: 'Arquivos',
     missing: ' Arquivos ausentes: {{count}}',
     totalSize: 'Tamanho total: {{size}}',
+    fileName: 'Nome do arquivo',
+    fileSize: 'Tamanho do arquivo',
   },
 
   sidebar: {
@@ -291,6 +306,7 @@ Deseja prosseguir?`,
 
   appModules: {
     home: 'Início',
+    landing: 'Boas-vindas',
     dashboard: 'Painel',
     surveyNew: 'Novo inventário',
     surveys: 'Inventários',
@@ -327,6 +343,9 @@ Deseja prosseguir?`,
     userInvite: 'Convidar usuário',
     userNew: 'Novo usuário',
     usersSurvey: 'Lista de usuários',
+    userGroup: 'Grupo de usuários',
+    userGroup_plural: 'Grupos de usuários',
+    userGroupNew: 'Novo grupo de usuários',
     usersList: 'Lista de usuários (todos)',
     user2FADevice: 'Dispositivo 2FA',
     user2FADevice_plural: 'Dispositivos 2FA',
@@ -343,6 +362,8 @@ Deseja prosseguir?`,
 
     message: 'Mensagem',
     message_plural: '$t(common.message_plural)',
+
+    jobMonitor: 'Monitor de tarefas',
 
     help: 'Ajuda',
     about: 'Sobre',
@@ -431,10 +452,14 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     dependencyTypes: {
       applicable: 'Aplicabilidade',
       defaultValues: 'Valor padrão',
+      editable: 'Editável',
+      fileName: 'Nome do arquivo',
       itemsFilter: 'Filtro de itens',
-      minCount: 'Contagem mínima',
       maxCount: 'Contagem máxima',
+      minCount: 'Contagem mínima',
+      parentCode: 'Código do pai',
       validations: 'Validações',
+      visible: 'Visível',
     },
     selectAtLeastOneDependencyType: 'Selecione pelo menos um tipo de dependência',
     noDependenciesToDisplay: 'Nenhuma dependência para exibir',
@@ -450,8 +475,14 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     errorLoadingRecord: 'Erro ao carregar registro: {{details}}',
     recordEditModalTitle: 'Registro: {{keyValues}}',
     recordNotFound: 'Registro não encontrado',
-    lock: 'Bloquear',
-    unlock: 'Desbloquear',
+    keyAttributeEditing: {
+      lock: 'Bloquear edição do atributo-chave',
+      unlock: 'Permitir editar o atributo-chave',
+    },
+    qualifierAttributeEditing: {
+      lock: 'Bloquear edição do atributo qualificador',
+      unlock: 'Permitir editar o atributo qualificador',
+    },
   },
 
   dataExplorerView: {
@@ -462,317 +493,8 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     editRecord: 'Editar registro',
   },
 
-  dataExportView: {
-    error: 'Erro ao exportar dados: {{details}}',
-    optionNotCompatibleWithDataImport: 'Não compatível com importação de dados',
-    options: {
-      header: '$t(common.options)',
-      fileFormatLabel: 'Formato de arquivo',
-      fileFormat: {
-        csv: 'CSV',
-        xlsx: 'Excel',
-      },
-      includeCategoryItemsLabels: 'Incluir rótulos dos itens de categoria',
-      includeCategories: 'Incluir categorias',
-      expandCategoryItems: 'Expandir itens de categoria',
-      exportSingleEntitiesIntoSeparateFiles: 'Exporte entidades únicas para arquivos separados',
-      includeAncestorAttributes: 'Incluir atributos ancestrais',
-      includeAnalysis: 'Incluir variáveis de resultado',
-      includeDataFromAllCycles: 'Incluir dados de todos os ciclos',
-      includeDateCreated: 'Incluir data de criação',
-      includeFiles: 'Incluir arquivos',
-      includeFileAttributeDefs: 'Incluir colunas de atributos de arquivo',
-      includeInternalUuids: 'Incluir UUIDs internos',
-      recordsModifiedAfter: 'Registros modificados após',
-    },
-    optionsInfo: {
-      expandCategoryItems:
-        'adiciona uma coluna booleana para cada item de categoria com valor VERDADEIRO se o item tiver sido selecionado, FALSO caso contrário',
-      exportSingleEntitiesIntoSeparateFiles: `exporta entidades únicas em arquivos separados; quando não estiver marcada, os atributos pertencentes a uma única entidade serão incluídos entre os de sua entidade múltipla ancestral mais próxima`,
-      includeAnalysis: 'inclui atributos de análise',
-      includeAncestorAttributes: 'inclui atributos que pertencem às entidades ancestrais, até a entidade raiz',
-      includeCategoryItemsLabels: 'adiciona uma coluna com um rótulo para cada item da categoria',
-      includeCategories: `as categorias serão exportadas para uma subpasta chamada "categorias"`,
-      includeDataFromAllCycles:
-        'serão incluídos dados de todos os ciclos, caso contrário apenas o selecionado será considerado',
-      includeDateCreated: 'inclui a data de criação de cada entidade (linha) em uma coluna chamada "data_criada"',
-      includeFiles: `exporta os arquivos associados aos registros para uma subpasta chamada "arquivos"`,
-      includeFileAttributeDefs: `adiciona colunas de atributos de arquivo: identificador interno do arquivo (file_uuid) e nome (file_name)`,
-      includeInternalUuids: 'inclui os identificadores internos (UUIDs) em colunas que terminam com o sufixo "_uuid"',
-      recordsModifiedAfter: 'exporta apenas dados de registros modificados após a data especificada',
-    },
-    startExport: 'Iniciar exportação',
-  },
-
-  dataImportView: {
-    confirmDeleteAllRecords: 'Excluir todos os registros antes da importação?',
-    confirmDeleteAllRecordsInCycle: 'Excluir todos os registros do ciclo {{cycle}} antes da importação?',
-    conflictResolutionStrategy: {
-      label: 'Estratégia de resolução de conflitos',
-      info: 'O que fazer caso o mesmo registro (ou um registro com os mesmos atributos-chave) seja encontrado',
-      skipExisting: 'Ignorar se já existir',
-      overwriteIfUpdated: 'Sobrescrever se atualizado',
-      merge: 'Mesclar registros',
-    },
-    deleteAllRecordsBeforeImport: 'Exclua todos os registros antes de importar',
-    downloadAllTemplates: 'Baixe todos os modelos',
-    downloadAllTemplates_csv: 'Baixe todos os modelos (CSV)',
-    downloadAllTemplates_xlsx: 'Baixe todos os modelos (Excel)',
-    downloadTemplate: 'Baixar modelo',
-    downloadTemplate_csv: 'Baixar modelo (CSV)',
-    downloadTemplate_xlsx: 'Baixar modelo (Excel)',
-    errors: {
-      rowNum: 'Linha #',
-    },
-    fileUploadChunkSize: {
-      label: 'Tamanho do bloco de upload de arquivo',
-    },
-    forceImportFromAnotherSurvey: 'Forçar importação de outro inventário',
-
-    importFromArena: 'Arena/Arena Mobile',
-    importFromCollect: 'Collect / Collect Mobile',
-    importFromCsvExcel: 'CSV/Excel',
-    importFromCsvStepsInfo: `### Importando etapas
-1. Selecione a entidade alvo
-2. Baixe um modelo
-3. Preencha o modelo e salve-o (se estiver em CSV, use UTF-8 como codificação)
-4. Verifique as opções
-5. Carregue o arquivo CSV/Excel
-6. Valide o arquivo
-7. Inicie a importação`,
-    importIntoCycle: 'Importar para o ciclo',
-    importIntoMultipleEntityOrAttribute: 'Importar para múltiplas entidades ou atributos',
-    importType: {
-      label: 'Tipo de importação',
-      insertNewRecords: 'Inserir novos registros',
-      updateExistingRecords: 'Atualizar registros existentes',
-    },
-    jobs: {
-      ArenaDataImportJob: {
-        importCompleteSuccessfully: `Importação de dados do Arena Mobile concluída:
-{{summary}}`,
-        importSummaryItem: {
-          processed: 'registros processados',
-          insertedRecords: 'registros criados',
-          updatedRecords: 'registros atualizados',
-          skippedRecords: 'registros ignorados',
-          missingFiles: 'arquivos faltando',
-        },
-      },
-      CollectDataImportJob: {
-        importCompleteSuccessfully: `Coleta de importação de dados concluída:
-        - {{insertedRecords}} registros criados`,
-      },
-      DataImportJob: {
-        importCompleteSummary: `- {{processed}} linhas processadas
-        - {{insertedRecords}} registros criados
-        - Registros {{updatedRecords}} atualizados
-        - {{entitiesCreated}} entidades criadas
-        - {{entitiesDeleted}} entidades excluídas
-        - Valores {{updatedValues}} atualizados`,
-        importCompleteSuccessfully: `## Importação concluída:
-$t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
-        importWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportJob.importCompleteSuccessfully)
-        - {{insertedFiles}} arquivos inseridos
-        - {{updatedFiles}} arquivos atualizados
-        - {{deletedFiles}} arquivos excluídos`,
-        importCompleteWithErrors: `## Importação concluída (com erros):
-        - {{processed}} linhas processadas`,
-      },
-      DataImportValidationJob: {
-        validationCompleteWithErrors: `## Validação concluída ({{errorsFoundMessage}})
-        - {{processed}} linhas processadas`,
-        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)`,
-        validationCompleteSuccessfully: `## Validação concluída sem erros
-        - {{processed}} linhas processadas
-        - registros {{insertedRecords}} seriam criados
-        - Os registros {{updatedRecords}} seriam atualizados
-        - Entidades {{entitiesCreated}} seriam criadas
-        - Entidades {{entitiesDeleted}} seriam excluídas
-        - Os valores {{updatedValues}} seriam atualizados`,
-        validationWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteSuccessfully)
-        - {{insertedFiles}} arquivos seriam inseridos
-        - {{updatedFiles}} arquivos seriam atualizados
-        - {{deletedFiles}} arquivos seriam excluídos`,
-      },
-    },
-    options: {
-      header: '$t(common.options)',
-      abortOnErrors: 'Abortar em caso de erros',
-      preventAddingNewEntityData: 'Impedir a adição de novos dados de entidade',
-      preventUpdatingRecordsInAnalysis: 'Impedir a atualização de registros na etapa Análise',
-      includeFiles: 'Incluir arquivos',
-      deleteExistingEntities: `excluir os dados da entidade selecionada em todos os registros`,
-    },
-    optionsInfo: {
-      deleteExistingEntities: `AVISO: todas as entidades "{{nodeDefName}}" 
-e todos os seus descendentes em todos os registros  
-serão excluídos antes de inserir os novos.`,
-    },
-    startImport: 'Iniciar importação',
-    startImportConfirm: `Ao pressionar 'Ok' você iniciará o processo de importação.  
-**Não será possível reverter as alterações.**  
-Tem certeza de que deseja continuar?`,
-    startImportConfirmWithDeleteExistingEntities: `$t(dataImportView.startImportConfirm)  
-**(opção $t(dataImportView.options.deleteExistingEntities) selecionada: entidades existentes serão excluídas antes da criação das novas)**
-`,
-    steps: {
-      selectImportType: 'Selecione o tipo de importação',
-      selectCycle: 'Selecione Ciclo',
-      selectEntity: 'Selecione Entidade',
-      selectFile: 'Selecione o arquivo',
-      startImport: 'Iniciar importação',
-    },
-    validateFile: 'Validar arquivo',
-    validateFileInfo:
-      'O processo de validação verifica se o arquivo contém dados válidos de acordo com o tipo de dados de cada atributo.',
-  },
-
-  dataView: {
-    charts: {
-      downloadToPng: 'Baixar gráfico para PNG',
-      warning: {
-        selectOneDimensionAndOneMeasure: 'Selecione uma dimensão e uma medida para mostrar o gráfico',
-        selectAtLeast2NumericAttributes: 'Selecione 2 atributos numéricos para mostrar o gráfico',
-        tooManyItemsToShowChart: `Muitos itens para mostrar o gráfico;
-esperando o máximo de itens {{maxItems}}.
-Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número de itens.`,
-      },
-      type: {
-        area: 'Gráfico de área',
-        bar: 'Gráfico de barras',
-        line: 'Gráfico de linhas',
-        pie: 'Gráfico de pizza',
-        scatter: 'Gráfico de dispersão',
-      },
-    },
-    dataQuery: {
-      deleteConfirmMessage: 'Excluir a consulta "{{name}}"?',
-      displayType: {
-        chart: 'Gráfico',
-        table: 'Tabela',
-      },
-      manageQueries: 'Gerenciar consultas',
-      mode: {
-        label: 'Modo:',
-        aggregate: 'Agregado',
-        raw: 'Bruto',
-        rawEdit: 'Edição bruta',
-      },
-      replaceQueryConfirmMessage: 'Substituir a consulta atual pela selecionada?',
-      showCodes: 'Mostrar códigos',
-    },
-    editSelectedRecord: 'Editar registro selecionado',
-    filterAttributeTypes: 'Filtrar tipos de atributo',
-    filterRecords: {
-      buttonTitle: 'Filtrar',
-      expressionEditorHeader: 'Expressão para filtrar registros',
-    },
-    invalidRecord: 'Registro inválido',
-    nodeDefsSelector: {
-      hide: 'Ocultar seletor de definições de nó',
-      show: 'Mostrar seletor de definições de nó',
-      nodeDefFrequency: `{{nodeDefLabel}} (frequência)`,
-    },
-    records: {
-      clone: 'Clonar',
-      confirmDeleteRecord: `Excluir o registro "{{keyValues}}"?`,
-      confirmDeleteSelectedRecord_one: `Excluir o registro selecionado?`,
-      confirmDeleteSelectedRecord_other: `Excluir os {{count}} registros selecionados?`,
-      confirmMergeSelectedRecords: `### Mesclar os registros selecionados em um?
-
-- o registro "origem" será mesclado no registro "destino":
-  - origem: [{{sourceRecordKeys}}], modificado em {{sourceRecordModifiedDate}};
-  - destino: [{{targetRecordKeys}}], modificado em {{targetRecordModifiedDate}};
-
-- uma pré-visualização do resultado será exibida antes da mesclagem;
-
-- quando a mesclagem for confirmada, **o registro de origem SERÁ EXCLUÍDO**`,
-      confirmUpdateRecordsStep: `Mover os {{count}} registro(s) selecionado(s) de {{stepFrom}} para {{stepTo}}?`,
-      confirmUpdateRecordOwner: `Alterar o proprietário do registro selecionado para {{ownerName}}?`,
-      confirmValidateAllRecords: `Revalidar todos os registros?\n\nIsso pode levar vários minutos.`,
-      deleteRecord: 'Excluir registro',
-      demoteAllRecordsFromAnalysis: 'Análise -> Limpeza',
-      demoteAllRecordsFromCleansing: 'Limpeza -> Entrada',
-      editRecord: 'Editar registro',
-      exportList: 'Exportar lista',
-      exportData: 'Exportar dados',
-      exportDataSummary: 'Exportar resumo dos dados',
-      filterPlaceholder: 'Filtrar por chaves ou proprietário',
-      merge: {
-        label: 'Mesclar',
-        confirmLabel: 'Confirmar mesclagem',
-        confirmTooManyDifferencesMessage: `**Diferenças demais**.  
-Parece que os registros são muito diferentes entre si.  
-Muitos atributos (~{{nodesUpdated}}) serão atualizados durante a mesclagem.  
-Continuar com a pré-visualização da mesclagem?`,
-        noChangesWillBeApplied: `Nenhuma alteração seria aplicada ao registro de destino.  
-A mesclagem não pode ser realizada.`,
-        performedSuccessfullyMessage: 'Mesclagem de registros realizada com sucesso!',
-        previewTitle: 'Pré-visualização da mesclagem (registro {{keyValues}})',
-      },
-      noRecordsAdded: 'Nenhum registro adicionado',
-      noRecordsAddedForThisSearch: 'Nenhum registro encontrado',
-      noSelectedRecordsInStep: 'Nenhum registro selecionado na etapa {{step}}',
-      owner: 'Proprietário',
-      promoteAllRecordsToAnalysis: 'Limpeza -> Análise',
-      promoteAllRecordsToCleansing: 'Entrada -> Limpeza',
-      step: 'Etapa',
-      updateRecordsStep: 'Atualizar etapa dos registros',
-      validateAll: 'Validar tudo',
-      viewRecord: 'Visualizar registro',
-    },
-    recordsClone: {
-      title: 'Clonagem de registros',
-      fromCycle: 'Do ciclo',
-      toCycle: 'Para o ciclo',
-      confirmClone: `Clonar registros do ciclo {{cycleFrom}} para o ciclo {{cycleTo}}?\n
-(Somente registros ainda não existentes no ciclo {{cycleTo}} serão clonados)`,
-      startCloning: 'Iniciar clonagem',
-      cloneComplete: 'Clonagem concluída. {{recordsCloned}} registros clonados de {{cycleFrom}} para {{cycleTo}}',
-      error: {
-        cycleToMissing: 'Selecione "Para o ciclo"',
-        cycleToMustBeDifferentFromCycleFrom: '"Para o ciclo" deve ser diferente de "Do ciclo"',
-      },
-      source: {
-        label: 'Origem',
-        allRecords: 'Todos os registros do ciclo {{cycleFrom}} que ainda não estão no ciclo {{cycleTo}}',
-        selectedRecords: 'Somente os {{selectedRecordsCount}} registros selecionados',
-      },
-    },
-    recordDeleted_one: `Registro excluído com sucesso!`,
-    recordDeleted_other: `{{count}} registros excluídos com sucesso!`,
-    recordsSource: {
-      label: 'Origem',
-    },
-    recordsUpdated: '{{count}} registros atualizados com sucesso!',
-    rowNum: 'Linha #',
-    selectedAttributes: 'Atributos selecionados:',
-    selectedDimensions: 'Dimensões selecionadas',
-    selectedMeasures: 'Medidas selecionadas',
-    sortableItemsInfo: 'Arraste e solte para ordenar',
-    showValidationReport: 'Mostrar relatório de validação',
-    sort: 'Ordenar',
-    dataExport: {
-      source: {
-        label: 'Origem',
-        allRecords: 'Todos os registros',
-        filteredRecords: 'Somente registros filtrados',
-        selectedRecord: 'Somente registro selecionado',
-        selectedRecord_other: 'Somente {{count}} registros selecionados',
-      },
-      title: 'Exportar dados',
-    },
-    dataVis: {
-      errorLoadingData: 'Erro ao carregar dados',
-      noData: 'Esta consulta não retornou dados',
-      noSelection:
-        'Faça sua seleção usando o painel esquerdo ou selecione uma consulta existente em "Gerenciar consultas"',
-    },
-    viewSelectedRecord: 'Visualizar registro selecionado',
-  },
-
   mapView: {
+    changeMarkerColor: 'Alterar cor do marcador',
     createRecord: 'Criar novo registro',
     editRecord: 'Editar registro',
     elevation: 'Elevação (m)',
@@ -786,6 +508,7 @@ A mesclagem não pode ser realizada.`,
       showSamplingPolygon: `Polígono amostral`,
       showControlPoints: `Pontos de controle`,
       showPlotReferencePoint: `Ponto de referência da parcela`,
+      showUtmGrid: 'Mostrar grade UTM',
     },
     rulerTooltip: `Pressione o botão para começar a medir distâncias.
   - clique várias vezes para medir percursos
@@ -843,6 +566,11 @@ A mesclagem não pode ser realizada.`,
     onlyOwn: 'Somente inventários próprios',
     records: 'Registros',
     recordsCreatedWithMoreApps: 'Registros criados com mais aplicativos:',
+    status: {
+      published: 'Publicado',
+      draft: 'Rascunho',
+      'published-draft': 'Publicado/Rascunho',
+    },
   },
 
   usersAccessRequestView: {
@@ -901,8 +629,9 @@ A mesclagem não pode ser realizada.`,
     confirmInviteSystemAdmin: 'Convidar o usuário {{email}} como Administrador do Sistema?',
     confirmInviteSystemAdmin_other: 'Convidar os usuários {{email}} como Administradores do Sistema?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Permissões',
       systemAdmin: `
@@ -1008,6 +737,11 @@ A mesclagem não pode ser realizada.`,
     },
     downloadSummaryJSON: 'Baixar resumo (JSON)',
     firstPhaseCategory: 'Categoria da 1ª fase',
+    firstPhaseCategoryInfo: 'Selecione a categoria que contém as amostras da 1ª fase.',
+    firstPhaseCategoryExtraProp: {
+      label: 'Atributo de estrato da 1ª fase',
+      info: 'Selecione a variável usada para dividir a população original em estratos amplos para a fase inicial de amostragem.',
+    },
     firstPhaseCommonAttribute: {
       label: 'Atributo comum',
       info: `Atributo em comum entre a unidade base e a tabela da 1ª fase 
@@ -1026,9 +760,11 @@ A mesclagem não pode ser realizada.`,
       surveyNotPublished: '$t(chainView.cannotStartRStudio.common): publique o inventário primeiro',
     },
     nonResponseBiasCorrection: 'Correção de viés de não resposta',
-    nonResponseBiasCorrectionTip: `Para implementar este método, adicione 'design_psu' e 'design_ssu' na categoria de estrato como propriedades extras.`,
+    nonResponseBiasCorrectionInfo: `Para implementar o método de ajuste por classes de ponderação, adicione 'design_psu' e 'design_ssu' à tabela de categorias do estrato como propriedades numéricas extras.`,
     pValue: 'Valor-p',
     resultsBackFromRStudio: 'Resultados lidos de volta do RStudio',
+    resultsBackFromRStudioInfo: `Ative esta opção se os atributos de resultado calculados no RStudio devem ser importados de volta para o servidor Arena.
+Este processo pode ser lento.`,
     samplingDesign: 'Desenho amostral',
     samplingDesignDetails: 'Detalhes do desenho amostral',
     samplingStrategyLabel: 'Estratégia amostral',
@@ -1050,11 +786,16 @@ A mesclagem não pode ser realizada.`,
         dimensionsSeparate: 'Dimensões separadamente',
       },
       reportingArea: 'Área total de reporte (ha) (Opcional)',
+      reportingAreaInfo: `Com amostragem estratificada, forneça as áreas dos estratos na tabela de categorias do atributo de estrato (nome da coluna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
+    stratumAttributeInfo: 'Selecione a variável usada para estratificar a amostra.',
+    stratumAttribute2ndPhase: 'Atributo de estrato da 2ª fase',
+    stratumAttribute2ndPhaseInfo: `Selecione a variável usada para subestratificar a amostra da 1ª fase antes de extrair a subamostra final e detalhada.`,
     postStratificationAttribute: 'Atributo de pós-estratificação',
     areaWeightingMethod: 'Método de ponderação por área',
     clusteringEntity: 'Entidade de agrupamento',
+    clusteringEntityInfo: `A entidade que define as unidades amostrais primárias. Nota: usada exclusivamente para análise de conglomerados no âmbito do pacote R survey.`,
     clusteringOnlyVariances: 'Agrupamento apenas para variâncias',
     errorNoLabel: 'A cadeia deve ter um rótulo válido',
     dateExecuted: 'Data de execução',
@@ -1063,6 +804,18 @@ A mesclagem não pode ser realizada.`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Cadeia de processamento excluída',
+    cloneFromAnotherSurvey: 'Clonar de outro estudo',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Clonar cadeia de outro estudo',
+      sourceSurvey: 'Estudo de origem',
+      sourceChain: 'Cadeia de origem',
+      entityCheck: 'Compatibilidade de entidades',
+      entityMissing: 'ausente no estudo destino',
+      skipMissingEntities: 'Ignorar atributos de análise de entidades ausentes no estudo destino',
+      noAnalysisAttributes: 'Esta cadeia não tem atributos de análise',
+      cloneComplete: 'Cadeia clonada com sucesso',
+      missingEntities: 'Não é possível clonar: as seguintes entidades não existem no estudo destino: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `A definição de nó "{{label}}" não pode ser selecionada porque não pertence a todos os ciclos da cadeia de processamento`,
     cannotSelectCycle: 'Este ciclo não pode ser selecionado porque algumas definições de nó não pertencem a este ciclo',
     copyRStudioCode: `#### Você está prestes a abrir um servidor RStudio ####  
@@ -1101,7 +854,9 @@ $t(common.cantUndoWarning)`,
   chain: {
     quantitative: 'Quantitativo',
     categorical: 'Categórico',
-    emptyNodeDefs: '$t(validationErrors.analysis.analysisNodeDefsRequired)',
+    addQuantitative: 'Adicionar atributo quantitativo',
+    addCategorical: 'Adicionar atributo categórico',
+    emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
     entityExcludedInRStudioScripts:
       'a entidade e todas as variáveis de resultado relacionadas serão excluídas dos scripts do RStudio',
     entityWithoutData: 'A entidade {{name}} não possui dados; $t(chain.entityExcludedInRStudioScripts)',
@@ -1126,6 +881,7 @@ $t(common.cantUndoWarning)`,
       'Nome de propriedade de valor de atributo inválido: {{attributeName}}.{{propName}}',
     invalidCategoryExtraProp: 'Nome de propriedade extra inválido: {{propName}}',
     invalidCategotyName: 'Nome de categoria inválido: {{name}}',
+    invalidTaxonomyExtraProp: 'Nome de propriedade extra de taxonomia inválido: {{propName}}',
     invalidTaxonomyName: 'Nome de taxonomia inválido: {{name}}',
     invalidTaxonVernacularNameLanguageCode:
       'Código de idioma do nome vernacular do táxon inválido: {{vernacularLangCode}}',
@@ -1137,7 +893,7 @@ $t(common.cantUndoWarning)`,
   helpView: {
     about: {
       text: `
-    Sobre
+Sobre
 ========
 
 $t(common.appNameFull)
@@ -1145,9 +901,12 @@ $t(common.appNameFull)
  
  * Desenvolvido por: $t(links.openforis)
  * Versão: {{version}}
+ * Website: $t(links.openforisArenaWebsite)
+ * Tutoriais em vídeo do Arena na Academia de Aprendizagem Online da FAO: $t(links.arenaVideoTutorialsInFaoElearningAcademy)
+ * Tutoriais em vídeo do Arena no YouTube: $t(links.arenaVideoTutorialsInYouTube)
  * Fórum de suporte: $t(links.supportForum)
- * Arena in GitHub: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
- * Arena R Scripts in GitHub: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
+ * Arena no GitHub: $t(links.arenaInGitHub)
+ * Scripts R do Arena no GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
   },
@@ -1159,6 +918,18 @@ $t(common.appNameFull)
     basic: 'Básico',
     advanced: 'Avançado',
     mobileApp: 'Aplicativo móvel',
+    print: 'Impressão',
+    printProps: {
+      printOrientation: {
+        label: 'Orientação da página',
+        info: 'Orientação usada quando esta entidade inicia sua própria seção imprimível. Por padrão, herda a orientação do documento escolhida na exportação.',
+      },
+      orientations: {
+        default: 'Padrão (documento)',
+        portrait: 'Retrato',
+        landscape: 'Paisagem',
+      },
+    },
     validations: 'Validações',
     function: 'Função',
     editingFunction: 'Editando função {{functionName}}',
@@ -1189,6 +960,12 @@ $t(common.appNameFull)
       now: 'Retorna a data ou hora atual',
       parent: 'Retorna a entidade pai do nó especificado',
       pow: 'Retorna o valor de uma base elevada a uma potência',
+      prevCycleNote:
+        'Funciona apenas no Arena Mobile quando múltiplos ciclos são definidos e o vínculo ao ciclo anterior está habilitado',
+      prevCycleValue:
+        'Retorna o valor do mesmo atributo no registro do ciclo anterior. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
+      prevCycleValues:
+        'Retorna os valores dos mesmos atributos no registro do ciclo anterior. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
       recordCycle: 'Retorna o ciclo do registro atual',
       recordDateCreated:
         'Retorna a data e hora de criação do registro atual como valor datetime. Pode ser usada em atributo de texto, data ou hora',
@@ -1201,6 +978,7 @@ $t(common.appNameFull)
       taxonProp: 'Retorna o valor da $t(extraProp.label) especificada de um táxon com o código informado',
       taxonVernacularName:
         'Retorna o (primeiro) nome vernacular (ou local) no idioma especificado de um táxon com o código informado',
+      unique: 'Retorna os valores únicos de um atributo múltiplo ou entidade',
       userEmail: 'Retorna o email do usuário autenticado',
       userIsRecordOwner:
         'Retorna um valor booleano "true" se o usuário que edita o registro também for seu proprietário, "false" caso contrário',
@@ -1221,6 +999,10 @@ $t(common.appNameFull)
         label: 'Auto incremental',
         info: 'O valor será gerado automaticamente',
       },
+      autoCreateMinCountItems: {
+        label: 'Criar mínimo de itens automaticamente',
+        info: 'Quando a entidade se torna relevante ou sua entidade pai é criada, um número de entidades igual ao mínimo será gerado automaticamente.',
+      },
       displayAs: 'Exibir como',
       displayIn: 'Exibir em',
       entitySource: 'Origem da entidade',
@@ -1240,18 +1022,44 @@ $t(common.appNameFull)
         info: `Se marcado, o atributo ficará visível na lista de registros`,
       },
       key: 'Chave',
+      maxKeysCountReached: 'Número máximo de chaves atingido ({{maxKeysCount}})',
       multiple: 'Múltiplo',
       ownPage: 'Página própria',
       parentPage: 'Página pai ({{parentPage}})',
+      qualifier: {
+        label: 'Qualificador',
+        info: `Quando um novo registro é criado por um usuário pertencente a um grupo, este atributo será automaticamente preenchido com o valor especificado para ele nos qualificadores do grupo do usuário. Os usuários só poderão ver e modificar registros pertencentes ao seu próprio grupo, se pertencerem a um.`,
+      },
       table: 'Tabela',
     },
     advancedProps: {
+      defaultValuesNotSpecified: 'Valores padrão não especificados',
+      defaultValuesSpecified: 'Valores padrão especificados',
+      editableAlways: 'Sempre editável',
+      editableIfConditionIsMet: 'Editável quando a condição é atendida',
+      relevantIfRadioNone: 'Sempre relevante',
+      relevantIfRadioDefined: 'Relevante quando a condição é atendida',
+      visibleAlways: 'Sempre visível',
+      visibleIfConditionIsMet: 'Visível quando a condição é atendida',
       areaBasedEstimate: 'Estimativa baseada em área',
       defaultValues: 'Valores padrão',
+      defaultValuesInfo: `Isto permite preencher automaticamente uma resposta com base em regras específicas.
+    Se você configurar várias regras, o sistema irá verificá-las em ordem, de cima para baixo.
+    Ele aplicará a primeira regra que atender às condições e usará esse resultado como resposta.`,
       defaultValueEvaluatedOneTime: 'Valor padrão avaliado apenas uma vez',
+      defaultValueEvaluatedOneTimeInfo: `O valor padrão será avaliado apenas uma vez, quando o atributo for criado.
+    Se não estiver marcado, o valor padrão será reavaliado toda vez que o registro for atualizado.
+    Deve ser marcado ao usar expressões como now() ou uuid(), que devem ser avaliadas apenas uma vez, quando o valor do atributo for gerado pela primeira vez.`,
       defaultValuesNotEditableForAutoIncrementalKey:
         'Valores padrão não editáveis porque a chave auto incremental está definida',
-      hidden: 'Ocultar no formulário de entrada',
+      editableIf: 'Editável se',
+      editableIfInfo: `Por padrão, um usuário sempre pode acessar um campo relevante.
+Aqui podemos definir uma regra para indicar se o usuário pode digitar ou alterar este campo.
+Isto define se um usuário pode digitar ou alterar este campo.
+Se as condições definidas forem atendidas, o campo pode ser editado. Caso contrário, ele fica somente leitura (bloqueado).`,
+      hidden: 'Sempre oculto',
+      hiddenInReport: 'Ocultar no Painel Analítico',
+      hiddenInReportInfo: `Se marcado, o atributo não ficará visível no Painel Analítico`,
       hiddenWhenNotRelevant: 'Oculto quando não relevante',
       itemsFilter: 'Filtro de itens',
       itemsFilterInfo: `Expressão usada para filtrar itens selecionáveis.
@@ -1260,7 +1068,16 @@ $t(common.appNameFull)
     (onde "region" é o nome de uma propriedade extra definida para o item e region_attribute_name é o nome de um atributo no inventário)`,
       readOnly: 'Somente leitura',
       relevantIf: 'Relevante se',
+      relevantIfInfo: `Por padrão, todos os campos ficam ativos.
+    Se você definir uma regra de relevância e ela não for atendida, o campo ficará cinza ou será ocultado por completo,
+    e respostas automáticas serão ignoradas.
+    Use isso para mostrar ou ocultar partes do formulário dinamicamente; por exemplo, mostrar "Especifique" apenas quando o usuário selecionar "Outro".`,
       script: 'Script',
+      visibleIf: 'Visível se',
+      visibleIfInfo: `Por padrão, um campo é sempre visível.
+    Se você definir uma regra, ele só será visível quando essa regra for atendida; caso contrário, ficará oculto.
+    Observação: diferente de ocultar um campo "não relevante", um campo oculto ainda pode salvar uma resposta automática.
+    Isso é útil para ocultar seções inteiras do formulário com base em quem está logado (por exemplo, por função).`,
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1275,6 +1092,9 @@ $t(common.appNameFull)
         label: 'Incluir no link para ciclo anterior',
         info: `Se marcado, o valor do ciclo anterior será exibido no formulário de entrada de dados (quando o link para o ciclo anterior estiver ativo no app móvel)`,
       },
+    },
+    numericProps: {
+      unit: 'Unidade',
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Número máximo de casas decimais',
@@ -1343,6 +1163,7 @@ $t(common.appNameFull)
     coordinateProps: {
       allowOnlyDeviceCoordinate: 'Permitir apenas coordenada do dispositivo',
       allowOnlyDeviceCoordinateInfo: `Aplica-se apenas ao Arena Mobile: se marcado, o usuário não poderá modificar os valores X/Y, e somente o GPS do dispositivo poderá ser usado para obtê-los`,
+      mapMarkerColor: 'Cor do marcador no mapa',
     },
     expressionsProp: {
       expression: 'Expressão',
@@ -1353,7 +1174,9 @@ $t(common.appNameFull)
     validationsProps: {
       minCount: 'Contagem mínima',
       maxCount: 'Contagem máxima',
-      expressions: 'Expressões',
+      expressions: 'Expressões de validação',
+      attributeAlwaysValid: 'Atributo sempre válido',
+      attributeValidWhenConditionIsMet: 'Atributo válido quando a condição é atendida',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Este nó não pode ser convertido para múltiplo porque possui valores padrão.',
@@ -1385,6 +1208,8 @@ $t(common.appNameFull)
 
 Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo *tree_species* marcado como **Único**, poderá ter apenas uma árvore por espécie dentro do mesmo *plot*.`,
     },
+    categoriesClonedFromSurvey: 'As seguintes categorias também foram clonadas do inventário de origem: {{names}}',
+    taxonomiesClonedFromSurvey: 'As seguintes taxonomias também foram clonadas do inventário de origem: {{names}}',
   },
 
   languagesEditor: {
@@ -1395,13 +1220,27 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
     header: 'Taxonomia',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Excluir a taxonomia {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clonar taxonomia de outro inquérito',
+      sourceSurvey: 'Inquérito de origem',
+      sourceTaxonomy: 'Taxonomia de origem',
+      loadingSurveys: 'A carregar inquéritos...',
+      noSurveysAvailable: 'Nenhum inquérito disponível',
+      selectSurveyFirst: 'Selecione primeiro um inquérito',
+      loadingTaxonomies: 'A carregar taxonomias...',
+      noTaxonomiesAvailable: 'Nenhuma taxonomia disponível no inquérito selecionado',
+    },
     edit: {
       taxonomyListName: 'Nome da lista de taxonomia',
       taxaNotImported: 'Táxons não importados',
       family: 'Família',
       genus: 'Gênero',
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
+      synonym: 'Sinônimo / Latim',
       extraPropsNotDefined: 'Propriedades extras não definidas para esta taxonomia',
+      importMissingPublishedTaxa:
+        '{{count}} táxon/taxa publicado(s) não encontrado(s) no arquivo importado e mantido(s) sem alterações. Códigos: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} mais)',
     },
     taxaCount: 'Contagem de táxons',
     vernacularNameLabel: 'Rótulo do nome vernacular',
@@ -1412,6 +1251,16 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
     batchImportCompleteSuccessfully: `{{importedCategories}} categorias importadas com sucesso!
   {{insertedCategories}} novas
   {{updatedCategories}} atualizadas`,
+    cloneFromAnotherSurvey: {
+      title: 'Clonar categoria de outro inquérito',
+      sourceSurvey: 'Inquérito de origem',
+      sourceCategory: 'Categoria de origem',
+      loadingSurveys: 'A carregar inquéritos...',
+      noSurveysAvailable: 'Nenhum inquérito disponível',
+      selectSurveyFirst: 'Selecione primeiro um inquérito',
+      loadingCategories: 'A carregar categorias...',
+      noCategoriesAvailable: 'Nenhuma categoria disponível no inquérito selecionado',
+    },
     itemsCount: 'Contagem de itens',
     types: {
       flat: 'Plano',
@@ -1467,11 +1316,6 @@ $t(common.cantUndoWarning)`,
       title: 'Resumo da importação de categoria',
     },
     reportingData: 'Dados de reporte',
-    templateForImport: 'Modelo para importação',
-    templateFor_specificDataImport_csv: 'Modelo para importação de dados (CSV)',
-    templateFor_specificDataImport_xlsx: 'Modelo para importação de dados (Excel)',
-    templateFor_genericDataImport_csv: 'Modelo para importação de dados (genérico, CSV)',
-    templateFor_genericDataImport_xlsx: 'Modelo para importação de dados (genérico, Excel)',
     templateFor_samplingPointDataImport_csv: 'Modelo para importação de dados de ponto amostral (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Modelo para importação de dados de ponto amostral (Excel)',
   },
@@ -1500,249 +1344,6 @@ $t(common.cantUndoWarning)`,
     },
     name: 'Nome da propriedade {{position}}',
     value: 'Valor',
-  },
-
-  // ===== All validation errors
-  validationErrors: {
-    // Common
-    invalidEmail: 'Email inválido',
-    invalidField: '"{{field}}" é inválido',
-    invalidNumber: 'Número inválido',
-    invalidDate: 'Data inválida',
-    minLengthNotRespected: 'Comprimento mínimo de {{minLength}} caracteres não respeitado',
-    nameDuplicate: 'Nome duplicado',
-    nameCannotBeKeyword: `O nome "{{value}}" não pode ser usado: é uma palavra reservada`,
-    nameInvalid:
-      'O nome "{{name}}" é inválido: deve ter no máximo 40 caracteres e conter apenas letras minúsculas, números e os símbolos "-" e "_", começando com uma letra',
-    nameRequired: 'Nome é obrigatório',
-    requiredField: '{{field}} é obrigatório',
-    rowsDuplicate: 'linha: {{row}} linha duplicada: {{duplicateRow}}',
-
-    analysis: {
-      labelDefaultLangRequired: 'Rótulo no idioma padrão do inventário é obrigatório',
-      analysisNodeDefsRequired: 'Pelo menos um atributo calculado é obrigatório',
-    },
-
-    categoryEdit: {
-      childrenEmpty: '$t(common.childrenEmpty)',
-      childrenInvalid: 'Pelo menos um filho inválido',
-      codeCannotBeKeyword: `O código "{{value}}" não pode ser usado: é uma palavra reservada`,
-      codeDuplicate: 'Código duplicado',
-      codeRequired: 'Código obrigatório',
-      itemExtraPropDataTypeRequired: 'Tipo de dado obrigatório para $t(extraProp.label) "{{key}}"',
-      itemExtraPropNameInvalid: 'Nome inválido para $t(extraProp.label) "{{key}}"',
-      itemExtraPropInvalidNumber: 'Número inválido para $t(extraProp.label) "{{key}}"',
-      itemExtraPropInvalidGeometryPoint: 'Ponto geométrico inválido para $t(extraProp.label) "{{key}}"',
-      itemsInvalid: 'Pelo menos um item inválido',
-      itemsEmpty: 'Defina pelo menos um item',
-      levelDuplicate: 'Nome de nível duplicado',
-      levelsInvalid: 'Pelo menos um nível inválido',
-      nameNotSpecified: 'Nome da categoria não especificado',
-    },
-
-    categoryImport: {
-      cannotDeleteItemsOfPublishedCategory:
-        'Não é possível excluir itens de categoria publicados. Itens ausentes no arquivo importado: {{deletedItemCodes}}',
-      cannotDeleteLevelsOfPublishedCategory:
-        'Não é possível excluir níveis de categoria publicada. Níveis ausentes no arquivo importado: {{deletedLevelNames}}',
-      codeColumnMissing: 'Deve haver pelo menos uma coluna "code"',
-      codeRequired: '{{columnName}}: um código é obrigatório',
-      codeDuplicate: '{{columnName}}: código duplicado "{{code}}"',
-      columnMissing: 'Coluna ausente: {{columnNameMissing}}',
-      emptyHeaderFound: 'O arquivo contém um cabeçalho vazio',
-      emptyFile: '$t(validationErrors.dataImport.emptyFile)',
-      invalidImportFile:
-        'O arquivo ZIP deve conter apenas arquivos .csv ou .xlsx (um para cada categoria), sem diretórios',
-      invalidParentItemOrder: 'O item com códigos {{parentItemCodes}} deve vir antes de seus filhos',
-      nameDuplicate: 'Já existe uma categoria com o mesmo nome: {{name}}',
-      srsNotDefined: 'SRS com código {{srs}} não definido no inventário',
-    },
-
-    dataImport: {
-      emptyFile: 'O arquivo que você está tentando importar está vazio',
-      invalidHeaders: 'Colunas inválidas: {{invalidHeaders}}',
-      invalidBoolean: 'Valor booleano inválido na coluna {{headers}}: {{value}}',
-      invalidCode: `Código inválido para o atributo '{{attributeName}}': {{code}}`,
-      invalidCoordinate: 'Coordenada inválida na coluna {{headers}}: {{value}}',
-      invalidDate:
-        'Data inválida na coluna {{headers}}: {{value}}. As datas devem estar no formato YYYY-MM-DD ou DD/MM/YYYY. Ex.: 2023-01-15 ou 15/01/2023',
-      invalidNumber: 'Número inválido na coluna {{headers}}: {{value}}',
-      invalidTaxonCode: 'Código inválido na coluna {{headers}}: {{value}}',
-      invalidTime:
-        'Hora inválida na coluna {{headers}}: {{value}}. A hora deve estar no formato HH:mm. Ex.: 09:45 ou 16:30',
-      missingRequiredHeaders: 'Colunas obrigatórias ausentes: {{missingRequiredHeaders}}',
-      errorUpdatingValues: 'Erro ao atualizar valores: {{details}}',
-      multipleRecordsMatchingKeys: 'Vários registros encontrados com as chaves "{{keyValues}}"',
-      recordAlreadyExisting: 'Registro com chaves "{{keyValues}}" já existente',
-      recordInAnalysisStepCannotBeUpdated:
-        'Registro com chaves "{{keyValues}}" está na etapa Análise e não pode ser atualizado',
-      recordKeyMissingOrInvalid: 'Valor ausente ou inválido para o atributo-chave "{{keyName}}"',
-      recordNotFound: 'Registro com chaves "{{keyValues}}" não encontrado',
-    },
-
-    expressions: {
-      cannotGetChildOfAttribute: 'não foi possível obter o nó filho {{childName}} do atributo {{parentName}}',
-      cannotUseCurrentNode: 'não é possível usar o nó atual {{name}} nesta expressão',
-      circularDependencyError: 'não é possível referenciar o nó {{name}} porque ele referencia o nó atual',
-      expressionInvalid: 'Expressão inválida: {{details}}',
-      unableToFindNode: 'não foi possível encontrar o nó: {{name}}',
-      unableToFindNodeChild: 'não foi possível encontrar o nó filho: {{name}}',
-      unableToFindNodeParent: 'não foi possível encontrar o nó pai: {{name}}',
-      unableToFindNodeSibling: 'não foi possível encontrar o nó irmão: {{name}}',
-    },
-
-    extraPropEdit: {
-      nameInvalid: 'Nome inválido',
-      nameRequired: 'Nome obrigatório',
-      dataTypeRequired: 'Tipo de dado obrigatório',
-      valueRequired: 'Valor obrigatório',
-    },
-
-    nodeDefEdit: {
-      analysisParentEntityRequired: 'Entidade obrigatória',
-      applyIfDuplicate: 'A condição "$t(nodeDefEdit.expressionsProp.applyIf)" está duplicada',
-      applyIfInvalid: 'Condição "$t(nodeDefEdit.advancedProps.relevantIf)" inválida',
-      columnWidthCannotBeGreaterThan: 'A largura da coluna não pode ser maior que {{max}}',
-      columnWidthCannotBeLessThan: 'A largura da coluna não pode ser menor que {{min}}',
-      countMaxMustBePositiveNumber: 'A contagem máxima deve ser um inteiro positivo',
-      countMinMustBePositiveNumber: 'A contagem mínima deve ser um inteiro positivo',
-      categoryRequired: 'Categoria obrigatória',
-      childrenEmpty: '$t(common.childrenEmpty)',
-      defaultValuesInvalid: '"Valores padrão" inválidos',
-      defaultValuesNotSpecified: 'Valor padrão não especificado',
-      entitySourceRequired: 'Origem da entidade obrigatória',
-      expressionApplyIfOnlyLastOneCanBeEmpty:
-        'Somente a última expressão pode ter a condição "$t(nodeDefEdit.expressionsProp.applyIf)" vazia',
-      expressionDuplicate: 'Expressão duplicada',
-      expressionRequired: 'Expressão obrigatória',
-      formulaInvalid: 'Fórmula inválida',
-      keysEmpty: 'Defina pelo menos um atributo-chave',
-
-      keysExceedingMax: 'Excede o número máximo de atributos-chave',
-      maxFileSizeInvalid: 'O tamanho máximo do arquivo deve ser maior que 0 e menor que {{max}}',
-      nameInvalid:
-        'Nome inválido (deve conter apenas letras minúsculas, números e sublinhados, começando com uma letra)',
-      taxonomyRequired: 'Taxonomia obrigatória',
-      validationsInvalid: '"Validações" inválidas',
-      countMaxInvalid: '"Contagem máxima" inválida',
-      countMinInvalid: '"Contagem mínima" inválida',
-    },
-
-    record: {
-      keyDuplicate: 'Chave de registro duplicada',
-      entityKeyDuplicate: 'Chave duplicada',
-      entityKeyValueNotSpecified: 'Valor da chave para "{{keyDefName}}" não especificado',
-      missingAncestorForEntity: 'Não foi possível encontrar "{{ancestorName}}" com estas chaves: {{keyValues}}',
-      oneOrMoreInvalidValues: 'Um ou mais valores são inválidos',
-      uniqueAttributeDuplicate: 'Valor duplicado',
-      valueInvalid: 'Valor inválido',
-      valueRequired: 'Valor obrigatório',
-    },
-
-    recordClone: {
-      differentKeyAttributes: 'Os atributos-chave são diferentes no Ciclo {{cycleFrom}} e no Ciclo {{cycleTo}}',
-    },
-
-    surveyInfoEdit: {
-      langRequired: 'Idioma obrigatório',
-      srsRequired: 'Sistema de Referência Espacial obrigatório',
-      cycleRequired: 'Ciclo obrigatório',
-      cyclesRequired: 'Pelo menos um ciclo deve ser definido',
-      cyclesExceedingMax: 'Um inventário pode ter no máximo 10 ciclos',
-      cycleDateStartBeforeDateEnd: 'A data de início do ciclo deve ser anterior à data de término',
-      cycleDateStartAfterPrevDateEnd: 'A data de início do ciclo deve ser posterior ao término do ciclo anterior',
-      cycleDateStartInvalid: 'Data de início do ciclo inválida',
-      cycleDateStartMandatory: 'A data de início do ciclo é obrigatória',
-      cycleDateEndInvalid: 'Data de término do ciclo inválida',
-      cycleDateEndMandatoryExceptForLastCycle:
-        'A data de término do ciclo é obrigatória para todos os ciclos, exceto o último',
-      fieldManualLinksInvalid: 'Link do manual de campo inválido',
-    },
-
-    surveyLabelsImport: {
-      invalidHeaders: 'Colunas inválidas: {{invalidHeaders}}',
-      cannotFindNodeDef: "Não foi possível encontrar definição de atributo ou entidade com nome '{{name}}'",
-    },
-
-    taxonomyEdit: {
-      codeChangedAfterPublishing: `O código publicado foi alterado: '{{oldCode}}' => '{{newCode}}'`,
-      codeDuplicate: 'Código duplicado {{value}}; $t(validationErrors.rowsDuplicate)',
-      codeRequired: 'Código obrigatório',
-      familyRequired: 'Família obrigatória',
-      genusRequired: 'Gênero obrigatório',
-      scientificNameDuplicate: 'Nome científico duplicado {{value}}; $t(validationErrors.rowsDuplicate)',
-      scientificNameRequired: 'Nome científico obrigatório',
-      taxaEmpty: 'Táxons vazios',
-      vernacularNamesDuplicate: `Nome vernacular duplicado '{{name}}' para o idioma '{{lang}}'`,
-    },
-
-    taxonomyImportJob: {
-      duplicateExtraPropsColumns: 'Colunas de informação extra duplicadas: {{duplicateColumns}}',
-      invalidExtraPropColumn:
-        'Nome de coluna de informação extra inválido "{{columnName}}": não pode ser palavra reservada',
-      missingRequiredColumns: 'Coluna(s) obrigatória(s) ausente(s): {{columns}}',
-    },
-
-    user: {
-      emailDuplicate: 'Usuário com o mesmo email já existe',
-      emailRequired: 'Email obrigatório',
-      emailInvalid: 'Email inválido',
-      emailNotFound: 'Email não encontrado',
-      groupRequired: 'Grupo obrigatório',
-      nameRequired: 'Nome obrigatório',
-      titleRequired: 'Título obrigatório',
-      passwordRequired: 'Senha obrigatória',
-      passwordInvalid: 'A senha não deve conter espaços em branco',
-      passwordUnsafe:
-        'A senha deve ter pelo menos 8 caracteres e conter letras minúsculas, letras maiúsculas e números',
-      passwordsDoNotMatch: `As senhas não coincidem`,
-
-      userNotFound: 'Usuário não encontrado. Verifique se email e senha estão corretos',
-      passwordChangeRequired: 'Alteração de senha obrigatória',
-      passwordResetNotAllowedWithPendingInvitation: `Redefinição de senha não permitida: o usuário foi convidado para um inventário, mas o convite ainda não foi aceito`,
-      twoFactorTokenRequired: 'Código de verificação obrigatório',
-    },
-
-    userAccessRequest: {
-      countryRequired: 'País obrigatório',
-      emailRequired: '$t(validationErrors.user.emailRequired)',
-      firstNameRequired: 'Nome obrigatório',
-      institutionRequired: 'Instituição obrigatória',
-      lastNameRequired: 'Sobrenome obrigatório',
-      purposeRequired: 'Finalidade obrigatória',
-      surveyNameRequired: 'Nome do inventário obrigatório',
-      invalidRequest: 'Solicitação de acesso de usuário inválida',
-      userAlreadyExisting: 'Usuário com email {{email}} já existe',
-      requestAlreadySent: `Solicitação de acesso para o usuário com email {{email}} já enviada`,
-      invalidReCaptcha: 'ReCaptcha inválido',
-    },
-
-    userAccessRequestAccept: {
-      accessRequestAlreadyProcessed: 'Solicitação de acesso de usuário já processada',
-      accessRequestNotFound: 'Solicitação de acesso de usuário não encontrada',
-      emailRequired: '$t(validationErrors.user.emailRequired)',
-      emailInvalid: '$t(validationErrors.user.emailInvalid)',
-      roleRequired: 'Papel obrigatório',
-      surveyNameRequired: 'Nome do inventário obrigatório',
-    },
-
-    userPasswordChange: {
-      oldPasswordRequired: 'Senha antiga obrigatória',
-      oldPasswordWrong: 'Senha antiga incorreta',
-      newPasswordRequired: 'Nova senha obrigatória',
-      confirmPasswordRequired: 'Confirmação de senha obrigatória',
-      confirmedPasswordNotMatching: 'Nova senha e confirmação de senha não coincidem',
-    },
-
-    userInvite: {
-      messageContainsLinks: 'A mensagem de convite não pode conter links',
-      messageTooLong: 'A mensagem de convite é muito longa (máximo de {{maxLength}} caracteres)',
-    },
-
-    user2FADevice: {
-      nameDuplicate: 'Já existe dispositivo com o mesmo nome',
-      nameRequired: 'Nome do dispositivo obrigatório',
-    },
   },
 
   record: {
@@ -1805,11 +1406,13 @@ $t(common.cantUndoWarning)`,
     qualifier: {
       'default-values': 'valor padrão',
       'default-values-apply-if': 'aplicar valor padrão se',
+      'editable-if': 'editável se',
       'max-count': 'contagem máxima',
       'min-count': 'contagem mínima',
       'relevant-if': 'relevante se',
       validations: 'regra de validação',
       'validations-apply-if': 'aplicar regra de validação se',
+      'visible-if': 'visível se',
     },
 
     selectAFunction: 'Selecione uma função',

@@ -1,5 +1,4 @@
 import './Error.scss'
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'

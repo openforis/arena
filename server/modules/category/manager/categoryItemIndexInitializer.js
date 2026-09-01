@@ -5,33 +5,12 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import { db } from '@server/db/db'
-import * as Log from '@server/log/log'
-import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as CategoryRepository from '../repository/categoryRepository'
-
-const logger = Log.getLogger('CategoryItemIndexInitializer')
 
 const shouldItemIndexBeInitialized = (item) => item && Objects.isEmpty(CategoryItem.getIndex(item))
 
 const isIndexable = ({ item, draft }) =>
   (draft && CategoryItem.isDraft(item)) || (!draft && CategoryItem.isPublished(item))
-
-const calculateIndexesByItemUuid = ({ itemsByParentUuid, draft }) => {
-  const indexByItemUuid = {}
-
-  for (const groupItems of Object.values(itemsByParentUuid)) {
-    // Sort by ID to maintain consistent ordering
-    const sortedItems = groupItems.sort(itemsSortFunction)
-
-    for (let index = 0; index < sortedItems.length; index++) {
-      const item = sortedItems[index]
-      if (isIndexable({ item, draft })) {
-        indexByItemUuid[CategoryItem.getUuid(item)] = index
-      }
-    }
-  }
-  return indexByItemUuid
-}
 
 const itemsSortFunction = (itemA, itemB) => {
   const indexA = CategoryItem.getIndex(itemA)
@@ -60,6 +39,23 @@ const itemsSortFunction = (itemA, itemB) => {
   }
   // 3. If indices are equal (or both are undefined), sort by ID (ascending).
   return CategoryItem.getId(itemA) - CategoryItem.getId(itemB)
+}
+
+const calculateIndexesByItemUuid = ({ itemsByParentUuid, draft }) => {
+  const indexByItemUuid = {}
+
+  for (const groupItems of Object.values(itemsByParentUuid)) {
+    // Sort by index or default to ID to maintain consistent ordering
+    const sortedItems = groupItems.sort(itemsSortFunction)
+
+    for (let index = 0; index < sortedItems.length; index++) {
+      const item = sortedItems[index]
+      if (isIndexable({ item, draft })) {
+        indexByItemUuid[CategoryItem.getUuid(item)] = index
+      }
+    }
+  }
+  return indexByItemUuid
 }
 
 const groupItemsByParentUuid = (items) => {
@@ -100,25 +96,19 @@ export const initializeSurveyCategoryItemsIndexes = async ({ surveyId, category 
   await _initializeSurveyCategoryItemsIndexesInternal({ surveyId, category, draft: true }, client)
 }
 
-export const initializeAllSurveysCategoryItemIndexes = async () => {
-  logger.debug(`initilizing category item indexes. Fetching survey IDs...`)
-  const surveyIds = await SurveyRepository.fetchAllSurveyIds()
+/**
+ * Initializes (fixes) the item indexes of every category in a single survey, in one transaction.
+ * @param {object} params - The parameters object.
+ * @param {number} params.surveyId - The survey id.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<void>} - A promise resolving to void.
+ */
+export const initializeCategoryItemIndexesForSurvey = async ({ surveyId }, client = db) => {
+  await client.tx(async (t) => {
+    const categoriesByUuid = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true }, t)
 
-  logger.debug(`${surveyIds.length} surveys found`)
-
-  let processed = 0
-  for (const surveyId of surveyIds) {
-    logger.debug(`initializing indexes for survey ${surveyId}...`)
-    await db.tx(async (t) => {
-      const categoriesByUuid = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true }, t)
-
-      for (const category of Object.values(categoriesByUuid)) {
-        await initializeSurveyCategoryItemsIndexes({ surveyId, category }, t)
-      }
-    })
-    logger.debug(
-      `indexes for survey ${surveyId} initialized. Progress ${Math.floor((++processed * 100) / surveyIds.length)}%`
-    )
-  }
-  logger.debug(`category item indexes initialization complete`)
+    for (const category of Object.values(categoriesByUuid)) {
+      await initializeSurveyCategoryItemsIndexes({ surveyId, category }, t)
+    }
+  })
 }

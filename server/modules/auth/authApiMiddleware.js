@@ -7,6 +7,7 @@ import { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as UserManager from '@server/modules/user/manager/userManager'
 import UnauthorizedError from '@server/utils/unauthorizedError'
 
 export const {
@@ -47,15 +48,58 @@ export const {
   requireDownloadToken,
 } = ApiAuthMiddleware
 
-const sendUnauthorizedError = ({ res, req = null }) => {
+const sendError = ({ errorCode, res, req = null }) => {
   const userName = req ? User.getName(Request.getUser(req)) : null
   const error = new UnauthorizedError(userName)
-  res.send(StatusCodes.UNAUTHORIZED, JSON.stringify(error))
+  res.status(errorCode).send(JSON.stringify(error))
+}
+
+const sendUnauthorizedError = ({ res, req = null }) => {
+  sendError({ errorCode: StatusCodes.UNAUTHORIZED, res, req })
+}
+
+const sendForbiddenError = ({ res, req = null }) => {
+  sendError({ errorCode: StatusCodes.FORBIDDEN, res, req })
 }
 
 export const requireLoggedInUser = async (req, res, next) => {
   const user = Request.getUser(req)
   return user ? next() : sendUnauthorizedError({ res })
+}
+
+export const requireSurveyUserExtraPropsEditPermission = async (req, res, next) => {
+  try {
+    const { surveyId, userUuid } = Request.getParams(req)
+    const user = Request.getUser(req)
+    const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
+    const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
+    if (userToUpdate && Authorizer.canEditUserAuthGroupExtraProps(user, surveyInfo, userToUpdate)) {
+      next()
+      return
+    }
+    return sendForbiddenError({ req, res })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const requireSurveyCloneFromViewPermission = async (req, res, next) => {
+  try {
+    const { cloneFrom } = Request.getBody(req)
+    if (!cloneFrom) {
+      next()
+      return
+    }
+    const user = Request.getUser(req)
+    const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: cloneFrom })
+    if (Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
+      next()
+      return
+    }
+    sendUnauthorizedError({ req, res })
+  } catch (error) {
+    next(error)
+  }
 }
 
 // Survey
@@ -68,6 +112,9 @@ export const requireSurveyCreatePermission = async (req, res, next) => {
       next()
       return
     }
+    // User is allowed to create surveys but has exceeded their quota
+    sendForbiddenError({ req, res })
+    return
   }
   sendUnauthorizedError({ req, res })
 }

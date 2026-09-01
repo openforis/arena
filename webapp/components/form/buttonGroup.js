@@ -1,6 +1,5 @@
 import './buttonGroup.scss'
 
-import React from 'react'
 import classNames from 'classnames'
 import * as R from 'ramda'
 import PropTypes from 'prop-types'

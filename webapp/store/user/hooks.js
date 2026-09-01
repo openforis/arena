@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useCallback, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -10,6 +10,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import { useAsyncGetRequest } from '@webapp/components/hooks'
 
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
+import { NotificationActions } from '@webapp/store/ui'
 import * as API from '@webapp/service/api'
 
 import * as UserState from './state'
@@ -20,6 +21,37 @@ export const useUserIsSystemAdmin = () => User.isSystemAdmin(useUser())
 // ====== Auth
 // ====== Auth / Surveys
 export const useAuthCanCreateSurvey = () => Authorizer.canCreateSurvey(useUser(), useSurveyInfo())
+export const useAuthIsMaxSurveysCountReached = () => {
+  const user = useUser()
+  const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
+  if (Number.isNaN(maxSurveysCount)) return false
+  const surveysCount = (User.getSurveysCountDraft(user) ?? 0) + (User.getSurveysCountPublished(user) ?? 0)
+  return surveysCount >= maxSurveysCount
+}
+
+export const useOnNewSurveyClick = ({ onAfterClick } = {}) => {
+  const dispatch = useDispatch()
+  const user = useUser()
+  const isMaxSurveysCountReached = useAuthIsMaxSurveysCountReached()
+
+  return useCallback(
+    (e) => {
+      if (isMaxSurveysCountReached) {
+        e.preventDefault()
+        const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
+        dispatch(
+          NotificationActions.notifyError({
+            key: 'surveyCreate:errorMaxSurveysCountExceeded',
+            params: { maxSurveysCount },
+          })
+        )
+      }
+      onAfterClick?.()
+    },
+    [isMaxSurveysCountReached, user, dispatch, onAfterClick]
+  )
+}
+
 export const useAuthCanEditSurvey = () => Authorizer.canEditSurvey(useUser(), useSurveyInfo())
 export const useAuthCanExportSurvey = () => Authorizer.canExportSurvey(useUser(), useSurveyInfo())
 export const useAuthCanViewTemplates = () => Authorizer.canViewTemplates(useUser())
@@ -74,6 +106,9 @@ export const useAuthCanUseMessages = useUserIsSystemAdmin
 export const useAuthCanCreateUsers = () => Authorizer.canCreateUsers(useUser())
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
 export const useAuthCanInviteUser = () => Authorizer.canInviteUsers(useUser(), useSurveyInfo())
+export const useAuthCanManageUserGroups = () => Authorizer.canManageUserGroups(useUser(), useSurveyInfo())
+export const useAuthCanEditQualifierAttributeValue = () =>
+  Authorizer.canEditQualifierAttributeValue(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersName = () =>
   Authorizer.canViewOtherUsersNameInSameSurvey(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersEmail = () =>
@@ -83,8 +118,6 @@ export const useAuthCanViewAllUsers = () => Authorizer.canViewAllUsers(useUser()
 
 // ====== Profile picture
 export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) => {
-  const [profilePicture, setProfilePicture] = useState(null)
-
   const { data = null, dispatch: fetchUserProfilePicture } = useAsyncGetRequest(
     `/api/user/${userUuid}/profilePicture`,
     { responseType: 'blob' }
@@ -96,10 +129,18 @@ export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) =>
     }
   }, [userUuid, forceUpdateKey])
 
+  const [profilePicture, setProfilePicture] = useState(null)
+
   useEffect(() => {
     if (data && data.size > 0) {
-      setProfilePicture(URL.createObjectURL(data))
+      const objectUrl = URL.createObjectURL(data)
+      setProfilePicture(objectUrl)
+      return () => {
+        URL.revokeObjectURL(objectUrl)
+      }
     }
+    setProfilePicture(null)
+    return undefined
   }, [data])
 
   return profilePicture

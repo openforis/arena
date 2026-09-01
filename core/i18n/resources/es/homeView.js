@@ -59,8 +59,33 @@ export default {
     noRecordsAddedInSelectedPeriod: 'No se añadieron registros en el período seleccionado',
   },
   surveyDeleted: 'La encuesta {{surveyName}} ha sido eliminada',
+  landing: {
+    openDashboard: 'Abrir panel',
+  },
   surveyInfo: {
     basic: 'Información básica',
+    branding: {
+      title: 'Marca',
+      primaryColor: 'Color primario',
+      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
+      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      fontSizePreset: {
+        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
+        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
+        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+      },
+      surveyLogo1: '$t(homeView:surveyInfo.branding.surveyLogo1)',
+      surveyLogo2: '$t(homeView:surveyInfo.branding.surveyLogo2)',
+      surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
+      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
+      uploadLogo: 'Subir logo',
+      logoFileFormatHint: '$t(homeView:surveyInfo.branding.logoFileFormatHint)',
+      logoFileTooLarge: '$t(homeView:surveyInfo.branding.logoFileTooLarge)',
+      preview: 'Vista previa',
+      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
+      invalidPrimaryColor: 'Introduzca un color #RRGGBB válido o déjelo vacío',
+      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
+    },
     configuration: {
       title: 'Configuración',
       filesTotalSpace: 'Espacio total de archivos (GB)',
@@ -70,14 +95,48 @@ export default {
       '¿Está seguro de que desea eliminar el ciclo {{cycle}}?\n\n$t(common.cantUndoWarning)\n\nSi hay registros asociados a este ciclo, se eliminarán.',
     cycleForArenaMobile: 'Ciclo para Arena Mobile',
     fieldManualLink: 'Enlace al manual de campo',
+    map: 'Mapa',
     editInfo: 'Editar información',
     viewInfo: 'Ver información',
+
+    preloadedMapLayers: {
+      enabledMessage: 'Capas de mapa precargadas habilitadas',
+      title: 'Capas de mapa precargadas',
+      fileName: 'Nombre del archivo',
+      fileSize: 'Tamaño del archivo',
+      confirmDelete: '¿Está seguro de que desea eliminar esta capa de mapa precargada?',
+      editor: {
+        title: 'Capa de mapa precargada',
+      },
+    },
+
+    surveyDocLayout: {
+      tabTitle: 'Diseño del documento',
+      title: 'Imágenes del documento',
+      layoutOptions: {
+        title: 'Opciones de diseño',
+        headerOnFirstPageOnly: 'Encabezado solo en la primera página',
+        pageNumbering: 'Numeración de páginas',
+      },
+      documentPlace: 'Ubicación',
+      documentPlaceValues: {
+        header: 'Encabezado',
+        footer: 'Pie de página',
+      },
+      applyIf: 'Aplicar si condición',
+      confirmDelete: '¿Está seguro de que desea eliminar esta imagen del documento?',
+      editor: {
+        title: 'Imagen del documento',
+      },
+    },
+
     preferredLanguage: 'Idioma preferido',
     sampleBasedImageInterpretation: 'Interpretación de imágenes basada en muestras',
     sampleBasedImageInterpretationEnabled: 'Interpretación de imágenes basada en muestras habilitada',
     security: {
       title: 'Seguridad',
       dataEditorViewNotOwnedRecordsAllowed: 'El editor de datos puede ver registros no propios',
+      dataAnalystViewNotOwnedRecordsAllowed: 'El analista de datos puede ver registros no propios',
       visibleInMobile: 'Visible en Arena Mobile',
       allowRecordsDownloadInMobile: 'Permitir la descarga de registros del servidor a Arena Mobile',
       allowRecordsUploadFromMobile: 'Permitir la carga de registros de Arena Mobile al servidor',

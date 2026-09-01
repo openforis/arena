@@ -5,17 +5,22 @@ import * as API from '@webapp/service/api'
 import { showJobMonitor } from '../app/job/actions'
 import { useI18n } from './i18n'
 import { MessageNotificationActions } from '../ui/messageNotification'
+import { NotificationActions } from '../ui/notification'
 import { SystemActionTypes } from './actionTypes'
 
 export const initSystem = () => async (dispatch) => {
   try {
     const i18n = useI18n()
 
-    const { user, survey } = await API.fetchLoggedInUserAndSurvey()
+    const { user, survey, error: surveyError } = await API.fetchLoggedInUserAndSurvey()
 
     analytics.identify({ userId: user?.uuid, properties: user })
 
     const systemInitPayload = { user, survey }
+
+    if (surveyError?.key) {
+      dispatch(NotificationActions.notifyWarning({ key: `appErrors:${surveyError.key}`, params: surveyError.params }))
+    }
 
     if (user) {
       const { appInfo, config } = await API.fetchInfo()

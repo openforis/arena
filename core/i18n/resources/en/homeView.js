@@ -61,8 +61,33 @@ export default {
     noRecordsAddedInSelectedPeriod: 'No records added in the selected period',
   },
   surveyDeleted: 'Survey {{surveyName}} has been deleted',
+  landing: {
+    openDashboard: 'Open dashboard',
+  },
   surveyInfo: {
     basic: 'Basic info',
+    branding: {
+      title: 'Branding',
+      primaryColor: 'Primary color',
+      titleFontSize: 'Title font size',
+      descriptionFontSize: 'Description font size',
+      fontSizePreset: {
+        small: 'Small',
+        default: 'Default',
+        large: 'Large',
+      },
+      surveyLogo1: 'Survey logo 1',
+      surveyLogo2: 'Survey logo 2',
+      surveyLogo3: 'Survey logo 3',
+      landingBackground: 'Landing background image',
+      uploadLogo: 'Upload image',
+      logoFileFormatHint: 'PNG, JPEG, WebP or SVG (max {{maxMb}} MB)',
+      logoFileTooLarge: 'Logo image must be {{maxMb}} MB or smaller',
+      preview: 'Preview',
+      backgroundFileTooLarge: 'Background image must be {{maxMb}} MB or smaller',
+      invalidPrimaryColor: 'Enter a valid #RRGGBB color or leave empty',
+      invalidSaveBlocked: 'Fix invalid branding fields before saving survey info',
+    },
     configuration: {
       title: 'Configuration',
       filesTotalSpace: 'Files total space (GB)',
@@ -84,13 +109,45 @@ If there are records associated to this cycle, they will be deleted.`,
     },
     fieldManualLink: 'Field manual link',
     editInfo: 'Edit info',
+    map: 'Map',
     viewInfo: 'View info',
+
+    preloadedMapLayers: {
+      enabledMessage: 'Preloaded map layers enabled',
+      title: 'Preloaded map layers',
+      confirmDelete: 'Are you sure you want to delete this preloaded map layer?',
+      editor: {
+        title: 'Preloaded map layer',
+      },
+    },
+
+    surveyDocLayout: {
+      tabTitle: 'Document Layout',
+      title: 'Document images',
+      layoutOptions: {
+        title: 'Layout options',
+        headerOnFirstPageOnly: 'Header on first page only',
+        pageNumbering: 'Page numbering',
+      },
+      documentPlace: 'Place',
+      documentPlaceValues: {
+        header: 'Header',
+        footer: 'Footer',
+      },
+      applyIf: 'Apply if condition',
+      confirmDelete: 'Are you sure you want to delete this document image?',
+      editor: {
+        title: 'Document image',
+      },
+    },
+
     preferredLanguage: 'Preferred language',
     sampleBasedImageInterpretation: 'Sample-based image interpretation',
     sampleBasedImageInterpretationEnabled: 'Sample-based image interpretation enabled',
     security: {
       title: 'Security',
       dataEditorViewNotOwnedRecordsAllowed: 'Data Editor can view not owned records',
+      dataAnalystViewNotOwnedRecordsAllowed: 'Data Analyst can view not owned records',
       visibleInMobile: 'Visible in Arena Mobile',
       allowRecordsDownloadInMobile: 'Allow downloading records from server to Arena Mobile',
       allowRecordsUploadFromMobile: 'Allow uploading records from Arena Mobile to server',

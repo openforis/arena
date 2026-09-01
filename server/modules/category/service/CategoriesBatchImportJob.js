@@ -72,10 +72,10 @@ export default class CategoriesBatchImportJob extends Job {
     let errorKey = null
 
     if (fileEntryNames.length === 0) {
-      errorKey = 'validationErrors.categoryImport.emptyFile'
+      errorKey = 'validationErrors:categoryImport.emptyFile'
     } else if (fileZip.getEntryNames({ excludeDirectories: false }).length > fileEntryNames.length) {
       // invalid zip file: it contains at least one directory
-      errorKey = 'validationErrors.categoryImport.invalidImportFile'
+      errorKey = 'validationErrors:categoryImport.invalidImportFile'
     }
     if (errorKey) {
       this.addError({

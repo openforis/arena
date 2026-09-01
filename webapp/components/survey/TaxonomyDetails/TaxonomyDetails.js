@@ -1,6 +1,5 @@
 import './TaxonomyDetails.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 import classNames from 'classnames'
@@ -15,6 +14,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { ButtonBack } from '@webapp/components/buttons'
 import Table from '@webapp/components/Table/Table'
+
 import Header from './Header'
 import TaxaTableRowHeader from './TaxaTableRowHeader'
 import TaxaTableRow from './TaxaTableRow'

@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
-import { useChain } from '@webapp/store/ui/chain'
+import { useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
@@ -21,6 +21,7 @@ export const BaseUnitCodeAttributeSelector = (props) => {
 
   const i18n = useI18n()
   const chain = useChain()
+  const editable = useChainEditable()
   const survey = useSurvey()
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
@@ -61,7 +62,7 @@ export const BaseUnitCodeAttributeSelector = (props) => {
 
   return (
     <FormItem label={label} info={info}>
-      <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} />
+      <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} disabled={!editable} />
     </FormItem>
   )
 }

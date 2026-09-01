@@ -9,7 +9,7 @@ module.exports = {
   launchOptions: {
     downloadsPath,
     headless,
-    slowMo: headless ? null : 250,
+    slowMo: headless ? undefined : 250,
   },
   contextOptions: {
     acceptDownloads: true,

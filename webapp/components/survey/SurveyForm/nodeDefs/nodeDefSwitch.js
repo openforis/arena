@@ -14,7 +14,14 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { SurveyState, useSurveyCycleKey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import {
+  SurveyState,
+  useIsNodeDefEnumerator,
+  useSurveyCycleKey,
+  useSurveyInfo,
+  useSurveyPreferredLang,
+} from '@webapp/store/survey'
+import { useAuthCanEditQualifierAttributeValue } from '@webapp/store/user'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 
 import * as NodeDefUiProps from './nodeDefUIProps'
@@ -41,12 +48,17 @@ const _hasSiblingWithoutKeys = ({ survey, nodeDef, record, parentNode }) => {
   )
 }
 
-const _maxCountReached = ({ parentNode, nodeDef, nodes }) => {
-  const maxCount = Nodes.getChildrenMaxCount({ parentNode, nodeDef })
-  return maxCount && nodes.length >= Number(maxCount)
+const _isNodesCountAboveMin = ({ parentNode, nodeDef, nodes }) => {
+  const minCount = Nodes.getChildrenMinCount({ parentNode, nodeDef })
+  return Objects.isEmpty(minCount) || nodes.length > Number(minCount)
 }
 
-const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
+const _isNodesCountBelowMax = ({ parentNode, nodeDef, nodes }) => {
+  const maxCount = Nodes.getChildrenMaxCount({ parentNode, nodeDef })
+  return Objects.isEmpty(maxCount) || nodes.length < Number(maxCount)
+}
+
+const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode, editable }) =>
   useSelector((state) => {
     const record = RecordState.getRecord(state)
     const rootNode = record ? Record.getRootNode(record) : null
@@ -60,24 +72,156 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
         ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
         : []
 
+    const canAddOrDeleteNodeCommon =
+      editable && canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)
+
     const canAddNode =
-      canEditRecord &&
-      parentNode &&
-      NodeDef.isMultiple(nodeDef) &&
-      !NodeDef.isEnumerate(nodeDef) &&
-      !_maxCountReached({ parentNode, nodeDef, nodes }) &&
+      canAddOrDeleteNodeCommon &&
+      _isNodesCountBelowMax({ parentNode, nodeDef, nodes }) &&
       !_hasSiblingWithoutKeys({ survey, nodeDef, record, parentNode })
 
+    const canDeleteNode = canAddOrDeleteNodeCommon && _isNodesCountAboveMin({ parentNode, nodeDef, nodes })
+
+    const nodesHaveValue = nodes.length > 0 && nodes.every((node) => Nodes.isValueNotBlank(node))
     const nodesEmpty = nodes.every((node) => Record.isNodeEmpty(node)(record))
+
     return {
       nodes,
       nodesEmpty,
+      nodesHaveValue,
       canAddNode,
+      canDeleteNode,
     }
   }, Objects.isEqual)
 
+const useHovering = ({ canEditDef, edit }) => {
+  const [isHovering, setIsHovering] = useState(false)
+
+  const onMouseEnter = () => {
+    if (edit && canEditDef && !isHovering) {
+      setIsHovering(true)
+    }
+  }
+
+  const onMouseLeave = () => {
+    setIsHovering(false)
+  }
+
+  return {
+    isHovering,
+    onMouseEnter,
+    onMouseLeave,
+  }
+}
+
+// Shared by useKeyFieldLock and useQualifierFieldLock: once a field holds a value it starts out
+// locked (read-only) to prevent accidental edits; the user can unlock it for the current focus
+// session via the lock toggle button.
+const useAttributeFieldLock = ({ nodeDef, lockEnabled, hasValue }) => {
+  const [editingNodeDefUuid, setEditingNodeDefUuid] = useState(null)
+  const [unlockedNodeDefUuid, setUnlockedNodeDefUuid] = useState(null)
+
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
+  const isEditing = editingNodeDefUuid === nodeDefUuid
+  const isUnlocked = unlockedNodeDefUuid === nodeDefUuid
+  const isLocked = lockEnabled && hasValue && !isUnlocked && !isEditing
+
+  const onFocus = useCallback(() => {
+    if (lockEnabled) {
+      setEditingNodeDefUuid(nodeDefUuid)
+    }
+  }, [lockEnabled, nodeDefUuid])
+
+  const onBlur = useCallback(
+    (event) => {
+      if (!lockEnabled || event.currentTarget.contains(event.relatedTarget)) return
+
+      setEditingNodeDefUuid(null)
+      if (hasValue) {
+        setUnlockedNodeDefUuid(null)
+      }
+    },
+    [lockEnabled, hasValue]
+  )
+
+  const onLockToggle = useCallback(() => {
+    if (!lockEnabled || !hasValue) return
+
+    if (isLocked) {
+      setUnlockedNodeDefUuid(nodeDefUuid)
+      return
+    }
+
+    setEditingNodeDefUuid(null)
+    setUnlockedNodeDefUuid(null)
+  }, [lockEnabled, hasValue, isLocked, nodeDefUuid])
+
+  return {
+    isLocked,
+    lockVisible: lockEnabled && hasValue,
+    onFocus,
+    onBlur,
+    onLockToggle,
+  }
+}
+
+const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, isNodeDefEnumerator, nodesHaveValue }) => {
+  const lockEnabled =
+    entry && !edit && canEditRecord && NodeDef.isAttribute(nodeDef) && NodeDef.isKey(nodeDef) && !isNodeDefEnumerator
+  return useAttributeFieldLock({ nodeDef, lockEnabled, hasValue: nodesHaveValue })
+}
+
+// Qualifier attribute values are auto-filled by the system based on the user's group and, unlike key
+// attributes, are read-only for every user once applied (see recordQualifierMatcher.js); survey admins
+// are the only ones allowed to correct them, and only after explicitly unlocking the field.
+const useQualifierFieldLock = ({ canEditQualifierValue, edit, entry, nodeDef, qualifierValueApplied }) => {
+  const lockEnabled =
+    entry && !edit && canEditQualifierValue && NodeDef.isAttribute(nodeDef) && NodeDef.isQualifier(nodeDef)
+  return useAttributeFieldLock({ nodeDef, lockEnabled, hasValue: qualifierValueApplied })
+}
+
+const getClassName = ({
+  applicable,
+  empty,
+  keyFieldLocked,
+  nodeDef,
+  qualifierFieldLocked,
+  readOnly,
+  renderType,
+  surveyCycleKey,
+}) => {
+  const mainClassNameSuffix = NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'
+  const mainClassName = 'survey-form__node-def-page' + mainClassNameSuffix
+
+  return classNames(mainClassName, {
+    'not-applicable': !applicable,
+    hidden:
+      !applicable &&
+      NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
+      renderType !== NodeDefLayout.renderType.tableBody &&
+      empty,
+    'key-field-locked': keyFieldLocked && renderType !== NodeDefLayout.renderType.tableHeader,
+    'qualifier-field-locked': qualifierFieldLocked && renderType !== NodeDefLayout.renderType.tableHeader,
+    'read-only':
+      (readOnly || keyFieldLocked || qualifierFieldLocked) && renderType !== NodeDefLayout.renderType.tableHeader,
+  })
+}
+
 const NodeDefSwitch = (props) => {
-  const { canEditDef, canEditRecord, edit, empty, entry, nodeDef, parentNode, renderType } = props
+  const {
+    canEditDef,
+    canEditRecord,
+    edit,
+    empty,
+    entry,
+    nodeDef,
+    onSortBy,
+    parentNode,
+    readOnly: readOnlyProp,
+    renderType,
+    sortCriteria = [],
+  } = props
 
   const dispatch = useDispatch()
   const containerRef = useRef(null)
@@ -85,38 +229,71 @@ const NodeDefSwitch = (props) => {
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
   const nodeDefLabelType = useNodeDefLabelType()
+  const isNodeDefEnumerator = useIsNodeDefEnumerator(nodeDef)
+  const canEditQualifierValue = useAuthCanEditQualifierAttributeValue()
   const lang = useSurveyPreferredLang()
   const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
   const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef)
-
-  const [isHovering, setIsHovering] = useState(false)
-
-  const renderAsForm = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
-  const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
-  const handleMouseEvents = edit && canEditDef && !renderAsForm
-
-  const updateNode = useCallback((...params) => dispatch(RecordActions.updateNode(...params)), [])
-  const removeNode = useCallback((...params) => dispatch(RecordActions.removeNode(...params)), [])
-  const createNodePlaceholder = useCallback((...params) => dispatch(RecordActions.createNodePlaceholder(...params)), [])
-
-  const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode })
-
-  const applicable = parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true
-  const { canAddNode, nodes } = entryProps
-
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-  const mainClassNameSuffix = NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'
-  const mainClassName = 'survey-form__node-def-page' + mainClassNameSuffix
+  const renderAsForm = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
+  const handleMouseEvents = edit && canEditDef && !renderAsForm
 
-  const className = classNames(mainClassName, {
-    'not-applicable': !applicable,
-    hidden:
-      !applicable &&
-      NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
-      renderType !== NodeDefLayout.renderType.tableBody &&
-      empty,
-    'read-only': NodeDef.isReadOnly(nodeDef) && renderType !== NodeDefLayout.renderType.tableHeader,
+  const updateNode = useCallback((...params) => dispatch(RecordActions.updateNode(...params)), [dispatch])
+  const removeNode = useCallback((...params) => dispatch(RecordActions.removeNode(...params)), [dispatch])
+  const createNodePlaceholder = useCallback(
+    (...params) => dispatch(RecordActions.createNodePlaceholder(...params)),
+    [dispatch]
+  )
+
+  const editable = parentNode ? Node.isChildEditable(nodeDefUuid)(parentNode) : true
+
+  const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode, editable })
+
+  const qualifierValueApplied = Boolean(entryProps.nodes?.[0] && Node.isQualifierValueApplied(entryProps.nodes[0]))
+
+  const applicable = parentNode ? Node.isChildApplicable(nodeDefUuid)(parentNode) : true
+
+  const { canAddNode, nodes, nodesHaveValue } = entryProps
+  const { isHovering, onMouseEnter, onMouseLeave } = useHovering({ canEditDef, edit })
+  const {
+    isLocked: keyFieldLocked,
+    lockVisible: keyFieldLockVisible,
+    onFocus: onKeyFieldFocus,
+    onBlur: onKeyFieldBlur,
+    onLockToggle: onKeyFieldLockToggle,
+  } = useKeyFieldLock({
+    canEditRecord,
+    edit,
+    entry,
+    nodeDef,
+    isNodeDefEnumerator,
+    nodesHaveValue,
+  })
+  const {
+    isLocked: qualifierFieldLocked,
+    lockVisible: qualifierFieldLockVisible,
+    onFocus: onQualifierFieldFocus,
+    onBlur: onQualifierFieldBlur,
+    onLockToggle: onQualifierFieldLockToggle,
+  } = useQualifierFieldLock({
+    canEditQualifierValue,
+    edit,
+    entry,
+    nodeDef,
+    qualifierValueApplied,
+  })
+  const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
+
+  const className = getClassName({
+    applicable,
+    empty,
+    keyFieldLocked,
+    nodeDef,
+    qualifierFieldLocked,
+    readOnly,
+    renderType,
+    surveyCycleKey,
   })
 
   const checkNodePlaceholder = useCallback(() => {
@@ -140,35 +317,32 @@ const NodeDefSwitch = (props) => {
     }
   }, [nodeDefUuid])
 
-  const _setIsHovering = useCallback(
-    (isHovering) => {
-      if (edit && canEditDef) {
-        setIsHovering(isHovering)
-      }
-    },
-    [canEditDef, edit]
-  )
-
-  const onMouseEnter = useCallback(() => {
-    if (!isHovering) {
-      _setIsHovering(true)
-    }
-  }, [_setIsHovering, isHovering])
-
-  const onMouseLeave = useCallback(() => {
-    _setIsHovering(false)
-  }, [_setIsHovering])
-
   const nestedComponentsProps = {
     ...props,
     ...entryProps,
     surveyInfo,
-    readOnly,
+    readOnly:
+      readOnlyProp ||
+      readOnly ||
+      keyFieldLocked ||
+      !editable ||
+      qualifierFieldLocked ||
+      (qualifierValueApplied && !canEditQualifierValue),
     label,
     lang,
     createNodePlaceholder,
     updateNode,
     removeNode,
+    keyFieldLocked,
+    keyFieldLockVisible,
+    onKeyFieldFocus,
+    onKeyFieldBlur,
+    onKeyFieldLockToggle,
+    qualifierFieldLocked,
+    qualifierFieldLockVisible,
+    onQualifierFieldFocus,
+    onQualifierFieldBlur,
+    onQualifierFieldLockToggle,
   }
 
   return (
@@ -184,7 +358,13 @@ const NodeDefSwitch = (props) => {
         <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
       )}
       {renderType === NodeDefLayout.renderType.tableHeader ? (
-        <NodeDefTableCellHeader nodeDef={nodeDef} label={label} lang={lang} />
+        <NodeDefTableCellHeader
+          nodeDef={nodeDef}
+          label={label}
+          lang={lang}
+          sortCriteria={sortCriteria}
+          onSortBy={onSortBy}
+        />
       ) : renderType === NodeDefLayout.renderType.tableBody ? (
         <NodeDefTableCellBody {...nestedComponentsProps} />
       ) : (
@@ -201,9 +381,12 @@ NodeDefSwitch.propTypes = {
   empty: PropTypes.bool,
   entry: PropTypes.bool,
   nodeDef: PropTypes.object.isRequired,
+  onSortBy: PropTypes.func,
   parentNode: PropTypes.object,
   preview: PropTypes.bool,
+  readOnly: PropTypes.bool,
   renderType: PropTypes.string,
+  sortCriteria: PropTypes.array,
 }
 
 export default NodeDefSwitch

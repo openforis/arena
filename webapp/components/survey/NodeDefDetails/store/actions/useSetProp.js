@@ -38,6 +38,9 @@ const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, value: multiple })
 
   if (NodeDef.isEntity(nodeDefUpdated) && !multiple) {
     nodeDefUpdated = NodeDef.dissocEnumerate(nodeDefUpdated)
+    nodeDefUpdated = NodeDef.mergePropsAdvanced({
+      [NodeDef.keysPropsAdvanced.enumeratingItemsExpression]: null,
+    })(nodeDefUpdated)
 
     if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefUpdated)) {
       const nodeDefsUpdated = Survey.updateLayoutProp({
@@ -90,9 +93,16 @@ const _onUpdateAutoIncrementalKey = ({ survey, nodeDef, value }) => {
   )(nodeDef)
 }
 
+const _onUpdateEnumerate = ({ nodeDef, value }) => {
+  if (value) return nodeDef
+
+  return NodeDef.mergePropsAdvanced({ [NodeDef.keysPropsAdvanced.enumeratingItemsExpression]: null })(nodeDef)
+}
+
 const updateFunctionByProp = {
   [NodeDef.propKeys.categoryUuid]: _onUpdateCategoryUuid,
   [NodeDef.propKeys.multiple]: _onUpdateMultiple,
+  [NodeDef.propKeys.enumerate]: _onUpdateEnumerate,
   [NodeDef.propKeys.name]: _onUpdateName,
   [NodeDef.propKeys.autoIncrementalKey]: _onUpdateAutoIncrementalKey,
 }
@@ -104,29 +114,32 @@ export const useSetProp = ({ setState }) => {
   const lang = useSelector(SurveyState.getSurveyPreferredLang)
   const validateNodeDef = useValidate({ setState })
 
-  return useCallback(({ state, key, value = null }) => {
-    const nodeDef = State.getNodeDef(state)
+  return useCallback(
+    async ({ state, key, value = null }) => {
+      const nodeDef = State.getNodeDef(state)
 
-    if (!_checkCanChangeProp({ dispatch, nodeDef, key, value })) {
-      return
-    }
+      if (!_checkCanChangeProp({ dispatch, nodeDef, key, value })) {
+        return
+      }
 
-    let nodeDefUpdated = NodeDef.assocProp({ key, value })(nodeDef)
+      let nodeDefUpdated = NodeDef.assocProp({ key, value })(nodeDef)
 
-    const propUpdater = updateFunctionByProp[key]
-    if (propUpdater) {
-      nodeDefUpdated = propUpdater({
-        survey,
-        surveyCycleKey,
-        lang,
-        nodeDef: nodeDefUpdated,
-        nodeDefPrev: nodeDef,
-        value,
-      })
-    }
+      const propUpdater = updateFunctionByProp[key]
+      if (propUpdater) {
+        nodeDefUpdated = propUpdater({
+          survey,
+          surveyCycleKey,
+          lang,
+          nodeDef: nodeDefUpdated,
+          nodeDefPrev: nodeDef,
+          value,
+        })
+      }
 
-    nodeDefUpdated = NodeDef.clearNotApplicableProps(surveyCycleKey)(nodeDefUpdated)
+      nodeDefUpdated = NodeDef.clearNotApplicableProps(surveyCycleKey)(nodeDefUpdated)
 
-    validateNodeDef({ nodeDef, nodeDefUpdated })
-  }, [])
+      await validateNodeDef({ nodeDef, nodeDefUpdated })
+    },
+    [dispatch, lang, survey, surveyCycleKey, validateNodeDef]
+  )
 }

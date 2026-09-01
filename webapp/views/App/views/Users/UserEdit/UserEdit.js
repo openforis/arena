@@ -1,16 +1,16 @@
 import './UserEdit.scss'
 
-import React from 'react'
+import { useCallback, useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router'
-
-import { Objects } from '@openforis/arena-core'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
-import { Button, ButtonDelete, ButtonInvite, ButtonSave, ExpansionPanel } from '@webapp/components'
+import { Button, ButtonDelete, ButtonInvite, ButtonSave, Fieldset } from '@webapp/components'
+import UserAiSettingsPanel from '@webapp/components/ai/UserAiSettingsPanel'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
@@ -18,16 +18,14 @@ import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import ProfilePicture from '@webapp/components/profilePicture'
 
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
+import { UserActions } from '@webapp/store/user'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 import DropdownUserRole from '../DropdownUserRole'
+import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
 import ProfilePictureEditor from './ProfilePictureEditor'
 import { useEditUser } from './store'
-import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
-import { DropdownPreferredUILanguage } from './DropdownPreferredUILanguage'
-import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -50,7 +48,7 @@ const UserEdit = () => {
     canViewSurveyManager,
     canEditSurveyManager,
     canManageTwoFactorDevices,
-    hideSurveyGroup,
+    showSurveyGroup,
 
     onChangePasswordClick,
     onExtraChange,
@@ -63,12 +61,35 @@ const UserEdit = () => {
     onSave,
     onSurveyAuthGroupChange,
     onSurveyManagerChange,
-    onSurveyExtraPropsChange,
     onUpdate,
     onUpdateProfilePicture,
   } = useEditUser({ userUuid })
 
-  const i18n = useI18n()
+  const dispatch = useDispatch()
+  const aiSaveRef = useRef(null)
+  const [aiSettingsDirty, setAiSettingsDirty] = useState(false)
+  const [notificationPrefsDirty, setNotificationPrefsDirty] = useState(false)
+  const [notifyOnUserAccessRequest, setNotifyOnUserAccessRequest] = useState(() =>
+    User.getPrefNotifyOnUserAccessRequest(user)
+  )
+
+  const onSaveAll = useCallback(async () => {
+    const saves = []
+    if (dirty) saves.push(onSave())
+    if (aiSettingsDirty) saves.push(aiSaveRef.current?.())
+    if (notificationPrefsDirty) {
+      saves.push(
+        dispatch(
+          UserActions.updateUserPrefs({
+            user: User.assocPrefNotifyOnUserAccessRequest(notifyOnUserAccessRequest)(user),
+          })
+        )
+      )
+    }
+    await Promise.all(saves)
+    setNotificationPrefsDirty(false)
+  }, [aiSettingsDirty, dirty, dispatch, notificationPrefsDirty, notifyOnUserAccessRequest, onSave, user])
+
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
   const canUseMap = useAuthCanUseMap()
@@ -85,8 +106,7 @@ const UserEdit = () => {
   const invitationExpired = User.isInvitationExpired(userToUpdate)
   const editingLoggedInUser = User.isEqual(user)(userToUpdate)
   const newUser = !userUuid
-  const surveyGroupsVisible = !newUser && !hideSurveyGroup
-  const surveyHasExtraProps = Objects.isNotEmpty(Survey.getUserExtraPropDefs(surveyInfo))
+  const surveyGroupsVisible = !newUser && showSurveyGroup
 
   return (
     <div className="user-edit" key={userUuid}>
@@ -122,12 +142,6 @@ const UserEdit = () => {
           value={User.getEmail(userToUpdate)}
         />
       )}
-      {userUuid && editingLoggedInUser && (
-        <FormItem label="userView.preferredUILanguage.label">
-          <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
-        </FormItem>
-      )}
-
       <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
 
       {(canViewSystemAdmin || (canViewSurveyManager && !systemAdmin)) && (
@@ -181,43 +195,54 @@ const UserEdit = () => {
               />
             </FormItem>
           )}
-          {surveyHasExtraProps && (
-            <ExpansionPanel
-              buttonLabel="usersView:surveyExtraProp.label_other"
-              className="extra-props"
-              startClosed={Objects.isEmpty(User.getAuthGroupExtraProps(userToUpdate))}
-            >
-              <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
-            </ExpansionPanel>
-          )}
         </>
       )}
       {!userUuid && (
         <UserPasswordSetForm form={userToUpdate} onFieldChange={onPasswordFormFieldChange} validation={validation} />
       )}
-      {editingLoggedInUser && hideSurveyGroup && canUseMap && (
-        // show map api keys only when editing the current user
-        <fieldset className="map-api-keys">
-          <legend>{i18n.t('user.mapApiKeys.title')}</legend>
-          <FormItem label="user.mapApiKeys.mapProviders.planet">
-            <Input
-              disabled={!canEditEmail}
-              value={User.getMapApiKey({ provider: 'planet' })(userToUpdate)}
-              validation={Validation.getFieldValidation(`${User.keysProps.mapApiKeyByProvider}.planet`)(validation)}
-              onChange={(value) => onUpdate(User.assocMapApiKey({ provider: 'planet', apiKey: value })(userToUpdate))}
-            />
-            <Button
-              label="common.test"
-              onClick={() =>
-                onMapApiKeyTest({
-                  provider: 'planet',
-                  apiKey: User.getMapApiKey({ provider: 'planet' })(userToUpdate),
-                })
-              }
-            />
-          </FormItem>
-        </fieldset>
+
+      {editingLoggedInUser && !showSurveyGroup && (
+        <>
+          {canUseMap && (
+            // show map api keys only when editing the current user
+            <Fieldset className="map-api-keys" legend="user.mapApiKeys.title">
+              <FormItem label="user.mapApiKeys.mapProviders.planet">
+                <Input
+                  disabled={!canEditEmail}
+                  value={User.getMapApiKey({ provider: 'planet' })(userToUpdate)}
+                  validation={Validation.getFieldValidation(`${User.keysProps.mapApiKeyByProvider}.planet`)(validation)}
+                  onChange={(value) =>
+                    onUpdate(User.assocMapApiKey({ provider: 'planet', apiKey: value })(userToUpdate))
+                  }
+                />
+                <Button
+                  label="common.test"
+                  onClick={() =>
+                    onMapApiKeyTest({
+                      provider: 'planet',
+                      apiKey: User.getMapApiKey({ provider: 'planet' })(userToUpdate),
+                    })
+                  }
+                />
+              </FormItem>
+            </Fieldset>
+          )}
+          <UserAiSettingsPanel ref={aiSaveRef} onDirtyChange={setAiSettingsDirty} />
+          {systemAdmin && (
+            <Fieldset className="notification-prefs" legend="usersView:prefs.title">
+              <Checkbox
+                checked={notifyOnUserAccessRequest}
+                label="usersView:prefs.notifyOnUserAccessRequest"
+                onChange={(value) => {
+                  setNotifyOnUserAccessRequest(value)
+                  setNotificationPrefsDirty(true)
+                }}
+              />
+            </Fieldset>
+          )}
+        </>
       )}
+
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">
           {userUuid && (
@@ -237,7 +262,13 @@ const UserEdit = () => {
             />
           )}
 
-          {canEdit && <ButtonSave onClick={onSave} disabled={!canSave || !dirty} className="btn-save" />}
+          {canEdit && (
+            <ButtonSave
+              onClick={onSaveAll}
+              disabled={!canSave || (!dirty && !aiSettingsDirty && !notificationPrefsDirty)}
+              className="btn-save"
+            />
+          )}
 
           {surveyGroupsVisible && invitationExpired && (
             <ButtonInvite onClick={onInviteRepeat} className="btn btn-invite" />

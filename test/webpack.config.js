@@ -3,11 +3,16 @@ const glob = require('glob')
 const nodeExternals = require('webpack-node-externals')
 
 const getEntry = (type) =>
-  glob.globSync(path.resolve(__dirname, type, 'tests', '*.js')).sort((fileA, fileB) => {
-    const idxA = fileA.substr(0, 3)
-    const idxB = fileB.substr(0, 3)
-    return idxA < idxB
-  })
+  // glob v13 requires forward slashes; path.resolve uses backslashes on Windows.
+  glob
+    .globSync(path.resolve(__dirname, type, 'tests', '*.{js,jsx,ts,tsx}').replace(/\\/g, '/'))
+    .sort((fileA, fileB) => {
+      const idxA = fileA.substr(0, 3)
+      const idxB = fileB.substr(0, 3)
+      if (idxA < idxB) return -1
+      if (idxA > idxB) return 1
+      return 0
+    })
 
 const getOutput = (type) => ({
   path: path.resolve(__dirname, '..', 'dist', '__tests__'),
@@ -18,7 +23,7 @@ const getOutput = (type) => ({
 const getModule = () => ({
   rules: [
     {
-      test: /\.(js|jsx)$/,
+      test: /\.(js|jsx|ts|tsx)$/,
       exclude: /(node_modules|bower_components)/,
       use: [{ loader: 'babel-loader' }],
     },
@@ -26,7 +31,18 @@ const getModule = () => ({
 })
 
 const getResolve = () => ({
-  extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.js', '.jsx', '.scss', '.sass', '.css'],
+  extensions: [
+    '.webpack-loader.js',
+    '.web-loader.js',
+    '.loader.js',
+    '.ts',
+    '.tsx',
+    '.js',
+    '.jsx',
+    '.scss',
+    '.sass',
+    '.css',
+  ],
   alias: {
     '@common': path.resolve(__dirname, '..', 'common/'),
     '@core': path.resolve(__dirname, '..', 'core/'),

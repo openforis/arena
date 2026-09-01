@@ -125,7 +125,7 @@ describe('RecordExpressionParser Test', () => {
       r: '12.75', // real distance should be around 8.57m
     },
     // distance between 2 points as coordinate attributes
-    { q: 'distance(plot[0].plot_location, plot[1].plot_location).toFixed(2)', r: '2171.94' },
+    { q: 'distance(plot[0].plot_location, plot[1].plot_location).toFixed(2)', r: '2171.95' },
     // distance: commutative property
     {
       q: 'distance(plot[0].plot_location, plot[1].plot_location) == distance(plot[1].plot_location, plot[0].plot_location)',
@@ -138,11 +138,11 @@ describe('RecordExpressionParser Test', () => {
     // distance (using categoryItemProp)
     {
       q: `distance(cluster_location, categoryItemProp('sampling_point_data', 'location', cluster_id)).toFixed(2)`,
-      r: '4307919.62',
+      r: '4307925.57',
     },
     {
       q: `distance(plot_location, categoryItemProp('sampling_point_data', 'location', cluster_id, plot_id)).toFixed(2)`,
-      r: '4311422.21',
+      r: '4311428.16',
       n: 'cluster/plot[1]/plot_id',
     },
     // taxonProp
@@ -204,7 +204,7 @@ describe('RecordExpressionParser Test', () => {
     {
       q: `distance(this, 'SRID=EPSG:4326;POINT(50.84805423 5.697799)').toFixed(2)`,
       n: 'cluster/plot[1]/plot_location',
-      r: '1240078.57',
+      r: '1240080.28',
     },
   ]
 

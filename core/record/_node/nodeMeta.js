@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Nodes } from '@openforis/arena-core'
+
 const keys = {
   meta: 'meta',
 }
@@ -9,6 +11,7 @@ const metaKeys = {
   childApplicability: 'childApplicability', // Applicability by child def uuid
   defaultValue: 'defaultValueApplied', // True if default value has been applied, false if the value is user defined
   hierarchyCode: 'hCode', // Hierarchy of code attribute ancestors (according to the parent code defs specified)
+  qualifierValueApplied: 'qualifierValueApplied', // True if the value has been auto-filled from the user group qualifier
 }
 
 // READ
@@ -17,8 +20,13 @@ const getMeta = R.propOr({}, keys.meta)
 
 const isChildApplicable = (childDefUuid) => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])
 const isDefaultValueApplied = R.pathOr(false, [keys.meta, metaKeys.defaultValue])
+const isQualifierValueApplied = R.pathOr(false, [keys.meta, metaKeys.qualifierValueApplied])
 
 const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
+
+const isChildEditable = (childDefUuid) => (node) => Nodes.isChildEditable(node, childDefUuid)
+
+const isChildVisible = (childDefUuid) => (node) => Nodes.isChildVisible(node, childDefUuid)
 
 // Code metadata
 const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode])
@@ -43,6 +51,19 @@ const assocIsDefaultValueApplied = (value) =>
       metaUpdated[metaKey] = true
     } else {
       // default value is false by default
+      delete metaUpdated[metaKey]
+    }
+    return metaUpdated
+  })
+
+const assocIsQualifierValueApplied = (value) =>
+  _updateMeta((metaOld) => {
+    const metaKey = metaKeys.qualifierValueApplied
+    const metaUpdated = { ...metaOld }
+    if (value) {
+      metaUpdated[metaKey] = true
+    } else {
+      // qualifier value applied is false by default
       delete metaUpdated[metaKey]
     }
     return metaUpdated
@@ -75,11 +96,15 @@ export const NodeMeta = {
   getMeta,
   isChildApplicable,
   isDefaultValueApplied,
+  isQualifierValueApplied,
   getHierarchy,
   getHierarchyCode,
+  isChildEditable,
+  isChildVisible,
 
   assocMeta,
   mergeMeta,
   assocIsDefaultValueApplied,
+  assocIsQualifierValueApplied,
   assocChildApplicability,
 }

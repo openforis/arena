@@ -1,12 +1,13 @@
 import * as R from 'ramda'
 
-import { NodeDefs, Objects } from '@openforis/arena-core'
+import { NodeDefs, NodeDefType, Objects } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import { ArrayUtils } from '@core/arrayUtils'
+import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
 
 import * as TextUtils from '@webapp/utils/textUtils'
 
@@ -54,10 +55,12 @@ export const propKeys = {
   cycles: 'cycles',
   descriptions: ObjectUtils.keysProps.descriptions,
   enumerate: 'enumerate', // only for multiple entities
+  autoCreateMinCountItems: 'autoCreateMinCountItems', // only for multiple entities
   key: 'key',
   autoIncrementalKey: 'autoIncrementalKey',
   labels: ObjectUtils.keysProps.labels,
   multiple: 'multiple',
+  qualifier: 'qualifier',
   name: ObjectUtils.keys.name,
   readOnly: 'readOnly',
   layout: 'layout',
@@ -69,8 +72,9 @@ export const propKeys = {
   textInputType: 'textInputType',
   textTransform: 'textTransform',
 
-  // Decimal
+  // Decimal / Integer
   maxNumberDecimalDigits: 'maxNumberDecimalDigits',
+  unit: 'unit',
 
   // Boolean
   labelValue: 'labelValue',
@@ -96,9 +100,13 @@ export const propKeys = {
   includeAccuracy: 'includeAccuracy',
   includeAltitude: 'includeAltitude',
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
+  mapMarkerColor: 'mapMarkerColor',
 
   // layout elements
   headerColor: 'headerColor',
+
+  // print
+  printOrientation: 'printOrientation',
 }
 
 const commonAttributePropsKeys = [
@@ -110,6 +118,7 @@ const commonAttributePropsKeys = [
   propKeys.layout,
   propKeys.multiple,
   propKeys.name,
+  propKeys.qualifier,
   propKeys.readOnly,
 ]
 
@@ -147,8 +156,10 @@ export const keysPropsAdvanced = {
   applicable: 'applicable',
   defaultValues: 'defaultValues',
   defaultValueEvaluatedOneTime: 'defaultValueEvaluatedOneTime',
+  editableIf: 'editableIf',
   excludedInClone: 'excludedInClone',
   validations: 'validations',
+  visibleIf: 'visibleIf',
   formula: 'formula',
 
   // Analisys
@@ -167,6 +178,10 @@ export const keysPropsAdvanced = {
   itemsFilter: 'itemsFilter',
   // file
   fileNameExpression: 'fileNameExpression',
+  enumeratingItemsExpression: 'enumeratingItemsExpression',
+
+  // reporting
+  hiddenInReport: 'hiddenInReport',
 }
 
 const commonAttributePropsAdvancedKeys = [
@@ -218,10 +233,11 @@ export const {
 } = ObjectUtils
 
 export const getType = R.prop(keys.type)
-export const getName = getProp(propKeys.name, '')
+export const getName = (nodeDef) => getProp(propKeys.name, '')(nodeDef)
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
+export const isQualifier = ObjectUtils.isPropTrue(propKeys.qualifier)
 export const isAutoIncrementalKey = ObjectUtils.isPropTrue(propKeys.autoIncrementalKey)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const isMultiple = ObjectUtils.isPropTrue(propKeys.multiple)
@@ -266,6 +282,7 @@ export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
 export const getDescriptions = getProp(propKeys.descriptions, {})
 
 export const isEnumerate = ObjectUtils.isPropTrue(propKeys.enumerate)
+export const isAutoCreateMinCountItems = ObjectUtils.isPropTrue(propKeys.autoCreateMinCountItems)
 
 // boolean
 export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
@@ -278,7 +295,10 @@ export const isAllowOnlyDeviceCoordinate = ObjectUtils.isPropTrue(propKeys.allow
 export const isAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAccuracy)
 export const isAltitudeIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitude)
 export const isAltitudeAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitudeAccuracy)
+export const getMapMarkerColor = getProp(propKeys.mapMarkerColor)
 export const getCoordinateAdditionalFields = NodeDefs.getCoordinateAdditionalFields
+// decimal / integer
+export const getUnit = getProp(propKeys.unit, '')
 // decimal
 export const getMaxNumberDecimalDigits = (nodeDef) => {
   const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef)
@@ -311,6 +331,13 @@ export const getTextTransformFunction = (nodeDef) =>
 
 export const getHeaderColor = getProp(propKeys.headerColor)
 export const isLayoutElement = isFormHeader
+
+/**
+ * Returns the entity printable orientation, if set.
+ * @param {!object} nodeDef - Entity node definition.
+ * @returns {string|undefined} 'portrait' | 'landscape' | undefined.
+ */
+export const getPrintOrientation = getProp(propKeys.printOrientation)
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -401,8 +428,23 @@ export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues,
 export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
 export const isDefaultValueEvaluatedOneTime = getPropAdvanced(keysPropsAdvanced.defaultValueEvaluatedOneTime, false)
 
+export const getEditableIf = getPropAdvanced(keysPropsAdvanced.editableIf, [])
+export const isAlwaysEditable = R.pipe(getEditableIf, R.isEmpty)
+export const getVisibleIf = getPropAdvanced(keysPropsAdvanced.visibleIf, [])
+export const isAlwaysVisible = R.pipe(getVisibleIf, R.isEmpty)
+
 export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
+export const hasValidationsDefined = (nodeDef) => {
+  const validations = getValidations(nodeDef)
+  return (
+    NodeDefValidations.isRequired(validations) ||
+    NodeDefValidations.isUnique(validations) ||
+    !R.isEmpty(NodeDefValidations.getMinCount(validations)) ||
+    !R.isEmpty(NodeDefValidations.getMaxCount(validations)) ||
+    !R.isEmpty(NodeDefValidations.getExpressions(validations))
+  )
+}
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 
@@ -411,6 +453,8 @@ export const getAllExpressions = (nodeDef) => {
     ...getDefaultValues(nodeDef),
     ...getValidationExpressions(nodeDef),
     ...getApplicable(nodeDef),
+    ...getEditableIf(nodeDef),
+    ...getVisibleIf(nodeDef),
   ]
   const expressions = nodeDefExpressions.reduce((acc, nodeDefExpression) => {
     ArrayUtils.addIfNotEmpty(NodeDefExpression.getExpression(nodeDefExpression))(acc)
@@ -419,8 +463,16 @@ export const getAllExpressions = (nodeDef) => {
   }, [])
   ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
   ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getEnumeratingItemsExpression(nodeDef))(expressions)
   return expressions
 }
+
+const userDependentFunctionsRegExp = new RegExp(String.raw`\b(${userDependentFunctionNames.join('|')})\s*\(`)
+
+// Returns true if any of the node def's expressions references a function whose
+// result depends on the currently logged in user (e.g. userProp).
+export const hasUserDependentExpressions = (nodeDef) =>
+  getAllExpressions(nodeDef).some((expression) => userDependentFunctionsRegExp.test(expression))
 
 export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClone, false)
 
@@ -428,6 +480,7 @@ export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClo
 export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
 // file
 export const getFileNameExpression = getPropAdvanced(keysPropsAdvanced.fileNameExpression, '')
+export const getEnumeratingItemsExpression = getPropAdvanced(keysPropsAdvanced.enumeratingItemsExpression, '')
 
 // Advanced props - Analysis
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
@@ -455,6 +508,9 @@ export const hasAreaBasedEstimated = (nodeDef) =>
   Boolean(getPropOrDraftAdvanced(keysPropsAdvanced.hasAreaBasedEstimated, false)(nodeDef))
 export const getAreaBasedEstimatedOf = getPropOrDraftAdvanced(keysPropsAdvanced.areaBasedEstimatedOf, null)
 export const isAreaBasedEstimatedOf = (nodeDef) => Boolean(getAreaBasedEstimatedOf(nodeDef))
+
+// Reporting
+export const isHiddenInReport = getPropAdvanced(keysPropsAdvanced.hiddenInReport, false)
 
 // ==== CREATE
 
@@ -518,16 +574,40 @@ export const assocHidden = (hidden) => assocProp({ key: propKeys.hidden, value: 
 
 export const dissocEnumerate = ObjectUtils.dissocProp(propKeys.enumerate)
 export const cloneIntoEntityDef =
-  ({ nodeDefParent, clonedNodeDefName }) =>
-  (nodeDef) =>
-    newNodeDef(
+  ({
+    nodeDefParent,
+    clonedNodeDefName,
+    ignoreDefaultValues = true,
+    ignoreApplicability = true,
+    ignoreValidations = true,
+  }) =>
+  (nodeDef) => {
+    const propsCloned = ObjectUtils.clone(getProps(nodeDef))
+    propsCloned[propKeys.name] = clonedNodeDefName
+
+    const propsAdvancedCloned = ObjectUtils.clone(getPropsAdvanced(nodeDef))
+    if (ignoreDefaultValues) {
+      delete propsCloned[propKeys.readOnly]
+      delete propsAdvancedCloned[keysPropsAdvanced.defaultValues]
+      delete propsAdvancedCloned[keysPropsAdvanced.defaultValueEvaluatedOneTime]
+      delete propsAdvancedCloned[keysPropsAdvanced.fileNameExpression]
+      delete propsCloned[propKeys.autoIncrementalKey]
+    }
+    if (ignoreApplicability) {
+      delete propsAdvancedCloned[keysPropsAdvanced.applicable]
+    }
+    if (ignoreValidations) {
+      delete propsAdvancedCloned[keysPropsAdvanced.validations]
+    }
+    return newNodeDef(
       nodeDefParent,
       getType(nodeDef),
       [...getCycles(nodeDef)],
-      { ...ObjectUtils.clone(getProps(nodeDef)), [propKeys.name]: clonedNodeDefName },
-      ObjectUtils.clone(getPropsAdvanced(nodeDef)),
+      propsCloned,
+      propsAdvancedCloned,
       isAnalysis(nodeDef)
     )
+  }
 
 export const changeParentEntity =
   ({ targetParentNodeDef }) =>
@@ -707,8 +787,16 @@ export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
 
 export const canShowGeotagInformation = (nodeDef) => getFileType(nodeDef) === fileTypeValues.image
 
+export const canBeHiddenInReport = (nodeDef) =>
+  [NodeDefType.boolean, NodeDefType.code, NodeDefType.taxon].includes(getType(nodeDef))
+
+export const canHaveAutoCreateMinCountItems = (nodeDef) => isMultipleEntity(nodeDef) && !isEnumerate(nodeDef)
+
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
+  if (!canHaveAutoCreateMinCountItems(nodeDefUpdated) && isAutoCreateMinCountItems(nodeDefUpdated)) {
+    nodeDefUpdated = assocProp({ key: propKeys.autoCreateMinCountItems, value: false })(nodeDefUpdated)
+  }
   // clear hidden if not applicable
   if (!canBeHidden(nodeDefUpdated) && isHidden(nodeDefUpdated)) {
     nodeDefUpdated = assocHidden(false)(nodeDefUpdated)
@@ -746,6 +834,15 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   }
   if (!canShowGeotagInformation(nodeDefUpdated) && isGeotagInformationShown(nodeDefUpdated)) {
     nodeDefUpdated = ObjectUtils.setProp(propKeys.geotagInformationShown, false)(nodeDefUpdated)
+  }
+  if (!canBeHiddenInReport(nodeDefUpdated) && isHiddenInReport(nodeDefUpdated)) {
+    nodeDefUpdated = assocProp({ key: keysPropsAdvanced.hiddenInReport, value: false })(nodeDefUpdated)
+  }
+  if (NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefUpdated) && A.isEmpty(getApplicable(nodeDefUpdated))) {
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenWhenNotRelevant })(nodeDefUpdated)
+  }
+  if (isDefaultValueEvaluatedOneTime(nodeDefUpdated) && A.isEmpty(getDefaultValues(nodeDefUpdated))) {
+    nodeDefUpdated = assocDefaultValueEvaluatedOnlyOneTime(false)(nodeDefUpdated)
   }
   return nodeDefUpdated
 }

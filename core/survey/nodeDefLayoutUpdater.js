@@ -128,15 +128,13 @@ export const updateLayout = ({ survey, nodeDefUuid, layout, nodeDefPrev = null }
  * Adds the layout for the specified cycle to a node def.
  * If the node def was associated already to a cycle, it copies the layout props from that cycle
  * into the new one, otherwise it sets default layout props to the new cycle.
- *
  * @param {!object} params - The update parameters.
  * @param {!object} [params.survey] - The survey object.
  * @param {!object} [params.nodeDef] - The node definition to update.
  * @param {!string} [params.cycle] - The survey cycle to add to the nodeDef.
- * @param {string} [params.cyclePrev=null] - The previous survey cycle (if any).
- *
+ * @param {string} [params.cyclePrev] - The previous survey cycle (if any).
  * @returns {object} - The updated node def.
- * */
+ */
 const _addLayoutForCycle = ({ nodeDef, cycle, cyclePrev = null }) =>
   NodeDef.updateLayout((layout) => {
     if (cyclePrev) {
@@ -253,16 +251,14 @@ const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
 
 /**
  * Updates the parent node definition layout after survey cycles have been added or removed from a node definition.
- *
  * @param {!object} params - The update parameters.
  * @param {!object} [params.survey] - The survey object.
  * @param {!object} [params.nodeDef] - The node definition that has just been updated.
- * @param {Array.<string>} [params.cyclesAdded = []] - The survey cycles added to the nodeDef.
- * @param {Array.<string>} [params.cyclesDeleted = []] - The survey cycles removed from the nodeDef.
- * @param {object} [params.layoutInParentByCycle = []] - The layout that needs to be kept when node def is added to the parent layout.
- *
+ * @param {Array.<string>} [params.cyclesAdded] - The survey cycles added to the nodeDef.
+ * @param {Array.<string>} [params.cyclesDeleted] - The survey cycles removed from the nodeDef.
+ * @param {object} [params.layoutInParentByCycle] - The layout that needs to be kept when node def is added to the parent layout.
  * @returns {object} - The updated parent node definition, if changed.
- * */
+ */
 export const updateParentLayout = ({
   survey,
   nodeDef,
@@ -319,14 +315,12 @@ export const updateParentLayout = ({
 /**
  * Updates the layout of a node definition and its parent after its survey cycles have been changed.
  * If the node definition is an entity, updates even the cycles of the descendant node definitions.
- *
  * @param {!object} params - The update parameters.
  * @param {!object} [params.survey] - The survey object.
  * @param {!string} [params.nodeDefUuid] - The UUID of the node definition to update.
  * @param {Array.<string>} [params.cycles] - The survey cycles associated to the node definition.
- *
  * @returns {object} - The updated node defs, returned as an object index by UUID.
- * */
+ */
 export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles, cyclesPrev }) => {
   const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
 
@@ -370,7 +364,6 @@ export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles, cycles
 /**
  * Avoids that items in form layout overlap each other by setting their height to the minimum
  * and moving the items below or above if necessary.
- *
  * @param {!object} params - The function parameters.
  * @param {!object} [params.survey] - The survey.
  * @param {!object} [params.nodeDef] - The node defintion.

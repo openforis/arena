@@ -62,7 +62,7 @@ const DataQueriesPanel = (props) => {
       className="data-queries-panel"
       onClose={onClose}
       width="50vw"
-      header={i18n.t('dataView.dataQuery.manageQueries')}
+      header={i18n.t('dataView:dataQuery.manageQueries')}
     >
       {Query.hasSelection(query) && (
         <DataQueryEditForm

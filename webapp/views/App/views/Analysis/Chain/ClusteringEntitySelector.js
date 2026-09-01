@@ -1,4 +1,3 @@
-import React from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
@@ -6,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 import { useSurvey } from '@webapp/store/survey'
 
 import { FormItem } from '@webapp/components/form/Input'
@@ -16,6 +15,7 @@ export const ClusteringEntitySelector = () => {
   const dispatch = useDispatch()
 
   const chain = useChain()
+  const editable = useChainEditable()
   const survey = useSurvey()
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
@@ -34,7 +34,7 @@ export const ClusteringEntitySelector = () => {
   }
 
   return (
-    <FormItem label="chainView.clusteringEntity">
+    <FormItem label="chainView.clusteringEntity" info="chainView.clusteringEntityInfo">
       <EntitySelector
         hierarchy={hierarchy}
         nodeDefUuidEntity={selectedEntityUuid}
@@ -42,6 +42,7 @@ export const ClusteringEntitySelector = () => {
         showSingleEntities={false}
         useNameAsLabel={true}
         allowEmptySelection={true}
+        disabled={!editable}
       />
     </FormItem>
   )

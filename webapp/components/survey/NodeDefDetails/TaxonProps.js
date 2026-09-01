@@ -25,7 +25,7 @@ import { useTaxonomyByUuid } from '@webapp/store/survey/hooks'
 
 import { TaxonomySelector } from '../TaxonomySelector'
 
-import { State } from './store'
+import { State, useNodeDefEditReadOnly } from './store'
 import { NodeDefs } from '@openforis/arena-core'
 
 const valueProps = Node.valuePropsTaxon
@@ -43,6 +43,7 @@ const TaxonProps = (props) => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const surveyInfo = useSurveyInfo()
+  const readOnly = useNodeDefEditReadOnly()
 
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
   const [taxonomyToEdit, setTaxonomyToEdit] = useState(null)
@@ -85,7 +86,7 @@ const TaxonProps = (props) => {
       <FormItem label="taxonomy.header">
         <div className="taxonomy-selector">
           <TaxonomySelector
-            disabled={!canUpdateTaxonomy}
+            disabled={readOnly || !canUpdateTaxonomy}
             onChange={onTaxonomySelect}
             selectedTaxonomyUuid={taxonomyUuid}
             testId={TestId.nodeDefDetails.taxonomySelector}
@@ -107,6 +108,7 @@ const TaxonProps = (props) => {
 
       <FormItem label="surveyForm:nodeDefTaxon.visibleFields">
         <Dropdown
+          disabled={readOnly}
           items={visibleFieldsDropdownItems}
           itemLabel={visibleFieldsLabelFunction}
           itemValue={JSON.stringify}
@@ -120,6 +122,7 @@ const TaxonProps = (props) => {
         placeholder="surveyForm:nodeDefTaxon.vernacularName"
         labels={NodeDef.getVernacularNameLabels(nodeDef)}
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameLabels, value })}
+        readOnly={readOnly}
       />
 
       <FormItem
@@ -131,6 +134,7 @@ const TaxonProps = (props) => {
         <div className="form-item_body">
           <Checkbox
             checked={NodeDef.isVernacularNameSelectionKept(nodeDef)}
+            disabled={readOnly}
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameSelectionKept, value })}
             validation={Validation.getFieldValidation(NodeDef.propKeys.vernacularNameSelectionKept)(validation)}
           />
@@ -142,6 +146,7 @@ const TaxonProps = (props) => {
           >
             <Checkbox
               checked={NodeDefs.isVernacularNameAlwaysIncludedIfSingle(nodeDef)}
+              disabled={readOnly}
               onChange={(value) =>
                 Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameAlwaysIncludedIfSingle, value })
               }

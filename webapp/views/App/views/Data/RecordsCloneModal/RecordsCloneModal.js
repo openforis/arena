@@ -47,9 +47,9 @@ export const RecordsCloneModal = (props) => {
   const checkCanClone = () => {
     let errorKey = null
     if (Objects.isEmpty(cycleTo)) {
-      errorKey = 'dataView.recordsClone.error.cycleToMissing'
+      errorKey = 'dataView:recordsClone.error.cycleToMissing'
     } else if (cycleFrom === cycleTo) {
-      errorKey = 'dataView.recordsClone.error.cycleToMustBeDifferentFromCycleFrom'
+      errorKey = 'dataView:recordsClone.error.cycleToMustBeDifferentFromCycleFrom'
     }
     if (errorKey) {
       dispatch(NotificationActions.notifyWarning({ key: errorKey }))
@@ -62,7 +62,7 @@ export const RecordsCloneModal = (props) => {
     ({ recordsCloned }) => {
       dispatch(
         NotificationActions.showNotification({
-          key: 'dataView.recordsClone.cloneComplete',
+          key: 'dataView:recordsClone.cloneComplete',
           params: { recordsCloned, cycleFrom: cycleFromLabel, cycleTo: cycleToLabel },
         })
       )
@@ -90,7 +90,7 @@ export const RecordsCloneModal = (props) => {
 
     dispatch(
       DialogConfirmActions.showDialogConfirm({
-        key: 'dataView.recordsClone.confirmClone',
+        key: 'dataView:recordsClone.confirmClone',
         params: { cycleFrom: cycleFromLabel, cycleTo: cycleToLabel },
         onOk: startCloneJob,
       })
@@ -98,29 +98,29 @@ export const RecordsCloneModal = (props) => {
   }
 
   return (
-    <Modal className="records-clone" onClose={onClose} showCloseButton title="dataView.recordsClone.title">
+    <Modal className="records-clone" onClose={onClose} showCloseButton title="dataView:recordsClone.title">
       <ModalBody>
-        <FormItem label="dataView.recordsClone.fromCycle">{cycleFromLabel}</FormItem>
-        <FormItem label="dataView.recordsClone.toCycle">
+        <FormItem label="dataView:recordsClone.fromCycle">{cycleFromLabel}</FormItem>
+        <FormItem label="dataView:recordsClone.toCycle">
           <CycleSelector
             selectedCycle={cycleTo}
             onChange={onCycleToChange}
             filterFunction={(cycle) => cycle > cycleFrom}
           />
         </FormItem>
-        <FormItem className="source-form-item" label="dataView.recordsClone.source.label">
+        <FormItem className="source-form-item" label="dataView:recordsClone.source.label">
           <RadioButtonGroup
             onChange={onSourceChange}
             value={source}
             items={[
               {
                 key: sources.allRecords,
-                label: `dataView.recordsClone.source.allRecords`,
+                label: `dataView:recordsClone.source.allRecords`,
                 labelParams: { cycleFrom: cycleFromLabel, cycleTo: cycleToLabel },
               },
               {
                 key: sources.selectedRecords,
-                label: `dataView.recordsClone.source.selectedRecords`,
+                label: `dataView:recordsClone.source.selectedRecords`,
                 labelParams: { selectedRecordsCount: selectedRecordsUuids.length },
                 disabled: selectedRecordsUuids.length === 0,
               },
@@ -129,7 +129,7 @@ export const RecordsCloneModal = (props) => {
         </FormItem>
       </ModalBody>
       <ModalFooter>
-        <Button className="modal-footer__item" onClick={onStartCloneClick} label="dataView.recordsClone.startCloning" />
+        <Button className="modal-footer__item" onClick={onStartCloneClick} label="dataView:recordsClone.startCloning" />
       </ModalFooter>
     </Modal>
   )

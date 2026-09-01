@@ -16,7 +16,13 @@ export default {
   },
   dataImport: {
     importFromMobileNotAllawed: 'Импорт данных из Arena Mobile не разрешен',
+    invalidNodeInRecord:
+      'Недопустимый узел в записи "{{recordUuid}}", узел "{{nodeUuid}}" с определением узла "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'В файле импорта не найдено записей или неверный формат файла',
+    pendingImportFileNotFoundOrExpired:
+      'Ранее загруженный файл не найден; возможно, срок его действия истек. Пожалуйста, загрузите его снова.',
+    recordOwnedByAnotherUser:
+      'Невозможно обновить запись "{{recordKeyValues}}", так как она принадлежит другому пользователю',
   },
   entryDataNotFound: 'Данные записи не найдены: {{entryName}}',
   expression: {
@@ -26,9 +32,11 @@ export default {
   functionHasTooFewArguments: 'Функция {{fnName}} требует как минимум {{minArity}} (получено {{numArgs}})',
   functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} (получено {{numArgs}})',
   generic: 'Неожиданная ошибка: {{text}}',
+  geoWhispApiError: 'Сервис Whisp временно недоступен.',
   importingDataIntoWrongCollectSurvey: 'Импорт данных в неверный опрос Collect. Ожидаемый URI: {{collectSurveyUri}}',
   invalidType: 'Неверный тип {{type}}',
   jobCanceledOrErrorsFound: 'Задача отменена или обнаружены ошибки; откат транзакции',
+  jobOrphanedOnRestart: 'Задача была прервана из-за перезапуска сервера. Повторите попытку.',
   paramIsRequired: 'Параметр {{param}} обязателен',
   unableToFindParent: 'Не удается найти родителя {{name}}',
   unableToFindNode: 'Не удается найти узел с именем {{name}}',
@@ -45,6 +53,7 @@ export default {
   sessionExpiredRefreshPage: 'Срок действия сеанса мог истечь.\nПопробуйте обновить страницу.',
   survey: {
     nodeDefNameNotFound: 'Определение узла не найдено: {{name}}',
+    dataMigrationInProgress: 'Это анкетирование обновляется; повторите попытку через некоторое время.',
   },
   unsupportedFunctionType: 'Неподдерживаемый тип функции: {{exprType}}',
   userHasPendingInvitation:

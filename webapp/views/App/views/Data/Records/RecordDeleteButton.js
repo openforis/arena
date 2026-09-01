@@ -40,7 +40,7 @@ export const RecordDeleteButton = (props) => {
 
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'dataView.records.confirmDeleteRecord',
+          key: 'dataView:records.confirmDeleteRecord',
           params: { keyValues },
           onOk: onDeleteConfirmed,
         })
@@ -52,7 +52,7 @@ export const RecordDeleteButton = (props) => {
   return (
     <ButtonDelete
       testId={testId}
-      title="dataView.records.deleteRecord"
+      title="dataView:records.deleteRecord"
       showLabel={false}
       onClick={onDeleteButtonClick}
       variant="text"

@@ -1,10 +1,13 @@
 import * as fs from 'fs'
 import * as R from 'ramda'
 
+import { Objects, Points } from '@openforis/arena-core'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import Job from '@server/job/job'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -21,6 +24,25 @@ import CategoryItemsUpdater from './categoryItemsUpdater'
 import { CategoryValidationJob } from './CategoryValidationJob'
 import * as CategoryService from './categoryService'
 
+const toNumber = (value) => Number(typeof value === 'string' ? value.replaceAll(',', '') : value)
+
+const extraPropProcessorByDataType = {
+  [ExtraPropDef.dataTypes.number]: ({ value }) => {
+    const parsedValue = toNumber(value)
+    if (Number.isFinite(parsedValue)) {
+      return { valid: true, valueProcessed: parsedValue }
+    }
+    return { valid: false, errorKey: Validation.messageKeys.categoryEdit.itemExtraPropInvalidNumber }
+  },
+  [ExtraPropDef.dataTypes.geometryPoint]: ({ value, srsIndex }) => {
+    const point = Points.parse(value)
+    if (!point || !Points.isValid(point, srsIndex)) {
+      return { valid: false, errorKey: Validation.messageKeys.categoryEdit.itemExtraPropInvalidGeometryPoint }
+    }
+    return { valid: true, valueProcessed: value }
+  },
+}
+
 export class CategoryImportInternalJob extends Job {
   constructor(params, type = 'CategoryImportInternalJob') {
     super(type, params)
@@ -30,6 +52,7 @@ export class CategoryImportInternalJob extends Job {
     this.itemsByCodes = {} // Cache of category items by ancestor codes
     this.category = null
     this.totalItemsInserted = 0
+    this.srsIndex = null
 
     this.itemsUpdater = null
   }
@@ -39,6 +62,8 @@ export class CategoryImportInternalJob extends Job {
 
     this.survey =
       this.contextSurvey ?? (await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx))
+    const surveyInfo = Survey.getSurveyInfo(this.survey)
+    this.srsIndex = Survey.getSRSIndex(surveyInfo)
 
     // 1. initialize summary (get it from params by default)
     this.summary = await this.getOrCreateSummary()
@@ -117,20 +142,45 @@ export class CategoryImportInternalJob extends Job {
   extractItemExtraDef() {
     const items = CategoryImportSummary.getItems(this.summary)
 
-    return items.reduce((accExtraDef, item) => {
+    const extraDefs = {}
+    let index = 0
+    for (const item of items) {
       if (CategoryImportSummary.isItemExtra(item)) {
         const itemKey = CategoryImportSummary.getItemKey(item)
-        accExtraDef[itemKey] = ExtraPropDef.newItem({
+        extraDefs[itemKey] = ExtraPropDef.newItem({
           dataType: CategoryImportSummary.getItemDataType(item),
-          index: Object.values(accExtraDef).length,
+          index,
         })
+        index++
       }
-      return accExtraDef
-    }, {})
+    }
+    return extraDefs
   }
 
   extractItemExtraProps(extra) {
-    return extra
+    const { category, srsIndex } = this
+    const itemExtraDef = Category.getItemExtraDef(category)
+    if (!itemExtraDef || !extra) return {}
+
+    const result = extra // do side effect on passed extra object
+
+    for (const [key, extraPropDef] of Object.entries(itemExtraDef)) {
+      const extraPropValue = extra[key]
+      if (Objects.isEmpty(extraPropValue)) {
+        delete result[key]
+        continue
+      }
+      const processExtraProp = extraPropProcessorByDataType[extraPropDef.dataType]
+      if (processExtraProp) {
+        const { valid, valueProcessed, errorKey } = processExtraProp({ value: extraPropValue, srsIndex })
+        if (valid) {
+          result[key] = valueProcessed
+        } else {
+          this._addError(errorKey, { key, value: extraPropValue })
+        }
+      }
+    }
+    return result
   }
 
   // End of methods that can be overridden by subclasses

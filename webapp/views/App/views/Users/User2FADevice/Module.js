@@ -1,4 +1,3 @@
-import React from 'react'
 
 import { userModules, user2FADeviceModules } from '@webapp/app/appModules'
 

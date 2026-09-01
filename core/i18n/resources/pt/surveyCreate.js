@@ -20,7 +20,7 @@ export default {
   template: 'Modelo',
   template_other: 'Modelos',
   error: 'Erro ao criar novo inventário',
-  errorMaxSurveysCountExceeded: `Erro ao criar inventário; verifique se o número máximo de inventários que você pode criar ({{maxSurveysCount}}) não foi excedido.`,
+  errorMaxSurveysCountExceeded: `Erro ao criar inventário; você atingiu o número máximo de inventários que pode criar ({{maxSurveysCount}}).`,
   options: {
     includeData: 'Incluir dados',
   },

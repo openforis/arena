@@ -39,7 +39,7 @@ const columnTransformByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ streamMode, nameFull, namesFull, alias }) => {
     if (!streamMode) {
       // boolean value, not text
-      return [`${nameFull}::boolean AS ${alias}`]
+      return [`${nameFull}::boolean AS ${DbUtils.asName(alias)}`]
     }
     // transform not applied
     return namesFull
@@ -50,21 +50,28 @@ const columnTransformByNodeDefType = {
       .map((colName) => {
         if (colName === alias) {
           // not in stream mode: read default column as a geometry point string
-          return DbUtils.geometryPointColumnAsText({ qualifiedColName: nameFull, alias })
+          return DbUtils.geometryPointColumnAsText({ qualifiedColName: nameFull, alias: DbUtils.asName(alias) })
         }
-        return `${viewAlias}.${colName} AS ${colName}`
+        return `${DbUtils.asName(viewAlias)}.${DbUtils.asName(colName)} AS ${DbUtils.asName(colName)}`
       })
     return result
   },
-  [NodeDef.nodeDefType.date]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${alias}`],
-  [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${alias}`],
+  [NodeDef.nodeDefType.date]: ({ nameFull, alias }) => [
+    `TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${DbUtils.asName(alias)}`,
+  ],
+  [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${DbUtils.asName(alias)}`],
 }
 
 const _selectFieldsByNodeDefType =
   ({ viewDataNodeDef, streamMode }) =>
   (nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const { name: alias, names, nameFull, namesFull } = columnNodeDef
+    const {
+      name: alias, // use column name as alias for easier mapping of transformed columns (e.g. coordinate) and default column in stream mode
+      names,
+      nameFull,
+      namesFull,
+    } = columnNodeDef
 
     const columnTransform = columnTransformByNodeDefType[NodeDef.getType(nodeDefCol)]
     if (columnTransform) {

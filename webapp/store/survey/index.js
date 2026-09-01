@@ -29,6 +29,7 @@ export {
   useNodeDefLabel,
   useNodeDefRootKeys,
   useIsAncestorMultipleEntityRoot,
+  useIsNodeDefEnumerator,
   useIsSurveyDirty,
   useChains,
 } from './hooks'

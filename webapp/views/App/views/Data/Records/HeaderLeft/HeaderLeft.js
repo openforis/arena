@@ -99,7 +99,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   )
 
   const onDeleteButtonClick = useCallback(async () => {
-    if (await confirm({ key: 'dataView.records.confirmDeleteSelectedRecord', params: { count: selectedItemsCount } })) {
+    if (await confirm({ key: 'dataView:records.confirmDeleteSelectedRecord', params: { count: selectedItemsCount } })) {
       onDeleteConfirm()
     }
   }, [confirm, selectedItemsCount, onDeleteConfirm])
@@ -125,7 +125,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
     if (
       await confirm({
-        key: 'dataView.records.confirmMergeSelectedRecords',
+        key: 'dataView:records.confirmMergeSelectedRecords',
         params: {
           sourceRecordKeys,
           sourceRecordModifiedDate,
@@ -156,7 +156,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   }, [closeMergePreviewModal, dispatch, onRecordsUpdate, selectedItems])
 
   const onValidateAllRecordsClick = useCallback(async () => {
-    if (await confirm({ key: 'dataView.records.confirmValidateAllRecords' })) {
+    if (await confirm({ key: 'dataView:records.confirmValidateAllRecords' })) {
       dispatch(RecordListActions.startRecordsValidation({ onRecordsUpdate }))
     }
   }, [confirm, dispatch, onRecordsUpdate])
@@ -174,7 +174,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
       {(totalCount > 0 || StringUtils.isNotBlank(search)) && (
         <input
           className="records__header-left__input-search"
-          placeholder={i18n.t('dataView.records.filterPlaceholder')}
+          placeholder={i18n.t('dataView:records.filterPlaceholder')}
           defaultValue={search}
           onChange={(e) => handleSearch(e.target.value)}
         />
@@ -186,20 +186,20 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
               testId={TestId.records.exportBtn}
               href={`/api/survey/${surveyId}/records/summary/export`}
               requestParams={{ cycle }}
-              label="dataView.records.exportList"
+              label="dataView:records.exportList"
             />
           )}
           {canExportRecordsData && (
-            <ButtonDownload label="dataView.records.exportData" onClick={toggleRecordsDataExportModalOpen} />
+            <ButtonDownload label="dataView:records.exportData" onClick={toggleRecordsDataExportModalOpen} />
           )}
           {canAnalyzeRecords && (
             <ButtonDownload
-              label="dataView.records.exportDataSummary"
+              label="dataView:records.exportDataSummary"
               onClick={() => dispatch(RecordListActions.startDataSummaryExport())}
             />
           )}
           {canValidateAllRecords && (
-            <ButtonDownload label="dataView.records.validateAll" onClick={onValidateAllRecordsClick} />
+            <ButtonDownload label="dataView:records.validateAll" onClick={onValidateAllRecordsClick} />
           )}
           {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
             <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />
@@ -207,7 +207,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           {selectedItemsCount === 2 && canDeleteSelectedRecords && (
             <Button
               iconClassName="icon-tree"
-              label="dataView.records.merge.label"
+              label="dataView:records.merge.label"
               onClick={mergeSelectedRecords}
               variant="outlined"
             />
@@ -218,13 +218,13 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
               (canEditSelectedItem ? (
                 <ButtonIconEdit
                   onClick={onSelectedRecordClick}
-                  title="dataView.editSelectedRecord"
+                  title="dataView:editSelectedRecord"
                   variant="contained"
                 />
               ) : (
                 <ButtonIconView
                   onClick={onSelectedRecordClick}
-                  title="dataView.viewSelectedRecord"
+                  title="dataView:viewSelectedRecord"
                   variant="contained"
                 />
               ))
@@ -232,7 +232,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           {canCloneRecords && (
             <Button
               iconClassName="icon-copy"
-              label="dataView.records.clone"
+              label="dataView:records.clone"
               onClick={toggleRecordsCloneModalOpen}
               variant="outlined"
             />

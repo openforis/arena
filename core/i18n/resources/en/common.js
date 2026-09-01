@@ -25,6 +25,7 @@ Do you want to ignore them?`,
     chain: 'Chain',
     chain_plural: 'Chains',
     childrenEmpty: 'Define at least one child item',
+    clear: 'Clear',
     clone: 'Clone',
     close: 'Close',
     cloneFrom: 'Clone from',
@@ -87,6 +88,7 @@ Please check also the Spam/Junk mail folder.`,
     from: 'From',
     function: 'Function',
     goToHomePage: 'Go to Home Page',
+    goToSurveys: 'Go to surveys',
     group: 'Group',
     help: 'Help',
     hide: 'Hide',
@@ -108,6 +110,8 @@ By confirming, all changes will be lost.
 Do you want to proceed?`,
     local: 'Local',
     loading: 'Loading...',
+    lock: 'Lock',
+    unlock: 'Unlock',
     max: 'Maximum',
     med: 'Median',
     manage: 'Manage',
@@ -162,6 +166,8 @@ Do you want to proceed?`,
     required: 'Required',
     requiredField: 'required field',
     reset: 'Reset',
+    refresh: 'Refresh',
+    pressRefreshToReloadPage: 'Press Refresh to reload the page.',
     resume: 'Resume',
     retry: 'Retry',
     role: 'Role',
@@ -177,6 +183,10 @@ Do you want to proceed?`,
     showLabels: 'Show labels',
     showLabelsAndNames: 'Show labels and names',
     showNames: 'Show names',
+    sort: 'Sort',
+    sortAsc: 'Sort ascending',
+    sortDesc: 'Sort descending',
+    sortNone: 'Remove sort',
     srs: 'SRS',
     status: 'Status',
     sum: 'Sum',
@@ -184,6 +194,7 @@ Do you want to proceed?`,
     to: 'To',
     totalItems: 'Total items',
     true: 'True',
+    trySplittingFileIntoSmallerChunks: 'Try splitting the file into smaller chunks.',
     type: 'Type',
     undefinedName: 'Undefined name',
     unique: 'Unique',
@@ -192,6 +203,8 @@ Do you want to proceed?`,
       message: `Error during file upload: {{error}}.\n
 Try again?`,
     },
+    uploadFileChangedError:
+      'The selected file appears to have been modified since it was selected. Please select it again.',
     uploadingFile: 'Uploading file ({{progressPercent}}%)',
     value: 'Value',
     view: 'View',
@@ -252,6 +265,8 @@ Try again?`,
     header: 'Files',
     missing: ' Missing files: {{count}}',
     totalSize: 'Total size: {{size}}',
+    fileName: 'File name',
+    fileSize: 'File size',
   },
 
   sidebar: {
@@ -261,7 +276,7 @@ Try again?`,
   header: {
     myProfile: 'My profile',
     qrCodeLoginDialog: {
-      title: 'Login from Arena Mobile using QR code',
+      title: 'Login to Arena Mobile using QR code',
       instructions: `1. Start **Arena Mobile** app on your mobile device
 2. Go to the **Settings** menu
 3. Select  **Connection to server**
@@ -291,6 +306,7 @@ Try again?`,
 
   appModules: {
     home: 'Home',
+    landing: 'Landing',
     dashboard: 'Dashboard',
     surveyNew: 'New Survey',
     surveys: 'Surveys',
@@ -327,6 +343,9 @@ Try again?`,
     userInvite: 'Invite user',
     userNew: 'New User',
     usersSurvey: 'Users list',
+    userGroup: 'User Group',
+    userGroup_plural: 'User Groups',
+    userGroupNew: 'New User Group',
     usersList: 'Users list (all)',
     user2FADevice: '2FA device',
     user2FADevice_plural: '2FA devices',
@@ -343,6 +362,8 @@ Try again?`,
 
     message: 'Message',
     message_plural: '$t(common.message_plural)',
+
+    jobMonitor: 'Job Monitor',
 
     help: 'Help',
     about: 'About',
@@ -398,13 +419,17 @@ $t(common.raiseTicketInSupportForum)
 **Once you send the request, please wait for an invitation email to access Arena.**`,
     reCaptchaNotAnswered: 'ReCaptcha not answered',
     requestSent: 'Access Request sent correctly',
-    requestSentMessage: `Please give us a couple of days to process your request.
-We will send soon an email to **{{email}}** with the instructions on how to access $t(common.appName).
+    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
+$t(accessRequestView.whitelistSenderSuggestion)
+
+Please give us a couple of days to process your request.
+We will send you another email to **{{email}}** with the instructions on how to access $t(common.appName), once it's accepted.
 Thank you and enjoy **$t(common.appNameFull)**!`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
     templateNotSelected: 'Not selected (start from scratch)',
     title: 'Requesting access to $t(common.appNameFull)',
+    whitelistSenderSuggestion: `If you find it in the Spam/Junk folder, please add **{{senderEmail}}** to your contacts (address book) or mark it as safe/not spam, so that future emails from us reach your inbox directly.`,
   },
 
   resetPasswordView: {
@@ -431,10 +456,14 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     dependencyTypes: {
       applicable: 'Applicability',
       defaultValues: 'Default value',
+      editable: 'Editable',
+      fileName: 'File name',
       itemsFilter: 'Items filter',
-      minCount: 'Min count',
       maxCount: 'Max count',
+      minCount: 'Min count',
+      parentCode: 'Parent code',
       validations: 'Validations',
+      visible: 'Visible',
     },
     selectAtLeastOneDependencyType: 'Select at least one dependency type',
     noDependenciesToDisplay: 'No dependencies to display',
@@ -450,8 +479,14 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     errorLoadingRecord: 'Error loading record: {{details}}',
     recordEditModalTitle: 'Record: {{keyValues}}',
     recordNotFound: 'Record not found',
-    lock: 'Lock',
-    unlock: 'Unlock',
+    keyAttributeEditing: {
+      lock: 'Lock key attribute editing',
+      unlock: 'Allow editing of key attribute',
+    },
+    qualifierAttributeEditing: {
+      lock: 'Lock qualifier attribute editing',
+      unlock: 'Allow editing of qualifier attribute',
+    },
   },
 
   dataExplorerView: {
@@ -462,320 +497,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     editRecord: 'Edit record',
   },
 
-  dataExportView: {
-    error: 'Error exporting data: {{details}}',
-    optionNotCompatibleWithDataImport: 'Not compatible with data import',
-    options: {
-      header: '$t(common.options)',
-      fileFormatLabel: 'File format',
-      fileFormat: {
-        csv: 'CSV',
-        xlsx: 'Excel',
-      },
-      includeCategoryItemsLabels: 'Include category items labels',
-      includeCategories: 'Include categories',
-      expandCategoryItems: 'Expand category items',
-      exportSingleEntitiesIntoSeparateFiles: 'Export single entities into separate files',
-      includeAncestorAttributes: 'Include ancestor attributes',
-      includeAnalysis: 'Include result variables',
-      includeDataFromAllCycles: 'Include data from all cycles',
-      includeDateCreated: 'Include creation date',
-      includeFiles: 'Include files',
-      includeFileAttributeDefs: 'Include file attribute columns',
-      includeInternalUuids: 'Include internal UUIDs',
-      recordsModifiedAfter: 'Records modified after',
-    },
-    optionsInfo: {
-      expandCategoryItems:
-        'adds one boolean column for every category item with a value TRUE if the item has been selected, FALSE otherwise',
-      exportSingleEntitiesIntoSeparateFiles: `exports single entities in separate files; when it's not checked, attributes belonging to a single entity will be included among the ones of its nearest ancestor multiple entity`,
-      includeAnalysis: 'includes analysis attributes',
-      includeAncestorAttributes: 'includes attributes that belong to the ancestor entities, up to the root entity',
-      includeCategoryItemsLabels: 'adds a column with a label for every category item',
-      includeCategories: `categories will be exported into a subfolder called "categories"`,
-      includeDataFromAllCycles:
-        'data from all cycles will be included, othwerwise only the selected one will be considered',
-      includeDateCreated: 'includes the creation date of every entity (row) in a column called "date_created"',
-      includeFiles: `exports files associated to the records into a subfolder called "files"`,
-      includeFileAttributeDefs: `adds file attributes' columns: file internal identifier (file_uuid) and name (file_name)`,
-      includeInternalUuids: 'includes the internal identifiers (UUIDs) in columns ending with the suffix "_uuid"',
-      recordsModifiedAfter: 'exports only data from records modified after the specified date',
-    },
-    startExport: 'Start export',
-  },
-
-  dataImportView: {
-    confirmDeleteAllRecords: 'Delete all records before import?',
-    confirmDeleteAllRecordsInCycle: 'Delete all records in the cycle {{cycle}} before import?',
-    conflictResolutionStrategy: {
-      label: 'Conflict resolution strategy',
-      info: 'What to do in case the same record (or a record with the same key attributes) is found',
-      skipExisting: 'Skip if already existing',
-      overwriteIfUpdated: 'Overwrite if updated',
-      merge: 'Merge records',
-    },
-    deleteAllRecordsBeforeImport: 'Delete all records before import',
-    downloadAllTemplates: 'Download all templates',
-    downloadAllTemplates_csv: 'Download all templates (CSV)',
-    downloadAllTemplates_xlsx: 'Download all templates (Excel)',
-    downloadTemplate: 'Download template',
-    downloadTemplate_csv: 'Download template (CSV)',
-    downloadTemplate_xlsx: 'Download template (Excel)',
-    errors: {
-      rowNum: 'Row #',
-    },
-    fileUploadChunkSize: {
-      label: 'File upload chunk size',
-    },
-    forceImportFromAnotherSurvey: 'Force import from another survey',
-
-    importFromArena: 'Arena/Arena Mobile',
-    importFromCollect: 'Collect / Collect Mobile',
-    importFromCsvExcel: 'CSV/Excel',
-    importFromCsvStepsInfo: `### Importing steps
-1. Select the target entity
-2. Download a template
-3. Fill in the template and save it (if in CSV, use UTF-8 as encoding)
-4. Check options
-5. Upload the CSV/Excel file
-6. Validate the file
-7. Start import
-`,
-    importIntoCycle: 'Import into cycle',
-    importIntoMultipleEntityOrAttribute: 'Import into multiple entity or attribute',
-    importType: {
-      label: 'Import type',
-      insertNewRecords: 'Insert new records',
-      updateExistingRecords: 'Update existing records',
-    },
-    jobs: {
-      ArenaDataImportJob: {
-        importCompleteSuccessfully: `Arena Mobile data import complete:
-{{summary}}`,
-        importSummaryItem: {
-          processed: 'records processed',
-          insertedRecords: 'records created',
-          updatedRecords: 'records updated',
-          skippedRecords: 'records skipped',
-          missingFiles: 'files missing',
-        },
-      },
-      CollectDataImportJob: {
-        importCompleteSuccessfully: `Collect data import complete:
-        - {{insertedRecords}} records created`,
-      },
-      DataImportJob: {
-        importCompleteSummary: `
-        - {{processed}} rows processed
-        - {{insertedRecords}} records created
-        - {{updatedRecords}} records updated
-        - {{entitiesCreated}} entities created
-        - {{entitiesDeleted}} entities deleted
-        - {{updatedValues}} values updated`,
-        importCompleteSuccessfully: `## Import complete:
-$t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
-        importWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportJob.importCompleteSuccessfully)
-        - {{insertedFiles}} files inserted
-        - {{updatedFiles}} files updated
-        - {{deletedFiles}} files deleted`,
-        importCompleteWithErrors: `## Import complete (with errors):
-        - {{processed}} rows processed`,
-      },
-      DataImportValidationJob: {
-        validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
-        - {{processed}} rows processed`,
-        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)`,
-        validationCompleteSuccessfully: `## Validation complete without errors
-        - {{processed}} rows processed
-        - {{insertedRecords}} records would be created
-        - {{updatedRecords}} records would be updated
-        - {{entitiesCreated}} entities would be created
-        - {{entitiesDeleted}} entities would be deleted
-        - {{updatedValues}} values would be updated`,
-        validationWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteSuccessfully)
-        - {{insertedFiles}} files would be inserted
-        - {{updatedFiles}} files would be updated
-        - {{deletedFiles}} files would be deleted`,
-      },
-    },
-    options: {
-      header: '$t(common.options)',
-      abortOnErrors: 'Abort on errors',
-      preventAddingNewEntityData: 'Prevent adding new entity data',
-      preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
-      includeFiles: 'Include files',
-      deleteExistingEntities: `delete selected entity's data in all records`,
-    },
-    optionsInfo: {
-      deleteExistingEntities: `WARNING: all entities "{{nodeDefName}}" 
-and all their descendants in all records  
-will be deleted before inserting the new ones.`,
-    },
-    startImport: 'Start import',
-    startImportConfirm: `By pressing 'Ok' you will start the import process.  
-**It won't be possible to rollback the changes.**  
-Are you sure you want to continue?`,
-    startImportConfirmWithDeleteExistingEntities: `$t(dataImportView.startImportConfirm)  
-**($t(dataImportView.options.deleteExistingEntities) option selected: existing entities will be deleted before creating new ones)**
-`,
-    steps: {
-      selectImportType: 'Select Import Type',
-      selectCycle: 'Select Cycle',
-      selectEntity: 'Select Entity',
-      selectFile: 'Select File',
-      startImport: 'Start import',
-    },
-    validateFile: 'Validate file',
-    validateFileInfo:
-      'The validation process checks that the file contains valid data according to the data type of each attribute.',
-  },
-
-  dataView: {
-    charts: {
-      downloadToPng: 'Download chart to PNG',
-      warning: {
-        selectOneDimensionAndOneMeasure: 'Please select one dimension and one measure to show the chart',
-        selectAtLeast2NumericAttributes: 'Please select 2 numeric attributes to show the chart',
-        tooManyItemsToShowChart: `Too many items to show the chart;
-expecting maximum {{maxItems}} items.
-Please refine your query (e.g. adding a filter) to reduce the number of items.
-`,
-      },
-      type: {
-        area: 'Area chart',
-        bar: 'Bar chart',
-        line: 'Line chart',
-        pie: 'Pie chart',
-        scatter: 'Scatter chart',
-      },
-    },
-    dataQuery: {
-      deleteConfirmMessage: 'Delete the query "{{name}}"?',
-      displayType: {
-        chart: 'Chart',
-        table: 'Table',
-      },
-      manageQueries: 'Manage queries',
-      mode: {
-        label: 'Mode:',
-        aggregate: 'Aggregate',
-        raw: 'Raw',
-        rawEdit: 'Raw edit',
-      },
-      replaceQueryConfirmMessage: 'Replace current query with the selected one?',
-      showCodes: 'Show codes',
-    },
-    editSelectedRecord: 'Edit selected record',
-    filterAttributeTypes: 'Filter attribute types',
-    filterRecords: {
-      buttonTitle: 'Filter',
-      expressionEditorHeader: 'Expression to filter records',
-    },
-    invalidRecord: 'Invalid record',
-    nodeDefsSelector: {
-      hide: 'Hide Node Definitions Selector',
-      show: 'Show Node Definitions Selector',
-      nodeDefFrequency: `{{nodeDefLabel}} (frequency)`,
-    },
-    records: {
-      clone: 'Clone',
-      confirmDeleteRecord: `Delete the record "{{keyValues}}"?`,
-      confirmDeleteSelectedRecord_one: `Delete the selected record?`,
-      confirmDeleteSelectedRecord_other: `Delete the selected {{count}} records?`,
-      confirmMergeSelectedRecords: `### Merge the selected records into one?
-
-- record "source" will be merged into record "target":
-  - source: [{{sourceRecordKeys}}], modified {{sourceRecordModifiedDate}};
-  - target: [{{targetRecordKeys}}], modified {{targetRecordModifiedDate}};
-
-- a preview of the result will be shown before merging is performed;
-
-- when merging will be confirmed, **the source record WILL BE DELETED**`,
-      confirmUpdateRecordsStep: `Move the selected {{count}} record(s) from {{stepFrom}} to {{stepTo}}?`,
-      confirmUpdateRecordOwner: `Change the owner of the selected record into {{ownerName}}?`,
-      confirmValidateAllRecords: `Re-validate all records?\n\nThis may take several minutes.`,
-      deleteRecord: 'Delete record',
-      demoteAllRecordsFromAnalysis: 'Analysis -> Cleansing',
-      demoteAllRecordsFromCleansing: 'Cleansing -> Entry',
-      editRecord: 'Edit record',
-      exportList: 'Export list',
-      exportData: 'Export data',
-      exportDataSummary: 'Export data summary',
-      filterPlaceholder: 'Filter by keys or owner',
-      merge: {
-        label: 'Merge',
-        confirmLabel: 'Confirm merge',
-        confirmTooManyDifferencesMessage: `**Too many differences**.  
-It seems like the records are very different each other.  
-Many attributes (~{{nodesUpdated}}) will be updated during merge.  
-Continue with merge preview?`,
-        noChangesWillBeApplied: `No changes would be applied to target record.  
-Merge cannot be performed.`,
-        performedSuccessfullyMessage: 'Records merge performed successfully!',
-        previewTitle: 'Merging preview (record {{keyValues}})',
-      },
-      noRecordsAdded: 'No records added',
-      noRecordsAddedForThisSearch: 'No records found',
-      noSelectedRecordsInStep: 'No selected records in step {{step}}',
-      owner: 'Owner',
-      promoteAllRecordsToAnalysis: 'Cleansing -> Analysis',
-      promoteAllRecordsToCleansing: 'Entry -> Cleansing',
-      step: 'Step',
-      updateRecordsStep: 'Update records step',
-      validateAll: 'Validate all',
-      viewRecord: 'View record',
-    },
-    recordsClone: {
-      title: 'Records clone',
-      fromCycle: 'From cycle',
-      toCycle: 'To cycle',
-      confirmClone: `Clone records from cycle {{cycleFrom}} to cycle {{cycleTo}}?\n
-(Only records not already in cycle {{cycleTo}} will be cloned)`,
-      startCloning: 'Start cloning',
-      cloneComplete: 'Clone complete. {{recordsCloned}} records cloned from {{cycleFrom}} to {{cycleTo}}',
-      error: {
-        cycleToMissing: 'Please select "To cycle"',
-        cycleToMustBeDifferentFromCycleFrom: '"To cycle" must be different from "From cycle"',
-      },
-      source: {
-        label: 'Source',
-        allRecords: 'All records in cycle {{cycleFrom}} not already in cycle {{cycleTo}}',
-        selectedRecords: 'Only the selected {{selectedRecordsCount}} records',
-      },
-    },
-    recordDeleted_one: `Record deleted successfully!`,
-    recordDeleted_other: `{{count}} records deleted successfully!`,
-    recordsSource: {
-      label: 'Source',
-    },
-    recordsUpdated: '{{count}} records updated successfully!',
-    rowNum: 'Row #',
-    selectedAttributes: 'Selected attributes:',
-    selectedDimensions: 'Selected dimensions',
-    selectedMeasures: 'Selected measures',
-    sortableItemsInfo: 'Drag&Drop to sort them',
-    showValidationReport: 'Show validation report',
-    sort: 'Sort',
-    dataExport: {
-      source: {
-        label: 'Source',
-        allRecords: 'All records',
-        filteredRecords: 'Only filtered records',
-        selectedRecord: 'Only selected record',
-        selectedRecord_other: 'Only selected {{count}} records',
-      },
-      title: 'Export data',
-    },
-    dataVis: {
-      errorLoadingData: 'Error loading data',
-      noData: 'This query returned no data',
-      noSelection:
-        'Please make your selection using the left side panel or select an existing query from "Manage queries"',
-    },
-    viewSelectedRecord: 'View selected record',
-  },
-
   mapView: {
+    changeMarkerColor: 'Change marker color',
     createRecord: 'Create new record',
     editRecord: 'Edit record',
     elevation: 'Elevation (m)',
@@ -789,6 +512,7 @@ Merge cannot be performed.`,
       showSamplingPolygon: `Sampling polygon`,
       showControlPoints: `Control points`,
       showPlotReferencePoint: `Plot reference point`,
+      showUtmGrid: 'Show UTM grid',
     },
     rulerTooltip: `Press the button to start measuring distances.
 - click multiple times to measure paths
@@ -846,6 +570,11 @@ Merge cannot be performed.`,
     onlyOwn: 'Only own surveys',
     records: 'Records',
     recordsCreatedWithMoreApps: 'Records created with more apps:',
+    status: {
+      published: 'Published',
+      draft: 'Draft',
+      'published-draft': 'Published/Draft',
+    },
   },
 
   usersAccessRequestView: {
@@ -904,8 +633,11 @@ Merge cannot be performed.`,
     confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
     confirmInviteSystemAdmin_other: 'Invite the users {{email}} as System Administrators?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} addresses have been skipped (they have been already invited to this survey previously): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} addresses have been skipped (they have been already invited to this survey previously): {{skippedEmails}}`,
+    invalidEmailsWarning: `The email address {{emails}} could not be reached and may not exist. It has been kept in the list below: please correct it or remove it and try inviting again.`,
+    invalidEmailsWarning_other: `The email addresses {{emails}} could not be reached and may not exist. They have been kept in the list below: please correct or remove them and try inviting again.`,
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `
@@ -1010,6 +742,11 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     },
     downloadSummaryJSON: 'Download Summary (JSON)',
     firstPhaseCategory: '1st phase category',
+    firstPhaseCategoryInfo: 'Select the category that contains the first-phase samples.',
+    firstPhaseCategoryExtraProp: {
+      label: '1st phase stratum attribute',
+      info: 'Select the extra property of the $t(chainView.firstPhaseCategory) (column of the category table) used to divide the original population into broad strata for the initial sampling phase.',
+    },
     firstPhaseCommonAttribute: {
       label: 'Common attribute',
       info: `Attribute in common between base unit and 1st phase table 
@@ -1028,9 +765,11 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       surveyNotPublished: '$t(chainView.cannotStartRStudio.common): publish the survey first',
     },
     nonResponseBiasCorrection: 'Non-response bias correction',
-    nonResponseBiasCorrectionTip: `To implement this method, add 'design_psu' and 'design_ssu' into the stratum category as extra properties.`,
+    nonResponseBiasCorrectionInfo: `To implement Weighting Class Adjustment method, add 'design_psu' and 'design_ssu' into the stratum category table as extra numeric properties`,
     pValue: 'P-value',
     resultsBackFromRStudio: 'Results read back from RStudio',
+    resultsBackFromRStudioInfo: `Enable this option if the result attributes calculated in RStudio should be imported back into the Arena server.
+This might be a slow process.`,
     samplingDesign: 'Sampling Design',
     samplingDesignDetails: 'Sampling Design Details',
     samplingStrategyLabel: 'Sampling strategy',
@@ -1052,11 +791,18 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
         dimensionsSeparate: 'Dimensions separately',
       },
       reportingArea: 'Total reporting area (ha) (Optional)',
+      reportingAreaInfo: `With stratified sampling, give areas of strata within the stratum attribute's category table (column name 'area')`,
     },
     stratumAttribute: 'Stratum attribute',
+    stratumAttributeInfo: 'Select the variable used to stratify the sample.',
+    stratumAttribute2ndPhase: '2nd phase stratum attribute',
+    stratumAttribute2ndPhaseInfo:
+      'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample.',
     postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
     clusteringEntity: 'Clustering entity',
+    clusteringEntityInfo:
+      'The entity defining primary sampling units. Note: This is used exclusively for cluster analysis within the R survey package framework.',
     clusteringOnlyVariances: 'Clustering only for variances',
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
@@ -1065,6 +811,18 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Processing chain deleted',
+    cloneFromAnotherSurvey: 'Clone from another survey',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Clone chain from another survey',
+      sourceSurvey: 'Source survey',
+      sourceChain: 'Source chain',
+      entityCheck: 'Entity compatibility',
+      entityMissing: 'missing in target survey',
+      skipMissingEntities: 'Skip analysis attributes for entities missing in the target survey',
+      noAnalysisAttributes: 'This chain has no analysis attributes',
+      cloneComplete: 'Chain cloned successfully',
+      missingEntities: 'Cannot clone: the following entities do not exist in the target survey: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
     copyRStudioCode: `#### You are about to open an RStudio Server ####  
@@ -1103,7 +861,9 @@ $t(common.cantUndoWarning)`,
   chain: {
     quantitative: 'Quantitative',
     categorical: 'Categorical',
-    emptyNodeDefs: '$t(validationErrors.analysis.analysisNodeDefsRequired)',
+    addQuantitative: 'Add quantitative attribute',
+    addCategorical: 'Add categorical attribute',
+    emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
     entityExcludedInRStudioScripts:
       'the entity and all the related result variables will be excluded in the RStudio scripts',
     entityWithoutData: 'Entity {{name}} has no data; $t(chain.entityExcludedInRStudioScripts)',
@@ -1127,6 +887,7 @@ $t(common.cantUndoWarning)`,
     invalidAttributeValuePropertyName: 'Invalid attribute value property name: {{attributeName}}.{{propName}}',
     invalidCategoryExtraProp: 'Invalid extra property name: {{propName}}',
     invalidCategotyName: 'Invalid category name: {{name}}',
+    invalidTaxonomyExtraProp: 'Invalid taxonomy extra property name: {{propName}}',
     invalidTaxonomyName: 'Invalid taxonomy name: {{name}}',
     invalidTaxonVernacularNameLanguageCode: 'Invalid taxon vernacular name language code: {{vernacularLangCode}}',
     missingFunctionParameters: 'Missing function parameters',
@@ -1145,9 +906,12 @@ $t(common.appNameFull)
  
  * Developed by: $t(links.openforis)
  * Version: {{version}}
+ * Website: $t(links.openforisArenaWebsite)
+ * Arena video tutorials in FAO elearning Academy: $t(links.arenaVideoTutorialsInFaoElearningAcademy)
+ * Arena video tutorials in YouTube: $t(links.arenaVideoTutorialsInYouTube)
  * Support Forum: $t(links.supportForum)
- * Arena in GitHub: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
- * Arena R Scripts in GitHub: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
+ * Arena in GitHub: $t(links.arenaInGitHub)
+ * Arena R Scripts in GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
   },
@@ -1159,6 +923,18 @@ $t(common.appNameFull)
     basic: 'Basic',
     advanced: 'Advanced',
     mobileApp: 'Mobile App',
+    print: 'Print',
+    printProps: {
+      printOrientation: {
+        label: 'Page orientation',
+        info: 'Orientation used when this entity starts its own printable section. Default inherits the document orientation chosen at export.',
+      },
+      orientations: {
+        default: 'Default (document)',
+        portrait: 'Portrait',
+        landscape: 'Landscape',
+      },
+    },
     validations: 'Validations',
     function: 'Function',
     editingFunction: 'Editing function {{functionName}}',
@@ -1189,6 +965,12 @@ $t(common.appNameFull)
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
       pow: 'Returns the value of a base raised to a power',
+      prevCycleNote:
+        'Works only in Arena Mobile when multiple cycles are defined and the previous-cycle link is enabled',
+      prevCycleValue:
+        'Returns the value of the same attribute in the record of the previous cycle. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
+      prevCycleValues:
+        'Returns the values of the same attributes in the record of the previous cycle. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
       recordCycle: 'Returns the cycle of the current record',
       recordDateCreated:
         'Returns the creation date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
@@ -1201,6 +983,7 @@ $t(common.appNameFull)
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       taxonVernacularName:
         'Returns the (first) vernacular (or local) name in the specified language of a taxon having the specified code',
+      unique: 'Returns the unique values of a multiple attribute or entity',
       userEmail: 'Returns the email of the logged in user',
       userIsRecordOwner:
         'Returns a boolean value "true" if the user editing the record is also its owner, "false" otherwise',
@@ -1221,12 +1004,20 @@ $t(common.appNameFull)
         label: 'Auto incremental',
         info: 'Value will be automatically generated',
       },
+      autoCreateMinCountItems: {
+        label: 'Auto-create minimum items',
+        info: 'When the entity becomes relevant or its parent entity is created, a number of entities equal to the minimum count will be generated automatically.',
+      },
       displayAs: 'Display as',
       displayIn: 'Display in',
       entitySource: 'Entity Source',
       enumerate: {
         label: 'Enumerate',
         info: `The rows will be automatically generated using the category items associated to a code attribute marked as Key defined inside the entity; rows cannot be added or deleted and the key code attribute won't be editable`,
+      },
+      enumeratingItemsExpression: {
+        label: 'Enumerating items expression',
+        info: 'Optional expression that filters which category items are enumerated (e.g. unique(table_source.source_type)). When empty, all category items are used.',
       },
       enumerator: {
         label: 'Enumerator',
@@ -1240,17 +1031,38 @@ $t(common.appNameFull)
         info: `If marked, the attribute will be visible in records list`,
       },
       key: 'Key',
+      maxKeysCountReached: 'Max keys count reached ({{maxKeysCount}})',
       multiple: 'Multiple',
       ownPage: 'Its own page',
       parentPage: 'Parent page ({{parentPage}})',
+      qualifier: {
+        label: 'Qualifier',
+        info: `When a new record is created by a user belonging to a group, this attribute will be automatically filled with the value specified for it in the qualifiers of the user's group. Users will only be able to see and modify records belonging to their own group, if they belong to one.`,
+      },
       table: 'Table',
     },
     advancedProps: {
       areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
+      defaultValuesInfo: `This allows you to automatically fill in an answer based on specific rules.  
+If you set up multiple rules, the system will check them in order from top to bottom.  
+It will apply the very first rule that matches your conditions and use that as the answer.`,
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
+      defaultValueEvaluatedOneTimeInfo: `The default value will be evaluated only one time, when the attribute is created.
+If not marked, the default value will be re-evaluated every time the record is updated.
+It should be marked when using expressions like now() or uuid() that should be evaluated only once, when the attribute value is generated for the first time.`,
       defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
-      hidden: 'Hide in entry form',
+      defaultValuesNotSpecified: 'Default values not specified',
+      defaultValuesSpecified: 'Default values specified',
+      editableIf: 'Editability',
+      editableIfInfo: `By default, a user can always access a relevant field.  
+Here we can set a rule whether a user can type into or change this field.  
+If the conditions you set are met, the field can be edited. If not, it becomes "read-only" (locked).`,
+      editableAlways: 'Always editable',
+      editableIfConditionIsMet: 'Editable if condition is met',
+      hidden: 'Always hidden',
+      hiddenInReport: 'Hidden in Analytical Dashboard',
+      hiddenInReportInfo: `If marked, the attribute won't be visible in the Analytical Dashboard`,
       hiddenWhenNotRelevant: 'Hidden when not relevant',
       itemsFilter: 'Items filter',
       itemsFilterInfo: `Expression used to filter selectable items.
@@ -1258,8 +1070,21 @@ In the expression, the word "this" will refer to the item itself.
 E.g. this.region = region_attribute_name 
 (where "region" is the name of an extra property defined for the item and region_attribute_name is the name of an attribute in the survey)`,
       readOnly: 'Read only',
-      relevantIf: 'Relevant if',
+      relevantIf: 'Relevance',
+      relevantIfInfo: `By default, all fields are always active.  
+If you set a relevance rule and it isn't met, the field will either turn grey or be hidden entirely,  
+and any automatic answers will be ignored.  
+Use this to dynamically show or hide parts of your survey; e.g. only revealing a "Please specify" text box if a user selects "Other" in the previous question.`,
+      relevantIfRadioNone: 'Always relevant',
+      relevantIfRadioDefined: 'Relevant if condition is met',
       script: 'Script',
+      visibleIf: 'Visibility',
+      visibleIfInfo: `By default, a field is always visible.  
+If you set a rule, it will only be visible when that rule is met; otherwise, it will be hidden.  
+Note: unlike hiding an "inactive" (irrelevant) field, a hidden field can still have an automatic answer saved behind the scenes.  
+This is perfect for hiding entire parts of a survey based on who is logged in (like user roles).`,
+      visibleAlways: 'Always visible',
+      visibleIfConditionIsMet: 'Visible if condition is met',
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1274,6 +1099,9 @@ E.g. this.region = region_attribute_name
         label: 'Include in previous cycle link',
         info: `If marked, the value from the previous cycle will be shown on the data entry form (when the link to the previous cycle is set active in the mobile app)`,
       },
+    },
+    numericProps: {
+      unit: 'Unit',
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
@@ -1342,6 +1170,7 @@ E.g. this.region = region_attribute_name
     coordinateProps: {
       allowOnlyDeviceCoordinate: 'Allow only device coordinate',
       allowOnlyDeviceCoordinateInfo: `It applies only to Arena Mobile: if checked, the user won't be able to modify the X/Y values, but only device GPS can be used to get them`,
+      mapMarkerColor: 'Map marker color',
     },
     expressionsProp: {
       expression: 'Expression',
@@ -1352,7 +1181,9 @@ E.g. this.region = region_attribute_name
     validationsProps: {
       minCount: 'Min count',
       maxCount: 'Max count',
-      expressions: 'Expressions',
+      expressions: 'Validation expressions',
+      attributeAlwaysValid: 'Attribute always valid',
+      attributeValidWhenConditionIsMet: 'Attribute valid when condition is met',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'This node cannot be converted to multiple because it has default values.',
@@ -1384,6 +1215,10 @@ E.g. this.region = region_attribute_name
 
 E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tree_species* marked as **Unique**, you can have only one tree per species inside the same *plot*.`,
     },
+    nodeDefClonedSuccessfully:
+      'Node definition "{{nodeDefName}}" cloned successfully into "{{targetParentNodeDefName}}"',
+    categoriesClonedFromSurvey: 'The following categories were also cloned from the source survey: {{names}}',
+    taxonomiesClonedFromSurvey: 'The following taxonomies were also cloned from the source survey: {{names}}',
   },
 
   languagesEditor: {
@@ -1394,13 +1229,27 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     header: 'Taxonomy',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Delete the taxonomy {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clone Taxonomy From Another Survey',
+      sourceSurvey: 'Source survey',
+      sourceTaxonomy: 'Source taxonomy',
+      loadingSurveys: 'Loading surveys...',
+      noSurveysAvailable: 'No surveys available',
+      selectSurveyFirst: 'Select a survey first',
+      loadingTaxonomies: 'Loading taxonomies...',
+      noTaxonomiesAvailable: 'No taxonomies available in the selected survey',
+    },
     edit: {
       taxonomyListName: 'Taxonomy list name',
       taxaNotImported: 'Taxa not imported',
       family: 'Family',
       genus: 'Genus',
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
+      synonym: 'Synonym / Latin',
       extraPropsNotDefined: 'Extra properties not defined for this taxonomy',
+      importMissingPublishedTaxa:
+        '{{count}} published taxon/taxa not found in the imported file and left unchanged. Codes: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} more)',
     },
     taxaCount: 'Taxa count',
     vernacularNameLabel: 'Vernacular name label',
@@ -1411,6 +1260,16 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     batchImportCompleteSuccessfully: `{{importedCategories}} categories imported successfully!
 {{insertedCategories}} new
 {{updatedCategories}} updated`,
+    cloneFromAnotherSurvey: {
+      title: 'Clone Category From Another Survey',
+      sourceSurvey: 'Source survey',
+      sourceCategory: 'Source category',
+      loadingSurveys: 'Loading surveys...',
+      noSurveysAvailable: 'No surveys available',
+      selectSurveyFirst: 'Select a survey first',
+      loadingCategories: 'Loading categories...',
+      noCategoriesAvailable: 'No categories available in the selected survey',
+    },
     itemsCount: 'Items count',
     types: {
       flat: 'Flat',
@@ -1466,11 +1325,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Category import summary',
     },
     reportingData: 'Reporting data',
-    templateForImport: 'Template for import',
-    templateFor_specificDataImport_csv: 'Template for data import (CSV)',
-    templateFor_specificDataImport_xlsx: 'Template for data import (Excel)',
-    templateFor_genericDataImport_csv: 'Template for data import (generic, CSV)',
-    templateFor_genericDataImport_xlsx: 'Template for data import (generic, Excel)',
     templateFor_samplingPointDataImport_csv: 'Template for Sampling Point Data import (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Template for Sampling Point Data import (Excel)',
   },
@@ -1499,246 +1353,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
     name: 'Property {{position}} name',
     value: 'Value',
-  },
-
-  // ===== All validation errors
-  validationErrors: {
-    // Common
-    invalidEmail: 'Invalid email',
-    invalidField: '"{{field}}" is invalid',
-    invalidNumber: 'Invalid number',
-    invalidDate: 'Invalid date',
-    minLengthNotRespected: 'Minimum length of {{minLength}} characters not respected',
-    nameDuplicate: 'Name is duplicate',
-    nameCannotBeKeyword: `Name "{{value}}" cannot be used: it's a reserved word`,
-    nameInvalid:
-      'Name "{{name}}" is invalid: it must be maximum 40 characters long and contain only lowercase letters, numbers and only "-" and "_" symbols, starting with a letter',
-    nameRequired: 'Name is required',
-    requiredField: '{{field}} is required',
-    rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
-
-    analysis: {
-      labelDefaultLangRequired: 'Label in survey default language is required',
-      analysisNodeDefsRequired: 'At least one calculated attribute is required',
-    },
-
-    categoryEdit: {
-      childrenEmpty: '$t(common.childrenEmpty)',
-      childrenInvalid: 'At least one invalid child',
-      codeCannotBeKeyword: `Code "{{value}}" cannot be used: it's a reserved word`,
-      codeDuplicate: 'Code is duplicate',
-      codeRequired: 'Code is required',
-      itemExtraPropDataTypeRequired: 'Data type required for $t(extraProp.label) "{{key}}"',
-      itemExtraPropNameInvalid: 'Invalid name for $t(extraProp.label) "{{key}}"',
-      itemExtraPropInvalidNumber: 'Invalid number for $t(extraProp.label) "{{key}}"',
-      itemExtraPropInvalidGeometryPoint: 'Invalid geometry point for $t(extraProp.label) "{{key}}"',
-      itemsInvalid: 'At least one invalid item',
-      itemsEmpty: 'Define at least one item',
-      levelDuplicate: 'Level name is duplicate',
-      levelsInvalid: 'At least one invalid level',
-      nameNotSpecified: 'Category name not specified',
-    },
-
-    categoryImport: {
-      cannotDeleteItemsOfPublishedCategory:
-        'Cannot delete published category items. Items missing in imported file: {{deletedItemCodes}}',
-      cannotDeleteLevelsOfPublishedCategory:
-        'Cannot delete levels of published category. Levels missing in imported file: {{deletedLevelNames}}',
-      codeColumnMissing: 'There should be at least one "code" column',
-      codeRequired: '{{columnName}}: a code is required',
-      codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
-      columnMissing: 'Missing column: {{columnNameMissing}}',
-      emptyHeaderFound: 'The file contains an empty header',
-      emptyFile: '$t(validationErrors.dataImport.emptyFile)',
-      invalidImportFile:
-        'ZIP file must contain only .csv or .xlsx files (one for each category), without any directories',
-      invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
-      nameDuplicate: 'A category with the same name already exists: {{name}}',
-      srsNotDefined: 'SRS with code {{srs}} not defined in survey',
-    },
-
-    dataImport: {
-      emptyFile: 'The file you are trying to import is empty',
-      invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
-      invalidBoolean: 'Invalid boolean value in column {{headers}}: {{value}}',
-      invalidCode: `Invalid code for attribute '{{attributeName}}': {{code}}`,
-      invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
-      invalidDate:
-        'Invalid date in column {{headers}}: {{value}}. Dates should be formatted as YYYY-MM-DD or DD/MM/YYYY. E.g. 2023-01-15 or 15/01/2023',
-      invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
-      invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
-      invalidTime:
-        'Invalid time in column {{headers}}: {{value}}. Time should be formatted as HH:mm. E.g. 09:45 or 16:30',
-      missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
-      errorUpdatingValues: 'Error updating values: {{details}}',
-      multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
-      recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
-      recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
-      recordKeyMissingOrInvalid: 'Missing or invalid value for key attribute "{{keyName}}"',
-      recordNotFound: 'Record with keys "{{keyValues}}" not found',
-    },
-
-    expressions: {
-      cannotGetChildOfAttribute: 'cannot get child node {{childName}} of attribute {{parentName}}',
-      cannotUseCurrentNode: 'cannot use current node {{name}} in this expression',
-      circularDependencyError: 'cannot reference node {{name}} because it references the current node',
-      expressionInvalid: 'Invalid expression: {{details}}',
-      unableToFindNode: 'unable to find node: {{name}}',
-      unableToFindNodeChild: 'unable to find child node: {{name}}',
-      unableToFindNodeParent: 'unable to find parent node: {{name}}',
-      unableToFindNodeSibling: 'unable to find sibling node: {{name}}',
-    },
-
-    extraPropEdit: {
-      nameInvalid: 'Invalid name',
-      nameRequired: 'Name required',
-      dataTypeRequired: 'Data type required',
-      valueRequired: 'Value required',
-    },
-
-    nodeDefEdit: {
-      analysisParentEntityRequired: 'Entity is required',
-      applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" condition is duplicate',
-      applyIfInvalid: 'Invalid "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
-      columnWidthCannotBeGreaterThan: 'Column width cannot be greater than {{max}}',
-      columnWidthCannotBeLessThan: 'Column width cannot be less than {{min}}',
-      countMaxMustBePositiveNumber: 'Max Count must be a positive integer',
-      countMinMustBePositiveNumber: 'Min Count must be a positive integer',
-      categoryRequired: 'Category is required',
-      childrenEmpty: '$t(common.childrenEmpty)',
-      defaultValuesInvalid: 'Invalid "Default Values"',
-      defaultValuesNotSpecified: 'Default value not specified',
-      entitySourceRequired: 'Entity Source required',
-      expressionApplyIfOnlyLastOneCanBeEmpty:
-        'Only last expression can have empty "$t(nodeDefEdit.expressionsProp.applyIf)" condition',
-      expressionDuplicate: 'Expression duplicate',
-      expressionRequired: 'Expression required',
-      formulaInvalid: 'Formula is invalid',
-      keysEmpty: 'Define at least one key attribute',
-
-      keysExceedingMax: 'Exceeding maximum number of key attributes',
-      maxFileSizeInvalid: 'Max file size must be greater than 0 and less than {{max}}',
-      nameInvalid:
-        'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
-      taxonomyRequired: 'Taxonomy is required',
-      validationsInvalid: 'Invalid "Validations"',
-      countMaxInvalid: 'Invalid "Max count"',
-      countMinInvalid: 'Invalid "Min count"',
-    },
-
-    record: {
-      keyDuplicate: 'Duplicate record key',
-      entityKeyDuplicate: 'Duplicate key',
-      entityKeyValueNotSpecified: 'Key value for "{{keyDefName}}" not specified',
-      missingAncestorForEntity: 'Cannot find "{{ancestorName}}" with these keys: {{keyValues}}',
-      oneOrMoreInvalidValues: 'One or more values are invalid',
-      uniqueAttributeDuplicate: 'Duplicate value',
-      valueInvalid: 'Invalid value',
-      valueRequired: 'Required value',
-    },
-
-    recordClone: {
-      differentKeyAttributes: 'Key attributes are different in Cycle {{cycleFrom}} and Cycle {{cycleTo}}',
-    },
-
-    surveyInfoEdit: {
-      langRequired: 'Language is required',
-      srsRequired: 'Spatial Reference System is required',
-      cycleRequired: 'Cycle is required',
-      cyclesRequired: 'At least one cycle must be defined',
-      cyclesExceedingMax: 'A survey can have at most 10 cycles',
-      cycleDateStartBeforeDateEnd: 'Cycle start date must be before its end date',
-      cycleDateStartAfterPrevDateEnd: 'Cycle start date must be after previous cycle end date',
-      cycleDateStartInvalid: 'Cycle start date is invalid',
-      cycleDateStartMandatory: 'Cycle start date is mandatory',
-      cycleDateEndInvalid: 'Cycle end date is invalid',
-      cycleDateEndMandatoryExceptForLastCycle: 'Cycle end date is mandatory for all but the last cycle',
-      fieldManualLinksInvalid: 'Field manual link is invalid',
-    },
-
-    surveyLabelsImport: {
-      invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
-      cannotFindNodeDef: "Cannot find attribute or entity definition with name '{{name}}'",
-    },
-
-    taxonomyEdit: {
-      codeChangedAfterPublishing: `Published code has changed: '{{oldCode}}' => '{{newCode}}'`,
-      codeDuplicate: 'Duplicate code {{value}}; $t(validationErrors.rowsDuplicate)',
-      codeRequired: 'Code is required',
-      familyRequired: 'Family is required',
-      genusRequired: 'Genus is required',
-      scientificNameDuplicate: 'Duplicate scientific name {{value}}; $t(validationErrors.rowsDuplicate)',
-      scientificNameRequired: 'Scientific name is required',
-      taxaEmpty: 'Empty taxa',
-      vernacularNamesDuplicate: `Duplicate vernacular name '{{name}}' for language '{{lang}}'`,
-    },
-
-    taxonomyImportJob: {
-      duplicateExtraPropsColumns: 'Duplicate Extra Info columns: {{duplicateColumns}}',
-      invalidExtraPropColumn: 'Invalid Extra Info column name "{{columnName}}": it cannot be a reserved word',
-      missingRequiredColumns: 'Missing required column(s): {{columns}}',
-    },
-
-    user: {
-      emailDuplicate: 'User with same email already exists',
-      emailRequired: 'Email is required',
-      emailInvalid: 'Email is invalid',
-      emailNotFound: 'Email not found',
-      groupRequired: 'Group is required',
-      nameRequired: 'Name is required',
-      titleRequired: 'Title is required',
-      passwordRequired: 'Password is required',
-      passwordInvalid: 'Password should not contain white spaces',
-      passwordUnsafe:
-        'Password should be at least 8 characters long and contain lowercase characters, uppercase characters and numbers',
-      passwordsDoNotMatch: `Passwords don't match`,
-
-      userNotFound: 'User not found. Make sure email and password are correct',
-      passwordChangeRequired: 'Password change required',
-      passwordResetNotAllowedWithPendingInvitation: `Password reset not allowed: user has been invited to a survey but the invitation hasn't been accepted yet`,
-      twoFactorTokenRequired: 'Verification code is required',
-    },
-
-    userAccessRequest: {
-      countryRequired: 'Country is required',
-      emailRequired: '$t(validationErrors.user.emailRequired)',
-      firstNameRequired: 'First name is required',
-      institutionRequired: 'Institution is required',
-      lastNameRequired: 'Last name is required',
-      purposeRequired: 'Purpose is required',
-      surveyNameRequired: 'Survey name is required',
-      invalidRequest: 'Invalid user access request',
-      userAlreadyExisting: 'User with email {{email}} already existing',
-      requestAlreadySent: `Access request for user with email {{email}} already sent`,
-      invalidReCaptcha: 'Invalid ReCaptcha',
-    },
-
-    userAccessRequestAccept: {
-      accessRequestAlreadyProcessed: 'User access request already processed',
-      accessRequestNotFound: 'User access request not found',
-      emailRequired: '$t(validationErrors.user.emailRequired)',
-      emailInvalid: '$t(validationErrors.user.emailInvalid)',
-      roleRequired: 'Role is required',
-      surveyNameRequired: 'Survey name is required',
-    },
-
-    userPasswordChange: {
-      oldPasswordRequired: 'Old password is required',
-      oldPasswordWrong: 'Old password is wrong',
-      newPasswordRequired: 'New password is required',
-      confirmPasswordRequired: 'Confirm password is required',
-      confirmedPasswordNotMatching: 'New password and confirm password do not match',
-    },
-
-    userInvite: {
-      messageContainsLinks: 'Invitation message cannot contain links',
-      messageTooLong: 'Invitation message is too long (maximum {{maxLength}} characters)',
-    },
-
-    user2FADevice: {
-      nameDuplicate: 'Device with same name already exists',
-      nameRequired: 'Device name is required',
-    },
   },
 
   record: {
@@ -1801,11 +1415,13 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     qualifier: {
       'default-values': 'default value',
       'default-values-apply-if': 'default value apply if',
+      'editable-if': 'editable if',
       'max-count': 'max count',
       'min-count': 'min count',
       'relevant-if': 'relevant if',
       validations: 'validation rule',
       'validations-apply-if': 'validation rule apply if',
+      'visible-if': 'visibility',
     },
 
     selectAFunction: 'Select a function',
@@ -1817,12 +1433,70 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   },
   urls: {
     openforisWebsite: 'https://www.openforis.org',
-    openforisArenaWebsite: '$t(urls.openforisWebsite)/tools/arena',
+    openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
     supportForum: 'https://openforis.support',
   },
   links: {
-    openforis: `<a href="$t(urls.openforisWebsite)" target="_blank">$t(common.openForis)</a>`,
-    openforisArenaWebsite: `<a href="$t(urls.openforisArenaWebsite)" target="_blank">$t(urls.openforisArenaWebsite)</a>`,
-    supportForum: `<a href="$t(urls.supportForum)" target="_blank">$t(urls.supportForum)</a>`,
+    openforis: `<a href="$t(urls.openforisWebsite)" target="_blank" rel="noopener noreferrer">$t(common.openForis)</a>`,
+    openforisArenaWebsite: `<a href="$t(urls.openforisArenaWebsite)" target="_blank" rel="noopener noreferrer">$t(urls.openforisArenaWebsite)</a>`,
+    supportForum: `<a href="$t(urls.supportForum)" target="_blank" rel="noopener noreferrer">$t(urls.supportForum)</a>`,
+    arenaVideoTutorialsInFaoElearningAcademy: `<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank" rel="noopener noreferrer">FAO elearning Academy</a>`,
+    arenaVideoTutorialsInYouTube: `<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank" rel="noopener noreferrer">YouTube</a>`,
+    arenaInGitHub: `<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>`,
+    arenaRScriptsInGitHub: `<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>`,
+  },
+
+  aiExpression: {
+    title: 'Generate expression from description',
+    hint: 'Describe in plain language what the expression should do. The AI will translate it into Arena syntax. Press Ctrl+Enter to generate.',
+    placeholder: 'e.g. tree height must be greater than 0 and less than 200',
+
+    generate: 'Generate',
+    generating: 'Generating…',
+    use: 'Use this expression',
+    useAnyway: 'Use anyway',
+    tryAgain: 'Try a different description',
+    parseError:
+      'The generated expression did not parse cleanly: {{message}}. You can still apply it and edit by hand, or try rephrasing.',
+
+    explain: {
+      title: 'Explain this expression',
+      thinking: 'Asking the AI to explain this expression…',
+      error: 'Failed to fetch explanation: {{message}}',
+      timeout: 'The AI took too long to respond. Please try again.',
+    },
+  },
+
+  aiTranslation: {
+    translateButton_one: 'Translate to {{count}} other language',
+    translateButton_other: 'Translate to {{count}} other languages',
+    translateButton: 'Translate to other languages',
+
+    success_one: 'Translated to {{count}} language. Review and save.',
+    success_other: 'Translated to {{count}} languages. Review and save.',
+    success: 'Translated. Review and save.',
+
+    failed: 'Translation failed: {{message}}',
+    timeout: 'Translation request timed out. Please try again.',
+  },
+
+  aiActivityLog: {
+    title: 'Activity log summary',
+    summarizeButton: 'Summarize',
+    thinking: 'Aggregating events and asking the AI to summarize…',
+    error: 'Failed to fetch summary: {{message}}',
+  },
+
+  aiChatbot: {
+    open: 'Help & documentation',
+    title: 'Help & documentation',
+    empty: 'Ask me anything about Open Foris Arena.',
+    placeholder: 'Type your question…',
+    send: 'Send',
+    stop: 'Stop',
+    clear: 'Clear',
+    showReasoning: 'Show reasoning',
+    error: 'Chatbot error: {{message}}',
+    language: 'Response language',
   },
 }

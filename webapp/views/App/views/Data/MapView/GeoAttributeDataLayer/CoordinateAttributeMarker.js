@@ -23,6 +23,7 @@ export const CoordinateAttributeMarker = (props) => {
     flyToPreviousPoint,
     markersColor,
     onPopupClose,
+    onPopupOpen,
     onRecordEditClick,
     popupOpen,
     setMarkerByKey,
@@ -37,6 +38,10 @@ export const CoordinateAttributeMarker = (props) => {
   const onDoubleClick = useCallback(() => {
     flyToPoint(data)
   }, [flyToPoint, data])
+
+  const handlePopupOpen = useCallback(() => {
+    onPopupOpen?.(key)
+  }, [key, onPopupOpen])
 
   const content = useMemo(
     () => (
@@ -73,9 +78,16 @@ export const CoordinateAttributeMarker = (props) => {
   )
 
   const eventHandlers = useMemo(
-    () => ObjectUtils.keepNonEmptyProps({ dblclick: onDoubleClick, popupclose: onPopupClose }),
-    [onDoubleClick, onPopupClose]
+    () => ObjectUtils.keepNonEmptyProps({ dblclick: onDoubleClick, popupclose: onPopupClose, popupopen: handlePopupOpen }),
+    [handlePopupOpen, onDoubleClick, onPopupClose]
   )
+
+  const circleMarkerPathOptions = useMemo(
+    () => ({ color: markersColor, fillColor: markersColor, fillOpacity }),
+    [markersColor]
+  )
+
+  const geoJsonStyle = useMemo(() => ({ color: markersColor }), [markersColor])
 
   return (
     <div>
@@ -85,10 +97,8 @@ export const CoordinateAttributeMarker = (props) => {
       {!innerData && (
         <CircleMarker
           center={[latitude, longitude]}
-          color={markersColor}
           eventHandlers={eventHandlers}
-          fillColor={markersColor}
-          fillOpacity={fillOpacity}
+          pathOptions={circleMarkerPathOptions}
           radius={markerRadius}
           ref={setRef}
         >
@@ -97,7 +107,7 @@ export const CoordinateAttributeMarker = (props) => {
       )}
 
       {innerData && (
-        <GeoJSON data={innerData} eventHandlers={eventHandlers} color={markersColor} ref={setRef}>
+        <GeoJSON data={innerData} eventHandlers={eventHandlers} style={geoJsonStyle} ref={setRef}>
           {content}
         </GeoJSON>
       )}
@@ -113,6 +123,7 @@ CoordinateAttributeMarker.propTypes = {
   flyToPreviousPoint: PropTypes.func,
   markersColor: PropTypes.any,
   onPopupClose: PropTypes.func,
+  onPopupOpen: PropTypes.func,
   onRecordEditClick: PropTypes.any,
   popupOpen: PropTypes.bool,
   setMarkerByKey: PropTypes.func,

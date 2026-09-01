@@ -112,13 +112,13 @@ export const init = (app) => {
     }
   })
 
-  app.post(`${uriPrefix}whisp/geojson/csv`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {
+  app.post(`${uriPrefix}whisp/geojson/csv`, AuthMiddleware.requireMapUsePermission, async (req, res) => {
     try {
       const geojson = Request.getBody(req)
       const { token } = await WhishDataProcessor.generateData({ geojson })
       res.json(token)
     } catch (error) {
-      next(error)
+      Response.sendErr(res, error)
     }
   })
 

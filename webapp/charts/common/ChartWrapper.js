@@ -1,6 +1,5 @@
 import './ChartWrapper.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import { ResponsiveContainer } from 'recharts'
 

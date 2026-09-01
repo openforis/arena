@@ -23,6 +23,13 @@ export const WebSocketEvents = {
   // Survey Events
   surveyUpdate: 'surveyUpdate',
 
+  // User events
+  userRoleUpdate: 'userRoleUpdate',
+  userRemovedFromSurvey: 'userRemovedFromSurvey',
+
+  // AI events
+  translationUpdate: 'translationUpdate',
+
   // temp auth token events
   tempLoginSuccessful: 'tempLoginSuccessful',
 }

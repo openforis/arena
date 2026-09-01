@@ -9,6 +9,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as TaxonomyManager from './taxonomyManager'
 import { TaxonComparator } from './taxonComparator'
+import SystemError from '@core/systemError'
 
 const createPredefinedTaxa = (taxonomy) => [
   Taxon.newTaxon({
@@ -27,6 +28,8 @@ const createPredefinedTaxa = (taxonomy) => [
   }),
 ]
 
+const predefinedCodes = new Set([Taxon.unknownCode, Taxon.unlistedCode])
+
 export default class TaxonomyImportManager {
   constructor({ user, surveyId, taxonomy, vernacularLanguageCodes, extraPropsDefs, tx }) {
     this.user = user
@@ -43,6 +46,8 @@ export default class TaxonomyImportManager {
       TaxonomyManager.updateTaxa(this.user, this.surveyId, items, this.tx)
     )
     this.insertedCodes = new Set() // Inserted taxa codes
+    this.insertedScientificNames = new Set() // Inserted taxa scientific names
+    this.seenCodes = new Set() // All codes seen in the imported file
     this.existingTaxaByCode = {} // Existing taxa (indexed by code)
     this.existingTaxaByScientificName = {} // Existing taxa (indexed by scientific name)
   }
@@ -101,7 +106,10 @@ export default class TaxonomyImportManager {
   }
 
   async addTaxonToUpdateBuffer(taxon) {
+    const code = Taxon.getCode(taxon)
+
     if (await this.updateExistingTaxonWithSameCodeIfAny(taxon)) {
+      this.seenCodes.add(code)
       return { success: true }
     }
 
@@ -113,7 +121,9 @@ export default class TaxonomyImportManager {
     // Insert new one
     await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon))
 
-    this.insertedCodes.add(Taxon.getCode(taxon))
+    this.insertedCodes.add(code)
+    this.seenCodes.add(code)
+    this.insertedScientificNames.add(Taxon.getScientificName(taxon))
 
     return { success: true }
   }
@@ -121,11 +131,25 @@ export default class TaxonomyImportManager {
   async finalizeImport() {
     const { user, surveyId } = this
 
+    // Compute published taxa codes absent from the imported file (before adding predefined taxa)
+    const missingPublishedCodes = Object.keys(this.existingTaxaByCode).filter(
+      (code) => !this.seenCodes.has(code) && !predefinedCodes.has(code)
+    )
+
     // Insert predefined taxa (UNL - UNK)
     const predefinedTaxaToInsert = R.pipe(
       createPredefinedTaxa,
       R.filter((taxon) => !this.insertedCodes.has(Taxon.getCode(taxon)))
     )(this.taxonomy)
+
+    for (const predefinedTaxon of predefinedTaxaToInsert) {
+      const scientificName = Taxon.getScientificName(predefinedTaxon)
+      if (this.insertedScientificNames.has(scientificName)) {
+        throw new SystemError('validationErrors:taxonomyImportJob.reservedScientificName', {
+          scientificName,
+        })
+      }
+    }
 
     await Promise.all(predefinedTaxaToInsert.map((predefinedTaxon) => this.addTaxonToUpdateBuffer(predefinedTaxon)))
 
@@ -160,5 +184,7 @@ export default class TaxonomyImportManager {
       true,
       this.tx
     )
+
+    return { missingPublishedCodes }
   }
 }

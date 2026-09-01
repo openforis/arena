@@ -1,0 +1,146 @@
+@use '~@webapp/style/vars' as *;
+
+.app-module {
+  .chain {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 2rem;
+    padding-bottom: 2rem;
+
+    .chain-top-bar {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+
+      .tab-bar {
+        flex: 1;
+      }
+
+      .chain-edit-lock-toggle {
+        flex-shrink: 0;
+      }
+    }
+
+    .form-item,
+    .labels-editor.with-label {
+      height: auto;
+      white-space: nowrap;
+      grid-template-columns: 0.3fr 0.65fr;
+    }
+
+    .dropdown,
+    .dropdown-wrapper {
+      width: 30rem;
+    }
+
+    .button-bar {
+      align-self: center;
+
+      .chain-summary-download-btn {
+        position: absolute;
+        left: 0;
+      }
+    }
+
+    .rstudio-accordion {
+      margin: auto;
+
+      .content {
+        .form-item {
+          display: flex;
+        }
+
+        display: flex;
+        gap: 3rem;
+      }
+    }
+
+    .records-count-wrapper,
+    .records-count {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .chain-basic-props {
+      display: flex;
+      flex-direction: column;
+      justify-self: center;
+      gap: 0.5rem;
+      width: 55rem;
+    }
+
+    .chain-sampling-design {
+      display: flex;
+      flex-flow: wrap;
+      justify-content: center;
+
+      .form {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        gap: 0;
+
+        .form-item {
+          grid-template-columns: 12rem 1fr;
+          height: 3rem;
+        }
+
+        &.form-right {
+          width: 35rem;
+
+          .form-item {
+            grid-template-columns: 20rem 1fr;
+
+            &.reporting-area {
+              width: 30rem;
+            }
+          }
+        }
+      }
+    }
+
+    .form_row {
+      display: flex;
+      gap: 3rem;
+
+      .form-item {
+        display: flex;
+      }
+
+      &.checkbox-with-info {
+        gap: 0rem;
+        align-items: center;
+      }
+
+      &.p-value {
+        margin-left: 16%;
+      }
+    }
+
+    .entity-selector,
+    .attributes-selector {
+      width: 30rem;
+    }
+
+    .entity-selector-wrapper {
+      display: flex;
+
+      .warning-badge {
+        position: relative;
+      }
+    }
+
+    .dimensions-selector,
+    .filter {
+      width: 30rem;
+    }
+
+    .dropdown-wrapper.p-value-dropdown {
+      width: 7rem;
+
+      .dropdown {
+        width: 7rem;
+      }
+    }
+  }
+}

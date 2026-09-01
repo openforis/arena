@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -16,7 +15,7 @@ import { State } from './store'
 import { TreeSelectViewMode } from '@webapp/model'
 
 const ButtonBar = (props) => {
-  const { state, Actions } = props
+  const { state, Actions, readOnly = false } = props
 
   const nodeDef = State.getNodeDef(state)
   const dirty = State.isDirty(state)
@@ -31,12 +30,11 @@ const ButtonBar = (props) => {
   const previousDefUuid = Actions.getSiblingNodeDefUuid({ state, offset: -1 })
   const nextDefUuid = Actions.getSiblingNodeDefUuid({ state, offset: 1 })
 
-  const saveDisabled = !dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))
+  const saveDisabled = readOnly || !dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))
 
   const canNavigateNodeDefs =
     (!NodeDef.isRoot(nodeDef) || viewModeAllNodeDefs) &&
     !NodeDef.isTemporary(nodeDef) &&
-    !NodeDef.isAnalysis(nodeDef) &&
     (!(NodeDef.isEntity(nodeDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(nodeDef)) || viewModeAllNodeDefs)
 
   return (
@@ -99,8 +97,8 @@ const ButtonBar = (props) => {
       )}
       {!NodeDef.isRoot(nodeDef) && !NodeDef.isTemporary(nodeDef) && (
         <ButtonDelete
-          disabled={dirty}
           testId={TestId.nodeDefDetails.deleteBtn}
+          disabled={readOnly}
           onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef, navigate))}
         />
       )}
@@ -111,6 +109,7 @@ const ButtonBar = (props) => {
 ButtonBar.propTypes = {
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
+  readOnly: PropTypes.bool,
 }
 
 export default ButtonBar

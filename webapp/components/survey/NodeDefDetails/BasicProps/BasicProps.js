@@ -17,6 +17,8 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import { NodeDefExpressionsProp } from '../ExpressionsProp'
+import { NodeDefSingleExpressionProp } from '../ExpressionsProp/NodeDefSingleExpressionProp'
+import { useNodeDefEditReadOnly } from '../store'
 
 import { useBasicProps } from './store'
 
@@ -28,6 +30,7 @@ import CoordinateProps from '../CoordinateProps'
 import DecimalProps from '../DecimalProps'
 import FileProps from '../FileProps'
 import FormHeaderProps from '../FormHeaderProps'
+import IntegerProps from '../IntegerProps'
 import TaxonProps from '../TaxonProps'
 import TextProps from '../TextProps'
 import AnalysisProps from '../AnalysisProps'
@@ -39,6 +42,7 @@ const basicPropsComponentByType = {
   [NodeDef.nodeDefType.decimal]: DecimalProps,
   [NodeDef.nodeDefType.file]: FileProps,
   [NodeDef.nodeDefType.formHeader]: FormHeaderProps,
+  [NodeDef.nodeDefType.integer]: IntegerProps,
   [NodeDef.nodeDefType.taxon]: TaxonProps,
   [NodeDef.nodeDefType.text]: TextProps,
 }
@@ -47,6 +51,7 @@ const BasicProps = (props) => {
   const { state, Actions, editingFromDesigner } = props
 
   const i18n = useI18n()
+  const readOnly = useNodeDefEditReadOnly()
 
   const {
     nodeDef,
@@ -56,6 +61,7 @@ const BasicProps = (props) => {
     displayAsTableDisabled,
     displayInParentPageDisabled,
     keyEditDisabled,
+    maxKeysCountReached,
     multipleEditDisabled,
     entitySourceHierarchy,
     renderType,
@@ -69,7 +75,10 @@ const BasicProps = (props) => {
     includedInClone,
     includeInCloneDisabled,
     canHaveAutoIncrementalKey,
+    canAutoCreateMinCountItems,
     canIncludeInMultipleEntitySummary,
+    canBeQualifier,
+    hasUserGroups,
   } = useBasicProps(props)
 
   return (
@@ -78,6 +87,7 @@ const BasicProps = (props) => {
         inputFieldIdPrefix={TestId.nodeDefDetails.nodeDefLabels('')}
         labels={NodeDef.getLabels(nodeDef)}
         onChange={(labels) => Actions.setProp({ state, key: NodeDef.propKeys.labels, value: labels })}
+        readOnly={readOnly}
       />
 
       <LabelsEditor
@@ -86,6 +96,7 @@ const BasicProps = (props) => {
         labels={NodeDef.getDescriptions(nodeDef)}
         onChange={(descriptions) => Actions.setProp({ state, key: NodeDef.propKeys.descriptions, value: descriptions })}
         inputType="textarea"
+        readOnly={readOnly}
       />
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (
@@ -94,11 +105,17 @@ const BasicProps = (props) => {
             <Checkbox
               id={TestId.nodeDefDetails.nodeDefKey}
               checked={NodeDef.isKey(nodeDef)}
-              disabled={keyEditDisabled}
+              info={
+                !NodeDef.isKey(nodeDef) && maxKeysCountReached
+                  ? 'nodeDefEdit.basicProps.maxKeysCountReached'
+                  : undefined
+              }
+              infoParams={maxKeysCountReached ? { maxKeysCount: NodeDef.maxKeyAttributes } : undefined}
+              disabled={readOnly || keyEditDisabled}
               onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.key, value })}
             />
             {enumerator && (
-              <span>
+              <span className="info-label">
                 {i18n.t('nodeDefEdit.basicProps.enumerator.label')}
                 <ButtonIconInfo title="nodeDefEdit.basicProps.enumerator.info" />
               </span>
@@ -110,6 +127,7 @@ const BasicProps = (props) => {
               >
                 <Checkbox
                   checked={NodeDef.isAutoIncrementalKey(nodeDef)}
+                  disabled={readOnly}
                   onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.autoIncrementalKey, value })}
                 />
               </FormItem>
@@ -125,23 +143,73 @@ const BasicProps = (props) => {
               <Checkbox
                 id={TestId.nodeDefDetails.nodeDefMultiple}
                 checked={NodeDef.isMultiple(nodeDef)}
-                disabled={multipleEditDisabled}
+                disabled={readOnly || multipleEditDisabled}
                 onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
               />
-              {NodeDef.isMultipleEntity(nodeDef) && (
-                <FormItem info="nodeDefEdit.basicProps.enumerate.info" label="nodeDefEdit.basicProps.enumerate.label">
+              {canAutoCreateMinCountItems && (
+                <FormItem
+                  info="nodeDefEdit.basicProps.autoCreateMinCountItems.info"
+                  label="nodeDefEdit.basicProps.autoCreateMinCountItems.label"
+                >
                   <div>
                     <Checkbox
-                      id={TestId.nodeDefDetails.nodeDefEnumerate}
-                      checked={NodeDef.isEnumerate(nodeDef)}
-                      onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.enumerate, value })}
+                      id={TestId.nodeDefDetails.nodeDefAutoCreateMinCountItems}
+                      checked={NodeDef.isAutoCreateMinCountItems(nodeDef)}
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        Actions.setProp({ state, key: NodeDef.propKeys.autoCreateMinCountItems, value })
+                      }
                     />
                   </div>
                 </FormItem>
               )}
             </div>
           </FormItem>
+
+          {NodeDef.isMultipleEntity(nodeDef) && (
+            <FormItem info="nodeDefEdit.basicProps.enumerate.info" label="nodeDefEdit.basicProps.enumerate.label">
+              <div className="form-item_body">
+                <Checkbox
+                  id={TestId.nodeDefDetails.nodeDefEnumerate}
+                  checked={NodeDef.isEnumerate(nodeDef)}
+                  disabled={readOnly || !!NodeDef.getEnumeratingItemsExpression(nodeDef)}
+                  onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.enumerate, value })}
+                />
+                {NodeDef.isEnumerate(nodeDef) && (
+                  <FormItem
+                    info="nodeDefEdit.basicProps.enumeratingItemsExpression.info"
+                    label="nodeDefEdit.basicProps.enumeratingItemsExpression.label"
+                  >
+                    <NodeDefSingleExpressionProp
+                      excludeCurrentNodeDef
+                      isBoolean={false}
+                      nodeDef={nodeDef}
+                      onChange={({ query: value }) =>
+                        Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.enumeratingItemsExpression, value })
+                      }
+                      qualifier="enumeratingItemsExpression"
+                      query={NodeDef.getEnumeratingItemsExpression(nodeDef)}
+                      validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.enumeratingItemsExpression)(
+                        validation
+                      )}
+                    />
+                  </FormItem>
+                )}
+              </div>
+            </FormItem>
+          )}
         </>
+      )}
+
+      {((canBeQualifier && hasUserGroups) || NodeDef.isQualifier(nodeDef)) && ( // allow to edit qualifier if it is already set, even if not applicable, so it can be unset
+        <FormItem label="nodeDefEdit.basicProps.qualifier.label">
+          <Checkbox
+            checked={NodeDef.isQualifier(nodeDef)}
+            disabled={readOnly}
+            info="nodeDefEdit.basicProps.qualifier.info"
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.qualifier, value })}
+          />
+        </FormItem>
       )}
 
       {NodeDef.getType(nodeDef) in basicPropsComponentByType &&
@@ -150,6 +218,7 @@ const BasicProps = (props) => {
       {displayAsEnabled && editingFromDesigner && (
         <FormItem label="nodeDefEdit.basicProps.displayAs">
           <ButtonGroup
+            disabled={readOnly}
             selectedItemKey={renderType}
             onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
             items={[
@@ -170,6 +239,7 @@ const BasicProps = (props) => {
       {displayInEnabled && editingFromDesigner && (
         <FormItem label="nodeDefEdit.basicProps.displayIn">
           <ButtonGroup
+            disabled={readOnly}
             selectedItemKey={displayIn}
             onChange={(value) =>
               Actions.setLayoutProp({
@@ -198,6 +268,7 @@ const BasicProps = (props) => {
         <FormItem label="nodeDefEdit.basicProps.includedInRecordsList.label">
           <Checkbox
             checked={includeInMultipleEntitySummary}
+            disabled={readOnly}
             info="nodeDefEdit.basicProps.includedInRecordsList.info"
             validation={Validation.getFieldValidation(NodeDefLayout.keys.includedInMultipleEntitySummary)(validation)}
             onChange={(value) =>
@@ -210,13 +281,13 @@ const BasicProps = (props) => {
       <CyclesSelector
         cyclesKeysSelectable={cyclesKeysParent}
         cyclesKeysSelected={cyclesNodeDef}
-        disabled={NodeDef.isRoot(nodeDef) || !editingFromDesigner || cyclesKeysParent.length <= 1}
+        disabled={readOnly || NodeDef.isRoot(nodeDef) || !editingFromDesigner || cyclesKeysParent.length <= 1}
         onChange={(cycles) => Actions.setProp({ state, key: NodeDef.propKeys.cycles, value: cycles })}
       >
         {!NodeDef.isLayoutElement(nodeDef) && (
           <Checkbox
             checked={includedInClone}
-            disabled={includeInCloneDisabled}
+            disabled={readOnly || includeInCloneDisabled}
             label="nodeDefEdit.basicProps.includedInClonedData"
             onChange={(value) =>
               Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.excludedInClone, value: !value })
@@ -229,6 +300,7 @@ const BasicProps = (props) => {
         <>
           <FormItem label="nodeDefEdit.basicProps.entitySource">
             <EntitySelector
+              disabled={readOnly}
               hierarchy={entitySourceHierarchy}
               nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}
               validation={Validation.getFieldValidation(NodeDef.keys.parentUuid)(validation)}
@@ -246,6 +318,7 @@ const BasicProps = (props) => {
             nodeDefUuidContext={NodeDef.getUuid(nodeDef)}
             isContextParent={false}
             hideAdvanced
+            readOnly={readOnly}
           />
         </>
       )}

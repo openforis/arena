@@ -1,61 +1,20 @@
-import * as R from 'ramda'
-
 import { Objects } from '@openforis/arena-core'
-import { DB, BaseProtocol, TableNodeDef, Schemata } from '@openforis/arena-server'
+import {
+  DB,
+  BaseProtocol,
+  TableNodeDef,
+  Schemata,
+  NodeDefRepository as NodeDefRepositoryServer,
+} from '@openforis/arena-server'
 
-import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as ServerDB from '@server/db'
+import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
 import * as DbUtils from '@server/db/dbUtils'
 
 const { getSchemaSurvey } = Schemata
 
-// advanced properties to track as draft (to be used when publishing record)
-const advancedPropKeysDraftToTrack = [
-  NodeDef.keysPropsAdvanced.applicable,
-  NodeDef.keysPropsAdvanced.defaultValues,
-  NodeDef.keysPropsAdvanced.fileNameExpression,
-  NodeDef.keysPropsAdvanced.validations,
-]
-
-const rowPropertyByAdvancedPropKeys = {
-  [NodeDef.keysPropsAdvanced.applicable]: A.camelize(NodeDef.keys.draftAdvancedApplicable),
-  [NodeDef.keysPropsAdvanced.defaultValues]: A.camelize(NodeDef.keys.draftAdvancedDefaultValues),
-  [NodeDef.keysPropsAdvanced.fileNameExpression]: A.camelize(NodeDef.keys.draftAdvancedFileNameExpression),
-  [NodeDef.keysPropsAdvanced.validations]: A.camelize(NodeDef.keys.draftAdvancedValidations),
-}
-
-const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) => {
-  const rowUpdated = { ...row }
-
-  if (advanced || backup) {
-    if (!R.isEmpty(rowUpdated.props_advanced_draft)) {
-      // there are draft advanced props to merge with "published" advanced props
-      rowUpdated[A.camelize(NodeDef.keys.draftAdvanced)] = true
-
-      // set updated props flags
-      advancedPropKeysDraftToTrack.forEach((advancedPropKey) => {
-        if (rowUpdated.props_advanced_draft[advancedPropKey]) {
-          rowUpdated[rowPropertyByAdvancedPropKeys[advancedPropKey]] = true
-        }
-      })
-
-      if (draft && !backup) {
-        // merge props_advanced and props_advanced_draft into props_advanced
-        rowUpdated.props_advanced = R.mergeLeft(row.props_advanced_draft, row.props_advanced)
-        delete rowUpdated.props_advanced_draft
-      }
-    }
-    if ((!backup && !draft) || R.isEmpty(rowUpdated.props_advanced_draft)) {
-      // ignore props_advanced_draft
-      delete rowUpdated.props_advanced_draft
-    }
-  } else {
-    delete rowUpdated.props_advanced
-    delete rowUpdated.props_advanced_draft
-  }
-  return ServerDB.transformCallback(rowUpdated, draft, true, backup)
-}
+const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) =>
+  NodeDefRepositoryServer.rowTransformCallback({ draft, advanced, backup })(row)
 
 const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, virtual, 
   ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, 
@@ -85,42 +44,56 @@ export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
 
 export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }, client = DB) => {
   const schema = getSchemaSurvey(surveyId)
+  // Build values and query for batch insert with RETURNING *
+  const columns = [
+    'parent_uuid',
+    'uuid',
+    'type',
+    'props',
+    'props_draft',
+    'props_advanced',
+    'props_advanced_draft',
+    'meta',
+    'analysis',
+    'virtual',
+  ]
+  const values = nodeDefs.map((nodeDef) => {
+    const { props, propsDraft, propsAdvanced, propsAdvancedDraft } = NodeDef.getAllPropsAndAllPropsDraft({
+      backup,
+    })(nodeDef)
+    return [
+      NodeDef.getParentUuid(nodeDef),
+      nodeDef.uuid,
+      NodeDef.getType(nodeDef),
+      props,
+      propsDraft,
+      propsAdvanced,
+      propsAdvancedDraft,
+      NodeDef.getMeta(nodeDef),
+      NodeDef.isAnalysis(nodeDef),
+      NodeDef.isVirtual(nodeDef),
+    ]
+  })
+  // Build parameterized query
+  const valuePlaceholders = values
+    .map((row, rowIdx) => {
+      const rowPlaceholders = row
+        .map((_, colIdx) => {
+          const placeholderIdx = rowIdx * columns.length + colIdx + 1
+          return `$${placeholderIdx}`
+        })
+        .join(', ')
+      return `(${rowPlaceholders})`
+    })
+    .join(', ')
+  const query = `
+    INSERT INTO ${schema}.node_def
+      (${columns.join(', ')})
+    VALUES ${valuePlaceholders}
+    RETURNING *`
+  const flatValues = values.flat()
 
-  return client.none(
-    DbUtils.insertAllQuery(
-      schema,
-      'node_def',
-      [
-        'parent_uuid',
-        'uuid',
-        'type',
-        'props',
-        'props_draft',
-        'props_advanced',
-        'props_advanced_draft',
-        'meta',
-        'analysis',
-        'virtual',
-      ],
-      nodeDefs.map((nodeDef) => {
-        const { props, propsDraft, propsAdvanced, propsAdvancedDraft } = NodeDef.getAllPropsAndAllPropsDraft({
-          backup,
-        })(nodeDef)
-        return [
-          NodeDef.getParentUuid(nodeDef),
-          nodeDef.uuid,
-          NodeDef.getType(nodeDef),
-          props,
-          propsDraft,
-          propsAdvanced,
-          propsAdvancedDraft,
-          NodeDef.getMeta(nodeDef),
-          NodeDef.isAnalysis(nodeDef),
-          NodeDef.isVirtual(nodeDef),
-        ]
-      })
-    )
-  )
+  return client.map(query, flatValues, (row) => dbTransformCallback({ row, draft: true, advanced: true }))
 }
 
 // ============== READ
@@ -136,27 +109,38 @@ export const countNodeDefsBySurveyId = async ({ surveyId, draft = true }, client
     (row) => Number(row.count)
   )
 
+// Cheap survey-level check for whether any node def expression references a function whose
+// result depends on the currently logged in user (e.g. userProp).
+// By default, only published (props_advanced) expressions are checked; pass draft = true to
+// also consider draft (props_advanced_draft) expressions.
+export const fetchSurveyHasUserDependentExpressions = async ({ surveyId, draft = false }, client = DB) => {
+  const functionsPattern = userDependentFunctionNames.join('|')
+  const propsAdvancedExpr = draft ? '(props_advanced || props_advanced_draft)' : 'props_advanced'
+  const { exists } = await client.one(String.raw`
+    SELECT EXISTS (
+      SELECT 1 FROM ${getSchemaSurvey(surveyId)}.node_def
+      WHERE deleted = false
+        AND (${propsAdvancedExpr})::text ~ '\y(${functionsPattern})\s*\('
+    ) AS exists
+  `)
+  return exists
+}
+
 export const fetchNodeDefsBySurveyId = async (
   { surveyId, cycle, draft, advanced = false, includeDeleted = false, backup = false, includeAnalysis = true },
   client = DB
 ) =>
-  client.map(
-    `
-    SELECT ${nodeDefSelectFields}
-    FROM ${getSchemaSurvey(surveyId)}.node_def 
-    WHERE TRUE
-      ${
-        cycle
-          ? `--filter by cycle
-          AND ${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, draft, '', false)} @> $1`
-          : ''
-      } 
-      ${!backup && !draft ? " AND props <> '{}'::jsonb" : ''}
-      ${!includeDeleted ? ' AND deleted IS NOT TRUE' : ''}
-      ${!includeAnalysis ? ' AND analysis IS NOT TRUE' : ''}
-    ORDER BY id`,
-    [JSON.stringify(cycle || null)],
-    (row) => dbTransformCallback({ row, draft, advanced, backup })
+  NodeDefRepositoryServer.getNodeDefsBySurveyId(
+    {
+      surveyId,
+      cycle,
+      draft,
+      advanced,
+      includeAnalysis,
+      includeDeleted,
+      backup,
+    },
+    client
   )
 
 export const fetchRootNodeDef = async (surveyId, draft, client = DB) =>
@@ -225,7 +209,7 @@ export const updateNodeDefProps = async (
 export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client = DB) =>
   client.tx(async (tx) => {
     const schema = getSchemaSurvey(surveyId)
-    const nodedefsUpdated = await tx.batch(
+    const nodeDefsUpdated = await tx.batch(
       nodeDefs.map(async (nodeDef) => {
         const { nodeDefUuid, props = {}, propsAdvanced = {} } = nodeDef
         return tx.one(
@@ -243,7 +227,7 @@ export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client =
         )
       })
     )
-    return nodedefsUpdated
+    return nodeDefsUpdated
   })
 
 export const updateNodeDefTypeAndProps = async (
@@ -473,13 +457,11 @@ export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, cli
 
 /**
  * Fetches all virtual entities.
- *
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
- * @param {number} [params.offset=0] - The select query offset.
- * @param {number} [params.limit=null] - The select query limit.
- * @param {BaseProtocol} [client=db] - The database client.
- *
+ * @param {number} [params.offset] - The select query offset.
+ * @param {number} [params.limit] - The select query limit.
+ * @param {BaseProtocol} [client] - The database client.
  * @returns {Promise<any[]>} - The result promise.
  */
 export const fetchVirtualEntities = async (params, client = DB) => {
@@ -504,11 +486,9 @@ export const fetchVirtualEntities = async (params, client = DB) => {
 
 /**
  * Count virtual entities.
- *
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
- * @param {BaseProtocol} [client=db] - The database client.
- *
+ * @param {BaseProtocol} [client] - The database client.
  * @returns {Promise<number>} - The result promise.
  */
 export const countVirtualEntities = async (params, client = DB) => {

@@ -28,7 +28,6 @@ export const getJsTypeBySqlType = (sqlType) => jsTypeBySqlType[sqlType] || 'unkn
  * Generates an alias from the specified name, splitting it into words
  * and getting the first letter of each word, to make it more or less human readable,
  * followed by a short hash of the name, to make it (almost) unique, but still short.
- *
  * @param {!string} name - The name used to generate the alias.
  * @returns {string} - The generated alias.
  */
@@ -44,7 +43,12 @@ export const createAlias = (name) =>
     StringUtils.hashCode(name)
   }`
 
-export const addAlias = (alias, ...columnNames) => columnNames.map((columnName) => `${alias}.${columnName}`)
+const quoteIdentifier = (identifier) =>
+  // do not quote '*' (used in count(*)) or identifiers starting with '_' (used for aliases), to avoid breaking queries
+  identifier === '*' || identifier.startsWith('_') ? identifier : StringUtils.quoteDouble(identifier)
+
+export const addAlias = (alias, ...columnNames) =>
+  columnNames.map((columnName) => `${quoteIdentifier(alias)}.${quoteIdentifier(columnName)}`)
 
 // Json
 export const jsonAgg = (expression, orderByColumns = []) => {

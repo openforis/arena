@@ -15,7 +15,7 @@ const urlBySource = {
 
 const createChunkProcessor =
   ({ onUploadProgress, newSurvey }) =>
-  async ({ chunk, totalChunks, content }) => {
+  async ({ chunk, content, totalChunks, totalFileSize }) => {
     const { fileId, source, ...surveyObj } = newSurvey
 
     const formData = objectToFormData({
@@ -23,6 +23,7 @@ const createChunkProcessor =
       file: content,
       chunk,
       totalChunks,
+      totalFileSize,
       survey: JSON.stringify(surveyObj),
     })
     const { data } = await axios.post(urlBySource[source], formData, {
@@ -48,7 +49,7 @@ const createOnErrorHandler =
 
 export const useOnImport = ({ newSurvey, setNewSurvey }) =>
   useCallback(
-    ({ startFromChunk = 1, onUploadProgress }) => {
+    ({ startFromChunk = 1, chunkSize, onUploadProgress }) => {
       const { file } = newSurvey
 
       // reset upload progress (hide progress bar)
@@ -59,7 +60,7 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) =>
         const chunkProcessor = createChunkProcessor({ onUploadProgress, newSurvey })
         const onError = createOnErrorHandler({ setNewSurvey, reject })
         const onComplete = createOnCompleteHandler({ setNewSurvey, resolve })
-        fileProcessor = new FileProcessor({ file, chunkProcessor, onError, onComplete })
+        fileProcessor = new FileProcessor({ file, chunkSize, chunkProcessor, onError, onComplete })
       })
       fileProcessor.start(startFromChunk)
       return { promise, processor: fileProcessor }

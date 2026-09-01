@@ -15,7 +15,12 @@ export default {
   },
   dataImport: {
     importFromMobileNotAllawed: 'Data import from Arena Mobile not allowed',
+    invalidNodeInRecord:
+      'Invalid node in record "{{recordUuid}}", node "{{nodeUuid}}" with node definition "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'No records found in the import file or wrong file format',
+    pendingImportFileNotFoundOrExpired:
+      'The previously uploaded file cannot be found anymore; it may have expired. Please upload it again.',
+    recordOwnedByAnotherUser: 'Cannot update record "{{recordKeyValues}}" as it is owned by another user',
   },
   entryDataNotFound: 'Entry data not found: {{entryName}}',
   expression: {
@@ -25,9 +30,11 @@ export default {
   functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
   functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
   generic: 'Unexpected error: {{text}}',
+  geoWhispApiError: 'The Whisp service is temporarily unavailable.',
   importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
   invalidType: 'Invalid type {{type}}',
   jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
+  jobOrphanedOnRestart: 'The job was interrupted by a server restart. Please try again.',
   paramIsRequired: 'Param {{param}} is required',
   unableToFindParent: 'Unable to find parent of {{name}}',
   unableToFindNode: 'Unable to find node with name {{name}}',
@@ -41,12 +48,51 @@ export default {
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating); error evaluating expression in node {{nodeDefName}}: {{details}}',
   },
+  recordPrintableExport: {
+    missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',
+    entityNotFound: 'Entity not found for the specified export',
+  },
   sessionExpiredRefreshPage: `Session could have expired.
 Try to refresh the page.`,
   survey: {
     nodeDefNameNotFound: 'Node definition not found: {{name}}',
+    dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
   },
   unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
+  // AI gateway errors
+  aiNotConfigured:
+    'AI is not configured. Set a personal provider in AI Settings or ask your administrator to configure a default.',
+  aiFeaturesDisabled: 'AI features are disabled on this deployment.',
+  aiFeatureDisabled: 'AI feature "{{feature}}" is disabled.',
+  aiPromptTooLarge: 'AI prompt is too large ({{size}} chars; limit {{limit}}).',
+  aiInputTooLong: 'AI input field "{{field}}" exceeds the {{limit}}-character limit.',
+  aiSchemaMissing: 'AI structured-output schema is missing for feature "{{feature}}".',
+  aiProviderInvalid: 'Unsupported AI provider: {{provider}}.',
+  aiModelMissing: 'AI model identifier is required.',
+  aiApiKeyMissing: 'API key is required for provider {{provider}}.',
+  aiBaseUrlMissing: 'A base URL is required for the openai-compatible provider.',
+  aiModelListFailed: 'Could not list models from the provider: {{message}}',
+  aiExpressionDescriptionMissing: 'Please describe the expression you want in plain language.',
+  aiExpressionTypeInvalid: 'Unknown expression kind: {{expressionType}}.',
+  aiExpressionNodeDefMissing: 'Cannot generate an expression without a target field.',
+  aiExpressionNodeDefNotFound: 'Could not find the target field (uuid {{nodeDefUuid}}).',
+  aiExpressionExpressionMissing: 'Cannot explain an empty expression.',
+  aiTranslationSocketMissing: 'WebSocket not connected. Please wait a moment and try again.',
+  aiTranslationSourceLangMissing: 'Source language is required for translation.',
+  aiTranslationTargetLangsMissing: 'At least one target language is required for translation.',
+  aiTranslationItemsMissing: 'Nothing to translate.',
+  aiTranslationTooManyItems: 'Too many items in one batch ({{count}}); the limit is {{limit}}.',
+  aiActivityLogSurveyMissing: 'A survey is required to summarize the activity log.',
+  aiChatbotDisabled: 'The documentation chatbot is disabled on this deployment.',
+  aiChatbotUpstreamError: 'The documentation chatbot is temporarily unavailable. Please try again in a moment.',
+  aiChatbotPayloadTooLarge: 'Your conversation is too large. Clear the chat and try a shorter question.',
+  userCannotDeleteHasMessages:
+    'This user cannot be deleted: they authored {{count}} message(s); delete or reassign them first',
+  userCannotDeleteLastSystemAdmin: 'This user cannot be deleted: they are the last system administrator',
+  userCannotDeleteOwnsSurveys: 'This user cannot be deleted: they own {{count}} survey(s); transfer ownership first',
+  userCannotDeleteSelf: 'You cannot delete your own user account',
+  userEmailInvalid:
+    'The invitation email could not be delivered to {{email}}; please check that the address is correct',
   userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
   userHasRole: 'The given user has already a role in this survey',
   userHasRole_other: 'The given users have already a role in this survey',
@@ -54,4 +100,5 @@ Try to refresh the page.`,
   userIsAdmin: 'The given user is already a system administrator',
   userNotAllowedToChangePref: 'User not allowed to change pref',
   userNotAuthorized: 'User {{userName}} is not authorized',
+  userNotFound: 'User not found: {{userUuid}}',
 }

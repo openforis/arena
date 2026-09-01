@@ -1,6 +1,6 @@
 import './RScriptEditor.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,22 +12,85 @@ import { ScriptEditor } from '@webapp/components/ScriptEditor'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 
-const RScriptEditor = (props) => {
-  const [defaultLocalScript, setDefaultLocalScript] = useState('')
+const codesTextPrefix = '# __CODES__'
+const maxCodesLineLength = 200
 
+const getDefaultScript = ({ survey, nodeDef }) => {
+  const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+  const parentDefName = NodeDef.getName(parentDef) || 'PARENT'
+  const nodeDefName = NodeDef.getName(nodeDef) || 'NAME'
+  return `${parentDefName}$${nodeDefName} <- NA`
+}
+
+const generateCodesPairs = ({ items, lang }) =>
+  Object.values(items).map((item) => `'${CategoryItem.getCode(item)}', ${CategoryItem.getLabel(lang)(item)}`)
+
+const wrapTextWithPrefix = ({ chunks, prefix, maxLineLength, separator = ' ' }) => {
+  const maxContentLength = maxLineLength - prefix.length - 1
+
+  if (maxContentLength <= 0) {
+    return `${prefix} ${chunks.join(separator)}`
+  }
+
+  const lines = []
+  let currentLine = ''
+
+  chunks.forEach((chunk) => {
+    const token = currentLine ? `${separator}${chunk}` : chunk
+
+    if (currentLine.length + token.length <= maxContentLength) {
+      currentLine += token
+      return
+    }
+
+    if (currentLine) {
+      lines.push(`${prefix} ${currentLine}`)
+      currentLine = ''
+    }
+
+    currentLine = chunk
+  })
+
+  if (currentLine) {
+    lines.push(`${prefix} ${currentLine}`)
+  }
+
+  return lines.join('\n')
+}
+
+const generateCodesCommentBlock = ({ items, lang }) => {
+  const codesPairs = generateCodesPairs({ items, lang })
+  return wrapTextWithPrefix({
+    chunks: codesPairs,
+    prefix: codesTextPrefix,
+    maxLineLength: maxCodesLineLength,
+    separator: '; ',
+  })
+}
+
+const RScriptEditor = (props) => {
   const { state, Actions, nodeDef } = props
+
+  const [localScript, setLocalScript] = useState('')
+
   const survey = useSurvey()
 
   const lang = useSurveyPreferredLang()
 
-  const nodeDefItems = Survey.getNodeDefsArray(survey).map((_nodeDef) => {
-    const parent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(_nodeDef))(survey)
-    return {
-      name: NodeDef.getName(_nodeDef),
-      label: NodeDef.getLabel(_nodeDef, lang),
-      parent,
-    }
-  })
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+
+  const nodeDefItems = useMemo(
+    () =>
+      Survey.getNodeDefsArray(survey).map((_nodeDef) => {
+        const parent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(_nodeDef))(survey)
+        return {
+          name: NodeDef.getName(_nodeDef),
+          label: NodeDef.getLabel(_nodeDef, lang),
+          parent,
+        }
+      }),
+    [survey, lang]
+  )
 
   const variableNamesCompleter = {
     getCompletions: (_editor, _session, _pos, _prefix, callback) => {
@@ -41,64 +104,69 @@ const RScriptEditor = (props) => {
       )
     },
   }
-  const onChange = (newValue) => {
-    Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.script, value: newValue })
-  }
 
-  const getDefaultScript = () =>
-    `${NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)) || 'PARENT'}$${
-      NodeDef.getName(nodeDef) || 'NAME'
-    } <- NA`
+  const onChange = useCallback(
+    (newValue) => {
+      Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.script, value: newValue })
+    },
+    [Actions, state]
+  )
 
-  const getScriptOrDefault = () => NodeDef.getScript(nodeDef) || getDefaultScript()
+  const generateLocalScript = useCallback(async () => {
+    const nodeDefScript = NodeDef.getScript(nodeDef)
+    const scriptOrDefault = nodeDefScript || getDefaultScript({ survey, nodeDef })
 
-  const generatePreScriptWithCategories = async () => {
-    const { request } = API.fetchCategoryItems({
-      surveyId: Survey.getId(survey),
-      categoryUuid: NodeDef.getCategoryUuid(nodeDef),
-    })
-    const {
-      data: { items },
-    } = await request
+    if (categoryUuid && NodeDef.getParentUuid(nodeDef)) {
+      const { request } = API.fetchCategoryItems({
+        surveyId: Survey.getId(survey),
+        categoryUuid,
+      })
+      const {
+        data: { items },
+      } = await request
 
-    const currentScript = NodeDef.getScript(nodeDef)
-    let newScript = ''
-    const generateCodesText = (_items) =>
-      Object.values(_items)
-        .map((_item) => `'${CategoryItem.getCode(_item)}', ${CategoryItem.getLabel(lang)(_item)} `)
-        .join('; ')
+      const codesCommentBlock = generateCodesCommentBlock({ items, lang })
 
-    if (NodeDef.getParentUuid(nodeDef) && NodeDef.getCategoryUuid(nodeDef)) {
-      if (/^# __CODES__/.test(currentScript)) {
-        const scriptSplitted = currentScript.split('\n')
-        scriptSplitted[0] = `# __CODES__ ${generateCodesText(items)}`
-        newScript = scriptSplitted.join('\n')
+      if (scriptOrDefault.startsWith(codesTextPrefix)) {
+        // replace existing codes comment block
+        const scriptSplitted = scriptOrDefault.split('\n')
+        let firstNonCodesLineIndex = 0
+
+        while (
+          firstNonCodesLineIndex < scriptSplitted.length &&
+          scriptSplitted[firstNonCodesLineIndex].startsWith(codesTextPrefix)
+        ) {
+          firstNonCodesLineIndex += 1
+        }
+
+        return [codesCommentBlock, ...scriptSplitted.slice(firstNonCodesLineIndex)].join('\n')
       } else {
-        newScript = `# __CODES__ ${generateCodesText(items)}\n${getScriptOrDefault()}`
+        // add codes text at the beginning of the script
+        return `${codesCommentBlock}\n\n${scriptOrDefault}`
       }
     }
-
-    onChange(newScript)
-    setDefaultLocalScript(newScript)
-  }
+    return scriptOrDefault
+  }, [categoryUuid, lang, nodeDef, survey])
 
   useEffect(() => {
-    if (NodeDef.getCategoryUuid(nodeDef)) {
-      generatePreScriptWithCategories()
+    let isMounted = true
+    generateLocalScript().then((script) => {
+      if (isMounted) {
+        setLocalScript(script)
+      }
+    })
+    return () => {
+      isMounted = false
     }
-  }, [NodeDef.getCategoryUuid(nodeDef), NodeDef.getParentUuid(nodeDef)])
-
-  useEffect(() => {
-    setDefaultLocalScript(getScriptOrDefault())
-  }, [])
+  }, [generateLocalScript])
 
   return (
     <FormItem label="nodeDefEdit.advancedProps.script" className="script-form">
       <ScriptEditor
-        key={defaultLocalScript}
+        key={localScript}
         name="node_def_analysis_script"
         mode="r"
-        script={defaultLocalScript}
+        script={localScript}
         onChange={onChange}
         completer={variableNamesCompleter}
         readOnly

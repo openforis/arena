@@ -13,6 +13,7 @@
     padding: 0;
     height: 30px;
     width: 30px;
+    top: 0;
     left: 0;
     border: 1px solid $greyBorder;
 
@@ -24,6 +25,10 @@
   .entity-selector {
     margin-bottom: 0.3rem;
     margin-left: 32px;
+  }
+
+  .node-defs-selector__input-search {
+    margin: 0 0.3rem 0.3rem;
   }
 
   .expansion-panel__header {

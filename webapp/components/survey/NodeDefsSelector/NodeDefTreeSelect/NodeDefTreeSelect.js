@@ -1,6 +1,5 @@
 import './NodeDefTreeSelect.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -21,6 +20,9 @@ const NodeDefTreeSelect = (props) => {
     nodeDefUuidActive = null,
     onlyPages = false,
     onSelect,
+    showExpandButton = true,
+    renderItemPrefix = undefined,
+    renderItemSuffix = undefined,
   } = props
 
   const {
@@ -44,7 +46,7 @@ const NodeDefTreeSelect = (props) => {
     onSelect,
   })
 
-  const collapseButtonVisible = treeItems?.length >= 1 && treeItems[0].items?.length > 0
+  const collapseButtonVisible = showExpandButton && treeItems?.length >= 1 && treeItems[0].items?.length > 0
 
   return (
     <div className="nodedef-tree-select">
@@ -71,6 +73,8 @@ const NodeDefTreeSelect = (props) => {
         onExpandedItemKeysChange={setExpandedNodeDefUuids}
         onSelectedItemKeysChange={onSelectedTreeItemKeyChange}
         selectedItemKeys={selectedTreeItemKeys}
+        renderItemPrefix={renderItemPrefix}
+        renderItemSuffix={renderItemSuffix}
       />
     </div>
   )
@@ -88,6 +92,9 @@ NodeDefTreeSelect.propTypes = {
   includeSingleEntities: PropTypes.bool,
   onlyPages: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
+  showExpandButton: PropTypes.bool,
+  renderItemPrefix: PropTypes.func,
+  renderItemSuffix: PropTypes.func,
 }
 
 export { NodeDefTreeSelect }

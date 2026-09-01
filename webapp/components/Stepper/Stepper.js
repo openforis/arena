@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 import { Step, StepLabel, Stepper as MuiStepper } from '@mui/material'
 

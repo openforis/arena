@@ -1,3 +1,5 @@
+import * as StringUtils from '@core/stringUtils'
+
 import * as SQL from '../sql'
 
 // common column set
@@ -62,7 +64,7 @@ export default class Table {
   }
 
   get nameQualified() {
-    return `${this.schema}."${this.name}"`
+    return `${this.schema}.${StringUtils.quoteDouble(this.name)}` // name should be quoted: it can contain reserved words
   }
 
   get nameAliased() {

@@ -16,7 +16,7 @@ export const DataQuerySortableItemChip = (props) => {
   const nodeDefLabelOrName = NodeDef.getLabelWithType({ nodeDef: nodeDefDef, lang, type: nodeDefLabelType })
 
   const label = NodeDef.isEntity(nodeDefDef)
-    ? i18n.t('dataView.nodeDefsSelector.nodeDefFrequency', {
+    ? i18n.t('dataView:nodeDefsSelector.nodeDefFrequency', {
         nodeDefLabel: nodeDefLabelOrName,
       })
     : nodeDefLabelOrName

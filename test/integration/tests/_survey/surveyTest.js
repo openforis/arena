@@ -24,3 +24,46 @@ export const createSurveyTest = async () => {
   expect(Survey.getDefaultLanguage(surveyInfo)).toEqual(expectedDefaultLanguage)
   expect(Survey.getDefaultLabel(surveyInfo)).toEqual(Survey.getDefaultLabel(surveyInfoTest))
 }
+
+// Regression test: SurveyManager.insertSurvey used to hold a db transaction open while
+// DBMigrator.migrateSurveySchema acquired another connection from the same pool; concurrent survey
+// creations could then exhaust the pool and hang the whole server (no connectionTimeoutMillis is set).
+export const createSurveysConcurrentlyTest = async () => {
+  const user = getContextUser()
+
+  const newSurveyInfo = () =>
+    Survey.newSurvey({
+      ownerUuid: User.getUuid(user),
+      name: `do_not_use__test_survey_concurrent_${uuidv4()}`,
+      label: 'DO NOT USE! Test Survey (concurrent)',
+      languages: ['en'],
+    })
+
+  const [surveyA, surveyB] = await Promise.all([
+    SurveyManager.insertSurvey({ user, surveyInfo: newSurveyInfo() }),
+    SurveyManager.insertSurvey({ user, surveyInfo: newSurveyInfo() }),
+  ])
+
+  expect(Survey.getId(surveyA)).not.toEqual(Survey.getId(surveyB))
+}
+
+// Regression test: SurveyManager.importSurvey (used when restoring an Arena backup file, and when
+// cloning a survey) had the same transaction-held-open-during-migration bug as insertSurvey above.
+export const importSurveysConcurrentlyTest = async () => {
+  const user = getContextUser()
+
+  const newSurveyInfo = () =>
+    Survey.newSurvey({
+      ownerUuid: User.getUuid(user),
+      name: `do_not_use__test_survey_import_concurrent_${uuidv4()}`,
+      label: 'DO NOT USE! Test Survey (import concurrent)',
+      languages: ['en'],
+    })
+
+  const [surveyA, surveyB] = await Promise.all([
+    SurveyManager.importSurvey({ user, surveyInfo: newSurveyInfo(), backup: true }),
+    SurveyManager.importSurvey({ user, surveyInfo: newSurveyInfo(), backup: true }),
+  ])
+
+  expect(Survey.getId(surveyA)).not.toEqual(Survey.getId(surveyB))
+}

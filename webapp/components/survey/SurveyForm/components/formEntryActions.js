@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -8,13 +8,15 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 import { RecordActions, RecordState, useRecord } from '@webapp/store/ui/record'
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
+import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 
 import { TestId } from '@webapp/utils/testId'
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonDownload, ButtonEditLockToggle } from '@webapp/components/buttons'
+import { PrintableExportFormats } from '@common/record/printableExport'
+import { RecordPrintableExportModal } from './RecordPrintableExportModal'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
 
@@ -23,6 +25,7 @@ const RecordEntryButtons = (props) => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const record = useRecord()
   const noHeader = useIsRecordViewWithoutHeader()
 
@@ -37,29 +40,44 @@ const RecordEntryButtons = (props) => {
   const canDemote = useAuthCanDemoteRecord(record) && !noHeader
   const canEdit = useAuthCanEditRecord(record)
 
+  const [printableExportOpen, setPrintableExportOpen] = useState(false)
+
   const getStepLabel = (_step) => i18n.t(`surveyForm:step.${RecordStep.getName(_step)}`)
+
+  const recordUuid = Record.getUuid(record)
 
   return (
     <>
       {!disableLockUnlock && canEdit && (
-        <Button
-          iconClassName={recordEditLocked ? 'icon-lock' : 'icon-unlocked'}
-          label={`recordView.${recordEditLocked ? 'unlock' : 'lock'}`}
+        <ButtonEditLockToggle
+          locked={recordEditLocked}
           onClick={() => dispatch(RecordActions.toggleEditLock)}
           testId={TestId.record.editLockToggleBtn}
-          variant="text"
         />
       )}
       {!disableValidationReport && !valid && (
         <Link
           data-testid={TestId.record.invalidBtn}
           className="btn btn-transparent error"
-          to={`${appModuleUri(dataModules.recordValidationReport)}${Record.getUuid(record)}`}
-          title={i18n.t('dataView.showValidationReport')}
+          to={`${appModuleUri(dataModules.recordValidationReport)}${recordUuid}`}
+          title={i18n.t('dataView:showValidationReport')}
         >
           <span className="icon icon-12px icon-warning icon-left" />
-          {i18n.t('dataView.invalidRecord')}
+          {i18n.t('dataView:invalidRecord')}
         </Link>
+      )}
+      {experimentalFeatures && (
+        <ButtonDownload
+          label="surveyForm:printableExport.exportDocument"
+          onClick={() => setPrintableExportOpen(true)}
+        />
+      )}
+      {printableExportOpen && (
+        <RecordPrintableExportModal
+          open
+          initialFormat={PrintableExportFormats.pdf}
+          onClose={() => setPrintableExportOpen(false)}
+        />
       )}
       <div className="survey-form-header__record-actions-steps">
         {canDemote && (

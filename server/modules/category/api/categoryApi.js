@@ -28,6 +28,29 @@ export const init = (app) => {
   })
 
   app.post(
+    '/survey/:surveyId/categories/clone-from-survey',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const { sourceSurveyId } = Request.getBody(req)
+        const sourceCategoryUuid = Request.getRequiredParam(req, 'sourceCategoryUuid')
+
+        const category = await CategoryService.cloneCategoryFromSurvey({
+          user,
+          sourceSurveyId,
+          sourceCategoryUuid,
+          targetSurveyId: surveyId,
+        })
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
     '/survey/:surveyId/categories/:categoryUuid/upload',
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {

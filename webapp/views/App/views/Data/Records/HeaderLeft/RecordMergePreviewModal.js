@@ -1,6 +1,5 @@
 import './RecordMergePreviewModal.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
@@ -24,7 +23,7 @@ const ModalTitle = () => {
 
   const keyValues = NodeValueFormatter.getFormattedRecordKeys({ survey, record, lang, showLabel: true }).join(', ')
 
-  const title = i18n.t('dataView.records.merge.previewTitle', { keyValues })
+  const title = i18n.t('dataView:records.merge.previewTitle', { keyValues })
 
   return <span>{title}</span>
 }
@@ -49,7 +48,7 @@ export const RecordMergePreviewModal = (props) => {
           className="btn-primary"
           onClick={onConfirmClick}
           iconClassName="icon-floppy-disk icon-12px"
-          label="dataView.records.merge.confirmLabel"
+          label="dataView:records.merge.confirmLabel"
         />
       </div>
     </ResizableModal>

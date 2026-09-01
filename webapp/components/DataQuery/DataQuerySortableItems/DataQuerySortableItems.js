@@ -29,7 +29,7 @@ export const DataQuerySortableItems = (props) => {
   if (nodeDefs.length === 0) return null
 
   return (
-    <FormItem className="data-query__sortable-items-form-item" info="dataView.sortableItemsInfo" label={label}>
+    <FormItem className="data-query__sortable-items-form-item" info="dataView:sortableItemsInfo" label={label}>
       <div className="data-query__sortable-items-wrapper" ref={containerRef}>
         {nodeDefs.map((nodeDef) => (
           <DataQuerySortableItemChip

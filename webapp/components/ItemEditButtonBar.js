@@ -1,6 +1,5 @@
 import './ItemEditButtonBar.scss'
 
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'

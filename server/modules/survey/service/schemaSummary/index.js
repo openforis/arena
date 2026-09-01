@@ -1,3 +1,2 @@
-import * as SchemaSummary from './schemaSummary'
-
-export { SchemaSummary }
+export * as SchemaSummary from './schemaSummary'
+export { default as SchemaSummaryExportJob } from './SchemaSummaryExportJob'

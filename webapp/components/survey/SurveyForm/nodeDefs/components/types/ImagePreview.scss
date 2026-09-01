@@ -1,0 +1,15 @@
+.survey-form__node-def-file__preview-image {
+  .image-preview__img {
+    display: block;
+
+    &--hidden {
+      display: none;
+    }
+  }
+
+  .image-preview__error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}

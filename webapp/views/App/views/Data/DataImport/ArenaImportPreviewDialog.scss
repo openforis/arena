@@ -1,0 +1,26 @@
+.arena-import-preview-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .modal-content {
+    width: 90vw;
+    max-width: 1400px;
+    height: 85vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__grid-wrapper {
+    flex: 1;
+    overflow: auto;
+  }
+}

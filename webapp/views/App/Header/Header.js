@@ -1,7 +1,7 @@
 import './Header.scss'
 
 import classNames from 'classnames'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
@@ -18,17 +18,17 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { Button, Spinner } from '@webapp/components'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
-import { usePrevious } from '@webapp/components/hooks'
 import ProfilePicture from '@webapp/components/profilePicture'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { useHasMessageNotifications } from '@webapp/store/ui'
 
 import { Breadcrumbs } from './Breadcrumbs'
 import { MessageNotificationPanel } from './MessageNotificationsPanel'
-import UserPopupMenu from './UserPopupMenu'
-import { useHasMessageNotifications } from '@webapp/store/ui'
+import { PreferredUILanguageButtonMenu } from './PreferredUILanguageButtonMenu'
 import { QRCodeLoginDialog } from './QRCodeLoginDialog'
+import UserPopupMenu from './UserPopupMenu'
 
 const Header = () => {
   const dispatch = useDispatch()
@@ -59,10 +59,13 @@ const Header = () => {
     toggleQrLoginDialogVisible()
   }, [toggleQrLoginDialogVisible])
 
-  const prevUser = usePrevious(user)
-  const pictureUpdateKeyRef = useRef(0)
+  const [prevUser, setPrevUser] = useState(user)
+  const [pictureUpdateKey, setPictureUpdateKey] = useState(0)
 
-  pictureUpdateKeyRef.current += prevUser !== user
+  if (prevUser !== user) {
+    setPrevUser(user)
+    setPictureUpdateKey((k) => k + 1)
+  }
 
   const surveyLabel = Survey.getLabel(surveyInfo, lang, false)
   const surveyName = Survey.getName(surveyInfo)
@@ -119,6 +122,7 @@ const Header = () => {
             {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
           </>
         )}
+        <PreferredUILanguageButtonMenu />
         <button
           className="app-header__btn-user"
           data-testid={TestId.header.userBtn}
@@ -132,7 +136,7 @@ const Header = () => {
           tabIndex="0"
           type="button"
         >
-          <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKeyRef.current} thumbnail />
+          <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKey} thumbnail />
           <span className="icon icon-ctrl" />
         </button>
       </div>

@@ -1,6 +1,6 @@
 {
   "name": "open-foris-arena",
-  "version": "2.3.15",
+  "version": "2.8.0",
   "license": "MIT",
   "engines": {
     "node": "^24.11.1"
@@ -26,7 +26,11 @@
     "test:e2e": "jest --config=test/e2e/jest.config.js",
     "test:e2e:codegen": "npx playwright --save-storage=test/e2e/resources/auth.json codegen http://localhost:9090",
     "test:e2e:watch": "cross-env PWDEBUG=1 jest --config=test/e2e/jest.config.js",
+    "test:load": "node --experimental-strip-types test/load/surveyImportStressTest.ts",
+    "test:load:unit": "node --experimental-strip-types --test test/load/**/*.test.ts",
+    "test:load:build-fixture": "node --experimental-strip-types test/load/buildSampleSurveyZip.ts",
     "test": "run-s test:unit test:e2e",
+    "typecheck": "tsc --noEmit",
     "test:docker": "test/bin/testExecDocker.sh",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
     "postversion": "git push --tags && git push && echo \"Successfully released version $npm_package_version!\"",
@@ -46,9 +50,17 @@
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/preset-env": "^7.28.6",
     "@babel/preset-react": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
     "@babel/register": "^7.28.6",
     "@babel/runtime-corejs3": "^7.28.6",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
+    "@types/jest": "^27.5.2",
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^24.10.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
     "babel-loader": "^10.0.0",
     "cache-loader": "^4.1.0",
     "cross-env": "^10.1.0",
@@ -89,6 +101,7 @@
     "sass-loader": "^16.0.6",
     "skeleton-loader": "^2.0.0",
     "style-loader": "^4.0.0",
+    "typescript": "^5.9.3",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^5.104.1",
     "webpack-bundle-analyzer": "^5.2.0",
@@ -98,7 +111,10 @@
     "yarn-audit-fix": "^10.1.1"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.975.0",
+    "@ai-sdk/anthropic": "^2",
+    "@ai-sdk/google": "^2",
+    "@ai-sdk/openai": "^2",
+    "@aws-sdk/client-s3": "^3.1112.0",
     "@codemirror/autocomplete": "^6.20.0",
     "@codemirror/lang-javascript": "^6.2.4",
     "@emotion/react": "^11.14.0",
@@ -122,6 +138,7 @@
     "@uiw/react-codemirror": "^4.25.4",
     "ace-builds": "^1.43.6",
     "adm-zip": "^0.5.16",
+    "ai": "^5",
     "archiver": "^7.0.1",
     "axios": "^1.13.4",
     "buffer": "^6.0.3",
@@ -137,6 +154,7 @@
     "fast-csv": "^5.0.5",
     "file-loader": "^6.2.0",
     "file-saver": "^2.0.5",
+    "heic-to": "^1.4.2",
     "i18next": "^25.8.0",
     "i18next-browser-languagedetector": "^8.2.0",
     "is-valid-coordinates": "^1.0.0",
@@ -149,6 +167,7 @@
     "leaflet.markercluster": "^1.5.3",
     "marked": "^14.1.4",
     "morgan": "^1.10.1",
+    "mui-color-input": "^9.0.0",
     "ncp": "^2.0.0",
     "node-schedule": "^2.1.1",
     "node-stream-zip": "^1.15.0",
@@ -165,6 +184,7 @@
     "react-avatar-editor": "^14.0.0",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.8",
+    "react-error-boundary": "^6.1.1",
     "react-google-recaptcha": "^3.1.0",
     "react-grid-layout": "^1.5.3",
     "react-i18next": "^15.7.4",
@@ -190,7 +210,11 @@
     "to-snake-case": "^1.0.0",
     "use-supercluster": "^1.2.0",
     "uuid": "^10.0.0",
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "zod": "^3.23.8"
+  },
+  "resolutions": {
+    "playwright-core": "1.24.2"
   },
   "arenaClientPackages": {
     "META": "This exists to minimize the final Docker server image",
@@ -217,7 +241,7 @@
     "last 2 versions"
   ],
   "lint-staged": {
-    "{common,core,server,test,webapp}/**/*.js": "eslint --cache --fix"
+    "{common,core,server,test,webapp}/**/*.{js,jsx,ts,tsx}": "eslint --cache --fix"
   },
-  "packageManager": "yarn@4.13.0"
+  "packageManager": "yarn@4.18.0"
 }

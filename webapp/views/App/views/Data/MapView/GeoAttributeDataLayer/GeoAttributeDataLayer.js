@@ -1,17 +1,20 @@
-import React from 'react'
+import { useCallback, useMemo } from 'react'
 import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import { ClusterMarker, useFlyToPoint } from '../common'
+import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
+import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 
 export const GeoAttributeDataLayer = (props) => {
-  const { attributeDef, markersColor, onRecordEditClick } = props
+  const { attributeDef, onRecordEditClick } = props
 
   const {
     layerName,
+    layerInnerName,
+    currentMarkersColor,
     clusters,
     clusterExpansionZoomExtractor,
     clusterIconCreator,
@@ -19,6 +22,11 @@ export const GeoAttributeDataLayer = (props) => {
     totalPoints,
     points,
   } = useGeoAttributeDataLayer(props)
+
+  const layerKey = NodeDef.getUuid(attributeDef)
+  const { selectPoint, layerSortOrders } = useMapLayersPanel()
+  const sortOrder = layerSortOrders[layerKey] ?? 'none'
+  const sortedPoints = useMemo(() => applySortOrder(points, sortOrder), [points, sortOrder])
 
   const {
     currentPointShown,
@@ -29,7 +37,12 @@ export const GeoAttributeDataLayer = (props) => {
     onCurrentPointPopupClose,
     openPopupOfPoint,
     setMarkerByKey,
-  } = useFlyToPoint({ points, onRecordEditClick, zoomToMaxLevel: NodeDef.isCoordinate(attributeDef) })
+  } = useFlyToPoint({ points: sortedPoints, onRecordEditClick, zoomToMaxLevel: NodeDef.isCoordinate(attributeDef) })
+
+  const onMarkerPopupOpen = useCallback((key) => selectPoint(key), [selectPoint])
+  const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])
+
+  useLayerRegistration({ layerKey, layerName: layerInnerName, points, flyToPoint })
 
   return (
     <LayersControl.Overlay name={layerName}>
@@ -44,7 +57,7 @@ export const GeoAttributeDataLayer = (props) => {
               <ClusterMarker
                 key={cluster.id}
                 cluster={cluster}
-                color={markersColor}
+                color={currentMarkersColor}
                 clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
                 clusterIconCreator={clusterIconCreator}
                 getClusterLeaves={getClusterLeaves}
@@ -65,7 +78,9 @@ export const GeoAttributeDataLayer = (props) => {
               flyToPoint={flyToPoint}
               flyToNextPoint={flyToNextPoint}
               flyToPreviousPoint={flyToPreviousPoint}
-              markersColor={markersColor}
+              markersColor={currentMarkersColor}
+              onPopupClose={onMarkerPopupClose}
+              onPopupOpen={onMarkerPopupOpen}
               onRecordEditClick={onRecordEditClick}
               setMarkerByKey={setMarkerByKey}
             />
@@ -77,8 +92,12 @@ export const GeoAttributeDataLayer = (props) => {
             data={currentPointShown}
             flyToNextPoint={flyToNextPoint}
             flyToPreviousPoint={flyToPreviousPoint}
-            markersColor={markersColor}
-            onPopupClose={onCurrentPointPopupClose}
+            markersColor={currentMarkersColor}
+            onPopupClose={() => {
+              onCurrentPointPopupClose()
+              onMarkerPopupClose()
+            }}
+            onPopupOpen={onMarkerPopupOpen}
             onRecordEditClick={onRecordEditClick}
             popupOpen={currentPointPopupOpen}
             setMarkerByKey={setMarkerByKey}

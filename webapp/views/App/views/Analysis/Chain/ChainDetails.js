@@ -1,0 +1,143 @@
+import './ChainDetails.scss'
+
+import React, { useCallback, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router'
+import { useDispatch } from 'react-redux'
+
+import * as A from '@core/arena'
+
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+import * as Chain from '@common/analysis/chain'
+
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/chain'
+import { useSurvey } from '@webapp/store/survey'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
+
+import { useLocationPathMatcher, useOnBrowserBack, useOnPageUnload, useQuery } from '@webapp/components/hooks'
+import TabBar from '@webapp/components/tabBar'
+import { ButtonEditLockToggle } from '@webapp/components'
+
+import ButtonBar from './ButtonBar'
+import { AnalysisNodeDefs } from './AnalysisNodeDefs'
+import { ChainBasicProps } from './ChainBasicProps'
+import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
+
+const ChainDetails = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { chainUuid } = useParams()
+  const { new: justCreated } = useQuery()
+  const chain = useChain()
+  const survey = useSurvey()
+  const canEditChain = useAuthCanUseAnalysis()
+  const chainEditLocked = useChainEditLocked()
+
+  // chain has just been created: keep it unlocked/editable and hide the lock toggle for the whole time this page stays mounted
+  const [isNewChain] = useState(justCreated === 'true')
+
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const canHaveRecords = Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)
+  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+  const validation = Chain.getValidation(chain)
+
+  const updateChain = useCallback(
+    (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate })),
+    [dispatch]
+  )
+
+  const toggleEditLock = useCallback(() => dispatch(ChainActions.toggleEditLock), [dispatch])
+
+  useEffect(() => {
+    const init = async () => {
+      dispatch(ChainActions.fetchChain({ chainUuid, validate: true }))
+      if (canHaveRecords) {
+        dispatch(ChainActions.fetchRecordsCountByStep)
+      }
+      if (justCreated === 'true') {
+        dispatch(ChainActions.setEditLocked(false))
+        navigate(`${appModuleUri(analysisModules.chain)}${chainUuid}/`, { replace: true })
+      }
+    }
+    init()
+  }, [dispatch, chainUuid, canHaveRecords, justCreated, navigate])
+
+  const locationPathMatcher = useLocationPathMatcher()
+  // un unmount, if changing location into node def edit, keep chain store, otherwise reset it
+  useEffect(() => {
+    return () => {
+      if (!locationPathMatcher(`${appModuleUri(analysisModules.nodeDef)}:uuid`)) {
+        dispatch(ChainActions.resetChainStore())
+      }
+    }
+  }, [])
+
+  const chainLoaded = Boolean(chain) && !A.isEmpty(chain)
+
+  const labelMissing =
+    !Validation.isValid(Validation.getFieldValidation(Chain.keysProps.labels)(validation)) && !chain?.isDeleted
+
+  // prevent page unload if label is not specified and chain is not deleted
+  useOnPageUnload({
+    active: labelMissing,
+    confirmMessageKey: 'chainView.errorNoLabel',
+  })
+
+  // chain has no description, no sampling design and no analysis attribute defined yet
+  const chainEmpty =
+    !chainLoaded ||
+    (!Chain.getDescription(chain) &&
+      !Chain.hasSamplingDesign(chain) &&
+      Survey.getAnalysisNodeDefs({
+        chain,
+        showSamplingNodeDefs: true,
+        hideAreaBasedEstimate: false,
+        showInactiveResultVariables: true,
+      })(survey).length === 0)
+
+  // if chain has just been created and user navigates back before it has any content, delete it and go back.
+  // active while the chain is still loading too (chainLoaded false), so a back press right after creation is still caught.
+  useOnBrowserBack({
+    active: isNewChain && (!chainLoaded || labelMissing) && chainEmpty,
+    onBack: useCallback(async () => {
+      await dispatch(ChainActions.deleteChain({ chain: chain ?? { uuid: chainUuid }, silent: true }))
+      navigate(-1)
+      return true
+    }, [dispatch, chain, chainUuid, navigate]),
+  })
+
+  if (!chain || A.isEmpty(chain)) return null
+
+  return (
+    <div className="chain">
+      <div className="chain-top-bar">
+        <TabBar
+          tabs={[
+            {
+              label: 'chainView.basic',
+              component: ChainBasicProps,
+              props: { updateChain },
+            },
+            {
+              label: 'chainView.samplingDesign',
+              component: ChainSamplingDesignProps,
+              props: { updateChain },
+            },
+          ]}
+          showTabs={Chain.hasSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
+        />
+
+        {canEditChain && !isNewChain && (
+          <ButtonEditLockToggle className="chain-edit-lock-toggle" locked={chainEditLocked} onClick={toggleEditLock} />
+        )}
+      </div>
+
+      <AnalysisNodeDefs />
+
+      <ButtonBar />
+    </div>
+  )
+}
+
+export default ChainDetails

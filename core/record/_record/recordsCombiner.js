@@ -12,22 +12,18 @@ import * as RecordReader from './recordReader'
 import { updateAttributeValue } from './recordNodeValueUpdater'
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
 
-const findEntityByIIdOrKeys = ({
-  survey,
-  record,
-  entityDefUuid,
-  parentEntity,
-  iId = null,
-  keyValuesByDefUuid = null,
-}) => {
-  const entityWithSameIId = iId ? Records.getNodeByIId(iId)(record) : null
-  if (entityWithSameIId) {
-    return entityWithSameIId
-  }
-  return keyValuesByDefUuid
+// Deliberately does not short-circuit on internal id equality: unlike the uuid this replaced
+// (globally unique, so a match could only ever mean "the same node"), internal ids are a plain
+// per-record counter starting at 1 - two independently-built records (the only case mergeRecords
+// is ever called with: merging a duplicate submission, or a mobile import, into an existing
+// record) routinely reuse the same small internal ids for entirely unrelated nodes. Matching on
+// that would produce false positives, silently treating an unrelated source node as "already
+// present" and discarding it instead of adding it. Key values are the only signal that's actually
+// comparable across two independently-numbered records.
+const findEntityByKeys = ({ survey, record, entityDefUuid, parentEntity, keyValuesByDefUuid = null }) =>
+  keyValuesByDefUuid
     ? Records.findEntityByKeyValues({ survey, record, parentEntity, entityDefUuid, keyValuesByDefUuid })
     : null
-}
 
 const _findNodeWithSameIId = (nodeSearch, nodesArray) =>
   nodesArray.find((node) => Node.getIId(node) === Node.getIId(nodeSearch))
@@ -178,7 +174,7 @@ export const replaceUpdatedNodes =
 
 const _recalculateNodeHierarchy = ({ parentEntity, node }) => {
   const parentEntityIId = Node.getIId(parentEntity)
-  node[Node.keys.parentIId] = parentEntityIId
+  node[Node.keys.pIId] = parentEntityIId
   const hierarchyUpdated = [...Node.getHierarchy(parentEntity), parentEntityIId]
   Objects.setInPath({ obj: node, path: [Node.keys.meta, Node.metaKeys.hierarchy], value: hierarchyUpdated })
 }
@@ -318,7 +314,12 @@ const _cloneEntityAndDescendants = async ({
   sideEffect = false,
 }) => {
   const newNodeIIdByOldIId = {}
-  let lastNodeInternalId = RecordReader.getLastNodeInternalId(recordSource)
+  // New ids must come from the target record's own counter, not the source's: source and target
+  // are two independently-built records (a duplicate submission, or a mobile import, merged into
+  // an existing record), each with their own internal id sequence starting near 1. Drawing new
+  // ids from the source's counter would routinely collide with ids the target record already
+  // uses, silently overwriting unrelated existing nodes instead of adding the cloned ones.
+  let lastNodeInternalId = RecordReader.getLastNodeInternalId(updateResult.record)
   RecordReader.visitDescendantsAndSelf(entitySource, (visitedChildSource) => {
     const oldIId = Node.getIId(visitedChildSource)
     const oldParentIId = Node.getParentInternalId(visitedChildSource)
@@ -336,6 +337,11 @@ const _cloneEntityAndDescendants = async ({
     // node hierarchy will be recalculated in _addNodeToUpdateResult
     _addNodeToUpdateResult({ updateResult, node: nodeTarget, sideEffect })
   })(recordSource)
+  // Persist the advanced counter onto the target record: _addNodeToUpdateResult was called above
+  // without assignNewIds (ids were already assigned here), so it never updated it, and later
+  // additions in this same merge (e.g. _mergeMultipleAttributes's assignNewIds: true path) must
+  // not reuse ids handed out in this loop.
+  updateResult.merge(new RecordUpdateResult({ record: { ...updateResult.record, lastNodeInternalId } }))
 }
 
 const _mergeMultipleEntities = ({
@@ -355,12 +361,11 @@ const _mergeMultipleEntities = ({
       record: recordSource,
       entity: childSource,
     })
-    const childTarget = findEntityByIIdOrKeys({
+    const childTarget = findEntityByKeys({
       survey,
       record: updateResult.record,
       entityDefUuid: childDefUuid,
       parentEntity: entityTarget,
-      iId: Node.getIId(childSource),
       keyValuesByDefUuid,
     })
     if (childTarget) {

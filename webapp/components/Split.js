@@ -1,6 +1,5 @@
 import './Split.scss'
 
-import React from 'react'
 import ReactSplit from 'react-split'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'

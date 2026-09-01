@@ -120,7 +120,7 @@ const _valueAdapterByType = {
     })
     if (!itemUuid) {
       const attributeName = NodeDef.getName(attributeDef)
-      throw new SystemError('validationErrors.dataImport.invalidCode', {
+      throw new SystemError('validationErrors:dataImport.invalidCode', {
         attributeName,
         code: NodeValues.getValueCode(value),
       })
@@ -145,7 +145,16 @@ const _adaptValue = async ({
 }
 
 const _addOrUpdateAttribute =
-  ({ survey, categoryItemProvider, taxonProvider, entity, attributeDef, value: valueParam, sideEffect = false }) =>
+  ({
+    survey,
+    categoryItemProvider,
+    taxonProvider,
+    entity,
+    attributeDef,
+    value: valueParam,
+    refData = null,
+    sideEffect = false,
+  }) =>
   async (record) => {
     const attributeDefUuid = NodeDef.getUuid(attributeDef)
     const attribute = RecordReader.getNodeChildByDefUuid(entity, attributeDefUuid)(record)
@@ -163,10 +172,20 @@ const _addOrUpdateAttribute =
       // create new attribute
       const updateResult = new RecordUpdateResult({ record })
       const attributeCreated = Node.newNode({ record, nodeDefUuid: attributeDefUuid, parentNode: entity, value })
-      updateResult.addNode(attributeCreated, { sideEffect })
+      const attributeToAdd = refData ? NodeRefData.assocRefData(refData)(attributeCreated) : attributeCreated
+      updateResult.addNode(attributeToAdd, { sideEffect })
       return updateResult
     }
-    return updateAttributeValue({ survey, record, entity, attributeDef, attribute, value, sideEffect })
+    return updateAttributeValue({
+      survey,
+      record,
+      entity,
+      attributeDef,
+      attribute,
+      value,
+      refData,
+      sideEffect,
+    })
   }
 
 const _addEntityAndKeyValues =
@@ -203,7 +222,7 @@ const _addEntityAndKeyValues =
       const keyValue = keyValuesByDefUuid[NodeDef.getUuid(keyDef)]
 
       if (Objects.isEmpty(keyValue)) {
-        throw new SystemError('validationErrors.record.entityKeyValueNotSpecified', {
+        throw new SystemError('validationErrors:record.entityKeyValueNotSpecified', {
           keyDefName: NodeDef.getName(keyDef),
         })
       }
@@ -270,7 +289,7 @@ const _getOrCreateEntityByKeys =
 
     if (!entityParent) {
       const keyValuePairs = getKeyValuePairs({ survey, entityDef: entityParentDef, valuesByDefUuid })
-      throw new SystemError('validationErrors.record.missingAncestorForEntity', {
+      throw new SystemError('validationErrors:record.missingAncestorForEntity', {
         entityName: NodeDef.getName(entityDef),
         ancestorName: NodeDef.getName(entityParentDef),
         keyValues: keyValuePairs,
@@ -347,6 +366,7 @@ const updateAttributesInEntityWithValues =
     survey,
     entity,
     valuesByDefUuid,
+    refDataByDefUuid = null,
     categoryItemProvider,
     taxonProvider,
     timezoneOffset,
@@ -386,6 +406,8 @@ const updateAttributesInEntityWithValues =
           nodeDefUuid: attributeDefUuid,
         })(currentRecord)
 
+        const refData = refDataByDefUuid?.[attributeDefUuid] ?? null
+
         const attributeUpdateResult = await _addOrUpdateAttribute({
           survey,
           categoryItemProvider,
@@ -393,6 +415,7 @@ const updateAttributesInEntityWithValues =
           entity: attributeParentEntity,
           attributeDef,
           value,
+          refData,
           sideEffect,
         })(currentRecord)
 

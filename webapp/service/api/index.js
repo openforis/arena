@@ -7,6 +7,7 @@ export {
   fetchItemsCountIndexedByCategoryUuid,
   fetchCategory,
   createCategory,
+  cloneCategoryFromSurvey,
   countCategoryItems,
   fetchCategoryItems,
   fetchCategoryItemsInLevelRequest,
@@ -22,17 +23,35 @@ export {
   updateCategoryItemProp,
   updateCategoryItemIndexes,
 } from './categories'
-export { fetchChains, getChainSummaryExportUrl } from './analysis'
+export {
+  fetchChains,
+  fetchChainsForCloneFromSurvey,
+  fetchChainSourceEntityNames,
+  getChainSummaryExportUrl,
+  cloneChainFromSurvey,
+  deleteChain,
+} from './analysis'
 
 export {
   fetchTaxonomies,
   fetchTaxonomy,
   createTaxonomy,
+  cloneTaxonomyFromSurvey,
   uploadTaxa,
   updateTaxonomy,
   updateTaxonomyExtraPropDef,
   deleteTaxonomyIfEmpty,
 } from './taxonomies'
+export {
+  fetchUserGroups,
+  fetchUserGroup,
+  fetchUserGroupMembers,
+  createUserGroup,
+  updateUserGroup,
+  deleteUserGroup,
+  addUserGroupMember,
+  removeUserGroupMember,
+} from './userGroups'
 export { fetchActivityLogs } from './activityLog'
 export {
   getRecordNodeFileUrl,
@@ -40,6 +59,8 @@ export {
   createRecordFromSamplingPointDataItem,
   startCollectRecordsImportJob,
   startDataImportFromArenaJob,
+  startArenaImportSummaryJob,
+  cancelArenaImportSummary,
   startDataImportFromCsvJob,
   getDataImportFromCsvTemplateUrl,
   getDataImportFromCsvTemplatesUrl,
@@ -50,6 +71,9 @@ export {
   fetchRecordsCountByStep,
   fetchRecordSummary,
   fetchRecordsSummary,
+  fetchRecordAndNodes,
+  getRecordDocxExportUrl,
+  getRecordPdfExportUrl,
   startExportDataJob,
   startExportDataSummaryJob,
   downloadExportedDataSummaryUrl,
@@ -66,7 +90,7 @@ export {
   updateDataQuerySummary,
   deleteDataQuerySummary,
 } from './dataQuery'
-export { fetchActiveJob } from './job'
+export { cancelJob, fetchActiveJob, fetchAllJobs, fetchJob } from './job'
 export {
   fetchAvailableMapPeriods,
   fetchElevation,
@@ -83,15 +107,24 @@ export {
   fetchSurveys,
   fetchSurveyTemplatesPublished,
   insertSurvey,
+  insertSurveyFile,
+  fetchSurveyFile,
   startImportLabelsJob,
+  startNodeDefsTranslationJob,
   updateSurveyConfigurationProp,
   updateSurveyOwner,
   updateSurveyProps,
   startSurveysListExportJob,
   getSurveyListExportedFileDownloadUrl,
+  getSurveyDocxExportUrl,
+  getSurveyFileDownloadUrl,
+  getSurveyPdfExportUrl,
+  startSchemaSummaryExportJob,
 } from './survey'
 export {
+  cloneNodeDefFromSurvey,
   convertNodeDef,
+  cloneNodeDef,
   fetchNodeDef,
   fetchNodeDefs,
   moveNodeDef,
@@ -123,3 +156,5 @@ export {
 export { getDevices, getDevice, addDevice, verifyDevice, regenerateBackupCodes, removeDevice } from './user2FA'
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
+
+export { aiSettings, aiExpression, aiTranslation, aiActivityLog, aiChatbot, streamSse as aiStreamSse } from './ai'

@@ -1,0 +1,41 @@
+export default {
+  error: 'Error exporting data: {{details}}',
+  optionNotCompatibleWithDataImport: 'Not compatible with data import',
+  options: {
+    header: '$t(common.options)',
+    fileFormatLabel: 'File format',
+    fileFormat: {
+      csv: 'CSV',
+      xlsx: 'Excel',
+    },
+    includeCategoryItemsLabels: 'Include category items labels',
+    includeCategories: 'Include categories',
+    expandCategoryItems: 'Expand category items',
+    exportSingleEntitiesIntoSeparateFiles: 'Export single entities into separate files',
+    includeAncestorAttributes: 'Include ancestor attributes',
+    includeAnalysis: 'Include result variables',
+    includeDataFromAllCycles: 'Include data from all cycles',
+    includeDateCreated: 'Include creation date',
+    includeFiles: 'Include files',
+    includeFileAttributeDefs: 'Include file attribute columns',
+    includeInternalUuids: 'Include internal UUIDs',
+    recordsModifiedAfter: 'Records modified after',
+  },
+  optionsInfo: {
+    expandCategoryItems:
+      'adds one boolean column for every category item with a value TRUE if the item has been selected, FALSE otherwise',
+    exportSingleEntitiesIntoSeparateFiles: `exports single entities in separate files; when it's not checked, attributes belonging to a single entity will be included among the ones of its nearest ancestor multiple entity`,
+    includeAnalysis: 'includes analysis attributes',
+    includeAncestorAttributes: 'includes attributes that belong to the ancestor entities, up to the root entity',
+    includeCategoryItemsLabels: 'adds a column with a label for every category item',
+    includeCategories: `categories will be exported into a subfolder called "categories"`,
+    includeDataFromAllCycles:
+      'data from all cycles will be included, otherwise only the selected one will be considered',
+    includeDateCreated: 'includes the creation date of every entity (row) in a column called "date_created"',
+    includeFiles: `exports files associated to the records into a subfolder called "files"`,
+    includeFileAttributeDefs: `adds file attributes' columns: file internal identifier (file_uuid) and name (file_name)`,
+    includeInternalUuids: 'includes the internal identifiers (UUIDs) in columns ending with the suffix "_uuid"',
+    recordsModifiedAfter: 'exports only data from records modified after the specified date',
+  },
+  startExport: 'Start export',
+}

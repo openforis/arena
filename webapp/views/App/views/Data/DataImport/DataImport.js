@@ -1,6 +1,5 @@
 import './DataImport.scss'
 
-import React from 'react'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -19,17 +18,17 @@ const DataImport = () => {
         tabs={[
           {
             id: TestId.dataImport.importFromCsvTab,
-            label: i18n.t('dataImportView.importFromCsvExcel'),
+            label: i18n.t('dataImportView:importFromCsvExcel'),
             component: DataImportFlatDataView,
           },
           {
             id: TestId.dataImport.importFromCollectTab,
-            label: i18n.t('dataImportView.importFromCollect'),
+            label: i18n.t('dataImportView:importFromCollect'),
             component: CollectDataImportView,
           },
           {
             id: TestId.dataImport.importFromCollectTab,
-            label: i18n.t('dataImportView.importFromArena'),
+            label: i18n.t('dataImportView:importFromArena'),
             component: DataImportArenaView,
           },
         ]}

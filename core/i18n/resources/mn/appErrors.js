@@ -16,7 +16,12 @@ export default {
   },
   dataImport: {
     importFromMobileNotAllawed: 'Arena Mobile-с өгөгдөл импортлохыг хориглоно',
+    invalidNodeInRecord:
+      '"{{recordUuid}}" бичлэгт буруу зангилаа байна, "{{nodeUuid}}" зангилаа, "{{nodeDefName}}" зангилааны тодорхойлолт (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'Импортын файлд бичлэг олдсонгүй эсвэл буруу файлын формат',
+    pendingImportFileNotFoundOrExpired:
+      'Өмнө оруулсан файл олдсонгүй; хугацаа нь дууссан байж магадгүй. Дахин оруулна уу.',
+    recordOwnedByAnotherUser: '"{{recordKeyValues}}" бичлэг өөр хэрэглэгчид харьяалагддаг тул шинэчлэх боломжгүй',
   },
   entryDataNotFound: 'Оролтын өгөгдөл олдсонгүй: {{entryName}}',
   expression: {
@@ -26,10 +31,12 @@ export default {
   functionHasTooFewArguments: 'Функц {{fnName}} нь дор хаяж {{minArity}} шаарддаг ({{numArgs}} авсан)',
   functionHasTooManyArguments: 'Функц {{fnName}} нь хамгийн ихдээ {{maxArity}} зөвшөөрдөг ({{numArgs}} авсан)',
   generic: 'Гэнэтийн алдаа: {{text}}',
+  geoWhispApiError: 'Whisp үйлчилгээ түр хугацаанд ажиллахгүй байна.',
   importingDataIntoWrongCollectSurvey:
     'Буруу цуглуулгын судалгаанд өгөгдөл импортлож байна. Хүлээгдэж буй URI: {{collectSurveyUri}}',
   invalidType: 'Буруу төрөл {{type}}',
   jobCanceledOrErrorsFound: 'Ажил цуцлагдсан эсвэл алдаа олдсон; гүйлгээг буцаах',
+  jobOrphanedOnRestart: 'Сервер дахин эхэлсний улмаас ажил тасалдлаа. Дахин оролдоно уу.',
   paramIsRequired: 'Парам {{param}} шаардлагатай',
   unableToFindParent: '{{name}}-н эцгийг олж чадахгүй байна',
   unableToFindNode: '{{name}} нэртэй зангилааг олж чадахгүй байна',
@@ -46,6 +53,7 @@ export default {
   sessionExpiredRefreshPage: 'Сесс дууссан байж магадгүй.\nХуудсыг сэргээж үзнэ үү.',
   survey: {
     nodeDefNameNotFound: 'Зангилааны тодорхойлолт олдсонгүй: {{name}}',
+    dataMigrationInProgress: 'Энэ судалгааг шинэчилж байна; түр хүлээгээд дахин оролдоно уу.',
   },
   unsupportedFunctionType: 'Дэмжигдээгүй функцийн төрөл: {{exprType}}',
   userHasPendingInvitation:

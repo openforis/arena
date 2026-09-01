@@ -8,6 +8,7 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
 import * as ProcessUtils from '@core/processUtils'
+import SystemError from '@core/systemError'
 
 import * as Log from '@server/log/log'
 import * as SurveyService from '../../survey/service/surveyService'
@@ -16,7 +17,7 @@ import * as RecordService from '../../record/service/recordService'
 
 const Logger = Log.getLogger('AuthAPI')
 
-const sendResponse = (res, user, survey = null) => res.json({ user, survey })
+const sendResponse = (res, user, survey = null, error = null) => res.json({ user, survey, error })
 
 const sendUserSurvey = async (res, user, surveyId) => {
   try {
@@ -28,8 +29,15 @@ const sendUserSurvey = async (res, user, surveyId) => {
     sendResponse(res, user, survey)
   } catch (error) {
     Logger.error(`error loading survey with id ${surveyId}: ${error.toString()}`)
-    // Survey not found with user pref
-    // removing user pref
+
+    if (error instanceof SystemError && error.key === 'survey.dataMigrationInProgress') {
+      // Survey data migration still in progress: keep the user's current survey preference untouched,
+      // it's not a case of the survey being missing or inaccessible, just temporarily unavailable.
+      sendResponse(res, user, null, { key: error.key, params: error.params })
+      return
+    }
+
+    // Survey not found (or otherwise inaccessible) with user pref: removing user pref
     const _user = User.deletePrefSurvey(surveyId)(user)
     sendResponse(res, await UserService.updateUserPrefsAndFetchGroups(_user))
   }
@@ -49,12 +57,14 @@ export const init = (app) => {
   app.get('/auth/user', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
+      const surveysCount = await UserService.fetchUserSurveysCount(User.getUuid(user))
+      const userWithCounts = { ...user, ...surveysCount }
       const surveyId = User.getPrefSurveyCurrent(user)
 
       if (surveyId) {
-        await sendUserSurvey(res, user, surveyId)
+        await sendUserSurvey(res, userWithCounts, surveyId)
       } else {
-        sendResponse(res, user)
+        sendResponse(res, userWithCounts)
       }
     } catch (error) {
       next(error)
@@ -65,7 +75,7 @@ export const init = (app) => {
     try {
       // Before logout checkOut record if there's an opened thread
       const socketId = Request.getSocketId(req)
-      RecordService.dissocSocketFromUpdateThread(socketId)
+      await RecordService.dissocSocketFromUpdateThread(socketId)
 
       res.clearCookie('refreshToken', {
         httpOnly: true,

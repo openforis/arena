@@ -13,6 +13,7 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useBrowserLanguageCode, useOnUpdate } from '@webapp/components/hooks'
 import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
+import { useI18n } from '@webapp/store/system'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import Table from '@webapp/components/Table'
@@ -27,6 +28,7 @@ const Surveys = (props) => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const i18n = useI18n()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
   const lang = useBrowserLanguageCode()
@@ -39,9 +41,9 @@ const Surveys = (props) => {
   const [requestedAt, setRequestedAt] = useState(Date.now())
   const [onlyOwn, setOnlyOwn] = useState(isSystemAdmin)
 
-  // Redirect to dashboard on survey change
+  // Redirect to landing on survey change
   useOnUpdate(() => {
-    navigate(appModuleUri(homeModules.dashboard))
+    navigate(appModuleUri(homeModules.landing))
   }, [Survey.getUuid(surveyInfo)])
 
   // reload table data on survey publish
@@ -121,7 +123,14 @@ const Surveys = (props) => {
       {
         key: Survey.sortableKeys.status,
         header: 'common.status',
-        renderItem: ({ item }) => Survey.getStatus(Survey.getSurveyInfo(item)),
+        renderItem: ({ item }) => {
+          const canEdit = Authorizer.canEditSurvey(user, item)
+          const surveyInfo = Survey.getSurveyInfo(item)
+          const surveyStatus = Survey.getStatus(surveyInfo)
+          const statusKey =
+            surveyStatus === Survey.status.publishedDraft && !canEdit ? Survey.status.published : surveyStatus
+          return i18n.t(`surveysView.status.${statusKey}`)
+        },
         width: '12rem',
         sortable: true,
       },
@@ -173,7 +182,7 @@ const Surveys = (props) => {
       )
     }
     return cols
-  }, [lang, onSurveysUpdate, template])
+  }, [i18n, lang, onSurveysUpdate, template, user])
 
   return (
     <Table

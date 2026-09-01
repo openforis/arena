@@ -1,11 +1,14 @@
 import Job from '@server/job/job'
 
 import * as DateUtils from '@core/dateUtils'
-import i18n from '@core/i18n/i18nFactory'
+import i18nInstance from '@core/i18n/i18nFactory'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as ValidationResult from '@core/validation/validationResult'
 import { ValidationUtils } from '@core/validation/validationUtils'
+import { Query } from '@common/model/query'
+import { ViewDataNodeDef } from '@common/model/db'
 
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -19,8 +22,33 @@ export default class VaidationReportGenerationJob extends Job {
   }
 
   async execute() {
-    const { surveyId, cycle, fileFormat, recordUuid, lang } = this.context
+    const {
+      surveyId,
+      cycle,
+      fileFormat,
+      recordUuid,
+      lang,
+      query,
+      attributeDefUuids = null,
+      messageTypeKeys = null,
+    } = this.context
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+    const filter = query ? Query.getFilter(query) : null
+    const hasAttributeFilter = Array.isArray(attributeDefUuids)
+    const hasMessageTypeFilter = Array.isArray(messageTypeKeys)
+    const filterBySurveyAttrs =
+      filter || hasAttributeFilter || hasMessageTypeFilter
+        ? {
+            ...(filter
+              ? {
+                  filter,
+                  rootDataViewName: new ViewDataNodeDef(survey, Survey.getNodeDefRoot(survey)).name,
+                }
+              : {}),
+            ...(hasAttributeFilter ? { attributeDefUuids } : {}),
+            ...(hasMessageTypeFilter ? { messageTypeKeys } : {}),
+          }
+        : null
 
     // create temp file
     const tempFileName = FileUtils.newTempFileName()
@@ -40,14 +68,14 @@ export default class VaidationReportGenerationJob extends Job {
       const validation = RecordValidationReportItem.getValidation(item)
 
       const errors = ValidationUtils.getJointMessage({
-        i18n,
+        i18n: i18nInstance,
         survey,
         showKeys: false,
         severity: ValidationResult.severity.error,
       })(validation)
 
       const warnings = ValidationUtils.getJointMessage({
-        i18n,
+        i18n: i18nInstance,
         survey,
         showKeys: false,
         severity: ValidationResult.severity.warning,
@@ -81,13 +109,17 @@ export default class VaidationReportGenerationJob extends Job {
       'record_date_modified',
     ]
 
-    this.total = await RecordManager.countValidationReportItems({ surveyId, cycle, recordUuid }, this.tx)
+    this.total = await RecordManager.countValidationReportItems(
+      { surveyId, cycle, recordUuid, filterBySurveyAttrs },
+      this.tx
+    )
 
     await RecordManager.getValidationReportAsStream(
       {
         surveyId,
         cycle,
         recordUuid,
+        filterBySurveyAttrs,
         processor: async (dbStream) => {
           this.dbStream = dbStream
           await FlatDataWriter.writeItemsStreamToStream({

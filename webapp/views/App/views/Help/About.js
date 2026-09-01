@@ -23,5 +23,5 @@ export const About = () => {
     }
   }, [])
 
-  return <Markdown className="about-container" source={i18n.t('helpView.about.text', { version })} />
+  return <Markdown className="about-container" sanitize={false} source={i18n.t('helpView.about.text', { version })} />
 }

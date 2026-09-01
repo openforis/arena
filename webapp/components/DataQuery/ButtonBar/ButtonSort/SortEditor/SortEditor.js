@@ -1,5 +1,4 @@
 import './sortEditor.scss'
-import React from 'react'
 import PropTypes from 'prop-types'
 
 import { Button } from '@webapp/components/buttons'

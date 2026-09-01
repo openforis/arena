@@ -3,9 +3,11 @@ import * as pgPromise from 'pg-promise'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import SystemError from '@core/systemError'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
+import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -30,7 +32,7 @@ import * as CategoryRepository from '../repository/categoryRepository'
 
 export {
   initializeSurveyCategoryItemsIndexes,
-  initializeAllSurveysCategoryItemIndexes,
+  initializeCategoryItemIndexesForSurvey,
 } from './categoryItemIndexInitializer'
 
 // ====== VALIDATION
@@ -85,7 +87,7 @@ export const validateCategory = async (
 }
 
 const _fetchSurvey = async ({ surveyId }, client = db) => {
-  let survey = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
+  const survey = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const srsCodes = Survey.getSRSCodes(survey)
   const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
   return Survey.assocSrs(srss)(survey)
@@ -227,6 +229,67 @@ export const insertCategory = async (
     return validate ? _validateCategory({ surveyId, categoryUuid: Category.getUuid(categoryDb) }, t) : categoryDb
   })
 
+/**
+ * Clones a category (levels and items included) from another survey into the given survey.
+ * Category, level and item uuids are preserved: each survey lives in its own db schema,
+ * so there is no risk of uuid collision, and levels/items can keep referencing each other as-is.
+ * Levels and items are cloned with a single INSERT...SELECT statement per table, entirely on the db side,
+ * to avoid loading potentially large item collections into memory.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user performing this operation.
+ * @param {!number} params.sourceSurveyId - The id of the survey the category is cloned from.
+ * @param {!string} params.sourceCategoryUuid - The uuid of the category to clone.
+ * @param {!number} params.targetSurveyId - The id of the survey the category is cloned into.
+ * @param {pgPromise.IDatabase} client - The database client.
+ * @returns {Promise<Category>} - The cloned and validated category.
+ */
+export const cloneCategoryFromSurvey = async (
+  { user, sourceSurveyId, sourceCategoryUuid, targetSurveyId },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const sourceCategory = await CategoryRepository.fetchCategoryAndLevelsByUuid(
+      { surveyId: sourceSurveyId, categoryUuid: sourceCategoryUuid, draft: true },
+      t
+    )
+    if (!sourceCategory) {
+      throw new Error(`Category with uuid ${sourceCategoryUuid} not found in survey ${sourceSurveyId}`)
+    }
+    const categoryName = Category.getName(sourceCategory)
+
+    const targetCategories = await CategoryRepository.fetchCategoriesBySurveyId(
+      { surveyId: targetSurveyId, draft: true },
+      t
+    )
+    const duplicateCheck = checkCloneFromSurveyDuplicate({
+      targetSurveyItems: targetCategories,
+      sourceItem: sourceCategory,
+      getUuid: Category.getUuid,
+      getName: Category.getName,
+      uuidDuplicateErrorKey: 'validationErrors:categoryImport.uuidDuplicate',
+      nameDuplicateErrorKey: 'validationErrors:categoryImport.nameDuplicate',
+    })
+    if (duplicateCheck) {
+      throw new SystemError(duplicateCheck.key, duplicateCheck.params)
+    }
+
+    await CategoryRepository.cloneCategoryFromSurvey(
+      { sourceSurveyId, targetSurveyId, categoryUuid: sourceCategoryUuid },
+      t
+    )
+
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: sourceCategoryUuid,
+      [ActivityLog.keysContent.categoryName]: categoryName,
+    }
+    await Promise.all([
+      markSurveyDraft(targetSurveyId, t),
+      ActivityLogRepository.insert(user, targetSurveyId, ActivityLog.type.categoryInsert, logContent, false, t),
+    ])
+
+    return _validateCategory({ surveyId: targetSurveyId, categoryUuid: sourceCategoryUuid }, t)
+  })
+
 export const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) =>
   client.tx(async (t) => {
     const parentUuid = CategoryItem.getParentUuid(itemParam)
@@ -249,7 +312,6 @@ export const insertItem = async (user, surveyId, categoryUuid, itemParam, client
 /**
  * Bulk insert of category items.
  * Items can belong to different categories and validation is not performed.
- *
  * @param {!object} user - The user performing this operation.
  * @param {!number} surveyId - The id of the survey.
  * @param {!any} items - Category items to be inserted.
@@ -348,9 +410,10 @@ const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, item
     if (R.isNil(CategoryItem.getExtraProp(name)(item))) {
       return acc
     }
+    const nameNew = ExtraPropDef.getName(itemExtraDef)
     const itemUpdated = deleted
       ? CategoryItem.dissocExtraProp(name)(item)
-      : CategoryItem.renameExtraProp({ nameOld: name, nameNew: ExtraPropDef.getName(itemExtraDef) })(item)
+      : CategoryItem.renameExtraProp({ nameOld: name, nameNew })(item)
 
     return [...acc, itemUpdated]
   }, [])
@@ -623,7 +686,6 @@ export const deleteLevel = async (user, surveyId, categoryUuid, levelUuid, clien
 /**
  * Deletes all levels without items.
  * Category validation is not performed.
- *
  * @param {!object} user - The user performing this operation.
  * @param {!number} surveyId - The id of the survey.
  * @param {!object} category - The category to filter by.
@@ -652,13 +714,11 @@ export const deleteLevelsEmptyByCategory = async (user, surveyId, category, clie
 /**
  * Deletes all levels and creates new ones with the specified names.
  * Category validation is not performed.
- *
  * @param {!object} user - The user performing this operation.
  * @param {!number} surveyId - The id of the survey.
  * @param {!object} category - The category of interest.
  * @param {string[]} levelNamesNew - Array of new level names.
  * @param {pgPromise.IDatabase} client - The database client.
- *
  * @returns {Promise<Category>} - Category with updated levels.
  */
 export const replaceLevels = async (user, surveyId, category, levelNamesNew, client = db) =>

@@ -115,6 +115,9 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
           const codeB = dataItemB[firstDimensionValueColumn]
           const categoryItemA = firstDimensionItems.find((item) => CategoryItem.getCode(item) === codeA)
           const categoryItemB = firstDimensionItems.find((item) => CategoryItem.getCode(item) === codeB)
+          if (!categoryItemA && !categoryItemB) return 0
+          if (!categoryItemA) return 1
+          if (!categoryItemB) return -1
           return CategoryItem.getIndex(categoryItemA) - CategoryItem.getIndex(categoryItemB)
         })
       : data

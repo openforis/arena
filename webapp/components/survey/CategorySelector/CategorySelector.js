@@ -78,7 +78,7 @@ export const CategorySelector = (props) => {
 
   const checkEditCategoryNameSpecified = useCallback(() => {
     if (StringUtils.isBlank(Category.getName(categoryToEdit))) {
-      notifyWarning({ key: 'validationErrors.categoryEdit.nameNotSpecified', timeout: 2000 })
+      notifyWarning({ key: 'validationErrors:categoryEdit.nameNotSpecified', timeout: 2000 })
       return false
     }
     return true

@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import { ServiceErrorActions } from '@webapp/store/system'
 import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
+import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 const tokenRefreshEndpoint = '/auth/token/refresh'
 
@@ -11,10 +12,12 @@ const tokenRefreshUrlRegExp = /^\/auth\/token\/refresh$/
 const errorIgnoredUrlRegExps = [
   loginUrlRegExp, // login
   /^\/auth\/user$/, // user (if not logged in or authorized)
+  /^\/api\/survey$/, // survey create (errors handled locally)
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/query$/, // data query
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/export\/start$/, // data query export
   /^\/api\/mobile\/survey\/\d+$/, // data import (Arena format)
   /^\/api\/2fa\/device\/[\w-]+\/verify$/, // 2FA device verification
+  /^\/api\/survey\/\d+\/record\/[\w-]+\/nodes\/[\w-]+\/file$/, // node file preview (errors handled locally in ImagePreview)
 ]
 
 const authorizationIgnoredUrlRegExps = [loginUrlRegExp, tokenRefreshUrlRegExp]
@@ -37,6 +40,8 @@ const processFailedRequestsQueue = ({ error = null, authToken = null }) => {
     if (error) {
       reject(error)
     } else if (authToken) {
+      // Mark as retried so a further 401 on this request doesn't re-enter the refresh flow.
+      config._retry = true
       setAuthorizationHeader({ config, authToken })
       resolve(axios.request(config))
     }
@@ -52,6 +57,7 @@ const refreshAuthToken = async () => {
     })
     const { authToken } = response.data
     ApiConstants.setAuthToken(authToken)
+    AppWebSocket.updateSocketToken(authToken)
     return { authToken }
   } catch (error) {
     return { error }
@@ -73,7 +79,9 @@ const handleAuthorizationError = async ({ originalRequest }) => {
   processFailedRequestsQueue({ authToken, error })
 
   if (authToken) {
-    // Retry the original failed request
+    // Retry the original failed request only once: a 401 surviving a token refresh means it wasn't
+    // actually caused by an expired Arena token, so retrying again would loop forever.
+    originalRequest._retry = true
     setAuthorizationHeader({ config: originalRequest, authToken })
     return axios.request(originalRequest)
   } else {
@@ -101,8 +109,10 @@ const createAxiosMiddleware =
       const originalRequest = error.config ?? {}
       const { url } = originalRequest
 
-      // Check for 401 response and ensure it's not the refresh endpoint itself or the login endpoint
-      if (error.response?.status === 401 && !isAuthorizationIgnoredUrl(url)) {
+      // Check for 401 response and ensure it's not the refresh endpoint itself or the login endpoint;
+      // skip requests already retried once after a token refresh, to avoid an infinite retry loop
+      // when the 401 isn't actually caused by an expired Arena token.
+      if (error.response?.status === 401 && !isAuthorizationIgnoredUrl(url) && !originalRequest._retry) {
         return handleAuthorizationError({ originalRequest })
       }
       if (!axios.isCancel(error) && url && !isErrorIgnoredUrlIgnored(url)) {

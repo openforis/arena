@@ -14,6 +14,7 @@ import { LabelWithTooltip } from '../form/LabelWithTooltip'
 const TreeItemPropTypes = PropTypes.shape({
   key: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
+  hasSubPages: PropTypes.bool,
   icon: PropTypes.any,
   items: PropTypes.array,
   label: PropTypes.string.isRequired,
@@ -21,8 +22,12 @@ const TreeItemPropTypes = PropTypes.shape({
 })
 
 const TreeItemView = (props) => {
-  const { item } = props
-  const { key, disabled, icon, label, items, testId } = item
+  const { item, renderItemPrefix, renderItemSuffix, expandedItemKeys } = props
+  const { key, disabled, hasSubPages, icon, label, items, testId } = item
+  const isExpanded = Boolean(expandedItemKeys?.includes(key))
+  const prefix = renderItemPrefix?.(item, { isExpanded })
+  const suffix = renderItemSuffix?.(item, { isExpanded })
+
   return (
     <MuiTreeItem
       key={key}
@@ -30,21 +35,36 @@ const TreeItemView = (props) => {
       itemId={key}
       label={
         <div className="tree-item-label display-flex">
+          {prefix}
           {icon}
           <LabelWithTooltip label={label} />
+          {suffix}
         </div>
       }
       data-testid={testId}
     >
-      {items?.map((childItem) => (
-        <TreeItemView key={childItem.key} item={childItem} />
-      ))}
+      {hasSubPages && !items?.length ? (
+        <MuiTreeItem key={`${key}__placeholder`} itemId={`${key}__placeholder`} label="" sx={{ display: 'none' }} />
+      ) : (
+        items?.map((childItem) => (
+          <TreeItemView
+            key={childItem.key}
+            item={childItem}
+            renderItemPrefix={renderItemPrefix}
+            renderItemSuffix={renderItemSuffix}
+            expandedItemKeys={expandedItemKeys}
+          />
+        ))
+      )}
     </MuiTreeItem>
   )
 }
 
 TreeItemView.propTypes = {
   item: TreeItemPropTypes,
+  renderItemPrefix: PropTypes.func,
+  renderItemSuffix: PropTypes.func,
+  expandedItemKeys: PropTypes.array,
 }
 
 export const TreeView = (props) => {
@@ -55,6 +75,8 @@ export const TreeView = (props) => {
     onExpandedItemKeysChange = undefined,
     selectedItemKeys = undefined,
     onSelectedItemKeysChange = undefined,
+    renderItemPrefix = undefined,
+    renderItemSuffix = undefined,
   } = props
 
   const onExpandedItemsChange = useCallback(
@@ -62,8 +84,10 @@ export const TreeView = (props) => {
       const treeItemKeysBeingCollapsed = expadedItemKeys.filter(
         (oldExpandedItemId) => !itemIds.includes(oldExpandedItemId)
       )
-      const targetClass = String(event?.target?.className)
-      if (treeItemKeysBeingCollapsed.length > 0 && targetClass.includes('label')) {
+      // Use closest() so clicks on SVG status icons inside the label are treated
+      // as label clicks (SVG className is SVGAnimatedString, not a plain string).
+      const isLabelClick = Boolean(event?.target?.closest?.('.MuiTreeItem-label, .tree-item-label'))
+      if (treeItemKeysBeingCollapsed.length > 0 && isLabelClick) {
         // do not collapse item if it is expanded and label is clicked; handle only selection;
         return false
       }
@@ -90,7 +114,13 @@ export const TreeView = (props) => {
       selectedItems={selectedItemKeys}
     >
       {items.map((childItem) => (
-        <TreeItemView key={childItem.key} item={childItem} />
+        <TreeItemView
+          key={childItem.key}
+          item={childItem}
+          renderItemPrefix={renderItemPrefix}
+          renderItemSuffix={renderItemSuffix}
+          expandedItemKeys={expadedItemKeys}
+        />
       ))}
     </SimpleTreeView>
   )
@@ -103,4 +133,6 @@ TreeView.propTypes = {
   onExpandedItemKeysChange: PropTypes.func,
   onSelectedItemKeysChange: PropTypes.func,
   selectedItemKeys: PropTypes.array,
+  renderItemPrefix: PropTypes.func,
+  renderItemSuffix: PropTypes.func,
 }

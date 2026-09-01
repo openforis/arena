@@ -23,6 +23,7 @@ export default {
     chain: 'Гинж',
     chain_plural: 'Гинжүүд',
     childrenEmpty: 'Наад зах нь нэг хүүхэд элементийг тодорхойлно уу',
+    clear: 'Арилгах',
     clone: 'Хувилах',
     close: 'Хаах',
     cloneFrom: 'Үүнээс хувилах',
@@ -85,6 +86,7 @@ export default {
     from: 'Эхлэл',
     function: 'Функц',
     goToHomePage: 'Нүүр хуудас руу очих',
+    goToSurveys: 'Судалгааны жагсаалт руу очих',
     group: 'Бүлэг',
     help: 'Тусламж',
     hide: 'Нуух',
@@ -106,6 +108,8 @@ export default {
 Үргэлжлүүлэх үү?`,
     local: 'Орон нутгийн',
     loading: 'Ачаалж байна...',
+    lock: 'Түгжих',
+    unlock: 'Түгжээг тайлах',
     max: 'Хамгийн их',
     med: 'Дундаж',
     manage: 'Удирдах',
@@ -156,6 +160,8 @@ export default {
     required: 'Шаардлагатай',
     requiredField: 'шаардлагатай талбар',
     reset: 'Дахин тохируулах',
+    refresh: 'Шинэчлэх',
+    pressRefreshToReloadPage: 'Хуудсыг дахин ачаалахын тулд Шинэчлэх товчийг дарна уу.',
     resume: 'Үргэлжлүүлэх',
     retry: 'Дахин оролдох',
     role: 'Үүрэг',
@@ -171,6 +177,10 @@ export default {
     showLabels: 'Шошго харуулах',
     showLabelsAndNames: 'Шошго ба нэр харуулах',
     showNames: 'Нэр харуулах',
+    sort: 'Эрэмбэлэх',
+    sortAsc: 'Өсөх эрэмбэ',
+    sortDesc: 'Буурах эрэмбэ',
+    sortNone: 'Эрэмбэ арилгах',
     srs: 'SRS',
     status: 'Төлөв',
     sum: 'Нийлбэр',
@@ -178,6 +188,7 @@ export default {
     to: 'Хүртэл',
     totalItems: 'Нийт элемент',
     true: 'Үнэн',
+    trySplittingFileIntoSmallerChunks: 'Файлыг жижиг хэсгүүдэд хуваахыг оролдоно уу.',
     type: 'Төрөл',
     undefinedName: 'Тодорхойгүй нэр',
     unique: 'Өвөрмөц',
@@ -186,6 +197,7 @@ export default {
       message: `Файл хуулах явцад алдаа гарлаа: {{error}}.\n
 Дахин оролдох уу?`,
     },
+    uploadFileChangedError: 'Сонгосон файл сонгосноос хойш өөрчлөгдсөн бололтой байна. Түүнийг дахин сонгоно уу.',
     uploadingFile: 'Файл байршуулж байна ({{progressPercent}}%)',
     value: 'Утга',
     view: 'Харах',
@@ -247,6 +259,8 @@ export default {
     header: 'Файлууд',
     missing: ' Дутуу файлууд: {{count}}',
     totalSize: 'Нийт хэмжээ: {{size}}',
+    fileName: 'Файлын нэр',
+    fileSize: 'Файлын хэмжээ',
   },
 
   sidebar: {
@@ -256,7 +270,7 @@ export default {
   header: {
     myProfile: 'Миний профайл',
     qrCodeLoginDialog: {
-      title: 'Arena Mobile-аас QR код ашиглан нэвтрэх',
+      title: 'Arena Mobile-д QR код ашиглан нэвтрэх',
       instructions: `1. Гар утсан дээрээ **Arena Mobile** аппыг нээнэ үү
 2. **Тохиргоо** цэс рүү орно уу
 3. **Серверт холбогдох**-ыг сонгоно уу
@@ -286,6 +300,7 @@ export default {
 
   appModules: {
     home: 'Нүүр хуудас',
+    landing: 'Тавтай морил',
     dashboard: 'Хяналтын самбар',
     surveyNew: 'Шинэ судалгаа',
     surveys: 'Судалгаанууд',
@@ -322,6 +337,9 @@ export default {
     userInvite: 'Хэрэглэгч урих',
     userNew: 'Шинэ хэрэглэгч',
     usersSurvey: 'Хэрэглэгчдийн жагсаалт',
+    userGroup: 'Хэрэглэгчийн бүлэг',
+    userGroup_plural: 'Хэрэглэгчийн бүлгүүд',
+    userGroupNew: 'Шинэ хэрэглэгчийн бүлэг',
     usersList: 'Хэрэглэгчдийн жагсаалт (бүгд)',
     user2FADevice: '2FA төхөөрөмж',
     user2FADevice_plural: '2FA төхөөрөмжүүд',
@@ -335,6 +353,8 @@ export default {
     entities: 'Виртуал объектууд',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Жишээнүүд',
+
+    jobMonitor: 'Ажлын хяналт',
 
     help: 'Тусламж',
     about: 'Тухай',
@@ -423,10 +443,14 @@ $t(common.raiseTicketInSupportForum)
     dependencyTypes: {
       applicable: 'Хэрэглэх боломжтой',
       defaultValues: 'Үндсэн утгууд',
+      editable: 'Засах боломжтой',
+      fileName: 'Файлын нэр',
       itemsFilter: 'Элементүүдийн шүүлтүүр',
-      minCount: 'Хамгийн бага тоо',
       maxCount: 'Хамгийн их тоо',
+      minCount: 'Хамгийн бага тоо',
+      parentCode: 'Эх кодекс',
       validations: 'Баталгаажуулалтууд',
+      visible: 'Харагдах',
     },
     selectAtLeastOneDependencyType: 'Наад зах нь нэг хамаарлын төрлийг сонгоно уу',
     noDependenciesToDisplay: 'Харуулах хамаарал байхгүй',
@@ -442,8 +466,14 @@ $t(common.raiseTicketInSupportForum)
     errorLoadingRecord: 'Бичлэг ачааллахад алдаа гарлаа: {{details}}',
     recordEditModalTitle: 'Бичлэг: {{keyValues}}',
     recordNotFound: 'Бичлэг олдсонгүй',
-    lock: 'Түгжих',
-    unlock: 'Түгжээг тайлах',
+    keyAttributeEditing: {
+      lock: 'Түлхүүр атрибутын засварыг түгжих',
+      unlock: 'Түлхүүр атрибутыг засахыг зөвшөөрөх',
+    },
+    qualifierAttributeEditing: {
+      lock: 'Квалификатор атрибутын засварыг түгжих',
+      unlock: 'Квалификатор атрибутыг засахыг зөвшөөрөх',
+    },
   },
 
   dataExplorerView: {
@@ -454,316 +484,8 @@ $t(common.raiseTicketInSupportForum)
     editRecord: 'Бичлэгийг засах',
   },
 
-  dataExportView: {
-    error: 'Өгөгдөл экспортлоход алдаа гарлаа: {{details}}',
-    optionNotCompatibleWithDataImport: 'Өгөгдөл импорттой нийцэхгүй',
-    options: {
-      header: '$t(common.options)',
-      fileFormatLabel: 'Файлын формат',
-      fileFormat: {
-        csv: 'CSV',
-        xlsx: 'Excel',
-      },
-      includeCategoryItemsLabels: 'Ангиллын элементүүдийн шошгыг оруулах',
-      includeCategories: 'Ангилалуудыг оруулах',
-      expandCategoryItems: 'Ангиллын элементүүдийг дэлгэх',
-      exportSingleEntitiesIntoSeparateFiles: 'Нэг объектуудыг тусдаа файлууд руу экспортлох',
-      includeAncestorAttributes: 'Өвөг дээдсийн шинж чанаруудыг оруулах',
-      includeAnalysis: 'Үр дүнгийн хувьсагчдыг оруулах',
-      includeDataFromAllCycles: 'Бүх мөчлөгийн өгөгдлийг оруулах',
-      includeDateCreated: 'Үүсгэсэн огноог оруулах',
-      includeFiles: 'Файлуудыг оруулах',
-      includeFileAttributeDefs: 'Файлын шинж чанарын багануудыг оруулах',
-      includeInternalUuids: 'Дотоод UUID-г оруулах',
-      recordsModifiedAfter: 'Дараа нь өөрчилсөн бичлэгүүд',
-    },
-    optionsInfo: {
-      expandCategoryItems:
-        'элемент сонгогдсон бол ҮНЭН, үгүй бол ХУДАЛ утгатай ангиллын элемент бүрт нэг боол багана нэмнэ',
-      exportSingleEntitiesIntoSeparateFiles: `нэг объектуудыг тусдаа файлууд руу экспортлох; хэрэв шалгагдаагүй бол нэг объектод хамаарах шинж чанарууд нь хамгийн ойрын дээд олон объектын шинж чанаруудад багтана`,
-      includeAnalysis: 'шинжилгээний шинж чанаруудыг оруулна',
-      includeAncestorAttributes: 'үндсэн объект хүртэлх дээд объектуудад хамаарах шинж чанаруудыг оруулна',
-      includeCategoryItemsLabels: 'ангиллын элемент бүрт шошго бүхий багана нэмнэ',
-      includeCategories: `ангилалууд "categories" гэсэн дэд хавтсанд экспортлогдоно`,
-      includeDataFromAllCycles: 'бүх мөчлөгийн өгөгдөл багтана, үгүй бол зөвхөн сонгогдсон мөчлөг л тооцогдоно',
-      includeDateCreated: 'объект бүрийн (мөр) үүсгэсэн огноог "date_created" гэсэн баганад оруулна',
-      includeFiles: `бичлэгүүдтэй холбоотой файлуудыг "files" гэсэн дэд хавтсанд экспортлоно`,
-      includeFileAttributeDefs: `файлын шинж чанарын багануудыг нэмнэ: файлын дотоод танигч (file_uuid) ба нэр (file_name)`,
-      includeInternalUuids: 'дотоод танигч (UUID) -г "_uuid" төгсгөлтэй багануудад оруулна',
-      recordsModifiedAfter: 'зөвхөн заасан огнооны дараа өөрчилсөн бичлэгүүдийн өгөгдлийг экспортлоно',
-    },
-    startExport: 'Экспортлохыг эхлүүлэх',
-  },
-
-  dataImportView: {
-    confirmDeleteAllRecords: 'Импортлохоос өмнө бүх бичлэгүүдийг устгах уу?',
-    confirmDeleteAllRecordsInCycle: 'Импортлохоос өмнө {{cycle}} мөчлөг дэх бүх бичлэгүүдийг устгах уу?',
-    conflictResolutionStrategy: {
-      label: 'Зөрчилдөөнийг шийдвэрлэх стратеги',
-      info: 'Ижил бичлэг (эсвэл ижил түлхүүр шинж чанартай бичлэг) олдвол юу хийх',
-      skipExisting: 'Хэрэв байгаа бол алгасах',
-      overwriteIfUpdated: 'Хэрэв шинэчлэгдсэн бол дахин бичих',
-      merge: 'Бичлэгүүдийг нэгтгэх',
-    },
-    deleteAllRecordsBeforeImport: 'Импортлохоос өмнө бүх бичлэгүүдийг устгах',
-    downloadAllTemplates: 'Бүх загваруудыг татах',
-    downloadAllTemplates_csv: 'Бүх загваруудыг татах (CSV)',
-    downloadAllTemplates_xlsx: 'Бүх загваруудыг татах (Excel)',
-    downloadTemplate: 'Загвар татах',
-    downloadTemplate_csv: 'Загвар татах (CSV)',
-    downloadTemplate_xlsx: 'Загвар татах (Excel)',
-    errors: {
-      rowNum: 'Мөр #',
-    },
-    forceImportFromAnotherSurvey: 'Өөр судалгаанаас албадан импортлох',
-
-    importFromArena: 'Арена/Арена Мобайл',
-    importFromCollect: 'Цуглуулах / Цуглуулах Мобайл',
-    importFromCsvExcel: 'CSV/Excel',
-    importFromCsvStepsInfo: `### Импортлох алхамууд
-1. Зорилтот объектыг сонгох
-2. Загварыг татах
-3. Загварыг бөглөж хадгалах (хэрэв CSV бол UTF-8-г кодчилол болгон ашиглана)
-4. Сонголтуудыг шалгах
-5. CSV/Excel файлыг байршуулах
-6. Файлыг баталгаажуулах
-7. Импортлохыг эхлүүлэх
-`,
-    importIntoCycle: 'Мөчлөгт импортлох',
-    importIntoMultipleEntityOrAttribute: 'Олон объектод эсвэл шинж чанарт импортлох',
-    importType: {
-      label: 'Импортын төрөл',
-      insertNewRecords: 'Шинэ бичлэгүүдийг оруулах',
-      updateExistingRecords: 'Одоо байгаа бичлэгүүдийг шинэчлэх',
-    },
-    jobs: {
-      ArenaDataImportJob: {
-        importCompleteSuccessfully: `Arena Mobile өгөгдөл импортлолт амжилттай боллоо:
-{{summary}}`,
-        importSummaryItem: {
-          processed: 'боловсруулсан бичлэг',
-          insertedRecords: 'үүсгэсэн бичлэг',
-          updatedRecords: 'шинэчилсэн бичлэг',
-          skippedRecords: 'алгассан бичлэг',
-          missingFiles: 'байхгүй файлууд',
-        },
-      },
-      CollectDataImportJob: {
-        importCompleteSuccessfully: `Цуглуулгын өгөгдлийн импорт амжилттай боллоо:
-        - {{insertedRecords}} бичлэг үүсгэгдсэн`,
-      },
-      DataImportJob: {
-        importCompleteSummary: `
-        - {{processed}} мөр боловсруулагдсан
-        - {{insertedRecords}} бичлэг үүсгэгдсэн
-        - {{updatedRecords}} бичлэг шинэчлэгдсэн
-        - {{entitiesCreated}} объект үүсгэгдсэн
-        - {{entitiesDeleted}} объект устгагдсан
-        - {{updatedValues}} утга шинэчлэгдсэн`,
-        importCompleteSuccessfully: `## Импорт амжилттай боллоо:
-$t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
-        importWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportJob.importCompleteSuccessfully)
-        - {{insertedFiles}} файл оруулсан
-        - {{updatedFiles}} файл шинэчлэгдсэн
-        - {{deletedFiles}} файл устгагдсан`,
-        importCompleteWithErrors: `## Импорт дууссан (алдаатай):
-        - {{processed}} мөр боловсруулагдсан`,
-      },
-      DataImportValidationJob: {
-        validationCompleteWithErrors: `## Баталгаажуулалт дууссан ({{errorsFoundMessage}})
-        - {{processed}} мөр боловсруулагдсан`,
-        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)`,
-        validationCompleteSuccessfully: `## Баталгаажуулалт алдаагүй амжилттай боллоо
-        - {{processed}} мөр боловсруулагдсан
-        - {{insertedRecords}} бичлэг үүсгэгдэх байсан
-        - {{updatedRecords}} бичлэг шинэчлэгдэх байсан
-        - {{entitiesCreated}} объект үүсгэгдэх байсан
-        - {{entitiesDeleted}} объект устгагдах байсан
-        - {{updatedValues}} утга шинэчлэгдэх байсан`,
-        validationWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteSuccessfully)
-        - {{insertedFiles}} файл оруулах байсан
-        - {{updatedFiles}} файл шинэчлэх байсан
-        - {{deletedFiles}} файл устгах байсан`,
-      },
-    },
-    options: {
-      header: '$t(common.options)',
-      abortOnErrors: 'Алдаа гарвал зогсоох',
-      preventAddingNewEntityData: 'Шинэ объектын өгөгдөл нэмэхийг хориглох',
-      preventUpdatingRecordsInAnalysis: 'Шинжилгээний алхамд бичлэгүүдийг шинэчлэхийг хориглох',
-      includeFiles: 'Файлуудыг оруулах',
-      deleteExistingEntities: `сонгогдсон объектын өгөгдлийг бүх бичлэгээс устгах`,
-    },
-    optionsInfo: {
-      deleteExistingEntities: `АНХААРУУЛГА: бүх "{{nodeDefName}}" объектууд
-болон тэдний бүх үр удам бүх бичлэгүүдээс
-шинэ объектуудыг оруулахаас өмнө устгагдана.`,
-    },
-    startImport: 'Импортлохыг эхлүүлэх',
-    startImportConfirm: `ОК товчийг дарснаар та импортлох үйл явцыг эхлүүлнэ.
-**Өөрчлөлтүүдийг буцаах боломжгүй.**
-Үргэлжлүүлэхдээ итгэлтэй байна уу?`,
-    startImportConfirmWithDeleteExistingEntities: `$t(dataImportView.startImportConfirm)
-**($t(dataImportView.options.deleteExistingEntities) сонголт сонгогдсон: одоо байгаа объектууд шинийг үүсгэхээс өмнө устгагдана)**
-`,
-    steps: {
-      selectImportType: 'Импортын төрлийг сонгох',
-      selectCycle: 'Мөчлөг сонгох',
-      selectEntity: 'Объект сонгох',
-      selectFile: 'Файл сонгох',
-      startImport: 'Импортлохыг эхлүүлэх',
-    },
-    validateFile: 'Файлыг баталгаажуулах',
-    validateFileInfo:
-      'Баталгаажуулах үйл явц нь файл нь шинж чанар бүрийн өгөгдлийн төрлийн дагуу хүчинтэй өгөгдөл агуулж байгаа эсэхийг шалгадаг.',
-  },
-
-  dataView: {
-    charts: {
-      downloadToPng: 'Графикийг PNG руу татах',
-      warning: {
-        selectOneDimensionAndOneMeasure: 'График харуулахын тулд нэг хэмжээс болон нэг хэмжигдэхүүн сонгоно уу',
-        selectAtLeast2NumericAttributes: 'График харуулахын тулд наад зах нь 2 тоон шинж чанар сонгоно уу',
-        tooManyItemsToShowChart: `График харуулахад хэт олон элемент байна;
-хамгийн ихдээ {{maxItems}} элемент хүлээж байна.
-Элементүүдийн тоог багасгахын тулд хүсэлтээ сайжруулна уу (жишээ нь шүүлтүүр нэмэх).
-`,
-      },
-      type: {
-        area: 'Талбайн график',
-        bar: 'Баар график',
-        line: 'Шугам график',
-        pie: 'Бялуу график',
-        scatter: 'Тархалтын график',
-      },
-    },
-    dataQuery: {
-      deleteConfirmMessage: 'Хүсэлт "{{name}}"-г устгах уу?',
-      displayType: {
-        chart: 'График',
-        table: 'Хүснэгт',
-      },
-      manageQueries: 'Хүсэлтүүдийг удирдах',
-      mode: {
-        label: 'Горим:',
-        aggregate: 'Нэгтгэх',
-        raw: 'Түүхий',
-        rawEdit: 'Түүхийг засах',
-      },
-      replaceQueryConfirmMessage: 'Одоогийн хүсэлтийг сонгосон хүсэлтээр солих уу?',
-      showCodes: 'Кодуудыг харуулах',
-    },
-    editSelectedRecord: 'Сонгогдсон бичлэгийг засах',
-    filterAttributeTypes: 'Шинж чанарын төрлүүдийг шүүх',
-    filterRecords: {
-      buttonTitle: 'Шүүх',
-      expressionEditorHeader: 'Бичлэгүүдийг шүүх илэрхийлэл',
-    },
-    invalidRecord: 'Хүчингүй бичлэг',
-    nodeDefsSelector: {
-      hide: 'Зангилааны тодорхойлолтын сонгогчийг нуух',
-      show: 'Зангилааны тодорхойлолтын сонгогчийг харуулах',
-      nodeDefFrequency: `{{nodeDefLabel}} (давтамж)`,
-    },
-    records: {
-      clone: 'Хувилах',
-      confirmDeleteRecord: `Бичлэг "{{keyValues}}"-г устгах уу?`,
-      confirmDeleteSelectedRecord_one: `Сонгогдсон бичлэгийг устгах уу?`,
-      confirmDeleteSelectedRecord_other: `Сонгогдсон {{count}} бичлэгийг устгах уу?`,
-      confirmMergeSelectedRecords: `### Сонгогдсон бичлэгүүдийг нэгтгэх үү?
-
-- "эх үүсвэр" бичлэг "зорилтот" бичлэгт нэгтгэгдэнэ:
-  - эх үүсвэр: [{{sourceRecordKeys}}], өөрчилсөн {{sourceRecordModifiedDate}};
-  - зорилтот: [{{targetRecordKeys}}], өөрчилсөн {{targetRecordModifiedDate}};
-
-- нэгтгэхээс өмнө үр дүнгийн урьдчилан харахыг харуулна;
-
-- нэгтгэхийг баталгаажуулсны дараа, **эх үүсвэр бичлэг УСТГАГДАНА**`,
-      confirmUpdateRecordsStep: `Сонгогдсон {{count}} бичлэг(үүд)-ийг {{stepFrom}}-аас {{stepTo}} руу шилжүүлэх үү?`,
-      confirmUpdateRecordOwner: `Сонгогдсон бичлэгийн эзэмшигчийг {{ownerName}} болгож өөрчлөх үү?`,
-      confirmValidateAllRecords: `Бүх бичлэгийг дахин баталгаажуулах уу?\n\nҮүнд хэдэн минут шаардагдаж магадгүй.`,
-      deleteRecord: 'Бичлэг устгах',
-      demoteAllRecordsFromAnalysis: 'Шинжилгээ -> Цэвэрлэгээ',
-      demoteAllRecordsFromCleansing: 'Цэвэрлэгээ -> Оролт',
-      editRecord: 'Бичлэгийг засах',
-      exportList: 'Жагсаалт экспортлох',
-      exportData: 'Өгөгдөл экспортлох',
-      exportDataSummary: 'Өгөгдлийн хураангуй экспортлох',
-      filterPlaceholder: 'Түлхүүр эсвэл эзэмшигчээр шүүх',
-      merge: {
-        label: 'Нэгтгэх',
-        confirmLabel: 'Нэгтгэх баталгаажуулах',
-        confirmTooManyDifferencesMessage: `**Хэт олон ялгаа**.
-Бичлэгүүд хоорондоо их ялгаатай байна.
-Олон шинж чанарууд (~{{nodesUpdated}}) нэгтгэх үед шинэчлэгдэх болно.
-Нэгтгэх урьдчилан харахыг үргэлжлүүлэх үү?`,
-        noChangesWillBeApplied: `Зорилтот бичлэгт өөрчлөлт орохгүй.
-Нэгтгэх боломжгүй.`,
-        performedSuccessfullyMessage: 'Бичлэгүүдийг нэгтгэх үйлдэл амжилттай боллоо!',
-        previewTitle: 'Нэгтгэх урьдчилан харах (бичлэг {{keyValues}})',
-      },
-      noRecordsAdded: 'Бичлэг нэмэгдээгүй',
-      noRecordsAddedForThisSearch: 'Энэ хайлтанд бичлэг олдсонгүй',
-      noSelectedRecordsInStep: 'Алхам {{step}}-д сонгогдсон бичлэг байхгүй',
-      owner: 'Эзэмшигч',
-      promoteAllRecordsToAnalysis: 'Цэвэрлэгээ -> Шинжилгээ',
-      promoteAllRecordsToCleansing: 'Оролт -> Цэвэрлэгээ',
-      step: 'Алхам',
-      updateRecordsStep: 'Бичлэгийн алхамыг шинэчлэх',
-      validateAll: 'Бүгдийг баталгаажуулах',
-      viewRecord: 'Бичлэгийг харах',
-    },
-    recordsClone: {
-      title: 'Бичлэг хувилах',
-      fromCycle: 'Мөчлөгөөс',
-      toCycle: 'Мөчлөгт',
-      confirmClone: `Бичлэгүүдийг {{cycleFrom}} мөчлөгөөс {{cycleTo}} мөчлөгт хувилах уу?\n
-({{cycleTo}} мөчлөгт аль хэдийн байхгүй бичлэгүүд л хувилах болно)`,
-      startCloning: 'Хувилахыг эхлүүлэх',
-      cloneComplete: 'Хувилах ажил дууссан. {{recordsCloned}} бичлэг {{cycleFrom}}-ээс {{cycleTo}} руу хувилах болно',
-      error: {
-        cycleToMissing: '"Хүртэлх мөчлөг"-ийг сонгоно уу',
-        cycleToMustBeDifferentFromCycleFrom: '"Хүртэлх мөчлөг" нь "Эхлэх мөчлөг"-өөс өөр байх ёстой',
-      },
-      source: {
-        label: 'Эх үүсвэр',
-        allRecords: '{{cycleFrom}} мөчлөгт байгаа бүх бичлэгүүд, {{cycleTo}} мөчлөгт аль хэдийн байхгүй',
-        selectedRecords: 'Зөвхөн сонгогдсон {{selectedRecordsCount}} бичлэг',
-      },
-    },
-    recordDeleted_one: `Бичлэг амжилттай устгагдлаа!`,
-    recordDeleted_other: `{{count}} бичлэг амжилттай устгагдлаа!`,
-    recordsSource: {
-      label: 'Эх үүсвэр',
-    },
-    recordsUpdated: '{{count}} бичлэг амжилттай шинэчлэгдлээ!',
-    rowNum: 'Мөр #',
-    selectedAttributes: 'Сонгогдсон шинж чанарууд:',
-    selectedDimensions: 'Сонгогдсон хэмжээсүүд',
-    selectedMeasures: 'Сонгогдсон хэмжигдэхүүнүүд',
-    sortableItemsInfo: 'Эрэмбэлэхийн тулд чирж оруулах',
-    showValidationReport: 'Баталгаажуулалтын тайланг харуулах',
-    sort: 'Эрэмбэлэх',
-    dataExport: {
-      source: {
-        label: 'Эх үүсвэр',
-        allRecords: 'Бүх бичлэгүүд',
-        filteredRecords: 'Зөвхөн шүүгдсэн бичлэгүүд',
-        selectedRecord: 'Зөвхөн сонгогдсон бичлэг',
-        selectedRecord_other: 'Зөвхөн сонгогдсон {{count}} бичлэг',
-      },
-      title: 'Өгөгдөл экспортлох',
-    },
-    dataVis: {
-      errorLoadingData: 'Өгөгдөл ачаалахад алдаа гарлаа',
-      noData: 'Энэ хүсэлт өгөгдөл буцаасангүй',
-      noSelection:
-        'Зүүн талын самбараас сонголт хийнэ үү эсвэл "Хүсэлтүүдийг удирдах"-аас одоо байгаа хүсэлтийг сонгоно уу',
-      viewSelectedRecord: 'Сонгогдсон бичлэгийг харах',
-    },
-  },
-
   mapView: {
+    changeMarkerColor: 'Тэмдэглэгээний өнгө өөрчлөх',
     createRecord: 'Шинэ бичлэг үүсгэх',
     editRecord: 'Бичлэгийг засах',
     elevation: 'Өндөр (м)',
@@ -777,6 +499,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       showSamplingPolygon: `Түүвэрлэх олон өнцөгт`,
       showControlPoints: `Хяналтын цэгүүд`,
       showPlotReferencePoint: `Газрын зургийн лавлах цэг`,
+      showUtmGrid: 'UTM торыг харуулах',
     },
     samplingPointDataLayerName: 'Түүвэрлэх цэгийн өгөгдөл - түвшин {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (ачаалж байна...)',
@@ -830,6 +553,11 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
     onlyOwn: 'Зөвхөн өөрийн судалгаанууд',
     records: 'Бичлэгүүд',
     recordsCreatedWithMoreApps: 'Илүү олон програмаар үүсгэсэн бичлэгүүд:',
+    status: {
+      published: 'Нийтэлсэн',
+      draft: 'Ноорог',
+      'published-draft': 'Нийтэлсэн/Ноорог',
+    },
   },
 
   usersAccessRequestView: {
@@ -881,8 +609,9 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
     confirmInviteSystemAdmin: 'Хэрэглэгч {{email}}-г Систем Администратороор урих уу?',
     confirmInviteSystemAdmin_other: 'Хэрэглэгч {{email}}-г Систем Администратороор урих уу?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} хаяг алгассан (тэдгээр нь энэ судалгаанд өмнө нь уригдсан байсан): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} хаяг алгассан (тэдгээр нь энэ судалгаанд өмнө нь уригдсан байсан): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Эрхүүд',
       systemAdmin: `
@@ -988,6 +717,11 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
     },
     downloadSummaryJSON: 'Хураангуй татах (JSON)',
     firstPhaseCategory: '1-р үе шатны ангилал',
+    firstPhaseCategoryInfo: '1-р үе шатны түүврийг агуулсан ангиллыг сонгоно уу.',
+    firstPhaseCategoryExtraProp: {
+      label: '1-р үе шатны давхаргын шинж чанар',
+      info: 'Анхны популяцийг эхний түүврийн шатанд өргөн давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.',
+    },
     firstPhaseCommonAttribute: {
       label: 'Нийтлэг шинж чанар',
       info: `Суурь нэгж ба 1-р үе шатны хүснэгтийн хоорондох нийтлэг шинж чанар
@@ -1006,9 +740,11 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       surveyNotPublished: '$t(chainView.cannotStartRStudio.common): эхлээд судалгааг нийтлэх',
     },
     nonResponseBiasCorrection: 'Хариу өгөхгүй байх хазайлт засварлах',
-    nonResponseBiasCorrectionTip: `Энэ аргыг хэрэгжүүлэхийн тулд "design_psu" болон "design_ssu"-г давхаргын ангилалд нэмэлт шинж чанар болгон нэмнэ үү.`,
+    nonResponseBiasCorrectionInfo: `Жинлэлтийн ангиллын тохируулгын аргыг хэрэгжүүлэхийн тулд 'design_psu' болон 'design_ssu'-г давхаргын ангиллын хүснэгтэд нэмэлт тоон шинж чанар болгон нэмнэ үү.`,
     pValue: 'P-утга',
     resultsBackFromRStudio: 'RStudio-оос үр дүнг буцааж уншсан',
+    resultsBackFromRStudioInfo: `RStudio-д тооцоолсон үр дүнгийн шинж чанаруудыг Arena сервер рүү буцааж импортлох шаардлагатай бол энэ сонголтыг идэвхжүүлнэ үү.
+Энэ үйл явц удаан байж болзошгүй.`,
     samplingDesign: 'Түүвэрлэлтийн загвар',
     samplingDesignDetails: 'Түүвэрлэлтийн загварын дэлгэрэнгүй мэдээлэл',
     samplingStrategyLabel: 'Түүвэрлэлтийн стратеги',
@@ -1030,11 +766,16 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         dimensionsSeparate: 'Хэмжээсүүдийг тусад нь',
       },
       reportingArea: 'Нийт тайлагнах талбай (га) (Заавал биш)',
+      reportingAreaInfo: `Үечилсэн түүвэрлэлтийн хувьд үечилсэн шинж чанарын ангиллын хүснэгтэд давхаргуудын талбайг оруулна уу (баганын нэр 'area')`,
     },
     stratumAttribute: 'Үеийн шинж чанар',
+    stratumAttributeInfo: 'Түүврийг давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.',
+    stratumAttribute2ndPhase: '2-р үе шатны давхаргын шинж чанар',
+    stratumAttribute2ndPhaseInfo: `Эцсийн, дэлгэрэнгүй дэд түүврийг гаргаж авахаас өмнө 1-р үе шатны түүврийг дэд давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.`,
     postStratificationAttribute: 'Дараах үечилсэн шинж чанар',
     areaWeightingMethod: 'Талбайн жинлэх арга',
     clusteringEntity: 'Бүлэглэх объект',
+    clusteringEntityInfo: `Анхдагч түүврийн нэгжийг тодорхойлох объект. Тэмдэглэл: Энэ нь зөвхөн R survey багцын хүрээнд кластерийн шинжилгээнд ашиглагдана.`,
     clusteringOnlyVariances: 'Зөвхөн хэлбэлзэлд зориулсан бүлэглэлт',
     errorNoLabel: 'Гинж нь хүчинтэй шошготой байх ёстой',
     dateExecuted: 'Гүйцэтгэсэн огноо',
@@ -1043,6 +784,18 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Боловсруулах гинж устгагдсан',
+    cloneFromAnotherSurvey: 'Өөр судалгаанаас хуулах',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Өөр судалгаанаас гинжийг хуулах',
+      sourceSurvey: 'Эх судалгаа',
+      sourceChain: 'Эх гинж',
+      entityCheck: 'Объектын нийцтэй байдал',
+      entityMissing: 'зорилтот судалгаанд байхгүй',
+      skipMissingEntities: 'Зорилтот судалгаанд байхгүй объектуудын шинжилгээний шинж чанаруудыг алгасах',
+      noAnalysisAttributes: 'Энэ гинж шинжилгээний шинж чанаргүй байна',
+      cloneComplete: 'Гинж амжилттай хуулагдсан',
+      missingEntities: 'Хуулах боломжгүй: дараах объектууд зорилтот судалгаанд байхгүй байна: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `Зангилааны тодорхойлолт "{{label}}" нь боловсруулах гинжийн бүх мөчлөгт хамаарахгүй тул сонгох боломжгүй.`,
     cannotSelectCycle:
       'Энэ мөчлөгийг сонгох боломжгүй, учир нь зарим зангилааны тодорхойлолтууд энэ мөчлөгт хамаарахгүй.',
@@ -1073,7 +826,9 @@ $t(common.cantUndoWarning)`,
   chain: {
     quantitative: 'Тоон',
     categorical: 'Ангиллын',
-    emptyNodeDefs: '$t(validationErrors.analysis.analysisNodeDefsRequired)',
+    addQuantitative: 'Тоон шинж чанар нэмэх',
+    addCategorical: 'Ангиллын шинж чанар нэмэх',
+    emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
     entityExcludedInRStudioScripts:
       'объект болон түүнтэй холбоотой бүх үр дүнгийн хувьсагчид RStudio скриптүүдэд хасагдана',
     entityWithoutData: 'Объект {{name}} өгөгдөлгүй байна; $t(chain.entityExcludedInRStudioScripts)',
@@ -1097,6 +852,7 @@ $t(common.cantUndoWarning)`,
     invalidAttributeValuePropertyName: 'Хүчингүй шинж чанарын утгын шинж чанарын нэр: {{attributeName}}.{{propName}}',
     invalidCategoryExtraProp: 'Хүчингүй нэмэлт шинж чанарын нэр: {{propName}}',
     invalidCategotyName: 'Хүчингүй ангиллын нэр: {{name}}',
+    invalidTaxonomyExtraProp: 'Хүчингүй таксономын нэмэлт шинж чанарын нэр: {{propName}}',
     invalidTaxonomyName: 'Хүчингүй таксономын нэр: {{name}}',
     invalidTaxonVernacularNameLanguageCode: 'Хүчингүй таксоны нутгийн нэрийн хэлний код: {{vernacularLangCode}}',
     missingFunctionParameters: 'Функцын дутуу параметрүүд',
@@ -1115,9 +871,12 @@ $t(common.appNameFull)
  
  * Хөгжүүлсэн: $t(links.openforis)
  * Хувилбар: {{version}}
+ * Вэбсайт: $t(links.openforisArenaWebsite)
+ * Arena видео хичээлүүд FAO elearning Академид: $t(links.arenaVideoTutorialsInFaoElearningAcademy)
+ * Arena видео хичээлүүд YouTube-д: $t(links.arenaVideoTutorialsInYouTube)
  * Дэмжлэгийн форум: $t(links.supportForum)
- * Арена GitHub-д: <a href="https://github.com/openforis/arena" target="_blank">https://github.com/openforis/arena</a>
- * Арена R Скриптүүд GitHub-д: <a href="https://github.com/openforis/arena-r" target="_blank">https://github.com/openforis/arena-r</a>
+ * Arena GitHub-д: $t(links.arenaInGitHub)
+ * Arena R Скриптүүд GitHub-д: $t(links.arenaRScriptsInGitHub)
 `,
     },
   },
@@ -1129,6 +888,18 @@ $t(common.appNameFull)
     basic: 'Үндсэн',
     advanced: 'Нарийвчилсан',
     mobileApp: 'Мобайл апп',
+    print: 'Хэвлэх',
+    printProps: {
+      printOrientation: {
+        label: 'Хуудасны чиглэл',
+        info: 'Энэ объект өөрийн хэвлэх хэсгийг эхлүүлэхэд ашиглагдах чиглэл. Анхдагчаар экспортод сонгосон баримтын чиглэлийг дагана.',
+      },
+      orientations: {
+        default: 'Анхдагч (баримт)',
+        portrait: 'Босоо',
+        landscape: 'Хэвтээ',
+      },
+    },
     validations: 'Баталгаажуулалтууд',
     function: 'Функц',
     editingFunction: 'Функц {{functionName}}-г засах',
@@ -1157,6 +928,12 @@ $t(common.appNameFull)
       now: 'Одоогийн огноо эсвэл цагийг буцаана',
       parent: 'Заасан зангилааны эцэг объектыг буцаана',
       pow: 'Суурийн утгыг зэрэгт өргөсөн утгыг буцаана',
+      prevCycleNote:
+        'Зөвхөн Arena Mobile-д ажилладаг, олон мөчлөг тодорхойлогдсон бөгөөд өмнөх мөчлөгтэй холбоос идэвхжүүлсэн үед',
+      prevCycleValue:
+        'Өмнөх мөчлөгийн бичлэгт ижил шинж чанарын утгыг буцаана. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
+      prevCycleValues:
+        'Өмнөх мөчлөгийн бичлэгт ижил шинж чанаруудын утгуудыг буцаана. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
       recordCycle: 'Одоогийн бичлэгийн мөчлөгийг буцаана',
       recordDateCreated:
         'Одоогийн бичлэгийн үүсгэсэн огноо, цагийг datetime утгаар буцаана. Үүнийг текст, огноо эсвэл цагийн шинж чанарт ашиглаж болно',
@@ -1168,6 +945,7 @@ $t(common.appNameFull)
       rowIndex: 'Одоогийн хүснэгтийн мөрний (эсвэл маягтын) индексыг буцаана',
       taxonProp: 'Заасан кодтой таксоны заасан $t(extraProp.label)-ийн утгыг буцаана',
       taxonVernacularName: 'Заасан кодтой таксоны заасан хэлээрх (эхний) нутгийн нэрийг буцаана',
+      unique: 'Олон шинж чанар эсвэл объектын өвөрмөц утгуудыг буцаана',
       userEmail: 'Нэвтэрсэн хэрэглэгчийн имэйлийг буцаана',
       userIsRecordOwner:
         'Бичлэгийг засаж буй хэрэглэгч нь мөн түүний эзэмшигч бол "үнэн", үгүй бол "худал" гэсэн боол утгыг буцаана',
@@ -1188,6 +966,10 @@ $t(common.appNameFull)
         label: 'Автомат өсөн нэмэгдэх түлхүүр',
         info: 'Утга автоматаар үүсгэгдэнэ',
       },
+      autoCreateMinCountItems: {
+        label: 'Хамгийн бага элементийг автоматаар үүсгэх',
+        info: 'Объект хэрэгжиж эхлэх үед эсвэл түүний эцэг объект үүсгэгдэх үед хамгийн бага тооны объектууд автоматаар үүсгэгдэнэ.',
+      },
       displayAs: 'Илэрхийлэх',
       displayIn: 'Илэрхийлэхдээ',
       entitySource: 'Объектын эх үүсвэр',
@@ -1207,18 +989,44 @@ $t(common.appNameFull)
         info: `Хэрэв тэмдэглэсэн бол уг шинж чанар нь бүртгэлийн жагсаалтад харагдах болно`,
       },
       key: 'Түлхүүр',
+      maxKeysCountReached: 'Түлхүүрийн дээд тоо хүрсэн ({{maxKeysCount}})',
       multiple: 'Олон',
       ownPage: 'Өөрийн хуудас',
       parentPage: 'Эцэг хуудас ({{parentPage}})',
+      qualifier: {
+        label: 'Тодорхойлогч',
+        info: `Бүлэгт харьяалагддаг хэрэглэгч шинэ бичлэг үүсгэхэд энэ атрибут нь хэрэглэгчийн бүлгийн тодорхойлогчид заасан утгаар автоматаар бөглөгдөнө. Хэрэглэгчид зөвхөн өөрийн бүлэгт хамаарах бичлэгүүдийг харах, засах боломжтой байх болно, хэрэв тэд бүлэгт харьяалагддаг бол.`,
+      },
       table: 'Хүснэгт',
     },
     advancedProps: {
+      defaultValuesNotSpecified: 'Үндсэн утгууд тодорхойлогдоогүй',
+      defaultValuesSpecified: 'Үндсэн утгууд тодорхойлогдсон',
+      editableAlways: 'Үргэлж засварлах боломжтой',
+      editableIfConditionIsMet: 'Нөхцөл биелсэн үед засварлах боломжтой',
+      relevantIfRadioNone: 'Үргэлж хамааралтай',
+      relevantIfRadioDefined: 'Нөхцөл биелсэн үед хамааралтай',
+      visibleAlways: 'Үргэлж харагдах',
+      visibleIfConditionIsMet: 'Нөхцөл биелсэн үед харагдах',
       areaBasedEstimate: 'Талбай дээр суурилсан тооцоо',
       defaultValues: 'Үндсэн утгууд',
+      defaultValuesInfo: `Энэ нь тодорхой дүрмийн дагуу хариуг автоматаар бөглөх боломжийг олгоно.
+    Хэрэв хэд хэдэн дүрэм тохируулсан бол систем тэдгээрийг дээрээс доош дарааллаар шалгана.
+    Нөхцөлд нийцсэн эхний дүрмийг хэрэглэж, түүний үр дүнг хариу болгон ашиглана.`,
       defaultValueEvaluatedOneTime: 'Үндсэн утга нэг удаа үнэлэгдсэн',
+      defaultValueEvaluatedOneTimeInfo: `Шинж чанар үүсэх үед үндсэн утгыг зөвхөн нэг удаа үнэлнэ.
+    Хэрэв тэмдэглээгүй бол бичлэг шинэчлэх бүрт үндсэн утгыг дахин үнэлнэ.
+    now() эсвэл uuid() зэрэг зөвхөн нэг удаа үнэлэгдэх ёстой илэрхийллүүдийг ашиглах үед үүнийг тэмдэглэх хэрэгтэй.`,
       defaultValuesNotEditableForAutoIncrementalKey:
         'Автоматаар өсөн нэмэгдэх түлхүүр тохируулагдсан тул үндсэн утгуудыг засах боломжгүй',
-      hidden: 'Оролтын маягтанд нуух',
+      editableIf: 'Хэрэв засварлах боломжтой бол',
+      editableIfInfo: `Анхдагчаар хэрэглэгч хамааралтай талбарт үргэлж хандах боломжтой.
+Энд хэрэглэгч энэ талбарт бичих эсвэл утгыг өөрчлөх эсэхийг тодорхойлох дүрэм тохируулж болно.
+Энэ нь хэрэглэгч энэ талбарт бичих эсвэл утгыг өөрчлөх боломжтой эсэхийг шийднэ.
+    Хэрэв таны тохируулсан нөхцөл биелбэл талбарыг засварлаж болно. Үгүй бол зөвхөн унших (түгжигдсэн) болно.`,
+      hidden: 'Үргэлж нуух',
+      hiddenInReport: 'Аналитик хяналтын самбарт нуух',
+      hiddenInReportInfo: `Хэрэв тэмдэглэгдсэн бол шинж чанар Аналитик хяналтын самбарт харагдахгүй`,
       hiddenWhenNotRelevant: 'Хамааралгүй үед нуух',
       itemsFilter: 'Элементүүдийн шүүлтүүр',
       itemsFilterInfo: `Сонгогдох элементүүдийг шүүхэд ашиглагдах илэрхийлэл.
@@ -1227,7 +1035,16 @@ $t(common.appNameFull)
 (энд "region" нь элементийн хувьд тодорхойлогдсон нэмэлт шинж чанарын нэр, region_attribute_name нь судалгаан дахь шинж чанарын нэр юм)`,
       readOnly: 'Зөвхөн унших',
       relevantIf: 'Хэрэв хамааралтай бол',
+      relevantIfInfo: `Анхдагчаар бүх талбар идэвхтэй байна.
+    Хэрэв хамааралтын дүрэм тохируулж, тэр нь биелэхгүй бол талбар саарал болох эсвэл бүрэн нуугдана,
+    мөн автомат хариунуудыг үл тоомсорлоно.
+    Үүнийг маягтын хэсгийг динамикаар харуулах/нуухад ашиглана; жишээ нь хэрэглэгч "Бусад" сонгосон үед л "Тодруулна уу" талбарыг харуулах.`,
       script: 'Скрипт',
+      visibleIf: 'Хэрэв харагдах бол',
+      visibleIfInfo: `Анхдагчаар талбар үргэлж харагдана.
+    Хэрэв дүрэм тохируулбал, тэр дүрэм биелсэн үед л харагдана; эс тэгвээс нуугдана.
+    Тэмдэглэл: "хамааралгүй" талбарыг нуухаас ялгаатай нь, нуугдсан талбар автомат хариуг хадгалж болно.
+    Энэ нь хэн нэвтэрснээс (жишээ нь үүргээс) хамаарч маягтын бүхэл хэсгийг нуухад тохиромжтой.`,
     },
     mobileAppProps: {
       hiddenInMobile: {
@@ -1242,6 +1059,9 @@ $t(common.appNameFull)
         label: 'Өмнөх мөчлөгийн холбоосонд оруулах',
         info: `Хэрэв тэмдэглэгдсэн бол өмнөх мөчлөгийн утга өгөгдөл оруулах маягт дээр харагдана (мобайл апп-д өмнөх мөчлөгт холбоос идэвхтэй үед)"`,
       },
+    },
+    numericProps: {
+      unit: 'Нэгж',
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Бутархай тооны хамгийн их орон',
@@ -1310,6 +1130,7 @@ $t(common.appNameFull)
     coordinateProps: {
       allowOnlyDeviceCoordinate: 'Зөвхөн төхөөрөмжийн координатыг зөвшөөрөх',
       allowOnlyDeviceCoordinateInfo: `Зөвхөн Арена Мобайл-д хамаарна: хэрэв шалгагдсан бол хэрэглэгч X/Y утгуудыг өөрчлөх боломжгүй, зөвхөн төхөөрөмжийн GPS-г ашиглан тэдгээрийг авах боломжтой`,
+      mapMarkerColor: 'Газрын зураг дээрх тэмдэглэгээний өнгө',
     },
     expressionsProp: {
       expression: 'Илэрхийлэл',
@@ -1320,7 +1141,9 @@ $t(common.appNameFull)
     validationsProps: {
       minCount: 'Хамгийн бага тоо',
       maxCount: 'Хамгийн их тоо',
-      expressions: 'Илэрхийлэл',
+      expressions: 'Баталгаажуулалтын илэрхийлэл',
+      attributeAlwaysValid: 'Шинж чанар үргэлж хүчинтэй',
+      attributeValidWhenConditionIsMet: 'Нөхцөл биелсэн үед шинж чанар хүчинтэй',
     },
     cannotChangeIntoMultipleWithDefaultValues: 'Энэ зангилааг үндсэн утгуудтай олон болгох боломжгүй.',
     cannotDeleteNodeDefReferenced: `Зангилааны тодорхойлолт "{{nodeDef}}"-г устгах боломжгүй: энэ нь дараах зангилааны тодорхойлолтуудаар холбогдсон байна: {{nodeDefDependents}}`,
@@ -1351,6 +1174,8 @@ $t(common.appNameFull)
 
 Жишээ нь, *бүлэглэл -> талбай -> мод* гэсэн бүтэцтэй бол, хэрэв танд **Өвөрмөц** гэж тэмдэглэгдсэн *tree_species* гэсэн шинж чанар байвал, нэг *талбай* дотор зөвхөн нэг төрлийн мод байж болно.`,
     },
+    categoriesClonedFromSurvey: 'Дараах ангилалууд эх судалгаанаас мөн хувилагдсан: {{names}}',
+    taxonomiesClonedFromSurvey: 'Дараах таксономууд эх судалгаанаас мөн хувилагдсан: {{names}}',
   },
 
   languagesEditor: {
@@ -1361,13 +1186,27 @@ $t(common.appNameFull)
     header: 'Таксоном',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Таксоном {{taxonomyName}}-г устгах уу?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Өөр судалгаанаас таксоном хуулах',
+      sourceSurvey: 'Эх сурвалж судалгаа',
+      sourceTaxonomy: 'Эх сурвалж таксоном',
+      loadingSurveys: 'Судалгаанууд ачаалж байна...',
+      noSurveysAvailable: 'Судалгаа алга байна',
+      selectSurveyFirst: 'Эхлээд судалгаа сонгоно уу',
+      loadingTaxonomies: 'Таксоном ачаалж байна...',
+      noTaxonomiesAvailable: 'Сонгосон судалгаанд таксоном алга байна',
+    },
     edit: {
       taxonomyListName: 'Таксономын жагсаалтын нэр',
       taxaNotImported: 'Таксонуудыг импортлоогүй',
       family: 'Овог',
       genus: 'Төрөл',
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
+      synonym: 'Ижил нэр / Латин',
       extraPropsNotDefined: 'Энэ таксономын нэмэлт шинж чанарууд тодорхойлогдоогүй',
+      importMissingPublishedTaxa:
+        '{{count}} нийтлэгдсэн таксон импортлосон файлд олдоогүй тул өөрчлөгдөлгүй үлдлээ. Кодууд: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} дахин)',
     },
     taxaCount: 'Таксоны тоо',
     vernacularNameLabel: 'Нутгийн нэрийн шошго',
@@ -1378,6 +1217,16 @@ $t(common.appNameFull)
     batchImportCompleteSuccessfully: `{{importedCategories}} ангилал амжилттай импортлогдлоо!
 {{insertedCategories}} шинэ
 {{updatedCategories}} шинэчлэгдсэн`,
+    cloneFromAnotherSurvey: {
+      title: 'Өөр судалгаанаас ангилал хуулах',
+      sourceSurvey: 'Эх сурвалж судалгаа',
+      sourceCategory: 'Эх сурвалж ангилал',
+      loadingSurveys: 'Судалгаанууд ачаалж байна...',
+      noSurveysAvailable: 'Судалгаа алга байна',
+      selectSurveyFirst: 'Эхлээд судалгаа сонгоно уу',
+      loadingCategories: 'Ангилал ачаалж байна...',
+      noCategoriesAvailable: 'Сонгосон судалгаанд ангилал алга байна',
+    },
     itemsCount: 'Элементүүдийн тоо',
     types: {
       flat: 'Хавтгай',
@@ -1433,11 +1282,6 @@ $t(common.cantUndoWarning)`,
       title: 'Ангиллын импортын хураангуй',
     },
     reportingData: 'Тайлагнах өгөгдөл',
-    templateForImport: 'Импортын загвар',
-    templateFor_specificDataImport_csv: 'Өгөгдөл импортлох загвар (CSV)',
-    templateFor_specificDataImport_xlsx: 'Өгөгдөл импортлох загвар (Excel)',
-    templateFor_genericDataImport_csv: 'Өгөгдлийн ерөнхий загвар (CSV)',
-    templateFor_genericDataImport_xlsx: 'Өгөгдлийн ерөнхий загвар (Excel)',
     templateFor_samplingPointDataImport_csv: 'Түүвэрлэлтийн цэгийн загвар (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Түүвэрлэлтийн цэгийн загвар (Excel)',
   },
@@ -1466,244 +1310,6 @@ $t(common.cantUndoWarning)`,
     },
     name: 'Шинж чанар {{position}} нэр',
     value: 'Утга',
-  },
-
-  // ===== All validation errors
-  validationErrors: {
-    // Common
-    invalidEmail: 'Хүчингүй имэйл',
-    invalidField: '"{{field}}" хүчингүй байна',
-    invalidNumber: 'Хүчингүй тоо',
-    invalidDate: 'Хүчингүй огноо',
-    minLengthNotRespected: 'Хамгийн багадаа {{minLength}} тэмдэгтийн урт хангагдаагүй',
-    nameDuplicate: 'Нэр давхцсан',
-    nameCannotBeKeyword: `Нэр "{{value}}" ашиглах боломжгүй: энэ нь нөөцлөгдсөн үг юм`,
-    nameInvalid:
-      'Нэр "{{name}}" хүчингүй байна: энэ нь хамгийн ихдээ 40 тэмдэгтээс бүрдсэн, зөвхөн бага үсэг, тоо агуулсан, үсгээр эхэлсэн, зөвхөн "-" ба "_" тэмдэгттэй байх ёстой',
-    nameRequired: 'Нэр шаардлагатай',
-    requiredField: '{{field}} шаардлагатай',
-    rowsDuplicate: 'мөр: {{row}} давхцсан мөр: {{duplicateRow}}',
-
-    analysis: {
-      labelDefaultLangRequired: 'Судалгааны үндсэн хэл дээрх шошго шаардлагатай',
-      analysisNodeDefsRequired: 'Наад зах нь нэг тооцоолсон шинж чанар шаардлагатай',
-    },
-
-    categoryEdit: {
-      childrenEmpty: '$t(common.childrenEmpty)',
-      childrenInvalid: 'Наад зах нь нэг хүчингүй хүүхэд',
-      codeCannotBeKeyword: `Код "{{value}}" ашиглах боломжгүй: энэ нь нөөцлөгдсөн үг юм`,
-      codeDuplicate: 'Код давхцсан',
-      codeRequired: 'Код шаардлагатай',
-      itemExtraPropDataTypeRequired: '$t(extraProp.label) "{{key}}"-д өгөгдлийн төрөл шаардлагатай',
-      itemExtraPropNameInvalid: '$t(extraProp.label) "{{key}}"-д хүчингүй нэр',
-      itemExtraPropInvalidNumber: '$t(extraProp.label) "{{key}}"-д хүчингүй тоо',
-      itemExtraPropInvalidGeometryPoint: '$t(extraProp.label) "{{key}}"-д хүчингүй геометрийн цэг',
-      itemsInvalid: 'Наад зах нь нэг хүчингүй элемент',
-      itemsEmpty: 'Наад зах нь нэг элементийг тодорхойлно уу',
-      levelDuplicate: 'Түвшний нэр давхцсан',
-      levelsInvalid: 'Наад зах нь нэг хүчингүй түвшин',
-      nameNotSpecified: 'Ангиллын нэр заагаагүй',
-    },
-
-    categoryImport: {
-      cannotDeleteItemsOfPublishedCategory:
-        'Нийтлэгдсэн ангиллын элементүүдийг устгах боломжгүй. Импортлогдсон файлд дутуу элементүүд: {{deletedItemCodes}}',
-      cannotDeleteLevelsOfPublishedCategory:
-        'Нийтлэгдсэн ангиллын түвшингүүдийг устгах боломжгүй. Импортлогдсон файлд дутуу түвшингүүд: {{deletedLevelNames}}',
-      codeColumnMissing: 'Наад зах нь нэг "код" багана байх ёстой',
-      codeRequired: '{{columnName}}: код шаардлагатай',
-      codeDuplicate: '{{columnName}}: давхцсан код "{{code}}"',
-      columnMissing: 'Дутуу багана: {{columnNameMissing}}',
-      emptyHeaderFound: 'Файл хоосон толгой хэсэг агуулсан байна',
-      emptyFile: '$t(validationErrors.dataImport.emptyFile)',
-      invalidImportFile:
-        'ZIP файл нь зөвхөн .csv эсвэл .xlsx файлуудыг агуулсан байх ёстой (ангилал бүрт нэг), ямар нэгэн хавтасгүйгээр',
-      invalidParentItemOrder: 'Код {{parentItemCodes}}-тэй элемент нь хүүхдүүдийнхээ өмнө байх ёстой',
-      nameDuplicate: 'Ижил нэртэй ангилал аль хэдийн байна: {{name}}',
-      srsNotDefined: 'Судалгаанд код {{srs}}-тэй SRS тодорхойлогдоогүй',
-    },
-
-    dataImport: {
-      emptyFile: 'Таны импортлох гэж буй файл хоосон байна',
-      invalidHeaders: 'Хүчингүй баганууд: {{invalidHeaders}}',
-      invalidBoolean: 'Багана {{headers}}-д хүчингүй боол утга: {{value}}',
-      invalidCode: `'{{attributeName}}' шинж чанарт хүчингүй код: {{code}}`,
-      invalidCoordinate: 'Багана {{headers}}-д хүчингүй координат: {{value}}',
-      invalidDate:
-        'Багана {{headers}}-д хүчингүй огноо: {{value}}. Огноог ҮҮ-СА-ӨД эсвэл ӨД/СА/ЖИЛ форматаар байх ёстой. Жишээ нь: 2023-01-15 эсвэл 15/01/2023',
-      invalidNumber: 'Багана {{headers}}-д хүчингүй тоо: {{value}}',
-      invalidTaxonCode: 'Багана {{headers}}-д хүчингүй таксоны код: {{value}}',
-      invalidTime:
-        'Багана {{headers}}-д хүчингүй цаг: {{value}}. Цагийг ЦАГ:МИНУТ форматаар байх ёстой. Жишээ нь: 09:45 эсвэл 16:30',
-      missingRequiredHeaders: 'Шаардлагатай баганууд дутуу: {{missingRequiredHeaders}}',
-      errorUpdatingValues: 'Утгуудыг шинэчлэхэд алдаа гарлаа: {{details}}',
-      multipleRecordsMatchingKeys: 'Түлхүүр "{{keyValues}}"-д тохирох олон бичлэг олдов',
-      recordAlreadyExisting: 'Түлхүүр "{{keyValues}}"-тэй бичлэг аль хэдийн байна',
-      recordInAnalysisStepCannotBeUpdated:
-        'Түлхүүр "{{keyValues}}"-тэй бичлэг нь шинжилгээний алхамд байгаа тул шинэчлэх боломжгүй',
-      recordKeyMissingOrInvalid: 'Түлхүүр шинж чанар "{{keyName}}"-д дутуу эсвэл хүчингүй утга',
-      recordNotFound: 'Түлхүүр "{{keyValues}}"-тэй бичлэг олдсонгүй',
-    },
-
-    expressions: {
-      cannotGetChildOfAttribute: 'шинж чанар {{parentName}}-ийн хүүхэд зангилаа {{childName}}-г авах боломжгүй',
-      cannotUseCurrentNode: 'одоогийн зангилаа {{name}}-г энэ илэрхийлэлд ашиглах боломжгүй',
-      circularDependencyError: 'зангилаа {{name}}-г холбох боломжгүй, учир нь энэ нь одоогийн зангилааг холбож байна',
-      expressionInvalid: 'Хүчингүй илэрхийлэл: {{details}}',
-      unableToFindNode: 'зангилаа олох боломжгүй: {{name}}',
-      unableToFindNodeChild: 'хүүхэд зангилаа олох боломжгүй: {{name}}',
-      unableToFindNodeParent: 'эцэг зангилаа олох боломжгүй: {{name}}',
-      unableToFindNodeSibling: 'ах дүү зангилаа олох боломжгүй: {{name}}',
-    },
-
-    extraPropEdit: {
-      nameInvalid: 'Нэр хүчингүй',
-      nameRequired: 'Нэр шаардлагатай',
-      dataTypeRequired: 'Өгөгдлийн төрөл шаардлагатай',
-      valueRequired: 'Утга шаардлагатай',
-    },
-
-    nodeDefEdit: {
-      analysisParentEntityRequired: 'Объект шаардлагатай',
-      applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" нөхцөл давхцсан',
-      applyIfInvalid: 'Хүчингүй "$t(nodeDefEdit.advancedProps.relevantIf)" нөхцөл',
-      columnWidthCannotBeGreaterThan: 'Баганын өргөн {{max}}-аас их байх боломжгүй',
-      columnWidthCannotBeLessThan: 'Баганын өргөн {{min}}-ээс бага байх боломжгүй',
-      countMaxMustBePositiveNumber: 'Хамгийн их тоо эерэг бүхэл тоо байх ёстой',
-      countMinMustBePositiveNumber: 'Хамгийн бага тоо эерэг бүхэл тоо байх ёстой',
-      categoryRequired: 'Ангилал шаардлагатай',
-      childrenEmpty: '$t(common.childrenEmpty)',
-      defaultValuesInvalid: 'Хүчингүй "Үндсэн утгууд"',
-      defaultValuesNotSpecified: 'Үндсэн утга заагаагүй',
-      entitySourceRequired: 'Объектын эх үүсвэр шаардлагатай',
-      expressionApplyIfOnlyLastOneCanBeEmpty:
-        'Зөвхөн сүүлийн илэрхийлэл нь хоосон "$t(nodeDefEdit.expressionsProp.applyIf)" нөхцөлтэй байж болно',
-      expressionDuplicate: 'Илэрхийлэл давхцсан',
-      expressionRequired: 'Илэрхийлэл шаардлагатай',
-      formulaInvalid: 'Томьёо хүчингүй байна',
-      keysEmpty: 'Наад зах нь нэг түлхүүр шинж чанарыг тодорхойлно уу',
-
-      keysExceedingMax: 'Түлхүүр шинж чанаруудын хамгийн их тооноос хэтэрсэн',
-      maxFileSizeInvalid: 'Хамгийн их файлын хэмжээ 0-ээс их ба {{max}}-ээс бага байх ёстой',
-      nameInvalid: 'Нэр хүчингүй байна (зөвхөн бага үсэг, тоо, доогуур зураас агуулсан, үсгээр эхэлсэн байх ёстой)',
-      taxonomyRequired: 'Таксоном шаардлагатай',
-      validationsInvalid: 'Хүчингүй "Баталгаажуулалтууд"',
-      countMaxInvalid: 'Хүчингүй "Хамгийн их тоо"',
-      countMinInvalid: 'Хүчингүй "Хамгийн бага тоо"',
-    },
-
-    record: {
-      keyDuplicate: 'Бичлэгийн түлхүүр давхцсан',
-      entityKeyDuplicate: 'Объектын түлхүүр давхцсан',
-      entityKeyValueNotSpecified: '"{{keyDefName}}" түлхүүрийн утга заагаагүй',
-      missingAncestorForEntity: 'Эдгээр түлхүүрүүдтэй "{{ancestorName}}" олох боломжгүй: {{keyValues}}',
-      oneOrMoreInvalidValues: 'Нэг буюу хэд хэдэн утга хүчингүй байна',
-      uniqueAttributeDuplicate: 'Давхцсан утга',
-      valueInvalid: 'Хүчингүй утга',
-      valueRequired: 'Шаардлагатай утга',
-    },
-
-    recordClone: {
-      differentKeyAttributes: 'Түлхүүр шинж чанарууд {{cycleFrom}} мөчлөг болон {{cycleTo}} мөчлөгт ялгаатай байна',
-    },
-
-    surveyInfoEdit: {
-      langRequired: 'Хэл шаардлагатай',
-      srsRequired: 'Орон зайн лавлах систем шаардлагатай',
-      cycleRequired: 'Мөчлөг шаардлагатай',
-      cyclesRequired: 'Наад зах нь нэг мөчлөг тодорхойлогдсон байх ёстой',
-      cyclesExceedingMax: 'Судалгаа хамгийн ихдээ 10 мөчлөгтэй байж болно',
-      cycleDateStartBeforeDateEnd: 'Мөчлөгийн эхлэх огноо дуусах огнооноос өмнө байх ёстой',
-      cycleDateStartAfterPrevDateEnd: 'Мөчлөгийн эхлэх огноо өмнөх мөчлөгийн дуусах огнооноос хойш байх ёстой',
-      cycleDateStartInvalid: 'Мөчлөгийн эхлэх огноо хүчингүй',
-      cycleDateStartMandatory: 'Мөчлөгийн эхлэх огноо заавал байх ёстой',
-      cycleDateEndInvalid: 'Мөчлөгийн дуусах огноо хүчингүй',
-      cycleDateEndMandatoryExceptForLastCycle:
-        'Мөчлөгийн дуусах огноо сүүлийн мөчлөгөөс бусад бүх мөчлөгт заавал байх ёстой',
-      fieldManualLinksInvalid: 'Талбайн гарын авлагын холбоос хүчингүй',
-    },
-
-    surveyLabelsImport: {
-      invalidHeaders: 'Хүчингүй баганууд: {{invalidHeaders}}',
-      cannotFindNodeDef: "'{{name}}' нэртэй шинж чанар эсвэл объектын тодорхойлолтыг олох боломжгүй",
-    },
-
-    taxonomyEdit: {
-      codeChangedAfterPublishing: `Нийтлэгдсэн код өөрчлөгдсөн: '{{oldCode}}' => '{{newCode}}'`,
-      codeDuplicate: 'Давхцсан код {{value}}; $t(validationErrors.rowsDuplicate)',
-      codeRequired: 'Код шаардлагатай',
-      familyRequired: 'Овог шаардлагатай',
-      genusRequired: 'Төрөл шаардлагатай',
-      scientificNameDuplicate: 'Давхцсан шинжлэх ухааны нэр {{value}}; $t(validationErrors.rowsDuplicate)',
-      scientificNameRequired: 'Шинжлэх ухааны нэр шаардлагатай',
-      taxaEmpty: 'Хоосон таксонууд',
-      vernacularNamesDuplicate: `'{{name}}' гэсэн нутгийн нэр давхцсан '{{lang}}' хэлээр`,
-    },
-
-    taxonomyImportJob: {
-      duplicateExtraPropsColumns: 'Нэмэлт мэдээллийн баганууд давхцсан: {{duplicateColumns}}',
-      invalidExtraPropColumn:
-        'Нэмэлт мэдээллийн баганын нэр "{{columnName}}" хүчингүй: энэ нь нөөцлөгдсөн үг байх боломжгүй',
-      missingRequiredColumns: 'Шаардлагатай багана(ууд) дутуу: {{columns}}',
-    },
-
-    user: {
-      emailRequired: 'Имэйл шаардлагатай',
-      emailInvalid: 'Имэйл хүчингүй',
-      emailNotFound: 'Имэйл олдсонгүй',
-      groupRequired: 'Бүлэг шаардлагатай',
-      nameRequired: 'Нэр шаардлагатай',
-      titleRequired: 'Цол шаардлагатай',
-      passwordRequired: 'Нууц үг шаардлагатай',
-      passwordInvalid: 'Нууц үгт хоосон зай байх ёсгүй',
-      passwordUnsafe: 'Нууц үг наад зах нь 8 тэмдэгтээс бүрдсэн, бага үсэг, том үсэг, тоо агуулсан байх ёстой',
-      passwordsDoNotMatch: `Нууц үгнүүд таарахгүй байна`,
-
-      userNotFound: 'Хэрэглэгч олдсонгүй. Имэйл болон нууц үг зөв эсэхийг шалгана уу',
-      passwordChangeRequired: 'Нууц үг солих шаардлагатай',
-      passwordResetNotAllowedWithPendingInvitation: `Нууц үг сэргээхийг зөвшөөрөхгүй: хэрэглэгч судалгаанд уригдсан боловч урилгыг хараахан хүлээн аваагүй байна`,
-    },
-
-    userAccessRequest: {
-      countryRequired: 'Улс шаардлагатай',
-      emailRequired: '$t(validationErrors.user.emailRequired)',
-      firstNameRequired: 'Нэр шаардлагатай',
-      institutionRequired: 'Байгууллага шаардлагатай',
-      lastNameRequired: 'Овог шаардлагатай',
-      purposeRequired: 'Зорилго шаардлагатай',
-      surveyNameRequired: 'Судалгааны нэр шаардлагатай',
-      invalidRequest: 'Хүчингүй хэрэглэгчийн хандалтын хүсэлт',
-      userAlreadyExisting: 'Имэйл {{email}}-тэй хэрэглэгч аль хэдийн байна',
-      requestAlreadySent: `Имэйл {{email}}-тэй хэрэглэгчийн хандалтын хүсэлт аль хэдийн илгээгдсэн`,
-      invalidReCaptcha: 'Хүчингүй ReCaptcha',
-    },
-
-    userAccessRequestAccept: {
-      accessRequestAlreadyProcessed: 'Хэрэглэгчийн хандалтын хүсэлт аль хэдийн боловсруулагдсан',
-      accessRequestNotFound: 'Хэрэглэгчийн хандалтын хүсэлт олдсонгүй',
-      emailRequired: '$t(validationErrors.user.emailRequired)',
-      emailInvalid: '$t(validationErrors.user.emailInvalid)',
-      roleRequired: 'Үүрэг шаардлагатай',
-      surveyNameRequired: 'Судалгааны нэр шаардлагатай',
-    },
-
-    userPasswordChange: {
-      oldPasswordRequired: 'Хуучин нууц үг шаардлагатай',
-      oldPasswordWrong: 'Хуучин нууц үг буруу байна',
-      newPasswordRequired: 'Шинэ нууц үг шаардлагатай',
-      confirmPasswordRequired: 'Нууц үгээ баталгаажуулах шаардлагатай',
-      confirmedPasswordNotMatching: 'Шинэ нууц үг болон баталгаажуулсан нууц үг таарахгүй байна',
-    },
-
-    userInvite: {
-      messageContainsLinks: 'Урилгын мессеж холбоос агуулж болохгүй',
-      messageTooLong: 'Урилгын мессеж хэт урт байна (хамгийн ихдээ {{maxLength}} тэмдэгт)',
-    },
-    user2FADevice: {
-      nameDuplicate: 'Ижил нэртэй төхөөрөмж аль хэдийн байна',
-      nameRequired: 'Төхөөрөмжийн нэр шаардлагатай',
-    },
   },
 
   record: {
@@ -1767,11 +1373,13 @@ $t(common.cantUndoWarning)`,
     qualifier: {
       'default-values': 'үндсэн утга',
       'default-values-apply-if': 'үндсэн утга хэрэглэх бол',
+      'editable-if': 'хэрэв засварлах боломжтой бол',
       'max-count': 'хамгийн их тоо',
       'min-count': 'хамгийн бага тоо',
       'relevant-if': 'хэрэв хамааралтай бол',
       validations: 'баталгаажуулалтын дүрэм',
       'validations-apply-if': 'баталгаажуулалтын дүрэм хэрэглэх бол',
+      'visible-if': 'хэрэв харагдах бол',
     },
 
     selectAFunction: 'Функц сонгох',

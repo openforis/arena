@@ -36,6 +36,7 @@ export const {
   fetchUsersWithExpiredInvitation,
   updateNamePasswordAndStatus,
   updatePassword,
+  deleteUserPrefsSurvey,
   resetUsersPrefsSurveyCycle,
   importNewUser,
   deleteUser,
@@ -198,10 +199,10 @@ const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserU
 }
 
 const _userFetcher =
-  (fetchFn) =>
+  (fetchFn, clientArgIndex = 1) =>
   async (...args) => {
     const user = await fetchFn(...args)
-    return user ? _attachAuthGroupsAndInvitationToUser({ user }) : null
+    return user ? _attachAuthGroupsAndInvitationToUser({ user, t: args[clientArgIndex] }) : null
   }
 
 export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
@@ -381,7 +382,10 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
     )
   })
 
-export const updateUser = _userFetcher(_updateUser)
+export const updateUser = _userFetcher(_updateUser, 4)
+
+export const updateUserAuthGroupExtraProps = async ({ surveyId, userUuid, extraProps }) =>
+  AuthGroupRepository.updateUserGroupExtraProps({ surveyId, userUuid, extraProps })
 
 export const updateUserPrefs = async (user) => UserRepository.updateUserPrefs(user)
 

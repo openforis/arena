@@ -1,10 +1,15 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
+
+import * as StringUtils from '@core/stringUtils'
 
 import { ServiceErrorActions, useI18n } from '@webapp/store/system'
 
 import Markdown from '@webapp/components/markdown'
+
+const appErrorsNamespace = 'appErrors:'
+const _toMessageKey = (key) => [key, StringUtils.prependIfMissing(appErrorsNamespace)(key)]
 
 const defaultError = { key: 'appErrors:networkError' }
 
@@ -13,9 +18,18 @@ const ServiceError = React.forwardRef((props, ref) => {
   const i18n = useI18n()
   const dispatch = useDispatch()
 
-  const { response } = error
+  const { response, message: errorMessage } = error
   const { data, status = '' } = response || {}
-  const { key, params } = data ?? defaultError
+
+  const message = useMemo(() => {
+    if (data) {
+      const { key, params } = data
+      if (key) {
+        return i18n.t(_toMessageKey(key), params)
+      }
+    }
+    return errorMessage ?? i18n.t(defaultError.key, defaultError.params)
+  }, [data, errorMessage, i18n])
 
   return (
     <div ref={ref} className="service-errors__error">
@@ -28,7 +42,7 @@ const ServiceError = React.forwardRef((props, ref) => {
       </button>
 
       <div className="status">ERROR {status}</div>
-      <Markdown className="message" source={i18n.t(key, params)} />
+      <Markdown className="message" source={message} />
     </div>
   )
 })

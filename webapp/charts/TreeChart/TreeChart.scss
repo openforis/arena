@@ -20,13 +20,18 @@
       display: flex;
       align-items: center;
       border: 1px solid $greyBorder;
-      justify-content: space-between;
       transition: background-color 1s ease;
       background-color: white;
       height: auto;
       padding: 6px;
 
+      .node-icon {
+        flex-shrink: 0;
+      }
+
       .btn {
+        flex-shrink: 0;
+        margin-left: auto;
         transform: rotate(-90deg);
         padding: 0.3rem;
       }
@@ -40,6 +45,7 @@
       }
 
       .node-label {
+        flex: 1;
         text-overflow: ellipsis;
         overflow: hidden;
         line-height: 1.5;
