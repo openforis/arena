@@ -121,7 +121,7 @@ yarn build:server:dev
 ### Testing
 
 ```bash
-# Run all tests (unit + e2e)
+# Run all tests (unit + e2e + integration)
 yarn test
 
 # Run unit tests only

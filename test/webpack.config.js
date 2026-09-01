@@ -7,8 +7,8 @@ const getEntry = (type) =>
   glob
     .globSync(path.resolve(__dirname, type, 'tests', '*.{js,jsx,ts,tsx}').replace(/\\/g, '/'))
     .sort((fileA, fileB) => {
-      const idxA = fileA.substr(0, 3)
-      const idxB = fileB.substr(0, 3)
+      const idxA = path.basename(fileA).substr(0, 3)
+      const idxB = path.basename(fileB).substr(0, 3)
       if (idxA < idxB) return -1
       if (idxA > idxB) return 1
       return 0
