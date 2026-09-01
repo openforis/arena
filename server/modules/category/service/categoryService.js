@@ -143,18 +143,20 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
   const category = await _getSamplingPointDataCategory({ surveyId, draft })
   if (!category) return []
 
-  const items = await CategoryManager.fetchItemsByLevelIndex({
-    surveyId,
-    categoryUuid: Category.getUuid(category),
-    levelIndex,
-    limit,
-    offset,
-    draft,
-  })
+  const [items, survey] = await Promise.all([
+    CategoryManager.fetchItemsByLevelIndex({
+      surveyId,
+      categoryUuid: Category.getUuid(category),
+      levelIndex,
+      limit,
+      offset,
+      draft,
+    }),
+    SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft }),
+  ])
 
-  const recordFinder = await createSamplingPointDataRecordFinder({ surveyId, draft })
+  const recordFinder = await createSamplingPointDataRecordFinder({ surveyId, survey, draft })
 
-  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
   const srsIndex = Survey.getSRSIndex(surveyInfo)
 
