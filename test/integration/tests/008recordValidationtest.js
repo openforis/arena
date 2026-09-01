@@ -104,7 +104,7 @@ const _addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
 }
 
 const _removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () => {
-  const { survey, record } = getContext()
+  const { survey } = getContext()
   await _addNodeWithDuplicateKeyAndExpect2ValidationErrors()
 
   const { record: recordBeforeDelete } = getContext()

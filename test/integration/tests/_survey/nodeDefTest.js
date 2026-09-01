@@ -45,9 +45,6 @@ export const createNodeDefsTest = async () => {
 // sibling/ancestor node reachability rules (as opposed to the flat, root-level node defs created by
 // createNodeDefsTest, which recordUpdateManagerTest.js relies on staying direct children of root).
 export const createExpressionsFixtureTest = async () => {
-  const survey = getContextSurvey()
-  const surveyId = Survey.getId(survey)
-
   const rootDef = await fetchRootNodeDef()
 
   const entity1 = await createAndStoreNodeDef(rootDef, NodeDef.nodeDefType.entity, 'entity1')
