@@ -194,15 +194,15 @@ describe('Record Validation Test', () => {
   })
 
   test('Correct date attribute value', async () => {
-    await _updateNodeAndExpectValidationToBe('cluster/cluster_start_date', '02/11/2019', true)
+    await _updateNodeAndExpectValidationToBe('cluster/cluster_start_date', '2019-11-02', true)
   })
 
   test('Invalid date attribute value (day)', async () => {
-    await _updateNodeAndExpectValidationToBe('cluster/cluster_start_date', '32/01/2019', false)
+    await _updateNodeAndExpectValidationToBe('cluster/cluster_start_date', '2019-01-32', false)
   })
 
   test('Invalid date attribute value (month)', async () => {
-    await _updateNodeAndExpectValidationToBe('cluster/cluster_start_date', '01/13/2019', false)
+    await _updateNodeAndExpectValidationToBe('cluster/cluster_start_date', '2019-13-01', false)
   })
 
   // ========== required
