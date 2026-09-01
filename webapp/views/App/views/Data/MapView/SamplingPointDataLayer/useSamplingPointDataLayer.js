@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
+import axios from 'axios'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
@@ -69,18 +70,25 @@ const _fetchItems = async ({ surveyId, levelIndex, fetchCancelRef, isMountedRef 
 
     fetchCancelRef.current = itemsFetchCancel
 
-    const {
-      data: { items: itemsFetchedCurrent },
-    } = await itemsRequest
+    try {
+      const {
+        data: { items: itemsFetchedCurrent },
+      } = await itemsRequest
 
-    fetchCancelRef.current = null
+      if (itemsFetchedCurrent.length === 0) break
 
-    if (itemsFetchedCurrent.length === 0) break
+      items.push(...itemsFetchedCurrent)
+      offset += itemsFetchedCurrent.length
 
-    items.push(...itemsFetchedCurrent)
-    offset += itemsFetchedCurrent.length
-
-    if (itemsFetchedCurrent.length < itemsPageSize) break
+      if (itemsFetchedCurrent.length < itemsPageSize) break
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        break
+      }
+      throw error
+    } finally {
+      fetchCancelRef.current = null
+    }
   }
 
   return items
