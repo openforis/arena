@@ -43,10 +43,10 @@ export const { generateRdbUpates, persistNodesToRDB } = NodeRdbManager
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
-    offset,
-    limit,
-    sortBy,
-    sortOrder,
+    offset = 0,
+    limit = undefined,
+    sortBy = undefined,
+    sortOrder = undefined,
     cycle: cycleParam = null,
     search = null,
     step = null,

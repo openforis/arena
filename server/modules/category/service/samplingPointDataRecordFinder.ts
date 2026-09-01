@@ -6,22 +6,44 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
+type RootEntityKeyDef = Record<string, any>
+type RecordSummary = Record<string, any>
+type SamplingPointDataItem = Record<string, any>
+type SurveyWithNodeDefs = Record<string, any>
+
+type SamplingPointDataRecordFinder = (samplingPointDataItem: SamplingPointDataItem) => RecordSummary | undefined
+
+type ExtractRecordKeyParams = {
+  rootEntityKeyDefs: RootEntityKeyDef[]
+}
+
+type ExtractSamplingPointItemKeyParams = {
+  rootEntityKeyDefs: RootEntityKeyDef[]
+  survey: SurveyWithNodeDefs
+}
+
+type CreateSamplingPointDataRecordFinderParams = {
+  surveyId: number
+  survey?: SurveyWithNodeDefs | null
+  draft?: boolean
+}
+
 const keySeparator = '\x1f'
 
 const extractRecordKey =
-  ({ rootEntityKeyDefs }) =>
-  (record) =>
+  ({ rootEntityKeyDefs }: ExtractRecordKeyParams) =>
+  (record: RecordSummary): string =>
     rootEntityKeyDefs
       .map((keyDef) => {
         const keyDefName = NodeDef.getName(keyDef)
-        const recordKeyValue = record[A.camelize(keyDefName)]
+        const recordKeyValue = record[A.camelize(keyDefName) as string]
         return recordKeyValue ?? ''
       })
       .join(keySeparator)
 
 const extractSamplingPointItemKey =
-  ({ rootEntityKeyDefs, survey }) =>
-  (samplingPointDataItem) => {
+  ({ rootEntityKeyDefs, survey }: ExtractSamplingPointItemKeyParams) =>
+  (samplingPointDataItem: SamplingPointDataItem): string => {
     const itemCodes = CategoryItem.getCodesHierarchy(samplingPointDataItem)
 
     return rootEntityKeyDefs
@@ -41,8 +63,13 @@ const extractSamplingPointItemKey =
  * @param {boolean} [params.draft] - Draft or only published props.
  * @returns {Promise<((samplingPointDataItem: object) => object)|null>} - The record finder function.
  */
-export const createSamplingPointDataRecordFinder = async ({ surveyId, survey = null, draft = false }) => {
-  const surveyWithNodeDefs = survey ?? (await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft }))
+export const createSamplingPointDataRecordFinder = async ({
+  surveyId,
+  survey = null,
+  draft = false,
+}: CreateSamplingPointDataRecordFinderParams): Promise<SamplingPointDataRecordFinder | null> => {
+  const surveyWithNodeDefs =
+    survey ?? ((await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft })) as SurveyWithNodeDefs)
   if (!Survey.canHaveData(surveyWithNodeDefs)) return null
 
   if (!Survey.canRecordBeIdentifiedBySamplingPointDataItem(surveyWithNodeDefs)) return null
@@ -53,12 +80,13 @@ export const createSamplingPointDataRecordFinder = async ({ surveyId, survey = n
   const { list: records } = recordsSummary
 
   const extractRecordKeyFn = extractRecordKey({ rootEntityKeyDefs })
-  const recordsByKey = new Map(records.map((record) => [extractRecordKeyFn(record), record]))
+  const recordsByKey = new Map(records.map((record: RecordSummary) => [extractRecordKeyFn(record), record]))
 
   const extractSamplingPointItemKeyFn = extractSamplingPointItemKey({
     rootEntityKeyDefs,
     survey: surveyWithNodeDefs,
   })
 
-  return (samplingPointDataItem) => recordsByKey.get(extractSamplingPointItemKeyFn(samplingPointDataItem))
+  return (samplingPointDataItem: SamplingPointDataItem): RecordSummary | undefined =>
+    recordsByKey.get(extractSamplingPointItemKeyFn(samplingPointDataItem))
 }
