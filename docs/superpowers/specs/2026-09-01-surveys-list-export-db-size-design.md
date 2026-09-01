@@ -17,6 +17,15 @@ The building blocks for this already exist and are used for the single-survey st
 - `DbUtils.fetchSchemaTablesSize({ schema })` (`server/db/dbUtils.js:221`) — sums
   `pg_relation_size` across all tables in a schema, returns bytes as a `Number`. Returns `0` (not an
   error) if the schema doesn't exist.
+
+  > **Correction (post-implementation fix pass):** the final whole-branch review found that
+  > `pg_relation_size` excludes TOAST storage (the out-of-line storage Postgres uses for large
+  > jsonb/bytea values), which could substantially under-report real storage for jsonb-heavy survey
+  > schemas. Fixed by switching `fetchSchemaTablesSize` to `pg_total_relation_size` (with a
+  > `relkind IN ('r', 'm', 'p')` filter to avoid double-counting indexes, which `pg_total_relation_size`
+  > already includes per base table). This also changes the number shown by the existing single-survey
+  > storage dashboard (`surveyService.fetchAndAssocStorageInfo`), which shares this function — treated
+  > as a correctness improvement there too, not a regression.
 - `Schemata.getSchemaSurvey(surveyId)` / `Schemata.getSchemaSurveyRdb(surveyId)` (from
   `@openforis/arena-server`) — give the two schema names (`survey_<id>` and `survey_<id>_data`).
 
