@@ -83,7 +83,7 @@ const _addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
   await _persistNode(nodePlot)
 
   // Update new plot num with a duplicate value
-  const nodePlotNum = RecordUtils.findNodeByPath('cluster/plot[4]/plot_num')(survey, record)
+  const nodePlotNum = RecordUtils.findNodeByPath('cluster/plot[3]/plot_num')(survey, record)
   const value = 2 // Duplicate value
   await _persistNode(Node.assocValue(value)(nodePlotNum))
 
@@ -96,7 +96,7 @@ const _addNodeWithDuplicateKeyAndExpect2ValidationErrors = async () => {
   expect(Validation.isValid(nodePlotNumValidation)).toBe(false)
 
   // Expect duplicate node validation to be invalid
-  const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, recordUpdated)
+  const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[1]/plot_num')(survey, recordUpdated)
   const nodePlotNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNumDuplicate))(
     Record.getValidation(recordUpdated)
   )
@@ -111,7 +111,7 @@ const _removeNodeWithDuplicateKeyAndExpectDuplicateNodeKeyToBeValid = async () =
   await _deleteNode(Record.getRootNode(recordBeforeDelete), 'plot', 4)
 
   const { record: recordUpdated } = getContext()
-  const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[2]/plot_num')(survey, recordUpdated)
+  const nodePlotNumDuplicate = RecordUtils.findNodeByPath('cluster/plot[1]/plot_num')(survey, recordUpdated)
   const nodePlotNumDuplicateValidation = Validation.getFieldValidation(Node.getUuid(nodePlotNumDuplicate))(
     Record.getValidation(recordUpdated)
   )
@@ -260,7 +260,7 @@ describe('Record Validation Test', () => {
   test('Children count: descendant children count validation deleted on node deletion', async () => {
     const { survey, record } = getContext()
     // 5 plots before => 4 plots after
-    const nodeParent = RecordUtils.findNodeByPath('cluster/plot[5]')(survey, record)
+    const nodeParent = RecordUtils.findNodeByPath('cluster/plot[4]')(survey, record)
     const nodeDefChild = Survey.getNodeDefByName('tree')(survey)
     const validationCount = R.pipe(
       Record.getValidation,
@@ -300,13 +300,13 @@ describe('Record Validation Test', () => {
 
   test('Expressions : reference to ancestor attribute (valid value)', async () => {
     // insert a new tree
-    await _addNodeAndExpectCountToBe('cluster/plot[1]', 'tree', true)
+    await _addNodeAndExpectCountToBe('cluster/plot[0]', 'tree', true)
     // update tree_start_time value
-    await _updateNodeAndExpectValidationToBe('cluster/plot[1]/tree[1]/tree_start_time', '10:20', true)
+    await _updateNodeAndExpectValidationToBe('cluster/plot[0]/tree[0]/tree_start_time', '10:20', true)
   })
 
   test('Expressions : reference to ancestor attribute (invalid value)', async () => {
-    await _updateNodeAndExpectValidationToBe('cluster/plot[1]/tree[1]/tree_start_time', '08:20', false)
+    await _updateNodeAndExpectValidationToBe('cluster/plot[0]/tree[0]/tree_start_time', '08:20', false)
   })
 
   // ========== entity keys validation
