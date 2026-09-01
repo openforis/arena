@@ -26,6 +26,12 @@ export default class RecordCheckJob extends Job {
     this.surveyAndNodeDefsByCycle = {} // Cache of surveys and updated node defs by cycle
     this.nodesBatchInserter = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
     this.nodesBatchUpdater = new BatchPersister(this.nodesBatchUpdateHandler.bind(this), 2500)
+    // Node defs (uuid -> { name, recordsAffectedCount }) whose value actually changed for at least
+    // one existing node while recalculating default values/applicability - only populated when
+    // context.recordValuesUpdateCheckEnabled is set (i.e. when running as part of a survey publish;
+    // see SurveyPublishJob). Used to cancel an unconfirmed publish that would silently alter data
+    // already recorded (see execute()).
+    this.nodeDefUuidsWithValueChanges = new Map()
   }
 
   // Like logDebug, but silenced unless VERBOSE_LOGGING is on - use for per-record/per-step tracing
@@ -69,6 +75,24 @@ export default class RecordCheckJob extends Job {
 
       index++
       this.incrementProcessedItems()
+    }
+
+    // Cancel the publish if unconfirmed changes were found: whether a node def flagged as "updated"
+    // actually changes any stored value can only be known by recalculating it (recalculation can
+    // land back on the same value), so this can only be decided here, after checking every record -
+    // not from the nodeDefUpdatedUuids classification alone.
+    if (
+      this.context.recordValuesUpdateCheckEnabled &&
+      !this.context.updateRecordValues &&
+      this.nodeDefUuidsWithValueChanges.size > 0
+    ) {
+      for (const { name, recordsAffectedCount } of this.nodeDefUuidsWithValueChanges.values()) {
+        this.errors[name] = {
+          key: 'jobs:recordCheckJobRecordValuesWillBeUpdated',
+          params: { recordsAffectedCount },
+        }
+      }
+      await this.setStatusFailed()
     }
   }
 
@@ -245,6 +269,13 @@ export default class RecordCheckJob extends Job {
     const nodeDefAddedOrUpdatedUuids = Array.from(nodeDefAddedOrUpdatedUuidsUnique)
     if (nodeDefAddedOrUpdatedUuids.length > 0) {
       this.logDebugOptional('applying default values')
+      // Snapshot the values of already-existing nodes belonging to updated (not added) node defs,
+      // so we can tell afterwards whether the recalculation actually changed anything - a node def
+      // flagged as "updated" can still recalculate to the exact same value it already had.
+      const valuesBeforeUpdateByNodeUuid = this.context.recordValuesUpdateCheckEnabled
+        ? _snapshotNodeValues({ nodeDefUpdatedUuids, record, nodesInsertedByUuid })
+        : null
+
       const { record: recordUpdate, nodes: nodesUpdatedDefaultValues = {} } = await _applyDefaultValuesAndApplicability(
         survey,
         nodeDefAddedOrUpdatedUuids,
@@ -254,6 +285,10 @@ export default class RecordCheckJob extends Job {
       )
       record = recordUpdate || record
       Object.assign(allUpdatedNodesByUuid, nodesUpdatedDefaultValues)
+
+      if (valuesBeforeUpdateByNodeUuid) {
+        this._trackNodeDefValueChanges({ survey, valuesBeforeUpdateByNodeUuid, nodesUpdatedDefaultValues })
+      }
       this.logDebugOptional('default values applied')
     }
 
@@ -334,6 +369,24 @@ export default class RecordCheckJob extends Job {
     await this.nodesBatchInserter.flush(this.tx)
     await this.nodesBatchUpdater.flush(this.tx)
   }
+
+  // Compares each updated node's new value against the pre-update snapshot and records, per node
+  // def, how many nodes actually changed value (as opposed to only recalculating to the same value).
+  _trackNodeDefValueChanges({ survey, valuesBeforeUpdateByNodeUuid, nodesUpdatedDefaultValues }) {
+    for (const [nodeUuid, valueBeforeUpdate] of valuesBeforeUpdateByNodeUuid) {
+      const nodeUpdated = nodesUpdatedDefaultValues[nodeUuid]
+      if (!nodeUpdated || R.equals(Node.getValue(nodeUpdated), valueBeforeUpdate)) continue
+
+      const nodeDefUuid = Node.getNodeDefUuid(nodeUpdated)
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      const entry = this.nodeDefUuidsWithValueChanges.get(nodeDefUuid) ?? {
+        name: NodeDef.getName(nodeDef),
+        recordsAffectedCount: 0,
+      }
+      entry.recordsAffectedCount += 1
+      this.nodeDefUuidsWithValueChanges.set(nodeDefUuid, entry)
+    }
+  }
 }
 
 // Inserts a missing single node in a specified parent node.
@@ -354,6 +407,24 @@ const _insertMissingSingleNode = async ({ survey, childDef, record, parentNode, 
     { user, survey, record, node: childNode, system: true, persistNodes: false, sideEffect },
     tx
   )
+}
+
+// Snapshots the current value of every already-existing node (i.e. not one just inserted this pass)
+// belonging to one of the given (already-published, value-affecting) node defs. Values are deep-cloned:
+// the recalculation below runs with sideEffect: true and can mutate a node's value object in place, so a
+// bare reference here would silently "follow" that mutation and make every comparison see no change.
+const _snapshotNodeValues = ({ nodeDefUpdatedUuids, record, nodesInsertedByUuid }) => {
+  const valuesByNodeUuid = new Map()
+  for (const nodeDefUuid of nodeDefUpdatedUuids) {
+    const nodes = Record.getNodesByDefUuid(nodeDefUuid)(record)
+    for (const node of nodes) {
+      const nodeUuid = Node.getUuid(node)
+      if (!nodesInsertedByUuid[nodeUuid]) {
+        valuesByNodeUuid.set(nodeUuid, R.clone(Node.getValue(node)))
+      }
+    }
+  }
+  return valuesByNodeUuid
 }
 
 const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, record, newNodes, tx) => {

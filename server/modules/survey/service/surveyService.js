@@ -48,10 +48,10 @@ export const fetchAndAssocStorageInfo = async ({ survey }) => {
 }
 
 // JOBS
-export const startPublishJob = ({ user, surveyId, cleanupRecords }) => {
+export const startPublishJob = ({ user, surveyId, cleanupRecords, updateRecordValues }) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
-  const job = new SurveyPublishJob({ user, surveyId, cleanupRecords })
+  const job = new SurveyPublishJob({ user, surveyId, cleanupRecords, updateRecordValues })
 
   JobManager.enqueueJob(job)
 

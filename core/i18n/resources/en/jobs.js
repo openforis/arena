@@ -28,6 +28,8 @@ export default {
   NodeDefsValidationJob: 'Node Definitions Validation',
   chainsCyclesCheckJob: `Chains Cycles Check`,
   RecordCheckJob: 'Record Check',
+  recordCheckJobRecordValuesWillBeUpdated:
+    "{{recordsAffectedCount}} record(s) will have this attribute's value updated on publish",
   RecordsCloneJob: 'Records Clone',
   RecordsImportJob: 'Records Import',
   RecordsUniquenessValidationJob: 'Records Uniqueness Validation',

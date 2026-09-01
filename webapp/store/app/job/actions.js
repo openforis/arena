@@ -11,6 +11,7 @@ export const showJobMonitor =
   ({
     job,
     onComplete = null,
+    onFail = null,
     autoHide = false,
     closeButton = null,
     closeButtonProps = null,
@@ -23,6 +24,7 @@ export const showJobMonitor =
       type: JOB_START,
       job,
       onComplete,
+      onFail,
       autoHide,
       closeButton,
       closeButtonProps,
@@ -43,6 +45,11 @@ export const updateJob =
       }
       if (JobState.isAutoHide(getState())) {
         dispatch({ type: JOB_UPDATE, job: null })
+      }
+    } else if (JobSerialized.isFailed(job)) {
+      const onFail = JobState.getOnFail(getState())
+      if (onFail) {
+        onFail(job)
       }
     }
   }

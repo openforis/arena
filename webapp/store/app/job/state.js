@@ -12,6 +12,7 @@ export const keys = {
   closeButtonProps: 'closeButtonProps',
   autoHide: 'autoHide',
   onComplete: 'onComplete',
+  onFail: 'onFail',
   errorKeyHeaderName: 'errorKeyHeaderName',
   errorsExportFileName: 'errorsExportFileName',
   longRunningMessageKey: 'longRunningMessageKey',
@@ -25,6 +26,8 @@ export const getCloseButton = R.pipe(getJob, R.propOr(null, keys.closeButton))
 export const getCloseButtonProps = R.pipe(getJob, R.propOr(null, keys.closeButtonProps))
 
 export const getOnComplete = R.pipe(getJob, R.propOr(null, keys.onComplete))
+
+export const getOnFail = R.pipe(getJob, R.propOr(null, keys.onFail))
 
 export const isAutoHide = R.pipe(getJob, R.propOr(false, keys.autoHide))
 
@@ -40,6 +43,7 @@ export const hasJob = (state) => Object.keys(getJob(state)).length > 0
 export const startJob = ({
   job,
   onComplete = null,
+  onFail = null,
   closeButton = null,
   closeButtonProps = null,
   autoHide = false,
@@ -52,6 +56,7 @@ export const startJob = ({
   [keys.closeButton]: closeButton,
   [keys.closeButtonProps]: closeButtonProps,
   [keys.onComplete]: onComplete,
+  [keys.onFail]: onFail,
   [keys.errorKeyHeaderName]: errorKeyHeaderName,
   [keys.errorsExportFileName]: errorsExportFileName,
   [keys.longRunningMessageKey]: longRunningMessageKey,
