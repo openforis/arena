@@ -29,5 +29,7 @@ describe('Survey Test', () => {
 
   test('Create Node Defs', async () => NodeDefTest.createNodeDefsTest())
 
+  test('Create Node Defs Expressions Fixture', async () => NodeDefTest.createExpressionsFixtureTest())
+
   test('Update Node Def', async () => NodeDefTest.updateNodeDefTest())
 })
