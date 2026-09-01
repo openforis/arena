@@ -221,10 +221,11 @@ export const vacuumTable = async ({ schema, table }, client = db) => client.quer
 export const fetchSchemaTablesSize = async ({ schema }, client = db) =>
   client.one(
     `SELECT 
-		SUM(pg_relation_size(pg_catalog.pg_class.oid)) as size
+		SUM(pg_total_relation_size(pg_catalog.pg_class.oid)) as size
     FROM pg_catalog.pg_class
       JOIN pg_catalog.pg_namespace ON relnamespace = pg_catalog.pg_namespace.oid
     WHERE pg_catalog.pg_namespace.nspname = $1
+      AND pg_catalog.pg_class.relkind IN ('r', 'm', 'p')
 `,
     [schema],
     (row) => Number(row.size)
