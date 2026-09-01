@@ -98,8 +98,8 @@ describe('Applicable Test', () => {
   test('Applicable evaluated on entity creation', async () => {
     const survey = global.applicableSurvey
     const record = global.applicableRecord
-    const nodeTree = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]')(survey, record)
-    const nodeTreeDbh = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]/tree_dbh')(survey, record)
+    const nodeTree = RecordUtils.findNodeByPath('cluster/plot[0]/tree[0]')(survey, record)
+    const nodeTreeDbh = RecordUtils.findNodeByPath('cluster/plot[0]/tree[0]/tree_dbh')(survey, record)
 
     // Tree_dbh should be not applicable (plot_no <= 10)
     expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).toBe(false)
@@ -108,7 +108,7 @@ describe('Applicable Test', () => {
   test('Applicable in multiple entity update', async () => {
     const survey = global.applicableSurvey
     const record = global.applicableRecord
-    const nodePlotNo = RecordUtils.findNodeByPath('cluster/plot[1]/plot_no')(survey, record)
+    const nodePlotNo = RecordUtils.findNodeByPath('cluster/plot[0]/plot_no')(survey, record)
     const nodePlotNoUpdated = Node.assocValue(11)(nodePlotNo)
     const recordUpdated = await RecordManager.persistNode({
       user: getContextUser(),
@@ -117,8 +117,8 @@ describe('Applicable Test', () => {
       node: nodePlotNoUpdated,
     })
 
-    const nodeTree = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]')(survey, recordUpdated)
-    const nodeTreeDbh = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]/tree_dbh')(survey, recordUpdated)
+    const nodeTree = RecordUtils.findNodeByPath('cluster/plot[0]/tree[0]')(survey, recordUpdated)
+    const nodeTreeDbh = RecordUtils.findNodeByPath('cluster/plot[0]/tree[0]/tree_dbh')(survey, recordUpdated)
 
     // Tree_dbh should be applicable (plot_no > 10)
     expect(Node.isChildApplicable(Node.getNodeDefUuid(nodeTreeDbh))(nodeTree)).toBe(true)

@@ -53,15 +53,14 @@ export const findNodeByPath = (path) => (survey, record) => {
       // Extract node name and index from path part
       const partMatch = /(\w+)(\[(\d+)\])?/.exec(part)
       const childName = partMatch[1]
-      // Path indices are 1-based (e.g. "plot[1]" is the first plot)
-      const childPosition = R.defaultTo(1, partMatch[3])
+      const childIndex = R.defaultTo(0, partMatch[3])
 
       currentNodeDef = Survey.getNodeDefChildByName(currentParentDef, childName)(survey)
 
       const children = Record.getNodeChildrenByDefUuid(currentParentNode, NodeDef.getUuid(currentNodeDef))(record)
 
-      if (children.length >= childPosition) {
-        currentNode = children[childPosition - 1]
+      if (children.length > childIndex) {
+        currentNode = children[childIndex]
       } else {
         currentNode = null
         // break the loop
