@@ -53,8 +53,9 @@ export default class SurveysListExportJob extends Job {
       'filesMissing',
     ]
 
-    const objectTransformer = (surveySummary) =>
-      Object.entries(surveySummary).reduce((acc, [key, value]) => {
+    const objectTransformer = (surveySummary) => {
+      const transformedSurveySummary = {}
+      for (const [key, value] of Object.entries(surveySummary)) {
         const valueTransformed = key.startsWith('date')
           ? DateUtils.convertDate({
               dateStr: value,
@@ -62,9 +63,10 @@ export default class SurveysListExportJob extends Job {
               formatTo: DateUtils.formats.datetimeExport,
             })
           : value
-        acc[key] = valueTransformed
-        return acc
-      }, {})
+        transformedSurveySummary[key] = valueTransformed
+      }
+      return transformedSurveySummary
+    }
 
     const outputTempFileName = FileUtils.newTempFileName()
     const outputFilePath = FileUtils.tempFilePath(outputTempFileName)
