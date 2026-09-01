@@ -76,7 +76,13 @@ job.
 
 ## Testing
 
-No existing unit/integration test covers `_fetchSurveyWithCounts`'s output shape directly. Manual
-verification: run the surveys list export (with `includeDbSize` wired in) and confirm `dbSize` and
-`dbDataSize` show plausible non-negative byte counts for at least one published survey (both
-schemas populated) and one draft-only survey (RDB schema absent → `dbDataSize` is `0`).
+`test/integration/tests/_survey/surveyTest.js` has an integration test
+(`fetchUserSurveysInfoDbSizeTest`) covering `SurveyManager.fetchUserSurveysInfo`'s
+`includeDbSize` option against a real Postgres DB: it asserts `dbSize` and `dbDataSize`
+are present and numeric when `includeDbSize: true`, that `dbDataSize` is `0` for a
+draft/unpublished survey (RDB schema not yet created), and that both fields are absent
+when `includeDbSize` is omitted.
+
+Manual verification of the actual export file (running the surveys list export end-to-end
+and opening the output) is still recommended before merge, since no automated test covers
+`SurveysListExportJob`'s file-writing path itself.

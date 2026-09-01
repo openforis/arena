@@ -93,7 +93,7 @@ export const fetchUserSurveysInfoDbSizeTest = async () => {
 
     expect(itemWithDbSize).toBeDefined()
     expect(typeof itemWithDbSize.dbSize).toBe('number')
-    expect(itemWithDbSize.dbSize).toBeGreaterThanOrEqual(0)
+    expect(itemWithDbSize.dbSize).toBeGreaterThan(0)
     // RDB/data schema isn't created until the survey is published, so it should resolve to 0, not throw.
     expect(itemWithDbSize.dbDataSize).toBe(0)
 
