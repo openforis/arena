@@ -62,6 +62,11 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           access-token: ${{ secrets.ACCESS_TOKEN }}
+      - name: Prepare DB schema
+        if: matrix.suite == 'integration'
+        run: |
+          yarn build:server:prod
+          yarn server:migrate
       - name: Run tests
         run: ${{ matrix.test-command }}
 
