@@ -157,6 +157,5 @@ export const setItemsCount = (count) => (category) => {
 export const isLevelDeleteAllowed = (level) => (category) =>
   !CategoryLevel.isPublished(level) && CategoryLevel.getIndex(level) === getLevelsArray(category).length - 1
 export const isSamplingUnitsPlanCategory = (category) => getName(category) === samplingUnitsPlanCategoryName
-export const isExtraPropDefReadOnly = (extraPropDef) => (category) =>
-  isReportingData(category) && ExtraPropDef.getName(extraPropDef) === reportingDataItemExtraDefKeys.area
+export const isExtraPropDefReadOnly = (extraPropDef) => () => ExtraPropDef.isLocked(extraPropDef)
 export const hasExtraDefs = (category) => getItemExtraDefKeys(category).length > 0

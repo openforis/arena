@@ -603,6 +603,7 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
       [Category.reportingDataItemExtraDefKeys.area]: ExtraPropDef.newItem({
         dataType: ExtraPropDef.dataTypes.number,
         index: Object.values(itemExtraDef).length,
+        locked: true,
       }),
     }
     categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(categoryUpdated)
