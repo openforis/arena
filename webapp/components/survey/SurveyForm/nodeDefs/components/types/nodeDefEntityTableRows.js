@@ -17,6 +17,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 import { getNextSortCriteria, sortNodes } from './nodeDefEntityTableRowsSort'
+import { useColumnHeaderHeight } from './useColumnHeaderHeight'
 
 const NodeDefEntityTableRows = (props) => {
   const {
@@ -76,6 +77,12 @@ const NodeDefEntityTableRows = (props) => {
     height: 0,
     top: 0,
     left: 0,
+  })
+
+  const headerRowRendered = edit || !R.isEmpty(nodes)
+  const { columnHeaderHeight, resizableCellHeight } = useColumnHeaderHeight({
+    headerRef: tableRowsHeaderRef,
+    enabled: headerRowRendered,
   })
 
   const onScrollTableDataRows = () => {
@@ -147,6 +154,7 @@ const NodeDefEntityTableRows = (props) => {
         canEditDef={canEditDef}
         canEditRecord={canEditRecord}
         canDelete={canDelete}
+        columnHeaderHeight={resizableCellHeight}
         edit={edit}
         entry={entry}
         gridSize={gridSize}
@@ -170,8 +178,11 @@ const NodeDefEntityTableRows = (props) => {
   }
 
   return (
-    <div className={classNames('survey-form__node-def-entity-table-rows', { edit })}>
-      {(edit || !R.isEmpty(nodes)) &&
+    <div
+      className={classNames('survey-form__node-def-entity-table-rows', { edit })}
+      style={columnHeaderHeight ? { '--column-header-height': `${columnHeaderHeight}px` } : undefined}
+    >
+      {headerRowRendered &&
         // eslint-disable-next-line react-hooks/refs -- pre-existing pattern: tableRowsHeaderRef is only forwarded to NodeDefEntityTableRow's `ref` prop (a forwardRef component), never dereferenced here.
         createRow({
           renderType: NodeDefLayout.renderType.tableHeader,
