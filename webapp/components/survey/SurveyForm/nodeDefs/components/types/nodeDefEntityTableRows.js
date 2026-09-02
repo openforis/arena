@@ -78,6 +78,24 @@ const NodeDefEntityTableRows = (props) => {
     left: 0,
   })
 
+  const [columnHeaderHeight, setColumnHeaderHeight] = useState(null)
+  const headerRowRendered = edit || !R.isEmpty(nodes)
+
+  useEffect(() => {
+    const headerEl = tableRowsHeaderRef.current
+    if (!headerRowRendered || !headerEl) return
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (!entry) return
+      const measuredHeight = Math.ceil(entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height)
+      setColumnHeaderHeight((prevHeight) => (prevHeight === measuredHeight ? prevHeight : measuredHeight))
+    })
+    observer.observe(headerEl)
+
+    return () => observer.disconnect()
+  }, [headerRowRendered])
+
   const onScrollTableDataRows = () => {
     const headerEl = tableRowsHeaderRef.current
     const rowsEl = tableDataRowsRef.current
@@ -170,8 +188,11 @@ const NodeDefEntityTableRows = (props) => {
   }
 
   return (
-    <div className={classNames('survey-form__node-def-entity-table-rows', { edit })}>
-      {(edit || !R.isEmpty(nodes)) &&
+    <div
+      className={classNames('survey-form__node-def-entity-table-rows', { edit })}
+      style={columnHeaderHeight ? { '--column-header-height': `${columnHeaderHeight}px` } : undefined}
+    >
+      {headerRowRendered &&
         // eslint-disable-next-line react-hooks/refs -- pre-existing pattern: tableRowsHeaderRef is only forwarded to NodeDefEntityTableRow's `ref` prop (a forwardRef component), never dereferenced here.
         createRow({
           renderType: NodeDefLayout.renderType.tableHeader,
