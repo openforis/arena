@@ -10,7 +10,6 @@ const actionHandlers = {
     {
       job,
       onComplete,
-      onFail,
       autoHide,
       closeButton,
       closeButtonProps,
@@ -22,7 +21,6 @@ const actionHandlers = {
     JobState.startJob({
       job,
       onComplete,
-      onFail,
       autoHide,
       closeButton,
       closeButtonProps,

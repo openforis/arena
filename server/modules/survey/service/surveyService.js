@@ -4,6 +4,7 @@ import { NodeDefExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@op
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
@@ -12,6 +13,7 @@ import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -47,15 +49,66 @@ export const fetchAndAssocStorageInfo = async ({ survey }) => {
   )(survey)
 }
 
+// Names of already-published, non-deleted node defs with a value-affecting advanced prop change in
+// the draft (applicable/default values/file name expression/enumerating items expression/items
+// filter) - the same condition RecordCheckJob uses to decide a node def's value needs recalculating
+// on publish (see recordCheckJob.js and NodeDef.hasValueAffectingAdvancedPropsDraft). A plain
+// node-def-only fetch, so this is cheap regardless of survey size or record count. backup: true keeps
+// propsAdvancedDraft separate from propsAdvanced, which hasValueAffectingAdvancedPropsDraft needs.
+const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({ surveyId }) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
+    surveyId,
+    draft: true,
+    advanced: true,
+    backup: true,
+  })
+  return Survey.getNodeDefsArray(survey)
+    .filter(
+      (nodeDef) =>
+        NodeDef.isPublished(nodeDef) &&
+        !NodeDef.isDeleted(nodeDef) &&
+        NodeDef.hasValueAffectingAdvancedPropsDraft(nodeDef)
+    )
+    .map(NodeDef.getName)
+}
+
 // JOBS
-export const startPublishJob = ({ user, surveyId, cleanupRecords, updateRecordValues }) => {
+
+/**
+ * Checks, cheaply and without touching any record, whether publishing the survey could silently
+ * recalculate values already stored in existing records. Meant to be called up front, before starting
+ * the (potentially long) publish job, so the user sees this warning immediately rather than after
+ * waiting for a full record check.
+ * @param {object} params - Params.
+ * @param {number} params.surveyId - Survey id.
+ * @returns {Promise<object|null>} `{ attributeNames }` if publishing is at risk of updating recorded
+ *   values, `null` otherwise.
+ */
+export const checkPublishRecordValuesUpdateWarning = async ({ surveyId }) => {
+  const attributeNames = await _findNodeDefNamesWithRecordValuesUpdateRisk({ surveyId })
+  if (attributeNames.length === 0) return null
+
+  const recordsCount = await RecordManager.countAllRecordsBySurveyId({ surveyId })
+  if (recordsCount === 0) return null
+
+  return { attributeNames }
+}
+
+export const startPublishJob = async ({ user, surveyId, cleanupRecords, updateRecordValues }) => {
+  if (!updateRecordValues) {
+    const recordValuesUpdateWarning = await checkPublishRecordValuesUpdateWarning({ surveyId })
+    if (recordValuesUpdateWarning) {
+      return { recordValuesUpdateWarning }
+    }
+  }
+
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   const job = new SurveyPublishJob({ user, surveyId, cleanupRecords, updateRecordValues })
 
   JobManager.enqueueJob(job)
 
-  return job
+  return { job }
 }
 
 export const startUnpublishJob = (user, surveyId) => {

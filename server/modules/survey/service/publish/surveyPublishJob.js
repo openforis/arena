@@ -21,10 +21,7 @@ import TaxonomiesValidationJob from './jobs/taxonomiesValidationJob'
 
 export default class SurveyPublishJob extends Job {
   constructor(params) {
-    // recordValuesUpdateCheckEnabled: always on for a publish (unlike RecordCheckJob's other callers,
-    // e.g. Collect import jobs, where "cancel and ask for confirmation" would not make sense - there is
-    // no prior published state to protect there).
-    super(SurveyPublishJob.type, { ...params, recordValuesUpdateCheckEnabled: true }, [
+    super(SurveyPublishJob.type, params, [
       new NodeDefsValidationJob(),
       new CategoriesValidationJob(),
       new TaxonomiesValidationJob(),
