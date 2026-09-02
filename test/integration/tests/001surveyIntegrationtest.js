@@ -27,6 +27,8 @@ describe('Survey Test', () => {
 
   test('Convert Category To GeoPackage', async () => CategoryTest.convertCategoryToGeoPackageTest())
   test('Convert Category To Sampling Point Data', async () => CategoryTest.convertCategoryToSamplingPointDataTest())
+  test('Convert Category To Sampling Point Data (already converted)', async () =>
+    CategoryTest.convertCategoryToSamplingPointDataAlreadyConvertedTest())
   test('Convert Category To Sampling Point Data (duplicate)', async () =>
     CategoryTest.convertCategoryToSamplingPointDataDuplicateTest())
 

@@ -176,6 +176,34 @@ export const convertCategoryToSamplingPointDataTest = async () => {
   expect(ExtraPropDef.isLocked(locationDef)).toBe(true)
 }
 
+export const convertCategoryToSamplingPointDataAlreadyConvertedTest = async () => {
+  const surveyId = getContextSurveyId()
+  const user = getContextUser()
+
+  // Reuses the sampling_point_data category already created and converted by
+  // convertCategoryToSamplingPointDataTest above: since sampling_point_data is a survey-wide
+  // singleton, converting a *different* category here would incorrectly hit the duplicate check
+  // instead of exercising the no-op-safe-rename path this test targets.
+  const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft: true })
+  const category = categories.find((c) => Category.getName(c) === 'sampling_point_data')
+  expect(category).toBeDefined()
+
+  // converting an already-sampling_point_data-named category again must be a no-op-safe rename,
+  // not a rejection
+  const categoryUpdatedAgain = await CategoryManager.convertCategoryToSamplingPointData({
+    user,
+    surveyId,
+    categoryUuid: Category.getUuid(category),
+  })
+
+  expect(Category.getName(categoryUpdatedAgain)).toBe('sampling_point_data')
+  const locationDefs = Category.getItemExtraDefsArray(categoryUpdatedAgain).filter(
+    (extraDef) => ExtraPropDef.getName(extraDef) === 'location'
+  )
+  expect(locationDefs.length).toBe(1)
+  expect(ExtraPropDef.isLocked(locationDefs[0])).toBe(true)
+}
+
 export const convertCategoryToSamplingPointDataDuplicateTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
