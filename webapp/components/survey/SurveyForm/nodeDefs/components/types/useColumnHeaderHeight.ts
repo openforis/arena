@@ -37,7 +37,8 @@ export const useColumnHeaderHeight = ({ headerRef, enabled }: Params): Result =>
       if (sampleCellItem) {
         const computedStyle = window.getComputedStyle(sampleCellItem)
         const verticalBorderWidth =
-          parseFloat(computedStyle.borderTopWidth || '0') + parseFloat(computedStyle.borderBottomWidth || '0')
+          Number.parseFloat(computedStyle.borderTopWidth || '0') +
+          Number.parseFloat(computedStyle.borderBottomWidth || '0')
         setHeaderCellChromeHeight((prevChrome) =>
           prevChrome === verticalBorderWidth ? prevChrome : verticalBorderWidth
         )

@@ -35,7 +35,7 @@
       -webkit-line-clamp: 2;
       overflow: hidden;
       white-space: normal;
-      word-break: break-word;
+      overflow-wrap: anywhere;
     }
   }
 
