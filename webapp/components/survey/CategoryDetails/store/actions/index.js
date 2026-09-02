@@ -4,6 +4,8 @@ import { useUpdateCategoryItemExtraPropItem } from './category/useUpdateCategory
 import { useUploadCategory } from './category/useUploadCategory'
 import { useCleanupCategory } from './category/useCleanupCategory'
 import { useConvertToReportingDataCategory } from './category/useConvertToReportingDataCategory'
+import { useConvertToSamplingPointDataCategory } from './category/useConvertToSamplingPointDataCategory'
+import { useConvertToGeoPackageCategory } from './category/useConvertToGeoPackageCategory'
 import { useConvertToSimpleCategory } from './category/useConvertToSimpleCategory'
 import { useOnDoneClick } from './category/useOnDoneClick'
 import { useToggleEditExtraPropertiesPanel } from './category/useToggleEditExtraPropertiesPanel'
@@ -33,6 +35,8 @@ export const useActions = ({ setState }) => ({
   importCategory: useImportCategory({ setState }),
   cleanupCategory: useCleanupCategory({ setState }),
   convertToReportingDataCategory: useConvertToReportingDataCategory({ setState }),
+  convertToSamplingPointDataCategory: useConvertToSamplingPointDataCategory({ setState }),
+  convertToGeoPackageCategory: useConvertToGeoPackageCategory({ setState }),
   convertToSimpleCategory: useConvertToSimpleCategory({ setState }),
   onDoneClick: useOnDoneClick({ setState }),
   toggleEditExtraPropertiesPanel: useToggleEditExtraPropertiesPanel({ setState }),
