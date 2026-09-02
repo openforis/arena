@@ -25,7 +25,7 @@ const getModule = () => ({
     {
       test: /\.(js|jsx|ts|tsx)$/,
       exclude: /(node_modules|bower_components)/,
-      use: [{ loader: 'babel-loader' }],
+      use: [{ loader: 'babel-loader', options: { cacheDirectory: true } }],
     },
   ],
 })
@@ -58,6 +58,10 @@ module.exports = (type) => ({
   externals: [nodeExternals()], // Ignore all modules in node_modules folder
   mode: 'development',
   devtool: 'source-map',
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, '..', 'node_modules', '.cache', 'webpack-test', type),
+  },
   node: {
     __filename: true,
     __dirname: true,
