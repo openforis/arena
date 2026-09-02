@@ -88,9 +88,12 @@ export default class RecordCheckJob extends Job {
     let result = this.surveyAndNodeDefsByCycle[cycle]
     if (!result) {
       // 1. fetch survey
+      // backup: true keeps propsAdvancedDraft separate from propsAdvanced (rather than merging and
+      // discarding it), which the classification below needs to detect an enumeratingItemsExpression/
+      // itemsFilter change - see NodeDef.hasValueAffectingAdvancedPropsDraft.
       this.logDebugOptional(`fetching survey for cycle ${cycle}...`)
       let survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-        { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
+        { surveyId, cycle, draft: true, advanced: true, backup: true, includeDeleted: true },
         tx
       )
 
@@ -114,13 +117,9 @@ export default class RecordCheckJob extends Job {
         } else if (!NodeDef.isPublished(def)) {
           // New node def
           nodeDefAddedUuids.push(nodeDefUuid)
-        } else if (
-          NodeDef.hasAdvancedPropsDraft(def) &&
-          (NodeDef.hasAdvancedPropsApplicableDraft(def) ||
-            NodeDef.hasAdvancedPropsDefaultValuesDraft(def) ||
-            NodeDef.hasAdvancedPropsFileNameExpressionDraft(def))
-        ) {
-          // Already existing node def but applicable or default values or file name expression have been updated
+        } else if (NodeDef.hasAdvancedPropsDraft(def) && NodeDef.hasValueAffectingAdvancedPropsDraft(def)) {
+          // Already existing node def but applicable, default values, file name expression,
+          // enumerating items expression or items filter have been updated
           nodeDefUpdatedUuids.push(nodeDefUuid)
         } else if (NodeDef.hasAdvancedPropsDraft(def) && NodeDef.hasAdvancedPropsValidationsDraft(def)) {
           // Already existing node def but only validations have been updated
