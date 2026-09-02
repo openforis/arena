@@ -86,17 +86,20 @@ const NodeDefEntityTableRows = (props) => {
     const headerEl = tableRowsHeaderRef.current
     if (!headerRowRendered || !headerEl) return
 
-    const sampleCellItem = headerEl.querySelector('.react-grid-item')
-    if (sampleCellItem) {
-      const computedStyle = window.getComputedStyle(sampleCellItem)
-      const verticalBorderWidth =
-        parseFloat(computedStyle.borderTopWidth || '0') + parseFloat(computedStyle.borderBottomWidth || '0')
-      setHeaderCellChromeHeight(verticalBorderWidth)
-    }
-
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0]
       if (!entry) return
+
+      const sampleCellItem = headerEl.querySelector('.react-grid-item')
+      if (sampleCellItem) {
+        const computedStyle = window.getComputedStyle(sampleCellItem)
+        const verticalBorderWidth =
+          parseFloat(computedStyle.borderTopWidth || '0') + parseFloat(computedStyle.borderBottomWidth || '0')
+        setHeaderCellChromeHeight((prevChrome) =>
+          prevChrome === verticalBorderWidth ? prevChrome : verticalBorderWidth
+        )
+      }
+
       const measuredHeight = Math.ceil(entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height)
       setColumnHeaderHeight((prevHeight) => (prevHeight === measuredHeight ? prevHeight : measuredHeight))
     })
