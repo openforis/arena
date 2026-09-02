@@ -22,6 +22,7 @@ import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenera
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
+import CategoryGeoPackageExportJob from './CategoryGeoPackageExportJob'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
@@ -120,6 +121,14 @@ export const exportAllCategories = ({ user, surveyId, fileFormat, draft }) => {
     fileFormat,
     draft,
   })
+
+  JobManager.enqueueJob(job)
+
+  return job
+}
+
+export const exportCategoryToGeoPackage = ({ user, surveyId, categoryUuid, draft }) => {
+  const job = new CategoryGeoPackageExportJob({ user, surveyId, categoryUuid, draft })
 
   JobManager.enqueueJob(job)
 

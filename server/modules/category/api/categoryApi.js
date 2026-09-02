@@ -271,6 +271,46 @@ export const init = (app) => {
     }
   )
 
+  app.post(
+    '/survey/:surveyId/categories/:categoryUuid/export/geopackage',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const job = CategoryService.exportCategoryToGeoPackage({ user, surveyId, categoryUuid, draft })
+        res.json({ job })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/export/geopackage/download',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true, tempFileName } = Request.getParams(req)
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
+        const surveyInfo = Survey.getSurveyInfo(survey)
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+        const name = `${Survey.getName(surveyInfo)}_${Category.getName(category)}.gpkg`
+        const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+
+        Response.sendFile({
+          res,
+          path: exportedFilePath,
+          name,
+          contentType: Response.contentTypes.gpkg,
+        })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   app.get(
     '/survey/:surveyId/categories/:categoryUuid/import-template/',
     AuthMiddleware.requireSurveyViewPermission,
