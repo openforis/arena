@@ -36,6 +36,8 @@ jobs:
   test-fast:
     runs-on: ubuntu-22.04
     name: Test (${{ matrix.suite }})
+    permissions:
+      contents: read
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
@@ -63,8 +65,11 @@ jobs:
         with:
           access-token: ${{ secrets.ACCESS_TOKEN }}
       # Integration tests hit the DB directly and need the schema migrated first, which currently
-      # only happens as a side effect of server startup. Building just the server (not the client)
-      # and booting it is enough, and much faster than the full `yarn build` used for e2e/load.
+      # only happens as a side effect of server startup (MIGRATE_ONLY is not read anywhere in
+      # server/ or @openforis/arena-server, so `yarn server:migrate` boots the full server and
+      # never exits - it can't be used as a one-shot migration step). Building just the server
+      # (not the client) and booting it is enough, and much faster than the full `yarn build`
+      # used for e2e/load.
       - name: Build server
         if: matrix.suite == 'integration'
         run: yarn build:server:dev
@@ -85,6 +90,8 @@ jobs:
     needs: build
     runs-on: ubuntu-22.04
     name: Test (${{ matrix.suite }})
+    permissions:
+      contents: read
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
