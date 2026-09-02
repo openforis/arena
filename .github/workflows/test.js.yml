@@ -61,12 +61,12 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v5
-      - name: Install Playwright browsers
-        if: matrix.playwright
-        uses: microsoft/playwright-github-action@v1
       - uses: ./.github/actions/setup
         with:
           access-token: ${{ secrets.ACCESS_TOKEN }}
+      - name: Install Playwright browsers
+        if: matrix.playwright
+        run: npx playwright install --with-deps
       - name: Install pm2
         run: npm install pm2 -g
       - uses: actions/download-artifact@v4
