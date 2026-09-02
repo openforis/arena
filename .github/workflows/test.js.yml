@@ -3,11 +3,52 @@ name: Run test
 on:
   pull_request:
 
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  PGHOST: localhost
+  PGPORT: 5444
+  PGDATABASE: of-arena-test
+  PGUSER: arena
+  PGPASSWORD: arena
+  # needed by the build job too: it's baked into the client bundle as EMAIL_FROM_RESOLVED (see webpack.config.babel.js)
+  ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+  RATE_LIMIT_ENABLED: false
+
 jobs:
   build:
     runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+        with:
+          access-token: ${{ secrets.ACCESS_TOKEN }}
+      - name: Build
+        run: yarn build
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 1
+
+  # unit and integration tests exercise the code in-process against the DB directly - they never
+  # talk to the built server over HTTP - so they don't need to wait on the `build` job at all.
+  test-fast:
+    runs-on: ubuntu-22.04
+    name: Test (${{ matrix.suite }})
+    permissions:
+      contents: read
     env:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: unit
+            test-command: yarn test:unit
+          - suite: integration
+            test-command: yarn test:integration
     services:
       postgres:
         image: postgis/postgis:12-3.0
@@ -18,59 +59,91 @@ jobs:
         ports:
           - 5444:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
       - uses: actions/checkout@v5
-      - uses: microsoft/playwright-github-action@v1
-      - uses: actions/setup-node@v5
+      - uses: ./.github/actions/setup
         with:
-          node-version: '24.11.1'
-          always-auth: true
-          auth-token: ${{secrets.ACCESS_TOKEN}}
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@openforis'
+          access-token: ${{ secrets.ACCESS_TOKEN }}
+      # Integration tests hit the DB directly and need the schema migrated first, which currently
+      # only happens as a side effect of server startup (MIGRATE_ONLY is not read anywhere in
+      # server/ or @openforis/arena-server, so `yarn server:migrate` boots the full server and
+      # never exits - it can't be used as a one-shot migration step). Building just the server
+      # (not the client) and booting it is enough, and much faster than the full `yarn build`
+      # used for e2e/load.
+      - name: Build server
+        if: matrix.suite == 'integration'
+        run: yarn build:server:dev
+      - name: Run server (applies DB migrations on startup)
+        if: matrix.suite == 'integration'
+        run: |
+          ln -s dist/server.js .
+          node dist/server.js &
+      - name: Wait for server to start
+        if: matrix.suite == 'integration'
+        run: while ! nc -z localhost 9090; do sleep 5; done;
+      - name: Run tests
+        run: ${{ matrix.test-command }}
+
+  # e2e and load tests drive the running server over HTTP, so they need the production build
+  # started with pm2 first.
+  test-server:
+    needs: build
+    runs-on: ubuntu-22.04
+    name: Test (${{ matrix.suite }})
+    permissions:
+      contents: read
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: e2e
+            test-command: yarn test:e2e
+            playwright: true
+          - suite: load
+            load: true
+    services:
+      postgres:
+        image: postgis/postgis:12-3.0
+        env:
+          POSTGRES_USER: arena
+          POSTGRES_PASSWORD: arena
+          POSTGRES_DB: of-arena-test
+        ports:
+          - 5444:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+        with:
+          access-token: ${{ secrets.ACCESS_TOKEN }}
+      - name: Install Playwright browsers
+        if: matrix.playwright
+        run: npx playwright install --with-deps
       - name: Install pm2
         run: npm install pm2 -g
-      - name: Yarn
-        run: yarn
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-      - name: Build
-        run: yarn build
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
       - name: Run server
         run: |
           ln -s dist/server.js .
           exec pm2-runtime server.js &
-        env:
-          PGHOST: localhost
-          PGPORT: 5444
-          PGDATABASE: of-arena-test
-          PGUSER: arena
-          PGPASSWORD: arena
-          SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
-          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
-          ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}
-          SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
-          RATE_LIMIT_ENABLED: false
       - name: Wait for server to start
         run: while ! nc -z localhost 9090; do sleep 5; done;
       - name: Run tests
-        run: yarn test
-        env:
-          PGHOST: localhost
-          PGPORT: 5444
-          PGDATABASE: of-arena-test
-          PGUSER: arena
-          PGPASSWORD: arena
-          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
-          SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
+        if: ${{ !matrix.load }}
+        run: ${{ matrix.test-command }}
       - name: Run load-test unit tests
+        if: matrix.load
         run: yarn test:load:unit
       - name: Build sample survey zip for stress test
+        if: matrix.load
         run: yarn test:load:build-fixture /tmp/sample-survey.zip
       - name: Run survey import stress test
+        if: matrix.load
         timeout-minutes: 20
         run: yarn test:load --zip /tmp/sample-survey.zip --job-timeout 600000
-        env:
-          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
-          ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}
