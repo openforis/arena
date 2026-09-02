@@ -62,6 +62,8 @@ jobs:
           PGDATABASE: of-arena-test
           PGUSER: arena
           PGPASSWORD: arena
+          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
+          SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
       - name: Run load-test unit tests
         run: yarn test:load:unit
       - name: Build sample survey zip for stress test

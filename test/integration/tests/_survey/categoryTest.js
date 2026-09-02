@@ -18,7 +18,6 @@ export const createCategoryTest = async () => {
   const categoryReq = Category.assocItemExtraDef(extraDef)(Category.newCategory({ name: 'category_test' }))
   const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
 
-  /* eslint-disable no-unused-expressions */
   expect(Category.getUuid(category)).toBeDefined()
 
   const reloadedCategory = await CategoryManager.fetchCategoryAndLevelsByUuid({
@@ -93,7 +92,7 @@ export const updateCategoryTest = async () => {
   const category = await _fetchFirstCategory(surveyId)
 
   const newName = 'category_modified'
-  const { category: updatedCategory } = await CategoryManager.updateCategoryProp({
+  const updatedCategory = await CategoryManager.updateCategoryProp({
     user,
     surveyId,
     categoryUuid: Category.getUuid(category),
@@ -110,15 +109,17 @@ export const updateCategoryItemExtraDefTest = async () => {
 
   const category = await _fetchFirstCategory(surveyId)
 
+  // Extra def names are validated against a lowercase-only pattern on update (unlike on create).
+  const newName = 'extra_def_text_modified'
   const categoryUpdated = await CategoryManager.updateCategoryItemExtraDefItem({
     user,
     surveyId,
     categoryUuid: Category.getUuid(category),
     name: 'extraDefText',
-    value: { name: 'extraDefText_modified', dataType: ExtraPropDef.dataTypes.text },
+    itemExtraDef: { name: newName, dataType: ExtraPropDef.dataTypes.text },
   })
 
-  const itemExtraDefExpected = { extraDefText_modified: { dataType: ExtraPropDef.dataTypes.text } }
-
-  expect(Category.getItemExtraDef(categoryUpdated)).toBe(itemExtraDefExpected)
+  // Renamed extra def replaces the old key; the other extra def (extraDefNumber) is preserved.
+  expect(Category.getItemExtraDefKeys(categoryUpdated)).toEqual([newName, 'extraDefNumber'])
+  expect(Category.getItemExtraDef(categoryUpdated)[newName].dataType).toBe(ExtraPropDef.dataTypes.text)
 }
