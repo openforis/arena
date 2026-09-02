@@ -1,0 +1,25 @@
+name: Setup Node.js and install dependencies
+description: >
+  Sets up Node.js with the yarn cache and runs `yarn install --immutable`.
+  Requires the repository to already be checked out (actions/checkout must
+  run as a separate, preceding step in the calling job).
+inputs:
+  access-token:
+    description: GitHub token used to authenticate with npm.pkg.github.com
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v5
+      with:
+        node-version: '24.11.1'
+        cache: 'yarn'
+        always-auth: true
+        auth-token: ${{ inputs.access-token }}
+        registry-url: 'https://npm.pkg.github.com'
+        scope: '@openforis'
+    - name: Yarn
+      shell: bash
+      run: yarn install --immutable
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.access-token }}

@@ -3,11 +3,53 @@ name: Run test
 on:
   pull_request:
 
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  PGHOST: localhost
+  PGPORT: 5444
+  PGDATABASE: of-arena-test
+  PGUSER: arena
+  PGPASSWORD: arena
+  SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
+  ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+  ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+  SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+  RATE_LIMIT_ENABLED: false
+
 jobs:
   build:
     runs-on: ubuntu-22.04
-    env:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+        with:
+          access-token: ${{ secrets.ACCESS_TOKEN }}
+      - name: Build
+        run: yarn build
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 1
+
+  test:
+    needs: build
+    runs-on: ubuntu-22.04
+    name: Test (${{ matrix.suite }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: unit
+            test-command: yarn test:unit
+          - suite: integration
+            test-command: yarn test:integration
+          - suite: e2e
+            test-command: yarn test:e2e
+            playwright: true
+          - suite: load
+            load: true
     services:
       postgres:
         image: postgis/postgis:12-3.0
@@ -18,59 +60,36 @@ jobs:
         ports:
           - 5444:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
       - uses: actions/checkout@v5
-      - uses: microsoft/playwright-github-action@v1
-      - uses: actions/setup-node@v5
+      - name: Install Playwright browsers
+        if: matrix.playwright
+        uses: microsoft/playwright-github-action@v1
+      - uses: ./.github/actions/setup
         with:
-          node-version: '24.11.1'
-          always-auth: true
-          auth-token: ${{secrets.ACCESS_TOKEN}}
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@openforis'
+          access-token: ${{ secrets.ACCESS_TOKEN }}
       - name: Install pm2
         run: npm install pm2 -g
-      - name: Yarn
-        run: yarn
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-      - name: Build
-        run: yarn build
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
       - name: Run server
         run: |
           ln -s dist/server.js .
           exec pm2-runtime server.js &
-        env:
-          PGHOST: localhost
-          PGPORT: 5444
-          PGDATABASE: of-arena-test
-          PGUSER: arena
-          PGPASSWORD: arena
-          SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
-          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
-          ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}
-          SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
-          RATE_LIMIT_ENABLED: false
       - name: Wait for server to start
         run: while ! nc -z localhost 9090; do sleep 5; done;
       - name: Run tests
-        run: yarn test
-        env:
-          PGHOST: localhost
-          PGPORT: 5444
-          PGDATABASE: of-arena-test
-          PGUSER: arena
-          PGPASSWORD: arena
-          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
-          SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
+        if: ${{ !matrix.load }}
+        run: ${{ matrix.test-command }}
       - name: Run load-test unit tests
+        if: matrix.load
         run: yarn test:load:unit
       - name: Build sample survey zip for stress test
+        if: matrix.load
         run: yarn test:load:build-fixture /tmp/sample-survey.zip
       - name: Run survey import stress test
+        if: matrix.load
         timeout-minutes: 20
         run: yarn test:load --zip /tmp/sample-survey.zip --job-timeout 600000
-        env:
-          ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
-          ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}
