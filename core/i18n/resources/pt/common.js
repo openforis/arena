@@ -159,6 +159,14 @@ Deseja prosseguir?`,
 - Os táxons não podem ser excluídos.
 
 **Tem certeza de que deseja continuar?**`,
+    publishRecordValuesUpdateConfirm: `#### Publicar {{survey}} irá atualizar dados já registrados ####
+
+Os seguintes atributos foram alterados de forma que seu valor será recalculado nos registros existentes: **{{attributeNames}}**.
+
+Isso pode alterar ou apagar permanentemente dados já inseridos. Digite o nome da pesquisa abaixo para confirmar.`,
+    publishRecordValuesUpdateConfirmHeader: 'Os dados de registros existentes serão atualizados',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Digite o nome da pesquisa "{{strongConfirmRequiredText}}" para confirmar',
     raiseTicketInSupportForum: `Em caso de problemas, abra um chamado com a tag 'arena' no nosso <b>Fórum de Suporte</b>: $t(links.supportForum)`,
     record: 'Registro',
     record_other: 'Registros',
