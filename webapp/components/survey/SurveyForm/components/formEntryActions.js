@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import PropTypes from 'prop-types'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
@@ -8,17 +8,18 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { RecordActions, RecordState, useRecord } from '@webapp/store/ui/record'
 import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
+import { RecordActions, RecordState, useRecord } from '@webapp/store/ui/record'
 import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 
-import { TestId } from '@webapp/utils/testId'
-import { Button, ButtonDownload, ButtonEditLockToggle } from '@webapp/components/buttons'
 import { PrintableExportFormats } from '@common/record/printableExport'
-import { RecordPrintableExportModal } from './RecordPrintableExportModal'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { Button, ButtonEditLockToggle } from '@webapp/components/buttons'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
+import { TestId } from '@webapp/utils/testId'
+
+import { RecordPrintableExportModal } from './RecordPrintableExportModal'
 
 const RecordEntryButtons = (props) => {
   const { disableLockUnlock = false, disableValidationReport = false } = props
@@ -69,9 +70,9 @@ const RecordEntryButtons = (props) => {
       {experimentalFeatures && !noHeader && (
         <Button
           iconClassName="icon-file-pdf"
-          title="surveyForm:printableExport.exportDocument"
           onClick={() => setPrintableExportOpen(true)}
           showLabel={false}
+          title="surveyForm:printableExport.exportDocument"
           variant="text"
         />
       )}
