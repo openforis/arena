@@ -79,11 +79,20 @@ const NodeDefEntityTableRows = (props) => {
   })
 
   const [columnHeaderHeight, setColumnHeaderHeight] = useState(null)
+  const [headerCellChromeHeight, setHeaderCellChromeHeight] = useState(0)
   const headerRowRendered = edit || !R.isEmpty(nodes)
 
   useEffect(() => {
     const headerEl = tableRowsHeaderRef.current
     if (!headerRowRendered || !headerEl) return
+
+    const sampleCellItem = headerEl.querySelector('.react-grid-item')
+    if (sampleCellItem) {
+      const computedStyle = window.getComputedStyle(sampleCellItem)
+      const verticalBorderWidth =
+        parseFloat(computedStyle.borderTopWidth || '0') + parseFloat(computedStyle.borderBottomWidth || '0')
+      setHeaderCellChromeHeight(verticalBorderWidth)
+    }
 
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0]
@@ -95,6 +104,9 @@ const NodeDefEntityTableRows = (props) => {
 
     return () => observer.disconnect()
   }, [headerRowRendered])
+
+  const resizableCellHeight =
+    columnHeaderHeight === null ? null : Math.max(0, columnHeaderHeight - headerCellChromeHeight)
 
   const onScrollTableDataRows = () => {
     const headerEl = tableRowsHeaderRef.current
@@ -165,7 +177,7 @@ const NodeDefEntityTableRows = (props) => {
         canEditDef={canEditDef}
         canEditRecord={canEditRecord}
         canDelete={canDelete}
-        columnHeaderHeight={columnHeaderHeight}
+        columnHeaderHeight={resizableCellHeight}
         edit={edit}
         entry={entry}
         gridSize={gridSize}
