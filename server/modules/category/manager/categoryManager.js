@@ -648,6 +648,115 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
     return categoryUpdated
   })
 
+const locationExtraPropName = 'location'
+
+export const convertCategoryToGeoPackage = async ({ user, surveyId, categoryUuid, locked = true }, client = db) =>
+  client.tx(async (t) => {
+    const category = await _fetchCategory({ surveyId, categoryUuid }, t)
+
+    const itemExtraDef = Category.getItemExtraDef(category)
+    if (locationExtraPropName in itemExtraDef) {
+      // already has a 'location' extra prop; nothing to add
+      return category
+    }
+
+    const itemExtraDefUpdated = {
+      ...itemExtraDef,
+      [locationExtraPropName]: ExtraPropDef.newItem({
+        dataType: ExtraPropDef.dataTypes.geometryPoint,
+        index: Object.values(itemExtraDef).length,
+        locked,
+      }),
+    }
+    const categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(category)
+
+    await CategoryRepository.updateCategoryProp(
+      surveyId,
+      categoryUuid,
+      Category.keysProps.itemExtraDef,
+      itemExtraDefUpdated,
+      t
+    )
+
+    await Promise.all([
+      markSurveyDraft(surveyId, t),
+      ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.categoryConvertToGeoPackage,
+        { [ActivityLog.keysContent.uuid]: categoryUuid },
+        false,
+        t
+      ),
+    ])
+    return categoryUpdated
+  })
+
+export const convertCategoryToSamplingPointData = async (
+  { user, surveyId, categoryUuid, locked = true },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const category = await _fetchCategory({ surveyId, categoryUuid }, t)
+
+    if (Category.getName(category) !== Survey.samplingPointDataCategoryName) {
+      const categories = await CategoryRepository.fetchCategoriesBySurveyId({ surveyId, draft: true }, t)
+      const duplicate = categories.find(
+        (otherCategory) =>
+          Category.getUuid(otherCategory) !== categoryUuid &&
+          Category.getName(otherCategory) === Survey.samplingPointDataCategoryName
+      )
+      if (duplicate) {
+        throw new SystemError('validationErrors:category.samplingPointDataCategoryAlreadyExists')
+      }
+    }
+
+    let categoryUpdated = Category.assocProp({
+      key: Category.keysProps.name,
+      value: Survey.samplingPointDataCategoryName,
+    })(category)
+    await CategoryRepository.updateCategoryProp(
+      surveyId,
+      categoryUuid,
+      Category.keysProps.name,
+      Survey.samplingPointDataCategoryName,
+      t
+    )
+
+    const itemExtraDef = Category.getItemExtraDef(categoryUpdated)
+    if (!(locationExtraPropName in itemExtraDef)) {
+      const itemExtraDefUpdated = {
+        ...itemExtraDef,
+        [locationExtraPropName]: ExtraPropDef.newItem({
+          dataType: ExtraPropDef.dataTypes.geometryPoint,
+          index: Object.values(itemExtraDef).length,
+          locked,
+        }),
+      }
+      categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(categoryUpdated)
+      await CategoryRepository.updateCategoryProp(
+        surveyId,
+        categoryUuid,
+        Category.keysProps.itemExtraDef,
+        itemExtraDefUpdated,
+        t
+      )
+    }
+
+    await Promise.all([
+      markSurveyDraft(surveyId, t),
+      ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.categoryConvertToSamplingPointData,
+        { [ActivityLog.keysContent.uuid]: categoryUuid },
+        false,
+        t
+      ),
+    ])
+    return _validateCategory({ surveyId, categoryUuid }, t)
+  })
+
 // ====== DELETE
 export const deleteCategory = async (user, surveyId, categoryUuid, client = db) =>
   client.tx(async (t) => {

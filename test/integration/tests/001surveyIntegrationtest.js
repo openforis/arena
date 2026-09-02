@@ -25,6 +25,11 @@ describe('Survey Test', () => {
 
   test('Update Category Item Extra Def', async () => CategoryTest.updateCategoryItemExtraDefTest())
 
+  test('Convert Category To GeoPackage', async () => CategoryTest.convertCategoryToGeoPackageTest())
+  test('Convert Category To Sampling Point Data', async () => CategoryTest.convertCategoryToSamplingPointDataTest())
+  test('Convert Category To Sampling Point Data (duplicate)', async () =>
+    CategoryTest.convertCategoryToSamplingPointDataDuplicateTest())
+
   // ==== NODE DEF
 
   test('Create Node Defs', async () => NodeDefTest.createNodeDefsTest())

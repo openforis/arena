@@ -123,3 +123,72 @@ export const updateCategoryItemExtraDefTest = async () => {
   expect(Category.getItemExtraDefKeys(categoryUpdated)).toEqual([newName, 'extraDefNumber'])
   expect(Category.getItemExtraDef(categoryUpdated)[newName].dataType).toBe(ExtraPropDef.dataTypes.text)
 }
+
+export const convertCategoryToGeoPackageTest = async () => {
+  const surveyId = getContextSurveyId()
+  const user = getContextUser()
+
+  const categoryReq = Category.newCategory({ name: 'category_geopackage_test' })
+  const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
+
+  const categoryUpdated = await CategoryManager.convertCategoryToGeoPackage({
+    user,
+    surveyId,
+    categoryUuid: Category.getUuid(category),
+  })
+
+  const locationDef = Category.getItemExtraDefsArray(categoryUpdated).find(
+    (extraDef) => ExtraPropDef.getName(extraDef) === 'location'
+  )
+  expect(locationDef).toBeDefined()
+  expect(ExtraPropDef.getDataType(locationDef)).toBe(ExtraPropDef.dataTypes.geometryPoint)
+  expect(ExtraPropDef.isLocked(locationDef)).toBe(true)
+
+  // idempotent: converting again does not duplicate or reset the extra def
+  const categoryUpdatedAgain = await CategoryManager.convertCategoryToGeoPackage({
+    user,
+    surveyId,
+    categoryUuid: Category.getUuid(category),
+    locked: false,
+  })
+  expect(Category.getItemExtraDefsArray(categoryUpdatedAgain).length).toBe(1)
+  expect(ExtraPropDef.isLocked(Category.getItemExtraDefsArray(categoryUpdatedAgain)[0])).toBe(true)
+}
+
+export const convertCategoryToSamplingPointDataTest = async () => {
+  const surveyId = getContextSurveyId()
+  const user = getContextUser()
+
+  const categoryReq = Category.newCategory({ name: 'category_spd_test' })
+  const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
+
+  const categoryUpdated = await CategoryManager.convertCategoryToSamplingPointData({
+    user,
+    surveyId,
+    categoryUuid: Category.getUuid(category),
+  })
+
+  expect(Category.getName(categoryUpdated)).toBe('sampling_point_data')
+  const locationDef = Category.getItemExtraDefsArray(categoryUpdated).find(
+    (extraDef) => ExtraPropDef.getName(extraDef) === 'location'
+  )
+  expect(locationDef).toBeDefined()
+  expect(ExtraPropDef.isLocked(locationDef)).toBe(true)
+}
+
+export const convertCategoryToSamplingPointDataDuplicateTest = async () => {
+  const surveyId = getContextSurveyId()
+  const user = getContextUser()
+
+  // a sampling_point_data category already exists from convertCategoryToSamplingPointDataTest above
+  const categoryReq = Category.newCategory({ name: 'category_spd_duplicate_test' })
+  const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
+
+  await expect(
+    CategoryManager.convertCategoryToSamplingPointData({
+      user,
+      surveyId,
+      categoryUuid: Category.getUuid(category),
+    })
+  ).rejects.toThrow()
+}
