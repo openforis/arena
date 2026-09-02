@@ -66,10 +66,13 @@ const RecordEntryButtons = (props) => {
           {i18n.t('dataView:invalidRecord')}
         </Link>
       )}
-      {experimentalFeatures && (
-        <ButtonDownload
-          label="surveyForm:printableExport.exportDocument"
+      {experimentalFeatures && !noHeader && (
+        <Button
+          iconClassName="icon-file-pdf"
+          title="surveyForm:printableExport.exportDocument"
           onClick={() => setPrintableExportOpen(true)}
+          showLabel={false}
+          variant="text"
         />
       )}
       {printableExportOpen && (
