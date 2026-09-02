@@ -7,6 +7,7 @@ import { useConvertToReportingDataCategory } from './category/useConvertToReport
 import { useConvertToSamplingPointDataCategory } from './category/useConvertToSamplingPointDataCategory'
 import { useConvertToGeoPackageCategory } from './category/useConvertToGeoPackageCategory'
 import { useConvertToSimpleCategory } from './category/useConvertToSimpleCategory'
+import { useExportToGeoPackage } from './category/useExportToGeoPackage'
 import { useOnDoneClick } from './category/useOnDoneClick'
 import { useToggleEditExtraPropertiesPanel } from './category/useToggleEditExtraPropertiesPanel'
 import { useImportCategory } from './importSummary/useImportCategory'
@@ -38,6 +39,7 @@ export const useActions = ({ setState }) => ({
   convertToSamplingPointDataCategory: useConvertToSamplingPointDataCategory({ setState }),
   convertToGeoPackageCategory: useConvertToGeoPackageCategory({ setState }),
   convertToSimpleCategory: useConvertToSimpleCategory({ setState }),
+  exportToGeoPackage: useExportToGeoPackage(),
   onDoneClick: useOnDoneClick({ setState }),
   toggleEditExtraPropertiesPanel: useToggleEditExtraPropertiesPanel({ setState }),
 

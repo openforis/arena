@@ -19,6 +19,7 @@ export {
   convertToSamplingPointDataCategory,
   convertToGeoPackageCategory,
   startExportAllCategoriesJob,
+  startExportCategoryToGeoPackageJob,
   startCategoriesBatchImportJob,
   updateCategoryProp,
   updateCategoryItemExtraDefItem,

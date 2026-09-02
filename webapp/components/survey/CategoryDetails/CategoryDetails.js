@@ -195,6 +195,16 @@ const CategoryDetails = (props) => {
               testId={TestId.categoryDetails.exportBtn}
             />
 
+            {hasLocationExtraProp && (
+              <Button
+                className="export-geopackage-btn"
+                iconClassName="icon-download2 icon-14px"
+                label="categoryEdit.exportToGeoPackage"
+                onClick={() => Actions.exportToGeoPackage({ categoryUuid })}
+                variant="outlined"
+              />
+            )}
+
             {Category.isReportingData(category) && (
               <Checkbox
                 checked

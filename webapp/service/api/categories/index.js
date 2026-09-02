@@ -88,6 +88,14 @@ export const startExportAllCategoriesJob = async ({ surveyId, fileFormat, draft 
   return { job }
 }
 
+export const startExportCategoryToGeoPackageJob = async ({ surveyId, categoryUuid, draft = true }) => {
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/export/geopackage`, { draft })
+
+  return { job }
+}
+
 export const startCategoriesBatchImportJob = async ({ surveyId, file }) => {
   const formData = objectToFormData({ file })
   const {
