@@ -1,10 +1,9 @@
-import { Objects, Points } from '@openforis/arena-core'
-
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { FileFormats } from '@core/fileFormats'
+import { parsePoint } from '@core/survey/categoryItemPointParser'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -12,17 +11,6 @@ import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as CategoryRepository from '../repository/categoryRepository'
 
 const levelPositionField = 'level'
-
-export const parsePoint = (geometryPoint) => {
-  if (Objects.isEmpty(geometryPoint)) return null
-  const point = Points.parse(geometryPoint)
-  if (point) return point
-  try {
-    return JSON.parse(geometryPoint)
-  } catch (error) {
-    return null
-  }
-}
 
 const transformGeometryPointExtraProperty = ({ extraDef, obj }) => {
   // split geometry point into separate columns

@@ -3,8 +3,7 @@ import { Points } from '@openforis/arena-core'
 import * as Category from '@core/survey/category'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
-
-import { parsePoint } from './categoryExportManager'
+import { parsePoint } from '@core/survey/categoryItemPointParser'
 
 const locationExtraPropName = 'location'
 
