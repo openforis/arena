@@ -165,6 +165,7 @@ const NodeDefEntityTableRows = (props) => {
         canEditDef={canEditDef}
         canEditRecord={canEditRecord}
         canDelete={canDelete}
+        columnHeaderHeight={columnHeaderHeight}
         edit={edit}
         entry={entry}
         gridSize={gridSize}
