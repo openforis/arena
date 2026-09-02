@@ -40,4 +40,17 @@ describe('ExtraPropDef locked flag', () => {
     })
     expect(ExtraPropDef.isLocked(updated.location)).toBe(true)
   })
+
+  it('backward-compatibility: pre-existing unlocked area extra-prop-def on reportingData category is still read-only', () => {
+    const reportingDataCategory = Category.assocProp({
+      key: Category.keysProps.reportingData,
+      value: true,
+    })(Category.newCategory())
+    // Simulate pre-existing data: area prop-def without locked field (missing field defaults to false via isLocked)
+    const unlockedAreaDef = {
+      ...ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
+      name: Category.reportingDataItemExtraDefKeys.area,
+    }
+    expect(Category.isExtraPropDefReadOnly(unlockedAreaDef)(reportingDataCategory)).toBe(true)
+  })
 })
