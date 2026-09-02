@@ -1,0 +1,1 @@
+export { LockFixedPropertiesDialog } from './LockFixedPropertiesDialog'

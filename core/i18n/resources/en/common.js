@@ -1302,6 +1302,35 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     convertToSimpleCategory: {
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convert to Sampling Point Data',
+      confirmMessage: `Convert this category to the Sampling Point Data category?
+
+The category will be renamed to 'sampling_point_data' and a 'location' extra property will be added to the items.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convert to GeoPackage category',
+      confirmMessage: `Convert this category to a GeoPackage category?
+
+A 'location' extra property will be added to the items.`,
+    },
+    createCategory: {
+      menuLabel: 'Add category',
+      simple: 'Simple category',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Sampling Point Data category',
+      message: `Create a new Sampling Point Data category?
+
+A 'location' extra property will be added to the items.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'GeoPackage category',
+      message: `Create a new GeoPackage category?
+
+A 'location' extra property will be added to the items.`,
+    },
+    lockFixedProperties: 'Lock fixed properties',
     deleteItem: 'Delete item',
     level: {
       title: 'Level {{levelPosition}}',

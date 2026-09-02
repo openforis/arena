@@ -176,6 +176,22 @@ export const convertToReportingDataCategory = async ({ surveyId, categoryUuid })
   return category
 }
 
+export const convertToSamplingPointDataCategory = async ({ surveyId, categoryUuid, locked = true }) => {
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/convertToSamplingPointData`, { locked })
+
+  return category
+}
+
+export const convertToGeoPackageCategory = async ({ surveyId, categoryUuid, locked = true }) => {
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/convertToGeoPackage`, { locked })
+
+  return category
+}
+
 // DELETE
 export const deleteCategory = async ({ surveyId, categoryUuid }) =>
   axios.delete(`/api/survey/${surveyId}/categories/${categoryUuid}`)
