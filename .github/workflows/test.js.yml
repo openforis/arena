@@ -31,8 +31,9 @@ jobs:
           path: dist
           retention-days: 1
 
-  test:
-    needs: build
+  # unit and integration tests exercise the code in-process against the DB directly - they never
+  # talk to the built server over HTTP - so they don't need to wait on the `build` job at all.
+  test-fast:
     runs-on: ubuntu-22.04
     name: Test (${{ matrix.suite }})
     env:
@@ -46,6 +47,37 @@ jobs:
             test-command: yarn test:unit
           - suite: integration
             test-command: yarn test:integration
+    services:
+      postgres:
+        image: postgis/postgis:12-3.0
+        env:
+          POSTGRES_USER: arena
+          POSTGRES_PASSWORD: arena
+          POSTGRES_DB: of-arena-test
+        ports:
+          - 5444:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+        with:
+          access-token: ${{ secrets.ACCESS_TOKEN }}
+      - name: Run tests
+        run: ${{ matrix.test-command }}
+
+  # e2e and load tests drive the running server over HTTP, so they need the production build
+  # started with pm2 first.
+  test-server:
+    needs: build
+    runs-on: ubuntu-22.04
+    name: Test (${{ matrix.suite }})
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
           - suite: e2e
             test-command: yarn test:e2e
             playwright: true
