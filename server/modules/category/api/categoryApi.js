@@ -539,6 +539,50 @@ export const init = (app) => {
     }
   )
 
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/convertToSamplingPointData',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, locked = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.convertCategoryToSamplingPointData({
+          user,
+          surveyId,
+          categoryUuid,
+          locked,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/convertToGeoPackage',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, locked = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.convertCategoryToGeoPackage({
+          user,
+          surveyId,
+          categoryUuid,
+          locked,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ==== DELETE
 
   app.delete(

@@ -252,6 +252,8 @@ export const {
   updateCategoryItemExtraDefItem,
   cleanupCategory,
   convertCategoryToReportingData,
+  convertCategoryToSamplingPointData,
+  convertCategoryToGeoPackage,
   updateLevelProp,
   updateItemProp,
   updateItemsIndex,
