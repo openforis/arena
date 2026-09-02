@@ -2,7 +2,9 @@ name: Setup Node.js and install dependencies
 description: >
   Sets up Node.js with the yarn cache and runs `yarn install --immutable`.
   Requires the repository to already be checked out (actions/checkout must
-  run as a separate, preceding step in the calling job).
+  run as a separate, preceding step in the calling job) and the calling
+  workflow to expose an NPM_TOKEN environment variable, since .yarnrc.yml
+  authenticates the @openforis npm scope with it.
 inputs:
   access-token:
     description: GitHub token used to authenticate with npm.pkg.github.com

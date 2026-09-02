@@ -10,9 +10,8 @@ env:
   PGDATABASE: of-arena-test
   PGUSER: arena
   PGPASSWORD: arena
+  # needed by the build job too: it's baked into the client bundle as EMAIL_FROM_RESOLVED (see webpack.config.babel.js)
   ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-  ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-  SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
   RATE_LIMIT_ENABLED: false
 
 jobs:
@@ -36,6 +35,9 @@ jobs:
     needs: build
     runs-on: ubuntu-22.04
     name: Test (${{ matrix.suite }})
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
     strategy:
       fail-fast: false
       matrix:
