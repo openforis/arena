@@ -13,7 +13,7 @@ import * as CategoryRepository from '../repository/categoryRepository'
 
 const levelPositionField = 'level'
 
-const parsePoint = (geometryPoint) => {
+export const parsePoint = (geometryPoint) => {
   if (Objects.isEmpty(geometryPoint)) return null
   const point = Points.parse(geometryPoint)
   if (point) return point
