@@ -17,6 +17,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 import { getNextSortCriteria, sortNodes } from './nodeDefEntityTableRowsSort'
+import { useColumnHeaderHeight } from './useColumnHeaderHeight'
 
 const NodeDefEntityTableRows = (props) => {
   const {
@@ -78,38 +79,11 @@ const NodeDefEntityTableRows = (props) => {
     left: 0,
   })
 
-  const [columnHeaderHeight, setColumnHeaderHeight] = useState(null)
-  const [headerCellChromeHeight, setHeaderCellChromeHeight] = useState(0)
   const headerRowRendered = edit || !R.isEmpty(nodes)
-
-  useEffect(() => {
-    const headerEl = tableRowsHeaderRef.current
-    if (!headerRowRendered || !headerEl) return
-
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0]
-      if (!entry) return
-
-      const sampleCellItem = headerEl.querySelector('.react-grid-item')
-      if (sampleCellItem) {
-        const computedStyle = window.getComputedStyle(sampleCellItem)
-        const verticalBorderWidth =
-          parseFloat(computedStyle.borderTopWidth || '0') + parseFloat(computedStyle.borderBottomWidth || '0')
-        setHeaderCellChromeHeight((prevChrome) =>
-          prevChrome === verticalBorderWidth ? prevChrome : verticalBorderWidth
-        )
-      }
-
-      const measuredHeight = Math.ceil(entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height)
-      setColumnHeaderHeight((prevHeight) => (prevHeight === measuredHeight ? prevHeight : measuredHeight))
-    })
-    observer.observe(headerEl)
-
-    return () => observer.disconnect()
-  }, [headerRowRendered])
-
-  const resizableCellHeight =
-    columnHeaderHeight === null ? null : Math.max(0, columnHeaderHeight - headerCellChromeHeight)
+  const { columnHeaderHeight, resizableCellHeight } = useColumnHeaderHeight({
+    headerRef: tableRowsHeaderRef,
+    enabled: headerRowRendered,
+  })
 
   const onScrollTableDataRows = () => {
     const headerEl = tableRowsHeaderRef.current
