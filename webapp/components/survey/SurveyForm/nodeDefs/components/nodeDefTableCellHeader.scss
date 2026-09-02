@@ -28,6 +28,15 @@
     .icon-info {
       padding-right: 5px;
     }
+
+    .label {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      white-space: normal;
+      word-break: break-word;
+    }
   }
 
   .subfields-labels-wrapper {

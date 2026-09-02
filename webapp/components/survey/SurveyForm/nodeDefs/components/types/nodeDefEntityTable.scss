@@ -65,7 +65,7 @@
 .survey-form__node-def-entity-table-row-header {
   position: absolute;
   display: flex;
-  height: $formTableRowHeaderHeight;
+  min-height: $formTableRowHeaderHeight;
   background-color: rgba($blueLight, 0.3);
   border-right: 1px solid transparent;
 
