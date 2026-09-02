@@ -36,6 +36,8 @@ jobs:
   test-fast:
     runs-on: ubuntu-22.04
     name: Test (${{ matrix.suite }})
+    permissions:
+      contents: read
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
@@ -76,6 +78,8 @@ jobs:
     needs: build
     runs-on: ubuntu-22.04
     name: Test (${{ matrix.suite }})
+    permissions:
+      contents: read
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
