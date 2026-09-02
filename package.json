@@ -124,6 +124,7 @@
     "@mui/x-data-grid": "^8.26.0",
     "@mui/x-date-pickers": "^8.26.0",
     "@mui/x-tree-view": "^8.26.0",
+    "@ngageoint/geopackage": "^4.2.9",
     "@openforis/arena-server": "^2.2.7",
     "@reduxjs/toolkit": "^2.11.2",
     "@sendgrid/mail": "^8.1.6",
