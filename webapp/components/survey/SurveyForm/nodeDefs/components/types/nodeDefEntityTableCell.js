@@ -36,8 +36,8 @@ const NodeDefEntityTableCellContent = (props) => {
       handleSize={[25, 25]}
       onResizeStart={onResizeStart}
       onResizeStop={onResizeStop}
-      minConstraints={[NodeDefLayout.columnWidthMinPx * fieldsLength, 40]}
-      maxConstraints={[NodeDefLayout.columnWidthMaxPx * fieldsLength, 40]}
+      minConstraints={[NodeDefLayout.columnWidthMinPx * fieldsLength, height]}
+      maxConstraints={[NodeDefLayout.columnWidthMaxPx * fieldsLength, height]}
     >
       {children}
     </ResizableBox>
