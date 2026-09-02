@@ -16,6 +16,8 @@ export {
   deleteCategory,
   cleanupCategory,
   convertToReportingDataCategory,
+  convertToSamplingPointDataCategory,
+  convertToGeoPackageCategory,
   startExportAllCategoriesJob,
   startCategoriesBatchImportJob,
   updateCategoryProp,

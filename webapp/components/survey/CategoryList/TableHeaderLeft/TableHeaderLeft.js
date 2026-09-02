@@ -3,20 +3,21 @@ import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import { useIsCategoriesRoute } from '@webapp/components/hooks'
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonMenu } from '@webapp/components/buttons'
 import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { UploadButton } from '@webapp/components/form'
 
 import { designerModules, appModuleUri } from '@webapp/app/appModules'
-import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import * as API from '@webapp/service/api'
-import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId, useCategoryByName } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { CategoryCloneFromSurveyDialog } from '../CategoryCloneFromSurveyDialog'
+import { LockFixedPropertiesDialog } from '../LockFixedPropertiesDialog'
 import { useActions, State } from '../store'
 
 const TableHeaderLeft = (props) => {
@@ -55,6 +56,31 @@ const TableHeaderLeft = (props) => {
     onAdd(category)
   }
 
+  const samplingPointDataCategory = useCategoryByName(Survey.samplingPointDataCategoryName)
+  const [templateDialogType, setTemplateDialogType] = useState(null) // 'samplingPointData' | 'geoPackage' | null
+
+  const insertAndNotify = (category) => {
+    dispatch(SurveyActions.surveyCategoryInserted(category))
+    dispatch(SurveyActions.metaUpdated())
+    onAdd(category)
+  }
+
+  const createSimpleCategory = async () => {
+    const category = await API.createCategory({ surveyId })
+    insertAndNotify(category)
+  }
+
+  const createTemplateCategory = async ({ locked }) => {
+    const category = await API.createCategory({ surveyId })
+    const categoryUuid = Category.getUuid(category)
+    const categoryUpdated =
+      templateDialogType === 'samplingPointData'
+        ? await API.convertToSamplingPointDataCategory({ surveyId, categoryUuid, locked })
+        : await API.convertToGeoPackageCategory({ surveyId, categoryUuid, locked })
+    setTemplateDialogType(null)
+    insertAndNotify(categoryUpdated)
+  }
+
   if (!canEditSurvey) {
     // placeholder to avoid breaking the header layout
     return <div></div>
@@ -62,7 +88,49 @@ const TableHeaderLeft = (props) => {
 
   return (
     <>
-      <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.category} />
+      <ButtonMenu
+        iconClassName="icon-plus icon-16px icon-left"
+        label="categoryEdit.createCategory.menuLabel"
+        items={[
+          {
+            key: 'simple',
+            label: 'categoryEdit.createCategory.simple',
+            onClick: createSimpleCategory,
+          },
+          ...(samplingPointDataCategory
+            ? []
+            : [
+                {
+                  key: 'sampling-point-data',
+                  label: 'categoryEdit.createSamplingPointDataCategory.buttonLabel',
+                  onClick: () => setTemplateDialogType('samplingPointData'),
+                },
+              ]),
+          {
+            key: 'geopackage',
+            label: 'categoryEdit.createGeoPackageCategory.buttonLabel',
+            onClick: () => setTemplateDialogType('geoPackage'),
+          },
+        ]}
+        size="small"
+      />
+
+      {templateDialogType && (
+        <LockFixedPropertiesDialog
+          titleKey={
+            templateDialogType === 'samplingPointData'
+              ? 'categoryEdit.createSamplingPointDataCategory.buttonLabel'
+              : 'categoryEdit.createGeoPackageCategory.buttonLabel'
+          }
+          messageKey={
+            templateDialogType === 'samplingPointData'
+              ? 'categoryEdit.createSamplingPointDataCategory.message'
+              : 'categoryEdit.createGeoPackageCategory.message'
+          }
+          onClose={() => setTemplateDialogType(null)}
+          onConfirm={createTemplateCategory}
+        />
+      )}
 
       <Button
         iconClassName="icon-copy"
