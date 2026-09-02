@@ -23,3 +23,4 @@ runs:
       run: yarn install --immutable
       env:
         NODE_AUTH_TOKEN: ${{ inputs.access-token }}
+        YARN_ENABLE_SCRIPTS: false

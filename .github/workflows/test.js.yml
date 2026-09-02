@@ -10,7 +10,6 @@ env:
   PGDATABASE: of-arena-test
   PGUSER: arena
   PGPASSWORD: arena
-  SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
   ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
   ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
   SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
@@ -64,7 +63,7 @@ jobs:
       - uses: actions/checkout@v5
       - name: Install Playwright browsers
         if: matrix.playwright
-        uses: microsoft/playwright-github-action@v1
+        uses: microsoft/playwright-github-action@91d778e7ba32fe5946d69a20848327c9718cdbc2 # v1.5.7
       - uses: ./.github/actions/setup
         with:
           access-token: ${{ secrets.ACCESS_TOKEN }}
