@@ -146,7 +146,7 @@ const _prepareFromClause = ({ queryBuilder, viewDataNodeDef, nodeDefCols, editMo
 
         return `LEFT JOIN LATERAL ( 
           ${tableNode.getSelect({
-            parentUuid: `${viewDataNodeDef.alias}.${ancestorMultipleEntityUuidColumnName}`,
+            parentIId: `${viewDataNodeDef.alias}.${ancestorMultipleEntityUuidColumnName}`,
             nodeDefUuid,
           })}
         ) AS ${tableNode.alias} ON TRUE`
