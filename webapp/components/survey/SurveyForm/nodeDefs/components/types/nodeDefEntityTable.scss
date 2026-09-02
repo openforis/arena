@@ -51,9 +51,9 @@
 
   .survey-form__node-def-entity-table-data-rows-wrapper {
     position: absolute;
-    top: $formTableRowHeaderHeight;
+    top: var(--column-header-height, #{$formTableRowHeaderHeight});
     width: 100%;
-    height: calc(100% - #{$formTableRowHeaderHeight});
+    height: calc(100% - var(--column-header-height, #{$formTableRowHeaderHeight}));
     overflow: auto;
 
     .survey-form__node-def-entity-table-data-rows {
@@ -65,7 +65,7 @@
 .survey-form__node-def-entity-table-row-header {
   position: absolute;
   display: flex;
-  height: $formTableRowHeaderHeight;
+  min-height: $formTableRowHeaderHeight;
   background-color: rgba($blueLight, 0.3);
   border-right: 1px solid transparent;
 
