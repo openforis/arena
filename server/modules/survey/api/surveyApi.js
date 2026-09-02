@@ -402,13 +402,22 @@ export const init = (app) => {
     }
   })
 
-  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
-    const { surveyId, cleanupRecords = false } = Request.getParams(req)
-    const user = Request.getUser(req)
+  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cleanupRecords = false, updateRecordValues = false } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-    const job = SurveyService.startPublishJob({ user, surveyId, cleanupRecords })
+      const { job, recordValuesUpdateWarning } = await SurveyService.startPublishJob({
+        user,
+        surveyId,
+        cleanupRecords,
+        updateRecordValues,
+      })
 
-    res.json({ job: JobUtils.jobToJSON(job) })
+      res.json(recordValuesUpdateWarning ? { recordValuesUpdateWarning } : { job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
   })
 
   app.put('/survey/:surveyId/unpublish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
