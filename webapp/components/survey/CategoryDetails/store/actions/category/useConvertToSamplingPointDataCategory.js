@@ -1,12 +1,14 @@
 import { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 
 import * as API from '@webapp/service/api'
 import { useNotifyError } from '@webapp/components/hooks'
-import { useSurveyId } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { useInit } from './useInit'
 
 export const useConvertToSamplingPointDataCategory = ({ setState }) => {
+  const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const init = useInit({ setState })
   const notifyError = useNotifyError()
@@ -14,13 +16,17 @@ export const useConvertToSamplingPointDataCategory = ({ setState }) => {
   return useCallback(
     async ({ categoryUuid, locked, onCategoryUpdate }) => {
       try {
-        await API.convertToSamplingPointDataCategory({ surveyId, categoryUuid, locked })
+        const category = await API.convertToSamplingPointDataCategory({ surveyId, categoryUuid, locked })
+
+        dispatch(SurveyActions.surveyCategoryUpdated(category))
+        dispatch(SurveyActions.metaUpdated())
+
         await init({ categoryUuid, onCategoryUpdate })
       } catch (error) {
         const { key, params } = error?.response?.data ?? {}
         notifyError({ key: key ?? 'appErrors:generic', params })
       }
     },
-    [surveyId, init, notifyError]
+    [surveyId, init, notifyError, dispatch]
   )
 }

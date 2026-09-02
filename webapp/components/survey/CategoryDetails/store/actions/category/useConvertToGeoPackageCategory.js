@@ -1,19 +1,25 @@
 import { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 
 import * as API from '@webapp/service/api'
-import { useSurveyId } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { useInit } from './useInit'
 
 export const useConvertToGeoPackageCategory = ({ setState }) => {
+  const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const init = useInit({ setState })
 
   return useCallback(
     async ({ categoryUuid, locked, onCategoryUpdate }) => {
-      await API.convertToGeoPackageCategory({ surveyId, categoryUuid, locked })
+      const category = await API.convertToGeoPackageCategory({ surveyId, categoryUuid, locked })
+
+      dispatch(SurveyActions.surveyCategoryUpdated(category))
+      dispatch(SurveyActions.metaUpdated())
+
       await init({ categoryUuid, onCategoryUpdate })
     },
-    [surveyId, init]
+    [surveyId, init, dispatch]
   )
 }
