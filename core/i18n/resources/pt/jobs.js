@@ -71,6 +71,7 @@ export default {
   // survey backup
   SurveyInfoExportJob: 'Exportação de informações do inventário',
   CategoriesExportJob: 'Exportação de categorias',
+  CategoryGeoPackageExportJob: 'Exportação de categoria para GeoPackage',
   TaxonomiesExportJob: 'Exportação de taxonomias',
   RecordsExportJob: 'Exportação de registros',
   RecordFilesExportJob: 'Exportação de arquivos de registros',
@@ -85,6 +86,4 @@ export default {
   RecordsValidationJob: `Validação de registros`,
   // analysis
   PersistResultsJob: 'Persistência dos resultados da análise',
-  elapsed: 'Decorrido',
-  remaining: 'Restante',
 }

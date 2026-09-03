@@ -18,6 +18,7 @@ const status = {
 export const contentTypes = {
   csv: 'text/csv',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  gpkg: 'application/geopackage+sqlite3',
   json: 'application/json',
   pdf: 'application/pdf',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -26,6 +27,7 @@ export const contentTypes = {
 
 const contentTypeByFileFormat = {
   [FileFormats.csv]: contentTypes.csv,
+  [FileFormats.gpkg]: contentTypes.gpkg,
   [FileFormats.xlsx]: contentTypes.xlsx,
   [FileFormats.zip]: contentTypes.zip,
 }

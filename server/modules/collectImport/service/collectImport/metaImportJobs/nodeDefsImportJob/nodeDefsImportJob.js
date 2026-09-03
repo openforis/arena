@@ -87,7 +87,6 @@ export default class NodeDefsImportJob extends Job {
    *
    * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
    * (used to import Collect composite attribute definitions like Range).
-   *
    * @param {NodeDef} parentNodeDef - Parent node def definition.
    * @param {!string} parentPath - Parent node path.
    * @param {!object} collectNodeDef - Collect node definition.
@@ -395,7 +394,7 @@ export default class NodeDefsImportJob extends Job {
       case NodeDef.nodeDefType.code: {
         const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
         const categoryName = R.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
-          ? Survey.samplingPointDataCategoryName
+          ? Category.samplingPointDataCategoryName
           : listName
         const category = Survey.getCategoryByName(categoryName)(this.survey)
 
