@@ -162,6 +162,9 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, draft = false, tempFileName } = Request.getParams(req)
+
+        FileUtils.checkIsValidTempFileName(tempFileName)
+
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)
         const name = `${Survey.getName(surveyInfo)}_categories.zip`
@@ -265,6 +268,49 @@ export const init = (app) => {
         const { surveyId, categoryUuid, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
         await CategoryService.exportCategory({ surveyId, categoryUuid, draft, res, fileFormat })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
+    '/survey/:surveyId/categories/:categoryUuid/export/geopackage',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const job = CategoryService.exportCategoryToGeoPackage({ user, surveyId, categoryUuid, draft })
+        res.json({ job })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/export/geopackage/download',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true, tempFileName } = Request.getParams(req)
+
+        FileUtils.checkIsValidTempFileName(tempFileName)
+
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
+        const surveyInfo = Survey.getSurveyInfo(survey)
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+        const name = `${Survey.getName(surveyInfo)}_${Category.getName(category)}.gpkg`
+        const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+
+        Response.sendFile({
+          res,
+          path: exportedFilePath,
+          name,
+          contentType: Response.contentTypes.gpkg,
+        })
       } catch (error) {
         next(error)
       }
@@ -530,6 +576,53 @@ export const init = (app) => {
           user,
           surveyId,
           categoryUuid,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/convertToSamplingPointData',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res) => {
+      try {
+        const { surveyId, categoryUuid, locked = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.convertCategoryToSamplingPointData({
+          user,
+          surveyId,
+          categoryUuid,
+          locked,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        // Response.sendErr (not next(error)): the error middleware registered by ArenaServer.init runs
+        // before these routes in the Express stack, so next(error) never reaches it and the specific
+        // error key/params would be lost (the client would get a generic HTML error page instead).
+        Response.sendErr(res, error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/convertToGeoPackage',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, locked = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.convertCategoryToGeoPackage({
+          user,
+          surveyId,
+          categoryUuid,
+          locked,
         })
 
         res.json({ category })

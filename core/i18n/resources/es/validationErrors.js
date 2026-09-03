@@ -34,6 +34,11 @@ export default {
     nameNotSpecified: 'Nombre de categoría no especificado',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Ya existe una categoría de Datos de puntos de muestreo en esta encuesta; solo puede haber una.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'No se pueden eliminar elementos de categoría publicados. Elementos faltantes en el archivo importado: {{deletedItemCodes}}',

@@ -22,6 +22,7 @@ import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenera
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
+import CategoryGeoPackageExportJob from './CategoryGeoPackageExportJob'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
@@ -126,9 +127,17 @@ export const exportAllCategories = ({ user, surveyId, fileFormat, draft }) => {
   return job
 }
 
+export const exportCategoryToGeoPackage = ({ user, surveyId, categoryUuid, draft }) => {
+  const job = new CategoryGeoPackageExportJob({ user, surveyId, categoryUuid, draft })
+
+  JobManager.enqueueJob(job)
+
+  return job
+}
+
 const _getSamplingPointDataCategory = async ({ surveyId, draft = true }) => {
   const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft })
-  return categories.find((category) => Category.getName(category) === Survey.samplingPointDataCategoryName)
+  return categories.find((category) => Category.getName(category) === Category.samplingPointDataCategoryName)
 }
 
 export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }) => {
@@ -161,7 +170,7 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
   const srsIndex = Survey.getSRSIndex(surveyInfo)
 
   const samplingPointData = items.reduce((acc, item) => {
-    const location = CategoryItem.getExtraProp('location')(item)
+    const location = CategoryItem.getExtraProp(Category.locationItemExtraDefName)(item)
     if (!location) return acc
 
     const codes = CategoryItem.getCodesHierarchy(item)
@@ -252,6 +261,8 @@ export const {
   updateCategoryItemExtraDefItem,
   cleanupCategory,
   convertCategoryToReportingData,
+  convertCategoryToSamplingPointData,
+  convertCategoryToGeoPackage,
   updateLevelProp,
   updateItemProp,
   updateItemsIndex,

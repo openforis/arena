@@ -2,7 +2,7 @@
 
 $borderColor: $greyBorder;
 
-.app__container .app-module > .category {
+.app__container .app-module>.category {
   overflow: hidden; // scrollbars managed in .category__levels
 }
 
@@ -17,7 +17,21 @@ $borderColor: $greyBorder;
 
 .category__header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: flex-start;
+  align-self: center;
+  gap: 2rem;
+
+  .category__header-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .category__header-column-fields,
+  .category__header-column-actions {
+    flex: 0 0 auto;
+  }
 
   .row {
     display: flex;
@@ -45,10 +59,6 @@ $borderColor: $greyBorder;
 
   .date-import-template-menu-btn {
     width: 14rem;
-  }
-
-  .reporting-data-checkbox {
-    width: 8rem;
   }
 
   .import-btn,

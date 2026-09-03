@@ -8,8 +8,6 @@ export default {
     survey: 'Formulaire',
     user: 'Utilisateur',
     progress: 'Progression',
-    elapsed: 'Écoulé',
-    remaining: 'Restant estimé',
     startedAt: 'Démarré le',
   },
   status: {

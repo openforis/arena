@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Имя категории не указано',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Категория данных точек выборки уже существует в этом опросе; может быть только одна.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Невозможно удалить опубликованные элементы категории. Элементы, отсутствующие в импортированном файле: {{deletedItemCodes}}',
