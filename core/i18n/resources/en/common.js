@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Active',
@@ -55,6 +57,7 @@ Do you want to ignore them?`,
     download: 'Download',
     draft: 'Draft',
     edit: 'Edit',
+    elapsed: 'Elapsed',
     email: 'Email',
     email_other: 'Emails',
     emailSentConfirmation: `An email to {{email}} has been sent.
@@ -169,6 +172,7 @@ This can permanently change or clear data already entered. Type the survey name 
     raiseTicketInSupportForum: `In case of problems please raise a ticket with a tag 'arena' in our <b>Support Forum</b>: $t(links.supportForum)`,
     record: 'Record',
     record_other: 'Records',
+    remaining: 'Remaining',
     remote: 'Remote',
     required: 'Required',
     requiredField: 'required field',
@@ -1282,10 +1286,13 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       noCategoriesAvailable: 'No categories available in the selected survey',
     },
     itemsCount: 'Items count',
+    structure: 'Structure',
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
       reportingData: 'Reporting Data',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Sampling Point Data',
     },
   },
 
@@ -1313,6 +1320,49 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     convertToSimpleCategory: {
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convert to Sampling Point Data',
+      confirmMessage: `Convert this category to the Sampling Point Data category?
+
+The category will be renamed to '${samplingPointDataCategoryName}' and a '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convert to GeoPackage category',
+      confirmMessage: `Convert this category to a GeoPackage category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this GeoPackage category to a simple category?
+
+The '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this Sampling Point Data category to a simple category?
+
+The category name will be cleared (you'll need to give it a new name), and the '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+    },
+    geoPackageCategory: 'This is a GeoPackage category',
+    samplingPointDataCategoryType: 'This is the Sampling Point Data category',
+    createCategory: {
+      menuLabel: 'Add category',
+      simple: 'Simple category',
+      otherTypes: 'More category types',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Sampling Point Data category',
+      message: `Create a new Sampling Point Data category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'GeoPackage category',
+      message: `Create a new GeoPackage category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
     deleteItem: 'Delete item',
     level: {
       title: 'Level {{levelPosition}}',
@@ -1336,6 +1386,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Category import summary',
     },
     reportingData: 'Reporting data',
+    exportToGeoPackage: 'Export to GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} item(s) without a valid location were skipped.',
     templateFor_samplingPointDataImport_csv: 'Template for Sampling Point Data import (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Template for Sampling Point Data import (Excel)',
   },

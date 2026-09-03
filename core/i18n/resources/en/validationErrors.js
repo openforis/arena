@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Category name not specified',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'A Sampling Point Data category already exists in this survey; there can be only one.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Cannot delete published category items. Items missing in imported file: {{deletedItemCodes}}',

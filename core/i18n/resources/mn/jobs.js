@@ -71,6 +71,7 @@ export default {
   // survey backup
   SurveyInfoExportJob: 'Судалгааны мэдээлэл экспортлох',
   CategoriesExportJob: 'Ангилал экспортлох',
+  CategoryGeoPackageExportJob: 'Ангиллыг GeoPackage рүү экспортлох',
   TaxonomiesExportJob: 'Таксоном экспортлох',
   RecordsExportJob: 'Бичлэг экспортлох',
   RecordFilesExportJob: 'Бичлэгийн файлуудыг экспортлох',
@@ -85,6 +86,4 @@ export default {
   RecordsValidationJob: 'Бичлэгүүдийн баталгаажуулалт',
   // analysis
   PersistResultsJob: 'Шинжилгээний үр дүнг хадгалах',
-  elapsed: 'Өнгөрсөн хугацаа',
-  remaining: 'Үлдсэн хугацаа',
 }

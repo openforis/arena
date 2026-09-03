@@ -32,6 +32,8 @@ export const type = {
   categoryItemDelete: 'categoryItemDelete',
   categoryImport: 'categoryImport',
   categoryConvertToReportingData: 'categoryConvertToReportingData',
+  categoryConvertToSamplingPointData: 'categoryConvertToSamplingPointData',
+  categoryConvertToGeoPackage: 'categoryConvertToGeoPackage',
 
   // Taxonomy
   taxonomyCreate: 'taxonomyCreate',

@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Activo',
@@ -54,6 +56,7 @@ export default {
     download: 'Descargar',
     draft: 'Borrador',
     edit: 'Editar',
+    elapsed: 'Transcurrido',
     email: 'Correo electrónico',
     email_other: 'Correos electrónicos',
     emailSentConfirmation:
@@ -149,6 +152,7 @@ Esto puede cambiar o borrar permanentemente datos ya introducidos. Escriba el no
       "En caso de problemas, por favor, abra un ticket con la etiqueta 'arena' en nuestro <b>Foro de soporte</b>: $t(links.supportForum)",
     record: 'Registro',
     record_other: 'Registros',
+    remaining: 'Restante',
     remote: 'Remoto',
     required: 'Requerido',
     requiredField: 'campo requerido',
@@ -1121,10 +1125,13 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       noCategoriesAvailable: 'No hay categorías disponibles en la encuesta seleccionada',
     },
     itemsCount: 'Recuento de elementos',
+    structure: 'Estructura',
     types: {
       flat: 'Plana',
       hierarchical: 'Jerárquica',
       reportingData: 'Datos de informes',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Datos de puntos de muestreo',
     },
   },
   categoryEdit: {
@@ -1146,6 +1153,37 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     convertToSimpleCategory: {
       confirmMessage: '¿Convertir esta categoría de datos de informes a una categoría simple?',
+    },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convertir a Datos de puntos de muestreo',
+      confirmMessage: `¿Convertir esta categoría en la categoría de Datos de puntos de muestreo?\n\nLa categoría se renombrará a '${samplingPointDataCategoryName}' y se añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convertir a categoría GeoPackage',
+      confirmMessage: `¿Convertir esta categoría en una categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convertir a categoría simple',
+      confirmMessage: `¿Convertir esta categoría GeoPackage en una categoría simple?\n\nSe desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convertir a categoría simple',
+      confirmMessage: `¿Convertir esta categoría de Datos de puntos de muestreo en una categoría simple?\n\nSe borrará el nombre de la categoría (deberá asignarle uno nuevo), y se desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
+    },
+    geoPackageCategory: 'Esta es una categoría GeoPackage',
+    samplingPointDataCategoryType: 'Esta es la categoría de Datos de puntos de muestreo',
+    createCategory: {
+      menuLabel: 'Añadir categoría',
+      simple: 'Categoría simple',
+      otherTypes: 'Más tipos de categoría',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Categoría de Datos de puntos de muestreo',
+      message: `¿Crear una nueva categoría de Datos de puntos de muestreo?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Categoría GeoPackage',
+      message: `¿Crear una nueva categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     deleteItem: 'Eliminar elemento',
     level: {
@@ -1169,6 +1207,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       title: 'Resumen de importación de categoría',
     },
     reportingData: 'Datos de informes',
+    exportToGeoPackage: 'Exportar a GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} elemento(s) sin una ubicación válida fueron omitidos.',
     templateFor_samplingPointDataImport_csv: 'Plantilla para importación de datos de puntos de muestreo (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Plantilla para importación de datos de puntos de muestreo (Excel)',
   },

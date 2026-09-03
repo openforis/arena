@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Actif',
@@ -55,6 +57,7 @@ Voulez-vous les ignorer ?`,
     download: 'Télécharger',
     draft: 'Brouillon',
     edit: 'Modifier',
+    elapsed: 'Écoulé',
     email: 'E-mail',
     email_other: 'E-mails',
     emailSentConfirmation: `Un e-mail a été envoyé à {{email}}.
@@ -170,6 +173,7 @@ Cela peut modifier ou effacer définitivement des données déjà saisies. Saisi
     raiseTicketInSupportForum: `En cas de problèmes, veuillez ouvrir un ticket avec le tag 'arena' dans notre <b>Forum de support</b> : $t(links.supportForum)`,
     record: 'Enregistrement',
     record_other: 'Enregistrements',
+    remaining: 'Restant',
     remote: 'Distant',
     required: 'Requis',
     requiredField: 'champ requis',
@@ -1283,10 +1287,13 @@ Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un att
       noCategoriesAvailable: "Aucune catégorie disponible dans l'enquête sélectionnée",
     },
     itemsCount: "Nombre d'éléments",
+    structure: 'Structure',
     types: {
       flat: 'Plat',
       hierarchical: 'Hiérarchique',
       reportingData: 'Données de rapport',
+      geoPackage: 'GeoPackage',
+      samplingPointData: "Données de points d'échantillonnage",
     },
   },
 
@@ -1314,6 +1321,49 @@ Les niveaux seront renommés en niveau_1, niveau_2... niveau_N et une propriét�
     convertToSimpleCategory: {
       confirmMessage: `Convertir cette catégorie de données de rapport en catégorie simple ?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: "Convertir en Données de points d'échantillonnage",
+      confirmMessage: `Convertir cette catégorie en catégorie Données de points d'échantillonnage ?
+
+La catégorie sera renommée en '${samplingPointDataCategoryName}' et une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux éléments.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convertir en catégorie GeoPackage',
+      confirmMessage: `Convertir cette catégorie en catégorie GeoPackage ?
+
+Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux éléments.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convertir en catégorie simple',
+      confirmMessage: `Convertir cette catégorie GeoPackage en catégorie simple ?
+
+La propriété supplémentaire '${locationItemExtraDefName}' sera déverrouillée : elle pourra être renommée, son type modifié ou elle pourra être supprimée comme n'importe quelle autre propriété supplémentaire. Ses données ne sont pas affectées.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convertir en catégorie simple',
+      confirmMessage: `Convertir cette catégorie Données de points d'échantillonnage en catégorie simple ?
+
+Le nom de la catégorie sera effacé (vous devrez lui donner un nouveau nom), et la propriété supplémentaire '${locationItemExtraDefName}' sera déverrouillée : elle pourra être renommée, son type modifié ou elle pourra être supprimée comme n'importe quelle autre propriété supplémentaire. Ses données ne sont pas affectées.`,
+    },
+    geoPackageCategory: 'Ceci est une catégorie GeoPackage',
+    samplingPointDataCategoryType: "Ceci est la catégorie Données de points d'échantillonnage",
+    createCategory: {
+      menuLabel: 'Ajouter une catégorie',
+      simple: 'Catégorie simple',
+      otherTypes: 'Autres types de catégorie',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: "Catégorie Données de points d'échantillonnage",
+      message: `Créer une nouvelle catégorie Données de points d'échantillonnage ?
+
+Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux éléments.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Catégorie GeoPackage',
+      message: `Créer une nouvelle catégorie GeoPackage ?
+
+Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux éléments.`,
+    },
     deleteItem: "Supprimer l'élément",
     level: {
       title: 'Niveau {{levelPosition}}',
@@ -1337,6 +1387,8 @@ Les niveaux seront renommés en niveau_1, niveau_2... niveau_N et une propriét�
       title: "Résumé de l'importation de catégorie",
     },
     reportingData: 'Données de rapport',
+    exportToGeoPackage: 'Exporter vers GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} élément(s) sans emplacement valide ont été ignorés.',
     templateFor_samplingPointDataImport_csv: "Modèle pour l'importation de données de points d'échantillonnage (CSV)",
     templateFor_samplingPointDataImport_xlsx:
       "Modèle pour l'importation de données de points d'échantillonnage (Excel)",

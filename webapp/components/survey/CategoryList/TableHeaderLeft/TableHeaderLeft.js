@@ -6,15 +6,15 @@ import { useDispatch } from 'react-redux'
 import * as Category from '@core/survey/category'
 
 import { useIsCategoriesRoute } from '@webapp/components/hooks'
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonMenu } from '@webapp/components/buttons'
 import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { UploadButton } from '@webapp/components/form'
 
 import { designerModules, appModuleUri } from '@webapp/app/appModules'
-import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import * as API from '@webapp/service/api'
-import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId, useCategoryByName } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { CategoryCloneFromSurveyDialog } from '../CategoryCloneFromSurveyDialog'
 import { useActions, State } from '../store'
@@ -55,6 +55,43 @@ const TableHeaderLeft = (props) => {
     onAdd(category)
   }
 
+  const samplingPointDataCategory = useCategoryByName(Category.samplingPointDataCategoryName)
+
+  const insertAndNotify = (category) => {
+    dispatch(SurveyActions.surveyCategoryInserted(category))
+    dispatch(SurveyActions.metaUpdated())
+    onAdd(category)
+  }
+
+  const createSimpleCategory = async () => {
+    const category = await API.createCategory({ surveyId })
+    insertAndNotify(category)
+  }
+
+  // the extra prop(s) added by these templates are always locked: there is no meaningful
+  // reason to leave them unlocked right after creating the category from a template
+  const createTemplateCategory = async (templateType) => {
+    const category = await API.createCategory({ surveyId })
+    const categoryUuid = Category.getUuid(category)
+    const categoryUpdated =
+      templateType === 'samplingPointData'
+        ? await API.convertToSamplingPointDataCategory({ surveyId, categoryUuid })
+        : await API.convertToGeoPackageCategory({ surveyId, categoryUuid })
+    insertAndNotify(categoryUpdated)
+  }
+
+  const confirmCreateTemplateCategory = (templateType) => {
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key:
+          templateType === 'samplingPointData'
+            ? 'categoryEdit.createSamplingPointDataCategory.message'
+            : 'categoryEdit.createGeoPackageCategory.message',
+        onOk: () => createTemplateCategory(templateType),
+      })
+    )
+  }
+
   if (!canEditSurvey) {
     // placeholder to avoid breaking the header layout
     return <div></div>
@@ -62,7 +99,36 @@ const TableHeaderLeft = (props) => {
 
   return (
     <>
-      <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.category} />
+      <span className="category-list__add-category-btn-group" style={{ display: 'inline-flex' }}>
+        <Button
+          className="btn-add-category"
+          iconClassName="icon-plus icon-16px icon-left"
+          label="categoryEdit.createCategory.menuLabel"
+          onClick={createSimpleCategory}
+          size="small"
+        />
+        <ButtonMenu
+          testId="btn-add-category-type-menu"
+          title="categoryEdit.createCategory.otherTypes"
+          items={[
+            ...(samplingPointDataCategory
+              ? []
+              : [
+                  {
+                    key: 'sampling-point-data',
+                    label: 'categoryEdit.createSamplingPointDataCategory.buttonLabel',
+                    onClick: () => confirmCreateTemplateCategory('samplingPointData'),
+                  },
+                ]),
+            {
+              key: 'geopackage',
+              label: 'categoryEdit.createGeoPackageCategory.buttonLabel',
+              onClick: () => confirmCreateTemplateCategory('geoPackage'),
+            },
+          ]}
+          size="small"
+        />
+      </span>
 
       <Button
         iconClassName="icon-copy"
