@@ -53,4 +53,34 @@ describe('ExtraPropDef locked flag', () => {
     }
     expect(Category.isExtraPropDefReadOnly(unlockedAreaDef)(reportingDataCategory)).toBe(true)
   })
+
+  it('hasLocationExtraProp / isLocationExtraPropLocked are false for a category with no location extra prop', () => {
+    const category = Category.newCategory()
+    expect(Category.hasLocationExtraProp(category)).toBe(false)
+    expect(Category.isLocationExtraPropLocked(category)).toBe(false)
+  })
+
+  it('isLocationExtraPropLocked is true only while the location extra prop is actually locked', () => {
+    const categoryWithLockedLocation = Category.assocItemExtraDef({
+      [Category.locationItemExtraDefName]: ExtraPropDef.newItem({
+        dataType: ExtraPropDef.dataTypes.geometryPoint,
+        locked: true,
+      }),
+    })(Category.newCategory())
+    expect(Category.hasLocationExtraProp(categoryWithLockedLocation)).toBe(true)
+    expect(Category.isLocationExtraPropLocked(categoryWithLockedLocation)).toBe(true)
+
+    // simulates the effect of "convert to simple category": the location extra prop is unlocked,
+    // not deleted, so hasLocationExtraProp stays true but isLocationExtraPropLocked must flip to
+    // false - a menu item gated on hasLocationExtraProp alone would incorrectly keep offering
+    // "convert to simple category" again after the category was already converted
+    const categoryWithUnlockedLocation = Category.assocItemExtraDef({
+      [Category.locationItemExtraDefName]: ExtraPropDef.newItem({
+        dataType: ExtraPropDef.dataTypes.geometryPoint,
+        locked: false,
+      }),
+    })(Category.newCategory())
+    expect(Category.hasLocationExtraProp(categoryWithUnlockedLocation)).toBe(true)
+    expect(Category.isLocationExtraPropLocked(categoryWithUnlockedLocation)).toBe(false)
+  })
 })

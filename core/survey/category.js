@@ -133,13 +133,23 @@ export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
 export const getItemExtraDefsArray = R.pipe(getItemExtraDef, ExtraPropDef.extraDefsToArray)
 export const getItemExtraDefKeys = (category) => getItemExtraDefsArray(category).map(ExtraPropDef.getName)
 
-// true if the category has an extra prop def named 'location' of type geometryPoint, i.e. it is exportable to GeoPackage
-export const hasLocationExtraProp = (category) =>
-  getItemExtraDefsArray(category).some(
+// the extra prop def named 'location' of type geometryPoint, if the category has one
+export const getLocationExtraDef = (category) =>
+  getItemExtraDefsArray(category).find(
     (extraDef) =>
       ExtraPropDef.getName(extraDef) === locationItemExtraDefName &&
       ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.geometryPoint
   )
+
+// true if the category has a 'location' extra prop, i.e. it is exportable to GeoPackage
+export const hasLocationExtraProp = (category) => Boolean(getLocationExtraDef(category))
+
+// true if the category has a 'location' extra prop AND it is locked - i.e. converting it to a
+// simple category (unlocking the prop) would actually change something
+export const isLocationExtraPropLocked = (category) => {
+  const locationExtraDef = getLocationExtraDef(category)
+  return Boolean(locationExtraDef) && ExtraPropDef.isLocked(locationExtraDef)
+}
 
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 

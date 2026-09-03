@@ -75,6 +75,7 @@ const CategoryDetails = (props) => {
   const levels = Category.getLevelsArray(category)
 
   const hasLocationExtraProp = Category.hasLocationExtraProp(category)
+  const isLocationExtraPropLocked = Category.isLocationExtraPropLocked(category)
   const isSamplingPointData = Category.getName(category) === Survey.samplingPointDataCategoryName
 
   // the extra prop(s) added by these conversions are always locked: there is no meaningful
@@ -209,7 +210,7 @@ const CategoryDetails = (props) => {
                               onClick: () => Actions.convertSamplingPointDataCategoryToSimple(categoryUuid),
                             },
                           ]
-                        : hasLocationExtraProp
+                        : isLocationExtraPropLocked
                           ? [
                               {
                                 key: 'convert-geopackage-category-to-simple',
