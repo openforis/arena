@@ -71,6 +71,7 @@ export default {
   // survey backup
   SurveyInfoExportJob: 'Экспорт информации об опросе',
   CategoriesExportJob: 'Экспорт категорий',
+  CategoryGeoPackageExportJob: 'Экспорт категории в GeoPackage',
   TaxonomiesExportJob: 'Экспорт таксономий',
   RecordsExportJob: 'Экспорт записей',
   RecordFilesExportJob: 'Экспорт файлов записей',
