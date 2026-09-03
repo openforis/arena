@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import { useIsCategoriesRoute } from '@webapp/components/hooks'
@@ -56,7 +55,7 @@ const TableHeaderLeft = (props) => {
     onAdd(category)
   }
 
-  const samplingPointDataCategory = useCategoryByName(Survey.samplingPointDataCategoryName)
+  const samplingPointDataCategory = useCategoryByName(Category.samplingPointDataCategoryName)
 
   const insertAndNotify = (category) => {
     dispatch(SurveyActions.surveyCategoryInserted(category))

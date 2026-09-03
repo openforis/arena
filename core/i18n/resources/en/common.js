@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Active',
@@ -1318,25 +1320,25 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       buttonLabel: 'Convert to Sampling Point Data',
       confirmMessage: `Convert this category to the Sampling Point Data category?
 
-The category will be renamed to 'sampling_point_data' and a 'location' extra property will be added to the items.`,
+The category will be renamed to '${samplingPointDataCategoryName}' and a '${locationItemExtraDefName}' extra property will be added to the items.`,
     },
     convertToGeoPackageCategory: {
       buttonLabel: 'Convert to GeoPackage category',
       confirmMessage: `Convert this category to a GeoPackage category?
 
-A 'location' extra property will be added to the items.`,
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
     },
     convertGeoPackageCategoryToSimple: {
       buttonLabel: 'Convert to simple category',
       confirmMessage: `Convert this GeoPackage category to a simple category?
 
-The 'location' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+The '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
     },
     convertSamplingPointDataCategoryToSimple: {
       buttonLabel: 'Convert to simple category',
       confirmMessage: `Convert this Sampling Point Data category to a simple category?
 
-The category name will be cleared (you'll need to give it a new name), and the 'location' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+The category name will be cleared (you'll need to give it a new name), and the '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
     },
     geoPackageCategory: 'This is a GeoPackage category',
     samplingPointDataCategoryType: 'This is the Sampling Point Data category',
@@ -1349,13 +1351,13 @@ The category name will be cleared (you'll need to give it a new name), and the '
       buttonLabel: 'Sampling Point Data category',
       message: `Create a new Sampling Point Data category?
 
-A 'location' extra property will be added to the items.`,
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
     },
     createGeoPackageCategory: {
       buttonLabel: 'GeoPackage category',
       message: `Create a new GeoPackage category?
 
-A 'location' extra property will be added to the items.`,
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
     },
     deleteItem: 'Delete item',
     level: {

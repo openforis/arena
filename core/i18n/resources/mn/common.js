@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Идэвхтэй',
@@ -1276,25 +1278,25 @@ $t(common.cantUndoWarning)`,
       buttonLabel: 'Дээж цэгийн өгөгдөл рүү хөрвүүлэх',
       confirmMessage: `Энэ ангиллыг Дээж цэгийн өгөгдлийн ангилал болгон хөрвүүлэх үү?
 
-Ангиллын нэр 'sampling_point_data' болж өөрчлөгдөж, элементүүдэд 'location' нэмэлт талбар нэмэгдэнэ.`,
+Ангиллын нэр '${samplingPointDataCategoryName}' болж өөрчлөгдөж, элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
     },
     convertToGeoPackageCategory: {
       buttonLabel: 'GeoPackage ангилал руу хөрвүүлэх',
       confirmMessage: `Энэ ангиллыг GeoPackage ангилал болгон хөрвүүлэх үү?
 
-Элементүүдэд 'location' нэмэлт талбар нэмэгдэнэ.`,
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
     },
     convertGeoPackageCategoryToSimple: {
       buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
       confirmMessage: `Энэ GeoPackage ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
 
-'location' нэмэлт талбарын цоожийг тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
+'${locationItemExtraDefName}' нэмэлт талбарын цоожийг тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
     },
     convertSamplingPointDataCategoryToSimple: {
       buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
       confirmMessage: `Энэ Дээж цэгийн өгөгдлийн ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
 
-Ангиллын нэрийг цэвэрлэх бөгөөд (шинэ нэр өгөх шаардлагатай болно), 'location' нэмэлт талбарын цоожийг мөн тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
+Ангиллын нэрийг цэвэрлэх бөгөөд (шинэ нэр өгөх шаардлагатай болно), '${locationItemExtraDefName}' нэмэлт талбарын цоожийг мөн тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
     },
     geoPackageCategory: 'Энэ бол GeoPackage ангилал юм',
     samplingPointDataCategoryType: 'Энэ бол Дээж цэгийн өгөгдлийн ангилал юм',
@@ -1307,13 +1309,13 @@ $t(common.cantUndoWarning)`,
       buttonLabel: 'Дээж цэгийн өгөгдлийн ангилал',
       message: `Шинэ Дээж цэгийн өгөгдлийн ангилал үүсгэх үү?
 
-Элементүүдэд 'location' нэмэлт талбар нэмэгдэнэ.`,
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
     },
     createGeoPackageCategory: {
       buttonLabel: 'GeoPackage ангилал',
       message: `Шинэ GeoPackage ангилал үүсгэх үү?
 
-Элементүүдэд 'location' нэмэлт талбар нэмэгдэнэ.`,
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
     },
     deleteItem: 'Элемент устгах',
     level: {

@@ -24,7 +24,7 @@ import { State, useActions, useLocalState } from './store'
 const getStructure = ({ category }) => (Category.isHierarchical(category) ? 'hierarchical' : 'flat')
 
 const getKind = ({ category }) => {
-  if (Category.getName(category) === Survey.samplingPointDataCategoryName) return 'samplingPointData'
+  if (Category.getName(category) === Category.samplingPointDataCategoryName) return 'samplingPointData'
   if (Category.hasLocationExtraProp(category)) return 'geoPackage'
   if (Category.isReportingData(category)) return 'reportingData'
   return null

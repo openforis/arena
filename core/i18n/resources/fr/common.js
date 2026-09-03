@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Actif',
@@ -1319,25 +1321,25 @@ Les niveaux seront renommés en niveau_1, niveau_2... niveau_N et une propriét�
       buttonLabel: "Convertir en Données de points d'échantillonnage",
       confirmMessage: `Convertir cette catégorie en catégorie Données de points d'échantillonnage ?
 
-La catégorie sera renommée en 'sampling_point_data' et une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
+La catégorie sera renommée en '${samplingPointDataCategoryName}' et une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux éléments.`,
     },
     convertToGeoPackageCategory: {
       buttonLabel: 'Convertir en catégorie GeoPackage',
       confirmMessage: `Convertir cette catégorie en catégorie GeoPackage ?
 
-Une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
+Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux éléments.`,
     },
     convertGeoPackageCategoryToSimple: {
       buttonLabel: 'Convertir en catégorie simple',
       confirmMessage: `Convertir cette catégorie GeoPackage en catégorie simple ?
 
-La propriété supplémentaire 'location' sera déverrouillée : elle pourra être renommée, son type modifié ou elle pourra être supprimée comme n'importe quelle autre propriété supplémentaire. Ses données ne sont pas affectées.`,
+La propriété supplémentaire '${locationItemExtraDefName}' sera déverrouillée : elle pourra être renommée, son type modifié ou elle pourra être supprimée comme n'importe quelle autre propriété supplémentaire. Ses données ne sont pas affectées.`,
     },
     convertSamplingPointDataCategoryToSimple: {
       buttonLabel: 'Convertir en catégorie simple',
       confirmMessage: `Convertir cette catégorie Données de points d'échantillonnage en catégorie simple ?
 
-Le nom de la catégorie sera effacé (vous devrez lui donner un nouveau nom), et la propriété supplémentaire 'location' sera déverrouillée : elle pourra être renommée, son type modifié ou elle pourra être supprimée comme n'importe quelle autre propriété supplémentaire. Ses données ne sont pas affectées.`,
+Le nom de la catégorie sera effacé (vous devrez lui donner un nouveau nom), et la propriété supplémentaire '${locationItemExtraDefName}' sera déverrouillée : elle pourra être renommée, son type modifié ou elle pourra être supprimée comme n'importe quelle autre propriété supplémentaire. Ses données ne sont pas affectées.`,
     },
     geoPackageCategory: 'Ceci est une catégorie GeoPackage',
     samplingPointDataCategoryType: "Ceci est la catégorie Données de points d'échantillonnage",
@@ -1350,13 +1352,13 @@ Le nom de la catégorie sera effacé (vous devrez lui donner un nouveau nom), et
       buttonLabel: "Catégorie Données de points d'échantillonnage",
       message: `Créer une nouvelle catégorie Données de points d'échantillonnage ?
 
-Une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
+Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux éléments.`,
     },
     createGeoPackageCategory: {
       buttonLabel: 'Catégorie GeoPackage',
       message: `Créer une nouvelle catégorie GeoPackage ?
 
-Une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
+Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux éléments.`,
     },
     deleteItem: "Supprimer l'élément",
     level: {

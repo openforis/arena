@@ -7,7 +7,6 @@ import classNames from 'classnames'
 
 import { FileFormats } from '@core/fileFormats'
 import * as StringUtils from '@core/stringUtils'
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
@@ -58,7 +57,7 @@ const CategoryDetails = (props) => {
   })
   const Actions = useActions({ setState })
 
-  const samplingPointDataCategory = useCategoryByName(Survey.samplingPointDataCategoryName)
+  const samplingPointDataCategory = useCategoryByName(Category.samplingPointDataCategoryName)
 
   const category = State.getCategory(state)
 
@@ -76,7 +75,7 @@ const CategoryDetails = (props) => {
 
   const hasLocationExtraProp = Category.hasLocationExtraProp(category)
   const isLocationExtraPropLocked = Category.isLocationExtraPropLocked(category)
-  const isSamplingPointData = Category.getName(category) === Survey.samplingPointDataCategoryName
+  const isSamplingPointData = Category.getName(category) === Category.samplingPointDataCategoryName
 
   // the extra prop(s) added by these conversions are always locked: there is no meaningful
   // reason to leave them unlocked right after converting the category to one of these types

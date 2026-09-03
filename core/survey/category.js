@@ -37,7 +37,9 @@ export const reportingDataItemExtraDefKeys = {
 export const locationItemExtraDefName = 'location'
 
 const samplingUnitsPlanCategoryName = 'sampling_units_plan'
-const samplingPointDataCategoryName = 'sampling_point_data'
+// single source of truth for this name: other modules must import it from here rather than
+// hard-coding the string or re-defining it
+export const samplingPointDataCategoryName = 'sampling_point_data'
 
 // ========
 // LEVELS

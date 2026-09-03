@@ -17,7 +17,7 @@ describe('ExtraPropDef locked flag', () => {
     const category = Category.newCategory()
     const lockedDef = {
       ...ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.geometryPoint, locked: true }),
-      name: 'location',
+      name: Category.locationItemExtraDefName,
     }
     const unlockedDef = {
       ...ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text, locked: false }),
@@ -91,7 +91,7 @@ describe('ExtraPropDef locked flag', () => {
     }
     const samplingPointDataCategory = Category.assocProp({
       key: Category.keysProps.name,
-      value: 'sampling_point_data',
+      value: Category.samplingPointDataCategoryName,
     })(Category.newCategory())
     expect(Category.isExtraPropDefReadOnly(unlockedLocationDef)(samplingPointDataCategory)).toBe(true)
 

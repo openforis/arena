@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Ativo',
@@ -1310,25 +1312,25 @@ $t(common.cantUndoWarning)`,
       buttonLabel: 'Converter para Dados de Ponto Amostral',
       confirmMessage: `Converter esta categoria na categoria de Dados de Ponto Amostral?
 
-A categoria será renomeada para 'sampling_point_data' e uma propriedade extra 'location' será adicionada aos itens.`,
+A categoria será renomeada para '${samplingPointDataCategoryName}' e uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
     },
     convertToGeoPackageCategory: {
       buttonLabel: 'Converter para categoria GeoPackage',
       confirmMessage: `Converter esta categoria em uma categoria GeoPackage?
 
-Uma propriedade extra 'location' será adicionada aos itens.`,
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
     },
     convertGeoPackageCategoryToSimple: {
       buttonLabel: 'Converter para categoria simples',
       confirmMessage: `Converter esta categoria GeoPackage em uma categoria simples?
 
-A propriedade extra 'location' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
+A propriedade extra '${locationItemExtraDefName}' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
     },
     convertSamplingPointDataCategoryToSimple: {
       buttonLabel: 'Converter para categoria simples',
       confirmMessage: `Converter esta categoria de Dados de Ponto Amostral em uma categoria simples?
 
-O nome da categoria será apagado (você precisará dar um novo nome a ela), e a propriedade extra 'location' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
+O nome da categoria será apagado (você precisará dar um novo nome a ela), e a propriedade extra '${locationItemExtraDefName}' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
     },
     geoPackageCategory: 'Esta é uma categoria GeoPackage',
     samplingPointDataCategoryType: 'Esta é a categoria de Dados de Ponto Amostral',
@@ -1341,13 +1343,13 @@ O nome da categoria será apagado (você precisará dar um novo nome a ela), e a
       buttonLabel: 'Categoria de Dados de Ponto Amostral',
       message: `Criar uma nova categoria de Dados de Ponto Amostral?
 
-Uma propriedade extra 'location' será adicionada aos itens.`,
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
     },
     createGeoPackageCategory: {
       buttonLabel: 'Categoria GeoPackage',
       message: `Criar uma nova categoria GeoPackage?
 
-Uma propriedade extra 'location' será adicionada aos itens.`,
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
     },
     deleteItem: 'Excluir item',
     level: {

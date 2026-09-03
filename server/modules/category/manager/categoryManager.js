@@ -715,12 +715,12 @@ export const convertCategoryToSamplingPointData = async (
   client.tx(async (t) => {
     const category = await _fetchCategory({ surveyId, categoryUuid }, t)
 
-    if (Category.getName(category) !== Survey.samplingPointDataCategoryName) {
+    if (Category.getName(category) !== Category.samplingPointDataCategoryName) {
       const categories = await CategoryRepository.fetchCategoriesBySurveyId({ surveyId, draft: true }, t)
       const duplicate = categories.find(
         (otherCategory) =>
           Category.getUuid(otherCategory) !== categoryUuid &&
-          Category.getName(otherCategory) === Survey.samplingPointDataCategoryName
+          Category.getName(otherCategory) === Category.samplingPointDataCategoryName
       )
       if (duplicate) {
         throw new SystemError(
@@ -731,22 +731,19 @@ export const convertCategoryToSamplingPointData = async (
       }
     }
 
-    let categoryUpdated = Category.assocProp({
+    const categoryUpdated = Category.assocProp({
       key: Category.keysProps.name,
-      value: Survey.samplingPointDataCategoryName,
+      value: Category.samplingPointDataCategoryName,
     })(category)
     await CategoryRepository.updateCategoryProp(
       surveyId,
       categoryUuid,
       Category.keysProps.name,
-      Survey.samplingPointDataCategoryName,
+      Category.samplingPointDataCategoryName,
       t
     )
 
-    categoryUpdated = await _addLocationItemExtraDefIfMissing(
-      { surveyId, categoryUuid, category: categoryUpdated, locked },
-      t
-    )
+    await _addLocationItemExtraDefIfMissing({ surveyId, categoryUuid, category: categoryUpdated, locked }, t)
 
     await Promise.all([
       markSurveyDraft(surveyId, t),

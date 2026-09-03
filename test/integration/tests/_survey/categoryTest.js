@@ -177,7 +177,7 @@ export const convertCategoryToGeoPackageTest = async () => {
   })
 
   const locationDef = Category.getItemExtraDefsArray(categoryUpdated).find(
-    (extraDef) => ExtraPropDef.getName(extraDef) === 'location'
+    (extraDef) => ExtraPropDef.getName(extraDef) === Category.locationItemExtraDefName
   )
   expect(locationDef).toBeDefined()
   expect(ExtraPropDef.getDataType(locationDef)).toBe(ExtraPropDef.dataTypes.geometryPoint)
@@ -207,9 +207,9 @@ export const convertCategoryToSamplingPointDataTest = async () => {
     categoryUuid: Category.getUuid(category),
   })
 
-  expect(Category.getName(categoryUpdated)).toBe('sampling_point_data')
+  expect(Category.getName(categoryUpdated)).toBe(Category.samplingPointDataCategoryName)
   const locationDef = Category.getItemExtraDefsArray(categoryUpdated).find(
-    (extraDef) => ExtraPropDef.getName(extraDef) === 'location'
+    (extraDef) => ExtraPropDef.getName(extraDef) === Category.locationItemExtraDefName
   )
   expect(locationDef).toBeDefined()
   expect(ExtraPropDef.isLocked(locationDef)).toBe(true)
@@ -224,7 +224,7 @@ export const convertCategoryToSamplingPointDataAlreadyConvertedTest = async () =
   // singleton, converting a *different* category here would incorrectly hit the duplicate check
   // instead of exercising the no-op-safe-rename path this test targets.
   const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft: true })
-  const category = categories.find((c) => Category.getName(c) === 'sampling_point_data')
+  const category = categories.find((c) => Category.getName(c) === Category.samplingPointDataCategoryName)
   expect(category).toBeDefined()
 
   // converting an already-sampling_point_data-named category again must be a no-op-safe rename,
@@ -235,9 +235,9 @@ export const convertCategoryToSamplingPointDataAlreadyConvertedTest = async () =
     categoryUuid: Category.getUuid(category),
   })
 
-  expect(Category.getName(categoryUpdatedAgain)).toBe('sampling_point_data')
+  expect(Category.getName(categoryUpdatedAgain)).toBe(Category.samplingPointDataCategoryName)
   const locationDefs = Category.getItemExtraDefsArray(categoryUpdatedAgain).filter(
-    (extraDef) => ExtraPropDef.getName(extraDef) === 'location'
+    (extraDef) => ExtraPropDef.getName(extraDef) === Category.locationItemExtraDefName
   )
   expect(locationDefs.length).toBe(1)
   expect(ExtraPropDef.isLocked(locationDefs[0])).toBe(true)

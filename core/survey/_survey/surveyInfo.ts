@@ -4,6 +4,7 @@ import { DEFAULT_SRS, Objects, Surveys } from '@openforis/arena-core'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
+import { samplingPointDataCategoryName } from '@core/survey/category'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
@@ -60,7 +61,7 @@ export const collectReportKeys = {
 
 export const cycleOneKey = '0'
 
-export const samplingPointDataCategoryName = 'sampling_point_data'
+export { samplingPointDataCategoryName }
 
 export const status = {
   draft: 'draft',

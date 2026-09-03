@@ -5,7 +5,6 @@ import { functionNames } from '@core/expressionParser/expression'
 
 import * as Category from '../category'
 import * as NodeDef from '../nodeDef'
-import * as SurveyInfo from './surveyInfo'
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
 const categories = 'categories'
@@ -35,7 +34,7 @@ export const getCategoryByName = (name) =>
     R.find((category) => Category.getName(category) === name)
   )
 
-export const getSamplingPointDataCategory = getCategoryByName(SurveyInfo.samplingPointDataCategoryName)
+export const getSamplingPointDataCategory = getCategoryByName(Category.samplingPointDataCategoryName)
 
 export const getSamplingPointDataNodeDefs = (survey) => {
   const samplingPointDataCategory = getSamplingPointDataCategory(survey)

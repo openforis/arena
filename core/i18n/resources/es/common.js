@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Activo',
@@ -1150,23 +1152,19 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     convertToSamplingPointDataCategory: {
       buttonLabel: 'Convertir a Datos de puntos de muestreo',
-      confirmMessage:
-        "¿Convertir esta categoría en la categoría de Datos de puntos de muestreo?\n\nLa categoría se renombrará a 'sampling_point_data' y se añadirá una propiedad extra 'location' a los elementos.",
+      confirmMessage: `¿Convertir esta categoría en la categoría de Datos de puntos de muestreo?\n\nLa categoría se renombrará a '${samplingPointDataCategoryName}' y se añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     convertToGeoPackageCategory: {
       buttonLabel: 'Convertir a categoría GeoPackage',
-      confirmMessage:
-        "¿Convertir esta categoría en una categoría GeoPackage?\n\nSe añadirá una propiedad extra 'location' a los elementos.",
+      confirmMessage: `¿Convertir esta categoría en una categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     convertGeoPackageCategoryToSimple: {
       buttonLabel: 'Convertir a categoría simple',
-      confirmMessage:
-        "¿Convertir esta categoría GeoPackage en una categoría simple?\n\nSe desbloqueará la propiedad extra 'location', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.",
+      confirmMessage: `¿Convertir esta categoría GeoPackage en una categoría simple?\n\nSe desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
     },
     convertSamplingPointDataCategoryToSimple: {
       buttonLabel: 'Convertir a categoría simple',
-      confirmMessage:
-        "¿Convertir esta categoría de Datos de puntos de muestreo en una categoría simple?\n\nSe borrará el nombre de la categoría (deberá asignarle uno nuevo), y se desbloqueará la propiedad extra 'location', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.",
+      confirmMessage: `¿Convertir esta categoría de Datos de puntos de muestreo en una categoría simple?\n\nSe borrará el nombre de la categoría (deberá asignarle uno nuevo), y se desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
     },
     geoPackageCategory: 'Esta es una categoría GeoPackage',
     samplingPointDataCategoryType: 'Esta es la categoría de Datos de puntos de muestreo',
@@ -1177,12 +1175,11 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     createSamplingPointDataCategory: {
       buttonLabel: 'Categoría de Datos de puntos de muestreo',
-      message:
-        "¿Crear una nueva categoría de Datos de puntos de muestreo?\n\nSe añadirá una propiedad extra 'location' a los elementos.",
+      message: `¿Crear una nueva categoría de Datos de puntos de muestreo?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     createGeoPackageCategory: {
       buttonLabel: 'Categoría GeoPackage',
-      message: "¿Crear una nueva categoría GeoPackage?\n\nSe añadirá una propiedad extra 'location' a los elementos.",
+      message: `¿Crear una nueva categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     deleteItem: 'Eliminar elemento',
     level: {
