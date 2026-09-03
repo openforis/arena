@@ -69,7 +69,7 @@ const _findTransitiveValueUpdateDependentUuids = ({ survey, nodeDefUuids }) => {
 
   while (stack.length > 0) {
     const nodeDefUuidCurrent = stack.pop()
-    _valueUpdateCascadeDependencyTypes.forEach((dependencyType) => {
+    for (const dependencyType of _valueUpdateCascadeDependencyTypes) {
       const dependents = Survey.getNodeDefDependencies(nodeDefUuidCurrent, dependencyType)(survey)
       for (const nodeDefDependent of dependents) {
         const nodeDefDependentUuid = NodeDef.getUuid(nodeDefDependent)
@@ -79,7 +79,7 @@ const _findTransitiveValueUpdateDependentUuids = ({ survey, nodeDefUuids }) => {
           stack.push(nodeDefDependentUuid)
         }
       }
-    })
+    }
   }
   return transitiveDependentUuids
 }
