@@ -37,6 +37,7 @@ export const reportingDataItemExtraDefKeys = {
 export const locationItemExtraDefName = 'location'
 
 const samplingUnitsPlanCategoryName = 'sampling_units_plan'
+const samplingPointDataCategoryName = 'sampling_point_data'
 
 // ========
 // LEVELS
@@ -178,7 +179,9 @@ export const setItemsCount = (count) => (category) => {
 export const isLevelDeleteAllowed = (level) => (category) =>
   !CategoryLevel.isPublished(level) && CategoryLevel.getIndex(level) === getLevelsArray(category).length - 1
 export const isSamplingUnitsPlanCategory = (category) => getName(category) === samplingUnitsPlanCategoryName
+export const isSamplingPointDataCategory = (category) => getName(category) === samplingPointDataCategoryName
 export const isExtraPropDefReadOnly = (extraPropDef) => (category) =>
   ExtraPropDef.isLocked(extraPropDef) ||
-  (isReportingData(category) && ExtraPropDef.getName(extraPropDef) === reportingDataItemExtraDefKeys.area)
+  (isReportingData(category) && ExtraPropDef.getName(extraPropDef) === reportingDataItemExtraDefKeys.area) ||
+  (isSamplingPointDataCategory(category) && ExtraPropDef.getName(extraPropDef) === locationItemExtraDefName)
 export const hasExtraDefs = (category) => getItemExtraDefKeys(category).length > 0

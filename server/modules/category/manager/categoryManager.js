@@ -410,10 +410,9 @@ const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, item
     if (R.isNil(CategoryItem.getExtraProp(name)(item))) {
       return acc
     }
-    const nameNew = ExtraPropDef.getName(itemExtraDef)
     const itemUpdated = deleted
       ? CategoryItem.dissocExtraProp(name)(item)
-      : CategoryItem.renameExtraProp({ nameOld: name, nameNew })(item)
+      : CategoryItem.renameExtraProp({ nameOld: name, nameNew: ExtraPropDef.getName(itemExtraDef) })(item)
 
     return [...acc, itemUpdated]
   }, [])

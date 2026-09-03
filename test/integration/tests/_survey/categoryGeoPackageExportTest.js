@@ -48,6 +48,12 @@ export const categoryGeoPackageExportTest = async () => {
 
   expect(job.errors).toEqual({})
   expect(job.isSucceeded()).toBe(true)
+  // total must be the leaf item count (2), not JobBase's inner-jobs-less default of 1, otherwise
+  // progressPercent (100 * processed / total) overshoots 100% as soon as more than one item is
+  // processed; processed counts skipped items too, so it reaches total (and 100%) exactly
+  expect(job.total).toBe(2)
+  expect(job.processed).toBe(2)
+  expect(job.calculateProgressPercent()).toBe(100)
   const { tempFileName, skippedItems } = job.result
   expect(skippedItems).toBe(1)
 
@@ -113,6 +119,10 @@ export const categoryGeoPackageExportHierarchicalTest = async () => {
 
   expect(job.errors).toEqual({})
   expect(job.isSucceeded()).toBe(true)
+  // total must be the leaf-level item count (1), excluding the non-leaf parent
+  expect(job.total).toBe(1)
+  expect(job.processed).toBe(1)
+  expect(job.calculateProgressPercent()).toBe(100)
   const { tempFileName, skippedItems } = job.result
   // the non-leaf parent item is filtered out, not counted as skipped
   expect(skippedItems).toBe(0)

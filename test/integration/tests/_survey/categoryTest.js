@@ -125,6 +125,44 @@ export const updateCategoryItemExtraDefTest = async () => {
   expect(Category.getItemExtraDef(categoryUpdated)[newName].dataType).toBe(ExtraPropDef.dataTypes.text)
 }
 
+export const deleteCategoryItemExtraDefTest = async () => {
+  const surveyId = getContextSurveyId()
+  const user = getContextUser()
+
+  const extraDef = { extraDefText: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }) }
+  const categoryReq = Category.assocItemExtraDef(extraDef)(
+    Category.newCategory({ name: 'category_delete_extradef_test' })
+  )
+  const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
+  const categoryUuid = Category.getUuid(category)
+  const level = Category.getLevelByIndex(0)(category)
+
+  // an item with a value set for the extra prop is required to reach the delete branch in
+  // CategoryManager._updateCategoryItemsExtraDef (items with no value for the prop are skipped);
+  // deleting used to crash there because itemExtraDef is null (like the real API/webapp call) when deleted is true
+  await CategoryManager.insertItem(
+    user,
+    surveyId,
+    categoryUuid,
+    CategoryItem.newItem(CategoryLevel.getUuid(level), null, {
+      code: '001',
+      labels: { en: 'Item 1' },
+      extra: { extraDefText: 'some value' },
+    })
+  )
+
+  const categoryUpdated = await CategoryManager.updateCategoryItemExtraDefItem({
+    user,
+    surveyId,
+    categoryUuid,
+    name: 'extraDefText',
+    itemExtraDef: null,
+    deleted: true,
+  })
+
+  expect(Category.getItemExtraDefKeys(categoryUpdated)).toEqual([])
+}
+
 export const convertCategoryToGeoPackageTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()

@@ -25,6 +25,7 @@ describe('Survey Test', () => {
   test('Update Category', async () => CategoryTest.updateCategoryTest())
 
   test('Update Category Item Extra Def', async () => CategoryTest.updateCategoryItemExtraDefTest())
+  test('Delete Category Item Extra Def', async () => CategoryTest.deleteCategoryItemExtraDefTest())
 
   test('Convert Category To GeoPackage', async () => CategoryTest.convertCategoryToGeoPackageTest())
   test('Convert Category To Sampling Point Data', async () => CategoryTest.convertCategoryToSamplingPointDataTest())

@@ -83,4 +83,20 @@ describe('ExtraPropDef locked flag', () => {
     expect(Category.hasLocationExtraProp(categoryWithUnlockedLocation)).toBe(true)
     expect(Category.isLocationExtraPropLocked(categoryWithUnlockedLocation)).toBe(false)
   })
+
+  it('the location extra prop is always read-only on a sampling point data category, even if not persisted as locked', () => {
+    const unlockedLocationDef = {
+      ...ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.geometryPoint, locked: false }),
+      name: Category.locationItemExtraDefName,
+    }
+    const samplingPointDataCategory = Category.assocProp({
+      key: Category.keysProps.name,
+      value: 'sampling_point_data',
+    })(Category.newCategory())
+    expect(Category.isExtraPropDefReadOnly(unlockedLocationDef)(samplingPointDataCategory)).toBe(true)
+
+    // a same-named unlocked prop on a regular category stays editable
+    const regularCategory = Category.newCategory()
+    expect(Category.isExtraPropDefReadOnly(unlockedLocationDef)(regularCategory)).toBe(false)
+  })
 })
