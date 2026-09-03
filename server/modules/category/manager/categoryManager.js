@@ -650,8 +650,11 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
 const locationExtraPropName = Category.locationItemExtraDefName
 
 /**
- * Adds the 'location' (geometry point) item extra prop def to the specified category, if not already there,
- * updating the category in the DB accordingly.
+ * Adds the 'location' (geometry point) item extra prop def to the specified category, if it doesn't already have
+ * one of that exact type, updating the category in the DB accordingly. A pre-existing 'location' extra prop def
+ * of a different data type is overwritten (fixed) in place, keeping its original index, rather than being treated
+ * as already satisfying the requirement - otherwise the category would never satisfy Category.hasLocationExtraProp
+ * and the conversion would keep being offered as a no-op.
  * @param {!object} params - The parameters object.
  * @param {!number} params.surveyId - The id of the survey the category belongs to.
  * @param {!string} params.categoryUuid - The uuid of the category to update.
@@ -661,16 +664,18 @@ const locationExtraPropName = Category.locationItemExtraDefName
  * @returns {Promise<object>} The updated category (the same one, if the extra prop def was already there).
  */
 const _addLocationItemExtraDefIfMissing = async ({ surveyId, categoryUuid, category, locked = true }, t) => {
-  const itemExtraDef = Category.getItemExtraDef(category)
-  if (locationExtraPropName in itemExtraDef) {
-    // already has a 'location' extra prop; nothing to add
+  if (Category.hasLocationExtraProp(category)) {
+    // already has a 'location' extra prop of type geometryPoint; nothing to add
     return category
   }
+  const itemExtraDef = Category.getItemExtraDef(category)
+  const existingLocationDef = itemExtraDef[locationExtraPropName]
+  const index = existingLocationDef ? ExtraPropDef.getIndex(existingLocationDef) : Object.values(itemExtraDef).length
   const itemExtraDefUpdated = {
     ...itemExtraDef,
     [locationExtraPropName]: ExtraPropDef.newItem({
       dataType: ExtraPropDef.dataTypes.geometryPoint,
-      index: Object.values(itemExtraDef).length,
+      index,
       locked,
     }),
   }

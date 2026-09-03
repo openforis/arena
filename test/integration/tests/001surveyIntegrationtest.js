@@ -28,6 +28,8 @@ describe('Survey Test', () => {
   test('Delete Category Item Extra Def', async () => CategoryTest.deleteCategoryItemExtraDefTest())
 
   test('Convert Category To GeoPackage', async () => CategoryTest.convertCategoryToGeoPackageTest())
+  test('Convert Category To GeoPackage (fixes wrong-type location extra def)', async () =>
+    CategoryTest.convertCategoryToGeoPackageFixesWrongTypeLocationExtraDefTest())
   test('Convert Category To Sampling Point Data', async () => CategoryTest.convertCategoryToSamplingPointDataTest())
   test('Convert Category To Sampling Point Data (already converted)', async () =>
     CategoryTest.convertCategoryToSamplingPointDataAlreadyConvertedTest())

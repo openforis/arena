@@ -194,6 +194,38 @@ export const convertCategoryToGeoPackageTest = async () => {
   expect(ExtraPropDef.isLocked(Category.getItemExtraDefsArray(categoryUpdatedAgain)[0])).toBe(true)
 }
 
+export const convertCategoryToGeoPackageFixesWrongTypeLocationExtraDefTest = async () => {
+  const surveyId = getContextSurveyId()
+  const user = getContextUser()
+
+  // a pre-existing 'location' extra prop def of the wrong data type (e.g. imported from a CSV
+  // where 'location' was just a text column) must not be mistaken for a real geometryPoint one:
+  // Category.hasLocationExtraProp would stay false forever and the conversion would be a permanent no-op
+  const categoryReq = Category.assocItemExtraDef({
+    notes: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text, index: 0 }),
+    [Category.locationItemExtraDefName]: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text, index: 1 }),
+  })(Category.newCategory({ name: 'category_geopackage_wrong_type_location_test' }))
+  const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
+
+  const categoryUpdated = await CategoryManager.convertCategoryToGeoPackage({
+    user,
+    surveyId,
+    categoryUuid: Category.getUuid(category),
+  })
+
+  const extraDefsArray = Category.getItemExtraDefsArray(categoryUpdated)
+  // the wrong-type def is fixed in place, not duplicated alongside a second 'location' def
+  expect(extraDefsArray.length).toBe(2)
+
+  const locationDef = Category.getItemExtraDef(categoryUpdated)[Category.locationItemExtraDefName]
+  expect(ExtraPropDef.getDataType(locationDef)).toBe(ExtraPropDef.dataTypes.geometryPoint)
+  expect(ExtraPropDef.isLocked(locationDef)).toBe(true)
+  // original index is preserved
+  expect(ExtraPropDef.getIndex(locationDef)).toBe(1)
+
+  expect(Category.hasLocationExtraProp(categoryUpdated)).toBe(true)
+}
+
 export const convertCategoryToSamplingPointDataTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
