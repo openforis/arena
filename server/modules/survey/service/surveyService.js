@@ -111,9 +111,10 @@ const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({ surveyId }) => {
     nodeDefUuids: nodeDefUuidsAtDirectRisk,
   })
   const nodeDefNamesAtDirectRisk = nodeDefsAtDirectRisk.map(NodeDef.getName)
-  const transitiveDependentNames = [...transitiveDependentUuids].map((nodeDefUuid) =>
-    NodeDef.getName(Survey.getNodeDefByUuid(nodeDefUuid)(survey))
-  )
+  const transitiveDependentNames = [...transitiveDependentUuids]
+    .map((nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey))
+    .filter((nodeDef) => nodeDef && NodeDef.isPublished(nodeDef) && !NodeDef.isDeleted(nodeDef))
+    .map(NodeDef.getName)
   return [...new Set([...nodeDefNamesAtDirectRisk, ...transitiveDependentNames])]
 }
 
