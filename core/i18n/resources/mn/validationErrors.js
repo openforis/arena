@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Ангиллын нэр заагаагүй',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Энэ судалгаанд Дээж цэгийн өгөгдлийн ангилал аль хэдийн байна; зөвхөн нэг л байж болно.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Нийтлэгдсэн ангиллын элементүүдийг устгах боломжгүй. Импортлогдсон файлд дутуу элементүүд: {{deletedItemCodes}}',

@@ -60,7 +60,7 @@ export const collectReportKeys = {
 
 export const cycleOneKey = '0'
 
-export const samplingPointDataCategoryName = 'sampling_point_data'
+export { samplingPointDataCategoryName } from '@core/survey/category'
 
 export const status = {
   draft: 'draft',

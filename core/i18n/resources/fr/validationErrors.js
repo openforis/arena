@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Nom de catégorie non spécifié',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      "Une catégorie de Données de points d'échantillonnage existe déjà dans ce formulaire ; il ne peut y en avoir qu'une seule.",
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Impossible de supprimer les éléments de catégorie publiés. Éléments manquants dans le fichier importé : {{deletedItemCodes}}',

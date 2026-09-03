@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Идэвхтэй',
@@ -53,6 +55,7 @@ export default {
     download: 'Татах',
     draft: 'Ноорог',
     edit: 'Засах',
+    elapsed: 'Өнгөрсөн хугацаа',
     email: 'Имэйл',
     email_other: 'Имэйлүүд',
     emailSentConfirmation: `{{email}} руу имэйл илгээсэн.
@@ -164,6 +167,7 @@ export default {
     raiseTicketInSupportForum: `Асуудал гарвал манай <b>Дэмжлэгийн Форум</b>: $t(links.supportForum) руу 'arena' шошготой тасалбар үүсгэнэ үү.`,
     record: 'Бичлэг',
     record_other: 'Бичлэгүүд',
+    remaining: 'Үлдсэн хугацаа',
     remote: 'Алсын',
     required: 'Шаардлагатай',
     requiredField: 'шаардлагатай талбар',
@@ -1236,10 +1240,13 @@ $t(common.appNameFull)
       noCategoriesAvailable: 'Сонгосон судалгаанд ангилал алга байна',
     },
     itemsCount: 'Элементүүдийн тоо',
+    structure: 'Бүтэц',
     types: {
       flat: 'Хавтгай',
       hierarchical: 'Иерархи',
       reportingData: 'Тайлагнах өгөгдөл',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Дээж цэгийн өгөгдөл',
     },
   },
 
@@ -1267,6 +1274,49 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Энэ Тайлагнах өгөгдлийн ангиллыг энгийн ангилал болгон хөрвүүлэх үү?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Дээж цэгийн өгөгдөл рүү хөрвүүлэх',
+      confirmMessage: `Энэ ангиллыг Дээж цэгийн өгөгдлийн ангилал болгон хөрвүүлэх үү?
+
+Ангиллын нэр '${samplingPointDataCategoryName}' болж өөрчлөгдөж, элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'GeoPackage ангилал руу хөрвүүлэх',
+      confirmMessage: `Энэ ангиллыг GeoPackage ангилал болгон хөрвүүлэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
+      confirmMessage: `Энэ GeoPackage ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
+
+'${locationItemExtraDefName}' нэмэлт талбарын цоожийг тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
+      confirmMessage: `Энэ Дээж цэгийн өгөгдлийн ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
+
+Ангиллын нэрийг цэвэрлэх бөгөөд (шинэ нэр өгөх шаардлагатай болно), '${locationItemExtraDefName}' нэмэлт талбарын цоожийг мөн тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
+    },
+    geoPackageCategory: 'Энэ бол GeoPackage ангилал юм',
+    samplingPointDataCategoryType: 'Энэ бол Дээж цэгийн өгөгдлийн ангилал юм',
+    createCategory: {
+      menuLabel: 'Ангилал нэмэх',
+      simple: 'Энгийн ангилал',
+      otherTypes: 'Ангиллын бусад төрлүүд',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Дээж цэгийн өгөгдлийн ангилал',
+      message: `Шинэ Дээж цэгийн өгөгдлийн ангилал үүсгэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'GeoPackage ангилал',
+      message: `Шинэ GeoPackage ангилал үүсгэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
     deleteItem: 'Элемент устгах',
     level: {
       title: 'Түвшин {{levelPosition}}',
@@ -1290,6 +1340,8 @@ $t(common.cantUndoWarning)`,
       title: 'Ангиллын импортын хураангуй',
     },
     reportingData: 'Тайлагнах өгөгдөл',
+    exportToGeoPackage: 'GeoPackage рүү экспортлох',
+    exportToGeoPackageSkippedItems: 'Хүчинтэй байршилгүй {{count}} элементийг алгаслаа.',
     templateFor_samplingPointDataImport_csv: 'Түүвэрлэлтийн цэгийн загвар (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Түүвэрлэлтийн цэгийн загвар (Excel)',
   },

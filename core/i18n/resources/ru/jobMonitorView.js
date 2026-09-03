@@ -8,8 +8,6 @@ export default {
     survey: 'Опрос',
     user: 'Пользователь',
     progress: 'Прогресс',
-    elapsed: 'Прошедшее время',
-    remaining: 'Осталось (примерно)',
     startedAt: 'Начато',
   },
   status: {

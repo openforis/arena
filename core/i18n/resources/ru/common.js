@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Активно',
@@ -53,6 +55,7 @@ export default {
     download: 'Скачать',
     draft: 'Черновик',
     edit: 'Редактировать',
+    elapsed: 'Прошедшее время',
     email: 'Электронная почта',
     email_other: 'Электронные письма',
     emailSentConfirmation: `Письмо на адрес {{email}} отправлено.
@@ -164,6 +167,7 @@ export default {
     raiseTicketInSupportForum: `В случае проблем, пожалуйста, создайте заявку с тегом 'arena' на нашем <b>Форуме поддержки</b>: $t(links.supportForum)`,
     record: 'Запись',
     record_other: 'Записи',
+    remaining: 'Оставшееся время',
     remote: 'Удаленно',
     required: 'Обязательно',
     requiredField: 'обязательное поле',
@@ -1245,10 +1249,13 @@ $t(common.appNameFull)
       noCategoriesAvailable: 'В выбранном опросе нет доступных категорий',
     },
     itemsCount: 'Количество элементов',
+    structure: 'Структура',
     types: {
       flat: 'Плоская',
       hierarchical: 'Иерархическая',
       reportingData: 'Отчетные данные',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Данные точек выборки',
     },
   },
 
@@ -1276,6 +1283,49 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Преобразовать эту категорию отчетных данных в простую категорию?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Преобразовать в данные точек выборки',
+      confirmMessage: `Преобразовать эту категорию в категорию данных точек выборки?
+
+Категория будет переименована в '${samplingPointDataCategoryName}', и к элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Преобразовать в категорию GeoPackage',
+      confirmMessage: `Преобразовать эту категорию в категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию GeoPackage в простую категорию?
+
+Дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию данных точек выборки в простую категорию?
+
+Имя категории будет очищено (вам нужно будет присвоить ей новое имя), а дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    geoPackageCategory: 'Это категория GeoPackage',
+    samplingPointDataCategoryType: 'Это категория данных точек выборки',
+    createCategory: {
+      menuLabel: 'Добавить категорию',
+      simple: 'Простая категория',
+      otherTypes: 'Другие типы категорий',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Категория данных точек выборки',
+      message: `Создать новую категорию данных точек выборки?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Категория GeoPackage',
+      message: `Создать новую категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
     deleteItem: 'Удалить элемент',
     level: {
       title: 'Уровень {{levelPosition}}',
@@ -1299,6 +1349,8 @@ $t(common.cantUndoWarning)`,
       title: 'Сводка импорта категорий',
     },
     reportingData: 'Отчетные данные',
+    exportToGeoPackage: 'Экспорт в GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} элемент(ов) без действительного местоположения были пропущены.',
     templateFor_samplingPointDataImport_csv: 'Шаблон для импорта данных точек выборки (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Шаблон для импорта данных точек выборки (Excel)',
   },

@@ -8,8 +8,6 @@ export default {
     survey: 'Inventário',
     user: 'Usuário',
     progress: 'Progresso',
-    elapsed: 'Decorrido',
-    remaining: 'Restante estimado',
     startedAt: 'Iniciado em',
   },
   status: {

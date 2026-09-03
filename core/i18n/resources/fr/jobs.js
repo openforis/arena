@@ -71,6 +71,7 @@ export default {
   // sauvegarde du formulaire
   SurveyInfoExportJob: 'Exportation des informations du formulaire',
   CategoriesExportJob: 'Exportation des catégories',
+  CategoryGeoPackageExportJob: 'Exportation de catégorie vers GeoPackage',
   TaxonomiesExportJob: 'Exportation des taxonomies',
   RecordsExportJob: 'Exportation des enregistrements',
   RecordFilesExportJob: 'Exportation des fichiers d’enregistrements',
@@ -85,6 +86,4 @@ export default {
   RecordsValidationJob: `Validation des enregistrements`,
   // analyse
   PersistResultsJob: "Persistance des résultats d'analyse",
-  elapsed: 'Écoulé',
-  remaining: 'Restant',
 }
