@@ -167,6 +167,12 @@ export const countRecordsBySurveyId = async (
   )
 }
 
+// Cheap existence/count check across all cycles, without the survey/root-node-def/summary-defs
+// lookups the search-aware countRecordsBySurveyId above needs - used where only "does this survey
+// have any records at all" matters (e.g. the publish record-values-update warning check).
+export const countAllRecordsBySurveyId = async ({ surveyId }, client = db) =>
+  RecordRepository.countRecordsBySurveyId({ surveyId }, client)
+
 export {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordByUuid,

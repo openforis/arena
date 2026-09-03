@@ -137,6 +137,14 @@ export default {
     publish: 'Publicar',
     publishConfirm:
       '#### Está a punto de publicar la encuesta {{survey}} ####\n\n###### El proceso de publicación *eliminará permanentemente* la siguiente información ###### \n- Etiquetas asociadas a idiomas eliminados.\n- Registros asociados a ciclos eliminados.\n- Datos asociados a campos de formulario eliminados.\n\n###### Después de publicar: ###### \n- Los campos de formulario no se pueden cambiar de único a múltiple y viceversa.\n- Los códigos de elementos de categoría no se pueden cambiar.\n- Los elementos de categoría no se pueden eliminar.\n- Los códigos de taxonomía no se pueden cambiar.\n- Los taxones no se pueden eliminar.\n\n**¿Está seguro de que desea continuar?**',
+    publishRecordValuesUpdateConfirm: `#### Publicar {{survey}} actualizará datos ya registrados ####
+
+Los siguientes atributos han cambiado de forma que se recalculará su valor en los registros existentes: **{{attributeNames}}**.
+
+Esto puede cambiar o borrar permanentemente datos ya introducidos. Escriba el nombre de la encuesta a continuación para confirmar.`,
+    publishRecordValuesUpdateConfirmHeader: 'Se actualizarán los datos de los registros existentes',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Escriba el nombre de la encuesta "{{strongConfirmRequiredText}}" para confirmar',
     raiseTicketInSupportForum:
       "En caso de problemas, por favor, abra un ticket con la etiqueta 'arena' en nuestro <b>Foro de soporte</b>: $t(links.supportForum)",
     record: 'Registro',

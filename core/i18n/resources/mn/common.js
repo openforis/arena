@@ -153,6 +153,14 @@ export default {
 - Таксонуудыг устгах боломжгүй.
 
 **Үргэлжлүүлэхдээ итгэлтэй байна уу?**`,
+    publishRecordValuesUpdateConfirm: `#### {{survey}}-г нийтлэх нь бүртгэгдсэн өгөгдлийг шинэчлэх болно ####
+
+Дараах атрибутууд өөрчлөгдсөн тул одоо байгаа бичлэгүүдэд утга нь дахин тооцоологдоно: **{{attributeNames}}**.
+
+Энэ нь оруулсан өгөгдлийг бүрмөсөн өөрчлөх эсвэл устгах магадлалтай. Баталгаажуулахын тулд доор судалгааны нэрийг бичнэ үү.`,
+    publishRecordValuesUpdateConfirmHeader: 'Одоо байгаа бичлэгийн өгөгдөл шинэчлэгдэнэ',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Баталгаажуулахын тулд судалгааны нэр "{{strongConfirmRequiredText}}"-г бичнэ үү',
     raiseTicketInSupportForum: `Асуудал гарвал манай <b>Дэмжлэгийн Форум</b>: $t(links.supportForum) руу 'arena' шошготой тасалбар үүсгэнэ үү.`,
     record: 'Бичлэг',
     record_other: 'Бичлэгүүд',

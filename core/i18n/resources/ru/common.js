@@ -153,6 +153,14 @@ export default {
 - Таксоны нельзя будет удалить.
 
 **Вы уверены, что хотите продолжить?**`,
+    publishRecordValuesUpdateConfirm: `#### Публикация {{survey}} обновит уже записанные данные ####
+
+Следующие атрибуты изменены таким образом, что их значение будет пересчитано в существующих записях: **{{attributeNames}}**.
+
+Это может безвозвратно изменить или удалить уже введённые данные. Введите название анкеты ниже, чтобы подтвердить.`,
+    publishRecordValuesUpdateConfirmHeader: 'Данные существующих записей будут обновлены',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Введите название анкеты "{{strongConfirmRequiredText}}" для подтверждения',
     raiseTicketInSupportForum: `В случае проблем, пожалуйста, создайте заявку с тегом 'arena' на нашем <b>Форуме поддержки</b>: $t(links.supportForum)`,
     record: 'Запись',
     record_other: 'Записи',

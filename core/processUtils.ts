@@ -59,8 +59,6 @@ export const ENV = {
   emailAmazonSESPort: Number(process.env.EMAIL_AMAZON_SES_PORT) || 465,
   // ANALYSIS
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
-  // SESSION
-  sessionIdCookieSecret: process.env.SESSION_ID_COOKIE_SECRET,
   // SERVER
   useHttps: isTrue(process.env.USE_HTTPS),
   fileUploadLimit: Number(process.env.FILE_UPLOAD_LIMIT) || 1024 ** 3, // 1GB

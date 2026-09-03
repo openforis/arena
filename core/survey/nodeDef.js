@@ -422,6 +422,25 @@ export const hasAdvancedPropsDefaultValuesDraft = (nodeDef) => R.prop(keys.draft
 export const hasAdvancedPropsFileNameExpressionDraft = (nodeDef) =>
   R.prop(keys.draftAdvancedFileNameExpression, nodeDef) === true
 export const hasAdvancedPropsValidationsDraft = (nodeDef) => R.prop(keys.draftAdvancedValidations, nodeDef) === true
+// Unlike the flags above (set on the node def row by the server whenever the corresponding key is
+// present in propsAdvancedDraft, for a fixed set of keys it tracks), enumeratingItemsExpression and
+// itemsFilter are not tracked server-side, so they're checked here instead, directly against
+// propsAdvancedDraft. This only works if the node def was fetched with backup: true (see
+// fetchSurveyAndNodeDefsBySurveyId) - a plain draft fetch merges propsAdvancedDraft into propsAdvanced
+// and discards it, at which point these would always read as unchanged.
+export const hasAdvancedPropsEnumeratingItemsExpressionDraft = (nodeDef) =>
+  Boolean(getPropAdvancedDraft(keysPropsAdvanced.enumeratingItemsExpression)(nodeDef))
+export const hasAdvancedPropsItemsFilterDraft = (nodeDef) =>
+  Boolean(getPropAdvancedDraft(keysPropsAdvanced.itemsFilter)(nodeDef))
+// Node defs whose value (or, for auto-enumerated entities, their enumerated child nodes) can be
+// recalculated on publish - see RecordCheckJob. Requires the node def to have been fetched with
+// backup: true (see the two functions above).
+export const hasValueAffectingAdvancedPropsDraft = (nodeDef) =>
+  hasAdvancedPropsApplicableDraft(nodeDef) ||
+  hasAdvancedPropsDefaultValuesDraft(nodeDef) ||
+  hasAdvancedPropsFileNameExpressionDraft(nodeDef) ||
+  hasAdvancedPropsEnumeratingItemsExpressionDraft(nodeDef) ||
+  hasAdvancedPropsItemsFilterDraft(nodeDef)
 const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
 export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues, [])

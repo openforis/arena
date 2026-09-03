@@ -159,6 +159,14 @@ Voulez-vous continuer ?`,
 - Les taxons ne peuvent pas être supprimés.
 
 **Êtes-vous sûr(e) de vouloir continuer ?**`,
+    publishRecordValuesUpdateConfirm: `#### La publication de {{survey}} mettra à jour des données déjà enregistrées ####
+
+Les attributs suivants ont changé de manière à recalculer leur valeur dans les enregistrements existants : **{{attributeNames}}**.
+
+Cela peut modifier ou effacer définitivement des données déjà saisies. Saisissez le nom de l'enquête ci-dessous pour confirmer.`,
+    publishRecordValuesUpdateConfirmHeader: 'Les données des enregistrements existants seront mises à jour',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Saisissez le nom de l\'enquête "{{strongConfirmRequiredText}}" pour confirmer',
     raiseTicketInSupportForum: `En cas de problèmes, veuillez ouvrir un ticket avec le tag 'arena' dans notre <b>Forum de support</b> : $t(links.supportForum)`,
     record: 'Enregistrement',
     record_other: 'Enregistrements',
