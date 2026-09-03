@@ -250,8 +250,8 @@ const CategoryDetails = (props) => {
               )}
             </div>
 
-            <div className="row">
-              {Category.isReportingData(category) && (
+            {Category.isReportingData(category) && (
+              <div className="row">
                 <Checkbox
                   checked
                   className="reporting-data-checkbox"
@@ -259,8 +259,10 @@ const CategoryDetails = (props) => {
                   label="categoryEdit.reportingData"
                   onChange={Actions.convertToSimpleCategory}
                 />
-              )}
+              </div>
+            )}
 
+            <div className="row">
               {isSamplingPointData ? (
                 <span className="category-type-label">{i18n.t('categoryEdit.samplingPointDataCategoryType')}</span>
               ) : (
