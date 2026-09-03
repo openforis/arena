@@ -215,10 +215,12 @@ mechanics).
 
 No GeoPackage/shapefile/GDAL library exists in this repo today (confirmed
 by dependency search). `@ngageoint/geopackage` is added to
-`package.json`: pure JS/TS, no native binary, so it fits the existing
-Node/Docker deployment without adding GDAL to the image (the alternative,
-shelling out to `ogr2ogr`, was considered and rejected for that reason —
-no precedent for a native GIS toolchain dependency in this codebase).
+`package.json`: JS/TS on top of a native SQLite addon (`better-sqlite3`)
+that ships prebuilt binaries for the standard deployment targets, so no
+build toolchain is required and it fits the existing Node/Docker
+deployment without adding GDAL to the image (the alternative, shelling
+out to `ogr2ogr`, was considered and rejected for that reason — no
+precedent for a native GIS toolchain dependency in this codebase).
 
 ### Routes
 

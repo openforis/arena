@@ -75,7 +75,7 @@ const CategoryDetails = (props) => {
 
   const hasLocationExtraProp = Category.getItemExtraDefsArray(category).some(
     (extraDef) =>
-      ExtraPropDef.getName(extraDef) === 'location' &&
+      ExtraPropDef.getName(extraDef) === Category.locationItemExtraDefName &&
       ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.geometryPoint
   )
   const isSamplingPointData = Category.getName(category) === Survey.samplingPointDataCategoryName
@@ -195,7 +195,9 @@ const CategoryDetails = (props) => {
               testId={TestId.categoryDetails.exportBtn}
             />
 
-            {hasLocationExtraProp && (
+            {/* export to GeoPackage starts a job through a route requiring survey edit permission:
+                do not show the button to users who can only view the survey */}
+            {!readOnly && hasLocationExtraProp && (
               <Button
                 className="export-geopackage-btn"
                 iconClassName="icon-download2 icon-14px"

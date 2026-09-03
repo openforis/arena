@@ -17,7 +17,7 @@ import * as CategoryRepository from '../repository/categoryRepository'
 import * as CategoryExportRepository from '../repository/categoryExportRepository'
 import { buildCategoryItemFeature } from '../manager/categoryGeoPackageFeatureBuilder'
 
-const locationExtraPropName = 'location'
+const locationExtraPropName = Category.locationItemExtraDefName
 const geometryColumnName = 'geom'
 const idColumnName = 'id'
 

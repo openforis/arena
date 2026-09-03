@@ -33,6 +33,9 @@ export const reportingDataItemExtraDefKeys = {
   area: 'area',
 }
 
+// name of the item extra prop def (of type geometryPoint) that makes a category exportable to GeoPackage
+export const locationItemExtraDefName = 'location'
+
 const samplingUnitsPlanCategoryName = 'sampling_units_plan'
 
 // ========

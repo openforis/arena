@@ -5,6 +5,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
+import { StatusCodes } from '@core/systemError'
 import { getContextSurveyId, getContextUser } from '../../config/context'
 
 export const createCategoryTest = async () => {
@@ -212,11 +213,17 @@ export const convertCategoryToSamplingPointDataDuplicateTest = async () => {
   const categoryReq = Category.newCategory({ name: 'category_spd_duplicate_test' })
   const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
 
-  await expect(
-    CategoryManager.convertCategoryToSamplingPointData({
-      user,
-      surveyId,
-      categoryUuid: Category.getUuid(category),
-    })
-  ).rejects.toThrow()
+  const promise = CategoryManager.convertCategoryToSamplingPointData({
+    user,
+    surveyId,
+    categoryUuid: Category.getUuid(category),
+  })
+
+  await expect(promise).rejects.toThrow()
+
+  // the specific error key and a 400-class status code must be preserved:
+  // the api route sends them back to the client with Response.sendErr
+  const error = await promise.catch((err) => err)
+  expect(error.key).toBe('validationErrors:category.samplingPointDataCategoryAlreadyExists')
+  expect(error.statusCode).toBe(StatusCodes.BAD_REQUEST)
 }

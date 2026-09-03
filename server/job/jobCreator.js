@@ -6,6 +6,7 @@ import ArenaMobileDataImportJob from '@server/modules/mobile/service/arenaMobile
 import ArenaMobileDataImportSummaryJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportSummaryJob'
 import CategoriesExportJob from '@server/modules/category/service/CategoriesExportJob'
 import CategoriesBatchImportJob from '@server/modules/category/service/CategoriesBatchImportJob'
+import CategoryGeoPackageExportJob from '@server/modules/category/service/CategoryGeoPackageExportJob'
 import CategoryImportJob from '@server/modules/category/service/categoryImportJob'
 import CollectImportJob from '@server/modules/collectImport/service/collectImport/collectImportJob'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
@@ -41,6 +42,7 @@ const jobClasses = [
   ArenaMobileDataImportSummaryJob,
   CategoriesExportJob,
   CategoriesBatchImportJob,
+  CategoryGeoPackageExportJob,
   CategoryImportJob,
   CollectImportJob,
   CollectDataImportJob,

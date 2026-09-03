@@ -5,7 +5,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { parsePoint } from '@core/survey/categoryItemPointParser'
 
-const locationExtraPropName = 'location'
+const locationExtraPropName = Category.locationItemExtraDefName
 
 /**
  * Builds a GeoJSON Point feature (geometry reprojected to EPSG:4326) from one row of the

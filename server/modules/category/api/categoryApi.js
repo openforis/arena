@@ -162,6 +162,9 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, draft = false, tempFileName } = Request.getParams(req)
+
+        FileUtils.checkIsValidTempFileName(tempFileName)
+
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)
         const name = `${Survey.getName(surveyInfo)}_categories.zip`
@@ -293,6 +296,9 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, categoryUuid, draft = true, tempFileName } = Request.getParams(req)
+
+        FileUtils.checkIsValidTempFileName(tempFileName)
+
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)
         const category = await CategoryService.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
@@ -582,7 +588,7 @@ export const init = (app) => {
   app.put(
     '/survey/:surveyId/categories/:categoryUuid/convertToSamplingPointData',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
+    async (req, res) => {
       try {
         const { surveyId, categoryUuid, locked = true } = Request.getParams(req)
         const user = Request.getUser(req)
@@ -596,7 +602,10 @@ export const init = (app) => {
 
         res.json({ category })
       } catch (error) {
-        next(error)
+        // Response.sendErr (not next(error)): the error middleware registered by ArenaServer.init runs
+        // before these routes in the Express stack, so next(error) never reaches it and the specific
+        // error key/params would be lost (the client would get a generic HTML error page instead).
+        Response.sendErr(res, error)
       }
     }
   )

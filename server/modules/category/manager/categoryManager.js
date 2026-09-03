@@ -3,7 +3,7 @@ import * as pgPromise from 'pg-promise'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
@@ -648,35 +648,52 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
     return categoryUpdated
   })
 
-const locationExtraPropName = 'location'
+const locationExtraPropName = Category.locationItemExtraDefName
+
+/**
+ * Adds the 'location' (geometry point) item extra prop def to the specified category, if not already there,
+ * updating the category in the DB accordingly.
+ * @param {!object} params - The parameters object.
+ * @param {!number} params.surveyId - The id of the survey the category belongs to.
+ * @param {!string} params.categoryUuid - The uuid of the category to update.
+ * @param {!object} params.category - The category to update.
+ * @param {boolean} [params.locked] - Whether the added extra prop def must be locked (not editable by the user).
+ * @param {!object} t - The DB transaction/client.
+ * @returns {Promise<object>} The updated category (the same one, if the extra prop def was already there).
+ */
+const _addLocationItemExtraDefIfMissing = async ({ surveyId, categoryUuid, category, locked = true }, t) => {
+  const itemExtraDef = Category.getItemExtraDef(category)
+  if (locationExtraPropName in itemExtraDef) {
+    // already has a 'location' extra prop; nothing to add
+    return category
+  }
+  const itemExtraDefUpdated = {
+    ...itemExtraDef,
+    [locationExtraPropName]: ExtraPropDef.newItem({
+      dataType: ExtraPropDef.dataTypes.geometryPoint,
+      index: Object.values(itemExtraDef).length,
+      locked,
+    }),
+  }
+  await CategoryRepository.updateCategoryProp(
+    surveyId,
+    categoryUuid,
+    Category.keysProps.itemExtraDef,
+    itemExtraDefUpdated,
+    t
+  )
+  return Category.assocItemExtraDef(itemExtraDefUpdated)(category)
+}
 
 export const convertCategoryToGeoPackage = async ({ user, surveyId, categoryUuid, locked = true }, client = db) =>
   client.tx(async (t) => {
     const category = await _fetchCategory({ surveyId, categoryUuid }, t)
 
-    const itemExtraDef = Category.getItemExtraDef(category)
-    if (locationExtraPropName in itemExtraDef) {
-      // already has a 'location' extra prop; nothing to add
+    const categoryUpdated = await _addLocationItemExtraDefIfMissing({ surveyId, categoryUuid, category, locked }, t)
+    if (categoryUpdated === category) {
+      // nothing changed: category already had a 'location' extra prop
       return category
     }
-
-    const itemExtraDefUpdated = {
-      ...itemExtraDef,
-      [locationExtraPropName]: ExtraPropDef.newItem({
-        dataType: ExtraPropDef.dataTypes.geometryPoint,
-        index: Object.values(itemExtraDef).length,
-        locked,
-      }),
-    }
-    const categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(category)
-
-    await CategoryRepository.updateCategoryProp(
-      surveyId,
-      categoryUuid,
-      Category.keysProps.itemExtraDef,
-      itemExtraDefUpdated,
-      t
-    )
 
     await Promise.all([
       markSurveyDraft(surveyId, t),
@@ -707,7 +724,11 @@ export const convertCategoryToSamplingPointData = async (
           Category.getName(otherCategory) === Survey.samplingPointDataCategoryName
       )
       if (duplicate) {
-        throw new SystemError('validationErrors:category.samplingPointDataCategoryAlreadyExists')
+        throw new SystemError(
+          'validationErrors:category.samplingPointDataCategoryAlreadyExists',
+          {},
+          StatusCodes.BAD_REQUEST
+        )
       }
     }
 
@@ -723,25 +744,10 @@ export const convertCategoryToSamplingPointData = async (
       t
     )
 
-    const itemExtraDef = Category.getItemExtraDef(categoryUpdated)
-    if (!(locationExtraPropName in itemExtraDef)) {
-      const itemExtraDefUpdated = {
-        ...itemExtraDef,
-        [locationExtraPropName]: ExtraPropDef.newItem({
-          dataType: ExtraPropDef.dataTypes.geometryPoint,
-          index: Object.values(itemExtraDef).length,
-          locked,
-        }),
-      }
-      categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(categoryUpdated)
-      await CategoryRepository.updateCategoryProp(
-        surveyId,
-        categoryUuid,
-        Category.keysProps.itemExtraDef,
-        itemExtraDefUpdated,
-        t
-      )
-    }
+    categoryUpdated = await _addLocationItemExtraDefIfMissing(
+      { surveyId, categoryUuid, category: categoryUpdated, locked },
+      t
+    )
 
     await Promise.all([
       markSurveyDraft(surveyId, t),
