@@ -89,9 +89,11 @@ describe('checkPublishRecordValuesUpdateWarning - transient dependencies', () =>
 
     const warning = await checkPublishRecordValuesUpdateWarning({ surveyId })
 
+    const sortAlphabetically = (names) => [...names].sort((nameA, nameB) => nameA.localeCompare(nameB))
+
     expect(warning).not.toBeNull()
-    expect(warning.attributeNames.sort()).toEqual(
-      ['num', 'num_double', 'num_double_square', 'num_flag', 'num_flag_note'].sort()
+    expect(sortAlphabetically(warning.attributeNames)).toEqual(
+      sortAlphabetically(['num', 'num_double', 'num_double_square', 'num_flag', 'num_flag_note'])
     )
   })
 })
