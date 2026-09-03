@@ -220,7 +220,9 @@ const CategoryDetails = (props) => {
                 variant="outlined"
               />
             )}
+          </div>
 
+          <div className="row">
             {Category.isReportingData(category) && (
               <Checkbox
                 checked

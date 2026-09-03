@@ -58,13 +58,6 @@ const CategoryList = (props) => {
       renderItem: ({ item: category }) => Category.getName(category),
       width: '1fr',
     },
-    // STRUCTURE (flat / hierarchical)
-    {
-      key: 'structure',
-      header: 'categoryList.structure',
-      renderItem: ({ item: category }) => i18n.t(`categoryList.types.${getStructure({ category })}`),
-      width: '10rem',
-    },
     // TYPE (reporting data / GeoPackage / Sampling Point Data / blank for a plain category)
     {
       key: 'type',
@@ -82,6 +75,13 @@ const CategoryList = (props) => {
       renderItem: ({ item: category }) =>
         Category.getItemExtraDefsArray(category).length > 0 ? <span className="icon icon-checkmark" /> : null,
       width: '8rem',
+    },
+    // STRUCTURE (flat / hierarchical)
+    {
+      key: 'structure',
+      header: 'categoryList.structure',
+      renderItem: ({ item: category }) => i18n.t(`categoryList.types.${getStructure({ category })}`),
+      width: '10rem',
     },
     // Items count
     {

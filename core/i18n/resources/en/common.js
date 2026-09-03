@@ -1328,15 +1328,13 @@ A 'location' extra property will be added to the items.`,
       buttonLabel: 'Convert to simple category',
       confirmMessage: `Convert this GeoPackage category to a simple category?
 
-The 'location' extra property will be removed, and the location value stored on every item will be lost.
-$t(common.cantUndoWarning)`,
+The 'location' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
     },
     convertSamplingPointDataCategoryToSimple: {
       buttonLabel: 'Convert to simple category',
       confirmMessage: `Convert this Sampling Point Data category to a simple category?
 
-The category name will be cleared (you'll need to give it a new name), the 'location' extra property will be removed, and the location value stored on every item will be lost.
-$t(common.cantUndoWarning)`,
+The category name will be cleared (you'll need to give it a new name), and the 'location' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
     },
     geoPackageCategory: 'This is a GeoPackage category',
     samplingPointDataCategoryType: 'This is the Sampling Point Data category',

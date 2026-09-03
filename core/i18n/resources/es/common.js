@@ -1159,12 +1159,12 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     convertGeoPackageCategoryToSimple: {
       buttonLabel: 'Convertir a categoría simple',
       confirmMessage:
-        "¿Convertir esta categoría GeoPackage en una categoría simple?\n\nSe eliminará la propiedad extra 'location', y se perderá el valor de ubicación almacenado en cada elemento.\n$t(common.cantUndoWarning)",
+        "¿Convertir esta categoría GeoPackage en una categoría simple?\n\nSe desbloqueará la propiedad extra 'location', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.",
     },
     convertSamplingPointDataCategoryToSimple: {
       buttonLabel: 'Convertir a categoría simple',
       confirmMessage:
-        "¿Convertir esta categoría de Datos de puntos de muestreo en una categoría simple?\n\nSe borrará el nombre de la categoría (deberá asignarle uno nuevo), se eliminará la propiedad extra 'location', y se perderá el valor de ubicación almacenado en cada elemento.\n$t(common.cantUndoWarning)",
+        "¿Convertir esta categoría de Datos de puntos de muestreo en una categoría simple?\n\nSe borrará el nombre de la categoría (deberá asignarle uno nuevo), y se desbloqueará la propiedad extra 'location', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.",
     },
     geoPackageCategory: 'Esta es una categoría GeoPackage',
     samplingPointDataCategoryType: 'Esta es la categoría de Datos de puntos de muestreo',

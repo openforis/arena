@@ -1329,15 +1329,13 @@ Une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
       buttonLabel: 'Convertir en catégorie simple',
       confirmMessage: `Convertir cette catégorie GeoPackage en catégorie simple ?
 
-La propriété supplémentaire 'location' sera supprimée, et la valeur d'emplacement stockée sur chaque élément sera perdue.
-$t(common.cantUndoWarning)`,
+La propriété supplémentaire 'location' sera déverrouillée : elle pourra être renommée, son type modifié ou elle pourra être supprimée comme n'importe quelle autre propriété supplémentaire. Ses données ne sont pas affectées.`,
     },
     convertSamplingPointDataCategoryToSimple: {
       buttonLabel: 'Convertir en catégorie simple',
       confirmMessage: `Convertir cette catégorie Données de points d'échantillonnage en catégorie simple ?
 
-Le nom de la catégorie sera effacé (vous devrez lui donner un nouveau nom), la propriété supplémentaire 'location' sera supprimée, et la valeur d'emplacement stockée sur chaque élément sera perdue.
-$t(common.cantUndoWarning)`,
+Le nom de la catégorie sera effacé (vous devrez lui donner un nouveau nom), et la propriété supplémentaire 'location' sera déverrouillée : elle pourra être renommée, son type modifié ou elle pourra être supprimée comme n'importe quelle autre propriété supplémentaire. Ses données ne sont pas affectées.`,
     },
     geoPackageCategory: 'Ceci est une catégorie GeoPackage',
     samplingPointDataCategoryType: "Ceci est la catégorie Données de points d'échantillonnage",

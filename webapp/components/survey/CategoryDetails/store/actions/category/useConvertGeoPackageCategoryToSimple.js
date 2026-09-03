@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Category from '@core/survey/category'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
@@ -17,10 +18,16 @@ export const useConvertGeoPackageCategoryToSimple = ({ setState }) => {
         DialogConfirmActions.showDialogConfirm({
           key: 'categoryEdit.convertGeoPackageCategoryToSimple.confirmMessage',
           onOk: async () => {
+            // unlock the 'location' extra prop rather than deleting it, to avoid losing the location
+            // value stored on every item; the user can delete it manually afterwards if they want to
             await updateCategoryItemExtraPropItem({
               categoryUuid,
               name: Category.locationItemExtraDefName,
-              deleted: true,
+              itemExtraDef: {
+                name: Category.locationItemExtraDefName,
+                dataType: ExtraPropDef.dataTypes.geometryPoint,
+                locked: false,
+              },
             })
           },
         })
