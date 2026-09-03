@@ -14,6 +14,7 @@ import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
 import * as SurveyManager from '../manager/surveyManager'
 import * as RecordManager from '../../record/manager/recordManager'
+import { findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges } from './publish/nodeDefExtraPropDependencyUtils'
 
 // Per-record/per-step tracing is too noisy to leave on for routine runs, but invaluable when a
 // publish is slow or looks stuck. Flip to true to re-enable it.
@@ -123,6 +124,35 @@ export default class RecordCheckJob extends Job {
           nodeDefUpdatedUuids.push(nodeDefUuid)
         } else if (NodeDef.hasAdvancedPropsDraft(def) && NodeDef.hasAdvancedPropsValidationsDraft(def)) {
           // Already existing node def but only validations have been updated
+          nodeDefValidationUpdatedUuids.push(nodeDefUuid)
+        }
+      }
+
+      // 2b. determine node defs affected by a category/taxonomy extra prop change (definition or
+      // item/taxon value) - these don't have their own advanced props draft flag set (their own props
+      // didn't change), so they can't be caught by the per-node-def loop above; found separately via a
+      // survey-wide category/taxonomy diff instead. See NodeDef.referencesCategoryExtraProp/
+      // referencesTaxonomyExtraProp and findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges.
+      const { valueAffectedNodeDefUuids, validationAffectedNodeDefUuids } =
+        await findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges({ surveyId, survey }, tx)
+
+      const nodeDefUpdatedOrAddedOrDeletedUuids = new Set([
+        ...nodeDefUpdatedUuids,
+        ...nodeDefAddedUuids,
+        ...nodeDefDeletedUuids,
+      ])
+      for (const nodeDefUuid of valueAffectedNodeDefUuids) {
+        if (!nodeDefUpdatedOrAddedOrDeletedUuids.has(nodeDefUuid)) {
+          nodeDefUpdatedUuids.push(nodeDefUuid)
+          nodeDefUpdatedOrAddedOrDeletedUuids.add(nodeDefUuid)
+        }
+      }
+      const nodeDefValidationUpdatedUuidsSet = new Set(nodeDefValidationUpdatedUuids)
+      for (const nodeDefUuid of validationAffectedNodeDefUuids) {
+        if (
+          !nodeDefUpdatedOrAddedOrDeletedUuids.has(nodeDefUuid) &&
+          !nodeDefValidationUpdatedUuidsSet.has(nodeDefUuid)
+        ) {
           nodeDefValidationUpdatedUuids.push(nodeDefUuid)
         }
       }

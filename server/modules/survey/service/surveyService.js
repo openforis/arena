@@ -23,6 +23,7 @@ import * as SurveyFileManager from '../manager/surveyFileManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import SurveyCreatorJob from './surveyCreateJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
+import { findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges } from './publish/nodeDefExtraPropDependencyUtils'
 import { SchemaSummaryExportJob } from './schemaSummary'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
@@ -84,14 +85,19 @@ const _findTransitiveValueUpdateDependentUuids = ({ survey, nodeDefUuids }) => {
   return transitiveDependentUuids
 }
 
-// Names of already-published, non-deleted node defs with a value-affecting advanced prop change in
-// the draft (applicable/default values/file name expression/enumerating items expression/items
-// filter) - the same condition RecordCheckJob uses to decide a node def's value needs recalculating
-// on publish (see recordCheckJob.js and NodeDef.hasValueAffectingAdvancedPropsDraft) - plus any
-// published node def that would be updated in cascade through a chain of "default values"/"applicable"
-// expressions rooted at one of those (see _findTransitiveValueUpdateDependentUuids). A plain node-def-
-// only fetch, so this is cheap regardless of survey size or record count. backup: true keeps
-// propsAdvancedDraft separate from propsAdvanced, which hasValueAffectingAdvancedPropsDraft needs.
+// Names of already-published, non-deleted node defs at risk of having their stored record value
+// silently recalculated on publish - i.e. the same node defs RecordCheckJob would recalculate. Two
+// direct sources, unioned before the transitive-cascade walk:
+// 1. A value-affecting advanced prop change on the node def itself (applicable/default values/file
+//    name expression/enumerating items expression/items filter) - see
+//    NodeDef.hasValueAffectingAdvancedPropsDraft. backup: true keeps propsAdvancedDraft separate from
+//    propsAdvanced, which that check needs.
+// 2. A categoryItemProp/taxonProp reference to a category/taxonomy extra prop (definition or item/taxon
+//    value) that changed in the draft - see findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges.
+// Plus any published node def that would be updated in cascade through a chain of "default values"/
+// "applicable" expressions rooted at one of those (see _findTransitiveValueUpdateDependentUuids).
+// The node-def fetch itself stays a plain, cheap one regardless of survey size or record count; the
+// category/taxonomy check adds a few small extra queries (see that function for the cost profile).
 const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({ surveyId }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
     surveyId,
@@ -99,23 +105,35 @@ const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({ surveyId }) => {
     advanced: true,
     backup: true,
   })
-  const nodeDefsAtDirectRisk = Survey.getNodeDefsArray(survey).filter(
-    (nodeDef) =>
-      NodeDef.isPublished(nodeDef) &&
-      !NodeDef.isDeleted(nodeDef) &&
-      NodeDef.hasValueAffectingAdvancedPropsDraft(nodeDef)
-  )
-  const nodeDefUuidsAtDirectRisk = nodeDefsAtDirectRisk.map(NodeDef.getUuid)
+  const nodeDefUuidsWithAdvancedPropsRisk = Survey.getNodeDefsArray(survey)
+    .filter(
+      (nodeDef) =>
+        NodeDef.isPublished(nodeDef) &&
+        !NodeDef.isDeleted(nodeDef) &&
+        NodeDef.hasValueAffectingAdvancedPropsDraft(nodeDef)
+    )
+    .map(NodeDef.getUuid)
+
+  // validationAffectedNodeDefUuids intentionally unused here: this warning is about record *value*
+  // recalculation risk, not validation staleness (see recordCheckJob.js for that separate handling).
+  const { valueAffectedNodeDefUuids } = await findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges({
+    surveyId,
+    survey,
+  })
+
+  const nodeDefUuidsAtDirectRisk = [...new Set([...nodeDefUuidsWithAdvancedPropsRisk, ...valueAffectedNodeDefUuids])]
+
   const transitiveDependentUuids = _findTransitiveValueUpdateDependentUuids({
     survey,
     nodeDefUuids: nodeDefUuidsAtDirectRisk,
   })
-  const nodeDefNamesAtDirectRisk = nodeDefsAtDirectRisk.map(NodeDef.getName)
-  const transitiveDependentNames = [...transitiveDependentUuids]
+
+  const allAtRiskUuids = new Set([...nodeDefUuidsAtDirectRisk, ...transitiveDependentUuids])
+
+  return [...allAtRiskUuids]
     .map((nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey))
     .filter((nodeDef) => nodeDef && NodeDef.isPublished(nodeDef) && !NodeDef.isDeleted(nodeDef))
     .map(NodeDef.getName)
-  return [...new Set([...nodeDefNamesAtDirectRisk, ...transitiveDependentNames])]
 }
 
 // JOBS

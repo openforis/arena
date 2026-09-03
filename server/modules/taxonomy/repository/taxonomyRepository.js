@@ -643,6 +643,23 @@ export const updateTaxa = async (surveyId, taxa, client = db) =>
 export const updateTaxaProps = async ({ surveyId, taxa }, client = db) =>
   client.batch(taxa.map((taxon) => updateTaxonProps({ surveyId, taxon }, client)))
 
+// Finds taxa whose "extra" prop data has a pending draft change (i.e. props_draft has an "extra" key
+// whose value differs from the published one) - used to detect taxonomies whose extra prop values
+// (not just their extraPropsDefs schema) changed, so that node defs reading them via taxonProp can be
+// flagged for value recalculation on publish (see
+// server/modules/survey/service/publish/nodeDefExtraPropDependencyUtils.js). Filtered at the DB level
+// so surveys with no pending taxon extra-value edits (the common case) never pull taxon data into
+// memory.
+export const fetchTaxaWithChangedExtraValues = async ({ surveyId }, client = db) =>
+  client.any(
+    `SELECT t.taxonomy_uuid AS "taxonomyUuid",
+            t.props->'extra' AS "extraPublished",
+            t.props_draft->'extra' AS "extraDraft"
+     FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon t
+     WHERE t.props_draft ? 'extra'
+       AND (t.props_draft -> 'extra') IS DISTINCT FROM (t.props -> 'extra')`
+  )
+
 // ============== DELETE
 
 export const deleteTaxonomy = async (surveyId, taxonomyUuid, client = db) =>
