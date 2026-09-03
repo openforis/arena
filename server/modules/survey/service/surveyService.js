@@ -49,11 +49,48 @@ export const fetchAndAssocStorageInfo = async ({ survey }) => {
   )(survey)
 }
 
+// Dependency types whose source-side re-evaluation can, in cascade, change a dependent node def's
+// stored value: "defaultValues" (dependent's default value formula reads the source) and "applicable"
+// (dependent becoming applicable triggers its default value to be evaluated; becoming not-applicable
+// clears its value - see recordNodeDependentsDefaultValuesUpdater.js/recordNodesUpdater.js on the
+// record-update side, which re-evaluate default values on both triggers).
+const _valueUpdateCascadeDependencyTypes = [Survey.dependencyTypes.defaultValues, Survey.dependencyTypes.applicable]
+
+// Collects the uuids of node defs that transitively depend, through a "default values" or "applicable"
+// expression, on any of the given node def uuids - e.g. if A's value is changing and B's default value
+// expression (or applicable expression) reads A, and C's reads B, both B and C are at risk of having
+// their stored value recalculated (evaluated or cleared) in cascade when A's value changes on publish.
+// dependencyGraph is single-hop only (see Survey.getNodeDefDependencies), so this walks it transitively,
+// one hop at a time and across both dependency types, to reach the full transitive closure.
+const _findTransitiveValueUpdateDependentUuids = ({ survey, nodeDefUuids }) => {
+  const visitedUuids = new Set(nodeDefUuids)
+  const transitiveDependentUuids = new Set()
+  const stack = [...nodeDefUuids]
+
+  while (stack.length > 0) {
+    const nodeDefUuidCurrent = stack.pop()
+    for (const dependencyType of _valueUpdateCascadeDependencyTypes) {
+      const dependents = Survey.getNodeDefDependencies(nodeDefUuidCurrent, dependencyType)(survey)
+      for (const nodeDefDependent of dependents) {
+        const nodeDefDependentUuid = NodeDef.getUuid(nodeDefDependent)
+        if (!visitedUuids.has(nodeDefDependentUuid)) {
+          visitedUuids.add(nodeDefDependentUuid)
+          transitiveDependentUuids.add(nodeDefDependentUuid)
+          stack.push(nodeDefDependentUuid)
+        }
+      }
+    }
+  }
+  return transitiveDependentUuids
+}
+
 // Names of already-published, non-deleted node defs with a value-affecting advanced prop change in
 // the draft (applicable/default values/file name expression/enumerating items expression/items
 // filter) - the same condition RecordCheckJob uses to decide a node def's value needs recalculating
-// on publish (see recordCheckJob.js and NodeDef.hasValueAffectingAdvancedPropsDraft). A plain
-// node-def-only fetch, so this is cheap regardless of survey size or record count. backup: true keeps
+// on publish (see recordCheckJob.js and NodeDef.hasValueAffectingAdvancedPropsDraft) - plus any
+// published node def that would be updated in cascade through a chain of "default values"/"applicable"
+// expressions rooted at one of those (see _findTransitiveValueUpdateDependentUuids). A plain node-def-
+// only fetch, so this is cheap regardless of survey size or record count. backup: true keeps
 // propsAdvancedDraft separate from propsAdvanced, which hasValueAffectingAdvancedPropsDraft needs.
 const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({ surveyId }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
@@ -62,14 +99,23 @@ const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({ surveyId }) => {
     advanced: true,
     backup: true,
   })
-  return Survey.getNodeDefsArray(survey)
-    .filter(
-      (nodeDef) =>
-        NodeDef.isPublished(nodeDef) &&
-        !NodeDef.isDeleted(nodeDef) &&
-        NodeDef.hasValueAffectingAdvancedPropsDraft(nodeDef)
-    )
+  const nodeDefsAtDirectRisk = Survey.getNodeDefsArray(survey).filter(
+    (nodeDef) =>
+      NodeDef.isPublished(nodeDef) &&
+      !NodeDef.isDeleted(nodeDef) &&
+      NodeDef.hasValueAffectingAdvancedPropsDraft(nodeDef)
+  )
+  const nodeDefUuidsAtDirectRisk = nodeDefsAtDirectRisk.map(NodeDef.getUuid)
+  const transitiveDependentUuids = _findTransitiveValueUpdateDependentUuids({
+    survey,
+    nodeDefUuids: nodeDefUuidsAtDirectRisk,
+  })
+  const nodeDefNamesAtDirectRisk = nodeDefsAtDirectRisk.map(NodeDef.getName)
+  const transitiveDependentNames = [...transitiveDependentUuids]
+    .map((nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey))
+    .filter((nodeDef) => nodeDef && NodeDef.isPublished(nodeDef) && !NodeDef.isDeleted(nodeDef))
     .map(NodeDef.getName)
+  return [...new Set([...nodeDefNamesAtDirectRisk, ...transitiveDependentNames])]
 }
 
 // JOBS
