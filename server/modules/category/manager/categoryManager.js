@@ -717,12 +717,12 @@ export const convertCategoryToSamplingPointData = async (
 
     if (Category.getName(category) !== Category.samplingPointDataCategoryName) {
       const categories = await CategoryRepository.fetchCategoriesBySurveyId({ surveyId, draft: true }, t)
-      const duplicate = categories.find(
+      const hasDuplicate = categories.some(
         (otherCategory) =>
           Category.getUuid(otherCategory) !== categoryUuid &&
           Category.getName(otherCategory) === Category.samplingPointDataCategoryName
       )
-      if (duplicate) {
+      if (hasDuplicate) {
         throw new SystemError(
           'validationErrors:category.samplingPointDataCategoryAlreadyExists',
           {},

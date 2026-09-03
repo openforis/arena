@@ -27,7 +27,7 @@ const locationExtraPropName = Category.locationItemExtraDefName
 const geometryColumnName = 'geom'
 const idColumnName = 'id'
 
-const sanitizeTableName = (name: string): string => (name || 'category').replace(/[^a-zA-Z0-9_]/g, '_').slice(0, 63)
+const sanitizeTableName = (name: string): string => (name || 'category').replace(/\W/g, '_').slice(0, 63)
 
 /**
  * Exports the items of a category into a GeoPackage file (one feature table, Point geometries).

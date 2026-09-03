@@ -95,6 +95,25 @@ const CategoryDetails = (props) => {
     )
   }
 
+  const getConvertToSimpleCategoryMenuItem = () => {
+    if (isSamplingPointData) {
+      return {
+        key: 'convert-sampling-point-data-category-to-simple',
+        label: 'categoryEdit.convertSamplingPointDataCategoryToSimple.buttonLabel',
+        onClick: () => Actions.convertSamplingPointDataCategoryToSimple(categoryUuid),
+      }
+    }
+    if (isLocationExtraPropLocked) {
+      return {
+        key: 'convert-geopackage-category-to-simple',
+        label: 'categoryEdit.convertGeoPackageCategoryToSimple.buttonLabel',
+        onClick: () => Actions.convertGeoPackageCategoryToSimple(categoryUuid),
+      }
+    }
+    return null
+  }
+  const convertToSimpleCategoryMenuItem = getConvertToSimpleCategoryMenuItem()
+
   return (
     <>
       <div className="category">
@@ -201,23 +220,7 @@ const CategoryDetails = (props) => {
                             },
                           ]
                         : []),
-                      ...(isSamplingPointData
-                        ? [
-                            {
-                              key: 'convert-sampling-point-data-category-to-simple',
-                              label: 'categoryEdit.convertSamplingPointDataCategoryToSimple.buttonLabel',
-                              onClick: () => Actions.convertSamplingPointDataCategoryToSimple(categoryUuid),
-                            },
-                          ]
-                        : isLocationExtraPropLocked
-                          ? [
-                              {
-                                key: 'convert-geopackage-category-to-simple',
-                                label: 'categoryEdit.convertGeoPackageCategoryToSimple.buttonLabel',
-                                onClick: () => Actions.convertGeoPackageCategoryToSimple(categoryUuid),
-                              },
-                            ]
-                          : []),
+                      ...(convertToSimpleCategoryMenuItem ? [convertToSimpleCategoryMenuItem] : []),
                       {
                         key: 'extra-props-editor',
                         label: 'extraProp.editor.title',
