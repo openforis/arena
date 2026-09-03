@@ -19,8 +19,8 @@ $borderColor: $greyBorder;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
+  align-self: center;
   gap: 2rem;
-  width: 100%;
 
   .category__header-column {
     display: flex;
@@ -28,12 +28,9 @@ $borderColor: $greyBorder;
     gap: 0.5rem;
   }
 
-  .category__header-column-fields {
-    flex: 0 0 auto;
-  }
-
+  .category__header-column-fields,
   .category__header-column-actions {
-    flex: 1;
+    flex: 0 0 auto;
   }
 
   .row {
