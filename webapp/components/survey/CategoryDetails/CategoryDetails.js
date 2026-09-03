@@ -15,6 +15,7 @@ import * as Validation from '@core/validation/validation'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useCategoryByName, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
@@ -49,6 +50,7 @@ const CategoryDetails = (props) => {
   const surveyId = useSurveyId()
 
   const readOnly = !useAuthCanEditSurvey()
+  const i18n = useI18n()
 
   const { state, setState } = useLocalState({
     categoryUuid: categoryUuidProp || categoryUuidParam,
@@ -165,6 +167,23 @@ const CategoryDetails = (props) => {
                           },
                         ]
                       : []),
+                    ...(isSamplingPointData
+                      ? [
+                          {
+                            key: 'convert-sampling-point-data-category-to-simple',
+                            label: 'categoryEdit.convertSamplingPointDataCategoryToSimple.buttonLabel',
+                            onClick: () => Actions.convertSamplingPointDataCategoryToSimple(categoryUuid),
+                          },
+                        ]
+                      : hasLocationExtraProp
+                        ? [
+                            {
+                              key: 'convert-geopackage-category-to-simple',
+                              label: 'categoryEdit.convertGeoPackageCategoryToSimple.buttonLabel',
+                              onClick: () => Actions.convertGeoPackageCategoryToSimple(categoryUuid),
+                            },
+                          ]
+                        : []),
                     {
                       key: 'extra-props-editor',
                       label: 'extraProp.editor.title',
@@ -215,6 +234,14 @@ const CategoryDetails = (props) => {
                 label="categoryEdit.reportingData"
                 onChange={Actions.convertToSimpleCategory}
               />
+            )}
+
+            {isSamplingPointData ? (
+              <span className="category-type-label">{i18n.t('categoryEdit.samplingPointDataCategoryType')}</span>
+            ) : (
+              hasLocationExtraProp && (
+                <span className="category-type-label">{i18n.t('categoryEdit.geoPackageCategory')}</span>
+              )
             )}
           </div>
         </div>

@@ -1321,6 +1321,22 @@ The category will be renamed to 'sampling_point_data' and a 'location' extra pro
 
 A 'location' extra property will be added to the items.`,
     },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this GeoPackage category to a simple category?
+
+The 'location' extra property will be removed, and the location value stored on every item will be lost.
+$t(common.cantUndoWarning)`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this Sampling Point Data category to a simple category?
+
+The category name will be cleared (you'll need to give it a new name), the 'location' extra property will be removed, and the location value stored on every item will be lost.
+$t(common.cantUndoWarning)`,
+    },
+    geoPackageCategory: 'This is a GeoPackage category',
+    samplingPointDataCategoryType: 'This is the Sampling Point Data category',
     createCategory: {
       menuLabel: 'Add category',
       simple: 'Simple category',

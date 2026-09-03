@@ -1288,6 +1288,22 @@ $t(common.cantUndoWarning)`,
 
 К элементам будет добавлено дополнительное свойство 'location'.`,
     },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию GeoPackage в простую категорию?
+
+Дополнительное свойство 'location' будет удалено, и значение местоположения, сохранённое в каждом элементе, будет потеряно.
+$t(common.cantUndoWarning)`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию данных точек выборки в простую категорию?
+
+Имя категории будет очищено (вам нужно будет присвоить ей новое имя), дополнительное свойство 'location' будет удалено, и значение местоположения, сохранённое в каждом элементе, будет потеряно.
+$t(common.cantUndoWarning)`,
+    },
+    geoPackageCategory: 'Это категория GeoPackage',
+    samplingPointDataCategoryType: 'Это категория данных точек выборки',
     createCategory: {
       menuLabel: 'Добавить категорию',
       simple: 'Простая категория',

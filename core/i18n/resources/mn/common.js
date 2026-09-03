@@ -1279,6 +1279,22 @@ $t(common.cantUndoWarning)`,
 
 Элементүүдэд 'location' нэмэлт талбар нэмэгдэнэ.`,
     },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
+      confirmMessage: `Энэ GeoPackage ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
+
+'location' нэмэлт талбар устгагдаж, элемент бүрт хадгалагдсан байршлын утга алдагдана.
+$t(common.cantUndoWarning)`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
+      confirmMessage: `Энэ Дээж цэгийн өгөгдлийн ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
+
+Ангиллын нэрийг цэвэрлэх бөгөөд (шинэ нэр өгөх шаардлагатай болно), 'location' нэмэлт талбар устгагдаж, элемент бүрт хадгалагдсан байршлын утга алдагдана.
+$t(common.cantUndoWarning)`,
+    },
+    geoPackageCategory: 'Энэ бол GeoPackage ангилал юм',
+    samplingPointDataCategoryType: 'Энэ бол Дээж цэгийн өгөгдлийн ангилал юм',
     createCategory: {
       menuLabel: 'Ангилал нэмэх',
       simple: 'Энгийн ангилал',

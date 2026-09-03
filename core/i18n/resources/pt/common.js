@@ -1313,6 +1313,22 @@ A categoria será renomeada para 'sampling_point_data' e uma propriedade extra '
 
 Uma propriedade extra 'location' será adicionada aos itens.`,
     },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Converter para categoria simples',
+      confirmMessage: `Converter esta categoria GeoPackage em uma categoria simples?
+
+A propriedade extra 'location' será removida, e o valor de localização armazenado em cada item será perdido.
+$t(common.cantUndoWarning)`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Converter para categoria simples',
+      confirmMessage: `Converter esta categoria de Dados de Ponto Amostral em uma categoria simples?
+
+O nome da categoria será apagado (você precisará dar um novo nome a ela), a propriedade extra 'location' será removida, e o valor de localização armazenado em cada item será perdido.
+$t(common.cantUndoWarning)`,
+    },
+    geoPackageCategory: 'Esta é uma categoria GeoPackage',
+    samplingPointDataCategoryType: 'Esta é a categoria de Dados de Ponto Amostral',
     createCategory: {
       menuLabel: 'Adicionar categoria',
       simple: 'Categoria simples',

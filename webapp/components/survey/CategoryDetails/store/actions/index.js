@@ -6,6 +6,8 @@ import { useCleanupCategory } from './category/useCleanupCategory'
 import { useConvertToReportingDataCategory } from './category/useConvertToReportingDataCategory'
 import { useConvertToSamplingPointDataCategory } from './category/useConvertToSamplingPointDataCategory'
 import { useConvertToGeoPackageCategory } from './category/useConvertToGeoPackageCategory'
+import { useConvertGeoPackageCategoryToSimple } from './category/useConvertGeoPackageCategoryToSimple'
+import { useConvertSamplingPointDataCategoryToSimple } from './category/useConvertSamplingPointDataCategoryToSimple'
 import { useConvertToSimpleCategory } from './category/useConvertToSimpleCategory'
 import { useExportToGeoPackage } from './category/useExportToGeoPackage'
 import { useOnDoneClick } from './category/useOnDoneClick'
@@ -38,6 +40,8 @@ export const useActions = ({ setState }) => ({
   convertToReportingDataCategory: useConvertToReportingDataCategory({ setState }),
   convertToSamplingPointDataCategory: useConvertToSamplingPointDataCategory({ setState }),
   convertToGeoPackageCategory: useConvertToGeoPackageCategory({ setState }),
+  convertGeoPackageCategoryToSimple: useConvertGeoPackageCategoryToSimple({ setState }),
+  convertSamplingPointDataCategoryToSimple: useConvertSamplingPointDataCategoryToSimple({ setState }),
   convertToSimpleCategory: useConvertToSimpleCategory({ setState }),
   exportToGeoPackage: useExportToGeoPackage(),
   onDoneClick: useOnDoneClick({ setState }),
