@@ -60,8 +60,8 @@ const _valueUpdateCascadeDependencyTypes = [Survey.dependencyTypes.defaultValues
 // expression, on any of the given node def uuids - e.g. if A's value is changing and B's default value
 // expression (or applicable expression) reads A, and C's reads B, both B and C are at risk of having
 // their stored value recalculated (evaluated or cleared) in cascade when A's value changes on publish.
-// dependencyGraph is single-hop only (see Survey.getNodeDefDependencies), so this walks it breadth-
-// first, one hop at a time and across both dependency types, to reach the full transitive closure.
+// dependencyGraph is single-hop only (see Survey.getNodeDefDependencies), so this walks it transitively,
+// one hop at a time and across both dependency types, to reach the full transitive closure.
 const _findTransitiveValueUpdateDependentUuids = ({ survey, nodeDefUuids }) => {
   const visitedUuids = new Set(nodeDefUuids)
   const transitiveDependentUuids = new Set()
@@ -111,9 +111,10 @@ const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({ surveyId }) => {
     nodeDefUuids: nodeDefUuidsAtDirectRisk,
   })
   const nodeDefNamesAtDirectRisk = nodeDefsAtDirectRisk.map(NodeDef.getName)
-  const transitiveDependentNames = [...transitiveDependentUuids].map((nodeDefUuid) =>
-    NodeDef.getName(Survey.getNodeDefByUuid(nodeDefUuid)(survey))
-  )
+  const transitiveDependentNames = [...transitiveDependentUuids]
+    .map((nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey))
+    .filter((nodeDef) => nodeDef && NodeDef.isPublished(nodeDef) && !NodeDef.isDeleted(nodeDef))
+    .map(NodeDef.getName)
   return [...new Set([...nodeDefNamesAtDirectRisk, ...transitiveDependentNames])]
 }
 
