@@ -1293,6 +1293,35 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Converter esta categoria de dados de reporte em uma categoria simples?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Converter para Dados de Ponto Amostral',
+      confirmMessage: `Converter esta categoria na categoria de Dados de Ponto Amostral?
+
+A categoria será renomeada para 'sampling_point_data' e uma propriedade extra 'location' será adicionada aos itens.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Converter para categoria GeoPackage',
+      confirmMessage: `Converter esta categoria em uma categoria GeoPackage?
+
+Uma propriedade extra 'location' será adicionada aos itens.`,
+    },
+    createCategory: {
+      menuLabel: 'Adicionar categoria',
+      simple: 'Categoria simples',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Categoria de Dados de Ponto Amostral',
+      message: `Criar uma nova categoria de Dados de Ponto Amostral?
+
+Uma propriedade extra 'location' será adicionada aos itens.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Categoria GeoPackage',
+      message: `Criar uma nova categoria GeoPackage?
+
+Uma propriedade extra 'location' será adicionada aos itens.`,
+    },
+    lockFixedProperties: 'Bloquear propriedades fixas',
     deleteItem: 'Excluir item',
     level: {
       title: 'Nível {{levelPosition}}',
@@ -1316,6 +1345,8 @@ $t(common.cantUndoWarning)`,
       title: 'Resumo da importação de categoria',
     },
     reportingData: 'Dados de reporte',
+    exportToGeoPackage: 'Exportar para GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} item(ns) sem localização válida foram ignorados.',
     templateFor_samplingPointDataImport_csv: 'Modelo para importação de dados de ponto amostral (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Modelo para importação de dados de ponto amostral (Excel)',
   },

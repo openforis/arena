@@ -1302,6 +1302,35 @@ Les niveaux seront renommés en niveau_1, niveau_2... niveau_N et une propriét�
     convertToSimpleCategory: {
       confirmMessage: `Convertir cette catégorie de données de rapport en catégorie simple ?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: "Convertir en Données de points d'échantillonnage",
+      confirmMessage: `Convertir cette catégorie en catégorie Données de points d'échantillonnage ?
+
+La catégorie sera renommée en 'sampling_point_data' et une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convertir en catégorie GeoPackage',
+      confirmMessage: `Convertir cette catégorie en catégorie GeoPackage ?
+
+Une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
+    },
+    createCategory: {
+      menuLabel: 'Ajouter une catégorie',
+      simple: 'Catégorie simple',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: "Catégorie Données de points d'échantillonnage",
+      message: `Créer une nouvelle catégorie Données de points d'échantillonnage ?
+
+Une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Catégorie GeoPackage',
+      message: `Créer une nouvelle catégorie GeoPackage ?
+
+Une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
+    },
+    lockFixedProperties: 'Verrouiller les propriétés fixes',
     deleteItem: "Supprimer l'élément",
     level: {
       title: 'Niveau {{levelPosition}}',
@@ -1325,6 +1354,8 @@ Les niveaux seront renommés en niveau_1, niveau_2... niveau_N et une propriét�
       title: "Résumé de l'importation de catégorie",
     },
     reportingData: 'Données de rapport',
+    exportToGeoPackage: 'Exporter vers GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} élément(s) sans emplacement valide ont été ignorés.',
     templateFor_samplingPointDataImport_csv: "Modèle pour l'importation de données de points d'échantillonnage (CSV)",
     templateFor_samplingPointDataImport_xlsx:
       "Modèle pour l'importation de données de points d'échantillonnage (Excel)",

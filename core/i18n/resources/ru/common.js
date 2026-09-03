@@ -1268,6 +1268,35 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Преобразовать эту категорию отчетных данных в простую категорию?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Преобразовать в данные точек выборки',
+      confirmMessage: `Преобразовать эту категорию в категорию данных точек выборки?
+
+Категория будет переименована в 'sampling_point_data', и к элементам будет добавлено дополнительное свойство 'location'.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Преобразовать в категорию GeoPackage',
+      confirmMessage: `Преобразовать эту категорию в категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство 'location'.`,
+    },
+    createCategory: {
+      menuLabel: 'Добавить категорию',
+      simple: 'Простая категория',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Категория данных точек выборки',
+      message: `Создать новую категорию данных точек выборки?
+
+К элементам будет добавлено дополнительное свойство 'location'.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Категория GeoPackage',
+      message: `Создать новую категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство 'location'.`,
+    },
+    lockFixedProperties: 'Заблокировать фиксированные свойства',
     deleteItem: 'Удалить элемент',
     level: {
       title: 'Уровень {{levelPosition}}',
@@ -1291,6 +1320,8 @@ $t(common.cantUndoWarning)`,
       title: 'Сводка импорта категорий',
     },
     reportingData: 'Отчетные данные',
+    exportToGeoPackage: 'Экспорт в GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} элемент(ов) без действительного местоположения были пропущены.',
     templateFor_samplingPointDataImport_csv: 'Шаблон для импорта данных точек выборки (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Шаблон для импорта данных точек выборки (Excel)',
   },

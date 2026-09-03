@@ -1135,6 +1135,30 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     convertToSimpleCategory: {
       confirmMessage: '¿Convertir esta categoría de datos de informes a una categoría simple?',
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convertir a Datos de puntos de muestreo',
+      confirmMessage:
+        "¿Convertir esta categoría en la categoría de Datos de puntos de muestreo?\n\nLa categoría se renombrará a 'sampling_point_data' y se añadirá una propiedad extra 'location' a los elementos.",
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convertir a categoría GeoPackage',
+      confirmMessage:
+        "¿Convertir esta categoría en una categoría GeoPackage?\n\nSe añadirá una propiedad extra 'location' a los elementos.",
+    },
+    createCategory: {
+      menuLabel: 'Añadir categoría',
+      simple: 'Categoría simple',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Categoría de Datos de puntos de muestreo',
+      message:
+        "¿Crear una nueva categoría de Datos de puntos de muestreo?\n\nSe añadirá una propiedad extra 'location' a los elementos.",
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Categoría GeoPackage',
+      message: "¿Crear una nueva categoría GeoPackage?\n\nSe añadirá una propiedad extra 'location' a los elementos.",
+    },
+    lockFixedProperties: 'Bloquear propiedades fijas',
     deleteItem: 'Eliminar elemento',
     level: {
       title: 'Nivel {{levelPosition}}',
@@ -1157,6 +1181,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       title: 'Resumen de importación de categoría',
     },
     reportingData: 'Datos de informes',
+    exportToGeoPackage: 'Exportar a GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} elemento(s) sin una ubicación válida fueron omitidos.',
     templateFor_samplingPointDataImport_csv: 'Plantilla para importación de datos de puntos de muestreo (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Plantilla para importación de datos de puntos de muestreo (Excel)',
   },
