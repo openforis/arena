@@ -12,8 +12,8 @@ export const useConvertToGeoPackageCategory = ({ setState }) => {
   const init = useInit({ setState })
 
   return useCallback(
-    async ({ categoryUuid, locked, onCategoryUpdate }) => {
-      const category = await API.convertToGeoPackageCategory({ surveyId, categoryUuid, locked })
+    async ({ categoryUuid, onCategoryUpdate }) => {
+      const category = await API.convertToGeoPackageCategory({ surveyId, categoryUuid })
 
       dispatch(SurveyActions.surveyCategoryUpdated(category))
       dispatch(SurveyActions.metaUpdated())

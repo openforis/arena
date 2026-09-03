@@ -1,8 +1,8 @@
 import './CategoryDetails.scss'
 
-import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useParams } from 'react-router'
+import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
 import { FileFormats } from '@core/fileFormats'
@@ -15,6 +15,7 @@ import * as Validation from '@core/validation/validation'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useCategoryByName, useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
@@ -24,7 +25,6 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
 
 import { ExtraPropDefsEditorPanel } from '../ExtraPropDefsEditor'
-import { LockFixedPropertiesDialog } from '../CategoryList/LockFixedPropertiesDialog'
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
@@ -50,6 +50,7 @@ const CategoryDetails = (props) => {
 
   const readOnly = !useAuthCanEditSurvey()
   const i18n = useI18n()
+  const dispatch = useDispatch()
 
   const { state, setState } = useLocalState({
     categoryUuid: categoryUuidProp || categoryUuidParam,
@@ -58,7 +59,6 @@ const CategoryDetails = (props) => {
   const Actions = useActions({ setState })
 
   const samplingPointDataCategory = useCategoryByName(Survey.samplingPointDataCategoryName)
-  const [convertDialogType, setConvertDialogType] = useState(null) // 'samplingPointData' | 'geoPackage' | null
 
   const category = State.getCategory(state)
 
@@ -76,6 +76,24 @@ const CategoryDetails = (props) => {
 
   const hasLocationExtraProp = Category.hasLocationExtraProp(category)
   const isSamplingPointData = Category.getName(category) === Survey.samplingPointDataCategoryName
+
+  // the extra prop(s) added by these conversions are always locked: there is no meaningful
+  // reason to leave them unlocked right after converting the category to one of these types
+  const confirmConvertCategory = (templateType) => {
+    const action =
+      templateType === 'samplingPointData'
+        ? Actions.convertToSamplingPointDataCategory
+        : Actions.convertToGeoPackageCategory
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key:
+          templateType === 'samplingPointData'
+            ? 'categoryEdit.convertToSamplingPointDataCategory.confirmMessage'
+            : 'categoryEdit.convertToGeoPackageCategory.confirmMessage',
+        onOk: () => action({ categoryUuid, onCategoryUpdate }),
+      })
+    )
+  }
 
   return (
     <>
@@ -170,7 +188,7 @@ const CategoryDetails = (props) => {
                             {
                               key: 'convert-to-sampling-point-data-category',
                               label: 'categoryEdit.convertToSamplingPointDataCategory.buttonLabel',
-                              onClick: () => setConvertDialogType('samplingPointData'),
+                              onClick: () => confirmConvertCategory('samplingPointData'),
                             },
                           ]
                         : []),
@@ -179,7 +197,7 @@ const CategoryDetails = (props) => {
                             {
                               key: 'convert-to-geopackage-category',
                               label: 'categoryEdit.convertToGeoPackageCategory.buttonLabel',
-                              onClick: () => setConvertDialogType('geoPackage'),
+                              onClick: () => confirmConvertCategory('geoPackage'),
                             },
                           ]
                         : []),
@@ -310,30 +328,6 @@ const CategoryDetails = (props) => {
       </div>
 
       {importSummary && <ImportSummary state={state} setState={setState} />}
-
-      {convertDialogType && (
-        <LockFixedPropertiesDialog
-          titleKey={
-            convertDialogType === 'samplingPointData'
-              ? 'categoryEdit.convertToSamplingPointDataCategory.buttonLabel'
-              : 'categoryEdit.convertToGeoPackageCategory.buttonLabel'
-          }
-          messageKey={
-            convertDialogType === 'samplingPointData'
-              ? 'categoryEdit.convertToSamplingPointDataCategory.confirmMessage'
-              : 'categoryEdit.convertToGeoPackageCategory.confirmMessage'
-          }
-          onClose={() => setConvertDialogType(null)}
-          onConfirm={({ locked }) => {
-            const action =
-              convertDialogType === 'samplingPointData'
-                ? Actions.convertToSamplingPointDataCategory
-                : Actions.convertToGeoPackageCategory
-            setConvertDialogType(null)
-            action({ categoryUuid, locked, onCategoryUpdate })
-          }}
-        />
-      )}
     </>
   )
 }

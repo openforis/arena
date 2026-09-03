@@ -15,9 +15,9 @@ import { designerModules, appModuleUri } from '@webapp/app/appModules'
 import * as API from '@webapp/service/api'
 import { SurveyActions, useSurveyId, useCategoryByName } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { CategoryCloneFromSurveyDialog } from '../CategoryCloneFromSurveyDialog'
-import { LockFixedPropertiesDialog } from '../LockFixedPropertiesDialog'
 import { useActions, State } from '../store'
 
 const TableHeaderLeft = (props) => {
@@ -57,7 +57,6 @@ const TableHeaderLeft = (props) => {
   }
 
   const samplingPointDataCategory = useCategoryByName(Survey.samplingPointDataCategoryName)
-  const [templateDialogType, setTemplateDialogType] = useState(null) // 'samplingPointData' | 'geoPackage' | null
 
   const insertAndNotify = (category) => {
     dispatch(SurveyActions.surveyCategoryInserted(category))
@@ -70,15 +69,28 @@ const TableHeaderLeft = (props) => {
     insertAndNotify(category)
   }
 
-  const createTemplateCategory = async ({ locked }) => {
+  // the extra prop(s) added by these templates are always locked: there is no meaningful
+  // reason to leave them unlocked right after creating the category from a template
+  const createTemplateCategory = async (templateType) => {
     const category = await API.createCategory({ surveyId })
     const categoryUuid = Category.getUuid(category)
     const categoryUpdated =
-      templateDialogType === 'samplingPointData'
-        ? await API.convertToSamplingPointDataCategory({ surveyId, categoryUuid, locked })
-        : await API.convertToGeoPackageCategory({ surveyId, categoryUuid, locked })
-    setTemplateDialogType(null)
+      templateType === 'samplingPointData'
+        ? await API.convertToSamplingPointDataCategory({ surveyId, categoryUuid })
+        : await API.convertToGeoPackageCategory({ surveyId, categoryUuid })
     insertAndNotify(categoryUpdated)
+  }
+
+  const confirmCreateTemplateCategory = (templateType) => {
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key:
+          templateType === 'samplingPointData'
+            ? 'categoryEdit.createSamplingPointDataCategory.message'
+            : 'categoryEdit.createGeoPackageCategory.message',
+        onOk: () => createTemplateCategory(templateType),
+      })
+    )
   }
 
   if (!canEditSurvey) {
@@ -106,35 +118,18 @@ const TableHeaderLeft = (props) => {
                   {
                     key: 'sampling-point-data',
                     label: 'categoryEdit.createSamplingPointDataCategory.buttonLabel',
-                    onClick: () => setTemplateDialogType('samplingPointData'),
+                    onClick: () => confirmCreateTemplateCategory('samplingPointData'),
                   },
                 ]),
             {
               key: 'geopackage',
               label: 'categoryEdit.createGeoPackageCategory.buttonLabel',
-              onClick: () => setTemplateDialogType('geoPackage'),
+              onClick: () => confirmCreateTemplateCategory('geoPackage'),
             },
           ]}
           size="small"
         />
       </span>
-
-      {templateDialogType && (
-        <LockFixedPropertiesDialog
-          titleKey={
-            templateDialogType === 'samplingPointData'
-              ? 'categoryEdit.createSamplingPointDataCategory.buttonLabel'
-              : 'categoryEdit.createGeoPackageCategory.buttonLabel'
-          }
-          messageKey={
-            templateDialogType === 'samplingPointData'
-              ? 'categoryEdit.createSamplingPointDataCategory.message'
-              : 'categoryEdit.createGeoPackageCategory.message'
-          }
-          onClose={() => setTemplateDialogType(null)}
-          onConfirm={createTemplateCategory}
-        />
-      )}
 
       <Button
         iconClassName="icon-copy"

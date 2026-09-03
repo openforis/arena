@@ -1355,7 +1355,6 @@ A 'location' extra property will be added to the items.`,
 
 A 'location' extra property will be added to the items.`,
     },
-    lockFixedProperties: 'Lock fixed properties',
     deleteItem: 'Delete item',
     level: {
       title: 'Level {{levelPosition}}',

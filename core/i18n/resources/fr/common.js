@@ -1356,7 +1356,6 @@ Une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
 
 Une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
     },
-    lockFixedProperties: 'Verrouiller les propriétés fixes',
     deleteItem: "Supprimer l'élément",
     level: {
       title: 'Niveau {{levelPosition}}',

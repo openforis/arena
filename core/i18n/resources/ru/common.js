@@ -1322,7 +1322,6 @@ $t(common.cantUndoWarning)`,
 
 К элементам будет добавлено дополнительное свойство 'location'.`,
     },
-    lockFixedProperties: 'Заблокировать фиксированные свойства',
     deleteItem: 'Удалить элемент',
     level: {
       title: 'Уровень {{levelPosition}}',

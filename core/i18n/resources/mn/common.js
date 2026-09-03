@@ -1313,7 +1313,6 @@ $t(common.cantUndoWarning)`,
 
 Элементүүдэд 'location' нэмэлт талбар нэмэгдэнэ.`,
     },
-    lockFixedProperties: 'Тогтмол шинж чанаруудыг түгжих',
     deleteItem: 'Элемент устгах',
     level: {
       title: 'Түвшин {{levelPosition}}',

@@ -1182,7 +1182,6 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       buttonLabel: 'Categoría GeoPackage',
       message: "¿Crear una nueva categoría GeoPackage?\n\nSe añadirá una propiedad extra 'location' a los elementos.",
     },
-    lockFixedProperties: 'Bloquear propiedades fijas',
     deleteItem: 'Eliminar elemento',
     level: {
       title: 'Nivel {{levelPosition}}',

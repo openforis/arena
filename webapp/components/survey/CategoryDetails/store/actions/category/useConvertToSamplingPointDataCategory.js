@@ -14,9 +14,9 @@ export const useConvertToSamplingPointDataCategory = ({ setState }) => {
   const notifyError = useNotifyError()
 
   return useCallback(
-    async ({ categoryUuid, locked, onCategoryUpdate }) => {
+    async ({ categoryUuid, onCategoryUpdate }) => {
       try {
-        const category = await API.convertToSamplingPointDataCategory({ surveyId, categoryUuid, locked })
+        const category = await API.convertToSamplingPointDataCategory({ surveyId, categoryUuid })
 
         dispatch(SurveyActions.surveyCategoryUpdated(category))
         dispatch(SurveyActions.metaUpdated())

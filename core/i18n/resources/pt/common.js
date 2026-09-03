@@ -1347,7 +1347,6 @@ Uma propriedade extra 'location' será adicionada aos itens.`,
 
 Uma propriedade extra 'location' será adicionada aos itens.`,
     },
-    lockFixedProperties: 'Bloquear propriedades fixas',
     deleteItem: 'Excluir item',
     level: {
       title: 'Nível {{levelPosition}}',
