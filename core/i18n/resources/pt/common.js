@@ -1270,10 +1270,13 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
       noCategoriesAvailable: 'Nenhuma categoria disponível no inquérito selecionado',
     },
     itemsCount: 'Contagem de itens',
+    structure: 'Estrutura',
     types: {
       flat: 'Plano',
       hierarchical: 'Hierárquico',
       reportingData: 'Dados de reporte',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Dados de Ponto Amostral',
     },
   },
 

@@ -133,6 +133,14 @@ export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
 export const getItemExtraDefsArray = R.pipe(getItemExtraDef, ExtraPropDef.extraDefsToArray)
 export const getItemExtraDefKeys = (category) => getItemExtraDefsArray(category).map(ExtraPropDef.getName)
 
+// true if the category has an extra prop def named 'location' of type geometryPoint, i.e. it is exportable to GeoPackage
+export const hasLocationExtraProp = (category) =>
+  getItemExtraDefsArray(category).some(
+    (extraDef) =>
+      ExtraPropDef.getName(extraDef) === locationItemExtraDefName &&
+      ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.geometryPoint
+  )
+
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 
 // ========

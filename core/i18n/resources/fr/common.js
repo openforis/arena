@@ -1279,10 +1279,13 @@ Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un att
       noCategoriesAvailable: "Aucune catégorie disponible dans l'enquête sélectionnée",
     },
     itemsCount: "Nombre d'éléments",
+    structure: 'Structure',
     types: {
       flat: 'Plat',
       hierarchical: 'Hiérarchique',
       reportingData: 'Données de rapport',
+      geoPackage: 'GeoPackage',
+      samplingPointData: "Données de points d'échantillonnage",
     },
   },
 

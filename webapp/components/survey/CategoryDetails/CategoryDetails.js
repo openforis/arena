@@ -10,7 +10,6 @@ import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -75,11 +74,7 @@ const CategoryDetails = (props) => {
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
 
-  const hasLocationExtraProp = Category.getItemExtraDefsArray(category).some(
-    (extraDef) =>
-      ExtraPropDef.getName(extraDef) === Category.locationItemExtraDefName &&
-      ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.geometryPoint
-  )
+  const hasLocationExtraProp = Category.hasLocationExtraProp(category)
   const isSamplingPointData = Category.getName(category) === Survey.samplingPointDataCategoryName
 
   return (

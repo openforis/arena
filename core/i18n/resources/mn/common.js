@@ -1236,10 +1236,13 @@ $t(common.appNameFull)
       noCategoriesAvailable: 'Сонгосон судалгаанд ангилал алга байна',
     },
     itemsCount: 'Элементүүдийн тоо',
+    structure: 'Бүтэц',
     types: {
       flat: 'Хавтгай',
       hierarchical: 'Иерархи',
       reportingData: 'Тайлагнах өгөгдөл',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Дээж цэгийн өгөгдөл',
     },
   },
 

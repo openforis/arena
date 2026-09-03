@@ -1117,10 +1117,13 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       noCategoriesAvailable: 'No hay categorías disponibles en la encuesta seleccionada',
     },
     itemsCount: 'Recuento de elementos',
+    structure: 'Estructura',
     types: {
       flat: 'Plana',
       hierarchical: 'Jerárquica',
       reportingData: 'Datos de informes',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Datos de puntos de muestreo',
     },
   },
   categoryEdit: {

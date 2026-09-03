@@ -1245,10 +1245,13 @@ $t(common.appNameFull)
       noCategoriesAvailable: 'В выбранном опросе нет доступных категорий',
     },
     itemsCount: 'Количество элементов',
+    structure: 'Структура',
     types: {
       flat: 'Плоская',
       hierarchical: 'Иерархическая',
       reportingData: 'Отчетные данные',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Данные точек выборки',
     },
   },
 

@@ -1278,10 +1278,13 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       noCategoriesAvailable: 'No categories available in the selected survey',
     },
     itemsCount: 'Items count',
+    structure: 'Structure',
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
       reportingData: 'Reporting Data',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Sampling Point Data',
     },
   },
 
