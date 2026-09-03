@@ -53,6 +53,7 @@ export default {
     download: 'Скачать',
     draft: 'Черновик',
     edit: 'Редактировать',
+    elapsed: 'Прошедшее время',
     email: 'Электронная почта',
     email_other: 'Электронные письма',
     emailSentConfirmation: `Письмо на адрес {{email}} отправлено.
@@ -164,6 +165,7 @@ export default {
     raiseTicketInSupportForum: `В случае проблем, пожалуйста, создайте заявку с тегом 'arena' на нашем <b>Форуме поддержки</b>: $t(links.supportForum)`,
     record: 'Запись',
     record_other: 'Записи',
+    remaining: 'Оставшееся время',
     remote: 'Удаленно',
     required: 'Обязательно',
     requiredField: 'обязательное поле',

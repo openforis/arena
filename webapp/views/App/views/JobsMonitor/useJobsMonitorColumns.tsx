@@ -51,13 +51,13 @@ export const useJobsMonitorColumns = ({ onCancelJob }: Props): GridColDef<JobMon
       },
       {
         field: 'elapsed',
-        headerName: i18n.t('jobMonitorView:columns.elapsed'),
+        headerName: i18n.t('common.elapsed'),
         width: 130,
         valueGetter: (_value, row) => formatDuration(JobSerialized.getElapsedMillis(row)) ?? '-',
       },
       {
         field: 'remaining',
-        headerName: i18n.t('jobMonitorView:columns.remaining'),
+        headerName: i18n.t('common.remaining'),
         width: 130,
         valueGetter: (_value, row) => {
           const remainingMillis = JobSerialized.getRemainingMillis(row)

@@ -86,6 +86,4 @@ export default {
   RecordsValidationJob: 'Проверка записей',
   // analysis
   PersistResultsJob: 'Сохранение результатов анализа',
-  elapsed: 'Прошедшее время',
-  remaining: 'Оставшееся время',
 }

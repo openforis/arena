@@ -86,6 +86,4 @@ export default {
   RecordsValidationJob: 'Бичлэгүүдийн баталгаажуулалт',
   // analysis
   PersistResultsJob: 'Шинжилгээний үр дүнг хадгалах',
-  elapsed: 'Өнгөрсөн хугацаа',
-  remaining: 'Үлдсэн хугацаа',
 }

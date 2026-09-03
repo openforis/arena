@@ -26,8 +26,8 @@ const JobTiming = ({ job }: Props) => {
 
   return (
     <div className="job-timing">
-      {`${i18n.t('jobs:elapsed')}: ${elapsedFormatted}`}
-      {remainingFormatted && ` · ${i18n.t('jobs:remaining')}: ~${remainingFormatted}`}
+      {`${i18n.t('common.elapsed')}: ${elapsedFormatted}`}
+      {remainingFormatted && ` · ${i18n.t('common.remaining')}: ~${remainingFormatted}`}
     </div>
   )
 }

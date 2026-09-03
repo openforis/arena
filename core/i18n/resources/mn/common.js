@@ -53,6 +53,7 @@ export default {
     download: 'Татах',
     draft: 'Ноорог',
     edit: 'Засах',
+    elapsed: 'Өнгөрсөн хугацаа',
     email: 'Имэйл',
     email_other: 'Имэйлүүд',
     emailSentConfirmation: `{{email}} руу имэйл илгээсэн.
@@ -164,6 +165,7 @@ export default {
     raiseTicketInSupportForum: `Асуудал гарвал манай <b>Дэмжлэгийн Форум</b>: $t(links.supportForum) руу 'arena' шошготой тасалбар үүсгэнэ үү.`,
     record: 'Бичлэг',
     record_other: 'Бичлэгүүд',
+    remaining: 'Үлдсэн хугацаа',
     remote: 'Алсын',
     required: 'Шаардлагатай',
     requiredField: 'шаардлагатай талбар',

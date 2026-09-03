@@ -86,6 +86,4 @@ export default {
   RecordsValidationJob: `Validação de registros`,
   // analysis
   PersistResultsJob: 'Persistência dos resultados da análise',
-  elapsed: 'Decorrido',
-  remaining: 'Restante',
 }

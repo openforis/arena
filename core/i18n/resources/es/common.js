@@ -54,6 +54,7 @@ export default {
     download: 'Descargar',
     draft: 'Borrador',
     edit: 'Editar',
+    elapsed: 'Transcurrido',
     email: 'Correo electrónico',
     email_other: 'Correos electrónicos',
     emailSentConfirmation:
@@ -149,6 +150,7 @@ Esto puede cambiar o borrar permanentemente datos ya introducidos. Escriba el no
       "En caso de problemas, por favor, abra un ticket con la etiqueta 'arena' en nuestro <b>Foro de soporte</b>: $t(links.supportForum)",
     record: 'Registro',
     record_other: 'Registros',
+    remaining: 'Restante',
     remote: 'Remoto',
     required: 'Requerido',
     requiredField: 'campo requerido',
