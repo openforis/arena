@@ -1325,6 +1325,7 @@ Une propriété supplémentaire 'location' sera ajoutée aux éléments.`,
     createCategory: {
       menuLabel: 'Ajouter une catégorie',
       simple: 'Catégorie simple',
+      otherTypes: 'Autres types de catégorie',
     },
     createSamplingPointDataCategory: {
       buttonLabel: "Catégorie Données de points d'échantillonnage",

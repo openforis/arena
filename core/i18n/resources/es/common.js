@@ -1156,6 +1156,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     createCategory: {
       menuLabel: 'Añadir categoría',
       simple: 'Categoría simple',
+      otherTypes: 'Más tipos de categoría',
     },
     createSamplingPointDataCategory: {
       buttonLabel: 'Categoría de Datos de puntos de muestreo',

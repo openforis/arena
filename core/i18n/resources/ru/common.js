@@ -1291,6 +1291,7 @@ $t(common.cantUndoWarning)`,
     createCategory: {
       menuLabel: 'Добавить категорию',
       simple: 'Простая категория',
+      otherTypes: 'Другие типы категорий',
     },
     createSamplingPointDataCategory: {
       buttonLabel: 'Категория данных точек выборки',

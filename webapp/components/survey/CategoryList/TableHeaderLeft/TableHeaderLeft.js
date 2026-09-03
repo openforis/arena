@@ -88,32 +88,36 @@ const TableHeaderLeft = (props) => {
 
   return (
     <>
-      <ButtonMenu
-        iconClassName="icon-plus icon-16px icon-left"
-        label="categoryEdit.createCategory.menuLabel"
-        items={[
-          {
-            key: 'simple',
-            label: 'categoryEdit.createCategory.simple',
-            onClick: createSimpleCategory,
-          },
-          ...(samplingPointDataCategory
-            ? []
-            : [
-                {
-                  key: 'sampling-point-data',
-                  label: 'categoryEdit.createSamplingPointDataCategory.buttonLabel',
-                  onClick: () => setTemplateDialogType('samplingPointData'),
-                },
-              ]),
-          {
-            key: 'geopackage',
-            label: 'categoryEdit.createGeoPackageCategory.buttonLabel',
-            onClick: () => setTemplateDialogType('geoPackage'),
-          },
-        ]}
-        size="small"
-      />
+      <span className="category-list__add-category-btn-group" style={{ display: 'inline-flex' }}>
+        <Button
+          className="btn-add-category"
+          iconClassName="icon-plus icon-16px icon-left"
+          label="categoryEdit.createCategory.menuLabel"
+          onClick={createSimpleCategory}
+          size="small"
+        />
+        <ButtonMenu
+          testId="btn-add-category-type-menu"
+          title="categoryEdit.createCategory.otherTypes"
+          items={[
+            ...(samplingPointDataCategory
+              ? []
+              : [
+                  {
+                    key: 'sampling-point-data',
+                    label: 'categoryEdit.createSamplingPointDataCategory.buttonLabel',
+                    onClick: () => setTemplateDialogType('samplingPointData'),
+                  },
+                ]),
+            {
+              key: 'geopackage',
+              label: 'categoryEdit.createGeoPackageCategory.buttonLabel',
+              onClick: () => setTemplateDialogType('geoPackage'),
+            },
+          ]}
+          size="small"
+        />
+      </span>
 
       {templateDialogType && (
         <LockFixedPropertiesDialog

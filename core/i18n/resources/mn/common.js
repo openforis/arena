@@ -1282,6 +1282,7 @@ $t(common.cantUndoWarning)`,
     createCategory: {
       menuLabel: 'Ангилал нэмэх',
       simple: 'Энгийн ангилал',
+      otherTypes: 'Ангиллын бусад төрлүүд',
     },
     createSamplingPointDataCategory: {
       buttonLabel: 'Дээж цэгийн өгөгдлийн ангилал',

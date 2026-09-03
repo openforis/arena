@@ -1316,6 +1316,7 @@ Uma propriedade extra 'location' será adicionada aos itens.`,
     createCategory: {
       menuLabel: 'Adicionar categoria',
       simple: 'Categoria simples',
+      otherTypes: 'Mais tipos de categoria',
     },
     createSamplingPointDataCategory: {
       buttonLabel: 'Categoria de Dados de Ponto Amostral',
