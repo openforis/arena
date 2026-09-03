@@ -17,7 +17,24 @@ $borderColor: $greyBorder;
 
 .category__header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2rem;
+  width: 100%;
+
+  .category__header-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .category__header-column-fields {
+    flex: 0 0 auto;
+  }
+
+  .category__header-column-actions {
+    flex: 1;
+  }
 
   .row {
     display: flex;
