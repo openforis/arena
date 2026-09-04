@@ -764,8 +764,8 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
     },
     firstPhaseCommonAttribute: {
       label: 'Attribut commun',
-      info: `Attribut en commun entre l'unité de base et la table de 1ère phase 
-(il doit s'agir d'un attribut code avec le même nom qu'une propriété supplémentaire définie pour la catégorie de 1ère phase)`,
+      info: `Attribut en commun entre l'unité de base et la table de 1ère phase
+(il doit s'agir d'un attribut de type code ou texte ; sa valeur est comparée aux propriétés supplémentaires définies pour la catégorie de 1ère phase - le nom de l'attribut n'a pas besoin de correspondre à celui de la propriété supplémentaire)`,
     },
     formLabel: 'Étiquette de la chaîne de traitement',
     basic: 'Basique',

@@ -761,8 +761,8 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     },
     firstPhaseCommonAttribute: {
       label: 'Atributo comum',
-      info: `Atributo em comum entre a unidade base e a tabela da 1ª fase 
-    (deve ser um atributo de código com o mesmo nome de uma propriedade extra definida para a categoria da 1ª fase)`,
+      info: `Atributo em comum entre a unidade base e a tabela da 1ª fase
+    (deve ser um atributo de código ou de texto; o seu valor é comparado com as propriedades extra definidas para a categoria da 1ª fase - o nome do atributo não precisa corresponder ao nome da propriedade extra)`,
     },
     formLabel: 'Rótulo da cadeia de processamento',
     basic: 'Básico',

@@ -633,7 +633,7 @@ Esto puede cambiar o borrar permanentemente datos ya introducidos. Escriba el no
     },
     firstPhaseCommonAttribute: {
       label: 'Atributo común',
-      info: 'Atributo común entre la unidad base y la tabla de primera fase (debe ser un atributo de código con el mismo nombre que una propiedad extra definida para la categoría de primera fase)',
+      info: 'Atributo común entre la unidad base y la tabla de primera fase (debe ser un atributo de código o de texto; su valor se compara con las propiedades adicionales definidas para la categoría de primera fase - el nombre del atributo no necesita coincidir con el de la propiedad adicional)',
     },
     formLabel: 'Etiqueta de cadena de procesamiento',
     basic: 'Básico',
