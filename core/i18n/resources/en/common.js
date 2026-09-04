@@ -164,11 +164,15 @@ Do you want to proceed?`,
 **Are you sure you want to continue?**`,
     publishRecordValuesUpdateConfirm: `#### Publishing {{survey}} will update data already recorded ####
 
-The following attributes changed in a way that will recalculate their value in existing records: **{{attributeNames}}**.
+{{reasons}}
 
 This can permanently change or clear data already entered. Type the survey name below to confirm.`,
     publishRecordValuesUpdateConfirmHeader: 'Existing record data will be updated',
     publishRecordValuesUpdateConfirmInputLabel: 'Type the survey name "{{strongConfirmRequiredText}}" to confirm',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'The following attributes changed in a way that will recalculate their value in existing records: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'The following attributes use an extra property of a category or taxonomy that changed, which will recalculate their value in existing records: **{{attributeNames}}**.',
     raiseTicketInSupportForum: `In case of problems please raise a ticket with a tag 'arena' in our <b>Support Forum</b>: $t(links.supportForum)`,
     record: 'Record',
     record_other: 'Records',

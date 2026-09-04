@@ -652,6 +652,24 @@ export const updateItemsProps = async ({ surveyId, items, draftProps = true }, c
   )
 }
 
+// Finds category items whose "extra" prop data has a pending draft change (i.e. props_draft has an
+// "extra" key whose value differs from the published one) - used to detect categories whose extra
+// prop values (not just their extraDef schema) changed, so that node defs reading them via
+// categoryItemProp can be flagged for value recalculation on publish (see
+// server/modules/survey/service/publish/nodeDefExtraPropDependencyUtils.js). Filtered at the DB level
+// so surveys with no pending item extra-value edits (the common case) never pull item data into
+// memory.
+export const fetchCategoryItemsWithChangedExtraValues = async ({ surveyId }, client = db) =>
+  client.any(
+    `SELECT cl.category_uuid AS "categoryUuid",
+            ci.props->'extra' AS "extraPublished",
+            ci.props_draft->'extra' AS "extraDraft"
+     FROM ${getSurveyDBSchema(surveyId)}.category_item ci
+     JOIN ${getSurveyDBSchema(surveyId)}.category_level cl ON cl.uuid = ci.level_uuid
+     WHERE ci.props_draft ? 'extra'
+       AND (ci.props_draft -> 'extra') IS DISTINCT FROM (ci.props -> 'extra')`
+  )
+
 // ============== DELETE
 
 export const deleteCategory = async (surveyId, categoryUuid, client = db) =>
