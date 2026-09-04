@@ -63,6 +63,134 @@ const _groupChangedExtraValuePropNamesByEntityUuid = (
 const _unionPropNames = (setA?: Set<string>, setB?: Set<string>): Set<string> =>
   new Set([...(setA ?? []), ...(setB ?? [])])
 
+// Finds every category in the survey (draft) whose item extra-prop definitions or values changed vs
+// what's currently published, returning [{ name, changedPropNames }] for just the changed ones.
+const _findChangedCategories = ({
+  survey,
+  categoriesPublishedByUuid,
+  categoryValueChangedPropNamesByUuid,
+}: {
+  survey: any
+  categoriesPublishedByUuid: Record<string, any>
+  categoryValueChangedPropNamesByUuid: Map<string, Set<string>>
+}): ChangedEntity[] => {
+  const changedCategories: ChangedEntity[] = []
+  for (const categoryDraft of Survey.getCategoriesArray(survey)) {
+    const categoryUuid = Category.getUuid(categoryDraft)
+    const categoryPublished = categoriesPublishedByUuid[categoryUuid]
+    const schemaChangedPropNames = categoryPublished
+      ? _diffExtraPropDefNames(Category.getItemExtraDef(categoryDraft), Category.getItemExtraDef(categoryPublished))
+      : new Set<string>()
+    const changedPropNames = _unionPropNames(
+      schemaChangedPropNames,
+      categoryValueChangedPropNamesByUuid.get(categoryUuid)
+    )
+    if (changedPropNames.size > 0) {
+      changedCategories.push({ name: Category.getName(categoryDraft), changedPropNames })
+    }
+  }
+  return changedCategories
+}
+
+// Same as _findChangedCategories, for taxonomies/extraPropsDefs.
+const _findChangedTaxonomies = ({
+  survey,
+  taxonomiesPublishedByUuid,
+  taxonomyValueChangedPropNamesByUuid,
+}: {
+  survey: any
+  taxonomiesPublishedByUuid: Record<string, any>
+  taxonomyValueChangedPropNamesByUuid: Map<string, Set<string>>
+}): ChangedEntity[] => {
+  const changedTaxonomies: ChangedEntity[] = []
+  for (const taxonomyDraft of Survey.getTaxonomiesArray(survey)) {
+    const taxonomyUuid = Taxonomy.getUuid(taxonomyDraft)
+    const taxonomyPublished = taxonomiesPublishedByUuid[taxonomyUuid]
+    const schemaChangedPropNames = taxonomyPublished
+      ? _diffExtraPropDefNames(Taxonomy.getExtraPropsDefs(taxonomyDraft), Taxonomy.getExtraPropsDefs(taxonomyPublished))
+      : new Set<string>()
+    const changedPropNames = _unionPropNames(
+      schemaChangedPropNames,
+      taxonomyValueChangedPropNamesByUuid.get(taxonomyUuid)
+    )
+    if (changedPropNames.size > 0) {
+      changedTaxonomies.push({ name: Taxonomy.getName(taxonomyDraft), changedPropNames })
+    }
+  }
+  return changedTaxonomies
+}
+
+// True if any of the given changed categories/taxonomies is referenced (via categoryItemProp/
+// taxonProp, for one of its changedPropNames) by one of the node def's value-affecting expressions.
+const _referencesChangedEntityValue = ({
+  nodeDef,
+  changedCategories,
+  changedTaxonomies,
+}: {
+  nodeDef: any
+  changedCategories: ChangedEntity[]
+  changedTaxonomies: ChangedEntity[]
+}): boolean =>
+  changedCategories.some(({ name, changedPropNames }) =>
+    NodeDef.referencesCategoryExtraProp({ categoryName: name, changedPropNames })(nodeDef)
+  ) ||
+  changedTaxonomies.some(({ name, changedPropNames }) =>
+    NodeDef.referencesTaxonomyExtraProp({ taxonomyName: name, changedPropNames })(nodeDef)
+  )
+
+// Same as _referencesChangedEntityValue, scanning only the node def's validation expressions.
+const _referencesChangedEntityInValidations = ({
+  nodeDef,
+  changedCategories,
+  changedTaxonomies,
+}: {
+  nodeDef: any
+  changedCategories: ChangedEntity[]
+  changedTaxonomies: ChangedEntity[]
+}): boolean =>
+  changedCategories.some(({ name, changedPropNames }) =>
+    NodeDef.referencesCategoryExtraPropInValidations({ categoryName: name, changedPropNames })(nodeDef)
+  ) ||
+  changedTaxonomies.some(({ name, changedPropNames }) =>
+    NodeDef.referencesTaxonomyExtraPropInValidations({ taxonomyName: name, changedPropNames })(nodeDef)
+  )
+
+// Splits the survey's already-published, non-deleted node defs into those whose value could be
+// affected by one of the changed categories/taxonomies, and those where only a validation expression
+// references one (see _referencesChangedEntityValue/_referencesChangedEntityInValidations). Skipped
+// entirely when nothing changed, since every node def would otherwise need scanning for no reason.
+const _findAffectedNodeDefUuids = ({
+  survey,
+  changedCategories,
+  changedTaxonomies,
+}: {
+  survey: any
+  changedCategories: ChangedEntity[]
+  changedTaxonomies: ChangedEntity[]
+}): { valueAffectedNodeDefUuids: Set<string>; validationAffectedNodeDefUuids: Set<string> } => {
+  const valueAffectedNodeDefUuids = new Set<string>()
+  const validationAffectedNodeDefUuids = new Set<string>()
+
+  if (changedCategories.length === 0 && changedTaxonomies.length === 0) {
+    return { valueAffectedNodeDefUuids, validationAffectedNodeDefUuids }
+  }
+
+  for (const nodeDef of Survey.getNodeDefsArray(survey)) {
+    if (!NodeDef.isPublished(nodeDef) || NodeDef.isDeleted(nodeDef)) continue
+
+    if (_referencesChangedEntityValue({ nodeDef, changedCategories, changedTaxonomies })) {
+      valueAffectedNodeDefUuids.add(NodeDef.getUuid(nodeDef))
+      continue
+    }
+
+    if (_referencesChangedEntityInValidations({ nodeDef, changedCategories, changedTaxonomies })) {
+      validationAffectedNodeDefUuids.add(NodeDef.getUuid(nodeDef))
+    }
+  }
+
+  return { valueAffectedNodeDefUuids, validationAffectedNodeDefUuids }
+}
+
 // Finds already-published, non-deleted node defs whose expressions reference (via
 // categoryItemProp/taxonProp) a category/taxonomy extra prop that changed in the draft - either its
 // definition (itemExtraDef/extraPropsDefs: added, removed, retyped) or an existing item's/taxon's
@@ -95,69 +223,16 @@ export const findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges = asyn
     'taxonomyUuid'
   )
 
-  const changedCategories: ChangedEntity[] = []
-  for (const categoryDraft of Survey.getCategoriesArray(survey)) {
-    const categoryUuid = Category.getUuid(categoryDraft)
-    const categoryPublished = categoriesPublishedByUuid[categoryUuid]
-    const schemaChangedPropNames = categoryPublished
-      ? _diffExtraPropDefNames(Category.getItemExtraDef(categoryDraft), Category.getItemExtraDef(categoryPublished))
-      : new Set<string>()
-    const changedPropNames = _unionPropNames(
-      schemaChangedPropNames,
-      categoryValueChangedPropNamesByUuid.get(categoryUuid)
-    )
-    if (changedPropNames.size > 0) {
-      changedCategories.push({ name: Category.getName(categoryDraft), changedPropNames })
-    }
-  }
+  const changedCategories = _findChangedCategories({
+    survey,
+    categoriesPublishedByUuid,
+    categoryValueChangedPropNamesByUuid,
+  })
+  const changedTaxonomies = _findChangedTaxonomies({
+    survey,
+    taxonomiesPublishedByUuid,
+    taxonomyValueChangedPropNamesByUuid,
+  })
 
-  const changedTaxonomies: ChangedEntity[] = []
-  for (const taxonomyDraft of Survey.getTaxonomiesArray(survey)) {
-    const taxonomyUuid = Taxonomy.getUuid(taxonomyDraft)
-    const taxonomyPublished = taxonomiesPublishedByUuid[taxonomyUuid]
-    const schemaChangedPropNames = taxonomyPublished
-      ? _diffExtraPropDefNames(Taxonomy.getExtraPropsDefs(taxonomyDraft), Taxonomy.getExtraPropsDefs(taxonomyPublished))
-      : new Set<string>()
-    const changedPropNames = _unionPropNames(
-      schemaChangedPropNames,
-      taxonomyValueChangedPropNamesByUuid.get(taxonomyUuid)
-    )
-    if (changedPropNames.size > 0) {
-      changedTaxonomies.push({ name: Taxonomy.getName(taxonomyDraft), changedPropNames })
-    }
-  }
-
-  const valueAffectedNodeDefUuids = new Set<string>()
-  const validationAffectedNodeDefUuids = new Set<string>()
-
-  if (changedCategories.length > 0 || changedTaxonomies.length > 0) {
-    for (const nodeDef of Survey.getNodeDefsArray(survey)) {
-      if (!NodeDef.isPublished(nodeDef) || NodeDef.isDeleted(nodeDef)) continue
-
-      const valueMatch =
-        changedCategories.some(({ name, changedPropNames }) =>
-          NodeDef.referencesCategoryExtraProp({ categoryName: name, changedPropNames })(nodeDef)
-        ) ||
-        changedTaxonomies.some(({ name, changedPropNames }) =>
-          NodeDef.referencesTaxonomyExtraProp({ taxonomyName: name, changedPropNames })(nodeDef)
-        )
-      if (valueMatch) {
-        valueAffectedNodeDefUuids.add(NodeDef.getUuid(nodeDef))
-        continue
-      }
-
-      const validationMatch =
-        changedCategories.some(({ name, changedPropNames }) =>
-          NodeDef.referencesCategoryExtraPropInValidations({ categoryName: name, changedPropNames })(nodeDef)
-        ) ||
-        changedTaxonomies.some(({ name, changedPropNames }) =>
-          NodeDef.referencesTaxonomyExtraPropInValidations({ taxonomyName: name, changedPropNames })(nodeDef)
-        )
-      if (validationMatch) {
-        validationAffectedNodeDefUuids.add(NodeDef.getUuid(nodeDef))
-      }
-    }
-  }
-
-  return { valueAffectedNodeDefUuids, validationAffectedNodeDefUuids }
+  return _findAffectedNodeDefUuids({ survey, changedCategories, changedTaxonomies })
 }
