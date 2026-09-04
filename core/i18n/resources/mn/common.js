@@ -374,6 +374,7 @@ export default {
 
     help: 'Тусламж',
     about: 'Тухай',
+    changelog: 'Changelog',
     disclaimer: 'Хариуцлагаас татгалзах',
     userManual: 'Хэрэглэгчийн гарын авлага',
   },
@@ -894,6 +895,9 @@ $t(common.appNameFull)
  * Arena GitHub-д: $t(links.arenaInGitHub)
  * Arena R Скриптүүд GitHub-д: $t(links.arenaRScriptsInGitHub)
 `,
+    },
+    changelog: {
+      title: '$t(appModules.changelog)',
     },
   },
 

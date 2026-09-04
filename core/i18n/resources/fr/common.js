@@ -384,6 +384,7 @@ Réessayer ?`,
 
     help: 'Aide',
     about: 'À propos',
+    changelog: 'Journal des modifications',
     disclaimer: 'Avertissement',
     userManual: 'Manuel utilisateur',
   },
@@ -929,6 +930,9 @@ $t(common.appNameFull)
  * Arena sur GitHub: $t(links.arenaInGitHub)
  * Scripts R Arena sur GitHub: $t(links.arenaRScriptsInGitHub)
 `,
+    },
+    changelog: {
+      title: '$t(appModules.changelog)',
     },
   },
 
