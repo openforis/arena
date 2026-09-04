@@ -149,11 +149,12 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
 
   const getCodeAttributeSummary = (key, codeAttrDef) => ({
     [key]: NodeDef.getName(codeAttrDef),
-    [`${key}Category`]: getCategoryNameByUuid({
-      survey,
-      categoryUuid: NodeDef.getCategoryUuid(codeAttrDef),
-    }),
-    [`${key}CategoryLevel`]: codeAttrDef ? Survey.getNodeDefCategoryLevelIndex(codeAttrDef)(survey) + 1 : '',
+    [`${key}Category`]:
+      codeAttrDef && NodeDef.isCode(codeAttrDef)
+        ? getCategoryNameByUuid({ survey, categoryUuid: NodeDef.getCategoryUuid(codeAttrDef) })
+        : '',
+    [`${key}CategoryLevel`]:
+      codeAttrDef && NodeDef.isCode(codeAttrDef) ? Survey.getNodeDefCategoryLevelIndex(codeAttrDef)(survey) + 1 : '',
   })
 
   const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })

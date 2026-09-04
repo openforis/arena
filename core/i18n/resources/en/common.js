@@ -764,8 +764,8 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     },
     firstPhaseCommonAttribute: {
       label: 'Common attribute',
-      info: `Attribute in common between base unit and 1st phase table 
-(it must be a code attribute with the same name of an extra property defined for the 1st phase category)`,
+      info: `Attribute in common between base unit and 1st phase table
+(it must be a code or text attribute; its value is matched against the extra properties defined for the 1st phase category - the attribute name does not need to match the extra property name)`,
     },
     formLabel: 'Processing chain label',
     basic: 'Basic',
