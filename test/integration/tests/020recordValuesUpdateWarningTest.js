@@ -4,7 +4,7 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
-import { checkPublishRecordValuesUpdateWarning } from '@server/modules/survey/service/surveyService'
+import { checkPublishRecordValuesUpdateWarning } from '@server/modules/survey/service/publish/recordValuesUpdateWarning'
 
 import { getContextUser } from '../config/context'
 

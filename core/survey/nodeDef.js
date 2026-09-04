@@ -7,7 +7,8 @@ import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import { ArrayUtils } from '@core/arrayUtils'
-import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
+import { functionNames, userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
+import { extractCallFirstTwoArgs } from '@core/expressionParser/helpers/functionCallArgs'
 
 import * as TextUtils from '@webapp/utils/textUtils'
 
@@ -467,6 +468,16 @@ export const hasValidationsDefined = (nodeDef) => {
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 
+// Flattens an array of NodeDefExpression objects (as stored under defaultValues/applicable/
+// validations.expressions/editableIf/visibleIf - each { expression, applyIf, ... }) into a plain array
+// of expression strings (both the expression itself and its applyIf, when present).
+const _expressionStringsFromNodeDefExpressions = (nodeDefExpressions) =>
+  nodeDefExpressions.reduce((acc, nodeDefExpression) => {
+    ArrayUtils.addIfNotEmpty(NodeDefExpression.getExpression(nodeDefExpression))(acc)
+    ArrayUtils.addIfNotEmpty(NodeDefExpression.getApplyIf(nodeDefExpression))(acc)
+    return acc
+  }, [])
+
 export const getAllExpressions = (nodeDef) => {
   const nodeDefExpressions = [
     ...getDefaultValues(nodeDef),
@@ -475,16 +486,35 @@ export const getAllExpressions = (nodeDef) => {
     ...getEditableIf(nodeDef),
     ...getVisibleIf(nodeDef),
   ]
-  const expressions = nodeDefExpressions.reduce((acc, nodeDefExpression) => {
-    ArrayUtils.addIfNotEmpty(NodeDefExpression.getExpression(nodeDefExpression))(acc)
-    ArrayUtils.addIfNotEmpty(NodeDefExpression.getApplyIf(nodeDefExpression))(acc)
-    return acc
-  }, [])
+  const expressions = _expressionStringsFromNodeDefExpressions(nodeDefExpressions)
   ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
   ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
   ArrayUtils.addIfNotEmpty(getEnumeratingItemsExpression(nodeDef))(expressions)
   return expressions
 }
+
+// Value-affecting-only subset of getAllExpressions: applicable, default values, file name expression,
+// enumerating items expression, items filter - the exact same boundary hasValueAffectingAdvancedPropsDraft
+// draws between props that can change a node's stored value and ones that don't (e.g. validations,
+// editableIf, visibleIf are excluded). Used to find node defs whose value needs recalculating when
+// something they read (e.g. a category/taxonomy extra prop) changes - see
+// referencesCategoryExtraProp/referencesTaxonomyExtraProp below.
+export const getValueAffectingExpressions = (nodeDef) => {
+  const expressions = _expressionStringsFromNodeDefExpressions([
+    ...getDefaultValues(nodeDef),
+    ...getApplicable(nodeDef),
+  ])
+  ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getEnumeratingItemsExpression(nodeDef))(expressions)
+  return expressions
+}
+
+// Plain expression strings from the node def's validation expressions only (see
+// getValidationExpressions) - used by referencesCategoryExtraPropInValidations/
+// referencesTaxonomyExtraPropInValidations below.
+const getValidationOnlyExpressionStrings = (nodeDef) =>
+  _expressionStringsFromNodeDefExpressions(getValidationExpressions(nodeDef))
 
 const userDependentFunctionsRegExp = new RegExp(String.raw`\b(${userDependentFunctionNames.join('|')})\s*\(`)
 
@@ -492,6 +522,66 @@ const userDependentFunctionsRegExp = new RegExp(String.raw`\b(${userDependentFun
 // result depends on the currently logged in user (e.g. userProp).
 export const hasUserDependentExpressions = (nodeDef) =>
   getAllExpressions(nodeDef).some((expression) => userDependentFunctionsRegExp.test(expression))
+
+// True if any of the given expressions calls categoryItemProp(entityName, propName, ...) /
+// taxonProp(entityName, propName, ...) - matched by function name - referencing the given
+// category/taxonomy name, for one of the given (changed) extra prop names. A non-literal propName
+// argument (identifier, nested call...) can't be resolved statically, so it's conservatively treated
+// as a potential match rather than ruled out.
+const _referencesExtraPropChange = ({ expressions, functionName, entityName, changedPropNames }) =>
+  expressions.some((expression) =>
+    extractCallFirstTwoArgs(expression, functionName).some(
+      ([entityNameArg, propNameArg]) =>
+        entityNameArg === entityName && (propNameArg === null || changedPropNames.has(propNameArg))
+    )
+  )
+
+// True if nodeDef's value could be affected by a change to one of `changedPropNames` on the category
+// named `categoryName` - i.e. one of its value-affecting expressions calls
+// categoryItemProp(categoryName, propName, ...) with propName in changedPropNames (or unresolvable).
+export const referencesCategoryExtraProp =
+  ({ categoryName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValueAffectingExpressions(nodeDef),
+      functionName: functionNames.categoryItemProp,
+      entityName: categoryName,
+      changedPropNames,
+    })
+
+// Same as referencesCategoryExtraProp, for taxonProp(taxonomyName, propName, ...) calls.
+export const referencesTaxonomyExtraProp =
+  ({ taxonomyName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValueAffectingExpressions(nodeDef),
+      functionName: functionNames.taxonProp,
+      entityName: taxonomyName,
+      changedPropNames,
+    })
+
+// Same as referencesCategoryExtraProp/referencesTaxonomyExtraProp, but scanning only validation
+// expressions - used to trigger re-validation (not value recalculation) of node defs that only
+// reference a changed extra prop from a validation expression.
+export const referencesCategoryExtraPropInValidations =
+  ({ categoryName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValidationOnlyExpressionStrings(nodeDef),
+      functionName: functionNames.categoryItemProp,
+      entityName: categoryName,
+      changedPropNames,
+    })
+
+export const referencesTaxonomyExtraPropInValidations =
+  ({ taxonomyName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValidationOnlyExpressionStrings(nodeDef),
+      functionName: functionNames.taxonProp,
+      entityName: taxonomyName,
+      changedPropNames,
+    })
 
 export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClone, false)
 
