@@ -4,7 +4,6 @@ import { NodeDefExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@op
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
@@ -13,7 +12,6 @@ import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -23,7 +21,7 @@ import * as SurveyFileManager from '../manager/surveyFileManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import SurveyCreatorJob from './surveyCreateJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
-import { findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges } from './publish/nodeDefExtraPropDependencyUtils'
+import { checkPublishRecordValuesUpdateWarning } from './publish/recordValuesUpdateWarning'
 import { SchemaSummaryExportJob } from './schemaSummary'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
@@ -50,113 +48,7 @@ export const fetchAndAssocStorageInfo = async ({ survey }) => {
   )(survey)
 }
 
-// Dependency types whose source-side re-evaluation can, in cascade, change a dependent node def's
-// stored value: "defaultValues" (dependent's default value formula reads the source) and "applicable"
-// (dependent becoming applicable triggers its default value to be evaluated; becoming not-applicable
-// clears its value - see recordNodeDependentsDefaultValuesUpdater.js/recordNodesUpdater.js on the
-// record-update side, which re-evaluate default values on both triggers).
-const _valueUpdateCascadeDependencyTypes = [Survey.dependencyTypes.defaultValues, Survey.dependencyTypes.applicable]
-
-// Collects the uuids of node defs that transitively depend, through a "default values" or "applicable"
-// expression, on any of the given node def uuids - e.g. if A's value is changing and B's default value
-// expression (or applicable expression) reads A, and C's reads B, both B and C are at risk of having
-// their stored value recalculated (evaluated or cleared) in cascade when A's value changes on publish.
-// dependencyGraph is single-hop only (see Survey.getNodeDefDependencies), so this walks it transitively,
-// one hop at a time and across both dependency types, to reach the full transitive closure.
-const _findTransitiveValueUpdateDependentUuids = ({ survey, nodeDefUuids }) => {
-  const visitedUuids = new Set(nodeDefUuids)
-  const transitiveDependentUuids = new Set()
-  const stack = [...nodeDefUuids]
-
-  while (stack.length > 0) {
-    const nodeDefUuidCurrent = stack.pop()
-    for (const dependencyType of _valueUpdateCascadeDependencyTypes) {
-      const dependents = Survey.getNodeDefDependencies(nodeDefUuidCurrent, dependencyType)(survey)
-      for (const nodeDefDependent of dependents) {
-        const nodeDefDependentUuid = NodeDef.getUuid(nodeDefDependent)
-        if (!visitedUuids.has(nodeDefDependentUuid)) {
-          visitedUuids.add(nodeDefDependentUuid)
-          transitiveDependentUuids.add(nodeDefDependentUuid)
-          stack.push(nodeDefDependentUuid)
-        }
-      }
-    }
-  }
-  return transitiveDependentUuids
-}
-
-// Names of already-published, non-deleted node defs at risk of having their stored record value
-// silently recalculated on publish - i.e. the same node defs RecordCheckJob would recalculate. Two
-// direct sources, unioned before the transitive-cascade walk:
-// 1. A value-affecting advanced prop change on the node def itself (applicable/default values/file
-//    name expression/enumerating items expression/items filter) - see
-//    NodeDef.hasValueAffectingAdvancedPropsDraft. backup: true keeps propsAdvancedDraft separate from
-//    propsAdvanced, which that check needs.
-// 2. A categoryItemProp/taxonProp reference to a category/taxonomy extra prop (definition or item/taxon
-//    value) that changed in the draft - see findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges.
-// Plus any published node def that would be updated in cascade through a chain of "default values"/
-// "applicable" expressions rooted at one of those (see _findTransitiveValueUpdateDependentUuids).
-// The node-def fetch itself stays a plain, cheap one regardless of survey size or record count; the
-// category/taxonomy check adds a few small extra queries (see that function for the cost profile).
-const _findNodeDefNamesWithRecordValuesUpdateRisk = async ({ surveyId }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
-    surveyId,
-    draft: true,
-    advanced: true,
-    backup: true,
-  })
-  const nodeDefUuidsWithAdvancedPropsRisk = Survey.getNodeDefsArray(survey)
-    .filter(
-      (nodeDef) =>
-        NodeDef.isPublished(nodeDef) &&
-        !NodeDef.isDeleted(nodeDef) &&
-        NodeDef.hasValueAffectingAdvancedPropsDraft(nodeDef)
-    )
-    .map(NodeDef.getUuid)
-
-  // validationAffectedNodeDefUuids intentionally unused here: this warning is about record *value*
-  // recalculation risk, not validation staleness (see recordCheckJob.js for that separate handling).
-  const { valueAffectedNodeDefUuids } = await findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges({
-    surveyId,
-    survey,
-  })
-
-  const nodeDefUuidsAtDirectRisk = [...new Set([...nodeDefUuidsWithAdvancedPropsRisk, ...valueAffectedNodeDefUuids])]
-
-  const transitiveDependentUuids = _findTransitiveValueUpdateDependentUuids({
-    survey,
-    nodeDefUuids: nodeDefUuidsAtDirectRisk,
-  })
-
-  const allAtRiskUuids = new Set([...nodeDefUuidsAtDirectRisk, ...transitiveDependentUuids])
-
-  return [...allAtRiskUuids]
-    .map((nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey))
-    .filter((nodeDef) => nodeDef && NodeDef.isPublished(nodeDef) && !NodeDef.isDeleted(nodeDef))
-    .map(NodeDef.getName)
-}
-
 // JOBS
-
-/**
- * Checks, cheaply and without touching any record, whether publishing the survey could silently
- * recalculate values already stored in existing records. Meant to be called up front, before starting
- * the (potentially long) publish job, so the user sees this warning immediately rather than after
- * waiting for a full record check.
- * @param {object} params - Params.
- * @param {number} params.surveyId - Survey id.
- * @returns {Promise<object|null>} `{ attributeNames }` if publishing is at risk of updating recorded
- *   values, `null` otherwise.
- */
-export const checkPublishRecordValuesUpdateWarning = async ({ surveyId }) => {
-  const attributeNames = await _findNodeDefNamesWithRecordValuesUpdateRisk({ surveyId })
-  if (attributeNames.length === 0) return null
-
-  const recordsCount = await RecordManager.countAllRecordsBySurveyId({ surveyId })
-  if (recordsCount === 0) return null
-
-  return { attributeNames }
-}
 
 export const startPublishJob = async ({ user, surveyId, cleanupRecords, updateRecordValues }) => {
   if (!updateRecordValues) {

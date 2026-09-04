@@ -11,7 +11,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
-import { checkPublishRecordValuesUpdateWarning } from '@server/modules/survey/service/surveyService'
+import { checkPublishRecordValuesUpdateWarning } from '@server/modules/survey/service/publish/recordValuesUpdateWarning'
 
 import { getContextUser } from '../config/context'
 
@@ -146,7 +146,7 @@ describe('checkPublishRecordValuesUpdateWarning / RecordCheckJob - category/taxo
 
     const warning = await checkPublishRecordValuesUpdateWarning({ surveyId })
     expect(warning).not.toBeNull()
-    expect(sortAlphabetically(warning.attributeNames)).toEqual(
+    expect(sortAlphabetically(warning.categoryOrTaxonomyExtraPropAttributeNames)).toEqual(
       sortAlphabetically(['species_habitat', 'tree_status_desc'])
     )
 
@@ -188,7 +188,7 @@ describe('checkPublishRecordValuesUpdateWarning / RecordCheckJob - category/taxo
 
     const warning = await checkPublishRecordValuesUpdateWarning({ surveyId })
     expect(warning).not.toBeNull()
-    expect(sortAlphabetically(warning.attributeNames)).toEqual(
+    expect(sortAlphabetically(warning.categoryOrTaxonomyExtraPropAttributeNames)).toEqual(
       sortAlphabetically(['species_habitat', 'species_region'])
     )
   })
