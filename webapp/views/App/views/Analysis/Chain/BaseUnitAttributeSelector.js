@@ -16,7 +16,7 @@ const nodeDefToItem = (nodeDef) => ({
   label: NodeDef.getLabel(nodeDef, null, NodeDef.NodeDefLabelTypes.name),
 })
 
-export const BaseUnitCodeAttributeSelector = (props) => {
+export const BaseUnitAttributeSelector = (props) => {
   const {
     allowEmptySelection,
     info,
@@ -75,7 +75,7 @@ export const BaseUnitCodeAttributeSelector = (props) => {
   )
 }
 
-BaseUnitCodeAttributeSelector.propTypes = {
+BaseUnitAttributeSelector.propTypes = {
   allowEmptySelection: PropTypes.bool,
   info: PropTypes.string,
   label: PropTypes.string.isRequired,

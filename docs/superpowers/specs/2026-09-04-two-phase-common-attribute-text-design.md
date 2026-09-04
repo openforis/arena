@@ -27,6 +27,14 @@ unrelated selectors — "Stratum attribute" and "Post-stratification attribute" 
 
 2. `webapp/views/App/views/Analysis/Chain/FirstPhaseCommonAttributeSelector.js`
    - Pass `nodeDefTypes={[NodeDef.nodeDefType.code, NodeDef.nodeDefType.text]}`.
+   - **Revision:** the component previously also filtered candidates down to attributes whose
+     *name* already matched one of the 1st-phase category's extra property names
+     (`nodeDefFilter: (nodeDef) => firstPhaseCategoryExtraDefNames.includes(NodeDef.getName(nodeDef))`).
+     That filter is removed. Requiring the same name made the manual selector redundant (if the
+     name always had to match, the tool could resolve it automatically instead of asking the user
+     to pick); matching happens by *value* against the category's extra properties, not by name,
+     so the attribute name is free to differ. This drops the `firstPhaseCategoryUuid` /
+     `useSelector` / extra-def-name lookup from the component entirely.
 
 3. `server/modules/analysis/service/chainSummaryGenerator.js`
    - `getCodeAttributeSummary('commonAttribute', firstPhaseCommonAttributeDef)` currently always
@@ -37,16 +45,18 @@ unrelated selectors — "Stratum attribute" and "Post-stratification attribute" 
      `resultVariables[].categoryName`). `commonAttribute` (the attribute name) is unaffected.
 
 4. `core/i18n/resources/en/common.js` — update `chainView.firstPhaseCommonAttribute.info`
-   (lines 761-765) from:
+   (lines 761-765). Original text:
    > "Attribute in common between base unit and 1st phase table (it must be a code attribute
    > with the same name of an extra property defined for the 1st phase category)"
 
-   to:
+   Final text (revised after dropping the same-name filter, see item 2):
    > "Attribute in common between base unit and 1st phase table (it must be a code or text
-   > attribute with the same name of an extra property defined for the 1st phase category)"
+   > attribute; its value is matched against the extra properties defined for the 1st phase
+   > category - the attribute name does not need to match the extra property name)"
 
-   Other locale files (es/fr/ru/pt/mn) are left unchanged — no reliable translation available;
-   their copy remains stale until translated separately.
+   **Update:** the other locale files (es/fr/ru/pt/mn) were subsequently updated too, with
+   translations of the final text above. Confidence is high for es/fr/pt, moderate for ru, and
+   low for mn (best-effort, worth a native-speaker review).
 
 ## Out of scope
 

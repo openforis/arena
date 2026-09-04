@@ -6,7 +6,7 @@ import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
-import { BaseUnitCodeAttributeSelector } from './BaseUnitCodeAttributeSelector'
+import { BaseUnitAttributeSelector } from './BaseUnitAttributeSelector'
 
 export const StratumAttributeSelector = () => {
   const dispatch = useDispatch()
@@ -30,7 +30,7 @@ export const StratumAttributeSelector = () => {
   const info = isTwoPhase ? 'chainView.stratumAttribute2ndPhaseInfo' : 'chainView.stratumAttributeInfo'
 
   return (
-    <BaseUnitCodeAttributeSelector
+    <BaseUnitAttributeSelector
       allowEmptySelection={ChainSamplingDesign.isStratificationNotSpecifiedAllowed(samplingDesign)}
       info={info}
       label={label}
