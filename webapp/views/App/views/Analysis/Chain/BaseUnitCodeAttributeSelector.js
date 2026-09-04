@@ -17,7 +17,15 @@ const nodeDefToItem = (nodeDef) => ({
 })
 
 export const BaseUnitCodeAttributeSelector = (props) => {
-  const { allowEmptySelection, info, label, nodeDefFilter, onChange: onChangeProp, selectedNodeDefUuid } = props
+  const {
+    allowEmptySelection,
+    info,
+    label,
+    nodeDefFilter,
+    nodeDefTypes = [NodeDef.nodeDefType.code],
+    onChange: onChangeProp,
+    selectedNodeDefUuid,
+  } = props
 
   const i18n = useI18n()
   const chain = useChain()
@@ -26,7 +34,7 @@ export const BaseUnitCodeAttributeSelector = (props) => {
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
-  // selectable attribute defs can be code attributes in base unit or its ancestors
+  // selectable attribute defs can be attributes of the allowed types in base unit or its ancestors
   const selectableDefs = useMemo(() => {
     if (!baseUnitNodeDef) return []
 
@@ -40,8 +48,8 @@ export const BaseUnitCodeAttributeSelector = (props) => {
       result.push(
         ...descendantDefs.filter(
           (descendantDef) =>
-            // only code attributes
-            NodeDef.isCode(descendantDef) &&
+            // only attributes of the allowed types
+            nodeDefTypes.includes(NodeDef.getType(descendantDef)) &&
             // avoid duplicates
             !result.some(NodeDef.isEqual(descendantDef)) &&
             (!nodeDefFilter || nodeDefFilter(descendantDef))
@@ -50,7 +58,7 @@ export const BaseUnitCodeAttributeSelector = (props) => {
     })(survey)
 
     return result
-  }, [baseUnitNodeDef, nodeDefFilter, survey])
+  }, [baseUnitNodeDef, nodeDefFilter, nodeDefTypes, survey])
 
   const onChange = useCallback((item) => onChangeProp(item?.value), [onChangeProp])
 
@@ -72,6 +80,7 @@ BaseUnitCodeAttributeSelector.propTypes = {
   info: PropTypes.string,
   label: PropTypes.string.isRequired,
   nodeDefFilter: PropTypes.func,
+  nodeDefTypes: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func.isRequired,
   selectedNodeDefUuid: PropTypes.string,
 }

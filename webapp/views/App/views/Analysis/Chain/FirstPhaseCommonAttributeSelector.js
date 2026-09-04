@@ -48,6 +48,7 @@ export const FirstPhaseCommonAttributeSelector = () => {
       info="chainView.firstPhaseCommonAttribute.info"
       label="chainView.firstPhaseCommonAttribute.label"
       nodeDefFilter={nodeDefFilter}
+      nodeDefTypes={[NodeDef.nodeDefType.code, NodeDef.nodeDefType.text]}
       selectedNodeDefUuid={ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(samplingDesign)}
       onChange={onChange}
     />
