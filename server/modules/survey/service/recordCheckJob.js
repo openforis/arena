@@ -94,7 +94,7 @@ export default class RecordCheckJob extends Job {
 
   async _fetchSurveyAndNodeDefsByCycle(cycle) {
     const { context, surveyId, tx } = this
-    const { cleanupRecords } = context
+    const { cleanupRecords, skipDataUpdate } = context
 
     // 1. fetch survey
     // backup: true keeps propsAdvancedDraft separate from propsAdvanced (rather than merging and
@@ -126,6 +126,16 @@ export default class RecordCheckJob extends Job {
       valueAffectedNodeDefUuids,
       validationAffectedNodeDefUuids,
     })
+
+    // skipDataUpdate: the user explicitly chose to publish without recalculating values already
+    // stored in existing records (this is exactly the risk surfaced by
+    // checkPublishRecordValuesUpdateWarning/nodeDefUpdatedUuids) - clear that bucket so
+    // _checkRecord leaves those values untouched. Added/deleted/validation-only-changed node defs
+    // are unaffected: inserting missing nodes, deleting nodes for removed defs and re-validating
+    // aren't a "data update", they're required for the record to stay consistent with the schema.
+    if (skipDataUpdate) {
+      nodeDefUpdatedUuids.length = 0
+    }
 
     const requiresCheck =
       cleanupRecords ||

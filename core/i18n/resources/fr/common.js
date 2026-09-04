@@ -166,14 +166,20 @@ Voulez-vous continuer ?`,
 
 {{reasons}}
 
-Cela peut modifier ou effacer définitivement des données déjà saisies. Saisissez le nom de l'enquête ci-dessous pour confirmer.`,
+Cela peut modifier ou effacer définitivement des données déjà saisies.
+
+Pour publier sans mettre à jour les données existantes, cochez « Ignorer la mise à jour des données » ci-dessous (non recommandé : cela peut laisser les données dans un état incohérent ou invalide).`,
     publishRecordValuesUpdateConfirmHeader: 'Les données des enregistrements existants seront mises à jour',
+    publishRecordValuesUpdateConfirmOk: 'Publier et mettre à jour les données',
     publishRecordValuesUpdateConfirmInputLabel:
       'Saisissez le nom de l\'enquête "{{strongConfirmRequiredText}}" pour confirmer',
     publishRecordValuesUpdateReasonAttributeChanged:
       'Les attributs suivants ont changé de manière à recalculer leur valeur dans les enregistrements existants : **{{attributeNames}}**.',
     publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
       "Les attributs suivants utilisent une propriété supplémentaire d'une catégorie ou d'une taxonomie qui a changé, ce qui recalculera leur valeur dans les enregistrements existants : **{{attributeNames}}**.",
+    publishSkipDataUpdate: 'Ignorer la mise à jour des données',
+    publishSkipDataUpdateConfirmOk: 'Ignorer la mise à jour des données et publier',
+    publishSkipDataUpdateConfirmOk: 'Ignorer la mise à jour des données et publier',
     raiseTicketInSupportForum: `En cas de problèmes, veuillez ouvrir un ticket avec le tag 'arena' dans notre <b>Forum de support</b> : $t(links.supportForum)`,
     record: 'Enregistrement',
     record_other: 'Enregistrements',

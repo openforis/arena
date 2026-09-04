@@ -166,14 +166,20 @@ Deseja prosseguir?`,
 
 {{reasons}}
 
-Isso pode alterar ou apagar permanentemente dados já inseridos. Digite o nome da pesquisa abaixo para confirmar.`,
+Isso pode alterar ou apagar permanentemente dados já inseridos.
+
+Para publicar sem atualizar os dados existentes, marque "Pular atualização de dados" abaixo (não recomendado: isso pode deixar os dados em um estado inconsistente ou inválido).`,
     publishRecordValuesUpdateConfirmHeader: 'Os dados de registros existentes serão atualizados',
+    publishRecordValuesUpdateConfirmOk: 'Publicar e atualizar dados',
     publishRecordValuesUpdateConfirmInputLabel:
       'Digite o nome da pesquisa "{{strongConfirmRequiredText}}" para confirmar',
     publishRecordValuesUpdateReasonAttributeChanged:
       'Os seguintes atributos foram alterados de forma que seu valor será recalculado nos registros existentes: **{{attributeNames}}**.',
     publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
       'Os seguintes atributos usam uma propriedade extra de uma categoria ou taxonomia que foi alterada, o que fará com que seu valor seja recalculado nos registros existentes: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Pular atualização de dados',
+    publishSkipDataUpdateConfirmOk: 'Pular atualização de dados e publicar',
+    publishSkipDataUpdateConfirmOk: 'Pular atualização de dados e publicar',
     raiseTicketInSupportForum: `Em caso de problemas, abra um chamado com a tag 'arena' no nosso <b>Fórum de Suporte</b>: $t(links.supportForum)`,
     record: 'Registro',
     record_other: 'Registros',

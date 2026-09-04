@@ -166,13 +166,18 @@ Do you want to proceed?`,
 
 {{reasons}}
 
-This can permanently change or clear data already entered. Type the survey name below to confirm.`,
+This can permanently change or clear data already entered.
+
+To publish without updating the existing data instead, check "Skip data update" below (not recommended: this can leave data in an inconsistent or invalid state).`,
     publishRecordValuesUpdateConfirmHeader: 'Existing record data will be updated',
+    publishRecordValuesUpdateConfirmOk: 'Publish and update data',
     publishRecordValuesUpdateConfirmInputLabel: 'Type the survey name "{{strongConfirmRequiredText}}" to confirm',
     publishRecordValuesUpdateReasonAttributeChanged:
       'The following attributes changed in a way that will recalculate their value in existing records: **{{attributeNames}}**.',
     publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
       'The following attributes use an extra property of a category or taxonomy that changed, which will recalculate their value in existing records: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Skip data update',
+    publishSkipDataUpdateConfirmOk: 'Skip data update and publish',
     raiseTicketInSupportForum: `In case of problems please raise a ticket with a tag 'arena' in our <b>Support Forum</b>: $t(links.supportForum)`,
     record: 'Record',
     record_other: 'Records',

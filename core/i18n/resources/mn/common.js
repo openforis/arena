@@ -160,14 +160,20 @@ export default {
 
 {{reasons}}
 
-Энэ нь оруулсан өгөгдлийг бүрмөсөн өөрчлөх эсвэл устгах магадлалтай. Баталгаажуулахын тулд доор судалгааны нэрийг бичнэ үү.`,
+Энэ нь оруулсан өгөгдлийг бүрмөсөн өөрчлөх эсвэл устгах магадлалтай.
+
+Одоо байгаа өгөгдлийг шинэчлэхгүйгээр нийтлэхийн тулд доорх "Өгөгдлийн шинэчлэлтийг алгасах" гэснийг сонгоно уу (зөвлөдөггүй: энэ нь өгөгдлийг зөрчилтэй эсвэл хүчингүй болгож болзошгүй).`,
     publishRecordValuesUpdateConfirmHeader: 'Одоо байгаа бичлэгийн өгөгдөл шинэчлэгдэнэ',
+    publishRecordValuesUpdateConfirmOk: 'Нийтлэх ба өгөгдлийг шинэчлэх',
     publishRecordValuesUpdateConfirmInputLabel:
       'Баталгаажуулахын тулд судалгааны нэр "{{strongConfirmRequiredText}}"-г бичнэ үү',
     publishRecordValuesUpdateReasonAttributeChanged:
       'Дараах атрибутууд өөрчлөгдсөн тул одоо байгаа бичлэгүүдэд утга нь дахин тооцоологдоно: **{{attributeNames}}**.',
     publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
       'Дараах атрибутууд нь өөрчлөгдсөн ангилал эсвэл таксономийн нэмэлт шинж чанарыг ашигладаг тул одоо байгаа бичлэгүүдэд утга нь дахин тооцоологдоно: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Өгөгдлийн шинэчлэлтийг алгасах',
+    publishSkipDataUpdateConfirmOk: 'Өгөгдлийн шинэчлэлтийг алгасаад нийтлэх',
+    publishSkipDataUpdateConfirmOk: 'Өгөгдлийн шинэчлэлтийг алгасаад нийтлэх',
     raiseTicketInSupportForum: `Асуудал гарвал манай <b>Дэмжлэгийн Форум</b>: $t(links.supportForum) руу 'arena' шошготой тасалбар үүсгэнэ үү.`,
     record: 'Бичлэг',
     record_other: 'Бичлэгүүд',
