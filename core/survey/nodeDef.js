@@ -781,6 +781,7 @@ export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
   !isMultiple(nodeDef) &&
   !isFile(nodeDef) &&
   !isGeo(nodeDef) &&
+  !isAnalysis(nodeDef) &&
   NodeDefLayout.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
 export const canIncludeInPreviousCycleLink = (cycle) => (nodeDef) =>
