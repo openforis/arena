@@ -10,12 +10,16 @@ import * as SurveyState from '../state'
 import { setActiveSurvey } from './active'
 
 export const publishSurvey =
-  ({ cleanupRecords = false, updateRecordValues = false } = {}) =>
+  ({ cleanupRecords = false, updateRecordValues = false, skipDataUpdate = false } = {}) =>
   async (dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
 
-    const { data } = await axios.put(`/api/survey/${surveyId}/publish`, { cleanupRecords, updateRecordValues })
+    const { data } = await axios.put(`/api/survey/${surveyId}/publish`, {
+      cleanupRecords,
+      updateRecordValues,
+      skipDataUpdate,
+    })
 
     const { recordValuesUpdateWarning } = data
     if (recordValuesUpdateWarning) {
@@ -38,16 +42,26 @@ export const publishSurvey =
           })
         )
       }
+      const reasonsText = reasons.join('\n\n')
 
+      // Skipping the data update is the risky choice (existing records can be left out of sync
+      // with the published survey definition), so it's kept behind an unchecked-by-default checkbox
+      // and only enforces the strong (type-the-survey-name) confirmation once checked; going ahead
+      // with the (default) data update only needs a plain, informational confirm.
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'common.publishRecordValuesUpdateConfirm',
-          params: { survey: surveyLabel, reasons: reasons.join('\n\n') },
+          params: { survey: surveyLabel, reasons: reasonsText },
           headerText: 'common.publishRecordValuesUpdateConfirmHeader',
+          okButtonLabel: 'common.publishRecordValuesUpdateConfirmOk',
+          onOk: publishSurvey({ cleanupRecords, updateRecordValues: true }),
+          checkboxLabel: 'common.publishSkipDataUpdate',
+          okButtonLabelChecked: 'common.publishSkipDataUpdateConfirmOk',
+          okButtonClassChecked: 'btn-danger',
+          onOkChecked: publishSurvey({ cleanupRecords, skipDataUpdate: true }),
           strongConfirm: true,
           strongConfirmInputLabel: 'common.publishRecordValuesUpdateConfirmInputLabel',
           strongConfirmRequiredText: surveyLabel,
-          onOk: publishSurvey({ cleanupRecords, updateRecordValues: true }),
         })
       )
       return

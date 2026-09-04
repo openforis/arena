@@ -15,6 +15,13 @@ const keys = {
   okButtonLabel: 'okButtonLabel',
   okButtonClass: 'okButtonClass',
   okButtonIconClass: 'okButtonIconClass',
+  // optional checkbox (unchecked by default) offering an alternative, less prominent action; when
+  // checked, onOkChecked/okButtonLabelChecked/okButtonClassChecked replace onOk/okButtonLabel/
+  // okButtonClass, and strong confirmation (if requested) is only enforced while it's checked
+  checkboxLabel: 'checkboxLabel',
+  onOkChecked: 'onOkChecked',
+  okButtonLabelChecked: 'okButtonLabelChecked',
+  okButtonClassChecked: 'okButtonClassChecked',
   // header
   headerText: 'headerText',
   // strong confirmation
@@ -23,6 +30,7 @@ const keys = {
   strongConfirmRequiredText: 'strongConfirmRequiredText', // text that the user has to input for strong confirmation
   // transient
   strongConfirmText: 'strongConfirmText',
+  checkboxChecked: 'checkboxChecked',
 }
 
 export const getKey = R.pipe(getState, R.propOr(null, keys.key))
@@ -33,6 +41,12 @@ export const getOnCancel = R.pipe(getState, R.prop(keys.onCancel))
 export const getOkButtonLabel = R.pipe(getState, R.propOr('common.ok', keys.okButtonLabel))
 export const getOkButtonClass = R.pipe(getState, R.prop(keys.okButtonClass))
 export const getOkButtonIconClass = R.pipe(getState, R.propOr('icon-checkmark icon-12px', keys.okButtonIconClass))
+// checkbox option
+export const getCheckboxLabel = R.pipe(getState, R.propOr(null, keys.checkboxLabel))
+export const getOnOkChecked = R.pipe(getState, R.prop(keys.onOkChecked))
+export const getOkButtonLabelChecked = R.pipe(getState, R.prop(keys.okButtonLabelChecked))
+export const getOkButtonClassChecked = R.pipe(getState, R.prop(keys.okButtonClassChecked))
+export const isCheckboxChecked = R.pipe(getState, R.propEq(keys.checkboxChecked, true))
 // header
 export const getHeaderText = R.pipe(getState, R.propOr(null, keys.headerText))
 // strong confirmation
@@ -51,6 +65,10 @@ export const show = ({
   okButtonLabel = 'common.ok',
   okButtonClass = undefined,
   okButtonIconClass = undefined,
+  checkboxLabel = null,
+  onOkChecked = null,
+  okButtonLabelChecked = null,
+  okButtonClassChecked = null,
   headerText = null,
   strongConfirm = false,
   strongConfirmInputLabel = 'confirm.strongConfirmInputLabel',
@@ -64,6 +82,10 @@ export const show = ({
   [keys.okButtonLabel]: okButtonLabel,
   [keys.okButtonClass]: okButtonClass,
   [keys.okButtonIconClass]: okButtonIconClass,
+  [keys.checkboxLabel]: checkboxLabel,
+  [keys.onOkChecked]: onOkChecked,
+  [keys.okButtonLabelChecked]: okButtonLabelChecked,
+  [keys.okButtonClassChecked]: okButtonClassChecked,
   [keys.headerText]: headerText,
   [keys.strongConfirm]: strongConfirm,
   [keys.strongConfirmInputLabel]: strongConfirmInputLabel,
@@ -73,3 +95,4 @@ export const show = ({
 // update
 export const hide = () => ({})
 export const setStrongConfirmText = (text) => R.assoc(keys.strongConfirmText, text)
+export const setCheckboxChecked = (checked) => R.assoc(keys.checkboxChecked, checked)
