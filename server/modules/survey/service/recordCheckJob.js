@@ -14,6 +14,7 @@ import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
 import * as SurveyManager from '../manager/surveyManager'
 import * as RecordManager from '../../record/manager/recordManager'
+import { findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges } from './publish/nodeDefExtraPropDependencyUtils'
 
 // Per-record/per-step tracing is too noisy to leave on for routine runs, but invaluable when a
 // publish is slow or looks stuck. Flip to true to re-enable it.
@@ -82,88 +83,157 @@ export default class RecordCheckJob extends Job {
   }
 
   async _getOrFetchSurveyAndNodeDefsByCycle(cycle) {
-    const { context, surveyId, tx } = this
-    const { cleanupRecords } = context
     this._cleanSurveysCache(cycle)
     let result = this.surveyAndNodeDefsByCycle[cycle]
     if (!result) {
-      // 1. fetch survey
-      // backup: true keeps propsAdvancedDraft separate from propsAdvanced (rather than merging and
-      // discarding it), which the classification below needs to detect an enumeratingItemsExpression/
-      // itemsFilter change - see NodeDef.hasValueAffectingAdvancedPropsDraft.
-      this.logDebugOptional(`fetching survey for cycle ${cycle}...`)
-      let survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-        { surveyId, cycle, draft: true, advanced: true, backup: true, includeDeleted: true },
-        tx
-      )
-
-      // 2. determine new, updated or deleted node defs
-      const nodeDefAddedUuids = []
-      const nodeDefUpdatedUuids = []
-      // Node defs whose validations alone changed: these need records re-validated against the new
-      // rules, but must NOT be treated as value-affecting (see below) - only applicable/default values/
-      // file name expression changes can affect stored node values (and, for code attributes, cascade
-      // into clearing dependent code attribute values). Folding a validations-only change (e.g. just
-      // editing a validation message) into that same bucket was wiping dependent code attribute values
-      // on every publish, even though the parent attribute's value never changed.
-      const nodeDefValidationUpdatedUuids = []
-      const nodeDefDeletedUuids = []
-
-      const nodeDefs = Survey.getNodeDefsArray(survey)
-      for (const def of nodeDefs) {
-        const nodeDefUuid = NodeDef.getUuid(def)
-        if (NodeDef.isDeleted(def)) {
-          nodeDefDeletedUuids.push(nodeDefUuid)
-        } else if (!NodeDef.isPublished(def)) {
-          // New node def
-          nodeDefAddedUuids.push(nodeDefUuid)
-        } else if (NodeDef.hasAdvancedPropsDraft(def) && NodeDef.hasValueAffectingAdvancedPropsDraft(def)) {
-          // Already existing node def but applicable, default values, file name expression,
-          // enumerating items expression or items filter have been updated
-          nodeDefUpdatedUuids.push(nodeDefUuid)
-        } else if (NodeDef.hasAdvancedPropsDraft(def) && NodeDef.hasAdvancedPropsValidationsDraft(def)) {
-          // Already existing node def but only validations have been updated
-          nodeDefValidationUpdatedUuids.push(nodeDefUuid)
-        }
-      }
-
-      const requiresCheck =
-        cleanupRecords ||
-        nodeDefAddedUuids.length +
-          nodeDefUpdatedUuids.length +
-          nodeDefValidationUpdatedUuids.length +
-          nodeDefDeletedUuids.length >
-          0
-
-      result = {
-        survey,
-        nodeDefAddedUuids,
-        nodeDefUpdatedUuids,
-        nodeDefValidationUpdatedUuids,
-        nodeDefDeletedUuids,
-        requiresCheck,
-        nodesForDeletedNodeDefsDeleted: false,
-      }
-
-      if (requiresCheck) {
-        this.logDebugOptional('survey has been updated: record check necessary; fetching survey and ref data...')
-        // fetch survey reference data (used later for record validation)
-        survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-          { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
-          tx
-        )
-        result.survey = survey
-
-        // get all not deleted node defs uuids (used for cleanupRecords)
-        const allNotDeletedNodeDefs = Survey.getNodeDefsArray(survey).filter((def) => !NodeDef.isDeleted(def))
-        const allNotDeletedNodeDefUuids = allNotDeletedNodeDefs.map(NodeDef.getUuid)
-        result.allNotDeletedNodeDefUuids = allNotDeletedNodeDefUuids
-        this.logDebugOptional('survey with ref data fetched')
-      }
+      result = await this._fetchSurveyAndNodeDefsByCycle(cycle)
       this.surveyAndNodeDefsByCycle[cycle] = result
+    }
+    return result
+  }
+
+  async _fetchSurveyAndNodeDefsByCycle(cycle) {
+    const { context, surveyId, tx } = this
+    const { cleanupRecords } = context
+
+    // 1. fetch survey
+    // backup: true keeps propsAdvancedDraft separate from propsAdvanced (rather than merging and
+    // discarding it), which _classifyNodeDefs needs to detect an enumeratingItemsExpression/
+    // itemsFilter change - see NodeDef.hasValueAffectingAdvancedPropsDraft.
+    this.logDebugOptional(`fetching survey for cycle ${cycle}...`)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+      { surveyId, cycle, draft: true, advanced: true, backup: true, includeDeleted: true },
+      tx
+    )
+
+    // 2. determine new, updated or deleted node defs
+    const { nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefValidationUpdatedUuids, nodeDefDeletedUuids } =
+      this._classifyNodeDefs(Survey.getNodeDefsArray(survey))
+
+    // 2b. determine node defs affected by a category/taxonomy extra prop change (definition or
+    // item/taxon value) - these don't have their own advanced props draft flag set (their own props
+    // didn't change), so they can't be caught by _classifyNodeDefs; found separately via a
+    // survey-wide category/taxonomy diff instead. See NodeDef.referencesCategoryExtraProp/
+    // referencesTaxonomyExtraProp and findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges.
+    const { valueAffectedNodeDefUuids, validationAffectedNodeDefUuids } =
+      await findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges({ surveyId, survey }, tx)
+
+    this._mergeCategoryOrTaxonomyAffectedNodeDefs({
+      nodeDefAddedUuids,
+      nodeDefUpdatedUuids,
+      nodeDefValidationUpdatedUuids,
+      nodeDefDeletedUuids,
+      valueAffectedNodeDefUuids,
+      validationAffectedNodeDefUuids,
+    })
+
+    const requiresCheck =
+      cleanupRecords ||
+      nodeDefAddedUuids.length +
+        nodeDefUpdatedUuids.length +
+        nodeDefValidationUpdatedUuids.length +
+        nodeDefDeletedUuids.length >
+        0
+
+    const result = {
+      survey,
+      nodeDefAddedUuids,
+      nodeDefUpdatedUuids,
+      nodeDefValidationUpdatedUuids,
+      nodeDefDeletedUuids,
+      requiresCheck,
+      nodesForDeletedNodeDefsDeleted: false,
+    }
+
+    if (requiresCheck) {
+      await this._fetchSurveyRefDataInto({ result, cycle })
     }
 
     return result
+  }
+
+  // Classifies each node def into exactly one of: added (new draft def), updated (existing def with a
+  // value-affecting advanced prop change) or validationUpdated (existing def with only a validations
+  // change), or collects it as deleted - leaving it out of all four buckets if nothing about it
+  // changed. Validations-only changes are kept out of "updated" on purpose: only applicable/default
+  // values/file name/enumerating items/items filter changes can affect a stored node value (and, for
+  // code attributes, cascade into clearing dependent code attribute values) - folding a
+  // validations-only change (e.g. just editing a validation message) into that same bucket was wiping
+  // dependent code attribute values on every publish, even though the parent attribute's value never
+  // changed.
+  _classifyNodeDefs(nodeDefs) {
+    const nodeDefAddedUuids = []
+    const nodeDefUpdatedUuids = []
+    const nodeDefValidationUpdatedUuids = []
+    const nodeDefDeletedUuids = []
+
+    for (const def of nodeDefs) {
+      const nodeDefUuid = NodeDef.getUuid(def)
+      if (NodeDef.isDeleted(def)) {
+        nodeDefDeletedUuids.push(nodeDefUuid)
+      } else if (!NodeDef.isPublished(def)) {
+        // New node def
+        nodeDefAddedUuids.push(nodeDefUuid)
+      } else if (NodeDef.hasAdvancedPropsDraft(def) && NodeDef.hasValueAffectingAdvancedPropsDraft(def)) {
+        // Already existing node def but applicable, default values, file name expression,
+        // enumerating items expression or items filter have been updated
+        nodeDefUpdatedUuids.push(nodeDefUuid)
+      } else if (NodeDef.hasAdvancedPropsDraft(def) && NodeDef.hasAdvancedPropsValidationsDraft(def)) {
+        // Already existing node def but only validations have been updated
+        nodeDefValidationUpdatedUuids.push(nodeDefUuid)
+      }
+    }
+
+    return { nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefValidationUpdatedUuids, nodeDefDeletedUuids }
+  }
+
+  // Folds category/taxonomy-extra-prop-affected node defs into the buckets from _classifyNodeDefs, in
+  // place, skipping any uuid already accounted for there: one already added/updated/deleted for its
+  // own reasons doesn't need a second, redundant "updated" entry, and one already flagged
+  // validation-updated doesn't need a duplicate either.
+  _mergeCategoryOrTaxonomyAffectedNodeDefs({
+    nodeDefAddedUuids,
+    nodeDefUpdatedUuids,
+    nodeDefValidationUpdatedUuids,
+    nodeDefDeletedUuids,
+    valueAffectedNodeDefUuids,
+    validationAffectedNodeDefUuids,
+  }) {
+    const nodeDefUpdatedOrAddedOrDeletedUuids = new Set([
+      ...nodeDefUpdatedUuids,
+      ...nodeDefAddedUuids,
+      ...nodeDefDeletedUuids,
+    ])
+    for (const nodeDefUuid of valueAffectedNodeDefUuids) {
+      if (!nodeDefUpdatedOrAddedOrDeletedUuids.has(nodeDefUuid)) {
+        nodeDefUpdatedUuids.push(nodeDefUuid)
+        nodeDefUpdatedOrAddedOrDeletedUuids.add(nodeDefUuid)
+      }
+    }
+
+    const nodeDefValidationUpdatedUuidsSet = new Set(nodeDefValidationUpdatedUuids)
+    for (const nodeDefUuid of validationAffectedNodeDefUuids) {
+      if (!nodeDefUpdatedOrAddedOrDeletedUuids.has(nodeDefUuid) && !nodeDefValidationUpdatedUuidsSet.has(nodeDefUuid)) {
+        nodeDefValidationUpdatedUuids.push(nodeDefUuid)
+      }
+    }
+  }
+
+  // Refetches the survey together with reference data (needed later for record validation) and
+  // computes the full non-deleted node def uuid list (needed for cleanupRecords), writing both onto
+  // `result` in place.
+  async _fetchSurveyRefDataInto({ result, cycle }) {
+    const { surveyId, tx } = this
+    this.logDebugOptional('survey has been updated: record check necessary; fetching survey and ref data...')
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
+      tx
+    )
+    result.survey = survey
+
+    const allNotDeletedNodeDefs = Survey.getNodeDefsArray(survey).filter((def) => !NodeDef.isDeleted(def))
+    result.allNotDeletedNodeDefUuids = allNotDeletedNodeDefs.map(NodeDef.getUuid)
+    this.logDebugOptional('survey with ref data fetched')
   }
 
   // Deletes nodes belonging to deleted node defs once per cycle: the delete is survey-wide (not

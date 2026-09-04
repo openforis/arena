@@ -164,12 +164,16 @@ Voulez-vous continuer ?`,
 **Êtes-vous sûr(e) de vouloir continuer ?**`,
     publishRecordValuesUpdateConfirm: `#### La publication de {{survey}} mettra à jour des données déjà enregistrées ####
 
-Les attributs suivants ont changé de manière à recalculer leur valeur dans les enregistrements existants : **{{attributeNames}}**.
+{{reasons}}
 
 Cela peut modifier ou effacer définitivement des données déjà saisies. Saisissez le nom de l'enquête ci-dessous pour confirmer.`,
     publishRecordValuesUpdateConfirmHeader: 'Les données des enregistrements existants seront mises à jour',
     publishRecordValuesUpdateConfirmInputLabel:
       'Saisissez le nom de l\'enquête "{{strongConfirmRequiredText}}" pour confirmer',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Les attributs suivants ont changé de manière à recalculer leur valeur dans les enregistrements existants : **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      "Les attributs suivants utilisent une propriété supplémentaire d'une catégorie ou d'une taxonomie qui a changé, ce qui recalculera leur valeur dans les enregistrements existants : **{{attributeNames}}**.",
     raiseTicketInSupportForum: `En cas de problèmes, veuillez ouvrir un ticket avec le tag 'arena' dans notre <b>Forum de support</b> : $t(links.supportForum)`,
     record: 'Enregistrement',
     record_other: 'Enregistrements',

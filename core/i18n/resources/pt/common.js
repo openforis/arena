@@ -164,12 +164,16 @@ Deseja prosseguir?`,
 **Tem certeza de que deseja continuar?**`,
     publishRecordValuesUpdateConfirm: `#### Publicar {{survey}} irá atualizar dados já registrados ####
 
-Os seguintes atributos foram alterados de forma que seu valor será recalculado nos registros existentes: **{{attributeNames}}**.
+{{reasons}}
 
 Isso pode alterar ou apagar permanentemente dados já inseridos. Digite o nome da pesquisa abaixo para confirmar.`,
     publishRecordValuesUpdateConfirmHeader: 'Os dados de registros existentes serão atualizados',
     publishRecordValuesUpdateConfirmInputLabel:
       'Digite o nome da pesquisa "{{strongConfirmRequiredText}}" para confirmar',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Os seguintes atributos foram alterados de forma que seu valor será recalculado nos registros existentes: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Os seguintes atributos usam uma propriedade extra de uma categoria ou taxonomia que foi alterada, o que fará com que seu valor seja recalculado nos registros existentes: **{{attributeNames}}**.',
     raiseTicketInSupportForum: `Em caso de problemas, abra um chamado com a tag 'arena' no nosso <b>Fórum de Suporte</b>: $t(links.supportForum)`,
     record: 'Registro',
     record_other: 'Registros',
