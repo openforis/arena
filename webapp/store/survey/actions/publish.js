@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import i18n from '@core/i18n/i18nFactory'
 import * as Survey from '@core/survey/survey'
 
 import { JobActions } from '@webapp/store/app'
@@ -21,10 +22,27 @@ export const publishSurvey =
       const surveyInfo = SurveyState.getSurveyInfo(state)
       const surveyLabel = Survey.getLabel(surveyInfo, SurveyState.getSurveyPreferredLang(state))
 
+      const { attributeNames = [], categoryOrTaxonomyExtraPropAttributeNames = [] } = recordValuesUpdateWarning
+      const reasons = []
+      if (attributeNames.length > 0) {
+        reasons.push(
+          i18n.t('common.publishRecordValuesUpdateReasonAttributeChanged', {
+            attributeNames: attributeNames.join(', '),
+          })
+        )
+      }
+      if (categoryOrTaxonomyExtraPropAttributeNames.length > 0) {
+        reasons.push(
+          i18n.t('common.publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged', {
+            attributeNames: categoryOrTaxonomyExtraPropAttributeNames.join(', '),
+          })
+        )
+      }
+
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'common.publishRecordValuesUpdateConfirm',
-          params: { survey: surveyLabel, attributeNames: recordValuesUpdateWarning.attributeNames.join(', ') },
+          params: { survey: surveyLabel, reasons: reasons.join('\n\n') },
           headerText: 'common.publishRecordValuesUpdateConfirmHeader',
           strongConfirm: true,
           strongConfirmInputLabel: 'common.publishRecordValuesUpdateConfirmInputLabel',
