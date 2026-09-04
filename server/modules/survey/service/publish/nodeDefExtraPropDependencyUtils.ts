@@ -23,13 +23,13 @@ const getExtraPropDefDataType = ExtraPropDef.getDataType as (extraPropDef: any) 
 const _diffExtraPropDefNames = (extraDefA: ExtraPropDefsMap, extraDefB: ExtraPropDefsMap): Set<string> => {
   const changedPropNames = new Set<string>()
   const allNames = new Set([...Object.keys(extraDefA), ...Object.keys(extraDefB)])
-  allNames.forEach((name) => {
+  for (const name of allNames) {
     const propA = extraDefA[name]
     const propB = extraDefB[name]
     if (!propA || !propB || getExtraPropDefDataType(propA) !== getExtraPropDefDataType(propB)) {
       changedPropNames.add(name)
     }
-  })
+  }
   return changedPropNames
 }
 
@@ -42,21 +42,21 @@ const _groupChangedExtraValuePropNamesByEntityUuid = (
   entityUuidField: string
 ): Map<string, Set<string>> => {
   const changedPropNamesByEntityUuid = new Map<string, Set<string>>()
-  rows.forEach((row) => {
+  for (const row of rows) {
     const entityUuid = row[entityUuidField]
     const extraPublished = row.extraPublished ?? {}
     const extraDraft = row.extraDraft ?? {}
     const changedPropNames = changedPropNamesByEntityUuid.get(entityUuid) ?? new Set<string>()
     const allNames = new Set([...Object.keys(extraPublished), ...Object.keys(extraDraft)])
-    allNames.forEach((name) => {
+    for (const name of allNames) {
       if (JSON.stringify(extraPublished[name]) !== JSON.stringify(extraDraft[name])) {
         changedPropNames.add(name)
       }
-    })
+    }
     if (changedPropNames.size > 0) {
       changedPropNamesByEntityUuid.set(entityUuid, changedPropNames)
     }
-  })
+  }
   return changedPropNamesByEntityUuid
 }
 
@@ -96,7 +96,7 @@ export const findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges = asyn
   )
 
   const changedCategories: ChangedEntity[] = []
-  Survey.getCategoriesArray(survey).forEach((categoryDraft: any) => {
+  for (const categoryDraft of Survey.getCategoriesArray(survey)) {
     const categoryUuid = Category.getUuid(categoryDraft)
     const categoryPublished = categoriesPublishedByUuid[categoryUuid]
     const schemaChangedPropNames = categoryPublished
@@ -109,10 +109,10 @@ export const findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges = asyn
     if (changedPropNames.size > 0) {
       changedCategories.push({ name: Category.getName(categoryDraft), changedPropNames })
     }
-  })
+  }
 
   const changedTaxonomies: ChangedEntity[] = []
-  Survey.getTaxonomiesArray(survey).forEach((taxonomyDraft: any) => {
+  for (const taxonomyDraft of Survey.getTaxonomiesArray(survey)) {
     const taxonomyUuid = Taxonomy.getUuid(taxonomyDraft)
     const taxonomyPublished = taxonomiesPublishedByUuid[taxonomyUuid]
     const schemaChangedPropNames = taxonomyPublished
@@ -125,14 +125,14 @@ export const findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges = asyn
     if (changedPropNames.size > 0) {
       changedTaxonomies.push({ name: Taxonomy.getName(taxonomyDraft), changedPropNames })
     }
-  })
+  }
 
   const valueAffectedNodeDefUuids = new Set<string>()
   const validationAffectedNodeDefUuids = new Set<string>()
 
   if (changedCategories.length > 0 || changedTaxonomies.length > 0) {
-    Survey.getNodeDefsArray(survey).forEach((nodeDef: any) => {
-      if (!NodeDef.isPublished(nodeDef) || NodeDef.isDeleted(nodeDef)) return
+    for (const nodeDef of Survey.getNodeDefsArray(survey)) {
+      if (!NodeDef.isPublished(nodeDef) || NodeDef.isDeleted(nodeDef)) continue
 
       const valueMatch =
         changedCategories.some(({ name, changedPropNames }) =>
@@ -143,7 +143,7 @@ export const findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges = asyn
         )
       if (valueMatch) {
         valueAffectedNodeDefUuids.add(NodeDef.getUuid(nodeDef))
-        return
+        continue
       }
 
       const validationMatch =
@@ -156,7 +156,7 @@ export const findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges = asyn
       if (validationMatch) {
         validationAffectedNodeDefUuids.add(NodeDef.getUuid(nodeDef))
       }
-    })
+    }
   }
 
   return { valueAffectedNodeDefUuids, validationAffectedNodeDefUuids }
