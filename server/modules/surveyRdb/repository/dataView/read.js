@@ -200,6 +200,7 @@ const _createViewDataQuery = (params) => {
     recordOwnerUuid = null,
     offset = null,
     limit = null,
+    randomize = false,
     stream = false,
   } = params
 
@@ -259,11 +260,16 @@ const _createViewDataQuery = (params) => {
   }
 
   // SORT clause
-  const sort = Query.getSort(query)
-  const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
-  if (!R.isEmpty(sortParams)) {
-    queryBuilder.orderBy(sortClause)
-    queryBuilder.addParams(sortParams)
+  if (randomize) {
+    // random sampling: ignore the requested sort, order randomly so a LIMIT below returns a representative sample
+    queryBuilder.orderBy('random()')
+  } else {
+    const sort = Query.getSort(query)
+    const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
+    if (!R.isEmpty(sortParams)) {
+      queryBuilder.orderBy(sortClause)
+      queryBuilder.addParams(sortParams)
+    }
   }
   if (!R.isNil(limit)) {
     queryBuilder.limit('$/limit/')
@@ -293,6 +299,7 @@ const _createViewDataQuery = (params) => {
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.offset] - The query offset.
  * @param {number} [params.limit] - The query limit.
+ * @param {boolean} [params.randomize] - Whether to order rows randomly instead of by the query sort, so that a limited result is a representative sample rather than the first N rows. Ignored when no limit is specified.
  * @param {boolean} [params.stream] - Whether to fetch rows to be streamed.
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.

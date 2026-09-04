@@ -18,6 +18,7 @@ export const useDataQuery = ({ query, limitData = true }) => {
   const [count, setCount] = useState(null)
   const [limit, setLimit] = useState(initialLimit)
   const [offset, setOffset] = useState(defaultValues.offset)
+  const [randomize, setRandomize] = useState(false)
 
   const hasSelection = Query.hasSelection(query)
   const mode = Query.getMode(query)
@@ -41,13 +42,24 @@ export const useDataQuery = ({ query, limitData = true }) => {
 
   // on mount or on update offset, attributeDefUuids, dimensions, measures: fetch or reset
   useEffect(() => {
-    if (hasSelection) Actions.fetch({ offset, limit, query })
+    if (hasSelection) Actions.fetch({ offset, limit, randomize, query })
     else Actions.reset()
-  }, [limit, offset, attributeDefUuids, dimensions, hasSelection, measures, measuresAggregateFnsSize, mode, sort])
+  }, [
+    limit,
+    offset,
+    randomize,
+    attributeDefUuids,
+    dimensions,
+    hasSelection,
+    measures,
+    measuresAggregateFnsSize,
+    mode,
+    sort,
+  ])
 
   // on filter update: fetch data and count
   useOnUpdate(() => {
-    if (hasSelection) Actions.fetch({ offset, limit, query, includesCount: true })
+    if (hasSelection) Actions.fetch({ offset, limit, randomize, query, includesCount: true })
   }, [filter, filterRecordUuid])
 
   return {
@@ -59,8 +71,10 @@ export const useDataQuery = ({ query, limitData = true }) => {
     dataLoadingError,
     limit,
     offset,
+    randomize,
     setLimit,
     setOffset,
+    setRandomize,
     setData: (dataUpdated) => setData({ ...data, data: dataUpdated }),
   }
 }
