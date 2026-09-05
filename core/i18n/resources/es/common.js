@@ -157,7 +157,6 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       'Los siguientes atributos utilizan una propiedad adicional de una categoría o taxonomía que ha cambiado, lo que hará que se recalcule su valor en los registros existentes: **{{attributeNames}}**.',
     publishSkipDataUpdate: 'Omitir actualización de datos',
     publishSkipDataUpdateConfirmOk: 'Omitir actualización de datos y publicar',
-    publishSkipDataUpdateConfirmOk: 'Omitir actualización de datos y publicar',
     raiseTicketInSupportForum:
       "En caso de problemas, por favor, abra un ticket con la etiqueta 'arena' en nuestro <b>Foro de soporte</b>: $t(links.supportForum)",
     record: 'Registro',

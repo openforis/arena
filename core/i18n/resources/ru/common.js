@@ -173,7 +173,6 @@ export default {
       'Следующие атрибуты используют дополнительное свойство категории или таксономии, которое изменилось, из-за чего их значение будет пересчитано в существующих записях: **{{attributeNames}}**.',
     publishSkipDataUpdate: 'Пропустить обновление данных',
     publishSkipDataUpdateConfirmOk: 'Пропустить обновление данных и опубликовать',
-    publishSkipDataUpdateConfirmOk: 'Пропустить обновление данных и опубликовать',
     raiseTicketInSupportForum: `В случае проблем, пожалуйста, создайте заявку с тегом 'arena' на нашем <b>Форуме поддержки</b>: $t(links.supportForum)`,
     record: 'Запись',
     record_other: 'Записи',

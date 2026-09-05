@@ -179,7 +179,6 @@ Pour publier sans mettre à jour les données existantes, cochez « Ignorer la m
       "Les attributs suivants utilisent une propriété supplémentaire d'une catégorie ou d'une taxonomie qui a changé, ce qui recalculera leur valeur dans les enregistrements existants : **{{attributeNames}}**.",
     publishSkipDataUpdate: 'Ignorer la mise à jour des données',
     publishSkipDataUpdateConfirmOk: 'Ignorer la mise à jour des données et publier',
-    publishSkipDataUpdateConfirmOk: 'Ignorer la mise à jour des données et publier',
     raiseTicketInSupportForum: `En cas de problèmes, veuillez ouvrir un ticket avec le tag 'arena' dans notre <b>Forum de support</b> : $t(links.supportForum)`,
     record: 'Enregistrement',
     record_other: 'Enregistrements',

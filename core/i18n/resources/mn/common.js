@@ -173,7 +173,6 @@ export default {
       'Дараах атрибутууд нь өөрчлөгдсөн ангилал эсвэл таксономийн нэмэлт шинж чанарыг ашигладаг тул одоо байгаа бичлэгүүдэд утга нь дахин тооцоологдоно: **{{attributeNames}}**.',
     publishSkipDataUpdate: 'Өгөгдлийн шинэчлэлтийг алгасах',
     publishSkipDataUpdateConfirmOk: 'Өгөгдлийн шинэчлэлтийг алгасаад нийтлэх',
-    publishSkipDataUpdateConfirmOk: 'Өгөгдлийн шинэчлэлтийг алгасаад нийтлэх',
     raiseTicketInSupportForum: `Асуудал гарвал манай <b>Дэмжлэгийн Форум</b>: $t(links.supportForum) руу 'arena' шошготой тасалбар үүсгэнэ үү.`,
     record: 'Бичлэг',
     record_other: 'Бичлэгүүд',
