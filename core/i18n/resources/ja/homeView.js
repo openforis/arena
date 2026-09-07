@@ -147,7 +147,7 @@ export default {
     security: {
       title: 'セキュリティ',
       dataEditorViewNotOwnedRecordsAllowed: 'データ編集者が他者所有の記録を閲覧可能にする',
-      dataAnalystViewNotOwnedRecordsAllowed: 'データアナリストが他者所有の記録を閲覧可能にする',
+      dataAnalystViewNotOwnedRecordsAllowed: 'データ分析者が他者所有の記録を閲覧可能にする',
       visibleInMobile: 'Arena Mobileに表示する',
       allowRecordsDownloadInMobile: 'サーバーからArena Mobileへの記録ダウンロードを許可',
       allowRecordsUploadFromMobile: 'Arena Mobileからサーバーへの記録アップロードを許可',

@@ -31,9 +31,9 @@ export default {
       description: 'データクレンジングステップで記録の編集が可能',
     },
     dataAnalyst: {
-      label: 'データアナリスト',
-      label_plural: 'データアナリスト',
-      description: 'データ分析ステップで記録の編集が可能',
+      label: 'データ分析者',
+      label_plural: 'データ分析者',
+      description: 'データ分析手順で記録の編集が可能',
     },
     surveyGuest: {
       label: '調査ゲスト',

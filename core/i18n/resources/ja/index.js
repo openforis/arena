@@ -1,9 +1,7 @@
-// 翻訳未着手の名前空間は英語(en)からそのまま再エクスポートしている。
-// 翻訳が完了し次第、対応するインポート元を './<name>' に切り替えること。
 import activityLog from './activityLog'
 import appErrors from './appErrors'
 import auth from './auth'
-import common from '../en/common'
+import common from './common'
 import dataExportView from './dataExportView'
 import dataImportView from './dataImportView'
 import dataView from './dataView'

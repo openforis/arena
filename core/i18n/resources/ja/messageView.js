@@ -42,7 +42,7 @@ export default {
       all: 'すべてのユーザー',
       system_admins: 'システム管理者',
       survey_managers: '調査マネージャー',
-      data_analysts: 'データアナリスト',
+      data_analysts: 'データ分析者',
       data_cleaners: 'データクレンザー',
       data_editors: 'データ編集者',
       individual: '個別ユーザー',
