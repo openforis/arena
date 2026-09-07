@@ -168,7 +168,7 @@ Deseja prosseguir?`,
 
 Isso pode alterar ou apagar permanentemente dados já inseridos.
 
-Para publicar sem atualizar os dados existentes, marque "Pular atualização de dados" abaixo (não recomendado: isso pode deixar os dados em um estado inconsistente ou inválido).`,
+Para publicar sem atualizar os dados existentes, marque "Pular atualização de dados" abaixo (não recomendado).`,
     publishRecordValuesUpdateConfirmHeader: 'Os dados de registros existentes serão atualizados',
     publishRecordValuesUpdateConfirmOk: 'Publicar e atualizar dados',
     publishRecordValuesUpdateConfirmInputLabel:
@@ -179,6 +179,13 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
       'Os seguintes atributos usam uma propriedade extra de uma categoria ou taxonomia que foi alterada, o que fará com que seu valor seja recalculado nos registros existentes: **{{attributeNames}}**.',
     publishSkipDataUpdate: 'Pular atualização de dados',
     publishSkipDataUpdateConfirmOk: 'Pular atualização de dados e publicar',
+    publishSkipDataUpdateImplications: 'Pular a atualização de dados significa que:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Os registros existentes podem não corresponder mais à nova definição da pesquisa',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Os valores afetados não serão recalculados até serem reinseridos manualmente',
+    publishSkipDataUpdateImplicationChains:
+      'As cadeias de processamento que usam esses atributos podem produzir resultados desatualizados',
     raiseTicketInSupportForum: `Em caso de problemas, abra um chamado com a tag 'arena' no nosso <b>Fórum de Suporte</b>: $t(links.supportForum)`,
     record: 'Registro',
     record_other: 'Registros',

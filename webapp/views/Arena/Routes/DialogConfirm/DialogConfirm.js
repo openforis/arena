@@ -24,6 +24,8 @@ const DialogConfirm = () => {
     checkboxChecked,
     okButtonLabelChecked,
     okButtonClassChecked,
+    checkboxCheckedContentKey,
+    checkboxCheckedContentParams,
     headerText,
     strongConfirm,
     strongConfirmInputLabel,
@@ -58,6 +60,10 @@ const DialogConfirm = () => {
             onChange={onCheckboxChange}
             testId={TestId.dialogConfirm.checkbox}
           />
+        )}
+
+        {checkboxChecked && checkboxCheckedContentKey && (
+          <Markdown source={i18n.t(checkboxCheckedContentKey, checkboxCheckedContentParams)} />
         )}
 
         {strongConfirmActive && (

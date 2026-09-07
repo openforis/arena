@@ -168,7 +168,7 @@ Voulez-vous continuer ?`,
 
 Cela peut modifier ou effacer définitivement des données déjà saisies.
 
-Pour publier sans mettre à jour les données existantes, cochez « Ignorer la mise à jour des données » ci-dessous (non recommandé : cela peut laisser les données dans un état incohérent ou invalide).`,
+Pour publier sans mettre à jour les données existantes, cochez « Ignorer la mise à jour des données » ci-dessous (non recommandé).`,
     publishRecordValuesUpdateConfirmHeader: 'Les données des enregistrements existants seront mises à jour',
     publishRecordValuesUpdateConfirmOk: 'Publier et mettre à jour les données',
     publishRecordValuesUpdateConfirmInputLabel:
@@ -179,6 +179,13 @@ Pour publier sans mettre à jour les données existantes, cochez « Ignorer la m
       "Les attributs suivants utilisent une propriété supplémentaire d'une catégorie ou d'une taxonomie qui a changé, ce qui recalculera leur valeur dans les enregistrements existants : **{{attributeNames}}**.",
     publishSkipDataUpdate: 'Ignorer la mise à jour des données',
     publishSkipDataUpdateConfirmOk: 'Ignorer la mise à jour des données et publier',
+    publishSkipDataUpdateImplications: 'Ignorer la mise à jour des données signifie que :\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      "Les enregistrements existants peuvent ne plus correspondre à la nouvelle définition de l'enquête",
+    publishSkipDataUpdateImplicationStaleValues:
+      "Les valeurs concernées ne seront pas recalculées tant qu'elles ne seront pas ressaisies manuellement",
+    publishSkipDataUpdateImplicationChains:
+      'Les chaînes de traitement utilisant ces attributs peuvent produire des résultats obsolètes',
     raiseTicketInSupportForum: `En cas de problèmes, veuillez ouvrir un ticket avec le tag 'arena' dans notre <b>Forum de support</b> : $t(links.supportForum)`,
     record: 'Enregistrement',
     record_other: 'Enregistrements',

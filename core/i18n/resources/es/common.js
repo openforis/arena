@@ -146,7 +146,7 @@ export default {
 
 Esto puede cambiar o borrar permanentemente datos ya introducidos.
 
-Para publicar sin actualizar los datos existentes, marque "Omitir actualización de datos" a continuación (no recomendado: esto puede dejar los datos en un estado inconsistente o no válido).`,
+Para publicar sin actualizar los datos existentes, marque "Omitir actualización de datos" a continuación (no recomendado).`,
     publishRecordValuesUpdateConfirmHeader: 'Se actualizarán los datos de los registros existentes',
     publishRecordValuesUpdateConfirmOk: 'Publicar y actualizar datos',
     publishRecordValuesUpdateConfirmInputLabel:
@@ -157,6 +157,13 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       'Los siguientes atributos utilizan una propiedad adicional de una categoría o taxonomía que ha cambiado, lo que hará que se recalcule su valor en los registros existentes: **{{attributeNames}}**.',
     publishSkipDataUpdate: 'Omitir actualización de datos',
     publishSkipDataUpdateConfirmOk: 'Omitir actualización de datos y publicar',
+    publishSkipDataUpdateImplications: 'Omitir la actualización de datos implica lo siguiente:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Los registros existentes pueden dejar de coincidir con la nueva definición de la encuesta',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Los valores afectados no se recalcularán hasta que se vuelvan a introducir manualmente',
+    publishSkipDataUpdateImplicationChains:
+      'Las cadenas de procesamiento que usan estos atributos pueden producir resultados desactualizados',
     raiseTicketInSupportForum:
       "En caso de problemas, por favor, abra un ticket con la etiqueta 'arena' en nuestro <b>Foro de soporte</b>: $t(links.supportForum)",
     record: 'Registro',

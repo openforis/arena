@@ -22,6 +22,9 @@ const keys = {
   onOkChecked: 'onOkChecked',
   okButtonLabelChecked: 'okButtonLabelChecked',
   okButtonClassChecked: 'okButtonClassChecked',
+  // optional extra content (i18n key + params), shown only while the checkbox is checked
+  checkboxCheckedContentKey: 'checkboxCheckedContentKey',
+  checkboxCheckedContentParams: 'checkboxCheckedContentParams',
   // header
   headerText: 'headerText',
   // strong confirmation
@@ -47,6 +50,8 @@ export const getOnOkChecked = R.pipe(getState, R.prop(keys.onOkChecked))
 export const getOkButtonLabelChecked = R.pipe(getState, R.prop(keys.okButtonLabelChecked))
 export const getOkButtonClassChecked = R.pipe(getState, R.prop(keys.okButtonClassChecked))
 export const isCheckboxChecked = R.pipe(getState, R.propEq(keys.checkboxChecked, true))
+export const getCheckboxCheckedContentKey = R.pipe(getState, R.propOr(null, keys.checkboxCheckedContentKey))
+export const getCheckboxCheckedContentParams = R.pipe(getState, R.propOr({}, keys.checkboxCheckedContentParams))
 // header
 export const getHeaderText = R.pipe(getState, R.propOr(null, keys.headerText))
 // strong confirmation
@@ -69,6 +74,8 @@ export const show = ({
   onOkChecked = null,
   okButtonLabelChecked = null,
   okButtonClassChecked = null,
+  checkboxCheckedContentKey = null,
+  checkboxCheckedContentParams = {},
   headerText = null,
   strongConfirm = false,
   strongConfirmInputLabel = 'confirm.strongConfirmInputLabel',
@@ -86,6 +93,8 @@ export const show = ({
   [keys.onOkChecked]: onOkChecked,
   [keys.okButtonLabelChecked]: okButtonLabelChecked,
   [keys.okButtonClassChecked]: okButtonClassChecked,
+  [keys.checkboxCheckedContentKey]: checkboxCheckedContentKey,
+  [keys.checkboxCheckedContentParams]: checkboxCheckedContentParams,
   [keys.headerText]: headerText,
   [keys.strongConfirm]: strongConfirm,
   [keys.strongConfirmInputLabel]: strongConfirmInputLabel,

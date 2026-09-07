@@ -44,6 +44,15 @@ export const publishSurvey =
       }
       const reasonsText = reasons.join('\n\n')
 
+      const survey = SurveyState.getSurvey(state)
+      const hasAnalysisNodeDefs = Survey.getAnalysisNodeDefs({})(survey).length > 0
+      const skipDataUpdateImplications = [
+        i18n.t('common.publishSkipDataUpdateImplicationInconsistentData'),
+        i18n.t('common.publishSkipDataUpdateImplicationStaleValues'),
+        ...(hasAnalysisNodeDefs ? [i18n.t('common.publishSkipDataUpdateImplicationChains')] : []),
+      ]
+      const skipDataUpdateImplicationsText = skipDataUpdateImplications.map((item) => `- ${item}`).join('\n')
+
       // Skipping the data update is the risky choice (existing records can be left out of sync
       // with the published survey definition), so it's kept behind an unchecked-by-default checkbox
       // and only enforces the strong (type-the-survey-name) confirmation once checked; going ahead
@@ -58,6 +67,8 @@ export const publishSurvey =
           checkboxLabel: 'common.publishSkipDataUpdate',
           okButtonLabelChecked: 'common.publishSkipDataUpdateConfirmOk',
           okButtonClassChecked: 'btn-danger',
+          checkboxCheckedContentKey: 'common.publishSkipDataUpdateImplications',
+          checkboxCheckedContentParams: { implications: skipDataUpdateImplicationsText },
           onOkChecked: publishSurvey({ cleanupRecords, skipDataUpdate: true }),
           strongConfirm: true,
           strongConfirmInputLabel: 'common.publishRecordValuesUpdateConfirmInputLabel',
