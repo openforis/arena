@@ -166,7 +166,7 @@ Deseja prosseguir?`,
 
 {{reasons}}
 
-Isso pode alterar ou apagar permanentemente dados já inseridos.
+Esta operação pode alterar ou apagar permanentemente dados já inseridos.
 
 Para publicar sem atualizar os dados existentes, marque "Pular atualização de dados" abaixo (não recomendado).`,
     publishRecordValuesUpdateConfirmHeader: 'Os dados de registros existentes serão atualizados',
@@ -174,7 +174,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     publishRecordValuesUpdateConfirmInputLabel:
       'Digite o nome da pesquisa "{{strongConfirmRequiredText}}" para confirmar',
     publishRecordValuesUpdateReasonAttributeChanged:
-      'Os seguintes atributos foram alterados de forma que seu valor será recalculado nos registros existentes: **{{attributeNames}}**.',
+      'Os seguintes atributos serão modificados, e seus valores nos registros existentes serão recalculados automaticamente: **{{attributeNames}}**.',
     publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
       'Os seguintes atributos usam uma propriedade extra de uma categoria ou taxonomia que foi alterada, o que fará com que seu valor seja recalculado nos registros existentes: **{{attributeNames}}**.',
     publishSkipDataUpdate: 'Pular atualização de dados',

@@ -166,7 +166,7 @@ Voulez-vous continuer ?`,
 
 {{reasons}}
 
-Cela peut modifier ou effacer définitivement des données déjà saisies.
+Cette opération peut modifier ou effacer définitivement des données déjà saisies.
 
 Pour publier sans mettre à jour les données existantes, cochez « Ignorer la mise à jour des données » ci-dessous (non recommandé).`,
     publishRecordValuesUpdateConfirmHeader: 'Les données des enregistrements existants seront mises à jour',
@@ -174,7 +174,7 @@ Pour publier sans mettre à jour les données existantes, cochez « Ignorer la m
     publishRecordValuesUpdateConfirmInputLabel:
       'Saisissez le nom de l\'enquête "{{strongConfirmRequiredText}}" pour confirmer',
     publishRecordValuesUpdateReasonAttributeChanged:
-      'Les attributs suivants ont changé de manière à recalculer leur valeur dans les enregistrements existants : **{{attributeNames}}**.',
+      'Les attributs suivants seront modifiés, et leurs valeurs dans les enregistrements existants seront automatiquement recalculées : **{{attributeNames}}**.',
     publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
       "Les attributs suivants utilisent une propriété supplémentaire d'une catégorie ou d'une taxonomie qui a changé, ce qui recalculera leur valeur dans les enregistrements existants : **{{attributeNames}}**.",
     publishSkipDataUpdate: 'Ignorer la mise à jour des données',

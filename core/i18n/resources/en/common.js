@@ -166,20 +166,21 @@ Do you want to proceed?`,
 
 {{reasons}}
 
-This can permanently change or clear data already entered.
+This operation can permanently change or clear data already entered.
 
 To publish without updating the existing data instead, check "Skip data update" below (not recommended).`,
     publishRecordValuesUpdateConfirmHeader: 'Existing record data will be updated',
     publishRecordValuesUpdateConfirmOk: 'Publish and update data',
     publishRecordValuesUpdateConfirmInputLabel: 'Type the survey name "{{strongConfirmRequiredText}}" to confirm',
     publishRecordValuesUpdateReasonAttributeChanged:
-      'The following attributes changed in a way that will recalculate their value in existing records: **{{attributeNames}}**.',
+      'The following attributes will be modified, and their values in existing records will be automatically recalculated: **{{attributeNames}}**.',
     publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
       'The following attributes use an extra property of a category or taxonomy that changed, which will recalculate their value in existing records: **{{attributeNames}}**.',
     publishSkipDataUpdate: 'Skip data update',
     publishSkipDataUpdateConfirmOk: 'Skip data update and publish',
     publishSkipDataUpdateImplications: 'Skipping the data update means:\n\n{{implications}}',
-    publishSkipDataUpdateImplicationInconsistentData: 'Existing records may no longer match the new survey definition',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Existing records may no longer match with the new survey definition',
     publishSkipDataUpdateImplicationStaleValues: "Affected values won't be recalculated until re-entered manually",
     publishSkipDataUpdateImplicationChains: 'Processing chains using these attributes may produce outdated results',
     raiseTicketInSupportForum: `In case of problems please raise a ticket with a tag 'arena' in our <b>Support Forum</b>: $t(links.supportForum)`,
