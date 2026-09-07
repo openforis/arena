@@ -14,6 +14,8 @@ export default {
     noRecordsMatchingSearchCriteria: 'No records matching search criteria',
   },
   dataImport: {
+    arenaMobileVersionNotSupported:
+      'This data was created with Arena Mobile version {{arenaMobileVersion}}, which is no longer supported; please update Arena Mobile to at least version {{minArenaMobileVersion}} and try again',
     importFromMobileNotAllawed: 'Data import from Arena Mobile not allowed',
     invalidNodeInRecord:
       'Invalid node in record "{{recordUuid}}", node "{{nodeUuid}}" with node definition "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
