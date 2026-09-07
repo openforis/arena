@@ -14,19 +14,25 @@ const pgp = pgPromise()
  * @returns {object} - The fake client.
  */
 const newFakeClient = () => ({
-  map: async (query, params) => {
+  map: async (query, params, cb) => {
     pgp.as.format(query, params)
-    return []
+    const fakeRow = { id: 1 }
+    cb(fakeRow, 0)
+    return [fakeRow]
   },
 })
 
 describe('nodeRepository.insertNodesInBatch', () => {
-  it('does not throw when a node value contains a literal "$" followed by digits', async () => {
+  it('does not misinterpret a node value containing a literal "$" followed by digits as a query parameter', async () => {
     const recordUuid = 'record-uuid-1'
     const node = Node.newNode('node-def-uuid-1', recordUuid, null, 'It costs $90, not more')
 
     const client = newFakeClient()
 
-    await insertNodesInBatch({ surveyId: 1, nodes: [node] }, client)
+    const nodesInserted = await insertNodesInBatch({ surveyId: 1, nodes: [node] }, client)
+
+    // the fake client's `map` above would have thrown "Variable $90 out of range" before reaching
+    // this point if the value had been misformatted as a query parameter
+    expect(nodesInserted[0].id).toBe(1)
   })
 })
