@@ -33,8 +33,14 @@ const JobTiming = ({ job }: Props) => {
 
   useEffect(() => {
     if (!jobRunning) return
+    // Track the real delta between ticks (rather than assuming a fixed 1000ms step),
+    // so a throttled/background tab doesn't cause the elapsed time to undercount.
+    let lastTick = Date.now()
     const intervalId = setInterval(() => {
-      setTickedElapsedMillis((elapsed) => elapsed + 1000)
+      const now = Date.now()
+      const delta = now - lastTick
+      lastTick = now
+      setTickedElapsedMillis((elapsed) => elapsed + delta)
     }, 1000)
     return () => clearInterval(intervalId)
   }, [jobRunning])
