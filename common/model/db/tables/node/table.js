@@ -13,7 +13,7 @@ const columnSet = {
   recordUuid: 'record_uuid',
   iId: 'i_id',
   parentIId: 'p_i_id',
-  nodeDefUuid: 'node_def_uuid',
+  nodeDefId: 'node_def_id',
   value: 'value',
   meta: 'meta',
   dateCreated: Table.columnSetCommon.dateCreated,
@@ -46,8 +46,8 @@ export default class TableNode extends TableSurvey {
     return super.getColumn(columnSet.parentIId)
   }
 
-  get columnNodeDefUuid() {
-    return super.getColumn(columnSet.nodeDefUuid)
+  get columnNodeDefId() {
+    return super.getColumn(columnSet.nodeDefId)
   }
 
   get columnValue() {

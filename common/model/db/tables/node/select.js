@@ -67,7 +67,12 @@ export function getSelect(params) {
 
   _addIdEqualCondition(this.columnIId, uuid)
   _addUuidEqualCondition(this.columnRecordUuid, recordUuid)
-  _addUuidEqualCondition(this.columnNodeDefUuid, nodeDefUuid)
+  if (nodeDefUuid) {
+    // node.node_def_uuid was dropped in favor of node.node_def_id; the survey (already in memory
+    // here) resolves the filter uuid to an id without needing a join to node_def just for this.
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(this.survey)
+    _addIdEqualCondition(this.columnNodeDefId, NodeDef.getId(nodeDef))
+  }
   _addParentNodeCondition()
 
   const _getColumnValueProp = (keyProp) => `${this.columnValue}->>'${keyProp}'`
@@ -75,7 +80,7 @@ export function getSelect(params) {
   const columnCategoryItemUuid = _getColumnValueProp(Node.valuePropsCode.itemUuid)
   const columnTaxonVernacularNameUuid = _getColumnValueProp(Node.valuePropsTaxon.vernacularNameUuid)
 
-  const query = `SELECT ${this.columns},
+  const query = `SELECT ${this.columns}, nd.uuid AS node_def_uuid,
         CASE
             WHEN ${columnTaxonUuid} IS NOT NULL
             THEN json_build_object( 
@@ -117,6 +122,10 @@ export function getSelect(params) {
         END AS ref_data
     FROM
         ${this.nameAliased}
+    JOIN
+        ${this.schema}.node_def nd
+    ON
+        nd.id = ${this.columnNodeDefId}
     LEFT OUTER JOIN
         ${tableCategoryItem.nameAliased}
     ON

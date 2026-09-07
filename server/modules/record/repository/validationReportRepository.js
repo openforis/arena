@@ -56,7 +56,7 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
   if (Array.isArray(attributeDefUuids) && attributeDefUuids.length === 0) {
     filterByAttributeDefsClause = 'AND 1 = 0'
   } else if (attributeDefUuids?.length > 0) {
-    filterByAttributeDefsClause = 'AND n.node_def_uuid IN ($/attributeDefUuids:csv/)'
+    filterByAttributeDefsClause = `AND n.node_def_id IN (SELECT id FROM ${surveySchema}.node_def WHERE uuid IN ($/attributeDefUuids:csv/))`
   } else {
     filterByAttributeDefsClause = ''
   }
@@ -109,8 +109,7 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
       r.date_modified as record_date_modified,
       u.name as record_owner_name,
       n.id AS node_id,
-      n.uuid AS node_uuid,
-      n.node_def_uuid,
+      nd.uuid AS node_def_uuid,
       nv.validation_count_child_def_uuid,
       nv.validation,
 
@@ -133,11 +132,14 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
       JOIN
         ${surveySchema}.node n
         ON n.i_id = nv.node_i_id AND n.record_uuid = nv.record_uuid
+      JOIN
+        ${surveySchema}.node_def nd
+        ON nd.id = n.node_def_id
     WHERE
       r.cycle = $/cycle/
       AND NOT r.preview
       -- exclude analysis variables
-      AND n.node_def_uuid NOT IN (SELECT uuid FROM ${surveySchema}.node_def WHERE analysis IS TRUE)
+      AND NOT nd.analysis
       ${recordUuid ? 'AND r.uuid = $/recordUuid/' : ''}
       ${filterBySurveyAttrsClause}
       ${filterByAttributeDefsClause}

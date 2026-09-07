@@ -39,7 +39,7 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
     const cols = [
       `?${colSet.recordUuid}`,
-      `?${colSet.nodeDefUuid}`,
+      `?${colSet.nodeDefId}`,
       `?${colSet.parentIId}`,
       new Column({ name: colSet.value, cast: 'jsonb' }),
     ]
@@ -51,9 +51,9 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
         schema: tableNode.schema,
         table: tableNode.name,
         cols,
-        where: ` WHERE 
-        t.${colSet.recordUuid}::uuid = v.${colSet.recordUuid}::uuid 
-        AND t.${colSet.nodeDefUuid}::uuid = v.${colSet.nodeDefUuid}::uuid
+        where: ` WHERE
+        t.${colSet.recordUuid}::uuid = v.${colSet.recordUuid}::uuid
+        AND t.${colSet.nodeDefId}::bigint = v.${colSet.nodeDefId}::bigint
         AND t.${colSet.parentIId} = v.${colSet.parentIId} `,
       },
       tx
@@ -68,10 +68,11 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
 
       const value = extractValueFromRowResult({ rowResult, nodeDef, columnName })
 
+      const colSet = TableNode.columnSet
       const values = {
         [colSet.parentIId]: rowResult[colSet.parentIId],
         [colSet.recordUuid]: rowResult[colSet.recordUuid],
-        [colSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
+        [colSet.nodeDefId]: NodeDef.getId(nodeDef),
         [colSet.value]: value,
       }
 

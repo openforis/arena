@@ -87,7 +87,10 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
   const valuesIndexedByCol = itemsValues.map((itemValues) => {
     const item = {}
     for (const [i, element] of cols.entries()) {
-      item[element] = itemValues[i]
+      // cols entries are usually plain column name strings, but can also be pg-promise column
+      // descriptor objects (e.g. { name, prop, mod }) - use their prop/name as the key in that case
+      const colName = typeof element === 'string' ? element : (element.prop ?? element.name)
+      item[colName] = itemValues[i]
     }
     return item
   })

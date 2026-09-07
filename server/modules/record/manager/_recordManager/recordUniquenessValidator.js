@@ -60,11 +60,11 @@ export const validateRecordsUniqueness = async (
   if (R.isEmpty(recordsCountRows)) return {}
 
   const result = {}
-  for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {
+  for (const { recordUuid, count, nodesKeyIIds } of recordsCountRows) {
     const unique = Number(count) === 1
     const validationNodesKeyFields = {}
-    for (const nodeKeyUuid of nodesKeyUuids) {
-      validationNodesKeyFields[nodeKeyUuid] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
+    for (const nodeKeyIId of nodesKeyIIds) {
+      validationNodesKeyFields[nodeKeyIId] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
     }
     result[recordUuid] = Validation.newInstance(unique, validationNodesKeyFields)
   }

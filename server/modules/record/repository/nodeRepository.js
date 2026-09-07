@@ -20,18 +20,27 @@ const { keys: refDataKeys } = NodeRefData
 const { keys: categoryItemKeys } = CategoryItem
 const { keys: taxonKeys } = Taxon
 
+// node.node_def_id (bigint, references node_def.id) replaced node.node_def_uuid to save space on
+// large surveys; callers still work in terms of node def uuids, so inserts resolve the uuid to an
+// id via this raw (unescaped) subquery fragment, and reads resolve it back via a join to node_def.
+const _toNodeDefIdRawValue = ({ schema, nodeDefUuid }) =>
+  `(SELECT id FROM ${schema}.node_def WHERE uuid = ${DbUtils.formatQuery('$1', [nodeDefUuid])})`
+
+export const toNodeDefIdRawValue = (surveyId, nodeDefUuid) =>
+  _toNodeDefIdRawValue({ schema: getSurveyDBSchema(surveyId), nodeDefUuid })
+
 export const tableColumnsInsert = [
   'date_created',
   'date_modified',
   'record_uuid',
   'i_id',
   'p_i_id',
-  'node_def_uuid',
+  { name: 'node_def_id', prop: 'node_def_id', mod: '^' }, // raw: value is a subquery fragment, see _toNodeDefIdRawValue
   'value',
   'meta',
 ] // Used for node values batch insert
 
-const tableColumnsSelect = ['id', ...tableColumnsInsert]
+const tableColumnsSelect = ['id', 'date_created', 'date_modified', 'record_uuid', 'i_id', 'p_i_id', 'value', 'meta']
 
 // ============== UTILS
 
@@ -85,11 +94,11 @@ export const getNodeSelectQuery = ({
 }) => {
   const schema = getSurveyDBSchema(surveyId)
 
-  const selectFields = (includeRecordUuid ? tableColumnsSelect : R.without(['record_uuid'], tableColumnsSelect)).map(
-    (field) => `n.${field}`
-  )
+  const selectFields = (includeRecordUuid ? tableColumnsSelect : R.without(['record_uuid'], tableColumnsSelect))
+    .map((field) => `n.${field}`)
+    .concat('nd.uuid AS node_def_uuid')
 
-  const fromParts = [`${schema}.node n`]
+  const fromParts = [`${schema}.node n`, `JOIN ${schema}.node_def nd ON nd.id = n.node_def_id`]
   if (includeSurveyUuid) {
     selectFields.push('si.survey_uuid')
     fromParts.push(`CROSS JOIN survey_info si`)
@@ -150,7 +159,7 @@ export const getNodeSelectQuery = ({
 export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, recordUuid = null }, client = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const whereConditions = [
-    `n.node_def_uuid IN ($/nodeDefFileUuids:csv/)`,
+    `n.node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($/nodeDefFileUuids:csv/))`,
     `n.value IS NOT NULL`,
     `(n.value->>'${Node.valuePropsFile.fileUuid}')::uuid NOT IN (SELECT uuid FROM ${schema}.file)`,
   ]
@@ -192,15 +201,15 @@ export const fetchFileValueNodesByNodeDefUuids = async ({ surveyId, nodeDefUuids
     `
     SELECT n.record_uuid AS "recordUuid", n.value ->> '${Node.valuePropsFile.fileUuid}' AS "fileUuid"
     FROM ${schema}.node n
-    JOIN ${schema}.node_def nd ON nd.uuid = n.node_def_uuid AND nd.type = '${NodeDef.nodeDefType.file}'
+    JOIN ${schema}.node_def nd ON nd.id = n.node_def_id AND nd.type = '${NodeDef.nodeDefType.file}'
     JOIN ${schema}.record r ON r.uuid = n.record_uuid AND r.preview = true
     WHERE n.value ->> '${Node.valuePropsFile.fileUuid}' IS NOT NULL
       AND (
-        n.node_def_uuid IN ($/nodeDefUuids:csv/)
+        n.node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($/nodeDefUuids:csv/))
         OR n.meta -> '${Node.metaKeys.hierarchy}' ?| (
              SELECT coalesce(array_agg(root.uuid::text), ARRAY[]::text[])
              FROM ${schema}.node root
-             WHERE root.node_def_uuid IN ($/nodeDefUuids:csv/)
+             WHERE root.node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($/nodeDefUuids:csv/))
            )
       )`,
     { nodeDefUuids },
@@ -220,11 +229,13 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
   const nodeIId = Node.getIId(node)
   const recordUuid = Node.getRecordUuid(node)
 
+  const schema = getSurveyDBSchema(surveyId)
+
   await client.query(
     `
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.node
-        (i_id, record_uuid, p_i_id, node_def_uuid, value, meta)
-    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
+    INSERT INTO ${schema}.node
+        (i_id, record_uuid, p_i_id, node_def_id, value, meta)
+    VALUES ($1, $2, $3, (SELECT id FROM ${schema}.node_def WHERE uuid = $4), $5::jsonb, $6::jsonb)
     `,
     [
       nodeIId,
@@ -248,8 +259,10 @@ export const insertNodesFromValues = async (surveyId, nodeValues, client = db) =
 export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) => {
   if (nodes.length === 0) return []
 
+  const schema = getSurveyDBSchema(surveyId)
+
   const query = DbUtils.insertAllQueryBatch(
-    getSurveyDBSchema(surveyId),
+    schema,
     'node',
     tableColumnsInsert,
     nodes.map((node) => ({
@@ -259,7 +272,7 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
       record_uuid: Node.getRecordUuid(node),
       i_id: Node.getIId(node),
       p_i_id: Node.getParentInternalId(node),
-      node_def_uuid: Node.getNodeDefUuid(node),
+      node_def_id: _toNodeDefIdRawValue({ schema, nodeDefUuid: Node.getNodeDefUuid(node) }),
       value: _toValueQueryParam(Node.getValue(node)),
       meta: Node.getMeta(node),
     }))
@@ -283,14 +296,18 @@ export const fetchNodesByRecordUuid = async (
     dbTransformCallback
   )
 
-export const fetchNodeByIId = async (surveyId, recordUuid, iId, client = db) =>
-  client.one(
+export const fetchNodeByIId = async (surveyId, recordUuid, iId, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.one(
     `
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_uuid = $/recordUuid/ AND i_id = $/iId/`,
+    SELECT n.*, nd.uuid AS node_def_uuid
+    FROM ${schema}.node n
+    JOIN ${schema}.node_def nd ON nd.id = n.node_def_id
+    WHERE n.record_uuid = $/recordUuid/ AND n.i_id = $/iId/`,
     { recordUuid, iId },
     dbTransformCallback
   )
+}
 
 export const fetchNodesWithRefDataByIIds = async ({ surveyId, recordUuid, nodeIIds, draft }, client = db) =>
   client.map(
@@ -305,16 +322,18 @@ export const fetchNodesWithRefDataByIIds = async ({ surveyId, recordUuid, nodeII
 export const fetchNodeWithRefDataByIId = async ({ surveyId, recordUuid, nodeIId, draft }, client = db) =>
   (await fetchNodesWithRefDataByIIds({ surveyId, recordUuid, nodeIIds: [nodeIId], draft }, client))[0]
 
-export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeIId, childDefUuids, client = db) =>
-  client.map(
+export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeIId, childDefUuids, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.map(
     `
     ${getNodeSelectQuery({ surveyId, draft: false })}
     WHERE n.record_uuid = $/recordUuid/
       AND n.p_i_id ${nodeIId ? '= $/nodeIId/' : 'is null'}
-      AND n.node_def_uuid IN ($/childDefUuids:csv/)`,
+      AND n.node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($/childDefUuids:csv/))`,
     { surveyId, recordUuid, nodeIId, childDefUuids },
     dbTransformCallback
   )
+}
 
 // ============== UPDATE
 export const updateNode = async (
@@ -362,16 +381,23 @@ export const updateNodes = async ({ surveyId, nodes }, client = db) => {
 }
 
 // ============== DELETE
-export const deleteNode = async ({ surveyId, recordUuid, nodeIId }, client = db) =>
-  client.one(
+export const deleteNode = async ({ surveyId, recordUuid, nodeIId }, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.one(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_uuid = $/recordUuid/ AND i_id = $/nodeIId/
-    RETURNING *, true as ${Node.keys.deleted}
+    WITH deleted AS (
+      DELETE FROM ${schema}.node
+      WHERE record_uuid = $/recordUuid/ AND i_id = $/nodeIId/
+      RETURNING *
+    )
+    SELECT deleted.*, nd.uuid AS node_def_uuid, true as ${Node.keys.deleted}
+    FROM deleted
+    JOIN ${schema}.node_def nd ON nd.id = deleted.node_def_id
     `,
     { recordUuid, nodeIId },
     dbTransformCallback
   )
+}
 
 /**
  * Deletes all nodes belonging to the given node def uuids, survey-wide. Callers of this delete
@@ -384,21 +410,30 @@ export const deleteNode = async ({ surveyId, recordUuid, nodeIId }, client = db)
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<number>} - The number of nodes deleted.
  */
-export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) =>
-  client.result(
+export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.result(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE node_def_uuid IN ($1:csv)
+    DELETE FROM ${schema}.node
+    WHERE node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($1:csv))
     `,
     [nodeDefUuids],
     R.prop('rowCount')
   )
+}
 
-export const deleteNodesByInternalIds = async ({ surveyId, recordUuid, nodeInternalIds }, client = db) =>
-  client.manyOrNone(
-    `DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_uuid = $/recordUuid/ AND i_id IN ($/nodeInternalIds:csv/)
-    RETURNING *, true as ${Node.keys.deleted}`,
+export const deleteNodesByInternalIds = async ({ surveyId, recordUuid, nodeInternalIds }, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.manyOrNone(
+    `WITH deleted AS (
+      DELETE FROM ${schema}.node
+      WHERE record_uuid = $/recordUuid/ AND i_id IN ($/nodeInternalIds:csv/)
+      RETURNING *
+    )
+    SELECT deleted.*, nd.uuid AS node_def_uuid, true as ${Node.keys.deleted}
+    FROM deleted
+    JOIN ${schema}.node_def nd ON nd.id = deleted.node_def_id`,
     { recordUuid, nodeInternalIds },
     dbTransformCallback
   )
+}

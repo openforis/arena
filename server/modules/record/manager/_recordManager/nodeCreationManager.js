@@ -37,7 +37,7 @@ export const insertNodesInBulk = async ({ user, surveyId, nodesArray, systemActi
     Node.getRecordUuid(node),
     Node.getIId(node),
     Node.getParentInternalId(node),
-    Node.getNodeDefUuid(node),
+    NodeRepository.toNodeDefIdRawValue(surveyId, Node.getNodeDefUuid(node)),
     JSON.stringify(Node.getValue(node, null)),
     Node.getMeta(node),
   ])
