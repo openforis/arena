@@ -260,8 +260,12 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
       meta: Node.getMeta(node),
     }))
   )
-  // assign generated ids to nodes (side effect)
-  await client.map(query + ' RETURNING id', [], (row, index) => (nodes[index].id = row.id))
+  // Passing no parameters (rather than []) tells pg-promise to send the query as-is: `query` was
+  // already built with every value embedded as a literal (see DbUtils.insertAllQueryBatch above),
+  // so re-running it through pg-promise's own $N parameter substitution - which scans the raw SQL
+  // text for "$" followed by digits, even inside string/JSON literals - would misinterpret a node
+  // value like "It costs $90" as a placeholder reference and throw "Variable $90 out of range".
+  await client.map(query + ' RETURNING id', undefined, (row, index) => (nodes[index].id = row.id))
   return nodes
 }
 
