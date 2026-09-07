@@ -160,14 +160,26 @@ export default {
 
 {{reasons}}
 
-Энэ нь оруулсан өгөгдлийг бүрмөсөн өөрчлөх эсвэл устгах магадлалтай. Баталгаажуулахын тулд доор судалгааны нэрийг бичнэ үү.`,
+Энэ үйлдэл нь оруулсан өгөгдлийг бүрмөсөн өөрчлөх эсвэл устгах магадлалтай.
+
+Одоо байгаа өгөгдлийг шинэчлэхгүйгээр нийтлэхийн тулд доорх "Өгөгдлийн шинэчлэлтийг алгасах" гэснийг сонгоно уу (зөвлөдөггүй).`,
     publishRecordValuesUpdateConfirmHeader: 'Одоо байгаа бичлэгийн өгөгдөл шинэчлэгдэнэ',
+    publishRecordValuesUpdateConfirmOk: 'Нийтлэх ба өгөгдлийг шинэчлэх',
     publishRecordValuesUpdateConfirmInputLabel:
       'Баталгаажуулахын тулд судалгааны нэр "{{strongConfirmRequiredText}}"-г бичнэ үү',
     publishRecordValuesUpdateReasonAttributeChanged:
-      'Дараах атрибутууд өөрчлөгдсөн тул одоо байгаа бичлэгүүдэд утга нь дахин тооцоологдоно: **{{attributeNames}}**.',
+      'Дараах атрибутууд өөрчлөгдөх бөгөөд одоо байгаа бичлэгүүдэд тэдгээрийн утга автоматаар дахин тооцоологдоно: **{{attributeNames}}**.',
     publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
       'Дараах атрибутууд нь өөрчлөгдсөн ангилал эсвэл таксономийн нэмэлт шинж чанарыг ашигладаг тул одоо байгаа бичлэгүүдэд утга нь дахин тооцоологдоно: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Өгөгдлийн шинэчлэлтийг алгасах',
+    publishSkipDataUpdateConfirmOk: 'Өгөгдлийн шинэчлэлтийг алгасаад нийтлэх',
+    publishSkipDataUpdateImplications: 'Өгөгдлийн шинэчлэлтийг алгасах нь дараахыг илэрхийлнэ:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Одоо байгаа бичлэгүүд шинэ судалгааны тодорхойлолттой нийцэхгүй болж болно',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Нөлөөлөлд өртсөн утгууд гараар дахин оруулах хүртэл дахин тооцоологдохгүй',
+    publishSkipDataUpdateImplicationChains:
+      'Эдгээр атрибутыг ашигладаг боловсруулалтын дараалал (chain) хуучирсан үр дүн гаргаж болзошгүй',
     raiseTicketInSupportForum: `Асуудал гарвал манай <b>Дэмжлэгийн Форум</b>: $t(links.supportForum) руу 'arena' шошготой тасалбар үүсгэнэ үү.`,
     record: 'Бичлэг',
     record_other: 'Бичлэгүүд',
