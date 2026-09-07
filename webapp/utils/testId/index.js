@@ -57,6 +57,7 @@ export const TestId = {
   },
   dialogConfirm: {
     strongConfirmInput: 'dialog-confirm__strong-confirm-input',
+    checkbox: 'dialog-confirm__checkbox',
   },
   dropdown: {
     dropDownItem: (key) => `dropdown-item-${key}`,
