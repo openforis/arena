@@ -1,3 +1,5 @@
+import { isLegacyNodeFormat, migrateRecordToInternalIds } from '@core/record/recordNodeIdMigration'
+
 import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFile'
 
 const _getJson = async (zipFile, entryName, defaultValue = null) => {
@@ -12,6 +14,9 @@ const _getPartsCount = (zipFile, partFileNameGetter) => {
   }
   return count
 }
+
+// Info
+export const getInfo = async (zipFile) => _getJson(zipFile, ExportFile.info)
 
 // Survey
 export const getSurvey = async (zipFile) => _getJson(zipFile, ExportFile.survey)
@@ -36,7 +41,15 @@ export const getCategoryItemsPartsCount = ({ zipFile, categoryUuid }) =>
 // Records
 export const getRecords = async (zipFile) => _getJson(zipFile, ExportFile.records, [])
 export const hasRecords = async (zipFile) => (await getRecords(zipFile)).length > 0
-export const getRecord = async (zipFile, recordUuid) => _getJson(zipFile, ExportFile.record({ recordUuid }))
+export const getRecord = async (zipFile, recordUuid) => {
+  const record = await _getJson(zipFile, ExportFile.record({ recordUuid }))
+  // A record from an Arena backup or an arena-mobile upload created before the node internal-id
+  // migration still links nodes by uuid/parentUuid; every consumer of this getter (mobile live
+  // sync, mobile import preview, and a full backup restore alike) expects the current iId/pIId
+  // shape, so convert it here once rather than at every call site.
+  if (record && isLegacyNodeFormat(record)) return migrateRecordToInternalIds(record)
+  return record
+}
 
 // Survey files
 export const getSurveyFile = async (zipFile, fileUuid) => zipFile.getEntryData(ExportFile.surveyFile({ fileUuid }))

@@ -7,7 +7,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-import { isLegacyNodeFormat, migrateRecordToInternalIds } from '@core/record/recordNodeIdMigration'
 import * as User from '@core/user/user'
 import SystemError from '@core/systemError'
 
@@ -79,11 +78,11 @@ export default class RecordsImportJob extends DataImportBaseJob {
         continue
       }
 
+      // ArenaSurveyFileZip.getRecord converts a legacy uuid/parentUuid-linked record (from an
+      // arena-mobile version older than the node internal-id migration) to the current iId/pIId
+      // shape, so nothing downstream needs to know about the legacy format.
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
-      // records uploaded by an arena-mobile version older than the node internal-id migration
-      // still link nodes by uuid/parentUuid; convert them before anything downstream (which is
-      // iId-only) touches the node tree.
-      this.currentRecord = isLegacyNodeFormat(record) ? migrateRecordToInternalIds(record) : record
+      this.currentRecord = record
       await this.cleanupCurrentRecord()
 
       await this.insertOrSkipRecord()
