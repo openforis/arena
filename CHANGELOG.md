@@ -2,6 +2,12 @@
 
 A short, user-facing summary of each release. Internal/code-level changes are omitted; see the [git tags](https://github.com/openforis/arena/tags) for the full commit history.
 
+- **[Unreleased](https://github.com/openforis/arena/compare/v2.8.1...master)**: job monitor now shows real elapsed time (#4412)
+- **[2.8.1](https://github.com/openforis/arena/compare/v2.8.0...v2.8.1)** — 2026-09-07: survey publish now warns about changes that could affect existing data (#4394, #4401, #4406); Category export to GeoPackage (#4400)
+- **[2.8.0](https://github.com/openforis/arena/compare/v2.7.5...v2.8.0)** — 2026-08-31: added dynamic enumerator support (#4388); data explorer: search/filter attributes by name (#4385)
+- **[2.7.5](https://github.com/openforis/arena/compare/v2.7.4...v2.7.5)** — 2026-08-28: Chain clone: allow cloning from templates (#4383); Multiple entity table layout: added sorting (#4376); Validation report: added message type filtering (#4373)
+- **[2.7.4](https://github.com/openforis/arena/compare/v2.7.3...v2.7.4)** — 2026-08-25: Chain UI: support for Two-phase Sampling (#4370)
+- **[2.7.3](https://github.com/openforis/arena/compare/v2.7.1...v2.7.3)** — 2026-08-25: Multiple entity: auto-generate minimum count items (#4366); added print orientation options for record Word/PDF export; fixed record check job getting stuck (#4371)
 - **[2.7.1](https://github.com/openforis/arena/compare/v2.7.0...v2.7.1)** — 2026-08-17: experimental status icons in entity dropdown; add copy path button next to form breadcrumbs; drive completion bar from page validation
 - **[2.7.0](https://github.com/openforis/arena/compare/v2.5.9...v2.7.0)** — 2026-07-30: survey landing, branding, and theme foundation (#4335); fixed runtime error in data explorer edit mode (#4342); make Branding tab visible only to survey admins (#4343)
 - **[2.5.9](https://github.com/openforis/arena/compare/v2.5.7...v2.5.9)** — 2026-07-22: Fixed Whisp CSV generation (#4328)
