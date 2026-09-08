@@ -77,6 +77,14 @@ export const EqualEarthBaseLayer = createLayerComponent<MaplibreGLLayer, EqualEa
     })
     layer.on('remove', () => {
       removed = true
+      // If the fetch never resolved (or resolved but its result was discarded because
+      // `removed` was already true by then), reset the guard so a future re-add retries
+      // it - otherwise the layer is permanently stuck with no data for the rest of the
+      // page session. Once trueData is populated, though, it stays valid indefinitely
+      // (the country data doesn't change at runtime), so don't refetch needlessly.
+      if (!trueData) {
+        fetchStarted = false
+      }
       context.map.off('zoom', scheduleBlend)
       if (pendingFrame !== null) {
         cancelAnimationFrame(pendingFrame)
