@@ -37,10 +37,12 @@ L.Marker.prototype.options.icon = L.icon({
 })
 // end of workaround
 
-const INITIAL_ZOOM_LEVEL = 1
+const INITIAL_ZOOM_LEVEL = 3
 // MapLibre GL layers (used by the Equal Earth base layer) don't sync reliably at
 // zoom 0, and MapLibre restricts max latitude more strictly than Leaflet - see
 // https://github.com/maplibre/maplibre-gl-leaflet#readme
+// Applied unconditionally (not just when equalEarthAsDefault is set) since the Equal
+// Earth layer stays selectable from the switcher either way.
 const MAP_MIN_ZOOM = 1
 const MAP_MAX_BOUNDS = [
   [180, -Infinity],
@@ -71,6 +73,7 @@ export const MapContainer = (props) => {
   const {
     baseLayersLabel,
     editable = false,
+    equalEarthAsDefault = false,
     geoJson = null,
     layers = [],
     markerPoint,
@@ -107,7 +110,12 @@ export const MapContainer = (props) => {
           maxBoundsViscosity={1}
         >
           <MapResizeHandler />
-          <MapLayersControl layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
+          <MapLayersControl
+            layers={layers}
+            baseLayersLabel={baseLayersLabel}
+            overlayGroups={overlayGroups}
+            equalEarthAsDefault={equalEarthAsDefault}
+          />
           <MapMarker
             editable={editable}
             point={markerPoint}
@@ -151,6 +159,7 @@ MapContainer.propTypes = {
   baseLayersLabel: PropTypes.string,
   centerPoint: PropTypes.object,
   editable: PropTypes.bool,
+  equalEarthAsDefault: PropTypes.bool,
   geoJson: PropTypes.object,
   layers: PropTypes.array,
   markerPoint: PropTypes.object,
