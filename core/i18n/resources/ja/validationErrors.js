@@ -107,7 +107,7 @@ export default {
   },
 
   nodeDefEdit: {
-    analysisParentEntityRequired: 'エンティティは必須です',
+    analysisParentEntityRequired: '項目は必須です',
     applyIfDuplicate: '「$t(nodeDefEdit.expressionsProp.applyIf)」条件が重複しています',
     applyIfInvalid: '「$t(nodeDefEdit.advancedProps.relevantIf)」条件が無効です',
     columnWidthCannotBeGreaterThan: '列幅は{{max}}より大きくできません',
@@ -118,7 +118,7 @@ export default {
     childrenEmpty: '$t(common.childrenEmpty)',
     defaultValuesInvalid: '「デフォルト値」が無効です',
     defaultValuesNotSpecified: 'デフォルト値が指定されていません',
-    entitySourceRequired: 'エンティティのソースは必須です',
+    entitySourceRequired: '項目のソースは必須です',
     expressionApplyIfOnlyLastOneCanBeEmpty:
       '「$t(nodeDefEdit.expressionsProp.applyIf)」条件を空にできるのは最後の式のみです',
     expressionDuplicate: '式が重複しています',
@@ -187,7 +187,7 @@ export default {
 
   surveyLabelsImport: {
     invalidHeaders: '無効な列：{{invalidHeaders}}',
-    cannotFindNodeDef: "名前が「{{name}}」の属性またはエンティティ定義が見つかりません",
+    cannotFindNodeDef: "名前が「{{name}}」の属性または項目定義が見つかりません",
   },
 
   taxonomyEdit: {

@@ -27,7 +27,7 @@ export default {
   importFromCollect: 'Collect / Collect Mobile',
   importFromCsvExcel: 'CSV/Excel',
   importFromCsvStepsInfo: `### インポートの手順
-1. 対象のエンティティを選択
+1. 対象の項目を選択
 2. テンプレートをダウンロード
 3. テンプレートに入力して保存（CSVの場合はUTF-8エンコーディングを使用）
 4. オプションを確認
@@ -36,7 +36,7 @@ export default {
 7. インポートを開始
 `,
   importIntoCycle: 'インポート先のサイクル',
-  importIntoMultipleEntityOrAttribute: '複数エンティティまたは属性へのインポート',
+  importIntoMultipleEntityOrAttribute: '複数項目または属性へのインポート',
   importPreview: {
     title: 'インポートプレビュー',
     generatePreview: 'プレビューを生成',
@@ -82,8 +82,8 @@ export default {
         - {{processed}}行を処理
         - {{insertedRecords}}件の記録を作成
         - {{updatedRecords}}件の記録を更新
-        - {{entitiesCreated}}件のエンティティを作成
-        - {{entitiesDeleted}}件のエンティティを削除
+        - {{entitiesCreated}}件の項目を作成
+        - {{entitiesDeleted}}件の項目を削除
         - {{updatedValues}}件の値を更新`,
       importCompleteSuccessfully: `## インポート完了：
 $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
@@ -103,8 +103,8 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{processed}}行を処理
         - {{insertedRecords}}件の記録が作成されます
         - {{updatedRecords}}件の記録が更新されます
-        - {{entitiesCreated}}件のエンティティが作成されます
-        - {{entitiesDeleted}}件のエンティティが削除されます
+        - {{entitiesCreated}}件の項目が作成されます
+        - {{entitiesDeleted}}件の項目が削除されます
         - {{updatedValues}}件の値が更新されます`,
       validationWithFilesCompleteSuccessfully: `$t(dataImportView:jobs.DataImportValidationJob.validationCompleteSuccessfully)
         - {{insertedFiles}}件のファイルが追加されます
@@ -116,27 +116,27 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
   options: {
     header: '$t(common.options)',
     abortOnErrors: 'エラー発生時に中止',
-    preventAddingNewEntityData: '新規エンティティデータの追加を禁止',
+    preventAddingNewEntityData: '新規項目データの追加を禁止',
     preventUpdatingRecordsInAnalysis: '分析ステップの記録更新を禁止',
     includeFiles: 'ファイルを含める',
     skipMissingFiles: '見つからないファイルを無視',
-    deleteExistingEntities: `選択したエンティティのデータをすべての記録から削除`,
+    deleteExistingEntities: `選択した項目のデータをすべての記録から削除`,
   },
   optionsInfo: {
-    deleteExistingEntities: `警告：新しいエンティティを挿入する前に、「{{nodeDefName}}」に該当する
-すべての記録内のエンティティとその子孫がすべて削除されます。`,
+    deleteExistingEntities: `警告：新しい項目を挿入する前に、「{{nodeDefName}}」に該当する
+すべての記録内の項目とその子孫がすべて削除されます。`,
   },
   startImport: 'インポートを開始',
   startImportConfirm: `「OK」を押すとインポート処理が開始されます。
 **変更をロールバックすることはできません。**
 続行してもよろしいですか？`,
   startImportConfirmWithDeleteExistingEntities: `$t(dataImportView:startImportConfirm)
-**（「$t(dataImportView:options.deleteExistingEntities)」オプションが選択されています：新規作成前に既存のエンティティが削除されます）**
+**（「$t(dataImportView:options.deleteExistingEntities)」オプションが選択されています：新規作成前に既存の項目が削除されます）**
 `,
   steps: {
     selectImportType: 'インポート種別を選択',
     selectCycle: 'サイクルを選択',
-    selectEntity: 'エンティティを選択',
+    selectEntity: '項目を選択',
     selectFile: 'ファイルを選択',
     startImport: 'インポートを開始',
   },

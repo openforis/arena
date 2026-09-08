@@ -44,13 +44,13 @@ export default {
   networkError: 'サーバーとの通信中にエラーが発生しました',
   record: {
     errorUpdating: '記録の更新中にエラーが発生しました',
-    entityNotFound: 'キー「{{keyValues}}」のエンティティ「{{entityName}}」が見つかりません',
+    entityNotFound: 'キー「{{keyValues}}」の項目「{{entityName}}」が見つかりません',
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating)。ノード{{nodeDefName}}での式の評価中にエラーが発生しました：{{details}}',
   },
   recordPrintableExport: {
     missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeUuidが必要です',
-    entityNotFound: '指定されたエクスポート対象のエンティティが見つかりません',
+    entityNotFound: '指定されたエクスポート対象の項目が見つかりません',
   },
   sessionExpiredRefreshPage: `セッションの有効期限が切れた可能性があります。
 ページを更新してください。`,

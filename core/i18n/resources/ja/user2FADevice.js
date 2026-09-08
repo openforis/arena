@@ -15,8 +15,8 @@ export default {
     label: '作成',
   },
   creationSuccessful: {
-    title: '2FAデバイスを作成しました',
-    message: `2FAデバイス「{{deviceName}}」を作成しました。
+    title: '2FA（二要素認証）デバイスを作成しました',
+    message: `2FA（二要素認証）デバイス「{{deviceName}}」を作成しました。
 $t(user2FADevice:backupCodesRegenerated.message)`,
   },
   deletion: {

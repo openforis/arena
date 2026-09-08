@@ -67,7 +67,7 @@ export default {
 
 迷惑メールフォルダもご確認ください。`,
     empty: '空',
-    entity: 'エンティティ',
+    entity: '項目',
     error: 'エラー',
     error_plural: 'エラー',
     errorFound: '1件のエラーが見つかりました',
@@ -82,7 +82,7 @@ export default {
     exportToExcel: 'Excelにエクスポート',
     exportToExcelTooManyItems: 'Excelでエクスポートするには項目数が多すぎます。CSVエクスポートをご利用ください。',
     expression: '式',
-    false: '偽',
+    false: '誤',
     file: 'ファイル',
     file_plural: 'ファイル',
     formContainsErrors: 'フォームにエラーがあります',
@@ -208,7 +208,7 @@ export default {
     test: 'テスト',
     to: '終了',
     totalItems: '合計項目数',
-    true: '真',
+    true: '正',
     trySplittingFileIntoSmallerChunks: 'ファイルをより小さく分割してお試しください。',
     type: '種類',
     undefinedName: '未定義の名前',
@@ -314,7 +314,7 @@ export default {
     geo: '地理空間',
     taxon: '分類群',
     file: 'ファイル',
-    entity: 'エンティティ',
+    entity: '項目',
   },
 
   // ====== App modules and views
@@ -362,16 +362,16 @@ export default {
     userGroup_plural: 'ユーザーグループ',
     userGroupNew: '新規ユーザーグループ',
     usersList: 'ユーザー一覧（全体）',
-    user2FADevice: '2FAデバイス',
-    user2FADevice_plural: '2FAデバイス',
+    user2FADevice: '2FA（二要素認証）デバイス',
+    user2FADevice_plural: '2FA（二要素認証）デバイス',
     user2FADeviceDetails: '$t(appModules.user2FADevice)',
     user2FADeviceList: '$t(appModules.user2FADevice_plural)',
 
     analysis: '分析',
     chain: '処理チェーン',
     chain_plural: '処理チェーン',
-    virtualEntity: '仮想エンティティ',
-    entities: '仮想エンティティ',
+    virtualEntity: '仮想項目',
+    entities: '仮想項目',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'インスタンス',
 
@@ -773,7 +773,7 @@ $t(accessRequestView.whitelistSenderSuggestion)
     recordsInStepCount: '{{step}}：{{recordsCount}}',
     submitOnlyAnalysisStepDataIntoR: '分析ステップのデータのみをRStudioに送信',
     submitOnlySelectedRecordsIntoR: '選択した記録のみをRStudioに送信',
-    includeEntitiesWithoutData: 'データのないエンティティを含める',
+    includeEntitiesWithoutData: 'データのない項目を含める',
     cannotStartRStudio: {
       common: 'RStudioを起動できません',
       noRecords: '$t(chainView.cannotStartRStudio.common)：送信する記録がありません',
@@ -797,8 +797,8 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     statisticalAnalysis: {
       header: '統計分析',
-      entityToReport: 'レポート対象のエンティティ',
-      entityWithoutData: 'エンティティ{{name}}にはデータがありません',
+      entityToReport: 'レポート対象の項目',
+      entityWithoutData: '項目{{name}}にはデータがありません',
       filter: 'フィルター（Rスクリプト）',
       reportingMethod: 'レポート方法',
       reportingMethods: {
@@ -815,9 +815,9 @@ $t(accessRequestView.whitelistSenderSuggestion)
       '最終的な詳細サブサンプルを抽出する前に、第1段階サンプルをさらに層別する変数を選択してください。',
     postStratificationAttribute: '事後層別属性',
     areaWeightingMethod: '面積重み付け方法',
-    clusteringEntity: 'クラスタリングエンティティ',
+    clusteringEntity: 'クラスタリング項目',
     clusteringEntityInfo:
-      '第一次抽出単位を定義するエンティティです。注：これはR surveyパッケージの枠組みにおけるクラスター分析にのみ使用されます。',
+      '第一次抽出単位を定義する項目です。注：これはR surveyパッケージの枠組みにおけるクラスター分析にのみ使用されます。',
     clusteringOnlyVariances: '分散計算のみクラスタリングを使用',
     errorNoLabel: '処理チェーンには有効なラベルが必要です',
     dateExecuted: '実行日',
@@ -831,12 +831,12 @@ $t(common.cantUndoWarning)`,
       title: '別の調査から処理チェーンを複製',
       sourceSurvey: '複製元の調査',
       sourceChain: '複製元の処理チェーン',
-      entityCheck: 'エンティティの互換性',
+      entityCheck: '項目の互換性',
       entityMissing: '対象調査に存在しません',
-      skipMissingEntities: '対象調査に存在しないエンティティの分析属性をスキップ',
+      skipMissingEntities: '対象調査に存在しない項目の分析属性をスキップ',
       noAnalysisAttributes: 'この処理チェーンには分析属性がありません',
       cloneComplete: '処理チェーンを複製しました',
-      missingEntities: '複製できません：以下のエンティティが対象調査に存在しません：{{entities}}',
+      missingEntities: '複製できません：以下の項目が対象調査に存在しません：{{entities}}',
     },
     cannotSelectNodeDefNotBelongingToCycles: `ノード定義「{{label}}」は、処理チェーンのすべてのサイクルに属していないため選択できません`,
     cannotSelectCycle: '一部のノード定義がこのサイクルに属していないため、このサイクルは選択できません',
@@ -861,7 +861,7 @@ $t(common.cantUndoWarning)`,
 
 `,
     entities: {
-      new: '仮想エンティティ',
+      new: '仮想項目',
     },
     reportingDataCategory: 'カテゴリテーブル名',
     reportingDataAttribute: '{{level}}の属性',
@@ -880,10 +880,10 @@ $t(common.cantUndoWarning)`,
     addCategorical: 'カテゴリ属性を追加',
     emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
     entityExcludedInRStudioScripts:
-      'このエンティティおよび関連するすべての結果変数はRStudioスクリプトから除外されます',
-    entityWithoutData: 'エンティティ{{name}}にはデータがありません。$t(chain.entityExcludedInRStudioScripts)',
+      'この項目および関連するすべての結果変数はRStudioスクリプトから除外されます',
+    entityWithoutData: '項目{{name}}にはデータがありません。$t(chain.entityExcludedInRStudioScripts)',
     entityNotInCurrentCycle:
-      'エンティティ{{name}}は選択中のサイクルでは利用できません。$t(chain.entityExcludedInRStudioScripts)',
+      '項目{{name}}は選択中のサイクルでは利用できません。$t(chain.entityExcludedInRStudioScripts)',
     error: {
       invalidToken: '無効または期限切れのトークンです',
     },
@@ -897,7 +897,7 @@ $t(common.cantUndoWarning)`,
   expression: {
     functionHasTooFewArguments: '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
     functionHasTooManyArguments: '関数{{fnName}}が受け付ける引数は最大{{maxArity}}個です（{{numArgs}}個指定されました）',
-    identifierNotFound: '属性またはエンティティ「{{name}}」が見つかりません',
+    identifierNotFound: '属性または項目「{{name}}」が見つかりません',
     invalid: '無効な式です：{{details}}',
     invalidAttributeValuePropertyName: '無効な属性値プロパティ名です：{{attributeName}}.{{propName}}',
     invalidCategoryExtraProp: '無効な追加プロパティ名です：{{propName}}',
@@ -942,7 +942,7 @@ $t(common.appNameFull)
     printProps: {
       printOrientation: {
         label: 'ページの向き',
-        info: 'このエンティティが独自の印刷セクションを開始する際に使用される向きです。デフォルトはエクスポート時に選択されたドキュメントの向きを継承します。',
+        info: 'この項目が独自の印刷セクションを開始する際に使用される向きです。デフォルトはエクスポート時に選択されたドキュメントの向きを継承します。',
       },
       orientations: {
         default: 'デフォルト（ドキュメント）',
@@ -963,7 +963,7 @@ $t(common.appNameFull)
         '指定したコードを持つカテゴリ項目の、指定した$t(extraProp.label)の値を返します',
       dateTimeDiff: '2つの日時の組の差（分単位）を返します',
       distance: '指定した座標間の距離（メートル単位）を返します',
-      first: '指定した複数属性またはエンティティの最初の値またはノードを返します',
+      first: '指定した複数属性または項目の最初の値またはノードを返します',
       geoCoordinateAtDistance:
         '指定した座標から指定した距離・方位にある座標を返します',
       geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
@@ -972,13 +972,13 @@ $t(common.appNameFull)
       index: '指定したノードの、兄弟ノード内でのインデックスを返します',
       isEmpty: '引数に値が指定されていない場合にtrueを返します',
       isNotEmpty: '引数に何らかの値が指定されている場合にtrueを返します',
-      last: '指定した複数属性またはエンティティの最後の値またはノードを返します',
+      last: '指定した複数属性または項目の最後の値またはノードを返します',
       ln: 'Xの自然対数を返します',
       log10: 'Xの常用対数（底10）を返します',
       max: '引数のうち最大の値を返します',
       min: '引数のうち最小の値を返します',
       now: '現在の日付または時刻を返します',
-      parent: '指定したノードの親エンティティを返します',
+      parent: '指定したノードの親項目を返します',
       pow: '底をべき乗した値を返します',
       prevCycleNote:
         '複数サイクルが定義されており、前サイクルへのリンクが有効な場合のみ、Arena Mobileで動作します',
@@ -998,13 +998,13 @@ $t(common.appNameFull)
       taxonProp: '指定したコードを持つ分類群の、指定した$t(extraProp.label)の値を返します',
       taxonVernacularName:
         '指定したコードを持つ分類群の、指定した言語での（最初の）通称名（現地名）を返します',
-      unique: '複数属性またはエンティティの一意な値を返します',
+      unique: '複数属性または項目の一意な値を返します',
       userEmail: 'ログイン中のユーザーのメールアドレスを返します',
       userIsRecordOwner:
         '記録を編集しているユーザーがその記録の所有者でもある場合は真偽値「true」、そうでなければ「false」を返します',
       userName: 'ログイン中のユーザーの名前を返します',
       userProp: 'ログイン中のユーザーの、指定した$t(extraProp.label)の値を返します',
-      uuid: '識別子として使用できるUUID（汎用一意識別子）を生成します（例：エンティティのキー属性として）',
+      uuid: '識別子として使用できるUUID（汎用一意識別子）を生成します（例：項目のキー属性として）',
       // SQL functions
       avg: '数値変数の平均値を返します',
       count: '指定した条件に一致する行数を返します',
@@ -1021,14 +1021,14 @@ $t(common.appNameFull)
       },
       autoCreateMinCountItems: {
         label: '最小項目数を自動作成',
-        info: 'エンティティが適用対象になった時、または親エンティティが作成された時に、最小数に等しい数のエンティティが自動的に生成されます。',
+        info: '項目が適用対象になった時、または親項目が作成された時に、最小数に等しい数の項目が自動的に生成されます。',
       },
       displayAs: '表示形式',
       displayIn: '表示先',
-      entitySource: 'エンティティのソース',
+      entitySource: '項目のソース',
       enumerate: {
         label: '列挙',
-        info: `エンティティ内でキーとして指定されたコード属性に関連付けられたカテゴリ項目を使用して、行が自動的に生成されます。行の追加・削除はできず、キーとなるコード属性も編集できません`,
+        info: `項目内でキーとして指定されたコード属性に関連付けられたカテゴリ項目を使用して、行が自動的に生成されます。行の追加・削除はできず、キーとなるコード属性も編集できません`,
       },
       enumeratingItemsExpression: {
         label: '列挙項目の式',
@@ -1036,7 +1036,7 @@ $t(common.appNameFull)
       },
       enumerator: {
         label: '列挙元',
-        info: 'このカテゴリの項目を使って、親エンティティの行が生成されます',
+        info: 'このカテゴリの項目を使って、親項目の行が生成されます',
       },
       form: 'フォーム',
       formula: '数式',
@@ -1107,8 +1107,8 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
         info: `有効にすると、この属性はArena Mobileに表示されません`,
       },
       includedInMultipleEntitySummary: {
-        label: '複数エンティティの概要に含める',
-        info: `有効にすると、この属性はエンティティ概要ビュー（Arena Mobile内）に表示されます`,
+        label: '複数項目の概要に含める',
+        info: `有効にすると、この属性は項目概要ビュー（Arena Mobile内）に表示されます`,
       },
       includedInPreviousCycleLink: {
         label: '前サイクルへのリンクに含める',
@@ -1206,7 +1206,7 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
     cloneDialog: {
       confirmButtonLabel: '複製',
       title: 'ノード定義「{{nodeDefName}}」を複製',
-      entitySelectLabel: '複製先のエンティティ：',
+      entitySelectLabel: '複製先の項目：',
     },
     conversion: {
       dialogTitle: '{{nodeDefName}}を別の型に変換',
@@ -1216,7 +1216,7 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
     moveDialog: {
       confirmButtonLabel: '移動',
       title: 'ノード定義「{{nodeDefName}}」を「{{parentNodeDefName}}」から移動',
-      entitySelectLabel: '移動先のエンティティ：',
+      entitySelectLabel: '移動先の項目：',
     },
     movedNodeDefinitionHasErrors: '移動したノード定義「{{nodeDefName}}」にはエラーがあります。修正してください。',
     nodeDefintionsHaveErrors: '以下のノード定義にはエラーがあります：{{nodeDefNames}}。修正してください。',
@@ -1224,7 +1224,7 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
     filterVariableForLevel: '{{levelName}}用の変数',
     unique: {
       label: '一意',
-      info: `属性を**一意**としてマークすると、その値は最も近い複数エンティティ内で一意である必要があります（そうでない場合はエラーが表示されます）。
+      info: `属性を**一意**としてマークすると、その値は最も近い複数項目内で一意である必要があります（そうでない場合はエラーが表示されます）。
 
 ---
 
@@ -1431,7 +1431,7 @@ $t(common.cantUndoWarning)`,
       valueRequired: '値は必須です',
     },
     entity: {
-      keyDuplicate: 'エンティティキーが重複しています',
+      keyDuplicate: '項目キーが重複しています',
     },
     nodes: {
       count: {

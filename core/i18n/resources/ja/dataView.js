@@ -42,7 +42,7 @@ export default {
     valueInvalid: '値が無効',
     uniqueDuplicate: '値の重複',
     customValidation: 'カスタム検証',
-    entityKeyDuplicate: 'エンティティキーの重複',
+    entityKeyDuplicate: '項目キーの重複',
     recordKeyDuplicate: '記録キーの重複',
     nodesCount: 'ノード数',
   },

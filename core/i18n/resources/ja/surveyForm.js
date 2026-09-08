@@ -25,7 +25,7 @@ export default {
   },
   clone: `「{{nodeDefLabel}}」を複製`,
   compressFormItems: `「{{nodeDefLabel}}」のフォーム項目を圧縮表示`,
-  confirmUpdateDependentEnumeratedEntities: `続行すると、一部の列挙エンティティ（{{entityDefs}}）が再列挙され、
+  confirmUpdateDependentEnumeratedEntities: `続行すると、一部の列挙項目（{{entityDefs}}）が再列挙され、
 既に入力されている値は削除されます（存在する場合）。
 続行しますか？`,
   convert: `「{{nodeDefLabel}}」を変換`,
@@ -96,7 +96,7 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
   },
   nodeDefEntityForm: {
     addNewEntity: '新しい{{name}}を追加',
-    confirmDelete: 'このエンティティを削除しますか？',
+    confirmDelete: 'この項目を削除しますか？',
     select: '{{name}}を選択：',
     selectedEntity: '選択中の{{name}}：',
   },
@@ -139,7 +139,7 @@ Arena Mobileでは：
     loadingSurveys: '調査を読み込み中...',
     noSurveysAvailable: '利用可能な調査がありません',
     sourceNode: '複製元ノード',
-    targetEntityCurrentSurvey: '複製先エンティティ（現在の調査）',
+    targetEntityCurrentSurvey: '複製先項目（現在の調査）',
   },
   confirmNodeDelete: 'この{{nodeDefType}}（{{nodeDefLabel}}）を削除しますか？',
   downloadPrintableDocument: '印刷用ドキュメントをダウンロード（Word）',

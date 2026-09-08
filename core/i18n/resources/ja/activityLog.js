@@ -9,7 +9,7 @@ export default {
     [ActivityLog.type.surveyCollectImport]: 'Collectから調査をインポートしました',
 
     // NodeDef
-    [ActivityLog.type.nodeDefCreate]: 'エンティティ{{parentName}}にノード定義{{type}}を追加しました',
+    [ActivityLog.type.nodeDefCreate]: '項目{{parentName}}にノード定義{{type}}を追加しました',
     [ActivityLog.type.nodeDefUpdate]: 'ノード定義{{name}}の{{keys}}を更新しました',
     [ActivityLog.type.nodeDefMarkDeleted]: 'ノード定義{{name}}を削除しました',
 

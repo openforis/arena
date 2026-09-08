@@ -20,7 +20,7 @@ export default {
   DataDeleteJob: 'データの削除',
   DataImportJob: 'データのインポート',
   DataImportValidationJob: 'インポートファイルの検証',
-  EntitiesDeleteJob: '既存エンティティの削除',
+  EntitiesDeleteJob: '既存項目の削除',
   FilesImportJob: 'ファイルのインポート',
   MessageSendJob: 'メッセージの送信',
   NodeDefsTranslationJob: 'ノード定義ラベルの翻訳',
