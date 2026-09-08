@@ -23,10 +23,11 @@ export const EqualEarthBaseLayer = createLayerComponent<MaplibreGLLayer, EqualEa
 
     let trueData: CountryFeatureCollection | null = null
     let pendingFrame: number | null = null
+    let removed = false
 
     const applyBlend = (): void => {
       pendingFrame = null
-      if (!trueData) return
+      if (!trueData || removed) return
       const source = layer.getMaplibreMap().getSource(COUNTRIES_SOURCE_ID) as GeoJSONSource | undefined
       const blend = getBlendFactor(context.map.getZoom(), DEFAULT_BLEND_ZOOM_RANGE)
       // blendCountryFeatureCollection's return shape matches GeoJSON.GeoJSON structurally,
@@ -36,13 +37,14 @@ export const EqualEarthBaseLayer = createLayerComponent<MaplibreGLLayer, EqualEa
     }
 
     const scheduleBlend = (): void => {
-      if (pendingFrame !== null) return
+      if (pendingFrame !== null || removed) return
       pendingFrame = requestAnimationFrame(applyBlend)
     }
 
     fetch(COUNTRIES_GEOJSON_URL)
       .then((response) => response.json())
       .then((data: CountryFeatureCollection) => {
+        if (removed) return
         trueData = data
         scheduleBlend()
       })
@@ -52,10 +54,12 @@ export const EqualEarthBaseLayer = createLayerComponent<MaplibreGLLayer, EqualEa
       })
 
     layer.on('add', () => {
+      removed = false
       context.map.on('zoom', scheduleBlend)
       scheduleBlend()
     })
     layer.on('remove', () => {
+      removed = true
       context.map.off('zoom', scheduleBlend)
       if (pendingFrame !== null) {
         cancelAnimationFrame(pendingFrame)
