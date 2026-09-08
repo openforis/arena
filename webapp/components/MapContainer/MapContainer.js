@@ -38,11 +38,14 @@ L.Marker.prototype.options.icon = L.icon({
 // end of workaround
 
 const INITIAL_ZOOM_LEVEL = 3
-// Matches the raster base layers' own hardcoded minZoom (see MapLayersControl.js) so
-// switching to them never produces a blank map at low zoom - MapLibre GL layers (the
-// Equal Earth base layer) only need zoom >= 1 to sync reliably, so 3 comfortably
-// covers that too. See https://github.com/maplibre/maplibre-gl-leaflet#readme
-const MAP_MIN_ZOOM = 3
+// 2, not 3, so a user can manually zoom out one step from the default view (still
+// INITIAL_ZOOM_LEVEL = 3) without hitting the floor immediately. Accepted trade-off:
+// raster base layers below this hardcode minZoom={3} on their own TileLayer (see
+// MapLayersControl.js), so zooming one of them out to exactly level 2 shows a blank
+// map at that level - recoverable by zooming back in or switching layers. Narrower
+// than the regression this constant was raised from (was 1, affecting two zoom levels
+// for every raster layer); deliberately kept at 2 rather than reverting further.
+const MAP_MIN_ZOOM = 2
 // Explicit, unconditional map-level maxZoom keeps map.getMaxZoom() finite and stable
 // regardless of which base layer is active. Without it, Leaflet derives the max
 // dynamically from whichever GridLayer-based TileLayers are currently registered - but
