@@ -41,6 +41,7 @@ Algumas variáveis de substituição também estão disponíveis:
       label: 'Tipo de usuário alvo',
       all: 'Todos os usuários',
       system_admins: 'Administradores do sistema',
+      survey_admins: 'Administradores de inventário',
       survey_managers: 'Gerentes de inventário',
       data_analysts: 'Analistas de dados',
       data_cleaners: 'Revisores de dados',
