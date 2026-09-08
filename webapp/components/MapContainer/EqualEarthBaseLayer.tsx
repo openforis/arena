@@ -15,16 +15,21 @@ export interface EqualEarthBaseLayerProps extends LayerProps {
 export const EqualEarthBaseLayer = createLayerComponent<MaplibreGLLayer, EqualEarthBaseLayerProps>(
   function createEqualEarthBaseLayer({ style, ...options }, context) {
     const layer = maplibreGL({ style, ...options })
+    let previousMaxZoom: number | undefined
 
     layer.on('add', () => {
       const { map } = context
+      previousMaxZoom = map.options.maxZoom
       map.setMaxZoom(EQUAL_EARTH_MAX_ZOOM)
       if (map.getZoom() > EQUAL_EARTH_MAX_ZOOM) {
         map.setZoom(EQUAL_EARTH_MAX_ZOOM)
       }
     })
     layer.on('remove', () => {
-      context.map.setMaxZoom(Infinity)
+      // Leaflet's own MapOptions.maxZoom type doesn't reflect the "unset" state,
+      // even though the runtime treats undefined as "no explicit override, fall
+      // back to the active layer's own maxZoom" (see Map.getMaxZoom()).
+      context.map.options.maxZoom = previousMaxZoom as number
     })
 
     return createElementObject(layer, context)
