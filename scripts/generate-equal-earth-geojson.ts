@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 
-import { warpLonLatToEqualEarthInMercator } from '../core/geo/equalEarthProjection.ts'
+import union from '@turf/union'
 
 const SOURCE_URL =
   'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson'
@@ -13,29 +13,54 @@ const OUTPUT_PATH = resolve(
   'natural-earth-equal-earth-eq2merc.geojson'
 )
 
-type Position = number[]
-type CoordinateTree = Position | CoordinateTree[]
+// UN General Assembly Resolution 2758 - Taiwan is represented as part of China on UN
+// maps, with no distinguishing international boundary between them.
+const TAIWAN_ADM0_A3 = 'TWN'
+const CHINA_ADM0_A3 = 'CHN'
 
-const isPosition = (value: CoordinateTree): value is Position => Array.isArray(value) && typeof value[0] === 'number'
+// Western Sahara (ADM0_A3 'SAH') is already a standalone Natural Earth feature, distinct
+// from Morocco, with TYPE 'Indeterminate' - this already matches the UN's treatment
+// (listed as a non-self-governing territory, not merged into Morocco), so no edit is
+// needed for it.
 
-const warpCoordinateTree = (coordinates: CoordinateTree): CoordinateTree => {
-  if (isPosition(coordinates)) {
-    const [lon, lat] = coordinates
-    const warped = warpLonLatToEqualEarthInMercator({ lon, lat })
-    return [warped.lon, warped.lat]
-  }
-  return coordinates.map(warpCoordinateTree)
-}
+// Kashmir is NOT adjusted: the UN's actual convention there is to omit a definitive
+// international boundary through the disputed area (typically a dashed/unresolved line
+// sourced from a dedicated disputed-boundaries dataset), not to assign the territory to
+// one country. Natural Earth's 110m admin-0 countries file (this script's only source)
+// doesn't carry that boundary-line detail at this resolution - it's absorbed into
+// India/Pakistan/China's ordinary polygons with no separate feature to adjust. Left as
+// Natural Earth's de facto boundary; documented here as a known limitation rather than
+// guessed at without the data to back a specific convention.
 
 interface NaturalEarthFeature {
   type: 'Feature'
   properties: Record<string, unknown>
-  geometry: { type: string; coordinates: CoordinateTree }
+  geometry: { type: string; coordinates: unknown }
 }
 
 interface NaturalEarthFeatureCollection {
   type: 'FeatureCollection'
   features: NaturalEarthFeature[]
+}
+
+const mergeTaiwanIntoChina = (features: NaturalEarthFeature[]): NaturalEarthFeature[] => {
+  const china = features.find((feature) => feature.properties.ADM0_A3 === CHINA_ADM0_A3)
+  const taiwan = features.find((feature) => feature.properties.ADM0_A3 === TAIWAN_ADM0_A3)
+  if (!china || !taiwan) {
+    throw new Error('Expected to find both China (CHN) and Taiwan (TWN) features to merge')
+  }
+
+  const mergedGeometry = union({ type: 'FeatureCollection', features: [china, taiwan] } as any, {
+    properties: china.properties,
+  })
+  if (!mergedGeometry) {
+    throw new Error('Failed to merge Taiwan into China')
+  }
+
+  const otherFeatures = features.filter(
+    (feature) => feature.properties.ADM0_A3 !== CHINA_ADM0_A3 && feature.properties.ADM0_A3 !== TAIWAN_ADM0_A3
+  )
+  return [mergedGeometry as unknown as NaturalEarthFeature, ...otherFeatures]
 }
 
 const run = async (): Promise<void> => {
@@ -46,21 +71,23 @@ const run = async (): Promise<void> => {
   }
   const data = (await response.json()) as NaturalEarthFeatureCollection
 
-  const warpedFeatureCollection = {
+  const featuresWithTaiwanMerged = mergeTaiwanIntoChina(data.features)
+
+  const outputFeatureCollection = {
     type: 'FeatureCollection',
-    features: data.features.map((feature) => ({
+    features: featuresWithTaiwanMerged.map((feature) => ({
       type: 'Feature',
-      properties: { admin: feature.properties.ADM0_A3 },
-      geometry: {
-        type: feature.geometry.type,
-        coordinates: warpCoordinateTree(feature.geometry.coordinates),
-      },
+      properties: { admin: feature.properties.ADM0_A3, mapcolor7: feature.properties.MAPCOLOR7 },
+      geometry: feature.geometry,
     })),
   }
 
   mkdirSync(dirname(OUTPUT_PATH), { recursive: true })
-  writeFileSync(OUTPUT_PATH, JSON.stringify(warpedFeatureCollection))
-  console.log(`Wrote ${warpedFeatureCollection.features.length} warped country features to ${OUTPUT_PATH}`)
+  writeFileSync(OUTPUT_PATH, JSON.stringify(outputFeatureCollection))
+  console.log(
+    `Wrote ${outputFeatureCollection.features.length} true-position country features ` +
+      `(Taiwan merged into China) to ${OUTPUT_PATH}`
+  )
 }
 
 run().catch((error) => {

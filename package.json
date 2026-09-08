@@ -137,6 +137,7 @@
     "@turf/circle": "^7.3.2",
     "@turf/helpers": "^7.3.2",
     "@turf/length": "^7.3.2",
+    "@turf/union": "^7.3.2",
     "@uiw/react-codemirror": "^4.25.4",
     "ace-builds": "^1.43.6",
     "adm-zip": "^0.5.16",

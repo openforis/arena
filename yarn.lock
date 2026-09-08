@@ -5018,6 +5018,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@turf/union@npm:^7.3.2":
+  version: 7.4.0
+  resolution: "@turf/union@npm:7.4.0"
+  dependencies:
+    "@turf/helpers": "npm:7.4.0"
+    "@turf/meta": "npm:7.4.0"
+    "@types/geojson": "npm:^7946.0.10"
+    polyclip-ts: "npm:^0.16.8"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/1f30ba610e3913e6b0bdb5283d1858b35873667c31b70dd87658fe033617d8093ad46277f2c5f4a2146780d4699a7e13d822f5fb688ec2a412cae1b2111ec27a
+  languageName: node
+  linkType: hard
+
 "@types/babel__core@npm:^7.0.0, @types/babel__core@npm:^7.1.14":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
@@ -7207,6 +7220,13 @@ __metadata:
   version: 11.1.4
   resolution: "bignumber.js@npm:11.1.4"
   checksum: 10c0/18a0830b51816f4225cf4a5d2df355bfdec79427dfa5d7b6fac0853d8c846bd020678aa4ee11460fff030132e6b4b0b05c40f2f5b9d52bca0361b2612d4c6960
+  languageName: node
+  linkType: hard
+
+"bignumber.js@npm:^9.1.0":
+  version: 9.3.1
+  resolution: "bignumber.js@npm:9.3.1"
+  checksum: 10c0/61342ba5fe1c10887f0ecf5be02ff6709271481aff48631f86b4d37d55a99b87ce441cfd54df3d16d10ee07ceab7e272fc0be430c657ffafbbbf7b7d631efb75
   languageName: node
   linkType: hard
 
@@ -15977,6 +15997,7 @@ __metadata:
     "@turf/circle": "npm:^7.3.2"
     "@turf/helpers": "npm:^7.3.2"
     "@turf/length": "npm:^7.3.2"
+    "@turf/union": "npm:^7.3.2"
     "@types/geojson": "npm:^7946.0.16"
     "@types/jest": "npm:^27.5.2"
     "@types/leaflet": "npm:^1.9.21"
@@ -16931,6 +16952,16 @@ __metadata:
   dependencies:
     browserify-zlib: "npm:^0.2.0"
   checksum: 10c0/61e275cb424b914fbc01c2a1b0096857f214c5fee45054c713dec1ad320760f4dd61f28bb0b3b0c139bd8c49def8891b02ca4018238e7b5f14bb671cd1ca7874
+  languageName: node
+  linkType: hard
+
+"polyclip-ts@npm:^0.16.8":
+  version: 0.16.8
+  resolution: "polyclip-ts@npm:0.16.8"
+  dependencies:
+    bignumber.js: "npm:^9.1.0"
+    splaytree-ts: "npm:^1.0.2"
+  checksum: 10c0/8de02c32e566421875c70890fe6d3d7bd55a92fc39867446e65999e042c4632fb27ab1a7e106e96edd12d63b32a643f3a690d9a980aeda655a41ddf4e8750f5d
   languageName: node
   linkType: hard
 
@@ -19720,6 +19751,13 @@ __metadata:
   version: 4.1.0
   resolution: "spex@npm:4.1.0"
   checksum: 10c0/d073167f3da25c7b36fbec378963d9b3de403f0b552bfd53f826fb30ea540714c2eb616090944e888876d00b78a480f3c958ba338f817b18916c20abff15bb48
+  languageName: node
+  linkType: hard
+
+"splaytree-ts@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "splaytree-ts@npm:1.0.2"
+  checksum: 10c0/4c34573891a749055ffe22381ea841ae03dbf7b55a3ea4a1d7df5013bfbe128e79f6c468579358ec573734cdbdf5f77a97ae7185f155248eb8be58151428c85e
   languageName: node
   linkType: hard
 
