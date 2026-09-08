@@ -56,8 +56,7 @@ export const MapLayersControl = (props) => {
 
   const baseLayersControls = useMemo(() => {
     const result = []
-    for (let index = 0; index < baseLayers.length; index++) {
-      const baseLayer = baseLayers[index]
+    for (const baseLayer of baseLayers) {
       const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, type, url, style } = baseLayer
 
       const checked = (!contextBaseLayer && baseLayer === defaultBaseLayer) || contextBaseLayer?.name === name
