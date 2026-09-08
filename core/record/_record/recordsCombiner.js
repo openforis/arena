@@ -25,13 +25,85 @@ const findEntityByKeys = ({ survey, record, entityDefUuid, parentEntity, keyValu
     ? Records.findEntityByKeyValues({ survey, record, parentEntity, entityDefUuid, keyValuesByDefUuid })
     : null
 
-const _findNodeWithSameIId = (nodeSearch, nodesArray) =>
-  nodesArray.find((node) => Node.getIId(node) === Node.getIId(nodeSearch))
+// Sorts by dateCreated, falling back to original array order for ties. Used as the last-resort way
+// to pair up same-def siblings that have no content-based identity to match on (see
+// _pairChildrenOfSameDef): dateCreated survives independent renumbering unlike iId, but nodes
+// created together in the same batch (e.g. an entity's auto-populated default children, or a bulk
+// import) routinely share the same millisecond, so ties still need a stable secondary order.
+const _sortByCreationOrder = (nodes) =>
+  nodes
+    .map((node, index) => ({ node, index }))
+    .sort((a, b) => {
+      const dateDiff = new Date(Node.getDateCreated(a.node)).getTime() - new Date(Node.getDateCreated(b.node)).getTime()
+      return dateDiff !== 0 ? dateDiff : a.index - b.index
+    })
+    .map(({ node }) => node)
 
-const _getNodesArrayDifference = (nodes, otherNodes) => nodes.filter((node) => !_findNodeWithSameIId(node, otherNodes))
+const _getEntityKeyValues = ({ survey, cycle, record, entity }) =>
+  Records.getEntityKeyValuesByDefUuid({ survey, cycle, record, entity })
 
-const _getNodesArrayIntersection = (nodes, otherNodes) =>
-  nodes.filter((node) => !!_findNodeWithSameIId(node, otherNodes))
+// Pairs up children of the same def from two independently-numbered records (source and target),
+// without relying on internal id equality - see the header comment on findEntityByKeys: two
+// independently-built records routinely reuse the same small internal ids for entirely unrelated
+// nodes, which replaceUpdatedNodes used to match on, silently deleting-and-recreating nodes that
+// were actually unchanged (and orphaning anything keyed off their old internal id - files, RDB
+// rows, validation fields) whenever the source's and target's ids happened to diverge.
+//
+// Multiple entities that declare key attributes are matched by key value equality, the same way
+// mergeRecords matches them. Everything else - multiple attributes, and multiple entities with no
+// key attributes - has no content-based identity to match on, so pairs are formed by creation order
+// instead (see _sortByCreationOrder).
+//
+// Returns { pairs, sourceOnly, targetOnly }: pairs are [source, target] node tuples to update in
+// place, sourceOnly are unmatched source nodes to add, targetOnly are unmatched target nodes to
+// delete.
+const _pairChildrenOfSameDef = ({
+  survey,
+  cycle,
+  recordSource,
+  recordTarget,
+  childDef,
+  childrenSource,
+  childrenTarget,
+}) => {
+  const pairs = []
+  const hasKeys = NodeDef.isEntity(childDef) && Surveys.getNodeDefKeys({ survey, cycle, nodeDef: childDef }).length > 0
+
+  if (!hasKeys) {
+    // no content-based identity to match on (a plain multiple attribute, or a multiple entity with
+    // no key attributes) - pair everything by creation order
+    const sortedSource = _sortByCreationOrder(childrenSource)
+    const sortedTarget = _sortByCreationOrder(childrenTarget)
+    const pairCount = Math.min(sortedSource.length, sortedTarget.length)
+    for (let i = 0; i < pairCount; i += 1) {
+      pairs.push([sortedSource[i], sortedTarget[i]])
+    }
+    return { pairs, sourceOnly: sortedSource.slice(pairCount), targetOnly: sortedTarget.slice(pairCount) }
+  }
+
+  // keyed multiple entity: match by key value equality. Anything left over here is definitively
+  // unmatched (there's no fallback to creation order once a key comparison has already ruled a pair
+  // out), so it goes straight to sourceOnly/targetOnly rather than through a second matching pass.
+  let unmatchedTarget = childrenTarget
+  const sourceOnly = []
+  for (const entitySource of childrenSource) {
+    const keyValuesSource = _getEntityKeyValues({ survey, cycle, record: recordSource, entity: entitySource })
+    const matchIndex = unmatchedTarget.findIndex((entityTargetCandidate) =>
+      Objects.isEqual(
+        keyValuesSource,
+        _getEntityKeyValues({ survey, cycle, record: recordTarget, entity: entityTargetCandidate })
+      )
+    )
+    if (matchIndex >= 0) {
+      pairs.push([entitySource, unmatchedTarget[matchIndex]])
+      unmatchedTarget = unmatchedTarget.filter((_node, index) => index !== matchIndex)
+    } else {
+      sourceOnly.push(entitySource)
+    }
+  }
+
+  return { pairs, sourceOnly, targetOnly: unmatchedTarget }
+}
 
 const _replaceAttributeValueIfEmptyOrModified = ({
   survey,
@@ -92,29 +164,39 @@ const _replaceUpdatedNodesInEntities = ({
       childDefUuid
     )(updateResult.record)
 
-    // delete nodes that are not in source record
-    const childrenTargetToDelete = _getNodesArrayDifference(childrenTarget, childrenSource).map(Node.assocDeleted(true))
-    if (childrenTargetToDelete.length > 0) {
-      const childrenTargetToDeleteIIds = childrenTargetToDelete.map(Node.getIId)
-      const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteIIds, { sideEffect })(
-        updateResult.record
-      )
+    const { pairs, sourceOnly, targetOnly } = _pairChildrenOfSameDef({
+      survey,
+      cycle: recordTarget.cycle,
+      recordSource,
+      recordTarget: updateResult.record,
+      childDef,
+      childrenSource,
+      childrenTarget,
+    })
+
+    // delete target nodes with no match in source
+    if (targetOnly.length > 0) {
+      const targetOnlyIIds = targetOnly.map(Node.getIId)
+      const nodesDeleteUpdateResult = Records.deleteNodes(targetOnlyIIds, { sideEffect })(updateResult.record)
       updateResult.merge(nodesDeleteUpdateResult)
     }
 
-    // add new nodes (in source record but not in target record) to updateResult (and record)
-    _getNodesArrayDifference(childrenSource, childrenTarget).forEach((childSourceToAdd) => {
-      RecordReader.visitDescendantsAndSelf(childSourceToAdd, (visitedChildSource) => {
-        const newNodeToAdd = Node.assocCreated(true)(visitedChildSource) // new node for the server
-        delete newNodeToAdd[Node.keys.id] // clear internal id
-        updateResult.addNode(newNodeToAdd, { sideEffect })
-      })(recordSource)
-    })
+    // add source nodes with no match in target; _cloneEntityAndDescendants assigns them fresh ids
+    // from the target record's own counter, rather than keeping the source's, since source and
+    // target are independently numbered (see _pairChildrenOfSameDef) and reusing the source's ids
+    // here could collide with an unrelated node the target already has under it
+    for (const childSourceToAdd of sourceOnly) {
+      _cloneEntityAndDescendants({
+        updateResult,
+        recordSource,
+        entitySource: childSourceToAdd,
+        parentEntity: entityTarget,
+        sideEffect,
+      })
+    }
 
-    // update existing nodes (nodes in both source and target records)
-
-    _getNodesArrayIntersection(childrenSource, childrenTarget).forEach((childSource) => {
-      const childTargetToUpdate = _findNodeWithSameIId(childSource, childrenTarget)
+    // update matched pairs (nodes present, under this def, in both source and target records)
+    for (const [childSource, childTargetToUpdate] of pairs) {
       if (NodeDef.isAttribute(childDef)) {
         const attrUpdateResult = _replaceAttributeValueIfEmptyOrModified({
           survey,
@@ -135,10 +217,11 @@ const _replaceUpdatedNodesInEntities = ({
           recordTarget: updateResult.record,
           entitySource: childSource,
           entityTarget: childTargetToUpdate,
+          sideEffect,
         })
         updateResult.merge(childEntityUpdateResult)
       }
-    })
+    }
   }
   return updateResult
 }
@@ -354,7 +437,7 @@ const _mergeMultipleEntities = ({
   stack,
   sideEffect = false,
 }) => {
-  childrenSource.forEach((childSource) => {
+  for (const childSource of childrenSource) {
     const keyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({
       survey,
       cycle: recordSource.cycle,
@@ -381,7 +464,7 @@ const _mergeMultipleEntities = ({
         sideEffect,
       })
     }
-  })
+  }
 }
 
 const _mergeRecordsNodes = ({
@@ -461,7 +544,7 @@ export const mergeRecords =
 
       const entityDef = Surveys.getNodeDefByUuid({ survey, uuid: Node.getNodeDefUuid(entitySource) })
       const childDefs = Surveys.getNodeDefChildrenSorted({ survey, nodeDef: entityDef, cycle })
-      childDefs.forEach((childDef) => {
+      for (const childDef of childDefs) {
         _mergeRecordsNodes({
           updateResult,
           survey,
@@ -472,7 +555,7 @@ export const mergeRecords =
           stack,
           sideEffect,
         })
-      })
+      }
     }
     return afterNodesUpdate({
       user,
