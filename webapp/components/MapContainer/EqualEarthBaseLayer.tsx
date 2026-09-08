@@ -22,13 +22,21 @@ export const EqualEarthBaseLayer = createLayerComponent<MaplibreGLLayer, EqualEa
     const layer = maplibreGL({ style, ...options })
 
     let trueData: CountryFeatureCollection | null = null
+    let fetchStarted = false
     let pendingFrame: number | null = null
     let removed = false
 
     const applyBlend = (): void => {
       pendingFrame = null
       if (!trueData || removed) return
-      const source = layer.getMaplibreMap().getSource(COUNTRIES_SOURCE_ID) as GeoJSONSource | undefined
+      // react-leaflet mounts every declared base layer (checked or not) at component
+      // creation time, so this can run for a layer that was never actually added to the
+      // map (e.g. the record-editing coordinate picker, where Equal Earth is present in
+      // the switcher but not selected) - getMaplibreMap() is only populated once onAdd
+      // has actually run, so guard against it being unset.
+      const maplibreMap = layer.getMaplibreMap()
+      if (!maplibreMap) return
+      const source = maplibreMap.getSource(COUNTRIES_SOURCE_ID) as GeoJSONSource | undefined
       const blend = getBlendFactor(context.map.getZoom(), DEFAULT_BLEND_ZOOM_RANGE)
       // blendCountryFeatureCollection's return shape matches GeoJSON.GeoJSON structurally,
       // but isn't declared against the strict 'geojson' package types this project doesn't
@@ -41,20 +49,29 @@ export const EqualEarthBaseLayer = createLayerComponent<MaplibreGLLayer, EqualEa
       pendingFrame = requestAnimationFrame(applyBlend)
     }
 
-    fetch(COUNTRIES_GEOJSON_URL)
-      .then((response) => response.json())
-      .then((data: CountryFeatureCollection) => {
-        if (removed) return
-        trueData = data
-        scheduleBlend()
-      })
-      .catch(() => {
-        // Fetch failed - the style's own static source URL (equalEarthMapStyle.ts) keeps
-        // rendering the unblended, true-position countries as a fallback.
-      })
+    // Only starts once the layer is actually added to the map (not just mounted) - the
+    // record-editing coordinate picker mounts this component without ever adding it
+    // (Equal Earth isn't its default layer there), and there's no reason to fetch 250KB
+    // of data for a layer nobody selected.
+    const ensureDataFetched = (): void => {
+      if (fetchStarted) return
+      fetchStarted = true
+      fetch(COUNTRIES_GEOJSON_URL)
+        .then((response) => response.json())
+        .then((data: CountryFeatureCollection) => {
+          if (removed) return
+          trueData = data
+          scheduleBlend()
+        })
+        .catch(() => {
+          // Fetch failed - the style's own static source URL (equalEarthMapStyle.ts) keeps
+          // rendering the unblended, true-position countries as a fallback.
+        })
+    }
 
     layer.on('add', () => {
       removed = false
+      ensureDataFetched()
       context.map.on('zoom', scheduleBlend)
       scheduleBlend()
     })

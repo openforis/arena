@@ -38,12 +38,23 @@ L.Marker.prototype.options.icon = L.icon({
 // end of workaround
 
 const INITIAL_ZOOM_LEVEL = 3
-// MapLibre GL layers (used by the Equal Earth base layer) don't sync reliably at
-// zoom 0, and MapLibre restricts max latitude more strictly than Leaflet - see
-// https://github.com/maplibre/maplibre-gl-leaflet#readme
-// Applied unconditionally (not just when equalEarthAsDefault is set) since the Equal
-// Earth layer stays selectable from the switcher either way.
-const MAP_MIN_ZOOM = 1
+// Matches the raster base layers' own hardcoded minZoom (see MapLayersControl.js) so
+// switching to them never produces a blank map at low zoom - MapLibre GL layers (the
+// Equal Earth base layer) only need zoom >= 1 to sync reliably, so 3 comfortably
+// covers that too. See https://github.com/maplibre/maplibre-gl-leaflet#readme
+const MAP_MIN_ZOOM = 3
+// Explicit, unconditional map-level maxZoom keeps map.getMaxZoom() finite and stable
+// regardless of which base layer is active. Without it, Leaflet derives the max
+// dynamically from whichever GridLayer-based TileLayers are currently registered - but
+// the Equal Earth base layer isn't a GridLayer and registers no zoom bound at all, so
+// with it active the derived max becomes Infinity, which broke useFlyToPoint's
+// map.flyTo(latlng, Infinity) (NaN propagates through Leaflet's flyTo animation math
+// and throws) and made ClusterMarker's "already at max zoom" check permanently false.
+// 17 matches the highest maxZoom among the existing raster layers (ESRI World
+// Imagery); layers with a lower native maxZoom (e.g. ESRI Terrain's 9) still stop
+// fetching new tiles at their own maxZoom and show stretched tiles beyond it - same as
+// normal over-zoom behavior, this doesn't change what tiles are available.
+const MAP_MAX_ZOOM = 17
 const MAP_MAX_BOUNDS = [
   [180, -Infinity],
   [-180, Infinity],
@@ -106,6 +117,7 @@ export const MapContainer = (props) => {
           zoomControl={false}
           zoom={INITIAL_ZOOM_LEVEL}
           minZoom={MAP_MIN_ZOOM}
+          maxZoom={MAP_MAX_ZOOM}
           maxBounds={MAP_MAX_BOUNDS}
           maxBoundsViscosity={1}
         >
