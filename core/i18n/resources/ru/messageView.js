@@ -42,6 +42,7 @@ export default {
       label: 'Тип целевой аудитории',
       all: 'Все пользователи',
       system_admins: 'Системные администраторы',
+      survey_admins: 'Администраторы опросов',
       survey_managers: 'Менеджеры опросов',
       data_analysts: 'Аналитики данных',
       data_cleaners: 'Специалисты по очистке данных',
