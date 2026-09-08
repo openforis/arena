@@ -20,11 +20,27 @@ const A3 = 0.000893
 const A4 = 0.003796
 const SQRT3 = Math.sqrt(3)
 
+/**
+ * Converts degrees to radians.
+ *
+ * @param {number} degrees - Angle in degrees.
+ * @returns {number} Angle in radians.
+ */
 const toRadians = (degrees: number): number => (degrees * Math.PI) / 180
+
+/**
+ * Converts radians to degrees.
+ *
+ * @param {number} radians - Angle in radians.
+ * @returns {number} Angle in degrees.
+ */
 const toDegrees = (radians: number): number => (radians * 180) / Math.PI
 
 /**
  * Projects a WGS84 longitude/latitude (degrees) to Equal Earth projected meters.
+ *
+ * @param {LonLat} lonLat - WGS84 longitude and latitude in degrees.
+ * @returns {MercatorMeters} Equal Earth projected coordinates in meters.
  */
 export const projectToEqualEarthMeters = ({ lon, lat }: LonLat): MercatorMeters => {
   const lambda = toRadians(lon)
@@ -41,6 +57,9 @@ export const projectToEqualEarthMeters = ({ lon, lat }: LonLat): MercatorMeters 
 
 /**
  * Inverse Web Mercator (EPSG:3857): converts meters back to a WGS84 longitude/latitude.
+ *
+ * @param {MercatorMeters} mercatorMeters - Mercator-projected coordinates in meters.
+ * @returns {LonLat} WGS84 longitude and latitude in degrees.
  */
 export const unprojectWebMercatorMeters = ({ x, y }: MercatorMeters): LonLat => ({
   lon: toDegrees(x / WEB_MERCATOR_RADIUS),
@@ -53,6 +72,9 @@ export const unprojectWebMercatorMeters = ({ x, y }: MercatorMeters): LonLat => 
  * forwardMercator(inverseMercator(x, y)) === (x, y), any Mercator-only renderer
  * (Leaflet, MapLibre, etc.) that projects the warped coordinate forward will draw
  * it at the true Equal Earth-projected position.
+ *
+ * @param {LonLat} lonLat - WGS84 longitude and latitude in degrees.
+ * @returns {LonLat} Warped WGS84 longitude and latitude coordinates for Web Mercator rendering.
  */
 export const warpLonLatToEqualEarthInMercator = (lonLat: LonLat): LonLat =>
   unprojectWebMercatorMeters(projectToEqualEarthMeters(lonLat))
