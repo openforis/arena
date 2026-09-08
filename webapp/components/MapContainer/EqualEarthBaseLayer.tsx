@@ -6,7 +6,12 @@ import type { StyleSpecification } from 'maplibre-gl'
 // The warped GeoJSON this layer renders only reads as an Equal Earth
 // projection near the world-overview scale; past this zoom the fixed warp
 // increasingly diverges from true geography, so zooming further in is capped.
-const EQUAL_EARTH_MAX_ZOOM = 2
+// 3 (rather than 2) is also the minimum needed to keep the base-layer switcher
+// usable: the other base layers hardcode minZoom={3}, and Leaflet's
+// Control.Layers disables a layer's radio whenever the map's current zoom is
+// below that layer's minZoom, so capping at 2 would permanently disable every
+// other base layer with no way to zoom past the cap to unlock them.
+const EQUAL_EARTH_MAX_ZOOM = 3
 
 export interface EqualEarthBaseLayerProps extends LayerProps {
   style: StyleSpecification
