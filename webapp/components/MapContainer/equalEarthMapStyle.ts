@@ -1,7 +1,5 @@
 import type { StyleSpecification } from 'maplibre-gl'
 
-import { DEFAULT_BLEND_ZOOM_RANGE } from '@core/geo/equalEarthBlend'
-
 const COUNTRIES_GEOJSON_URL = '/geo/natural-earth-equal-earth-eq2merc.geojson'
 
 // Matches the "UN ClearMap" entry in ./baseLayers.js - duplicated here (rather than
@@ -12,7 +10,15 @@ const UN_CLEAR_MAP_TILE_URL =
 const UN_CLEAR_MAP_ATTRIBUTION = 'Map data &copy; <a href="https://www.un.org/geospatial/">United Nations</a>'
 const UN_CLEAR_MAP_MAX_ZOOM = 8
 
-const { start: BLEND_START_ZOOM, end: BLEND_END_ZOOM } = DEFAULT_BLEND_ZOOM_RANGE
+// The vector country layers below (Natural Earth-derived, heavily simplified) never
+// pixel-align with UN ClearMap's own raster boundaries. A gradual cross-fade would show
+// both simultaneously and expose that mismatch as a shimmering double-boundary
+// artifact, so instead of fading, this style cuts over instantly at one zoom level -
+// the two boundary datasets are never visible at the same time, so the mismatch is
+// never seen even though the underlying data still differs. This is independent of
+// EqualEarthBaseLayer.tsx's own position blend (still a smooth zoom 4-8 fade from the
+// Equal Earth warp to true positions) - that part is unaffected by this constant.
+const RASTER_CUTOVER_ZOOM = 7
 
 export const equalEarthMapStyle: StyleSpecification = {
   version: 8,
@@ -42,7 +48,7 @@ export const equalEarthMapStyle: StyleSpecification = {
       type: 'raster',
       source: 'unClearMap',
       paint: {
-        'raster-opacity': ['interpolate', ['linear'], ['zoom'], BLEND_START_ZOOM, 0, BLEND_END_ZOOM, 1],
+        'raster-opacity': ['step', ['zoom'], 0, RASTER_CUTOVER_ZOOM, 1],
       },
     },
     {
@@ -53,7 +59,7 @@ export const equalEarthMapStyle: StyleSpecification = {
       paint: {
         'line-color': '#226688',
         'line-width': 5,
-        'line-opacity': ['interpolate', ['linear'], ['zoom'], BLEND_START_ZOOM, 0.1, BLEND_END_ZOOM, 0],
+        'line-opacity': ['step', ['zoom'], 0.1, RASTER_CUTOVER_ZOOM, 0],
       },
     },
     {
@@ -64,7 +70,7 @@ export const equalEarthMapStyle: StyleSpecification = {
       paint: {
         'line-color': '#226688',
         'line-width': ['interpolate', ['linear'], ['zoom'], 0, 1.2, 1, 1.6, 2, 2, 3, 2.4],
-        'line-opacity': ['interpolate', ['linear'], ['zoom'], BLEND_START_ZOOM, 0.8, BLEND_END_ZOOM, 0],
+        'line-opacity': ['step', ['zoom'], 0.8, RASTER_CUTOVER_ZOOM, 0],
       },
     },
     {
@@ -91,7 +97,7 @@ export const equalEarthMapStyle: StyleSpecification = {
           '#ceb5cf',
           /* fallback for any unexpected value */ '#cccccc',
         ],
-        'fill-opacity': ['interpolate', ['linear'], ['zoom'], BLEND_START_ZOOM, 1, BLEND_END_ZOOM, 0],
+        'fill-opacity': ['step', ['zoom'], 1, RASTER_CUTOVER_ZOOM, 0],
       },
     },
     {
@@ -101,7 +107,7 @@ export const equalEarthMapStyle: StyleSpecification = {
       filter: ['==', ['get', 'admin'], 'ATA'],
       paint: {
         'fill-color': '#f0f8ff',
-        'fill-opacity': ['interpolate', ['linear'], ['zoom'], BLEND_START_ZOOM, 1, BLEND_END_ZOOM, 0],
+        'fill-opacity': ['step', ['zoom'], 1, RASTER_CUTOVER_ZOOM, 0],
       },
     },
   ],
