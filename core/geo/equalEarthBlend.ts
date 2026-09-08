@@ -9,7 +9,7 @@ export interface BlendZoomRange {
  * The zoom range the Equal Earth base layer blends over: fully warped at or below
  * `start`, fully true position at or above `end`.
  */
-export const DEFAULT_BLEND_ZOOM_RANGE: BlendZoomRange = { start: 1, end: 4 }
+export const DEFAULT_BLEND_ZOOM_RANGE: BlendZoomRange = { start: 4, end: 8 }
 
 export type Position = number[]
 export type CoordinateTree = Position | CoordinateTree[]

@@ -20,8 +20,8 @@ describe('equalEarthBlend', () => {
     expect(getBlendFactor(2.5, { start: 1, end: 4 })).toBeCloseTo(0.5)
   })
 
-  test('DEFAULT_BLEND_ZOOM_RANGE is zoom 1 to 4', () => {
-    expect(DEFAULT_BLEND_ZOOM_RANGE).toEqual({ start: 1, end: 4 })
+  test('DEFAULT_BLEND_ZOOM_RANGE is zoom 4 to 8', () => {
+    expect(DEFAULT_BLEND_ZOOM_RANGE).toEqual({ start: 4, end: 8 })
   })
 
   test('blendLonLat at blend=0 returns the true position unchanged', () => {
