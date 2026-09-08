@@ -37,7 +37,15 @@ L.Marker.prototype.options.icon = L.icon({
 })
 // end of workaround
 
-const INITIAL_ZOOM_LEVEL = 3
+const INITIAL_ZOOM_LEVEL = 1
+// MapLibre GL layers (used by the Equal Earth base layer) don't sync reliably at
+// zoom 0, and MapLibre restricts max latitude more strictly than Leaflet - see
+// https://github.com/maplibre/maplibre-gl-leaflet#readme
+const MAP_MIN_ZOOM = 1
+const MAP_MAX_BOUNDS = [
+  [180, -Infinity],
+  [-180, Infinity],
+]
 
 const MapResizeHandler = () => {
   const map = useLeafletMap()
@@ -94,6 +102,9 @@ export const MapContainer = (props) => {
           doubleClickZoom={false}
           zoomControl={false}
           zoom={INITIAL_ZOOM_LEVEL}
+          minZoom={MAP_MIN_ZOOM}
+          maxBounds={MAP_MAX_BOUNDS}
+          maxBoundsViscosity={1}
         >
           <MapResizeHandler />
           <MapLayersControl layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />

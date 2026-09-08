@@ -7,6 +7,7 @@ import { useUser } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 
 import { baseLayers } from './baseLayers'
+import { EqualEarthBaseLayer } from './EqualEarthBaseLayer'
 import { useMapContext } from './MapContext'
 import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
 import { WmtsComponent } from './WmtsComponent'
@@ -45,14 +46,23 @@ export const MapLayersControl = (props) => {
     const result = []
     for (let index = 0; index < baseLayers.length; index++) {
       const baseLayer = baseLayers[index]
-      const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, url } = baseLayer
+      const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, type, url, style } = baseLayer
+
+      const checked = (!contextBaseLayer && index === 0) || contextBaseLayer?.name === name
+
+      if (type === 'maplibre') {
+        result.push(
+          <LayersControl.BaseLayer key={key} name={name} checked={checked}>
+            <EqualEarthBaseLayer style={style} attribution={attribution} />
+          </LayersControl.BaseLayer>
+        )
+        continue
+      }
 
       const tileUrl = getTileUrl({ url, apiKeyRequired, provider, user })
       if (!tileUrl) {
         continue
       }
-
-      const checked = (!contextBaseLayer && index === 0) || contextBaseLayer?.name === name
 
       result.push(
         <LayersControl.BaseLayer key={key} name={name} checked={checked}>
