@@ -775,6 +775,11 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       info: `Atributo em comum entre a unidade base e a tabela da 1ª fase
     (deve ser um atributo de código ou de texto; o seu valor é comparado com as propriedades extra definidas para a categoria da 1ª fase - o nome do atributo não precisa corresponder ao nome da propriedade extra)`,
     },
+    firstPhaseSamplingPointDataJoinMethod: {
+      label: 'Método de junção',
+      description:
+        'A unidade base e a tabela da 1ª fase são unidas usando o método Sampling Point Data: o atributo chave da unidade base usa a categoria Sampling Point Data, portanto não é necessário um atributo de junção separado.',
+    },
     formLabel: 'Rótulo da cadeia de processamento',
     basic: 'Básico',
     records: 'Registros',

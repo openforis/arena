@@ -778,6 +778,11 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
       info: `Attribut en commun entre l'unité de base et la table de 1ère phase
 (il doit s'agir d'un attribut de type code ou texte ; sa valeur est comparée aux propriétés supplémentaires définies pour la catégorie de 1ère phase - le nom de l'attribut n'a pas besoin de correspondre à celui de la propriété supplémentaire)`,
     },
+    firstPhaseSamplingPointDataJoinMethod: {
+      label: 'Méthode de jointure',
+      description:
+        "L'unité de base et la table de 1ère phase sont jointes à l'aide de la méthode Sampling Point Data : l'attribut clé de l'unité de base utilise la catégorie Sampling Point Data, aucun attribut de jointure distinct n'est donc nécessaire.",
+    },
     formLabel: 'Étiquette de la chaîne de traitement',
     basic: 'Basique',
     records: 'Enregistrements',
