@@ -187,16 +187,26 @@ The existing `commonAttribute` block's condition changes from
 explicit-join case applies, which is exactly what the redefined function
 still expresses, now also accounting for the sampling-point-data case).
 
-A new field is added, always present as a boolean:
+A new field is added, present as a boolean whenever two-phase sampling is
+selected:
 
 ```js
-phase2AsSamplingPointData: ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({ survey, baseUnitNodeDef }),
+...(ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(chainSamplingDesign)
+  ? {
+      phase2AsSamplingPointData: ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({
+        survey,
+        baseUnitNodeDef,
+      }),
+    }
+  : {}),
 ```
 
-`phase2AsSamplingPointData` (name chosen by the user) is always included in
-the summary JSON, `true` only when the automatic method applies — unlike
-`commonAttribute`'s presence-means-something convention, an analyst's R
-script can check this boolean directly.
+`phase2AsSamplingPointData` (name chosen by the user) is included whenever
+`twoPhase` sampling is selected, `true` only when the automatic method
+applies — unlike `commonAttribute`'s presence-means-something convention,
+an analyst's R script can check this boolean directly whenever it's
+relevant. It's omitted entirely for other sampling strategies, matching
+the gate the "Common attribute"/info-text UI already uses.
 
 ### 5. Clone-sanitization — verified, no change needed
 
@@ -250,4 +260,6 @@ the base unit to one with an ordinary key attribute — confirm the "Common
 attribute" dropdown reappears, that leaving it empty shows a validation
 error, and that setting it makes the summary JSON include `commonAttribute`
 again (matching today's existing output shape) with
-`phase2AsSamplingPointData: false`.
+`phase2AsSamplingPointData: false`. Then switch the sampling strategy away
+from `twoPhase` — confirm the summary JSON omits `phase2AsSamplingPointData`
+entirely.

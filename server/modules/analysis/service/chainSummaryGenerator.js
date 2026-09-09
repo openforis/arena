@@ -187,10 +187,14 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     })
       ? getCodeAttributeSummary('commonAttribute', firstPhaseCommonAttributeDef)
       : {}),
-    phase2AsSamplingPointData: ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({
-      survey,
-      baseUnitNodeDef,
-    }),
+    ...(ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(chainSamplingDesign)
+      ? {
+          phase2AsSamplingPointData: ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({
+            survey,
+            baseUnitNodeDef,
+          }),
+        }
+      : {}),
     ...(ChainSamplingDesign.isPostStratificationEnabled(chainSamplingDesign)
       ? { postStratificationAttribute: '' } // not supoprted in R script yet, keep it blank
       : //  getCodeAttributeSummary('postStratificationAttribute', postStratificationAttributeDef)
