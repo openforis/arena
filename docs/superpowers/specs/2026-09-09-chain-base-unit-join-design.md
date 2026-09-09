@@ -187,17 +187,16 @@ The existing `commonAttribute` block's condition changes from
 explicit-join case applies, which is exactly what the redefined function
 still expresses, now also accounting for the sampling-point-data case).
 
-A new field is added, present only when the automatic method applies:
+A new field is added, always present as a boolean:
 
 ```js
-...(ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({ survey, baseUnitNodeDef })
-  ? { phase2AsSamplingPointData: true }
-  : {}),
+phase2AsSamplingPointData: ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({ survey, baseUnitNodeDef }),
 ```
 
-`phase2AsSamplingPointData` (name chosen by the user) mirrors
-`commonAttribute`'s own presence-means-something convention — an analyst's
-R script can check either key's presence the same way.
+`phase2AsSamplingPointData` (name chosen by the user) is always included in
+the summary JSON, `true` only when the automatic method applies — unlike
+`commonAttribute`'s presence-means-something convention, an analyst's R
+script can check this boolean directly.
 
 ### 5. Clone-sanitization — verified, no change needed
 
@@ -250,5 +249,5 @@ that downloading the chain summary JSON includes
 the base unit to one with an ordinary key attribute — confirm the "Common
 attribute" dropdown reappears, that leaving it empty shows a validation
 error, and that setting it makes the summary JSON include `commonAttribute`
-again (matching today's existing output shape) and omit
-`phase2AsSamplingPointData`.
+again (matching today's existing output shape) with
+`phase2AsSamplingPointData: false`.

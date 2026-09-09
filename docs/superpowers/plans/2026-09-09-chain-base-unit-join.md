@@ -13,7 +13,7 @@
 - Branch: `feat/chain-base-unit-join` (already checked out, created from `master`).
 - No R-generation code — Arena only exposes metadata; the analyst's own R script (`scriptCommon`/`scriptEnd`) does the actual join, exactly as it already does for `commonAttribute` today.
 - No manual override for the automatic detection (confirmed with the user).
-- The chain summary JSON field name for the automatic-method case is `phase2AsSamplingPointData` (boolean, present and `true` only when the method applies — chosen by the user, not to be changed).
+- The chain summary JSON field name for the automatic-method case is `phase2AsSamplingPointData` (boolean, always present, `true` only when the method applies — chosen by the user, not to be changed).
 - Every new user-facing string (form label, form description, validation error message) must be added to all six language files this project maintains: `core/i18n/resources/{en,es,fr,mn,pt,ru}/`. Do not add English-only placeholders — this project's own recent commit history (`4f94889d9`, "Messages: allow targeting survey admins") shows every new key translated into all six languages in the same commit.
 - **Critical, independently verified detail:** a `ValidationResult.newInstance(key)` whose `key` resolves to `undefined` (i.e. the message key constant doesn't exist yet in `core/validation/_validator/validatorErrorKeys.ts`) is silently swallowed by `core/validation/validator.ts`'s `extractNestedErrorsOrWarnings` — the field will show as *valid* even though the validator logically returned an error. This was confirmed by actually running the new validator end-to-end against a real fixture before writing this plan (see Task 1) — the message key MUST be added to `validatorErrorKeys.ts` in the same task as the validator function, not deferred.
 - Design doc: `docs/superpowers/specs/2026-09-09-chain-base-unit-join-design.md`.
@@ -506,9 +506,10 @@ change to:
     })
       ? getCodeAttributeSummary('commonAttribute', firstPhaseCommonAttributeDef)
       : {}),
-    ...(ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({ survey, baseUnitNodeDef })
-      ? { phase2AsSamplingPointData: true }
-      : {}),
+    phase2AsSamplingPointData: ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({
+      survey,
+      baseUnitNodeDef,
+    }),
 ```
 
 `baseUnitNodeDef` is already computed earlier in this same function (`const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)`, near the top of `generateChainSummary`) — no new derivation needed, just reference the existing local variable.
@@ -963,7 +964,7 @@ Change the base unit to an entity keyed by an ordinary (non-`sampling_point_data
 - The "Common attribute" dropdown reappears.
 - Leaving it unset and attempting to save/trigger validation shows a validation error on that field (the new required-field message).
 - Setting a value clears the error.
-- Download the Summary JSON again — confirm it now includes `"commonAttribute": "<attribute name>"` (plus `commonAttributeCategory`/`commonAttributeCategoryLevel`, unchanged from today's existing behavior) and does NOT include `phase2AsSamplingPointData`.
+- Download the Summary JSON again — confirm it now includes `"commonAttribute": "<attribute name>"` (plus `commonAttributeCategory`/`commonAttributeCategoryLevel`, unchanged from today's existing behavior) and `"phase2AsSamplingPointData": false`.
 
 - [ ] **Step 4: Verify other sampling strategies are unaffected**
 
