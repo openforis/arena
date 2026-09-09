@@ -780,7 +780,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     firstPhaseSamplingPointDataJoinMethod: {
       label: 'Join method',
       description:
-        "Base unit and 1st phase tables are joined using the Sampling Point Data method: the base unit's key attribute uses the Sampling Point Data category, so no separate join attribute is needed.",
+        "Base unit and 1st phase tables are joined using the Sampling Point Data method: the base unit's key attribute and the 1st phase category both use the Sampling Point Data category, so no separate join attribute is needed.",
     },
     formLabel: 'Processing chain label',
     basic: 'Basic',

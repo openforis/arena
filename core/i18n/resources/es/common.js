@@ -649,7 +649,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     firstPhaseSamplingPointDataJoinMethod: {
       label: 'Método de unión',
       description:
-        'La unidad base y la tabla de primera fase se combinan mediante el método de Datos de Puntos de Muestreo: el atributo clave de la unidad base utiliza la categoría de Datos de Puntos de Muestreo, por lo que no es necesario especificar un atributo de unión.',
+        'La unidad base y la tabla de primera fase se combinan mediante el método de Datos de Puntos de Muestreo: el atributo clave de la unidad base y la categoría de primera fase utilizan ambos la categoría de Datos de Puntos de Muestreo, por lo que no es necesario especificar un atributo de unión.',
     },
     formLabel: 'Etiqueta de cadena de procesamiento',
     basic: 'Básico',

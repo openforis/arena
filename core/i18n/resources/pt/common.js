@@ -778,7 +778,7 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     firstPhaseSamplingPointDataJoinMethod: {
       label: 'Método de junção',
       description:
-        'A unidade base e a tabela da 1ª fase são unidas usando o método Dados de Ponto Amostral: o atributo chave da unidade base usa a categoria Dados de Ponto Amostral, portanto não é necessário um atributo de junção separado.',
+        'A unidade base e a tabela da 1ª fase são unidas usando o método Dados de Ponto Amostral: o atributo chave da unidade base e a categoria da 1ª fase usam ambos a categoria Dados de Ponto Amostral, portanto não é necessário um atributo de junção separado.',
     },
     formLabel: 'Rótulo da cadeia de processamento',
     basic: 'Básico',
