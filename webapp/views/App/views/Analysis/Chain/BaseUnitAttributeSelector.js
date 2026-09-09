@@ -10,6 +10,7 @@ import { useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const nodeDefToItem = (nodeDef) => ({
   value: NodeDef.getUuid(nodeDef),
@@ -25,6 +26,7 @@ export const BaseUnitAttributeSelector = (props) => {
     nodeDefTypes = [NodeDef.nodeDefType.code],
     onChange: onChangeProp,
     selectedNodeDefUuid,
+    validation,
   } = props
 
   const i18n = useI18n()
@@ -68,9 +70,13 @@ export const BaseUnitAttributeSelector = (props) => {
   const selectedNodeDef = selectedNodeDefUuid ? Survey.getNodeDefByUuid(selectedNodeDefUuid)(survey) : null
   const selectedItem = selectedNodeDef ? nodeDefToItem(selectedNodeDef) : emptySelectionItem
 
+  const dropdown = (
+    <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} disabled={!editable} />
+  )
+
   return (
     <FormItem label={label} info={info}>
-      <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} disabled={!editable} />
+      {validation ? <ValidationTooltip validation={validation}>{dropdown}</ValidationTooltip> : dropdown}
     </FormItem>
   )
 }
@@ -83,4 +89,5 @@ BaseUnitAttributeSelector.propTypes = {
   nodeDefTypes: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func.isRequired,
   selectedNodeDefUuid: PropTypes.string,
+  validation: PropTypes.object,
 }
