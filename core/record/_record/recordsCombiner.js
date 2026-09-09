@@ -25,6 +25,8 @@ const findEntityByKeys = ({ survey, record, entityDefUuid, parentEntity, keyValu
     ? Records.findEntityByKeyValues({ survey, record, parentEntity, entityDefUuid, keyValuesByDefUuid })
     : null
 
+const _getDateCreatedTime = (node) => new Date(Node.getDateCreated(node)).getTime()
+
 // Sorts by dateCreated, falling back to original array order for ties. Used as the last-resort way
 // to pair up same-def siblings that have no content-based identity to match on (see
 // _pairChildrenOfSameDef): dateCreated survives independent renumbering unlike iId, but nodes
@@ -34,7 +36,7 @@ const _sortByCreationOrder = (nodes) =>
   nodes
     .map((node, index) => ({ node, index }))
     .sort((a, b) => {
-      const dateDiff = new Date(Node.getDateCreated(a.node)).getTime() - new Date(Node.getDateCreated(b.node)).getTime()
+      const dateDiff = _getDateCreatedTime(a.node) - _getDateCreatedTime(b.node)
       return dateDiff !== 0 ? dateDiff : a.index - b.index
     })
     .map(({ node }) => node)
@@ -71,9 +73,31 @@ const _pairChildrenOfSameDef = ({
 
   if (!hasKeys) {
     // no content-based identity to match on (a plain multiple attribute, or a multiple entity with
-    // no key attributes) - pair everything by creation order
-    const sortedSource = _sortByCreationOrder(childrenSource)
-    const sortedTarget = _sortByCreationOrder(childrenTarget)
+    // no key attributes). First, match siblings that share the exact same dateCreated: under the
+    // same parent and node def, that's the same signal mergeRecords' key-value match relies on for
+    // keyed entities - two independently-built records can't agree on a timestamp by accident. It's
+    // also strictly better than the creation-order fallback below when the two sides' child counts
+    // differ (e.g. one side has an extra or a missing node), since a positional pairing shifts every
+    // later pair out of alignment while a dateCreated match doesn't.
+    let unmatchedTarget = [...childrenTarget]
+    const unmatchedSource = []
+    for (const nodeSource of childrenSource) {
+      const dateCreatedSource = _getDateCreatedTime(nodeSource)
+      const matchIndex = unmatchedTarget.findIndex(
+        (nodeTargetCandidate) => _getDateCreatedTime(nodeTargetCandidate) === dateCreatedSource
+      )
+      if (matchIndex >= 0) {
+        pairs.push([nodeSource, unmatchedTarget[matchIndex]])
+        unmatchedTarget = unmatchedTarget.filter((_node, index) => index !== matchIndex)
+      } else {
+        unmatchedSource.push(nodeSource)
+      }
+    }
+
+    // anything left shares no dateCreated with a sibling on the other side - pair it by creation
+    // order, the last resort when there's no content-based identity left to match on
+    const sortedSource = _sortByCreationOrder(unmatchedSource)
+    const sortedTarget = _sortByCreationOrder(unmatchedTarget)
     const pairCount = Math.min(sortedSource.length, sortedTarget.length)
     for (let i = 0; i < pairCount; i += 1) {
       pairs.push([sortedSource[i], sortedTarget[i]])
