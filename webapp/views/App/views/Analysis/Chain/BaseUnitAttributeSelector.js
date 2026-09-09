@@ -25,7 +25,6 @@ export const BaseUnitAttributeSelector = (props) => {
     nodeDefTypes = [NodeDef.nodeDefType.code],
     onChange: onChangeProp,
     selectedNodeDefUuid,
-    validation,
   } = props
 
   const i18n = useI18n()
@@ -71,13 +70,7 @@ export const BaseUnitAttributeSelector = (props) => {
 
   return (
     <FormItem label={label} info={info}>
-      <Dropdown
-        selection={selectedItem}
-        items={selectableItems}
-        onChange={onChange}
-        disabled={!editable}
-        validation={validation}
-      />
+      <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} disabled={!editable} />
     </FormItem>
   )
 }
@@ -90,5 +83,4 @@ BaseUnitAttributeSelector.propTypes = {
   nodeDefTypes: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func.isRequired,
   selectedNodeDefUuid: PropTypes.string,
-  validation: PropTypes.object,
 }

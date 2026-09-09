@@ -646,11 +646,6 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       label: 'Atributo común',
       info: 'Atributo común entre la unidad base y la tabla de primera fase (debe ser un atributo de código o de texto; su valor se compara con las propiedades adicionales definidas para la categoría de primera fase - el nombre del atributo no necesita coincidir con el de la propiedad adicional)',
     },
-    firstPhaseSamplingPointDataJoinMethod: {
-      label: 'Método de unión',
-      description:
-        'La unidad base y la tabla de primera fase se combinan mediante el método de Datos de Puntos de Muestreo: el atributo clave de la unidad base y la categoría de primera fase utilizan ambos la categoría de Datos de Puntos de Muestreo, por lo que no es necesario especificar un atributo de unión.',
-    },
     formLabel: 'Etiqueta de cadena de procesamiento',
     basic: 'Básico',
     records: 'Registros',
