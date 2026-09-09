@@ -190,6 +190,7 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     ...(ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(chainSamplingDesign)
       ? {
           phase2AsSamplingPointData: ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({
+            samplingDesign: chainSamplingDesign,
             survey,
             baseUnitNodeDef,
           }),

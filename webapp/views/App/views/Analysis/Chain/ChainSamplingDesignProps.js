@@ -36,6 +36,7 @@ export const ChainSamplingDesignProps = (props) => {
   const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chain)
   const validation = Chain.getValidation(chain)
   const isSamplingPointDataJoinMethod = ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({
+    samplingDesign,
     survey,
     baseUnitNodeDef,
   })

@@ -14,19 +14,19 @@ attribute" (`firstPhaseCommonAttributeUuid`, exposed to R as
 the base unit (or its ancestors) whose value is matched against the
 Phase-1 category's extra properties.
 
-There is a second case where no such attribute is needed at all: when the
-base unit entity's own key attribute *is itself* a code attribute drawn
-from the `sampling_point_data` category (`core/survey/category.js`'s
-`samplingPointDataCategoryName`/`isSamplingPointDataCategory` — defined but,
-per a full-repo search, never previously used by any chain/analysis code).
-In that case the base unit's key IS the sampling-point-data item, so the
-join between the base unit and Phase-1 tables is inherently given by that
-key — no explicit join attribute is meaningful or needed. Per the user's
-explicit final direction, this detection deliberately looks only at the
-base unit's key attribute, not at whether the Phase-1 category is itself
-`sampling_point_data` — the rule is "does the base unit's own key make the
-join method self-evident", independent of what the Phase-1 category
-happens to be.
+There is a second case where no such attribute is needed at all: when
+**both** the base unit entity's own key attribute _is itself_ a code
+attribute drawn from the `sampling_point_data` category (`core/survey/
+category.js`'s `samplingPointDataCategoryName`/`isSamplingPointDataCategory`
+— defined but, per a full-repo search, never previously used by any
+chain/analysis code) **and** the selected Phase-1 category is itself
+`sampling_point_data`. In that case the base unit's key IS the Phase-1
+sampling-point-data item, so the join between the base unit and Phase-1
+tables is inherently given by that key — no explicit join attribute is
+meaningful or needed. Both conditions are required, confirmed with the
+user: a base unit keyed by `sampling_point_data` says nothing about an
+unrelated Phase-1 category, and a Phase-1 category that happens to be
+`sampling_point_data` says nothing about how the base unit is keyed.
 
 This spec adds automatic detection of that second case and adjusts the
 sampling-design edit form and the generated `chain_summary.json`
@@ -41,11 +41,11 @@ join code for this, only exposed the values an analyst's script needs.
 ## Goal
 
 1. Detect, from survey structure alone (no new stored chain property),
-   whether the base unit's key attribute uses the `sampling_point_data`
-   category.
+   whether both the base unit's key attribute AND the selected Phase-1
+   category use the `sampling_point_data` category.
 2. When true: show explanatory text in the sampling-design form instead of
    the "Common attribute" selector, and add a `phase2AsSamplingPointData:
-   true` field to the generated chain summary JSON.
+true` field to the generated chain summary JSON.
 3. When false: behavior is unchanged from today — the "Common attribute"
    selector is shown, and it becomes a **hard-required** field (new
    validation; today no sampling-design field has field-level required
@@ -58,17 +58,21 @@ join code for this, only exposed the values an analyst's script needs.
 
 ### 1. Detection predicate (`common/analysis/chainSamplingDesign.js`)
 
-A new survey-aware function:
+A new survey-aware function, requiring both the base unit's key attribute
+AND the Phase-1 category to be `sampling_point_data`:
 
 ```js
-const isFirstPhaseSamplingPointDataJoinMethod = ({ survey, baseUnitNodeDef }) => {
-  if (!baseUnitNodeDef) return false
-  return Survey.getNodeDefKeys(baseUnitNodeDef)(survey).some(
+const _isNodeDefKeyOnSamplingPointDataCategory = ({ survey, nodeDef }) =>
+  Boolean(nodeDef) &&
+  Survey.getNodeDefKeys(nodeDef)(survey).some(
     (keyAttrDef) =>
       NodeDef.isCode(keyAttrDef) &&
       Category.isSamplingPointDataCategory(Survey.getCategoryByUuid(NodeDef.getCategoryUuid(keyAttrDef))(survey))
   )
-}
+
+const isFirstPhaseSamplingPointDataJoinMethod = ({ samplingDesign, survey, baseUnitNodeDef }) =>
+  _isNodeDefKeyOnSamplingPointDataCategory({ survey, nodeDef: baseUnitNodeDef }) &&
+  Category.isSamplingPointDataCategory(Survey.getCategoryByUuid(getFirstPhaseCategoryUuid(samplingDesign))(survey))
 ```
 
 `Survey.getNodeDefKeys(nodeDef)(survey)` (existing, `core/survey/_survey/
@@ -79,12 +83,13 @@ exactly the category check needed; this is its first real caller.
 
 A second new function combines this with the existing strategy check, and
 is used everywhere the OLD `isFirstPhaseCommonAttributeSelectionEnabled`
-was used *except* inside the module's own pure cleanup cascade (see below):
+was used _except_ inside the module's own pure cleanup cascade (see below):
 
 ```js
 const isFirstPhaseCommonAttributeRequired = ({ samplingDesign, survey, baseUnitNodeDef }) =>
   isFirstPhaseCategorySelectionEnabled(samplingDesign) &&
-  !isFirstPhaseSamplingPointDataJoinMethod({ survey, baseUnitNodeDef })
+  Boolean(baseUnitNodeDef) &&
+  !isFirstPhaseSamplingPointDataJoinMethod({ samplingDesign, survey, baseUnitNodeDef })
 ```
 
 This single function answers both "should the Common attribute selector be
@@ -116,6 +121,7 @@ Add:
 
 ```js
 const isSamplingPointDataJoinMethod = ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({
+  samplingDesign,
   survey,
   baseUnitNodeDef,
 })
@@ -125,12 +131,10 @@ and change the existing conditional block (currently gated on
 `isFirstPhaseCommonAttributeSelectionEnabled`) to:
 
 ```jsx
-{ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign) &&
-  (isSamplingPointDataJoinMethod ? (
-    <FirstPhaseSamplingPointDataJoinInfo />
-  ) : (
-    <FirstPhaseCommonAttributeSelector />
-  ))}
+{
+  ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign) &&
+    (isSamplingPointDataJoinMethod ? <FirstPhaseSamplingPointDataJoinInfo /> : <FirstPhaseCommonAttributeSelector />)
+}
 ```
 
 A new, minimal component `FirstPhaseSamplingPointDataJoinInfo.js` renders a
@@ -198,6 +202,7 @@ selected:
 ...(ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(chainSamplingDesign)
   ? {
       phase2AsSamplingPointData: ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({
+        samplingDesign: chainSamplingDesign,
         survey,
         baseUnitNodeDef,
       }),
@@ -229,7 +234,7 @@ assumed.
 - No manual override for the automatic detection (confirmed with the
   user).
 - No change to `checkChangeRequiresSurveyPublish` (`common/analysis/
-  chain.js`) — it already doesn't track `firstPhaseCommonAttributeUuid`
+chain.js`) — it already doesn't track `firstPhaseCommonAttributeUuid`
   changes either, and this feature doesn't add a new stored/tracked prop.
 - No proactive clearing of a stale `firstPhaseCommonAttributeUuid` when a
   base unit change newly qualifies for the automatic method (see §1 — inert,
@@ -248,14 +253,16 @@ assumed.
 Unit tests, mirroring the existing style in `test/unit/tests/
 042chainSamplingDesign.test.js` (plain `describe`/`test`, object literals,
 no DB):
-- `isFirstPhaseSamplingPointDataJoinMethod`: true when the base unit's key
-  attribute is a code attribute on the `sampling_point_data` category;
-  false when the base unit has no key attribute on that category, when the
-  key attribute isn't a code type, and when there's no base unit at all.
-- `isFirstPhaseCommonAttributeRequired`: combines the strategy check and
-  the new predicate correctly across all four combinations (twoPhase ×
-  sampling-point-data, twoPhase × not, other-strategy × sampling-point-data,
-  other-strategy × not).
+
+- `isFirstPhaseSamplingPointDataJoinMethod`: true only when BOTH the base
+  unit's key attribute AND the Phase-1 category are `sampling_point_data`;
+  false in each of the other three combinations (base unit only, Phase-1
+  category only, neither), when the key attribute isn't a code type, and
+  when there's no base unit at all.
+- `isFirstPhaseCommonAttributeRequired`: combines the strategy check, the
+  base-unit-selected check, and the new predicate correctly (twoPhase with
+  both conditions met, twoPhase with only one met, other-strategy, and no
+  base unit selected).
 
 A focused unit test for the new validator function in `chainValidator.js`
 (no existing unit test file covers this module; a new one is added,
@@ -264,14 +271,15 @@ integration-test DB-backed `SB` builder, since existing validator logic in
 this codebase is tested at the pure-function level elsewhere).
 
 Manual verification in the browser: open a chain's sampling design with a
-`twoPhase` strategy and a base unit keyed by a `sampling_point_data`
-category attribute — confirm the info text appears (not the dropdown), and
-that downloading the chain summary JSON includes
-`phase2AsSamplingPointData: true` and omits `commonAttribute`. Then switch
-the base unit to one with an ordinary key attribute — confirm the "Common
-attribute" dropdown reappears, that leaving it empty shows a validation
-error, and that setting it makes the summary JSON include `commonAttribute`
-again (matching today's existing output shape) with
-`phase2AsSamplingPointData: false`. Then switch the sampling strategy away
-from `twoPhase` — confirm the summary JSON omits `phase2AsSamplingPointData`
-entirely.
+`twoPhase` strategy, a base unit keyed by a `sampling_point_data` category
+attribute, AND a Phase-1 category that is itself `sampling_point_data` —
+confirm the info text appears (not the dropdown), and that downloading the
+chain summary JSON includes `phase2AsSamplingPointData: true` and omits
+`commonAttribute`. Then switch the Phase-1 category to an ordinary one
+(base unit unchanged) — confirm the "Common attribute" dropdown reappears
+even though the base unit is still sampling-point-data-keyed, that leaving
+it empty shows a validation error, and that setting it makes the summary
+JSON include `commonAttribute` again (matching today's existing output
+shape) with `phase2AsSamplingPointData: false`. Then switch the sampling
+strategy away from `twoPhase` — confirm the summary JSON omits
+`phase2AsSamplingPointData` entirely.

@@ -66,19 +66,23 @@ const isFirstPhaseCategoryExtraPropSelectionEnabled = isFirstPhaseCategorySelect
 
 const isFirstPhaseCommonAttributeSelectionEnabled = isFirstPhaseCategorySelectionEnabled
 
-// Detects whether the base unit's own key attribute is a code attribute drawn from the
-// sampling_point_data category - in that case the base unit's key IS the sampling-point-data
-// item, so the join between the base unit and Phase-1 tables is inherently given by that key
-// and no explicit join attribute is needed or shown (per the user's explicit design choice:
-// this check is intentionally limited to the base unit's key, not the Phase-1 category).
-const isFirstPhaseSamplingPointDataJoinMethod = ({ survey, baseUnitNodeDef }) => {
-  if (!baseUnitNodeDef) return false
-  return Survey.getNodeDefKeys(baseUnitNodeDef)(survey).some(
+const _isNodeDefKeyOnSamplingPointDataCategory = ({ survey, nodeDef }) =>
+  Boolean(nodeDef) &&
+  Survey.getNodeDefKeys(nodeDef)(survey).some(
     (keyAttrDef) =>
       NodeDef.isCode(keyAttrDef) &&
       Category.isSamplingPointDataCategory(Survey.getCategoryByUuid(NodeDef.getCategoryUuid(keyAttrDef))(survey))
   )
-}
+
+// Detects whether both the base unit's own key attribute AND the Phase-1 category are drawn
+// from the sampling_point_data category - in that case the base unit's key IS the Phase-1
+// sampling-point-data item, so the join between the base unit and Phase-1 tables is inherently
+// given by that key and no explicit join attribute is needed or shown. Both conditions are
+// required (confirmed with the user): a base unit keyed by sampling_point_data doesn't imply
+// the unrelated Phase-1 category is also sampling_point_data, and vice versa.
+const isFirstPhaseSamplingPointDataJoinMethod = ({ samplingDesign, survey, baseUnitNodeDef }) =>
+  _isNodeDefKeyOnSamplingPointDataCategory({ survey, nodeDef: baseUnitNodeDef }) &&
+  Category.isSamplingPointDataCategory(Survey.getCategoryByUuid(getFirstPhaseCategoryUuid(samplingDesign))(survey))
 
 // Whether the "Common attribute" selector should be shown AND is required: true only for
 // two-phase sampling with a base unit selected, where the automatic sampling-point-data
@@ -87,7 +91,7 @@ const isFirstPhaseSamplingPointDataJoinMethod = ({ survey, baseUnitNodeDef }) =>
 const isFirstPhaseCommonAttributeRequired = ({ samplingDesign, survey, baseUnitNodeDef }) =>
   isFirstPhaseCategorySelectionEnabled(samplingDesign) &&
   Boolean(baseUnitNodeDef) &&
-  !isFirstPhaseSamplingPointDataJoinMethod({ survey, baseUnitNodeDef })
+  !isFirstPhaseSamplingPointDataJoinMethod({ samplingDesign, survey, baseUnitNodeDef })
 
 // UPDATE
 
