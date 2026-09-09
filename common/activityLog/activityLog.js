@@ -11,6 +11,7 @@ export const type = {
   surveyUnpublish: 'surveyUnpublish',
   surveyCollectImport: 'surveyCollectImport',
   surveyArenaImport: 'surveyArenaImport',
+  surveyOdkImport: 'surveyOdkImport',
 
   // NodeDef
   nodeDefCreate: 'nodeDefCreate',

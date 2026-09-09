@@ -1,0 +1,316 @@
+import * as FileXml from '@server/utils/file/fileXml'
+
+/**
+ * A node in the verbose (non-compact) xml-js tree produced by FileXml.parseToJson(xml, false):
+ * { type: 'element', name: 'tag', attributes: {...}, elements: [...] } or { type: 'text', text: '...' }.
+ */
+export interface XmlElement {
+  type?: string
+  name?: string
+  attributes?: Record<string, string>
+  elements?: XmlElement[]
+  text?: string
+}
+
+export interface XFormBind {
+  nodeset: string
+  type: string | null
+  relevant: string | null
+  constraint: string | null
+  required: string | null
+  calculate: string | null
+  readonly: string | null
+}
+
+export interface XFormBodyItem {
+  value: string
+  labelRef: string | null
+  labelText: string | null
+}
+
+export interface XFormBodyControl {
+  path: string
+  controlType: string
+  appearance: string | null
+  mediatype: string | null
+  labelRef: string | null
+  labelText: string | null
+  items: XFormBodyItem[]
+  itemsetInstanceId: string | null
+}
+
+export interface XFormSecondaryInstanceItem {
+  name: string
+  labelRef: string | null
+  labelText: string | null
+}
+
+export interface InstanceNodeVisit {
+  element: XmlElement
+  name: string
+  path: string
+  parentPath: string | null
+}
+
+export type ItextTranslations = Record<string, Record<string, string>>
+
+// XForm elements are namespace-prefixed inconsistently across producers (h:body, xf:body, body...);
+// comparing local names only (ignoring the prefix) is more robust than hardcoding a prefix.
+const localName = (name: string | undefined): string => (name ? (name.split(':').pop() ?? name) : '')
+
+const isElement = (el: XmlElement): boolean => el.type === 'element'
+
+const getChildElements = (el: XmlElement): XmlElement[] => (el.elements ?? []).filter(isElement)
+
+const getDirectChildrenByLocalName = (el: XmlElement, name: string): XmlElement[] =>
+  getChildElements(el).filter((child) => localName(child.name) === name)
+
+const getDirectChildByLocalName = (el: XmlElement, name: string): XmlElement | null =>
+  getDirectChildrenByLocalName(el, name)[0] ?? null
+
+const findAllByLocalName = (el: XmlElement, name: string): XmlElement[] => {
+  const result: XmlElement[] = []
+  const visit = (node: XmlElement) => {
+    if (isElement(node) && localName(node.name) === name) result.push(node)
+    getChildElements(node).forEach(visit)
+  }
+  visit(el)
+  return result
+}
+
+const findFirstByLocalName = (el: XmlElement, name: string): XmlElement | null =>
+  findAllByLocalName(el, name)[0] ?? null
+
+export const getAttribute =
+  (name: string, defaultValue: string | null = null) =>
+  (el: XmlElement | null): string | null =>
+    el?.attributes?.[name] ?? defaultValue
+
+const getElementText = (el: XmlElement | null): string | null => {
+  if (!el) return null
+  const textNode = (el.elements ?? []).find((child) => child.type === 'text')
+  return textNode?.text ?? null
+}
+
+export const parseXForm = (xml: string): XmlElement => {
+  const parsed = FileXml.parseToJson(xml, false) as XmlElement
+  const root = getChildElements(parsed)[0]
+  if (!root) throw new Error('Invalid XForm: no root element found')
+  return root
+}
+
+export const getFormTitle = (xform: XmlElement): string | null => getElementText(findFirstByLocalName(xform, 'title'))
+
+const getModel = (xform: XmlElement): XmlElement => {
+  const modelEl = findFirstByLocalName(xform, 'model')
+  if (!modelEl) throw new Error('Invalid XForm: no <model> element found')
+  return modelEl
+}
+
+/**
+ * Locates the primary instance's data root element (the element that defines the node shape of the form,
+ * e.g. the <data id="..."> under <model><instance> with no `id` attribute of its own).
+ */
+export const getPrimaryInstanceRoot = (xform: XmlElement): XmlElement => {
+  const modelEl = getModel(xform)
+  const instanceEls = getDirectChildrenByLocalName(modelEl, 'instance')
+  const primaryInstanceEl = instanceEls.find((instanceEl) => !getAttribute('id')(instanceEl)) ?? instanceEls[0]
+  if (!primaryInstanceEl) throw new Error('Invalid XForm: no primary <instance> element found')
+  const dataRootEl = getChildElements(primaryInstanceEl)[0]
+  if (!dataRootEl) throw new Error('Invalid XForm: primary instance has no data root element')
+  return dataRootEl
+}
+
+/**
+ * Depth-first walk of the primary instance tree (node shape only - not repeat cardinality, see
+ * buildRepeatPathsSet). The root itself is visited (becomes Arena's root entity, mirroring how
+ * Collect's importer treats its schema root). The reserved ODK/OpenRosa `meta` node (instanceID etc.,
+ * conventionally a direct child of the root) is skipped entirely, along with its descendants.
+ */
+export const visitPrimaryInstanceNodes = (
+  primaryInstanceRoot: XmlElement,
+  visitor: (node: InstanceNodeVisit) => void
+): void => {
+  const rootName = localName(primaryInstanceRoot.name)
+  const visit = (element: XmlElement, path: string, parentPath: string | null) => {
+    if (localName(element.name) === 'meta') return
+    visitor({ element, name: localName(element.name), path, parentPath })
+    getChildElements(element).forEach((child) => visit(child, `${path}/${localName(child.name)}`, path))
+  }
+  visit(primaryInstanceRoot, `/${rootName}`, null)
+}
+
+export const buildBindsByPath = (xform: XmlElement): Map<string, XFormBind> => {
+  const modelEl = getModel(xform)
+  const bindsByPath = new Map<string, XFormBind>()
+  getDirectChildrenByLocalName(modelEl, 'bind').forEach((bindEl) => {
+    const nodeset = getAttribute('nodeset')(bindEl)
+    if (!nodeset) return
+    bindsByPath.set(nodeset, {
+      nodeset,
+      type: getAttribute('type')(bindEl),
+      relevant: getAttribute('relevant')(bindEl),
+      constraint: getAttribute('constraint')(bindEl),
+      required: getAttribute('required')(bindEl),
+      calculate: getAttribute('calculate')(bindEl),
+      readonly: getAttribute('readonly')(bindEl),
+    })
+  })
+  return bindsByPath
+}
+
+/**
+ * Absolute nodeset paths that are wrapped in a body <repeat> - the only reliable signal in an XForm
+ * that a primary-instance node is repeatable (Arena `multiple: true`). A <group> at the same path with
+ * no wrapping <repeat> is a single, non-repeatable entity.
+ */
+export const buildRepeatPathsSet = (xform: XmlElement): Set<string> => {
+  const bodyEl = findFirstByLocalName(xform, 'body')
+  const repeatPaths = new Set<string>()
+  if (!bodyEl) return repeatPaths
+  findAllByLocalName(bodyEl, 'repeat').forEach((repeatEl) => {
+    const nodeset = getAttribute('nodeset')(repeatEl)
+    if (nodeset) repeatPaths.add(nodeset)
+  })
+  return repeatPaths
+}
+
+const ITEXT_REF_PATTERN = /^jr:itext\(['"](.+)['"]\)$/
+const ITEMSET_INSTANCE_PATTERN = /instance\(['"]([^'"]+)['"]\)/
+
+const extractLabel = (containerEl: XmlElement): { labelRef: string | null; labelText: string | null } => {
+  const labelEl = getDirectChildByLocalName(containerEl, 'label')
+  if (!labelEl) return { labelRef: null, labelText: null }
+  const ref = getAttribute('ref')(labelEl)
+  if (ref) {
+    const match = ITEXT_REF_PATTERN.exec(ref.trim())
+    if (match) return { labelRef: match[1], labelText: null }
+  }
+  return { labelRef: null, labelText: getElementText(labelEl) }
+}
+
+const extractBodyItems = (controlEl: XmlElement): XFormBodyItem[] =>
+  getDirectChildrenByLocalName(controlEl, 'item').map((itemEl) => {
+    const valueEl = getDirectChildByLocalName(itemEl, 'value')
+    const { labelRef, labelText } = extractLabel(itemEl)
+    return { value: getElementText(valueEl) ?? '', labelRef, labelText }
+  })
+
+const extractItemsetInstanceId = (controlEl: XmlElement): string | null => {
+  const itemsetEl = getDirectChildByLocalName(controlEl, 'itemset')
+  if (!itemsetEl) return null
+  const reference = getAttribute('nodeset')(itemsetEl) ?? getElementText(itemsetEl)
+  if (!reference) return null
+  const match = ITEMSET_INSTANCE_PATTERN.exec(reference)
+  return match ? match[1] : null
+}
+
+const bodyControlLocalNames = ['input', 'select1', 'select', 'upload', 'trigger', 'group', 'repeat']
+
+/**
+ * Path-keyed body-element metadata (display info, and the parts a bind alone can't tell us: upload
+ * mediatype disambiguates image/audio/video, and select1/select carries the actual choice items).
+ */
+export const buildBodyControlsByPath = (xform: XmlElement): Map<string, XFormBodyControl> => {
+  const bodyEl = findFirstByLocalName(xform, 'body')
+  const controlsByPath = new Map<string, XFormBodyControl>()
+  if (!bodyEl) return controlsByPath
+
+  bodyControlLocalNames.forEach((controlType) => {
+    findAllByLocalName(bodyEl, controlType).forEach((controlEl) => {
+      const path =
+        getAttribute('ref')(controlEl) ?? getAttribute('nodeset')(controlEl) ?? getAttribute('bind')(controlEl)
+      if (!path || controlsByPath.has(path)) return
+      const { labelRef, labelText } = extractLabel(controlEl)
+      controlsByPath.set(path, {
+        path,
+        controlType,
+        appearance: getAttribute('appearance')(controlEl),
+        mediatype: getAttribute('mediatype')(controlEl),
+        labelRef,
+        labelText,
+        items: extractBodyItems(controlEl),
+        itemsetInstanceId: extractItemsetInstanceId(controlEl),
+      })
+    })
+  })
+  return controlsByPath
+}
+
+/**
+ * Secondary <instance id="..."> choice lists (the itemset(instance('id')/root/item) idiom that
+ * pyxform/ODK Central compile external/searchable select lists to), keyed by instance id.
+ */
+export const getSecondaryInstancesByInstanceId = (xform: XmlElement): Map<string, XFormSecondaryInstanceItem[]> => {
+  const modelEl = getModel(xform)
+  const result = new Map<string, XFormSecondaryInstanceItem[]>()
+  getDirectChildrenByLocalName(modelEl, 'instance').forEach((instanceEl) => {
+    const id = getAttribute('id')(instanceEl)
+    if (!id) return // the primary instance has no id
+    const rootEl = getChildElements(instanceEl)[0]
+    if (!rootEl) return
+    const items = getDirectChildrenByLocalName(rootEl, 'item').map((itemEl) => {
+      const nameEl = getDirectChildByLocalName(itemEl, 'name')
+      const { labelRef, labelText } = extractLabel(itemEl)
+      return { name: getElementText(nameEl) ?? '', labelRef, labelText }
+    })
+    if (items.length > 0) result.set(id, items)
+  })
+  return result
+}
+
+/**
+ * Parses <itext><translation lang="..." default="true()"><text id="..."><value>...</value></text>...
+ * into { [textId]: { [lang]: text } }, plus the resolved default language (explicit `default="true()"`
+ * wins; otherwise the first translation encountered).
+ */
+export const getItextTranslations = (
+  xform: XmlElement
+): { translations: ItextTranslations; defaultLang: string | null } => {
+  const itextEl = findFirstByLocalName(xform, 'itext')
+  const translations: ItextTranslations = {}
+  let defaultLang: string | null = null
+  if (!itextEl) return { translations, defaultLang }
+
+  getDirectChildrenByLocalName(itextEl, 'translation').forEach((translationEl) => {
+    const lang = getAttribute('lang')(translationEl)
+    if (!lang) return
+    const isDefault = ['true()', 'true'].includes(getAttribute('default')(translationEl) ?? '')
+    if (isDefault) {
+      defaultLang = lang
+    } else if (!defaultLang) {
+      defaultLang = lang
+    }
+
+    getDirectChildrenByLocalName(translationEl, 'text').forEach((textEl) => {
+      const textId = getAttribute('id')(textEl)
+      if (!textId) return
+      const text = getElementText(getDirectChildByLocalName(textEl, 'value'))
+      if (text === null) return
+      if (!translations[textId]) translations[textId] = {}
+      translations[textId][lang] = text
+    })
+  })
+  return { translations, defaultLang }
+}
+
+/**
+ * Resolves a body control/item's label into Arena's { [lang]: text } shape: itext indirection first
+ * (multi-language), falling back to a literal <label>text</label> assigned to the form's default
+ * language (simple, non-translated forms have no itext block at all).
+ */
+export const resolveLabels = ({
+  labelRef,
+  labelText,
+  translations,
+  defaultLanguage,
+}: {
+  labelRef: string | null
+  labelText: string | null
+  translations: ItextTranslations
+  defaultLanguage: string
+}): Record<string, string> => {
+  if (labelRef) return translations[labelRef] ?? {}
+  if (labelText !== null && labelText.trim() !== '') return { [defaultLanguage]: labelText }
+  return {}
+}
