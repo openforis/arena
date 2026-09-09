@@ -16,7 +16,6 @@ export const ValidatorErrorKeys = {
   analysis: {
     labelDefaultLangRequired: 'validationErrors:analysis.labelDefaultLangRequired',
     analysisNodeDefsRequired: 'validationErrors:analysis.analysisNodeDefsRequired',
-    firstPhaseCommonAttributeRequired: 'validationErrors:analysis.firstPhaseCommonAttributeRequired',
   },
 
   categoryEdit: {

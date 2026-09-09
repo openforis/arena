@@ -19,7 +19,6 @@ import { ClusteringEntitySelector } from './ClusteringEntitySelector'
 import { FirstPhaseCategoryExtraPropSelector } from './FirstPhaseCategoryExtraPropSelector'
 import { FirstPhaseCategorySelector } from './FirstPhaseCategorySelector'
 import { FirstPhaseCommonAttributeSelector } from './FirstPhaseCommonAttributeSelector'
-import { FirstPhaseSamplingPointDataJoinInfo } from './FirstPhaseSamplingPointDataJoinInfo'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
 
@@ -35,11 +34,6 @@ export const ChainSamplingDesignProps = (props) => {
   const samplingDesign = Chain.getSamplingDesign(chain)
   const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chain)
   const validation = Chain.getValidation(chain)
-  const isSamplingPointDataJoinMethod = ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({
-    samplingDesign,
-    survey,
-    baseUnitNodeDef,
-  })
 
   const updateStatisticalAnalysis = useCallback(
     (updateFn) => {
@@ -81,15 +75,12 @@ export const ChainSamplingDesignProps = (props) => {
               </>
             )}
 
-            {ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign) &&
-              (isSamplingPointDataJoinMethod ? (
-                <FirstPhaseSamplingPointDataJoinInfo />
-              ) : (
-                <FirstPhaseCommonAttributeSelector />
-              ))}
-
             {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
             {/* {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />} */}
+
+            {ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(samplingDesign) && (
+              <FirstPhaseCommonAttributeSelector />
+            )}
 
             <ClusteringEntitySelector />
           </>
