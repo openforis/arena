@@ -16,7 +16,6 @@ export default {
   analysis: {
     labelDefaultLangRequired: 'Label in survey default language is required',
     analysisNodeDefsRequired: 'At least one calculated attribute is required',
-    firstPhaseCommonAttributeRequired: 'A join attribute between Phase-1 and base unit tables is required',
   },
 
   categoryEdit: {

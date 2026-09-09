@@ -16,8 +16,6 @@ export default {
   analysis: {
     labelDefaultLangRequired: 'Rótulo no idioma padrão do inventário é obrigatório',
     analysisNodeDefsRequired: 'Pelo menos um atributo calculado é obrigatório',
-    firstPhaseCommonAttributeRequired:
-      'É necessário um atributo de junção entre as tabelas da 1ª fase e da unidade base',
   },
 
   categoryEdit: {
