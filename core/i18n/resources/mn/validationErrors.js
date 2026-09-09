@@ -16,6 +16,7 @@ export default {
   analysis: {
     labelDefaultLangRequired: 'Судалгааны үндсэн хэл дээрх шошго шаардлагатай',
     analysisNodeDefsRequired: 'Наад зах нь нэг тооцоолсон шинж чанар шаардлагатай',
+    firstPhaseCommonAttributeRequired: '1-р үе шат ба суурь нэгжийн хүснэгтүүдийг холбох шинж чанар шаардлагатай',
   },
 
   categoryEdit: {

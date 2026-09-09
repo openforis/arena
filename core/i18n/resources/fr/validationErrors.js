@@ -16,6 +16,8 @@ export default {
   analysis: {
     labelDefaultLangRequired: "L'étiquette dans la langue par défaut du formulaire est requise",
     analysisNodeDefsRequired: 'Au moins un attribut calculé est requis',
+    firstPhaseCommonAttributeRequired:
+      "Un attribut de jointure entre les tables de la 1ère phase et de l'unité de base est requis",
   },
 
   categoryEdit: {

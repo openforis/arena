@@ -16,6 +16,7 @@ export default {
   analysis: {
     labelDefaultLangRequired: 'Метка на языке по умолчанию для опроса обязательна',
     analysisNodeDefsRequired: 'Требуется хотя бы один вычисляемый атрибут',
+    firstPhaseCommonAttributeRequired: 'Требуется атрибут соединения между таблицами 1-й фазы и базовой единицы',
   },
 
   categoryEdit: {
