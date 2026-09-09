@@ -778,6 +778,11 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       info: `Attribute in common between base unit and 1st phase table
 (it must be a code or text attribute; its value is matched against the extra properties defined for the 1st phase category - the attribute name does not need to match the extra property name)`,
     },
+    firstPhaseSamplingPointDataJoinMethod: {
+      label: 'Join method',
+      description:
+        "Base unit and 1st phase tables are joined using the Sampling Point Data method: the base unit's key attribute and the 1st phase category both use the Sampling Point Data category, so no separate join attribute is needed.",
+    },
     formLabel: 'Processing chain label',
     basic: 'Basic',
     records: 'Records',

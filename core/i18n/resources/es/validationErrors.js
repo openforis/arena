@@ -15,6 +15,8 @@ export default {
   analysis: {
     labelDefaultLangRequired: 'La etiqueta en el idioma predeterminado de la encuesta es obligatoria',
     analysisNodeDefsRequired: 'Se requiere al menos un atributo calculado',
+    firstPhaseCommonAttributeRequired:
+      'Se requiere un atributo de unión entre las tablas de la 1ª fase y la unidad base',
   },
 
   categoryEdit: {
