@@ -56,11 +56,15 @@ export type ItextTranslations = Record<string, Record<string, string>>
 
 // XForm elements are namespace-prefixed inconsistently across producers (h:body, xf:body, body...);
 // comparing local names only (ignoring the prefix) is more robust than hardcoding a prefix.
-const localName = (name: string | undefined): string => (name ? (name.split(':').pop() ?? name) : '')
+export const xmlLocalName = (name: string | undefined): string => (name ? (name.split(':').pop() ?? name) : '')
+const localName = xmlLocalName
 
 const isElement = (el: XmlElement): boolean => el.type === 'element'
 
-const getChildElements = (el: XmlElement): XmlElement[] => (el.elements ?? []).filter(isElement)
+// Exported so callers walking the primary-instance tree themselves (e.g. NodeDefsImportJob's
+// recursive, DB-insert-interleaved walk, which can't use visitPrimaryInstanceNodes's synchronous
+// visitor callback) can reuse the same element-filtering logic instead of duplicating it.
+export const getChildElements = (el: XmlElement): XmlElement[] => (el.elements ?? []).filter(isElement)
 
 const getDirectChildrenByLocalName = (el: XmlElement, name: string): XmlElement[] =>
   getChildElements(el).filter((child) => localName(child.name) === name)

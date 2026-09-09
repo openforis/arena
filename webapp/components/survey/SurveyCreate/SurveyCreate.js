@@ -49,6 +49,7 @@ const cloneFromTypeButtonGroupItems = Object.values(SurveyType)
 const dropzoneAcceptBySource = {
   [importSources.arena]: { [contentTypes.zip]: ['.zip'] },
   [importSources.collect]: { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] },
+  [importSources.odk]: { [contentTypes.xml]: ['.xml'] },
 }
 
 const SurveyCreate = (props) => {

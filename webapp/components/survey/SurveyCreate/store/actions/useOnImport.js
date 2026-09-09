@@ -11,6 +11,7 @@ import { importSources } from '../importSources'
 const urlBySource = {
   [importSources.collect]: '/api/survey/collect-import',
   [importSources.arena]: '/api/survey/arena-import',
+  [importSources.odk]: '/api/survey/odk-import',
 }
 
 const createChunkProcessor =
