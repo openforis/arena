@@ -75,7 +75,7 @@ export const getId = R.pipe(getSurveyInfo, SurveyInfo.getId)
 export const getIdSurveyInfo = SurveyInfo.getId
 export const canHaveData = (survey) => {
   const surveyInfo = getSurveyInfo(survey)
-  return isPublished(surveyInfo) || isFromCollect(surveyInfo)
+  return isPublished(surveyInfo) || isFromCollect(surveyInfo) || isFromOdk(surveyInfo)
 }
 /**
  * Returns true if all the root key attribute definitions are code attributes using the sampling point data category.
@@ -132,11 +132,13 @@ export const {
   isPublished,
   isDraft,
   isFromCollect,
+  isFromOdk,
   isRdbInitialized,
   getCollectUri,
   getCollectReport,
   getCollectNodeDefsInfoByPath,
   hasCollectReportIssues,
+  getOdkFormId,
   getOwnerName,
   getOwnerUuid,
   getAppVersion,

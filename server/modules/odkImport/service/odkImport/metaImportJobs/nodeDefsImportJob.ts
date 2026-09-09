@@ -90,6 +90,12 @@ export default class NodeDefsImportJob extends Job {
       }
 
     const nodeName = XForm.xmlLocalName(instanceElement.name)
+
+    // Reserved ODK/OpenRosa bookkeeping node (instanceID etc.) - not user data, same skip rule as
+    // XForm.visitPrimaryInstanceNodes (used here for totals only, not for driving this insert walk,
+    // since inserts need to happen in parent-before-child order interleaved with awaited DB calls).
+    if (nodeName === 'meta' && parentNodeDef !== null) return null
+
     const path = parentPath ? `${parentPath}/${nodeName}` : `/${nodeName}`
 
     const bind = bindsByPath.get(path) ?? null
