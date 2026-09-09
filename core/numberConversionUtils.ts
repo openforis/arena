@@ -70,6 +70,52 @@ const dataStorageValueToBytes =
   (value: unknown): number =>
     _convertNumberToUnit((num) => num * dataStorageUnitToBytesConversionFactor[unit])(value)
 
+const _unitsFrench = [
+  'zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix',
+  'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf',
+]
+
+const _underHundredToWordsFrench = (n: number): string => {
+  if (n < 20) return _unitsFrench[n]
+  if (n < 70) {
+    const tens = Math.floor(n / 10)
+    const rest = n % 10
+    const tensWord = ['vingt', 'trente', 'quarante', 'cinquante', 'soixante'][tens - 2]
+    if (rest === 0) return tensWord
+    if (rest === 1) return `${tensWord} et un`
+    return `${tensWord}-${_unitsFrench[rest]}`
+  }
+  if (n < 80) {
+    const rest = n - 60
+    return rest === 11 ? 'soixante et onze' : `soixante-${_underHundredToWordsFrench(rest)}`
+  }
+  if (n === 80) return 'quatre-vingts'
+  return `quatre-vingt-${_underHundredToWordsFrench(n - 80)}`
+}
+
+const _hundredsToWordsFrench = (n: number): string => {
+  if (n < 100) return _underHundredToWordsFrench(n)
+  const hundreds = Math.floor(n / 100)
+  const rest = n % 100
+  const hundredsWord = hundreds === 1 ? 'cent' : `${_underHundredToWordsFrench(hundreds)} cent${rest === 0 ? 's' : ''}`
+  return rest === 0 ? hundredsWord : `${hundredsWord} ${_underHundredToWordsFrench(rest)}`
+}
+
+const numberToWordsFrench = (value: unknown): string => {
+  const num = Objects.isNil(value) ? NaN : Number(value)
+  if (!Number.isInteger(num) || num < 0 || num > 999999999999) return ''
+  if (num < 1000) return _hundredsToWordsFrench(num)
+  const millions = Math.floor(num / 1000000)
+  const thousands = Math.floor((num % 1000000) / 1000)
+  const rest = num % 1000
+  const parts: string[] = []
+  if (millions > 0) parts.push(`${_hundredsToWordsFrench(millions)} million${millions > 1 ? 's' : ''}`)
+  if (thousands === 1) parts.push('mille')
+  else if (thousands > 1) parts.push(`${_hundredsToWordsFrench(thousands)} mille`)
+  if (rest > 0) parts.push(_hundredsToWordsFrench(rest))
+  return parts.join(' ')
+}
+
 const dataStorageValueToUnit =
   (
     unitFrom: keyof typeof dataStorageUnitToBytesConversionFactor,
@@ -82,6 +128,7 @@ const dataStorageValueToUnit =
 
 export const NumberConversionUtils = {
   areaUnits,
+  numberToWordsFrench,
   lengthUnits,
   abbreviationByUnit,
   metersToUnit,
