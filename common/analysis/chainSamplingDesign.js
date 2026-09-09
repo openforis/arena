@@ -1,6 +1,9 @@
 import { Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
+import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 const keysProps = {
   areaWeightingMethod: 'areaWeightingMethod',
@@ -62,6 +65,25 @@ const isFirstPhaseCategorySelectionEnabled = (samplingDesign) =>
 const isFirstPhaseCategoryExtraPropSelectionEnabled = isFirstPhaseCategorySelectionEnabled
 
 const isFirstPhaseCommonAttributeSelectionEnabled = isFirstPhaseCategorySelectionEnabled
+
+// Detects whether the base unit's own key attribute is a code attribute drawn from the
+// sampling_point_data category - in that case the base unit's key IS the sampling-point-data
+// item, so if the Phase-1 category is also sampling_point_data-derived the two tables are
+// already inherently linked and no explicit join attribute is needed or shown.
+const isFirstPhaseSamplingPointDataJoinMethod = ({ survey, baseUnitNodeDef }) => {
+  if (!baseUnitNodeDef) return false
+  return Survey.getNodeDefKeys(baseUnitNodeDef)(survey).some(
+    (keyAttrDef) =>
+      NodeDef.isCode(keyAttrDef) &&
+      Category.isSamplingPointDataCategory(Survey.getCategoryByUuid(NodeDef.getCategoryUuid(keyAttrDef))(survey))
+  )
+}
+
+// Whether the "Common attribute" selector should be shown AND is required: true only for
+// two-phase sampling where the automatic sampling-point-data method does NOT apply.
+const isFirstPhaseCommonAttributeRequired = ({ samplingDesign, survey, baseUnitNodeDef }) =>
+  isFirstPhaseCategorySelectionEnabled(samplingDesign) &&
+  !isFirstPhaseSamplingPointDataJoinMethod({ survey, baseUnitNodeDef })
 
 // UPDATE
 
@@ -159,6 +181,8 @@ export const ChainSamplingDesign = {
   isFirstPhaseCategoryExtraPropSelectionEnabled,
   isFirstPhaseCategorySelectionEnabled,
   isFirstPhaseCommonAttributeSelectionEnabled,
+  isFirstPhaseCommonAttributeRequired,
+  isFirstPhaseSamplingPointDataJoinMethod,
   isStratificationEnabled,
   isStratificationNotSpecifiedAllowed,
   getPostStratificationAttributeDefUuid,
