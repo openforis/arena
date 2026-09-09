@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Validation from '@core/validation/validation'
 
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
@@ -13,6 +14,7 @@ export const FirstPhaseCommonAttributeSelector = () => {
   const dispatch = useDispatch()
   const chain = useChain()
   const samplingDesign = Chain.getSamplingDesign(chain)
+  const validation = Chain.getValidation(chain)
 
   const onChange = (attrDefUuid) => {
     const chainUpdated = Chain.updateSamplingDesign(
@@ -28,6 +30,9 @@ export const FirstPhaseCommonAttributeSelector = () => {
       nodeDefTypes={[NodeDef.nodeDefType.code, NodeDef.nodeDefType.text]}
       selectedNodeDefUuid={ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(samplingDesign)}
       onChange={onChange}
+      validation={Validation.getFieldValidation(ChainSamplingDesign.keysProps.firstPhaseCommonAttributeUuid)(
+        validation
+      )}
     />
   )
 }
