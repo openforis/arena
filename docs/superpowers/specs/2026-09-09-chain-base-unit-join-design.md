@@ -19,10 +19,14 @@ base unit entity's own key attribute *is itself* a code attribute drawn
 from the `sampling_point_data` category (`core/survey/category.js`'s
 `samplingPointDataCategoryName`/`isSamplingPointDataCategory` — defined but,
 per a full-repo search, never previously used by any chain/analysis code).
-In that case the base unit's key IS the sampling-point-data item, and if
-the same `sampling_point_data` category also serves as the Phase-1
-category, the two tables are already inherently linked — no explicit join
-attribute is meaningful or needed.
+In that case the base unit's key IS the sampling-point-data item, so the
+join between the base unit and Phase-1 tables is inherently given by that
+key — no explicit join attribute is meaningful or needed. Per the user's
+explicit final direction, this detection deliberately looks only at the
+base unit's key attribute, not at whether the Phase-1 category is itself
+`sampling_point_data` — the rule is "does the base unit's own key make the
+join method self-evident", independent of what the Phase-1 category
+happens to be.
 
 This spec adds automatic detection of that second case and adjusts the
 sampling-design edit form and the generated `chain_summary.json`
@@ -230,6 +234,14 @@ assumed.
 - No proactive clearing of a stale `firstPhaseCommonAttributeUuid` when a
   base unit change newly qualifies for the automatic method (see §1 — inert,
   not a bug).
+- **Deployment consequence, accepted as intended**: this is the first
+  hard-required field-level validation on any sampling-design prop
+  (confirmed with the user, §Goal 3). Publishing a survey runs chain
+  validation (`ChainsValidationJob`) and fails the whole publish if any
+  chain is invalid, so an existing `twoPhase` chain whose base unit isn't
+  sampling-point-data-keyed and that never had `firstPhaseCommonAttributeUuid`
+  set (previously legal) will now block publish until an analyst sets it.
+  This is the deliberate effect of making the field required, not a defect.
 
 ## Testing
 

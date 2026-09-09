@@ -68,8 +68,9 @@ const isFirstPhaseCommonAttributeSelectionEnabled = isFirstPhaseCategorySelectio
 
 // Detects whether the base unit's own key attribute is a code attribute drawn from the
 // sampling_point_data category - in that case the base unit's key IS the sampling-point-data
-// item, so if the Phase-1 category is also sampling_point_data-derived the two tables are
-// already inherently linked and no explicit join attribute is needed or shown.
+// item, so the join between the base unit and Phase-1 tables is inherently given by that key
+// and no explicit join attribute is needed or shown (per the user's explicit design choice:
+// this check is intentionally limited to the base unit's key, not the Phase-1 category).
 const isFirstPhaseSamplingPointDataJoinMethod = ({ survey, baseUnitNodeDef }) => {
   if (!baseUnitNodeDef) return false
   return Survey.getNodeDefKeys(baseUnitNodeDef)(survey).some(
@@ -80,9 +81,12 @@ const isFirstPhaseSamplingPointDataJoinMethod = ({ survey, baseUnitNodeDef }) =>
 }
 
 // Whether the "Common attribute" selector should be shown AND is required: true only for
-// two-phase sampling where the automatic sampling-point-data method does NOT apply.
+// two-phase sampling with a base unit selected, where the automatic sampling-point-data
+// method does NOT apply. Requires baseUnitNodeDef so that clearing the base unit (which hides
+// the selector in the UI) can never leave the chain in an unsatisfiable invalid state.
 const isFirstPhaseCommonAttributeRequired = ({ samplingDesign, survey, baseUnitNodeDef }) =>
   isFirstPhaseCategorySelectionEnabled(samplingDesign) &&
+  Boolean(baseUnitNodeDef) &&
   !isFirstPhaseSamplingPointDataJoinMethod({ survey, baseUnitNodeDef })
 
 // UPDATE
@@ -180,7 +184,6 @@ export const ChainSamplingDesign = {
   getReportingDataCategoryUuid,
   isFirstPhaseCategoryExtraPropSelectionEnabled,
   isFirstPhaseCategorySelectionEnabled,
-  isFirstPhaseCommonAttributeSelectionEnabled,
   isFirstPhaseCommonAttributeRequired,
   isFirstPhaseSamplingPointDataJoinMethod,
   isStratificationEnabled,

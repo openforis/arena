@@ -10,7 +10,6 @@ import { useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const nodeDefToItem = (nodeDef) => ({
   value: NodeDef.getUuid(nodeDef),
@@ -70,13 +69,15 @@ export const BaseUnitAttributeSelector = (props) => {
   const selectedNodeDef = selectedNodeDefUuid ? Survey.getNodeDefByUuid(selectedNodeDefUuid)(survey) : null
   const selectedItem = selectedNodeDef ? nodeDefToItem(selectedNodeDef) : emptySelectionItem
 
-  const dropdown = (
-    <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} disabled={!editable} />
-  )
-
   return (
     <FormItem label={label} info={info}>
-      {validation ? <ValidationTooltip validation={validation}>{dropdown}</ValidationTooltip> : dropdown}
+      <Dropdown
+        selection={selectedItem}
+        items={selectableItems}
+        onChange={onChange}
+        disabled={!editable}
+        validation={validation}
+      />
     </FormItem>
   )
 }

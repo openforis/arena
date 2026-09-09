@@ -781,7 +781,7 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
     firstPhaseSamplingPointDataJoinMethod: {
       label: 'Méthode de jointure',
       description:
-        "L'unité de base et la table de 1ère phase sont jointes à l'aide de la méthode Sampling Point Data : l'attribut clé de l'unité de base utilise la catégorie Sampling Point Data, aucun attribut de jointure distinct n'est donc nécessaire.",
+        "L'unité de base et la table de 1ère phase sont jointes à l'aide de la méthode Données de points d'échantillonnage : l'attribut clé de l'unité de base utilise la catégorie Données de points d'échantillonnage, aucun attribut de jointure distinct n'est donc nécessaire.",
     },
     formLabel: 'Étiquette de la chaîne de traitement',
     basic: 'Basique',

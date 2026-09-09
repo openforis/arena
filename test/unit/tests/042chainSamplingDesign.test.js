@@ -41,7 +41,7 @@ describe('ChainSamplingDesign.firstPhaseCategoryExtraProp', () => {
   })
 })
 
-const _buildSurveyWithBaseUnit = ({ baseUnitKeyIsSamplingPointData }) => {
+const _buildSurveyWithBaseUnit = ({ baseUnitKeyIsSamplingPointData, baseUnitKeyIsCode = true }) => {
   let survey = SurveyFactory.createInstance({ name: 'test_survey' })
 
   const category = CategoryFactory.createInstance({
@@ -60,9 +60,9 @@ const _buildSurveyWithBaseUnit = ({ baseUnitKeyIsSamplingPointData }) => {
   survey = Survey.assocNodeDef({ nodeDef: plot })(survey)
 
   const plotId = NodeDefFactory.createInstance({
-    type: NodeDef.nodeDefType.code,
+    type: baseUnitKeyIsCode ? NodeDef.nodeDefType.code : NodeDef.nodeDefType.text,
     nodeDefParent: plot,
-    props: { name: 'plot_id', key: true, categoryUuid: category.uuid },
+    props: { name: 'plot_id', key: true, ...(baseUnitKeyIsCode ? { categoryUuid: category.uuid } : {}) },
   })
   survey = Survey.assocNodeDef({ nodeDef: plotId })(survey)
 
@@ -84,11 +84,17 @@ describe('ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod', () => {
     const { survey } = _buildSurveyWithBaseUnit({ baseUnitKeyIsSamplingPointData: true })
     expect(ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({ survey, baseUnitNodeDef: null })).toBe(false)
   })
+
+  it('is false when the base unit key attribute is on the sampling_point_data category but is not a code attribute', () => {
+    const { survey, baseUnitNodeDef } = _buildSurveyWithBaseUnit({
+      baseUnitKeyIsSamplingPointData: true,
+      baseUnitKeyIsCode: false,
+    })
+    expect(ChainSamplingDesign.isFirstPhaseSamplingPointDataJoinMethod({ survey, baseUnitNodeDef })).toBe(false)
+  })
 })
 
 describe('ChainSamplingDesign.isFirstPhaseCommonAttributeRequired', () => {
-  const { samplingStrategies } = ChainSamplingDesign
-
   it('is true for two-phase sampling with a base unit not keyed by sampling_point_data', () => {
     const { survey, baseUnitNodeDef } = _buildSurveyWithBaseUnit({ baseUnitKeyIsSamplingPointData: false })
     const samplingDesign = { samplingStrategy: samplingStrategies.twoPhase }
@@ -111,5 +117,21 @@ describe('ChainSamplingDesign.isFirstPhaseCommonAttributeRequired', () => {
     expect(ChainSamplingDesign.isFirstPhaseCommonAttributeRequired({ samplingDesign, survey, baseUnitNodeDef })).toBe(
       false
     )
+  })
+
+  it('is false when sampling strategy is not two-phase, even with a base unit keyed by sampling_point_data', () => {
+    const { survey, baseUnitNodeDef } = _buildSurveyWithBaseUnit({ baseUnitKeyIsSamplingPointData: true })
+    const samplingDesign = { samplingStrategy: samplingStrategies.stratifiedRandom }
+    expect(ChainSamplingDesign.isFirstPhaseCommonAttributeRequired({ samplingDesign, survey, baseUnitNodeDef })).toBe(
+      false
+    )
+  })
+
+  it('is false for two-phase sampling with no base unit selected', () => {
+    const { survey } = _buildSurveyWithBaseUnit({ baseUnitKeyIsSamplingPointData: false })
+    const samplingDesign = { samplingStrategy: samplingStrategies.twoPhase }
+    expect(
+      ChainSamplingDesign.isFirstPhaseCommonAttributeRequired({ samplingDesign, survey, baseUnitNodeDef: null })
+    ).toBe(false)
   })
 })

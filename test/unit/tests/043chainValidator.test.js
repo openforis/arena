@@ -59,6 +59,9 @@ describe('chainValidator - firstPhaseCommonAttributeUuid required field', () => 
     )
 
     expect(Validation.isValid(fieldValidation)).toBe(false)
+    expect(Validation.getErrors(fieldValidation).map((error) => error.key)).toEqual([
+      Validation.messageKeys.analysis.firstPhaseCommonAttributeRequired,
+    ])
   })
 
   it('reports no error when the sampling point data method applies', async () => {
@@ -79,6 +82,18 @@ describe('chainValidator - firstPhaseCommonAttributeUuid required field', () => 
       baseUnitNodeDefUuid: NodeDef.getUuid(baseUnitNodeDef),
       firstPhaseCommonAttributeUuid: 'some-uuid',
     })
+
+    const validation = await validateChain({ chain, defaultLang: 'en', survey })
+    const fieldValidation = Validation.getFieldValidation(ChainSamplingDesign.keysProps.firstPhaseCommonAttributeUuid)(
+      validation
+    )
+
+    expect(Validation.isValid(fieldValidation)).toBe(true)
+  })
+
+  it('reports no error when no base unit is selected', async () => {
+    const { survey } = _buildSurveyWithBaseUnit({ baseUnitKeyIsSamplingPointData: false })
+    const chain = _buildChain({ baseUnitNodeDefUuid: null })
 
     const validation = await validateChain({ chain, defaultLang: 'en', survey })
     const fieldValidation = Validation.getFieldValidation(ChainSamplingDesign.keysProps.firstPhaseCommonAttributeUuid)(
