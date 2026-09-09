@@ -8,8 +8,11 @@ export const FirstPhaseSamplingPointDataJoinInfo = () => {
   const i18n = useI18n()
 
   return (
-    <FormItem label="chainView.firstPhaseSamplingPointDataJoinMethod.label">
-      <div className="first-phase-sampling-point-data-join-info">
+    <FormItem
+      className="first-phase-sampling-point-data-join-info"
+      label="chainView.firstPhaseSamplingPointDataJoinMethod.label"
+    >
+      <div className="first-phase-sampling-point-data-join-info__text">
         {i18n.t('chainView.firstPhaseSamplingPointDataJoinMethod.description')}
       </div>
     </FormItem>

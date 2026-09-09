@@ -83,6 +83,15 @@
         .form-item {
           grid-template-columns: 12rem 1fr;
           height: 3rem;
+
+          &.first-phase-sampling-point-data-join-info {
+            height: auto;
+            white-space: normal;
+
+            .first-phase-sampling-point-data-join-info__text {
+              white-space: normal;
+            }
+          }
         }
 
         &.form-right {
