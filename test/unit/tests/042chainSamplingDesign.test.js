@@ -62,7 +62,9 @@ const _buildSurveyWithBaseUnit = ({ baseUnitKeyIsSamplingPointData, baseUnitKeyI
   const plotId = NodeDefFactory.createInstance({
     type: baseUnitKeyIsCode ? NodeDef.nodeDefType.code : NodeDef.nodeDefType.text,
     nodeDefParent: plot,
-    props: { name: 'plot_id', key: true, ...(baseUnitKeyIsCode ? { categoryUuid: category.uuid } : {}) },
+    // categoryUuid is set even for the non-code case, so the "not a code attribute" test
+    // isolates the isCode guard rather than accidentally testing category mismatch too.
+    props: { name: 'plot_id', key: true, categoryUuid: category.uuid },
   })
   survey = Survey.assocNodeDef({ nodeDef: plotId })(survey)
 
