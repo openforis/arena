@@ -80,15 +80,15 @@ export const ChainSamplingDesignProps = (props) => {
               </>
             )}
 
-            {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
-            {/* {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />} */}
-
             {ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign) &&
               (isSamplingPointDataJoinMethod ? (
                 <FirstPhaseSamplingPointDataJoinInfo />
               ) : (
                 <FirstPhaseCommonAttributeSelector />
               ))}
+
+            {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
+            {/* {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />} */}
 
             <ClusteringEntitySelector />
           </>
