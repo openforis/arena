@@ -21,12 +21,8 @@ const oldSamplingDesignPhasePropKeys = {
  * Determines whether the given entity node def can be selected as phase 2 join entity.
  * Mirrors the filter used by the Phase2JoinEntitySelector component in the webapp: only the root
  * entity, the base unit entity itself, or one of the base unit's ancestors are selectable.
- * @param {object} params - Parameters.
- * @param {object} params.nodeDef - The candidate entity node def.
- * @param {object} [params.baseUnitNodeDef] - The base unit entity node def of the sampling design (if any).
- * @returns {boolean} True if the candidate entity would be accepted by the phase 2 join entity selector.
  */
-const _isSelectableAsPhase2JoinEntity = ({ nodeDef, baseUnitNodeDef }) =>
+const _isSelectableAsPhase2JoinEntity = ({ nodeDef, baseUnitNodeDef }: { nodeDef: any; baseUnitNodeDef?: any }) =>
   NodeDef.isRoot(nodeDef) ||
   (Boolean(baseUnitNodeDef) &&
     (NodeDef.getUuid(nodeDef) === NodeDef.getUuid(baseUnitNodeDef) || NodeDef.isAncestorOf(baseUnitNodeDef)(nodeDef)))
@@ -37,13 +33,16 @@ const _isSelectableAsPhase2JoinEntity = ({ nodeDef, baseUnitNodeDef }) =>
  * attribute" selector allowed attributes nested in single entities below the base unit (or below one
  * of its ancestors): those immediate parent entities are not selectable in the new selector, and
  * would be silently discarded (together with the join attribute) as soon as the page is rendered.
- * @param {object} params - Parameters.
- * @param {object} params.attributeNodeDef - The previously selected common attribute node def.
- * @param {object} [params.baseUnitNodeDef] - The base unit entity node def of the sampling design (if any).
- * @param {object} params.survey - The survey with node defs.
- * @returns {object|null} The closest selectable ancestor entity node def, or null when none qualifies.
  */
-const _findPhase2JoinEntity = ({ attributeNodeDef, baseUnitNodeDef, survey }) => {
+const _findPhase2JoinEntity = ({
+  attributeNodeDef,
+  baseUnitNodeDef,
+  survey,
+}: {
+  attributeNodeDef: any
+  baseUnitNodeDef?: any
+  survey: any
+}): any => {
   let candidate = Survey.getNodeDefParent(attributeNodeDef)(survey)
   while (candidate) {
     if (_isSelectableAsPhase2JoinEntity({ nodeDef: candidate, baseUnitNodeDef })) return candidate
@@ -52,7 +51,13 @@ const _findPhase2JoinEntity = ({ attributeNodeDef, baseUnitNodeDef, survey }) =>
   return null
 }
 
-const _migrateSamplingDesignPhaseProps = ({ samplingDesign, survey }) => {
+const _migrateSamplingDesignPhaseProps = ({
+  samplingDesign,
+  survey,
+}: {
+  samplingDesign: Record<string, any>
+  survey: any
+}): Record<string, any> => {
   const migrated = { ...samplingDesign }
 
   if (oldSamplingDesignPhasePropKeys.firstPhaseCategoryUuid in migrated) {
@@ -72,7 +77,10 @@ const _migrateSamplingDesignPhaseProps = ({ samplingDesign, survey }) => {
 
     const attributeNodeDef = Survey.getNodeDefByUuid(attributeUuid)(survey)
     // base unit node def uuid is not touched by this migration: read it from the original sampling design
-    const baseUnitNodeDefUuid = ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesign)
+    // (cast needed: TS's inference of this Ramda-backed getter from the untyped JS module resolves to `{}`)
+    const baseUnitNodeDefUuid = (ChainSamplingDesign.getBaseUnitNodeDefUuid as (samplingDesign: any) => string)(
+      samplingDesign
+    )
     const baseUnitNodeDef = baseUnitNodeDefUuid ? Survey.getNodeDefByUuid(baseUnitNodeDefUuid)(survey) : null
     const joinEntity = attributeNodeDef ? _findPhase2JoinEntity({ attributeNodeDef, baseUnitNodeDef, survey }) : null
     if (joinEntity) {
@@ -91,15 +99,14 @@ const _migrateSamplingDesignPhaseProps = ({ samplingDesign, survey }) => {
  * phase2JoinEntityUuid with the closest ancestor entity of the previously selected common attribute
  * that is also selectable in the new phase 2 join entity selector.
  * Chains without any of the old keys are left untouched.
- * @param {object} params - Parameters.
- * @param {number} params.surveyId - The survey id.
- * @param {pgPromise.IDatabase} [client] - The database client.
- * @returns {Promise<void>} Resolves when every chain needing migration has been updated.
  */
-export const migrateSamplingDesignPhaseProps = async ({ surveyId }, client = DB.client) => {
+export const migrateSamplingDesignPhaseProps = async (
+  { surveyId }: { surveyId: number },
+  client: any = DB.client
+): Promise<void> => {
   const chains = await ChainRepository.fetchChains({ surveyId }, client)
 
-  const chainsToMigrate = chains.filter((chain) => {
+  const chainsToMigrate = chains.filter((chain: any) => {
     const samplingDesign = Chain.getSamplingDesign(chain)
     return Object.values(oldSamplingDesignPhasePropKeys).some((oldKey) => oldKey in samplingDesign)
   })
@@ -110,7 +117,7 @@ export const migrateSamplingDesignPhaseProps = async ({ surveyId }, client = DB.
     client
   )
 
-  for (const chain of chainsToMigrate) {
+  for (const chain of chainsToMigrate as any[]) {
     const samplingDesign = Chain.getSamplingDesign(chain)
     const migratedSamplingDesign = _migrateSamplingDesignPhaseProps({ samplingDesign, survey })
     await ChainRepository.updateChain(
