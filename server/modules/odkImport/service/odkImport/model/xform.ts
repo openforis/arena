@@ -90,7 +90,9 @@ export const getAttribute =
   (el: XmlElement | null): string | null =>
     el?.attributes?.[name] ?? defaultValue
 
-const getElementText = (el: XmlElement | null): string | null => {
+// Exported for reuse by data import (odkAttributeValueExtractor's caller), which reads a submission
+// leaf element's own text content the same way schema import reads a <label>'s.
+export const getElementText = (el: XmlElement | null): string | null => {
   if (!el) return null
   const textNode = (el.elements ?? []).find((child) => child.type === 'text')
   return textNode?.text ?? null

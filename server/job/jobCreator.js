@@ -18,6 +18,7 @@ import { GeoJsonDataExportJob } from '@server/modules/geo/service/GeoJsonDataExp
 import MessageSendJob from '@server/modules/message/service/MessageSendJob'
 import NodeDefsTranslationJob from '@server/modules/survey/service/NodeDefsTranslationJob'
 import OdkImportJob from '@server/modules/odkImport/service/odkImport/odkImportJob'
+import OdkDataImportJob from '@server/modules/odkImport/service/odkImport/odkDataImportJob'
 import PersistOlapDataJob from '@server/modules/analysis/service/olap/PersistOlapDataJob'
 import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistResultsJob'
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
@@ -55,6 +56,7 @@ const jobClasses = [
   MessageSendJob,
   NodeDefsTranslationJob,
   OdkImportJob,
+  OdkDataImportJob,
   PersistOlapDataJob,
   PersistResultsJob,
   RecordsCloneJob,
