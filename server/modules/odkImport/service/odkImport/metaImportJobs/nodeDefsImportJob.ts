@@ -2,7 +2,10 @@ import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Category from '@core/survey/category'
+import * as OdkImportReportItem from '@core/survey/odkImportReportItem'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -10,36 +13,45 @@ import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 // Small, generic (no Collect-specific logic) name-deduplication utility - reused as-is rather than
 // forked, see docs/superpowers/specs/2026-09-09-odk-import-design.md.
 import NodeDefUniqueNameGenerator from '@server/modules/collectImport/service/collectImport/model/nodeDefUniqueNameGenerator'
+import * as OdkImportReportManager from '../../../manager/odkImportReportManager'
 
 import * as XForm from '../model/xform'
 import type { XmlElement, XFormBind, XFormBodyControl, ItextTranslations } from '../model/xform'
 import { mapXFormTypeToNodeDefType, arenaFileTypeFromMediatype } from '../model/xformTypeMapping'
+import { OdkExpressionConverter } from './nodeDefsImportJob/odkExpressionConverter'
 
-export interface OdkImportIssue {
-  path: string
-  flag: string
-}
+const literalTrueValues = ['true()', 'true']
+const literalFalseValues = ['false()', 'false']
 
 /**
  * Recursively walks the XForm primary instance (node shape) and, for each node, joins in the
- * matching <bind> (type/validation - validation/expressions deferred to a later phase, see the
- * design spec) and body control (display/select items/upload mediatype) to create the matching
- * Arena NodeDef. Repeats are detected via the body <repeat> path set built by OdkFormReaderJob's
- * caller (see execute()). Mirrors collectImport's NodeDefsImportJob, without the expression-
- * conversion and validation-parsing steps (phase 0 scope only).
+ * matching <bind> (type, relevant/constraint/calculate/required expressions) and body control
+ * (display/select items/upload mediatype) to create the matching Arena NodeDef. Repeats are detected
+ * via the body <repeat> path set built during execute(). Mirrors collectImport's NodeDefsImportJob:
+ * base NodeDef inserted first, then relevant/constraint/calculate/required are converted (via
+ * OdkExpressionConverter) and applied as a second `updateNodeDefProps` call, same two-phase shape
+ * Collect's importer uses. Every conversion attempt (success or failure) is logged as an
+ * OdkImportReportItem and never blocks the import - see the design spec.
+ *
+ * Known limitation (shared with Collect's own importer, not a regression): expressions are converted
+ * in the same single top-to-bottom pass nodes are inserted in, so a `relevant`/`constraint`/`calculate`
+ * referencing a sibling that hasn't been inserted yet (appears later in the primary instance) will fail
+ * to resolve and gets flagged rather than silently retried.
  */
 export default class NodeDefsImportJob extends Job {
   static readonly type = 'NodeDefsImportJob'
 
   nodeDefs: Record<string, any>
+  nodeDefsByXFormPath: Map<string, any>
   nodeDefUniqueNameGenerator: NodeDefUniqueNameGenerator
-  importIssues: OdkImportIssue[]
+  reportItems: any[]
 
   constructor(params?: any) {
     super(NodeDefsImportJob.type, params)
     this.nodeDefs = {}
+    this.nodeDefsByXFormPath = new Map()
     this.nodeDefUniqueNameGenerator = new NodeDefUniqueNameGenerator()
-    this.importIssues = []
+    this.reportItems = []
   }
 
   async execute() {
@@ -59,14 +71,14 @@ export default class NodeDefsImportJob extends Job {
 
     await this._insertNodeDef({ parentNodeDef: null, parentPath: null, instanceElement: primaryInstanceRoot })
 
-    this.importIssues.forEach((issue) => this.logWarn(`ODK import: ${issue.flag} at ${issue.path}`))
+    await OdkImportReportManager.insertItems({ surveyId, items: this.reportItems }, this.tx)
 
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle: Survey.cycleOneKey, draft: true, advanced: true },
       this.tx
     )
 
-    this.setContext({ importIssues: this.importIssues, [Job.keysContext.survey]: survey })
+    this.setContext({ [Job.keysContext.survey]: survey })
   }
 
   async _insertNodeDef({
@@ -136,7 +148,12 @@ export default class NodeDefsImportJob extends Job {
     Object.assign(this.nodeDefs, nodeDefsUpdated)
     this.incrementProcessedItems()
 
-    const nodeDef = nodeDefsUpdated[NodeDef.getUuid(nodeDefParam)]
+    let nodeDef = nodeDefsUpdated[NodeDef.getUuid(nodeDefParam)]
+    this.nodeDefsByXFormPath.set(path, nodeDef)
+
+    // entities only ever carry a `relevant` bind in practice (constraint/calculate/required are
+    // attribute-only concepts) - still routed through the same helper for consistency
+    nodeDef = await this._applyExpressions({ nodeDef, path, bind })
 
     for (const childElement of childElements) {
       if (this.isCanceled()) break
@@ -170,8 +187,16 @@ export default class NodeDefsImportJob extends Job {
       hasBodyControl: Boolean(bodyControl),
     })
 
+    // The report table's node_def_uuid FK requires a *real, already-inserted* NodeDef - a mapping
+    // issue discovered before insert (including "skip", where no NodeDef is ever created for this
+    // path at all) is attached to the parent entity instead, which always exists by this point.
     if (mapping.flag) {
-      this.importIssues.push({ path, flag: mapping.flag })
+      this._pushReportItem({
+        nodeDefUuid: NodeDef.getUuid(parentNodeDef),
+        itemType: mapping.flag,
+        expression: odkType,
+        message: path,
+      })
     }
     if (mapping.skip || !mapping.nodeDefType) {
       this.incrementProcessedItems()
@@ -190,13 +215,20 @@ export default class NodeDefsImportJob extends Job {
       [NodeDef.propKeys.labels]: labels,
     }
 
+    // a calculated attribute isn't meant to be user-edited directly, same convention as Collect's
+    // importer (which marks its own "calculated" attributes read-only)
+    if (bind?.calculate) {
+      props[NodeDef.propKeys.readOnly] = true
+    }
+
+    let categoryMissing = false
     if (type === NodeDef.nodeDefType.code) {
       const categoryKey = bodyControl?.itemsetInstanceId ? `instance:${bodyControl.itemsetInstanceId}` : `field:${path}`
       const category = categoriesByKey?.[categoryKey]
       if (category) {
         props[NodeDef.propKeys.categoryUuid] = Category.getUuid(category)
       } else {
-        this.importIssues.push({ path, flag: 'missingCategory' })
+        categoryMissing = true
       }
       if (odkType === 'select') {
         props[NodeDef.propKeys.multiple] = true
@@ -215,7 +247,156 @@ export default class NodeDefsImportJob extends Job {
     Object.assign(this.nodeDefs, nodeDefsUpdated)
     this.incrementProcessedItems()
 
-    return nodeDefsUpdated[NodeDef.getUuid(nodeDefParam)]
+    let nodeDef = nodeDefsUpdated[NodeDef.getUuid(nodeDefParam)]
+    this.nodeDefsByXFormPath.set(path, nodeDef)
+
+    // logged only now that the attribute's own uuid exists, to satisfy the report table's FK
+    if (categoryMissing) {
+      this._pushReportItem({
+        nodeDefUuid: NodeDef.getUuid(nodeDef),
+        itemType: OdkImportReportItem.itemTypes.missingCategory,
+        message: path,
+      })
+    }
+
+    nodeDef = await this._applyExpressions({ nodeDef, path, bind })
+
+    return nodeDef
+  }
+
+  /**
+   * Converts bind.relevant/constraint/calculate/required (if present) and, for whichever convert
+   * successfully, updates the just-inserted NodeDef's advanced props in a second call - same
+   * insert-then-update-advanced-props shape as collectImport's NodeDefsImportJob. Every attempt
+   * (success or failure) is logged as an OdkImportReportItem regardless.
+   */
+  async _applyExpressions({
+    nodeDef,
+    path,
+    bind,
+  }: {
+    nodeDef: any
+    path: string
+    bind: XFormBind | null
+  }): Promise<any> {
+    if (!bind) return nodeDef
+
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    const survey = this.survey
+    const propsAdvanced: Record<string, any> = {}
+    const validations: Record<string, any> = {}
+
+    const convertAndReport = async ({ itemType, expression }: { itemType: string; expression: string }) => {
+      const converted = await OdkExpressionConverter.convert({
+        survey,
+        nodeDefCurrent: nodeDef,
+        currentXFormPath: path,
+        nodeDefsByXFormPath: this.nodeDefsByXFormPath,
+        expression,
+      })
+      this._pushReportItem({ nodeDefUuid, itemType, expression, resolved: Boolean(converted) })
+      return converted
+    }
+
+    if (bind.relevant) {
+      const converted = await convertAndReport({
+        itemType: OdkImportReportItem.itemTypes.relevant,
+        expression: bind.relevant,
+      })
+      if (converted) {
+        propsAdvanced[NodeDef.keysPropsAdvanced.applicable] = [
+          NodeDefExpression.createExpression({ expression: converted }),
+        ]
+      }
+    }
+
+    if (bind.constraint) {
+      const converted = await convertAndReport({
+        itemType: OdkImportReportItem.itemTypes.constraint,
+        expression: bind.constraint,
+      })
+      if (converted) {
+        validations[NodeDefValidations.keys.expressions] = [
+          NodeDefExpression.createExpression({ expression: converted }),
+        ]
+      }
+    }
+
+    if (bind.calculate) {
+      const converted = await convertAndReport({
+        itemType: OdkImportReportItem.itemTypes.calculate,
+        expression: bind.calculate,
+      })
+      if (converted) {
+        propsAdvanced[NodeDef.keysPropsAdvanced.defaultValues] = [
+          NodeDefExpression.createExpression({ expression: converted }),
+        ]
+      }
+    }
+
+    if (bind.required) {
+      const requiredRaw = bind.required.trim()
+      if (literalTrueValues.includes(requiredRaw)) {
+        validations[NodeDefValidations.keys.required] = true
+      } else if (!literalFalseValues.includes(requiredRaw)) {
+        // a non-trivial `required` expression - Arena's required flag is a plain boolean (unlike
+        // relevant/constraint/calculate, it has no expression slot to convert into), so this is
+        // flagged for manual review rather than guessed at
+        this._pushReportItem({
+          nodeDefUuid,
+          itemType: OdkImportReportItem.itemTypes.requiredExpr,
+          expression: bind.required,
+          resolved: false,
+        })
+      }
+    }
+
+    if (Object.keys(validations).length > 0) {
+      propsAdvanced[NodeDef.keysPropsAdvanced.validations] = validations
+    }
+
+    if (Object.keys(propsAdvanced).length === 0) return nodeDef
+
+    const nodeDefsUpdated = await NodeDefManager.updateNodeDefProps(
+      {
+        user: this.user,
+        survey: this.survey,
+        nodeDefUuid,
+        parentUuid: NodeDef.getParentUuid(nodeDef),
+        props: {},
+        propsAdvanced,
+        system: true,
+      },
+      this.tx
+    )
+    Object.assign(this.nodeDefs, nodeDefsUpdated)
+    const updatedNodeDef = nodeDefsUpdated[nodeDefUuid]
+    this.nodeDefsByXFormPath.set(path, updatedNodeDef)
+    return updatedNodeDef
+  }
+
+  _pushReportItem({
+    nodeDefUuid,
+    itemType,
+    expression = null,
+    message = null,
+    resolved = false,
+  }: {
+    nodeDefUuid: string
+    itemType: string
+    expression?: string | null
+    message?: string | null
+    resolved?: boolean
+  }) {
+    this.reportItems.push(
+      OdkImportReportItem.newReportItem({
+        nodeDefUuid,
+        itemType,
+        expression,
+        message,
+        resolved,
+      })
+    )
   }
 
   _calculateTotal(primaryInstanceRoot: XmlElement) {
