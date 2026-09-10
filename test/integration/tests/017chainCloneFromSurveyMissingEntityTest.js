@@ -151,6 +151,50 @@ describe('Clone chain from another survey - missing entities', () => {
     expect(ChainSamplingDesign.getBaseUnitNodeDefUuid(clonedSamplingDesign)).toBeUndefined()
   })
 
+  test('Cloning with skipMissingEntityAttributes remaps the phase 2 join entity/attribute and drops the phase 1 category/join attribute', async () => {
+    const user = getContextUser()
+    const sourceSurveyId = Survey.getId(sourceSurvey)
+    const targetSurveyId = Survey.getId(targetSurvey)
+
+    const clusterSrcEntity = Survey.findNodeDefByName('cluster_src')(sourceSurvey)
+    const volumeAnalysisAttr = Survey.findNodeDefByName('volume_analysis_src')(sourceSurvey)
+    const phase2ChainUuid = uuidv4()
+
+    await ChainRepository.insertChain({
+      surveyId: sourceSurveyId,
+      chain: {
+        uuid: phase2ChainUuid,
+        props: {
+          name: 'chain_phase2_join_props_src',
+          [Chain.keysProps.samplingDesign]: {
+            [ChainSamplingDesign.keysProps.samplingStrategy]: ChainSamplingDesign.samplingStrategies.twoPhase,
+            [ChainSamplingDesign.keysProps.phase1CategoryUuid]: 'category-uuid',
+            [ChainSamplingDesign.keysProps.phase1JoinAttribute]: 'design_psu',
+            [ChainSamplingDesign.keysProps.phase2JoinEntityUuid]: NodeDef.getUuid(clusterSrcEntity),
+            [ChainSamplingDesign.keysProps.phase2JoinAttribute]: NodeDef.getUuid(volumeAnalysisAttr),
+          },
+        },
+      },
+    })
+
+    const clonedChain = await AnalysisManager.cloneChainFromSurvey({
+      user,
+      surveyId: targetSurveyId,
+      sourceSurveyId,
+      sourceChainUuid: phase2ChainUuid,
+      skipMissingEntityAttributes: true,
+    })
+
+    const clonedSamplingDesign = Chain.getSamplingDesign(clonedChain)
+    expect(ChainSamplingDesign.getPhase1CategoryUuid(clonedSamplingDesign)).toBeUndefined()
+    expect(ChainSamplingDesign.getPhase1JoinAttribute(clonedSamplingDesign)).toBeUndefined()
+    // "cluster_src" and its analysis attribute both exist in the target survey by name, so they remap
+    const targetClusterSrcEntity = Survey.findNodeDefByName('cluster_src')(targetSurvey)
+    expect(ChainSamplingDesign.getPhase2JoinEntityUuid(clonedSamplingDesign)).toBe(
+      NodeDef.getUuid(targetClusterSrcEntity)
+    )
+  })
+
   test('Cloning with skipMissingEntityAttributes succeeds with zero cloned attributes when every entity is missing in the target survey', async () => {
     const user = getContextUser()
     const sourceSurveyId = Survey.getId(sourceSurvey)

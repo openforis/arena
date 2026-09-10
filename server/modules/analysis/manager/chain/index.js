@@ -199,12 +199,16 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
       [ChainSamplingDesign.keysProps.postStratificationAttributeDefUuid]: remap(
         ChainSamplingDesign.getPostStratificationAttributeDefUuid(sourceSamplingDesign)
       ),
-      [ChainSamplingDesign.keysProps.firstPhaseCommonAttributeUuid]: remap(
-        ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(sourceSamplingDesign)
+      [ChainSamplingDesign.keysProps.phase2JoinEntityUuid]: remap(
+        ChainSamplingDesign.getPhase2JoinEntityUuid(sourceSamplingDesign)
       ),
-      // Category UUIDs are survey-specific and cannot be remapped; clear them
-      [ChainSamplingDesign.keysProps.firstPhaseCategoryUuid]: undefined,
-      [ChainSamplingDesign.keysProps.firstPhaseCategoryExtraProp]: undefined,
+      [ChainSamplingDesign.keysProps.phase2JoinAttribute]: remap(
+        ChainSamplingDesign.getPhase2JoinAttribute(sourceSamplingDesign)
+      ),
+      // Category UUIDs are survey-specific and cannot be remapped; clear them, and the join
+      // attribute that only makes sense in the context of that category
+      [ChainSamplingDesign.keysProps.phase1CategoryUuid]: undefined,
+      [ChainSamplingDesign.keysProps.phase1JoinAttribute]: undefined,
       [ChainSamplingDesign.keysProps.reportingDataCategoryUuid]: undefined,
       [ChainSamplingDesign.keysProps.reportingDataAttributeDefsByLevelUuid]: undefined,
     }).filter(([, v]) => v !== undefined)
