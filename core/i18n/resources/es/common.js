@@ -699,7 +699,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     stratumAttributeInfo: 'Seleccione la variable utilizada para estratificar la muestra.',
     stratumAttribute2ndPhase: 'Atributo de estrato de 2ª fase',
     stratumAttribute2ndPhaseInfo:
-      'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada.',
+      'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada. Solo se muestran los atributos cuyo nombre también aparece como columna de la categoría de la 1ª fase.',
     postStratificationAttribute: 'Atributo de postestratificación',
     areaWeightingMethod: 'Método de ponderación de área',
     clusteringEntity: 'Entidad de agrupación',

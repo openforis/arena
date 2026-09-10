@@ -829,7 +829,7 @@ This might be a slow process.`,
     stratumAttributeInfo: 'Select the variable used to stratify the sample.',
     stratumAttribute2ndPhase: '2nd phase stratum attribute',
     stratumAttribute2ndPhaseInfo:
-      'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample.',
+      'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample. Only attributes whose name also appears as a column of the 1st phase category are shown.',
     postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
     clusteringEntity: 'Clustering entity',

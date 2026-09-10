@@ -39,7 +39,10 @@ export const StratumAttributeSelector = () => {
   /* eslint-disable react-hooks/preserve-manual-memoization -- React Compiler cannot preserve this memoization here (dependencies may be mutated later) */
   const nodeDefFilter = useMemo(() => {
     if (!isTwoPhase) return null
-    const candidateNames = new Set(['code', ...(phase1Category ? Category.getItemExtraDefKeys(phase1Category) : [])])
+    const candidateNames = new Set([
+      ChainSamplingDesign.categoryCodeAttributeName,
+      ...(phase1Category ? Category.getItemExtraDefKeys(phase1Category) : []),
+    ])
     return (nodeDef) => candidateNames.has(NodeDef.getName(nodeDef))
   }, [isTwoPhase, phase1Category])
   /* eslint-enable react-hooks/preserve-manual-memoization */

@@ -16,7 +16,7 @@ import { SurveyState } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 
-const codeAttributeName = 'code'
+const { categoryCodeAttributeName } = ChainSamplingDesign
 
 const attributeNameToItem = (name) => ({ value: name, label: name })
 
@@ -31,11 +31,11 @@ export const Phase1JoinAttributeSelector = () => {
   const attributeNames = useSelector((state) => {
     const survey = SurveyState.getSurvey(state)
     const phase1Category = Survey.getCategoryByUuid(phase1CategoryUuid)(survey)
-    if (!phase1Category) return [codeAttributeName]
+    if (!phase1Category) return [categoryCodeAttributeName]
     const extraPropNames = Category.getItemExtraDefsArray(phase1Category)
       .filter((extraDef) => ExtraPropDef.getDataType(extraDef) !== ExtraPropDef.dataTypes.geometryPoint)
       .map(ExtraPropDef.getName)
-    return [codeAttributeName, ...extraPropNames]
+    return [categoryCodeAttributeName, ...extraPropNames]
   }, Objects.isEqual)
 
   const emptyItem = { value: null, label: i18n.t('common.notSpecified') }

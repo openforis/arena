@@ -91,6 +91,41 @@ const oldSamplingDesignPhasePropKeys = {
   firstPhaseCommonAttributeUuid: 'firstPhaseCommonAttributeUuid',
 }
 
+/**
+ * Determines whether the given entity node def can be selected as phase 2 join entity.
+ * Mirrors the filter used by the Phase2JoinEntitySelector component in the webapp: only the root
+ * entity, the base unit entity itself, or one of the base unit's ancestors are selectable.
+ * @param {object} params - Parameters.
+ * @param {object} params.nodeDef - The candidate entity node def.
+ * @param {object} [params.baseUnitNodeDef] - The base unit entity node def of the sampling design (if any).
+ * @returns {boolean} True if the candidate entity would be accepted by the phase 2 join entity selector.
+ */
+const _isSelectableAsPhase2JoinEntity = ({ nodeDef, baseUnitNodeDef }) =>
+  NodeDef.isRoot(nodeDef) ||
+  (Boolean(baseUnitNodeDef) &&
+    (NodeDef.getUuid(nodeDef) === NodeDef.getUuid(baseUnitNodeDef) || NodeDef.isAncestorOf(baseUnitNodeDef)(nodeDef)))
+
+/**
+ * Finds the closest ancestor entity (starting from the attribute's own parent entity) that would be
+ * accepted by the phase 2 join entity selector. Walking up is necessary because the old "common
+ * attribute" selector allowed attributes nested in single entities below the base unit (or below one
+ * of its ancestors): those immediate parent entities are not selectable in the new selector, and
+ * would be silently discarded (together with the join attribute) as soon as the page is rendered.
+ * @param {object} params - Parameters.
+ * @param {object} params.attributeNodeDef - The previously selected common attribute node def.
+ * @param {object} [params.baseUnitNodeDef] - The base unit entity node def of the sampling design (if any).
+ * @param {object} params.survey - The survey with node defs.
+ * @returns {object|null} The closest selectable ancestor entity node def, or null when none qualifies.
+ */
+const _findPhase2JoinEntity = ({ attributeNodeDef, baseUnitNodeDef, survey }) => {
+  let candidate = Survey.getNodeDefParent(attributeNodeDef)(survey)
+  while (candidate) {
+    if (_isSelectableAsPhase2JoinEntity({ nodeDef: candidate, baseUnitNodeDef })) return candidate
+    candidate = Survey.getNodeDefParent(candidate)(survey)
+  }
+  return null
+}
+
 const _migrateSamplingDesignPhaseProps = ({ samplingDesign, survey }) => {
   const migrated = { ...samplingDesign }
 
@@ -110,9 +145,12 @@ const _migrateSamplingDesignPhaseProps = ({ samplingDesign, survey }) => {
     delete migrated[oldSamplingDesignPhasePropKeys.firstPhaseCommonAttributeUuid]
 
     const attributeNodeDef = Survey.getNodeDefByUuid(attributeUuid)(survey)
-    const parentEntity = attributeNodeDef ? Survey.getNodeDefParent(attributeNodeDef)(survey) : null
-    if (parentEntity) {
-      migrated[ChainSamplingDesign.keysProps.phase2JoinEntityUuid] = NodeDef.getUuid(parentEntity)
+    // base unit node def uuid is not touched by this migration: read it from the original sampling design
+    const baseUnitNodeDefUuid = ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesign)
+    const baseUnitNodeDef = baseUnitNodeDefUuid ? Survey.getNodeDefByUuid(baseUnitNodeDefUuid)(survey) : null
+    const joinEntity = attributeNodeDef ? _findPhase2JoinEntity({ attributeNodeDef, baseUnitNodeDef, survey }) : null
+    if (joinEntity) {
+      migrated[ChainSamplingDesign.keysProps.phase2JoinEntityUuid] = NodeDef.getUuid(joinEntity)
     }
     migrated[ChainSamplingDesign.keysProps.phase2AsSamplingPointData] = false
   }
@@ -124,7 +162,8 @@ const _migrateSamplingDesignPhaseProps = ({ samplingDesign, survey }) => {
  * Migrates every chain in the given survey from the old sampling design phase prop names
  * (firstPhaseCategoryUuid, firstPhaseCategoryExtraProp, firstPhaseCommonAttributeUuid) to the
  * current ones (phase1CategoryUuid, phase1JoinAttribute, phase2JoinAttribute), backfilling
- * phase2JoinEntityUuid from the previously selected common attribute's parent entity.
+ * phase2JoinEntityUuid with the closest ancestor entity of the previously selected common attribute
+ * that is also selectable in the new phase 2 join entity selector.
  * Chains without any of the old keys are left untouched.
  * @param {object} params - Parameters.
  * @param {number} params.surveyId - The survey id.

@@ -18,6 +18,9 @@ const keysProps = {
   stratumNodeDefUuid: 'stratumNodeDefUuid',
 }
 
+// name of the built-in "code" column of a category, always available as join attribute
+const categoryCodeAttributeName = 'code'
+
 const samplingStrategies = {
   simpleRandom: 'simpleRandom',
   systematic: 'systematic',
@@ -160,6 +163,7 @@ const assocReportingDataAttributeDefUuid =
     })
 
 export const ChainSamplingDesign = {
+  categoryCodeAttributeName,
   keysProps,
   samplingStrategies,
 

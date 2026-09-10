@@ -111,6 +111,25 @@ describe('ChainSamplingDesign.phase2AsSamplingPointData', () => {
     expect(ChainSamplingDesign.isPhase2AsSamplingPointDataSelectionEnabled(stratifiedRandom)).toBe(false)
   })
 
+  it('makes both join attribute selectors available again when turned back off', () => {
+    let samplingDesign = { samplingStrategy: samplingStrategies.twoPhase }
+    samplingDesign = ChainSamplingDesign.assocPhase1JoinAttribute('design_psu')(samplingDesign)
+    samplingDesign = ChainSamplingDesign.assocPhase2JoinAttribute('attr-uuid')(samplingDesign)
+    samplingDesign = ChainSamplingDesign.assocPhase2AsSamplingPointData(true)(samplingDesign)
+
+    expect(ChainSamplingDesign.isPhase1JoinAttributeSelectionEnabled(samplingDesign)).toBe(false)
+    expect(ChainSamplingDesign.isPhase2JoinAttributeSelectionEnabled(samplingDesign)).toBe(false)
+
+    samplingDesign = ChainSamplingDesign.assocPhase2AsSamplingPointData(false)(samplingDesign)
+
+    expect(ChainSamplingDesign.isPhase2AsSamplingPointData(samplingDesign)).toBe(false)
+    expect(ChainSamplingDesign.isPhase1JoinAttributeSelectionEnabled(samplingDesign)).toBe(true)
+    expect(ChainSamplingDesign.isPhase2JoinAttributeSelectionEnabled(samplingDesign)).toBe(true)
+    // the values themselves are not restored: the user has to pick them again
+    expect(ChainSamplingDesign.getPhase1JoinAttribute(samplingDesign)).toBeUndefined()
+    expect(ChainSamplingDesign.getPhase2JoinAttribute(samplingDesign)).toBeUndefined()
+  })
+
   it('is cleared (reset to false) when sampling strategy changes away from two-phase', () => {
     let samplingDesign = { samplingStrategy: samplingStrategies.twoPhase }
     samplingDesign = ChainSamplingDesign.assocPhase2AsSamplingPointData(true)(samplingDesign)
