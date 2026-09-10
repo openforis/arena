@@ -23,7 +23,6 @@ services:
       PGPASSWORD: arena
       TEMP_FOLDER: /tmp/arena_upload
       ANALYSIS_OUTPUT_DIR: /tmp/arena_analysis
-      SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
       HEADLESS_CHROME: 'true'
       TAIKO_BROWSER_PATH: /usr/local/lib/node_modules/chromium/lib/chromium/chrome-linux/chrome
 

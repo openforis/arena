@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Идэвхтэй',
@@ -53,6 +55,7 @@ export default {
     download: 'Татах',
     draft: 'Ноорог',
     edit: 'Засах',
+    elapsed: 'Өнгөрсөн хугацаа',
     email: 'Имэйл',
     email_other: 'Имэйлүүд',
     emailSentConfirmation: `{{email}} руу имэйл илгээсэн.
@@ -153,9 +156,34 @@ export default {
 - Таксонуудыг устгах боломжгүй.
 
 **Үргэлжлүүлэхдээ итгэлтэй байна уу?**`,
+    publishRecordValuesUpdateConfirm: `#### {{survey}}-г нийтлэх нь бүртгэгдсэн өгөгдлийг шинэчлэх болно ####
+
+{{reasons}}
+
+Энэ үйлдэл нь оруулсан өгөгдлийг бүрмөсөн өөрчлөх эсвэл устгах магадлалтай.
+
+Одоо байгаа өгөгдлийг шинэчлэхгүйгээр нийтлэхийн тулд доорх "Өгөгдлийн шинэчлэлтийг алгасах" гэснийг сонгоно уу (зөвлөдөггүй).`,
+    publishRecordValuesUpdateConfirmHeader: 'Одоо байгаа бичлэгийн өгөгдөл шинэчлэгдэнэ',
+    publishRecordValuesUpdateConfirmOk: 'Нийтлэх ба өгөгдлийг шинэчлэх',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Баталгаажуулахын тулд судалгааны нэр "{{strongConfirmRequiredText}}"-г бичнэ үү',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Дараах атрибутууд өөрчлөгдөх бөгөөд одоо байгаа бичлэгүүдэд тэдгээрийн утга автоматаар дахин тооцоологдоно: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Дараах атрибутууд нь өөрчлөгдсөн ангилал эсвэл таксономийн нэмэлт шинж чанарыг ашигладаг тул одоо байгаа бичлэгүүдэд утга нь дахин тооцоологдоно: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Өгөгдлийн шинэчлэлтийг алгасах',
+    publishSkipDataUpdateConfirmOk: 'Өгөгдлийн шинэчлэлтийг алгасаад нийтлэх',
+    publishSkipDataUpdateImplications: 'Өгөгдлийн шинэчлэлтийг алгасах нь дараахыг илэрхийлнэ:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Одоо байгаа бичлэгүүд шинэ судалгааны тодорхойлолттой нийцэхгүй болж болно',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Нөлөөлөлд өртсөн утгууд гараар дахин оруулах хүртэл дахин тооцоологдохгүй',
+    publishSkipDataUpdateImplicationChains:
+      'Эдгээр атрибутыг ашигладаг боловсруулалтын дараалал (chain) хуучирсан үр дүн гаргаж болзошгүй',
     raiseTicketInSupportForum: `Асуудал гарвал манай <b>Дэмжлэгийн Форум</b>: $t(links.supportForum) руу 'arena' шошготой тасалбар үүсгэнэ үү.`,
     record: 'Бичлэг',
     record_other: 'Бичлэгүүд',
+    remaining: 'Үлдсэн хугацаа',
     remote: 'Алсын',
     required: 'Шаардлагатай',
     requiredField: 'шаардлагатай талбар',
@@ -353,6 +381,8 @@ export default {
     entities: 'Виртуал объектууд',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Жишээнүүд',
+
+    jobMonitor: 'Ажлын хяналт',
 
     help: 'Тусламж',
     about: 'Тухай',
@@ -715,10 +745,15 @@ $t(common.raiseTicketInSupportForum)
     },
     downloadSummaryJSON: 'Хураангуй татах (JSON)',
     firstPhaseCategory: '1-р үе шатны ангилал',
+    firstPhaseCategoryInfo: '1-р үе шатны түүврийг агуулсан ангиллыг сонгоно уу.',
+    firstPhaseCategoryExtraProp: {
+      label: '1-р үе шатны давхаргын шинж чанар',
+      info: 'Анхны популяцийг эхний түүврийн шатанд өргөн давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.',
+    },
     firstPhaseCommonAttribute: {
       label: 'Нийтлэг шинж чанар',
       info: `Суурь нэгж ба 1-р үе шатны хүснэгтийн хоорондох нийтлэг шинж чанар
-(энэ нь 1-р үе шатны ангилалд тодорхойлогдсон нэмэлт шинж чанарын ижил нэртэй кодын шинж чанар байх ёстой)`,
+(энэ нь код эсвэл текст төрлийн шинж чанар байх ёстой; түүний утгыг 1-р үе шатны ангилалд тодорхойлогдсон нэмэлт шинж чанаруудтай харьцуулна - шинж чанарын нэр нэмэлт шинж чанарын нэртэй адил байх шаардлагагүй)`,
     },
     formLabel: 'Боловсруулах гинжийн шошго',
     basic: 'Үндсэн',
@@ -762,9 +797,13 @@ $t(common.raiseTicketInSupportForum)
       reportingAreaInfo: `Үечилсэн түүвэрлэлтийн хувьд үечилсэн шинж чанарын ангиллын хүснэгтэд давхаргуудын талбайг оруулна уу (баганын нэр 'area')`,
     },
     stratumAttribute: 'Үеийн шинж чанар',
+    stratumAttributeInfo: 'Түүврийг давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.',
+    stratumAttribute2ndPhase: '2-р үе шатны давхаргын шинж чанар',
+    stratumAttribute2ndPhaseInfo: `Эцсийн, дэлгэрэнгүй дэд түүврийг гаргаж авахаас өмнө 1-р үе шатны түүврийг дэд давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.`,
     postStratificationAttribute: 'Дараах үечилсэн шинж чанар',
     areaWeightingMethod: 'Талбайн жинлэх арга',
     clusteringEntity: 'Бүлэглэх объект',
+    clusteringEntityInfo: `Анхдагч түүврийн нэгжийг тодорхойлох объект. Тэмдэглэл: Энэ нь зөвхөн R survey багцын хүрээнд кластерийн шинжилгээнд ашиглагдана.`,
     clusteringOnlyVariances: 'Зөвхөн хэлбэлзэлд зориулсан бүлэглэлт',
     errorNoLabel: 'Гинж нь хүчинтэй шошготой байх ёстой',
     dateExecuted: 'Гүйцэтгэсэн огноо',
@@ -780,6 +819,7 @@ $t(common.cantUndoWarning)`,
       sourceChain: 'Эх гинж',
       entityCheck: 'Объектын нийцтэй байдал',
       entityMissing: 'зорилтот судалгаанд байхгүй',
+      skipMissingEntities: 'Зорилтот судалгаанд байхгүй объектуудын шинжилгээний шинж чанаруудыг алгасах',
       noAnalysisAttributes: 'Энэ гинж шинжилгээний шинж чанаргүй байна',
       cloneComplete: 'Гинж амжилттай хуулагдсан',
       missingEntities: 'Хуулах боломжгүй: дараах объектууд зорилтот судалгаанд байхгүй байна: {{entities}}',
@@ -933,6 +973,7 @@ $t(common.appNameFull)
       rowIndex: 'Одоогийн хүснэгтийн мөрний (эсвэл маягтын) индексыг буцаана',
       taxonProp: 'Заасан кодтой таксоны заасан $t(extraProp.label)-ийн утгыг буцаана',
       taxonVernacularName: 'Заасан кодтой таксоны заасан хэлээрх (эхний) нутгийн нэрийг буцаана',
+      unique: 'Олон шинж чанар эсвэл объектын өвөрмөц утгуудыг буцаана',
       userEmail: 'Нэвтэрсэн хэрэглэгчийн имэйлийг буцаана',
       userIsRecordOwner:
         'Бичлэгийг засаж буй хэрэглэгч нь мөн түүний эзэмшигч бол "үнэн", үгүй бол "худал" гэсэн боол утгыг буцаана',
@@ -1215,10 +1256,13 @@ $t(common.appNameFull)
       noCategoriesAvailable: 'Сонгосон судалгаанд ангилал алга байна',
     },
     itemsCount: 'Элементүүдийн тоо',
+    structure: 'Бүтэц',
     types: {
       flat: 'Хавтгай',
       hierarchical: 'Иерархи',
       reportingData: 'Тайлагнах өгөгдөл',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Дээж цэгийн өгөгдөл',
     },
   },
 
@@ -1246,6 +1290,49 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Энэ Тайлагнах өгөгдлийн ангиллыг энгийн ангилал болгон хөрвүүлэх үү?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Дээж цэгийн өгөгдөл рүү хөрвүүлэх',
+      confirmMessage: `Энэ ангиллыг Дээж цэгийн өгөгдлийн ангилал болгон хөрвүүлэх үү?
+
+Ангиллын нэр '${samplingPointDataCategoryName}' болж өөрчлөгдөж, элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'GeoPackage ангилал руу хөрвүүлэх',
+      confirmMessage: `Энэ ангиллыг GeoPackage ангилал болгон хөрвүүлэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
+      confirmMessage: `Энэ GeoPackage ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
+
+'${locationItemExtraDefName}' нэмэлт талбарын цоожийг тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
+      confirmMessage: `Энэ Дээж цэгийн өгөгдлийн ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
+
+Ангиллын нэрийг цэвэрлэх бөгөөд (шинэ нэр өгөх шаардлагатай болно), '${locationItemExtraDefName}' нэмэлт талбарын цоожийг мөн тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
+    },
+    geoPackageCategory: 'Энэ бол GeoPackage ангилал юм',
+    samplingPointDataCategoryType: 'Энэ бол Дээж цэгийн өгөгдлийн ангилал юм',
+    createCategory: {
+      menuLabel: 'Ангилал нэмэх',
+      simple: 'Энгийн ангилал',
+      otherTypes: 'Ангиллын бусад төрлүүд',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Дээж цэгийн өгөгдлийн ангилал',
+      message: `Шинэ Дээж цэгийн өгөгдлийн ангилал үүсгэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'GeoPackage ангилал',
+      message: `Шинэ GeoPackage ангилал үүсгэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
     deleteItem: 'Элемент устгах',
     level: {
       title: 'Түвшин {{levelPosition}}',
@@ -1269,6 +1356,8 @@ $t(common.cantUndoWarning)`,
       title: 'Ангиллын импортын хураангуй',
     },
     reportingData: 'Тайлагнах өгөгдөл',
+    exportToGeoPackage: 'GeoPackage рүү экспортлох',
+    exportToGeoPackageSkippedItems: 'Хүчинтэй байршилгүй {{count}} элементийг алгаслаа.',
     templateFor_samplingPointDataImport_csv: 'Түүвэрлэлтийн цэгийн загвар (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Түүвэрлэлтийн цэгийн загвар (Excel)',
   },

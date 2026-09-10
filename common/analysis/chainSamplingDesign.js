@@ -6,6 +6,7 @@ const keysProps = {
   areaWeightingMethod: 'areaWeightingMethod',
   baseUnitNodeDefUuid: 'baseUnitNodeDefUuid',
   clusteringNodeDefUuid: 'clusteringNodeDefUuid',
+  firstPhaseCategoryExtraProp: 'firstPhaseCategoryExtraProp',
   firstPhaseCategoryUuid: 'firstPhaseCategoryUuid',
   firstPhaseCommonAttributeUuid: 'firstPhaseCommonAttributeUuid',
   postStratificationAttributeDefUuid: 'postStratificationAttributeDefUuid',
@@ -29,6 +30,7 @@ const isPropTrue = (prop) => (obj) => A.prop(prop)(obj) === true
 const isAreaWeightingMethod = isPropTrue(keysProps.areaWeightingMethod)
 const getBaseUnitNodeDefUuid = A.prop(keysProps.baseUnitNodeDefUuid)
 const getClusteringNodeDefUuid = A.prop(keysProps.clusteringNodeDefUuid)
+const getFirstPhaseCategoryExtraProp = A.prop(keysProps.firstPhaseCategoryExtraProp)
 const getFirstPhaseCategoryUuid = A.prop(keysProps.firstPhaseCategoryUuid)
 const getFirstPhaseCommonAttributeUuid = A.prop(keysProps.firstPhaseCommonAttributeUuid)
 const getPostStratificationAttributeDefUuid = A.prop(keysProps.postStratificationAttributeDefUuid)
@@ -57,10 +59,13 @@ const isStratificationNotSpecifiedAllowed = () => {
 const isFirstPhaseCategorySelectionEnabled = (samplingDesign) =>
   getSamplingStrategy(samplingDesign) === samplingStrategies.twoPhase
 
+const isFirstPhaseCategoryExtraPropSelectionEnabled = isFirstPhaseCategorySelectionEnabled
+
 const isFirstPhaseCommonAttributeSelectionEnabled = isFirstPhaseCategorySelectionEnabled
 
 // UPDATE
 
+const dissocFirstPhaseCategoryExtraProp = A.dissoc(keysProps.firstPhaseCategoryExtraProp)
 const dissocFirstPhaseCategoryUuid = A.dissoc(keysProps.firstPhaseCategoryUuid)
 const dissocFirstPhaseCommonAttributeUuid = A.dissoc(keysProps.firstPhaseCommonAttributeUuid)
 const dissocPostStratificationAttributeDefUuid = A.dissoc(keysProps.postStratificationAttributeDefUuid)
@@ -84,6 +89,9 @@ const cleanupSamplingDesign = (samplingDesign) => {
   if (!isFirstPhaseCategorySelectionEnabled(samplingDesignUpdated)) {
     samplingDesignUpdated = dissocFirstPhaseCategoryUuid(samplingDesignUpdated)
   }
+  if (!isFirstPhaseCategoryExtraPropSelectionEnabled(samplingDesignUpdated)) {
+    samplingDesignUpdated = dissocFirstPhaseCategoryExtraProp(samplingDesignUpdated)
+  }
   if (!isFirstPhaseCommonAttributeSelectionEnabled(samplingDesignUpdated)) {
     samplingDesignUpdated = dissocFirstPhaseCommonAttributeUuid(samplingDesignUpdated)
   }
@@ -98,7 +106,14 @@ const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
   A.assoc(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
 
 const assocFirstPhaseCategoryUuid = (firstPhaseCategoryUuid) =>
-  A.pipe(dissocFirstPhaseCommonAttributeUuid, A.assoc(keysProps.firstPhaseCategoryUuid, firstPhaseCategoryUuid))
+  A.pipe(
+    dissocFirstPhaseCommonAttributeUuid,
+    dissocFirstPhaseCategoryExtraProp,
+    A.assoc(keysProps.firstPhaseCategoryUuid, firstPhaseCategoryUuid)
+  )
+
+const assocFirstPhaseCategoryExtraProp = (firstPhaseCategoryExtraProp) =>
+  A.assoc(keysProps.firstPhaseCategoryExtraProp, firstPhaseCategoryExtraProp)
 
 const assocFirstPhaseCommonAttributeUuid = (firstPhaseCommonAttributeUuid) =>
   A.assoc(keysProps.firstPhaseCommonAttributeUuid, firstPhaseCommonAttributeUuid)
@@ -135,11 +150,13 @@ export const ChainSamplingDesign = {
   getBaseUnitNodeDefUuid,
   isAreaWeightingMethod,
   getClusteringNodeDefUuid,
+  getFirstPhaseCategoryExtraProp,
   getFirstPhaseCategoryUuid,
   getFirstPhaseCommonAttributeUuid,
   isPostStratificationEnabled,
   getReportingDataAttributeDefUuid,
   getReportingDataCategoryUuid,
+  isFirstPhaseCategoryExtraPropSelectionEnabled,
   isFirstPhaseCategorySelectionEnabled,
   isFirstPhaseCommonAttributeSelectionEnabled,
   isStratificationEnabled,
@@ -152,6 +169,7 @@ export const ChainSamplingDesign = {
   assocAreaWeightingMethod,
   assocBaseUnitNodeDefUuid,
   assocClusteringNodeDefUuid,
+  assocFirstPhaseCategoryExtraProp,
   assocFirstPhaseCategoryUuid,
   assocFirstPhaseCommonAttributeUuid,
   assocPostStratificationAttributeDefUuid,

@@ -35,6 +35,7 @@ export default {
   importingDataIntoWrongCollectSurvey: 'Importando dados no inventário errado. URI esperada: {{collectSurveyUri}}',
   invalidType: 'Tipo inválido {{type}}',
   jobCanceledOrErrorsFound: 'Job cancelado ou erros encontrados; revertendo transação',
+  jobOrphanedOnRestart: 'O job foi interrompido por uma reinicialização do servidor. Tente novamente.',
   paramIsRequired: 'O parâmetro {{param}} é obrigatório',
   unableToFindParent: 'Não foi possível encontrar o pai de {{name}}',
   unableToFindNode: 'Não foi possível encontrar nó com nome {{name}}',
@@ -52,6 +53,7 @@ export default {
 Tente atualizar a página.`,
   survey: {
     nodeDefNameNotFound: 'Definição de nó não encontrada: {{name}}',
+    dataMigrationInProgress: 'Esta pesquisa está sendo atualizada; tente novamente em breve.',
   },
   unsupportedFunctionType: 'Tipo de função não suportado: {{exprType}}',
   userHasPendingInvitation: `Já existe um convite pendente para o usuário com email '{{email}}'; ele(a) não pode ser convidado(a) para este inventário até aceitá-lo`,

@@ -7,7 +7,8 @@ import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import { ArrayUtils } from '@core/arrayUtils'
-import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
+import { functionNames, userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
+import { extractCallFirstTwoArgs } from '@core/expressionParser/helpers/functionCallArgs'
 
 import * as TextUtils from '@webapp/utils/textUtils'
 
@@ -178,6 +179,7 @@ export const keysPropsAdvanced = {
   itemsFilter: 'itemsFilter',
   // file
   fileNameExpression: 'fileNameExpression',
+  enumeratingItemsExpression: 'enumeratingItemsExpression',
 
   // reporting
   hiddenInReport: 'hiddenInReport',
@@ -421,6 +423,25 @@ export const hasAdvancedPropsDefaultValuesDraft = (nodeDef) => R.prop(keys.draft
 export const hasAdvancedPropsFileNameExpressionDraft = (nodeDef) =>
   R.prop(keys.draftAdvancedFileNameExpression, nodeDef) === true
 export const hasAdvancedPropsValidationsDraft = (nodeDef) => R.prop(keys.draftAdvancedValidations, nodeDef) === true
+// Unlike the flags above (set on the node def row by the server whenever the corresponding key is
+// present in propsAdvancedDraft, for a fixed set of keys it tracks), enumeratingItemsExpression and
+// itemsFilter are not tracked server-side, so they're checked here instead, directly against
+// propsAdvancedDraft. This only works if the node def was fetched with backup: true (see
+// fetchSurveyAndNodeDefsBySurveyId) - a plain draft fetch merges propsAdvancedDraft into propsAdvanced
+// and discards it, at which point these would always read as unchanged.
+export const hasAdvancedPropsEnumeratingItemsExpressionDraft = (nodeDef) =>
+  Boolean(getPropAdvancedDraft(keysPropsAdvanced.enumeratingItemsExpression)(nodeDef))
+export const hasAdvancedPropsItemsFilterDraft = (nodeDef) =>
+  Boolean(getPropAdvancedDraft(keysPropsAdvanced.itemsFilter)(nodeDef))
+// Node defs whose value (or, for auto-enumerated entities, their enumerated child nodes) can be
+// recalculated on publish - see RecordCheckJob. Requires the node def to have been fetched with
+// backup: true (see the two functions above).
+export const hasValueAffectingAdvancedPropsDraft = (nodeDef) =>
+  hasAdvancedPropsApplicableDraft(nodeDef) ||
+  hasAdvancedPropsDefaultValuesDraft(nodeDef) ||
+  hasAdvancedPropsFileNameExpressionDraft(nodeDef) ||
+  hasAdvancedPropsEnumeratingItemsExpressionDraft(nodeDef) ||
+  hasAdvancedPropsItemsFilterDraft(nodeDef)
 const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
 export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues, [])
@@ -447,6 +468,16 @@ export const hasValidationsDefined = (nodeDef) => {
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 
+// Flattens an array of NodeDefExpression objects (as stored under defaultValues/applicable/
+// validations.expressions/editableIf/visibleIf - each { expression, applyIf, ... }) into a plain array
+// of expression strings (both the expression itself and its applyIf, when present).
+const _expressionStringsFromNodeDefExpressions = (nodeDefExpressions) =>
+  nodeDefExpressions.reduce((acc, nodeDefExpression) => {
+    ArrayUtils.addIfNotEmpty(NodeDefExpression.getExpression(nodeDefExpression))(acc)
+    ArrayUtils.addIfNotEmpty(NodeDefExpression.getApplyIf(nodeDefExpression))(acc)
+    return acc
+  }, [])
+
 export const getAllExpressions = (nodeDef) => {
   const nodeDefExpressions = [
     ...getDefaultValues(nodeDef),
@@ -455,15 +486,35 @@ export const getAllExpressions = (nodeDef) => {
     ...getEditableIf(nodeDef),
     ...getVisibleIf(nodeDef),
   ]
-  const expressions = nodeDefExpressions.reduce((acc, nodeDefExpression) => {
-    ArrayUtils.addIfNotEmpty(NodeDefExpression.getExpression(nodeDefExpression))(acc)
-    ArrayUtils.addIfNotEmpty(NodeDefExpression.getApplyIf(nodeDefExpression))(acc)
-    return acc
-  }, [])
+  const expressions = _expressionStringsFromNodeDefExpressions(nodeDefExpressions)
   ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
   ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getEnumeratingItemsExpression(nodeDef))(expressions)
   return expressions
 }
+
+// Value-affecting-only subset of getAllExpressions: applicable, default values, file name expression,
+// enumerating items expression, items filter - the exact same boundary hasValueAffectingAdvancedPropsDraft
+// draws between props that can change a node's stored value and ones that don't (e.g. validations,
+// editableIf, visibleIf are excluded). Used to find node defs whose value needs recalculating when
+// something they read (e.g. a category/taxonomy extra prop) changes - see
+// referencesCategoryExtraProp/referencesTaxonomyExtraProp below.
+export const getValueAffectingExpressions = (nodeDef) => {
+  const expressions = _expressionStringsFromNodeDefExpressions([
+    ...getDefaultValues(nodeDef),
+    ...getApplicable(nodeDef),
+  ])
+  ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getEnumeratingItemsExpression(nodeDef))(expressions)
+  return expressions
+}
+
+// Plain expression strings from the node def's validation expressions only (see
+// getValidationExpressions) - used by referencesCategoryExtraPropInValidations/
+// referencesTaxonomyExtraPropInValidations below.
+const getValidationOnlyExpressionStrings = (nodeDef) =>
+  _expressionStringsFromNodeDefExpressions(getValidationExpressions(nodeDef))
 
 const userDependentFunctionsRegExp = new RegExp(String.raw`\b(${userDependentFunctionNames.join('|')})\s*\(`)
 
@@ -472,12 +523,73 @@ const userDependentFunctionsRegExp = new RegExp(String.raw`\b(${userDependentFun
 export const hasUserDependentExpressions = (nodeDef) =>
   getAllExpressions(nodeDef).some((expression) => userDependentFunctionsRegExp.test(expression))
 
+// True if any of the given expressions calls categoryItemProp(entityName, propName, ...) /
+// taxonProp(entityName, propName, ...) - matched by function name - referencing the given
+// category/taxonomy name, for one of the given (changed) extra prop names. A non-literal propName
+// argument (identifier, nested call...) can't be resolved statically, so it's conservatively treated
+// as a potential match rather than ruled out.
+const _referencesExtraPropChange = ({ expressions, functionName, entityName, changedPropNames }) =>
+  expressions.some((expression) =>
+    extractCallFirstTwoArgs(expression, functionName).some(
+      ([entityNameArg, propNameArg]) =>
+        entityNameArg === entityName && (propNameArg === null || changedPropNames.has(propNameArg))
+    )
+  )
+
+// True if nodeDef's value could be affected by a change to one of `changedPropNames` on the category
+// named `categoryName` - i.e. one of its value-affecting expressions calls
+// categoryItemProp(categoryName, propName, ...) with propName in changedPropNames (or unresolvable).
+export const referencesCategoryExtraProp =
+  ({ categoryName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValueAffectingExpressions(nodeDef),
+      functionName: functionNames.categoryItemProp,
+      entityName: categoryName,
+      changedPropNames,
+    })
+
+// Same as referencesCategoryExtraProp, for taxonProp(taxonomyName, propName, ...) calls.
+export const referencesTaxonomyExtraProp =
+  ({ taxonomyName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValueAffectingExpressions(nodeDef),
+      functionName: functionNames.taxonProp,
+      entityName: taxonomyName,
+      changedPropNames,
+    })
+
+// Same as referencesCategoryExtraProp/referencesTaxonomyExtraProp, but scanning only validation
+// expressions - used to trigger re-validation (not value recalculation) of node defs that only
+// reference a changed extra prop from a validation expression.
+export const referencesCategoryExtraPropInValidations =
+  ({ categoryName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValidationOnlyExpressionStrings(nodeDef),
+      functionName: functionNames.categoryItemProp,
+      entityName: categoryName,
+      changedPropNames,
+    })
+
+export const referencesTaxonomyExtraPropInValidations =
+  ({ taxonomyName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValidationOnlyExpressionStrings(nodeDef),
+      functionName: functionNames.taxonProp,
+      entityName: taxonomyName,
+      changedPropNames,
+    })
+
 export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClone, false)
 
 // code and taxon
 export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
 // file
 export const getFileNameExpression = getPropAdvanced(keysPropsAdvanced.fileNameExpression, '')
+export const getEnumeratingItemsExpression = getPropAdvanced(keysPropsAdvanced.enumeratingItemsExpression, '')
 
 // Advanced props - Analysis
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
@@ -759,6 +871,7 @@ export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
   !isMultiple(nodeDef) &&
   !isFile(nodeDef) &&
   !isGeo(nodeDef) &&
+  !isAnalysis(nodeDef) &&
   NodeDefLayout.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
 export const canIncludeInPreviousCycleLink = (cycle) => (nodeDef) =>
@@ -787,9 +900,11 @@ export const canShowGeotagInformation = (nodeDef) => getFileType(nodeDef) === fi
 export const canBeHiddenInReport = (nodeDef) =>
   [NodeDefType.boolean, NodeDefType.code, NodeDefType.taxon].includes(getType(nodeDef))
 
+export const canHaveAutoCreateMinCountItems = (nodeDef) => isMultipleEntity(nodeDef) && !isEnumerate(nodeDef)
+
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
-  if (!isMultipleEntity(nodeDefUpdated) && isAutoCreateMinCountItems(nodeDefUpdated)) {
+  if (!canHaveAutoCreateMinCountItems(nodeDefUpdated) && isAutoCreateMinCountItems(nodeDefUpdated)) {
     nodeDefUpdated = assocProp({ key: propKeys.autoCreateMinCountItems, value: false })(nodeDefUpdated)
   }
   // clear hidden if not applicable

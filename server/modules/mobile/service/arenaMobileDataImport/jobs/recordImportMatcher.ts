@@ -112,18 +112,13 @@ export const determineRecordAction = ({
     return { action: RecordImportAction.insert, existingRecordUuid: null }
   }
 
-  const recordUuid = Record.getUuid(record)
   const existingRecordUuid = Record.getUuid(existingRecordSummary)
-  const updatingExistingRecordWithSameUuid = recordUuid === existingRecordUuid
 
   if (conflictResolutionStrategy === ConflictResolutionStrategy.skipExisting) {
     return { action: RecordImportAction.skip, existingRecordUuid }
   }
 
-  if (
-    conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated ||
-    (conflictResolutionStrategy === ConflictResolutionStrategy.merge && updatingExistingRecordWithSameUuid)
-  ) {
+  if (conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated) {
     const willUpdate = Dates.isAfter(
       Record.getDateModified(record) as any,
       Record.getDateModified(existingRecordSummary) as any
@@ -132,6 +127,7 @@ export const determineRecordAction = ({
   }
 
   if (conflictResolutionStrategy === ConflictResolutionStrategy.merge) {
+    // applies both to a same-uuid record diverged on two clients, and to a different-uuid record matched by keys
     return { action: RecordImportAction.merge, existingRecordUuid }
   }
 

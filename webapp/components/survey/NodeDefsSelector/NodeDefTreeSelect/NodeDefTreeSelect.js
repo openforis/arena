@@ -21,6 +21,7 @@ const NodeDefTreeSelect = (props) => {
     onlyPages = false,
     onSelect,
     showExpandButton = true,
+    renderItemPrefix = undefined,
     renderItemSuffix = undefined,
   } = props
 
@@ -72,6 +73,7 @@ const NodeDefTreeSelect = (props) => {
         onExpandedItemKeysChange={setExpandedNodeDefUuids}
         onSelectedItemKeysChange={onSelectedTreeItemKeyChange}
         selectedItemKeys={selectedTreeItemKeys}
+        renderItemPrefix={renderItemPrefix}
         renderItemSuffix={renderItemSuffix}
       />
     </div>
@@ -91,6 +93,7 @@ NodeDefTreeSelect.propTypes = {
   onlyPages: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
   showExpandButton: PropTypes.bool,
+  renderItemPrefix: PropTypes.func,
   renderItemSuffix: PropTypes.func,
 }
 

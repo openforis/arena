@@ -15,7 +15,7 @@ import { useI18n } from '@webapp/store/system'
 import { ChainActions } from '@webapp/store/ui/chain'
 
 import { Button, ButtonCancel } from '@webapp/components/buttons'
-import { Dropdown } from '@webapp/components/form'
+import { Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 
@@ -29,6 +29,11 @@ type SurveyItem = {
   value: number
   label: string
   surveyInfo: object
+}
+
+type SurveyItemGroup = {
+  label: string
+  options: SurveyItem[]
 }
 
 type EntityCheckItem = {
@@ -49,13 +54,14 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
   const currentSurveyId = useSurveyId()
 
   const [loadingSurveys, setLoadingSurveys] = useState(true)
-  const [surveyItems, setSurveyItems] = useState<SurveyItem[]>([])
+  const [surveyItems, setSurveyItems] = useState<SurveyItemGroup[]>([])
   const [selectedSurveyItem, setSelectedSurveyItem] = useState<SurveyItem | null>(null)
   const [loadingChains, setLoadingChains] = useState(false)
   const [chainItems, setChainItems] = useState<ChainItem[]>([])
   const [selectedChainItem, setSelectedChainItem] = useState<ChainItem | null>(null)
   const [entityCheckItems, setEntityCheckItems] = useState<EntityCheckItem[]>([])
   const [loadingEntityCheck, setLoadingEntityCheck] = useState(false)
+  const [skipMissingEntities, setSkipMissingEntities] = useState(false)
 
   // Collect entity names from the current (target) survey.
   const targetEntityNames = useMemo(
@@ -72,91 +78,101 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
     [lang]
   )
 
-  // Load all surveys with at least one chain (server-side filtered), excluding current.
-  const loadSurveys = useCallback(async () => {
-    setLoadingSurveys(true)
-    try {
-      const [publishedSurveys, draftSurveys] = await Promise.all([
-        API.fetchSurveys({ draft: false, withChains: true }),
-        API.fetchSurveys({ draft: true, withChains: true }),
-      ])
-
-      // Deduplicate by survey id, exclude current survey.
-      const byId: Record<number, object> = {}
-      ;[...publishedSurveys, ...draftSurveys].forEach((surveyInfo) => {
-        const id = Survey.getIdSurveyInfo(surveyInfo)
-        if (id !== currentSurveyId) byId[id] = surveyInfo
-      })
-
-      const items: SurveyItem[] = Object.values(byId)
+  const buildSurveyItems = useCallback(
+    (surveys: object[]): SurveyItem[] =>
+      surveys
         .map((surveyInfo) => {
           const surveyLabel = Survey.getLabel(surveyInfo, lang)
           const surveyName = Survey.getName(surveyInfo)
           const label = surveyLabel && surveyLabel !== surveyName ? `${surveyLabel} [${surveyName}]` : surveyName
           return { value: Survey.getIdSurveyInfo(surveyInfo) as number, label, surveyInfo }
         })
-        .sort((a, b) => a.label.localeCompare(b.label))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [lang]
+  )
 
-      setSurveyItems(items)
+  // Load all surveys and published templates with at least one chain (server-side filtered),
+  // excluding current, grouped into "Surveys" and "Templates".
+  const loadSurveys = useCallback(async () => {
+    setLoadingSurveys(true)
+    try {
+      const [publishedSurveys, draftSurveys, publishedTemplates] = await Promise.all([
+        API.fetchSurveys({ draft: false, withChains: true }),
+        API.fetchSurveys({ draft: true, withChains: true }),
+        API.fetchSurveys({ draft: false, template: true, withChains: true }).catch(() => []),
+      ])
+
+      // Deduplicate regular surveys by id, exclude current survey.
+      const byId: Record<number, object> = {}
+      ;[...publishedSurveys, ...draftSurveys].forEach((surveyInfo) => {
+        const id = Survey.getIdSurveyInfo(surveyInfo)
+        if (id !== currentSurveyId) byId[id] = surveyInfo
+      })
+
+      const surveyGroupItems = buildSurveyItems(Object.values(byId))
+      const templateGroupItems = buildSurveyItems(
+        publishedTemplates.filter((surveyInfo: object) => Survey.getIdSurveyInfo(surveyInfo) !== currentSurveyId)
+      )
+
+      const groups: SurveyItemGroup[] = [
+        { label: i18n.t('appModules.surveys'), options: surveyGroupItems },
+        { label: i18n.t('appModules.templates'), options: templateGroupItems },
+      ].filter((group) => group.options.length > 0)
+
+      setSurveyItems(groups)
     } catch {
       setSurveyItems([])
     } finally {
       setLoadingSurveys(false)
     }
-  }, [currentSurveyId, lang])
+  }, [buildSurveyItems, currentSurveyId, i18n])
 
   useEffect(() => {
     loadSurveys()
   }, [loadSurveys])
 
-  // When a survey is selected, lazily fetch its chains.
+  // When a survey is selected, lazily fetch its chains (works for both regular surveys and
+  // published templates, since the endpoint below checks source-survey access itself).
   const onSurveyChange = useCallback(
     async (item: SurveyItem | null) => {
       setSelectedSurveyItem(item)
       setSelectedChainItem(null)
       setChainItems([])
       setEntityCheckItems([])
+      setSkipMissingEntities(false)
       if (!item) return
       setLoadingChains(true)
       try {
-        const { chains } = await API.fetchChains({ surveyId: item.value } as any)
+        const { chains } = await API.fetchChainsForCloneFromSurvey({
+          targetSurveyId: currentSurveyId,
+          sourceSurveyId: item.value,
+        } as any)
         setChainItems((chains as object[]).map((chain) => toChainItem(chain)))
       } finally {
         setLoadingChains(false)
       }
     },
-    [toChainItem]
+    [currentSurveyId, toChainItem]
   )
 
-  // When a chain is selected, check entity compatibility by fetching the source survey's
-  // full node defs (including analysis attributes).
+  // When a chain is selected, check entity compatibility using the source chain's analysis
+  // attributes' parent entity names (works for templates too, since fetching the source survey's
+  // full structure directly is membership-gated and unavailable for a non-member on a template).
   const onChainChange = useCallback(
     async (item: ChainItem | null) => {
       setSelectedChainItem(item)
       setEntityCheckItems([])
+      setSkipMissingEntities(false)
       if (!item || !selectedSurveyItem) return
       setLoadingEntityCheck(true)
       try {
-        const sourceSurvey = await API.fetchSurveyFull({
-          surveyId: selectedSurveyItem.value,
-          advanced: true,
-          includeAnalysis: true,
+        const { entityNames } = await API.fetchChainSourceEntityNames({
+          targetSurveyId: currentSurveyId,
+          sourceSurveyId: selectedSurveyItem.value,
+          sourceChainUuid: item.value,
         } as any)
-        const chainUuid = item.value
-        const sourceAnalysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(
-          (nd: object) => NodeDef.isAnalysis(nd) && NodeDef.getChainUuid(nd) === chainUuid
-        )
-        // Collect unique parent entity names.
-        const parentEntityNames: string[] = []
-        sourceAnalysisNodeDefs.forEach((nd: object) => {
-          const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey)
-          if (parentEntity) {
-            const name = NodeDef.getName(parentEntity)
-            if (!parentEntityNames.includes(name)) parentEntityNames.push(name)
-          }
-        })
         setEntityCheckItems(
-          parentEntityNames.map((entityName) => ({
+          (entityNames as string[]).map((entityName) => ({
             entityName,
             found: targetEntityNames.has(entityName),
           }))
@@ -165,11 +181,12 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
         setLoadingEntityCheck(false)
       }
     },
-    [selectedSurveyItem, targetEntityNames]
+    [currentSurveyId, selectedSurveyItem, targetEntityNames]
   )
 
   const allEntitiesFound = entityCheckItems.every((c) => c.found)
-  const confirmDisabled = !selectedSurveyItem || !selectedChainItem || loadingEntityCheck || !allEntitiesFound
+  const confirmDisabled =
+    !selectedSurveyItem || !selectedChainItem || loadingEntityCheck || (!allEntitiesFound && !skipMissingEntities)
 
   const onConfirm = useCallback(() => {
     if (!selectedSurveyItem || !selectedChainItem) return
@@ -177,11 +194,12 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
       ChainActions.cloneChainFromSurvey({
         sourceSurveyId: selectedSurveyItem.value,
         sourceChainUuid: selectedChainItem.value,
+        skipMissingEntityAttributes: skipMissingEntities,
         navigate,
       })
     )
     onClose()
-  }, [dispatch, navigate, onClose, selectedChainItem, selectedSurveyItem])
+  }, [dispatch, navigate, onClose, selectedChainItem, selectedSurveyItem, skipMissingEntities])
 
   return (
     <Modal
@@ -213,25 +231,36 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
 
         {selectedChainItem && !loadingEntityCheck && entityCheckItems.length > 0 && (
           <FormItem label={i18n.t('chainView.cloneFromAnotherSurveyDialog.entityCheck')}>
-            <div className="chain-clone-from-survey-dialog__entity-check-list">
-              {entityCheckItems.map(({ entityName, found }) => (
-                <div key={entityName} className={found ? 'found' : 'missing'}>
-                  <span
-                    className={`icon icon-12px ${
-                      found
-                        ? 'icon-checkmark chain-clone-from-survey-dialog__entity-icon--found'
-                        : 'icon-cross chain-clone-from-survey-dialog__entity-icon--missing'
-                    }`}
+            <div className="chain-clone-from-survey-dialog__entity-check-content">
+              <div className="chain-clone-from-survey-dialog__entity-check-list">
+                {entityCheckItems.map(({ entityName, found }) => (
+                  <div key={entityName} className={found ? 'found' : 'missing'}>
+                    <span
+                      className={`icon icon-12px ${
+                        found
+                          ? 'icon-checkmark chain-clone-from-survey-dialog__entity-icon--found'
+                          : 'icon-cross chain-clone-from-survey-dialog__entity-icon--missing'
+                      }`}
+                    />
+                    {entityName}
+                    {!found && (
+                      <span className="chain-clone-from-survey-dialog__entity-missing-label">
+                        {' '}
+                        ({i18n.t('chainView.cloneFromAnotherSurveyDialog.entityMissing')})
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {!allEntitiesFound && (
+                <div className="chain-clone-from-survey-dialog__skip-missing-checkbox-wrapper">
+                  <Checkbox
+                    checked={skipMissingEntities}
+                    label="chainView.cloneFromAnotherSurveyDialog.skipMissingEntities"
+                    onChange={setSkipMissingEntities}
                   />
-                  {entityName}
-                  {!found && (
-                    <span className="chain-clone-from-survey-dialog__entity-missing-label">
-                      {' '}
-                      ({i18n.t('chainView.cloneFromAnotherSurveyDialog.entityMissing')})
-                    </span>
-                  )}
                 </div>
-              ))}
+              )}
             </div>
           </FormItem>
         )}

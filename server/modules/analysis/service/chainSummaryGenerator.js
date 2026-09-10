@@ -149,11 +149,12 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
 
   const getCodeAttributeSummary = (key, codeAttrDef) => ({
     [key]: NodeDef.getName(codeAttrDef),
-    [`${key}Category`]: getCategoryNameByUuid({
-      survey,
-      categoryUuid: NodeDef.getCategoryUuid(codeAttrDef),
-    }),
-    [`${key}CategoryLevel`]: codeAttrDef ? Survey.getNodeDefCategoryLevelIndex(codeAttrDef)(survey) + 1 : '',
+    [`${key}Category`]:
+      codeAttrDef && NodeDef.isCode(codeAttrDef)
+        ? getCategoryNameByUuid({ survey, categoryUuid: NodeDef.getCategoryUuid(codeAttrDef) })
+        : '',
+    [`${key}CategoryLevel`]:
+      codeAttrDef && NodeDef.isCode(codeAttrDef) ? Survey.getNodeDefCategoryLevelIndex(codeAttrDef)(survey) + 1 : '',
   })
 
   const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })
@@ -167,16 +168,17 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     baseUnit: NodeDef.getName(baseUnitNodeDef),
     baseUnitEntityKeys,
     ...(samplingStrategySpecified ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
-    ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
-      ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
-      : {}),
     ...(ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(chainSamplingDesign)
       ? {
           phase1Category: getCategoryNameByUuid({
             survey,
             categoryUuid: ChainSamplingDesign.getFirstPhaseCategoryUuid(chainSamplingDesign),
           }),
+          phase1StratumAttribute: ChainSamplingDesign.getFirstPhaseCategoryExtraProp(chainSamplingDesign) ?? '',
         }
+      : {}),
+    ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
+      ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
       : {}),
     ...(ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(chainSamplingDesign)
       ? getCodeAttributeSummary('commonAttribute', firstPhaseCommonAttributeDef)

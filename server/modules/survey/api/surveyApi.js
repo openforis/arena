@@ -26,45 +26,50 @@ import * as SurveyService from '../service/surveyService'
 
 export const init = (app) => {
   // ==== CREATE
-  app.post('/survey', AuthMiddleware.requireSurveyCreatePermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const surveyReq = Request.getBody(req)
-      const { name, label, lang, cloneFrom = null, cloneFromCycle = null, template = false } = surveyReq
+  app.post(
+    '/survey',
+    AuthMiddleware.requireSurveyCreatePermission,
+    AuthMiddleware.requireSurveyCloneFromViewPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const surveyReq = Request.getBody(req)
+        const { name, label, lang, cloneFrom = null, cloneFromCycle = null, template = false } = surveyReq
 
-      const validation = cloneFrom
-        ? await SurveyService.validateSurveyClone({ newSurvey: surveyReq })
-        : await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
+        const validation = cloneFrom
+          ? await SurveyService.validateSurveyClone({ newSurvey: surveyReq })
+          : await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
 
-      if (Validation.isValid(validation)) {
-        const surveyInfoTarget = Survey.newSurvey({
-          ownerUuid: User.getUuid(user),
-          name,
-          label,
-          languages: [lang],
-          template,
-        })
-
-        if (cloneFrom) {
-          const job = SurveyService.cloneSurvey({
-            surveyId: cloneFrom,
-            cycle: cloneFromCycle,
-            surveyInfoTarget,
-            user,
-            res,
+        if (Validation.isValid(validation)) {
+          const surveyInfoTarget = Survey.newSurvey({
+            ownerUuid: User.getUuid(user),
+            name,
+            label,
+            languages: [lang],
+            template,
           })
+
+          if (cloneFrom) {
+            const job = SurveyService.cloneSurvey({
+              surveyId: cloneFrom,
+              cycle: cloneFromCycle,
+              surveyInfoTarget,
+              user,
+              res,
+            })
+            res.json({ job })
+            return
+          }
+          const job = SurveyService.startCreateSurveyJob({ user, surveyInfo: surveyInfoTarget })
           res.json({ job })
-          return
+        } else {
+          res.json({ validation })
         }
-        const job = SurveyService.startCreateSurveyJob({ user, surveyInfo: surveyInfoTarget })
-        res.json({ job })
-      } else {
-        res.json({ validation })
+      } catch (error) {
+        next(error)
       }
-    } catch (error) {
-      next(error)
     }
-  })
+  )
 
   // ==== READ
   app.get('/surveys', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
@@ -397,13 +402,28 @@ export const init = (app) => {
     }
   })
 
-  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
-    const { surveyId, cleanupRecords = false } = Request.getParams(req)
-    const user = Request.getUser(req)
+  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const {
+        surveyId,
+        cleanupRecords = false,
+        updateRecordValues = false,
+        skipDataUpdate = false,
+      } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-    const job = SurveyService.startPublishJob({ user, surveyId, cleanupRecords })
+      const { job, recordValuesUpdateWarning } = await SurveyService.startPublishJob({
+        user,
+        surveyId,
+        cleanupRecords,
+        updateRecordValues,
+        skipDataUpdate,
+      })
 
-    res.json({ job: JobUtils.jobToJSON(job) })
+      res.json(recordValuesUpdateWarning ? { recordValuesUpdateWarning } : { job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
   })
 
   app.put('/survey/:surveyId/unpublish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {

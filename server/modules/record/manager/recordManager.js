@@ -43,10 +43,10 @@ export const { generateRdbUpates, persistNodesToRDB } = NodeRdbManager
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
-    offset,
-    limit,
-    sortBy,
-    sortOrder,
+    offset = 0,
+    limit = undefined,
+    sortBy = undefined,
+    sortOrder = undefined,
     cycle: cycleParam = null,
     search = null,
     step = null,
@@ -167,9 +167,16 @@ export const countRecordsBySurveyId = async (
   )
 }
 
+// Cheap existence/count check across all cycles, without the survey/root-node-def/summary-defs
+// lookups the search-aware countRecordsBySurveyId above needs - used where only "does this survey
+// have any records at all" matters (e.g. the publish record-values-update warning check).
+export const countAllRecordsBySurveyId = async ({ surveyId }, client = db) =>
+  RecordRepository.countRecordsBySurveyId({ surveyId }, client)
+
 export {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordByUuid,
+  fetchRecordDateModified,
   fetchRecordsByUuids,
   fetchRecordsUuidAndCycle,
   fetchRecordCreatedCountsByDates,

@@ -33,8 +33,19 @@ export default {
   },
   editSelectedRecord: 'Editar registro seleccionado',
   filterAttributeTypes: 'Filtrar tipos de atributos',
+  filterAttributes: 'Filtrar atributos',
+  filterMessages: 'Filtrar mensajes',
+  messageTypeFilter: {
+    valueRequired: 'Valor obligatorio',
+    valueInvalid: 'Valor inválido',
+    uniqueDuplicate: 'Valor duplicado',
+    customValidation: 'Validación personalizada',
+    entityKeyDuplicate: 'Clave de entidad duplicada',
+    recordKeyDuplicate: 'Clave de registro duplicada',
+    nodesCount: 'Recuento de nodos',
+  },
   filterRecords: {
-    buttonTitle: 'Filtrar',
+    buttonTitle: 'Filtrar registros',
     expressionEditorHeader: 'Expresión para filtrar registros',
   },
   invalidRecord: 'Registro no válido',
@@ -42,6 +53,7 @@ export default {
     hide: 'Ocultar selector de definiciones de nodo',
     show: 'Mostrar selector de definiciones de nodo',
     nodeDefFrequency: '{{nodeDefLabel}} (frecuencia)',
+    searchPlaceholder: 'Buscar variable por nombre',
   },
   records: {
     clone: 'Clonar',

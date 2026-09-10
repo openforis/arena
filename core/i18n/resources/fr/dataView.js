@@ -35,8 +35,19 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
   },
   editSelectedRecord: "Modifier l'enregistrement sélectionné",
   filterAttributeTypes: "Filtrer les types d'attributs",
+  filterAttributes: 'Filtrer les attributs',
+  filterMessages: 'Filtrer les messages',
+  messageTypeFilter: {
+    valueRequired: 'Valeur requise',
+    valueInvalid: 'Valeur invalide',
+    uniqueDuplicate: 'Valeur en double',
+    customValidation: 'Validation personnalisée',
+    entityKeyDuplicate: "Clé d'entité en double",
+    recordKeyDuplicate: "Clé d'enregistrement dupliquée",
+    nodesCount: 'Nombre de nœuds',
+  },
   filterRecords: {
-    buttonTitle: 'Filtrer',
+    buttonTitle: 'Filtrer les enregistrements',
     expressionEditorHeader: 'Expression pour filtrer les enregistrements',
   },
   invalidRecord: 'Enregistrement invalide',
@@ -44,6 +55,7 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     hide: 'Masquer le sélecteur de définitions de nœud',
     show: 'Afficher le sélecteur de définitions de nœud',
     nodeDefFrequency: `{{nodeDefLabel}} (fréquence)`,
+    searchPlaceholder: 'Rechercher une variable par nom',
   },
   records: {
     clone: 'Cloner',

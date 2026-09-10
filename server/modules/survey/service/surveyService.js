@@ -21,6 +21,7 @@ import * as SurveyFileManager from '../manager/surveyFileManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import SurveyCreatorJob from './surveyCreateJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
+import { checkPublishRecordValuesUpdateWarning } from './publish/recordValuesUpdateWarning'
 import { SchemaSummaryExportJob } from './schemaSummary'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
@@ -48,14 +49,28 @@ export const fetchAndAssocStorageInfo = async ({ survey }) => {
 }
 
 // JOBS
-export const startPublishJob = ({ user, surveyId, cleanupRecords }) => {
+
+export const startPublishJob = async ({
+  user,
+  surveyId,
+  cleanupRecords,
+  updateRecordValues,
+  skipDataUpdate = false,
+}) => {
+  if (!updateRecordValues && !skipDataUpdate) {
+    const recordValuesUpdateWarning = await checkPublishRecordValuesUpdateWarning({ surveyId })
+    if (recordValuesUpdateWarning) {
+      return { recordValuesUpdateWarning }
+    }
+  }
+
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
-  const job = new SurveyPublishJob({ user, surveyId, cleanupRecords })
+  const job = new SurveyPublishJob({ user, surveyId, cleanupRecords, updateRecordValues, skipDataUpdate })
 
   JobManager.enqueueJob(job)
 
-  return job
+  return { job }
 }
 
 export const startUnpublishJob = (user, surveyId) => {
@@ -256,7 +271,7 @@ export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
 
 export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
   const summary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
-  const contentStream = await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileUuid })
+  const contentStream = await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileSummary: summary })
   return { summary, contentStream }
 }
 

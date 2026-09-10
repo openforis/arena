@@ -19,7 +19,7 @@ const keysExtra = {
 }
 
 const keysItem = {
-  location: 'location',
+  location: Category.locationItemExtraDefName,
 }
 
 const samplingPointDataZipEntryPath = 'sampling_design/sampling_design.csv'
@@ -29,7 +29,7 @@ class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
     super(
       {
         ...params,
-        [CategoryImportJobParams.keys.categoryName]: Survey.samplingPointDataCategoryName,
+        [CategoryImportJobParams.keys.categoryName]: Category.samplingPointDataCategoryName,
       },
       'SamplingPointDataImportInternalJob'
     )

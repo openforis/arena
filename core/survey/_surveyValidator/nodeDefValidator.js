@@ -176,6 +176,22 @@ const validateFileNameExpression = async (survey, nodeDef) => {
   return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
 }
 
+const validateEnumeratingItemsExpression = async (survey, nodeDef) => {
+  if (!NodeDef.isEntity(nodeDef) || !NodeDef.isEnumerate(nodeDef)) return null
+
+  const expression = NodeDef.getEnumeratingItemsExpression(nodeDef)
+  if (R.isEmpty(expression)) return null
+
+  const { validationResult } = await nodeDefExpressionValidator.validate({
+    survey,
+    nodeDefCurrent: nodeDef,
+    expression,
+    isContextParent: true,
+    selfReferenceAllowed: false,
+  })
+  return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
+}
+
 const validateColumnWidth =
   ({ survey }) =>
   (_propName, nodeDef) => {
@@ -264,6 +280,7 @@ const validateAdvancedProps = async (survey, nodeDef) => {
     [keysPropsAdvanced.formula]: validateVirtualEntityFormula(survey, nodeDef),
     [keysPropsAdvanced.itemsFilter]: validateItemsFilterExpression(survey, nodeDef),
     [keysPropsAdvanced.fileNameExpression]: validateFileNameExpression(survey, nodeDef),
+    [keysPropsAdvanced.enumeratingItemsExpression]: validateEnumeratingItemsExpression(survey, nodeDef),
   }
   const validationResultsArray = await Promise.all(Object.values(validatorsByProp))
   const validationResultsByProp = Object.keys(validatorsByProp).reduce((acc, prop, index) => {

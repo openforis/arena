@@ -54,6 +54,11 @@ export const getMaxSurveysUserCanCreate = (user: ArenaUser): number => {
 
 export const canViewSurvey = (user: ArenaUser, surveyInfo: ArenaSurvey): boolean =>
   User.isSystemAdmin(user) || _hasAuthGroupForSurvey({ user, surveyInfo })
+// Narrow, additive variant used only by chain-clone-from-survey: lets any authenticated user view a
+// published template as a clone source, without widening plain canViewSurvey (which also backs
+// record listing, RDB queries, activity log, and survey export via arena-server's middleware).
+export const canViewSurveyOrPublishedTemplate = (user: ArenaUser, surveyInfo: ArenaSurvey): boolean =>
+  canViewSurvey(user, surveyInfo) || Boolean(user && Survey.isTemplate(surveyInfo) && Survey.isPublished(surveyInfo))
 export const canExportSurvey = _hasSurveyPermission(permissions.recordAnalyse)
 export const canExportSurveysList = (user: ArenaUser): boolean => User.isSystemAdmin(user)
 export const canViewTemplates = (user: ArenaUser): boolean => User.isSystemAdmin(user)

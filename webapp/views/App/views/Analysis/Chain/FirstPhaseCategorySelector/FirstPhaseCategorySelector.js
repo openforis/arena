@@ -22,7 +22,7 @@ export const FirstPhaseCategorySelector = () => {
   }
 
   return (
-    <FormItem label="chainView.firstPhaseCategory">
+    <FormItem label="chainView.firstPhaseCategory" info="chainView.firstPhaseCategoryInfo">
       <CategorySelector
         categoryUuid={ChainSamplingDesign.getFirstPhaseCategoryUuid(samplingDesign)}
         onChange={onChange}

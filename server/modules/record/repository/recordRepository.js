@@ -541,12 +541,22 @@ export const fetchRecordCreatedCountsByUser = async (surveyId, cycle, from, to, 
 
 export const updateRecordDateModified = async ({ surveyId, recordUuid, dateModified = new Date() }, client = db) =>
   client.one(
-    `UPDATE ${getSchemaSurvey(surveyId)}.record 
+    `UPDATE ${getSchemaSurvey(surveyId)}.record
      SET date_modified = $2
      WHERE uuid = $1
     RETURNING ${recordSelectFields}`,
     [recordUuid, Dates.formatForStorage(dateModified)]
   )
+
+export const fetchRecordDateModified = async ({ surveyId, recordUuid }, client = db) => {
+  const row = await client.oneOrNone(
+    `SELECT ${DbUtils.selectDate('date_modified')}
+     FROM ${getSchemaSurvey(surveyId)}.record
+     WHERE uuid = $1`,
+    [recordUuid]
+  )
+  return row?.date_modified ? Dates.parseISO(row.date_modified) : null
+}
 
 export const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
   client.one(

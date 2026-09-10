@@ -36,6 +36,7 @@ const notificationTypeItems = [MessageNotificationType.Email, MessageNotificatio
 const targetUserTypeItems = [
   MessageTargetUserType.All,
   MessageTargetUserType.SystemAdmins,
+  MessageTargetUserType.SurveyAdmins,
   MessageTargetUserType.SurveyManagers,
   MessageTargetUserType.DataAnalysts,
   MessageTargetUserType.DataCleaners,

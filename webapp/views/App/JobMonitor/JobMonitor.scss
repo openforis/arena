@@ -24,6 +24,12 @@
     color: $orange;
     margin-top: 0.25rem;
   }
+
+  .job-monitor__canceled-by-admin-message {
+    font-size: 0.8rem;
+    color: $red;
+    margin-bottom: 0.5rem;
+  }
 }
 
 .app-job-monitor__job-errors {

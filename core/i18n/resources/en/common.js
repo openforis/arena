@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Active',
@@ -55,6 +57,7 @@ Do you want to ignore them?`,
     download: 'Download',
     draft: 'Draft',
     edit: 'Edit',
+    elapsed: 'Elapsed',
     email: 'Email',
     email_other: 'Emails',
     emailSentConfirmation: `An email to {{email}} has been sent.
@@ -159,9 +162,31 @@ Do you want to proceed?`,
 - Taxa cannot be deleted.
 
 **Are you sure you want to continue?**`,
+    publishRecordValuesUpdateConfirm: `#### Publishing {{survey}} will update data already recorded ####
+
+{{reasons}}
+
+This operation can permanently change or clear data already entered.
+
+To publish without updating the existing data instead, check "Skip data update" below (not recommended).`,
+    publishRecordValuesUpdateConfirmHeader: 'Existing record data will be updated',
+    publishRecordValuesUpdateConfirmOk: 'Publish and update data',
+    publishRecordValuesUpdateConfirmInputLabel: 'Type the survey name "{{strongConfirmRequiredText}}" to confirm',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'The following attributes will be modified, and their values in existing records will be automatically recalculated: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'The following attributes use an extra property of a category or taxonomy that changed, which will recalculate their value in existing records: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Skip data update',
+    publishSkipDataUpdateConfirmOk: 'Skip data update and publish',
+    publishSkipDataUpdateImplications: 'Skipping the data update means:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Existing records may no longer match with the new survey definition',
+    publishSkipDataUpdateImplicationStaleValues: "Affected values won't be recalculated until re-entered manually",
+    publishSkipDataUpdateImplicationChains: 'Processing chains using these attributes may produce outdated results',
     raiseTicketInSupportForum: `In case of problems please raise a ticket with a tag 'arena' in our <b>Support Forum</b>: $t(links.supportForum)`,
     record: 'Record',
     record_other: 'Records',
+    remaining: 'Remaining',
     remote: 'Remote',
     required: 'Required',
     requiredField: 'required field',
@@ -362,6 +387,8 @@ Try again?`,
 
     message: 'Message',
     message_plural: '$t(common.message_plural)',
+
+    jobMonitor: 'Job Monitor',
 
     help: 'Help',
     about: 'About',
@@ -740,10 +767,15 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     },
     downloadSummaryJSON: 'Download Summary (JSON)',
     firstPhaseCategory: '1st phase category',
+    firstPhaseCategoryInfo: 'Select the category that contains the first-phase samples.',
+    firstPhaseCategoryExtraProp: {
+      label: '1st phase stratum attribute',
+      info: 'Select the extra property of the $t(chainView.firstPhaseCategory) (column of the category table) used to divide the original population into broad strata for the initial sampling phase.',
+    },
     firstPhaseCommonAttribute: {
       label: 'Common attribute',
-      info: `Attribute in common between base unit and 1st phase table 
-(it must be a code attribute with the same name of an extra property defined for the 1st phase category)`,
+      info: `Attribute in common between base unit and 1st phase table
+(it must be a code or text attribute; its value is matched against the extra properties defined for the 1st phase category - the attribute name does not need to match the extra property name)`,
     },
     formLabel: 'Processing chain label',
     basic: 'Basic',
@@ -787,9 +819,15 @@ This might be a slow process.`,
       reportingAreaInfo: `With stratified sampling, give areas of strata within the stratum attribute's category table (column name 'area')`,
     },
     stratumAttribute: 'Stratum attribute',
+    stratumAttributeInfo: 'Select the variable used to stratify the sample.',
+    stratumAttribute2ndPhase: '2nd phase stratum attribute',
+    stratumAttribute2ndPhaseInfo:
+      'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample.',
     postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
     clusteringEntity: 'Clustering entity',
+    clusteringEntityInfo:
+      'The entity defining primary sampling units. Note: This is used exclusively for cluster analysis within the R survey package framework.',
     clusteringOnlyVariances: 'Clustering only for variances',
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
@@ -805,6 +843,7 @@ $t(common.cantUndoWarning)`,
       sourceChain: 'Source chain',
       entityCheck: 'Entity compatibility',
       entityMissing: 'missing in target survey',
+      skipMissingEntities: 'Skip analysis attributes for entities missing in the target survey',
       noAnalysisAttributes: 'This chain has no analysis attributes',
       cloneComplete: 'Chain cloned successfully',
       missingEntities: 'Cannot clone: the following entities do not exist in the target survey: {{entities}}',
@@ -969,6 +1008,7 @@ $t(common.appNameFull)
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       taxonVernacularName:
         'Returns the (first) vernacular (or local) name in the specified language of a taxon having the specified code',
+      unique: 'Returns the unique values of a multiple attribute or entity',
       userEmail: 'Returns the email of the logged in user',
       userIsRecordOwner:
         'Returns a boolean value "true" if the user editing the record is also its owner, "false" otherwise',
@@ -999,6 +1039,10 @@ $t(common.appNameFull)
       enumerate: {
         label: 'Enumerate',
         info: `The rows will be automatically generated using the category items associated to a code attribute marked as Key defined inside the entity; rows cannot be added or deleted and the key code attribute won't be editable`,
+      },
+      enumeratingItemsExpression: {
+        label: 'Enumerating items expression',
+        info: 'Optional expression that filters which category items are enumerated (e.g. unique(table_source.source_type)). When empty, all category items are used.',
       },
       enumerator: {
         label: 'Enumerator',
@@ -1252,10 +1296,13 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       noCategoriesAvailable: 'No categories available in the selected survey',
     },
     itemsCount: 'Items count',
+    structure: 'Structure',
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
       reportingData: 'Reporting Data',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Sampling Point Data',
     },
   },
 
@@ -1283,6 +1330,49 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     convertToSimpleCategory: {
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convert to Sampling Point Data',
+      confirmMessage: `Convert this category to the Sampling Point Data category?
+
+The category will be renamed to '${samplingPointDataCategoryName}' and a '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convert to GeoPackage category',
+      confirmMessage: `Convert this category to a GeoPackage category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this GeoPackage category to a simple category?
+
+The '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this Sampling Point Data category to a simple category?
+
+The category name will be cleared (you'll need to give it a new name), and the '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+    },
+    geoPackageCategory: 'This is a GeoPackage category',
+    samplingPointDataCategoryType: 'This is the Sampling Point Data category',
+    createCategory: {
+      menuLabel: 'Add category',
+      simple: 'Simple category',
+      otherTypes: 'More category types',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Sampling Point Data category',
+      message: `Create a new Sampling Point Data category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'GeoPackage category',
+      message: `Create a new GeoPackage category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
     deleteItem: 'Delete item',
     level: {
       title: 'Level {{levelPosition}}',
@@ -1306,6 +1396,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Category import summary',
     },
     reportingData: 'Reporting data',
+    exportToGeoPackage: 'Export to GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} item(s) without a valid location were skipped.',
     templateFor_samplingPointDataImport_csv: 'Template for Sampling Point Data import (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Template for Sampling Point Data import (Excel)',
   },

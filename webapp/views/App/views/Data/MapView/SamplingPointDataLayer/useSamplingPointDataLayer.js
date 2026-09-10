@@ -2,8 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
+import axios from 'axios'
 
-import { Arrays, PointFactory, Points } from '@openforis/arena-core'
+import { PointFactory, Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
@@ -17,7 +18,7 @@ import { LoaderActions } from '@webapp/store/ui'
 
 import { useMapClusters, useMapLayerToggle, useLayerColorPicker } from '../common'
 
-const itemsPageSize = 2000
+const itemsPageSize = 10000
 
 const _convertItemsToPoints = (items) => {
   const bounds = latLngBounds() // keep track of the layer bounds to calculate its center and pan the map into it
@@ -57,36 +58,35 @@ const _convertItemsToPoints = (items) => {
 }
 
 const _fetchItems = async ({ surveyId, levelIndex, fetchCancelRef, isMountedRef }) => {
-  const { request: countRequest, cancel: countCancel } = API.countSamplingPointData({ surveyId, levelIndex })
-
-  fetchCancelRef.current = countCancel
-
-  const {
-    data: { count },
-  } = await countRequest
-
-  fetchCancelRef.current = null
-
-  // load items in pages
   const items = []
-  const pagesCount = Math.ceil(count / itemsPageSize)
-  for (const currentPage of Arrays.fromNumberOfElements(pagesCount)) {
-    if (isMountedRef.current) {
-      const { request: itemsRequest, cancel: itemsFetchCancel } = API.fetchSamplingPointData({
-        surveyId,
-        levelIndex,
-        limit: itemsPageSize,
-        offset: currentPage * itemsPageSize,
-      })
+  let offset = 0
+  while (isMountedRef.current) {
+    const { request: itemsRequest, cancel: itemsFetchCancel } = API.fetchSamplingPointData({
+      surveyId,
+      levelIndex,
+      limit: itemsPageSize,
+      offset,
+    })
 
-      fetchCancelRef.current = itemsFetchCancel
+    fetchCancelRef.current = itemsFetchCancel
 
+    try {
       const {
         data: { items: itemsFetchedCurrent },
       } = await itemsRequest
 
-      items.push(...itemsFetchedCurrent)
+      if (itemsFetchedCurrent.length === 0) break
 
+      items.push(...itemsFetchedCurrent)
+      offset += itemsFetchedCurrent.length
+
+      if (itemsFetchedCurrent.length < itemsPageSize) break
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        break
+      }
+      throw error
+    } finally {
       fetchCancelRef.current = null
     }
   }

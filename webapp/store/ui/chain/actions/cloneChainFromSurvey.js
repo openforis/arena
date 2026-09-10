@@ -5,12 +5,17 @@ import { LoaderActions } from '@webapp/store/ui/loader'
 import { NotificationActions } from '@webapp/store/ui/notification'
 
 export const cloneChainFromSurvey =
-  ({ sourceSurveyId, sourceChainUuid, navigate }) =>
+  ({ sourceSurveyId, sourceChainUuid, skipMissingEntityAttributes = false, navigate }) =>
   async (dispatch, getState) => {
     dispatch(LoaderActions.showLoader())
     try {
       const surveyId = SurveyState.getSurveyId(getState())
-      const chain = await API.cloneChainFromSurvey({ targetSurveyId: surveyId, sourceSurveyId, sourceChainUuid })
+      const chain = await API.cloneChainFromSurvey({
+        targetSurveyId: surveyId,
+        sourceSurveyId,
+        sourceChainUuid,
+        skipMissingEntityAttributes,
+      })
       dispatch(SurveyActions.resetSurveyDefs())
       dispatch(NotificationActions.notifyInfo({ key: 'chainView.cloneFromAnotherSurveyDialog.cloneComplete' }))
       navigate(`${appModuleUri(analysisModules.chain)}${chain.uuid}/`)

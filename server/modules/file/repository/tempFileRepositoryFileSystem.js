@@ -37,3 +37,26 @@ export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = nul
   await endWriteStream(writeStream)
   return finalFilePath
 }
+
+const pendingImportFilePrefix = 'pendingImport_'
+const getPendingImportFileName = (fileId) => `${pendingImportFilePrefix}${fileId}`
+
+export const keepFileForLaterUse = async ({ fileId, filePath }) => {
+  const destPath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
+  await FileUtils.renameFile(filePath, destPath)
+}
+
+export const getKeptFilePath = async ({ fileId }) => {
+  const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
+  if (!FileUtils.exists(filePath)) {
+    return null
+  }
+  return filePath
+}
+
+export const deletePendingImportFileIfAny = async ({ fileId }) => {
+  const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
+  if (FileUtils.exists(filePath)) {
+    await FileUtils.deleteFileAsync(filePath)
+  }
+}

@@ -67,7 +67,7 @@ export const useBasicProps = (props) => {
     (NodeDef.canHaveAutoIncrementalKey({ nodeDef, nodeDefParent }) &&
       ancestorMultipleEntityDef &&
       !NodeDef.isRoot(ancestorMultipleEntityDef))
-  const canAutoCreateMinCountItems = NodeDef.isMultipleEntity(nodeDef)
+  const canAutoCreateMinCountItems = NodeDef.canHaveAutoCreateMinCountItems(nodeDef)
   const canIncludeInMultipleEntitySummary = NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
   const canBeQualifier = Survey.canNodeDefBeQualifier(nodeDef)(survey)
   const hasUserGroups = useHasSurveyUserGroups({ enabled: canBeQualifier })

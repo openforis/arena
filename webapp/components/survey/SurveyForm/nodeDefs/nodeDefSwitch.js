@@ -216,9 +216,11 @@ const NodeDefSwitch = (props) => {
     empty,
     entry,
     nodeDef,
+    onSortBy,
     parentNode,
     readOnly: readOnlyProp,
     renderType,
+    sortCriteria = [],
   } = props
 
   const dispatch = useDispatch()
@@ -356,7 +358,13 @@ const NodeDefSwitch = (props) => {
         <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
       )}
       {renderType === NodeDefLayout.renderType.tableHeader ? (
-        <NodeDefTableCellHeader nodeDef={nodeDef} label={label} lang={lang} />
+        <NodeDefTableCellHeader
+          nodeDef={nodeDef}
+          label={label}
+          lang={lang}
+          sortCriteria={sortCriteria}
+          onSortBy={onSortBy}
+        />
       ) : renderType === NodeDefLayout.renderType.tableBody ? (
         <NodeDefTableCellBody {...nestedComponentsProps} />
       ) : (
@@ -373,10 +381,12 @@ NodeDefSwitch.propTypes = {
   empty: PropTypes.bool,
   entry: PropTypes.bool,
   nodeDef: PropTypes.object.isRequired,
+  onSortBy: PropTypes.func,
   parentNode: PropTypes.object,
   preview: PropTypes.bool,
   readOnly: PropTypes.bool,
   renderType: PropTypes.string,
+  sortCriteria: PropTypes.array,
 }
 
 export default NodeDefSwitch

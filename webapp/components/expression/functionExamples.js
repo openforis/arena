@@ -34,6 +34,7 @@ const functionExamples = {
     [functionNames.recordOwnerRole]: 'recordOwnerRole()',
     [functionNames.taxonProp]: `taxonProp('taxonomy_name', 'extra_prop', taxon_attribute_name)`,
     [functionNames.taxonVernacularName]: `taxonVernacularName('taxonomy_name', 'swa', taxon_attribute_name)`,
+    [functionNames.unique]: `unique(multiple_attribute_name), unique(multiple_entity_name.entity_attribute_name), ...`,
     [functionNames.userEmail]: 'userEmail()',
     [functionNames.userIsRecordOwner]: 'userIsRecordOwner()',
     [functionNames.userName]: 'userName()',

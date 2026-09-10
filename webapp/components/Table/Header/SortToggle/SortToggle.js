@@ -9,7 +9,7 @@ const tooltipKeyByOrder = {
   desc: 'common.sortNone',
 }
 
-const SortToggle = ({ disabled = false, sort, field, handleSortBy }) => {
+const SortToggle = ({ disabled = false, sort, field, handleSortBy, priority = null }) => {
   const i18n = useI18n()
 
   const active = sort.by === field
@@ -31,6 +31,7 @@ const SortToggle = ({ disabled = false, sort, field, handleSortBy }) => {
       aria-pressed={active}
     >
       <span className="icon icon-play3 icon-10px arrow-toggle" />
+      {priority && <span className="btn-sort-toggle-priority">{priority}</span>}
     </button>
   )
 }
@@ -40,6 +41,7 @@ SortToggle.propTypes = {
   sort: PropTypes.object.isRequired,
   field: PropTypes.string.isRequired,
   handleSortBy: PropTypes.func.isRequired,
+  priority: PropTypes.number,
 }
 
 export default SortToggle

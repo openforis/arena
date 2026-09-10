@@ -38,6 +38,7 @@ export default {
     'Importation de données dans le mauvais formulaire. URI attendu : {{collectSurveyUri}}',
   invalidType: 'Type invalide {{type}}',
   jobCanceledOrErrorsFound: 'Tâche annulée ou erreurs trouvées ; annulation de la transaction',
+  jobOrphanedOnRestart: 'La tâche a été interrompue par un redémarrage du serveur. Veuillez réessayer.',
   paramIsRequired: 'Le paramètre {{param}} est requis',
   unableToFindParent: 'Impossible de trouver le parent de {{name}}',
   unableToFindNode: 'Impossible de trouver le nœud avec le nom {{name}}',
@@ -55,6 +56,7 @@ export default {
 Essayez de rafraîchir la page.`,
   survey: {
     nodeDefNameNotFound: 'Définition de nœud introuvable : {{name}}',
+    dataMigrationInProgress: 'Ce formulaire est en cours de mise à niveau ; veuillez réessayer sous peu.',
   },
   unsupportedFunctionType: 'Type de fonction non pris en charge : {{exprType}}',
   userHasPendingInvitation: `Il existe déjà une invitation en attente pour l'utilisateur avec l'email '{{email}}' ; il/elle ne peut pas être invité(e) à ce formulaire jusqu'à ce qu'elle soit acceptée`,

@@ -6,6 +6,7 @@ import dataImportView from './dataImportView'
 import dataView from './dataView'
 import homeView from './homeView'
 import jobs from './jobs'
+import jobMonitorView from './jobMonitorView'
 import messageView from './messageView'
 import surveyCreate from './surveyCreate'
 import surveyForm from './surveyForm'
@@ -23,6 +24,7 @@ export default {
   dataView,
   homeView,
   jobs,
+  jobMonitorView,
   messageView,
   surveyCreate,
   surveyForm,

@@ -47,7 +47,7 @@ const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
   const file = fileUuid ? await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid) : null
   if (file) {
     const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
-    const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid })
+    const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary: file })
     return { fileName, file, contentStream }
   } else {
     const error = new Error(`File not found for node ${nodeUuid}`)
@@ -348,9 +348,23 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/validationReport', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, offset, limit, cycle, recordUuid } = Request.getParams(req)
+      const { surveyId, offset, limit, cycle, recordUuid, sortBy, sortOrder } = Request.getParams(req)
+      const query = Request.getJsonParam(req, 'query')
+      const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
+      const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
 
-      const list = await RecordService.fetchValidationReport({ surveyId, cycle, offset, limit, recordUuid })
+      const list = await RecordService.fetchValidationReport({
+        surveyId,
+        cycle,
+        offset,
+        limit,
+        recordUuid,
+        query,
+        attributeDefUuids,
+        messageTypeKeys,
+        sortBy,
+        sortOrder,
+      })
 
       res.json({ list })
     } catch (error) {
@@ -361,8 +375,18 @@ export const init = (app) => {
   app.get('/survey/:surveyId/validationReport/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, recordUuid } = Request.getParams(req)
+      const query = Request.getJsonParam(req, 'query')
+      const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
+      const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
 
-      const count = await RecordService.countValidationReportItems({ surveyId, cycle, recordUuid })
+      const count = await RecordService.countValidationReportItems({
+        surveyId,
+        cycle,
+        recordUuid,
+        query,
+        attributeDefUuids,
+        messageTypeKeys,
+      })
 
       res.json({ count })
     } catch (error) {
@@ -377,6 +401,9 @@ export const init = (app) => {
       try {
         const user = Request.getUser(req)
         const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+        const query = Request.getJsonParam(req, 'query')
+        const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
+        const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
 
         const job = RecordService.startValidationReportGenerationJob({
           user,
@@ -384,6 +411,9 @@ export const init = (app) => {
           cycle,
           lang,
           recordUuid,
+          query,
+          attributeDefUuids,
+          messageTypeKeys,
           fileFormat,
         })
         res.json(JobUtils.jobToJSON(job))
@@ -613,13 +643,18 @@ export const init = (app) => {
     '/survey/:surveyId/record/:recordUuid/node/:nodeUuid',
     requireRecordEditPermission,
     requireRecordMatchesUserGroupQualifiers,
-    (req, res) => {
-      const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const socketId = Request.getSocketId(req)
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const socketId = Request.getSocketId(req)
 
-      RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset })
-      sendOk(res)
+        await RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset })
+
+        sendOk(res)
+      } catch (error) {
+        next(error)
+      }
     }
   )
 }

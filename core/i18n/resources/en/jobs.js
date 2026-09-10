@@ -1,5 +1,6 @@
 export default {
   ActivityLogImportJob: 'Activity Log Import',
+  AllSurveysDataMigrationJob: 'All Surveys Data Migration',
   ArenaMobileDataImportJob: 'Arena Data Import',
   ArenaMobileDataImportSummaryJob: 'Arena Data Import Summary',
   CategoriesImportJob: 'Categories Import',
@@ -70,6 +71,7 @@ export default {
   // survey backup
   SurveyInfoExportJob: 'Survey Info Export',
   CategoriesExportJob: 'Categories Export',
+  CategoryGeoPackageExportJob: 'Category GeoPackage Export',
   TaxonomiesExportJob: 'Taxonomies Export',
   RecordsExportJob: 'Records Export',
   RecordFilesExportJob: 'Record Files Export',
@@ -84,6 +86,4 @@ export default {
   RecordsValidationJob: `Records' validation`,
   // analysis
   PersistResultsJob: 'Persist Analysis Results',
-  elapsed: 'Elapsed',
-  remaining: 'Remaining',
 }

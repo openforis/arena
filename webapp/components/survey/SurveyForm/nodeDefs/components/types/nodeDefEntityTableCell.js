@@ -14,7 +14,7 @@ import NodeDefSwitch from '../../nodeDefSwitch'
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefEntityTableCellContent = (props) => {
-  const { children, fieldsLength, nodeDef, onResizeStart, onResizeStop, resizable, width } = props
+  const { children, fieldsLength, height, nodeDef, onResizeStart, onResizeStop, resizable, width } = props
 
   const className = 'survey-form__node-def-entity-table-cell-content'
   const testId = TestId.surveyForm.nodeDefEntityTableCellWrapper(NodeDef.getName(nodeDef))
@@ -31,13 +31,13 @@ const NodeDefEntityTableCellContent = (props) => {
       data-testid={testId}
       className={className}
       width={width}
-      height={40}
+      height={height}
       axis="x"
       handleSize={[25, 25]}
       onResizeStart={onResizeStart}
       onResizeStop={onResizeStop}
-      minConstraints={[NodeDefLayout.columnWidthMinPx * fieldsLength, 40]}
-      maxConstraints={[NodeDefLayout.columnWidthMaxPx * fieldsLength, 40]}
+      minConstraints={[NodeDefLayout.columnWidthMinPx * fieldsLength, height]}
+      maxConstraints={[NodeDefLayout.columnWidthMaxPx * fieldsLength, height]}
     >
       {children}
     </ResizableBox>
@@ -47,6 +47,7 @@ const NodeDefEntityTableCellContent = (props) => {
 NodeDefEntityTableCellContent.propTypes = {
   children: PropTypes.node.isRequired,
   fieldsLength: PropTypes.number.isRequired,
+  height: PropTypes.number,
   nodeDef: PropTypes.object.isRequired,
   onResizeStart: PropTypes.func.isRequired,
   onResizeStop: PropTypes.func.isRequired,
@@ -56,6 +57,7 @@ NodeDefEntityTableCellContent.propTypes = {
 
 const NodeDefEntityTableCell = (props) => {
   const {
+    columnHeaderHeight = null,
     draggable,
     gridSize = {},
     nodeDef,
@@ -103,6 +105,7 @@ const NodeDefEntityTableCell = (props) => {
       elemBottom >= gridTop && // Vertical visibility
       elemLeft <= gridRight &&
       elemRight >= gridLeft // Horizontal visibility
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(elemVisible)
   }, [gridSize])
 
@@ -136,6 +139,7 @@ const NodeDefEntityTableCell = (props) => {
     >
       <NodeDefEntityTableCellContent
         fieldsLength={fieldsLength}
+        height={columnHeaderHeight ?? undefined}
         nodeDef={nodeDef}
         onResizeStart={onResizeStart}
         onResizeStop={onResizeStop}
@@ -155,6 +159,7 @@ const NodeDefEntityTableCell = (props) => {
 }
 
 NodeDefEntityTableCell.propTypes = {
+  columnHeaderHeight: PropTypes.number,
   draggable: PropTypes.bool.isRequired, // true if the drag&drop is enabled
   nodeDef: PropTypes.object.isRequired,
   parentNode: PropTypes.object,

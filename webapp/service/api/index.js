@@ -16,14 +16,24 @@ export {
   deleteCategory,
   cleanupCategory,
   convertToReportingDataCategory,
+  convertToSamplingPointDataCategory,
+  convertToGeoPackageCategory,
   startExportAllCategoriesJob,
+  startExportCategoryToGeoPackageJob,
   startCategoriesBatchImportJob,
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
   updateCategoryItemProp,
   updateCategoryItemIndexes,
 } from './categories'
-export { fetchChains, getChainSummaryExportUrl, cloneChainFromSurvey, deleteChain } from './analysis'
+export {
+  fetchChains,
+  fetchChainsForCloneFromSurvey,
+  fetchChainSourceEntityNames,
+  getChainSummaryExportUrl,
+  cloneChainFromSurvey,
+  deleteChain,
+} from './analysis'
 
 export {
   fetchTaxonomies,
@@ -83,7 +93,7 @@ export {
   updateDataQuerySummary,
   deleteDataQuerySummary,
 } from './dataQuery'
-export { fetchActiveJob } from './job'
+export { cancelJob, fetchActiveJob, fetchAllJobs, fetchJob } from './job'
 export {
   fetchAvailableMapPeriods,
   fetchElevation,

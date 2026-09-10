@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Nome da categoria não especificado',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Já existe uma categoria de Dados de Ponto Amostral neste inventário; só pode haver uma.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Não é possível excluir itens de categoria publicados. Itens ausentes no arquivo importado: {{deletedItemCodes}}',

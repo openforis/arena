@@ -36,6 +36,7 @@ export default {
   importingDataIntoWrongCollectSurvey: 'Импорт данных в неверный опрос Collect. Ожидаемый URI: {{collectSurveyUri}}',
   invalidType: 'Неверный тип {{type}}',
   jobCanceledOrErrorsFound: 'Задача отменена или обнаружены ошибки; откат транзакции',
+  jobOrphanedOnRestart: 'Задача была прервана из-за перезапуска сервера. Повторите попытку.',
   paramIsRequired: 'Параметр {{param}} обязателен',
   unableToFindParent: 'Не удается найти родителя {{name}}',
   unableToFindNode: 'Не удается найти узел с именем {{name}}',
@@ -52,6 +53,7 @@ export default {
   sessionExpiredRefreshPage: 'Срок действия сеанса мог истечь.\nПопробуйте обновить страницу.',
   survey: {
     nodeDefNameNotFound: 'Определение узла не найдено: {{name}}',
+    dataMigrationInProgress: 'Это анкетирование обновляется; повторите попытку через некоторое время.',
   },
   unsupportedFunctionType: 'Неподдерживаемый тип функции: {{exprType}}',
   userHasPendingInvitation:

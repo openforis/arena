@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Activo',
@@ -54,6 +56,7 @@ export default {
     download: 'Descargar',
     draft: 'Borrador',
     edit: 'Editar',
+    elapsed: 'Transcurrido',
     email: 'Correo electrónico',
     email_other: 'Correos electrónicos',
     emailSentConfirmation:
@@ -137,10 +140,35 @@ export default {
     publish: 'Publicar',
     publishConfirm:
       '#### Está a punto de publicar la encuesta {{survey}} ####\n\n###### El proceso de publicación *eliminará permanentemente* la siguiente información ###### \n- Etiquetas asociadas a idiomas eliminados.\n- Registros asociados a ciclos eliminados.\n- Datos asociados a campos de formulario eliminados.\n\n###### Después de publicar: ###### \n- Los campos de formulario no se pueden cambiar de único a múltiple y viceversa.\n- Los códigos de elementos de categoría no se pueden cambiar.\n- Los elementos de categoría no se pueden eliminar.\n- Los códigos de taxonomía no se pueden cambiar.\n- Los taxones no se pueden eliminar.\n\n**¿Está seguro de que desea continuar?**',
+    publishRecordValuesUpdateConfirm: `#### Publicar {{survey}} actualizará datos ya registrados ####
+
+{{reasons}}
+
+Esta operación puede cambiar o borrar permanentemente datos ya introducidos.
+
+Para publicar sin actualizar los datos existentes, marque "Omitir actualización de datos" a continuación (no recomendado).`,
+    publishRecordValuesUpdateConfirmHeader: 'Se actualizarán los datos de los registros existentes',
+    publishRecordValuesUpdateConfirmOk: 'Publicar y actualizar datos',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Escriba el nombre de la encuesta "{{strongConfirmRequiredText}}" para confirmar',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Los siguientes atributos serán modificados, y sus valores en los registros existentes se recalcularán automáticamente: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Los siguientes atributos utilizan una propiedad adicional de una categoría o taxonomía que ha cambiado, lo que hará que se recalcule su valor en los registros existentes: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Omitir actualización de datos',
+    publishSkipDataUpdateConfirmOk: 'Omitir actualización de datos y publicar',
+    publishSkipDataUpdateImplications: 'Omitir la actualización de datos implica lo siguiente:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Los registros existentes pueden dejar de coincidir con la nueva definición de la encuesta',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Los valores afectados no se recalcularán hasta que se vuelvan a introducir manualmente',
+    publishSkipDataUpdateImplicationChains:
+      'Las cadenas de procesamiento que usan estos atributos pueden producir resultados desactualizados',
     raiseTicketInSupportForum:
       "En caso de problemas, por favor, abra un ticket con la etiqueta 'arena' en nuestro <b>Foro de soporte</b>: $t(links.supportForum)",
     record: 'Registro',
     record_other: 'Registros',
+    remaining: 'Restante',
     remote: 'Remoto',
     required: 'Requerido',
     requiredField: 'campo requerido',
@@ -323,6 +351,9 @@ export default {
     entities: 'Entidades virtuales',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Instancias',
+
+    jobMonitor: 'Monitor de trabajos',
+
     help: 'Ayuda',
     about: 'Acerca de',
     disclaimer: 'Descargo de responsabilidad',
@@ -606,9 +637,14 @@ export default {
     },
     downloadSummaryJSON: 'Descargar resumen (JSON)',
     firstPhaseCategory: 'Categoría de primera fase',
+    firstPhaseCategoryInfo: 'Seleccione la categoría que contiene las muestras de la primera fase.',
+    firstPhaseCategoryExtraProp: {
+      label: 'Atributo de estrato de 1ª fase',
+      info: 'Seleccione la variable utilizada para dividir la población original en estratos amplios para la fase inicial de muestreo.',
+    },
     firstPhaseCommonAttribute: {
       label: 'Atributo común',
-      info: 'Atributo común entre la unidad base y la tabla de primera fase (debe ser un atributo de código con el mismo nombre que una propiedad extra definida para la categoría de primera fase)',
+      info: 'Atributo común entre la unidad base y la tabla de primera fase (debe ser un atributo de código o de texto; su valor se compara con las propiedades adicionales definidas para la categoría de primera fase - el nombre del atributo no necesita coincidir con el de la propiedad adicional)',
     },
     formLabel: 'Etiqueta de cadena de procesamiento',
     basic: 'Básico',
@@ -653,9 +689,15 @@ export default {
       reportingAreaInfo: `Con muestreo estratificado, proporcione las áreas de los estratos en la tabla de categorías del atributo de estrato (nombre de la columna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
+    stratumAttributeInfo: 'Seleccione la variable utilizada para estratificar la muestra.',
+    stratumAttribute2ndPhase: 'Atributo de estrato de 2ª fase',
+    stratumAttribute2ndPhaseInfo:
+      'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada.',
     postStratificationAttribute: 'Atributo de postestratificación',
     areaWeightingMethod: 'Método de ponderación de área',
     clusteringEntity: 'Entidad de agrupación',
+    clusteringEntityInfo:
+      'La entidad que define las unidades primarias de muestreo. Nota: se utiliza exclusivamente para el análisis de conglomerados dentro del marco del paquete R survey.',
     clusteringOnlyVariances: 'Agrupación solo para varianzas',
     errorNoLabel: 'La cadena debe tener una etiqueta válida',
     dateExecuted: 'Fecha de ejecución',
@@ -669,6 +711,7 @@ export default {
       sourceChain: 'Cadena de origen',
       entityCheck: 'Compatibilidad de entidades',
       entityMissing: 'falta en el estudio destino',
+      skipMissingEntities: 'Omitir atributos de análisis de entidades que faltan en el estudio destino',
       noAnalysisAttributes: 'Esta cadena no tiene atributos de análisis',
       cloneComplete: 'Cadena clonada correctamente',
       missingEntities: 'No se puede clonar: las siguientes entidades no existen en el estudio destino: {{entities}}',
@@ -818,6 +861,7 @@ $t(common.appNameFull)
         'Devuelve el valor de la $t(extraProp.label) especificada de un taxón que tiene el código especificado',
       taxonVernacularName:
         'Devuelve el (primer) nombre vernáculo (o local) en el idioma especificado de un taxón que tiene el código especificado',
+      unique: 'Devuelve los valores únicos de un atributo o entidad múltiple',
       userEmail: 'Devuelve el correo electrónico del usuario que ha iniciado sesión',
       userIsRecordOwner:
         'Devuelve un valor booleano "verdadero" si el usuario que edita el registro también es su propietario, "falso" en caso contrario',
@@ -1093,10 +1137,13 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       noCategoriesAvailable: 'No hay categorías disponibles en la encuesta seleccionada',
     },
     itemsCount: 'Recuento de elementos',
+    structure: 'Estructura',
     types: {
       flat: 'Plana',
       hierarchical: 'Jerárquica',
       reportingData: 'Datos de informes',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Datos de puntos de muestreo',
     },
   },
   categoryEdit: {
@@ -1118,6 +1165,37 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     convertToSimpleCategory: {
       confirmMessage: '¿Convertir esta categoría de datos de informes a una categoría simple?',
+    },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convertir a Datos de puntos de muestreo',
+      confirmMessage: `¿Convertir esta categoría en la categoría de Datos de puntos de muestreo?\n\nLa categoría se renombrará a '${samplingPointDataCategoryName}' y se añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convertir a categoría GeoPackage',
+      confirmMessage: `¿Convertir esta categoría en una categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convertir a categoría simple',
+      confirmMessage: `¿Convertir esta categoría GeoPackage en una categoría simple?\n\nSe desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convertir a categoría simple',
+      confirmMessage: `¿Convertir esta categoría de Datos de puntos de muestreo en una categoría simple?\n\nSe borrará el nombre de la categoría (deberá asignarle uno nuevo), y se desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
+    },
+    geoPackageCategory: 'Esta es una categoría GeoPackage',
+    samplingPointDataCategoryType: 'Esta es la categoría de Datos de puntos de muestreo',
+    createCategory: {
+      menuLabel: 'Añadir categoría',
+      simple: 'Categoría simple',
+      otherTypes: 'Más tipos de categoría',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Categoría de Datos de puntos de muestreo',
+      message: `¿Crear una nueva categoría de Datos de puntos de muestreo?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Categoría GeoPackage',
+      message: `¿Crear una nueva categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     deleteItem: 'Eliminar elemento',
     level: {
@@ -1141,6 +1219,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       title: 'Resumen de importación de categoría',
     },
     reportingData: 'Datos de informes',
+    exportToGeoPackage: 'Exportar a GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} elemento(s) sin una ubicación válida fueron omitidos.',
     templateFor_samplingPointDataImport_csv: 'Plantilla para importación de datos de puntos de muestreo (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Plantilla para importación de datos de puntos de muestreo (Excel)',
   },

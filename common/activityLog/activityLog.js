@@ -17,6 +17,7 @@ export const type = {
   nodeDefUpdate: 'nodeDefUpdate',
   nodeDefMarkDeleted: 'nodeDefMarkDeleted',
   nodeDefConversion: 'nodeDefConversion',
+  nodeDefNodesDelete: 'nodeDefNodesDelete', // System
 
   // Category
   categoryInsert: 'categoryInsert',
@@ -31,6 +32,8 @@ export const type = {
   categoryItemDelete: 'categoryItemDelete',
   categoryImport: 'categoryImport',
   categoryConvertToReportingData: 'categoryConvertToReportingData',
+  categoryConvertToSamplingPointData: 'categoryConvertToSamplingPointData',
+  categoryConvertToGeoPackage: 'categoryConvertToGeoPackage',
 
   // Taxonomy
   taxonomyCreate: 'taxonomyCreate',

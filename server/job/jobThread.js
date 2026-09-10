@@ -22,7 +22,7 @@ class JobThread extends Thread {
         this.sendJobToParentThread()
         break
       case jobThreadMessageTypes.cancelJob:
-        await this.job.cancel()
+        await this.job.cancel({ canceledByAdmin: msg.canceledByAdmin })
         break
       default:
         logger.error(`Skipping unknown message type: ${msg.type}`)

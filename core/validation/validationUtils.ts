@@ -90,13 +90,34 @@ const getFieldValidationMessage =
     }
   }
 
+// A well-formed fields-map only ever holds nested Validation instances ({ valid, errors, warnings,
+// fields }) - a "key" property directly on the map itself means it's actually a bare ValidationResult
+// ({ key, params }) sitting where a fields-map was expected (e.g. a job error persisted without going
+// through Job.addError's { error: { valid, errors: [...] } } wrapping). Detect that and normalize it
+// under a synthetic "error" field, matching the addError convention, instead of iterating the
+// ValidationResult's own "key"/"params" properties as if they were field names.
+const isBareValidationResult = (fields: ReturnType<typeof Validation.getFieldValidations>): boolean =>
+  typeof (fields as unknown as ValidationResult.ValidationResultInstance)?.[ValidationResult.keys.key] === 'string'
+
+const getNormalizedFieldValidations = (
+  validation: Validation.ValidationInstance
+): ReturnType<typeof Validation.getFieldValidations> => {
+  const fields = Validation.getFieldValidations(validation)
+  if (isBareValidationResult(fields)) {
+    return {
+      error: Validation.newInstance(false, {}, [fields as unknown as ValidationResult.ValidationResultInstance]),
+    }
+  }
+  return fields
+}
+
 const getJointMessages =
   ({ i18n, survey, showKeys = true }: { i18n: I18n; survey: unknown; showKeys?: boolean }) =>
   (validation: Validation.ValidationInstance): { severity: ValidationResult.Severity; text: string }[] => {
     const messages: { severity: ValidationResult.Severity; text: string }[] = []
 
     // Add messages from fields
-    Object.entries(Validation.getFieldValidations(validation)).forEach(([field, childValidation]) => {
+    Object.entries(getNormalizedFieldValidations(validation)).forEach(([field, childValidation]) => {
       const { severity, text } = getFieldValidationMessage({ survey, field, i18n })(childValidation)
       const textPrefix = showKeys ? `${i18n.t(field)}: ` : ''
       messages.push({ severity, text: `${textPrefix}${text}` })

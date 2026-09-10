@@ -1,6 +1,6 @@
 {
   "name": "open-foris-arena",
-  "version": "2.7.1",
+  "version": "2.8.2",
   "license": "MIT",
   "engines": {
     "node": "^24.11.1"
@@ -29,7 +29,7 @@
     "test:load": "node --experimental-strip-types test/load/surveyImportStressTest.ts",
     "test:load:unit": "node --experimental-strip-types --test test/load/**/*.test.ts",
     "test:load:build-fixture": "node --experimental-strip-types test/load/buildSampleSurveyZip.ts",
-    "test": "run-s test:unit test:e2e",
+    "test": "run-s test:unit test:e2e test:integration",
     "typecheck": "tsc --noEmit",
     "test:docker": "test/bin/testExecDocker.sh",
     "preversion": "git diff --quiet || { echo \"Working directory is dirty\"; exit 1; }; yarn test:docker",
@@ -54,6 +54,7 @@
     "@babel/register": "^7.28.6",
     "@babel/runtime-corejs3": "^7.28.6",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
+    "@types/geojson": "^7946.0.16",
     "@types/jest": "^27.5.2",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^24.10.0",
@@ -114,7 +115,7 @@
     "@ai-sdk/anthropic": "^2",
     "@ai-sdk/google": "^2",
     "@ai-sdk/openai": "^2",
-    "@aws-sdk/client-s3": "^3.975.0",
+    "@aws-sdk/client-s3": "^3.1112.0",
     "@codemirror/autocomplete": "^6.20.0",
     "@codemirror/lang-javascript": "^6.2.4",
     "@emotion/react": "^11.14.0",
@@ -124,7 +125,8 @@
     "@mui/x-data-grid": "^8.26.0",
     "@mui/x-date-pickers": "^8.26.0",
     "@mui/x-tree-view": "^8.26.0",
-    "@openforis/arena-server": "^2.1.1",
+    "@ngageoint/geopackage": "^4.2.9",
+    "@openforis/arena-server": "^2.2.8",
     "@reduxjs/toolkit": "^2.11.2",
     "@sendgrid/mail": "^8.1.6",
     "@shopify/draggable": "^1.2.1",
@@ -242,5 +244,5 @@
   "lint-staged": {
     "{common,core,server,test,webapp}/**/*.{js,jsx,ts,tsx}": "eslint --cache --fix"
   },
-  "packageManager": "yarn@4.17.1"
+  "packageManager": "yarn@4.18.0"
 }

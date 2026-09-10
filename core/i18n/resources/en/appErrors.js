@@ -34,6 +34,7 @@ export default {
   importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
   invalidType: 'Invalid type {{type}}',
   jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
+  jobOrphanedOnRestart: 'The job was interrupted by a server restart. Please try again.',
   paramIsRequired: 'Param {{param}} is required',
   unableToFindParent: 'Unable to find parent of {{name}}',
   unableToFindNode: 'Unable to find node with name {{name}}',
@@ -55,6 +56,7 @@ export default {
 Try to refresh the page.`,
   survey: {
     nodeDefNameNotFound: 'Node definition not found: {{name}}',
+    dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
   },
   unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
   // AI gateway errors

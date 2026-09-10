@@ -35,8 +35,19 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
   },
   editSelectedRecord: 'Edit selected record',
   filterAttributeTypes: 'Filter attribute types',
+  filterAttributes: 'Filter attributes',
+  filterMessages: 'Filter messages',
+  messageTypeFilter: {
+    valueRequired: 'Required value',
+    valueInvalid: 'Invalid value',
+    uniqueDuplicate: 'Duplicate value',
+    customValidation: 'Custom validation',
+    entityKeyDuplicate: 'Duplicate entity key',
+    recordKeyDuplicate: 'Duplicate record key',
+    nodesCount: 'Node count',
+  },
   filterRecords: {
-    buttonTitle: 'Filter',
+    buttonTitle: 'Filter records',
     expressionEditorHeader: 'Expression to filter records',
   },
   invalidRecord: 'Invalid record',
@@ -44,6 +55,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     hide: 'Hide Node Definitions Selector',
     show: 'Show Node Definitions Selector',
     nodeDefFrequency: `{{nodeDefLabel}} (frequency)`,
+    searchPlaceholder: 'Search variable by name',
   },
   records: {
     clone: 'Clone',

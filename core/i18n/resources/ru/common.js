@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Активно',
@@ -53,6 +55,7 @@ export default {
     download: 'Скачать',
     draft: 'Черновик',
     edit: 'Редактировать',
+    elapsed: 'Прошедшее время',
     email: 'Электронная почта',
     email_other: 'Электронные письма',
     emailSentConfirmation: `Письмо на адрес {{email}} отправлено.
@@ -153,9 +156,34 @@ export default {
 - Таксоны нельзя будет удалить.
 
 **Вы уверены, что хотите продолжить?**`,
+    publishRecordValuesUpdateConfirm: `#### Публикация {{survey}} обновит уже записанные данные ####
+
+{{reasons}}
+
+Эта операция может безвозвратно изменить или удалить уже введённые данные.
+
+Чтобы опубликовать без обновления существующих данных, отметьте «Пропустить обновление данных» ниже (не рекомендуется).`,
+    publishRecordValuesUpdateConfirmHeader: 'Данные существующих записей будут обновлены',
+    publishRecordValuesUpdateConfirmOk: 'Опубликовать и обновить данные',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Введите название анкеты "{{strongConfirmRequiredText}}" для подтверждения',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Следующие атрибуты будут изменены, и их значения в существующих записях будут автоматически пересчитаны: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Следующие атрибуты используют дополнительное свойство категории или таксономии, которое изменилось, из-за чего их значение будет пересчитано в существующих записях: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Пропустить обновление данных',
+    publishSkipDataUpdateConfirmOk: 'Пропустить обновление данных и опубликовать',
+    publishSkipDataUpdateImplications: 'Пропуск обновления данных означает следующее:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Существующие записи могут перестать соответствовать новому определению анкеты',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Затронутые значения не будут пересчитаны, пока не будут введены заново вручную',
+    publishSkipDataUpdateImplicationChains:
+      'Цепочки обработки, использующие эти атрибуты, могут выдавать устаревшие результаты',
     raiseTicketInSupportForum: `В случае проблем, пожалуйста, создайте заявку с тегом 'arena' на нашем <b>Форуме поддержки</b>: $t(links.supportForum)`,
     record: 'Запись',
     record_other: 'Записи',
+    remaining: 'Оставшееся время',
     remote: 'Удаленно',
     required: 'Обязательно',
     requiredField: 'обязательное поле',
@@ -352,6 +380,8 @@ export default {
     entities: 'Виртуальные сущности',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Экземпляры',
+
+    jobMonitor: 'Монитор заданий',
 
     help: 'Помощь',
     about: 'О программе',
@@ -714,10 +744,15 @@ $t(common.raiseTicketInSupportForum)
     },
     downloadSummaryJSON: 'Скачать сводку (JSON)',
     firstPhaseCategory: 'Категория 1-й фазы',
+    firstPhaseCategoryInfo: 'Выберите категорию, содержащую выборки 1-й фазы.',
+    firstPhaseCategoryExtraProp: {
+      label: 'Атрибут страты 1-й фазы',
+      info: 'Выберите переменную, используемую для разделения исходной совокупности на широкие страты для начальной фазы выборки.',
+    },
     firstPhaseCommonAttribute: {
       label: 'Общий атрибут',
       info: `Атрибут, общий для базовой единицы и таблицы 1-й фазы
-(это должен быть кодовый атрибут с тем же именем, что и дополнительное свойство, определенное для категории 1-й фазы)`,
+(это должен быть атрибут типа "код" или "текст"; его значение сопоставляется с дополнительными свойствами, определенными для категории 1-й фазы — имя атрибута не обязательно должно совпадать с именем дополнительного свойства)`,
     },
     formLabel: 'Метка цепочки обработки',
     basic: 'Основное',
@@ -761,9 +796,13 @@ $t(common.raiseTicketInSupportForum)
       reportingAreaInfo: `При стратифицированной выборке укажите площади страт в таблице категорий атрибута страты (название столбца 'area')`,
     },
     stratumAttribute: 'Атрибут страты',
+    stratumAttributeInfo: 'Выберите переменную, используемую для стратификации выборки.',
+    stratumAttribute2ndPhase: 'Атрибут страты 2-й фазы',
+    stratumAttribute2ndPhaseInfo: `Выберите переменную, используемую для подразделения выборки 1-й фазы на страты перед формированием окончательной детальной подвыборки.`,
     postStratificationAttribute: 'Атрибут послестратификации',
     areaWeightingMethod: 'Метод взвешивания по площади',
     clusteringEntity: 'Сущность кластеризации',
+    clusteringEntityInfo: `Сущность, определяющая первичные единицы выборки. Примечание: используется исключительно для кластерного анализа в рамках пакета R survey.`,
     clusteringOnlyVariances: 'Кластеризация только для дисперсий',
     errorNoLabel: 'Цепочка должна иметь допустимую метку',
     dateExecuted: 'Дата выполнения',
@@ -779,6 +818,7 @@ $t(common.cantUndoWarning)`,
       sourceChain: 'Исходная цепочка',
       entityCheck: 'Совместимость сущностей',
       entityMissing: 'отсутствует в целевом опросе',
+      skipMissingEntities: 'Пропустить атрибуты анализа для сущностей, отсутствующих в целевом опросе',
       noAnalysisAttributes: 'Эта цепочка не имеет атрибутов анализа',
       cloneComplete: 'Цепочка успешно клонирована',
       missingEntities: 'Невозможно клонировать: следующие сущности не существуют в целевом опросе: {{entities}}',
@@ -940,6 +980,7 @@ $t(common.appNameFull)
       taxonProp: 'Возвращает значение указанного $t(extraProp.label) таксона с указанным кодом',
       taxonVernacularName:
         'Возвращает (первое) народное (или местное) название на указанном языке таксона с указанным кодом',
+      unique: 'Возвращает уникальные значения множественного атрибута или сущности',
       userEmail: 'Возвращает email вошедшего в систему пользователя',
       userIsRecordOwner:
         'Возвращает логическое значение "true", если пользователь, редактирующий запись, также является ее владельцем, "false" в противном случае',
@@ -1224,10 +1265,13 @@ $t(common.appNameFull)
       noCategoriesAvailable: 'В выбранном опросе нет доступных категорий',
     },
     itemsCount: 'Количество элементов',
+    structure: 'Структура',
     types: {
       flat: 'Плоская',
       hierarchical: 'Иерархическая',
       reportingData: 'Отчетные данные',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Данные точек выборки',
     },
   },
 
@@ -1255,6 +1299,49 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Преобразовать эту категорию отчетных данных в простую категорию?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Преобразовать в данные точек выборки',
+      confirmMessage: `Преобразовать эту категорию в категорию данных точек выборки?
+
+Категория будет переименована в '${samplingPointDataCategoryName}', и к элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Преобразовать в категорию GeoPackage',
+      confirmMessage: `Преобразовать эту категорию в категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию GeoPackage в простую категорию?
+
+Дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию данных точек выборки в простую категорию?
+
+Имя категории будет очищено (вам нужно будет присвоить ей новое имя), а дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    geoPackageCategory: 'Это категория GeoPackage',
+    samplingPointDataCategoryType: 'Это категория данных точек выборки',
+    createCategory: {
+      menuLabel: 'Добавить категорию',
+      simple: 'Простая категория',
+      otherTypes: 'Другие типы категорий',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Категория данных точек выборки',
+      message: `Создать новую категорию данных точек выборки?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Категория GeoPackage',
+      message: `Создать новую категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
     deleteItem: 'Удалить элемент',
     level: {
       title: 'Уровень {{levelPosition}}',
@@ -1278,6 +1365,8 @@ $t(common.cantUndoWarning)`,
       title: 'Сводка импорта категорий',
     },
     reportingData: 'Отчетные данные',
+    exportToGeoPackage: 'Экспорт в GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} элемент(ов) без действительного местоположения были пропущены.',
     templateFor_samplingPointDataImport_csv: 'Шаблон для импорта данных точек выборки (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Шаблон для импорта данных точек выборки (Excel)',
   },
