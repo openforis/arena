@@ -73,6 +73,22 @@ export default class NodeDefsImportJob extends Job {
 
     await OdkImportReportManager.insertItems({ surveyId, items: this.reportItems }, this.tx)
 
+    // Persisted so a later data-import run (a separate job, possibly a separate session entirely) can
+    // resolve an ODK submission's element paths to Arena NodeDefs without re-deriving names, which the
+    // NodeDefUniqueNameGenerator may have changed from the raw XForm element name (dedup/keyword clash).
+    const pathToNodeDefUuid: Record<string, string> = {}
+    this.nodeDefsByXFormPath.forEach((nodeDef, path) => {
+      pathToNodeDefUuid[path] = NodeDef.getUuid(nodeDef)
+    })
+    await SurveyManager.updateSurveyProp(
+      this.user,
+      surveyId,
+      Survey.infoKeys.odkNodeDefsInfoByPath,
+      pathToNodeDefUuid,
+      true,
+      this.tx
+    )
+
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle: Survey.cycleOneKey, draft: true, advanced: true },
       this.tx

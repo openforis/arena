@@ -139,6 +139,7 @@ export const {
   getCollectNodeDefsInfoByPath,
   hasCollectReportIssues,
   getOdkFormId,
+  getOdkNodeDefsInfoByPath,
   getOwnerName,
   getOwnerUuid,
   getAppVersion,
