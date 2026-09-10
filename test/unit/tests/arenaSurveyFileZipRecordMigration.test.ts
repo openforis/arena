@@ -13,7 +13,7 @@ const legacyRecord = {
 const migratedRecord = {
   uuid: recordUuid,
   nodes: {
-    1: { iId: 1, pIId: null, recordUuid, nodeDefUuid: 'cluster-def-uuid', meta: { h: [] } },
+    1: { iId: 1, recordUuid, nodeDefUuid: 'cluster-def-uuid', meta: { h: [] } },
   },
   lastNodeInternalId: 1,
 }
@@ -31,7 +31,7 @@ describe('ArenaSurveyFileZip.getRecord', () => {
     const [node]: any[] = Object.values(record.nodes)
     expect(node.uuid).toBeUndefined()
     expect(node.iId).toBe(1)
-    expect(node.pIId).toBeNull()
+    expect(node.pIId).toBeUndefined()
   })
 
   test('leaves an already-migrated record unchanged', async () => {

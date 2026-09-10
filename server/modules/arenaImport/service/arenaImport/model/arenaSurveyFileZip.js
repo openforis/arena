@@ -1,4 +1,4 @@
-import { isLegacyNodeFormat, migrateRecordToInternalIds } from '@core/record/recordNodeIdMigration'
+import { RecordFixer } from '@openforis/arena-core'
 
 import { ExportFile } from '@server/modules/survey/service/surveyExport/exportFile'
 
@@ -47,7 +47,9 @@ export const getRecord = async (zipFile, recordUuid) => {
   // migration still links nodes by uuid/parentUuid; every consumer of this getter (mobile live
   // sync, mobile import preview, and a full backup restore alike) expects the current iId/pIId
   // shape, so convert it here once rather than at every call site.
-  if (record && isLegacyNodeFormat(record)) return migrateRecordToInternalIds(record)
+  if (record && RecordFixer.isLegacyNodeFormat(record)) {
+    return RecordFixer.initInternalIds({ record, nodes: Object.values(record.nodes) })
+  }
   return record
 }
 

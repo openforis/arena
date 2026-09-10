@@ -3507,7 +3507,7 @@ __metadata:
 
 "@openforis/arena-core@file:../arena-core::locator=open-foris-arena%40workspace%3A.":
   version: 2.2.2
-  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=8de9aa&locator=open-foris-arena%40workspace%3A."
+  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=24997e&locator=open-foris-arena%40workspace%3A."
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     "@turf/bearing": "npm:^7.3.5"
@@ -3523,7 +3523,7 @@ __metadata:
     moment: "npm:^2.30.1"
     proj4: "npm:^2.20.9"
     uuid: "npm:^14.0.1"
-  checksum: 10c0/da0393023f1c8ef6fbcdec746890f417e58139bc66e6d0ae9910491d753521aa0848646afa056511ff8c1bcc2ecf0ba9097993c64da4a04ef1be045bc4a6c64a
+  checksum: 10c0/1dedf690bddde0bf417c71d889c5b9323c09ab65bff70f37693ddf43b2ba0072e856021b0c2eab82390aae83bc7a0737b70e3e1e4f78f7ff409a299709f7e3b6
   languageName: node
   linkType: hard
 
@@ -3550,8 +3550,8 @@ __metadata:
   linkType: hard
 
 "@openforis/arena-server@file:../arena-server::locator=open-foris-arena%40workspace%3A.":
-  version: 2.2.7
-  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=a38256&locator=open-foris-arena%40workspace%3A."
+  version: 2.2.8
+  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=37d318&locator=open-foris-arena%40workspace%3A."
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1112.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -3577,7 +3577,7 @@ __metadata:
     pdfkit: "npm:^0.19.1"
     pg-promise: "npm:^12.7.0"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/27caa577348b8fe45513351eb49bd83e906867d84a11d981b59e75bc3500ae3436b32e2d3b7d788c4d4851096692555d9af01dde3f071b28f9404d4cf0018ee5
+  checksum: 10c0/a49323f9344b28d7b44edd884568c0a480352bb5674d8593b3eef412b1590ecf3cff817c7971f19023b6e2a83512d3820e0581574bb977092594fd2889fdc48a
   languageName: node
   linkType: hard
 

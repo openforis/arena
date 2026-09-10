@@ -1,8 +1,9 @@
+import { RecordFixer } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-import { migrateRecordToInternalIds } from '@core/record/recordNodeIdMigration'
 
 import * as SurveyUtils from '../../utils/surveyUtils'
 import * as SB from '../../utils/surveyBuilder'
@@ -17,7 +18,7 @@ const { nodeDefType } = NodeDef
 //   2. arena-mobile itself later upgrades past the node internal-id migration, and runs the very
 //      same conversion locally on its own (still-legacy) copy of that record. Since the two
 //      migrations run independently - different node insertion order on each side is enough to
-//      make the depth-tie-break in migrateRecordToInternalIds diverge - the resulting iIds for
+//      make the depth-tie-break in RecordFixer.initInternalIds diverge - the resulting iIds for
 //      non-root nodes don't have to (and here, deliberately don't) match the server's.
 //   3. The user edits the record in the now-migrated app and re-submits it. This becomes the
 //      source record below, fed into the same replaceUpdatedNodes path RecordsImportJob uses for
@@ -117,7 +118,7 @@ describe('recordsCombiner (cross node-id-migration merge)', () => {
 
   // Builds the legacy uuid/parentUuid-linked record (the shape arena-mobile produced before the
   // node internal-id migration). `nodeOrder` controls the insertion order of the returned `nodes`
-  // object - migrateRecordToInternalIds breaks same-depth ties by that order, so two calls with a
+  // object - RecordFixer.initInternalIds breaks same-depth ties by that order, so two calls with a
   // different order (but otherwise identical node data) simulate two independent migrations of
   // "the same" record disagreeing on non-root iIds, exactly as the server's and arena-mobile's own
   // migration would if they ran at different times against differently-ordered local node maps.
@@ -262,14 +263,15 @@ describe('recordsCombiner (cross node-id-migration merge)', () => {
     }
   }
 
-  // migrateRecordToInternalIds doesn't build the nodes index that the rest of the record model
+  // RecordFixer.initInternalIds doesn't build the nodes index that the rest of the record model
   // (RecordReader / recordsCombiner) relies on to look up children - the real fetch path
   // (RecordManager.fetchRecordAndNodesByUuid) always builds it via Record.assocNodes after
   // loading, so a hand-built record here has to go through the same step.
   const finalizeRecord = (record: any) =>
     Record.assocNodes({ nodes: Record.getNodes(record), updateNodesIndex: true, sideEffect: true })(record)
 
-  const migrateAndFinalize = (legacyRecord: any) => finalizeRecord(migrateRecordToInternalIds(legacyRecord))
+  const migrateAndFinalize = (legacyRecord: any) =>
+    finalizeRecord(RecordFixer.initInternalIds({ record: legacyRecord, nodes: Object.values(legacyRecord.nodes) }))
 
   const findPlotByPlotId = (record: any, plotId: number) => {
     const clusterNode = Record.getRootNode(record)
@@ -296,7 +298,7 @@ describe('recordsCombiner (cross node-id-migration merge)', () => {
 
   // arena-mobile's independent local order: plot 2's subtree before plot 1's, and the multiple
   // attributes reversed - same nodes, same dateCreated values, different same-depth tie-break
-  // order, so migrateRecordToInternalIds hands out different non-root iIds than the server did.
+  // order, so RecordFixer.initInternalIds hands out different non-root iIds than the server did.
   const mobileNodeOrder = [
     uuids.root,
     uuids.clusterId,
