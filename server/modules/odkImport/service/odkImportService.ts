@@ -1,4 +1,5 @@
 import * as JobManager from '@server/job/jobManager'
+import * as OdkImportReportManager from '../manager/odkImportReportManager'
 import OdkImportJob from './odkImport/odkImportJob'
 
 /**
@@ -33,3 +34,14 @@ export const startOdkImportJob = ({
 
   return job
 }
+
+// REPORT ITEMS
+
+// READ
+export const fetchReportItems = OdkImportReportManager.fetchItems
+export const fetchReportItemsStream = OdkImportReportManager.fetchItemsStream
+export const countReportItems = OdkImportReportManager.countItems
+
+// UPDATE
+export const updateReportItem = async (surveyId: number, itemId: number, resolved: boolean) =>
+  OdkImportReportManager.updateItem(surveyId, itemId, {}, resolved)
