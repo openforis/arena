@@ -96,7 +96,11 @@ describe('ChainSamplingDesign.phase2AsSamplingPointData', () => {
   })
 
   it('can be set and read back', () => {
-    const samplingDesign = ChainSamplingDesign.assocPhase2AsSamplingPointData(true)({})
+    // starts from a two-phase design: assocPhase2AsSamplingPointData runs cleanupSamplingDesign,
+    // which would immediately strip the flag again on a design where two-phase isn't selected
+    const samplingDesign = ChainSamplingDesign.assocPhase2AsSamplingPointData(true)({
+      samplingStrategy: samplingStrategies.twoPhase,
+    })
     expect(ChainSamplingDesign.isPhase2AsSamplingPointData(samplingDesign)).toBe(true)
   })
 

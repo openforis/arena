@@ -97,23 +97,19 @@ const cleanupSamplingDesign = (samplingDesign) => {
   ) {
     samplingDesignUpdated = dissocPostStratificationAttributeDefUuid(samplingDesignUpdated)
   }
-  if (!isPhase1CategorySelectionEnabled(samplingDesignUpdated) && getPhase1CategoryUuid(samplingDesignUpdated)) {
+  if (!isPhase1CategorySelectionEnabled(samplingDesignUpdated)) {
     samplingDesignUpdated = dissocPhase1CategoryUuid(samplingDesignUpdated)
   }
-  if (!isPhase2JoinEntitySelectionEnabled(samplingDesignUpdated) && getPhase2JoinEntityUuid(samplingDesignUpdated)) {
+  if (!isPhase2JoinEntitySelectionEnabled(samplingDesignUpdated)) {
     samplingDesignUpdated = dissocPhase2JoinEntityUuid(samplingDesignUpdated)
   }
-  if (
-    getSamplingStrategy(samplingDesignUpdated) &&
-    !isPhase2AsSamplingPointDataSelectionEnabled(samplingDesignUpdated) &&
-    isPhase2AsSamplingPointData(samplingDesignUpdated)
-  ) {
+  if (!isPhase2AsSamplingPointDataSelectionEnabled(samplingDesignUpdated)) {
     samplingDesignUpdated = dissocPhase2AsSamplingPointData(samplingDesignUpdated)
   }
-  if (!isPhase1JoinAttributeSelectionEnabled(samplingDesignUpdated) && getPhase1JoinAttribute(samplingDesignUpdated)) {
+  if (!isPhase1JoinAttributeSelectionEnabled(samplingDesignUpdated)) {
     samplingDesignUpdated = dissocPhase1JoinAttribute(samplingDesignUpdated)
   }
-  if (!isPhase2JoinAttributeSelectionEnabled(samplingDesignUpdated) && getPhase2JoinAttribute(samplingDesignUpdated)) {
+  if (!isPhase2JoinAttributeSelectionEnabled(samplingDesignUpdated)) {
     samplingDesignUpdated = dissocPhase2JoinAttribute(samplingDesignUpdated)
   }
   return samplingDesignUpdated
