@@ -1,3 +1,4 @@
+import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
@@ -32,12 +33,15 @@ export const Phase2JoinEntitySelector = () => {
 
   const selectedEntityUuid = ChainSamplingDesign.getPhase2JoinEntityUuid(samplingDesign)
 
-  const onChange = (entityDefUuid) => {
-    const chainUpdated = Chain.updateSamplingDesign(
-      ChainSamplingDesign.assocPhase2JoinEntityUuid(entityDefUuid === 'null' ? null : entityDefUuid)
-    )(chain)
-    dispatch(ChainActions.updateChain({ chain: chainUpdated }))
-  }
+  const onChange = useCallback(
+    (entityDefUuid) => {
+      const chainUpdated = Chain.updateSamplingDesign(
+        ChainSamplingDesign.assocPhase2JoinEntityUuid(entityDefUuid === 'null' ? null : entityDefUuid)
+      )(chain)
+      dispatch(ChainActions.updateChain({ chain: chainUpdated }))
+    },
+    [dispatch, chain]
+  )
 
   return (
     <FormItem label="chainView.phase2JoinEntity.label" info="chainView.phase2JoinEntity.info">
