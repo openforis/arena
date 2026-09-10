@@ -400,10 +400,10 @@ export default {
     requestAccess: '$t(common.appNameFull)を初めて利用しますか？アクセスを申請する',
     resetPassword: 'パスワードを再設定',
     login: 'ログイン',
-    loginUsingBackupCode: '2FAバックアップコードでログイン',
+    loginUsingBackupCode: '2FA（二段階認証）バックアップコードでログイン',
     forgotPassword: 'パスワードをお忘れですか',
     sendPasswordResetEmail: 'パスワード再設定メールを送信',
-    twoFactorBackupCode: '2FAバックアップコード',
+    twoFactorBackupCode: '2FA（二段階認証）バックアップコード',
     twoFactorToken: '確認コード',
     twoFactorTokenDescription: `アカウントを安全に保つため、本人確認を行っています。
 
@@ -499,8 +499,8 @@ $t(accessRequestView.whitelistSenderSuggestion)
       unlock: 'キー属性の編集を許可',
     },
     qualifierAttributeEditing: {
-      lock: '修飾子属性の編集をロック',
-      unlock: '修飾子属性の編集を許可',
+      lock: 'グループ識別属性の編集をロック',
+      unlock: 'グループ識別属性の編集を許可',
     },
   },
 
@@ -567,7 +567,7 @@ $t(accessRequestView.whitelistSenderSuggestion)
 
   mapBaseLayerPeriodSelector: {
     chooseAPeriodToCompareWith: '比較する期間を選択',
-    falseColor: 'フォールスカラー',
+    falseColor: '偽合成色（フォールスカラー）',
   },
 
   surveysView: {
@@ -623,13 +623,13 @@ $t(accessRequestView.whitelistSenderSuggestion)
     removeUserConfirmation: 'ユーザー{{user}}を調査{{survey}}から削除しました',
     maxSurveysUserCanCreate: 'ユーザーが作成できる調査の最大数',
     preferredUILanguage: {
-      label: '優先UI言語',
+      label: '優先ユーザー画面言語',
       auto: '自動検出（{{detectedLanguage}}）',
     },
     newPassword: 'パスワード',
     confirmPassword: 'パスワード（確認）',
     manageTwoFactorDevices: {
-      label: '2FAを管理',
+      label: '2FA（二段階認証）を管理',
       title: '二要素認証デバイスの管理',
     },
   },
@@ -1051,8 +1051,8 @@ $t(common.appNameFull)
       ownPage: '専用ページ',
       parentPage: '親ページ（{{parentPage}}）',
       qualifier: {
-        label: '修飾子',
-        info: `グループに所属するユーザーが新規記録を作成すると、この属性にはそのユーザーのグループに設定された修飾子の値が自動的に入力されます。グループに所属するユーザーは、自分のグループに属する記録のみを閲覧・編集できます。`,
+        label: 'グループ識別属性',
+        info: `グループに所属するユーザーが新規記録を作成すると、この属性にはそのユーザーが属するグループに設定された値が自動的に入力されます。グループに所属するユーザーは、自分のグループに属する記録のみを閲覧・編集できます。`,
       },
       table: 'テーブル',
     },

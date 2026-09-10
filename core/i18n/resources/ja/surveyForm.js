@@ -8,7 +8,7 @@ export default {
   addChildTo: '{{nodeDefLabel}}に追加',
   addChildToTitle: '{{nodeDefLabel}}に新しいノードを追加',
   addChildToTypes: {
-    boolean: '真偽値',
+    boolean: '正誤値',
     code: 'コード',
     coordinate: '座標',
     date: '日付',

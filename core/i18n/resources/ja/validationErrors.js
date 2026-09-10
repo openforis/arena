@@ -136,10 +136,10 @@ export default {
     countMinInvalid: '「最小数」が無効です',
     readOnlyCannotHaveEditableIf: '読み取り専用ノードには「編集可能条件」を設定できません',
     qualifierCannotHaveApplicableExpression:
-      '修飾子属性には「$t(nodeDefEdit.advancedProps.relevantIf)」条件を設定できません',
-    qualifierCannotHaveEditabilityRule: '修飾子属性には編集可能ルールを設定できません',
-    qualifierCannotHaveDefaultValues: '修飾子属性にはデフォルト値を設定できません',
-    qualifierCannotHaveValidations: '修飾子属性には検証ルールを設定できません',
+      'グループ識別属性には「$t(nodeDefEdit.advancedProps.relevantIf)」条件を設定できません',
+    qualifierCannotHaveEditabilityRule: 'グループ識別属性には編集可能ルールを設定できません',
+    qualifierCannotHaveDefaultValues: 'グループ識別属性にはデフォルト値を設定できません',
+    qualifierCannotHaveValidations: 'グループ識別属性には検証ルールを設定できません',
   },
 
   record: {
@@ -263,10 +263,10 @@ export default {
 
   userGroupEdit: {
     nameDuplicate: '同じ名前のグループが既に存在します：{{name}}',
-    qualifiersInvalid: '1つ以上の修飾子のキーが無効または重複しています',
-    qualifierNameDuplicate: 'このグループには同じ名前の修飾子が既に存在します：{{name}}',
-    qualifierNameInvalid: '修飾子名が無効です',
-    qualifierNameRequired: '修飾子名は必須です',
+    qualifiersInvalid: '1つ以上のグループ識別属性のキーが無効または重複しています',
+    qualifierNameDuplicate: 'このグループには同じ名前のグループ識別属性が既に存在します：{{name}}',
+    qualifierNameInvalid: 'グループ識別属性名が無効です',
+    qualifierNameRequired: 'グループ識別属性名は必須です',
   },
 
   userPasswordChange: {

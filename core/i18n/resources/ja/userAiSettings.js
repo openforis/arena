@@ -5,7 +5,7 @@ export default {
   categoriesSection: 'AI統合レベル',
   categories: {
     chat: 'ドキュメントチャットボット',
-    chatHint: '設定されたAIプロバイダーを利用し、Arenaに関する質問に答えるフローティングヘルプボタンです。',
+    chatHint: '設定されたAIプロバイダーを利用し、Arenaに関する質問に答える浮遊ヘルプボタンです。',
     expressions: '式の生成・検証',
     expressionsHint: '調査の検証式の下書き作成・説明を支援するAI機能です。',
     translation: 'ラベルの翻訳',

@@ -68,7 +68,7 @@ export default {
     basic: '基本情報',
     branding: {
       title: 'ブランディング',
-      primaryColor: 'プライマリカラー',
+      primaryColor: '主要な色',
       titleFontSize: 'タイトルのフォントサイズ',
       descriptionFontSize: '説明のフォントサイズ',
       fontSizePreset: {
@@ -113,11 +113,11 @@ export default {
     viewInfo: '情報を表示',
 
     preloadedMapLayers: {
-      enabledMessage: 'プリロード済み地図レイヤーが有効です',
-      title: 'プリロード済み地図レイヤー',
-      confirmDelete: 'このプリロード済み地図レイヤーを削除しますか？',
+      enabledMessage: '事前ロード済み地図レイヤーが有効です',
+      title: '事前ロード済み地図レイヤー',
+      confirmDelete: 'この事前ロード済み地図レイヤーを削除しますか？',
       editor: {
-        title: 'プリロード済み地図レイヤー',
+        title: '事前ロード済み地図レイヤー',
       },
     },
 
