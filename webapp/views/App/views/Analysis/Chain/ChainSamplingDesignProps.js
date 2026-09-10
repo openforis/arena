@@ -17,7 +17,7 @@ import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import BaseUnitSelector from './BaseUnitSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
 import { FirstPhaseCategoryExtraPropSelector } from './FirstPhaseCategoryExtraPropSelector'
-import { FirstPhaseCategorySelector } from './FirstPhaseCategorySelector'
+import { Phase1CategorySelector } from './Phase1CategorySelector'
 import { FirstPhaseCommonAttributeSelector } from './FirstPhaseCommonAttributeSelector'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
@@ -70,7 +70,7 @@ export const ChainSamplingDesignProps = (props) => {
 
             {ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign) && (
               <>
-                <FirstPhaseCategorySelector />
+                <Phase1CategorySelector />
                 <FirstPhaseCategoryExtraPropSelector />
               </>
             )}
