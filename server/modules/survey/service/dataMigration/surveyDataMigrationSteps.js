@@ -2,6 +2,7 @@ import { Versions } from '@openforis/arena-core'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as ChainManager from '@server/modules/analysis/manager'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 
 /**
@@ -20,6 +21,12 @@ export const surveyDataMigrationSteps = [
     version: '2.7.2', // formerly versionWithNewFilePathFormat in server/system/dataMigrator/index.js
     migrate: async ({ surveyId, client }) => {
       await SurveyFileManager.migrateFilesToNewPathFormat({ surveyId }, client)
+    },
+  },
+  {
+    version: '2.8.3',
+    migrate: async ({ surveyId, client }) => {
+      await ChainManager.migrateSamplingDesignPhaseProps({ surveyId }, client)
     },
   },
   // future per-survey migration steps are appended here, each with its own version threshold

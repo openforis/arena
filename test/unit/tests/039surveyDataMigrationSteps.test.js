@@ -9,12 +9,12 @@ import {
 } from '@server/modules/survey/service/dataMigration/surveyDataMigrationSteps'
 
 describe('surveyDataMigrationSteps', () => {
-  it('has exactly two entries', () => {
-    expect(surveyDataMigrationSteps).toHaveLength(2)
+  it('has exactly three entries', () => {
+    expect(surveyDataMigrationSteps).toHaveLength(3)
   })
 
-  it('exposes the latest version as 2.7.2, computed via version comparison', () => {
-    expect(latestSurveyDataMigrationVersion).toBe('2.7.2')
+  it('exposes the latest version as 2.8.3, computed via version comparison', () => {
+    expect(latestSurveyDataMigrationVersion).toBe('2.8.3')
   })
 })
 

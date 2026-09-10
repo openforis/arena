@@ -83,6 +83,82 @@ export const updateChainStatusExec = async ({ user, surveyId, chainUuid, statusE
     return Promise.all(promises)
   })
 
+// ====== MIGRATION
+
+const oldSamplingDesignPhasePropKeys = {
+  firstPhaseCategoryUuid: 'firstPhaseCategoryUuid',
+  firstPhaseCategoryExtraProp: 'firstPhaseCategoryExtraProp',
+  firstPhaseCommonAttributeUuid: 'firstPhaseCommonAttributeUuid',
+}
+
+const _migrateSamplingDesignPhaseProps = ({ samplingDesign, survey }) => {
+  const migrated = { ...samplingDesign }
+
+  if (oldSamplingDesignPhasePropKeys.firstPhaseCategoryUuid in migrated) {
+    migrated[ChainSamplingDesign.keysProps.phase1CategoryUuid] =
+      migrated[oldSamplingDesignPhasePropKeys.firstPhaseCategoryUuid]
+    delete migrated[oldSamplingDesignPhasePropKeys.firstPhaseCategoryUuid]
+  }
+  if (oldSamplingDesignPhasePropKeys.firstPhaseCategoryExtraProp in migrated) {
+    migrated[ChainSamplingDesign.keysProps.phase1JoinAttribute] =
+      migrated[oldSamplingDesignPhasePropKeys.firstPhaseCategoryExtraProp]
+    delete migrated[oldSamplingDesignPhasePropKeys.firstPhaseCategoryExtraProp]
+  }
+  if (oldSamplingDesignPhasePropKeys.firstPhaseCommonAttributeUuid in migrated) {
+    const attributeUuid = migrated[oldSamplingDesignPhasePropKeys.firstPhaseCommonAttributeUuid]
+    migrated[ChainSamplingDesign.keysProps.phase2JoinAttribute] = attributeUuid
+    delete migrated[oldSamplingDesignPhasePropKeys.firstPhaseCommonAttributeUuid]
+
+    const attributeNodeDef = Survey.getNodeDefByUuid(attributeUuid)(survey)
+    const parentEntity = attributeNodeDef ? Survey.getNodeDefParent(attributeNodeDef)(survey) : null
+    if (parentEntity) {
+      migrated[ChainSamplingDesign.keysProps.phase2JoinEntityUuid] = NodeDef.getUuid(parentEntity)
+    }
+    migrated[ChainSamplingDesign.keysProps.phase2AsSamplingPointData] = false
+  }
+
+  return migrated
+}
+
+/**
+ * Migrates every chain in the given survey from the old sampling design phase prop names
+ * (firstPhaseCategoryUuid, firstPhaseCategoryExtraProp, firstPhaseCommonAttributeUuid) to the
+ * current ones (phase1CategoryUuid, phase1JoinAttribute, phase2JoinAttribute), backfilling
+ * phase2JoinEntityUuid from the previously selected common attribute's parent entity.
+ * Chains without any of the old keys are left untouched.
+ * @param {object} params - Parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<void>} Resolves when every chain needing migration has been updated.
+ */
+export const migrateSamplingDesignPhaseProps = async ({ surveyId }, client = DB.client) => {
+  const chains = await ChainRepository.fetchChains({ surveyId }, client)
+
+  const chainsToMigrate = chains.filter((chain) => {
+    const samplingDesign = Chain.getSamplingDesign(chain)
+    return Object.values(oldSamplingDesignPhasePropKeys).some((oldKey) => oldKey in samplingDesign)
+  })
+  if (chainsToMigrate.length === 0) return
+
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+    { surveyId, draft: true, advanced: true, includeAnalysis: true },
+    client
+  )
+
+  for (const chain of chainsToMigrate) {
+    const samplingDesign = Chain.getSamplingDesign(chain)
+    const migratedSamplingDesign = _migrateSamplingDesignPhaseProps({ samplingDesign, survey })
+    await ChainRepository.updateChain(
+      {
+        surveyId,
+        chainUuid: Chain.getUuid(chain),
+        fields: { [TableChain.columnSet.props]: { [Chain.keysProps.samplingDesign]: migratedSamplingDesign } },
+      },
+      client
+    )
+  }
+}
+
 const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
   const chainUuid = Chain.getUuid(chain)
   const propsToUpdate = Chain.getPropsDiff(chain)(chainDb)
