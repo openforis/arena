@@ -188,10 +188,24 @@ describe('Clone chain from another survey - missing entities', () => {
     const clonedSamplingDesign = Chain.getSamplingDesign(clonedChain)
     expect(ChainSamplingDesign.getPhase1CategoryUuid(clonedSamplingDesign)).toBeUndefined()
     expect(ChainSamplingDesign.getPhase1JoinAttribute(clonedSamplingDesign)).toBeUndefined()
-    // "cluster_src" and its analysis attribute both exist in the target survey by name, so they remap
-    const targetClusterSrcEntity = Survey.findNodeDefByName('cluster_src')(targetSurvey)
+
+    // "cluster_src" and its analysis attribute both exist in the target survey by name, so they
+    // remap; re-fetch the target survey so this reflects the attribute cloned onto it by the
+    // earlier "clones only attributes..." test rather than the stale outer `targetSurvey` built
+    // in `beforeAll` (which predates that clone).
+    const targetSurveyRefetched = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
+      surveyId: targetSurveyId,
+      draft: true,
+      advanced: true,
+      includeAnalysis: true,
+    })
+    const targetClusterSrcEntity = Survey.findNodeDefByName('cluster_src')(targetSurveyRefetched)
     expect(ChainSamplingDesign.getPhase2JoinEntityUuid(clonedSamplingDesign)).toBe(
       NodeDef.getUuid(targetClusterSrcEntity)
+    )
+    const targetVolumeAnalysisAttr = Survey.findNodeDefByName('volume_analysis_src')(targetSurveyRefetched)
+    expect(ChainSamplingDesign.getPhase2JoinAttribute(clonedSamplingDesign)).toBe(
+      NodeDef.getUuid(targetVolumeAnalysisAttr)
     )
   })
 
