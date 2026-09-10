@@ -50,8 +50,14 @@ export const fetchAndAssocStorageInfo = async ({ survey }) => {
 
 // JOBS
 
-export const startPublishJob = async ({ user, surveyId, cleanupRecords, updateRecordValues }) => {
-  if (!updateRecordValues) {
+export const startPublishJob = async ({
+  user,
+  surveyId,
+  cleanupRecords,
+  updateRecordValues,
+  skipDataUpdate = false,
+}) => {
+  if (!updateRecordValues && !skipDataUpdate) {
     const recordValuesUpdateWarning = await checkPublishRecordValuesUpdateWarning({ surveyId })
     if (recordValuesUpdateWarning) {
       return { recordValuesUpdateWarning }
@@ -60,7 +66,7 @@ export const startPublishJob = async ({ user, surveyId, cleanupRecords, updateRe
 
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
-  const job = new SurveyPublishJob({ user, surveyId, cleanupRecords, updateRecordValues })
+  const job = new SurveyPublishJob({ user, surveyId, cleanupRecords, updateRecordValues, skipDataUpdate })
 
   JobManager.enqueueJob(job)
 

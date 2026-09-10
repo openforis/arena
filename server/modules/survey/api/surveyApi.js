@@ -404,7 +404,12 @@ export const init = (app) => {
 
   app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, cleanupRecords = false, updateRecordValues = false } = Request.getParams(req)
+      const {
+        surveyId,
+        cleanupRecords = false,
+        updateRecordValues = false,
+        skipDataUpdate = false,
+      } = Request.getParams(req)
       const user = Request.getUser(req)
 
       const { job, recordValuesUpdateWarning } = await SurveyService.startPublishJob({
@@ -412,6 +417,7 @@ export const init = (app) => {
         surveyId,
         cleanupRecords,
         updateRecordValues,
+        skipDataUpdate,
       })
 
       res.json(recordValuesUpdateWarning ? { recordValuesUpdateWarning } : { job: JobUtils.jobToJSON(job) })

@@ -160,14 +160,26 @@ export default {
 
 {{reasons}}
 
-Это может безвозвратно изменить или удалить уже введённые данные. Введите название анкеты ниже, чтобы подтвердить.`,
+Эта операция может безвозвратно изменить или удалить уже введённые данные.
+
+Чтобы опубликовать без обновления существующих данных, отметьте «Пропустить обновление данных» ниже (не рекомендуется).`,
     publishRecordValuesUpdateConfirmHeader: 'Данные существующих записей будут обновлены',
+    publishRecordValuesUpdateConfirmOk: 'Опубликовать и обновить данные',
     publishRecordValuesUpdateConfirmInputLabel:
       'Введите название анкеты "{{strongConfirmRequiredText}}" для подтверждения',
     publishRecordValuesUpdateReasonAttributeChanged:
-      'Следующие атрибуты изменены таким образом, что их значение будет пересчитано в существующих записях: **{{attributeNames}}**.',
+      'Следующие атрибуты будут изменены, и их значения в существующих записях будут автоматически пересчитаны: **{{attributeNames}}**.',
     publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
       'Следующие атрибуты используют дополнительное свойство категории или таксономии, которое изменилось, из-за чего их значение будет пересчитано в существующих записях: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Пропустить обновление данных',
+    publishSkipDataUpdateConfirmOk: 'Пропустить обновление данных и опубликовать',
+    publishSkipDataUpdateImplications: 'Пропуск обновления данных означает следующее:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Существующие записи могут перестать соответствовать новому определению анкеты',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Затронутые значения не будут пересчитаны, пока не будут введены заново вручную',
+    publishSkipDataUpdateImplicationChains:
+      'Цепочки обработки, использующие эти атрибуты, могут выдавать устаревшие результаты',
     raiseTicketInSupportForum: `В случае проблем, пожалуйста, создайте заявку с тегом 'arena' на нашем <b>Форуме поддержки</b>: $t(links.supportForum)`,
     record: 'Запись',
     record_other: 'Записи',

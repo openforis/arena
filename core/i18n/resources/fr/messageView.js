@@ -41,6 +41,7 @@ Certaines variables de substitution sont également disponibles :
       label: "Type d'utilisateur cible",
       all: 'Tous les utilisateurs',
       system_admins: 'Administrateurs système',
+      survey_admins: 'Administrateurs de formulaire',
       survey_managers: 'Gestionnaires de formulaire',
       data_analysts: 'Analystes de données',
       data_cleaners: 'Nettoyeurs de données',
