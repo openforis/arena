@@ -764,16 +764,22 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
         'Ao excluir a unidade base, todas as seleções de "variável baseada em área" serão desmarcadas. Continuar?',
     },
     downloadSummaryJSON: 'Baixar resumo (JSON)',
-    firstPhaseCategory: 'Categoria da 1ª fase',
-    firstPhaseCategoryInfo: 'Selecione a categoria que contém as amostras da 1ª fase.',
-    firstPhaseCategoryExtraProp: {
-      label: 'Atributo de estrato da 1ª fase',
-      info: 'Selecione a variável usada para dividir a população original em estratos amplos para a fase inicial de amostragem.',
+    phase1Category: 'Categoria da 1ª fase',
+    phase1CategoryInfo: 'Selecione a categoria que contém as amostras da 1ª fase.',
+    phase2JoinEntity: {
+      label: 'Entidade de junção (2ª fase)',
+      info: 'Entidade usada para unir a unidade base à categoria da 1ª fase: a própria entidade da unidade base, ou uma das suas entidades superiores.',
     },
-    firstPhaseCommonAttribute: {
-      label: 'Atributo comum',
-      info: `Atributo em comum entre a unidade base e a tabela da 1ª fase
-    (deve ser um atributo de código ou de texto; o seu valor é comparado com as propriedades extra definidas para a categoria da 1ª fase - o nome do atributo não precisa corresponder ao nome da propriedade extra)`,
+    phase2AsSamplingPointData: {
+      label: 'Unir usando a ligação de Sampling Point Data',
+    },
+    phase1JoinAttribute: {
+      label: 'Atributo de junção (1ª fase)',
+      info: 'Selecione a coluna da tabela $t(chainView.phase1Category) (uma propriedade extra, ou "code") usada para a unir à entidade de junção da 2ª fase.',
+    },
+    phase2JoinAttribute: {
+      label: 'Atributo de junção (2ª fase)',
+      info: 'Selecione o atributo de código ou texto da entidade de junção (2ª fase) usado para a unir à tabela da 1ª fase; o seu valor é comparado com as propriedades extra definidas para a categoria da 1ª fase.',
     },
     formLabel: 'Rótulo da cadeia de processamento',
     basic: 'Básico',
