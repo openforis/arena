@@ -80,6 +80,38 @@ export const extractAttributeValue = async ({
       })
     }
 
+    case NodeDef.nodeDefType.geo: {
+      // ODK geotrace/geoshape: ";"-separated "lat lon alt acc" points. Both compile to Arena's `geo`
+      // type (see xformTypeMapping.ts's lossy mapping), so the original distinction is gone by the
+      // time schema import finishes - LineString vs Polygon is inferred from the data itself instead
+      // of threading the original ODK bind type through the whole submission-import pipeline just for
+      // this: a closed ring (first point equals the last) is how ODK Collect always represents a
+      // geoshape, and not how a geotrace is ever represented in practice.
+      const points = text
+        .split(';')
+        .map((point) => point.trim())
+        .filter(Boolean)
+        .map((point): [number, number] => {
+          const [latRaw, lonRaw] = point.split(/\s+/)
+          return [Number.parseFloat(lonRaw), Number.parseFloat(latRaw)]
+        })
+        .filter(([lon, lat]) => !Number.isNaN(lon) && !Number.isNaN(lat))
+
+      if (points.length < 2) return null
+
+      const [first] = points
+      const last = points[points.length - 1]
+      const isClosedRing = points.length >= 4 && first[0] === last[0] && first[1] === last[1]
+
+      return {
+        type: 'Feature',
+        geometry: isClosedRing
+          ? { type: 'Polygon', coordinates: [points] }
+          : { type: 'LineString', coordinates: points },
+        properties: {},
+      }
+    }
+
     case NodeDef.nodeDefType.code: {
       const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
       const codes = NodeDef.isMultiple(nodeDef) ? text.split(/\s+/) : [text]
