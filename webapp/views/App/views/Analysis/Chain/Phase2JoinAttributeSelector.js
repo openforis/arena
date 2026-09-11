@@ -13,7 +13,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 
-const allowedNodeDefTypes = [NodeDef.nodeDefType.code, NodeDef.nodeDefType.text]
+const allowedNodeDefTypes = new Set([NodeDef.nodeDefType.code, NodeDef.nodeDefType.text])
 
 const nodeDefToItem = (nodeDef) => ({
   value: NodeDef.getUuid(nodeDef),
@@ -37,7 +37,7 @@ export const Phase2JoinAttributeSelector = () => {
     return Survey.getNodeDefDescendantAttributesInSingleEntities({
       nodeDef: phase2JoinEntity,
       includeAnalysis: true,
-    })(survey).filter((descendantDef) => allowedNodeDefTypes.includes(NodeDef.getType(descendantDef)))
+    })(survey).filter((descendantDef) => allowedNodeDefTypes.has(NodeDef.getType(descendantDef)))
   }, [phase2JoinEntity, survey])
   /* eslint-enable react-hooks/preserve-manual-memoization */
 
