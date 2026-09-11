@@ -112,6 +112,18 @@ export const {
   updateRecordOwner,
 } = RecordManager
 
+// keepTimeZone: false avoids convertDate's default parseZone-based parsing, which treats a
+// timezone-less "HH:mm:ss" string as UTC and shifts it by the local UTC offset on format (e.g.
+// "14:30:45" -> "16:30:45" on a UTC+2 host). Time values have no timezone component, so they
+// must be parsed and formatted consistently in the local zone.
+export const formatTimeSummaryValue = ({ value, nodeDef }) =>
+  DateUtils.convertDate({
+    dateStr: value,
+    formatFrom: 'HH:mm:ss',
+    formatTo: DateUtils.getTimeFormat(nodeDef),
+    keepTimeZone: false,
+  })
+
 export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, user }) => {
   const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({
     surveyId,
@@ -127,8 +139,7 @@ export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, u
         formatFrom: DateUtils.formats.datetimeISO,
         formatTo: DateUtils.formats.dateDefault,
       }),
-    [NodeDef.nodeDefType.time]: ({ value }) =>
-      DateUtils.convertDate({ dateStr: value, formatFrom: 'HH:mm:ss', formatTo: DateUtils.formats.timeStorage }),
+    [NodeDef.nodeDefType.time]: formatTimeSummaryValue,
   }
 
   const objectTransformer = (recordSummary) => {
@@ -140,7 +151,7 @@ export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, u
         nodeDefKeyColumnNames.forEach((nodeDefKeyColumnName) => {
           const value = recordSummary[A.camelize(nodeDefKeyColumnName)]
           const formatter = valueFormattersByType[NodeDef.getType(nodeDefKey)]
-          const valueFormatted = formatter ? formatter({ value }) : value
+          const valueFormatted = formatter ? formatter({ value, nodeDef: nodeDefKey }) : value
           keysAcc[nodeDefKeyColumnName] = valueFormatted
         })
         return keysAcc

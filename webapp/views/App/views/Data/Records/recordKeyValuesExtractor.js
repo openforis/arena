@@ -37,6 +37,18 @@ const _findCategoryItem = ({ survey, nodeDef, code, categoryItemsByCodeDefUuid, 
   )
 }
 
+// keepTimeZone: false avoids convertDate's default parseZone-based parsing, which treats a
+// timezone-less "HH:mm:ss" string as UTC and shifts it by the local UTC offset on format (e.g.
+// "14:30:45" -> "16:30:45" on a UTC+2 host). Time values have no timezone component, so they
+// must be parsed and formatted consistently in the local zone.
+export const formatTimeKeyValue = ({ value, nodeDef }) =>
+  DateUtils.convertDate({
+    dateStr: value,
+    formatFrom: 'HH:mm:ss',
+    formatTo: DateUtils.getTimeFormat(nodeDef),
+    keepTimeZone: false,
+  })
+
 const valueFormattersByType = {
   [NodeDef.nodeDefType.code]: ({
     survey,
@@ -70,12 +82,7 @@ const valueFormattersByType = {
       formatFrom: DateUtils.formats.datetimeISO,
       formatTo: DateUtils.formats.dateDefault,
     }),
-  [NodeDef.nodeDefType.time]: ({ value }) =>
-    DateUtils.convertDate({
-      dateStr: value,
-      formatFrom: 'HH:mm:ss',
-      formatTo: DateUtils.formats.timeStorage,
-    }),
+  [NodeDef.nodeDefType.time]: formatTimeKeyValue,
 }
 
 const extractKeyOrSummaryValue = ({
