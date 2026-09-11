@@ -166,13 +166,23 @@ export default {
 
 {{reasons}}
 
-これにより、既に入力されたデータが恒久的に変更または消去される可能性があります。確認のため、以下に調査名を入力してください。`,
+この操作により、既に入力されたデータが恒久的に変更または消去される可能性があります。
+
+データを更新せずに公開したい場合は、下の「データ更新をスキップ」にチェックを入れてください（非推奨）。`,
     publishRecordValuesUpdateConfirmHeader: '既存の記録データが更新されます',
+    publishRecordValuesUpdateConfirmOk: '公開してデータを更新',
     publishRecordValuesUpdateConfirmInputLabel: '確認のため、調査名「{{strongConfirmRequiredText}}」を入力してください',
     publishRecordValuesUpdateReasonAttributeChanged:
-      '以下の属性が変更されたため、既存の記録内でその値が再計算されます：**{{attributeNames}}**。',
+      '以下の属性が変更され、既存の記録内でその値が自動的に再計算されます：**{{attributeNames}}**。',
     publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
       '以下の属性は、変更されたカテゴリまたは分類体系の追加プロパティを使用しているため、既存の記録内でその値が再計算されます：**{{attributeNames}}**。',
+    publishSkipDataUpdate: 'データ更新をスキップ',
+    publishSkipDataUpdateConfirmOk: 'データ更新をスキップして公開',
+    publishSkipDataUpdateImplications: 'データ更新をスキップすると、次のようになります：\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      '既存の記録が新しい調査定義と一致しなくなる場合があります',
+    publishSkipDataUpdateImplicationStaleValues: '影響を受ける値は、手動で再入力するまで再計算されません',
+    publishSkipDataUpdateImplicationChains: 'これらの属性を使用する処理チェーンが、古い結果を出力する可能性があります',
     raiseTicketInSupportForum: `問題が発生した場合は、<b>サポートフォーラム</b>に「arena」タグを付けてチケットを作成してください：$t(links.supportForum)`,
     record: '記録',
     record_other: '記録',
@@ -756,16 +766,23 @@ $t(accessRequestView.whitelistSenderSuggestion)
       confirmDelete: '基本単位を削除すると、すべての「面積ベース変数」の選択が解除されます。続行しますか？',
     },
     downloadSummaryJSON: '概要をダウンロード（JSON）',
-    firstPhaseCategory: '第1段階カテゴリ',
-    firstPhaseCategoryInfo: '第1段階のサンプルを含むカテゴリを選択してください。',
-    firstPhaseCategoryExtraProp: {
-      label: '第1段階の層別属性',
-      info: '第1段階のサンプリングにおいて、元の母集団を大まかな層に分けるために使用する$t(chainView.firstPhaseCategory)の追加プロパティ（カテゴリテーブルの列）を選択してください。',
+    phase1Category: '第1段階カテゴリ',
+    phase1CategoryInfo: '第1段階のサンプルを含むカテゴリを選択してください。',
+    phase2JoinEntity: {
+      label: '結合項目（第2段階）',
+      info: '基本単位と第1段階カテゴリを結合するために使用する項目です。基本単位項目自体、またはその上位の項目のいずれかを指定します。',
     },
-    firstPhaseCommonAttribute: {
-      label: '共通属性',
-      info: `基本単位と第1段階テーブルで共通する属性
-（コード属性またはテキスト属性である必要があります。その値は第1段階カテゴリに定義された追加プロパティと照合されます。属性名は追加プロパティ名と一致している必要はありません）`,
+    phase2AsSamplingPointData: {
+      label: '抽出地点データのリンクを使って結合',
+    },
+    phase1JoinAttribute: {
+      label: '結合属性（第1段階）',
+      info: '$t(chainView.phase1Category)テーブルの列（追加プロパティまたは「コード」）を選択してください。第2段階の結合項目との結合に使用されます。',
+    },
+    phase2JoinAttribute: {
+      label: '結合属性（第2段階）',
+      info: `結合項目（第2段階）のコード属性またはテキスト属性を選択してください。第1段階テーブルとの結合に使用されます。
+その値は、第1段階カテゴリに定義された追加プロパティと照合されます。`,
     },
     formLabel: '処理チェーンのラベル',
     basic: '基本',

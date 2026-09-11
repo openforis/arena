@@ -41,6 +41,7 @@ export default {
       label: '対象ユーザータイプ',
       all: 'すべてのユーザー',
       system_admins: 'システム管理者',
+      survey_admins: '調査管理者',
       survey_managers: '調査マネージャー',
       data_analysts: 'データ分析者',
       data_cleaners: 'データクレンザー',
