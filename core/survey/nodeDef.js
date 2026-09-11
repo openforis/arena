@@ -96,6 +96,9 @@ export const propKeys = {
   fileType: 'fileType',
   geotagInformationShown: 'geotagInformationShown',
 
+  // Time
+  includeSeconds: 'includeSeconds',
+
   // Coordinate
   allowOnlyDeviceCoordinate: 'allowOnlyDeviceCoordinate',
   includeAccuracy: 'includeAccuracy',
@@ -310,6 +313,8 @@ export const isNumberOfFilesEnabled = isMultiple
 export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
 export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 export const isGeotagInformationShown = ObjectUtils.isPropTrue(propKeys.geotagInformationShown)
+// time
+export const isSecondsIncluded = ObjectUtils.isPropTrue(propKeys.includeSeconds)
 // taxon
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 export const getVernacularNameLabels = getProp(propKeys.vernacularNameLabels, {})
