@@ -21,6 +21,15 @@ let templateFileValue = null
   templateFileValue = Node.newNodeValueFile({ fileUuid, fileName })
 }
 
+export const getTimeTemplateValue = ({ nodeDef }) => {
+  const now = new Date()
+  return DateUtils.formatTime(
+    now.getHours(),
+    now.getMinutes(),
+    NodeDef.isSecondsIncluded(nodeDef) ? now.getSeconds() : undefined
+  )
+}
+
 const valuesByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: () => true,
   [NodeDef.nodeDefType.code]: () => 'CATEGORY_CODE',
@@ -34,10 +43,7 @@ const valuesByNodeDefType = {
   [NodeDef.nodeDefType.integer]: () => 123,
   [NodeDef.nodeDefType.taxon]: () => 'TAXON_CODE',
   [NodeDef.nodeDefType.text]: () => 'Text',
-  [NodeDef.nodeDefType.time]: () => {
-    const now = new Date()
-    return DateUtils.formatTime(now.getHours(), now.getMinutes())
-  },
+  [NodeDef.nodeDefType.time]: getTimeTemplateValue,
 }
 
 const extractDataImportTemplate = async ({ survey, cycle, nodeDefUuid, includeFiles }) => {
@@ -55,7 +61,7 @@ const extractDataImportTemplate = async ({ survey, cycle, nodeDefUuid, includeFi
   })
   const template = exportModel.columns.reduce((acc, column) => {
     const { header, nodeDef, valueProp } = column
-    const value = nodeDef ? valuesByNodeDefType[NodeDef.getType(nodeDef)]({ valueProp }) : ''
+    const value = nodeDef ? valuesByNodeDefType[NodeDef.getType(nodeDef)]({ valueProp, nodeDef }) : ''
     return { ...acc, [header]: value }
   }, {})
 
