@@ -37,6 +37,7 @@ export interface XFormBodyControl {
   labelText: string | null
   items: XFormBodyItem[]
   itemsetInstanceId: string | null
+  hasChoiceFilter: boolean
 }
 
 export interface XFormSecondaryInstanceItem {
@@ -211,6 +212,16 @@ const extractItemsetInstanceId = (controlEl: XmlElement): string | null => {
   return match ? match[1] : null
 }
 
+// pyxform/ODK Central compile a choice_filter into an XPath predicate appended to the itemset's
+// nodeset reference (e.g. "instance('list')/root/item[parent_field=/data/other_field]") - a "[" there
+// is the reliable signal, since a plain (unfiltered) itemset reference never contains one.
+const extractHasChoiceFilter = (controlEl: XmlElement): boolean => {
+  const itemsetEl = getDirectChildByLocalName(controlEl, 'itemset')
+  if (!itemsetEl) return false
+  const reference = getAttribute('nodeset')(itemsetEl) ?? getElementText(itemsetEl)
+  return Boolean(reference?.includes('['))
+}
+
 const bodyControlLocalNames = ['input', 'select1', 'select', 'upload', 'trigger', 'group', 'repeat']
 
 /**
@@ -237,6 +248,7 @@ export const buildBodyControlsByPath = (xform: XmlElement): Map<string, XFormBod
         labelText,
         items: extractBodyItems(controlEl),
         itemsetInstanceId: extractItemsetInstanceId(controlEl),
+        hasChoiceFilter: extractHasChoiceFilter(controlEl),
       })
     })
   })

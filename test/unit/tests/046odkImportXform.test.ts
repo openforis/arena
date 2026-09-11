@@ -134,6 +134,43 @@ describe('odkImport / xform', () => {
     const listedControl = controlsByPath.get('/data/listed_field')
     expect(listedControl?.itemsetInstanceId).toBe('list1')
     expect(listedControl?.items).toEqual([])
+    expect(listedControl?.hasChoiceFilter).toBe(false)
+
+    expect(nameControl?.hasChoiceFilter).toBe(false)
+    expect(choiceControl?.hasChoiceFilter).toBe(false)
+  })
+
+  test('buildBodyControlsByPath flags a choice_filter-compiled itemset (a "[" predicate in the nodeset reference)', () => {
+    const xformWithChoiceFilter = XForm.parseXForm(`<?xml version="1.0"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms">
+  <h:head>
+    <model>
+      <instance>
+        <data id="x">
+          <region/>
+          <city/>
+          <meta><instanceID/></meta>
+        </data>
+      </instance>
+      <instance id="cities"><root>
+        <item><name>rome</name><label>Rome</label><region>lazio</region></item>
+      </root></instance>
+      <bind nodeset="/data/region" type="select1"/>
+      <bind nodeset="/data/city" type="select1"/>
+    </model>
+  </h:head>
+  <h:body>
+    <select1 ref="/data/region"><label>Region</label>
+      <item><label>Lazio</label><value>lazio</value></item>
+    </select1>
+    <select1 ref="/data/city"><label>City</label>
+      <itemset nodeset="instance('cities')/root/item[region=/data/region]"/>
+    </select1>
+  </h:body>
+</h:html>`)
+    const controlsByPath = XForm.buildBodyControlsByPath(xformWithChoiceFilter)
+    expect(controlsByPath.get('/data/city')?.hasChoiceFilter).toBe(true)
+    expect(controlsByPath.get('/data/region')?.hasChoiceFilter).toBe(false)
   })
 
   test('getSecondaryInstancesByInstanceId extracts choice items keyed by instance id', () => {

@@ -303,6 +303,12 @@ export default class NodeDefsImportJob extends Job {
         itemType: OdkImportReportItem.itemTypes.missingCategory,
         message: path,
       })
+    } else if (type === NodeDef.nodeDefType.code && bodyControl?.hasChoiceFilter) {
+      this._pushReportItem({
+        nodeDefUuid: NodeDef.getUuid(nodeDef),
+        itemType: OdkImportReportItem.itemTypes.choiceFilterNotConverted,
+        message: path,
+      })
     }
 
     nodeDef = await this._applyExpressions({ nodeDef, path, bind })
