@@ -21,6 +21,12 @@ let templateFileValue = null
   templateFileValue = Node.newNodeValueFile({ fileUuid, fileName })
 }
 
+/**
+ * Generates a sample time value for the data import template, based on the current time.
+ * @param {object} params - The function parameters.
+ * @param {object} params.nodeDef - The time node definition to generate the sample value for.
+ * @returns {string} The formatted current time, including seconds if the node definition includes them.
+ */
 export const getTimeTemplateValue = ({ nodeDef }) => {
   const now = new Date()
   return DateUtils.formatTime(

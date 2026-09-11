@@ -102,6 +102,14 @@ const findTaxon = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
 
 const timeWithSecondsValuePattern = /^\d{1,2}:\d{2}:\d{2}$/
 
+/**
+ * Extracts and validates a time value from an imported row, formatting it according to the node definition's seconds setting.
+ * @param {!object} params - The parameters object.
+ * @param {!object} [params.value] - The raw value object read from the input row.
+ * @param {!string} [params.headers] - The input file headers, used for error reporting.
+ * @param {!object} [params.nodeDef] - The time node definition the value belongs to.
+ * @returns {object} An object with the formatted time `value` and a null `refData`.
+ */
 export const extractTimeValue = ({ value, headers, nodeDef }) => {
   const val = value[VALUE_PROP_DEFAULT]
   // Only apply the node def's seconds-including format when the input value itself carries

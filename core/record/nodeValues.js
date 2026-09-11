@@ -66,7 +66,11 @@ const dateTimeComparator =
         return Dates.format(val, formatTo)
       }
       const formatFrom = formatsSource.find((format) => Dates.isValidDateInFormat(val, format))
-      return formatFrom ? Dates.convertDate({ dateStr: val, formatFrom, formatTo }) : null
+      // keepTimeZone: false avoids convertDate's default parseZone-based parsing, which treats a
+      // timezone-less date/time string as UTC and shifts it by the host's UTC offset on format.
+      // Date and time values have no real timezone component, so they must be parsed and
+      // formatted consistently in the local zone.
+      return formatFrom ? Dates.convertDate({ dateStr: val, formatFrom, formatTo, keepTimeZone: false }) : null
     }
     const dateTime = toDateTime(value)
     const dateTimeSearch = toDateTime(valueSearch)

@@ -35,6 +35,11 @@ const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColumnName(ancestorMultipleEntityDef)
 }
 
+/**
+ * Determines the Postgres TO_CHAR format to use to format a time column value.
+ * @param {object} nodeDefCol - The time node definition column.
+ * @returns {string} The TO_CHAR format, including seconds if the node definition includes them.
+ */
 export const getTimeColumnToCharFormat = (nodeDefCol) =>
   NodeDef.isSecondsIncluded(nodeDefCol) ? 'HH24:MI:SS' : 'HH24:MI'
 
