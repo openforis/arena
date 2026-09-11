@@ -20,8 +20,7 @@ export const ClusteringEntitySelector = () => {
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const hierarchy = Survey.getHierarchy(
-    (nodeDef) =>
-      NodeDef.isRoot(nodeDef) || (NodeDef.isMultipleEntity(nodeDef) && NodeDef.isAncestorOf(baseUnitNodeDef)(nodeDef))
+    (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isAncestorOf(baseUnitNodeDef)(nodeDef)
   )(survey)
   const samplingDesign = Chain.getSamplingDesign(chain)
   const selectedEntityUuid = ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign)
