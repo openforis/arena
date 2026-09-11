@@ -5,13 +5,13 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { isSurveyDataMigrationPending } from './surveyDataMigrationSteps'
 import SurveyDataMigrationJob from './surveyDataMigrationJob'
 
+type SurveyIdAndAppVersion = { id: number; appVersion?: string }
+
 /**
  * Filters the given surveys, keeping only the ones whose stored app version is lower than the latest
  * survey data migration version, i.e. the ones that still need to be migrated.
- * @param {Array<{ id: number, appVersion: string }>} surveys - The surveys to filter.
- * @returns {Array<{ id: number, appVersion: string }>} - The surveys that still need to be migrated.
  */
-export const getSurveysToMigrate = (surveys) =>
+export const getSurveysToMigrate = (surveys: SurveyIdAndAppVersion[]): SurveyIdAndAppVersion[] =>
   surveys.filter(({ appVersion }) => isSurveyDataMigrationPending({ appVersion }))
 
 /**
@@ -29,12 +29,14 @@ export const getSurveysToMigrate = (surveys) =>
  * runs) rather than racing each other to run DDL migrations and data migrations against the same surveys.
  */
 export default class AllSurveysDataMigrationJob extends Job {
-  constructor(params) {
+  static readonly type = 'AllSurveysDataMigrationJob'
+
+  constructor(params?: any) {
     super(AllSurveysDataMigrationJob.type, params)
   }
 
   async execute() {
-    const surveyIdsWithErrors = []
+    const surveyIdsWithErrors: number[] = []
 
     await runWithClusterLock({
       lockName: 'boot-all-surveys-data-migration',
@@ -66,7 +68,7 @@ export default class AllSurveysDataMigrationJob extends Job {
               surveyIdsWithErrors.push(surveyId)
               this.logWarn(`could not migrate data for survey ${surveyId}: inner job did not succeed`)
             }
-          } catch (error) {
+          } catch (error: any) {
             surveyIdsWithErrors.push(surveyId)
             this.logError(`error migrating survey ${surveyId}: ${error.stack || error}`)
           }
@@ -81,5 +83,3 @@ export default class AllSurveysDataMigrationJob extends Job {
     this.result = { surveyIdsWithErrors }
   }
 }
-
-AllSurveysDataMigrationJob.type = 'AllSurveysDataMigrationJob'
