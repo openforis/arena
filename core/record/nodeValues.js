@@ -123,14 +123,13 @@ const valueComparatorByNodeDefType = {
   },
   [NodeDef.nodeDefType.text]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.time]: dateTimeComparator({
-    formatsSource: [DateFormats.timeStorage, 'HH:mm:ss'],
-    formatTo: DateFormats.timeStorage,
+    formatsSource: [DateFormats.timeStorage, DateFormats.timeWithSeconds],
+    formatTo: DateFormats.timeWithSeconds,
   }),
 }
 
 /**
  * Compares 2 attribute values according to their properties (depending on the attribute definition).
- *
  * @param {!object} params - The function parameters.
  * @param {!object} [params.survey] - The survey object.
  * @param {!object} [params.value] - The 1st value to compare.
