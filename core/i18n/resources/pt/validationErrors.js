@@ -71,7 +71,7 @@ export default {
     invalidNumber: 'Número inválido na coluna {{headers}}: {{value}}',
     invalidTaxonCode: 'Código inválido na coluna {{headers}}: {{value}}',
     invalidTime:
-      'Hora inválida na coluna {{headers}}: {{value}}. A hora deve estar no formato HH:mm. Ex.: 09:45 ou 16:30',
+      'Hora inválida na coluna {{headers}}: {{value}}. A hora deve estar no formato HH:mm ou HH:mm:ss. Ex.: 09:45, 16:30 ou 09:45:30',
     missingRequiredHeaders: 'Colunas obrigatórias ausentes: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Erro ao atualizar valores: {{details}}',
     multipleRecordsMatchingKeys: 'Vários registros encontrados com as chaves "{{keyValues}}"',

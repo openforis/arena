@@ -37,7 +37,7 @@ const allowedDateFormats = dateFormatsSeparators.reduce((acc, separator) => {
   acc.push(...generateAllowedDateFormats(separator))
   return acc
 }, [])
-const allowedTimeFormats = [DateUtils.formats.timeStorage, 'H:mm']
+const allowedTimeFormats = [DateUtils.formats.timeStorage, 'H:mm', DateUtils.formats.timeWithSeconds, 'H:mm:ss']
 
 const singlePropValueConverter = ({ value }) => value[VALUE_PROP_DEFAULT]
 
@@ -98,6 +98,27 @@ const findTaxon = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
     Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey) ??
     (await taxonProvider.getTaxonByCode({ survey, taxonomyUuid, taxonCode }))
   )
+}
+
+const timeWithSecondsValuePattern = /^\d{1,2}:\d{2}:\d{2}$/
+
+export const extractTimeValue = ({ value, headers, nodeDef }) => {
+  const val = value[VALUE_PROP_DEFAULT]
+  // Only apply the node def's seconds-including format when the input value itself carries
+  // seconds; otherwise fall back to the plain HH:mm storage format, so an HH:mm input into a
+  // seconds-enabled attribute is accepted as-is, instead of being padded with a spurious ":00".
+  const valueHasSeconds = typeof val === 'string' && timeWithSecondsValuePattern.test(val.trim())
+  const formatTo = valueHasSeconds ? DateUtils.getTimeFormat(nodeDef) : DateUtils.formats.timeStorage
+  return {
+    value: extractDateOrTime({
+      value,
+      allowedFormats: allowedTimeFormats,
+      formatTo,
+      headers,
+      errorKey: 'validationErrors:dataImport.invalidTime',
+    }),
+    refData: null,
+  }
 }
 
 const nodeValueAndRefDataExtractorByNodeDefType = {
@@ -197,16 +218,7 @@ const nodeValueAndRefDataExtractorByNodeDefType = {
     const val = singlePropValueConverter({ value })
     return { value: val === null || val === undefined ? null : String(val), refData: null }
   },
-  [NodeDef.nodeDefType.time]: ({ value, headers }) => ({
-    value: extractDateOrTime({
-      value,
-      allowedFormats: allowedTimeFormats,
-      formatTo: DateUtils.formats.timeStorage,
-      headers,
-      errorKey: 'validationErrors:dataImport.invalidTime',
-    }),
-    refData: null,
-  }),
+  [NodeDef.nodeDefType.time]: extractTimeValue,
 }
 
 const checkAllHeadersAreValid =
