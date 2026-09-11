@@ -38,6 +38,30 @@ L.Marker.prototype.options.icon = L.icon({
 // end of workaround
 
 const INITIAL_ZOOM_LEVEL = 3
+// 2, not 3, so a user can manually zoom out one step from the default view (still
+// INITIAL_ZOOM_LEVEL = 3) without hitting the floor immediately. Accepted trade-off:
+// raster base layers below this hardcode minZoom={3} on their own TileLayer (see
+// MapLayersControl.js), so zooming one of them out to exactly level 2 shows a blank
+// map at that level - recoverable by zooming back in or switching layers. Narrower
+// than the regression this constant was raised from (was 1, affecting two zoom levels
+// for every raster layer); deliberately kept at 2 rather than reverting further.
+const MAP_MIN_ZOOM = 2
+// Explicit, unconditional map-level maxZoom keeps map.getMaxZoom() finite and stable
+// regardless of which base layer is active. Without it, Leaflet derives the max
+// dynamically from whichever GridLayer-based TileLayers are currently registered - but
+// the Equal Earth base layer isn't a GridLayer and registers no zoom bound at all, so
+// with it active the derived max becomes Infinity, which broke useFlyToPoint's
+// map.flyTo(latlng, Infinity) (NaN propagates through Leaflet's flyTo animation math
+// and throws) and made ClusterMarker's "already at max zoom" check permanently false.
+// 17 matches the highest maxZoom among the existing raster layers (ESRI World
+// Imagery); layers with a lower native maxZoom (e.g. ESRI Terrain's 9) still stop
+// fetching new tiles at their own maxZoom and show stretched tiles beyond it - same as
+// normal over-zoom behavior, this doesn't change what tiles are available.
+const MAP_MAX_ZOOM = 17
+const MAP_MAX_BOUNDS = [
+  [180, -Infinity],
+  [-180, Infinity],
+]
 
 const MapResizeHandler = () => {
   const map = useLeafletMap()
@@ -63,6 +87,7 @@ export const MapContainer = (props) => {
   const {
     baseLayersLabel,
     editable = false,
+    equalEarthAsDefault = false,
     geoJson = null,
     layers = [],
     markerPoint,
@@ -94,9 +119,18 @@ export const MapContainer = (props) => {
           doubleClickZoom={false}
           zoomControl={false}
           zoom={INITIAL_ZOOM_LEVEL}
+          minZoom={MAP_MIN_ZOOM}
+          maxZoom={MAP_MAX_ZOOM}
+          maxBounds={MAP_MAX_BOUNDS}
+          maxBoundsViscosity={1}
         >
           <MapResizeHandler />
-          <MapLayersControl layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
+          <MapLayersControl
+            layers={layers}
+            baseLayersLabel={baseLayersLabel}
+            overlayGroups={overlayGroups}
+            equalEarthAsDefault={equalEarthAsDefault}
+          />
           <MapMarker
             editable={editable}
             point={markerPoint}
@@ -140,6 +174,7 @@ MapContainer.propTypes = {
   baseLayersLabel: PropTypes.string,
   centerPoint: PropTypes.object,
   editable: PropTypes.bool,
+  equalEarthAsDefault: PropTypes.bool,
   geoJson: PropTypes.object,
   layers: PropTypes.array,
   markerPoint: PropTypes.object,

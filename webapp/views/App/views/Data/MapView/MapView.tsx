@@ -85,7 +85,12 @@ const MapViewContent = ({ baseLayersLabel, layers, overlayGroups }: MapViewConte
         />
       )}
       <div className="map-view-content__map">
-        <MapContainer layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
+        <MapContainer
+          layers={layers}
+          baseLayersLabel={baseLayersLabel}
+          overlayGroups={overlayGroups}
+          equalEarthAsDefault
+        />
       </div>
     </div>
   )
