@@ -87,6 +87,8 @@ export default class RecordsImportJob extends Job {
 
     const nodeDefNamesByPath = CollectSurvey.generateArenaNodeDefNamesByPath(collectSurvey)
 
+    const insertedRecordsUuids = []
+
     for (const entryName of entryNames) {
       if (this.isCanceled()) {
         break
@@ -118,6 +120,8 @@ export default class RecordsImportJob extends Job {
       const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
       // This.logDebug(`${entryName} recordToCreate end`)
 
+      insertedRecordsUuids.push(Record.getUuid(record))
+
       // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes start`)
       await this.traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath })
       // This.logDebug(`${entryName} traverseCollectRecordAndInsertNodes end`)
@@ -129,7 +133,13 @@ export default class RecordsImportJob extends Job {
       }
     }
 
-    this.setContext({ insertedRecords: this.processed })
+    // recordUuids is read by the following RecordCheckJob (collectImportJob.js/collectDataImportJob.js
+    // chain it right after this job, sharing the same context): it scopes the check to just the
+    // records imported here and forces every node def to be checked, not just newly-added ones - a
+    // Collect-imported record is only given nodes for paths present in the Collect data, so it can be
+    // missing nodes (and therefore default values) for Arena-only attributes even though their node
+    // defs are already published. See RecordCheckJob._fetchSurveyAndNodeDefsByCycle.
+    this.setContext({ insertedRecords: this.processed, recordUuids: insertedRecordsUuids })
   }
 
   async beforeSuccess() {
