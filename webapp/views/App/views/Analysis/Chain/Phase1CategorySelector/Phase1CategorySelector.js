@@ -8,7 +8,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { ChainActions, useChain, useChainEditable } from '@webapp/store/ui/chain'
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 
-export const FirstPhaseCategorySelector = () => {
+export const Phase1CategorySelector = () => {
   const dispatch = useDispatch()
   const chain = useChain()
   const editable = useChainEditable()
@@ -16,15 +16,15 @@ export const FirstPhaseCategorySelector = () => {
 
   const onChange = (category) => {
     const chainUpdated = Chain.updateSamplingDesign(
-      ChainSamplingDesign.assocFirstPhaseCategoryUuid(Category.getUuid(category))
+      ChainSamplingDesign.assocPhase1CategoryUuid(Category.getUuid(category))
     )(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 
   return (
-    <FormItem label="chainView.firstPhaseCategory" info="chainView.firstPhaseCategoryInfo">
+    <FormItem label="chainView.phase1Category" info="chainView.phase1CategoryInfo">
       <CategorySelector
-        categoryUuid={ChainSamplingDesign.getFirstPhaseCategoryUuid(samplingDesign)}
+        categoryUuid={ChainSamplingDesign.getPhase1CategoryUuid(samplingDesign)}
         onChange={onChange}
         showAdd={false}
         showEdit={editable}
