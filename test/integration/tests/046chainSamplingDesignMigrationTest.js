@@ -144,6 +144,13 @@ describe('Chain sampling design phase props migration', () => {
       },
     })
 
+    // Regression test for a real deadlock: at the point AllSurveysDataMigrationJob runs this step,
+    // the survey's stored app_version is still OLD (it only gets stamped with the new version after
+    // every step succeeds) -- so this migration must fetch the survey without going through
+    // SurveyManager.fetchSurveyById's assertSurveyDataMigrated guard, or it throws
+    // "survey.dataMigrationInProgress" while trying to migrate the very survey that needs it.
+    await SurveyManager.updateSurveyAppVersion({ surveyId, version: '2.0.0' })
+
     await AnalysisManager.migrateSamplingDesignPhaseProps({ surveyId })
   })
 

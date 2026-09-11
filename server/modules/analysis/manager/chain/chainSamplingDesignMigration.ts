@@ -112,8 +112,12 @@ export const migrateSamplingDesignPhaseProps = async (
   })
   if (chainsToMigrate.length === 0) return
 
+  // skipMigrationCheck: this step itself runs while the survey is still considered "pending migration"
+  // (its stored app_version isn't stamped with the new version until every step succeeds), so the
+  // normal guarded fetch would throw survey.dataMigrationInProgress while trying to migrate the very
+  // survey that needs it.
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-    { surveyId, draft: true, advanced: true, includeAnalysis: true },
+    { surveyId, draft: true, advanced: true, includeAnalysis: true, skipMigrationCheck: true },
     client
   )
 
