@@ -69,6 +69,14 @@ export const startCollectRecordsImportJob = async ({
   return job
 }
 
+export const startOdkDataImportJob = async ({ surveyId, file, cycle, onUploadProgress } = {}) => {
+  const formData = objectToFormData({ file, cycle })
+
+  const { data } = await axios.post(`/api/odk-import/survey/${surveyId}`, formData, { onUploadProgress })
+  const { job } = data
+  return job
+}
+
 export const startDataImportFromCsvJob = ({
   surveyId,
   cycle,

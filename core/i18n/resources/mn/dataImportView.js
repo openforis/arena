@@ -22,6 +22,7 @@ export default {
 
   importFromArena: 'Арена/Арена Мобайл',
   importFromCollect: 'Цуглуулах / Цуглуулах Мобайл',
+  importFromOdk: 'ODK / ODK Collect',
   importFromCsvExcel: 'CSV/Excel',
   importFromCsvStepsInfo: `### Импортлох алхамууд
 1. Зорилтот объектыг сонгох
@@ -73,6 +74,11 @@ export default {
     CollectDataImportJob: {
       importCompleteSuccessfully: `Цуглуулгын өгөгдлийн импорт амжилттай боллоо:
         - {{insertedRecords}} бичлэг үүсгэгдсэн`,
+    },
+    OdkDataImportJob: {
+      importCompleteSuccessfully: `ODK data import complete:
+        - {{submittedCount}} records created
+        - {{skippedCount}} duplicate submissions skipped`,
     },
     DataImportJob: {
       importCompleteSummary: `
