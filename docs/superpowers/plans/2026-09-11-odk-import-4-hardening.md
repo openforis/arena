@@ -38,8 +38,19 @@
 
 ---
 
+### Finding 4: "note" detection used the wrong signal, so real ODK Central/pyxform notes were never skipped
+
+**Files:** `server/modules/odkImport/service/odkImport/model/xformTypeMapping.ts`, `server/modules/odkImport/service/odkImport/metaImportJobs/nodeDefsImportJob.ts`, `test/unit/tests/047odkImportXformTypeMapping.test.ts`. Commit `b601c9bda`.
+
+- [x] The design spec (and Phase 0's own type-mapping table) promises a readonly, ODK "note" question is skipped entirely (no NodeDef created, flagged `skippedNote`) rather than imported as a dead, never-filled-in text attribute. The original check was `isTruthyXPathBoolean(readonly) && !hasBodyControl` - which is backwards for real forms. Verified directly against pyxform's `question_type_dictionary.py` (fetched from GitHub): the `note` question type's control dict is `{"tag": "input"}` and bind dict is `{"readonly": "true()", "type": "string"}` - a real, pyxform/ODK Central-compiled note **always** has a body `<input>` control (an XForm has no other way to display anything to the user), so `!hasBodyControl` could never match it in practice. The one existing unit test asserting the old (backwards) behavior was itself evidence nobody had checked this against a real compiled form.
+- [x] The actual reliable signal, confirmed the same way: a genuine calculated field's bind always carries a `calculate` expression; a note's never does. Replaced `hasBodyControl` with `hasCalculate` (`Boolean(bind?.calculate)`, already available at the call site and used elsewhere in the same file for identical purposes) - independent of body-control presence.
+- [x] Unit tests rewritten: a readonly-no-calculate string (the real note shape, body control or not) → skipped; a readonly-with-calculate string → kept as a genuine computed field; a non-readonly string → never treated as a note.
+- [x] Live-verified: a form with `instructions_note` (readonly, body `<input>`, no calculate - pyxform's real note shape) and `computed_total` (readonly, body `<input>`, with a `calculate`) imported only `plot_id` and `computed_total` into `node_def` - `instructions_note` correctly got no NodeDef at all, and the report log showed exactly one `skippedNote` item for it plus a `calculate` conversion item for `computed_total`.
+
+---
+
 ## Self-Review Notes
 
 - **Every finding above traces to a concrete divergence** between what an earlier phase doc or the design spec promised and what the code actually did (a missing `switch` case, a `[0]`-index-only accessor, a report item type with no producer) - not speculative "what if" hardening.
 - **Every fix has both a unit test and a live verification** against a real running server + Postgres, following the same rigor as Phases 0-3, including the recurring `odk_import_report`-table-not-yet-migrated workaround (temporarily stub `OdkImportReportManager.insertItems` to log instead of insert, verify, revert, confirm via `git diff` before committing).
-- **Not yet covered, still open for a future finding:** `barcode`/`note`/`dateTime` review, real-world ODK Central-exported XForm samples (all fixtures used across every phase so far are hand-written, spec-minimal XML), performance on large forms/submission sets. Flagged in the design spec's Phase/Milestone notes, not silently dropped.
+- **Not yet covered, still open for a future finding:** `barcode`/`dateTime` review, real-world ODK Central-exported XForm samples (all fixtures used across every phase so far are hand-written, spec-minimal XML - Finding 4 shows this gap is real, not theoretical: the wrong signal passed every hand-written test until checked against pyxform's actual compiled output), performance on large forms/submission sets. Flagged in the design spec's Phase/Milestone notes, not silently dropped.
