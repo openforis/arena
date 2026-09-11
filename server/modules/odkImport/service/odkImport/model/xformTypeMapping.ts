@@ -25,26 +25,33 @@ const isTruthyXPathBoolean = (value: string | null): boolean => value === 'true(
 /**
  * Maps an ODK/XForm bind `type` to the closest Arena NodeDef type, per the mapping table in
  * docs/superpowers/specs/2026-09-09-odk-import-design.md. Every unmapped or lossy case is flagged
- * (never a silent drop); `skip: true` means no NodeDef should be created at all (ODK's readonly,
- * body-less "note" idiom, which Arena has no display-only equivalent for).
+ * (never a silent drop); `skip: true` means no NodeDef should be created at all (ODK's readonly
+ * "note" idiom, which Arena has no display-only equivalent for).
  * @param params - Function parameters.
  * @param params.odkType - The bind's `type` attribute (e.g. 'string', 'int', 'select1'), or null.
  * @param params.readonly - The bind's `readonly` attribute, or null.
- * @param params.hasBodyControl - Whether a body element (input/select.../upload/...) references this path.
+ * @param params.hasCalculate - Whether the bind has a `calculate` expression.
  * @returns The mapping result.
  */
 export const mapXFormTypeToNodeDefType = ({
   odkType,
   readonly,
-  hasBodyControl,
+  hasCalculate,
 }: {
   odkType: string | null
   readonly: string | null
-  hasBodyControl: boolean
+  hasCalculate: boolean
 }): OdkTypeMappingResult => {
   switch (odkType) {
     case 'string':
-      if (isTruthyXPathBoolean(readonly) && !hasBodyControl) return skipped('skippedNote')
+      // pyxform/ODK Central's "note" question type always compiles to a readonly string bind with NO
+      // `calculate` (verified against pyxform's question_type_dictionary.py: the note type's bind dict
+      // is exactly {readonly: "true()", type: "string"}, no calculate key) - and, unlike a bare
+      // "calculate"-type bind, it DOES get a body <input> control, since that's the only way an XForm
+      // ever displays anything. `calculate` presence, not body-control presence, is what actually tells
+      // a note apart from a genuine computed field (which is always readonly too, by convention, to stop
+      // user edits from being overwritten on next save) - a body control doesn't discriminate between them.
+      if (isTruthyXPathBoolean(readonly) && !hasCalculate) return skipped('skippedNote')
       return mapped(nodeDefType.text)
     case 'int':
       return mapped(nodeDefType.integer)

@@ -223,7 +223,7 @@ export default class NodeDefsImportJob extends Job {
     const mapping = mapXFormTypeToNodeDefType({
       odkType,
       readonly: bind?.readonly ?? null,
-      hasBodyControl: Boolean(bodyControl),
+      hasCalculate: Boolean(bind?.calculate),
     })
 
     // The report table's node_def_uuid FK requires a *real, already-inserted* NodeDef - a mapping

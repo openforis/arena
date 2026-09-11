@@ -17,7 +17,7 @@ describe('odkImport / xformTypeMapping', () => {
     ['select1', nodeDefType.code],
     ['select', nodeDefType.code],
   ])('maps ODK type %s to Arena type %s, unflagged', (odkType, expectedType) => {
-    const result = mapXFormTypeToNodeDefType({ odkType, readonly: null, hasBodyControl: true })
+    const result = mapXFormTypeToNodeDefType({ odkType, readonly: null, hasCalculate: false })
     expect(result).toEqual({ nodeDefType: expectedType, skip: false, flag: null })
   })
 
@@ -28,17 +28,25 @@ describe('odkImport / xformTypeMapping', () => {
     ['barcode', nodeDefType.text, 'unmappedType'],
     ['unknown_type', nodeDefType.text, 'unmappedType'],
   ])('flags lossy/unmapped ODK type %s (-> %s, %s) without dropping data', (odkType, expectedType, expectedFlag) => {
-    const result = mapXFormTypeToNodeDefType({ odkType, readonly: null, hasBodyControl: true })
+    const result = mapXFormTypeToNodeDefType({ odkType, readonly: null, hasCalculate: false })
     expect(result).toEqual({ nodeDefType: expectedType, skip: false, flag: expectedFlag })
   })
 
-  test('a readonly string bind with no body control is treated as a skipped ODK "note"', () => {
-    const result = mapXFormTypeToNodeDefType({ odkType: 'string', readonly: 'true()', hasBodyControl: false })
+  // pyxform's "note" question type always compiles to exactly this shape - readonly, no calculate -
+  // and it DOES get a body <input> control (verified against pyxform's question_type_dictionary.py),
+  // so body-control presence can't be the note signal; only `calculate` presence can.
+  test('a readonly string bind with no calculate is treated as a skipped ODK "note" (pyxform\'s real note shape)', () => {
+    const result = mapXFormTypeToNodeDefType({ odkType: 'string', readonly: 'true()', hasCalculate: false })
     expect(result).toEqual({ nodeDefType: null, skip: true, flag: 'skippedNote' })
   })
 
-  test('a readonly string bind WITH a body control (e.g. a calculated field) is not treated as a note', () => {
-    const result = mapXFormTypeToNodeDefType({ odkType: 'string', readonly: 'true()', hasBodyControl: true })
+  test('a readonly string bind WITH a calculate expression is a genuine computed field, not a note', () => {
+    const result = mapXFormTypeToNodeDefType({ odkType: 'string', readonly: 'true()', hasCalculate: true })
+    expect(result).toEqual({ nodeDefType: nodeDefType.text, skip: false, flag: null })
+  })
+
+  test('a non-readonly string bind is never treated as a note, regardless of calculate', () => {
+    const result = mapXFormTypeToNodeDefType({ odkType: 'string', readonly: null, hasCalculate: false })
     expect(result).toEqual({ nodeDefType: nodeDefType.text, skip: false, flag: null })
   })
 
