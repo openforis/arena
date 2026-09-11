@@ -2,16 +2,21 @@ import { Versions } from '@openforis/arena-core'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { getCurrentAppVersionStamp, surveyDataMigrationSteps } from './surveyDataMigrationSteps'
+import {
+  getCurrentAppVersionStamp,
+  surveyDataMigrationSteps,
+  SurveyDataMigrationStep,
+} from './surveyDataMigrationSteps'
 
 /**
  * Determines the data migration steps that still need to be applied to a survey, given the app version
- * it was last migrated to.
- * @param {object} params - The parameters object.
- * @param {string} [params.surveyAppVersion] - The app version the survey was last migrated to (null/undefined is treated as '0.0.0').
- * @returns {Array<{ version: string, migrate: (params: { surveyId: number }) => Promise<void> }>} - The pending migration steps, in order.
+ * it was last migrated to (null/undefined is treated as '0.0.0').
  */
-export const getPendingSurveyDataMigrationSteps = ({ surveyAppVersion }) =>
+export const getPendingSurveyDataMigrationSteps = ({
+  surveyAppVersion,
+}: {
+  surveyAppVersion?: string
+}): SurveyDataMigrationStep[] =>
   surveyDataMigrationSteps.filter((step) => Versions.isLessThan(surveyAppVersion ?? '0.0.0', step.version))
 
 /**
@@ -21,12 +26,15 @@ export const getPendingSurveyDataMigrationSteps = ({ surveyAppVersion }) =>
  * serialized job type.
  */
 export default class SurveyDataMigrationJob extends Job {
-  constructor(params) {
+  static readonly type = 'SurveyDataMigrationJob'
+
+  constructor(params?: any) {
     super(SurveyDataMigrationJob.type, params)
   }
 
   async execute() {
-    const { surveyId, surveyAppVersion } = this.context
+    const context: any = this.context
+    const { surveyId, surveyAppVersion } = context
 
     const stepsToRun = getPendingSurveyDataMigrationSteps({ surveyAppVersion })
     this.total = stepsToRun.length
@@ -39,5 +47,3 @@ export default class SurveyDataMigrationJob extends Job {
     await SurveyManager.updateSurveyAppVersion({ surveyId, version: getCurrentAppVersionStamp() }, this.tx)
   }
 }
-
-SurveyDataMigrationJob.type = 'SurveyDataMigrationJob'

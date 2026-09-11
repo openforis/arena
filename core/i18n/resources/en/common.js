@@ -766,16 +766,23 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       confirmDelete: 'By deleting the base unit, you will uncheck all "area-based variable" selections. Continue?',
     },
     downloadSummaryJSON: 'Download Summary (JSON)',
-    firstPhaseCategory: '1st phase category',
-    firstPhaseCategoryInfo: 'Select the category that contains the first-phase samples.',
-    firstPhaseCategoryExtraProp: {
-      label: '1st phase stratum attribute',
-      info: 'Select the extra property of the $t(chainView.firstPhaseCategory) (column of the category table) used to divide the original population into broad strata for the initial sampling phase.',
+    phase1Category: '1st phase category',
+    phase1CategoryInfo: 'Select the category that contains the first-phase samples.',
+    phase2JoinEntity: {
+      label: 'Join entity (2nd phase)',
+      info: 'Entity used to join the base unit with the 1st phase category: the base unit entity itself, or one of its parent entities.',
     },
-    firstPhaseCommonAttribute: {
-      label: 'Common attribute',
-      info: `Attribute in common between base unit and 1st phase table
-(it must be a code or text attribute; its value is matched against the extra properties defined for the 1st phase category - the attribute name does not need to match the extra property name)`,
+    phase2AsSamplingPointData: {
+      label: 'Join by using Sampling Point Data linkage',
+    },
+    phase1JoinAttribute: {
+      label: 'Join attribute (1st phase)',
+      info: 'Select the column of the $t(chainView.phase1Category) table (an extra property, or "code") used to join it with the 2nd phase join entity.',
+    },
+    phase2JoinAttribute: {
+      label: 'Join attribute (2nd phase)',
+      info: `Select the code or text attribute of the join entity (2nd phase) used to join it with the 1st phase table;
+its value is matched against the extra properties defined for the 1st phase category.`,
     },
     formLabel: 'Processing chain label',
     basic: 'Basic',
@@ -822,7 +829,7 @@ This might be a slow process.`,
     stratumAttributeInfo: 'Select the variable used to stratify the sample.',
     stratumAttribute2ndPhase: '2nd phase stratum attribute',
     stratumAttribute2ndPhaseInfo:
-      'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample.',
+      'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample. Only attributes whose name also appears as a column of the 1st phase category are shown.',
     postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
     clusteringEntity: 'Clustering entity',
