@@ -1002,6 +1002,9 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     mobileProps: {
       title: 'Aplicación móvil',
     },
+    timeProps: {
+      includeSeconds: 'Incluir segundos',
+    },
     formHeaderProps: {
       headerColorLabel: 'Color de encabezado',
       headerColor: {
