@@ -45,6 +45,7 @@ export default class NodeDefsImportJob extends Job {
   nodeDefsByXFormPath: Map<string, any>
   nodeDefUniqueNameGenerator: NodeDefUniqueNameGenerator
   reportItems: any[]
+  entityUuidsWithKeyAssigned: Set<string>
 
   constructor(params?: any) {
     super(NodeDefsImportJob.type, params)
@@ -52,6 +53,14 @@ export default class NodeDefsImportJob extends Job {
     this.nodeDefsByXFormPath = new Map()
     this.nodeDefUniqueNameGenerator = new NodeDefUniqueNameGenerator()
     this.reportItems = []
+    // Arena requires every entity (root and every multiple/repeatable entity) to have at least one key
+    // attribute among its own direct children to ever be publishable, but ODK has no equivalent concept
+    // in its bind/body model to read one from - defaulted to the first eligible (canNodeDefTypeBeKey)
+    // attribute directly under each entity, in document order. Found this was a hard requirement (not
+    // just a nice-to-have) by actually trying to publish an ODK-imported survey through the real UI -
+    // without it, publishing always fails, which blocks every data-import source (not just ODK's),
+    // since Authorizer.canImportRecords requires a published survey.
+    this.entityUuidsWithKeyAssigned = new Set()
   }
 
   async execute() {
@@ -70,6 +79,20 @@ export default class NodeDefsImportJob extends Job {
     this._calculateTotal(primaryInstanceRoot)
 
     await this._insertNodeDef({ parentNodeDef: null, parentPath: null, instanceElement: primaryInstanceRoot })
+
+    // Every entity (not just root) that ended up with no eligible key candidate among its children -
+    // e.g. one whose only attributes are file/geo/coordinate/boolean types - is flagged for manual
+    // review, since it will block publishing otherwise.
+    for (const entityNodeDef of Object.values(this.nodeDefs)) {
+      if (!NodeDef.isEntity(entityNodeDef)) continue
+      const entityUuid = NodeDef.getUuid(entityNodeDef)
+      if (this.entityUuidsWithKeyAssigned.has(entityUuid)) continue
+      this._pushReportItem({
+        nodeDefUuid: entityUuid,
+        itemType: OdkImportReportItem.itemTypes.missingEntityKey,
+        message: "No eligible attribute found for this entity's key; set one manually before publishing.",
+      })
+    }
 
     await OdkImportReportManager.insertItems({ surveyId, items: this.reportItems }, this.tx)
 
@@ -221,13 +244,20 @@ export default class NodeDefsImportJob extends Job {
 
     const type = mapping.nodeDefType
 
+    // First eligible attribute directly under each entity becomes that entity's key - see the
+    // constructor comment for why this default exists at all.
+    const parentUuid = NodeDef.getUuid(parentNodeDef)
+    const isKey =
+      !this.entityUuidsWithKeyAssigned.has(parentUuid) && !bind?.calculate && NodeDef.canNodeDefTypeBeKey(type)
+    if (isKey) this.entityUuidsWithKeyAssigned.add(parentUuid)
+
     const props: Record<string, any> = {
       [NodeDef.propKeys.name]: this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
         parentNodeDefName: NodeDef.getName(parentNodeDef),
         nodeDefName: nodeName,
       }),
       [NodeDef.propKeys.multiple]: false,
-      [NodeDef.propKeys.key]: false,
+      [NodeDef.propKeys.key]: isKey,
       [NodeDef.propKeys.labels]: labels,
     }
 

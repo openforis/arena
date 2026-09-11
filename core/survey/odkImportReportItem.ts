@@ -28,6 +28,7 @@ export const itemTypes = {
   skippedNote: 'skippedNote', // a readonly, body-control-less ODK "note" - no NodeDef was created for it
   choiceFilterNotConverted: 'choiceFilterNotConverted', // a choice_filter was imported as a flat, non-cascading category
   missingCategory: 'missingCategory', // a select1/select attribute's choice list couldn't be resolved to a Category
+  missingEntityKey: 'missingEntityKey', // no eligible attribute was found to default an entity's key to
 }
 
 export const newReportItem = ({
