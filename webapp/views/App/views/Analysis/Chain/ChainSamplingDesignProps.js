@@ -64,7 +64,7 @@ export const ChainSamplingDesignProps = (props) => {
   return (
     <div className="chain-sampling-design">
       <div className="form">
-        {hasBaseUnit && <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />}
+        <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
 
         {(Chain.hasSamplingDesign(chain) || hasBaseUnit) && <BaseUnitSelector />}
 
