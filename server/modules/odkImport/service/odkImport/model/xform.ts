@@ -291,7 +291,12 @@ export const getItextTranslations = (
     getDirectChildrenByLocalName(translationEl, 'text').forEach((textEl) => {
       const textId = getAttribute('id')(textEl)
       if (!textId) return
-      const text = getElementText(getDirectChildByLocalName(textEl, 'value'))
+      // A single <text> can carry several <value> forms (plain label, plus e.g. form="image"/"audio"/
+      // "guidance" media annotations for the same question) - prefer the one with no `form` attribute
+      // (the plain-text label), falling back to the first value present if every one is annotated.
+      const valueEls = getDirectChildrenByLocalName(textEl, 'value')
+      const valueEl = valueEls.find((el) => !getAttribute('form')(el)) ?? valueEls[0] ?? null
+      const text = getElementText(valueEl)
       if (text === null) return
       if (!translations[textId]) translations[textId] = {}
       translations[textId][lang] = text

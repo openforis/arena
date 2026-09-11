@@ -167,4 +167,26 @@ describe('odkImport / xform', () => {
       {}
     )
   })
+
+  test('getItextTranslations prefers the plain-text <value> over a media-annotated one (form="image"/"audio")', () => {
+    const xformWithMediaItext = XForm.parseXForm(`<?xml version="1.0"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms">
+  <h:head>
+    <model>
+      <itext>
+        <translation lang="English" default="true()">
+          <text id="/data/photo_field:label">
+            <value form="image">photo_field-media/label.png</value>
+            <value>Take a photo</value>
+          </text>
+        </translation>
+      </itext>
+      <instance><data id="x"><photo_field/></data></instance>
+    </model>
+  </h:head>
+  <h:body><upload ref="/data/photo_field"><label ref="jr:itext('/data/photo_field:label')"/></upload></h:body>
+</h:html>`)
+    const { translations } = XForm.getItextTranslations(xformWithMediaItext)
+    expect(translations['/data/photo_field:label']).toEqual({ English: 'Take a photo' })
+  })
 })
