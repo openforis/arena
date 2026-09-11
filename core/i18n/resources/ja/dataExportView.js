@@ -1,0 +1,41 @@
+export default {
+  error: 'データのエクスポート中にエラーが発生しました：{{details}}',
+  optionNotCompatibleWithDataImport: 'データインポートと互換性がありません',
+  options: {
+    header: '$t(common.options)',
+    fileFormatLabel: 'ファイル形式',
+    fileFormat: {
+      csv: 'CSV',
+      xlsx: 'Excel',
+    },
+    includeCategoryItemsLabels: 'カテゴリ項目のラベルを含める',
+    includeCategories: 'カテゴリを含める',
+    expandCategoryItems: 'カテゴリ項目を展開する',
+    exportSingleEntitiesIntoSeparateFiles: '単一項目を個別ファイルにエクスポート',
+    includeAncestorAttributes: '上位階層の属性を含める',
+    includeAnalysis: '分析結果の変数を含める',
+    includeDataFromAllCycles: 'すべてのサイクルのデータを含める',
+    includeDateCreated: '作成日を含める',
+    includeFiles: 'ファイルを含める',
+    includeFileAttributeDefs: 'ファイル属性の列を含める',
+    includeInternalUuids: '内部UUIDを含める',
+    recordsModifiedAfter: 'この日時以降に更新された記録',
+  },
+  optionsInfo: {
+    expandCategoryItems:
+      'カテゴリ項目ごとに真偽値の列を追加し、その項目が選択されていればTRUE、そうでなければFALSEを設定します',
+    exportSingleEntitiesIntoSeparateFiles: `単一項目を個別のファイルにエクスポートします。チェックを外した場合、単一項目に属する属性は、最も近い上位の複数項目の属性と一緒に出力されます`,
+    includeAnalysis: '分析用属性を含めます',
+    includeAncestorAttributes: 'ルートの項目に至るまでの、上位階層に属する属性を含めます',
+    includeCategoryItemsLabels: 'カテゴリ項目ごとにラベルの列を追加します',
+    includeCategories: `カテゴリは「categories」というサブフォルダにエクスポートされます`,
+    includeDataFromAllCycles:
+      'すべてのサイクルのデータを含めます。チェックしない場合は選択中のサイクルのみが対象になります',
+    includeDateCreated: '各項目（行）の作成日を「date_created」という列に含めます',
+    includeFiles: `記録に紐づくファイルを「files」というサブフォルダにエクスポートします`,
+    includeFileAttributeDefs: `ファイル属性の列（ファイルの内部識別子「file_uuid」とファイル名「file_name」）を追加します`,
+    includeInternalUuids: '内部識別子（UUID）を「_uuid」で終わる列に含めます',
+    recordsModifiedAfter: '指定した日付以降に更新された記録のデータのみをエクスポートします',
+  },
+  startExport: 'エクスポートを開始',
+}
