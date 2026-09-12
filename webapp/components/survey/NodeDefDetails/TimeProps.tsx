@@ -1,5 +1,3 @@
-import PropTypes from 'prop-types'
-
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { Checkbox } from '@webapp/components/form'
@@ -23,20 +21,14 @@ const TimeProps = (props: TimePropsProps) => {
   const nodeDef = State.getNodeDef(state)
 
   return (
-    <FormItem label="">
+    <FormItem label="nodeDefEdit.timeProps.includeSeconds">
       <Checkbox
         checked={NodeDef.isSecondsIncluded(nodeDef)}
         disabled={readOnly}
-        label="nodeDefEdit.timeProps.includeSeconds"
         onChange={(value: boolean) => Actions.setProp({ state, key: NodeDef.propKeys.includeSeconds, value })}
       />
     </FormItem>
   )
-}
-
-TimeProps.propTypes = {
-  state: PropTypes.object.isRequired,
-  Actions: PropTypes.object.isRequired,
 }
 
 export default TimeProps
