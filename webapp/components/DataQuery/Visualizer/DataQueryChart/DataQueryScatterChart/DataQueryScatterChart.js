@@ -44,7 +44,7 @@ const countDistinctValues = ({ data, columnName }) => {
 }
 
 export const DataQueryScatterChart = (props) => {
-  const { data, nodeDefLabelType } = props
+  const { data, dataCount, nodeDefLabelType } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -129,26 +129,34 @@ export const DataQueryScatterChart = (props) => {
   const dataSet = Object.entries(chartDataGrouped).map(([name, data], index) => ({ name, data, fill: colors[index] }))
 
   return (
-    <ScatterChart
-      dataSet={dataSet}
-      onClick={onClick}
-      renderTooltip={
-        <DataQueryScatterChartTooltip
-          categoricalAttributeDefField={categoricalAttributeDefColumnName}
-          categoricalAttributeDefName={categoricalAttributeDefLabel}
-          xAxisDataKey={xAxisDataKey}
-          xAxisName={xAxisName}
-          yAxisDataKey={yAxisDataKey}
-          yAxisName={yAxisName}
-        />
-      }
-      xAxisProps={{ name: xAxisName, dataKey: xAxisDataKey }}
-      yAxisProps={{ name: yAxisName, dataKey: yAxisDataKey }}
-    />
+    <>
+      {typeof dataCount === 'number' && dataCount > data.length && (
+        <div className="data-query-chart-sample-notice">
+          {i18n.t('dataView:charts.warning.showingRandomSample', { sampleSize: data.length, totalCount: dataCount })}
+        </div>
+      )}
+      <ScatterChart
+        dataSet={dataSet}
+        onClick={onClick}
+        renderTooltip={
+          <DataQueryScatterChartTooltip
+            categoricalAttributeDefField={categoricalAttributeDefColumnName}
+            categoricalAttributeDefName={categoricalAttributeDefLabel}
+            xAxisDataKey={xAxisDataKey}
+            xAxisName={xAxisName}
+            yAxisDataKey={yAxisDataKey}
+            yAxisName={yAxisName}
+          />
+        }
+        xAxisProps={{ name: xAxisName, dataKey: xAxisDataKey }}
+        yAxisProps={{ name: yAxisName, dataKey: yAxisDataKey }}
+      />
+    </>
   )
 }
 
 DataQueryScatterChart.propTypes = {
   data: PropTypes.array.isRequired,
+  dataCount: PropTypes.number,
   nodeDefLabelType: PropTypes.string,
 }

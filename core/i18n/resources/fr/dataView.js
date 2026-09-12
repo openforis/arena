@@ -8,6 +8,7 @@ export default {
 maximum {{maxItems}} éléments attendus.
 Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le nombre d'éléments.
 `,
+      showingRandomSample: "Affichage d'un échantillon aléatoire de {{sampleSize}} éléments sur {{totalCount}}.",
     },
     type: {
       area: 'Graphique en aires',

@@ -7,6 +7,7 @@ export default {
       tooManyItemsToShowChart: `Muitos itens para mostrar o gráfico;
 esperando o máximo de itens {{maxItems}}.
 Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número de itens.`,
+      showingRandomSample: 'Exibindo uma amostra aleatória de {{sampleSize}} de {{totalCount}} itens.',
     },
     type: {
       area: 'Gráfico de área',
