@@ -62,8 +62,20 @@
 
 ---
 
+### Finding 6: ODK's documented "Name (code)" language convention was never normalized to a real ISO code
+
+**Files:** `server/modules/odkImport/service/odkImport/model/xform.ts` (`getItextTranslations`, new `normalizeLangCode`), `test/unit/tests/046odkImportXform.test.ts`. Commit `1f6e12af6`.
+
+- [x] Every hand-written fixture used across every phase of this feature so far used simplified bare language names (`lang="English"`, `lang="French"`), which never surfaced a real gap: ODK's own documentation (`docs.getodk.org/form-language`) recommends XLSForm language columns named `"Language Name (code)"` (e.g. `label::English (en)`), and pyxform/ODK Central preserve that whole string verbatim as the compiled itext `<translation lang="...">` attribute - not a bare code (confirmed via a real user-reported example on the ODK forum: `lang="Portuguese (pt)"`, not `lang="pt"`).
+- [x] The importer was taking that raw `lang` attribute and using it directly as Arena's language identifier everywhere (`survey.languages`, every label object's keys), even though Arena's own language model (`core/app/languages.ts`) expects real ISO 639-1 codes. For any real multi-language ODK Central form following the documented convention, every survey language would end up keyed by a garbage `"English (en)"`-shaped string instead of `"en"`.
+- [x] Fixed at the single point `lang` is first read (`getItextTranslations`): extracts a trailing parenthesized code and uses it only when it's a real, recognized Arena language code (checked against `core/app/languages.ts`'s known list); otherwise leaves the raw attribute value untouched, so a form already using bare codes (or any other convention) is unaffected.
+- [x] Unit test: a form with `lang="English (en)"`/`"Portuguese (pt)"`/a made-up `"Klingon (xx-made-up)"` normalizes the first two to `en`/`pt` and leaves the unrecognized one as-is.
+- [x] Live-verified: imported a form with `lang="English (en)"` (default) and `lang="Portuguese (pt)"` - `survey.languages` came back exactly `["en", "pt"]` and the imported attribute's labels came back `{"en": "Plot id", "pt": "Id do talhao"}`, confirmed via `psql`.
+
+---
+
 ## Self-Review Notes
 
 - **Every finding above traces to a concrete divergence** between what an earlier phase doc or the design spec promised and what the code actually did (a missing `switch` case, a `[0]`-index-only accessor, a report item type with no producer) - not speculative "what if" hardening.
 - **Every fix has both a unit test and a live verification** against a real running server + Postgres, following the same rigor as Phases 0-3, including the recurring `odk_import_report`-table-not-yet-migrated workaround (temporarily stub `OdkImportReportManager.insertItems` to log instead of insert, verify, revert, confirm via `git diff` before committing).
-- **Not yet covered, still open for a future finding:** `barcode`/`dateTime` review, real-world ODK Central-exported XForm samples (all fixtures used across every phase so far are hand-written, spec-minimal XML - Finding 4 shows this gap is real, not theoretical: the wrong signal passed every hand-written test until checked against pyxform's actual compiled output), performance on large forms/submission sets. Flagged in the design spec's Phase/Milestone notes, not silently dropped.
+- **Not yet covered, still open for a future finding:** `barcode`/`dateTime` review, real-world ODK Central-exported XForm samples (all fixtures used across every phase so far are hand-written, spec-minimal XML - Findings 4 and 6 both show this gap is real, not theoretical: the wrong signal/assumption passed every hand-written test until checked against pyxform's actual compiled output and ODK's own documented conventions), performance on large forms/submission sets. Flagged in the design spec's Phase/Milestone notes, not silently dropped.
