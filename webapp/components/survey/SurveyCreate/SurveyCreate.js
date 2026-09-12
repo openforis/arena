@@ -210,19 +210,6 @@ const SurveyCreate = (props) => {
         <>
           {!uploading && (
             <>
-              <div className="row">
-                <fieldset className="options-fieldset">
-                  <legend>{i18n.t('common.options')}</legend>
-                  <div>
-                    <Checkbox
-                      id={TestId.surveyCreate.optionIncludeDataCheckbox}
-                      checked={options['includeData']}
-                      label={`surveyCreate:options.includeData`}
-                      onChange={(value) => onOptionChange({ key: 'includeData', value })}
-                    />
-                  </div>
-                </fieldset>
-              </div>
               <FormItem label="surveyCreate:source.label">
                 <RadioButtonGroup items={importSourceButtonGroupItems} onChange={onSourceChange} row value={source} />
               </FormItem>
@@ -234,6 +221,21 @@ const SurveyCreate = (props) => {
                   droppedFiles={file ? [file] : []}
                 />
               </div>
+              {(source === importSources.arena || source === importSources.collect) && (
+                <div className="row">
+                  <fieldset className="options-fieldset">
+                    <legend>{i18n.t('common.options')}</legend>
+                    <div>
+                      <Checkbox
+                        id={TestId.surveyCreate.optionIncludeDataCheckbox}
+                        checked={options['includeData']}
+                        label={`surveyCreate:options.includeData`}
+                        onChange={(value) => onOptionChange({ key: 'includeData', value })}
+                      />
+                    </div>
+                  </fieldset>
+                </div>
+              )}
               <FileUploadChunkSizeDropdown onChange={setChunkSize} value={chunkSize} />
             </>
           )}
