@@ -84,8 +84,18 @@
 
 ---
 
+### Closed the "no real fixture" gap
+
+**Files:** `test/unit/tests/050odkImportRealForm.test.ts`. Commit `f28290fd9`.
+
+- [x] Every fixture in 046-049 is hand-written and spec-minimal - the exact gap that let Findings 4 and 6 slip past the whole test suite until checked against real pyxform/ODK behavior externally. Added a new test file embedding a real, unmodified ODK form verbatim: "Household Survey.xml" from ODK's own official `getodk/sample-forms` repository (published there explicitly "for use in ODK Collect and ODK Web Forms").
+- [x] Chosen over the equally real, more on-theme "Forest Structure Form" sample specifically because it has a genuine, uncommented `<repeat>` group (Forest Structure's is commented out) plus richer expression variety: `jr:preload` metadata, a `barcode` field, a `geopoint`, upload mediatypes, a bind with no body control anywhere (`HouseholdAudio`), a real `regex()`/`count-selected()`/`if()`-ternary/absolute-path-`selected()` mix of expressions, and 5 real itext languages with no `default="true()"` anywhere (exercising the first-encountered fallback).
+- [x] 14 tests across 3 groups (pure `xform.ts`/`xformTypeMapping` parsing needing no survey at all, plus `OdkExpressionConverter` conversions against a small real Arena survey built with `surveyBuilder` for just the fields under test) - every one passed on the first run, including the two outcomes I hadn't verified beforehand (`regex()` and `count-selected()` are correctly left unconverted, since neither is a real Arena expression function).
+
+---
+
 ## Self-Review Notes
 
 - **Every finding above traces to a concrete divergence** between what an earlier phase doc or the design spec promised and what the code actually did (a missing `switch` case, a `[0]`-index-only accessor, a report item type with no producer) - not speculative "what if" hardening.
 - **Every fix has both a unit test and a live verification** against a real running server + Postgres, following the same rigor as Phases 0-3, including the recurring `odk_import_report`-table-not-yet-migrated workaround (temporarily stub `OdkImportReportManager.insertItems` to log instead of insert, verify, revert, confirm via `git diff` before committing).
-- **Not yet covered, still open for a future finding:** `barcode`/`dateTime` review, real-world ODK Central-exported XForm samples (all fixtures used across every phase so far are hand-written, spec-minimal XML - Findings 4 and 6 both show this gap is real, not theoretical: the wrong signal/assumption passed every hand-written test until checked against pyxform's actual compiled output and ODK's own documented conventions), performance on large forms/submission sets. Flagged in the design spec's Phase/Milestone notes, not silently dropped.
+- **Not yet covered, still open for a future finding:** `barcode`/`dateTime` review beyond what the real-form test now exercises, performance on large forms/submission sets. The "hand-written-fixtures-only" gap itself is now partially closed (one real form, unit-level) - a real end-to-end DB-backed integration test importing an actual survey/data from a real form, and a second real form/submission-set exercising things this one doesn't (a filtered `choice_filter` select, an external secondary instance, geotrace/geoshape), remain open.
