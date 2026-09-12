@@ -14,7 +14,7 @@ import { RecordCycle } from '@core/record/recordCycle'
 import { appModuleUri, appModules } from '@webapp/app/appModules'
 
 import { contentTypes } from '@webapp/service/api'
-import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
+import { useI18n, useSystemConfigExperimentalFeatures, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
@@ -33,11 +33,6 @@ import {
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
-
-const importSourceButtonGroupItems = Object.values(importSources).map((key) => ({
-  key,
-  label: `surveyCreate:source.${key}`,
-}))
 
 const cloneFromTypeButtonGroupItems = Object.values(SurveyType)
   .reverse()
@@ -95,6 +90,12 @@ const SurveyCreate = (props) => {
   }, [Survey.getUuid(surveyInfo)])
 
   const fileUploadLimitMB = useSystemConfigFileUploadLimitMB()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
+
+  // ODK import is experimental - only shown when EXPERIMENTAL_FEATURES is enabled (see core/processUtils.ts)
+  const importSourceButtonGroupItems = Object.values(importSources)
+    .filter((key) => key !== importSources.odk || experimentalFeatures)
+    .map((key) => ({ key, label: `surveyCreate:source.${key}` }))
 
   return (
     <div className="home-survey-create">
