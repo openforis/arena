@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 
-import { useNodeDefEditReadOnly } from './store'
+import { State, useNodeDefEditReadOnly } from './store'
 
 type NodeDefEditState = {
   nodeDef: Parameters<typeof NodeDef.isSecondsIncluded>[0]
@@ -20,7 +20,7 @@ const TimeProps = (props: TimePropsProps) => {
   const { state, Actions } = props
   const readOnly = useNodeDefEditReadOnly()
 
-  const nodeDef = state.nodeDef
+  const nodeDef = State.getNodeDef(state)
 
   return (
     <FormItem label="">
