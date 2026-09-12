@@ -27,6 +27,8 @@ export const keys = {
   collectUri: 'collectUri',
   collectReport: 'collectReport',
   collectNodeDefsInfoByPath: 'collectNodeDefsInfoByPath',
+  odkFormId: 'odkFormId',
+  odkNodeDefsInfoByPath: 'odkNodeDefsInfoByPath',
   cycles: 'cycles',
   defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
@@ -194,6 +196,12 @@ export const hasCollectReportIssues = R.pipe(
 export const getCollectNodeDefsInfoByPath = ObjectUtils.getProp(keys.collectNodeDefsInfoByPath, {})
 
 export const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
+
+export const getOdkFormId = ObjectUtils.getProp(keys.odkFormId)
+
+export const isFromOdk = R.pipe(getOdkFormId, R.isNil, R.not)
+
+export const getOdkNodeDefsInfoByPath = ObjectUtils.getProp(keys.odkNodeDefsInfoByPath, {})
 
 export const getLanguage = (preferredLang) => (surveyInfo) =>
   R.pipe(getLanguages, R.find(R.equals(preferredLang)), R.defaultTo(getDefaultLanguage(surveyInfo)))(surveyInfo)

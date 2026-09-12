@@ -146,6 +146,5 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
   templateFor_genericDataImport_csv: 'インポート用テンプレート（汎用、CSV）',
   templateFor_genericDataImport_xlsx: 'インポート用テンプレート（汎用、Excel）',
   validateFile: 'ファイルを検証',
-  validateFileInfo:
-    '検証処理では、各属性のデータ型に従って、ファイルに有効なデータが含まれているかを確認します。',
+  validateFileInfo: '検証処理では、各属性のデータ型に従って、ファイルに有効なデータが含まれているかを確認します。',
 }

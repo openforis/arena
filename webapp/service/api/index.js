@@ -61,6 +61,7 @@ export {
   fetchRecordsNodeFileExifInfo,
   createRecordFromSamplingPointDataItem,
   startCollectRecordsImportJob,
+  startOdkDataImportJob,
   startDataImportFromArenaJob,
   startArenaImportSummaryJob,
   cancelArenaImportSummary,

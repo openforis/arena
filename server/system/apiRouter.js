@@ -9,6 +9,8 @@ import * as taxonomyApi from '@server/modules/taxonomy/api/taxonomyApi'
 import * as geoApi from '@server/modules/geo/api/geoApi'
 import * as collectImportApi from '@server/modules/collectImport/api/collectImportApi'
 import * as arenaImportApi from '@server/modules/arenaImport/api/arenaImportApi'
+import * as odkImportApi from '@server/modules/odkImport/api/odkImportApi'
+import * as odkDataImportApi from '@server/modules/odkImport/api/odkDataImportApi'
 import * as recordApi from '@server/modules/record/api/recordApi'
 import * as dataExportApi from '@server/modules/dataExport/api/dataExportApi'
 import * as dataImportApi from '@server/modules/dataImport/api/dataImportApi'
@@ -37,6 +39,8 @@ geoApi.init(router)
 
 collectImportApi.init(router)
 arenaImportApi.init(router)
+odkImportApi.init(router)
+odkDataImportApi.init(router)
 
 recordApi.init(router)
 dataExportApi.init(router)

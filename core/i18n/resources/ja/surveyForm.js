@@ -58,8 +58,7 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
   nodeDefEditFormActions: {
     columns: '列',
     confirmConvert: '属性「{{name}}」を「{{toType}}」に変換しますか？',
-    confirmDelete:
-      'このノード定義「{{ name }}」を完全に削除しますか？\n\n$t(common.cantUndoWarning)',
+    confirmDelete: 'このノード定義「{{ name }}」を完全に削除しますか？\n\n$t(common.cantUndoWarning)',
   },
   nodeDefCode: {
     code: '$t(common.code)',

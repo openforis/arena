@@ -13,6 +13,7 @@ export default {
     label: 'Эх сурвалж',
     arena: 'Arena (.zip)',
     collect: 'Collect (.collect, .collect-backup, .collect-data)',
+    odk: 'ODK (.xml)',
   },
   startImport: 'Импорт эхлүүлэх',
   survey: 'Судалгаа',

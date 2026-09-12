@@ -151,8 +151,7 @@ export default {
       visibleInMobile: 'Arena Mobileに表示する',
       allowRecordsDownloadInMobile: 'サーバーからArena Mobileへの記録ダウンロードを許可',
       allowRecordsUploadFromMobile: 'Arena Mobileからサーバーへの記録アップロードを許可',
-      allowRecordsWithErrorsUploadFromMobile:
-        '検証エラーのある記録のArena Mobileからサーバーへのアップロードを許可',
+      allowRecordsWithErrorsUploadFromMobile: '検証エラーのある記録のArena Mobileからサーバーへのアップロードを許可',
     },
     srsPlaceholder: 'コードまたはラベルを入力',
     unpublish: '公開を取り消してデータを削除',

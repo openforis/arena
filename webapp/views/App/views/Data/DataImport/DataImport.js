@@ -1,16 +1,17 @@
 import './DataImport.scss'
 
-
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 import TabBar from '@webapp/components/tabBar'
 import { TestId } from '@webapp/utils/testId'
 import { DataImportFlatDataView } from './DataImportFlatDataView'
 import { CollectDataImportView } from './DataImportCollectView'
 import { DataImportArenaView } from './DataImportArenaView'
+import { DataImportOdkView } from './DataImportOdkView'
 
 const DataImport = () => {
   const i18n = useI18n()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   return (
     <div className="data-import">
@@ -31,6 +32,17 @@ const DataImport = () => {
             label: i18n.t('dataImportView:importFromArena'),
             component: DataImportArenaView,
           },
+          // ODK import is experimental - only shown when EXPERIMENTAL_FEATURES is enabled
+          // (see core/processUtils.ts)
+          ...(experimentalFeatures
+            ? [
+                {
+                  id: TestId.dataImport.importFromOdkTab,
+                  label: i18n.t('dataImportView:importFromOdk'),
+                  component: DataImportOdkView,
+                },
+              ]
+            : []),
         ]}
       />
     </div>
