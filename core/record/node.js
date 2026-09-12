@@ -303,6 +303,7 @@ export const newNodeValueTaxon = ({ taxonUuid }) => ({ [valuePropsTaxon.taxonUui
 const _getTimePart = _getDateTimePart(':')
 export const getTimeHour = _getTimePart(0)
 export const getTimeMinute = _getTimePart(1)
+export const getTimeSeconds = _getTimePart(2)
 
 // Generic value prop extractor
 const _datePropGetters = {
@@ -314,6 +315,7 @@ const _datePropGetters = {
 const _timePropGetters = {
   [valuePropsTime.hour]: getTimeHour,
   [valuePropsTime.minute]: getTimeMinute,
+  [valuePropsTime.seconds]: getTimeSeconds,
 }
 
 const _valuePropGetters = {

@@ -1158,6 +1158,9 @@ This is perfect for hiding entire parts of a survey based on who is logged in (l
     mobileProps: {
       title: 'Mobile App',
     },
+    timeProps: {
+      includeSeconds: 'Include seconds',
+    },
     formHeaderProps: {
       headerColorLabel: 'Header color',
       headerColor: {

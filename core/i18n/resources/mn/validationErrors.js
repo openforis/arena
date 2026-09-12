@@ -71,7 +71,7 @@ export default {
     invalidNumber: 'Багана {{headers}}-д хүчингүй тоо: {{value}}',
     invalidTaxonCode: 'Багана {{headers}}-д хүчингүй таксоны код: {{value}}',
     invalidTime:
-      'Багана {{headers}}-д хүчингүй цаг: {{value}}. Цагийг ЦАГ:МИНУТ форматаар байх ёстой. Жишээ нь: 09:45 эсвэл 16:30',
+      'Багана {{headers}}-д хүчингүй цаг: {{value}}. Цагийг ЦАГ:МИНУТ эсвэл ЦАГ:МИНУТ:СЕКУНД форматаар байх ёстой. Жишээ нь: 09:45, 16:30 эсвэл 09:45:30',
     missingRequiredHeaders: 'Шаардлагатай баганууд дутуу: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Утгуудыг шинэчлэхэд алдаа гарлаа: {{details}}',
     multipleRecordsMatchingKeys: 'Түлхүүр "{{keyValues}}"-д тохирох олон бичлэг олдов',

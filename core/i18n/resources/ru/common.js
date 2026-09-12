@@ -1127,6 +1127,9 @@ $t(common.appNameFull)
     mobileProps: {
       title: 'Мобильное приложение',
     },
+    timeProps: {
+      includeSeconds: 'Включить секунды',
+    },
     formHeaderProps: {
       headerColorLabel: 'Цвет заголовка',
       headerColor: {
