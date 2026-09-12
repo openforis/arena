@@ -127,7 +127,7 @@ export const formatTimeSummaryValue = ({ value, nodeDef }) =>
   DateUtils.convertDate({
     dateStr: value,
     formatFrom: 'HH:mm:ss',
-    formatTo: DateUtils.getTimeFormat(nodeDef),
+    formatTo: DateUtils.getTimeFormat(NodeDef.isSecondsIncluded(nodeDef)),
     keepTimeZone: false,
   })
 

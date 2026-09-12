@@ -23,7 +23,6 @@ const {
 export { add, addHours, addMinutes, convertDate, diffInHours, parse, parseISO, sub, subDays, subMonths, subYears }
 
 import { isBlank } from './stringUtils'
-import * as NodeDef from './survey/nodeDef'
 
 export const formats = {
   dateDefault: DateFormats.dateDisplay,
@@ -141,8 +140,8 @@ export const formatTime = (hour: unknown, minute: unknown, seconds?: unknown): s
   return seconds === undefined ? base : `${base}:${normalizeDateTimeValue(2)(seconds)}`
 }
 
-export const getTimeFormat = (nodeDef: unknown): string =>
-  NodeDef.isSecondsIncluded(nodeDef as never) ? formats.timeWithSeconds : formats.timeStorage
+export const getTimeFormat = (includeSeconds: boolean): string =>
+  includeSeconds ? formats.timeWithSeconds : formats.timeStorage
 
 export const parseDateISO = (dateStr: string): unknown => parse(dateStr, formats.dateISO)
 

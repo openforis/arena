@@ -30,13 +30,11 @@ describe('DateUtils time-with-seconds helpers', () => {
   })
 
   it('getTimeFormat returns timeStorage when includeSeconds is not set', () => {
-    const nodeDef = { props: {} }
-    expect(DateUtils.getTimeFormat(nodeDef)).toBe(DateUtils.formats.timeStorage)
+    expect(DateUtils.getTimeFormat(false)).toBe(DateUtils.formats.timeStorage)
   })
 
   it('getTimeFormat returns timeWithSeconds when includeSeconds is true', () => {
-    const nodeDef = { props: { includeSeconds: true } }
-    expect(DateUtils.getTimeFormat(nodeDef)).toBe(DateUtils.formats.timeWithSeconds)
+    expect(DateUtils.getTimeFormat(true)).toBe(DateUtils.formats.timeWithSeconds)
   })
 
   it('formatTime with 2 args keeps existing HH:mm behavior', () => {

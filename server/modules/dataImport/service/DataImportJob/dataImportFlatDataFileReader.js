@@ -116,7 +116,9 @@ export const extractTimeValue = ({ value, headers, nodeDef }) => {
   // seconds; otherwise fall back to the plain HH:mm storage format, so an HH:mm input into a
   // seconds-enabled attribute is accepted as-is, instead of being padded with a spurious ":00".
   const valueHasSeconds = typeof val === 'string' && timeWithSecondsValuePattern.test(val.trim())
-  const formatTo = valueHasSeconds ? DateUtils.getTimeFormat(nodeDef) : DateUtils.formats.timeStorage
+  const formatTo = valueHasSeconds
+    ? DateUtils.getTimeFormat(NodeDef.isSecondsIncluded(nodeDef))
+    : DateUtils.formats.timeStorage
   return {
     value: extractDateOrTime({
       value,
