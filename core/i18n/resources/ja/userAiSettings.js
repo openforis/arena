@@ -1,0 +1,61 @@
+export default {
+  title: 'AI設定',
+  section: 'AI機能',
+  enableFeatures: 'AI機能を有効にする',
+  categoriesSection: 'AI統合レベル',
+  categories: {
+    chat: 'ドキュメントチャットボット',
+    chatHint: '設定されたAIプロバイダーを利用し、Arenaに関する質問に答える浮遊ヘルプボタンです。',
+    expressions: '式の生成・検証',
+    expressionsHint: '調査の検証式の下書き作成・説明を支援するAI機能です。',
+    translation: 'ラベルの翻訳',
+    translationHint: '設定したAIプロバイダーを通じて、多言語対応の調査項目ラベルを自動翻訳します。',
+    dataDictionary: 'データディクショナリ',
+    dataDictionaryHint: 'AIによるデータディクショナリのエクスポート下書き作成です。',
+    userActivity: 'ユーザーアクティビティ',
+    userActivityHint: 'AIによって生成されるアクティビティログの要約です。',
+  },
+  providerSection: 'AIプロバイダー',
+  currentlyUsing: '現在使用中：{{source}} - {{provider}} / {{model}}',
+  sourceUser: '個人用プロバイダー',
+  'sourceAdmin-default': 'プラットフォームのデフォルト',
+  notConfigured:
+    'あなたのアカウント、またはこのデプロイメントではAIが設定されていません。以下で個人用プロバイダーを設定するか、管理者に連絡してください。',
+  featuresDisabled: 'このデプロイメントではAI機能が無効になっています。',
+  encryptionMissing:
+    'このデプロイメントにはAI_USER_KEY_ENCRYPTION_SECRETが設定されていません。管理者が設定するまで、個人用APIキーは保存できません。',
+
+  provider: 'プロバイダー',
+  providers: {
+    default: 'デフォルト',
+    openai: 'OpenAI',
+    anthropic: 'Anthropic（Claude）',
+    google: 'Google（Gemini）',
+    'openai-compatible': 'OpenAI互換（Azure、OpenRouter、Ollamaなど）',
+    'vercel-ai-sdk': 'Vercel AI SDK（チャットエンドポイント）',
+  },
+  defaultProviderHint: 'Arena管理者が設定したAIプロバイダーを使用します。',
+  model: 'モデル',
+  modelOther: 'その他（モデルIDを入力）...',
+  baseUrl: 'ベースURL',
+  apiKey: 'APIキー',
+  apiKeyPlaceholder: 'プロバイダーのAPIキーを貼り付けてください',
+  apiKeyKept: '既存のキーを維持する場合は空欄のままにしてください。',
+  vercelAiSdkHint:
+    'Vercel AI SDKチャットエンドポイントは固定エージェントとして扱われ、モデル選択やAPIキーは適用されません。自由記述の生成は機能しますが、構造化出力機能は動作しない場合があります。',
+  fetchModels: 'モデルを取得',
+  fetchingModels: 'モデルを取得中...',
+  modelsFetchFailed: 'モデルを取得できませんでした：{{message}}',
+
+  save: '保存',
+  testConnection: '接続をテスト',
+  clear: 'クリア',
+
+  testing: '接続をテスト中...',
+  testOk: '接続に成功しました（{{latencyMs}} ms）。',
+  testFailed: '接続に失敗しました：{{message}}',
+
+  savedSuccessfully: 'AI設定を保存しました。',
+  saveFailed: 'AI設定の保存に失敗しました：{{message}}',
+  cleared: '個人用AI設定を削除しました。',
+}
