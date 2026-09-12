@@ -392,6 +392,7 @@ Try again?`,
 
     help: 'Help',
     about: 'About',
+    changelog: 'Changelog',
     disclaimer: 'Disclaimer',
     userManual: 'User Manual',
   },
@@ -935,7 +936,7 @@ About
 
 $t(common.appNameFull)
 --------
- 
+
  * Developed by: $t(links.openforis)
  * Version: {{version}}
  * Website: $t(links.openforisArenaWebsite)
@@ -945,6 +946,9 @@ $t(common.appNameFull)
  * Arena in GitHub: $t(links.arenaInGitHub)
  * Arena R Scripts in GitHub: $t(links.arenaRScriptsInGitHub)
 `,
+    },
+    changelog: {
+      title: '$t(appModules.changelog)',
     },
   },
 

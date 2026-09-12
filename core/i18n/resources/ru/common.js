@@ -385,6 +385,7 @@ export default {
 
     help: 'Помощь',
     about: 'О программе',
+    changelog: 'Журнал изменений',
     disclaimer: 'Отказ от ответственности',
     userManual: 'Руководство пользователя',
   },
@@ -918,6 +919,9 @@ $t(common.appNameFull)
  * Arena на GitHub: $t(links.arenaInGitHub)
  * Скрипты Arena R на GitHub: $t(links.arenaRScriptsInGitHub)
 `,
+    },
+    changelog: {
+      title: '$t(appModules.changelog)',
     },
   },
 

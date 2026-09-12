@@ -1,5 +1,5 @@
 export { fetchLoggedInUserAndSurvey } from './fetchUserAndSurvey'
-export { downloadFileUrl, fetchVersion } from './generic'
+export { downloadFileUrl, fetchChangelog, fetchVersion } from './generic'
 export { fetchInfo } from './info'
 
 export {

@@ -395,6 +395,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
 
     help: 'Ajuda',
     about: 'Sobre',
+    changelog: 'Registo de alterações',
     disclaimer: 'Aviso legal',
     userManual: 'Manual do usuário',
   },
@@ -942,6 +943,9 @@ $t(common.appNameFull)
  * Arena no GitHub: $t(links.arenaInGitHub)
  * Scripts R do Arena no GitHub: $t(links.arenaRScriptsInGitHub)
 `,
+    },
+    changelog: {
+      title: '$t(appModules.changelog)',
     },
   },
 

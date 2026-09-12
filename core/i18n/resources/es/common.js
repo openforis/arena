@@ -356,6 +356,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
 
     help: 'Ayuda',
     about: 'Acerca de',
+    changelog: 'Registro de cambios',
     disclaimer: 'Descargo de responsabilidad',
     userManual: 'Manual de usuario',
   },
@@ -800,6 +801,9 @@ $t(common.appNameFull)
  * Arena en GitHub: $t(links.arenaInGitHub)
  * Scripts R de Arena en GitHub: $t(links.arenaRScriptsInGitHub)
 `,
+    },
+    changelog: {
+      title: '$t(appModules.changelog)',
     },
   },
   nodeDefEdit: {
