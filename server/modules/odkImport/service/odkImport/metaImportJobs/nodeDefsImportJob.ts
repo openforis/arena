@@ -20,8 +20,8 @@ import type { XmlElement, XFormBind, XFormBodyControl, ItextTranslations } from 
 import { mapXFormTypeToNodeDefType, arenaFileTypeFromMediatype } from '../model/xformTypeMapping'
 import { OdkExpressionConverter } from './nodeDefsImportJob/odkExpressionConverter'
 
-const literalTrueValues = ['true()', 'true']
-const literalFalseValues = ['false()', 'false']
+const literalTrueValues = new Set(['true()', 'true'])
+const literalFalseValues = new Set(['false()', 'false'])
 
 /**
  * Recursively walks the XForm primary instance (node shape) and, for each node, joins in the
@@ -269,16 +269,9 @@ export default class NodeDefsImportJob extends Job {
 
     let categoryMissing = false
     if (type === NodeDef.nodeDefType.code) {
-      const categoryKey = bodyControl?.itemsetInstanceId ? `instance:${bodyControl.itemsetInstanceId}` : `field:${path}`
-      const category = categoriesByKey?.[categoryKey]
-      if (category) {
-        props[NodeDef.propKeys.categoryUuid] = Category.getUuid(category)
-      } else {
-        categoryMissing = true
-      }
-      if (odkType === 'select') {
-        props[NodeDef.propKeys.multiple] = true
-      }
+      const codeTypeResult = this._buildCodeTypeProps({ odkType, path, bodyControl, categoriesByKey })
+      Object.assign(props, codeTypeResult.props)
+      categoryMissing = codeTypeResult.categoryMissing
     }
 
     if (type === NodeDef.nodeDefType.file) {
@@ -297,6 +290,54 @@ export default class NodeDefsImportJob extends Job {
     this.nodeDefsByXFormPath.set(path, nodeDef)
 
     // logged only now that the attribute's own uuid exists, to satisfy the report table's FK
+    this._pushCategoryReportItemIfNeeded({ nodeDef, type, path, bodyControl, categoryMissing })
+
+    nodeDef = await this._applyExpressions({ nodeDef, path, bind })
+
+    return nodeDef
+  }
+
+  // Resolves a code-type attribute's category (by itemset-instance id, or by field path) into its
+  // NodeDef props, and whether ODK's `select` (multi-select) variant needs `multiple: true` - split out
+  // of _insertAttributeNodeDef to keep that function's branching flat (cognitive complexity).
+  _buildCodeTypeProps({
+    odkType,
+    path,
+    bodyControl,
+    categoriesByKey,
+  }: {
+    odkType: string | null
+    path: string
+    bodyControl: XFormBodyControl | null
+    categoriesByKey: Record<string, any>
+  }): { props: Record<string, any>; categoryMissing: boolean } {
+    const categoryKey = bodyControl?.itemsetInstanceId ? `instance:${bodyControl.itemsetInstanceId}` : `field:${path}`
+    const category = categoriesByKey?.[categoryKey]
+
+    const props: Record<string, any> = {}
+    if (category) {
+      props[NodeDef.propKeys.categoryUuid] = Category.getUuid(category)
+    }
+    if (odkType === 'select') {
+      props[NodeDef.propKeys.multiple] = true
+    }
+    return { props, categoryMissing: !category }
+  }
+
+  // Split out of _insertAttributeNodeDef to keep that function's branching flat (cognitive complexity).
+  _pushCategoryReportItemIfNeeded({
+    nodeDef,
+    type,
+    path,
+    bodyControl,
+    categoryMissing,
+  }: {
+    nodeDef: any
+    type: string
+    path: string
+    bodyControl: XFormBodyControl | null
+    categoryMissing: boolean
+  }) {
     if (categoryMissing) {
       this._pushReportItem({
         nodeDefUuid: NodeDef.getUuid(nodeDef),
@@ -310,10 +351,6 @@ export default class NodeDefsImportJob extends Job {
         message: path,
       })
     }
-
-    nodeDef = await this._applyExpressions({ nodeDef, path, bind })
-
-    return nodeDef
   }
 
   /**
@@ -350,57 +387,50 @@ export default class NodeDefsImportJob extends Job {
       return converted
     }
 
-    if (bind.relevant) {
-      const converted = await convertAndReport({
+    // relevant/constraint/calculate are structurally identical to convert (bind field -> converted
+    // expression -> stored in either propsAdvanced or validations) - handled as data instead of 3
+    // near-duplicate if-blocks to keep this function's branching flat (cognitive complexity).
+    const expressionBindings: {
+      bindValue: string | null | undefined
+      itemType: string
+      apply: (converted: string) => void
+    }[] = [
+      {
+        bindValue: bind.relevant,
         itemType: OdkImportReportItem.itemTypes.relevant,
-        expression: bind.relevant,
-      })
-      if (converted) {
-        propsAdvanced[NodeDef.keysPropsAdvanced.applicable] = [
-          NodeDefExpression.createExpression({ expression: converted }),
-        ]
-      }
-    }
-
-    if (bind.constraint) {
-      const converted = await convertAndReport({
+        apply: (converted) => {
+          propsAdvanced[NodeDef.keysPropsAdvanced.applicable] = [
+            NodeDefExpression.createExpression({ expression: converted }),
+          ]
+        },
+      },
+      {
+        bindValue: bind.constraint,
         itemType: OdkImportReportItem.itemTypes.constraint,
-        expression: bind.constraint,
-      })
-      if (converted) {
-        validations[NodeDefValidations.keys.expressions] = [
-          NodeDefExpression.createExpression({ expression: converted }),
-        ]
-      }
-    }
-
-    if (bind.calculate) {
-      const converted = await convertAndReport({
+        apply: (converted) => {
+          validations[NodeDefValidations.keys.expressions] = [
+            NodeDefExpression.createExpression({ expression: converted }),
+          ]
+        },
+      },
+      {
+        bindValue: bind.calculate,
         itemType: OdkImportReportItem.itemTypes.calculate,
-        expression: bind.calculate,
-      })
-      if (converted) {
-        propsAdvanced[NodeDef.keysPropsAdvanced.defaultValues] = [
-          NodeDefExpression.createExpression({ expression: converted }),
-        ]
-      }
+        apply: (converted) => {
+          propsAdvanced[NodeDef.keysPropsAdvanced.defaultValues] = [
+            NodeDefExpression.createExpression({ expression: converted }),
+          ]
+        },
+      },
+    ]
+    for (const { bindValue, itemType, apply } of expressionBindings) {
+      if (!bindValue) continue
+      const converted = await convertAndReport({ itemType, expression: bindValue })
+      if (converted) apply(converted)
     }
 
-    if (bind.required) {
-      const requiredRaw = bind.required.trim()
-      if (literalTrueValues.includes(requiredRaw)) {
-        validations[NodeDefValidations.keys.required] = true
-      } else if (!literalFalseValues.includes(requiredRaw)) {
-        // a non-trivial `required` expression - Arena's required flag is a plain boolean (unlike
-        // relevant/constraint/calculate, it has no expression slot to convert into), so this is
-        // flagged for manual review rather than guessed at
-        this._pushReportItem({
-          nodeDefUuid,
-          itemType: OdkImportReportItem.itemTypes.requiredExpr,
-          expression: bind.required,
-          resolved: false,
-        })
-      }
+    if (this._resolveRequiredValidation({ requiredRaw: bind.required, nodeDefUuid })) {
+      validations[NodeDefValidations.keys.required] = true
     }
 
     if (Object.keys(validations).length > 0) {
@@ -425,6 +455,31 @@ export default class NodeDefsImportJob extends Job {
     const updatedNodeDef = nodeDefsUpdated[nodeDefUuid]
     this.nodeDefsByXFormPath.set(path, updatedNodeDef)
     return updatedNodeDef
+  }
+
+  // Arena's `required` flag is a plain boolean (unlike relevant/constraint/calculate, it has no
+  // expression slot to convert into) - a non-trivial `required` expression is flagged for manual
+  // review rather than guessed at. Split out of _applyExpressions to keep that function's branching
+  // flat (cognitive complexity).
+  _resolveRequiredValidation({
+    requiredRaw,
+    nodeDefUuid,
+  }: {
+    requiredRaw: string | null | undefined
+    nodeDefUuid: string
+  }): boolean {
+    if (!requiredRaw) return false
+    const trimmed = requiredRaw.trim()
+    if (literalTrueValues.has(trimmed)) return true
+    if (!literalFalseValues.has(trimmed)) {
+      this._pushReportItem({
+        nodeDefUuid,
+        itemType: OdkImportReportItem.itemTypes.requiredExpr,
+        expression: requiredRaw,
+        resolved: false,
+      })
+    }
+    return false
   }
 
   _pushReportItem({

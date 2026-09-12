@@ -207,37 +207,77 @@ export default class RecordsImportJob extends Job {
       for (const childElement of childElements) {
         if (this.isCanceled()) break
 
-        if (NodeDef.isEntity(nodeDef)) {
-          const node = Node.newNode(nodeDefUuid, Record.getUuid(recordUpdated), parentNode)
-          recordUpdated = Record.assocNode(node, { sideEffect: true })(recordUpdated)
-
-          recordUpdated = await this._buildRecordNodes({
-            survey,
-            nodeDefsInfoByPath,
-            parentNode: node,
-            parentPath: childPath,
-            submissionElement: childElement,
-            record: recordUpdated,
-            submissionFileZip,
-            submissionDir,
-          })
-        } else {
-          const rawText = XForm.getElementText(childElement)
-
-          recordUpdated = await this._buildAttributeNodes({
-            survey,
-            nodeDef,
-            nodeDefUuid,
-            parentNode,
-            rawText,
-            record: recordUpdated,
-            submissionFileZip,
-            submissionDir,
-          })
-        }
+        recordUpdated = await this._buildChildNode({
+          survey,
+          nodeDefsInfoByPath,
+          nodeDef,
+          nodeDefUuid,
+          parentNode,
+          childPath,
+          childElement,
+          record: recordUpdated,
+          submissionFileZip,
+          submissionDir,
+        })
       }
     }
     return recordUpdated
+  }
+
+  // Builds either a nested entity's own subtree (recursing back into _buildRecordNodes) or a single
+  // attribute node, depending on the child's NodeDef type - split out of _buildRecordNodes to keep that
+  // function's loop nesting shallow (cognitive complexity).
+  async _buildChildNode({
+    survey,
+    nodeDefsInfoByPath,
+    nodeDef,
+    nodeDefUuid,
+    parentNode,
+    childPath,
+    childElement,
+    record,
+    submissionFileZip,
+    submissionDir,
+  }: {
+    survey: any
+    nodeDefsInfoByPath: { [path: string]: string }
+    nodeDef: any
+    nodeDefUuid: string
+    parentNode: any
+    childPath: string
+    childElement: XmlElement
+    record: any
+    submissionFileZip: any
+    submissionDir: string
+  }): Promise<any> {
+    if (NodeDef.isEntity(nodeDef)) {
+      const node = Node.newNode(nodeDefUuid, Record.getUuid(record), parentNode)
+      const recordWithNode = Record.assocNode(node, { sideEffect: true })(record)
+
+      return this._buildRecordNodes({
+        survey,
+        nodeDefsInfoByPath,
+        parentNode: node,
+        parentPath: childPath,
+        submissionElement: childElement,
+        record: recordWithNode,
+        submissionFileZip,
+        submissionDir,
+      })
+    }
+
+    const rawText = XForm.getElementText(childElement)
+
+    return this._buildAttributeNodes({
+      survey,
+      nodeDef,
+      nodeDefUuid,
+      parentNode,
+      rawText,
+      record,
+      submissionFileZip,
+      submissionDir,
+    })
   }
 
   async _buildAttributeNodes({

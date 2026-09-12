@@ -313,9 +313,7 @@ export const getItextTranslations = (
     if (!rawLang) return
     const lang = normalizeLangCode(rawLang)
     const isDefault = ['true()', 'true'].includes(getAttribute('default')(translationEl) ?? '')
-    if (isDefault) {
-      defaultLang = lang
-    } else if (!defaultLang) {
+    if (isDefault || !defaultLang) {
       defaultLang = lang
     }
 

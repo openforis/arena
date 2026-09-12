@@ -1,10 +1,10 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as OdkImportReportItem from '@core/survey/odkImportReportItem'
 
+import { Schemata } from '@common/model/db'
+
 import * as DbUtils from '@server/db/dbUtils'
 import * as ImportReportRepository from '@server/modules/importReport/repository/importReportRepository'
-
-import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 // Table-level CRUD (fetchItems/countItems/insertItem/insertItems/updateItem) is shared with the Collect
 // importer via ImportReportRepository - see its header comment and
@@ -34,8 +34,8 @@ export const fetchItemsStream = async ({ surveyId }: { surveyId: number }) => {
         (ir.props)->>'${OdkImportReportItem.propKeys.message}' as message,
         ir.props as props,
         ir.resolved as resolved
-      FROM ${getSurveyDBSchema(surveyId)}.import_report ir
-      JOIN ${getSurveyDBSchema(surveyId)}.node_def nd on nd.uuid = ir.node_def_uuid
+      FROM ${Schemata.getSchemaSurvey(surveyId)}.import_report ir
+      JOIN ${Schemata.getSchemaSurvey(surveyId)}.node_def nd on nd.uuid = ir.node_def_uuid
       WHERE ir.source = 'odk'
       ORDER BY id
    `

@@ -1,9 +1,10 @@
 import * as R from 'ramda'
 
+import { Schemata } from '@common/model/db'
+
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
-
-import { getSurveyDBSchema, dbTransformCallback } from '../../survey/repository/surveySchemaRepositoryUtils'
+import { transformCallback } from '@server/db'
 
 // Shared, source-agnostic CRUD over the `import_report` table - see
 // arena-server's 20260911194436-generalize-collect-import-report-to-import-report migration. The table
@@ -43,14 +44,14 @@ export const fetchItems = async (
   client.map(
     `
       SELECT *
-      FROM ${getSurveyDBSchema(surveyId)}.${table}
+      FROM ${Schemata.getSchemaSurvey(surveyId)}.${table}
       ${_getSelectWhereCondition({ excludeResolved })}
       ORDER BY id
       LIMIT ${limit ? '$/limit/' : 'ALL'}
       OFFSET $/offset/
     `,
     { source, limit, offset },
-    dbTransformCallback
+    transformCallback
   )
 
 export const countItems = async (
@@ -60,7 +61,7 @@ export const countItems = async (
   client.one(
     `
       SELECT COUNT(*) as tot
-      FROM ${getSurveyDBSchema(surveyId)}.${table}
+      FROM ${Schemata.getSchemaSurvey(surveyId)}.${table}
       ${_getSelectWhereCondition({ excludeResolved })}
     `,
     { source },
@@ -75,12 +76,12 @@ export const insertItem = async (
 ) =>
   client.one(
     `
-      INSERT INTO ${getSurveyDBSchema(surveyId)}.${table} (node_def_uuid, props, resolved, source)
+      INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.${table} (node_def_uuid, props, resolved, source)
       VALUES ($1, $2, $3, $4)
       RETURNING *
     `,
     [item.nodeDefUuid, item.props, item.resolved, source],
-    dbTransformCallback
+    transformCallback
   )
 
 export const insertItems = async (
@@ -94,7 +95,7 @@ export const insertItems = async (
   items.length > 0 &&
   client.none(
     DbUtils.insertAllQueryBatch(
-      getSurveyDBSchema(surveyId),
+      Schemata.getSchemaSurvey(surveyId),
       table,
       ['node_def_uuid', 'props', 'resolved', 'source'],
       items.map((item) => ({
@@ -116,7 +117,7 @@ export const updateItem = async (
 ) =>
   client.one(
     `
-      UPDATE ${getSurveyDBSchema(surveyId)}.${table}
+      UPDATE ${Schemata.getSchemaSurvey(surveyId)}.${table}
       SET
         props = props || $3::jsonb,
         resolved = $4,
@@ -125,5 +126,5 @@ export const updateItem = async (
       RETURNING *
     `,
     [itemId, source, props, resolved],
-    dbTransformCallback
+    transformCallback
   )

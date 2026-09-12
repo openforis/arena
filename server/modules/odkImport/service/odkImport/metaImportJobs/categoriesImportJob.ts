@@ -24,7 +24,7 @@ interface CategorySource {
 
 const sanitizeCategoryName = (rawName: string): string =>
   rawName
-    .replace(/[^a-zA-Z0-9_]/g, '_')
+    .replace(/\W/g, '_')
     .replace(/^[^a-zA-Z_]/, '_$&')
     .toLowerCase() || 'choices'
 

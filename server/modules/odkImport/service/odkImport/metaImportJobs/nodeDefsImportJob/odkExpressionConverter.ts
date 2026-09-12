@@ -91,7 +91,11 @@ const ABSOLUTE_PATH_PATTERN = /(?<![.\w/])\/[A-Za-z_]\w*(?:\/[A-Za-z_]\w*)+/g
 // Consumes every "/segment" after the leading dots, not just one, so "../a/b/c" converts as a whole.
 const RELATIVE_DOTS_PATH_PATTERN = /\.\.(?:\/\.\.)*(?:\/[A-Za-z_]\w*)*/g
 const SELF_REFERENCE_PATTERN = /(?<![\w.])\.(?![\w.(])/g
-const SELECTED_CALL_PATTERN = /\bselected\(\s*([^,]+?)\s*,\s*((?:'[^']*')|(?:"[^"]*"))\s*\)/g
+// The path-argument group is greedy with no adjacent optional-whitespace boundary (leading/trailing
+// whitespace inside it is trimmed at the call site instead) - avoids the overlapping-quantifier
+// backtracking blowup an equivalent `\s*([^,]+?)\s*,` shape has, since both `\s` and `[^,]` can match
+// the same whitespace character.
+const SELECTED_CALL_PATTERN = /\bselected\(([^,]+),\s*((?:'[^']*')|(?:"[^"]*"))\s*\)/g
 
 /**
  * Converts an ODK/XForm `relevant`/`constraint`/`calculate`/`required` XPath expression into a valid
@@ -140,7 +144,7 @@ const convert = async ({
   }
 
   const converted = expression
-    .replace(/\n/g, ' ')
+    .replaceAll('\n', ' ')
     .trim()
     // selected(x, 'v') -> includes(<resolved x>, 'v') - must run before generic path resolution,
     // since its first argument is itself a path token
