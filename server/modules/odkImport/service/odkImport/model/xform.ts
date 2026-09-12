@@ -1,3 +1,5 @@
+import { languageCodes } from '@core/app/languages'
+
 import * as FileXml from '@server/utils/file/fileXml'
 
 /**
@@ -277,10 +279,26 @@ export const getSecondaryInstancesByInstanceId = (xform: XmlElement): Map<string
   return result
 }
 
+const LANG_CODE_SUFFIX_PATTERN = /\(([a-zA-Z-]+)\)\s*$/
+
+// ODK's official XLSForm convention for a language column is "Language Name (code)" (e.g.
+// "label::English (en)"), and pyxform/ODK Central preserve that whole string verbatim as the itext
+// <translation lang="..."> attribute - not a bare ISO code (confirmed against real pyxform output,
+// e.g. a reported `lang="Portuguese (pt)"`). Arena's own language model expects a real ISO 639-1 code
+// (core/app/languages.ts), so this extracts the parenthesized code when present and recognized,
+// falling back to the raw attribute value unchanged otherwise (already a bare code, or some other
+// convention) rather than guessing at a transformation with no evidence behind it.
+const normalizeLangCode = (rawLang: string): string => {
+  const match = LANG_CODE_SUFFIX_PATTERN.exec(rawLang)
+  const code = match?.[1]?.toLowerCase()
+  return code && languageCodes.includes(code) ? code : rawLang
+}
+
 /**
  * Parses <itext><translation lang="..." default="true()"><text id="..."><value>...</value></text>...
  * into { [textId]: { [lang]: text } }, plus the resolved default language (explicit `default="true()"`
- * wins; otherwise the first translation encountered).
+ * wins; otherwise the first translation encountered). The `lang` attribute is normalized to a bare ISO
+ * code when it follows ODK's "Name (code)" convention - see normalizeLangCode.
  */
 export const getItextTranslations = (
   xform: XmlElement
@@ -291,8 +309,9 @@ export const getItextTranslations = (
   if (!itextEl) return { translations, defaultLang }
 
   getDirectChildrenByLocalName(itextEl, 'translation').forEach((translationEl) => {
-    const lang = getAttribute('lang')(translationEl)
-    if (!lang) return
+    const rawLang = getAttribute('lang')(translationEl)
+    if (!rawLang) return
+    const lang = normalizeLangCode(rawLang)
     const isDefault = ['true()', 'true'].includes(getAttribute('default')(translationEl) ?? '')
     if (isDefault) {
       defaultLang = lang

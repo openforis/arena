@@ -205,6 +205,41 @@ describe('odkImport / xform', () => {
     )
   })
 
+  test('getItextTranslations normalizes ODK\'s "Name (code)" language convention to a bare ISO code', () => {
+    // ODK's own docs (docs.getodk.org/form-language) recommend XLSForm columns like "label::English (en)",
+    // and pyxform/ODK Central preserve that whole string verbatim as the itext lang attribute - a real
+    // reported example is lang="Portuguese (pt)", not lang="pt".
+    const xformWithNamedLangs = XForm.parseXForm(`<?xml version="1.0"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms">
+  <h:head>
+    <model>
+      <itext>
+        <translation lang="English (en)" default="true()">
+          <text id="/data/name:label"><value>Name</value></text>
+        </translation>
+        <translation lang="Portuguese (pt)">
+          <text id="/data/name:label"><value>Nome</value></text>
+        </translation>
+        <translation lang="Klingon (xx-made-up)">
+          <text id="/data/name:label"><value>???</value></text>
+        </translation>
+      </itext>
+      <instance><data id="x"><name/></data></instance>
+    </model>
+  </h:head>
+  <h:body><input ref="/data/name"><label ref="jr:itext('/data/name:label')"/></input></h:body>
+</h:html>`)
+    const { translations, defaultLang } = XForm.getItextTranslations(xformWithNamedLangs)
+    expect(defaultLang).toBe('en')
+    expect(translations['/data/name:label']).toEqual({
+      en: 'Name',
+      pt: 'Nome',
+      // an unrecognized code (not in Arena's known ISO 639-1 list) is left as the raw attribute value,
+      // rather than guessing - "xx-made-up" isn't a real language, so this falls through unnormalized
+      'Klingon (xx-made-up)': '???',
+    })
+  })
+
   test('getItextTranslations prefers the plain-text <value> over a media-annotated one (form="image"/"audio")', () => {
     const xformWithMediaItext = XForm.parseXForm(`<?xml version="1.0"?>
 <h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms">
