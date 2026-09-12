@@ -767,16 +767,22 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
         'En supprimant l\'unité de base, vous décocherez toutes les sélections "variable basée sur la surface". Continuer ?',
     },
     downloadSummaryJSON: 'Télécharger le résumé (JSON)',
-    firstPhaseCategory: 'Catégorie de 1ère phase',
-    firstPhaseCategoryInfo: 'Sélectionnez la catégorie contenant les échantillons de la 1ère phase.',
-    firstPhaseCategoryExtraProp: {
-      label: 'Attribut de strate de 1ère phase',
-      info: "Sélectionnez la variable utilisée pour diviser la population d'origine en strates larges pour la phase initiale d'échantillonnage.",
+    phase1Category: 'Catégorie de 1ère phase',
+    phase1CategoryInfo: 'Sélectionnez la catégorie contenant les échantillons de la 1ère phase.',
+    phase2JoinEntity: {
+      label: 'Entité de jointure (2e phase)',
+      info: "Entité utilisée pour joindre l'unité de base à la catégorie de 1ère phase : l'entité de l'unité de base elle-même, ou l'une de ses entités parentes.",
     },
-    firstPhaseCommonAttribute: {
-      label: 'Attribut commun',
-      info: `Attribut en commun entre l'unité de base et la table de 1ère phase
-(il doit s'agir d'un attribut de type code ou texte ; sa valeur est comparée aux propriétés supplémentaires définies pour la catégorie de 1ère phase - le nom de l'attribut n'a pas besoin de correspondre à celui de la propriété supplémentaire)`,
+    phase2AsSamplingPointData: {
+      label: 'Joindre en utilisant le lien Sampling Point Data',
+    },
+    phase1JoinAttribute: {
+      label: 'Attribut de jointure (1ère phase)',
+      info: "Sélectionnez la colonne de la table $t(chainView.phase1Category) (une propriété supplémentaire, ou « code ») utilisée pour la joindre à l'entité de jointure de la 2e phase.",
+    },
+    phase2JoinAttribute: {
+      label: 'Attribut de jointure (2e phase)',
+      info: "Sélectionnez l'attribut de type code ou texte de l'entité de jointure (2e phase) utilisé pour la joindre à la table de 1ère phase ; sa valeur est comparée aux propriétés supplémentaires définies pour la catégorie de 1ère phase.",
     },
     formLabel: 'Étiquette de la chaîne de traitement',
     basic: 'Basique',
@@ -822,7 +828,7 @@ Ce processus peut être lent.`,
     stratumAttribute: 'Attribut de strate',
     stratumAttributeInfo: "Sélectionnez la variable utilisée pour stratifier l'échantillon.",
     stratumAttribute2ndPhase: 'Attribut de strate de 2ème phase',
-    stratumAttribute2ndPhaseInfo: `Sélectionnez la variable utilisée pour sous-stratifier l'échantillon de la 1ère phase avant de tirer le sous-échantillon final et détaillé.`,
+    stratumAttribute2ndPhaseInfo: `Sélectionnez la variable utilisée pour sous-stratifier l'échantillon de la 1ère phase avant de tirer le sous-échantillon final et détaillé. Seuls les attributs dont le nom apparaît également comme colonne de la catégorie de la 1ère phase sont affichés.`,
     postStratificationAttribute: 'Attribut de post-stratification',
     areaWeightingMethod: 'Méthode de pondération par surface',
     clusteringEntity: 'Entité de regroupement',
@@ -1147,6 +1153,9 @@ Ex. this.region = nom_attribut_region
     },
     mobileProps: {
       title: 'Application mobile',
+    },
+    timeProps: {
+      includeSeconds: 'Inclure les secondes',
     },
     formHeaderProps: {
       headerColorLabel: "Couleur d'en-tête",

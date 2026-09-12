@@ -264,12 +264,20 @@ const assertSurveyDataMigrated = (surveyInfo) => {
   }
 }
 
-export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
+// skipMigrationCheck: for internal callers that run DURING a survey's own pending per-survey data
+// migration (i.e. the migration steps themselves) -- everyone else should leave this false, since it
+// bypasses the assertSurveyDataMigrated guard below.
+export const fetchSurveyById = async (
+  { surveyId, draft = false, validate = false, backup = false, skipMigrationCheck = false },
+  client = db
+) => {
   const [surveyInfo, authGroups] = await Promise.all([
     SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
     AuthGroupRepository.fetchSurveyGroups(surveyId, client),
   ])
-  assertSurveyDataMigrated(surveyInfo)
+  if (!skipMigrationCheck) {
+    assertSurveyDataMigrated(surveyInfo)
+  }
 
   let surveyInfoUpdated = Survey.assocAuthGroups(authGroups)(surveyInfo)
   surveyInfoUpdated = await _fetchAndAssocAdditionalInfo({ surveyInfo: surveyInfoUpdated }, client)
@@ -292,10 +300,11 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
     includeDeleted = false,
     backup = false,
     includeAnalysis = true,
+    skipMigrationCheck = false,
   },
   client = db
 ) => {
-  const surveyDb = await fetchSurveyById({ surveyId, draft, validate, backup }, client)
+  const surveyDb = await fetchSurveyById({ surveyId, draft, validate, backup, skipMigrationCheck }, client)
   const surveyCycles = Survey.getCycleKeys(
     backup ? { ...surveyDb, props: ObjectUtils.getPropsAndPropsDraftCombined(surveyDb) } : surveyDb
   )

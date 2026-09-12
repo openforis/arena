@@ -636,15 +636,22 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
         'Al eliminar la unidad base, se desmarcarán todas las selecciones de "variable basada en área". ¿Continuar?',
     },
     downloadSummaryJSON: 'Descargar resumen (JSON)',
-    firstPhaseCategory: 'Categoría de primera fase',
-    firstPhaseCategoryInfo: 'Seleccione la categoría que contiene las muestras de la primera fase.',
-    firstPhaseCategoryExtraProp: {
-      label: 'Atributo de estrato de 1ª fase',
-      info: 'Seleccione la variable utilizada para dividir la población original en estratos amplios para la fase inicial de muestreo.',
+    phase1Category: 'Categoría de primera fase',
+    phase1CategoryInfo: 'Seleccione la categoría que contiene las muestras de la primera fase.',
+    phase2JoinEntity: {
+      label: 'Entidad de unión (2ª fase)',
+      info: 'Entidad utilizada para unir la unidad base con la categoría de 1ª fase: la propia entidad de la unidad base, o una de sus entidades superiores.',
     },
-    firstPhaseCommonAttribute: {
-      label: 'Atributo común',
-      info: 'Atributo común entre la unidad base y la tabla de primera fase (debe ser un atributo de código o de texto; su valor se compara con las propiedades adicionales definidas para la categoría de primera fase - el nombre del atributo no necesita coincidir con el de la propiedad adicional)',
+    phase2AsSamplingPointData: {
+      label: 'Unir usando el enlace de Sampling Point Data',
+    },
+    phase1JoinAttribute: {
+      label: 'Atributo de unión (1ª fase)',
+      info: 'Seleccione la columna de la tabla $t(chainView.phase1Category) (una propiedad adicional, o "code") utilizada para unirla con la entidad de unión de la 2ª fase.',
+    },
+    phase2JoinAttribute: {
+      label: 'Atributo de unión (2ª fase)',
+      info: 'Seleccione el atributo de código o texto de la entidad de unión (2ª fase) utilizado para unirla con la tabla de 1ª fase; su valor se compara con las propiedades adicionales definidas para la categoría de 1ª fase.',
     },
     formLabel: 'Etiqueta de cadena de procesamiento',
     basic: 'Básico',
@@ -692,7 +699,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     stratumAttributeInfo: 'Seleccione la variable utilizada para estratificar la muestra.',
     stratumAttribute2ndPhase: 'Atributo de estrato de 2ª fase',
     stratumAttribute2ndPhaseInfo:
-      'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada.',
+      'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada. Solo se muestran los atributos cuyo nombre también aparece como columna de la categoría de la 1ª fase.',
     postStratificationAttribute: 'Atributo de postestratificación',
     areaWeightingMethod: 'Método de ponderación de área',
     clusteringEntity: 'Entidad de agrupación',
@@ -994,6 +1001,9 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     mobileProps: {
       title: 'Aplicación móvil',
+    },
+    timeProps: {
+      includeSeconds: 'Incluir segundos',
     },
     formHeaderProps: {
       headerColorLabel: 'Color de encabezado',
