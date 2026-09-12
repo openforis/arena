@@ -70,7 +70,7 @@ export default {
     invalidNumber: 'Número no válido en la columna {{headers}}: {{value}}',
     invalidTaxonCode: 'Código no válido en la columna {{headers}}: {{value}}',
     invalidTime:
-      'Hora no válida en la columna {{headers}}: {{value}}. La hora debe tener el formato HH:mm. Ej.: 09:45 o 16:30',
+      'Hora no válida en la columna {{headers}}: {{value}}. La hora debe tener el formato HH:mm o HH:mm:ss. Ej.: 09:45, 16:30 o 09:45:30',
     missingRequiredHeaders: 'Faltan columnas obligatorias: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Error al actualizar valores: {{details}}',
     multipleRecordsMatchingKeys: 'Se encontraron varios registros que coinciden con las claves "{{keyValues}}"',
