@@ -7,12 +7,13 @@ import { useUser } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 
 import { baseLayers } from './baseLayers'
+import { EqualEarthBaseLayer } from './EqualEarthBaseLayer'
 import { useMapContext } from './MapContext'
 import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
 import { WmtsComponent } from './WmtsComponent'
 
 export const MapLayersControl = (props) => {
-  const { layers = [], baseLayersLabel, overlayGroups = [] } = props
+  const { layers = [], baseLayersLabel, overlayGroups = [], equalEarthAsDefault = false } = props
 
   const user = useUser()
   const surveyId = useSurveyId()
@@ -41,18 +42,38 @@ export const MapLayersControl = (props) => {
     [surveyId]
   )
 
+  // The array itself keeps the Equal Earth entry first (so it's first in the switcher's
+  // list everywhere), but only equalEarthAsDefault callers (MapView) should have it
+  // pre-selected - other consumers (e.g. the record-editing coordinate picker) fall back
+  // to the first non-maplibre entry, matching this app's pre-experiment default.
+  const defaultBaseLayer = useMemo(
+    () =>
+      equalEarthAsDefault
+        ? baseLayers[0]
+        : (baseLayers.find((baseLayer) => baseLayer.type !== 'maplibre') ?? baseLayers[0]),
+    [equalEarthAsDefault]
+  )
+
   const baseLayersControls = useMemo(() => {
     const result = []
-    for (let index = 0; index < baseLayers.length; index++) {
-      const baseLayer = baseLayers[index]
-      const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, url } = baseLayer
+    for (const baseLayer of baseLayers) {
+      const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, type, url, style } = baseLayer
+
+      const checked = (!contextBaseLayer && baseLayer === defaultBaseLayer) || contextBaseLayer?.name === name
+
+      if (type === 'maplibre') {
+        result.push(
+          <LayersControl.BaseLayer key={key} name={name} checked={checked}>
+            <EqualEarthBaseLayer style={style} attribution={attribution} />
+          </LayersControl.BaseLayer>
+        )
+        continue
+      }
 
       const tileUrl = getTileUrl({ url, apiKeyRequired, provider, user })
       if (!tileUrl) {
         continue
       }
-
-      const checked = (!contextBaseLayer && index === 0) || contextBaseLayer?.name === name
 
       result.push(
         <LayersControl.BaseLayer key={key} name={name} checked={checked}>
@@ -61,7 +82,7 @@ export const MapLayersControl = (props) => {
       )
     }
     return result
-  }, [contextBaseLayer, getTileUrl, user])
+  }, [contextBaseLayer, defaultBaseLayer, getTileUrl, user])
 
   const showGroupsInjector = baseLayersLabel || overlayGroups.length > 0
 
@@ -81,6 +102,7 @@ export const MapLayersControl = (props) => {
 
 MapLayersControl.propTypes = {
   baseLayersLabel: PropTypes.string,
+  equalEarthAsDefault: PropTypes.bool,
   layers: PropTypes.array,
   overlayGroups: PropTypes.arrayOf(
     PropTypes.shape({
