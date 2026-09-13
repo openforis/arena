@@ -1154,6 +1154,9 @@ Ex. this.region = nom_attribut_region
     mobileProps: {
       title: 'Application mobile',
     },
+    timeProps: {
+      includeSeconds: 'Inclure les secondes',
+    },
     formHeaderProps: {
       headerColorLabel: "Couleur d'en-tête",
       headerColor: {

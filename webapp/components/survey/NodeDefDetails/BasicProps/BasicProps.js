@@ -33,6 +33,7 @@ import FormHeaderProps from '../FormHeaderProps'
 import IntegerProps from '../IntegerProps'
 import TaxonProps from '../TaxonProps'
 import TextProps from '../TextProps'
+import TimeProps from '../TimeProps'
 import AnalysisProps from '../AnalysisProps'
 
 const basicPropsComponentByType = {
@@ -45,6 +46,7 @@ const basicPropsComponentByType = {
   [NodeDef.nodeDefType.integer]: IntegerProps,
   [NodeDef.nodeDefType.taxon]: TaxonProps,
   [NodeDef.nodeDefType.text]: TextProps,
+  [NodeDef.nodeDefType.time]: TimeProps,
 }
 
 const BasicProps = (props) => {

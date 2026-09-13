@@ -150,8 +150,7 @@ export default {
   dataVis: {
     errorLoadingData: 'データの読み込み中にエラーが発生しました',
     noData: 'このクエリではデータが見つかりませんでした',
-    noSelection:
-      '左側のパネルから選択するか、「クエリを管理」から既存のクエリを選択してください',
+    noSelection: '左側のパネルから選択するか、「クエリを管理」から既存のクエリを選択してください',
   },
   viewSelectedRecord: '選択した記録を表示',
   mapView: {

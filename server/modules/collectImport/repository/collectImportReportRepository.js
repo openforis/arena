@@ -1,32 +1,23 @@
-import * as R from 'ramda'
-
-import * as NodeDef from '@core/survey/nodeDef'
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
+import * as NodeDef from '@core/survey/nodeDef'
 
-import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
+import * as ImportReportRepository from '@server/modules/importReport/repository/importReportRepository'
 
-import { getSurveyDBSchema, dbTransformCallback } from '../../survey/repository/surveySchemaRepositoryUtils'
+import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
-const _getSelectWhereCondition = ({ excludeResolved }) => `${excludeResolved ? 'WHERE resolved = FALSE' : ''}`
+// Table-level CRUD (fetchItems/countItems/insertItem/insertItems/updateItem) is shared with the ODK
+// importer via ImportReportRepository - see its header comment and
+// docs/superpowers/plans/2026-09-11-odk-import-4-hardening.md. Only fetchItemsStream stays here: its
+// per-language `messages` column projection is specific to Collect's report-item prop shape.
+const source = 'collect'
 
-export const fetchItems = async ({ surveyId, excludeResolved = false, offset = 0, limit = null }, client = db) =>
-  client.map(
-    `
-      SELECT * 
-      FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
-      ${_getSelectWhereCondition({ excludeResolved })}
-      ORDER BY id
-      LIMIT ${limit ? '$/limit/' : 'ALL'}
-      OFFSET $/offset/
-    `,
-    { limit, offset },
-    dbTransformCallback
-  )
+export const fetchItems = async ({ surveyId, excludeResolved = false, offset = 0, limit = null }, client) =>
+  ImportReportRepository.fetchItems({ surveyId, source, excludeResolved, offset, limit }, client)
 
 export const fetchItemsStream = async ({ surveyId, messageLangCode }) => {
   const select = `
-      SELECT 
+      SELECT
         cr.id,
         cr.node_def_uuid,
         (nd.props_draft || nd.props)->>'${NodeDef.propKeys.name}' as node_def_name,
@@ -36,66 +27,43 @@ export const fetchItemsStream = async ({ surveyId, messageLangCode }) => {
         (cr.props)#>>'{${CollectImportReportItem.propKeys.messages},${messageLangCode}}' as message,
         cr.props as props,
         cr.resolved as resolved
-      FROM ${getSurveyDBSchema(surveyId)}.collect_import_report cr
+      FROM ${getSurveyDBSchema(surveyId)}.import_report cr
       JOIN ${getSurveyDBSchema(surveyId)}.node_def nd on nd.uuid = cr.node_def_uuid
+      WHERE cr.source = 'collect'
       ORDER BY id
    `
 
   return new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
 }
 
-export const countItems = async ({ surveyId, excludeResolved }, client = db) =>
-  client.one(
-    `
-      SELECT COUNT(*) as tot
-      FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
-      ${_getSelectWhereCondition({ excludeResolved })}
-    `,
-    [],
-    R.prop('tot')
+export const countItems = async ({ surveyId, excludeResolved }, client) =>
+  ImportReportRepository.countItems({ surveyId, source, excludeResolved }, client)
+
+export const insertItem = async (surveyId, item, client) =>
+  ImportReportRepository.insertItem(
+    surveyId,
+    source,
+    {
+      nodeDefUuid: CollectImportReportItem.getNodeDefUuid(item),
+      props: CollectImportReportItem.getProps(item),
+      resolved: CollectImportReportItem.isResolved(item),
+    },
+    client
   )
 
-export const insertItem = async (surveyId, item, client = db) =>
-  client.one(
-    `
-      INSERT INTO ${getSurveyDBSchema(surveyId)}.collect_import_report (node_def_uuid, props, resolved)
-      VALUES ($1, $2, $3)
-      RETURNING *
-    `,
-    [
-      CollectImportReportItem.getNodeDefUuid(item),
-      CollectImportReportItem.getProps(item),
-      CollectImportReportItem.isResolved(item),
-    ],
-    dbTransformCallback
-  )
-
-export const insertItems = async ({ surveyId, items = [] }, client = db) =>
-  items.length > 0 &&
-  client.none(
-    DbUtils.insertAllQueryBatch(
-      getSurveyDBSchema(surveyId),
-      'collect_import_report',
-      ['node_def_uuid', 'props', 'resolved'],
-      items.map((item) => ({
-        node_def_uuid: CollectImportReportItem.getNodeDefUuid(item),
+export const insertItems = async ({ surveyId, items = [] }, client) =>
+  ImportReportRepository.insertItems(
+    {
+      surveyId,
+      source,
+      items: items.map((item) => ({
+        nodeDefUuid: CollectImportReportItem.getNodeDefUuid(item),
         props: CollectImportReportItem.getProps(item),
         resolved: CollectImportReportItem.isResolved(item),
-      }))
-    )
+      })),
+    },
+    client
   )
 
-export const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
-  client.one(
-    `
-      UPDATE ${getSurveyDBSchema(surveyId)}.collect_import_report
-      SET 
-        props = props || $2::jsonb,
-        resolved = $3,
-        date_modified = ${DbUtils.now}
-      WHERE id = $1
-      RETURNING *
-    `,
-    [itemId, props, resolved],
-    dbTransformCallback
-  )
+export const updateItem = async (surveyId, itemId, props, resolved, client) =>
+  ImportReportRepository.updateItem(surveyId, source, itemId, props, resolved, client)

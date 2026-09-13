@@ -1149,6 +1149,9 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
     mobileProps: {
       title: 'Aplicativo móvel',
     },
+    timeProps: {
+      includeSeconds: 'Incluir segundos',
+    },
     formHeaderProps: {
       headerColorLabel: 'Cor do cabeçalho',
       headerColor: {
