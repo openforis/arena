@@ -21,7 +21,7 @@
   }
 
   .MuiFormGroup-row {
-    gap: 2rem;
+    gap: 0.5rem;
   }
 
   .home-survey-create__collect-import {
@@ -49,5 +49,12 @@
 
   .chunk-size-dropdown {
     width: 10rem;
+  }
+
+  .options-fieldset {
+    .form-item {
+      display: flex;
+      width: auto;
+    }
   }
 }
