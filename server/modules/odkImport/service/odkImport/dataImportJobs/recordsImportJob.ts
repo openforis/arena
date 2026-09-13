@@ -1,5 +1,6 @@
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
+import { isUuid } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -20,8 +21,6 @@ import { extractAttributeValue } from './odkAttributeValueExtractor'
 
 const categoryItemProvider = CategoryItemProviderDefault
 
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-
 /**
  * Extracts ODK's <meta><instanceID> value (conventionally "uuid:<uuid>", sometimes the bare uuid) as a
  * validated, lowercased uuid, or null if absent/not actually uuid-shaped.
@@ -33,7 +32,7 @@ const extractInstanceUuid = (submissionRoot: XmlElement): string | null => {
   const raw = instanceIdEl ? XForm.getElementText(instanceIdEl) : null
   if (!raw) return null
   const stripped = raw.startsWith('uuid:') ? raw.slice(5) : raw
-  return UUID_PATTERN.test(stripped) ? stripped.toLowerCase() : null
+  return isUuid(stripped) ? stripped.toLowerCase() : null
 }
 
 const groupChildrenByName = (elements: XmlElement[]): Map<string, XmlElement[]> => {
