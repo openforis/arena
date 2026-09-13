@@ -12,6 +12,10 @@ const baseLayerProviders = {
   equalEarth: 'EqualEarth',
 }
 
+export const baseLayerTypes = {
+  maplibre: 'maplibre',
+}
+
 // const baseLayerAttribution = {
 //   planet: 'Planet Labs PBC, NICFI Satellite Data Program',
 // }
@@ -86,7 +90,7 @@ export const baseLayers = [
     key: 'Equal Earth',
     name: 'Equal Earth (experimental)',
     provider: baseLayerProviders.equalEarth,
-    type: 'maplibre',
+    type: baseLayerTypes.maplibre,
     attribution: 'Natural Earth',
     style: equalEarthMapStyle,
   },
@@ -174,4 +178,5 @@ export const baseLayers = [
   // },
 ]
 
-export const defaultBaseLayer = baseLayers.find((baseLayer) => baseLayer.type !== 'maplibre') ?? baseLayers[0]
+export const defaultBaseLayer =
+  baseLayers.find((baseLayer) => baseLayer.type !== baseLayerTypes.maplibre) ?? baseLayers[0]

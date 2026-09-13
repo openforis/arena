@@ -7,7 +7,7 @@ import { useUser } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
-import { baseLayers } from './baseLayers'
+import { baseLayers, baseLayerTypes } from './baseLayers'
 import { EqualEarthBaseLayer } from './EqualEarthBaseLayer'
 import { useMapContext } from './MapContext'
 import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
@@ -47,7 +47,7 @@ export const MapLayersControl = (props) => {
   // Equal Earth is experimental: hidden from the switcher unless EXPERIMENTAL_FEATURES is
   // enabled, and never pre-selected as the default base layer even when visible.
   const defaultBaseLayer = useMemo(
-    () => baseLayers.find((baseLayer) => baseLayer.type !== 'maplibre') ?? baseLayers[0],
+    () => baseLayers.find((baseLayer) => baseLayer.type !== baseLayerTypes.maplibre) ?? baseLayers[0],
     []
   )
 
@@ -56,13 +56,13 @@ export const MapLayersControl = (props) => {
     for (const baseLayer of baseLayers) {
       const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, type, url, style } = baseLayer
 
-      if (type === 'maplibre' && !experimentalFeaturesEnabled) {
+      if (type === baseLayerTypes.maplibre && !experimentalFeaturesEnabled) {
         continue
       }
 
       const checked = (!contextBaseLayer && baseLayer === defaultBaseLayer) || contextBaseLayer?.name === name
 
-      if (type === 'maplibre') {
+      if (type === baseLayerTypes.maplibre) {
         result.push(
           <LayersControl.BaseLayer key={key} name={name} checked={checked}>
             <EqualEarthBaseLayer style={style} attribution={attribution} />
