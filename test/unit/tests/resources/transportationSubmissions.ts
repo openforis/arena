@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 // Real ODK Collect submissions against transportationXform.ts's form, sourced from onaio/onadata's own
 // test suite (https://github.com/onaio/onadata/tree/9aa15caa4cb9ead70074e362654d8c24ffc7c573/onadata/apps/

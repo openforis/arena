@@ -367,7 +367,11 @@ export const resolveLabels = ({
 export const labelFromElementName = (name: string): string =>
   name
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    // fixed-width (no "+" quantifier overlapping the next group, unlike a naive /([A-Z]+)([A-Z][a-z])/g)
+    // so there's only one way to align it against the input - no backtracking blowup on a long all-caps
+    // run with no match. The global replace still walks one boundary at a time across a longer acronym
+    // (e.g. "HTTPResponse" -> "HTTP Response": matches at the P/Re boundary, same end result).
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
     .replace(/[_-]+/g, ' ')
     .trim()
     .split(/\s+/)

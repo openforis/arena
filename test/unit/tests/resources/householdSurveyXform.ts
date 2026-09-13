@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 // A real, unmodified ODK sample form - "Household Survey.xml" from ODK's own official sample-forms
 // repository (https://github.com/getodk/sample-forms/blob/master/xml-examples/Household%20Survey.xml,

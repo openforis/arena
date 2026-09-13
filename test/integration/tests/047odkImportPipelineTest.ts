@@ -206,8 +206,10 @@ describe('ODK import pipeline - real form + real submissions (onaio/onadata)', (
       // real multi-select answer "ambulance bicycle" -> one sibling node per selected code, each
       // resolved to the real category item inserted from the form's own static <item> choices
       const multiSelectNodes = Record.getNodesByDefUuid(multiSelectDefUuid)(record)
-      const selectedItemUuids = multiSelectNodes.map((node: any) => Node.getCategoryItemUuid(node)).sort()
-      expect(selectedItemUuids).toEqual([ambulanceItemUuid, bicycleItemUuid].sort())
+      const selectedItemUuids = multiSelectNodes
+        .map((node: any) => Node.getCategoryItemUuid(node))
+        .sort((a: string, b: string) => a.localeCompare(b))
+      expect(selectedItemUuids).toEqual([ambulanceItemUuid, bicycleItemUuid].sort((a, b) => a.localeCompare(b)))
 
       // real nested select1 answers ("daily" for ambulance, "weekly" for bicycle), 3 levels deep
       const ambulanceFrequencyNode = Record.getNodesByDefUuid(ambulanceFrequencyDefUuid)(record)[0]

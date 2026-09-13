@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 // A real, historic ODK/OpenRosa demo form ("Transportation" survey) sourced from onaio/onadata - the
 // open-source ODK/OpenRosa platform formerly known as formhub (https://github.com/onaio/onadata/blob/
