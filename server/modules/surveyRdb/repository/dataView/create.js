@@ -25,7 +25,7 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
     } else if (isMultipleAttribute && NodeDef.isDescendantOf(viewNodeDef)(nodeDef)) {
       if (canJoinWithMultipleAttributeTable({ nodeDef, viewNodeDef })) {
         const multAttrDataTable = new TableDataNodeDef(survey, nodeDef)
-        return colNames.map((colName) => `${DbUtils.asName(multAttrDataTable.alias)}.${DbUtils.asName(colName)}`)
+        return colNames.map((colName) => `${multAttrDataTable.alias}.${DbUtils.asName(colName)}`)
       } else {
         // skip multiple attributes that cannot be aggregated into a single column yet
         return []
@@ -38,10 +38,7 @@ const _getSelectFieldKeys = (viewDataNodeDef) => {
   const nodeDefKeys = Survey.getNodeDefKeys(viewDataNodeDef.nodeDef)(viewDataNodeDef.survey)
   const keys = nodeDefKeys.flatMap((nodeDef) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDef)
-    return [
-      `'${NodeDef.getUuid(nodeDef)}'`,
-      `${DbUtils.asName(viewDataNodeDef.tableData.alias)}.${DbUtils.asName(columnNodeDef.name)}`,
-    ]
+    return [`'${NodeDef.getUuid(nodeDef)}'`, `${viewDataNodeDef.tableData.alias}.${DbUtils.asName(columnNodeDef.name)}`]
   })
   return `${SQL.jsonBuildObject(...keys)} AS ${ViewDataNodeDef.columnSet.keys}`
 }
@@ -50,16 +47,16 @@ const _getJoinWithMultipleAttributeTable = ({ viewDataNodeDef, multAttrColumnNod
   const { survey, tableData } = viewDataNodeDef
   const { nodeDef: multAttrDef, names: columnNames } = multAttrColumnNodeDef
   const multAttrDataTable = new TableDataNodeDef(survey, multAttrDef)
-  const tableNameAliasQuoted = DbUtils.asName(multAttrDataTable.alias)
+  const tableNameAlias = multAttrDataTable.alias
 
-  return `LEFT JOIN 
+  return `LEFT JOIN
   (
-    SELECT 
-      ${multAttrDataTable.columnParentUuid}, 
-      ${columnNames.map((colName) => `json_agg(${tableNameAliasQuoted}.${DbUtils.asName(colName)}) AS ${DbUtils.asName(colName)}`).join(', ')}
+    SELECT
+      ${multAttrDataTable.columnParentUuid},
+      ${columnNames.map((colName) => `json_agg(${tableNameAlias}.${DbUtils.asName(colName)}) AS ${DbUtils.asName(colName)}`).join(', ')}
     FROM ${multAttrDataTable.nameAliased}
     GROUP BY ${multAttrDataTable.columnParentUuid}
-  ) AS ${tableNameAliasQuoted}
+  ) AS ${tableNameAlias}
   ON ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
 }
 
@@ -117,10 +114,10 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
     : ''
 
   const query = `
-    CREATE VIEW ${viewDataNodeDef.nameQualified} AS ( 
-      SELECT 
+    CREATE VIEW ${viewDataNodeDef.nameQualified} AS (
+      SELECT
         ${selectFields.filter(Boolean).join(', ')}
-      FROM 
+      FROM
         ${tableData.nameAliased}
       ${joinWithParentView}
       ${_getJoinsWithMultipleAttributeDataTables(viewDataNodeDef)}

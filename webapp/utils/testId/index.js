@@ -54,6 +54,7 @@ export const TestId = {
   dataImport: {
     importFromCollectTab: 'importFromCollectTab',
     importFromCsvTab: 'importFromCsvTab',
+    importFromOdkTab: 'importFromOdkTab',
   },
   dialogConfirm: {
     strongConfirmInput: 'dialog-confirm__strong-confirm-input',

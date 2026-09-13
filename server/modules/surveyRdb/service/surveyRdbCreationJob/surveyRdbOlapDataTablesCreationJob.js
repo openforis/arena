@@ -148,7 +148,8 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
     const { surveyId, tx } = this
     const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
-    const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+    const fetchDraft =
+      (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
     return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, draft: fetchDraft, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },

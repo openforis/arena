@@ -9,7 +9,7 @@ import {
   getRecordFormattedKeyValuesByDefUuid,
   findExistingRecordSummary,
   determineRecordAction,
-} from './recordImportMatcher'
+} from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
 
 /**
  * Reads every record contained in an Arena format zip and, for each one, determines whether it's new,

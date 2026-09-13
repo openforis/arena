@@ -34,4 +34,4 @@ export default class ChainsCyclesCheckJob extends Job {
   }
 }
 
-ChainsCyclesCheckJob.type = 'chainsCyclesCheckJob'
+ChainsCyclesCheckJob.type = 'ChainsCyclesCheckJob'
