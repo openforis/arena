@@ -29,6 +29,7 @@ export const keys = {
   collectNodeDefsInfoByPath: 'collectNodeDefsInfoByPath',
   odkFormId: 'odkFormId',
   odkNodeDefsInfoByPath: 'odkNodeDefsInfoByPath',
+  odkNodeDefsOriginalNames: 'odkNodeDefsOriginalNames',
   cycles: 'cycles',
   defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
@@ -202,6 +203,10 @@ export const getOdkFormId = ObjectUtils.getProp(keys.odkFormId)
 export const isFromOdk = R.pipe(getOdkFormId, R.isNil, R.not)
 
 export const getOdkNodeDefsInfoByPath = ObjectUtils.getProp(keys.odkNodeDefsInfoByPath, {})
+
+// Dictionary of the raw (pre-normalization, pre-uniqueness) ODK element name and the final Arena node
+// def name generated for it, keyed by node def uuid - see NodeDefsImportJob.
+export const getOdkNodeDefsOriginalNames = ObjectUtils.getProp(keys.odkNodeDefsOriginalNames, {})
 
 export const getLanguage = (preferredLang) => (surveyInfo) =>
   R.pipe(getLanguages, R.find(R.equals(preferredLang)), R.defaultTo(getDefaultLanguage(surveyInfo)))(surveyInfo)

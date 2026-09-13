@@ -205,6 +205,18 @@ describe('odkImport / xform', () => {
     )
   })
 
+  test('labelFromElementName splits camelCase/PascalCase and snake_case ids into a readable label', () => {
+    expect(XForm.labelFromElementName('HouseholdSurvey')).toBe('Household Survey')
+    expect(XForm.labelFromElementName('HeadOfHouseholdConfirmation')).toBe('Head Of Household Confirmation')
+    expect(XForm.labelFromElementName('ChildInSchool')).toBe('Child In School')
+    // acronym runs (all-caps) are preserved as-is rather than re-cased into e.g. "Device Id"
+    expect(XForm.labelFromElementName('DeviceID')).toBe('Device ID')
+    expect(XForm.labelFromElementName('SubscriberID')).toBe('Subscriber ID')
+    // snake_case/kebab-case ids get their separators turned into spaces and each word capitalized
+    expect(XForm.labelFromElementName('household_survey')).toBe('Household Survey')
+    expect(XForm.labelFromElementName('child-in-school')).toBe('Child In School')
+  })
+
   test('getItextTranslations normalizes ODK\'s "Name (code)" language convention to a bare ISO code', () => {
     // ODK's own docs (docs.getodk.org/form-language) recommend XLSForm columns like "label::English (en)",
     // and pyxform/ODK Central preserve that whole string verbatim as the itext lang attribute - a real

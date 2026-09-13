@@ -1,4 +1,5 @@
 import { uuidv4 } from '@core/uuid'
+import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -23,6 +24,16 @@ import { OdkExpressionConverter } from './nodeDefsImportJob/odkExpressionConvert
 const literalTrueValues = new Set(['true()', 'true'])
 const literalFalseValues = new Set(['false()', 'false'])
 
+// Dictionary entry recording, for one imported node def, the raw ODK element name it came from
+// alongside the final Arena name generated for it (normalized via StringUtils.normalizeName and
+// deduplicated via NodeDefUniqueNameGenerator) - persisted as the odkNodeDefsOriginalNames survey prop
+// so the two can be told apart later (e.g. a "Foo Bar" ODK name became "foo_bar" in Arena).
+export type OdkNodeDefOriginalNameInfo = {
+  path: string
+  odkName: string
+  arenaName: string
+}
+
 /**
  * Recursively walks the XForm primary instance (node shape) and, for each node, joins in the
  * matching <bind> (type, relevant/constraint/calculate/required expressions) and body control
@@ -44,6 +55,7 @@ export default class NodeDefsImportJob extends Job {
   nodeDefs: Record<string, any>
   nodeDefsByXFormPath: Map<string, any>
   nodeDefUniqueNameGenerator: NodeDefUniqueNameGenerator
+  originalNamesByNodeDefUuid: Record<string, OdkNodeDefOriginalNameInfo>
   reportItems: any[]
   entityUuidsWithKeyAssigned: Set<string>
 
@@ -52,6 +64,7 @@ export default class NodeDefsImportJob extends Job {
     this.nodeDefs = {}
     this.nodeDefsByXFormPath = new Map()
     this.nodeDefUniqueNameGenerator = new NodeDefUniqueNameGenerator()
+    this.originalNamesByNodeDefUuid = {}
     this.reportItems = []
     // Arena requires every entity (root and every multiple/repeatable entity) to have at least one key
     // attribute among its own direct children to ever be publishable, but ODK has no equivalent concept
@@ -112,6 +125,19 @@ export default class NodeDefsImportJob extends Job {
       this.tx
     )
 
+    // Name dictionary for troubleshooting/traceability - same spirit as Collect import's path-keyed info
+    // map, but keyed by node def uuid and explicit about the odkName -> arenaName rename, since ODK
+    // element names are normalized (StringUtils.normalizeName) and deduplicated before becoming Arena
+    // node def names, so they can differ a lot more from the source than Collect's already-valid names.
+    await SurveyManager.updateSurveyProp(
+      this.user,
+      surveyId,
+      Survey.infoKeys.odkNodeDefsOriginalNames,
+      this.originalNamesByNodeDefUuid,
+      true,
+      this.tx
+    )
+
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle: Survey.cycleOneKey, draft: true, advanced: true },
       this.tx
@@ -154,12 +180,17 @@ export default class NodeDefsImportJob extends Job {
     const childElements = XForm.getChildElements(instanceElement)
     const isEntity = childElements.length > 0 || parentNodeDef === null
 
-    const labels = XForm.resolveLabels({
+    const labelsResolved = XForm.resolveLabels({
       labelRef: bodyControl?.labelRef ?? null,
       labelText: bodyControl?.labelText ?? null,
       translations: itextTranslations,
       defaultLanguage,
     })
+    // No explicit label anywhere (no itext ref, no literal <label>) - fall back to one derived from
+    // the element's own internal id, rather than leaving the node def unlabeled.
+    const labels = StringUtils.isNotBlank(labelsResolved[defaultLanguage])
+      ? labelsResolved
+      : { ...labelsResolved, [defaultLanguage]: XForm.labelFromElementName(nodeName) }
 
     if (!isEntity) {
       return this._insertAttributeNodeDef({ parentNodeDef, path, nodeName, bind, bodyControl, labels, categoriesByKey })
@@ -168,11 +199,13 @@ export default class NodeDefsImportJob extends Job {
     const multiple = parentNodeDef !== null && repeatPaths.has(path)
     const pageUuid = multiple ? null : uuidv4()
 
+    const arenaName = this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
+      parentNodeDefName: NodeDef.getName(parentNodeDef),
+      nodeDefName: StringUtils.normalizeName(nodeName),
+    })
+
     const props: Record<string, any> = {
-      [NodeDef.propKeys.name]: this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
-        parentNodeDefName: NodeDef.getName(parentNodeDef),
-        nodeDefName: nodeName,
-      }),
+      [NodeDef.propKeys.name]: arenaName,
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: false,
       [NodeDef.propKeys.labels]: labels,
@@ -189,6 +222,7 @@ export default class NodeDefsImportJob extends Job {
 
     let nodeDef = nodeDefsUpdated[NodeDef.getUuid(nodeDefParam)]
     this.nodeDefsByXFormPath.set(path, nodeDef)
+    this.originalNamesByNodeDefUuid[NodeDef.getUuid(nodeDef)] = { path, odkName: nodeName, arenaName }
 
     // entities only ever carry a `relevant` bind in practice (constraint/calculate/required are
     // attribute-only concepts) - still routed through the same helper for consistency
@@ -251,11 +285,13 @@ export default class NodeDefsImportJob extends Job {
       !this.entityUuidsWithKeyAssigned.has(parentUuid) && !bind?.calculate && NodeDef.canNodeDefTypeBeKey(type)
     if (isKey) this.entityUuidsWithKeyAssigned.add(parentUuid)
 
+    const arenaName = this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
+      parentNodeDefName: NodeDef.getName(parentNodeDef),
+      nodeDefName: StringUtils.normalizeName(nodeName),
+    })
+
     const props: Record<string, any> = {
-      [NodeDef.propKeys.name]: this.nodeDefUniqueNameGenerator.getUniqueNodeDefName({
-        parentNodeDefName: NodeDef.getName(parentNodeDef),
-        nodeDefName: nodeName,
-      }),
+      [NodeDef.propKeys.name]: arenaName,
       [NodeDef.propKeys.multiple]: false,
       [NodeDef.propKeys.key]: isKey,
       [NodeDef.propKeys.labels]: labels,
@@ -288,6 +324,7 @@ export default class NodeDefsImportJob extends Job {
 
     let nodeDef = nodeDefsUpdated[NodeDef.getUuid(nodeDefParam)]
     this.nodeDefsByXFormPath.set(path, nodeDef)
+    this.originalNamesByNodeDefUuid[NodeDef.getUuid(nodeDef)] = { path, odkName: nodeName, arenaName }
 
     // logged only now that the attribute's own uuid exists, to satisfy the report table's FK
     this._pushCategoryReportItemIfNeeded({ nodeDef, type, path, bodyControl, categoryMissing })

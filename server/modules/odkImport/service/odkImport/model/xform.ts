@@ -1,3 +1,4 @@
+import * as StringUtils from '@core/stringUtils'
 import { languageCodes } from '@core/app/languages'
 
 import * as FileXml from '@server/utils/file/fileXml'
@@ -354,3 +355,21 @@ export const resolveLabels = ({
   if (labelText !== null && labelText.trim() !== '') return { [defaultLanguage]: labelText }
   return {}
 }
+
+/**
+ * Turns an XForm element's internal id (its instance node name, e.g. "HeadOfHouseholdConfirmation" or
+ * "household_survey") into a human-readable label, for elements that have no explicit label anywhere
+ * (no itext ref, no literal <label>text</label>): splits camelCase/PascalCase words apart, turns
+ * snake_case/kebab-case separators into spaces, and capitalizes each resulting lowercase word - while
+ * leaving already-capitalized words and all-caps runs (likely acronyms, e.g. "ID", "GPS") untouched, so
+ * "DeviceID" becomes "Device ID" rather than "Device Id".
+ */
+export const labelFromElementName = (name: string): string =>
+  name
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    .replace(/[_-]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .map((word) => (/^[a-z]/.test(word) ? StringUtils.capitalizeFirstLetter(word) : word))
+    .join(' ')
