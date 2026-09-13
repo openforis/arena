@@ -121,15 +121,15 @@ export default class RecordsImportJob extends Job {
         continue
       }
 
-      const recordToCreate = { ...Record.newRecord(user, cycle), ...(instanceUuid ? { uuid: instanceUuid } : {}) }
-      let record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
-
       const rootNodeDefUuid = nodeDefsInfoByPath[`/${XForm.xmlLocalName(submissionRoot.name)}`]
       if (!rootNodeDefUuid) {
         this.logWarn(`root node def not found for submission ${entryName}; skipping`)
         this.incrementProcessedItems()
         continue
       }
+
+      const recordToCreate = { ...Record.newRecord(user, cycle), ...(instanceUuid ? { uuid: instanceUuid } : {}) }
+      let record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
       const rootNode = Node.newNode(rootNodeDefUuid, Record.getUuid(record), null)
       record = Record.assocNode(rootNode, { sideEffect: true })(record)
 
