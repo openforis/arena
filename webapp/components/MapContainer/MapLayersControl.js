@@ -5,18 +5,20 @@ import PropTypes from 'prop-types'
 import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
-import { baseLayers } from './baseLayers'
+import { baseLayers, baseLayerTypes } from './baseLayers'
 import { EqualEarthBaseLayer } from './EqualEarthBaseLayer'
 import { useMapContext } from './MapContext'
 import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
 import { WmtsComponent } from './WmtsComponent'
 
 export const MapLayersControl = (props) => {
-  const { layers = [], baseLayersLabel, overlayGroups = [], equalEarthAsDefault = false } = props
+  const { layers = [], baseLayersLabel, overlayGroups = [] } = props
 
   const user = useUser()
   const surveyId = useSurveyId()
+  const experimentalFeaturesEnabled = useSystemConfigExperimentalFeatures()
   const { contextObject, onBaseLayerUpdate } = useMapContext()
   const { baseLayer: contextBaseLayer } = contextObject
 
@@ -42,16 +44,11 @@ export const MapLayersControl = (props) => {
     [surveyId]
   )
 
-  // The array itself keeps the Equal Earth entry first (so it's first in the switcher's
-  // list everywhere), but only equalEarthAsDefault callers (MapView) should have it
-  // pre-selected - other consumers (e.g. the record-editing coordinate picker) fall back
-  // to the first non-maplibre entry, matching this app's pre-experiment default.
+  // Equal Earth is experimental: hidden from the switcher unless EXPERIMENTAL_FEATURES is
+  // enabled, and never pre-selected as the default base layer even when visible.
   const defaultBaseLayer = useMemo(
-    () =>
-      equalEarthAsDefault
-        ? baseLayers[0]
-        : (baseLayers.find((baseLayer) => baseLayer.type !== 'maplibre') ?? baseLayers[0]),
-    [equalEarthAsDefault]
+    () => baseLayers.find((baseLayer) => baseLayer.type !== baseLayerTypes.maplibre) ?? baseLayers[0],
+    []
   )
 
   const baseLayersControls = useMemo(() => {
@@ -59,9 +56,13 @@ export const MapLayersControl = (props) => {
     for (const baseLayer of baseLayers) {
       const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, type, url, style } = baseLayer
 
+      if (type === baseLayerTypes.maplibre && !experimentalFeaturesEnabled) {
+        continue
+      }
+
       const checked = (!contextBaseLayer && baseLayer === defaultBaseLayer) || contextBaseLayer?.name === name
 
-      if (type === 'maplibre') {
+      if (type === baseLayerTypes.maplibre) {
         result.push(
           <LayersControl.BaseLayer key={key} name={name} checked={checked}>
             <EqualEarthBaseLayer style={style} attribution={attribution} />
@@ -82,7 +83,7 @@ export const MapLayersControl = (props) => {
       )
     }
     return result
-  }, [contextBaseLayer, defaultBaseLayer, getTileUrl, user])
+  }, [contextBaseLayer, defaultBaseLayer, experimentalFeaturesEnabled, getTileUrl, user])
 
   const showGroupsInjector = baseLayersLabel || overlayGroups.length > 0
 
@@ -102,7 +103,6 @@ export const MapLayersControl = (props) => {
 
 MapLayersControl.propTypes = {
   baseLayersLabel: PropTypes.string,
-  equalEarthAsDefault: PropTypes.bool,
   layers: PropTypes.array,
   overlayGroups: PropTypes.arrayOf(
     PropTypes.shape({
