@@ -1,5 +1,7 @@
 import * as StringUtils from '@core/stringUtils'
 
+import { equalEarthMapStyle } from './equalEarthMapStyle'
+
 const baseLayerProviders = {
   esri: 'ESRI',
   carto: 'Carto',
@@ -7,6 +9,7 @@ const baseLayerProviders = {
   openStreetMap: 'OpenStreetMap',
   planet: 'planet',
   un: 'UN',
+  equalEarth: 'EqualEarth',
 }
 
 // const baseLayerAttribution = {
@@ -38,6 +41,14 @@ export const baseLayerUrlByProviderFunction = {
 }
 
 export const baseLayers = [
+  {
+    key: 'Equal Earth',
+    name: 'Equal Earth (experimental)',
+    provider: baseLayerProviders.equalEarth,
+    type: 'maplibre',
+    attribution: 'Natural Earth',
+    style: equalEarthMapStyle,
+  },
   {
     key: 'ESRI World Imagery',
     name: 'ESRI World Imagery (satellite)',
