@@ -33,6 +33,11 @@
 
   .options-fieldset {
     height: fit-content;
+
+    .form-item {
+      display: flex;
+      width: auto;
+    }
   }
 
   .cycle-dropdown {
@@ -49,12 +54,5 @@
 
   .chunk-size-dropdown {
     width: 10rem;
-  }
-
-  .options-fieldset {
-    .form-item {
-      display: flex;
-      width: auto;
-    }
   }
 }
