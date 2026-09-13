@@ -25,6 +25,7 @@ export default {
 
   importFromArena: 'Arena/Arena Mobile',
   importFromCollect: 'Collect / Collect Mobile',
+  importFromOdk: 'ODK / ODK Collect',
   importFromCsvExcel: 'CSV/Excel',
   importFromCsvStepsInfo: `### Importando etapas
 1. Selecione a entidade alvo
@@ -75,6 +76,11 @@ export default {
     CollectDataImportJob: {
       importCompleteSuccessfully: `Coleta de importação de dados concluída:
         - {{insertedRecords}} registros criados`,
+    },
+    OdkDataImportJob: {
+      importCompleteSuccessfully: `ODK data import complete:
+        - {{submittedCount}} records created
+        - {{skippedCount}} duplicate submissions skipped`,
     },
     DataImportJob: {
       importCompleteSummary: `- {{processed}} linhas processadas

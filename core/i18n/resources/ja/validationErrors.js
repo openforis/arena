@@ -70,8 +70,7 @@ export default {
       '列{{headers}}の日付が無効です：{{value}}。日付はYYYY-MM-DDまたはDD/MM/YYYY形式で入力してください（例：2023-01-15または15/01/2023）',
     invalidNumber: '列{{headers}}の数値が無効です：{{value}}',
     invalidTaxonCode: '列{{headers}}のコードが無効です：{{value}}',
-    invalidTime:
-      '列{{headers}}の時刻が無効です：{{value}}。時刻はHH:mm形式で入力してください（例：09:45または16:30）',
+    invalidTime: '列{{headers}}の時刻が無効です：{{value}}。時刻はHH:mm形式で入力してください（例：09:45または16:30）',
     missingRequiredHeaders: '必須列が見つかりません：{{missingRequiredHeaders}}',
     errorUpdatingValues: '値の更新中にエラーが発生しました：{{details}}',
     multipleRecordsMatchingKeys: 'キー「{{keyValues}}」に一致する記録が複数見つかりました',
@@ -128,8 +127,7 @@ export default {
 
     keysExceedingMax: 'キー属性の最大数を超えています',
     maxFileSizeInvalid: '最大ファイルサイズは0より大きく、{{max}}未満である必要があります',
-    nameInvalid:
-      '名前が無効です（半角小文字・数字・アンダースコアのみを使用し、先頭は文字である必要があります）',
+    nameInvalid: '名前が無効です（半角小文字・数字・アンダースコアのみを使用し、先頭は文字である必要があります）',
     taxonomyRequired: '分類体系は必須です',
     validationsInvalid: '「検証ルール」が無効です',
     countMaxInvalid: '「最大数」が無効です',
@@ -187,7 +185,7 @@ export default {
 
   surveyLabelsImport: {
     invalidHeaders: '無効な列：{{invalidHeaders}}',
-    cannotFindNodeDef: "名前が「{{name}}」の属性または項目定義が見つかりません",
+    cannotFindNodeDef: '名前が「{{name}}」の属性または項目定義が見つかりません',
   },
 
   taxonomyEdit: {
@@ -226,8 +224,7 @@ export default {
     titleRequired: '敬称は必須です',
     passwordRequired: 'パスワードは必須です',
     passwordInvalid: 'パスワードに空白文字を含めることはできません',
-    passwordUnsafe:
-      'パスワードは8文字以上で、半角小文字・大文字・数字を含む必要があります',
+    passwordUnsafe: 'パスワードは8文字以上で、半角小文字・大文字・数字を含む必要があります',
     passwordsDoNotMatch: `パスワードが一致しません`,
 
     userNotFound: 'ユーザーが見つかりません。メールアドレスとパスワードが正しいか確認してください',
@@ -247,8 +244,7 @@ export default {
     invalidRequest: '無効なユーザーアクセス申請です',
     userAlreadyExisting: 'メールアドレス{{email}}のユーザーは既に存在します',
     requestAlreadySent: `メールアドレス{{email}}のユーザーのアクセス申請は既に送信済みです`,
-    emailNotReachable:
-      '確認メールを{{email}}に送信できませんでした。アドレスが正しいか確認してください',
+    emailNotReachable: '確認メールを{{email}}に送信できませんでした。アドレスが正しいか確認してください',
     invalidReCaptcha: 'reCAPTCHAが無効です',
   },
 

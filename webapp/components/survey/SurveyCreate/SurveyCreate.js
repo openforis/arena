@@ -14,7 +14,7 @@ import { RecordCycle } from '@core/record/recordCycle'
 import { appModuleUri, appModules } from '@webapp/app/appModules'
 
 import { contentTypes } from '@webapp/service/api'
-import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
+import { useSystemConfigExperimentalFeatures, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
@@ -23,7 +23,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import { useOnUpdate } from '@webapp/components/hooks'
 import { Checkbox, Dropdown } from '@webapp/components/form'
-import { Button, Dropzone, RadioButtonGroup } from '@webapp/components'
+import { Button, Dropzone, Fieldset, RadioButtonGroup } from '@webapp/components'
 import { SurveyType } from '@webapp/model'
 import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
 import {
@@ -33,11 +33,6 @@ import {
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
-
-const importSourceButtonGroupItems = Object.values(importSources).map((key) => ({
-  key,
-  label: `surveyCreate:source.${key}`,
-}))
 
 const cloneFromTypeButtonGroupItems = Object.values(SurveyType)
   .reverse()
@@ -49,13 +44,13 @@ const cloneFromTypeButtonGroupItems = Object.values(SurveyType)
 const dropzoneAcceptBySource = {
   [importSources.arena]: { [contentTypes.zip]: ['.zip'] },
   [importSources.collect]: { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] },
+  [importSources.odk]: { [contentTypes.xml]: ['.xml'] },
 }
 
 const SurveyCreate = (props) => {
   const { showImport = true, submitButtonLabel = 'surveyCreate:createSurvey', template = false } = props
 
   const surveyInfo = useSurveyInfo()
-  const i18n = useI18n()
   const navigate = useNavigate()
   const [chunkSize, setChunkSize] = useState(defaultChunkSize)
 
@@ -94,6 +89,12 @@ const SurveyCreate = (props) => {
   }, [Survey.getUuid(surveyInfo)])
 
   const fileUploadLimitMB = useSystemConfigFileUploadLimitMB()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
+
+  // ODK import is experimental - only shown when EXPERIMENTAL_FEATURES is enabled (see core/processUtils.ts)
+  const importSourceButtonGroupItems = Object.values(importSources)
+    .filter((key) => key !== importSources.odk || experimentalFeatures)
+    .map((key) => ({ key, label: `surveyCreate:source.${key}` }))
 
   return (
     <div className="home-survey-create">
@@ -156,8 +157,7 @@ const SurveyCreate = (props) => {
       {createType === createTypes.clone && (
         <>
           <FormItem className="clone-from">
-            <fieldset>
-              <legend>{i18n.t('common.cloneFrom')}</legend>
+            <Fieldset legend="common.cloneFrom">
               <RadioButtonGroup
                 className="clone-from-type_btn-group"
                 items={cloneFromTypeButtonGroupItems}
@@ -174,7 +174,7 @@ const SurveyCreate = (props) => {
                 selection={cloneFrom?.value}
                 type={cloneFromType}
               />
-            </fieldset>
+            </Fieldset>
           </FormItem>
           {cloneFrom?.cycles?.length > 1 && (
             <FormItem label="common.cycle">
@@ -208,19 +208,6 @@ const SurveyCreate = (props) => {
         <>
           {!uploading && (
             <>
-              <div className="row">
-                <fieldset className="options-fieldset">
-                  <legend>{i18n.t('common.options')}</legend>
-                  <div>
-                    <Checkbox
-                      id={TestId.surveyCreate.optionIncludeDataCheckbox}
-                      checked={options['includeData']}
-                      label={`surveyCreate:options.includeData`}
-                      onChange={(value) => onOptionChange({ key: 'includeData', value })}
-                    />
-                  </div>
-                </fieldset>
-              </div>
               <FormItem label="surveyCreate:source.label">
                 <RadioButtonGroup items={importSourceButtonGroupItems} onChange={onSourceChange} row value={source} />
               </FormItem>
@@ -232,6 +219,20 @@ const SurveyCreate = (props) => {
                   droppedFiles={file ? [file] : []}
                 />
               </div>
+              {(source === importSources.arena || source === importSources.collect) && (
+                <div className="row">
+                  <Fieldset className="options-fieldset" legend="common.options">
+                    <div>
+                      <Checkbox
+                        id={TestId.surveyCreate.optionIncludeDataCheckbox}
+                        checked={options['includeData']}
+                        label={`surveyCreate:options.includeData`}
+                        onChange={(value) => onOptionChange({ key: 'includeData', value })}
+                      />
+                    </div>
+                  </Fieldset>
+                </div>
+              )}
               <FileUploadChunkSizeDropdown onChange={setChunkSize} value={chunkSize} />
             </>
           )}

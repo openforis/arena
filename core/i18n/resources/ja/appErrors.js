@@ -10,7 +10,8 @@ export default {
     emptyHeaders: '空のヘッダーが見つかりました',
   },
   dataExport: {
-    excelMaxCellsLimitExceeded: 'データのエクスポート中にエラーが発生しました（項目数が多すぎます）。CSV形式でのエクスポートをお試しください。',
+    excelMaxCellsLimitExceeded:
+      'データのエクスポート中にエラーが発生しました（項目数が多すぎます）。CSV形式でのエクスポートをお試しください。',
     noRecordsMatchingSearchCriteria: '検索条件に一致する記録がありません',
   },
   dataImport: {
@@ -27,7 +28,8 @@ export default {
     identifierNotFound: '$t(expression.identifierNotFound)',
     undefinedFunction: '$t(expression.undefinedFunction)',
   },
-  functionHasTooFewArguments: '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
+  functionHasTooFewArguments:
+    '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
   functionHasTooManyArguments: '関数{{fnName}}が受け付ける引数は最大{{maxArity}}個です（{{numArgs}}個指定されました）',
   generic: '予期しないエラー：{{text}}',
   geoWhispApiError: 'Whispサービスは現在一時的に利用できません。',
@@ -84,15 +86,16 @@ export default {
   aiTranslationTooManyItems: '一度に処理できる項目数（{{limit}}件）を超えています（{{count}}件指定されました）。',
   aiActivityLogSurveyMissing: 'アクティビティログを要約するには調査の指定が必要です。',
   aiChatbotDisabled: 'このデプロイメントではドキュメントチャットボットが無効になっています。',
-  aiChatbotUpstreamError: 'ドキュメントチャットボットは現在一時的に利用できません。しばらくしてから再度お試しください。',
+  aiChatbotUpstreamError:
+    'ドキュメントチャットボットは現在一時的に利用できません。しばらくしてから再度お試しください。',
   aiChatbotPayloadTooLarge: '会話が長すぎます。チャットをクリアして、もう少し短い質問をお試しください。',
   userCannotDeleteHasMessages:
     'このユーザーは削除できません：{{count}}件のメッセージを作成しています。先にメッセージを削除するか、担当を変更してください',
   userCannotDeleteLastSystemAdmin: 'このユーザーは削除できません：最後のシステム管理者です',
-  userCannotDeleteOwnsSurveys: 'このユーザーは削除できません：{{count}}件の調査を所有しています。先に所有権を移譲してください',
+  userCannotDeleteOwnsSurveys:
+    'このユーザーは削除できません：{{count}}件の調査を所有しています。先に所有権を移譲してください',
   userCannotDeleteSelf: '自分自身のユーザーアカウントは削除できません',
-  userEmailInvalid:
-    '招待メールを{{email}}に送信できませんでした。アドレスが正しいか確認してください',
+  userEmailInvalid: '招待メールを{{email}}に送信できませんでした。アドレスが正しいか確認してください',
   userHasPendingInvitation: `メールアドレス「{{email}}」のユーザーには既に招待が保留中です。承認されるまでこの調査に招待することはできません`,
   userHasRole: 'このユーザーは既にこの調査で役割を持っています',
   userHasRole_other: 'これらのユーザーは既にこの調査で役割を持っています',

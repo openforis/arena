@@ -60,7 +60,8 @@ export const fetchRecordsSummaryBySurveyId = async (
   client = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
-  const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  const nodeDefsDraft =
+    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = includeRootKeyValues
     ? await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
@@ -152,7 +153,8 @@ export const countRecordsBySurveyId = async (
   client = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
-  const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  const nodeDefsDraft =
+    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
   const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)

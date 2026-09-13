@@ -179,8 +179,7 @@ export default {
     publishSkipDataUpdate: 'データ更新をスキップ',
     publishSkipDataUpdateConfirmOk: 'データ更新をスキップして公開',
     publishSkipDataUpdateImplications: 'データ更新をスキップすると、次のようになります：\n\n{{implications}}',
-    publishSkipDataUpdateImplicationInconsistentData:
-      '既存の記録が新しい調査定義と一致しなくなる場合があります',
+    publishSkipDataUpdateImplicationInconsistentData: '既存の記録が新しい調査定義と一致しなくなる場合があります',
     publishSkipDataUpdateImplicationStaleValues: '影響を受ける値は、手動で再入力するまで再計算されません',
     publishSkipDataUpdateImplicationChains: 'これらの属性を使用する処理チェーンが、古い結果を出力する可能性があります',
     raiseTicketInSupportForum: `問題が発生した場合は、<b>サポートフォーラム</b>に「arena」タグを付けてチケットを作成してください：$t(links.supportForum)`,
@@ -228,8 +227,7 @@ export default {
       message: `ファイルのアップロード中にエラーが発生しました：{{error}}\n
 再試行しますか？`,
     },
-    uploadFileChangedError:
-      '選択したファイルは、選択後に変更されたようです。もう一度選択し直してください。',
+    uploadFileChangedError: '選択したファイルは、選択後に変更されたようです。もう一度選択し直してください。',
     uploadingFile: 'ファイルをアップロード中（{{progressPercent}}%）',
     value: '値',
     view: '表示',
@@ -896,8 +894,7 @@ $t(common.cantUndoWarning)`,
     addQuantitative: '量的属性を追加',
     addCategorical: 'カテゴリ属性を追加',
     emptyNodeDefs: '$t(validationErrors:analysis.analysisNodeDefsRequired)',
-    entityExcludedInRStudioScripts:
-      'この項目および関連するすべての結果変数はRStudioスクリプトから除外されます',
+    entityExcludedInRStudioScripts: 'この項目および関連するすべての結果変数はRStudioスクリプトから除外されます',
     entityWithoutData: '項目{{name}}にはデータがありません。$t(chain.entityExcludedInRStudioScripts)',
     entityNotInCurrentCycle:
       '項目{{name}}は選択中のサイクルでは利用できません。$t(chain.entityExcludedInRStudioScripts)',
@@ -912,8 +909,10 @@ $t(common.cantUndoWarning)`,
   },
 
   expression: {
-    functionHasTooFewArguments: '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
-    functionHasTooManyArguments: '関数{{fnName}}が受け付ける引数は最大{{maxArity}}個です（{{numArgs}}個指定されました）',
+    functionHasTooFewArguments:
+      '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
+    functionHasTooManyArguments:
+      '関数{{fnName}}が受け付ける引数は最大{{maxArity}}個です（{{numArgs}}個指定されました）',
     identifierNotFound: '属性または項目「{{name}}」が見つかりません',
     invalid: '無効な式です：{{details}}',
     invalidAttributeValuePropertyName: '無効な属性値プロパティ名です：{{attributeName}}.{{propName}}',
@@ -976,13 +975,11 @@ $t(common.appNameFull)
     },
     editorCompletionHelp: '- 利用可能な変数と関数を表示',
     functionDescriptions: {
-      categoryItemProp:
-        '指定したコードを持つカテゴリ項目の、指定した$t(extraProp.label)の値を返します',
+      categoryItemProp: '指定したコードを持つカテゴリ項目の、指定した$t(extraProp.label)の値を返します',
       dateTimeDiff: '2つの日時の組の差（分単位）を返します',
       distance: '指定した座標間の距離（メートル単位）を返します',
       first: '指定した複数属性または項目の最初の値またはノードを返します',
-      geoCoordinateAtDistance:
-        '指定した座標から指定した距離・方位にある座標を返します',
+      geoCoordinateAtDistance: '指定した座標から指定した距離・方位にある座標を返します',
       geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
       geoPolygon: '座標のリストからGeoJSON形式のポリゴンを生成します',
       includes: '指定した複数属性に指定した値が含まれている場合にtrueを返します。',
@@ -997,15 +994,13 @@ $t(common.appNameFull)
       now: '現在の日付または時刻を返します',
       parent: '指定したノードの親項目を返します',
       pow: '底をべき乗した値を返します',
-      prevCycleNote:
-        '複数サイクルが定義されており、前サイクルへのリンクが有効な場合のみ、Arena Mobileで動作します',
+      prevCycleNote: '複数サイクルが定義されており、前サイクルへのリンクが有効な場合のみ、Arena Mobileで動作します',
       prevCycleValue:
         '前サイクルの記録における同じ属性の値を返します。$t(nodeDefEdit.functionDescriptions.prevCycleNote)',
       prevCycleValues:
         '前サイクルの記録における同じ属性群の値を返します。$t(nodeDefEdit.functionDescriptions.prevCycleNote)',
       recordCycle: '現在の記録のサイクルを返します',
-      recordDateCreated:
-        '現在の記録の作成日時を日時値として返します。テキスト、日付、または時刻属性で使用できます',
+      recordDateCreated: '現在の記録の作成日時を日時値として返します。テキスト、日付、または時刻属性で使用できます',
       recordDateLastModified:
         '現在の記録の最終更新日時を日時値として返します。テキスト、日付、または時刻属性で使用できます',
       recordOwnerEmail: '記録を所有するユーザーのメールアドレスを返します',
@@ -1013,8 +1008,7 @@ $t(common.appNameFull)
       recordOwnerRole: '記録を所有するユーザーの（現在の調査における）役割を返します',
       rowIndex: '現在のテーブル行（またはフォーム）のインデックスを返します',
       taxonProp: '指定したコードを持つ分類群の、指定した$t(extraProp.label)の値を返します',
-      taxonVernacularName:
-        '指定したコードを持つ分類群の、指定した言語での（最初の）通称名（現地名）を返します',
+      taxonVernacularName: '指定したコードを持つ分類群の、指定した言語での（最初の）通称名（現地名）を返します',
       unique: '複数属性または項目の一意な値を返します',
       userEmail: 'ログイン中のユーザーのメールアドレスを返します',
       userIsRecordOwner:
@@ -1217,8 +1211,7 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
       attributeAlwaysValid: '属性は常に有効',
       attributeValidWhenConditionIsMet: '条件を満たす場合に属性は有効',
     },
-    cannotChangeIntoMultipleWithDefaultValues:
-      'デフォルト値が設定されているため、このノードを複数に変換できません。',
+    cannotChangeIntoMultipleWithDefaultValues: 'デフォルト値が設定されているため、このノードを複数に変換できません。',
     cannotDeleteNodeDefReferenced: `「{{nodeDef}}」は以下のノード定義から参照されているため削除できません：{{nodeDefDependents}}`,
     cloneDialog: {
       confirmButtonLabel: '複製',
@@ -1247,8 +1240,7 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
 
 例：*クラスター → プロット → 樹木*のような構造で、属性*tree_species*を**一意**としてマークすると、同じ*プロット*内では樹種ごとに1本の木しか登録できません。`,
     },
-    nodeDefClonedSuccessfully:
-      'ノード定義「{{nodeDefName}}」を「{{targetParentNodeDefName}}」に複製しました',
+    nodeDefClonedSuccessfully: 'ノード定義「{{nodeDefName}}」を「{{targetParentNodeDefName}}」に複製しました',
     categoriesClonedFromSurvey: '以下のカテゴリも複製元の調査から複製されました：{{names}}',
     taxonomiesClonedFromSurvey: '以下の分類体系も複製元の調査から複製されました：{{names}}',
   },
