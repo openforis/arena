@@ -87,7 +87,6 @@ export const MapContainer = (props) => {
   const {
     baseLayersLabel,
     editable = false,
-    equalEarthAsDefault = false,
     geoJson = null,
     layers = [],
     markerPoint,
@@ -125,12 +124,7 @@ export const MapContainer = (props) => {
           maxBoundsViscosity={1}
         >
           <MapResizeHandler />
-          <MapLayersControl
-            layers={layers}
-            baseLayersLabel={baseLayersLabel}
-            overlayGroups={overlayGroups}
-            equalEarthAsDefault={equalEarthAsDefault}
-          />
+          <MapLayersControl layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
           <MapMarker
             editable={editable}
             point={markerPoint}
@@ -174,7 +168,6 @@ MapContainer.propTypes = {
   baseLayersLabel: PropTypes.string,
   centerPoint: PropTypes.object,
   editable: PropTypes.bool,
-  equalEarthAsDefault: PropTypes.bool,
   geoJson: PropTypes.object,
   layers: PropTypes.array,
   markerPoint: PropTypes.object,

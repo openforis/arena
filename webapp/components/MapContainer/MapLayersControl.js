@@ -14,7 +14,7 @@ import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
 import { WmtsComponent } from './WmtsComponent'
 
 export const MapLayersControl = (props) => {
-  const { layers = [], baseLayersLabel, overlayGroups = [], equalEarthAsDefault = false } = props
+  const { layers = [], baseLayersLabel, overlayGroups = [] } = props
 
   const user = useUser()
   const surveyId = useSurveyId()
@@ -45,15 +45,10 @@ export const MapLayersControl = (props) => {
   )
 
   // Equal Earth is experimental: hidden from the switcher unless EXPERIMENTAL_FEATURES is
-  // enabled, and only equalEarthAsDefault callers (MapView) have it pre-selected when visible -
-  // other consumers (e.g. the record-editing coordinate picker) fall back to the first
-  // non-maplibre entry, matching this app's pre-experiment default.
+  // enabled, and never pre-selected as the default base layer even when visible.
   const defaultBaseLayer = useMemo(
-    () =>
-      equalEarthAsDefault && experimentalFeaturesEnabled
-        ? (baseLayers.find((baseLayer) => baseLayer.type === 'maplibre') ?? baseLayers[0])
-        : (baseLayers.find((baseLayer) => baseLayer.type !== 'maplibre') ?? baseLayers[0]),
-    [equalEarthAsDefault, experimentalFeaturesEnabled]
+    () => baseLayers.find((baseLayer) => baseLayer.type !== 'maplibre') ?? baseLayers[0],
+    []
   )
 
   const baseLayersControls = useMemo(() => {
@@ -108,7 +103,6 @@ export const MapLayersControl = (props) => {
 
 MapLayersControl.propTypes = {
   baseLayersLabel: PropTypes.string,
-  equalEarthAsDefault: PropTypes.bool,
   layers: PropTypes.array,
   overlayGroups: PropTypes.arrayOf(
     PropTypes.shape({
