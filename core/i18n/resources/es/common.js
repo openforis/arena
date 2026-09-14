@@ -644,6 +644,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     },
     phase2AsSamplingPointData: {
       label: 'Unir usando el enlace de Sampling Point Data',
+      info: 'La(s) clave(s) de la entidad de 2ª fase se leen de la tabla de Sampling Point Data, que es la misma tabla utilizada para la 1ª fase.',
     },
     phase1JoinAttribute: {
       label: 'Atributo de unión (1ª fase)',
@@ -651,7 +652,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     },
     phase2JoinAttribute: {
       label: 'Atributo de unión (2ª fase)',
-      info: 'Seleccione el atributo de código o texto de la entidad de unión (2ª fase) utilizado para unirla con la tabla de 1ª fase; su valor se compara con las propiedades adicionales definidas para la categoría de 1ª fase.',
+      info: 'Seleccione el atributo (de la entidad de 2ª fase) para unir con la tabla de 1ª fase; su valor se compara con el atributo de unión de la 1ª fase anterior.',
     },
     formLabel: 'Etiqueta de cadena de procesamiento',
     basic: 'Básico',
@@ -697,7 +698,6 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     },
     stratumAttribute: 'Atributo de estrato',
     stratumAttributeInfo: 'Seleccione la variable utilizada para estratificar la muestra.',
-    stratumAttribute2ndPhase: 'Atributo de estrato de 2ª fase',
     stratumAttribute2ndPhaseInfo:
       'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada. Solo se muestran los atributos cuyo nombre también aparece como columna de la categoría de la 1ª fase.',
     postStratificationAttribute: 'Atributo de postestratificación',

@@ -30,7 +30,7 @@ export const StratumAttributeSelector = () => {
   )
 
   const isTwoPhase = ChainSamplingDesign.isPhase1CategorySelectionEnabled(samplingDesign)
-  const label = isTwoPhase ? 'chainView.stratumAttribute2ndPhase' : 'chainView.stratumAttribute'
+  const label = 'chainView.stratumAttribute'
   const info = isTwoPhase ? 'chainView.stratumAttribute2ndPhaseInfo' : 'chainView.stratumAttributeInfo'
 
   const phase1CategoryUuid = ChainSamplingDesign.getPhase1CategoryUuid(samplingDesign)
