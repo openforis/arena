@@ -1,4 +1,5 @@
 import { useDispatch } from 'react-redux'
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -9,6 +10,8 @@ import { TestId } from '@webapp/utils/testId'
 
 import { Button } from './buttons'
 import { useKeyboardShiftKeyPressed } from './hooks'
+
+import './buttonPublishSurvey.scss'
 
 const ButtonPublishSurvey = (props) => {
   const { className, disabled = false, variant = 'outlined' } = props
@@ -23,7 +26,7 @@ const ButtonPublishSurvey = (props) => {
 
   return (
     <Button
-      className={className}
+      className={classNames('btn-publish-survey', className)}
       disabled={disabled || surveyIsDirty}
       iconClassName="icon-warning icon-left icon-10px"
       label="common.publish"
