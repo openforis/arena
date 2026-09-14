@@ -775,6 +775,7 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
     },
     phase2AsSamplingPointData: {
       label: 'Joindre en utilisant le lien Sampling Point Data',
+      info: "La ou les clés de l'entité de 2e phase sont lues dans la table Sampling Point Data, qui est la même table utilisée pour la 1ère phase.",
     },
     phase1JoinAttribute: {
       label: 'Attribut de jointure (1ère phase)',
@@ -782,7 +783,7 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
     },
     phase2JoinAttribute: {
       label: 'Attribut de jointure (2e phase)',
-      info: "Sélectionnez l'attribut de type code ou texte de l'entité de jointure (2e phase) utilisé pour la joindre à la table de 1ère phase ; sa valeur est comparée aux propriétés supplémentaires définies pour la catégorie de 1ère phase.",
+      info: "Sélectionnez l'attribut (de l'entité de 2e phase) à joindre avec la table de 1ère phase ; sa valeur est comparée à l'attribut de jointure de la 1ère phase précédent.",
     },
     formLabel: 'Étiquette de la chaîne de traitement',
     basic: 'Basique',
@@ -827,7 +828,6 @@ Ce processus peut être lent.`,
     },
     stratumAttribute: 'Attribut de strate',
     stratumAttributeInfo: "Sélectionnez la variable utilisée pour stratifier l'échantillon.",
-    stratumAttribute2ndPhase: 'Attribut de strate de 2ème phase',
     stratumAttribute2ndPhaseInfo: `Sélectionnez la variable utilisée pour sous-stratifier l'échantillon de la 1ère phase avant de tirer le sous-échantillon final et détaillé. Seuls les attributs dont le nom apparaît également comme colonne de la catégorie de la 1ère phase sont affichés.`,
     postStratificationAttribute: 'Attribut de post-stratification',
     areaWeightingMethod: 'Méthode de pondération par surface',
