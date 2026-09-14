@@ -25,7 +25,11 @@ export const Phase2AsSamplingPointDataSelector = () => {
   /* eslint-enable react-hooks/preserve-manual-memoization */
 
   return (
-    <FormItem className="phase2-as-sampling-point-data" label="chainView.phase2AsSamplingPointData.label">
+    <FormItem
+      className="phase2-as-sampling-point-data"
+      label="chainView.phase2AsSamplingPointData.label"
+      info="chainView.phase2AsSamplingPointData.info"
+    >
       <Checkbox
         checked={ChainSamplingDesign.isPhase2AsSamplingPointData(samplingDesign)}
         onChange={onChange}

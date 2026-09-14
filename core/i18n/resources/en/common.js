@@ -775,6 +775,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     },
     phase2AsSamplingPointData: {
       label: 'Join by using Sampling Point Data linkage',
+      info: 'The second-phase entity key(s) are read from the Sampling Point Data table, which is the same table used for the first phase.',
     },
     phase1JoinAttribute: {
       label: 'Join attribute (1st phase)',
@@ -782,8 +783,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     },
     phase2JoinAttribute: {
       label: 'Join attribute (2nd phase)',
-      info: `Select the code or text attribute of the join entity (2nd phase) used to join it with the 1st phase table;
-its value is matched against the extra properties defined for the 1st phase category.`,
+      info: `Select the attribute (of 2nd phase entity) to join with 1st phase table; its value is matched against the previous 1st phase join attribute.`,
     },
     formLabel: 'Processing chain label',
     basic: 'Basic',
@@ -828,7 +828,6 @@ This might be a slow process.`,
     },
     stratumAttribute: 'Stratum attribute',
     stratumAttributeInfo: 'Select the variable used to stratify the sample.',
-    stratumAttribute2ndPhase: '2nd phase stratum attribute',
     stratumAttribute2ndPhaseInfo:
       'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample. Only attributes whose name also appears as a column of the 1st phase category are shown.',
     postStratificationAttribute: 'Post stratification attribute',
