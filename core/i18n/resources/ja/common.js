@@ -772,6 +772,7 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     phase2AsSamplingPointData: {
       label: '抽出地点データのリンクを使って結合',
+      info: '第2段階項目のキーは、第1段階でも使用される同じ抽出地点データ（Sampling Point Data）テーブルから読み込まれます。',
     },
     phase1JoinAttribute: {
       label: '結合属性（第1段階）',
@@ -779,8 +780,7 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     phase2JoinAttribute: {
       label: '結合属性（第2段階）',
-      info: `結合項目（第2段階）のコード属性またはテキスト属性を選択してください。第1段階テーブルとの結合に使用されます。
-その値は、第1段階カテゴリに定義された追加プロパティと照合されます。`,
+      info: '第2段階項目の属性の中から、第1段階テーブルと結合する属性を選択してください。その値は、前述の第1段階の結合属性と照合されます。',
     },
     formLabel: '処理チェーンのラベル',
     basic: '基本',
@@ -825,7 +825,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     stratumAttribute: '層別属性',
     stratumAttributeInfo: 'サンプルの層別に使用する変数を選択してください。',
-    stratumAttribute2ndPhase: '第2段階の層別属性',
     stratumAttribute2ndPhaseInfo:
       '最終的な詳細サブサンプルを抽出する前に、第1段階サンプルをさらに層別する変数を選択してください。',
     postStratificationAttribute: '事後層別属性',
