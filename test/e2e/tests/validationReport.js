@@ -10,7 +10,6 @@ import { expectNoItems } from './_tables'
 
 const DUPLICATE_VALUE = 'Duplicate value'
 
-/* eslint-disable camelcase */
 const { cluster_id, cluster_coordinate } = cluster.children
 const { plot_id } = plot.children
 const { tree_id, tree_dec_2, tree_species } = tree.children
@@ -69,7 +68,7 @@ const gotoRecordAndEnterValue = (record, attribute, value) => {
   gotoRecords()
   gotoRecord({ record, unlock: true })
   enterAttribute(attribute, value)
-  // eslint-disable-next-line no-param-reassign
+
   record[attribute.name] = value
   waitThread()
 }
@@ -128,6 +127,10 @@ export default () =>
       enterAttribute(tree_id, '', getTreeSelector(0))
       enterAttribute(tree_dec_2, '0', getTreeSelector(0))
       enterAttribute(tree_id, '10', getTreeSelector(1))
+      // wait for the duplicate key validation triggered by the previous entry to settle before entering another
+      // duplicate value: entering it too soon races with the entity table re-render and can make the next
+      // enterAttribute hit a row mid-render, hanging until the test timeout (see flaky CI failures on this line)
+      waitThread()
       enterAttribute(tree_id, '10', getTreeSelector(2))
       enterAttribute(tree_id, '0', getTreeSelector(3))
       waitThread()
