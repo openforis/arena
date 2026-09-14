@@ -219,9 +219,9 @@ const SurveyCreate = (props) => {
                   droppedFiles={file ? [file] : []}
                 />
               </div>
-              {(source === importSources.arena || source === importSources.collect) && (
-                <div className="row">
-                  <Fieldset className="options-fieldset" legend="common.options">
+              <div className="row">
+                <Fieldset className="options-fieldset" legend="common.options">
+                  {(source === importSources.arena || source === importSources.collect) && (
                     <div>
                       <Checkbox
                         id={TestId.surveyCreate.optionIncludeDataCheckbox}
@@ -230,10 +230,10 @@ const SurveyCreate = (props) => {
                         onChange={(value) => onOptionChange({ key: 'includeData', value })}
                       />
                     </div>
-                  </Fieldset>
-                </div>
-              )}
-              <FileUploadChunkSizeDropdown onChange={setChunkSize} value={chunkSize} />
+                  )}
+                  <FileUploadChunkSizeDropdown onChange={setChunkSize} value={chunkSize} />
+                </Fieldset>
+              </div>
             </>
           )}
           <div className="row">
