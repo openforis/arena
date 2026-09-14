@@ -8,6 +8,7 @@ import { CallGeoCoordinateAtDistanceEditor } from './callGeoCoordinateAtDistance
 import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
 import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
+import { CallNumberToWordsEditor } from './callNumberToWordsEditor'
 import { CallTaxonPropEditor } from './callTaxonPropEditor'
 import { CallTaxonVernacularNameEditor } from './callTaxonVernacularNameEditor'
 import { CallUserPropEditor } from './callUserPropEditor'
@@ -29,6 +30,10 @@ export const functions = {
   [functionNames.isNotEmpty]: {
     label: 'isNotEmpty(...)',
     component: CallIsNotEmptyEditor,
+  },
+  [functionNames.numberToWords]: {
+    label: 'numberToWords(...)',
+    component: CallNumberToWordsEditor,
   },
   [functionNames.count]: {
     label: 'count(...)',
