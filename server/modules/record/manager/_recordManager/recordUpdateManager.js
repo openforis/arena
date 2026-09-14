@@ -41,6 +41,7 @@ export const initNewRecord = async (
     survey,
     record,
     timezoneOffset,
+    lang,
     nodesUpdateListener = null,
     nodesValidationListener = null,
     createMultipleEntities = true,
@@ -58,6 +59,7 @@ export const initNewRecord = async (
       record,
       node: rootNode,
       timezoneOffset,
+      lang,
       nodesUpdateListener,
       nodesValidationListener,
       system: true,
@@ -67,7 +69,15 @@ export const initNewRecord = async (
   )
 
   return _applyGroupQualifierValues(
-    { user, survey, record: recordWithRootEntity, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+    {
+      user,
+      survey,
+      record: recordWithRootEntity,
+      timezoneOffset,
+      lang,
+      nodesUpdateListener,
+      nodesValidationListener,
+    },
     client
   )
 }
@@ -76,7 +86,7 @@ export const initNewRecord = async (
 // in the qualifiers of the current user's group for this survey, and marks
 // the affected node as non-editable in the UI.
 const _applyGroupQualifierValues = async (
-  { user, survey, record, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+  { user, survey, record, timezoneOffset, lang, nodesUpdateListener, nodesValidationListener },
   client
 ) => {
   const qualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey }, client)
@@ -99,6 +109,7 @@ const _applyGroupQualifierValues = async (
         record: recordUpdated,
         node: nodeWithValue,
         timezoneOffset,
+        lang,
         nodesUpdateListener,
         nodesValidationListener,
         system: true,
@@ -218,6 +229,7 @@ export const persistNode = async (
     record,
     node,
     timezoneOffset,
+    lang,
     nodesUpdateListener = null,
     nodesValidationListener = null,
     system = false,
@@ -232,6 +244,7 @@ export const persistNode = async (
       record,
       node,
       timezoneOffset,
+      lang,
       nodesUpdateFn: async (user, survey, record, node, t) => {
         const nodeUuid = Node.getUuid(node)
 
@@ -241,7 +254,7 @@ export const persistNode = async (
           return NodeUpdateManager.updateNode({ user, survey, record, node, system }, t)
         }
         return NodeCreationManager.insertNode(
-          { user, survey, record, node, system, createMultipleEntities, timezoneOffset },
+          { user, survey, record, node, system, createMultipleEntities, timezoneOffset, lang },
           t
         )
       },
@@ -259,6 +272,7 @@ export const deleteNode = async (
   record,
   nodeUuid,
   timezoneOffset,
+  lang,
   nodesUpdateListener = null,
   nodesValidationListener = null,
   t = db
@@ -270,6 +284,7 @@ export const deleteNode = async (
       record,
       node: Record.getNodeByUuid(nodeUuid)(record),
       timezoneOffset,
+      lang,
       nodesUpdateFn: (user, survey, record, node, t) =>
         NodeUpdateManager.deleteNode(user, survey, record, Node.getUuid(node), t),
       nodesUpdateListener,
@@ -291,6 +306,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
     node,
     categoryItemProvider,
     timezoneOffset,
+    lang,
     nodesUpdateFn,
     nodesUpdateListener = null,
     nodesValidationListener = null,
@@ -310,6 +326,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
         record: recordUpdated,
         nodesUpdated,
         timezoneOffset,
+        lang,
         nodesUpdateListener,
         nodesValidationListener,
       },
@@ -385,7 +402,7 @@ const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
 }
 
 const _onNodesUpdate = async (
-  { user, survey, record, nodesUpdated, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+  { user, survey, record, nodesUpdated, timezoneOffset, lang, nodesUpdateListener, nodesValidationListener },
   t
 ) => {
   // 1. update record and notify
@@ -395,7 +412,10 @@ const _onNodesUpdate = async (
 
   // 2. update dependent nodes
   const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } =
-    await NodeUpdateManager.updateNodesDependents({ user, survey, record, nodes: nodesUpdated, timezoneOffset }, t)
+    await NodeUpdateManager.updateNodesDependents(
+      { user, survey, record, nodes: nodesUpdated, timezoneOffset, lang },
+      t
+    )
   if (nodesUpdateListener) {
     nodesUpdateListener(updatedDependentNodes)
   }

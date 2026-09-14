@@ -206,7 +206,7 @@ const _persistNodes = async ({ survey, nodesArray, isPreview = false }, tx) => {
 }
 
 export const updateNodesDependents = async (
-  { user, survey, record, nodes, timezoneOffset, persistNodes = true, sideEffect = false },
+  { user, survey, record, nodes, timezoneOffset, lang, persistNodes = true, sideEffect = false },
   tx
 ) => {
   const { record: recordUpdatedDependents, nodes: allNodesUpdated } = await Record.updateNodesDependents({
@@ -217,6 +217,7 @@ export const updateNodesDependents = async (
     categoryItemProvider,
     taxonProvider,
     timezoneOffset,
+    lang,
     logger,
     sideEffect,
   })
