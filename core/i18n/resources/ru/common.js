@@ -751,6 +751,7 @@ $t(common.raiseTicketInSupportForum)
     },
     phase2AsSamplingPointData: {
       label: 'Соединять с использованием связи Sampling Point Data',
+      info: 'Ключ(и) объекта 2-й фазы считываются из таблицы Sampling Point Data, той же таблицы, что используется для 1-й фазы.',
     },
     phase1JoinAttribute: {
       label: 'Атрибут соединения (1-я фаза)',

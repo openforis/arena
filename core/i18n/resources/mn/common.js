@@ -752,6 +752,7 @@ $t(common.raiseTicketInSupportForum)
     },
     phase2AsSamplingPointData: {
       label: 'Sampling Point Data холбоосыг ашиглан холбох',
+      info: '2-р үе шатны объектын түлхүүр(үүд) нь 1-р үе шатанд ашигласантай ижил Sampling Point Data хүснэгтээс уншигдана.',
     },
     phase1JoinAttribute: {
       label: 'Холболтын шинж чанар (1-р үе шат)',

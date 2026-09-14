@@ -644,6 +644,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     },
     phase2AsSamplingPointData: {
       label: 'Unir usando el enlace de Sampling Point Data',
+      info: 'La(s) clave(s) de la entidad de 2ª fase se leen de la tabla de Sampling Point Data, que es la misma tabla utilizada para la 1ª fase.',
     },
     phase1JoinAttribute: {
       label: 'Atributo de unión (1ª fase)',

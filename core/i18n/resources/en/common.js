@@ -774,6 +774,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     },
     phase2AsSamplingPointData: {
       label: 'Join by using Sampling Point Data linkage',
+      info: 'The second-phase entity key(s) are read from the Sampling Point Data table, which is the same table used for the first phase.',
     },
     phase1JoinAttribute: {
       label: 'Join attribute (1st phase)',

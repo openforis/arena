@@ -772,6 +772,7 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     phase2AsSamplingPointData: {
       label: '抽出地点データのリンクを使って結合',
+      info: '第2段階項目のキーは、第1段階でも使用される同じ抽出地点データ（Sampling Point Data）テーブルから読み込まれます。',
     },
     phase1JoinAttribute: {
       label: '結合属性（第1段階）',

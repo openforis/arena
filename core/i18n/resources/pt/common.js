@@ -772,6 +772,7 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     },
     phase2AsSamplingPointData: {
       label: 'Unir usando a ligação de Sampling Point Data',
+      info: 'A(s) chave(s) da entidade da 2ª fase são lidas da tabela Sampling Point Data, que é a mesma tabela usada para a 1ª fase.',
     },
     phase1JoinAttribute: {
       label: 'Atributo de junção (1ª fase)',

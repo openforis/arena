@@ -775,6 +775,7 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
     },
     phase2AsSamplingPointData: {
       label: 'Joindre en utilisant le lien Sampling Point Data',
+      info: "La ou les clés de l'entité de 2e phase sont lues dans la table Sampling Point Data, qui est la même table utilisée pour la 1ère phase.",
     },
     phase1JoinAttribute: {
       label: 'Attribut de jointure (1ère phase)',
