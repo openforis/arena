@@ -127,11 +127,12 @@ export default () =>
       enterAttribute(tree_id, '', getTreeSelector(0))
       enterAttribute(tree_dec_2, '0', getTreeSelector(0))
       enterAttribute(tree_id, '10', getTreeSelector(1))
-      // wait for the duplicate key validation triggered by the previous entry to settle before entering another
+      // wait for the duplicate key validation triggered by each entry to settle before entering another
       // duplicate value: entering it too soon races with the entity table re-render and can make the next
       // enterAttribute hit a row mid-render, hanging until the test timeout (see flaky CI failures on this line)
       waitThread()
       enterAttribute(tree_id, '10', getTreeSelector(2))
+      waitThread()
       enterAttribute(tree_id, '0', getTreeSelector(3))
       waitThread()
 
