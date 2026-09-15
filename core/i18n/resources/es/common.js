@@ -639,8 +639,11 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     mauFile: {
       upload: 'Subir MAU.zip',
       download: 'Descargar MAU.zip',
+      delete: 'Eliminar MAU.zip',
       confirmReplace: 'Ya se ha subido un archivo MAU.zip para esta cadena. ¿Desea reemplazarlo?',
+      confirmDelete: '¿Eliminar el archivo MAU.zip subido para esta cadena?',
       uploadComplete: 'Archivo MAU.zip subido correctamente',
+      deleteComplete: 'Archivo MAU.zip eliminado',
       invalidFileExtension: 'Seleccione un archivo .zip',
     },
     phase1Category: 'Categoría de primera fase',

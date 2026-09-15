@@ -30,6 +30,7 @@ const AdvancedFunctionsMenu = () => {
 
   const [mauFile, setMauFile] = useState(null)
   const [uploadingMauFile, setUploadingMauFile] = useState(false)
+  const [deletingMauFile, setDeletingMauFile] = useState(false)
 
   const mauFileInputRef = useRef(null)
 
@@ -89,6 +90,27 @@ const AdvancedFunctionsMenu = () => {
     [chainUuid, confirmAsync, dispatch, mauFile, surveyId]
   )
 
+  const onDeleteMauFileClick = useCallback(async () => {
+    const confirmed = await confirmAsync({ key: 'chainView.mauFile.confirmDelete' })
+    if (!confirmed) return
+
+    setDeletingMauFile(true)
+    try {
+      await API.deleteChainMauFile({ surveyId, chainUuid })
+      setMauFile(null)
+      dispatch(NotificationActions.notifyInfo({ key: 'chainView.mauFile.deleteComplete' }))
+    } catch (error) {
+      dispatch(
+        NotificationActions.notifyError({
+          key: 'appErrors:generic',
+          params: { text: String(error?.message || error) },
+        })
+      )
+    } finally {
+      setDeletingMauFile(false)
+    }
+  }, [chainUuid, confirmAsync, dispatch, surveyId])
+
   const canEditChainNow = canEditChain && !chainEditLocked
 
   const items = useMemo(() => {
@@ -134,6 +156,14 @@ const AdvancedFunctionsMenu = () => {
         ),
       })
     }
+    if (mauFile && canEditChainNow) {
+      menuItems.push({
+        key: 'chain-mau-delete',
+        content: (
+          <ButtonDelete disabled={deletingMauFile} label="chainView.mauFile.delete" onClick={onDeleteMauFileClick} />
+        ),
+      })
+    }
     if (canEditChainNow) {
       menuItems.push({
         key: 'chain-delete',
@@ -141,7 +171,19 @@ const AdvancedFunctionsMenu = () => {
       })
     }
     return menuItems
-  }, [canEditChainNow, chainUuid, cycle, deleteChain, lang, mauFile, onUploadButtonClick, surveyId, uploadingMauFile])
+  }, [
+    canEditChainNow,
+    chainUuid,
+    cycle,
+    deleteChain,
+    deletingMauFile,
+    lang,
+    mauFile,
+    onDeleteMauFileClick,
+    onUploadButtonClick,
+    surveyId,
+    uploadingMauFile,
+  ])
 
   return (
     <>

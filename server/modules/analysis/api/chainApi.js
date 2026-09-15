@@ -322,4 +322,20 @@ export const init = (app) => {
       }
     }
   )
+
+  app.delete(
+    '/survey/:surveyId/chain/:chainUuid/mau',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid } = Request.getParams(req)
+
+        await AnalysisService.deleteChainMauFile({ surveyId, chainUuid })
+
+        Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 }

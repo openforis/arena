@@ -36,6 +36,7 @@ export {
   uploadChainMauFile,
   cloneChainFromSurvey,
   deleteChain,
+  deleteChainMauFile,
 } from './analysis'
 
 export {

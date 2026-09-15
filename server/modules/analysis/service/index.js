@@ -2,7 +2,12 @@ export { update, validate } from './update'
 import { ChainSummaryGenerator } from './chainSummaryGenerator'
 const { generateChainSummary } = ChainSummaryGenerator
 export { generateChainSummary }
-export { fetchChainMauFileSummary, uploadChainMauFile, fetchChainMauFileContent } from './chainMauFile'
+export {
+  fetchChainMauFileSummary,
+  uploadChainMauFile,
+  fetchChainMauFileContent,
+  deleteChainMauFile,
+} from './chainMauFile'
 
 export {
   // ====== CREATE - Chain

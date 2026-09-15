@@ -747,8 +747,11 @@ $t(common.raiseTicketInSupportForum)
     mauFile: {
       upload: 'MAU.zip байршуулах',
       download: 'MAU.zip татах',
+      delete: 'MAU.zip устгах',
       confirmReplace: 'Энэ хэлхээнд MAU.zip файл аль хэдийн байршуулагдсан байна. Үүнийг солих уу?',
+      confirmDelete: 'Энэ хэлхээнд байршуулсан MAU.zip файлыг устгах уу?',
       uploadComplete: 'MAU.zip файл амжилттай байршуулагдлаа',
+      deleteComplete: 'MAU.zip файл устгагдлаа',
       invalidFileExtension: '.zip файл сонгоно уу',
     },
     phase1Category: '1-р үе шатны ангилал',

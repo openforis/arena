@@ -76,3 +76,7 @@ export const cloneChainFromSurvey = async ({
 export const deleteChain = async ({ surveyId, chainUuid }) => {
   await axios.delete(`/api/survey/${surveyId}/chain/${chainUuid}`)
 }
+
+export const deleteChainMauFile = async ({ surveyId, chainUuid }) => {
+  await axios.delete(`/api/survey/${surveyId}/chain/${chainUuid}/mau`)
+}

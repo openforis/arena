@@ -767,8 +767,11 @@ $t(accessRequestView.whitelistSenderSuggestion)
     mauFile: {
       upload: 'MAU.zipをアップロード',
       download: 'MAU.zipをダウンロード',
+      delete: 'MAU.zipを削除',
       confirmReplace: 'このチェーンには既にMAU.zipファイルがアップロードされています。置き換えますか？',
+      confirmDelete: 'このチェーンにアップロードされたMAU.zipファイルを削除しますか？',
       uploadComplete: 'MAU.zipファイルが正常にアップロードされました',
+      deleteComplete: 'MAU.zipファイルが削除されました',
       invalidFileExtension: '.zipファイルを選択してください',
     },
     phase1Category: '第1段階カテゴリ',

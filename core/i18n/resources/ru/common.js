@@ -746,8 +746,11 @@ $t(common.raiseTicketInSupportForum)
     mauFile: {
       upload: 'Загрузить MAU.zip',
       download: 'Скачать MAU.zip',
+      delete: 'Удалить MAU.zip',
       confirmReplace: 'Файл MAU.zip уже загружен для этой цепочки. Заменить его?',
+      confirmDelete: 'Удалить файл MAU.zip, загруженный для этой цепочки?',
       uploadComplete: 'Файл MAU.zip успешно загружен',
+      deleteComplete: 'Файл MAU.zip удалён',
       invalidFileExtension: 'Пожалуйста, выберите файл .zip',
     },
     phase1Category: 'Категория 1-й фазы',
