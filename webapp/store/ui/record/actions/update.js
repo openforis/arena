@@ -12,6 +12,7 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 import { objectToFormData } from '@webapp/service/api'
 
 import { AppSavingActions } from '@webapp/store/app'
+import { I18nState } from '@webapp/store/system'
 import { SurveyState } from '@webapp/store/survey'
 
 import { appModules, appModuleUri } from '@webapp/app/appModules'
@@ -35,6 +36,7 @@ const _updateNodeDebounced = (node, file, delay) => {
       draft,
       node: JSON.stringify(node),
       timezoneOffset: Dates.getTimezoneOffset(),
+      lang: I18nState.getLang(),
       ...(file ? { file } : {}),
     })
 

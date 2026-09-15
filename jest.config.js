@@ -17,7 +17,16 @@ module.exports = {
   // transformed based on its own immediate package name, instead of being skipped just because an
   // earlier, non-allowlisted wrapper package appears earlier in the path.
   transformIgnorePatterns: [
-    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/)',
+    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/|n2words/)',
   ],
+  // n2words (transitive dep of @openforis/arena-core, used by numberToWords) is exports-map-only,
+  // no "main" field - jest-resolve 27 predates Node's package.json#exports resolution support, so
+  // `require('n2words/en')` fails to resolve even though Node itself resolves it fine. Map each
+  // subpath straight to its source file until Jest is upgraded past 27.
+  // Resolved via require.resolve (not <rootDir>) so it still points here when this config is
+  // spread into test/e2e/jest.config.js, which overrides rootDir to test/e2e/.
+  moduleNameMapper: {
+    '^n2words/(.+)$': `${require.resolve('n2words/package.json').replace(/package\.json$/, 'src')}/$1.js`,
+  },
   verbose: true,
 }

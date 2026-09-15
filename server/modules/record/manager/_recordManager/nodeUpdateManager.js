@@ -206,7 +206,7 @@ const _persistNodes = async ({ survey, nodesArray, isPreview = false }, tx) => {
 }
 
 export const updateNodesDependents = async (
-  { user, survey, record, nodes, timezoneOffset, persistNodes = true, sideEffect = false },
+  { user, survey, record, nodes, timezoneOffset, lang, persistNodes = true, sideEffect = false },
   tx
 ) => {
   const { record: recordUpdatedDependents, nodes: allNodesUpdated } = await Record.updateNodesDependents({
@@ -217,6 +217,9 @@ export const updateNodesDependents = async (
     categoryItemProvider,
     taxonProvider,
     timezoneOffset,
+    // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
+    // fall back to the survey default when no UI language was provided (e.g. background jobs)
+    lang: lang ?? Survey.getDefaultLanguage(survey),
     logger,
     sideEffect,
   })
