@@ -78,6 +78,7 @@ export const useEditUser = ({ userUuid }) => {
   const editingSameUser = User.isEqual(user)(userToUpdate)
 
   const { onGetUser, onUpdate, onUpdateProfilePicture, onSave, onRemove, onInviteRepeat } = useActions({
+    userUuid,
     userToUpdate,
     setUserToUpdate,
     userToUpdateOriginal,
