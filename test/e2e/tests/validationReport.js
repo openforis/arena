@@ -69,6 +69,7 @@ const gotoRecordAndEnterValue = (record, attribute, value) => {
   gotoRecord({ record, unlock: true })
   enterAttribute(attribute, value)
 
+  // eslint-disable-next-line no-param-reassign
   record[attribute.name] = value
   waitThread()
 }
