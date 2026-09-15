@@ -21,7 +21,7 @@ export const deleteChainMauFile = async ({ surveyId, chainUuid }, client = undef
 }
 
 export const uploadChainMauFile = async ({ surveyId, chainUuid, filePath, fileName, fileSize }) => {
-  await deleteChainMauFile({ surveyId, chainUuid })
+  const existingSummary = await fetchChainMauFileSummary({ surveyId, chainUuid })
 
   const content = await FileUtils.readBinaryFile(filePath)
   const file = SurveyFile.createFile({
@@ -32,6 +32,10 @@ export const uploadChainMauFile = async ({ surveyId, chainUuid, filePath, fileNa
     type: SurveyFileType.chainMau,
   })
   await SurveyFileService.insertFile(surveyId, file)
+
+  if (existingSummary) {
+    await SurveyFileService.deleteFilesAndContent({ surveyId, fileSummaries: [existingSummary] })
+  }
   return file
 }
 
