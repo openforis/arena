@@ -14,9 +14,10 @@ export const fetchChainMauFileSummary = async ({ surveyId, chainUuid }, client =
 }
 
 export const deleteChainMauFile = async ({ surveyId, chainUuid }, client = undefined) => {
-  const existingSummary = await fetchChainMauFileSummary({ surveyId, chainUuid }, client)
-  if (existingSummary) {
-    await SurveyFileService.deleteFilesAndContent({ surveyId, fileSummaries: [existingSummary] }, client)
+  const summaries = await SurveyFileService.fetchFileSummariesByType({ surveyId, type: SurveyFileType.chainMau }, client)
+  const summariesForChain = summaries.filter((summary) => SurveyFile.getChainUuid(summary) === chainUuid)
+  if (summariesForChain.length > 0) {
+    await SurveyFileService.deleteFilesAndContent({ surveyId, fileSummaries: summariesForChain }, client)
   }
 }
 
