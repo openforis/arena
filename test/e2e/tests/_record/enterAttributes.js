@@ -150,7 +150,7 @@ const enterFns = {
 // timeout so failed attempts still have several seconds left for lock-toggle, retry, and
 // error-handling overhead before Jest aborts the test.
 const KEY_FIELD_RETRY_ATTEMPTS = 2
-const KEY_FIELD_ATTEMPT_TIMEOUT_MS = 4000
+const KEY_FIELD_ATTEMPT_TIMEOUT_MS = 3000
 
 const unlockKeyFieldIfNeeded = async (nodeDef, parentSelector) => {
   if (!nodeDef.key) return
@@ -195,7 +195,6 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
         try {
           await unlockKeyFieldIfNeeded(nodeDef, parentSelector)
           await enterValue(KEY_FIELD_ATTEMPT_TIMEOUT_MS)
-          lastError = null
           break
         } catch (e) {
           lastError = e
