@@ -128,6 +128,9 @@ const enterFns = {
   time: enterTime,
 }
 
+const KEY_FIELD_RETRY_ATTEMPTS = 3
+const KEY_FIELD_ATTEMPT_TIMEOUT_MS = 3000
+
 const unlockKeyFieldIfNeeded = async (nodeDef, parentSelector) => {
   if (!nodeDef.key) return
   const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
@@ -160,13 +163,11 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
       // e.g. https://github.com/openforis/arena/actions/runs/34883644236). Retry the whole
       // unlock+fill sequence a few times with a short per-attempt budget, the same way
       // enterTaxon above already retries around a similar record-update race.
-      const attempts = 3
-      const attemptTimeoutMs = 3000
       let lastError
-      for (let attempt = 0; attempt < attempts; attempt += 1) {
+      for (let attempt = 0; attempt < KEY_FIELD_RETRY_ATTEMPTS; attempt += 1) {
         try {
           await unlockKeyFieldIfNeeded(nodeDef, parentSelector)
-          await enterValue(attemptTimeoutMs)
+          await enterValue(KEY_FIELD_ATTEMPT_TIMEOUT_MS)
           lastError = null
           break
         } catch (e) {
