@@ -394,7 +394,7 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
 }
 
 const _getSearchQueryParam = ({ searchValue }) =>
-  `${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
+  `%${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
 const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
