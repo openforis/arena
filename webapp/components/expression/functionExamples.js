@@ -22,6 +22,7 @@ const functionExamples = {
     [functionNames.max]: 'max(3,1,2) = 3',
     [functionNames.min]: 'min(3,1) = 1',
     [functionNames.now]: 'now()',
+    [functionNames.numberToWords]: `numberToWords(numeric_attribute_name) = 'one hundred twenty-three'`,
     [functionNames.parent]: `parent(this), parent($context), parent(node_name)`,
     [functionNames.pow]: 'pow(2,3) = 2³ = 8',
     [functionNames.prevCycleValue]: `prevCycleValue(attribute_name)`,

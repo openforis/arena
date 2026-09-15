@@ -8,6 +8,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
+import { I18nState } from '@webapp/store/system'
 import { SurveyState } from '@webapp/store/survey'
 import { LoaderActions } from '@webapp/store/ui'
 
@@ -24,6 +25,7 @@ export const checkInRecord =
     } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`, {
       draft,
       timezoneOffset: Dates.getTimezoneOffset(),
+      lang: I18nState.getLang(),
     })
 
     if (!record) {
