@@ -6,6 +6,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
 import { AppSavingActions } from '@webapp/store/app'
+import { I18nState } from '@webapp/store/system'
 import { SurveyState } from '@webapp/store/survey'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
@@ -27,7 +28,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
     const nodeUuid = Node.getUuid(node)
 
     await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}/node/${nodeUuid}`, {
-      data: { cycle, draft, timezoneOffset: Dates.getTimezoneOffset() },
+      data: { cycle, draft, timezoneOffset: Dates.getTimezoneOffset(), lang: I18nState.getLang() },
     })
   }
   checkAndConfirmUpdateNode({ dispatch, getState, node, nodeDef, onOk })
