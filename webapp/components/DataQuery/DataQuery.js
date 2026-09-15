@@ -40,6 +40,7 @@ const DataQuery = () => {
     offset,
     setLimit,
     setOffset,
+    setRandomize,
     setData,
   } = useDataQuery({ query })
 
@@ -57,7 +58,6 @@ const DataQuery = () => {
       >
         <div className="table__header">
           <ButtonBar
-            dataCount={count}
             dataEmpty={dataEmpty}
             dataLoaded={dataLoaded}
             dataLoading={dataLoading}
@@ -65,6 +65,7 @@ const DataQuery = () => {
             onNodeDefLabelTypeChange={toggleLabelFunction}
             setQueryLimit={setLimit}
             setQueryOffset={setOffset}
+            setQueryRandomize={setRandomize}
           />
         </div>
 
@@ -74,6 +75,7 @@ const DataQuery = () => {
 
         <Visualizer
           data={data}
+          dataCount={count}
           dataEmpty={dataEmpty}
           dataLoading={dataLoading}
           dataLoadingError={dataLoadingError}

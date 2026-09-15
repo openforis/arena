@@ -12,7 +12,7 @@ const components = {
 }
 
 const Visualizer = (props) => {
-  const { data, dataEmpty, dataLoading, dataLoadingError = false, nodeDefLabelType, offset, setData } = props
+  const { data, dataCount, dataEmpty, dataLoading, dataLoadingError = false, nodeDefLabelType, offset, setData } = props
 
   const displayType = DataExplorerSelectors.useDisplayType()
 
@@ -20,6 +20,7 @@ const Visualizer = (props) => {
     <div className="table__content">
       {React.createElement(components[displayType], {
         data,
+        dataCount,
         dataEmpty,
         dataLoading,
         dataLoadingError,
@@ -33,6 +34,7 @@ const Visualizer = (props) => {
 
 Visualizer.propTypes = {
   data: PropTypes.array,
+  dataCount: PropTypes.number,
   dataEmpty: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool.isRequired,
   dataLoadingError: PropTypes.bool,

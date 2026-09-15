@@ -53,7 +53,6 @@ const uiModeByQueryMode = {
 
 const ButtonBar = (props) => {
   const {
-    dataCount,
     dataEmpty,
     dataLoaded,
     dataLoading,
@@ -61,6 +60,7 @@ const ButtonBar = (props) => {
     onNodeDefLabelTypeChange,
     setQueryLimit,
     setQueryOffset,
+    setQueryRandomize,
   } = props
 
   const dispatch = useDispatch()
@@ -130,13 +130,16 @@ const ButtonBar = (props) => {
 
       <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
 
-      <ButtonGroupDisplayType dataCount={dataCount} setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
+      <ButtonGroupDisplayType
+        setQueryLimit={setQueryLimit}
+        setQueryOffset={setQueryOffset}
+        setQueryRandomize={setQueryRandomize}
+      />
     </div>
   )
 }
 
 ButtonBar.propTypes = {
-  dataCount: PropTypes.number,
   dataEmpty: PropTypes.bool.isRequired,
   dataLoaded: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool.isRequired,
@@ -144,6 +147,7 @@ ButtonBar.propTypes = {
   onNodeDefLabelTypeChange: PropTypes.func.isRequired,
   setQueryLimit: PropTypes.func.isRequired,
   setQueryOffset: PropTypes.func.isRequired,
+  setQueryRandomize: PropTypes.func.isRequired,
 }
 
 export default ButtonBar
