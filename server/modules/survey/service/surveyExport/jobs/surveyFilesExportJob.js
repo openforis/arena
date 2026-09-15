@@ -11,6 +11,7 @@ const SURVEY_FILE_TYPES_TO_EXPORT = [
   SurveyFile.SurveyFileType.brandingSurveyLogo2,
   SurveyFile.SurveyFileType.brandingSurveyLogo3,
   SurveyFile.SurveyFileType.brandingLandingBackground,
+  SurveyFile.SurveyFileType.chainMau,
 ]
 
 export default class SurveyFilesExportJob extends Job {
@@ -32,6 +33,15 @@ export default class SurveyFilesExportJob extends Job {
     this.logDebug(`survey file(s) to export: ${filesCount}`)
 
     if (filesCount > 0) {
+      // chain MAU files metadata (unlike preloaded map layers, doc images and branding images) is not part of
+      // the survey definition itself, so it needs to be exported separately, alongside the file content
+      const chainMauFileSummaries = fileSummaries.filter(
+        (fileSummary) => SurveyFile.getType(fileSummary) === SurveyFile.SurveyFileType.chainMau
+      )
+      if (chainMauFileSummaries.length > 0) {
+        archive.append(JSON.stringify(chainMauFileSummaries, null, 2), { name: ExportFile.chainMauFilesSummaries })
+      }
+
       // write each file content into a separate binary file
       for (const fileSummary of fileSummaries) {
         if (this.isCanceled()) {
