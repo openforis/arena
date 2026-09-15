@@ -81,6 +81,11 @@ const Users = () => {
     _modules.push(
       {
         component: UserEdit,
+        path: userModules.user.path,
+        props: { ownProfile: true },
+      },
+      {
+        component: UserEdit,
         path: `${userModules.user.path}/:userUuid`,
       },
       {
