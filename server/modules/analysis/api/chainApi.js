@@ -288,8 +288,13 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, chainUuid } = Request.getParams(req)
-        const { name: fileName, size: fileSize } = Request.getFile(req)
+        const upload = Request.getFile(req)
         const filePath = Request.getFilePath(req)
+        if (!upload || !filePath) {
+          res.sendStatus(400)
+          return
+        }
+        const { name: fileName, size: fileSize } = upload
 
         const file = await AnalysisService.uploadChainMauFile({ surveyId, chainUuid, filePath, fileName, fileSize })
 
