@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import { objectToFormData } from '../utils/apiUtils'
+
 // ==== READ
 
 export const fetchChains = async ({ surveyId, surveyCycleKey = null } = {}) => {
@@ -32,6 +34,26 @@ export const fetchChainSourceEntityNames = async ({ targetSurveyId, sourceSurvey
 
 export const getChainSummaryExportUrl = ({ surveyId, chainUuid }) =>
   `/api/survey/${surveyId}/chain/${chainUuid}/summary`
+
+export const fetchChainMauFileSummary = async ({ surveyId, chainUuid }) => {
+  const {
+    data: { file },
+  } = await axios.get(`/api/survey/${surveyId}/chain/${chainUuid}/mau`)
+  return file
+}
+
+export const getChainMauFileDownloadUrl = ({ surveyId, chainUuid }) =>
+  `/api/survey/${surveyId}/chain/${chainUuid}/mau/content`
+
+// ==== CREATE/UPDATE
+
+export const uploadChainMauFile = async ({ surveyId, chainUuid, file }) => {
+  const formData = objectToFormData({ file })
+  const {
+    data: { file: uploadedFile },
+  } = await axios.post(`/api/survey/${surveyId}/chain/${chainUuid}/mau`, formData)
+  return uploadedFile
+}
 
 // ==== CLONE
 

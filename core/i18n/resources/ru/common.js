@@ -743,6 +743,13 @@ $t(common.raiseTicketInSupportForum)
       confirmDelete: 'При удалении базовой единицы вы снимите все отметки "переменная на основе площади". Продолжить?',
     },
     downloadSummaryJSON: 'Скачать сводку (JSON)',
+    mauFile: {
+      upload: 'Загрузить MAU.zip',
+      download: 'Скачать MAU.zip',
+      confirmReplace: 'Файл MAU.zip уже загружен для этой цепочки. Заменить его?',
+      uploadComplete: 'Файл MAU.zip успешно загружен',
+      invalidFileExtension: 'Пожалуйста, выберите файл .zip',
+    },
     phase1Category: 'Категория 1-й фазы',
     phase1CategoryInfo: 'Выберите категорию, содержащую выборки 1-й фазы.',
     phase2JoinEntity: {

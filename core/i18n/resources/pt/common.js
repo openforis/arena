@@ -764,6 +764,13 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
         'Ao excluir a unidade base, todas as seleções de "variável baseada em área" serão desmarcadas. Continuar?',
     },
     downloadSummaryJSON: 'Baixar resumo (JSON)',
+    mauFile: {
+      upload: 'Enviar MAU.zip',
+      download: 'Baixar MAU.zip',
+      confirmReplace: 'Já foi enviado um arquivo MAU.zip para esta cadeia. Deseja substituí-lo?',
+      uploadComplete: 'Arquivo MAU.zip enviado com sucesso',
+      invalidFileExtension: 'Selecione um arquivo .zip',
+    },
     phase1Category: 'Categoria da 1ª fase',
     phase1CategoryInfo: 'Selecione a categoria que contém as amostras da 1ª fase.',
     phase2JoinEntity: {

@@ -744,6 +744,13 @@ $t(common.raiseTicketInSupportForum)
         'Суурь нэгжийг устгаснаар та бүх "талбай дээр суурилсан хувьсагч" сонголтуудыг болино. Үргэлжлүүлэх үү?',
     },
     downloadSummaryJSON: 'Хураангуй татах (JSON)',
+    mauFile: {
+      upload: 'MAU.zip байршуулах',
+      download: 'MAU.zip татах',
+      confirmReplace: 'Энэ хэлхээнд MAU.zip файл аль хэдийн байршуулагдсан байна. Үүнийг солих уу?',
+      uploadComplete: 'MAU.zip файл амжилттай байршуулагдлаа',
+      invalidFileExtension: '.zip файл сонгоно уу',
+    },
     phase1Category: '1-р үе шатны ангилал',
     phase1CategoryInfo: '1-р үе шатны түүврийг агуулсан ангиллыг сонгоно уу.',
     phase2JoinEntity: {

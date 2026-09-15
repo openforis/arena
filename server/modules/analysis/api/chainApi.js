@@ -1,3 +1,5 @@
+import * as SurveyFile from '@core/survey/surveyFile'
+
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
@@ -261,4 +263,63 @@ export const init = (app) => {
       next(error)
     }
   })
+
+  // === MAU file
+
+  app.get(
+    '/survey/:surveyId/chain/:chainUuid/mau',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid } = Request.getParams(req)
+
+        const file = await AnalysisService.fetchChainMauFileSummary({ surveyId, chainUuid })
+
+        res.json({ file })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
+    '/survey/:surveyId/chain/:chainUuid/mau',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid } = Request.getParams(req)
+        const { name: fileName, size: fileSize } = Request.getFile(req)
+        const filePath = Request.getFilePath(req)
+
+        const file = await AnalysisService.uploadChainMauFile({ surveyId, chainUuid, filePath, fileName, fileSize })
+
+        res.json({ file })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/chain/:chainUuid/mau/content',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid } = Request.getParams(req)
+
+        const result = await AnalysisService.fetchChainMauFileContent({ surveyId, chainUuid })
+        if (!result) {
+          res.sendStatus(404)
+          return
+        }
+        const { summary, contentStream } = result
+        const fileName = SurveyFile.getName(summary)
+        const fileSize = SurveyFile.getSize(summary)
+        Response.setContentTypeFile({ res, fileName, fileSize, contentType: Response.contentTypes.zip })
+        contentStream.pipe(res)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 }

@@ -636,6 +636,13 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
         'Al eliminar la unidad base, se desmarcarán todas las selecciones de "variable basada en área". ¿Continuar?',
     },
     downloadSummaryJSON: 'Descargar resumen (JSON)',
+    mauFile: {
+      upload: 'Subir MAU.zip',
+      download: 'Descargar MAU.zip',
+      confirmReplace: 'Ya se ha subido un archivo MAU.zip para esta cadena. ¿Desea reemplazarlo?',
+      uploadComplete: 'Archivo MAU.zip subido correctamente',
+      invalidFileExtension: 'Seleccione un archivo .zip',
+    },
     phase1Category: 'Categoría de primera fase',
     phase1CategoryInfo: 'Seleccione la categoría que contiene las muestras de la primera fase.',
     phase2JoinEntity: {

@@ -766,6 +766,13 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       confirmDelete: 'By deleting the base unit, you will uncheck all "area-based variable" selections. Continue?',
     },
     downloadSummaryJSON: 'Download Summary (JSON)',
+    mauFile: {
+      upload: 'Upload MAU.zip',
+      download: 'Download MAU.zip',
+      confirmReplace: 'A MAU.zip file has already been uploaded for this chain. Do you want to replace it?',
+      uploadComplete: 'MAU.zip file uploaded successfully',
+      invalidFileExtension: 'Please select a .zip file',
+    },
     phase1Category: '1st phase category',
     phase1CategoryInfo: 'Select the category that contains the first-phase samples.',
     phase2JoinEntity: {

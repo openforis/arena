@@ -31,6 +31,9 @@ export {
   fetchChainsForCloneFromSurvey,
   fetchChainSourceEntityNames,
   getChainSummaryExportUrl,
+  fetchChainMauFileSummary,
+  getChainMauFileDownloadUrl,
+  uploadChainMauFile,
   cloneChainFromSurvey,
   deleteChain,
 } from './analysis'

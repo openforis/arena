@@ -764,6 +764,13 @@ $t(accessRequestView.whitelistSenderSuggestion)
       confirmDelete: '基本単位を削除すると、すべての「面積ベース変数」の選択が解除されます。続行しますか？',
     },
     downloadSummaryJSON: '概要をダウンロード（JSON）',
+    mauFile: {
+      upload: 'MAU.zipをアップロード',
+      download: 'MAU.zipをダウンロード',
+      confirmReplace: 'このチェーンには既にMAU.zipファイルがアップロードされています。置き換えますか？',
+      uploadComplete: 'MAU.zipファイルが正常にアップロードされました',
+      invalidFileExtension: '.zipファイルを選択してください',
+    },
     phase1Category: '第1段階カテゴリ',
     phase1CategoryInfo: '第1段階のサンプルを含むカテゴリを選択してください。',
     phase2JoinEntity: {
