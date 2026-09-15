@@ -16,6 +16,7 @@ export const keys = {
 }
 
 export const propKeys = {
+  chainUuid: 'chainUuid',
   deleted: 'deleted',
   labels: 'labels',
   name: 'name',
@@ -32,6 +33,7 @@ export const invalidPropKeys = {
 }
 
 export const SurveyFileType = {
+  chainMau: 'chainMau',
   preloadedMapLayer: 'preloadedMapLayer',
   recordAttachment: 'recordAttachment',
   surveyDocImage: 'surveyDocImage',
@@ -47,12 +49,14 @@ export const createFile = ({
   uuid = null,
   size = null,
   content = null,
+  chainUuid = null,
   recordUuid = null,
   nodeUuid = null,
   type = null,
   temporary = false,
 }) => {
   const props = ObjectUtils.keepNonEmptyProps({
+    [propKeys.chainUuid]: chainUuid,
     [propKeys.labels]: labels,
     [propKeys.name]: name,
     [propKeys.nodeUuid]: nodeUuid,
@@ -97,6 +101,7 @@ export const isDeleted = (file) => Boolean(ObjectUtils.getProp(propKeys.deleted,
 export const isTemporary = (file) => Boolean(ObjectUtils.getProp(propKeys.temporary, false)(file))
 export const getName = ObjectUtils.getProp(propKeys.name)
 export const getSize = ObjectUtils.getProp(propKeys.size)
+export const getChainUuid = ObjectUtils.getProp(propKeys.chainUuid)
 export const getNodeUuid = ObjectUtils.getProp(propKeys.nodeUuid)
 export const getRecordUuid = ObjectUtils.getProp(propKeys.recordUuid)
 export const getContent = R.prop(keys.content)
