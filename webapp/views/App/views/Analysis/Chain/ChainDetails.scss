@@ -3,7 +3,7 @@
 .app-module {
   .chain {
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr;
     gap: 2rem;
     padding-bottom: 2rem;
 
@@ -16,7 +16,10 @@
         flex: 1;
       }
 
-      .chain-edit-lock-toggle {
+      .chain-top-bar-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
         flex-shrink: 0;
       }
     }
@@ -31,15 +34,6 @@
     .dropdown,
     .dropdown-wrapper {
       width: 30rem;
-    }
-
-    .button-bar {
-      align-self: center;
-
-      .chain-summary-download-btn {
-        position: absolute;
-        left: 0;
-      }
     }
 
     .rstudio-accordion {

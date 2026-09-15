@@ -767,6 +767,16 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
         'En supprimant l\'unité de base, vous décocherez toutes les sélections "variable basée sur la surface". Continuer ?',
     },
     downloadSummaryJSON: 'Télécharger le résumé (JSON)',
+    mauFile: {
+      upload: 'Importer MAU.zip',
+      download: 'Télécharger MAU.zip',
+      delete: 'Supprimer MAU.zip',
+      confirmReplace: 'Un fichier MAU.zip a déjà été importé pour cette chaîne. Voulez-vous le remplacer ?',
+      confirmDelete: 'Supprimer le fichier MAU.zip importé pour cette chaîne ?',
+      uploadComplete: 'Fichier MAU.zip importé avec succès',
+      deleteComplete: 'Fichier MAU.zip supprimé',
+      invalidFileExtension: 'Veuillez sélectionner un fichier .zip',
+    },
     phase1Category: 'Catégorie de 1ère phase',
     phase1CategoryInfo: 'Sélectionnez la catégorie contenant les échantillons de la 1ère phase.',
     phase2JoinEntity: {
