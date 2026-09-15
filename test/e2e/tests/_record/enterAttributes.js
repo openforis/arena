@@ -172,7 +172,13 @@ const simpleFillTypes = [nodeDefType.decimal, nodeDefType.integer, nodeDefType.t
 
 export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
-    const enterValue = (timeout) => enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector, { timeout })
+    const enterValue = (timeout) => {
+      const parsedValue = parseValue(value)
+      if (simpleFillTypes.includes(nodeDef.type)) {
+        return enterFns[nodeDef.type](nodeDef, parsedValue, parentSelector, { timeout })
+      }
+      return enterFns[nodeDef.type](nodeDef, parsedValue, parentSelector)
+    }
 
     if (nodeDef.key && simpleFillTypes.includes(nodeDef.type)) {
       // Key fields start locked once they hold a value and only unlock for the current focus
