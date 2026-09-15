@@ -69,7 +69,6 @@ const gotoRecordAndEnterValue = (record, attribute, value) => {
   gotoRecord({ record, unlock: true })
   enterAttribute(attribute, value)
 
-  // eslint-disable-next-line no-param-reassign
   record[attribute.name] = value
   waitThread()
 }
@@ -128,12 +127,7 @@ export default () =>
       enterAttribute(tree_id, '', getTreeSelector(0))
       enterAttribute(tree_dec_2, '0', getTreeSelector(0))
       enterAttribute(tree_id, '10', getTreeSelector(1))
-      // wait for the duplicate key validation triggered by each entry to settle before entering another
-      // duplicate value: entering it too soon races with the entity table re-render and can make the next
-      // enterAttribute hit a row mid-render, hanging until the test timeout (see flaky CI failures on this line)
-      waitThread()
       enterAttribute(tree_id, '10', getTreeSelector(2))
-      waitThread()
       enterAttribute(tree_id, '0', getTreeSelector(3))
       waitThread()
 
@@ -164,9 +158,6 @@ export default () =>
       enterAttribute(plot_id, plotIdValue)
 
       enterAttribute(tree_id, record1.trees[0][tree_id.name], getTreeSelector(0))
-      // wait for the key change to settle (same race as in the Invalidate record section above)
-      // before entering subsequent attributes on the same or adjacent rows
-      waitThread()
       enterAttribute(tree_dec_2, record1.trees[0][tree_dec_2.name], getTreeSelector(0))
       // duplicate species with value of previous tree
       enterAttribute(tree_species, record1.trees[0][tree_species.name], getTreeSelector(1))

@@ -1,5 +1,4 @@
 import * as DateUtils from '../../../../core/dateUtils'
-import { nodeDefType } from '../../../../core/survey/nodeDefType'
 
 import { getSelector, TestId } from '../../../../webapp/utils/testId'
 import { FormUtils } from '../utils/formUtils'
@@ -67,44 +66,7 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
   expect(valueSet).toBeTruthy()
 }
 
-const getRemainingTimeoutMs = (deadlineMs) => deadlineMs - Date.now()
-const minOperationTimeoutMs = 50
-
-const getRemainingTimeoutMsOrThrow = (deadlineMs, operation) => {
-  const remainingTimeoutMs = getRemainingTimeoutMs(deadlineMs)
-  if (remainingTimeoutMs < minOperationTimeoutMs) {
-    throw new Error(`enterAttribute attempt timed out waiting for ${operation}`)
-  }
-  return remainingTimeoutMs
-}
-
-const waitForTextInputToBeEditable = async (selector, deadlineMs) => {
-  await page.waitForSelector(selector, {
-    state: 'visible',
-    timeout: getRemainingTimeoutMsOrThrow(deadlineMs, 'text input to become visible'),
-  })
-  await page.waitForFunction(
-    (inputSelector) => {
-      const input = document.querySelector(inputSelector)
-      return Boolean(input) && !input.disabled && !input.readOnly
-    },
-    selector,
-    { timeout: getRemainingTimeoutMsOrThrow(deadlineMs, 'text input to become editable') }
-  )
-}
-
-const enterText = async (nodeDef, value, parentSelector, { timeout } = {}) => {
-  const selector = getTextSelector(nodeDef, parentSelector)
-  if (timeout) {
-    const deadlineMs = Date.now() + timeout
-    await waitForTextInputToBeEditable(selector, deadlineMs)
-    await page.fill(selector, value, {
-      timeout: getRemainingTimeoutMsOrThrow(deadlineMs, 'text input fill'),
-    })
-  } else {
-    await page.fill(selector, value)
-  }
-}
+const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
 
 const enterTime = async (nodeDef, value, parentSelector) => {
   // open hours/minutes selector
@@ -146,77 +108,19 @@ const enterFns = {
   time: enterTime,
 }
 
-// Keep the total retry budget implied by these constants well below the 15 s enterAttribute test
-// timeout so failed attempts still have several seconds left for lock-toggle, retry, and
-// error-handling overhead before Jest aborts the test.
-const KEY_FIELD_RETRY_ATTEMPTS = 2
-const KEY_FIELD_ATTEMPT_TIMEOUT_MS = 3000
-
-const unlockKeyFieldIfNeeded = async (nodeDef, parentSelector, deadlineMs = null) => {
-  if (!nodeDef.key) return
-  const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
-  const keyToggleHandle = await page.$(keyToggleSelector)
-  if (keyToggleHandle) {
-    const keyToggleAriaLabel = await keyToggleHandle.getAttribute('aria-label')
-    if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
-      if (deadlineMs) {
-        await keyToggleHandle.click({ timeout: getRemainingTimeoutMsOrThrow(deadlineMs, 'key field unlock') })
-      } else {
-        await keyToggleHandle.click()
-      }
-      await page.keyboard.press('Escape') // close potential tooltip
-    }
-  }
-}
-
-// Types whose enter function is a plain, idempotent fill: safe to retry from scratch if an
-// attempt hangs, unlike e.g. code/time which drive a stateful dropdown/picker that a second,
-// overlapping invocation could leave open or half-interacted with.
-const simpleFillTypes = [nodeDefType.decimal, nodeDefType.integer, nodeDefType.text]
-
 export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
-    const enterValue = (timeout) => {
-      const parsedValue = parseValue(value)
-      if (simpleFillTypes.includes(nodeDef.type)) {
-        return enterFns[nodeDef.type](nodeDef, parsedValue, parentSelector, { timeout })
-      }
-      return enterFns[nodeDef.type](nodeDef, parsedValue, parentSelector)
-    }
-
-    if (nodeDef.key && simpleFillTypes.includes(nodeDef.type)) {
-      // Key fields start locked once they hold a value and only unlock for the current focus
-      // session (see useAttributeFieldLock in webapp/.../nodeDefSwitch.js). The unlock check
-      // above is a single, non-retried isVisible() snapshot: if an async validation update
-      // (triggered by a sibling row's duplicate-key edit) re-renders this field's lock toggle
-      // between that check and the fill, the toggle can be missed and the fill is left racing a
-      // disabled input that never becomes enabled, hanging until the test timeout (seen in CI,
-      // e.g. https://github.com/openforis/arena/actions/runs/34883644236). Retry the whole
-      // unlock+fill sequence a few times with a short per-attempt budget, the same way
-      // enterTaxon above already retries around a similar record-update race.
-      if (KEY_FIELD_RETRY_ATTEMPTS < 1) {
-        throw new Error('enterAttribute retry misconfigured: KEY_FIELD_RETRY_ATTEMPTS must be at least 1')
-      }
-      let lastError
-      for (let attempt = 0; attempt < KEY_FIELD_RETRY_ATTEMPTS; attempt += 1) {
-        try {
-          const deadlineMs = Date.now() + KEY_FIELD_ATTEMPT_TIMEOUT_MS
-          await unlockKeyFieldIfNeeded(nodeDef, parentSelector, deadlineMs)
-          await enterValue(getRemainingTimeoutMsOrThrow(deadlineMs, 'key field value entry'))
-          lastError = null
-          break
-        } catch (e) {
-          lastError = e
+    if (nodeDef.key) {
+      const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
+      const keyToggleLocator = page.locator(keyToggleSelector)
+      if (await keyToggleLocator.isVisible()) {
+        const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
+        if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
+          await keyToggleLocator.click()
+          await page.keyboard.press('Escape') // close potential tooltip
         }
       }
-      if (lastError) throw lastError
-    } else {
-      // Non-idempotent key widgets (e.g. code/time pickers) still unlock once if needed, but do
-      // not retry: repeating those interactions mid-update can leave dropdowns or pickers open and
-      // make the flake worse instead of better.
-      await unlockKeyFieldIfNeeded(nodeDef, parentSelector)
-      await enterValue()
     }
-
+    await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
     await FormUtils.waitForHeaderLoaderToDisappear()
-  }, 15000)
+  }, 10000)
