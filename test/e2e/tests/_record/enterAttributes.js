@@ -66,7 +66,27 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
   expect(valueSet).toBeTruthy()
 }
 
-const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
+const waitForTextInputToBeEditable = async (selector, timeout) => {
+  await page.waitForSelector(selector, { state: 'visible', timeout })
+  await page.waitForFunction(
+    (inputSelector) => {
+      const input = document.querySelector(inputSelector)
+      return Boolean(input) && !input.disabled && !input.readOnly
+    },
+    selector,
+    { timeout }
+  )
+}
+
+const enterText = async (nodeDef, value, parentSelector, { timeout } = {}) => {
+  const selector = getTextSelector(nodeDef, parentSelector)
+  if (timeout) {
+    await waitForTextInputToBeEditable(selector, timeout)
+    await page.fill(selector, value, { timeout })
+  } else {
+    await page.fill(selector, value)
+  }
+}
 
 const enterTime = async (nodeDef, value, parentSelector) => {
   // open hours/minutes selector
@@ -128,7 +148,7 @@ const simpleFillTypes = ['decimal', 'integer', 'text']
 
 export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
-    const enterValue = () => enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
+    const enterValue = (timeout) => enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector, { timeout })
 
     if (nodeDef.key && simpleFillTypes.includes(nodeDef.type)) {
       // Key fields start locked once they hold a value and only unlock for the current focus
@@ -146,12 +166,7 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
       for (let attempt = 0; attempt < attempts; attempt += 1) {
         try {
           await unlockKeyFieldIfNeeded(nodeDef, parentSelector)
-          await Promise.race([
-            enterValue(),
-            new Promise((_resolve, reject) =>
-              setTimeout(() => reject(new Error('enterAttribute attempt timed out')), attemptTimeoutMs)
-            ),
-          ])
+          await enterValue(attemptTimeoutMs)
           lastError = null
           break
         } catch (e) {
