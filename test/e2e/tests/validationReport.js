@@ -10,7 +10,6 @@ import { expectNoItems } from './_tables'
 
 const DUPLICATE_VALUE = 'Duplicate value'
 
-/* eslint-disable camelcase */
 const { cluster_id, cluster_coordinate } = cluster.children
 const { plot_id } = plot.children
 const { tree_id, tree_dec_2, tree_species } = tree.children
@@ -69,7 +68,7 @@ const gotoRecordAndEnterValue = (record, attribute, value) => {
   gotoRecords()
   gotoRecord({ record, unlock: true })
   enterAttribute(attribute, value)
-  // eslint-disable-next-line no-param-reassign
+
   record[attribute.name] = value
   waitThread()
 }
