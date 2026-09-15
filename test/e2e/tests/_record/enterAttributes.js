@@ -68,10 +68,11 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
 }
 
 const getRemainingTimeoutMs = (deadlineMs) => deadlineMs - Date.now()
+const minOperationTimeoutMs = 50
 
 const getRemainingTimeoutMsOrThrow = (deadlineMs, operation) => {
   const remainingTimeoutMs = getRemainingTimeoutMs(deadlineMs)
-  if (remainingTimeoutMs <= 0) {
+  if (remainingTimeoutMs < minOperationTimeoutMs) {
     throw new Error(`enterAttribute attempt timed out waiting for ${operation}`)
   }
   return remainingTimeoutMs
@@ -145,10 +146,11 @@ const enterFns = {
   time: enterTime,
 }
 
-// Keep the total retry budget comfortably below the 15 s enterAttribute test timeout so failed
-// attempts still have room to report their error and exit cleanly.
-const KEY_FIELD_RETRY_ATTEMPTS = 3
-const KEY_FIELD_ATTEMPT_TIMEOUT_MS = 3000
+// Keep the total retry budget (2 * 4000 ms) well below the 15 s enterAttribute test timeout so
+// failed attempts still have several seconds left for lock-toggle, retry, and error-handling
+// overhead before Jest aborts the test.
+const KEY_FIELD_RETRY_ATTEMPTS = 2
+const KEY_FIELD_ATTEMPT_TIMEOUT_MS = 4000
 
 const unlockKeyFieldIfNeeded = async (nodeDef, parentSelector) => {
   if (!nodeDef.key) return
