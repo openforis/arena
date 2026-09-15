@@ -19,7 +19,7 @@ import { useLocationPathMatcher, useOnBrowserBack, useOnPageUnload, useQuery } f
 import TabBar from '@webapp/components/tabBar'
 import { ButtonEditLockToggle } from '@webapp/components'
 
-import ButtonBar from './ButtonBar'
+import AdvancedFunctionsMenu from './AdvancedFunctionsMenu'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
 import { ChainBasicProps } from './ChainBasicProps'
 import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
@@ -128,14 +128,19 @@ const ChainDetails = () => {
           showTabs={Chain.hasSamplingDesign(chain) || Boolean(baseUnitNodeDef)}
         />
 
-        {canEditChain && !isNewChain && (
-          <ButtonEditLockToggle className="chain-edit-lock-toggle" locked={chainEditLocked} onClick={toggleEditLock} />
-        )}
+        <div className="chain-top-bar-actions">
+          {!isNewChain && <AdvancedFunctionsMenu />}
+          {canEditChain && !isNewChain && (
+            <ButtonEditLockToggle
+              className="chain-edit-lock-toggle"
+              locked={chainEditLocked}
+              onClick={toggleEditLock}
+            />
+          )}
+        </div>
       </div>
 
       <AnalysisNodeDefs />
-
-      <ButtonBar />
     </div>
   )
 }

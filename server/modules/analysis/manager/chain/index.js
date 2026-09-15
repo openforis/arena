@@ -23,6 +23,7 @@ import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as ChainMauFileService from '@server/modules/analysis/service/chainMauFile'
 
 import * as DB from '@server/db'
 import UnauthorizedError from '@server/utils/unauthorizedError'
@@ -134,6 +135,8 @@ export const _deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cl
     .map(NodeDef.getUuid)
 
   await NodeDefService.markNodeDefsDeleted({ user, surveyId, nodeDefUuids: nodeDefsUuidsInDeleteChains }, client)
+
+  await ChainMauFileService.deleteChainMauFile({ surveyId, chainUuid: deletedChainUuid }, client)
 
   return deletedChain
 }

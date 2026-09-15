@@ -77,5 +77,6 @@ export const {
   updateFileProps,
   // DELETE
   deleteFileByUuid,
+  deleteFilesAndContent,
   cleanupSurveyFilesProps,
 } = SurveyFileManager

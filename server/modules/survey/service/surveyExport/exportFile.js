@@ -28,6 +28,7 @@ export const ExportFile = {
   record: ({ recordUuid }) => path(dir.records, `${recordUuid}.json`),
   survey: 'survey.json',
   surveyFile: ({ fileUuid }) => path(dir.surveyFiles, `${fileUuid}.bin`),
+  chainMauFilesSummaries: path(dir.surveyFiles, 'chainMauFiles.json'),
   taxonomies: path(dir.taxonomies, 'taxonomies.json'),
   taxa: ({ taxonomyUuid }) => path(dir.taxonomies, `${taxonomyUuid}.json`),
   taxaPart: ({ taxonomyUuid, index }) => path(dir.taxonomies, `${taxonomyUuid}_${index}.json`),

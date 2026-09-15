@@ -40,6 +40,7 @@ export const getRecord = async (zipFile, recordUuid) => _getJson(zipFile, Export
 
 // Survey files
 export const getSurveyFile = async (zipFile, fileUuid) => zipFile.getEntryData(ExportFile.surveyFile({ fileUuid }))
+export const getChainMauFilesSummaries = async (zipFile) => _getJson(zipFile, ExportFile.chainMauFilesSummaries, [])
 
 // Files
 export const getFilesSummaries = async (zipFile) => _getJson(zipFile, ExportFile.filesSummaries)
