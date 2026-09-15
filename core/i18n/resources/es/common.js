@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Activo',
@@ -54,6 +56,7 @@ export default {
     download: 'Descargar',
     draft: 'Borrador',
     edit: 'Editar',
+    elapsed: 'Transcurrido',
     email: 'Correo electrónico',
     email_other: 'Correos electrónicos',
     emailSentConfirmation:
@@ -105,6 +108,8 @@ export default {
       'Hay cambios sin guardar en el formulario. \nAl confirmar, todos los cambios se perderán. \n¿Desea continuar?',
     local: 'Local',
     loading: 'Cargando...',
+    lock: 'Bloquear',
+    unlock: 'Desbloquear',
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Administrar',
@@ -135,10 +140,35 @@ export default {
     publish: 'Publicar',
     publishConfirm:
       '#### Está a punto de publicar la encuesta {{survey}} ####\n\n###### El proceso de publicación *eliminará permanentemente* la siguiente información ###### \n- Etiquetas asociadas a idiomas eliminados.\n- Registros asociados a ciclos eliminados.\n- Datos asociados a campos de formulario eliminados.\n\n###### Después de publicar: ###### \n- Los campos de formulario no se pueden cambiar de único a múltiple y viceversa.\n- Los códigos de elementos de categoría no se pueden cambiar.\n- Los elementos de categoría no se pueden eliminar.\n- Los códigos de taxonomía no se pueden cambiar.\n- Los taxones no se pueden eliminar.\n\n**¿Está seguro de que desea continuar?**',
+    publishRecordValuesUpdateConfirm: `#### Publicar {{survey}} actualizará datos ya registrados ####
+
+{{reasons}}
+
+Esta operación puede cambiar o borrar permanentemente datos ya introducidos.
+
+Para publicar sin actualizar los datos existentes, marque "Omitir actualización de datos" a continuación (no recomendado).`,
+    publishRecordValuesUpdateConfirmHeader: 'Se actualizarán los datos de los registros existentes',
+    publishRecordValuesUpdateConfirmOk: 'Publicar y actualizar datos',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Escriba el nombre de la encuesta "{{strongConfirmRequiredText}}" para confirmar',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Los siguientes atributos serán modificados, y sus valores en los registros existentes se recalcularán automáticamente: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Los siguientes atributos utilizan una propiedad adicional de una categoría o taxonomía que ha cambiado, lo que hará que se recalcule su valor en los registros existentes: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Omitir actualización de datos',
+    publishSkipDataUpdateConfirmOk: 'Omitir actualización de datos y publicar',
+    publishSkipDataUpdateImplications: 'Omitir la actualización de datos implica lo siguiente:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Los registros existentes pueden dejar de coincidir con la nueva definición de la encuesta',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Los valores afectados no se recalcularán hasta que se vuelvan a introducir manualmente',
+    publishSkipDataUpdateImplicationChains:
+      'Las cadenas de procesamiento que usan estos atributos pueden producir resultados desactualizados',
     raiseTicketInSupportForum:
       "En caso de problemas, por favor, abra un ticket con la etiqueta 'arena' en nuestro <b>Foro de soporte</b>: $t(links.supportForum)",
     record: 'Registro',
     record_other: 'Registros',
+    remaining: 'Restante',
     remote: 'Remoto',
     required: 'Requerido',
     requiredField: 'campo requerido',
@@ -160,6 +190,10 @@ export default {
     showLabels: 'Mostrar etiquetas',
     showLabelsAndNames: 'Mostrar etiquetas y nombres',
     showNames: 'Mostrar nombres',
+    sort: 'Ordenar',
+    sortAsc: 'Ordenar ascendente',
+    sortDesc: 'Ordenar descendente',
+    sortNone: 'Quitar orden',
     srs: 'SRS',
     status: 'Estado',
     sum: 'Suma',
@@ -167,6 +201,7 @@ export default {
     to: 'A',
     totalItems: 'Total de elementos',
     true: 'Verdadero',
+    trySplittingFileIntoSmallerChunks: 'Intente dividir el archivo en partes más pequeñas.',
     type: 'Tipo',
     undefinedName: 'Nombre indefinido',
     unique: 'Único',
@@ -175,6 +210,8 @@ export default {
       message: `Error durante la carga del archivo: {{error}}.\n
 ¿Intentar de nuevo?`,
     },
+    uploadFileChangedError:
+      'El archivo seleccionado parece haber sido modificado desde que fue seleccionado. Por favor, selecciónelo de nuevo.',
     uploadingFile: 'Subiendo archivo ({{progressPercent}}%)',
     value: 'Valor',
     view: 'Ver',
@@ -265,6 +302,7 @@ export default {
   },
   appModules: {
     home: 'Inicio',
+    landing: 'Bienvenida',
     dashboard: 'Panel de control',
     surveyNew: 'Nueva encuesta',
     surveys: 'Encuestas',
@@ -298,6 +336,9 @@ export default {
     userInvite: 'Invitar usuario',
     userNew: 'Nuevo usuario',
     usersSurvey: 'Lista de usuarios',
+    userGroup: 'Grupo de usuarios',
+    userGroup_plural: 'Grupos de usuarios',
+    userGroupNew: 'Nuevo grupo de usuarios',
     usersList: 'Lista de usuarios (todos)',
     user2FADevice: 'Dispositivo 2FA',
     user2FADevice_plural: 'Dispositivos 2FA',
@@ -310,6 +351,9 @@ export default {
     entities: 'Entidades virtuales',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Instancias',
+
+    jobMonitor: 'Monitor de trabajos',
+
     help: 'Ayuda',
     about: 'Acerca de',
     disclaimer: 'Descargo de responsabilidad',
@@ -410,8 +454,10 @@ export default {
       lock: 'Bloquear edición del atributo clave',
       unlock: 'Permitir editar el atributo clave',
     },
-    lock: 'Bloquear',
-    unlock: 'Desbloquear',
+    qualifierAttributeEditing: {
+      lock: 'Bloquear edición del atributo calificador',
+      unlock: 'Permitir editar el atributo calificador',
+    },
   },
   dataExplorerView: {
     customAggregateFunction: {
@@ -537,7 +583,9 @@ export default {
     confirmInviteSystemAdmin: '¿Invitar al usuario {{email}} como Administrador del Sistema?',
     confirmInviteSystemAdmin_other: '¿Invitar a los usuarios {{email}} como Administradores del Sistema?',
     emailSentConfirmationWithSkippedEmails:
-      '$t(common.emailSentConfirmation)\n    \n    Se han omitido {{skppedEmailsCount}} direcciones (ya fueron invitadas a esta encuesta anteriormente): {{skippedEmails}}',
+      '$t(common.emailSentConfirmation)\n\n    $t(userInviteView.skippedEmailsNotice)',
+    skippedEmailsNotice:
+      'Se han omitido {{skppedEmailsCount}} direcciones (ya fueron invitadas a esta encuesta anteriormente): {{skippedEmails}}',
     groupPermissions: {
       label: 'Permisos',
       systemAdmin: '        <li>Derechos de acceso completos al sistema</li>',
@@ -588,10 +636,33 @@ export default {
         'Al eliminar la unidad base, se desmarcarán todas las selecciones de "variable basada en área". ¿Continuar?',
     },
     downloadSummaryJSON: 'Descargar resumen (JSON)',
-    firstPhaseCategory: 'Categoría de primera fase',
-    firstPhaseCommonAttribute: {
-      label: 'Atributo común',
-      info: 'Atributo común entre la unidad base y la tabla de primera fase (debe ser un atributo de código con el mismo nombre que una propiedad extra definida para la categoría de primera fase)',
+    mauFile: {
+      upload: 'Subir MAU.zip',
+      download: 'Descargar MAU.zip',
+      delete: 'Eliminar MAU.zip',
+      confirmReplace: 'Ya se ha subido un archivo MAU.zip para esta cadena. ¿Desea reemplazarlo?',
+      confirmDelete: '¿Eliminar el archivo MAU.zip subido para esta cadena?',
+      uploadComplete: 'Archivo MAU.zip subido correctamente',
+      deleteComplete: 'Archivo MAU.zip eliminado',
+      invalidFileExtension: 'Seleccione un archivo .zip',
+    },
+    phase1Category: 'Categoría de primera fase',
+    phase1CategoryInfo: 'Seleccione la categoría que contiene las muestras de la primera fase.',
+    phase2JoinEntity: {
+      label: 'Entidad de unión (2ª fase)',
+      info: 'Entidad utilizada para unir la unidad base con la categoría de 1ª fase: la propia entidad de la unidad base, o una de sus entidades superiores.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Unir usando el enlace de Sampling Point Data',
+      info: 'La(s) clave(s) de la entidad de 2ª fase se leen de la tabla de Sampling Point Data, que es la misma tabla utilizada para la 1ª fase.',
+    },
+    phase1JoinAttribute: {
+      label: 'Atributo de unión (1ª fase)',
+      info: 'Seleccione la columna de la tabla $t(chainView.phase1Category) (una propiedad adicional, o "code") utilizada para unirla con la entidad de unión de la 2ª fase.',
+    },
+    phase2JoinAttribute: {
+      label: 'Atributo de unión (2ª fase)',
+      info: 'Seleccione el atributo (de la entidad de 2ª fase) para unir con la tabla de 1ª fase; su valor se compara con el atributo de unión de la 1ª fase anterior.',
     },
     formLabel: 'Etiqueta de cadena de procesamiento',
     basic: 'Básico',
@@ -610,6 +681,8 @@ export default {
       "Para implementar el método de ajuste por clases de ponderación, agregue 'design_psu' y 'design_ssu' a la tabla de categorías del estrato como propiedades numéricas adicionales.",
     pValue: 'Valor P',
     resultsBackFromRStudio: 'Resultados leídos de RStudio',
+    resultsBackFromRStudioInfo:
+      'Habilite esta opción si los atributos de resultado calculados en RStudio deben importarse de vuelta al servidor de Arena. Este proceso puede ser lento.',
     samplingDesign: 'Diseño de muestreo',
     samplingDesignDetails: 'Detalles del diseño de muestreo',
     samplingStrategyLabel: 'Estrategia de muestreo',
@@ -634,15 +707,32 @@ export default {
       reportingAreaInfo: `Con muestreo estratificado, proporcione las áreas de los estratos en la tabla de categorías del atributo de estrato (nombre de la columna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
+    stratumAttributeInfo: 'Seleccione la variable utilizada para estratificar la muestra.',
+    stratumAttribute2ndPhaseInfo:
+      'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada. Solo se muestran los atributos cuyo nombre también aparece como columna de la categoría de la 1ª fase.',
     postStratificationAttribute: 'Atributo de postestratificación',
     areaWeightingMethod: 'Método de ponderación de área',
     clusteringEntity: 'Entidad de agrupación',
+    clusteringEntityInfo:
+      'La entidad que define las unidades primarias de muestreo. Nota: se utiliza exclusivamente para el análisis de conglomerados dentro del marco del paquete R survey.',
     clusteringOnlyVariances: 'Agrupación solo para varianzas',
     errorNoLabel: 'La cadena debe tener una etiqueta válida',
     dateExecuted: 'Fecha de ejecución',
     deleteChain: 'Eliminar cadena',
     deleteConfirm: '¿Eliminar esta cadena de procesamiento?\n\n$t(common.cantUndoWarning)',
     deleteComplete: 'Cadena de procesamiento eliminada',
+    cloneFromAnotherSurvey: 'Clonar desde otro estudio',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Clonar cadena desde otro estudio',
+      sourceSurvey: 'Estudio de origen',
+      sourceChain: 'Cadena de origen',
+      entityCheck: 'Compatibilidad de entidades',
+      entityMissing: 'falta en el estudio destino',
+      skipMissingEntities: 'Omitir atributos de análisis de entidades que faltan en el estudio destino',
+      noAnalysisAttributes: 'Esta cadena no tiene atributos de análisis',
+      cloneComplete: 'Cadena clonada correctamente',
+      missingEntities: 'No se puede clonar: las siguientes entidades no existen en el estudio destino: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles:
       'La definición de nodo "{{label}}" no se puede seleccionar porque no pertenece a todos los ciclos de la cadena de procesamiento',
     cannotSelectCycle:
@@ -727,6 +817,18 @@ $t(common.appNameFull)
     basic: 'Básico',
     advanced: 'Avanzado',
     mobileApp: 'Aplicación móvil',
+    print: 'Impresión',
+    printProps: {
+      printOrientation: {
+        label: 'Orientación de página',
+        info: 'Orientación usada cuando esta entidad inicia su propia sección imprimible. Por defecto se hereda la orientación del documento elegida en la exportación.',
+      },
+      orientations: {
+        default: 'Predeterminada (documento)',
+        portrait: 'Vertical',
+        landscape: 'Horizontal',
+      },
+    },
     validations: 'Validaciones',
     function: 'Función',
     editingFunction: 'Editando función {{functionName}}',
@@ -776,6 +878,7 @@ $t(common.appNameFull)
         'Devuelve el valor de la $t(extraProp.label) especificada de un taxón que tiene el código especificado',
       taxonVernacularName:
         'Devuelve el (primer) nombre vernáculo (o local) en el idioma especificado de un taxón que tiene el código especificado',
+      unique: 'Devuelve los valores únicos de un atributo o entidad múltiple',
       userEmail: 'Devuelve el correo electrónico del usuario que ha iniciado sesión',
       userIsRecordOwner:
         'Devuelve un valor booleano "verdadero" si el usuario que edita el registro también es su propietario, "falso" en caso contrario',
@@ -794,6 +897,10 @@ $t(common.appNameFull)
       autoIncrementalKey: {
         label: 'Clave auto incremental',
         info: 'El valor se generará automáticamente',
+      },
+      autoCreateMinCountItems: {
+        label: 'Crear mínimo de elementos automáticamente',
+        info: 'Cuando la entidad se vuelve relevante o se crea su entidad padre, se generará automáticamente un número de entidades igual al mínimo requerido.',
       },
       displayAs: 'Mostrar como',
       displayIn: 'Mostrar en',
@@ -818,6 +925,10 @@ $t(common.appNameFull)
       multiple: 'Múltiple',
       ownPage: 'Su propia página',
       parentPage: 'Página padre ({{parentPage}})',
+      qualifier: {
+        label: 'Calificador',
+        info: `Cuando un usuario que pertenece a un grupo crea un nuevo registro, este atributo se completará automáticamente con el valor especificado para él en los calificadores del grupo del usuario. Los usuarios solo podrán ver y modificar los registros que pertenezcan a su propio grupo, si pertenecen a uno.`,
+      },
       table: 'Tabla',
     },
     advancedProps: {
@@ -900,6 +1011,9 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     mobileProps: {
       title: 'Aplicación móvil',
+    },
+    timeProps: {
+      includeSeconds: 'Incluir segundos',
     },
     formHeaderProps: {
       headerColorLabel: 'Color de encabezado',
@@ -993,6 +1107,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       label: 'Único',
       info: 'Cuando un atributo está marcado como **Único**, su valor debe ser único dentro de la entidad múltiple más cercana (se mostrará un error en caso contrario). \n\n---\n\nEj.: en una estructura como *clúster -> parcela -> árbol*, si tiene un atributo *tree_species* marcado como **Único**, solo puede tener un árbol por especie dentro de la misma *parcela*.',
     },
+    categoriesClonedFromSurvey: 'Las siguientes categorías también se clonaron desde la encuesta de origen: {{names}}',
+    taxonomiesClonedFromSurvey: 'Las siguientes taxonomías también se clonaron desde la encuesta de origen: {{names}}',
   },
   languagesEditor: {
     languages: 'Idioma(s)',
@@ -1001,6 +1117,16 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     header: 'Taxonomía',
     cantBeDeleted: "$t(common.cantBeDeletedUsedItem, {'item': 'taxonomía'})",
     confirmDelete: '¿Eliminar la taxonomía {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clonar taxonomía de otra encuesta',
+      sourceSurvey: 'Encuesta de origen',
+      sourceTaxonomy: 'Taxonomía de origen',
+      loadingSurveys: 'Cargando encuestas...',
+      noSurveysAvailable: 'No hay encuestas disponibles',
+      selectSurveyFirst: 'Seleccione primero una encuesta',
+      loadingTaxonomies: 'Cargando taxonomías...',
+      noTaxonomiesAvailable: 'No hay taxonomías disponibles en la encuesta seleccionada',
+    },
     edit: {
       taxonomyListName: 'Nombre de la lista de taxonomía',
       taxaNotImported: 'Taxones no importados',
@@ -1009,6 +1135,9 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Sinónimo / Latín',
       extraPropsNotDefined: 'Propiedades extra no definidas para esta taxonomía',
+      importMissingPublishedTaxa:
+        '{{count}} taxón/taxa publicado/s no encontrado/s en el archivo importado y dejado/s sin cambios. Códigos: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} más)',
     },
     taxaCount: 'Recuento de taxones',
     vernacularNameLabel: 'Etiqueta de nombre vernáculo',
@@ -1017,11 +1146,24 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     batchImport: 'Importar categorías en lote (desde ZIP)',
     batchImportCompleteSuccessfully:
       '¡{{importedCategories}} categorías importadas correctamente!\n{{insertedCategories}} nuevas\n{{updatedCategories}} actualizadas',
+    cloneFromAnotherSurvey: {
+      title: 'Clonar categoría de otra encuesta',
+      sourceSurvey: 'Encuesta de origen',
+      sourceCategory: 'Categoría de origen',
+      loadingSurveys: 'Cargando encuestas...',
+      noSurveysAvailable: 'No hay encuestas disponibles',
+      selectSurveyFirst: 'Seleccione primero una encuesta',
+      loadingCategories: 'Cargando categorías...',
+      noCategoriesAvailable: 'No hay categorías disponibles en la encuesta seleccionada',
+    },
     itemsCount: 'Recuento de elementos',
+    structure: 'Estructura',
     types: {
       flat: 'Plana',
       hierarchical: 'Jerárquica',
       reportingData: 'Datos de informes',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Datos de puntos de muestreo',
     },
   },
   categoryEdit: {
@@ -1043,6 +1185,37 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     convertToSimpleCategory: {
       confirmMessage: '¿Convertir esta categoría de datos de informes a una categoría simple?',
+    },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convertir a Datos de puntos de muestreo',
+      confirmMessage: `¿Convertir esta categoría en la categoría de Datos de puntos de muestreo?\n\nLa categoría se renombrará a '${samplingPointDataCategoryName}' y se añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convertir a categoría GeoPackage',
+      confirmMessage: `¿Convertir esta categoría en una categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convertir a categoría simple',
+      confirmMessage: `¿Convertir esta categoría GeoPackage en una categoría simple?\n\nSe desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convertir a categoría simple',
+      confirmMessage: `¿Convertir esta categoría de Datos de puntos de muestreo en una categoría simple?\n\nSe borrará el nombre de la categoría (deberá asignarle uno nuevo), y se desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
+    },
+    geoPackageCategory: 'Esta es una categoría GeoPackage',
+    samplingPointDataCategoryType: 'Esta es la categoría de Datos de puntos de muestreo',
+    createCategory: {
+      menuLabel: 'Añadir categoría',
+      simple: 'Categoría simple',
+      otherTypes: 'Más tipos de categoría',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Categoría de Datos de puntos de muestreo',
+      message: `¿Crear una nueva categoría de Datos de puntos de muestreo?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Categoría GeoPackage',
+      message: `¿Crear una nueva categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     deleteItem: 'Eliminar elemento',
     level: {
@@ -1066,6 +1239,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       title: 'Resumen de importación de categoría',
     },
     reportingData: 'Datos de informes',
+    exportToGeoPackage: 'Exportar a GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} elemento(s) sin una ubicación válida fueron omitidos.',
     templateFor_samplingPointDataImport_csv: 'Plantilla para importación de datos de puntos de muestreo (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Plantilla para importación de datos de puntos de muestreo (Excel)',
   },

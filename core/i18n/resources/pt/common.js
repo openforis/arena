@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Ativo',
@@ -55,6 +57,7 @@ Deseja ignorá-las?`,
     download: 'Baixar',
     draft: 'Rascunho',
     edit: 'Editar',
+    elapsed: 'Decorrido',
     email: 'Email',
     email_other: 'Emails',
     emailSentConfirmation: `Um email para {{email}} foi enviado.
@@ -110,6 +113,8 @@ Ao confirmar, todas as alterações serão perdidas.
 Deseja prosseguir?`,
     local: 'Local',
     loading: 'Carregando...',
+    lock: 'Bloquear',
+    unlock: 'Desbloquear',
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Gerenciar',
@@ -157,9 +162,34 @@ Deseja prosseguir?`,
 - Os táxons não podem ser excluídos.
 
 **Tem certeza de que deseja continuar?**`,
+    publishRecordValuesUpdateConfirm: `#### Publicar {{survey}} irá atualizar dados já registrados ####
+
+{{reasons}}
+
+Esta operação pode alterar ou apagar permanentemente dados já inseridos.
+
+Para publicar sem atualizar os dados existentes, marque "Pular atualização de dados" abaixo (não recomendado).`,
+    publishRecordValuesUpdateConfirmHeader: 'Os dados de registros existentes serão atualizados',
+    publishRecordValuesUpdateConfirmOk: 'Publicar e atualizar dados',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Digite o nome da pesquisa "{{strongConfirmRequiredText}}" para confirmar',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Os seguintes atributos serão modificados, e seus valores nos registros existentes serão recalculados automaticamente: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Os seguintes atributos usam uma propriedade extra de uma categoria ou taxonomia que foi alterada, o que fará com que seu valor seja recalculado nos registros existentes: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Pular atualização de dados',
+    publishSkipDataUpdateConfirmOk: 'Pular atualização de dados e publicar',
+    publishSkipDataUpdateImplications: 'Pular a atualização de dados significa que:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Os registros existentes podem não corresponder mais à nova definição da pesquisa',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Os valores afetados não serão recalculados até serem reinseridos manualmente',
+    publishSkipDataUpdateImplicationChains:
+      'As cadeias de processamento que usam esses atributos podem produzir resultados desatualizados',
     raiseTicketInSupportForum: `Em caso de problemas, abra um chamado com a tag 'arena' no nosso <b>Fórum de Suporte</b>: $t(links.supportForum)`,
     record: 'Registro',
     record_other: 'Registros',
+    remaining: 'Restante',
     remote: 'Remoto',
     required: 'Obrigatório',
     requiredField: 'campo obrigatório',
@@ -181,6 +211,10 @@ Deseja prosseguir?`,
     showLabels: 'Mostrar rótulos',
     showLabelsAndNames: 'Mostrar rótulos e nomes',
     showNames: 'Mostrar nomes',
+    sort: 'Ordenar',
+    sortAsc: 'Ordenar ascendente',
+    sortDesc: 'Ordenar descendente',
+    sortNone: 'Remover ordem',
     srs: 'SRS',
     status: 'Status',
     sum: 'Soma',
@@ -188,6 +222,7 @@ Deseja prosseguir?`,
     to: 'Para',
     totalItems: 'Total de itens',
     true: 'Verdadeiro',
+    trySplittingFileIntoSmallerChunks: 'Tente dividir o arquivo em partes menores.',
     type: 'Tipo',
     undefinedName: 'Nome indefinido',
     unique: 'Único',
@@ -196,6 +231,8 @@ Deseja prosseguir?`,
       message: `Erro durante o envio do arquivo: {{error}}.\n
     Tentar novamente?`,
     },
+    uploadFileChangedError:
+      'O arquivo selecionado parece ter sido modificado desde que foi selecionado. Selecione-o novamente.',
     uploadingFile: 'Enviando arquivo ({{progressPercent}}%)',
     value: 'Valor',
     view: 'Visualizar',
@@ -297,6 +334,7 @@ Deseja prosseguir?`,
 
   appModules: {
     home: 'Início',
+    landing: 'Boas-vindas',
     dashboard: 'Painel',
     surveyNew: 'Novo inventário',
     surveys: 'Inventários',
@@ -333,6 +371,9 @@ Deseja prosseguir?`,
     userInvite: 'Convidar usuário',
     userNew: 'Novo usuário',
     usersSurvey: 'Lista de usuários',
+    userGroup: 'Grupo de usuários',
+    userGroup_plural: 'Grupos de usuários',
+    userGroupNew: 'Novo grupo de usuários',
     usersList: 'Lista de usuários (todos)',
     user2FADevice: 'Dispositivo 2FA',
     user2FADevice_plural: 'Dispositivos 2FA',
@@ -349,6 +390,8 @@ Deseja prosseguir?`,
 
     message: 'Mensagem',
     message_plural: '$t(common.message_plural)',
+
+    jobMonitor: 'Monitor de tarefas',
 
     help: 'Ajuda',
     about: 'Sobre',
@@ -464,8 +507,10 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       lock: 'Bloquear edição do atributo-chave',
       unlock: 'Permitir editar o atributo-chave',
     },
-    lock: 'Bloquear',
-    unlock: 'Desbloquear',
+    qualifierAttributeEditing: {
+      lock: 'Bloquear edição do atributo qualificador',
+      unlock: 'Permitir editar o atributo qualificador',
+    },
   },
 
   dataExplorerView: {
@@ -612,8 +657,9 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     confirmInviteSystemAdmin: 'Convidar o usuário {{email}} como Administrador do Sistema?',
     confirmInviteSystemAdmin_other: 'Convidar os usuários {{email}} como Administradores do Sistema?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Permissões',
       systemAdmin: `
@@ -718,11 +764,33 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
         'Ao excluir a unidade base, todas as seleções de "variável baseada em área" serão desmarcadas. Continuar?',
     },
     downloadSummaryJSON: 'Baixar resumo (JSON)',
-    firstPhaseCategory: 'Categoria da 1ª fase',
-    firstPhaseCommonAttribute: {
-      label: 'Atributo comum',
-      info: `Atributo em comum entre a unidade base e a tabela da 1ª fase 
-    (deve ser um atributo de código com o mesmo nome de uma propriedade extra definida para a categoria da 1ª fase)`,
+    mauFile: {
+      upload: 'Enviar MAU.zip',
+      download: 'Baixar MAU.zip',
+      delete: 'Excluir MAU.zip',
+      confirmReplace: 'Já foi enviado um arquivo MAU.zip para esta cadeia. Deseja substituí-lo?',
+      confirmDelete: 'Excluir o arquivo MAU.zip enviado para esta cadeia?',
+      uploadComplete: 'Arquivo MAU.zip enviado com sucesso',
+      deleteComplete: 'Arquivo MAU.zip excluído',
+      invalidFileExtension: 'Selecione um arquivo .zip',
+    },
+    phase1Category: 'Categoria da 1ª fase',
+    phase1CategoryInfo: 'Selecione a categoria que contém as amostras da 1ª fase.',
+    phase2JoinEntity: {
+      label: 'Entidade de junção (2ª fase)',
+      info: 'Entidade usada para unir a unidade base à categoria da 1ª fase: a própria entidade da unidade base, ou uma das suas entidades superiores.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Unir usando a ligação de Sampling Point Data',
+      info: 'A(s) chave(s) da entidade da 2ª fase são lidas da tabela Sampling Point Data, que é a mesma tabela usada para a 1ª fase.',
+    },
+    phase1JoinAttribute: {
+      label: 'Atributo de junção (1ª fase)',
+      info: 'Selecione a coluna da tabela $t(chainView.phase1Category) (uma propriedade extra, ou "code") usada para a unir à entidade de junção da 2ª fase.',
+    },
+    phase2JoinAttribute: {
+      label: 'Atributo de junção (2ª fase)',
+      info: 'Selecione o atributo (da entidade da 2ª fase) para unir com a tabela da 1ª fase; o seu valor é comparado com o atributo de junção da 1ª fase anterior.',
     },
     formLabel: 'Rótulo da cadeia de processamento',
     basic: 'Básico',
@@ -740,6 +808,8 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     nonResponseBiasCorrectionInfo: `Para implementar o método de ajuste por classes de ponderação, adicione 'design_psu' e 'design_ssu' à tabela de categorias do estrato como propriedades numéricas extras.`,
     pValue: 'Valor-p',
     resultsBackFromRStudio: 'Resultados lidos de volta do RStudio',
+    resultsBackFromRStudioInfo: `Ative esta opção se os atributos de resultado calculados no RStudio devem ser importados de volta para o servidor Arena.
+Este processo pode ser lento.`,
     samplingDesign: 'Desenho amostral',
     samplingDesignDetails: 'Detalhes do desenho amostral',
     samplingStrategyLabel: 'Estratégia amostral',
@@ -764,9 +834,12 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       reportingAreaInfo: `Com amostragem estratificada, forneça as áreas dos estratos na tabela de categorias do atributo de estrato (nome da coluna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
+    stratumAttributeInfo: 'Selecione a variável usada para estratificar a amostra.',
+    stratumAttribute2ndPhaseInfo: `Selecione a variável usada para subestratificar a amostra da 1ª fase antes de extrair a subamostra final e detalhada. Apenas são apresentados os atributos cujo nome também aparece como coluna da categoria da 1ª fase.`,
     postStratificationAttribute: 'Atributo de pós-estratificação',
     areaWeightingMethod: 'Método de ponderação por área',
     clusteringEntity: 'Entidade de agrupamento',
+    clusteringEntityInfo: `A entidade que define as unidades amostrais primárias. Nota: usada exclusivamente para análise de conglomerados no âmbito do pacote R survey.`,
     clusteringOnlyVariances: 'Agrupamento apenas para variâncias',
     errorNoLabel: 'A cadeia deve ter um rótulo válido',
     dateExecuted: 'Data de execução',
@@ -775,6 +848,18 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Cadeia de processamento excluída',
+    cloneFromAnotherSurvey: 'Clonar de outro estudo',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Clonar cadeia de outro estudo',
+      sourceSurvey: 'Estudo de origem',
+      sourceChain: 'Cadeia de origem',
+      entityCheck: 'Compatibilidade de entidades',
+      entityMissing: 'ausente no estudo destino',
+      skipMissingEntities: 'Ignorar atributos de análise de entidades ausentes no estudo destino',
+      noAnalysisAttributes: 'Esta cadeia não tem atributos de análise',
+      cloneComplete: 'Cadeia clonada com sucesso',
+      missingEntities: 'Não é possível clonar: as seguintes entidades não existem no estudo destino: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `A definição de nó "{{label}}" não pode ser selecionada porque não pertence a todos os ciclos da cadeia de processamento`,
     cannotSelectCycle: 'Este ciclo não pode ser selecionado porque algumas definições de nó não pertencem a este ciclo',
     copyRStudioCode: `#### Você está prestes a abrir um servidor RStudio ####  
@@ -877,6 +962,18 @@ $t(common.appNameFull)
     basic: 'Básico',
     advanced: 'Avançado',
     mobileApp: 'Aplicativo móvel',
+    print: 'Impressão',
+    printProps: {
+      printOrientation: {
+        label: 'Orientação da página',
+        info: 'Orientação usada quando esta entidade inicia sua própria seção imprimível. Por padrão, herda a orientação do documento escolhida na exportação.',
+      },
+      orientations: {
+        default: 'Padrão (documento)',
+        portrait: 'Retrato',
+        landscape: 'Paisagem',
+      },
+    },
     validations: 'Validações',
     function: 'Função',
     editingFunction: 'Editando função {{functionName}}',
@@ -925,6 +1022,7 @@ $t(common.appNameFull)
       taxonProp: 'Retorna o valor da $t(extraProp.label) especificada de um táxon com o código informado',
       taxonVernacularName:
         'Retorna o (primeiro) nome vernacular (ou local) no idioma especificado de um táxon com o código informado',
+      unique: 'Retorna os valores únicos de um atributo múltiplo ou entidade',
       userEmail: 'Retorna o email do usuário autenticado',
       userIsRecordOwner:
         'Retorna um valor booleano "true" se o usuário que edita o registro também for seu proprietário, "false" caso contrário',
@@ -944,6 +1042,10 @@ $t(common.appNameFull)
       autoIncrementalKey: {
         label: 'Auto incremental',
         info: 'O valor será gerado automaticamente',
+      },
+      autoCreateMinCountItems: {
+        label: 'Criar mínimo de itens automaticamente',
+        info: 'Quando a entidade se torna relevante ou sua entidade pai é criada, um número de entidades igual ao mínimo será gerado automaticamente.',
       },
       displayAs: 'Exibir como',
       displayIn: 'Exibir em',
@@ -968,6 +1070,10 @@ $t(common.appNameFull)
       multiple: 'Múltiplo',
       ownPage: 'Página própria',
       parentPage: 'Página pai ({{parentPage}})',
+      qualifier: {
+        label: 'Qualificador',
+        info: `Quando um novo registro é criado por um usuário pertencente a um grupo, este atributo será automaticamente preenchido com o valor especificado para ele nos qualificadores do grupo do usuário. Os usuários só poderão ver e modificar registros pertencentes ao seu próprio grupo, se pertencerem a um.`,
+      },
       table: 'Tabela',
     },
     advancedProps: {
@@ -1052,6 +1158,9 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
     },
     mobileProps: {
       title: 'Aplicativo móvel',
+    },
+    timeProps: {
+      includeSeconds: 'Incluir segundos',
     },
     formHeaderProps: {
       headerColorLabel: 'Cor do cabeçalho',
@@ -1146,6 +1255,8 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
 
 Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo *tree_species* marcado como **Único**, poderá ter apenas uma árvore por espécie dentro do mesmo *plot*.`,
     },
+    categoriesClonedFromSurvey: 'As seguintes categorias também foram clonadas do inventário de origem: {{names}}',
+    taxonomiesClonedFromSurvey: 'As seguintes taxonomias também foram clonadas do inventário de origem: {{names}}',
   },
 
   languagesEditor: {
@@ -1156,6 +1267,16 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
     header: 'Taxonomia',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Excluir a taxonomia {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clonar taxonomia de outro inquérito',
+      sourceSurvey: 'Inquérito de origem',
+      sourceTaxonomy: 'Taxonomia de origem',
+      loadingSurveys: 'A carregar inquéritos...',
+      noSurveysAvailable: 'Nenhum inquérito disponível',
+      selectSurveyFirst: 'Selecione primeiro um inquérito',
+      loadingTaxonomies: 'A carregar taxonomias...',
+      noTaxonomiesAvailable: 'Nenhuma taxonomia disponível no inquérito selecionado',
+    },
     edit: {
       taxonomyListName: 'Nome da lista de taxonomia',
       taxaNotImported: 'Táxons não importados',
@@ -1164,6 +1285,9 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Sinônimo / Latim',
       extraPropsNotDefined: 'Propriedades extras não definidas para esta taxonomia',
+      importMissingPublishedTaxa:
+        '{{count}} táxon/taxa publicado(s) não encontrado(s) no arquivo importado e mantido(s) sem alterações. Códigos: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} mais)',
     },
     taxaCount: 'Contagem de táxons',
     vernacularNameLabel: 'Rótulo do nome vernacular',
@@ -1174,11 +1298,24 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
     batchImportCompleteSuccessfully: `{{importedCategories}} categorias importadas com sucesso!
   {{insertedCategories}} novas
   {{updatedCategories}} atualizadas`,
+    cloneFromAnotherSurvey: {
+      title: 'Clonar categoria de outro inquérito',
+      sourceSurvey: 'Inquérito de origem',
+      sourceCategory: 'Categoria de origem',
+      loadingSurveys: 'A carregar inquéritos...',
+      noSurveysAvailable: 'Nenhum inquérito disponível',
+      selectSurveyFirst: 'Selecione primeiro um inquérito',
+      loadingCategories: 'A carregar categorias...',
+      noCategoriesAvailable: 'Nenhuma categoria disponível no inquérito selecionado',
+    },
     itemsCount: 'Contagem de itens',
+    structure: 'Estrutura',
     types: {
       flat: 'Plano',
       hierarchical: 'Hierárquico',
       reportingData: 'Dados de reporte',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Dados de Ponto Amostral',
     },
   },
 
@@ -1206,6 +1343,49 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Converter esta categoria de dados de reporte em uma categoria simples?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Converter para Dados de Ponto Amostral',
+      confirmMessage: `Converter esta categoria na categoria de Dados de Ponto Amostral?
+
+A categoria será renomeada para '${samplingPointDataCategoryName}' e uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Converter para categoria GeoPackage',
+      confirmMessage: `Converter esta categoria em uma categoria GeoPackage?
+
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Converter para categoria simples',
+      confirmMessage: `Converter esta categoria GeoPackage em uma categoria simples?
+
+A propriedade extra '${locationItemExtraDefName}' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Converter para categoria simples',
+      confirmMessage: `Converter esta categoria de Dados de Ponto Amostral em uma categoria simples?
+
+O nome da categoria será apagado (você precisará dar um novo nome a ela), e a propriedade extra '${locationItemExtraDefName}' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
+    },
+    geoPackageCategory: 'Esta é uma categoria GeoPackage',
+    samplingPointDataCategoryType: 'Esta é a categoria de Dados de Ponto Amostral',
+    createCategory: {
+      menuLabel: 'Adicionar categoria',
+      simple: 'Categoria simples',
+      otherTypes: 'Mais tipos de categoria',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Categoria de Dados de Ponto Amostral',
+      message: `Criar uma nova categoria de Dados de Ponto Amostral?
+
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Categoria GeoPackage',
+      message: `Criar uma nova categoria GeoPackage?
+
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
     deleteItem: 'Excluir item',
     level: {
       title: 'Nível {{levelPosition}}',
@@ -1229,6 +1409,8 @@ $t(common.cantUndoWarning)`,
       title: 'Resumo da importação de categoria',
     },
     reportingData: 'Dados de reporte',
+    exportToGeoPackage: 'Exportar para GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} item(ns) sem localização válida foram ignorados.',
     templateFor_samplingPointDataImport_csv: 'Modelo para importação de dados de ponto amostral (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Modelo para importação de dados de ponto amostral (Excel)',
   },

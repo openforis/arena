@@ -5,9 +5,10 @@ import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
-import { Query } from '@common/model/query'
+import { Query, Sort, SortCriteria } from '@common/model/query'
 import { ColumnNodeDef } from '@common/model/db'
 
+import { SortToggle } from '@webapp/components/Table'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 
@@ -37,7 +38,16 @@ const getColLabelKey = ({ columnName, nodeDef }) => {
 }
 
 const ColumnHeader = (props) => {
-  const { codesVisible, colWidth, nodeDef, nodeDefLabelType, onChangeQuery, query } = props
+  const {
+    codesVisible,
+    colWidth,
+    dataLoading,
+    nodeDef,
+    nodeDefLabelType,
+    onChangeQuery,
+    query,
+    sortableVariablesByUuid,
+  } = props
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -57,6 +67,37 @@ const ColumnHeader = (props) => {
 
   const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 
+  const sortableVariable = sortableVariablesByUuid[nodeDefUuid]
+  const sortable = Boolean(sortableVariable) && !modeEdit
+  const sort = Query.getSort(query)
+  const sortCriteriaIndex = sortable
+    ? sort.findIndex((sortCriteria) => SortCriteria.getVariable(sortCriteria) === sortableVariable.value)
+    : -1
+  const sortCriteria = sortCriteriaIndex >= 0 ? sort[sortCriteriaIndex] : null
+  const sortToggleSort = {
+    by: sortCriteria ? sortableVariable.value : null,
+    order: sortCriteria ? SortCriteria.getOrder(sortCriteria) : null,
+  }
+
+  const handleSortBy = () => {
+    if (dataLoading) return
+
+    let sortUpdated
+    if (!sortCriteria) {
+      const newSortCriteria = SortCriteria.assocOrderAsc(
+        SortCriteria.assocVariable({ variable: sortableVariable.value, label: sortableVariable.label })(
+          SortCriteria.create()
+        )
+      )
+      sortUpdated = Sort.addSortCriteria(newSortCriteria)(sort)
+    } else if (SortCriteria.isOrderAsc(sortCriteria)) {
+      sortUpdated = Sort.updateSortCriteria(sortCriteriaIndex, SortCriteria.assocOrderDesc(sortCriteria))(sort)
+    } else {
+      sortUpdated = Sort.deleteSortCriteria(sortCriteriaIndex)(sort)
+    }
+    onChangeQuery(Query.assocSort(sortUpdated)(query))
+  }
+
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
       <div className="table__cell-content-wrapper width100">
@@ -64,6 +105,14 @@ const ColumnHeader = (props) => {
           <NodeDefTableCellHeader nodeDef={nodeDef} label={nodeDefLabel} lang={lang} />
         ) : (
           <>
+            {sortable && (
+              <SortToggle
+                disabled={dataLoading}
+                sort={sortToggleSort}
+                field={sortableVariable.value}
+                handleSortBy={handleSortBy}
+              />
+            )}
             <span className="ellipsis">{nodeDefLabel}</span>
             {isMeasure && canEditMeasure && (
               <ButtonIconGear
@@ -120,10 +169,12 @@ const ColumnHeader = (props) => {
 ColumnHeader.propTypes = {
   codesVisible: PropTypes.bool.isRequired,
   colWidth: PropTypes.number.isRequired,
+  dataLoading: PropTypes.bool,
   nodeDef: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
   query: PropTypes.object.isRequired,
+  sortableVariablesByUuid: PropTypes.object.isRequired,
 }
 
 export default ColumnHeader

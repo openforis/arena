@@ -1,20 +1,28 @@
 import * as schedule from 'node-schedule'
 
+import { runWithClusterLock } from '@openforis/arena-server'
+
 import * as Log from '@server/log/log'
 
 const Logger = Log.getLogger('ExpiredUserInvitationsCleanup')
 
 import * as UserService from '@server/modules/user/service/userService'
 
+const lockName = 'scheduler-expired-user-invitations-cleanup'
 const entriesType = 'users with expired invitations and surveys'
 
 const deleteExpiredItems = async () => {
   try {
-    Logger.debug(`Deleting ${entriesType}`)
+    await runWithClusterLock({
+      lockName,
+      fn: async () => {
+        Logger.debug(`Deleting ${entriesType}`)
 
-    const { deletedUsers, deletedSurveyIds } = await UserService.deleteExpiredInvitationsUsersAndSurveys()
+        const { deletedUsers, deletedSurveyIds } = await UserService.deleteExpiredInvitationsUsersAndSurveys()
 
-    Logger.debug(`${deletedUsers.length} users deleted, ${deletedSurveyIds.length} surveys could be deleted`)
+        Logger.debug(`${deletedUsers.length} users deleted, ${deletedSurveyIds.length} surveys could be deleted`)
+      },
+    })
   } catch (error) {
     Logger.error(`Error deleting ${entriesType}: ${error.toString()}`)
   }

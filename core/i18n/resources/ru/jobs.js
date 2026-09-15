@@ -1,6 +1,8 @@
 export default {
   ActivityLogImportJob: 'Импорт журнала активности',
-  ArenaMobileDataImportJob: 'Импорт данных Arena Mobile',
+  AllSurveysDataMigrationJob: 'Миграция данных всех опросов',
+  ArenaMobileDataImportJob: 'Импорт данных Arena',
+  ArenaMobileDataImportSummaryJob: 'Сводка импорта данных Arena',
   CategoriesImportJob: 'Импорт категорий',
   CategoriesValidationJob: 'Валидация категорий',
   CategoriesBatchImportJob: 'Импорт категорий',
@@ -24,7 +26,8 @@ export default {
   NodeDefsTranslationJob: 'Перевод меток определений узлов',
   NodeDefsImportJob: 'Импорт определений узлов',
   NodeDefsValidationJob: 'Валидация определений узлов',
-  chainsCyclesCheckJob: 'Проверка циклов цепочек',
+  OdkImportJob: 'Импорт ODK',
+  ChainsCyclesCheckJob: 'Проверка циклов цепочек',
   RecordCheckJob: 'Проверка записи',
   RecordsCloneJob: 'Клонирование записей',
   RecordsImportJob: 'Импорт записей',
@@ -69,6 +72,7 @@ export default {
   // survey backup
   SurveyInfoExportJob: 'Экспорт информации об опросе',
   CategoriesExportJob: 'Экспорт категорий',
+  CategoryGeoPackageExportJob: 'Экспорт категории в GeoPackage',
   TaxonomiesExportJob: 'Экспорт таксономий',
   RecordsExportJob: 'Экспорт записей',
   RecordFilesExportJob: 'Экспорт файлов записей',

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -8,12 +8,12 @@ import * as Chain from '@common/analysis/chain'
 
 import { useI18n } from '@webapp/store/system'
 import { useChains, useSurvey } from '@webapp/store/survey'
-import { useChain, useChainRecordsCountByStep } from '@webapp/store/ui/chain'
+import { useChain, useChainEditable, useChainRecordsCountByStep } from '@webapp/store/ui/chain'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import { ChainRStudioFieldset } from './ChainRStudioFieldset'
+import { ChainRStudioPanel } from './ChainRStudioPanel'
 
 export const ChainBasicProps = (props) => {
   const { updateChain } = props
@@ -22,18 +22,16 @@ export const ChainBasicProps = (props) => {
   const chain = useChain()
   const survey = useSurvey()
   const chains = useChains()
-
-  const [existsAnotherChainWithSamplingDesign, setExistsAnotherChainWithSamplingDesign] = useState(false)
+  const editable = useChainEditable()
 
   const recordsCountByStep = useChainRecordsCountByStep()
 
-  useEffect(() => {
-    if (chains) {
-      setExistsAnotherChainWithSamplingDesign(
-        chains.some((_chain) => Chain.getUuid(_chain) !== Chain.getUuid(chain) && Chain.hasSamplingDesign(_chain))
-      )
-    }
-  }, [chain, chains])
+  const existsAnotherChainWithSamplingDesign = useMemo(
+    () =>
+      chains?.some((_chain) => Chain.getUuid(_chain) !== Chain.getUuid(chain) && Chain.hasSamplingDesign(_chain)) ??
+      false,
+    [chain, chains]
+  )
 
   const validation = Chain.getValidation(chain)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
@@ -47,13 +45,14 @@ export const ChainBasicProps = (props) => {
         autoFocus
         labels={chain.props?.labels}
         formLabelKey="chainView.formLabel"
-        readOnly={false}
+        readOnly={!editable}
         validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
         onChange={(labels) => updateChain({ ...chain, props: { ...chain.props, labels } })}
       />
       <LabelsEditor
         formLabelKey="common.description"
         labels={chain.props.descriptions}
+        readOnly={!editable}
         onChange={(descriptions) => updateChain({ ...chain, props: { ...chain.props, descriptions } })}
       />
       <FormItem label="chainView.samplingDesign" className="sampling-design-form-item">
@@ -61,7 +60,7 @@ export const ChainBasicProps = (props) => {
           checked={Chain.hasSamplingDesign(chain)}
           validation={Validation.getFieldValidation(Chain.keysProps.samplingDesign)(validation)}
           onChange={(value) => updateChain(Chain.assocHasSamplingDesign(value)(chain))}
-          disabled={samplingDesignDisabled}
+          disabled={samplingDesignDisabled || !editable}
         />
       </FormItem>
       <FormItem label="chainView.records">
@@ -80,7 +79,7 @@ export const ChainBasicProps = (props) => {
         </div>
       </FormItem>
 
-      <ChainRStudioFieldset updateChain={updateChain} />
+      <ChainRStudioPanel updateChain={updateChain} />
     </div>
   )
 }

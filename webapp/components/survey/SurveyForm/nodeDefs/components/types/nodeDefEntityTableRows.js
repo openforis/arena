@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
@@ -11,10 +11,13 @@ import * as Node from '@core/record/node'
 import { debounce } from '@core/functionsDefer'
 
 import { elementOffset } from '@webapp/utils/domUtils'
-import { SurveyState } from '@webapp/store/survey'
+import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
+import { RecordState } from '@webapp/store/ui/record'
 import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
+import { getNextSortCriteria, sortNodes } from './nodeDefEntityTableRowsSort'
+import { useColumnHeaderHeight } from './useColumnHeaderHeight'
 
 const NodeDefEntityTableRows = (props) => {
   const {
@@ -49,6 +52,23 @@ const NodeDefEntityTableRows = (props) => {
     nodeDefColumnUuids
   )
 
+  const record = useSelector(RecordState.getRecord)
+  const lang = useSurveyPreferredLang()
+
+  const [sortCriteria, setSortCriteria] = useState([])
+
+  const handleSortBy = useCallback((field) => {
+    setSortCriteria((prevSortCriteria) => getNextSortCriteria({ sortCriteria: prevSortCriteria, field }))
+  }, [])
+
+  const sortedNodes = useMemo(
+    () =>
+      sortCriteria.length === 0
+        ? nodes
+        : sortNodes({ nodes, sortCriteria, nodeDefColumns, survey, cycle: surveyCycleKey, lang, record }),
+    [nodes, sortCriteria, nodeDefColumns, survey, surveyCycleKey, lang, record]
+  )
+
   const tableRowsHeaderRef = useRef(null)
   const tableDataRowsRef = useRef(null)
 
@@ -57,6 +77,12 @@ const NodeDefEntityTableRows = (props) => {
     height: 0,
     top: 0,
     left: 0,
+  })
+
+  const headerRowRendered = edit || !R.isEmpty(nodes)
+  const { columnHeaderHeight, resizableCellHeight } = useColumnHeaderHeight({
+    headerRef: tableRowsHeaderRef,
+    enabled: headerRowRendered,
   })
 
   const onScrollTableDataRows = () => {
@@ -128,6 +154,7 @@ const NodeDefEntityTableRows = (props) => {
         canEditDef={canEditDef}
         canEditRecord={canEditRecord}
         canDelete={canDelete}
+        columnHeaderHeight={resizableCellHeight}
         edit={edit}
         entry={entry}
         gridSize={gridSize}
@@ -136,12 +163,14 @@ const NodeDefEntityTableRows = (props) => {
         nodeDef={nodeDef}
         nodeDefColumns={nodeDefColumns}
         nodes={null}
+        onSortBy={entry ? handleSortBy : undefined}
         parentNode={parentNode}
         preview={preview}
         readOnly={readOnly}
         recordUuid={recordUuid}
         renderType={renderType}
         siblingEntities={nodes}
+        sortCriteria={sortCriteria}
         surveyCycleKey={surveyCycleKey}
         surveyInfo={surveyInfo}
       />
@@ -149,8 +178,12 @@ const NodeDefEntityTableRows = (props) => {
   }
 
   return (
-    <div className={classNames('survey-form__node-def-entity-table-rows', { edit })}>
-      {(edit || !R.isEmpty(nodes)) &&
+    <div
+      className={classNames('survey-form__node-def-entity-table-rows', { edit })}
+      style={columnHeaderHeight ? { '--column-header-height': `${columnHeaderHeight}px` } : undefined}
+    >
+      {headerRowRendered &&
+        // eslint-disable-next-line react-hooks/refs -- pre-existing pattern: tableRowsHeaderRef is only forwarded to NodeDefEntityTableRow's `ref` prop (a forwardRef component), never dereferenced here.
         createRow({
           renderType: NodeDefLayout.renderType.tableHeader,
           ref: tableRowsHeaderRef,
@@ -166,7 +199,7 @@ const NodeDefEntityTableRows = (props) => {
           <div className="survey-form__node-def-entity-table-data-rows">
             {gridSize.height > 0 &&
               gridSize.width > 0 &&
-              nodes.map((node, index) =>
+              sortedNodes.map((node, index) =>
                 createRow({
                   renderType: NodeDefLayout.renderType.tableBody,
                   node,

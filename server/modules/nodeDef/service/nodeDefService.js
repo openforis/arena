@@ -9,6 +9,8 @@ import * as ObjectUtils from '@core/objectUtils'
 
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import * as NodeDefManager from '../manager/nodeDefManager'
 
 const fetchSurvey = async ({ surveyId, cycle }, client = db) =>
@@ -148,8 +150,55 @@ export const convertNodeDef = async ({ user, surveyId, nodeDefUuid, toType }, cl
     return afterNodeDefUpdate({ survey, nodeDef, nodeDefsDependentsUuids })
   })
 
+/**
+ * Resolves categories/taxonomies referenced by code/taxon attributes among the given cloned node defs:
+ * reuses an existing category/taxonomy in the target survey (matched by uuid or name), or clones it from
+ * the source survey. Cloned node defs associated with an existing item matched by name (different uuid)
+ * get their categoryUuid/taxonomyUuid prop rewritten accordingly.
+ * @param {object} params - The params.
+ * @param {object} params.user - The user performing the clone.
+ * @param {string} params.sourceSurveyId - The source survey id.
+ * @param {object} params.sourceSurvey - The source survey.
+ * @param {string} params.targetSurveyId - The target survey id.
+ * @param {object} params.targetSurvey - The target survey.
+ * @param {Array.<object>} params.clonedNodeDefs - The node defs cloned from the source survey.
+ * @param {object} [client] - The db client.
+ * @returns {Promise<object>} - { clonedNodeDefs, categoriesCloned, taxonomiesCloned }.
+ */
+export const resolveAndCloneNodeDefsCategoriesAndTaxonomies = async (
+  { user, sourceSurveyId, sourceSurvey, targetSurveyId, targetSurvey, clonedNodeDefs },
+  client = db
+) => {
+  const {
+    clonedNodeDefs: resolvedClonedNodeDefs,
+    categoryUuidsToClone,
+    taxonomyUuidsToClone,
+  } = Survey.resolveClonedNodeDefsCategoriesAndTaxonomies({ sourceSurvey, targetSurvey, clonedNodeDefs })
+
+  const categoriesCloned = []
+  for (const sourceCategoryUuid of categoryUuidsToClone) {
+    categoriesCloned.push(
+      await CategoryManager.cloneCategoryFromSurvey(
+        { user, sourceSurveyId, sourceCategoryUuid, targetSurveyId },
+        client
+      )
+    )
+  }
+  const taxonomiesCloned = []
+  for (const sourceTaxonomyUuid of taxonomyUuidsToClone) {
+    taxonomiesCloned.push(
+      await TaxonomyManager.cloneTaxonomyFromSurvey(
+        { user, sourceSurveyId, sourceTaxonomyUuid, targetSurveyId },
+        client
+      )
+    )
+  }
+
+  return { clonedNodeDefs: resolvedClonedNodeDefs, categoriesCloned, taxonomiesCloned }
+}
+
 export const cloneNodeDefFromSurvey = async (
-  { sourceSurveyId, sourceNodeDefUuid, targetSurveyId, targetParentNodeDefUuid },
+  { user, sourceSurveyId, sourceNodeDefUuid, targetSurveyId, targetParentNodeDefUuid },
   client = db
 ) =>
   client.tx(async (t) => {
@@ -172,15 +221,32 @@ export const cloneNodeDefFromSurvey = async (
       existingNodeDefNames,
     })(mergedSurvey)
 
-    return _insertClonedNodeDefsAndUpdateLayout({
+    // Resolve categories/taxonomies referenced by code/taxon attributes in the cloned subtree:
+    // reuse an existing one (by uuid or name), or clone it from the source survey.
+    const {
+      clonedNodeDefs: resolvedClonedNodeDefs,
+      categoriesCloned,
+      taxonomiesCloned,
+    } = await resolveAndCloneNodeDefsCategoriesAndTaxonomies(
+      { user, sourceSurveyId, sourceSurvey, targetSurveyId, targetSurvey, clonedNodeDefs },
+      t
+    )
+
+    const rootClonedNodeDefResolved = resolvedClonedNodeDefs.find(
+      (nd) => NodeDef.getUuid(nd) === NodeDef.getUuid(rootClonedNodeDef)
+    )
+
+    const { nodeDefsUpdated, nodeDefsValidation } = await _insertClonedNodeDefsAndUpdateLayout({
       survey: targetSurvey,
       surveyId: targetSurveyId,
-      clonedNodeDefs,
-      rootClonedNodeDef,
+      clonedNodeDefs: resolvedClonedNodeDefs,
+      rootClonedNodeDef: rootClonedNodeDefResolved,
       layoutRefParentNodeDefUuid: targetParentNodeDefUuid,
       layoutRefNodeDefUuid: sourceNodeDefUuid,
       t,
     })
+
+    return { nodeDefsUpdated, nodeDefsValidation, categoriesCloned, taxonomiesCloned }
   })
 
 const _insertClonedNodeDefsAndUpdateLayout = async ({

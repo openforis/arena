@@ -20,6 +20,8 @@ export default {
     invalidNodeInRecord:
       'Nœud invalide dans l\'enregistrement "{{recordUuid}}", nœud "{{nodeUuid}}" avec la définition de nœud "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: "Aucun enregistrement trouvé dans le fichier d'importation ou format de fichier incorrect",
+    pendingImportFileNotFoundOrExpired:
+      'Le fichier précédemment téléchargé est introuvable ; il a peut-être expiré. Veuillez le télécharger à nouveau.',
     recordOwnedByAnotherUser:
       'Impossible de mettre à jour l’enregistrement "{{recordKeyValues}}" car il appartient à un autre utilisateur',
   },
@@ -31,10 +33,12 @@ export default {
   functionHasTooFewArguments: 'La fonction {{fnName}} nécessite au moins {{minArity}} arguments (reçu {{numArgs}})',
   functionHasTooManyArguments: 'La fonction {{fnName}} accepte au maximum {{maxArity}} arguments (reçu {{numArgs}})',
   generic: 'Erreur inattendue : {{text}}',
+  geoWhispApiError: 'Le service Whisp est temporairement indisponible.',
   importingDataIntoWrongCollectSurvey:
     'Importation de données dans le mauvais formulaire. URI attendu : {{collectSurveyUri}}',
   invalidType: 'Type invalide {{type}}',
   jobCanceledOrErrorsFound: 'Tâche annulée ou erreurs trouvées ; annulation de la transaction',
+  jobOrphanedOnRestart: 'La tâche a été interrompue par un redémarrage du serveur. Veuillez réessayer.',
   paramIsRequired: 'Le paramètre {{param}} est requis',
   unableToFindParent: 'Impossible de trouver le parent de {{name}}',
   unableToFindNode: 'Impossible de trouver le nœud avec le nom {{name}}',
@@ -52,6 +56,7 @@ export default {
 Essayez de rafraîchir la page.`,
   survey: {
     nodeDefNameNotFound: 'Définition de nœud introuvable : {{name}}',
+    dataMigrationInProgress: 'Ce formulaire est en cours de mise à niveau ; veuillez réessayer sous peu.',
   },
   unsupportedFunctionType: 'Type de fonction non pris en charge : {{exprType}}',
   userHasPendingInvitation: `Il existe déjà une invitation en attente pour l'utilisateur avec l'email '{{email}}' ; il/elle ne peut pas être invité(e) à ce formulaire jusqu'à ce qu'elle soit acceptée`,

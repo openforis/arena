@@ -6,11 +6,11 @@ import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModule
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import CategoryDetails from '@webapp/components/survey/CategoryDetails'
-import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import Chains from './Chains'
 import Chain from './Chain'
+import ChainNodeDefDetails from './ChainNodeDefDetails'
 import Instances from './Instances'
 import { useSurveyInfo } from '@webapp/store/survey'
 // import Entities from './Entities'
@@ -41,7 +41,7 @@ const Analysis = () => {
           //   path: appModuleUri(analysisModules.entities),
           // },
           {
-            component: NodeDefDetails,
+            component: ChainNodeDefDetails,
             path: `${analysisModules.nodeDef.path}/:nodeDefUuid/`,
           },
           {

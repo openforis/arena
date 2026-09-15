@@ -7,7 +7,7 @@ import { ArrayUtils } from '@core/arrayUtils'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
-import { TablesActions, useTableMaxRows, useTableVisibleColumns } from '@webapp/store/ui/tables'
+import { TablesActions, useTableMaxRows, useTableSort, useTableVisibleColumns } from '@webapp/store/ui/tables'
 
 export const useTable = ({
   columns,
@@ -41,7 +41,9 @@ export const useTable = ({
   const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
 
   const offset = getOffset()
-  const sort = getSort()
+  const sortInState = useTableSort(module)
+  const sortInLink = getSort()
+  const sort = sortInState ?? sortInLink
   const search = getSearch()
 
   const {
@@ -77,11 +79,9 @@ export const useTable = ({
   // init data on mount and on restParams and search update
   useEffect(initData, [JSON.stringify(restParams), search])
 
-  useEffect(() => {
-    if (totalCount < count) {
-      setTotalCount(count)
-    }
-  }, [count, totalCount])
+  if (totalCount < count) {
+    setTotalCount(count)
+  }
 
   useOnUpdate(() => {
     fetchData()
@@ -92,9 +92,11 @@ export const useTable = ({
       let order = sort.by !== orderByField && sort.order !== 'asc' ? 'desc' : 'asc'
       order = sort.by === orderByField && sort.order === 'asc' ? null : order
 
-      updateQuery(navigate)({ sort: { by: orderByField, order }, offset: null })
+      const sortUpdated = { by: orderByField, order }
+      updateQuery(navigate)({ sort: sortUpdated, offset: null })
+      dispatch(TablesActions.updateSort({ module, sort: sortUpdated }))
     },
-    [navigate, sort.by, sort.order]
+    [dispatch, module, navigate, sort.by, sort.order]
   )
 
   const handleSearch = useCallback(

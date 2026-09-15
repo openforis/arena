@@ -37,6 +37,29 @@ export const init = (app) => {
     }
   })
 
+  app.post(
+    '/survey/:surveyId/taxonomies/clone-from-survey',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const { sourceSurveyId } = Request.getBody(req)
+        const sourceTaxonomyUuid = Request.getRequiredParam(req, 'sourceTaxonomyUuid')
+
+        const taxonomy = await TaxonomyService.cloneTaxonomyFromSurvey({
+          user,
+          sourceSurveyId,
+          sourceTaxonomyUuid,
+          targetSurveyId: surveyId,
+        })
+        res.json({ taxonomy })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ====== READ
 
   app.get('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {

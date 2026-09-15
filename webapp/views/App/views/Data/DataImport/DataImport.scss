@@ -1,6 +1,6 @@
 @use '~@webapp/style/vars' as *;
 
-.app-module> :first-child.data-import {
+.app-module > :first-child.data-import {
   height: auto;
   display: flex;
   flex-direction: column;
@@ -23,6 +23,14 @@
 
     .nodedef-tree-select {
       max-height: 50vh;
+    }
+  }
+
+  .data-import-options {
+    width: 40rem;
+
+    .form-item {
+      grid-template-columns: 0.5fr 0.5fr;
     }
   }
 }

@@ -25,6 +25,7 @@ export default {
 
   importFromArena: 'Arena/Arena Mobile',
   importFromCollect: 'Collect / Collect Mobile',
+  importFromOdk: 'ODK / ODK Collect',
   importFromCsvExcel: 'CSV/Excel',
   importFromCsvStepsInfo: `### Étapes d'importation
 1. Sélectionnez l'entité cible
@@ -37,6 +38,25 @@ export default {
 `,
   importIntoCycle: 'Importer dans le cycle',
   importIntoMultipleEntityOrAttribute: 'Importer dans une entité multiple ou un attribut',
+  importPreview: {
+    title: "Aperçu de l'importation",
+    generatePreview: "Générer l'aperçu",
+    skipInfo:
+      'Les enregistrements marqués comme « Ignorer » ne peuvent pas être sélectionnés : un enregistrement existant, modifié plus récemment, existe déjà, ils ne seront donc pas importés.',
+    confirmImport: 'Importer les enregistrements sélectionnés ({{count}})',
+    columns: {
+      exists: 'Existe',
+      action: 'Action',
+      dateModified: 'Enregistrement importé modifié',
+      existingDateModified: 'Enregistrement existant modifié',
+    },
+    action: {
+      insert: 'Insérer',
+      overwrite: 'Écraser',
+      merge: 'Fusionner',
+      skip: 'Ignorer',
+    },
+  },
   importType: {
     label: "Type d'importation",
     insertNewRecords: 'Insérer de nouveaux enregistrements',
@@ -58,6 +78,11 @@ export default {
       importCompleteSuccessfully: `Importation de données Collect terminée :
         - {{insertedRecords}} enregistrements créés`,
     },
+    OdkDataImportJob: {
+      importCompleteSuccessfully: `ODK data import complete:
+        - {{submittedCount}} records created
+        - {{skippedCount}} duplicate submissions skipped`,
+    },
     DataImportJob: {
       importCompleteSummary: `
         - {{processed}} lignes traitées
@@ -74,6 +99,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{deletedFiles}} fichiers supprimés`,
       importCompleteWithErrors: `## Importation terminée (avec des erreurs) :
         - {{processed}} lignes traitées`,
+      tooLong: `Cette importation prend du temps. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
     DataImportValidationJob: {
       validationCompleteWithErrors: `## Validation terminée ({{errorsFoundMessage}})
@@ -90,6 +116,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{insertedFiles}} fichiers seraient insérés
         - {{updatedFiles}} fichiers seraient mis à jour
         - {{deletedFiles}} fichiers seraient supprimés`,
+      tooLong: `Cette validation prend du temps. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
   },
   options: {
@@ -98,6 +125,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
     preventAddingNewEntityData: "Empêcher l'ajout de nouvelles données d'entité",
     preventUpdatingRecordsInAnalysis: "Empêcher la mise à jour des enregistrements à l'étape d'analyse",
     includeFiles: 'Inclure les fichiers',
+    skipMissingFiles: 'Ignorer les fichiers manquants',
     deleteExistingEntities: `Supprimer les données de l'entité sélectionnée dans tous les enregistrements`,
   },
   optionsInfo: {

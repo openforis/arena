@@ -13,6 +13,7 @@ export default {
     label: 'Source',
     arena: 'Arena (.zip)',
     collect: 'Collect (.collect, .collect-backup, .collect-data)',
+    odk: 'ODK (.xml)',
   },
   startImport: "Démarrer l'importation",
   survey: 'Formulaire',

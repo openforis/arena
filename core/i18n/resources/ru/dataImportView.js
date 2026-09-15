@@ -22,6 +22,7 @@ export default {
 
   importFromArena: 'Arena/Arena Mobile',
   importFromCollect: 'Collect / Collect Mobile',
+  importFromOdk: 'ODK / ODK Collect',
   importFromCsvExcel: 'CSV/Excel',
   importFromCsvStepsInfo: `### Шаги импорта
 1. Выберите целевую сущность
@@ -34,6 +35,25 @@ export default {
 `,
   importIntoCycle: 'Импортировать в цикл',
   importIntoMultipleEntityOrAttribute: 'Импортировать в множественную сущность или атрибут',
+  importPreview: {
+    title: 'Предварительный просмотр импорта',
+    generatePreview: 'Создать предварительный просмотр',
+    skipInfo:
+      'Записи, отмеченные как «Пропустить», нельзя выбрать: уже существует более недавно измененная запись, поэтому они не будут импортированы.',
+    confirmImport: 'Импортировать выбранные записи ({{count}})',
+    columns: {
+      exists: 'Существует',
+      action: 'Действие',
+      dateModified: 'Импортируемая запись изменена',
+      existingDateModified: 'Существующая запись изменена',
+    },
+    action: {
+      insert: 'Вставить',
+      overwrite: 'Перезаписать',
+      merge: 'Объединить',
+      skip: 'Пропустить',
+    },
+  },
   importType: {
     label: 'Тип импорта',
     insertNewRecords: 'Вставить новые записи',
@@ -55,6 +75,11 @@ export default {
       importCompleteSuccessfully: `Импорт данных Collect завершен:
         - {{insertedRecords}} записей создано`,
     },
+    OdkDataImportJob: {
+      importCompleteSuccessfully: `ODK data import complete:
+        - {{submittedCount}} records created
+        - {{skippedCount}} duplicate submissions skipped`,
+    },
     DataImportJob: {
       importCompleteSummary: `
         - {{processed}} строк обработано
@@ -71,6 +96,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{deletedFiles}} файлов удалено`,
       importCompleteWithErrors: `## Импорт завершен (с ошибками):
         - {{processed}} строк обработано`,
+      tooLong: `Импорт занимает много времени. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
     DataImportValidationJob: {
       validationCompleteWithErrors: `## Проверка завершена ({{errorsFoundMessage}})
@@ -87,6 +113,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
         - {{insertedFiles}} файлов будет вставлено
         - {{updatedFiles}} файлов будет обновлено
         - {{deletedFiles}} файлов будет удалено`,
+      tooLong: `Проверка занимает много времени. $t(common.trySplittingFileIntoSmallerChunks)`,
     },
   },
   options: {
@@ -95,6 +122,7 @@ $t(dataImportView:jobs.DataImportJob.importCompleteSummary)`,
     preventAddingNewEntityData: 'Запретить добавление новых данных сущностей',
     preventUpdatingRecordsInAnalysis: 'Запретить обновление записей на этапе анализа',
     includeFiles: 'Включить файлы',
+    skipMissingFiles: 'Игнорировать отсутствующие файлы',
     deleteExistingEntities: `Удалить данные выбранной сущности во всех записях`,
   },
   optionsInfo: {

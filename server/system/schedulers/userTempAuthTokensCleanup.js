@@ -4,21 +4,27 @@ import { ServiceRegistry } from '@openforis/arena-core'
 
 import * as Log from '@server/log/log'
 
-import { ServerServiceType } from '@openforis/arena-server'
+import { ServerServiceType, runWithClusterLock } from '@openforis/arena-server'
 
 const Logger = Log.getLogger('UserTempAuthTokensCleanup')
 
+const lockName = 'scheduler-user-temp-auth-tokens-cleanup'
 const items = 'expired temporary user auth tokens'
 const task = `deleting ${items}`
 
 const deleteExpiredUserTempAuthTokens = async () => {
   try {
-    Logger.debug(task)
+    await runWithClusterLock({
+      lockName,
+      fn: async () => {
+        Logger.debug(task)
 
-    const serviceRegistry = ServiceRegistry.getInstance()
-    const userTempAuthTokenService = serviceRegistry.getService(ServerServiceType.userTempAuthToken)
-    const count = await userTempAuthTokenService.cleanupExpired()
-    Logger.debug(`${count} ${items} deleted`)
+        const serviceRegistry = ServiceRegistry.getInstance()
+        const userTempAuthTokenService = serviceRegistry.getService(ServerServiceType.userTempAuthToken)
+        const count = await userTempAuthTokenService.cleanupExpired()
+        Logger.debug(`${count} ${items} deleted`)
+      },
+    })
   } catch (error) {
     Logger.error(`Error ${task}: ${error.toString()}`)
   }

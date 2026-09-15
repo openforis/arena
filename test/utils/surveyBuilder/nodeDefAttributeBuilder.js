@@ -32,6 +32,14 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
     )
   }
 
+  unique(unique = true) {
+    return this._setProp(
+      NodeDef.keysPropsAdvanced.validations,
+      R.pipe(NodeDef.getValidations, NodeDefValidations.assocUnique(unique))(this),
+      true
+    )
+  }
+
   analysis() {
     this._analysis = true
     return this
@@ -39,6 +47,11 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
 
   category(categoryName) {
     this._categoryName = categoryName
+    return this
+  }
+
+  taxonomy(taxonomyName) {
+    this._taxonomyName = taxonomyName
     return this
   }
 
@@ -50,6 +63,10 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
     if (this._categoryName) {
       const category = Survey.getCategoryByName(this._categoryName)(survey)
       def.props[NodeDef.propKeys.categoryUuid] = category?.uuid
+    }
+    if (this._taxonomyName) {
+      const taxonomy = Survey.getTaxonomyByName(this._taxonomyName)(survey)
+      def.props[NodeDef.propKeys.taxonomyUuid] = taxonomy?.uuid
     }
     return {
       [NodeDef.getUuid(def)]: def,

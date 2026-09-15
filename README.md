@@ -91,10 +91,6 @@ SENDGRID_API_KEY= # get it from https://sendgrid.com/
 ANALYSIS_OUTPUT_DIR=/home/your_user/openforis/arena/analysis
 
 # Server
-## HTTP Session
-## Secret used to sign the session ID cookie
-SESSION_ID_COOKIE_SECRET=my-cookie-secret-key
-
 ## Set to true if http requests must be forwarded to https
 USE_HTTPS=false
 

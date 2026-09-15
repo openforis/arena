@@ -1,10 +1,13 @@
-import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+import { ClusterBus, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
+import * as Log from '@server/log/log'
 import ThreadManager from '@server/threads/threadManager'
 
 import { RecordsUpdateThreadMessageTypes } from './thread/recordsThreadMessageTypes'
 import { SurveyRecordsThreadMap } from './surveyRecordsThreadMap'
 import * as RecordSocketsMap from './recordSocketsMap'
+
+const Logger = Log.getLogger('SurveyRecordsThreadService')
 
 const { get: getThreadByKey, getKey: getThreadKey } = SurveyRecordsThreadMap
 
@@ -15,6 +18,33 @@ const threadTimeouts = {}
 // ======
 // THREAD
 // ======
+
+const clusterEventTargetType = 'recordsUpdateThread'
+const clusterEventTypes = { surveyClear: 'surveyClear', recordClear: 'recordClear' }
+
+const handleClusterEvent = (event) => {
+  const { targetType, eventType, message } = event
+  if (targetType !== clusterEventTargetType) return
+
+  // Every cluster event is delivered to every dyno, including events about surveys/records this dyno
+  // holds nothing for: use the plain lookup, not getThread(), which would reset the thread inactivity
+  // timeout (preventing the thread from ever idling out) and could revive a thread being terminated.
+  const thread = getThreadByKey(getThreadKey())
+  if (!thread) return
+
+  if (eventType === clusterEventTypes.surveyClear) {
+    thread.postMessage({ type: RecordsUpdateThreadMessageTypes.surveyClear, ...message })
+  } else if (eventType === clusterEventTypes.recordClear) {
+    thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordClear, ...message })
+  }
+}
+
+// Exported under a test-only name so tests can invoke it directly, without needing to intercept
+// the ClusterBus.onEvent registration call below (which runs at module-load time, before any
+// test's jest.spyOn setup could possibly run).
+export const _handleClusterEventForTest = handleClusterEvent
+
+ClusterBus.onEvent(handleClusterEvent)
 
 // ====== CREATE
 const _createThread = () => {
@@ -32,7 +62,9 @@ const _createThread = () => {
         thread.terminate()
       }
     } else {
-      notifyRecordUpdateToSockets({ eventType: type, content })
+      notifyRecordUpdateToSockets({ eventType: type, content }).catch((error) =>
+        Logger.error(`error notifying record update to sockets: ${error}`)
+      )
     }
   }
 
@@ -62,13 +94,21 @@ const killThread = () => {
 }
 
 const clearSurveyDataFromThread = ({ surveyId, cycle = null, draft = false }) => {
-  const thread = getThread()
-  thread?.postMessage({ type: RecordsUpdateThreadMessageTypes.surveyClear, surveyId, cycle, draft })
+  ClusterBus.publish({
+    targetType: clusterEventTargetType,
+    targetId: `survey-${surveyId}`,
+    eventType: clusterEventTypes.surveyClear,
+    message: { surveyId, cycle, draft },
+  }).catch((error) => Logger.error(`error publishing surveyClear cluster event: ${error}`))
 }
 
 const clearRecordDataFromThread = ({ surveyId, cycle, draft, recordUuid }) => {
-  const thread = getThread()
-  thread?.postMessage({ type: RecordsUpdateThreadMessageTypes.recordClear, surveyId, cycle, draft, recordUuid })
+  ClusterBus.publish({
+    targetType: clusterEventTargetType,
+    targetId: recordUuid,
+    eventType: clusterEventTypes.recordClear,
+    message: { surveyId, cycle, draft, recordUuid },
+  }).catch((error) => Logger.error(`error publishing recordClear cluster event: ${error}`))
 }
 
 // ====== READ
@@ -106,28 +146,28 @@ const getOrCreatedThread = () => {
 
 const { assocSocket, dissocSocket, dissocSocketBySocketId } = RecordSocketsMap
 
-const notifyRecordUpdateToSockets = ({ eventType, content }) => {
+const notifyRecordUpdateToSockets = async ({ eventType, content }) => {
   const { recordUuid } = content
-  const socketIds = RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
-  socketIds.forEach((socketId) => {
-    if (WebSocketServer.isSocketConnected(socketId)) {
+  const socketIds = await RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
+  for (const socketId of socketIds) {
+    if (await WebSocketServer.isSocketConnected(socketId)) {
       WebSocketServer.notifySocket(socketId, eventType, content)
     } else {
       // socket has been disconnected without checking out the record
-      RecordSocketsMap.dissocSocket({ recordUuid, socketId })
+      await RecordSocketsMap.dissocSocket({ recordUuid, socketId })
     }
-  })
+  }
 }
 
-const notifyRecordDeleteToSockets = ({ socketIdUser, recordUuid, notifySameUser = true }) => {
+const notifyRecordDeleteToSockets = async ({ socketIdUser, recordUuid, notifySameUser = true }) => {
   // Notify other users viewing or editing the record it has been deleted
-  const socketIds = RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
+  const socketIds = await RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
   socketIds.forEach((socketId) => {
     if (socketId !== socketIdUser || notifySameUser) {
       WebSocketServer.notifySocket(socketId, WebSocketEvent.recordDelete, recordUuid)
     }
   })
-  RecordSocketsMap.dissocSocketsByRecordUuid(recordUuid)
+  await RecordSocketsMap.dissocSocketsByRecordUuid(recordUuid)
 }
 
 export const RecordsUpdateThreadService = {
@@ -138,6 +178,7 @@ export const RecordsUpdateThreadService = {
   clearRecordDataFromThread,
   // sockets
   assocSocket,
+  notifyRecordUpdateToSockets,
   notifyRecordDeleteToSockets,
   dissocSocket,
   dissocSocketBySocketId,

@@ -10,6 +10,13 @@
     grid-row-gap: 0;
   }
 
+  // Branding tab only: avoid nested scroll so Save stays below the preview block.
+  .tab-bar .form.survey-info-branding-form {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
   .form-item {
     grid-template-columns: 0.2fr 0.65fr;
   }
@@ -25,10 +32,15 @@
   }
 
   .survey-info__map,
+  .survey-info-branding-form,
   .extra-prop-defs-editor,
   .survey-security-editor,
   .survey-configuration {
     justify-self: center;
+  }
+
+  .survey-info-branding-form {
+    width: min(56rem, 100%);
   }
 
   .survey-security-editor {

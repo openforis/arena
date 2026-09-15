@@ -24,7 +24,7 @@ import { Button } from '@webapp/components/buttons'
 
 import FormEntryActions from '../components/formEntryActions'
 import FormEditActions from '../components/formEditActions'
-import { usePath } from './usePath'
+import { FormHeaderPath } from './FormHeaderPath'
 import FormHeaderAdvancedButton from './FormHeaderAdvancedButton'
 
 const FormHeader = (props) => {
@@ -38,7 +38,6 @@ const FormHeader = (props) => {
   const nodeDefPage = useNodeDefPage()
   const showPageNavigation = useShowPageNavigation()
   const canEditSurvey = useAuthCanEditSurvey()
-  const path = usePath(entry)
   const treeViewMode = useTreeSelectViewMode()
   const cycle = useSurveyCycleKey()
 
@@ -72,12 +71,7 @@ const FormHeader = (props) => {
           />
         )}
 
-        <div
-          className="survey-form-header__path"
-          data-nodedef-name={NodeDef.getName(nodeDefPage)}
-          id="survey-form-page-label"
-          dangerouslySetInnerHTML={{ __html: path }}
-        />
+        <FormHeaderPath entry={entry} nodeDefPageName={NodeDef.getName(nodeDefPage)} />
       </div>
 
       <div className="survey-form-header__options">

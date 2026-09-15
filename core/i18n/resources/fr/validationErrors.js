@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Nom de catégorie non spécifié',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      "Une catégorie de Données de points d'échantillonnage existe déjà dans ce formulaire ; il ne peut y en avoir qu'une seule.",
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Impossible de supprimer les éléments de catégorie publiés. Éléments manquants dans le fichier importé : {{deletedItemCodes}}',
@@ -51,6 +56,8 @@ export default {
     invalidParentItemOrder: "L'élément avec les codes {{parentItemCodes}} doit précéder ses enfants",
     nameDuplicate: 'Une catégorie avec le même nom existe déjà : {{name}}',
     srsNotDefined: 'SRS avec le code {{srs}} non défini dans le formulaire',
+    uuidDuplicate:
+      'Cette catégorie a déjà été clonée dans ce formulaire (actuellement nommée "{{name}}"). Elle ne peut pas être clonée à nouveau.',
   },
 
   dataImport: {
@@ -64,7 +71,7 @@ export default {
     invalidNumber: 'Nombre invalide dans la colonne {{headers}} : {{value}}',
     invalidTaxonCode: 'Code invalide dans la colonne {{headers}} : {{value}}',
     invalidTime:
-      "Heure invalide dans la colonne {{headers}} : {{value}}. L'heure doit être au format HH:mm. Ex. 09:45 ou 16:30",
+      "Heure invalide dans la colonne {{headers}} : {{value}}. L'heure doit être au format HH:mm ou HH:mm:ss. Ex. 09:45, 16:30 ou 09:45:30",
     missingRequiredHeaders: 'Colonnes requises manquantes : {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Erreur lors de la mise à jour des valeurs : {{details}}',
     multipleRecordsMatchingKeys: 'Plusieurs enregistrements trouvés correspondant aux clés "{{keyValues}}"',
@@ -129,6 +136,11 @@ export default {
     countMaxInvalid: '"Nombre maximum" invalide',
     countMinInvalid: '"Nombre minimum" invalide',
     readOnlyCannotHaveEditableIf: 'Un noeud en lecture seule ne peut pas avoir de condition "Editable if"',
+    qualifierCannotHaveApplicableExpression:
+      'Un attribut qualificatif ne peut pas avoir de condition "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    qualifierCannotHaveEditabilityRule: "Un attribut qualificatif ne peut pas avoir de règles d'éditabilité définies",
+    qualifierCannotHaveDefaultValues: 'Un attribut qualificatif ne peut pas avoir de valeurs par défaut',
+    qualifierCannotHaveValidations: 'Un attribut qualificatif ne peut pas avoir de règles de validation définies',
   },
 
   record: {
@@ -191,6 +203,12 @@ export default {
     scientificNameRequired: 'Le nom scientifique est requis',
     taxaEmpty: 'Taxons vides',
     vernacularNamesDuplicate: `Nom vernaculaire en double '{{name}}' pour la langue '{{lang}}'`,
+  },
+
+  taxonomyImport: {
+    nameDuplicate: 'Une taxonomie avec le même nom existe déjà : {{name}}',
+    uuidDuplicate:
+      'Cette taxonomie a déjà été clonée dans ce formulaire (actuellement nommée "{{name}}"). Elle ne peut pas être clonée à nouveau.',
   },
 
   taxonomyImportJob: {

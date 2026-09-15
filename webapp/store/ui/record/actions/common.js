@@ -9,6 +9,7 @@ import { SurveyState } from '@webapp/store/survey'
 
 import * as RecordState from '../state'
 import * as ActionTypes from './actionTypes'
+import { mergeNodesIntoFetchedRecordsCache } from '../fetchedRecordsCache'
 
 export const recordNodesUpdate =
   (nodes, removeDirtyFlag = true) =>
@@ -19,6 +20,8 @@ export const recordNodesUpdate =
     if (A.isEmpty(Record.getNodes(record))) {
       dispatch(LoaderActions.hideLoader())
     }
+
+    mergeNodesIntoFetchedRecordsCache(nodes)
 
     dispatch({ type: ActionTypes.nodesUpdate, nodes, removeDirtyFlag })
   }

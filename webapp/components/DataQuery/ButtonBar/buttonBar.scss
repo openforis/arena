@@ -11,8 +11,22 @@
   margin-top: 10px;
   margin-bottom: 10px;
 
+  .data-query-button-bar__internal-container {
+    display: flex;
+    align-items: center;
+  }
+
   .btn-toggle-node-defs-selector {
     align-self: center;
+  }
+
+  .data-query-loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
   }
 
   .mode-form-item {

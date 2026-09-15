@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Активно',
@@ -53,6 +55,7 @@ export default {
     download: 'Скачать',
     draft: 'Черновик',
     edit: 'Редактировать',
+    elapsed: 'Прошедшее время',
     email: 'Электронная почта',
     email_other: 'Электронные письма',
     emailSentConfirmation: `Письмо на адрес {{email}} отправлено.
@@ -108,6 +111,8 @@ export default {
 Вы хотите продолжить?`,
     local: 'Локально',
     loading: 'Загрузка...',
+    lock: 'Заблокировать',
+    unlock: 'Разблокировать',
     max: 'Максимум',
     med: 'Медиана',
     manage: 'Управление',
@@ -151,9 +156,34 @@ export default {
 - Таксоны нельзя будет удалить.
 
 **Вы уверены, что хотите продолжить?**`,
+    publishRecordValuesUpdateConfirm: `#### Публикация {{survey}} обновит уже записанные данные ####
+
+{{reasons}}
+
+Эта операция может безвозвратно изменить или удалить уже введённые данные.
+
+Чтобы опубликовать без обновления существующих данных, отметьте «Пропустить обновление данных» ниже (не рекомендуется).`,
+    publishRecordValuesUpdateConfirmHeader: 'Данные существующих записей будут обновлены',
+    publishRecordValuesUpdateConfirmOk: 'Опубликовать и обновить данные',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Введите название анкеты "{{strongConfirmRequiredText}}" для подтверждения',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Следующие атрибуты будут изменены, и их значения в существующих записях будут автоматически пересчитаны: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Следующие атрибуты используют дополнительное свойство категории или таксономии, которое изменилось, из-за чего их значение будет пересчитано в существующих записях: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Пропустить обновление данных',
+    publishSkipDataUpdateConfirmOk: 'Пропустить обновление данных и опубликовать',
+    publishSkipDataUpdateImplications: 'Пропуск обновления данных означает следующее:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Существующие записи могут перестать соответствовать новому определению анкеты',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Затронутые значения не будут пересчитаны, пока не будут введены заново вручную',
+    publishSkipDataUpdateImplicationChains:
+      'Цепочки обработки, использующие эти атрибуты, могут выдавать устаревшие результаты',
     raiseTicketInSupportForum: `В случае проблем, пожалуйста, создайте заявку с тегом 'arena' на нашем <b>Форуме поддержки</b>: $t(links.supportForum)`,
     record: 'Запись',
     record_other: 'Записи',
+    remaining: 'Оставшееся время',
     remote: 'Удаленно',
     required: 'Обязательно',
     requiredField: 'обязательное поле',
@@ -175,6 +205,10 @@ export default {
     showLabels: 'Показать метки',
     showLabelsAndNames: 'Показать метки и имена',
     showNames: 'Показать имена',
+    sort: 'Сортировка',
+    sortAsc: 'Сортировать по возрастанию',
+    sortDesc: 'Сортировать по убыванию',
+    sortNone: 'Убрать сортировку',
     srs: 'SRS',
     status: 'Статус',
     sum: 'Сумма',
@@ -182,6 +216,7 @@ export default {
     to: 'Кому',
     totalItems: 'Всего элементов',
     true: 'Истина',
+    trySplittingFileIntoSmallerChunks: 'Попробуйте разбить файл на меньшие части.',
     type: 'Тип',
     undefinedName: 'Неопределенное имя',
     unique: 'Уникальный',
@@ -190,6 +225,7 @@ export default {
       message: `Ошибка при загрузке файла: {{error}}.\n
 Попробовать снова?`,
     },
+    uploadFileChangedError: 'Похоже, что выбранный файл был изменен после выбора. Пожалуйста, выберите его снова.',
     uploadingFile: 'Загрузка файла ({{progressPercent}}%)',
     value: 'Значение',
     view: 'Просмотр',
@@ -291,6 +327,7 @@ export default {
 
   appModules: {
     home: 'Главная',
+    landing: 'Приветствие',
     dashboard: 'Панель управления',
     surveyNew: 'Новый опрос',
     surveys: 'Опросы',
@@ -327,6 +364,9 @@ export default {
     userInvite: 'Пригласить пользователя',
     userNew: 'Новый пользователь',
     usersSurvey: 'Список пользователей',
+    userGroup: 'Группа пользователей',
+    userGroup_plural: 'Группы пользователей',
+    userGroupNew: 'Новая группа пользователей',
     usersList: 'Список пользователей (все)',
     user2FADevice: 'Устройство 2FA',
     user2FADevice_plural: 'Устройства 2FA',
@@ -340,6 +380,8 @@ export default {
     entities: 'Виртуальные сущности',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Экземпляры',
+
+    jobMonitor: 'Монитор заданий',
 
     help: 'Помощь',
     about: 'О программе',
@@ -456,8 +498,10 @@ $t(common.raiseTicketInSupportForum)
       lock: 'Заблокировать редактирование ключевого атрибута',
       unlock: 'Разрешить редактирование ключевого атрибута',
     },
-    lock: 'Заблокировать',
-    unlock: 'Разблокировать',
+    qualifierAttributeEditing: {
+      lock: 'Заблокировать редактирование атрибута-квалификатора',
+      unlock: 'Разрешить редактирование атрибута-квалификатора',
+    },
   },
 
   dataExplorerView: {
@@ -593,8 +637,9 @@ $t(common.raiseTicketInSupportForum)
     confirmInviteSystemAdmin: 'Пригласить пользователя {{email}} в качестве системного администратора?',
     confirmInviteSystemAdmin_other: 'Пригласить пользователей {{email}} в качестве системных администраторов?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} адресов были пропущены (они уже были приглашены в этот опрос ранее): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} адресов были пропущены (они уже были приглашены в этот опрос ранее): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Разрешения',
       systemAdmin: `
@@ -698,11 +743,33 @@ $t(common.raiseTicketInSupportForum)
       confirmDelete: 'При удалении базовой единицы вы снимите все отметки "переменная на основе площади". Продолжить?',
     },
     downloadSummaryJSON: 'Скачать сводку (JSON)',
-    firstPhaseCategory: 'Категория 1-й фазы',
-    firstPhaseCommonAttribute: {
-      label: 'Общий атрибут',
-      info: `Атрибут, общий для базовой единицы и таблицы 1-й фазы
-(это должен быть кодовый атрибут с тем же именем, что и дополнительное свойство, определенное для категории 1-й фазы)`,
+    mauFile: {
+      upload: 'Загрузить MAU.zip',
+      download: 'Скачать MAU.zip',
+      delete: 'Удалить MAU.zip',
+      confirmReplace: 'Файл MAU.zip уже загружен для этой цепочки. Заменить его?',
+      confirmDelete: 'Удалить файл MAU.zip, загруженный для этой цепочки?',
+      uploadComplete: 'Файл MAU.zip успешно загружен',
+      deleteComplete: 'Файл MAU.zip удалён',
+      invalidFileExtension: 'Пожалуйста, выберите файл .zip',
+    },
+    phase1Category: 'Категория 1-й фазы',
+    phase1CategoryInfo: 'Выберите категорию, содержащую выборки 1-й фазы.',
+    phase2JoinEntity: {
+      label: 'Объект соединения (2-я фаза)',
+      info: 'Объект, используемый для соединения базовой единицы с категорией 1-й фазы: сама базовая единица или одна из её родительских сущностей.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Соединять с использованием связи Sampling Point Data',
+      info: 'Ключ(и) объекта 2-й фазы считываются из таблицы Sampling Point Data, той же таблицы, что используется для 1-й фазы.',
+    },
+    phase1JoinAttribute: {
+      label: 'Атрибут соединения (1-я фаза)',
+      info: 'Выберите столбец таблицы $t(chainView.phase1Category) (дополнительное свойство или "code"), используемый для соединения с объектом соединения 2-й фазы.',
+    },
+    phase2JoinAttribute: {
+      label: 'Атрибут соединения (2-я фаза)',
+      info: 'Выберите атрибут (объекта 2-й фазы) для соединения с таблицей 1-й фазы; его значение сопоставляется с предыдущим атрибутом соединения 1-й фазы.',
     },
     formLabel: 'Метка цепочки обработки',
     basic: 'Основное',
@@ -720,6 +787,8 @@ $t(common.raiseTicketInSupportForum)
     nonResponseBiasCorrectionInfo: `Чтобы реализовать метод корректировки по весовым классам, добавьте 'design_psu' и 'design_ssu' в таблицу категорий страты как дополнительные числовые свойства.`,
     pValue: 'P-значение',
     resultsBackFromRStudio: 'Результаты получены из RStudio',
+    resultsBackFromRStudioInfo: `Включите эту опцию, если атрибуты результатов, вычисленные в RStudio, должны быть импортированы обратно на сервер Arena.
+Этот процесс может быть медленным.`,
     samplingDesign: 'Дизайн выборки',
     samplingDesignDetails: 'Детали дизайна выборки',
     samplingStrategyLabel: 'Стратегия выборки',
@@ -744,9 +813,12 @@ $t(common.raiseTicketInSupportForum)
       reportingAreaInfo: `При стратифицированной выборке укажите площади страт в таблице категорий атрибута страты (название столбца 'area')`,
     },
     stratumAttribute: 'Атрибут страты',
+    stratumAttributeInfo: 'Выберите переменную, используемую для стратификации выборки.',
+    stratumAttribute2ndPhaseInfo: `Выберите переменную, используемую для подразделения выборки 1-й фазы на страты перед формированием окончательной детальной подвыборки. Показываются только те атрибуты, имя которых также присутствует как столбец категории 1-й фазы.`,
     postStratificationAttribute: 'Атрибут послестратификации',
     areaWeightingMethod: 'Метод взвешивания по площади',
     clusteringEntity: 'Сущность кластеризации',
+    clusteringEntityInfo: `Сущность, определяющая первичные единицы выборки. Примечание: используется исключительно для кластерного анализа в рамках пакета R survey.`,
     clusteringOnlyVariances: 'Кластеризация только для дисперсий',
     errorNoLabel: 'Цепочка должна иметь допустимую метку',
     dateExecuted: 'Дата выполнения',
@@ -755,6 +827,18 @@ $t(common.raiseTicketInSupportForum)
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Цепочка обработки удалена',
+    cloneFromAnotherSurvey: 'Клонировать из другого опроса',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Клонировать цепочку из другого опроса',
+      sourceSurvey: 'Исходный опрос',
+      sourceChain: 'Исходная цепочка',
+      entityCheck: 'Совместимость сущностей',
+      entityMissing: 'отсутствует в целевом опросе',
+      skipMissingEntities: 'Пропустить атрибуты анализа для сущностей, отсутствующих в целевом опросе',
+      noAnalysisAttributes: 'Эта цепочка не имеет атрибутов анализа',
+      cloneComplete: 'Цепочка успешно клонирована',
+      missingEntities: 'Невозможно клонировать: следующие сущности не существуют в целевом опросе: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `Определение узла "{{label}}" не может быть выбрано, поскольку оно не принадлежит всем циклам цепочки обработки`,
     cannotSelectCycle: 'Этот цикл не может быть выбран, так как некоторые определения узлов не принадлежат этому циклу',
     copyRStudioCode: `#### Вы собираетесь открыть RStudio Server ####
@@ -854,6 +938,18 @@ $t(common.appNameFull)
     basic: 'Основное',
     advanced: 'Расширенные',
     mobileApp: 'Мобильное приложение',
+    print: 'Печать',
+    printProps: {
+      printOrientation: {
+        label: 'Ориентация страницы',
+        info: 'Ориентация, используемая когда эта сущность начинает свою собственную печатную секцию. По умолчанию наследуется ориентация документа, выбранная при экспорте.',
+      },
+      orientations: {
+        default: 'По умолчанию (документ)',
+        portrait: 'Портретная',
+        landscape: 'Альбомная',
+      },
+    },
     validations: 'Проверки',
     function: 'Функция',
     editingFunction: 'Редактирование функции {{functionName}}',
@@ -900,6 +996,7 @@ $t(common.appNameFull)
       taxonProp: 'Возвращает значение указанного $t(extraProp.label) таксона с указанным кодом',
       taxonVernacularName:
         'Возвращает (первое) народное (или местное) название на указанном языке таксона с указанным кодом',
+      unique: 'Возвращает уникальные значения множественного атрибута или сущности',
       userEmail: 'Возвращает email вошедшего в систему пользователя',
       userIsRecordOwner:
         'Возвращает логическое значение "true", если пользователь, редактирующий запись, также является ее владельцем, "false" в противном случае',
@@ -919,6 +1016,10 @@ $t(common.appNameFull)
       autoIncrementalKey: {
         label: 'Автоинкрементный ключ',
         info: 'Значение будет генерироваться автоматически',
+      },
+      autoCreateMinCountItems: {
+        label: 'Автосоздание минимального количества элементов',
+        info: 'Когда сущность становится актуальной или создается ее родительская сущность, автоматически создается количество сущностей, равное минимальному значению.',
       },
       displayAs: 'Отображать как',
       displayIn: 'Отображать в',
@@ -943,6 +1044,10 @@ $t(common.appNameFull)
       multiple: 'Множественный',
       ownPage: 'Собственная страница',
       parentPage: 'Родительская страница ({{parentPage}})',
+      qualifier: {
+        label: 'Квалификатор',
+        info: `Когда пользователь, принадлежащий к группе, создаёт новую запись, этот атрибут будет автоматически заполнен значением, указанным для него в квалификаторах группы пользователя. Пользователи смогут видеть и изменять только записи, принадлежащие их собственной группе, если они входят в какую-либо группу.`,
+      },
       table: 'Таблица',
     },
     advancedProps: {
@@ -1027,6 +1132,9 @@ $t(common.appNameFull)
     },
     mobileProps: {
       title: 'Мобильное приложение',
+    },
+    timeProps: {
+      includeSeconds: 'Включить секунды',
     },
     formHeaderProps: {
       headerColorLabel: 'Цвет заголовка',
@@ -1122,6 +1230,8 @@ $t(common.appNameFull)
 
 Например, в структуре *кластер -> участок -> дерево*, если у вас есть атрибут *tree_species*, помеченный как **Уникальный**, вы можете иметь только одно дерево каждого вида внутри одного и того же *участка*.`,
     },
+    categoriesClonedFromSurvey: 'Следующие категории также были клонированы из исходного опроса: {{names}}',
+    taxonomiesClonedFromSurvey: 'Следующие таксономии также были клонированы из исходного опроса: {{names}}',
   },
 
   languagesEditor: {
@@ -1132,6 +1242,16 @@ $t(common.appNameFull)
     header: 'Таксономия',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Удалить таксономию {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Клонировать таксономию из другого опроса',
+      sourceSurvey: 'Исходный опрос',
+      sourceTaxonomy: 'Исходная таксономия',
+      loadingSurveys: 'Загрузка опросов...',
+      noSurveysAvailable: 'Нет доступных опросов',
+      selectSurveyFirst: 'Сначала выберите опрос',
+      loadingTaxonomies: 'Загрузка таксономий...',
+      noTaxonomiesAvailable: 'В выбранном опросе нет доступных таксономий',
+    },
     edit: {
       taxonomyListName: 'Название списка таксономии',
       taxaNotImported: 'Таксоны не импортированы',
@@ -1140,6 +1260,9 @@ $t(common.appNameFull)
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Синоним / Латинское название',
       extraPropsNotDefined: 'Дополнительные свойства не определены для этой таксономии',
+      importMissingPublishedTaxa:
+        '{{count}} опубликованный таксон/таксона не найден(ы) в импортируемом файле и оставлен(ы) без изменений. Коды: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (ещё {{extra}})',
     },
     taxaCount: 'Количество таксонов',
     vernacularNameLabel: 'Метка местного названия',
@@ -1150,11 +1273,24 @@ $t(common.appNameFull)
     batchImportCompleteSuccessfully: `{{importedCategories}} категорий успешно импортировано!
 {{insertedCategories}} новых
 {{updatedCategories}} обновленных`,
+    cloneFromAnotherSurvey: {
+      title: 'Клонировать категорию из другого опроса',
+      sourceSurvey: 'Исходный опрос',
+      sourceCategory: 'Исходная категория',
+      loadingSurveys: 'Загрузка опросов...',
+      noSurveysAvailable: 'Нет доступных опросов',
+      selectSurveyFirst: 'Сначала выберите опрос',
+      loadingCategories: 'Загрузка категорий...',
+      noCategoriesAvailable: 'В выбранном опросе нет доступных категорий',
+    },
     itemsCount: 'Количество элементов',
+    structure: 'Структура',
     types: {
       flat: 'Плоская',
       hierarchical: 'Иерархическая',
       reportingData: 'Отчетные данные',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Данные точек выборки',
     },
   },
 
@@ -1182,6 +1318,49 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Преобразовать эту категорию отчетных данных в простую категорию?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Преобразовать в данные точек выборки',
+      confirmMessage: `Преобразовать эту категорию в категорию данных точек выборки?
+
+Категория будет переименована в '${samplingPointDataCategoryName}', и к элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Преобразовать в категорию GeoPackage',
+      confirmMessage: `Преобразовать эту категорию в категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию GeoPackage в простую категорию?
+
+Дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию данных точек выборки в простую категорию?
+
+Имя категории будет очищено (вам нужно будет присвоить ей новое имя), а дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    geoPackageCategory: 'Это категория GeoPackage',
+    samplingPointDataCategoryType: 'Это категория данных точек выборки',
+    createCategory: {
+      menuLabel: 'Добавить категорию',
+      simple: 'Простая категория',
+      otherTypes: 'Другие типы категорий',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Категория данных точек выборки',
+      message: `Создать новую категорию данных точек выборки?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Категория GeoPackage',
+      message: `Создать новую категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
     deleteItem: 'Удалить элемент',
     level: {
       title: 'Уровень {{levelPosition}}',
@@ -1205,6 +1384,8 @@ $t(common.cantUndoWarning)`,
       title: 'Сводка импорта категорий',
     },
     reportingData: 'Отчетные данные',
+    exportToGeoPackage: 'Экспорт в GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} элемент(ов) без действительного местоположения были пропущены.',
     templateFor_samplingPointDataImport_csv: 'Шаблон для импорта данных точек выборки (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Шаблон для импорта данных точек выборки (Excel)',
   },

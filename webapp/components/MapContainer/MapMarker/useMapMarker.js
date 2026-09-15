@@ -15,9 +15,10 @@ export const useMapMarker = (props) => {
   const [state, setState] = useState({
     pointLatLon: null, // array with latitude and longitude values
     pointUpdated: null,
+    popupOpen: false,
   })
 
-  const { pointLatLon, pointUpdated } = state
+  const { pointLatLon, pointUpdated, popupOpen } = state
   const pointSrs = point?.srs
 
   const fromPointToLatLon = useCallback(
@@ -68,6 +69,12 @@ export const useMapMarker = (props) => {
           onPointUpdated({ lat, lng })
         }
       },
+      popupopen() {
+        setState((statePrev) => ({ ...statePrev, popupOpen: true }))
+      },
+      popupclose() {
+        setState((statePrev) => ({ ...statePrev, popupOpen: false }))
+      },
     }),
     [onPointUpdated]
   )
@@ -81,5 +88,5 @@ export const useMapMarker = (props) => {
     },
   })
 
-  return { markerEventHandlers, markerRef, pointLatLon, pointUpdated }
+  return { markerEventHandlers, markerRef, pointLatLon, popupOpen, pointUpdated }
 }

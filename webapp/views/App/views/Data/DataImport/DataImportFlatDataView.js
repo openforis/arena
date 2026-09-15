@@ -181,6 +181,7 @@ export const DataImportFlatDataView = () => {
           autoHide: true,
           errorKeyHeaderName: 'dataImportView:errors.rowNum',
           errorsExportFileName,
+          longRunningMessageKey: `dataImportView:jobs.${JobSerialized.getType(job)}.tooLong`,
           onComplete: (jobCompleted) => {
             setState((statePrev) => ({ ...statePrev, jobCompleted }))
           },

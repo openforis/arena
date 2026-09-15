@@ -122,4 +122,55 @@ export const deleteOldTempFiles = async ({ olderThanHours }) => {
   return oldFiles.length
 }
 
+const pendingImportPrefix = 'pendingImport/'
+const getPendingImportFileKey = ({ fileId }) => `${pendingImportPrefix}${fileId}`
+
+export const keepFileForLaterUse = async ({ fileId, filePath }) => {
+  const fileUuid = getPendingImportFileKey({ fileId })
+  const contentStream = FileUtils.createReadStream(filePath)
+  const contentLength = FileUtils.getFileSize(filePath)
+  await uploadFileContentAsStream({ fileUuid, contentStream, contentLength })
+  await FileUtils.deleteFileAsync(filePath)
+}
+
+// Downloads the kept file into a fresh LOCAL COPY and returns its path; the source S3 object at
+// pendingImport/<fileId> is left untouched and is only ever removed by the periodic temp-file TTL
+// sweep (deleteOldTempFiles), not by this function or its callers - same lifecycle the local file
+// on the fileSystem backend would have had.
+export const getKeptFilePath = async ({ fileId }) => {
+  const fileUuid = getPendingImportFileKey({ fileId })
+  let size
+  try {
+    size = await getFileSize({ fileUuid })
+  } catch (error) {
+    // HeadObjectCommand throws a synthesized "NotFound" error (HTTP 404) for a missing key, rather
+    // than resolving with a non-finite ContentLength; treat it the same as "not found". Any other
+    // error (bad credentials, network failure, permissions, etc.) should propagate.
+    if (error?.$metadata?.httpStatusCode === 404) {
+      return null
+    }
+    throw error
+  }
+  if (!Number.isFinite(size)) {
+    return null
+  }
+  const localFilePath = FileUtils.tempFilePath(FileUtils.newTempFileName())
+  const writeStream = FileUtils.createWriteStream(localFilePath)
+  try {
+    const contentStream = await getFileContentAsStream({ fileUuid })
+    await writeReadableToWritable({ readStream: contentStream, writeStream })
+    await endWriteStream(writeStream)
+    return localFilePath
+  } catch (error) {
+    writeStream.destroy(error)
+    await FileUtils.deleteFileAsync(localFilePath).catch(() => null)
+    throw error
+  }
+}
+
+export const deletePendingImportFileIfAny = async ({ fileId }) => {
+  const fileUuid = getPendingImportFileKey({ fileId })
+  await deleteFile({ fileNameOrPath: fileUuid })
+}
+
 export { uploadFileContent, uploadFileContentAsStream, getFileContentAsStream }

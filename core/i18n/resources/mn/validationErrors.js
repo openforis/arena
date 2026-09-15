@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Ангиллын нэр заагаагүй',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Энэ судалгаанд Дээж цэгийн өгөгдлийн ангилал аль хэдийн байна; зөвхөн нэг л байж болно.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Нийтлэгдсэн ангиллын элементүүдийг устгах боломжгүй. Импортлогдсон файлд дутуу элементүүд: {{deletedItemCodes}}',
@@ -51,6 +56,8 @@ export default {
     invalidParentItemOrder: 'Код {{parentItemCodes}}-тэй элемент нь хүүхдүүдийнхээ өмнө байх ёстой',
     nameDuplicate: 'Ижил нэртэй ангилал аль хэдийн байна: {{name}}',
     srsNotDefined: 'Судалгаанд код {{srs}}-тэй SRS тодорхойлогдоогүй',
+    uuidDuplicate:
+      'Энэ ангилал энэ судалгаанд аль хэдийн хуулагдсан байна (одоогийн нэр нь "{{name}}"). Дахин хуулах боломжгүй.',
   },
 
   dataImport: {
@@ -64,7 +71,7 @@ export default {
     invalidNumber: 'Багана {{headers}}-д хүчингүй тоо: {{value}}',
     invalidTaxonCode: 'Багана {{headers}}-д хүчингүй таксоны код: {{value}}',
     invalidTime:
-      'Багана {{headers}}-д хүчингүй цаг: {{value}}. Цагийг ЦАГ:МИНУТ форматаар байх ёстой. Жишээ нь: 09:45 эсвэл 16:30',
+      'Багана {{headers}}-д хүчингүй цаг: {{value}}. Цагийг ЦАГ:МИНУТ эсвэл ЦАГ:МИНУТ:СЕКУНД форматаар байх ёстой. Жишээ нь: 09:45, 16:30 эсвэл 09:45:30',
     missingRequiredHeaders: 'Шаардлагатай баганууд дутуу: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Утгуудыг шинэчлэхэд алдаа гарлаа: {{details}}',
     multipleRecordsMatchingKeys: 'Түлхүүр "{{keyValues}}"-д тохирох олон бичлэг олдов',
@@ -128,6 +135,11 @@ export default {
     countMaxInvalid: 'Хүчингүй "Хамгийн их тоо"',
     countMinInvalid: 'Хүчингүй "Хамгийн бага тоо"',
     readOnlyCannotHaveEditableIf: 'Зөвхөн унших зангилаа "Editable if" нөхцөлтэй байж болохгүй',
+    qualifierCannotHaveApplicableExpression:
+      'Квалификатор шинж чанар "$t(nodeDefEdit.advancedProps.relevantIf)" нөхцөлтэй байж болохгүй',
+    qualifierCannotHaveEditabilityRule: 'Квалификатор шинж чанар засварлах дүрэмтэй байж болохгүй',
+    qualifierCannotHaveDefaultValues: 'Квалификатор шинж чанар өгөгдмөл утгатай байж болохгүй',
+    qualifierCannotHaveValidations: 'Квалификатор шинж чанар баталгаажуулах дүрэмтэй байж болохгүй',
   },
 
   record: {
@@ -189,6 +201,12 @@ export default {
     scientificNameRequired: 'Шинжлэх ухааны нэр шаардлагатай',
     taxaEmpty: 'Хоосон таксонууд',
     vernacularNamesDuplicate: `'{{name}}' гэсэн нутгийн нэр давхцсан '{{lang}}' хэлээр`,
+  },
+
+  taxonomyImport: {
+    nameDuplicate: 'Ижил нэртэй таксоном аль хэдийн байна: {{name}}',
+    uuidDuplicate:
+      'Энэ таксоном энэ судалгаанд аль хэдийн хуулагдсан байна (одоогийн нэр нь "{{name}}"). Дахин хуулах боломжгүй.',
   },
 
   taxonomyImportJob: {

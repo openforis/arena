@@ -3,5 +3,8 @@
     "allow": [
       "Bash(npx tsc *)"
     ]
+  },
+  "enabledPlugins": {
+    "superpowers@superpowers-dev": true
   }
 }

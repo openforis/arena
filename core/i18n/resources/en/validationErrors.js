@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Category name not specified',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'A Sampling Point Data category already exists in this survey; there can be only one.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Cannot delete published category items. Items missing in imported file: {{deletedItemCodes}}',
@@ -51,6 +56,8 @@ export default {
     invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
     nameDuplicate: 'A category with the same name already exists: {{name}}',
     srsNotDefined: 'SRS with code {{srs}} not defined in survey',
+    uuidDuplicate:
+      'This category has already been cloned into this survey (currently named "{{name}}"). It cannot be cloned again.',
   },
 
   dataImport: {
@@ -64,7 +71,7 @@ export default {
     invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
     invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
     invalidTime:
-      'Invalid time in column {{headers}}: {{value}}. Time should be formatted as HH:mm. E.g. 09:45 or 16:30',
+      'Invalid time in column {{headers}}: {{value}}. Time should be formatted as HH:mm or HH:mm:ss. E.g. 09:45, 16:30 or 09:45:30',
     missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Error updating values: {{details}}',
     multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
@@ -128,6 +135,11 @@ export default {
     countMaxInvalid: 'Invalid "Max count"',
     countMinInvalid: 'Invalid "Min count"',
     readOnlyCannotHaveEditableIf: 'Read-only node cannot have "Editable if" condition',
+    qualifierCannotHaveApplicableExpression:
+      'Qualifier attribute cannot have "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
+    qualifierCannotHaveEditabilityRule: 'Qualifier attribute cannot have editability rules defined',
+    qualifierCannotHaveDefaultValues: 'Qualifier attribute cannot have default values',
+    qualifierCannotHaveValidations: 'Qualifier attribute cannot have validation rules defined',
   },
 
   record: {
@@ -190,6 +202,12 @@ export default {
     vernacularNamesDuplicate: `Duplicate vernacular name '{{name}}' for language '{{lang}}'`,
   },
 
+  taxonomyImport: {
+    nameDuplicate: 'A taxonomy with the same name already exists: {{name}}',
+    uuidDuplicate:
+      'This taxonomy has already been cloned into this survey (currently named "{{name}}"). It cannot be cloned again.',
+  },
+
   taxonomyImportJob: {
     duplicateExtraPropsColumns: 'Duplicate Extra Info columns: {{duplicateColumns}}',
     invalidExtraPropColumn: 'Invalid Extra Info column name "{{columnName}}": it cannot be a reserved word',
@@ -229,6 +247,8 @@ export default {
     invalidRequest: 'Invalid user access request',
     userAlreadyExisting: 'User with email {{email}} already existing',
     requestAlreadySent: `Access request for user with email {{email}} already sent`,
+    emailNotReachable:
+      'The confirmation email could not be delivered to {{email}}; please check that the address is correct',
     invalidReCaptcha: 'Invalid ReCaptcha',
   },
 
@@ -239,6 +259,14 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Role is required',
     surveyNameRequired: 'Survey name is required',
+  },
+
+  userGroupEdit: {
+    nameDuplicate: 'A group with the same name already exists: {{name}}',
+    qualifiersInvalid: 'One or more qualifiers have an invalid or duplicate key',
+    qualifierNameDuplicate: 'A qualifier with the same name already exists in this group: {{name}}',
+    qualifierNameInvalid: 'Invalid qualifier name',
+    qualifierNameRequired: 'Qualifier name is required',
   },
 
   userPasswordChange: {

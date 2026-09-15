@@ -9,6 +9,7 @@ import { Objects } from '@openforis/arena-core'
 import type { ValidationInstance } from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
+import { ButtonIconCancel } from '@webapp/components/buttons'
 
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
@@ -23,6 +24,7 @@ type NumberFormatProps = {
 }
 
 type Props = {
+  allowClear?: boolean
   autoFocus?: boolean
   className?: string
   disabled?: boolean
@@ -47,6 +49,7 @@ type Props = {
 
 export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const {
+    allowClear = false,
     autoFocus,
     className: classNameProp = null,
     disabled = false,
@@ -118,6 +121,11 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const rows = inputType === 'textarea' ? textAreaRows : undefined
   const placeholder = placeholderProp ? i18n.t(placeholderProp) : placeholderProp
 
+  const clearButtonVisible = allowClear && !disabled && !readOnly && Objects.isNotEmpty(value)
+  const endAdornment = clearButtonVisible ? (
+    <ButtonIconCancel className="form-input-clear-btn" label="common.clear" onClick={() => handleValueChange('')} />
+  ) : undefined
+
   return (
     <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
       {numberFormat ? (
@@ -136,7 +144,7 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           onFocus={onFocus}
           onValueChange={onFormattedValueChange}
           placeholder={placeholder ?? undefined}
-          slotProps={{ htmlInput: { 'data-testid': id } }}
+          slotProps={{ htmlInput: { 'data-testid': id }, input: { endAdornment } }}
           title={title === undefined ? undefined : String(title)}
           type={type === 'number' ? undefined : type}
           value={value}
@@ -148,6 +156,7 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
           autoFocus={autoFocus}
           className={className}
           disabled={disabled}
+          endAdornment={endAdornment}
           id={id ?? undefined}
           label={label}
           maxLength={maxLength ?? undefined}

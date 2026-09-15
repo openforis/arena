@@ -1,8 +1,12 @@
 import './dataQueryTable.scss'
+import { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { Query } from '@common/model/query'
 
+import * as ObjectUtils from '@core/objectUtils'
+
+import { useQuerySortableVariables } from '@webapp/components/DataQuery/store'
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useI18n } from '@webapp/store/system'
 
@@ -17,6 +21,8 @@ const DataQueryTable = (props) => {
   const codesVisible = DataExplorerSelectors.useCodesVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
   const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, setData })
+  const sortableVariables = useQuerySortableVariables({ query })
+  const sortableVariablesByUuid = useMemo(() => ObjectUtils.toUuidIndexedObj(sortableVariables), [sortableVariables])
 
   if (!colWidth) return null
 
@@ -33,10 +39,12 @@ const DataQueryTable = (props) => {
         codesVisible={codesVisible}
         colWidth={colWidth}
         colIndexWidth={colIndexWidth}
+        dataLoading={dataLoading}
         nodeDefCols={nodeDefCols}
         nodeDefLabelType={nodeDefLabelType}
         onChangeQuery={onChangeQuery}
         query={query}
+        sortableVariablesByUuid={sortableVariablesByUuid}
       />
 
       <div className="table__data-rows">

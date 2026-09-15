@@ -5,6 +5,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: $formHeaderHeight;
   height: $formHeaderHeight;
 }
 
@@ -12,13 +13,28 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .survey-form-header__path {
   margin-left: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  overflow-x: auto;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.survey-form-header__path-trail {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  max-width: 100%;
+  width: fit-content;
 }
 
 .survey-form-header__actions {
@@ -37,7 +53,7 @@
 .survey-form-header__options {
   display: flex;
   justify-content: flex-end;
-  flex: 1;
+  flex: 0 0 auto;
 }
 
 .survey-form-header__download-buttons {

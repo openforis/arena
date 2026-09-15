@@ -1,4 +1,5 @@
 @import 'leaflet/dist/leaflet.css';
+@import 'maplibre-gl/dist/maplibre-gl.css';
 
 .panel-right {
   &.map-panel > * {
@@ -52,6 +53,7 @@
         width: 100%;
         display: flex;
         align-items: center;
+        gap: 4px;
 
         .layer-selector-name {
           flex: 1;
@@ -61,7 +63,6 @@
         .layer-selector-button-bar {
           display: flex;
           align-items: center;
-          gap: 4px;
           width: auto;
 
           .layer-selector-earth-map-btn {

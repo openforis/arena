@@ -15,7 +15,6 @@ import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
 import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
-import LoadingBar from '../LoadingBar'
 import Visualizer from './Visualizer'
 import {
   DataQuerySelectedAttributes,
@@ -56,8 +55,6 @@ const DataQuery = () => {
           'no-content': !dataLoaded,
         })}
       >
-        {dataLoading && <LoadingBar />}
-
         <div className="table__header">
           <ButtonBar
             dataCount={count}
@@ -85,9 +82,16 @@ const DataQuery = () => {
           setData={setData}
         />
 
-        {dataLoaded && displayType === DataExplorerState.displayTypes.table && count && (
+        {!dataEmpty && displayType === DataExplorerState.displayTypes.table && count && (
           <div className="table__footer">
-            <Paginator count={count} limit={limit} offset={offset} setLimit={setLimit} setOffset={setOffset} />
+            <Paginator
+              count={count}
+              disabled={dataLoading}
+              limit={limit}
+              offset={offset}
+              setLimit={setLimit}
+              setOffset={setOffset}
+            />
           </div>
         )}
       </div>

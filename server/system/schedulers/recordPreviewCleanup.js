@@ -1,18 +1,27 @@
 import * as schedule from 'node-schedule'
 
+import { runWithClusterLock } from '@openforis/arena-server'
+
 import * as Log from '@server/log/log'
 
 const Logger = Log.getLogger('RecordPreviewCleanup')
 
 import * as RecordService from '@server/modules/record/service/recordService'
 
+const lockName = 'scheduler-record-preview-cleanup'
+
 const deleteRecordsPreview = async (olderThan24Hours = false) => {
   try {
-    Logger.debug('Deleting stale preview records')
+    await runWithClusterLock({
+      lockName,
+      fn: async () => {
+        Logger.debug('Deleting stale preview records')
 
-    const count = await RecordService.deleteRecordsPreview(olderThan24Hours)
+        const count = await RecordService.deleteRecordsPreview(olderThan24Hours)
 
-    Logger.debug(`${count} stale preview records deleted`)
+        Logger.debug(`${count} stale preview records deleted`)
+      },
+    })
   } catch (error) {
     Logger.error(`Error deleting stale preview records: ${error.toString()}`)
   }

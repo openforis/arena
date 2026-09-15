@@ -3,6 +3,7 @@ import * as Record from '@core/record/record'
 import * as DataTest from '../../utils/dataTest'
 import * as RB from '../../utils/recordBuilder'
 import { TestUtils } from '../../utils/testUtils'
+import { shiftDateModifiedIntoTheFuture } from '../../utils/recordUtils'
 
 import { getContextUser } from '../../integration/config/context'
 
@@ -99,6 +100,8 @@ describe('Records merge Test', () => {
         )
       )
     ).build()
+
+    record2 = shiftDateModifiedIntoTheFuture(record2)
   }, 10000)
 
   it('New entities added', async () => {

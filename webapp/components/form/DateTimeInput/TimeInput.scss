@@ -6,4 +6,8 @@
   .MuiPickersInputBase-root {
     height: 2rem;
   }
+
+  &--with-seconds {
+    width: 9rem;
+  }
 }

@@ -1,9 +1,12 @@
 import * as ObjectUtils from '@core/objectUtils'
 
+import AllSurveysDataMigrationJob from '@server/modules/survey/service/dataMigration/allSurveysDataMigrationJob'
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
 import ArenaMobileDataImportJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportJob'
+import ArenaMobileDataImportSummaryJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportSummaryJob'
 import CategoriesExportJob from '@server/modules/category/service/CategoriesExportJob'
 import CategoriesBatchImportJob from '@server/modules/category/service/CategoriesBatchImportJob'
+import CategoryGeoPackageExportJob from '@server/modules/category/service/CategoryGeoPackageExportJob'
 import CategoryImportJob from '@server/modules/category/service/categoryImportJob'
 import CollectImportJob from '@server/modules/collectImport/service/collectImport/collectImportJob'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
@@ -14,6 +17,8 @@ import DataSummaryExportJob from '@server/modules/dataExport/service/DataSummary
 import { GeoJsonDataExportJob } from '@server/modules/geo/service/GeoJsonDataExportJob'
 import MessageSendJob from '@server/modules/message/service/MessageSendJob'
 import NodeDefsTranslationJob from '@server/modules/survey/service/NodeDefsTranslationJob'
+import OdkImportJob from '@server/modules/odkImport/service/odkImport/odkImportJob'
+import OdkDataImportJob from '@server/modules/odkImport/service/odkImport/odkDataImportJob'
 import PersistOlapDataJob from '@server/modules/analysis/service/olap/PersistOlapDataJob'
 import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistResultsJob'
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
@@ -21,6 +26,7 @@ import RecordsValidationJob from '@server/modules/record/service/recordsValidati
 import SelectedRecordsExportJob from '@server/modules/record/service/selectedRecordsExportJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import SurveyActivityLogClearJob from '@server/modules/survey/service/surveyActivityLogClearJob'
+import SurveyCreatorJob from '@server/modules/survey/service/surveyCreateJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 import SurveyLabelsImportJob from '@server/modules/survey/service/surveyLabelsImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
@@ -32,10 +38,13 @@ import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJo
 import VaidationReportGenerationJob from '@server/modules/record/service/validationReportGenerationJob'
 
 const jobClasses = [
+  AllSurveysDataMigrationJob,
   ArenaImportJob,
   ArenaMobileDataImportJob,
+  ArenaMobileDataImportSummaryJob,
   CategoriesExportJob,
   CategoriesBatchImportJob,
+  CategoryGeoPackageExportJob,
   CategoryImportJob,
   CollectImportJob,
   CollectDataImportJob,
@@ -46,6 +55,8 @@ const jobClasses = [
   GeoJsonDataExportJob,
   MessageSendJob,
   NodeDefsTranslationJob,
+  OdkImportJob,
+  OdkDataImportJob,
   PersistOlapDataJob,
   PersistResultsJob,
   RecordsCloneJob,
@@ -53,6 +64,7 @@ const jobClasses = [
   SelectedRecordsExportJob,
   SurveyCloneJob,
   SurveyActivityLogClearJob,
+  SurveyCreatorJob,
   SurveyExportJob,
   SurveyLabelsImportJob,
   SurveyPublishJob,

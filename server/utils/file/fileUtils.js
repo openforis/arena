@@ -48,6 +48,7 @@ export const writeFile = async (path, data = '') => fsp.writeFile(path, data)
 export const appendFile = async (path, data = '') => fsp.appendFile(path, data)
 
 export const copyFile = async (src, dest) => fsp.copyFile(src, dest)
+export const renameFile = async (src, dest) => fsp.rename(src, dest)
 
 export const { createWriteStream, createReadStream } = fs
 
@@ -104,6 +105,7 @@ export const getBaseName = (file) => {
 
 export const deleteFile = (path) => fs.unlinkSync(path)
 export const deleteFileAsync = (path) => fsp.unlink(path)
+export const rename = (oldPath, newPath) => fsp.rename(oldPath, newPath)
 
 // ======= Temp Files
 export const newTempFileName = () => `${uuidv4()}.tmp`

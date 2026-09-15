@@ -33,6 +33,7 @@ export const useOnCreate = ({ newSurvey, setNewSurvey }) => {
               const { surveyId } = JobSerialized.getResult(_job)
               dispatch(SurveyActions.setActiveSurvey(surveyId, true, true))
             },
+            autoHide: true,
           })
         )
       } else if (survey) {

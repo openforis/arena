@@ -119,6 +119,42 @@ const insertTaxon = async ({ surveyId, taxon, backup = false, client = db }) => 
 export const insertTaxa = async ({ surveyId, taxa, backup = false, client = db }) =>
   client.batch(taxa.map((taxon) => insertTaxon({ surveyId, taxon, backup, client })))
 
+export const cloneTaxonomyFromSurvey = async ({ sourceSurveyId, targetSurveyId, taxonomyUuid }, client = db) => {
+  const sourceSchema = Schemata.getSchemaSurvey(sourceSurveyId)
+  const targetSchema = Schemata.getSchemaSurvey(targetSurveyId)
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.taxonomy (uuid, props, props_draft)
+    SELECT uuid, '{}'::jsonb, COALESCE(props, '{}'::jsonb) || COALESCE(props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.taxonomy
+    WHERE uuid = $1
+  `,
+    [taxonomyUuid]
+  )
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.taxon (uuid, taxonomy_uuid, props, props_draft)
+    SELECT uuid, taxonomy_uuid, '{}'::jsonb, COALESCE(props, '{}'::jsonb) || COALESCE(props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.taxon
+    WHERE taxonomy_uuid = $1
+  `,
+    [taxonomyUuid]
+  )
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.taxon_vernacular_name (uuid, taxon_uuid, props, props_draft)
+    SELECT vn.uuid, vn.taxon_uuid, '{}'::jsonb, COALESCE(vn.props, '{}'::jsonb) || COALESCE(vn.props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.taxon_vernacular_name vn
+    JOIN ${sourceSchema}.taxon t ON t.uuid = vn.taxon_uuid
+    WHERE t.taxonomy_uuid = $1
+  `,
+    [taxonomyUuid]
+  )
+}
+
 // ============== READ
 
 export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client = db) =>
@@ -606,6 +642,23 @@ export const updateTaxa = async (surveyId, taxa, client = db) =>
 
 export const updateTaxaProps = async ({ surveyId, taxa }, client = db) =>
   client.batch(taxa.map((taxon) => updateTaxonProps({ surveyId, taxon }, client)))
+
+// Finds taxa whose "extra" prop data has a pending draft change (i.e. props_draft has an "extra" key
+// whose value differs from the published one) - used to detect taxonomies whose extra prop values
+// (not just their extraPropsDefs schema) changed, so that node defs reading them via taxonProp can be
+// flagged for value recalculation on publish (see
+// server/modules/survey/service/publish/nodeDefExtraPropDependencyUtils.js). Filtered at the DB level
+// so surveys with no pending taxon extra-value edits (the common case) never pull taxon data into
+// memory.
+export const fetchTaxaWithChangedExtraValues = async ({ surveyId }, client = db) =>
+  client.any(
+    `SELECT t.taxonomy_uuid AS "taxonomyUuid",
+            t.props->'extra' AS "extraPublished",
+            t.props_draft->'extra' AS "extraDraft"
+     FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon t
+     WHERE t.props_draft ? 'extra'
+       AND (t.props_draft -> 'extra') IS DISTINCT FROM (t.props -> 'extra')`
+  )
 
 // ============== DELETE
 

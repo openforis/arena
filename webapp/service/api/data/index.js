@@ -31,11 +31,18 @@ export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
   const list = await fetchRecordsSummary({ surveyId, cycle, recordUuid })
   return list?.[0]
 }
-export const getRecordDocxExportUrl = ({ surveyId, recordUuid, lang }) =>
-  `/api/survey/${surveyId}/record/${recordUuid}/export/docx?${new URLSearchParams({ lang })}`
-
-export const getRecordPdfExportUrl = ({ surveyId, recordUuid, lang }) =>
-  `/api/survey/${surveyId}/record/${recordUuid}/export/pdf?${new URLSearchParams({ lang })}`
+export const fetchRecordAndNodes = async ({ surveyId, recordUuid }) => {
+  const { data: record } = await axios.get(`/api/survey/${surveyId}/record`, { params: { recordUuid } })
+  return record
+}
+export {
+  getRecordPrintableExportUrl,
+  getRecordDocxExportUrl,
+  getRecordPdfExportUrl,
+  PrintableExportFormats,
+  PrintableExportScopes,
+  PrintOrientations,
+} from './recordPrintableExportUrl'
 
 // ==== RECORD FILE
 export const getRecordNodeFileUrl = ({ surveyId, node }) =>
@@ -58,6 +65,14 @@ export const startCollectRecordsImportJob = async ({
   const formData = objectToFormData({ file, deleteAllRecords, cycle, forceImport })
 
   const { data } = await axios.post(`/api/survey/${surveyId}/data-import/collect`, formData, { onUploadProgress })
+  const { job } = data
+  return job
+}
+
+export const startOdkDataImportJob = async ({ surveyId, file, cycle, onUploadProgress } = {}) => {
+  const formData = objectToFormData({ file, cycle })
+
+  const { data } = await axios.post(`/api/odk-import/survey/${surveyId}`, formData, { onUploadProgress })
   const { job } = data
   return job
 }
@@ -120,20 +135,33 @@ export const startDataImportFromCsvJob = ({
 
 export const startDataImportFromArenaJob = ({
   surveyId,
-  cycle,
   conflictResolutionStrategy,
   file,
   fileId,
   chunkSize,
   onUploadProgress,
   dryRun = false,
+  skipMissingFiles = false,
   startFromChunk = 1,
+  reuseUploadedFile = false,
+  selectedRecordsUuids = undefined,
 }) => {
   const commonParameters = {
     fileId,
-    cycle,
     dryRun,
     conflictResolutionStrategy,
+    skipMissingFiles,
+  }
+  if (reuseUploadedFile) {
+    // confirming an import after previewing it: the file was already uploaded and kept server-side
+    const promise = axios
+      .post(`/api/mobile/survey/${surveyId}`, {
+        ...commonParameters,
+        reuseUploadedFile: true,
+        selectedRecordsUuids,
+      })
+      .then(({ data }) => data.job)
+    return { promise }
   }
   if (chunkSize > 0) {
     let fileProcessor = null
@@ -169,6 +197,58 @@ export const startDataImportFromArenaJob = ({
     const promise = axios.post(`/api/mobile/survey/${surveyId}`, formData, { onUploadProgress })
     return { promise }
   }
+}
+
+export const startArenaImportSummaryJob = ({
+  surveyId,
+  conflictResolutionStrategy,
+  file,
+  fileId,
+  chunkSize,
+  onUploadProgress,
+  startFromChunk = 1,
+}) => {
+  const commonParameters = { fileId, conflictResolutionStrategy }
+  if (chunkSize > 0) {
+    let fileProcessor = null
+    const promise = new Promise((resolve, reject) => {
+      fileProcessor = new FileProcessor({
+        file,
+        chunkSize,
+        chunkProcessor: async ({ chunk, totalChunks, content, totalFileSize }) => {
+          const formData = objectToFormData({
+            ...commonParameters,
+            file: content,
+            chunk,
+            totalChunks,
+            totalFileSize,
+          })
+          const { data } = await axios.post(`/api/mobile/survey/${surveyId}/import-summary`, formData, {
+            onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
+          })
+          return data
+        },
+        onComplete: (data) => {
+          resolve(data.job)
+        },
+        onError: (error) => {
+          reject(error)
+        },
+      })
+      fileProcessor.start(startFromChunk)
+    })
+    return { promise, processor: fileProcessor }
+  } else {
+    const formData = objectToFormData({ ...commonParameters, file })
+    const promise = axios
+      .post(`/api/mobile/survey/${surveyId}/import-summary`, formData, { onUploadProgress })
+      .then(({ data }) => data.job)
+    return { promise }
+  }
+}
+
+export const cancelArenaImportSummary = async ({ surveyId, fileId }) => {
+  await axios.delete(`/api/mobile/survey/${surveyId}/import-summary/${fileId}`)
 }
 
 export const getDataImportFromCsvTemplateUrl = ({ surveyId }) =>
@@ -256,11 +336,22 @@ export const mergeRecords = async ({ surveyId, sourceRecordUuid, targetRecordUui
 }
 
 // ==== Validation Report
-export const startValidationReportGeneration = async ({ surveyId, cycle, recordUuid, lang }) => {
+export const startValidationReportGeneration = async ({
+  surveyId,
+  cycle,
+  recordUuid,
+  lang,
+  query,
+  attributeDefUuids,
+  messageTypeKeys,
+}) => {
   const { data } = await axios.post(`/api/survey/${surveyId}/validationReport/start-export`, {
     cycle,
     recordUuid,
     lang,
+    query,
+    attributeDefUuids,
+    messageTypeKeys,
   })
   return data
 }

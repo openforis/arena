@@ -3,6 +3,7 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { TimeInput } from '@webapp/components/form/DateTimeInput'
 
@@ -30,7 +31,12 @@ const NodeDefTime = (props) => {
 
   return (
     <div className="survey-form__node-def-time">
-      <TimeInput disabled={edit || !canEditRecord || readOnly} onChange={onChange} value={timeStr} />
+      <TimeInput
+        disabled={edit || !canEditRecord || readOnly}
+        onChange={onChange}
+        value={timeStr}
+        withSeconds={NodeDef.isSecondsIncluded(nodeDef)}
+      />
     </div>
   )
 }

@@ -11,7 +11,7 @@ import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 
-import { State } from './store'
+import { State, useNodeDefEditReadOnly } from './store'
 import { NodeDefSingleExpressionProp } from './ExpressionsProp/NodeDefSingleExpressionProp'
 
 const fileTypes = Object.keys(NodeDef.fileTypeValues).map((key) => ({
@@ -23,6 +23,7 @@ const FileProps = (props) => {
   const { state, Actions } = props
 
   const i18n = useI18n()
+  const readOnly = useNodeDefEditReadOnly()
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
@@ -50,7 +51,7 @@ const FileProps = (props) => {
       <FormItem label="nodeDefEdit.fileProps.maxFileSize">
         <Input
           className="max-file-size"
-          disabled={false}
+          disabled={readOnly}
           placeholder="nodeDefEdit.fileProps.maxFileSize"
           value={NodeDef.getMaxFileSize(nodeDef)}
           type="number"
@@ -74,10 +75,16 @@ const FileProps = (props) => {
       </FormItem>
       <FormItem label="nodeDefEdit.fileProps.fileType">
         <div className="form-item_body">
-          <ButtonGroup selectedItemKey={NodeDef.getFileType(nodeDef)} onChange={selectFileType} items={fileTypes} />
+          <ButtonGroup
+            disabled={readOnly}
+            selectedItemKey={NodeDef.getFileType(nodeDef)}
+            onChange={selectFileType}
+            items={fileTypes}
+          />
           {NodeDef.canShowGeotagInformation(nodeDef) && (
             <Checkbox
               checked={NodeDef.isGeotagInformationShown(nodeDef)}
+              disabled={readOnly}
               label="nodeDefEdit.fileProps.showGeotagInformation"
               onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.geotagInformationShown, value })}
             />

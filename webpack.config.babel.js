@@ -61,6 +61,9 @@ const plugins = [
         RECAPTCHA_ENABLED: process.env.RECAPTCHA_ENABLED,
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
         RSTUDIO_DOWNLOAD_SERVER_URL: JSON.stringify(process.env.RSTUDIO_DOWNLOAD_SERVER_URL),
+        EMAIL_FROM_RESOLVED: JSON.stringify(
+          process.env.EMAIL_FROM || process.env.ADMIN_EMAIL || process.env.EMAIL_AUTH_USER
+        ),
       },
     },
   }),
@@ -115,7 +118,7 @@ const webPackConfig = {
     proxy: [
       {
         // Proxy all server-served routes:
-        context: ['/img', '/api', '/auth', '/socket.io', 'sockjs-node'],
+        context: ['/img', '/geo', '/api', '/auth', '/socket.io', 'sockjs-node'],
         target: 'http://localhost:9090',
       },
       {

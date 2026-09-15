@@ -13,7 +13,7 @@ import ButtonGroup, { toButtonGroupItems } from '@webapp/components/form/buttonG
 
 import { headerColorRgbCodesByColor } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
-import { State } from './store'
+import { State, useNodeDefEditReadOnly } from './store'
 
 const headerColorItems = ({ i18n }) =>
   toButtonGroupItems({
@@ -29,6 +29,7 @@ const FormHeaderProps = (props) => {
   const { state, Actions } = props
 
   const i18n = useI18n()
+  const readOnly = useNodeDefEditReadOnly()
 
   const nodeDef = State.getNodeDef(state)
 
@@ -47,6 +48,7 @@ const FormHeaderProps = (props) => {
     <FormItem label={i18n.t('nodeDefEdit.formHeaderProps.headerColorLabel')}>
       <ButtonGroup
         className="form-header-color-btn-group"
+        disabled={readOnly}
         selectedItemKey={headerColor}
         onChange={onHeaderColorChange}
         items={items}

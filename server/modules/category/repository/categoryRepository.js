@@ -86,6 +86,42 @@ export const insertItems = async ({ surveyId, items, backup = false }, client = 
   )
 }
 
+export const cloneCategoryFromSurvey = async ({ sourceSurveyId, targetSurveyId, categoryUuid }, client = db) => {
+  const sourceSchema = getSurveyDBSchema(sourceSurveyId)
+  const targetSchema = getSurveyDBSchema(targetSurveyId)
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.category (uuid, props, props_draft)
+    SELECT uuid, '{}'::jsonb, COALESCE(props, '{}'::jsonb) || COALESCE(props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.category
+    WHERE uuid = $1
+  `,
+    [categoryUuid]
+  )
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.category_level (uuid, category_uuid, index, props, props_draft)
+    SELECT uuid, category_uuid, index, '{}'::jsonb, COALESCE(props, '{}'::jsonb) || COALESCE(props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.category_level
+    WHERE category_uuid = $1
+  `,
+    [categoryUuid]
+  )
+
+  await client.none(
+    `
+    INSERT INTO ${targetSchema}.category_item (uuid, level_uuid, parent_uuid, props, props_draft)
+    SELECT i.uuid, i.level_uuid, i.parent_uuid, '{}'::jsonb, COALESCE(i.props, '{}'::jsonb) || COALESCE(i.props_draft, '{}'::jsonb)
+    FROM ${sourceSchema}.category_item i
+    JOIN ${sourceSchema}.category_level l ON l.uuid = i.level_uuid
+    WHERE l.category_uuid = $1
+  `,
+    [categoryUuid]
+  )
+}
+
 // ============== READ
 
 const _getFetchCategoriesAndLevelsQuery = ({
@@ -358,7 +394,7 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
 }
 
 const _getSearchQueryParam = ({ searchValue }) =>
-  `${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
+  `%${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
 const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
@@ -615,6 +651,24 @@ export const updateItemsProps = async ({ surveyId, items, draftProps = true }, c
     )
   )
 }
+
+// Finds category items whose "extra" prop data has a pending draft change (i.e. props_draft has an
+// "extra" key whose value differs from the published one) - used to detect categories whose extra
+// prop values (not just their extraDef schema) changed, so that node defs reading them via
+// categoryItemProp can be flagged for value recalculation on publish (see
+// server/modules/survey/service/publish/nodeDefExtraPropDependencyUtils.js). Filtered at the DB level
+// so surveys with no pending item extra-value edits (the common case) never pull item data into
+// memory.
+export const fetchCategoryItemsWithChangedExtraValues = async ({ surveyId }, client = db) =>
+  client.any(
+    `SELECT cl.category_uuid AS "categoryUuid",
+            ci.props->'extra' AS "extraPublished",
+            ci.props_draft->'extra' AS "extraDraft"
+     FROM ${getSurveyDBSchema(surveyId)}.category_item ci
+     JOIN ${getSurveyDBSchema(surveyId)}.category_level cl ON cl.uuid = ci.level_uuid
+     WHERE ci.props_draft ? 'extra'
+       AND (ci.props_draft -> 'extra') IS DISTINCT FROM (ci.props -> 'extra')`
+  )
 
 // ============== DELETE
 

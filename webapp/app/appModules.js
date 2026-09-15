@@ -39,6 +39,11 @@ export const appModules = {
     path: 'home',
     icon: 'home2',
   },
+  dashboard: {
+    key: 'dashboard',
+    path: 'dashboard',
+    icon: 'stats-bars',
+  },
   designer: {
     key: 'designer',
     path: 'designer',
@@ -64,6 +69,11 @@ export const appModules = {
     path: 'messages',
     icon: 'envelop',
   },
+  jobs: {
+    key: 'jobMonitor',
+    path: 'jobMonitor',
+    icon: 'cogs',
+  },
   help: {
     key: 'help',
     path: 'help',
@@ -74,9 +84,9 @@ export const appModules = {
 // ==== Inner modules
 
 export const homeModules = {
-  dashboard: {
-    key: 'dashboard',
-    path: 'dashboard',
+  landing: {
+    key: 'landing',
+    path: 'landing',
   },
   surveyInfo: {
     key: 'surveyInfo',
@@ -214,6 +224,18 @@ export const userModules = {
   usersAccessRequest: {
     key: 'usersAccessRequest',
     path: 'usersAccessRequest',
+  },
+  userGroups: {
+    key: 'userGroup_plural',
+    path: 'userGroups',
+  },
+  userGroupNew: {
+    key: 'userGroupNew',
+    path: 'userGroupNew',
+  },
+  userGroup: {
+    key: 'userGroup',
+    path: 'userGroup',
   },
 }
 

@@ -49,6 +49,11 @@
   }
 }
 
+.form-input-clear-btn {
+  min-width: unset;
+  padding: 0;
+}
+
 .input-text {
   .MuiInputBase-root.Mui-disabled {
     background-color: #f5f5f5;

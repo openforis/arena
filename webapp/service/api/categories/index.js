@@ -88,6 +88,14 @@ export const startExportAllCategoriesJob = async ({ surveyId, fileFormat, draft 
   return { job }
 }
 
+export const startExportCategoryToGeoPackageJob = async ({ surveyId, categoryUuid, draft = true }) => {
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/export/geopackage`, { draft })
+
+  return { job }
+}
+
 export const startCategoriesBatchImportJob = async ({ surveyId, file }) => {
   const formData = objectToFormData({ file })
   const {
@@ -101,6 +109,17 @@ export const createCategory = async ({ surveyId }) => {
   const {
     data: { category },
   } = await axios.post(`/api/survey/${surveyId}/categories`, Category.newCategory())
+
+  return category
+}
+
+export const cloneCategoryFromSurvey = async ({ surveyId, sourceSurveyId, sourceCategoryUuid }) => {
+  const {
+    data: { category },
+  } = await axios.post(`/api/survey/${surveyId}/categories/clone-from-survey`, {
+    sourceSurveyId,
+    sourceCategoryUuid,
+  })
 
   return category
 }
@@ -161,6 +180,22 @@ export const convertToReportingDataCategory = async ({ surveyId, categoryUuid })
   const {
     data: { category },
   } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/convertToReportingData`)
+
+  return category
+}
+
+export const convertToSamplingPointDataCategory = async ({ surveyId, categoryUuid, locked = true }) => {
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/convertToSamplingPointData`, { locked })
+
+  return category
+}
+
+export const convertToGeoPackageCategory = async ({ surveyId, categoryUuid, locked = true }) => {
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/convertToGeoPackage`, { locked })
 
   return category
 }

@@ -101,7 +101,17 @@ export const getFormPageParentNode = (nodeDef) => (state) => {
     }
 
     const parentNodeUuid = getFormPageNodeUuid(nodeDefParent)(state)
-    return Record.getNodeByUuid(parentNodeUuid)(record)
+    if (parentNodeUuid) {
+      const mappedParent = Record.getNodeByUuid(parentNodeUuid)(record)
+      if (mappedParent) return mappedParent
+    }
+
+    // Fallback only for single parents: using [0] on a multiple entity would
+    // bind the form to an arbitrary instance. Multiples must be in pagesUuidMap.
+    if (NodeDef.isMultiple(nodeDefParent)) return null
+
+    const parentNodes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDefParent))(record)
+    return parentNodes?.[0] ?? null
   }
 
   return null

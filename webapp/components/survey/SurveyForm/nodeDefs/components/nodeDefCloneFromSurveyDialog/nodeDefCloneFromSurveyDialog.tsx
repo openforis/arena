@@ -1,3 +1,4 @@
+import '../../../../cloneFromSurveyDialog.scss'
 import './nodeDefCloneFromSurveyDialog.scss'
 
 import React, { useCallback, useState } from 'react'
@@ -11,9 +12,8 @@ import { Button, ButtonCancel } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 
-import { SurveyEntitiesTreeView, SourceEntitySelection } from './surveyEntitiesTreeView'
+import { SurveyNodeDefsTreeView, SourceNodeDefSelection } from './surveyNodeDefsTreeView'
 
 type ConfirmParams = {
   sourceSurveyId: number | string
@@ -34,42 +34,41 @@ export const NodeDefCloneFromSurveyDialog = (props: NodeDefCloneFromSurveyDialog
   const { currentNodeDef, onClose, onConfirm } = props
 
   const cycle = useSurveyCycleKey()
-  const i18n = useI18n()
   const surveyCurrent = useSurvey()
 
   const surveyCurrentHierarchy = Survey.getHierarchy()(surveyCurrent)
 
-  const [sourceEntitySelection, setSourceEntitySelection] = useState<SourceEntitySelection | null>(null)
+  const [sourceNodeDefSelection, setSourceNodeDefSelection] = useState<SourceNodeDefSelection | null>(null)
   const [targetEntityDefUuid, setTargetEntityDefUuid] = useState<string>(NodeDef.getUuid(currentNodeDef))
 
   const onConfirmClick = useCallback(() => {
     onConfirm({
-      sourceSurveyId: sourceEntitySelection!.surveyId,
-      sourceNodeDefUuid: sourceEntitySelection!.nodeDefUuid,
+      sourceSurveyId: sourceNodeDefSelection!.surveyId,
+      sourceNodeDefUuid: sourceNodeDefSelection!.nodeDefUuid,
       targetParentNodeDefUuid: targetEntityDefUuid,
     })
-  }, [onConfirm, sourceEntitySelection, targetEntityDefUuid])
+  }, [onConfirm, sourceNodeDefSelection, targetEntityDefUuid])
 
-  const confirmButtonDisabled = !sourceEntitySelection || !targetEntityDefUuid
+  const confirmButtonDisabled = !sourceNodeDefSelection || !targetEntityDefUuid
 
   return (
     <Modal
-      className="survey-form__node-def-clone-from-survey-dialog"
+      className="survey-form__node-def-clone-from-survey-dialog clone-from-survey-dialog"
       onClose={onClose}
       showCloseButton
-      title={i18n.t('surveyForm.cloneFromAnotherSurvey.title')}
+      title="surveyForm:cloneFromAnotherSurvey.title"
     >
       <ModalBody>
-        <FormItem label={<span>Source entity</span>}>
+        <FormItem label="surveyForm:cloneFromAnotherSurvey.sourceNode">
           <div className="clone-from-survey-dialog__tree-view-container">
-            <SurveyEntitiesTreeView
-              selectedSourceEntity={sourceEntitySelection}
-              onSourceEntitySelectionChange={setSourceEntitySelection}
+            <SurveyNodeDefsTreeView
+              selectedSourceNodeDef={sourceNodeDefSelection}
+              onSourceNodeDefSelectionChange={setSourceNodeDefSelection}
             />
           </div>
         </FormItem>
 
-        <FormItem label={<span>Target entity (current survey)</span>}>
+        <FormItem label="surveyForm:cloneFromAnotherSurvey.targetEntityCurrentSurvey">
           <EntitySelector
             filterFn={(entityDef: object) => targetEntityFilterFn({ cycle, entityDef })}
             hierarchy={surveyCurrentHierarchy}

@@ -1,7 +1,8 @@
 import { TestId, getSelector } from '../../../webapp/utils/testId'
+import { BASE_URL } from '../config'
 import { getSurveyZipPath } from '../paths'
 import { survey, surveyImport } from '../mock/survey'
-import { gotoHome, gotoSurveyCreate, gotoSurveyList } from './_navigation'
+import { gotoDashboard, gotoSurveyCreate, gotoSurveyList } from './_navigation'
 import {
   exportSurvey,
   verifyCategories,
@@ -39,10 +40,12 @@ export default () =>
       const json = await response.json()
 
       surveyImport.name = json.survey.props.name
-      await page.reload()
+      // Import now lands on landing; open dashboard so export controls are ready
+      // (previously home defaulted to dashboard after import).
+      await page.goto(`${BASE_URL}/app/dashboard/`)
     })
 
-    gotoHome()
+    gotoDashboard()
 
     exportSurvey(surveyImport)
 

@@ -21,6 +21,8 @@ export default {
     invalidNodeInRecord:
       'Nodo inválido en el registro "{{recordUuid}}", nodo "{{nodeUuid}}" con la definición de nodo "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
     noRecordsFound: 'No se encontraron registros en el archivo de importación o formato de archivo incorrecto',
+    pendingImportFileNotFoundOrExpired:
+      'No se puede encontrar el archivo subido anteriormente; puede haber expirado. Por favor, súbalo de nuevo.',
     recordOwnedByAnotherUser:
       'No se puede actualizar el registro "{{recordKeyValues}}" porque pertenece a otro usuario',
   },
@@ -32,10 +34,12 @@ export default {
   functionHasTooFewArguments: 'La función {{fnName}} requiere al menos {{minArity}} (obtenido {{numArgs}})',
   functionHasTooManyArguments: 'La función {{fnName}} solo acepta un máximo de {{maxArity}} (obtenido {{numArgs}})',
   generic: 'Error inesperado: {{text}}',
+  geoWhispApiError: 'El servicio Whisp no está disponible temporalmente.',
   importingDataIntoWrongCollectSurvey:
     'Importando datos en la encuesta Collect incorrecta. URI esperado: {{collectSurveyUri}}',
   invalidType: 'Tipo no válido {{type}}',
   jobCanceledOrErrorsFound: 'Trabajo cancelado o errores encontrados; transacción de reversión',
+  jobOrphanedOnRestart: 'El trabajo se interrumpió por un reinicio del servidor. Vuelva a intentarlo.',
   paramIsRequired: 'El parámetro {{param}} es obligatorio',
   unableToFindParent: 'No se puede encontrar el padre de {{name}}',
   unableToFindNode: 'No se puede encontrar el nodo con el nombre {{name}}',
@@ -52,6 +56,7 @@ export default {
   sessionExpiredRefreshPage: 'La sesión podría haber caducado.\nIntente actualizar la página.',
   survey: {
     nodeDefNameNotFound: 'Definición de nodo no encontrada: {{name}}',
+    dataMigrationInProgress: 'Esta encuesta se está actualizando; vuelva a intentarlo en breve.',
   },
   unsupportedFunctionType: 'Tipo de función no compatible: {{exprType}}',
   userHasPendingInvitation:

@@ -1,6 +1,8 @@
 export default {
   ActivityLogImportJob: 'Үйл ажиллагааны бүртгэл импортлох',
-  ArenaMobileDataImportJob: 'Arena Mobile өгөгдөл импортлох',
+  AllSurveysDataMigrationJob: 'Бүх судалгааны өгөгдлийн шилжилт',
+  ArenaMobileDataImportJob: 'Arena өгөгдөл импортлох',
+  ArenaMobileDataImportSummaryJob: 'Arena өгөгдөл импортлох хураангуй',
   CategoriesImportJob: 'Ангилал импортлох',
   CategoriesValidationJob: 'Ангилал баталгаажуулах',
   CategoriesBatchImportJob: 'Ангилал импортлох',
@@ -24,7 +26,8 @@ export default {
   NodeDefsTranslationJob: 'Зангилааны тодорхойлолтын шошгыг орчуулах',
   NodeDefsImportJob: 'Зангилааны тодорхойлолт импортлох',
   NodeDefsValidationJob: 'Зангилааны тодорхойлолт баталгаажуулах',
-  chainsCyclesCheckJob: 'Гинжин хэлхээний мөчлөгийг шалгах',
+  OdkImportJob: 'ODK импортлох',
+  ChainsCyclesCheckJob: 'Гинжин хэлхээний мөчлөгийг шалгах',
   RecordCheckJob: 'Бичлэг шалгах',
   RecordsCloneJob: 'Бичлэг хуулах',
   RecordsImportJob: 'Бичлэг импортлох',
@@ -69,6 +72,7 @@ export default {
   // survey backup
   SurveyInfoExportJob: 'Судалгааны мэдээлэл экспортлох',
   CategoriesExportJob: 'Ангилал экспортлох',
+  CategoryGeoPackageExportJob: 'Ангиллыг GeoPackage рүү экспортлох',
   TaxonomiesExportJob: 'Таксоном экспортлох',
   RecordsExportJob: 'Бичлэг экспортлох',
   RecordFilesExportJob: 'Бичлэгийн файлуудыг экспортлох',

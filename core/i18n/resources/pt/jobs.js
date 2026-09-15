@@ -1,6 +1,8 @@
 export default {
   ActivityLogImportJob: 'Importação de log de atividades',
-  ArenaMobileDataImportJob: 'Importação de dados do Arena Mobile',
+  AllSurveysDataMigrationJob: 'Migração de dados de todos os inventários',
+  ArenaMobileDataImportJob: 'Importação de dados do Arena',
+  ArenaMobileDataImportSummaryJob: 'Resumo da importação de dados do Arena',
   CategoriesImportJob: 'Importação de categorias',
   CategoriesValidationJob: 'Validação de categorias',
   CategoriesBatchImportJob: 'Importação de categorias',
@@ -24,7 +26,8 @@ export default {
   NodeDefsTranslationJob: 'Tradução de rótulos de definições de nós',
   NodeDefsImportJob: 'Importação de definições de nós',
   NodeDefsValidationJob: 'Validação de definições de nós',
-  chainsCyclesCheckJob: `Verificação de ciclos das cadeias`,
+  OdkImportJob: 'Importação do ODK',
+  ChainsCyclesCheckJob: `Verificação de ciclos das cadeias`,
   RecordCheckJob: 'Verificação de registro',
   RecordsCloneJob: 'Clonagem de registros',
   RecordsImportJob: 'Importação de registros',
@@ -69,6 +72,7 @@ export default {
   // survey backup
   SurveyInfoExportJob: 'Exportação de informações do inventário',
   CategoriesExportJob: 'Exportação de categorias',
+  CategoryGeoPackageExportJob: 'Exportação de categoria para GeoPackage',
   TaxonomiesExportJob: 'Exportação de taxonomias',
   RecordsExportJob: 'Exportação de registros',
   RecordFilesExportJob: 'Exportação de arquivos de registros',

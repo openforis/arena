@@ -1,4 +1,3 @@
-import * as PromiseUtils from '../../../core/promiseUtils'
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { survey, survey2, surveyFromTemplate, surveyImport } from '../mock/survey'
 import { gotoSurveyList } from './_navigation'
@@ -34,7 +33,9 @@ export default () =>
     gotoSurveyList()
 
     test('Delete surveys', async () => {
-      await PromiseUtils.each([survey2, surveyImport, surveyFromTemplate, survey], deleteSurvey)
+      for (const surveyToDelete of [survey2, surveyImport, surveyFromTemplate, survey]) {
+        await deleteSurvey(surveyToDelete)
+      }
     }, 30000)
 
     test('Verify survey list empty', async () => {

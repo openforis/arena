@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Имя категории не указано',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Категория данных точек выборки уже существует в этом опросе; может быть только одна.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Невозможно удалить опубликованные элементы категории. Элементы, отсутствующие в импортированном файле: {{deletedItemCodes}}',
@@ -51,6 +56,8 @@ export default {
     invalidParentItemOrder: 'Элемент с кодами {{parentItemCodes}} должен стоять перед своими дочерними элементами',
     nameDuplicate: 'Категория с таким именем уже существует: {{name}}',
     srsNotDefined: 'SRS с кодом {{srs}} не определено в опросе',
+    uuidDuplicate:
+      'Эта категория уже была клонирована в этот опрос (в настоящее время называется "{{name}}"). Её нельзя клонировать снова.',
   },
 
   dataImport: {
@@ -64,7 +71,7 @@ export default {
     invalidNumber: 'Неверное число в столбце {{headers}}: {{value}}',
     invalidTaxonCode: 'Неверный код в столбце {{headers}}: {{value}}',
     invalidTime:
-      'Неверное время в столбце {{headers}}: {{value}}. Время должно быть отформатировано как HH:mm. Например, 09:45 или 16:30',
+      'Неверное время в столбце {{headers}}: {{value}}. Время должно быть отформатировано как HH:mm или HH:mm:ss. Например, 09:45, 16:30 или 09:45:30',
     missingRequiredHeaders: 'Отсутствуют обязательные столбцы: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Ошибка обновления значений: {{details}}',
     multipleRecordsMatchingKeys: 'Найдено несколько записей, соответствующих ключам "{{keyValues}}"',
@@ -129,6 +136,11 @@ export default {
     countMaxInvalid: 'Неверное "Максимальное количество"',
     countMinInvalid: 'Неверное "Минимальное количество"',
     readOnlyCannotHaveEditableIf: 'Узел только для чтения не может иметь условие "Editable if"',
+    qualifierCannotHaveApplicableExpression:
+      'Атрибут-квалификатор не может иметь условие "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    qualifierCannotHaveEditabilityRule: 'Атрибут-квалификатор не может иметь правил редактируемости',
+    qualifierCannotHaveDefaultValues: 'Атрибут-квалификатор не может иметь значения по умолчанию',
+    qualifierCannotHaveValidations: 'Атрибут-квалификатор не может иметь правил проверки',
   },
 
   record: {
@@ -189,6 +201,12 @@ export default {
     scientificNameRequired: 'Научное название обязательно',
     taxaEmpty: 'Пустые таксоны',
     vernacularNamesDuplicate: `Дублирующее местное название '{{name}}' для языка '{{lang}}'`,
+  },
+
+  taxonomyImport: {
+    nameDuplicate: 'Таксономия с таким именем уже существует: {{name}}',
+    uuidDuplicate:
+      'Эта таксономия уже была клонирована в этот опрос (в настоящее время называется "{{name}}"). Её нельзя клонировать снова.',
   },
 
   taxonomyImportJob: {

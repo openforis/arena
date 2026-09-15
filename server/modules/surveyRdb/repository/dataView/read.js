@@ -35,6 +35,14 @@ const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColumnName(ancestorMultipleEntityDef)
 }
 
+/**
+ * Determines the Postgres TO_CHAR format to use to format a time column value.
+ * @param {object} nodeDefCol - The time node definition column.
+ * @returns {string} The TO_CHAR format, including seconds if the node definition includes them.
+ */
+export const getTimeColumnToCharFormat = (nodeDefCol) =>
+  NodeDef.isSecondsIncluded(nodeDefCol) ? 'HH24:MI:SS' : 'HH24:MI'
+
 const columnTransformByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ streamMode, nameFull, namesFull, alias }) => {
     if (!streamMode) {
@@ -59,7 +67,9 @@ const columnTransformByNodeDefType = {
   [NodeDef.nodeDefType.date]: ({ nameFull, alias }) => [
     `TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${DbUtils.asName(alias)}`,
   ],
-  [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${DbUtils.asName(alias)}`],
+  [NodeDef.nodeDefType.time]: ({ nodeDefCol, nameFull, alias }) => [
+    `TO_CHAR(${nameFull}, '${getTimeColumnToCharFormat(nodeDefCol)}') AS ${DbUtils.asName(alias)}`,
+  ],
 }
 
 const _selectFieldsByNodeDefType =
@@ -75,7 +85,15 @@ const _selectFieldsByNodeDefType =
 
     const columnTransform = columnTransformByNodeDefType[NodeDef.getType(nodeDefCol)]
     if (columnTransform) {
-      return columnTransform({ streamMode, viewAlias: viewDataNodeDef.alias, nameFull, namesFull, names, alias })
+      return columnTransform({
+        streamMode,
+        viewAlias: viewDataNodeDef.alias,
+        nodeDefCol,
+        nameFull,
+        namesFull,
+        names,
+        alias,
+      })
     }
     return namesFull
   }

@@ -167,7 +167,9 @@ class RChain {
 
   async _initEntities() {
     const { chain, cycle, survey } = this
-    const entityDefs = Survey.getAnalysisEntities({ chain })(survey).filter(NodeDef.isInCycle(cycle))
+
+    const allAnalysisEntities = Survey.getAnalysisEntities({ chain })(survey)
+    const entityDefs = cycle ? allAnalysisEntities.filter(NodeDef.isInCycle(cycle)) : allAnalysisEntities
 
     this._entities = Chain.isIncludeEntitiesWithoutData(chain)
       ? entityDefs

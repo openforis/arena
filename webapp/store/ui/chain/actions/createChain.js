@@ -12,5 +12,5 @@ export const createChain =
 
     const { data: chain } = await axios.post(`/api/survey/${surveyId}/chain`, { cycle })
 
-    navigate(`${appModuleUri(analysisModules.chain)}${chain.uuid}/`)
+    navigate(`${appModuleUri(analysisModules.chain)}${chain.uuid}/?new=true`)
   }

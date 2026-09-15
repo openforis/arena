@@ -4,8 +4,6 @@
 //== buttons
 $sidebarBtnMargin: 1px;
 $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
-//== popup-menu
-$sidebarPopupMenuBgColor: color.adjust($blue, $lightness: 40%);
 
 .sidebar {
   display: flex;
@@ -40,7 +38,8 @@ $sidebarPopupMenuBgColor: color.adjust($blue, $lightness: 40%);
 
     &.popup-menu-opened {
       .sidebar__module.over {
-        background: $sidebarPopupMenuBgColor;
+        // Soft brand tint; --blue is set by SurveyThemeBridge
+        background: color-mix(in srgb, var(--blue) 18%, white);
       }
     }
   }
@@ -59,11 +58,16 @@ $sidebarPopupMenuBgColor: color.adjust($blue, $lightness: 40%);
 
     &.active {
       opacity: 1;
-      border-right-color: $blue;
-      background: linear-gradient(to left, rgba($blue, 0.1) 0%, rgba($blue, 0.04) 50%, transparent 80%);
+      border-right-color: var(--blue);
+      background: linear-gradient(
+        to left,
+        color-mix(in srgb, var(--blue) 10%, transparent) 0%,
+        color-mix(in srgb, var(--blue) 4%, transparent) 50%,
+        transparent 80%
+      );
 
       .icon {
-        color: $blue;
+        color: var(--blue);
       }
     }
   }
@@ -80,7 +84,7 @@ $sidebarPopupMenuBgColor: color.adjust($blue, $lightness: 40%);
 
     &:only-child.active {
       font-weight: bold;
-      color: $blue;
+      color: var(--blue);
     }
   }
 
@@ -90,7 +94,7 @@ $sidebarPopupMenuBgColor: color.adjust($blue, $lightness: 40%);
 
     &.active {
       font-weight: bold;
-      color: $blue;
+      color: var(--blue);
     }
   }
 
@@ -125,7 +129,7 @@ $sidebarPopupMenuBgColor: color.adjust($blue, $lightness: 40%);
   position: fixed;
   z-index: $zIndex10TopOfApp;
   left: $sidebarWidthClosed - 1px;
-  background-color: $sidebarPopupMenuBgColor;
+  background-color: color-mix(in srgb, var(--blue) 18%, white);
   border-top: 1px solid $greyBorder;
   border-right: 1px solid $greyBorder;
   border-bottom: 1px solid $greyBorder;

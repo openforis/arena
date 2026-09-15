@@ -2,6 +2,7 @@ import './CategoryDetails.scss'
 
 import PropTypes from 'prop-types'
 import { useParams } from 'react-router'
+import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
 import { FileFormats } from '@core/fileFormats'
@@ -11,7 +12,9 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyId } from '@webapp/store/survey'
+import { useCategoryByName, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
@@ -45,12 +48,16 @@ const CategoryDetails = (props) => {
   const surveyId = useSurveyId()
 
   const readOnly = !useAuthCanEditSurvey()
+  const i18n = useI18n()
+  const dispatch = useDispatch()
 
   const { state, setState } = useLocalState({
     categoryUuid: categoryUuidProp || categoryUuidParam,
     onCategoryUpdate,
   })
   const Actions = useActions({ setState })
+
+  const samplingPointDataCategory = useCategoryByName(Category.samplingPointDataCategoryName)
 
   const category = State.getCategory(state)
 
@@ -66,112 +73,207 @@ const CategoryDetails = (props) => {
   const validation = Validation.getValidation(category)
   const levels = Category.getLevelsArray(category)
 
+  const hasLocationExtraProp = Category.hasLocationExtraProp(category)
+  const isLocationExtraPropLocked = Category.isLocationExtraPropLocked(category)
+  const isSamplingPointData = Category.getName(category) === Category.samplingPointDataCategoryName
+
+  // the extra prop(s) added by these conversions are always locked: there is no meaningful
+  // reason to leave them unlocked right after converting the category to one of these types
+  const confirmConvertCategory = (templateType) => {
+    const action =
+      templateType === 'samplingPointData'
+        ? Actions.convertToSamplingPointDataCategory
+        : Actions.convertToGeoPackageCategory
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key:
+          templateType === 'samplingPointData'
+            ? 'categoryEdit.convertToSamplingPointDataCategory.confirmMessage'
+            : 'categoryEdit.convertToGeoPackageCategory.confirmMessage',
+        onOk: () => action({ categoryUuid, onCategoryUpdate }),
+      })
+    )
+  }
+
+  const getConvertToSimpleCategoryMenuItem = () => {
+    if (isSamplingPointData) {
+      return {
+        key: 'convert-sampling-point-data-category-to-simple',
+        label: 'categoryEdit.convertSamplingPointDataCategoryToSimple.buttonLabel',
+        onClick: () => Actions.convertSamplingPointDataCategoryToSimple(categoryUuid),
+      }
+    }
+    if (isLocationExtraPropLocked) {
+      return {
+        key: 'convert-geopackage-category-to-simple',
+        label: 'categoryEdit.convertGeoPackageCategoryToSimple.buttonLabel',
+        onClick: () => Actions.convertGeoPackageCategoryToSimple(categoryUuid),
+      }
+    }
+    return null
+  }
+  const convertToSimpleCategoryMenuItem = getConvertToSimpleCategoryMenuItem()
+
   return (
     <>
       <div className="category">
         <div className="category__header">
-          <div className="row">
-            <FormItem label="categoryEdit.categoryName">
-              <Input
-                autoFocus
-                id={TestId.categoryDetails.categoryName}
-                value={Category.getName(category)}
-                validation={Validation.getFieldValidation(Category.keysProps.name)(validation)}
-                onChange={(value) =>
-                  Actions.updateCategoryProp({ key: Category.keysProps.name, value: StringUtils.normalizeName(value) })
-                }
-                readOnly={readOnly}
-              />
-            </FormItem>
-
-            {!readOnly && (
-              <>
-                <OpenFileUploadDialogButton
-                  className="import-btn"
-                  label="common.import"
-                  accept={allowedImportExtensions}
-                  onOk={({ files, onUploadProgress }) =>
-                    Actions.uploadCategory({ categoryUuid, file: files[0], onUploadProgress })
+          <div className="category__header-column category__header-column-fields">
+            <div className="row">
+              <FormItem label="categoryEdit.categoryName">
+                <Input
+                  autoFocus
+                  id={TestId.categoryDetails.categoryName}
+                  value={Category.getName(category)}
+                  validation={Validation.getFieldValidation(Category.keysProps.name)(validation)}
+                  onChange={(value) =>
+                    Actions.updateCategoryProp({
+                      key: Category.keysProps.name,
+                      value: StringUtils.normalizeName(value),
+                    })
                   }
+                  readOnly={readOnly}
                 />
-                <ButtonMenu
-                  className="date-import-template-menu-btn"
-                  label="dataImportView:templateForImport"
-                  iconClassName="icon-download2 icon-14px"
-                  items={Object.keys(templateTypes).flatMap((templateType) =>
-                    templateFileFormats.map((fileFormat) => ({
-                      key: `data-import-template-${templateType}-${fileFormat}`,
-                      content: (
-                        <ButtonDownload
-                          href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                          requestParams={{
-                            fileFormat,
-                            generic: templateType === templateTypes.genericDataImport,
-                            samplingPointData: templateType === templateTypes.samplingPointDataImport,
-                          }}
-                          label={
-                            templateType === templateTypes.samplingPointDataImport
-                              ? `categoryEdit.templateFor_${templateType}_${fileFormat}`
-                              : `dataImportView:templateFor_${templateType}_${fileFormat}`
-                          }
-                          variant="text"
-                        />
-                      ),
-                    }))
-                  )}
-                  variant="outlined"
+              </FormItem>
+            </div>
+
+            <div className="row">
+              <FormItem info="common.designerNotesInfo" label="common.designerNotes">
+                <Input
+                  inputType="textarea"
+                  onChange={(value) => Actions.updateCategoryProp({ key: Category.keysProps.designerNotes, value })}
+                  readOnly={readOnly}
+                  textAreaRows={2}
+                  validation={Validation.getFieldValidation(Category.keysProps.designerNotes)(validation)}
+                  value={Category.getDesignerNotes(category)}
                 />
-                <ButtonMenu
-                  iconClassName="icon-cog icon-14px"
-                  items={[
-                    ...(!Category.isReportingData(category)
-                      ? [
-                          {
-                            key: 'convert-to-report-data-category',
-                            label: 'categoryEdit.convertToReportingDataCategory.buttonLabel',
-                            onClick: () => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate }),
-                          },
-                        ]
-                      : []),
-                    {
-                      key: 'extra-props-editor',
-                      label: 'extraProp.editor.title',
-                      onClick: Actions.toggleEditExtraPropertiesPanel,
-                    },
-                  ]}
-                />
-              </>
-            )}
+              </FormItem>
+            </div>
           </div>
 
-          <div className="row">
-            <FormItem info="common.designerNotesInfo" label="common.designerNotes">
-              <Input
-                inputType="textarea"
-                onChange={(value) => Actions.updateCategoryProp({ key: Category.keysProps.designerNotes, value })}
-                readOnly={readOnly}
-                textAreaRows={2}
-                validation={Validation.getFieldValidation(Category.keysProps.designerNotes)(validation)}
-                value={Category.getDesignerNotes(category)}
-              />
-            </FormItem>
+          <div className="category__header-column category__header-column-actions">
+            <div className="row">
+              {!readOnly && (
+                <>
+                  <OpenFileUploadDialogButton
+                    className="import-btn"
+                    label="common.import"
+                    accept={allowedImportExtensions}
+                    onOk={({ files, onUploadProgress }) =>
+                      Actions.uploadCategory({ categoryUuid, file: files[0], onUploadProgress })
+                    }
+                  />
+                  <ButtonMenu
+                    className="date-import-template-menu-btn"
+                    label="dataImportView:templateForImport"
+                    iconClassName="icon-download2 icon-14px"
+                    items={Object.keys(templateTypes).flatMap((templateType) =>
+                      templateFileFormats.map((fileFormat) => ({
+                        key: `data-import-template-${templateType}-${fileFormat}`,
+                        content: (
+                          <ButtonDownload
+                            href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                            requestParams={{
+                              fileFormat,
+                              generic: templateType === templateTypes.genericDataImport,
+                              samplingPointData: templateType === templateTypes.samplingPointDataImport,
+                            }}
+                            label={
+                              templateType === templateTypes.samplingPointDataImport
+                                ? `categoryEdit.templateFor_${templateType}_${fileFormat}`
+                                : `dataImportView:templateFor_${templateType}_${fileFormat}`
+                            }
+                            variant="text"
+                          />
+                        ),
+                      }))
+                    )}
+                    variant="outlined"
+                  />
+                  <ButtonMenu
+                    iconClassName="icon-cog icon-14px"
+                    items={[
+                      ...(!Category.isReportingData(category)
+                        ? [
+                            {
+                              key: 'convert-to-report-data-category',
+                              label: 'categoryEdit.convertToReportingDataCategory.buttonLabel',
+                              onClick: () => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate }),
+                            },
+                          ]
+                        : []),
+                      ...(!isSamplingPointData && !samplingPointDataCategory
+                        ? [
+                            {
+                              key: 'convert-to-sampling-point-data-category',
+                              label: 'categoryEdit.convertToSamplingPointDataCategory.buttonLabel',
+                              onClick: () => confirmConvertCategory('samplingPointData'),
+                            },
+                          ]
+                        : []),
+                      ...(!hasLocationExtraProp
+                        ? [
+                            {
+                              key: 'convert-to-geopackage-category',
+                              label: 'categoryEdit.convertToGeoPackageCategory.buttonLabel',
+                              onClick: () => confirmConvertCategory('geoPackage'),
+                            },
+                          ]
+                        : []),
+                      ...(convertToSimpleCategoryMenuItem ? [convertToSimpleCategoryMenuItem] : []),
+                      {
+                        key: 'extra-props-editor',
+                        label: 'extraProp.editor.title',
+                        onClick: Actions.toggleEditExtraPropertiesPanel,
+                      },
+                    ]}
+                  />
+                </>
+              )}
+            </div>
 
-            <ButtonMenuExport
-              className="export-btn"
-              excelExportDisabled={excelExportDisabled}
-              href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
-              testId={TestId.categoryDetails.exportBtn}
-            />
+            <div className="row">
+              <ButtonMenuExport
+                className="export-btn"
+                excelExportDisabled={excelExportDisabled}
+                href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
+                testId={TestId.categoryDetails.exportBtn}
+              />
+
+              {/* export to GeoPackage starts a job through a route requiring survey edit permission:
+                  do not show the button to users who can only view the survey */}
+              {!readOnly && hasLocationExtraProp && (
+                <Button
+                  className="export-geopackage-btn"
+                  iconClassName="icon-download2 icon-14px"
+                  label="categoryEdit.exportToGeoPackage"
+                  onClick={() => Actions.exportToGeoPackage({ categoryUuid })}
+                  variant="outlined"
+                />
+              )}
+            </div>
 
             {Category.isReportingData(category) && (
-              <Checkbox
-                checked
-                className="reporting-data-checkbox"
-                disabled={readOnly}
-                label="categoryEdit.reportingData"
-                onChange={Actions.convertToSimpleCategory}
-              />
+              <div className="row">
+                <Checkbox
+                  checked
+                  className="reporting-data-checkbox"
+                  disabled={readOnly}
+                  label="categoryEdit.reportingData"
+                  onChange={Actions.convertToSimpleCategory}
+                />
+              </div>
             )}
+
+            <div className="row">
+              {isSamplingPointData ? (
+                <span className="category-type-label">{i18n.t('categoryEdit.samplingPointDataCategoryType')}</span>
+              ) : (
+                hasLocationExtraProp && (
+                  <span className="category-type-label">{i18n.t('categoryEdit.geoPackageCategory')}</span>
+                )
+              )}
+            </div>
           </div>
         </div>
 

@@ -21,6 +21,7 @@ import {
   useSurveyInfo,
   useSurveyPreferredLang,
 } from '@webapp/store/survey'
+import { useAuthCanEditQualifierAttributeValue } from '@webapp/store/user'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 
 import * as NodeDefUiProps from './nodeDefUIProps'
@@ -113,15 +114,15 @@ const useHovering = ({ canEditDef, edit }) => {
   }
 }
 
-const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, isNodeDefEnumerator, nodesHaveValue }) => {
+// Shared by useKeyFieldLock and useQualifierFieldLock: once a field holds a value it starts out
+// locked (read-only) to prevent accidental edits; the user can unlock it for the current focus
+// session via the lock toggle button.
+const useAttributeFieldLock = ({ nodeDef, lockEnabled, hasValue }) => {
   const [editingNodeDefUuid, setEditingNodeDefUuid] = useState(null)
   const [unlockedNodeDefUuid, setUnlockedNodeDefUuid] = useState(null)
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-  const lockEnabled =
-    entry && !edit && canEditRecord && NodeDef.isAttribute(nodeDef) && NodeDef.isKey(nodeDef) && !isNodeDefEnumerator
-  const hasValue = lockEnabled && nodesHaveValue
   const isEditing = editingNodeDefUuid === nodeDefUuid
   const isUnlocked = unlockedNodeDefUuid === nodeDefUuid
   const isLocked = lockEnabled && hasValue && !isUnlocked && !isEditing
@@ -157,7 +158,6 @@ const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, isNodeDefEnumera
   }, [lockEnabled, hasValue, isLocked, nodeDefUuid])
 
   return {
-    hasValue,
     isLocked,
     lockVisible: lockEnabled && hasValue,
     onFocus,
@@ -166,7 +166,31 @@ const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, isNodeDefEnumera
   }
 }
 
-const getClassName = ({ applicable, empty, keyFieldLocked, nodeDef, readOnly, renderType, surveyCycleKey }) => {
+const useKeyFieldLock = ({ canEditRecord, edit, entry, nodeDef, isNodeDefEnumerator, nodesHaveValue }) => {
+  const lockEnabled =
+    entry && !edit && canEditRecord && NodeDef.isAttribute(nodeDef) && NodeDef.isKey(nodeDef) && !isNodeDefEnumerator
+  return useAttributeFieldLock({ nodeDef, lockEnabled, hasValue: nodesHaveValue })
+}
+
+// Qualifier attribute values are auto-filled by the system based on the user's group and, unlike key
+// attributes, are read-only for every user once applied (see recordQualifierMatcher.js); survey admins
+// are the only ones allowed to correct them, and only after explicitly unlocking the field.
+const useQualifierFieldLock = ({ canEditQualifierValue, edit, entry, nodeDef, qualifierValueApplied }) => {
+  const lockEnabled =
+    entry && !edit && canEditQualifierValue && NodeDef.isAttribute(nodeDef) && NodeDef.isQualifier(nodeDef)
+  return useAttributeFieldLock({ nodeDef, lockEnabled, hasValue: qualifierValueApplied })
+}
+
+const getClassName = ({
+  applicable,
+  empty,
+  keyFieldLocked,
+  nodeDef,
+  qualifierFieldLocked,
+  readOnly,
+  renderType,
+  surveyCycleKey,
+}) => {
   const mainClassNameSuffix = NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'
   const mainClassName = 'survey-form__node-def-page' + mainClassNameSuffix
 
@@ -178,7 +202,9 @@ const getClassName = ({ applicable, empty, keyFieldLocked, nodeDef, readOnly, re
       renderType !== NodeDefLayout.renderType.tableBody &&
       empty,
     'key-field-locked': keyFieldLocked && renderType !== NodeDefLayout.renderType.tableHeader,
-    'read-only': (readOnly || keyFieldLocked) && renderType !== NodeDefLayout.renderType.tableHeader,
+    'qualifier-field-locked': qualifierFieldLocked && renderType !== NodeDefLayout.renderType.tableHeader,
+    'read-only':
+      (readOnly || keyFieldLocked || qualifierFieldLocked) && renderType !== NodeDefLayout.renderType.tableHeader,
   })
 }
 
@@ -190,9 +216,11 @@ const NodeDefSwitch = (props) => {
     empty,
     entry,
     nodeDef,
+    onSortBy,
     parentNode,
     readOnly: readOnlyProp,
     renderType,
+    sortCriteria = [],
   } = props
 
   const dispatch = useDispatch()
@@ -202,6 +230,7 @@ const NodeDefSwitch = (props) => {
   const surveyCycleKey = useSurveyCycleKey()
   const nodeDefLabelType = useNodeDefLabelType()
   const isNodeDefEnumerator = useIsNodeDefEnumerator(nodeDef)
+  const canEditQualifierValue = useAuthCanEditQualifierAttributeValue()
   const lang = useSurveyPreferredLang()
   const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
   const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef)
@@ -221,6 +250,8 @@ const NodeDefSwitch = (props) => {
 
   const entryProps = useEntryProps({ canEditRecord, entry, nodeDef, parentNode, editable })
 
+  const qualifierValueApplied = Boolean(entryProps.nodes?.[0] && Node.isQualifierValueApplied(entryProps.nodes[0]))
+
   const applicable = parentNode ? Node.isChildApplicable(nodeDefUuid)(parentNode) : true
 
   const { canAddNode, nodes, nodesHaveValue } = entryProps
@@ -239,6 +270,19 @@ const NodeDefSwitch = (props) => {
     isNodeDefEnumerator,
     nodesHaveValue,
   })
+  const {
+    isLocked: qualifierFieldLocked,
+    lockVisible: qualifierFieldLockVisible,
+    onFocus: onQualifierFieldFocus,
+    onBlur: onQualifierFieldBlur,
+    onLockToggle: onQualifierFieldLockToggle,
+  } = useQualifierFieldLock({
+    canEditQualifierValue,
+    edit,
+    entry,
+    nodeDef,
+    qualifierValueApplied,
+  })
   const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
 
   const className = getClassName({
@@ -246,6 +290,7 @@ const NodeDefSwitch = (props) => {
     empty,
     keyFieldLocked,
     nodeDef,
+    qualifierFieldLocked,
     readOnly,
     renderType,
     surveyCycleKey,
@@ -276,7 +321,13 @@ const NodeDefSwitch = (props) => {
     ...props,
     ...entryProps,
     surveyInfo,
-    readOnly: readOnlyProp || readOnly || keyFieldLocked || !editable,
+    readOnly:
+      readOnlyProp ||
+      readOnly ||
+      keyFieldLocked ||
+      !editable ||
+      qualifierFieldLocked ||
+      (qualifierValueApplied && !canEditQualifierValue),
     label,
     lang,
     createNodePlaceholder,
@@ -287,6 +338,11 @@ const NodeDefSwitch = (props) => {
     onKeyFieldFocus,
     onKeyFieldBlur,
     onKeyFieldLockToggle,
+    qualifierFieldLocked,
+    qualifierFieldLockVisible,
+    onQualifierFieldFocus,
+    onQualifierFieldBlur,
+    onQualifierFieldLockToggle,
   }
 
   return (
@@ -302,7 +358,13 @@ const NodeDefSwitch = (props) => {
         <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
       )}
       {renderType === NodeDefLayout.renderType.tableHeader ? (
-        <NodeDefTableCellHeader nodeDef={nodeDef} label={label} lang={lang} />
+        <NodeDefTableCellHeader
+          nodeDef={nodeDef}
+          label={label}
+          lang={lang}
+          sortCriteria={sortCriteria}
+          onSortBy={onSortBy}
+        />
       ) : renderType === NodeDefLayout.renderType.tableBody ? (
         <NodeDefTableCellBody {...nestedComponentsProps} />
       ) : (
@@ -319,10 +381,12 @@ NodeDefSwitch.propTypes = {
   empty: PropTypes.bool,
   entry: PropTypes.bool,
   nodeDef: PropTypes.object.isRequired,
+  onSortBy: PropTypes.func,
   parentNode: PropTypes.object,
   preview: PropTypes.bool,
   readOnly: PropTypes.bool,
   renderType: PropTypes.string,
+  sortCriteria: PropTypes.array,
 }
 
 export default NodeDefSwitch

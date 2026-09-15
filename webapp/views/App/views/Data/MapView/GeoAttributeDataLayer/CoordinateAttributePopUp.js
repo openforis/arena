@@ -75,7 +75,7 @@ export const CoordinateAttributePopUp = (props) => {
 
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude })
   // fetch elevation and record owner name only when popup is open
-  const elevation = useElevation({ survey, point: pointLatLong, active: open })
+  const elevation = useElevation({ point: pointLatLong, active: open })
   const recordOwnerName = useUserName({ userUuid: recordOwnerUuid, active: open })
 
   const onRemove = useCallback(() => {

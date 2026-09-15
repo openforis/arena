@@ -5,6 +5,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as RecordValidation from '@core/record/recordValidation'
+import { LanguageCode, ValidationSeverity } from '@openforis/arena-core'
 
 interface I18n {
   language: string
@@ -29,7 +30,7 @@ const getValidationText =
   ({ survey, i18n }: { survey: unknown; i18n: I18n }) =>
   (validationResult: ValidationResult.ValidationResultInstance): string => {
     if (ValidationResult.hasMessages(validationResult)) {
-      return ValidationResult.getMessage(i18n.language)(validationResult)
+      return ValidationResult.getMessage(i18n.language as LanguageCode)(validationResult)
     }
     if (RecordValidation.isValidationResultErrorCount(validationResult)) {
       return getValidationCountErrorText({ survey, i18n })(validationResult)
@@ -60,13 +61,13 @@ const getValidationMessage =
     const errorText = getJointText({ i18n, survey, getterFn: Validation.getErrors })(validation)
 
     if (errorText) {
-      return { severity: ValidationResult.severity.error, text: errorText }
+      return { severity: ValidationSeverity.error, text: errorText }
     }
 
     const warningText = getJointText({ i18n, survey, getterFn: Validation.getWarnings })(validation)
 
     if (warningText) {
-      return { severity: ValidationResult.severity.warning, text: warningText }
+      return { severity: ValidationSeverity.warning, text: warningText }
     }
     return null
   }
@@ -79,7 +80,7 @@ const getFieldValidationMessage =
       return message
     }
     return {
-      severity: ValidationResult.severity.error,
+      severity: ValidationSeverity.error,
       text: getValidationText({ survey, i18n })(
         ValidationResult.newInstance(
           Validation.messageKeys.invalidField, // Default error message
@@ -89,13 +90,34 @@ const getFieldValidationMessage =
     }
   }
 
+// A well-formed fields-map only ever holds nested Validation instances ({ valid, errors, warnings,
+// fields }) - a "key" property directly on the map itself means it's actually a bare ValidationResult
+// ({ key, params }) sitting where a fields-map was expected (e.g. a job error persisted without going
+// through Job.addError's { error: { valid, errors: [...] } } wrapping). Detect that and normalize it
+// under a synthetic "error" field, matching the addError convention, instead of iterating the
+// ValidationResult's own "key"/"params" properties as if they were field names.
+const isBareValidationResult = (fields: ReturnType<typeof Validation.getFieldValidations>): boolean =>
+  typeof (fields as unknown as ValidationResult.ValidationResultInstance)?.[ValidationResult.keys.key] === 'string'
+
+const getNormalizedFieldValidations = (
+  validation: Validation.ValidationInstance
+): ReturnType<typeof Validation.getFieldValidations> => {
+  const fields = Validation.getFieldValidations(validation)
+  if (isBareValidationResult(fields)) {
+    return {
+      error: Validation.newInstance(false, {}, [fields as unknown as ValidationResult.ValidationResultInstance]),
+    }
+  }
+  return fields
+}
+
 const getJointMessages =
   ({ i18n, survey, showKeys = true }: { i18n: I18n; survey: unknown; showKeys?: boolean }) =>
   (validation: Validation.ValidationInstance): { severity: ValidationResult.Severity; text: string }[] => {
     const messages: { severity: ValidationResult.Severity; text: string }[] = []
 
     // Add messages from fields
-    Object.entries(Validation.getFieldValidations(validation)).forEach(([field, childValidation]) => {
+    Object.entries(getNormalizedFieldValidations(validation)).forEach(([field, childValidation]) => {
       const { severity, text } = getFieldValidationMessage({ survey, field, i18n })(childValidation)
       const textPrefix = showKeys ? `${i18n.t(field)}: ` : ''
       messages.push({ severity, text: `${textPrefix}${text}` })

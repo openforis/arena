@@ -14,7 +14,14 @@ import * as NodeDefValidationsValidator from './nodeDefValidationsValidator'
 
 const { keys, keysPropsAdvanced, propKeys } = NodeDef
 
-const keysValidationFields = { children: 'children', keyAttributes: 'keyAttributes' }
+const keysValidationFields = {
+  children: 'children',
+  keyAttributes: 'keyAttributes',
+  qualifierApplicable: 'qualifierApplicable',
+  qualifierEditableIf: 'qualifierEditableIf',
+  qualifierDefaultValues: 'qualifierDefaultValues',
+  qualifierValidations: 'qualifierValidations',
+}
 
 const MAX_FILE_SIZE_MAX = 100 // max size of files that can be uploaded using file attribute
 
@@ -92,6 +99,39 @@ const validateReadOnly = (propName, nodeDef) => {
   return null
 }
 
+// a qualifier attribute value is always managed by the system (auto-filled based on the user's group,
+// then only survey admins may correct it, see canEditQualifierAttributeValue in authorizer.ts), so
+// designer-configured applicable/editability rules for it are meaningless and must be cleared
+const validateQualifierApplicable = (_propName, nodeDef) => {
+  if (NodeDef.isQualifier(nodeDef) && !R.isEmpty(NodeDef.getApplicable(nodeDef))) {
+    return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveApplicableExpression }
+  }
+  return null
+}
+
+const validateQualifierEditableIf = (_propName, nodeDef) => {
+  if (NodeDef.isQualifier(nodeDef) && (NodeDef.isReadOnly(nodeDef) || !R.isEmpty(NodeDef.getEditableIf(nodeDef)))) {
+    return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveEditabilityRule }
+  }
+  return null
+}
+
+// a qualifier attribute value is always system-assigned, so a default value would never be applied,
+// and being effectively read-only, it can never be validated against required/unique/count/expression rules
+const validateQualifierDefaultValues = (_propName, nodeDef) => {
+  if (NodeDef.isQualifier(nodeDef) && NodeDef.hasDefaultValues(nodeDef)) {
+    return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveDefaultValues }
+  }
+  return null
+}
+
+const validateQualifierValidations = (_propName, nodeDef) => {
+  if (NodeDef.isQualifier(nodeDef) && NodeDef.hasValidationsDefined(nodeDef)) {
+    return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveValidations }
+  }
+  return null
+}
+
 const validateParentEntityUuid = (_propName, nodeDef) => {
   if (NodeDef.isAnalysis(nodeDef) && R.isNil(NodeDef.getParentUuid(nodeDef))) {
     const errorKey = NodeDef.isVirtual(nodeDef)
@@ -124,6 +164,22 @@ const validateItemsFilterExpression = async (survey, nodeDef) => {
 
 const validateFileNameExpression = async (survey, nodeDef) => {
   const expression = NodeDef.getFileNameExpression(nodeDef)
+  if (R.isEmpty(expression)) return null
+
+  const { validationResult } = await nodeDefExpressionValidator.validate({
+    survey,
+    nodeDefCurrent: nodeDef,
+    expression,
+    isContextParent: true,
+    selfReferenceAllowed: false,
+  })
+  return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
+}
+
+const validateEnumeratingItemsExpression = async (survey, nodeDef) => {
+  if (!NodeDef.isEntity(nodeDef) || !NodeDef.isEnumerate(nodeDef)) return null
+
+  const expression = NodeDef.getEnumeratingItemsExpression(nodeDef)
   if (R.isEmpty(expression)) return null
 
   const { validationResult } = await nodeDefExpressionValidator.validate({
@@ -186,6 +242,10 @@ const propsValidations = (survey) => ({
   ],
   [`${keys.props}.${propKeys.key}`]: [validateKey(survey)],
   [`${keys.props}.${propKeys.readOnly}`]: [validateReadOnly],
+  [keysValidationFields.qualifierApplicable]: [validateQualifierApplicable],
+  [keysValidationFields.qualifierEditableIf]: [validateQualifierEditableIf],
+  [keysValidationFields.qualifierDefaultValues]: [validateQualifierDefaultValues],
+  [keysValidationFields.qualifierValidations]: [validateQualifierValidations],
   [keysValidationFields.keyAttributes]: [validateKeyAttributes(survey)],
   [keysValidationFields.children]: [validateChildren(survey)],
   // Virtual Entity
@@ -220,6 +280,7 @@ const validateAdvancedProps = async (survey, nodeDef) => {
     [keysPropsAdvanced.formula]: validateVirtualEntityFormula(survey, nodeDef),
     [keysPropsAdvanced.itemsFilter]: validateItemsFilterExpression(survey, nodeDef),
     [keysPropsAdvanced.fileNameExpression]: validateFileNameExpression(survey, nodeDef),
+    [keysPropsAdvanced.enumeratingItemsExpression]: validateEnumeratingItemsExpression(survey, nodeDef),
   }
   const validationResultsArray = await Promise.all(Object.values(validatorsByProp))
   const validationResultsByProp = Object.keys(validatorsByProp).reduce((acc, prop, index) => {

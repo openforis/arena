@@ -1,16 +1,19 @@
+import { Navigate } from 'react-router'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
-import { appModules, homeModules } from '@webapp/app/appModules'
+import { appModuleUri, appModules, homeModules } from '@webapp/app/appModules'
 import { useAuthCanCreateSurvey, useAuthCanCreateTemplate } from '@webapp/store/user/hooks'
 
-import Dashboard from './Dashboard'
 import CollectImportReport from './CollectImportReport'
+import Landing from './Landing'
 import SurveyList from './SurveyList'
 import SurveyCreate from './SurveyCreate'
 import SurveyInfo from './SurveyInfo'
 import TemplateList from './TemplateList'
 import TemplateCreate from './TemplateCreate'
+
+const HomeDashboardRedirect = () => <Navigate to={appModuleUri(appModules.dashboard)} replace />
 
 const Home = () => {
   const canCreateSurvey = useAuthCanCreateSurvey()
@@ -19,11 +22,15 @@ const Home = () => {
   return (
     <ModuleSwitch
       moduleRoot={appModules.home}
-      moduleDefault={homeModules.dashboard}
+      moduleDefault={homeModules.landing}
       modules={[
         {
-          component: Dashboard,
-          path: homeModules.dashboard.path,
+          component: Landing,
+          path: homeModules.landing.path,
+        },
+        {
+          component: HomeDashboardRedirect,
+          path: 'dashboard',
         },
         {
           component: SurveyList,

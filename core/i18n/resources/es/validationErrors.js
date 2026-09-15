@@ -34,6 +34,11 @@ export default {
     nameNotSpecified: 'Nombre de categoría no especificado',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Ya existe una categoría de Datos de puntos de muestreo en esta encuesta; solo puede haber una.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'No se pueden eliminar elementos de categoría publicados. Elementos faltantes en el archivo importado: {{deletedItemCodes}}',
@@ -50,6 +55,8 @@ export default {
     invalidParentItemOrder: 'El elemento con códigos {{parentItemCodes}} debe ir antes que sus hijos',
     nameDuplicate: 'Ya existe una categoría con el mismo nombre: {{name}}',
     srsNotDefined: 'SRS con código {{srs}} no definido en la encuesta',
+    uuidDuplicate:
+      'Esta categoría ya ha sido clonada en esta encuesta (actualmente llamada "{{name}}"). No se puede clonar de nuevo.',
   },
 
   dataImport: {
@@ -63,7 +70,7 @@ export default {
     invalidNumber: 'Número no válido en la columna {{headers}}: {{value}}',
     invalidTaxonCode: 'Código no válido en la columna {{headers}}: {{value}}',
     invalidTime:
-      'Hora no válida en la columna {{headers}}: {{value}}. La hora debe tener el formato HH:mm. Ej.: 09:45 o 16:30',
+      'Hora no válida en la columna {{headers}}: {{value}}. La hora debe tener el formato HH:mm o HH:mm:ss. Ej.: 09:45, 16:30 o 09:45:30',
     missingRequiredHeaders: 'Faltan columnas obligatorias: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Error al actualizar valores: {{details}}',
     multipleRecordsMatchingKeys: 'Se encontraron varios registros que coinciden con las claves "{{keyValues}}"',
@@ -127,6 +134,11 @@ export default {
     countMaxInvalid: 'Recuento máximo no válido',
     countMinInvalid: 'Recuento mínimo no válido',
     readOnlyCannotHaveEditableIf: 'Un nodo de solo lectura no puede tener la condición "Editable si"',
+    qualifierCannotHaveApplicableExpression:
+      'El atributo calificador no puede tener la condición "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    qualifierCannotHaveEditabilityRule: 'El atributo calificador no puede tener reglas de editabilidad definidas',
+    qualifierCannotHaveDefaultValues: 'El atributo calificador no puede tener valores por defecto',
+    qualifierCannotHaveValidations: 'El atributo calificador no puede tener reglas de validación definidas',
   },
 
   record: {
@@ -189,6 +201,12 @@ export default {
     scientificNameRequired: 'El nombre científico es obligatorio',
     taxaEmpty: 'Taxones vacíos',
     vernacularNamesDuplicate: "Nombre vernáculo duplicado '{{name}}' para el idioma '{{lang}}'",
+  },
+
+  taxonomyImport: {
+    nameDuplicate: 'Ya existe una taxonomía con el mismo nombre: {{name}}',
+    uuidDuplicate:
+      'Esta taxonomía ya ha sido clonada en esta encuesta (actualmente llamada "{{name}}"). No se puede clonar de nuevo.',
   },
 
   taxonomyImportJob: {

@@ -122,6 +122,7 @@ export const {
   isChildEditable,
   isChildVisible,
   isDefaultValueApplied,
+  isQualifierValueApplied,
   getHierarchy,
   getHierarchyCode,
 } = NodeMeta
@@ -165,7 +166,13 @@ export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
 export const assocValue = R.assoc(keys.value)
 export const { assocValidation } = Validation
 
-export const { assocMeta, mergeMeta, assocChildApplicability, assocIsDefaultValueApplied } = NodeMeta
+export const {
+  assocMeta,
+  mergeMeta,
+  assocChildApplicability,
+  assocIsDefaultValueApplied,
+  assocIsQualifierValueApplied,
+} = NodeMeta
 
 export const assocCreated = R.assoc(keys.created)
 export const setCreated = (node) => {
@@ -296,6 +303,7 @@ export const newNodeValueTaxon = ({ taxonUuid }) => ({ [valuePropsTaxon.taxonUui
 const _getTimePart = _getDateTimePart(':')
 export const getTimeHour = _getTimePart(0)
 export const getTimeMinute = _getTimePart(1)
+export const getTimeSeconds = _getTimePart(2)
 
 // Generic value prop extractor
 const _datePropGetters = {
@@ -307,6 +315,7 @@ const _datePropGetters = {
 const _timePropGetters = {
   [valuePropsTime.hour]: getTimeHour,
   [valuePropsTime.minute]: getTimeMinute,
+  [valuePropsTime.seconds]: getTimeSeconds,
 }
 
 const _valuePropGetters = {

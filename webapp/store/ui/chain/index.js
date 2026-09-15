@@ -1,5 +1,5 @@
 export { ChainActions } from './actions'
 
-export { useChain, useChainRecordsCountByStep } from './hooks'
+export { useChain, useChainRecordsCountByStep, useChainEditLocked, useChainEditable } from './hooks'
 
 export { ChainReducer } from './reducer'

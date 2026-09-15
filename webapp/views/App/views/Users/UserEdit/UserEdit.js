@@ -1,14 +1,16 @@
 import './UserEdit.scss'
 
 import { useCallback, useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router'
+import PropTypes from 'prop-types'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
-import { Button, ButtonDelete, ButtonInvite, ButtonSave } from '@webapp/components'
+import { Button, ButtonDelete, ButtonInvite, ButtonSave, Fieldset } from '@webapp/components'
 import UserAiSettingsPanel from '@webapp/components/ai/UserAiSettingsPanel'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
@@ -17,7 +19,7 @@ import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import ProfilePicture from '@webapp/components/profilePicture'
 
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
+import { UserActions, useUser } from '@webapp/store/user'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 import DropdownUserRole from '../DropdownUserRole'
@@ -26,8 +28,11 @@ import ProfilePictureEditor from './ProfilePictureEditor'
 import { useEditUser } from './store'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 
-const UserEdit = () => {
-  const { userUuid } = useParams()
+const UserEdit = ({ ownProfile = false }) => {
+  const { userUuid: userUuidParam } = useParams()
+  const loggedInUser = useUser()
+  // own profile page has no uuid in the URL: resolve it from the logged-in user instead
+  const userUuid = userUuidParam || (ownProfile ? User.getUuid(loggedInUser) : undefined)
 
   const {
     ready,
@@ -64,16 +69,31 @@ const UserEdit = () => {
     onUpdateProfilePicture,
   } = useEditUser({ userUuid })
 
+  const dispatch = useDispatch()
   const aiSaveRef = useRef(null)
   const [aiSettingsDirty, setAiSettingsDirty] = useState(false)
+  const [notificationPrefsDirty, setNotificationPrefsDirty] = useState(false)
+  const [notifyOnUserAccessRequest, setNotifyOnUserAccessRequest] = useState(() =>
+    User.getPrefNotifyOnUserAccessRequest(user)
+  )
+
   const onSaveAll = useCallback(async () => {
     const saves = []
     if (dirty) saves.push(onSave())
     if (aiSettingsDirty) saves.push(aiSaveRef.current?.())
+    if (notificationPrefsDirty) {
+      saves.push(
+        dispatch(
+          UserActions.updateUserPrefs({
+            user: User.assocPrefNotifyOnUserAccessRequest(notifyOnUserAccessRequest)(user),
+          })
+        )
+      )
+    }
     await Promise.all(saves)
-  }, [aiSettingsDirty, dirty, onSave])
+    setNotificationPrefsDirty(false)
+  }, [aiSettingsDirty, dirty, dispatch, notificationPrefsDirty, notifyOnUserAccessRequest, onSave, user])
 
-  const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
   const canUseMap = useAuthCanUseMap()
@@ -89,7 +109,7 @@ const UserEdit = () => {
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
   const invitationExpired = User.isInvitationExpired(userToUpdate)
   const editingLoggedInUser = User.isEqual(user)(userToUpdate)
-  const newUser = !userUuid
+  const newUser = !userUuidParam && !ownProfile
   const surveyGroupsVisible = !newUser && showSurveyGroup
 
   return (
@@ -189,8 +209,7 @@ const UserEdit = () => {
         <>
           {canUseMap && (
             // show map api keys only when editing the current user
-            <fieldset className="map-api-keys">
-              <legend>{i18n.t('user.mapApiKeys.title')}</legend>
+            <Fieldset className="map-api-keys" legend="user.mapApiKeys.title">
               <FormItem label="user.mapApiKeys.mapProviders.planet">
                 <Input
                   disabled={!canEditEmail}
@@ -210,9 +229,21 @@ const UserEdit = () => {
                   }
                 />
               </FormItem>
-            </fieldset>
+            </Fieldset>
           )}
           <UserAiSettingsPanel ref={aiSaveRef} onDirtyChange={setAiSettingsDirty} />
+          {systemAdmin && (
+            <Fieldset className="notification-prefs" legend="usersView:prefs.title">
+              <Checkbox
+                checked={notifyOnUserAccessRequest}
+                label="usersView:prefs.notifyOnUserAccessRequest"
+                onChange={(value) => {
+                  setNotifyOnUserAccessRequest(value)
+                  setNotificationPrefsDirty(true)
+                }}
+              />
+            </Fieldset>
+          )}
         </>
       )}
 
@@ -236,7 +267,11 @@ const UserEdit = () => {
           )}
 
           {canEdit && (
-            <ButtonSave onClick={onSaveAll} disabled={!canSave || (!dirty && !aiSettingsDirty)} className="btn-save" />
+            <ButtonSave
+              onClick={onSaveAll}
+              disabled={!canSave || (!dirty && !aiSettingsDirty && !notificationPrefsDirty)}
+              className="btn-save"
+            />
           )}
 
           {surveyGroupsVisible && invitationExpired && (
@@ -254,6 +289,10 @@ const UserEdit = () => {
       )}
     </div>
   )
+}
+
+UserEdit.propTypes = {
+  ownProfile: PropTypes.bool, // True when editing the logged-in user's own profile (route has no userUuid param)
 }
 
 export default UserEdit

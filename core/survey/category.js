@@ -33,7 +33,13 @@ export const reportingDataItemExtraDefKeys = {
   area: 'area',
 }
 
+// name of the item extra prop def (of type geometryPoint) that makes a category exportable to GeoPackage
+export const locationItemExtraDefName = 'location'
+
 const samplingUnitsPlanCategoryName = 'sampling_units_plan'
+// single source of truth for this name: other modules must import it from here rather than
+// hard-coding the string or re-defining it
+export const samplingPointDataCategoryName = 'sampling_point_data'
 
 // ========
 // LEVELS
@@ -130,6 +136,24 @@ export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
 export const getItemExtraDefsArray = R.pipe(getItemExtraDef, ExtraPropDef.extraDefsToArray)
 export const getItemExtraDefKeys = (category) => getItemExtraDefsArray(category).map(ExtraPropDef.getName)
 
+// the extra prop def named 'location' of type geometryPoint, if the category has one
+export const getLocationExtraDef = (category) =>
+  getItemExtraDefsArray(category).find(
+    (extraDef) =>
+      ExtraPropDef.getName(extraDef) === locationItemExtraDefName &&
+      ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.geometryPoint
+  )
+
+// true if the category has a 'location' extra prop, i.e. it is exportable to GeoPackage
+export const hasLocationExtraProp = (category) => Boolean(getLocationExtraDef(category))
+
+// true if the category has a 'location' extra prop AND it is locked - i.e. converting it to a
+// simple category (unlocking the prop) would actually change something
+export const isLocationExtraPropLocked = (category) => {
+  const locationExtraDef = getLocationExtraDef(category)
+  return Boolean(locationExtraDef) && ExtraPropDef.isLocked(locationExtraDef)
+}
+
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 
 // ========
@@ -157,6 +181,9 @@ export const setItemsCount = (count) => (category) => {
 export const isLevelDeleteAllowed = (level) => (category) =>
   !CategoryLevel.isPublished(level) && CategoryLevel.getIndex(level) === getLevelsArray(category).length - 1
 export const isSamplingUnitsPlanCategory = (category) => getName(category) === samplingUnitsPlanCategoryName
+export const isSamplingPointDataCategory = (category) => getName(category) === samplingPointDataCategoryName
 export const isExtraPropDefReadOnly = (extraPropDef) => (category) =>
-  isReportingData(category) && ExtraPropDef.getName(extraPropDef) === reportingDataItemExtraDefKeys.area
+  ExtraPropDef.isLocked(extraPropDef) ||
+  (isReportingData(category) && ExtraPropDef.getName(extraPropDef) === reportingDataItemExtraDefKeys.area) ||
+  (isSamplingPointDataCategory(category) && ExtraPropDef.getName(extraPropDef) === locationItemExtraDefName)
 export const hasExtraDefs = (category) => getItemExtraDefKeys(category).length > 0

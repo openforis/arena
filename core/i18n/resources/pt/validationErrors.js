@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Nome da categoria não especificado',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Já existe uma categoria de Dados de Ponto Amostral neste inventário; só pode haver uma.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Não é possível excluir itens de categoria publicados. Itens ausentes no arquivo importado: {{deletedItemCodes}}',
@@ -51,6 +56,8 @@ export default {
     invalidParentItemOrder: 'O item com códigos {{parentItemCodes}} deve vir antes de seus filhos',
     nameDuplicate: 'Já existe uma categoria com o mesmo nome: {{name}}',
     srsNotDefined: 'SRS com código {{srs}} não definido no inventário',
+    uuidDuplicate:
+      'Esta categoria já foi clonada neste inventário (atualmente chamada "{{name}}"). Não pode ser clonada novamente.',
   },
 
   dataImport: {
@@ -64,7 +71,7 @@ export default {
     invalidNumber: 'Número inválido na coluna {{headers}}: {{value}}',
     invalidTaxonCode: 'Código inválido na coluna {{headers}}: {{value}}',
     invalidTime:
-      'Hora inválida na coluna {{headers}}: {{value}}. A hora deve estar no formato HH:mm. Ex.: 09:45 ou 16:30',
+      'Hora inválida na coluna {{headers}}: {{value}}. A hora deve estar no formato HH:mm ou HH:mm:ss. Ex.: 09:45, 16:30 ou 09:45:30',
     missingRequiredHeaders: 'Colunas obrigatórias ausentes: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Erro ao atualizar valores: {{details}}',
     multipleRecordsMatchingKeys: 'Vários registros encontrados com as chaves "{{keyValues}}"',
@@ -128,6 +135,11 @@ export default {
     countMaxInvalid: '"Contagem máxima" inválida',
     countMinInvalid: '"Contagem mínima" inválida',
     readOnlyCannotHaveEditableIf: 'Um nó somente leitura não pode ter a condição "Editable if"',
+    qualifierCannotHaveApplicableExpression:
+      'O atributo qualificador não pode ter a condição "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    qualifierCannotHaveEditabilityRule: 'O atributo qualificador não pode ter regras de editabilidade definidas',
+    qualifierCannotHaveDefaultValues: 'O atributo qualificador não pode ter valores padrão',
+    qualifierCannotHaveValidations: 'O atributo qualificador não pode ter regras de validação definidas',
   },
 
   record: {
@@ -189,6 +201,12 @@ export default {
     scientificNameRequired: 'Nome científico obrigatório',
     taxaEmpty: 'Táxons vazios',
     vernacularNamesDuplicate: `Nome vernacular duplicado '{{name}}' para o idioma '{{lang}}'`,
+  },
+
+  taxonomyImport: {
+    nameDuplicate: 'Já existe uma taxonomia com o mesmo nome: {{name}}',
+    uuidDuplicate:
+      'Esta taxonomia já foi clonada neste inventário (atualmente chamada "{{name}}"). Não pode ser clonada novamente.',
   },
 
   taxonomyImportJob: {

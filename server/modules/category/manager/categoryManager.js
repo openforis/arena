@@ -3,9 +3,11 @@ import * as pgPromise from 'pg-promise'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
+import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -30,7 +32,7 @@ import * as CategoryRepository from '../repository/categoryRepository'
 
 export {
   initializeSurveyCategoryItemsIndexes,
-  initializeAllSurveysCategoryItemIndexes,
+  initializeCategoryItemIndexesForSurvey,
 } from './categoryItemIndexInitializer'
 
 // ====== VALIDATION
@@ -227,6 +229,67 @@ export const insertCategory = async (
     return validate ? _validateCategory({ surveyId, categoryUuid: Category.getUuid(categoryDb) }, t) : categoryDb
   })
 
+/**
+ * Clones a category (levels and items included) from another survey into the given survey.
+ * Category, level and item uuids are preserved: each survey lives in its own db schema,
+ * so there is no risk of uuid collision, and levels/items can keep referencing each other as-is.
+ * Levels and items are cloned with a single INSERT...SELECT statement per table, entirely on the db side,
+ * to avoid loading potentially large item collections into memory.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user performing this operation.
+ * @param {!number} params.sourceSurveyId - The id of the survey the category is cloned from.
+ * @param {!string} params.sourceCategoryUuid - The uuid of the category to clone.
+ * @param {!number} params.targetSurveyId - The id of the survey the category is cloned into.
+ * @param {pgPromise.IDatabase} client - The database client.
+ * @returns {Promise<Category>} - The cloned and validated category.
+ */
+export const cloneCategoryFromSurvey = async (
+  { user, sourceSurveyId, sourceCategoryUuid, targetSurveyId },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const sourceCategory = await CategoryRepository.fetchCategoryAndLevelsByUuid(
+      { surveyId: sourceSurveyId, categoryUuid: sourceCategoryUuid, draft: true },
+      t
+    )
+    if (!sourceCategory) {
+      throw new Error(`Category with uuid ${sourceCategoryUuid} not found in survey ${sourceSurveyId}`)
+    }
+    const categoryName = Category.getName(sourceCategory)
+
+    const targetCategories = await CategoryRepository.fetchCategoriesBySurveyId(
+      { surveyId: targetSurveyId, draft: true },
+      t
+    )
+    const duplicateCheck = checkCloneFromSurveyDuplicate({
+      targetSurveyItems: targetCategories,
+      sourceItem: sourceCategory,
+      getUuid: Category.getUuid,
+      getName: Category.getName,
+      uuidDuplicateErrorKey: 'validationErrors:categoryImport.uuidDuplicate',
+      nameDuplicateErrorKey: 'validationErrors:categoryImport.nameDuplicate',
+    })
+    if (duplicateCheck) {
+      throw new SystemError(duplicateCheck.key, duplicateCheck.params)
+    }
+
+    await CategoryRepository.cloneCategoryFromSurvey(
+      { sourceSurveyId, targetSurveyId, categoryUuid: sourceCategoryUuid },
+      t
+    )
+
+    const logContent = {
+      [ActivityLog.keysContent.uuid]: sourceCategoryUuid,
+      [ActivityLog.keysContent.categoryName]: categoryName,
+    }
+    await Promise.all([
+      markSurveyDraft(targetSurveyId, t),
+      ActivityLogRepository.insert(user, targetSurveyId, ActivityLog.type.categoryInsert, logContent, false, t),
+    ])
+
+    return _validateCategory({ surveyId: targetSurveyId, categoryUuid: sourceCategoryUuid }, t)
+  })
+
 export const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) =>
   client.tx(async (t) => {
     const parentUuid = CategoryItem.getParentUuid(itemParam)
@@ -347,10 +410,9 @@ const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, item
     if (R.isNil(CategoryItem.getExtraProp(name)(item))) {
       return acc
     }
-    const nameNew = ExtraPropDef.getName(itemExtraDef)
     const itemUpdated = deleted
       ? CategoryItem.dissocExtraProp(name)(item)
-      : CategoryItem.renameExtraProp({ nameOld: name, nameNew })(item)
+      : CategoryItem.renameExtraProp({ nameOld: name, nameNew: ExtraPropDef.getName(itemExtraDef) })(item)
 
     return [...acc, itemUpdated]
   }, [])
@@ -540,6 +602,7 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
       [Category.reportingDataItemExtraDefKeys.area]: ExtraPropDef.newItem({
         dataType: ExtraPropDef.dataTypes.number,
         index: Object.values(itemExtraDef).length,
+        locked: true,
       }),
     }
     categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(categoryUpdated)
@@ -582,6 +645,123 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
       ),
     ])
     return categoryUpdated
+  })
+
+const locationExtraPropName = Category.locationItemExtraDefName
+
+/**
+ * Adds the 'location' (geometry point) item extra prop def to the specified category, if it doesn't already have
+ * one of that exact type, updating the category in the DB accordingly. A pre-existing 'location' extra prop def
+ * of a different data type is overwritten (fixed) in place, keeping its original index, rather than being treated
+ * as already satisfying the requirement - otherwise the category would never satisfy Category.hasLocationExtraProp
+ * and the conversion would keep being offered as a no-op.
+ * @param {!object} params - The parameters object.
+ * @param {!number} params.surveyId - The id of the survey the category belongs to.
+ * @param {!string} params.categoryUuid - The uuid of the category to update.
+ * @param {!object} params.category - The category to update.
+ * @param {boolean} [params.locked] - Whether the added extra prop def must be locked (not editable by the user).
+ * @param {!object} t - The DB transaction/client.
+ * @returns {Promise<object>} The updated category (the same one, if the extra prop def was already there).
+ */
+const _addLocationItemExtraDefIfMissing = async ({ surveyId, categoryUuid, category, locked = true }, t) => {
+  if (Category.hasLocationExtraProp(category)) {
+    // already has a 'location' extra prop of type geometryPoint; nothing to add
+    return category
+  }
+  const itemExtraDef = Category.getItemExtraDef(category)
+  const existingLocationDef = itemExtraDef[locationExtraPropName]
+  const index = existingLocationDef ? ExtraPropDef.getIndex(existingLocationDef) : Object.values(itemExtraDef).length
+  const itemExtraDefUpdated = {
+    ...itemExtraDef,
+    [locationExtraPropName]: ExtraPropDef.newItem({
+      dataType: ExtraPropDef.dataTypes.geometryPoint,
+      index,
+      locked,
+    }),
+  }
+  await CategoryRepository.updateCategoryProp(
+    surveyId,
+    categoryUuid,
+    Category.keysProps.itemExtraDef,
+    itemExtraDefUpdated,
+    t
+  )
+  return Category.assocItemExtraDef(itemExtraDefUpdated)(category)
+}
+
+export const convertCategoryToGeoPackage = async ({ user, surveyId, categoryUuid, locked = true }, client = db) =>
+  client.tx(async (t) => {
+    const category = await _fetchCategory({ surveyId, categoryUuid }, t)
+
+    const categoryUpdated = await _addLocationItemExtraDefIfMissing({ surveyId, categoryUuid, category, locked }, t)
+    if (categoryUpdated === category) {
+      // nothing changed: category already had a 'location' extra prop
+      return category
+    }
+
+    await Promise.all([
+      markSurveyDraft(surveyId, t),
+      ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.categoryConvertToGeoPackage,
+        { [ActivityLog.keysContent.uuid]: categoryUuid },
+        false,
+        t
+      ),
+    ])
+    return categoryUpdated
+  })
+
+export const convertCategoryToSamplingPointData = async (
+  { user, surveyId, categoryUuid, locked = true },
+  client = db
+) =>
+  client.tx(async (t) => {
+    const category = await _fetchCategory({ surveyId, categoryUuid }, t)
+
+    if (Category.getName(category) !== Category.samplingPointDataCategoryName) {
+      const categories = await CategoryRepository.fetchCategoriesBySurveyId({ surveyId, draft: true }, t)
+      const hasDuplicate = categories.some(
+        (otherCategory) =>
+          Category.getUuid(otherCategory) !== categoryUuid &&
+          Category.getName(otherCategory) === Category.samplingPointDataCategoryName
+      )
+      if (hasDuplicate) {
+        throw new SystemError(
+          'validationErrors:category.samplingPointDataCategoryAlreadyExists',
+          {},
+          StatusCodes.BAD_REQUEST
+        )
+      }
+    }
+
+    const categoryUpdated = Category.assocProp({
+      key: Category.keysProps.name,
+      value: Category.samplingPointDataCategoryName,
+    })(category)
+    await CategoryRepository.updateCategoryProp(
+      surveyId,
+      categoryUuid,
+      Category.keysProps.name,
+      Category.samplingPointDataCategoryName,
+      t
+    )
+
+    await _addLocationItemExtraDefIfMissing({ surveyId, categoryUuid, category: categoryUpdated, locked }, t)
+
+    await Promise.all([
+      markSurveyDraft(surveyId, t),
+      ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.categoryConvertToSamplingPointData,
+        { [ActivityLog.keysContent.uuid]: categoryUuid },
+        false,
+        t
+      ),
+    ])
+    return _validateCategory({ surveyId, categoryUuid }, t)
   })
 
 // ====== DELETE

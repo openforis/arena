@@ -66,7 +66,11 @@ const dateTimeComparator =
         return Dates.format(val, formatTo)
       }
       const formatFrom = formatsSource.find((format) => Dates.isValidDateInFormat(val, format))
-      return formatFrom ? Dates.convertDate({ dateStr: val, formatFrom, formatTo }) : null
+      // keepTimeZone: false avoids convertDate's default parseZone-based parsing, which treats a
+      // timezone-less date/time string as UTC and shifts it by the host's UTC offset on format.
+      // Date and time values have no real timezone component, so they must be parsed and
+      // formatted consistently in the local zone.
+      return formatFrom ? Dates.convertDate({ dateStr: val, formatFrom, formatTo, keepTimeZone: false }) : null
     }
     const dateTime = toDateTime(value)
     const dateTimeSearch = toDateTime(valueSearch)
@@ -123,14 +127,13 @@ const valueComparatorByNodeDefType = {
   },
   [NodeDef.nodeDefType.text]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.time]: dateTimeComparator({
-    formatsSource: [DateFormats.timeStorage, 'HH:mm:ss'],
-    formatTo: DateFormats.timeStorage,
+    formatsSource: [DateFormats.timeStorage, DateFormats.timeWithSeconds],
+    formatTo: DateFormats.timeWithSeconds,
   }),
 }
 
 /**
  * Compares 2 attribute values according to their properties (depending on the attribute definition).
- *
  * @param {!object} params - The function parameters.
  * @param {!object} [params.survey] - The survey object.
  * @param {!object} [params.value] - The 1st value to compare.

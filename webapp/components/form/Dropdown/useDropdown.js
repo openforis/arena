@@ -108,7 +108,7 @@ export const useDropdown = ({
       if (Objects.isEqual(selection, selectionNext)) return
 
       if (!onBeforeChange || (await onBeforeChange(selectionNext))) {
-        onChangeProp(selectionNext)
+        await onChangeProp(selectionNext)
       }
     },
     [getItemFromOption, multiple, onBeforeChange, onChangeProp, selection]

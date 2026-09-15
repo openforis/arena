@@ -8,6 +8,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
+import { useHasSurveyUserGroups } from './useHasSurveyUserGroups'
 import { useIsKeyEditDisabled } from './useIsKeyEditDisabled'
 import { useIsMultipleEditDisabled } from './useIsMultipleEditDisabled'
 
@@ -66,7 +67,10 @@ export const useBasicProps = (props) => {
     (NodeDef.canHaveAutoIncrementalKey({ nodeDef, nodeDefParent }) &&
       ancestorMultipleEntityDef &&
       !NodeDef.isRoot(ancestorMultipleEntityDef))
+  const canAutoCreateMinCountItems = NodeDef.canHaveAutoCreateMinCountItems(nodeDef)
   const canIncludeInMultipleEntitySummary = NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+  const canBeQualifier = Survey.canNodeDefBeQualifier(nodeDef)(survey)
+  const hasUserGroups = useHasSurveyUserGroups({ enabled: canBeQualifier })
 
   return {
     nodeDef,
@@ -91,6 +95,9 @@ export const useBasicProps = (props) => {
     includedInClone,
     includeInCloneDisabled,
     canHaveAutoIncrementalKey,
+    canAutoCreateMinCountItems,
     canIncludeInMultipleEntitySummary,
+    canBeQualifier,
+    hasUserGroups,
   }
 }

@@ -7,7 +7,7 @@ import { TestId } from '@webapp/utils/testId'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDefIconKey from '../NodeDefIconKey'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
-import NodeDefKeyLockToggle from '../NodeDefKeyLockToggle'
+import NodeDefAttributeLockToggle from '../NodeDefAttributeLockToggle'
 
 const NodeDefFormItemLabel = (props) => {
   const {
@@ -19,7 +19,10 @@ const NodeDefFormItemLabel = (props) => {
     keyFieldLockVisible = false,
     nodes = [],
     onKeyFieldLockToggle = undefined,
+    onQualifierFieldLockToggle = undefined,
     parentNode = null,
+    qualifierFieldLocked = false,
+    qualifierFieldLockVisible = false,
   } = props
 
   return (
@@ -27,11 +30,20 @@ const NodeDefFormItemLabel = (props) => {
       <NodeDefIconKey nodeDef={nodeDef} />
       <span>{label}</span>
       {keyFieldLockVisible && (
-        <NodeDefKeyLockToggle
-          className="survey-form__node-def-key-lock-btn"
-          keyFieldLocked={keyFieldLocked}
+        <NodeDefAttributeLockToggle
+          className="survey-form__node-def-attribute-lock-btn"
+          locked={keyFieldLocked}
           onClick={onKeyFieldLockToggle}
           testId={TestId.surveyForm.keyLockToggle(NodeDef.getName(nodeDef))}
+        />
+      )}
+      {qualifierFieldLockVisible && (
+        <NodeDefAttributeLockToggle
+          className="survey-form__node-def-attribute-lock-btn"
+          locked={qualifierFieldLocked}
+          onClick={onQualifierFieldLockToggle}
+          testId={TestId.surveyForm.qualifierLockToggle(NodeDef.getName(nodeDef))}
+          titleKeyPrefix="recordView.qualifierAttributeEditing"
         />
       )}
       <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
@@ -48,7 +60,10 @@ NodeDefFormItemLabel.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   nodes: PropTypes.array,
   onKeyFieldLockToggle: PropTypes.func,
+  onQualifierFieldLockToggle: PropTypes.func,
   parentNode: PropTypes.object,
+  qualifierFieldLocked: PropTypes.bool,
+  qualifierFieldLockVisible: PropTypes.bool,
 }
 
 export default NodeDefFormItemLabel

@@ -9,15 +9,18 @@ import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 import { useSurvey } from '@webapp/store/survey'
-import { useChain } from '@webapp/store/ui/chain'
+import { useChain, useChainEditable } from '@webapp/store/ui/chain'
 
 import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 
 import BaseUnitSelector from './BaseUnitSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
-import { FirstPhaseCategorySelector } from './FirstPhaseCategorySelector'
-import { FirstPhaseCommonAttributeSelector } from './FirstPhaseCommonAttributeSelector'
+import { Phase1CategorySelector } from './Phase1CategorySelector'
+import { Phase1JoinAttributeSelector } from './Phase1JoinAttributeSelector'
+import { Phase2AsSamplingPointDataSelector } from './Phase2AsSamplingPointDataSelector'
+import { Phase2JoinAttributeSelector } from './Phase2JoinAttributeSelector'
+import { Phase2JoinEntitySelector } from './Phase2JoinEntitySelector'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
 
@@ -26,6 +29,7 @@ export const ChainSamplingDesignProps = (props) => {
 
   const survey = useSurvey()
   const chain = useChain()
+  const editable = useChainEditable()
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const hasBaseUnit = Boolean(baseUnitNodeDef)
@@ -60,20 +64,28 @@ export const ChainSamplingDesignProps = (props) => {
   return (
     <div className="chain-sampling-design">
       <div className="form">
+        <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
+
         {(Chain.hasSamplingDesign(chain) || hasBaseUnit) && <BaseUnitSelector />}
 
         {hasBaseUnit && (
           <>
-            <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
+            {ChainSamplingDesign.isPhase1CategorySelectionEnabled(samplingDesign) && (
+              <>
+                <Phase1CategorySelector />
+                <Phase2JoinEntitySelector />
+                <Phase2AsSamplingPointDataSelector />
+                {ChainSamplingDesign.isPhase1JoinAttributeSelectionEnabled(samplingDesign) && (
+                  <Phase1JoinAttributeSelector />
+                )}
+                {ChainSamplingDesign.isPhase2JoinAttributeSelectionEnabled(samplingDesign) && (
+                  <Phase2JoinAttributeSelector />
+                )}
+              </>
+            )}
 
             {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
             {/* {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />} */}
-
-            {ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign) && <FirstPhaseCategorySelector />}
-
-            {ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(samplingDesign) && (
-              <FirstPhaseCommonAttributeSelector />
-            )}
 
             <ClusteringEntitySelector />
           </>
@@ -88,6 +100,7 @@ export const ChainSamplingDesignProps = (props) => {
                 validation
               )}
               onChange={onClusteringOnlyVariancesChange}
+              disabled={!editable}
             />
           </FormItem>
         )}
@@ -99,6 +112,7 @@ export const ChainSamplingDesignProps = (props) => {
               validation
             )}
             onChange={onNonResponseBiasCorrectionChange}
+            disabled={!editable}
           />
         </FormItem>
 
@@ -111,6 +125,7 @@ export const ChainSamplingDesignProps = (props) => {
             numberFormat={NumberFormats.decimal()}
             onChange={onReportingAreaChange}
             value={ChainStatisticalAnalysis.getReportingArea(chainStatisticalAnalysis)}
+            readOnly={!editable}
           />
         </FormItem>
       </div>

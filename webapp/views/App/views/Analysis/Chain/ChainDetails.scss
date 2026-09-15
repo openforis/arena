@@ -3,9 +3,26 @@
 .app-module {
   .chain {
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr;
     gap: 2rem;
     padding-bottom: 2rem;
+
+    .chain-top-bar {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+
+      .tab-bar {
+        flex: 1;
+      }
+
+      .chain-top-bar-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-shrink: 0;
+      }
+    }
 
     .form-item,
     .labels-editor.with-label {
@@ -19,16 +36,7 @@
       width: 30rem;
     }
 
-    .button-bar {
-      align-self: center;
-
-      .chain-summary-download-btn {
-        position: absolute;
-        left: 0;
-      }
-    }
-
-    .rstudio-fieldset {
+    .rstudio-accordion {
       margin: auto;
 
       .content {
@@ -69,6 +77,14 @@
         .form-item {
           grid-template-columns: 12rem 1fr;
           height: 3rem;
+
+          // longer label than its siblings: give it more room and let it wrap instead of
+          // overflowing/clipping against the checkbox
+          &.phase2-as-sampling-point-data {
+            grid-template-columns: 22rem 1fr;
+            height: auto;
+            white-space: normal;
+          }
         }
 
         &.form-right {

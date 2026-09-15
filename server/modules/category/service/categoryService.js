@@ -4,11 +4,15 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Record from '@core/record/record'
+import * as User from '@core/user/user'
 import { FileFormats } from '@core/fileFormats'
+import * as NumberUtils from '@core/numberUtils'
+import * as Authorizer from '@core/auth/authorizer'
 
 import * as JobManager from '@server/job/jobManager'
 import * as Response from '@server/utils/response'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
@@ -18,6 +22,7 @@ import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenera
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
+import CategoryGeoPackageExportJob from './CategoryGeoPackageExportJob'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
@@ -122,9 +127,17 @@ export const exportAllCategories = ({ user, surveyId, fileFormat, draft }) => {
   return job
 }
 
+export const exportCategoryToGeoPackage = ({ user, surveyId, categoryUuid, draft }) => {
+  const job = new CategoryGeoPackageExportJob({ user, surveyId, categoryUuid, draft })
+
+  JobManager.enqueueJob(job)
+
+  return job
+}
+
 const _getSamplingPointDataCategory = async ({ surveyId, draft = true }) => {
   const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft })
-  return categories.find((category) => Category.getName(category) === Survey.samplingPointDataCategoryName)
+  return categories.find((category) => Category.getName(category) === Category.samplingPointDataCategoryName)
 }
 
 export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }) => {
@@ -139,23 +152,25 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
   const category = await _getSamplingPointDataCategory({ surveyId, draft })
   if (!category) return []
 
-  const items = await CategoryManager.fetchItemsByLevelIndex({
-    surveyId,
-    categoryUuid: Category.getUuid(category),
-    levelIndex,
-    limit,
-    offset,
-    draft,
-  })
+  const [items, survey] = await Promise.all([
+    CategoryManager.fetchItemsByLevelIndex({
+      surveyId,
+      categoryUuid: Category.getUuid(category),
+      levelIndex,
+      limit,
+      offset,
+      draft,
+    }),
+    SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft }),
+  ])
 
-  const recordFinder = await createSamplingPointDataRecordFinder({ surveyId, draft })
+  const recordFinder = await createSamplingPointDataRecordFinder({ surveyId, survey, draft })
 
-  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
   const srsIndex = Survey.getSRSIndex(surveyInfo)
 
   const samplingPointData = items.reduce((acc, item) => {
-    const location = CategoryItem.getExtraProp('location')(item)
+    const location = CategoryItem.getExtraProp(Category.locationItemExtraDefName)(item)
     if (!location) return acc
 
     const codes = CategoryItem.getCodesHierarchy(item)
@@ -174,6 +189,50 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
     return acc
   }, [])
   return samplingPointData
+}
+
+/**
+ * Validates that the given value is a positive integer survey id.
+ * @param {!object} params - Parameters object.
+ * @param {number|string} params.surveyId - The value to validate.
+ * @param {!string} params.paramName - The name of the parameter, used in the error message.
+ * @returns {number} The survey id, converted to a number.
+ * @throws {Error} If the value is not a positive integer.
+ */
+const _validateSurveyId = ({ surveyId, paramName }) => {
+  if (!NumberUtils.isInteger(surveyId) || Number(surveyId) <= 0) {
+    throw new Error(`${paramName} must be a positive integer`)
+  }
+  return Number(surveyId)
+}
+
+/**
+ * Clones a category from another survey into the given survey, after validating the survey ids
+ * and checking that the user is allowed to view the source survey.
+ * @param {!object} params - Parameters object.
+ * @param {!object} params.user - The user performing this operation.
+ * @param {!number} params.sourceSurveyId - The id of the survey the category is cloned from.
+ * @param {!string} params.sourceCategoryUuid - The uuid of the category to clone.
+ * @param {!number} params.targetSurveyId - The id of the survey the category is cloned into.
+ * @returns {Promise<Category>} The cloned and validated category.
+ * @throws {UnauthorizedError} If the user is not allowed to view the source survey.
+ */
+export const cloneCategoryFromSurvey = async ({ user, sourceSurveyId, sourceCategoryUuid, targetSurveyId }) => {
+  const sourceSurveyIdValidated = _validateSurveyId({ surveyId: sourceSurveyId, paramName: 'sourceSurveyId' })
+  const targetSurveyIdValidated = _validateSurveyId({ surveyId: targetSurveyId, paramName: 'targetSurveyId' })
+
+  const sourceSurvey = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyIdValidated })
+  const sourceSurveyInfo = Survey.getSurveyInfo(sourceSurvey)
+  if (!Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+
+  return CategoryManager.cloneCategoryFromSurvey({
+    user,
+    sourceSurveyId: sourceSurveyIdValidated,
+    sourceCategoryUuid,
+    targetSurveyId: targetSurveyIdValidated,
+  })
 }
 
 export const {
@@ -202,6 +261,8 @@ export const {
   updateCategoryItemExtraDefItem,
   cleanupCategory,
   convertCategoryToReportingData,
+  convertCategoryToSamplingPointData,
+  convertCategoryToGeoPackage,
   updateLevelProp,
   updateItemProp,
   updateItemsIndex,
@@ -211,5 +272,5 @@ export const {
   deleteItem,
 
   initializeSurveyCategoryItemsIndexes,
-  initializeAllSurveysCategoryItemIndexes,
+  initializeCategoryItemIndexesForSurvey,
 } = CategoryManager

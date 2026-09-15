@@ -7,6 +7,7 @@ export {
   fetchItemsCountIndexedByCategoryUuid,
   fetchCategory,
   createCategory,
+  cloneCategoryFromSurvey,
   countCategoryItems,
   fetchCategoryItems,
   fetchCategoryItemsInLevelRequest,
@@ -15,31 +16,59 @@ export {
   deleteCategory,
   cleanupCategory,
   convertToReportingDataCategory,
+  convertToSamplingPointDataCategory,
+  convertToGeoPackageCategory,
   startExportAllCategoriesJob,
+  startExportCategoryToGeoPackageJob,
   startCategoriesBatchImportJob,
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
   updateCategoryItemProp,
   updateCategoryItemIndexes,
 } from './categories'
-export { fetchChains, getChainSummaryExportUrl } from './analysis'
+export {
+  fetchChains,
+  fetchChainsForCloneFromSurvey,
+  fetchChainSourceEntityNames,
+  getChainSummaryExportUrl,
+  fetchChainMauFileSummary,
+  getChainMauFileDownloadUrl,
+  uploadChainMauFile,
+  cloneChainFromSurvey,
+  deleteChain,
+  deleteChainMauFile,
+} from './analysis'
 
 export {
   fetchTaxonomies,
   fetchTaxonomy,
   createTaxonomy,
+  cloneTaxonomyFromSurvey,
   uploadTaxa,
   updateTaxonomy,
   updateTaxonomyExtraPropDef,
   deleteTaxonomyIfEmpty,
 } from './taxonomies'
+export {
+  fetchUserGroups,
+  fetchUserGroup,
+  fetchUserGroupMembers,
+  createUserGroup,
+  updateUserGroup,
+  deleteUserGroup,
+  addUserGroupMember,
+  removeUserGroupMember,
+} from './userGroups'
 export { fetchActivityLogs } from './activityLog'
 export {
   getRecordNodeFileUrl,
   fetchRecordsNodeFileExifInfo,
   createRecordFromSamplingPointDataItem,
   startCollectRecordsImportJob,
+  startOdkDataImportJob,
   startDataImportFromArenaJob,
+  startArenaImportSummaryJob,
+  cancelArenaImportSummary,
   startDataImportFromCsvJob,
   getDataImportFromCsvTemplateUrl,
   getDataImportFromCsvTemplatesUrl,
@@ -50,6 +79,7 @@ export {
   fetchRecordsCountByStep,
   fetchRecordSummary,
   fetchRecordsSummary,
+  fetchRecordAndNodes,
   getRecordDocxExportUrl,
   getRecordPdfExportUrl,
   startExportDataJob,
@@ -68,7 +98,7 @@ export {
   updateDataQuerySummary,
   deleteDataQuerySummary,
 } from './dataQuery'
-export { fetchActiveJob } from './job'
+export { cancelJob, fetchActiveJob, fetchAllJobs, fetchJob } from './job'
 export {
   fetchAvailableMapPeriods,
   fetchElevation,
@@ -86,6 +116,7 @@ export {
   fetchSurveyTemplatesPublished,
   insertSurvey,
   insertSurveyFile,
+  fetchSurveyFile,
   startImportLabelsJob,
   startNodeDefsTranslationJob,
   updateSurveyConfigurationProp,

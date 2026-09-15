@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Идэвхтэй',
@@ -53,6 +55,7 @@ export default {
     download: 'Татах',
     draft: 'Ноорог',
     edit: 'Засах',
+    elapsed: 'Өнгөрсөн хугацаа',
     email: 'Имэйл',
     email_other: 'Имэйлүүд',
     emailSentConfirmation: `{{email}} руу имэйл илгээсэн.
@@ -108,6 +111,8 @@ export default {
 Үргэлжлүүлэх үү?`,
     local: 'Орон нутгийн',
     loading: 'Ачаалж байна...',
+    lock: 'Түгжих',
+    unlock: 'Түгжээг тайлах',
     max: 'Хамгийн их',
     med: 'Дундаж',
     manage: 'Удирдах',
@@ -151,9 +156,34 @@ export default {
 - Таксонуудыг устгах боломжгүй.
 
 **Үргэлжлүүлэхдээ итгэлтэй байна уу?**`,
+    publishRecordValuesUpdateConfirm: `#### {{survey}}-г нийтлэх нь бүртгэгдсэн өгөгдлийг шинэчлэх болно ####
+
+{{reasons}}
+
+Энэ үйлдэл нь оруулсан өгөгдлийг бүрмөсөн өөрчлөх эсвэл устгах магадлалтай.
+
+Одоо байгаа өгөгдлийг шинэчлэхгүйгээр нийтлэхийн тулд доорх "Өгөгдлийн шинэчлэлтийг алгасах" гэснийг сонгоно уу (зөвлөдөггүй).`,
+    publishRecordValuesUpdateConfirmHeader: 'Одоо байгаа бичлэгийн өгөгдөл шинэчлэгдэнэ',
+    publishRecordValuesUpdateConfirmOk: 'Нийтлэх ба өгөгдлийг шинэчлэх',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Баталгаажуулахын тулд судалгааны нэр "{{strongConfirmRequiredText}}"-г бичнэ үү',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Дараах атрибутууд өөрчлөгдөх бөгөөд одоо байгаа бичлэгүүдэд тэдгээрийн утга автоматаар дахин тооцоологдоно: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Дараах атрибутууд нь өөрчлөгдсөн ангилал эсвэл таксономийн нэмэлт шинж чанарыг ашигладаг тул одоо байгаа бичлэгүүдэд утга нь дахин тооцоологдоно: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Өгөгдлийн шинэчлэлтийг алгасах',
+    publishSkipDataUpdateConfirmOk: 'Өгөгдлийн шинэчлэлтийг алгасаад нийтлэх',
+    publishSkipDataUpdateImplications: 'Өгөгдлийн шинэчлэлтийг алгасах нь дараахыг илэрхийлнэ:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Одоо байгаа бичлэгүүд шинэ судалгааны тодорхойлолттой нийцэхгүй болж болно',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Нөлөөлөлд өртсөн утгууд гараар дахин оруулах хүртэл дахин тооцоологдохгүй',
+    publishSkipDataUpdateImplicationChains:
+      'Эдгээр атрибутыг ашигладаг боловсруулалтын дараалал (chain) хуучирсан үр дүн гаргаж болзошгүй',
     raiseTicketInSupportForum: `Асуудал гарвал манай <b>Дэмжлэгийн Форум</b>: $t(links.supportForum) руу 'arena' шошготой тасалбар үүсгэнэ үү.`,
     record: 'Бичлэг',
     record_other: 'Бичлэгүүд',
+    remaining: 'Үлдсэн хугацаа',
     remote: 'Алсын',
     required: 'Шаардлагатай',
     requiredField: 'шаардлагатай талбар',
@@ -175,6 +205,10 @@ export default {
     showLabels: 'Шошго харуулах',
     showLabelsAndNames: 'Шошго ба нэр харуулах',
     showNames: 'Нэр харуулах',
+    sort: 'Эрэмбэлэх',
+    sortAsc: 'Өсөх эрэмбэ',
+    sortDesc: 'Буурах эрэмбэ',
+    sortNone: 'Эрэмбэ арилгах',
     srs: 'SRS',
     status: 'Төлөв',
     sum: 'Нийлбэр',
@@ -182,6 +216,7 @@ export default {
     to: 'Хүртэл',
     totalItems: 'Нийт элемент',
     true: 'Үнэн',
+    trySplittingFileIntoSmallerChunks: 'Файлыг жижиг хэсгүүдэд хуваахыг оролдоно уу.',
     type: 'Төрөл',
     undefinedName: 'Тодорхойгүй нэр',
     unique: 'Өвөрмөц',
@@ -190,6 +225,7 @@ export default {
       message: `Файл хуулах явцад алдаа гарлаа: {{error}}.\n
 Дахин оролдох уу?`,
     },
+    uploadFileChangedError: 'Сонгосон файл сонгосноос хойш өөрчлөгдсөн бололтой байна. Түүнийг дахин сонгоно уу.',
     uploadingFile: 'Файл байршуулж байна ({{progressPercent}}%)',
     value: 'Утга',
     view: 'Харах',
@@ -292,6 +328,7 @@ export default {
 
   appModules: {
     home: 'Нүүр хуудас',
+    landing: 'Тавтай морил',
     dashboard: 'Хяналтын самбар',
     surveyNew: 'Шинэ судалгаа',
     surveys: 'Судалгаанууд',
@@ -328,6 +365,9 @@ export default {
     userInvite: 'Хэрэглэгч урих',
     userNew: 'Шинэ хэрэглэгч',
     usersSurvey: 'Хэрэглэгчдийн жагсаалт',
+    userGroup: 'Хэрэглэгчийн бүлэг',
+    userGroup_plural: 'Хэрэглэгчийн бүлгүүд',
+    userGroupNew: 'Шинэ хэрэглэгчийн бүлэг',
     usersList: 'Хэрэглэгчдийн жагсаалт (бүгд)',
     user2FADevice: '2FA төхөөрөмж',
     user2FADevice_plural: '2FA төхөөрөмжүүд',
@@ -341,6 +381,8 @@ export default {
     entities: 'Виртуал объектууд',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Жишээнүүд',
+
+    jobMonitor: 'Ажлын хяналт',
 
     help: 'Тусламж',
     about: 'Тухай',
@@ -456,8 +498,10 @@ $t(common.raiseTicketInSupportForum)
       lock: 'Түлхүүр атрибутын засварыг түгжих',
       unlock: 'Түлхүүр атрибутыг засахыг зөвшөөрөх',
     },
-    lock: 'Түгжих',
-    unlock: 'Түгжээг тайлах',
+    qualifierAttributeEditing: {
+      lock: 'Квалификатор атрибутын засварыг түгжих',
+      unlock: 'Квалификатор атрибутыг засахыг зөвшөөрөх',
+    },
   },
 
   dataExplorerView: {
@@ -593,8 +637,9 @@ $t(common.raiseTicketInSupportForum)
     confirmInviteSystemAdmin: 'Хэрэглэгч {{email}}-г Систем Администратороор урих уу?',
     confirmInviteSystemAdmin_other: 'Хэрэглэгч {{email}}-г Систем Администратороор урих уу?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} хаяг алгассан (тэдгээр нь энэ судалгаанд өмнө нь уригдсан байсан): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} хаяг алгассан (тэдгээр нь энэ судалгаанд өмнө нь уригдсан байсан): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Эрхүүд',
       systemAdmin: `
@@ -699,11 +744,33 @@ $t(common.raiseTicketInSupportForum)
         'Суурь нэгжийг устгаснаар та бүх "талбай дээр суурилсан хувьсагч" сонголтуудыг болино. Үргэлжлүүлэх үү?',
     },
     downloadSummaryJSON: 'Хураангуй татах (JSON)',
-    firstPhaseCategory: '1-р үе шатны ангилал',
-    firstPhaseCommonAttribute: {
-      label: 'Нийтлэг шинж чанар',
-      info: `Суурь нэгж ба 1-р үе шатны хүснэгтийн хоорондох нийтлэг шинж чанар
-(энэ нь 1-р үе шатны ангилалд тодорхойлогдсон нэмэлт шинж чанарын ижил нэртэй кодын шинж чанар байх ёстой)`,
+    mauFile: {
+      upload: 'MAU.zip байршуулах',
+      download: 'MAU.zip татах',
+      delete: 'MAU.zip устгах',
+      confirmReplace: 'Энэ хэлхээнд MAU.zip файл аль хэдийн байршуулагдсан байна. Үүнийг солих уу?',
+      confirmDelete: 'Энэ хэлхээнд байршуулсан MAU.zip файлыг устгах уу?',
+      uploadComplete: 'MAU.zip файл амжилттай байршуулагдлаа',
+      deleteComplete: 'MAU.zip файл устгагдлаа',
+      invalidFileExtension: '.zip файл сонгоно уу',
+    },
+    phase1Category: '1-р үе шатны ангилал',
+    phase1CategoryInfo: '1-р үе шатны түүврийг агуулсан ангиллыг сонгоно уу.',
+    phase2JoinEntity: {
+      label: 'Холболтын объект (2-р үе шат)',
+      info: 'Суурь нэгжийг 1-р үе шатны ангилалтай холбоход ашиглах объект: суурь нэгж өөрөө, эсвэл түүний эцэг объектуудын аль нэг.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Sampling Point Data холбоосыг ашиглан холбох',
+      info: '2-р үе шатны объектын түлхүүр(үүд) нь 1-р үе шатанд ашигласантай ижил Sampling Point Data хүснэгтээс уншигдана.',
+    },
+    phase1JoinAttribute: {
+      label: 'Холболтын шинж чанар (1-р үе шат)',
+      info: '$t(chainView.phase1Category) хүснэгтийн баганыг (нэмэлт шинж чанар эсвэл "code") 2-р үе шатны холболтын объекттой холбоход ашиглана.',
+    },
+    phase2JoinAttribute: {
+      label: 'Холболтын шинж чанар (2-р үе шат)',
+      info: '1-р үе шатны хүснэгттэй холбохын тулд 2-р үе шатны объектын шинж чанарыг сонгоно уу; түүний утгыг өмнөх 1-р үе шатны холболтын шинж чанартай харьцуулна.',
     },
     formLabel: 'Боловсруулах гинжийн шошго',
     basic: 'Үндсэн',
@@ -721,6 +788,8 @@ $t(common.raiseTicketInSupportForum)
     nonResponseBiasCorrectionInfo: `Жинлэлтийн ангиллын тохируулгын аргыг хэрэгжүүлэхийн тулд 'design_psu' болон 'design_ssu'-г давхаргын ангиллын хүснэгтэд нэмэлт тоон шинж чанар болгон нэмнэ үү.`,
     pValue: 'P-утга',
     resultsBackFromRStudio: 'RStudio-оос үр дүнг буцааж уншсан',
+    resultsBackFromRStudioInfo: `RStudio-д тооцоолсон үр дүнгийн шинж чанаруудыг Arena сервер рүү буцааж импортлох шаардлагатай бол энэ сонголтыг идэвхжүүлнэ үү.
+Энэ үйл явц удаан байж болзошгүй.`,
     samplingDesign: 'Түүвэрлэлтийн загвар',
     samplingDesignDetails: 'Түүвэрлэлтийн загварын дэлгэрэнгүй мэдээлэл',
     samplingStrategyLabel: 'Түүвэрлэлтийн стратеги',
@@ -745,9 +814,12 @@ $t(common.raiseTicketInSupportForum)
       reportingAreaInfo: `Үечилсэн түүвэрлэлтийн хувьд үечилсэн шинж чанарын ангиллын хүснэгтэд давхаргуудын талбайг оруулна уу (баганын нэр 'area')`,
     },
     stratumAttribute: 'Үеийн шинж чанар',
+    stratumAttributeInfo: 'Түүврийг давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.',
+    stratumAttribute2ndPhaseInfo: `Эцсийн, дэлгэрэнгүй дэд түүврийг гаргаж авахаас өмнө 1-р үе шатны түүврийг дэд давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу. Зөвхөн 1-р үе шатны ангиллын багана болж мөн орсон нэртэй атрибутууд харагдана.`,
     postStratificationAttribute: 'Дараах үечилсэн шинж чанар',
     areaWeightingMethod: 'Талбайн жинлэх арга',
     clusteringEntity: 'Бүлэглэх объект',
+    clusteringEntityInfo: `Анхдагч түүврийн нэгжийг тодорхойлох объект. Тэмдэглэл: Энэ нь зөвхөн R survey багцын хүрээнд кластерийн шинжилгээнд ашиглагдана.`,
     clusteringOnlyVariances: 'Зөвхөн хэлбэлзэлд зориулсан бүлэглэлт',
     errorNoLabel: 'Гинж нь хүчинтэй шошготой байх ёстой',
     dateExecuted: 'Гүйцэтгэсэн огноо',
@@ -756,6 +828,18 @@ $t(common.raiseTicketInSupportForum)
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Боловсруулах гинж устгагдсан',
+    cloneFromAnotherSurvey: 'Өөр судалгаанаас хуулах',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Өөр судалгаанаас гинжийг хуулах',
+      sourceSurvey: 'Эх судалгаа',
+      sourceChain: 'Эх гинж',
+      entityCheck: 'Объектын нийцтэй байдал',
+      entityMissing: 'зорилтот судалгаанд байхгүй',
+      skipMissingEntities: 'Зорилтот судалгаанд байхгүй объектуудын шинжилгээний шинж чанаруудыг алгасах',
+      noAnalysisAttributes: 'Энэ гинж шинжилгээний шинж чанаргүй байна',
+      cloneComplete: 'Гинж амжилттай хуулагдсан',
+      missingEntities: 'Хуулах боломжгүй: дараах объектууд зорилтот судалгаанд байхгүй байна: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `Зангилааны тодорхойлолт "{{label}}" нь боловсруулах гинжийн бүх мөчлөгт хамаарахгүй тул сонгох боломжгүй.`,
     cannotSelectCycle:
       'Энэ мөчлөгийг сонгох боломжгүй, учир нь зарим зангилааны тодорхойлолтууд энэ мөчлөгт хамаарахгүй.',
@@ -848,6 +932,18 @@ $t(common.appNameFull)
     basic: 'Үндсэн',
     advanced: 'Нарийвчилсан',
     mobileApp: 'Мобайл апп',
+    print: 'Хэвлэх',
+    printProps: {
+      printOrientation: {
+        label: 'Хуудасны чиглэл',
+        info: 'Энэ объект өөрийн хэвлэх хэсгийг эхлүүлэхэд ашиглагдах чиглэл. Анхдагчаар экспортод сонгосон баримтын чиглэлийг дагана.',
+      },
+      orientations: {
+        default: 'Анхдагч (баримт)',
+        portrait: 'Босоо',
+        landscape: 'Хэвтээ',
+      },
+    },
     validations: 'Баталгаажуулалтууд',
     function: 'Функц',
     editingFunction: 'Функц {{functionName}}-г засах',
@@ -893,6 +989,7 @@ $t(common.appNameFull)
       rowIndex: 'Одоогийн хүснэгтийн мөрний (эсвэл маягтын) индексыг буцаана',
       taxonProp: 'Заасан кодтой таксоны заасан $t(extraProp.label)-ийн утгыг буцаана',
       taxonVernacularName: 'Заасан кодтой таксоны заасан хэлээрх (эхний) нутгийн нэрийг буцаана',
+      unique: 'Олон шинж чанар эсвэл объектын өвөрмөц утгуудыг буцаана',
       userEmail: 'Нэвтэрсэн хэрэглэгчийн имэйлийг буцаана',
       userIsRecordOwner:
         'Бичлэгийг засаж буй хэрэглэгч нь мөн түүний эзэмшигч бол "үнэн", үгүй бол "худал" гэсэн боол утгыг буцаана',
@@ -912,6 +1009,10 @@ $t(common.appNameFull)
       autoIncrementalKey: {
         label: 'Автомат өсөн нэмэгдэх түлхүүр',
         info: 'Утга автоматаар үүсгэгдэнэ',
+      },
+      autoCreateMinCountItems: {
+        label: 'Хамгийн бага элементийг автоматаар үүсгэх',
+        info: 'Объект хэрэгжиж эхлэх үед эсвэл түүний эцэг объект үүсгэгдэх үед хамгийн бага тооны объектууд автоматаар үүсгэгдэнэ.',
       },
       displayAs: 'Илэрхийлэх',
       displayIn: 'Илэрхийлэхдээ',
@@ -936,6 +1037,10 @@ $t(common.appNameFull)
       multiple: 'Олон',
       ownPage: 'Өөрийн хуудас',
       parentPage: 'Эцэг хуудас ({{parentPage}})',
+      qualifier: {
+        label: 'Тодорхойлогч',
+        info: `Бүлэгт харьяалагддаг хэрэглэгч шинэ бичлэг үүсгэхэд энэ атрибут нь хэрэглэгчийн бүлгийн тодорхойлогчид заасан утгаар автоматаар бөглөгдөнө. Хэрэглэгчид зөвхөн өөрийн бүлэгт хамаарах бичлэгүүдийг харах, засах боломжтой байх болно, хэрэв тэд бүлэгт харьяалагддаг бол.`,
+      },
       table: 'Хүснэгт',
     },
     advancedProps: {
@@ -1020,6 +1125,9 @@ $t(common.appNameFull)
     },
     mobileProps: {
       title: 'Мобайл апп',
+    },
+    timeProps: {
+      includeSeconds: 'Секунд оруулах',
     },
     formHeaderProps: {
       headerColorLabel: 'Толгой хэсгийн өнгө',
@@ -1113,6 +1221,8 @@ $t(common.appNameFull)
 
 Жишээ нь, *бүлэглэл -> талбай -> мод* гэсэн бүтэцтэй бол, хэрэв танд **Өвөрмөц** гэж тэмдэглэгдсэн *tree_species* гэсэн шинж чанар байвал, нэг *талбай* дотор зөвхөн нэг төрлийн мод байж болно.`,
     },
+    categoriesClonedFromSurvey: 'Дараах ангилалууд эх судалгаанаас мөн хувилагдсан: {{names}}',
+    taxonomiesClonedFromSurvey: 'Дараах таксономууд эх судалгаанаас мөн хувилагдсан: {{names}}',
   },
 
   languagesEditor: {
@@ -1123,6 +1233,16 @@ $t(common.appNameFull)
     header: 'Таксоном',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Таксоном {{taxonomyName}}-г устгах уу?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Өөр судалгаанаас таксоном хуулах',
+      sourceSurvey: 'Эх сурвалж судалгаа',
+      sourceTaxonomy: 'Эх сурвалж таксоном',
+      loadingSurveys: 'Судалгаанууд ачаалж байна...',
+      noSurveysAvailable: 'Судалгаа алга байна',
+      selectSurveyFirst: 'Эхлээд судалгаа сонгоно уу',
+      loadingTaxonomies: 'Таксоном ачаалж байна...',
+      noTaxonomiesAvailable: 'Сонгосон судалгаанд таксоном алга байна',
+    },
     edit: {
       taxonomyListName: 'Таксономын жагсаалтын нэр',
       taxaNotImported: 'Таксонуудыг импортлоогүй',
@@ -1131,6 +1251,9 @@ $t(common.appNameFull)
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Ижил нэр / Латин',
       extraPropsNotDefined: 'Энэ таксономын нэмэлт шинж чанарууд тодорхойлогдоогүй',
+      importMissingPublishedTaxa:
+        '{{count}} нийтлэгдсэн таксон импортлосон файлд олдоогүй тул өөрчлөгдөлгүй үлдлээ. Кодууд: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} дахин)',
     },
     taxaCount: 'Таксоны тоо',
     vernacularNameLabel: 'Нутгийн нэрийн шошго',
@@ -1141,11 +1264,24 @@ $t(common.appNameFull)
     batchImportCompleteSuccessfully: `{{importedCategories}} ангилал амжилттай импортлогдлоо!
 {{insertedCategories}} шинэ
 {{updatedCategories}} шинэчлэгдсэн`,
+    cloneFromAnotherSurvey: {
+      title: 'Өөр судалгаанаас ангилал хуулах',
+      sourceSurvey: 'Эх сурвалж судалгаа',
+      sourceCategory: 'Эх сурвалж ангилал',
+      loadingSurveys: 'Судалгаанууд ачаалж байна...',
+      noSurveysAvailable: 'Судалгаа алга байна',
+      selectSurveyFirst: 'Эхлээд судалгаа сонгоно уу',
+      loadingCategories: 'Ангилал ачаалж байна...',
+      noCategoriesAvailable: 'Сонгосон судалгаанд ангилал алга байна',
+    },
     itemsCount: 'Элементүүдийн тоо',
+    structure: 'Бүтэц',
     types: {
       flat: 'Хавтгай',
       hierarchical: 'Иерархи',
       reportingData: 'Тайлагнах өгөгдөл',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Дээж цэгийн өгөгдөл',
     },
   },
 
@@ -1173,6 +1309,49 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Энэ Тайлагнах өгөгдлийн ангиллыг энгийн ангилал болгон хөрвүүлэх үү?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Дээж цэгийн өгөгдөл рүү хөрвүүлэх',
+      confirmMessage: `Энэ ангиллыг Дээж цэгийн өгөгдлийн ангилал болгон хөрвүүлэх үү?
+
+Ангиллын нэр '${samplingPointDataCategoryName}' болж өөрчлөгдөж, элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'GeoPackage ангилал руу хөрвүүлэх',
+      confirmMessage: `Энэ ангиллыг GeoPackage ангилал болгон хөрвүүлэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
+      confirmMessage: `Энэ GeoPackage ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
+
+'${locationItemExtraDefName}' нэмэлт талбарын цоожийг тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
+      confirmMessage: `Энэ Дээж цэгийн өгөгдлийн ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
+
+Ангиллын нэрийг цэвэрлэх бөгөөд (шинэ нэр өгөх шаардлагатай болно), '${locationItemExtraDefName}' нэмэлт талбарын цоожийг мөн тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
+    },
+    geoPackageCategory: 'Энэ бол GeoPackage ангилал юм',
+    samplingPointDataCategoryType: 'Энэ бол Дээж цэгийн өгөгдлийн ангилал юм',
+    createCategory: {
+      menuLabel: 'Ангилал нэмэх',
+      simple: 'Энгийн ангилал',
+      otherTypes: 'Ангиллын бусад төрлүүд',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Дээж цэгийн өгөгдлийн ангилал',
+      message: `Шинэ Дээж цэгийн өгөгдлийн ангилал үүсгэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'GeoPackage ангилал',
+      message: `Шинэ GeoPackage ангилал үүсгэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
     deleteItem: 'Элемент устгах',
     level: {
       title: 'Түвшин {{levelPosition}}',
@@ -1196,6 +1375,8 @@ $t(common.cantUndoWarning)`,
       title: 'Ангиллын импортын хураангуй',
     },
     reportingData: 'Тайлагнах өгөгдөл',
+    exportToGeoPackage: 'GeoPackage рүү экспортлох',
+    exportToGeoPackageSkippedItems: 'Хүчинтэй байршилгүй {{count}} элементийг алгаслаа.',
     templateFor_samplingPointDataImport_csv: 'Түүвэрлэлтийн цэгийн загвар (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Түүвэрлэлтийн цэгийн загвар (Excel)',
   },

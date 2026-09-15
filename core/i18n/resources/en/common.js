@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Active',
@@ -55,6 +57,7 @@ Do you want to ignore them?`,
     download: 'Download',
     draft: 'Draft',
     edit: 'Edit',
+    elapsed: 'Elapsed',
     email: 'Email',
     email_other: 'Emails',
     emailSentConfirmation: `An email to {{email}} has been sent.
@@ -110,6 +113,8 @@ By confirming, all changes will be lost.
 Do you want to proceed?`,
     local: 'Local',
     loading: 'Loading...',
+    lock: 'Lock',
+    unlock: 'Unlock',
     max: 'Maximum',
     med: 'Median',
     manage: 'Manage',
@@ -157,9 +162,31 @@ Do you want to proceed?`,
 - Taxa cannot be deleted.
 
 **Are you sure you want to continue?**`,
+    publishRecordValuesUpdateConfirm: `#### Publishing {{survey}} will update data already recorded ####
+
+{{reasons}}
+
+This operation can permanently change or clear data already entered.
+
+To publish without updating the existing data instead, check "Skip data update" below (not recommended).`,
+    publishRecordValuesUpdateConfirmHeader: 'Existing record data will be updated',
+    publishRecordValuesUpdateConfirmOk: 'Publish and update data',
+    publishRecordValuesUpdateConfirmInputLabel: 'Type the survey name "{{strongConfirmRequiredText}}" to confirm',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'The following attributes will be modified, and their values in existing records will be automatically recalculated: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'The following attributes use an extra property of a category or taxonomy that changed, which will recalculate their value in existing records: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Skip data update',
+    publishSkipDataUpdateConfirmOk: 'Skip data update and publish',
+    publishSkipDataUpdateImplications: 'Skipping the data update means:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Existing records may no longer match with the new survey definition',
+    publishSkipDataUpdateImplicationStaleValues: "Affected values won't be recalculated until re-entered manually",
+    publishSkipDataUpdateImplicationChains: 'Processing chains using these attributes may produce outdated results',
     raiseTicketInSupportForum: `In case of problems please raise a ticket with a tag 'arena' in our <b>Support Forum</b>: $t(links.supportForum)`,
     record: 'Record',
     record_other: 'Records',
+    remaining: 'Remaining',
     remote: 'Remote',
     required: 'Required',
     requiredField: 'required field',
@@ -181,6 +208,10 @@ Do you want to proceed?`,
     showLabels: 'Show labels',
     showLabelsAndNames: 'Show labels and names',
     showNames: 'Show names',
+    sort: 'Sort',
+    sortAsc: 'Sort ascending',
+    sortDesc: 'Sort descending',
+    sortNone: 'Remove sort',
     srs: 'SRS',
     status: 'Status',
     sum: 'Sum',
@@ -188,6 +219,7 @@ Do you want to proceed?`,
     to: 'To',
     totalItems: 'Total items',
     true: 'True',
+    trySplittingFileIntoSmallerChunks: 'Try splitting the file into smaller chunks.',
     type: 'Type',
     undefinedName: 'Undefined name',
     unique: 'Unique',
@@ -196,6 +228,8 @@ Do you want to proceed?`,
       message: `Error during file upload: {{error}}.\n
 Try again?`,
     },
+    uploadFileChangedError:
+      'The selected file appears to have been modified since it was selected. Please select it again.',
     uploadingFile: 'Uploading file ({{progressPercent}}%)',
     value: 'Value',
     view: 'View',
@@ -297,6 +331,7 @@ Try again?`,
 
   appModules: {
     home: 'Home',
+    landing: 'Landing',
     dashboard: 'Dashboard',
     surveyNew: 'New Survey',
     surveys: 'Surveys',
@@ -333,6 +368,9 @@ Try again?`,
     userInvite: 'Invite user',
     userNew: 'New User',
     usersSurvey: 'Users list',
+    userGroup: 'User Group',
+    userGroup_plural: 'User Groups',
+    userGroupNew: 'New User Group',
     usersList: 'Users list (all)',
     user2FADevice: '2FA device',
     user2FADevice_plural: '2FA devices',
@@ -349,6 +387,8 @@ Try again?`,
 
     message: 'Message',
     message_plural: '$t(common.message_plural)',
+
+    jobMonitor: 'Job Monitor',
 
     help: 'Help',
     about: 'About',
@@ -404,13 +444,17 @@ $t(common.raiseTicketInSupportForum)
 **Once you send the request, please wait for an invitation email to access Arena.**`,
     reCaptchaNotAnswered: 'ReCaptcha not answered',
     requestSent: 'Access Request sent correctly',
-    requestSentMessage: `Please give us a couple of days to process your request.
-We will send soon an email to **{{email}}** with the instructions on how to access $t(common.appName).
+    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
+$t(accessRequestView.whitelistSenderSuggestion)
+
+Please give us a couple of days to process your request.
+We will send you another email to **{{email}}** with the instructions on how to access $t(common.appName), once it's accepted.
 Thank you and enjoy **$t(common.appNameFull)**!`,
     sendRequest: 'Send Request',
     sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
     templateNotSelected: 'Not selected (start from scratch)',
     title: 'Requesting access to $t(common.appNameFull)',
+    whitelistSenderSuggestion: `If you find it in the Spam/Junk folder, please add **{{senderEmail}}** to your contacts (address book) or mark it as safe/not spam, so that future emails from us reach your inbox directly.`,
   },
 
   resetPasswordView: {
@@ -464,8 +508,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       lock: 'Lock key attribute editing',
       unlock: 'Allow editing of key attribute',
     },
-    lock: 'Lock',
-    unlock: 'Unlock',
+    qualifierAttributeEditing: {
+      lock: 'Lock qualifier attribute editing',
+      unlock: 'Allow editing of qualifier attribute',
+    },
   },
 
   dataExplorerView: {
@@ -612,8 +658,11 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
     confirmInviteSystemAdmin_other: 'Invite the users {{email}} as System Administrators?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
-    
-    {{skppedEmailsCount}} addresses have been skipped (they have been already invited to this survey previously): {{skippedEmails}}`,
+
+    $t(userInviteView.skippedEmailsNotice)`,
+    skippedEmailsNotice: `{{skppedEmailsCount}} addresses have been skipped (they have been already invited to this survey previously): {{skippedEmails}}`,
+    invalidEmailsWarning: `The email address {{emails}} could not be reached and may not exist. It has been kept in the list below: please correct it or remove it and try inviting again.`,
+    invalidEmailsWarning_other: `The email addresses {{emails}} could not be reached and may not exist. They have been kept in the list below: please correct or remove them and try inviting again.`,
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `
@@ -717,11 +766,33 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       confirmDelete: 'By deleting the base unit, you will uncheck all "area-based variable" selections. Continue?',
     },
     downloadSummaryJSON: 'Download Summary (JSON)',
-    firstPhaseCategory: '1st phase category',
-    firstPhaseCommonAttribute: {
-      label: 'Common attribute',
-      info: `Attribute in common between base unit and 1st phase table 
-(it must be a code attribute with the same name of an extra property defined for the 1st phase category)`,
+    mauFile: {
+      upload: 'Upload MAU.zip',
+      download: 'Download MAU.zip',
+      delete: 'Delete MAU.zip',
+      confirmReplace: 'A MAU.zip file has already been uploaded for this chain. Do you want to replace it?',
+      confirmDelete: 'Delete the MAU.zip file uploaded for this chain?',
+      uploadComplete: 'MAU.zip file uploaded successfully',
+      deleteComplete: 'MAU.zip file deleted',
+      invalidFileExtension: 'Please select a .zip file',
+    },
+    phase1Category: '1st phase category',
+    phase1CategoryInfo: 'Select the category that contains the first-phase samples.',
+    phase2JoinEntity: {
+      label: 'Join entity (2nd phase)',
+      info: 'Entity used to join the base unit with the 1st phase category: the base unit entity itself, or one of its parent entities.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Join by using Sampling Point Data linkage',
+      info: 'The second-phase entity key(s) are read from the Sampling Point Data table, which is the same table used for the first phase.',
+    },
+    phase1JoinAttribute: {
+      label: 'Join attribute (1st phase)',
+      info: 'Select the column of the $t(chainView.phase1Category) table (an extra property, or "code") used to join it with the 2nd phase join entity.',
+    },
+    phase2JoinAttribute: {
+      label: 'Join attribute (2nd phase)',
+      info: `Select the attribute (of 2nd phase entity) to join with 1st phase table; its value is matched against the previous 1st phase join attribute.`,
     },
     formLabel: 'Processing chain label',
     basic: 'Basic',
@@ -739,6 +810,8 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     nonResponseBiasCorrectionInfo: `To implement Weighting Class Adjustment method, add 'design_psu' and 'design_ssu' into the stratum category table as extra numeric properties`,
     pValue: 'P-value',
     resultsBackFromRStudio: 'Results read back from RStudio',
+    resultsBackFromRStudioInfo: `Enable this option if the result attributes calculated in RStudio should be imported back into the Arena server.
+This might be a slow process.`,
     samplingDesign: 'Sampling Design',
     samplingDesignDetails: 'Sampling Design Details',
     samplingStrategyLabel: 'Sampling strategy',
@@ -763,9 +836,14 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       reportingAreaInfo: `With stratified sampling, give areas of strata within the stratum attribute's category table (column name 'area')`,
     },
     stratumAttribute: 'Stratum attribute',
+    stratumAttributeInfo: 'Select the variable used to stratify the sample.',
+    stratumAttribute2ndPhaseInfo:
+      'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample. Only attributes whose name also appears as a column of the 1st phase category are shown.',
     postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
     clusteringEntity: 'Clustering entity',
+    clusteringEntityInfo:
+      'The entity defining primary sampling units. Note: This is used exclusively for cluster analysis within the R survey package framework.',
     clusteringOnlyVariances: 'Clustering only for variances',
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
@@ -774,6 +852,18 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     
 $t(common.cantUndoWarning)`,
     deleteComplete: 'Processing chain deleted',
+    cloneFromAnotherSurvey: 'Clone from another survey',
+    cloneFromAnotherSurveyDialog: {
+      title: 'Clone chain from another survey',
+      sourceSurvey: 'Source survey',
+      sourceChain: 'Source chain',
+      entityCheck: 'Entity compatibility',
+      entityMissing: 'missing in target survey',
+      skipMissingEntities: 'Skip analysis attributes for entities missing in the target survey',
+      noAnalysisAttributes: 'This chain has no analysis attributes',
+      cloneComplete: 'Chain cloned successfully',
+      missingEntities: 'Cannot clone: the following entities do not exist in the target survey: {{entities}}',
+    },
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
     copyRStudioCode: `#### You are about to open an RStudio Server ####  
@@ -874,6 +964,18 @@ $t(common.appNameFull)
     basic: 'Basic',
     advanced: 'Advanced',
     mobileApp: 'Mobile App',
+    print: 'Print',
+    printProps: {
+      printOrientation: {
+        label: 'Page orientation',
+        info: 'Orientation used when this entity starts its own printable section. Default inherits the document orientation chosen at export.',
+      },
+      orientations: {
+        default: 'Default (document)',
+        portrait: 'Portrait',
+        landscape: 'Landscape',
+      },
+    },
     validations: 'Validations',
     function: 'Function',
     editingFunction: 'Editing function {{functionName}}',
@@ -922,6 +1024,7 @@ $t(common.appNameFull)
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       taxonVernacularName:
         'Returns the (first) vernacular (or local) name in the specified language of a taxon having the specified code',
+      unique: 'Returns the unique values of a multiple attribute or entity',
       userEmail: 'Returns the email of the logged in user',
       userIsRecordOwner:
         'Returns a boolean value "true" if the user editing the record is also its owner, "false" otherwise',
@@ -942,12 +1045,20 @@ $t(common.appNameFull)
         label: 'Auto incremental',
         info: 'Value will be automatically generated',
       },
+      autoCreateMinCountItems: {
+        label: 'Auto-create minimum items',
+        info: 'When the entity becomes relevant or its parent entity is created, a number of entities equal to the minimum count will be generated automatically.',
+      },
       displayAs: 'Display as',
       displayIn: 'Display in',
       entitySource: 'Entity Source',
       enumerate: {
         label: 'Enumerate',
         info: `The rows will be automatically generated using the category items associated to a code attribute marked as Key defined inside the entity; rows cannot be added or deleted and the key code attribute won't be editable`,
+      },
+      enumeratingItemsExpression: {
+        label: 'Enumerating items expression',
+        info: 'Optional expression that filters which category items are enumerated (e.g. unique(table_source.source_type)). When empty, all category items are used.',
       },
       enumerator: {
         label: 'Enumerator',
@@ -965,6 +1076,10 @@ $t(common.appNameFull)
       multiple: 'Multiple',
       ownPage: 'Its own page',
       parentPage: 'Parent page ({{parentPage}})',
+      qualifier: {
+        label: 'Qualifier',
+        info: `When a new record is created by a user belonging to a group, this attribute will be automatically filled with the value specified for it in the qualifiers of the user's group. Users will only be able to see and modify records belonging to their own group, if they belong to one.`,
+      },
       table: 'Table',
     },
     advancedProps: {
@@ -1047,6 +1162,9 @@ This is perfect for hiding entire parts of a survey based on who is logged in (l
     },
     mobileProps: {
       title: 'Mobile App',
+    },
+    timeProps: {
+      includeSeconds: 'Include seconds',
     },
     formHeaderProps: {
       headerColorLabel: 'Header color',
@@ -1143,6 +1261,8 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     },
     nodeDefClonedSuccessfully:
       'Node definition "{{nodeDefName}}" cloned successfully into "{{targetParentNodeDefName}}"',
+    categoriesClonedFromSurvey: 'The following categories were also cloned from the source survey: {{names}}',
+    taxonomiesClonedFromSurvey: 'The following taxonomies were also cloned from the source survey: {{names}}',
   },
 
   languagesEditor: {
@@ -1153,6 +1273,16 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     header: 'Taxonomy',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
     confirmDelete: 'Delete the taxonomy {{taxonomyName}}?\n$t(common.cantUndoWarning)',
+    cloneFromAnotherSurvey: {
+      title: 'Clone Taxonomy From Another Survey',
+      sourceSurvey: 'Source survey',
+      sourceTaxonomy: 'Source taxonomy',
+      loadingSurveys: 'Loading surveys...',
+      noSurveysAvailable: 'No surveys available',
+      selectSurveyFirst: 'Select a survey first',
+      loadingTaxonomies: 'Loading taxonomies...',
+      noTaxonomiesAvailable: 'No taxonomies available in the selected survey',
+    },
     edit: {
       taxonomyListName: 'Taxonomy list name',
       taxaNotImported: 'Taxa not imported',
@@ -1161,6 +1291,9 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       synonym: 'Synonym / Latin',
       extraPropsNotDefined: 'Extra properties not defined for this taxonomy',
+      importMissingPublishedTaxa:
+        '{{count}} published taxon/taxa not found in the imported file and left unchanged. Codes: {{codes}}',
+      importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} more)',
     },
     taxaCount: 'Taxa count',
     vernacularNameLabel: 'Vernacular name label',
@@ -1171,11 +1304,24 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     batchImportCompleteSuccessfully: `{{importedCategories}} categories imported successfully!
 {{insertedCategories}} new
 {{updatedCategories}} updated`,
+    cloneFromAnotherSurvey: {
+      title: 'Clone Category From Another Survey',
+      sourceSurvey: 'Source survey',
+      sourceCategory: 'Source category',
+      loadingSurveys: 'Loading surveys...',
+      noSurveysAvailable: 'No surveys available',
+      selectSurveyFirst: 'Select a survey first',
+      loadingCategories: 'Loading categories...',
+      noCategoriesAvailable: 'No categories available in the selected survey',
+    },
     itemsCount: 'Items count',
+    structure: 'Structure',
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
       reportingData: 'Reporting Data',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Sampling Point Data',
     },
   },
 
@@ -1203,6 +1349,49 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     convertToSimpleCategory: {
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convert to Sampling Point Data',
+      confirmMessage: `Convert this category to the Sampling Point Data category?
+
+The category will be renamed to '${samplingPointDataCategoryName}' and a '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convert to GeoPackage category',
+      confirmMessage: `Convert this category to a GeoPackage category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this GeoPackage category to a simple category?
+
+The '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this Sampling Point Data category to a simple category?
+
+The category name will be cleared (you'll need to give it a new name), and the '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+    },
+    geoPackageCategory: 'This is a GeoPackage category',
+    samplingPointDataCategoryType: 'This is the Sampling Point Data category',
+    createCategory: {
+      menuLabel: 'Add category',
+      simple: 'Simple category',
+      otherTypes: 'More category types',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Sampling Point Data category',
+      message: `Create a new Sampling Point Data category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'GeoPackage category',
+      message: `Create a new GeoPackage category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
     deleteItem: 'Delete item',
     level: {
       title: 'Level {{levelPosition}}',
@@ -1226,6 +1415,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Category import summary',
     },
     reportingData: 'Reporting data',
+    exportToGeoPackage: 'Export to GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} item(s) without a valid location were skipped.',
     templateFor_samplingPointDataImport_csv: 'Template for Sampling Point Data import (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Template for Sampling Point Data import (Excel)',
   },
@@ -1364,6 +1555,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Explain this expression',
       thinking: 'Asking the AI to explain this expression…',
       error: 'Failed to fetch explanation: {{message}}',
+      timeout: 'The AI took too long to respond. Please try again.',
     },
   },
 

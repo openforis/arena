@@ -21,7 +21,7 @@ export const getAnalysisNodeDefs =
   }) =>
   (survey) => {
     const _nodeDefs = SurveyNodeDefs.getNodeDefsArray(survey)
-    let nodeDefs = _nodeDefs.filter((nodeDef) => {
+    const nodeDefs = _nodeDefs.filter((nodeDef) => {
       if (!NodeDef.isAnalysis(nodeDef)) return false
 
       // remove nodeDefs not in this chain
@@ -121,7 +121,6 @@ export const getSamplingNodeDefChild =
 /**
  * Returns the availble reporting data node defs
  * (code attribute definitions belonging to the base unit or its ancestors).
- *
  * @param {!object} param - The parameters.
  * @param {!object} [param.chain] - The chain parameter.
  * @returns {NodeDef[]} - List of available reporting data node defs.

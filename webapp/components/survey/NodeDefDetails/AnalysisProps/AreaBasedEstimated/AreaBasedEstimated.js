@@ -9,10 +9,13 @@ import { useSurvey } from '@webapp/store/survey'
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
 
+import { useNodeDefEditReadOnly } from '../../store'
+
 const AreaBasedEstimated = (props) => {
   const { nodeDef, state, Actions } = props
 
   const survey = useSurvey()
+  const readOnly = useNodeDefEditReadOnly()
 
   const [hasAreaBasedEstimateNodeDef, setHasAreaBasedEstimateNodeDef] = useState(
     !!Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey)
@@ -23,6 +26,7 @@ const AreaBasedEstimated = (props) => {
       <FormItem label="nodeDefEdit.advancedProps.areaBasedEstimate">
         <Checkbox
           checked={hasAreaBasedEstimateNodeDef}
+          disabled={readOnly}
           onChange={(value) => {
             setHasAreaBasedEstimateNodeDef(value)
             Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.hasAreaBasedEstimated, value })

@@ -1,6 +1,6 @@
 import './AccessRequest.scss'
 
-
+import * as ProcessUtils from '@core/processUtils'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 
 import Markdown from '@webapp/components/markdown'
@@ -23,7 +23,10 @@ const AccessRequest = () => {
         <div className="content">
           <Markdown
             className="request-sent-message"
-            source={i18n.t('accessRequestView.requestSentMessage', { email: request.email })}
+            source={i18n.t('accessRequestView.requestSentMessage', {
+              email: request.email,
+              senderEmail: ProcessUtils.ENV.emailFromResolved,
+            })}
           />
         </div>
       </div>

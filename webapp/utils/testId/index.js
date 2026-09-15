@@ -54,9 +54,11 @@ export const TestId = {
   dataImport: {
     importFromCollectTab: 'importFromCollectTab',
     importFromCsvTab: 'importFromCsvTab',
+    importFromOdkTab: 'importFromOdkTab',
   },
   dialogConfirm: {
     strongConfirmInput: 'dialog-confirm__strong-confirm-input',
+    checkbox: 'dialog-confirm__checkbox',
   },
   dropdown: {
     dropDownItem: (key) => `dropdown-item-${key}`,
@@ -114,10 +116,12 @@ export const TestId = {
     maxCount: 'max-count',
     minCount: 'min-count',
     mobile: 'mobile',
+    print: 'print',
     nextBtn: 'node-def-next-btn',
     nodeDefDescriptions: _withLang('node-def-descriptions'),
     nodeDefLabels: _withLang('node-def-labels'),
     nodeDefCodeParent: 'node-def-code-parent',
+    nodeDefAutoCreateMinCountItems: 'node-def-auto-create-min-count-items',
     nodeDefEnumerate: 'node-def-enumerate',
     nodeDefName: 'node-def-name',
     nodeDefKey: 'node-def-key',
@@ -186,6 +190,7 @@ export const TestId = {
     pageLinkBtn: (name) => `${name}-page-link-btn`,
     previewCloseBtn: 'preview-close-btn',
     previewOpenBtn: 'preview-open-btn',
+    qualifierLockToggle: (name) => `qualifier-lock-toggle-${name}`,
     schemaSummary: 'schema-summary-btn',
     surveyForm: 'survey-form',
     taxonField: (name, field) => `${name}-${field}`,

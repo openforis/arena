@@ -19,6 +19,7 @@ export const keys = {
   draft: 'draft',
   published: ObjectUtils.keys.published,
   datePublished: 'datePublished',
+  appVersion: 'appVersion',
   authGroups: 'authGroups',
   props: ObjectUtils.keys.props,
   rdbInitialized: 'rdbInitialized',
@@ -26,6 +27,9 @@ export const keys = {
   collectUri: 'collectUri',
   collectReport: 'collectReport',
   collectNodeDefsInfoByPath: 'collectNodeDefsInfoByPath',
+  odkFormId: 'odkFormId',
+  odkNodeDefsInfoByPath: 'odkNodeDefsInfoByPath',
+  odkNodeDefsOriginalNames: 'odkNodeDefsOriginalNames',
   cycles: 'cycles',
   defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
@@ -37,6 +41,7 @@ export const keys = {
   preloadedMapLayersEnabled: 'preloadedMapLayersEnabled',
   surveyDocImages: 'surveyDocImages',
   surveyDocOptions: 'surveyDocOptions',
+  branding: 'branding',
   sampleBasedImageInterpretationEnabled: 'sampleBasedImageInterpretationEnabled',
   samplingPolygon: 'samplingPolygon',
   security: 'security',
@@ -58,7 +63,7 @@ export const collectReportKeys = {
 
 export const cycleOneKey = '0'
 
-export const samplingPointDataCategoryName = 'sampling_point_data'
+export { samplingPointDataCategoryName } from '@core/survey/category'
 
 export const status = {
   draft: 'draft',
@@ -79,6 +84,8 @@ export const getName = (survey): string => ObjectUtils.getProp(keys.name, '')(su
 export const getOwnerUuid = R.propOr(null, keys.ownerUuid)
 
 export const getOwnerName = R.propOr('', keys.ownerName)
+
+export const getAppVersion = R.propOr(null, keys.appVersion)
 
 export const isDraft = R.propEq(keys.draft, true)
 
@@ -190,6 +197,16 @@ export const hasCollectReportIssues = R.pipe(
 export const getCollectNodeDefsInfoByPath = ObjectUtils.getProp(keys.collectNodeDefsInfoByPath, {})
 
 export const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
+
+export const getOdkFormId = ObjectUtils.getProp(keys.odkFormId)
+
+export const isFromOdk = R.pipe(getOdkFormId, R.isNil, R.not)
+
+export const getOdkNodeDefsInfoByPath = ObjectUtils.getProp(keys.odkNodeDefsInfoByPath, {})
+
+// Dictionary of the raw (pre-normalization, pre-uniqueness) ODK element name and the final Arena node
+// def name generated for it, keyed by node def uuid - see NodeDefsImportJob.
+export const getOdkNodeDefsOriginalNames = ObjectUtils.getProp(keys.odkNodeDefsOriginalNames, {})
 
 export const getLanguage = (preferredLang) => (surveyInfo) =>
   R.pipe(getLanguages, R.find(R.equals(preferredLang)), R.defaultTo(getDefaultLanguage(surveyInfo)))(surveyInfo)

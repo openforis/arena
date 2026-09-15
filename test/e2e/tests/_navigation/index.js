@@ -1,6 +1,17 @@
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { BASE_URL } from '../../config'
 
+export const gotoDashboard = () =>
+  test('Goto dashboard', async () => {
+    const dashboardUrl = `${BASE_URL}/app/dashboard/`
+    if (!page.url().startsWith(dashboardUrl)) {
+      await page.goto(dashboardUrl)
+    }
+    expect(page.url()).toBe(dashboardUrl)
+    // Wait until survey dashboard content is ready (not only the URL).
+    await page.waitForSelector(getSelector(TestId.dashboard.surveyInfoBtn, 'button'), { timeout: 30000 })
+  })
+
 // ===== Header
 export const gotoSurveyCreate = () =>
   test('Goto survey create', async () => {
@@ -33,22 +44,27 @@ export const gotoTemplateList = () =>
 // ==== Dashboard
 export const gotoSurveyInfo = () =>
   test('Goto survey info', async () => {
-    await page.goto(`${BASE_URL}/app/home/dashboard/`)
+    await page.goto(`${BASE_URL}/app/dashboard/`)
     await page.click(getSelector(TestId.dashboard.surveyInfoBtn, 'button'))
     expect(page.url()).toBe(`${BASE_URL}/app/home/surveyInfo/`)
   })
 
 // ==== Sidebar
+const homeUrl = `${BASE_URL}/app/home/`
+const landingUrl = `${homeUrl}landing/`
+
+const isHomeUrl = (url) => url === homeUrl || url === landingUrl
+
 export const gotoHome = () =>
   test('Goto home', async () => {
-    const currentUrl = await page.url()
-    const homeUrl = `${BASE_URL}/app/home/`
-    const dashboardUrl = `${homeUrl}dashboard/`
-    if (currentUrl !== dashboardUrl) {
-      await page.click(getSelector(TestId.sidebar.moduleBtn('home'), 'a'))
+    const currentUrl = page.url()
+    if (!isHomeUrl(currentUrl)) {
+      await Promise.all([
+        page.waitForURL((url) => isHomeUrl(url.href)),
+        page.click(getSelector(TestId.sidebar.moduleBtn('home'), 'a')),
+      ])
     }
-    // page url could be /home/dashboard or /home (redirection to dashboard not performed yet)
-    expect([homeUrl, dashboardUrl]).toContain(page.url())
+    expect(isHomeUrl(page.url())).toBe(true)
   })
 
 const _gotoSubModule =
@@ -76,7 +92,13 @@ const _gotoSubModule =
       expect(page.url()).toBe(`${BASE_URL}/app/${module}/${subModule}/`)
     })
 
-export const gotoFormDesigner = _gotoSubModule('designer', 'formDesigner')
+export const gotoFormDesigner = () => {
+  _gotoSubModule('designer', 'formDesigner')()
+
+  test('Wait for form designer to load', async () => {
+    await page.waitForSelector(getSelector(TestId.surveyForm.surveyForm))
+  })
+}
 
 export const gotoRecords = _gotoSubModule('data', 'records')
 

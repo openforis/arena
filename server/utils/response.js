@@ -18,6 +18,7 @@ const status = {
 export const contentTypes = {
   csv: 'text/csv',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  gpkg: 'application/geopackage+sqlite3',
   json: 'application/json',
   pdf: 'application/pdf',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -26,6 +27,7 @@ export const contentTypes = {
 
 const contentTypeByFileFormat = {
   [FileFormats.csv]: contentTypes.csv,
+  [FileFormats.gpkg]: contentTypes.gpkg,
   [FileFormats.xlsx]: contentTypes.xlsx,
   [FileFormats.zip]: contentTypes.zip,
 }
@@ -46,7 +48,7 @@ export const sendErr = (res, err) => {
   } else if (err instanceof SystemError || err instanceof CoreSystemError) {
     res.status(err.statusCode).json(_getErr(err))
   } else {
-    res.status(err.statusCode).json(
+    res.status(err.statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR).json(
       _getErr({
         key: 'appErrors:generic',
         params: { text: `Could not serve: ${err.toString()}` },

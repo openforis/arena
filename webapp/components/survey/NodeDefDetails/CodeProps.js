@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -16,7 +16,7 @@ import { ButtonGroup, Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 
-import { State } from './store'
+import { State, useNodeDefEditReadOnly } from './store'
 
 const displayAsItems = [
   {
@@ -34,16 +34,20 @@ const CodeProps = (props) => {
 
   const surveyCycleKey = useSurveyCycleKey()
   const survey = useSurvey()
-  const readOnly = !useAuthCanEditSurvey()
+  const readOnlyLocked = useNodeDefEditReadOnly()
+  const canEditSurvey = useAuthCanEditSurvey()
+  const readOnly = readOnlyLocked || !canEditSurvey
 
   const [category, setCategory] = useState(null)
 
-  const nodeDef = State.getNodeDef(state)
-  const nodeDefCategoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  const nodeDef = useMemo(() => State.getNodeDef(state), [state])
   const validation = State.getValidation(state)
-  const canUpdateCategory = Survey.canUpdateCategory(nodeDef)(survey)
   const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents({ nodeDef, category })(survey)
   const parentCodeDef = Survey.getNodeDefParentCode(nodeDef)(survey)
+
+  const canUpdateCategory = useMemo(() => Survey.canUpdateCategory(nodeDef)(survey), [nodeDef, survey])
+
+  const nodeDefCategoryUuid = useMemo(() => NodeDef.getCategoryUuid(nodeDef), [nodeDef])
 
   const onCategoryChange = useCallback(
     (selectedCategory) => {
@@ -59,7 +63,7 @@ const CodeProps = (props) => {
     <>
       <FormItem label="nodeDefEdit.codeProps.category">
         <CategorySelector
-          disabled={!canUpdateCategory}
+          disabled={readOnly || !canUpdateCategory}
           categoryUuid={nodeDefCategoryUuid}
           validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
           editingNodeDef
@@ -79,7 +83,7 @@ const CodeProps = (props) => {
                 }}
               >
                 <Dropdown
-                  disabled={!canUpdateCategory || R.isEmpty(candidateParentCodeNodeDefs)}
+                  disabled={readOnly || !canUpdateCategory || R.isEmpty(candidateParentCodeNodeDefs)}
                   items={candidateParentCodeNodeDefs}
                   selection={parentCodeDef}
                   itemValue="uuid"
@@ -95,6 +99,7 @@ const CodeProps = (props) => {
 
           <FormItem label="nodeDefEdit.basicProps.displayAs">
             <ButtonGroup
+              disabled={readOnly}
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
               onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
               items={displayAsItems}

@@ -83,6 +83,25 @@ export const requireSurveyUserExtraPropsEditPermission = async (req, res, next) 
   }
 }
 
+export const requireSurveyCloneFromViewPermission = async (req, res, next) => {
+  try {
+    const { cloneFrom } = Request.getBody(req)
+    if (!cloneFrom) {
+      next()
+      return
+    }
+    const user = Request.getUser(req)
+    const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: cloneFrom })
+    if (Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
+      next()
+      return
+    }
+    sendUnauthorizedError({ req, res })
+  } catch (error) {
+    next(error)
+  }
+}
+
 // Survey
 export const requireSurveyCreatePermission = async (req, res, next) => {
   const user = Request.getUser(req)

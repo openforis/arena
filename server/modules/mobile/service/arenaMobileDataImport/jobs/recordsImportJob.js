@@ -1,14 +1,12 @@
-import { Dates, Objects, Records, Surveys } from '@openforis/arena-core'
+import { Dates } from '@openforis/arena-core'
 
-import { ConflictResolutionStrategy } from '@common/dataImport'
+import { RecordImportAction } from '@common/dataImport'
 
-import * as A from '@core/arena'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as User from '@core/user/user'
 import SystemError from '@core/systemError'
 
@@ -20,31 +18,27 @@ import * as UserService from '@server/modules/user/service/userService'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
 import { checkNodeIsValid } from './recordNodeChecks'
+import {
+  getRecordFormattedKeyValues,
+  findExistingRecordSummary,
+  determineRecordAction,
+} from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
 
 const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',
+  mergedSameRecordUuids: 'mergedSameRecordUuids',
 }
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
-
-const getRecordFormattedKeyValues = ({ survey, record }) => {
-  const rootDef = Surveys.getNodeDefRoot({ survey })
-  const recordRootEntity = Records.getRoot(record)
-  const recordKeyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({ survey, record, entity: recordRootEntity })
-  const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
-  return keyDefs.map((keyDef) => {
-    const value = recordKeyValuesByDefUuid[NodeDef.getUuid(keyDef)]
-    return NodeValueFormatter.format({ survey, nodeDef: keyDef, value })
-  })
-}
 
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
     super(RecordsImportJob.type, params)
 
     this.recordsFileUuids = new Set() // used to check validity of file UUIDs in FilesImportJob
-    this.mergedRecordsMap = {} // maps the uuid of a record to the uuid of the record in which it has been merged
+    this.mergedRecordsMap = {} // maps the uuid of a record to the uuid of a *different* record it has been merged into (duplicate-key case)
+    this.mergedSameRecordUuids = new Set() // uuids of records merged node-by-node with their own existing (same-uuid) server record
   }
 
   async onStart() {
@@ -75,9 +69,18 @@ export default class RecordsImportJob extends DataImportBaseJob {
       throw new SystemError('dataImport.noRecordsFound')
     }
 
+    const { selectedRecordsUuids } = context
+
     // import records sequentially
     for (const recordSummary of recordSummaries) {
       const recordUuid = Record.getUuid(recordSummary)
+
+      if (selectedRecordsUuids && !selectedRecordsUuids.includes(recordUuid)) {
+        // record excluded by the user in the import preview: skip it entirely
+        this.skippedRecordsUuids.add(recordUuid)
+        this.incrementProcessedItems()
+        continue
+      }
 
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
       this.currentRecord = record
@@ -99,12 +102,13 @@ export default class RecordsImportJob extends DataImportBaseJob {
   trackFileUuids({ nodes }) {
     // keep track of file uuids found in record attribute values
     const { survey } = this.context
-    Object.values(nodes).forEach((node) => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+    for (const node of Object.values(nodes)) {
+      const nodeDefUuid = Node.getNodeDefUuid(node)
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       if (NodeDef.isFile(nodeDef)) {
         this.trackFileUuid({ node })
       }
-    })
+    }
   }
 
   async cleanupCurrentRecord() {
@@ -150,87 +154,54 @@ export default class RecordsImportJob extends DataImportBaseJob {
     this.currentRecord = Record.assocNodes({ nodes, sideEffect: true })(record)
   }
 
-  findExistingRecordSummaryWithSameKeys() {
-    const { context, currentRecord: record } = this
-    const { survey, existingRecordsSummary } = context
-    const rootDef = Surveys.getNodeDefRoot({ survey })
-    const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
-    const recordSummaryKeyProps = keyDefs.map((keyDef) => A.camelize(NodeDef.getName(keyDef)))
-    const recordKeyValues = getRecordFormattedKeyValues({ survey, record })
-    const recordSummariesWithSameKeys = existingRecordsSummary.filter((recordSummary) => {
-      const recordSummaryKeyValues = recordSummaryKeyProps.map((key) => recordSummary[key])
-      return Objects.isEqual(recordKeyValues, recordSummaryKeyValues)
-    })
-    return recordSummariesWithSameKeys[0]
-  }
-
-  findExistingRecordSummary() {
-    const { context, currentRecord: record } = this
-    const { existingRecordsSummary, conflictResolutionStrategy } = context
-
-    const recordUuid = Record.getUuid(record)
-    const existingRecordWithSameUuid = existingRecordsSummary.find(
-      (recordSummary) => Record.getUuid(recordSummary) === recordUuid
-    )
-    if (existingRecordWithSameUuid) {
-      return existingRecordWithSameUuid
-    }
-    if (ConflictResolutionStrategy.merge === conflictResolutionStrategy) {
-      return this.findExistingRecordSummaryWithSameKeys()
-    }
-    return null
-  }
-
   async insertOrSkipRecord() {
     const { context, currentRecord: record } = this
-    const { conflictResolutionStrategy } = context
+    const { survey, existingRecordsSummary, conflictResolutionStrategy } = context
 
     const recordUuid = Record.getUuid(record)
 
-    const existingRecordSummary = this.findExistingRecordSummary()
+    const existingRecordSummary = findExistingRecordSummary({
+      survey,
+      record,
+      existingRecordsSummary,
+      conflictResolutionStrategy,
+    })
+    const { action, existingRecordUuid } = determineRecordAction({
+      record,
+      existingRecordSummary,
+      conflictResolutionStrategy,
+    })
 
-    if (existingRecordSummary) {
-      const existingRecordUuid = Record.getUuid(existingRecordSummary)
-      const updatingExistingRecordWithSameUuid = recordUuid === existingRecordUuid
-
-      if (conflictResolutionStrategy === ConflictResolutionStrategy.skipExisting) {
-        // skip record
+    switch (action) {
+      case RecordImportAction.skip:
         this.skippedRecordsUuids.add(recordUuid)
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
-      } else if (
-        conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated ||
-        (conflictResolutionStrategy === ConflictResolutionStrategy.merge && updatingExistingRecordWithSameUuid)
-      ) {
-        if (Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))) {
-          await this.mergeWithExistingRecord()
-        } else {
-          // skip record
-          this.skippedRecordsUuids.add(recordUuid)
-          this.logDebug(`record ${recordUuid} skipped; it already exists and it has not been updated`)
-        }
-      } else if (conflictResolutionStrategy === ConflictResolutionStrategy.merge) {
-        await this.mergeWithExistingRecord({ targetRecordUuid: existingRecordUuid })
-      }
-    } else {
-      await this.insertNewRecord()
+        break
+      case RecordImportAction.overwrite:
+        await this.mergeWithExistingRecord({ merge: false })
+        break
+      case RecordImportAction.merge:
+        await this.mergeWithExistingRecord({ targetRecordUuid: existingRecordUuid, merge: true })
+        break
+      case RecordImportAction.insert:
+      default:
+        await this.insertNewRecord()
     }
   }
 
-  async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null } = {}) {
+  async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null, merge = false } = {}) {
     const { context, currentRecord: record, tx, user } = this
     const { survey, surveyId } = context
 
     const recordUuid = Record.getUuid(record)
     const targetRecordUuid = targetRecordUuidParam ?? recordUuid
 
-    const merge = targetRecordUuid !== recordUuid
-
     this.logDebug(
       merge ? `merging record ${recordUuid} into existing record ${targetRecordUuid}` : `updating record ${recordUuid}`
     )
 
     const recordTarget = await RecordManager.fetchRecordAndNodesByUuid(
-      { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true },
+      { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true, user },
       tx
     )
     // check can update record
@@ -248,7 +219,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     this.trackFileUuids({ nodes: nodesUpdated })
 
     const recordSourceDateModified = Record.getDateModified(record)
-    const recordTargetDateModified = Record.getDateCreated(recordTarget)
+    const recordTargetDateModified = Record.getDateModified(recordTarget)
     const dateModified =
       merge && Dates.isAfter(recordTargetDateModified, recordSourceDateModified)
         ? recordTargetDateModified
@@ -257,7 +228,15 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     this.updatedRecordsUuids.add(targetRecordUuid)
     if (merge) {
-      this.mergedRecordsMap[recordUuid] = targetRecordUuid
+      if (targetRecordUuid !== recordUuid) {
+        // duplicate-key merge into a *different* existing record: track the uuid mapping (used by clients to
+        // reconcile their local copy of the now-superseded record)
+        this.mergedRecordsMap[recordUuid] = targetRecordUuid
+      } else {
+        // same-uuid merge: the record was reconciled with its own newer server copy, not superseded by another
+        // record, so it must not be flagged via mergedRecordsMap (clients treat that as "hide this record")
+        this.mergedSameRecordUuids.add(recordUuid)
+      }
     }
     this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
   }
@@ -316,6 +295,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
   generateResult() {
     const result = super.generateResult()
     result[resultKeys.mergedRecordsMap] = this.mergedRecordsMap
+    result[resultKeys.mergedSameRecordUuids] = Array.from(this.mergedSameRecordUuids)
     return result
   }
 }

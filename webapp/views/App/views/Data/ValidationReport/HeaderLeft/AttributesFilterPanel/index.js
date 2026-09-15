@@ -1,0 +1,1 @@
+export { AttributesFilterPanel } from './AttributesFilterPanel'

@@ -26,12 +26,18 @@ import * as CollectAttributeValueExtractor from './collectAttributeValueExtracto
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
 
-const evaluateApplicability = async ({ survey, childDef, record, node }) => {
+const evaluateApplicability = async ({ user, survey, childDef, record, node }) => {
   let applicable = true
   const expressionsApplicable = NodeDef.getApplicable(childDef)
 
   if (!R.isEmpty(expressionsApplicable)) {
-    const exprEval = await RecordExpressionParser.evalApplicableExpression(survey, record, node, expressionsApplicable)
+    const exprEval = await RecordExpressionParser.evalApplicableExpression(
+      survey,
+      record,
+      node,
+      expressionsApplicable,
+      user
+    )
     applicable = R.propOr(false, 'value', exprEval)
   }
   return applicable
@@ -81,6 +87,8 @@ export default class RecordsImportJob extends Job {
 
     const nodeDefNamesByPath = CollectSurvey.generateArenaNodeDefNamesByPath(collectSurvey)
 
+    const insertedRecordsUuids = []
+
     for (const entryName of entryNames) {
       if (this.isCanceled()) {
         break
@@ -112,6 +120,8 @@ export default class RecordsImportJob extends Job {
       const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
       // This.logDebug(`${entryName} recordToCreate end`)
 
+      insertedRecordsUuids.push(Record.getUuid(record))
+
       // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes start`)
       await this.traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath })
       // This.logDebug(`${entryName} traverseCollectRecordAndInsertNodes end`)
@@ -123,7 +133,13 @@ export default class RecordsImportJob extends Job {
       }
     }
 
-    this.setContext({ insertedRecords: this.processed })
+    // recordUuids is read by the following RecordCheckJob (collectImportJob.js/collectDataImportJob.js
+    // chain it right after this job, sharing the same context): it scopes the check to just the
+    // records imported here and forces every node def to be checked, not just newly-added ones - a
+    // Collect-imported record is only given nodes for paths present in the Collect data, so it can be
+    // missing nodes (and therefore default values) for Arena-only attributes even though their node
+    // defs are already published. See RecordCheckJob._fetchSurveyAndNodeDefsByCycle.
+    this.setContext({ insertedRecords: this.processed, recordUuids: insertedRecordsUuids })
   }
 
   async beforeSuccess() {
@@ -241,7 +257,7 @@ export default class RecordsImportJob extends Job {
         }
       }
     }
-    recordUpdated = await this._updateRelevance(survey, recordUpdated)
+    recordUpdated = await this._updateRelevance(survey, recordUpdated, this.user)
 
     await this._insertRecordNodes(recordUpdated)
   }
@@ -325,9 +341,10 @@ export default class RecordsImportJob extends Job {
    * Evaluates all record entities children applicability and stores the updated nodes.
    * @param {!Survey} survey - The survey object.
    * @param {!Record} record - The record object.
+   * @param {!User} user - The user performing the import (used to evaluate user-dependent expressions).
    * @returns {Promise<null>} - The updated record (promise).
    */
-  async _updateRelevance(survey, record) {
+  async _updateRelevance(survey, record, user) {
     const stack = []
     stack.push(Record.getRootNode(record))
     let recordUpdated = record
@@ -339,7 +356,7 @@ export default class RecordsImportJob extends Job {
         const childrenApplicability = {}
         const nodeDefChildren = Survey.getNodeDefChildren({ nodeDef })(survey)
         for (const childDef of nodeDefChildren) {
-          const applicable = await evaluateApplicability({ survey, childDef, record: recordUpdated, node })
+          const applicable = await evaluateApplicability({ user, survey, childDef, record: recordUpdated, node })
           const childDefUuid = NodeDef.getUuid(childDef)
           if (applicable) {
             const nodeChildren = Record.getNodeChildrenByDefUuid(node, childDefUuid)(record)

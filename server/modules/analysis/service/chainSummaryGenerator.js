@@ -1,6 +1,5 @@
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,6 +11,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ChainManager from '../manager'
 import { Objects } from '@openforis/arena-core'
 import { ArrayUtils } from '@core/arrayUtils'
+import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
@@ -51,29 +51,6 @@ const generateResultVariableSummary = ({ survey, analysisNodeDef, lang }) => {
   return result
 }
 
-const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
-  const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
-  if (ChainStatisticalAnalysis.isEmpty(statisticalAnalysis)) return {}
-
-  const entity = Survey.getNodeDefByUuid(ChainStatisticalAnalysis.getEntityDefUuid(statisticalAnalysis))(survey)
-  const dimensions = Survey.getNodeDefsByUuids(ChainStatisticalAnalysis.getDimensionUuids(statisticalAnalysis))(survey)
-  const chainSamplingDesign = Chain.getSamplingDesign(chain)
-  const samplingStrategySpecified = !!ChainSamplingDesign.getSamplingStrategy(chainSamplingDesign)
-
-  return {
-    analysis: {
-      entity: NodeDef.getName(entity),
-      dimensions: dimensions.map(NodeDef.getName),
-      filter: ChainStatisticalAnalysis.getFilter(statisticalAnalysis),
-      reportingMethod: ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis),
-      clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
-      nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
-      ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
-      reportingArea: ChainStatisticalAnalysis.getReportingArea(statisticalAnalysis),
-    },
-  }
-}
-
 const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
   const hierarchicalCategories = Survey.getCategoriesArray(survey).filter(Category.isHierarchical)
   if (hierarchicalCategories.length === 0) {
@@ -102,6 +79,29 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
 
   return {
     categoryAttributeAncestors,
+  }
+}
+
+const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
+  const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
+  if (ChainStatisticalAnalysis.isEmpty(statisticalAnalysis)) return {}
+
+  const entity = Survey.getNodeDefByUuid(ChainStatisticalAnalysis.getEntityDefUuid(statisticalAnalysis))(survey)
+  const dimensions = Survey.getNodeDefsByUuids(ChainStatisticalAnalysis.getDimensionUuids(statisticalAnalysis))(survey)
+  const chainSamplingDesign = Chain.getSamplingDesign(chain)
+  const samplingStrategySpecified = !!ChainSamplingDesign.getSamplingStrategy(chainSamplingDesign)
+
+  return {
+    analysis: {
+      entity: NodeDef.getName(entity),
+      dimensions: dimensions.map(NodeDef.getName),
+      filter: ChainStatisticalAnalysis.getFilter(statisticalAnalysis),
+      reportingMethod: ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis),
+      clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
+      nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
+      ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
+      reportingArea: ChainStatisticalAnalysis.getReportingArea(statisticalAnalysis),
+    },
   }
 }
 
@@ -137,9 +137,8 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   // const postStratificationAttributeDef = getNodeDefByUuid(
   //   ChainSamplingDesign.getPostStratificationAttributeDefUuid(chainSamplingDesign)
   // )
-  const firstPhaseCommonAttributeDef = getNodeDefByUuid(
-    ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(chainSamplingDesign)
-  )
+  const phase2JoinEntityDef = getNodeDefByUuid(ChainSamplingDesign.getPhase2JoinEntityUuid(chainSamplingDesign))
+  const phase2JoinAttributeDef = getNodeDefByUuid(ChainSamplingDesign.getPhase2JoinAttribute(chainSamplingDesign))
   const clusteringEntityDef = getNodeDefByUuid(ChainSamplingDesign.getClusteringNodeDefUuid(chainSamplingDesign))
   const analysisNodeDefs = Survey.getAnalysisNodeDefs({
     chain,
@@ -149,11 +148,12 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
 
   const getCodeAttributeSummary = (key, codeAttrDef) => ({
     [key]: NodeDef.getName(codeAttrDef),
-    [`${key}Category`]: getCategoryNameByUuid({
-      survey,
-      categoryUuid: NodeDef.getCategoryUuid(codeAttrDef),
-    }),
-    [`${key}CategoryLevel`]: codeAttrDef ? Survey.getNodeDefCategoryLevelIndex(codeAttrDef)(survey) + 1 : '',
+    [`${key}Category`]:
+      codeAttrDef && NodeDef.isCode(codeAttrDef)
+        ? getCategoryNameByUuid({ survey, categoryUuid: NodeDef.getCategoryUuid(codeAttrDef) })
+        : '',
+    [`${key}CategoryLevel`]:
+      codeAttrDef && NodeDef.isCode(codeAttrDef) ? Survey.getNodeDefCategoryLevelIndex(codeAttrDef)(survey) + 1 : '',
   })
 
   const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })
@@ -167,19 +167,28 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     baseUnit: NodeDef.getName(baseUnitNodeDef),
     baseUnitEntityKeys,
     ...(samplingStrategySpecified ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
-    ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
-      ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
-      : {}),
-    ...(ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(chainSamplingDesign)
+    ...(ChainSamplingDesign.isPhase1CategorySelectionEnabled(chainSamplingDesign)
       ? {
           phase1Category: getCategoryNameByUuid({
             survey,
-            categoryUuid: ChainSamplingDesign.getFirstPhaseCategoryUuid(chainSamplingDesign),
+            categoryUuid: ChainSamplingDesign.getPhase1CategoryUuid(chainSamplingDesign),
           }),
         }
       : {}),
-    ...(ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(chainSamplingDesign)
-      ? getCodeAttributeSummary('commonAttribute', firstPhaseCommonAttributeDef)
+    ...(ChainSamplingDesign.isPhase2JoinEntitySelectionEnabled(chainSamplingDesign)
+      ? { phase2JoinEntity: NodeDef.getName(phase2JoinEntityDef) }
+      : {}),
+    ...(ChainSamplingDesign.isPhase2AsSamplingPointDataSelectionEnabled(chainSamplingDesign)
+      ? { phase2AsSamplingPointData: ChainSamplingDesign.isPhase2AsSamplingPointData(chainSamplingDesign) }
+      : {}),
+    ...(ChainSamplingDesign.isPhase1JoinAttributeSelectionEnabled(chainSamplingDesign)
+      ? { phase1JoinAttribute: ChainSamplingDesign.getPhase1JoinAttribute(chainSamplingDesign) ?? '' }
+      : {}),
+    ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
+      ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
+      : {}),
+    ...(ChainSamplingDesign.isPhase2JoinAttributeSelectionEnabled(chainSamplingDesign)
+      ? getCodeAttributeSummary('phase2JoinAttribute', phase2JoinAttributeDef)
       : {}),
     ...(ChainSamplingDesign.isPostStratificationEnabled(chainSamplingDesign)
       ? { postStratificationAttribute: '' } // not supoprted in R script yet, keep it blank
@@ -201,7 +210,6 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     resultVariables: analysisNodeDefs.map((analysisNodeDef) =>
       generateResultVariableSummary({ survey, analysisNodeDef, lang })
     ),
-    ...statisticalAnalysisSummary,
   }
 }
 
