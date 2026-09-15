@@ -108,19 +108,61 @@ const enterFns = {
   time: enterTime,
 }
 
+const unlockKeyFieldIfNeeded = async (nodeDef, parentSelector) => {
+  if (!nodeDef.key) return
+  const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
+  const keyToggleLocator = page.locator(keyToggleSelector)
+  if (await keyToggleLocator.isVisible()) {
+    const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
+    if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
+      await keyToggleLocator.click()
+      await page.keyboard.press('Escape') // close potential tooltip
+    }
+  }
+}
+
+// Types whose enter function is a plain, idempotent fill: safe to retry from scratch if an
+// attempt hangs, unlike e.g. code/time which drive a stateful dropdown/picker that a second,
+// overlapping invocation could leave open or half-interacted with.
+const simpleFillTypes = ['decimal', 'integer', 'text']
+
 export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
-    if (nodeDef.key) {
-      const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
-      const keyToggleLocator = page.locator(keyToggleSelector)
-      if (await keyToggleLocator.isVisible()) {
-        const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
-        if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
-          await keyToggleLocator.click()
-          await page.keyboard.press('Escape') // close potential tooltip
+    const enterValue = () => enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
+
+    if (nodeDef.key && simpleFillTypes.includes(nodeDef.type)) {
+      // Key fields start locked once they hold a value and only unlock for the current focus
+      // session (see useAttributeFieldLock in webapp/.../nodeDefSwitch.js). The unlock check
+      // above is a single, non-retried isVisible() snapshot: if an async validation update
+      // (triggered by a sibling row's duplicate-key edit) re-renders this field's lock toggle
+      // between that check and the fill, the toggle can be missed and the fill is left racing a
+      // disabled input that never becomes enabled, hanging until the test timeout (seen in CI,
+      // e.g. https://github.com/openforis/arena/actions/runs/34883644236). Retry the whole
+      // unlock+fill sequence a few times with a short per-attempt budget, the same way
+      // enterTaxon above already retries around a similar record-update race.
+      const attempts = 3
+      const attemptTimeoutMs = 3000
+      let lastError
+      for (let attempt = 0; attempt < attempts; attempt += 1) {
+        try {
+          await unlockKeyFieldIfNeeded(nodeDef, parentSelector)
+          await Promise.race([
+            enterValue(),
+            new Promise((_resolve, reject) =>
+              setTimeout(() => reject(new Error('enterAttribute attempt timed out')), attemptTimeoutMs)
+            ),
+          ])
+          lastError = null
+          break
+        } catch (e) {
+          lastError = e
         }
       }
+      if (lastError) throw lastError
+    } else {
+      await unlockKeyFieldIfNeeded(nodeDef, parentSelector)
+      await enterValue()
     }
-    await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
+
     await FormUtils.waitForHeaderLoaderToDisappear()
-  }, 10000)
+  }, 15000)
