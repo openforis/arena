@@ -152,14 +152,18 @@ const enterFns = {
 const KEY_FIELD_RETRY_ATTEMPTS = 2
 const KEY_FIELD_ATTEMPT_TIMEOUT_MS = 3000
 
-const unlockKeyFieldIfNeeded = async (nodeDef, parentSelector) => {
+const unlockKeyFieldIfNeeded = async (nodeDef, parentSelector, deadlineMs = null) => {
   if (!nodeDef.key) return
   const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
-  const keyToggleLocator = page.locator(keyToggleSelector)
-  if (await keyToggleLocator.isVisible()) {
-    const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
+  const keyToggleHandle = await page.$(keyToggleSelector)
+  if (keyToggleHandle) {
+    const keyToggleAriaLabel = await keyToggleHandle.getAttribute('aria-label')
     if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
-      await keyToggleLocator.click()
+      if (deadlineMs) {
+        await keyToggleHandle.click({ timeout: getRemainingTimeoutMsOrThrow(deadlineMs, 'key field unlock') })
+      } else {
+        await keyToggleHandle.click()
+      }
       await page.keyboard.press('Escape') // close potential tooltip
     }
   }
@@ -190,11 +194,15 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
       // e.g. https://github.com/openforis/arena/actions/runs/34883644236). Retry the whole
       // unlock+fill sequence a few times with a short per-attempt budget, the same way
       // enterTaxon above already retries around a similar record-update race.
+      if (KEY_FIELD_RETRY_ATTEMPTS < 1) {
+        throw new Error('enterAttribute retry misconfigured: KEY_FIELD_RETRY_ATTEMPTS must be at least 1')
+      }
       let lastError
       for (let attempt = 0; attempt < KEY_FIELD_RETRY_ATTEMPTS; attempt += 1) {
         try {
-          await unlockKeyFieldIfNeeded(nodeDef, parentSelector)
-          await enterValue(KEY_FIELD_ATTEMPT_TIMEOUT_MS)
+          const deadlineMs = Date.now() + KEY_FIELD_ATTEMPT_TIMEOUT_MS
+          await unlockKeyFieldIfNeeded(nodeDef, parentSelector, deadlineMs)
+          await enterValue(getRemainingTimeoutMsOrThrow(deadlineMs, 'key field value entry'))
           break
         } catch (e) {
           lastError = e
