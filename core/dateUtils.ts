@@ -32,6 +32,7 @@ export const formats = {
   datetimeDisplay: DateFormats.datetimeDisplay,
   datetimeISO: DateFormats.datetimeStorage,
   timeStorage: DateFormats.timeStorage,
+  timeWithSeconds: DateFormats.timeWithSeconds,
 } as const
 
 const normalizeDateTimeValue =
@@ -108,12 +109,13 @@ export const isValidDate = (year: unknown, month: unknown, day: unknown): boolea
 }
 
 /**
- * Check if time (hour:minute) is valid.
+ * Check if time (hour:minute:seconds) is valid. Seconds default to a valid 0 when omitted.
  */
-export const isValidTime = (hour: unknown = '', minutes: unknown = ''): boolean =>
-  isBlank(hour) || isBlank(minutes)
-    ? false
-    : Number(hour) >= 0 && Number(hour) < 24 && Number(minutes) >= 0 && Number(minutes) < 60
+export const isValidTime = (hour: unknown = '', minutes: unknown = '', seconds: unknown = 0): boolean => {
+  if (isBlank(hour) || isBlank(minutes)) return false
+  if (!(Number(hour) >= 0 && Number(hour) < 24 && Number(minutes) >= 0 && Number(minutes) < 60)) return false
+  return Number(seconds) >= 0 && Number(seconds) < 60
+}
 
 /**
  * Check if a date string is valid for the given format.
@@ -133,8 +135,13 @@ export const formatDateTimeDisplay = (date: unknown): string => format(date, for
 
 export const formatDateTimeExport = (date: unknown): string => format(date, formats.datetimeExport)
 
-export const formatTime = (hour: unknown, minute: unknown): string =>
-  `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
+export const formatTime = (hour: unknown, minute: unknown, seconds?: unknown): string => {
+  const base = `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
+  return seconds === undefined ? base : `${base}:${normalizeDateTimeValue(2)(seconds)}`
+}
+
+export const getTimeFormat = (includeSeconds: boolean): string =>
+  includeSeconds ? formats.timeWithSeconds : formats.timeStorage
 
 export const parseDateISO = (dateStr: string): unknown => parse(dateStr, formats.dateISO)
 

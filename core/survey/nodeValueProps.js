@@ -39,6 +39,7 @@ export const valuePropsTaxon = {
 export const valuePropsTime = {
   hour: 'hour',
   minute: 'minute',
+  seconds: 'seconds',
 }
 
 /**

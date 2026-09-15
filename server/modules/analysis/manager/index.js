@@ -10,6 +10,7 @@ export {
   cloneChainFromSurvey,
   fetchChainsForCloneFromSurvey,
   fetchChainSourceEntityNames,
+  migrateSamplingDesignPhaseProps,
 } from './chain'
 
 export { cleanChains } from './chainsCleanManager'

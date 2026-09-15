@@ -83,6 +83,14 @@
         .form-item {
           grid-template-columns: 12rem 1fr;
           height: 3rem;
+
+          // longer label than its siblings: give it more room and let it wrap instead of
+          // overflowing/clipping against the checkbox
+          &.phase2-as-sampling-point-data {
+            grid-template-columns: 22rem 1fr;
+            height: auto;
+            white-space: normal;
+          }
         }
 
         &.form-right {

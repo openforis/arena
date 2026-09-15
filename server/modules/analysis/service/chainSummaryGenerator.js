@@ -137,9 +137,8 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   // const postStratificationAttributeDef = getNodeDefByUuid(
   //   ChainSamplingDesign.getPostStratificationAttributeDefUuid(chainSamplingDesign)
   // )
-  const firstPhaseCommonAttributeDef = getNodeDefByUuid(
-    ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(chainSamplingDesign)
-  )
+  const phase2JoinEntityDef = getNodeDefByUuid(ChainSamplingDesign.getPhase2JoinEntityUuid(chainSamplingDesign))
+  const phase2JoinAttributeDef = getNodeDefByUuid(ChainSamplingDesign.getPhase2JoinAttribute(chainSamplingDesign))
   const clusteringEntityDef = getNodeDefByUuid(ChainSamplingDesign.getClusteringNodeDefUuid(chainSamplingDesign))
   const analysisNodeDefs = Survey.getAnalysisNodeDefs({
     chain,
@@ -168,20 +167,28 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     baseUnit: NodeDef.getName(baseUnitNodeDef),
     baseUnitEntityKeys,
     ...(samplingStrategySpecified ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
-    ...(ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(chainSamplingDesign)
+    ...(ChainSamplingDesign.isPhase1CategorySelectionEnabled(chainSamplingDesign)
       ? {
           phase1Category: getCategoryNameByUuid({
             survey,
-            categoryUuid: ChainSamplingDesign.getFirstPhaseCategoryUuid(chainSamplingDesign),
+            categoryUuid: ChainSamplingDesign.getPhase1CategoryUuid(chainSamplingDesign),
           }),
-          phase1StratumAttribute: ChainSamplingDesign.getFirstPhaseCategoryExtraProp(chainSamplingDesign) ?? '',
         }
+      : {}),
+    ...(ChainSamplingDesign.isPhase2JoinEntitySelectionEnabled(chainSamplingDesign)
+      ? { phase2JoinEntity: NodeDef.getName(phase2JoinEntityDef) }
+      : {}),
+    ...(ChainSamplingDesign.isPhase2AsSamplingPointDataSelectionEnabled(chainSamplingDesign)
+      ? { phase2AsSamplingPointData: ChainSamplingDesign.isPhase2AsSamplingPointData(chainSamplingDesign) }
+      : {}),
+    ...(ChainSamplingDesign.isPhase1JoinAttributeSelectionEnabled(chainSamplingDesign)
+      ? { phase1JoinAttribute: ChainSamplingDesign.getPhase1JoinAttribute(chainSamplingDesign) ?? '' }
       : {}),
     ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
       ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
       : {}),
-    ...(ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(chainSamplingDesign)
-      ? getCodeAttributeSummary('commonAttribute', firstPhaseCommonAttributeDef)
+    ...(ChainSamplingDesign.isPhase2JoinAttributeSelectionEnabled(chainSamplingDesign)
+      ? getCodeAttributeSummary('phase2JoinAttribute', phase2JoinAttributeDef)
       : {}),
     ...(ChainSamplingDesign.isPostStratificationEnabled(chainSamplingDesign)
       ? { postStratificationAttribute: '' } // not supoprted in R script yet, keep it blank

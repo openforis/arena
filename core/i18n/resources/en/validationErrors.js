@@ -71,7 +71,7 @@ export default {
     invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
     invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
     invalidTime:
-      'Invalid time in column {{headers}}: {{value}}. Time should be formatted as HH:mm. E.g. 09:45 or 16:30',
+      'Invalid time in column {{headers}}: {{value}}. Time should be formatted as HH:mm or HH:mm:ss. E.g. 09:45, 16:30 or 09:45:30',
     missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Error updating values: {{details}}',
     multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',

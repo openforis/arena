@@ -21,6 +21,7 @@ export default {
   forceImportFromAnotherSurvey: 'Forzar importación desde otra encuesta',
   importFromArena: 'Arena/Arena Mobile',
   importFromCollect: 'Collect / Collect Mobile',
+  importFromOdk: 'ODK / ODK Collect',
   importFromCsvExcel: 'CSV/Excel',
   importFromCsvStepsInfo:
     '### Pasos de importación\n1. Seleccione la entidad de destino\n2. Descargue una plantilla\n3. Rellene la plantilla y guárdela (si es CSV, use UTF-8 como codificación)\n4. Verifique las opciones\n5. Suba el archivo CSV/Excel\n6. Valide el archivo\n7. Inicie la importación\n',
@@ -65,6 +66,11 @@ export default {
     CollectDataImportJob: {
       importCompleteSuccessfully:
         'Importación de datos de Collect completada:\n        - {{insertedRecords}} registros creados',
+    },
+    OdkDataImportJob: {
+      importCompleteSuccessfully: `ODK data import complete:
+        - {{submittedCount}} records created
+        - {{skippedCount}} duplicate submissions skipped`,
     },
     DataImportJob: {
       importCompleteSummary:

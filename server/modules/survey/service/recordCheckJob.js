@@ -44,8 +44,19 @@ export default class RecordCheckJob extends Job {
     // shm-size (see DbUtils.disableParallelQueryForTransaction for why).
     await DbUtils.disableParallelQueryForTransaction(this.tx)
 
+    const { recordUuids } = this.context
+    if (Array.isArray(recordUuids) && recordUuids.length === 0) {
+      // recordUuids explicitly scopes the check to zero records (e.g. a Collect import that inserted
+      // no records) - nothing to check. Without this, an empty array would be treated as "no
+      // restriction" below (see Objects.isEmpty in fetchRecordsUuidAndCycle) and check every record.
+      return
+    }
+
     this.logDebugOptional('fetching records uuids and cycles...')
-    const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle({ surveyId: this.surveyId }, this.tx)
+    const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle(
+      { surveyId: this.surveyId, recordUuidsIncluded: recordUuids },
+      this.tx
+    )
 
     this.total = R.length(recordsUuidAndCycle)
     this.logDebugOptional(`${this.total} records to check`)
@@ -94,7 +105,12 @@ export default class RecordCheckJob extends Job {
 
   async _fetchSurveyAndNodeDefsByCycle(cycle) {
     const { context, surveyId, tx } = this
-    const { cleanupRecords, skipDataUpdate } = context
+    const { cleanupRecords, skipDataUpdate, recordUuids } = context
+    // recordUuids scopes the check to a specific set of records (e.g. just imported from Collect) and,
+    // like cleanupRecords, forces every node def to be checked for those records rather than just the
+    // ones added since last publish - a Collect-imported record can be missing nodes for node defs
+    // that are already published (they just have no counterpart in the Collect survey/data).
+    const forceFullCheck = cleanupRecords || Array.isArray(recordUuids)
 
     // 1. fetch survey
     // backup: true keeps propsAdvancedDraft separate from propsAdvanced (rather than merging and
@@ -138,7 +154,7 @@ export default class RecordCheckJob extends Job {
     }
 
     const requiresCheck =
-      cleanupRecords ||
+      forceFullCheck ||
       nodeDefAddedUuids.length +
         nodeDefUpdatedUuids.length +
         nodeDefValidationUpdatedUuids.length +
@@ -152,6 +168,7 @@ export default class RecordCheckJob extends Job {
       nodeDefValidationUpdatedUuids,
       nodeDefDeletedUuids,
       requiresCheck,
+      forceFullCheck,
       nodesForDeletedNodeDefsDeleted: false,
     }
 
@@ -273,7 +290,7 @@ export default class RecordCheckJob extends Job {
   }
 
   async _checkRecord({ surveyAndNodeDefs, recordUuid }) {
-    const { context, surveyId, user, tx } = this
+    const { surveyId, user, tx } = this
     const {
       survey,
       nodeDefAddedUuids,
@@ -281,8 +298,8 @@ export default class RecordCheckJob extends Job {
       nodeDefValidationUpdatedUuids,
       nodeDefDeletedUuids,
       allNotDeletedNodeDefUuids,
+      forceFullCheck,
     } = surveyAndNodeDefs
-    const { cleanupRecords } = context
 
     this.logDebugOptional(`checking record ${recordUuid}`)
 
@@ -301,7 +318,7 @@ export default class RecordCheckJob extends Job {
     const allUpdatedNodesByUuid = {}
 
     // 3. insert missing nodes
-    const nodeDefToCheckForMissingNodesUuids = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedUuids
+    const nodeDefToCheckForMissingNodesUuids = forceFullCheck ? allNotDeletedNodeDefUuids : nodeDefAddedUuids
     if (nodeDefToCheckForMissingNodesUuids.length > 0) {
       this.logDebugOptional(`inserting missing nodes with node def uuids ${nodeDefToCheckForMissingNodesUuids}`)
       const { record: recordUpdateInsert, nodes: nodesUpdatedMissing = {} } = await this._insertMissingSingleNodes({
@@ -355,12 +372,12 @@ export default class RecordCheckJob extends Job {
     const nodeDefToValidateUuidsUnique = new Set(R.concat(nodeDefAddedOrUpdatedUuids, nodeDefValidationUpdatedUuids))
     const nodeDefAddedOrUpdatedOrValidationUpdatedUuids = Array.from(nodeDefToValidateUuidsUnique)
     if (
-      cleanupRecords ||
+      forceFullCheck ||
       !R.isEmpty(nodeDefAddedOrUpdatedOrValidationUpdatedUuids) ||
       !R.isEmpty(nodeDefDeletedUuids) ||
       !R.isEmpty(allUpdatedNodesByUuid)
     ) {
-      const nodeDefUuidsToValidate = cleanupRecords
+      const nodeDefUuidsToValidate = forceFullCheck
         ? allNotDeletedNodeDefUuids
         : nodeDefAddedOrUpdatedOrValidationUpdatedUuids
       this.logDebugOptional(`validating record ${recordUuid} (${nodeDefUuidsToValidate.length} node defs)`)

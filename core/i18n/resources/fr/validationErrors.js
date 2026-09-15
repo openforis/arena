@@ -71,7 +71,7 @@ export default {
     invalidNumber: 'Nombre invalide dans la colonne {{headers}} : {{value}}',
     invalidTaxonCode: 'Code invalide dans la colonne {{headers}} : {{value}}',
     invalidTime:
-      "Heure invalide dans la colonne {{headers}} : {{value}}. L'heure doit être au format HH:mm. Ex. 09:45 ou 16:30",
+      "Heure invalide dans la colonne {{headers}} : {{value}}. L'heure doit être au format HH:mm ou HH:mm:ss. Ex. 09:45, 16:30 ou 09:45:30",
     missingRequiredHeaders: 'Colonnes requises manquantes : {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Erreur lors de la mise à jour des valeurs : {{details}}',
     multipleRecordsMatchingKeys: 'Plusieurs enregistrements trouvés correspondant aux clés "{{keyValues}}"',

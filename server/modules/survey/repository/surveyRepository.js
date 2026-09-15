@@ -269,12 +269,15 @@ export const fetchSurveyIdsAndNames = async (client = db) =>
   )
 
 /**
- * Fetches the id and app version of every survey.
+ * Fetches the id and app version of every survey, most recently modified first.
+ * Used to prioritize the startup data migration: surveys ordered this way have their more
+ * recently active (and therefore more likely to be opened again soon) surveys migrated first,
+ * reducing the window in which any given survey is temporarily unavailable while migrating.
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
  */
 export const fetchSurveyIdsAndAppVersions = async (client = db) =>
-  client.map('SELECT id, app_version FROM survey', [], camelize)
+  client.map('SELECT id, app_version FROM survey ORDER BY date_modified DESC', [], camelize)
 
 export const fetchSurveyById = async ({ surveyId, draft = false, backup = false }, client = db) =>
   client.one(`SELECT ${_getSurveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
