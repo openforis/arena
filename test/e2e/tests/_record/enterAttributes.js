@@ -67,23 +67,26 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
   expect(valueSet).toBeTruthy()
 }
 
-const waitForTextInputToBeEditable = async (selector, timeout) => {
-  await page.waitForSelector(selector, { state: 'visible', timeout })
+const getRemainingTimeoutMs = (deadlineMs) => Math.max(1, deadlineMs - Date.now())
+
+const waitForTextInputToBeEditable = async (selector, deadlineMs) => {
+  await page.waitForSelector(selector, { state: 'visible', timeout: getRemainingTimeoutMs(deadlineMs) })
   await page.waitForFunction(
     (inputSelector) => {
       const input = document.querySelector(inputSelector)
       return Boolean(input) && !input.disabled && !input.readOnly
     },
     selector,
-    { timeout }
+    { timeout: getRemainingTimeoutMs(deadlineMs) }
   )
 }
 
 const enterText = async (nodeDef, value, parentSelector, { timeout } = {}) => {
   const selector = getTextSelector(nodeDef, parentSelector)
   if (timeout) {
-    await waitForTextInputToBeEditable(selector, timeout)
-    await page.fill(selector, value, { timeout })
+    const deadlineMs = Date.now() + timeout
+    await waitForTextInputToBeEditable(selector, deadlineMs)
+    await page.fill(selector, value, { timeout: getRemainingTimeoutMs(deadlineMs) })
   } else {
     await page.fill(selector, value)
   }
@@ -177,6 +180,9 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
       }
       if (lastError) throw lastError
     } else {
+      // Non-idempotent key widgets (e.g. code/time pickers) still unlock once if needed, but do
+      // not retry: repeating those interactions mid-update can leave dropdowns or pickers open and
+      // make the flake worse instead of better.
       await unlockKeyFieldIfNeeded(nodeDef, parentSelector)
       await enterValue()
     }
