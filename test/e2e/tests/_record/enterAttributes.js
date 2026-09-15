@@ -203,6 +203,7 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
           const deadlineMs = Date.now() + KEY_FIELD_ATTEMPT_TIMEOUT_MS
           await unlockKeyFieldIfNeeded(nodeDef, parentSelector, deadlineMs)
           await enterValue(getRemainingTimeoutMsOrThrow(deadlineMs, 'key field value entry'))
+          lastError = null
           break
         } catch (e) {
           lastError = e
