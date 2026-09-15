@@ -1,4 +1,5 @@
 import * as DateUtils from '../../../../core/dateUtils'
+import { nodeDefType } from '../../../../core/survey/nodeDefType'
 
 import { getSelector, TestId } from '../../../../webapp/utils/testId'
 import { FormUtils } from '../utils/formUtils'
@@ -147,7 +148,7 @@ const unlockKeyFieldIfNeeded = async (nodeDef, parentSelector) => {
 // Types whose enter function is a plain, idempotent fill: safe to retry from scratch if an
 // attempt hangs, unlike e.g. code/time which drive a stateful dropdown/picker that a second,
 // overlapping invocation could leave open or half-interacted with.
-const simpleFillTypes = ['decimal', 'integer', 'text']
+const simpleFillTypes = [nodeDefType.decimal, nodeDefType.integer, nodeDefType.text]
 
 export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
