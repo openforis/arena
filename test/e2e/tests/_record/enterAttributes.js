@@ -146,9 +146,9 @@ const enterFns = {
   time: enterTime,
 }
 
-// Keep the total retry budget (2 * 4000 ms) well below the 15 s enterAttribute test timeout so
-// failed attempts still have several seconds left for lock-toggle, retry, and error-handling
-// overhead before Jest aborts the test.
+// Keep the total retry budget implied by these constants well below the 15 s enterAttribute test
+// timeout so failed attempts still have several seconds left for lock-toggle, retry, and
+// error-handling overhead before Jest aborts the test.
 const KEY_FIELD_RETRY_ATTEMPTS = 2
 const KEY_FIELD_ATTEMPT_TIMEOUT_MS = 4000
 
