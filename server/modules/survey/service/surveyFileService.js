@@ -73,6 +73,7 @@ export const {
   fetchFileSummaryByUuid,
   fetchFileSummariesBySurveyId,
   fetchFileSummariesByType,
+  fetchExistingNonDeletedFileUuids,
   // UPDATE
   updateFileProps,
   // DELETE
