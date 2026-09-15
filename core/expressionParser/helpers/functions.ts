@@ -18,6 +18,7 @@ export const functionNames = {
   max: 'max',
   min: 'min',
   now: 'now',
+  numberToWords: 'numberToWords',
   parent: 'parent',
   pow: 'pow',
   prevCycleValue: 'prevCycleValue',

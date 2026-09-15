@@ -241,7 +241,7 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   return count
 }
 
-export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset }) => {
+export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset, lang }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
   // Passing `user` re-evaluates user-dependent applicability/relevance (e.g. userProp) for
@@ -268,6 +268,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
         draft,
         recordUuid,
         timezoneOffset,
+        lang,
       })
     }
   }
@@ -441,6 +442,7 @@ export const persistNode = async ({
   node,
   file = null,
   timezoneOffset = null,
+  lang = null,
 }) => {
   const recordUuid = Node.getRecordUuid(node)
 
@@ -466,11 +468,20 @@ export const persistNode = async ({
     socketId,
     user,
     recordUuid,
-    msg: { type: RecordsUpdateThreadMessageTypes.nodePersist, surveyId, cycle, draft, node, user, timezoneOffset },
+    msg: {
+      type: RecordsUpdateThreadMessageTypes.nodePersist,
+      surveyId,
+      cycle,
+      draft,
+      node,
+      user,
+      timezoneOffset,
+      lang,
+    },
   })
 }
 
-export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset }) =>
+export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset, lang }) =>
   _sendNodeUpdateMessage({
     socketId,
     user,
@@ -484,6 +495,7 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
       nodeUuid,
       user,
       timezoneOffset,
+      lang,
     },
   })
 

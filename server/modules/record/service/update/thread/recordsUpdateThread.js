@@ -196,7 +196,7 @@ export class RecordsUpdateThread extends Thread {
   }
 
   async processRecordInitMsg(msg) {
-    const { surveyId, recordUuid, user, timezoneOffset } = msg
+    const { surveyId, recordUuid, user, timezoneOffset, lang } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -211,6 +211,7 @@ export class RecordsUpdateThread extends Thread {
             survey,
             record,
             timezoneOffset,
+            lang,
             nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
             nodesValidationListener: (validations) =>
               this.handleNodesValidationUpdated.bind(this)({ record, validations }),
@@ -239,7 +240,7 @@ export class RecordsUpdateThread extends Thread {
   }
 
   async processRecordNodePersistMsg(msg) {
-    const { surveyId, node, user, timezoneOffset } = msg
+    const { surveyId, node, user, timezoneOffset, lang } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -257,6 +258,7 @@ export class RecordsUpdateThread extends Thread {
             record,
             node,
             timezoneOffset,
+            lang,
             nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
             nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
           },
@@ -268,7 +270,7 @@ export class RecordsUpdateThread extends Thread {
   }
 
   async processRecordNodeDeleteMsg(msg) {
-    const { surveyId, nodeUuid, recordUuid, user, timezoneOffset } = msg
+    const { surveyId, nodeUuid, recordUuid, user, timezoneOffset, lang } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -282,6 +284,7 @@ export class RecordsUpdateThread extends Thread {
           record,
           nodeUuid,
           timezoneOffset,
+          lang,
           (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
           (validations) => this.handleNodesValidationUpdated({ record, validations }),
           t

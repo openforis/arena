@@ -97,12 +97,12 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { surveyId, cycle, draft, timezoneOffset } = Request.getParams(req)
+        const { surveyId, cycle, draft, timezoneOffset, lang } = Request.getParams(req)
         const node = Request.getJsonParam(req, 'node')
         const file = Request.getFile(req)
         const socketId = Request.getSocketId(req)
 
-        await RecordService.persistNode({ socketId, user, surveyId, cycle, draft, node, file, timezoneOffset })
+        await RecordService.persistNode({ socketId, user, surveyId, cycle, draft, node, file, timezoneOffset, lang })
 
         sendOk(res)
       } catch (error) {
@@ -510,11 +510,19 @@ export const init = (app) => {
     requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {
-        const { surveyId, recordUuid, draft, timezoneOffset } = Request.getParams(req)
+        const { surveyId, recordUuid, draft, timezoneOffset, lang } = Request.getParams(req)
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
 
-        const record = await RecordService.checkIn({ socketId, user, surveyId, recordUuid, draft, timezoneOffset })
+        const record = await RecordService.checkIn({
+          socketId,
+          user,
+          surveyId,
+          recordUuid,
+          draft,
+          timezoneOffset,
+          lang,
+        })
 
         res.json({ record })
       } catch (error) {
@@ -645,11 +653,21 @@ export const init = (app) => {
     requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset } = Request.getParams(req)
+        const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset, lang } = Request.getParams(req)
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
 
-        await RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset })
+        await RecordService.deleteNode({
+          socketId,
+          user,
+          surveyId,
+          cycle,
+          draft,
+          recordUuid,
+          nodeUuid,
+          timezoneOffset,
+          lang,
+        })
 
         sendOk(res)
       } catch (error) {

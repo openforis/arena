@@ -75,6 +75,7 @@ export const afterNodesUpdate = async ({
   categoryItemProvider,
   taxonProvider,
   timezoneOffset,
+  lang = undefined,
   sideEffect = false,
 }) => {
   // output
@@ -92,6 +93,9 @@ export const afterNodesUpdate = async ({
     categoryItemProvider,
     taxonProvider,
     timezoneOffset,
+    // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
+    // fall back to the survey default when no UI language was provided (e.g. background jobs)
+    lang: lang ?? Survey.getDefaultLanguage(survey),
     sideEffect,
   })
 
