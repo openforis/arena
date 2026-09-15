@@ -67,17 +67,28 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
   expect(valueSet).toBeTruthy()
 }
 
-const getRemainingTimeoutMs = (deadlineMs) => Math.max(1, deadlineMs - Date.now())
+const getRemainingTimeoutMs = (deadlineMs) => deadlineMs - Date.now()
+
+const getRemainingTimeoutMsOrThrow = (deadlineMs, operation) => {
+  const remainingTimeoutMs = getRemainingTimeoutMs(deadlineMs)
+  if (remainingTimeoutMs <= 0) {
+    throw new Error(`enterAttribute attempt timed out waiting for ${operation}`)
+  }
+  return remainingTimeoutMs
+}
 
 const waitForTextInputToBeEditable = async (selector, deadlineMs) => {
-  await page.waitForSelector(selector, { state: 'visible', timeout: getRemainingTimeoutMs(deadlineMs) })
+  await page.waitForSelector(selector, {
+    state: 'visible',
+    timeout: getRemainingTimeoutMsOrThrow(deadlineMs, 'text input to become visible'),
+  })
   await page.waitForFunction(
     (inputSelector) => {
       const input = document.querySelector(inputSelector)
       return Boolean(input) && !input.disabled && !input.readOnly
     },
     selector,
-    { timeout: getRemainingTimeoutMs(deadlineMs) }
+    { timeout: getRemainingTimeoutMsOrThrow(deadlineMs, 'text input to become editable') }
   )
 }
 
@@ -86,7 +97,9 @@ const enterText = async (nodeDef, value, parentSelector, { timeout } = {}) => {
   if (timeout) {
     const deadlineMs = Date.now() + timeout
     await waitForTextInputToBeEditable(selector, deadlineMs)
-    await page.fill(selector, value, { timeout: getRemainingTimeoutMs(deadlineMs) })
+    await page.fill(selector, value, {
+      timeout: getRemainingTimeoutMsOrThrow(deadlineMs, 'text input fill'),
+    })
   } else {
     await page.fill(selector, value)
   }
@@ -132,6 +145,8 @@ const enterFns = {
   time: enterTime,
 }
 
+// Keep the total retry budget comfortably below the 15 s enterAttribute test timeout so failed
+// attempts still have room to report their error and exit cleanly.
 const KEY_FIELD_RETRY_ATTEMPTS = 3
 const KEY_FIELD_ATTEMPT_TIMEOUT_MS = 3000
 
