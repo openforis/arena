@@ -164,6 +164,9 @@ export default () =>
       enterAttribute(plot_id, plotIdValue)
 
       enterAttribute(tree_id, record1.trees[0][tree_id.name], getTreeSelector(0))
+      // wait for the key change to settle (same race as in the Invalidate record section above)
+      // before entering subsequent attributes on the same or adjacent rows
+      waitThread()
       enterAttribute(tree_dec_2, record1.trees[0][tree_dec_2.name], getTreeSelector(0))
       // duplicate species with value of previous tree
       enterAttribute(tree_species, record1.trees[0][tree_species.name], getTreeSelector(1))
