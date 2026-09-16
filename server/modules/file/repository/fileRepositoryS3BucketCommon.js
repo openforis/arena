@@ -99,7 +99,15 @@ export const createS3BucketRepository = ({ getFileKey }) => {
 
   const deleteFile = async (params) => {
     const command = new DeleteObjectCommand(createCommandParams({ getFileKey, params }))
-    return _sendCommand(command)
+    try {
+      return await _sendCommand(command)
+    } catch (error) {
+      // ignore error if the object is already missing from the bucket (nothing left to delete)
+      if (error.$metadata?.httpStatusCode === 404) {
+        return null
+      }
+      throw error
+    }
   }
 
   const deleteFiles = async ({ fileUuids, ...params }) => {
