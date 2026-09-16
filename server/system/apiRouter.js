@@ -12,6 +12,7 @@ import * as arenaImportApi from '@server/modules/arenaImport/api/arenaImportApi'
 import * as odkImportApi from '@server/modules/odkImport/api/odkImportApi'
 import * as odkDataImportApi from '@server/modules/odkImport/api/odkDataImportApi'
 import * as recordApi from '@server/modules/record/api/recordApi'
+import * as recordPrintableExportPublicApi from '@server/modules/record/api/recordPrintableExportPublicApi'
 import * as dataExportApi from '@server/modules/dataExport/api/dataExportApi'
 import * as dataImportApi from '@server/modules/dataImport/api/dataImportApi'
 import * as surveyRdbApi from '@server/modules/surveyRdb/api/surveyRdbApi'
@@ -43,6 +44,7 @@ odkImportApi.init(router)
 odkDataImportApi.init(router)
 
 recordApi.init(router)
+recordPrintableExportPublicApi.init(router)
 dataExportApi.init(router)
 dataImportApi.init(router)
 
