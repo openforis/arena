@@ -764,6 +764,9 @@ const exportRecordDocument = async ({
 
   let documentResult
   if (includeQrCode) {
+    if (!serverUrl) {
+      throw new SystemError('appErrors:recordPrintableExport.missingServerUrl', {}, StatusCodes.BAD_REQUEST)
+    }
     const existingShare = await ShareRepository.fetchBySurveyRecordEntityNode({
       surveyId,
       recordUuid,
@@ -772,6 +775,7 @@ const exportRecordDocument = async ({
     let accessToken = existingShare?.access_token ?? randomBytes(32).toString('base64url')
     let qrCodeImage
     let pdfResult
+    let shareMatched = false
 
     for (let attempt = 0; attempt < 2; attempt += 1) {
       const publicUrl = `${serverUrl}/api/public/record-export/${accessToken}`
@@ -787,9 +791,14 @@ const exportRecordDocument = async ({
         accessToken,
       })
       if (share.accessToken === accessToken) {
+        shareMatched = true
         break
       }
       accessToken = share.accessToken
+    }
+
+    if (!shareMatched) {
+      throw new SystemError('appErrors:recordPrintableExport.qrTokenMismatch', {}, StatusCodes.CONFLICT)
     }
 
     documentResult = extension === 'pdf' ? pdfResult : await generator({ ...generatorOptions, qrCodeImage })

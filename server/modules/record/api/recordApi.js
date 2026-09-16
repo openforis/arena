@@ -441,10 +441,9 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record/:recordUuid/export/docx', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation } =
+      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
         Request.getParams(req)
-      const includeQrCode = String(req.query.includeQrCode || '').toLowerCase() === 'true'
-      const serverUrl = Request.getServerUrl(req)
+      const serverUrl = Request.getPublicServerUrl(req)
 
       await RecordService.exportRecordDocx({
         user,
@@ -455,7 +454,7 @@ export const init = (app) => {
         entityDefUuid,
         entityNodeUuid,
         orientation,
-        includeQrCode,
+        includeQrCode: includeQrCode === true,
         serverUrl,
         outputStream: res,
       })
@@ -467,10 +466,9 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record/:recordUuid/export/pdf', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation } =
+      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
         Request.getParams(req)
-      const includeQrCode = String(req.query.includeQrCode || '').toLowerCase() === 'true'
-      const serverUrl = Request.getServerUrl(req)
+      const serverUrl = Request.getPublicServerUrl(req)
 
       await RecordService.exportRecordPdf({
         user,
@@ -481,7 +479,7 @@ export const init = (app) => {
         entityDefUuid,
         entityNodeUuid,
         orientation,
-        includeQrCode,
+        includeQrCode: includeQrCode === true,
         serverUrl,
         outputStream: res,
       })

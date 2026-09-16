@@ -1,8 +1,23 @@
 import * as R from 'ramda'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as User from '@core/user/user'
 
 export const getServerUrl = (req) => `${req.protocol}://${req.get('host')}`
+
+/**
+ * Returns the public origin for URLs that outlive the request (QR codes, emails).
+ * Prefers ARENA_PUBLIC_URL when configured; otherwise uses the request Host.
+ * @param {object} req - Express request.
+ * @returns {string} Origin without a trailing slash.
+ */
+export const getPublicServerUrl = (req) => {
+  const configured = ProcessUtils.ENV.arenaPublicUrl
+  if (configured) {
+    return String(configured).replace(/\/+$/, '')
+  }
+  return getServerUrl(req)
+}
 
 export const getHost = (req) => req.header('host')
 

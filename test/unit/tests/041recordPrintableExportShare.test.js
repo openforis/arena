@@ -15,6 +15,7 @@ describe('record printable export share', () => {
     database = { tx: jest.fn() }
     shareRepository = {
       deleteByRecordUuid: jest.fn(),
+      deleteByRecordUuids: jest.fn(),
       fetchByAccessToken: jest.fn(),
       fetchBySurveyRecordEntityNode: jest.fn(),
       fetchBySurveyRecordEntityNodeForUpdate: jest.fn(),
@@ -26,6 +27,7 @@ describe('record printable export share', () => {
       deleteFilesAndContentByUuids: jest.fn(),
       fetchFileContentAsBuffer: jest.fn(),
       fetchFileSummaryByUuid: jest.fn(),
+      fetchFilesStatistics: jest.fn().mockResolvedValue({ availableSpace: 10_000_000 }),
       insertFile: jest.fn(),
     }
     shareService = createRecordPrintableExportShareService({ database, shareRepository, surveyFileService })
@@ -100,6 +102,69 @@ describe('record printable export share', () => {
 
     expect(surveyFileService.deleteFilesAndContentByUuids).toHaveBeenCalledWith(
       { surveyId, fileUuids: ['file-1', 'file-2'] },
+      client
+    )
+  })
+
+  test('upsert continues when previous file summary is missing', async () => {
+    const tx = { name: 'transaction' }
+    const existingShare = {
+      uuid: 'share-uuid',
+      access_token: 'stable-access-token',
+      file_uuid: 'missing-file-uuid',
+    }
+    database.tx.mockImplementation(async (callback) => callback(tx))
+    shareRepository.fetchBySurveyRecordEntityNodeForUpdate.mockResolvedValue(existingShare)
+    surveyFileService.fetchFileSummaryByUuid.mockResolvedValue(null)
+    surveyFileService.insertFile.mockImplementation(async (_surveyId, file) => file)
+
+    const result = await shareService.upsertShareWithPdf({
+      surveyId,
+      recordUuid,
+      entityDefUuid,
+      entityNodeUuid,
+      pdfBuffer: Buffer.from('pdf'),
+    })
+
+    expect(result.accessToken).toBe(existingShare.access_token)
+    expect(shareRepository.updateOnReexport).toHaveBeenCalled()
+    expect(surveyFileService.deleteFilesAndContentByUuids).not.toHaveBeenCalled()
+  })
+
+  test('upsert does not fail export when superseded file cleanup fails', async () => {
+    const tx = { name: 'transaction' }
+    const existingShare = {
+      uuid: 'share-uuid',
+      access_token: 'stable-access-token',
+      file_uuid: 'old-file-uuid',
+    }
+    const oldFileSummary = { uuid: existingShare.file_uuid, props: { size: 3 } }
+    database.tx.mockImplementation(async (callback) => callback(tx))
+    shareRepository.fetchBySurveyRecordEntityNodeForUpdate.mockResolvedValue(existingShare)
+    surveyFileService.fetchFileSummaryByUuid.mockResolvedValue(oldFileSummary)
+    surveyFileService.insertFile.mockImplementation(async (_surveyId, file) => file)
+    surveyFileService.deleteFilesAndContentByUuids.mockRejectedValue(new Error('storage down'))
+
+    const result = await shareService.upsertShareWithPdf({
+      surveyId,
+      recordUuid,
+      entityDefUuid,
+      entityNodeUuid,
+      pdfBuffer: Buffer.from('pdf'),
+    })
+
+    expect(result.accessToken).toBe(existingShare.access_token)
+  })
+
+  test('deleteByRecordUuids deletes shares for all records in one call', async () => {
+    const client = { name: 'client' }
+    shareRepository.deleteByRecordUuids.mockResolvedValue([{ file_uuid: 'file-a' }, { file_uuid: 'file-b' }])
+
+    await shareService.deleteByRecordUuids({ surveyId, recordUuids: ['r1', 'r2'] }, client)
+
+    expect(shareRepository.deleteByRecordUuids).toHaveBeenCalledWith({ surveyId, recordUuids: ['r1', 'r2'] }, client)
+    expect(surveyFileService.deleteFilesAndContentByUuids).toHaveBeenCalledWith(
+      { surveyId, fileUuids: ['file-a', 'file-b'] },
       client
     )
   })

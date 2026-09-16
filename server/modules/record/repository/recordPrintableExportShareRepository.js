@@ -134,11 +134,26 @@ export const incrementDownloadCount = async ({ uuid }, client = db) =>
  * @returns {Promise<Array<object>>} Deleted file UUID rows.
  */
 export const deleteByRecordUuid = async ({ surveyId, recordUuid }, client = db) =>
-  client.manyOrNone(
+  deleteByRecordUuids({ surveyId, recordUuids: [recordUuid] }, client)
+
+/**
+ * Deletes all printable export shares for multiple records.
+ * @param {object} params - Delete parameters.
+ * @param {number} params.surveyId - Survey identifier.
+ * @param {string[]} params.recordUuids - Record UUIDs.
+ * @param {object} client - Database client.
+ * @returns {Promise<Array<object>>} Deleted file UUID rows.
+ */
+export const deleteByRecordUuids = async ({ surveyId, recordUuids }, client = db) => {
+  if (!recordUuids?.length) {
+    return []
+  }
+  return client.manyOrNone(
     `
     DELETE FROM ${TABLE_NAME}
     WHERE survey_id = $1
-      AND record_uuid = $2
+      AND record_uuid = ANY($2::uuid[])
     RETURNING file_uuid`,
-    [surveyId, recordUuid]
+    [surveyId, recordUuids]
   )
+}

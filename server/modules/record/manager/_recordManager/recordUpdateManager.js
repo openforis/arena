@@ -207,11 +207,7 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
   db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!A.isEmpty(recordUuids)) {
-      await Promise.all(
-        recordUuids.map((recordUuid) =>
-          RecordPrintableExportShareService.deleteByRecordUuid({ surveyId, recordUuid }, t)
-        )
-      )
+      await RecordPrintableExportShareService.deleteByRecordUuids({ surveyId, recordUuids }, t)
       await RecordFileManager.deleteFilesByRecordUuids(surveyId, recordUuids, t)
     }
     return recordUuids.length
@@ -220,11 +216,7 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
 export const deleteRecordsByCycles = async (surveyId, cycles, client = db) => {
   const recordUuids = await RecordRepository.deleteRecordsByCycles(surveyId, cycles, client)
   if (!A.isEmpty(recordUuids)) {
-    await Promise.all(
-      recordUuids.map((recordUuid) =>
-        RecordPrintableExportShareService.deleteByRecordUuid({ surveyId, recordUuid }, client)
-      )
-    )
+    await RecordPrintableExportShareService.deleteByRecordUuids({ surveyId, recordUuids }, client)
   }
   return recordUuids
 }

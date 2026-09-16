@@ -1,4 +1,4 @@
-import { StatusCodes } from 'http-status-codes'
+import { StatusCodes } from '@core/systemError'
 
 import * as RecordPrintableExportShareService from '@server/modules/record/service/recordPrintableExportShareService'
 
@@ -13,6 +13,8 @@ export const init = (app) => {
       }
       res.setHeader('Content-Type', result.contentType)
       res.setHeader('Content-Disposition', 'inline; filename="record-export.pdf"')
+      res.setHeader('Cache-Control', 'private, no-store')
+      res.setHeader('X-Content-Type-Options', 'nosniff')
       res.status(StatusCodes.OK).send(result.buffer)
     } catch (error) {
       next(error)

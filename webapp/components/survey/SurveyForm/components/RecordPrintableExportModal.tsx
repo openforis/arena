@@ -55,6 +55,14 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
   }, [initialFormat])
 
   useEffect(() => {
+    if (!open) {
+      setIncludeQrCode(false)
+      setExportScope(PrintableExportScopes.currentPage)
+      setOrientation(PrintOrientations.portrait)
+    }
+  }, [open])
+
+  useEffect(() => {
     if (includeQrCode) {
       setExportScope(PrintableExportScopes.currentPage)
     }
