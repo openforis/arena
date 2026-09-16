@@ -23,6 +23,27 @@ export const fetchBySurveyRecordEntityNode = async ({ surveyId, recordUuid, enti
   )
 
 /**
+ * Fetches and locks a printable export share for an entity node.
+ * @param {object} params - Query parameters.
+ * @param {number} params.surveyId - Survey identifier.
+ * @param {string} params.recordUuid - Record UUID.
+ * @param {string} params.entityNodeUuid - Entity node UUID.
+ * @param {object} client - Transaction client.
+ * @returns {Promise<object|null>} The locked share, or null.
+ */
+export const fetchBySurveyRecordEntityNodeForUpdate = async ({ surveyId, recordUuid, entityNodeUuid }, client = db) =>
+  client.oneOrNone(
+    `
+    SELECT *
+    FROM ${TABLE_NAME}
+    WHERE survey_id = $1
+      AND record_uuid = $2
+      AND entity_node_uuid = $3
+    FOR UPDATE`,
+    [surveyId, recordUuid, entityNodeUuid]
+  )
+
+/**
  * Fetches a printable export share by access token.
  * @param {object} params - Query parameters.
  * @param {string} params.accessToken - Public access token.

@@ -2,20 +2,14 @@ import { randomBytes } from 'node:crypto'
 
 import * as SurveyFile from '@core/survey/surveyFile'
 
-import * as FileManagerCommon from '@server/modules/file/manager/fileManagerCommon'
-import * as FileRepositoryFileSystem from '@server/modules/record/repository/fileRepositoryFileSystem'
-import * as FileRepositoryS3Bucket from '@server/modules/record/repository/fileRepositoryS3Bucket'
+import { db } from '@server/db/db'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 
 import * as ShareRepository from '../repository/recordPrintableExportShareRepository'
 
 const CONTENT_TYPE_PDF = 'application/pdf'
 const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000
-
-const contentOverwriteFunctionByStorageType = {
-  [FileManagerCommon.fileContentStorageTypes.fileSystem]: FileRepositoryFileSystem.writeFileContent,
-  [FileManagerCommon.fileContentStorageTypes.s3Bucket]: FileRepositoryS3Bucket.uploadFileContent,
-}
+const POSTGRES_UNIQUE_VIOLATION = '23505'
 
 const createPdfFile = ({ recordUuid, entityNodeUuid, pdfBuffer }) =>
   SurveyFile.createFile({
@@ -30,41 +24,80 @@ const createPdfFile = ({ recordUuid, entityNodeUuid, pdfBuffer }) =>
 const newExpiresAt = () => new Date(Date.now() + ONE_YEAR_MS)
 const newAccessToken = () => randomBytes(32).toString('base64url')
 
-const overwriteExternalFileContent = async ({ surveyId, fileUuid, recordUuid, content }) => {
-  const storageType = FileManagerCommon.getFileContentStorageType()
-  const overwriteContent = contentOverwriteFunctionByStorageType[storageType]
-  await overwriteContent({ surveyId, fileUuid, recordUuid, content })
-}
+const isUniqueViolation = (error) => error?.code === POSTGRES_UNIQUE_VIOLATION
 
-const updateFileSize = async ({ surveyId, fileSummary, size }) => {
+const deleteFile = async ({ surveyId, fileSummary }) => {
   const fileUuid = SurveyFile.getUuid(fileSummary)
-  const fileSummaryUpdated = SurveyFile.assocSize(size)(fileSummary)
-  await SurveyFileService.updateFileProps(surveyId, fileUuid, SurveyFile.getProps(fileSummaryUpdated))
+  await SurveyFileService.deleteFilesAndContentByUuids({
+    surveyId,
+    fileUuids: [fileUuid],
+    fallbackFileSummaries: [fileSummary],
+  })
 }
 
-const replaceDatabaseFile = async ({ surveyId, recordUuid, entityNodeUuid, pdfBuffer, existingFileSummary }) => {
-  const replacementFile = createPdfFile({ recordUuid, entityNodeUuid, pdfBuffer })
-  const insertedFile = await SurveyFileService.insertFile(surveyId, replacementFile)
-  return {
-    fileUuid: SurveyFile.getUuid(insertedFile),
-    deleteReplacedFile: async () =>
-      SurveyFileService.deleteFilesAndContent({ surveyId, fileSummaries: [existingFileSummary] }),
-  }
-}
+const persistShareWithPdf = async ({
+  surveyId,
+  recordUuid,
+  entityDefUuid,
+  entityNodeUuid,
+  pdfBuffer,
+  requestedAccessToken,
+}) => {
+  const expiresAt = newExpiresAt()
+  const stagedFile = createPdfFile({ recordUuid, entityNodeUuid, pdfBuffer })
+  let replacedFileSummary = null
+  let accessToken
 
-const overwriteFile = async ({ surveyId, recordUuid, entityNodeUuid, fileUuid, pdfBuffer }) => {
-  const existingFileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
-  if (!existingFileSummary) {
-    throw new Error(`Printable export file not found: ${fileUuid}`)
+  try {
+    accessToken = await db.tx(async (tx) => {
+      const existing = await ShareRepository.fetchBySurveyRecordEntityNodeForUpdate(
+        { surveyId, recordUuid, entityNodeUuid },
+        tx
+      )
+
+      if (existing) {
+        replacedFileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, existing.file_uuid, tx)
+        if (!replacedFileSummary) {
+          throw new Error(`Printable export file not found: ${existing.file_uuid}`)
+        }
+      }
+
+      const insertedFile = await SurveyFileService.insertFile(surveyId, stagedFile, tx)
+      const fileUuid = SurveyFile.getUuid(insertedFile)
+
+      if (existing) {
+        await ShareRepository.updateOnReexport(
+          { uuid: existing.uuid, fileUuid, expiresAt, dateModified: new Date() },
+          tx
+        )
+        return existing.access_token
+      }
+
+      const accessTokenNew = requestedAccessToken ?? newAccessToken()
+      await ShareRepository.insert(
+        {
+          surveyId,
+          recordUuid,
+          entityDefUuid,
+          entityNodeUuid,
+          accessToken: accessTokenNew,
+          fileUuid,
+          contentType: CONTENT_TYPE_PDF,
+          expiresAt,
+        },
+        tx
+      )
+      return accessTokenNew
+    })
+  } catch (error) {
+    await deleteFile({ surveyId, fileSummary: stagedFile })
+    throw error
   }
 
-  if (FileManagerCommon.getFileContentStorageType() === FileManagerCommon.fileContentStorageTypes.db) {
-    return replaceDatabaseFile({ surveyId, recordUuid, entityNodeUuid, pdfBuffer, existingFileSummary })
+  if (replacedFileSummary) {
+    await deleteFile({ surveyId, fileSummary: replacedFileSummary })
   }
-
-  await overwriteExternalFileContent({ surveyId, fileUuid, recordUuid, content: pdfBuffer })
-  await updateFileSize({ surveyId, fileSummary: existingFileSummary, size: Buffer.byteLength(pdfBuffer) })
-  return { fileUuid, deleteReplacedFile: async () => undefined }
+  return { accessToken, expiresAt }
 }
 
 /**
@@ -86,45 +119,28 @@ export const upsertShareWithPdf = async ({
   pdfBuffer,
   accessToken: requestedAccessToken,
 }) => {
-  const existing = await ShareRepository.fetchBySurveyRecordEntityNode({
-    surveyId,
-    recordUuid,
-    entityNodeUuid,
-  })
-  const expiresAt = newExpiresAt()
-
-  if (existing) {
-    const { fileUuid, deleteReplacedFile } = await overwriteFile({
-      surveyId,
-      recordUuid,
-      entityNodeUuid,
-      fileUuid: existing.file_uuid,
-      pdfBuffer,
-    })
-    await ShareRepository.updateOnReexport({
-      uuid: existing.uuid,
-      fileUuid,
-      expiresAt,
-      dateModified: new Date(),
-    })
-    await deleteReplacedFile()
-    return { accessToken: existing.access_token, expiresAt }
-  }
-
-  const accessToken = requestedAccessToken ?? newAccessToken()
-  const file = createPdfFile({ recordUuid, entityNodeUuid, pdfBuffer })
-  const insertedFile = await SurveyFileService.insertFile(surveyId, file)
-  await ShareRepository.insert({
+  const params = {
     surveyId,
     recordUuid,
     entityDefUuid,
     entityNodeUuid,
-    accessToken,
-    fileUuid: SurveyFile.getUuid(insertedFile),
-    contentType: CONTENT_TYPE_PDF,
-    expiresAt,
-  })
-  return { accessToken, expiresAt }
+    pdfBuffer,
+    requestedAccessToken,
+  }
+
+  try {
+    return await persistShareWithPdf(params)
+  } catch (error) {
+    if (!isUniqueViolation(error)) {
+      throw error
+    }
+
+    const existing = await ShareRepository.fetchBySurveyRecordEntityNode({ surveyId, recordUuid, entityNodeUuid })
+    if (!existing) {
+      throw error
+    }
+    return persistShareWithPdf(params)
+  }
 }
 
 /**
@@ -163,12 +179,8 @@ export const fetchValidPdfByToken = async ({ token }) => {
 export const deleteByRecordUuid = async ({ surveyId, recordUuid }, client) => {
   const deleted = await ShareRepository.deleteByRecordUuid({ surveyId, recordUuid }, client)
   const fileUuids = deleted.map(({ file_uuid: fileUuid }) => fileUuid).filter(Boolean)
-  const fileSummaries = await Promise.all(
-    fileUuids.map((fileUuid) => SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, client))
-  )
-  const existingFileSummaries = fileSummaries.filter(Boolean)
-  if (existingFileSummaries.length > 0) {
-    await SurveyFileService.deleteFilesAndContent({ surveyId, fileSummaries: existingFileSummaries }, client)
+  if (fileUuids.length > 0) {
+    await SurveyFileService.deleteFilesAndContentByUuids({ surveyId, fileUuids }, client)
   }
 }
 
