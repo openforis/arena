@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { randomBytes } from 'node:crypto'
 
 import { NodeValues, Objects, RecordExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
 import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
@@ -39,6 +40,7 @@ import * as Response from '@server/utils/response'
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
 import * as RecordFileManager from '../manager/recordFileManager'
+import * as ShareRepository from '../repository/recordPrintableExportShareRepository'
 import { findSurveyDocImageApplicable } from '../../survey/service/surveyDocImageUtils'
 
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
@@ -46,6 +48,8 @@ import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
 import RecordsCloneJob from './recordsCloneJob'
 import RecordsValidationJob from './recordsValidationJob'
+import { toQrPngBuffer } from './qrCodePng'
+import { upsertShareWithPdf } from './recordPrintableExportShareService'
 import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
@@ -670,7 +674,13 @@ const exportRecordDocument = async ({
   entityDefUuid,
   entityNodeUuid,
   orientation = PrintOrientations.portrait,
+  includeQrCode = false,
+  serverUrl = null,
 }) => {
+  if (includeQrCode && (exportScope !== PrintableExportScopes.currentPage || !entityDefUuid || !entityNodeUuid)) {
+    throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
+  }
+
   const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true, user })
   const cycle = Record.getCycle(record)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
@@ -731,7 +741,7 @@ const exportRecordDocument = async ({
   const pageNumbering = Survey.isDocPageNumberingEnabled(survey)
 
   const i18n = await i18nFactory.createI18nAsync(langToUse)
-  const { buffer, surveyName } = await generator({
+  const generatorOptions = {
     survey,
     cycle,
     record,
@@ -750,7 +760,35 @@ const exportRecordDocument = async ({
     entityDefUuid,
     entityNodeUuid,
     orientation,
-  })
+  }
+
+  let documentResult
+  if (includeQrCode) {
+    const existingShare = await ShareRepository.fetchBySurveyRecordEntityNode({
+      surveyId,
+      recordUuid,
+      entityNodeUuid,
+    })
+    const accessToken = existingShare?.access_token ?? randomBytes(32).toString('base64url')
+    const publicUrl = `${serverUrl}/api/public/record-export/${accessToken}`
+    const qrCodeImage = await toQrPngBuffer(publicUrl)
+    const pdfResult = await SurveyPdfGenerator.generateSurveyPdf({ ...generatorOptions, qrCodeImage })
+
+    await upsertShareWithPdf({
+      surveyId,
+      recordUuid,
+      entityDefUuid,
+      entityNodeUuid,
+      pdfBuffer: pdfResult.buffer,
+      accessToken,
+    })
+
+    documentResult = extension === 'pdf' ? pdfResult : await generator({ ...generatorOptions, qrCodeImage })
+  } else {
+    documentResult = await generator(generatorOptions)
+  }
+
+  const { buffer, surveyName } = documentResult
   const fileName =
     exportScope === PrintableExportScopes.currentPage
       ? ExportFileNameGenerator.generate({
@@ -780,6 +818,8 @@ export const exportRecordDocx = ({
   entityDefUuid,
   entityNodeUuid,
   orientation,
+  includeQrCode,
+  serverUrl,
 }) =>
   exportRecordDocument({
     user,
@@ -791,6 +831,8 @@ export const exportRecordDocx = ({
     entityDefUuid,
     entityNodeUuid,
     orientation,
+    includeQrCode,
+    serverUrl,
     generator: SurveyDocxGenerator.generateSurveyDocx,
     extension: 'docx',
     contentType: Response.contentTypes.docx,
@@ -806,6 +848,8 @@ export const exportRecordPdf = ({
   entityDefUuid,
   entityNodeUuid,
   orientation,
+  includeQrCode,
+  serverUrl,
 }) =>
   exportRecordDocument({
     user,
@@ -817,6 +861,8 @@ export const exportRecordPdf = ({
     entityDefUuid,
     entityNodeUuid,
     orientation,
+    includeQrCode,
+    serverUrl,
     generator: SurveyPdfGenerator.generateSurveyPdf,
     extension: 'pdf',
     contentType: Response.contentTypes.pdf,

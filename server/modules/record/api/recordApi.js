@@ -443,6 +443,8 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation } =
         Request.getParams(req)
+      const includeQrCode = String(req.query.includeQrCode || '').toLowerCase() === 'true'
+      const serverUrl = Request.getServerUrl(req)
 
       await RecordService.exportRecordDocx({
         user,
@@ -453,6 +455,8 @@ export const init = (app) => {
         entityDefUuid,
         entityNodeUuid,
         orientation,
+        includeQrCode,
+        serverUrl,
         outputStream: res,
       })
     } catch (error) {
@@ -465,6 +469,8 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation } =
         Request.getParams(req)
+      const includeQrCode = String(req.query.includeQrCode || '').toLowerCase() === 'true'
+      const serverUrl = Request.getServerUrl(req)
 
       await RecordService.exportRecordPdf({
         user,
@@ -475,6 +481,8 @@ export const init = (app) => {
         entityDefUuid,
         entityNodeUuid,
         orientation,
+        includeQrCode,
+        serverUrl,
         outputStream: res,
       })
     } catch (error) {
