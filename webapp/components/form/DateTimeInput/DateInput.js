@@ -23,7 +23,10 @@ const DateInput = (props) => {
       disabled={disabled}
       format={displayFormat}
       onChange={onInputChange}
-      slotProps={{ textField: { autoComplete: 'off', className: 'date-picker__text-field', error: errorRef.current } }}
+      slotProps={{
+        field: { clearable: !disabled },
+        textField: { autoComplete: 'off', className: 'date-picker__text-field', error: errorRef.current },
+      }}
       value={dateValue}
     />
   )

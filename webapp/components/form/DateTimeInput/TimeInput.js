@@ -20,6 +20,7 @@ const TimeInput = (props) => {
       disabled={disabled}
       onChange={onInputChange}
       slotProps={{
+        field: { clearable: !disabled },
         textField: {
           className: classNames('time-picker__text-field', { 'time-picker__text-field--with-seconds': withSeconds }),
           // eslint-disable-next-line react-hooks/refs -- pre-existing pattern (predates this change, see git blame): errorRef is a plain ref updated in useDateTimeInput's onInputChange/applyChange callbacks, not read for reactive rendering logic.
