@@ -769,19 +769,28 @@ const exportRecordDocument = async ({
       recordUuid,
       entityNodeUuid,
     })
-    const accessToken = existingShare?.access_token ?? randomBytes(32).toString('base64url')
-    const publicUrl = `${serverUrl}/api/public/record-export/${accessToken}`
-    const qrCodeImage = await toQrPngBuffer(publicUrl)
-    const pdfResult = await SurveyPdfGenerator.generateSurveyPdf({ ...generatorOptions, qrCodeImage })
+    let accessToken = existingShare?.access_token ?? randomBytes(32).toString('base64url')
+    let qrCodeImage
+    let pdfResult
 
-    await upsertShareWithPdf({
-      surveyId,
-      recordUuid,
-      entityDefUuid,
-      entityNodeUuid,
-      pdfBuffer: pdfResult.buffer,
-      accessToken,
-    })
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const publicUrl = `${serverUrl}/api/public/record-export/${accessToken}`
+      qrCodeImage = await toQrPngBuffer(publicUrl)
+      pdfResult = await SurveyPdfGenerator.generateSurveyPdf({ ...generatorOptions, qrCodeImage })
+
+      const share = await upsertShareWithPdf({
+        surveyId,
+        recordUuid,
+        entityDefUuid,
+        entityNodeUuid,
+        pdfBuffer: pdfResult.buffer,
+        accessToken,
+      })
+      if (share.accessToken === accessToken) {
+        break
+      }
+      accessToken = share.accessToken
+    }
 
     documentResult = extension === 'pdf' ? pdfResult : await generator({ ...generatorOptions, qrCodeImage })
   } else {
