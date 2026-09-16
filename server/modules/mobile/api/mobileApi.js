@@ -139,7 +139,7 @@ export const init = (app) => {
       try {
         const { surveyId, recordUuids = [] } = Request.getParams(req)
         const fileUuidsByRecordUuid = await RecordService.fetchFileUuidsByRecordUuid({ surveyId, recordUuids })
-        res.json({ fileUuids: fileUuidsByRecordUuid })
+        res.json({ fileUuidsByRecordUuid })
       } catch (e) {
         next(e)
       }
