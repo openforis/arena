@@ -26,47 +26,44 @@ const newAccessToken = () => randomBytes(32).toString('base64url')
 
 const isUniqueViolation = (error) => error?.code === POSTGRES_UNIQUE_VIOLATION
 
-const deleteFile = async ({ surveyId, fileSummary }) => {
+const deleteFile = async ({ surveyId, fileSummary }, { surveyFileService }) => {
   const fileUuid = SurveyFile.getUuid(fileSummary)
-  await SurveyFileService.deleteFilesAndContentByUuids({
+  await surveyFileService.deleteFilesAndContentByUuids({
     surveyId,
     fileUuids: [fileUuid],
     fallbackFileSummaries: [fileSummary],
   })
 }
 
-const persistShareWithPdf = async ({
-  surveyId,
-  recordUuid,
-  entityDefUuid,
-  entityNodeUuid,
-  pdfBuffer,
-  requestedAccessToken,
-}) => {
+const persistShareWithPdf = async (
+  { surveyId, recordUuid, entityDefUuid, entityNodeUuid, pdfBuffer, requestedAccessToken },
+  dependencies
+) => {
+  const { database, shareRepository, surveyFileService } = dependencies
   const expiresAt = newExpiresAt()
   const stagedFile = createPdfFile({ recordUuid, entityNodeUuid, pdfBuffer })
   let replacedFileSummary = null
   let accessToken
 
   try {
-    accessToken = await db.tx(async (tx) => {
-      const existing = await ShareRepository.fetchBySurveyRecordEntityNodeForUpdate(
+    accessToken = await database.tx(async (tx) => {
+      const existing = await shareRepository.fetchBySurveyRecordEntityNodeForUpdate(
         { surveyId, recordUuid, entityNodeUuid },
         tx
       )
 
       if (existing) {
-        replacedFileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, existing.file_uuid, tx)
+        replacedFileSummary = await surveyFileService.fetchFileSummaryByUuid(surveyId, existing.file_uuid, tx)
         if (!replacedFileSummary) {
           throw new Error(`Printable export file not found: ${existing.file_uuid}`)
         }
       }
 
-      const insertedFile = await SurveyFileService.insertFile(surveyId, stagedFile, tx)
+      const insertedFile = await surveyFileService.insertFile(surveyId, stagedFile, tx)
       const fileUuid = SurveyFile.getUuid(insertedFile)
 
       if (existing) {
-        await ShareRepository.updateOnReexport(
+        await shareRepository.updateOnReexport(
           { uuid: existing.uuid, fileUuid, expiresAt, dateModified: new Date() },
           tx
         )
@@ -74,7 +71,7 @@ const persistShareWithPdf = async ({
       }
 
       const accessTokenNew = requestedAccessToken ?? newAccessToken()
-      await ShareRepository.insert(
+      await shareRepository.insert(
         {
           surveyId,
           recordUuid,
@@ -90,106 +87,94 @@ const persistShareWithPdf = async ({
       return accessTokenNew
     })
   } catch (error) {
-    await deleteFile({ surveyId, fileSummary: stagedFile })
+    await deleteFile({ surveyId, fileSummary: stagedFile }, dependencies)
     throw error
   }
 
   if (replacedFileSummary) {
-    await deleteFile({ surveyId, fileSummary: replacedFileSummary })
+    await deleteFile({ surveyId, fileSummary: replacedFileSummary }, dependencies)
   }
   return { accessToken, expiresAt }
 }
 
 /**
- * Creates or refreshes a printable-export share and stores its PDF.
- * @param {object} params - Share and PDF values.
- * @param {number} params.surveyId - Survey identifier.
- * @param {string} params.recordUuid - Record UUID.
- * @param {string} params.entityDefUuid - Entity definition UUID.
- * @param {string} params.entityNodeUuid - Entity node UUID.
- * @param {Buffer} params.pdfBuffer - PDF bytes.
- * @param {string} [params.accessToken] - Optional precomputed access token.
- * @returns {Promise<{accessToken: string, expiresAt: Date}>} Public token and expiry.
+ * Creates a printable-export share service with replaceable persistence dependencies.
+ * @param {object} [dependencies] - Service dependencies.
+ * @param {object} [dependencies.database] - Database client.
+ * @param {object} [dependencies.shareRepository] - Share repository.
+ * @param {object} [dependencies.surveyFileService] - Survey file service.
+ * @returns {object} Printable-export share operations.
  */
-export const upsertShareWithPdf = async ({
-  surveyId,
-  recordUuid,
-  entityDefUuid,
-  entityNodeUuid,
-  pdfBuffer,
-  accessToken: requestedAccessToken,
-}) => {
-  const params = {
+export const createRecordPrintableExportShareService = ({
+  database = db,
+  shareRepository = ShareRepository,
+  surveyFileService = SurveyFileService,
+} = {}) => {
+  const dependencies = { database, shareRepository, surveyFileService }
+
+  const upsertShareWithPdf = async ({
     surveyId,
     recordUuid,
     entityDefUuid,
     entityNodeUuid,
     pdfBuffer,
-    requestedAccessToken,
-  }
-
-  try {
-    return await persistShareWithPdf(params)
-  } catch (error) {
-    if (!isUniqueViolation(error)) {
-      throw error
+    accessToken: requestedAccessToken,
+  }) => {
+    const params = {
+      surveyId,
+      recordUuid,
+      entityDefUuid,
+      entityNodeUuid,
+      pdfBuffer,
+      requestedAccessToken,
     }
 
-    const existing = await ShareRepository.fetchBySurveyRecordEntityNode({ surveyId, recordUuid, entityNodeUuid })
-    if (!existing) {
-      throw error
+    try {
+      return await persistShareWithPdf(params, dependencies)
+    } catch (error) {
+      if (!isUniqueViolation(error)) {
+        throw error
+      }
+
+      const existing = await shareRepository.fetchBySurveyRecordEntityNode({ surveyId, recordUuid, entityNodeUuid })
+      if (!existing) {
+        throw error
+      }
+      return persistShareWithPdf(params, dependencies)
     }
-    return persistShareWithPdf(params)
   }
+
+  const fetchValidPdfByToken = async ({ token }) => {
+    const row = await shareRepository.fetchByAccessToken({ accessToken: token })
+    if (!row || new Date(row.expires_at).getTime() <= Date.now()) {
+      return null
+    }
+
+    const fileSummary = await surveyFileService.fetchFileSummaryByUuid(row.survey_id, row.file_uuid)
+    if (!fileSummary) {
+      return null
+    }
+    const buffer = await surveyFileService.fetchFileContentAsBuffer({ surveyId: row.survey_id, fileSummary })
+    if (!buffer) {
+      return null
+    }
+
+    await shareRepository.incrementDownloadCount({ uuid: row.uuid }).catch(() => undefined)
+    return { buffer, contentType: row.content_type || CONTENT_TYPE_PDF }
+  }
+
+  const deleteByRecordUuid = async ({ surveyId, recordUuid }, client) => {
+    const deleted = await shareRepository.deleteByRecordUuid({ surveyId, recordUuid }, client)
+    const fileUuids = deleted.map(({ file_uuid: fileUuid }) => fileUuid).filter(Boolean)
+    if (fileUuids.length > 0) {
+      await surveyFileService.deleteFilesAndContentByUuids({ surveyId, fileUuids }, client)
+    }
+  }
+
+  const incrementDownloadCount = async ({ uuid }, client) => shareRepository.incrementDownloadCount({ uuid }, client)
+
+  return { deleteByRecordUuid, fetchValidPdfByToken, incrementDownloadCount, upsertShareWithPdf }
 }
 
-/**
- * Fetches a non-expired shared PDF by token.
- * @param {object} params - Fetch parameters.
- * @param {string} params.token - Public access token.
- * @returns {Promise<{buffer: Buffer, contentType: string}|null>} PDF data, or null.
- */
-export const fetchValidPdfByToken = async ({ token }) => {
-  const row = await ShareRepository.fetchByAccessToken({ accessToken: token })
-  if (!row || new Date(row.expires_at).getTime() <= Date.now()) {
-    return null
-  }
-
-  const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(row.survey_id, row.file_uuid)
-  if (!fileSummary) {
-    return null
-  }
-  const buffer = await SurveyFileService.fetchFileContentAsBuffer({ surveyId: row.survey_id, fileSummary })
-  if (!buffer) {
-    return null
-  }
-
-  await ShareRepository.incrementDownloadCount({ uuid: row.uuid }).catch(() => undefined)
-  return { buffer, contentType: row.content_type || CONTENT_TYPE_PDF }
-}
-
-/**
- * Deletes printable export shares and their PDF files for a record.
- * @param {object} params - Delete parameters.
- * @param {number} params.surveyId - Survey identifier.
- * @param {string} params.recordUuid - Record UUID.
- * @param {object} [client] - Optional database client.
- * @returns {Promise<void>} A promise resolved after deletion.
- */
-export const deleteByRecordUuid = async ({ surveyId, recordUuid }, client) => {
-  const deleted = await ShareRepository.deleteByRecordUuid({ surveyId, recordUuid }, client)
-  const fileUuids = deleted.map(({ file_uuid: fileUuid }) => fileUuid).filter(Boolean)
-  if (fileUuids.length > 0) {
-    await SurveyFileService.deleteFilesAndContentByUuids({ surveyId, fileUuids }, client)
-  }
-}
-
-/**
- * Increments a printable export share download count.
- * @param {object} params - Update parameters.
- * @param {string} params.uuid - Share UUID.
- * @param {object} [client] - Optional database client.
- * @returns {Promise<void>} A promise resolved after the update.
- */
-export const incrementDownloadCount = async ({ uuid }, client) =>
-  ShareRepository.incrementDownloadCount({ uuid }, client)
+export const { deleteByRecordUuid, fetchValidPdfByToken, incrementDownloadCount, upsertShareWithPdf } =
+  createRecordPrintableExportShareService()
