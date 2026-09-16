@@ -7,7 +7,7 @@ import * as SurveyFile from '@core/survey/surveyFile'
 
 import * as API from '@webapp/service/api'
 import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/chain'
-import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 import { NotificationActions } from '@webapp/store/ui'
 import { useConfirmAsync } from '@webapp/components/hooks'
@@ -21,6 +21,7 @@ const AdvancedFunctionsMenu = () => {
   const surveyId = useSurveyId()
   const chain = useChain()
   const cycle = useSurveyCycleKey()
+  const cycleKeys = useSurveyCycleKeys()
   const lang = useSurveyPreferredLang()
   const chainEditLocked = useChainEditLocked()
   const canEditChain = useAuthCanUseAnalysis()
@@ -66,6 +67,14 @@ const AdvancedFunctionsMenu = () => {
         return
       }
 
+      if (cycleKeys.length > 1) {
+        const confirmed = await confirmAsync({
+          key: 'chainView.mauFile.confirmCycleAssociation',
+          params: { cycle: Number(cycle) + 1 },
+        })
+        if (!confirmed) return
+      }
+
       if (mauFile) {
         const confirmed = await confirmAsync({ key: 'chainView.mauFile.confirmReplace' })
         if (!confirmed) return
@@ -87,7 +96,7 @@ const AdvancedFunctionsMenu = () => {
         setUploadingMauFile(false)
       }
     },
-    [chainUuid, confirmAsync, dispatch, mauFile, surveyId]
+    [chainUuid, confirmAsync, cycle, cycleKeys, dispatch, mauFile, surveyId]
   )
 
   const onDeleteMauFileClick = useCallback(async () => {

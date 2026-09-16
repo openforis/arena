@@ -770,6 +770,8 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       upload: 'Upload MAU.zip',
       download: 'Download MAU.zip',
       delete: 'Delete MAU.zip',
+      confirmCycleAssociation:
+        'The MAU.zip file will be associated to the current cycle ({{cycle}}). Do you want to continue?',
       confirmReplace: 'A MAU.zip file has already been uploaded for this chain. Do you want to replace it?',
       confirmDelete: 'Delete the MAU.zip file uploaded for this chain?',
       uploadComplete: 'MAU.zip file uploaded successfully',
