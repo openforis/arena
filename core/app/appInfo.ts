@@ -9,7 +9,7 @@ const arenaMobile2Id = 'am'
 const appNameById: Record<string, string> = {
   [arenaAppId]: 'Arena',
   [arenaMobileId]: 'Arena Mobile',
-  [arenaMobile2Id]: 'Arena Mobile 2',
+  [arenaMobile2Id]: 'Arena Mobile',
   [arenaMobileExperimentsId]: 'Arena Mobile Experiments',
 }
 
