@@ -20,6 +20,7 @@ export default {
     includeFileAttributeDefs: 'ファイル属性の列を含める',
     includeInternalUuids: '内部UUIDを含める',
     recordsModifiedAfter: 'この日時以降に更新された記録',
+    recordsModifiedBefore: 'この日時以前に更新された記録',
   },
   optionsInfo: {
     expandCategoryItems:
@@ -36,6 +37,7 @@ export default {
     includeFileAttributeDefs: `ファイル属性の列（ファイルの内部識別子「file_uuid」とファイル名「file_name」）を追加します`,
     includeInternalUuids: '内部識別子（UUID）を「_uuid」で終わる列に含めます',
     recordsModifiedAfter: '指定した日付以降に更新された記録のデータのみをエクスポートします',
+    recordsModifiedBefore: '指定した日付以前に更新された記録のデータのみをエクスポートします',
   },
   startExport: 'エクスポートを開始',
 }

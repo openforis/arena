@@ -187,14 +187,28 @@ export const fetchViewDataAgg = async (params, client = db) => {
   return result
 }
 
-const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuids, search, user }) => {
+const _determineRecordUuidsFilter = async ({
+  survey,
+  cycle,
+  recordsModifiedAfter,
+  recordsModifiedBefore,
+  recordUuids,
+  search,
+  user,
+}) => {
   // recordUuids explicitly selected by the user are already checked against qualifiers by
   // requireRecordsMatchUserGroupQualifiers, at the API layer
   if (recordUuids) return recordUuids
 
   const qualifierNodeDefFilters = user ? await SurveyManager.fetchUserQualifierFilters({ user, survey }) : []
 
-  if (Objects.isEmpty(search) && !recordsModifiedAfter && qualifierNodeDefFilters.length === 0) return null
+  if (
+    Objects.isEmpty(search) &&
+    !recordsModifiedAfter &&
+    !recordsModifiedBefore &&
+    qualifierNodeDefFilters.length === 0
+  )
+    return null
 
   const surveyId = Survey.getId(survey)
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
@@ -210,6 +224,11 @@ const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter
   if (recordsModifiedAfter) {
     recordsSummaries = recordsSummaries.filter((recordSummary) =>
       Dates.isAfter(Record.getDateModified(recordSummary), recordsModifiedAfter)
+    )
+  }
+  if (recordsModifiedBefore) {
+    recordsSummaries = recordsSummaries.filter((recordSummary) =>
+      Dates.isBefore(Record.getDateModified(recordSummary), recordsModifiedBefore)
     )
   }
   return recordsSummaries.map(Record.getUuid)
@@ -355,7 +374,7 @@ export const fetchEntitiesDataToCsvFiles = async (
   },
   client = db
 ) => {
-  const { recordsModifiedAfter, fileFormat } = options
+  const { recordsModifiedAfter, recordsModifiedBefore, fileFormat } = options
 
   const nodeDefs = getEntityDefsToExport({ survey, cycle, options })
 
@@ -363,6 +382,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     survey,
     cycle,
     recordsModifiedAfter,
+    recordsModifiedBefore,
     recordUuids: recordUuidsParam,
     search,
     user,
