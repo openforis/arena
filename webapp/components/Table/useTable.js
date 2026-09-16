@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 
 import { ArrayUtils } from '@core/arrayUtils'
+import { SortOrder } from '@core/sortOrder'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
@@ -89,8 +90,9 @@ export const useTable = ({
 
   const handleSortBy = useCallback(
     (orderByField) => {
-      let order = sort.by !== orderByField && sort.order !== 'asc' ? 'desc' : 'asc'
-      order = sort.by === orderByField && sort.order === 'asc' ? null : order
+      const currentOrder = sort.by === orderByField ? sort.order : null
+      const order =
+        currentOrder === SortOrder.asc ? SortOrder.desc : currentOrder === SortOrder.desc ? null : SortOrder.asc
 
       const sortUpdated = { by: orderByField, order }
       updateQuery(navigate)({ sort: sortUpdated, offset: null })
