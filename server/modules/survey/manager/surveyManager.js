@@ -364,10 +364,8 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 
-const calculateFilesMissing = async ({ surveyId, draft }) => {
-  const nodeDefFileUuids = (await NodeDefRepository.fetchNodeDefsBySurveyId({ surveyId, draft }))
-    .filter(NodeDef.isFile)
-    .map(NodeDef.getUuid)
+const calculateFilesMissing = async ({ surveyId }) => {
+  const nodeDefFileUuids = await NodeDefRepository.fetchFileNodeDefUuidsBySurveyId({ surveyId })
   if (Objects.isEmpty(nodeDefFileUuids)) {
     return 0
   }
@@ -410,23 +408,39 @@ const _fetchSurveyWithCounts = async ({ survey, draft, includeDbSize = false }) 
   }
   try {
     const canHaveData = Survey.canHaveData(survey)
-    const { count: filesCount, total: filesSize } = await SurveyFileManager.fetchCountAndTotalFilesSize({ surveyId })
+
+    const [
+      { count: filesCount, total: filesSize },
+      nodeDefsCount,
+      recordsCount,
+      recordsCountByApp,
+      chainsCount,
+      filesMissing,
+    ] = await Promise.all([
+      SurveyFileManager.fetchCountAndTotalFilesSize({ surveyId }),
+      NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
+      canHaveData ? RecordRepository.countRecordsBySurveyId({ surveyId }) : 0,
+      canHaveData ? RecordRepository.countRecordsGroupedByApp({ surveyId }) : {},
+      ChainRepository.countChains({ surveyId }),
+      calculateFilesMissing({ surveyId }),
+    ])
 
     Object.assign(surveyWithCounts, {
-      nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
-      recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }) : 0,
-      recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }) : {},
-      chainsCount: await ChainRepository.countChains({ surveyId }),
+      nodeDefsCount,
+      recordsCount,
+      recordsCountByApp,
+      chainsCount,
       filesCount,
       filesSize,
-      filesMissing: await calculateFilesMissing({ surveyId, draft }),
+      filesMissing,
     })
 
     if (includeDbSize) {
-      Object.assign(surveyWithCounts, {
-        dbSize: await DbUtils.fetchSchemaTablesSize({ schema: Schemata.getSchemaSurvey(surveyId) }),
-        dbDataSize: await DbUtils.fetchSchemaTablesSize({ schema: Schemata.getSchemaSurveyRdb(surveyId) }),
-      })
+      const [dbSize, dbDataSize] = await Promise.all([
+        DbUtils.fetchSchemaTablesSize({ schema: Schemata.getSchemaSurvey(surveyId) }),
+        DbUtils.fetchSchemaTablesSize({ schema: Schemata.getSchemaSurveyRdb(surveyId) }),
+      ])
+      Object.assign(surveyWithCounts, { dbSize, dbDataSize })
     }
   } catch (error) {
     Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}: ${error}`)
@@ -434,13 +448,21 @@ const _fetchSurveyWithCounts = async ({ survey, draft, includeDbSize = false }) 
   return surveyWithCounts
 }
 
+// Max number of surveys to fetch counts for concurrently, to avoid exhausting the DB connection pool
+// (each survey can issue up to ~6 concurrent queries via _fetchSurveyWithCounts).
+const _fetchSurveysWithCountsConcurrency = 3
+
 const _fetchSurveysWithCounts = async ({ surveys, draft, includeDbSize, onProgress, stopIfFunction }) => {
   const surveysWithCounts = []
-  for (const survey of surveys) {
+  for (let i = 0; i < surveys.length; i += _fetchSurveysWithCountsConcurrency) {
     if (stopIfFunction?.()) {
       break
     }
-    surveysWithCounts.push(await _fetchSurveyWithCounts({ survey, draft, includeDbSize }))
+    const batch = surveys.slice(i, i + _fetchSurveysWithCountsConcurrency)
+    const batchWithCounts = await Promise.all(
+      batch.map((survey) => _fetchSurveyWithCounts({ survey, draft, includeDbSize }))
+    )
+    surveysWithCounts.push(...batchWithCounts)
     onProgress?.({ total: surveys.length, processed: surveysWithCounts.length })
   }
   return surveysWithCounts

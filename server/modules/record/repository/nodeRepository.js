@@ -152,7 +152,8 @@ export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, re
   const whereConditions = [
     `n.node_def_uuid IN ($/nodeDefFileUuids:csv/)`,
     `n.value IS NOT NULL`,
-    `(n.value->>'${Node.valuePropsFile.fileUuid}')::uuid NOT IN (SELECT uuid FROM ${schema}.file)`,
+    `n.value->>'${Node.valuePropsFile.fileUuid}' IS NOT NULL`,
+    `NOT EXISTS (SELECT 1 FROM ${schema}.file f WHERE f.uuid = (n.value->>'${Node.valuePropsFile.fileUuid}')::uuid)`,
   ]
   if (recordUuid) {
     whereConditions.push(`n.record_uuid = $/recordUuid/`)

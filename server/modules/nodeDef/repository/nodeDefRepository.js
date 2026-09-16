@@ -109,6 +109,19 @@ export const countNodeDefsBySurveyId = async ({ surveyId, draft = true }, client
     (row) => Number(row.count)
   )
 
+// Lightweight alternative to fetchNodeDefsBySurveyId when only the uuids of file node defs are needed
+// (e.g. to check for missing files), avoiding fetching and transforming full node def rows.
+export const fetchFileNodeDefUuidsBySurveyId = async ({ surveyId }, client = DB) =>
+  client.map(
+    `
+    SELECT uuid
+    FROM ${getSchemaSurvey(surveyId)}.node_def
+    WHERE type = $/type/
+    AND NOT deleted`,
+    { type: NodeDef.nodeDefType.file },
+    (row) => row.uuid
+  )
+
 // Cheap survey-level check for whether any node def expression references a function whose
 // result depends on the currently logged in user (e.g. userProp).
 // By default, only published (props_advanced) expressions are checked; pass draft = true to
