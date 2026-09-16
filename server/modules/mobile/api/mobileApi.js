@@ -5,6 +5,7 @@ import * as Log from '@server/log/log'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
+import * as RecordService from '@server/modules/record/service/recordService'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as Request from '@server/utils/request'
@@ -123,6 +124,22 @@ export const init = (app) => {
         const { fileId } = Request.getParams(req)
         await TempFileManager.deletePendingImportFileIfAny({ fileId })
         res.json({})
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
+
+  // ====== FILE UUIDS - for the given records, returns the UUIDs of the files already stored
+  // on the server, so a mobile client can skip re-uploading file content that hasn't changed.
+  app.post(
+    '/mobile/survey/:surveyId/records/file-uuids',
+    AuthMiddleware.requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, recordUuids = [] } = Request.getParams(req)
+        const fileUuidsByRecordUuid = await RecordService.fetchFileUuidsByRecordUuid({ surveyId, recordUuids })
+        res.json({ fileUuidsByRecordUuid })
       } catch (e) {
         next(e)
       }
