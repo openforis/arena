@@ -38,14 +38,14 @@ const AdvancedFunctionsMenu = () => {
   useEffect(() => {
     let cancelled = false
     const fetchMauFile = async () => {
-      const file = await API.fetchChainMauFileSummary({ surveyId, chainUuid })
+      const file = await API.fetchChainMauFileSummary({ surveyId, chainUuid, cycle })
       if (!cancelled) setMauFile(file)
     }
     fetchMauFile()
     return () => {
       cancelled = true
     }
-  }, [surveyId, chainUuid])
+  }, [surveyId, chainUuid, cycle])
 
   const deleteChain = useCallback(
     () => dispatch(ChainActions.deleteChain({ chain, navigate })),
@@ -82,7 +82,7 @@ const AdvancedFunctionsMenu = () => {
 
       setUploadingMauFile(true)
       try {
-        const uploadedFile = await API.uploadChainMauFile({ surveyId, chainUuid, file })
+        const uploadedFile = await API.uploadChainMauFile({ surveyId, chainUuid, cycle, file })
         setMauFile(uploadedFile)
         dispatch(NotificationActions.notifyInfo({ key: 'chainView.mauFile.uploadComplete' }))
       } catch (error) {
@@ -105,7 +105,7 @@ const AdvancedFunctionsMenu = () => {
 
     setDeletingMauFile(true)
     try {
-      await API.deleteChainMauFile({ surveyId, chainUuid })
+      await API.deleteChainMauFile({ surveyId, chainUuid, cycle })
       setMauFile(null)
       dispatch(NotificationActions.notifyInfo({ key: 'chainView.mauFile.deleteComplete' }))
     } catch (error) {
@@ -118,7 +118,7 @@ const AdvancedFunctionsMenu = () => {
     } finally {
       setDeletingMauFile(false)
     }
-  }, [chainUuid, confirmAsync, dispatch, surveyId])
+  }, [chainUuid, confirmAsync, cycle, dispatch, surveyId])
 
   const canEditChainNow = canEditChain && !chainEditLocked
 
@@ -160,6 +160,7 @@ const AdvancedFunctionsMenu = () => {
             fileName={SurveyFile.getName(mauFile)}
             href={API.getChainMauFileDownloadUrl({ surveyId, chainUuid })}
             label="chainView.mauFile.download"
+            requestParams={{ cycle }}
             variant="text"
           />
         ),
