@@ -16,6 +16,7 @@ import {
 
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { Button, ButtonDownload } from '@webapp/components/buttons'
+import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { RadioButtonGroup } from '@webapp/components/RadioButtonGroup'
 import { useI18n } from '@webapp/store/system'
@@ -47,10 +48,17 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
   const [format, setFormat] = useState<PrintableExportFormat>(initialFormat)
   const [exportScope, setExportScope] = useState<PrintableExportScope>(PrintableExportScopes.currentPage)
   const [orientation, setOrientation] = useState<PrintOrientation>(PrintOrientations.portrait)
+  const [includeQrCode, setIncludeQrCode] = useState(false)
 
   useEffect(() => {
     setFormat(initialFormat)
   }, [initialFormat])
+
+  useEffect(() => {
+    if (includeQrCode) {
+      setExportScope(PrintableExportScopes.currentPage)
+    }
+  }, [includeQrCode])
 
   const entityDefUuid = NodeDef.getUuid(nodeDefPage)
   const entityLabel = NodeDef.getLabel(nodeDefPage, lang) || NodeDef.getName(nodeDefPage)
@@ -80,11 +88,12 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
       format,
       exportScope,
       orientation,
+      includeQrCode,
       ...(exportScope === PrintableExportScopes.currentPage
         ? { entityDefUuid, entityNodeUuid: entityNodeUuid ?? undefined }
         : {}),
     })
-  }, [surveyId, record, lang, format, exportScope, orientation, entityDefUuid, entityNodeUuid])
+  }, [surveyId, record, lang, format, exportScope, orientation, includeQrCode, entityDefUuid, entityNodeUuid])
 
   if (!open) return null
 
@@ -115,7 +124,11 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
               value={exportScope}
               onChange={(value) => setExportScope(value as PrintableExportScope)}
               items={[
-                { key: PrintableExportScopes.full, label: 'surveyForm:printableExport.scopes.full' },
+                {
+                  key: PrintableExportScopes.full,
+                  label: 'surveyForm:printableExport.scopes.full',
+                  disabled: includeQrCode,
+                },
                 {
                   key: PrintableExportScopes.currentPage,
                   label: 'surveyForm:printableExport.scopes.currentPage',
@@ -133,6 +146,12 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
               </Box>
             )}
           </FormItem>
+          <Checkbox
+            checked={includeQrCode}
+            onChange={(checked: boolean) => setIncludeQrCode(checked)}
+            label="surveyForm:printableExport.includeQrCode"
+            info="surveyForm:printableExport.includeQrCodeInfo"
+          />
           <FormItem label="surveyForm:printableExport.orientation">
             <RadioButtonGroup
               row
