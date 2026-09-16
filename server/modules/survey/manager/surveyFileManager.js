@@ -188,6 +188,7 @@ export const {
   fetchFileSummariesByType,
   fetchFileSummaryByUuid,
   fetchFileUuidsBySurveyId,
+  fetchExistingNonDeletedFileUuids,
   fetchCountAndTotalFilesSize,
   // UPDATE
   updateFileProps,
