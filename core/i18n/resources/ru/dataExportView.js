@@ -20,6 +20,7 @@ export default {
     includeFileAttributeDefs: 'Включить столбцы атрибутов файлов',
     includeInternalUuids: 'Включить внутренние UUID',
     recordsModifiedAfter: 'Записи, измененные после',
+    recordsModifiedBefore: 'Записи, измененные до',
   },
   optionsInfo: {
     expandCategoryItems:
@@ -36,6 +37,7 @@ export default {
     includeFileAttributeDefs: `добавляет столбцы атрибутов файлов: внутренний идентификатор файла (file_uuid) и имя (file_name)`,
     includeInternalUuids: 'включает внутренние идентификаторы (UUID) в столбцы, оканчивающиеся суффиксом "_uuid"',
     recordsModifiedAfter: 'экспортирует только данные из записей, измененных после указанной даты',
+    recordsModifiedBefore: 'экспортирует только данные из записей, измененных до указанной даты',
   },
   startExport: 'Начать экспорт',
 }
