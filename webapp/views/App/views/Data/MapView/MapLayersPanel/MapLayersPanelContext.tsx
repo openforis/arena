@@ -1,5 +1,7 @@
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react'
 
+import { SortOrder } from '@core/sortOrder'
+
 export type MapLayerPoint = {
   geometry: {
     coordinates: [number, number]
@@ -20,9 +22,13 @@ export type ActiveLayer = {
   flyToPoint: (point: MapLayerPoint) => void
 }
 
-export type SortOrder = 'none' | 'asc' | 'desc'
+export type MapSortOrder = 'none' | SortOrder
 
-export const SORT_ORDER_NEXT: Record<SortOrder, SortOrder> = { none: 'asc', asc: 'desc', desc: 'none' }
+export const SORT_ORDER_NEXT: Record<MapSortOrder, MapSortOrder> = {
+  none: SortOrder.asc,
+  [SortOrder.asc]: SortOrder.desc,
+  [SortOrder.desc]: 'none',
+}
 
 const naturalCompare = (a: string, b: string): number => {
   const numA = Number(a)
@@ -40,23 +46,23 @@ const compareAncestorsKeys = (keysA: string[], keysB: string[]): number => {
   return keysA.length - keysB.length
 }
 
-export const applySortOrder = (points: MapLayerPoint[], sortOrder: SortOrder): MapLayerPoint[] => {
+export const applySortOrder = (points: MapLayerPoint[], sortOrder: MapSortOrder): MapLayerPoint[] => {
   if (sortOrder === 'none') return points
   return [...points].sort((a, b) => {
     const cmp = compareAncestorsKeys(a.properties.ancestorsKeys, b.properties.ancestorsKeys)
-    return sortOrder === 'asc' ? cmp : -cmp
+    return sortOrder === SortOrder.asc ? cmp : -cmp
   })
 }
 
 type MapLayersPanelContextType = {
   activeLayers: ActiveLayer[]
   isPanelVisible: boolean
-  layerSortOrders: Record<string, SortOrder>
+  layerSortOrders: Record<string, MapSortOrder>
   selectedPointKey: string | null
   registerLayer: (layer: ActiveLayer) => void
   unregisterLayer: (params: { key: string }) => void
   selectPoint: (key: string | null) => void
-  setLayerSortOrder: (layerKey: string, sortOrder: SortOrder) => void
+  setLayerSortOrder: (layerKey: string, sortOrder: MapSortOrder) => void
   togglePanelVisible: () => void
 }
 
@@ -80,7 +86,7 @@ export const MapLayersPanelProvider = ({ children }: MapLayersPanelProviderProps
   const [activeLayers, setActiveLayers] = useState<ActiveLayer[]>([])
   const [isPanelVisible, setIsPanelVisible] = useState(true)
   const [selectedPointKey, setSelectedPointKey] = useState<string | null>(null)
-  const [layerSortOrders, setLayerSortOrders] = useState<Record<string, SortOrder>>({})
+  const [layerSortOrders, setLayerSortOrders] = useState<Record<string, MapSortOrder>>({})
 
   const registerLayer = useCallback(({ key, layerName, points, flyToPoint }: ActiveLayer) => {
     setActiveLayers((prev) => {
@@ -106,7 +112,7 @@ export const MapLayersPanelProvider = ({ children }: MapLayersPanelProviderProps
     setSelectedPointKey(key)
   }, [])
 
-  const setLayerSortOrder = useCallback((layerKey: string, sortOrder: SortOrder) => {
+  const setLayerSortOrder = useCallback((layerKey: string, sortOrder: MapSortOrder) => {
     setLayerSortOrders((prev) => ({ ...prev, [layerKey]: sortOrder }))
   }, [])
 

@@ -18,7 +18,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
-import { Button, ButtonDownload, ButtonMenu } from '@webapp/components'
+import { Button, ButtonDownload, ButtonIconInfo, ButtonMenu } from '@webapp/components'
 import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
@@ -267,10 +267,16 @@ const CategoryDetails = (props) => {
 
             <div className="row">
               {isSamplingPointData ? (
-                <span className="category-type-label">{i18n.t('categoryEdit.samplingPointDataCategoryType')}</span>
+                <span className="category-type-label">
+                  {i18n.t('categoryEdit.samplingPointDataCategoryType')}
+                  <ButtonIconInfo title="categoryEdit.samplingPointDataCategoryTypeInfo" />
+                </span>
               ) : (
                 hasLocationExtraProp && (
-                  <span className="category-type-label">{i18n.t('categoryEdit.geoPackageCategory')}</span>
+                  <span className="category-type-label">
+                    {i18n.t('categoryEdit.geoPackageCategory')}
+                    <ButtonIconInfo title="categoryEdit.geoPackageCategoryInfo" />
+                  </span>
                 )
               )}
             </div>

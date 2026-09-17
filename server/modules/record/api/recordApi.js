@@ -48,6 +48,12 @@ const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
   if (file) {
     const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
     const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary: file })
+    if (!contentStream) {
+      // the file is registered but its content is missing from the storage (e.g. deleted from the S3 bucket)
+      const error = new Error(`File content not found for node ${nodeUuid}`)
+      error.statusCode = 404
+      throw error
+    }
     return { fileName, file, contentStream }
   } else {
     const error = new Error(`File not found for node ${nodeUuid}`)

@@ -770,6 +770,8 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       upload: 'Upload MAU.zip',
       download: 'Download MAU.zip',
       delete: 'Delete MAU.zip',
+      confirmCycleAssociation:
+        'The MAU.zip file will be associated to the current cycle ({{cycle}}). Do you want to continue?',
       confirmReplace: 'A MAU.zip file has already been uploaded for this chain. Do you want to replace it?',
       confirmDelete: 'Delete the MAU.zip file uploaded for this chain?',
       uploadComplete: 'MAU.zip file uploaded successfully',
@@ -1373,8 +1375,10 @@ The '${locationItemExtraDefName}' extra property will be unlocked, so it can be 
 
 The category name will be cleared (you'll need to give it a new name), and the '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
     },
-    geoPackageCategory: 'This is a GeoPackage category',
+    geoPackageCategory: 'This category has geo capabilities',
+    geoPackageCategoryInfo: `This category has an extra property called '${locationItemExtraDefName}', which allows it to be exported as a GeoPackage file.`,
     samplingPointDataCategoryType: 'This is the Sampling Point Data category',
+    samplingPointDataCategoryTypeInfo: `This is a predefined category for sampling point data. It has an extra property called '${locationItemExtraDefName}', which allows it to be exported as a GeoPackage file.`,
     createCategory: {
       menuLabel: 'Add category',
       simple: 'Simple category',
@@ -1382,13 +1386,15 @@ The category name will be cleared (you'll need to give it a new name), and the '
     },
     createSamplingPointDataCategory: {
       buttonLabel: 'Sampling Point Data category',
+      description: 'Predefined category for sampling point data, including a location field for each item.',
       message: `Create a new Sampling Point Data category?
 
 A '${locationItemExtraDefName}' extra property will be added to the items.`,
     },
     createGeoPackageCategory: {
-      buttonLabel: 'GeoPackage category',
-      message: `Create a new GeoPackage category?
+      buttonLabel: 'Category with geo capabilities',
+      description: 'Adds a location field to items, so the category can be exported as a GeoPackage file.',
+      message: `Create a new category with geo capabilities?
 
 A '${locationItemExtraDefName}' extra property will be added to the items.`,
     },

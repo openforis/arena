@@ -271,9 +271,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, chainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid, cycle } = Request.getParams(req)
 
-        const file = await AnalysisService.fetchChainMauFileSummary({ surveyId, chainUuid })
+        const file = await AnalysisService.fetchChainMauFileSummary({ surveyId, chainUuid, cycle })
 
         res.json({ file })
       } catch (error) {
@@ -287,7 +287,7 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, chainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid, cycle } = Request.getParams(req)
         const upload = Request.getFile(req)
         const filePath = Request.getFilePath(req)
         if (!upload || !filePath) {
@@ -296,7 +296,14 @@ export const init = (app) => {
         }
         const { name: fileName, size: fileSize } = upload
 
-        const file = await AnalysisService.uploadChainMauFile({ surveyId, chainUuid, filePath, fileName, fileSize })
+        const file = await AnalysisService.uploadChainMauFile({
+          surveyId,
+          chainUuid,
+          cycle,
+          filePath,
+          fileName,
+          fileSize,
+        })
 
         res.json({ file })
       } catch (error) {
@@ -310,9 +317,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, chainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid, cycle } = Request.getParams(req)
 
-        const result = await AnalysisService.fetchChainMauFileContent({ surveyId, chainUuid })
+        const result = await AnalysisService.fetchChainMauFileContent({ surveyId, chainUuid, cycle })
         if (!result) {
           res.sendStatus(404)
           return
@@ -333,9 +340,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, chainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid, cycle } = Request.getParams(req)
 
-        await AnalysisService.deleteChainMauFile({ surveyId, chainUuid })
+        await AnalysisService.deleteChainMauFile({ surveyId, chainUuid, cycle })
 
         Response.sendOk(res)
       } catch (error) {

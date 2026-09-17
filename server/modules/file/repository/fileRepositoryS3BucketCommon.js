@@ -99,7 +99,17 @@ export const createS3BucketRepository = ({ getFileKey }) => {
 
   const deleteFile = async (params) => {
     const command = new DeleteObjectCommand(createCommandParams({ getFileKey, params }))
-    return _sendCommand(command)
+    try {
+      return await _sendCommand(command)
+    } catch (error) {
+      // ignore error if the object is already missing from the bucket (nothing left to delete);
+      // check the specific error name rather than the (ambiguous) 404 status alone, so that e.g. a
+      // missing/misconfigured bucket (NoSuchBucket) still fails loudly instead of being swallowed
+      if (error.name === 'NoSuchKey') {
+        return null
+      }
+      throw error
+    }
   }
 
   const deleteFiles = async ({ fileUuids, ...params }) => {

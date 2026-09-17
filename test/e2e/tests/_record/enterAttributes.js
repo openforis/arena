@@ -116,7 +116,12 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
       if (await keyToggleLocator.isVisible()) {
         const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
         if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
-          await keyToggleLocator.click()
+          // The toggle wraps itself in a MUI tooltip showing its own lock/unlock hint; Playwright's
+          // click hovers first, which can pop that tooltip open right on top of the button and make
+          // it intercept the click, hanging until the test timeout (seen consistently in CI, e.g.
+          // https://github.com/openforis/arena/actions/runs/34883644236). force bypasses that
+          // pointer-interception check; we already know exactly which button this is.
+          await keyToggleLocator.click({ force: true })
           await page.keyboard.press('Escape') // close potential tooltip
         }
       }

@@ -100,6 +100,26 @@ export const createRecordFromSamplingPointDataItem = async ({ user, surveyId, cy
   })
 }
 
+/**
+ * Fetches, for each of the given record UUIDs, the UUIDs of the files already stored on the
+ * server for it. Used by mobile clients to skip re-uploading file content that hasn't changed.
+ * @param {object} params - The function parameters.
+ * @param {number} params.surveyId - The survey ID.
+ * @param {Array<string>} params.recordUuids - The record UUIDs to fetch files for.
+ * @returns {Promise<{[recordUuid: string]: Array<string>}>} File UUIDs grouped by record UUID.
+ */
+export const fetchFileUuidsByRecordUuid = async ({ surveyId, recordUuids }) => {
+  const files = await RecordFileManager.fetchNonDeletedFileUuidsByRecordUuids({ surveyId, recordUuids })
+  const fileUuidsByRecordUuid = {}
+  for (const { fileUuid, recordUuid } of files) {
+    if (!fileUuidsByRecordUuid[recordUuid]) {
+      fileUuidsByRecordUuid[recordUuid] = []
+    }
+    fileUuidsByRecordUuid[recordUuid].push(fileUuid)
+  }
+  return fileUuidsByRecordUuid
+}
+
 export const {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordsUuidAndCycle,

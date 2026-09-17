@@ -768,6 +768,7 @@ $t(accessRequestView.whitelistSenderSuggestion)
       upload: 'MAU.zipをアップロード',
       download: 'MAU.zipをダウンロード',
       delete: 'MAU.zipを削除',
+      confirmCycleAssociation: 'MAU.zipファイルは現在のサイクル（{{cycle}}）に関連付けられます。続けますか？',
       confirmReplace: 'このチェーンには既にMAU.zipファイルがアップロードされています。置き換えますか？',
       confirmDelete: 'このチェーンにアップロードされたMAU.zipファイルを削除しますか？',
       uploadComplete: 'MAU.zipファイルが正常にアップロードされました',
@@ -1362,8 +1363,10 @@ $t(common.cantUndoWarning)`,
 
 カテゴリ名はクリアされ（新しい名前を付ける必要があります）、「${locationItemExtraDefName}」の追加プロパティのロックが解除され、他の追加プロパティと同様に名前変更・型変更・削除ができるようになります。データ自体には影響しません。`,
     },
-    geoPackageCategory: 'これはGeoPackageカテゴリです',
+    geoPackageCategory: 'このカテゴリには位置情報機能があります',
+    geoPackageCategoryInfo: `このカテゴリには「${locationItemExtraDefName}」という追加プロパティがあり、GeoPackageファイルとしてエクスポートできます。`,
     samplingPointDataCategoryType: 'これは抽出地点データカテゴリです',
+    samplingPointDataCategoryTypeInfo: `これは抽出地点データ用の定義済みカテゴリです。「${locationItemExtraDefName}」という追加プロパティがあり、GeoPackageファイルとしてエクスポートできます。`,
     createCategory: {
       menuLabel: 'カテゴリを追加',
       simple: '単純カテゴリ',
@@ -1371,13 +1374,16 @@ $t(common.cantUndoWarning)`,
     },
     createSamplingPointDataCategory: {
       buttonLabel: '抽出地点データカテゴリ',
+      description: '各項目に位置情報フィールドを含む、抽出地点データ用の定義済みカテゴリです。',
       message: `新しい抽出地点データカテゴリを作成しますか？
 
 項目に「${locationItemExtraDefName}」の追加プロパティが追加されます。`,
     },
     createGeoPackageCategory: {
-      buttonLabel: 'GeoPackageカテゴリ',
-      message: `新しいGeoPackageカテゴリを作成しますか？
+      buttonLabel: '位置情報機能付きカテゴリ',
+      description:
+        '項目に位置情報フィールドを追加し、カテゴリをGeoPackageファイルとしてエクスポートできるようにします。',
+      message: `新しい位置情報機能付きカテゴリを作成しますか？
 
 項目に「${locationItemExtraDefName}」の追加プロパティが追加されます。`,
     },

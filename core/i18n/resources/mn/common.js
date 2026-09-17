@@ -748,6 +748,7 @@ $t(common.raiseTicketInSupportForum)
       upload: 'MAU.zip байршуулах',
       download: 'MAU.zip татах',
       delete: 'MAU.zip устгах',
+      confirmCycleAssociation: 'MAU.zip файл нь одоогийн мөчлөгтэй ({{cycle}}) холбогдоно. Үргэлжлүүлэх үү?',
       confirmReplace: 'Энэ хэлхээнд MAU.zip файл аль хэдийн байршуулагдсан байна. Үүнийг солих уу?',
       confirmDelete: 'Энэ хэлхээнд байршуулсан MAU.zip файлыг устгах уу?',
       uploadComplete: 'MAU.zip файл амжилттай байршуулагдлаа',
@@ -1333,8 +1334,10 @@ $t(common.cantUndoWarning)`,
 
 Ангиллын нэрийг цэвэрлэх бөгөөд (шинэ нэр өгөх шаардлагатай болно), '${locationItemExtraDefName}' нэмэлт талбарын цоожийг мөн тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
     },
-    geoPackageCategory: 'Энэ бол GeoPackage ангилал юм',
+    geoPackageCategory: 'Энэ ангилал нь гео чадвартай',
+    geoPackageCategoryInfo: `Энэ ангилалд GeoPackage файл болгон экспортлох боломжийг олгодог '${locationItemExtraDefName}' нэртэй нэмэлт талбар байдаг.`,
     samplingPointDataCategoryType: 'Энэ бол Дээж цэгийн өгөгдлийн ангилал юм',
+    samplingPointDataCategoryTypeInfo: `Энэ бол дээж цэгийн өгөгдлийн урьдчилан тодорхойлсон ангилал юм. Үүнд GeoPackage файл болгон экспортлох боломжийг олгодог '${locationItemExtraDefName}' нэртэй нэмэлт талбар байдаг.`,
     createCategory: {
       menuLabel: 'Ангилал нэмэх',
       simple: 'Энгийн ангилал',
@@ -1342,13 +1345,16 @@ $t(common.cantUndoWarning)`,
     },
     createSamplingPointDataCategory: {
       buttonLabel: 'Дээж цэгийн өгөгдлийн ангилал',
+      description:
+        'Дээж цэгийн өгөгдлийн урьдчилан тодорхойлсон ангилал бөгөөд элемент бүрт байршлын талбарыг агуулна.',
       message: `Шинэ Дээж цэгийн өгөгдлийн ангилал үүсгэх үү?
 
 Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
     },
     createGeoPackageCategory: {
-      buttonLabel: 'GeoPackage ангилал',
-      message: `Шинэ GeoPackage ангилал үүсгэх үү?
+      buttonLabel: 'Гео чадвартай ангилал',
+      description: 'Элементүүдэд байршлын талбар нэмж, ангиллыг GeoPackage файл болгон экспортлох боломжтой болгоно.',
+      message: `Шинэ гео чадвартай ангилал үүсгэх үү?
 
 Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
     },

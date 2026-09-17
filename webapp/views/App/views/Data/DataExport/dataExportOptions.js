@@ -12,6 +12,7 @@ export const dataExportOptions = {
   includeCategories: 'includeCategories',
   includeDataFromAllCycles: 'includeDataFromAllCycles',
   recordsModifiedAfter: 'recordsModifiedAfter',
+  recordsModifiedBefore: 'recordsModifiedBefore',
   includeDateCreated: 'includeDateCreated',
   includeInternalUuids: 'includeInternalUuids',
 }
@@ -28,6 +29,7 @@ export const defaultDataExportOptionsSelection = {
   [dataExportOptions.includeCategories]: false,
   [dataExportOptions.includeDataFromAllCycles]: false,
   [dataExportOptions.recordsModifiedAfter]: null,
+  [dataExportOptions.recordsModifiedBefore]: null,
   [dataExportOptions.includeDateCreated]: false,
   [dataExportOptions.includeInternalUuids]: false,
 }

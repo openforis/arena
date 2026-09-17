@@ -768,6 +768,7 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       upload: 'Enviar MAU.zip',
       download: 'Baixar MAU.zip',
       delete: 'Excluir MAU.zip',
+      confirmCycleAssociation: 'O arquivo MAU.zip será associado ao ciclo atual ({{cycle}}). Deseja continuar?',
       confirmReplace: 'Já foi enviado um arquivo MAU.zip para esta cadeia. Deseja substituí-lo?',
       confirmDelete: 'Excluir o arquivo MAU.zip enviado para esta cadeia?',
       uploadComplete: 'Arquivo MAU.zip enviado com sucesso',
@@ -1367,8 +1368,10 @@ A propriedade extra '${locationItemExtraDefName}' será desbloqueada, podendo se
 
 O nome da categoria será apagado (você precisará dar um novo nome a ela), e a propriedade extra '${locationItemExtraDefName}' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
     },
-    geoPackageCategory: 'Esta é uma categoria GeoPackage',
+    geoPackageCategory: 'Esta categoria tem capacidades geográficas',
+    geoPackageCategoryInfo: `Esta categoria possui uma propriedade extra chamada '${locationItemExtraDefName}', que permite exportá-la como um arquivo GeoPackage.`,
     samplingPointDataCategoryType: 'Esta é a categoria de Dados de Ponto Amostral',
+    samplingPointDataCategoryTypeInfo: `Esta é uma categoria predefinida para dados de ponto amostral. Ela possui uma propriedade extra chamada '${locationItemExtraDefName}', que permite exportá-la como um arquivo GeoPackage.`,
     createCategory: {
       menuLabel: 'Adicionar categoria',
       simple: 'Categoria simples',
@@ -1376,13 +1379,17 @@ O nome da categoria será apagado (você precisará dar um novo nome a ela), e a
     },
     createSamplingPointDataCategory: {
       buttonLabel: 'Categoria de Dados de Ponto Amostral',
+      description:
+        'Categoria predefinida para dados de ponto amostral, incluindo um campo de localização para cada item.',
       message: `Criar uma nova categoria de Dados de Ponto Amostral?
 
 Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
     },
     createGeoPackageCategory: {
-      buttonLabel: 'Categoria GeoPackage',
-      message: `Criar uma nova categoria GeoPackage?
+      buttonLabel: 'Categoria com capacidades geográficas',
+      description:
+        'Adiciona um campo de localização aos itens, para que a categoria possa ser exportada como um arquivo GeoPackage.',
+      message: `Criar uma nova categoria com capacidades geográficas?
 
 Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
     },
