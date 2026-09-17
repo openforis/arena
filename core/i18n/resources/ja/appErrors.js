@@ -53,6 +53,8 @@ export default {
   recordPrintableExport: {
     missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeUuidが必要です',
     entityNotFound: '指定されたエクスポート対象の項目が見つかりません',
+    missingServerUrl: 'QRコード付きエクスポートには公開サーバーURLが必要です',
+    qrTokenMismatch: 'QRコードのエクスポートを確定できませんでした。再試行してください',
   },
   sessionExpiredRefreshPage: `セッションの有効期限が切れた可能性があります。
 ページを更新してください。`,

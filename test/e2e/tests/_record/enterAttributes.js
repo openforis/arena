@@ -108,24 +108,44 @@ const enterFns = {
   time: enterTime,
 }
 
-export const enterAttribute = (nodeDef, value, parentSelector = '') =>
-  test(`Enter ${nodeDef.name} value`, async () => {
-    if (nodeDef.key) {
-      const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
-      const keyToggleLocator = page.locator(keyToggleSelector)
-      if (await keyToggleLocator.isVisible()) {
-        const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
-        if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
-          // The toggle wraps itself in a MUI tooltip showing its own lock/unlock hint; Playwright's
-          // click hovers first, which can pop that tooltip open right on top of the button and make
-          // it intercept the click, hanging until the test timeout (seen consistently in CI, e.g.
-          // https://github.com/openforis/arena/actions/runs/34883644236). force bypasses that
-          // pointer-interception check; we already know exactly which button this is.
-          await keyToggleLocator.click({ force: true })
-          await page.keyboard.press('Escape') // close potential tooltip
+export const enterAttribute = (nodeDef, value, parentSelector = '') => {
+  const isKeyAttribute = Boolean(nodeDef.key)
+  // Key fields need an unlock click first; keep a bit more budget for the React re-render
+  // before Playwright can fill the (previously disabled) input.
+  const testTimeoutMs = isKeyAttribute ? 15000 : 10000
+
+  return test(
+    `Enter ${nodeDef.name} value`,
+    async () => {
+      if (isKeyAttribute) {
+        const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
+        const keyToggleLocator = page.locator(keyToggleSelector)
+        if (await keyToggleLocator.isVisible()) {
+          await keyToggleLocator.scrollIntoViewIfNeeded()
+          const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
+          if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
+            // The toggle wraps itself in a MUI tooltip showing its own lock/unlock hint; Playwright's
+            // click hovers first, which can pop that tooltip open right on top of the button and make
+            // it intercept the click, hanging until the test timeout (seen consistently in CI, e.g.
+            // https://github.com/openforis/arena/actions/runs/34883644236). force bypasses that
+            // pointer-interception check; we already know exactly which button this is.
+            await keyToggleLocator.click({ force: true })
+            await page.keyboard.press('Escape') // close potential tooltip
+
+            // Unlock flips the input from disabled → enabled asynchronously; wait before fill so we
+            // don't burn the whole jest timeout on Playwright's actionability wait (seen on
+            // validationReport tree_id row 3: https://github.com/openforis/arena/actions/runs/35232215668).
+            if (['integer', 'decimal', 'text'].includes(nodeDef.type)) {
+              const inputLocator = page.locator(getTextSelector(nodeDef, parentSelector))
+              await inputLocator.waitFor({ state: 'visible', timeout: 5000 })
+              await expect(inputLocator).toBeEnabled({ timeout: 5000 })
+            }
+          }
         }
       }
-    }
-    await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
-    await FormUtils.waitForHeaderLoaderToDisappear()
-  }, 10000)
+      await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
+      await FormUtils.waitForHeaderLoaderToDisappear()
+    },
+    testTimeoutMs
+  )
+}

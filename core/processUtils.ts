@@ -61,6 +61,8 @@ export const ENV = {
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
   // SERVER
   useHttps: isTrue(process.env.USE_HTTPS),
+  // Public origin baked into QR codes / emails when set (no trailing slash). Falls back to request Host.
+  arenaPublicUrl: process.env.ARENA_PUBLIC_URL || '',
   fileUploadLimit: Number(process.env.FILE_UPLOAD_LIMIT) || 1024 ** 3, // 1GB
   // RStudio Server
   rStudioDownloadServerUrl: process.env.RSTUDIO_DOWNLOAD_SERVER_URL,

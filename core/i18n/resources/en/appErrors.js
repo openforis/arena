@@ -51,6 +51,8 @@ export default {
   recordPrintableExport: {
     missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',
     entityNotFound: 'Entity not found for the specified export',
+    missingServerUrl: 'Public server URL is required when exporting with a QR code',
+    qrTokenMismatch: 'Could not finalize QR code export; please retry',
   },
   sessionExpiredRefreshPage: `Session could have expired.
 Try to refresh the page.`,

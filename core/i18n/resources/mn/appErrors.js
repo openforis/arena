@@ -50,6 +50,12 @@ export default {
     updateSelfAndDependentsDefaultValues:
       'Бичлэг шинэчлэхэд алдаа гарлаа; {{nodeDefName}} зангилааны илэрхийллийг үнэлэхэд алдаа гарлаа: {{details}}',
   },
+  recordPrintableExport: {
+    missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',
+    entityNotFound: 'Заасан экспортын нэгж олдсонгүй',
+    missingServerUrl: 'QR кодтой экспорт хийхэд нийтийн серверийн URL шаардлагатай',
+    qrTokenMismatch: 'QR кодтой экспортыг дуусгаж чадсангүй; дахин оролдоно уу',
+  },
   sessionExpiredRefreshPage: 'Сесс дууссан байж магадгүй.\nХуудсыг сэргээж үзнэ үү.',
   survey: {
     nodeDefNameNotFound: 'Зангилааны тодорхойлолт олдсонгүй: {{name}}',

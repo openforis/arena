@@ -141,6 +141,34 @@ export const deleteFilesAndContent = async ({ surveyId, fileSummaries }, client 
   await FileRepository.deleteFilesByUuids(surveyId, fileUuids, client)
 }
 
+/**
+ * Deletes file rows and content by UUID.
+ * @param {object} params - Delete parameters.
+ * @param {number} params.surveyId - Survey identifier.
+ * @param {Array<string>} params.fileUuids - File UUIDs.
+ * @param {Array<object>} [params.fallbackFileSummaries] - Summaries for content whose rows were rolled back.
+ * @param {object} [client] - Optional database client.
+ * @returns {Promise<void>} A promise resolved after deletion.
+ */
+export const deleteFilesAndContentByUuids = async (
+  { surveyId, fileUuids, fallbackFileSummaries = [] },
+  client = db
+) => {
+  if (fileUuids.length === 0) return
+
+  const persistedFileSummaries = await FileRepository.fetchFileSummariesByUuids({ surveyId, fileUuids }, client)
+  const fileSummaryByUuid = new Map(
+    [...fallbackFileSummaries, ...persistedFileSummaries].map((fileSummary) => [
+      SurveyFile.getUuid(fileSummary),
+      fileSummary,
+    ])
+  )
+  const fileSummaries = fileUuids.map((fileUuid) => fileSummaryByUuid.get(fileUuid)).filter(Boolean)
+
+  await deleteFilesContentByUuids({ surveyId, fileSummaries })
+  await FileRepository.deleteFilesByUuids(surveyId, fileUuids, client)
+}
+
 export const migrateFilesToNewPathFormat = async ({ surveyId }, client = db) => {
   const storageType = getFileContentStorageType()
   if (storageType === fileContentStorageTypes.db) {

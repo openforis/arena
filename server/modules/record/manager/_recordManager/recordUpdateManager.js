@@ -17,6 +17,7 @@ import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as RecordFileManager from '@server/modules/record/manager/recordFileManager'
+import * as RecordPrintableExportShareService from '@server/modules/record/service/recordPrintableExportShareService'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
@@ -190,6 +191,7 @@ export const deleteRecord = async (user, survey, record, client = db) =>
     await Promise.all([
       RecordRepository.deleteRecord(surveyId, uuid, t),
       RecordFileManager.markRecordFilesAsDeleted(surveyId, uuid, t),
+      RecordPrintableExportShareService.deleteByRecordUuid({ surveyId, recordUuid: uuid }, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, logContent, false, t),
     ])
   })
@@ -197,6 +199,7 @@ export const deleteRecord = async (user, survey, record, client = db) =>
 export const deleteRecordPreview = async (surveyId, recordUuid) =>
   await db.tx(async (t) => {
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
+    await RecordPrintableExportShareService.deleteByRecordUuid({ surveyId, recordUuid }, t)
     await RecordFileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
@@ -204,12 +207,19 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
   db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!A.isEmpty(recordUuids)) {
+      await RecordPrintableExportShareService.deleteByRecordUuids({ surveyId, recordUuids }, t)
       await RecordFileManager.deleteFilesByRecordUuids(surveyId, recordUuids, t)
     }
     return recordUuids.length
   })
 
-export const { deleteRecordsByCycles } = RecordRepository
+export const deleteRecordsByCycles = async (surveyId, cycles, client = db) => {
+  const recordUuids = await RecordRepository.deleteRecordsByCycles(surveyId, cycles, client)
+  if (!A.isEmpty(recordUuids)) {
+    await RecordPrintableExportShareService.deleteByRecordUuids({ surveyId, recordUuids }, client)
+  }
+  return recordUuids
+}
 
 /**
  * ======.

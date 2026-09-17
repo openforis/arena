@@ -38,4 +38,33 @@ describe('getRecordPrintableExportUrl', () => {
     expect(url).toContain(`exportScope=${PrintableExportScopes.full}`)
     expect(url).not.toContain('entityDefUuid')
   })
+
+  test('includes includeQrCode when true', () => {
+    const url = getRecordPrintableExportUrl({
+      surveyId: 1,
+      recordUuid: 'rec-1',
+      lang: 'en',
+      format: PrintableExportFormats.pdf,
+      exportScope: PrintableExportScopes.currentPage,
+      entityDefUuid: 'def-1',
+      entityNodeUuid: 'node-1',
+      orientation: PrintOrientations.portrait,
+      includeQrCode: true,
+    })
+    expect(url).toContain('includeQrCode=true')
+  })
+
+  test('omits includeQrCode when false or unset', () => {
+    const params = {
+      surveyId: 1,
+      recordUuid: 'rec-1',
+      lang: 'en',
+      format: PrintableExportFormats.pdf,
+    }
+    const urlWithoutQrCode = getRecordPrintableExportUrl(params)
+    const urlWithQrCodeDisabled = getRecordPrintableExportUrl({ ...params, includeQrCode: false })
+
+    expect(urlWithoutQrCode).not.toContain('includeQrCode')
+    expect(urlWithQrCodeDisabled).not.toContain('includeQrCode')
+  })
 })
