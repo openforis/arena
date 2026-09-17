@@ -35,10 +35,10 @@ export const fetchChainSourceEntityNames = async ({ targetSurveyId, sourceSurvey
 export const getChainSummaryExportUrl = ({ surveyId, chainUuid }) =>
   `/api/survey/${surveyId}/chain/${chainUuid}/summary`
 
-export const fetchChainMauFileSummary = async ({ surveyId, chainUuid }) => {
+export const fetchChainMauFileSummary = async ({ surveyId, chainUuid, cycle }) => {
   const {
     data: { file },
-  } = await axios.get(`/api/survey/${surveyId}/chain/${chainUuid}/mau`)
+  } = await axios.get(`/api/survey/${surveyId}/chain/${chainUuid}/mau`, { params: { cycle } })
   return file
 }
 
@@ -47,8 +47,8 @@ export const getChainMauFileDownloadUrl = ({ surveyId, chainUuid }) =>
 
 // ==== CREATE/UPDATE
 
-export const uploadChainMauFile = async ({ surveyId, chainUuid, file }) => {
-  const formData = objectToFormData({ file })
+export const uploadChainMauFile = async ({ surveyId, chainUuid, cycle, file }) => {
+  const formData = objectToFormData({ file, cycle })
   const {
     data: { file: uploadedFile },
   } = await axios.post(`/api/survey/${surveyId}/chain/${chainUuid}/mau`, formData)
@@ -77,6 +77,6 @@ export const deleteChain = async ({ surveyId, chainUuid }) => {
   await axios.delete(`/api/survey/${surveyId}/chain/${chainUuid}`)
 }
 
-export const deleteChainMauFile = async ({ surveyId, chainUuid }) => {
-  await axios.delete(`/api/survey/${surveyId}/chain/${chainUuid}/mau`)
+export const deleteChainMauFile = async ({ surveyId, chainUuid, cycle }) => {
+  await axios.delete(`/api/survey/${surveyId}/chain/${chainUuid}/mau`, { params: { cycle } })
 }

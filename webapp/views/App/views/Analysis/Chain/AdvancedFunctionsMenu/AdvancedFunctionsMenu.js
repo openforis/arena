@@ -7,7 +7,7 @@ import * as SurveyFile from '@core/survey/surveyFile'
 
 import * as API from '@webapp/service/api'
 import { ChainActions, useChain, useChainEditLocked } from '@webapp/store/ui/chain'
-import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 import { NotificationActions } from '@webapp/store/ui'
 import { useConfirmAsync } from '@webapp/components/hooks'
@@ -21,6 +21,7 @@ const AdvancedFunctionsMenu = () => {
   const surveyId = useSurveyId()
   const chain = useChain()
   const cycle = useSurveyCycleKey()
+  const cycleKeys = useSurveyCycleKeys()
   const lang = useSurveyPreferredLang()
   const chainEditLocked = useChainEditLocked()
   const canEditChain = useAuthCanUseAnalysis()
@@ -37,14 +38,14 @@ const AdvancedFunctionsMenu = () => {
   useEffect(() => {
     let cancelled = false
     const fetchMauFile = async () => {
-      const file = await API.fetchChainMauFileSummary({ surveyId, chainUuid })
+      const file = await API.fetchChainMauFileSummary({ surveyId, chainUuid, cycle })
       if (!cancelled) setMauFile(file)
     }
     fetchMauFile()
     return () => {
       cancelled = true
     }
-  }, [surveyId, chainUuid])
+  }, [surveyId, chainUuid, cycle])
 
   const deleteChain = useCallback(
     () => dispatch(ChainActions.deleteChain({ chain, navigate })),
@@ -66,6 +67,14 @@ const AdvancedFunctionsMenu = () => {
         return
       }
 
+      if (cycleKeys.length > 1) {
+        const confirmed = await confirmAsync({
+          key: 'chainView.mauFile.confirmCycleAssociation',
+          params: { cycle: Number(cycle) + 1 },
+        })
+        if (!confirmed) return
+      }
+
       if (mauFile) {
         const confirmed = await confirmAsync({ key: 'chainView.mauFile.confirmReplace' })
         if (!confirmed) return
@@ -73,7 +82,7 @@ const AdvancedFunctionsMenu = () => {
 
       setUploadingMauFile(true)
       try {
-        const uploadedFile = await API.uploadChainMauFile({ surveyId, chainUuid, file })
+        const uploadedFile = await API.uploadChainMauFile({ surveyId, chainUuid, cycle, file })
         setMauFile(uploadedFile)
         dispatch(NotificationActions.notifyInfo({ key: 'chainView.mauFile.uploadComplete' }))
       } catch (error) {
@@ -87,7 +96,7 @@ const AdvancedFunctionsMenu = () => {
         setUploadingMauFile(false)
       }
     },
-    [chainUuid, confirmAsync, dispatch, mauFile, surveyId]
+    [chainUuid, confirmAsync, cycle, cycleKeys, dispatch, mauFile, surveyId]
   )
 
   const onDeleteMauFileClick = useCallback(async () => {
@@ -96,7 +105,7 @@ const AdvancedFunctionsMenu = () => {
 
     setDeletingMauFile(true)
     try {
-      await API.deleteChainMauFile({ surveyId, chainUuid })
+      await API.deleteChainMauFile({ surveyId, chainUuid, cycle })
       setMauFile(null)
       dispatch(NotificationActions.notifyInfo({ key: 'chainView.mauFile.deleteComplete' }))
     } catch (error) {
@@ -109,7 +118,7 @@ const AdvancedFunctionsMenu = () => {
     } finally {
       setDeletingMauFile(false)
     }
-  }, [chainUuid, confirmAsync, dispatch, surveyId])
+  }, [chainUuid, confirmAsync, cycle, dispatch, surveyId])
 
   const canEditChainNow = canEditChain && !chainEditLocked
 
@@ -151,6 +160,7 @@ const AdvancedFunctionsMenu = () => {
             fileName={SurveyFile.getName(mauFile)}
             href={API.getChainMauFileDownloadUrl({ surveyId, chainUuid })}
             label="chainView.mauFile.download"
+            requestParams={{ cycle }}
             variant="text"
           />
         ),

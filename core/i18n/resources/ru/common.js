@@ -747,6 +747,7 @@ $t(common.raiseTicketInSupportForum)
       upload: 'Загрузить MAU.zip',
       download: 'Скачать MAU.zip',
       delete: 'Удалить MAU.zip',
+      confirmCycleAssociation: 'Файл MAU.zip будет связан с текущим циклом ({{cycle}}). Продолжить?',
       confirmReplace: 'Файл MAU.zip уже загружен для этой цепочки. Заменить его?',
       confirmDelete: 'Удалить файл MAU.zip, загруженный для этой цепочки?',
       uploadComplete: 'Файл MAU.zip успешно загружен',
