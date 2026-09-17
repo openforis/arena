@@ -7,6 +7,7 @@ import { truncate } from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
 
 import * as Node from '../record/node'
+import { cycleOneKey } from './_survey/surveyInfo'
 
 export const keys = {
   content: 'content',
@@ -17,6 +18,7 @@ export const keys = {
 
 export const propKeys = {
   chainUuid: 'chainUuid',
+  cycle: 'cycle',
   deleted: 'deleted',
   labels: 'labels',
   name: 'name',
@@ -50,6 +52,7 @@ export const createFile = ({
   size = null,
   content = null,
   chainUuid = null,
+  cycle = null,
   recordUuid = null,
   nodeUuid = null,
   type = null,
@@ -57,6 +60,7 @@ export const createFile = ({
 }) => {
   const props = ObjectUtils.keepNonEmptyProps({
     [propKeys.chainUuid]: chainUuid,
+    [propKeys.cycle]: cycle,
     [propKeys.labels]: labels,
     [propKeys.name]: name,
     [propKeys.nodeUuid]: nodeUuid,
@@ -102,6 +106,7 @@ export const isTemporary = (file) => Boolean(ObjectUtils.getProp(propKeys.tempor
 export const getName = ObjectUtils.getProp(propKeys.name)
 export const getSize = ObjectUtils.getProp(propKeys.size)
 export const getChainUuid = ObjectUtils.getProp(propKeys.chainUuid)
+export const getCycle = ObjectUtils.getProp(propKeys.cycle, cycleOneKey)
 export const getNodeUuid = ObjectUtils.getProp(propKeys.nodeUuid)
 export const getRecordUuid = ObjectUtils.getProp(propKeys.recordUuid)
 export const getContent = R.prop(keys.content)
