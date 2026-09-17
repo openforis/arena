@@ -768,6 +768,7 @@ $t(accessRequestView.whitelistSenderSuggestion)
       upload: 'MAU.zipをアップロード',
       download: 'MAU.zipをダウンロード',
       delete: 'MAU.zipを削除',
+      confirmCycleAssociation: 'MAU.zipファイルは現在のサイクル（{{cycle}}）に関連付けられます。続けますか？',
       confirmReplace: 'このチェーンには既にMAU.zipファイルがアップロードされています。置き換えますか？',
       confirmDelete: 'このチェーンにアップロードされたMAU.zipファイルを削除しますか？',
       uploadComplete: 'MAU.zipファイルが正常にアップロードされました',

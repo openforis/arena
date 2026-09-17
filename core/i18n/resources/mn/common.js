@@ -749,6 +749,7 @@ $t(common.raiseTicketInSupportForum)
       upload: 'MAU.zip байршуулах',
       download: 'MAU.zip татах',
       delete: 'MAU.zip устгах',
+      confirmCycleAssociation: 'MAU.zip файл нь одоогийн мөчлөгтэй ({{cycle}}) холбогдоно. Үргэлжлүүлэх үү?',
       confirmReplace: 'Энэ хэлхээнд MAU.zip файл аль хэдийн байршуулагдсан байна. Үүнийг солих уу?',
       confirmDelete: 'Энэ хэлхээнд байршуулсан MAU.zip файлыг устгах уу?',
       uploadComplete: 'MAU.zip файл амжилттай байршуулагдлаа',

@@ -641,6 +641,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       upload: 'Subir MAU.zip',
       download: 'Descargar MAU.zip',
       delete: 'Eliminar MAU.zip',
+      confirmCycleAssociation: 'El archivo MAU.zip se asociará al ciclo actual ({{cycle}}). ¿Desea continuar?',
       confirmReplace: 'Ya se ha subido un archivo MAU.zip para esta cadena. ¿Desea reemplazarlo?',
       confirmDelete: '¿Eliminar el archivo MAU.zip subido para esta cadena?',
       uploadComplete: 'Archivo MAU.zip subido correctamente',

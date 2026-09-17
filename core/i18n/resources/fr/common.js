@@ -772,6 +772,7 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
       upload: 'Importer MAU.zip',
       download: 'Télécharger MAU.zip',
       delete: 'Supprimer MAU.zip',
+      confirmCycleAssociation: 'Le fichier MAU.zip sera associé au cycle actuel ({{cycle}}). Voulez-vous continuer ?',
       confirmReplace: 'Un fichier MAU.zip a déjà été importé pour cette chaîne. Voulez-vous le remplacer ?',
       confirmDelete: 'Supprimer le fichier MAU.zip importé pour cette chaîne ?',
       uploadComplete: 'Fichier MAU.zip importé avec succès',
