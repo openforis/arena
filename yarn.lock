@@ -3896,37 +3896,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@file:../arena-server::locator=open-foris-arena%40workspace%3A.":
-  version: 2.3.1
-  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=c3426f&locator=open-foris-arena%40workspace%3A."
-  dependencies:
-    "@aws-sdk/client-s3": "npm:^3.1112.0"
-    "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^2.3.1"
-    bcryptjs: "npm:^3.0.3"
-    compression: "npm:^1.8.1"
-    cookie-parser: "npm:^1.4.7"
-    db-migrate: "npm:^0.11.14"
-    db-migrate-pg: "npm:^1.5.2"
-    docx: "npm:^9.7.1"
-    express: "npm:^5.2.1"
-    express-fileupload: "npm:^1.5.2"
-    express-rate-limit: "npm:^8.5.2"
-    image-size: "npm:^2.0.2"
-    jsonwebtoken: "npm:^9.0.3"
-    jszip: "npm:^3.10.1"
-    lodash.throttle: "npm:^4.1.1"
-    log4js: "npm:^6.9.1"
-    otplib: "npm:^13.4.1"
-    passport: "npm:^0.7.0"
-    passport-jwt: "npm:^4.0.1"
-    passport-local: "npm:^1.0.0"
-    pdfkit: "npm:^0.19.1"
-    pg-promise: "npm:^12.7.0"
-    socket.io: "npm:^4.8.3"
-  checksum: 10c0/0a5cc5630b1eb7d9f273bf8f769650774b1aaec869e1295feb0fff484e627d58d08171cfb23e2d87d1309117c367ad6caefeceb0bccd410a235b3f903c45f33a
-  languageName: node
-  linkType: hard
 
 "@opentelemetry/api@npm:1.9.0":
   version: 1.9.0
@@ -16003,7 +15972,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:^8.26.0"
     "@mui/x-tree-view": "npm:^8.26.0"
     "@ngageoint/geopackage": "npm:^4.2.9"
-    "@openforis/arena-server": "file:../arena-server"
+    "@openforis/arena-server": "npm:^2.3.2"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
@@ -22436,3 +22405,36 @@ __metadata:
   checksum: 10c0/860d25a81ab41d33aa25f8d0d07b091a04acb426e605f396227a796e9e800c44723ed96d0f53a512b57be3d1520f45bf69c0cb3b378a232a00787a2609625307
   languageName: node
   linkType: hard
+
+"@openforis/arena-server@npm:^2.3.2":
+  version: 2.3.2
+  resolution: "@openforis/arena-server@npm:2.3.2::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40openforis%2Farena-server%2F2.3.2%2F31741047653be6f23ba446ccdd3c8728028a9ed6"
+  dependencies:
+    "@aws-sdk/client-s3": "npm:^3.1112.0"
+    "@godaddy/terminus": "npm:^4.12.1"
+    "@openforis/arena-core": "npm:^2.3.1"
+    bcryptjs: "npm:^3.0.3"
+    compression: "npm:^1.8.1"
+    cookie-parser: "npm:^1.4.7"
+    db-migrate: "npm:^0.11.14"
+    db-migrate-pg: "npm:^1.5.2"
+    docx: "npm:^9.7.1"
+    express: "npm:^5.2.1"
+    express-fileupload: "npm:^1.5.2"
+    express-rate-limit: "npm:^8.5.2"
+    image-size: "npm:^2.0.2"
+    jsonwebtoken: "npm:^9.0.3"
+    jszip: "npm:^3.10.1"
+    lodash.throttle: "npm:^4.1.1"
+    log4js: "npm:^6.9.1"
+    otplib: "npm:^13.4.1"
+    passport: "npm:^0.7.0"
+    passport-jwt: "npm:^4.0.1"
+    passport-local: "npm:^1.0.0"
+    pdfkit: "npm:^0.19.1"
+    pg-promise: "npm:^12.7.0"
+    socket.io: "npm:^4.8.3"
+  checksum: 10c0/ef60ef8c0e4e0b43773acf0dc55500b3674d3b137f7dcce1e87f02fdf5614a00b8eb735e88a9c1fe49335ea2eee90ab470ac860dd2460680d0094c5b5dbccc77
+  languageName: node
+  linkType: hard
+

@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-15  
 **Branch:** `feat/record-pdf-qr-code-export` (from `master`)  
-**Reference:** [Trello](https://trello.com/c/p466YUnB/25-add-qr-code-option-to-pdf-export-to-access-related-arena-data), [Tech Meeting with Stefano 2026-09-14](https://app.notion.com/p/3dba458bdbaf80e394f7c9b3adca36d4)  
+**Reference:** [Trello](https://trello.com/c/p466YUnB/25-add-qr-code-option-to-pdf-export-to-access-related-arena-data), [Tech meeting 2026-09-14](https://app.notion.com/p/3dba458bdbaf80e394f7c9b3adca36d4)  
 **Repos:** `arena` (UI, export API, public route, DB metadata) and sibling `arena-server` (QR stamp in PDF/DOCX)  
 **Predecessor:** `docs/superpowers/specs/2026-08-05-record-printable-export-options-design.md`
 

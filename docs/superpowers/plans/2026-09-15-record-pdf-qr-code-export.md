@@ -910,7 +910,7 @@ EOF
 
 If still on `file:../arena-server` for local demo, note that in the PR and bump when publishing.
 
-- [ ] **Step 3: Push branches for Stefano review**
+- [ ] **Step 3: Push branches for review**
 
 ```bash
 cd /Users/andrea-unibo/Developer/work/FAO/openforis/arena
