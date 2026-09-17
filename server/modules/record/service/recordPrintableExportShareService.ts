@@ -21,19 +21,40 @@ const POSTGRES_UNIQUE_VIOLATION = '23505'
 
 type DbClient = typeof db
 
+/** Minimal shape used by SurveyFile getters in this service. */
+type SurveyFileSummary = {
+  uuid: string
+  props?: {
+    size?: number
+    name?: string
+    type?: string
+    recordUuid?: string
+    nodeUuid?: string
+  }
+  content?: Buffer | null
+  dateCreated?: string
+}
+
 type SurveyFileServiceLike = {
   deleteFilesAndContentByUuids: (
     params: {
       surveyId: number
       fileUuids: string[]
-      fallbackFileSummaries?: unknown[]
+      fallbackFileSummaries?: SurveyFileSummary[]
     },
     client?: DbClient
   ) => Promise<unknown>
-  fetchFileContentAsBuffer: (params: { surveyId: number; fileSummary: unknown }) => Promise<Buffer | null>
-  fetchFileSummaryByUuid: (surveyId: number, fileUuid: string, client?: DbClient) => Promise<unknown>
+  fetchFileContentAsBuffer: (params: {
+    surveyId: number
+    fileSummary: SurveyFileSummary
+  }) => Promise<Buffer | null>
+  fetchFileSummaryByUuid: (
+    surveyId: number,
+    fileUuid: string,
+    client?: DbClient
+  ) => Promise<SurveyFileSummary | null>
   fetchFilesStatistics?: (params: { surveyId: number }) => Promise<{ availableSpace: number }>
-  insertFile: (surveyId: number, file: unknown, client?: DbClient) => Promise<unknown>
+  insertFile: (surveyId: number, file: SurveyFileSummary, client?: DbClient) => Promise<SurveyFileSummary>
 }
 
 type ShareRepositoryLike = {
@@ -104,7 +125,7 @@ const createPdfFile = ({
   recordUuid: string
   entityNodeUuid: string
   pdfBuffer: Buffer
-}) =>
+}): SurveyFileSummary =>
   SurveyFile.createFile({
     name: `printable-export-${entityNodeUuid}.pdf`,
     size: Buffer.byteLength(pdfBuffer),
@@ -121,7 +142,7 @@ const isUniqueViolation = (error: unknown): boolean =>
   typeof error === 'object' && error !== null && 'code' in error && error.code === POSTGRES_UNIQUE_VIOLATION
 
 const deleteFile = async (
-  { surveyId, fileSummary }: { surveyId: number; fileSummary: unknown },
+  { surveyId, fileSummary }: { surveyId: number; fileSummary: SurveyFileSummary },
   { surveyFileService }: ShareServiceDependencies
 ): Promise<void> => {
   const fileUuid = SurveyFile.getUuid(fileSummary)
@@ -133,7 +154,7 @@ const deleteFile = async (
 }
 
 const deleteFileBestEffort = async (
-  { surveyId, fileSummary }: { surveyId: number; fileSummary: unknown },
+  { surveyId, fileSummary }: { surveyId: number; fileSummary: SurveyFileSummary },
   dependencies: ShareServiceDependencies,
   context: string
 ): Promise<void> => {
@@ -175,7 +196,7 @@ const persistShareWithPdf = async (
   const { database, shareRepository, surveyFileService } = dependencies
   const expiresAt = newExpiresAt()
   const stagedFile = createPdfFile({ recordUuid, entityNodeUuid, pdfBuffer })
-  let replacedFileSummary: unknown = null
+  let replacedFileSummary: SurveyFileSummary | null = null
   let accessToken: string
 
   try {

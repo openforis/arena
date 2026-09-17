@@ -1,4 +1,4 @@
-import QRCode from 'qrcode'
+import { toBuffer as qrToBuffer } from 'qrcode'
 
 /**
  * Renders a URL as a PNG buffer for PDF or DOCX embedding.
@@ -6,7 +6,7 @@ import QRCode from 'qrcode'
  * @returns {Promise<Buffer>} PNG bytes.
  */
 export const toQrPngBuffer = async (url: string): Promise<Buffer> =>
-  QRCode.toBuffer(url, {
+  qrToBuffer(url, {
     type: 'png',
     errorCorrectionLevel: 'M',
     margin: 2,

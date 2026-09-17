@@ -710,7 +710,7 @@ const generateDocumentWithQrCode = async ({
       accessToken,
     })
     if (share.accessToken === accessToken) {
-      return extension === 'pdf' ? pdfResult : generator({ ...generatorOptions, qrCodeImage })
+      return extension === 'pdf' ? pdfResult : await generator({ ...generatorOptions, qrCodeImage })
     }
     accessToken = share.accessToken
   }

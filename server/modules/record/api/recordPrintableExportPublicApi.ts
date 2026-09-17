@@ -7,7 +7,12 @@ import * as RecordPrintableExportShareService from '@server/modules/record/servi
 export const init = (app: Express): void => {
   app.get('/public/record-export/:token', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { token } = req.params
+      const tokenParam = req.params.token
+      const token = typeof tokenParam === 'string' ? tokenParam : tokenParam?.[0]
+      if (!token) {
+        res.status(StatusCodes.NOT_FOUND).end()
+        return
+      }
       const result = await RecordPrintableExportShareService.fetchValidPdfByToken({ token })
       if (!result) {
         res.status(StatusCodes.NOT_FOUND).end()
