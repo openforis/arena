@@ -155,6 +155,9 @@ No Arena Mobile:
     currentPageHint: 'Página atual: {{entityLabel}}',
     currentPageUnavailable:
       'Não foi possível determinar a instância da página atual. Navegue até uma página específica ou exporte a pesquisa completa.',
+    includeQrCode: 'Incluir código QR',
+    includeQrCodeInfo:
+      'Adiciona um código QR na primeira página com link para uma cópia somente leitura do PDF desta entidade (válido por 1 ano).',
     orientation: 'Orientação da página',
     orientations: {
       portrait: 'Retrato',

@@ -52,6 +52,12 @@ export default {
     updateSelfAndDependentsDefaultValues:
       "$t(appErrors:record.errorUpdating) ; erreur lors de l'évaluation de l'expression dans le nœud {{nodeDefName}} : {{details}}",
   },
+  recordPrintableExport: {
+    missingEntityParams: "L'export de la page actuelle nécessite entityDefUuid et entityNodeUuid",
+    entityNotFound: "Entité introuvable pour l'export spécifié",
+    missingServerUrl: "L'URL publique du serveur est requise lors de l'export avec un code QR",
+    qrTokenMismatch: "Impossible de finaliser l'export avec code QR ; veuillez réessayer",
+  },
   sessionExpiredRefreshPage: `La session a peut-être expiré.
 Essayez de rafraîchir la page.`,
   survey: {

@@ -155,6 +155,9 @@ Dans Arena Mobile :
     currentPageHint: 'Page actuelle : {{entityLabel}}',
     currentPageUnavailable:
       "Impossible de déterminer l'instance de la page actuelle. Naviguez vers une page spécifique ou exportez le formulaire complet.",
+    includeQrCode: 'Inclure un code QR',
+    includeQrCodeInfo:
+      'Ajoute un code QR sur la première page menant à une copie en lecture seule du PDF de cette entité (valable 1 an).',
     orientation: 'Orientation de la page',
     orientations: {
       portrait: 'Portrait',

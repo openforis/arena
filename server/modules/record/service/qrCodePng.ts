@@ -5,7 +5,7 @@ import QRCode from 'qrcode'
  * @param {string} url - Absolute public URL encoded in the QR code.
  * @returns {Promise<Buffer>} PNG bytes.
  */
-export const toQrPngBuffer = async (url) =>
+export const toQrPngBuffer = async (url: string): Promise<Buffer> =>
   QRCode.toBuffer(url, {
     type: 'png',
     errorCorrectionLevel: 'M',

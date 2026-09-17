@@ -53,6 +53,12 @@ export default {
     updateSelfAndDependentsDefaultValues:
       'Error al actualizar el registro; error al evaluar la expresión en el nodo {{nodeDefName}}: {{details}}',
   },
+  recordPrintableExport: {
+    missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeUuid',
+    entityNotFound: 'Entidad no encontrada para la exportación especificada',
+    missingServerUrl: 'Se requiere la URL pública del servidor al exportar con un código QR',
+    qrTokenMismatch: 'No se pudo finalizar la exportación con código QR; inténtelo de nuevo',
+  },
   sessionExpiredRefreshPage: 'La sesión podría haber caducado.\nIntente actualizar la página.',
   survey: {
     nodeDefNameNotFound: 'Definición de nodo no encontrada: {{name}}',

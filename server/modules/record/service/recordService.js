@@ -661,6 +661,63 @@ export const mergeRecords = async (
     }
   })
 
+const assertCurrentPageEntity = ({ survey, record, entityDefUuid, entityNodeUuid }) => {
+  if (!entityDefUuid || !entityNodeUuid) {
+    throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
+  }
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  const entityNode = Record.getNodeByUuid(entityNodeUuid)(record)
+  if (!entityDef || !NodeDef.isEntity(entityDef) || !entityNode || Node.getNodeDefUuid(entityNode) !== entityDefUuid) {
+    throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
+  }
+  return entityDef
+}
+
+const generateDocumentWithQrCode = async ({
+  surveyId,
+  recordUuid,
+  entityDefUuid,
+  entityNodeUuid,
+  serverUrl,
+  generatorOptions,
+  generator,
+  extension,
+}) => {
+  if (!serverUrl) {
+    throw new SystemError('appErrors:recordPrintableExport.missingServerUrl', {}, StatusCodes.BAD_REQUEST)
+  }
+
+  const existingShare = await ShareRepository.fetchBySurveyRecordEntityNode({
+    surveyId,
+    recordUuid,
+    entityNodeUuid,
+  })
+  let accessToken = existingShare?.access_token ?? randomBytes(32).toString('base64url')
+  let qrCodeImage
+  let pdfResult
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const publicUrl = `${serverUrl}/api/public/record-export/${accessToken}`
+    qrCodeImage = await toQrPngBuffer(publicUrl)
+    pdfResult = await SurveyPdfGenerator.generateSurveyPdf({ ...generatorOptions, qrCodeImage })
+
+    const share = await upsertShareWithPdf({
+      surveyId,
+      recordUuid,
+      entityDefUuid,
+      entityNodeUuid,
+      pdfBuffer: pdfResult.buffer,
+      accessToken,
+    })
+    if (share.accessToken === accessToken) {
+      return extension === 'pdf' ? pdfResult : generator({ ...generatorOptions, qrCodeImage })
+    }
+    accessToken = share.accessToken
+  }
+
+  throw new SystemError('appErrors:recordPrintableExport.qrTokenMismatch', {}, StatusCodes.CONFLICT)
+}
+
 const exportRecordDocument = async ({
   user,
   surveyId,
@@ -693,19 +750,7 @@ const exportRecordDocument = async ({
 
   let entityDef = null
   if (exportScope === PrintableExportScopes.currentPage) {
-    if (!entityDefUuid || !entityNodeUuid) {
-      throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
-    }
-    entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-    const entityNode = Record.getNodeByUuid(entityNodeUuid)(record)
-    if (
-      !entityDef ||
-      !NodeDef.isEntity(entityDef) ||
-      !entityNode ||
-      Node.getNodeDefUuid(entityNode) !== entityDefUuid
-    ) {
-      throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
-    }
+    entityDef = assertCurrentPageEntity({ survey, record, entityDefUuid, entityNodeUuid })
   }
 
   const rootNode = Record.getRootNode(record)
@@ -762,49 +807,18 @@ const exportRecordDocument = async ({
     orientation,
   }
 
-  let documentResult
-  if (includeQrCode) {
-    if (!serverUrl) {
-      throw new SystemError('appErrors:recordPrintableExport.missingServerUrl', {}, StatusCodes.BAD_REQUEST)
-    }
-    const existingShare = await ShareRepository.fetchBySurveyRecordEntityNode({
-      surveyId,
-      recordUuid,
-      entityNodeUuid,
-    })
-    let accessToken = existingShare?.access_token ?? randomBytes(32).toString('base64url')
-    let qrCodeImage
-    let pdfResult
-    let shareMatched = false
-
-    for (let attempt = 0; attempt < 2; attempt += 1) {
-      const publicUrl = `${serverUrl}/api/public/record-export/${accessToken}`
-      qrCodeImage = await toQrPngBuffer(publicUrl)
-      pdfResult = await SurveyPdfGenerator.generateSurveyPdf({ ...generatorOptions, qrCodeImage })
-
-      const share = await upsertShareWithPdf({
+  const documentResult = includeQrCode
+    ? await generateDocumentWithQrCode({
         surveyId,
         recordUuid,
         entityDefUuid,
         entityNodeUuid,
-        pdfBuffer: pdfResult.buffer,
-        accessToken,
+        serverUrl,
+        generatorOptions,
+        generator,
+        extension,
       })
-      if (share.accessToken === accessToken) {
-        shareMatched = true
-        break
-      }
-      accessToken = share.accessToken
-    }
-
-    if (!shareMatched) {
-      throw new SystemError('appErrors:recordPrintableExport.qrTokenMismatch', {}, StatusCodes.CONFLICT)
-    }
-
-    documentResult = extension === 'pdf' ? pdfResult : await generator({ ...generatorOptions, qrCodeImage })
-  } else {
-    documentResult = await generator(generatorOptions)
-  }
+    : await generator(generatorOptions)
 
   const { buffer, surveyName } = documentResult
   const fileName =

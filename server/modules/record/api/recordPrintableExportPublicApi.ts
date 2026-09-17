@@ -1,9 +1,11 @@
+import type { Express, NextFunction, Request, Response } from 'express'
+
 import { StatusCodes } from '@core/systemError'
 
 import * as RecordPrintableExportShareService from '@server/modules/record/service/recordPrintableExportShareService'
 
-export const init = (app) => {
-  app.get('/public/record-export/:token', async (req, res, next) => {
+export const init = (app: Express): void => {
+  app.get('/public/record-export/:token', async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { token } = req.params
       const result = await RecordPrintableExportShareService.fetchValidPdfByToken({ token })
