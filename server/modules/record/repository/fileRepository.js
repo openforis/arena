@@ -160,7 +160,7 @@ export const fetchCountAndTotalFilesSize = async ({ surveyId, recordUuid = null 
 
 // ============== UPDATE
 export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
-  client.one(
+  client.oneOrNone(
     `
     UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
     SET props = jsonb_set(props, '{${SurveyFile.propKeys.deleted}}', 'true')
