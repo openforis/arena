@@ -91,8 +91,12 @@ export const useTable = ({
   const handleSortBy = useCallback(
     (orderByField) => {
       const currentOrder = sort.by === orderByField ? sort.order : null
-      const order =
-        currentOrder === SortOrder.asc ? SortOrder.desc : currentOrder === SortOrder.desc ? null : SortOrder.asc
+      let order = SortOrder.asc
+      if (currentOrder === SortOrder.asc) {
+        order = SortOrder.desc
+      } else if (currentOrder === SortOrder.desc) {
+        order = null
+      }
 
       const sortUpdated = { by: orderByField, order }
       updateQuery(navigate)({ sort: sortUpdated, offset: null })
