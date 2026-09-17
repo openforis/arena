@@ -1207,8 +1207,10 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       buttonLabel: 'Convertir a categoría simple',
       confirmMessage: `¿Convertir esta categoría de Datos de puntos de muestreo en una categoría simple?\n\nSe borrará el nombre de la categoría (deberá asignarle uno nuevo), y se desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
     },
-    geoPackageCategory: 'Esta es una categoría GeoPackage',
+    geoPackageCategory: 'Esta categoría tiene capacidades geográficas',
+    geoPackageCategoryInfo: `Esta categoría tiene una propiedad extra llamada '${locationItemExtraDefName}', que permite exportarla como un archivo GeoPackage.`,
     samplingPointDataCategoryType: 'Esta es la categoría de Datos de puntos de muestreo',
+    samplingPointDataCategoryTypeInfo: `Esta es una categoría predefinida para datos de puntos de muestreo. Tiene una propiedad extra llamada '${locationItemExtraDefName}', que permite exportarla como un archivo GeoPackage.`,
     createCategory: {
       menuLabel: 'Añadir categoría',
       simple: 'Categoría simple',
@@ -1216,11 +1218,15 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     createSamplingPointDataCategory: {
       buttonLabel: 'Categoría de Datos de puntos de muestreo',
+      description:
+        'Categoría predefinida para datos de puntos de muestreo, que incluye un campo de ubicación para cada elemento.',
       message: `¿Crear una nueva categoría de Datos de puntos de muestreo?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     createGeoPackageCategory: {
-      buttonLabel: 'Categoría GeoPackage',
-      message: `¿Crear una nueva categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+      buttonLabel: 'Categoría con capacidades geográficas',
+      description:
+        'Añade un campo de ubicación a los elementos, para que la categoría se pueda exportar como un archivo GeoPackage.',
+      message: `¿Crear una nueva categoría con capacidades geográficas?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     deleteItem: 'Eliminar elemento',
     level: {

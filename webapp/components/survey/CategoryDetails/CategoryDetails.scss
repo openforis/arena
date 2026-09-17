@@ -57,6 +57,12 @@ $borderColor: $greyBorder;
     height: 2rem;
   }
 
+  .category-type-label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
   .date-import-template-menu-btn {
     width: 14rem;
   }
