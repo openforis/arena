@@ -50,6 +50,12 @@ export default {
     updateSelfAndDependentsDefaultValues:
       'Ошибка обновления записи; ошибка при оценке выражения в узле {{nodeDefName}}: {{details}}',
   },
+  recordPrintableExport: {
+    missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeUuid',
+    entityNotFound: 'Сущность не найдена для указанного экспорта',
+    missingServerUrl: 'Для экспорта с QR-кодом требуется публичный URL сервера',
+    qrTokenMismatch: 'Не удалось завершить экспорт с QR-кодом; повторите попытку',
+  },
   sessionExpiredRefreshPage: 'Срок действия сеанса мог истечь.\nПопробуйте обновить страницу.',
   survey: {
     nodeDefNameNotFound: 'Определение узла не найдено: {{name}}',

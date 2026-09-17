@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { randomBytes } from 'node:crypto'
 
 import { NodeValues, Objects, RecordExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
 import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
@@ -39,6 +40,7 @@ import * as Response from '@server/utils/response'
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
 import * as RecordFileManager from '../manager/recordFileManager'
+import * as ShareRepository from '../repository/recordPrintableExportShareRepository'
 import { findSurveyDocImageApplicable } from '../../survey/service/surveyDocImageUtils'
 
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
@@ -46,6 +48,8 @@ import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
 import RecordsCloneJob from './recordsCloneJob'
 import RecordsValidationJob from './recordsValidationJob'
+import { toQrPngBuffer } from './qrCodePng'
+import { upsertShareWithPdf } from './recordPrintableExportShareService'
 import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
@@ -677,6 +681,63 @@ export const mergeRecords = async (
     }
   })
 
+const assertCurrentPageEntity = ({ survey, record, entityDefUuid, entityNodeUuid }) => {
+  if (!entityDefUuid || !entityNodeUuid) {
+    throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
+  }
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  const entityNode = Record.getNodeByUuid(entityNodeUuid)(record)
+  if (!entityDef || !NodeDef.isEntity(entityDef) || !entityNode || Node.getNodeDefUuid(entityNode) !== entityDefUuid) {
+    throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
+  }
+  return entityDef
+}
+
+const generateDocumentWithQrCode = async ({
+  surveyId,
+  recordUuid,
+  entityDefUuid,
+  entityNodeUuid,
+  serverUrl,
+  generatorOptions,
+  generator,
+  extension,
+}) => {
+  if (!serverUrl) {
+    throw new SystemError('appErrors:recordPrintableExport.missingServerUrl', {}, StatusCodes.BAD_REQUEST)
+  }
+
+  const existingShare = await ShareRepository.fetchBySurveyRecordEntityNode({
+    surveyId,
+    recordUuid,
+    entityNodeUuid,
+  })
+  let accessToken = existingShare?.access_token ?? randomBytes(32).toString('base64url')
+  let qrCodeImage
+  let pdfResult
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const publicUrl = `${serverUrl}/api/public/record-export/${accessToken}`
+    qrCodeImage = await toQrPngBuffer(publicUrl)
+    pdfResult = await SurveyPdfGenerator.generateSurveyPdf({ ...generatorOptions, qrCodeImage })
+
+    const share = await upsertShareWithPdf({
+      surveyId,
+      recordUuid,
+      entityDefUuid,
+      entityNodeUuid,
+      pdfBuffer: pdfResult.buffer,
+      accessToken,
+    })
+    if (share.accessToken === accessToken) {
+      return extension === 'pdf' ? pdfResult : await generator({ ...generatorOptions, qrCodeImage })
+    }
+    accessToken = share.accessToken
+  }
+
+  throw new SystemError('appErrors:recordPrintableExport.qrTokenMismatch', {}, StatusCodes.CONFLICT)
+}
+
 const exportRecordDocument = async ({
   user,
   surveyId,
@@ -690,7 +751,13 @@ const exportRecordDocument = async ({
   entityDefUuid,
   entityNodeUuid,
   orientation = PrintOrientations.portrait,
+  includeQrCode = false,
+  serverUrl = null,
 }) => {
+  if (includeQrCode && (exportScope !== PrintableExportScopes.currentPage || !entityDefUuid || !entityNodeUuid)) {
+    throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
+  }
+
   const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true, user })
   const cycle = Record.getCycle(record)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
@@ -703,19 +770,7 @@ const exportRecordDocument = async ({
 
   let entityDef = null
   if (exportScope === PrintableExportScopes.currentPage) {
-    if (!entityDefUuid || !entityNodeUuid) {
-      throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
-    }
-    entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-    const entityNode = Record.getNodeByUuid(entityNodeUuid)(record)
-    if (
-      !entityDef ||
-      !NodeDef.isEntity(entityDef) ||
-      !entityNode ||
-      Node.getNodeDefUuid(entityNode) !== entityDefUuid
-    ) {
-      throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
-    }
+    entityDef = assertCurrentPageEntity({ survey, record, entityDefUuid, entityNodeUuid })
   }
 
   const rootNode = Record.getRootNode(record)
@@ -751,7 +806,7 @@ const exportRecordDocument = async ({
   const pageNumbering = Survey.isDocPageNumberingEnabled(survey)
 
   const i18n = await i18nFactory.createI18nAsync(langToUse)
-  const { buffer, surveyName } = await generator({
+  const generatorOptions = {
     survey,
     cycle,
     record,
@@ -770,7 +825,22 @@ const exportRecordDocument = async ({
     entityDefUuid,
     entityNodeUuid,
     orientation,
-  })
+  }
+
+  const documentResult = includeQrCode
+    ? await generateDocumentWithQrCode({
+        surveyId,
+        recordUuid,
+        entityDefUuid,
+        entityNodeUuid,
+        serverUrl,
+        generatorOptions,
+        generator,
+        extension,
+      })
+    : await generator(generatorOptions)
+
+  const { buffer, surveyName } = documentResult
   const fileName =
     exportScope === PrintableExportScopes.currentPage
       ? ExportFileNameGenerator.generate({
@@ -800,6 +870,8 @@ export const exportRecordDocx = ({
   entityDefUuid,
   entityNodeUuid,
   orientation,
+  includeQrCode,
+  serverUrl,
 }) =>
   exportRecordDocument({
     user,
@@ -811,6 +883,8 @@ export const exportRecordDocx = ({
     entityDefUuid,
     entityNodeUuid,
     orientation,
+    includeQrCode,
+    serverUrl,
     generator: SurveyDocxGenerator.generateSurveyDocx,
     extension: 'docx',
     contentType: Response.contentTypes.docx,
@@ -826,6 +900,8 @@ export const exportRecordPdf = ({
   entityDefUuid,
   entityNodeUuid,
   orientation,
+  includeQrCode,
+  serverUrl,
 }) =>
   exportRecordDocument({
     user,
@@ -837,6 +913,8 @@ export const exportRecordPdf = ({
     entityDefUuid,
     entityNodeUuid,
     orientation,
+    includeQrCode,
+    serverUrl,
     generator: SurveyPdfGenerator.generateSurveyPdf,
     extension: 'pdf',
     contentType: Response.contentTypes.pdf,

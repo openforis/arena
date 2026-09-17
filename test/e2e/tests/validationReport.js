@@ -128,6 +128,8 @@ export default () =>
       enterAttribute(tree_dec_2, '0', getTreeSelector(0))
       enterAttribute(tree_id, '10', getTreeSelector(1))
       enterAttribute(tree_id, '10', getTreeSelector(2))
+      // Let duplicate-key validation settle before unlocking another keyed tree row.
+      waitThread(500)
       enterAttribute(tree_id, '0', getTreeSelector(3))
       waitThread()
 

@@ -159,6 +159,9 @@ Arena Mobileでは：
     currentPageHint: '現在のページ：{{entityLabel}}',
     currentPageUnavailable:
       '現在のページのインスタンスを特定できません。特定のページに移動するか、調査全体をエクスポートしてください。',
+    includeQrCode: 'QRコードを含める',
+    includeQrCodeInfo:
+      '先頭ページに、このエンティティの読み取り専用PDFへリンクするQRコードを追加します（有効期限1年）。',
     orientation: 'ページの向き',
     orientations: {
       portrait: '縦',

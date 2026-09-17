@@ -37,6 +37,7 @@ export const invalidPropKeys = {
 export const SurveyFileType = {
   chainMau: 'chainMau',
   preloadedMapLayer: 'preloadedMapLayer',
+  printableExportPdf: 'printableExportPdf',
   recordAttachment: 'recordAttachment',
   surveyDocImage: 'surveyDocImage',
   brandingSurveyLogo1: 'brandingSurveyLogo1',
