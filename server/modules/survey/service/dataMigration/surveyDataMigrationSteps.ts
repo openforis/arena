@@ -33,6 +33,11 @@ export const surveyDataMigrationSteps: SurveyDataMigrationStep[] = [
       await ChainManager.migrateSamplingDesignPhaseProps({ surveyId }, client)
     },
   },
+  {
+    // QR printable-export share table (arena-server) and related schema changes; no per-survey data transform.
+    version: '2.8.5',
+    migrate: async () => {},
+  },
   // future per-survey migration steps are appended here, each with its own version threshold
 ]
 
