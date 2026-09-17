@@ -9,6 +9,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import { uuidv4 } from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
+import { SortOrder } from '@core/sortOrder'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Survey from '@core/survey/survey'
@@ -380,7 +381,7 @@ const _validateFetchUserSurveysInfoSortParams = ({ sortBy, sortOrder }) => {
   // check sortOrder is valid
   if (sortOrder) {
     const sortOrderStr = typeof sortOrder === 'string' ? sortOrder.toLowerCase() : null
-    if (!sortOrderStr || !['asc', 'desc'].includes(sortOrderStr))
+    if (!sortOrderStr || !Object.values(SortOrder).includes(sortOrderStr))
       throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
   }
 }
