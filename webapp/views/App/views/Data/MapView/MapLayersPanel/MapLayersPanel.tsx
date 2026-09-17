@@ -12,12 +12,14 @@ import {
   Typography,
 } from '@mui/material'
 
+import { SortOrder } from '@core/sortOrder'
+
 import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import {
   applySortOrder,
   type MapLayerPoint,
+  type MapSortOrder,
   SORT_ORDER_NEXT,
-  type SortOrder,
   useMapLayersPanel,
 } from './MapLayersPanelContext'
 
@@ -77,19 +79,19 @@ const PointListItem: FC<PointListItemProps> = ({ point, isSelected, onClick }) =
 }
 
 type SortButtonProps = {
-  sortOrder: SortOrder
+  sortOrder: MapSortOrder
   onClick: (e: React.MouseEvent) => void
 }
 
 const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
   const i18n = useI18n()
-  const tooltipKeyBySortOrder: Record<SortOrder, string> = {
-    asc: 'common.sortDesc',
-    desc: 'common.sortNone',
+  const tooltipKeyBySortOrder: Record<MapSortOrder, string> = {
+    [SortOrder.asc]: 'common.sortDesc',
+    [SortOrder.desc]: 'common.sortNone',
     none: 'common.sortAsc',
   }
   const tooltipKey = tooltipKeyBySortOrder[sortOrder]
-  const iconClass = sortOrder === 'desc' ? 'icon-sort-alpha-desc' : 'icon-sort-alpha-asc'
+  const iconClass = sortOrder === SortOrder.desc ? 'icon-sort-alpha-desc' : 'icon-sort-alpha-asc'
   return (
     <Tooltip title={i18n.t(tooltipKey)} placement="right">
       <IconButton
@@ -158,7 +160,7 @@ const LayerAccordion: FC<LayerAccordionProps> = ({
 }) => {
   const i18n = useI18n()
   const { layerSortOrders, setLayerSortOrder } = useMapLayersPanel()
-  const sortOrder: SortOrder = layerSortOrders[layerKey] ?? 'none'
+  const sortOrder: MapSortOrder = layerSortOrders[layerKey] ?? 'none'
   const containerRef = useRef<HTMLElement | null>(null)
   const [scrollTop, setScrollTop] = useState(0)
   const [containerHeight, setContainerHeight] = useState(400)
