@@ -3,21 +3,21 @@ import PropTypes from 'prop-types'
 import { AppInfo } from '@core/app/appInfo'
 import { useI18n } from '@webapp/store/system'
 
-const iconByAppId = {
-  [AppInfo.arenaAppId]: 'of_arena_icon.png',
-  [AppInfo.arenaMobileId]: 'of_arena_mobile_icon.png',
-  [AppInfo.arenaMobile2Id]: 'of_arena_mobile_2_icon_32x32.png',
+const iconNameByAppId = {
+  [AppInfo.arenaAppId]: 'laptop',
+  [AppInfo.arenaMobileId]: 'mobile',
+  [AppInfo.arenaMobile2Id]: 'mobile2',
 }
-const unknownAppIcon = 'question_mark_icon_20x20.png'
+const unknownAppIconName = 'question'
 
 export const AppIcon = (props) => {
   const { appId, alt, style, title: titleProp } = props
 
   const i18n = useI18n()
-  const icon = iconByAppId[appId] ?? unknownAppIcon
+  const iconName = iconNameByAppId[appId] ?? unknownAppIconName
   const title = titleProp ?? i18n.t('common.createdWithApp', { app: AppInfo.getAppNameById(appId) })
 
-  return <img className="app-icon" src={`/img/${icon}`} height={20} alt={alt} style={style} title={title} />
+  return <span className={`app-icon icon icon-20px icon-${iconName}`} aria-label={alt} style={style} title={title} />
 }
 
 AppIcon.propTypes = {
