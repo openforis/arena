@@ -25,7 +25,6 @@ const getStructure = ({ category }) => (Category.isHierarchical(category) ? 'hie
 
 const getKind = ({ category }) => {
   if (Category.getName(category) === Category.samplingPointDataCategoryName) return 'samplingPointData'
-  if (Category.hasLocationExtraProp(category)) return 'geoPackage'
   if (Category.isReportingData(category)) return 'reportingData'
   return null
 }
@@ -58,7 +57,7 @@ const CategoryList = (props) => {
       renderItem: ({ item: category }) => Category.getName(category),
       width: '1fr',
     },
-    // TYPE (reporting data / GeoPackage / Sampling Point Data / blank for a plain category)
+    // TYPE (reporting data / Sampling Point Data / blank for a plain category)
     {
       key: 'type',
       header: 'common.type',

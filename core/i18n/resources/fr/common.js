@@ -1377,8 +1377,10 @@ La propriété supplémentaire '${locationItemExtraDefName}' sera déverrouillé
 
 Le nom de la catégorie sera effacé (vous devrez lui donner un nouveau nom), et la propriété supplémentaire '${locationItemExtraDefName}' sera déverrouillée : elle pourra être renommée, son type modifié ou elle pourra être supprimée comme n'importe quelle autre propriété supplémentaire. Ses données ne sont pas affectées.`,
     },
-    geoPackageCategory: 'Ceci est une catégorie GeoPackage',
+    geoPackageCategory: 'Cette catégorie a des capacités géographiques',
+    geoPackageCategoryInfo: `Cette catégorie possède une propriété supplémentaire nommée '${locationItemExtraDefName}', qui lui permet d'être exportée au format GeoPackage.`,
     samplingPointDataCategoryType: "Ceci est la catégorie Données de points d'échantillonnage",
+    samplingPointDataCategoryTypeInfo: `Il s'agit d'une catégorie prédéfinie pour les données de points d'échantillonnage. Elle possède une propriété supplémentaire nommée '${locationItemExtraDefName}', qui lui permet d'être exportée au format GeoPackage.`,
     createCategory: {
       menuLabel: 'Ajouter une catégorie',
       simple: 'Catégorie simple',
@@ -1386,13 +1388,17 @@ Le nom de la catégorie sera effacé (vous devrez lui donner un nouveau nom), et
     },
     createSamplingPointDataCategory: {
       buttonLabel: "Catégorie Données de points d'échantillonnage",
+      description:
+        "Catégorie prédéfinie pour les données de points d'échantillonnage, incluant un champ de localisation pour chaque élément.",
       message: `Créer une nouvelle catégorie Données de points d'échantillonnage ?
 
 Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux éléments.`,
     },
     createGeoPackageCategory: {
-      buttonLabel: 'Catégorie GeoPackage',
-      message: `Créer une nouvelle catégorie GeoPackage ?
+      buttonLabel: 'Catégorie avec capacités géographiques',
+      description:
+        'Ajoute un champ de localisation aux éléments, afin que la catégorie puisse être exportée au format GeoPackage.',
+      message: `Créer une nouvelle catégorie avec capacités géographiques ?
 
 Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux éléments.`,
     },

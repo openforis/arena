@@ -13,6 +13,7 @@ import { UploadButton } from '@webapp/components/form'
 import { designerModules, appModuleUri } from '@webapp/app/appModules'
 import * as API from '@webapp/service/api'
 import { SurveyActions, useSurveyId, useCategoryByName } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
@@ -24,6 +25,7 @@ const TableHeaderLeft = (props) => {
   const { state, setState } = headerProps
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const i18n = useI18n()
   const surveyId = useSurveyId()
 
   const Actions = useActions({ setState })
@@ -97,6 +99,13 @@ const TableHeaderLeft = (props) => {
     return <div></div>
   }
 
+  const categoryTypeMenuItemContent = ({ labelKey, descriptionKey }) => (
+    <div className="button-menu__item-with-description">
+      <span className="button-menu__item-label">{i18n.t(labelKey)}</span>
+      <span className="button-menu__item-description">{i18n.t(descriptionKey)}</span>
+    </div>
+  )
+
   return (
     <>
       <span className="category-list__add-category-btn-group" style={{ display: 'inline-flex' }}>
@@ -116,13 +125,19 @@ const TableHeaderLeft = (props) => {
               : [
                   {
                     key: 'sampling-point-data',
-                    label: 'categoryEdit.createSamplingPointDataCategory.buttonLabel',
+                    content: categoryTypeMenuItemContent({
+                      labelKey: 'categoryEdit.createSamplingPointDataCategory.buttonLabel',
+                      descriptionKey: 'categoryEdit.createSamplingPointDataCategory.description',
+                    }),
                     onClick: () => confirmCreateTemplateCategory('samplingPointData'),
                   },
                 ]),
             {
               key: 'geopackage',
-              label: 'categoryEdit.createGeoPackageCategory.buttonLabel',
+              content: categoryTypeMenuItemContent({
+                labelKey: 'categoryEdit.createGeoPackageCategory.buttonLabel',
+                descriptionKey: 'categoryEdit.createGeoPackageCategory.description',
+              }),
               onClick: () => confirmCreateTemplateCategory('geoPackage'),
             },
           ]}
