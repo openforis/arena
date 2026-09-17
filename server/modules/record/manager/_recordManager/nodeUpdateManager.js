@@ -122,7 +122,7 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
           t
         )
       } else {
-        // non-preview records: soft-delete (unchanged, out of scope for this fix)
+        // non-preview records: soft-delete; no-op if the file row is already missing
         await FileRepository.markFileAsDeleted(surveyId, fileUuidPrev, t)
       }
     }
