@@ -141,7 +141,7 @@
     "@turf/union": "^7.3.2",
     "@uiw/react-codemirror": "^4.25.4",
     "ace-builds": "^1.43.6",
-    "adm-zip": "^0.5.16",
+    "adm-zip": "^0.6.1",
     "ai": "^5",
     "archiver": "^7.0.1",
     "axios": "^1.13.4",
@@ -176,7 +176,7 @@
     "ncp": "^2.0.0",
     "node-schedule": "^2.1.1",
     "node-stream-zip": "^1.15.0",
-    "nodemailer": "^7.0.13",
+    "nodemailer": "^10.0.10",
     "path": "^0.12.7",
     "pg": "^8.17.2",
     "pg-query-stream": "^4.11.2",
@@ -215,12 +215,19 @@
     "swagger-ui-express": "^5.0.1",
     "to-snake-case": "^1.0.0",
     "use-supercluster": "^1.2.0",
-    "uuid": "^10.0.0",
+    "uuid": "^14.0.2",
     "xml-js": "^1.6.11",
     "zod": "^3.23.8"
   },
   "resolutions": {
-    "playwright-core": "1.24.2"
+    "playwright-core": "1.24.2",
+    "css-modules-loader-core/postcss": "^8.5.28",
+    "css-img-datauri-stream/underscore": "^1.13.8",
+    "css-img-datauri-stream/mime": "^1.6.0",
+    "postcss-modules-extract-imports/postcss": "^8.5.28",
+    "postcss-modules-local-by-default/postcss": "^8.5.28",
+    "postcss-modules-scope/postcss": "^8.5.28",
+    "postcss-modules-values/postcss": "^8.5.28"
   },
   "arenaClientPackages": {
     "META": "This exists to minimize the final Docker server image",
