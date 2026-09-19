@@ -103,7 +103,7 @@
     "sass-loader": "^17",
     "skeleton-loader": "^2.0.0",
     "style-loader": "^4.0.0",
-    "typescript": "^5.9.3",
+    "typescript": "^6",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^5.104.1",
     "webpack-bundle-analyzer": "^5.2.0",
