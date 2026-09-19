@@ -36,7 +36,7 @@ const ResultSchema = z.object({
   translations: z.array(
     z.object({
       id: z.string(),
-      byLang: z.record(z.string()),
+      byLang: z.record(z.string(), z.string()),
     })
   ),
 })
