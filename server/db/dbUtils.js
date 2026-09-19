@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 import * as pgPromise from 'pg-promise'
-import * as _QueryStream from 'pg-query-stream'
+import _QueryStream from 'pg-query-stream'
 
 import { Objects, Strings } from '@openforis/arena-core'
 

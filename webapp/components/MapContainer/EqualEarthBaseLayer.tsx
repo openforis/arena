@@ -1,7 +1,14 @@
 import { createElementObject, createLayerComponent, type LayerProps } from '@react-leaflet/core'
 import { maplibreGL } from '@maplibre/maplibre-gl-leaflet'
+import { setWorkerUrl } from 'maplibre-gl'
 import type { MaplibreGL as MaplibreGLLayer } from 'leaflet'
 import type { GeoJSONSource, StyleSpecification } from 'maplibre-gl'
+
+// maplibre-gl v6 is ESM-only and can't have its worker bundled by webpack - the worker file
+// (and its own maplibre-gl-shared.mjs sibling chunk) is instead copied to this path verbatim by
+// CopyPlugin in webpack.config.babel.js, and fetched from there at runtime. Must run before any
+// map is created, so it's called at module scope rather than inside the component.
+setWorkerUrl('/maplibre-gl/maplibre-gl-worker.mjs')
 
 import {
   DEFAULT_BLEND_ZOOM_RANGE,

@@ -8,6 +8,7 @@ import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import { GitRevisionPlugin } from 'git-revision-webpack-plugin'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
+import CopyPlugin from 'copy-webpack-plugin'
 
 import { v4 as uuidv4 } from 'uuid'
 
@@ -68,6 +69,18 @@ const plugins = [
     },
   }),
   new CleanUpStatsPlugin(),
+  // maplibre-gl v6 is ESM-only and loads its worker (and the worker's own maplibre-gl-shared.mjs
+  // sibling chunk) at runtime via a URL rather than letting webpack bundle it - see setWorkerUrl()
+  // call in EqualEarthBaseLayer.tsx, which must be kept in sync with this destination path.
+  new CopyPlugin({
+    patterns: [
+      {
+        from: path.resolve(__dirname, 'node_modules/maplibre-gl/dist'),
+        to: 'maplibre-gl/[name][ext]',
+        filter: (resourcePath) => /maplibre-gl-(worker|shared)\.mjs$/.test(resourcePath),
+      },
+    ],
+  }),
 ]
 
 if (isDevelopment) {
@@ -84,6 +97,12 @@ const webPackConfig = {
   entry: ['./webapp/Main.js'],
   mode: environment,
   devtool: 'source-map',
+  // maplibre-gl's own runtime worker-loading code (new Worker(dynamicUrl, ...)) is flagged by
+  // webpack as a "critical dependency" since the URL isn't statically analyzable - this is
+  // expected: the worker is served separately (see the CopyPlugin config below and
+  // EqualEarthBaseLayer.tsx's setWorkerUrl() call), not bundled, so the warning is a false
+  // positive that only clutters output and pops the dev-server error overlay.
+  ignoreWarnings: [{ module: /maplibre-gl[/\\]dist[/\\]maplibre-gl\.mjs$/, message: /Critical dependency/ }],
   resolve: {
     extensions: [
       '.webpack-loader.js',
