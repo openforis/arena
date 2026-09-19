@@ -113,9 +113,9 @@
     "yarn-audit-fix": "^11"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^2",
-    "@ai-sdk/google": "^2",
-    "@ai-sdk/openai": "^2",
+    "@ai-sdk/anthropic": "^4",
+    "@ai-sdk/google": "^4",
+    "@ai-sdk/openai": "^4",
     "@aws-sdk/client-s3": "^3.1112.0",
     "@codemirror/autocomplete": "^6.20.0",
     "@codemirror/lang-javascript": "^6.2.4",
@@ -142,7 +142,7 @@
     "@uiw/react-codemirror": "^4.25.4",
     "ace-builds": "^1.43.6",
     "adm-zip": "^0.6.1",
-    "ai": "^5",
+    "ai": "^7",
     "archiver": "^8",
     "axios": "^1.13.4",
     "buffer": "^6.0.3",
