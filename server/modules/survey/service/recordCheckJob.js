@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -58,7 +58,7 @@ export default class RecordCheckJob extends Job {
       this.tx
     )
 
-    this.total = R.length(recordsUuidAndCycle)
+    this.total = A.length(recordsUuidAndCycle)
     this.logDebugOptional(`${this.total} records to check`)
 
     let index = 0
@@ -334,7 +334,7 @@ export default class RecordCheckJob extends Job {
     }
 
     // 4. apply default values and recalculate applicability
-    const nodeDefAddedOrUpdatedUuidsUnique = new Set(R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids))
+    const nodeDefAddedOrUpdatedUuidsUnique = new Set(A.concat(nodeDefAddedUuids, nodeDefUpdatedUuids))
     for (const nodeInserted of Object.values(nodesInsertedByUuid)) {
       nodeDefAddedOrUpdatedUuidsUnique.add(Node.getNodeDefUuid(nodeInserted))
     }
@@ -369,13 +369,13 @@ export default class RecordCheckJob extends Job {
 
     // 6. validate nodes (also re-validate node defs whose validations alone changed, even though their
     // values were not recomputed above)
-    const nodeDefToValidateUuidsUnique = new Set(R.concat(nodeDefAddedOrUpdatedUuids, nodeDefValidationUpdatedUuids))
+    const nodeDefToValidateUuidsUnique = new Set(A.concat(nodeDefAddedOrUpdatedUuids, nodeDefValidationUpdatedUuids))
     const nodeDefAddedOrUpdatedOrValidationUpdatedUuids = Array.from(nodeDefToValidateUuidsUnique)
     if (
       forceFullCheck ||
-      !R.isEmpty(nodeDefAddedOrUpdatedOrValidationUpdatedUuids) ||
-      !R.isEmpty(nodeDefDeletedUuids) ||
-      !R.isEmpty(allUpdatedNodesByUuid)
+      !A.isEmpty(nodeDefAddedOrUpdatedOrValidationUpdatedUuids) ||
+      !A.isEmpty(nodeDefDeletedUuids) ||
+      !A.isEmpty(allUpdatedNodesByUuid)
     ) {
       const nodeDefUuidsToValidate = forceFullCheck
         ? allNotDeletedNodeDefUuids
@@ -440,7 +440,7 @@ const _insertMissingSingleNode = async ({ survey, childDef, record, parentNode, 
     return {}
   }
   const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
-  if (!R.isEmpty(children)) {
+  if (!A.isEmpty(children)) {
     // single node already inserted
     return {}
   }

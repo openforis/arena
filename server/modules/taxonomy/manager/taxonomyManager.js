@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -366,7 +366,7 @@ const _updateTaxaExtraDefProp = async ({ surveyId, taxonomyUuid, propName, extra
 
   const taxaUpdated = []
   taxa.forEach((taxon) => {
-    if (R.isNil(Taxon.getExtraProp(propName)(taxon))) return
+    if (A.isNil(Taxon.getExtraProp(propName)(taxon))) return
 
     const taxonUpdated = deleted
       ? Taxon.dissocExtraProp(propName)(taxon)

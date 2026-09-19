@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '../../../../../../core/survey/survey'
@@ -27,15 +27,15 @@ export default class SurveyCreatorJob extends Job {
 
     const collectUri = CollectSurvey.getUri(collectSurvey)
 
-    const startingName = newSurveyParam.name || R.pipe(R.split('/'), R.last)(collectUri)
+    const startingName = newSurveyParam.name || A.pipe(A.split('/'), A.last)(collectUri)
     const name = await SurveyUniqueNameGenerator.findUniqueSurveyName({ startingName })
 
-    const languages = R.pipe(CollectSurvey.getElementsByName('language'), R.map(CollectSurvey.getText))(collectSurvey)
+    const languages = A.pipe(CollectSurvey.getElementsByName('language'), A.map(CollectSurvey.getText))(collectSurvey)
 
     const defaultLanguage = languages[0]
 
     const labels = CollectSurvey.toLabels('project', defaultLanguage)(collectSurvey)
-    const label = R.prop(defaultLanguage, labels)
+    const label = A.prop(defaultLanguage, labels)
 
     const descriptions = CollectSurvey.toLabels('description', defaultLanguage)(collectSurvey)
 
@@ -84,6 +84,6 @@ export default class SurveyCreatorJob extends Job {
       return srsIdCleaned === 'WGS84' ? '4326' : srsIdCleaned
     })
     const srss = await SrsManager.fetchSRSsByCodes({ srsCodes }, this.tx)
-    return srss.map(R.omit([Srs.keys.wkt]))
+    return srss.map(A.omit([Srs.keys.wkt]))
   }
 }

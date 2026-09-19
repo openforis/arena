@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { Dates } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
@@ -85,7 +83,7 @@ export const getNodeSelectQuery = ({
 }) => {
   const schema = getSurveyDBSchema(surveyId)
 
-  const selectFields = (includeRecordUuid ? tableColumnsSelect : R.without(['record_uuid'], tableColumnsSelect)).map(
+  const selectFields = (includeRecordUuid ? tableColumnsSelect : A.without(['record_uuid'], tableColumnsSelect)).map(
     (field) => `n.${field}`
   )
 
@@ -392,7 +390,7 @@ export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client =
     WHERE node_def_uuid IN ($1:csv)
     `,
     [nodeDefUuids],
-    R.prop('rowCount')
+    A.prop('rowCount')
   )
 
 export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>

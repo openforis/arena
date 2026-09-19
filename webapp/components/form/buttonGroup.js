@@ -1,7 +1,7 @@
 import './buttonGroup.scss'
 
 import classNames from 'classnames'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import PropTypes from 'prop-types'
 import MuiButtonGroup from '@mui/material/ButtonGroup'
 
@@ -23,7 +23,7 @@ const ButtonGroup = ({
       if (selected && !multiple && !deselectable) return
       let value
       if (multiple) {
-        value = R.ifElse(R.always(selected), R.without(item.key), R.append(item.key))(selectedItemKey)
+        value = A.ifElse(A.always(selected), A.without(item.key), A.append(item.key))(selectedItemKey)
       } else if (!selected) {
         value = item.key
       } else {
@@ -36,7 +36,7 @@ const ButtonGroup = ({
     <MuiButtonGroup className={classNames('btn-group', className)}>
       {items.map((item) => {
         const { key, disabled: itemDisabled, icon, iconClassName, label, labelParams, title } = item
-        const selected = selectedItemKey === key || (multiple && R.includes(key, selectedItemKey))
+        const selected = selectedItemKey === key || (multiple && A.includes(key, selectedItemKey))
         const variant = selected ? 'contained' : 'outlined'
         return (
           <Button

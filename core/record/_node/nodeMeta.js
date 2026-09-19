@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Nodes } from '@openforis/arena-core'
 
@@ -16,24 +16,24 @@ const metaKeys = {
 
 // READ
 
-const getMeta = R.propOr({}, keys.meta)
+const getMeta = A.propOr({}, keys.meta)
 
-const isChildApplicable = (childDefUuid) => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])
-const isDefaultValueApplied = R.pathOr(false, [keys.meta, metaKeys.defaultValue])
-const isQualifierValueApplied = R.pathOr(false, [keys.meta, metaKeys.qualifierValueApplied])
+const isChildApplicable = (childDefUuid) => A.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])
+const isDefaultValueApplied = A.pathOr(false, [keys.meta, metaKeys.defaultValue])
+const isQualifierValueApplied = A.pathOr(false, [keys.meta, metaKeys.qualifierValueApplied])
 
-const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
+const getHierarchy = A.pathOr([], [keys.meta, metaKeys.hierarchy])
 
 const isChildEditable = (childDefUuid) => (node) => Nodes.isChildEditable(node, childDefUuid)
 
 const isChildVisible = (childDefUuid) => (node) => Nodes.isChildVisible(node, childDefUuid)
 
 // Code metadata
-const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode])
+const getHierarchyCode = A.pathOr([], [keys.meta, metaKeys.hierarchyCode])
 
 // UPDATE
 
-const assocMeta = R.assoc(keys.meta)
+const assocMeta = A.assoc(keys.meta)
 
 const _updateMeta = (updateFn) => (node) => {
   const metaOld = getMeta(node)
@@ -41,7 +41,7 @@ const _updateMeta = (updateFn) => (node) => {
   return assocMeta(metaUpdated)(node)
 }
 
-const mergeMeta = (meta) => _updateMeta((metaOld) => R.mergeLeft(meta)(metaOld))
+const mergeMeta = (meta) => _updateMeta((metaOld) => A.mergeLeft(meta)(metaOld))
 
 const assocIsDefaultValueApplied = (value) =>
   _updateMeta((metaOld) => {
@@ -81,7 +81,7 @@ const assocChildApplicability = ({ nodeDefUuid, applicable }) =>
       childApplicabilityUpdated[nodeDefUuid] = false
     }
     const metaUpdated = { ...metaOld }
-    if (R.isEmpty(childApplicabilityUpdated)) {
+    if (A.isEmpty(childApplicabilityUpdated)) {
       delete metaUpdated[metaKey]
     } else {
       metaUpdated[metaKey] = childApplicabilityUpdated

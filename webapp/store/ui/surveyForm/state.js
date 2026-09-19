@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -13,8 +13,8 @@ import { RecordState } from '@webapp/store/ui/record'
 import * as UiState from '../state'
 
 export const stateKey = 'surveyForm'
-const getState = R.pipe(UiState.getState, R.propOr({}, stateKey))
-const getStateProp = (prop, defaultTo = null) => R.pipe(getState, R.propOr(defaultTo, prop))
+const getState = A.pipe(UiState.getState, A.propOr({}, stateKey))
+const getStateProp = (prop, defaultTo = null) => A.pipe(getState, A.propOr(defaultTo, prop))
 
 const keys = {
   treeSelectViewMode: 'treeSelectViewMode', // Tree select view mode
@@ -30,20 +30,20 @@ const keys = {
 // context state is global state
 export const getGlobalStateTreeSelectViewMode = getStateProp(keys.treeSelectViewMode, TreeSelectViewMode.onlyPages)
 // context state is SurveyFormState
-export const getTreeSelectViewMode = R.propOr(TreeSelectViewMode.onlyPages, keys.treeSelectViewMode)
-export const assocTreeSelectViewMode = R.assoc(keys.treeSelectViewMode)
+export const getTreeSelectViewMode = A.propOr(TreeSelectViewMode.onlyPages, keys.treeSelectViewMode)
+export const assocTreeSelectViewMode = A.assoc(keys.treeSelectViewMode)
 
 export const getFormActiveNodeDefUuid = (state) =>
   getStateProp(keys.nodeDefUuid, NodeDef.getUuid(getFormActivePageNodeDef(state)))(state)
-export const assocFormActiveNodeDefUuid = R.assoc(keys.nodeDefUuid)
+export const assocFormActiveNodeDefUuid = A.assoc(keys.nodeDefUuid)
 
 // ====== nodeDefUuidPage
 
 export const assocFormActivePage = (nodeDef) =>
-  R.ifElse(
-    R.always(R.isNil(nodeDef)),
-    R.dissoc(keys.nodeDefUuidPage),
-    R.assoc(keys.nodeDefUuidPage, NodeDef.getUuid(nodeDef))
+  A.ifElse(
+    A.always(A.isNil(nodeDef)),
+    A.dissoc(keys.nodeDefUuidPage),
+    A.assoc(keys.nodeDefUuidPage, NodeDef.getUuid(nodeDef))
   )
 
 export const getFormActivePageNodeDef = (state) => {
@@ -55,11 +55,11 @@ export const getFormActivePageNodeDef = (state) => {
 }
 
 export const isNodeDefFormActivePage = (nodeDef) =>
-  R.pipe(getFormActivePageNodeDef, R.propEq(NodeDef.keys.uuid, NodeDef.getUuid(nodeDef)))
+  A.pipe(getFormActivePageNodeDef, A.propEq(NodeDef.keys.uuid, NodeDef.getUuid(nodeDef)))
 
 // ====== nodeDefUuidAddChildTo
 
-export const assocNodeDefAddChildTo = (nodeDef) => R.assoc(keys.nodeDefUuidAddChildTo, NodeDef.getUuid(nodeDef))
+export const assocNodeDefAddChildTo = (nodeDef) => A.assoc(keys.nodeDefUuidAddChildTo, NodeDef.getUuid(nodeDef))
 
 export const getNodeDefAddChildTo = (state) => {
   const survey = SurveyState.getSurvey(state)
@@ -72,21 +72,21 @@ export const getNodeDefAddChildTo = (state) => {
 
 export const assocFormPageNode = (nodeDefUuid, nodeUuid) => {
   const path = [keys.nodeDefUuidPageNodeUuid, nodeDefUuid]
-  return nodeUuid ? R.assocPath(path, nodeUuid) : R.dissocPath(path)
+  return nodeUuid ? A.assocPath(path, nodeUuid) : A.dissocPath(path)
 }
 
 export const assocFormPageNodes = (formPageNodeUuidByNodeDefUuid) => (state) =>
-  R.pipe(
-    R.keys,
-    R.reduce((stateAcc, nodeDefUuid) => {
-      const nodeUuid = R.prop(nodeDefUuid, formPageNodeUuidByNodeDefUuid)
+  A.pipe(
+    A.keys,
+    A.reduce((stateAcc, nodeDefUuid) => {
+      const nodeUuid = A.prop(nodeDefUuid, formPageNodeUuidByNodeDefUuid)
       return assocFormPageNode(nodeDefUuid, nodeUuid)(stateAcc)
     }, state)
   )(formPageNodeUuidByNodeDefUuid)
 
 export const getPagesUuidMap = getStateProp(keys.nodeDefUuidPageNodeUuid, {})
 
-export const getFormPageNodeUuid = (nodeDef) => R.pipe(getPagesUuidMap, R.prop(NodeDef.getUuid(nodeDef)))
+export const getFormPageNodeUuid = (nodeDef) => A.pipe(getPagesUuidMap, A.prop(NodeDef.getUuid(nodeDef)))
 
 export const getFormPageParentNode = (nodeDef) => (state) => {
   const survey = SurveyState.getSurvey(state)
@@ -121,24 +121,24 @@ export const getFormPageParentNode = (nodeDef) => (state) => {
 
 export const showPageNavigation = getStateProp(keys.showPageNavigation, true)
 
-export const setShowPageNavigation = (value) => R.assoc(keys.showPageNavigation, value)
+export const setShowPageNavigation = (value) => A.assoc(keys.showPageNavigation, value)
 
 export const expandedPageNavigation = getStateProp(keys.expandedPageNavigation, false)
 
-export const setExpandedPageNavigation = (value) => R.assoc(keys.expandedPageNavigation, value)
+export const setExpandedPageNavigation = (value) => A.assoc(keys.expandedPageNavigation, value)
 
 // ============ Form nodeDef label Function
 export const getNodeDefLabelType = getStateProp(keys.nodeDefLabelType, NodeDef.NodeDefLabelTypes.label)
 
-export const setNodeDefLabelType = (value) => R.assoc(keys.nodeDefLabelType, value)
+export const setNodeDefLabelType = (value) => A.assoc(keys.nodeDefLabelType, value)
 
 // ====== NodeDef update actions
 
 // On nodeDef delete, dissoc nodeDefUuidPage and nodeDefUuidAddChildTo if they correspond to nodeDef
 export const dissocParamsOnNodeDefDelete = (nodeDef) => (surveyFormState) => {
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  return R.pipe(
-    R.ifElse(R.propEq(keys.nodeDefUuidPage, nodeDefUuid), R.dissoc(keys.nodeDefUuidPage), R.identity),
-    R.ifElse(R.propEq(keys.nodeDefUuidAddChildTo, nodeDefUuid), R.dissoc(keys.nodeDefUuidAddChildTo), R.identity)
+  return A.pipe(
+    A.ifElse(A.propEq(keys.nodeDefUuidPage, nodeDefUuid), A.dissoc(keys.nodeDefUuidPage), A.identity),
+    A.ifElse(A.propEq(keys.nodeDefUuidAddChildTo, nodeDefUuid), A.dissoc(keys.nodeDefUuidAddChildTo), A.identity)
   )(surveyFormState)
 }

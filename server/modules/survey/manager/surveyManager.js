@@ -1,5 +1,5 @@
 import pgPromise from 'pg-promise'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Numbers, Objects } from '@openforis/arena-core'
 import { DBMigrator, Schemata } from '@openforis/arena-server'
@@ -319,7 +319,7 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
     TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft }, client),
   ])
 
-  let survey = R.pipe(
+  let survey = A.pipe(
     Survey.assocNodeDefsSimple({ nodeDefs }),
     Survey.assocCategories(categories),
     Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))
@@ -533,14 +533,14 @@ const updateSurveyCyclesProp = async ({ surveyId, value, valuePrev }, client = d
   const cycles = Object.keys(value)
   const cyclesPrev = Object.keys(valuePrev)
   // Add new cycles to nodeDefs
-  const cyclesAdded = R.difference(cycles, cyclesPrev)
-  if (!R.isEmpty(cyclesAdded)) {
-    await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, client)
+  const cyclesAdded = A.difference(cycles, cyclesPrev)
+  if (!A.isEmpty(cyclesAdded)) {
+    await NodeDefManager.addNodeDefsCycles(surveyId, A.last(cyclesPrev), cyclesAdded, client)
   }
 
   // Remove delete cycles from nodeDefs
-  const cyclesRemoved = R.difference(cyclesPrev, cycles)
-  if (!R.isEmpty(cyclesRemoved)) {
+  const cyclesRemoved = A.difference(cyclesPrev, cycles)
+  if (!A.isEmpty(cyclesRemoved)) {
     await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, client)
   }
 }
@@ -558,7 +558,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
     for (const [key, value] of Object.entries(props)) {
       const valuePrev = propsPrev[key]
 
-      if (!R.equals(value, valuePrev)) {
+      if (!A.equals(value, valuePrev)) {
         await Promise.all([
           SurveyRepository.updateSurveyProp(surveyId, key, value, t),
           SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
@@ -617,7 +617,7 @@ export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
 export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
   client.tx(async (t) => {
     await SurveyRepository.publishSurveyProps(surveyId, t)
-    if (!R.isEmpty(langsDeleted)) {
+    if (!A.isEmpty(langsDeleted)) {
       await SurveyRepository.deleteSurveyLabelsAndDescriptions(surveyId, langsDeleted, t)
     }
   })

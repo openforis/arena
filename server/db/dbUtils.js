@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import * as pgPromise from 'pg-promise'
 import _QueryStream from 'pg-query-stream'
 
@@ -105,10 +105,10 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
  * @returns {string} Generated query string.
  */
 export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
-  const getColumnName = (col) => R.propOr(col, 'name', col)
+  const getColumnName = (col) => A.propOr(col, 'name', col)
 
   const idColumnName = getColumnName(idCol)
-  const idColCast = R.propOr('text', 'cast', idCol)
+  const idColCast = A.propOr('text', 'cast', idCol)
 
   const cols = [`?${idColumnName}`, ...updateCols]
 

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { FileNames } from '@openforis/arena-core'
 
@@ -92,9 +92,9 @@ export const createFileFromNode = ({ node, size = null, content = null }) =>
   })
 
 export const truncateFileName = (fileName, maxLength = 10) => {
-  if (fileName && !R.isEmpty(fileName)) {
+  if (fileName && !A.isEmpty(fileName)) {
     const extension = FileNames.getExtension(fileName)
-    return R.pipe(R.dropLast(extension.length + 1), truncate(maxLength), (name) => `${name}.${extension}`)(fileName)
+    return A.pipe(A.dropLast(extension.length + 1), truncate(maxLength), (name) => `${name}.${extension}`)(fileName)
   }
 
   return ''
@@ -110,16 +110,16 @@ export const getChainUuid = ObjectUtils.getProp(propKeys.chainUuid)
 export const getCycle = ObjectUtils.getProp(propKeys.cycle, cycleOneKey)
 export const getNodeUuid = ObjectUtils.getProp(propKeys.nodeUuid)
 export const getRecordUuid = ObjectUtils.getProp(propKeys.recordUuid)
-export const getContent = R.prop(keys.content)
-export const getExtension = R.pipe(getName, FileNames.getExtension)
+export const getContent = A.prop(keys.content)
+export const getExtension = A.pipe(getName, FileNames.getExtension)
 export const getType = ObjectUtils.getProp(propKeys.type, SurveyFileType.recordAttachment)
 
 // UPDATE
 export const { assocLabels } = ObjectUtils
-export const assocContent = R.assoc(keys.content)
+export const assocContent = A.assoc(keys.content)
 export const assocSize = (size) => ObjectUtils.setProp(propKeys.size, size)
 
-const assocProps = R.assoc(keys.props)
+const assocProps = A.assoc(keys.props)
 
 const hasInvalidProps = (file) => Object.hasOwn(getProps(file), invalidPropKeys.fileName)
 

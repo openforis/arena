@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -39,7 +39,7 @@ const _validateNodeDefs = async ({ survey, nodeDef, updatedNodeDefs, nodeDefsDep
     nodeDefsValidationsAcc[NodeDef.getUuid(nodeDefToValidate)] = nodeDefsValidationArray[index]
     return nodeDefsValidationsAcc
   }, {})
-  const valid = nodeDefsValidationArray.every(Validation.isValid)
+  const valid = nodeDefsValidationArray.every((validation) => Validation.isValid(validation))
 
   return Validation.newInstance(valid, nodeDefsValidationsByUuid)
 }
@@ -342,7 +342,7 @@ export const markNodeDefsDeleted = async ({ user, surveyId, cycle, nodeDefUuids 
 
   for (const nodeDefUuid of nodeDefUuids) {
     const _response = await markNodeDefDeleted({ user, surveyId, cycle, nodeDefUuid }, client)
-    response = R.mergeDeepLeft(response, _response)
+    response = A.mergeDeepLeft(response, _response)
   }
 
   return response

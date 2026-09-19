@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -85,10 +85,10 @@ export const updateNodeDefTest = async () => {
   const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId({ surveyId, cycle: Survey.cycleOneKey, draft: true })
 
   // Only one node def with that name
-  expect(R.filter((n) => NodeDef.getName(n) === newName, nodeDefs).length).toBe(1)
+  expect(A.filter((n) => NodeDef.getName(n) === newName, nodeDefs).length).toBe(1)
 
   // Do not modify existing nodes
-  const reloadedNodeDef2 = R.find((n) => NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef2))(nodeDefs)
+  const reloadedNodeDef2 = A.find((n) => NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef2))(nodeDefs)
   expect(NodeDef.getType(reloadedNodeDef2)).toBe(NodeDef.getType(nodeDef2))
   expect(NodeDef.getName(reloadedNodeDef2)).toBe(NodeDef.getName(nodeDef2))
 }

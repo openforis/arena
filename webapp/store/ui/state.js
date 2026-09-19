@@ -1,5 +1,5 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const stateKey = 'ui'
 
-export const getState = R.propOr({}, stateKey)
+export const getState = A.propOr({}, stateKey)

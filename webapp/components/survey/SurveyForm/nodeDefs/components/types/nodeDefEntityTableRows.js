@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -40,7 +40,7 @@ const NodeDefEntityTableRows = (props) => {
   const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
   const nodeDefUuid = nodeDef?.uuid
 
-  const nodeDefColumns = R.reduce(
+  const nodeDefColumns = A.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {
       const nodeDefChild = Survey.getNodeDefByUuid(nodeDefColumnUuid)(survey)
       if (nodeDefChild && !NodeDef.isAnalysis(nodeDefChild)) {
@@ -79,7 +79,7 @@ const NodeDefEntityTableRows = (props) => {
     left: 0,
   })
 
-  const headerRowRendered = edit || !R.isEmpty(nodes)
+  const headerRowRendered = edit || !A.isEmpty(nodes)
   const { columnHeaderHeight, resizableCellHeight } = useColumnHeaderHeight({
     headerRef: tableRowsHeaderRef,
     enabled: headerRowRendered,

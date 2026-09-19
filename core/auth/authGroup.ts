@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { UserAuthGroup } from '@openforis/arena-core'
 
@@ -107,20 +107,20 @@ const sortedGroupNames = [
   groupNames.surveyGuest,
 ]
 
-export const getUuid = R.prop(keys.uuid)
+export const getUuid = A.prop(keys.uuid)
 
-export const getName = R.prop(keys.name)
+export const getName = A.prop(keys.name)
 
-export const getSurveyUuid = R.prop(keys.surveyUuid)
+export const getSurveyUuid = A.prop(keys.surveyUuid)
 
-export const getSurveyId = R.prop(keys.surveyId)
+export const getSurveyId = A.prop(keys.surveyId)
 
 export const getPermissions = (group: UserAuthGroup): string[] =>
   permissionsByGroupName[getName(group) as keyof typeof permissionsByGroupName] ?? []
 
-export const getRecordSteps = R.propOr([], keys.recordSteps)
+export const getRecordSteps = A.propOr([], keys.recordSteps)
 
-export const getRecordEditLevel = (step: string) => R.pipe(getRecordSteps, R.prop(step))
+export const getRecordEditLevel = (step: string) => A.pipe(getRecordSteps, A.prop(step))
 
 export const isSystemAdminGroup = (group: UserAuthGroup): boolean => getName(group) === groupNames.systemAdmin
 

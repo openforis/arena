@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects, Validation as ArenaValidation } from '@openforis/arena-core'
 
@@ -8,11 +8,7 @@ import { ValidatorErrorKeys } from './validatorErrorKeys'
 import * as ValidatorNameKeywords from './validatorNameKeywords'
 
 export type ValidatorResult =
-  | { key: string; params?: Record<string, unknown> }
-  | string
-  | ArenaValidation
-  | null
-  | undefined
+  { key: string; params?: Record<string, unknown> } | string | ArenaValidation | null | undefined
 
 export type ValidatorFn = (propName: string, obj: unknown) => ValidatorResult | Promise<ValidatorResult>
 
@@ -27,13 +23,13 @@ const validEmailRegex =
 export const getProp =
   (propName: string, defaultValue: unknown = null) =>
   (obj: unknown): unknown =>
-    R.pathOr(defaultValue, propName.split('.'))(obj as Record<string, unknown>)
+    A.pathOr(defaultValue, propName.split('.'))(obj as Record<string, unknown>)
 
 export const validateRequired =
   (errorKey: string): ValidatorFn =>
   (propName, obj) => {
-    const value = R.pipe(getProp(propName), R.defaultTo(''))(obj)
-    return R.isEmpty(value as string) ? { key: errorKey } : null
+    const value = A.pipe(getProp(propName), A.defaultTo(''))(obj)
+    return A.isEmpty(value as string) ? { key: errorKey } : null
   }
 
 export const validateItemPropUniqueness =
@@ -42,7 +38,7 @@ export const validateItemPropUniqueness =
   (propName, item: Record<string, unknown>) => {
     const hasDuplicates =
       items &&
-      R.any(
+      A.any(
         (i: Record<string, unknown>) =>
           !ObjectUtils.isEqual(i)(item) && getProp(propName)(i) === getProp(propName)(item),
         items

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -262,7 +262,7 @@ describe('Record Validation Test', () => {
     // 5 plots before => 4 plots after
     const nodeParent = RecordUtils.findNodeByPath('cluster/plot[4]')(survey, record)
     const nodeDefChild = Survey.getNodeDefByName('tree')(survey)
-    const validationCount = R.pipe(
+    const validationCount = A.pipe(
       Record.getValidation,
       RecordValidation.getValidationChildrenCount(Node.getUuid(nodeParent), NodeDef.getUuid(nodeDefChild))
     )(record)
@@ -271,7 +271,7 @@ describe('Record Validation Test', () => {
     await _deleteNode(Record.getParentNode(nodeParent)(record), 'plot', 5)
 
     const { record: recordUpdated } = getContext()
-    const validationCountUpdated = R.path(
+    const validationCountUpdated = A.path(
       [
         Validation.keys.validation,
         Validation.keys.fields,

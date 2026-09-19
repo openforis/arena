@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import { db } from '@server/db/db'
 
 import { NodeDefsFixer, Objects } from '@openforis/arena-core'
@@ -44,8 +44,8 @@ const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cycles
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyCycleKeys = Survey.getCycleKeys(surveyInfo)
 
-  const cyclesAdded = R.difference(cycles, cyclesPrev)
-  const cyclesDeleted = R.difference(cyclesPrev, cycles)
+  const cyclesAdded = A.difference(cycles, cyclesPrev)
+  const cyclesDeleted = A.difference(cyclesPrev, cycles)
 
   const batchUpdates = []
   Survey.getNodeDefsArray(survey)
@@ -155,7 +155,7 @@ export const fetchNodeDefsBySurveyId = async (
 
 const _propsUpdateRequiresParentLayoutUpdate = ({ nodeDef, props }) =>
   NodeDef.isCoordinate(nodeDef) &&
-  R.intersection(Object.keys(props))([
+  A.intersection(Object.keys(props))([
     NodeDef.propKeys.includeAccuracy,
     NodeDef.propKeys.includeAltitude,
     NodeDef.propKeys.includeAltitudeAccuracy,
@@ -264,8 +264,8 @@ export const updateNodeDefProps = async (
     }
     const logContent = {
       uuid: nodeDefUuid,
-      ...(R.isEmpty(props) ? {} : { props }),
-      ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
+      ...(A.isEmpty(props) ? {} : { props }),
+      ...(A.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
     }
 
     // persist changes in db
@@ -453,7 +453,7 @@ export const convertNodeDef = async ({ user, survey, nodeDefUuid, toType }, clie
 export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
   await NodeDefRepository.publishNodeDefsProps(surveyId, client)
 
-  if (!R.isEmpty(langsDeleted)) {
+  if (!A.isEmpty(langsDeleted)) {
     // delete labels
     await Promise.all(langsDeleted.map((lang) => NodeDefRepository.deleteNodeDefsLabels(surveyId, lang, client)))
     // delete descriptions

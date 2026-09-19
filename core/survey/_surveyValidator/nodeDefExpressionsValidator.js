@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
@@ -14,11 +14,11 @@ const { dependencyTypes } = SurveyDependencyTypes
 const expressionsByDependencyTypeFns = {
   [dependencyTypes.defaultValues]: NodeDef.getDefaultValues,
   [dependencyTypes.applicable]: NodeDef.getApplicable,
-  [dependencyTypes.validations]: R.pipe(NodeDef.getValidations, NodeDefValidations.getExpressions),
+  [dependencyTypes.validations]: A.pipe(NodeDef.getValidations, NodeDefValidations.getExpressions),
   [dependencyTypes.formula]: NodeDef.getFormula,
   [dependencyTypes.itemsFilter]: NodeDef.getItemsFilter,
-  [dependencyTypes.maxCount]: R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount),
-  [dependencyTypes.minCount]: R.pipe(NodeDef.getValidations, NodeDefValidations.getMinCount),
+  [dependencyTypes.maxCount]: A.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount),
+  [dependencyTypes.minCount]: A.pipe(NodeDef.getValidations, NodeDefValidations.getMinCount),
 }
 
 const applyIfUniquenessByDependencyType = {
@@ -40,7 +40,7 @@ const errorKeyByDependencyType = {
 }
 
 const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (propName, item) => {
-  const exprString = R.pathOr(null, propName.split('.'), item)
+  const exprString = A.pathOr(null, propName.split('.'), item)
   const isContextParent = SurveyDependencyTypes.isContextParentByDependencyType[dependencyType]
   const selfReferenceAllowed = SurveyDependencyTypes.selfReferenceAllowedByDependencyType[dependencyType]
 
@@ -57,7 +57,7 @@ const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (prop
 
 const _validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) => async (propName, nodeDefExpression) => {
   const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
-  return R.isEmpty(expr) && i < nodeDefExpressions.length - 1
+  return A.isEmpty(expr) && i < nodeDefExpressions.length - 1
     ? {
         key: Validation.messageKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty,
       }
@@ -65,7 +65,7 @@ const _validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) => async (propName
 }
 
 const _validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
-  R.any(
+  A.any(
     (nodeDefExpr) =>
       !ObjectUtils.isEqual(nodeDefExpression)(nodeDefExpr) &&
       NodeDefExpression.getExpression(nodeDefExpr) === NodeDefExpression.getExpression(nodeDefExpression) &&

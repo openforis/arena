@@ -59,8 +59,9 @@ const UserGroupsList = (): React.ReactElement => {
     [i18n, preferredLang]
   )
 
-  const onRowClick = (params: GridRowParams): void =>
+  const onRowClick = (params: GridRowParams): void => {
     navigate(`${appModuleUri(userModules.userGroup as AppModule)}${UserGroup.getUuid(params.row)}`)
+  }
 
   if (loading) {
     return <LoadingBar />

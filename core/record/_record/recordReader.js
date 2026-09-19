@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Nodes, Records } from '@openforis/arena-core'
 
@@ -24,7 +24,7 @@ const {
 /**
  * === simple getters.
  */
-export const getNodes = R.propOr({}, keys.nodes)
+export const getNodes = A.propOr({}, keys.nodes)
 export const getNodesArray = (record) => Object.values(getNodes(record))
 
 export { getNodeChildren, getNodeByUuid, getNodesByDefUuid, getRootNode, getParentNode }
@@ -61,10 +61,10 @@ export const getAncestorsAndSelf = (node) => (record) => {
 }
 
 export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => (record) =>
-  R.pipe(
+  A.pipe(
     getParentNode(node),
     (parentNode) => getAncestorsAndSelf(parentNode)(record),
-    R.find((ancestor) => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
+    A.find((ancestor) => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
   )(record)
 
 // Descendants
@@ -83,7 +83,7 @@ export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) =>
 }
 
 export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) =>
-  R.pipe(getNodeChildrenByDefUuid(parentNode, nodeDefUuid), R.head)
+  A.pipe(getNodeChildrenByDefUuid(parentNode, nodeDefUuid), A.head)
 
 export const getNodeChildIndex = (node) => (record) => {
   const parentNode = getParentNode(node)(record)
@@ -239,7 +239,7 @@ export const getEntityKeyNodes = (survey, nodeEntity) => (record) =>
   Records.getEntityKeyNodes({ survey, record, entity: nodeEntity })
 
 export const getEntityKeyValues = (survey, nodeEntity) =>
-  R.pipe(getEntityKeyNodes(survey, nodeEntity), R.map(Node.getValue))
+  A.pipe(getEntityKeyNodes(survey, nodeEntity), A.map(Node.getValue))
 
 export const findChildByKeyValues =
   ({ survey, parentNode, childDefUuid, keyValuesByDefUuid }) =>

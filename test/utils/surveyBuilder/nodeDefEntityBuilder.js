@@ -1,5 +1,5 @@
 import { uuidv4 } from '@core/uuid'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
@@ -52,10 +52,10 @@ export default class NodeDefEntityBuilder extends NodeDefBuilder {
 
     const defUuid = NodeDef.getUuid(def)
 
-    const defs = R.pipe(
-      R.map((childBuilder) => childBuilder.build(survey, defUpdated)),
-      R.mergeAll,
-      R.assoc(defUuid, defUpdated)
+    const defs = A.pipe(
+      A.map((childBuilder) => childBuilder.build(survey, defUpdated)),
+      A.mergeAll,
+      A.assoc(defUuid, defUpdated)
     )(this.childBuilders)
     const surveyUpdated = Survey.mergeNodeDefs(defs)(survey)
 
