@@ -1,6 +1,20 @@
+const fs = require('fs')
 const path = require('path')
 const glob = require('glob')
 const nodeExternals = require('webpack-node-externals')
+
+const isEsmOnlyModule = (moduleName) => {
+  const [first, second] = moduleName.split('/')
+  const packageName = first.startsWith('@') ? `${first}/${second}` : first
+  try {
+    const packageJson = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '..', 'node_modules', packageName, 'package.json'), 'utf8')
+    )
+    return packageJson.type === 'module'
+  } catch {
+    return false
+  }
+}
 
 const getEntry = (type) =>
   // glob v13 requires forward slashes; path.resolve uses backslashes on Windows.
@@ -55,7 +69,9 @@ const getResolve = () => ({
 module.exports = (type) => ({
   entry: getEntry(type),
   target: 'node', // Ignore built-in modules like path, fs, etc.
-  externals: [nodeExternals()], // Ignore all modules in node_modules folder
+  // Ignore all modules in node_modules folder, except the ESM-only ones: Jest can only require() ESM
+  // natively on Node >= 24.9, so they are bundled (and transpiled) into the test bundle instead.
+  externals: [nodeExternals({ allowlist: [isEsmOnlyModule] })],
   mode: 'development',
   devtool: 'source-map',
   cache: {
