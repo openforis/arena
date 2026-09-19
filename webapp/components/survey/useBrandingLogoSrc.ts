@@ -36,8 +36,9 @@ const toDisplayableImageBlob = (response: AxiosResponse<Blob>): Blob => {
     return blob
   }
   const headerType = response.headers?.['content-type']
+  const headerTypeString = typeof headerType === 'string' ? headerType : null
   const mimeType =
-    (headerType && headerType !== 'application/octet-stream' ? headerType : null) ||
+    (headerTypeString && headerTypeString !== 'application/octet-stream' ? headerTypeString : null) ||
     mimeTypeFromContentDisposition(response.headers?.['content-disposition']) ||
     'application/octet-stream'
   return new Blob([blob], { type: mimeType })
