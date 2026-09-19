@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -120,7 +120,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       { surveyId, recordUuid },
       client
     )
-    const filesMissing = R.isEmpty(nodeDefFileUuids)
+    const filesMissing = A.isEmpty(nodeDefFileUuids)
       ? 0
       : await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid, nodeDefFileUuids }, client)
 
@@ -259,7 +259,7 @@ export const fetchRecordAndNodesByUuid = async (
 
   // Preview records are always initialized from scratch with the requesting user's context,
   // so their applicability is already up to date and doesn't need recomputing here.
-  if (user && !R.isEmpty(indexedNodes) && !Record.isPreview(recordWithNodes)) {
+  if (user && !A.isEmpty(indexedNodes) && !Record.isPreview(recordWithNodes)) {
     recordWithNodes = await _recomputeUserDependentNodeState({ user, surveyId, draft, record: recordWithNodes }, client)
   }
 
@@ -355,7 +355,7 @@ export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepT
 export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
   client.tx(async (t) => {
     const activities = nodes.map((node) => {
-      const logContent = R.pick([
+      const logContent = A.pick([
         Node.keys.uuid,
         Node.keys.recordUuid,
         Node.keys.parentUuid,

@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 import axios from 'axios'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -63,10 +63,10 @@ const _performInvite =
     try {
       dispatch(LoaderActions.showLoader())
 
-      const userInviteParams = R.pipe(
-        R.omit([UserInvite.keys.validation]),
-        R.assoc('surveyCycleKey', surveyCycleKey),
-        R.assoc('repeatInvitation', repeatInvitation)
+      const userInviteParams = A.pipe(
+        A.omit([UserInvite.keys.validation]),
+        A.assoc('surveyCycleKey', surveyCycleKey),
+        A.assoc('repeatInvitation', repeatInvitation)
       )(userInvite)
 
       const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)

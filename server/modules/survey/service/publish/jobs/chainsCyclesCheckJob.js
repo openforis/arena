@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import Job from '@server/job/job'
 
@@ -26,7 +26,7 @@ export default class ChainsCyclesCheckJob extends Job {
     if (Survey.isPublished(surveyInfo)) {
       const surveyPrev = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId }, this.tx)
       const surveyInfoPrev = Survey.getSurveyInfo(surveyPrev)
-      const cycleKeysDeleted = R.difference(Survey.getCycleKeys(surveyInfoPrev), cycleKeys)
+      const cycleKeysDeleted = A.difference(Survey.getCycleKeys(surveyInfoPrev), cycleKeys)
       return { cycleKeys, cycleKeysDeleted }
     }
 

@@ -2,7 +2,7 @@ import { _curry1 } from './_curry1'
 import { _curry2 } from './_curry2'
 import { _isPlaceholder } from './_isPlaceholder'
 
-type AnyFn = (...args: unknown[]) => unknown
+type AnyFn = (...args: any[]) => any
 
 /**
  * Optimized internal three-arity curry function.
@@ -12,7 +12,7 @@ type AnyFn = (...args: unknown[]) => unknown
  * @returns {Function} The curried function.
  */
 export const _curry3 = (fn: AnyFn) =>
-  function f3(a?: unknown, b?: unknown, c?: unknown): unknown {
+  function f3(a?: unknown, b?: unknown, c?: unknown): any {
     switch (arguments.length) {
       case 0:
         return f3

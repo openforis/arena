@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -83,7 +83,7 @@ const CodeProps = (props) => {
                 }}
               >
                 <Dropdown
-                  disabled={readOnly || !canUpdateCategory || R.isEmpty(candidateParentCodeNodeDefs)}
+                  disabled={readOnly || !canUpdateCategory || A.isEmpty(candidateParentCodeNodeDefs)}
                   items={candidateParentCodeNodeDefs}
                   selection={parentCodeDef}
                   itemValue="uuid"

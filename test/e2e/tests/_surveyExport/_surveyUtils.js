@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const getProps = (obj) => ({ ...obj.props, ...obj.propsDraft })
 
@@ -16,18 +16,18 @@ export const getLabel = (nodeDef, lang) => {
   return label
 }
 
-const isRoot = (nodeDef) => R.isNil(nodeDef.parentUuid)
+const isRoot = (nodeDef) => A.isNil(nodeDef.parentUuid)
 
 export const getNodeDefsArray = (survey) => Object.values(survey.nodeDefs)
 
-export const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(isRoot))
+export const getNodeDefRoot = A.pipe(getNodeDefsArray, A.find(isRoot))
 
-export const getNodeDefByUuid = (uuid) => R.pipe(R.propOr({}, 'nodeDefs'), R.propOr(null, uuid))
+export const getNodeDefByUuid = (uuid) => A.pipe(A.propOr({}, 'nodeDefs'), A.propOr(null, uuid))
 
 export const getNodeDefByName = (name) =>
-  R.pipe(
+  A.pipe(
     getNodeDefsArray,
-    R.find((nodeDef) => getProps(nodeDef).name === name)
+    A.find((nodeDef) => getProps(nodeDef).name === name)
   )
 
 export const getNodeDefSource = (nodeDef) => (nodeDef.virtual ? getNodeDefByUuid(nodeDef.parentUuid) : null)
@@ -42,9 +42,9 @@ export const getNodeDefChildren = (nodeDef) => (survey) => {
 
   const { uuid: nodeDefUuid } = nodeDef
   children.push(
-    ...R.pipe(
+    ...A.pipe(
       getNodeDefsArray,
-      R.filter((nodeDefCurrent) => {
+      A.filter((nodeDefCurrent) => {
         if (nodeDefCurrent.analysis) {
           return false
         }

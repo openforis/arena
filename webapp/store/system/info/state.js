@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import * as SystemState from '../state'
 
 export const stateKey = 'info'
@@ -16,16 +16,16 @@ const configKeys = {
 
 const defaultFileUploadLimit = 1024 ** 3 // 1GB
 
-export const getState = R.pipe(SystemState.getState, R.propOr({}, stateKey))
+export const getState = A.pipe(SystemState.getState, A.propOr({}, stateKey))
 
 // ====== READ
-export const getAppInfo = R.pipe(getState, R.propOr({}, keys.appInfo))
-export const getConfig = R.pipe(getState, R.propOr({}, keys.config))
-export const getConfigFileUploadLimit = R.pipe(getConfig, R.propOr(defaultFileUploadLimit, configKeys.fileUploadLimit))
+export const getAppInfo = A.pipe(getState, A.propOr({}, keys.appInfo))
+export const getConfig = A.pipe(getState, A.propOr({}, keys.config))
+export const getConfigFileUploadLimit = A.pipe(getConfig, A.propOr(defaultFileUploadLimit, configKeys.fileUploadLimit))
 export const getConfigFileUploadLimitMB = (state) => getConfigFileUploadLimit(state) / 1024 ** 2
-export const getConfigExperimentalFeatures = R.pipe(getConfig, R.propEq(configKeys.experimentalFeatures, true))
-export const isConfigAiFeaturesEnabled = R.pipe(getConfig, R.propEq(configKeys.aiFeaturesEnabled, true))
+export const getConfigExperimentalFeatures = A.pipe(getConfig, A.propEq(configKeys.experimentalFeatures, true))
+export const isConfigAiFeaturesEnabled = A.pipe(getConfig, A.propEq(configKeys.aiFeaturesEnabled, true))
 
 // ====== UPDATE
-export const assocAppInfo = R.assoc(keys.appInfo)
-export const assocConfig = R.assoc(keys.config)
+export const assocAppInfo = A.assoc(keys.appInfo)
+export const assocConfig = A.assoc(keys.config)

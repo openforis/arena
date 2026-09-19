@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { Dates, Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -47,11 +45,11 @@ const dbTransformCallback =
   (record) => {
     if (!record) return null
     const validation = Record.getValidation(record)
-    return R.pipe(
-      R.dissoc(Validation.keys.validation),
+    return A.pipe(
+      A.dissoc(Validation.keys.validation),
       A.camelizePartial({ limitToLevel: 1 }),
-      R.assoc('surveyId', surveyId),
-      R.assoc(
+      A.assoc('surveyId', surveyId),
+      A.assoc(
         Validation.keys.validation,
         includeValidationFields
           ? validation
@@ -646,7 +644,7 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours = false, c
     RETURNING uuid
     `,
     [true],
-    R.prop('uuid')
+    A.prop('uuid')
   )
 
 export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
@@ -657,7 +655,7 @@ export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
     RETURNING uuid
   `,
     [cycles],
-    R.prop('uuid')
+    A.prop('uuid')
   )
 
 export const deleteRecordsBySurvey = async (surveyId, client = db) =>

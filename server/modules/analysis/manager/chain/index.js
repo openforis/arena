@@ -1,7 +1,5 @@
 import { ChainFactory } from '@openforis/arena-core'
 
-import * as R from 'ramda'
-
 import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
@@ -414,7 +412,7 @@ export const cloneChainFromSurvey = async (
         ignoreApplicability: false,
         ignoreValidations: false,
       })(nd)
-      return R.assocPath([NodeDef.keys.propsAdvanced, NodeDef.keysPropsAdvanced.chainUuid], newChainUuid)(cloned)
+      return A.assocPath([NodeDef.keys.propsAdvanced, NodeDef.keysPropsAdvanced.chainUuid], newChainUuid)(cloned)
     })
 
     // Resolve categories/taxonomies referenced by cloned code/taxon analysis attributes:

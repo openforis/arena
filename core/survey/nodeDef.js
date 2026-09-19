@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { NodeDefs, NodeDefType, Objects } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
@@ -236,16 +234,16 @@ export const {
   dissocProp,
 } = ObjectUtils
 
-export const getType = R.prop(keys.type)
+export const getType = A.prop(keys.type)
 export const getName = (nodeDef) => getProp(propKeys.name, '')(nodeDef)
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
 export const isQualifier = ObjectUtils.isPropTrue(propKeys.qualifier)
 export const isAutoIncrementalKey = ObjectUtils.isPropTrue(propKeys.autoIncrementalKey)
-export const isRoot = R.pipe(getParentUuid, R.isNil)
+export const isRoot = A.pipe(getParentUuid, A.isNil)
 export const isMultiple = ObjectUtils.isPropTrue(propKeys.multiple)
-export const isSingle = R.pipe(isMultiple, R.not)
+export const isSingle = A.pipe(isMultiple, A.not)
 
 const isType = (type) => (nodeDef) => getType(nodeDef) === type
 
@@ -254,7 +252,7 @@ export const isSingleEntity = (nodeDef) => isEntity(nodeDef) && isSingle(nodeDef
 export const isMultipleEntity = (nodeDef) => isEntity(nodeDef) && isMultiple(nodeDef)
 export const isEntityOrMultiple = (nodeDef) => isEntity(nodeDef) || isMultiple(nodeDef)
 
-export const isAttribute = R.pipe(isEntity, R.not)
+export const isAttribute = A.pipe(isEntity, A.not)
 export const isSingleAttribute = (nodeDef) => isAttribute(nodeDef) && isSingle(nodeDef)
 export const isMultipleAttribute = (nodeDef) => isAttribute(nodeDef) && isMultiple(nodeDef)
 export const isAttributeComposite = (nodeDef) =>
@@ -346,8 +344,8 @@ export const isLayoutElement = isFormHeader
 export const getPrintOrientation = getProp(propKeys.printOrientation)
 
 // ==== READ meta
-export const getMeta = R.propOr({}, keys.meta)
-export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
+export const getMeta = A.propOr({}, keys.meta)
+export const getMetaHierarchy = A.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
 export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultToName = true) => {
@@ -357,7 +355,7 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultT
   if (type === NodeDefLabelTypes.name) {
     firstPart = name
   } else {
-    const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+    const label = A.path([keys.props, propKeys.labels, lang], nodeDef)
 
     if (!StringUtils.isBlank(label)) {
       if (type === NodeDefLabelTypes.label) {
@@ -378,30 +376,30 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultT
 }
 export const getLabelWithType = ({ nodeDef, lang, type }) => getLabel(nodeDef, lang, type)
 
-export const getDescription = (lang) => (nodeDef) => R.propOr('', lang, getDescriptions(nodeDef))
+export const getDescription = (lang) => (nodeDef) => A.propOr('', lang, getDescriptions(nodeDef))
 
-export const getCycleFirst = R.pipe(getCycles, R.head)
+export const getCycleFirst = A.pipe(getCycles, A.head)
 
 export const isInCycle = (cycle) => (nodeDef) => getCycles(nodeDef).includes(cycle)
 
 export const isAncestorOf = (nodeDefDescendant) => (nodeDef) =>
-  R.startsWith([...getMetaHierarchy(nodeDef), getUuid(nodeDef)], getMetaHierarchy(nodeDefDescendant))
+  A.startsWith([...getMetaHierarchy(nodeDef), getUuid(nodeDef)], getMetaHierarchy(nodeDefDescendant))
 
 export const isDescendantOf = (nodeDefAncestor) => (nodeDef) => {
   const hAncestor = [...getMetaHierarchy(nodeDefAncestor), getUuid(nodeDefAncestor)]
-  return R.startsWith(hAncestor, getMetaHierarchy(nodeDef))
+  return A.startsWith(hAncestor, getMetaHierarchy(nodeDef))
 }
 
 // Advanced props
 
-export const getPropsAdvanced = R.propOr({}, keys.propsAdvanced)
-export const getPropsAdvancedDraft = R.propOr({}, keys.propsAdvancedDraft)
+export const getPropsAdvanced = A.propOr({}, keys.propsAdvanced)
+export const getPropsAdvancedDraft = A.propOr({}, keys.propsAdvancedDraft)
 
 export const getPropAdvanced = (prop, defaultTo = null) =>
-  R.pipe(getPropsAdvanced, R.pathOr(defaultTo, prop.split('.')))
+  A.pipe(getPropsAdvanced, A.pathOr(defaultTo, prop.split('.')))
 
 export const getPropAdvancedDraft = (prop, defaultTo = null) =>
-  R.pipe(getPropsAdvancedDraft, R.pathOr(defaultTo, prop.split('.')))
+  A.pipe(getPropsAdvancedDraft, A.pathOr(defaultTo, prop.split('.')))
 
 export const getPropOrDraftAdvanced =
   (prop, defaultTo = null) =>
@@ -422,12 +420,12 @@ export const getAllPropsAndAllPropsDraft =
     }
   }
 
-export const hasAdvancedPropsDraft = (nodeDef) => R.prop(keys.draftAdvanced, nodeDef) === true
-export const hasAdvancedPropsApplicableDraft = (nodeDef) => R.prop(keys.draftAdvancedApplicable, nodeDef) === true
-export const hasAdvancedPropsDefaultValuesDraft = (nodeDef) => R.prop(keys.draftAdvancedDefaultValues, nodeDef) === true
+export const hasAdvancedPropsDraft = (nodeDef) => A.prop(keys.draftAdvanced, nodeDef) === true
+export const hasAdvancedPropsApplicableDraft = (nodeDef) => A.prop(keys.draftAdvancedApplicable, nodeDef) === true
+export const hasAdvancedPropsDefaultValuesDraft = (nodeDef) => A.prop(keys.draftAdvancedDefaultValues, nodeDef) === true
 export const hasAdvancedPropsFileNameExpressionDraft = (nodeDef) =>
-  R.prop(keys.draftAdvancedFileNameExpression, nodeDef) === true
-export const hasAdvancedPropsValidationsDraft = (nodeDef) => R.prop(keys.draftAdvancedValidations, nodeDef) === true
+  A.prop(keys.draftAdvancedFileNameExpression, nodeDef) === true
+export const hasAdvancedPropsValidationsDraft = (nodeDef) => A.prop(keys.draftAdvancedValidations, nodeDef) === true
 // Unlike the flags above (set on the node def row by the server whenever the corresponding key is
 // present in propsAdvancedDraft, for a fixed set of keys it tracks), enumeratingItemsExpression and
 // itemsFilter are not tracked server-side, so they're checked here instead, directly against
@@ -450,24 +448,24 @@ export const hasValueAffectingAdvancedPropsDraft = (nodeDef) =>
 const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
 export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues, [])
-export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
+export const hasDefaultValues = A.pipe(getDefaultValues, A.isEmpty, A.not)
 export const isDefaultValueEvaluatedOneTime = getPropAdvanced(keysPropsAdvanced.defaultValueEvaluatedOneTime, false)
 
 export const getEditableIf = getPropAdvanced(keysPropsAdvanced.editableIf, [])
-export const isAlwaysEditable = R.pipe(getEditableIf, R.isEmpty)
+export const isAlwaysEditable = A.pipe(getEditableIf, A.isEmpty)
 export const getVisibleIf = getPropAdvanced(keysPropsAdvanced.visibleIf, [])
-export const isAlwaysVisible = R.pipe(getVisibleIf, R.isEmpty)
+export const isAlwaysVisible = A.pipe(getVisibleIf, A.isEmpty)
 
 export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
-export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
+export const getValidationExpressions = A.pipe(getValidations, NodeDefValidations.getExpressions)
 export const hasValidationsDefined = (nodeDef) => {
   const validations = getValidations(nodeDef)
   return (
     NodeDefValidations.isRequired(validations) ||
     NodeDefValidations.isUnique(validations) ||
-    !R.isEmpty(NodeDefValidations.getMinCount(validations)) ||
-    !R.isEmpty(NodeDefValidations.getMaxCount(validations)) ||
-    !R.isEmpty(NodeDefValidations.getExpressions(validations))
+    !A.isEmpty(NodeDefValidations.getMinCount(validations)) ||
+    !A.isEmpty(NodeDefValidations.getMaxCount(validations)) ||
+    !A.isEmpty(NodeDefValidations.getExpressions(validations))
   )
 }
 
@@ -609,7 +607,7 @@ export const isActive = getPropAdvanced(keysPropsAdvanced.active, false)
 export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
 
 export const getAggregateFunctions = getPropOrDraftAdvanced(keysPropsAdvanced.aggregateFunctions, {})
-export const getAggregateFunctionByUuid = (uuid) => R.pipe(getAggregateFunctions, R.propOr(null, uuid))
+export const getAggregateFunctionByUuid = (uuid) => A.pipe(getAggregateFunctions, A.propOr(null, uuid))
 
 // READ Analysis
 export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
@@ -657,14 +655,14 @@ export const newNodeDef = (
 
 // ==== UPDATE
 
-export const assocDeleted = R.assoc(keys.deleted)
+export const assocDeleted = A.assoc(keys.deleted)
 
-export const assocParentUuid = R.assoc(keys.parentUuid)
-export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
+export const assocParentUuid = A.assoc(keys.parentUuid)
+export const assocMetaHierarchy = A.assocPath([keys.meta, metaKeys.h])
 export const { mergeProps } = ObjectUtils
-const assocPropsAdvanced = R.assoc(keys.propsAdvanced)
+const assocPropsAdvanced = A.assoc(keys.propsAdvanced)
 export const mergePropsAdvanced = (propsAdvanced) => (nodeDef) =>
-  R.pipe(getPropsAdvanced, R.mergeLeft(propsAdvanced), (propsAdvancedUpdated) =>
+  A.pipe(getPropsAdvanced, A.mergeLeft(propsAdvanced), (propsAdvancedUpdated) =>
     assocPropsAdvanced(propsAdvancedUpdated, nodeDef)
   )(nodeDef)
 export const assocDefaultValues = (defaultValues) =>
@@ -672,7 +670,7 @@ export const assocDefaultValues = (defaultValues) =>
 export const assocDefaultValueEvaluatedOnlyOneTime = (evaluatedOnlyOneTime) =>
   mergePropsAdvanced({ [keysPropsAdvanced.defaultValueEvaluatedOneTime]: evaluatedOnlyOneTime })
 export const assocValidations = (validations) => mergePropsAdvanced({ [keysPropsAdvanced.validations]: validations })
-export const dissocTemporary = R.dissoc(keys.temporary)
+export const dissocTemporary = A.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
@@ -740,15 +738,15 @@ export const changeParentEntity =
 export const convertToType =
   ({ toType }) =>
   (nodeDef) => {
-    const propsUpdated = R.pick(commonAttributePropsKeys)(getProps(nodeDef))
+    const propsUpdated = A.pick(commonAttributePropsKeys)(getProps(nodeDef))
     const propsAdvancedToKeep = isAutoIncrementalKey(nodeDef)
       ? commonAttributePropsAdvancedKeys.filter((prop) => prop !== keysPropsAdvanced.defaultValues)
       : commonAttributePropsAdvancedKeys
-    const propsAdvancedUpdated = R.pick(propsAdvancedToKeep)(getPropsAdvanced(nodeDef))
+    const propsAdvancedUpdated = A.pick(propsAdvancedToKeep)(getPropsAdvanced(nodeDef))
 
     const layout = getLayout(nodeDef)
     const layoutUpdated = Object.entries(layout).reduce((acc, [cycleKey, cycleLayout]) => {
-      acc[cycleKey] = R.pick(NodeDefLayout.commonAttributeKeys)(cycleLayout)
+      acc[cycleKey] = A.pick(NodeDefLayout.commonAttributeKeys)(cycleLayout)
       return acc
     }, {})
     propsUpdated[propKeys.layout] = layoutUpdated
@@ -817,7 +815,7 @@ export const canNodeDefBeMultiple = (nodeDef) =>
   // Attribute def but not layout element and not analysis
   (!isLayoutElement(nodeDef) &&
     !isAnalysis(nodeDef) &&
-    R.includes(getType(nodeDef), [
+    A.includes(getType(nodeDef), [
       nodeDefType.decimal,
       nodeDefType.code,
       nodeDefType.file,
@@ -826,7 +824,7 @@ export const canNodeDefBeMultiple = (nodeDef) =>
     ]))
 
 export const canNodeDefTypeBeKey = (type) =>
-  R.includes(type, [
+  A.includes(type, [
     nodeDefType.date,
     nodeDefType.decimal,
     nodeDefType.code,
@@ -841,7 +839,7 @@ export const canNodeDefBeKey = (nodeDef) =>
 
 export const canHaveDefaultValue = (nodeDef) =>
   isSingleAttribute(nodeDef) &&
-  R.includes(getType(nodeDef), [
+  A.includes(getType(nodeDef), [
     nodeDefType.boolean,
     nodeDefType.code,
     nodeDefType.coordinate,
@@ -854,7 +852,7 @@ export const canHaveDefaultValue = (nodeDef) =>
     nodeDefType.time,
   ])
 
-export const belongsToAllCycles = (cycles) => (nodeDef) => R.isEmpty(R.difference(cycles, getCycles(nodeDef)))
+export const belongsToAllCycles = (cycles) => (nodeDef) => A.isEmpty(A.difference(cycles, getCycles(nodeDef)))
 export const canBeExcludedInClone = (nodeDef) => !isRoot(nodeDef) && !isKey(nodeDef)
 
 const isEntityAndNotRoot = (nodeDef) => isEntity(nodeDef) && !isRoot(nodeDef)

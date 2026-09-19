@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { DateFormats, Dates } from '@openforis/arena-core'
 
@@ -38,7 +38,7 @@ export const formats = {
 const normalizeDateTimeValue =
   (length: number) =>
   (value: unknown): string =>
-    R.pipe(R.ifElse(R.is(String), R.identity, R.toString), (val: string) => val.padStart(length, '0'))(value)
+    A.pipe(A.ifElse(A.is(String), A.identity, A.toString), (val: string) => val.padStart(length, '0'))(value)
 
 export const format = (date: unknown, format: string = formats.dateDefault): string =>
   Dates.format(date as Date, format)
@@ -50,7 +50,7 @@ export const getRelativeDate = (
   i18n: { t: (key: string, params?: Record<string, unknown>) => string },
   date: unknown
 ): string | null => {
-  if (R.isNil(date)) {
+  if (A.isNil(date)) {
     return null
   }
 

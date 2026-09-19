@@ -1,11 +1,10 @@
 import { _curry3 } from './internal/_curry3'
+import { defaultTo } from './defaultTo'
 import { prop } from './prop'
-
-type Indexable = Record<PropertyKey, unknown>
 
 /**
  * Returns a function that when supplied an object returns the indicated
- * property of that object if it exists, otherwise the default value.
+ * property of that object if it exists (and is not `null`, `undefined` or `NaN`), otherwise the default value.
  *
  * @param {*} defaultValue - The default value.
  * @param {!string|number} property - The property name or array index.
@@ -13,7 +12,6 @@ type Indexable = Record<PropertyKey, unknown>
  *
  * @returns {*} - The value at `object.property` or the default value.
  */
-export const propOr = _curry3((defaultValue: unknown, property: PropertyKey, object: Indexable | null | undefined) => {
-  const value = object ? prop(property, object) : null
-  return value ?? defaultValue
-})
+export const propOr = _curry3((defaultValue: unknown, property: PropertyKey, object: unknown) =>
+  defaultTo(defaultValue, prop(property, object))
+)

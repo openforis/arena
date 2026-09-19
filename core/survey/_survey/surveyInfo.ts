@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { DEFAULT_SRS, Objects, Surveys } from '@openforis/arena-core'
 
@@ -73,7 +73,7 @@ export const status = {
 
 export const getInfo = (survey: any) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
 
-export const isRdbInitialized = R.propOr(false, keys.rdbInitialized)
+export const isRdbInitialized = A.propOr(false, keys.rdbInitialized)
 
 // ====== READ surveyInfo
 export const { getId, getUuid, getProps, getPropsDraft, isPublished, getDescription, getDescriptions, getLabels } =
@@ -81,28 +81,28 @@ export const { getId, getUuid, getProps, getPropsDraft, isPublished, getDescript
 
 export const getName = (survey): string => ObjectUtils.getProp(keys.name, '')(survey) as string
 
-export const getOwnerUuid = R.propOr(null, keys.ownerUuid)
+export const getOwnerUuid = A.propOr(null, keys.ownerUuid)
 
-export const getOwnerName = R.propOr('', keys.ownerName)
+export const getOwnerName = A.propOr('', keys.ownerName)
 
-export const getAppVersion = R.propOr(null, keys.appVersion)
+export const getAppVersion = A.propOr(null, keys.appVersion)
 
-export const isDraft = R.propEq(keys.draft, true)
+export const isDraft = A.propEq(keys.draft, true)
 
-export const getDbStatistics = R.propOr({}, keys.dbStatistics)
+export const getDbStatistics = A.propOr({}, keys.dbStatistics)
 
-export const getFilesStatistics = R.propOr({}, keys.filesStatistics)
+export const getFilesStatistics = A.propOr({}, keys.filesStatistics)
 
-export const getActivityLogSize = R.propOr(-1, keys.activityLogSize)
+export const getActivityLogSize = A.propOr(-1, keys.activityLogSize)
 
 export const getLanguages = ObjectUtils.getProp(keys.languages, [])
 
-export const getDefaultLanguage = R.pipe(getLanguages, R.head)
+export const getDefaultLanguage = A.pipe(getLanguages, A.head)
 
 export const getDefaultLabel = (surveyInfo) => {
   const labels = ObjectUtils.getLabels(surveyInfo)
   const lang = getDefaultLanguage(surveyInfo)
-  return R.prop(lang, labels)
+  return A.prop(lang, labels)
 }
 
 export const getDefaultDescription = (surveyInfo) => {
@@ -159,7 +159,7 @@ export const getSRSIndex = (survey) => {
   return srssIndex
 }
 
-export const getDefaultSRS = R.pipe(getSRS, R.head)
+export const getDefaultSRS = A.pipe(getSRS, A.head)
 
 export const getStatus = (surveyInfo) => {
   const published = isPublished(surveyInfo)
@@ -172,9 +172,9 @@ export const getStatus = (surveyInfo) => {
 
 export const getCycles = ObjectUtils.getProp(keys.cycles)
 
-export const getCycleKeys = R.pipe(getCycles, R.keys)
+export const getCycleKeys = A.pipe(getCycles, A.keys)
 
-const getLastCycleKey = R.pipe(getCycleKeys, R.last)
+const getLastCycleKey = A.pipe(getCycleKeys, A.last)
 
 export const getDefaultCycleKey = (surveyInfo) => {
   const defaultCycleKey = ObjectUtils.getProp(keys.defaultCycleKey)(surveyInfo)
@@ -189,18 +189,18 @@ export const getCollectUri = ObjectUtils.getProp(keys.collectUri)
 
 export const getCollectReport = ObjectUtils.getProp(keys.collectReport, {})
 
-export const hasCollectReportIssues = R.pipe(
+export const hasCollectReportIssues = A.pipe(
   getCollectReport,
-  R.propSatisfies((total) => total > 0, collectReportKeys.issuesTotal)
+  A.propSatisfies((total) => total > 0, collectReportKeys.issuesTotal)
 )
 
 export const getCollectNodeDefsInfoByPath = ObjectUtils.getProp(keys.collectNodeDefsInfoByPath, {})
 
-export const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
+export const isFromCollect = A.pipe(getCollectUri, A.isNil, A.not)
 
 export const getOdkFormId = ObjectUtils.getProp(keys.odkFormId)
 
-export const isFromOdk = R.pipe(getOdkFormId, R.isNil, R.not)
+export const isFromOdk = A.pipe(getOdkFormId, A.isNil, A.not)
 
 export const getOdkNodeDefsInfoByPath = ObjectUtils.getProp(keys.odkNodeDefsInfoByPath, {})
 
@@ -209,30 +209,30 @@ export const getOdkNodeDefsInfoByPath = ObjectUtils.getProp(keys.odkNodeDefsInfo
 export const getOdkNodeDefsOriginalNames = ObjectUtils.getProp(keys.odkNodeDefsOriginalNames, {})
 
 export const getLanguage = (preferredLang) => (surveyInfo) =>
-  R.pipe(getLanguages, R.find(R.equals(preferredLang)), R.defaultTo(getDefaultLanguage(surveyInfo)))(surveyInfo)
+  A.pipe(getLanguages, A.find(A.equals(preferredLang)), A.defaultTo(getDefaultLanguage(surveyInfo)))(surveyInfo)
 
-export const isTemplate = R.propEq(keys.template, true)
+export const isTemplate = A.propEq(keys.template, true)
 
 export const getFieldManualLinks = ObjectUtils.getProp(keys.fieldManualLinks, {})
 
 export const getUserExtraPropDefs = ObjectUtils.getProp(keys.userExtraPropDefs, {})
 
-export const getUserExtraPropDefsArray = R.pipe(getUserExtraPropDefs, ExtraPropDef.extraDefsToArray)
+export const getUserExtraPropDefsArray = A.pipe(getUserExtraPropDefs, ExtraPropDef.extraDefsToArray)
 
 // ====== UPDATE
-export const markDraft = R.assoc(keys.draft, true)
+export const markDraft = A.assoc(keys.draft, true)
 
-export const assocDbStatistics = R.assoc(keys.dbStatistics)
+export const assocDbStatistics = A.assoc(keys.dbStatistics)
 
-export const assocFilesStatistics = R.assoc(keys.filesStatistics)
+export const assocFilesStatistics = A.assoc(keys.filesStatistics)
 
-export const assocActivityLogSize = R.assoc(keys.activityLogSize)
+export const assocActivityLogSize = A.assoc(keys.activityLogSize)
 
 export const assocSrs = (srs) => ObjectUtils.setProp(keys.srs, srs)
 
-export const assocRDBInitilized = R.assoc(keys.rdbInitialized)
+export const assocRDBInitilized = A.assoc(keys.rdbInitialized)
 
-export const assocOwnerUuid = R.assoc(keys.ownerUuid)
+export const assocOwnerUuid = A.assoc(keys.ownerUuid)
 
 // ====== UTILS
 
@@ -249,10 +249,10 @@ export const getAuthGroupByName = (groupName) => (surveyInfo) => {
   return authGroups.find((authGroup) => AuthGroup.getName(authGroup) === groupName)
 }
 
-const _getAuthGroupByName = (name) => R.pipe(getAuthGroups, R.find(R.propEq(AuthGroup.keys.name, name)))
+const _getAuthGroupByName = (name) => A.pipe(getAuthGroups, A.find(A.propEq(AuthGroup.keys.name, name)))
 
 export const getAuthGroupAdmin = _getAuthGroupByName(AuthGroup.groupNames.surveyAdmin)
 
 export const isAuthGroupAdmin = (group) => (surveyInfo) => AuthGroup.isEqual(group)(getAuthGroupAdmin(surveyInfo))
 
-export const assocAuthGroups = R.assoc(keys.authGroups)
+export const assocAuthGroups = A.assoc(keys.authGroups)

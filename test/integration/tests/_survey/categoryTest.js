@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as Category from '@core/survey/category'
@@ -33,7 +33,7 @@ export const createCategoryTest = async () => {
 
 const _fetchFirstCategory = async (surveyId) => {
   const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true })
-  return R.pipe(R.values, R.head)(categories)
+  return A.pipe(A.values, A.head)(categories)
 }
 
 export const createCategoryLevelTest = async () => {

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -163,7 +163,7 @@ export { insertUserAccessRequest } from '../repository/userAccessRequestReposito
 const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUuid = {}, userGroups = [], t }) => {
   // Assoc auth groups
 
-  const _userGroups = R.isEmpty(userGroups)
+  const _userGroups = A.isEmpty(userGroups)
     ? await AuthGroupRepository.fetchUserGroups(User.getUuid(user), t)
     : userGroups
   let userUpdated = User.assocAuthGroups(_userGroups)(user)
@@ -245,7 +245,7 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
   const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
   if (user && (await passwordCompareFn(password, user.password)))
-    return _attachAuthGroupsAndInvitationToUser({ user: R.dissoc('password', user) })
+    return _attachAuthGroupsAndInvitationToUser({ user: A.dissoc('password', user) })
 
   return null
 }

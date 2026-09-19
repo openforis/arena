@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import axios from 'axios'
 
 import { Dates } from '@openforis/arena-core'
@@ -52,14 +52,14 @@ export const checkInRecord =
       const nodeDefActivePage =
         pageNodeDef && NodeDefLayout.hasPage(cycle)(pageNodeDef)
           ? pageNodeDef
-          : R.pipe(
-              R.map((ancestor) => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
-              R.find(NodeDefLayout.hasPage(cycle))
+          : A.pipe(
+              A.map((ancestor) => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
+              A.find(NodeDefLayout.hasPage(cycle))
             )(ancestors)
 
       // Getting the nodes associated to the nodeDef page
-      const formPageNodeUuidByNodeDefUuid = R.reduce(
-        (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
+      const formPageNodeUuidByNodeDefUuid = A.reduce(
+        (acc, ancestor) => A.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
         [],
         ancestors
       )
@@ -77,7 +77,7 @@ export const checkInRecord =
     }
 
     // Hide app loader on record edit
-    if (!R.isEmpty(Record.getNodes(record))) {
+    if (!A.isEmpty(Record.getNodes(record))) {
       dispatch(LoaderActions.hideLoader())
     }
   }

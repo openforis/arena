@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -29,7 +29,7 @@ const CountProp = (props) => {
   const { Actions, countType, nodeDef, nodeDefUuidContext, readOnly, state } = props
 
   const countPropExtractor = (countType) => (nodeDef) => {
-    const count = R.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
+    const count = A.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
     if (Objects.isEmpty(count)) return []
     if (Array.isArray(count)) return count
     return [NodeDefExpression.createExpression({ expression: count })]
@@ -47,7 +47,7 @@ const CountProp = (props) => {
   }
 
   const determineValueType = useCallback(() => {
-    const count = R.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
+    const count = A.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
     return Objects.isEmpty(count) || !Array.isArray(count) ? ValueType.constant : ValueType.expression
   }, [countType, nodeDef])
 

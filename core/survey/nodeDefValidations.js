@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const keys = {
   count: 'count',
@@ -10,34 +10,34 @@ export const keys = {
 }
 
 // COUNT
-export const dissocCount = R.dissoc(keys.count)
+export const dissocCount = A.dissoc(keys.count)
 
-export const getCountProp = (key) => R.pathOr('', [keys.count, key])
+export const getCountProp = (key) => A.pathOr('', [keys.count, key])
 
 export const getMinCount = getCountProp(keys.min)
 
 export const getMaxCount = getCountProp(keys.max)
 
 export const assocCountProp = (key) => (value) =>
-  R.pipe(
-    R.ifElse(R.always(R.isEmpty(value)), R.dissocPath([keys.count, key]), R.assocPath([keys.count, key], value)),
+  A.pipe(
+    A.ifElse(A.always(A.isEmpty(value)), A.dissocPath([keys.count, key]), A.assocPath([keys.count, key], value)),
     // If validations count obj is empty, it gets removed from validations
-    R.ifElse(R.pipe(R.prop(keys.count), R.isEmpty), dissocCount, R.identity)
+    A.ifElse(A.pipe(A.prop(keys.count), A.isEmpty), dissocCount, A.identity)
   )
 
 export const assocMinCount = assocCountProp(keys.min)
 export const assocMaxCount = assocCountProp(keys.max)
 
 // REQUIRED
-export const isRequired = R.propOr(false, keys.required)
-export const assocRequired = (required) => R.assoc(keys.required, required)
-export const dissocRequired = R.dissoc(keys.required)
+export const isRequired = A.propOr(false, keys.required)
+export const assocRequired = (required) => A.assoc(keys.required, required)
+export const dissocRequired = A.dissoc(keys.required)
 
 // UNIQUE
-export const isUnique = R.propOr(false, keys.unique)
-export const assocUnique = (unique) => R.assoc(keys.unique, unique)
-export const dissocUnique = R.dissoc(keys.unique)
+export const isUnique = A.propOr(false, keys.unique)
+export const assocUnique = (unique) => A.assoc(keys.unique, unique)
+export const dissocUnique = A.dissoc(keys.unique)
 
 // EXPRESSIONS
-export const getExpressions = R.propOr([], keys.expressions)
-export const assocExpressions = (expressions) => R.assoc(keys.expressions, expressions)
+export const getExpressions = A.propOr([], keys.expressions)
+export const assocExpressions = (expressions) => A.assoc(keys.expressions, expressions)

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Authorizer } from '@openforis/arena-core'
 
@@ -181,7 +181,7 @@ export const init = (app) => {
   app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, draft, validate } = Request.getParams(req)
-      const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
+      const user = A.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
       const [survey] = await Promise.all([
         SurveyService.fetchSurveyById({ surveyId, draft, validate }),
@@ -205,7 +205,7 @@ export const init = (app) => {
         validate,
         updateUserPrefs = false,
       } = Request.getParams(req)
-      const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
+      const user = A.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
       const promises = [
         SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({

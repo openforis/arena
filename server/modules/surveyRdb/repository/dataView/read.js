@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import * as camelize from 'camelize'
 import * as pgPromise from 'pg-promise'
 
@@ -120,7 +120,7 @@ const _prepareSelectFields = ({
         .filter((columnNodeDef) => includeFileAttributeDefs || !NodeDef.isFile(columnNodeDef.nodeDef))
         .flatMap((columnNodeDef) => _selectFieldsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef))
     )
-  } else if (R.isEmpty(nodeDefCols)) {
+  } else if (A.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
   } else {
     queryBuilder.select(
@@ -243,7 +243,7 @@ const _createViewDataQuery = (params) => {
   _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode })
 
   // WHERE clause
-  if (!R.isNil(cycle)) {
+  if (!A.isNil(cycle)) {
     queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
     queryBuilder.addParams({ cycle })
 
@@ -271,7 +271,7 @@ const _createViewDataQuery = (params) => {
 
   const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
-  if (!R.isNil(filterClause)) {
+  if (!A.isNil(filterClause)) {
     queryBuilder.where(filterClause)
     queryBuilder.addParams(filterParams)
   }
@@ -279,15 +279,15 @@ const _createViewDataQuery = (params) => {
   // SORT clause
   const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
-  if (!R.isEmpty(sortParams)) {
+  if (!A.isEmpty(sortParams)) {
     queryBuilder.orderBy(sortClause)
     queryBuilder.addParams(sortParams)
   }
-  if (!R.isNil(limit)) {
+  if (!A.isNil(limit)) {
     queryBuilder.limit('$/limit/')
     queryBuilder.addParams({ limit })
   }
-  if (!R.isNil(offset)) {
+  if (!A.isNil(offset)) {
     queryBuilder.offset('$/offset/')
     queryBuilder.addParams({ offset })
   }
@@ -355,7 +355,7 @@ export const countDataTableRows = async (
     WHERE 
       ${TableDataNodeDef.columnSet.recordCycle} = $/cycle/
       ${recordOwnerUuid ? ` AND ${TableDataNodeDef.columnSet.recordOwnerUuid} = $/recordOwnerUuid/` : ''}
-      ${R.isNil(filterClause) ? '' : ` AND ${filterClause}`}
+      ${A.isNil(filterClause) ? '' : ` AND ${filterClause}`}
     `,
     {
       ...filterParams,
@@ -382,13 +382,13 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
     operator: Expression.operators.comparison.notEq.value,
   })
 
-  const filter = R.reduce(
+  const filter = A.reduce(
     (whereExprAcc, nodeDefUnique) => {
       const nodeUnique = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefUnique))(record)
 
       const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
       const colValue = TableDataNodeDefColUtils.getValue(survey, nodeDefUnique, nodeUnique)
-      const colValueString = R.isNil(colValue) ? null : String(colValue)
+      const colValueString = A.isNil(colValue) ? null : String(colValue)
       const value = Expression.newLiteral(colValueString)
 
       const condition = Expression.newBinary({
