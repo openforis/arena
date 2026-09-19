@@ -7,7 +7,7 @@ const _toString = (value: any): string => {
   if (value !== null && typeof value === 'object' && Object.prototype.toString.call(value) === '[object Object]') {
     return `{${Object.keys(value)
       .map((key) => `${JSON.stringify(key)}: ${_toString(value[key])}`)
-      .sort()
+      .sort((a, b) => a.localeCompare(b))
       .join(', ')}}`
   }
   return String(value)

@@ -38,12 +38,11 @@ const TaxonomyDetails = (props) => {
 
   const onlyRequiredColumns = A.isEmpty(vernacularLanguageCodes) && A.isEmpty(extraPropsDefsArray)
 
+  const vernacularColumns = A.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 20rem)`
+  const extraPropsColumns = A.isEmpty(extraPropsDefsArray) ? '' : `repeat(${extraPropsDefsArray.length}, 15rem)`
   const gridTemplateColumns = onlyRequiredColumns
     ? `.1fr .1fr .2fr .2fr .4fr`
-    : `4rem 15rem 15rem 20rem 30rem ${
-        A.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 20rem)`
-      }
-        ${A.isEmpty(extraPropsDefsArray) ? '' : `repeat(${extraPropsDefsArray.length}, 15rem)`}`
+    : `4rem 15rem 15rem 20rem 30rem ${vernacularColumns} ${extraPropsColumns}`
 
   return (
     <div className={classNames('taxonomy', { onlyRequiredColumns })}>

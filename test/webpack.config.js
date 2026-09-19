@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fs = require('node:fs')
 const path = require('path')
 const glob = require('glob')
 const nodeExternals = require('webpack-node-externals')

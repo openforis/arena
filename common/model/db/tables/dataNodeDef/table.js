@@ -109,7 +109,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
         includeSamplingDefsWithoutSiblings: true,
       }),
       A.filter(NodeDef.isSingleAttribute),
-      A.sortBy(A.ascend(A.prop('id')))
+      A.sortBy(A.prop('id'))
     )(survey)
   }
 

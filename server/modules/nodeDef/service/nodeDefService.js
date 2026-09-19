@@ -39,7 +39,7 @@ const _validateNodeDefs = async ({ survey, nodeDef, updatedNodeDefs, nodeDefsDep
     nodeDefsValidationsAcc[NodeDef.getUuid(nodeDefToValidate)] = nodeDefsValidationArray[index]
     return nodeDefsValidationsAcc
   }, {})
-  const valid = nodeDefsValidationArray.every(Validation.isValid)
+  const valid = nodeDefsValidationArray.every((validation) => Validation.isValid(validation))
 
   return Validation.newInstance(valid, nodeDefsValidationsByUuid)
 }

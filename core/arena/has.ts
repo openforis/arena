@@ -10,5 +10,5 @@ import { _curry2 } from './internal/_curry2'
  */
 export const has = _curry2(
   (property: PropertyKey, object: any): boolean =>
-    object !== null && object !== undefined && Object.prototype.hasOwnProperty.call(object, property)
+    object !== null && object !== undefined && Object.hasOwn(object, property)
 )

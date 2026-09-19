@@ -31,5 +31,5 @@ export const _equals = (a: any, b: any): boolean => {
   if (Array.isArray(a) && a.length !== b.length) return false
   const keysA = Object.keys(a)
   if (keysA.length !== Object.keys(b).length) return false
-  return keysA.every((key) => Object.prototype.hasOwnProperty.call(b, key) && _equals(a[key], b[key]))
+  return keysA.every((key) => Object.hasOwn(b, key) && _equals(a[key], b[key]))
 }

@@ -79,7 +79,7 @@ const _resetNextLevelsByProp =
     const nextIndexes = A.pipe(
       A.prop(prop),
       A.keys,
-      A.map((k) => Number(k)),
+      A.map(Number),
       A.filter((idx) => idx > levelIndex)
     )(state)
 

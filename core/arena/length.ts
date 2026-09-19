@@ -8,5 +8,5 @@ import { _curry1 } from './internal/_curry1'
  * @returns {number} - The result.
  */
 export const length = _curry1((list: any): number =>
-  list !== null && list !== undefined && typeof list.length === 'number' ? list.length : NaN
+  list !== null && list !== undefined && typeof list.length === 'number' ? list.length : Number.NaN
 )

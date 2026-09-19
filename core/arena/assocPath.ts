@@ -7,12 +7,9 @@ const _assocPath = (pathArray: Array<string | number>, value: any, object: any):
   const idx = pathArray[0]
   let newValue = value
   if (pathArray.length > 1) {
-    const nextObject =
-      object !== null && object !== undefined && has(idx, object)
-        ? object[idx]
-        : Number.isInteger(pathArray[1])
-          ? []
-          : {}
+    const hasNext = object !== null && object !== undefined && has(idx, object)
+    const emptyNext = Number.isInteger(pathArray[1]) ? [] : {}
+    const nextObject = hasNext ? object[idx] : emptyNext
     newValue = _assocPath(pathArray.slice(1), value, nextObject)
   }
   return assoc(idx, newValue, object)
