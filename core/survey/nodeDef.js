@@ -929,7 +929,7 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   // clear include in multiple entity summary if not applicable
   if (
     !canIncludeInMultipleEntitySummary(cycle)(nodeDefUpdated) &&
-    NodeDefLayout.isIncludedInMultipleEntitySummary(getLayout(nodeDefUpdated))
+    NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(nodeDefUpdated)
   ) {
     nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInMultipleEntitySummary })(
       nodeDefUpdated
@@ -938,7 +938,7 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   // clear include in previous cycle link if not applicable
   if (
     !canIncludeInPreviousCycleLink(cycle)(nodeDefUpdated) &&
-    NodeDefLayout.isIncludedInPreviousCycleLink(getLayout(nodeDefUpdated))
+    NodeDefLayout.isIncludedInPreviousCycleLink(cycle)(nodeDefUpdated)
   ) {
     nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInPreviousCycleLink })(nodeDefUpdated)
   }

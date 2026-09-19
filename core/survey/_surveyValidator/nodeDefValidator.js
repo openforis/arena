@@ -59,10 +59,7 @@ const validateKeyAttributes = (survey) => (propName, nodeDef) => {
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
     const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
-    if (
-      keyAttributesCount === 0 &&
-      (NodeDef.isRoot(nodeDef) || (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef)))
-    ) {
+    if (keyAttributesCount === 0 && (NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef))) {
       return { key: Validation.messageKeys.nodeDefEdit.keysEmpty }
     }
 
