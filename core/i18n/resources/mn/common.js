@@ -1029,6 +1029,10 @@ $t(common.appNameFull)
       form: 'Маягт',
       formula: 'Томьёо',
       includedInClonedData: 'Хувилах өгөгдөлд оруулсан',
+      includedInMultipleEntitySummary: {
+        label: 'Олон объектын хураангуйд оруулах',
+        info: `Хэрэв тэмдэглэгдсэн бол шинж чанар объектын хураангуй харагдацад харагдана`,
+      },
       includedInRecordsList: {
         label: 'Бүртгэлийн жагсаалтад оруулах',
         info: `Хэрэв тэмдэглэсэн бол уг шинж чанар нь бүртгэлийн жагсаалтад харагдах болно`,
@@ -1095,10 +1099,6 @@ $t(common.appNameFull)
       hiddenInMobile: {
         label: 'Арена Мобайл-д нуугдсан',
         info: `Хэрэв тэмдэглэгдсэн бол шинж чанар AM-д харагдахгүй`,
-      },
-      includedInMultipleEntitySummary: {
-        label: 'Олон объектын хураангуйд оруулах',
-        info: `Хэрэв тэмдэглэгдсэн бол шинж чанар объектын хураангуй харагдацад харагдана`,
       },
       includedInPreviousCycleLink: {
         label: 'Өмнөх мөчлөгийн холбоосонд оруулах',

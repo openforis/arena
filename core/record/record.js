@@ -73,6 +73,7 @@ export const {
   findNodeChildren,
   visitAncestorsAndSelf,
   visitDescendantsAndSelf,
+  findDescendantOrSelf,
 } = RecordReader
 
 // ==== utils

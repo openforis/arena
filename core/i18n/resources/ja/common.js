@@ -1062,6 +1062,10 @@ $t(common.appNameFull)
       form: 'フォーム',
       formula: '数式',
       includedInClonedData: '複製データに含める',
+      includedInMultipleEntitySummary: {
+        label: '複数項目の概要に含める',
+        info: `有効にすると、この属性は項目概要ビュー（Arena Mobile内）に表示されます`,
+      },
       includedInRecordsList: {
         label: '記録一覧に含める',
         info: `有効にすると、この属性が記録一覧に表示されます`,
@@ -1126,10 +1130,6 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
       hiddenInMobile: {
         label: 'Arena Mobileで非表示',
         info: `有効にすると、この属性はArena Mobileに表示されません`,
-      },
-      includedInMultipleEntitySummary: {
-        label: '複数項目の概要に含める',
-        info: `有効にすると、この属性は項目概要ビュー（Arena Mobile内）に表示されます`,
       },
       includedInPreviousCycleLink: {
         label: '前サイクルへのリンクに含める',

@@ -85,21 +85,31 @@ const _getNodeValueString = ({ nodeDef, node, lang }) => {
   return Node.getValue(node, '')
 }
 
-export const useNodeKeysLabelValues = (nodeDef, nodeEntities) =>
+export const useNodeKeysLabelValues = (nodeDef, nodeEntities, { includeSummaryAttributes = false } = {}) =>
   useSelector((state) => {
     const survey = SurveyState.getSurvey(state)
     const lang = SurveyState.getSurveyPreferredLang(state)
+    const cycle = SurveyState.getSurveyCycleKey(state)
     const record = RecordState.getRecord(state)
     const nodeDefKeys = Survey.getNodeDefKeys(nodeDef)(survey)
+    const nodeDefSummaries = includeSummaryAttributes ? Survey.getSummaryDefs({ nodeDef, cycle })(survey) : []
 
-    const getNodeDefKeyLabelValue = (nodeEntity) => (nodeDefKey) => {
-      const label = NodeDef.getLabel(nodeDefKey, lang)
-      const nodeKey = Record.getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)
-      const value = _getNodeValueString({ nodeDef: nodeDefKey, node: nodeKey, lang })
-      return `${label}: ${value}`
+    const getNodeDefLabelValue = (nodeEntity) => (nodeDefChild) => {
+      const label = NodeDef.getLabel(nodeDefChild, lang)
+      const nodeDefChildUuid = NodeDef.getUuid(nodeDefChild)
+      const nodeChild = Record.findDescendantOrSelf(
+        nodeEntity,
+        (node) => Node.getNodeDefUuid(node) === nodeDefChildUuid
+      )(record)
+      const value = nodeChild ? _getNodeValueString({ nodeDef: nodeDefChild, node: nodeChild, lang }) : ''
+      return { label, value }
     }
 
-    return nodeEntities.map((nodeEntity) => nodeDefKeys.map(getNodeDefKeyLabelValue(nodeEntity)).join(', '))
+    return nodeEntities.map((nodeEntity) => {
+      const keysLabelValues = nodeDefKeys.map(getNodeDefLabelValue(nodeEntity))
+      const summaryLabelValues = nodeDefSummaries.map(getNodeDefLabelValue(nodeEntity)).filter(({ value }) => !!value)
+      return [...keysLabelValues, ...summaryLabelValues].map(({ label, value }) => `${label}: ${value}`).join(', ')
+    })
   })
 
 export const useNodeKeyLabelValues = (nodeDef, nodeEntity) => useNodeKeysLabelValues(nodeDef, [nodeEntity])
