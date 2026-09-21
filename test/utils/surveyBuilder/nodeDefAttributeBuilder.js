@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
@@ -27,7 +27,7 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
   required(required = true) {
     return this._setProp(
       NodeDef.keysPropsAdvanced.validations,
-      R.pipe(NodeDef.getValidations, NodeDefValidations.assocRequired(required))(this),
+      A.pipe(NodeDef.getValidations, NodeDefValidations.assocRequired(required))(this),
       true
     )
   }
@@ -35,7 +35,7 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
   unique(unique = true) {
     return this._setProp(
       NodeDef.keysPropsAdvanced.validations,
-      R.pipe(NodeDef.getValidations, NodeDefValidations.assocUnique(unique))(this),
+      A.pipe(NodeDef.getValidations, NodeDefValidations.assocUnique(unique))(this),
       true
     )
   }

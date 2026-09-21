@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -62,7 +62,7 @@ export const keys = {
   ...flagKeys,
 }
 
-export const isValueProp = ({ nodeDef, prop }) => Boolean(R.path([NodeDef.getType(nodeDef), prop])(valuePropsByType))
+export const isValueProp = ({ nodeDef, prop }) => Boolean(A.path([NodeDef.getType(nodeDef), prop])(valuePropsByType))
 
 //
 // ======
@@ -74,19 +74,19 @@ export const { getId, getUuid } = ObjectUtils
 
 export const { getParentUuid } = ObjectUtils
 
-export const getRecordUuid = R.prop(keys.recordUuid)
+export const getRecordUuid = A.prop(keys.recordUuid)
 
-export const getValue = (node = {}, defaultValue = {}) => R.propOr(defaultValue, keys.value, node)
+export const getValue = (node = {}, defaultValue = {}) => A.propOr(defaultValue, keys.value, node)
 
-const _getValuePropRaw = (prop, defaultValue = null) => R.pipe(getValue, R.propOr(defaultValue, prop))
+const _getValuePropRaw = (prop, defaultValue = null) => A.pipe(getValue, A.propOr(defaultValue, prop))
 
 export const { getNodeDefUuid } = ObjectUtils
 
 export const getNodeDefUuids = (nodes) =>
-  R.pipe(
-    R.keys,
-    R.map((key) => getNodeDefUuid(nodes[key])),
-    R.uniq
+  A.pipe(
+    A.keys,
+    A.map((key) => getNodeDefUuid(nodes[key])),
+    A.uniq
   )(nodes)
 
 export const getNodeLayoutChildren =
@@ -102,16 +102,16 @@ export const getNodeLayoutChildren =
     return NodeDefLayout.getLayoutChildrenCompressed({ cycle, hiddenDefsByUuid })(nodeDef)
   }
 
-export const isPlaceholder = R.propEq(keys.placeholder, true)
-export const isCreated = R.propEq(keys.created, true)
-export const isUpdated = R.propEq(keys.updated, true)
-export const isDeleted = R.propEq(keys.deleted, true)
-export const isDirty = R.propEq(dirtyFlag, true)
-export const isRoot = R.pipe(getParentUuid, R.isNil)
+export const isPlaceholder = A.propEq(keys.placeholder, true)
+export const isCreated = A.propEq(keys.created, true)
+export const isUpdated = A.propEq(keys.updated, true)
+export const isDeleted = A.propEq(keys.deleted, true)
+export const isDirty = A.propEq(dirtyFlag, true)
+export const isRoot = A.pipe(getParentUuid, A.isNil)
 export const { isEqual } = ObjectUtils
 
 export const { getValidation } = Validation
-export const isValid = R.pipe(getValidation, Validation.isValid)
+export const isValid = A.pipe(getValidation, Validation.isValid)
 
 // ===== READ metadata
 
@@ -128,7 +128,7 @@ export const {
 } = NodeMeta
 
 // Hierarchy
-export const isDescendantOf = (ancestor) => (node) => R.includes(getUuid(ancestor), getHierarchy(node))
+export const isDescendantOf = (ancestor) => (node) => A.includes(getUuid(ancestor), getHierarchy(node))
 
 //
 // ======
@@ -145,7 +145,7 @@ export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null
     [keys.parentUuid]: getUuid(parentNode),
     [keys.value]: value,
     [keys.meta]: {
-      [metaKeys.hierarchy]: parentNode ? R.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
+      [metaKeys.hierarchy]: parentNode ? A.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
     },
     [keys.created]: true,
     [keys.dateCreated]: now,
@@ -163,7 +163,7 @@ export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
 // UPDATE
 // ======
 //
-export const assocValue = R.assoc(keys.value)
+export const assocValue = A.assoc(keys.value)
 export const { assocValidation } = Validation
 
 export const {
@@ -174,14 +174,14 @@ export const {
   assocIsQualifierValueApplied,
 } = NodeMeta
 
-export const assocCreated = R.assoc(keys.created)
+export const assocCreated = A.assoc(keys.created)
 export const setCreated = (node) => {
   node[keys.created] = true
   return node
 }
-export const assocDeleted = R.assoc(keys.deleted)
-export const assocUpdated = R.assoc(keys.updated)
-export const assocDirty = R.assoc(dirtyFlag)
+export const assocDeleted = A.assoc(keys.deleted)
+export const assocUpdated = A.assoc(keys.updated)
+export const assocDirty = A.assoc(dirtyFlag)
 export const removeFlags =
   ({ removeDirtyFlag = true, sideEffect = false } = {}) =>
   (node) => {
@@ -192,11 +192,11 @@ export const removeFlags =
       }
       return node
     } else {
-      return R.omit(keysToRemove)(node)
+      return A.omit(keysToRemove)(node)
     }
   }
 
-export const assocDateModified = R.assoc(keys.dateModified)
+export const assocDateModified = A.assoc(keys.dateModified)
 
 //
 // ======
@@ -207,15 +207,15 @@ export const assocDateModified = R.assoc(keys.dateModified)
 export const isValueBlank = (node) => {
   const value = getValue(node, null)
 
-  if (R.isNil(value)) {
+  if (A.isNil(value)) {
     return true
   }
 
-  if (R.is(String, value)) {
+  if (A.is(String, value)) {
     return StringUtils.isBlank(value)
   }
 
-  return R.isEmpty(value)
+  return A.isEmpty(value)
 }
 
 export const hasUserInputValue = (node) => !isValueBlank(node) && !isDefaultValueApplied(node)
@@ -239,7 +239,7 @@ export const newNodeValueCode = ({ itemUuid = null, code = null }) => {
 // Coordinate
 const _getValuePropNumber = ({ node, prop }) => {
   const value = _getValuePropRaw(prop)(node)
-  return R.isNil(value) || R.isEmpty(value) ? null : Number(value)
+  return A.isNil(value) || A.isEmpty(value) ? null : Number(value)
 }
 export const getCoordinateX = (node) => _getValuePropNumber({ node, prop: valuePropsCoordinate.x })
 export const getCoordinateY = (node) => _getValuePropNumber({ node, prop: valuePropsCoordinate.y })
@@ -268,7 +268,7 @@ export const newNodeValueCoordinate = ({
 
 const _getDateTimePart = (separator) => (index) => (node) => {
   const value = getValue(node)
-  if (R.isNil(value) || R.isEmpty(value) || !R.is(String, value)) return null
+  if (A.isNil(value) || A.isEmpty(value) || !A.is(String, value)) return null
   const part = value.split(separator)[index]
   return Number(StringUtils.trim(part))
 }
@@ -279,8 +279,8 @@ export const getDateYear = _getDatePart(0)
 export const getDateMonth = _getDatePart(1)
 export const getDateDay = _getDatePart(2)
 
-export const getDateCreated = R.prop(keys.dateCreated)
-export const getDateModified = R.prop(keys.dateModified)
+export const getDateCreated = A.prop(keys.dateCreated)
+export const getDateModified = A.prop(keys.dateModified)
 
 // File
 export const getFileName = _getValuePropRaw(valuePropsFile.fileName, '')

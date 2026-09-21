@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Schemata } from '@common/model/db'
 
@@ -65,7 +65,7 @@ export const countItems = async (
       ${_getSelectWhereCondition({ excludeResolved })}
     `,
     { source },
-    R.prop('tot')
+    A.prop('tot')
   )
 
 export const insertItem = async (

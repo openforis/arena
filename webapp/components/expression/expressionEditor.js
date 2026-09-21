@@ -2,7 +2,7 @@ import './expressionEditor.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -111,7 +111,7 @@ const ExpressionEditor = (props) => {
         />
       ) : (
         <div className="expression-editor__query-container">
-          {!R.isEmpty(query) && (
+          {!A.isEmpty(query) && (
             <div className="query" id={`${idPrefix}-query`} data-testid={TestId.expressionEditor.query(qualifier)}>
               {query}
             </div>
@@ -134,7 +134,7 @@ const ExpressionEditor = (props) => {
               title="aiExpression.title"
             />
           )}
-          {aiExpressionsEnabled && !R.isEmpty(query) && nodeDefUuidCurrent && (
+          {aiExpressionsEnabled && !A.isEmpty(query) && nodeDefUuidCurrent && (
             <Button
               className="btn-s btn-ai-explain"
               iconClassName="icon-question icon-14px"

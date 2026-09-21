@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 interface Operator {
   value: string
@@ -28,10 +28,10 @@ const arithmetic = {
   exp: { value: '**', label: '**' },
 }
 
-const binary = R.mergeLeft(arithmetic, comparison)
-const binaryValues = R.values(binary) as Operator[]
+const binary = A.mergeLeft(arithmetic, comparison)
+const binaryValues = A.values(binary) as Operator[]
 
-const findBinary = (operator: string): Operator | undefined => R.find(R.propEq('value', operator), binaryValues)
+const findBinary = (operator: string): Operator | undefined => A.find(A.propEq('value', operator), binaryValues)
 
 const js2sqlOperators: Record<string, string> = {
   '&&': 'AND',

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -200,10 +200,10 @@ const _onNodeDefsUpdate =
   (dispatch) => {
     dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
-    if (!R.isEmpty(nodeDefsUpdated)) {
+    if (!A.isEmpty(nodeDefsUpdated)) {
       dispatch({ type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
     }
-    if (!R.isEmpty(dependencyGraph)) {
+    if (!A.isEmpty(dependencyGraph)) {
       dispatch({ type: dependencyGraphUpdate, dependencyGraph })
     }
   }
@@ -339,7 +339,7 @@ const _checkCanRemoveNodeDef = async ({ dispatch, getState, nodeDef }) => {
       !NodeDef.isDescendantOf(nodeDef)(dependent)
   )
 
-  if (R.isEmpty(nodeDefDependentsNotDescendants)) {
+  if (A.isEmpty(nodeDefDependentsNotDescendants)) {
     return true
   }
 

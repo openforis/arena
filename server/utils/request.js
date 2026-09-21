@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as User from '@core/user/user'
@@ -34,33 +34,33 @@ export const getPublicServerUrl = (req) => {
 
 export const getHost = (req) => req.header('host')
 
-export const getUrl = R.prop('url')
+export const getUrl = A.prop('url')
 
 export const getParams = (req) =>
-  R.pipe(
-    R.mergeLeft(R.prop('query', req)),
-    R.mergeLeft(R.prop('params', req)),
-    R.mergeLeft(R.prop('body', req)),
+  A.pipe(
+    A.mergeLeft(A.prop('query', req)),
+    A.mergeLeft(A.prop('params', req)),
+    A.mergeLeft(A.prop('body', req)),
     // Convert String boolean values to Boolean type
-    R.mapObjIndexed((val) => R.ifElse((v) => v === 'true' || v === 'false', R.always(val === 'true'), R.identity)(val))
+    A.mapObjIndexed((val) => A.ifElse((v) => v === 'true' || v === 'false', A.always(val === 'true'), A.identity)(val))
   )({})
 
 export const getJsonParam = (req, param, defaultValue = null) => {
-  const jsonStr = R.prop(param, getParams(req))
+  const jsonStr = A.prop(param, getParams(req))
   if (jsonStr && typeof jsonStr === 'string') return JSON.parse(jsonStr)
   if (jsonStr && typeof jsonStr === 'object') return jsonStr // already parsed to a JSON object
   return defaultValue
 }
 
 export const getNumericParam = (req, param, defaultValue = null) => {
-  const value = R.prop(param, getParams(req))
+  const value = A.prop(param, getParams(req))
   if (value === undefined) return defaultValue
   const numericValue = Number(value)
   return Number.isNaN(numericValue) ? defaultValue : numericValue
 }
 
 export const getRequiredParam = (req, param) => {
-  const value = R.prop(param, getParams(req))
+  const value = A.prop(param, getParams(req))
   if (!value) {
     throw new Error(`${param} is required`)
   }
@@ -75,21 +75,21 @@ export const getRequiredIntegerParam = (req, param) => {
   return value
 }
 
-export const getFile = R.pathOr(null, ['files', 'file'])
+export const getFile = A.pathOr(null, ['files', 'file'])
 export const getFiles = (req) => req?.files || req?.file || null
 export const getFilePath = (req) => getFile(req)?.tempFilePath || null
 
-export const getBody = R.propOr(null, 'body')
+export const getBody = A.propOr(null, 'body')
 
 // User
 
-export const getUser = R.prop('user')
-export const getUserUuid = R.pipe(getUser, R.prop('uuid'))
-export const getSurveyCycleKey = R.pipe(getUser, User.getPrefSurveyCurrentCycle)
+export const getUser = A.prop('user')
+export const getUserUuid = A.pipe(getUser, A.prop('uuid'))
+export const getSurveyCycleKey = A.pipe(getUser, User.getPrefSurveyCurrentCycle)
 
 // Headers
 
-const getHeader = (name) => R.path(['headers', name])
+const getHeader = (name) => A.path(['headers', name])
 
 export const getSocketId = getHeader('socketid')
 
@@ -98,4 +98,4 @@ export const getSocketId = getHeader('socketid')
 export const isHttps = (req) => req.secure || req.header('x-forwarded-proto') === 'https'
 
 // Download file name set by download auth middleware
-export const getDownloadFileName = R.prop('downloadFileName')
+export const getDownloadFileName = A.prop('downloadFileName')

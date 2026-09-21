@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { useI18n } from '@webapp/store/system'
 import { timeRanges } from './utils'
@@ -31,7 +31,7 @@ export const useTimeRanges = ({ timeRange }) => {
       label: i18n.t('homeView:recordsSummary.year', { count: 5 }),
     },
   ]
-  const timeRangeSelection = timeRangeItems.find(R.propEq('value', timeRange))
+  const timeRangeSelection = timeRangeItems.find(A.propEq('value', timeRange))
 
   return {
     timeRangeItems,

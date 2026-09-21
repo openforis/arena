@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { db } from '@server/db/db'
 
@@ -29,7 +29,7 @@ export const getNodePath = (node) => (survey, record) => {
 
     if (NodeDef.isMultiple(nodeDef)) {
       const siblings = Record.getNodeChildrenByDefUuid(parentNode, nodeDefUuid)(record)
-      const index = R.findIndex((n) => Node.getUuid(n) === Node.getUuid(node), siblings)
+      const index = A.findIndex((n) => Node.getUuid(n) === Node.getUuid(node), siblings)
       return `${parentNodePath}/${NodeDef.getName(nodeDef)}[${index}]`
     }
 
@@ -41,7 +41,7 @@ export const getNodePath = (node) => (survey, record) => {
 }
 
 export const findNodeByPath = (path) => (survey, record) => {
-  const parts = R.ifElse(R.is(Array), R.identity, R.split(/[\\/|.]/))(path)
+  const parts = A.ifElse(A.is(Array), A.identity, A.split(/[\\/|.]/))(path)
 
   let currentNodeDef = null
   let currentNode = null
@@ -53,7 +53,7 @@ export const findNodeByPath = (path) => (survey, record) => {
       // Extract node name and index from path part
       const partMatch = /(\w+)(\[(\d+)\])?/.exec(part)
       const childName = partMatch[1]
-      const childIndex = R.defaultTo(0, partMatch[3])
+      const childIndex = A.defaultTo(0, partMatch[3])
 
       currentNodeDef = Survey.getNodeDefChildByName(currentParentDef, childName)(survey)
 
@@ -89,14 +89,14 @@ export const findNodeValueByPath = (path) => (survey, record) => Node.getValue(f
 // future removes the ambiguity.
 export const shiftDateModifiedIntoTheFuture = (record, offsetMillis = 60000) => ({
   ...record,
-  nodes: R.map(
+  nodes: A.map(
     (node) => Node.assocDateModified(new Date(Node.getDateModified(node).getTime() + offsetMillis))(node),
     record.nodes
   ),
 })
 
 export const getValidationChildrenCount = (parentNode, childDef) =>
-  R.pipe(
+  A.pipe(
     Validation.getValidation,
     RecordValidation.getValidationChildrenCount(Node.getUuid(parentNode), NodeDef.getUuid(childDef))
   )

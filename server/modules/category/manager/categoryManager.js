@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import * as pgPromise from 'pg-promise'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -50,7 +50,7 @@ const _validateCategoryFromCategories = async (
   client = db
 ) => {
   const surveyId = Survey.getId(survey)
-  const category = R.prop(categoryUuid, categories)
+  const category = A.prop(categoryUuid, categories)
   const bigCategory = await _isBigCategory({ surveyId, categoryUuid }, client)
   const items =
     (validateItems || validateLevels) && !bigCategory
@@ -59,7 +59,7 @@ const _validateCategoryFromCategories = async (
 
   const validation = await CategoryValidator.validateCategory({
     survey,
-    categories: R.values(categories),
+    categories: A.values(categories),
     category,
     bigCategory,
     items,
@@ -407,7 +407,7 @@ export const updateCategoryProp = async ({ user, surveyId, categoryUuid, key, va
 const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, itemExtraDef, deleted }, t) => {
   const items = await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, t)
   const itemsUpdated = items.reduce((acc, item) => {
-    if (R.isNil(CategoryItem.getExtraProp(name)(item))) {
+    if (A.isNil(CategoryItem.getExtraProp(name)(item))) {
       return acc
     }
     const itemUpdated = deleted
@@ -824,7 +824,7 @@ export const deleteLevelsEmptyByCategory = async (user, surveyId, category, clie
       ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
       markSurveyDraft(surveyId, t),
     ])
-    const levelsUpdated = R.reject((level) => R.includes(CategoryLevel.getUuid(level), levelUuidsDeleted))(levels)
+    const levelsUpdated = A.reject((level) => A.includes(CategoryLevel.getUuid(level), levelUuidsDeleted))(levels)
     return Category.assocLevelsArray(levelsUpdated)(category)
   })
 

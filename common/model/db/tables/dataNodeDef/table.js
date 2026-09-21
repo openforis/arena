@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
@@ -102,14 +102,14 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       // Multiple attr table
       return [nodeDef]
     }
-    return R.pipe(
+    return A.pipe(
       Survey.getNodeDefDescendantAttributesInSingleEntities({
         nodeDef,
         includeAnalysis,
         includeSamplingDefsWithoutSiblings: true,
       }),
-      R.filter(NodeDef.isSingleAttribute),
-      R.sortBy(R.ascend(R.prop('id')))
+      A.filter(NodeDef.isSingleAttribute),
+      A.sortBy(A.prop('id'))
     )(survey)
   }
 

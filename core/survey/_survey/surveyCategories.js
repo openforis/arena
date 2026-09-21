@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 import { functionNames } from '@core/expressionParser/expression'
@@ -10,13 +10,13 @@ import * as SurveyNodeDefs from './surveyNodeDefs'
 const categories = 'categories'
 
 // ====== READ
-export const getCategories = R.pipe(R.prop(categories), R.defaultTo({}))
+export const getCategories = A.pipe(A.prop(categories), A.defaultTo({}))
 
-export const getCategoriesArray = R.pipe(
+export const getCategoriesArray = A.pipe(
   getCategories,
-  R.values,
+  A.values,
   // Sort by name
-  R.sort((category1, category2) => {
+  A.sort((category1, category2) => {
     const name1 = Category.getName(category1)
     const name2 = Category.getName(category2)
     if (name1 < name2) return -1
@@ -25,13 +25,13 @@ export const getCategoriesArray = R.pipe(
   })
 )
 
-export const getCategoryByUuid = (uuid) => R.pipe(getCategories, R.prop(uuid))
+export const getCategoryByUuid = (uuid) => A.pipe(getCategories, A.prop(uuid))
 
 export const getCategoryByName = (name) =>
-  R.pipe(
+  A.pipe(
     getCategories,
-    R.values,
-    R.find((category) => Category.getName(category) === name)
+    A.values,
+    A.find((category) => Category.getName(category) === name)
   )
 
 export const getSamplingPointDataCategory = getCategoryByName(Category.samplingPointDataCategoryName)
@@ -63,7 +63,7 @@ export const isCategoryUnused = (category) => (survey) =>
   !isCategoryUsedInExpressions(category)(survey)
 
 // ====== UPDATE
-export const assocCategories = (newCategories) => R.assoc(categories, newCategories)
+export const assocCategories = (newCategories) => A.assoc(categories, newCategories)
 
 export const assocCategory = (category) => (survey) =>
   Objects.assocPath({ obj: survey, path: [categories, Category.getUuid(category)], value: category })

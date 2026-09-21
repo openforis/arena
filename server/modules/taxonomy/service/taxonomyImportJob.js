@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -90,7 +90,7 @@ export default class TaxonomyImportJob extends Job {
     // 4. finalize import
     if (this.isRunning()) {
       if (this.hasErrors()) {
-        this.logDebug(`${R.keys(this.errors).length} errors found`)
+        this.logDebug(`${A.keys(this.errors).length} errors found`)
         await this.setStatusFailed()
       } else {
         this.logDebug('no errors found, finalizing import')
@@ -140,7 +140,7 @@ export default class TaxonomyImportJob extends Job {
     const validHeaders = this._validateHeaders(headers)
     if (validHeaders) {
       // vernacular lang codes
-      this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
+      this.vernacularLanguageCodes = A.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
       // extra prop defs
       const extraPropsColumns = filterExtraPropsColumns(headers)
 
@@ -180,7 +180,7 @@ export default class TaxonomyImportJob extends Job {
     if (Validation.isObjValid(taxon)) {
       await this.addTaxonToUpdateBuffer(taxon)
     } else {
-      this.addError(R.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon))
+      this.addError(A.pipe(Validation.getValidation, Validation.getFieldValidations)(taxon))
     }
 
     this.incrementProcessedItems()
@@ -211,11 +211,11 @@ export default class TaxonomyImportJob extends Job {
 
   _validateHeaders(columns) {
     let valid = true
-    const missingColumns = R.difference(requiredColumns, columns)
-    if (!R.isEmpty(missingColumns)) {
+    const missingColumns = A.difference(requiredColumns, columns)
+    if (!A.isEmpty(missingColumns)) {
       this._addHeaderError({
         key: Validation.messageKeys.taxonomyImportJob.missingRequiredColumns,
-        params: { columns: R.join(', ', missingColumns) },
+        params: { columns: A.join(', ', missingColumns) },
       })
       valid = false
     }

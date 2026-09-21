@@ -2,7 +2,7 @@ import './nodeDefs.scss'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -297,7 +297,7 @@ const NodeDefSwitch = (props) => {
   })
 
   const checkNodePlaceholder = useCallback(() => {
-    if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
+    if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && A.none(Node.isPlaceholder, nodes)) {
       createNodePlaceholder(nodeDef, parentNode, NodeDefUiProps.getDefaultValue(nodeDef))
     }
   }, [canAddNode, createNodePlaceholder, nodeDef, nodes, parentNode])

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Dates } from '@openforis/arena-core'
 
@@ -60,7 +60,7 @@ const _cycleValidators = (cyclePrev, isLast) => ({
 })
 
 export const validateCycles = async (cycles) => {
-  const cyclesArray = R.values(cycles)
+  const cyclesArray = A.values(cycles)
   const cyclesSize = cyclesArray.length
 
   const result = Validation.newInstance()

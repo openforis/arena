@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -158,7 +158,7 @@ describe('Dependent code attributes - survey publish', () => {
 
     // Change only the validation rule's message, not the expression itself
     const validationsPrev = NodeDef.getValidations(parentCodeDef)
-    const expressionPrev = R.head(NodeDefValidations.getExpressions(validationsPrev))
+    const expressionPrev = A.head(NodeDefValidations.getExpressions(validationsPrev))
     const expressionUpdated = NodeDefExpression.assocMessages({ en: 'Updated validation message' })(expressionPrev)
     const validationsUpdated = NodeDefValidations.assocExpressions([expressionUpdated])(validationsPrev)
 

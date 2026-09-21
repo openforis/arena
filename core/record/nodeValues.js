@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { CategoryItems, DateFormats, Dates, Objects } from '@openforis/arena-core'
 
@@ -110,7 +110,7 @@ const valueComparatorByNodeDefType = {
     }
     return false
   },
-  [NodeDef.nodeDefType.coordinate]: ({ value, valueSearch }) => R.equals(value, valueSearch),
+  [NodeDef.nodeDefType.coordinate]: ({ value, valueSearch }) => A.equals(value, valueSearch),
   [NodeDef.nodeDefType.date]: dateTimeComparator({
     formatsSource: [DateFormats.dateDisplay, DateFormats.dateStorage],
     formatTo: DateFormats.dateStorage,

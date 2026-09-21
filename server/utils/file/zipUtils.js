@@ -1,9 +1,9 @@
-import Archiver from 'archiver'
+import { ZipArchive } from 'archiver'
 import * as FileUtils from './fileUtils'
 
 const zipDirIntoFile = async ({ dirPath, outputFilePath, onTotal = null, onProgress = null }) => {
   const output = FileUtils.createWriteStream(outputFilePath)
-  const zip = Archiver('zip')
+  const zip = new ZipArchive()
   let totalSize = null
   if (onTotal) {
     totalSize = FileUtils.getDirSize(dirPath)

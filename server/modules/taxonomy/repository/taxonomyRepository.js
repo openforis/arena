@@ -1,4 +1,3 @@
-import * as R from 'ramda'
 import pgPromise from 'pg-promise'
 import * as toSnakeCase from 'to-snake-case'
 
@@ -79,9 +78,9 @@ export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, cli
  */
 const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, backup = false, client = db }) =>
   A.pipe(
-    R.values,
-    R.flatten,
-    R.map((vernacularName) => {
+    A.values,
+    A.flatten,
+    A.map((vernacularName) => {
       const { props, propsDraft } = TaxonVernacularName.getPropsAndPropsDraft({ backup })(vernacularName)
       return client.none(
         `INSERT INTO 
@@ -407,7 +406,7 @@ export const fetchTaxaWithVernacularNamesStream = ({
   draft = false,
 }) => {
   const vernacularNamesSubSelects = A.pipe(
-    R.map(
+    A.map(
       (langCode) =>
         `(SELECT
             string_agg(${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')}, '${
@@ -420,12 +419,12 @@ export const fetchTaxaWithVernacularNamesStream = ({
             AND ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')} = '${langCode}'
        ) AS ${langCode}`
     ),
-    R.join(', ')
+    A.join(', ')
   )(vernacularLangCodes)
 
   const propsFields = A.pipe(
-    R.map((prop) => `${DbUtils.getPropColCombined(prop, draft, 't.')} AS ${toSnakeCase(prop)}`),
-    R.join(', ')
+    A.map((prop) => `${DbUtils.getPropColCombined(prop, draft, 't.')} AS ${toSnakeCase(prop)}`),
+    A.join(', ')
   )([Taxon.propKeys.code, Taxon.propKeys.family, Taxon.propKeys.genus, Taxon.propKeys.scientificName])
 
   const extraPropsFields = Object.keys(extraPropsDefs)
@@ -480,7 +479,7 @@ export const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = fal
     draft,
     client
   )
-  return R.head(taxa)
+  return A.head(taxa)
 }
 
 const findTaxaByPropLike = async (surveyId, taxonomyUuid, filterProp, filterValue, draft = false, client = db) => {
@@ -599,7 +598,7 @@ export const fetchTaxonWithVernacularNamesByUuid = async (
   client = db
 ) => {
   const taxa = await fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, taxonUuid, draft }, client)
-  return R.head(taxa)
+  return A.head(taxa)
 }
 
 export const fetchTaxonWithVernacularNamesByCode = async (

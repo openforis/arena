@@ -32,13 +32,26 @@ export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
   if (nodeDefChild.type === 'entity') {
     test(`Expand ${nodeDefChild.name} table`, async () => {
       // expand table by 3 columns and 4 rows
-      const entityEl = await page.$(getSelector(TestId.surveyForm.nodeDefWrapper(tree.name)))
+      const entitySelector = getSelector(TestId.surveyForm.nodeDefWrapper(tree.name))
+      const entityEl = await page.$(entitySelector)
       const entityBBox = await entityEl.boundingBox()
+      // move the mouse in several steps: the grid layout updates the item size on every mouse move
       await dragAndDrop(
         entityBBox.x + entityBBox.width - 5,
         entityBBox.y + entityBBox.height - 5,
         entityBBox.x + entityBBox.width * 3,
-        entityBBox.y + entityBBox.height * 4
+        entityBBox.y + entityBBox.height * 4,
+        { steps: 10 }
+      )
+      // a missed resize would leave the table one row high (only its header visible) and break the next tests
+      // (no optional chaining here: the function is serialized and evaluated in the page)
+      await page.waitForFunction(
+        ({ selector, heightBefore }) => {
+          const el = document.querySelector(selector)
+          return !!el && el.getBoundingClientRect().height > heightBefore * 2
+        },
+        { selector: entitySelector, heightBefore: entityBBox.height },
+        { timeout: 5000 }
       )
     })
   }

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { ExportFile } from '../../../../server/modules/survey/service/surveyExport/exportFile'
 import { getSurveyEntry } from '../../paths'
@@ -27,7 +27,7 @@ export const verifyNodeDefs = (survey) => {
     const clusterExport = getNodeDefRoot(surveyExport)
     const clusterExportChildDefs = getNodeDefChildren(clusterExport)(surveyExport)
 
-    await expect(R.isNil(clusterExport.parentUuid)).toBe(true)
+    await expect(A.isNil(clusterExport.parentUuid)).toBe(true)
     await expect(getProps(clusterExport).name).toBe(cluster.name)
     await expect(getProps(clusterExport).labels.en).toBe(cluster.label)
     await expect(clusterExportChildDefs.length).toBe(Object.keys(cluster.children).length)

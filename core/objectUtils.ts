@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as StringUtils from './stringUtils'
 import * as DateUtils from './dateUtils'
@@ -32,50 +32,50 @@ export const keysProps = {
 type ObjectType = Record<string, unknown> | object
 
 // ====== READ
-export const getId = R.prop(keys.id)
-export const getUuid = (obj: any): string | null => R.propOr(null, keys.uuid)(obj)
+export const getId = A.prop(keys.id)
+export const getUuid = (obj: any): string | null => A.propOr(null, keys.uuid)(obj)
 
-export const getProps = R.propOr({}, keys.props)
-export const getPropsDraft = R.propOr({}, keys.propsDraft)
+export const getProps = A.propOr({}, keys.props)
+export const getPropsDraft = A.propOr({}, keys.propsDraft)
 export const getProp =
   <T>(prop: string, defaultTo: unknown = null) =>
   (obj: ObjectType): T =>
-    R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))(obj)
+    A.pipe(getProps, A.pathOr(defaultTo, prop.split('.')))(obj)
 export const isKeyTrue =
   (key: string) =>
   (obj: ObjectType): boolean =>
-    !!R.propOr(false, key)(obj)
+    !!A.propOr(false, key)(obj)
 export const isPropTrue =
   (prop: string) =>
   (obj: ObjectType): boolean =>
     !!getProp(prop)(obj)
 
-export const getParentUuid = R.propOr(null, keys.parentUuid)
+export const getParentUuid = A.propOr(null, keys.parentUuid)
 
 export const getLabels = (obj: ObjectType): Record<string, string> =>
   getProp<Record<string, string>>(keysProps.labels, {})(obj)
-export const getLabel = (lang: string, defaultTo: unknown = null) => R.pipe(getLabels, R.propOr(defaultTo, lang))
+export const getLabel = (lang: string, defaultTo: unknown = null) => A.pipe(getLabels, A.propOr(defaultTo, lang))
 
 export const getDescriptions = (obj: ObjectType): Record<string, string> =>
   getProp<Record<string, string>>(keysProps.descriptions, {})(obj)
 export const getDescription = (lang: string, defaultTo: unknown = null) =>
-  R.pipe(getDescriptions, R.propOr(defaultTo, lang))
+  A.pipe(getDescriptions, A.propOr(defaultTo, lang))
 
 export const getExtra = getProp(keysProps.extra, {})
-export const getExtraProp = (extraPropKey: string) => R.pipe(getExtra, R.propOr(null, extraPropKey))
+export const getExtraProp = (extraPropKey: string) => A.pipe(getExtra, A.propOr(null, extraPropKey))
 
 export const getDate =
   (prop: string) =>
   (obj: ObjectType): unknown =>
-    R.pipe(R.propOr(null, prop), R.unless(R.isNil, DateUtils.parseISO))(obj)
+    A.pipe(A.propOr(null, prop), A.unless(A.isNil, DateUtils.parseISO))(obj)
 export const getDateCreated = getDate(keys.dateCreated)
 export const getDateModified = getDate(keys.dateModified)
 
-export const getCycle = R.prop(keys.cycle)
+export const getCycle = A.prop(keys.cycle)
 export const getCycles = getProp(keysProps.cycles, [])
-export const getIndex = R.pipe(R.propOr(0, keys.index), Number)
-export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
-export const getAuthGroups = R.propOr([], keys.authGroups)
+export const getIndex = A.pipe(A.propOr(0, keys.index), Number)
+export const getNodeDefUuid = A.prop(keys.nodeDefUuid)
+export const getAuthGroups = A.propOr([], keys.authGroups)
 
 export const isTemporary = isKeyTrue(keys.temporary)
 export const isPublished = isKeyTrue(keys.published)
@@ -83,7 +83,7 @@ export const isDraft = isKeyTrue(keys.draft)
 
 // ====== CHECK
 const isBlank = (value: unknown): boolean =>
-  value === null || value === undefined || R.isEmpty(value) || StringUtils.isBlank(value)
+  value === null || value === undefined || A.isEmpty(value) || StringUtils.isBlank(value)
 export const isEqual =
   (other: ObjectType) =>
   (self: ObjectType): boolean =>
@@ -96,22 +96,22 @@ export const getPropsDiff =
   (obj: ObjectType): Record<string, unknown> => {
     const propsSelf = getProps(obj) as Record<string, unknown>
     const propsOther = getProps(other) as Record<string, unknown>
-    return R.fromPairs(R.difference(R.toPairs(propsOther), R.toPairs(propsSelf)))
+    return A.fromPairs(A.difference(A.toPairs(propsOther), A.toPairs(propsSelf)))
   }
 
 // ===== UPDATE
-export const assocIndex = R.assoc(keys.index)
+export const assocIndex = A.assoc(keys.index)
 
 export const mergeProps =
   (props: Record<string, unknown>) =>
   (obj: ObjectType): ObjectType =>
-    R.pipe(getProps, R.mergeLeft(props), (propsUpdate: Record<string, unknown>) =>
-      R.assoc(keys.props, propsUpdate, obj)
+    A.pipe(getProps, A.mergeLeft(props), (propsUpdate: Record<string, unknown>) =>
+      A.assoc(keys.props, propsUpdate, obj)
     )(obj)
 
-export const setProp = (key: string, value: unknown) => R.assocPath([keys.props, key], value)
+export const setProp = (key: string, value: unknown) => A.assocPath([keys.props, key], value)
 
-export const dissocProp = (key: string) => R.dissocPath([keys.props, key])
+export const dissocProp = (key: string) => A.dissocPath([keys.props, key])
 
 export const setInPath =
   (pathArray: string[], value: unknown, includeEmpty: boolean = true) =>
@@ -138,7 +138,7 @@ export const setInPath =
 
 export const assocLabels = (labels: Record<string, unknown>) => setProp(keysProps.labels, labels)
 
-export const dissocTemporary = R.unless(R.isNil, R.dissoc(keys.temporary))
+export const dissocTemporary = A.unless(A.isNil, A.dissoc(keys.temporary))
 
 export const keepNonEmptyProps = (obj: Record<string, unknown>): Record<string, unknown> =>
   Object.entries(obj).reduce((acc: Record<string, unknown>, [key, value]) => {
@@ -152,7 +152,7 @@ export const keepNonEmptyProps = (obj: Record<string, unknown>): Record<string, 
 const _getProp =
   (propNameOrExtractor: string | ((item: any) => unknown)) =>
   (item: any): unknown =>
-    typeof propNameOrExtractor === 'string' ? R.path(propNameOrExtractor.split('.'))(item) : propNameOrExtractor(item)
+    typeof propNameOrExtractor === 'string' ? A.path(propNameOrExtractor.split('.'))(item) : propNameOrExtractor(item)
 
 export const toIndexedObj = (
   array: any[],
@@ -164,14 +164,14 @@ export const toIndexedObj = (
     return acc
   }, {})
 
-export const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
+export const toUuidIndexedObj = A.partialRight(toIndexedObj, [keys.uuid])
 
 export const groupByProps =
   (...propNamesOrExtractors: Array<string | ((item: any) => unknown)>) =>
   (items: any[]): Record<string, unknown> =>
     items.reduce((acc: Record<string, unknown>, item) => {
       const props = propNamesOrExtractors.map((propNameOrExtractor) => _getProp(propNameOrExtractor)(item))
-      let itemsPartial: any = R.path(props as string[])(acc)
+      let itemsPartial: any = A.path(props as string[])(acc)
       if (!itemsPartial) {
         itemsPartial = []
       }
@@ -182,7 +182,7 @@ export const groupByProps =
 
 export const groupByProp = groupByProps
 
-export const clone = (obj: any): any => (R.isNil(obj) ? obj : JSON.parse(JSON.stringify(obj)))
+export const clone = (obj: any): any => (A.isNil(obj) ? obj : JSON.parse(JSON.stringify(obj)))
 
 export const getPropsAndPropsDraft =
   ({ backup = false } = {}): ((obj: Record<string, unknown>) => Record<string, unknown>) =>

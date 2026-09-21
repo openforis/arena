@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
@@ -9,13 +9,13 @@ const getErrorText = (i18n) => (error) =>
     : i18n.t(ValidationResult.getKey(error), ValidationResult.getParams(error))
 
 const getValidationErrorMessages = (i18n) => (validation) =>
-  R.pipe(Validation.getErrors, R.concat(Validation.getWarnings(validation)), R.map(getErrorText(i18n)))(validation)
+  A.pipe(Validation.getErrors, A.concat(Validation.getWarnings(validation)), A.map(getErrorText(i18n)))(validation)
 
 const getValidationFieldErrorMessage = (i18n, field) =>
-  R.pipe(
+  A.pipe(
     getValidationErrorMessages(i18n),
-    R.ifElse(
-      R.isEmpty,
+    A.ifElse(
+      A.isEmpty,
       () =>
         getErrorText(i18n)(
           ValidationResult.newInstance(
@@ -23,21 +23,21 @@ const getValidationFieldErrorMessage = (i18n, field) =>
             { field }
           )
         ),
-      R.join(', ')
+      A.join(', ')
     )
   )
 
 export const getValidationFieldMessages =
   (i18n, showKeys = true) =>
   (validation) =>
-    R.pipe(
+    A.pipe(
       // Extract invalid fields error messages
       Validation.getFieldValidations,
       Object.entries,
-      R.map(
+      A.map(
         ([field, fieldValidation]) =>
           `${showKeys ? `${i18n.t(field)}: ` : ''}${getValidationFieldErrorMessage(i18n, field)(fieldValidation)}`
       ),
       // Prepend validation error messages
-      (messages) => R.pipe(getValidationErrorMessages(i18n), R.concat(messages))(validation)
+      (messages) => A.pipe(getValidationErrorMessages(i18n), A.concat(messages))(validation)
     )(validation)

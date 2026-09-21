@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects, Surveys, TraverseMethod } from '@openforis/arena-core'
 
@@ -17,15 +17,15 @@ import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 const nodeDefsKey = 'nodeDefs'
 
 // ====== READ
-export const getNodeDefs = R.propOr({}, nodeDefsKey)
+export const getNodeDefs = A.propOr({}, nodeDefsKey)
 
-export const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
+export const getNodeDefsArray = A.pipe(getNodeDefs, A.values)
 
 export const getNodeDefRoot = (survey) => Surveys.getNodeDefRoot({ survey })
 
 export const getQualifierNodeDefs = (survey) => Surveys.getQualifierDefs({ survey })
 
-export const getNodeDefByUuid = (uuid) => R.pipe(getNodeDefs, R.propOr(null, uuid))
+export const getNodeDefByUuid = (uuid) => A.pipe(getNodeDefs, A.propOr(null, uuid))
 
 export const getNodeDefsByUuids =
   (uuids = []) =>
@@ -184,15 +184,15 @@ export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
     return false
   }
 
-  return R.pipe(getNodeDefChildren({ nodeDef }), R.any(NodeDef.isEntity))(survey)
+  return A.pipe(getNodeDefChildren({ nodeDef }), A.any(NodeDef.isEntity))(survey)
 }
 
 export const getNodeDefChildByName = (nodeDef, childName) => (survey) =>
   SurveyNodeDefsIndex.hasNodeDefsIndexByName(survey)
     ? Surveys.getNodeDefByName({ survey, name: childName })
-    : R.pipe(
+    : A.pipe(
         getNodeDefChildren({ nodeDef }),
-        R.find((childDef) => childName === NodeDef.getName(childDef))
+        A.find((childDef) => childName === NodeDef.getName(childDef))
       )(survey)
 
 export const getNodeDefParent = (nodeDef) => (survey) => {
@@ -264,12 +264,12 @@ export const getNodeDefsRootUnique = (survey) => {
 export const getNodeDefByName = (name) => (survey) => Surveys.getNodeDefByName({ survey, name })
 
 export const getNodeDefsByCategoryUuid = (uuid) =>
-  R.pipe(getNodeDefsArray, R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.categoryUuid], uuid)))
+  A.pipe(getNodeDefsArray, A.filter(A.pathEq([NodeDef.keys.props, NodeDef.propKeys.categoryUuid], uuid)))
 
 export const getNodeDefsByTaxonomyUuid = (uuid) =>
-  R.pipe(getNodeDefsArray, R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.taxonomyUuid], uuid)))
+  A.pipe(getNodeDefsArray, A.filter(A.pathEq([NodeDef.keys.props, NodeDef.propKeys.taxonomyUuid], uuid)))
 
-export const findNodeDef = (predicate) => R.pipe(getNodeDefsArray, R.find(predicate))
+export const findNodeDef = (predicate) => A.pipe(getNodeDefsArray, A.find(predicate))
 
 export const findNodeDefByName = (name) => (survey) => Surveys.findNodeDefByName({ survey, name })
 
@@ -282,7 +282,7 @@ export const getNodeDefMaxDecimalDigits = (nodeDef) => (survey) => {
 // ====== UPDATE
 
 export const assocNodeDefs = (nodeDefs) => (survey) => {
-  const surveyUpdated = R.assoc(nodeDefsKey, nodeDefs)(survey)
+  const surveyUpdated = A.assoc(nodeDefsKey, nodeDefs)(survey)
   return SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(surveyUpdated)
 }
 
@@ -292,12 +292,12 @@ const updateNodeDefs = (updateFn) => (survey) => {
   return assocNodeDefs(nodeDefsUpdated)(survey)
 }
 
-export const assocNodeDef = (nodeDef) => updateNodeDefs(R.assoc(NodeDef.getUuid(nodeDef), nodeDef))
+export const assocNodeDef = (nodeDef) => updateNodeDefs(A.assoc(NodeDef.getUuid(nodeDef), nodeDef))
 
 // merge the specified node defs with the ones already in the survey
 export const mergeNodeDefs = (nodeDefs) => updateNodeDefs((nodeDefsPrev) => ({ ...nodeDefsPrev, ...nodeDefs }))
 
-export const dissocNodeDef = (nodeDefUuid) => updateNodeDefs(R.dissoc(nodeDefUuid))
+export const dissocNodeDef = (nodeDefUuid) => updateNodeDefs(A.dissoc(nodeDefUuid))
 
 const updateClonedEntityDefLayout = ({ clonedEntityDef, newUuidByOldUuid }) => {
   const layout = NodeDef.getLayout(clonedEntityDef)
@@ -498,7 +498,7 @@ export const getHierarchy =
 
 export const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) => {
   await visitorFn(nodeDefItem, depth)
-  const children = R.propOr([], 'children', nodeDefItem)
+  const children = A.propOr([], 'children', nodeDefItem)
   for (const child of children) {
     await traverseHierarchyItem(child, visitorFn, depth + 1)
   }
@@ -506,7 +506,7 @@ export const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) =
 
 export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => {
   visitorFn(nodeDefItem, depth)
-  const children = R.propOr([], 'children', nodeDefItem)
+  const children = A.propOr([], 'children', nodeDefItem)
   children.forEach((child) => {
     traverseHierarchyItemSync(child, visitorFn, depth + 1)
   })
@@ -575,9 +575,9 @@ export const getNodeDefParentCode = (nodeDef) => getNodeDefByUuid(NodeDef.getPar
 export const getNodeDefAncestorCodes = (nodeDef) => (survey) => Surveys.getNodeDefAncestorCodes({ survey, nodeDef })
 
 export const isNodeDefParentCode = (nodeDef) =>
-  R.pipe(
+  A.pipe(
     getNodeDefsArray,
-    R.any((def) => NodeDef.getParentCodeDefUuid(def) === NodeDef.getUuid(nodeDef))
+    A.any((def) => NodeDef.getParentCodeDefUuid(def) === NodeDef.getUuid(nodeDef))
   )
 
 export const getNodeDefCategoryLevelIndex = (nodeDef) => (survey) => {
@@ -595,9 +595,9 @@ export const getNodeDefCodeCandidateParents =
     const candidates = []
     visitAncestorsAndSelf(nodeDef, (nodeDefAncestor) => {
       if (!NodeDef.isEqual(nodeDefAncestor)(nodeDef)) {
-        const candidatesAncestor = R.pipe(
+        const candidatesAncestor = A.pipe(
           getNodeDefChildren({ nodeDef: nodeDefAncestor }),
-          R.reject(
+          A.reject(
             (n) =>
               // Reject multiple attributes
               NodeDef.isMultiple(n) ||

@@ -1,5 +1,5 @@
 import path from 'path'
-import Archiver from 'archiver'
+import { ZipArchive } from 'archiver'
 
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
@@ -95,7 +95,7 @@ export const sendDirAsZip = ({ res, dir, name, deleteDirOnFinish = false }) => {
   // zip dir into a new temporary file to get the final size
   const tempFilePath = FileUtils.newTempFilePath()
   const output = FileUtils.createWriteStream(tempFilePath)
-  const zip = Archiver('zip')
+  const zip = new ZipArchive()
   zip.pipe(output)
   zip.directory(dir, false)
   zip.finalize()
@@ -119,7 +119,7 @@ export const sendDirAsZip = ({ res, dir, name, deleteDirOnFinish = false }) => {
 
 export const sendFilesAsZip = (res, fileName, files) => {
   setContentTypeFile({ res, fileName, contentType: contentTypes.zip })
-  const zip = Archiver('zip')
+  const zip = new ZipArchive()
   zip.pipe(res)
   files.forEach(({ data, name }) => {
     zip.append(data, { name })

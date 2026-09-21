@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -54,9 +54,9 @@ export const newReportItem = ({
 })
 
 export const { getId } = ObjectUtils
-export const isResolved = R.propOr(false, keys.resolved)
-export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
-export const getProps = R.propOr({}, keys.props)
+export const isResolved = A.propOr(false, keys.resolved)
+export const getNodeDefUuid = A.prop(keys.nodeDefUuid)
+export const getProps = A.propOr({}, keys.props)
 
 export const getItemType = ObjectUtils.getProp(propKeys.itemType)
 export const getExpression = ObjectUtils.getProp(propKeys.expression, '')

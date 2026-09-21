@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects, Points } from '@openforis/arena-core'
 
@@ -291,7 +291,7 @@ export class CategoryImportInternalJob extends Job {
 
     const itemExtraDef = this.extractItemExtraDef()
 
-    if (!R.isEmpty(itemExtraDef)) {
+    if (!A.isEmpty(itemExtraDef)) {
       await CategoryManager.updateCategoryProp(
         {
           user: this.user,

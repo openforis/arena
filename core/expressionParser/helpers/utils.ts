@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { isBlank, isNotBlank, trim } from '@core/stringUtils'
 
@@ -15,7 +15,7 @@ const binaryToString = (node: ExpressionNode): string =>
   `${toString(node.left as ExpressionNode)} ${node.operator} ${toString(node.right as ExpressionNode)}`
 
 // Valid
-const propValid = (prop: string) => R.pipe(R.prop(prop), isNotBlank)
+const propValid = (prop: string) => A.pipe(A.prop(prop), isNotBlank)
 const binaryValid = (node: ExpressionNode): boolean =>
   isValid(node.left as ExpressionNode) && propValid('operator')(node) && isValid(node.right as ExpressionNode)
 
@@ -26,7 +26,7 @@ interface TypeProps {
 
 const typeProps: Record<string, TypeProps> = {
   [types.Identifier]: {
-    toString: R.prop('name') as (node: ExpressionNode) => string,
+    toString: A.prop('name') as (node: ExpressionNode) => string,
     isValid: propValid('name') as (node: ExpressionNode) => boolean,
   },
   [types.MemberExpression]: {
@@ -34,7 +34,7 @@ const typeProps: Record<string, TypeProps> = {
     isValid: (node) => isValid(node.object as ExpressionNode) && isValid(node.property as ExpressionNode),
   },
   [types.Literal]: {
-    toString: R.prop('raw') as (node: ExpressionNode) => string,
+    toString: A.prop('raw') as (node: ExpressionNode) => string,
     isValid: propValid('raw') as (node: ExpressionNode) => boolean,
   },
   [types.ThisExpression]: {
@@ -60,7 +60,7 @@ const typeProps: Record<string, TypeProps> = {
   },
 }
 
-const getTypeProp = (type: string, prop: keyof TypeProps) => R.path([type, prop], typeProps) as TypeProps[typeof prop]
+const getTypeProp = (type: string, prop: keyof TypeProps) => A.path([type, prop], typeProps) as TypeProps[typeof prop]
 
 export const toString = (expr: ExpressionNode | null | undefined): string => {
   if (isBlank(expr)) return ''

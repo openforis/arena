@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
-import { Responsive, WidthProvider } from 'react-grid-layout'
+import { Responsive, WidthProvider } from 'react-grid-layout/legacy'
 import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
@@ -34,7 +34,7 @@ const NodeDefEntityFormGrid = (props) => {
 
   const dispatch = useDispatch()
 
-  const editContainerRef = useRef(null)
+  const editWrapperRef = useRef(null)
   const entryContainerRef = useRef(null)
 
   const survey = useSelector(SurveyState.getSurvey)
@@ -50,7 +50,7 @@ const NodeDefEntityFormGrid = (props) => {
 
   // on node def or node change, scroll inner container to top
   useEffect(() => {
-    const innerContainer = editContainerRef.current?.elementRef?.current ?? entryContainerRef.current
+    const innerContainer = editWrapperRef.current?.firstElementChild ?? entryContainerRef.current
     if (innerContainer) {
       innerContainer.scrollTop = 0
     }
@@ -170,26 +170,29 @@ const NodeDefEntityFormGrid = (props) => {
 
   if (edit) {
     return (
-      <ResponsiveGridLayout
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        autoSize={entry}
-        rowHeight={70}
-        cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
-        layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
-        containerPadding={canEditDef ? [15, 40] : [15, 15]}
-        margin={[5, 5]}
-        isDraggable={canEditDef}
-        isResizable={canEditDef}
-        compactType={null}
-        preventCollision
-        className={classNames('survey-form__node-def-entity-form-grid', { mounted: !!mountedRef.current })}
-        onDragStop={onChangeLayout}
-        onResizeStop={onChangeLayout}
-        ref={editContainerRef}
-        useCSSTransforms={false}
-      >
-        {visibleNodeDefsComponents}
-      </ResponsiveGridLayout>
+      // WidthProvider (react-grid-layout v2) does not forward refs: the wrapper gives access to the grid element
+      <div ref={editWrapperRef} style={{ display: 'contents' }}>
+        <ResponsiveGridLayout
+          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+          autoSize={entry}
+          rowHeight={70}
+          cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
+          layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
+          containerPadding={canEditDef ? [15, 40] : [15, 15]}
+          margin={[5, 5]}
+          isDraggable={canEditDef}
+          isResizable={canEditDef}
+          compactType={null}
+          preventCollision
+          // eslint-disable-next-line react-hooks/refs -- mountedRef only flips after the initial render (pre-existing)
+          className={classNames('survey-form__node-def-entity-form-grid', { mounted: !!mountedRef.current })}
+          onDragStop={onChangeLayout}
+          onResizeStop={onChangeLayout}
+          useCSSTransforms={false}
+        >
+          {visibleNodeDefsComponents}
+        </ResponsiveGridLayout>
+      </div>
     )
   }
 

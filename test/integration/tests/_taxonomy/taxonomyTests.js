@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -50,8 +50,8 @@ afterAll(async () => {
 export const taxonomyTests = async () => {
   const { survey } = getContext()
   const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId({ surveyId: Survey.getId(survey), draft: true })
-  expect(taxonomies.length).to.be.equal(1, 'None or more than one taxonomies found')
-  const taxonomy = R.head(taxonomies)
+  expect(taxonomies.length).toBe(1)
+  const taxonomy = A.head(taxonomies)
   expect(Taxonomy.getName(taxonomy)).toBe(taxonomyNameDefault)
 
   const taxaCount = await TaxonomyManager.countTaxaByTaxonomyUuid(
@@ -72,7 +72,7 @@ export const taxonomyUpdateTest = async () => {
   await TaxonomyManager.updateTaxonomyProp(user, surveyId, taxonomyUuid, Taxonomy.keysProps.name, taxonomyNameUpdated)
 
   const taxonomyUpdated = TaxonomyUtils.fetchTaxonomyByName(surveyId, taxonomyNameUpdated, true)
-  /* eslint-disable no-unused-expressions */
+
   expect(taxonomyUpdated).toBeDefined()
 
   // Restore original taxonomy name
@@ -143,7 +143,6 @@ export const taxonUpdateTest = async () => {
 
   const taxonReloaded = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, true)
 
-  /* eslint-disable no-unused-expressions */
   expect(taxonReloaded).toBeDefined()
 
   expect(Taxon.getProps(taxonReloaded)).toEqual(Taxon.getProps(taxonNew))
@@ -160,7 +159,7 @@ export const taxonomyImportErrorMissingColumnsTest = async () => {
     'species list test (short with vernacular names) (errors) (missing columns).csv'
   )
   expect(job.status).toBe(jobStatus.failed)
-  expect(R.path(['errors', '1', 'all', 'errors', '0', 'key'], job)).toBe(
+  expect(A.path(['errors', '1', 'all', 'errors', '0', 'key'], job)).toBe(
     Validation.messageKeys.taxonomyImportJob.missingRequiredColumns
   )
 }
@@ -187,7 +186,7 @@ export const taxonomyImportNewTest = async () => {
   // Check that all taxon props have been imported
   {
     const taxon = taxa.find((t) => Taxon.getCode(t) === 'AFZ/QUA')
-    /* eslint-disable no-unused-expressions */
+
     expect(taxon).toBeDefined()
     expect(Taxon.getProps(taxon)).toEqual({
       [Taxon.propKeys.code]: 'AFZ/QUA',
@@ -202,7 +201,7 @@ export const taxonomyImportNewTest = async () => {
   // Check that multiple vernacular names are imported correctly
   {
     const taxon = taxa.find((t) => Taxon.getCode(t) === 'ALB/GLA')
-    /* eslint-disable no-unused-expressions */
+
     expect(taxon).toBeDefined()
     const vernacularNames = TaxonomyUtils.getTaxonVernacularNamesText('swa')(taxon)
     expect(vernacularNames).toEqual(['Mchani', 'Mgerenge'])
