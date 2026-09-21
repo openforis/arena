@@ -52,7 +52,7 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel
 
       const [longitude, latitude] = point.geometry.coordinates
       const nextZoomLevel = zoomToMaxLevel ? map.getMaxZoom() : undefined
-      map.flyTo([latitude, longitude], nextZoomLevel)
+      map.flyTo([latitude, longitude], nextZoomLevel, { duration: 2, easeLinearity: 0.5 })
       map.once('zoomend', () => openPopupOfPoint(point))
     },
     [map, onRecordEditClick, openPopupOfPoint, zoomToMaxLevel]
