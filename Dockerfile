@@ -13,8 +13,7 @@ COPY . /app/
 
 WORKDIR /app
 
-RUN --mount=type=secret,id=npm_token,env=NPM_TOKEN \
-    yarn install --immutable \
+RUN yarn install --immutable \
     && yarn build \
     && npm install pm2 -g \
     && ln -s dist/server.js .
