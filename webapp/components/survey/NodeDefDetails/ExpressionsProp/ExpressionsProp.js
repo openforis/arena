@@ -3,7 +3,7 @@ import './ExpressionsProp.scss'
 import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import classNames from 'classnames'
 
 import { Objects } from '@openforis/arena-core'
@@ -45,7 +45,7 @@ const extractConstantValue = ({ values }) => {
   const expression = NodeDefExpression.getExpression(nodeDefExpr)
   const stringValue = typeof expression === 'string' ? expression : null
   return Expression.isLiteral(Expression.fromString(stringValue))
-    ? R.pipe(StringUtils.unquote, StringUtils.unquoteDouble)(stringValue)
+    ? A.pipe(StringUtils.unquote, StringUtils.unquoteDouble)(stringValue)
     : null
 }
 
@@ -101,7 +101,7 @@ const ExpressionsProp = (props) => {
   const [valueType, setValueType] = useState(determineValueType?.())
   const [expressionPlaceholder, setExpressionPlaceholder] = useState(null)
 
-  const valuesIsEmpty = R.isEmpty(values) || values.every(NodeDefExpression.isEmpty)
+  const valuesIsEmpty = A.isEmpty(values) || values.every(NodeDefExpression.isEmpty)
 
   const onValueTypeChange = useCallback(
     async (valueTypeNext) => {
@@ -134,7 +134,7 @@ const ExpressionsProp = (props) => {
   )
 
   const getExpressionIndex = useCallback(
-    (expression) => R.findIndex(NodeDefExpression.isEqual(expression), values),
+    (expression) => A.findIndex(NodeDefExpression.isEqual(expression), values),
     [values]
   )
 
@@ -152,7 +152,7 @@ const ExpressionsProp = (props) => {
     ({ expression, callback = null }) => {
       const index = getExpressionIndex(expression)
       if (index >= 0) {
-        const newValues = R.remove(index, 1, values)
+        const newValues = A.remove(index, 1, values)
         onChange(newValues)
         callback?.()
       } else {
@@ -187,7 +187,7 @@ const ExpressionsProp = (props) => {
       } else {
         removePlaceholder(expression)
         const index = getExpressionIndex(expression)
-        const newValues = index >= 0 ? R.update(index, expression, values) : R.append(expression, values)
+        const newValues = index >= 0 ? A.update(index, expression, values) : A.append(expression, values)
         onChange(newValues)
         callback?.()
       }
@@ -196,10 +196,10 @@ const ExpressionsProp = (props) => {
   )
 
   const uiValues = useMemo(
-    () => (Objects.isEmpty(expressionPlaceholder) ? values : R.append(expressionPlaceholder, values)),
+    () => (Objects.isEmpty(expressionPlaceholder) ? values : A.append(expressionPlaceholder, values)),
     [expressionPlaceholder, values]
   )
-  const uiValuesIsEmpty = R.isEmpty(uiValues) || uiValues.every(NodeDefExpression.isEmpty)
+  const uiValuesIsEmpty = A.isEmpty(uiValues) || uiValues.every(NodeDefExpression.isEmpty)
 
   const onAddPlaceholder = useCallback(() => {
     if (Objects.isEmpty(expressionPlaceholder)) {

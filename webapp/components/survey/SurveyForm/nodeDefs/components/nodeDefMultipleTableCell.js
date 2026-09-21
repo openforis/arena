@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -26,7 +26,7 @@ const getNodeValues = (nodeDef, nodes, lang) => {
     return Node.getValue(node)
   }
 
-  return R.reduce(
+  return A.reduce(
     (accString, node) =>
       Node.isPlaceholder(node) || Node.isValueBlank(node)
         ? accString
@@ -44,12 +44,12 @@ const NodeDefMultipleTableCell = (props) => {
 
   useEffect(() => {
     const nodeValuesUpdate = getNodeValues(nodeDef, nodes, lang)
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- keeps the derived values in sync with the nodes prop
     setNodeValues(nodeValuesUpdate)
   }, [nodes])
 
   if (showEditDialog) {
     return ReactDOM.createPortal(
-      /* eslint-disable react/jsx-props-no-spreading */
       <NodeDefMultipleEditDialog {...props} onClose={() => setShowEditDialog(false)} />,
       document.body
     )

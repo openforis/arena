@@ -1,7 +1,7 @@
 import './expressionEditorPopup.scss'
 
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Expression from '@core/expressionParser/expression'
 
@@ -98,7 +98,7 @@ const ExpressionEditorPopup = (props) => {
 
         <div className="expression-editor-popup__footer">
           <Button
-            disabled={R.isEmpty(query)}
+            disabled={A.isEmpty(query)}
             iconClassName="icon-undo2 icon-12px"
             label="common.reset"
             onClick={() => onChange('')}

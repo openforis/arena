@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -30,7 +30,7 @@ const evaluateApplicability = async ({ user, survey, childDef, record, node }) =
   let applicable = true
   const expressionsApplicable = NodeDef.getApplicable(childDef)
 
-  if (!R.isEmpty(expressionsApplicable)) {
+  if (!A.isEmpty(expressionsApplicable)) {
     const exprEval = await RecordExpressionParser.evalApplicableExpression(
       survey,
       record,
@@ -38,7 +38,7 @@ const evaluateApplicability = async ({ user, survey, childDef, record, node }) =
       expressionsApplicable,
       user
     )
-    applicable = R.propOr(false, 'value', exprEval)
+    applicable = A.propOr(false, 'value', exprEval)
   }
   return applicable
 }
@@ -158,7 +158,7 @@ export default class RecordsImportJob extends Job {
 
     for (const step of steps) {
       const entryNames = collectSurveyFileZip.getEntryNames({ path: this.getEntriesPath({ step }) })
-      if (!R.isEmpty(entryNames)) {
+      if (!A.isEmpty(entryNames)) {
         return entryNames
       }
     }
@@ -238,7 +238,7 @@ export default class RecordsImportJob extends Job {
 
           const { value = null, meta = {} } = valueAndMeta || {}
 
-          nodeToInsert = R.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
+          nodeToInsert = A.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
 
           recordUpdated = Record.assocNode(nodeToInsert, { sideEffect: true })(recordUpdated)
 
@@ -366,7 +366,7 @@ export default class RecordsImportJob extends Job {
             childrenApplicability[childDefUuid] = applicable
           }
         }
-        if (!R.isEmpty(childrenApplicability)) {
+        if (!A.isEmpty(childrenApplicability)) {
           const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
           recordUpdated = Record.assocNode(nodeUpdated, { sideEffect: true })(recordUpdated)
         }

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
@@ -108,18 +108,18 @@ export const getModulesHierarchy = (user, surveyInfo) => {
   ]
 }
 
-export const getKey = R.prop(keys.key)
-export const getUri = R.prop(keys.uri)
-export const getIcon = R.prop(keys.icon)
-export const getChildren = R.prop(keys.children)
+export const getKey = A.prop(keys.key)
+export const getUri = A.prop(keys.uri)
+export const getIcon = A.prop(keys.icon)
+export const getChildren = A.prop(keys.children)
 
-export const isRoot = R.propEq(keys.root, true)
-export const isHidden = R.propEq(keys.hidden, true)
-export const isExternal = R.propEq(keys.external, true)
+export const isRoot = A.propEq(keys.root, true)
+export const isHidden = A.propEq(keys.hidden, true)
+export const isExternal = A.propEq(keys.external, true)
 export const isHome = (module) => getKey(module) === appModules.home.key
 export const isSurveySelectionRequired = (module) =>
   ![appModules.home.key, appModules.help.key, appModules.jobs.key].includes(getKey(module))
 export const isActive = (pathname) => (module) => {
   // Module home is active when page is on landing
-  return isHome(module) ? pathname === appModuleUri(homeModules.landing) : R.startsWith(module.uri, pathname)
+  return isHome(module) ? pathname === appModuleUri(homeModules.landing) : A.startsWith(module.uri, pathname)
 }

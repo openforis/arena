@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import Job from '@server/job/job'
 
@@ -40,7 +40,7 @@ export default class NodeDefsValidationJob extends Job {
     await NodeDefManager.deleteOrphaneNodeDefs(surveyId, tx)
 
     const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
-    const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(surveySummary)
+    const cycleKeys = A.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(surveySummary)
 
     for (const cycle of cycleKeys) {
       const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
@@ -48,17 +48,17 @@ export default class NodeDefsValidationJob extends Job {
         tx
       )
 
-      R.pipe(
+      A.pipe(
         Survey.getNodeDefsValidation,
         Validation.getFieldValidations,
-        R.forEachObjIndexed((nodeDefValidation, nodeDefUuid) => {
+        A.forEachObjIndexed((nodeDefValidation, nodeDefUuid) => {
           const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
           errors[getNodeDefPath({ survey, nodeDef })] = Validation.getFieldValidations(nodeDefValidation)
         })
       )(survey)
     }
 
-    if (!R.isEmpty(errors)) {
+    if (!A.isEmpty(errors)) {
       await this.setStatusFailed()
     }
   }

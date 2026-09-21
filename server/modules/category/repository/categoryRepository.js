@@ -1,4 +1,3 @@
-import * as R from 'ramda'
 import * as A from '@core/arena'
 
 import { Objects, Strings } from '@openforis/arena-core'
@@ -269,7 +268,7 @@ export const fetchCategoryAndLevelsByUuid = async (
     ${backup || draft ? 'WHERE' : 'AND'} c.uuid = $1`,
     [categoryUuid]
   )
-  return A.pipe(R.values, R.head)(categories)
+  return A.pipe(A.values, A.head)(categories)
 }
 
 export const fetchItemsByCategoryUuid = async (
@@ -293,7 +292,7 @@ export const fetchItemsByCategoryUuid = async (
     (def) => DB.transformCallback(def, draft, true, backup)
   )
 
-  return backup || draft ? items : R.filter((item) => item.published)(items)
+  return backup || draft ? items : A.filter((item) => item.published)(items)
 }
 
 const getWhereConditionItemsWithLevelParentAndCode = ({ draft, parentUuid = null, tableAlias = 'i' }) => {
@@ -335,7 +334,7 @@ export const fetchItemsByLevelParentAndCode = async (
     itemDBTransformCallback({ draft })
   )
 
-  return draft ? items : R.filter((item) => item.published)(items)
+  return draft ? items : A.filter((item) => item.published)(items)
 }
 
 export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = false }, client = db) => {
@@ -427,7 +426,7 @@ export const fetchItemsByParentUuid = async (
   const search = _getSearchQueryParam({ searchValue })
   const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang, limit })
   const items = await client.map(select, { categoryUuid, search, limit }, itemDBTransformCallback({ draft }))
-  return draft ? items : R.filter((item) => item.published)(items)
+  return draft ? items : A.filter((item) => item.published)(items)
 }
 
 export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex }, client = db) => {
@@ -701,7 +700,7 @@ export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client
       RETURNING l.uuid
     `,
     [categoryUuid],
-    R.prop('uuid')
+    A.prop('uuid')
   )
 
 export const deleteItem = async (surveyId, itemUuid, client = db) =>

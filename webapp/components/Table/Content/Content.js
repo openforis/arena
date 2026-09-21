@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import LoadingBar from '@webapp/components/LoadingBar'
 
@@ -71,7 +71,7 @@ const Content = (props) => {
     }
   }, [offset, tableRef])
 
-  if (!loading && R.isEmpty(list)) {
+  if (!loading && A.isEmpty(list)) {
     return (
       <div className="table__empty-rows" data-testid={TestId.table.noItems}>
         {Number(totalCount) <= 0 ? i18n.t(noItemsLabelKey) : i18n.t(noItemsLabelForSearchKey)}

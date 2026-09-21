@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -40,13 +38,13 @@ export const isDirty = (state) => {
 export const getPropsUpdated = (state) => {
   const propsOriginal = NodeDef.getProps(getNodeDefOriginal(state))
   const props = NodeDef.getProps(getNodeDef(state))
-  return R.fromPairs(R.difference(R.toPairs(props), R.toPairs(propsOriginal)))
+  return A.fromPairs(A.difference(A.toPairs(props), A.toPairs(propsOriginal)))
 }
 
 export const getPropsAdvancedUpdated = (state) => {
   const propsAdvancedOriginal = NodeDef.getPropsAdvanced(getNodeDefOriginal(state))
   const propsAdvanced = NodeDef.getPropsAdvanced(getNodeDef(state))
-  return R.fromPairs(R.difference(R.toPairs(propsAdvanced), R.toPairs(propsAdvancedOriginal)))
+  return A.fromPairs(A.difference(A.toPairs(propsAdvanced), A.toPairs(propsAdvancedOriginal)))
 }
 
 const isEntityAndNotRoot = (state) => {
@@ -58,12 +56,12 @@ export const isDisplayAsEnabled = isEntityAndNotRoot
 export const isDisplayInEnabled = isEntityAndNotRoot
 
 // ===== UPDATE
-export const assocNodeDef = R.assoc(keys.nodeDef)
+export const assocNodeDef = A.assoc(keys.nodeDef)
 
-export const assocValidation = (validation) => R.assoc(keys.validation, validation)
+export const assocValidation = (validation) => A.assoc(keys.validation, validation)
 
 export const assocNodeDefAndValidation = (nodeDef, nodeDefValidation) =>
-  R.pipe(assocNodeDef(nodeDef), assocValidation(nodeDefValidation))
+  A.pipe(assocNodeDef(nodeDef), assocValidation(nodeDefValidation))
 
 export const assocNodeDefProp = (key, value) => (state) => {
   const nodeDef = getNodeDef(state)

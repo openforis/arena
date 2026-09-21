@@ -85,9 +85,10 @@ const ChainDetails = () => {
   })
 
   // chain has no description, no sampling design and no analysis attribute defined yet
+  const chainHasDescription = Object.values(Chain.getDescriptions(chain) ?? {}).some(Boolean)
   const chainEmpty =
     !chainLoaded ||
-    (!Chain.getDescription(chain) &&
+    (!chainHasDescription &&
       !Chain.hasSamplingDesign(chain) &&
       Survey.getAnalysisNodeDefs({
         chain,

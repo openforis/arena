@@ -25,7 +25,14 @@ module.exports = {
   // subpath straight to its source file until Jest is upgraded past 27.
   // Resolved via require.resolve (not <rootDir>) so it still points here when this config is
   // spread into test/e2e/jest.config.js, which overrides rootDir to test/e2e/.
+  // Path aliases (mirrors jsconfig.json / the webpack configs): unit and integration tests are bundled
+  // by webpack, but e2e runs the sources directly through Jest, which needs them resolved here.
   moduleNameMapper: {
+    '^@common/(.*)$': `${__dirname}/common/$1`,
+    '^@core/(.*)$': `${__dirname}/core/$1`,
+    '^@server/(.*)$': `${__dirname}/server/$1`,
+    '^@webapp/(.*)$': `${__dirname}/webapp/$1`,
+    '^@test/(.*)$': `${__dirname}/test/$1`,
     '^n2words/(.+)$': `${require.resolve('n2words/package.json').replace(/package\.json$/, 'src')}/$1.js`,
   },
   verbose: true,

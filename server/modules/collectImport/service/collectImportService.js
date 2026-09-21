@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { db } from '@server/db/db'
 
@@ -38,7 +38,7 @@ export const updateReportItem = async (user, surveyId, itemId, props, resolved, 
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
     const collectReport = Survey.getCollectReport(surveyInfo)
-    const issuesResolved = R.propOr(0, Survey.collectReportKeys.issuesResolved)(collectReport)
+    const issuesResolved = A.propOr(0, Survey.collectReportKeys.issuesResolved)(collectReport)
     const issuesResolvedUpdated = issuesResolved + (resolved ? 1 : -1)
 
     const collectReportUpdated = {

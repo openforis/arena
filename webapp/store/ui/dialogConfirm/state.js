@@ -1,10 +1,10 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as UiState from '../state'
 
 export const stateKey = 'dialogConfirm'
 
-const getState = R.pipe(UiState.getState, R.propOr({}, stateKey))
+const getState = A.pipe(UiState.getState, A.propOr({}, stateKey))
 
 const keys = {
   key: 'key',
@@ -36,29 +36,29 @@ const keys = {
   checkboxChecked: 'checkboxChecked',
 }
 
-export const getKey = R.pipe(getState, R.propOr(null, keys.key))
-export const getParams = R.pipe(getState, R.propOr({}, keys.params))
-export const getOnOk = R.pipe(getState, R.prop(keys.onOk))
-export const isDismissable = R.pipe(getState, R.propEq(keys.dismissable, true))
-export const getOnCancel = R.pipe(getState, R.prop(keys.onCancel))
-export const getOkButtonLabel = R.pipe(getState, R.propOr('common.ok', keys.okButtonLabel))
-export const getOkButtonClass = R.pipe(getState, R.prop(keys.okButtonClass))
-export const getOkButtonIconClass = R.pipe(getState, R.propOr('icon-checkmark icon-12px', keys.okButtonIconClass))
+export const getKey = A.pipe(getState, A.propOr(null, keys.key))
+export const getParams = A.pipe(getState, A.propOr({}, keys.params))
+export const getOnOk = A.pipe(getState, A.prop(keys.onOk))
+export const isDismissable = A.pipe(getState, A.propEq(keys.dismissable, true))
+export const getOnCancel = A.pipe(getState, A.prop(keys.onCancel))
+export const getOkButtonLabel = A.pipe(getState, A.propOr('common.ok', keys.okButtonLabel))
+export const getOkButtonClass = A.pipe(getState, A.prop(keys.okButtonClass))
+export const getOkButtonIconClass = A.pipe(getState, A.propOr('icon-checkmark icon-12px', keys.okButtonIconClass))
 // checkbox option
-export const getCheckboxLabel = R.pipe(getState, R.propOr(null, keys.checkboxLabel))
-export const getOnOkChecked = R.pipe(getState, R.prop(keys.onOkChecked))
-export const getOkButtonLabelChecked = R.pipe(getState, R.prop(keys.okButtonLabelChecked))
-export const getOkButtonClassChecked = R.pipe(getState, R.prop(keys.okButtonClassChecked))
-export const isCheckboxChecked = R.pipe(getState, R.propEq(keys.checkboxChecked, true))
-export const getCheckboxCheckedContentKey = R.pipe(getState, R.propOr(null, keys.checkboxCheckedContentKey))
-export const getCheckboxCheckedContentParams = R.pipe(getState, R.propOr({}, keys.checkboxCheckedContentParams))
+export const getCheckboxLabel = A.pipe(getState, A.propOr(null, keys.checkboxLabel))
+export const getOnOkChecked = A.pipe(getState, A.prop(keys.onOkChecked))
+export const getOkButtonLabelChecked = A.pipe(getState, A.prop(keys.okButtonLabelChecked))
+export const getOkButtonClassChecked = A.pipe(getState, A.prop(keys.okButtonClassChecked))
+export const isCheckboxChecked = A.pipe(getState, A.propEq(keys.checkboxChecked, true))
+export const getCheckboxCheckedContentKey = A.pipe(getState, A.propOr(null, keys.checkboxCheckedContentKey))
+export const getCheckboxCheckedContentParams = A.pipe(getState, A.propOr({}, keys.checkboxCheckedContentParams))
 // header
-export const getHeaderText = R.pipe(getState, R.propOr(null, keys.headerText))
+export const getHeaderText = A.pipe(getState, A.propOr(null, keys.headerText))
 // strong confirmation
-export const isStrongConfirm = R.pipe(getState, R.propEq(keys.strongConfirm, true))
-export const getStrongConfirmInputLabel = R.pipe(getState, R.propOr(null, keys.strongConfirmInputLabel))
-export const getStrongConfirmRequiredText = R.pipe(getState, R.propOr(null, keys.strongConfirmRequiredText))
-export const getStrongConfirmText = R.pipe(getState, R.propOr('', keys.strongConfirmText))
+export const isStrongConfirm = A.pipe(getState, A.propEq(keys.strongConfirm, true))
+export const getStrongConfirmInputLabel = A.pipe(getState, A.propOr(null, keys.strongConfirmInputLabel))
+export const getStrongConfirmRequiredText = A.pipe(getState, A.propOr(null, keys.strongConfirmRequiredText))
+export const getStrongConfirmText = A.pipe(getState, A.propOr('', keys.strongConfirmText))
 
 // create
 export const show = ({
@@ -103,5 +103,5 @@ export const show = ({
 
 // update
 export const hide = () => ({})
-export const setStrongConfirmText = (text) => R.assoc(keys.strongConfirmText, text)
-export const setCheckboxChecked = (checked) => R.assoc(keys.checkboxChecked, checked)
+export const setStrongConfirmText = (text) => A.assoc(keys.strongConfirmText, text)
+export const setCheckboxChecked = (checked) => A.assoc(keys.checkboxChecked, checked)

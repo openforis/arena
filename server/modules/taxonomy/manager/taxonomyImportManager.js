@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import BatchPersister from '@server/db/batchPersister'
 
@@ -80,7 +80,7 @@ export default class TaxonomyImportManager {
     // Update existing item
     const taxonUpdated = Taxon.mergeProps(taxon)(taxonExisting)
     if (!TaxonComparator.isTaxonEqual(taxonExisting)(taxonUpdated)) {
-      await this.batchPersisterUpdate.addItem(R.omit([Validation.keys.validation], taxonUpdated))
+      await this.batchPersisterUpdate.addItem(A.omit([Validation.keys.validation], taxonUpdated))
     }
     return true
   }
@@ -119,7 +119,7 @@ export default class TaxonomyImportManager {
     }
 
     // Insert new one
-    await this.batchPersisterInsert.addItem(R.omit([Validation.keys.validation], taxon))
+    await this.batchPersisterInsert.addItem(A.omit([Validation.keys.validation], taxon))
 
     this.insertedCodes.add(code)
     this.seenCodes.add(code)
@@ -137,9 +137,9 @@ export default class TaxonomyImportManager {
     )
 
     // Insert predefined taxa (UNL - UNK)
-    const predefinedTaxaToInsert = R.pipe(
+    const predefinedTaxaToInsert = A.pipe(
       createPredefinedTaxa,
-      R.filter((taxon) => !this.insertedCodes.has(Taxon.getCode(taxon)))
+      A.filter((taxon) => !this.insertedCodes.has(Taxon.getCode(taxon)))
     )(this.taxonomy)
 
     for (const predefinedTaxon of predefinedTaxaToInsert) {

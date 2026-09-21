@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/refs */
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import React, { createRef, useMemo, useRef } from 'react'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import './ServiceErrors.scss'
@@ -40,7 +40,7 @@ const ServiceErrors = () => {
   }, [errors]) // Only re-runs when the errors array changes
 
   return (
-    <TransitionGroup className={`service-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`} enter appear>
+    <TransitionGroup className={`service-errors${A.isEmpty(errors) ? ' hidden-transition' : ''}`} enter appear>
       {itemsWithRefs.map(({ error, nodeRef }) => (
         <CSSTransition key={error.id} timeout={500} classNames="fade" nodeRef={nodeRef}>
           <ServiceError error={error} nodeRef={nodeRef} />

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 const keys = {
   collectSurveyFileZip: 'collectSurveyFileZip',
@@ -7,10 +7,10 @@ const keys = {
 
 // ===== READ
 
-export const getCollectSurveyFileZip = R.prop(keys.collectSurveyFileZip)
+export const getCollectSurveyFileZip = A.prop(keys.collectSurveyFileZip)
 
-export const getSurvey = R.prop(keys.survey)
+export const getSurvey = A.prop(keys.survey)
 
 // ===== UPDATE
 
-export const assocSurvey = R.assoc(keys.survey)
+export const assocSurvey = A.assoc(keys.survey)

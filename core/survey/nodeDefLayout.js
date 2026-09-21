@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -57,9 +57,9 @@ export const columnWidthMaxPx = 500
 // ====== CREATE
 
 export const newLayout = (cycle, renderAs, pageUuid = null) =>
-  R.pipe(
-    R.assocPath([cycle, keys.renderType], renderAs),
-    R.when(R.always(pageUuid), R.assocPath([cycle, keys.pageUuid], pageUuid))
+  A.pipe(
+    A.assocPath([cycle, keys.renderType], renderAs),
+    A.when(A.always(pageUuid), A.assocPath([cycle, keys.pageUuid], pageUuid))
   )({})
 
 // ====== READ
@@ -78,11 +78,11 @@ const layoutPropsDefault = {
 
 export const getLayout = ObjectUtils.getProp(keys.layout, {})
 
-export const getLayoutCycle = (cycle) => R.pipe(getLayout, R.prop(cycle))
+export const getLayoutCycle = (cycle) => A.pipe(getLayout, A.prop(cycle))
 
 export const hasLayoutCycle = (cycle) => (nodeDef) => Boolean(getLayoutCycle(cycle)(nodeDef))
 
-export const getPropLayout = (cycle, prop) => R.pipe(getLayoutCycle(cycle), R.propOr(layoutPropsDefault[prop], prop))
+export const getPropLayout = (cycle, prop) => A.pipe(getLayoutCycle(cycle), A.propOr(layoutPropsDefault[prop], prop))
 
 export const getIndexChildren = (cycle) => getPropLayout(cycle, keys.indexChildren)
 
@@ -169,25 +169,25 @@ export const getLayoutChildrenUuids = (cycle) => (nodeDef) => {
   const layoutChildren = getLayoutChildren(cycle)(nodeDef)
   return nodeDefRenderType === renderType.table
     ? layoutChildren
-    : R.pipe(R.sortWith([R.ascend(R.prop('y')), R.ascend(R.prop('x'))]), R.map(R.prop('i')))(layoutChildren)
+    : A.pipe(A.sortWith([A.ascend(A.prop('y')), A.ascend(A.prop('x'))]), A.map(A.prop('i')))(layoutChildren)
 }
 
 export const getColumnsNo = (cycle) => getPropLayout(cycle, keys.columnsNo)
 
 export const getPageUuid = (cycle) => getPropLayout(cycle, keys.pageUuid)
 
-export const hasPage = (cycle) => R.pipe(getPageUuid(cycle), R.isNil, R.not)
+export const hasPage = (cycle) => A.pipe(getPageUuid(cycle), A.isNil, A.not)
 
 export const getDisplayIn = (cycle) =>
-  R.ifElse(hasPage(cycle), R.always(displayIn.ownPage), R.always(displayIn.parentPage))
+  A.ifElse(hasPage(cycle), A.always(displayIn.ownPage), A.always(displayIn.parentPage))
 
-const isRenderType = (cycle, type) => R.pipe(getRenderType(cycle), R.equals(type))
+const isRenderType = (cycle, type) => A.pipe(getRenderType(cycle), A.equals(type))
 export const isRenderTable = (cycle) => isRenderType(cycle, renderType.table)
 export const isRenderForm = (cycle) => isRenderType(cycle, renderType.form)
 export const isRenderDropdown = (cycle) => isRenderType(cycle, renderType.dropdown)
 export const isRenderCheckbox = (cycle) => isRenderType(cycle, renderType.checkbox)
 
-const isDisplayIn = (cycle, value) => R.pipe(getDisplayIn(cycle), R.equals(value))
+const isDisplayIn = (cycle, value) => A.pipe(getDisplayIn(cycle), A.equals(value))
 export const isDisplayInParentPage = (cycle) => isDisplayIn(cycle, displayIn.parentPage)
 export const isDisplayInOwnPage = (cycle) => isDisplayIn(cycle, displayIn.ownPage)
 export const isRenderFromInOwnPage = (cycle) => (nodeDef) =>
@@ -208,23 +208,23 @@ export const isCodeShown = (cycle) => getPropLayout(cycle, keys.codeShown)
 // ====== UPDATE
 
 // invoked on "layout"
-export const assocLayoutCycle = (cycle, layoutCycle) => R.assoc(cycle, layoutCycle)
+export const assocLayoutCycle = (cycle, layoutCycle) => A.assoc(cycle, layoutCycle)
 
-export const dissocLayoutCycle = (cycle) => R.dissoc(cycle)
+export const dissocLayoutCycle = (cycle) => A.dissoc(cycle)
 
 export const dissocLayoutCycles = (cycles) => (nodeDefLayout) =>
   cycles.reduce((nodeDefLayoutUpdated, cycle) => dissocLayoutCycle(cycle)(nodeDefLayoutUpdated), nodeDefLayout)
 
-export const assocLayoutProp = (cycle, prop, value) => R.assocPath([cycle, prop], value)
+export const assocLayoutProp = (cycle, prop, value) => A.assocPath([cycle, prop], value)
 
-export const dissocLayoutProp = (cycle, prop) => R.dissocPath([cycle, prop])
+export const dissocLayoutProp = (cycle, prop) => A.dissocPath([cycle, prop])
 
 export const assocIndexChildren = (cycle, indexChildren) => assocLayoutProp(cycle, keys.indexChildren, indexChildren)
 
 export const assocLayoutChildren = (cycle, layoutChildren) =>
   assocLayoutProp(cycle, keys.layoutChildren, layoutChildren)
 
-export const dissocLayoutChildren = (cycle) => R.dissocPath([cycle, keys.layoutChildren])
+export const dissocLayoutChildren = (cycle) => A.dissocPath([cycle, keys.layoutChildren])
 
 export const assocPageUuid = (cycle, pageUuid) => assocLayoutProp(cycle, keys.pageUuid, pageUuid)
 
@@ -237,4 +237,4 @@ export const assocIncludeInMultipleEntitySummary = (cycle, value) =>
 
 // ====== UTILS
 
-export const rejectNodeDefsWithPage = (cycle) => R.reject(hasPage(cycle))
+export const rejectNodeDefsWithPage = (cycle) => A.reject(hasPage(cycle))

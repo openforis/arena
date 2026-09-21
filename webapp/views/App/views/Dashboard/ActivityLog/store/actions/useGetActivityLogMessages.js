@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { useState } from 'react'
 
 import * as A from '@core/arena'
@@ -33,9 +31,9 @@ export const useFetchMessages = ({ messages, setMessages }) => {
     }
     const highlighted = newest && initialized
 
-    const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
-    const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
-    const newMessages = newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
+    const messagesNew = A.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
+    const messagesOld = A.map(ActivityLogMessage.dissocHighlighted, messages)
+    const newMessages = newest ? A.concat(messagesNew, messagesOld) : A.concat(messagesOld, messagesNew)
     if (newMessages) {
       setMessages(newMessages)
     }
@@ -62,9 +60,9 @@ export const useFetchMessages = ({ messages, setMessages }) => {
 
     if (initialized) {
       if (_newest) {
-        _params.idGreaterThan = R.pipe(R.head, ActivityLogMessage.getId)(messages)
+        _params.idGreaterThan = A.pipe(A.head, ActivityLogMessage.getId)(messages)
       } else {
-        _params.idLessThan = R.pipe(R.last, ActivityLogMessage.getId)(messages)
+        _params.idLessThan = A.pipe(A.last, ActivityLogMessage.getId)(messages)
       }
     }
 

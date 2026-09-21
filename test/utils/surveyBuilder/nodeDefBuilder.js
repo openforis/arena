@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
@@ -43,7 +43,7 @@ export default class NodeDefBuilder {
   minCount(count) {
     return this._setProp(
       NodeDef.keysPropsAdvanced.validations,
-      R.pipe(NodeDef.getValidations, NodeDefValidations.assocMinCount(count))(this),
+      A.pipe(NodeDef.getValidations, NodeDefValidations.assocMinCount(count))(this),
       true
     )
   }
@@ -51,7 +51,7 @@ export default class NodeDefBuilder {
   maxCount(count) {
     return this._setProp(
       NodeDef.keysPropsAdvanced.validations,
-      R.pipe(NodeDef.getValidations, NodeDefValidations.assocMaxCount(count))(this),
+      A.pipe(NodeDef.getValidations, NodeDefValidations.assocMaxCount(count))(this),
       true
     )
   }
@@ -59,7 +59,7 @@ export default class NodeDefBuilder {
   expressions(...expressions) {
     return this._setProp(
       NodeDef.keysPropsAdvanced.validations,
-      R.pipe(NodeDef.getValidations, NodeDefValidations.assocExpressions(expressions))(this),
+      A.pipe(NodeDef.getValidations, NodeDefValidations.assocExpressions(expressions))(this),
       true
     )
   }

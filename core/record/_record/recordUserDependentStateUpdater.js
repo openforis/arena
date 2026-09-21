@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Nodes, RecordExpressionEvaluator, RecordNodesUpdater as CoreRecordNodesUpdater } from '@openforis/arena-core'
 
@@ -28,7 +28,7 @@ const _recomputeBooleanState = async ({ user, survey, record, nodeDefs, getExpre
 
   for (const nodeDef of nodeDefs) {
     const expressions = getExpressions(nodeDef)
-    if (R.isEmpty(expressions)) continue
+    if (A.isEmpty(expressions)) continue
 
     const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
     if (!parentNodeDef) continue // root node def has no parent to store meta on
@@ -63,9 +63,9 @@ const _recomputeBooleanState = async ({ user, survey, record, nodeDefs, getExpre
 // (Nodes.isDefaultValueApplied / Nodes.isValueBlank checks in canApplyDefaultValue).
 const _recomputeDefaultValues = async ({ user, survey, record, nodeDefs }) => {
   const nodeDefsToRecompute = nodeDefs.filter(
-    (nodeDef) => !R.isEmpty(NodeDef.getDefaultValues(nodeDef)) && !NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
+    (nodeDef) => !A.isEmpty(NodeDef.getDefaultValues(nodeDef)) && !NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
   )
-  if (R.isEmpty(nodeDefsToRecompute)) return record
+  if (A.isEmpty(nodeDefsToRecompute)) return record
 
   const nodesToRecompute = nodeDefsToRecompute.reduce((acc, nodeDef) => {
     RecordReader.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record).forEach((node) => {
@@ -73,7 +73,7 @@ const _recomputeDefaultValues = async ({ user, survey, record, nodeDefs }) => {
     })
     return acc
   }, {})
-  if (R.isEmpty(nodesToRecompute)) return record
+  if (A.isEmpty(nodesToRecompute)) return record
 
   const { record: recordUpdated } = await updateNodesDependents({
     user,
@@ -90,7 +90,7 @@ const _recomputeDefaultValues = async ({ user, survey, record, nodeDefs }) => {
 // persists anything, so callers decide whether/how the result should be stored.
 const recomputeUserDependentNodeState = async ({ user, survey, record }) => {
   const nodeDefsUserDependent = Survey.getNodeDefsArray(survey).filter(NodeDef.hasUserDependentExpressions)
-  if (R.isEmpty(nodeDefsUserDependent)) return record
+  if (A.isEmpty(nodeDefsUserDependent)) return record
 
   let recordUpdated = await _recomputeBooleanState({
     user,

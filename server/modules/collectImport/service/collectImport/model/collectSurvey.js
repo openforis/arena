@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { nodeDefType } from '@core/survey/nodeDef'
 import NodeDefUniqueNameGenerator from './nodeDefUniqueNameGenerator'
@@ -64,58 +64,58 @@ export const getNodeDefFieldsByCollectNodeDef = (collectNodeDef) => {
 export const toLabels =
   (elName, defaultLang, typesFilter = [], suffix = '') =>
   (xml) =>
-    R.pipe(
+    A.pipe(
       getElementsByName(elName),
-      R.reduce((labelsAcc, labelEl) => {
+      A.reduce((labelsAcc, labelEl) => {
         const lang = getAttribute(keys.lang, defaultLang)(labelEl)
         const type = getAttribute(keys.type)(labelEl)
 
-        if (!R.has(lang, labelsAcc) && (R.isEmpty(typesFilter) || R.includes(type, typesFilter))) {
+        if (!A.has(lang, labelsAcc) && (A.isEmpty(typesFilter) || A.includes(type, typesFilter))) {
           const text = getText(labelEl) + suffix
-          return R.assoc(lang, text, labelsAcc)
+          return A.assoc(lang, text, labelsAcc)
         }
 
         return labelsAcc
       }, {})
     )(xml)
 
-export const getElements = R.propOr([], keys.elements)
+export const getElements = A.propOr([], keys.elements)
 
 export const getElementsByName = (name) =>
-  R.pipe(
+  A.pipe(
     getElements,
-    R.filter((el) => getElementName(el) === name)
+    A.filter((el) => getElementName(el) === name)
   )
 
 export const getElementsByPath = (path) => (xml) =>
-  R.reduce(
+  A.reduce(
     (acc, pathPart) =>
-      R.ifElse(
-        R.isNil,
-        R.identity,
-        R.pipe(R.ifElse(R.is(Array), R.head, R.identity), getElementsByName(pathPart))
+      A.ifElse(
+        A.isNil,
+        A.identity,
+        A.pipe(A.ifElse(A.is(Array), A.head, A.identity), getElementsByName(pathPart))
       )(acc),
     xml,
     path
   )
 
-export const getElementByName = (name) => R.pipe(getElementsByName(name), R.head)
+export const getElementByName = (name) => A.pipe(getElementsByName(name), A.head)
 
 export const getNodeDefChildByName = (name) =>
-  R.pipe(
+  A.pipe(
     getElements,
-    R.find((el) => getNodeDefName(el) === name)
+    A.find((el) => getNodeDefName(el) === name)
   )
 
-export const getElementName = R.prop(keys.name)
+export const getElementName = A.prop(keys.name)
 
-export const getText = R.pipe(getElements, R.find(R.propEq(keys.type, keys.text)), R.prop(keys.text))
+export const getText = A.pipe(getElements, A.find(A.propEq(keys.type, keys.text)), A.prop(keys.text))
 
-export const getChildElementText = (name) => R.pipe(getElementByName(name), getText)
+export const getChildElementText = (name) => A.pipe(getElementByName(name), getText)
 
-export const getAttributes = R.propOr({}, keys.attributes)
+export const getAttributes = A.propOr({}, keys.attributes)
 
-export const getAttribute = (name, defaultValue = null) => R.pipe(getAttributes, R.propOr(defaultValue, name))
+export const getAttribute = (name, defaultValue = null) => A.pipe(getAttributes, A.propOr(defaultValue, name))
 
 /**
  * Returns the attribute called 'name' of a node def element.
@@ -124,7 +124,7 @@ const getNodeDefName = getAttribute('name')
 
 export const getAttributeName = getNodeDefName
 
-export const getAttributeBoolean = (name) => R.pipe(getAttribute(name), R.equals('true'))
+export const getAttributeBoolean = (name) => A.pipe(getAttribute(name), A.equals('true'))
 
 const _transformValue = (value) =>
   value === 'true' || value === 'false'
@@ -147,17 +147,17 @@ export const getCollectAttribute =
     return _transformValue(value)
   }
 
-export const getNodeDefRoot = R.pipe(getElementsByPath(['schema', 'entity']), R.head)
+export const getNodeDefRoot = A.pipe(getElementsByPath(['schema', 'entity']), A.head)
 
 export const getNodeDefByPath = (collectNodeDefPath) => (collectSurvey) => {
-  const collectAncestorNodeNames = R.pipe(R.split('/'), R.reject(R.isEmpty))(collectNodeDefPath)
+  const collectAncestorNodeNames = A.pipe(A.split('/'), A.reject(A.isEmpty))(collectNodeDefPath)
 
   let currentCollectNode = getElementByName('schema')(collectSurvey)
 
   for (const collectAncestorNodeName of collectAncestorNodeNames) {
-    const collectChildNodeDef = R.pipe(
-      R.propOr([], 'elements'),
-      R.find(R.pathEq(['attributes', 'name'], collectAncestorNodeName))
+    const collectChildNodeDef = A.pipe(
+      A.propOr([], 'elements'),
+      A.find(A.pathEq(['attributes', 'name'], collectAncestorNodeName))
     )(currentCollectNode)
 
     if (collectChildNodeDef) {
@@ -170,9 +170,9 @@ export const getNodeDefByPath = (collectNodeDefPath) => (collectSurvey) => {
   return currentCollectNode
 }
 
-export const getNodeDefChildren = (collectNodeDef) => R.pipe(getElements, R.filter(_isNodeDefElement))(collectNodeDef)
+export const getNodeDefChildren = (collectNodeDef) => A.pipe(getElements, A.filter(_isNodeDefElement))(collectNodeDef)
 
-const _isNodeDefElement = R.pipe(getElementName, (name) => R.includes(name, R.keys(collectNodeDefTypes)))
+const _isNodeDefElement = A.pipe(getElementName, (name) => A.includes(name, A.keys(collectNodeDefTypes)))
 
 export const isCollectEarthSurvey = (collectSurvey) => getAttribute('collect:target', null)(collectSurvey) === 'CE'
 

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Survey from '@core/survey/survey'
@@ -10,7 +10,7 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import { fetchFullContextSurvey } from '../config/context'
 
 const validateExpression = async (survey, nodeDefName, expression) => {
-  const nodeDef = R.pipe(
+  const nodeDef = A.pipe(
     Survey.getNodeDefByName(nodeDefName),
     NodeDef.mergePropsAdvanced({
       [NodeDef.keysPropsAdvanced.validations]: {
@@ -102,7 +102,7 @@ const expressions = [
 
 describe('NodeDefExpressions Validation Test', () => {
   expressions.forEach((expr) => {
-    test(expr.t, async () => {
+    test(`${expr.t}`, async () => {
       const survey = await fetchFullContextSurvey()
       const validation = await validateExpression(survey, expr.n, expr.e)
       expect(Validation.isValid(validation)).toBe(expr.v)
