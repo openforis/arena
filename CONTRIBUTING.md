@@ -4,7 +4,7 @@
 
 First, [install Yarn](https://yarnpkg.com/en/docs/install) (a modern npm replacement).
 
-Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using LTS version 18.x).
+Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using version 24.11.1).
 
 ## Development
 
