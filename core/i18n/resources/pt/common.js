@@ -1066,6 +1066,10 @@ $t(common.appNameFull)
       form: 'Formulário',
       formula: 'Fórmula',
       includedInClonedData: 'Incluído nos dados clonados',
+      includedInMultipleEntitySummary: {
+        label: 'Incluir no resumo da entidade múltipla',
+        info: `Se marcado, o valor do atributo ficará visível no seletor de entidades e na tela de resumo da entidade`,
+      },
       includedInRecordsList: {
         label: 'Incluir na lista de registros',
         info: `Se marcado, o atributo ficará visível na lista de registros`,
@@ -1132,10 +1136,6 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
       hiddenInMobile: {
         label: 'Oculto no Arena Mobile',
         info: `Se marcado, o atributo não ficará visível no AM`,
-      },
-      includedInMultipleEntitySummary: {
-        label: 'Incluir no resumo da entidade múltipla',
-        info: `Se marcado, o atributo ficará visível na tela de resumo da entidade (no Arena Mobile)`,
       },
       includedInPreviousCycleLink: {
         label: 'Incluir no link para ciclo anterior',

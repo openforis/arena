@@ -881,7 +881,7 @@ export const canIncludeInPreviousCycleLink = (cycle) => (nodeDef) =>
   !isKey(nodeDef) && NodeDefLayout.canIncludeInPreviousCycleLink(cycle)(nodeDef)
 
 export const canHaveMobileProps = (cycle) => (nodeDef) =>
-  canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+  canBeHiddenInMobile(nodeDef) || canIncludeInPreviousCycleLink(cycle)(nodeDef)
 
 export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
   if (!isKey(nodeDef) || !isInteger(nodeDef)) return false

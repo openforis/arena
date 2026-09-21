@@ -148,7 +148,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
   const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   const nodeDefName = NodeDef.getLabel(nodeDef, lang)
-  const nodeKeysLabelValues = useNodeKeysLabelValues(nodeDef, nodes)
+  const nodeKeysLabelValues = useNodeKeysLabelValues(nodeDef, nodes, { includeSummaryAttributes: true })
   const selectedValue = selectedNode ? Node.getUuid(selectedNode) : PLACEHOLDER_VALUE
   const placeholderLabel = i18n.t('common.select')
 

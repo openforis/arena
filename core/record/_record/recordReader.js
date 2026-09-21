@@ -111,7 +111,17 @@ export const visitDescendantsAndSelf =
     }
   }
 
-export const findDescendantOrSelf = (node, filterFn) => (record) => Records.findDescendantOrSelf(node, filterFn)(record)
+export const findDescendantOrSelf = (node, filterFn) => (record) => {
+  let found = null
+  visitDescendantsAndSelf(
+    node,
+    (currentNode) => {
+      if (filterFn(currentNode)) found = currentNode
+    },
+    () => found !== null
+  )(record)
+  return found
+}
 
 /**
  * Finds a the parent node of the specified node def, starting from the specified parent node and traversing
