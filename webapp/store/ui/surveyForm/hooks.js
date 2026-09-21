@@ -101,13 +101,16 @@ export const useNodeKeysLabelValues = (nodeDef, nodeEntities, { includeSummaryAt
         nodeEntity,
         (node) => Node.getNodeDefUuid(node) === nodeDefChildUuid
       )(record)
-      const value = nodeChild ? _getNodeValueString({ nodeDef: nodeDefChild, node: nodeChild, lang }) : ''
+      const valueRaw = nodeChild ? _getNodeValueString({ nodeDef: nodeDefChild, node: nodeChild, lang }) : null
+      const value = String(valueRaw ?? '')
       return { label, value }
     }
 
     return nodeEntities.map((nodeEntity) => {
       const keysLabelValues = nodeDefKeys.map(getNodeDefLabelValue(nodeEntity))
-      const summaryLabelValues = nodeDefSummaries.map(getNodeDefLabelValue(nodeEntity)).filter(({ value }) => !!value)
+      const summaryLabelValues = nodeDefSummaries
+        .map(getNodeDefLabelValue(nodeEntity))
+        .filter(({ value }) => value !== '')
       return [...keysLabelValues, ...summaryLabelValues].map(({ label, value }) => `${label}: ${value}`).join(', ')
     })
   })
