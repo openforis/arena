@@ -33,6 +33,9 @@ module.exports = {
     '^@server/(.*)$': `${__dirname}/server/$1`,
     '^@webapp/(.*)$': `${__dirname}/webapp/$1`,
     '^@test/(.*)$': `${__dirname}/test/$1`,
+    // pdfkit (dependency of @openforis/arena-server) has an exports map only; without exports support Jest
+    // picks its ESM browser build, so point it to the CommonJS build.
+    '^pdfkit$': require.resolve('pdfkit'),
     '^n2words/(.+)$': `${require.resolve('n2words/package.json').replace(/package\.json$/, 'src')}/$1.js`,
   },
   verbose: true,
