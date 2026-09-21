@@ -58,7 +58,7 @@ export const EqualEarthBaseLayer = createLayerComponent<MaplibreGLLayer, EqualEa
 
     // Only starts once the layer is actually added to the map (not just mounted) - the
     // record-editing coordinate picker mounts this component without ever adding it
-    // (Equal Earth isn't its default layer there), and there's no reason to fetch 250KB
+    // (Equal Earth isn't its default layer there), and there's no reason to fetch several MB
     // of data for a layer nobody selected.
     const ensureDataFetched = (): void => {
       if (fetchStarted) return
