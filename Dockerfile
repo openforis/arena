@@ -13,7 +13,7 @@ COPY . /app/
 
 WORKDIR /app
 
-RUN yarn install --immutable \
+RUN yarn install --immutable --mode=skip-build \
     && yarn build \
     && npm install pm2 -g \
     && ln -s dist/server.js .
