@@ -128,7 +128,7 @@
     "@mui/x-date-pickers": "^9",
     "@mui/x-tree-view": "^9",
     "@ngageoint/geopackage": "^4.2.9",
-    "@openforis/arena-server": "^2.4.0",
+    "@openforis/arena-server": "^2.4.2",
     "@reduxjs/toolkit": "^2.11.2",
     "@sendgrid/mail": "^8.1.6",
     "@shopify/draggable": "^1.2.1",

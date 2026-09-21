@@ -4,7 +4,6 @@ on:
   pull_request:
 
 env:
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   PGHOST: localhost
   PGPORT: 5444
   PGDATABASE: of-arena-test
@@ -20,8 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup
-        with:
-          access-token: ${{ secrets.ACCESS_TOKEN }}
       - name: Build
         run: yarn build
       - name: Upload build output
@@ -62,8 +59,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup
-        with:
-          access-token: ${{ secrets.ACCESS_TOKEN }}
       # Integration tests hit the DB directly and need the schema migrated first, which currently
       # only happens as a side effect of server startup (MIGRATE_ONLY is not read anywhere in
       # server/ or @openforis/arena-server, so `yarn server:migrate` boots the full server and
@@ -117,8 +112,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup
-        with:
-          access-token: ${{ secrets.ACCESS_TOKEN }}
       - name: Install Playwright browsers
         if: matrix.playwright
         run: npx playwright install --with-deps
