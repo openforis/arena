@@ -13,7 +13,7 @@ export const keys = {
   layoutChildren: 'layoutChildren', // React Data Grid layout (form layout) or sorted children uuids (table layout)
   hiddenWhenNotRelevant: 'hiddenWhenNotRelevant', // Boolean: true if the node must be hidden when is not relevant
   hiddenInMobile: 'hiddenInMobile', // Boolean: true if the node must be always hidden in Arena Mobile
-  includedInMultipleEntitySummary: 'includedInMultipleEntitySummary', // Boolean: true if the attribute must be included in the multiple entity summary (in mobile)
+  includedInMultipleEntitySummary: 'includedInMultipleEntitySummary', // Boolean: true if the attribute must be included in the multiple entity summary
   includedInPreviousCycleLink: 'includedInPreviousCycleLink', // Boolean: true if the previous cycle value must be visible for this node
   // Node Def Code
   codeShown: 'codeShown', // Boolean: true if the code of the category item should be shown, false otherwise

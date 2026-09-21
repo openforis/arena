@@ -1036,6 +1036,10 @@ $t(common.appNameFull)
       form: 'Форма',
       formula: 'Формула',
       includedInClonedData: 'Включено в клонированные данные',
+      includedInMultipleEntitySummary: {
+        label: 'Включить в сводку множественной сущности',
+        info: `Если отмечено, значение атрибута будет отображаться в списке выбора сущности и в представлении сводки сущности`,
+      },
       includedInRecordsList: {
         label: 'Включить в список записей',
         info: `Если отмечено, атрибут будет виден в списке записей`,
@@ -1102,10 +1106,6 @@ $t(common.appNameFull)
       hiddenInMobile: {
         label: 'Скрыто в Arena Mobile',
         info: `Если отмечено, атрибут не будет виден в AM`,
-      },
-      includedInMultipleEntitySummary: {
-        label: 'Включить в сводку множественной сущности',
-        info: `Если отмечено, атрибут будет виден в представлении сводки сущности`,
       },
       includedInPreviousCycleLink: {
         label: 'Включить в ссылку на предыдущий цикл',

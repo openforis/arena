@@ -280,6 +280,20 @@ const BasicProps = (props) => {
         </FormItem>
       )}
 
+      {canIncludeInMultipleEntitySummary && !ancestorMultipleEntityIsRoot && (
+        <FormItem label="nodeDefEdit.basicProps.includedInMultipleEntitySummary.label">
+          <Checkbox
+            checked={includeInMultipleEntitySummary}
+            disabled={readOnly}
+            info="nodeDefEdit.basicProps.includedInMultipleEntitySummary.info"
+            validation={Validation.getFieldValidation(NodeDefLayout.keys.includedInMultipleEntitySummary)(validation)}
+            onChange={(value) =>
+              Actions.setLayoutProp({ state, key: NodeDefLayout.keys.includedInMultipleEntitySummary, value })
+            }
+          />
+        </FormItem>
+      )}
+
       <CyclesSelector
         cyclesKeysSelectable={cyclesKeysParent}
         cyclesKeysSelected={cyclesNodeDef}

@@ -1067,6 +1067,10 @@ $t(common.appNameFull)
       form: 'Formulaire',
       formula: 'Formule',
       includedInClonedData: 'Inclus dans les données clonées',
+      includedInMultipleEntitySummary: {
+        label: "Inclure dans le résumé de l'entité multiple",
+        info: `Si coché, la valeur de l'attribut sera visible dans le sélecteur d'entités et dans la vue récapitulative de l'entité`,
+      },
       includedInRecordsList: {
         label: 'Inclure dans la liste des enregistrements',
         info: `Si coché, l'attribut sera visible dans la liste des enregistrements`,
@@ -1133,10 +1137,6 @@ Ex. this.region = nom_attribut_region
       hiddenInMobile: {
         label: 'Masqué dans Arena Mobile',
         info: `Si coché, l'attribut ne sera pas visible dans AM`,
-      },
-      includedInMultipleEntitySummary: {
-        label: "Inclure dans le résumé de l'entité multiple",
-        info: `Si coché, l'attribut sera visible dans la vue récapitulative de l'entité (dans Arena Mobile)`,
       },
       includedInPreviousCycleLink: {
         label: 'Inclure dans le lien du cycle précédent',
