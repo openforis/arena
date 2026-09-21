@@ -1064,7 +1064,7 @@ $t(common.appNameFull)
       includedInClonedData: 'Incluído nos dados clonados',
       includedInMultipleEntitySummary: {
         label: 'Incluir no resumo da entidade múltipla',
-        info: `Se marcado, o atributo ficará visível na tela de resumo da entidade (no Arena Mobile)`,
+        info: `Se marcado, o valor do atributo ficará visível no seletor de entidades e na tela de resumo da entidade`,
       },
       includedInRecordsList: {
         label: 'Incluir na lista de registros',

@@ -919,7 +919,7 @@ $t(common.appNameFull)
       includedInClonedData: 'Incluido en los datos clonados',
       includedInMultipleEntitySummary: {
         label: 'Incluir en el resumen de entidades múltiples',
-        info: 'Si está marcado, el atributo será visible en la vista de resumen de la entidad',
+        info: `Si está marcado, el valor del atributo será visible en el selector de entidades y en la vista de resumen de la entidad`,
       },
       includedInRecordsList: {
         label: 'Incluir en la lista de registros',

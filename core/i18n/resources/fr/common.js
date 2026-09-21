@@ -1069,7 +1069,7 @@ $t(common.appNameFull)
       includedInClonedData: 'Inclus dans les données clonées',
       includedInMultipleEntitySummary: {
         label: "Inclure dans le résumé de l'entité multiple",
-        info: `Si coché, l'attribut sera visible dans la vue récapitulative de l'entité (dans Arena Mobile)`,
+        info: `Si coché, la valeur de l'attribut sera visible dans le sélecteur d'entités et dans la vue récapitulative de l'entité`,
       },
       includedInRecordsList: {
         label: 'Inclure dans la liste des enregistrements',

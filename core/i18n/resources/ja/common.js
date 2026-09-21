@@ -1064,7 +1064,7 @@ $t(common.appNameFull)
       includedInClonedData: '複製データに含める',
       includedInMultipleEntitySummary: {
         label: '複数項目の概要に含める',
-        info: `有効にすると、この属性は項目概要ビュー（Arena Mobile内）に表示されます`,
+        info: `有効にすると、この属性の値が、エンティティ選択リストおよびエンティティ概要ビューに表示されます`,
       },
       includedInRecordsList: {
         label: '記録一覧に含める',
