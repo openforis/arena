@@ -4,7 +4,7 @@ import { dirname, resolve } from 'node:path'
 import union from '@turf/union'
 
 const SOURCE_URL =
-  'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson'
+  'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_countries.geojson'
 const OUTPUT_PATH = resolve(
   import.meta.dirname,
   '..',
@@ -26,7 +26,7 @@ const CHINA_ADM0_A3 = 'CHN'
 // Kashmir is NOT adjusted: the UN's actual convention there is to omit a definitive
 // international boundary through the disputed area (typically a dashed/unresolved line
 // sourced from a dedicated disputed-boundaries dataset), not to assign the territory to
-// one country. Natural Earth's 110m admin-0 countries file (this script's only source)
+// one country. Natural Earth's 10m admin-0 countries file (this script's only source)
 // doesn't carry that boundary-line detail at this resolution - it's absorbed into
 // India/Pakistan/China's ordinary polygons with no separate feature to adjust. Left as
 // Natural Earth's de facto boundary; documented here as a known limitation rather than
@@ -41,6 +41,24 @@ interface NaturalEarthFeature {
 interface NaturalEarthFeatureCollection {
   type: 'FeatureCollection'
   features: NaturalEarthFeature[]
+}
+
+// 10m is the most detailed Natural Earth scale (110m drops most islands, e.g. only ~12 of the
+// Philippines'). Coordinates are rounded to 2 decimals (~1km) and consecutive duplicates
+// dropped to keep the file small - the UN raster takes over at high zoom anyway.
+const COORDINATE_DECIMALS = 2
+
+const roundCoordinates = (coordinates: any): any => {
+  if (typeof coordinates[0] === 'number') {
+    return coordinates.map((value: number) => Number(value.toFixed(COORDINATE_DECIMALS)))
+  }
+  const rounded = coordinates.map(roundCoordinates)
+  if (typeof rounded[0]?.[0] !== 'number') return rounded
+  // ring / line: drop consecutive duplicate positions
+  return rounded.filter(
+    (position: number[], index: number) =>
+      index === 0 || position[0] !== rounded[index - 1][0] || position[1] !== rounded[index - 1][1]
+  )
 }
 
 const mergeTaiwanIntoChina = (features: NaturalEarthFeature[]): NaturalEarthFeature[] => {
@@ -78,7 +96,7 @@ const run = async (): Promise<void> => {
     features: featuresWithTaiwanMerged.map((feature) => ({
       type: 'Feature',
       properties: { admin: feature.properties.ADM0_A3, mapcolor7: feature.properties.MAPCOLOR7 },
-      geometry: feature.geometry,
+      geometry: { ...feature.geometry, coordinates: roundCoordinates(feature.geometry.coordinates) },
     })),
   }
 
