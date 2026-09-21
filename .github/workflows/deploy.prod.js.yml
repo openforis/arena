@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0 # fetch all tags, default 1
+          persist-credentials: false # avoid leaking the token into .git/config (COPY'd into the Docker image)
 
       - name: Use Node.js
         uses: actions/setup-node@v5
@@ -60,6 +61,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0 # fetch all tags, default 1
+          persist-credentials: false # avoid leaking the token into .git/config (COPY'd into the Docker image)
 
       - name: Use Node.js
         uses: actions/setup-node@v5
