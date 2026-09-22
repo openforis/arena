@@ -194,7 +194,7 @@ const isTypeFastIndexable = (nodeDefType) => Object.hasOwn(fastEqualityKeyExtrac
  * @param {!object} [params.nodeDef] - The node def of the compared value.
  * @param {object} [params.value] - The value to compute the key for.
  * @returns {{supported: boolean, key: (string|null)}} - supported is false if the node def type isn't
- * indexable this way; key is null when the value is empty (an empty value never matches, per isValueEqual).
+ * indexable this way; key is null when the value is empty (callers should treat a null key as non-match when using this key for indexing).
  */
 const getFastEqualityKeyWithoutRecordContext = ({ survey, nodeDef, value }) => {
   const extractor = fastEqualityKeyExtractorByNodeDefType[NodeDef.getType(nodeDef)]
