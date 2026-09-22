@@ -45,9 +45,8 @@ RUN rm -rf \
     node_modules/wait-on \
     node_modules/playwright \
     node_modules/uglifyjs-webpack-plugin \
-    node_modules/@babel/plugin-transform-modules-systemjs
-
-RUN ln -s dist/server.js .
+    node_modules/@babel/plugin-transform-modules-systemjs \
+    && ln -s dist/server.js .
 
 USER node
 
