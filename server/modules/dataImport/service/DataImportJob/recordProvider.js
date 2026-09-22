@@ -19,6 +19,76 @@ const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
   }
 }
 
+// Length-prefix each key part before concatenating, so that different key part arrays can never
+// produce the same bucket key string, regardless of their content (no separator character to collide
+// on, unlike a plain join or a doubled-separator escape - which is still ambiguous for values that are
+// themselves runs of the separator straddling a part boundary, e.g. ["\u0001\u0001", "X"] vs
+// ["\u0001", "\u0001X"]). Must be used identically on both the index-build and the lookup side.
+const buildBucketKey = (keyParts) => keyParts.map((keyPart) => `${keyPart.length}:${keyPart}`).join('')
+
+/**
+ * Builds a Map index of recordsSummary bucketed by root key values, so that a matching record can be
+ * looked up in O(1) instead of scanning the whole array for every imported row (recordsSummary can hold
+ * every existing record in the survey, and this lookup otherwise runs once per imported row).
+ * Returns null when at least one root key def's type isn't supported by
+ * NodeValues.getFastEqualityKeyWithoutRecordContext: callers should fall back to a full scan in that case,
+ * matching the pre-existing behavior exactly (see fetchOrCreateRecord below).
+ * @param {!object} params - The function parameters.
+ * @param {!object} params.survey - The survey object.
+ * @param {!Array<object>} params.rootKeyDefs - The root entity key node defs.
+ * @param {!Array<object>} params.recordsSummary - The records summary list to index.
+ * @returns {Map<string, Array<object>>|null} - The index, or null if it cannot be built safely.
+ */
+const buildRecordsSummaryIndex = ({ survey, rootKeyDefs, recordsSummary }) => {
+  if (!rootKeyDefs.every((rootKeyDef) => NodeValues.isTypeFastIndexable(NodeDef.getType(rootKeyDef)))) {
+    return null
+  }
+  const index = new Map()
+  recordsSummary.forEach((record) => {
+    const keyParts = []
+    for (const rootKeyDef of rootKeyDefs) {
+      const value = record[A.camelize(NodeDef.getName(rootKeyDef))]
+      const { key } = NodeValues.getFastEqualityKeyWithoutRecordContext({ survey, nodeDef: rootKeyDef, value })
+      if (key === null) return // record has an empty root key value: never matches, skip indexing it
+      keyParts.push(key)
+    }
+    const bucketKey = buildBucketKey(keyParts)
+    const bucket = index.get(bucketKey)
+    if (bucket) {
+      bucket.push(record)
+    } else {
+      index.set(bucketKey, [record])
+    }
+  })
+  return index
+}
+
+const findRecordSummariesMatchingKeysByIndex = ({ survey, rootKeyDefs, valuesByDefUuid, index }) => {
+  const keyParts = []
+  for (const rootKeyDef of rootKeyDefs) {
+    const value = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
+    const { key } = NodeValues.getFastEqualityKeyWithoutRecordContext({ survey, nodeDef: rootKeyDef, value })
+    if (key === null) return [] // empty value in the row: never matches, same as the full-scan comparator
+    keyParts.push(key)
+  }
+  return index.get(buildBucketKey(keyParts)) ?? []
+}
+
+const findRecordSummariesMatchingKeysByScan = ({ survey, rootKeyDefs, valuesByDefUuid, recordsSummary }) =>
+  recordsSummary.filter((record) =>
+    rootKeyDefs.every((rootKeyDef) => {
+      const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
+      const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
+
+      return NodeValues.isValueEqual({
+        survey,
+        nodeDef: rootKeyDef,
+        value: keyValueInRecord,
+        valueSearch: keyValueInRow,
+      })
+    })
+  )
+
 const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback, currentRecord = null }) => {
   const { cycle, dryRun, insertNewRecords, recordsSummary, survey, surveyId, updateRecordsInAnalysis, user } = context
 
@@ -35,19 +105,21 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback
 
   checkRootKeysSpecified({ rootKeyDefs, rootKeyValuesFormatted })
 
-  const recordSummariesMatchingKeys = recordsSummary.filter((record) =>
-    rootKeyDefs.every((rootKeyDef) => {
-      const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
-      const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
-
-      return NodeValues.isValueEqual({
-        survey,
-        nodeDef: rootKeyDef,
-        value: keyValueInRecord,
-        valueSearch: keyValueInRow,
-      })
+  if (context.recordsSummaryIndex === undefined) {
+    // built lazily on first row and cached on the (per-job, mutable) context for subsequent rows;
+    // not enumerable so it doesn't leak into job context logging/serialization
+    Object.defineProperty(context, 'recordsSummaryIndex', {
+      value: buildRecordsSummaryIndex({ survey, rootKeyDefs, recordsSummary }),
+      enumerable: false,
+      writable: true,
     })
-  )
+  }
+  const { recordsSummaryIndex } = context
+
+  const recordSummariesMatchingKeys = recordsSummaryIndex
+    ? findRecordSummariesMatchingKeysByIndex({ survey, rootKeyDefs, valuesByDefUuid, index: recordsSummaryIndex })
+    : findRecordSummariesMatchingKeysByScan({ survey, rootKeyDefs, valuesByDefUuid, recordsSummary })
+
   const keyNameValuePairs = rootKeyDefs
     .map((keyDef, index) => {
       const name = NodeDef.getName(keyDef)
@@ -121,4 +193,6 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback
 
 export const DataImportJobRecordProvider = {
   fetchOrCreateRecord,
+  // exported for unit testing: bucket key construction must stay collision-free (see buildBucketKey)
+  buildBucketKey,
 }
