@@ -23,13 +23,15 @@ RUN yarn install --immutable --mode=skip-build \
 # full node image, which otherwise sit unused in the final image.
 FROM node:${node_version}-bookworm-slim AS arena
 
-RUN npm install pm2 -g
+RUN npm install --ignore-scripts pm2@7.0.4 -g
 
 WORKDIR /app
 
-COPY --from=builder /app /app/
+COPY --chown=node:node --from=builder /app /app/
 
 RUN ln -s dist/server.js .
+
+USER node
 
 CMD ["pm2-runtime", "server.js"]
 
