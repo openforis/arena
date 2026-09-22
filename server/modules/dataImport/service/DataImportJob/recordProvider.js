@@ -47,7 +47,7 @@ const buildRecordsSummaryIndex = ({ survey, rootKeyDefs, recordsSummary }) => {
       if (key === null) return // record has an empty root key value: never matches, skip indexing it
       keyParts.push(key)
     }
-    const bucketKey = keyParts.join(bucketKeySeparator)
+    const bucketKey = keyParts.map((keyPart) => keyPart.replaceAll(bucketKeySeparator, `${bucketKeySeparator}${bucketKeySeparator}`)).join(bucketKeySeparator)
     const bucket = index.get(bucketKey)
     if (bucket) {
       bucket.push(record)
