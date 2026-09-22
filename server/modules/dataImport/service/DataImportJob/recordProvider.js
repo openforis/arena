@@ -19,7 +19,12 @@ const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
   }
 }
 
-const bucketKeySeparator = '\u0001'
+// Length-prefix each key part before concatenating, so that different key part arrays can never
+// produce the same bucket key string, regardless of their content (no separator character to collide
+// on, unlike a plain join or a doubled-separator escape - which is still ambiguous for values that are
+// themselves runs of the separator straddling a part boundary, e.g. ["\u0001\u0001", "X"] vs
+// ["\u0001", "\u0001X"]). Must be used identically on both the index-build and the lookup side.
+const buildBucketKey = (keyParts) => keyParts.map((keyPart) => `${keyPart.length}:${keyPart}`).join('')
 
 /**
  * Builds a Map index of recordsSummary bucketed by root key values, so that a matching record can be
@@ -47,7 +52,7 @@ const buildRecordsSummaryIndex = ({ survey, rootKeyDefs, recordsSummary }) => {
       if (key === null) return // record has an empty root key value: never matches, skip indexing it
       keyParts.push(key)
     }
-    const bucketKey = keyParts.map((keyPart) => keyPart.replaceAll(bucketKeySeparator, `${bucketKeySeparator}${bucketKeySeparator}`)).join(bucketKeySeparator)
+    const bucketKey = buildBucketKey(keyParts)
     const bucket = index.get(bucketKey)
     if (bucket) {
       bucket.push(record)
@@ -66,7 +71,7 @@ const findRecordSummariesMatchingKeysByIndex = ({ survey, rootKeyDefs, valuesByD
     if (key === null) return [] // empty value in the row: never matches, same as the full-scan comparator
     keyParts.push(key)
   }
-  return index.get(keyParts.join(bucketKeySeparator)) ?? []
+  return index.get(buildBucketKey(keyParts)) ?? []
 }
 
 const findRecordSummariesMatchingKeysByScan = ({ survey, rootKeyDefs, valuesByDefUuid, recordsSummary }) =>
@@ -188,4 +193,6 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback
 
 export const DataImportJobRecordProvider = {
   fetchOrCreateRecord,
+  // exported for unit testing: bucket key construction must stay collision-free (see buildBucketKey)
+  buildBucketKey,
 }

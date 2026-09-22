@@ -183,18 +183,24 @@ const fastEqualityKeyExtractorByNodeDefType = {
 const isTypeFastIndexable = (nodeDefType) => Object.hasOwn(fastEqualityKeyExtractorByNodeDefType, nodeDefType)
 
 /**
- * Computes a string key equivalent to isValueEqual's result, valid ONLY when isValueEqual would be
- * called without record/parentNode/attribute (no hierarchical code resolution, non-strict comparison) -
+ * Computes a string key for building a lookup index, valid ONLY when isValueEqual would be called
+ * without record/parentNode/attribute (no hierarchical code resolution, non-strict comparison) -
  * exactly the conditions under which flat values (e.g. record summaries) are matched against each other.
- * Two values produce the same key if and only if isValueEqual (called under those conditions) would
- * consider them equal. Do NOT reuse this outside of that context: hierarchical code attributes need
- * the record/parentNode-aware resolution in isValueEqual and are intentionally unsupported here.
+ * For 2 non-empty values, this key matches if and only if isValueEqual (called under those conditions)
+ * would consider them equal. Empty values are always given a null key here, and null keys are always
+ * treated by callers as "does not match anything" - this is a deliberate simplification and diverges
+ * from isValueEqual, which returns true for 2 values that are === (e.g. two nulls, or two empty
+ * strings), via its own value === valueSearch shortcut. Callers relying on the equivalence with
+ * isValueEqual must ensure at least one of the two compared values can never be empty (e.g. by
+ * validating the searched-for value isn't empty before doing any lookup), as is done by every current
+ * caller. Do NOT reuse this outside of that context: hierarchical code attributes need the
+ * record/parentNode-aware resolution in isValueEqual and are intentionally unsupported here.
  * @param {!object} params - The function parameters.
  * @param {!object} [params.survey] - The survey object.
  * @param {!object} [params.nodeDef] - The node def of the compared value.
  * @param {object} [params.value] - The value to compute the key for.
  * @returns {{supported: boolean, key: (string|null)}} - supported is false if the node def type isn't
- * indexable this way; key is null when the value is empty (callers should treat a null key as non-match when using this key for indexing).
+ * indexable this way; key is null when the value is empty (see above).
  */
 const getFastEqualityKeyWithoutRecordContext = ({ survey, nodeDef, value }) => {
   const extractor = fastEqualityKeyExtractorByNodeDefType[NodeDef.getType(nodeDef)]
