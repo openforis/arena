@@ -45,15 +45,18 @@ export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
       )
       // a missed resize would leave the table one row high (only its header visible) and break the next tests
       // (no optional chaining here: the function is serialized and evaluated in the page)
+      // Timeout matches the outer test timeout below with margin for cleanup/reporting: under CI
+      // load the grid layout can take well over 5s to react to the simulated drag, which was
+      // making this test (and every downstream test relying on the table being expanded) flaky.
       await page.waitForFunction(
         ({ selector, heightBefore }) => {
           const el = document.querySelector(selector)
           return !!el && el.getBoundingClientRect().height > heightBefore * 2
         },
         { selector: entitySelector, heightBefore: entityBBox.height },
-        { timeout: 5000 }
+        { timeout: 12000 }
       )
-    })
+    }, 15000)
   }
 }
 
