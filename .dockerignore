@@ -1,5 +1,11 @@
 .git
 node_modules
+# local Python virtualenvs (e.g. a scratch venv for prototyping a translation
+# helper) have no relation to this Node.js project, but were still getting
+# copied into the image via `COPY . /app/` when present on the build machine
+.venv*
+venv/
+__pycache__
 npm-debug.log
 yarn-error.log
 .env
