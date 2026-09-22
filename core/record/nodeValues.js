@@ -162,8 +162,58 @@ const isValueEqual = ({
   return !!valueComparator?.({ survey, nodeDef, record, parentNode, value, valueSearch, attribute, strict })
 }
 
+// ===== Fast equality key (for building lookup indexes over flat/summary values)
+
+// Node def types for which isValueEqual, when called WITHOUT record/parentNode/attribute
+// (i.e. no hierarchical category item resolution), depends only on the 2 compared values
+// and can therefore be reduced to a single string key safe to use as a Map bucket key.
+const fastEqualityKeyExtractorByNodeDefType = {
+  [NodeDef.nodeDefType.boolean]: ({ value }) => String(value),
+  [NodeDef.nodeDefType.text]: ({ value }) => String(value),
+  [NodeDef.nodeDefType.integer]: ({ value }) => String(value),
+  [NodeDef.nodeDefType.decimal]: ({ value }) => String(value),
+  [NodeDef.nodeDefType.code]: ({ survey, value }) => extractCategoryItemCodeFromValue({ survey, value }),
+}
+
+/**
+ * Determines whether a node def type is supported by getFastEqualityKeyWithoutRecordContext.
+ * @param {!string} nodeDefType - The node def type (see NodeDef.nodeDefType).
+ * @returns {boolean} - True if the type is supported.
+ */
+const isTypeFastIndexable = (nodeDefType) => Object.hasOwn(fastEqualityKeyExtractorByNodeDefType, nodeDefType)
+
+/**
+ * Computes a string key for building a lookup index, valid ONLY when isValueEqual would be called
+ * without record/parentNode/attribute (no hierarchical code resolution, non-strict comparison) -
+ * exactly the conditions under which flat values (e.g. record summaries) are matched against each other.
+ * For 2 non-empty values, this key matches if and only if isValueEqual (called under those conditions)
+ * would consider them equal. Empty values are always given a null key here, and null keys are always
+ * treated by callers as "does not match anything" - this is a deliberate simplification and diverges
+ * from isValueEqual, which returns true for 2 values that are === (e.g. two nulls, or two empty
+ * strings), via its own value === valueSearch shortcut. Callers relying on the equivalence with
+ * isValueEqual must ensure at least one of the two compared values can never be empty (e.g. by
+ * validating the searched-for value isn't empty before doing any lookup), as is done by every current
+ * caller. Do NOT reuse this outside of that context: hierarchical code attributes need the
+ * record/parentNode-aware resolution in isValueEqual and are intentionally unsupported here.
+ * @param {!object} params - The function parameters.
+ * @param {!object} [params.survey] - The survey object.
+ * @param {!object} [params.nodeDef] - The node def of the compared value.
+ * @param {object} [params.value] - The value to compute the key for.
+ * @returns {{supported: boolean, key: (string|null)}} - supported is false if the node def type isn't
+ * indexable this way; key is null when the value is empty (see above).
+ */
+const getFastEqualityKeyWithoutRecordContext = ({ survey, nodeDef, value }) => {
+  const extractor = fastEqualityKeyExtractorByNodeDefType[NodeDef.getType(nodeDef)]
+  if (!extractor) return { supported: false, key: null }
+  if (Objects.isEmpty(value)) return { supported: true, key: null }
+  const key = extractor({ survey, value })
+  return { supported: true, key: Objects.isEmpty(key) ? null : key }
+}
+
 export const NodeValues = {
   isValueEqual,
+  isTypeFastIndexable,
+  getFastEqualityKeyWithoutRecordContext,
   getValueCode,
   getValueItemUuid,
 }
