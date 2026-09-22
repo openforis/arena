@@ -1,5 +1,4 @@
-.git/config
-.git/modules/**/config
+.git
 node_modules
 npm-debug.log
 yarn-error.log
