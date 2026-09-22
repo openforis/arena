@@ -231,7 +231,7 @@ const buildNodeDefItem = ({ survey, nodeDef, languages, defaultLang, cycle, incl
     categoryLevel: getCodeAttributeCategoryLevel(survey, nodeDef),
     enumerator,
     taxonomyName: getTaxonomyName(survey, nodeDef),
-    multiple: String(NodeDef.isMultiple(nodeDef)),
+    multiple: String(NodeDef.isMultiple(nodeDef) || NodeDef.isRoot(nodeDef)),
     readOnly: String(NodeDef.isReadOnly(nodeDef)),
     fileType: NodeDef.isFile(nodeDef) ? NodeDef.getFileType(nodeDef) : '',
     maxFileSize: NodeDef.isFile(nodeDef) ? String(NodeDef.getMaxFileSize(nodeDef)) : '',
