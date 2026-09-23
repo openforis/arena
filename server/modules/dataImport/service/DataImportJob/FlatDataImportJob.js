@@ -44,6 +44,11 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     this.filesToDeleteByUuid = {}
     this.entityUuidTouchedByRecordUuid = {}
     this.entitiesCreated = 0
+    // nodes (by uuid) updated in the current record whose dependent nodes (and validation) have not been updated yet:
+    // dependents are evaluated once per record (instead of once per updated attribute) to avoid quadratic processing time
+    // when the survey has expressions depending on many nodes (e.g. aggregate functions on multiple entities);
+    // the node objects are the same ones passed to the batch persisters (their ids are set when they are inserted)
+    this.nodesPendingDependentsUpdateByUuid = new Map()
   }
 
   async onStart() {
@@ -86,6 +91,10 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
     this.flatDataReader = await this.createFlatDataReader()
     await this.startFlatDataReader()
+
+    if (!this.isCanceled()) {
+      await this.updatePendingDependentsSafe()
+    }
 
     if (!this.hasErrors() && this.processed === 0) {
       // Error: empty file
@@ -189,7 +198,11 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
   async fetchOrCreateRecord({ valuesByDefUuid }) {
     const { currentRecord, context, tx } = this
-    const flushCallback = async () => this.flushBatchPersisters()
+    const flushCallback = async () => {
+      // dependents must be updated (and persisted) before another record is fetched
+      await this.updatePendingDependents()
+      await this.flushBatchPersisters()
+    }
     return DataImportJobRecordProvider.fetchOrCreateRecord({
       valuesByDefUuid,
       currentRecord,
@@ -217,7 +230,12 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     })
 
     try {
+      const previousRecord = this.currentRecord
       const { record, newRecord } = await this.fetchOrCreateRecord({ valuesByDefUuid })
+      if (previousRecord && Record.getUuid(previousRecord) !== Record.getUuid(record)) {
+        // moving to another record: update dependents of the previous one (this.currentRecord is still the previous one)
+        await this.updatePendingDependents()
+      }
       this.currentRecord = record
       const recordUuid = Record.getUuid(this.currentRecord)
 
@@ -240,6 +258,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         taxonProvider,
         insertMissingNodes,
         sideEffect,
+        updateDependents: false,
       })(this.currentRecord)
 
       const entityUuid = Node.getUuid(entity)
@@ -263,6 +282,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         sideEffect,
         categoryItemProvider,
         taxonProvider,
+        updateDependents: false,
       })(this.currentRecord)
 
       updateResult.merge(updateResultUpdateAttributes)
@@ -270,6 +290,12 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
       const { nodes: nodesUpdated } = updateResult
       await this.persistUpdatedNodes({ nodesUpdated })
+
+      Object.values(nodesUpdated).forEach((node) => {
+        if (!Node.isDeleted(node)) {
+          this.nodesPendingDependentsUpdateByUuid.set(Node.getUuid(node), node)
+        }
+      })
 
       // update counts
       const nodesUpdatedArray = Object.values(nodesUpdated)
@@ -281,6 +307,77 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         this.updatedRecordsUuids.add(recordUuid)
       }
       this.updateFilesSummary({ originalRecord: record, nodesUpdatedArray })
+    } catch (e) {
+      const { key, params } = e
+      const errorKey = key ?? Validation.messageKeys.dataImport.errorUpdatingValues
+      const errorParams = params ?? { details: String(e) }
+      this._addError(errorKey, errorParams)
+    }
+  }
+
+  /**
+   * Updates the dependent nodes and the validation of the nodes updated in the current record since the last call,
+   * and persists the changes.
+   * @returns {Promise<void>} - The promise that resolves when the update is completed.
+   */
+  async updatePendingDependents() {
+    const { context, currentRecord } = this
+    const pendingNodesByUuid = this.nodesPendingDependentsUpdateByUuid
+    if (pendingNodesByUuid.size === 0) return
+
+    const { survey, includeFiles, user } = context
+
+    const nodesUpdated = {}
+    pendingNodesByUuid.forEach((_node, nodeUuid) => {
+      const node = Record.getNodeByUuid(nodeUuid)(currentRecord)
+      if (node) {
+        nodesUpdated[nodeUuid] = node
+      }
+    })
+    this.nodesPendingDependentsUpdateByUuid = new Map()
+
+    if (Object.keys(nodesUpdated).length === 0) return
+
+    const { record: recordUpdated, nodes: nodesUpdatedWithDependents } = await Record.afterNodesUpdate({
+      user,
+      survey,
+      record: currentRecord,
+      nodes: nodesUpdated,
+      categoryItemProvider,
+      taxonProvider,
+      sideEffect: !includeFiles,
+    })
+    this.currentRecord = recordUpdated
+
+    // persist only the nodes changed by the dependents update (the original nodes have already been persisted)
+    const nodesChanged = Object.values(nodesUpdatedWithDependents).filter(
+      (node) => Node.isCreated(node) || Node.isUpdated(node) || Node.isDeleted(node)
+    )
+
+    // nodes inserted in this same batch have no id yet (it is set when they are inserted) and the updates use it:
+    // insert them now and copy the id from the node object that has been inserted
+    const nodesWithoutId = nodesChanged.filter((node) => !Node.getId(node))
+    if (nodesWithoutId.length > 0) {
+      await this.nodesInsertBatchPersister.flush()
+      nodesWithoutId.forEach((node) => {
+        const nodeId = Node.getId(pendingNodesByUuid.get(Node.getUuid(node)))
+        if (nodeId) {
+          node.id = nodeId
+        }
+      })
+    }
+    await this.persistUpdatedNodes({ nodesUpdated: nodesChanged })
+
+    const recordUuid = Record.getUuid(recordUpdated)
+    if (nodesChanged.length > 0 && !this.insertedRecordsUuids.has(recordUuid)) {
+      this.updatedValues += nodesChanged.length
+      this.updatedRecordsUuids.add(recordUuid)
+    }
+  }
+
+  async updatePendingDependentsSafe() {
+    try {
+      await this.updatePendingDependents()
     } catch (e) {
       const { key, params } = e
       const errorKey = key ?? Validation.messageKeys.dataImport.errorUpdatingValues
