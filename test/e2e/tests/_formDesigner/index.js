@@ -31,6 +31,18 @@ export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
 
   if (nodeDefChild.type === 'entity') {
     test(`Expand ${nodeDefChild.name} table`, async () => {
+      // The previous test (persistNodeDefChanges) just navigated back here, which briefly shows
+      // the app's global route loader (Routes.js renders <Loader />, centered on the viewport -
+      // see Loader.scss's .loader__boxes) on top of everything. page.waitForSelector below only
+      // waits for the entity to be present/visible, not for this overlay to be gone, and the raw
+      // page.mouse drag further down has none of page.click's built-in "not obscured by another
+      // element" checks - confirmed in CI logs, where elementFromPoint at the drag's start
+      // coordinates resolved to the loader's own div instead of the resize handle (the entity
+      // happened to sit near the viewport center, right under it). Waiting for it here first
+      // avoids starting the drag on top of it. It unmounts (CSSTransition unmountOnExit) rather
+      // than just hiding, so waiting for it to detach is the right check, not just "hidden".
+      await page.waitForSelector('.loader__boxes', { state: 'detached', timeout: 5000 })
+
       // expand table by 3 columns and 4 rows
       const entitySelector = getSelector(TestId.surveyForm.nodeDefWrapper(tree.name))
       await page.waitForSelector(entitySelector)
@@ -56,77 +68,23 @@ export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
       }, entitySelector)
       if (!handleBox) throw new Error(`Could not find .react-resizable-handle for ${entitySelector}`)
 
-      const dragStartX = handleBox.x + handleBox.width / 2
-      const dragStartY = handleBox.y + handleBox.height / 2
-
-      // TEMP DIAGNOSTIC (to be removed once the CI-only flake is confirmed fixed): capture what's
-      // actually at the computed drag point and the handle's visibility, since this test still
-      // flakes in CI in a way that hasn't reproduced locally.
-      const preDragDiag = await page.evaluate(
-        ([x, y]) => {
-          const el = document.elementFromPoint(x, y)
-          return el && { tag: el.tagName, cls: el.className, testid: el.getAttribute('data-testid') }
-        },
-        [dragStartX, dragStartY]
-      )
-      // eslint-disable-next-line no-console -- temporary CI diagnostic
-      console.log('EXPAND_TABLE_DIAG pre-drag', JSON.stringify({ handleBox, entityBBox, elAtDragStart: preDragDiag }))
-
       // move the mouse in several steps: the grid layout updates the item size on every mouse move
       await dragAndDrop(
-        dragStartX,
-        dragStartY,
+        handleBox.x + handleBox.width / 2,
+        handleBox.y + handleBox.height / 2,
         entityBBox.x + entityBBox.width * 3,
         entityBBox.y + entityBBox.height * 4,
-        {
-          steps: 10,
-        }
+        { steps: 10 }
       )
       // a missed resize would leave the table one row high (only its header visible) and break the next tests
-      try {
-        await page.waitForFunction(
-          ({ selector, heightBefore }) => {
-            const el = document.querySelector(selector)
-            return !!el && el.getBoundingClientRect().height > heightBefore * 2
-          },
-          { selector: entitySelector, heightBefore: entityBBox.height },
-          { timeout: 12000 }
-        )
-      } catch (error) {
-        const postDragDiag = await page.evaluate(
-          ({ selector, x, y }) => {
-            const el = document.querySelector(selector)
-            const gridItem = el?.closest('.react-grid-item')
-            const handle = gridItem?.querySelector('.react-resizable-handle')
-            const handleRect = handle?.getBoundingClientRect()
-            const elAtPoint = document.elementFromPoint(x, y)
-            return {
-              elRect:
-                el &&
-                (({ x: ex, y: ey, width, height }) => ({ x: ex, y: ey, width, height }))(el.getBoundingClientRect()),
-              gridItemClassName: gridItem?.className,
-              gridItemRect:
-                gridItem &&
-                (({ x: gx, y: gy, width, height }) => ({ x: gx, y: gy, width, height }))(
-                  gridItem.getBoundingClientRect()
-                ),
-              handleExists: !!handle,
-              handleRect: handleRect && {
-                x: handleRect.x,
-                y: handleRect.y,
-                width: handleRect.width,
-                height: handleRect.height,
-              },
-              handleDisplay: handle && getComputedStyle(handle).display,
-              elAtDragStartNow: elAtPoint && { tag: elAtPoint.tagName, cls: elAtPoint.className },
-            }
-          },
-          { selector: entitySelector, x: dragStartX, y: dragStartY }
-        )
-        // eslint-disable-next-line no-console -- temporary CI diagnostic
-        console.log('EXPAND_TABLE_DIAG post-failure', JSON.stringify(postDragDiag))
-        throw error
-      }
+      await page.waitForFunction(
+        ({ selector, heightBefore }) => {
+          const el = document.querySelector(selector)
+          return !!el && el.getBoundingClientRect().height > heightBefore * 2
+        },
+        { selector: entitySelector, heightBefore: entityBBox.height },
+        { timeout: 12000 }
+      )
     }, 15000)
   }
 }
