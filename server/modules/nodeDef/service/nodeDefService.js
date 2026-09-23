@@ -321,8 +321,22 @@ export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, 
   return afterNodeDefUpdate({ survey, nodeDefsUpdated })
 }
 
-// reassigns a contiguous 0..n-1 chain index to the analysis node defs remaining in the same chain,
-// so that deleting one doesn't leave permanent gaps in the sibling indices
+/**
+ * Reassigns a contiguous 0..n-1 chain index to the analysis node defs remaining in the same chain
+ * after one has been deleted, so that deleting a variable never leaves permanent gaps in the sibling
+ * indices.
+ *
+ * NOTE: `survey` is the pre-deletion survey snapshot (fetched before `markNodeDefDeleted` ran).
+ * `nodeDefDeleted` may therefore still appear in the results of `Survey.getAnalysisNodeDefs`;
+ * the explicit `.filter(...)` below is the sole guard that excludes it from the reindexing.
+ *
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - The survey object (pre-deletion snapshot).
+ * @param {number} params.surveyId - The survey identifier.
+ * @param {object} params.nodeDefDeleted - The analysis node def that was just deleted.
+ * @param {object} client - The database client / transaction.
+ * @returns {Promise<object>} UUID-indexed map of the reindexed node defs (may be empty if no reindexing was needed).
+ */
 const _reindexAnalysisNodeDefsAfterDelete = async ({ survey, surveyId, nodeDefDeleted }, client) => {
   const chainUuid = NodeDef.getChainUuid(nodeDefDeleted)
   const siblingAnalysisNodeDefs = Survey.getAnalysisNodeDefs({
