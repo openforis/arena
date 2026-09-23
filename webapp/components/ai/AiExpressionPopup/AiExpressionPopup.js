@@ -35,6 +35,39 @@ const getErrorMessage = ({ err, i18n }) => {
   return key ? i18n.t(`appErrors:${key}`, params) : err?.message || 'unknown'
 }
 
+/**
+ * Shows the generated expression, its explanation and the related errors, if any.
+ * @param {!object} props - The component props.
+ * @param {!object} props.result - The result returned by the AI expression API.
+ * @param {object} [props.validationError] - The validation error, if any.
+ * @param {boolean} props.isValid - Whether the expression is valid.
+ * @param {!object} props.i18n - The i18n instance.
+ * @returns {React.ReactElement} - The rendered result.
+ */
+const ExpressionResult = ({ result, validationError = null, isValid, i18n }) => (
+  <>
+    <div className={`ai-expression-popup__result${isValid ? '' : ' ai-expression-popup__result--invalid'}`}>
+      {result.expression}
+    </div>
+    <div className="ai-expression-popup__explanation">{result.explanation}</div>
+    {!result.isValid && result.parseError ? (
+      <div className="ai-expression-popup__error">
+        {i18n.t('aiExpression.parseError', { message: result.parseError })}
+      </div>
+    ) : null}
+    {result.isValid && validationError ? (
+      <div className="ai-expression-popup__error">{i18n.t(validationError.key, validationError.params)}</div>
+    ) : null}
+  </>
+)
+
+ExpressionResult.propTypes = {
+  result: PropTypes.object.isRequired,
+  validationError: PropTypes.object,
+  isValid: PropTypes.bool.isRequired,
+  i18n: PropTypes.object.isRequired,
+}
+
 const AiExpressionPopup = (props) => {
   const { excludeCurrentNodeDef = true, isContextParent = false, qualifier, nodeDefUuid, onCancel, onApply } = props
 
@@ -116,20 +149,7 @@ const AiExpressionPopup = (props) => {
         />
 
         {result ? (
-          <>
-            <div className={`ai-expression-popup__result${isValid ? '' : ' ai-expression-popup__result--invalid'}`}>
-              {result.expression}
-            </div>
-            <div className="ai-expression-popup__explanation">{result.explanation}</div>
-            {!result.isValid && result.parseError ? (
-              <div className="ai-expression-popup__error">
-                {i18n.t('aiExpression.parseError', { message: result.parseError })}
-              </div>
-            ) : null}
-            {result.isValid && validationError ? (
-              <div className="ai-expression-popup__error">{i18n.t(validationError.key, validationError.params)}</div>
-            ) : null}
-          </>
+          <ExpressionResult result={result} validationError={validationError} isValid={isValid} i18n={i18n} />
         ) : null}
 
         {error ? <div className="ai-expression-popup__error">{error}</div> : null}
