@@ -321,13 +321,48 @@ export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, 
   return afterNodeDefUpdate({ survey, nodeDefsUpdated })
 }
 
+// reassigns a contiguous 0..n-1 chain index to the analysis node defs remaining in the same chain,
+// so that deleting one doesn't leave permanent gaps in the sibling indices
+const _reindexAnalysisNodeDefsAfterDelete = async ({ survey, surveyId, nodeDefDeleted }, client) => {
+  const chainUuid = NodeDef.getChainUuid(nodeDefDeleted)
+  const siblingAnalysisNodeDefs = Survey.getAnalysisNodeDefs({
+    chain: { uuid: chainUuid },
+    showSamplingNodeDefs: false,
+    showInactiveResultVariables: true,
+  })(survey).filter((sibling) => NodeDef.getUuid(sibling) !== NodeDef.getUuid(nodeDefDeleted))
+
+  const nodeDefsToReindex = siblingAnalysisNodeDefs.reduce((acc, sibling, index) => {
+    if (NodeDef.getChainIndex(sibling) !== index) {
+      acc.push({ nodeDefUuid: NodeDef.getUuid(sibling), propsAdvanced: { [NodeDef.keysPropsAdvanced.index]: index } })
+    }
+    return acc
+  }, [])
+  if (nodeDefsToReindex.length === 0) return {}
+
+  const nodeDefsReindexed = await NodeDefManager.updateNodeDefPropsInBatch(
+    { surveyId, nodeDefs: nodeDefsToReindex },
+    client
+  )
+  return ObjectUtils.toUuidIndexedObj(nodeDefsReindexed)
+}
+
 export const markNodeDefDeleted = async ({ user, surveyId, cycle, nodeDefUuid }, client = db) =>
   client.tx(async (t) => {
     const survey = await fetchSurvey({ surveyId, cycle }, t)
 
     const nodeDefsDependentsUuids = Survey.getNodeDefDependentsUuids(nodeDefUuid)(survey)
 
-    const nodeDefsUpdated = await NodeDefManager.markNodeDefDeleted({ user, survey, cycle, nodeDefUuid }, t)
+    const nodeDefToDelete = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+    let nodeDefsUpdated = await NodeDefManager.markNodeDefDeleted({ user, survey, cycle, nodeDefUuid }, t)
+
+    if (NodeDef.isAnalysis(nodeDefToDelete) && !NodeDef.isSampling(nodeDefToDelete)) {
+      const nodeDefsReindexed = await _reindexAnalysisNodeDefsAfterDelete(
+        { survey, surveyId, nodeDefDeleted: nodeDefToDelete },
+        t
+      )
+      nodeDefsUpdated = { ...nodeDefsUpdated, ...nodeDefsReindexed }
+    }
 
     // remove dependent node defs from dependency graph (add them back later)
     const surveyUpdated = Survey.removeNodeDefDependencies(nodeDefUuid)(survey)
