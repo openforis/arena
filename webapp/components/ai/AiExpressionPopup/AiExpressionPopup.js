@@ -21,6 +21,20 @@ const expressionTypeFromQualifier = (qualifier) => {
   return 'validation'
 }
 
+/**
+ * Extracts a user-readable error message from a failed API request.
+ * @param {!object} params - Parameters.
+ * @param {!object} params.err - The error thrown by the request.
+ * @param {!object} params.i18n - The i18n instance.
+ * @returns {string} - The error message.
+ */
+const getErrorMessage = ({ err, i18n }) => {
+  const data = err?.response?.data
+  const key = data?.error?.key || data?.errorKey
+  const params = data?.error?.params || data?.errorParams
+  return key ? i18n.t(`appErrors:${key}`, params) : err?.message || 'unknown'
+}
+
 const AiExpressionPopup = (props) => {
   const { excludeCurrentNodeDef = true, isContextParent = false, qualifier, nodeDefUuid, onCancel, onApply } = props
 
@@ -69,10 +83,7 @@ const AiExpressionPopup = (props) => {
         setValidationError(validatorError)
       }
     } catch (err) {
-      const key = err?.response?.data?.error?.key || err?.response?.data?.errorKey
-      const params = err?.response?.data?.error?.params || err?.response?.data?.errorParams
-      const fallback = err?.message || 'unknown'
-      setError(key ? i18n.t(`appErrors:${key}`, params) : fallback)
+      setError(getErrorMessage({ err, i18n }))
     } finally {
       setBusy(false)
     }
