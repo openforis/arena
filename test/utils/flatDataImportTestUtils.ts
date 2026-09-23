@@ -1,4 +1,4 @@
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 import ExcelJS from 'exceljs'
 
 import * as Survey from '@core/survey/survey'
@@ -20,7 +20,7 @@ export const fileFormats: FlatDataFileFormat[] = [FileFormats.csv, FileFormats.x
 const csvCellToString = (cell: Cell): string => {
   if (cell === null || cell === undefined) return ''
   const str = String(cell)
-  return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str
+  return /[",\n]/.test(str) ? `"${str.replaceAll('"', '""')}"` : str
 }
 
 export const toCsvContent = (rows: Rows): string => rows.map((row) => row.map(csvCellToString).join(',')).join('\n')
