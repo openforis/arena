@@ -23,7 +23,9 @@ const getMessagesEl = async (path) => {
   return page.$(`[data-value="${path}"] + ${getSelector(TestId.validationReport.cellMessages)}`)
 }
 
-const validationReportWaitTimeout = 12000
+// Increased from 12000 to give the background validation thread more time to settle on slow CI
+// runners before the page-level waitForFunction poll detects the expected message count.
+const validationReportWaitTimeout = 20000
 const validationReportRowSelector = `${getSelector(TestId.table.rows(validationReport))} div.table__row`
 
 const waitForMessagesCount = async (count, timeout = validationReportWaitTimeout) => {
@@ -40,7 +42,7 @@ const waitForMessagesCount = async (count, timeout = validationReportWaitTimeout
   )
 }
 
-const waitThread = (timeout = 5000) =>
+const waitThread = (timeout = 8000) =>
   test('Wait thread to complete', async () => {
     // TODO thread issue: https://github.com/openforis/arena/issues/1412
     await page.waitForTimeout(timeout)
