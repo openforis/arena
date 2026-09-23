@@ -132,6 +132,13 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') => {
             // it intercept the click, hanging until the test timeout (seen consistently in CI, e.g.
             // https://github.com/openforis/arena/actions/runs/34883644236). force bypasses that
             // pointer-interception check; we already know exactly which button this is.
+            // force also bypasses Playwright's "not obscured by another element" check entirely, so
+            // it's just as happy to click the app's global route loader (Routes.js's <Loader />,
+            // see Loader.scss's .loader__boxes and _formDesigner/index.js's "Expand tree table" fix
+            // for the same overlay caught doing this to a resize handle) if that's still on top from
+            // a recent navigation - the toggle never actually gets clicked, so the field stays
+            // disabled and the toBeEnabled check below fails. Wait for it to be gone first.
+            await page.waitForSelector('.loader__boxes', { state: 'detached', timeout: 5000 })
             await keyToggleLocator.click({ force: true })
             await page.keyboard.press('Escape') // close potential tooltip
 
@@ -139,9 +146,35 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') => {
             // don't burn the whole jest timeout on Playwright's actionability wait (seen on
             // validationReport tree_id row 3: https://github.com/openforis/arena/actions/runs/35232215668).
             if (['integer', 'decimal', 'text'].includes(nodeDef.type)) {
-              const inputLocator = page.locator(getTextSelector(nodeDef, parentSelector))
-              await inputLocator.waitFor({ state: 'visible', timeout: 5000 })
-              await expect(inputLocator).toBeEnabled({ timeout: 5000 })
+              const inputSelector = getTextSelector(nodeDef, parentSelector)
+              await page.waitForSelector(inputSelector, { state: 'visible', timeout: 5000 })
+              try {
+                // (no optional chaining here: the function is serialized and evaluated in the page)
+                await page.waitForFunction(
+                  (selector) => {
+                    const el = document.querySelector(selector)
+                    return !!el && !el.disabled
+                  },
+                  inputSelector,
+                  { timeout: 5000 }
+                )
+              } catch (error) {
+                // TEMP DIAGNOSTIC (remove once this is confirmed fixed): if the loader wasn't the
+                // (whole) story, find out what actually is at the toggle's position right now.
+                const diag = await page.evaluate((selector) => {
+                  const el = document.querySelector(selector)
+                  const rect = el?.getBoundingClientRect()
+                  const elAtPoint = rect && document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)
+                  return {
+                    toggleExists: !!el,
+                    toggleAriaLabel: el?.getAttribute('aria-label'),
+                    elAtToggleCenter: elAtPoint && { tag: elAtPoint.tagName, cls: elAtPoint.className },
+                  }
+                }, keyToggleSelector)
+                // eslint-disable-next-line no-console -- temporary CI diagnostic
+                console.log('KEY_TOGGLE_DIAG', JSON.stringify(diag))
+                throw error
+              }
             }
           }
         }
