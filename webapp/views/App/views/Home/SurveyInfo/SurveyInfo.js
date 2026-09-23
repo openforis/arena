@@ -1,7 +1,6 @@
 import './SurveyInfo.scss'
 
 import { useAuthCanEditSurvey, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonSave } from '@webapp/components'
@@ -21,7 +20,6 @@ const SurveyInfo = () => {
   const readOnly = !useAuthCanEditSurvey()
   const isSystemAdmin = useUserIsSystemAdmin()
   const canUseAnalysis = useAuthCanUseAnalysis()
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   const {
     preloadedMapLayers,
@@ -108,7 +106,7 @@ const SurveyInfo = () => {
       },
     })
   }
-  if (experimentalFeatures && !readOnly) {
+  if (!readOnly) {
     tabs.push({
       key: 'documents',
       component: SurveyInfoDocuments,
