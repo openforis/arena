@@ -320,6 +320,7 @@ const getOrCreateEntityByKeys =
     timezoneOffset,
     insertMissingNodes = false,
     sideEffect = false,
+    updateDependents = true,
   }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
@@ -338,6 +339,10 @@ const getOrCreateEntityByKeys =
     if (updateResultEntity) {
       updateResult.merge(updateResultEntity)
 
+      if (!updateDependents) {
+        // caller is responsible for updating dependent nodes and validation (see afterNodesUpdate)
+        return { entity, updateResult }
+      }
       const dependentsUpdateResult = await afterNodesUpdate({
         user,
         survey,
@@ -371,6 +376,7 @@ const updateAttributesInEntityWithValues =
     taxonProvider,
     timezoneOffset,
     sideEffect = false,
+    updateDependents = true,
   }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
@@ -379,6 +385,9 @@ const updateAttributesInEntityWithValues =
       if (!nodeUpdateResult) return
 
       updateResult.merge(nodeUpdateResult)
+
+      // when not updating dependents, the caller is responsible for it (see afterNodesUpdate)
+      if (!updateDependents) return
 
       const dependentsUpdateResult = await afterNodesUpdate({
         user,

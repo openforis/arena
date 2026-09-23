@@ -39,7 +39,7 @@ describe('RecordNodesUpdater Test', () => {
 
     // expect node value has been updated
     const dbhUpdatedNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[1]/dbh')(survey, recordUpdated)
-    expect(Node.getValue(dbhUpdatedNode)).toEqual(20)
+    expect(Node.getValue(dbhUpdatedNode)).toBe(20)
   })
 
   it('Test update nodes with new values does not have side effect on record', async () => {
@@ -56,16 +56,16 @@ describe('RecordNodesUpdater Test', () => {
 
     // expect old record value hasn't been modified
     const dbhOldNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[1]/dbh')(survey, record)
-    expect(Node.getValue(dbhOldNode)).toEqual(10.123)
+    expect(Node.getValue(dbhOldNode)).toBe(10.123)
   })
 
-  it('Test update nodes (insertMissingNodes=false) with missing parent entity throws error', () => {
+  it('Test update nodes (insertMissingNodes=false) with missing parent entity throws error', async () => {
     const plotIdDef = getNodeDef('cluster/plot/plot_id')
     const treeDef = getNodeDef('cluster/plot/tree')
     const treeIdDef = getNodeDef('cluster/plot/tree/tree_id')
     const treeDbhDef = getNodeDef('cluster/plot/tree/dbh')
 
-    expect(
+    await expect(
       Record.updateAttributesWithValues({
         survey,
         entityDefUuid: treeDef.uuid,
@@ -93,7 +93,7 @@ describe('RecordNodesUpdater Test', () => {
 
     // expect node value has been updated
     const dbhInsertedNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[2]/dbh')(survey, recordUpdated)
-    expect(Node.getValue(dbhInsertedNode)).toEqual(10)
+    expect(Node.getValue(dbhInsertedNode)).toBe(10)
 
     // expect default value on tree_status has been updated
     const treeStatusInsertedNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[2]/tree_status')(
@@ -108,7 +108,7 @@ describe('RecordNodesUpdater Test', () => {
     expect(Node.getCategoryItemUuid(treeStatusInsertedNode)).toEqual(treeStatusLiveCategoryItemUuid)
   })
 
-  it('Test update code attribute ', async () => {
+  it('Test update code attribute', async () => {
     const plotIdDef = getNodeDef('cluster/plot/plot_id')
     const treeDef = getNodeDef('cluster/plot/tree')
     const treeIdDef = getNodeDef('cluster/plot/tree/tree_id')
@@ -165,6 +165,54 @@ describe('RecordNodesUpdater Test', () => {
     const treeNode = RecordUtils.findNodeByPath('cluster/plot[0]/tree[1]')(survey, recordUpdated)
     const treeHeightApplicable = Node.isChildApplicable(treeHeightDef.uuid)(treeNode)
     expect(treeHeightApplicable).toBe(false)
+  })
+
+  it('Test update node without updating dependents, then update them at once (applicability)', async () => {
+    const plotIdDef = getNodeDef('cluster/plot/plot_id')
+    const treeDef = getNodeDef('cluster/plot/tree')
+    const treeIdDef = getNodeDef('cluster/plot/tree/tree_id')
+    const treeStatusDef = getNodeDef('cluster/plot/tree/tree_status')
+    const treeHeightDef = getNodeDef('cluster/plot/tree/tree_height')
+
+    const treeStatusDeadCategoryItem = SurveyUtils.getCategoryItem({
+      survey,
+      categoryName: 'tree_status',
+      codesPath: ['D'],
+    })
+    const valuesByDefUuid = {
+      [plotIdDef.uuid]: 1,
+      [treeIdDef.uuid]: 2,
+      [treeStatusDef.uuid]: Node.newNodeValueCode({ itemUuid: treeStatusDeadCategoryItem.uuid }),
+    }
+
+    const { entity, updateResult: entityUpdateResult } = await Record.getOrCreateEntityByKeys({
+      survey,
+      entityDefUuid: treeDef.uuid,
+      valuesByDefUuid,
+      insertMissingNodes: true,
+      updateDependents: false,
+    })(record)
+
+    const attributesUpdateResult = await Record.updateAttributesInEntityWithValues({
+      survey,
+      entity,
+      valuesByDefUuid,
+      updateDependents: false,
+    })(entityUpdateResult.record)
+
+    // dependents not updated yet: tree_height still applicable
+    const treeNodeBefore = Record.getNodeByUuid(Node.getUuid(entity))(attributesUpdateResult.record)
+    expect(Node.isChildApplicable(treeHeightDef.uuid)(treeNodeBefore)).toBe(true)
+
+    const { record: recordUpdated } = await Record.afterNodesUpdate({
+      survey,
+      record: attributesUpdateResult.record,
+      nodes: { ...entityUpdateResult.nodes, ...attributesUpdateResult.nodes },
+    })
+
+    // dependents updated: tree_height not applicable
+    const treeNodeAfter = Record.getNodeByUuid(Node.getUuid(entity))(recordUpdated)
+    expect(Node.isChildApplicable(treeHeightDef.uuid)(treeNodeAfter)).toBe(false)
   })
 
   it('Test update node in nested single entities', async () => {
