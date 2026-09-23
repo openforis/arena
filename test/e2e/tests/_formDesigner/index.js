@@ -56,23 +56,77 @@ export const addNodeDef = (nodeDefParent, nodeDefChild, editDetails = true) => {
       }, entitySelector)
       if (!handleBox) throw new Error(`Could not find .react-resizable-handle for ${entitySelector}`)
 
+      const dragStartX = handleBox.x + handleBox.width / 2
+      const dragStartY = handleBox.y + handleBox.height / 2
+
+      // TEMP DIAGNOSTIC (to be removed once the CI-only flake is confirmed fixed): capture what's
+      // actually at the computed drag point and the handle's visibility, since this test still
+      // flakes in CI in a way that hasn't reproduced locally.
+      const preDragDiag = await page.evaluate(
+        ([x, y]) => {
+          const el = document.elementFromPoint(x, y)
+          return el && { tag: el.tagName, cls: el.className, testid: el.getAttribute('data-testid') }
+        },
+        [dragStartX, dragStartY]
+      )
+      // eslint-disable-next-line no-console -- temporary CI diagnostic
+      console.log('EXPAND_TABLE_DIAG pre-drag', JSON.stringify({ handleBox, entityBBox, elAtDragStart: preDragDiag }))
+
       // move the mouse in several steps: the grid layout updates the item size on every mouse move
       await dragAndDrop(
-        handleBox.x + handleBox.width / 2,
-        handleBox.y + handleBox.height / 2,
+        dragStartX,
+        dragStartY,
         entityBBox.x + entityBBox.width * 3,
         entityBBox.y + entityBBox.height * 4,
-        { steps: 10 }
+        {
+          steps: 10,
+        }
       )
       // a missed resize would leave the table one row high (only its header visible) and break the next tests
-      await page.waitForFunction(
-        ({ selector, heightBefore }) => {
-          const el = document.querySelector(selector)
-          return !!el && el.getBoundingClientRect().height > heightBefore * 2
-        },
-        { selector: entitySelector, heightBefore: entityBBox.height },
-        { timeout: 12000 }
-      )
+      try {
+        await page.waitForFunction(
+          ({ selector, heightBefore }) => {
+            const el = document.querySelector(selector)
+            return !!el && el.getBoundingClientRect().height > heightBefore * 2
+          },
+          { selector: entitySelector, heightBefore: entityBBox.height },
+          { timeout: 12000 }
+        )
+      } catch (error) {
+        const postDragDiag = await page.evaluate(
+          ({ selector, x, y }) => {
+            const el = document.querySelector(selector)
+            const gridItem = el?.closest('.react-grid-item')
+            const handle = gridItem?.querySelector('.react-resizable-handle')
+            const handleRect = handle?.getBoundingClientRect()
+            const elAtPoint = document.elementFromPoint(x, y)
+            return {
+              elRect:
+                el &&
+                (({ x: ex, y: ey, width, height }) => ({ x: ex, y: ey, width, height }))(el.getBoundingClientRect()),
+              gridItemClassName: gridItem?.className,
+              gridItemRect:
+                gridItem &&
+                (({ x: gx, y: gy, width, height }) => ({ x: gx, y: gy, width, height }))(
+                  gridItem.getBoundingClientRect()
+                ),
+              handleExists: !!handle,
+              handleRect: handleRect && {
+                x: handleRect.x,
+                y: handleRect.y,
+                width: handleRect.width,
+                height: handleRect.height,
+              },
+              handleDisplay: handle && getComputedStyle(handle).display,
+              elAtDragStartNow: elAtPoint && { tag: elAtPoint.tagName, cls: elAtPoint.className },
+            }
+          },
+          { selector: entitySelector, x: dragStartX, y: dragStartY }
+        )
+        // eslint-disable-next-line no-console -- temporary CI diagnostic
+        console.log('EXPAND_TABLE_DIAG post-failure', JSON.stringify(postDragDiag))
+        throw error
+      }
     }, 15000)
   }
 }
