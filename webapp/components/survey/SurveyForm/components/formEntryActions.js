@@ -8,7 +8,7 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { RecordActions, RecordState, useRecord } from '@webapp/store/ui/record'
 import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
@@ -26,7 +26,6 @@ const RecordEntryButtons = (props) => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const record = useRecord()
   const noHeader = useIsRecordViewWithoutHeader()
 
@@ -67,7 +66,7 @@ const RecordEntryButtons = (props) => {
           {i18n.t('dataView:invalidRecord')}
         </Link>
       )}
-      {experimentalFeatures && !noHeader && (
+      {!noHeader && (
         <Button
           iconClassName="icon-file-pdf"
           onClick={() => setPrintableExportOpen(true)}
