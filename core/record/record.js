@@ -93,6 +93,7 @@ export const { assocDateModified, assocNodes, assocNode, dissocNodes, mergeNodes
 export const {
   createRootEntity,
   getOrCreateEntityByKeys,
+  afterNodesUpdate,
   updateNodesDependents,
   updateAttributesInEntityWithValues,
   updateAttributesWithValues,
