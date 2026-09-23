@@ -6,7 +6,6 @@ import { gotoFormPage, selectForm } from './_formDesigner'
 import { gotoHome, gotoRecords, gotoValidationReport } from './_navigation'
 import { enterAttribute, getTreeSelector } from './_record'
 import { gotoRecord } from './_records'
-import { expectNoItems } from './_tables'
 
 const DUPLICATE_VALUE = 'Duplicate value'
 
@@ -24,7 +23,24 @@ const getMessagesEl = async (path) => {
   return page.$(`[data-value="${path}"] + ${getSelector(TestId.validationReport.cellMessages)}`)
 }
 
-const waitThread = (timeout = 1500) =>
+const validationReportWaitTimeout = 12000
+const validationReportRowSelector = `${getSelector(TestId.table.rows(validationReport))} div.table__row`
+
+const waitForMessagesCount = async (count, timeout = validationReportWaitTimeout) => {
+  const noItemsSelector = getSelector(TestId.table.noItems)
+
+  await page.waitForFunction(
+    ({ count, noItemsSelector, rowSelector }) => {
+      const rows = document.querySelectorAll(rowSelector)
+      const noItemsVisible = Boolean(document.querySelector(noItemsSelector))
+      return count === 0 ? noItemsVisible : rows.length === count
+    },
+    { count, noItemsSelector, rowSelector: validationReportRowSelector },
+    { timeout }
+  )
+}
+
+const waitThread = (timeout = 5000) =>
   test('Wait thread to complete', async () => {
     // TODO thread issue: https://github.com/openforis/arena/issues/1412
     await page.waitForTimeout(timeout)
@@ -40,29 +56,32 @@ const gotoNode = (path) =>
     ])
   })
 
-const expectMessages = (messages) => {
-  if (messages.length > 0) {
-    messages.forEach(([path, message], idx) =>
-      test(`Verify messages ${path}`, async () => {
-        await page.waitForSelector(getSelector(TestId.table.row(TestId.validationReport.validationReport, idx)))
-        const messagesEl = await getMessagesEl(path)
-        await expect(messagesEl).not.toBeNull()
-        await expect(await messagesEl.getAttribute('data-value')).toBe(message)
-      })
-    )
-  } else {
-    test('Verify validation report empty', async () => {
-      await expectNoItems()
+const expectMessages = (messages) =>
+  describe(`Expected messages ${messages.length}`, () => {
+    beforeAll(async () => {
+      await waitForMessagesCount(messages.length)
     })
-  }
 
-  test(`Verify messages to be ${messages.length}`, async () => {
-    const rowsSelector = getSelector(TestId.table.rows(validationReport))
+    if (messages.length > 0) {
+      messages.forEach(([path, message], idx) =>
+        test(`Verify messages ${path}`, async () => {
+          await page.waitForSelector(getSelector(TestId.table.row(TestId.validationReport.validationReport, idx)))
+          const messagesEl = await getMessagesEl(path)
+          await expect(messagesEl).not.toBeNull()
+          await expect(await messagesEl.getAttribute('data-value')).toBe(message)
+        })
+      )
+    } else {
+      test('Verify validation report empty', async () => {
+        await expect(page).toHaveSelector(getSelector(TestId.table.noItems))
+      })
+    }
 
-    const rowsEl = await page.$$(`${rowsSelector} div.table__row`)
-    await expect(rowsEl.length).toBe(messages.length)
+    test(`Verify messages to be ${messages.length}`, async () => {
+      const rowsEl = await page.$$(validationReportRowSelector)
+      await expect(rowsEl.length).toBe(messages.length)
+    })
   })
-}
 
 const gotoRecordAndEnterValue = (record, attribute, value) => {
   gotoRecords()
