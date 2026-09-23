@@ -126,9 +126,8 @@ const ChatbotPanel = ({ onClose }) => {
     const nextMessages = [...messages, userMsg, assistantMsg]
     const assistantIdx = nextMessages.length - 1
 
-    // We send the history up to and including the user turn — not the
-    // empty assistant placeholder.
-    const outboundMessages = [...messages, userMsg]
+    // Drop the empty assistant placeholder and any stale empty messages from earlier failed turns.
+    const outboundMessages = [...messages, userMsg].filter((m) => stripText(m).length > 0)
 
     setMessages(nextMessages)
     setInput('')
@@ -157,10 +156,33 @@ const ChatbotPanel = ({ onClose }) => {
       },
       onTitle: (next) => setTitle(next),
       onDone: () => {
+        // Drop the placeholder if the stream produced no text at all, instead of persisting it.
+        setMessages((prev) => {
+          const current = prev[assistantIdx]
+          if (current && stripText(current).length === 0) {
+            setReasoningByIdx((prevReasoning) => {
+              const { [assistantIdx]: _removed, ...rest } = prevReasoning
+              return rest
+            })
+            return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
+          }
+          return prev
+        })
         setStreaming(false)
         cancelRef.current = null
       },
       onError: (err) => {
+        setMessages((prev) => {
+          const current = prev[assistantIdx]
+          if (current && stripText(current).length === 0) {
+            setReasoningByIdx((prevReasoning) => {
+              const { [assistantIdx]: _removed, ...rest } = prevReasoning
+              return rest
+            })
+            return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
+          }
+          return prev
+        })
         setError(err?.message || 'unknown')
         setStreaming(false)
         cancelRef.current = null

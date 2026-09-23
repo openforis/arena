@@ -73,6 +73,8 @@ export const TestId = {
     },
   },
   expressionEditor: {
+    aiGenerateBtn: (qualifier) => `${qualifier}-ai-generate-btn`,
+    aiPopupBtn: 'expression-ai-popup-btn',
     applyBtn: 'expression-apply-btn',
     editBtn: (qualifier, index) => `${qualifier}-edit-btn-${index}`,
     literalDropdown: 'expression-literal-dropdown',
