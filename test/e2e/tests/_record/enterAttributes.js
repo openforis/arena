@@ -112,7 +112,10 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') => {
   const isKeyAttribute = Boolean(nodeDef.key)
   // Key fields need an unlock click first; keep a bit more budget for the React re-render
   // before Playwright can fill the (previously disabled) input.
-  const testTimeoutMs = isKeyAttribute ? 15000 : 10000
+  // Key attributes: waitFor(visible,5s) + toBeEnabled(5s) + fill + waitForHeaderLoader(5s) can
+  // stack to >15 s on slow CI runners, so use 25 s to give a comfortable margin.
+  // Non-key attributes: fill + waitForHeaderLoader(5s) — bumped to 15 s to match previous key budget.
+  const testTimeoutMs = isKeyAttribute ? 25000 : 15000
 
   return test(
     `Enter ${nodeDef.name} value`,
