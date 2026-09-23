@@ -48,11 +48,17 @@ const isChatEnabledForUser = (user) =>
 
 // Convert validated v5 messages (`{ role, parts: [{type:'text', text}] }`)
 // into the Vercel AI SDK v4 chat shape (`{ role, content: string }`).
+// Messages that collapse to an empty string (e.g. a stale placeholder from
+// a client turn that never received any content) are dropped — the
+// Anthropic provider rejects requests containing an empty text content
+// block.
 const v5ToV4Messages = (messages) =>
-  messages.map((m) => ({
-    role: m.role,
-    content: (m.parts || []).map((p) => p.text || '').join(''),
-  }))
+  messages
+    .map((m) => ({
+      role: m.role,
+      content: (m.parts || []).map((p) => p.text || '').join(''),
+    }))
+    .filter((m) => m.content.length > 0)
 
 export const init = (app) => {
   app.get('/ai/chatbot/status', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {

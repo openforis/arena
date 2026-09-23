@@ -127,8 +127,10 @@ const ChatbotPanel = ({ onClose }) => {
     const assistantIdx = nextMessages.length - 1
 
     // We send the history up to and including the user turn — not the
-    // empty assistant placeholder.
-    const outboundMessages = [...messages, userMsg]
+    // empty assistant placeholder. Also drop any stale empty-text messages
+    // that may have been persisted by an earlier failed turn (older
+    // sessionStorage history) — the provider rejects empty text blocks.
+    const outboundMessages = [...messages, userMsg].filter((m) => stripText(m).length > 0)
 
     setMessages(nextMessages)
     setInput('')
@@ -157,10 +159,37 @@ const ChatbotPanel = ({ onClose }) => {
       },
       onTitle: (next) => setTitle(next),
       onDone: () => {
+        // If the stream produced no text at all (e.g. the request failed or
+        // was aborted before the first chunk), drop the empty placeholder
+        // instead of persisting it — resending it as history would trip the
+        // provider's "empty text content block" validation on every future
+        // turn.
+        setMessages((prev) => {
+          const current = prev[assistantIdx]
+          if (current && stripText(current).length === 0) {
+            setReasoningByIdx((prevReasoning) => {
+              const { [assistantIdx]: _removed, ...rest } = prevReasoning
+              return rest
+            })
+            return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
+          }
+          return prev
+        })
         setStreaming(false)
         cancelRef.current = null
       },
       onError: (err) => {
+        setMessages((prev) => {
+          const current = prev[assistantIdx]
+          if (current && stripText(current).length === 0) {
+            setReasoningByIdx((prevReasoning) => {
+              const { [assistantIdx]: _removed, ...rest } = prevReasoning
+              return rest
+            })
+            return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
+          }
+          return prev
+        })
         setError(err?.message || 'unknown')
         setStreaming(false)
         cancelRef.current = null
