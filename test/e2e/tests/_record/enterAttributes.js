@@ -148,33 +148,15 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') => {
             if (['integer', 'decimal', 'text'].includes(nodeDef.type)) {
               const inputSelector = getTextSelector(nodeDef, parentSelector)
               await page.waitForSelector(inputSelector, { state: 'visible', timeout: 5000 })
-              try {
-                // (no optional chaining here: the function is serialized and evaluated in the page)
-                await page.waitForFunction(
-                  (selector) => {
-                    const el = document.querySelector(selector)
-                    return !!el && !el.disabled
-                  },
-                  inputSelector,
-                  { timeout: 5000 }
-                )
-              } catch (error) {
-                // TEMP DIAGNOSTIC (remove once this is confirmed fixed): if the loader wasn't the
-                // (whole) story, find out what actually is at the toggle's position right now.
-                const diag = await page.evaluate((selector) => {
+              // (no optional chaining here: the function is serialized and evaluated in the page)
+              await page.waitForFunction(
+                (selector) => {
                   const el = document.querySelector(selector)
-                  const rect = el?.getBoundingClientRect()
-                  const elAtPoint = rect && document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)
-                  return {
-                    toggleExists: !!el,
-                    toggleAriaLabel: el?.getAttribute('aria-label'),
-                    elAtToggleCenter: elAtPoint && { tag: elAtPoint.tagName, cls: elAtPoint.className },
-                  }
-                }, keyToggleSelector)
-                // eslint-disable-next-line no-console -- temporary CI diagnostic
-                console.log('KEY_TOGGLE_DIAG', JSON.stringify(diag))
-                throw error
-              }
+                  return !!el && !el.disabled
+                },
+                inputSelector,
+                { timeout: 5000 }
+              )
             }
           }
         }
