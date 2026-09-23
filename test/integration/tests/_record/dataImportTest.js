@@ -7,13 +7,14 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-import { FileFormats } from '@core/fileFormats'
+import { getExtensionByFileFormat } from '@core/fileFormats'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import DataImportJob from '@server/modules/dataImport/service/DataImportJob/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 
 import * as SB from '../../../utils/surveyBuilder'
+import { toFileContent } from '../../../utils/flatDataImportTestUtils'
 
 const clusterName = 'cluster'
 const clusterIdName = 'cluster_id'
@@ -45,20 +46,21 @@ const _buildSurvey = ({ user }) =>
     )
   ).buildAndStore()
 
-const _writeTempCsv = (content) => {
-  const filePath = path.join(os.tmpdir(), `arena_data_import_test_${Date.now()}_${Math.random()}.csv`)
-  fs.writeFileSync(filePath, content)
+const _writeTempFile = async ({ fileFormat, rows }) => {
+  const extension = getExtensionByFileFormat(fileFormat)
+  const filePath = path.join(os.tmpdir(), `arena_data_import_test_${Date.now()}_${Math.random()}.${extension}`)
+  fs.writeFileSync(filePath, await toFileContent({ fileFormat, rows }))
   return filePath
 }
 
 // the job deletes the file when it ends
-const _runImport = async ({ user, survey, entityName, csv, JobClass = DataImportJob, ...params }) => {
+const _runImport = async ({ user, survey, entityName, fileFormat, rows, JobClass = DataImportJob, ...params }) => {
   const entityDef = Survey.getNodeDefByName(entityName)(survey)
   const job = new JobClass({
     user,
     surveyId: Survey.getId(survey),
-    filePath: _writeTempCsv(csv),
-    fileFormat: FileFormats.csv,
+    filePath: await _writeTempFile({ fileFormat, rows }),
+    fileFormat,
     abortOnErrors: true,
     cycle: Survey.cycleOneKey,
     nodeDefUuid: NodeDef.getUuid(entityDef),
@@ -122,15 +124,16 @@ const _expectJobSucceeded = (job) => {
   }
 }
 
-export const dataImportCsvTest = async ({ user }) => {
+export const dataImportTest = async ({ user, fileFormat }) => {
   const survey = await _buildSurvey({ user })
 
   // 1. insert new records (root entity)
   const insertRecordsJob = await _runImport({
     user,
     survey,
+    fileFormat,
     entityName: clusterName,
-    csv: `${clusterIdName}\n1\n2\n`,
+    rows: [[clusterIdName], [1], [2]],
     insertNewRecords: true,
   })
   _expectJobSucceeded(insertRecordsJob)
@@ -141,14 +144,14 @@ export const dataImportCsvTest = async ({ user }) => {
   const insertPlotsJob = await _runImport({
     user,
     survey,
+    fileFormat,
     entityName: plotName,
-    csv: [
-      `${clusterIdName},${plotIdName},${plotSizeName}`,
-      '1,1,10',
-      '1,2,20',
-      '2,1,30',
-      '', // empty lines are ignored
-    ].join('\n'),
+    rows: [
+      [clusterIdName, plotIdName, plotSizeName],
+      [1, 1, 10],
+      [1, 2, 20],
+      [2, 1, 30],
+    ],
     insertMissingNodes: true,
   })
   _expectJobSucceeded(insertPlotsJob)
@@ -167,8 +170,12 @@ export const dataImportCsvTest = async ({ user }) => {
   const updatePlotsJob = await _runImport({
     user,
     survey,
+    fileFormat,
     entityName: plotName,
-    csv: `${clusterIdName},${plotIdName},${plotSizeName}\n1,2,25\n`,
+    rows: [
+      [clusterIdName, plotIdName, plotSizeName],
+      [1, 2, 25],
+    ],
   })
   _expectJobSucceeded(updatePlotsJob)
   expect(updatePlotsJob.result.updatedRecords).toBe(1)
@@ -180,13 +187,14 @@ export const dataImportCsvTest = async ({ user }) => {
   return survey
 }
 
-export const dataImportCsvInvalidValueTest = async ({ user }) => {
+export const dataImportInvalidValueTest = async ({ user, fileFormat }) => {
   const survey = await _buildSurvey({ user })
   await _runImport({
     user,
     survey,
+    fileFormat,
     entityName: clusterName,
-    csv: `${clusterIdName}\n1\n`,
+    rows: [[clusterIdName], [1]],
     insertNewRecords: true,
   })
 
@@ -194,8 +202,13 @@ export const dataImportCsvInvalidValueTest = async ({ user }) => {
   const job = await _runImport({
     user,
     survey,
+    fileFormat,
     entityName: plotName,
-    csv: [`${clusterIdName},${plotIdName},${plotSizeName}`, '1,1,10', '1,2,not_a_number'].join('\n'),
+    rows: [
+      [clusterIdName, plotIdName, plotSizeName],
+      [1, 1, 10],
+      [1, 2, 'not_a_number'],
+    ],
     insertMissingNodes: true,
   })
   expect(job.status).toBe('failed')
@@ -203,13 +216,14 @@ export const dataImportCsvInvalidValueTest = async ({ user }) => {
   expect((await _fetchRecordsSummaries({ survey }))[0].plots).toEqual({})
 }
 
-export const dataImportCsvEntityNotFoundTest = async ({ user }) => {
+export const dataImportEntityNotFoundTest = async ({ user, fileFormat }) => {
   const survey = await _buildSurvey({ user })
   await _runImport({
     user,
     survey,
+    fileFormat,
     entityName: clusterName,
-    csv: `${clusterIdName}\n1\n`,
+    rows: [[clusterIdName], [1]],
     insertNewRecords: true,
   })
 
@@ -217,42 +231,55 @@ export const dataImportCsvEntityNotFoundTest = async ({ user }) => {
   const job = await _runImport({
     user,
     survey,
+    fileFormat,
     entityName: plotName,
-    csv: `${clusterIdName},${plotIdName},${plotSizeName}\n1,1,10\n`,
+    rows: [
+      [clusterIdName, plotIdName, plotSizeName],
+      [1, 1, 10],
+    ],
   })
   expect(job.status).toBe('failed')
   expect((await _fetchRecordsSummaries({ survey }))[0].plots).toEqual({})
 }
 
-export const dataImportCsvRecordNotFoundTest = async ({ user }) => {
+export const dataImportRecordNotFoundTest = async ({ user, fileFormat }) => {
   const survey = await _buildSurvey({ user })
 
   const job = await _runImport({
     user,
     survey,
+    fileFormat,
     entityName: plotName,
-    csv: `${clusterIdName},${plotIdName},${plotSizeName}\n99,1,10\n`,
+    rows: [
+      [clusterIdName, plotIdName, plotSizeName],
+      [99, 1, 10],
+    ],
     insertMissingNodes: true,
   })
   expect(job.status).toBe('failed')
   expect(await _fetchRecordsSummaries({ survey })).toEqual([])
 }
 
-export const dataImportCsvDryRunTest = async ({ user }) => {
+export const dataImportDryRunTest = async ({ user, fileFormat }) => {
   const survey = await _buildSurvey({ user })
   await _runImport({
     user,
     survey,
+    fileFormat,
     entityName: clusterName,
-    csv: `${clusterIdName}\n1\n`,
+    rows: [[clusterIdName], [1]],
     insertNewRecords: true,
   })
 
   const job = await _runImport({
     user,
     survey,
+    fileFormat,
     entityName: plotName,
-    csv: `${clusterIdName},${plotIdName},${plotSizeName}\n1,1,10\n`,
+    rows: [
+      [clusterIdName, plotIdName, plotSizeName],
+      [1, 1, 10],
+    ],
     insertMissingNodes: true,
     dryRun: true,
     JobClass: DataImportValidationJob,
