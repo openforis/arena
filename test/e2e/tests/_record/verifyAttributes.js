@@ -46,6 +46,14 @@ const verifyDate = async (nodeDef, value, parentSelector) => {
 
 const verifyTaxon = async (nodeDef, value, parentSelector) => {
   const { codeSelector, scientificNameSelector, vernacularNameSelector } = getTaxonSelector(nodeDef, parentSelector)
+  // A taxon default value (e.g. a default-value expression applied right after the node is added)
+  // is filled in asynchronously, so the input can still be empty for a moment after the node
+  // appears; wait for it to settle instead of reading it on the very first paint.
+  await page.waitForFunction(
+    ({ selector, expectedValue }) => document.querySelector(selector)?.value === expectedValue,
+    { selector: codeSelector, expectedValue: value.code },
+    { timeout: 5000 }
+  )
   const code = await page.$(codeSelector)
   const scientificName = await page.$(scientificNameSelector)
   const vernacularName = await page.$(vernacularNameSelector)
