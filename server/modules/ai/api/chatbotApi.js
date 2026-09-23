@@ -48,10 +48,7 @@ const isChatEnabledForUser = (user) =>
 
 // Convert validated v5 messages (`{ role, parts: [{type:'text', text}] }`)
 // into the Vercel AI SDK v4 chat shape (`{ role, content: string }`).
-// Messages that collapse to an empty string (e.g. a stale placeholder from
-// a client turn that never received any content) are dropped — the
-// Anthropic provider rejects requests containing an empty text content
-// block.
+// Empty-string messages are dropped — the provider rejects empty text blocks.
 const v5ToV4Messages = (messages) =>
   messages
     .map((m) => ({

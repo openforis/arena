@@ -126,10 +126,7 @@ const ChatbotPanel = ({ onClose }) => {
     const nextMessages = [...messages, userMsg, assistantMsg]
     const assistantIdx = nextMessages.length - 1
 
-    // We send the history up to and including the user turn — not the
-    // empty assistant placeholder. Also drop any stale empty-text messages
-    // that may have been persisted by an earlier failed turn (older
-    // sessionStorage history) — the provider rejects empty text blocks.
+    // Drop the empty assistant placeholder and any stale empty messages from earlier failed turns.
     const outboundMessages = [...messages, userMsg].filter((m) => stripText(m).length > 0)
 
     setMessages(nextMessages)
@@ -159,11 +156,7 @@ const ChatbotPanel = ({ onClose }) => {
       },
       onTitle: (next) => setTitle(next),
       onDone: () => {
-        // If the stream produced no text at all (e.g. the request failed or
-        // was aborted before the first chunk), drop the empty placeholder
-        // instead of persisting it — resending it as history would trip the
-        // provider's "empty text content block" validation on every future
-        // turn.
+        // Drop the placeholder if the stream produced no text at all, instead of persisting it.
         setMessages((prev) => {
           const current = prev[assistantIdx]
           if (current && stripText(current).length === 0) {

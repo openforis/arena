@@ -21,6 +21,10 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 
+import AiExpressionPopup from '@webapp/components/ai/AiExpressionPopup'
+import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
+import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+
 import ExpressionProp from './ExpressionProp'
 
 export const ValueType = {
@@ -97,9 +101,11 @@ const ExpressionsProp = (props) => {
 
   const dispatch = useDispatch()
   const confirm = useConfirmAsync()
+  const aiExpressionsEnabled = useAiFeatureEnabled('expressions')
 
   const [valueType, setValueType] = useState(determineValueType?.())
   const [expressionPlaceholder, setExpressionPlaceholder] = useState(null)
+  const [aiOpen, setAiOpen] = useState(false)
 
   const valuesIsEmpty = A.isEmpty(values) || values.every(NodeDefExpression.isEmpty)
 
@@ -207,6 +213,15 @@ const ExpressionsProp = (props) => {
     }
   }, [expressionPlaceholder])
 
+  const onAiCancel = useCallback(() => setAiOpen(false), [])
+  const onAiApply = useCallback(
+    (expression) => {
+      setAiOpen(false)
+      onUpdate(NodeDefExpression.createExpression({ expression }))
+    },
+    [onUpdate]
+  )
+
   return (
     <FormItem info={info} label={label} className={classNames({ error: Validation.isNotValid(validation) })}>
       <ExpressionsWrapper validation={validation}>
@@ -254,11 +269,29 @@ const ExpressionsProp = (props) => {
               />
             ))}
             {!readOnly && (multiple || uiValuesIsEmpty) && (
-              <ButtonNew onClick={onAddPlaceholder} testId={TestId.expressionEditor.newBtn(qualifier)} />
+              <div className="node-def-edit__expressions-actions">
+                <ButtonNew onClick={onAddPlaceholder} testId={TestId.expressionEditor.newBtn(qualifier)} />
+                {aiExpressionsEnabled && nodeDefUuidCurrent && (
+                  <ButtonAiGenerateExpression
+                    onClick={() => setAiOpen(true)}
+                    testId={TestId.expressionEditor.aiGenerateBtn(qualifier)}
+                  />
+                )}
+              </div>
             )}
           </div>
         )}
       </ExpressionsWrapper>
+      {aiOpen && (
+        <AiExpressionPopup
+          excludeCurrentNodeDef={excludeCurrentNodeDef}
+          isContextParent={isContextParent}
+          qualifier={qualifier}
+          nodeDefUuid={nodeDefUuidCurrent}
+          onCancel={onAiCancel}
+          onApply={onAiApply}
+        />
+      )}
     </FormItem>
   )
 }
