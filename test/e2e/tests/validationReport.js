@@ -24,7 +24,24 @@ const getMessagesEl = async (path) => {
   return page.$(`[data-value="${path}"] + ${getSelector(TestId.validationReport.cellMessages)}`)
 }
 
-const waitThread = (timeout = 1500) =>
+const validationReportWaitTimeout = 12000
+
+const waitForMessagesCount = async (count, timeout = validationReportWaitTimeout) => {
+  const rowsSelector = getSelector(TestId.table.rows(validationReport))
+  const noItemsSelector = getSelector(TestId.table.noItems)
+
+  await page.waitForFunction(
+    ({ count, noItemsSelector, rowsSelector }) => {
+      const rows = document.querySelectorAll(`${rowsSelector} div.table__row`)
+      const noItemsVisible = Boolean(document.querySelector(noItemsSelector))
+      return count === 0 ? noItemsVisible : rows.length === count
+    },
+    { count, noItemsSelector, rowsSelector },
+    { timeout }
+  )
+}
+
+const waitThread = (timeout = 5000) =>
   test('Wait thread to complete', async () => {
     // TODO thread issue: https://github.com/openforis/arena/issues/1412
     await page.waitForTimeout(timeout)
@@ -44,6 +61,7 @@ const expectMessages = (messages) => {
   if (messages.length > 0) {
     messages.forEach(([path, message], idx) =>
       test(`Verify messages ${path}`, async () => {
+        await waitForMessagesCount(messages.length)
         await page.waitForSelector(getSelector(TestId.table.row(TestId.validationReport.validationReport, idx)))
         const messagesEl = await getMessagesEl(path)
         await expect(messagesEl).not.toBeNull()
@@ -52,13 +70,14 @@ const expectMessages = (messages) => {
     )
   } else {
     test('Verify validation report empty', async () => {
+      await waitForMessagesCount(0)
       await expectNoItems()
     })
   }
 
   test(`Verify messages to be ${messages.length}`, async () => {
+    await waitForMessagesCount(messages.length)
     const rowsSelector = getSelector(TestId.table.rows(validationReport))
-
     const rowsEl = await page.$$(`${rowsSelector} div.table__row`)
     await expect(rowsEl.length).toBe(messages.length)
   })
