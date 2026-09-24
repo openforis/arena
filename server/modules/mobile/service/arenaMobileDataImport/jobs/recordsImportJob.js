@@ -167,6 +167,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       conflictResolutionStrategy,
     })
     const { action, existingRecordUuid } = determineRecordAction({
+      survey,
       record,
       existingRecordSummary,
       conflictResolutionStrategy,

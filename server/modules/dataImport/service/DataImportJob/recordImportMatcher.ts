@@ -4,8 +4,10 @@ import { ConflictResolutionStrategy } from '@common/dataImport'
 import { RecordImportAction, RecordImportActionType } from '@common/dataImport/recordImportAction'
 
 import * as A from '@core/arena'
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import SystemError from '@core/systemError'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 
 /**
@@ -98,12 +100,16 @@ export const findExistingRecordSummary = ({
  * Determines what action will be taken for the given imported record, given a possible existing match
  * and the chosen conflict resolution strategy. This mirrors exactly the branching logic used to actually
  * perform the import, so that a generated preview/summary can never disagree with the real import.
+ * Throws an error if the record would be merged into a different record with the same keys
+ * and the survey security settings do not allow it.
  */
 export const determineRecordAction = ({
+  survey,
   record,
   existingRecordSummary,
   conflictResolutionStrategy,
 }: {
+  survey: any
   record: any
   existingRecordSummary: any
   conflictResolutionStrategy: string
@@ -127,6 +133,13 @@ export const determineRecordAction = ({
   }
 
   if (conflictResolutionStrategy === ConflictResolutionStrategy.merge) {
+    if (
+      existingRecordUuid !== Record.getUuid(record) &&
+      !Surveys.isRecordsMergeWithSameKeysAllowed(Survey.getSurveyInfo(survey))
+    ) {
+      const recordKeyValues = getRecordFormattedKeyValues({ survey, record })
+      throw new SystemError('dataImport.recordMergeWithSameKeysNotAllowed', { recordKeyValues })
+    }
     // applies both to a same-uuid record diverged on two clients, and to a different-uuid record matched by keys
     return { action: RecordImportAction.merge, existingRecordUuid }
   }
