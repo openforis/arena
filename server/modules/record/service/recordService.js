@@ -841,16 +841,17 @@ const exportRecordDocument = async ({
     : await generator(generatorOptions)
 
   const { buffer, surveyName } = documentResult
+  // Shorter printable names: omit redundant RecordForm suffix; item labels are sanitized
+  // (no URL-encoding / % sequences) by ExportFileNameGenerator.
   const fileName =
     exportScope === PrintableExportScopes.currentPage
       ? ExportFileNameGenerator.generate({
           surveyName,
           cycle,
           itemName: NodeDef.getLabel(entityDef, langToUse) || NodeDef.getName(entityDef),
-          fileType: 'RecordForm',
           extension,
         })
-      : ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'RecordForm', extension })
+      : ExportFileNameGenerator.generate({ surveyName, cycle, extension })
   Response.sendFileContent({
     res: outputStream,
     fileName,
