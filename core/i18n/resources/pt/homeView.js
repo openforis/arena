@@ -154,6 +154,8 @@ Se houver registros associados a este ciclo, eles serão excluídos.`,
       allowRecordsUploadFromMobile: 'Permitir upload de registros do Arena Mobile para o servidor',
       allowRecordsWithErrorsUploadFromMobile:
         'Permitir upload de registros com erros de validação do Arena Mobile para o servidor',
+      allowRecordsMergeWithSameKeys:
+        'Permitir a mesclagem de registros com as mesmas chaves (ex. registros criados em diferentes dispositivos Arena Mobile)',
     },
     srsPlaceholder: 'Digite código ou rótulo',
     unpublish: 'Despublicar e excluir dados',

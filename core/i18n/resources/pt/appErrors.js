@@ -21,6 +21,8 @@ export default {
     noRecordsFound: 'Nenhum registro encontrado no arquivo de importação ou formato de arquivo incorreto',
     pendingImportFileNotFoundOrExpired:
       'O arquivo enviado anteriormente não foi encontrado; ele pode ter expirado. Por favor, envie-o novamente.',
+    recordMergeWithSameKeysNotAllowed:
+      'Não é possível importar o registro "{{recordKeyValues}}": já existe outro registro com as mesmas chaves e a mesclagem de registros com as mesmas chaves não é permitida nesta pesquisa',
     recordOwnedByAnotherUser: 'Não é possível atualizar o registro "{{recordKeyValues}}" pois pertence a outro usuário',
   },
   entryDataNotFound: 'Dados de entrada não encontrados: {{entryName}}',

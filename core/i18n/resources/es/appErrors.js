@@ -23,6 +23,8 @@ export default {
     noRecordsFound: 'No se encontraron registros en el archivo de importación o formato de archivo incorrecto',
     pendingImportFileNotFoundOrExpired:
       'No se puede encontrar el archivo subido anteriormente; puede haber expirado. Por favor, súbalo de nuevo.',
+    recordMergeWithSameKeysNotAllowed:
+      'No se puede importar el registro "{{recordKeyValues}}": ya existe otro registro con las mismas claves y la fusión de registros con las mismas claves no está permitida en esta encuesta',
     recordOwnedByAnotherUser:
       'No se puede actualizar el registro "{{recordKeyValues}}" porque pertenece a otro usuario',
   },
