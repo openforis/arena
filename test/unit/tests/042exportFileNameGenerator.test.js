@@ -9,6 +9,8 @@ describe('ExportFileNameGenerator.sanitizeFileNamePart', () => {
 
   test('collapses consecutive separators and trims edges', () => {
     expect(ExportFileNameGenerator.sanitizeFileNamePart('  --Plot  details--  ')).toBe('Plot-details')
+    expect(ExportFileNameGenerator.sanitizeFileNamePart('---')).toBe('')
+    expect(ExportFileNameGenerator.sanitizeFileNamePart('a---b___c...d')).toBe('a-b___c...d')
   })
 
   test('returns empty string for blank input', () => {
