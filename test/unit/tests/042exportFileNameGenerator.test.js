@@ -10,7 +10,9 @@ describe('ExportFileNameGenerator.sanitizeFileNamePart', () => {
   test('collapses consecutive separators and trims edges', () => {
     expect(ExportFileNameGenerator.sanitizeFileNamePart('  --Plot  details--  ')).toBe('Plot-details')
     expect(ExportFileNameGenerator.sanitizeFileNamePart('---')).toBe('')
-    expect(ExportFileNameGenerator.sanitizeFileNamePart('a---b___c...d')).toBe('a-b___c...d')
+    // Allowed hyphens/underscores/dots are kept; only disallowed runs become a single '-'
+    expect(ExportFileNameGenerator.sanitizeFileNamePart('a---b___c...d')).toBe('a---b___c...d')
+    expect(ExportFileNameGenerator.sanitizeFileNamePart('a   b')).toBe('a-b')
   })
 
   test('returns empty string for blank input', () => {
