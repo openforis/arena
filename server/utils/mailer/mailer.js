@@ -1,3 +1,4 @@
+import { ArrayUtils } from '@core/arrayUtils'
 import * as ProcessUtils from '@core/processUtils'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 
@@ -38,13 +39,10 @@ if (typeof emailProvider.logTransportOptionsType === 'function') {
 emailProvider.validateEnv({ from })
 emailProvider.init?.()
 
-const toArray = (value) => {
-  if (!value) return []
-  return Array.isArray(value) ? value : [value]
-}
-
 export const sendCustomEmail = async ({ to = null, bcc = null, subject, html, log = true }) => {
-  const recipientsCount = toArray(to).length + toArray(bcc).length
+  const toRecipients = ArrayUtils.toArray(to)
+  const bccRecipients = ArrayUtils.toArray(bcc)
+  const recipientsCount = toRecipients.length + bccRecipients.length
   const subjectTruncationLength = 20
   let logMessageCommonPart = 'message'
   if (log) {
@@ -60,7 +58,7 @@ export const sendCustomEmail = async ({ to = null, bcc = null, subject, html, lo
     if (log) {
       logger.debug(`sent ${logMessageCommonPart}`)
     }
-    return result ?? { accepted: [...toArray(to), ...toArray(bcc)], rejected: [] }
+    return result ?? { accepted: [...toRecipients, ...bccRecipients], rejected: [] }
   } catch (error) {
     logger.error(`error sending ${logMessageCommonPart}: ${error.message}`)
     throw error
