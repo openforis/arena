@@ -256,30 +256,31 @@ export const findChildByKeyValues =
   (record) => {
     const childDef = SurveyNodeDefs.getNodeDefByUuid(childDefUuid)(survey)
     const siblings = getNodeChildrenByDefUuidUnsorted(parentNode, childDefUuid)(record)
-    return siblings.find((sibling) => {
-      if (NodeDef.isSingleEntity(childDef)) {
-        return sibling
-      }
-      const keyDefs = SurveyNodeDefs.getNodeDefKeys(childDef)(survey)
-      return keyDefs
-        .filter((keyDef) => Nodes.isChildApplicable(parentNode, NodeDef.getUuid(keyDef)))
-        .every((keyDef) => {
-          const keyDefUuid = NodeDef.getUuid(keyDef)
-          const keyAttribute = getNodeChildByDefUuid(sibling, keyDefUuid)(record)
-          const keyAttributeValue = Node.getValue(keyAttribute)
-          const keyAttributeValueSearch = keyValuesByDefUuid[keyDefUuid]
+    if (NodeDef.isSingleEntity(childDef)) {
+      return siblings[0]
+    }
+    // key defs are computed once (and not for every sibling): siblings can be many (e.g. when importing data)
+    const applicableKeyDefs = SurveyNodeDefs.getNodeDefKeys(childDef)(survey).filter((keyDef) =>
+      Nodes.isChildApplicable(parentNode, NodeDef.getUuid(keyDef))
+    )
+    return siblings.find((sibling) =>
+      applicableKeyDefs.every((keyDef) => {
+        const keyDefUuid = NodeDef.getUuid(keyDef)
+        const keyAttribute = getNodeChildByDefUuid(sibling, keyDefUuid)(record)
+        const keyAttributeValue = Node.getValue(keyAttribute)
+        const keyAttributeValueSearch = keyValuesByDefUuid[keyDefUuid]
 
-          return NodeValues.isValueEqual({
-            survey,
-            nodeDef: keyDef,
-            record,
-            parentNode: sibling,
-            attribute: keyAttribute,
-            value: keyAttributeValue,
-            valueSearch: keyAttributeValueSearch,
-          })
+        return NodeValues.isValueEqual({
+          survey,
+          nodeDef: keyDef,
+          record,
+          parentNode: sibling,
+          attribute: keyAttribute,
+          value: keyAttributeValue,
+          valueSearch: keyAttributeValueSearch,
         })
-    })
+      })
+    )
   }
 
 export const findDescendantByKeyValues =
