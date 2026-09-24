@@ -19,6 +19,7 @@ import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import ProfilePicture from '@webapp/components/profilePicture'
 
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
 import { UserActions, useUser } from '@webapp/store/user'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
@@ -97,6 +98,7 @@ const UserEdit = ({ ownProfile = false }) => {
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
   const canUseMap = useAuthCanUseMap()
+  const aiFeaturesEnabled = useSystemConfigAiFeaturesEnabled()
 
   if (!ready) return null
 
@@ -231,7 +233,7 @@ const UserEdit = ({ ownProfile = false }) => {
               </FormItem>
             </Fieldset>
           )}
-          <UserAiSettingsPanel ref={aiSaveRef} onDirtyChange={setAiSettingsDirty} />
+          {aiFeaturesEnabled && <UserAiSettingsPanel ref={aiSaveRef} onDirtyChange={setAiSettingsDirty} />}
           {systemAdmin && (
             <Fieldset className="notification-prefs" legend="usersView:prefs.title">
               <Checkbox
