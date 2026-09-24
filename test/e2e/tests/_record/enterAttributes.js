@@ -112,10 +112,10 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') => {
   const isKeyAttribute = Boolean(nodeDef.key)
   // Key fields need an unlock click first; keep a bit more budget for the React re-render
   // before Playwright can fill the (previously disabled) input.
-  // Key attributes: waitFor(visible,5s) + toBeEnabled(5s) + fill + waitForHeaderLoader(5s) can
-  // stack to >15 s on slow CI runners, so use 25 s to give a comfortable margin.
+  // Key attributes: unlock retries + waitFor(enabled) + fill + waitForHeaderLoader can stack on
+  // slow CI (validationReport tree_id row 3), so use 30 s to give a comfortable margin.
   // Non-key attributes: fill + waitForHeaderLoader(5s) — bumped to 15 s to match previous key budget.
-  const testTimeoutMs = isKeyAttribute ? 25000 : 15000
+  const testTimeoutMs = isKeyAttribute ? 30000 : 15000
 
   return test(
     `Enter ${nodeDef.name} value`,
@@ -138,25 +138,52 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') => {
             // for the same overlay caught doing this to a resize handle) if that's still on top from
             // a recent navigation - the toggle never actually gets clicked, so the field stays
             // disabled and the toBeEnabled check below fails. Wait for it to be gone first.
-            await page.waitForSelector('.loader__boxes', { state: 'detached', timeout: 5000 })
-            await keyToggleLocator.click({ force: true })
-            await page.keyboard.press('Escape') // close potential tooltip
-
-            // Unlock flips the input from disabled → enabled asynchronously; wait before fill so we
-            // don't burn the whole jest timeout on Playwright's actionability wait (seen on
-            // validationReport tree_id row 3: https://github.com/openforis/arena/actions/runs/35232215668).
+            //
+            // Even with force + Escape, the unlock click can still be swallowed under CI load
+            // (validationReport tree_id row 3: https://github.com/openforis/arena/actions/runs/35980579257).
+            // Retry unlock until the input is actually enabled instead of failing on a single 5s wait.
             if (['integer', 'decimal', 'text'].includes(nodeDef.type)) {
               const inputSelector = getTextSelector(nodeDef, parentSelector)
               await page.waitForSelector(inputSelector, { state: 'visible', timeout: 5000 })
-              // (no optional chaining here: the function is serialized and evaluated in the page)
-              await page.waitForFunction(
-                (selector) => {
+
+              const isInputEnabled = async () =>
+                page.evaluate((selector) => {
                   const el = document.querySelector(selector)
                   return !!el && !el.disabled
-                },
-                inputSelector,
-                { timeout: 5000 }
-              )
+                }, inputSelector)
+
+              const unlockKeyInput = async () => {
+                await page.waitForSelector('.loader__boxes', { state: 'detached', timeout: 5000 })
+                await keyToggleLocator.click({ force: true })
+                await page.keyboard.press('Escape') // close potential tooltip
+              }
+
+              const maxUnlockAttempts = 3
+              for (let attempt = 0; attempt < maxUnlockAttempts; attempt += 1) {
+                await unlockKeyInput()
+                try {
+                  await page.waitForFunction(
+                    (selector) => {
+                      const el = document.querySelector(selector)
+                      return !!el && !el.disabled
+                    },
+                    inputSelector,
+                    { timeout: 5000 }
+                  )
+                  break
+                } catch (error) {
+                  if (await isInputEnabled()) {
+                    break
+                  }
+                  if (attempt === maxUnlockAttempts - 1) {
+                    throw error
+                  }
+                }
+              }
+            } else {
+              await page.waitForSelector('.loader__boxes', { state: 'detached', timeout: 5000 })
+              await keyToggleLocator.click({ force: true })
+              await page.keyboard.press('Escape') // close potential tooltip
             }
           }
         }

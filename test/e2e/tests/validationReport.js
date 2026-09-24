@@ -150,7 +150,8 @@ export default () =>
       enterAttribute(tree_id, '10', getTreeSelector(1))
       enterAttribute(tree_id, '10', getTreeSelector(2))
       // Let duplicate-key validation settle before unlocking another keyed tree row.
-      waitThread(500)
+      // 500ms was too short under CI load (unlock click swallowed → tree_id stayed disabled).
+      waitThread(2000)
       enterAttribute(tree_id, '0', getTreeSelector(3))
       waitThread()
 
