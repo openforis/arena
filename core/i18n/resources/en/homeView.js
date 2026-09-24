@@ -153,6 +153,8 @@ If there are records associated to this cycle, they will be deleted.`,
       allowRecordsUploadFromMobile: 'Allow uploading records from Arena Mobile to server',
       allowRecordsWithErrorsUploadFromMobile:
         'Allow uploading records with validation errors from Arena Mobile to server',
+      allowRecordsMergeWithSameKeys:
+        'Allow merging records with same keys (e.g. records created in different Arena Mobile devices)',
     },
     srsPlaceholder: 'Type code or label',
     unpublish: 'Unpublish and delete data',

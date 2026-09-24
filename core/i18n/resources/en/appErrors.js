@@ -20,6 +20,8 @@ export default {
     noRecordsFound: 'No records found in the import file or wrong file format',
     pendingImportFileNotFoundOrExpired:
       'The previously uploaded file cannot be found anymore; it may have expired. Please upload it again.',
+    recordMergeWithSameKeysNotAllowed:
+      'Cannot import record "{{recordKeyValues}}": another record with the same keys already exists and merging records with same keys is not allowed in this survey',
     recordOwnedByAnotherUser: 'Cannot update record "{{recordKeyValues}}" as it is owned by another user',
   },
   entryDataNotFound: 'Entry data not found: {{entryName}}',

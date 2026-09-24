@@ -65,7 +65,12 @@ export default class RecordsImportSummaryJob extends Job {
         existingRecordsSummary,
         conflictResolutionStrategy,
       })
-      const { action } = determineRecordAction({ record, existingRecordSummary, conflictResolutionStrategy })
+      const { action } = determineRecordAction({
+        survey,
+        record,
+        existingRecordSummary,
+        conflictResolutionStrategy,
+      })
       const keyValues = getRecordFormattedKeyValuesByDefUuid({ survey, record })
 
       this.items.push({
