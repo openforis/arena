@@ -4313,9 +4313,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@openforis/arena-core@npm:2.3.6"
+"@openforis/arena-core@npm:^2.3.7":
+  version: 2.3.7
+  resolution: "@openforis/arena-core@npm:2.3.7"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     "@turf/bearing": "npm:^7.3.5"
@@ -4332,17 +4332,17 @@ __metadata:
     n2words: "npm:^6.2.0"
     proj4: "npm:^2.22.0"
     uuid: "npm:^14.0.2"
-  checksum: 10c0/67ffa7c501161c2b90c0d170c4f7d1c2fb14816ba5234c06a7f60737526ea214ecaa2293f63a741b0ff3ea38d418738602fe84123ceeaf81524afcb4fe4688c5
+  checksum: 10c0/3a1d23304a1929c7172eca2edc0d83118e952e74582b8ab79c9b1d8e2a54fb0b9812f26f6967c4466798756c7cae07aa09ba9b5399a0f7cba711fa14761b55ac
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.4.4":
-  version: 2.4.4
-  resolution: "@openforis/arena-server@npm:2.4.4"
+"@openforis/arena-server@npm:^2.4.5":
+  version: 2.4.5
+  resolution: "@openforis/arena-server@npm:2.4.5"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1135.0"
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^2.3.6"
+    "@openforis/arena-core": "npm:^2.3.7"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.2"
     cookie-parser: "npm:^1.4.7"
@@ -4364,7 +4364,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.3"
-  checksum: 10c0/e0fa74c6d51b7e70e0458118c6cf2e73e9e85ebe45f80c7f2546f6dc115887e6675cf21373f3b78508d498ea23f7100a4bf92fea2f92db0931b55f5cdb6dab7d
+  checksum: 10c0/ab885a7413cfeffa14ebef51c1aa5169d96b69b23d8b1c53b4bb72a595c9a1e97cd3a7e4787e7b4a9cae50bc789cf3783b7f52985470880a8a84b07c63d7df22
   languageName: node
   linkType: hard
 
@@ -16134,7 +16134,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9"
     "@mui/x-tree-view": "npm:^9"
     "@ngageoint/geopackage": "npm:^4.2.9"
-    "@openforis/arena-server": "npm:^2.4.4"
+    "@openforis/arena-server": "npm:^2.4.5"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.2"
     "@reduxjs/toolkit": "npm:^2.11.2"
     "@sendgrid/mail": "npm:^8.1.6"
