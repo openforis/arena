@@ -38,8 +38,13 @@ if (typeof emailProvider.logTransportOptionsType === 'function') {
 emailProvider.validateEnv({ from })
 emailProvider.init?.()
 
-export const sendCustomEmail = async ({ to, subject, html, log = true }) => {
-  const recipientsCount = Array.isArray(to) ? to.length : 1
+const toArray = (value) => {
+  if (!value) return []
+  return Array.isArray(value) ? value : [value]
+}
+
+export const sendCustomEmail = async ({ to = null, bcc = null, subject, html, log = true }) => {
+  const recipientsCount = toArray(to).length + toArray(bcc).length
   const subjectTruncationLength = 20
   let logMessageCommonPart = 'message'
   if (log) {
@@ -51,22 +56,29 @@ export const sendCustomEmail = async ({ to, subject, html, log = true }) => {
     logger.debug(`sending ${logMessageCommonPart}`)
   }
   try {
-    const result = await emailProvider.sendEmail({ to, from, subject, html })
+    const result = await emailProvider.sendEmail({ to, bcc, from, subject, html })
     if (log) {
       logger.debug(`sent ${logMessageCommonPart}`)
     }
-    return result ?? { accepted: Array.isArray(to) ? to : [to], rejected: [] }
+    return result ?? { accepted: [...toArray(to), ...toArray(bcc)], rejected: [] }
   } catch (error) {
     logger.error(`error sending ${logMessageCommonPart}: ${error.message}`)
     throw error
   }
 }
 
-export const sendEmail = async ({ to, msgKey, msgParams = {}, i18n: i18nParam = null, lang = 'en' }) => {
+export const sendEmail = async ({
+  to = null,
+  bcc = null,
+  msgKey,
+  msgParams = {},
+  i18n: i18nParam = null,
+  lang = 'en',
+}) => {
   const i18n = i18nParam ?? (await i18nFactory.createI18nAsync(lang))
 
   const subject = i18n.t(`${msgKey}.subject`, msgParams)
   const html = i18n.t(`${msgKey}.body`, msgParams)
 
-  return sendCustomEmail({ to, subject, html })
+  return sendCustomEmail({ to, bcc, subject, html })
 }
