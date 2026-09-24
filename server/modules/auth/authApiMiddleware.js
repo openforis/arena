@@ -92,11 +92,12 @@ export const requireSurveyCloneFromViewPermission = async (req, res, next) => {
     }
     const user = Request.getUser(req)
     const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: cloneFrom })
-    if (Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
+    // published templates can be cloned by any user allowed to create surveys
+    if (Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
       next()
       return
     }
-    sendUnauthorizedError({ req, res })
+    sendForbiddenError({ req, res })
   } catch (error) {
     next(error)
   }
