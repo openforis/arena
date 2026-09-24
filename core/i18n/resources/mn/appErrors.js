@@ -21,6 +21,8 @@ export default {
     noRecordsFound: 'Импортын файлд бичлэг олдсонгүй эсвэл буруу файлын формат',
     pendingImportFileNotFoundOrExpired:
       'Өмнө оруулсан файл олдсонгүй; хугацаа нь дууссан байж магадгүй. Дахин оруулна уу.',
+    recordMergeWithSameKeysNotAllowed:
+      '"{{recordKeyValues}}" бичлэгийг импортлох боломжгүй: ижил түлхүүртэй өөр бичлэг аль хэдийн байгаа бөгөөд энэ судалгаанд ижил түлхүүртэй бичлэгүүдийг нэгтгэхийг зөвшөөрөөгүй',
     recordOwnedByAnotherUser: '"{{recordKeyValues}}" бичлэг өөр хэрэглэгчид харьяалагддаг тул шинэчлэх боломжгүй',
   },
   entryDataNotFound: 'Оролтын өгөгдөл олдсонгүй: {{entryName}}',

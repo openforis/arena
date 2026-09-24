@@ -96,8 +96,8 @@ const sortByProps =
 
 const sortById = sortByProps(['id'])
 
-const toArray = <T>(value: T | T[] | null | undefined): T | T[] | null | undefined => {
-  if (Objects.isNil(value)) return value
+const toArray = <T>(value: T | T[] | null | undefined): T[] => {
+  if (Objects.isNil(value)) return []
   return Array.isArray(value) ? value : [value]
 }
 

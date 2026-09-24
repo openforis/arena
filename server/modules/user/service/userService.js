@@ -151,8 +151,9 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
     // send the emails only after use access request has been inserted into the db
     const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail()
 
+    // use bcc so that system administrators cannot see each other's email addresses
     await Mailer.sendEmail({
-      to: systemAdminEmails,
+      bcc: systemAdminEmails,
       msgKey: 'emails:userAccessRequest',
       msgParams: { ...props, country, email, serverUrl },
     })

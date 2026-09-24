@@ -152,6 +152,7 @@ export default {
       allowRecordsDownloadInMobile: 'サーバーからArena Mobileへの記録ダウンロードを許可',
       allowRecordsUploadFromMobile: 'Arena Mobileからサーバーへの記録アップロードを許可',
       allowRecordsWithErrorsUploadFromMobile: '検証エラーのある記録のArena Mobileからサーバーへのアップロードを許可',
+      allowRecordsMergeWithSameKeys: '同じキーを持つ記録の統合を許可（例：異なるArena Mobile端末で作成された記録）',
     },
     srsPlaceholder: 'コードまたはラベルを入力',
     unpublish: '公開を取り消してデータを削除',
