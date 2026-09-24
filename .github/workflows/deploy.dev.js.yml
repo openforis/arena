@@ -9,13 +9,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # fetch all tags, default 1
           persist-credentials: false # this job never pushes back to git, so don't leave a token in .git/config
 
       - name: Use Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24.11.1'
           cache: 'yarn'
@@ -33,7 +33,7 @@ jobs:
         run: curl https://cli-assets.heroku.com/install.sh | sh
 
       - name: Deploy to Heroku (dev)
-        uses: akhileshns/heroku-deploy@v3.15.15
+        uses: akhileshns/heroku-deploy@1b080913896a5d6d44a18e9e208f8eb1fee9b0f7 # v3.15.15
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_APP_NAME_DEVELOPMENT}}
