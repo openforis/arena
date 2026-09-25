@@ -1,24 +1,55 @@
+import type { Node as ArenaNode, NodeDef as ArenaNodeDef } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as Node from '../node'
 import { NodeValues } from '../nodeValues'
 
-const toEntryKey = ({ parentNode, childDefUuid }) => `${Node.getUuid(parentNode)}|${childDefUuid}`
+type KeyDef = ArenaNodeDef<any>
+
+type KeyAttributeGetter = (entity: ArenaNode, keyDefUuid: string) => ArenaNode | undefined
+
+type Entry = {
+  keyDefs: KeyDef[]
+  siblingsCount: number
+  entityUuidsByKey: Map<string, string[]>
+  usable: boolean
+}
+
+type CompositeKey = { supported: boolean; key: string | null }
+
+const toEntryKey = ({ parentNode, childDefUuid }: { parentNode: ArenaNode; childDefUuid: string }): string =>
+  `${Node.getUuid(parentNode)}|${childDefUuid}`
 
 // key values are compared with record context (see RecordReader.findChildByKeyValues)
-const getCompositeKey = ({ keyDefs, getKeyValue }) =>
+const getCompositeKey = ({
+  keyDefs,
+  getKeyValue,
+}: {
+  keyDefs: KeyDef[]
+  getKeyValue: (keyDef: KeyDef) => any
+}): CompositeKey =>
   NodeValues.getFastEqualityCompositeKey({
     nodeDefs: keyDefs,
-    getKey: (keyDef) => NodeValues.getFastEqualityKeyInRecordContext({ nodeDef: keyDef, value: getKeyValue(keyDef) }),
+    getKey: (keyDef: KeyDef) =>
+      NodeValues.getFastEqualityKeyInRecordContext({ nodeDef: keyDef, value: getKeyValue(keyDef) }),
   })
 
-const getEntityCompositeKey = ({ keyDefs, entity, getKeyAttribute }) =>
+const getEntityCompositeKey = ({
+  keyDefs,
+  entity,
+  getKeyAttribute,
+}: {
+  keyDefs: KeyDef[]
+  entity: ArenaNode
+  getKeyAttribute: KeyAttributeGetter
+}): CompositeKey =>
   getCompositeKey({
     keyDefs,
     getKeyValue: (keyDef) => Node.getValue(getKeyAttribute(entity, NodeDef.getUuid(keyDef))),
   })
 
-const haveSameDefUuids = (keyDefsA, keyDefsB) =>
+const haveSameDefUuids = (keyDefsA: KeyDef[], keyDefsB: KeyDef[]): boolean =>
   keyDefsA.length === keyDefsB.length &&
   keyDefsA.every((keyDef, index) => NodeDef.getUuid(keyDef) === NodeDef.getUuid(keyDefsB[index]))
 
@@ -32,16 +63,14 @@ const haveSameDefUuids = (keyDefsA, keyDefsB) =>
  * It must be used with only one record.
  */
 export class EntityKeysIndexCache {
-  constructor() {
-    this.entriesByKey = new Map()
-  }
+  private readonly entriesByKey: Map<string, Entry> = new Map()
 
   /**
    * Determines whether entities can be looked up using an index for the specified key definitions.
-   * @param {!Array<object>} keyDefs - The key attribute definitions of the entity.
-   * @returns {boolean} - True if the index can be used, false otherwise.
+   * @param keyDefs - The key attribute definitions of the entity.
+   * @returns True if the index can be used, false otherwise.
    */
-  static canBeUsed(keyDefs) {
+  static canBeUsed(keyDefs: KeyDef[]): boolean {
     return (
       keyDefs.length > 0 &&
       keyDefs.every((keyDef) => NodeValues.isTypeFastIndexableInRecordContext(NodeDef.getType(keyDef)))
@@ -51,17 +80,31 @@ export class EntityKeysIndexCache {
   /**
    * Finds the UUIDs of the sibling entities having the specified key values.
    * The entities found must still be checked by the caller (the index can be outdated if key values have been modified).
-   * @param {!object} params - The parameters.
-   * @param {!object} params.parentNode - The parent entity of the entities to find.
-   * @param {!string} params.childDefUuid - The UUID of the definition of the entities to find.
-   * @param {!Array<object>} params.keyDefs - The key attribute definitions of the entities.
-   * @param {!Array<object>} params.siblings - The current child entities of the parent node, with the specified definition.
-   * @param {!function(object, string): object} params.getKeyAttribute - Function returning the key attribute of an entity, given its definition UUID.
-   * @param {!object} params.keyValuesByDefUuid - The key values to search for, indexed by key attribute definition UUID.
-   * @returns {Array<string>|null} - The UUIDs of the entities with the specified key values,
+   * @param params - The parameters.
+   * @param params.parentNode - The parent entity of the entities to find.
+   * @param params.childDefUuid - The UUID of the definition of the entities to find.
+   * @param params.keyDefs - The key attribute definitions of the entities.
+   * @param params.siblings - The current child entities of the parent node, with the specified definition.
+   * @param params.getKeyAttribute - Function returning the key attribute of an entity, given its definition UUID.
+   * @param params.keyValuesByDefUuid - The key values to search for, indexed by key attribute definition UUID.
+   * @returns The UUIDs of the entities with the specified key values,
    * or null if the index cannot be used (some key values are empty or their key cannot be determined).
    */
-  findEntityUuids({ parentNode, childDefUuid, keyDefs, siblings, getKeyAttribute, keyValuesByDefUuid }) {
+  findEntityUuids({
+    parentNode,
+    childDefUuid,
+    keyDefs,
+    siblings,
+    getKeyAttribute,
+    keyValuesByDefUuid,
+  }: {
+    parentNode: ArenaNode
+    childDefUuid: string
+    keyDefs: KeyDef[]
+    siblings: ArenaNode[]
+    getKeyAttribute: KeyAttributeGetter
+    keyValuesByDefUuid: Record<string, any>
+  }): string[] | null {
     const { key: searchKey } = getCompositeKey({
       keyDefs,
       getKeyValue: (keyDef) => keyValuesByDefUuid[NodeDef.getUuid(keyDef)],
@@ -71,7 +114,7 @@ export class EntityKeysIndexCache {
     const entryKey = toEntryKey({ parentNode, childDefUuid })
     let entry = this.entriesByKey.get(entryKey)
     if (!entry || entry.siblingsCount !== siblings.length || !haveSameDefUuids(entry.keyDefs, keyDefs)) {
-      entry = this._buildEntry({ keyDefs, siblings, getKeyAttribute })
+      entry = this.buildEntry({ keyDefs, siblings, getKeyAttribute })
       this.entriesByKey.set(entryKey, entry)
     }
     if (!entry.usable) return null
@@ -81,13 +124,20 @@ export class EntityKeysIndexCache {
 
   /**
    * Adds a new entity to the index of its parent node (if any).
-   * @param {!object} params - The parameters.
-   * @param {!object} params.parentNode - The parent entity of the new entity.
-   * @param {!object} params.entity - The new entity (with its key attributes).
-   * @param {!function(object, string): object} params.getKeyAttribute - Function returning the key attribute of an entity, given its definition UUID.
-   * @returns {void}
+   * @param params - The parameters.
+   * @param params.parentNode - The parent entity of the new entity.
+   * @param params.entity - The new entity (with its key attributes).
+   * @param params.getKeyAttribute - Function returning the key attribute of an entity, given its definition UUID.
    */
-  addEntity({ parentNode, entity, getKeyAttribute }) {
+  addEntity({
+    parentNode,
+    entity,
+    getKeyAttribute,
+  }: {
+    parentNode: ArenaNode
+    entity: ArenaNode
+    getKeyAttribute: KeyAttributeGetter
+  }): void {
     const entry = this.entriesByKey.get(toEntryKey({ parentNode, childDefUuid: Node.getNodeDefUuid(entity) }))
     if (!entry) return
     entry.siblingsCount += 1
@@ -97,12 +147,20 @@ export class EntityKeysIndexCache {
     if (!supported) {
       entry.usable = false
     } else if (key !== null) {
-      this._addToIndex({ entry, key, entityUuid: Node.getUuid(entity) })
+      this.addToIndex({ entry, key, entityUuid: Node.getUuid(entity) })
     }
   }
 
-  _buildEntry({ keyDefs, siblings, getKeyAttribute }) {
-    const entry = { keyDefs, siblingsCount: siblings.length, entityUuidsByKey: new Map(), usable: true }
+  private buildEntry({
+    keyDefs,
+    siblings,
+    getKeyAttribute,
+  }: {
+    keyDefs: KeyDef[]
+    siblings: ArenaNode[]
+    getKeyAttribute: KeyAttributeGetter
+  }): Entry {
+    const entry: Entry = { keyDefs, siblingsCount: siblings.length, entityUuidsByKey: new Map(), usable: true }
     for (const sibling of siblings) {
       const { supported, key } = getEntityCompositeKey({ keyDefs, entity: sibling, getKeyAttribute })
       if (!supported) {
@@ -112,13 +170,13 @@ export class EntityKeysIndexCache {
         return entry
       }
       if (key !== null) {
-        this._addToIndex({ entry, key, entityUuid: Node.getUuid(sibling) })
+        this.addToIndex({ entry, key, entityUuid: Node.getUuid(sibling) })
       }
     }
     return entry
   }
 
-  _addToIndex({ entry, key, entityUuid }) {
+  private addToIndex({ entry, key, entityUuid }: { entry: Entry; key: string; entityUuid: string }): void {
     const entityUuids = entry.entityUuidsByKey.get(key)
     if (entityUuids) {
       entityUuids.push(entityUuid)
