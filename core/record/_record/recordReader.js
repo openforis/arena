@@ -12,6 +12,7 @@ import * as Node from '../node'
 import { NodeValues } from '../nodeValues'
 
 import { keys } from './recordKeys'
+import { EntityKeysIndexCache } from './entityKeysIndexCache'
 
 const {
   getChildren: getNodeChildren,
@@ -252,7 +253,7 @@ export const getEntityKeyValues = (survey, nodeEntity) =>
   A.pipe(getEntityKeyNodes(survey, nodeEntity), A.map(Node.getValue))
 
 export const findChildByKeyValues =
-  ({ survey, parentNode, childDefUuid, keyValuesByDefUuid }) =>
+  ({ survey, parentNode, childDefUuid, keyValuesByDefUuid, entityKeysIndexCache = null }) =>
   (record) => {
     const childDef = SurveyNodeDefs.getNodeDefByUuid(childDefUuid)(survey)
     const siblings = getNodeChildrenByDefUuidUnsorted(parentNode, childDefUuid)(record)
@@ -263,10 +264,10 @@ export const findChildByKeyValues =
     const applicableKeyDefs = SurveyNodeDefs.getNodeDefKeys(childDef)(survey).filter((keyDef) =>
       Nodes.isChildApplicable(parentNode, NodeDef.getUuid(keyDef))
     )
-    return siblings.find((sibling) =>
+    const hasKeyValues = (entity) =>
       applicableKeyDefs.every((keyDef) => {
         const keyDefUuid = NodeDef.getUuid(keyDef)
-        const keyAttribute = getNodeChildByDefUuid(sibling, keyDefUuid)(record)
+        const keyAttribute = getNodeChildByDefUuid(entity, keyDefUuid)(record)
         const keyAttributeValue = Node.getValue(keyAttribute)
         const keyAttributeValueSearch = keyValuesByDefUuid[keyDefUuid]
 
@@ -274,17 +275,34 @@ export const findChildByKeyValues =
           survey,
           nodeDef: keyDef,
           record,
-          parentNode: sibling,
+          parentNode: entity,
           attribute: keyAttribute,
           value: keyAttributeValue,
           valueSearch: keyAttributeValueSearch,
         })
       })
-    )
+
+    if (entityKeysIndexCache && EntityKeysIndexCache.canBeUsed(applicableKeyDefs)) {
+      const entityUuids = entityKeysIndexCache.findEntityUuids({
+        parentNode,
+        childDefUuid,
+        keyDefs: applicableKeyDefs,
+        siblings,
+        getKeyAttribute: (entity, keyDefUuid) => getNodeChildByDefUuid(entity, keyDefUuid)(record),
+        keyValuesByDefUuid,
+      })
+      if (entityUuids) {
+        // entities found in the index are checked again: key values could have been modified after the index has been built
+        return entityUuids
+          .map((entityUuid) => getNodeByUuid(entityUuid)(record))
+          .find((entity) => entity && !Node.isDeleted(entity) && hasKeyValues(entity))
+      }
+    }
+    return siblings.find(hasKeyValues)
   }
 
 export const findDescendantByKeyValues =
-  ({ survey, descendantDefUuid, keyValuesByDefUuid }) =>
+  ({ survey, descendantDefUuid, keyValuesByDefUuid, entityKeysIndexCache = null }) =>
   (record) => {
     // start from root node
     const rootNode = getRootNode(record)
@@ -305,6 +323,7 @@ export const findDescendantByKeyValues =
         parentNode: currentNode,
         childDefUuid: nodeDefUuid,
         keyValuesByDefUuid,
+        entityKeysIndexCache,
       })(record)
 
       currentNode = descendant

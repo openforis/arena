@@ -1,8 +1,8 @@
-import { DataImportJobRecordProvider } from '@server/modules/dataImport/service/DataImportJob/recordProvider'
+import { NodeValues } from '@core/record/nodeValues'
 
-const { buildBucketKey } = DataImportJobRecordProvider as { buildBucketKey: (keyParts: string[]) => string }
+const { buildCompositeKey: buildBucketKey } = NodeValues as { buildCompositeKey: (keyParts: string[]) => string }
 
-describe('DataImportJobRecordProvider.buildBucketKey', () => {
+describe('NodeValues.buildCompositeKey', () => {
   it('is stable and deterministic for the same key parts', () => {
     expect(buildBucketKey(['A', 'B'])).toBe(buildBucketKey(['A', 'B']))
   })
@@ -12,7 +12,7 @@ describe('DataImportJobRecordProvider.buildBucketKey', () => {
   })
 
   it('does not collide when a key part contains the internal separator character', () => {
-    // \u0001 is the internal bucketKeySeparator: without escaping, ["A\u0001B", "C"] and
+    // \u0001 is a typical separator character: without escaping, ["A\u0001B", "C"] and
     // ["A", "B\u0001C"] would join to the exact same string and be treated as the same record.
     const keyPartsA = ['A\u0001B', 'C']
     const keyPartsB = ['A', 'B\u0001C']
