@@ -49,6 +49,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     // when the survey has expressions depending on many nodes (e.g. aggregate functions on multiple entities);
     // the node objects are the same ones passed to the batch persisters (their ids are set when they are inserted)
     this.nodesPendingDependentsUpdateByUuid = new Map()
+    // index of the entities by key values, used to find the entity of every row without comparing the keys of all its siblings
+    // (valid only for the current record)
+    this.entityKeysIndexCache = new Record.EntityKeysIndexCache()
   }
 
   async onStart() {
@@ -236,6 +239,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         // moving to another record: update dependents of the previous one (this.currentRecord is still the previous one)
         await this.updatePendingDependents()
       }
+      if (Record.getUuid(previousRecord) !== Record.getUuid(record)) {
+        this.entityKeysIndexCache = new Record.EntityKeysIndexCache()
+      }
       this.currentRecord = record
       const recordUuid = Record.getUuid(this.currentRecord)
 
@@ -259,6 +265,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         insertMissingNodes,
         sideEffect,
         updateDependents: false,
+        entityKeysIndexCache: this.entityKeysIndexCache,
       })(this.currentRecord)
 
       const entityUuid = Node.getUuid(entity)

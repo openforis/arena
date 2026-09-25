@@ -253,6 +253,7 @@ const _getOrCreateEntityByKeys =
     valuesByDefUuid,
     insertMissingNodes,
     sideEffect = false,
+    entityKeysIndexCache = null,
   }) =>
   async (record) => {
     if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === entityDefUuid) {
@@ -262,6 +263,7 @@ const _getOrCreateEntityByKeys =
       survey,
       descendantDefUuid: entityDefUuid,
       keyValuesByDefUuid: valuesByDefUuid,
+      entityKeysIndexCache,
     })(record)
 
     if (entity) {
@@ -285,6 +287,7 @@ const _getOrCreateEntityByKeys =
           survey,
           descendantDefUuid: NodeDef.getUuid(entityParentDef),
           keyValuesByDefUuid: valuesByDefUuid,
+          entityKeysIndexCache,
         })(record)
 
     if (!entityParent) {
@@ -306,6 +309,13 @@ const _getOrCreateEntityByKeys =
       sideEffect,
     })(record)
 
+    entityKeysIndexCache?.addEntity({
+      survey,
+      parentNode: entityParent,
+      entity: entityInserted,
+      keyValuesByDefUuid: valuesByDefUuid,
+    })
+
     return { entity: entityInserted, updateResult }
   }
 
@@ -321,6 +331,7 @@ const getOrCreateEntityByKeys =
     insertMissingNodes = false,
     sideEffect = false,
     updateDependents = true,
+    entityKeysIndexCache = null,
   }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
@@ -334,6 +345,7 @@ const getOrCreateEntityByKeys =
       valuesByDefUuid,
       insertMissingNodes,
       sideEffect,
+      entityKeysIndexCache,
     })(record)
 
     if (updateResultEntity) {

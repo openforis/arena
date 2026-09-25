@@ -84,6 +84,7 @@ export const { getDependentNodePointers, getParentCodeAttribute, getDependentCod
 
 // ====== Keys
 export const { getEntityKeyNodes, getEntityKeyValues, findDescendantByKeyValues, findChildByKeyValues } = RecordReader
+export { EntityKeysIndexCache } from './_record/entityKeysIndexCache'
 
 // ====== Unique
 export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = RecordReader

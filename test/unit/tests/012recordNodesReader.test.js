@@ -56,13 +56,13 @@ describe('RecordReader Test', () => {
     // find plot with plot_id = 1
     const plot1Found = findPlotWithId({ plotId: 1 })
     const plot1FoundId = Record.getNodeChildByDefUuid(plot1Found, plotIdDef.uuid)(record)
-    expect(Node.getValue(plot1FoundId)).toEqual(1)
+    expect(Node.getValue(plot1FoundId)).toBe(1)
     expect(plot1Found).toStrictEqual(getNode('cluster/plot[0]'))
 
     // find plot with plot_id = 2
     const plot2Found = findPlotWithId({ plotId: 2 })
     const plot2FoundId = Record.getNodeChildByDefUuid(plot2Found, plotIdDef.uuid)(record)
-    expect(Node.getValue(plot2FoundId)).toEqual(2)
+    expect(Node.getValue(plot2FoundId)).toBe(2)
     expect(plot2Found).toStrictEqual(getNode('cluster/plot[1]'))
   })
 
@@ -87,13 +87,93 @@ describe('RecordReader Test', () => {
     // find tree in plot 1 with tree_id = 1
     const tree1Found = findTreeWithId({ plotId: 1, treeId: 1 })
     const tree1FoundId = Record.getNodeChildByDefUuid(tree1Found, treeIdDef.uuid)(record)
-    expect(Node.getValue(tree1FoundId)).toEqual(1)
+    expect(Node.getValue(tree1FoundId)).toBe(1)
     expect(tree1Found).toStrictEqual(getNode('cluster/plot[0]/tree[0]'))
 
     // find tree in plot 1 with tree_id = 2
     const tree2Found = findTreeWithId({ plotId: 1, treeId: 2 })
     const tree2FoundId = Record.getNodeChildByDefUuid(tree2Found, treeIdDef.uuid)(record)
-    expect(Node.getValue(tree2FoundId)).toEqual(2)
+    expect(Node.getValue(tree2FoundId)).toBe(2)
     expect(tree2Found).toStrictEqual(getNode('cluster/plot[0]/tree[1]'))
+  })
+})
+
+describe('RecordReader Test (entity keys index cache)', () => {
+  beforeAll(async () => {
+    const user = getContextUser()
+
+    survey = await DataTest.createTestSurvey({ user })
+
+    record = DataTest.createTestRecord({ user, survey })
+  }, 10000)
+
+  const findPlot = ({ plotId, entityKeysIndexCache, recordToSearch = record }) =>
+    Record.findChildByKeyValues({
+      survey,
+      parentNode: Record.getRootNode(recordToSearch),
+      childDefUuid: getNodeDef('cluster/plot').uuid,
+      keyValuesByDefUuid: { [getNodeDef('cluster/plot/plot_id').uuid]: plotId },
+      entityKeysIndexCache,
+    })(recordToSearch)
+
+  const getOrCreatePlot = ({ plotId, entityKeysIndexCache, recordToUpdate }) =>
+    Record.getOrCreateEntityByKeys({
+      user: getContextUser(),
+      survey,
+      entityDefUuid: getNodeDef('cluster/plot').uuid,
+      valuesByDefUuid: {
+        [getNodeDef('cluster/cluster_id').uuid]: Node.getValue(getNode('cluster/cluster_id')),
+        [getNodeDef('cluster/plot/plot_id').uuid]: plotId,
+      },
+      insertMissingNodes: true,
+      updateDependents: false,
+      entityKeysIndexCache,
+    })(recordToUpdate)
+
+  it('Test find child node by key values using the cache', () => {
+    const entityKeysIndexCache = new Record.EntityKeysIndexCache()
+
+    expect(findPlot({ plotId: 1, entityKeysIndexCache })).toStrictEqual(getNode('cluster/plot[0]'))
+    expect(findPlot({ plotId: 2, entityKeysIndexCache })).toStrictEqual(getNode('cluster/plot[1]'))
+    expect(findPlot({ plotId: '2', entityKeysIndexCache })).toStrictEqual(getNode('cluster/plot[1]'))
+    expect(findPlot({ plotId: 99, entityKeysIndexCache })).toBeUndefined()
+  })
+
+  it('Test entities created using the cache are found without creating duplicates', async () => {
+    const entityKeysIndexCache = new Record.EntityKeysIndexCache()
+    // build the index
+    expect(findPlot({ plotId: 99, entityKeysIndexCache })).toBeUndefined()
+
+    const { entity: plotCreated, updateResult } = await getOrCreatePlot({
+      plotId: 99,
+      entityKeysIndexCache,
+      recordToUpdate: record,
+    })
+    expect(Node.isCreated(plotCreated)).toBeTruthy()
+    const recordUpdated = updateResult.record
+
+    expect(findPlot({ plotId: 99, entityKeysIndexCache, recordToSearch: recordUpdated })).toStrictEqual(
+      Record.getNodeByUuid(Node.getUuid(plotCreated))(recordUpdated)
+    )
+    const { entity: plotFound } = await getOrCreatePlot({
+      plotId: 99,
+      entityKeysIndexCache,
+      recordToUpdate: recordUpdated,
+    })
+    expect(Node.getUuid(plotFound)).toEqual(Node.getUuid(plotCreated))
+  })
+
+  it('Test cache is rebuilt when entities are added without using it', async () => {
+    const entityKeysIndexCache = new Record.EntityKeysIndexCache()
+    // build the index
+    expect(findPlot({ plotId: 98, entityKeysIndexCache })).toBeUndefined()
+
+    // create entity without using the cache
+    const { entity: plotCreated, updateResult } = await getOrCreatePlot({ plotId: 98, recordToUpdate: record })
+    const recordUpdated = updateResult.record
+
+    expect(Node.getUuid(findPlot({ plotId: 98, entityKeysIndexCache, recordToSearch: recordUpdated }))).toEqual(
+      Node.getUuid(plotCreated)
+    )
   })
 })
