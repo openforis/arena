@@ -10152,10 +10152,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expect-playwright@npm:^0.8.0":
+"expect-playwright@npm:0.8.0":
   version: 0.8.0
   resolution: "expect-playwright@npm:0.8.0"
   checksum: 10c0/89235929d99df0d7c8b6fcf0bca7f85bb1b1c23cf09cf2317f8d86644fa2aecc76ec49f8dabd5a517c9826c991ee495d2bdd61a0c5c3da05010d3977eae6aec4
+  languageName: node
+  linkType: hard
+
+"expect-playwright@patch:expect-playwright@npm%3A0.8.0#~/.yarn/patches/expect-playwright-npm-0.8.0-0fec7940e9.patch":
+  version: 0.8.0
+  resolution: "expect-playwright@patch:expect-playwright@npm%3A0.8.0#~/.yarn/patches/expect-playwright-npm-0.8.0-0fec7940e9.patch::version=0.8.0&hash=7b5704"
+  checksum: 10c0/fbaaaa1772245a4eb12eae12ed545a680493b92277a8dc5a48542028c3013fb0c1b5e58b1d69e112447a7c334b491757dc19cfe92ed947a8ce9c259fd238a3f0
   languageName: node
   linkType: hard
 

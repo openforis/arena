@@ -51,7 +51,10 @@ WORKDIR /app
 
 COPY --chown=node:node --from=builder /app /app/
 
-RUN ln -s dist/server.js .
+# /app is owned by root: create the default log folder (LOG_FOLDER, ./logs) writable by the node user
+RUN ln -s dist/server.js . \
+    && mkdir -p logs \
+    && chown node:node logs
 
 USER node
 
