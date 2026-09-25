@@ -22,7 +22,7 @@ import DataImportBaseJob from './DataImportBaseJob'
 import { DataImportFileReader } from './dataImportFileReader'
 
 const defaultErrorKey = 'error'
-// max time spent processing rows without letting the event loop process timers and messages
+// Maximum time (ms) spent processing rows without letting the event loop process timers and messages.
 const eventLoopYieldIntervalMillis = 200
 
 const categoryItemProvider = CategoryItemProviderDefault
