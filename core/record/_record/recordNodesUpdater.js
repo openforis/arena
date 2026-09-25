@@ -310,10 +310,10 @@ const _getOrCreateEntityByKeys =
     })(record)
 
     entityKeysIndexCache?.addEntity({
-      survey,
       parentNode: entityParent,
       entity: entityInserted,
-      keyValuesByDefUuid: valuesByDefUuid,
+      getKeyAttribute: (entity, keyDefUuid) =>
+        RecordReader.getNodeChildByDefUuid(entity, keyDefUuid)(updateResult.record),
     })
 
     return { entity: entityInserted, updateResult }

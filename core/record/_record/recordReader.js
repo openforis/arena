@@ -284,7 +284,6 @@ export const findChildByKeyValues =
 
     if (entityKeysIndexCache && EntityKeysIndexCache.canBeUsed(applicableKeyDefs)) {
       const entityUuids = entityKeysIndexCache.findEntityUuids({
-        survey,
         parentNode,
         childDefUuid,
         keyDefs: applicableKeyDefs,

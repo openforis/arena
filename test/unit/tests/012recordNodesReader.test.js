@@ -122,7 +122,9 @@ describe('RecordReader Test (entity keys index cache)', () => {
       survey,
       entityDefUuid: getNodeDef('cluster/plot').uuid,
       valuesByDefUuid: {
-        [getNodeDef('cluster/cluster_id').uuid]: Node.getValue(getNode('cluster/cluster_id')),
+        [getNodeDef('cluster/cluster_id').uuid]: Node.getValue(
+          RecordUtils.findNodeByPath('cluster/cluster_id')(survey, recordToUpdate)
+        ),
         [getNodeDef('cluster/plot/plot_id').uuid]: plotId,
       },
       insertMissingNodes: true,

@@ -3,31 +3,20 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '../node'
 import { NodeValues } from '../nodeValues'
 
-// key attribute types whose values can be compared using a simple string key (see NodeValues.getFastEqualityKeyWithoutRecordContext);
-// code attributes are not supported: the comparison of their values can depend on the record (hierarchical categories)
-const supportedKeyDefTypes = new Set([
-  NodeDef.nodeDefType.boolean,
-  NodeDef.nodeDefType.decimal,
-  NodeDef.nodeDefType.integer,
-  NodeDef.nodeDefType.text,
-])
-
 const toEntryKey = ({ parentNode, childDefUuid }) => `${Node.getUuid(parentNode)}|${childDefUuid}`
 
-// key parts are length-prefixed so that different key values can never produce the same index key
-const toIndexKey = ({ survey, keyDefs, getKeyValue }) => {
-  const keyParts = []
-  for (const keyDef of keyDefs) {
-    const { key } = NodeValues.getFastEqualityKeyWithoutRecordContext({
-      survey,
-      nodeDef: keyDef,
-      value: getKeyValue(keyDef),
-    })
-    if (key === null) return null
-    keyParts.push(`${key.length}:${key}`)
-  }
-  return keyParts.join('')
-}
+// key values are compared with record context (see RecordReader.findChildByKeyValues)
+const getCompositeKey = ({ keyDefs, getKeyValue }) =>
+  NodeValues.getFastEqualityCompositeKey({
+    nodeDefs: keyDefs,
+    getKey: (keyDef) => NodeValues.getFastEqualityKeyInRecordContext({ nodeDef: keyDef, value: getKeyValue(keyDef) }),
+  })
+
+const getEntityCompositeKey = ({ keyDefs, entity, getKeyAttribute }) =>
+  getCompositeKey({
+    keyDefs,
+    getKeyValue: (keyDef) => Node.getValue(getKeyAttribute(entity, NodeDef.getUuid(keyDef))),
+  })
 
 const haveSameDefUuids = (keyDefsA, keyDefsB) =>
   keyDefsA.length === keyDefsB.length &&
@@ -38,6 +27,8 @@ const haveSameDefUuids = (keyDefsA, keyDefsB) =>
  * without comparing the key values of every sibling (e.g. when importing data into a record with many entities).
  * Every index is built once per parent entity and child entity definition, and it's updated when new entities are added (see addEntity);
  * it's rebuilt when the number of siblings is different from the expected one (entities added or deleted without updating the index).
+ * When the key of some value cannot be determined without comparing it using the record (see NodeValues.getFastEqualityKeyInRecordContext),
+ * the index cannot be used and the entities must be found comparing the key values of every sibling.
  * It must be used with only one record.
  */
 export class EntityKeysIndexCache {
@@ -51,25 +42,27 @@ export class EntityKeysIndexCache {
    * @returns {boolean} - True if the index can be used, false otherwise.
    */
   static canBeUsed(keyDefs) {
-    return keyDefs.length > 0 && keyDefs.every((keyDef) => supportedKeyDefTypes.has(NodeDef.getType(keyDef)))
+    return (
+      keyDefs.length > 0 &&
+      keyDefs.every((keyDef) => NodeValues.isTypeFastIndexableInRecordContext(NodeDef.getType(keyDef)))
+    )
   }
 
   /**
    * Finds the UUIDs of the sibling entities having the specified key values.
    * The entities found must still be checked by the caller (the index can be outdated if key values have been modified).
    * @param {!object} params - The parameters.
-   * @param {!object} params.survey - The survey.
    * @param {!object} params.parentNode - The parent entity of the entities to find.
    * @param {!string} params.childDefUuid - The UUID of the definition of the entities to find.
    * @param {!Array<object>} params.keyDefs - The key attribute definitions of the entities.
    * @param {!Array<object>} params.siblings - The current child entities of the parent node, with the specified definition.
    * @param {!function(object, string): object} params.getKeyAttribute - Function returning the key attribute of an entity, given its definition UUID.
    * @param {!object} params.keyValuesByDefUuid - The key values to search for, indexed by key attribute definition UUID.
-   * @returns {Array<string>|null} - The UUIDs of the entities with the specified key values, or null if some key values are empty.
+   * @returns {Array<string>|null} - The UUIDs of the entities with the specified key values,
+   * or null if the index cannot be used (some key values are empty or their key cannot be determined).
    */
-  findEntityUuids({ survey, parentNode, childDefUuid, keyDefs, siblings, getKeyAttribute, keyValuesByDefUuid }) {
-    const searchKey = toIndexKey({
-      survey,
+  findEntityUuids({ parentNode, childDefUuid, keyDefs, siblings, getKeyAttribute, keyValuesByDefUuid }) {
+    const { key: searchKey } = getCompositeKey({
       keyDefs,
       getKeyValue: (keyDef) => keyValuesByDefUuid[NodeDef.getUuid(keyDef)],
     })
@@ -78,43 +71,51 @@ export class EntityKeysIndexCache {
     const entryKey = toEntryKey({ parentNode, childDefUuid })
     let entry = this.entriesByKey.get(entryKey)
     if (!entry || entry.siblingsCount !== siblings.length || !haveSameDefUuids(entry.keyDefs, keyDefs)) {
-      entry = { keyDefs, siblingsCount: siblings.length, entityUuidsByKey: new Map() }
-      siblings.forEach((sibling) => {
-        const key = toIndexKey({
-          survey,
-          keyDefs,
-          getKeyValue: (keyDef) => Node.getValue(getKeyAttribute(sibling, NodeDef.getUuid(keyDef))),
-        })
-        if (key !== null) {
-          this._addToIndex({ entry, key, entityUuid: Node.getUuid(sibling) })
-        }
-      })
+      entry = this._buildEntry({ keyDefs, siblings, getKeyAttribute })
       this.entriesByKey.set(entryKey, entry)
     }
+    if (!entry.usable) return null
+
     return entry.entityUuidsByKey.get(searchKey) ?? []
   }
 
   /**
    * Adds a new entity to the index of its parent node (if any).
    * @param {!object} params - The parameters.
-   * @param {!object} params.survey - The survey.
    * @param {!object} params.parentNode - The parent entity of the new entity.
-   * @param {!object} params.entity - The new entity.
-   * @param {!object} params.keyValuesByDefUuid - The key values of the new entity, indexed by key attribute definition UUID.
+   * @param {!object} params.entity - The new entity (with its key attributes).
+   * @param {!function(object, string): object} params.getKeyAttribute - Function returning the key attribute of an entity, given its definition UUID.
    * @returns {void}
    */
-  addEntity({ survey, parentNode, entity, keyValuesByDefUuid }) {
+  addEntity({ parentNode, entity, getKeyAttribute }) {
     const entry = this.entriesByKey.get(toEntryKey({ parentNode, childDefUuid: Node.getNodeDefUuid(entity) }))
     if (!entry) return
     entry.siblingsCount += 1
-    const key = toIndexKey({
-      survey,
-      keyDefs: entry.keyDefs,
-      getKeyValue: (keyDef) => keyValuesByDefUuid[NodeDef.getUuid(keyDef)],
-    })
-    if (key !== null) {
+    if (!entry.usable) return
+
+    const { supported, key } = getEntityCompositeKey({ keyDefs: entry.keyDefs, entity, getKeyAttribute })
+    if (!supported) {
+      entry.usable = false
+    } else if (key !== null) {
       this._addToIndex({ entry, key, entityUuid: Node.getUuid(entity) })
     }
+  }
+
+  _buildEntry({ keyDefs, siblings, getKeyAttribute }) {
+    const entry = { keyDefs, siblingsCount: siblings.length, entityUuidsByKey: new Map(), usable: true }
+    for (const sibling of siblings) {
+      const { supported, key } = getEntityCompositeKey({ keyDefs, entity: sibling, getKeyAttribute })
+      if (!supported) {
+        // the key values of this sibling can be compared only using the record: the index cannot be used
+        entry.usable = false
+        entry.entityUuidsByKey = new Map()
+        return entry
+      }
+      if (key !== null) {
+        this._addToIndex({ entry, key, entityUuid: Node.getUuid(sibling) })
+      }
+    }
+    return entry
   }
 
   _addToIndex({ entry, key, entityUuid }) {
