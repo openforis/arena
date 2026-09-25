@@ -1,10 +1,9 @@
 import * as A from '@core/arena'
 
-import { Objects, Surveys, TraverseMethod } from '@openforis/arena-core'
+import { Objects, Queue, Surveys, TraverseMethod } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import * as ObjectUtils from '@core/objectUtils'
-import Queue from '@core/queue'
 
 import * as NodeDef from '../nodeDef'
 import * as NodeDefLayout from '../nodeDefLayout'

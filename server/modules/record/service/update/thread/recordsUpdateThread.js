@@ -1,4 +1,4 @@
-import { Objects, SystemError } from '@openforis/arena-core'
+import { Objects, Queue, SystemError } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import { db } from '@server/db/db'
@@ -7,7 +7,6 @@ import * as Log from '@server/log/log'
 import Thread from '@server/threads/thread'
 import IdleTimeoutCache from '@server/utils/IdleTimeoutCache'
 
-import Queue from '@core/queue'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
