@@ -113,7 +113,7 @@ export class EntityKeysIndexCache {
 
     const entryKey = toEntryKey({ parentNode, childDefUuid })
     let entry = this.entriesByKey.get(entryKey)
-    if (!entry || entry.siblingsCount !== siblings.length || !haveSameDefUuids(entry.keyDefs, keyDefs)) {
+    if (entry?.siblingsCount !== siblings.length || !haveSameDefUuids(entry.keyDefs, keyDefs)) {
       entry = this.buildEntry({ keyDefs, siblings, getKeyAttribute })
       this.entriesByKey.set(entryKey, entry)
     }
