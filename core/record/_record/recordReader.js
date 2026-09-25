@@ -1,8 +1,6 @@
 import * as A from '@core/arena'
 
-import { Nodes, Records } from '@openforis/arena-core'
-
-import Queue from '@core/queue'
+import { Nodes, Queue, Records } from '@openforis/arena-core'
 
 import * as SurveyNodeDefs from '@core/survey/_survey/surveyNodeDefs'
 import * as NodeDef from '@core/survey/nodeDef'
