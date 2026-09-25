@@ -1,3 +1,5 @@
+import { setImmediate as waitForEventLoop } from 'node:timers/promises'
+
 import { Objects, RecordUpdateResult } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -20,6 +22,8 @@ import DataImportBaseJob from './DataImportBaseJob'
 import { DataImportFileReader } from './dataImportFileReader'
 
 const defaultErrorKey = 'error'
+// Maximum time (ms) spent processing rows without letting the event loop process timers and messages.
+const eventLoopYieldIntervalMillis = 200
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
@@ -52,6 +56,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     // index of the entities by key values, used to find the entity of every row without comparing the keys of all its siblings
     // (valid only for the current record)
     this.entityKeysIndexCache = new Record.EntityKeysIndexCache()
+    this.lastEventLoopYieldTime = Date.now()
   }
 
   async onStart() {
@@ -219,6 +224,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     const { context } = this
     const { survey, includeFiles, insertMissingNodes, user } = context
 
+    await this.yieldToEventLoopIfNeeded()
+
     if (this.isCanceled()) {
       return
     }
@@ -320,6 +327,19 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       const errorParams = params ?? { details: String(e) }
       this._addError(errorKey, errorParams)
     }
+  }
+
+  /**
+   * Rows can be processed without doing any I/O (e.g. dry run, or when the record has already been fetched):
+   * the event loop has to be released periodically, otherwise timers (e.g. job progress notifications)
+   * and messages (e.g. job cancel requests) would be processed only when all the rows have been processed.
+   * @returns {Promise<void>} - The promise that resolves when the event loop has been released (if needed).
+   */
+  async yieldToEventLoopIfNeeded() {
+    const now = Date.now()
+    if (now - this.lastEventLoopYieldTime < eventLoopYieldIntervalMillis) return
+    await waitForEventLoop()
+    this.lastEventLoopYieldTime = Date.now()
   }
 
   /**
