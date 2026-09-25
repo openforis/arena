@@ -1,3 +1,5 @@
+import { Queue } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -7,7 +9,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
-import Queue from '@core/queue'
 import SystemError from '@core/systemError'
 
 import BatchPersister from '@server/db/batchPersister'
