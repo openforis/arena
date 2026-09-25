@@ -36,14 +36,14 @@ RUN apt-get update \
     && apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/*
 
-# pm2 is installed as a local package (not with `npm install -g`) so that
-# `overrides` can be applied to its pinned dependencies (js-yaml 4.3.1 is
-# vulnerable to CVE-2026-84375).
+# pm2 is installed as a local package (not with `npm install -g`) from a
+# lockfile, so that `overrides` can be applied to its pinned dependencies
+# (js-yaml 4.3.1 is vulnerable to CVE-2026-84375).
 # npm itself is only needed to install pm2; remove it (and its own vendored
 # dependencies) afterwards rather than carrying their CVEs into the image.
 WORKDIR /opt/pm2
-RUN echo '{"private":true,"dependencies":{"pm2":"7.0.4"},"overrides":{"js-yaml":"^4.3.2"}}' > package.json \
-    && npm install --omit=dev --ignore-scripts --no-audit --no-fund \
+COPY docker/pm2/package.json docker/pm2/package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund \
     && ln -s /opt/pm2/node_modules/.bin/pm2 /opt/pm2/node_modules/.bin/pm2-runtime /usr/local/bin/ \
     && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /root/.npm
 
