@@ -210,10 +210,90 @@ const getFastEqualityKeyWithoutRecordContext = ({ survey, nodeDef, value }) => {
   return { supported: true, key: Objects.isEmpty(key) ? null : key }
 }
 
+// Node def types for which isValueEqual, when called WITH record context (see findChildByKeyValues),
+// can be reduced to a single string key; code attribute values are identified by their category item UUID
+// (isValueEqual compares item UUIDs when both values have them).
+const fastEqualityKeyInRecordContextExtractorByNodeDefType = {
+  [NodeDef.nodeDefType.boolean]: ({ value }) => String(value),
+  [NodeDef.nodeDefType.text]: ({ value }) => String(value),
+  [NodeDef.nodeDefType.integer]: ({ value }) => String(value),
+  [NodeDef.nodeDefType.decimal]: ({ value }) => String(value),
+  [NodeDef.nodeDefType.code]: ({ value }) => (typeof value === 'object' ? (getValueItemUuid(value) ?? null) : null),
+}
+
+/**
+ * Determines whether a node def type is supported by getFastEqualityKeyInRecordContext.
+ * @param {!string} nodeDefType - The node def type (see NodeDef.nodeDefType).
+ * @returns {boolean} - True if the type is supported.
+ */
+const isTypeFastIndexableInRecordContext = (nodeDefType) =>
+  Object.hasOwn(fastEqualityKeyInRecordContextExtractorByNodeDefType, nodeDefType)
+
+/**
+ * Computes a string key for building a lookup index of attribute values compared with isValueEqual WITH record context
+ * (e.g. entity key attributes in a record).
+ * For 2 non-empty values with a key, the keys match if and only if isValueEqual would consider them equal.
+ * Empty values are given a null key (callers must treat it as "does not match anything", see getFastEqualityKeyWithoutRecordContext).
+ * Non-empty values whose key cannot be determined without the record (e.g. code values without category item UUID,
+ * whose item can depend on the parent code attribute) are not supported: callers must compare them using isValueEqual.
+ * @param {!object} params - The function parameters.
+ * @param {!object} [params.nodeDef] - The node def of the compared value.
+ * @param {object} [params.value] - The value to compute the key for.
+ * @returns {{supported: boolean, key: (string|null)}} - supported is false if the node def type or the value isn't
+ * indexable this way; key is null when the value is empty.
+ */
+const getFastEqualityKeyInRecordContext = ({ nodeDef, value }) => {
+  const extractor = fastEqualityKeyInRecordContextExtractorByNodeDefType[NodeDef.getType(nodeDef)]
+  if (!extractor) return { supported: false, key: null }
+  if (Objects.isEmpty(value)) return { supported: true, key: null }
+  const key = extractor({ value })
+  return Objects.isEmpty(key) ? { supported: false, key: null } : { supported: true, key }
+}
+
+/**
+ * Combines key parts into a single key.
+ * Key parts are length-prefixed before concatenating them, so that different key part arrays can never
+ * produce the same key, regardless of their content (no separator character to collide on, unlike a plain join
+ * or a doubled-separator escape - which is still ambiguous for values that are themselves runs of the separator
+ * straddling a part boundary, e.g. ["\u0001\u0001", "X"] vs ["\u0001", "\u0001X"]).
+ * @param {!Array<string>} keyParts - The key parts.
+ * @returns {string} - The composite key.
+ */
+const buildCompositeKey = (keyParts) => keyParts.map((keyPart) => `${keyPart.length}:${keyPart}`).join('')
+
+/**
+ * Computes a composite key for the values of the specified node defs (e.g. entity key attribute defs),
+ * using the specified function to compute the key of every value
+ * (e.g. getFastEqualityKeyWithoutRecordContext or getFastEqualityKeyInRecordContext).
+ * @param {!object} params - The function parameters.
+ * @param {!Array<object>} params.nodeDefs - The node defs whose values are part of the key.
+ * @param {!function(object): {supported: boolean, key: (string|null)}} params.getKey - Function returning the key of the value of the specified node def.
+ * @returns {{supported: boolean, key: (string|null)}} - supported is false if the key of some value is not supported;
+ * key is null if the key of some value is null (empty value).
+ */
+const getFastEqualityCompositeKey = ({ nodeDefs, getKey }) => {
+  const keyParts = []
+  let hasEmptyValues = false
+  for (const nodeDef of nodeDefs) {
+    const { supported, key } = getKey(nodeDef)
+    if (!supported) return { supported: false, key: null }
+    if (key === null) {
+      hasEmptyValues = true
+    } else {
+      keyParts.push(key)
+    }
+  }
+  return { supported: true, key: hasEmptyValues ? null : buildCompositeKey(keyParts) }
+}
+
 export const NodeValues = {
   isValueEqual,
   isTypeFastIndexable,
   getFastEqualityKeyWithoutRecordContext,
+  isTypeFastIndexableInRecordContext,
+  getFastEqualityKeyInRecordContext,
+  buildCompositeKey,
+  getFastEqualityCompositeKey,
   getValueCode,
   getValueItemUuid,
 }

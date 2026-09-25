@@ -19,12 +19,16 @@ const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
   }
 }
 
-// Length-prefix each key part before concatenating, so that different key part arrays can never
-// produce the same bucket key string, regardless of their content (no separator character to collide
-// on, unlike a plain join or a doubled-separator escape - which is still ambiguous for values that are
-// themselves runs of the separator straddling a part boundary, e.g. ["\u0001\u0001", "X"] vs
-// ["\u0001", "\u0001X"]). Must be used identically on both the index-build and the lookup side.
-const buildBucketKey = (keyParts) => keyParts.map((keyPart) => `${keyPart.length}:${keyPart}`).join('')
+const getRecordSummaryKey = ({ survey, rootKeyDefs, record }) =>
+  NodeValues.getFastEqualityCompositeKey({
+    nodeDefs: rootKeyDefs,
+    getKey: (rootKeyDef) =>
+      NodeValues.getFastEqualityKeyWithoutRecordContext({
+        survey,
+        nodeDef: rootKeyDef,
+        value: record[A.camelize(NodeDef.getName(rootKeyDef))],
+      }),
+  })
 
 /**
  * Builds a Map index of recordsSummary bucketed by root key values, so that a matching record can be
@@ -45,14 +49,8 @@ const buildRecordsSummaryIndex = ({ survey, rootKeyDefs, recordsSummary }) => {
   }
   const index = new Map()
   recordsSummary.forEach((record) => {
-    const keyParts = []
-    for (const rootKeyDef of rootKeyDefs) {
-      const value = record[A.camelize(NodeDef.getName(rootKeyDef))]
-      const { key } = NodeValues.getFastEqualityKeyWithoutRecordContext({ survey, nodeDef: rootKeyDef, value })
-      if (key === null) return // record has an empty root key value: never matches, skip indexing it
-      keyParts.push(key)
-    }
-    const bucketKey = buildBucketKey(keyParts)
+    const { key: bucketKey } = getRecordSummaryKey({ survey, rootKeyDefs, record })
+    if (bucketKey === null) return // record has an empty root key value: never matches, skip indexing it
     const bucket = index.get(bucketKey)
     if (bucket) {
       bucket.push(record)
@@ -64,14 +62,17 @@ const buildRecordsSummaryIndex = ({ survey, rootKeyDefs, recordsSummary }) => {
 }
 
 const findRecordSummariesMatchingKeysByIndex = ({ survey, rootKeyDefs, valuesByDefUuid, index }) => {
-  const keyParts = []
-  for (const rootKeyDef of rootKeyDefs) {
-    const value = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
-    const { key } = NodeValues.getFastEqualityKeyWithoutRecordContext({ survey, nodeDef: rootKeyDef, value })
-    if (key === null) return [] // empty value in the row: never matches, same as the full-scan comparator
-    keyParts.push(key)
-  }
-  return index.get(buildBucketKey(keyParts)) ?? []
+  const { key: bucketKey } = NodeValues.getFastEqualityCompositeKey({
+    nodeDefs: rootKeyDefs,
+    getKey: (rootKeyDef) =>
+      NodeValues.getFastEqualityKeyWithoutRecordContext({
+        survey,
+        nodeDef: rootKeyDef,
+        value: valuesByDefUuid[NodeDef.getUuid(rootKeyDef)],
+      }),
+  })
+  if (bucketKey === null) return [] // empty value in the row: never matches, same as the full-scan comparator
+  return index.get(bucketKey) ?? []
 }
 
 const findRecordSummariesMatchingKeysByScan = ({ survey, rootKeyDefs, valuesByDefUuid, recordsSummary }) =>
@@ -193,6 +194,4 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback
 
 export const DataImportJobRecordProvider = {
   fetchOrCreateRecord,
-  // exported for unit testing: bucket key construction must stay collision-free (see buildBucketKey)
-  buildBucketKey,
 }
