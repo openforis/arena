@@ -59,8 +59,10 @@ const Login = () => {
   }, [objectValid, formObject, validation, dispatch])
 
   const onClickBack = useCallback(() => {
+    setObjectField(FormFields.twoFactorToken, '')
+    dispatch(LoginActions.setLoginError(null))
     dispatch(LoginActions.setViewState(ViewState.askUsernameAndPassword))
-  }, [dispatch])
+  }, [dispatch, setObjectField])
 
   const onChangeEmail = useCallback(
     (value) => {
