@@ -30,12 +30,29 @@ const failingClient = {
 }
 
 class FailingBeforeRunningJob extends Job {
-  constructor() {
-    super('FailingBeforeRunningJob')
+  constructor(type = 'FailingBeforeRunningJob') {
+    super(type)
+    this.onEndCalled = false
   }
 
   async start() {
     return super.start(failingClient)
+  }
+
+  async onEnd() {
+    await super.onEnd()
+    this.onEndCalled = true
+  }
+}
+
+class FailingBeforeRunningAndOnEndJob extends FailingBeforeRunningJob {
+  constructor() {
+    super('FailingBeforeRunningAndOnEndJob')
+  }
+
+  async onEnd() {
+    await super.onEnd()
+    throw new Error('error deleting temp file')
   }
 }
 
@@ -68,13 +85,34 @@ describe('Job end notification', () => {
   })
 
   test('job failing before running is notified as failed', async () => {
-    const notifications = await runJob(new FailingBeforeRunningJob())
+    const job = new FailingBeforeRunningJob()
+    const notifications = await runJob(job)
+    // the job end is handled as usual (onEnd cleanup)
+    expect(job.onEndCalled).toBe(true)
     expect(notifications.length).toBe(1)
     const [notification] = notifications
     expect(notification.ended).toBe(true)
     expect(notification.status).toBe(jobStatus.failed)
     // the original error is swallowed by JobBase.start when the job is not running yet
     expect(JSON.stringify(notification.errors)).toContain('Job terminated unexpectedly')
+  })
+})
+
+describe('Job end notification (errors while ending)', () => {
+  test('job failing before running and while ending is notified as failed', async () => {
+    const job = new FailingBeforeRunningAndOnEndJob()
+    const notifications = []
+    const notifyJob = () => notifications.push(jobToJSON(job))
+    job.onEvent(notifyJob)
+    await startJobEnsuringEndNotification({
+      job,
+      isEndNotified: () => notifications.some((notification) => notification.ended),
+      notifyJob,
+    })
+    expect(job.onEndCalled).toBe(true)
+    expect(notifications.length).toBe(1)
+    expect(notifications[0].ended).toBe(true)
+    expect(notifications[0].status).toBe(jobStatus.failed)
   })
 })
 
@@ -117,6 +155,18 @@ describe('Job thread listeners', () => {
     expect(lastUpdate.uuid).toBe('job-exit-1')
     expect(lastUpdate.ended).toBe(true)
     expect(lastUpdate.status).toBe(jobStatus.failed)
+  })
+
+  test('thread exiting before the job ends keeps the last known progress', () => {
+    const { onJobUpdate, onThreadExit, updates } = createListeners({ jobUuid: 'job-exit-3' })
+    onJobUpdate({ uuid: 'job-exit-3', userUuid: 'user-1', status: jobStatus.running, processed: 8, total: 10 })
+    onThreadExit()
+
+    const lastUpdate = updates.at(-1)
+    expect(lastUpdate.status).toBe(jobStatus.failed)
+    expect(lastUpdate.processed).toBe(8)
+    expect(lastUpdate.total).toBe(10)
+    expect(lastUpdate.progressPercent).toBe(80)
   })
 
   test('thread exiting after the job ended does not notify anything else', () => {

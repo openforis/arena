@@ -25,7 +25,15 @@ export const startJobEnsuringEndNotification = async ({ job, isEndNotified, noti
   if (!job.isEnded()) {
     const { key, params } = job.getErrorInfo(startError ?? new Error('Job terminated unexpectedly'))
     job.addError({ error: { valid: false, errors: [{ key, params }] } })
-    job.status = jobStatus.failed
+    try {
+      // set the status through the job, so that its end is handled as usual (e.g. onEnd cleanup, end event notification)
+      await job.setStatusFailed()
+    } catch (error) {
+      // an error occurred while ending the job (e.g. in onEnd): the end hasn't been notified
+      logger?.error(`Error ending job ${job.type} (${job.uuid}): ${error.stack ?? error}`)
+      job.status = jobStatus.failed
+    }
+    if (isEndNotified()) return
   }
   notifyJob()
 }

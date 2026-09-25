@@ -77,15 +77,15 @@ export const cancelActiveJobByUserUuid = async (userUuid, { canceledByAdmin = fa
 
 // ====== EXECUTE
 
-const _createFailedJobSummary = ({ jobUuid, jobType, userUuid, surveyId, dateCreated }) =>
+const _createFailedJobSummary = ({ jobUuid, jobType, userUuid, surveyId, dateCreated, processed, total }) =>
   jobRowToSummary({
     uuid: jobUuid,
     userUuid,
     surveyId,
     type: jobType,
     status: jobStatus.failed,
-    processed: 0,
-    total: 0,
+    processed,
+    total,
     props: {
       errors: { generic: { key: 'appErrors:generic', params: { text: 'Job execution terminated unexpectedly' } } },
     },
@@ -108,6 +108,9 @@ const _createFailedJobSummary = ({ jobUuid, jobType, userUuid, surveyId, dateCre
 export const createJobThreadListeners = ({ jobUuid, jobType, userUuid, surveyId, onUpdate }) => {
   const dateCreated = new Date()
   let ended = false
+  // last known progress, kept when the job is marked as failed because its thread exited unexpectedly
+  let processed = 0
+  let total = 0
 
   const onJobUpdate = (jobSerialized) => {
     if (ended) {
@@ -115,6 +118,8 @@ export const createJobThreadListeners = ({ jobUuid, jobType, userUuid, surveyId,
       return
     }
     ended = Boolean(jobSerialized.ended)
+    processed = jobSerialized.processed ?? processed
+    total = jobSerialized.total ?? total
     throttle(_notifyJobUpdate, 'jobThread_' + jobUuid, notificationThrottleLimit)(jobSerialized)
     onUpdate?.(jobSerialized)
   }
@@ -122,7 +127,7 @@ export const createJobThreadListeners = ({ jobUuid, jobType, userUuid, surveyId,
   const onThreadExit = () => {
     if (ended) return
     logger.error(`thread of job ${jobType} (${jobUuid}) exited before the job ended; marking the job as failed`)
-    onJobUpdate(_createFailedJobSummary({ jobUuid, jobType, userUuid, surveyId, dateCreated }))
+    onJobUpdate(_createFailedJobSummary({ jobUuid, jobType, userUuid, surveyId, dateCreated, processed, total }))
   }
 
   return { onJobUpdate, onThreadExit }
