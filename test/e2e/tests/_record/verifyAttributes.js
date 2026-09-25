@@ -10,8 +10,11 @@ import {
 } from './utils'
 import * as DateUtils from '../../../../core/dateUtils'
 
+// the record form can still be rendering its nodes when a verification starts: wait for the element
+const waitForElement = (selector) => page.waitForSelector(selector, { state: 'attached', timeout: 5000 })
+
 const verifyBoolean = async (nodeDef, value, parentSelector) => {
-  const booleanRadioButton = await page.$(`${getBooleanSelector(nodeDef, parentSelector, value)}`)
+  const booleanRadioButton = await waitForElement(`${getBooleanSelector(nodeDef, parentSelector, value)}`)
   await expect(await booleanRadioButton.getAttribute('class')).toContain('Mui-checked')
 }
 
@@ -24,8 +27,8 @@ const verifyCode = async (nodeDef, value, parentSelector) =>
 const verifyCoordinate = async (nodeDef, value, parentSelector) => {
   const { xSelector, ySelector, srsTestId } = getCoordinateSelector(nodeDef, parentSelector)
 
-  const x = await page.$(xSelector)
-  const y = await page.$(ySelector)
+  const x = await waitForElement(xSelector)
+  const y = await waitForElement(ySelector)
 
   await expect(Number(await x.getAttribute('value'))).toBe(Number(value.x))
   await expect(Number(await y.getAttribute('value'))).toBe(Number(value.y))
@@ -38,7 +41,7 @@ const verifyCoordinate = async (nodeDef, value, parentSelector) => {
 
 const verifyDate = async (nodeDef, value, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
-  const inputField = await page.$(`${nodeDefSelector} input`)
+  const inputField = await waitForElement(`${nodeDefSelector} input`)
   const inputFieldValue = await inputField.getAttribute('value')
   const dateFormatted = DateUtils.format(value)
   await expect(inputFieldValue).toBe(dateFormatted)
@@ -54,22 +57,22 @@ const verifyTaxon = async (nodeDef, value, parentSelector) => {
     { selector: codeSelector, expectedValue: value.code },
     { timeout: 5000 }
   )
-  const code = await page.$(codeSelector)
-  const scientificName = await page.$(scientificNameSelector)
-  const vernacularName = await page.$(vernacularNameSelector)
+  const code = await waitForElement(codeSelector)
+  const scientificName = await waitForElement(scientificNameSelector)
+  const vernacularName = await waitForElement(vernacularNameSelector)
   await expect(await code.getAttribute('value')).toBe(value.code)
   await expect(await scientificName.getAttribute('value')).toBe(value.scientificName)
   await expect(await vernacularName.getAttribute('value')).toBe(value.vernacularName)
 }
 
 const verifyText = async (nodeDef, value, parentSelector) => {
-  const text = await page.$(getTextSelector(nodeDef, parentSelector))
+  const text = await waitForElement(getTextSelector(nodeDef, parentSelector))
   await expect(await text.getAttribute('value')).toBe(value)
 }
 
 const verifyTime = async (nodeDef, valueRegExpOrDate, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
-  const inputField = await page.$(`${nodeDefSelector} input`)
+  const inputField = await waitForElement(`${nodeDefSelector} input`)
   const inputFieldValue = await inputField.getAttribute('value')
   if (typeof valueRegExpOrDate === 'string') {
     await expect(inputFieldValue).toMatch(new RegExp(valueRegExpOrDate))

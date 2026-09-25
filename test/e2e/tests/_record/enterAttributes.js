@@ -139,24 +139,36 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') => {
             // a recent navigation - the toggle never actually gets clicked, so the field stays
             // disabled and the toBeEnabled check below fails. Wait for it to be gone first.
             await page.waitForSelector('.loader__boxes', { state: 'detached', timeout: 5000 })
-            await keyToggleLocator.click({ force: true })
-            await page.keyboard.press('Escape') // close potential tooltip
+
+            const isTextInput = ['integer', 'decimal', 'text'].includes(nodeDef.type)
+            const inputSelector = getTextSelector(nodeDef, parentSelector)
 
             // Unlock flips the input from disabled → enabled asynchronously; wait before fill so we
             // don't burn the whole jest timeout on Playwright's actionability wait (seen on
             // validationReport tree_id row 3: https://github.com/openforis/arena/actions/runs/35232215668).
-            if (['integer', 'decimal', 'text'].includes(nodeDef.type)) {
-              const inputSelector = getTextSelector(nodeDef, parentSelector)
-              await page.waitForSelector(inputSelector, { state: 'visible', timeout: 5000 })
-              // (no optional chaining here: the function is serialized and evaluated in the page)
-              await page.waitForFunction(
-                (selector) => {
-                  const el = document.querySelector(selector)
-                  return !!el && !el.disabled
-                },
-                inputSelector,
-                { timeout: 5000 }
-              )
+            // With recent Playwright versions the forced click can also land while the row is still
+            // re-rendering and get lost (the toggle keeps its "allow" label): click again in that case.
+            const maxUnlockAttempts = 3
+            for (let attempt = 1; attempt <= maxUnlockAttempts; attempt += 1) {
+              await keyToggleLocator.click({ force: true })
+              await page.keyboard.press('Escape') // close potential tooltip
+              if (!isTextInput) break
+              try {
+                await page.waitForSelector(inputSelector, { state: 'visible', timeout: 5000 })
+                // (no optional chaining here: the function is serialized and evaluated in the page)
+                await page.waitForFunction(
+                  (selector) => {
+                    const el = document.querySelector(selector)
+                    return !!el && !el.disabled
+                  },
+                  inputSelector,
+                  { timeout: 2000 }
+                )
+                break
+              } catch (error) {
+                const ariaLabel = await keyToggleLocator.getAttribute('aria-label')
+                if (attempt === maxUnlockAttempts || !ariaLabel?.toLowerCase().includes('allow')) throw error
+              }
             }
           }
         }
