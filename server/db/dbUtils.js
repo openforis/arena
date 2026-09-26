@@ -1,5 +1,5 @@
 import * as A from '@core/arena'
-import * as pgPromise from 'pg-promise'
+import pgPromise from 'pg-promise'
 import _QueryStream from 'pg-query-stream'
 
 import { Objects, Strings } from '@openforis/arena-core'
@@ -255,3 +255,23 @@ export const createColumnSet = ({ pgp: pgpProp = pgp, columns, schema = null, ta
   )
 
 export const createBulkUpdateValues = ({ columnSet, values }) => pgp.helpers.values(values, columnSet)
+
+/**
+ * Runs the specified queries and returns their results (in the same order).
+ * Queries are run in parallel only when the client is the connection pool: in a task or a transaction they share
+ * the same connection, where queries cannot run concurrently (deprecated by pg, removed in pg@9), so they are run
+ * one after the other.
+ * @param {pgPromise.IDatabase|pgPromise.ITask} client - The db client (pool, task or transaction).
+ * @param {Array<function(): Promise<object>>} queryFns - Functions running the queries.
+ * @returns {Promise<Array<object>>} - The results of the queries.
+ */
+export const runQueries = async (client, queryFns) => {
+  if (client === db) {
+    return Promise.all(queryFns.map((queryFn) => queryFn()))
+  }
+  const results = []
+  for (const queryFn of queryFns) {
+    results.push(await queryFn())
+  }
+  return results
+}

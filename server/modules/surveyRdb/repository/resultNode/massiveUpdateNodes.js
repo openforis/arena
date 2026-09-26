@@ -1,4 +1,4 @@
-import * as pgPromise from 'pg-promise'
+import pgPromise from 'pg-promise'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import { TableNode } from '@common/model/db'

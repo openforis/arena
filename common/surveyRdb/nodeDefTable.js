@@ -1,5 +1,5 @@
 import * as A from '@core/arena'
-import * as toSnakeCase from 'to-snake-case'
+import toSnakeCase from 'to-snake-case'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import ColumnNodeDef from '@common/model/db/tables/dataNodeDef/columnNodeDef'

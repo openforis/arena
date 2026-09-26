@@ -1,5 +1,5 @@
 import pgPromise from 'pg-promise'
-import * as toSnakeCase from 'to-snake-case'
+import toSnakeCase from 'to-snake-case'
 
 import { Objects } from '@openforis/arena-core'
 

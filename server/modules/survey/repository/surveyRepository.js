@@ -425,7 +425,10 @@ export const clearSurveyConfiguration = async ({ surveyId }, client = db) =>
   client.none(`UPDATE survey SET config = null WHERE id = $1`, [surveyId])
 
 // ============== DELETE
-export const deleteSurvey = async (id, client = db) => client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
+// the survey row could be missing (e.g. when cleaning up after a failed survey creation): do not fail in that case,
+// otherwise the whole delete transaction (dropping the survey schemas) would be rolled back
+export const deleteSurvey = async (id, client = db) =>
+  client.oneOrNone('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
 
 export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
   const propsUpdateCond = A.pipe(

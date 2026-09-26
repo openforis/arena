@@ -2,7 +2,7 @@ import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as camelize from 'camelize'
+import camelize from 'camelize'
 import * as DbUtils from '@server/db/dbUtils'
 
 export const tableName = 'user_invitation'
