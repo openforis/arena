@@ -73,10 +73,11 @@ export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, cli
  * @param {!number} [params.surveyId] - The ID of the survey.
  * @param {!string} [params.taxonUuid] - The UUID of the taxon.
  * @param {!object} [params.vernacularNames] - The vernacular names indexed by language code.
+ * @param {boolean} [params.backup] - Whether the vernacular names come from a survey backup (props are published).
  * @param {pgPromise.IDatabase} [params.client] - The database client.
- * @returns {Array.<Promise>} - The result promises.
+ * @returns {Array.<function(): Promise<null>>} - The functions running the insert/update queries (not started yet):
+ * to be run with DbUtils.runQueries.
  */
-// returns the functions running the queries (to be run with DbUtils.runQueries)
 const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, backup = false, client = db }) =>
   A.pipe(
     A.values,
