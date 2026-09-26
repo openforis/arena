@@ -1,5 +1,5 @@
 import * as A from '@core/arena'
-import * as pgPromise from 'pg-promise'
+import pgPromise from 'pg-promise'
 import _QueryStream from 'pg-query-stream'
 
 import { Objects, Strings } from '@openforis/arena-core'

@@ -9,7 +9,7 @@ import parserTypeScript from '@typescript-eslint/parser'
 
 // Testing Plugins
 import pluginJest from 'eslint-plugin-jest'
-import pluginPlaywright from 'eslint-plugin-playwright' // Used for Jest-Playwright E2E tests
+import pluginPlaywright from 'eslint-plugin-playwright' // Used for Playwright Test E2E tests
 
 // Formatting/Parser Plugins
 import babelParser from '@babel/eslint-parser'
@@ -119,6 +119,8 @@ export default [
   {
     // Apply this to files matching Jest naming convention
     files: ['test/**/*.js', 'test/**/*.ts', '**/*.test.js', '**/*.spec.js', '**/*.test.ts', '**/*.spec.ts'],
+    // e2e tests run with Playwright Test (see below)
+    ignores: ['test/e2e/**'],
     plugins: {
       jest: pluginJest,
     },
@@ -137,19 +139,16 @@ export default [
     },
   },
 
-  // 6. Jest-Playwright (E2E Tests) Configuration
+  // 6. Playwright Test (E2E Tests) Configuration
   {
-    // Apply this to files matching Playwright test naming convention (often different than Jest unit tests)
-    files: ['test/e2e/**/*.js', 'test/e2e/**/*.jsx', 'test/e2e/**/*.ts', 'test/e2e/**/*.tsx'],
-    plugins: {
-      playwright: pluginPlaywright,
-    },
+    ...pluginPlaywright.configs['flat/recommended'],
+    files: ['test/e2e/**/*.ts'],
     rules: {
-      // Use the recommended Playwright rules
-      ...pluginPlaywright.configs['playwright-test'].rules,
-      // Playwright-specific rules (e.g., forcing async/await usage on Playwright methods)
-      // 'playwright/prefer-web-first-assertions': 'error',
-      // 'playwright/await-expect': 'error',
+      ...pluginPlaywright.configs['flat/recommended'].rules,
+      // Playwright fixtures receive a `use` callback that is not a React hook
+      'react-hooks/rules-of-hooks': 'off',
+      // helpers performing assertions
+      'playwright/expect-expect': ['warn', { assertFunctionNames: ['expectReportMessages', 'publishSurvey'] }],
     },
   },
 
