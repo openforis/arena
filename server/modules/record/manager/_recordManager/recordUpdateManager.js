@@ -27,6 +27,7 @@ import * as RecordValidationManager from './recordValidationManager'
 import * as NodeCreationManager from './nodeCreationManager'
 import * as NodeUpdateManager from './nodeUpdateManager'
 import { NodeRdbManager } from './nodeRDBManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 /**
  * =======.
@@ -134,21 +135,22 @@ export const updateRecordStep = async ({ user, surveyId, record, stepId, system 
     const recordUuid = Record.getUuid(record)
     const rootDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, client)
 
-    await Promise.all([
-      RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, client),
-      DataTableUpdateRepository.updateRecordStep({ surveyId, recordUuid, stepId, tableDef: rootDef }, client),
-      ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.recordStepUpdate,
-        {
-          [ActivityLog.keysContent.uuid]: recordUuid,
-          [ActivityLog.keysContent.stepFrom]: currentStepId,
-          [ActivityLog.keysContent.stepTo]: stepId,
-        },
-        system,
-        client
-      ),
+    await DbUtils.runQueries(client, [
+      () => RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, client),
+      () => DataTableUpdateRepository.updateRecordStep({ surveyId, recordUuid, stepId, tableDef: rootDef }, client),
+      () =>
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.recordStepUpdate,
+          {
+            [ActivityLog.keysContent.uuid]: recordUuid,
+            [ActivityLog.keysContent.stepFrom]: currentStepId,
+            [ActivityLog.keysContent.stepTo]: stepId,
+          },
+          system,
+          client
+        ),
     ])
   } else {
     throw new SystemError('cantUpdateStep')
@@ -188,11 +190,11 @@ export const deleteRecord = async (user, survey, record, client = db) =>
     }
 
     const surveyId = Survey.getId(survey)
-    await Promise.all([
-      RecordRepository.deleteRecord(surveyId, uuid, t),
-      RecordFileManager.markRecordFilesAsDeleted(surveyId, uuid, t),
-      RecordPrintableExportShareService.deleteByRecordUuid({ surveyId, recordUuid: uuid }, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, logContent, false, t),
+    await DbUtils.runQueries(t, [
+      () => RecordRepository.deleteRecord(surveyId, uuid, t),
+      () => RecordFileManager.markRecordFilesAsDeleted(surveyId, uuid, t),
+      () => RecordPrintableExportShareService.deleteByRecordUuid({ surveyId, recordUuid: uuid }, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, logContent, false, t),
     ])
   })
 

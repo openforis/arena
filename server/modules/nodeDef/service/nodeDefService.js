@@ -12,6 +12,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import * as NodeDefManager from '../manager/nodeDefManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 const fetchSurvey = async ({ surveyId, cycle }, client = db) =>
   SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
@@ -202,9 +203,9 @@ export const cloneNodeDefFromSurvey = async (
   client = db
 ) =>
   client.tx(async (t) => {
-    const [sourceSurvey, targetSurvey] = await Promise.all([
-      fetchSurvey({ surveyId: sourceSurveyId }, t),
-      fetchSurvey({ surveyId: targetSurveyId }, t),
+    const [sourceSurvey, targetSurvey] = await DbUtils.runQueries(t, [
+      () => fetchSurvey({ surveyId: sourceSurveyId }, t),
+      () => fetchSurvey({ surveyId: targetSurveyId }, t),
     ])
 
     // Temporarily inject the source node def subtree into the target survey so
@@ -329,7 +330,6 @@ export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, 
  * NOTE: `survey` is the pre-deletion survey snapshot (fetched before `markNodeDefDeleted` ran).
  * `nodeDefDeleted` may therefore still appear in the results of `Survey.getAnalysisNodeDefs`;
  * the explicit `.filter(...)` below is the sole guard that excludes it from the reindexing.
- *
  * @param {object} params - Parameters.
  * @param {object} params.survey - The survey object (pre-deletion snapshot).
  * @param {number} params.surveyId - The survey identifier.

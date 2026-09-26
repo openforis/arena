@@ -224,7 +224,10 @@ export const cleanupSurveyFilesProps = async ({ surveyId }, client = db) =>
     )
     const count = fileSummariesToClean?.length ?? 0
     if (count > 0) {
-      await t.batch(fileSummariesToClean.map((fileSummary) => cleanupFileProps({ surveyId, fileSummary }, t)))
+      await DbUtils.runQueries(
+        t,
+        fileSummariesToClean.map((fileSummary) => () => cleanupFileProps({ surveyId, fileSummary }, t))
+      )
     }
     return count
   })

@@ -6,6 +6,7 @@ import * as ChainValidator from '@common/analysis/chainValidator'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import { TableChain } from '@common/model/db'
 
+import * as DbUtils from '@server/db/dbUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
 import * as ChainManager from '@server/modules/analysis/manager/chain'
@@ -29,7 +30,8 @@ export const update = async ({ user, surveyId, chain }) => {
     const propsToUpdate = Chain.getPropsDiff(chain)(chainDb)
 
     // activity log for each updated prop
-    const updates = Object.entries(propsToUpdate).map(([key, value]) => {
+    // (updates are collected as functions and run at the end, one at a time: they share the same transaction)
+    const updates = Object.entries(propsToUpdate).map(([key, value]) => () => {
       const content = { [ActivityLog.keysContent.uuid]: chainUuid, key, value }
       const type = ActivityLog.type.chainPropUpdate
       return ActivityLogRepository.insert(user, surveyId, type, content, false, t)
@@ -40,14 +42,14 @@ export const update = async ({ user, surveyId, chain }) => {
     // chain props
     const fields = { [TableChain.columnSet.props]: propsToUpdate }
     const params = { surveyId, chainUuid, dateModified: true, fields }
-    updates.push(ChainRepository.updateChain(params, t))
+    updates.push(() => ChainRepository.updateChain(params, t))
 
     if (Chain.checkChangeRequiresSurveyPublish({ chainPrev: chainDb, chainNext: chainWithValidation })) {
       // mark survey draft
-      updates.push(markSurveyDraft(surveyId, t))
+      updates.push(() => markSurveyDraft(surveyId, t))
     }
 
-    await t.batch(updates)
+    await DbUtils.runQueries(t, updates)
 
     return chainWithValidation
   })
