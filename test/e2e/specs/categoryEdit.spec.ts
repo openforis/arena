@@ -43,6 +43,7 @@ const addItems = async (page: Page, items: SampleCategoryItem[], levelIdx = 0): 
     const propSaved = (key: string) =>
       page.waitForResponse(
         (response) =>
+          response.ok() &&
           response.request().method() === 'PUT' &&
           /\/items\//.test(response.url()) &&
           (response.request().postDataJSON()?.key ?? '') === key

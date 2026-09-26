@@ -12,6 +12,14 @@ type JobParams = {
   [key: string]: any
 }
 
+// serialized job summary (see jobUtils.jobToJSON / jobRowToSummary), as sent to the clients
+type JobSummary = {
+  uuid: string
+  status: JobStatus
+  ended?: boolean
+  [key: string]: any
+}
+
 type JobInfo = {
   uuid: string
   type: string
@@ -20,7 +28,7 @@ type JobInfo = {
   persistPromise?: Promise<JobRow | void>
   ended?: boolean
   // last serialized summary of the job, received from the job thread
-  summary?: any
+  summary?: JobSummary
 }
 
 type ActiveJobRow = {
@@ -108,7 +116,7 @@ export class JobQueue {
    * @param jobUuid - The job UUID.
    * @returns Job summary or null if not found.
    */
-  getJobSummary(jobUuid: string): any {
+  getJobSummary(jobUuid: string): JobSummary | null {
     const jobInfo = this._jobInfoByUuid[jobUuid]
     return jobInfo ? this._getJobSummary(jobInfo) : null
   }
@@ -120,7 +128,7 @@ export class JobQueue {
    * @param jobInfo - The job info.
    * @returns The job summary.
    */
-  private _getJobSummary(jobInfo: JobInfo): any {
+  private _getJobSummary(jobInfo: JobInfo): JobSummary {
     const { uuid: jobUuid, params } = jobInfo
     const { user, surveyId } = params
     const { uuid: userUuid } = user
@@ -142,7 +150,7 @@ export class JobQueue {
       props: {},
       dateCreated: now,
       dateModified: now,
-    })
+    }) as JobSummary
   }
 
   /**
@@ -150,7 +158,7 @@ export class JobQueue {
    * @param userUuid - The user UUID.
    * @returns Job summary or null if user has no running jobs.
    */
-  getRunningJobSummaryByUserUuid(userUuid: string): any {
+  getRunningJobSummaryByUserUuid(userUuid: string): JobSummary | null {
     const jobInfo = this._getJobInfoByUserUuid(userUuid)
     return jobInfo ? this._getJobSummary(jobInfo) : null
   }
@@ -266,7 +274,7 @@ export class JobQueue {
    * Callback when a job ends.
    * @param job - The job object.
    */
-  onJobEnd(job: JobInfo): void {
+  onJobEnd(job: { uuid: string }): void {
     const jobInfo = this._jobInfoByUuid[job.uuid]
 
     const { uuid, params, status } = jobInfo
@@ -292,7 +300,7 @@ export class JobQueue {
    * Callback when a job updates its status.
    * @param job - The job object.
    */
-  onJobUpdate(job: JobInfo): void {
+  onJobUpdate(job: JobSummary): void {
     // runs in main thread; can safely modify internal variables
     const { ended, status, uuid } = job
     const jobInfo = this._jobInfoByUuid[uuid]
