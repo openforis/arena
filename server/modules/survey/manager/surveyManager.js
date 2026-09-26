@@ -676,12 +676,15 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
     : await SurveyFileManager.fetchFileSummariesBySurveyId(surveyId, client)
 
   await client.tx(async (t) => {
+    // Drop the schemas first: the survey tables reference the "user" table, so dropping them locks it exclusively.
+    // Updating the user prefs before that would lock some user rows first, and a concurrent user prefs update
+    // (holding a lock on the "user" table and waiting for those rows) would cause a deadlock.
+    await SurveyRepository.dropSurveySchema(surveyId, t)
+    await SchemaRdbRepository.dropSchema(surveyId, t)
+    await SurveyRepository.deleteSurvey(surveyId, t)
     if (deleteUserPrefs) {
       await UserRepository.deleteUsersPrefsSurvey(surveyId, t)
     }
-    await SurveyRepository.deleteSurvey(surveyId, t)
-    await SurveyRepository.dropSurveySchema(surveyId, t)
-    await SchemaRdbRepository.dropSchema(surveyId, t)
   })
   if (filesToDelete.length > 0) {
     await SurveyFileManager.deleteFilesContentByUuids({ surveyId, fileSummaries: filesToDelete })
