@@ -23,8 +23,12 @@ test.describe('Survey info edit', () => {
     await form.name.fill('')
     await form.saveBtn.click()
 
-    await form.name.hover()
-    await expect(page.getByText('Name is required')).toBeVisible()
+    // the validation error is shown in a tooltip, when hovering the field (validation can arrive after the hover)
+    await expect(async () => {
+      await page.mouse.move(0, 0)
+      await form.name.hover()
+      await expect(page.getByText('Name is required')).toBeVisible({ timeout: 1000 })
+    }).toPass()
   })
 
   test('saves name, label, description and languages', async ({ page, survey }) => {
