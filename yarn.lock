@@ -180,7 +180,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:^3.1135.0, @aws-sdk/client-s3@npm:^3.1141.0":
+"@aws-sdk/client-s3@npm:^3.1141.0":
   version: 3.1141.0
   resolution: "@aws-sdk/client-s3@npm:3.1141.0"
   dependencies:
@@ -3945,14 +3945,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^2.3.9":
-  version: 2.3.9
-  resolution: "@openforis/arena-core@npm:2.3.9"
+"@openforis/arena-core@npm:^2.3.10":
+  version: 2.3.10
+  resolution: "@openforis/arena-core@npm:2.3.10"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
-    "@turf/bearing": "npm:^7.3.5"
-    "@turf/destination": "npm:^7.3.5"
-    "@turf/distance": "npm:^7.3.5"
+    "@turf/bearing": "npm:^7.4.0"
+    "@turf/destination": "npm:^7.4.0"
+    "@turf/distance": "npm:^7.4.0"
     bignumber.js: "npm:^11.1.5"
     change-case: "npm:^5.4.4"
     jsep: "npm:^1.4.0"
@@ -3964,23 +3964,23 @@ __metadata:
     n2words: "npm:^6.2.0"
     proj4: "npm:^2.22.0"
     uuid: "npm:^14.0.2"
-  checksum: 10c0/3cd35b679c278df6b55262b8013f48156db50bd1fe38ccdada5b9e038f0b21a59ad6b2df24746c361006a542ad0ebbc4734ea46b71791367d97fcfc0d1d39fed
+  checksum: 10c0/4755d0ef314582b5697a00c007f5fd165036de231ff9bb6dc1cf93a5fd9b93a715184b7820861ddb3c712c387a791eed4ee56fe98e48c466becce3eff76a249b
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.4.7":
-  version: 2.4.7
-  resolution: "@openforis/arena-server@npm:2.4.7"
+"@openforis/arena-server@npm:^2.4.8":
+  version: 2.4.8
+  resolution: "@openforis/arena-server@npm:2.4.8"
   dependencies:
-    "@aws-sdk/client-s3": "npm:^3.1135.0"
+    "@aws-sdk/client-s3": "npm:^3.1141.0"
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^2.3.9"
+    "@openforis/arena-core": "npm:^2.3.10"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.2"
     cookie-parser: "npm:^1.4.7"
     db-migrate: "npm:^0.11.14"
     db-migrate-pg: "npm:^1.5.2"
-    docx: "npm:^9.7.1"
+    docx: "npm:^9.7.2"
     express: "npm:^5.2.1"
     express-fileupload: "npm:^1.5.2"
     express-rate-limit: "npm:^8.7.0"
@@ -3995,8 +3995,8 @@ __metadata:
     passport-local: "npm:^1.0.0"
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
-    socket.io: "npm:^4.8.3"
-  checksum: 10c0/3c4d6dd1f7322eb41bba049a832394953eeaa6628b36ab5ffef11b55ac0031b5c34af21ff5496a87207518f7d38bc91986fcb75812b759a7cb399b6b4cb6cc27
+    socket.io: "npm:^4.8.4"
+  checksum: 10c0/fcba198ddf6184ce468f72b11fa16e5907e58598e30ecdb33e1e8f608e1d469fbf4f1ab63bd5b8908a16538d4815603fcee2216fb11561c891d2b796423f5e89
   languageName: node
   linkType: hard
 
@@ -4713,15 +4713,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/bearing@npm:^7.3.5":
-  version: 7.3.5
-  resolution: "@turf/bearing@npm:7.3.5"
+"@turf/bearing@npm:^7.4.0":
+  version: 7.4.0
+  resolution: "@turf/bearing@npm:7.4.0"
   dependencies:
-    "@turf/helpers": "npm:7.3.5"
-    "@turf/invariant": "npm:7.3.5"
+    "@turf/helpers": "npm:7.4.0"
+    "@turf/invariant": "npm:7.4.0"
     "@types/geojson": "npm:^7946.0.10"
     tslib: "npm:^2.8.1"
-  checksum: 10c0/fe494a2601d752142616bc0af4b2b02a77e81f6ea35233ffa91a6d205a2b95674a9c23cf4639ac7f6fe3e0ac87a1c5ca87ca08b52e856f1b9814352d4107c579
+  checksum: 10c0/9c1a25f7f492e039fa9fc9f563210f3c2442594a848cacc35e39e180f7221fc7777a5d22946720afb2d1707890fb69d81547130c5e8f78b626e0fa8b5ce8c007
   languageName: node
   linkType: hard
 
@@ -4801,7 +4801,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/destination@npm:7.4.0, @turf/destination@npm:^7.3.5":
+"@turf/destination@npm:7.4.0, @turf/destination@npm:^7.4.0":
   version: 7.4.0
   resolution: "@turf/destination@npm:7.4.0"
   dependencies:
@@ -4823,7 +4823,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turf/distance@npm:7.4.0, @turf/distance@npm:^7.3.5":
+"@turf/distance@npm:7.4.0, @turf/distance@npm:^7.4.0":
   version: 7.4.0
   resolution: "@turf/distance@npm:7.4.0"
   dependencies:
@@ -4839,16 +4839,6 @@ __metadata:
   version: 6.5.0
   resolution: "@turf/helpers@npm:6.5.0"
   checksum: 10c0/786cbe0c0027f85db286fb3a0b7be04bb29bd63ec07760a49735ef32e9c5b4a7c059a8f691fafa31c7e0e9be34c281e014dc24077438bae01a09b492a680fb6f
-  languageName: node
-  linkType: hard
-
-"@turf/helpers@npm:7.3.5":
-  version: 7.3.5
-  resolution: "@turf/helpers@npm:7.3.5"
-  dependencies:
-    "@types/geojson": "npm:^7946.0.10"
-    tslib: "npm:^2.8.1"
-  checksum: 10c0/bd8ff4fce1a007999d5059cf8676da3287fbb0ddc9e803cf3a38522205bf857e982a6fa4049ac2f0b42113e1ada844712e4c3642007e3448ab41d22f1463e335
   languageName: node
   linkType: hard
 
@@ -4870,17 +4860,6 @@ __metadata:
     "@turf/invariant": "npm:^6.5.0"
     polygon-clipping: "npm:^0.15.3"
   checksum: 10c0/e2b95ab2f8b874c17fa788f3256147c8963be8b8689f21b7b692fb0112c3f06ab6d33a568e943c2c87f383ac8dba127ea67c3e7e7e4fd75b5331a8d4e7cf84d8
-  languageName: node
-  linkType: hard
-
-"@turf/invariant@npm:7.3.5":
-  version: 7.3.5
-  resolution: "@turf/invariant@npm:7.3.5"
-  dependencies:
-    "@turf/helpers": "npm:7.3.5"
-    "@types/geojson": "npm:^7946.0.10"
-    tslib: "npm:^2.8.1"
-  checksum: 10c0/e036a2f7276555c9882d1d6f144a8fb191ced223160b94e32c8ce89f09499e8a9f70d1f27d2fcf451bca2ae0ecc53a6978ebbe38f654aba8f2b7de51336ad77e
   languageName: node
   linkType: hard
 
@@ -8924,7 +8903,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"docx@npm:^9.7.1":
+"docx@npm:^9.7.2":
   version: 9.7.2
   resolution: "docx@npm:9.7.2"
   dependencies:
@@ -14719,7 +14698,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9"
     "@mui/x-tree-view": "npm:^9"
     "@ngageoint/geopackage": "patch:@ngageoint/geopackage@npm%3A4.2.9#~/.yarn/patches/@ngageoint-geopackage-npm-4.2.9-0462c5ae41.patch"
-    "@openforis/arena-server": "npm:^2.4.7"
+    "@openforis/arena-server": "npm:^2.4.8"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@reduxjs/toolkit": "npm:^2.12.0"
     "@sendgrid/mail": "npm:^8.1.6"
@@ -17985,7 +17964,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socket.io@npm:^4.8.3":
+"socket.io@npm:^4.8.4":
   version: 4.8.4
   resolution: "socket.io@npm:4.8.4"
   dependencies:
