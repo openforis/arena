@@ -1,0 +1,17 @@
+diff --git a/lib/matchers/utils.js b/lib/matchers/utils.js
+index 51471e1b899ac8db5338eaddc87000a186b55780..b020a4716bbc93411ee20ed7f6176eb9a8e8e69b 100644
+--- a/lib/matchers/utils.js
++++ b/lib/matchers/utils.js
+@@ -2,10 +2,10 @@
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.compareText = exports.getMessage = exports.quote = exports.getElementHandle = exports.getFrame = void 0;
+ const isElementHandle = (value) => {
+-    return value.constructor.name === "ElementHandle";
++    return /^_?ElementHandle$/.test(value.constructor.name);
+ };
+ const isLocator = (value) => {
+-    return value.constructor.name === "Locator";
++    return /^_?Locator$/.test(value.constructor.name);
+ };
+ const getFrame = async (value) => {
+     const resolved = await value;

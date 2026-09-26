@@ -1,0 +1,13 @@
+diff --git a/dist/lib/tiles/imageUtils.js b/dist/lib/tiles/imageUtils.js
+index 5830f5d57893636d98b7a19e270a2625727d4f39..bc0fd18db1f4d0eb952d5f106acd192973f5d210 100644
+--- a/dist/lib/tiles/imageUtils.js
++++ b/dist/lib/tiles/imageUtils.js
+@@ -51,7 +51,7 @@ var ImageUtils = /** @class */ (function () {
+      * @returns {Object}
+      */
+     ImageUtils.getImageSize = function (data) {
+-        return image_size_1.default.imageSize(data);
++        return (image_size_1.default.imageSize || image_size_1.default)(data);
+     };
+     /**
+      * Get image for data

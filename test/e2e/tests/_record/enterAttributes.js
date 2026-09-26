@@ -108,6 +108,72 @@ const enterFns = {
   time: enterTime,
 }
 
+const isKeyToggleInAllowState = async (keyToggleLocator) => {
+  const ariaLabel = await keyToggleLocator.getAttribute('aria-label')
+  return Boolean(ariaLabel?.toLowerCase().includes('allow'))
+}
+
+const waitForTextInputEnabled = async (inputSelector) => {
+  await page.waitForSelector(inputSelector, { state: 'visible', timeout: 5000 })
+  // (no optional chaining here: the function is serialized and evaluated in the page)
+  await page.waitForFunction(
+    (selector) => {
+      const el = document.querySelector(selector)
+      return !!el && !el.disabled
+    },
+    inputSelector,
+    { timeout: 2000 }
+  )
+}
+
+const clickKeyToggle = async (keyToggleLocator) => {
+  // The toggle wraps itself in a MUI tooltip showing its own lock/unlock hint; Playwright's
+  // click hovers first, which can pop that tooltip open right on top of the button and make
+  // it intercept the click, hanging until the test timeout (seen consistently in CI, e.g.
+  // https://github.com/openforis/arena/actions/runs/34883644236). force bypasses that
+  // pointer-interception check; we already know exactly which button this is.
+  await keyToggleLocator.click({ force: true })
+  await page.keyboard.press('Escape') // close potential tooltip
+}
+
+const unlockKeyAttribute = async (nodeDef, parentSelector) => {
+  const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
+  const keyToggleLocator = page.locator(keyToggleSelector)
+  if (!(await keyToggleLocator.isVisible())) return
+
+  await keyToggleLocator.scrollIntoViewIfNeeded()
+  if (!(await isKeyToggleInAllowState(keyToggleLocator))) return
+
+  // force (see clickKeyToggle) also bypasses Playwright's "not obscured by another element" check
+  // entirely, so it's just as happy to click the app's global route loader (Routes.js's <Loader />,
+  // see Loader.scss's .loader__boxes and _formDesigner/index.js's "Expand tree table" fix
+  // for the same overlay caught doing this to a resize handle) if that's still on top from
+  // a recent navigation - the toggle never actually gets clicked, so the field stays
+  // disabled and the enabled check below fails. Wait for it to be gone first.
+  await page.waitForSelector('.loader__boxes', { state: 'detached', timeout: 5000 })
+
+  if (!['integer', 'decimal', 'text'].includes(nodeDef.type)) {
+    await clickKeyToggle(keyToggleLocator)
+    return
+  }
+  // Unlock flips the input from disabled → enabled asynchronously; wait before fill so we
+  // don't burn the whole jest timeout on Playwright's actionability wait (seen on
+  // validationReport tree_id row 3: https://github.com/openforis/arena/actions/runs/35232215668).
+  // With recent Playwright versions the forced click can also land while the row is still
+  // re-rendering and get lost (the toggle keeps its "allow" label): click again in that case.
+  const inputSelector = getTextSelector(nodeDef, parentSelector)
+  const maxUnlockAttempts = 3
+  for (let attempt = 1; attempt <= maxUnlockAttempts; attempt += 1) {
+    await clickKeyToggle(keyToggleLocator)
+    try {
+      await waitForTextInputEnabled(inputSelector)
+      return
+    } catch (error) {
+      if (attempt === maxUnlockAttempts || !(await isKeyToggleInAllowState(keyToggleLocator))) throw error
+    }
+  }
+}
+
 export const enterAttribute = (nodeDef, value, parentSelector = '') => {
   const isKeyAttribute = Boolean(nodeDef.key)
   // Key fields need an unlock click first; keep a bit more budget for the React re-render
@@ -121,45 +187,7 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') => {
     `Enter ${nodeDef.name} value`,
     async () => {
       if (isKeyAttribute) {
-        const keyToggleSelector = `${parentSelector} ${getSelector(TestId.surveyForm.keyLockToggle(nodeDef.name), 'button')}`
-        const keyToggleLocator = page.locator(keyToggleSelector)
-        if (await keyToggleLocator.isVisible()) {
-          await keyToggleLocator.scrollIntoViewIfNeeded()
-          const keyToggleAriaLabel = await keyToggleLocator.getAttribute('aria-label')
-          if (keyToggleAriaLabel?.toLowerCase().includes('allow')) {
-            // The toggle wraps itself in a MUI tooltip showing its own lock/unlock hint; Playwright's
-            // click hovers first, which can pop that tooltip open right on top of the button and make
-            // it intercept the click, hanging until the test timeout (seen consistently in CI, e.g.
-            // https://github.com/openforis/arena/actions/runs/34883644236). force bypasses that
-            // pointer-interception check; we already know exactly which button this is.
-            // force also bypasses Playwright's "not obscured by another element" check entirely, so
-            // it's just as happy to click the app's global route loader (Routes.js's <Loader />,
-            // see Loader.scss's .loader__boxes and _formDesigner/index.js's "Expand tree table" fix
-            // for the same overlay caught doing this to a resize handle) if that's still on top from
-            // a recent navigation - the toggle never actually gets clicked, so the field stays
-            // disabled and the toBeEnabled check below fails. Wait for it to be gone first.
-            await page.waitForSelector('.loader__boxes', { state: 'detached', timeout: 5000 })
-            await keyToggleLocator.click({ force: true })
-            await page.keyboard.press('Escape') // close potential tooltip
-
-            // Unlock flips the input from disabled → enabled asynchronously; wait before fill so we
-            // don't burn the whole jest timeout on Playwright's actionability wait (seen on
-            // validationReport tree_id row 3: https://github.com/openforis/arena/actions/runs/35232215668).
-            if (['integer', 'decimal', 'text'].includes(nodeDef.type)) {
-              const inputSelector = getTextSelector(nodeDef, parentSelector)
-              await page.waitForSelector(inputSelector, { state: 'visible', timeout: 5000 })
-              // (no optional chaining here: the function is serialized and evaluated in the page)
-              await page.waitForFunction(
-                (selector) => {
-                  const el = document.querySelector(selector)
-                  return !!el && !el.disabled
-                },
-                inputSelector,
-                { timeout: 5000 }
-              )
-            }
-          }
-        }
+        await unlockKeyAttribute(nodeDef, parentSelector)
       }
       await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
       await FormUtils.waitForHeaderLoaderToDisappear()
