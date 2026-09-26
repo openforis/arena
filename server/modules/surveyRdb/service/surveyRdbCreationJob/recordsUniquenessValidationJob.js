@@ -38,7 +38,10 @@ export default class RecordsUniquenessValidationJob extends Job {
 
     this.total = A.length(cycleKeys) * 2
 
-    await Promise.all(cycleKeys.map((cycle) => this.validateRecordsUniquenessByCycle(cycle)))
+    // one cycle at a time: the validation runs queries in the job transaction
+    for (const cycle of cycleKeys) {
+      await this.validateRecordsUniquenessByCycle(cycle)
+    }
   }
 
   async validateRecordsUniquenessByCycle(cycle) {

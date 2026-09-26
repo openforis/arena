@@ -8,6 +8,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { db } from '@server/db/db'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
+import * as DbUtils from '@server/db/dbUtils'
 
 type ExtraPropDefsMap = Record<string, any>
 type ExtraValueRow = Record<string, any>
@@ -206,11 +207,11 @@ export const findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges = asyn
   client: any = db
 ): Promise<{ valueAffectedNodeDefUuids: Set<string>; validationAffectedNodeDefUuids: Set<string> }> => {
   const [categoriesPublishedByUuid, taxonomiesPublishedArray, categoryItemsChangedRows, taxaChangedRows] =
-    await Promise.all([
-      CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: false }, client),
-      TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft: false }, client),
-      CategoryRepository.fetchCategoryItemsWithChangedExtraValues({ surveyId }, client),
-      TaxonomyRepository.fetchTaxaWithChangedExtraValues({ surveyId }, client),
+    await DbUtils.runQueries(client, [
+      () => CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: false }, client),
+      () => TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft: false }, client),
+      () => CategoryRepository.fetchCategoryItemsWithChangedExtraValues({ surveyId }, client),
+      () => TaxonomyRepository.fetchTaxaWithChangedExtraValues({ surveyId }, client),
     ])
   const taxonomiesPublishedByUuid = ObjectUtils.toUuidIndexedObj(taxonomiesPublishedArray)
 

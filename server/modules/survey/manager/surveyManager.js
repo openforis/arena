@@ -272,9 +272,9 @@ export const fetchSurveyById = async (
   { surveyId, draft = false, validate = false, backup = false, skipMigrationCheck = false },
   client = db
 ) => {
-  const [surveyInfo, authGroups] = await Promise.all([
-    SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
-    AuthGroupRepository.fetchSurveyGroups(surveyId, client),
+  const [surveyInfo, authGroups] = await DbUtils.runQueries(client, [
+    () => SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
+    () => AuthGroupRepository.fetchSurveyGroups(surveyId, client),
   ])
   if (!skipMigrationCheck) {
     assertSurveyDataMigrated(surveyInfo)
@@ -521,10 +521,10 @@ export const fetchUserSurveysInfo = async ({
 // ====== UPDATE
 export const updateSurveyProp = async (user, surveyId, key, value, system = false, client = db) =>
   client.tx(async (t) => {
-    await Promise.all([
-      SurveyRepository.updateSurveyProp(surveyId, key, value, t),
-      SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
+    await DbUtils.runQueries(t, [
+      () => SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+      () => SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
     ])
 
     return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
@@ -560,10 +560,11 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
       const valuePrev = propsPrev[key]
 
       if (!A.equals(value, valuePrev)) {
-        await Promise.all([
-          SurveyRepository.updateSurveyProp(surveyId, key, value, t),
-          SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
-          ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
+        await DbUtils.runQueries(t, [
+          () => SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+          () => SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+          () =>
+            ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
         ])
 
         if (key === Survey.infoKeys.cycles) {
