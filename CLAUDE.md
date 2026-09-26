@@ -236,7 +236,8 @@ Long-running operations use the job system in `server/job/`. Jobs are persisted 
 
 **E2E Tests:**
 
-- Use Playwright with jest-playwright-preset
+- New, isolated E2E tests go in `test/e2e-playwright/` (TypeScript, `@playwright/test`, run with `yarn test:e2e:pw`); see its README
+- Legacy suite (being migrated): Playwright with jest-playwright-preset
 - Tests are in `test/e2e/tests/`
 - Authentication state is saved in `test/e2e/resources/auth.json`
 - Test utilities in `test/e2e/tests/utils/`

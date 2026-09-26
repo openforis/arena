@@ -153,6 +153,15 @@ export default [
     },
   },
 
+  // 6b. Playwright Test (E2E Tests) Configuration
+  {
+    files: ['test/e2e-playwright/**/*.ts'],
+    rules: {
+      // Playwright fixtures receive a `use` callback that is not a React hook
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
+
   // --- FINAL FORMATTING & IGNORE ---
 
   // 7. Prettier Integration (Must be the LAST configuration)
