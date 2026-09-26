@@ -57,7 +57,20 @@ export default class NodeDefEntityBuilder extends NodeDefBuilder {
       A.mergeAll,
       A.assoc(defUuid, defUpdated)
     )(this.childBuilders)
-    const surveyUpdated = Survey.mergeNodeDefs(defs)(survey)
+
+    const findChildDef = (name) =>
+      Object.values(defs).find((d) => NodeDef.getParentUuid(d) === defUuid && NodeDef.getName(d) === name)
+    const getChildBuilderName = (childBuilder) => childBuilder.props[NodeDef.propKeys.name]
+
+    // resolve parent code attributes (siblings, available only now that all the children have been built)
+    this.childBuilders.forEach((childBuilder) => {
+      const { parentCodeDefName } = childBuilder
+      if (!parentCodeDefName) return
+      const childDef = findChildDef(getChildBuilderName(childBuilder))
+      childDef.props[NodeDef.propKeys.parentCodeDefUuid] = NodeDef.getUuid(findChildDef(parentCodeDefName))
+    })
+
+    let surveyUpdated = Survey.mergeNodeDefs(defs)(survey)
 
     // update node def layout
 
@@ -65,6 +78,23 @@ export default class NodeDefEntityBuilder extends NodeDefBuilder {
       survey: surveyUpdated,
       cycle: Survey.cycleOneKey,
       nodeDefParent: defUpdated,
+    })
+    surveyUpdated = Survey.mergeNodeDefs({ [defUuid]: defUpdated })(surveyUpdated)
+
+    // add every child to this entity layout (grid layout, table columns or child pages), like the form designer does
+    this.childBuilders.forEach((childBuilder) => {
+      const childDef = findChildDef(getChildBuilderName(childBuilder))
+      const { layoutInParent } = childBuilder
+      const defWithChildLayout = NodeDefLayoutUpdater.updateParentLayout({
+        survey: surveyUpdated,
+        nodeDef: childDef,
+        cyclesAdded: [Survey.cycleOneKey],
+        layoutInParentByCycle: layoutInParent ? { [Survey.cycleOneKey]: layoutInParent } : null,
+      })
+      if (defWithChildLayout) {
+        defUpdated = defWithChildLayout
+        surveyUpdated = Survey.mergeNodeDefs({ [defUuid]: defUpdated })(surveyUpdated)
+      }
     })
 
     const defsUpdated = { ...defs, [defUuid]: defUpdated }

@@ -112,42 +112,43 @@ class SurveyBuilder {
   async buildAndStore(publish = true, client = db) {
     const surveyParam = await this.build()
 
-    return client.tx(async (t) => {
-      const surveyCreationParams = {
-        user: this.user,
-        surveyInfo: surveyParam,
-        createRootEntityDef: false,
-        system: true,
-      }
-      const survey = await SurveyManager.insertSurvey(surveyCreationParams, t)
+    // Insert the survey outside of a transaction: SurveyManager.insertSurvey creates the survey schema using
+    // separate db connections, which would wait forever for the locks held by a (still open) transaction.
+    const survey = await SurveyManager.insertSurvey(
+      { user: this.user, surveyInfo: surveyParam, createRootEntityDef: false, system: true },
+      client
+    )
+    const surveyId = Survey.getId(survey)
 
-      const surveyId = Survey.getId(survey)
+    try {
+      await client.tx(async (t) => {
+        // Node defs
+        const nodeDefRoot = Survey.getNodeDefRoot(surveyParam)
+        await _insertNodeDefRecursively(surveyId, surveyParam, t)(nodeDefRoot)
 
-      // Node defs
-      const nodeDefRoot = Survey.getNodeDefRoot(surveyParam)
+        // Categories and taxonomies (one at a time: queries cannot run concurrently on the same transaction)
+        for (const categoryBuilder of this.categoryBuilders) {
+          await categoryBuilder.buildAndStore(this.user, surveyId, t)
+        }
+        for (const taxonomyBuilder of this.taxonomyBuilders) {
+          await taxonomyBuilder.buildAndStore(this.user, surveyId, t)
+        }
+      })
 
-      await _insertNodeDefRecursively(surveyId, surveyParam, t)(nodeDefRoot)
-
-      // Categories
-      await Promise.all(
-        this.categoryBuilders.map((categoryBuilder) => categoryBuilder.buildAndStore(this.user, surveyId, t))
-      )
-
-      // Taxonomies
-      await Promise.all(
-        this.taxonomyBuilders.map((taxonomyBuilder) => taxonomyBuilder.buildAndStore(this.user, surveyId, t))
-      )
-
+      // publish after the transaction has been committed (the publish job creates the survey RDB schema)
       if (publish) {
-        await SurveyUtils.publishSurvey(this.user, surveyId, t)
+        await SurveyUtils.publishSurvey(this.user, surveyId, client)
       }
+    } catch (error) {
+      await SurveyManager.deleteSurvey(surveyId)
+      throw error
+    }
 
-      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-        { surveyId, cycle: Survey.cycleOneKey, draft: !publish, advanced: true },
-        t
-      )
-      return Survey.buildAndAssocDependencyGraph(surveyDb)
-    })
+    const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+      { surveyId, cycle: Survey.cycleOneKey, draft: !publish, advanced: true },
+      client
+    )
+    return Survey.buildAndAssocDependencyGraph(surveyDb)
   }
 }
 

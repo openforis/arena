@@ -55,6 +55,17 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
     return this
   }
 
+  /**
+   * Sets the parent code attribute of a code attribute; it must be a sibling of this attribute
+   * (it's resolved by the parent entity builder, once all the children have been built).
+   * @param {string} parentCodeDefName - Name of the parent code attribute.
+   * @returns {NodeDefAttributeBuilder} - This builder.
+   */
+  parentCode(parentCodeDefName) {
+    this.parentCodeDefName = parentCodeDefName
+    return this
+  }
+
   build(survey, parentDef = null) {
     const def = this._createNodeDef(parentDef)
 
