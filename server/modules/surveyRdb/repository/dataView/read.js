@@ -1,5 +1,5 @@
 import * as A from '@core/arena'
-import * as camelize from 'camelize'
+import camelize from 'camelize'
 import * as pgPromise from 'pg-promise'
 
 import { Objects } from '@openforis/arena-core'
