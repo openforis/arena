@@ -23,10 +23,8 @@ module.exports = {
   // no "main" field - jest-resolve 27 predates Node's package.json#exports resolution support, so
   // `require('n2words/en')` fails to resolve even though Node itself resolves it fine. Map each
   // subpath straight to its source file until Jest is upgraded past 27.
-  // Resolved via require.resolve (not <rootDir>) so it still points here when this config is
-  // spread into test/e2e/jest.config.js, which overrides rootDir to test/e2e/.
   // Path aliases (mirrors jsconfig.json / the webpack configs): unit and integration tests are bundled
-  // by webpack, but e2e runs the sources directly through Jest, which needs them resolved here.
+  // by webpack, which resolves them; they are needed here only for tests run directly through Jest.
   moduleNameMapper: {
     '^@common/(.*)$': `${__dirname}/common/$1`,
     '^@core/(.*)$': `${__dirname}/core/$1`,

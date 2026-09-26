@@ -81,9 +81,11 @@ export default class NodeDefEntityBuilder extends NodeDefBuilder {
     })
     surveyUpdated = Survey.mergeNodeDefs({ [defUuid]: defUpdated })(surveyUpdated)
 
-    // add every child to this entity layout (grid layout, table columns or child pages), like the form designer does
+    // add every child to this entity layout (grid layout or table columns), like the form designer does
+    // (child pages are already in the children index, see initializeParentLayout)
     this.childBuilders.forEach((childBuilder) => {
       const childDef = findChildDef(getChildBuilderName(childBuilder))
+      if (NodeDefLayout.hasPage(Survey.cycleOneKey)(childDef)) return
       const { layoutInParent } = childBuilder
       const defWithChildLayout = NodeDefLayoutUpdater.updateParentLayout({
         survey: surveyUpdated,
