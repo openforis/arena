@@ -1,6 +1,7 @@
 import { test as base, expect } from '@playwright/test'
 
 import { ArenaApi } from './arenaApi'
+import { insertSampleSurvey, SampleSurveyOptions } from './seed/sampleSurvey'
 import { getWorkerTestUser, insertTestUserIfMissing, TestUser } from './testUsers'
 
 export type TestSurvey = {
@@ -24,7 +25,19 @@ type TestFixtures = {
    * It is deleted at the end of the test.
    */
   survey: TestSurvey
+  /**
+   * Options used to create the sample survey (see sampleSurvey fixture); override them with test.use(...).
+   */
+  sampleSurveyOptions: Omit<SampleSurveyOptions, 'userEmail' | 'name' | 'label'>
+  /**
+   * The sample survey (cluster -> plot -> tree, with a category and a taxonomy), inserted directly in the DB
+   * before the test and set as current survey of the test user. It is deleted at the end of the test.
+   */
+  sampleSurvey: TestSurvey
 }
+
+// set E2E_KEEP_DATA=true to keep the surveys created by the tests (e.g. to inspect them after a failure)
+const keepData = process.env.E2E_KEEP_DATA === 'true'
 
 let surveyNameSeq = 0
 
@@ -51,6 +64,8 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
   authenticated: [true, { option: true }],
 
   context: async ({ context, authenticated, testUser, baseURL }, use) => {
+    // do not send analytics from the tests
+    await context.route(/google-analytics\.com|googletagmanager\.com/, (route) => route.abort())
     if (authenticated) {
       // context.request shares the cookie jar with the browser context:
       // the refresh token cookie set by the login is then used by the web app to get its auth token
@@ -73,7 +88,17 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     const label = `Survey ${name}`
     const id = await api.createSurvey({ name, label })
     await use({ id, name, label })
-    await api.deleteSurveyIfExists(id)
+    if (!keepData) await api.deleteSurveyIfExists(id)
+  },
+
+  sampleSurveyOptions: [{}, { option: true }],
+
+  sampleSurvey: async ({ api, testUser, sampleSurveyOptions }, use, testInfo) => {
+    const name = generateSurveyName(testInfo.parallelIndex)
+    const label = `Sample survey ${name}`
+    const id = await insertSampleSurvey({ ...sampleSurveyOptions, userEmail: testUser.email, name, label })
+    await use({ id, name, label })
+    if (!keepData) await api.deleteSurveyIfExists(id)
   },
 })
 

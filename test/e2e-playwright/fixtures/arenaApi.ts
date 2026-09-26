@@ -73,7 +73,8 @@ export class ArenaApi {
     const start = Date.now()
     for (;;) {
       const job: JobSummary = await this.get(`/api/jobs/${jobUuid}`)
-      if (endedJobStatuses.includes(job?.status)) {
+      // right after being started, the summary of the previous job of the same user can be returned: ignore it
+      if (job?.uuid === jobUuid && endedJobStatuses.includes(job.status)) {
         expect(job.status, `job ${jobUuid} did not succeed: ${JSON.stringify(job.errors)}`).toBe('succeeded')
         return job
       }
