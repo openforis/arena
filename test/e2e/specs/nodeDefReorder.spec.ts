@@ -26,6 +26,11 @@ const dragWithMouse = async (page: Page, from: { x: number; y: number }, to: { x
   await page.mouse.up()
 }
 
+const waitForLayoutSave = (page: Page) =>
+  page.waitForResponse(
+    (response) => response.request().method() === 'PUT' && /\/nodeDefs?\//.test(response.url()) && response.ok()
+  )
+
 const nodeDefWrapper = (page: Page, name: string) => page.getByTestId(TestId.surveyForm.nodeDefWrapper(name)).first()
 
 /**
@@ -58,9 +63,7 @@ const move = async (page: Page, name: string, targetName: string, position: 'rig
       ? { x: targetBox.x + targetBox.width + 5, y: targetBox.y }
       : { x: targetBox.x, y: targetBox.y + targetBox.height + 5 }
   // the new layout is saved (with a debounce) after every move: wait for it before the next move
-  const layoutSaved = page.waitForResponse(
-    (response) => response.request().method() === 'PUT' && /\/nodeDefs?\//.test(response.url()) && response.ok()
-  )
+  const layoutSaved = waitForLayoutSave(page)
   await dragWithMouse(page, { x: box.x + 2, y: box.y + 2 }, to)
   await layoutSaved
   await waitForLayoutStable(page)
@@ -86,9 +89,12 @@ const moveTableColumn = async (page: Page, name: string, targetName: string, sid
       .first()
   const target = cell(targetName)
   const targetBox = await boxOf(target)
+  // wait for the new layout to be saved before the next move (the table row is updated from the saved layout)
+  const layoutSaved = waitForLayoutSave(page)
   await cell(name).dragTo(target, {
     targetPosition: { x: targetBox.width / 2 + (side === 'right' ? 5 : -5), y: 5 },
   })
+  await layoutSaved
 }
 
 test.describe('Node def reorder', () => {
@@ -141,9 +147,7 @@ test.describe('Node def reorder', () => {
     await expect.poll(() => designer.childNames('cluster')).toEqual(expectedClusterOrder)
   })
 
-  // FIXME: the column order changes in the page, but the new layout is never saved (no request is sent):
-  // to be investigated (possibly a regression of the resizable table header changes, #4397)
-  test.fixme('reorders the columns of an entity table', async ({ page, sampleSurvey: _ }) => {
+  test('reorders the columns of an entity table', async ({ page, sampleSurvey: _ }) => {
     const designer = new FormDesigner(page)
     await designer.goto()
     await designer.gotoPage('plot')
