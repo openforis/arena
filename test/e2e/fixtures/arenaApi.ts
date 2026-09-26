@@ -10,7 +10,7 @@ type JobSummary = {
   errors?: unknown
 }
 
-const endedJobStatuses = ['succeeded', 'failed', 'canceled']
+const endedJobStatuses = new Set(['succeeded', 'failed', 'canceled'])
 
 export type SurveyCreateParams = {
   name: string
@@ -74,7 +74,7 @@ export class ArenaApi {
     for (;;) {
       const job: JobSummary = await this.get(`/api/jobs/${jobUuid}`)
       // right after being started, the summary of the previous job of the same user can be returned: ignore it
-      if (job?.uuid === jobUuid && endedJobStatuses.includes(job.status)) {
+      if (job?.uuid === jobUuid && endedJobStatuses.has(job.status)) {
         expect(job.status, `job ${jobUuid} did not succeed: ${JSON.stringify(job.errors)}`).toBe('succeeded')
         return job
       }

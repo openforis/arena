@@ -8,7 +8,8 @@ import * as Validation from '../../../../../core/validation/validation'
  * @param {boolean} [includeValidationFields] - Whether to include all the Validation fields.
  * @returns {Record} - The record object.
  */
-export default (surveyId, includeValidationFields = true) =>
+const recordTransformCallback =
+  (surveyId, includeValidationFields = true) =>
   (record) => {
     const validation = Validation.getValidation(record)
 
@@ -23,3 +24,5 @@ export default (surveyId, includeValidationFields = true) =>
           },
     }
   }
+
+export default recordTransformCallback

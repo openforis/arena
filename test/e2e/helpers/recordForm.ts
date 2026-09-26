@@ -78,7 +78,7 @@ export class RecordForm {
     const wrapper = this.nodeDefWrapper(def.name, parent)
     switch (def.type) {
       case 'boolean': {
-        const option = wrapper.locator(`.MuiButtonBase-root[data-value="${value}"]`)
+        const option = wrapper.locator(`.MuiButtonBase-root[data-value="${value as string}"]`)
         if (((await option.getAttribute('class')) ?? '').includes('Mui-checked')) return false
         await option.click()
         break
@@ -140,7 +140,7 @@ export class RecordForm {
     const wrapper = this.nodeDefWrapper(def.name, parent)
     switch (def.type) {
       case 'boolean':
-        await expect(wrapper.locator(`.MuiButtonBase-root[data-value="${value}"]`)).toHaveClass(/Mui-checked/)
+        await expect(wrapper.locator(`.MuiButtonBase-root[data-value="${value as string}"]`)).toHaveClass(/Mui-checked/)
         break
       case 'code': {
         const dropdown = getDropdown(wrapper)

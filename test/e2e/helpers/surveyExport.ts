@@ -104,7 +104,8 @@ const verifyChildDefs = (surveyExport: SurveyExport, parentName: string, childre
   const parentDef = surveyExport.nodeDefByName(parentName)
   const childDefs = surveyExport.childDefs(parentDef)
   const attributeDefs = childDefs.filter((nodeDef) => nodeDef.type !== 'entity')
-  expect(attributeDefs.map((nodeDef) => getProps(nodeDef).name).sort()).toEqual(Object.keys(children).sort())
+  const sortNames = (names: string[]) => [...names].sort((nameA, nameB) => nameA.localeCompare(nameB))
+  expect(sortNames(attributeDefs.map((nodeDef) => getProps(nodeDef).name))).toEqual(sortNames(Object.keys(children)))
   for (const nodeDef of attributeDefs) {
     const expected = children[getProps(nodeDef).name]
     expect(nodeDef.type).toBe(expected.type)

@@ -39,7 +39,7 @@ export type SampleCategoryItem = { code: string; label: string; children: Sample
 const createCategoryItems = (levelIdx = 0, codePrefix = ''): SampleCategoryItem[] => {
   const level = category.levels[levelIdx]
   if (!level) return []
-  return Array.from(Array(level.codes).keys()).map((itemIdx) => {
+  return Array.from({ length: level.codes }, (_, itemIdx) => {
     const code = `${codePrefix}${itemIdx}`
     return { code, label: `${level.name} ${code}`, children: createCategoryItems(levelIdx + 1, code) }
   })
