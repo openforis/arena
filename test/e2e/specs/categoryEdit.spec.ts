@@ -39,8 +39,18 @@ const fillAndWait = async (page: Page, testId: string, value: string): Promise<v
 const addItems = async (page: Page, items: SampleCategoryItem[], levelIdx = 0): Promise<void> => {
   for (const [itemIdx, item] of items.entries()) {
     await page.getByTestId(TestId.categoryDetails.levelAddItemBtn(levelIdx)).click()
-    await fillAndWait(page, TestId.categoryDetails.itemCode(levelIdx, itemIdx), item.code)
-    await fillAndWait(page, TestId.categoryDetails.itemLabel(levelIdx, itemIdx)(), item.label)
+    // code and label filled one right after the other: both changes must be saved
+    const propSaved = (key: string) =>
+      page.waitForResponse(
+        (response) =>
+          response.request().method() === 'PUT' &&
+          /\/items\//.test(response.url()) &&
+          (response.request().postDataJSON()?.key ?? '') === key
+      )
+    const codeAndLabelSaved = Promise.all([propSaved('code'), propSaved('labels')])
+    await input(page, TestId.categoryDetails.itemCode(levelIdx, itemIdx)).fill(item.code)
+    await input(page, TestId.categoryDetails.itemLabel(levelIdx, itemIdx)()).fill(item.label)
+    await codeAndLabelSaved
     await page.getByTestId(TestId.categoryDetails.itemCloseBtn(levelIdx, itemIdx)).click()
   }
   // select every item and add its children in the next level
