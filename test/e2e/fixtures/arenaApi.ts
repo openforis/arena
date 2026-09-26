@@ -2,15 +2,14 @@ import { APIRequestContext, expect, request } from '@playwright/test'
 
 import type { TestUser } from './testUsers'
 
-// GET /api/jobs/:uuid returns a different shape depending on whether the job is running (serialized summary)
-// or only queued / just ended (internal job info, without result): rely only on the fields common to both
 type JobSummary = {
   uuid: string
   status: string
+  ended: boolean
+  succeeded: boolean
   errors?: unknown
+  result?: Record<string, any>
 }
-
-const endedJobStatuses = new Set(['succeeded', 'failed', 'canceled'])
 
 export type SurveyCreateParams = {
   name: string
@@ -73,9 +72,9 @@ export class ArenaApi {
     const start = Date.now()
     for (;;) {
       const job: JobSummary = await this.get(`/api/jobs/${jobUuid}`)
-      // right after being started, the summary of the previous job of the same user can be returned: ignore it
-      if (job?.uuid === jobUuid && endedJobStatuses.has(job.status)) {
-        expect(job.status, `job ${jobUuid} did not succeed: ${JSON.stringify(job.errors)}`).toBe('succeeded')
+      expect(job.uuid).toBe(jobUuid)
+      if (job.ended) {
+        expect(job.succeeded, `job ${jobUuid} did not succeed: ${JSON.stringify(job.errors)}`).toBe(true)
         return job
       }
       if (Date.now() - start > jobTimeoutMs) throw new Error(`job ${jobUuid} did not end in ${jobTimeoutMs}ms`)
@@ -91,16 +90,8 @@ export class ArenaApi {
   async createSurvey({ name, label, lang = 'en', template = false }: SurveyCreateParams): Promise<number> {
     const { job, validation } = await this.post('/api/survey', { name, label, lang, template })
     expect(validation, `survey validation failed: ${JSON.stringify(validation)}`).toBeUndefined()
-    await this.waitForJob(job.uuid)
-    // the job can be reported as succeeded slightly before the new survey is returned by the surveys list
-    let surveyId: number | null = null
-    await expect
-      .poll(async () => (surveyId = await this.findSurveyIdByName({ name, template })), {
-        message: `survey ${name} not found after creation`,
-        timeout: 10_000,
-      })
-      .not.toBeNull()
-    return surveyId!
+    const jobEnded = await this.waitForJob(job.uuid)
+    return Number(jobEnded.result!.surveyId)
   }
 
   /**

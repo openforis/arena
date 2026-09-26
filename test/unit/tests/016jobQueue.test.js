@@ -352,6 +352,62 @@ describe('JobQueue test', () => {
     expect(queue._jobUuidsByUserUuid[user1.uuid]).toBeUndefined()
   })
 
+  test('the summary of a queued job does not expose the job params', async () => {
+    class NoOpExecuteJobQueue extends JobQueue {
+      _executeJob() {
+        // no-op: don't spawn a real thread
+      }
+    }
+    const queue = new NoOpExecuteJobQueue()
+    const jobA = new Job('SurveyJob', { surveyId: surveyId1, user: user1 })
+    const jobB = new Job('SurveyJob', { surveyId: surveyId2, user: user1 })
+
+    queue.enqueue(jobA)
+    await queue._startNextJobChain // jobA running
+    queue.enqueue(jobB)
+    await queue._startNextJobChain // jobB queued
+
+    const summary = queue.getJobSummary(jobB.uuid)
+    expect(summary.uuid).toBe(jobB.uuid)
+    expect(summary.status).toBe(jobStatus.pending)
+    expect(summary.ended).toBe(false)
+    expect(summary.params).toBeUndefined()
+
+    await queue.destroy()
+  })
+
+  test('the summary of a job is the last one received from its thread (with the job result)', async () => {
+    class NoOpExecuteJobQueue extends JobQueue {
+      _executeJob() {
+        // no-op: don't spawn a real thread
+      }
+    }
+    const queue = new NoOpExecuteJobQueue()
+    const job = new Job('SurveyJob', { surveyId: surveyId1, user: user2 })
+
+    queue.enqueue(job)
+    await queue._startNextJobChain
+
+    const jobSerialized = {
+      uuid: job.uuid,
+      userUuid: user2.uuid,
+      status: jobStatus.succeeded,
+      succeeded: true,
+      ended: true,
+      result: { surveyId: 10 },
+    }
+    queue.onJobUpdate(jobSerialized)
+    await queue._startNextJobChain
+
+    const summary = queue.getJobSummary(job.uuid)
+    expect(summary.uuid).toBe(job.uuid)
+    expect(summary.ended).toBe(true)
+    expect(summary.result).toEqual({ surveyId: 10 })
+    expect(summary.params).toBeUndefined()
+
+    await queue.destroy()
+  })
+
   test('cancelling a queued survey-scoped job persists a canceled status to the DB', async () => {
     // Regression test: cancelJobByUserUuid's queued-job branch used to only mutate local
     // in-memory state, never writing a terminal status to the job's DB row. That left the

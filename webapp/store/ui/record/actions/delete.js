@@ -13,6 +13,7 @@ import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import * as RecordState from '../state'
 import * as ActionTypes from './actionTypes'
 import { checkAndConfirmUpdateNode } from './common'
+import { enqueueNodeRequest } from './nodeRequestsQueue'
 
 export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   const onOk = async () => {
@@ -27,9 +28,11 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
     const draft = Record.isPreview(record)
     const nodeUuid = Node.getUuid(node)
 
-    await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}/node/${nodeUuid}`, {
-      data: { cycle, draft, timezoneOffset: Dates.getTimezoneOffset(), lang: I18nState.getLang() },
-    })
+    await enqueueNodeRequest(() =>
+      axios.delete(`/api/survey/${surveyId}/record/${recordUuid}/node/${nodeUuid}`, {
+        data: { cycle, draft, timezoneOffset: Dates.getTimezoneOffset(), lang: I18nState.getLang() },
+      })
+    )
   }
   checkAndConfirmUpdateNode({ dispatch, getState, node, nodeDef, onOk })
 }

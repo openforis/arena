@@ -26,8 +26,14 @@ const insertGroup = async (authGroup, surveyId, client = db) =>
     dbTransformCallback
   )
 
-export const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
-  Promise.all(surveyGroups.map((authGroup) => insertGroup(authGroup, surveyId, client)))
+export const createSurveyGroups = async (surveyId, surveyGroups, client = db) => {
+  // one at a time: queries cannot run concurrently on the same client (e.g. a transaction)
+  const groups = []
+  for (const authGroup of surveyGroups) {
+    groups.push(await insertGroup(authGroup, surveyId, client))
+  }
+  return groups
+}
 
 export const insertUserGroup = async ({ groupUuid, userUuid, props = null }, client = db) =>
   client.one(

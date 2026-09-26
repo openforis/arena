@@ -196,28 +196,21 @@ export class RecordForm {
     await this.page.mouse.move(0, 0)
   }
 
-  /**
-   * Clicks the specified "add entity" button and waits for the new entity to be persisted.
-   * Editing its attributes before that would make their persist requests race with the entity one
-   * (the server would fail with a foreign key violation).
-   * @param {Locator} addButton - The button that adds the entity.
-   * @returns {Promise<void>} - Resolves when the new entity has been persisted.
-   */
-  async addEntity(addButton: Locator): Promise<void> {
-    await Promise.all([
-      this.page.waitForResponse(
-        (response) => response.request().method() === 'POST' && /\/record\/[\w-]+\/node$/.test(response.url())
-      ),
-      addButton.click(),
-    ])
-  }
+  // The attributes of a new entity can be edited right after adding it, without waiting for the entity
+  // to be persisted: the node requests are sent in order (see nodeRequestsQueue.js).
 
   async addFormEntity(): Promise<void> {
-    await this.addEntity(this.page.getByTestId(TestId.entities.form.addNewNode))
+    await this.page.getByTestId(TestId.entities.form.addNewNode).click()
   }
 
   async addTableEntity(entityName: string): Promise<void> {
-    await this.addEntity(this.page.getByTestId(TestId.surveyForm.entityAddBtn(entityName)))
+    // data rows only (the header row is rendered only when there is at least one row)
+    const rows = this.page.locator(
+      `[data-testid^="${TestId.surveyForm.entityRowData(entityName, '')}"]:not([data-testid="${TestId.surveyForm.entityRowHeader(entityName)}"])`
+    )
+    const rowsCount = await rows.count()
+    await this.page.getByTestId(TestId.surveyForm.entityAddBtn(entityName)).click()
+    await expect(rows).toHaveCount(rowsCount + 1)
   }
 
   async gotoPage(nodeDefName: string): Promise<void> {
