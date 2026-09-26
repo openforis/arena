@@ -4,7 +4,7 @@ ARG node_version=24.21.0
 
 # Build stage: needs the full image (compilers/headers) to install
 # dependencies and run the webpack build. Not shipped to runtime.
-FROM node:${node_version} AS builder
+FROM node:${node_version}-trixie AS builder
 
 # Enable Corepack for Yarn Modern
 RUN corepack enable
@@ -13,40 +13,48 @@ COPY . /app/
 
 WORKDIR /app
 
+# After the build, reinstall node_modules with production dependencies only:
+# devDependencies (webpack, babel, eslint, jest, playwright...) are only needed
+# to produce dist/ and would otherwise be shipped in the runtime image with
+# their own vulnerabilities. dist/*.js only requires production dependencies
+# (and their transitive ones) at runtime.
 RUN yarn install --immutable --mode=skip-build \
-    && yarn build
+    && yarn build \
+    && YARN_ENABLE_SCRIPTS=false yarn workspaces focus --production
 
 ############################################################
 
 # Runtime stage: slim base has no need for the build-only OS packages
 # (ImageMagick, MariaDB/GLib/OpenSSL headers, etc.) pulled in by the
 # full node image, which otherwise sit unused in the final image.
-FROM node:${node_version}-bookworm-slim AS arena
+# Debian 13 (trixie) instead of Debian 12 (bookworm): most of the OS package
+# vulnerabilities reported by trivy on bookworm have no fix available there.
+FROM node:${node_version}-trixie-slim AS arena
 
-# npm itself is only needed to install pm2 below; remove its own vendored
-# dependencies afterwards rather than carrying their CVEs into the image.
-RUN npm install --ignore-scripts pm2@7.0.4 -g \
-    && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+# Apply the available OS security updates on top of the base image
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# pm2 is installed as a local package (not with `npm install -g`) from a
+# lockfile, so that `overrides` can be applied to its pinned dependencies
+# (js-yaml 4.3.1 is vulnerable to CVE-2026-84375).
+# npm itself is only needed to install pm2; remove it (and its own vendored
+# dependencies) afterwards rather than carrying their CVEs into the image.
+WORKDIR /opt/pm2
+COPY docker/pm2/package.json docker/pm2/package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund \
+    && ln -s /opt/pm2/node_modules/.bin/pm2 /opt/pm2/node_modules/.bin/pm2-runtime /usr/local/bin/ \
+    && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /root/.npm
 
 WORKDIR /app
 
 COPY --chown=node:node --from=builder /app /app/
 
-# These are build/test-only tools (webpack plugins, babel plugins, node-gyp -
-# an optionalDependency of native modules like better-sqlite3, only installed
-# from source when no prebuilt binary matches the target platform - and
-# jest/playwright test tooling) that dist/server.js never requires at runtime
-# - confirmed via grep across the built bundles - but that were otherwise
-# shipped into the image just because `yarn install` also installs
-# devDependencies (and any optionalDependencies) needed only to produce
-# dist/ in the builder stage.
-RUN rm -rf \
-    node_modules/node-gyp \
-    node_modules/wait-on \
-    node_modules/playwright \
-    node_modules/uglifyjs-webpack-plugin \
-    node_modules/@babel/plugin-transform-modules-systemjs \
-    && ln -s dist/server.js .
+# /app is owned by root: create the default log folder (LOG_FOLDER, ./logs) writable by the node user
+RUN ln -s dist/server.js . \
+    && mkdir -p logs \
+    && chown node:node logs
 
 USER node
 

@@ -11,3 +11,5 @@ yarn-error.log
 .env
 .env.*
 !.env.template
+# local server log files (LOG_FOLDER, ./logs by default)
+logs

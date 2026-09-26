@@ -7,7 +7,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
 import { GitRevisionPlugin } from 'git-revision-webpack-plugin'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
-import UglifyJsPlugin from 'uglifyjs-webpack-plugin'
+import TerserPlugin from 'terser-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
 
 import { v4 as uuidv4 } from 'uuid'
@@ -137,22 +137,19 @@ const webPackConfig = {
     proxy: [
       {
         // Proxy all server-served routes:
-        context: ['/img', '/geo', '/api', '/auth', '/socket.io', 'sockjs-node'],
+        context: ['/img', '/geo', '/api', '/auth', '/socket.io'],
         target: 'http://localhost:9090',
       },
       {
-        context: ['/socket.io', 'sockjs-node'],
+        context: ['/socket.io'],
         target: 'ws://localhost:9090',
         ws: true,
       },
-      // Proxy root to server to mirror the server routes (goes to /app/home currently)
+      // Proxy root to server to mirror the server routes (goes to /app/home currently);
+      // any other path is served index.html by historyApiFallback
       {
-        context: '/',
+        context: (path) => path === '/',
         target: 'http://localhost:9090',
-
-        bypass(req) {
-          return req.path !== '/' ? '/index.html' : undefined
-        },
       },
     ],
     compress: false,
@@ -207,13 +204,13 @@ const webPackConfig = {
   plugins,
   optimization: {
     minimizer: [
-      new UglifyJsPlugin({
+      new TerserPlugin({
         parallel: true,
-        uglifyOptions: {
+        extractComments: false,
+        terserOptions: {
           compress: true,
-          output: { comments: false },
+          format: { comments: false },
         },
-        sourceMap: true,
       }),
       new OptimizeCSSAssetsPlugin({}),
     ],
