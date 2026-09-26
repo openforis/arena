@@ -1,3 +1,25 @@
+diff --git a/dist/lib/tiles/creator/tileCreator.js b/dist/lib/tiles/creator/tileCreator.js
+index 08579fba6af231d7b1069e3ed1be37ea66c88124..7e6a711b68fbc9dc8aa44fc5806206e4ff306657 100644
+--- a/dist/lib/tiles/creator/tileCreator.js
++++ b/dist/lib/tiles/creator/tileCreator.js
+@@ -63,7 +63,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.TileCreator = void 0;
+-var fileType = __importStar(require("file-type"));
++// file-type (ESM only since v17) is loaded lazily with a dynamic import (see addTile)
+ var proj4_1 = __importDefault(require("proj4"));
+ var projectTile_1 = __importDefault(require("./projectTile"));
+ var tileBoundingBoxUtils_1 = require("../tileBoundingBoxUtils");
+@@ -170,7 +170,7 @@ var TileCreator = /** @class */ (function () {
+             var type, tile, i, p;
+             return __generator(this, function (_a) {
+                 switch (_a.label) {
+-                    case 0: return [4 /*yield*/, (typeof tileData === 'string' ? fileType.fromFile(tileData) : fileType.fromBuffer(tileData))];
++                    case 0: return [4 /*yield*/, import('file-type').then(function (fileType) { return typeof tileData === 'string' ? fileType.fileTypeFromFile(tileData) : fileType.fileTypeFromBuffer(tileData); })];
+                     case 1:
+                         type = _a.sent();
+                         return [4 /*yield*/, imageUtils_1.ImageUtils.getImage(tileData, type.mime)];
 diff --git a/dist/lib/tiles/imageUtils.js b/dist/lib/tiles/imageUtils.js
 index 5830f5d57893636d98b7a19e270a2625727d4f39..bc0fd18db1f4d0eb952d5f106acd192973f5d210 100644
 --- a/dist/lib/tiles/imageUtils.js

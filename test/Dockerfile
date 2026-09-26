@@ -4,20 +4,20 @@
 
 FROM node:24.11.1 AS test
 
-# Install git and netcat, PM2 and cross-env
+# Install git, netcat and PM2 (cross-env is a project dependency)
 RUN apt-get update; \
     apt-get install -y git netcat-openbsd; \
     apt-get autoremove; apt-get autoclean; \
-    npm install pm2 cross-env -g
+    npm install -g --ignore-scripts pm2@7.0.4
 
 WORKDIR /app
 
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/
 
-# Install the dependencies and the browser used by the e2e tests (Playwright Test, version pinned by the lockfile)
+# Install the dependencies and the browser used by the e2e tests (Playwright CLI version locked by yarn.lock)
 RUN yarn install --ignore-scripts --frozen-lockfile; \
-    yarn playwright install --with-deps chromium
+    ./node_modules/.bin/playwright install --with-deps chromium
 
 COPY .git /app/.git
 RUN git reset --hard; yarn build:server:dev

@@ -235,6 +235,7 @@
     "istanbul-lib-processinfo/uuid": "^11.1.1",
     "node-notifier/uuid": "^11.1.1",
     "sockjs/uuid": "^11.1.1",
+    "@ngageoint/geopackage/file-type": "^21.3.1",
     "@ngageoint/geopackage/image-size": "^2.0.4"
   },
   "arenaClientPackages": {
