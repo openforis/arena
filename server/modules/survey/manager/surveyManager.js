@@ -309,14 +309,15 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
   const surveyCycles = Survey.getCycleKeys(
     backup ? { ...surveyDb, props: ObjectUtils.getPropsAndPropsDraftCombined(surveyDb) } : surveyDb
   )
-  const [nodeDefs, dependencies, categories, taxonomies] = await Promise.all([
-    NodeDefManager.fetchNodeDefsBySurveyId(
-      { surveyId, surveyCycles, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
-      client
-    ),
-    fetchDependencies(surveyId, client),
-    CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft }, client),
-    TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft }, client),
+  const [nodeDefs, dependencies, categories, taxonomies] = await DbUtils.runQueries(client, [
+    () =>
+      NodeDefManager.fetchNodeDefsBySurveyId(
+        { surveyId, surveyCycles, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
+        client
+      ),
+    () => fetchDependencies(surveyId, client),
+    () => CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft }, client),
+    () => TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft }, client),
   ])
 
   let survey = A.pipe(
