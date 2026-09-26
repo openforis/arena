@@ -151,7 +151,10 @@ export default class TaxonomyImportManager {
       }
     }
 
-    await Promise.all(predefinedTaxaToInsert.map((predefinedTaxon) => this.addTaxonToUpdateBuffer(predefinedTaxon)))
+    // one at a time: adding a taxon can run queries in the import transaction and flush the update buffer
+    for (const predefinedTaxon of predefinedTaxaToInsert) {
+      await this.addTaxonToUpdateBuffer(predefinedTaxon)
+    }
 
     await this.batchPersisterInsert.flush()
     await this.batchPersisterUpdate.flush()

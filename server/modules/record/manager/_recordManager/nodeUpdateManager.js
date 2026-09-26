@@ -16,6 +16,7 @@ import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProv
 import * as NodeRepository from '../../repository/nodeRepository'
 import * as FileRepository from '../../repository/fileRepository'
 import * as RecordFileManager from '../recordFileManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 const logger = Log.getLogger('NodeUpdateManager')
 
@@ -62,8 +63,9 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
     const nodesDependent = Record.getDependentCodeAttributes(node)(record)
 
     if (!A.isEmpty(nodesDependent)) {
-      const nodesClearedArray = await Promise.all(
-        nodesDependent.map((nodeDependent) => {
+      const nodesClearedArray = await DbUtils.runQueries(
+        t,
+        nodesDependent.map((nodeDependent) => () => {
           const nodeDefDependent = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeDependent))(survey)
 
           return NodeDef.isMultiple(nodeDefDependent)

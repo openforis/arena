@@ -29,6 +29,7 @@ import * as FileRepository from '../repository/fileRepository'
 import * as NodeRepository from '../repository/nodeRepository'
 import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 // ==== CREATE
 
@@ -344,9 +345,10 @@ export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepT
       },
       client
     )
-    await Promise.all(
-      recordsSummaryToMove.map((record) =>
-        RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t)
+    await DbUtils.runQueries(
+      t,
+      recordsSummaryToMove.map(
+        (record) => () => RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t)
       )
     )
     return { count: recordsSummaryToMove.length }

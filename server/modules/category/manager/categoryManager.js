@@ -17,6 +17,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
 
 import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import {
   publishSurveySchemaTableProps,
@@ -170,9 +171,10 @@ export const validateCategories = async (survey, client = db) => {
     client
   )
 
-  const categoriesValidated = await Promise.all(
-    Object.keys(categories).map((categoryUuid) =>
-      _validateCategoryFromCategories({ survey, categories, categoryUuid }, client)
+  const categoriesValidated = await DbUtils.runQueries(
+    client,
+    Object.keys(categories).map(
+      (categoryUuid) => () => _validateCategoryFromCategories({ survey, categories, categoryUuid }, client)
     )
   )
   return ObjectUtils.toUuidIndexedObj(categoriesValidated)
@@ -190,11 +192,14 @@ const _insertLevelInTransaction = async ({
   backup,
   t,
 }) => {
-  const [level] = await Promise.all([
-    CategoryRepository.insertLevel({ surveyId, level: levelParam, backup, client: t }),
-    markSurveyDraft(surveyId, t),
+  const [level] = await DbUtils.runQueries(t, [
+    () => CategoryRepository.insertLevel({ surveyId, level: levelParam, backup, client: t }),
+    () => markSurveyDraft(surveyId, t),
     ...(addLogs
-      ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelInsert, levelParam, system, t)]
+      ? [
+          () =>
+            ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelInsert, levelParam, system, t),
+        ]
       : []),
   ])
   return {
@@ -215,14 +220,15 @@ export const insertCategory = async (
   client = db
 ) =>
   client.tx(async (t) => {
-    const [categoryDb] = await Promise.all([
-      CategoryRepository.insertCategory({ surveyId, category, backup, client: t }),
-      ...Category.getLevelsArray(category).map((level) =>
-        _insertLevelInTransaction({ user, surveyId, level, system: true, addLogs, validate, backup, t })
+    const [categoryDb] = await DbUtils.runQueries(t, [
+      () => CategoryRepository.insertCategory({ surveyId, category, backup, client: t }),
+      ...Category.getLevelsArray(category).map(
+        (level) => () =>
+          _insertLevelInTransaction({ user, surveyId, level, system: true, addLogs, validate, backup, t })
       ),
-      markSurveyDraft(surveyId, t),
+      () => markSurveyDraft(surveyId, t),
       ...(addLogs
-        ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryInsert, category, system, t)]
+        ? [() => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryInsert, category, system, t)]
         : []),
     ])
 
@@ -282,9 +288,9 @@ export const cloneCategoryFromSurvey = async (
       [ActivityLog.keysContent.uuid]: sourceCategoryUuid,
       [ActivityLog.keysContent.categoryName]: categoryName,
     }
-    await Promise.all([
-      markSurveyDraft(targetSurveyId, t),
-      ActivityLogRepository.insert(user, targetSurveyId, ActivityLog.type.categoryInsert, logContent, false, t),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(targetSurveyId, t),
+      () => ActivityLogRepository.insert(user, targetSurveyId, ActivityLog.type.categoryInsert, logContent, false, t),
     ])
 
     return _validateCategory({ surveyId: targetSurveyId, categoryUuid: sourceCategoryUuid }, t)
@@ -299,10 +305,10 @@ export const insertItem = async (user, surveyId, categoryUuid, itemParam, client
     )
     const itemToInsert = CategoryItem.assocProp({ key: CategoryItem.keysProps.index, value: itemsCountPrev })(itemParam)
     const logContent = { ...itemToInsert, [ActivityLog.keysContent.categoryUuid]: categoryUuid }
-    const [item] = await Promise.all([
-      CategoryRepository.insertItem(surveyId, itemToInsert, t),
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemInsert, logContent, false, t),
+    const [item] = await DbUtils.runQueries(t, [
+      () => CategoryRepository.insertItem(surveyId, itemToInsert, t),
+      () => markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemInsert, logContent, false, t),
     ])
     const itemUuid = CategoryItem.getUuid(item)
     const category = await _afterItemUpdate({ surveyId, categoryUuid, itemUuid, prevItem: item }, t)
@@ -321,10 +327,10 @@ export const insertItem = async (user, surveyId, categoryUuid, itemParam, client
 export const insertItems = async (user, surveyId, items, client = db) =>
   client.tx(async (t) => {
     const activityLogs = items.map((item) => ActivityLog.newActivity(ActivityLog.type.categoryItemInsert, item, true))
-    await Promise.all([
-      CategoryRepository.insertItems({ surveyId, items }, t),
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insertMany(user, surveyId, activityLogs, t),
+    await DbUtils.runQueries(t, [
+      () => CategoryRepository.insertItems({ surveyId, items }, t),
+      () => markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insertMany(user, surveyId, activityLogs, t),
     ])
   })
 
@@ -366,38 +372,39 @@ const allCategoryRelatedTables = ['category', 'category_level', 'category_item']
 
 export const publishProps = async (surveyId, langsDeleted, client = db) =>
   client.tx(async (t) =>
-    Promise.all([
-      ...allCategoryRelatedTables.map((table) => publishSurveySchemaTableProps(surveyId, table, t)),
-      CategoryRepository.markCategoriesPublishedBySurveyId(surveyId, t),
-      ...langsDeleted.map((langDeleted) => CategoryRepository.deleteItemLabels(surveyId, langDeleted, t)),
+    DbUtils.runQueries(t, [
+      ...allCategoryRelatedTables.map((table) => () => publishSurveySchemaTableProps(surveyId, table, t)),
+      () => CategoryRepository.markCategoriesPublishedBySurveyId(surveyId, t),
+      ...langsDeleted.map((langDeleted) => () => CategoryRepository.deleteItemLabels(surveyId, langDeleted, t)),
     ])
   )
 
 export const unpublishProps = async (surveyId, client = db) =>
   client.tx(async (t) =>
-    Promise.all([
-      ...allCategoryRelatedTables.map((table) => unpublishSurveySchemaTableProps(surveyId, table, t)),
-      CategoryRepository.markCategoriesUnpublishedBySurveyId(surveyId, t),
+    DbUtils.runQueries(t, [
+      ...allCategoryRelatedTables.map((table) => () => unpublishSurveySchemaTableProps(surveyId, table, t)),
+      () => CategoryRepository.markCategoriesUnpublishedBySurveyId(surveyId, t),
     ])
   )
 
 export const updateCategoryProp = async ({ user, surveyId, categoryUuid, key, value, system = false }, client = db) =>
   client.tx(async (t) => {
-    await Promise.all([
-      CategoryRepository.updateCategoryProp(surveyId, categoryUuid, key, value, t),
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.categoryPropUpdate,
-        {
-          [ActivityLog.keysContent.uuid]: categoryUuid,
-          [ActivityLog.keysContent.key]: key,
-          [ActivityLog.keysContent.value]: value,
-        },
-        system,
-        t
-      ),
+    await DbUtils.runQueries(t, [
+      () => CategoryRepository.updateCategoryProp(surveyId, categoryUuid, key, value, t),
+      () => markSurveyDraft(surveyId, t),
+      () =>
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.categoryPropUpdate,
+          {
+            [ActivityLog.keysContent.uuid]: categoryUuid,
+            [ActivityLog.keysContent.key]: key,
+            [ActivityLog.keysContent.value]: value,
+          },
+          system,
+          t
+        ),
     ])
     const validateLevels = false
     const validateItems = [Category.keysProps.itemExtraDef].includes(key)
@@ -449,22 +456,23 @@ export const updateCategoryItemExtraDefItem = async (
 
 export const updateLevelProp = async (user, surveyId, categoryUuid, levelUuid, key, value, client = db) =>
   client.tx(async (t) => {
-    const [level] = await Promise.all([
-      CategoryRepository.updateLevelProp(surveyId, levelUuid, key, value, t),
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.categoryLevelPropUpdate,
-        {
-          [ActivityLog.keysContent.uuid]: levelUuid,
-          [ActivityLog.keysContent.categoryUuid]: categoryUuid,
-          [ActivityLog.keysContent.key]: key,
-          [ActivityLog.keysContent.value]: value,
-        },
-        false,
-        t
-      ),
+    const [level] = await DbUtils.runQueries(t, [
+      () => CategoryRepository.updateLevelProp(surveyId, levelUuid, key, value, t),
+      () => markSurveyDraft(surveyId, t),
+      () =>
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.categoryLevelPropUpdate,
+          {
+            [ActivityLog.keysContent.uuid]: levelUuid,
+            [ActivityLog.keysContent.categoryUuid]: categoryUuid,
+            [ActivityLog.keysContent.key]: key,
+            [ActivityLog.keysContent.value]: value,
+          },
+          false,
+          t
+        ),
     ])
 
     return { level, category: await _validateCategory({ surveyId, categoryUuid, validateItems: false }, t) }
@@ -488,14 +496,15 @@ export const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key
   client.tx(async (t) => {
     const prevItem = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: itemUuid, draft: true }, t)
     const item = await CategoryRepository.updateItemProp(surveyId, itemUuid, key, value, t)
-    await Promise.all([
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insertMany(
-        user,
-        surveyId,
-        [_newCategoryItemUpdateLogActivity(categoryUuid, item, key, value, false)],
-        t
-      ),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(surveyId, t),
+      () =>
+        ActivityLogRepository.insertMany(
+          user,
+          surveyId,
+          [_newCategoryItemUpdateLogActivity(categoryUuid, item, key, value, false)],
+          t
+        ),
     ])
     const shouldValidate = [CategoryItem.keysProps.code, CategoryItem.keysProps.extra].includes(key)
     const categoryUpdated = shouldValidate
@@ -510,10 +519,10 @@ export const updateItemsProps = async (user, surveyId, categoryUuid, items, clie
     const logActivities = items.map((item) =>
       _newCategoryItemUpdateLogActivity(categoryUuid, item, CategoryItem.keys.props, CategoryItem.getProps(item), true)
     )
-    await Promise.all([
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
-      CategoryRepository.updateItemsProps({ surveyId, items }, t),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
+      () => CategoryRepository.updateItemsProps({ surveyId, items }, t),
     ])
   })
 
@@ -544,10 +553,10 @@ export const updateItemsIndex = async ({ user, surveyId, categoryUuid, indexByUu
         )
       }
     }
-    await Promise.all([
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
-      CategoryRepository.updateItemsProps({ surveyId, items: itemsUpdated }, t),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
+      () => CategoryRepository.updateItemsProps({ surveyId, items: itemsUpdated }, t),
     ])
   })
 
@@ -618,8 +627,9 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
     // update levels name
     const levels = Category.getLevelsArray(category)
 
-    const levelsUpdated = await Promise.all(
-      levels.map(async (level, index) => {
+    const levelsUpdated = await DbUtils.runQueries(
+      t,
+      levels.map((level, index) => async () => {
         const levelNameNew = `level_${index + 1}`
         await CategoryRepository.updateLevelProp(
           surveyId,
@@ -633,16 +643,17 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
     )
     categoryUpdated = Category.assocLevelsArray(levelsUpdated)(categoryUpdated)
 
-    await Promise.all([
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.categoryConvertToReportingData,
-        { [ActivityLog.keysContent.uuid]: categoryUuid },
-        false,
-        t
-      ),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(surveyId, t),
+      () =>
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.categoryConvertToReportingData,
+          { [ActivityLog.keysContent.uuid]: categoryUuid },
+          false,
+          t
+        ),
     ])
     return categoryUpdated
   })
@@ -699,16 +710,17 @@ export const convertCategoryToGeoPackage = async ({ user, surveyId, categoryUuid
       return category
     }
 
-    await Promise.all([
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.categoryConvertToGeoPackage,
-        { [ActivityLog.keysContent.uuid]: categoryUuid },
-        false,
-        t
-      ),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(surveyId, t),
+      () =>
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.categoryConvertToGeoPackage,
+          { [ActivityLog.keysContent.uuid]: categoryUuid },
+          false,
+          t
+        ),
     ])
     return categoryUpdated
   })
@@ -750,16 +762,17 @@ export const convertCategoryToSamplingPointData = async (
 
     await _addLocationItemExtraDefIfMissing({ surveyId, categoryUuid, category: categoryUpdated, locked }, t)
 
-    await Promise.all([
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.categoryConvertToSamplingPointData,
-        { [ActivityLog.keysContent.uuid]: categoryUuid },
-        false,
-        t
-      ),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(surveyId, t),
+      () =>
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.categoryConvertToSamplingPointData,
+          { [ActivityLog.keysContent.uuid]: categoryUuid },
+          false,
+          t
+        ),
     ])
     return _validateCategory({ surveyId, categoryUuid }, t)
   })
@@ -774,9 +787,9 @@ export const deleteCategory = async (user, surveyId, categoryUuid, client = db) 
       [ActivityLog.keysContent.categoryName]: Category.getName(category),
     }
 
-    await Promise.all([
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryDelete, logContent, false, t),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryDelete, logContent, false, t),
     ])
 
     return null
@@ -792,9 +805,9 @@ export const deleteLevel = async (user, surveyId, categoryUuid, levelUuid, clien
       [ActivityLog.keysContent.categoryUuid]: categoryUuid,
     }
 
-    await Promise.all([
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelDelete, logContent, false, t),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelDelete, logContent, false, t),
     ])
 
     return _validateCategory({ surveyId, categoryUuid }, t)
@@ -820,9 +833,9 @@ export const deleteLevelsEmptyByCategory = async (user, surveyId, category, clie
     const logActivities = levelUuidsDeleted.map((uuid) =>
       ActivityLog.newActivity(ActivityLog.type.categoryLevelDelete, { [ActivityLog.keysContent.uuid]: uuid }, true)
     )
-    await Promise.all([
-      ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
-      markSurveyDraft(surveyId, t),
+    await DbUtils.runQueries(t, [
+      () => ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
+      () => markSurveyDraft(surveyId, t),
     ])
     const levelsUpdated = A.reject((level) => A.includes(CategoryLevel.getUuid(level), levelUuidsDeleted))(levels)
     return Category.assocLevelsArray(levelsUpdated)(category)
@@ -845,11 +858,11 @@ export const replaceLevels = async (user, surveyId, category, levelNamesNew, cli
       Category.newLevel(category, { [CategoryLevel.keysProps.name]: levelName }, index)
     )
     const logContent = { [ActivityLog.keysContent.uuid]: categoryUuid }
-    await Promise.all([
-      CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelsDelete, logContent, true, t),
-      ...levelsNew.map((level) => _insertLevelInTransaction({ user, surveyId, level, system: true, t })),
-      markSurveyDraft(surveyId, t),
+    await DbUtils.runQueries(t, [
+      () => CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelsDelete, logContent, true, t),
+      ...levelsNew.map((level) => () => _insertLevelInTransaction({ user, surveyId, level, system: true, t })),
+      () => markSurveyDraft(surveyId, t),
     ])
     return Category.assocLevelsArray(levelsNew)(category)
   })
@@ -899,13 +912,13 @@ export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client 
       }
     }
 
-    await Promise.all([
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemDelete, logContent, false, t),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemDelete, logContent, false, t),
       ...(itemsToUpdate.length > 0
         ? [
-            ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
-            CategoryRepository.updateItemsProps({ surveyId, items: itemsToUpdate }, t),
+            () => ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
+            () => CategoryRepository.updateItemsProps({ surveyId, items: itemsToUpdate }, t),
           ]
         : []),
     ])
@@ -923,9 +936,9 @@ export const deleteItems = async ({ user, surveyId, categoryUuid, items }, t = d
     }
     return ActivityLog.newActivity(ActivityLog.type.categoryItemDelete, logContent)
   })
-  await Promise.all([
-    markSurveyDraft(surveyId, t),
-    ActivityLogRepository.insertMany(user, surveyId, activities, t),
-    CategoryRepository.deleteItems(surveyId, items.map(CategoryItem.getUuid), t),
+  await DbUtils.runQueries(t, [
+    () => markSurveyDraft(surveyId, t),
+    () => ActivityLogRepository.insertMany(user, surveyId, activities, t),
+    () => CategoryRepository.deleteItems(surveyId, items.map(CategoryItem.getUuid), t),
   ])
 }

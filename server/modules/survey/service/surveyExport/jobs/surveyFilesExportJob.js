@@ -3,6 +3,7 @@ import * as SurveyFile from '@core/survey/surveyFile'
 import Job from '@server/job/job'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { ExportFile } from '../exportFile'
+import * as DbUtils from '@server/db/dbUtils'
 
 const SURVEY_FILE_TYPES_TO_EXPORT = [
   SurveyFile.SurveyFileType.preloadedMapLayer,
@@ -22,8 +23,11 @@ export default class SurveyFilesExportJob extends Job {
   async execute() {
     const { archive, surveyId } = this.context
 
-    const fileSummariesByType = await Promise.all(
-      SURVEY_FILE_TYPES_TO_EXPORT.map((type) => SurveyFileService.fetchFileSummariesByType({ surveyId, type }, this.tx))
+    const fileSummariesByType = await DbUtils.runQueries(
+      this.tx,
+      SURVEY_FILE_TYPES_TO_EXPORT.map(
+        (type) => () => SurveyFileService.fetchFileSummariesByType({ surveyId, type }, this.tx)
+      )
     )
     const fileSummaries = fileSummariesByType.flat()
 

@@ -261,12 +261,13 @@ export const createBulkUpdateValues = ({ columnSet, values }) => pgp.helpers.val
  * Queries are run in parallel only when the client is the connection pool: in a task or a transaction they share
  * the same connection, where queries cannot run concurrently (deprecated by pg, removed in pg@9), so they are run
  * one after the other.
- * @param {pgPromise.IDatabase|pgPromise.ITask} client - The db client (pool, task or transaction).
+ * @param {pgPromise.IDatabase|pgPromise.ITask} [client] - The db client (pool, task or transaction); when not specified,
+ * the queries are expected to use the connection pool.
  * @param {Array<function(): Promise<object>>} queryFns - Functions running the queries.
  * @returns {Promise<Array<object>>} - The results of the queries.
  */
 export const runQueries = async (client, queryFns) => {
-  if (client === db) {
+  if (!client || client === db) {
     return Promise.all(queryFns.map((queryFn) => queryFn()))
   }
   const results = []

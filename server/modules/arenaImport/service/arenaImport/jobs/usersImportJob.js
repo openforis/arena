@@ -9,6 +9,7 @@ import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupR
 import * as UserInvitationsRepository from '@server/modules/user/repository/userInvitationRepository'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
+import * as DbUtils from '@server/db/dbUtils'
 
 const _associateToGroup = async ({ userUuid, groupName }, client) => {
   const group = await AuthGroupRepository.fetchGroupByName({ name: groupName }, client)
@@ -127,8 +128,9 @@ export default class UsersImportJob extends Job {
       users.push(this.user)
     }
 
-    const insertedUsers = await Promise.all(
-      users.map(async (user) => insertUser({ user, surveyId, survey, arenaSurveyFileZip, arenaSurvey }, this.tx))
+    const insertedUsers = await DbUtils.runQueries(
+      this.tx,
+      users.map((user) => async () => insertUser({ user, surveyId, survey, arenaSurveyFileZip, arenaSurvey }, this.tx))
     )
     // map of user uuids in the db by user uuid in the zip file being imported (users could be already inserted in the db with a different uuid)
     const newUserUuidByOldUuid = users.reduce(

@@ -16,6 +16,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 const logger = Log.getLogger('NodeDefManager')
 
@@ -64,7 +65,7 @@ const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cycles
       const { uuid: descendantUuid, parentUuid } = nodeDefDescendantUpdated
 
       // add db update to batch
-      batchUpdates.push(
+      batchUpdates.push(() =>
         NodeDefRepository.updateNodeDefProps(
           { surveyId, nodeDefUuid: descendantUuid, parentUuid, props: { [NodeDef.propKeys.cycles]: cyclesUpdated } },
           client
@@ -74,7 +75,7 @@ const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cycles
     })
 
   // perform updates in batch
-  await client.batch(batchUpdates)
+  await DbUtils.runQueries(client, batchUpdates)
 
   return nodeDefsUpdated
 }
@@ -269,12 +270,12 @@ export const updateNodeDefProps = async (
     }
 
     // persist changes in db
-    await t.batch([
-      ...Object.values(nodeDefsUpdated).map((nodeDefToUpdate) =>
-        _persistNodeDefLayout({ surveyId, nodeDef: nodeDefToUpdate }, t)
+    await DbUtils.runQueries(t, [
+      ...Object.values(nodeDefsUpdated).map(
+        (nodeDefToUpdate) => () => _persistNodeDefLayout({ surveyId, nodeDef: nodeDefToUpdate }, t)
       ),
-      ...(markSurveyAsDraft ? [markSurveyDraft(surveyId, t)] : []),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t),
+      ...(markSurveyAsDraft ? [() => markSurveyDraft(surveyId, t)] : []),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t),
     ])
 
     return nodeDefsUpdated
@@ -321,7 +322,7 @@ const updateDescendantsLayout = async ({ survey, nodeDefSource, nodeDefUpdated, 
 
     const descendantUuid = NodeDef.getUuid(nodeDefDescendant)
 
-    batchUpdates.push(
+    batchUpdates.push(() =>
       NodeDefRepository.updateNodeDefProps(
         {
           surveyId,
@@ -337,7 +338,7 @@ const updateDescendantsLayout = async ({ survey, nodeDefSource, nodeDefUpdated, 
 
   // Perform all descendant updates in batch
   if (batchUpdates.length > 0) {
-    await t.batch(batchUpdates)
+    await DbUtils.runQueries(t, batchUpdates)
   }
   return nodeDefsUpdatedByUuid
 }
@@ -455,9 +456,15 @@ export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) 
 
   if (!A.isEmpty(langsDeleted)) {
     // delete labels
-    await Promise.all(langsDeleted.map((lang) => NodeDefRepository.deleteNodeDefsLabels(surveyId, lang, client)))
+    await DbUtils.runQueries(
+      client,
+      langsDeleted.map((lang) => () => NodeDefRepository.deleteNodeDefsLabels(surveyId, lang, client))
+    )
     // delete descriptions
-    await Promise.all(langsDeleted.map((lang) => NodeDefRepository.deleteNodeDefsDescriptions(surveyId, lang, client)))
+    await DbUtils.runQueries(
+      client,
+      langsDeleted.map((lang) => () => NodeDefRepository.deleteNodeDefsDescriptions(surveyId, lang, client))
+    )
     // delete validation messages
     await NodeDefRepository.deleteNodeDefsValidationMessageLabels(surveyId, langsDeleted, client)
   }

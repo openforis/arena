@@ -16,6 +16,7 @@ import { TableChain } from '@common/model/db'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ChainValidator from '@common/analysis/chainValidator'
 
+import * as DbUtils from '@server/db/dbUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
@@ -67,19 +68,20 @@ export const updateChainValidation = async ({ surveyId, chainUuid, validation },
 
 export const updateChainStatusExec = async ({ user, surveyId, chainUuid, statusExec }) =>
   DB.client.tx(async (tx) => {
-    const promises = [
-      ChainRepository.updateChain(
-        { surveyId, chainUuid, fields: { [TableChain.columnSet.statusExec]: statusExec }, dateExecuted: true },
-        tx
-      ),
+    const queryFns = [
+      () =>
+        ChainRepository.updateChain(
+          { surveyId, chainUuid, fields: { [TableChain.columnSet.statusExec]: statusExec }, dateExecuted: true },
+          tx
+        ),
     ]
     if (statusExec === Chain.statusExec.success) {
       const type = ActivityLog.type.chainStatusExecSuccess
       const content = { [ActivityLog.keysContent.uuid]: chainUuid }
-      promises.push(ActivityLogRepository.insert(user, surveyId, type, content, false, tx))
+      queryFns.push(() => ActivityLogRepository.insert(user, surveyId, type, content, false, tx))
     }
 
-    return Promise.all(promises)
+    return DbUtils.runQueries(tx, queryFns)
   })
 
 // ====== MIGRATION
@@ -90,7 +92,7 @@ const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
   const chainUuid = Chain.getUuid(chain)
   const propsToUpdate = Chain.getPropsDiff(chain)(chainDb)
   // activity log for each updated prop
-  const promises = Object.entries(propsToUpdate).map(([key, value]) => {
+  const queryFns = Object.entries(propsToUpdate).map(([key, value]) => () => {
     const content = { [ActivityLog.keysContent.uuid]: chainUuid, key, value }
     const type = ActivityLog.type.chainPropUpdate
     return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
@@ -101,9 +103,9 @@ const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
     [TableChain.columnSet.validation]: Chain.getValidation(chain),
   }
   const params = { surveyId, chainUuid, dateModified: true, fields }
-  promises.push(ChainRepository.updateChain(params, client))
+  queryFns.push(() => ChainRepository.updateChain(params, client))
 
-  return Promise.all(promises)
+  return DbUtils.runQueries(client, queryFns)
 }
 
 // ====== PERSIST
@@ -147,9 +149,9 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
       [ActivityLog.keysContent.uuid]: chainUuid,
       [ActivityLog.keysContent.labels]: Chain.getLabels(deletedChain),
     }
-    return tx.batch([
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainDelete, content, false, tx),
-      markSurveyDraft(surveyId, tx),
+    return DbUtils.runQueries(tx, [
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainDelete, content, false, tx),
+      () => markSurveyDraft(surveyId, tx),
     ])
   })
 
@@ -436,10 +438,10 @@ export const cloneChainFromSurvey = async (
       survey: updatedTargetSurvey,
     })
 
-    await tx.batch([
-      updateChainValidation({ surveyId, chainUuid: newChainUuid, validation }, tx),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, insertedChain, false, tx),
-      markSurveyDraft(surveyId, tx),
+    await DbUtils.runQueries(tx, [
+      () => updateChainValidation({ surveyId, chainUuid: newChainUuid, validation }, tx),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, insertedChain, false, tx),
+      () => markSurveyDraft(surveyId, tx),
     ])
 
     return Chain.assocValidation(validation)(insertedChain)

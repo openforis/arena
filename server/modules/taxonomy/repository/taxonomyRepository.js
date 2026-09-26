@@ -76,11 +76,12 @@ export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, cli
  * @param {pgPromise.IDatabase} [params.client] - The database client.
  * @returns {Array.<Promise>} - The result promises.
  */
+// returns the functions running the queries (to be run with DbUtils.runQueries)
 const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, backup = false, client = db }) =>
   A.pipe(
     A.values,
     A.flatten,
-    A.map((vernacularName) => {
+    A.map((vernacularName) => () => {
       const { props, propsDraft } = TaxonVernacularName.getPropsAndPropsDraft({ backup })(vernacularName)
       return client.none(
         `INSERT INTO 
@@ -99,24 +100,29 @@ const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, 
 const insertTaxon = async ({ surveyId, taxon, backup = false, client = db }) => {
   const { props, propsDraft } = Taxon.getPropsAndPropsDraft({ backup })(taxon)
 
-  return client.batch([
-    client.none(
-      `INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.taxon (uuid, taxonomy_uuid, props, props_draft)
+  // insert the taxon first: the vernacular names reference it
+  await client.none(
+    `INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.taxon (uuid, taxonomy_uuid, props, props_draft)
        VALUES ($1, $2, $3, $4)`,
-      [Taxon.getUuid(taxon), Taxon.getTaxonomyUuid(taxon), props, propsDraft]
-    ),
-    ..._insertOrUpdateVernacularNames({
+    [Taxon.getUuid(taxon), Taxon.getTaxonomyUuid(taxon), props, propsDraft]
+  )
+  await DbUtils.runQueries(
+    client,
+    _insertOrUpdateVernacularNames({
       surveyId,
       taxonUuid: Taxon.getUuid(taxon),
       vernacularNames: Taxon.getVernacularNames(taxon),
       backup,
       client,
-    }),
-  ])
+    })
+  )
 }
 
 export const insertTaxa = async ({ surveyId, taxa, backup = false, client = db }) =>
-  client.batch(taxa.map((taxon) => insertTaxon({ surveyId, taxon, backup, client })))
+  DbUtils.runQueries(
+    client,
+    taxa.map((taxon) => () => insertTaxon({ surveyId, taxon, backup, client }))
+  )
 
 export const cloneTaxonomyFromSurvey = async ({ sourceSurveyId, targetSurveyId, taxonomyUuid }, client = db) => {
   const sourceSchema = Schemata.getSchemaSurvey(sourceSurveyId)
@@ -626,8 +632,8 @@ export const updateTaxonProps = async ({ surveyId, taxon }, client = db) =>
   )
 
 export const updateTaxonAndVernacularNames = async (surveyId, taxon, client = db) =>
-  client.batch([
-    updateTaxonProps({ surveyId, taxon }, client),
+  DbUtils.runQueries(client, [
+    () => updateTaxonProps({ surveyId, taxon }, client),
     ..._insertOrUpdateVernacularNames({
       surveyId,
       taxonUuid: Taxon.getUuid(taxon),
@@ -637,10 +643,16 @@ export const updateTaxonAndVernacularNames = async (surveyId, taxon, client = db
   ])
 
 export const updateTaxa = async (surveyId, taxa, client = db) =>
-  client.batch(taxa.map((taxon) => updateTaxonAndVernacularNames(surveyId, taxon, client)))
+  DbUtils.runQueries(
+    client,
+    taxa.map((taxon) => () => updateTaxonAndVernacularNames(surveyId, taxon, client))
+  )
 
 export const updateTaxaProps = async ({ surveyId, taxa }, client = db) =>
-  client.batch(taxa.map((taxon) => updateTaxonProps({ surveyId, taxon }, client)))
+  DbUtils.runQueries(
+    client,
+    taxa.map((taxon) => () => updateTaxonProps({ surveyId, taxon }, client))
+  )
 
 // Finds taxa whose "extra" prop data has a pending draft change (i.e. props_draft has an "extra" key
 // whose value differs from the published one) - used to detect taxonomies whose extra prop values

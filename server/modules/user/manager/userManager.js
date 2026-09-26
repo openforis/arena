@@ -22,6 +22,7 @@ import * as UserResetPasswordRepository from '@server/modules/user/repository/us
 import * as UserAccessRequestRepository from '@server/modules/user/repository/userAccessRequestRepository'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as UserInvitationManager from './userInvitationManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 const { groupNames } = AuthGroup
 
@@ -186,14 +187,16 @@ const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserU
 
   const authGroups = await AuthGroupRepository.fetchUsersGroups(usersUuids, t)
 
-  return Promise.all(
-    users.map((user) =>
-      _attachAuthGroupsAndInvitationToUser({
-        user,
-        invitationsByUserUuid,
-        userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
-        t,
-      })
+  return DbUtils.runQueries(
+    t,
+    users.map(
+      (user) => () =>
+        _attachAuthGroupsAndInvitationToUser({
+          user,
+          invitationsByUserUuid,
+          userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
+          t,
+        })
     )
   )
 }
@@ -400,16 +403,17 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, survey }, c
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
     const surveyUuid = Survey.getUuid(Survey.getSurveyInfo(survey))
-    return Promise.all([
-      AuthGroupRepository.deleteUserGroupBySurveyAndUser(surveyId, userUuidToRemove, t),
-      ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.userRemove,
-        { [ActivityLog.keysContent.uuid]: userUuidToRemove },
-        false,
-        t
-      ),
-      UserInvitationManager.updateRemovedDate({ surveyUuid, userUuidToRemove }, t),
+    return DbUtils.runQueries(t, [
+      () => AuthGroupRepository.deleteUserGroupBySurveyAndUser(surveyId, userUuidToRemove, t),
+      () =>
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.userRemove,
+          { [ActivityLog.keysContent.uuid]: userUuidToRemove },
+          false,
+          t
+        ),
+      () => UserInvitationManager.updateRemovedDate({ surveyUuid, userUuidToRemove }, t),
     ])
   })
