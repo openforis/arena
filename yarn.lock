@@ -14858,7 +14858,7 @@ __metadata:
     swagger-ui-express: "npm:^5.0.1"
     terser-webpack-plugin: "npm:^5.6.0"
     to-snake-case: "npm:^1.0.0"
-    typescript: "npm:^6"
+    typescript: "npm:~6.0.3"
     use-supercluster: "npm:^1.2.0"
     uuid: "npm:^14.0.2"
     webpack: "npm:^5.111.1"
@@ -19259,7 +19259,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^6":
+"typescript@npm:~6.0.3":
   version: 6.0.3
   resolution: "typescript@npm:6.0.3"
   bin:
@@ -19269,7 +19269,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^6#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A~6.0.3#optional!builtin<compat/typescript>":
   version: 6.0.3
   resolution: "typescript@patch:typescript@npm%3A6.0.3#optional!builtin<compat/typescript>::version=6.0.3&hash=5786d5"
   bin:
