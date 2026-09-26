@@ -66,8 +66,15 @@ export default class NodeDefEntityBuilder extends NodeDefBuilder {
     this.childBuilders.forEach((childBuilder) => {
       const { parentCodeDefName } = childBuilder
       if (!parentCodeDefName) return
-      const childDef = findChildDef(getChildBuilderName(childBuilder))
-      childDef.props[NodeDef.propKeys.parentCodeDefUuid] = NodeDef.getUuid(findChildDef(parentCodeDefName))
+      const childName = getChildBuilderName(childBuilder)
+      const childDef = findChildDef(childName)
+      const parentCodeDef = findChildDef(parentCodeDefName)
+      if (!parentCodeDef) {
+        throw new Error(
+          `parent code attribute '${parentCodeDefName}' of '${childName}' not found: it must be a sibling of it in entity '${NodeDef.getName(def)}'`
+        )
+      }
+      childDef.props[NodeDef.propKeys.parentCodeDefUuid] = NodeDef.getUuid(parentCodeDef)
     })
 
     let surveyUpdated = Survey.mergeNodeDefs(defs)(survey)

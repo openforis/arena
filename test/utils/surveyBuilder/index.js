@@ -140,7 +140,7 @@ class SurveyBuilder {
         await SurveyUtils.publishSurvey(this.user, surveyId, client)
       }
     } catch (error) {
-      await SurveyManager.deleteSurvey(surveyId)
+      await SurveyManager.deleteSurvey(surveyId, {}, client)
       throw error
     }
 
