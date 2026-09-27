@@ -18,7 +18,7 @@ type QueryNodeDef = ArenaNodeDef<NodeDefType>
  * @param {object} nodeDef - The node definition.
  * @returns {boolean} - True if the node def can be used as a dimension.
  */
-export const isDimensionEligible = (nodeDef: QueryNodeDef): boolean =>
+const isDimensionEligible = (nodeDef: QueryNodeDef): boolean =>
   NodeDef.isBoolean(nodeDef) || NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isKey(nodeDef)
 
 /**
@@ -27,7 +27,7 @@ export const isDimensionEligible = (nodeDef: QueryNodeDef): boolean =>
  * @param {object} nodeDef - The node definition.
  * @returns {boolean} - True if the node def can be used as a measure.
  */
-export const isMeasureEligible = (nodeDef: QueryNodeDef): boolean =>
+const isMeasureEligible = (nodeDef: QueryNodeDef): boolean =>
   (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) && !NodeDef.isKey(nodeDef)
 
 /**
@@ -36,7 +36,7 @@ export const isMeasureEligible = (nodeDef: QueryNodeDef): boolean =>
  * @param {object} nodeDef - The node definition.
  * @returns {boolean} - True if the entity can be queried.
  */
-export const isQueryableEntity = (nodeDef: QueryNodeDef): boolean =>
+const isQueryableEntity = (nodeDef: QueryNodeDef): boolean =>
   NodeDef.isEntity(nodeDef) && (NodeDef.isRoot(nodeDef) || !NodeDef.isSingleEntity(nodeDef))
 
 const isInCycle = (cycle: string | null) => (nodeDef: QueryNodeDef) => !cycle || NodeDef.isInCycle(cycle)(nodeDef)
@@ -48,7 +48,7 @@ const isInCycle = (cycle: string | null) => (nodeDef: QueryNodeDef) => !cycle ||
  * @param {string} [params.cycle] - The survey cycle.
  * @returns {object[]} - The queryable entity defs.
  */
-export const getQueryableEntityDefs = ({ survey, cycle = null }: { survey: ArenaSurvey; cycle?: string | null }) => {
+const getQueryableEntityDefs = ({ survey, cycle = null }: { survey: ArenaSurvey; cycle?: string | null }) => {
   const result: QueryNodeDef[] = []
   const stack: QueryNodeDef[] = [Survey.getNodeDefRoot(survey)]
   while (stack.length > 0) {
@@ -124,7 +124,7 @@ const getAttributeDefsInEntityAndAncestors = ({ survey, entityDef, cycle, includ
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @returns {object[]} - The attribute defs.
  */
-export const getRawAttributeDefs = ({ survey, entityDef, cycle = null, includeAnalysis = false }) =>
+const getRawAttributeDefs = ({ survey, entityDef, cycle = null, includeAnalysis = false }) =>
   getAttributeDefsInEntityAndAncestors({ survey, entityDef, cycle, includeAnalysis, includeMultiple: true })
 
 /**
@@ -136,7 +136,7 @@ export const getRawAttributeDefs = ({ survey, entityDef, cycle = null, includeAn
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @returns {object[]} - The attribute defs.
  */
-export const getDimensionAttributeDefs = ({ survey, entityDef, cycle = null, includeAnalysis = false }) =>
+const getDimensionAttributeDefs = ({ survey, entityDef, cycle = null, includeAnalysis = false }) =>
   getAttributeDefsInEntityAndAncestors({ survey, entityDef, cycle, includeAnalysis, includeMultiple: false }).filter(
     isDimensionEligible
   )
@@ -151,7 +151,7 @@ export const getDimensionAttributeDefs = ({ survey, entityDef, cycle = null, inc
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @returns {object[]} - The attribute defs.
  */
-export const getMeasureAttributeDefs = ({ survey, entityDef, cycle = null, includeAnalysis = false }) =>
+const getMeasureAttributeDefs = ({ survey, entityDef, cycle = null, includeAnalysis = false }) =>
   Survey.getNodeDefChildrenSorted({ nodeDef: entityDef, cycle, includeAnalysis })(survey).filter(
     (nodeDef) =>
       NodeDef.isAttribute(nodeDef) &&
@@ -159,3 +159,13 @@ export const getMeasureAttributeDefs = ({ survey, entityDef, cycle = null, inclu
       isInCycle(cycle)(nodeDef) &&
       isMeasureEligible(nodeDef)
   )
+
+export const QueryNodeDefs = {
+  isDimensionEligible,
+  isMeasureEligible,
+  isQueryableEntity,
+  getQueryableEntityDefs,
+  getRawAttributeDefs,
+  getDimensionAttributeDefs,
+  getMeasureAttributeDefs,
+}
