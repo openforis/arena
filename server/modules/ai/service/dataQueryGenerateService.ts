@@ -200,6 +200,10 @@ export const toQuery = ({
         ? entityDef
         : resolveNames({ names: [attribute], candidates: measureCandidates, kind: 'measure' })[0]
       if (!measureDef) return
+      if (functions.length === 0) {
+        errors.push(`measure "${attribute}" has no aggregate functions`)
+        return
+      }
 
       const allowedFunctions = isEntityFrequency ? [Query.DEFAULT_AGGREGATE_FUNCTIONS.cnt] : aggregateFunctions
       const invalidFunctions = functions.filter((fn) => !allowedFunctions.includes(fn))
@@ -247,6 +251,7 @@ export const toQuery = ({
   }
 
   // sort
+  const sortOrders: string[] = Object.values(SortCriteria.orders)
   const sort = aiResult.sort.reduce((acc, { attribute, order }) => {
     const sortDef = sortableDefs.find((nodeDef) => NodeDef.getName(nodeDef) === attribute)
     if (!sortDef) {
@@ -255,9 +260,13 @@ export const toQuery = ({
       )
       return acc
     }
-    const sortCriteria = SortCriteria.assocOrder(
-      order === SortCriteria.orders.desc ? SortCriteria.orders.desc : SortCriteria.orders.asc
-    )(
+    // missing order means ascending; any other unexpected value is rejected (and fed back to the model)
+    const orderNormalized = StringUtils.isBlank(order) ? SortCriteria.orders.asc : order.trim().toLowerCase()
+    if (!sortOrders.includes(orderNormalized)) {
+      errors.push(`invalid sort order "${order}" for "${attribute}"; allowed: ${sortOrders.join(', ')}`)
+      return acc
+    }
+    const sortCriteria = SortCriteria.assocOrder(orderNormalized)(
       SortCriteria.assocVariable({
         variable: ColumnNodeDef.getColumnName(sortDef),
         label: NodeDef.getLabel(sortDef, lang),

@@ -106,13 +106,18 @@ export const useDataQueriesPanel = () => {
     dispatch(DataExplorerActions.setQuerySummaryDraft(null))
     const prefill = async () => {
       const querySummary = { props: querySummaryDraft }
-      // validate against the existing queries (name uniqueness)
-      const existingQuerySummaries = await API.fetchDataQuerySummaries({ surveyId })
-      const validation = await DataQuerySummaryValidator.validate({
-        dataQuerySummary: querySummary,
-        dataQuerySummaries: existingQuerySummaries,
-      })
-      const editedQuerySummaryNext = Validation.assocValidation(validation)(querySummary)
+      let editedQuerySummaryNext = querySummary
+      try {
+        // validate against the existing queries (name uniqueness)
+        const existingQuerySummaries = await API.fetchDataQuerySummaries({ surveyId })
+        const validation = await DataQuerySummaryValidator.validate({
+          dataQuerySummary: querySummary,
+          dataQuerySummaries: existingQuerySummaries,
+        })
+        editedQuerySummaryNext = Validation.assocValidation(validation)(querySummary)
+      } catch {
+        // validation not available: prefill anyway, it will be validated again on save
+      }
       setState((statePrev) => ({ ...statePrev, editedQuerySummary: editedQuerySummaryNext }))
     }
     prefill()

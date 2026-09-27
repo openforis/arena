@@ -124,6 +124,29 @@ describe('AI data query generation', () => {
       )
     })
 
+    test('measure without aggregate functions', () => {
+      const { query, errors } = convert({
+        dimensions: ['tree_species'],
+        measures: [{ attribute: 'dbh', functions: [] }],
+      })
+      expect(query).toBeNull()
+      expect(errors).toEqual(['measure "dbh" has no aggregate functions'])
+    })
+
+    test('sort order', () => {
+      const convertWithSortOrder = (order) =>
+        convert({
+          mode: Query.modes.raw,
+          attributes: ['dbh'],
+          sort: [{ attribute: 'dbh', order }],
+        })
+      expect(SortCriteria.isOrderAsc(Query.getSort(convertWithSortOrder(null).query)[0])).toBe(true)
+      expect(SortCriteria.isOrderDesc(Query.getSort(convertWithSortOrder(' DESC ').query)[0])).toBe(true)
+      expect(convertWithSortOrder('descending').errors).toEqual([
+        'invalid sort order "descending" for "dbh"; allowed: asc, desc',
+      ])
+    })
+
     test('missing selection', () => {
       expect(convert({}).errors).toEqual(
         expect.arrayContaining([
