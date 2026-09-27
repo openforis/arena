@@ -6,18 +6,19 @@
  * Shared between the Data Explorer node defs selectors (webapp) and the AI data query generator (server)
  * so that both always agree on what makes a valid query.
  */
+import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-type NodeDefAny = any
-type SurveyAny = any
+type QueryNodeDef = ArenaNodeDef<NodeDefType>
 
 /**
  * Returns true if the given node def can be used as a dimension in an aggregate query.
  * @param {object} nodeDef - The node definition.
  * @returns {boolean} - True if the node def can be used as a dimension.
  */
-export const isDimensionEligible = (nodeDef: NodeDefAny): boolean =>
+export const isDimensionEligible = (nodeDef: QueryNodeDef): boolean =>
   NodeDef.isBoolean(nodeDef) || NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isKey(nodeDef)
 
 /**
@@ -26,7 +27,7 @@ export const isDimensionEligible = (nodeDef: NodeDefAny): boolean =>
  * @param {object} nodeDef - The node definition.
  * @returns {boolean} - True if the node def can be used as a measure.
  */
-export const isMeasureEligible = (nodeDef: NodeDefAny): boolean =>
+export const isMeasureEligible = (nodeDef: QueryNodeDef): boolean =>
   (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) && !NodeDef.isKey(nodeDef)
 
 /**
@@ -35,10 +36,10 @@ export const isMeasureEligible = (nodeDef: NodeDefAny): boolean =>
  * @param {object} nodeDef - The node definition.
  * @returns {boolean} - True if the entity can be queried.
  */
-export const isQueryableEntity = (nodeDef: NodeDefAny): boolean =>
+export const isQueryableEntity = (nodeDef: QueryNodeDef): boolean =>
   NodeDef.isEntity(nodeDef) && (NodeDef.isRoot(nodeDef) || !NodeDef.isSingleEntity(nodeDef))
 
-const isInCycle = (cycle: string | null) => (nodeDef: NodeDefAny) => !cycle || NodeDef.isInCycle(cycle)(nodeDef)
+const isInCycle = (cycle: string | null) => (nodeDef: QueryNodeDef) => !cycle || NodeDef.isInCycle(cycle)(nodeDef)
 
 /**
  * Returns the entities that can be selected as the main entity of a query, in hierarchical order.
@@ -47,9 +48,9 @@ const isInCycle = (cycle: string | null) => (nodeDef: NodeDefAny) => !cycle || N
  * @param {string} [params.cycle] - The survey cycle.
  * @returns {object[]} - The queryable entity defs.
  */
-export const getQueryableEntityDefs = ({ survey, cycle = null }: { survey: SurveyAny; cycle?: string | null }) => {
-  const result: NodeDefAny[] = []
-  const stack: NodeDefAny[] = [Survey.getNodeDefRoot(survey)]
+export const getQueryableEntityDefs = ({ survey, cycle = null }: { survey: ArenaSurvey; cycle?: string | null }) => {
+  const result: QueryNodeDef[] = []
+  const stack: QueryNodeDef[] = [Survey.getNodeDefRoot(survey)]
   while (stack.length > 0) {
     const nodeDef = stack.shift()
     if (isQueryableEntity(nodeDef) && isInCycle(cycle)(nodeDef)) {
@@ -95,7 +96,7 @@ const getAttributeDefsInSingleEntities = ({ survey, entityDef, cycle, includeAna
  * @returns {object[]} - The attribute defs.
  */
 const getAttributeDefsInEntityAndAncestors = ({ survey, entityDef, cycle, includeAnalysis, includeMultiple }) => {
-  const result: NodeDefAny[] = []
+  const result: QueryNodeDef[] = []
   let entityDefCurrent = entityDef
   while (entityDefCurrent) {
     result.push(

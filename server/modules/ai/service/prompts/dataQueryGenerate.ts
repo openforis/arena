@@ -169,7 +169,9 @@ export const buildDataQueryGeneratePrompt = ({
   const surveyName = Survey.getName(surveyInfo)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
 
-  let prompt = `Survey: ${pq(surveyName, 200)}${surveyLabel ? ` label=${pq(surveyLabel, 200)}` : ''}
+  const surveyLabelPart = surveyLabel ? ` label=${pq(surveyLabel, 200)}` : ''
+
+  let prompt = `Survey: ${pq(surveyName, 200)}${surveyLabelPart}
 
 Schema (entities in hierarchical order, each followed by its attributes):
 ${buildSchemaDescription({ survey, cycle, lang, includeAnalysis })}
