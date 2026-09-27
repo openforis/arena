@@ -27,6 +27,7 @@ import { State, useButtonBar } from './store'
 import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
 import ButtonManageQueries from './ButtonManageQueries'
+import { ButtonAiGenerateQuery } from './ButtonAiGenerateQuery'
 import { ButtonGroupDisplayType } from './ButtonGroupDisplayType'
 
 const { modes } = Query
@@ -127,6 +128,8 @@ const ButtonBar = (props) => {
           label="dataView:dataQuery.showCodes"
         />
       )}
+
+      <ButtonAiGenerateQuery disabled={appSaving || modeEdit} state={state} Actions={Actions} />
 
       <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
 

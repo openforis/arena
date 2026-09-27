@@ -18,6 +18,18 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     },
   },
   dataQuery: {
+    ai: {
+      button: 'Ask AI',
+      buttonTitle: 'Generate a query from a description using AI',
+      title: 'Generate a query with AI',
+      hint: 'Describe the data you want to see; the AI will select the entity, the attributes (or dimensions and measures), the filter and the sorting. You can review and save the generated query.',
+      placeholder: 'e.g. number of trees grouped by species',
+      generate: 'Generate',
+      generating: 'Generating…',
+      replaceQueryConfirmMessage: 'Replace the current query with the generated one?',
+      generatedSuccessfully:
+        'Query generated: {{explanation}} Check the result and save the query if you want to keep it.',
+    },
     deleteConfirmMessage: 'Delete the query "{{name}}"?',
     displayType: {
       chart: 'Chart',

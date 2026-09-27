@@ -20,14 +20,15 @@ export const useDataQueriesPanel = () => {
 
   const query = DataExplorerSelectors.useQuery()
   const selectedQuerySummaryUuid = DataExplorerSelectors.useSelectedQuerySummaryUuid()
+  const querySummaryDraft = DataExplorerSelectors.useQuerySummaryDraft()
 
-  const [state, setState] = useState({
+  const [state, setState] = useState(() => ({
     editedQuerySummary: {},
     fetchedQuerySummary: null,
     dataQuerySummaries: [],
     queriesRequestedAt: Date.now(),
     validating: false,
-  })
+  }))
   const { editedQuerySummary, fetchedQuerySummary, dataQuerySummaries, queriesRequestedAt, validating } = state
 
   const draft =
@@ -93,10 +94,29 @@ export const useDataQueriesPanel = () => {
   // on load, fetch queries and set selected query in form (if any)
   useEffect(() => {
     if (selectedQuerySummaryUuid) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- state is set after the fetch completes
       fetchAndSetEditedQuerySummary({ querySummaryUuid: selectedQuerySummaryUuid })
     }
     fetchDataQuerySummaries()
   }, [fetchAndSetEditedQuerySummary, fetchDataQuerySummaries, selectedQuerySummaryUuid])
+
+  // prefill the form with the summary props suggested by the AI query generator (if any)
+  useEffect(() => {
+    if (!querySummaryDraft || selectedQuerySummaryUuid) return
+    dispatch(DataExplorerActions.setQuerySummaryDraft(null))
+    const prefill = async () => {
+      const querySummary = { props: querySummaryDraft }
+      // validate against the existing queries (name uniqueness)
+      const existingQuerySummaries = await API.fetchDataQuerySummaries({ surveyId })
+      const validation = await DataQuerySummaryValidator.validate({
+        dataQuerySummary: querySummary,
+        dataQuerySummaries: existingQuerySummaries,
+      })
+      const editedQuerySummaryNext = Validation.assocValidation(validation)(querySummary)
+      setState((statePrev) => ({ ...statePrev, editedQuerySummary: editedQuerySummaryNext }))
+    }
+    prefill()
+  }, [dispatch, querySummaryDraft, selectedQuerySummaryUuid, surveyId])
 
   const isTableRowActive = useCallback(
     (row) => DataQuerySummaries.getUuid(row) === selectedQuerySummaryUuid,

@@ -1,0 +1,27 @@
+.ai-generate-query-popup {
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__hint {
+    font-size: 0.85rem;
+    color: var(--colorGrey700);
+  }
+
+  &__textarea {
+    width: 100%;
+    min-height: 5rem;
+    resize: vertical;
+    font: inherit;
+    padding: 0.5rem;
+    border: 1px solid var(--colorGrey500);
+    border-radius: 4px;
+  }
+
+  &__error {
+    color: #c62828;
+    font-size: 0.9rem;
+  }
+}
