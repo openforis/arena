@@ -1,4 +1,5 @@
 import * as ObjectUtils from '@core/objectUtils'
+import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
@@ -8,7 +9,7 @@ const { updateTablesFromUpdates } = DataTableUpdateRepository
 const generateRdbUpdates = ({ survey, record, nodesArray }) => {
   // include ancestor nodes (used to find the correct rdb table to update)
   const nodesAndDependentsAndAncestors = nodesArray.reduce((nodesAcc, node) => {
-    Record.visitAncestorsAndSelf({ node, visitor: (n) => (nodesAcc[n.uuid] = n) })(record)
+    Record.visitAncestorsAndSelf({ node, visitor: (n) => (nodesAcc[Node.getIId(n)] = n) })(record)
     return nodesAcc
   }, {})
   const rdbUpdates = DataTableUpdateRepository.generateRdbUpdates({

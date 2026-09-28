@@ -20,7 +20,7 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
     })
 
   const nodesSelect = `${getNodeSelectQuery(nodeDefAncestorMultipleEntity)}
-    WHERE n.node_def_uuid = $/nodeDefUuid/
+    WHERE nd.uuid = $/nodeDefUuid/
     ORDER BY n.id`
 
   if (NodeDef.isAttribute(nodeDef)) {

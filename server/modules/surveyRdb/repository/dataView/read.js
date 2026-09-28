@@ -123,7 +123,7 @@ const _prepareSelectFields = ({
   } else {
     queryBuilder.select(
       ...alwaysIncludedFields,
-      viewDataNodeDef.columnUuid,
+      viewDataNodeDef.columnIId,
       // selected node def columns
       ...nodeDefCols.flatMap(_selectFieldsByNodeDefType({ viewDataNodeDef, streamMode })),
       // Add ancestor internal IDs columns

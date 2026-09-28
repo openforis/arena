@@ -79,25 +79,26 @@ export class RdbUpdatesForTable {
   constructor({ nodeDefUuid, nodeDefHierarchyLevel }) {
     this.nodeDefUuid = nodeDefUuid
     this.nodeDefHierarchyLevel = nodeDefHierarchyLevel
-    this.updatesByRowUuid = {}
+    this.updatesByRowKey = {}
   }
 
   get size() {
-    return Object.keys(this.updatesByRowUuid).length
+    return Object.keys(this.updatesByRowKey).length
   }
 
   getAll() {
-    return Object.values(this.updatesByRowUuid)
+    return Object.values(this.updatesByRowKey)
   }
 
   addUpdate(update) {
-    const { rowUuid } = update
-    const oldUpdate = this.updatesByRowUuid[rowUuid]
+    // node internal ids are unique only inside the same record (updates of different records can be batched together)
+    const { recordUuid, nodeIId } = update
+    const rowKey = `${recordUuid}_${nodeIId}`
+    const oldUpdate = this.updatesByRowKey[rowKey]
     if (oldUpdate) {
       this._mergeUpdates(oldUpdate, update)
-      this.updatesByRowUuid[rowUuid] = oldUpdate
     } else {
-      this.updatesByRowUuid[rowUuid] = update
+      this.updatesByRowKey[rowKey] = update
     }
   }
 

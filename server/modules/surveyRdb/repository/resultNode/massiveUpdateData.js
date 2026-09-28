@@ -18,10 +18,10 @@ export default class MassiveUpdateData extends MassiveUpdate {
     })
     const columnNames = Object.keys(nodeDefsByColumnName)
 
-    // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
+    // Adding '?' in front of a column name means it is only for a WHERE condition (record_uuid and i_id)
     const cols = [
       `?${TableDataNodeDef.columnSet.recordUuid}`,
-      `?${TableDataNodeDef.columnSet.uuid}`,
+      `?${TableDataNodeDef.columnSet.iId}`,
       ...columnNames.map((columnName) => {
         const nodeDef = nodeDefsByColumnName[columnName]
         return new Column({
@@ -38,7 +38,9 @@ export default class MassiveUpdateData extends MassiveUpdate {
         schema: tableNode.schema,
         table: tableNode.name,
         cols,
-        where: ` WHERE t.uuid::uuid = v.uuid::uuid`,
+        // node internal ids are unique only inside the same record
+        where: ` WHERE t.${TableDataNodeDef.columnSet.recordUuid}::uuid = v.${TableDataNodeDef.columnSet.recordUuid}::uuid
+          AND t.${TableDataNodeDef.columnSet.iId}::integer = v.${TableDataNodeDef.columnSet.iId}::integer`,
       },
       tx
     )

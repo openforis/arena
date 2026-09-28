@@ -53,7 +53,7 @@ export default {
       '$t(appErrors:record.errorUpdating); error evaluating expression in node {{nodeDefName}}: {{details}}',
   },
   recordPrintableExport: {
-    missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',
+    missingEntityParams: 'Current page export requires entityDefUuid and entityNodeIId',
     entityNotFound: 'Entity not found for the specified export',
     missingServerUrl: 'Public server URL is required when exporting with a QR code',
     qrTokenMismatch: 'Could not finalize QR code export; please retry',

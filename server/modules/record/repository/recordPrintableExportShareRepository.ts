@@ -9,7 +9,7 @@ export type RecordPrintableExportShareRow = {
   survey_id: number
   record_uuid: string
   entity_def_uuid: string
-  entity_node_uuid: string
+  entity_node_i_id: number
   access_token: string
   file_uuid: string
   content_type: string
@@ -30,11 +30,11 @@ export const fetchBySurveyRecordEntityNode = async (
   {
     surveyId,
     recordUuid,
-    entityNodeUuid,
+    entityNodeIId,
   }: {
     surveyId: number
     recordUuid: string
-    entityNodeUuid: string
+    entityNodeIId: number
   },
   client: DbClient = db
 ): Promise<RecordPrintableExportShareRow | null> =>
@@ -44,8 +44,8 @@ export const fetchBySurveyRecordEntityNode = async (
     FROM ${TABLE_NAME}
     WHERE survey_id = $1
       AND record_uuid = $2
-      AND entity_node_uuid = $3`,
-    [surveyId, recordUuid, entityNodeUuid]
+      AND entity_node_i_id = $3`,
+    [surveyId, recordUuid, entityNodeIId]
   )
 
 /**
@@ -55,11 +55,11 @@ export const fetchBySurveyRecordEntityNodeForUpdate = async (
   {
     surveyId,
     recordUuid,
-    entityNodeUuid,
+    entityNodeIId,
   }: {
     surveyId: number
     recordUuid: string
-    entityNodeUuid: string
+    entityNodeIId: number
   },
   client: DbClient = db
 ): Promise<RecordPrintableExportShareRow | null> =>
@@ -69,9 +69,9 @@ export const fetchBySurveyRecordEntityNodeForUpdate = async (
     FROM ${TABLE_NAME}
     WHERE survey_id = $1
       AND record_uuid = $2
-      AND entity_node_uuid = $3
+      AND entity_node_i_id = $3
     FOR UPDATE`,
-    [surveyId, recordUuid, entityNodeUuid]
+    [surveyId, recordUuid, entityNodeIId]
   )
 
 /**
@@ -97,7 +97,7 @@ export const insert = async (
     surveyId,
     recordUuid,
     entityDefUuid,
-    entityNodeUuid,
+    entityNodeIId,
     accessToken,
     fileUuid,
     contentType,
@@ -106,7 +106,7 @@ export const insert = async (
     surveyId: number
     recordUuid: string
     entityDefUuid: string
-    entityNodeUuid: string
+    entityNodeIId: number
     accessToken: string
     fileUuid: string
     contentType: string
@@ -117,11 +117,11 @@ export const insert = async (
   client.one(
     `
     INSERT INTO ${TABLE_NAME}
-      (survey_id, record_uuid, entity_def_uuid, entity_node_uuid, access_token, file_uuid, content_type, expires_at)
+      (survey_id, record_uuid, entity_def_uuid, entity_node_i_id, access_token, file_uuid, content_type, expires_at)
     VALUES
       ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`,
-    [surveyId, recordUuid, entityDefUuid, entityNodeUuid, accessToken, fileUuid, contentType, expiresAt]
+    [surveyId, recordUuid, entityDefUuid, entityNodeIId, accessToken, fileUuid, contentType, expiresAt]
   )
 
 /**

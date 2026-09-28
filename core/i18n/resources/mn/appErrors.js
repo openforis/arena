@@ -58,7 +58,7 @@ export default {
       'Бичлэг шинэчлэхэд алдаа гарлаа; {{nodeDefName}} зангилааны илэрхийллийг үнэлэхэд алдаа гарлаа: {{details}}',
   },
   recordPrintableExport: {
-    missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',
+    missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeIId шаардлагатай',
     entityNotFound: 'Заасан экспортын нэгж олдсонгүй',
     missingServerUrl: 'QR кодтой экспорт хийхэд нийтийн серверийн URL шаардлагатай',
     qrTokenMismatch: 'QR кодтой экспортыг дуусгаж чадсангүй; дахин оролдоно уу',

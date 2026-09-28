@@ -176,7 +176,7 @@ export const updateRecordStep = async ({ surveyId, recordUuid, stepId, tableDef 
     `UPDATE ${Schemata.getSchemaSurveyRdb(surveyId)}.${tableName}
     SET ${TableDataNodeDef.columnSet.recordStep} = $/stepId/
     WHERE ${TableDataNodeDef.columnSet.recordUuid} = $/recordUuid/
-    RETURNING uuid`,
+    RETURNING ${TableDataNodeDef.columnSet.recordUuid}`,
     { recordUuid, stepId }
   )
 }

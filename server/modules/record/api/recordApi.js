@@ -447,7 +447,7 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record/:recordUuid/export/docx', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
+      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeIId, orientation, includeQrCode } =
         Request.getParams(req)
       const serverUrl = Request.getPublicServerUrl(req)
 
@@ -458,7 +458,7 @@ export const init = (app) => {
         lang,
         exportScope,
         entityDefUuid,
-        entityNodeUuid,
+        entityNodeIId: entityNodeIId ? Number(entityNodeIId) : undefined,
         orientation,
         includeQrCode: includeQrCode === true,
         serverUrl,
@@ -472,7 +472,7 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record/:recordUuid/export/pdf', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
+      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeIId, orientation, includeQrCode } =
         Request.getParams(req)
       const serverUrl = Request.getPublicServerUrl(req)
 
@@ -483,7 +483,7 @@ export const init = (app) => {
         lang,
         exportScope,
         entityDefUuid,
-        entityNodeUuid,
+        entityNodeIId: entityNodeIId ? Number(entityNodeIId) : undefined,
         orientation,
         includeQrCode: includeQrCode === true,
         serverUrl,

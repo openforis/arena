@@ -216,7 +216,9 @@ export const fetch = async ({
     LEFT OUTER JOIN
       ${NodeKeysHierarchyView.getNameWithSchema(surveyId)} n_h
     ON
-      l.content_uuid = n_h.${NodeKeysHierarchyView.columns.nodeIId}
+      -- node internal ids are unique only inside the same record
+      (l.content->>'${ActivityLog.keysContent.recordUuid}')::uuid = n_h.${NodeKeysHierarchyView.columns.recordUuid}
+      AND (l.content->>'${ActivityLog.keysContent.nodeIId}')::integer = n_h.${NodeKeysHierarchyView.columns.nodeIId}
     `
         : ''
     }

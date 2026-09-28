@@ -3,7 +3,7 @@ import { createRecordPrintableExportShareService } from '@server/modules/record/
 const surveyId = 1
 const recordUuid = 'record-uuid'
 const entityDefUuid = 'entity-def-uuid'
-const entityNodeUuid = 'entity-node-uuid'
+const entityNodeIId = 12
 
 describe('record printable export share', () => {
   let database
@@ -51,7 +51,7 @@ describe('record printable export share', () => {
       surveyId,
       recordUuid,
       entityDefUuid,
-      entityNodeUuid,
+      entityNodeIId,
       pdfBuffer: Buffer.from('pdf'),
     })
 
@@ -122,7 +122,7 @@ describe('record printable export share', () => {
       surveyId,
       recordUuid,
       entityDefUuid,
-      entityNodeUuid,
+      entityNodeIId,
       pdfBuffer: Buffer.from('pdf'),
     })
 
@@ -149,7 +149,7 @@ describe('record printable export share', () => {
       surveyId,
       recordUuid,
       entityDefUuid,
-      entityNodeUuid,
+      entityNodeIId,
       pdfBuffer: Buffer.from('pdf'),
     })
 

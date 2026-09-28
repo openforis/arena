@@ -117,7 +117,8 @@ export const keysContent = {
   // Node
   nodeDefUuid: 'nodeDefUuid',
   recordUuid: 'recordUuid',
-  nodeIId: 'nodeIId',
+  // same key used in the node objects: node activities contain (a subset of) the node itself
+  nodeIId: ObjectUtils.keys.iId,
   // User
   groupUuid: 'groupUuid',
   // Analysis
@@ -179,6 +180,7 @@ export const getContentStepFrom = _getContentProp(keysContent.stepFrom)
 export const getContentStepTo = _getContentProp(keysContent.stepTo)
 export const getContentNodeDefUuid = _getContentProp(keysContent.nodeDefUuid)
 export const getContentRecordUuid = _getContentProp(keysContent.recordUuid)
+export const getContentNodeIId = _getContentProp(keysContent.nodeIId)
 // Content props user
 export const getContentGroupUuid = _getContentProp(keysContent.groupUuid)
 // Content props analysis

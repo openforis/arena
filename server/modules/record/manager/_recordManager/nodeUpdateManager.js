@@ -377,7 +377,7 @@ export const deleteNodesByInternalIds = async (
 ) => {
   const nodesDeleted = await NodeRepository.deleteNodesByInternalIds({ surveyId, recordUuid, nodeInternalIds }, tx)
   const activities = nodeInternalIds.map((iId) =>
-    ActivityLog.newActivity(ActivityLog.type.nodeDelete, { iId }, systemActivity)
+    ActivityLog.newActivity(ActivityLog.type.nodeDelete, { recordUuid, iId }, systemActivity)
   )
   await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
   return nodesDeleted
