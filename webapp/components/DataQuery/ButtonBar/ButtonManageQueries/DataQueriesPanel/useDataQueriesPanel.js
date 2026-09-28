@@ -1,26 +1,46 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+import * as A from '@core/arena'
 import { DataQuerySummaries, Objects } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
 import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
+import { useNotifyError } from '@webapp/components/hooks'
 import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
 
+/**
+ * Returns the given name, or the first "name_N" (N = 2, 3, ...) not used by any of the given query summaries.
+ * @param {object} params - The parameters.
+ * @param {string} params.name - The name.
+ * @param {object[]} params.dataQuerySummaries - The existing query summaries.
+ * @returns {string} - The unique name.
+ */
+const toUniqueName = ({ name, dataQuerySummaries }) => {
+  const existingNames = new Set(dataQuerySummaries.map(DataQuerySummaries.getName))
+  let uniqueName = name
+  for (let index = 2; existingNames.has(uniqueName); index++) {
+    uniqueName = `${name}_${index}`
+  }
+  return uniqueName
+}
+
 export const useDataQueriesPanel = () => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
+  const cycle = useSurveyCycleKey()
+  const lang = useSurveyPreferredLang()
+  const notifyError = useNotifyError()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
 
   const query = DataExplorerSelectors.useQuery()
   const selectedQuerySummaryUuid = DataExplorerSelectors.useSelectedQuerySummaryUuid()
-  const querySummaryDraft = DataExplorerSelectors.useQuerySummaryDraft()
 
   const [state, setState] = useState(() => ({
     editedQuerySummary: {},
@@ -28,8 +48,10 @@ export const useDataQueriesPanel = () => {
     dataQuerySummaries: [],
     queriesRequestedAt: Date.now(),
     validating: false,
+    summarizing: false,
   }))
-  const { editedQuerySummary, fetchedQuerySummary, dataQuerySummaries, queriesRequestedAt, validating } = state
+  const { editedQuerySummary, fetchedQuerySummary, dataQuerySummaries, queriesRequestedAt, validating, summarizing } =
+    state
 
   const draft =
     !Objects.isEqual(fetchedQuerySummary, editedQuerySummary) ||
@@ -100,29 +122,6 @@ export const useDataQueriesPanel = () => {
     fetchDataQuerySummaries()
   }, [fetchAndSetEditedQuerySummary, fetchDataQuerySummaries, selectedQuerySummaryUuid])
 
-  // prefill the form with the summary props suggested by the AI query generator (if any)
-  useEffect(() => {
-    if (!querySummaryDraft || selectedQuerySummaryUuid) return
-    dispatch(DataExplorerActions.setQuerySummaryDraft(null))
-    const prefill = async () => {
-      const querySummary = { props: querySummaryDraft }
-      let editedQuerySummaryNext = querySummary
-      try {
-        // validate against the existing queries (name uniqueness)
-        const existingQuerySummaries = await API.fetchDataQuerySummaries({ surveyId })
-        const validation = await DataQuerySummaryValidator.validate({
-          dataQuerySummary: querySummary,
-          dataQuerySummaries: existingQuerySummaries,
-        })
-        editedQuerySummaryNext = Validation.assocValidation(validation)(querySummary)
-      } catch {
-        // validation not available: prefill anyway, it will be validated again on save
-      }
-      setState((statePrev) => ({ ...statePrev, editedQuerySummary: editedQuerySummaryNext }))
-    }
-    prefill()
-  }, [dispatch, querySummaryDraft, selectedQuerySummaryUuid, surveyId])
-
   const isTableRowActive = useCallback(
     (row) => DataQuerySummaries.getUuid(row) === selectedQuerySummaryUuid,
     [selectedQuerySummaryUuid]
@@ -167,6 +166,43 @@ export const useDataQueriesPanel = () => {
       queriesRequestedAt: Date.now(),
     }))
   }, [dispatch, editedQuerySummary, query, surveyId, validateEditedQuerySummary, validating])
+
+  // fills name, label and description (in the preferred language) with the ones suggested by the AI
+  const onAiSuggestSummary = useCallback(async () => {
+    if (summarizing) return
+    setState((statePrev) => ({ ...statePrev, summarizing: true }))
+    try {
+      const { name, label, description } = await API.aiDataQuery.summarize({ surveyId, cycle, lang, query })
+      const querySummaryUpdated = A.pipe(
+        DataQuerySummaries.assocName(toUniqueName({ name, dataQuerySummaries })),
+        DataQuerySummaries.assocLabels({ ...DataQuerySummaries.getLabels(editedQuerySummary), [lang]: label }),
+        DataQuerySummaries.assocDescriptions({
+          ...DataQuerySummaries.getDescriptions(editedQuerySummary),
+          [lang]: description,
+        })
+      )(editedQuerySummary)
+      await setEditedQuerySummary(querySummaryUpdated)
+    } catch (error) {
+      const errorData = error?.response?.data?.error
+      if (errorData?.key) {
+        notifyError({ key: `appErrors:${errorData.key}`, params: errorData.params })
+      } else {
+        notifyError({ key: 'dataView:dataQuery.ai.suggestSummaryFailed', params: { message: error?.message } })
+      }
+    } finally {
+      setState((statePrev) => ({ ...statePrev, summarizing: false }))
+    }
+  }, [
+    cycle,
+    dataQuerySummaries,
+    editedQuerySummary,
+    lang,
+    notifyError,
+    query,
+    setEditedQuerySummary,
+    summarizing,
+    surveyId,
+  ])
 
   const doDelete = useCallback(async () => {
     const querySummaryUuid = DataQuerySummaries.getUuid(editedQuerySummary)
@@ -214,6 +250,7 @@ export const useDataQueriesPanel = () => {
     draft,
     editedQuerySummary,
     isTableRowActive,
+    onAiSuggestSummary,
     onNew,
     onSave,
     onDelete,
@@ -221,6 +258,7 @@ export const useDataQueriesPanel = () => {
     query,
     queriesRequestedAt,
     setEditedQuerySummary,
+    summarizing,
     validating,
   }
 }

@@ -11,8 +11,7 @@
  *      Data Explorer rules (`@common/model/query/queryNodeDefs`); parse and
  *      check the filter expression and the sort criteria.
  *   5. On any failure, retry the prompt ONCE with the errors fed back.
- *   6. Return the query (ready to be set in the Data Explorer) and the
- *      suggested name / label / description to save it as a data query summary.
+ *   6. Return the query (ready to be set in the Data Explorer) and a short explanation of it.
  */
 import { z } from 'zod'
 
@@ -56,9 +55,6 @@ const AiResultSchema = z.object({
     .array(z.object({ attribute: z.string(), order: z.string().nullish() }))
     .nullish()
     .transform((value) => value ?? []),
-  name: z.string().nullish(),
-  label: z.string().nullish(),
-  description: z.string().nullish(),
   explanation: z.string().nullish(),
 })
 
@@ -284,27 +280,14 @@ export const toQuery = ({
 }
 
 /**
- * Normalizes the query name suggested by the model (only lowercase letters, digits and underscores).
- * @param {object} params - The parameters.
- * @param {string} [params.name] - The suggested name.
- * @param {string} [params.label] - The suggested label (used as fallback).
- * @returns {string} - The normalized name.
- */
-const normalizeQueryName = ({ name, label }) => {
-  const source = StringUtils.isNotBlank(name) ? name : (label ?? '')
-  return StringUtils.normalizeName(source).replace(/_+/g, '_').replace(/^_|_$/g, '') || 'ai_query'
-}
-
-/**
  * Generates a Data Explorer query from a natural-language description.
  * @param {object} params - The parameters.
  * @param {object} params.user - Acting user.
  * @param {number} params.surveyId - Survey ID.
  * @param {string} params.cycle - Survey cycle key.
- * @param {string} params.lang - Language used for labels and for the suggested label / description.
+ * @param {string} params.lang - Language used for labels and for the explanation.
  * @param {string} params.description - The user's request in natural language.
- * @returns {Promise<{query: object, summary: {name: string, label: string, description: string}, explanation: string}>}
- *   The generated query and the suggested summary props.
+ * @returns {Promise<{query: object, explanation: string}>} - The generated query and its explanation.
  */
 export const generate = async ({
   user,
@@ -375,13 +358,5 @@ export const generate = async ({
     throw new SystemError('aiDataQueryInvalid', { errors: result.errors.join('; ') })
   }
   const { aiResult, query } = result
-  return {
-    query,
-    summary: {
-      name: normalizeQueryName({ name: aiResult.name, label: aiResult.label }),
-      label: aiResult.label ?? '',
-      description: aiResult.description ?? '',
-    },
-    explanation: aiResult.explanation ?? '',
-  }
+  return { query, explanation: aiResult.explanation ?? '' }
 }

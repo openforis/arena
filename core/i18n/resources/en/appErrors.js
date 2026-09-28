@@ -93,6 +93,8 @@ Try to refresh the page.`,
   aiDataQueryDescriptionMissing: 'Please describe the data you want to see in plain language.',
   aiDataQueryNoEntities: 'This survey has no entities that can be queried.',
   aiDataQueryInvalid: 'The AI could not generate a valid query for this request: {{errors}}',
+  aiDataQueryEmpty: 'Select an entity and some attributes (or dimensions and measures) first.',
+  aiDataQuerySummaryInvalid: 'The AI could not suggest a name and description for this query. Please try again.',
   userCannotDeleteHasMessages:
     'This user cannot be deleted: they authored {{count}} message(s); delete or reassign them first',
   userCannotDeleteLastSystemAdmin: 'This user cannot be deleted: they are the last system administrator',

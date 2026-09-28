@@ -50,8 +50,7 @@ for taxon attributes "<name>" contains the taxon code and "<name>_scientific_nam
 Sort (optional, empty list if not needed): list of { "attribute", "order" } where attribute is one of the
 selected raw attributes (raw mode) or one of the dimensions (aggregate mode) and order is "asc" or "desc".
 
-Also suggest a short query name (lowercase letters, digits and underscores only, max 40 chars), a human readable
-label, a one-sentence description of what the query shows, and a short explanation for the user.
+Also write a short explanation of the query for the user.
 
 Output format (very important):
 Reply with EXACTLY one JSON object, nothing else, in this exact shape:
@@ -63,9 +62,6 @@ Reply with EXACTLY one JSON object, nothing else, in this exact shape:
   "measures": [{ "attribute": "<attribute or entity name>", "functions": ["cnt"] }],
   "filter": "<filter expression>" | null,
   "sort": [{ "attribute": "<attribute name>", "order": "asc" }],
-  "name": "<query_name>",
-  "label": "<query label>",
-  "description": "<query description>",
   "explanation": "<short explanation of the query for the user>"
 }
 - In raw mode "attributes" must contain at least one attribute, "dimensions" and "measures" must be empty.
@@ -75,9 +71,9 @@ Reply with EXACTLY one JSON object, nothing else, in this exact shape:
 
 Example: in a survey with entities cluster / plot / tree, where tree has the attributes species (taxon, [dimension])
 and dbh (decimal, [measure]), the request "number of trees by species" becomes:
-{"entity":"tree","mode":"aggregate","attributes":[],"dimensions":["species"],"measures":[{"attribute":"tree","functions":["cnt"]}],"filter":null,"sort":[],"name":"trees_by_species","label":"Number of trees by species","description":"Number of trees grouped by species.","explanation":"Counts the trees grouped by species."}
+{"entity":"tree","mode":"aggregate","attributes":[],"dimensions":["species"],"measures":[{"attribute":"tree","functions":["cnt"]}],"filter":null,"sort":[],"explanation":"Counts the trees grouped by species."}
 and "average dbh of trees with dbh greater than 10 by plot" becomes:
-{"entity":"tree","mode":"aggregate","attributes":[],"dimensions":["plot_id"],"measures":[{"attribute":"dbh","functions":["avg"]}],"filter":"dbh > 10","sort":[{"attribute":"plot_id","order":"asc"}],"name":"avg_dbh_by_plot","label":"Average DBH by plot","description":"Average DBH of trees with DBH greater than 10, grouped by plot.","explanation":"Averages the DBH of the trees with DBH > 10 for each plot."}`
+{"entity":"tree","mode":"aggregate","attributes":[],"dimensions":["plot_id"],"measures":[{"attribute":"dbh","functions":["avg"]}],"filter":"dbh > 10","sort":[{"attribute":"plot_id","order":"asc"}],"explanation":"Averages the DBH of the trees with DBH > 10 for each plot."}`
 
 const describeAttribute = ({ survey, nodeDef, entityDef, lang, cycle, includeAnalysis }) => {
   const name = NodeDef.getName(nodeDef)
@@ -151,7 +147,7 @@ export const buildSchemaDescription = ({ survey, cycle, lang, includeAnalysis = 
  * @param {object} params - The parameters.
  * @param {object} params.survey - The survey (with node defs).
  * @param {string} params.cycle - The survey cycle.
- * @param {string} params.lang - The language used for the labels (and for the suggested label/description).
+ * @param {string} params.lang - The language used for the labels (and for the explanation).
  * @param {string} params.description - The user's request in natural language.
  * @param {boolean} [params.includeAnalysis] - Whether to include analysis attributes.
  * @param {{message: string}} [params.previousError] - Error from a previous attempt, fed back to the model.
@@ -176,7 +172,7 @@ export const buildDataQueryGeneratePrompt = ({
 Schema (entities in hierarchical order, each followed by its attributes):
 ${buildSchemaDescription({ survey, cycle, lang, includeAnalysis })}
 
-Write "label", "description" and "explanation" in the language with code ${pq(lang, 16)}.
+Write "explanation" in the language with code ${pq(lang, 16)}.
 
 User request: ${pq(description, MAX_DESCRIPTION_IN_PROMPT)}`
 

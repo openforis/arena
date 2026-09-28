@@ -32,6 +32,7 @@ const featureToCategory = {
   activityLogSummary: AiSettingsService.featureCategories.userActivity,
   schemaSummary: AiSettingsService.featureCategories.dataDictionary,
   dataQueryGenerate: AiSettingsService.featureCategories.dataQuery,
+  dataQuerySummarize: AiSettingsService.featureCategories.dataQuery,
 }
 
 const assertFeaturesEnabled = (feature, user) => {

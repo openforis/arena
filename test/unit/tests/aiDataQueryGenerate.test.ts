@@ -12,6 +12,8 @@ import { Query, SortCriteria } from '@common/model/query'
 
 import { toQuery } from '@server/modules/ai/service/dataQueryGenerateService'
 import { buildDataQueryGeneratePrompt } from '@server/modules/ai/service/prompts/dataQueryGenerate'
+import { normalizeQueryName } from '@server/modules/ai/service/dataQuerySummarizeService'
+import { buildDataQuerySummarizePrompt } from '@server/modules/ai/service/prompts/dataQuerySummarize'
 
 import * as DataTest from '../../utils/dataTest'
 import * as SurveyUtils from '../../utils/surveyUtils'
@@ -205,6 +207,44 @@ describe('AI data query generation', () => {
         previousError: { message: 'entity "trees" not found' },
       })
       expect(prompt).toMatch(/The previous answer was not valid: "entity \\"trees\\" not found"/)
+    })
+  })
+
+  describe('buildDataQuerySummarizePrompt', () => {
+    test('describes an aggregate query', () => {
+      const { query } = convert({
+        dimensions: ['tree_species'],
+        measures: [{ attribute: 'tree', functions: ['cnt'] }],
+        filter: 'dbh > 10',
+        sort: [{ attribute: 'tree_species', order: 'desc' }],
+      })
+      const { system, prompt } = buildDataQuerySummarizePrompt({ survey, query, lang })
+      expect(system).toMatch(/"name": "<query_name>"/)
+      expect(prompt).toMatch(/Entity: tree/)
+      expect(prompt).toMatch(/Mode: aggregate/)
+      expect(prompt).toMatch(/Dimensions: tree_species/)
+      expect(prompt).toMatch(/Measures: tree.*: cnt/)
+      expect(prompt).toMatch(/Filter: "dbh > 10"/)
+      expect(prompt).toMatch(/Sort: tree_species desc/)
+      expect(prompt).toMatch(/language with code "en"/)
+    })
+
+    test('describes a raw query', () => {
+      const { query } = convert({ mode: Query.modes.raw, attributes: ['tree_id', 'dbh'] })
+      const { prompt } = buildDataQuerySummarizePrompt({ survey, query, lang })
+      expect(prompt).toMatch(/Mode: raw/)
+      expect(prompt).toMatch(/Attributes: tree_id.*, dbh/)
+      expect(prompt).not.toMatch(/Filter:/)
+      expect(prompt).not.toMatch(/Sort:/)
+    })
+  })
+
+  describe('normalizeQueryName', () => {
+    test('normalizes the suggested name, falling back to the label', () => {
+      expect(normalizeQueryName({ name: 'Trees by Species', label: 'x' })).toBe('trees_by_species')
+      expect(normalizeQueryName({ name: '', label: 'Average DBH' })).toBe('average_dbh')
+      expect(normalizeQueryName({ name: null, label: null })).toBe('ai_query')
+      expect(normalizeQueryName({ name: 'a'.repeat(60) }).length).toBe(40)
     })
   })
 })

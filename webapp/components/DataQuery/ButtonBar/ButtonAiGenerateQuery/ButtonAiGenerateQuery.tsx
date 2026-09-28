@@ -9,7 +9,6 @@ import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEna
 import * as ExpressionParser from '@webapp/components/expression/expressionParser'
 import { useNotifyInfo } from '@webapp/components/hooks'
 import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import type { AiDataQueryGenerateResult } from '@webapp/service/api/ai/dataQuery'
@@ -28,13 +27,12 @@ export const ButtonAiGenerateQuery = (props: Props) => {
 
   const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
   const enabled = useAiFeatureEnabled('dataQuery')
-  const lang = useSurveyPreferredLang()
   const query = DataExplorerSelectors.useQuery()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
   const notifyInfo = useNotifyInfo()
 
   const applyGeneratedQuery = useCallback(
-    ({ query: queryGenerated, summary, explanation }: AiDataQueryGenerateResult) => {
+    ({ query: queryGenerated, explanation }: AiDataQueryGenerateResult) => {
       const filter = Query.getFilter(queryGenerated)
       const queryToApply = filter
         ? Query.assocFilter(ExpressionParser.normalize({ expr: filter, canBeCall: true }))(queryGenerated)
@@ -42,19 +40,11 @@ export const ButtonAiGenerateQuery = (props: Props) => {
 
       dispatch(DataExplorerActions.setSelectedQuerySummaryUuid(null))
       dispatch(DataExplorerActions.setNodeDefsSelectorVisible(true))
-      dispatch(
-        DataExplorerActions.setQuerySummaryDraft({
-          name: summary.name,
-          labels: summary.label ? { [lang]: summary.label } : {},
-          descriptions: summary.description ? { [lang]: summary.description } : {},
-        })
-      )
       onChangeQuery(queryToApply)
-      // open the queries panel (prefilled with the suggested name, label and description) and close the AI popup
-      Actions.togglePanelQueries()
+      Actions.closePanels()
       notifyInfo({ key: 'dataView:dataQuery.ai.generatedSuccessfully', params: { explanation } })
     },
-    [Actions, dispatch, lang, notifyInfo, onChangeQuery]
+    [Actions, dispatch, notifyInfo, onChangeQuery]
   )
 
   const onGenerated = useCallback(
