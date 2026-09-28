@@ -23,10 +23,12 @@ import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
  * @returns {string} - The unique name.
  */
 const toUniqueName = ({ name, dataQuerySummaries }) => {
-  const existingNames = new Set(dataQuerySummaries.map(DataQuerySummaries.getName))
+  const existingNames = new Set(dataQuerySummaries.map((querySummary) => DataQuerySummaries.getName(querySummary)))
   let uniqueName = name
-  for (let index = 2; existingNames.has(uniqueName); index++) {
+  let index = 2
+  while (existingNames.has(uniqueName)) {
     uniqueName = `${name}_${index}`
+    index++
   }
   return uniqueName
 }

@@ -61,16 +61,17 @@ export const describeQuery = ({ survey, query, lang }) => {
   const lines = [`Entity: ${describeNodeDef({ nodeDef: entityDef, lang })}`]
 
   if (Query.isModeAggregate(query)) {
-    lines.push('Mode: aggregate')
-    lines.push(`Dimensions: ${describeNodeDefs(Query.getDimensions(query))}`)
     const measures = findNodeDefs(Query.getMeasuresKeys(query)).map(
       (nodeDef) =>
         `${describeNodeDef({ nodeDef, lang })}: ${Query.getMeasureAggregateFunctions(NodeDef.getUuid(nodeDef))(query).join(', ')}`
     )
-    lines.push(`Measures: ${measures.join('; ')}`)
+    lines.push(
+      'Mode: aggregate',
+      `Dimensions: ${describeNodeDefs(Query.getDimensions(query))}`,
+      `Measures: ${measures.join('; ')}`
+    )
   } else {
-    lines.push('Mode: raw')
-    lines.push(`Attributes: ${describeNodeDefs(Query.getAttributeDefUuids(query))}`)
+    lines.push('Mode: raw', `Attributes: ${describeNodeDefs(Query.getAttributeDefUuids(query))}`)
   }
 
   const filter = Query.getFilter(query)

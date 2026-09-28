@@ -244,7 +244,7 @@ describe('AI data query generation', () => {
       expect(normalizeQueryName({ name: 'Trees by Species', label: 'x' })).toBe('trees_by_species')
       expect(normalizeQueryName({ name: '', label: 'Average DBH' })).toBe('average_dbh')
       expect(normalizeQueryName({ name: null, label: null })).toBe('ai_query')
-      expect(normalizeQueryName({ name: 'a'.repeat(60) }).length).toBe(40)
+      expect(normalizeQueryName({ name: 'a'.repeat(60) })).toHaveLength(40)
     })
   })
 })
