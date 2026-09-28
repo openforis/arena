@@ -1,6 +1,6 @@
 import './WhatsNew.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 
 import * as WhatsNew from '@core/whatsNew/whatsNew'
 

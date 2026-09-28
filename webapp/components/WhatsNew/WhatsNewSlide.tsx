@@ -1,5 +1,3 @@
-import React from 'react'
-
 import * as WhatsNew from '@core/whatsNew/whatsNew'
 
 import { useI18n } from '@webapp/store/system'

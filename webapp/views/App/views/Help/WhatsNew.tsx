@@ -1,7 +1,5 @@
 import './WhatsNew.scss'
 
-import React from 'react'
-
 import { WhatsNewCarousel, useWhatsNewVisibleItems } from '@webapp/components/WhatsNew'
 import { useI18n } from '@webapp/store/system'
 

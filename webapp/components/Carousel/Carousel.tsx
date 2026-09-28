@@ -1,6 +1,6 @@
 import './Carousel.scss'
 
-import React, { useCallback, useState } from 'react'
+import { KeyboardEvent, ReactNode, useCallback, useState } from 'react'
 import classNames from 'classnames'
 import MobileStepper from '@mui/material/MobileStepper'
 
@@ -9,7 +9,7 @@ import { ButtonNext, ButtonPrevious } from '../buttons'
 type CarouselProps<T> = {
   className?: string
   items: T[]
-  renderItem: (item: T, index: number) => React.ReactNode
+  renderItem: (item: T, index: number) => ReactNode
 }
 
 export const Carousel = <T,>(props: CarouselProps<T>) => {
@@ -29,7 +29,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
   // arrow keys navigation, when the Previous or Next button has the focus
   const onButtonKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
+    (event: KeyboardEvent) => {
       if (event.key === 'ArrowLeft') {
         event.preventDefault()
         goToPrevious()

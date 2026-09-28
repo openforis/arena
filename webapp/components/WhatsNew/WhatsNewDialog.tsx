@@ -1,6 +1,6 @@
 import './WhatsNew.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { Button } from '../buttons'
 import { Checkbox } from '../form'
