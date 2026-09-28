@@ -18,6 +18,22 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     },
   },
   dataQuery: {
+    ai: {
+      button: "Demander à l'IA",
+      buttonTitle: "Générer une requête à partir d'une description avec l'IA",
+      title: "Générer une requête avec l'IA",
+      hint: "Décrivez les données que vous souhaitez voir ; l'IA sélectionnera l'entité, les attributs (ou les dimensions et les mesures), le filtre et le tri. Vous pourrez ensuite vérifier la requête générée et l'enregistrer depuis le gestionnaire de requêtes.",
+      placeholder: "ex. nombre d'arbres regroupés par espèce",
+      generate: 'Générer',
+      generating: 'Génération…',
+      replaceQueryConfirmMessage: 'Remplacer la requête actuelle par la requête générée ?',
+      suggestSummary: 'Suggérer un nom et une description',
+      suggestSummaryFailed: 'Impossible de suggérer le nom et la description de la requête : {{message}}',
+      suggestSummaryTitle:
+        "Utiliser l'IA pour suggérer le nom, le libellé et la description de la requête d'après les sélections actuelles",
+      generatedSuccessfully:
+        'Requête générée : {{explanation}} Vérifiez le résultat et enregistrez la requête si vous souhaitez la conserver.',
+    },
     deleteConfirmMessage: 'Supprimer la requête "{{name}}" ?',
     displayType: {
       chart: 'Graphique',

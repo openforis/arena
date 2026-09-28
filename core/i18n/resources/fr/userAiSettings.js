@@ -14,6 +14,8 @@ export default {
     dataDictionaryHint: 'Exports de dictionnaire de donnees rediges par IA.',
     userActivity: 'Activite utilisateur',
     userActivityHint: 'Resumes du journal d activite generes par IA.',
+    dataQuery: 'Requêtes de données',
+    dataQueryHint: "Générer des requêtes de l'Explorateur de données à partir d'une description en langage naturel.",
   },
   providerSection: 'Fournisseur IA',
   currentlyUsing: 'Utilise actuellement : {{source}} - {{provider}} / {{model}}',

@@ -1,4 +1,9 @@
 export default {
+  aiDataQueryDescriptionMissing: 'Үзэхийг хүссэн өгөгдлөө энгийн үгээр тайлбарлана уу.',
+  aiDataQueryEmpty: 'Эхлээд объект болон шинж чанаруудыг (эсвэл хэмжээс, хэмжигдэхүүнүүдийг) сонгоно уу.',
+  aiDataQueryInvalid: 'AI энэ тайлбарт тохирох зөв хүсэлт үүсгэж чадсангүй: {{errors}}',
+  aiDataQueryNoEntities: 'Энэ судалгаанд хүсэлт гаргах боломжтой объект байхгүй байна.',
+  aiDataQuerySummaryInvalid: 'AI энэ хүсэлтийн нэр, тайлбарыг санал болгож чадсангүй. Дахин оролдоно уу.',
   cannotGetChild: "Атрибут {{name}}-с '{{childName}}' хүүг авч чадахгүй байна",
   cannotImportFilesExceedingQuota: 'Бичлэгийн файлуудыг импортлох боломжгүй: файл хадгалах квот хэтэрсэн',
   cannotInsertFileExceedingQuota: 'Файл оруулах боломжгүй: файл хадгалах квот хэтэрсэн',

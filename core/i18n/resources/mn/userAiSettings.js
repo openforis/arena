@@ -15,6 +15,8 @@ export default {
     dataDictionaryHint: 'AI-aar bolovsruulsan ugugdliin toli export.',
     userActivity: 'Hereglegchiin uil ajillagaa',
     userActivityHint: 'AI-aar uusgesen uil ajillagaany burtgeliin huraangui.',
+    dataQuery: 'Өгөгдлийн хүсэлтүүд',
+    dataQueryHint: 'Энгийн үгээр бичсэн тайлбараас Өгөгдлийн хайгчийн хүсэлт үүсгэх.',
   },
   providerSection: 'AI uilchilgee uzuulegch',
   currentlyUsing: 'Odoogoor ashiglaj bui: {{source}} - {{provider}} / {{model}}',

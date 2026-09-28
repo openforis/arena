@@ -1,34 +1,59 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+import * as A from '@core/arena'
 import { DataQuerySummaries, Objects } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
 import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
+import { useNotifyError } from '@webapp/components/hooks'
 import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
 
+/**
+ * Returns the given name, or the first "name_N" (N = 2, 3, ...) not used by any of the given query summaries.
+ * @param {object} params - The parameters.
+ * @param {string} params.name - The name.
+ * @param {object[]} params.dataQuerySummaries - The existing query summaries.
+ * @returns {string} - The unique name.
+ */
+const toUniqueName = ({ name, dataQuerySummaries }) => {
+  const existingNames = new Set(dataQuerySummaries.map((querySummary) => DataQuerySummaries.getName(querySummary)))
+  let uniqueName = name
+  let index = 2
+  while (existingNames.has(uniqueName)) {
+    uniqueName = `${name}_${index}`
+    index++
+  }
+  return uniqueName
+}
+
 export const useDataQueriesPanel = () => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
+  const cycle = useSurveyCycleKey()
+  const lang = useSurveyPreferredLang()
+  const notifyError = useNotifyError()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
 
   const query = DataExplorerSelectors.useQuery()
   const selectedQuerySummaryUuid = DataExplorerSelectors.useSelectedQuerySummaryUuid()
 
-  const [state, setState] = useState({
+  const [state, setState] = useState(() => ({
     editedQuerySummary: {},
     fetchedQuerySummary: null,
     dataQuerySummaries: [],
     queriesRequestedAt: Date.now(),
     validating: false,
-  })
-  const { editedQuerySummary, fetchedQuerySummary, dataQuerySummaries, queriesRequestedAt, validating } = state
+    summarizing: false,
+  }))
+  const { editedQuerySummary, fetchedQuerySummary, dataQuerySummaries, queriesRequestedAt, validating, summarizing } =
+    state
 
   const draft =
     !Objects.isEqual(fetchedQuerySummary, editedQuerySummary) ||
@@ -93,6 +118,7 @@ export const useDataQueriesPanel = () => {
   // on load, fetch queries and set selected query in form (if any)
   useEffect(() => {
     if (selectedQuerySummaryUuid) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- state is set after the fetch completes
       fetchAndSetEditedQuerySummary({ querySummaryUuid: selectedQuerySummaryUuid })
     }
     fetchDataQuerySummaries()
@@ -143,6 +169,43 @@ export const useDataQueriesPanel = () => {
     }))
   }, [dispatch, editedQuerySummary, query, surveyId, validateEditedQuerySummary, validating])
 
+  // fills name, label and description (in the preferred language) with the ones suggested by the AI
+  const onAiSuggestSummary = useCallback(async () => {
+    if (summarizing) return
+    setState((statePrev) => ({ ...statePrev, summarizing: true }))
+    try {
+      const { name, label, description } = await API.aiDataQuery.summarize({ surveyId, cycle, lang, query })
+      const querySummaryUpdated = A.pipe(
+        DataQuerySummaries.assocName(toUniqueName({ name, dataQuerySummaries })),
+        DataQuerySummaries.assocLabels({ ...DataQuerySummaries.getLabels(editedQuerySummary), [lang]: label }),
+        DataQuerySummaries.assocDescriptions({
+          ...DataQuerySummaries.getDescriptions(editedQuerySummary),
+          [lang]: description,
+        })
+      )(editedQuerySummary)
+      await setEditedQuerySummary(querySummaryUpdated)
+    } catch (error) {
+      const errorData = error?.response?.data?.error
+      if (errorData?.key) {
+        notifyError({ key: `appErrors:${errorData.key}`, params: errorData.params })
+      } else {
+        notifyError({ key: 'dataView:dataQuery.ai.suggestSummaryFailed', params: { message: error?.message } })
+      }
+    } finally {
+      setState((statePrev) => ({ ...statePrev, summarizing: false }))
+    }
+  }, [
+    cycle,
+    dataQuerySummaries,
+    editedQuerySummary,
+    lang,
+    notifyError,
+    query,
+    setEditedQuerySummary,
+    summarizing,
+    surveyId,
+  ])
+
   const doDelete = useCallback(async () => {
     const querySummaryUuid = DataQuerySummaries.getUuid(editedQuerySummary)
     await API.deleteDataQuerySummary({ surveyId, querySummaryUuid })
@@ -189,6 +252,7 @@ export const useDataQueriesPanel = () => {
     draft,
     editedQuerySummary,
     isTableRowActive,
+    onAiSuggestSummary,
     onNew,
     onSave,
     onDelete,
@@ -196,6 +260,7 @@ export const useDataQueriesPanel = () => {
     query,
     queriesRequestedAt,
     setEditedQuerySummary,
+    summarizing,
     validating,
   }
 }

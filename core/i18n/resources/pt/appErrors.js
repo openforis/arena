@@ -1,4 +1,9 @@
 export default {
+  aiDataQueryDescriptionMissing: 'Descreva em linguagem natural os dados que deseja ver.',
+  aiDataQueryEmpty: 'Selecione primeiro uma entidade e alguns atributos (ou dimensões e medidas).',
+  aiDataQueryInvalid: 'A IA não conseguiu gerar uma consulta válida para esta solicitação: {{errors}}',
+  aiDataQueryNoEntities: 'Este inventário não possui entidades que possam ser consultadas.',
+  aiDataQuerySummaryInvalid: 'A IA não conseguiu sugerir um nome e uma descrição para esta consulta. Tente novamente.',
   cannotGetChild: `Não foi possível obter o filho '{{childName}}' do atributo {{name}}`,
   cannotImportFilesExceedingQuota:
     'Não é possível importar arquivos de registros: a cota de armazenamento seria excedida',

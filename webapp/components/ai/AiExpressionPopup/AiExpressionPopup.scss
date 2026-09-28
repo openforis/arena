@@ -10,16 +10,6 @@
     color: var(--colorGrey700);
   }
 
-  &__textarea {
-    width: 100%;
-    min-height: 5rem;
-    resize: vertical;
-    font: inherit;
-    padding: 0.5rem;
-    border: 1px solid var(--colorGrey500);
-    border-radius: 4px;
-  }
-
   &__result {
     background: var(--colorGrey300);
     border-left: 3px solid #2e7d32;
@@ -44,5 +34,4 @@
     color: #c62828;
     font-size: 0.9rem;
   }
-
 }
