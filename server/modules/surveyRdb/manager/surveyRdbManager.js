@@ -40,7 +40,7 @@ export {
 } from '../repository/schemaRdbRepository'
 
 // Data tables and views
-export const { createDataTable } = DataTableRepository
+export const { createDataTable, createDataTableIndexes } = DataTableRepository
 export const { createDataView, countViewData, countViewDataAgg } = DataViewRepository
 
 // Node key views
