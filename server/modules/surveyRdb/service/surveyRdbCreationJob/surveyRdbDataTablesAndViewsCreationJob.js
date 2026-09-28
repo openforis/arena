@@ -47,6 +47,8 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       await SurveyRdbManager.populateTable({ survey, nodeDef, stopIfFunction }, tx)
       this.logDebug(`insert into table ${nodeDefName} - end`)
 
+      if (this.isCanceled()) break
+
       // ===== create indexes (after populating the table, to speed up the insert)
       this.logDebug(`create indexes on table ${nodeDefName} - start`)
       await SurveyRdbManager.createDataTableIndexes({ survey, nodeDef }, tx)

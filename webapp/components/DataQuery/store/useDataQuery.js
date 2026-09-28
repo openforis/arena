@@ -43,11 +43,12 @@ export const useDataQuery = ({ query, limitData = true }) => {
   // on entity def uuid or filter update: reset data
   useOnUpdate(Actions.reset, [entityDefUuid, filter])
 
-  // on mount or on update offset, attributeDefUuids, dimensions, measures, sort or filter: fetch or reset data
+  // on mount or on update entityDefUuid, offset, attributeDefUuids, dimensions, measures, sort or filter: fetch or reset data
   useEffect(() => {
     if (hasSelection) Actions.fetchData({ offset, limit, query })
     else Actions.resetData()
   }, [
+    entityDefUuid,
     limit,
     offset,
     attributeDefUuids,
