@@ -1,0 +1,17 @@
+.ai-generate-query-popup {
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__hint {
+    font-size: 0.85rem;
+    color: var(--colorGrey700);
+  }
+
+  &__error {
+    color: #c62828;
+    font-size: 0.9rem;
+  }
+}

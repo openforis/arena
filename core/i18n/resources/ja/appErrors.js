@@ -93,6 +93,11 @@ export default {
   aiChatbotUpstreamError:
     'ドキュメントチャットボットは現在一時的に利用できません。しばらくしてから再度お試しください。',
   aiChatbotPayloadTooLarge: '会話が長すぎます。チャットをクリアして、もう少し短い質問をお試しください。',
+  aiDataQueryDescriptionMissing: '表示したいデータを自然な言葉で説明してください。',
+  aiDataQueryNoEntities: 'この調査にはクエリ可能な項目がありません。',
+  aiDataQueryInvalid: 'AIはこのリクエストに対して有効なクエリを生成できませんでした：{{errors}}',
+  aiDataQueryEmpty: '先に項目と属性（またはディメンションとメジャー）を選択してください。',
+  aiDataQuerySummaryInvalid: 'AIはこのクエリの名前と説明を提案できませんでした。もう一度お試しください。',
   userCannotDeleteHasMessages:
     'このユーザーは削除できません：{{count}}件のメッセージを作成しています。先にメッセージを削除するか、担当を変更してください',
   userCannotDeleteLastSystemAdmin: 'このユーザーは削除できません：最後のシステム管理者です',

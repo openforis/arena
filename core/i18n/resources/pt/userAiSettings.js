@@ -14,6 +14,8 @@ export default {
     dataDictionaryHint: 'Exportacoes de dicionario de dados redigidas por IA.',
     userActivity: 'Atividade do usuario',
     userActivityHint: 'Resumos do log de atividades gerados por IA.',
+    dataQuery: 'Consultas de dados',
+    dataQueryHint: 'Gerar consultas do Explorador de dados a partir de uma descrição em linguagem natural.',
   },
   providerSection: 'Provedor de IA',
   currentlyUsing: 'Usando atualmente: {{source}} - {{provider}} / {{model}}',
