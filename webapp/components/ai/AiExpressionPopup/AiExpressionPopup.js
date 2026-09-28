@@ -1,3 +1,4 @@
+import '../aiTextarea.scss'
 import './AiExpressionPopup.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
@@ -138,7 +139,7 @@ const AiExpressionPopup = (props) => {
 
         <textarea
           ref={textareaRef}
-          className="ai-expression-popup__textarea"
+          className="ai-textarea"
           placeholder={i18n.t('aiExpression.placeholder')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}

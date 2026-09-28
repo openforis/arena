@@ -1,5 +1,3 @@
-@use '../aiTextarea' as *;
-
 .ai-expression-popup {
   .modal-body {
     display: flex;
@@ -10,10 +8,6 @@
   &__hint {
     font-size: 0.85rem;
     color: var(--colorGrey700);
-  }
-
-  &__textarea {
-    @include aiTextarea;
   }
 
   &__result {

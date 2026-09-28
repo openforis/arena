@@ -1,3 +1,4 @@
+import '@webapp/components/ai/aiTextarea.scss'
 import './AiGenerateQueryPopup.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
@@ -69,7 +70,7 @@ export const AiGenerateQueryPopup = (props: Props) => {
 
         <textarea
           ref={textareaRef}
-          className="ai-generate-query-popup__textarea"
+          className="ai-textarea"
           placeholder={i18n.t('dataView:dataQuery.ai.placeholder')}
           value={description}
           onChange={(e) => setDescription(e.target.value)}

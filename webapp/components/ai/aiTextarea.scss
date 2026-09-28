@@ -2,7 +2,7 @@
 
 // Textarea used in the AI dialogs to write a request in plain language:
 // input background and border so that it stands out from the dialog background.
-@mixin aiTextarea {
+.ai-textarea {
   width: 100%;
   min-height: 5rem;
   resize: vertical;
