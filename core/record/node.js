@@ -203,8 +203,9 @@ export const removeFlags =
   (node) => {
     const keysToRemove = removeDirtyFlag ? flagKeysIncludingDirty : flagKeysArray
     if (sideEffect) {
+      // do not use "delete": it would switch the node object to the (much bigger) V8 dictionary mode
       for (const key of keysToRemove) {
-        delete node[key]
+        if (node[key] !== undefined) node[key] = undefined
       }
       return node
     } else {

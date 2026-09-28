@@ -45,15 +45,18 @@ const tableColumnsSelect = ['id', 'date_created', 'date_modified', 'record_uuid'
 // cache of camelized keys
 const nodeKeyByColumnName = {}
 
-const dbTransformCallback = (node) => {
+const dbTransformCallback = (row) => {
   // use a cache of camelized keys; "camelize" is too slow when running on thousands of objects
-  // (do not camelize meta properties)
-  for (const [columnName, value] of Object.entries(node)) {
-    const nodeKey = nodeKeyByColumnName[columnName] ?? A.camelize(columnName)
-    if (nodeKey !== columnName) {
-      node[nodeKey] = value
-      delete node[columnName]
+  // (do not camelize meta properties);
+  // build a new object instead of deleting the row keys: "delete" would switch it to the (much bigger) V8 dictionary mode
+  const node = {}
+  for (const [columnName, value] of Object.entries(row)) {
+    let nodeKey = nodeKeyByColumnName[columnName]
+    if (!nodeKey) {
+      nodeKey = A.camelize(columnName)
+      nodeKeyByColumnName[columnName] = nodeKey
     }
+    node[nodeKey] = value
   }
   // cast id to Number
   node.id = Number(node.id)

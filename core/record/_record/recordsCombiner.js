@@ -303,7 +303,8 @@ const _addNodeToUpdateResult = ({
     updateResult.merge(new RecordUpdateResult({ record: recordUpdated }))
   }
   // clear id, used for storage in DB, but not needed for the updateResult
-  delete newNodeToAdd[Node.keys.id]
+  // (not deleted: it would switch the node to the V8 dictionary mode)
+  newNodeToAdd[Node.keys.id] = undefined
 
   newNodeToAdd[Node.keys.recordUuid] = record.uuid
 
