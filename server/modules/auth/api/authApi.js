@@ -11,6 +11,7 @@ import * as ProcessUtils from '@core/processUtils'
 import SystemError from '@core/systemError'
 
 import * as Log from '@server/log/log'
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
@@ -54,7 +55,7 @@ export const init = (app) => {
     }
   })
 
-  app.get('/api/changelog', async (_req, res, next) => {
+  app.get('/api/changelog', AuthMiddleware.requireAdminPermission, async (_req, res, next) => {
     try {
       const content = await FileUtils.readFile('CHANGELOG.md')
       res.json({ content })
