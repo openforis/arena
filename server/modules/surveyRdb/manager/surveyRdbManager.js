@@ -37,6 +37,7 @@ export {
   dropOlapDataTablesAndViews,
   dropSchema,
   selectOlapDataTablesExists,
+  selectSchemaExists,
 } from '../repository/schemaRdbRepository'
 
 // Data tables and views

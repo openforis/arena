@@ -350,11 +350,12 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
     backup = false,
     includeBigCategories = false,
     includeBigTaxonomies = false,
+    skipMigrationCheck = false,
   },
   client = db
 ) => {
   const survey = await fetchSurveyAndNodeDefsBySurveyId(
-    { surveyId, cycle, draft, advanced, validate, includeDeleted, includeAnalysis, backup },
+    { surveyId, cycle, draft, advanced, validate, includeDeleted, includeAnalysis, backup, skipMigrationCheck },
     client
   )
   const categoryItemsRefData = await CategoryRepository.fetchIndex({ surveyId, draft, includeBigCategories }, client)

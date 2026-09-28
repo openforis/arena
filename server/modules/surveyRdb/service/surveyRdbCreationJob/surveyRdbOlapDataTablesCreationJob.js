@@ -47,14 +47,17 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
       this.logDebug('OLAP tables creation needed (survey not published yet)')
       return true
     }
-    const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
+    const surveySummary = await SurveyManager.fetchSurveyById(
+      { surveyId, draft: true, skipMigrationCheck: this.context.skipMigrationCheck },
+      tx
+    )
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
     if (!Survey.isPublished(surveyInfo)) {
       this.logDebug('OLAP tables creation not needed (survey not published yet)')
       return false
     }
     const surveyNext = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-      { surveyId, advanced: true, includeAnalysis: true },
+      { surveyId, advanced: true, includeAnalysis: true, skipMigrationCheck: this.context.skipMigrationCheck },
       tx
     )
     // check if cycles changed
@@ -146,13 +149,23 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
 
   async fetchSurvey() {
     const { surveyId, tx } = this
-    const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
+    const surveySummary = await SurveyManager.fetchSurveyById(
+      { surveyId, draft: true, skipMigrationCheck: this.context.skipMigrationCheck },
+      tx
+    )
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
     const fetchDraft =
       (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
     return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      { surveyId, draft: fetchDraft, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
+      {
+        surveyId,
+        draft: fetchDraft,
+        advanced: true,
+        includeBigCategories: false,
+        includeBigTaxonomies: false,
+        skipMigrationCheck: this.context.skipMigrationCheck,
+      },
       tx
     )
   }

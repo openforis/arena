@@ -33,7 +33,8 @@ export default class RecordsUniquenessValidationJob extends Job {
   }
 
   async execute() {
-    const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId }, this.tx)
+    const { skipMigrationCheck } = this.context
+    const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, skipMigrationCheck }, this.tx)
     const cycleKeys = A.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
 
     this.total = A.length(cycleKeys) * 2
@@ -47,7 +48,13 @@ export default class RecordsUniquenessValidationJob extends Job {
   async validateRecordsUniquenessByCycle(cycle) {
     // 1. fetch survey and node defs
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      { surveyId: this.surveyId, cycle, draft: true, advanced: true },
+      {
+        surveyId: this.surveyId,
+        cycle,
+        draft: true,
+        advanced: true,
+        skipMigrationCheck: this.context.skipMigrationCheck,
+      },
       this.tx
     )
     this.incrementProcessedItems()

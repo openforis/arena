@@ -4,6 +4,8 @@ import * as ProcessUtils from '@core/processUtils'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as ChainManager from '@server/modules/analysis/manager'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import SurveyRdbCreationJob from '@server/modules/surveyRdb/service/surveyRdbCreationJob/surveyRdbCreationJob'
 
 export type SurveyDataMigrationStep = {
   version: string
@@ -37,6 +39,23 @@ export const surveyDataMigrationSteps: SurveyDataMigrationStep[] = [
     // QR printable-export share table (arena-server) and related schema changes; no per-survey data transform.
     version: '2.8.5',
     migrate: async () => {},
+  },
+  {
+    // node internal ids: the survey schema migrations (applied just before this step) replace node uuids with internal
+    // ids, but the survey rdb schema (if any) is still uuid based: regenerate it.
+    // The version must be the one of the release including the node internal ids: every survey stamped with an older
+    // version gets its schema migrated (and its rdb regenerated) at the next startup.
+    version: '2.10.0',
+    migrate: async ({ surveyId, client }) => {
+      if (!(await SurveyRdbManager.selectSchemaExists(surveyId, client))) return
+
+      // skipMigrationCheck: the survey data migration is still pending while its steps run
+      const job = new SurveyRdbCreationJob({ surveyId, skipMigrationCheck: true })
+      await job.start(client)
+      if (!job.isSucceeded()) {
+        throw new Error(`error regenerating the rdb schema of survey ${surveyId}`)
+      }
+    },
   },
   // future per-survey migration steps are appended here, each with its own version threshold
 ]
