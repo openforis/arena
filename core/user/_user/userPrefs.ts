@@ -12,6 +12,7 @@ export const keysPrefs = {
   current: 'current',
   language: 'language',
   notifyOnUserAccessRequest: 'notifyOnUserAccessRequest',
+  whatsNewSeenIds: 'whatsNewSeenIds',
 } as const
 
 export const keysSurveyPrefs = {
@@ -29,6 +30,7 @@ const surveyPrefPath = ({ surveyId, key }: { surveyId: unknown; key: string }) =
 ]
 const pathLanguage = [keys.prefs, keysPrefs.language]
 const pathNotifyOnUserAccessRequest = [keys.prefs, keysPrefs.notifyOnUserAccessRequest]
+const pathWhatsNewSeenIds = [keys.prefs, keysPrefs.whatsNewSeenIds]
 
 const surveyCyclePrefPath = (surveyId: unknown) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.cycle })
 const surveyLangPrefPath = (surveyId: unknown) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.language })
@@ -73,6 +75,10 @@ export const getPrefLanguage = A.path(pathLanguage)
 export const getPrefNotifyOnUserAccessRequest = (user: Record<string, unknown>): boolean =>
   A.pathOr(true, pathNotifyOnUserAccessRequest, user) as boolean
 
+// ids of the "What's new" items the user chose not to see again
+export const getPrefWhatsNewSeenIds = (user: Record<string, unknown>): string[] =>
+  A.pathOr([], pathWhatsNewSeenIds, user) as string[]
+
 // ====== UPDATE
 export const assocPrefSurveyCycle = (surveyId: unknown, cycle: unknown) =>
   A.assocPath(surveyCyclePrefPath(surveyId), cycle)
@@ -92,6 +98,8 @@ export const assocPrefSurveyCurrentAndCycle = (surveyId: unknown, cycle: unknown
 export const assocPrefLanguage = ({ lang }: { lang: string }) => A.assocPath(pathLanguage, lang)
 
 export const assocPrefNotifyOnUserAccessRequest = (value: boolean) => A.assocPath(pathNotifyOnUserAccessRequest, value)
+
+export const assocPrefWhatsNewSeenIds = (ids: string[]) => A.assocPath(pathWhatsNewSeenIds, ids)
 
 // ====== DELETE
 export const deletePrefSurvey = (surveyId: unknown) => (user: Record<string, unknown>) => {

@@ -1,0 +1,61 @@
+@use '~@webapp/style/vars' as *;
+
+.whats-new-dialog .modal-content {
+  max-width: 800px;
+  max-height: 90vh;
+  margin: 5vh auto auto;
+  overflow-y: auto;
+
+  .modal-body {
+    padding-top: 0;
+  }
+
+  .modal-footer {
+    padding-top: 1rem;
+  }
+}
+
+.whats-new-slide {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .whats-new-slide__image {
+    // same height for every slide, so the dialog does not change size while navigating
+    height: min(32vh, 280px);
+    max-width: 100%;
+    object-fit: contain;
+    align-self: center;
+    border: 1px solid $greyBorder;
+    border-radius: 4px;
+  }
+
+  .whats-new-slide__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .whats-new-slide__title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: $colorTextPrimary;
+  }
+
+  .whats-new-slide__experimental-badge {
+    padding: 0.1rem 0.5rem;
+    border-radius: 1rem;
+    background-color: $orangeLight;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .whats-new-slide__description {
+    line-height: 1.5;
+  }
+
+  .whats-new-slide__version {
+    font-size: 0.8rem;
+    color: color-mix(in srgb, $black 60%, transparent);
+  }
+}

@@ -1,0 +1,14 @@
+.carousel {
+  display: flex;
+  flex-direction: column;
+  outline: none;
+
+  .carousel__item {
+    flex: 1 1 auto;
+  }
+
+  .carousel__stepper.MuiMobileStepper-root {
+    background-color: transparent;
+    padding: 1rem 0 0;
+  }
+}

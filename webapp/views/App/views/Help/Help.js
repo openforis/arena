@@ -5,6 +5,7 @@ import { appModules, helpModules } from '@webapp/app/appModules'
 import { useUser } from '@webapp/store/user'
 import { About } from './About'
 import { Changelog } from './Changelog'
+import { WhatsNew } from './WhatsNew'
 
 const Help = () => {
   const user = useUser()
@@ -18,6 +19,11 @@ const Help = () => {
         {
           component: About,
           path: helpModules.about.path,
+        },
+        // What's new
+        {
+          component: WhatsNew,
+          path: helpModules.whatsNew.path,
         },
         // Changelog (system admins only)
         ...(User.isSystemAdmin(user)

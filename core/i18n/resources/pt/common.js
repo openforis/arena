@@ -396,6 +396,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     help: 'Ajuda',
     about: 'Sobre',
     changelog: 'Registo de alterações',
+    whatsNew: 'Novidades',
     disclaimer: 'Aviso legal',
     userManual: 'Manual do usuário',
   },

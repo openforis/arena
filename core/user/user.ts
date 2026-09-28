@@ -114,6 +114,7 @@ export const {
   getPrefSurveyCurrentCycle,
   getPrefLanguage,
   getPrefNotifyOnUserAccessRequest,
+  getPrefWhatsNewSeenIds,
   assocPrefSurveyCurrent,
   assocPrefSurveyCycle,
   assocPrefSurveyLang,
@@ -121,6 +122,7 @@ export const {
   deletePrefSurvey,
   assocPrefLanguage,
   assocPrefNotifyOnUserAccessRequest,
+  assocPrefWhatsNewSeenIds,
 } = UserPrefs
 
 // PROPS

@@ -387,6 +387,7 @@ export default {
     help: 'Тусламж',
     about: 'Тухай',
     changelog: 'Changelog',
+    whatsNew: 'Шинэ боломжууд',
     disclaimer: 'Хариуцлагаас татгалзах',
     userManual: 'Хэрэглэгчийн гарын авлага',
   },
