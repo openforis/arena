@@ -12,6 +12,7 @@ import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import ChatbotFab from '@webapp/components/ai/Chatbot'
+import { WhatsNewDialog } from '@webapp/components/WhatsNew'
 
 import Header from './Header'
 import JobMonitor from './JobMonitor'
@@ -96,6 +97,7 @@ const AppView = () => {
       <FileUploadDialog />
       <ServiceErrors />
       <ChatbotFab />
+      <WhatsNewDialog />
     </>
   )
 }

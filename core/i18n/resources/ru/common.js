@@ -386,6 +386,7 @@ export default {
     help: 'Помощь',
     about: 'О программе',
     changelog: 'Журнал изменений',
+    whatsNew: 'Что нового',
     disclaimer: 'Отказ от ответственности',
     userManual: 'Руководство пользователя',
   },

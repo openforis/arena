@@ -106,6 +106,7 @@ export const getModulesHierarchy = (user, surveyInfo) => {
       children: [
         helpModules.userManual,
         helpModules.about,
+        helpModules.whatsNew,
         ...(User.isSystemAdmin(user) ? [helpModules.changelog] : []),
         helpModules.disclaimer,
       ],

@@ -357,6 +357,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     help: 'Ayuda',
     about: 'Acerca de',
     changelog: 'Registro de cambios',
+    whatsNew: 'Novedades',
     disclaimer: 'Descargo de responsabilidad',
     userManual: 'Manual de usuario',
   },

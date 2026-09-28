@@ -20,7 +20,7 @@ const jobErrorsText = async (page: Page): Promise<string> =>
   `job errors: ${await page.locator('.app-job-monitor').innerText()}`
 
 const startPublish = async (page: Page) => {
-  await page.getByTestId(TestId.header.surveyPublishBtn).click()
+  await page.locator('.app-header').getByTestId(TestId.header.surveyPublishBtn).click()
   await page.getByTestId(TestId.modal.modal).getByRole('button', { name: 'Ok' }).click()
 }
 

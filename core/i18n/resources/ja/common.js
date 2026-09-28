@@ -390,6 +390,7 @@ export default {
 
     help: 'ヘルプ',
     about: 'このアプリについて',
+    whatsNew: '新機能',
     disclaimer: '免責事項',
     userManual: 'ユーザーマニュアル',
   },
