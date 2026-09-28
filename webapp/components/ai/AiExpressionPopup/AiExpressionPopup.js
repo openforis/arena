@@ -144,7 +144,10 @@ const AiExpressionPopup = (props) => {
           onChange={(e) => setDescription(e.target.value)}
           disabled={busy}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) onGenerate()
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault()
+              onGenerate()
+            }
           }}
         />
 

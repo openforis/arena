@@ -1,3 +1,5 @@
+@use '../aiTextarea' as *;
+
 .ai-expression-popup {
   .modal-body {
     display: flex;
@@ -11,13 +13,7 @@
   }
 
   &__textarea {
-    width: 100%;
-    min-height: 5rem;
-    resize: vertical;
-    font: inherit;
-    padding: 0.5rem;
-    border: 1px solid var(--colorGrey500);
-    border-radius: 4px;
+    @include aiTextarea;
   }
 
   &__result {
@@ -44,5 +40,4 @@
     color: #c62828;
     font-size: 0.9rem;
   }
-
 }
