@@ -198,6 +198,31 @@ When adding a new node definition type or modifying the survey schema:
 
 Database migrations are in `server/db/` directory. The server automatically runs migrations on startup unless `MIGRATE_ONLY=true` is set.
 
+## Coding Conventions
+
+**TypeScript for new code:**
+New files must be written in TypeScript (`.ts` / `.tsx`), not JavaScript. When substantially rewriting an existing `.js` file, prefer converting it to TypeScript. Run `yarn typecheck` to verify types.
+
+**Types from `@openforis/arena-core`:**
+Most domain types are (or should be) defined in `@openforis/arena-core` (e.g. `Survey`, `NodeDef`, `ArenaRecord`, `Node`, `Category`, `Taxonomy`, `User`). Import them from there instead of redefining them locally. If a needed domain type is missing, point it out rather than creating a local duplicate.
+
+**Cognitive complexity:**
+Keep the cognitive complexity of every function at 15 or below (SonarCloud rule). Split complex logic into small helper functions, use early returns, and avoid deeply nested conditions/loops.
+
+**Loops:**
+Prefer `for...of` loops over `Array.prototype.forEach`.
+
+**Comments:**
+Keep comments short and to the point (JSDoc descriptions included): one line when possible, explaining the "why" rather than restating the code. The same applies to replies on GitHub PR findings.
+
+## Pull Requests
+
+After creating a PR, wait for the SonarCloud analysis and the Copilot review to complete, then go through their findings:
+
+- Fetch them with `gh` (e.g. `gh pr view <PR#> --comments`, `gh api repos/openforis/arena/pulls/<PR#>/comments` for inline review comments, `gh pr checks <PR#>` for the SonarCloud quality gate).
+- Fix every finding that can reasonably be solved, and push the fixes to the PR branch.
+- Reply to each finding on GitHub with a comment: explain how it was fixed (referencing the commit), or why it was not fixed (false positive, out of scope, etc.).
+
 ## Important Notes
 
 **Path Aliases:**
