@@ -1,1 +1,1 @@
-export { createDataTable } from './create'
+export { createDataTable, createDataTableIndexes } from './create'
