@@ -14,6 +14,8 @@ export default {
     dataDictionaryHint: 'AIによるデータディクショナリのエクスポート下書き作成です。',
     userActivity: 'ユーザーアクティビティ',
     userActivityHint: 'AIによって生成されるアクティビティログの要約です。',
+    dataQuery: 'データクエリ',
+    dataQueryHint: '自然な言葉の説明からデータエクスプローラーのクエリを生成します。',
   },
   providerSection: 'AIプロバイダー',
   currentlyUsing: '現在使用中：{{source}} - {{provider}} / {{model}}',

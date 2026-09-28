@@ -18,6 +18,21 @@ export default {
     },
   },
   dataQuery: {
+    ai: {
+      button: 'AIに質問',
+      buttonTitle: 'AIを使って説明からクエリを生成',
+      title: 'AIでクエリを生成',
+      hint: '表示したいデータを説明してください。AIが項目、属性（またはディメンションとメジャー）、絞り込み条件、並べ替えを選択します。生成されたクエリを確認し、クエリ管理から保存できます。',
+      placeholder: '例：樹種ごとの樹木の本数',
+      generate: '生成',
+      generating: '生成中…',
+      replaceQueryConfirmMessage: '現在のクエリを生成されたクエリで置き換えますか？',
+      suggestSummary: '名前と説明を提案',
+      suggestSummaryFailed: 'クエリの名前と説明を提案できませんでした：{{message}}',
+      suggestSummaryTitle: 'AIを使って、現在の選択内容に基づきクエリの名前・ラベル・説明を提案します',
+      generatedSuccessfully:
+        'クエリを生成しました：{{explanation}} 結果を確認し、残したい場合はクエリを保存してください。',
+    },
     deleteConfirmMessage: 'クエリ「{{name}}」を削除しますか？',
     displayType: {
       chart: 'グラフ',
