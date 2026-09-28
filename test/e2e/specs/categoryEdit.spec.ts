@@ -105,10 +105,10 @@ test.describe('Category edit', () => {
     await fillAndWait(page, TestId.categoryDetails.categoryName, category.name)
 
     // the first level is created with the category
+    await expect(page.getByTestId(TestId.categoryDetails.level(0))).toBeVisible()
     for (let levelIdx = 1; levelIdx < category.levels.length; levelIdx += 1) {
       await page.getByTestId(TestId.categoryDetails.addLevelBtn).click()
-    }
-    for (const levelIdx of category.levels.keys()) {
+      // wait for the level before adding the next one: a click while the previous level is being created is lost
       await expect(page.getByTestId(TestId.categoryDetails.level(levelIdx))).toBeVisible()
     }
     for (const [levelIdx, level] of category.levels.entries()) {
