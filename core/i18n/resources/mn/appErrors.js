@@ -1,4 +1,9 @@
 export default {
+  aiDataQueryDescriptionMissing: 'Үзэхийг хүссэн өгөгдлөө энгийн үгээр тайлбарлана уу.',
+  aiDataQueryEmpty: 'Эхлээд объект болон шинж чанаруудыг (эсвэл хэмжээс, хэмжигдэхүүнүүдийг) сонгоно уу.',
+  aiDataQueryInvalid: 'AI энэ тайлбарт тохирох зөв хүсэлт үүсгэж чадсангүй: {{errors}}',
+  aiDataQueryNoEntities: 'Энэ судалгаанд хүсэлт гаргах боломжтой объект байхгүй байна.',
+  aiDataQuerySummaryInvalid: 'AI энэ хүсэлтийн нэр, тайлбарыг санал болгож чадсангүй. Дахин оролдоно уу.',
   cannotGetChild: "Атрибут {{name}}-с '{{childName}}' хүүг авч чадахгүй байна",
   cannotImportFilesExceedingQuota: 'Бичлэгийн файлуудыг импортлох боломжгүй: файл хадгалах квот хэтэрсэн',
   cannotInsertFileExceedingQuota: 'Файл оруулах боломжгүй: файл хадгалах квот хэтэрсэн',
@@ -21,6 +26,8 @@ export default {
     noRecordsFound: 'Импортын файлд бичлэг олдсонгүй эсвэл буруу файлын формат',
     pendingImportFileNotFoundOrExpired:
       'Өмнө оруулсан файл олдсонгүй; хугацаа нь дууссан байж магадгүй. Дахин оруулна уу.',
+    recordMergeWithSameKeysNotAllowed:
+      '"{{recordKeyValues}}" бичлэгийг импортлох боломжгүй: ижил түлхүүртэй өөр бичлэг аль хэдийн байгаа бөгөөд энэ судалгаанд ижил түлхүүртэй бичлэгүүдийг нэгтгэхийг зөвшөөрөөгүй',
     recordOwnedByAnotherUser: '"{{recordKeyValues}}" бичлэг өөр хэрэглэгчид харьяалагддаг тул шинэчлэх боломжгүй',
   },
   entryDataNotFound: 'Оролтын өгөгдөл олдсонгүй: {{entryName}}',
@@ -49,6 +56,12 @@ export default {
     entityNotFound: '"{{entityName}}" нэртэй объект "{{keyValues}}" түлхүүрээр олдсонгүй',
     updateSelfAndDependentsDefaultValues:
       'Бичлэг шинэчлэхэд алдаа гарлаа; {{nodeDefName}} зангилааны илэрхийллийг үнэлэхэд алдаа гарлаа: {{details}}',
+  },
+  recordPrintableExport: {
+    missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',
+    entityNotFound: 'Заасан экспортын нэгж олдсонгүй',
+    missingServerUrl: 'QR кодтой экспорт хийхэд нийтийн серверийн URL шаардлагатай',
+    qrTokenMismatch: 'QR кодтой экспортыг дуусгаж чадсангүй; дахин оролдоно уу',
   },
   sessionExpiredRefreshPage: 'Сесс дууссан байж магадгүй.\nХуудсыг сэргээж үзнэ үү.',
   survey: {

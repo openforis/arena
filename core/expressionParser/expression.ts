@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { JavascriptExpressionParser } from '@openforis/arena-core'
 
@@ -17,13 +17,13 @@ export { operators } from './helpers/operators'
 export { functionNames } from './helpers/functions'
 export { toSql } from './toSql'
 
-export const getName = R.prop('name') as (expr: { name?: string }) => string | undefined
+export const getName = A.prop('name') as (expr: { name?: string }) => string | undefined
 
 export const toString = (expr: unknown, exprMode: string = modes.json): string => {
   const string = ExpressionUtils.toString(expr as ExpressionUtils.ExpressionNode)
 
   return exprMode === modes.sql
-    ? R.pipe(R.replace(/&&/g, 'AND'), R.replace(/\|\|/g, 'OR'), R.replace(/==/g, '='), R.replace(/"/g, `'`))(string)
+    ? A.pipe(A.replace(/&&/g, 'AND'), A.replace(/\|\|/g, 'OR'), A.replace(/==/g, '='), A.replace(/"/g, `'`))(string)
     : string
 }
 
@@ -31,13 +31,13 @@ export const fromString = (string: string, exprMode: string = modes.json): unkno
   const exprString =
     exprMode === modes.json
       ? string
-      : R.pipe(
-          R.replace(/AND/g, '&&'),
-          R.replace(/OR/g, '||'),
-          R.replace(/=+/g, '=='),
-          R.replace(/!==/g, '!='),
-          R.replace(/>==/g, '>='),
-          R.replace(/<==/g, '<=')
+      : A.pipe(
+          A.replace(/AND/g, '&&'),
+          A.replace(/OR/g, '||'),
+          A.replace(/=+/g, '=='),
+          A.replace(/!==/g, '!='),
+          A.replace(/>==/g, '>='),
+          A.replace(/<==/g, '<=')
         )(string)
 
   return new JavascriptExpressionParser().parse(exprString)
@@ -47,8 +47,8 @@ export const { isValid } = ExpressionUtils
 
 // ====== Type checking
 
-export const getType = R.prop('type') as (expr: { type?: string }) => string | undefined
-const isType = (type: string) => R.propEq('type', type)
+export const getType = A.prop('type') as (expr: { type?: string }) => string | undefined
+const isType = (type: string) => A.propEq('type', type)
 
 // Return true if the nodeDef can be used in expressions and false otherwise
 export const isValidExpressionType = (nodeDef: unknown): boolean => !NodeDef.isFile(nodeDef as never)

@@ -16,6 +16,22 @@ export default {
     },
   },
   dataQuery: {
+    ai: {
+      button: 'Preguntar a la IA',
+      buttonTitle: 'Generar una consulta a partir de una descripción usando IA',
+      title: 'Generar una consulta con IA',
+      hint: 'Describa los datos que desea ver; la IA seleccionará la entidad, los atributos (o dimensiones y medidas), el filtro y el orden. Luego podrá revisar la consulta generada y guardarla desde el administrador de consultas.',
+      placeholder: 'p. ej. número de árboles agrupados por especie',
+      generate: 'Generar',
+      generating: 'Generando…',
+      replaceQueryConfirmMessage: '¿Reemplazar la consulta actual por la generada?',
+      suggestSummary: 'Sugerir nombre y descripción',
+      suggestSummaryFailed: 'No se pudo sugerir el nombre y la descripción de la consulta: {{message}}',
+      suggestSummaryTitle:
+        'Usar IA para sugerir el nombre, la etiqueta y la descripción de la consulta según las selecciones actuales',
+      generatedSuccessfully:
+        'Consulta generada: {{explanation}} Revise el resultado y guarde la consulta si desea conservarla.',
+    },
     deleteConfirmMessage: '¿Eliminar la consulta "{{name}}"?',
     displayType: {
       chart: 'Gráfico',

@@ -1,4 +1,9 @@
 export default {
+  aiDataQueryDescriptionMissing: 'Descreva em linguagem natural os dados que deseja ver.',
+  aiDataQueryEmpty: 'Selecione primeiro uma entidade e alguns atributos (ou dimensões e medidas).',
+  aiDataQueryInvalid: 'A IA não conseguiu gerar uma consulta válida para esta solicitação: {{errors}}',
+  aiDataQueryNoEntities: 'Este inventário não possui entidades que possam ser consultadas.',
+  aiDataQuerySummaryInvalid: 'A IA não conseguiu sugerir um nome e uma descrição para esta consulta. Tente novamente.',
   cannotGetChild: `Não foi possível obter o filho '{{childName}}' do atributo {{name}}`,
   cannotImportFilesExceedingQuota:
     'Não é possível importar arquivos de registros: a cota de armazenamento seria excedida',
@@ -21,6 +26,8 @@ export default {
     noRecordsFound: 'Nenhum registro encontrado no arquivo de importação ou formato de arquivo incorreto',
     pendingImportFileNotFoundOrExpired:
       'O arquivo enviado anteriormente não foi encontrado; ele pode ter expirado. Por favor, envie-o novamente.',
+    recordMergeWithSameKeysNotAllowed:
+      'Não é possível importar o registro "{{recordKeyValues}}": já existe outro registro com as mesmas chaves e a mesclagem de registros com as mesmas chaves não é permitida nesta pesquisa',
     recordOwnedByAnotherUser: 'Não é possível atualizar o registro "{{recordKeyValues}}" pois pertence a outro usuário',
   },
   entryDataNotFound: 'Dados de entrada não encontrados: {{entryName}}',
@@ -48,6 +55,12 @@ export default {
     entityNotFound: 'Entidade "{{entityName}}" com chaves "{{keyValues}}" não encontrada',
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating); erro ao avaliar expressão no nó {{nodeDefName}}: {{details}}',
+  },
+  recordPrintableExport: {
+    missingEntityParams: 'A exportação da página atual requer entityDefUuid e entityNodeUuid',
+    entityNotFound: 'Entidade não encontrada para a exportação especificada',
+    missingServerUrl: 'A URL pública do servidor é necessária ao exportar com um código QR',
+    qrTokenMismatch: 'Não foi possível finalizar a exportação com código QR; tente novamente',
   },
   sessionExpiredRefreshPage: `A sessão pode ter expirado.
 Tente atualizar a página.`,

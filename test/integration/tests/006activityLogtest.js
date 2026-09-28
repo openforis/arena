@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { uuidv4 } from '../../../core/uuid'
 import * as Survey from '../../../core/survey/survey'
@@ -55,7 +55,7 @@ describe('Activity Log Test', () => {
     })
     expect(logs.length).toBeGreaterThanOrEqual(1)
 
-    const recordCreateLogs = R.filter(
+    const recordCreateLogs = A.filter(
       (activity) => ObjectUtils.getUuid(ActivityLog.getContent(activity)) === Record.getUuid(record)
     )(logs)
 

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -18,10 +18,10 @@ const _updateNodeValidation = (validationRecord, nodeIId, validationNode) => {
   const validationNodeOld = Validation.getFieldValidation(nodeIId)(validationRecord)
 
   // Merge new validation with node validation
-  const nodeValidationUpdated = R.mergeDeepRight(validationNodeOld, validationNode)
+  const nodeValidationUpdated = A.mergeDeepRight(validationNodeOld, validationNode)
 
   // Replace node validation in record validation
-  return R.pipe(Validation.setValid(false), Validation.setField(nodeIId, nodeValidationUpdated))(validationRecord)
+  return A.pipe(Validation.setValid(false), Validation.setField(nodeIId, nodeValidationUpdated))(validationRecord)
 }
 
 export default class RecordsUniquenessValidationJob extends Job {
@@ -34,11 +34,14 @@ export default class RecordsUniquenessValidationJob extends Job {
 
   async execute() {
     const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId }, this.tx)
-    const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
+    const cycleKeys = A.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
 
-    this.total = R.length(cycleKeys) * 2
+    this.total = A.length(cycleKeys) * 2
 
-    await Promise.all(cycleKeys.map((cycle) => this.validateRecordsUniquenessByCycle(cycle)))
+    // one cycle at a time: the validation runs queries in the job transaction
+    for (const cycle of cycleKeys) {
+      await this.validateRecordsUniquenessByCycle(cycle)
+    }
   }
 
   async validateRecordsUniquenessByCycle(cycle) {
@@ -51,7 +54,7 @@ export default class RecordsUniquenessValidationJob extends Job {
 
     const nodeDefRoot = Survey.getNodeDefRoot(survey)
     const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
-    if (R.isEmpty(nodeDefKeys)) {
+    if (A.isEmpty(nodeDefKeys)) {
       return
     }
 
@@ -64,7 +67,7 @@ export default class RecordsUniquenessValidationJob extends Job {
       this.tx
     )
 
-    if (!R.isEmpty(rowsRecordsDuplicate)) {
+    if (!A.isEmpty(rowsRecordsDuplicate)) {
       // 3. update records validation
       const validationDuplicate = RecordValidation.newValidationRecordDuplicate()
 
@@ -85,8 +88,8 @@ export default class RecordsUniquenessValidationJob extends Job {
         )
         const validationRecord = this.validationByRecordUuid[recordUuid] || validation
 
-        const validationRecordUpdated = R.pipe(
-          R.reduce(
+        const validationRecordUpdated = A.pipe(
+          A.reduce(
             (validationRecordAccumulator, nodeKeyDuplicate) =>
               _updateNodeValidation(validationRecordAccumulator, Node.getIId(nodeKeyDuplicate), validationDuplicate),
             validationRecord

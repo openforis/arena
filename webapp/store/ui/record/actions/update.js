@@ -12,6 +12,7 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 import { objectToFormData } from '@webapp/service/api'
 
 import { AppSavingActions } from '@webapp/store/app'
+import { I18nState } from '@webapp/store/system'
 import { SurveyState } from '@webapp/store/survey'
 
 import { appModules, appModuleUri } from '@webapp/app/appModules'
@@ -19,6 +20,7 @@ import { appModules, appModuleUri } from '@webapp/app/appModules'
 import * as RecordState from '../state'
 import * as ActionTypes from './actionTypes'
 import { checkAndConfirmUpdateNode, recordNodesUpdate } from './common'
+import { enqueueNodeRequest } from './nodeRequestsQueue'
 
 const _updateNodeDebounced = (node, file, delay) => {
   const action = async (dispatch, getState) => {
@@ -35,11 +37,12 @@ const _updateNodeDebounced = (node, file, delay) => {
       draft,
       node: JSON.stringify(node),
       timezoneOffset: Dates.getTimezoneOffset(),
+      lang: I18nState.getLang(),
       ...(file ? { file } : {}),
     })
     const recordUuid = Node.getRecordUuid(node)
     const surveyId = SurveyState.getSurveyId(state)
-    await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/node`, formData)
+    await enqueueNodeRequest(() => axios.post(`/api/survey/${surveyId}/record/${recordUuid}/node`, formData))
   }
 
   const recordUuid = Node.getRecordUuid(node)
@@ -50,6 +53,11 @@ const _updateNodeDebounced = (node, file, delay) => {
 export const updateNode =
   (nodeDef, node, value, file = null, meta = {}, refData = null) =>
   async (dispatch, getState) => {
+    if (A.isNil(Node.getIId(node))) {
+      // the node doesn't exist yet (e.g. attribute of an entity just added, not yet created server side):
+      // nothing to update (the attribute is read only until its node is available)
+      return
+    }
     const onOk = async () => {
       const nodeToUpdate = A.pipe(
         A.dissoc(Node.keys.placeholder),

@@ -1,14 +1,15 @@
 import pgPromise from 'pg-promise'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Numbers, Objects } from '@openforis/arena-core'
-import { DBMigrator } from '@openforis/arena-server'
+import { DBMigrator, Schemata } from '@openforis/arena-server'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import { uuidv4 } from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
+import { SortOrder } from '@core/sortOrder'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Survey from '@core/survey/survey'
@@ -20,6 +21,7 @@ import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import * as Log from '@server/log/log'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
@@ -263,12 +265,20 @@ const assertSurveyDataMigrated = (surveyInfo) => {
   }
 }
 
-export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
-  const [surveyInfo, authGroups] = await Promise.all([
-    SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
-    AuthGroupRepository.fetchSurveyGroups(surveyId, client),
+// skipMigrationCheck: for internal callers that run DURING a survey's own pending per-survey data
+// migration (i.e. the migration steps themselves) -- everyone else should leave this false, since it
+// bypasses the assertSurveyDataMigrated guard below.
+export const fetchSurveyById = async (
+  { surveyId, draft = false, validate = false, backup = false, skipMigrationCheck = false },
+  client = db
+) => {
+  const [surveyInfo, authGroups] = await DbUtils.runQueries(client, [
+    () => SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
+    () => AuthGroupRepository.fetchSurveyGroups(surveyId, client),
   ])
-  assertSurveyDataMigrated(surveyInfo)
+  if (!skipMigrationCheck) {
+    assertSurveyDataMigrated(surveyInfo)
+  }
 
   let surveyInfoUpdated = Survey.assocAuthGroups(authGroups)(surveyInfo)
   surveyInfoUpdated = await _fetchAndAssocAdditionalInfo({ surveyInfo: surveyInfoUpdated }, client)
@@ -291,24 +301,26 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
     includeDeleted = false,
     backup = false,
     includeAnalysis = true,
+    skipMigrationCheck = false,
   },
   client = db
 ) => {
-  const surveyDb = await fetchSurveyById({ surveyId, draft, validate, backup }, client)
+  const surveyDb = await fetchSurveyById({ surveyId, draft, validate, backup, skipMigrationCheck }, client)
   const surveyCycles = Survey.getCycleKeys(
     backup ? { ...surveyDb, props: ObjectUtils.getPropsAndPropsDraftCombined(surveyDb) } : surveyDb
   )
-  const [nodeDefs, dependencies, categories, taxonomies] = await Promise.all([
-    NodeDefManager.fetchNodeDefsBySurveyId(
-      { surveyId, surveyCycles, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
-      client
-    ),
-    fetchDependencies(surveyId, client),
-    CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft }, client),
-    TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft }, client),
+  const [nodeDefs, dependencies, categories, taxonomies] = await DbUtils.runQueries(client, [
+    () =>
+      NodeDefManager.fetchNodeDefsBySurveyId(
+        { surveyId, surveyCycles, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
+        client
+      ),
+    () => fetchDependencies(surveyId, client),
+    () => CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft }, client),
+    () => TaxonomyRepository.fetchTaxonomiesBySurveyId({ surveyId, draft }, client),
   ])
 
-  let survey = R.pipe(
+  let survey = A.pipe(
     Survey.assocNodeDefsSimple({ nodeDefs }),
     Survey.assocCategories(categories),
     Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))
@@ -354,10 +366,8 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 
-const calculateFilesMissing = async ({ surveyId, draft }) => {
-  const nodeDefFileUuids = (await NodeDefRepository.fetchNodeDefsBySurveyId({ surveyId, draft }))
-    .filter(NodeDef.isFile)
-    .map(NodeDef.getUuid)
+const calculateFilesMissing = async ({ surveyId }) => {
+  const nodeDefFileUuids = await NodeDefRepository.fetchFileNodeDefUuidsBySurveyId({ surveyId })
   if (Objects.isEmpty(nodeDefFileUuids)) {
     return 0
   }
@@ -372,7 +382,7 @@ const _validateFetchUserSurveysInfoSortParams = ({ sortBy, sortOrder }) => {
   // check sortOrder is valid
   if (sortOrder) {
     const sortOrderStr = typeof sortOrder === 'string' ? sortOrder.toLowerCase() : null
-    if (!sortOrderStr || !['asc', 'desc'].includes(sortOrderStr))
+    if (!sortOrderStr || !Object.values(SortOrder).includes(sortOrderStr))
       throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
   }
 }
@@ -391,7 +401,7 @@ const _filterSurveysWithChains = async (surveys) => {
   return surveysWithChains
 }
 
-const _fetchSurveyWithCounts = async ({ survey, draft }) => {
+const _fetchSurveyWithCounts = async ({ survey, draft, includeDbSize = false }) => {
   const surveyId = Survey.getId(survey)
   const surveyWithCounts = {
     ...survey,
@@ -400,30 +410,61 @@ const _fetchSurveyWithCounts = async ({ survey, draft }) => {
   }
   try {
     const canHaveData = Survey.canHaveData(survey)
-    const { count: filesCount, total: filesSize } = await SurveyFileManager.fetchCountAndTotalFilesSize({ surveyId })
+
+    const [
+      { count: filesCount, total: filesSize },
+      nodeDefsCount,
+      recordsCount,
+      recordsCountByApp,
+      chainsCount,
+      filesMissing,
+    ] = await Promise.all([
+      SurveyFileManager.fetchCountAndTotalFilesSize({ surveyId }),
+      NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
+      canHaveData ? RecordRepository.countRecordsBySurveyId({ surveyId }) : 0,
+      canHaveData ? RecordRepository.countRecordsGroupedByApp({ surveyId }) : {},
+      ChainRepository.countChains({ surveyId }),
+      calculateFilesMissing({ surveyId }),
+    ])
 
     Object.assign(surveyWithCounts, {
-      nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
-      recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }) : 0,
-      recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }) : {},
-      chainsCount: await ChainRepository.countChains({ surveyId }),
+      nodeDefsCount,
+      recordsCount,
+      recordsCountByApp,
+      chainsCount,
       filesCount,
       filesSize,
-      filesMissing: await calculateFilesMissing({ surveyId, draft }),
+      filesMissing,
     })
+
+    if (includeDbSize) {
+      const [dbSize, dbDataSize] = await Promise.all([
+        DbUtils.fetchSchemaTablesSize({ schema: Schemata.getSchemaSurvey(surveyId) }),
+        DbUtils.fetchSchemaTablesSize({ schema: Schemata.getSchemaSurveyRdb(surveyId) }),
+      ])
+      Object.assign(surveyWithCounts, { dbSize, dbDataSize })
+    }
   } catch (error) {
     Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}: ${error}`)
   }
   return surveyWithCounts
 }
 
-const _fetchSurveysWithCounts = async ({ surveys, draft, onProgress, stopIfFunction }) => {
+// Max number of surveys to fetch counts for concurrently, to avoid exhausting the DB connection pool
+// (each survey can issue up to ~6 concurrent queries via _fetchSurveyWithCounts).
+const _fetchSurveysWithCountsConcurrency = 3
+
+const _fetchSurveysWithCounts = async ({ surveys, draft, includeDbSize, onProgress, stopIfFunction }) => {
   const surveysWithCounts = []
-  for (const survey of surveys) {
+  for (let i = 0; i < surveys.length; i += _fetchSurveysWithCountsConcurrency) {
     if (stopIfFunction?.()) {
       break
     }
-    surveysWithCounts.push(await _fetchSurveyWithCounts({ survey, draft }))
+    const batch = surveys.slice(i, i + _fetchSurveysWithCountsConcurrency)
+    const batchWithCounts = await Promise.all(
+      batch.map((survey) => _fetchSurveyWithCounts({ survey, draft, includeDbSize }))
+    )
+    surveysWithCounts.push(...batchWithCounts)
     onProgress?.({ total: surveys.length, processed: surveysWithCounts.length })
   }
   return surveysWithCounts
@@ -440,6 +481,7 @@ export const fetchUserSurveysInfo = async ({
   sortBy,
   sortOrder,
   includeCounts = false,
+  includeDbSize = false,
   includeOwnerEmailAddress = false,
   onlyOwn = false,
   withChains = false,
@@ -473,16 +515,16 @@ export const fetchUserSurveysInfo = async ({
   if (!includeCounts) {
     return surveys
   }
-  return _fetchSurveysWithCounts({ surveys, draft, onProgress, stopIfFunction })
+  return _fetchSurveysWithCounts({ surveys, draft, includeDbSize, onProgress, stopIfFunction })
 }
 
 // ====== UPDATE
 export const updateSurveyProp = async (user, surveyId, key, value, system = false, client = db) =>
   client.tx(async (t) => {
-    await Promise.all([
-      SurveyRepository.updateSurveyProp(surveyId, key, value, t),
-      SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
+    await DbUtils.runQueries(t, [
+      () => SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+      () => SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, system, t),
     ])
 
     return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
@@ -492,14 +534,14 @@ const updateSurveyCyclesProp = async ({ surveyId, value, valuePrev }, client = d
   const cycles = Object.keys(value)
   const cyclesPrev = Object.keys(valuePrev)
   // Add new cycles to nodeDefs
-  const cyclesAdded = R.difference(cycles, cyclesPrev)
-  if (!R.isEmpty(cyclesAdded)) {
-    await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, client)
+  const cyclesAdded = A.difference(cycles, cyclesPrev)
+  if (!A.isEmpty(cyclesAdded)) {
+    await NodeDefManager.addNodeDefsCycles(surveyId, A.last(cyclesPrev), cyclesAdded, client)
   }
 
   // Remove delete cycles from nodeDefs
-  const cyclesRemoved = R.difference(cyclesPrev, cycles)
-  if (!R.isEmpty(cyclesRemoved)) {
+  const cyclesRemoved = A.difference(cyclesPrev, cycles)
+  if (!A.isEmpty(cyclesRemoved)) {
     await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, client)
   }
 }
@@ -517,11 +559,12 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
     for (const [key, value] of Object.entries(props)) {
       const valuePrev = propsPrev[key]
 
-      if (!R.equals(value, valuePrev)) {
-        await Promise.all([
-          SurveyRepository.updateSurveyProp(surveyId, key, value, t),
-          SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
-          ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
+      if (!A.equals(value, valuePrev)) {
+        await DbUtils.runQueries(t, [
+          () => SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+          () => SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+          () =>
+            ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
         ])
 
         if (key === Survey.infoKeys.cycles) {
@@ -576,7 +619,7 @@ export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
 export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
   client.tx(async (t) => {
     await SurveyRepository.publishSurveyProps(surveyId, t)
-    if (!R.isEmpty(langsDeleted)) {
+    if (!A.isEmpty(langsDeleted)) {
       await SurveyRepository.deleteSurveyLabelsAndDescriptions(surveyId, langsDeleted, t)
     }
   })
@@ -635,12 +678,15 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
     : await SurveyFileManager.fetchFileSummariesBySurveyId(surveyId, client)
 
   await client.tx(async (t) => {
+    // Drop the schemas first: the survey tables reference the "user" table, so dropping them locks it exclusively.
+    // Updating the user prefs before that would lock some user rows first, and a concurrent user prefs update
+    // (holding a lock on the "user" table and waiting for those rows) would cause a deadlock.
+    await SurveyRepository.dropSurveySchema(surveyId, t)
+    await SchemaRdbRepository.dropSchema(surveyId, t)
+    await SurveyRepository.deleteSurvey(surveyId, t)
     if (deleteUserPrefs) {
       await UserRepository.deleteUsersPrefsSurvey(surveyId, t)
     }
-    await SurveyRepository.deleteSurvey(surveyId, t)
-    await SurveyRepository.dropSurveySchema(surveyId, t)
-    await SchemaRdbRepository.dropSchema(surveyId, t)
   })
   if (filesToDelete.length > 0) {
     await SurveyFileManager.deleteFilesContentByUuids({ surveyId, fileSummaries: filesToDelete })

@@ -160,6 +160,9 @@ In Arena Mobile:
     currentPageHint: 'Current page: {{entityLabel}}',
     currentPageUnavailable:
       'Unable to determine the current page instance. Navigate to a specific page or export the full survey.',
+    includeQrCode: 'Include QR code',
+    includeQrCodeInfo:
+      'Adds a QR code on the first page linking to a read-only copy of this page’s entity PDF (valid for 1 year).',
     orientation: 'Page orientation',
     orientations: {
       portrait: 'Portrait',

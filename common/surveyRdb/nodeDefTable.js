@@ -1,5 +1,5 @@
-import * as R from 'ramda'
-import * as toSnakeCase from 'to-snake-case'
+import * as A from '@core/arena'
+import toSnakeCase from 'to-snake-case'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import ColumnNodeDef from '@common/model/db/tables/dataNodeDef/columnNodeDef'
@@ -26,7 +26,7 @@ const getDefaultColumnName = (nodeDef) =>
 export const getColumnNames = (nodeDef, includeExtendedCols = true) =>
   includeExtendedCols ? ColumnNodeDef.getColumnNames(nodeDef) : [getDefaultColumnName(nodeDef)]
 
-export const getColumnName = R.pipe(getColumnNames, R.head)
+export const getColumnName = A.pipe(getColumnNames, A.head)
 
 export const getNodeDefsWithColumnNames = ({ nodeDefs, includeExtendedCols }) =>
   nodeDefs.flatMap((nodeDef) => {
@@ -44,17 +44,17 @@ export const getNodeDefsByColumnNames = ({ nodeDefs, includeExtendedCols }) =>
   )
 
 export const extractColumnName = (nodeDef, col) =>
-  R.replace(
+  A.replace(
     // TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
     `${toSnakeCase(NodeDef.getName(nodeDef))}_`,
     '',
     col
   )
 
-export const extractNodeDefNameFromViewName = R.pipe(
-  R.defaultTo(''),
-  R.split(tablePrefix),
-  R.last,
-  R.split(viewSuffix),
-  R.head
+export const extractNodeDefNameFromViewName = A.pipe(
+  A.defaultTo(''),
+  A.split(tablePrefix),
+  A.last,
+  A.split(viewSuffix),
+  A.head
 )

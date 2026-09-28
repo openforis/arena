@@ -64,6 +64,7 @@ export const canExportSurveysList = (user: ArenaUser): boolean => User.isSystemA
 export const canViewTemplates = (user: ArenaUser): boolean => User.isSystemAdmin(user)
 
 export const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
+export const canEditSomeSurvey = _hasPermissionInSomeGroup(permissions.surveyEdit)
 export const canEditSurveyConfig = (user: ArenaUser): boolean => User.isSystemAdmin(user)
 export const canEditSurveyOwner = (user: ArenaUser): boolean => User.isSystemAdmin(user)
 export const canEditTemplates = (user: ArenaUser): boolean => User.isSystemAdmin(user)

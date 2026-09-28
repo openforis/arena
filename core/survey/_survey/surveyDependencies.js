@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import { Surveys } from '@openforis/arena-core'
@@ -10,11 +10,11 @@ const keys = {
 }
 
 // READ
-export const getDependencyGraph = R.propOr({}, keys.dependencyGraph)
+export const getDependencyGraph = A.propOr({}, keys.dependencyGraph)
 
 export const hasDependencyGraph = (survey) => {
   const graph = getDependencyGraph(survey)
-  return !R.isEmpty(graph)
+  return !A.isEmpty(graph)
 }
 
 export const getNodeDefDependencies =
@@ -29,7 +29,6 @@ export const getNodeDefDependentsUuids =
 
 /**
  * Determines if the specified nodeDefUuid is among the dependencies of the specified nodeDefSourceUuid.
- *
  * @param {!string} nodeDefUuid - The uuid of the node definition to look for.
  * @param {!string} nodeDefSourceUuid - The uuid of the node definition to use as source of the dependency.
  * @returns {boolean} - True if the dependency if found, false otherwise.
@@ -54,7 +53,7 @@ export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => (survey)
     visitedUuids.add(nodeDefUuidCurrent)
 
     const dependencies = getNodeDefDependencies(nodeDefUuidCurrent)(survey)
-    R.forEach((nodeDefDependent) => {
+    A.forEach((nodeDefDependent) => {
       if (!visitedUuids.has(nodeDefDependent.uuid)) {
         stack.push(nodeDefDependent.uuid)
       }
@@ -65,7 +64,7 @@ export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => (survey)
 }
 
 // UPDATE
-export const assocDependencyGraph = (dependencyGraph) => R.assoc(keys.dependencyGraph, dependencyGraph)
+export const assocDependencyGraph = (dependencyGraph) => A.assoc(keys.dependencyGraph, dependencyGraph)
 
 // ====== CREATE
 export const addNodeDefDependencies = (nodeDef) => async (survey) => Surveys.addNodeDefDependencies({ nodeDef, survey })

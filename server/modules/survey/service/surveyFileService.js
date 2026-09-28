@@ -73,9 +73,12 @@ export const {
   fetchFileSummaryByUuid,
   fetchFileSummariesBySurveyId,
   fetchFileSummariesByType,
+  fetchExistingNonDeletedFileUuids,
   // UPDATE
   updateFileProps,
   // DELETE
   deleteFileByUuid,
+  deleteFilesAndContent,
+  deleteFilesAndContentByUuids,
   cleanupSurveyFilesProps,
 } = SurveyFileManager

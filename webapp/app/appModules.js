@@ -293,6 +293,14 @@ export const helpModules = {
     key: 'about',
     path: 'about',
   },
+  changelog: {
+    key: 'changelog',
+    path: 'changelog',
+  },
+  whatsNew: {
+    key: 'whatsNew',
+    path: 'whats-new',
+  },
   disclaimer: {
     key: 'disclaimer',
     uri: 'https://openforis.org/legal-disclaimer/',

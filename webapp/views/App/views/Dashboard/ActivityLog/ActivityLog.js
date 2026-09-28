@@ -1,7 +1,7 @@
 import './ActivityLog.scss'
 
 import React, { useState } from 'react'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 
@@ -48,7 +48,7 @@ const ActivityLog = () => {
         <div className="activity-log__messages">
           {messages.length === 0 && <LoadingBar />}
           {messages.map((message, index) => {
-            const setRef = (el) => (index === R.length(messages) - 10 ? setNextActivitiesFetchTrigger(el) : null)
+            const setRef = (el) => (index === A.length(messages) - 10 ? setNextActivitiesFetchTrigger(el) : null)
 
             return <Message setRef={setRef} key={ActivityLogMessage.getId(message)} message={message} />
           })}

@@ -10,6 +10,7 @@ export default {
   CategoryImportInternalJob: '$t(jobs:CategoryImportJob)',
   CategoryBatchImportJob: '$t(jobs:CategoryImportJob)',
   CategoryValidationJob: 'Category Validation',
+  ChainsCyclesCheckJob: `Chains Cycles Check`,
   ChainsSamplingNodeDefsCheckJob: 'Processing Chains Sampling Node Definitions Creation',
   ChainsValidationJob: 'Processing Chains Validation',
   ChainsImportJob: 'Chains Import',
@@ -26,7 +27,7 @@ export default {
   NodeDefsTranslationJob: 'Node Definitions Labels Translation',
   NodeDefsImportJob: 'Node Definitions Import',
   NodeDefsValidationJob: 'Node Definitions Validation',
-  chainsCyclesCheckJob: `Chains Cycles Check`,
+  OdkImportJob: 'ODK Import',
   RecordCheckJob: 'Record Check',
   RecordsCloneJob: 'Records Clone',
   RecordsImportJob: 'Records Import',
@@ -71,6 +72,7 @@ export default {
   // survey backup
   SurveyInfoExportJob: 'Survey Info Export',
   CategoriesExportJob: 'Categories Export',
+  CategoryGeoPackageExportJob: 'Category GeoPackage Export',
   TaxonomiesExportJob: 'Taxonomies Export',
   RecordsExportJob: 'Records Export',
   RecordFilesExportJob: 'Record Files Export',
@@ -85,6 +87,4 @@ export default {
   RecordsValidationJob: `Records' validation`,
   // analysis
   PersistResultsJob: 'Persist Analysis Results',
-  elapsed: 'Elapsed',
-  remaining: 'Remaining',
 }

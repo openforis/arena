@@ -26,7 +26,8 @@ export default {
   NodeDefsTranslationJob: 'Перевод меток определений узлов',
   NodeDefsImportJob: 'Импорт определений узлов',
   NodeDefsValidationJob: 'Валидация определений узлов',
-  chainsCyclesCheckJob: 'Проверка циклов цепочек',
+  OdkImportJob: 'Импорт ODK',
+  ChainsCyclesCheckJob: 'Проверка циклов цепочек',
   RecordCheckJob: 'Проверка записи',
   RecordsCloneJob: 'Клонирование записей',
   RecordsImportJob: 'Импорт записей',
@@ -71,6 +72,7 @@ export default {
   // survey backup
   SurveyInfoExportJob: 'Экспорт информации об опросе',
   CategoriesExportJob: 'Экспорт категорий',
+  CategoryGeoPackageExportJob: 'Экспорт категории в GeoPackage',
   TaxonomiesExportJob: 'Экспорт таксономий',
   RecordsExportJob: 'Экспорт записей',
   RecordFilesExportJob: 'Экспорт файлов записей',
@@ -85,6 +87,4 @@ export default {
   RecordsValidationJob: 'Проверка записей',
   // analysis
   PersistResultsJob: 'Сохранение результатов анализа',
-  elapsed: 'Прошедшее время',
-  remaining: 'Оставшееся время',
 }

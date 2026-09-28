@@ -1,4 +1,3 @@
-import * as R from 'ramda'
 import * as A from '@core/arena'
 
 import { Objects, Strings } from '@openforis/arena-core'
@@ -269,7 +268,7 @@ export const fetchCategoryAndLevelsByUuid = async (
     ${backup || draft ? 'WHERE' : 'AND'} c.uuid = $1`,
     [categoryUuid]
   )
-  return A.pipe(R.values, R.head)(categories)
+  return A.pipe(A.values, A.head)(categories)
 }
 
 export const fetchItemsByCategoryUuid = async (
@@ -293,7 +292,7 @@ export const fetchItemsByCategoryUuid = async (
     (def) => DB.transformCallback(def, draft, true, backup)
   )
 
-  return backup || draft ? items : R.filter((item) => item.published)(items)
+  return backup || draft ? items : A.filter((item) => item.published)(items)
 }
 
 const getWhereConditionItemsWithLevelParentAndCode = ({ draft, parentUuid = null, tableAlias = 'i' }) => {
@@ -335,7 +334,7 @@ export const fetchItemsByLevelParentAndCode = async (
     itemDBTransformCallback({ draft })
   )
 
-  return draft ? items : R.filter((item) => item.published)(items)
+  return draft ? items : A.filter((item) => item.published)(items)
 }
 
 export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = false }, client = db) => {
@@ -394,7 +393,7 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
 }
 
 const _getSearchQueryParam = ({ searchValue }) =>
-  `${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
+  `%${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
 const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
@@ -427,7 +426,7 @@ export const fetchItemsByParentUuid = async (
   const search = _getSearchQueryParam({ searchValue })
   const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang, limit })
   const items = await client.map(select, { categoryUuid, search, limit }, itemDBTransformCallback({ draft }))
-  return draft ? items : R.filter((item) => item.published)(items)
+  return draft ? items : A.filter((item) => item.published)(items)
 }
 
 export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex }, client = db) => {
@@ -652,6 +651,24 @@ export const updateItemsProps = async ({ surveyId, items, draftProps = true }, c
   )
 }
 
+// Finds category items whose "extra" prop data has a pending draft change (i.e. props_draft has an
+// "extra" key whose value differs from the published one) - used to detect categories whose extra
+// prop values (not just their extraDef schema) changed, so that node defs reading them via
+// categoryItemProp can be flagged for value recalculation on publish (see
+// server/modules/survey/service/publish/nodeDefExtraPropDependencyUtils.js). Filtered at the DB level
+// so surveys with no pending item extra-value edits (the common case) never pull item data into
+// memory.
+export const fetchCategoryItemsWithChangedExtraValues = async ({ surveyId }, client = db) =>
+  client.any(
+    `SELECT cl.category_uuid AS "categoryUuid",
+            ci.props->'extra' AS "extraPublished",
+            ci.props_draft->'extra' AS "extraDraft"
+     FROM ${getSurveyDBSchema(surveyId)}.category_item ci
+     JOIN ${getSurveyDBSchema(surveyId)}.category_level cl ON cl.uuid = ci.level_uuid
+     WHERE ci.props_draft ? 'extra'
+       AND (ci.props_draft -> 'extra') IS DISTINCT FROM (ci.props -> 'extra')`
+  )
+
 // ============== DELETE
 
 export const deleteCategory = async (surveyId, categoryUuid, client = db) =>
@@ -683,7 +700,7 @@ export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client
       RETURNING l.uuid
     `,
     [categoryUuid],
-    R.prop('uuid')
+    A.prop('uuid')
   )
 
 export const deleteItem = async (surveyId, itemUuid, client = db) =>

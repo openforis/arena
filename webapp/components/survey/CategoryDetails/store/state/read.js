@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
 import * as StringUtils from '@core/stringUtils'
@@ -14,16 +12,16 @@ export const getFileFormat = A.prop(keys.fileFormat)
 
 export const getImportSummary = A.prop(keys.importSummary)
 
-export const isItemsLoading = ({ levelIndex }) => R.pathOr(false, [keys.itemsLoading, String(levelIndex)])
+export const isItemsLoading = ({ levelIndex }) => A.pathOr(false, [keys.itemsLoading, String(levelIndex)])
 
-export const getItems = ({ levelIndex }) => R.pathOr({}, [keys.items, String(levelIndex)])
+export const getItems = ({ levelIndex }) => A.pathOr({}, [keys.items, String(levelIndex)])
 
-export const getItemsArray = ({ levelIndex }) => R.pathOr([], [keys.itemsArray, String(levelIndex)])
+export const getItemsArray = ({ levelIndex }) => A.pathOr([], [keys.itemsArray, String(levelIndex)])
 
 export const getItemActive =
   ({ levelIndex }) =>
   (state) => {
-    const itemActiveUuid = R.path([keys.itemsActive, String(levelIndex)])(state)
+    const itemActiveUuid = A.path([keys.itemsActive, String(levelIndex)])(state)
     const items = getItems({ levelIndex })(state)
     return items[itemActiveUuid]
   }
@@ -37,10 +35,10 @@ export const isItemActiveLeaf =
 
 export const getItemActiveLastLevelIndex = A.pipe(
   A.prop(keys.itemsActive),
-  R.keys,
-  R.map(Number),
-  R.sort((a, b) => a - b),
-  R.last
+  A.keys,
+  A.map(Number),
+  A.sort((a, b) => a - b),
+  A.last
 )
 
 export const isCategoryEmpty = (state) => {

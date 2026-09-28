@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { NodeDefs, NodeDefType, Objects } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
@@ -7,7 +5,8 @@ import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import { ArrayUtils } from '@core/arrayUtils'
-import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
+import { functionNames, userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
+import { extractCallFirstTwoArgs } from '@core/expressionParser/helpers/functionCallArgs'
 
 import * as TextUtils from '@webapp/utils/textUtils'
 
@@ -94,6 +93,9 @@ export const propKeys = {
   maxFileSize: 'maxFileSize', // max file size in MB
   fileType: 'fileType',
   geotagInformationShown: 'geotagInformationShown',
+
+  // Time
+  includeSeconds: 'includeSeconds',
 
   // Coordinate
   allowOnlyDeviceCoordinate: 'allowOnlyDeviceCoordinate',
@@ -232,16 +234,16 @@ export const {
   dissocProp,
 } = ObjectUtils
 
-export const getType = R.prop(keys.type)
+export const getType = A.prop(keys.type)
 export const getName = (nodeDef) => getProp(propKeys.name, '')(nodeDef)
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
 export const isQualifier = ObjectUtils.isPropTrue(propKeys.qualifier)
 export const isAutoIncrementalKey = ObjectUtils.isPropTrue(propKeys.autoIncrementalKey)
-export const isRoot = R.pipe(getParentUuid, R.isNil)
+export const isRoot = A.pipe(getParentUuid, A.isNil)
 export const isMultiple = ObjectUtils.isPropTrue(propKeys.multiple)
-export const isSingle = R.pipe(isMultiple, R.not)
+export const isSingle = A.pipe(isMultiple, A.not)
 
 const isType = (type) => (nodeDef) => getType(nodeDef) === type
 
@@ -250,7 +252,7 @@ export const isSingleEntity = (nodeDef) => isEntity(nodeDef) && isSingle(nodeDef
 export const isMultipleEntity = (nodeDef) => isEntity(nodeDef) && isMultiple(nodeDef)
 export const isEntityOrMultiple = (nodeDef) => isEntity(nodeDef) || isMultiple(nodeDef)
 
-export const isAttribute = R.pipe(isEntity, R.not)
+export const isAttribute = A.pipe(isEntity, A.not)
 export const isSingleAttribute = (nodeDef) => isAttribute(nodeDef) && isSingle(nodeDef)
 export const isMultipleAttribute = (nodeDef) => isAttribute(nodeDef) && isMultiple(nodeDef)
 export const isAttributeComposite = (nodeDef) =>
@@ -309,6 +311,8 @@ export const isNumberOfFilesEnabled = isMultiple
 export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
 export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 export const isGeotagInformationShown = ObjectUtils.isPropTrue(propKeys.geotagInformationShown)
+// time
+export const isSecondsIncluded = ObjectUtils.isPropTrue(propKeys.includeSeconds)
 // taxon
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 export const getVernacularNameLabels = getProp(propKeys.vernacularNameLabels, {})
@@ -340,8 +344,8 @@ export const isLayoutElement = isFormHeader
 export const getPrintOrientation = getProp(propKeys.printOrientation)
 
 // ==== READ meta
-export const getMeta = R.propOr({}, keys.meta)
-export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
+export const getMeta = A.propOr({}, keys.meta)
+export const getMetaHierarchy = A.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
 export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultToName = true) => {
@@ -351,7 +355,7 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultT
   if (type === NodeDefLabelTypes.name) {
     firstPart = name
   } else {
-    const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+    const label = A.path([keys.props, propKeys.labels, lang], nodeDef)
 
     if (!StringUtils.isBlank(label)) {
       if (type === NodeDefLabelTypes.label) {
@@ -372,30 +376,30 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultT
 }
 export const getLabelWithType = ({ nodeDef, lang, type }) => getLabel(nodeDef, lang, type)
 
-export const getDescription = (lang) => (nodeDef) => R.propOr('', lang, getDescriptions(nodeDef))
+export const getDescription = (lang) => (nodeDef) => A.propOr('', lang, getDescriptions(nodeDef))
 
-export const getCycleFirst = R.pipe(getCycles, R.head)
+export const getCycleFirst = A.pipe(getCycles, A.head)
 
 export const isInCycle = (cycle) => (nodeDef) => getCycles(nodeDef).includes(cycle)
 
 export const isAncestorOf = (nodeDefDescendant) => (nodeDef) =>
-  R.startsWith([...getMetaHierarchy(nodeDef), getUuid(nodeDef)], getMetaHierarchy(nodeDefDescendant))
+  A.startsWith([...getMetaHierarchy(nodeDef), getUuid(nodeDef)], getMetaHierarchy(nodeDefDescendant))
 
 export const isDescendantOf = (nodeDefAncestor) => (nodeDef) => {
   const hAncestor = [...getMetaHierarchy(nodeDefAncestor), getUuid(nodeDefAncestor)]
-  return R.startsWith(hAncestor, getMetaHierarchy(nodeDef))
+  return A.startsWith(hAncestor, getMetaHierarchy(nodeDef))
 }
 
 // Advanced props
 
-export const getPropsAdvanced = R.propOr({}, keys.propsAdvanced)
-export const getPropsAdvancedDraft = R.propOr({}, keys.propsAdvancedDraft)
+export const getPropsAdvanced = A.propOr({}, keys.propsAdvanced)
+export const getPropsAdvancedDraft = A.propOr({}, keys.propsAdvancedDraft)
 
 export const getPropAdvanced = (prop, defaultTo = null) =>
-  R.pipe(getPropsAdvanced, R.pathOr(defaultTo, prop.split('.')))
+  A.pipe(getPropsAdvanced, A.pathOr(defaultTo, prop.split('.')))
 
 export const getPropAdvancedDraft = (prop, defaultTo = null) =>
-  R.pipe(getPropsAdvancedDraft, R.pathOr(defaultTo, prop.split('.')))
+  A.pipe(getPropsAdvancedDraft, A.pathOr(defaultTo, prop.split('.')))
 
 export const getPropOrDraftAdvanced =
   (prop, defaultTo = null) =>
@@ -416,37 +420,66 @@ export const getAllPropsAndAllPropsDraft =
     }
   }
 
-export const hasAdvancedPropsDraft = (nodeDef) => R.prop(keys.draftAdvanced, nodeDef) === true
-export const hasAdvancedPropsApplicableDraft = (nodeDef) => R.prop(keys.draftAdvancedApplicable, nodeDef) === true
-export const hasAdvancedPropsDefaultValuesDraft = (nodeDef) => R.prop(keys.draftAdvancedDefaultValues, nodeDef) === true
+export const hasAdvancedPropsDraft = (nodeDef) => A.prop(keys.draftAdvanced, nodeDef) === true
+export const hasAdvancedPropsApplicableDraft = (nodeDef) => A.prop(keys.draftAdvancedApplicable, nodeDef) === true
+export const hasAdvancedPropsDefaultValuesDraft = (nodeDef) => A.prop(keys.draftAdvancedDefaultValues, nodeDef) === true
 export const hasAdvancedPropsFileNameExpressionDraft = (nodeDef) =>
-  R.prop(keys.draftAdvancedFileNameExpression, nodeDef) === true
-export const hasAdvancedPropsValidationsDraft = (nodeDef) => R.prop(keys.draftAdvancedValidations, nodeDef) === true
+  A.prop(keys.draftAdvancedFileNameExpression, nodeDef) === true
+export const hasAdvancedPropsValidationsDraft = (nodeDef) => A.prop(keys.draftAdvancedValidations, nodeDef) === true
+// Unlike the flags above (set on the node def row by the server whenever the corresponding key is
+// present in propsAdvancedDraft, for a fixed set of keys it tracks), enumeratingItemsExpression and
+// itemsFilter are not tracked server-side, so they're checked here instead, directly against
+// propsAdvancedDraft. This only works if the node def was fetched with backup: true (see
+// fetchSurveyAndNodeDefsBySurveyId) - a plain draft fetch merges propsAdvancedDraft into propsAdvanced
+// and discards it, at which point these would always read as unchanged.
+export const hasAdvancedPropsEnumeratingItemsExpressionDraft = (nodeDef) =>
+  Boolean(getPropAdvancedDraft(keysPropsAdvanced.enumeratingItemsExpression)(nodeDef))
+export const hasAdvancedPropsItemsFilterDraft = (nodeDef) =>
+  Boolean(getPropAdvancedDraft(keysPropsAdvanced.itemsFilter)(nodeDef))
+// Node defs whose value (or, for auto-enumerated entities, their enumerated child nodes) can be
+// recalculated on publish - see RecordCheckJob. Requires the node def to have been fetched with
+// backup: true (see the two functions above).
+export const hasValueAffectingAdvancedPropsDraft = (nodeDef) =>
+  hasAdvancedPropsApplicableDraft(nodeDef) ||
+  hasAdvancedPropsDefaultValuesDraft(nodeDef) ||
+  hasAdvancedPropsFileNameExpressionDraft(nodeDef) ||
+  hasAdvancedPropsEnumeratingItemsExpressionDraft(nodeDef) ||
+  hasAdvancedPropsItemsFilterDraft(nodeDef)
 const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
 export const getDefaultValues = getPropAdvanced(keysPropsAdvanced.defaultValues, [])
-export const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
+export const hasDefaultValues = A.pipe(getDefaultValues, A.isEmpty, A.not)
 export const isDefaultValueEvaluatedOneTime = getPropAdvanced(keysPropsAdvanced.defaultValueEvaluatedOneTime, false)
 
 export const getEditableIf = getPropAdvanced(keysPropsAdvanced.editableIf, [])
-export const isAlwaysEditable = R.pipe(getEditableIf, R.isEmpty)
+export const isAlwaysEditable = A.pipe(getEditableIf, A.isEmpty)
 export const getVisibleIf = getPropAdvanced(keysPropsAdvanced.visibleIf, [])
-export const isAlwaysVisible = R.pipe(getVisibleIf, R.isEmpty)
+export const isAlwaysVisible = A.pipe(getVisibleIf, A.isEmpty)
 
 export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
-export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
+export const getValidationExpressions = A.pipe(getValidations, NodeDefValidations.getExpressions)
 export const hasValidationsDefined = (nodeDef) => {
   const validations = getValidations(nodeDef)
   return (
     NodeDefValidations.isRequired(validations) ||
     NodeDefValidations.isUnique(validations) ||
-    !R.isEmpty(NodeDefValidations.getMinCount(validations)) ||
-    !R.isEmpty(NodeDefValidations.getMaxCount(validations)) ||
-    !R.isEmpty(NodeDefValidations.getExpressions(validations))
+    !A.isEmpty(NodeDefValidations.getMinCount(validations)) ||
+    !A.isEmpty(NodeDefValidations.getMaxCount(validations)) ||
+    !A.isEmpty(NodeDefValidations.getExpressions(validations))
   )
 }
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
+
+// Flattens an array of NodeDefExpression objects (as stored under defaultValues/applicable/
+// validations.expressions/editableIf/visibleIf - each { expression, applyIf, ... }) into a plain array
+// of expression strings (both the expression itself and its applyIf, when present).
+const _expressionStringsFromNodeDefExpressions = (nodeDefExpressions) =>
+  nodeDefExpressions.reduce((acc, nodeDefExpression) => {
+    ArrayUtils.addIfNotEmpty(NodeDefExpression.getExpression(nodeDefExpression))(acc)
+    ArrayUtils.addIfNotEmpty(NodeDefExpression.getApplyIf(nodeDefExpression))(acc)
+    return acc
+  }, [])
 
 export const getAllExpressions = (nodeDef) => {
   const nodeDefExpressions = [
@@ -456,16 +489,35 @@ export const getAllExpressions = (nodeDef) => {
     ...getEditableIf(nodeDef),
     ...getVisibleIf(nodeDef),
   ]
-  const expressions = nodeDefExpressions.reduce((acc, nodeDefExpression) => {
-    ArrayUtils.addIfNotEmpty(NodeDefExpression.getExpression(nodeDefExpression))(acc)
-    ArrayUtils.addIfNotEmpty(NodeDefExpression.getApplyIf(nodeDefExpression))(acc)
-    return acc
-  }, [])
+  const expressions = _expressionStringsFromNodeDefExpressions(nodeDefExpressions)
   ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
   ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
   ArrayUtils.addIfNotEmpty(getEnumeratingItemsExpression(nodeDef))(expressions)
   return expressions
 }
+
+// Value-affecting-only subset of getAllExpressions: applicable, default values, file name expression,
+// enumerating items expression, items filter - the exact same boundary hasValueAffectingAdvancedPropsDraft
+// draws between props that can change a node's stored value and ones that don't (e.g. validations,
+// editableIf, visibleIf are excluded). Used to find node defs whose value needs recalculating when
+// something they read (e.g. a category/taxonomy extra prop) changes - see
+// referencesCategoryExtraProp/referencesTaxonomyExtraProp below.
+export const getValueAffectingExpressions = (nodeDef) => {
+  const expressions = _expressionStringsFromNodeDefExpressions([
+    ...getDefaultValues(nodeDef),
+    ...getApplicable(nodeDef),
+  ])
+  ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getEnumeratingItemsExpression(nodeDef))(expressions)
+  return expressions
+}
+
+// Plain expression strings from the node def's validation expressions only (see
+// getValidationExpressions) - used by referencesCategoryExtraPropInValidations/
+// referencesTaxonomyExtraPropInValidations below.
+const getValidationOnlyExpressionStrings = (nodeDef) =>
+  _expressionStringsFromNodeDefExpressions(getValidationExpressions(nodeDef))
 
 const userDependentFunctionsRegExp = new RegExp(String.raw`\b(${userDependentFunctionNames.join('|')})\s*\(`)
 
@@ -473,6 +525,66 @@ const userDependentFunctionsRegExp = new RegExp(String.raw`\b(${userDependentFun
 // result depends on the currently logged in user (e.g. userProp).
 export const hasUserDependentExpressions = (nodeDef) =>
   getAllExpressions(nodeDef).some((expression) => userDependentFunctionsRegExp.test(expression))
+
+// True if any of the given expressions calls categoryItemProp(entityName, propName, ...) /
+// taxonProp(entityName, propName, ...) - matched by function name - referencing the given
+// category/taxonomy name, for one of the given (changed) extra prop names. A non-literal propName
+// argument (identifier, nested call...) can't be resolved statically, so it's conservatively treated
+// as a potential match rather than ruled out.
+const _referencesExtraPropChange = ({ expressions, functionName, entityName, changedPropNames }) =>
+  expressions.some((expression) =>
+    extractCallFirstTwoArgs(expression, functionName).some(
+      ([entityNameArg, propNameArg]) =>
+        entityNameArg === entityName && (propNameArg === null || changedPropNames.has(propNameArg))
+    )
+  )
+
+// True if nodeDef's value could be affected by a change to one of `changedPropNames` on the category
+// named `categoryName` - i.e. one of its value-affecting expressions calls
+// categoryItemProp(categoryName, propName, ...) with propName in changedPropNames (or unresolvable).
+export const referencesCategoryExtraProp =
+  ({ categoryName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValueAffectingExpressions(nodeDef),
+      functionName: functionNames.categoryItemProp,
+      entityName: categoryName,
+      changedPropNames,
+    })
+
+// Same as referencesCategoryExtraProp, for taxonProp(taxonomyName, propName, ...) calls.
+export const referencesTaxonomyExtraProp =
+  ({ taxonomyName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValueAffectingExpressions(nodeDef),
+      functionName: functionNames.taxonProp,
+      entityName: taxonomyName,
+      changedPropNames,
+    })
+
+// Same as referencesCategoryExtraProp/referencesTaxonomyExtraProp, but scanning only validation
+// expressions - used to trigger re-validation (not value recalculation) of node defs that only
+// reference a changed extra prop from a validation expression.
+export const referencesCategoryExtraPropInValidations =
+  ({ categoryName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValidationOnlyExpressionStrings(nodeDef),
+      functionName: functionNames.categoryItemProp,
+      entityName: categoryName,
+      changedPropNames,
+    })
+
+export const referencesTaxonomyExtraPropInValidations =
+  ({ taxonomyName, changedPropNames }) =>
+  (nodeDef) =>
+    _referencesExtraPropChange({
+      expressions: getValidationOnlyExpressionStrings(nodeDef),
+      functionName: functionNames.taxonProp,
+      entityName: taxonomyName,
+      changedPropNames,
+    })
 
 export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClone, false)
 
@@ -495,7 +607,7 @@ export const isActive = getPropAdvanced(keysPropsAdvanced.active, false)
 export const getScript = getPropOrDraftAdvanced(keysPropsAdvanced.script, '')
 
 export const getAggregateFunctions = getPropOrDraftAdvanced(keysPropsAdvanced.aggregateFunctions, {})
-export const getAggregateFunctionByUuid = (uuid) => R.pipe(getAggregateFunctions, R.propOr(null, uuid))
+export const getAggregateFunctionByUuid = (uuid) => A.pipe(getAggregateFunctions, A.propOr(null, uuid))
 
 // READ Analysis
 export const isAnalysis = ObjectUtils.isKeyTrue(keys.analysis)
@@ -543,14 +655,14 @@ export const newNodeDef = (
 
 // ==== UPDATE
 
-export const assocDeleted = R.assoc(keys.deleted)
+export const assocDeleted = A.assoc(keys.deleted)
 
-export const assocParentUuid = R.assoc(keys.parentUuid)
-export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
+export const assocParentUuid = A.assoc(keys.parentUuid)
+export const assocMetaHierarchy = A.assocPath([keys.meta, metaKeys.h])
 export const { mergeProps } = ObjectUtils
-const assocPropsAdvanced = R.assoc(keys.propsAdvanced)
+const assocPropsAdvanced = A.assoc(keys.propsAdvanced)
 export const mergePropsAdvanced = (propsAdvanced) => (nodeDef) =>
-  R.pipe(getPropsAdvanced, R.mergeLeft(propsAdvanced), (propsAdvancedUpdated) =>
+  A.pipe(getPropsAdvanced, A.mergeLeft(propsAdvanced), (propsAdvancedUpdated) =>
     assocPropsAdvanced(propsAdvancedUpdated, nodeDef)
   )(nodeDef)
 export const assocDefaultValues = (defaultValues) =>
@@ -558,7 +670,7 @@ export const assocDefaultValues = (defaultValues) =>
 export const assocDefaultValueEvaluatedOnlyOneTime = (evaluatedOnlyOneTime) =>
   mergePropsAdvanced({ [keysPropsAdvanced.defaultValueEvaluatedOneTime]: evaluatedOnlyOneTime })
 export const assocValidations = (validations) => mergePropsAdvanced({ [keysPropsAdvanced.validations]: validations })
-export const dissocTemporary = R.dissoc(keys.temporary)
+export const dissocTemporary = A.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
@@ -626,15 +738,15 @@ export const changeParentEntity =
 export const convertToType =
   ({ toType }) =>
   (nodeDef) => {
-    const propsUpdated = R.pick(commonAttributePropsKeys)(getProps(nodeDef))
+    const propsUpdated = A.pick(commonAttributePropsKeys)(getProps(nodeDef))
     const propsAdvancedToKeep = isAutoIncrementalKey(nodeDef)
       ? commonAttributePropsAdvancedKeys.filter((prop) => prop !== keysPropsAdvanced.defaultValues)
       : commonAttributePropsAdvancedKeys
-    const propsAdvancedUpdated = R.pick(propsAdvancedToKeep)(getPropsAdvanced(nodeDef))
+    const propsAdvancedUpdated = A.pick(propsAdvancedToKeep)(getPropsAdvanced(nodeDef))
 
     const layout = getLayout(nodeDef)
     const layoutUpdated = Object.entries(layout).reduce((acc, [cycleKey, cycleLayout]) => {
-      acc[cycleKey] = R.pick(NodeDefLayout.commonAttributeKeys)(cycleLayout)
+      acc[cycleKey] = A.pick(NodeDefLayout.commonAttributeKeys)(cycleLayout)
       return acc
     }, {})
     propsUpdated[propKeys.layout] = layoutUpdated
@@ -703,7 +815,7 @@ export const canNodeDefBeMultiple = (nodeDef) =>
   // Attribute def but not layout element and not analysis
   (!isLayoutElement(nodeDef) &&
     !isAnalysis(nodeDef) &&
-    R.includes(getType(nodeDef), [
+    A.includes(getType(nodeDef), [
       nodeDefType.decimal,
       nodeDefType.code,
       nodeDefType.file,
@@ -712,7 +824,7 @@ export const canNodeDefBeMultiple = (nodeDef) =>
     ]))
 
 export const canNodeDefTypeBeKey = (type) =>
-  R.includes(type, [
+  A.includes(type, [
     nodeDefType.date,
     nodeDefType.decimal,
     nodeDefType.code,
@@ -727,7 +839,7 @@ export const canNodeDefBeKey = (nodeDef) =>
 
 export const canHaveDefaultValue = (nodeDef) =>
   isSingleAttribute(nodeDef) &&
-  R.includes(getType(nodeDef), [
+  A.includes(getType(nodeDef), [
     nodeDefType.boolean,
     nodeDefType.code,
     nodeDefType.coordinate,
@@ -740,7 +852,7 @@ export const canHaveDefaultValue = (nodeDef) =>
     nodeDefType.time,
   ])
 
-export const belongsToAllCycles = (cycles) => (nodeDef) => R.isEmpty(R.difference(cycles, getCycles(nodeDef)))
+export const belongsToAllCycles = (cycles) => (nodeDef) => A.isEmpty(A.difference(cycles, getCycles(nodeDef)))
 export const canBeExcludedInClone = (nodeDef) => !isRoot(nodeDef) && !isKey(nodeDef)
 
 const isEntityAndNotRoot = (nodeDef) => isEntity(nodeDef) && !isRoot(nodeDef)
@@ -762,13 +874,14 @@ export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
   !isMultiple(nodeDef) &&
   !isFile(nodeDef) &&
   !isGeo(nodeDef) &&
+  !isAnalysis(nodeDef) &&
   NodeDefLayout.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
 export const canIncludeInPreviousCycleLink = (cycle) => (nodeDef) =>
   !isKey(nodeDef) && NodeDefLayout.canIncludeInPreviousCycleLink(cycle)(nodeDef)
 
 export const canHaveMobileProps = (cycle) => (nodeDef) =>
-  canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+  canBeHiddenInMobile(nodeDef) || canIncludeInPreviousCycleLink(cycle)(nodeDef)
 
 export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
   if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
@@ -816,7 +929,7 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   // clear include in multiple entity summary if not applicable
   if (
     !canIncludeInMultipleEntitySummary(cycle)(nodeDefUpdated) &&
-    NodeDefLayout.isIncludedInMultipleEntitySummary(getLayout(nodeDefUpdated))
+    NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(nodeDefUpdated)
   ) {
     nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInMultipleEntitySummary })(
       nodeDefUpdated
@@ -825,7 +938,7 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   // clear include in previous cycle link if not applicable
   if (
     !canIncludeInPreviousCycleLink(cycle)(nodeDefUpdated) &&
-    NodeDefLayout.isIncludedInPreviousCycleLink(getLayout(nodeDefUpdated))
+    NodeDefLayout.isIncludedInPreviousCycleLink(cycle)(nodeDefUpdated)
   ) {
     nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInPreviousCycleLink })(nodeDefUpdated)
   }

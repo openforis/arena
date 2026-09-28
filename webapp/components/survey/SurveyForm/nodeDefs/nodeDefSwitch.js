@@ -2,7 +2,7 @@ import './nodeDefs.scss'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -297,7 +297,7 @@ const NodeDefSwitch = (props) => {
   })
 
   const checkNodePlaceholder = useCallback(() => {
-    if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
+    if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && A.none(Node.isPlaceholder, nodes)) {
       createNodePlaceholder(nodeDef, parentNode, NodeDefUiProps.getDefaultValue(nodeDef))
     }
   }, [canAddNode, createNodePlaceholder, nodeDef, nodes, parentNode])
@@ -317,6 +317,10 @@ const NodeDefSwitch = (props) => {
     }
   }, [nodeDefUuid])
 
+  // the nodes of the attributes of a new entity are created server side: until they arrive, there is no node to update
+  const attributeNodeMissing =
+    entry && NodeDef.isAttribute(nodeDef) && NodeDef.isSingle(nodeDef) && A.isEmpty(nodes ?? [])
+
   const nestedComponentsProps = {
     ...props,
     ...entryProps,
@@ -324,6 +328,7 @@ const NodeDefSwitch = (props) => {
     readOnly:
       readOnlyProp ||
       readOnly ||
+      attributeNodeMissing ||
       keyFieldLocked ||
       !editable ||
       qualifierFieldLocked ||

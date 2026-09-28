@@ -1,7 +1,9 @@
 import './SurveyInfo.scss'
 
+import * as ObjectUtils from '@core/objectUtils'
+
+import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonSave } from '@webapp/components'
@@ -17,11 +19,10 @@ import { SurveyInfoMap } from './SurveyInfoMap'
 import { useSurveyInfoForm } from './store'
 import { SurveySecurityEditor } from './surveySecurityEditor'
 
-const SurveyInfo = () => {
+const SurveyInfoForm = () => {
   const readOnly = !useAuthCanEditSurvey()
   const isSystemAdmin = useUserIsSystemAdmin()
   const canUseAnalysis = useAuthCanUseAnalysis()
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   const {
     preloadedMapLayers,
@@ -108,7 +109,7 @@ const SurveyInfo = () => {
       },
     })
   }
-  if (experimentalFeatures && !readOnly) {
+  if (!readOnly) {
     tabs.push({
       key: 'documents',
       component: SurveyInfoDocuments,
@@ -159,6 +160,17 @@ const SurveyInfo = () => {
       )}
     </div>
   )
+}
+
+const SurveyInfo = () => {
+  const surveyInfo = useSurveyInfo()
+  const surveyUuid = ObjectUtils.getUuid(surveyInfo)
+
+  // the form state is initialized with the survey info: render the form only once the survey info has been loaded
+  // (e.g. when the page is reloaded) and initialize it again if the current survey changes
+  if (!surveyUuid) return null
+
+  return <SurveyInfoForm key={surveyUuid} />
 }
 
 export default SurveyInfo

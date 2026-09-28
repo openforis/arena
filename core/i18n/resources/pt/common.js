@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Ativo',
@@ -55,6 +57,7 @@ Deseja ignorá-las?`,
     download: 'Baixar',
     draft: 'Rascunho',
     edit: 'Editar',
+    elapsed: 'Decorrido',
     email: 'Email',
     email_other: 'Emails',
     emailSentConfirmation: `Um email para {{email}} foi enviado.
@@ -159,9 +162,34 @@ Deseja prosseguir?`,
 - Os táxons não podem ser excluídos.
 
 **Tem certeza de que deseja continuar?**`,
+    publishRecordValuesUpdateConfirm: `#### Publicar {{survey}} irá atualizar dados já registrados ####
+
+{{reasons}}
+
+Esta operação pode alterar ou apagar permanentemente dados já inseridos.
+
+Para publicar sem atualizar os dados existentes, marque "Pular atualização de dados" abaixo (não recomendado).`,
+    publishRecordValuesUpdateConfirmHeader: 'Os dados de registros existentes serão atualizados',
+    publishRecordValuesUpdateConfirmOk: 'Publicar e atualizar dados',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Digite o nome da pesquisa "{{strongConfirmRequiredText}}" para confirmar',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Os seguintes atributos serão modificados, e seus valores nos registros existentes serão recalculados automaticamente: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Os seguintes atributos usam uma propriedade extra de uma categoria ou taxonomia que foi alterada, o que fará com que seu valor seja recalculado nos registros existentes: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Pular atualização de dados',
+    publishSkipDataUpdateConfirmOk: 'Pular atualização de dados e publicar',
+    publishSkipDataUpdateImplications: 'Pular a atualização de dados significa que:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Os registros existentes podem não corresponder mais à nova definição da pesquisa',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Os valores afetados não serão recalculados até serem reinseridos manualmente',
+    publishSkipDataUpdateImplicationChains:
+      'As cadeias de processamento que usam esses atributos podem produzir resultados desatualizados',
     raiseTicketInSupportForum: `Em caso de problemas, abra um chamado com a tag 'arena' no nosso <b>Fórum de Suporte</b>: $t(links.supportForum)`,
     record: 'Registro',
     record_other: 'Registros',
+    remaining: 'Restante',
     remote: 'Remoto',
     required: 'Obrigatório',
     requiredField: 'campo obrigatório',
@@ -367,6 +395,8 @@ Deseja prosseguir?`,
 
     help: 'Ajuda',
     about: 'Sobre',
+    changelog: 'Registo de alterações',
+    whatsNew: 'Novidades',
     disclaimer: 'Aviso legal',
     userManual: 'Manual do usuário',
   },
@@ -736,16 +766,34 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
         'Ao excluir a unidade base, todas as seleções de "variável baseada em área" serão desmarcadas. Continuar?',
     },
     downloadSummaryJSON: 'Baixar resumo (JSON)',
-    firstPhaseCategory: 'Categoria da 1ª fase',
-    firstPhaseCategoryInfo: 'Selecione a categoria que contém as amostras da 1ª fase.',
-    firstPhaseCategoryExtraProp: {
-      label: 'Atributo de estrato da 1ª fase',
-      info: 'Selecione a variável usada para dividir a população original em estratos amplos para a fase inicial de amostragem.',
+    mauFile: {
+      upload: 'Enviar MAU.zip',
+      download: 'Baixar MAU.zip',
+      delete: 'Excluir MAU.zip',
+      confirmCycleAssociation: 'O arquivo MAU.zip será associado ao ciclo atual ({{cycle}}). Deseja continuar?',
+      confirmReplace: 'Já foi enviado um arquivo MAU.zip para esta cadeia. Deseja substituí-lo?',
+      confirmDelete: 'Excluir o arquivo MAU.zip enviado para esta cadeia?',
+      uploadComplete: 'Arquivo MAU.zip enviado com sucesso',
+      deleteComplete: 'Arquivo MAU.zip excluído',
+      invalidFileExtension: 'Selecione um arquivo .zip',
     },
-    firstPhaseCommonAttribute: {
-      label: 'Atributo comum',
-      info: `Atributo em comum entre a unidade base e a tabela da 1ª fase 
-    (deve ser um atributo de código com o mesmo nome de uma propriedade extra definida para a categoria da 1ª fase)`,
+    phase1Category: 'Categoria da 1ª fase',
+    phase1CategoryInfo: 'Selecione a categoria que contém as amostras da 1ª fase.',
+    phase2JoinEntity: {
+      label: 'Entidade de junção (2ª fase)',
+      info: 'Entidade usada para unir a unidade base à categoria da 1ª fase: a própria entidade da unidade base, ou uma das suas entidades superiores.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Unir usando a ligação de Sampling Point Data',
+      info: 'A(s) chave(s) da entidade da 2ª fase são lidas da tabela Sampling Point Data, que é a mesma tabela usada para a 1ª fase.',
+    },
+    phase1JoinAttribute: {
+      label: 'Atributo de junção (1ª fase)',
+      info: 'Selecione a coluna da tabela $t(chainView.phase1Category) (uma propriedade extra, ou "code") usada para a unir à entidade de junção da 2ª fase.',
+    },
+    phase2JoinAttribute: {
+      label: 'Atributo de junção (2ª fase)',
+      info: 'Selecione o atributo (da entidade da 2ª fase) para unir com a tabela da 1ª fase; o seu valor é comparado com o atributo de junção da 1ª fase anterior.',
     },
     formLabel: 'Rótulo da cadeia de processamento',
     basic: 'Básico',
@@ -790,8 +838,7 @@ Este processo pode ser lento.`,
     },
     stratumAttribute: 'Atributo de estrato',
     stratumAttributeInfo: 'Selecione a variável usada para estratificar a amostra.',
-    stratumAttribute2ndPhase: 'Atributo de estrato da 2ª fase',
-    stratumAttribute2ndPhaseInfo: `Selecione a variável usada para subestratificar a amostra da 1ª fase antes de extrair a subamostra final e detalhada.`,
+    stratumAttribute2ndPhaseInfo: `Selecione a variável usada para subestratificar a amostra da 1ª fase antes de extrair a subamostra final e detalhada. Apenas são apresentados os atributos cujo nome também aparece como coluna da categoria da 1ª fase.`,
     postStratificationAttribute: 'Atributo de pós-estratificação',
     areaWeightingMethod: 'Método de ponderação por área',
     clusteringEntity: 'Entidade de agrupamento',
@@ -909,6 +956,9 @@ $t(common.appNameFull)
  * Scripts R do Arena no GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
+    changelog: {
+      title: '$t(appModules.changelog)',
+    },
   },
 
   // ====== Survey views
@@ -1017,6 +1067,10 @@ $t(common.appNameFull)
       form: 'Formulário',
       formula: 'Fórmula',
       includedInClonedData: 'Incluído nos dados clonados',
+      includedInMultipleEntitySummary: {
+        label: 'Incluir no resumo da entidade múltipla',
+        info: `Se marcado, o valor do atributo ficará visível no seletor de entidades e na tela de resumo da entidade`,
+      },
       includedInRecordsList: {
         label: 'Incluir na lista de registros',
         info: `Se marcado, o atributo ficará visível na lista de registros`,
@@ -1084,10 +1138,6 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
         label: 'Oculto no Arena Mobile',
         info: `Se marcado, o atributo não ficará visível no AM`,
       },
-      includedInMultipleEntitySummary: {
-        label: 'Incluir no resumo da entidade múltipla',
-        info: `Se marcado, o atributo ficará visível na tela de resumo da entidade (no Arena Mobile)`,
-      },
       includedInPreviousCycleLink: {
         label: 'Incluir no link para ciclo anterior',
         info: `Se marcado, o valor do ciclo anterior será exibido no formulário de entrada de dados (quando o link para o ciclo anterior estiver ativo no app móvel)`,
@@ -1114,6 +1164,9 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
     },
     mobileProps: {
       title: 'Aplicativo móvel',
+    },
+    timeProps: {
+      includeSeconds: 'Incluir segundos',
     },
     formHeaderProps: {
       headerColorLabel: 'Cor do cabeçalho',
@@ -1262,10 +1315,13 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
       noCategoriesAvailable: 'Nenhuma categoria disponível no inquérito selecionado',
     },
     itemsCount: 'Contagem de itens',
+    structure: 'Estrutura',
     types: {
       flat: 'Plano',
       hierarchical: 'Hierárquico',
       reportingData: 'Dados de reporte',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Dados de Ponto Amostral',
     },
   },
 
@@ -1293,6 +1349,55 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Converter esta categoria de dados de reporte em uma categoria simples?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Converter para Dados de Ponto Amostral',
+      confirmMessage: `Converter esta categoria na categoria de Dados de Ponto Amostral?
+
+A categoria será renomeada para '${samplingPointDataCategoryName}' e uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Converter para categoria GeoPackage',
+      confirmMessage: `Converter esta categoria em uma categoria GeoPackage?
+
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Converter para categoria simples',
+      confirmMessage: `Converter esta categoria GeoPackage em uma categoria simples?
+
+A propriedade extra '${locationItemExtraDefName}' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Converter para categoria simples',
+      confirmMessage: `Converter esta categoria de Dados de Ponto Amostral em uma categoria simples?
+
+O nome da categoria será apagado (você precisará dar um novo nome a ela), e a propriedade extra '${locationItemExtraDefName}' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
+    },
+    geoPackageCategory: 'Esta categoria tem capacidades geográficas',
+    geoPackageCategoryInfo: `Esta categoria possui uma propriedade extra chamada '${locationItemExtraDefName}', que permite exportá-la como um arquivo GeoPackage.`,
+    samplingPointDataCategoryType: 'Esta é a categoria de Dados de Ponto Amostral',
+    samplingPointDataCategoryTypeInfo: `Esta é uma categoria predefinida para dados de ponto amostral. Ela possui uma propriedade extra chamada '${locationItemExtraDefName}', que permite exportá-la como um arquivo GeoPackage.`,
+    createCategory: {
+      menuLabel: 'Adicionar categoria',
+      simple: 'Categoria simples',
+      otherTypes: 'Mais tipos de categoria',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Categoria de Dados de Ponto Amostral',
+      description:
+        'Categoria predefinida para dados de ponto amostral, incluindo um campo de localização para cada item.',
+      message: `Criar uma nova categoria de Dados de Ponto Amostral?
+
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Categoria com capacidades geográficas',
+      description:
+        'Adiciona um campo de localização aos itens, para que a categoria possa ser exportada como um arquivo GeoPackage.',
+      message: `Criar uma nova categoria com capacidades geográficas?
+
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
     deleteItem: 'Excluir item',
     level: {
       title: 'Nível {{levelPosition}}',
@@ -1316,6 +1421,8 @@ $t(common.cantUndoWarning)`,
       title: 'Resumo da importação de categoria',
     },
     reportingData: 'Dados de reporte',
+    exportToGeoPackage: 'Exportar para GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} item(ns) sem localização válida foram ignorados.',
     templateFor_samplingPointDataImport_csv: 'Modelo para importação de dados de ponto amostral (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Modelo para importação de dados de ponto amostral (Excel)',
   },

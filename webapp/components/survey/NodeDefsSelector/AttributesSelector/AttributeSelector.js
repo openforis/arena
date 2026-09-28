@@ -1,6 +1,6 @@
 import './AttributeSelector.scss'
 import * as PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
@@ -26,7 +26,7 @@ const AttributeSelector = (props) => {
   const lang = useSurveyPreferredLang()
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const active = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
+  const active = A.includes(nodeDefUuid, nodeDefUuidsAttributes)
 
   const label = labelFunction
     ? labelFunction(nodeDef)

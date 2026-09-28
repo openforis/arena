@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import camelize from 'camelize'
 
 import { db } from '@server/db/db'
@@ -66,7 +66,7 @@ export const insertSurvey = async ({ survey, props = {}, propsDraft = {}, appVer
 
 // ============== READ
 
-export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], R.prop('id'))
+export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], A.prop('id'))
 
 const _getSelectWhereCondition = ({ draft, search }) => {
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
@@ -269,12 +269,15 @@ export const fetchSurveyIdsAndNames = async (client = db) =>
   )
 
 /**
- * Fetches the id and app version of every survey.
+ * Fetches the id and app version of every survey, most recently modified first.
+ * Used to prioritize the startup data migration: surveys ordered this way have their more
+ * recently active (and therefore more likely to be opened again soon) surveys migrated first,
+ * reducing the window in which any given survey is temporarily unavailable while migrating.
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
  */
 export const fetchSurveyIdsAndAppVersions = async (client = db) =>
-  client.map('SELECT id, app_version FROM survey', [], camelize)
+  client.map('SELECT id, app_version FROM survey ORDER BY date_modified DESC', [], camelize)
 
 export const fetchSurveyById = async ({ surveyId, draft = false, backup = false }, client = db) =>
   client.one(`SELECT ${_getSurveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
@@ -285,7 +288,7 @@ export const fetchDependencies = async (surveyId, client = db) =>
   client.oneOrNone(
     "SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1",
     [surveyId],
-    R.prop('dependencies')
+    A.prop('dependencies')
   )
 
 export const fetchFilesTotalSpace = async (surveyId, client = db) =>
@@ -294,7 +297,7 @@ export const fetchFilesTotalSpace = async (surveyId, client = db) =>
      FROM survey 
      WHERE id = $1`,
     [surveyId],
-    R.prop('value')
+    A.prop('value')
   )
 
 export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {}, client = db) =>
@@ -305,7 +308,7 @@ export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {},
      ${olderThan24Hours ? "AND date_created <= NOW() - INTERVAL '24 HOURS'" : ''}
     `,
     [],
-    R.prop('id')
+    A.prop('id')
   )
 
 // ============== UPDATE
@@ -422,14 +425,17 @@ export const clearSurveyConfiguration = async ({ surveyId }, client = db) =>
   client.none(`UPDATE survey SET config = null WHERE id = $1`, [surveyId])
 
 // ============== DELETE
-export const deleteSurvey = async (id, client = db) => client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
+// the survey row could be missing (e.g. when cleaning up after a failed survey creation): do not fail in that case,
+// otherwise the whole delete transaction (dropping the survey schemas) would be rolled back
+export const deleteSurvey = async (id, client = db) =>
+  client.oneOrNone('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
 
 export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
-  const propsUpdateCond = R.pipe(
-    R.map(
+  const propsUpdateCond = A.pipe(
+    A.map(
       (langCode) => `#-'{${NodeDef.propKeys.labels},${langCode}}' #-'{${NodeDef.propKeys.descriptions},${langCode}}'`
     ),
-    R.join(' ')
+    A.join(' ')
   )(langCodes)
 
   await client.none(

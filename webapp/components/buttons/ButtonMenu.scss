@@ -18,5 +18,21 @@
       width: 100%;
       justify-content: left;
     }
+
+    .button-menu__item-with-description {
+      display: flex;
+      flex-direction: column;
+      padding: 0.4rem;
+
+      .button-menu__item-label {
+        font-weight: 500;
+      }
+
+      .button-menu__item-description {
+        opacity: 0.7;
+        font-size: 0.8em;
+        white-space: normal;
+      }
+    }
   }
 }

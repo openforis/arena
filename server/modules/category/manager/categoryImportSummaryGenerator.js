@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
@@ -100,7 +100,7 @@ export const createImportSummaryFromColumnNames = ({
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }) => {
-  if (R.find(StringUtils.isBlank)(columnNames)) {
+  if (A.find(StringUtils.isBlank)(columnNames)) {
     throw new SystemError(Validation.messageKeys.categoryImport.emptyHeaderFound)
   }
 

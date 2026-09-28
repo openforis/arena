@@ -17,6 +17,22 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
     },
   },
   dataQuery: {
+    ai: {
+      button: 'Perguntar à IA',
+      buttonTitle: 'Gerar uma consulta a partir de uma descrição usando IA',
+      title: 'Gerar uma consulta com IA',
+      hint: 'Descreva os dados que deseja ver; a IA selecionará a entidade, os atributos (ou dimensões e medidas), o filtro e a ordenação. Depois, você poderá revisar a consulta gerada e salvá-la no gerenciador de consultas.',
+      placeholder: 'ex.: número de árvores agrupadas por espécie',
+      generate: 'Gerar',
+      generating: 'Gerando…',
+      replaceQueryConfirmMessage: 'Substituir a consulta atual pela gerada?',
+      suggestSummary: 'Sugerir nome e descrição',
+      suggestSummaryFailed: 'Não foi possível sugerir o nome e a descrição da consulta: {{message}}',
+      suggestSummaryTitle:
+        'Usar IA para sugerir o nome, o rótulo e a descrição da consulta com base nas seleções atuais',
+      generatedSuccessfully:
+        'Consulta gerada: {{explanation}} Verifique o resultado e salve a consulta se quiser mantê-la.',
+    },
     deleteConfirmMessage: 'Excluir a consulta "{{name}}"?',
     displayType: {
       chart: 'Gráfico',

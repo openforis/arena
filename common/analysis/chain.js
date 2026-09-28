@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Dates } from '@openforis/arena-core'
 
@@ -56,9 +56,9 @@ export const {
   isTemporary,
 } = ObjectUtils
 export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
-export const getStatusExec = R.propOr(null, keys.statusExec)
-export const getScriptCommon = R.propOr(null, keys.scriptCommon)
-export const getScriptEnd = R.propOr(null, keys.scriptEnd)
+export const getStatusExec = A.propOr(null, keys.statusExec)
+export const getScriptCommon = A.propOr(null, keys.scriptCommon)
+export const getScriptEnd = A.propOr(null, keys.scriptEnd)
 export const hasSamplingDesign = ObjectUtils.isPropTrue(keysProps.hasSamplingDesign)
 export const isSubmitOnlyAnalysisStepDataIntoR = ObjectUtils.isPropTrue(keysProps.submitOnlyAnalysisStepDataIntoR)
 export const isSubmitOnlySelectedRecordsIntoR = ObjectUtils.isPropTrue(keysProps.submitOnlySelectedRecordsIntoR)
@@ -120,7 +120,7 @@ export const updateStatisticalAnalysis = (updateFn) => (chain) => {
 }
 
 // ====== CHECK
-export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), (chain) =>
+export const isDraft = A.ifElse(A.pipe(getDateExecuted, A.isNil), A.always(true), (chain) =>
   Dates.isAfter(getDateModified(chain), getDateExecuted(chain))
 )
 
@@ -140,8 +140,8 @@ export const checkChangeRequiresSurveyPublish = ({ chainPrev, chainNext }) => {
 // The validation object contains the validation of chain index by uuids
 export const { getValidation, hasValidation, assocValidation, dissocValidation } = Validation
 
-export const getItemValidationByUuid = (uuid) => R.pipe(getValidation, Validation.getFieldValidation(uuid))
+export const getItemValidationByUuid = (uuid) => A.pipe(getValidation, Validation.getFieldValidation(uuid))
 export const assocItemValidation = (uuid, validation) => (chain) =>
-  R.pipe(getValidation, Validation.assocFieldValidation(uuid, validation), (validationUpdated) =>
+  A.pipe(getValidation, Validation.assocFieldValidation(uuid, validation), (validationUpdated) =>
     Validation.assocValidation(validationUpdated)(chain)
   )(chain)

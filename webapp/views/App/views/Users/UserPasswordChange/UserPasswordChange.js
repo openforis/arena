@@ -31,7 +31,7 @@ const UserPasswordChange = () => {
   const [state, setState] = useState(defaultState)
   const { form, userToUpdate, validation } = state
   const empty = UserPasswordChangeForm.isEmpty(form)
-  const canEdit = isSystemAdmin || userUuid === User.getUuid(user)
+  const canEdit = isSystemAdmin || !userUuid || userUuid === User.getUuid(user)
 
   useEffect(() => {
     const fetchAndSetUser = async () => {

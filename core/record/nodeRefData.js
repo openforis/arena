@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const keys = {
   refData: 'refData',
@@ -6,10 +6,10 @@ export const keys = {
   categoryItem: 'categoryItem',
 }
 
-const getRefData = R.propOr({}, keys.refData)
-const getRefDataProp = (key) => R.pipe(getRefData, R.prop(key))
+const getRefData = A.propOr({}, keys.refData)
+const getRefDataProp = (key) => A.pipe(getRefData, A.prop(key))
 
 export const getTaxon = getRefDataProp(keys.taxon)
 export const getCategoryItem = getRefDataProp(keys.categoryItem)
 
-export const assocRefData = R.assoc(keys.refData)
+export const assocRefData = A.assoc(keys.refData)

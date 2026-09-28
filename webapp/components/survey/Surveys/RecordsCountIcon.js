@@ -5,15 +5,15 @@ import { AppInfo } from '@core/app/appInfo'
 import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 
-const multipleAppsIconOffset = 8
-const appIconZindexStart = 5
+const stackedIconOffset = 12
+const stackedIconZindexStart = 5
 
 const getSortedAppCountsEntries = (recordsCountByApp) =>
   Object.entries(recordsCountByApp).sort(([_id1, count1], [_id2, count2]) => count2 - count1)
 
 export const RecordsCountIcon = (props) => {
   const { item } = props
-  const { recordsCount, recordsCountByApp } = item
+  const { recordsCount, recordsCountByApp = {} } = item
 
   const i18n = useI18n()
 
@@ -38,11 +38,7 @@ ${sortedAppCountsEntries
           <AppIcon
             key={appId}
             appId={appId}
-            style={{
-              position: 'absolute',
-              zIndex: appIconZindexStart - index,
-              left: `${multipleAppsIconOffset * index}px`,
-            }}
+            style={{ zIndex: stackedIconZindexStart - index, left: `${stackedIconOffset * index}px` }}
             title={multipleApps ? countSummary : undefined}
           />
         ))}

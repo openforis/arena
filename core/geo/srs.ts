@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const idPrefix = 'EPSG:'
 
@@ -22,9 +22,9 @@ export const newSrs = (code: string, name: string, wkt: string): Srs => ({
 })
 
 // ===== READ
-export const getCode = R.prop(keys.code)
-export const getName = R.prop(keys.name)
-export const getWkt = R.prop(keys.wkt)
+export const getCode = A.prop(keys.code)
+export const getName = A.prop(keys.name)
+export const getWkt = A.prop(keys.wkt)
 
 // ===== UTILS
 

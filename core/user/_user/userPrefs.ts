@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -12,6 +12,7 @@ export const keysPrefs = {
   current: 'current',
   language: 'language',
   notifyOnUserAccessRequest: 'notifyOnUserAccessRequest',
+  whatsNewSeenIds: 'whatsNewSeenIds',
 } as const
 
 export const keysSurveyPrefs = {
@@ -19,7 +20,7 @@ export const keysSurveyPrefs = {
   language: 'language',
 } as const
 
-const getPrefs = R.propOr({}, keys.prefs)
+const getPrefs = A.propOr({}, keys.prefs)
 
 const pathSurveyCurrent = [keys.prefs, keysPrefs.surveys, keysPrefs.current]
 const surveyPrefsPath = ({ surveyId }: { surveyId: unknown }) => [keys.prefs, keysPrefs.surveys, String(surveyId)]
@@ -29,6 +30,7 @@ const surveyPrefPath = ({ surveyId, key }: { surveyId: unknown; key: string }) =
 ]
 const pathLanguage = [keys.prefs, keysPrefs.language]
 const pathNotifyOnUserAccessRequest = [keys.prefs, keysPrefs.notifyOnUserAccessRequest]
+const pathWhatsNewSeenIds = [keys.prefs, keysPrefs.whatsNewSeenIds]
 
 const surveyCyclePrefPath = (surveyId: unknown) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.cycle })
 const surveyLangPrefPath = (surveyId: unknown) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.language })
@@ -52,10 +54,10 @@ export const newPrefs = ({
 }
 
 // ====== READ
-export const getPrefSurveyCurrent = R.path(pathSurveyCurrent)
+export const getPrefSurveyCurrent = A.path(pathSurveyCurrent)
 
-export const getPrefSurveyCycle = (surveyId: unknown) => R.path(surveyCyclePrefPath(surveyId))
-export const getPrefSurveyLang = (surveyId: unknown) => R.path(surveyLangPrefPath(surveyId))
+export const getPrefSurveyCycle = (surveyId: unknown) => A.path(surveyCyclePrefPath(surveyId))
+export const getPrefSurveyLang = (surveyId: unknown) => A.path(surveyLangPrefPath(surveyId))
 
 export const getPrefSurveyCurrentCycle = (user: Record<string, unknown>) => {
   const surveyId = getPrefSurveyCurrent(user)
@@ -67,37 +69,43 @@ export const getPrefSurveyCurrentLanguage = (user: Record<string, unknown>) => {
   return getPrefSurveyLang(surveyId)(user)
 }
 
-export const getPrefLanguage = R.path(pathLanguage)
+export const getPrefLanguage = A.path(pathLanguage)
 
 // defaults to true: an unset pref must behave like "notify", preserving pre-existing behaviour
 export const getPrefNotifyOnUserAccessRequest = (user: Record<string, unknown>): boolean =>
-  R.pathOr(true, pathNotifyOnUserAccessRequest, user) as boolean
+  A.pathOr(true, pathNotifyOnUserAccessRequest, user) as boolean
+
+// ids of the "What's new" items the user chose not to see again
+export const getPrefWhatsNewSeenIds = (user: Record<string, unknown>): string[] =>
+  A.pathOr([], pathWhatsNewSeenIds, user) as string[]
 
 // ====== UPDATE
 export const assocPrefSurveyCycle = (surveyId: unknown, cycle: unknown) =>
-  R.assocPath(surveyCyclePrefPath(surveyId), cycle)
+  A.assocPath(surveyCyclePrefPath(surveyId), cycle)
 export const assocPrefSurveyLang = ({ surveyId, lang }: { surveyId: unknown; lang: string }) =>
-  R.assocPath(surveyLangPrefPath(surveyId), lang)
+  A.assocPath(surveyLangPrefPath(surveyId), lang)
 
 export const assocPrefSurveyCurrent = (surveyId: unknown) => (user: Record<string, unknown>) =>
-  R.pipe(
+  A.pipe(
     // If the survey is selected for the first time, add the first cycle to its prefs
-    R.when(R.always(R.isNil(getPrefSurveyCycle(surveyId)(user))), assocPrefSurveyCycle(surveyId, Survey.cycleOneKey)),
-    R.assocPath(pathSurveyCurrent, surveyId)
+    A.when(A.always(A.isNil(getPrefSurveyCycle(surveyId)(user))), assocPrefSurveyCycle(surveyId, Survey.cycleOneKey)),
+    A.assocPath(pathSurveyCurrent, surveyId)
   )(user)
 
 export const assocPrefSurveyCurrentAndCycle = (surveyId: unknown, cycle: unknown) =>
-  R.pipe(assocPrefSurveyCurrent(surveyId), assocPrefSurveyCycle(surveyId, cycle))
+  A.pipe(assocPrefSurveyCurrent(surveyId), assocPrefSurveyCycle(surveyId, cycle))
 
-export const assocPrefLanguage = ({ lang }: { lang: string }) => R.assocPath(pathLanguage, lang)
+export const assocPrefLanguage = ({ lang }: { lang: string }) => A.assocPath(pathLanguage, lang)
 
-export const assocPrefNotifyOnUserAccessRequest = (value: boolean) => R.assocPath(pathNotifyOnUserAccessRequest, value)
+export const assocPrefNotifyOnUserAccessRequest = (value: boolean) => A.assocPath(pathNotifyOnUserAccessRequest, value)
+
+export const assocPrefWhatsNewSeenIds = (ids: string[]) => A.assocPath(pathWhatsNewSeenIds, ids)
 
 // ====== DELETE
 export const deletePrefSurvey = (surveyId: unknown) => (user: Record<string, unknown>) => {
   const surveyIdPref = getPrefSurveyCurrent(user)
-  return R.pipe(
-    R.when(R.always(String(surveyIdPref) === String(surveyId)), assocPrefSurveyCurrent(null)),
-    R.dissocPath(surveyPrefsPath({ surveyId }))
+  return A.pipe(
+    A.when(A.always(String(surveyIdPref) === String(surveyId)), assocPrefSurveyCurrent(null)),
+    A.dissocPath(surveyPrefsPath({ surveyId }))
   )(user)
 }

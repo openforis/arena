@@ -33,7 +33,8 @@ const updateOrDeleteExtraDef = async ({ extraPropDefs, propName, extraPropDef, d
   return itemExtraDefsArrayUpdated.reduce((acc, item, index) => {
     const name = ExtraPropDef.getName(item)
     const dataType = ExtraPropDef.getDataType(item)
-    acc[name] = ExtraPropDef.newItem({ dataType, index })
+    const locked = ExtraPropDef.isLocked(item)
+    acc[name] = ExtraPropDef.newItem({ dataType, index, locked })
     return acc
   }, {})
 }

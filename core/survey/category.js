@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import { uuidv4 } from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -33,7 +33,13 @@ export const reportingDataItemExtraDefKeys = {
   area: 'area',
 }
 
+// name of the item extra prop def (of type geometryPoint) that makes a category exportable to GeoPackage
+export const locationItemExtraDefName = 'location'
+
 const samplingUnitsPlanCategoryName = 'sampling_units_plan'
+// single source of truth for this name: other modules must import it from here rather than
+// hard-coding the string or re-defining it
+export const samplingPointDataCategoryName = 'sampling_point_data'
 
 // ========
 // LEVELS
@@ -46,25 +52,25 @@ export const getDesignerNotes = ObjectUtils.getProp(keysProps.designerNotes, '')
 export const isReportingData = ObjectUtils.getProp(keysProps.reportingData, false)
 export const { getValidation } = Validation
 
-const getLevels = R.propOr({}, keys.levels)
-export const getLevelsArray = R.pipe(getLevels, R.values, R.sortBy(R.prop('index')))
+const getLevels = A.propOr({}, keys.levels)
+export const getLevelsArray = A.pipe(getLevels, A.values, A.sortBy(A.prop('index')))
 export const getLevelByUuid = (uuid) =>
-  R.pipe(
+  A.pipe(
     getLevels,
-    R.values,
-    R.find((level) => CategoryLevel.getUuid(level) === uuid)
+    A.values,
+    A.find((level) => CategoryLevel.getUuid(level) === uuid)
   )
-export const getLevelsSize = R.pipe(getLevels, R.values, R.length)
-export const getLevelByIndex = (idx) => R.path([keys.levels, idx])
+export const getLevelsSize = A.pipe(getLevels, A.values, A.length)
+export const getLevelByIndex = (idx) => A.path([keys.levels, idx])
 
-const getLevelsCount = (category) => Math.max(getLevelsArray(category).length, R.propOr(0, keys.levelsCount)(category))
+const getLevelsCount = (category) => Math.max(getLevelsArray(category).length, A.propOr(0, keys.levelsCount)(category))
 export const isFlat = (category) => getLevelsCount(category) === 1
 export const isHierarchical = (category) => !isFlat(category)
 
 export const getLevelValidation = (levelIndex) =>
-  R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
+  A.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
 
-export const getItemsCount = R.propOr(-1, keys.itemsCount)
+export const getItemsCount = A.propOr(-1, keys.itemsCount)
 export const getItemsCountOrLevelsItemsCount = (category) =>
   getItemsCount(category) > 0
     ? getItemsCount(category)
@@ -80,12 +86,12 @@ export const assocProp =
   ({ key, value }) =>
   (category) => {
     const categoryUpdated = ObjectUtils.setProp(key, value)(category)
-    const validationUpdated = R.pipe(Validation.getValidation, Validation.dissocFieldValidation(key))(categoryUpdated)
+    const validationUpdated = A.pipe(Validation.getValidation, Validation.dissocFieldValidation(key))(categoryUpdated)
     return Validation.assocValidation(validationUpdated)(categoryUpdated)
   }
 
 // ==== CREATE
-export const newLevel = (category, props = {}, index = R.pipe(getLevels, R.keys, R.length)(category)) => ({
+export const newLevel = (category, props = {}, index = A.pipe(getLevels, A.keys, A.length)(category)) => ({
   [CategoryLevel.keys.uuid]: uuidv4(),
   [CategoryLevel.keys.categoryUuid]: ObjectUtils.getUuid(category),
   [CategoryLevel.keys.index]: index,
@@ -95,14 +101,14 @@ export const newLevel = (category, props = {}, index = R.pipe(getLevels, R.keys,
   },
 })
 
-const assocLevels = ({ levels }) => R.assoc(keys.levels, levels)
+const assocLevels = ({ levels }) => A.assoc(keys.levels, levels)
 
 export const assocLevelsArray = (array) => assocLevels({ levels: ObjectUtils.toIndexedObj(array, 'index') })
 
 export const assocLevel =
   ({ level }) =>
   (category) => {
-    const levelsUpdated = R.pipe(getLevels, R.assoc(CategoryLevel.getIndex(level), level))(category)
+    const levelsUpdated = A.pipe(getLevels, A.assoc(CategoryLevel.getIndex(level), level))(category)
     return assocLevels({ levels: levelsUpdated })(category)
   }
 
@@ -119,7 +125,7 @@ export const getItemLevelIndex = (item) => (category) => {
 export const isItemLeaf = (item) => (category) => getItemLevelIndex(item)(category) === getLevelsSize(category) - 1
 
 export const getItemValidation = (item) =>
-  R.pipe(
+  A.pipe(
     getValidation,
     Validation.getFieldValidation(keys.items),
     Validation.getFieldValidation(CategoryItem.getUuid(item))
@@ -127,8 +133,26 @@ export const getItemValidation = (item) =>
 
 // ====== ITEMS extra def
 export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
-export const getItemExtraDefsArray = R.pipe(getItemExtraDef, ExtraPropDef.extraDefsToArray)
+export const getItemExtraDefsArray = A.pipe(getItemExtraDef, ExtraPropDef.extraDefsToArray)
 export const getItemExtraDefKeys = (category) => getItemExtraDefsArray(category).map(ExtraPropDef.getName)
+
+// the extra prop def named 'location' of type geometryPoint, if the category has one
+export const getLocationExtraDef = (category) =>
+  getItemExtraDefsArray(category).find(
+    (extraDef) =>
+      ExtraPropDef.getName(extraDef) === locationItemExtraDefName &&
+      ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.geometryPoint
+  )
+
+// true if the category has a 'location' extra prop, i.e. it is exportable to GeoPackage
+export const hasLocationExtraProp = (category) => Boolean(getLocationExtraDef(category))
+
+// true if the category has a 'location' extra prop AND it is locked - i.e. converting it to a
+// simple category (unlocking the prop) would actually change something
+export const isLocationExtraPropLocked = (category) => {
+  const locationExtraDef = getLocationExtraDef(category)
+  return Boolean(locationExtraDef) && ExtraPropDef.isLocked(locationExtraDef)
+}
 
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 
@@ -148,7 +172,7 @@ export const newCategory = (props = {}, levels = null) => {
   }
 }
 
-export const assocItemsCount = (count) => R.assoc(keys.itemsCount, count)
+export const assocItemsCount = (count) => A.assoc(keys.itemsCount, count)
 export const setItemsCount = (count) => (category) => {
   category[keys.itemsCount] = count
 }
@@ -157,6 +181,9 @@ export const setItemsCount = (count) => (category) => {
 export const isLevelDeleteAllowed = (level) => (category) =>
   !CategoryLevel.isPublished(level) && CategoryLevel.getIndex(level) === getLevelsArray(category).length - 1
 export const isSamplingUnitsPlanCategory = (category) => getName(category) === samplingUnitsPlanCategoryName
+export const isSamplingPointDataCategory = (category) => getName(category) === samplingPointDataCategoryName
 export const isExtraPropDefReadOnly = (extraPropDef) => (category) =>
-  isReportingData(category) && ExtraPropDef.getName(extraPropDef) === reportingDataItemExtraDefKeys.area
+  ExtraPropDef.isLocked(extraPropDef) ||
+  (isReportingData(category) && ExtraPropDef.getName(extraPropDef) === reportingDataItemExtraDefKeys.area) ||
+  (isSamplingPointDataCategory(category) && ExtraPropDef.getName(extraPropDef) === locationItemExtraDefName)
 export const hasExtraDefs = (category) => getItemExtraDefKeys(category).length > 0

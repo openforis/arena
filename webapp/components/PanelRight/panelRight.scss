@@ -34,9 +34,16 @@
   color: $white;
   border-bottom: 1px solid $blue;
 
-  .btn-close {
+  .btn-close-container {
     position: absolute;
+    top: 0;
+    bottom: 0;
     right: 5px;
+    display: flex;
+    align-items: center;
+  }
+
+  .btn-close {
     color: $white;
   }
 

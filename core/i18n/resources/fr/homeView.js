@@ -158,6 +158,8 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
         'Autoriser le téléversement des enregistrements depuis Arena Mobile vers le serveur',
       allowRecordsWithErrorsUploadFromMobile:
         'Autoriser le téléversement des enregistrements avec des erreurs de validation depuis Arena Mobile vers le serveur',
+      allowRecordsMergeWithSameKeys:
+        'Autoriser la fusion des enregistrements avec les mêmes clés (ex. enregistrements créés sur différents appareils Arena Mobile)',
     },
     srsPlaceholder: "Tapez le code ou l'étiquette",
     unpublish: 'Dépublier et supprimer les données',

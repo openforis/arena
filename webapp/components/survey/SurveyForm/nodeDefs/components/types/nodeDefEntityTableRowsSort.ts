@@ -2,10 +2,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as CoreRecord from '@core/record/record'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
+import { SortOrder } from '@core/sortOrder'
 
 export interface SortCriterion {
   by: string // column node def uuid
-  order: 'asc' | 'desc'
+  order: SortOrder
 }
 
 // none -> asc -> desc -> none, cycling only the entry for `field`; other criteria are left untouched
@@ -20,13 +21,13 @@ export const getNextSortCriteria = ({
   const index = sortCriteria.findIndex((criterion) => criterion.by === field)
 
   if (index < 0) {
-    return [...sortCriteria, { by: field, order: 'asc' }]
+    return [...sortCriteria, { by: field, order: SortOrder.asc }]
   }
 
   const criterion = sortCriteria[index]
-  if (criterion.order === 'asc') {
+  if (criterion.order === SortOrder.asc) {
     const updated = [...sortCriteria]
-    updated[index] = { by: field, order: 'desc' }
+    updated[index] = { by: field, order: SortOrder.desc }
     return updated
   }
 
@@ -93,7 +94,7 @@ const compareByCriterion =
     if (!valueB) return -1
 
     const comparison = valueA.localeCompare(valueB, lang, { numeric: true, sensitivity: 'base' })
-    return criterion.order === 'desc' ? -comparison : comparison
+    return criterion.order === SortOrder.desc ? -comparison : comparison
   }
 
 // Partitions out placeholder rows, sorts the rest by each criterion's column's formatted value

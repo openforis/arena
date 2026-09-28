@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
-import { Query } from '@common/model/query'
+import { Query, QueryNodeDefs } from '@common/model/query'
 import * as StepVariable from '@common/analysis/stepVariable'
 
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -105,14 +105,7 @@ const NodeDefsSelectorAggregate = (props) => {
           <ExpansionPanel buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               onToggleAttribute={onToggleDimension}
-              filterFunction={combineNodeDefFilterFunctions(
-                (nodeDef) =>
-                  NodeDef.isBoolean(nodeDef) ||
-                  NodeDef.isCode(nodeDef) ||
-                  NodeDef.isTaxon(nodeDef) ||
-                  NodeDef.isKey(nodeDef),
-                searchFilterFunction
-              )}
+              filterFunction={combineNodeDefFilterFunctions(QueryNodeDefs.isDimensionEligible, searchFilterFunction)}
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={dimensions}
@@ -125,8 +118,7 @@ const NodeDefsSelectorAggregate = (props) => {
 
           <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
-              filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
-              filterFunction={combineNodeDefFilterFunctions((nodeDef) => !NodeDef.isKey(nodeDef), searchFilterFunction)}
+              filterFunction={combineNodeDefFilterFunctions(QueryNodeDefs.isMeasureEligible, searchFilterFunction)}
               includeEntityFrequencySelector
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}

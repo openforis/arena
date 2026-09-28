@@ -1,5 +1,7 @@
 import * as StringUtils from '@core/stringUtils'
 
+import { equalEarthMapStyle } from './equalEarthMapStyle'
+
 const baseLayerProviders = {
   esri: 'ESRI',
   carto: 'Carto',
@@ -7,6 +9,11 @@ const baseLayerProviders = {
   openStreetMap: 'OpenStreetMap',
   planet: 'planet',
   un: 'UN',
+  equalEarth: 'EqualEarth',
+}
+
+export const baseLayerTypes = {
+  maplibre: 'maplibre',
 }
 
 // const baseLayerAttribution = {
@@ -78,6 +85,14 @@ export const baseLayers = [
     attribution: 'Map data &copy; <a href="https://www.un.org/geospatial/">United Nations</a>',
     url: 'https://geoservices.un.org/arcgis/rest/services/ClearMap_WebTopo/MapServer/tile/{z}/{y}/{x}',
     maxZoom: 6,
+  },
+  {
+    key: 'Equal Earth',
+    name: 'Equal Earth (experimental)',
+    provider: baseLayerProviders.equalEarth,
+    type: baseLayerTypes.maplibre,
+    attribution: 'Natural Earth',
+    style: equalEarthMapStyle,
   },
   // {
   //   key: 'OpenStreetMap',
@@ -163,4 +178,5 @@ export const baseLayers = [
   // },
 ]
 
-export const defaultBaseLayer = baseLayers[0]
+export const defaultBaseLayer =
+  baseLayers.find((baseLayer) => baseLayer.type !== baseLayerTypes.maplibre) ?? baseLayers[0]

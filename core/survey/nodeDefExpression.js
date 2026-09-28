@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { NodeDefExpressionFactory } from '@openforis/arena-core/dist/nodeDef/nodeDef'
 
@@ -31,17 +31,17 @@ export const createExpressionPlaceholder = () => createExpression({ placeholder:
 
 export const { getUuid } = ObjectUtils
 
-export const getExpression = R.propOr('', keys.expression)
+export const getExpression = A.propOr('', keys.expression)
 
-export const getApplyIf = R.prop(keys.applyIf)
+export const getApplyIf = A.prop(keys.applyIf)
 
-export const getMessages = (expression) => R.propOr({}, keys.messages)(expression)
+export const getMessages = (expression) => A.propOr({}, keys.messages)(expression)
 
-export const getMessage = (lang, defaultValue = '') => R.pipe(getMessages, R.propOr(defaultValue, lang))
+export const getMessage = (lang, defaultValue = '') => A.pipe(getMessages, A.propOr(defaultValue, lang))
 
-export const getSeverity = R.propOr(ValidationResult.severity.error, keys.severity)
+export const getSeverity = A.propOr(ValidationResult.severity.error, keys.severity)
 
-export const isPlaceholder = R.propEq(keys.placeholder, true)
+export const isPlaceholder = A.propEq(keys.placeholder, true)
 
 export const isExpressionEmpty = (expression = {}) => StringUtils.isBlank(getExpression(expression))
 export const isApplyIfEmpty = (expression = {}) => StringUtils.isBlank(getApplyIf(expression))
@@ -60,7 +60,7 @@ export const isSimilarTo = (expressionA) => (expressionB) => {
 
 // ====== UPDATE
 
-const assocProp = (propName, value) => R.pipe(R.assoc(propName, value), R.dissoc(keys.placeholder))
+const assocProp = (propName, value) => A.pipe(A.assoc(propName, value), A.dissoc(keys.placeholder))
 
 // ====== UTILS
 

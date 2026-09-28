@@ -47,6 +47,13 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       await SurveyRdbManager.populateTable({ survey, nodeDef, stopIfFunction }, tx)
       this.logDebug(`insert into table ${nodeDefName} - end`)
 
+      if (this.isCanceled()) break
+
+      // ===== create indexes (after populating the table, to speed up the insert)
+      this.logDebug(`create indexes on table ${nodeDefName} - start`)
+      await SurveyRdbManager.createDataTableIndexes({ survey, nodeDef }, tx)
+      this.logDebug(`create indexes on table ${nodeDefName} - end`)
+
       this.incrementProcessedItems()
     }
 
@@ -88,7 +95,8 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     const { surveyId, tx } = this
     const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
-    const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+    const fetchDraft =
+      (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
     return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, draft: fetchDraft, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },

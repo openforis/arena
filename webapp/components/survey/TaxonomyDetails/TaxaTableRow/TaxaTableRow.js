@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
@@ -21,7 +21,7 @@ const TaxaTableRow = (props) => {
         const vernacularNames = Taxon.getVernacularNamesByLang(lang)(taxon)
         return (
           <div key={`${Taxon.getUuid(taxon)}_vernacular_name_${lang}`}>
-            {R.pipe(R.map(TaxonVernacularName.getName), R.join(TaxonVernacularName.NAMES_SEPARATOR))(vernacularNames)}
+            {A.pipe(A.map(TaxonVernacularName.getName), A.join(TaxonVernacularName.NAMES_SEPARATOR))(vernacularNames)}
           </div>
         )
       })}

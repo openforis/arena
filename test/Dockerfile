@@ -4,33 +4,22 @@
 
 FROM node:24.11.1 AS test
 
-# Install Chromium dependencies, git and netcat
+# Install git, netcat and PM2 (cross-env is a project dependency)
 RUN apt-get update; \
-    apt-get install -y wget unzip fontconfig \
-    locales gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \
-    libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \
-    libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 \
-    libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \
-    libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates \
-    fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils \
-    git netcat; \
-    apt-get autoremove; apt-get autoclean;
+    apt-get install -y git netcat-openbsd; \
+    apt-get autoremove; apt-get autoclean; \
+    npm install -g --ignore-scripts pm2@7.0.4
 
-# Install Chromium
-RUN npm install -g chromium --unsafe-perm
-# Install PM2
-RUN npm install pm2 -g
-# Install cross-env
-RUN npm install cross-env -g
+WORKDIR /app
 
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/
 
-RUN cd /app; yarn install --ignore-scripts --frozen-lockfile;
+# Install the dependencies and the browser used by the e2e tests (Playwright CLI version locked by yarn.lock)
+RUN yarn install --ignore-scripts --frozen-lockfile; \
+    ./node_modules/.bin/playwright install --with-deps chromium
 
 COPY .git /app/.git
-RUN cd /app; git reset --hard; yarn build:server:dev
-
-WORKDIR /app
+RUN git reset --hard; yarn build:server:dev
 
 ############################################################

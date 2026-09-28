@@ -38,7 +38,9 @@ export const writeFileContent = async ({ surveyId, fileUuid, content, recordUuid
 export const getFileContentAsStream = ({ surveyId, fileUuid, recordUuid = null }) => {
   const filePath = getFilePath({ surveyId, fileUuid, recordUuid })
   if (!FileUtils.exists(filePath)) {
-    throw new Error(`File not found: ${filePath}`)
+    // the file is registered but its content is missing from storage: let the caller handle it
+    // (matches the DB and S3 storage backends, which also return null instead of throwing)
+    return null
   }
   return FileUtils.createReadStream(filePath)
 }

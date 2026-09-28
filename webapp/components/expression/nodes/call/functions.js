@@ -8,6 +8,7 @@ import { CallGeoCoordinateAtDistanceEditor } from './callGeoCoordinateAtDistance
 import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
 import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
+import { CallNumberToWordsEditor } from './callNumberToWordsEditor'
 import { CallTaxonPropEditor } from './callTaxonPropEditor'
 import { CallTaxonVernacularNameEditor } from './callTaxonVernacularNameEditor'
 import { CallUserPropEditor } from './callUserPropEditor'
@@ -22,13 +23,9 @@ const complexFunctions = {
 }
 
 export const functions = {
-  [functionNames.isEmpty]: {
-    label: 'isEmpty(...)',
-    component: CallIsEmptyEditor,
-  },
-  [functionNames.isNotEmpty]: {
-    label: 'isNotEmpty(...)',
-    component: CallIsNotEmptyEditor,
+  [functionNames.categoryItemProp]: {
+    label: 'categoryItemProp(...)',
+    component: CallCategoryItemPropEditor,
   },
   [functionNames.count]: {
     label: 'count(...)',
@@ -54,20 +51,20 @@ export const functions = {
     label: 'includes(...)',
     component: CallIncludesEditor,
   },
+  [functionNames.isEmpty]: {
+    label: 'isEmpty(...)',
+    component: CallIsEmptyEditor,
+  },
+  [functionNames.isNotEmpty]: {
+    label: 'isNotEmpty(...)',
+    component: CallIsNotEmptyEditor,
+  },
   [functionNames.now]: {
     callee: functionNames.now,
   },
-  [functionNames.categoryItemProp]: {
-    label: 'categoryItemProp(...)',
-    component: CallCategoryItemPropEditor,
-  },
-  [functionNames.taxonProp]: {
-    label: 'taxonProp(...)',
-    component: CallTaxonPropEditor,
-  },
-  [functionNames.taxonVernacularName]: {
-    label: 'taxonVernacularName(...)',
-    component: CallTaxonVernacularNameEditor,
+  [functionNames.numberToWords]: {
+    label: 'numberToWords(...)',
+    component: CallNumberToWordsEditor,
   },
   [functionNames.recordCycle]: {
     callee: functionNames.recordCycle,
@@ -87,6 +84,15 @@ export const functions = {
   [functionNames.recordOwnerRole]: {
     callee: functionNames.recordOwnerRole,
   },
+  rowIndex: complexFunctions.rowIndex,
+  [functionNames.taxonProp]: {
+    label: 'taxonProp(...)',
+    component: CallTaxonPropEditor,
+  },
+  [functionNames.taxonVernacularName]: {
+    label: 'taxonVernacularName(...)',
+    component: CallTaxonVernacularNameEditor,
+  },
   [functionNames.userEmail]: {
     callee: functionNames.userEmail,
   },
@@ -103,7 +109,6 @@ export const functions = {
   [functionNames.uuid]: {
     callee: functionNames.uuid,
   },
-  ...complexFunctions,
 }
 
 export const getComplexFunctionNameByExpression = (exprString) => {

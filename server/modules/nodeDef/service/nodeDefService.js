@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,6 +12,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import * as NodeDefManager from '../manager/nodeDefManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 const fetchSurvey = async ({ surveyId, cycle }, client = db) =>
   SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
@@ -39,7 +40,7 @@ const _validateNodeDefs = async ({ survey, nodeDef, updatedNodeDefs, nodeDefsDep
     nodeDefsValidationsAcc[NodeDef.getUuid(nodeDefToValidate)] = nodeDefsValidationArray[index]
     return nodeDefsValidationsAcc
   }, {})
-  const valid = nodeDefsValidationArray.every(Validation.isValid)
+  const valid = nodeDefsValidationArray.every((validation) => Validation.isValid(validation))
 
   return Validation.newInstance(valid, nodeDefsValidationsByUuid)
 }
@@ -202,9 +203,9 @@ export const cloneNodeDefFromSurvey = async (
   client = db
 ) =>
   client.tx(async (t) => {
-    const [sourceSurvey, targetSurvey] = await Promise.all([
-      fetchSurvey({ surveyId: sourceSurveyId }, t),
-      fetchSurvey({ surveyId: targetSurveyId }, t),
+    const [sourceSurvey, targetSurvey] = await DbUtils.runQueries(t, [
+      () => fetchSurvey({ surveyId: sourceSurveyId }, t),
+      () => fetchSurvey({ surveyId: targetSurveyId }, t),
     ])
 
     // Temporarily inject the source node def subtree into the target survey so
@@ -321,13 +322,61 @@ export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, 
   return afterNodeDefUpdate({ survey, nodeDefsUpdated })
 }
 
+/**
+ * Reassigns a contiguous 0..n-1 chain index to the analysis node defs remaining in the same chain
+ * after one has been deleted, so that deleting a variable never leaves permanent gaps in the sibling
+ * indices.
+ *
+ * NOTE: `survey` is the pre-deletion survey snapshot (fetched before `markNodeDefDeleted` ran).
+ * `nodeDefDeleted` may therefore still appear in the results of `Survey.getAnalysisNodeDefs`;
+ * the explicit `.filter(...)` below is the sole guard that excludes it from the reindexing.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - The survey object (pre-deletion snapshot).
+ * @param {number} params.surveyId - The survey identifier.
+ * @param {object} params.nodeDefDeleted - The analysis node def that was just deleted.
+ * @param {object} client - The database client / transaction.
+ * @returns {Promise<object>} UUID-indexed map of the reindexed node defs (may be empty if no reindexing was needed).
+ */
+const _reindexAnalysisNodeDefsAfterDelete = async ({ survey, surveyId, nodeDefDeleted }, client) => {
+  const chainUuid = NodeDef.getChainUuid(nodeDefDeleted)
+  const siblingAnalysisNodeDefs = Survey.getAnalysisNodeDefs({
+    chain: { uuid: chainUuid },
+    showSamplingNodeDefs: false,
+    showInactiveResultVariables: true,
+  })(survey).filter((sibling) => NodeDef.getUuid(sibling) !== NodeDef.getUuid(nodeDefDeleted))
+
+  const nodeDefsToReindex = siblingAnalysisNodeDefs.reduce((acc, sibling, index) => {
+    if (NodeDef.getChainIndex(sibling) !== index) {
+      acc.push({ nodeDefUuid: NodeDef.getUuid(sibling), propsAdvanced: { [NodeDef.keysPropsAdvanced.index]: index } })
+    }
+    return acc
+  }, [])
+  if (nodeDefsToReindex.length === 0) return {}
+
+  const nodeDefsReindexed = await NodeDefManager.updateNodeDefPropsInBatch(
+    { surveyId, nodeDefs: nodeDefsToReindex },
+    client
+  )
+  return ObjectUtils.toUuidIndexedObj(nodeDefsReindexed)
+}
+
 export const markNodeDefDeleted = async ({ user, surveyId, cycle, nodeDefUuid }, client = db) =>
   client.tx(async (t) => {
     const survey = await fetchSurvey({ surveyId, cycle }, t)
 
     const nodeDefsDependentsUuids = Survey.getNodeDefDependentsUuids(nodeDefUuid)(survey)
 
-    const nodeDefsUpdated = await NodeDefManager.markNodeDefDeleted({ user, survey, cycle, nodeDefUuid }, t)
+    const nodeDefToDelete = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+    let nodeDefsUpdated = await NodeDefManager.markNodeDefDeleted({ user, survey, cycle, nodeDefUuid }, t)
+
+    if (NodeDef.isAnalysis(nodeDefToDelete) && !NodeDef.isSampling(nodeDefToDelete)) {
+      const nodeDefsReindexed = await _reindexAnalysisNodeDefsAfterDelete(
+        { survey, surveyId, nodeDefDeleted: nodeDefToDelete },
+        t
+      )
+      nodeDefsUpdated = { ...nodeDefsUpdated, ...nodeDefsReindexed }
+    }
 
     // remove dependent node defs from dependency graph (add them back later)
     const surveyUpdated = Survey.removeNodeDefDependencies(nodeDefUuid)(survey)
@@ -342,7 +391,7 @@ export const markNodeDefsDeleted = async ({ user, surveyId, cycle, nodeDefUuids 
 
   for (const nodeDefUuid of nodeDefUuids) {
     const _response = await markNodeDefDeleted({ user, surveyId, cycle, nodeDefUuid }, client)
-    response = R.mergeDeepLeft(response, _response)
+    response = A.mergeDeepLeft(response, _response)
   }
 
   return response

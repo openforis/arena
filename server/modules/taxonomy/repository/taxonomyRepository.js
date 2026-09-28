@@ -1,6 +1,5 @@
-import * as R from 'ramda'
 import pgPromise from 'pg-promise'
-import * as toSnakeCase from 'to-snake-case'
+import toSnakeCase from 'to-snake-case'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -74,14 +73,16 @@ export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, cli
  * @param {!number} [params.surveyId] - The ID of the survey.
  * @param {!string} [params.taxonUuid] - The UUID of the taxon.
  * @param {!object} [params.vernacularNames] - The vernacular names indexed by language code.
+ * @param {boolean} [params.backup] - Whether the vernacular names come from a survey backup (props are published).
  * @param {pgPromise.IDatabase} [params.client] - The database client.
- * @returns {Array.<Promise>} - The result promises.
+ * @returns {Array.<function(): Promise<null>>} - The functions running the insert/update queries (not started yet):
+ * to be run with DbUtils.runQueries.
  */
 const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, backup = false, client = db }) =>
   A.pipe(
-    R.values,
-    R.flatten,
-    R.map((vernacularName) => {
+    A.values,
+    A.flatten,
+    A.map((vernacularName) => () => {
       const { props, propsDraft } = TaxonVernacularName.getPropsAndPropsDraft({ backup })(vernacularName)
       return client.none(
         `INSERT INTO 
@@ -100,24 +101,29 @@ const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, 
 const insertTaxon = async ({ surveyId, taxon, backup = false, client = db }) => {
   const { props, propsDraft } = Taxon.getPropsAndPropsDraft({ backup })(taxon)
 
-  return client.batch([
-    client.none(
-      `INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.taxon (uuid, taxonomy_uuid, props, props_draft)
+  // insert the taxon first: the vernacular names reference it
+  await client.none(
+    `INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.taxon (uuid, taxonomy_uuid, props, props_draft)
        VALUES ($1, $2, $3, $4)`,
-      [Taxon.getUuid(taxon), Taxon.getTaxonomyUuid(taxon), props, propsDraft]
-    ),
-    ..._insertOrUpdateVernacularNames({
+    [Taxon.getUuid(taxon), Taxon.getTaxonomyUuid(taxon), props, propsDraft]
+  )
+  await DbUtils.runQueries(
+    client,
+    _insertOrUpdateVernacularNames({
       surveyId,
       taxonUuid: Taxon.getUuid(taxon),
       vernacularNames: Taxon.getVernacularNames(taxon),
       backup,
       client,
-    }),
-  ])
+    })
+  )
 }
 
 export const insertTaxa = async ({ surveyId, taxa, backup = false, client = db }) =>
-  client.batch(taxa.map((taxon) => insertTaxon({ surveyId, taxon, backup, client })))
+  DbUtils.runQueries(
+    client,
+    taxa.map((taxon) => () => insertTaxon({ surveyId, taxon, backup, client }))
+  )
 
 export const cloneTaxonomyFromSurvey = async ({ sourceSurveyId, targetSurveyId, taxonomyUuid }, client = db) => {
   const sourceSchema = Schemata.getSchemaSurvey(sourceSurveyId)
@@ -407,7 +413,7 @@ export const fetchTaxaWithVernacularNamesStream = ({
   draft = false,
 }) => {
   const vernacularNamesSubSelects = A.pipe(
-    R.map(
+    A.map(
       (langCode) =>
         `(SELECT
             string_agg(${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')}, '${
@@ -420,12 +426,12 @@ export const fetchTaxaWithVernacularNamesStream = ({
             AND ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')} = '${langCode}'
        ) AS ${langCode}`
     ),
-    R.join(', ')
+    A.join(', ')
   )(vernacularLangCodes)
 
   const propsFields = A.pipe(
-    R.map((prop) => `${DbUtils.getPropColCombined(prop, draft, 't.')} AS ${toSnakeCase(prop)}`),
-    R.join(', ')
+    A.map((prop) => `${DbUtils.getPropColCombined(prop, draft, 't.')} AS ${toSnakeCase(prop)}`),
+    A.join(', ')
   )([Taxon.propKeys.code, Taxon.propKeys.family, Taxon.propKeys.genus, Taxon.propKeys.scientificName])
 
   const extraPropsFields = Object.keys(extraPropsDefs)
@@ -480,7 +486,7 @@ export const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = fal
     draft,
     client
   )
-  return R.head(taxa)
+  return A.head(taxa)
 }
 
 const findTaxaByPropLike = async (surveyId, taxonomyUuid, filterProp, filterValue, draft = false, client = db) => {
@@ -599,7 +605,7 @@ export const fetchTaxonWithVernacularNamesByUuid = async (
   client = db
 ) => {
   const taxa = await fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, taxonUuid, draft }, client)
-  return R.head(taxa)
+  return A.head(taxa)
 }
 
 export const fetchTaxonWithVernacularNamesByCode = async (
@@ -627,8 +633,8 @@ export const updateTaxonProps = async ({ surveyId, taxon }, client = db) =>
   )
 
 export const updateTaxonAndVernacularNames = async (surveyId, taxon, client = db) =>
-  client.batch([
-    updateTaxonProps({ surveyId, taxon }, client),
+  DbUtils.runQueries(client, [
+    () => updateTaxonProps({ surveyId, taxon }, client),
     ..._insertOrUpdateVernacularNames({
       surveyId,
       taxonUuid: Taxon.getUuid(taxon),
@@ -638,10 +644,33 @@ export const updateTaxonAndVernacularNames = async (surveyId, taxon, client = db
   ])
 
 export const updateTaxa = async (surveyId, taxa, client = db) =>
-  client.batch(taxa.map((taxon) => updateTaxonAndVernacularNames(surveyId, taxon, client)))
+  DbUtils.runQueries(
+    client,
+    taxa.map((taxon) => () => updateTaxonAndVernacularNames(surveyId, taxon, client))
+  )
 
 export const updateTaxaProps = async ({ surveyId, taxa }, client = db) =>
-  client.batch(taxa.map((taxon) => updateTaxonProps({ surveyId, taxon }, client)))
+  DbUtils.runQueries(
+    client,
+    taxa.map((taxon) => () => updateTaxonProps({ surveyId, taxon }, client))
+  )
+
+// Finds taxa whose "extra" prop data has a pending draft change (i.e. props_draft has an "extra" key
+// whose value differs from the published one) - used to detect taxonomies whose extra prop values
+// (not just their extraPropsDefs schema) changed, so that node defs reading them via taxonProp can be
+// flagged for value recalculation on publish (see
+// server/modules/survey/service/publish/nodeDefExtraPropDependencyUtils.js). Filtered at the DB level
+// so surveys with no pending taxon extra-value edits (the common case) never pull taxon data into
+// memory.
+export const fetchTaxaWithChangedExtraValues = async ({ surveyId }, client = db) =>
+  client.any(
+    `SELECT t.taxonomy_uuid AS "taxonomyUuid",
+            t.props->'extra' AS "extraPublished",
+            t.props_draft->'extra' AS "extraDraft"
+     FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon t
+     WHERE t.props_draft ? 'extra'
+       AND (t.props_draft -> 'extra') IS DISTINCT FROM (t.props -> 'extra')`
+  )
 
 // ============== DELETE
 

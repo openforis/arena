@@ -1,3 +1,5 @@
+import { setImmediate as waitForEventLoop } from 'node:timers/promises'
+
 import { Objects, RecordUpdateResult } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -20,6 +22,8 @@ import DataImportBaseJob from './DataImportBaseJob'
 import { DataImportFileReader } from './dataImportFileReader'
 
 const defaultErrorKey = 'error'
+// Maximum time (ms) spent processing rows without letting the event loop process timers and messages.
+const eventLoopYieldIntervalMillis = 200
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
@@ -44,6 +48,15 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     this.filesToDeleteByUuid = {}
     this.entityIIdTouchedByRecordUuid = {}
     this.entitiesCreated = 0
+    // nodes (by uuid) updated in the current record whose dependent nodes (and validation) have not been updated yet:
+    // dependents are evaluated once per record (instead of once per updated attribute) to avoid quadratic processing time
+    // when the survey has expressions depending on many nodes (e.g. aggregate functions on multiple entities);
+    // the node objects are the same ones passed to the batch persisters (their ids are set when they are inserted)
+    this.nodesPendingDependentsUpdateByIId = new Map()
+    // index of the entities by key values, used to find the entity of every row without comparing the keys of all its siblings
+    // (valid only for the current record)
+    this.entityKeysIndexCache = new Record.EntityKeysIndexCache()
+    this.lastEventLoopYieldTime = Date.now()
   }
 
   async onStart() {
@@ -86,6 +99,10 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
     this.flatDataReader = await this.createFlatDataReader()
     await this.startFlatDataReader()
+
+    if (!this.isCanceled()) {
+      await this.updatePendingDependentsSafe()
+    }
 
     if (!this.hasErrors() && this.processed === 0) {
       // Error: empty file
@@ -189,7 +206,11 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
   async fetchOrCreateRecord({ valuesByDefUuid }) {
     const { currentRecord, context, tx } = this
-    const flushCallback = async () => this.flushBatchPersisters()
+    const flushCallback = async () => {
+      // dependents must be updated (and persisted) before another record is fetched
+      await this.updatePendingDependents()
+      await this.flushBatchPersisters()
+    }
     return DataImportJobRecordProvider.fetchOrCreateRecord({
       valuesByDefUuid,
       currentRecord,
@@ -202,6 +223,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
   async onRowItem({ valuesByDefUuid, refDataByDefUuid, errors }) {
     const { context } = this
     const { survey, includeFiles, insertMissingNodes, user } = context
+
+    await this.yieldToEventLoopIfNeeded()
 
     if (this.isCanceled()) {
       return
@@ -217,7 +240,15 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     })
 
     try {
+      const previousRecord = this.currentRecord
       const { record, newRecord } = await this.fetchOrCreateRecord({ valuesByDefUuid })
+      if (previousRecord && Record.getUuid(previousRecord) !== Record.getUuid(record)) {
+        // moving to another record: update dependents of the previous one (this.currentRecord is still the previous one)
+        await this.updatePendingDependents()
+      }
+      if (Record.getUuid(previousRecord) !== Record.getUuid(record)) {
+        this.entityKeysIndexCache = new Record.EntityKeysIndexCache()
+      }
       this.currentRecord = record
       const recordUuid = Record.getUuid(this.currentRecord)
 
@@ -240,6 +271,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         taxonProvider,
         insertMissingNodes,
         sideEffect,
+        updateDependents: false,
+        entityKeysIndexCache: this.entityKeysIndexCache,
       })(this.currentRecord)
 
       const entityIId = Node.getIId(entity)
@@ -263,6 +296,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         sideEffect,
         categoryItemProvider,
         taxonProvider,
+        updateDependents: false,
       })(this.currentRecord)
 
       updateResult.merge(updateResultUpdateAttributes)
@@ -270,6 +304,12 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
       const { nodes: nodesUpdated } = updateResult
       await this.persistUpdatedNodes({ nodesUpdated })
+
+      Object.values(nodesUpdated).forEach((node) => {
+        if (!Node.isDeleted(node)) {
+          this.nodesPendingDependentsUpdateByIId.set(Node.getIId(node), node)
+        }
+      })
 
       // update counts
       const nodesUpdatedArray = Object.values(nodesUpdated)
@@ -281,6 +321,90 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         this.updatedRecordsUuids.add(recordUuid)
       }
       this.updateFilesSummary({ originalRecord: record, nodesUpdatedArray })
+    } catch (e) {
+      const { key, params } = e
+      const errorKey = key ?? Validation.messageKeys.dataImport.errorUpdatingValues
+      const errorParams = params ?? { details: String(e) }
+      this._addError(errorKey, errorParams)
+    }
+  }
+
+  /**
+   * Rows can be processed without doing any I/O (e.g. dry run, or when the record has already been fetched):
+   * the event loop has to be released periodically, otherwise timers (e.g. job progress notifications)
+   * and messages (e.g. job cancel requests) would be processed only when all the rows have been processed.
+   * @returns {Promise<void>} - The promise that resolves when the event loop has been released (if needed).
+   */
+  async yieldToEventLoopIfNeeded() {
+    const now = Date.now()
+    if (now - this.lastEventLoopYieldTime < eventLoopYieldIntervalMillis) return
+    await waitForEventLoop()
+    this.lastEventLoopYieldTime = Date.now()
+  }
+
+  /**
+   * Updates the dependent nodes and the validation of the nodes updated in the current record since the last call,
+   * and persists the changes.
+   * @returns {Promise<void>} - The promise that resolves when the update is completed.
+   */
+  async updatePendingDependents() {
+    const { context, currentRecord } = this
+    const pendingNodesByIId = this.nodesPendingDependentsUpdateByIId
+    if (pendingNodesByIId.size === 0) return
+
+    const { survey, includeFiles, user } = context
+
+    const nodesUpdated = {}
+    pendingNodesByIId.forEach((_node, nodeIId) => {
+      const node = Record.getNodeByInternalId(nodeIId)(currentRecord)
+      if (node) {
+        nodesUpdated[nodeIId] = node
+      }
+    })
+    this.nodesPendingDependentsUpdateByIId = new Map()
+
+    if (Object.keys(nodesUpdated).length === 0) return
+
+    const { record: recordUpdated, nodes: nodesUpdatedWithDependents } = await Record.afterNodesUpdate({
+      user,
+      survey,
+      record: currentRecord,
+      nodes: nodesUpdated,
+      categoryItemProvider,
+      taxonProvider,
+      sideEffect: !includeFiles,
+    })
+    this.currentRecord = recordUpdated
+
+    // persist only the nodes changed by the dependents update (the original nodes have already been persisted)
+    const nodesChanged = Object.values(nodesUpdatedWithDependents).filter(
+      (node) => Node.isCreated(node) || Node.isUpdated(node) || Node.isDeleted(node)
+    )
+
+    // nodes inserted in this same batch have no id yet (it is set when they are inserted) and the updates use it:
+    // insert them now and copy the id from the node object that has been inserted
+    const nodesWithoutId = nodesChanged.filter((node) => !Node.getId(node))
+    if (nodesWithoutId.length > 0) {
+      await this.nodesInsertBatchPersister.flush()
+      nodesWithoutId.forEach((node) => {
+        const nodeId = Node.getId(pendingNodesByIId.get(Node.getIId(node)))
+        if (nodeId) {
+          node.id = nodeId
+        }
+      })
+    }
+    await this.persistUpdatedNodes({ nodesUpdated: nodesChanged })
+
+    const recordUuid = Record.getUuid(recordUpdated)
+    if (nodesChanged.length > 0 && !this.insertedRecordsUuids.has(recordUuid)) {
+      this.updatedValues += nodesChanged.length
+      this.updatedRecordsUuids.add(recordUuid)
+    }
+  }
+
+  async updatePendingDependentsSafe() {
+    try {
+      await this.updatePendingDependents()
     } catch (e) {
       const { key, params } = e
       const errorKey = key ?? Validation.messageKeys.dataImport.errorUpdatingValues

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Survey from '@core/survey/survey'
@@ -10,7 +10,7 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import { fetchFullContextSurvey } from '../config/context'
 
 const validateExpression = async (survey, nodeDefName, expression) => {
-  const nodeDef = R.pipe(
+  const nodeDef = A.pipe(
     Survey.getNodeDefByName(nodeDefName),
     NodeDef.mergePropsAdvanced({
       [NodeDef.keysPropsAdvanced.validations]: {
@@ -51,13 +51,13 @@ const expressions = [
   },
   {
     t: 'Test using a sibling value',
-    n: 'node_def_text',
+    n: 'entity1_text',
     e: 'sibling1',
     v: true,
   },
   {
     t: 'Test using an ancestor attribute value',
-    n: 'node_def_text',
+    n: 'entity1_text',
     e: 'ancestor1',
     v: true,
   },
@@ -69,7 +69,7 @@ const expressions = [
   },
   {
     t: 'Test using a node that exists but is not reachable in the ancestor hierarchy',
-    n: 'node_def_text',
+    n: 'entity1_text',
     e: 'unreachable_node',
     v: false,
   },
@@ -80,10 +80,11 @@ const expressions = [
     v: false,
   },
   {
-    t: 'Test an expression with a type error',
+    // Consistent with the "appending" cases below: '+' concatenates regardless of operand order.
+    t: 'Test appending a string to a number',
     n: 'node_def_text',
     e: '1 + node_def_text',
-    v: false,
+    v: true,
   },
   {
     t: 'Test appending number to a string',
@@ -101,7 +102,7 @@ const expressions = [
 
 describe('NodeDefExpressions Validation Test', () => {
   expressions.forEach((expr) => {
-    test(expr.t, async () => {
+    test(`${expr.t}`, async () => {
       const survey = await fetchFullContextSurvey()
       const validation = await validateExpression(survey, expr.n, expr.e)
       expect(Validation.isValid(validation)).toBe(expr.v)

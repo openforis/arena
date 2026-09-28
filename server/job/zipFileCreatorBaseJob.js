@@ -1,4 +1,4 @@
-import Archiver from 'archiver'
+import { ZipArchive } from 'archiver'
 
 import * as ProcessUtils from '@core/processUtils'
 
@@ -19,7 +19,7 @@ export default class ZipFileCreatorBaseJob extends Job {
 
     const outputFileStream = FileUtils.createWriteStream(outputFilePath)
 
-    const archive = Archiver('zip')
+    const archive = new ZipArchive()
     archive.pipe(outputFileStream)
 
     this.setContext({ archive, outputFileName, filePath: outputFilePath })

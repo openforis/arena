@@ -4,7 +4,12 @@ import { useUpdateCategoryItemExtraPropItem } from './category/useUpdateCategory
 import { useUploadCategory } from './category/useUploadCategory'
 import { useCleanupCategory } from './category/useCleanupCategory'
 import { useConvertToReportingDataCategory } from './category/useConvertToReportingDataCategory'
+import { useConvertToSamplingPointDataCategory } from './category/useConvertToSamplingPointDataCategory'
+import { useConvertToGeoPackageCategory } from './category/useConvertToGeoPackageCategory'
+import { useConvertGeoPackageCategoryToSimple } from './category/useConvertGeoPackageCategoryToSimple'
+import { useConvertSamplingPointDataCategoryToSimple } from './category/useConvertSamplingPointDataCategoryToSimple'
 import { useConvertToSimpleCategory } from './category/useConvertToSimpleCategory'
+import { useExportToGeoPackage } from './category/useExportToGeoPackage'
 import { useOnDoneClick } from './category/useOnDoneClick'
 import { useToggleEditExtraPropertiesPanel } from './category/useToggleEditExtraPropertiesPanel'
 import { useImportCategory } from './importSummary/useImportCategory'
@@ -33,7 +38,12 @@ export const useActions = ({ setState }) => ({
   importCategory: useImportCategory({ setState }),
   cleanupCategory: useCleanupCategory({ setState }),
   convertToReportingDataCategory: useConvertToReportingDataCategory({ setState }),
+  convertToSamplingPointDataCategory: useConvertToSamplingPointDataCategory({ setState }),
+  convertToGeoPackageCategory: useConvertToGeoPackageCategory({ setState }),
+  convertGeoPackageCategoryToSimple: useConvertGeoPackageCategoryToSimple({ setState }),
+  convertSamplingPointDataCategoryToSimple: useConvertSamplingPointDataCategoryToSimple({ setState }),
   convertToSimpleCategory: useConvertToSimpleCategory({ setState }),
+  exportToGeoPackage: useExportToGeoPackage(),
   onDoneClick: useOnDoneClick({ setState }),
   toggleEditExtraPropertiesPanel: useToggleEditExtraPropertiesPanel({ setState }),
 

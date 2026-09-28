@@ -32,4 +32,5 @@ export {
   useIsNodeDefEnumerator,
   useIsSurveyDirty,
   useChains,
+  useCategoryByName,
 } from './hooks'

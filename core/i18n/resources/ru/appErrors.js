@@ -1,4 +1,9 @@
 export default {
+  aiDataQueryDescriptionMissing: 'Опишите обычным языком данные, которые вы хотите увидеть.',
+  aiDataQueryEmpty: 'Сначала выберите сущность и атрибуты (или измерения и меры).',
+  aiDataQueryInvalid: 'ИИ не удалось сформировать корректный запрос по этому описанию: {{errors}}',
+  aiDataQueryNoEntities: 'В этом опросе нет сущностей, по которым можно выполнить запрос.',
+  aiDataQuerySummaryInvalid: 'ИИ не удалось предложить название и описание для этого запроса. Попробуйте ещё раз.',
   cannotGetChild: "Не удается получить дочерний элемент '{{childName}}' из атрибута {{name}}",
   cannotImportFilesExceedingQuota: 'Невозможно импортировать файлы записей: будет превышена квота хранения файлов',
   cannotInsertFileExceedingQuota: 'Невозможно вставить файл: будет превышена квота хранения файлов',
@@ -21,6 +26,8 @@ export default {
     noRecordsFound: 'В файле импорта не найдено записей или неверный формат файла',
     pendingImportFileNotFoundOrExpired:
       'Ранее загруженный файл не найден; возможно, срок его действия истек. Пожалуйста, загрузите его снова.',
+    recordMergeWithSameKeysNotAllowed:
+      'Невозможно импортировать запись "{{recordKeyValues}}": другая запись с такими же ключами уже существует, а объединение записей с одинаковыми ключами в этом опросе не разрешено',
     recordOwnedByAnotherUser:
       'Невозможно обновить запись "{{recordKeyValues}}", так как она принадлежит другому пользователю',
   },
@@ -49,6 +56,12 @@ export default {
     entityNotFound: 'Сущность "{{entityName}}" с ключами "{{keyValues}}" не найдена',
     updateSelfAndDependentsDefaultValues:
       'Ошибка обновления записи; ошибка при оценке выражения в узле {{nodeDefName}}: {{details}}',
+  },
+  recordPrintableExport: {
+    missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeUuid',
+    entityNotFound: 'Сущность не найдена для указанного экспорта',
+    missingServerUrl: 'Для экспорта с QR-кодом требуется публичный URL сервера',
+    qrTokenMismatch: 'Не удалось завершить экспорт с QR-кодом; повторите попытку',
   },
   sessionExpiredRefreshPage: 'Срок действия сеанса мог истечь.\nПопробуйте обновить страницу.',
   survey: {

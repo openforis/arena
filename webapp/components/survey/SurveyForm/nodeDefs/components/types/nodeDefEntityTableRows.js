@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -17,6 +17,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 import { getNextSortCriteria, sortNodes } from './nodeDefEntityTableRowsSort'
+import { useColumnHeaderHeight } from './useColumnHeaderHeight'
 
 const NodeDefEntityTableRows = (props) => {
   const {
@@ -41,7 +42,7 @@ const NodeDefEntityTableRows = (props) => {
   const minCount = useNodesMinCount({ parentNodeIId: parentNode?.iId, nodeDefUuid })
   const canDeleteRows = !NodeDef.isEnumerate(nodeDef) && (!minCount || nodes.length > minCount)
 
-  const nodeDefColumns = R.reduce(
+  const nodeDefColumns = A.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {
       const nodeDefChild = Survey.getNodeDefByUuid(nodeDefColumnUuid)(survey)
       if (nodeDefChild && !NodeDef.isAnalysis(nodeDefChild)) {
@@ -78,6 +79,12 @@ const NodeDefEntityTableRows = (props) => {
     height: 0,
     top: 0,
     left: 0,
+  })
+
+  const headerRowRendered = edit || !A.isEmpty(nodes)
+  const { columnHeaderHeight, resizableCellHeight } = useColumnHeaderHeight({
+    headerRef: tableRowsHeaderRef,
+    enabled: headerRowRendered,
   })
 
   const onScrollTableDataRows = () => {
@@ -149,6 +156,7 @@ const NodeDefEntityTableRows = (props) => {
         canEditDef={canEditDef}
         canEditRecord={canEditRecord}
         canDelete={canDelete}
+        columnHeaderHeight={resizableCellHeight}
         edit={edit}
         entry={entry}
         gridSize={gridSize}
@@ -172,8 +180,11 @@ const NodeDefEntityTableRows = (props) => {
   }
 
   return (
-    <div className={classNames('survey-form__node-def-entity-table-rows', { edit })}>
-      {(edit || !R.isEmpty(nodes)) &&
+    <div
+      className={classNames('survey-form__node-def-entity-table-rows', { edit })}
+      style={columnHeaderHeight ? { '--column-header-height': `${columnHeaderHeight}px` } : undefined}
+    >
+      {headerRowRendered &&
         // eslint-disable-next-line react-hooks/refs -- pre-existing pattern: tableRowsHeaderRef is only forwarded to NodeDefEntityTableRow's `ref` prop (a forwardRef component), never dereferenced here.
         createRow({
           renderType: NodeDefLayout.renderType.tableHeader,

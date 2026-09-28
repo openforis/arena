@@ -174,9 +174,15 @@ const props = {
   },
   [nodeDefType.time]: {
     [colValueProcessor]: ({ nodeCol }) => {
-      const [hour, minute] = [Node.getTimeHour(nodeCol), Node.getTimeMinute(nodeCol)]
+      const [hour, minute, seconds] = [
+        Node.getTimeHour(nodeCol),
+        Node.getTimeMinute(nodeCol),
+        Node.getTimeSeconds(nodeCol),
+      ]
       return () =>
-        DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${StringUtils.padStart(2, '0')(minute)}:00` : null
+        DateTimeUtils.isValidTime(hour, minute, seconds)
+          ? `${hour}:${StringUtils.padStart(2, '0')(minute)}:${StringUtils.padStart(2, '0')(seconds)}`
+          : null
     },
   },
 }

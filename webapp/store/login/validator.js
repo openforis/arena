@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
@@ -7,7 +7,7 @@ import * as UserValidator from '@core/user/userValidator'
 import * as User from '@core/user/user'
 import { UserPasswordValidator } from '@core/user/userPasswordValidator'
 
-const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
+const getProp = (propName, defaultValue) => A.pathOr(defaultValue, propName.split('.'))
 
 const _validatePasswordConfirm = (propName, item) => {
   const { password } = item
@@ -49,10 +49,10 @@ export const validateResetPasswordObj = async (obj) => {
 }
 
 export const getFirstError = (validation, order) =>
-  R.pipe(
-    R.map((field) => Validation.getFieldValidation(field)(validation)),
-    R.find(Validation.isNotValid),
+  A.pipe(
+    A.map((field) => Validation.getFieldValidation(field)(validation)),
+    A.find(Validation.isNotValid),
     Validation.getErrors,
-    R.head,
+    A.head,
     ValidationResult.getKey
   )(order)

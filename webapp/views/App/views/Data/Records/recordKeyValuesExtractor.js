@@ -37,6 +37,25 @@ const _findCategoryItem = ({ survey, nodeDef, code, categoryItemsByCodeDefUuid, 
   )
 }
 
+// keepTimeZone: false avoids convertDate's default parseZone-based parsing, which treats a
+// timezone-less "HH:mm:ss" string as UTC and shifts it by the local UTC offset on format (e.g.
+// "14:30:45" -> "16:30:45" on a UTC+2 host). Time values have no timezone component, so they
+// must be parsed and formatted consistently in the local zone.
+/**
+ * Formats a time value for display as a record key or summary field, applying the node definition's time format.
+ * @param {object} params - The function parameters.
+ * @param {string} params.value - The stored time value (HH:mm:ss).
+ * @param {object} params.nodeDef - The time node definition the value belongs to.
+ * @returns {string} The formatted time value.
+ */
+export const formatTimeKeyValue = ({ value, nodeDef }) =>
+  DateUtils.convertDate({
+    dateStr: value,
+    formatFrom: 'HH:mm:ss',
+    formatTo: DateUtils.getTimeFormat(NodeDef.isSecondsIncluded(nodeDef)),
+    keepTimeZone: false,
+  })
+
 const valueFormattersByType = {
   [NodeDef.nodeDefType.code]: ({
     survey,
@@ -70,12 +89,7 @@ const valueFormattersByType = {
       formatFrom: DateUtils.formats.datetimeISO,
       formatTo: DateUtils.formats.dateDefault,
     }),
-  [NodeDef.nodeDefType.time]: ({ value }) =>
-    DateUtils.convertDate({
-      dateStr: value,
-      formatFrom: 'HH:mm:ss',
-      formatTo: DateUtils.formats.timeStorage,
-    }),
+  [NodeDef.nodeDefType.time]: formatTimeKeyValue,
 }
 
 const extractKeyOrSummaryValue = ({

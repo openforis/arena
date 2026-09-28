@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { FileNames } from '@openforis/arena-core'
 
@@ -7,6 +7,7 @@ import { truncate } from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
 
 import * as Node from '../record/node'
+import { cycleOneKey } from './_survey/surveyInfo'
 
 export const keys = {
   content: 'content',
@@ -16,6 +17,8 @@ export const keys = {
 }
 
 export const propKeys = {
+  chainUuid: 'chainUuid',
+  cycle: 'cycle',
   deleted: 'deleted',
   labels: 'labels',
   name: 'name',
@@ -32,7 +35,9 @@ export const invalidPropKeys = {
 }
 
 export const SurveyFileType = {
+  chainMau: 'chainMau',
   preloadedMapLayer: 'preloadedMapLayer',
+  printableExportPdf: 'printableExportPdf',
   recordAttachment: 'recordAttachment',
   surveyDocImage: 'surveyDocImage',
   brandingSurveyLogo1: 'brandingSurveyLogo1',
@@ -47,12 +52,16 @@ export const createFile = ({
   uuid = null,
   size = null,
   content = null,
+  chainUuid = null,
+  cycle = null,
   recordUuid = null,
   nodeIId = null,
   type = null,
   temporary = false,
 }) => {
   const props = ObjectUtils.keepNonEmptyProps({
+    [propKeys.chainUuid]: chainUuid,
+    [propKeys.cycle]: cycle,
     [propKeys.labels]: labels,
     [propKeys.name]: name,
     [propKeys.nodeIId]: nodeIId,
@@ -83,9 +92,9 @@ export const createFileFromNode = ({ node, size = null, content = null }) =>
   })
 
 export const truncateFileName = (fileName, maxLength = 10) => {
-  if (fileName && !R.isEmpty(fileName)) {
+  if (fileName && !A.isEmpty(fileName)) {
     const extension = FileNames.getExtension(fileName)
-    return R.pipe(R.dropLast(extension.length + 1), truncate(maxLength), (name) => `${name}.${extension}`)(fileName)
+    return A.pipe(A.dropLast(extension.length + 1), truncate(maxLength), (name) => `${name}.${extension}`)(fileName)
   }
 
   return ''
@@ -97,18 +106,20 @@ export const isDeleted = (file) => Boolean(ObjectUtils.getProp(propKeys.deleted,
 export const isTemporary = (file) => Boolean(ObjectUtils.getProp(propKeys.temporary, false)(file))
 export const getName = ObjectUtils.getProp(propKeys.name)
 export const getSize = ObjectUtils.getProp(propKeys.size)
+export const getChainUuid = ObjectUtils.getProp(propKeys.chainUuid)
+export const getCycle = ObjectUtils.getProp(propKeys.cycle, cycleOneKey)
 export const getNodeIId = ObjectUtils.getProp(propKeys.nodeIId)
 export const getRecordUuid = ObjectUtils.getProp(propKeys.recordUuid)
-export const getContent = R.prop(keys.content)
-export const getExtension = R.pipe(getName, FileNames.getExtension)
+export const getContent = A.prop(keys.content)
+export const getExtension = A.pipe(getName, FileNames.getExtension)
 export const getType = ObjectUtils.getProp(propKeys.type, SurveyFileType.recordAttachment)
 
 // UPDATE
 export const { assocLabels } = ObjectUtils
-export const assocContent = R.assoc(keys.content)
+export const assocContent = A.assoc(keys.content)
 export const assocSize = (size) => ObjectUtils.setProp(propKeys.size, size)
 
-const assocProps = R.assoc(keys.props)
+const assocProps = A.assoc(keys.props)
 
 const hasInvalidProps = (file) => Object.hasOwn(getProps(file), invalidPropKeys.fileName)
 

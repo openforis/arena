@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { db } from '@server/db/db'
 
@@ -31,10 +31,10 @@ class EntityBuilder extends NodeBuilder {
     const entity = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDef), parentNode })
     record.lastNodeInternalId = Node.getIId(entity)
 
-    return R.pipe(
-      R.map((childBuilder) => childBuilder.build(survey, nodeDef, record, entity)),
-      R.mergeAll,
-      R.assoc(Node.getIId(entity), entity)
+    return A.pipe(
+      A.map((childBuilder) => childBuilder.build(survey, nodeDef, record, entity)),
+      A.mergeAll,
+      A.assoc(Node.getIId(entity), entity)
     )(this.childBuilders)
   }
 
@@ -45,7 +45,7 @@ class EntityBuilder extends NodeBuilder {
     if (NodeDef.isRoot(nodeDef)) {
       node = Record.getRootNode(record)
     } else if (NodeDef.isSingle(nodeDef)) {
-      node = R.head(Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record))
+      node = A.head(Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record))
     } else {
       node = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(nodeDef), parentNode })
       record.lastNodeInternalId = Node.getIId(node)
@@ -83,7 +83,7 @@ class AttributeBuilder extends NodeBuilder {
     }
 
     const nodeInRecord = NodeDef.isSingle(nodeDef)
-      ? R.head(Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record))
+      ? A.head(Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record))
       : null
 
     let nodeToPersist

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -27,7 +27,7 @@ const extractNestedErrorsOrWarnings = (
       } else if ((currentItem as Record<string, unknown>).key) {
         const item = currentItem as ValidationResult.ValidationResultInstance
         const arr = ValidationResult.isError(item) ? errors : warnings
-        const itemToAdd = R.omit([ValidationResult.keys.severity], item)
+        const itemToAdd = A.omit([ValidationResult.keys.severity], item)
         addUniqueItems([itemToAdd as ValidationResult.ValidationResultInstance])(arr)
       } else {
         const validation = currentItem as Validation.ValidationInstance
@@ -54,7 +54,7 @@ const validateProp = async (
     errors.push(...errorsCurrent)
     warnings.push(...warningsCurrent)
   })
-  return Validation.newInstance(R.isEmpty(errors) && R.isEmpty(warnings), {}, errors, warnings)
+  return Validation.newInstance(A.isEmpty(errors) && A.isEmpty(warnings), {}, errors, warnings)
 }
 
 export const validate = async (
@@ -69,7 +69,7 @@ export const validate = async (
     const validationPropValid = Validation.isValid(validationProp)
 
     if (!validationPropValid || !removeValidFields) {
-      const validationPropKey = R.pipe(R.split('.'), R.last)(prop) as string
+      const validationPropKey = A.pipe(A.split('.'), A.last)(prop) as string
       Validation.setField(validationPropKey, validationProp)(validation)
     }
 

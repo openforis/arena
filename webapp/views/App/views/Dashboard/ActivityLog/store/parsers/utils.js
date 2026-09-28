@@ -1,4 +1,3 @@
-import * as R from 'ramda'
 import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -8,13 +7,13 @@ import * as Category from '@core/survey/category'
 // ===== SURVEY
 
 export const getNodeDef = (survey) =>
-  R.pipe(ActivityLog.getContentUuid, (nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey))
+  A.pipe(ActivityLog.getContentUuid, (nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey))
 
 // ===== CATEGORY
 
 export const getItemCategory = ActivityLog.getCategory
 
-export const isItemCategoryDeleted = () => R.pipe(ActivityLog.getCategory, R.isNil)
+export const isItemCategoryDeleted = () => A.pipe(ActivityLog.getCategory, A.isNil)
 
 export const isCategoryDeleted = isItemCategoryDeleted
 
@@ -27,4 +26,4 @@ export const isLevelDeleted = ({ category, levelUuid }) =>
 
 export const { getTaxonomy } = ActivityLog
 
-export const isTaxonomyDeleted = () => A.pipe(ActivityLog.getTaxonomy, R.isNil)
+export const isTaxonomyDeleted = () => A.pipe(ActivityLog.getTaxonomy, A.isNil)

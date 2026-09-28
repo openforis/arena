@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { Dates } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
@@ -94,7 +92,7 @@ export const getNodeSelectQuery = ({
 }) => {
   const schema = getSurveyDBSchema(surveyId)
 
-  const selectFields = (includeRecordUuid ? tableColumnsSelect : R.without(['record_uuid'], tableColumnsSelect))
+  const selectFields = (includeRecordUuid ? tableColumnsSelect : A.without(['record_uuid'], tableColumnsSelect))
     .map((field) => `n.${field}`)
     .concat('nd.uuid AS node_def_uuid')
 
@@ -161,7 +159,8 @@ export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, re
   const whereConditions = [
     `n.node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($/nodeDefFileUuids:csv/))`,
     `n.value IS NOT NULL`,
-    `(n.value->>'${Node.valuePropsFile.fileUuid}')::uuid NOT IN (SELECT uuid FROM ${schema}.file)`,
+    `n.value->>'${Node.valuePropsFile.fileUuid}' IS NOT NULL`,
+    `NOT EXISTS (SELECT 1 FROM ${schema}.file f WHERE f.uuid = (n.value->>'${Node.valuePropsFile.fileUuid}')::uuid)`,
   ]
   if (recordUuid) {
     whereConditions.push(`n.record_uuid = $/recordUuid/`)
@@ -277,8 +276,12 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
       meta: Node.getMeta(node),
     }))
   )
-  // assign generated ids to nodes (side effect)
-  await client.map(query + ' RETURNING id', [], (row, index) => (nodes[index].id = row.id))
+  // Passing no parameters (rather than []) tells pg-promise to send the query as-is: `query` was
+  // already built with every value embedded as a literal (see DbUtils.insertAllQueryBatch above),
+  // so re-running it through pg-promise's own $N parameter substitution - which scans the raw SQL
+  // text for "$" followed by digits, even inside string/JSON literals - would misinterpret a node
+  // value like "It costs $90" as a placeholder reference and throw "Variable $90 out of range".
+  await client.map(query + ' RETURNING id', undefined, (row, index) => (nodes[index].id = row.id))
   return nodes
 }
 
@@ -418,7 +421,7 @@ export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client =
     WHERE node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($1:csv))
     `,
     [nodeDefUuids],
-    R.prop('rowCount')
+    A.prop('rowCount')
   )
 }
 

@@ -48,6 +48,12 @@ const fetchRecordNodeFileAsStream = async ({ surveyId, recordUuid, nodeIId }) =>
   if (file) {
     const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeIId, file })
     const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary: file })
+    if (!contentStream) {
+      // the file is registered but its content is missing from the storage (e.g. deleted from the S3 bucket)
+      const error = new Error(`File content not found for node ${nodeIId}`)
+      error.statusCode = 404
+      throw error
+    }
     return { fileName, file, contentStream }
   } else {
     const error = new Error(`File not found for node ${nodeIId}`)
@@ -97,12 +103,12 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { surveyId, cycle, draft, timezoneOffset } = Request.getParams(req)
+        const { surveyId, cycle, draft, timezoneOffset, lang } = Request.getParams(req)
         const node = Request.getJsonParam(req, 'node')
         const file = Request.getFile(req)
         const socketId = Request.getSocketId(req)
 
-        await RecordService.persistNode({ socketId, user, surveyId, cycle, draft, node, file, timezoneOffset })
+        await RecordService.persistNode({ socketId, user, surveyId, cycle, draft, node, file, timezoneOffset, lang })
 
         sendOk(res)
       } catch (error) {
@@ -441,8 +447,9 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record/:recordUuid/export/docx', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation } =
+      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
         Request.getParams(req)
+      const serverUrl = Request.getPublicServerUrl(req)
 
       await RecordService.exportRecordDocx({
         user,
@@ -453,6 +460,8 @@ export const init = (app) => {
         entityDefUuid,
         entityNodeUuid,
         orientation,
+        includeQrCode: includeQrCode === true,
+        serverUrl,
         outputStream: res,
       })
     } catch (error) {
@@ -463,8 +472,9 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record/:recordUuid/export/pdf', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation } =
+      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
         Request.getParams(req)
+      const serverUrl = Request.getPublicServerUrl(req)
 
       await RecordService.exportRecordPdf({
         user,
@@ -475,6 +485,8 @@ export const init = (app) => {
         entityDefUuid,
         entityNodeUuid,
         orientation,
+        includeQrCode: includeQrCode === true,
+        serverUrl,
         outputStream: res,
       })
     } catch (error) {
@@ -510,11 +522,19 @@ export const init = (app) => {
     requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {
-        const { surveyId, recordUuid, draft, timezoneOffset } = Request.getParams(req)
+        const { surveyId, recordUuid, draft, timezoneOffset, lang } = Request.getParams(req)
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
 
-        const record = await RecordService.checkIn({ socketId, user, surveyId, recordUuid, draft, timezoneOffset })
+        const record = await RecordService.checkIn({
+          socketId,
+          user,
+          surveyId,
+          recordUuid,
+          draft,
+          timezoneOffset,
+          lang,
+        })
 
         res.json({ record })
       } catch (error) {
@@ -645,11 +665,21 @@ export const init = (app) => {
     requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, draft, recordUuid, nodeIId, timezoneOffset } = Request.getParams(req)
+        const { surveyId, cycle, draft, recordUuid, nodeIId, timezoneOffset, lang } = Request.getParams(req)
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
 
-        await RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeIId, timezoneOffset })
+        await RecordService.deleteNode({
+          socketId,
+          user,
+          surveyId,
+          cycle,
+          draft,
+          recordUuid,
+          nodeIId,
+          timezoneOffset,
+          lang,
+        })
 
         sendOk(res)
       } catch (error) {

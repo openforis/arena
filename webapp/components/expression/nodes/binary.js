@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Expression from '@core/expressionParser/expression'
 
@@ -23,7 +23,7 @@ const Binary = (props) => {
 
   const i18n = useI18n()
 
-  const leftOperand = R.prop(BinaryOperandType.left)(node)
+  const leftOperand = A.prop(BinaryOperandType.left)(node)
   const leftOperandType = Expression.getType(leftOperand)
 
   const showOperator = node.operator || ![Expression.types.Literal].includes(leftOperandType)
@@ -56,7 +56,7 @@ const Binary = (props) => {
             items={Expression.operators.binaryValues}
             placeholder={i18n.t('expressionEditor.operator')}
             selection={binaryOperator}
-            onChange={(item) => onChange(R.assoc('operator', item?.value ?? '', node))}
+            onChange={(item) => onChange(A.assoc('operator', item?.value ?? '', node))}
           />
 
           {createOperand(BinaryOperandType.right)}

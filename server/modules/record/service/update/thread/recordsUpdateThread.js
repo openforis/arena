@@ -1,4 +1,4 @@
-import { Objects, SystemError } from '@openforis/arena-core'
+import { Objects, Queue, SystemError } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import { db } from '@server/db/db'
@@ -7,7 +7,6 @@ import * as Log from '@server/log/log'
 import Thread from '@server/threads/thread'
 import IdleTimeoutCache from '@server/utils/IdleTimeoutCache'
 
-import Queue from '@core/queue'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
@@ -202,7 +201,7 @@ export class RecordsUpdateThread extends Thread {
   }
 
   async processRecordInitMsg(msg) {
-    const { surveyId, recordUuid, user, timezoneOffset } = msg
+    const { surveyId, recordUuid, user, timezoneOffset, lang } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -217,6 +216,7 @@ export class RecordsUpdateThread extends Thread {
             survey,
             record,
             timezoneOffset,
+            lang,
             nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
             nodesValidationListener: (validations) =>
               this.handleNodesValidationUpdated.bind(this)({ record, validations }),
@@ -245,7 +245,7 @@ export class RecordsUpdateThread extends Thread {
   }
 
   async processRecordNodePersistMsg(msg) {
-    const { surveyId, node, user, timezoneOffset } = msg
+    const { surveyId, node, user, timezoneOffset, lang } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -264,6 +264,7 @@ export class RecordsUpdateThread extends Thread {
             record,
             node: nodePreparedForStorage,
             timezoneOffset,
+            lang,
             nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
             nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
           },
@@ -275,7 +276,7 @@ export class RecordsUpdateThread extends Thread {
   }
 
   async processRecordNodeDeleteMsg(msg) {
-    const { surveyId, nodeIId, recordUuid, user, timezoneOffset } = msg
+    const { surveyId, nodeIId, recordUuid, user, timezoneOffset, lang } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -289,6 +290,7 @@ export class RecordsUpdateThread extends Thread {
           record,
           nodeIId,
           timezoneOffset,
+          lang,
           (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
           (validations) => this.handleNodesValidationUpdated({ record, validations }),
           t

@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Активно',
@@ -53,6 +55,7 @@ export default {
     download: 'Скачать',
     draft: 'Черновик',
     edit: 'Редактировать',
+    elapsed: 'Прошедшее время',
     email: 'Электронная почта',
     email_other: 'Электронные письма',
     emailSentConfirmation: `Письмо на адрес {{email}} отправлено.
@@ -153,9 +156,34 @@ export default {
 - Таксоны нельзя будет удалить.
 
 **Вы уверены, что хотите продолжить?**`,
+    publishRecordValuesUpdateConfirm: `#### Публикация {{survey}} обновит уже записанные данные ####
+
+{{reasons}}
+
+Эта операция может безвозвратно изменить или удалить уже введённые данные.
+
+Чтобы опубликовать без обновления существующих данных, отметьте «Пропустить обновление данных» ниже (не рекомендуется).`,
+    publishRecordValuesUpdateConfirmHeader: 'Данные существующих записей будут обновлены',
+    publishRecordValuesUpdateConfirmOk: 'Опубликовать и обновить данные',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Введите название анкеты "{{strongConfirmRequiredText}}" для подтверждения',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Следующие атрибуты будут изменены, и их значения в существующих записях будут автоматически пересчитаны: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Следующие атрибуты используют дополнительное свойство категории или таксономии, которое изменилось, из-за чего их значение будет пересчитано в существующих записях: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Пропустить обновление данных',
+    publishSkipDataUpdateConfirmOk: 'Пропустить обновление данных и опубликовать',
+    publishSkipDataUpdateImplications: 'Пропуск обновления данных означает следующее:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Существующие записи могут перестать соответствовать новому определению анкеты',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Затронутые значения не будут пересчитаны, пока не будут введены заново вручную',
+    publishSkipDataUpdateImplicationChains:
+      'Цепочки обработки, использующие эти атрибуты, могут выдавать устаревшие результаты',
     raiseTicketInSupportForum: `В случае проблем, пожалуйста, создайте заявку с тегом 'arena' на нашем <b>Форуме поддержки</b>: $t(links.supportForum)`,
     record: 'Запись',
     record_other: 'Записи',
+    remaining: 'Оставшееся время',
     remote: 'Удаленно',
     required: 'Обязательно',
     requiredField: 'обязательное поле',
@@ -357,6 +385,8 @@ export default {
 
     help: 'Помощь',
     about: 'О программе',
+    changelog: 'Журнал изменений',
+    whatsNew: 'Что нового',
     disclaimer: 'Отказ от ответственности',
     userManual: 'Руководство пользователя',
   },
@@ -715,16 +745,34 @@ $t(common.raiseTicketInSupportForum)
       confirmDelete: 'При удалении базовой единицы вы снимите все отметки "переменная на основе площади". Продолжить?',
     },
     downloadSummaryJSON: 'Скачать сводку (JSON)',
-    firstPhaseCategory: 'Категория 1-й фазы',
-    firstPhaseCategoryInfo: 'Выберите категорию, содержащую выборки 1-й фазы.',
-    firstPhaseCategoryExtraProp: {
-      label: 'Атрибут страты 1-й фазы',
-      info: 'Выберите переменную, используемую для разделения исходной совокупности на широкие страты для начальной фазы выборки.',
+    mauFile: {
+      upload: 'Загрузить MAU.zip',
+      download: 'Скачать MAU.zip',
+      delete: 'Удалить MAU.zip',
+      confirmCycleAssociation: 'Файл MAU.zip будет связан с текущим циклом ({{cycle}}). Продолжить?',
+      confirmReplace: 'Файл MAU.zip уже загружен для этой цепочки. Заменить его?',
+      confirmDelete: 'Удалить файл MAU.zip, загруженный для этой цепочки?',
+      uploadComplete: 'Файл MAU.zip успешно загружен',
+      deleteComplete: 'Файл MAU.zip удалён',
+      invalidFileExtension: 'Пожалуйста, выберите файл .zip',
     },
-    firstPhaseCommonAttribute: {
-      label: 'Общий атрибут',
-      info: `Атрибут, общий для базовой единицы и таблицы 1-й фазы
-(это должен быть кодовый атрибут с тем же именем, что и дополнительное свойство, определенное для категории 1-й фазы)`,
+    phase1Category: 'Категория 1-й фазы',
+    phase1CategoryInfo: 'Выберите категорию, содержащую выборки 1-й фазы.',
+    phase2JoinEntity: {
+      label: 'Объект соединения (2-я фаза)',
+      info: 'Объект, используемый для соединения базовой единицы с категорией 1-й фазы: сама базовая единица или одна из её родительских сущностей.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Соединять с использованием связи Sampling Point Data',
+      info: 'Ключ(и) объекта 2-й фазы считываются из таблицы Sampling Point Data, той же таблицы, что используется для 1-й фазы.',
+    },
+    phase1JoinAttribute: {
+      label: 'Атрибут соединения (1-я фаза)',
+      info: 'Выберите столбец таблицы $t(chainView.phase1Category) (дополнительное свойство или "code"), используемый для соединения с объектом соединения 2-й фазы.',
+    },
+    phase2JoinAttribute: {
+      label: 'Атрибут соединения (2-я фаза)',
+      info: 'Выберите атрибут (объекта 2-й фазы) для соединения с таблицей 1-й фазы; его значение сопоставляется с предыдущим атрибутом соединения 1-й фазы.',
     },
     formLabel: 'Метка цепочки обработки',
     basic: 'Основное',
@@ -769,8 +817,7 @@ $t(common.raiseTicketInSupportForum)
     },
     stratumAttribute: 'Атрибут страты',
     stratumAttributeInfo: 'Выберите переменную, используемую для стратификации выборки.',
-    stratumAttribute2ndPhase: 'Атрибут страты 2-й фазы',
-    stratumAttribute2ndPhaseInfo: `Выберите переменную, используемую для подразделения выборки 1-й фазы на страты перед формированием окончательной детальной подвыборки.`,
+    stratumAttribute2ndPhaseInfo: `Выберите переменную, используемую для подразделения выборки 1-й фазы на страты перед формированием окончательной детальной подвыборки. Показываются только те атрибуты, имя которых также присутствует как столбец категории 1-й фазы.`,
     postStratificationAttribute: 'Атрибут послестратификации',
     areaWeightingMethod: 'Метод взвешивания по площади',
     clusteringEntity: 'Сущность кластеризации',
@@ -885,6 +932,9 @@ $t(common.appNameFull)
  * Скрипты Arena R на GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
+    changelog: {
+      title: '$t(appModules.changelog)',
+    },
   },
 
   // ====== Survey views
@@ -991,6 +1041,10 @@ $t(common.appNameFull)
       form: 'Форма',
       formula: 'Формула',
       includedInClonedData: 'Включено в клонированные данные',
+      includedInMultipleEntitySummary: {
+        label: 'Включить в сводку множественной сущности',
+        info: `Если отмечено, значение атрибута будет отображаться в списке выбора сущности и в представлении сводки сущности`,
+      },
       includedInRecordsList: {
         label: 'Включить в список записей',
         info: `Если отмечено, атрибут будет виден в списке записей`,
@@ -1058,10 +1112,6 @@ $t(common.appNameFull)
         label: 'Скрыто в Arena Mobile',
         info: `Если отмечено, атрибут не будет виден в AM`,
       },
-      includedInMultipleEntitySummary: {
-        label: 'Включить в сводку множественной сущности',
-        info: `Если отмечено, атрибут будет виден в представлении сводки сущности`,
-      },
       includedInPreviousCycleLink: {
         label: 'Включить в ссылку на предыдущий цикл',
         info: `Если отмечено, значение из предыдущего цикла будет отображаться в форме ввода данных (когда ссылка на предыдущий цикл активна в мобильном приложении)"`,
@@ -1088,6 +1138,9 @@ $t(common.appNameFull)
     },
     mobileProps: {
       title: 'Мобильное приложение',
+    },
+    timeProps: {
+      includeSeconds: 'Включить секунды',
     },
     formHeaderProps: {
       headerColorLabel: 'Цвет заголовка',
@@ -1237,10 +1290,13 @@ $t(common.appNameFull)
       noCategoriesAvailable: 'В выбранном опросе нет доступных категорий',
     },
     itemsCount: 'Количество элементов',
+    structure: 'Структура',
     types: {
       flat: 'Плоская',
       hierarchical: 'Иерархическая',
       reportingData: 'Отчетные данные',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Данные точек выборки',
     },
   },
 
@@ -1268,6 +1324,55 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Преобразовать эту категорию отчетных данных в простую категорию?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Преобразовать в данные точек выборки',
+      confirmMessage: `Преобразовать эту категорию в категорию данных точек выборки?
+
+Категория будет переименована в '${samplingPointDataCategoryName}', и к элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Преобразовать в категорию GeoPackage',
+      confirmMessage: `Преобразовать эту категорию в категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию GeoPackage в простую категорию?
+
+Дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию данных точек выборки в простую категорию?
+
+Имя категории будет очищено (вам нужно будет присвоить ей новое имя), а дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    geoPackageCategory: 'Эта категория имеет геопространственные возможности',
+    geoPackageCategoryInfo: `У этой категории есть дополнительное свойство '${locationItemExtraDefName}', которое позволяет экспортировать её в виде файла GeoPackage.`,
+    samplingPointDataCategoryType: 'Это категория данных точек выборки',
+    samplingPointDataCategoryTypeInfo: `Это предопределенная категория для данных точек выборки. У неё есть дополнительное свойство '${locationItemExtraDefName}', которое позволяет экспортировать её в виде файла GeoPackage.`,
+    createCategory: {
+      menuLabel: 'Добавить категорию',
+      simple: 'Простая категория',
+      otherTypes: 'Другие типы категорий',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Категория данных точек выборки',
+      description:
+        'Предопределенная категория для данных точек выборки, включающая поле местоположения для каждого элемента.',
+      message: `Создать новую категорию данных точек выборки?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Категория с геопространственными возможностями',
+      description:
+        'Добавляет элементам поле местоположения, чтобы категорию можно было экспортировать в виде файла GeoPackage.',
+      message: `Создать новую категорию с геопространственными возможностями?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
     deleteItem: 'Удалить элемент',
     level: {
       title: 'Уровень {{levelPosition}}',
@@ -1291,6 +1396,8 @@ $t(common.cantUndoWarning)`,
       title: 'Сводка импорта категорий',
     },
     reportingData: 'Отчетные данные',
+    exportToGeoPackage: 'Экспорт в GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} элемент(ов) без действительного местоположения были пропущены.',
     templateFor_samplingPointDataImport_csv: 'Шаблон для импорта данных точек выборки (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Шаблон для импорта данных точек выборки (Excel)',
   },

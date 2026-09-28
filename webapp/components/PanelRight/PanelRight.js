@@ -22,7 +22,9 @@ const PanelRight = (props) => {
       style={{ width: `min(${width}, 100vw)` }}
     >
       <div className="panel-right__header">
-        <ButtonIconClose className="btn-close" onClick={onClose} testId={TestId.panelRight.closeBtn} />
+        <div className="btn-close-container">
+          <ButtonIconClose className="btn-close" onClick={onClose} testId={TestId.panelRight.closeBtn} />
+        </div>
         <div>{headerText}</div>
       </div>
       <div className="panel-right__content">{React.Children.toArray(children)}</div>

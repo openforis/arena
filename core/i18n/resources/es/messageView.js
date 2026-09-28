@@ -42,6 +42,7 @@ Algunas variables de marcador de posición también están disponibles:
       label: 'Tipo de usuario objetivo',
       all: 'Todos los usuarios',
       system_admins: 'Administradores del sistema',
+      survey_admins: 'Administradores de encuestas',
       survey_managers: 'Gestores de encuestas',
       data_analysts: 'Analistas de datos',
       data_cleaners: 'Limpiadores de datos',

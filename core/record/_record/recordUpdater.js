@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Records, Dates } from '@openforis/arena-core'
 
@@ -37,7 +37,7 @@ export const mergeNodes =
           !nodeExisting || // NodeExisting does not exist, n is new node
           !Node.isDirty(nodeExisting) || // Existing node is not dirty
           Node.isDirty(n) || // New node is dirty, replace the existing one
-          R.equals(Node.getValue(nodeExisting), Node.getValue(n)) || // New node is not dirty and has the same value of the existing (dirty) node
+          A.equals(Node.getValue(nodeExisting), Node.getValue(n)) || // New node is not dirty and has the same value of the existing (dirty) node
           (Node.isValueBlank(nodeExisting) && Node.isDefaultValueApplied(n)) // Existing node has a blank value and n has a default value applied
 
         if (toBeAdded) {
@@ -75,15 +75,15 @@ export const assocNodes =
     Records.addNodes(nodes, { updateNodesIndex, sideEffect })(record)
 
 export const mergeNodeValidations = (nodeValidations) => (record) =>
-  R.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), (validationMerged) =>
+  A.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), (validationMerged) =>
     Validation.assocValidation(validationMerged)(record)
   )(record)
 
-export const dissocNodes = R.dissoc(keys.nodes)
+export const dissocNodes = A.dissoc(keys.nodes)
 
 export const assocDateModified = (dateModified) => (record) => {
   const dateModifiedString = Dates.formatForStorage(dateModified)
-  return R.assoc(keys.dateModified, dateModifiedString)(record)
+  return A.assoc(keys.dateModified, dateModifiedString)(record)
 }
 
 // ====== DELETE

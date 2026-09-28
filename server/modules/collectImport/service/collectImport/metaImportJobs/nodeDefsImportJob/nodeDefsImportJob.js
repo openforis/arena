@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
@@ -87,7 +87,6 @@ export default class NodeDefsImportJob extends Job {
    *
    * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
    * (used to import Collect composite attribute definitions like Range).
-   *
    * @param {NodeDef} parentNodeDef - Parent node def definition.
    * @param {!string} parentPath - Parent node path.
    * @param {!object} collectNodeDef - Collect node definition.
@@ -167,7 +166,7 @@ export default class NodeDefsImportJob extends Job {
 
     const _updateLayoutProp = ({ propName, value }) => {
       const layout = propsUpdated[NodeDefLayout.keys.layout] || NodeDef.getLayout(nodeDef)
-      const layoutUpdated = R.assocPath([Survey.cycleOneKey, propName], value)(layout)
+      const layoutUpdated = A.assocPath([Survey.cycleOneKey, propName], value)(layout)
       propsUpdated[NodeDefLayout.keys.layout] = layoutUpdated
     }
 
@@ -294,7 +293,7 @@ export default class NodeDefsImportJob extends Job {
 
           const nodeDefsInserted = await this.insertNodeDef(nodeDef, collectNodeDefPath, collectChild, childType, field)
           // sort inserted node defs by id
-          const insertedUuids = R.pipe(R.values, R.sortBy(NodeDef.getId), R.map(NodeDef.getUuid))(nodeDefsInserted)
+          const insertedUuids = A.pipe(A.values, A.sortBy(NodeDef.getId), A.map(NodeDef.getUuid))(nodeDefsInserted)
           if (tableLayout) {
             childrenUuids.push(...insertedUuids)
           }
@@ -329,7 +328,7 @@ export default class NodeDefsImportJob extends Job {
     // 1. default values
     const defaultValues = await this.parseDefaultValues({ nodeDef, collectNodeDef })
 
-    if (!R.isEmpty(defaultValues)) {
+    if (!A.isEmpty(defaultValues)) {
       propsAdvanced[NodeDef.keysPropsAdvanced.defaultValues] = defaultValues
     }
 
@@ -394,8 +393,8 @@ export default class NodeDefsImportJob extends Job {
     switch (type) {
       case NodeDef.nodeDefType.code: {
         const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
-        const categoryName = R.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
-          ? Survey.samplingPointDataCategoryName
+        const categoryName = A.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
+          ? Category.samplingPointDataCategoryName
           : listName
         const category = Survey.getCategoryByName(categoryName)(this.survey)
 
@@ -483,7 +482,7 @@ export default class NodeDefsImportJob extends Job {
     const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(this.survey)
 
     const qualifiableItemCodesByCategoryAndLevel = this.getContextProp('qualifiableItemCodesByCategoryAndLevel', {})
-    const qualifiableItemCodes = R.pathOr(
+    const qualifiableItemCodes = A.pathOr(
       [],
       [categoryName, String(levelIndex)],
       qualifiableItemCodesByCategoryAndLevel
@@ -499,9 +498,9 @@ export default class NodeDefsImportJob extends Job {
           parentNodeDefName: NodeDef.getName(parentNodeDef),
           nodeDefName: `${nodeDefName}${specifyAttributeNameSuffix}`,
         }),
-        [NodeDef.propKeys.labels]: R.pipe(
+        [NodeDef.propKeys.labels]: A.pipe(
           NodeDef.getLabels,
-          R.mapObjIndexed((label) => `${label}${specifyAttributeLabelSuffix}`)
+          A.mapObjIndexed((label) => `${label}${specifyAttributeLabelSuffix}`)
         )(nodeDef),
         // hidden when not relevant
         [NodeDef.propKeys.layout]: {
@@ -532,7 +531,7 @@ export default class NodeDefsImportJob extends Job {
 
       const qualifierNodeDefUuid = NodeDef.getUuid(qualifierNodeDefParam)
       nodeDefsInserted[qualifierNodeDefUuid] = qualifierNodeDefAndOthersUpdated[qualifierNodeDefUuid]
-      Object.assign(nodeDefsUpdated, R.omit(qualifierNodeDefUuid, qualifierNodeDefAndOthersUpdated))
+      Object.assign(nodeDefsUpdated, A.omit(qualifierNodeDefUuid, qualifierNodeDefAndOthersUpdated))
     }
     return { nodeDefsInserted, nodeDefsUpdated }
   }
@@ -602,7 +601,7 @@ export default class NodeDefsImportJob extends Job {
         })
       )
 
-      return success ? R.propOr(null, 'uuid', R.head(nodeDefsInfo)) : null
+      return success ? A.propOr(null, 'uuid', A.head(nodeDefsInfo)) : null
     }
 
     return null

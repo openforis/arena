@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Имя категории не указано',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Категория данных точек выборки уже существует в этом опросе; может быть только одна.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Невозможно удалить опубликованные элементы категории. Элементы, отсутствующие в импортированном файле: {{deletedItemCodes}}',
@@ -66,7 +71,7 @@ export default {
     invalidNumber: 'Неверное число в столбце {{headers}}: {{value}}',
     invalidTaxonCode: 'Неверный код в столбце {{headers}}: {{value}}',
     invalidTime:
-      'Неверное время в столбце {{headers}}: {{value}}. Время должно быть отформатировано как HH:mm. Например, 09:45 или 16:30',
+      'Неверное время в столбце {{headers}}: {{value}}. Время должно быть отформатировано как HH:mm или HH:mm:ss. Например, 09:45, 16:30 или 09:45:30',
     missingRequiredHeaders: 'Отсутствуют обязательные столбцы: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Ошибка обновления значений: {{details}}',
     multipleRecordsMatchingKeys: 'Найдено несколько записей, соответствующих ключам "{{keyValues}}"',

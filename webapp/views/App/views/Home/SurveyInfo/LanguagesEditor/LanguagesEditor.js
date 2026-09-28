@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { useI18n } from '@webapp/store/system'
 import InputChips from '@webapp/components/form/InputChips'
@@ -29,7 +29,7 @@ const LanguagesEditor = (props) => {
         items={appLanguages}
         selection={selection}
         onChange={(items) => {
-          setLanguages(R.pluck('value', items))
+          setLanguages(A.pluck('value', items))
         }}
         requiredItems={1}
         readOnly={readOnly}

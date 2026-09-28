@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Request from '@server/utils/request'
 
@@ -52,7 +52,7 @@ export const init = (app) => {
         cycle: surveyCycleKey,
         nodeDef,
       })
-      res.json({ nodeDefsUpdated: R.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated), nodeDefsValidation })
+      res.json({ nodeDefsUpdated: A.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated), nodeDefsValidation })
     } catch (error) {
       next(error)
     }

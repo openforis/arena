@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const keys = {
   type: 'type',
@@ -30,14 +30,14 @@ export const keys = {
 }
 
 // ===== READ
-export const getUuid = R.prop(keys.uuid)
-export const getType = R.prop(keys.type)
-export const getInnerJobs = R.propOr([], keys.innerJobs)
-export const getCurrentInnerJobIndex = R.propOr(-1, keys.currentInnerJobIndex)
-export const getProgressPercent = R.propOr(0, keys.progressPercent)
-export const getElapsedMillis = R.propOr(0, keys.elapsedMillis)
-export const getTotal = R.propOr(0, keys.total)
-export const getProcessed = R.propOr(0, keys.processed)
+export const getUuid = A.prop(keys.uuid)
+export const getType = A.prop(keys.type)
+export const getInnerJobs = A.propOr([], keys.innerJobs)
+export const getCurrentInnerJobIndex = A.propOr(-1, keys.currentInnerJobIndex)
+export const getProgressPercent = A.propOr(0, keys.progressPercent)
+export const getElapsedMillis = A.propOr(0, keys.elapsedMillis)
+export const getTotal = A.propOr(0, keys.total)
+export const getProcessed = A.propOr(0, keys.processed)
 
 /**
  * Estimates the remaining milliseconds for a job based on elapsed time and progress.
@@ -94,19 +94,19 @@ export const getRemainingMillis = (job) => {
   return Math.round(currentJobRemaining + futureJobsEstimate)
 }
 
-export const getResult = R.prop(keys.result)
+export const getResult = A.prop(keys.result)
 export const getErrors = (job) => {
-  const errors = R.propOr([], keys.errors, job)
+  const errors = A.propOr([], keys.errors, job)
   // If errors is empty, get errors from failed inner job (if any)
-  return R.isEmpty(errors) ? R.pipe(getInnerJobs, R.find(isFailed), R.propOr([], keys.errors))(job) : errors
+  return A.isEmpty(errors) ? A.pipe(getInnerJobs, A.find(isFailed), A.propOr([], keys.errors))(job) : errors
 }
 export const getErrorsCount = (job) => Object.keys(getErrors(job)).length
 export const hasErrors = (job) => getErrorsCount(job) > 0
 
 // ===== READ (status)
-export const getStatus = R.prop(keys.status)
+export const getStatus = A.prop(keys.status)
 
-const _isPropTrue = (prop) => R.pipe(R.prop(prop), R.equals(true))
+const _isPropTrue = (prop) => A.pipe(A.prop(prop), A.equals(true))
 export const isPending = _isPropTrue(keys.pending)
 export const isRunning = _isPropTrue(keys.running)
 export const isSucceeded = _isPropTrue(keys.succeeded)

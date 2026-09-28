@@ -121,20 +121,21 @@ yarn build:server:dev
 ### Testing
 
 ```bash
-# Run all tests (unit + e2e)
+# Run all tests (unit + e2e + integration)
 yarn test
 
 # Run unit tests only
 yarn test:unit
 
-# Run e2e tests only
+# Run e2e tests only (Playwright Test; needs a running server, see test/e2e/README.md)
 yarn test:e2e
 
 # Run integration tests
 yarn test:integration
 
-# Run e2e tests in watch/debug mode
-yarn test:e2e:watch
+# Run e2e tests in UI mode / debug mode
+yarn test:e2e:ui
+yarn test:e2e:debug
 
 # Generate e2e test code with Playwright codegen
 yarn test:e2e:codegen
@@ -173,7 +174,7 @@ yarn test:docker
 For e2e tests:
 
 ```bash
-jest --config=test/e2e/jest.config.js test/e2e/tests/yourTest.js
+yarn test:e2e specs/yourTest.spec.ts
 ```
 
 For unit tests (after building):
@@ -196,6 +197,31 @@ When adding a new node definition type or modifying the survey schema:
 ### Working with Database Migrations
 
 Database migrations are in `server/db/` directory. The server automatically runs migrations on startup unless `MIGRATE_ONLY=true` is set.
+
+## Coding Conventions
+
+**TypeScript for new code:**
+New files must be written in TypeScript (`.ts` / `.tsx`), not JavaScript. When substantially rewriting an existing `.js` file, prefer converting it to TypeScript. Run `yarn typecheck` to verify types.
+
+**Types from `@openforis/arena-core`:**
+Most domain types are (or should be) defined in `@openforis/arena-core` (e.g. `Survey`, `NodeDef`, `ArenaRecord`, `Node`, `Category`, `Taxonomy`, `User`). Import them from there instead of redefining them locally. If a needed domain type is missing, point it out rather than creating a local duplicate.
+
+**Cognitive complexity:**
+Keep the cognitive complexity of every function at 15 or below (SonarCloud rule). Split complex logic into small helper functions, use early returns, and avoid deeply nested conditions/loops.
+
+**Loops:**
+Prefer `for...of` loops over `Array.prototype.forEach`.
+
+**Comments:**
+Keep comments short and to the point (JSDoc descriptions included): one line when possible, explaining the "why" rather than restating the code. The same applies to replies on GitHub PR findings.
+
+## Pull Requests
+
+After creating a PR, wait for the SonarCloud analysis and the Copilot review to complete, then go through their findings:
+
+- Fetch them with `gh` (e.g. `gh pr view <PR#> --comments`, `gh api repos/openforis/arena/pulls/<PR#>/comments` for inline review comments, `gh pr checks <PR#>` for the SonarCloud quality gate).
+- Fix every finding that can reasonably be solved, and push the fixes to the PR branch.
+- Reply to each finding on GitHub with a comment: explain how it was fixed (referencing the commit), or why it was not fixed (false positive, out of scope, etc.).
 
 ## Important Notes
 
@@ -236,10 +262,10 @@ Long-running operations use the job system in `server/job/`. Jobs are persisted 
 
 **E2E Tests:**
 
-- Use Playwright with jest-playwright-preset
-- Tests are in `test/e2e/tests/`
-- Authentication state is saved in `test/e2e/resources/auth.json`
-- Test utilities in `test/e2e/tests/utils/`
+- Playwright Test (`@playwright/test`), written in TypeScript: specs in `test/e2e/specs/`, see `test/e2e/README.md`
+- Every spec is isolated: it prepares its data with the fixtures in `test/e2e/fixtures/` (per-worker test user,
+  logged-in browser context, REST API client, sample survey inserted in the DB with the `test/utils` builders)
+- Shared UI helpers in `test/e2e/helpers/`
 
 **Integration Tests:**
 

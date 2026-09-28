@@ -14,6 +14,7 @@ import { useBrowserLanguageCode, useOnUpdate } from '@webapp/components/hooks'
 import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
+import { useTableVisibleColumns } from '@webapp/store/ui/tables'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import Table from '@webapp/components/Table'
@@ -22,6 +23,10 @@ import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
 import HeaderLeft from './HeaderLeft'
 import { RecordsCountIcon } from './RecordsCountIcon'
 import { SurveyOwnerColumn } from './SurveyOwnerColumn'
+
+// Column keys whose values are only populated when the "includeCounts" API param is set;
+// they are hidden by default, so counts should not be fetched unless one of them is made visible.
+const countsDependentColumnKeys = ['nodes', 'records', 'files', 'chains']
 
 const Surveys = (props) => {
   const { module, moduleApiUri, template = false } = props
@@ -33,6 +38,7 @@ const Surveys = (props) => {
   const surveyInfo = useSurveyInfo()
   const lang = useBrowserLanguageCode()
   const isSystemAdmin = useUserIsSystemAdmin()
+  const visibleColumnKeysInStore = useTableVisibleColumns(module)
 
   /**
    * Parameter passed to table rest params
@@ -184,6 +190,13 @@ const Surveys = (props) => {
     return cols
   }, [i18n, lang, onSurveysUpdate, template, user])
 
+  // Only request the (expensive) per-survey counts from the API when a column that displays them is visible.
+  const includeCounts = useMemo(() => {
+    const visibleColumnKeys =
+      visibleColumnKeysInStore ?? columns.filter((column) => !column.hidden).map((column) => column.key)
+    return countsDependentColumnKeys.some((key) => visibleColumnKeys.includes(key))
+  }, [columns, visibleColumnKeysInStore])
+
   return (
     <Table
       cellTestIdExtractor={({ column, item }) =>
@@ -199,7 +212,7 @@ const Surveys = (props) => {
       moduleApiUri={moduleApiUri}
       noItemsLabelForSearchKey="surveysView.noSurveysMatchingFilter"
       onRowClick={onRowClick}
-      restParams={{ lang, template, requestedAt, includeCounts: true, onlyOwn }}
+      restParams={{ lang, template, requestedAt, includeCounts, onlyOwn }}
       visibleColumnsSelectionEnabled
     />
   )

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -14,12 +14,13 @@ export const newEntityAggregatedView = (entityDef, calculations = []) => ({
 })
 
 // ===== READ
-export const getEntityDef = R.propOr([], keys.entityDef)
-export const getCalculations = R.propOr([], keys.calculations)
+export const getEntityDef = A.propOr([], keys.entityDef)
+export const getCalculations = A.propOr([], keys.calculations)
 
 // ===== UPDATE
-export const addCalculation = (calculation) => R.over(R.lens(keys.calculations), R.append(calculation))
+export const addCalculation = (calculation) => (view) =>
+  A.assoc(keys.calculations, A.append(calculation, view[keys.calculations] ?? []), view)
 
 // ===== UTILS
 export const getViewName = (entityAggregatedView) =>
-  `data_${R.pipe(getEntityDef, NodeDef.getName)(entityAggregatedView)}_agg_view`
+  `data_${A.pipe(getEntityDef, NodeDef.getName)(entityAggregatedView)}_agg_view`

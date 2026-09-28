@@ -26,7 +26,8 @@ export default {
   NodeDefsTranslationJob: 'Traducción de etiquetas de definiciones de nodos',
   NodeDefsImportJob: 'Importación de definiciones de nodos',
   NodeDefsValidationJob: 'Validación de definiciones de nodos',
-  chainsCyclesCheckJob: 'Verificación de ciclos de cadenas',
+  OdkImportJob: 'Importación de ODK',
+  ChainsCyclesCheckJob: 'Verificación de ciclos de cadenas',
   RecordCheckJob: 'Verificación de registro',
   RecordsCloneJob: 'Clonación de registros',
   RecordsImportJob: 'Importación de registros',
@@ -71,6 +72,7 @@ export default {
   // survey backup
   SurveyInfoExportJob: 'Exportación de información de encuesta',
   CategoriesExportJob: 'Exportación de categorías',
+  CategoryGeoPackageExportJob: 'Exportación de categoría a GeoPackage',
   TaxonomiesExportJob: 'Exportación de taxonomías',
   RecordsExportJob: 'Exportación de registros',
   RecordFilesExportJob: 'Exportación de archivos de registros',
@@ -85,6 +87,4 @@ export default {
   RecordsValidationJob: 'Validación de registros',
   // analysis
   PersistResultsJob: 'Persistencia de resultados del análisis',
-  elapsed: 'Transcurrido',
-  remaining: 'Restante',
 }

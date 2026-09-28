@@ -18,7 +18,6 @@ import {
 } from '@webapp/store/survey'
 import { FileUploadDialogActions } from '@webapp/store/ui'
 import { useNodeDefPage } from '@webapp/store/ui/surveyForm'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { TestId } from '@webapp/utils/testId'
 
@@ -36,7 +35,6 @@ const labelsExportAllowedFileFormats = [FileFormats.csv, FileFormats.xlsx]
 const FormHeaderAdvancedButton = ({ canEditDef }) => {
   const dispatch = useDispatch()
 
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const surveyId = useSurveyId()
   const surveyInfo = useSurveyInfo()
   const surveyIsDraft = Survey.isDraft(surveyInfo)
@@ -118,47 +116,43 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
             },
           ]
         : []),
-      ...(experimentalFeatures
+      ...(canEditDef
         ? [
-            ...(canEditDef
-              ? [
-                  {
-                    key: 'node-clone-from-other-survey',
-                    content: (
-                      <Button
-                        iconClassName="icon-copy"
-                        label="surveyForm:cloneFromAnotherSurvey.title"
-                        onClick={openCloneFromSurveyDialog}
-                        variant="text"
-                      />
-                    ),
-                  },
-                ]
-              : []),
             {
-              key: 'survey-docx-export',
+              key: 'node-clone-from-other-survey',
               content: (
-                <ButtonDownload
-                  href={API.getSurveyDocxExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
-                  iconClassName="icon-file-word"
-                  label="surveyForm:downloadPrintableDocument"
-                  variant="text"
-                />
-              ),
-            },
-            {
-              key: 'survey-pdf-export',
-              content: (
-                <ButtonDownload
-                  href={API.getSurveyPdfExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
-                  iconClassName="icon-file-pdf"
-                  label="surveyForm:downloadPrintableDocumentPdf"
+                <Button
+                  iconClassName="icon-copy"
+                  label="surveyForm:cloneFromAnotherSurvey.title"
+                  onClick={openCloneFromSurveyDialog}
                   variant="text"
                 />
               ),
             },
           ]
         : []),
+      {
+        key: 'survey-docx-export',
+        content: (
+          <ButtonDownload
+            href={API.getSurveyDocxExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
+            iconClassName="icon-file-word"
+            label="surveyForm:downloadPrintableDocument"
+            variant="text"
+          />
+        ),
+      },
+      {
+        key: 'survey-pdf-export',
+        content: (
+          <ButtonDownload
+            href={API.getSurveyPdfExportUrl({ surveyId, cycle, lang, draft: surveyIsDraft })}
+            iconClassName="icon-file-pdf"
+            label="surveyForm:downloadPrintableDocumentPdf"
+            variant="text"
+          />
+        ),
+      },
       ...labelsExportAllowedFileFormats.map((fileFormat) => ({
         key: `labels-export-${fileFormat}`,
         content: (
@@ -202,7 +196,6 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
       canEditDef,
       cycle,
       dataDictionaryAiEnabled,
-      experimentalFeatures,
       lang,
       onLabelsImportFileSelected,
       onStartTranslation,

@@ -2,7 +2,7 @@ import './expressionEditor.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -15,6 +15,7 @@ import { useNodeDefByUuid } from '@webapp/store/survey'
 import { Button } from '../buttons'
 import AiExpressionPopup from '@webapp/components/ai/AiExpressionPopup'
 import AiExplainPanel from '@webapp/components/ai/AiExplainPanel'
+import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
 import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 
 const ExpressionEditor = (props) => {
@@ -47,6 +48,10 @@ const ExpressionEditor = (props) => {
   const [explainOpen, setExplainOpen] = useState(false)
 
   const closeEditor = useCallback(() => setEdit(false), [])
+  const onOpenAiFromEditor = useCallback(() => {
+    closeEditor()
+    setAiOpen(true)
+  }, [closeEditor])
   const onAiCancel = useCallback(() => setAiOpen(false), [])
   const onAiApply = useCallback(
     (expression) => {
@@ -106,12 +111,13 @@ const ExpressionEditor = (props) => {
           isBoolean={isBoolean}
           onClose={handleClose}
           onChange={applyChange}
+          onGenerateWithAi={aiExpressionsEnabled && !readOnly && nodeDefUuidCurrent ? onOpenAiFromEditor : null}
           types={types}
           header={popupHeader}
         />
       ) : (
         <div className="expression-editor__query-container">
-          {!R.isEmpty(query) && (
+          {!A.isEmpty(query) && (
             <div className="query" id={`${idPrefix}-query`} data-testid={TestId.expressionEditor.query(qualifier)}>
               {query}
             </div>
@@ -126,15 +132,9 @@ const ExpressionEditor = (props) => {
             />
           )}
           {aiExpressionsEnabled && !readOnly && nodeDefUuidCurrent && (
-            <Button
-              className="btn-s btn-ai"
-              iconClassName="icon-magic-wand icon-14px"
-              id={`${idPrefix}-ai-btn`}
-              onClick={() => setAiOpen(true)}
-              title="aiExpression.title"
-            />
+            <ButtonAiGenerateExpression id={`${idPrefix}-ai-btn`} onClick={() => setAiOpen(true)} />
           )}
-          {aiExpressionsEnabled && !R.isEmpty(query) && nodeDefUuidCurrent && (
+          {aiExpressionsEnabled && !A.isEmpty(query) && nodeDefUuidCurrent && (
             <Button
               className="btn-s btn-ai-explain"
               iconClassName="icon-question icon-14px"
@@ -147,6 +147,8 @@ const ExpressionEditor = (props) => {
       )}
       {aiOpen && (
         <AiExpressionPopup
+          excludeCurrentNodeDef={excludeCurrentNodeDef}
+          isContextParent={isContextParent}
           qualifier={qualifier}
           nodeDefUuid={nodeDefUuidCurrent}
           onCancel={onAiCancel}

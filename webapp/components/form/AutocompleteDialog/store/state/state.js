@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-import * as R from 'ramda'
 import { elementOffset } from '@webapp/utils/domUtils'
 
 const keys = {
@@ -57,7 +56,7 @@ export const create = ({ inputField, sourceElement, items, itemLabelFunction, it
 
 // ===== UPDATE
 
-export const assocFocusedItemIndex = R.assoc(keys.focusedItemIndex)
-export const assocItems = R.assoc(keys.items)
-export const assocInputField = R.assoc(keys.inputField)
-export const assocList = R.assoc(keys.list)
+export const assocFocusedItemIndex = A.assoc(keys.focusedItemIndex)
+export const assocItems = A.assoc(keys.items)
+export const assocInputField = A.assoc(keys.inputField)
+export const assocList = A.assoc(keys.list)

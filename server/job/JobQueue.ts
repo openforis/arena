@@ -12,6 +12,14 @@ type JobParams = {
   [key: string]: any
 }
 
+// serialized job summary (see jobUtils.jobToJSON / jobRowToSummary), as sent to the clients
+type JobSummary = {
+  uuid: string
+  status: JobStatus
+  ended?: boolean
+  [key: string]: any
+}
+
 type JobInfo = {
   uuid: string
   type: string
@@ -19,6 +27,8 @@ type JobInfo = {
   params: JobParams
   persistPromise?: Promise<JobRow | void>
   ended?: boolean
+  // last serialized summary of the job, received from the job thread
+  summary?: JobSummary
 }
 
 type ActiveJobRow = {
@@ -106,17 +116,41 @@ export class JobQueue {
    * @param jobUuid - The job UUID.
    * @returns Job summary or null if not found.
    */
-  getJobSummary(jobUuid: string): JobInfo | null {
+  getJobSummary(jobUuid: string): JobSummary | null {
     const jobInfo = this._jobInfoByUuid[jobUuid]
-    if (!jobInfo) return null
-    const { params } = jobInfo
-    const { user } = params
+    return jobInfo ? this._getJobSummary(jobInfo) : null
+  }
+
+  /**
+   * Returns the summary of the specified job: the active job summary (if running), the last summary received from the
+   * job thread or, if the job has not started yet, a summary created from the job info.
+   * The job info itself is never returned: it contains the job params (e.g. the user who started the job).
+   * @param jobInfo - The job info.
+   * @returns The job summary.
+   */
+  private _getJobSummary(jobInfo: JobInfo): JobSummary {
+    const { uuid: jobUuid, params } = jobInfo
+    const { user, surveyId } = params
     const { uuid: userUuid } = user
     if (this._runningJobUuidByUserUuid[userUuid] === jobUuid) {
-      return JobThreadExecutor.getActiveJobSummary(userUuid)
-    } else {
-      return jobInfo
+      const activeJobSummary = JobThreadExecutor.getActiveJobSummary(userUuid)
+      // the active job summary of the user is deleted with a delay: it could still be the one of a previous job
+      if (activeJobSummary?.uuid === jobUuid) return activeJobSummary
     }
+    if (jobInfo.summary) return jobInfo.summary
+    const now = new Date()
+    return jobRowToSummary({
+      uuid: jobUuid,
+      userUuid,
+      surveyId,
+      type: jobInfo.type,
+      status: jobInfo.status,
+      processed: 0,
+      total: 0,
+      props: {},
+      dateCreated: now,
+      dateModified: now,
+    }) as JobSummary
   }
 
   /**
@@ -124,16 +158,9 @@ export class JobQueue {
    * @param userUuid - The user UUID.
    * @returns Job summary or null if user has no running jobs.
    */
-  getRunningJobSummaryByUserUuid(userUuid: string): JobInfo | null {
+  getRunningJobSummaryByUserUuid(userUuid: string): JobSummary | null {
     const jobInfo = this._getJobInfoByUserUuid(userUuid)
-    if (!jobInfo) {
-      return null
-    }
-    if (this._runningJobUuidByUserUuid[userUuid]) {
-      return JobThreadExecutor.getActiveJobSummary(userUuid)
-    } else {
-      return jobInfo
-    }
+    return jobInfo ? this._getJobSummary(jobInfo) : null
   }
 
   /**
@@ -247,7 +274,7 @@ export class JobQueue {
    * Callback when a job ends.
    * @param job - The job object.
    */
-  onJobEnd(job: JobInfo): void {
+  onJobEnd(job: { uuid: string }): void {
     const jobInfo = this._jobInfoByUuid[job.uuid]
 
     const { uuid, params, status } = jobInfo
@@ -273,11 +300,12 @@ export class JobQueue {
    * Callback when a job updates its status.
    * @param job - The job object.
    */
-  onJobUpdate(job: JobInfo): void {
+  onJobUpdate(job: JobSummary): void {
     // runs in main thread; can safely modify internal variables
     const { ended, status, uuid } = job
     const jobInfo = this._jobInfoByUuid[uuid]
     jobInfo.status = status
+    jobInfo.summary = job
     if (ended) {
       this.onJobEnd(job)
     }

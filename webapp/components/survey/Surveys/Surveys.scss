@@ -1,3 +1,5 @@
+@use "~@webapp/style/vars" as *;
+
 .table.surveys {
   .table__header {
     column-gap: 5rem;
@@ -25,8 +27,22 @@
 
     .app-icons-wrapper {
       position: relative;
-      width: 30px;
-      height: 20px;
+      height: 22px;
+      width: 36px;
+
+      .app-icon {
+        position: absolute;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background-color: $white;
+        border: $profilePictureBorder;
+      }
     }
   }
 

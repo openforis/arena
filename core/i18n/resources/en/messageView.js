@@ -41,6 +41,7 @@ Some placeholder variables are also available:
       label: 'Target User Type',
       all: 'All Users',
       system_admins: 'System Administrators',
+      survey_admins: 'Survey Administrators',
       survey_managers: 'Survey Managers',
       data_analysts: 'Data Analysts',
       data_cleaners: 'Data Cleaners',

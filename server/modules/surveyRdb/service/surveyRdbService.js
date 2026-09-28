@@ -21,16 +21,46 @@ import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 
 const Logger = Log.getLogger('SurveyRdbService')
 
-const _fetchSurvey = async ({ surveyId, cycle }) => {
-  const draft = true // always load draft node defs (needed for custom aggregate functions)
-  return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+// promises of the surveys being fetched, indexed by fetch parameters;
+// concurrent requests (e.g. data explorer data and count requests coming from many users at the same time)
+// share the same fetch instead of loading the same survey from the DB multiple times
+const surveyFetchPromisesByKey = new Map()
+
+const _doFetchSurvey = async ({ surveyId, cycle, includeRefData }) => {
+  const params = {
     surveyId,
     cycle,
-    draft,
+    draft: true, // always load draft node defs (needed for custom aggregate functions)
     advanced: true,
-    includeBigCategories: false,
-    includeBigTaxonomies: false,
-  })
+  }
+  return includeRefData
+    ? SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+        ...params,
+        includeBigCategories: false,
+        includeBigTaxonomies: false,
+      })
+    : SurveyManager.fetchSurveyAndNodeDefsBySurveyId(params)
+}
+
+/**
+ * Fetches the survey used to run queries on the data views.
+ * Concurrent calls with the same parameters share the same (in-progress) fetch.
+ * @param {!object} params - The fetch parameters.
+ * @param {!number} params.surveyId - The survey id.
+ * @param {string} [params.cycle] - The survey cycle.
+ * @param {boolean} [params.includeRefData] - Whether to include categories and taxonomies reference data (needed only when exporting data).
+ * @returns {Promise<object>} - The fetched survey.
+ */
+const _fetchSurvey = async ({ surveyId, cycle, includeRefData = false }) => {
+  const key = `${surveyId}_${cycle}_${includeRefData}`
+  let fetchPromise = surveyFetchPromisesByKey.get(key)
+  if (!fetchPromise) {
+    fetchPromise = _doFetchSurvey({ surveyId, cycle, includeRefData }).finally(() => {
+      surveyFetchPromisesByKey.delete(key)
+    })
+    surveyFetchPromisesByKey.set(key, fetchPromise)
+  }
+  return fetchPromise
 }
 
 const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
@@ -69,7 +99,9 @@ export const fetchViewData = async (params) => {
   if (typeof query === 'string') {
     parsedQuery = A.parse(query)
   }
-  const survey = await _fetchSurvey({ surveyId, cycle })
+  // reference data (category items, taxa) is needed only to write category item labels in exported files
+  const includeRefData = Boolean(outputStream)
+  const survey = await _fetchSurvey({ surveyId, cycle, includeRefData })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
   const data = Query.isModeAggregate(parsedQuery)

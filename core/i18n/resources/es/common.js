@@ -1,3 +1,5 @@
+import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+
 export default {
   common: {
     active: 'Activo',
@@ -54,6 +56,7 @@ export default {
     download: 'Descargar',
     draft: 'Borrador',
     edit: 'Editar',
+    elapsed: 'Transcurrido',
     email: 'Correo electrónico',
     email_other: 'Correos electrónicos',
     emailSentConfirmation:
@@ -137,10 +140,35 @@ export default {
     publish: 'Publicar',
     publishConfirm:
       '#### Está a punto de publicar la encuesta {{survey}} ####\n\n###### El proceso de publicación *eliminará permanentemente* la siguiente información ###### \n- Etiquetas asociadas a idiomas eliminados.\n- Registros asociados a ciclos eliminados.\n- Datos asociados a campos de formulario eliminados.\n\n###### Después de publicar: ###### \n- Los campos de formulario no se pueden cambiar de único a múltiple y viceversa.\n- Los códigos de elementos de categoría no se pueden cambiar.\n- Los elementos de categoría no se pueden eliminar.\n- Los códigos de taxonomía no se pueden cambiar.\n- Los taxones no se pueden eliminar.\n\n**¿Está seguro de que desea continuar?**',
+    publishRecordValuesUpdateConfirm: `#### Publicar {{survey}} actualizará datos ya registrados ####
+
+{{reasons}}
+
+Esta operación puede cambiar o borrar permanentemente datos ya introducidos.
+
+Para publicar sin actualizar los datos existentes, marque "Omitir actualización de datos" a continuación (no recomendado).`,
+    publishRecordValuesUpdateConfirmHeader: 'Se actualizarán los datos de los registros existentes',
+    publishRecordValuesUpdateConfirmOk: 'Publicar y actualizar datos',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Escriba el nombre de la encuesta "{{strongConfirmRequiredText}}" para confirmar',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Los siguientes atributos serán modificados, y sus valores en los registros existentes se recalcularán automáticamente: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Los siguientes atributos utilizan una propiedad adicional de una categoría o taxonomía que ha cambiado, lo que hará que se recalcule su valor en los registros existentes: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Omitir actualización de datos',
+    publishSkipDataUpdateConfirmOk: 'Omitir actualización de datos y publicar',
+    publishSkipDataUpdateImplications: 'Omitir la actualización de datos implica lo siguiente:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Los registros existentes pueden dejar de coincidir con la nueva definición de la encuesta',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Los valores afectados no se recalcularán hasta que se vuelvan a introducir manualmente',
+    publishSkipDataUpdateImplicationChains:
+      'Las cadenas de procesamiento que usan estos atributos pueden producir resultados desactualizados',
     raiseTicketInSupportForum:
       "En caso de problemas, por favor, abra un ticket con la etiqueta 'arena' en nuestro <b>Foro de soporte</b>: $t(links.supportForum)",
     record: 'Registro',
     record_other: 'Registros',
+    remaining: 'Restante',
     remote: 'Remoto',
     required: 'Requerido',
     requiredField: 'campo requerido',
@@ -328,6 +356,8 @@ export default {
 
     help: 'Ayuda',
     about: 'Acerca de',
+    changelog: 'Registro de cambios',
+    whatsNew: 'Novedades',
     disclaimer: 'Descargo de responsabilidad',
     userManual: 'Manual de usuario',
   },
@@ -608,15 +638,34 @@ export default {
         'Al eliminar la unidad base, se desmarcarán todas las selecciones de "variable basada en área". ¿Continuar?',
     },
     downloadSummaryJSON: 'Descargar resumen (JSON)',
-    firstPhaseCategory: 'Categoría de primera fase',
-    firstPhaseCategoryInfo: 'Seleccione la categoría que contiene las muestras de la primera fase.',
-    firstPhaseCategoryExtraProp: {
-      label: 'Atributo de estrato de 1ª fase',
-      info: 'Seleccione la variable utilizada para dividir la población original en estratos amplios para la fase inicial de muestreo.',
+    mauFile: {
+      upload: 'Subir MAU.zip',
+      download: 'Descargar MAU.zip',
+      delete: 'Eliminar MAU.zip',
+      confirmCycleAssociation: 'El archivo MAU.zip se asociará al ciclo actual ({{cycle}}). ¿Desea continuar?',
+      confirmReplace: 'Ya se ha subido un archivo MAU.zip para esta cadena. ¿Desea reemplazarlo?',
+      confirmDelete: '¿Eliminar el archivo MAU.zip subido para esta cadena?',
+      uploadComplete: 'Archivo MAU.zip subido correctamente',
+      deleteComplete: 'Archivo MAU.zip eliminado',
+      invalidFileExtension: 'Seleccione un archivo .zip',
     },
-    firstPhaseCommonAttribute: {
-      label: 'Atributo común',
-      info: 'Atributo común entre la unidad base y la tabla de primera fase (debe ser un atributo de código con el mismo nombre que una propiedad extra definida para la categoría de primera fase)',
+    phase1Category: 'Categoría de primera fase',
+    phase1CategoryInfo: 'Seleccione la categoría que contiene las muestras de la primera fase.',
+    phase2JoinEntity: {
+      label: 'Entidad de unión (2ª fase)',
+      info: 'Entidad utilizada para unir la unidad base con la categoría de 1ª fase: la propia entidad de la unidad base, o una de sus entidades superiores.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Unir usando el enlace de Sampling Point Data',
+      info: 'La(s) clave(s) de la entidad de 2ª fase se leen de la tabla de Sampling Point Data, que es la misma tabla utilizada para la 1ª fase.',
+    },
+    phase1JoinAttribute: {
+      label: 'Atributo de unión (1ª fase)',
+      info: 'Seleccione la columna de la tabla $t(chainView.phase1Category) (una propiedad adicional, o "code") utilizada para unirla con la entidad de unión de la 2ª fase.',
+    },
+    phase2JoinAttribute: {
+      label: 'Atributo de unión (2ª fase)',
+      info: 'Seleccione el atributo (de la entidad de 2ª fase) para unir con la tabla de 1ª fase; su valor se compara con el atributo de unión de la 1ª fase anterior.',
     },
     formLabel: 'Etiqueta de cadena de procesamiento',
     basic: 'Básico',
@@ -662,9 +711,8 @@ export default {
     },
     stratumAttribute: 'Atributo de estrato',
     stratumAttributeInfo: 'Seleccione la variable utilizada para estratificar la muestra.',
-    stratumAttribute2ndPhase: 'Atributo de estrato de 2ª fase',
     stratumAttribute2ndPhaseInfo:
-      'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada.',
+      'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada. Solo se muestran los atributos cuyo nombre también aparece como columna de la categoría de la 1ª fase.',
     postStratificationAttribute: 'Atributo de postestratificación',
     areaWeightingMethod: 'Método de ponderación de área',
     clusteringEntity: 'Entidad de agrupación',
@@ -765,6 +813,9 @@ $t(common.appNameFull)
  * Arena en GitHub: $t(links.arenaInGitHub)
  * Scripts R de Arena en GitHub: $t(links.arenaRScriptsInGitHub)
 `,
+    },
+    changelog: {
+      title: '$t(appModules.changelog)',
     },
   },
   nodeDefEdit: {
@@ -871,6 +922,10 @@ $t(common.appNameFull)
       form: 'Formulario',
       formula: 'Fórmula',
       includedInClonedData: 'Incluido en los datos clonados',
+      includedInMultipleEntitySummary: {
+        label: 'Incluir en el resumen de entidades múltiples',
+        info: `Si está marcado, el valor del atributo será visible en el selector de entidades y en la vista de resumen de la entidad`,
+      },
       includedInRecordsList: {
         label: 'Incluir en la lista de registros',
         info: `Si está marcado, el atributo será visible en la lista de registros`,
@@ -936,10 +991,6 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
         label: 'Oculto en Arena Mobile',
         info: 'Si está marcado, el atributo no será visible en AM',
       },
-      includedInMultipleEntitySummary: {
-        label: 'Incluir en el resumen de entidades múltiples',
-        info: 'Si está marcado, el atributo será visible en la vista de resumen de la entidad',
-      },
       includedInPreviousCycleLink: {
         label: 'Incluir en el enlace del ciclo anterior',
         info: 'Si está marcado, el valor del ciclo anterior se mostrará en el formulario de entrada de datos (cuando el enlace al ciclo anterior esté activo en la aplicación móvil)',
@@ -966,6 +1017,9 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     mobileProps: {
       title: 'Aplicación móvil',
+    },
+    timeProps: {
+      includeSeconds: 'Incluir segundos',
     },
     formHeaderProps: {
       headerColorLabel: 'Color de encabezado',
@@ -1109,10 +1163,13 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       noCategoriesAvailable: 'No hay categorías disponibles en la encuesta seleccionada',
     },
     itemsCount: 'Recuento de elementos',
+    structure: 'Estructura',
     types: {
       flat: 'Plana',
       hierarchical: 'Jerárquica',
       reportingData: 'Datos de informes',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Datos de puntos de muestreo',
     },
   },
   categoryEdit: {
@@ -1134,6 +1191,43 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     convertToSimpleCategory: {
       confirmMessage: '¿Convertir esta categoría de datos de informes a una categoría simple?',
+    },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convertir a Datos de puntos de muestreo',
+      confirmMessage: `¿Convertir esta categoría en la categoría de Datos de puntos de muestreo?\n\nLa categoría se renombrará a '${samplingPointDataCategoryName}' y se añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convertir a categoría GeoPackage',
+      confirmMessage: `¿Convertir esta categoría en una categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convertir a categoría simple',
+      confirmMessage: `¿Convertir esta categoría GeoPackage en una categoría simple?\n\nSe desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convertir a categoría simple',
+      confirmMessage: `¿Convertir esta categoría de Datos de puntos de muestreo en una categoría simple?\n\nSe borrará el nombre de la categoría (deberá asignarle uno nuevo), y se desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
+    },
+    geoPackageCategory: 'Esta categoría tiene capacidades geográficas',
+    geoPackageCategoryInfo: `Esta categoría tiene una propiedad extra llamada '${locationItemExtraDefName}', que permite exportarla como un archivo GeoPackage.`,
+    samplingPointDataCategoryType: 'Esta es la categoría de Datos de puntos de muestreo',
+    samplingPointDataCategoryTypeInfo: `Esta es una categoría predefinida para datos de puntos de muestreo. Tiene una propiedad extra llamada '${locationItemExtraDefName}', que permite exportarla como un archivo GeoPackage.`,
+    createCategory: {
+      menuLabel: 'Añadir categoría',
+      simple: 'Categoría simple',
+      otherTypes: 'Más tipos de categoría',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Categoría de Datos de puntos de muestreo',
+      description:
+        'Categoría predefinida para datos de puntos de muestreo, que incluye un campo de ubicación para cada elemento.',
+      message: `¿Crear una nueva categoría de Datos de puntos de muestreo?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Categoría con capacidades geográficas',
+      description:
+        'Añade un campo de ubicación a los elementos, para que la categoría se pueda exportar como un archivo GeoPackage.',
+      message: `¿Crear una nueva categoría con capacidades geográficas?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     deleteItem: 'Eliminar elemento',
     level: {
@@ -1157,6 +1251,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       title: 'Resumen de importación de categoría',
     },
     reportingData: 'Datos de informes',
+    exportToGeoPackage: 'Exportar a GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} elemento(s) sin una ubicación válida fueron omitidos.',
     templateFor_samplingPointDataImport_csv: 'Plantilla para importación de datos de puntos de muestreo (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Plantilla para importación de datos de puntos de muestreo (Excel)',
   },

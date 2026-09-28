@@ -25,7 +25,8 @@ const Data = () => {
   const dispatch = useDispatch()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
-  const draftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  const draftDefs =
+    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
   return (
     <SurveyDefsLoader

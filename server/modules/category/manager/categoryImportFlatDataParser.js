@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects, PointFactory, Points, SystemError } from '@openforis/arena-core'
 
@@ -94,7 +94,7 @@ export const createRowsReaderFromStream = async ({ stream, survey, summary, onRo
         })
 
         // Determine level
-        const levelIndex = R.findLastIndex(StringUtils.isNotBlank)(codes)
+        const levelIndex = A.findLastIndex(StringUtils.isNotBlank)(codes)
 
         await onRowItem({
           levelIndex,

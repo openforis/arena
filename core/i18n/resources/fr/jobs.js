@@ -26,7 +26,8 @@ export default {
   NodeDefsTranslationJob: 'Traduction des libellés des définitions de nœud',
   NodeDefsImportJob: 'Importation des définitions de nœud',
   NodeDefsValidationJob: 'Validation des définitions de nœud',
-  chainsCyclesCheckJob: `Vérification des cycles de chaînes`,
+  OdkImportJob: 'Importation ODK',
+  ChainsCyclesCheckJob: `Vérification des cycles de chaînes`,
   RecordCheckJob: "Vérification d'enregistrement",
   RecordsCloneJob: "Clone d'enregistrements",
   RecordsImportJob: "Importation d'enregistrements",
@@ -71,6 +72,7 @@ export default {
   // sauvegarde du formulaire
   SurveyInfoExportJob: 'Exportation des informations du formulaire',
   CategoriesExportJob: 'Exportation des catégories',
+  CategoryGeoPackageExportJob: 'Exportation de catégorie vers GeoPackage',
   TaxonomiesExportJob: 'Exportation des taxonomies',
   RecordsExportJob: 'Exportation des enregistrements',
   RecordFilesExportJob: 'Exportation des fichiers d’enregistrements',
@@ -85,6 +87,4 @@ export default {
   RecordsValidationJob: `Validation des enregistrements`,
   // analyse
   PersistResultsJob: "Persistance des résultats d'analyse",
-  elapsed: 'Écoulé',
-  remaining: 'Restant',
 }

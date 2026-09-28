@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Nom de catégorie non spécifié',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      "Une catégorie de Données de points d'échantillonnage existe déjà dans ce formulaire ; il ne peut y en avoir qu'une seule.",
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Impossible de supprimer les éléments de catégorie publiés. Éléments manquants dans le fichier importé : {{deletedItemCodes}}',
@@ -66,7 +71,7 @@ export default {
     invalidNumber: 'Nombre invalide dans la colonne {{headers}} : {{value}}',
     invalidTaxonCode: 'Code invalide dans la colonne {{headers}} : {{value}}',
     invalidTime:
-      "Heure invalide dans la colonne {{headers}} : {{value}}. L'heure doit être au format HH:mm. Ex. 09:45 ou 16:30",
+      "Heure invalide dans la colonne {{headers}} : {{value}}. L'heure doit être au format HH:mm ou HH:mm:ss. Ex. 09:45, 16:30 ou 09:45:30",
     missingRequiredHeaders: 'Colonnes requises manquantes : {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Erreur lors de la mise à jour des valeurs : {{details}}',
     multipleRecordsMatchingKeys: 'Plusieurs enregistrements trouvés correspondant aux clés "{{keyValues}}"',

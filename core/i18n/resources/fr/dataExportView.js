@@ -20,6 +20,7 @@ export default {
     includeFileAttributeDefs: "Inclure les colonnes d'attributs de fichier",
     includeInternalUuids: 'Inclure les UUIDs internes',
     recordsModifiedAfter: 'Enregistrements modifiés après',
+    recordsModifiedBefore: 'Enregistrements modifiés avant',
   },
   optionsInfo: {
     expandCategoryItems:
@@ -37,6 +38,7 @@ export default {
     includeInternalUuids:
       'inclut les identifiants internes (UUIDs) dans des colonnes se terminant par le suffixe "_uuid"',
     recordsModifiedAfter: 'exporte uniquement les données des enregistrements modifiés après la date spécifiée',
+    recordsModifiedBefore: 'exporte uniquement les données des enregistrements modifiés avant la date spécifiée',
   },
   startExport: "Démarrer l'exportation",
 }

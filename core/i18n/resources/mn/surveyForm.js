@@ -156,6 +156,9 @@ Arena Mobile дээр:
     currentPageHint: 'Current page: {{entityLabel}}',
     currentPageUnavailable:
       'Unable to determine the current page instance. Navigate to a specific page or export the full survey.',
+    includeQrCode: 'QR код оруулах',
+    includeQrCodeInfo:
+      'Энэ нэгжийн зөвхөн унших PDF руу холбосон QR кодыг эхний хуудсанд нэмнэ (1 жилийн хугацаатай).',
     orientation: 'Page orientation',
     orientations: {
       portrait: 'Portrait',

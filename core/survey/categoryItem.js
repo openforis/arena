@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { CategoryItems } from '@openforis/arena-core'
 
@@ -57,8 +57,8 @@ export const {
   isPublished,
   isDraft,
 } = ObjectUtils
-export const getLevelUuid = R.prop(keys.levelUuid)
-export const getParentUuid = R.prop(keys.parentUuid)
+export const getLevelUuid = A.prop(keys.levelUuid)
+export const getParentUuid = A.prop(keys.parentUuid)
 export const getCode = ObjectUtils.getProp(keysProps.code, '')
 export const getLabel =
   (language, defaultToCode = true) =>
@@ -70,7 +70,7 @@ export const getIndex = CategoryItems.getIndex
 // ====== UPDATE
 export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)
 // ====== UPDATE - Extra Props
-export const dissocExtraProp = (key) => R.dissocPath([keys.props, keysProps.extra, key])
+export const dissocExtraProp = (key) => A.dissocPath([keys.props, keysProps.extra, key])
 export const renameExtraProp =
   ({ nameOld, nameNew }) =>
   (item) => {
@@ -86,7 +86,7 @@ export const renameExtraProp =
 
 // gets the ancestor codes as an array (only if ancestor codes have been populated during fetch)
 export const getAncestorCodes = (item) => {
-  const getLevelCode = (levelIndex) => R.propOr(null, `level${levelIndex}Code`)
+  const getLevelCode = (levelIndex) => A.propOr(null, `level${levelIndex}Code`)
 
   const codes = []
   let levelIndex = 0
@@ -101,8 +101,8 @@ export const getAncestorCodes = (item) => {
 
 export const getCodesHierarchy = (item) => [...getAncestorCodes(item), getCode(item)]
 
-export const normalizeCode = R.pipe(
+export const normalizeCode = A.pipe(
   StringUtils.leftTrim,
-  R.replace(codeNotAllowedCharactersRegExp, '_'),
-  R.slice(0, 40)
+  A.replace(codeNotAllowedCharactersRegExp, '_'),
+  A.slice(0, 40)
 )

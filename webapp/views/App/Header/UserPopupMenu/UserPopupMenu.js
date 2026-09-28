@@ -89,7 +89,7 @@ const UserPopupMenu = (props) => {
             <Link
               className="btn-s btn-transparent"
               data-testid={TestId.header.userProfileBtn}
-              to={`${appModuleUri(userModules.user)}${User.getUuid(user)}/`}
+              to={appModuleUri(userModules.user)}
               onClick={onClose}
             >
               <span className="icon icon-user icon-12px icon-left" />

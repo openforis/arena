@@ -12,6 +12,7 @@ import Thread from './thread'
 import * as ThreadParams from './threadParams'
 
 const workerEvents = {
+  error: 'error',
   message: 'message',
   exit: 'exit',
 }
@@ -29,6 +30,11 @@ export default class ThreadManager {
     this.logger = Log.getLogger(`ThreadManager - thread ID: ${this.threadId}`)
 
     this.addMessageListener(this.messageHandlerWrapper.bind(this)(messageListener))
+
+    this.worker.on(workerEvents.error, (error) => {
+      // uncaught error in the thread: the 'exit' event will follow
+      this.logger.error(`uncaught error in thread: ${error?.stack ?? error}`)
+    })
 
     this.worker.on(workerEvents.exit, () => {
       this.logger.debug('thread ended')

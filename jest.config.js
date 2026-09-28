@@ -13,11 +13,28 @@ module.exports = {
   // `(?!.*/node_modules/)` guard forces the match position to be the LAST /node_modules/ in the
   // path, so a package that itself nests inside another, non-allowlisted package (e.g.
   // otplib -> @otplib/plugin-crypto-noble -> node_modules/@noble/hashes, a doubly-nested ESM
-  // dependency pulled in transitively via the @openforis/arena-server portal link) is still
+  // dependency pulled in transitively via the @openforis/arena-server dependency) is still
   // transformed based on its own immediate package name, instead of being skipped just because an
   // earlier, non-allowlisted wrapper package appears earlier in the path.
   transformIgnorePatterns: [
-    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/)',
+    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/|n2words/)',
   ],
+  // n2words (transitive dep of @openforis/arena-core, used by numberToWords) is exports-map-only,
+  // no "main" field - jest-resolve 27 predates Node's package.json#exports resolution support, so
+  // `require('n2words/en')` fails to resolve even though Node itself resolves it fine. Map each
+  // subpath straight to its source file until Jest is upgraded past 27.
+  // Path aliases (mirrors jsconfig.json / the webpack configs): unit and integration tests are bundled
+  // by webpack, which resolves them; they are needed here only for tests run directly through Jest.
+  moduleNameMapper: {
+    '^@common/(.*)$': `${__dirname}/common/$1`,
+    '^@core/(.*)$': `${__dirname}/core/$1`,
+    '^@server/(.*)$': `${__dirname}/server/$1`,
+    '^@webapp/(.*)$': `${__dirname}/webapp/$1`,
+    '^@test/(.*)$': `${__dirname}/test/$1`,
+    // pdfkit (dependency of @openforis/arena-server) has an exports map only; without exports support Jest
+    // picks its ESM browser build, so point it to the CommonJS build.
+    '^pdfkit$': require.resolve('pdfkit'),
+    '^n2words/(.+)$': `${require.resolve('n2words/package.json').replace(/package\.json$/, 'src')}/$1.js`,
+  },
   verbose: true,
 }

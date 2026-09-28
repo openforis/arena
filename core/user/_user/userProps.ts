@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -40,21 +38,21 @@ export const newProps = (propsParam: Record<string, unknown>) =>
   }, {})
 
 // ====== READ
-export const getProps = R.prop(userKeys.props)
-export const getTitle = R.pipe(getProps, R.propOr('', keysProps.title))
+export const getProps = A.prop(userKeys.props)
+export const getTitle = A.pipe(getProps, A.propOr('', keysProps.title))
 export const getMapApiKey = ({ provider }: { provider: string }) =>
-  R.pipe(getProps, R.path([keysProps.mapApiKeyByProvider, provider]))
-export const getMaxSurveys = R.pipe(getProps, R.propOr(defaultMaxSurveys, keysProps.maxSurveys))
+  A.pipe(getProps, A.path([keysProps.mapApiKeyByProvider, provider]))
+export const getMaxSurveys = A.pipe(getProps, A.propOr(defaultMaxSurveys, keysProps.maxSurveys))
 
 // ====== UPDATE
-export const assocProps = R.assoc(userKeys.props)
+export const assocProps = A.assoc(userKeys.props)
 export const assocProp = (key: string) => (value: unknown) => (user: Record<string, unknown>) =>
-  assocProps(R.pipe(getProps, R.assoc(key, value))(user))(user)
+  assocProps(A.pipe(getProps, A.assoc(key, value))(user))(user)
 export const assocTitle = assocProp(keysProps.title)
 export const assocMapApiKey =
   ({ provider, apiKey }: { provider: string; apiKey: string }) =>
   (user: Record<string, unknown>) => {
-    const mapApiKeyByProvider = R.pipe(getProps, R.prop(keysProps.mapApiKeyByProvider))(user)
+    const mapApiKeyByProvider = A.pipe(getProps, A.prop(keysProps.mapApiKeyByProvider))(user)
     const mapApiKeyByProviderUpdated = { ...(mapApiKeyByProvider as object), [provider]: apiKey }
     return assocProp(keysProps.mapApiKeyByProvider)(mapApiKeyByProviderUpdated)(user)
   }
@@ -62,7 +60,7 @@ export const assocMaxSurveys = assocProp(keysProps.maxSurveys)
 export const assocExtra = assocProp(keysProps.extra)
 
 const dissocListOfProps = (propsArray: string[]) => (user: Record<string, unknown>) =>
-  propsArray.reduce((acc, propKey) => R.dissocPath([userKeys.props, propKey])(acc), user)
+  propsArray.reduce((acc, propKey) => A.dissocPath([userKeys.props, propKey])(acc), user)
 
 export const dissocPrivateProps = dissocListOfProps(privateProps)
 export const dissocRestrictedProps = dissocListOfProps(restrictedProps)

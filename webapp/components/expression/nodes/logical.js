@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Expression from '@core/expressionParser/expression'
 
@@ -23,7 +23,7 @@ const Logical = (props) => {
   const createElementNode = (type, nodeEl, nodeElOther, canDeleteEl) =>
     React.createElement(renderNode, {
       node: nodeEl,
-      onChange: (item) => onChange(R.assoc(type, item, node)),
+      onChange: (item) => onChange(A.assoc(type, item, node)),
       onDelete: () => onChange(nodeElOther),
       canDelete: canDeleteEl,
       nodeDefCurrent,
@@ -43,7 +43,7 @@ const Logical = (props) => {
               key={logicalOperatorKey}
               active={operator === logicalOperator.value}
               label={`expressionEditor.${logicalOperatorKey}`}
-              onClick={() => onChange(R.assoc('operator', logicalOperator.value, node))}
+              onClick={() => onChange(A.assoc('operator', logicalOperator.value, node))}
               size="small"
               variant="outlined"
             />

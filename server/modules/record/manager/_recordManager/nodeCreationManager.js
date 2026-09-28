@@ -64,6 +64,7 @@ export const insertNode = async (
     node,
     system,
     timezoneOffset,
+    lang,
     persistNodes = true,
     createMultipleEntities = true,
     sideEffect = false,
@@ -99,6 +100,7 @@ export const insertNode = async (
       parentNode: node,
       nodeDef,
       timezoneOffset,
+      lang,
       createMultipleEntities,
     })
     Object.assign(nodesCreatedByIId, descendantsCreateResult.nodes)

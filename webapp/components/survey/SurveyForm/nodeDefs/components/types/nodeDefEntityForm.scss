@@ -23,6 +23,10 @@
         display: none;
       }
 
+      border: 1px solid $greyBorder;
+      border-radius: 0.25rem;
+      padding: 0.25rem 0.5rem;
+
       .MuiSelect-select {
         display: flex;
         align-items: center;

@@ -20,6 +20,7 @@ export default {
     includeFileAttributeDefs: 'Incluir columnas de atributos de archivo',
     includeInternalUuids: 'Incluir UUID internos',
     recordsModifiedAfter: 'Registros modificados después',
+    recordsModifiedBefore: 'Registros modificados antes',
   },
   optionsInfo: {
     expandCategoryItems:
@@ -38,6 +39,7 @@ export default {
       'añade columnas de atributos de archivo: identificador interno del archivo (file_uuid) y nombre (file_name)',
     includeInternalUuids: 'incluye los identificadores internos (UUIDs) en columnas que terminan con el sufijo "_uuid"',
     recordsModifiedAfter: 'exporta solo datos de registros modificados después de la fecha especificada',
+    recordsModifiedBefore: 'exporta solo datos de registros modificados antes de la fecha especificada',
   },
   startExport: 'Iniciar exportación',
 }

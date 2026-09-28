@@ -6,15 +6,20 @@ const keysProps = {
   areaWeightingMethod: 'areaWeightingMethod',
   baseUnitNodeDefUuid: 'baseUnitNodeDefUuid',
   clusteringNodeDefUuid: 'clusteringNodeDefUuid',
-  firstPhaseCategoryExtraProp: 'firstPhaseCategoryExtraProp',
-  firstPhaseCategoryUuid: 'firstPhaseCategoryUuid',
-  firstPhaseCommonAttributeUuid: 'firstPhaseCommonAttributeUuid',
+  phase1CategoryUuid: 'phase1CategoryUuid',
+  phase1JoinAttribute: 'phase1JoinAttribute',
+  phase2AsSamplingPointData: 'phase2AsSamplingPointData',
+  phase2JoinAttribute: 'phase2JoinAttribute',
+  phase2JoinEntityUuid: 'phase2JoinEntityUuid',
   postStratificationAttributeDefUuid: 'postStratificationAttributeDefUuid',
   reportingDataCategoryUuid: 'reportingDataCategoryUuid',
   reportingDataAttributeDefsByLevelUuid: 'reportingDataAttributeDefsByLevelUuid',
   samplingStrategy: 'samplingStrategy',
   stratumNodeDefUuid: 'stratumNodeDefUuid',
 }
+
+// name of the built-in "code" column of a category, always available as join attribute
+const categoryCodeAttributeName = 'code'
 
 const samplingStrategies = {
   simpleRandom: 'simpleRandom',
@@ -30,9 +35,11 @@ const isPropTrue = (prop) => (obj) => A.prop(prop)(obj) === true
 const isAreaWeightingMethod = isPropTrue(keysProps.areaWeightingMethod)
 const getBaseUnitNodeDefUuid = A.prop(keysProps.baseUnitNodeDefUuid)
 const getClusteringNodeDefUuid = A.prop(keysProps.clusteringNodeDefUuid)
-const getFirstPhaseCategoryExtraProp = A.prop(keysProps.firstPhaseCategoryExtraProp)
-const getFirstPhaseCategoryUuid = A.prop(keysProps.firstPhaseCategoryUuid)
-const getFirstPhaseCommonAttributeUuid = A.prop(keysProps.firstPhaseCommonAttributeUuid)
+const getPhase1CategoryUuid = A.prop(keysProps.phase1CategoryUuid)
+const getPhase1JoinAttribute = A.prop(keysProps.phase1JoinAttribute)
+const isPhase2AsSamplingPointData = isPropTrue(keysProps.phase2AsSamplingPointData)
+const getPhase2JoinAttribute = A.prop(keysProps.phase2JoinAttribute)
+const getPhase2JoinEntityUuid = A.prop(keysProps.phase2JoinEntityUuid)
 const getPostStratificationAttributeDefUuid = A.prop(keysProps.postStratificationAttributeDefUuid)
 const getReportingDataCategoryUuid = A.prop(keysProps.reportingDataCategoryUuid)
 const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
@@ -56,18 +63,25 @@ const isStratificationNotSpecifiedAllowed = () => {
   // return getSamplingStrategy(chain) === samplingStrategies.doublePhase
 }
 
-const isFirstPhaseCategorySelectionEnabled = (samplingDesign) =>
+const isPhase1CategorySelectionEnabled = (samplingDesign) =>
   getSamplingStrategy(samplingDesign) === samplingStrategies.twoPhase
 
-const isFirstPhaseCategoryExtraPropSelectionEnabled = isFirstPhaseCategorySelectionEnabled
+const isPhase2JoinEntitySelectionEnabled = isPhase1CategorySelectionEnabled
 
-const isFirstPhaseCommonAttributeSelectionEnabled = isFirstPhaseCategorySelectionEnabled
+const isPhase2AsSamplingPointDataSelectionEnabled = isPhase1CategorySelectionEnabled
+
+const isPhase1JoinAttributeSelectionEnabled = (samplingDesign) =>
+  isPhase1CategorySelectionEnabled(samplingDesign) && !isPhase2AsSamplingPointData(samplingDesign)
+
+const isPhase2JoinAttributeSelectionEnabled = isPhase1JoinAttributeSelectionEnabled
 
 // UPDATE
 
-const dissocFirstPhaseCategoryExtraProp = A.dissoc(keysProps.firstPhaseCategoryExtraProp)
-const dissocFirstPhaseCategoryUuid = A.dissoc(keysProps.firstPhaseCategoryUuid)
-const dissocFirstPhaseCommonAttributeUuid = A.dissoc(keysProps.firstPhaseCommonAttributeUuid)
+const dissocPhase1CategoryUuid = A.dissoc(keysProps.phase1CategoryUuid)
+const dissocPhase1JoinAttribute = A.dissoc(keysProps.phase1JoinAttribute)
+const dissocPhase2AsSamplingPointData = A.dissoc(keysProps.phase2AsSamplingPointData)
+const dissocPhase2JoinAttribute = A.dissoc(keysProps.phase2JoinAttribute)
+const dissocPhase2JoinEntityUuid = A.dissoc(keysProps.phase2JoinEntityUuid)
 const dissocPostStratificationAttributeDefUuid = A.dissoc(keysProps.postStratificationAttributeDefUuid)
 const dissocStratumNodeDefUuid = A.dissoc(keysProps.stratumNodeDefUuid)
 const dissocReportingDataAttributeDefsByLevelUuid = A.dissoc(keysProps.reportingDataAttributeDefsByLevelUuid)
@@ -86,14 +100,20 @@ const cleanupSamplingDesign = (samplingDesign) => {
   ) {
     samplingDesignUpdated = dissocPostStratificationAttributeDefUuid(samplingDesignUpdated)
   }
-  if (!isFirstPhaseCategorySelectionEnabled(samplingDesignUpdated)) {
-    samplingDesignUpdated = dissocFirstPhaseCategoryUuid(samplingDesignUpdated)
+  if (!isPhase1CategorySelectionEnabled(samplingDesignUpdated)) {
+    samplingDesignUpdated = dissocPhase1CategoryUuid(samplingDesignUpdated)
   }
-  if (!isFirstPhaseCategoryExtraPropSelectionEnabled(samplingDesignUpdated)) {
-    samplingDesignUpdated = dissocFirstPhaseCategoryExtraProp(samplingDesignUpdated)
+  if (!isPhase2JoinEntitySelectionEnabled(samplingDesignUpdated)) {
+    samplingDesignUpdated = dissocPhase2JoinEntityUuid(samplingDesignUpdated)
   }
-  if (!isFirstPhaseCommonAttributeSelectionEnabled(samplingDesignUpdated)) {
-    samplingDesignUpdated = dissocFirstPhaseCommonAttributeUuid(samplingDesignUpdated)
+  if (!isPhase2AsSamplingPointDataSelectionEnabled(samplingDesignUpdated)) {
+    samplingDesignUpdated = dissocPhase2AsSamplingPointData(samplingDesignUpdated)
+  }
+  if (!isPhase1JoinAttributeSelectionEnabled(samplingDesignUpdated)) {
+    samplingDesignUpdated = dissocPhase1JoinAttribute(samplingDesignUpdated)
+  }
+  if (!isPhase2JoinAttributeSelectionEnabled(samplingDesignUpdated)) {
+    samplingDesignUpdated = dissocPhase2JoinAttribute(samplingDesignUpdated)
   }
   return samplingDesignUpdated
 }
@@ -105,18 +125,18 @@ const assocAreaWeightingMethod = (areaWeightingMethod) => A.assoc(keysProps.area
 const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
   A.assoc(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
 
-const assocFirstPhaseCategoryUuid = (firstPhaseCategoryUuid) =>
-  A.pipe(
-    dissocFirstPhaseCommonAttributeUuid,
-    dissocFirstPhaseCategoryExtraProp,
-    A.assoc(keysProps.firstPhaseCategoryUuid, firstPhaseCategoryUuid)
-  )
+const assocPhase1CategoryUuid = (phase1CategoryUuid) =>
+  A.pipe(dissocPhase1JoinAttribute, A.assoc(keysProps.phase1CategoryUuid, phase1CategoryUuid))
 
-const assocFirstPhaseCategoryExtraProp = (firstPhaseCategoryExtraProp) =>
-  A.assoc(keysProps.firstPhaseCategoryExtraProp, firstPhaseCategoryExtraProp)
+const assocPhase1JoinAttribute = (phase1JoinAttribute) => A.assoc(keysProps.phase1JoinAttribute, phase1JoinAttribute)
 
-const assocFirstPhaseCommonAttributeUuid = (firstPhaseCommonAttributeUuid) =>
-  A.assoc(keysProps.firstPhaseCommonAttributeUuid, firstPhaseCommonAttributeUuid)
+const assocPhase2JoinEntityUuid = (phase2JoinEntityUuid) =>
+  A.pipe(dissocPhase2JoinAttribute, A.assoc(keysProps.phase2JoinEntityUuid, phase2JoinEntityUuid))
+
+const assocPhase2AsSamplingPointData = (phase2AsSamplingPointData) =>
+  A.pipe(A.assoc(keysProps.phase2AsSamplingPointData, phase2AsSamplingPointData), cleanupSamplingDesign)
+
+const assocPhase2JoinAttribute = (phase2JoinAttribute) => A.assoc(keysProps.phase2JoinAttribute, phase2JoinAttribute)
 
 const assocPostStratificationAttributeDefUuid = (postStratificationAttributeDefUuid) =>
   A.assoc(keysProps.postStratificationAttributeDefUuid, postStratificationAttributeDefUuid)
@@ -143,6 +163,7 @@ const assocReportingDataAttributeDefUuid =
     })
 
 export const ChainSamplingDesign = {
+  categoryCodeAttributeName,
   keysProps,
   samplingStrategies,
 
@@ -150,15 +171,19 @@ export const ChainSamplingDesign = {
   getBaseUnitNodeDefUuid,
   isAreaWeightingMethod,
   getClusteringNodeDefUuid,
-  getFirstPhaseCategoryExtraProp,
-  getFirstPhaseCategoryUuid,
-  getFirstPhaseCommonAttributeUuid,
+  getPhase1CategoryUuid,
+  getPhase1JoinAttribute,
+  isPhase2AsSamplingPointData,
+  getPhase2JoinAttribute,
+  getPhase2JoinEntityUuid,
   isPostStratificationEnabled,
   getReportingDataAttributeDefUuid,
   getReportingDataCategoryUuid,
-  isFirstPhaseCategoryExtraPropSelectionEnabled,
-  isFirstPhaseCategorySelectionEnabled,
-  isFirstPhaseCommonAttributeSelectionEnabled,
+  isPhase1CategorySelectionEnabled,
+  isPhase1JoinAttributeSelectionEnabled,
+  isPhase2AsSamplingPointDataSelectionEnabled,
+  isPhase2JoinAttributeSelectionEnabled,
+  isPhase2JoinEntitySelectionEnabled,
   isStratificationEnabled,
   isStratificationNotSpecifiedAllowed,
   getPostStratificationAttributeDefUuid,
@@ -169,9 +194,11 @@ export const ChainSamplingDesign = {
   assocAreaWeightingMethod,
   assocBaseUnitNodeDefUuid,
   assocClusteringNodeDefUuid,
-  assocFirstPhaseCategoryExtraProp,
-  assocFirstPhaseCategoryUuid,
-  assocFirstPhaseCommonAttributeUuid,
+  assocPhase1CategoryUuid,
+  assocPhase1JoinAttribute,
+  assocPhase2AsSamplingPointData,
+  assocPhase2JoinAttribute,
+  assocPhase2JoinEntityUuid,
   assocPostStratificationAttributeDefUuid,
   assocReportingDataCategoryUuid,
   assocReportingDataAttributeDefUuid,

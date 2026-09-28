@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import { TableDataNodeDefColUtils } from './colUtils'
@@ -8,7 +8,7 @@ const getNodeCol = (nodeDefCol, nodeRow) => {
   const nodeDefUuidRow = nodeRow.node_def_uuid
 
   // Attribute column in multiple attribute table (value of its own table)
-  return nodeDefUuidRow === nodeDefUuidCol ? nodeRow : R.pathOr({}, ['children', nodeDefUuidCol], nodeRow)
+  return nodeDefUuidRow === nodeDefUuidCol ? nodeRow : A.pathOr({}, ['children', nodeDefUuidCol], nodeRow)
 }
 
 const getValuesByColumnName = ({ survey, nodeRow, nodeDefColumns }) => {

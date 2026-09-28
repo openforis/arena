@@ -23,7 +23,7 @@ import { PrintProps } from './PrintProps'
 import ValidationsProps from './ValidationsProps'
 
 import { useSurveyCycleKey } from '@webapp/store/survey'
-import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+import { useI18n } from '@webapp/store/system'
 
 import { NodeDefEditReadOnlyContext, State, useNodeDefDetails } from './store'
 
@@ -31,7 +31,6 @@ const NodeDefDetails = (props) => {
   const { nodeDefUuid = null, readOnly = false } = props
 
   const i18n = useI18n()
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   const { state, Actions, editingFromDesigner } = useNodeDefDetails({ nodeDefUuid })
 
@@ -60,7 +59,7 @@ const NodeDefDetails = (props) => {
         props: tabProps,
       })
     }
-    if (experimentalFeatures && NodeDef.isEntity(nodeDef)) {
+    if (NodeDef.isEntity(nodeDef)) {
       _tabs.push({
         label: 'nodeDefEdit.print',
         component: PrintProps,
@@ -92,17 +91,7 @@ const NodeDefDetails = (props) => {
       }
     }
     return _tabs
-  }, [
-    Actions,
-    canHaveMobileProps,
-    editingFromDesigner,
-    experimentalFeatures,
-    nodeDef,
-    nodeDefIsRoot,
-    nodeDefNull,
-    nodeDefType,
-    state,
-  ])
+  }, [Actions, canHaveMobileProps, editingFromDesigner, nodeDef, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
 
   if (!nodeDef) return null
 

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import * as SystemState from '../state'
 
 export const stateKey = 'status'
@@ -7,7 +7,7 @@ export const systemStatus = {
   ready: 'ready',
 }
 
-export const getState = R.pipe(SystemState.getState, R.propOr({}, stateKey))
+export const getState = A.pipe(SystemState.getState, A.propOr({}, stateKey))
 
 // ====== READ
-export const isReady = R.pipe(SystemState.getState, R.propEq(stateKey, systemStatus.ready))
+export const isReady = A.pipe(SystemState.getState, A.propEq(stateKey, systemStatus.ready))

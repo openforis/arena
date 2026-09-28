@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import Job from '@server/job/job'
 
@@ -23,7 +23,7 @@ export default class CyclesDeletedCheckJob extends Job {
     this.logDebug(`deleted cycles keys: ${cycleKeysDeleted}`)
     this.incrementProcessedItems()
 
-    if (!R.isEmpty(cycleKeysDeleted)) {
+    if (!A.isEmpty(cycleKeysDeleted)) {
       // 2. mark node defs without cycles as 'deleted'
       this.logDebug('marking node defs without cycles as deleted')
       await NodeDefManager.markNodeDefsWithoutCyclesDeleted(this.surveyId, this.tx)
@@ -33,7 +33,7 @@ export default class CyclesDeletedCheckJob extends Job {
       // 3. delete records of deleted cycles
       this.logDebug('deleting records')
       const recordsDeletedUuids = await RecordManager.deleteRecordsByCycles(this.surveyId, cycleKeysDeleted, this.tx)
-      this.logDebug(`records deleted: ${R.length(recordsDeletedUuids)}`)
+      this.logDebug(`records deleted: ${A.length(recordsDeletedUuids)}`)
       this.incrementProcessedItems()
 
       // 4. reset users pref cycle (if among deleted ones)
@@ -51,7 +51,7 @@ export default class CyclesDeletedCheckJob extends Job {
     if (Survey.isPublished(surveyInfo)) {
       const surveyPrev = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId }, this.tx)
       const surveyInfoPrev = Survey.getSurveyInfo(surveyPrev)
-      return R.difference(Survey.getCycleKeys(surveyInfoPrev), Survey.getCycleKeys(surveyInfo))
+      return A.difference(Survey.getCycleKeys(surveyInfoPrev), Survey.getCycleKeys(surveyInfo))
     }
 
     return []

@@ -14,7 +14,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 
-const experimentalNodeDefTypes = [NodeDef.nodeDefType.formHeader]
+const experimentalNodeDefTypes = new Set([])
 
 const AddNodeDefButtons = (props) => {
   const { surveyCycleKey, nodeDef, addNodeDef } = props
@@ -25,9 +25,7 @@ const AddNodeDefButtons = (props) => {
 
   const availableNodeDefTypes = useMemo(
     () =>
-      Object.values(NodeDef.nodeDefType).filter(
-        (type) => experimentalFeatures || !experimentalNodeDefTypes.includes(type)
-      ),
+      Object.values(NodeDef.nodeDefType).filter((type) => experimentalFeatures || !experimentalNodeDefTypes.has(type)),
     [experimentalFeatures]
   )
 

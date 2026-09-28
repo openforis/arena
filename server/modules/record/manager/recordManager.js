@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -29,6 +29,7 @@ import * as FileRepository from '../repository/fileRepository'
 import * as NodeRepository from '../repository/nodeRepository'
 import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 // ==== CREATE
 
@@ -43,10 +44,10 @@ export const { generateRdbUpdates, persistNodesToRDB } = NodeRdbManager
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
-    offset,
-    limit,
-    sortBy,
-    sortOrder,
+    offset = 0,
+    limit = undefined,
+    sortBy = undefined,
+    sortOrder = undefined,
     cycle: cycleParam = null,
     search = null,
     step = null,
@@ -60,7 +61,8 @@ export const fetchRecordsSummaryBySurveyId = async (
   client = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
-  const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  const nodeDefsDraft =
+    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = includeRootKeyValues
     ? await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
@@ -119,7 +121,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       { surveyId, recordUuid },
       client
     )
-    const filesMissing = R.isEmpty(nodeDefFileUuids)
+    const filesMissing = A.isEmpty(nodeDefFileUuids)
       ? 0
       : await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid, nodeDefFileUuids }, client)
 
@@ -152,7 +154,8 @@ export const countRecordsBySurveyId = async (
   client = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
-  const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  const nodeDefsDraft =
+    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
   const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
@@ -166,6 +169,12 @@ export const countRecordsBySurveyId = async (
     client
   )
 }
+
+// Cheap existence/count check across all cycles, without the survey/root-node-def/summary-defs
+// lookups the search-aware countRecordsBySurveyId above needs - used where only "does this survey
+// have any records at all" matters (e.g. the publish record-values-update warning check).
+export const countAllRecordsBySurveyId = async ({ surveyId }, client = db) =>
+  RecordRepository.countRecordsBySurveyId({ surveyId }, client)
 
 export {
   countRecordsBySurveyIdGroupedByStep,
@@ -251,7 +260,7 @@ export const fetchRecordAndNodesByUuid = async (
 
   // Preview records are always initialized from scratch with the requesting user's context,
   // so their applicability is already up to date and doesn't need recomputing here.
-  if (user && !R.isEmpty(indexedNodes) && !Record.isPreview(recordWithNodes)) {
+  if (user && !A.isEmpty(indexedNodes) && !Record.isPreview(recordWithNodes)) {
     recordWithNodes = await _recomputeUserDependentNodeState({ user, surveyId, draft, record: recordWithNodes }, client)
   }
 
@@ -336,9 +345,10 @@ export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepT
       },
       client
     )
-    await Promise.all(
-      recordsSummaryToMove.map((record) =>
-        RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t)
+    await DbUtils.runQueries(
+      t,
+      recordsSummaryToMove.map(
+        (record) => () => RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t)
       )
     )
     return { count: recordsSummaryToMove.length }
@@ -347,7 +357,7 @@ export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepT
 export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
   client.tx(async (t) => {
     const activities = nodes.map((node) => {
-      const logContent = R.pick([
+      const logContent = A.pick([
         Node.keys.recordUuid,
         Node.keys.iId,
         Node.keys.pIId,

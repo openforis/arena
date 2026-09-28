@@ -1,4 +1,4 @@
-import * as camelize from 'camelize'
+import camelize from 'camelize'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'

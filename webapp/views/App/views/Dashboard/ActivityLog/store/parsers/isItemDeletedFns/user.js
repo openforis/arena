@@ -1,8 +1,8 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-const _isUserRemoved = () => R.pipe(ActivityLog.getTargetUserUuid, R.isNil)
+const _isUserRemoved = () => A.pipe(ActivityLog.getTargetUserUuid, A.isNil)
 
 export default {
   [ActivityLog.type.userInvite]: _isUserRemoved,

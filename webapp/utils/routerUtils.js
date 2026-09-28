@@ -1,5 +1,5 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
-export const getLocationPathname = R.path(['location', 'pathname'])
+export const getLocationPathname = A.path(['location', 'pathname'])
 
-export const getUrlParam = (param) => R.path(['params', param])
+export const getUrlParam = (param) => A.path(['params', param])

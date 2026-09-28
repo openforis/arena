@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
@@ -20,7 +20,7 @@ export const newUserGroup = (): Record<string, unknown> => ({ [keys.props]: {} }
 
 // ====== READ
 export const { getUuid, getProps, getLabels, getLabel, isEqual } = ObjectUtils
-export const getSurveyUuid = R.propOr(null, keys.surveyUuid)
+export const getSurveyUuid = A.propOr(null, keys.surveyUuid)
 export const getName = ObjectUtils.getProp<string>(keysProps.name, '')
 export const getQualifiers = ObjectUtils.getProp<Array<{ name: string; value: string }>>(keysProps.qualifiers, [])
 export const { getValidation } = Validation

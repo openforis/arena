@@ -198,7 +198,7 @@ describe('RecordExpressionParser Test', () => {
     { q: 'visit_date.week', e: new SystemError('expression.invalidAttributeValuePropertyName') },
     { q: 'visit_time.hour', r: 10 },
     { q: 'visit_time.minute', r: 30 },
-    { q: 'visit_time.seconds', e: new SystemError('expression.invalidAttributeValuePropertyName') },
+    { q: 'visit_time.seconds', r: 0 },
     // this
     { q: 'this', n: 'cluster/cluster_id', r: 12 },
     {

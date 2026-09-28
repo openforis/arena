@@ -18,7 +18,11 @@ import * as UserService from '@server/modules/user/service/userService'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
 import { checkNodeIsValid } from './recordNodeChecks'
-import { getRecordFormattedKeyValues, findExistingRecordSummary, determineRecordAction } from './recordImportMatcher'
+import {
+  getRecordFormattedKeyValues,
+  findExistingRecordSummary,
+  determineRecordAction,
+} from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
 
 const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',
@@ -166,6 +170,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       conflictResolutionStrategy,
     })
     const { action, existingRecordUuid } = determineRecordAction({
+      survey,
       record,
       existingRecordSummary,
       conflictResolutionStrategy,

@@ -1,7 +1,7 @@
 import './expressionEditorPopup.scss'
 
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Expression from '@core/expressionParser/expression'
 
@@ -10,6 +10,7 @@ import { TestId } from '@webapp/utils/testId'
 import PanelRight from '@webapp/components/PanelRight'
 
 import { Button } from '../buttons'
+import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
 import { useExpressionEditorPopupState } from './expressionEditorPopupState'
 import AdvancedExpressionEditorPopup from './advancedExpressionEditorPopup'
 import BasicExpressionEditorPopup from './basicExpressionEditorPopup'
@@ -30,6 +31,7 @@ const ExpressionEditorPopup = (props) => {
     nodeDefUuidCurrent = null,
     onChange = () => {},
     onClose = () => {},
+    onGenerateWithAi = null,
     query = '',
     types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   } = props
@@ -63,15 +65,24 @@ const ExpressionEditorPopup = (props) => {
   return (
     <PanelRight onClose={onClose} width="100vw" header={header}>
       <div className="expression-editor-popup">
-        {types.includes(ExpressionEditorType.basic) && types.includes(ExpressionEditorType.advanced) && (
-          <Button
-            className="expression-editor-popup__toggle-advanced"
-            label={advanced ? 'nodeDefEdit.basic' : 'nodeDefEdit.advanced'}
-            onClick={onToggleAdvancedEditor}
-            size="small"
-            testId={TestId.expressionEditor.toggleModeBtn}
-          />
-        )}
+        <div className="expression-editor-popup__toolbar">
+          {types.includes(ExpressionEditorType.basic) && types.includes(ExpressionEditorType.advanced) && (
+            <Button
+              className="expression-editor-popup__toggle-advanced"
+              label={advanced ? 'nodeDefEdit.basic' : 'nodeDefEdit.advanced'}
+              onClick={onToggleAdvancedEditor}
+              size="small"
+              testId={TestId.expressionEditor.toggleModeBtn}
+            />
+          )}
+          {onGenerateWithAi && (
+            <ButtonAiGenerateExpression
+              onClick={onGenerateWithAi}
+              testId={TestId.expressionEditor.aiPopupBtn}
+              variant="outlined"
+            />
+          )}
+        </div>
         {advanced ? (
           <AdvancedExpressionEditorPopup
             nodeDefCurrent={nodeDefCurrent}
@@ -98,7 +109,7 @@ const ExpressionEditorPopup = (props) => {
 
         <div className="expression-editor-popup__footer">
           <Button
-            disabled={R.isEmpty(query)}
+            disabled={A.isEmpty(query)}
             iconClassName="icon-undo2 icon-12px"
             label="common.reset"
             onClick={() => onChange('')}
@@ -138,6 +149,7 @@ ExpressionEditorPopup.propTypes = {
   nodeDefUuidCurrent: PropTypes.string, // Attribute
   onChange: PropTypes.func,
   onClose: PropTypes.func,
+  onGenerateWithAi: PropTypes.func, // if set, shows a button to generate the expression from a description via AI
   query: PropTypes.string, // String representing the expression
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
 }

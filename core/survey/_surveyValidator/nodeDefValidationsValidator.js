@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -42,11 +42,11 @@ export const validate = async (survey, nodeDef) => {
       })
     : Validation.newInstance()
 
-  return R.pipe(
+  return A.pipe(
     Validation.assocFieldValidation(
       keys.expressions,
       await NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.validations)
     ),
-    R.unless(Validation.isValid, Validation.setErrors([{ key: Validation.messageKeys.nodeDefEdit.validationsInvalid }]))
+    A.unless(Validation.isValid, Validation.setErrors([{ key: Validation.messageKeys.nodeDefEdit.validationsInvalid }]))
   )(validation)
 }

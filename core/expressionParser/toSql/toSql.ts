@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import SystemError from '@core/systemError'
 
@@ -111,7 +111,7 @@ const _getLiteralParamValue = (value: unknown): unknown => {
 }
 
 export const literal = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
-  if (R.isNil(node.value)) {
+  if (A.isNil(node.value)) {
     return {
       clause: 'NULL',
       params,

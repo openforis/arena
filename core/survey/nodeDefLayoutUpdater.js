@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -144,7 +144,7 @@ const _addLayoutForCycle = ({ nodeDef, cycle, cyclePrev = null }) =>
       return layoutUpdated
     }
     // previous cycle does not exist: set the default layout
-    const layoutUpdated = R.mergeLeft(
+    const layoutUpdated = A.mergeLeft(
       // TODO use NodeDefLayout default props layout
       NodeDef.isEntity(nodeDef)
         ? NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.form, uuidv4())
@@ -205,7 +205,7 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef, h: hParam = nu
   }
   // render as form in current page (grid layout)
   // Add new node to the bottom left corner of the form (x = 0, y = max value of every child layout y + h or 0)
-  const y = layoutChildrenPrev.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0)
+  const y = layoutChildrenPrev.reduce((accY, layoutChild) => A.max(accY, layoutChild.y + layoutChild.h), 0)
 
   // New node def height depends on its type
   const minH = NodeDefLayoutSizes.getMinGridItemHeight({ nodeDef })
@@ -229,7 +229,7 @@ const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
 
   if (NodeDefLayout.isRenderTable(cycle)(nodeDefParent)) {
     // Remove node def from children (render as table)
-    const layoutChildrenUpdated = R.without([nodeDefUuid])(layoutChildrenPrev)
+    const layoutChildrenUpdated = A.without([nodeDefUuid])(layoutChildrenPrev)
     return Object.assign({}, layoutForCycle, { [NodeDefLayout.keys.layoutChildren]: layoutChildrenUpdated })
   }
   // render as form
@@ -238,13 +238,13 @@ const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
 
   if (NodeDefLayout.hasPage(cycle)(nodeDef)) {
     // Node def displayed in its own page
-    const childrenPagesIndexUpdated = R.without([nodeDefUuid])(childrenPagesIndexPrev)
+    const childrenPagesIndexUpdated = A.without([nodeDefUuid])(childrenPagesIndexPrev)
     return Object.assign({}, layoutForCycle, { [NodeDefLayout.keys.indexChildren]: childrenPagesIndexUpdated })
   }
   // render as form in current page (grid layout)
   // Remove node def from children
   const layoutForCycleUpdated = Object.assign({}, layoutForCycle, {
-    [NodeDefLayout.keys.layoutChildren]: R.reject(R.propEq('i', nodeDefUuid), layoutChildrenPrev),
+    [NodeDefLayout.keys.layoutChildren]: A.reject(A.propEq('i', nodeDefUuid), layoutChildrenPrev),
   })
   return layoutForCycleUpdated
 }
@@ -305,7 +305,7 @@ export const updateParentLayout = ({
   const nodeDefParentLayout = NodeDef.getLayout(nodeDefParent)
   const nodeDefParentLayoutUpdated = NodeDef.getLayout(nodeDefParentUpdated)
 
-  if (R.equals(nodeDefParentLayout, nodeDefParentLayoutUpdated)) {
+  if (A.equals(nodeDefParentLayout, nodeDefParentLayoutUpdated)) {
     // no changes applied
     return null
   }
@@ -324,8 +324,8 @@ export const updateParentLayout = ({
 export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles, cyclesPrev }) => {
   const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
 
-  const cyclesAdded = R.difference(cycles, cyclesPrev)
-  const cyclesDeleted = R.difference(cyclesPrev, cycles)
+  const cyclesAdded = A.difference(cycles, cyclesPrev)
+  const cyclesDeleted = A.difference(cyclesPrev, cycles)
 
   const nodeDefsUpdated = {}
 

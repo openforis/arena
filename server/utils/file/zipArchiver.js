@@ -1,8 +1,8 @@
-import Archiver from 'archiver'
+import { ZipArchive } from 'archiver'
 
 export class ZipArchiver {
   constructor(outputStream) {
-    this.archiver = Archiver('zip')
+    this.archiver = new ZipArchive()
     this.archiver.pipe(outputStream)
   }
 

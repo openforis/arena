@@ -1,4 +1,10 @@
 export default {
+  aiDataQueryDescriptionMissing: 'Veuillez décrire en langage naturel les données que vous souhaitez voir.',
+  aiDataQueryEmpty: "Sélectionnez d'abord une entité et des attributs (ou des dimensions et des mesures).",
+  aiDataQueryInvalid: "L'IA n'a pas pu générer une requête valide pour cette demande : {{errors}}",
+  aiDataQueryNoEntities: 'Ce formulaire ne contient aucune entité pouvant être interrogée.',
+  aiDataQuerySummaryInvalid:
+    "L'IA n'a pas pu suggérer un nom et une description pour cette requête. Veuillez réessayer.",
   cannotGetChild: `Impossible d'obtenir l'enfant '{{childName}}' depuis l'attribut {{name}}`,
   cannotImportFilesExceedingQuota:
     "Impossible d'importer les fichiers d'enregistrement : le quota de stockage serait dépassé",
@@ -22,6 +28,8 @@ export default {
     noRecordsFound: "Aucun enregistrement trouvé dans le fichier d'importation ou format de fichier incorrect",
     pendingImportFileNotFoundOrExpired:
       'Le fichier précédemment téléchargé est introuvable ; il a peut-être expiré. Veuillez le télécharger à nouveau.',
+    recordMergeWithSameKeysNotAllowed:
+      'Impossible d’importer l’enregistrement "{{recordKeyValues}}" : un autre enregistrement avec les mêmes clés existe déjà et la fusion des enregistrements avec les mêmes clés n’est pas autorisée dans cette enquête',
     recordOwnedByAnotherUser:
       'Impossible de mettre à jour l’enregistrement "{{recordKeyValues}}" car il appartient à un autre utilisateur',
   },
@@ -51,6 +59,12 @@ export default {
     entityNotFound: 'Entité "{{entityName}}" avec les clés "{{keyValues}}" introuvable',
     updateSelfAndDependentsDefaultValues:
       "$t(appErrors:record.errorUpdating) ; erreur lors de l'évaluation de l'expression dans le nœud {{nodeDefName}} : {{details}}",
+  },
+  recordPrintableExport: {
+    missingEntityParams: "L'export de la page actuelle nécessite entityDefUuid et entityNodeUuid",
+    entityNotFound: "Entité introuvable pour l'export spécifié",
+    missingServerUrl: "L'URL publique du serveur est requise lors de l'export avec un code QR",
+    qrTokenMismatch: "Impossible de finaliser l'export avec code QR ; veuillez réessayer",
   },
   sessionExpiredRefreshPage: `La session a peut-être expiré.
 Essayez de rafraîchir la page.`,

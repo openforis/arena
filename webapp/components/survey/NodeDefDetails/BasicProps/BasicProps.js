@@ -33,6 +33,7 @@ import FormHeaderProps from '../FormHeaderProps'
 import IntegerProps from '../IntegerProps'
 import TaxonProps from '../TaxonProps'
 import TextProps from '../TextProps'
+import TimeProps from '../TimeProps'
 import AnalysisProps from '../AnalysisProps'
 
 const basicPropsComponentByType = {
@@ -45,6 +46,7 @@ const basicPropsComponentByType = {
   [NodeDef.nodeDefType.integer]: IntegerProps,
   [NodeDef.nodeDefType.taxon]: TaxonProps,
   [NodeDef.nodeDefType.text]: TextProps,
+  [NodeDef.nodeDefType.time]: TimeProps,
 }
 
 const BasicProps = (props) => {
@@ -270,6 +272,20 @@ const BasicProps = (props) => {
             checked={includeInMultipleEntitySummary}
             disabled={readOnly}
             info="nodeDefEdit.basicProps.includedInRecordsList.info"
+            validation={Validation.getFieldValidation(NodeDefLayout.keys.includedInMultipleEntitySummary)(validation)}
+            onChange={(value) =>
+              Actions.setLayoutProp({ state, key: NodeDefLayout.keys.includedInMultipleEntitySummary, value })
+            }
+          />
+        </FormItem>
+      )}
+
+      {canIncludeInMultipleEntitySummary && !ancestorMultipleEntityIsRoot && (
+        <FormItem label="nodeDefEdit.basicProps.includedInMultipleEntitySummary.label">
+          <Checkbox
+            checked={includeInMultipleEntitySummary}
+            disabled={readOnly}
+            info="nodeDefEdit.basicProps.includedInMultipleEntitySummary.info"
             validation={Validation.getFieldValidation(NodeDefLayout.keys.includedInMultipleEntitySummary)(validation)}
             onChange={(value) =>
               Actions.setLayoutProp({ state, key: NodeDefLayout.keys.includedInMultipleEntitySummary, value })

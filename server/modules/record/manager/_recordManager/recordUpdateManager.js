@@ -17,6 +17,7 @@ import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as RecordFileManager from '@server/modules/record/manager/recordFileManager'
+import * as RecordPrintableExportShareService from '@server/modules/record/service/recordPrintableExportShareService'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
@@ -26,6 +27,7 @@ import * as RecordValidationManager from './recordValidationManager'
 import * as NodeCreationManager from './nodeCreationManager'
 import * as NodeUpdateManager from './nodeUpdateManager'
 import { NodeRdbManager } from './nodeRDBManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 /**
  * =======.
@@ -41,6 +43,7 @@ export const initNewRecord = async (
     survey,
     record,
     timezoneOffset,
+    lang,
     nodesUpdateListener = null,
     nodesValidationListener = null,
     createMultipleEntities = true,
@@ -58,6 +61,7 @@ export const initNewRecord = async (
       record,
       node: rootNode,
       timezoneOffset,
+      lang,
       nodesUpdateListener,
       nodesValidationListener,
       system: true,
@@ -67,7 +71,15 @@ export const initNewRecord = async (
   )
 
   return _applyGroupQualifierValues(
-    { user, survey, record: recordWithRootEntity, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+    {
+      user,
+      survey,
+      record: recordWithRootEntity,
+      timezoneOffset,
+      lang,
+      nodesUpdateListener,
+      nodesValidationListener,
+    },
     client
   )
 }
@@ -76,7 +88,7 @@ export const initNewRecord = async (
 // in the qualifiers of the current user's group for this survey, and marks
 // the affected node as non-editable in the UI.
 const _applyGroupQualifierValues = async (
-  { user, survey, record, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+  { user, survey, record, timezoneOffset, lang, nodesUpdateListener, nodesValidationListener },
   client
 ) => {
   const qualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey }, client)
@@ -89,7 +101,8 @@ const _applyGroupQualifierValues = async (
   for (const { nodeDef, value } of qualifierFilters) {
     const existingNode = Record.getNodeChildrenByDefUuid(rootNode, NodeDef.getUuid(nodeDef))(recordUpdated)[0]
     const nodeToPersist =
-      existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(recordUpdated), rootNode)
+      existingNode ??
+      Node.newNode({ record: recordUpdated, nodeDefUuid: NodeDef.getUuid(nodeDef), parentNode: rootNode })
     const nodeWithValue = Node.assocIsQualifierValueApplied(true)(Node.assocValue(value)(nodeToPersist))
 
     recordUpdated = await persistNode(
@@ -99,6 +112,7 @@ const _applyGroupQualifierValues = async (
         record: recordUpdated,
         node: nodeWithValue,
         timezoneOffset,
+        lang,
         nodesUpdateListener,
         nodesValidationListener,
         system: true,
@@ -122,21 +136,22 @@ export const updateRecordStep = async ({ user, surveyId, record, stepId, system 
     const recordUuid = Record.getUuid(record)
     const rootDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, client)
 
-    await Promise.all([
-      RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, client),
-      DataTableUpdateRepository.updateRecordStep({ surveyId, recordUuid, stepId, tableDef: rootDef }, client),
-      ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.recordStepUpdate,
-        {
-          [ActivityLog.keysContent.uuid]: recordUuid,
-          [ActivityLog.keysContent.stepFrom]: currentStepId,
-          [ActivityLog.keysContent.stepTo]: stepId,
-        },
-        system,
-        client
-      ),
+    await DbUtils.runQueries(client, [
+      () => RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, client),
+      () => DataTableUpdateRepository.updateRecordStep({ surveyId, recordUuid, stepId, tableDef: rootDef }, client),
+      () =>
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.recordStepUpdate,
+          {
+            [ActivityLog.keysContent.uuid]: recordUuid,
+            [ActivityLog.keysContent.stepFrom]: currentStepId,
+            [ActivityLog.keysContent.stepTo]: stepId,
+          },
+          system,
+          client
+        ),
     ])
   } else {
     throw new SystemError('cantUpdateStep')
@@ -176,16 +191,18 @@ export const deleteRecord = async (user, survey, record, client = db) =>
     }
 
     const surveyId = Survey.getId(survey)
-    await Promise.all([
-      RecordRepository.deleteRecord(surveyId, uuid, t),
-      RecordFileManager.markRecordFilesAsDeleted(surveyId, uuid, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, logContent, false, t),
+    await DbUtils.runQueries(t, [
+      () => RecordRepository.deleteRecord(surveyId, uuid, t),
+      () => RecordFileManager.markRecordFilesAsDeleted(surveyId, uuid, t),
+      () => RecordPrintableExportShareService.deleteByRecordUuid({ surveyId, recordUuid: uuid }, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, logContent, false, t),
     ])
   })
 
 export const deleteRecordPreview = async (surveyId, recordUuid) =>
   await db.tx(async (t) => {
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
+    await RecordPrintableExportShareService.deleteByRecordUuid({ surveyId, recordUuid }, t)
     await RecordFileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
@@ -193,12 +210,19 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
   db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!A.isEmpty(recordUuids)) {
+      await RecordPrintableExportShareService.deleteByRecordUuids({ surveyId, recordUuids }, t)
       await RecordFileManager.deleteFilesByRecordUuids(surveyId, recordUuids, t)
     }
     return recordUuids.length
   })
 
-export const { deleteRecordsByCycles } = RecordRepository
+export const deleteRecordsByCycles = async (surveyId, cycles, client = db) => {
+  const recordUuids = await RecordRepository.deleteRecordsByCycles(surveyId, cycles, client)
+  if (!A.isEmpty(recordUuids)) {
+    await RecordPrintableExportShareService.deleteByRecordUuids({ surveyId, recordUuids }, client)
+  }
+  return recordUuids
+}
 
 /**
  * ======.
@@ -218,6 +242,7 @@ export const persistNode = async (
     record,
     node,
     timezoneOffset,
+    lang,
     nodesUpdateListener = null,
     nodesValidationListener = null,
     system = false,
@@ -232,6 +257,7 @@ export const persistNode = async (
       record,
       node,
       timezoneOffset,
+      lang,
       nodesUpdateFn: async (user, survey, record, node, t) => {
         const nodeIId = Node.getIId(node)
 
@@ -241,7 +267,7 @@ export const persistNode = async (
           return NodeUpdateManager.updateNode({ user, survey, record, node, system }, t)
         }
         return NodeCreationManager.insertNode(
-          { user, survey, record, node, system, createMultipleEntities, timezoneOffset },
+          { user, survey, record, node, system, createMultipleEntities, timezoneOffset, lang },
           t
         )
       },
@@ -259,6 +285,7 @@ export const deleteNode = async (
   record,
   nodeIId,
   timezoneOffset,
+  lang,
   nodesUpdateListener = null,
   nodesValidationListener = null,
   t = db
@@ -270,6 +297,7 @@ export const deleteNode = async (
       record,
       node: Record.getNodeByInternalId(nodeIId)(record),
       timezoneOffset,
+      lang,
       nodesUpdateFn: (user, survey, record, node, t) =>
         NodeUpdateManager.deleteNode(user, survey, record, Node.getIId(node), t),
       nodesUpdateListener,
@@ -291,6 +319,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
     node,
     categoryItemProvider,
     timezoneOffset,
+    lang,
     nodesUpdateFn,
     nodesUpdateListener = null,
     nodesValidationListener = null,
@@ -310,6 +339,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
         record: recordUpdated,
         nodesUpdated,
         timezoneOffset,
+        lang,
         nodesUpdateListener,
         nodesValidationListener,
       },
@@ -385,7 +415,7 @@ const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
 }
 
 const _onNodesUpdate = async (
-  { user, survey, record, nodesUpdated, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+  { user, survey, record, nodesUpdated, timezoneOffset, lang, nodesUpdateListener, nodesValidationListener },
   t
 ) => {
   // 1. update record and notify
@@ -395,7 +425,10 @@ const _onNodesUpdate = async (
 
   // 2. update dependent nodes
   const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } =
-    await NodeUpdateManager.updateNodesDependents({ user, survey, record, nodes: nodesUpdated, timezoneOffset }, t)
+    await NodeUpdateManager.updateNodesDependents(
+      { user, survey, record, nodes: nodesUpdated, timezoneOffset, lang },
+      t
+    )
   if (nodesUpdateListener) {
     nodesUpdateListener(updatedDependentNodes)
   }

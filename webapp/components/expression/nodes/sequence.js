@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import EditButtons from './editButtons'
 
@@ -29,7 +29,7 @@ const Sequence = (props) => {
         level: level + 1,
         node: expression,
         nodeDefCurrent,
-        onChange: (item) => onChange(R.assoc('expression', item, node)),
+        onChange: (item) => onChange(A.assoc('expression', item, node)),
         onDelete,
         type,
         variables,

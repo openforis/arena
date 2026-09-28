@@ -8,7 +8,7 @@ import { isUuid, uuidv4 } from '@core/uuid'
 const dirSeparator = '/'
 
 const encodings = {
-  utf8: 'utf-8',
+  utf8: /** @type {'utf-8'} */ ('utf-8'),
   base64: 'base64',
 }
 

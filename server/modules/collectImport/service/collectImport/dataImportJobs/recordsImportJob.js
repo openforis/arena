@@ -1,4 +1,6 @@
-import * as R from 'ramda'
+import { Queue } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -7,7 +9,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
-import Queue from '@core/queue'
 import SystemError from '@core/systemError'
 
 import BatchPersister from '@server/db/batchPersister'
@@ -30,7 +31,7 @@ const evaluateApplicability = async ({ user, survey, childDef, record, node }) =
   let applicable = true
   const expressionsApplicable = NodeDef.getApplicable(childDef)
 
-  if (!R.isEmpty(expressionsApplicable)) {
+  if (!A.isEmpty(expressionsApplicable)) {
     const exprEval = await RecordExpressionParser.evalApplicableExpression(
       survey,
       record,
@@ -38,7 +39,7 @@ const evaluateApplicability = async ({ user, survey, childDef, record, node }) =
       expressionsApplicable,
       user
     )
-    applicable = R.propOr(false, 'value', exprEval)
+    applicable = A.propOr(false, 'value', exprEval)
   }
   return applicable
 }
@@ -87,6 +88,8 @@ export default class RecordsImportJob extends Job {
 
     const nodeDefNamesByPath = CollectSurvey.generateArenaNodeDefNamesByPath(collectSurvey)
 
+    const insertedRecordsUuids = []
+
     for (const entryName of entryNames) {
       if (this.isCanceled()) {
         break
@@ -118,6 +121,8 @@ export default class RecordsImportJob extends Job {
       const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
       // This.logDebug(`${entryName} recordToCreate end`)
 
+      insertedRecordsUuids.push(Record.getUuid(record))
+
       // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes start`)
       await this.traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath })
       // This.logDebug(`${entryName} traverseCollectRecordAndInsertNodes end`)
@@ -129,7 +134,13 @@ export default class RecordsImportJob extends Job {
       }
     }
 
-    this.setContext({ insertedRecords: this.processed })
+    // recordUuids is read by the following RecordCheckJob (collectImportJob.js/collectDataImportJob.js
+    // chain it right after this job, sharing the same context): it scopes the check to just the
+    // records imported here and forces every node def to be checked, not just newly-added ones - a
+    // Collect-imported record is only given nodes for paths present in the Collect data, so it can be
+    // missing nodes (and therefore default values) for Arena-only attributes even though their node
+    // defs are already published. See RecordCheckJob._fetchSurveyAndNodeDefsByCycle.
+    this.setContext({ insertedRecords: this.processed, recordUuids: insertedRecordsUuids })
   }
 
   async beforeSuccess() {
@@ -148,7 +159,7 @@ export default class RecordsImportJob extends Job {
 
     for (const step of steps) {
       const entryNames = collectSurveyFileZip.getEntryNames({ path: this.getEntriesPath({ step }) })
-      if (!R.isEmpty(entryNames)) {
+      if (!A.isEmpty(entryNames)) {
         return entryNames
       }
     }
@@ -227,7 +238,7 @@ export default class RecordsImportJob extends Job {
 
           const { value = null, meta = {} } = valueAndMeta || {}
 
-          nodeToInsert = R.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
+          nodeToInsert = A.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
 
           recordUpdated = Record.assocNode(nodeToInsert, { sideEffect: true })(recordUpdated)
 
@@ -355,7 +366,7 @@ export default class RecordsImportJob extends Job {
             childrenApplicability[childDefUuid] = applicable
           }
         }
-        if (!R.isEmpty(childrenApplicability)) {
+        if (!A.isEmpty(childrenApplicability)) {
           const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
           recordUpdated = Record.assocNode(nodeUpdated, { sideEffect: true })(recordUpdated)
         }

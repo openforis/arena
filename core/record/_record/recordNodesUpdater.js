@@ -253,6 +253,7 @@ const _getOrCreateEntityByKeys =
     valuesByDefUuid,
     insertMissingNodes,
     sideEffect = false,
+    entityKeysIndexCache = null,
   }) =>
   async (record) => {
     if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === entityDefUuid) {
@@ -262,6 +263,7 @@ const _getOrCreateEntityByKeys =
       survey,
       descendantDefUuid: entityDefUuid,
       keyValuesByDefUuid: valuesByDefUuid,
+      entityKeysIndexCache,
     })(record)
 
     if (entity) {
@@ -285,6 +287,7 @@ const _getOrCreateEntityByKeys =
           survey,
           descendantDefUuid: NodeDef.getUuid(entityParentDef),
           keyValuesByDefUuid: valuesByDefUuid,
+          entityKeysIndexCache,
         })(record)
 
     if (!entityParent) {
@@ -306,6 +309,13 @@ const _getOrCreateEntityByKeys =
       sideEffect,
     })(record)
 
+    entityKeysIndexCache?.addEntity({
+      parentNode: entityParent,
+      entity: entityInserted,
+      getKeyAttribute: (entity, keyDefUuid) =>
+        RecordReader.getNodeChildByDefUuid(entity, keyDefUuid)(updateResult.record),
+    })
+
     return { entity: entityInserted, updateResult }
   }
 
@@ -320,6 +330,8 @@ const getOrCreateEntityByKeys =
     timezoneOffset,
     insertMissingNodes = false,
     sideEffect = false,
+    updateDependents = true,
+    entityKeysIndexCache = null,
   }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
@@ -333,11 +345,16 @@ const getOrCreateEntityByKeys =
       valuesByDefUuid,
       insertMissingNodes,
       sideEffect,
+      entityKeysIndexCache,
     })(record)
 
     if (updateResultEntity) {
       updateResult.merge(updateResultEntity)
 
+      if (!updateDependents) {
+        // caller is responsible for updating dependent nodes and validation (see afterNodesUpdate)
+        return { entity, updateResult }
+      }
       const dependentsUpdateResult = await afterNodesUpdate({
         user,
         survey,
@@ -371,6 +388,7 @@ const updateAttributesInEntityWithValues =
     taxonProvider,
     timezoneOffset,
     sideEffect = false,
+    updateDependents = true,
   }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
@@ -379,6 +397,9 @@ const updateAttributesInEntityWithValues =
       if (!nodeUpdateResult) return
 
       updateResult.merge(nodeUpdateResult)
+
+      // when not updating dependents, the caller is responsible for it (see afterNodesUpdate)
+      if (!updateDependents) return
 
       const dependentsUpdateResult = await afterNodesUpdate({
         user,

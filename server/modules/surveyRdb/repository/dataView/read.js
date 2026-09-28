@@ -1,5 +1,5 @@
-import * as R from 'ramda'
-import * as camelize from 'camelize'
+import * as A from '@core/arena'
+import camelize from 'camelize'
 import * as pgPromise from 'pg-promise'
 
 import { Objects } from '@openforis/arena-core'
@@ -33,6 +33,14 @@ const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef, nodeDef) => {
   return ColumnNodeDef.getColumnName(ancestorMultipleEntityDef)
 }
 
+/**
+ * Determines the Postgres TO_CHAR format to use to format a time column value.
+ * @param {object} nodeDefCol - The time node definition column.
+ * @returns {string} The TO_CHAR format, including seconds if the node definition includes them.
+ */
+export const getTimeColumnToCharFormat = (nodeDefCol) =>
+  NodeDef.isSecondsIncluded(nodeDefCol) ? 'HH24:MI:SS' : 'HH24:MI'
+
 const columnTransformByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ streamMode, nameFull, namesFull, alias }) => {
     if (!streamMode) {
@@ -57,7 +65,9 @@ const columnTransformByNodeDefType = {
   [NodeDef.nodeDefType.date]: ({ nameFull, alias }) => [
     `TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${DbUtils.asName(alias)}`,
   ],
-  [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${DbUtils.asName(alias)}`],
+  [NodeDef.nodeDefType.time]: ({ nodeDefCol, nameFull, alias }) => [
+    `TO_CHAR(${nameFull}, '${getTimeColumnToCharFormat(nodeDefCol)}') AS ${DbUtils.asName(alias)}`,
+  ],
 }
 
 const _selectFieldsByNodeDefType =
@@ -73,7 +83,15 @@ const _selectFieldsByNodeDefType =
 
     const columnTransform = columnTransformByNodeDefType[NodeDef.getType(nodeDefCol)]
     if (columnTransform) {
-      return columnTransform({ streamMode, viewAlias: viewDataNodeDef.alias, nameFull, namesFull, names, alias })
+      return columnTransform({
+        streamMode,
+        viewAlias: viewDataNodeDef.alias,
+        nodeDefCol,
+        nameFull,
+        namesFull,
+        names,
+        alias,
+      })
     }
     return namesFull
   }
@@ -100,7 +118,7 @@ const _prepareSelectFields = ({
         .filter((columnNodeDef) => includeFileAttributeDefs || !NodeDef.isFile(columnNodeDef.nodeDef))
         .flatMap((columnNodeDef) => _selectFieldsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef))
     )
-  } else if (R.isEmpty(nodeDefCols)) {
+  } else if (A.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
   } else {
     queryBuilder.select(
@@ -223,7 +241,7 @@ const _createViewDataQuery = (params) => {
   _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode })
 
   // WHERE clause
-  if (!R.isNil(cycle)) {
+  if (!A.isNil(cycle)) {
     queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
     queryBuilder.addParams({ cycle })
 
@@ -251,7 +269,7 @@ const _createViewDataQuery = (params) => {
 
   const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
-  if (!R.isNil(filterClause)) {
+  if (!A.isNil(filterClause)) {
     queryBuilder.where(filterClause)
     queryBuilder.addParams(filterParams)
   }
@@ -259,15 +277,15 @@ const _createViewDataQuery = (params) => {
   // SORT clause
   const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
-  if (!R.isEmpty(sortParams)) {
+  if (!A.isEmpty(sortParams)) {
     queryBuilder.orderBy(sortClause)
     queryBuilder.addParams(sortParams)
   }
-  if (!R.isNil(limit)) {
+  if (!A.isNil(limit)) {
     queryBuilder.limit('$/limit/')
     queryBuilder.addParams({ limit })
   }
-  if (!R.isNil(offset)) {
+  if (!A.isNil(offset)) {
     queryBuilder.offset('$/offset/')
     queryBuilder.addParams({ offset })
   }
@@ -335,7 +353,7 @@ export const countDataTableRows = async (
     WHERE 
       ${TableDataNodeDef.columnSet.recordCycle} = $/cycle/
       ${recordOwnerUuid ? ` AND ${TableDataNodeDef.columnSet.recordOwnerUuid} = $/recordOwnerUuid/` : ''}
-      ${R.isNil(filterClause) ? '' : ` AND ${filterClause}`}
+      ${A.isNil(filterClause) ? '' : ` AND ${filterClause}`}
     `,
     {
       ...filterParams,
@@ -362,13 +380,13 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
     operator: Expression.operators.comparison.notEq.value,
   })
 
-  const filter = R.reduce(
+  const filter = A.reduce(
     (whereExprAcc, nodeDefUnique) => {
       const nodeUnique = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefUnique))(record)
 
       const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
       const colValue = TableDataNodeDefColUtils.getValue(survey, nodeDefUnique, nodeUnique)
-      const colValueString = R.isNil(colValue) ? null : String(colValue)
+      const colValueString = A.isNil(colValue) ? null : String(colValue)
       const value = Expression.newLiteral(colValueString)
 
       const condition = Expression.newBinary({

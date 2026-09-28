@@ -1,4 +1,10 @@
 export default {
+  aiDataQueryDescriptionMissing: 'Describa en lenguaje natural los datos que desea ver.',
+  aiDataQueryEmpty: 'Primero seleccione una entidad y algunos atributos (o dimensiones y medidas).',
+  aiDataQueryInvalid: 'La IA no pudo generar una consulta válida para esta solicitud: {{errors}}',
+  aiDataQueryNoEntities: 'Esta encuesta no tiene entidades que se puedan consultar.',
+  aiDataQuerySummaryInvalid:
+    'La IA no pudo sugerir un nombre y una descripción para esta consulta. Inténtelo de nuevo.',
   cannotGetChild: "No se puede obtener el hijo '{{childName}}' del atributo {{name}}",
   cannotImportFilesExceedingQuota:
     'No se pueden importar archivos de registro: se excedería la cuota de almacenamiento de archivos',
@@ -23,6 +29,8 @@ export default {
     noRecordsFound: 'No se encontraron registros en el archivo de importación o formato de archivo incorrecto',
     pendingImportFileNotFoundOrExpired:
       'No se puede encontrar el archivo subido anteriormente; puede haber expirado. Por favor, súbalo de nuevo.',
+    recordMergeWithSameKeysNotAllowed:
+      'No se puede importar el registro "{{recordKeyValues}}": ya existe otro registro con las mismas claves y la fusión de registros con las mismas claves no está permitida en esta encuesta',
     recordOwnedByAnotherUser:
       'No se puede actualizar el registro "{{recordKeyValues}}" porque pertenece a otro usuario',
   },
@@ -52,6 +60,12 @@ export default {
     entityNotFound: 'Entidad "{{entityName}}" con claves "{{keyValues}}" no encontrada',
     updateSelfAndDependentsDefaultValues:
       'Error al actualizar el registro; error al evaluar la expresión en el nodo {{nodeDefName}}: {{details}}',
+  },
+  recordPrintableExport: {
+    missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeUuid',
+    entityNotFound: 'Entidad no encontrada para la exportación especificada',
+    missingServerUrl: 'Se requiere la URL pública del servidor al exportar con un código QR',
+    qrTokenMismatch: 'No se pudo finalizar la exportación con código QR; inténtelo de nuevo',
   },
   sessionExpiredRefreshPage: 'La sesión podría haber caducado.\nIntente actualizar la página.',
   survey: {

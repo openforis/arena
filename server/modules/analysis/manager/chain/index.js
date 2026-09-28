@@ -1,7 +1,5 @@
 import { ChainFactory } from '@openforis/arena-core'
 
-import * as R from 'ramda'
-
 import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
@@ -18,11 +16,13 @@ import { TableChain } from '@common/model/db'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ChainValidator from '@common/analysis/chainValidator'
 
+import * as DbUtils from '@server/db/dbUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as ChainMauFileService from '@server/modules/analysis/service/chainMauFile'
 
 import * as DB from '@server/db'
 import UnauthorizedError from '@server/utils/unauthorizedError'
@@ -68,26 +68,31 @@ export const updateChainValidation = async ({ surveyId, chainUuid, validation },
 
 export const updateChainStatusExec = async ({ user, surveyId, chainUuid, statusExec }) =>
   DB.client.tx(async (tx) => {
-    const promises = [
-      ChainRepository.updateChain(
-        { surveyId, chainUuid, fields: { [TableChain.columnSet.statusExec]: statusExec }, dateExecuted: true },
-        tx
-      ),
+    const queryFns = [
+      () =>
+        ChainRepository.updateChain(
+          { surveyId, chainUuid, fields: { [TableChain.columnSet.statusExec]: statusExec }, dateExecuted: true },
+          tx
+        ),
     ]
     if (statusExec === Chain.statusExec.success) {
       const type = ActivityLog.type.chainStatusExecSuccess
       const content = { [ActivityLog.keysContent.uuid]: chainUuid }
-      promises.push(ActivityLogRepository.insert(user, surveyId, type, content, false, tx))
+      queryFns.push(() => ActivityLogRepository.insert(user, surveyId, type, content, false, tx))
     }
 
-    return Promise.all(promises)
+    return DbUtils.runQueries(tx, queryFns)
   })
+
+// ====== MIGRATION
+
+export { migrateSamplingDesignPhaseProps } from './chainSamplingDesignMigration'
 
 const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
   const chainUuid = Chain.getUuid(chain)
   const propsToUpdate = Chain.getPropsDiff(chain)(chainDb)
   // activity log for each updated prop
-  const promises = Object.entries(propsToUpdate).map(([key, value]) => {
+  const queryFns = Object.entries(propsToUpdate).map(([key, value]) => () => {
     const content = { [ActivityLog.keysContent.uuid]: chainUuid, key, value }
     const type = ActivityLog.type.chainPropUpdate
     return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
@@ -98,9 +103,9 @@ const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
     [TableChain.columnSet.validation]: Chain.getValidation(chain),
   }
   const params = { surveyId, chainUuid, dateModified: true, fields }
-  promises.push(ChainRepository.updateChain(params, client))
+  queryFns.push(() => ChainRepository.updateChain(params, client))
 
-  return Promise.all(promises)
+  return DbUtils.runQueries(client, queryFns)
 }
 
 // ====== PERSIST
@@ -131,6 +136,8 @@ export const _deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cl
 
   await NodeDefService.markNodeDefsDeleted({ user, surveyId, nodeDefUuids: nodeDefsUuidsInDeleteChains }, client)
 
+  await ChainMauFileService.deleteChainMauFile({ surveyId, chainUuid: deletedChainUuid }, client)
+
   return deletedChain
 }
 
@@ -142,9 +149,9 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
       [ActivityLog.keysContent.uuid]: chainUuid,
       [ActivityLog.keysContent.labels]: Chain.getLabels(deletedChain),
     }
-    return tx.batch([
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainDelete, content, false, tx),
-      markSurveyDraft(surveyId, tx),
+    return DbUtils.runQueries(tx, [
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainDelete, content, false, tx),
+      () => markSurveyDraft(surveyId, tx),
     ])
   })
 
@@ -199,12 +206,16 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
       [ChainSamplingDesign.keysProps.postStratificationAttributeDefUuid]: remap(
         ChainSamplingDesign.getPostStratificationAttributeDefUuid(sourceSamplingDesign)
       ),
-      [ChainSamplingDesign.keysProps.firstPhaseCommonAttributeUuid]: remap(
-        ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(sourceSamplingDesign)
+      [ChainSamplingDesign.keysProps.phase2JoinEntityUuid]: remap(
+        ChainSamplingDesign.getPhase2JoinEntityUuid(sourceSamplingDesign)
       ),
-      // Category UUIDs are survey-specific and cannot be remapped; clear them
-      [ChainSamplingDesign.keysProps.firstPhaseCategoryUuid]: undefined,
-      [ChainSamplingDesign.keysProps.firstPhaseCategoryExtraProp]: undefined,
+      [ChainSamplingDesign.keysProps.phase2JoinAttribute]: remap(
+        ChainSamplingDesign.getPhase2JoinAttribute(sourceSamplingDesign)
+      ),
+      // Category UUIDs are survey-specific and cannot be remapped; clear them, and the join
+      // attribute that only makes sense in the context of that category
+      [ChainSamplingDesign.keysProps.phase1CategoryUuid]: undefined,
+      [ChainSamplingDesign.keysProps.phase1JoinAttribute]: undefined,
       [ChainSamplingDesign.keysProps.reportingDataCategoryUuid]: undefined,
       [ChainSamplingDesign.keysProps.reportingDataAttributeDefsByLevelUuid]: undefined,
     }).filter(([, v]) => v !== undefined)
@@ -403,7 +414,7 @@ export const cloneChainFromSurvey = async (
         ignoreApplicability: false,
         ignoreValidations: false,
       })(nd)
-      return R.assocPath([NodeDef.keys.propsAdvanced, NodeDef.keysPropsAdvanced.chainUuid], newChainUuid)(cloned)
+      return A.assocPath([NodeDef.keys.propsAdvanced, NodeDef.keysPropsAdvanced.chainUuid], newChainUuid)(cloned)
     })
 
     // Resolve categories/taxonomies referenced by cloned code/taxon analysis attributes:
@@ -427,10 +438,10 @@ export const cloneChainFromSurvey = async (
       survey: updatedTargetSurvey,
     })
 
-    await tx.batch([
-      updateChainValidation({ surveyId, chainUuid: newChainUuid, validation }, tx),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, insertedChain, false, tx),
-      markSurveyDraft(surveyId, tx),
+    await DbUtils.runQueries(tx, [
+      () => updateChainValidation({ surveyId, chainUuid: newChainUuid, validation }, tx),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, insertedChain, false, tx),
+      () => markSurveyDraft(surveyId, tx),
     ])
 
     return Chain.assocValidation(validation)(insertedChain)

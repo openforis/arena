@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import axios from 'axios'
 
 import { Dates } from '@openforis/arena-core'
@@ -8,6 +8,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
+import { I18nState } from '@webapp/store/system'
 import { SurveyState } from '@webapp/store/survey'
 import { LoaderActions } from '@webapp/store/ui'
 
@@ -24,6 +25,7 @@ export const checkInRecord =
     } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`, {
       draft,
       timezoneOffset: Dates.getTimezoneOffset(),
+      lang: I18nState.getLang(),
     })
 
     if (!record) {
@@ -50,14 +52,14 @@ export const checkInRecord =
       const nodeDefActivePage =
         pageNodeDef && NodeDefLayout.hasPage(cycle)(pageNodeDef)
           ? pageNodeDef
-          : R.pipe(
-              R.map((ancestor) => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
-              R.find(NodeDefLayout.hasPage(cycle))
+          : A.pipe(
+              A.map((ancestor) => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
+              A.find(NodeDefLayout.hasPage(cycle))
             )(ancestors)
 
       // Getting the nodes associated to the nodeDef page
-      const formPageNodeIIdByNodeDefUuid = R.reduce(
-        (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getIId(ancestor), acc),
+      const formPageNodeIIdByNodeDefUuid = A.reduce(
+        (acc, ancestor) => A.assoc(Node.getNodeDefUuid(ancestor), Node.getIId(ancestor), acc),
         [],
         ancestors
       )
@@ -75,7 +77,7 @@ export const checkInRecord =
     }
 
     // Hide app loader on record edit
-    if (!R.isEmpty(Record.getNodes(record))) {
+    if (!A.isEmpty(Record.getNodes(record))) {
       dispatch(LoaderActions.hideLoader())
     }
   }

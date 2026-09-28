@@ -20,6 +20,7 @@ export default {
     includeFileAttributeDefs: 'Файлын шинж чанарын багануудыг оруулах',
     includeInternalUuids: 'Дотоод UUID-г оруулах',
     recordsModifiedAfter: 'Дараа нь өөрчилсөн бичлэгүүд',
+    recordsModifiedBefore: 'Өмнө нь өөрчилсөн бичлэгүүд',
   },
   optionsInfo: {
     expandCategoryItems:
@@ -35,6 +36,7 @@ export default {
     includeFileAttributeDefs: `файлын шинж чанарын багануудыг нэмнэ: файлын дотоод танигч (file_uuid) ба нэр (file_name)`,
     includeInternalUuids: 'дотоод танигч (UUID) -г "_uuid" төгсгөлтэй багануудад оруулна',
     recordsModifiedAfter: 'зөвхөн заасан огнооны дараа өөрчилсөн бичлэгүүдийн өгөгдлийг экспортлоно',
+    recordsModifiedBefore: 'зөвхөн заасан огнооны өмнө өөрчилсөн бичлэгүүдийн өгөгдлийг экспортлоно',
   },
   startExport: 'Экспортлохыг эхлүүлэх',
 }

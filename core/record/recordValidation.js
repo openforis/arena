@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
@@ -15,10 +15,10 @@ export const prefixValidationFieldChildrenCount = 'childrenCount_'
 // ===== UTILS
 export const getValidationChildrenCountKey = (nodeParentIId, nodeDefChildUuid) =>
   RecordValidations.getValidationChildrenCountKey({ nodeParentInternalId: nodeParentIId, nodeDefChildUuid })
-export const isValidationFieldKeyChildrenCount = R.startsWith(prefixValidationFieldChildrenCount)
+export const isValidationFieldKeyChildrenCount = A.startsWith(prefixValidationFieldChildrenCount)
 export const isValidationResultErrorCount = (validationResult) =>
   ValidationResult.getKey(validationResult).startsWith('record.nodes.count.')
-export const getValidationCountNodeDefUuid = (field) => R.pipe(R.split('_'), R.last)(field)
+export const getValidationCountNodeDefUuid = (field) => A.pipe(A.split('_'), A.last)(field)
 
 // ===== CREATE
 export const newValidationRecordDuplicate = ({

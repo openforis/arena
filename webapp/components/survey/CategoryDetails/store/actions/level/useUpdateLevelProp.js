@@ -37,7 +37,8 @@ export const useUpdateLevelProp = ({ setState }) => {
     dispatch(
       debounceAction(
         _putProp({ surveyId, categoryUuid, levelUuid, key, value, setState }),
-        `category_level_prop_update_${levelUuid}`
+        // one debounce per level prop (updating a prop would discard the pending update of another one)
+        `category_level_prop_update_${levelUuid}_${key}`
       )
     )
   }, [])

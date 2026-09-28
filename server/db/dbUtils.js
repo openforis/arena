@@ -1,6 +1,6 @@
-import * as R from 'ramda'
-import * as pgPromise from 'pg-promise'
-import * as _QueryStream from 'pg-query-stream'
+import * as A from '@core/arena'
+import pgPromise from 'pg-promise'
+import _QueryStream from 'pg-query-stream'
 
 import { Objects, Strings } from '@openforis/arena-core'
 
@@ -108,10 +108,10 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
  * @returns {string} Generated query string.
  */
 export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
-  const getColumnName = (col) => R.propOr(col, 'name', col)
+  const getColumnName = (col) => A.propOr(col, 'name', col)
 
   const idColumnName = getColumnName(idCol)
-  const idColCast = R.propOr('text', 'cast', idCol)
+  const idColCast = A.propOr('text', 'cast', idCol)
 
   const cols = [`?${idColumnName}`, ...updateCols]
 
@@ -224,10 +224,11 @@ export const vacuumTable = async ({ schema, table }, client = db) => client.quer
 export const fetchSchemaTablesSize = async ({ schema }, client = db) =>
   client.one(
     `SELECT 
-		SUM(pg_relation_size(pg_catalog.pg_class.oid)) as size
+		SUM(pg_total_relation_size(pg_catalog.pg_class.oid)) as size
     FROM pg_catalog.pg_class
       JOIN pg_catalog.pg_namespace ON relnamespace = pg_catalog.pg_namespace.oid
     WHERE pg_catalog.pg_namespace.nspname = $1
+      AND pg_catalog.pg_class.relkind IN ('r', 'm', 'p')
 `,
     [schema],
     (row) => Number(row.size)
@@ -257,3 +258,24 @@ export const createColumnSet = ({ pgp: pgpProp = pgp, columns, schema = null, ta
   )
 
 export const createBulkUpdateValues = ({ columnSet, values }) => pgp.helpers.values(values, columnSet)
+
+/**
+ * Runs the specified queries and returns their results (in the same order).
+ * Queries are run in parallel only when the client is the connection pool: in a task or a transaction they share
+ * the same connection, where queries cannot run concurrently (deprecated by pg, removed in pg@9), so they are run
+ * one after the other.
+ * @param {pgPromise.IDatabase|pgPromise.ITask} [client] - The db client (pool, task or transaction); when not specified,
+ * the queries are expected to use the connection pool.
+ * @param {Array<function(): Promise<object>>} queryFns - Functions running the queries.
+ * @returns {Promise<Array<object>>} - The results of the queries.
+ */
+export const runQueries = async (client, queryFns) => {
+  if (!client || client === db) {
+    return Promise.all(queryFns.map((queryFn) => queryFn()))
+  }
+  const results = []
+  for (const queryFn of queryFns) {
+    results.push(await queryFn())
+  }
+  return results
+}

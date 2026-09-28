@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
@@ -58,7 +58,7 @@ const NodeDefExpressionsProp = (props) => {
   const values = propExtractor ? propExtractor(nodeDef) : NodeDef.getPropAdvanced(propName, [])(nodeDef)
 
   // Radio logic (if enabled)
-  const valuesDefined = !R.isEmpty(values)
+  const valuesDefined = !A.isEmpty(values)
   const getSelectedRadioMode = useCallback(() => {
     if (determineRadioMode) {
       return determineRadioMode({ nodeDef, values, valuesDefined })

@@ -5,6 +5,7 @@ import * as A from '@core/arena'
 const keys = {
   dataType: 'dataType',
   index: 'index',
+  locked: 'locked',
   name: 'name',
   uuid: 'uuid',
 }
@@ -15,15 +16,17 @@ const dataTypes = {
   text: 'text',
 }
 
-const newItem = ({ dataType, index = 0 }) => ({
+const newItem = ({ dataType, index = 0, locked = false }) => ({
   [keys.uuid]: UUIDs.v4(),
   [keys.dataType]: dataType,
   [keys.index]: index,
+  [keys.locked]: locked,
 })
 
 const getDataType = A.propOr(dataTypes.text, keys.dataType)
 const getIndex = A.propOr(0, keys.index)
 const getName = A.prop(keys.name)
+const isLocked = A.propOr(false, keys.locked)
 
 // UPDATE
 const assocIndex = A.assoc(keys.index)
@@ -50,6 +53,7 @@ export const ExtraPropDef = {
   getDataType,
   getIndex,
   getName,
+  isLocked,
   assocIndex,
   extraDefsToArray,
 }

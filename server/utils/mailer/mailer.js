@@ -1,3 +1,4 @@
+import { ArrayUtils } from '@core/arrayUtils'
 import * as ProcessUtils from '@core/processUtils'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 
@@ -38,8 +39,10 @@ if (typeof emailProvider.logTransportOptionsType === 'function') {
 emailProvider.validateEnv({ from })
 emailProvider.init?.()
 
-export const sendCustomEmail = async ({ to, subject, html, log = true }) => {
-  const recipientsCount = Array.isArray(to) ? to.length : 1
+export const sendCustomEmail = async ({ to = null, bcc = null, subject, html, log = true }) => {
+  const toRecipients = ArrayUtils.toArray(to)
+  const bccRecipients = ArrayUtils.toArray(bcc)
+  const recipientsCount = toRecipients.length + bccRecipients.length
   const subjectTruncationLength = 20
   let logMessageCommonPart = 'message'
   if (log) {
@@ -51,22 +54,29 @@ export const sendCustomEmail = async ({ to, subject, html, log = true }) => {
     logger.debug(`sending ${logMessageCommonPart}`)
   }
   try {
-    const result = await emailProvider.sendEmail({ to, from, subject, html })
+    const result = await emailProvider.sendEmail({ to, bcc, from, subject, html })
     if (log) {
       logger.debug(`sent ${logMessageCommonPart}`)
     }
-    return result ?? { accepted: Array.isArray(to) ? to : [to], rejected: [] }
+    return result ?? { accepted: [...toRecipients, ...bccRecipients], rejected: [] }
   } catch (error) {
     logger.error(`error sending ${logMessageCommonPart}: ${error.message}`)
     throw error
   }
 }
 
-export const sendEmail = async ({ to, msgKey, msgParams = {}, i18n: i18nParam = null, lang = 'en' }) => {
+export const sendEmail = async ({
+  to = null,
+  bcc = null,
+  msgKey,
+  msgParams = {},
+  i18n: i18nParam = null,
+  lang = 'en',
+}) => {
   const i18n = i18nParam ?? (await i18nFactory.createI18nAsync(lang))
 
   const subject = i18n.t(`${msgKey}.subject`, msgParams)
   const html = i18n.t(`${msgKey}.body`, msgParams)
 
-  return sendCustomEmail({ to, subject, html })
+  return sendCustomEmail({ to, bcc, subject, html })
 }

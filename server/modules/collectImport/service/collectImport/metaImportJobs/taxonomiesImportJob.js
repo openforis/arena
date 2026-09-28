@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -124,7 +124,7 @@ export default class TaxonomiesImportJob extends Job {
   }
 
   async onHeaders(headers) {
-    this.vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
+    this.vernacularLangCodes = A.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
     this.extraPropsDefs = headers.reduce((extraPropsAcc, header) => {
       if (!fixedColumns.includes(header) && !languageCodesISO639part2.includes(header)) {
         extraPropsAcc[header] = { key: header }
@@ -151,10 +151,10 @@ export default class TaxonomiesImportJob extends Job {
     this.rowById[id] = { id, parent_id: parentId, rank, scientific_name: scientificName } // skip vernacular names in rows cache
 
     if (this.validateRow(speciesFileName, row)) {
-      const genus = R.pipe(R.split(' '), R.head)(scientificName)
+      const genus = A.pipe(A.split(' '), A.head)(scientificName)
       const family = this.extractFamily({ row })
 
-      const vernacularNames = R.reduce(
+      const vernacularNames = A.reduce(
         (accVernacularNames, lang) => {
           const vernacularNames = this.extractVernacularNames({ row, lang })
           const vernacularNamesObjects = vernacularNames.map((name) =>
@@ -263,6 +263,6 @@ export default class TaxonomiesImportJob extends Job {
     const vernacularNamesStr = row[lang] || ''
     const vernacularNames = vernacularNamesStr.split(VERNACULAR_NAMES_SEPARATOR_REGEX)
     const vernacularNamesTrimmed = vernacularNames.map((vernacularName) => StringUtils.trim(vernacularName))
-    return R.uniq(vernacularNamesTrimmed)
+    return A.uniq(vernacularNamesTrimmed)
   }
 }
