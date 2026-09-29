@@ -246,9 +246,11 @@ export default {
     },
     paginator: {
       firstPage: 'Эхний хуудас',
+      goToPage: 'Хуудас руу очих',
       itemsPerPage: 'Нэг хуудсанд ногдох элемент',
       lastPage: 'Сүүлийн хуудас',
       nextPage: 'Дараагийн хуудас',
+      page: 'Хуудас',
       previousPage: 'Өмнөх хуудас',
     },
     table: {

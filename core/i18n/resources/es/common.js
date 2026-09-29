@@ -232,9 +232,11 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     },
     paginator: {
       firstPage: 'Primera página',
+      goToPage: 'Ir a la página',
       itemsPerPage: 'Elementos por página',
       lastPage: 'Última página',
       nextPage: 'Página siguiente',
+      page: 'Página',
       previousPage: 'Página anterior',
     },
     table: {

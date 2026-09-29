@@ -253,9 +253,11 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     },
     paginator: {
       firstPage: 'Primeira página',
+      goToPage: 'Ir para a página',
       itemsPerPage: 'Itens por página',
       lastPage: 'Última página',
       nextPage: 'Próxima página',
+      page: 'Página',
       previousPage: 'Página anterior',
     },
     table: {
