@@ -37,6 +37,8 @@ const ItemDetails = (props) => {
   const itemExtraDefsArray = Category.getItemExtraDefsArray(category)
   const validation = Category.getItemValidation(item)(category)
   const { published: disabled } = item
+  const code = CategoryItem.getCode(item)
+  const label = CategoryItem.getLabel(lang, false)(item)
 
   const levelIndex = useMemo(() => CategoryLevel.getIndex(level), [level])
   const levelIsLast = levelIndex === Category.getLevelsArray(category).length - 1
@@ -189,11 +191,12 @@ const ItemDetails = (props) => {
         </>
       ) : (
         <>
-          <div className="ellipsis">{CategoryItem.getCode(item)}</div>
+          <div className="category__item-index">#{index + 1}</div>
+          <div className={classNames('ellipsis', 'category__item-code', { empty: !code })}>{code || '---'}</div>
           <div>
             {'\u00A0'}-{'\u00A0'}
           </div>
-          <div className="ellipsis">{CategoryItem.getLabel(lang, false)(item)}</div>
+          <div className={classNames('ellipsis', { empty: !label })}>{label || '---'}</div>
         </>
       )}
     </div>
