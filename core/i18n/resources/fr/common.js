@@ -253,9 +253,11 @@ Réessayer ?`,
     },
     paginator: {
       firstPage: 'Première page',
+      goToPage: 'Aller à la page',
       itemsPerPage: 'Éléments par page',
       lastPage: 'Dernière page',
       nextPage: 'Page suivante',
+      page: 'Page',
       previousPage: 'Page précédente',
     },
     table: {
