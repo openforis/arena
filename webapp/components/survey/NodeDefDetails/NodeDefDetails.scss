@@ -13,7 +13,7 @@
     z-index: $zIndex10TopOfApp;
   }
 
-  &.read-only .node-def-edit__fields > * {
+  &.read-only .node-def-edit__fields>* {
     opacity: 0.8;
   }
 
@@ -70,7 +70,7 @@
       width: 80%;
     }
 
-    .validation-tooltip__default-values > fieldset.node-def-edit__expressions-fieldset {
+    .validation-tooltip__default-values>fieldset.node-def-edit__expressions-fieldset {
       width: 100%;
     }
 
@@ -151,8 +151,13 @@
   .node-def-unit-input {
     width: 10rem;
   }
+
   .node-def-decimal-digits-input {
     width: 3rem;
+  }
+
+  .node-def-print-orientation-dropdown {
+    width: 16rem;
   }
 }
 
