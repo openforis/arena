@@ -155,9 +155,8 @@ In Arena Mobile:
     scope: 'Content',
     scopes: {
       full: 'Full survey',
-      currentPage: 'Current page only',
+      currentPage: 'Current page only ({{entityLabel}})',
     },
-    currentPageHint: 'Current page: {{entityLabel}}',
     currentPageUnavailable:
       'Unable to determine the current page instance. Navigate to a specific page or export the full survey.',
     includeQrCode: 'Include QR code',

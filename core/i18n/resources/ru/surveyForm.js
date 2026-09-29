@@ -147,9 +147,8 @@ export default {
     scope: 'Содержимое',
     scopes: {
       full: 'Вся анкета',
-      currentPage: 'Только текущая страница',
+      currentPage: 'Только текущая страница ({{entityLabel}})',
     },
-    currentPageHint: 'Текущая страница: {{entityLabel}}',
     currentPageUnavailable:
       'Не удалось определить экземпляр текущей страницы. Перейдите на конкретную страницу или экспортируйте всю анкету.',
     includeQrCode: 'Включить QR-код',

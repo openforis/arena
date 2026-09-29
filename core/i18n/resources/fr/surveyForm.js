@@ -150,9 +150,8 @@ Dans Arena Mobile :
     scope: 'Contenu',
     scopes: {
       full: 'Formulaire complet',
-      currentPage: 'Page actuelle uniquement',
+      currentPage: 'Page actuelle uniquement ({{entityLabel}})',
     },
-    currentPageHint: 'Page actuelle : {{entityLabel}}',
     currentPageUnavailable:
       "Impossible de déterminer l'instance de la page actuelle. Naviguez vers une page spécifique ou exportez le formulaire complet.",
     includeQrCode: 'Inclure un code QR',

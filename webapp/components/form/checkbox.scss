@@ -14,6 +14,11 @@
     }
   }
 
+  &.align-with-labelled-controls .MuiButtonBase-root {
+    // same negative margin MUI applies to labelled controls (FormControlLabel)
+    margin-left: -11px;
+  }
+
   .info-icon-btn {
     padding: 0 0.5rem;
   }

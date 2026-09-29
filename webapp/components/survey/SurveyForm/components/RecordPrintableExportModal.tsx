@@ -140,26 +140,16 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
                 {
                   key: PrintableExportScopes.currentPage,
                   label: 'surveyForm:printableExport.scopes.currentPage',
+                  labelParams: { entityLabel },
                 },
               ]}
             />
-            {exportScope === PrintableExportScopes.currentPage && (
-              <Box sx={{ mt: 1, typography: 'body2', color: 'text.secondary' }}>
-                {i18n.t('surveyForm:printableExport.currentPageHint', { entityLabel })}
-              </Box>
-            )}
             {showCurrentPageUnavailable && (
               <Box sx={{ mt: 1, typography: 'body2', color: 'error.main' }}>
                 {i18n.t('surveyForm:printableExport.currentPageUnavailable')}
               </Box>
             )}
           </FormItem>
-          <Checkbox
-            checked={includeQrCode}
-            onChange={(checked: boolean) => setIncludeQrCode(checked)}
-            label="surveyForm:printableExport.includeQrCode"
-            info="surveyForm:printableExport.includeQrCodeInfo"
-          />
           <FormItem label="surveyForm:printableExport.orientation">
             <RadioButtonGroup
               row
@@ -177,6 +167,16 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
               ]}
             />
           </FormItem>
+          <FormItem
+            label="surveyForm:printableExport.includeQrCode"
+            info="surveyForm:printableExport.includeQrCodeInfo"
+          >
+            <Checkbox
+              checked={includeQrCode}
+              onChange={(checked: boolean) => setIncludeQrCode(checked)}
+              alignWithLabelledControls
+            />
+          </FormItem>
         </Box>
       </ModalBody>
       <ModalFooter>
@@ -186,6 +186,7 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
           href={href}
           label="surveyForm:printableExport.download"
           onClick={onClose}
+          variant="contained"
         />
       </ModalFooter>
     </Modal>

@@ -150,9 +150,8 @@ En Arena Mobile:
     scope: 'Contenido',
     scopes: {
       full: 'Encuesta completa',
-      currentPage: 'Solo página actual',
+      currentPage: 'Solo página actual ({{entityLabel}})',
     },
-    currentPageHint: 'Página actual: {{entityLabel}}',
     currentPageUnavailable:
       'No se puede determinar la instancia de la página actual. Navegue a una página específica o exporte la encuesta completa.',
     includeQrCode: 'Incluir código QR',

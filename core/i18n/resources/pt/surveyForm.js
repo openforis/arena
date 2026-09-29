@@ -150,9 +150,8 @@ No Arena Mobile:
     scope: 'Conteúdo',
     scopes: {
       full: 'Pesquisa completa',
-      currentPage: 'Somente página atual',
+      currentPage: 'Somente página atual ({{entityLabel}})',
     },
-    currentPageHint: 'Página atual: {{entityLabel}}',
     currentPageUnavailable:
       'Não foi possível determinar a instância da página atual. Navegue até uma página específica ou exporte a pesquisa completa.',
     includeQrCode: 'Incluir código QR',
