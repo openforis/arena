@@ -21,7 +21,7 @@ const keys = {
   nodeDefUuid: 'nodeDefUuid', // Current node def (if view mode is "allNodeDefs")
   nodeDefUuidPage: 'nodeDefUuidPage', // Current page nodeDef
   nodeDefUuidAddChildTo: 'nodeDefUuidAddChildTo', // NodeDef (entity) selected to add children to
-  nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // Map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
+  nodeDefUuidPageNodeIId: 'nodeDefUuidPageNodeIId', // Map of nodeDefUuid -> nodeIId representing the node loaded in page nodeDefUuid
   showPageNavigation: 'showPageNavigation',
   expandedPageNavigation: 'expandedPageNavigation',
   nodeDefLabelType: 'nodeDefLabelType', // NodeDef label function
@@ -68,25 +68,25 @@ export const getNodeDefAddChildTo = (state) => {
   return Survey.getNodeDefByUuid(nodeDefUuidAddChildTo)(survey)
 }
 
-// ====== nodeDefUuidPageNodeUuid
+// ====== nodeDefUuidPageNodeIId
 
-export const assocFormPageNode = (nodeDefUuid, nodeUuid) => {
-  const path = [keys.nodeDefUuidPageNodeUuid, nodeDefUuid]
-  return nodeUuid ? A.assocPath(path, nodeUuid) : A.dissocPath(path)
+export const assocFormPageNode = (nodeDefUuid, nodeIId) => {
+  const path = [keys.nodeDefUuidPageNodeIId, nodeDefUuid]
+  return nodeIId ? A.assocPath(path, nodeIId) : A.dissocPath(path)
 }
 
-export const assocFormPageNodes = (formPageNodeUuidByNodeDefUuid) => (state) =>
+export const assocFormPageNodes = (formPageNodeIIdByNodeDefUuid) => (state) =>
   A.pipe(
     A.keys,
     A.reduce((stateAcc, nodeDefUuid) => {
-      const nodeUuid = A.prop(nodeDefUuid, formPageNodeUuidByNodeDefUuid)
-      return assocFormPageNode(nodeDefUuid, nodeUuid)(stateAcc)
+      const nodeIId = A.prop(nodeDefUuid, formPageNodeIIdByNodeDefUuid)
+      return assocFormPageNode(nodeDefUuid, nodeIId)(stateAcc)
     }, state)
-  )(formPageNodeUuidByNodeDefUuid)
+  )(formPageNodeIIdByNodeDefUuid)
 
-export const getPagesUuidMap = getStateProp(keys.nodeDefUuidPageNodeUuid, {})
+export const getPagesIIdMap = getStateProp(keys.nodeDefUuidPageNodeIId, {})
 
-export const getFormPageNodeUuid = (nodeDef) => A.pipe(getPagesUuidMap, A.prop(NodeDef.getUuid(nodeDef)))
+export const getFormPageNodeIId = (nodeDef) => A.pipe(getPagesIIdMap, A.prop(NodeDef.getUuid(nodeDef)))
 
 export const getFormPageParentNode = (nodeDef) => (state) => {
   const survey = SurveyState.getSurvey(state)
@@ -100,14 +100,14 @@ export const getFormPageParentNode = (nodeDef) => (state) => {
       return Record.getRootNode(record)
     }
 
-    const parentNodeUuid = getFormPageNodeUuid(nodeDefParent)(state)
-    if (parentNodeUuid) {
-      const mappedParent = Record.getNodeByUuid(parentNodeUuid)(record)
+    const parentNodeIId = getFormPageNodeIId(nodeDefParent)(state)
+    if (parentNodeIId) {
+      const mappedParent = Record.getNodeByInternalId(parentNodeIId)(record)
       if (mappedParent) return mappedParent
     }
 
     // Fallback only for single parents: using [0] on a multiple entity would
-    // bind the form to an arbitrary instance. Multiples must be in pagesUuidMap.
+    // bind the form to an arbitrary instance. Multiples must be in the pages internal-id map.
     if (NodeDef.isMultiple(nodeDefParent)) return null
 
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDefParent))(record)

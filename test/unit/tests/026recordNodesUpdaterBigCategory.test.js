@@ -68,7 +68,7 @@ describe('RecordNodesUpdater - big category relevancy', () => {
     expect(Survey.getCategoryItemByUuid(item.uuid)(survey)).toBeUndefined()
 
     const catCodeNode = RecordUtils.findNodeByPath('root/cat_code')(survey, record)
-    const nodes = { [Node.getUuid(catCodeNode)]: catCodeNode }
+    const nodes = { [Node.getIId(catCodeNode)]: catCodeNode }
 
     const { record: recordUpdated } = await afterNodesUpdate({
       survey,
@@ -100,7 +100,7 @@ describe('RecordNodesUpdater - big category relevancy', () => {
     ).build()
 
     const catCodeNode = RecordUtils.findNodeByPath('root/cat_code')(survey, record)
-    const nodes = { [Node.getUuid(catCodeNode)]: catCodeNode }
+    const nodes = { [Node.getIId(catCodeNode)]: catCodeNode }
 
     const { record: recordUpdated } = await afterNodesUpdate({
       survey,

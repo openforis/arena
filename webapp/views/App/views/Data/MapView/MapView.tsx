@@ -114,7 +114,7 @@ const getSamplingPointDataLevels = (survey: any): any[] => {
 
 type MapWrapperState = {
   editingRecordUuid: string | null
-  editingParentNodeUuid: string | null
+  editingParentNodeIId: number | null
   lastRecordEditModalState: unknown
 }
 
@@ -127,10 +127,10 @@ const MapWrapper = () => {
 
   const [state, setState] = useState<MapWrapperState>({
     editingRecordUuid: null,
-    editingParentNodeUuid: null,
+    editingParentNodeIId: null,
     lastRecordEditModalState: null,
   })
-  const { editingRecordUuid, editingParentNodeUuid, lastRecordEditModalState } = state
+  const { editingRecordUuid, editingParentNodeIId, lastRecordEditModalState } = state
 
   const geoAttributeDefs = useMemo(
     () =>
@@ -149,17 +149,17 @@ const MapWrapper = () => {
     samplingPointDataLevels.length + geoAttributeDefs.length + preloadedLayerSummaries.length
   )
 
-  const onRecordEditClick = useCallback((params?: { recordUuid?: string; parentUuid?: string }) => {
-    const { recordUuid, parentUuid } = params ?? {}
+  const onRecordEditClick = useCallback((params?: { recordUuid?: string; parentIId?: number }) => {
+    const { recordUuid, parentIId } = params ?? {}
     setState((statePrev) => ({
       ...statePrev,
       editingRecordUuid: recordUuid ?? null,
-      editingParentNodeUuid: parentUuid ?? null,
+      editingParentNodeIId: parentIId ?? null,
     }))
   }, [])
 
   const closeRecordEditor = useCallback(() => {
-    setState((statePrev) => ({ ...statePrev, editingRecordUuid: null, editingParentNodeUuid: null }))
+    setState((statePrev) => ({ ...statePrev, editingRecordUuid: null, editingParentNodeIId: null }))
   }, [])
 
   const onRecordEditorClose = useCallback(({ modalState: lastRecordEditModalState }: { modalState: unknown }) => {
@@ -245,7 +245,7 @@ const MapWrapper = () => {
           onClose={onRecordEditorClose}
           onRequestClose={closeRecordEditor}
           recordUuid={editingRecordUuid}
-          parentNodeUuid={editingParentNodeUuid}
+          parentNodeIId={editingParentNodeIId}
         />
       )}
     </MapLayersPanelProvider>

@@ -12,14 +12,15 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
   const getNodeSelectQuery = (ancestorDef) =>
     NodeRepository.getNodeSelectQuery({
       surveyId,
-      ancestorDef,
       includeRefData: true,
+      includeRecordUuid: true,
       includeRecordInfo: true,
       includeSurveyUuid: false,
+      ancestorDef,
     })
 
   const nodesSelect = `${getNodeSelectQuery(nodeDefAncestorMultipleEntity)}
-    WHERE n.node_def_uuid = $/nodeDefUuid/
+    WHERE nd.uuid = $/nodeDefUuid/
     ORDER BY n.id`
 
   if (NodeDef.isAttribute(nodeDef)) {
@@ -41,9 +42,10 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
       LEFT OUTER JOIN
         (
           SELECT
-            c.ancestor_uuid,
+            c.record_uuid,
+            c.ancestor_i_id,
             json_object_agg(c.node_def_uuid::text, json_build_object(
-                '${Node.keys.uuid}', c.uuid,
+                '${Node.keys.iId}', c.i_id,
                 '${Node.keys.nodeDefUuid}', c.node_def_uuid,
                 '${Node.keys.value}', c.value,
                 '${NodeRefData.keys.refData}', c.ref_data
@@ -53,10 +55,11 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
             c.value IS NOT NULL
             ${nodeDefColumnsUuids.length > 0 ? 'AND c.node_def_uuid IN ($/nodeDefColumnsUuids:csv/)' : ''} 
           GROUP BY
-            c.ancestor_uuid
+            c.record_uuid, c.ancestor_i_id
         ) c
       ON
-        c.ancestor_uuid = n.uuid`
+        c.record_uuid = n.record_uuid 
+        AND c.ancestor_i_id = n.i_id`
 }
 
 export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, onProgress = null }, client) => {

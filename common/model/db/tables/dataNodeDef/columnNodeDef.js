@@ -10,6 +10,7 @@ import * as SQL from '../../sql'
 
 const { nodeDefType } = NodeDef
 
+const columnSuffixEntityIId = '_i_id'
 const columnSuffixCodeLabel = '_label'
 const columnSuffixFileUuid = '_file_uuid'
 const columnSuffixFileName = '_file_name'
@@ -69,7 +70,7 @@ const getColumnNames = (nodeDef) => {
     return colsSuffix.map((colSuffix) => `${nodeDefName}${colSuffix}`)
   }
   if (NodeDef.isEntity(nodeDef)) {
-    return [`${nodeDefName}_uuid`]
+    return [`${nodeDefName}${columnSuffixEntityIId}`]
   }
   return [nodeDefName]
 }

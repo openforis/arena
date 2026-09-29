@@ -42,17 +42,17 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
     this.dataImportFileReader = null
     this.flatDataReader = null
-    this.entitiesWithMultipleAttributesClearedByUuid = {} // used to clear multiple attribute values only once
+    this.entitiesWithMultipleAttributesClearedByIId = {} // used to clear multiple attribute values only once
     this.updatedFilesByUuid = {}
     this.updatedFilesByName = {}
     this.filesToDeleteByUuid = {}
-    this.entityUuidTouchedByRecordUuid = {}
+    this.entityIIdTouchedByRecordUuid = {}
     this.entitiesCreated = 0
     // nodes (by uuid) updated in the current record whose dependent nodes (and validation) have not been updated yet:
     // dependents are evaluated once per record (instead of once per updated attribute) to avoid quadratic processing time
     // when the survey has expressions depending on many nodes (e.g. aggregate functions on multiple entities);
     // the node objects are the same ones passed to the batch persisters (their ids are set when they are inserted)
-    this.nodesPendingDependentsUpdateByUuid = new Map()
+    this.nodesPendingDependentsUpdateByIId = new Map()
     // index of the entities by key values, used to find the entity of every row without comparing the keys of all its siblings
     // (valid only for the current record)
     this.entityKeysIndexCache = new Record.EntityKeysIndexCache()
@@ -117,7 +117,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         dataImportFileReader: this.dataImportFileReader,
         updatedFilesByUuid: this.updatedFilesByUuid,
         filesToDeleteByUuid: this.filesToDeleteByUuid,
-        entityUuidTouchedByRecordUuid: this.entityUuidTouchedByRecordUuid,
+        entityIIdTouchedByRecordUuid: this.entityIIdTouchedByRecordUuid,
       })
     }
   }
@@ -275,9 +275,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         entityKeysIndexCache: this.entityKeysIndexCache,
       })(this.currentRecord)
 
-      const entityUuid = Node.getUuid(entity)
+      const entityIId = Node.getIId(entity)
 
-      Objects.setInPath({ obj: this.entityUuidTouchedByRecordUuid, path: [recordUuid, entityUuid], value: true })
+      Objects.setInPath({ obj: this.entityIIdTouchedByRecordUuid, path: [recordUuid, entityIId], value: true })
 
       if (Node.isCreated(entity)) {
         this.entitiesCreated += 1
@@ -307,7 +307,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
       Object.values(nodesUpdated).forEach((node) => {
         if (!Node.isDeleted(node)) {
-          this.nodesPendingDependentsUpdateByUuid.set(Node.getUuid(node), node)
+          this.nodesPendingDependentsUpdateByIId.set(Node.getIId(node), node)
         }
       })
 
@@ -349,19 +349,19 @@ export default class FlatDataImportJob extends DataImportBaseJob {
    */
   async updatePendingDependents() {
     const { context, currentRecord } = this
-    const pendingNodesByUuid = this.nodesPendingDependentsUpdateByUuid
-    if (pendingNodesByUuid.size === 0) return
+    const pendingNodesByIId = this.nodesPendingDependentsUpdateByIId
+    if (pendingNodesByIId.size === 0) return
 
     const { survey, includeFiles, user } = context
 
     const nodesUpdated = {}
-    pendingNodesByUuid.forEach((_node, nodeUuid) => {
-      const node = Record.getNodeByUuid(nodeUuid)(currentRecord)
+    pendingNodesByIId.forEach((_node, nodeIId) => {
+      const node = Record.getNodeByInternalId(nodeIId)(currentRecord)
       if (node) {
-        nodesUpdated[nodeUuid] = node
+        nodesUpdated[nodeIId] = node
       }
     })
-    this.nodesPendingDependentsUpdateByUuid = new Map()
+    this.nodesPendingDependentsUpdateByIId = new Map()
 
     if (Object.keys(nodesUpdated).length === 0) return
 
@@ -387,7 +387,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     if (nodesWithoutId.length > 0) {
       await this.nodesInsertBatchPersister.flush()
       nodesWithoutId.forEach((node) => {
-        const nodeId = Node.getId(pendingNodesByUuid.get(Node.getUuid(node)))
+        const nodeId = Node.getId(pendingNodesByIId.get(Node.getIId(node)))
         if (nodeId) {
           node.id = nodeId
         }
@@ -420,8 +420,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     const multipleAttributeDefsBeingUpdated = Object.keys(valuesByDefUuid)
       .map((nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey))
       .filter(NodeDef.isMultipleAttribute)
-    const entityUuid = Node.getUuid(entity)
-    if (multipleAttributeDefsBeingUpdated.length > 0 && !this.entitiesWithMultipleAttributesClearedByUuid[entityUuid]) {
+    const entityIId = Node.getIId(entity)
+    if (multipleAttributeDefsBeingUpdated.length > 0 && !this.entitiesWithMultipleAttributesClearedByIId[entityIId]) {
       const nodeDefUuidsToClear = multipleAttributeDefsBeingUpdated.map(NodeDef.getUuid)
       const entityClearUpdateResult = await Record.deleteNodesInEntityByNodeDefUuid({
         survey,
@@ -431,7 +431,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       })(this.currentRecord)
 
       this.currentRecord = entityClearUpdateResult.record
-      this.entitiesWithMultipleAttributesClearedByUuid[entityUuid] = true
+      this.entitiesWithMultipleAttributesClearedByIId[entityIId] = true
 
       await this.persistUpdatedNodes({ nodesUpdated: entityClearUpdateResult.nodes })
     }
@@ -444,7 +444,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       if (NodeDef.isFile(nodeDef)) {
-        const oldNode = Record.getNodeByUuid(Node.getUuid(node))(originalRecord)
+        const oldNode = Record.getNodeByInternalId(Node.getIId(node))(originalRecord)
         if (!Node.isValueBlank(oldNode)) {
           const fileToDeleteUuid = Node.getFileUuid(oldNode)
           filesToDeleteByUuid[fileToDeleteUuid] = SurveyFile.createFileFromNode({ node: oldNode })

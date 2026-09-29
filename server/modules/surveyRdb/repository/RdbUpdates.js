@@ -39,21 +39,18 @@ export class RdbUpdates {
   }
 
   getAll() {
-    return (
-      Object.entries(this.updatesBySchemaTableAndType)
-        .sort(([keyA, tableUpdatesA], [keyB, tableUpdatesB]) => {
-          // execute updates in order, according to the type (1. delete, 2. insert, 3. update) and hierarchy level
-          const { type: typeA } = RdbUpdates.expandKey(keyA)
-          const { nodeDefHierarchyLevel: nodeDefHierarchyLevelA } = tableUpdatesA
-          const { type: typeB } = RdbUpdates.expandKey(keyB)
-          const { nodeDefHierarchyLevel: nodeDefHierarchyLevelB } = tableUpdatesB
-          return (
-            executionOrderByType[typeA] - executionOrderByType[typeB] || nodeDefHierarchyLevelA - nodeDefHierarchyLevelB
-          )
-        })
-        // eslint-disable-next-line no-unused-vars
-        .flatMap(([_key, updates]) => updates.getAll())
-    )
+    return Object.entries(this.updatesBySchemaTableAndType)
+      .sort(([keyA, tableUpdatesA], [keyB, tableUpdatesB]) => {
+        // execute updates in order, according to the type (1. delete, 2. insert, 3. update) and hierarchy level
+        const { type: typeA } = RdbUpdates.expandKey(keyA)
+        const { nodeDefHierarchyLevel: nodeDefHierarchyLevelA } = tableUpdatesA
+        const { type: typeB } = RdbUpdates.expandKey(keyB)
+        const { nodeDefHierarchyLevel: nodeDefHierarchyLevelB } = tableUpdatesB
+        return (
+          executionOrderByType[typeA] - executionOrderByType[typeB] || nodeDefHierarchyLevelA - nodeDefHierarchyLevelB
+        )
+      })
+      .flatMap(([_key, updates]) => updates.getAll())
   }
 
   merge(updates) {
@@ -82,25 +79,26 @@ export class RdbUpdatesForTable {
   constructor({ nodeDefUuid, nodeDefHierarchyLevel }) {
     this.nodeDefUuid = nodeDefUuid
     this.nodeDefHierarchyLevel = nodeDefHierarchyLevel
-    this.updatesByRowUuid = {}
+    this.updatesByRowKey = {}
   }
 
   get size() {
-    return Object.keys(this.updatesByRowUuid).length
+    return Object.keys(this.updatesByRowKey).length
   }
 
   getAll() {
-    return Object.values(this.updatesByRowUuid)
+    return Object.values(this.updatesByRowKey)
   }
 
   addUpdate(update) {
-    const { rowUuid } = update
-    const oldUpdate = this.updatesByRowUuid[rowUuid]
+    // node internal ids are unique only inside the same record (updates of different records can be batched together)
+    const { recordUuid, nodeIId } = update
+    const rowKey = `${recordUuid}_${nodeIId}`
+    const oldUpdate = this.updatesByRowKey[rowKey]
     if (oldUpdate) {
       this._mergeUpdates(oldUpdate, update)
-      this.updatesByRowUuid[rowUuid] = oldUpdate
     } else {
-      this.updatesByRowUuid[rowUuid] = update
+      this.updatesByRowKey[rowKey] = update
     }
   }
 

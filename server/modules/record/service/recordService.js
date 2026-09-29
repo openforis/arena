@@ -455,7 +455,7 @@ const _sendNodeUpdateMessage = async ({ socketId, user, recordUuid, msg }) => {
   thread.postMessage(msg, user)
 }
 
-export const { fetchNodeByUuid } = RecordManager
+export const { fetchNodeByIId } = RecordManager
 
 export const persistNode = async ({
   socketId,
@@ -482,7 +482,7 @@ export const persistNode = async ({
       size: file.size,
       content: fs.readFileSync(file.tempFilePath),
       recordUuid,
-      nodeUuid: Node.getUuid(node),
+      nodeIId: Node.getIId(node),
       type: SurveyFile.SurveyFileType.recordAttachment,
     })
     await SurveyFileService.insertFile(surveyId, fileObj)
@@ -505,7 +505,7 @@ export const persistNode = async ({
   })
 }
 
-export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset, lang }) =>
+export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeIId, timezoneOffset, lang }) =>
   _sendNodeUpdateMessage({
     socketId,
     user,
@@ -516,7 +516,7 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
       cycle,
       draft,
       recordUuid,
-      nodeUuid,
+      nodeIId,
       user,
       timezoneOffset,
       lang,
@@ -524,8 +524,8 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
   })
 
 // generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
-export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
-  const node = await fetchNodeByUuid(surveyId, nodeUuid)
+export const generateNodeFileNameForDownload = async ({ surveyId, nodeIId, file }) => {
+  const node = await fetchNodeByIId(surveyId, nodeIId)
   const record = await fetchRecordAndNodesByUuid({
     surveyId,
     recordUuid: Node.getRecordUuid(node),
@@ -681,12 +681,12 @@ export const mergeRecords = async (
     }
   })
 
-const assertCurrentPageEntity = ({ survey, record, entityDefUuid, entityNodeUuid }) => {
-  if (!entityDefUuid || !entityNodeUuid) {
+const assertCurrentPageEntity = ({ survey, record, entityDefUuid, entityNodeIId }) => {
+  if (!entityDefUuid || !entityNodeIId) {
     throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
   }
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const entityNode = Record.getNodeByUuid(entityNodeUuid)(record)
+  const entityNode = Record.getNodeByInternalId(entityNodeIId)(record)
   if (!entityDef || !NodeDef.isEntity(entityDef) || !entityNode || Node.getNodeDefUuid(entityNode) !== entityDefUuid) {
     throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
   }
@@ -697,7 +697,7 @@ const generateDocumentWithQrCode = async ({
   surveyId,
   recordUuid,
   entityDefUuid,
-  entityNodeUuid,
+  entityNodeIId,
   serverUrl,
   generatorOptions,
   generator,
@@ -710,7 +710,7 @@ const generateDocumentWithQrCode = async ({
   const existingShare = await ShareRepository.fetchBySurveyRecordEntityNode({
     surveyId,
     recordUuid,
-    entityNodeUuid,
+    entityNodeIId,
   })
   let accessToken = existingShare?.access_token ?? randomBytes(32).toString('base64url')
   let qrCodeImage
@@ -725,7 +725,7 @@ const generateDocumentWithQrCode = async ({
       surveyId,
       recordUuid,
       entityDefUuid,
-      entityNodeUuid,
+      entityNodeIId,
       pdfBuffer: pdfResult.buffer,
       accessToken,
     })
@@ -749,12 +749,12 @@ const exportRecordDocument = async ({
   contentType,
   exportScope = PrintableExportScopes.full,
   entityDefUuid,
-  entityNodeUuid,
+  entityNodeIId,
   orientation = PrintOrientations.portrait,
   includeQrCode = false,
   serverUrl = null,
 }) => {
-  if (includeQrCode && (exportScope !== PrintableExportScopes.currentPage || !entityDefUuid || !entityNodeUuid)) {
+  if (includeQrCode && (exportScope !== PrintableExportScopes.currentPage || !entityDefUuid || !entityNodeIId)) {
     throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
   }
 
@@ -770,7 +770,7 @@ const exportRecordDocument = async ({
 
   let entityDef = null
   if (exportScope === PrintableExportScopes.currentPage) {
-    entityDef = assertCurrentPageEntity({ survey, record, entityDefUuid, entityNodeUuid })
+    entityDef = assertCurrentPageEntity({ survey, record, entityDefUuid, entityNodeIId })
   }
 
   const rootNode = Record.getRootNode(record)
@@ -823,7 +823,7 @@ const exportRecordDocument = async ({
     readOnly: true,
     exportScope,
     entityDefUuid,
-    entityNodeUuid,
+    entityNodeIId,
     orientation,
   }
 
@@ -832,7 +832,7 @@ const exportRecordDocument = async ({
         surveyId,
         recordUuid,
         entityDefUuid,
-        entityNodeUuid,
+        entityNodeIId,
         serverUrl,
         generatorOptions,
         generator,
@@ -869,7 +869,7 @@ export const exportRecordDocx = ({
   lang = null,
   exportScope,
   entityDefUuid,
-  entityNodeUuid,
+  entityNodeIId,
   orientation,
   includeQrCode,
   serverUrl,
@@ -882,7 +882,7 @@ export const exportRecordDocx = ({
     lang,
     exportScope,
     entityDefUuid,
-    entityNodeUuid,
+    entityNodeIId,
     orientation,
     includeQrCode,
     serverUrl,
@@ -899,7 +899,7 @@ export const exportRecordPdf = ({
   lang = null,
   exportScope,
   entityDefUuid,
-  entityNodeUuid,
+  entityNodeIId,
   orientation,
   includeQrCode,
   serverUrl,
@@ -912,7 +912,7 @@ export const exportRecordPdf = ({
     lang,
     exportScope,
     entityDefUuid,
-    entityNodeUuid,
+    entityNodeIId,
     orientation,
     includeQrCode,
     serverUrl,

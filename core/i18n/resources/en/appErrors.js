@@ -14,6 +14,8 @@ export default {
     noRecordsMatchingSearchCriteria: 'No records matching search criteria',
   },
   dataImport: {
+    arenaMobileVersionNotSupported:
+      'This data was created with Arena Mobile version {{arenaMobileVersion}}, which is no longer supported; please update Arena Mobile to at least version {{minArenaMobileVersion}} and try again',
     importFromMobileNotAllawed: 'Data import from Arena Mobile not allowed',
     invalidNodeInRecord:
       'Invalid node in record "{{recordUuid}}", node "{{nodeUuid}}" with node definition "{{nodeDefName}}" (uuid "{{nodeDefUuid}}"): {{details}}',
@@ -51,7 +53,7 @@ export default {
       '$t(appErrors:record.errorUpdating); error evaluating expression in node {{nodeDefName}}: {{details}}',
   },
   recordPrintableExport: {
-    missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',
+    missingEntityParams: 'Current page export requires entityDefUuid and entityNodeIId',
     entityNotFound: 'Entity not found for the specified export',
     missingServerUrl: 'Public server URL is required when exporting with a QR code',
     qrTokenMismatch: 'Could not finalize QR code export; please retry',

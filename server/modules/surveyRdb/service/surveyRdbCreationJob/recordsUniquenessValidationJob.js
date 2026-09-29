@@ -14,14 +14,14 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 
 const recordValidationUpdateBatchSize = 1000
 
-const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
-  const validationNodeOld = Validation.getFieldValidation(nodeUuid)(validationRecord)
+const _updateNodeValidation = (validationRecord, nodeIId, validationNode) => {
+  const validationNodeOld = Validation.getFieldValidation(nodeIId)(validationRecord)
 
   // Merge new validation with node validation
   const nodeValidationUpdated = A.mergeDeepRight(validationNodeOld, validationNode)
 
   // Replace node validation in record validation
-  return A.pipe(Validation.setValid(false), Validation.setField(nodeUuid, nodeValidationUpdated))(validationRecord)
+  return A.pipe(Validation.setValid(false), Validation.setField(nodeIId, nodeValidationUpdated))(validationRecord)
 }
 
 export default class RecordsUniquenessValidationJob extends Job {
@@ -33,7 +33,8 @@ export default class RecordsUniquenessValidationJob extends Job {
   }
 
   async execute() {
-    const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId }, this.tx)
+    const { skipMigrationCheck } = this.context
+    const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, skipMigrationCheck }, this.tx)
     const cycleKeys = A.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
 
     this.total = A.length(cycleKeys) * 2
@@ -47,7 +48,13 @@ export default class RecordsUniquenessValidationJob extends Job {
   async validateRecordsUniquenessByCycle(cycle) {
     // 1. fetch survey and node defs
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      { surveyId: this.surveyId, cycle, draft: true, advanced: true },
+      {
+        surveyId: this.surveyId,
+        cycle,
+        draft: true,
+        advanced: true,
+        skipMigrationCheck: this.context.skipMigrationCheck,
+      },
       this.tx
     )
     this.incrementProcessedItems()
@@ -77,13 +84,13 @@ export default class RecordsUniquenessValidationJob extends Job {
         }
 
         // 2. for each duplicate node entity, update record validation
-        const { uuid: recordUuid, validation, node_duplicate_uuids: nodeDuplicateUuids } = rowRecordDuplicate
-        const nodeRootUuid = nodeDuplicateUuids[0]
+        const { uuid: recordUuid, validation, node_duplicate_iids: nodeDuplicateIIds } = rowRecordDuplicate
+        const nodeRootIId = nodeDuplicateIIds[0]
         const nodesKeyDuplicate = await RecordManager.fetchChildNodesByNodeDefUuids(
           this.surveyId,
           recordUuid,
-          nodeRootUuid,
-          nodeDefKeys.map((nd) => NodeDef.getUuid(nd)),
+          nodeRootIId,
+          nodeDefKeys.map(NodeDef.getUuid),
           this.tx
         )
         const validationRecord = this.validationByRecordUuid[recordUuid] || validation
@@ -91,7 +98,7 @@ export default class RecordsUniquenessValidationJob extends Job {
         const validationRecordUpdated = A.pipe(
           A.reduce(
             (validationRecordAccumulator, nodeKeyDuplicate) =>
-              _updateNodeValidation(validationRecordAccumulator, Node.getUuid(nodeKeyDuplicate), validationDuplicate),
+              _updateNodeValidation(validationRecordAccumulator, Node.getIId(nodeKeyDuplicate), validationDuplicate),
             validationRecord
           ),
           Validation.updateCounts

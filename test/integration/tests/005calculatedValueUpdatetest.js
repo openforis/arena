@@ -25,7 +25,7 @@ const updateNodeAndExpectDependentNodeValueToBe = async (
   const nodeSource = RecordUtils.findNodeByPath(sourcePath)(survey, record)
 
   const nodesUpdated = {
-    [Node.getUuid(nodeSource)]: Node.assocValue(sourceValue)(nodeSource),
+    [Node.getIId(nodeSource)]: Node.assocValue(sourceValue)(nodeSource),
   }
   const recordWithSourceUpdated = Record.mergeNodes(nodesUpdated)(record)
   global.applicableRecord = recordWithSourceUpdated

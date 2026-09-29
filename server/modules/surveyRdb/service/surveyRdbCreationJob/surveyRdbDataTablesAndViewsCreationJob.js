@@ -93,13 +93,21 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
 
   async fetchSurvey() {
     const { surveyId, tx } = this
-    const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
+    const { skipMigrationCheck } = this.context
+    const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true, skipMigrationCheck }, tx)
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
     const fetchDraft =
       (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
     return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      { surveyId, draft: fetchDraft, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
+      {
+        surveyId,
+        draft: fetchDraft,
+        advanced: true,
+        includeBigCategories: false,
+        includeBigTaxonomies: false,
+        skipMigrationCheck,
+      },
       tx
     )
   }

@@ -155,14 +155,14 @@ describe('RecordReader Test (entity keys index cache)', () => {
     const recordUpdated = updateResult.record
 
     expect(findPlot({ plotId: 99, entityKeysIndexCache, recordToSearch: recordUpdated })).toStrictEqual(
-      Record.getNodeByUuid(Node.getUuid(plotCreated))(recordUpdated)
+      Record.getNodeByInternalId(Node.getIId(plotCreated))(recordUpdated)
     )
     const { entity: plotFound } = await getOrCreatePlot({
       plotId: 99,
       entityKeysIndexCache,
       recordToUpdate: recordUpdated,
     })
-    expect(Node.getUuid(plotFound)).toEqual(Node.getUuid(plotCreated))
+    expect(Node.getIId(plotFound)).toEqual(Node.getIId(plotCreated))
   })
 
   it('Test cache is rebuilt when entities are added without using it', async () => {
@@ -174,8 +174,8 @@ describe('RecordReader Test (entity keys index cache)', () => {
     const { entity: plotCreated, updateResult } = await getOrCreatePlot({ plotId: 98, recordToUpdate: record })
     const recordUpdated = updateResult.record
 
-    expect(Node.getUuid(findPlot({ plotId: 98, entityKeysIndexCache, recordToSearch: recordUpdated }))).toEqual(
-      Node.getUuid(plotCreated)
+    expect(Node.getIId(findPlot({ plotId: 98, entityKeysIndexCache, recordToSearch: recordUpdated }))).toEqual(
+      Node.getIId(plotCreated)
     )
   })
 })

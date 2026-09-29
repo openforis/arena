@@ -41,22 +41,22 @@ import {
   requireRecordsMatchUserGroupQualifiers,
 } from './recordQualifierMiddleware'
 
-const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
-  const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
+const fetchRecordNodeFileAsStream = async ({ surveyId, recordUuid, nodeIId }) => {
+  const node = await RecordService.fetchNodeByIId(surveyId, recordUuid, nodeIId)
   const fileUuid = Node.getFileUuid(node)
   const file = fileUuid ? await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid) : null
   if (file) {
-    const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
+    const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeIId, file })
     const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary: file })
     if (!contentStream) {
       // the file is registered but its content is missing from the storage (e.g. deleted from the S3 bucket)
-      const error = new Error(`File content not found for node ${nodeUuid}`)
+      const error = new Error(`File content not found for node ${nodeIId}`)
       error.statusCode = 404
       throw error
     }
     return { fileName, file, contentStream }
   } else {
-    const error = new Error(`File not found for node ${nodeUuid}`)
+    const error = new Error(`File not found for node ${nodeIId}`)
     error.statusCode = 404
     throw error
   }
@@ -316,13 +316,13 @@ export const init = (app) => {
   })
 
   app.get(
-    '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
+    '/survey/:surveyId/record/:recordUuid/nodes/:nodeIId/file',
     requireRecordViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, nodeUuid } = Request.getParams(req)
+        const { surveyId, recordUuid, nodeIId } = Request.getParams(req)
 
-        const { fileName, file, contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
+        const { fileName, file, contentStream } = await fetchRecordNodeFileAsStream({ surveyId, recordUuid, nodeIId })
         setContentTypeFile({ res, fileName, fileSize: SurveyFile.getSize(file) })
         contentStream.pipe(res)
       } catch (error) {
@@ -332,13 +332,13 @@ export const init = (app) => {
   )
 
   app.get(
-    '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
+    '/survey/:surveyId/record/:recordUuid/nodes/:nodeIId/file-exif',
     requireRecordViewPermission,
     async (req, res, next) => {
       let tempFilePath
       try {
-        const { surveyId, nodeUuid } = Request.getParams(req)
-        const { contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
+        const { surveyId, recordUuid, nodeIId } = Request.getParams(req)
+        const { contentStream } = await fetchRecordNodeFileAsStream({ surveyId, recordUuid, nodeIId })
         ;({ tempFilePath } = await FileUtils.writeStreamToTempFile(contentStream))
         const info = await exifr.parse(tempFilePath)
         res.json(info)
@@ -447,7 +447,7 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record/:recordUuid/export/docx', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
+      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeIId, orientation, includeQrCode } =
         Request.getParams(req)
       const serverUrl = Request.getPublicServerUrl(req)
 
@@ -458,7 +458,7 @@ export const init = (app) => {
         lang,
         exportScope,
         entityDefUuid,
-        entityNodeUuid,
+        entityNodeIId: entityNodeIId ? Number(entityNodeIId) : undefined,
         orientation,
         includeQrCode: includeQrCode === true,
         serverUrl,
@@ -472,7 +472,7 @@ export const init = (app) => {
   app.get('/survey/:surveyId/record/:recordUuid/export/pdf', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
+      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeIId, orientation, includeQrCode } =
         Request.getParams(req)
       const serverUrl = Request.getPublicServerUrl(req)
 
@@ -483,7 +483,7 @@ export const init = (app) => {
         lang,
         exportScope,
         entityDefUuid,
-        entityNodeUuid,
+        entityNodeIId: entityNodeIId ? Number(entityNodeIId) : undefined,
         orientation,
         includeQrCode: includeQrCode === true,
         serverUrl,
@@ -660,12 +660,12 @@ export const init = (app) => {
   )
 
   app.delete(
-    '/survey/:surveyId/record/:recordUuid/node/:nodeUuid',
+    '/survey/:surveyId/record/:recordUuid/node/:nodeIId',
     requireRecordEditPermission,
     requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset, lang } = Request.getParams(req)
+        const { surveyId, cycle, draft, recordUuid, nodeIId, timezoneOffset, lang } = Request.getParams(req)
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
 
@@ -676,7 +676,7 @@ export const init = (app) => {
           cycle,
           draft,
           recordUuid,
-          nodeUuid,
+          nodeIId,
           timezoneOffset,
           lang,
         })

@@ -12,14 +12,14 @@ type KeyAttributeGetter = (entity: ArenaNode, keyDefUuid: string) => ArenaNode |
 type Entry = {
   keyDefs: KeyDef[]
   siblingsCount: number
-  entityUuidsByKey: Map<string, string[]>
+  entityIIdsByKey: Map<string, number[]>
   usable: boolean
 }
 
 type CompositeKey = { supported: boolean; key: string | null }
 
 const toEntryKey = ({ parentNode, childDefUuid }: { parentNode: ArenaNode; childDefUuid: string }): string =>
-  `${Node.getUuid(parentNode)}|${childDefUuid}`
+  `${Node.getIId(parentNode)}|${childDefUuid}`
 
 // key values are compared with record context (see RecordReader.findChildByKeyValues)
 const getCompositeKey = ({
@@ -78,7 +78,7 @@ export class EntityKeysIndexCache {
   }
 
   /**
-   * Finds the UUIDs of the sibling entities having the specified key values.
+   * Finds the internal IDs of the sibling entities having the specified key values.
    * The entities found must still be checked by the caller (the index can be outdated if key values have been modified).
    * @param params - The parameters.
    * @param params.parentNode - The parent entity of the entities to find.
@@ -87,10 +87,10 @@ export class EntityKeysIndexCache {
    * @param params.siblings - The current child entities of the parent node, with the specified definition.
    * @param params.getKeyAttribute - Function returning the key attribute of an entity, given its definition UUID.
    * @param params.keyValuesByDefUuid - The key values to search for, indexed by key attribute definition UUID.
-   * @returns The UUIDs of the entities with the specified key values,
+   * @returns The internal IDs of the entities with the specified key values,
    * or null if the index cannot be used (some key values are empty or their key cannot be determined).
    */
-  findEntityUuids({
+  findEntityIIds({
     parentNode,
     childDefUuid,
     keyDefs,
@@ -104,7 +104,7 @@ export class EntityKeysIndexCache {
     siblings: ArenaNode[]
     getKeyAttribute: KeyAttributeGetter
     keyValuesByDefUuid: Record<string, any>
-  }): string[] | null {
+  }): number[] | null {
     const { key: searchKey } = getCompositeKey({
       keyDefs,
       getKeyValue: (keyDef) => keyValuesByDefUuid[NodeDef.getUuid(keyDef)],
@@ -119,7 +119,7 @@ export class EntityKeysIndexCache {
     }
     if (!entry.usable) return null
 
-    return entry.entityUuidsByKey.get(searchKey) ?? []
+    return entry.entityIIdsByKey.get(searchKey) ?? []
   }
 
   /**
@@ -147,7 +147,7 @@ export class EntityKeysIndexCache {
     if (!supported) {
       entry.usable = false
     } else if (key !== null) {
-      this.addToIndex({ entry, key, entityUuid: Node.getUuid(entity) })
+      this.addToIndex({ entry, key, entityIId: Node.getIId(entity) })
     }
   }
 
@@ -160,28 +160,28 @@ export class EntityKeysIndexCache {
     siblings: ArenaNode[]
     getKeyAttribute: KeyAttributeGetter
   }): Entry {
-    const entry: Entry = { keyDefs, siblingsCount: siblings.length, entityUuidsByKey: new Map(), usable: true }
+    const entry: Entry = { keyDefs, siblingsCount: siblings.length, entityIIdsByKey: new Map(), usable: true }
     for (const sibling of siblings) {
       const { supported, key } = getEntityCompositeKey({ keyDefs, entity: sibling, getKeyAttribute })
       if (!supported) {
         // the key values of this sibling can be compared only using the record: the index cannot be used
         entry.usable = false
-        entry.entityUuidsByKey = new Map()
+        entry.entityIIdsByKey = new Map()
         return entry
       }
       if (key !== null) {
-        this.addToIndex({ entry, key, entityUuid: Node.getUuid(sibling) })
+        this.addToIndex({ entry, key, entityIId: Node.getIId(sibling) })
       }
     }
     return entry
   }
 
-  private addToIndex({ entry, key, entityUuid }: { entry: Entry; key: string; entityUuid: string }): void {
-    const entityUuids = entry.entityUuidsByKey.get(key)
-    if (entityUuids) {
-      entityUuids.push(entityUuid)
+  private addToIndex({ entry, key, entityIId }: { entry: Entry; key: string; entityIId: number }): void {
+    const entityIIds = entry.entityIIdsByKey.get(key)
+    if (entityIIds) {
+      entityIIds.push(entityIId)
     } else {
-      entry.entityUuidsByKey.set(key, [entityUuid])
+      entry.entityIIdsByKey.set(key, [entityIId])
     }
   }
 }

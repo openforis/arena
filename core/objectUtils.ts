@@ -11,9 +11,11 @@ export const keys = {
   draft: 'draft',
   extra: 'extra',
   id: 'id',
+  iId: 'iId',
   index: 'index',
   name: 'name',
   nodeDefUuid: 'nodeDefUuid',
+  pIId: 'pIId',
   parentUuid: 'parentUuid',
   props: 'props',
   propsDraft: 'propsDraft',
@@ -33,6 +35,7 @@ type ObjectType = Record<string, unknown> | object
 
 // ====== READ
 export const getId = A.prop(keys.id)
+export const getIId = A.prop(keys.iId)
 export const getUuid = (obj: any): string | null => A.propOr(null, keys.uuid)(obj)
 
 export const getProps = A.propOr({}, keys.props)
@@ -51,6 +54,7 @@ export const isPropTrue =
     !!getProp(prop)(obj)
 
 export const getParentUuid = A.propOr(null, keys.parentUuid)
+export const getParentInternalId = A.propOr(null, keys.pIId)
 
 export const getLabels = (obj: ObjectType): Record<string, string> =>
   getProp<Record<string, string>>(keysProps.labels, {})(obj)
@@ -165,6 +169,8 @@ export const toIndexedObj = (
   }, {})
 
 export const toUuidIndexedObj = A.partialRight(toIndexedObj, [keys.uuid])
+
+export const toIIdIndexedObj = A.partialRight(toIndexedObj, [keys.iId])
 
 export const groupByProps =
   (...propNamesOrExtractors: Array<string | ((item: any) => unknown)>) =>

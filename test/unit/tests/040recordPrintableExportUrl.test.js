@@ -14,13 +14,13 @@ describe('getRecordPrintableExportUrl', () => {
       format: PrintableExportFormats.pdf,
       exportScope: PrintableExportScopes.currentPage,
       entityDefUuid: 'def-1',
-      entityNodeUuid: 'node-1',
+      entityNodeIId: 12,
       orientation: PrintOrientations.landscape,
     })
     expect(url).toContain('/api/survey/1/record/rec-1/export/pdf?')
     expect(url).toContain(`exportScope=${PrintableExportScopes.currentPage}`)
     expect(url).toContain('entityDefUuid=def-1')
-    expect(url).toContain('entityNodeUuid=node-1')
+    expect(url).toContain('entityNodeIId=12')
     expect(url).toContain(`orientation=${PrintOrientations.landscape}`)
     expect(url).toContain('lang=en')
   })
@@ -47,7 +47,7 @@ describe('getRecordPrintableExportUrl', () => {
       format: PrintableExportFormats.pdf,
       exportScope: PrintableExportScopes.currentPage,
       entityDefUuid: 'def-1',
-      entityNodeUuid: 'node-1',
+      entityNodeIId: 12,
       orientation: PrintOrientations.portrait,
       includeQrCode: true,
     })

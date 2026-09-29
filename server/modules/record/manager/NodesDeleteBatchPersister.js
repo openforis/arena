@@ -9,11 +9,12 @@ export class NodesDeleteBatchPersister extends BatchPersister {
   constructor({ user, surveyId, tx }) {
     super(
       async (nodes) =>
-        RecordManager.deleteNodesByUuids(
+        RecordManager.deleteNodesByInternalIds(
           {
             user: this.user,
             surveyId: this.surveyId,
-            nodeUuids: nodes.map(Node.getUuid),
+            recordUuid: Node.getRecordUuid(nodes[0]), // all nodes belong to the same record
+            nodeInternalIds: nodes.map(Node.getIId),
             systemActivity: true,
           },
           this.tx

@@ -29,7 +29,7 @@ type SurveyFileSummary = {
     name?: string
     type?: string
     recordUuid?: string
-    nodeUuid?: string
+    nodeIId?: number
   }
   content?: Buffer | null
   dateCreated?: string
@@ -44,15 +44,8 @@ type SurveyFileServiceLike = {
     },
     client?: DbClient
   ) => Promise<unknown>
-  fetchFileContentAsBuffer: (params: {
-    surveyId: number
-    fileSummary: SurveyFileSummary
-  }) => Promise<Buffer | null>
-  fetchFileSummaryByUuid: (
-    surveyId: number,
-    fileUuid: string,
-    client?: DbClient
-  ) => Promise<SurveyFileSummary | null>
+  fetchFileContentAsBuffer: (params: { surveyId: number; fileSummary: SurveyFileSummary }) => Promise<Buffer | null>
+  fetchFileSummaryByUuid: (surveyId: number, fileUuid: string, client?: DbClient) => Promise<SurveyFileSummary | null>
   fetchFilesStatistics?: (params: { surveyId: number }) => Promise<{ availableSpace: number }>
   insertFile: (surveyId: number, file: SurveyFileSummary, client?: DbClient) => Promise<SurveyFileSummary>
 }
@@ -71,11 +64,11 @@ type ShareRepositoryLike = {
     client?: DbClient
   ) => Promise<RecordPrintableExportShareRow | null>
   fetchBySurveyRecordEntityNode: (
-    params: { surveyId: number; recordUuid: string; entityNodeUuid: string },
+    params: { surveyId: number; recordUuid: string; entityNodeIId: number },
     client?: DbClient
   ) => Promise<RecordPrintableExportShareRow | null>
   fetchBySurveyRecordEntityNodeForUpdate: (
-    params: { surveyId: number; recordUuid: string; entityNodeUuid: string },
+    params: { surveyId: number; recordUuid: string; entityNodeIId: number },
     client?: DbClient
   ) => Promise<RecordPrintableExportShareRow | null>
   incrementDownloadCount: (params: { uuid: string }, client?: DbClient) => Promise<unknown>
@@ -84,7 +77,7 @@ type ShareRepositoryLike = {
       surveyId: number
       recordUuid: string
       entityDefUuid: string
-      entityNodeUuid: string
+      entityNodeIId: number
       accessToken: string
       fileUuid: string
       contentType: string
@@ -112,26 +105,26 @@ type PersistShareParams = {
   surveyId: number
   recordUuid: string
   entityDefUuid: string
-  entityNodeUuid: string
+  entityNodeIId: number
   pdfBuffer: Buffer
   requestedAccessToken?: string | null
 }
 
 const createPdfFile = ({
   recordUuid,
-  entityNodeUuid,
+  entityNodeIId,
   pdfBuffer,
 }: {
   recordUuid: string
-  entityNodeUuid: string
+  entityNodeIId: number
   pdfBuffer: Buffer
 }): SurveyFileSummary =>
   SurveyFile.createFile({
-    name: `printable-export-${entityNodeUuid}.pdf`,
+    name: `printable-export-${entityNodeIId}.pdf`,
     size: Buffer.byteLength(pdfBuffer),
     content: pdfBuffer,
     recordUuid,
-    nodeUuid: entityNodeUuid,
+    nodeIId: entityNodeIId,
     type: SurveyFile.SurveyFileType.printableExportPdf,
   })
 
@@ -190,19 +183,19 @@ const assertQuotaAllowsInsert = async (
 }
 
 const persistShareWithPdf = async (
-  { surveyId, recordUuid, entityDefUuid, entityNodeUuid, pdfBuffer, requestedAccessToken }: PersistShareParams,
+  { surveyId, recordUuid, entityDefUuid, entityNodeIId, pdfBuffer, requestedAccessToken }: PersistShareParams,
   dependencies: ShareServiceDependencies
 ): Promise<{ accessToken: string; expiresAt: Date }> => {
   const { database, shareRepository, surveyFileService } = dependencies
   const expiresAt = newExpiresAt()
-  const stagedFile = createPdfFile({ recordUuid, entityNodeUuid, pdfBuffer })
+  const stagedFile = createPdfFile({ recordUuid, entityNodeIId, pdfBuffer })
   let replacedFileSummary: SurveyFileSummary | null = null
   let accessToken: string
 
   try {
     accessToken = await database.tx(async (tx) => {
       const existing = await shareRepository.fetchBySurveyRecordEntityNodeForUpdate(
-        { surveyId, recordUuid, entityNodeUuid },
+        { surveyId, recordUuid, entityNodeIId },
         tx
       )
 
@@ -231,7 +224,7 @@ const persistShareWithPdf = async (
           surveyId,
           recordUuid,
           entityDefUuid,
-          entityNodeUuid,
+          entityNodeIId,
           accessToken: accessTokenNew,
           fileUuid,
           contentType: CONTENT_TYPE_PDF,
@@ -279,14 +272,14 @@ export const createRecordPrintableExportShareService = ({
     surveyId,
     recordUuid,
     entityDefUuid,
-    entityNodeUuid,
+    entityNodeIId,
     pdfBuffer,
     accessToken: requestedAccessToken,
   }: {
     surveyId: number
     recordUuid: string
     entityDefUuid: string
-    entityNodeUuid: string
+    entityNodeIId: number
     pdfBuffer: Buffer
     accessToken?: string | null
   }) => {
@@ -294,7 +287,7 @@ export const createRecordPrintableExportShareService = ({
       surveyId,
       recordUuid,
       entityDefUuid,
-      entityNodeUuid,
+      entityNodeIId,
       pdfBuffer,
       requestedAccessToken,
     }
@@ -306,7 +299,7 @@ export const createRecordPrintableExportShareService = ({
         throw error
       }
 
-      const existing = await shareRepository.fetchBySurveyRecordEntityNode({ surveyId, recordUuid, entityNodeUuid })
+      const existing = await shareRepository.fetchBySurveyRecordEntityNode({ surveyId, recordUuid, entityNodeIId })
       if (!existing) {
         throw error
       }

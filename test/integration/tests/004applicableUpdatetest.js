@@ -55,7 +55,7 @@ describe('Applicable Test', () => {
     const nodeSource = RecordUtils.findNodeByPath('cluster/num')(survey, record)
     const nodeDependent = RecordUtils.findNodeByPath('cluster/dependent_node')(survey, record)
     const nodeDependentParent = Record.getParentNode(nodeDependent)(record)
-    const nodeDependentParentUuid = Node.getUuid(nodeDependentParent)
+    const nodeDependentParentIId = Node.getIId(nodeDependentParent)
     const nodeDependentDefUuid = Node.getNodeDefUuid(nodeDependent)
 
     // Test values, couples of expected values by input
@@ -72,7 +72,7 @@ describe('Applicable Test', () => {
 
       // Update source node value
       const nodesUpdated = {
-        [Node.getUuid(nodeSource)]: Node.assocValue(sourceValue)(nodeSource),
+        [Node.getIId(nodeSource)]: Node.assocValue(sourceValue)(nodeSource),
       }
 
       record = Record.mergeNodes(nodesUpdated)(record)
@@ -87,7 +87,7 @@ describe('Applicable Test', () => {
       record = recordUpdate
       global.applicableRecord = record
 
-      const nodeDependentParentUpdated = Record.getNodeByUuid(nodeDependentParentUuid)(record)
+      const nodeDependentParentUpdated = Record.getNodeByInternalId(nodeDependentParentIId)(record)
 
       const applicable = Node.isChildApplicable(nodeDependentDefUuid)(nodeDependentParentUpdated)
 

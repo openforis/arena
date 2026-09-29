@@ -65,7 +65,7 @@ const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
   return resolvePageEntity({
     survey: SurveyState.getSurvey(state),
     record,
-    pagesUuidMap: SurveyFormState.getPagesUuidMap(state),
+    pagesUuidMap: SurveyFormState.getPagesIIdMap(state),
     pageNodeDefUuid,
   })
 }
@@ -140,7 +140,7 @@ const evaluatePage = (
   state: unknown,
   { instanceScoped = false }: { instanceScoped?: boolean } = {}
 ): PageEvalResult => {
-  let scopeEntityUuid: string | undefined
+  let scopeEntityInternalId: number | undefined
 
   if (instanceScoped) {
     const survey = SurveyState.getSurvey(state)
@@ -152,13 +152,13 @@ const evaluatePage = (
       if (parentDef && NodeDef.isMultiple(parentDef)) {
         return EMPTY_PAGE_EVAL
       }
-      const pagesUuidMap = SurveyFormState.getPagesUuidMap(state)
+      const pagesUuidMap = SurveyFormState.getPagesIIdMap(state)
       if (hasUnresolvedMultipleAncestor(pageNodeDef, survey, pagesUuidMap)) {
         return EMPTY_PAGE_EVAL
       }
     }
 
-    scopeEntityUuid = entity?.uuid
+    scopeEntityInternalId = entity?.iId
   }
 
   const pageDescendants = descendantPageUuidsByPage[uuid] ?? []
@@ -166,7 +166,7 @@ const evaluatePage = (
     pageNodeDefUuid: uuid,
     descendantPageUuids: pageDescendants,
     record,
-    ...(scopeEntityUuid ? { scopeEntityUuid } : {}),
+    ...(scopeEntityInternalId ? { scopeEntityInternalId } : {}),
   })
   const hasCompletableContent = pageHasOwnCompletableAttributes(uuid, state)
   const percent = getPageCompletionPercent({ pageNodeDefUuid: uuid, ownOnly: true, state })
@@ -256,19 +256,19 @@ const getNonMultipleTreeItemStatus = (
 }
 
 /**
- * Resolves the ancestor entity UUID that scopes aggregation for a multiple page.
+ * Resolves the ancestor entity internal ID that scopes aggregation for a multiple page.
  *
  * @param pageNodeDef - Multiple page node def
  * @param state - Redux state
- * @returns Parent entity UUID, or null when the parent cannot be resolved
+ * @returns Parent entity internal ID, or null when the parent cannot be resolved
  */
-const getMultiplePageScopeEntityUuid = (pageNodeDef: object, state: unknown): string | null => {
+const getMultiplePageScopeEntityUuid = (pageNodeDef: object, state: unknown): number | null => {
   const record = RecordState.getRecord(state)
   if (!record) return null
   return resolveMultiplePageScopeEntityUuid({
     survey: SurveyState.getSurvey(state),
     record,
-    pagesUuidMap: SurveyFormState.getPagesUuidMap(state),
+    pagesUuidMap: SurveyFormState.getPagesIIdMap(state),
     pageNodeDef,
   })
 }
@@ -315,8 +315,8 @@ export const useRecordTreeItemStatus = ({
       const parentDefUuid = NodeDef.getParentUuid(pageNodeDef)
       // Nested under a parent page: require a resolved parent scope (selected Plot, etc.).
       // Top-level multiples under root still resolve the single root via getPageEntity.
-      const scopeEntityUuid = parentDefUuid ? getMultiplePageScopeEntityUuid(pageNodeDef, state) : null
-      if (parentDefUuid && !scopeEntityUuid) {
+      const scopeEntityInternalId = parentDefUuid ? getMultiplePageScopeEntityUuid(pageNodeDef, state) : null
+      if (parentDefUuid && !scopeEntityInternalId) {
         return EMPTY_STATUS
       }
 
@@ -325,7 +325,7 @@ export const useRecordTreeItemStatus = ({
         record,
         pageNodeDefUuid,
         cycle: RecordCore.getCycle(record),
-        ...(scopeEntityUuid ? { scopeEntityUuid } : {}),
+        ...(scopeEntityInternalId ? { scopeEntityInternalId } : {}),
       })
       return {
         hasErrors: status.hasErrors,

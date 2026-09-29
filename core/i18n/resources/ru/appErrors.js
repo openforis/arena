@@ -58,7 +58,7 @@ export default {
       'Ошибка обновления записи; ошибка при оценке выражения в узле {{nodeDefName}}: {{details}}',
   },
   recordPrintableExport: {
-    missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeUuid',
+    missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeIId',
     entityNotFound: 'Сущность не найдена для указанного экспорта',
     missingServerUrl: 'Для экспорта с QR-кодом требуется публичный URL сервера',
     qrTokenMismatch: 'Не удалось завершить экспорт с QR-кодом; повторите попытку',

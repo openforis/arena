@@ -51,7 +51,7 @@ export const fetchRecordAndNodesOnce = ({ surveyId, recordUuid }) => {
  * Records that have not been fetched (nothing cached for their uuid) are left untouched. Must be called
  * before the corresponding Redux nodesUpdate action is dispatched, so that components re-rendered by that
  * dispatch (they all subscribe to the ui/record Redux state) read the already-updated cached record.
- * @param {object} nodes - The updated/created nodes, indexed by uuid.
+ * @param {object} nodes - The updated/created nodes, indexed by internal ID.
  * @returns {void}
  */
 export const mergeNodesIntoFetchedRecordsCache = (nodes) => {
@@ -59,7 +59,7 @@ export const mergeNodesIntoFetchedRecordsCache = (nodes) => {
   Object.values(nodes).forEach((node) => {
     const recordUuid = Node.getRecordUuid(node)
     if (!resolvedRecordsByUuid[recordUuid]) return
-    nodesByRecordUuid[recordUuid] = { ...nodesByRecordUuid[recordUuid], [Node.getUuid(node)]: node }
+    nodesByRecordUuid[recordUuid] = { ...nodesByRecordUuid[recordUuid], [Node.getIId(node)]: node }
   })
   Object.entries(nodesByRecordUuid).forEach(([recordUuid, recordNodes]) => {
     resolvedRecordsByUuid[recordUuid] = Record.mergeNodes(recordNodes, { removeFlags: true })(

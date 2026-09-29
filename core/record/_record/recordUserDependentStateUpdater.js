@@ -69,7 +69,7 @@ const _recomputeDefaultValues = async ({ user, survey, record, nodeDefs }) => {
 
   const nodesToRecompute = nodeDefsToRecompute.reduce((acc, nodeDef) => {
     RecordReader.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record).forEach((node) => {
-      acc[Node.getUuid(node)] = node
+      acc[Node.getIId(node)] = node
     })
     return acc
   }, {})

@@ -62,7 +62,7 @@ export default {
       'Error al actualizar el registro; error al evaluar la expresión en el nodo {{nodeDefName}}: {{details}}',
   },
   recordPrintableExport: {
-    missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeUuid',
+    missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeIId',
     entityNotFound: 'Entidad no encontrada para la exportación especificada',
     missingServerUrl: 'Se requiere la URL pública del servidor al exportar con un código QR',
     qrTokenMismatch: 'No se pudo finalizar la exportación con código QR; inténtelo de nuevo',

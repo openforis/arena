@@ -103,7 +103,12 @@ describe('recordMatchesQualifierFilters', () => {
     const teamDef = Survey.getNodeDefByName('team')(survey)
     const record = RB.record(user, survey, RB.entity('plot', RB.attribute('team', 'north'))).build()
     const rootNode = Record.getRootNode(record)
-    const pendingNode = Node.newNode(NodeDef.getUuid(teamDef), Record.getUuid(record), rootNode, 'south')
+    const pendingNode = Node.newNode({
+      record,
+      nodeDefUuid: NodeDef.getUuid(teamDef),
+      parentNode: rootNode,
+      value: 'south',
+    })
 
     expect(
       recordMatchesQualifierFilters({
@@ -120,7 +125,12 @@ describe('recordMatchesQualifierFilters', () => {
     const teamDef = Survey.getNodeDefByName('team')(survey)
     const record = RB.record(user, survey, RB.entity('plot', RB.attribute('team', 'north'))).build()
     const rootNode = Record.getRootNode(record)
-    const pendingNode = Node.newNode(NodeDef.getUuid(teamDef), Record.getUuid(record), rootNode, null)
+    const pendingNode = Node.newNode({
+      record,
+      nodeDefUuid: NodeDef.getUuid(teamDef),
+      parentNode: rootNode,
+      value: null,
+    })
 
     expect(
       recordMatchesQualifierFilters({
@@ -137,7 +147,12 @@ describe('recordMatchesQualifierFilters', () => {
     const teamDef = Survey.getNodeDefByName('team')(survey)
     const record = RB.record(user, survey, RB.entity('plot')).build()
     const rootNode = Record.getRootNode(record)
-    const pendingNode = Node.newNode(NodeDef.getUuid(teamDef), Record.getUuid(record), rootNode, 'north')
+    const pendingNode = Node.newNode({
+      record,
+      nodeDefUuid: NodeDef.getUuid(teamDef),
+      parentNode: rootNode,
+      value: 'north',
+    })
 
     expect(
       recordMatchesQualifierFilters({
@@ -155,7 +170,12 @@ describe('recordMatchesQualifierFilters', () => {
     const statusDef = Survey.getNodeDefByName('status')(survey)
     const record = RB.record(user, survey, RB.entity('plot', RB.attribute('team', 'north'))).build()
     const rootNode = Record.getRootNode(record)
-    const pendingNode = Node.newNode(NodeDef.getUuid(statusDef), Record.getUuid(record), rootNode, null)
+    const pendingNode = Node.newNode({
+      record,
+      nodeDefUuid: NodeDef.getUuid(statusDef),
+      parentNode: rootNode,
+      value: null,
+    })
 
     expect(
       recordMatchesQualifierFilters({

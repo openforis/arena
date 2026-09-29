@@ -29,28 +29,28 @@ export default class EntitiesDeleteJob extends DataImportBaseJob {
 
   async deleteNotUpdatedEntities() {
     const { context, currentRecord } = this
-    const { entityUuidTouchedByRecordUuid, includeFiles, nodeDefUuid, survey, user } = context
+    const { entityIIdTouchedByRecordUuid, includeFiles, nodeDefUuid, survey, user } = context
 
     const recordUuid = Record.getUuid(currentRecord)
     const sideEffect = !includeFiles
     const nodes = Record.getNodesByDefUuid(nodeDefUuid)(currentRecord)
-    const nodeUuidsToDelete = []
-    for (const node of nodes) {
-      const nodeUuid = Node.getUuid(node)
-      if (!entityUuidTouchedByRecordUuid[recordUuid]?.[nodeUuid]) {
-        nodeUuidsToDelete.push(nodeUuid)
+    const nodeIIdsToDelete = nodes.reduce((acc, node) => {
+      const nodeIId = Node.getIId(node)
+      if (!entityIIdTouchedByRecordUuid[recordUuid]?.[nodeIId]) {
+        acc.push(nodeIId)
       }
-    }
-    if (nodeUuidsToDelete.length === 0) return null
+      return acc
+    }, [])
+    if (nodeIIdsToDelete.length === 0) return null
 
     const updateResult = await Record.deleteNodes({
       user,
       survey,
       record: currentRecord,
-      nodeUuids: nodeUuidsToDelete,
+      nodeInternalIds: nodeIIdsToDelete,
       sideEffect,
     })
-    this.entitiesDeleted += nodeUuidsToDelete.length
+    this.entitiesDeleted += nodeIIdsToDelete.length
 
     const { nodes: nodesUpdated } = updateResult
 

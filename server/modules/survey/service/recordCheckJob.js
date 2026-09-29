@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
+import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 
 import * as DbUtils from '@server/db/dbUtils'
@@ -369,6 +370,13 @@ export default class RecordCheckJob extends Job {
 
     // 6. validate nodes (also re-validate node defs whose validations alone changed, even though their
     // values were not recomputed above)
+    const newNodes = nodeDefAddedUuids.reduce((nodesByIId, nodeDefUuid) => {
+      const nodes = Record.getNodesByDefUuid(nodeDefUuid)(record)
+      return Object.assign(nodesByIId, ObjectUtils.toIIdIndexedObj(nodes))
+    }, {})
+
+    Object.assign(allUpdatedNodesByUuid, newNodes)
+
     const nodeDefToValidateUuidsUnique = new Set(A.concat(nodeDefAddedOrUpdatedUuids, nodeDefValidationUpdatedUuids))
     const nodeDefAddedOrUpdatedOrValidationUpdatedUuids = Array.from(nodeDefToValidateUuidsUnique)
     if (
@@ -445,7 +453,7 @@ const _insertMissingSingleNode = async ({ survey, childDef, record, parentNode, 
     return {}
   }
   // insert missing single node
-  const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
+  const childNode = Node.newNode({ record, nodeDefUuid: NodeDef.getUuid(childDef), parentNode })
   return RecordManager.insertNode(
     { user, survey, record, node: childNode, system: true, persistNodes: false, sideEffect },
     tx
@@ -459,7 +467,7 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
   for (const nodeDefUpdatedUuid of nodeDefUpdatedUuids) {
     const nodesToUpdatePartial = Record.getNodesByDefUuid(nodeDefUpdatedUuid)(record)
     for (const nodeUpdated of nodesToUpdatePartial) {
-      nodesToUpdate[Node.getUuid(nodeUpdated)] = nodeUpdated
+      nodesToUpdate[Node.getIId(nodeUpdated)] = nodeUpdated
     }
   }
 
@@ -491,7 +499,7 @@ const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx)
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
     for (const parentNode of parentNodes) {
-      nodesToValidate[Node.getUuid(parentNode)] = parentNode
+      nodesToValidate[Node.getIId(parentNode)] = parentNode
     }
   }
   // Record keys uniqueness must be validated after RDB generation

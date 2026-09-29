@@ -34,13 +34,14 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
       includeExtendedCols: true,
     })
 
+    const colSet = TableNode.columnSet
+
     // Adding '?' in front of a column name means it is only for a WHERE condition in this case the record_uuid
     const cols = [
-      `?${TableNode.columnSet.recordUuid}`,
-      `?${TableNode.columnSet.nodeDefUuid}`,
-      `?${TableNode.columnSet.parentUuid}`,
-
-      new Column({ name: TableNode.columnSet.value, cast: 'jsonb' }),
+      `?${colSet.recordUuid}`,
+      `?${colSet.nodeDefId}`,
+      `?${colSet.parentIId}`,
+      new Column({ name: colSet.value, cast: 'jsonb' }),
     ]
 
     const tableNode = new TableNode(survey)
@@ -50,10 +51,10 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
         schema: tableNode.schema,
         table: tableNode.name,
         cols,
-        where: ` WHERE 
-        t.${TableNode.columnSet.recordUuid}::uuid = v.${TableNode.columnSet.recordUuid}::uuid 
-        AND t.${TableNode.columnSet.nodeDefUuid}::uuid = v.${TableNode.columnSet.nodeDefUuid}::uuid
-        AND t.${TableNode.columnSet.parentUuid}::uuid = v.${TableNode.columnSet.parentUuid}::uuid `,
+        where: ` WHERE
+        t.${colSet.recordUuid}::uuid = v.${colSet.recordUuid}::uuid
+        AND t.${colSet.nodeDefId}::bigint = v.${colSet.nodeDefId}::bigint
+        AND t.${colSet.parentIId} = v.${colSet.parentIId} `,
       },
       tx
     )
@@ -67,11 +68,12 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
 
       const value = extractValueFromRowResult({ rowResult, nodeDef, columnName })
 
+      const colSet = TableNode.columnSet
       const values = {
-        [TableNode.columnSet.parentUuid]: rowResult[TableNode.columnSet.parentUuid],
-        [TableNode.columnSet.recordUuid]: rowResult[TableNode.columnSet.recordUuid],
-        [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
-        [TableNode.columnSet.value]: value,
+        [colSet.parentIId]: rowResult[colSet.parentIId],
+        [colSet.recordUuid]: rowResult[colSet.recordUuid],
+        [colSet.nodeDefId]: NodeDef.getId(nodeDef),
+        [colSet.value]: value,
       }
 
       super.push(values)

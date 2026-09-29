@@ -5,6 +5,7 @@ export const keys = {
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
   info: 'info',
+  lastNodeInternalId: 'lastNodeInternalId',
   mergedIntoRecordUuid: 'mergedIntoRecordUuid',
   nodes: 'nodes',
   ownerEmail: 'ownerEmail',

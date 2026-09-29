@@ -37,9 +37,9 @@ const _getOrFetchTaxon = async ({ survey, nodeDef, taxonUuid }) => {
 }
 
 const _checkParentValid = ({ nodes, node, nodeDef }) => {
-  const parentUuid = Node.getParentUuid(node)
-  if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
-    return { warn: 'has missing or invalid parent_uuid' }
+  const parentIId = Node.getParentInternalId(node)
+  if ((!parentIId && !NodeDef.isRoot(nodeDef)) || (parentIId && !nodes[parentIId])) {
+    return { warn: 'has missing or invalid parent internal id' }
   }
   return null
 }
@@ -55,7 +55,7 @@ const _checkHierarchyValid = ({ nodes, node, nodeDef }) => {
   const nodeHierarchy = Node.getHierarchy(node)
   if (
     nodeHierarchy.length !== NodeDef.getMetaHierarchy(nodeDef)?.length ||
-    nodeHierarchy.some((ancestorUuid) => !nodes[ancestorUuid])
+    nodeHierarchy.some((ancestorIId) => !nodes[ancestorIId])
   ) {
     return { warn: 'has an invalid meta hierarchy' }
   }

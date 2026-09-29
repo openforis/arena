@@ -22,7 +22,7 @@ export const propKeys = {
   deleted: 'deleted',
   labels: 'labels',
   name: 'name',
-  nodeUuid: 'nodeUuid',
+  nodeIId: 'nodeIId',
   recordUuid: 'recordUuid',
   size: 'size',
   temporary: 'temporary',
@@ -55,7 +55,7 @@ export const createFile = ({
   chainUuid = null,
   cycle = null,
   recordUuid = null,
-  nodeUuid = null,
+  nodeIId = null,
   type = null,
   temporary = false,
 }) => {
@@ -64,7 +64,7 @@ export const createFile = ({
     [propKeys.cycle]: cycle,
     [propKeys.labels]: labels,
     [propKeys.name]: name,
-    [propKeys.nodeUuid]: nodeUuid,
+    [propKeys.nodeIId]: nodeIId,
     [propKeys.recordUuid]: recordUuid,
     [propKeys.size]: size,
     [propKeys.type]: type,
@@ -85,7 +85,7 @@ export const createFileFromNode = ({ node, size = null, content = null }) =>
     uuid: Node.getFileUuid(node),
     name: Node.getFileName(node),
     recordUuid: Node.getRecordUuid(node),
-    nodeUuid: Node.getUuid(node),
+    nodeIId: Node.getIId(node),
     size,
     content,
     type: SurveyFileType.recordAttachment,
@@ -108,7 +108,7 @@ export const getName = ObjectUtils.getProp(propKeys.name)
 export const getSize = ObjectUtils.getProp(propKeys.size)
 export const getChainUuid = ObjectUtils.getProp(propKeys.chainUuid)
 export const getCycle = ObjectUtils.getProp(propKeys.cycle, cycleOneKey)
-export const getNodeUuid = ObjectUtils.getProp(propKeys.nodeUuid)
+export const getNodeIId = ObjectUtils.getProp(propKeys.nodeIId)
 export const getRecordUuid = ObjectUtils.getProp(propKeys.recordUuid)
 export const getContent = A.prop(keys.content)
 export const getExtension = A.pipe(getName, FileNames.getExtension)
@@ -134,7 +134,7 @@ export const cleanupInvalidProps = (file) => {
     [propKeys.size]: props[invalidPropKeys.fileSize],
     ...ObjectUtils.keepNonEmptyProps({
       [propKeys.recordUuid]: props[propKeys.recordUuid],
-      [propKeys.nodeUuid]: props[propKeys.nodeUuid],
+      [propKeys.nodeIId]: props[propKeys.nodeIId],
       [propKeys.labels]: props[propKeys.labels],
     }),
   }

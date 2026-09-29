@@ -205,7 +205,7 @@ export const verifySampleRecords = (surveyExport: SurveyExport, expectedRecords:
     for (const expectedTree of expected.trees) {
       const treeIdNode = treeIdNodes.find((node) => node.value === expectedTree.tree_id)!
       const treeChildValue = (name: string) =>
-        nodesOf(name).find((node) => node.parentUuid === treeIdNode.parentUuid)?.value
+        nodesOf(name).find((node) => node.pIId === treeIdNode.pIId)?.value
       expect(treeChildValue('tree_dec_1')).toBe(expectedTree.tree_dec_1)
       expect(treeChildValue('tree_dec_2')).toBe(expectedTree.tree_dec_2)
       expect(treeChildValue('tree_species')?.taxonUuid).toBeTruthy()

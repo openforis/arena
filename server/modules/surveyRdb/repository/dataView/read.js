@@ -4,8 +4,6 @@ import * as pgPromise from 'pg-promise'
 
 import { Objects } from '@openforis/arena-core'
 
-import { quote } from '@core/stringUtils'
-
 import { db } from '../../../../db/db'
 import * as DbUtils from '../../../../db/dbUtils'
 
@@ -125,11 +123,11 @@ const _prepareSelectFields = ({
   } else {
     queryBuilder.select(
       ...alwaysIncludedFields,
-      viewDataNodeDef.columnUuid,
+      viewDataNodeDef.columnIId,
       // selected node def columns
       ...nodeDefCols.flatMap(_selectFieldsByNodeDefType({ viewDataNodeDef, streamMode })),
-      // Add ancestor uuid columns
-      ...viewDataNodeDef.columnUuids
+      // Add ancestor internal IDs columns
+      ...viewDataNodeDef.columnIIdsNamesFull
     )
     if (includeDateCreated) {
       queryBuilder.select(viewDataNodeDef.columnDateCreated)
@@ -164,7 +162,7 @@ const _prepareFromClause = ({ queryBuilder, viewDataNodeDef, nodeDefCols, editMo
 
         return `LEFT JOIN LATERAL ( 
           ${tableNode.getSelect({
-            parentUuid: `${viewDataNodeDef.alias}.${ancestorMultipleEntityUuidColumnName}`,
+            parentIId: `${viewDataNodeDef.alias}.${ancestorMultipleEntityUuidColumnName}`,
             nodeDefUuid,
           })}
         ) AS ${tableNode.alias} ON TRUE`
@@ -477,14 +475,14 @@ export const fetchRecordsCountByRootNodesValue = async (
         ${filterColumnsString}
     )
     SELECT
-      ${rootTableRecordUuidAliasedCol}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
+      ${rootTableRecordUuidAliasedCol}, jsonb_agg(n.i_id) as nodes_key_i_ids, cr.count
     FROM
         ${rootTable} ${rootTableAlias}
     JOIN count_records cr
       ON ${filterColumns.map((keyCol) => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
     JOIN ${schema}.node n
       ON n.record_uuid = r.record_uuid
-      AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => quote(NodeDef.getUuid(nodeDefKey))).join(', ')})
+      AND n.node_def_id IN (${nodeDefs.map((nodeDefKey) => NodeDef.getId(nodeDefKey)).join(', ')})
     WHERE
       ${rootTableAlias}.${TableDataNodeDef.columnSet.recordCycle} = $/cycle/
       AND ${filterCondition}

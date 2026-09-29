@@ -130,7 +130,7 @@ export default class RecordsImportJob extends Job {
 
       const recordToCreate = { ...Record.newRecord(user, cycle), ...(instanceUuid ? { uuid: instanceUuid } : {}) }
       let record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
-      const rootNode = Node.newNode(rootNodeDefUuid, Record.getUuid(record), null)
+      const rootNode = Node.newNode({ record, nodeDefUuid: rootNodeDefUuid })
       record = Record.assocNode(rootNode, { sideEffect: true })(record)
 
       record = await this._buildRecordNodes({
@@ -250,7 +250,7 @@ export default class RecordsImportJob extends Job {
     submissionDir: string
   }): Promise<any> {
     if (NodeDef.isEntity(nodeDef)) {
-      const node = Node.newNode(nodeDefUuid, Record.getUuid(record), parentNode)
+      const node = Node.newNode({ record, nodeDefUuid, parentNode })
       const recordWithNode = Record.assocNode(node, { sideEffect: true })(record)
 
       return this._buildRecordNodes({
@@ -315,7 +315,7 @@ export default class RecordsImportJob extends Job {
     let recordUpdated = record
     const values = NodeDef.isMultiple(nodeDef) && Array.isArray(value) ? value : [value]
     for (const singleValue of values) {
-      const node = Node.newNode(nodeDefUuid, Record.getUuid(recordUpdated), parentNode, singleValue)
+      const node = Node.newNode({ record: recordUpdated, nodeDefUuid, parentNode, value: singleValue })
       recordUpdated = Record.assocNode(node, { sideEffect: true })(recordUpdated)
     }
     return recordUpdated
@@ -345,14 +345,14 @@ export default class RecordsImportJob extends Job {
       return record
     }
 
-    const node = Node.newNode(nodeDefUuid, Record.getUuid(record), parentNode)
+    const node = Node.newNode({ record, nodeDefUuid, parentNode })
     const fileSize = Buffer.byteLength(content)
     const file = SurveyFile.createFile({
       name: fileName,
       size: fileSize,
       content,
       recordUuid: Node.getRecordUuid(node),
-      nodeUuid: Node.getUuid(node),
+      nodeIId: Node.getIId(node),
       type: SurveyFile.SurveyFileType.recordAttachment,
     })
     await insertFile(this.surveyId, file, this.tx)

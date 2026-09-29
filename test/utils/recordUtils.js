@@ -29,7 +29,7 @@ export const getNodePath = (node) => (survey, record) => {
 
     if (NodeDef.isMultiple(nodeDef)) {
       const siblings = Record.getNodeChildrenByDefUuid(parentNode, nodeDefUuid)(record)
-      const index = A.findIndex((n) => Node.getUuid(n) === Node.getUuid(node), siblings)
+      const index = A.findIndex((n) => Node.getIId(n) === Node.getIId(node), siblings)
       return `${parentNodePath}/${NodeDef.getName(nodeDef)}[${index}]`
     }
 
@@ -98,5 +98,5 @@ export const shiftDateModifiedIntoTheFuture = (record, offsetMillis = 60000) => 
 export const getValidationChildrenCount = (parentNode, childDef) =>
   A.pipe(
     Validation.getValidation,
-    RecordValidation.getValidationChildrenCount(Node.getUuid(parentNode), NodeDef.getUuid(childDef))
+    RecordValidation.getValidationChildrenCount(Node.getIId(parentNode), NodeDef.getUuid(childDef))
   )

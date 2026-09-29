@@ -40,20 +40,20 @@ const _updateNodeDebounced = (node, file, delay) => {
       lang: I18nState.getLang(),
       ...(file ? { file } : {}),
     })
-
     const recordUuid = Node.getRecordUuid(node)
-
     const surveyId = SurveyState.getSurveyId(state)
     await enqueueNodeRequest(() => axios.post(`/api/survey/${surveyId}/record/${recordUuid}/node`, formData))
   }
 
-  return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)
+  const recordUuid = Node.getRecordUuid(node)
+  const nodeIId = Node.getIId(node)
+  return debounceAction(action, `node_update_${recordUuid}_${nodeIId}`, delay)
 }
 
 export const updateNode =
   (nodeDef, node, value, file = null, meta = {}, refData = null) =>
   async (dispatch, getState) => {
-    if (!Node.getUuid(node)) {
+    if (A.isNil(Node.getIId(node))) {
       // the node doesn't exist yet (e.g. attribute of an entity just added, not yet created server side):
       // nothing to update (the attribute is read only until its node is available)
       return
@@ -67,7 +67,7 @@ export const updateNode =
         Node.assocDirty(true)
       )(node)
       const removeDirtyFlag = false
-      await dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }, removeDirtyFlag))
+      await dispatch(recordNodesUpdate({ [Node.getIId(node)]: nodeToUpdate }, removeDirtyFlag))
       dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
     }
     checkAndConfirmUpdateNode({ dispatch, getState, node, nodeDef, onOk })

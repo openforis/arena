@@ -20,7 +20,7 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
     const isMultipleAttribute = NodeDef.isMultipleAttribute(nodeDef)
     if (NodeDef.isEqual(nodeDef)(viewNodeDef)) {
       if (!isMultipleAttribute) {
-        return [`${tableData.columnUuid} AS ${colName}`]
+        return [`${tableData.columnIId} AS ${colName}`]
       }
     } else if (isMultipleAttribute && NodeDef.isDescendantOf(viewNodeDef)(nodeDef)) {
       if (canJoinWithMultipleAttributeTable({ nodeDef, viewNodeDef })) {
@@ -52,12 +52,14 @@ const _getJoinWithMultipleAttributeTable = ({ viewDataNodeDef, multAttrColumnNod
   return `LEFT JOIN
   (
     SELECT
-      ${multAttrDataTable.columnParentUuid},
+      ${multAttrDataTable.columnRecordUuid},
+      ${multAttrDataTable.columnParentInternalId},
       ${columnNames.map((colName) => `json_agg(${tableNameAlias}.${DbUtils.asName(colName)}) AS ${DbUtils.asName(colName)}`).join(', ')}
     FROM ${multAttrDataTable.nameAliased}
-    GROUP BY ${multAttrDataTable.columnParentUuid}
+    GROUP BY ${multAttrDataTable.columnRecordUuid}, ${multAttrDataTable.columnParentInternalId}
   ) AS ${tableNameAlias}
-  ON ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
+  ON ${multAttrDataTable.columnRecordUuid} = ${tableData.columnRecordUuid}
+    AND ${multAttrDataTable.columnParentInternalId} = ${tableData.columnIId}`
 }
 
 const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef) => {
@@ -110,7 +112,8 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
 
   const joinWithParentView = viewDataParent
     ? `LEFT JOIN ${viewDataParent.nameAliased}  
-            ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
+        ON ${viewDataParent.columnRecordUuid} = ${tableData.columnRecordUuid} 
+          AND ${viewDataParent.columnIId} = ${tableData.columnParentInternalId}`
     : ''
 
   const query = `

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Box } from '@mui/material'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -49,29 +49,35 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
   const [exportScope, setExportScope] = useState<PrintableExportScope>(PrintableExportScopes.currentPage)
   const [orientation, setOrientation] = useState<PrintOrientation>(PrintOrientations.portrait)
   const [includeQrCode, setIncludeQrCode] = useState(false)
+  const [prevInitialFormat, setPrevInitialFormat] = useState(initialFormat)
+  const [prevOpen, setPrevOpen] = useState(open)
 
-  useEffect(() => {
+  // adjust the state when the props change (during rendering instead of in effects, to avoid cascading renders)
+  if (initialFormat !== prevInitialFormat) {
+    setPrevInitialFormat(initialFormat)
     setFormat(initialFormat)
-  }, [initialFormat])
-
-  useEffect(() => {
+  }
+  if (open !== prevOpen) {
+    setPrevOpen(open)
     if (!open) {
       setIncludeQrCode(false)
       setExportScope(PrintableExportScopes.currentPage)
       setOrientation(PrintOrientations.portrait)
     }
-  }, [open])
+  }
 
-  useEffect(() => {
-    if (includeQrCode) {
+  const onIncludeQrCodeChange = (checked: boolean) => {
+    setIncludeQrCode(checked)
+    if (checked) {
+      // the QR code can be included only when exporting the current page
       setExportScope(PrintableExportScopes.currentPage)
     }
-  }, [includeQrCode])
+  }
 
   const entityDefUuid = NodeDef.getUuid(nodeDefPage)
   const entityLabel = NodeDef.getLabel(nodeDefPage, lang) || NodeDef.getName(nodeDefPage)
 
-  const entityNodeUuid = useMemo(() => {
+  const entityNodeIId = useMemo(() => {
     if (!record) return null
     const pageEntity = getPageEntity({
       survey,
@@ -79,7 +85,7 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
       pagesUuidMap,
       pageNodeDefUuid: entityDefUuid,
     })
-    return pageEntity ? Node.getUuid(pageEntity) : null
+    return pageEntity ? Node.getIId(pageEntity) : null
   }, [survey, record, pagesUuidMap, entityDefUuid])
 
   const unresolvedMultipleAncestor = useMemo(
@@ -98,18 +104,17 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
       orientation,
       includeQrCode,
       ...(exportScope === PrintableExportScopes.currentPage
-        ? { entityDefUuid, entityNodeUuid: entityNodeUuid ?? undefined }
+        ? { entityDefUuid, entityNodeIId: entityNodeIId ?? undefined }
         : {}),
     })
-  }, [surveyId, record, lang, format, exportScope, orientation, includeQrCode, entityDefUuid, entityNodeUuid])
+  }, [surveyId, record, lang, format, exportScope, orientation, includeQrCode, entityDefUuid, entityNodeIId])
 
   if (!open) return null
 
   const canDownload =
-    exportScope === PrintableExportScopes.full ||
-    Boolean(entityDefUuid && entityNodeUuid && !unresolvedMultipleAncestor)
+    exportScope === PrintableExportScopes.full || Boolean(entityDefUuid && entityNodeIId && !unresolvedMultipleAncestor)
   const showCurrentPageUnavailable =
-    exportScope === PrintableExportScopes.currentPage && (!entityNodeUuid || unresolvedMultipleAncestor)
+    exportScope === PrintableExportScopes.currentPage && (!entityNodeIId || unresolvedMultipleAncestor)
 
   return (
     <Modal onClose={onClose} title="surveyForm:printableExport.title">
@@ -156,7 +161,7 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
           </FormItem>
           <Checkbox
             checked={includeQrCode}
-            onChange={(checked: boolean) => setIncludeQrCode(checked)}
+            onChange={onIncludeQrCodeChange}
             label="surveyForm:printableExport.includeQrCode"
             info="surveyForm:printableExport.includeQrCodeInfo"
           />

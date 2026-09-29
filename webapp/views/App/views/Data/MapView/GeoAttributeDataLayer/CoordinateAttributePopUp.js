@@ -61,7 +61,7 @@ ${locationSummary}
 export const CoordinateAttributePopUp = (props) => {
   const { attributeDef, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } = props
 
-  const { recordUuid, recordOwnerUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
+  const { recordUuid, recordOwnerUuid, parentIId, point, ancestorsKeys } = pointFeature.properties
   const [longitude, latitude] = pointFeature.geometry.coordinates
 
   const popupRef = useRef(null)
@@ -148,7 +148,7 @@ export const CoordinateAttributePopUp = (props) => {
             <ButtonIconEdit
               label="mapView.editRecord"
               showLabel
-              onClick={() => onRecordEditClick({ recordUuid, parentUuid })}
+              onClick={() => onRecordEditClick({ recordUuid, parentIId })}
               variant="contained"
             />
 

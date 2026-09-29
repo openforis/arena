@@ -18,6 +18,12 @@ import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
 
+const prepareNodeForStorage = ({ record, node }) => {
+  const lastIId = Record.getLastNodeInternalId(record)
+  const nodeIId = Node.getIId(node) ?? lastIId + 1
+  return Node.assocIId(nodeIId)(node)
+}
+
 // Maximum time to wait for another dyno to release a record's advisory lock.
 // There's a single RecordsUpdateThread per dyno processing messages one at a time, so an unbounded
 // wait would stall every record edit on this dyno behind one slow record held elsewhere.
@@ -249,13 +255,14 @@ export class RecordsUpdateThread extends Thread {
       recordUuid,
       fn: async (t) => {
         let record = await this.getOrFetchRecord({ msg, recordUuid, t })
+        const nodePreparedForStorage = prepareNodeForStorage({ record, node })
 
         record = await RecordManager.persistNode(
           {
             user,
             survey,
             record,
-            node,
+            node: nodePreparedForStorage,
             timezoneOffset,
             lang,
             nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
@@ -269,7 +276,7 @@ export class RecordsUpdateThread extends Thread {
   }
 
   async processRecordNodeDeleteMsg(msg) {
-    const { surveyId, nodeUuid, recordUuid, user, timezoneOffset, lang } = msg
+    const { surveyId, nodeIId, recordUuid, user, timezoneOffset, lang } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -281,7 +288,7 @@ export class RecordsUpdateThread extends Thread {
           user,
           survey,
           record,
-          nodeUuid,
+          nodeIId,
           timezoneOffset,
           lang,
           (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),

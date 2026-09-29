@@ -18,7 +18,7 @@ export const useLocalState = (props) => {
     editableProp,
     recordProp,
     recordUuid: recordUuidProp,
-    pageNodeUuid: pageNodeUuidProp,
+    pageNodeIId: pageNodeIIdProp,
     pageNodeDefUuid: pageNodeDefUuidProp,
     noHeader: noHeaderProp = false,
     locked: lockedProp = false,
@@ -30,7 +30,7 @@ export const useLocalState = (props) => {
   const { recordUuid: recordUuidUrlParam } = useParams()
 
   const {
-    pageNodeUuid: pageNodeUuidUrlParam,
+    pageNodeIId: pageNodeIIdUrlParam,
     pageNodeDefUuid: pageNodeDefUuidUrlParam,
     noHeader: noHeaderUrlParam,
     locked: lockedUrlParam,
@@ -40,7 +40,7 @@ export const useLocalState = (props) => {
   const preview = Boolean(recordUuidPreview)
 
   const recordUuid = recordUuidProp || recordUuidUrlParam || recordUuidPreview
-  const pageNodeUuid = pageNodeUuidProp || pageNodeUuidUrlParam
+  const pageNodeIId = pageNodeIIdProp || pageNodeIIdUrlParam
   const pageNodeDefUuid = pageNodeDefUuidProp || pageNodeDefUuidUrlParam
   const noHeader = noHeaderProp || noHeaderUrlParam
 
@@ -55,23 +55,23 @@ export const useLocalState = (props) => {
   // Add websocket event listeners
   useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdate,
-    eventHandler: useCallback((content) => dispatch(RecordActions.recordNodesUpdate(content.updatedNodes)), []),
+    eventHandler: useCallback((content) => dispatch(RecordActions.recordNodesUpdate(content.updatedNodes)), [dispatch]),
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.nodeValidationsUpdate,
-    eventHandler: useCallback((content) => dispatch(RecordActions.nodeValidationsUpdate(content)), []),
+    eventHandler: useCallback((content) => dispatch(RecordActions.nodeValidationsUpdate(content)), [dispatch]),
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdateCompleted,
-    eventHandler: useCallback((content) => dispatch(RecordActions.nodesUpdateCompleted(content)), []),
+    eventHandler: useCallback((content) => dispatch(RecordActions.nodesUpdateCompleted(content)), [dispatch]),
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.recordDelete,
-    eventHandler: useCallback(() => dispatch(RecordActions.recordDeleted(navigate)), []),
+    eventHandler: useCallback(() => dispatch(RecordActions.recordDeleted(navigate)), [dispatch, navigate]),
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.recordSessionExpired,
-    eventHandler: useCallback(() => dispatch(RecordActions.sessionExpired(navigate)), []),
+    eventHandler: useCallback(() => dispatch(RecordActions.sessionExpired(navigate)), [dispatch, navigate]),
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.applicationError,
@@ -100,7 +100,7 @@ export const useLocalState = (props) => {
         RecordActions.checkInRecord({
           recordUuid,
           draft,
-          pageNodeUuid,
+          pageNodeIId,
           pageNodeDefUuid,
           noHeader,
           locked: lockedUrlParam || lockedProp,

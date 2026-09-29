@@ -58,12 +58,12 @@ const ValidationReport = () => {
   }, [selectedMessageTypeCategoryIds])
 
   const onRowClick = (row) => {
-    const pageNodeUuid = RecordValidationReportItem.getNodeContextUuid(row)
+    const pageNodeIId = RecordValidationReportItem.getNodeContextIId(row)
     const pageNodeDefUuid = RecordValidationReportItem.getNodeDefContextUuid(row)
     const recordUuid = RecordValidationReportItem.getRecordUuid(row)
     const recordEditUrl = `${appModuleUri(
       dataModules.record
-    )}${recordUuid}?pageNodeUuid=${pageNodeUuid}&pageNodeDefUuid=${pageNodeDefUuid}`
+    )}${recordUuid}?pageNodeIId=${pageNodeIId}&pageNodeDefUuid=${pageNodeDefUuid}`
 
     navigate(recordEditUrl)
   }

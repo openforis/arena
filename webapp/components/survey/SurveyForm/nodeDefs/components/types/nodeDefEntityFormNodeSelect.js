@@ -25,12 +25,12 @@ const PLACEHOLDER_VALUE = 'placeholder'
 /**
  * Renders one entity dropdown option row with its subtree status icon.
  * @param {object} props - Component props
- * @param {string} props.nodeUuid - Entity node UUID
+ * @param {number} props.nodeIId - Entity node internal ID
  * @param {string} props.label - Display label for the entity
  * @returns {React.ReactElement} Option label row
  */
-const EntitySelectOptionLabel = ({ nodeUuid, label }) => {
-  const { hasErrors, hasWarnings, isComplete } = useEntitySubtreeStatus(nodeUuid)
+const EntitySelectOptionLabel = ({ nodeIId, label }) => {
+  const { hasErrors, hasWarnings, isComplete } = useEntitySubtreeStatus(nodeIId)
   return (
     <span className="node-select-option">
       <span className="node-select-option__label">{label}</span>
@@ -40,15 +40,15 @@ const EntitySelectOptionLabel = ({ nodeUuid, label }) => {
 }
 
 EntitySelectOptionLabel.propTypes = {
-  nodeUuid: PropTypes.string.isRequired,
+  nodeIId: PropTypes.number.isRequired,
   label: PropTypes.string.isRequired,
 }
 
 /**
  * Shared props for native and experimental entity instance selectors.
  * @typedef {object} EntitySelectProps
- * @property {string} selectedValue - Selected node UUID or placeholder
- * @property {(nodeUuid: string) => void} onChange - Called with the selected node UUID
+ * @property {number|string} selectedValue - Selected node internal ID or placeholder
+ * @property {(nodeIId: number|string) => void} onChange - Called with the selected node internal ID
  * @property {Array} nodes - Sibling entity nodes
  * @property {string[]} nodeKeysLabelValues - Display labels aligned with `nodes`
  * @property {string} placeholderLabel - Placeholder option text
@@ -70,7 +70,7 @@ const EntitySelectNative = ({ selectedValue, onChange, nodes, nodeKeysLabelValue
       {placeholderLabel}
     </option>
     {nodes.map((n, index) => (
-      <option key={Node.getUuid(n)} value={Node.getUuid(n)} data-testid={TestId.entities.form.nodeSelectOption(index)}>
+      <option key={Node.getIId(n)} value={Node.getIId(n)} data-testid={TestId.entities.form.nodeSelectOption(index)}>
         {nodeKeysLabelValues[index]}
       </option>
     ))}
@@ -78,7 +78,7 @@ const EntitySelectNative = ({ selectedValue, onChange, nodes, nodeKeysLabelValue
 )
 
 EntitySelectNative.propTypes = {
-  selectedValue: PropTypes.string.isRequired,
+  selectedValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   onChange: PropTypes.func.isRequired,
   nodes: PropTypes.array.isRequired,
   nodeKeysLabelValues: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -96,9 +96,9 @@ const EntitySelectWithStatus = ({ selectedValue, onChange, nodes, nodeKeysLabelV
       if (!value || value === PLACEHOLDER_VALUE) {
         return placeholderLabel
       }
-      const index = nodes.findIndex((n) => Node.getUuid(n) === value)
+      const index = nodes.findIndex((n) => Node.getIId(n) === value)
       const label = index >= 0 ? nodeKeysLabelValues[index] : placeholderLabel
-      return <EntitySelectOptionLabel nodeUuid={value} label={label} />
+      return <EntitySelectOptionLabel nodeIId={value} label={label} />
     },
     [nodeKeysLabelValues, nodes, placeholderLabel]
   )
@@ -119,11 +119,11 @@ const EntitySelectWithStatus = ({ selectedValue, onChange, nodes, nodeKeysLabelV
       </MenuItem>
       {nodes.map((n, index) => (
         <MenuItem
-          key={Node.getUuid(n)}
-          value={Node.getUuid(n)}
+          key={Node.getIId(n)}
+          value={Node.getIId(n)}
           data-testid={TestId.entities.form.nodeSelectOption(index)}
         >
-          <EntitySelectOptionLabel nodeUuid={Node.getUuid(n)} label={nodeKeysLabelValues[index]} />
+          <EntitySelectOptionLabel nodeIId={Node.getIId(n)} label={nodeKeysLabelValues[index]} />
         </MenuItem>
       ))}
     </Select>
@@ -131,7 +131,7 @@ const EntitySelectWithStatus = ({ selectedValue, onChange, nodes, nodeKeysLabelV
 }
 
 EntitySelectWithStatus.propTypes = {
-  selectedValue: PropTypes.string.isRequired,
+  selectedValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   onChange: PropTypes.func.isRequired,
   nodes: PropTypes.array.isRequired,
   nodeKeysLabelValues: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -149,7 +149,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
 
   const nodeDefName = NodeDef.getLabel(nodeDef, lang)
   const nodeKeysLabelValues = useNodeKeysLabelValues(nodeDef, nodes, { includeSummaryAttributes: true })
-  const selectedValue = selectedNode ? Node.getUuid(selectedNode) : PLACEHOLDER_VALUE
+  const selectedValue = selectedNode ? Node.getIId(selectedNode) : PLACEHOLDER_VALUE
   const placeholderLabel = i18n.t('common.select')
 
   const onDeleteClick = useCallback(() => {
@@ -179,9 +179,13 @@ const NodeDefEntityFormNodeSelect = (props) => {
           testId={TestId.entities.form.addNewNode}
           size="small"
           onClick={() => {
-            const entity = Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
+            const entity = Node.newNode({
+              record: { uuid: Node.getRecordUuid(parentNode) },
+              nodeDefUuid: NodeDef.getUuid(nodeDef),
+              parentNode,
+            })
             updateNode(nodeDef, entity)
-            onChange(Node.getUuid(entity))
+            onChange(Node.getIId(entity))
           }}
           iconClassName="icon-plus icon-10px icon-left"
           label="surveyForm:nodeDefEntityForm.addNewEntity"

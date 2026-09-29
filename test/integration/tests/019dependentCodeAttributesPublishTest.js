@@ -133,9 +133,10 @@ describe('Dependent code attributes - survey publish', () => {
     const dependentNode = RecordUtils.findNodeByPath(`${entityName}/${dependentCodeDefName}`)(survey, record)
     await NodeRepository.updateNode({
       surveyId: Survey.getId(survey),
-      nodeUuid: Node.getUuid(dependentNode),
+      recordUuid: Record.getUuid(record),
+      nodeIId: Node.getIId(dependentNode),
       value: Node.getValue(dependentNode),
-      meta: { [Node.metaKeys.hierarchyCode]: [Node.getUuid(fraClassNode)] },
+      meta: { [Node.metaKeys.hierarchyCode]: [Node.getIId(fraClassNode)] },
       draft: false,
       reloadNode: false,
     })

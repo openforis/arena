@@ -12,7 +12,7 @@ import { debounce } from '@core/functionsDefer'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
-import { RecordState } from '@webapp/store/ui/record'
+import { RecordState, useNodesMinCount } from '@webapp/store/ui/record'
 import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
@@ -39,6 +39,8 @@ const NodeDefEntityTableRows = (props) => {
   const survey = useSelector(SurveyState.getSurvey)
   const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
   const nodeDefUuid = nodeDef?.uuid
+  const minCount = useNodesMinCount({ parentNodeIId: parentNode?.iId, nodeDefUuid })
+  const canDeleteRows = !NodeDef.isEnumerate(nodeDef) && (!minCount || nodes.length > minCount)
 
   const nodeDefColumns = A.reduce(
     (nodeDefColumnsAgg, nodeDefColumnUuid) => {
@@ -203,8 +205,8 @@ const NodeDefEntityTableRows = (props) => {
                 createRow({
                   renderType: NodeDefLayout.renderType.tableBody,
                   node,
-                  key: `entity-table-row-${Node.getUuid(node)}`,
-                  canDelete: canDeleteNode,
+                  key: `entity-table-row-${Node.getIId(node)}`,
+                  canDelete: canDeleteRows,
                   index,
                 })
               )}

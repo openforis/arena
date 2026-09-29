@@ -13,8 +13,8 @@ import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 const extractCommonProperties = ({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n }) => {
   const recordUuid = dataItem[TableDataNodeDef.columnSet.recordUuid]
   const recordOwnerUuid = dataItem[TableDataNodeDef.columnSet.recordOwnerUuid]
-  const parentUuid = dataItem[parentEntityColumn.name]
-  const key = `${recordUuid}-${parentUuid}`
+  const parentIId = dataItem[parentEntityColumn.name]
+  const key = `${recordUuid}-${parentIId}`
   const ancestorsKeys = ancestorsKeysColumns.map((column) =>
     DataQueryValueFormatter.formatDataItemKey({ i18n, nodeDef: column.nodeDef, dataItem })
   )
@@ -22,8 +22,8 @@ const extractCommonProperties = ({ dataItem, parentEntityColumn, ancestorsKeysCo
   return {
     key,
     ancestorsKeys,
-    parentUuid,
     recordUuid,
+    parentIId,
     recordOwnerUuid,
     center: true,
   }

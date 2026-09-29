@@ -24,8 +24,8 @@ const newFakeClient = () => ({
 
 describe('nodeRepository.insertNodesInBatch', () => {
   it('does not misinterpret a node value containing a literal "$" followed by digits as a query parameter', async () => {
-    const recordUuid = 'record-uuid-1'
-    const node = Node.newNode('node-def-uuid-1', recordUuid, null, 'It costs $90, not more')
+    const record = { uuid: 'record-uuid-1' }
+    const node = Node.newNode({ record, nodeDefUuid: 'node-def-uuid-1', value: 'It costs $90, not more' })
 
     const client = newFakeClient()
 

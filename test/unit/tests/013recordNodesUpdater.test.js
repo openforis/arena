@@ -201,7 +201,7 @@ describe('RecordNodesUpdater Test', () => {
     })(entityUpdateResult.record)
 
     // dependents not updated yet: tree_height still applicable
-    const treeNodeBefore = Record.getNodeByUuid(Node.getUuid(entity))(attributesUpdateResult.record)
+    const treeNodeBefore = Record.getNodeByInternalId(Node.getIId(entity))(attributesUpdateResult.record)
     expect(Node.isChildApplicable(treeHeightDef.uuid)(treeNodeBefore)).toBe(true)
 
     const { record: recordUpdated } = await Record.afterNodesUpdate({
@@ -211,7 +211,7 @@ describe('RecordNodesUpdater Test', () => {
     })
 
     // dependents updated: tree_height not applicable
-    const treeNodeAfter = Record.getNodeByUuid(Node.getUuid(entity))(recordUpdated)
+    const treeNodeAfter = Record.getNodeByInternalId(Node.getIId(entity))(recordUpdated)
     expect(Node.isChildApplicable(treeHeightDef.uuid)(treeNodeAfter)).toBe(false)
   })
 

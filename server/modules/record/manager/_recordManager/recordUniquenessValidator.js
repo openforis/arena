@@ -12,7 +12,7 @@ import * as DataViewRepository from '@server/modules/surveyRdb/repository/dataVi
 const createNodesRecordUniqueValidation = ({ nodes, unique, errorKey }) => {
   const validationAcc = {}
   for (const node of nodes) {
-    validationAcc[Node.getUuid(node)] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
+    validationAcc[Node.getIId(node)] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
   }
   return validationAcc
 }
@@ -60,11 +60,11 @@ export const validateRecordsUniqueness = async (
   if (A.isEmpty(recordsCountRows)) return {}
 
   const result = {}
-  for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {
+  for (const { recordUuid, count, nodesKeyIIds } of recordsCountRows) {
     const unique = Number(count) === 1
     const validationNodesKeyFields = {}
-    for (const nodeKeyUuid of nodesKeyUuids) {
-      validationNodesKeyFields[nodeKeyUuid] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
+    for (const nodeKeyIId of nodesKeyIIds) {
+      validationNodesKeyFields[nodeKeyIId] = RecordValidation.newValidationRecordDuplicate({ unique, errorKey })
     }
     result[recordUuid] = Validation.newInstance(unique, validationNodesKeyFields)
   }

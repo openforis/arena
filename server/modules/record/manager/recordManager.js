@@ -37,7 +37,7 @@ export { insertRecord, createRecordFromSamplingPointDataItem } from './_recordMa
 export { insertNodesInBatch, insertNodesInBulk } from './_recordManager/nodeCreationManager'
 
 export const { insertNode } = RecordUpdateManager
-export const { generateRdbUpates, persistNodesToRDB } = NodeRdbManager
+export const { generateRdbUpdates, persistNodesToRDB } = NodeRdbManager
 
 // ==== READ
 
@@ -253,7 +253,7 @@ export const fetchRecordAndNodesByUuid = async (
     },
     client
   )
-  const indexedNodes = ObjectUtils.toUuidIndexedObj(nodes)
+  const indexedNodes = ObjectUtils.toIIdIndexedObj(nodes)
   let recordWithNodes = Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate, sideEffect: true })(
     record
   )
@@ -267,7 +267,7 @@ export const fetchRecordAndNodesByUuid = async (
   return recordWithNodes
 }
 
-export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
+export { fetchNodeByIId, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
 
 export { recordMatchesQualifierFilters } from './_recordManager/recordQualifierMatcher'
 
@@ -358,9 +358,9 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
   client.tx(async (t) => {
     const activities = nodes.map((node) => {
       const logContent = A.pick([
-        Node.keys.uuid,
         Node.keys.recordUuid,
-        Node.keys.parentUuid,
+        Node.keys.iId,
+        Node.keys.pIId,
         Node.keys.nodeDefUuid,
         Node.keys.meta,
         Node.keys.value,
@@ -389,7 +389,7 @@ export {
   deleteRecordsByCycles,
   deleteNode,
   deleteNodesByNodeDefUuids,
-  deleteNodesByUuids,
+  deleteNodesByInternalIds,
 } from './_recordManager/recordUpdateManager'
 
 // ==== VALIDATION

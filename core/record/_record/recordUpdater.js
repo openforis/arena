@@ -26,12 +26,12 @@ export const mergeNodes =
       recordUpdated[keys.nodes] = {}
     }
 
-    Object.entries(nodes).forEach(([nodeUuid, n]) => {
+    Object.entries(nodes).forEach(([nodeIId, n]) => {
       // Remove deleted node
       if (Node.isDeleted(n)) {
         recordUpdated = deleteNode(n, { sideEffect })(recordUpdated)
       } else {
-        const nodeExisting = RecordReader.getNodeByUuid(nodeUuid)(recordUpdated)
+        const nodeExisting = RecordReader.getNodeByInternalId(nodeIId)(recordUpdated)
         // Exclude dirty nodes currently being edited by the user
         const toBeAdded =
           !nodeExisting || // NodeExisting does not exist, n is new node
@@ -91,7 +91,7 @@ export const assocDateModified = (dateModified) => (record) => {
 export const deleteNode =
   (node, { sideEffect = false } = {}) =>
   (record) => {
-    const nodeUuid = Node.getUuid(node)
-    const { record: recordUpdated } = Records.deleteNode(nodeUuid, { sideEffect })(record)
+    const nodeIId = Node.getIId(node)
+    const { record: recordUpdated } = Records.deleteNode(nodeIId, { sideEffect })(record)
     return recordUpdated
   }

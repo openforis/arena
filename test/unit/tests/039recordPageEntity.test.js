@@ -36,7 +36,7 @@ describe('recordPageEntity', () => {
       pageNodeDefUuid: NodeDef.getUuid(clusterDef),
     })
 
-    expect(Node.getUuid(resolved)).toBe(Node.getUuid(cluster))
+    expect(Node.getIId(resolved)).toBe(Node.getIId(cluster))
   })
 
   test('never guesses first instance for a multiple page entity', () => {
@@ -60,11 +60,11 @@ describe('recordPageEntity', () => {
     const resolved = getPageEntity({
       survey,
       record,
-      pagesUuidMap: { [NodeDef.getUuid(plotDef)]: Node.getUuid(plot2) },
+      pagesUuidMap: { [NodeDef.getUuid(plotDef)]: Node.getIId(plot2) },
       pageNodeDefUuid: NodeDef.getUuid(plotDef),
     })
 
-    expect(Node.getUuid(resolved)).toBe(Node.getUuid(plot2))
+    expect(Node.getIId(resolved)).toBe(Node.getIId(plot2))
   })
 
   test('resolves nested single entity under selected multiple parent', () => {
@@ -76,11 +76,11 @@ describe('recordPageEntity', () => {
     const resolved = getPageEntity({
       survey,
       record,
-      pagesUuidMap: { [NodeDef.getUuid(plotDef)]: Node.getUuid(plot1) },
+      pagesUuidMap: { [NodeDef.getUuid(plotDef)]: Node.getIId(plot1) },
       pageNodeDefUuid: NodeDef.getUuid(plotDetailsDef),
     })
 
-    expect(Node.getUuid(resolved)).toBe(Node.getUuid(plotDetails1))
+    expect(Node.getIId(resolved)).toBe(Node.getIId(plotDetails1))
   })
 
   test('does not resolve nested entity when multiple parent is unselected', () => {
@@ -109,7 +109,7 @@ describe('recordPageEntity', () => {
 
     expect(
       hasUnresolvedMultipleAncestor(plotDetailsDef, survey, {
-        [NodeDef.getUuid(plotDef)]: Node.getUuid(plot1),
+        [NodeDef.getUuid(plotDef)]: Node.getIId(plot1),
       })
     ).toBe(false)
   })
@@ -122,11 +122,11 @@ describe('recordPageEntity', () => {
     const scopeUuid = getMultiplePageScopeEntityUuid({
       survey,
       record,
-      pagesUuidMap: { [NodeDef.getUuid(plotDef)]: Node.getUuid(plot2) },
+      pagesUuidMap: { [NodeDef.getUuid(plotDef)]: Node.getIId(plot2) },
       pageNodeDef: treeDef,
     })
 
-    expect(scopeUuid).toBe(Node.getUuid(plot2))
+    expect(scopeUuid).toBe(Node.getIId(plot2))
   })
 
   test('getMultiplePageScopeEntityUuid returns null when parent is unselected', () => {

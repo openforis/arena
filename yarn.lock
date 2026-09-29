@@ -3936,6 +3936,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@openforis/arena-core@file:../arena-core::locator=open-foris-arena%40workspace%3A.":
+  version: 2.3.10
+  resolution: "@openforis/arena-core@file:../arena-core#../arena-core::hash=7b0fb1&locator=open-foris-arena%40workspace%3A."
+  dependencies:
+    "@jsep-plugin/regex": "npm:^1.0.4"
+    "@turf/bearing": "npm:^7.4.0"
+    "@turf/destination": "npm:^7.4.0"
+    "@turf/distance": "npm:^7.4.0"
+    bignumber.js: "npm:^11.1.5"
+    change-case: "npm:^5.4.4"
+    jsep: "npm:^1.4.0"
+    lodash.differencewith: "npm:^4.5.0"
+    lodash.frompairs: "npm:^4.0.1"
+    lodash.isequal: "npm:^4.5.0"
+    lodash.topairs: "npm:^4.3.0"
+    moment: "npm:^2.31.0"
+    n2words: "npm:^6.2.0"
+    proj4: "npm:^2.22.0"
+    uuid: "npm:^14.0.2"
+  checksum: 10c0/ef358aecfba78cf9d33c0d6994b8958fbc8a64f04f65d7bac6616b61b588cbd6735e1ed7eaa97ae52042870a1658bb9eb7e695976abcfd4327252f273d9274d3
+  languageName: node
+  linkType: hard
+
 "@openforis/arena-core@npm:^2.3.10":
   version: 2.3.10
   resolution: "@openforis/arena-core@npm:2.3.10"
@@ -3959,9 +3982,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.4.8":
+"@openforis/arena-server@file:../arena-server::locator=open-foris-arena%40workspace%3A.":
   version: 2.4.8
-  resolution: "@openforis/arena-server@npm:2.4.8"
+  resolution: "@openforis/arena-server@file:../arena-server#../arena-server::hash=d43cb5&locator=open-foris-arena%40workspace%3A."
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1141.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -3987,7 +4010,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.4"
-  checksum: 10c0/fcba198ddf6184ce468f72b11fa16e5907e58598e30ecdb33e1e8f608e1d469fbf4f1ab63bd5b8908a16538d4815603fcee2216fb11561c891d2b796423f5e89
+  checksum: 10c0/64b158d1a1e0cb33dd6426d3b19e16f16d849c8ab3a8f1c483436e1f865af4eddb37d690ddbd63504ba60c9b86453b2b209d26a9ab19174f2e836a2f4d6cf480
   languageName: node
   linkType: hard
 
@@ -14297,7 +14320,8 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9"
     "@mui/x-tree-view": "npm:^9"
     "@ngageoint/geopackage": "patch:@ngageoint/geopackage@npm%3A4.2.9#~/.yarn/patches/@ngageoint-geopackage-npm-4.2.9-0462c5ae41.patch"
-    "@openforis/arena-server": "npm:^2.4.8"
+    "@openforis/arena-core": ../arena-core
+    "@openforis/arena-server": ../arena-server
     "@playwright/test": "npm:1.63.0"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@reduxjs/toolkit": "npm:^2.12.0"

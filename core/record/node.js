@@ -4,7 +4,6 @@ import { Objects } from '@openforis/arena-core'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
-import { uuidv4 } from '@core/uuid'
 
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -43,8 +42,9 @@ const flagKeysIncludingDirty = [...flagKeysArray, dirtyFlag]
 
 export const keys = {
   id: ObjectUtils.keys.id,
+  iId: ObjectUtils.keys.iId,
   uuid: ObjectUtils.keys.uuid,
-  parentUuid: ObjectUtils.keys.parentUuid,
+  pIId: ObjectUtils.keys.pIId,
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
   recordUuid: 'recordUuid',
@@ -70,9 +70,9 @@ export const isValueProp = ({ nodeDef, prop }) => Boolean(A.path([NodeDef.getTyp
 // ======
 //
 
-export const { getId, getUuid } = ObjectUtils
+export const { getId, getIId, getUuid } = ObjectUtils
 
-export const { getParentUuid } = ObjectUtils
+export const { getParentInternalId } = ObjectUtils
 
 export const getRecordUuid = A.prop(keys.recordUuid)
 
@@ -107,7 +107,7 @@ export const isCreated = A.propEq(keys.created, true)
 export const isUpdated = A.propEq(keys.updated, true)
 export const isDeleted = A.propEq(keys.deleted, true)
 export const isDirty = A.propEq(dirtyFlag, true)
-export const isRoot = A.pipe(getParentUuid, A.isNil)
+export const isRoot = A.pipe(getParentInternalId, A.isNil)
 export const { isEqual } = ObjectUtils
 
 export const { getValidation } = Validation
@@ -128,7 +128,7 @@ export const {
 } = NodeMeta
 
 // Hierarchy
-export const isDescendantOf = (ancestor) => (node) => A.includes(getUuid(ancestor), getHierarchy(node))
+export const isDescendantOf = (ancestor) => (node) => A.includes(getIId(ancestor), getHierarchy(node))
 
 //
 // ======
@@ -136,16 +136,16 @@ export const isDescendantOf = (ancestor) => (node) => A.includes(getUuid(ancesto
 // ======
 //
 
-export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => {
+export const newNode = ({ record, nodeDefUuid, parentNode = null, value = null }) => {
   const now = new Date()
   return {
-    [keys.uuid]: uuidv4(),
     [keys.nodeDefUuid]: nodeDefUuid,
-    [keys.recordUuid]: recordUuid,
-    [keys.parentUuid]: getUuid(parentNode),
+    [keys.recordUuid]: ObjectUtils.getUuid(record),
+    [keys.iId]: (record.lastNodeInternalId ?? 0) + 1,
+    [keys.pIId]: getIId(parentNode),
     [keys.value]: value,
     [keys.meta]: {
-      [metaKeys.hierarchy]: parentNode ? A.append(getUuid(parentNode), getHierarchy(parentNode)) : [],
+      [metaKeys.hierarchy]: parentNode ? A.append(getIId(parentNode), getHierarchy(parentNode)) : [],
     },
     [keys.created]: true,
     [keys.dateCreated]: now,
@@ -154,7 +154,14 @@ export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null
 }
 
 export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
-  ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
+  // Placeholders are never persisted, so there's no real record to draw the next internal id
+  // from; a negative, timestamp-derived one keeps it unique and clear of real (positive) ids.
+  ...newNode({
+    record: { lastNodeInternalId: -Date.now() },
+    nodeDefUuid: NodeDef.getUuid(nodeDef),
+    parentNode,
+    value,
+  }),
   [keys.placeholder]: true,
 })
 
@@ -163,6 +170,7 @@ export const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
 // UPDATE
 // ======
 //
+export const assocIId = A.assoc(keys.iId)
 export const assocValue = A.assoc(keys.value)
 export const { assocValidation } = Validation
 
@@ -179,6 +187,14 @@ export const setCreated = (node) => {
   node[keys.created] = true
   return node
 }
+export const setUpdated = (node) => {
+  node[keys.updated] = true
+  return node
+}
+export const setDeleted = (node) => {
+  node[keys.deleted] = true
+  return node
+}
 export const assocDeleted = A.assoc(keys.deleted)
 export const assocUpdated = A.assoc(keys.updated)
 export const assocDirty = A.assoc(dirtyFlag)
@@ -187,8 +203,9 @@ export const removeFlags =
   (node) => {
     const keysToRemove = removeDirtyFlag ? flagKeysIncludingDirty : flagKeysArray
     if (sideEffect) {
+      // do not use "delete": it would switch the node object to the (much bigger) V8 dictionary mode
       for (const key of keysToRemove) {
-        delete node[key]
+        if (node[key] !== undefined) node[key] = undefined
       }
       return node
     } else {

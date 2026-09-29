@@ -39,5 +39,5 @@ export const createRecord =
 
 export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) => (dispatch) => {
   const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
-  dispatch(recordNodesUpdate({ [Node.getUuid(node)]: node }))
+  dispatch(recordNodesUpdate({ [Node.getIId(node)]: node }))
 }

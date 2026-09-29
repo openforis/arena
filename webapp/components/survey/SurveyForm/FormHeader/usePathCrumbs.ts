@@ -60,11 +60,11 @@ export const usePathCrumbs = (entry: boolean): FormPathCrumb[] => {
 
     if (entry && record && (NodeDef.isRoot(nodeDefCurrent) || NodeDef.isMultipleEntity(nodeDefCurrent))) {
       const nodeDefUuidCurrent = NodeDef.getUuid(nodeDefCurrent)
-      const nodeUuidCurrent = pagesUuidMap[nodeDefUuidCurrent]
+      const nodeIIdCurrent = pagesUuidMap[nodeDefUuidCurrent]
 
       const nodeCurrent = NodeDef.isSingle(nodeDefCurrent)
         ? Record.getNodesByDefUuid(nodeDefUuidCurrent)(record)[0]
-        : Record.getNodeByUuid(nodeUuidCurrent)(record)
+        : Record.getNodeByInternalId(nodeIIdCurrent)(record)
 
       if (nodeCurrent) {
         const nodeDefKeys = Survey.getNodeDefKeysSorted({ nodeDef: nodeDefCurrent, cycle })(survey)

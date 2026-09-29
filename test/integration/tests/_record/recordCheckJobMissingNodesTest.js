@@ -29,8 +29,13 @@ const _insertRecordMissingComputedNode = async ({ user, survey, keyValue }) => {
   const recordDb = await RecordManager.insertRecord(user, surveyId, recordToCreate, true)
   const recordUuid = Record.getUuid(recordDb)
 
-  const rootNode = Node.newNode(NodeDef.getUuid(rootDef), recordUuid)
-  const plainAttrNode = Node.newNode(NodeDef.getUuid(plainAttrDef), recordUuid, rootNode, keyValue)
+  const rootNode = Node.newNode({ record: recordDb, nodeDefUuid: NodeDef.getUuid(rootDef) })
+  const plainAttrNode = Node.newNode({
+    record: { ...recordDb, lastNodeInternalId: Node.getIId(rootNode) },
+    nodeDefUuid: NodeDef.getUuid(plainAttrDef),
+    parentNode: rootNode,
+    value: keyValue,
+  })
 
   await RecordManager.insertNodesInBulk({ user, surveyId, nodesArray: [rootNode, plainAttrNode] })
 

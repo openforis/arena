@@ -33,7 +33,7 @@ const getOrderByClause = ({ sortBy, sortOrder }) => {
 const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortOrder }) => {
   const surveySchema = getSurveyDBSchema(surveyId)
   const surveyRdbSchema = SchemaRdb.getName(surveyId)
-  const uuidLength = 36
+  const childrenCountPrefixLength = prefixChildrenCount.length
   const filter = filterBySurveyAttrs?.filter
   const rootDataViewName = filterBySurveyAttrs?.rootDataViewName
   const attributeDefUuids = filterBySurveyAttrs?.attributeDefUuids
@@ -56,7 +56,7 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
   if (Array.isArray(attributeDefUuids) && attributeDefUuids.length === 0) {
     filterByAttributeDefsClause = 'AND 1 = 0'
   } else if (attributeDefUuids?.length > 0) {
-    filterByAttributeDefsClause = 'AND n.node_def_uuid IN ($/attributeDefUuids:csv/)'
+    filterByAttributeDefsClause = `AND n.node_def_id IN (SELECT id FROM ${surveySchema}.node_def WHERE uuid IN ($/attributeDefUuids:csv/))`
   } else {
     filterByAttributeDefsClause = ''
   }
@@ -73,21 +73,23 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
   const orderByClause = getOrderByClause({ sortBy, sortOrder })
 
   const text = `WITH node_validation AS (
-    SELECT 
+    SELECT
       r.uuid AS record_uuid,
-      -- node_uuid
-      -- if the length of the key is ${uuidLength}, then it's a uuid
-      -- otherwise the key of the field validation starts with '${prefixChildrenCount}' followed by the child def uuid
+      -- node_i_id
+      -- if the key does not start with '${prefixChildrenCount}', it's a plain node internal id;
+      -- otherwise the key is '${prefixChildrenCount}' followed by the parent node internal id, an
+      -- underscore, and the child def uuid - the parent's internal id is what the report attaches
+      -- the children-count validation message to.
       (
-        CASE WHEN LENGTH(nv.key) = ${uuidLength}
-        THEN nv.key
-        ELSE SUBSTRING(nv.key, ${prefixChildrenCount.length + 1}, ${uuidLength})
+        CASE WHEN LEFT(nv.key, ${childrenCountPrefixLength}) = '${prefixChildrenCount}'
+        THEN split_part(nv.key, '_', 2)
+        ELSE nv.key
         END
-      )::uuid AS node_uuid,
+      )::int AS node_i_id,
       -- validation_count_child_def_uuid
       (
-        CASE WHEN LENGTH(nv.key) > ${uuidLength}
-        THEN SUBSTRING(nv.key, ${prefixChildrenCount.length + uuidLength + 2}, ${uuidLength})
+        CASE WHEN LEFT(nv.key, ${childrenCountPrefixLength}) = '${prefixChildrenCount}'
+        THEN split_part(nv.key, '_', 3)
         ELSE NULL
         END
       )::uuid AS validation_count_child_def_uuid,
@@ -95,9 +97,9 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
       nv.value::jsonb AS validation
     FROM
       ${surveySchema}.record r,
-      jsonb_each(r.validation #> '{${Validation.keys.fields}}' ) nv    
+      jsonb_each(r.validation #> '{${Validation.keys.fields}}' ) nv
   )
-    
+
   SELECT
       r.cycle AS record_cycle,
       r.owner_uuid AS record_owner_uuid,
@@ -107,35 +109,37 @@ const query = ({ surveyId, recordUuid, filterBySurveyAttrs = null, sortBy, sortO
       r.date_modified as record_date_modified,
       u.name as record_owner_name,
       n.id AS node_id,
-      n.uuid AS node_uuid,
-      n.node_def_uuid,
+      nd.uuid AS node_def_uuid,
       nv.validation_count_child_def_uuid,
       nv.validation,
-      
+
       -- TODO: check why subquery is faster than outer join when joining _node_keys_hierarchy view
-      (SELECT h.keys_self 
+      (SELECT h.keys_self
         FROM ${surveyRdbSchema}._node_keys_hierarchy h
-        WHERE h.node_uuid = n.uuid
+        WHERE h.node_i_id = n.i_id AND h.record_uuid = n.record_uuid
       ),
-      (SELECT h.keys_hierarchy 
+      (SELECT h.keys_hierarchy
         FROM ${surveyRdbSchema}._node_keys_hierarchy h
-        WHERE h.node_uuid = n.uuid
+        WHERE h.node_i_id = n.i_id AND h.record_uuid = n.record_uuid
       )
     FROM
       ${surveySchema}.record r
       JOIN "user" u
         ON (r.owner_uuid = u.uuid)
-      JOIN 
+      JOIN
         node_validation nv
         ON (r.uuid = nv.record_uuid)
       JOIN
         ${surveySchema}.node n
-        ON n.uuid = nv.node_uuid
-    WHERE 
+        ON n.i_id = nv.node_i_id AND n.record_uuid = nv.record_uuid
+      JOIN
+        ${surveySchema}.node_def nd
+        ON nd.id = n.node_def_id
+    WHERE
       r.cycle = $/cycle/
       AND NOT r.preview
       -- exclude analysis variables
-      AND n.node_def_uuid NOT IN (SELECT uuid FROM ${surveySchema}.node_def WHERE analysis IS TRUE)
+      AND NOT nd.analysis
       ${recordUuid ? 'AND r.uuid = $/recordUuid/' : ''}
       ${filterBySurveyAttrsClause}
       ${filterByAttributeDefsClause}

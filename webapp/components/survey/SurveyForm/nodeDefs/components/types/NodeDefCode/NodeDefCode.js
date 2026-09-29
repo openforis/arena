@@ -68,7 +68,13 @@ const NodeDefCode = (props) => {
   const onItemAdd = useCallback(
     (item) => {
       const existingNode = singleNode ? nodes[0] : null
-      const node = existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
+      const node =
+        existingNode ??
+        Node.newNode({
+          record: { uuid: Node.getRecordUuid(parentNode) },
+          nodeDefUuid: NodeDef.getUuid(nodeDef),
+          parentNode,
+        })
 
       const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
       const meta = { [Node.metaKeys.hierarchyCode]: codeAttributesUuidsHierarchy }

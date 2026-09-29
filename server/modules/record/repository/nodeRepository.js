@@ -18,33 +18,45 @@ const { keys: refDataKeys } = NodeRefData
 const { keys: categoryItemKeys } = CategoryItem
 const { keys: taxonKeys } = Taxon
 
+// node.node_def_id (bigint, references node_def.id) replaced node.node_def_uuid to save space on
+// large surveys; callers still work in terms of node def uuids, so inserts resolve the uuid to an
+// id via this raw (unescaped) subquery fragment, and reads resolve it back via a join to node_def.
+const _toNodeDefIdRawValue = ({ schema, nodeDefUuid }) =>
+  `(SELECT id FROM ${schema}.node_def WHERE uuid = ${DbUtils.formatQuery('$1', [nodeDefUuid])})`
+
+export const toNodeDefIdRawValue = (surveyId, nodeDefUuid) =>
+  _toNodeDefIdRawValue({ schema: getSurveyDBSchema(surveyId), nodeDefUuid })
+
 export const tableColumnsInsert = [
-  'uuid',
   'date_created',
   'date_modified',
   'record_uuid',
-  'parent_uuid',
-  'node_def_uuid',
+  'i_id',
+  'p_i_id',
+  { name: 'node_def_id', prop: 'node_def_id', mod: '^' }, // raw: value is a subquery fragment, see _toNodeDefIdRawValue
   'value',
   'meta',
 ] // Used for node values batch insert
 
-const tableColumnsSelect = ['id', ...tableColumnsInsert]
+const tableColumnsSelect = ['id', 'date_created', 'date_modified', 'record_uuid', 'i_id', 'p_i_id', 'value', 'meta']
 
 // ============== UTILS
 
 // cache of camelized keys
 const nodeKeyByColumnName = {}
 
-const dbTransformCallback = (node) => {
+const dbTransformCallback = (row) => {
   // use a cache of camelized keys; "camelize" is too slow when running on thousands of objects
-  // (do not camelize meta properties)
-  for (const [columnName, value] of Object.entries(node)) {
-    const nodeKey = nodeKeyByColumnName[columnName] ?? A.camelize(columnName)
-    if (nodeKey !== columnName) {
-      node[nodeKey] = value
-      delete node[columnName]
+  // (do not camelize meta properties);
+  // build a new object instead of deleting the row keys: "delete" would switch it to the (much bigger) V8 dictionary mode
+  const node = {}
+  for (const [columnName, value] of Object.entries(row)) {
+    let nodeKey = nodeKeyByColumnName[columnName]
+    if (!nodeKey) {
+      nodeKey = A.camelize(columnName)
+      nodeKeyByColumnName[columnName] = nodeKey
     }
+    node[nodeKey] = value
   }
   // cast id to Number
   node.id = Number(node.id)
@@ -53,11 +65,11 @@ const dbTransformCallback = (node) => {
 
 const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
 
-const _getAncestorUuidSelectField = (ancestorDef) => {
+const _getAncestorIIdSelectField = (ancestorDef) => {
   const nodeAncestorEntityHierarchyIndex = ancestorDef ? NodeDef.getMetaHierarchy(ancestorDef).length : null
   return nodeAncestorEntityHierarchyIndex === null
     ? 'null'
-    : `(n.meta -> '${Node.metaKeys.hierarchy}' ->> ${nodeAncestorEntityHierarchyIndex})::uuid`
+    : `(n.meta -> '${Node.metaKeys.hierarchy}' -> ${nodeAncestorEntityHierarchyIndex})::integer`
 }
 
 /**
@@ -83,11 +95,11 @@ export const getNodeSelectQuery = ({
 }) => {
   const schema = getSurveyDBSchema(surveyId)
 
-  const selectFields = (includeRecordUuid ? tableColumnsSelect : A.without(['record_uuid'], tableColumnsSelect)).map(
-    (field) => `n.${field}`
-  )
+  const selectFields = (includeRecordUuid ? tableColumnsSelect : A.without(['record_uuid'], tableColumnsSelect))
+    .map((field) => `n.${field}`)
+    .concat('nd.uuid AS node_def_uuid')
 
-  const fromParts = [`${schema}.node n`]
+  const fromParts = [`${schema}.node n`, `JOIN ${schema}.node_def nd ON nd.id = n.node_def_id`]
   if (includeSurveyUuid) {
     selectFields.push('si.survey_uuid')
     fromParts.push(`CROSS JOIN survey_info si`)
@@ -98,7 +110,7 @@ export const getNodeSelectQuery = ({
       'r.cycle AS record_cycle',
       'r.step AS record_step',
       'r.owner_uuid AS record_owner_uuid',
-      `${_getAncestorUuidSelectField(ancestorDef)} AS ancestor_uuid`
+      `${_getAncestorIIdSelectField(ancestorDef)} AS ancestor_i_id`
     )
     fromParts.push(`JOIN ${schema}.record r 
       ON r.uuid = n.record_uuid
@@ -148,7 +160,7 @@ export const getNodeSelectQuery = ({
 export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, recordUuid = null }, client = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const whereConditions = [
-    `n.node_def_uuid IN ($/nodeDefFileUuids:csv/)`,
+    `n.node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($/nodeDefFileUuids:csv/))`,
     `n.value IS NOT NULL`,
     `n.value->>'${Node.valuePropsFile.fileUuid}' IS NOT NULL`,
     `NOT EXISTS (SELECT 1 FROM ${schema}.file f WHERE f.uuid = (n.value->>'${Node.valuePropsFile.fileUuid}')::uuid)`,
@@ -191,15 +203,15 @@ export const fetchFileValueNodesByNodeDefUuids = async ({ surveyId, nodeDefUuids
     `
     SELECT n.record_uuid AS "recordUuid", n.value ->> '${Node.valuePropsFile.fileUuid}' AS "fileUuid"
     FROM ${schema}.node n
-    JOIN ${schema}.node_def nd ON nd.uuid = n.node_def_uuid AND nd.type = '${NodeDef.nodeDefType.file}'
+    JOIN ${schema}.node_def nd ON nd.id = n.node_def_id AND nd.type = '${NodeDef.nodeDefType.file}'
     JOIN ${schema}.record r ON r.uuid = n.record_uuid AND r.preview = true
     WHERE n.value ->> '${Node.valuePropsFile.fileUuid}' IS NOT NULL
       AND (
-        n.node_def_uuid IN ($/nodeDefUuids:csv/)
+        n.node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($/nodeDefUuids:csv/))
         OR n.meta -> '${Node.metaKeys.hierarchy}' ?| (
              SELECT coalesce(array_agg(root.uuid::text), ARRAY[]::text[])
              FROM ${schema}.node root
-             WHERE root.node_def_uuid IN ($/nodeDefUuids:csv/)
+             WHERE root.node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($/nodeDefUuids:csv/))
            )
       )`,
     { nodeDefUuids },
@@ -216,16 +228,21 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
     [Node.metaKeys.childApplicability]: {},
   }
 
+  const nodeIId = Node.getIId(node)
+  const recordUuid = Node.getRecordUuid(node)
+
+  const schema = getSurveyDBSchema(surveyId)
+
   await client.query(
     `
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.node
-        (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
-    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
+    INSERT INTO ${schema}.node
+        (i_id, record_uuid, p_i_id, node_def_id, value, meta)
+    VALUES ($1, $2, $3, (SELECT id FROM ${schema}.node_def WHERE uuid = $4), $5::jsonb, $6::jsonb)
     `,
     [
-      Node.getUuid(node),
-      Node.getRecordUuid(node),
-      Node.getParentUuid(node),
+      nodeIId,
+      recordUuid,
+      Node.getParentInternalId(node),
       Node.getNodeDefUuid(node),
       _toValueQueryParam(Node.getValue(node, null)),
       meta,
@@ -233,7 +250,7 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
   )
 
   // reload node to get node ref data
-  const nodeAdded = await fetchNodeWithRefDataByUuid({ surveyId, nodeUuid: Node.getUuid(node), draft }, client)
+  const nodeAdded = await fetchNodeWithRefDataByIId({ surveyId, recordUuid, nodeIId, draft }, client)
 
   return { ...nodeAdded, [Node.keys.created]: true }
 }
@@ -244,8 +261,10 @@ export const insertNodesFromValues = async (surveyId, nodeValues, client = db) =
 export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) => {
   if (nodes.length === 0) return []
 
+  const schema = getSurveyDBSchema(surveyId)
+
   const query = DbUtils.insertAllQueryBatch(
-    getSurveyDBSchema(surveyId),
+    schema,
     'node',
     tableColumnsInsert,
     nodes.map((node) => ({
@@ -253,8 +272,9 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
       date_created: Dates.formatForStorage(Node.getDateCreated(node)),
       date_modified: Dates.formatForStorage(Node.getDateModified(node)),
       record_uuid: Node.getRecordUuid(node),
-      parent_uuid: Node.getParentUuid(node),
-      node_def_uuid: Node.getNodeDefUuid(node),
+      i_id: Node.getIId(node),
+      p_i_id: Node.getParentInternalId(node),
+      node_def_id: _toNodeDefIdRawValue({ schema, nodeDefUuid: Node.getNodeDefUuid(node) }),
       value: _toValueQueryParam(Node.getValue(node)),
       meta: Node.getMeta(node),
     }))
@@ -282,58 +302,64 @@ export const fetchNodesByRecordUuid = async (
     dbTransformCallback
   )
 
-export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
-  client.one(
+export const fetchNodeByIId = async (surveyId, recordUuid, iId, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.one(
     `
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE uuid = $1`,
-    [uuid],
+    SELECT n.*, nd.uuid AS node_def_uuid
+    FROM ${schema}.node n
+    JOIN ${schema}.node_def nd ON nd.id = n.node_def_id
+    WHERE n.record_uuid = $/recordUuid/ AND n.i_id = $/iId/`,
+    { recordUuid, iId },
     dbTransformCallback
   )
+}
 
-export const fetchNodesWithRefDataByUuids = async ({ surveyId, nodeUuids, draft }, client = db) =>
+export const fetchNodesWithRefDataByIIds = async ({ surveyId, recordUuid, nodeIIds, draft }, client = db) =>
   client.map(
     `
     ${getNodeSelectQuery({ surveyId, draft })}
-    WHERE n.uuid IN ($/nodeUuids:list/)
+    WHERE n.record_uuid = $/recordUuid/ AND n.i_id IN ($/nodeIIds:list/)
   `,
-    { surveyId, nodeUuids },
+    { surveyId, recordUuid, nodeIIds },
     dbTransformCallback
   )
 
-export const fetchNodeWithRefDataByUuid = async ({ surveyId, nodeUuid, draft }, client = db) =>
-  (await fetchNodesWithRefDataByUuids({ surveyId, nodeUuids: [nodeUuid], draft }, client))[0]
+export const fetchNodeWithRefDataByIId = async ({ surveyId, recordUuid, nodeIId, draft }, client = db) =>
+  (await fetchNodesWithRefDataByIIds({ surveyId, recordUuid, nodeIIds: [nodeIId], draft }, client))[0]
 
-export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUuids, client = db) =>
-  client.map(
+export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeIId, childDefUuids, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.map(
     `
     ${getNodeSelectQuery({ surveyId, draft: false })}
     WHERE n.record_uuid = $/recordUuid/
-      AND n.parent_uuid ${nodeUuid ? '= $/nodeUuid/' : 'is null'}
-      AND n.node_def_uuid IN ($/childDefUuids:csv/)`,
-    { surveyId, recordUuid, nodeUuid, childDefUuids },
+      AND n.p_i_id ${nodeIId ? '= $/nodeIId/' : 'is null'}
+      AND n.node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($/childDefUuids:csv/))`,
+    { surveyId, recordUuid, nodeIId, childDefUuids },
     dbTransformCallback
   )
+}
 
 // ============== UPDATE
 export const updateNode = async (
-  { surveyId, nodeUuid, value = null, meta = {}, draft, reloadNode = true },
+  { surveyId, recordUuid, nodeIId, value = null, meta = {}, draft, reloadNode = true },
   client = db
 ) => {
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node
-    SET value = $1::jsonb,
-    meta = meta || $2::jsonb, 
+    SET value = $/value/::jsonb,
+    meta = meta || $/meta/::jsonb, 
     date_modified = ${DbUtils.now}
-    WHERE uuid = $3
+    WHERE record_uuid = $/recordUuid/ AND i_id = $/nodeIId/
     `,
-    [_toValueQueryParam(value), meta || {}, nodeUuid]
+    { value: _toValueQueryParam(value), meta: meta || {}, recordUuid, nodeIId }
   )
   if (!reloadNode) return null
 
   // fetch node with ref data
-  const node = await fetchNodeWithRefDataByUuid({ surveyId, nodeUuid, draft }, client)
+  const node = await fetchNodeWithRefDataByIId({ surveyId, recordUuid, nodeIId, draft }, client)
   node[Node.keys.updated] = true
   return node
 }
@@ -361,16 +387,23 @@ export const updateNodes = async ({ surveyId, nodes }, client = db) => {
 }
 
 // ============== DELETE
-export const deleteNode = async (surveyId, nodeUuid, client = db) =>
-  client.one(
+export const deleteNode = async ({ surveyId, recordUuid, nodeIId }, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.one(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE uuid = $1
-    RETURNING *, true as ${Node.keys.deleted}
+    WITH deleted AS (
+      DELETE FROM ${schema}.node
+      WHERE record_uuid = $/recordUuid/ AND i_id = $/nodeIId/
+      RETURNING *
+    )
+    SELECT deleted.*, nd.uuid AS node_def_uuid, true as ${Node.keys.deleted}
+    FROM deleted
+    JOIN ${schema}.node_def nd ON nd.id = deleted.node_def_id
     `,
-    [nodeUuid],
+    { recordUuid, nodeIId },
     dbTransformCallback
   )
+}
 
 /**
  * Deletes all nodes belonging to the given node def uuids, survey-wide. Callers of this delete
@@ -383,21 +416,30 @@ export const deleteNode = async (surveyId, nodeUuid, client = db) =>
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<number>} - The number of nodes deleted.
  */
-export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) =>
-  client.result(
+export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.result(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE node_def_uuid IN ($1:csv)
+    DELETE FROM ${schema}.node
+    WHERE node_def_id IN (SELECT id FROM ${schema}.node_def WHERE uuid IN ($1:csv))
     `,
     [nodeDefUuids],
     A.prop('rowCount')
   )
+}
 
-export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>
-  client.manyOrNone(
-    `DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE uuid IN ($1:csv)
-    RETURNING *, true as ${Node.keys.deleted}`,
-    [nodeUuids],
+export const deleteNodesByInternalIds = async ({ surveyId, recordUuid, nodeInternalIds }, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.manyOrNone(
+    `WITH deleted AS (
+      DELETE FROM ${schema}.node
+      WHERE record_uuid = $/recordUuid/ AND i_id IN ($/nodeInternalIds:csv/)
+      RETURNING *
+    )
+    SELECT deleted.*, nd.uuid AS node_def_uuid, true as ${Node.keys.deleted}
+    FROM deleted
+    JOIN ${schema}.node_def nd ON nd.id = deleted.node_def_id`,
+    { recordUuid, nodeInternalIds },
     dbTransformCallback
   )
+}

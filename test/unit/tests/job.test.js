@@ -121,9 +121,12 @@ describe('Job execute default', () => {
       }
     }
     const job = new LeafJob('LeafJob')
+    const dbTxSpy = jest.spyOn(db, 'tx').mockImplementation(async (fn) => fn({ marker: 'fake-tx-from-db' }))
 
     await job.start()
 
     expect(job.isSucceeded()).toBe(true)
+
+    dbTxSpy.mockRestore()
   })
 })

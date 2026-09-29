@@ -53,7 +53,7 @@ export default {
       '$t(appErrors:record.errorUpdating)。ノード{{nodeDefName}}での式の評価中にエラーが発生しました：{{details}}',
   },
   recordPrintableExport: {
-    missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeUuidが必要です',
+    missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeIIdが必要です',
     entityNotFound: '指定されたエクスポート対象の項目が見つかりません',
     missingServerUrl: 'QRコード付きエクスポートには公開サーバーURLが必要です',
     qrTokenMismatch: 'QRコードのエクスポートを確定できませんでした。再試行してください',

@@ -82,6 +82,9 @@ export default class RecordsImportJob extends DataImportBaseJob {
         continue
       }
 
+      // ArenaSurveyFileZip.getRecord converts a legacy uuid/parentUuid-linked record (from an
+      // arena-mobile version older than the node internal-id migration) to the current iId/pIId
+      // shape, so nothing downstream needs to know about the legacy format.
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
       this.currentRecord = record
       await this.cleanupCurrentRecord()
@@ -125,7 +128,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     delete record['_nodesIndex']
     const nodes = Record.getNodes(record)
 
-    for (const [nodeUuid, node] of Object.entries(nodes)) {
+    for (const [nodeIId, node] of Object.entries(nodes)) {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const { valid, error, warn } = await checkNodeIsValid({ survey, nodes, node, nodeDef })
@@ -136,13 +139,13 @@ export default class RecordsImportJob extends DataImportBaseJob {
       } else {
         const nodeDefName = nodeDef ? NodeDef.getName(nodeDef) : '<missing>'
         if (warn) {
-          const messagePrefix = `record ${recordUuid}: node with uuid ${nodeUuid} and node def ${nodeDefName} (uuid ${nodeDefUuid})`
+          const messagePrefix = `record ${recordUuid}: node with internal id ${nodeIId} and node def ${nodeDefName} (uuid ${nodeDefUuid})`
           this.logWarn(`${messagePrefix} ${warn}: skipping it`)
-          delete nodes[nodeUuid]
+          delete nodes[nodeIId]
         } else {
           throw new SystemError('dataImport.invalidNodeInRecord', {
             recordUuid,
-            nodeUuid,
+            nodeIId,
             nodeDefName,
             nodeDefUuid,
             details: error,
@@ -255,19 +258,19 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const nodesIndexedByUuid = Record.getNodesArray(record)
       .sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
       .reduce((acc, node) => {
-        const nodeUuid = Node.getUuid(node)
+        const nodeIId = Node.getIId(node)
         const nodeDefUuid = Node.getNodeDefUuid(node)
         // check that the node definition associated to the node has not been deleted from the survey
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
         if (nodeDef) {
           node[Node.keys.created] = true // do side effect to avoid creating new objects
-          acc[nodeUuid] = node
+          acc[nodeIId] = node
           if (NodeDef.isFile(nodeDef)) {
             this.trackFileUuid({ node })
           }
         } else {
           this.logDebug(
-            `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeUuid}; skipping it`
+            `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeIId}; skipping it`
           )
         }
         return acc

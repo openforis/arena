@@ -16,16 +16,16 @@ import { TestId } from '@webapp/utils/testId'
  * first instance only for single entities (never for multiples).
  * @param {object} params - Lookup params
  * @param {object} params.record - Record
- * @param {object} params.pagesUuidMap - Page node def UUID → node UUID map
+ * @param {object} params.pagesUuidMap - Page node def UUID → node internal ID map
  * @param {string} params.nodeDefUuid - Page entity node def UUID
  * @param {object} params.survey - Survey
  * @returns {object|null} Page entity node or null
  */
 const getPageNode = ({ record, pagesUuidMap, nodeDefUuid, survey }) => {
   if (!record || !nodeDefUuid) return null
-  const nodeUuid = pagesUuidMap[nodeDefUuid]
-  if (nodeUuid) {
-    const mapped = Record.getNodeByUuid(nodeUuid)(record)
+  const nodeIId = pagesUuidMap[nodeDefUuid]
+  if (nodeIId) {
+    const mapped = Record.getNodeByInternalId(nodeIId)(record)
     if (mapped) return mapped
   }
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)

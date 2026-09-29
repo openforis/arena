@@ -171,7 +171,7 @@ const _addOrUpdateAttribute =
     if (!attribute || NodeDef.isMultipleAttribute(attributeDef)) {
       // create new attribute
       const updateResult = new RecordUpdateResult({ record })
-      const attributeCreated = Node.newNode(attributeDefUuid, record.uuid, entity, value)
+      const attributeCreated = Node.newNode({ record, nodeDefUuid: attributeDefUuid, parentNode: entity, value })
       const attributeToAdd = refData ? NodeRefData.assocRefData(refData)(attributeCreated) : attributeCreated
       updateResult.addNode(attributeToAdd, { sideEffect })
       return updateResult
@@ -497,17 +497,17 @@ const deleteNodesInEntityByNodeDefUuid =
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
-    const nodeUuidsToDelete = []
+    const nodeIIdsToDelete = []
     for (const nodeDefUuid of nodeDefUuids) {
       const children = RecordReader.getNodeChildrenByDefUuid(entity, nodeDefUuid)(record)
-      nodeUuidsToDelete.push(...children.map(Node.getUuid))
+      nodeIIdsToDelete.push(...children.map(Node.getIId))
     }
 
     const nodesDeleteUpdateResult = await deleteNodes({
       user,
       survey,
       record,
-      nodeUuids: nodeUuidsToDelete,
+      nodeInternalIds: nodeIIdsToDelete,
       categoryItemProvider,
       taxonProvider,
       sideEffect,

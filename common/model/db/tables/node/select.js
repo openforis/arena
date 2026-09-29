@@ -16,17 +16,16 @@ const _isInsideSingleEntity = ({ survey, nodeDefUuid }) => {
 
 /**
  * Generates the select query for the node table by the given parameters.
- *
  * @param {!object} params - The query parameters.
- * @param {string} [params.uuid=null] - The node uuid to filter by.
- * @param {string} [params.recordUuid=null] - The record uuid to filter by.
- * @param {string} [params.parentUuid=null] - The parent node uuid to filter by.
- * @param {string} [params.nodeDefUuid=null] - The node definition uuid to filter by.
- * @param {boolean} [params.draft=false] - Whether to fetch draft props or only published ones.
+ * @param {string} [params.uuid] - The node uuid to filter by.
+ * @param {string} [params.recordUuid] - The record uuid to filter by.
+ * @param {string} [params.parentIId] - The parent node internal id to filter by.
+ * @param {string} [params.nodeDefUuid] - The node definition uuid to filter by.
+ * @param {boolean} [params.draft] - Whether to fetch draft props or only published ones.
  * @returns {string} - The select query.
  */
 export function getSelect(params) {
-  const { uuid = null, recordUuid = null, parentUuid = null, nodeDefUuid = null, draft = false } = params
+  const { uuid = null, recordUuid = null, parentIId = null, nodeDefUuid = null, draft = false } = params
 
   const _getPropsCombined = (table) =>
     draft ? `${table.columnProps} || ${table.columnPropsDraft}` : `${table.columnProps}`
@@ -47,22 +46,33 @@ export function getSelect(params) {
     }
   }
 
-  const _addParentNodeCondition = () => {
-    if (nodeDefUuid && _isInsideSingleEntity({ survey: this.survey, nodeDefUuid })) {
-      // node def is inside a single entity
-      // parentUuid is the uuid of the first ancestor multiple entity
-      // use node hierarchy in the where condition
-      whereConditions.push(
-        `${parentUuid}::text IN (SELECT jsonb_array_elements_text(${this.columnMeta} -> '${Node.metaKeys.hierarchy}'))`
-      )
-    } else {
-      _addUuidEqualCondition(this.columnParentUuid, parentUuid)
+  const _addIdEqualCondition = (column, value) => {
+    if (value) {
+      whereConditions.push(`${column} = ${value}`)
     }
   }
 
-  _addUuidEqualCondition(this.columnUuid, uuid)
+  const _addParentNodeCondition = () => {
+    if (nodeDefUuid && _isInsideSingleEntity({ survey: this.survey, nodeDefUuid })) {
+      // node def is inside a single entity
+      // parentIId is the internal id of the first ancestor multiple entity
+      // use node hierarchy in the where condition
+      whereConditions.push(
+        `${parentIId}::integer IN (SELECT jsonb_array_elements(${this.columnMeta} -> '${Node.metaKeys.hierarchy}'))`
+      )
+    } else {
+      _addIdEqualCondition(this.columnParentIId, parentIId)
+    }
+  }
+
+  _addIdEqualCondition(this.columnIId, uuid)
   _addUuidEqualCondition(this.columnRecordUuid, recordUuid)
-  _addUuidEqualCondition(this.columnNodeDefUuid, nodeDefUuid)
+  if (nodeDefUuid) {
+    // node.node_def_uuid was dropped in favor of node.node_def_id; the survey (already in memory
+    // here) resolves the filter uuid to an id without needing a join to node_def just for this.
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(this.survey)
+    _addIdEqualCondition(this.columnNodeDefId, NodeDef.getId(nodeDef))
+  }
   _addParentNodeCondition()
 
   const _getColumnValueProp = (keyProp) => `${this.columnValue}->>'${keyProp}'`
@@ -70,7 +80,7 @@ export function getSelect(params) {
   const columnCategoryItemUuid = _getColumnValueProp(Node.valuePropsCode.itemUuid)
   const columnTaxonVernacularNameUuid = _getColumnValueProp(Node.valuePropsTaxon.vernacularNameUuid)
 
-  const query = `SELECT ${this.columns},
+  const query = `SELECT ${this.columns}, nd.uuid AS node_def_uuid,
         CASE
             WHEN ${columnTaxonUuid} IS NOT NULL
             THEN json_build_object( 
@@ -112,6 +122,10 @@ export function getSelect(params) {
         END AS ref_data
     FROM
         ${this.nameAliased}
+    JOIN
+        ${this.schema}.node_def nd
+    ON
+        nd.id = ${this.columnNodeDefId}
     LEFT OUTER JOIN
         ${tableCategoryItem.nameAliased}
     ON

@@ -3,7 +3,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as RecordCore from '@core/record/record'
 
-export type PagesUuidMap = Record<string, string>
+export type PagesUuidMap = Record<string, number>
 
 type GetPageEntityParams = {
   survey: object
@@ -38,8 +38,8 @@ export const getPageEntityFromParent = ({
   survey,
 }: GetPageEntityFromParentParams) => {
   const parentDef = Survey.getNodeDefByUuid(parentDefUuid)(survey)
-  const parentMappedUuid = pagesUuidMap?.[parentDefUuid]
-  let parentEntity = parentMappedUuid ? RecordCore.getNodeByUuid(parentMappedUuid)(record) : null
+  const parentMappedIId = pagesUuidMap?.[parentDefUuid]
+  let parentEntity = parentMappedIId ? RecordCore.getNodeByInternalId(parentMappedIId)(record) : null
   if (!parentEntity && parentDef && !NodeDef.isMultiple(parentDef)) {
     parentEntity = RecordCore.getNodesByDefUuid(parentDefUuid)(record)?.[0] ?? null
   }
@@ -62,9 +62,9 @@ export const getPageEntityFromParent = ({
 export const getPageEntity = ({ survey, record, pagesUuidMap, pageNodeDefUuid }: GetPageEntityParams) => {
   if (!record) return null
 
-  const mappedUuid = pagesUuidMap?.[pageNodeDefUuid]
-  if (mappedUuid) {
-    const mappedEntity = RecordCore.getNodeByUuid(mappedUuid)(record)
+  const mappedIId = pagesUuidMap?.[pageNodeDefUuid]
+  if (mappedIId) {
+    const mappedEntity = RecordCore.getNodeByInternalId(mappedIId)(record)
     if (mappedEntity) return mappedEntity
   }
 
@@ -116,12 +116,12 @@ export const hasUnresolvedMultipleAncestor = (
 }
 
 /**
- * Resolves the ancestor entity UUID that scopes aggregation for a multiple page.
+ * Resolves the ancestor entity internal ID that scopes aggregation for a multiple page.
  * Nested multiples (e.g. Tree under Plot) must only aggregate instances under the
  * currently selected parent — never sibling parents.
  *
  * @param params - Survey, record, selection map, and multiple page node def
- * @returns Parent entity UUID, or null when the parent cannot be resolved
+ * @returns Parent entity internal ID, or null when the parent cannot be resolved
  */
 export const getMultiplePageScopeEntityUuid = ({
   survey,
@@ -133,10 +133,10 @@ export const getMultiplePageScopeEntityUuid = ({
   record: object
   pagesUuidMap?: PagesUuidMap
   pageNodeDef: object
-}): string | null => {
+}): number | null => {
   const parentDefUuid = NodeDef.getParentUuid(pageNodeDef)
   if (!parentDefUuid) return null
 
   const parentEntity = getPageEntity({ survey, record, pagesUuidMap, pageNodeDefUuid: parentDefUuid })
-  return parentEntity ? Node.getUuid(parentEntity) : null
+  return parentEntity ? Node.getIId(parentEntity) : null
 }

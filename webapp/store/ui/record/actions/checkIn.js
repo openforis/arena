@@ -15,7 +15,7 @@ import { LoaderActions } from '@webapp/store/ui'
 import * as ActionTypes from './actionTypes'
 
 export const checkInRecord =
-  ({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, noHeader, locked = false }) =>
+  ({ recordUuid, draft, pageNodeIId, pageNodeDefUuid, noHeader, locked = false }) =>
   async (dispatch, getState) => {
     dispatch(LoaderActions.showLoader())
 
@@ -35,13 +35,13 @@ export const checkInRecord =
     }
 
     // This is used by dataQuery when user is editing a specific entity
-    if (pageNodeUuid) {
+    if (pageNodeIId) {
       const state = getState()
       const survey = SurveyState.getSurvey(state)
       const cycle = Record.getCycle(record)
 
       // Ancestors are needed to find the entity with a pageUuid specified
-      const entity = Record.getNodeByUuid(pageNodeUuid)(record)
+      const entity = Record.getNodeByInternalId(pageNodeIId)(record)
       const ancestors = Record.getAncestorsAndSelf(entity)(record)
       const pageNodeDef = Survey.getNodeDefByUuid(pageNodeDefUuid)(survey)
 
@@ -58,8 +58,8 @@ export const checkInRecord =
             )(ancestors)
 
       // Getting the nodes associated to the nodeDef page
-      const formPageNodeUuidByNodeDefUuid = A.reduce(
-        (acc, ancestor) => A.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
+      const formPageNodeIIdByNodeDefUuid = A.reduce(
+        (acc, ancestor) => A.assoc(Node.getNodeDefUuid(ancestor), Node.getIId(ancestor), acc),
         [],
         ancestors
       )
@@ -68,7 +68,7 @@ export const checkInRecord =
         type: ActionTypes.recordLoad,
         record,
         nodeDefActivePage,
-        formPageNodeUuidByNodeDefUuid,
+        formPageNodeIIdByNodeDefUuid,
         noHeader,
         locked,
       })

@@ -9,11 +9,11 @@ import TableSurvey from '../tableSurvey'
 import { getSelect } from './select'
 
 const columnSet = {
-  uuid: Table.columnSetCommon.uuid,
   id: Table.columnSetCommon.id,
   recordUuid: 'record_uuid',
-  parentUuid: 'parent_uuid',
-  nodeDefUuid: 'node_def_uuid',
+  iId: 'i_id',
+  parentIId: 'p_i_id',
+  nodeDefId: 'node_def_id',
   value: 'value',
   meta: 'meta',
   dateCreated: Table.columnSetCommon.dateCreated,
@@ -38,12 +38,16 @@ export default class TableNode extends TableSurvey {
     return super.getColumn(columnSet.recordUuid)
   }
 
-  get columnParentUuid() {
-    return super.getColumn(columnSet.parentUuid)
+  get columnIId() {
+    return super.getColumn(columnSet.iId)
   }
 
-  get columnNodeDefUuid() {
-    return super.getColumn(columnSet.nodeDefUuid)
+  get columnParentIId() {
+    return super.getColumn(columnSet.parentIId)
+  }
+
+  get columnNodeDefId() {
+    return super.getColumn(columnSet.nodeDefId)
   }
 
   get columnValue() {

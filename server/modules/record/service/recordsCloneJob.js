@@ -85,11 +85,7 @@ export default class RecordsCloneJob extends Job {
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
 
     // assign new UUIDs with side effect on record and nodes, faster when record is big
-    const {
-      record: recordCloned,
-      newNodeUuidsByOldUuid,
-      newFileUuidsByOldUuid,
-    } = RecordCloner.cloneRecord({ survey, record, cycleTo })
+    const { record: recordCloned, newFileUuidsByOldUuid } = RecordCloner.cloneRecord({ survey, record, cycleTo })
 
     const newRecordUuid = Record.getUuid(recordCloned)
     const nodes = Record.getNodes(recordCloned)
@@ -110,25 +106,25 @@ export default class RecordsCloneJob extends Job {
     // update RDB
     await DataTableUpdateRepository.updateTables({ survey, record: recordCloned, nodes }, tx)
 
-    await this.cloneFiles({ newFileUuidsByOldUuid, newNodeUuidsByOldUuid, newRecordUuid })
+    await this.cloneFiles({ newFileUuidsByOldUuid, newRecordUuid })
 
     this.incrementProcessedItems()
   }
 
-  async cloneFiles({ newFileUuidsByOldUuid, newNodeUuidsByOldUuid, newRecordUuid }) {
+  async cloneFiles({ newFileUuidsByOldUuid, newRecordUuid }) {
     const { context, tx } = this
     const { surveyId } = context
 
     for (const [fileUuid, newFileUuid] of Object.entries(newFileUuidsByOldUuid)) {
       const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
       if (fileSummary) {
+        // node internal ids are stable across a clone (RecordCloner keeps them, only recordUuid
+        // and file uuids change), so the old file's nodeIId is still valid in the cloned record.
         const content = await SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary }, tx)
-        const oldNodeUuid = SurveyFile.getNodeUuid(fileSummary)
-        const newNodeUuid = oldNodeUuid ? newNodeUuidsByOldUuid[oldNodeUuid] : null
         const newFile = SurveyFile.createFile({
           content,
           name: SurveyFile.getName(fileSummary),
-          nodeUuid: newNodeUuid,
+          nodeIId: SurveyFile.getNodeIId(fileSummary),
           recordUuid: newRecordUuid,
           size: SurveyFile.getSize(fileSummary),
           type: SurveyFile.SurveyFileType.recordAttachment,
