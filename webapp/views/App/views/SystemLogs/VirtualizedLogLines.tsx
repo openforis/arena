@@ -12,16 +12,29 @@ const overscanRows = 20
 
 type Props = {
   lines: LogLine[]
+  // when specified, every line is prefixed by its instance id, with this color
+  instanceColors?: Record<string, string> | null
 }
 
-const LogLineRow = ({ line, top }: { line: LogLine; top: number }) => {
+type LogLineRowProps = {
+  line: LogLine
+  top: number
+  instanceColor?: string
+}
+
+const LogLineRow = ({ line, top, instanceColor }: LogLineRowProps) => {
   const i18n = useI18n()
-  const { text, level, marker } = line
+  const { instanceId, text, level, marker } = line
   return (
     <div
       className={classNames('system-logs__line', { [`level-${level}`]: level, 'system-logs__marker': marker })}
       style={{ top, height: rowHeight, lineHeight: `${rowHeight}px` }}
     >
+      {instanceColor && (
+        <span className="system-logs__line-instance" style={{ color: instanceColor }}>
+          {instanceId}
+        </span>
+      )}
       {marker ? `— ${i18n.t(`systemLogsView:markers.${marker}`)} —` : text}
     </div>
   )
@@ -32,7 +45,7 @@ const LogLineRow = ({ line, top }: { line: LogLine; top: number }) => {
  * @param {Props} props - The props.
  * @returns {React.ReactElement} - The list.
  */
-export const VirtualizedLogLines = ({ lines }: Props): React.ReactElement => {
+export const VirtualizedLogLines = ({ lines, instanceColors = null }: Props): React.ReactElement => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [scrollTop, setScrollTop] = useState(0)
   const [viewportHeight, setViewportHeight] = useState(0)
@@ -77,7 +90,12 @@ export const VirtualizedLogLines = ({ lines }: Props): React.ReactElement => {
       <div className="system-logs__lines" ref={containerRef} onScroll={onScroll}>
         <div className="system-logs__lines-content" style={{ height: lines.length * rowHeight }}>
           {visibleLines.map((line, index) => (
-            <LogLineRow key={line.id} line={line} top={(firstIndex + index) * rowHeight} />
+            <LogLineRow
+              key={line.id}
+              line={line}
+              top={(firstIndex + index) * rowHeight}
+              instanceColor={instanceColors?.[line.instanceId]}
+            />
           ))}
         </div>
       </div>

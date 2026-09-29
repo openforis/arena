@@ -1,6 +1,9 @@
 export default {
   title: 'System Logs',
-  source: 'Instance: {{instanceId}} · File: {{fileName}}',
+  source: 'Connected to instance: {{instanceId}} · File: {{fileName}}',
+  instances: 'Instances',
+  localInstance: '{{instanceId}} (connected)',
+  instanceLost: 'This instance stopped sending its log (shut down or unreachable)',
   status: {
     connecting: 'Connecting...',
     connected: 'Live',
@@ -19,7 +22,7 @@ export default {
   clear: 'Clear',
   reconnect: 'Reconnect',
   jumpToLatest: 'Jump to latest',
-  fileNotFound: 'Log file {{fileName}} not found: waiting for it to be created',
+  fileNotFound: 'Instance {{instanceId}}: log file {{fileName}} not found, waiting for it to be created',
   linesCount: 'Showing {{visible}} of {{total}} lines',
   markers: {
     rotated: 'log file rotated',

@@ -63,3 +63,22 @@ SSE-over-`fetch` helper and renders the kept lines in a virtualized list.
 
 - `yarn typecheck`, `npx eslint` on changed files, `yarn test:unit`.
 - Build the client/server and manually try the view.
+
+## Task 8: combine the logs of all instances
+
+See "Multiple instances" in the design.
+
+- `common/systemLog/systemLogConstants.ts`: `instanceId` in every message, `local` in `init`,
+  `instanceLost` message.
+- `server/modules/systemLog/service/logFileStream.ts`: init + tail of a log file, chunking and byte
+  limit (extracted from the API).
+- `server/modules/systemLog/service/sequencedDelivery.ts`: in-order delivery per stream.
+- `server/modules/systemLog/service/systemLogClusterRelay.ts`: `subscribe` / `unsubscribe` / `message`
+  events on `ClusterBus`, remote tails with lease and heartbeat.
+- `server/modules/systemLog/service/systemLogStreamSession.ts`: local stream + remote messages,
+  keepalive, lost instances detection; used by `systemLogApi.ts`.
+- Webapp: `systemLogLines.ts` (instance + timestamp per line, `mergeLines`, instance filter),
+  `useSystemLogStream.ts` (instances state), `SystemLogs.tsx` (instances selector),
+  `VirtualizedLogLines.tsx` (instance tag).
+- Tests: `test/unit/tests/systemLogClusterRelay.test.ts` (in-memory bus), `systemLogLines.test.ts`.
+- Manual check with two servers on the same database.

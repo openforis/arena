@@ -4,9 +4,12 @@ export const SystemLogConstants = {
 }
 
 export const SystemLogMessageTypes = {
+  // sent once per instance (again if the instance restarts its tail): last lines of its log file
   init: 'init',
   append: 'append',
   reset: 'reset',
+  // an instance stopped sending its log (e.g. shut down or unreachable)
+  instanceLost: 'instanceLost',
 } as const
 
 export const SystemLogResetReasons = {
@@ -21,6 +24,8 @@ export type SystemLogResetReason = (typeof SystemLogResetReasons)[keyof typeof S
 export type SystemLogInitMessage = {
   type: typeof SystemLogMessageTypes.init
   instanceId: string
+  // true for the instance serving the stream
+  local: boolean
   fileName: string
   fileExists: boolean
   lines: string[]
@@ -29,12 +34,20 @@ export type SystemLogInitMessage = {
 
 export type SystemLogAppendMessage = {
   type: typeof SystemLogMessageTypes.append
+  instanceId: string
   lines: string[]
 }
 
 export type SystemLogResetMessage = {
   type: typeof SystemLogMessageTypes.reset
+  instanceId: string
   reason: SystemLogResetReason
 }
 
-export type SystemLogMessage = SystemLogInitMessage | SystemLogAppendMessage | SystemLogResetMessage
+export type SystemLogInstanceLostMessage = {
+  type: typeof SystemLogMessageTypes.instanceLost
+  instanceId: string
+}
+
+export type SystemLogMessage =
+  SystemLogInitMessage | SystemLogAppendMessage | SystemLogResetMessage | SystemLogInstanceLostMessage

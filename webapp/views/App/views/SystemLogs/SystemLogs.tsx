@@ -11,7 +11,7 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
 import { allLogLevels, filterLines, LogLevel } from './systemLogLines'
-import { useSystemLogStream } from './useSystemLogStream'
+import { SystemLogInstance, useSystemLogStream } from './useSystemLogStream'
 import { VirtualizedLogLines } from './VirtualizedLogLines'
 
 const maxLinesOptions = [SystemLogConstants.defaultMaxLines, 5000, SystemLogConstants.maxLinesLimit].map((value) => ({
@@ -19,24 +19,77 @@ const maxLinesOptions = [SystemLogConstants.defaultMaxLines, 5000, SystemLogCons
   label: value.toLocaleString(),
 }))
 
+// readable on the dark background of the log lines
+const instanceColorsPalette = ['#56d4dd', '#d2a8ff', '#7ee787', '#ffa657', '#f778ba', '#a5d6ff', '#e3b341', '#ff7b72']
+
+const toggleItem = <T,>(items: T[], item: T): T[] =>
+  items.includes(item) ? items.filter((existingItem) => existingItem !== item) : [...items, item]
+
+type InstancesSelectorProps = {
+  instances: SystemLogInstance[]
+  instanceColors: Record<string, string>
+  excludedInstanceIds: string[]
+  onToggle: (instanceId: string) => void
+}
+
+const InstancesSelector = ({ instances, instanceColors, excludedInstanceIds, onToggle }: InstancesSelectorProps) => {
+  const i18n = useI18n()
+  return (
+    <div className="system-logs__instances">
+      <span>{i18n.t('systemLogsView:instances')}</span>
+      {instances.map(({ instanceId, local, lost }) => (
+        <Button
+          key={instanceId}
+          className={classNames('system-logs__instance', { lost })}
+          iconClassName="icon-display"
+          iconEnd={
+            <span className="system-logs__instance-color" style={{ backgroundColor: instanceColors[instanceId] }} />
+          }
+          label={local ? i18n.t('systemLogsView:localInstance', { instanceId }) : instanceId}
+          labelIsI18nKey={false}
+          onClick={() => onToggle(instanceId)}
+          size="small"
+          title={lost ? 'systemLogsView:instanceLost' : undefined}
+          variant={excludedInstanceIds.includes(instanceId) ? 'outlined' : 'contained'}
+        />
+      ))}
+    </div>
+  )
+}
+
 const SystemLogs = (): React.ReactElement => {
   const i18n = useI18n()
   const [maxLines, setMaxLines] = useState(SystemLogConstants.defaultMaxLines)
   const [paused, setPaused] = useState(false)
   const [searchText, setSearchText] = useState('')
   const [levels, setLevels] = useState<LogLevel[]>(allLogLevels)
+  // new instances are included by default: keep track of the excluded ones
+  const [excludedInstanceIds, setExcludedInstanceIds] = useState<string[]>([])
 
-  const { instanceId, fileName, fileExists, lines, pendingCount, status, error, clear, reconnect } = useSystemLogStream(
-    { maxLines, paused }
+  const { instances, lines, pendingCount, status, error, clear, reconnect } = useSystemLogStream({ maxLines, paused })
+
+  const localInstance = instances.find((instance) => instance.local)
+  const missingFileInstances = instances.filter((instance) => !instance.fileExists)
+
+  const instanceColors = useMemo(
+    () =>
+      Object.fromEntries(
+        instances.map(({ instanceId }, index) => [
+          instanceId,
+          instanceColorsPalette[index % instanceColorsPalette.length],
+        ])
+      ),
+    [instances]
   )
 
-  const visibleLines = useMemo(() => filterLines(lines, { text: searchText, levels }), [levels, lines, searchText])
+  const visibleLines = useMemo(
+    () => filterLines(lines, { text: searchText, levels, excludedInstanceIds }),
+    [excludedInstanceIds, levels, lines, searchText]
+  )
 
-  const toggleLevel = useCallback(
-    (level: LogLevel) =>
-      setLevels((prevLevels) =>
-        prevLevels.includes(level) ? prevLevels.filter((prevLevel) => prevLevel !== level) : [...prevLevels, level]
-      ),
+  const toggleLevel = useCallback((level: LogLevel) => setLevels((prev) => toggleItem(prev, level)), [])
+  const toggleInstance = useCallback(
+    (instanceId: string) => setExcludedInstanceIds((prev) => toggleItem(prev, instanceId)),
     []
   )
 
@@ -45,7 +98,14 @@ const SystemLogs = (): React.ReactElement => {
       <div className="system-logs__header">
         <h1>{i18n.t('systemLogsView:title')}</h1>
         <div className="system-logs__source">
-          {instanceId && <span>{i18n.t('systemLogsView:source', { instanceId, fileName })}</span>}
+          {localInstance && (
+            <span>
+              {i18n.t('systemLogsView:source', {
+                instanceId: localInstance.instanceId,
+                fileName: localInstance.fileName,
+              })}
+            </span>
+          )}
           <span className={classNames('system-logs__status', status)}>{i18n.t(`systemLogsView:status.${status}`)}</span>
           {error && <span className="system-logs__error">{error}</span>}
         </div>
@@ -90,9 +150,22 @@ const SystemLogs = (): React.ReactElement => {
         <Button iconClassName="icon-loop2" label="systemLogsView:reconnect" onClick={reconnect} variant="outlined" />
       </div>
 
-      {!fileExists && <div className="system-logs__info">{i18n.t('systemLogsView:fileNotFound', { fileName })}</div>}
+      {instances.length > 0 && (
+        <InstancesSelector
+          instances={instances}
+          instanceColors={instanceColors}
+          excludedInstanceIds={excludedInstanceIds}
+          onToggle={toggleInstance}
+        />
+      )}
 
-      <VirtualizedLogLines lines={visibleLines} />
+      {missingFileInstances.map(({ instanceId, fileName }) => (
+        <div key={instanceId} className="system-logs__info">
+          {i18n.t('systemLogsView:fileNotFound', { instanceId, fileName })}
+        </div>
+      ))}
+
+      <VirtualizedLogLines lines={visibleLines} instanceColors={instances.length > 1 ? instanceColors : null} />
 
       <div className="system-logs__footer">
         {i18n.t('systemLogsView:linesCount', { visible: visibleLines.length, total: lines.length })}

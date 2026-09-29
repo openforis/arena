@@ -1,11 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { SystemLogMessage, SystemLogMessageTypes, SystemLogResetReasons } from '@common/systemLog/systemLogConstants'
+import {
+  SystemLogInitMessage,
+  SystemLogMessage,
+  SystemLogMessageTypes,
+  SystemLogResetReasons,
+} from '@common/systemLog/systemLogConstants'
 
 import * as API from '@webapp/service/api'
 import useInterval from '@webapp/components/hooks/useInterval'
 
-import { appendLines, createLogLinesParser, LogLine, LogLinesParser, LogMarkers } from './systemLogLines'
+import {
+  appendLines,
+  createLogLinesParser,
+  LogLine,
+  LogLinesParser,
+  LogMarkers,
+  removeInstanceLines,
+} from './systemLogLines'
 
 // incoming lines are rendered in batches, so a burst of log lines causes a few renders only
 const flushIntervalMs = 250
@@ -18,13 +30,18 @@ export const SystemLogStreamStatuses = {
 
 export type SystemLogStreamStatus = (typeof SystemLogStreamStatuses)[keyof typeof SystemLogStreamStatuses]
 
-type SourceInfo = {
-  instanceId: string | null
-  fileName: string | null
+export type SystemLogInstance = {
+  instanceId: string
+  // true for the instance serving the stream
+  local: boolean
+  fileName: string
   fileExists: boolean
+  // true when the instance stopped sending its log
+  lost: boolean
 }
 
-type UseSystemLogStreamResult = SourceInfo & {
+type UseSystemLogStreamResult = {
+  instances: SystemLogInstance[]
   lines: LogLine[]
   pendingCount: number
   status: SystemLogStreamStatus
@@ -39,11 +56,22 @@ type ConnectionState = {
   error: string | null
 }
 
-const initialSourceInfo: SourceInfo = { instanceId: null, fileName: null, fileExists: true }
-
 const resetMarkerByReason = {
   [SystemLogResetReasons.rotated]: LogMarkers.rotated,
   [SystemLogResetReasons.skipped]: LogMarkers.skipped,
+}
+
+const compareInstances = (instanceA: SystemLogInstance, instanceB: SystemLogInstance): number => {
+  if (instanceA.local !== instanceB.local) return instanceA.local ? -1 : 1
+  return instanceA.instanceId.localeCompare(instanceB.instanceId)
+}
+
+const parseInitLines = (parser: LogLinesParser, message: SystemLogInitMessage): LogLine[] => {
+  const { instanceId, lines, truncated } = message
+  const parsedLines = parser.parse(instanceId, lines)
+  if (!truncated) return parsedLines
+  const marker = parser.createMarker({ instanceId, marker: LogMarkers.truncated, timestamp: parsedLines[0]?.timestamp })
+  return [marker, ...parsedLines]
 }
 
 export const useSystemLogStream = ({
@@ -55,7 +83,7 @@ export const useSystemLogStream = ({
 }): UseSystemLogStreamResult => {
   const [lines, setLines] = useState<LogLine[]>([])
   const [pendingCount, setPendingCount] = useState(0)
-  const [sourceInfo, setSourceInfo] = useState<SourceInfo>(initialSourceInfo)
+  const [instancesById, setInstancesById] = useState<Record<string, SystemLogInstance>>({})
   const [connectionCount, setConnectionCount] = useState(0)
   // a new connection is opened when this key changes
   const connectionKey = `${connectionCount}_${maxLines}`
@@ -73,27 +101,57 @@ export const useSystemLogStream = ({
   // lines received but not rendered yet (waiting for the next flush or for the stream to be resumed)
   const pendingRef = useRef<LogLine[]>([])
 
-  const onMessage = useCallback(
-    (message: SystemLogMessage) => {
-      const parser = parserRef.current
-      if (message.type === SystemLogMessageTypes.init) {
-        const { instanceId, fileName, fileExists, lines: initialLines, truncated } = message
-        const parsedLines = parser.parse(initialLines)
-        pendingRef.current = []
-        setLines(truncated ? [parser.createMarker(LogMarkers.truncated), ...parsedLines] : parsedLines)
-        setSourceInfo({ instanceId, fileName, fileExists })
+  const addPendingLines = useCallback(
+    (newLines: LogLine[]) => {
+      pendingRef.current = appendLines(pendingRef.current, newLines, maxLines)
+    },
+    [maxLines]
+  )
+
+  const setInstanceLost = useCallback(
+    (instanceId: string, lost: boolean) =>
+      setInstancesById((prev) => {
+        const instance = prev[instanceId]
+        return !instance || instance.lost === lost ? prev : { ...prev, [instanceId]: { ...instance, lost } }
+      }),
+    []
+  )
+
+  const onInit = useCallback(
+    (message: SystemLogInitMessage) => {
+      const { instanceId, local, fileName, fileExists } = message
+      const initLines = parseInitLines(parserRef.current, message)
+      // an instance can send its init again (e.g. its tail restarted): its previous lines are replaced
+      pendingRef.current = removeInstanceLines(pendingRef.current, instanceId)
+      setLines((prevLines) => appendLines(removeInstanceLines(prevLines, instanceId), initLines, maxLines))
+      setInstancesById((prev) => ({ ...prev, [instanceId]: { instanceId, local, fileName, fileExists, lost: false } }))
+      if (local) {
         setConnectionState({ key: connectionKey, status: SystemLogStreamStatuses.connected, error: null })
-      } else if (message.type === SystemLogMessageTypes.append) {
-        pendingRef.current = appendLines(pendingRef.current, parser.parse(message.lines), maxLines)
-      } else if (message.type === SystemLogMessageTypes.reset) {
-        pendingRef.current = appendLines(
-          pendingRef.current,
-          [parser.createMarker(resetMarkerByReason[message.reason])],
-          maxLines
-        )
       }
     },
     [connectionKey, maxLines]
+  )
+
+  const onMessage = useCallback(
+    (message: SystemLogMessage) => {
+      const parser = parserRef.current
+      const { instanceId } = message
+      if (message.type === SystemLogMessageTypes.init) {
+        onInit(message)
+        return
+      }
+      if (message.type === SystemLogMessageTypes.instanceLost) {
+        setInstanceLost(instanceId, true)
+        return
+      }
+      setInstanceLost(instanceId, false)
+      if (message.type === SystemLogMessageTypes.append) {
+        addPendingLines(parser.parse(instanceId, message.lines))
+      } else if (message.type === SystemLogMessageTypes.reset) {
+        addPendingLines([parser.createMarker({ instanceId, marker: resetMarkerByReason[message.reason] })])
+      }
+    },
+    [addPendingLines, onInit, setInstanceLost]
   )
 
   useEffect(() => {
@@ -133,7 +191,13 @@ export const useSystemLogStream = ({
     setLines([])
   }, [])
 
-  const reconnect = useCallback(() => setConnectionCount((count) => count + 1), [])
+  const reconnect = useCallback(() => {
+    setInstancesById({})
+    setLines([])
+    setConnectionCount((count) => count + 1)
+  }, [])
 
-  return { ...sourceInfo, lines, pendingCount, status, error, clear, reconnect }
+  const instances = Object.values(instancesById).sort(compareInstances)
+
+  return { instances, lines, pendingCount, status, error, clear, reconnect }
 }
