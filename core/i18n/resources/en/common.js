@@ -391,6 +391,7 @@ Try again?`,
     message_plural: '$t(common.message_plural)',
 
     jobMonitor: 'Job Monitor',
+    systemLogs: 'System Logs',
 
     help: 'Help',
     about: 'About',

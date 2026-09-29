@@ -18,6 +18,7 @@ import * as dataImportApi from '@server/modules/dataImport/api/dataImportApi'
 import * as surveyRdbApi from '@server/modules/surveyRdb/api/surveyRdbApi'
 import * as analysisApi from '@server/modules/analysis/api'
 import * as jobApi from '@server/job/jobApi'
+import * as systemLogApi from '@server/modules/systemLog/api/systemLogApi'
 import * as expressionApi from '@server/modules/expression/api/expressionApi'
 import * as rstudioApi from '@server/modules/rstudio/api/rstudioApi'
 import * as mobileApi from '@server/modules/mobile/api/mobileApi'
@@ -53,6 +54,7 @@ surveyRdbApi.init(router)
 analysisApi.init(router)
 
 jobApi.init(router)
+systemLogApi.init(router)
 
 expressionApi.init(router)
 

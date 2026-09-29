@@ -74,6 +74,11 @@ export const appModules = {
     path: 'jobMonitor',
     icon: 'cogs',
   },
+  systemLogs: {
+    key: 'systemLogs',
+    path: 'systemLogs',
+    icon: 'terminal',
+  },
   help: {
     key: 'help',
     path: 'help',
