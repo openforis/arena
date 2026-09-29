@@ -154,9 +154,8 @@ Arena Mobileでは：
     scope: '内容',
     scopes: {
       full: '調査全体',
-      currentPage: '現在のページのみ',
+      currentPage: '現在のページのみ ({{entityLabel}})',
     },
-    currentPageHint: '現在のページ：{{entityLabel}}',
     currentPageUnavailable:
       '現在のページのインスタンスを特定できません。特定のページに移動するか、調査全体をエクスポートしてください。',
     includeQrCode: 'QRコードを含める',
