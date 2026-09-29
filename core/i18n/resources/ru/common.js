@@ -246,9 +246,11 @@ export default {
     },
     paginator: {
       firstPage: 'Первая страница',
+      goToPage: 'Перейти на страницу',
       itemsPerPage: 'Элементов на страницу',
       lastPage: 'Последняя страница',
       nextPage: 'Следующая страница',
+      page: 'Страница',
       previousPage: 'Предыдущая страница',
     },
     table: {

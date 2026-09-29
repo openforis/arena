@@ -248,9 +248,11 @@ export default {
     },
     paginator: {
       firstPage: '最初のページ',
+      goToPage: 'ページへ移動',
       itemsPerPage: '1ページあたりの項目数',
       lastPage: '最後のページ',
       nextPage: '次のページ',
+      page: 'ページ',
       previousPage: '前のページ',
     },
     table: {

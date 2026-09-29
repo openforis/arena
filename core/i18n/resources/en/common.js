@@ -250,9 +250,11 @@ Try again?`,
     },
     paginator: {
       firstPage: 'First page',
+      goToPage: 'Go to page',
       itemsPerPage: 'Items per page',
       lastPage: 'Last page',
       nextPage: 'Next page',
+      page: 'Page',
       previousPage: 'Previous page',
     },
     table: {
