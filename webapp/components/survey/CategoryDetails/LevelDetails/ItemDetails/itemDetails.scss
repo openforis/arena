@@ -17,7 +17,7 @@ $borderColor: $greyBorder;
   display: grid;
   align-content: center;
   align-items: center;
-  grid-template-columns: 3rem 80px auto 1fr;
+  grid-template-columns: 4rem 80px auto 1fr;
   column-gap: 10px;
   grid-row-gap: 0.2rem;
   font-size: 0.9rem;
@@ -48,7 +48,7 @@ $borderColor: $greyBorder;
   }
 
   &.not-valid {
-    grid-template-columns: 26px 3rem 44px auto 1fr;
+    grid-template-columns: 26px 4rem 44px auto 1fr;
     border-left-color: $red;
 
     .badge {
