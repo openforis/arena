@@ -4,6 +4,8 @@ import * as SystemInfoState from './state'
 
 export const useSystemAppInfo = () => useSelector(SystemInfoState.getAppInfo)
 export const useSystemConfig = () => useSelector(SystemInfoState.getConfig)
+export const useSystemConfigActivityLogDisabled = (): boolean =>
+  useSelector(SystemInfoState.isConfigActivityLogDisabled)
 export const useSystemConfigAiFeaturesEnabled = (): boolean => useSelector(SystemInfoState.isConfigAiFeaturesEnabled)
 export const useSystemConfigExperimentalFeatures = (): boolean =>
   useSelector(SystemInfoState.getConfigExperimentalFeatures)

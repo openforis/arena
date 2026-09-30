@@ -8,10 +8,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
-import * as ProcessUtils from '@core/processUtils'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigActivityLogDisabled } from '@webapp/store/system'
 import { SurveyActions, useChains, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -35,6 +34,7 @@ const SurveyInfo = (props) => {
   const canExportSurvey = useAuthCanExportSurvey()
   const chains = useChains()
   const hasChains = chains?.length > 0
+  const activityLogDisabled = useSystemConfigActivityLogDisabled()
 
   const surveyName = Survey.getName(surveyInfo)
   const surveyLabel = Survey.getLabel(surveyInfo, lang, false)
@@ -98,7 +98,7 @@ const SurveyInfo = (props) => {
         ),
       })
     }
-    if (!ProcessUtils.ENV.activityLogDisabled) {
+    if (!activityLogDisabled) {
       items.push({
         key: 'survey-delete-activity-log',
         content: (
@@ -118,7 +118,7 @@ const SurveyInfo = (props) => {
       content: <ButtonDelete onClick={onDeleteClick} testId={TestId.dashboard.surveyDeleteBtn} variant="text" />,
     })
     return items
-  }, [onDeleteActivityLogDataClick, onDeleteClick, onUnpublishClick, surveyInfo])
+  }, [activityLogDisabled, onDeleteActivityLogDataClick, onDeleteClick, onUnpublishClick, surveyInfo])
 
   const exportMenuItems = useMemo(() => {
     const items = [
@@ -136,7 +136,7 @@ const SurveyInfo = (props) => {
         onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true })),
         testId: TestId.dashboard.surveyExportWithDataBtn,
       })
-      if (!ProcessUtils.ENV.activityLogDisabled) {
+      if (!activityLogDisabled) {
         items.push({
           key: 'survey-export-with-data-no-activity-log',
           label: 'homeView:dashboard.exportWithDataNoActivityLog',
@@ -161,7 +161,7 @@ const SurveyInfo = (props) => {
       }
     }
     return items
-  }, [dispatch, hasChains, surveyInfo])
+  }, [activityLogDisabled, dispatch, hasChains, surveyInfo])
 
   return (
     <>
