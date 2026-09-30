@@ -27,8 +27,7 @@ const Home = React.lazy(() => import('./views/Home'))
 const Dashboard = React.lazy(() => import('./views/Dashboard'))
 const Users = React.lazy(() => import('./views/Users'))
 const Message = React.lazy(() => import('./views/Message'))
-const JobsMonitor = React.lazy(() => import('./views/JobsMonitor'))
-const SystemLogs = React.lazy(() => import('./views/SystemLogs'))
+const SystemAdmin = React.lazy(() => import('./views/SystemAdmin'))
 const Help = React.lazy(() => import('./views/Help'))
 
 const AppView = () => {
@@ -74,8 +73,7 @@ const AppView = () => {
       result.push({ component: Message, path: `${appModules.messages.path}/*` })
     }
     if (isSystemAdmin) {
-      result.push({ component: JobsMonitor, path: `${appModules.jobs.path}/*` })
-      result.push({ component: SystemLogs, path: `${appModules.systemLogs.path}/*` })
+      result.push({ component: SystemAdmin, path: `${appModules.systemAdmin.path}/*` })
     }
     result.push({
       component: Help,

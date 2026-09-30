@@ -1,1 +1,1 @@
-export { default } from './SystemLogsModule'
+export { default } from './SystemLogs'

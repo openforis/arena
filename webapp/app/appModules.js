@@ -69,15 +69,10 @@ export const appModules = {
     path: 'messages',
     icon: 'envelop',
   },
-  jobs: {
-    key: 'jobMonitor',
-    path: 'jobMonitor',
+  systemAdmin: {
+    key: 'systemAdmin',
+    path: 'systemAdmin',
     icon: 'cogs',
-  },
-  systemLogs: {
-    key: 'systemLogs',
-    path: 'systemLogs',
-    icon: 'terminal',
   },
   help: {
     key: 'help',
@@ -293,6 +288,17 @@ export const messageModules = {
   },
 }
 
+export const systemAdminModules = {
+  jobMonitor: {
+    key: 'jobMonitor',
+    path: 'jobMonitor',
+  },
+  systemLogs: {
+    key: 'systemLogs',
+    path: 'systemLogs',
+  },
+}
+
 export const helpModules = {
   about: {
     key: 'about',
@@ -326,6 +332,7 @@ const allAppModuleGroups = [
   analysisModules,
   user2FADeviceModules,
   messageModules,
+  systemAdminModules,
   helpModules,
 ]
 
@@ -343,6 +350,7 @@ const _getModuleParentPathParts = (module) => {
   if (Object.values(analysisModules).includes(module)) return _getModulePathParts(appModules.analysis)
   if (Object.values(messageModules).includes(module)) return _getModulePathParts(appModules.messages)
   if (Object.values(user2FADeviceModules).includes(module)) return _getModulePathParts(userModules.user2FADevices)
+  if (Object.values(systemAdminModules).includes(module)) return _getModulePathParts(appModules.systemAdmin)
   if (Object.values(helpModules).includes(module)) return _getModulePathParts(appModules.help)
 
   throw new Error(`Parent path not found for module ${module?.path}`)

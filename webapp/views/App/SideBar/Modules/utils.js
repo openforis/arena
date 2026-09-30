@@ -14,6 +14,7 @@ import {
   userModules,
   helpModules,
   messageModules,
+  systemAdminModules,
 } from '@webapp/app/appModules'
 
 const keys = {
@@ -99,9 +100,14 @@ export const getModulesHierarchy = (user, surveyInfo) => {
           }),
         ]
       : []),
-    // job monitor and system logs
+    // system admin
     ...(User.isSystemAdmin(user)
-      ? [getModule({ module: appModules.jobs }), getModule({ module: appModules.systemLogs })]
+      ? [
+          getModule({
+            module: appModules.systemAdmin,
+            children: [systemAdminModules.jobMonitor, systemAdminModules.systemLogs],
+          }),
+        ]
       : []),
     getModule({
       module: appModules.help,
@@ -126,7 +132,7 @@ export const isHidden = A.propEq(keys.hidden, true)
 export const isExternal = A.propEq(keys.external, true)
 export const isHome = (module) => getKey(module) === appModules.home.key
 export const isSurveySelectionRequired = (module) =>
-  ![appModules.home.key, appModules.help.key, appModules.jobs.key, appModules.systemLogs.key].includes(getKey(module))
+  ![appModules.home.key, appModules.help.key, appModules.systemAdmin.key].includes(getKey(module))
 export const isActive = (pathname) => (module) => {
   // Module home is active when page is on landing
   return isHome(module) ? pathname === appModuleUri(homeModules.landing) : A.startsWith(module.uri, pathname)
