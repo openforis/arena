@@ -384,7 +384,9 @@ export default {
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Жишээнүүд',
 
+    systemAdmin: 'Системийн удирдлага',
     jobMonitor: 'Ажлын хяналт',
+    systemLogs: 'Системийн бүртгэл',
 
     help: 'Тусламж',
     about: 'Тухай',

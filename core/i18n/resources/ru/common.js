@@ -383,7 +383,9 @@ export default {
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Экземпляры',
 
+    systemAdmin: 'Администрирование системы',
     jobMonitor: 'Монитор заданий',
+    systemLogs: 'Системные журналы',
 
     help: 'Помощь',
     about: 'О программе',

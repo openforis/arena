@@ -1,0 +1,186 @@
+@use '~@webapp/style/vars' as *;
+
+.app__container .app-module > .system-logs {
+  // the log lines scroll inside their own container
+  overflow: hidden;
+}
+
+.system-logs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__source {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__status {
+    padding: 0.1rem 0.6rem;
+    border-radius: 1rem;
+    color: white;
+    background-color: $orange;
+
+    &.connected {
+      background-color: $green;
+    }
+
+    &.disconnected {
+      background-color: $red;
+    }
+  }
+
+  &__error,
+  &__info {
+    color: $red;
+  }
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+
+  &__levels {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  &__instances {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+  }
+
+  &__instance {
+    &.lost {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+  }
+
+  &__instance-color {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+  }
+
+  &__search {
+    width: 20rem;
+  }
+
+  &__max-lines {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .dropdown {
+      width: 8rem;
+    }
+  }
+
+  &__lines-wrapper {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+
+    // nested to win over the MUI Button "position: relative" style
+    .system-logs__jump-to-latest {
+      position: absolute;
+      right: 1rem;
+      bottom: 0.4rem;
+    }
+  }
+
+  &__lines {
+    height: 100%;
+    // long lines wrap: no horizontal scrollbar
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+    font-size: 0.75rem;
+    border-radius: 4px;
+
+    // the default (dark) scrollbar thumb is barely visible on the dark background
+    &::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-corner {
+      background-color: #2a2a2a;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 5px;
+      border: 2px solid #2a2a2a;
+      background-color: #6e6e6e;
+
+      &:hover {
+        background-color: #9e9e9e;
+      }
+    }
+
+    // Firefox has no ::-webkit-scrollbar support
+    @supports not selector(::-webkit-scrollbar) {
+      scrollbar-color: #6e6e6e #2a2a2a;
+    }
+  }
+
+  &__lines-content {
+    position: relative;
+  }
+
+  &__line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    padding: 0 0.5rem;
+    line-height: 18px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    &.level-error {
+      color: #ff7b72;
+    }
+
+    &.level-warn {
+      color: #e3b341;
+    }
+
+    &.level-debug {
+      color: #8b949e;
+    }
+  }
+
+  &__line-instance {
+    display: inline-block;
+    min-width: 6rem;
+    margin-right: 0.75rem;
+  }
+
+  &__marker {
+    color: #79c0ff;
+    font-style: italic;
+  }
+
+  &__footer {
+    font-size: 0.8rem;
+    text-align: right;
+  }
+}

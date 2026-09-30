@@ -394,7 +394,9 @@ Réessayer ?`,
     message: 'Message',
     message_plural: '$t(common.message_plural)',
 
+    systemAdmin: 'Administration du système',
     jobMonitor: 'Moniteur des tâches',
+    systemLogs: 'Journaux système',
 
     help: 'Aide',
     about: 'À propos',
