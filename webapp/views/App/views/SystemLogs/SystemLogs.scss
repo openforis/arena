@@ -106,7 +106,9 @@
 
   &__lines {
     height: 100%;
-    overflow: auto;
+    // long lines wrap: no horizontal scrollbar
+    overflow-x: hidden;
+    overflow-y: auto;
     background-color: #1e1e1e;
     color: #d4d4d4;
     font-family: Menlo, Consolas, 'DejaVu Sans Mono', monospace;
@@ -142,14 +144,16 @@
 
   &__lines-content {
     position: relative;
-    min-width: 100%;
   }
 
   &__line {
     position: absolute;
     left: 0;
+    right: 0;
     padding: 0 0.5rem;
-    white-space: pre;
+    line-height: 18px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 
     &.level-error {
       color: #ff7b72;
