@@ -41,8 +41,11 @@ export default class IdleTimeoutCache extends ItemsCache {
   _resetItemIdleTimeout(key) {
     this._clearItemIdleTimeout(key)
 
-    this._itemTimeoutIdByKey[key] = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       this.delete(key)
     }, this.options.itemIdleTimeoutSeconds * 1000)
+    // eviction timer must not keep the process alive (e.g. at the end of the tests)
+    timeoutId.unref?.()
+    this._itemTimeoutIdByKey[key] = timeoutId
   }
 }
