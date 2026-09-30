@@ -1,10 +1,9 @@
 import './Dashboard.scss'
 
-
 import * as Survey from '@core/survey/survey'
-import * as ProcessUtils from '@core/processUtils'
 
 import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
+import { useSystemConfigActivityLogDisabled } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
@@ -29,6 +28,7 @@ const Dashboard = () => {
   const surveyInfo = useSurveyInfo()
   const recordsSummaryState = useRecordsSummary()
   const hasSamplingPointData = useHasSamplingPointData()
+  const activityLogDisabled = useSystemConfigActivityLogDisabled()
 
   const tabItems = []
 
@@ -68,7 +68,7 @@ const Dashboard = () => {
           renderContent: () => <SamplingPointDataSummary />,
         })
       }
-      if (!ProcessUtils.ENV.activityLogDisabled) {
+      if (!activityLogDisabled) {
         tabItems.push({
           key: 'activityLog',
           label: 'homeView:dashboard.activityLog.title',

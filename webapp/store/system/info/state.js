@@ -9,6 +9,7 @@ const keys = {
 }
 
 const configKeys = {
+  activityLogDisabled: 'activityLogDisabled',
   aiFeaturesEnabled: 'aiFeaturesEnabled',
   experimentalFeatures: 'experimentalFeatures',
   fileUploadLimit: 'fileUploadLimit',
@@ -24,6 +25,7 @@ export const getConfig = A.pipe(getState, A.propOr({}, keys.config))
 export const getConfigFileUploadLimit = A.pipe(getConfig, A.propOr(defaultFileUploadLimit, configKeys.fileUploadLimit))
 export const getConfigFileUploadLimitMB = (state) => getConfigFileUploadLimit(state) / 1024 ** 2
 export const getConfigExperimentalFeatures = A.pipe(getConfig, A.propEq(configKeys.experimentalFeatures, true))
+export const isConfigActivityLogDisabled = A.pipe(getConfig, A.propEq(configKeys.activityLogDisabled, true))
 export const isConfigAiFeaturesEnabled = A.pipe(getConfig, A.propEq(configKeys.aiFeaturesEnabled, true))
 
 // ====== UPDATE
