@@ -45,8 +45,11 @@ export const run = async () => {
     logger.warn(`marked ${orphanedJobsCount} orphaned job(s) as failed (instanceId: ${ProcessEnv.instanceId})`)
   }
 
-  if (ProcessUtils.isEnvDevelopment) {
-    app.use(morgan('dev'))
+  if (ProcessUtils.isEnvDevelopment || ProcessUtils.ENV.logHttpRequests) {
+    // written through log4js (not to stdout directly), so requests end up in the log file too
+    const httpLogger = Log.getLogger('HttpRequest')
+    const stream = { write: (message) => httpLogger.debug(message.trimEnd()) }
+    app.use(morgan(':method :url :status :response-time ms - :res[content-length]', { stream }))
   }
 
   // ====== app initializations

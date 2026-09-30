@@ -27,6 +27,15 @@ created but stays empty (verified by starting the server with `LOG_FOLDER` point
 **Fix:** `server/log/log.js` configures the same `file` appender as arena-server (same path, max size,
 backups, compression), using `ProcessEnv` exported by `@openforis/arena-server`.
 
+### HTTP requests log
+
+`morgan` (HTTP requests log, enabled in development only) wrote to stdout directly, so request lines
+never reached the log file. It now writes through log4js (`HttpRequest` logger, DEBUG level, without ANSI
+colors) and can be enabled in production too with `LOG_HTTP_REQUESTS=true`. Requests rejected by
+arena-server's middlewares registered before it (e.g. authentication, 401) are not logged. The
+webpack-dev-server proxy lines (`[HPM] ...`) come from the separate dev-server process (development only)
+and cannot be part of the server log.
+
 ## Approach
 
 The server tails its own local `arena.log` and streams new lines to the browser over
