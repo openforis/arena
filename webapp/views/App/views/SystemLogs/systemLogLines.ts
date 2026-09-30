@@ -192,3 +192,25 @@ export const filterLines = (lines: LogLine[], filter: LogLinesFilter): LogLine[]
     return !searchText || text.toLocaleLowerCase().includes(searchText)
   })
 }
+
+/**
+ * Formats the lines as the content of a text file (one line per row).
+ * @param {LogLine[]} lines - Lines to format.
+ * @param {object} options - The options.
+ * @param {Function} options.formatMarker - Returns the text of a marker line.
+ * @param {boolean} [options.includeInstanceId] - When true, every line is prefixed by its instance id.
+ * @returns {string} - The text.
+ */
+export const formatLinesAsText = (
+  lines: LogLine[],
+  {
+    formatMarker,
+    includeInstanceId = false,
+  }: { formatMarker: (marker: LogMarker) => string; includeInstanceId?: boolean }
+): string =>
+  lines
+    .map(({ instanceId, text, marker }) => {
+      const lineText = marker ? formatMarker(marker) : text
+      return includeInstanceId ? `[${instanceId}] ${lineText}` : lineText
+    })
+    .join('\n')

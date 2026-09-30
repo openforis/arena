@@ -19,6 +19,8 @@ export default {
   maxLines: 'Max lines',
   pause: 'Pause',
   resume: 'Resume ({{count}} new)',
+  export: 'Export',
+  exportTitle: 'Download all the loaded lines (filters not applied) to a text file',
   clear: 'Clear',
   reconnect: 'Reconnect',
   jumpToLatest: 'Jump to latest',

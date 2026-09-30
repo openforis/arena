@@ -4,13 +4,15 @@ import React, { useCallback, useMemo, useState } from 'react'
 import classNames from 'classnames'
 
 import { SystemLogConstants } from '@common/systemLog/systemLogConstants'
+import * as DateUtils from '@core/dateUtils'
 
 import { useI18n } from '@webapp/store/system'
 import { Button } from '@webapp/components/buttons'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
+import { downloadTextToFile } from '@webapp/utils/domUtils'
 
-import { allLogLevels, filterLines, LogLevel } from './systemLogLines'
+import { allLogLevels, filterLines, formatLinesAsText, LogLevel, LogMarker } from './systemLogLines'
 import { SystemLogInstance, useSystemLogStream } from './useSystemLogStream'
 import { VirtualizedLogLines } from './VirtualizedLogLines'
 
@@ -87,6 +89,18 @@ const SystemLogs = (): React.ReactElement => {
     [excludedInstanceIds, levels, lines, searchText]
   )
 
+  const multipleInstances = instances.length > 1
+
+  // exports all the loaded lines, ignoring the filters
+  const exportLines = useCallback(() => {
+    const text = formatLinesAsText(lines, {
+      formatMarker: (marker: LogMarker) => `— ${i18n.t(`systemLogsView:markers.${marker}`)} —`,
+      includeInstanceId: multipleInstances,
+    })
+    const timestamp = DateUtils.formatDateTimeExport(new Date()).replaceAll(/[ :]/g, '-')
+    downloadTextToFile(text, `arena_logs_${timestamp}.log`)
+  }, [i18n, lines, multipleInstances])
+
   const toggleLevel = useCallback((level: LogLevel) => setLevels((prev) => toggleItem(prev, level)), [])
   const toggleInstance = useCallback(
     (instanceId: string) => setExcludedInstanceIds((prev) => toggleItem(prev, instanceId)),
@@ -146,6 +160,14 @@ const SystemLogs = (): React.ReactElement => {
           onClick={() => setPaused(!paused)}
           variant="outlined"
         />
+        <Button
+          disabled={lines.length === 0}
+          iconClassName="icon-download2"
+          label="systemLogsView:export"
+          onClick={exportLines}
+          title="systemLogsView:exportTitle"
+          variant="outlined"
+        />
         <Button iconClassName="icon-bin2" label="systemLogsView:clear" onClick={clear} variant="outlined" />
         <Button iconClassName="icon-loop2" label="systemLogsView:reconnect" onClick={reconnect} variant="outlined" />
       </div>
@@ -165,7 +187,7 @@ const SystemLogs = (): React.ReactElement => {
         </div>
       ))}
 
-      <VirtualizedLogLines lines={visibleLines} instanceColors={instances.length > 1 ? instanceColors : null} />
+      <VirtualizedLogLines lines={visibleLines} instanceColors={multipleInstances ? instanceColors : null} />
 
       <div className="system-logs__footer">
         {i18n.t('systemLogsView:linesCount', { visible: visibleLines.length, total: lines.length })}

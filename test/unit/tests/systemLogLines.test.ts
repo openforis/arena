@@ -5,6 +5,7 @@ import {
   extractLevel,
   extractTimestamp,
   filterLines,
+  formatLinesAsText,
   LogLevels,
   LogMarkers,
   mergeLines,
@@ -101,5 +102,19 @@ describe('System log lines', () => {
 
     const onlyB = filterLines(lines, { text: '', levels: allLogLevels, excludedInstanceIds: ['A'] })
     expect(onlyB.map((line) => line.instanceId)).toEqual(['B'])
+  })
+
+  test('formatLinesAsText', () => {
+    const parser = createLogLinesParser()
+    const lines = [
+      parser.createMarker({ instanceId: 'a', marker: LogMarkers.truncated }),
+      ...parser.parse('a', [infoLine, stackLine]),
+    ]
+    const formatMarker = (marker: string) => `-- ${marker} --`
+    expect(formatLinesAsText(lines, { formatMarker })).toBe(`-- truncated --\n${infoLine}\n${stackLine}`)
+    expect(formatLinesAsText(lines.slice(1), { formatMarker, includeInstanceId: true })).toBe(
+      `[a] ${infoLine}\n[a] ${stackLine}`
+    )
+    expect(formatLinesAsText([], { formatMarker })).toBe('')
   })
 })
