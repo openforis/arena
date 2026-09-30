@@ -16,6 +16,8 @@ export default {
     info: 'Info',
     debug: 'Debug',
   },
+  httpRequests: 'HTTP requests',
+  httpRequestsTitle: 'Show or hide the lines logging the HTTP requests served by the server',
   maxLines: 'Max lines',
   pause: 'Pause',
   resume: 'Resume ({{count}} new)',

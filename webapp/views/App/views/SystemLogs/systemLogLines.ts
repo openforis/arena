@@ -27,6 +27,8 @@ export type LogLine = {
   level: LogLevel | null
   // set for lines added by the viewer (e.g. log file rotated), not coming from the log file
   marker?: LogMarker
+  // true for the lines written by the HttpRequest logger (requests served by the server)
+  httpRequest?: boolean
 }
 
 // log4js basic layout: "[2026-09-29T10:00:00.000] [INFO] arena - message"
@@ -41,6 +43,11 @@ const levelByLog4jsLevel: Record<string, LogLevel> = {
   DEBUG: LogLevels.debug,
   TRACE: LogLevels.debug,
 }
+
+// written by the server logger with prefix "HttpRequest": "[...] [DEBUG] arena - HttpRequest - GET /api/... 200"
+const httpRequestLineRegExp = /^\[[^\]]+\] \[[A-Z]+\] \S+ - HttpRequest - /
+
+export const isHttpRequestLine = (text: string): boolean => httpRequestLineRegExp.test(text)
 
 export const extractLevel = (text: string): LogLevel | null => {
   const match = linePrefixRegExp.exec(text)
@@ -80,7 +87,9 @@ export const createLogLinesParser = (): LogLinesParser => {
       state.level = extractLevel(text) ?? state.level
       state.timestamp = extractTimestamp(text) ?? state.timestamp
       nextId += 1
-      return { id: nextId, instanceId, timestamp: state.timestamp, text, level: state.level }
+      const line: LogLine = { id: nextId, instanceId, timestamp: state.timestamp, text, level: state.level }
+      if (isHttpRequestLine(text)) line.httpRequest = true
+      return line
     })
   }
 
@@ -169,13 +178,17 @@ export type LogLinesFilter = {
   text: string
   levels: LogLevel[]
   excludedInstanceIds?: string[]
+  hideHttpRequests?: boolean
 }
 
-const isFilterEmpty = ({ text, levels, excludedInstanceIds = [] }: LogLinesFilter): boolean =>
-  !text.trim() && excludedInstanceIds.length === 0 && allLogLevels.every((level) => levels.includes(level))
+const isFilterEmpty = ({ text, levels, excludedInstanceIds = [], hideHttpRequests = false }: LogLinesFilter): boolean =>
+  !text.trim() &&
+  !hideHttpRequests &&
+  excludedInstanceIds.length === 0 &&
+  allLogLevels.every((level) => levels.includes(level))
 
 /**
- * Filters the lines by instance, text (case insensitive) and level.
+ * Filters the lines by instance, text (case insensitive), level and type (HTTP requests).
  * Markers and lines without a level are kept, unless their instance is excluded.
  * @param {LogLine[]} lines - Lines to filter.
  * @param {LogLinesFilter} filter - The filter.
@@ -183,11 +196,12 @@ const isFilterEmpty = ({ text, levels, excludedInstanceIds = [] }: LogLinesFilte
  */
 export const filterLines = (lines: LogLine[], filter: LogLinesFilter): LogLine[] => {
   if (isFilterEmpty(filter)) return lines
-  const { levels, excludedInstanceIds = [] } = filter
+  const { levels, excludedInstanceIds = [], hideHttpRequests = false } = filter
   const searchText = filter.text.trim().toLocaleLowerCase()
-  return lines.filter(({ instanceId, text, level, marker }) => {
+  return lines.filter(({ instanceId, text, level, marker, httpRequest }) => {
     if (excludedInstanceIds.includes(instanceId)) return false
     if (marker) return true
+    if (hideHttpRequests && httpRequest) return false
     if (level && !levels.includes(level)) return false
     return !searchText || text.toLocaleLowerCase().includes(searchText)
   })

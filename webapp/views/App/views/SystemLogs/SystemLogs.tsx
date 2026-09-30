@@ -65,6 +65,7 @@ const SystemLogs = (): React.ReactElement => {
   const [paused, setPaused] = useState(false)
   const [searchText, setSearchText] = useState('')
   const [levels, setLevels] = useState<LogLevel[]>(allLogLevels)
+  const [showHttpRequests, setShowHttpRequests] = useState(true)
   // new instances are included by default: keep track of the excluded ones
   const [excludedInstanceIds, setExcludedInstanceIds] = useState<string[]>([])
 
@@ -85,8 +86,8 @@ const SystemLogs = (): React.ReactElement => {
   )
 
   const visibleLines = useMemo(
-    () => filterLines(lines, { text: searchText, levels, excludedInstanceIds }),
-    [excludedInstanceIds, levels, lines, searchText]
+    () => filterLines(lines, { text: searchText, levels, excludedInstanceIds, hideHttpRequests: !showHttpRequests }),
+    [excludedInstanceIds, levels, lines, searchText, showHttpRequests]
   )
 
   const multipleInstances = instances.length > 1
@@ -143,6 +144,13 @@ const SystemLogs = (): React.ReactElement => {
             />
           ))}
         </div>
+        <Button
+          label="systemLogsView:httpRequests"
+          onClick={() => setShowHttpRequests(!showHttpRequests)}
+          size="small"
+          title="systemLogsView:httpRequestsTitle"
+          variant={showHttpRequests ? 'contained' : 'outlined'}
+        />
         <div className="system-logs__max-lines">
           <span>{i18n.t('systemLogsView:maxLines')}</span>
           <Dropdown

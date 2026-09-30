@@ -6,6 +6,7 @@ import {
   extractTimestamp,
   filterLines,
   formatLinesAsText,
+  isHttpRequestLine,
   LogLevels,
   LogMarkers,
   mergeLines,
@@ -102,6 +103,21 @@ describe('System log lines', () => {
 
     const onlyB = filterLines(lines, { text: '', levels: allLogLevels, excludedInstanceIds: ['A'] })
     expect(onlyB.map((line) => line.instanceId)).toEqual(['B'])
+  })
+
+  test('HTTP request lines can be hidden', () => {
+    const httpLine = '[2026-09-29T10:00:03.000] [DEBUG] arena - HttpRequest - GET /api/surveys 200 3.1 ms - 42'
+    expect(isHttpRequestLine(httpLine)).toBe(true)
+    expect(isHttpRequestLine(debugLine)).toBe(false)
+    expect(isHttpRequestLine('GET /api/surveys HttpRequest - ')).toBe(false)
+
+    const parser = createLogLinesParser()
+    const lines = [...parser.parse('A', [infoLine, httpLine, debugLine])]
+    expect(lines.map((line) => !!line.httpRequest)).toEqual([false, true, false])
+
+    expect(filterLines(lines, { text: '', levels: allLogLevels, hideHttpRequests: false })).toBe(lines)
+    const withoutHttp = filterLines(lines, { text: '', levels: allLogLevels, hideHttpRequests: true })
+    expect(texts(withoutHttp)).toEqual([infoLine, debugLine])
   })
 
   test('formatLinesAsText', () => {
