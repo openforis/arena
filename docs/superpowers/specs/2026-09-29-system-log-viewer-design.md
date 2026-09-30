@@ -85,7 +85,7 @@ token) and server helpers (`server/modules/ai/api/serverSentEvents.ts`) already 
 - `readLastLines({ filePath, maxLines })`: reads the file **backwards** in 64 KB chunks until
   `maxLines` complete lines are collected (or the start of the file, or a 5 MB cap is reached, in which
   case `truncated: true`). Memory is bounded; a 10 MB file is never read in full for 1000 lines.
-  Returns `{ lines, size, ino }`; `size` is the offset from which tailing continues.
+  Returns `{ exists, lines, offset, ino, truncated }`; `offset` is the position from which tailing continues.
 - `LogFileTail` watcher: polls `fs.stat` every second (`fs.watch` is unreliable on container and
   network file systems, and a stat per second per open viewer is negligible):
   - `size > offset` → read the new bytes (at most 1 MB per tick; if more was written, skip to the last
@@ -134,9 +134,10 @@ Protocol (`targetId` = a session id generated per viewer):
 
 ### Access
 
-- New app module `systemLogs` (path `/app/systemLogs`, icon `terminal`), registered in `AppView` and
-  in the sidebar **only if `User.isSystemAdmin(user)`**, like the Job Monitor. No survey selection
-  needed.
+- New app module `systemAdmin` (path `/app/systemAdmin`, icon `cogs`) grouping the Job Monitor
+  (`/app/systemAdmin/jobMonitor`) and the System Logs (`/app/systemAdmin/systemLogs`), served by
+  `SystemAdmin.tsx`; registered in `AppView` and in the sidebar **only if `User.isSystemAdmin(user)`**.
+  No survey selection needed.
 - The API is protected server-side regardless of the UI.
 
 ### View (`webapp/views/App/views/SystemLogs/`)

@@ -24,7 +24,7 @@ SSE-over-`fetch` helper and renders the kept lines in a virtualized list.
 ## Task 3: log file tail service
 
 - Create `server/modules/systemLog/service/logFileTail.ts`:
-  - `readLastLines({ filePath, maxLines })` → `{ exists, lines, size, ino, truncated }`.
+  - `readLastLines({ filePath, maxLines })` → `{ exists, lines, offset, ino, truncated }`.
   - `LogFileTail` class: `start()`, `stop()`, callbacks `onLines`, `onReset`, `onError`; poll interval
     and max bytes per read configurable (for tests).
 - Test: `test/unit/tests/systemLogFileTail.test.js` (temp files in `os.tmpdir()`):
@@ -50,14 +50,15 @@ SSE-over-`fetch` helper and renders the kept lines in a virtualized list.
 
 - `webapp/views/App/views/SystemLogs/`:
   - `useSystemLogStream.ts` — connection state, batching (250 ms), pause buffer, reconnect.
-  - `VirtualizedLogLines.tsx` — fixed row height virtual list, follow mode, "jump to latest".
+  - `VirtualizedLogLines.tsx` — virtual list (wrapped lines, measured row heights), follow mode, "jump to latest".
   - `SystemLogs.tsx` + `SystemLogs.scss` — header, toolbar, list.
-  - `SystemLogsModule.tsx`, `index.ts`.
-- `webapp/app/appModules.js`: `systemLogs` module (icon `terminal`).
+  - `index.ts`.
+- `webapp/views/App/views/SystemAdmin/SystemAdmin.tsx`: groups Job Monitor and System Logs.
+- `webapp/app/appModules.js`: `systemAdmin` module (icon `cogs`) with `systemAdminModules` (`jobMonitor`, `systemLogs`).
 - `webapp/views/App/AppView.js`: lazy route, only for system admins.
 - `webapp/views/App/SideBar/Modules/utils.js`: sidebar entry for system admins; no survey required.
-- i18n: `core/i18n/resources/en/systemLogsView.js` (+ register in `index.js`), `appModules.systemLogs`
-  in `common.js`.
+- i18n: `core/i18n/resources/<lang>/systemLogsView.ts` (+ register in `index.js`), `appModules.systemAdmin`
+  and `appModules.systemLogs` in `common.js`.
 
 ## Task 7: verification
 

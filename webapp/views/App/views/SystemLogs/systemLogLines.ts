@@ -207,6 +207,9 @@ export const filterLines = (lines: LogLine[], filter: LogLinesFilter): LogLine[]
   })
 }
 
+// text shown instead of a marker line
+export const formatMarkerText = (markerLabel: string): string => `— ${markerLabel} —`
+
 /**
  * Formats the lines as the content of a text file (one line per row).
  * @param {LogLine[]} lines - Lines to format.

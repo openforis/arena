@@ -12,7 +12,7 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 import { downloadTextToFile } from '@webapp/utils/domUtils'
 
-import { allLogLevels, filterLines, formatLinesAsText, LogLevel, LogMarker } from './systemLogLines'
+import { allLogLevels, filterLines, formatLinesAsText, formatMarkerText, LogLevel, LogMarker } from './systemLogLines'
 import { SystemLogInstance, useSystemLogStream } from './useSystemLogStream'
 import { VirtualizedLogLines } from './VirtualizedLogLines'
 
@@ -95,7 +95,7 @@ const SystemLogs = (): React.ReactElement => {
   // exports all the loaded lines, ignoring the filters
   const exportLines = useCallback(() => {
     const text = formatLinesAsText(lines, {
-      formatMarker: (marker: LogMarker) => `— ${i18n.t(`systemLogsView:markers.${marker}`)} —`,
+      formatMarker: (marker: LogMarker) => formatMarkerText(i18n.t(`systemLogsView:markers.${marker}`)),
       includeInstanceId: multipleInstances,
     })
     const timestamp = DateUtils.formatDateTimeExport(new Date()).replaceAll(/[ :]/g, '-')

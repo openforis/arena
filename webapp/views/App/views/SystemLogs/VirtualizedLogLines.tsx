@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import { useI18n } from '@webapp/store/system'
 import { Button } from '@webapp/components/buttons'
 
-import { LogLine } from './systemLogLines'
+import { formatMarkerText, LogLine } from './systemLogLines'
 
 // height of a line not measured yet (rendered on a single row)
 const estimatedRowHeight = 18
@@ -48,7 +48,7 @@ const LogLineRow = ({ line, top, instanceColor, rowsObserver }: LogLineRowProps)
           {instanceId}
         </span>
       )}
-      {marker ? `— ${i18n.t(`systemLogsView:markers.${marker}`)} —` : text}
+      {marker ? formatMarkerText(i18n.t(`systemLogsView:markers.${marker}`)) : text}
     </div>
   )
 }

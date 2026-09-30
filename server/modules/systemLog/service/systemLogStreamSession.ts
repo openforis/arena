@@ -1,6 +1,8 @@
 import { SystemLogMessage, SystemLogMessageTypes } from '@common/systemLog/systemLogConstants'
 import { uuidv4 } from '@core/uuid'
 
+import * as Log from '@server/log/log'
+
 import { LogFileStream, startLogFileStream } from './logFileStream'
 import { SequencedDelivery } from './sequencedDelivery'
 import { RemoteLogEventMessage, SystemLogClusterRelay } from './systemLogClusterRelay'
@@ -16,6 +18,11 @@ export type SystemLogStreamSessionParams = {
 }
 
 export type SystemLogStreamSession = { stop: () => void }
+
+const logger = Log.getLogger('SystemLogStreamSession')
+
+// a failed publish on the cluster bus must not stop the stream of the local log file
+const logPublishError = (error: Error) => logger.warn(`error publishing on the cluster bus: ${error.message}`)
 
 /**
  * Tracks when the remote instances were last heard of, to detect the ones that stopped sending their log.
@@ -67,7 +74,7 @@ export const startSystemLogStreamSession = async (
 
   let localStream: LogFileStream | null = null
   const keepalive = setInterval(() => {
-    relay.publishSubscribe({ sessionId, maxLines })
+    relay.publishSubscribe({ sessionId, maxLines }).catch(logPublishError)
     for (const lostInstanceId of remoteInstances.extractLost(leaseMs)) {
       send({ type: SystemLogMessageTypes.instanceLost, instanceId: lostInstanceId })
     }
@@ -77,7 +84,7 @@ export const startSystemLogStreamSession = async (
     clearInterval(keepalive)
     localStream?.stop()
     relay.removeOriginListener(sessionId)
-    relay.publishUnsubscribe(sessionId)
+    relay.publishUnsubscribe(sessionId).catch(logPublishError)
   }
 
   try {

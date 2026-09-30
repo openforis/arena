@@ -165,7 +165,9 @@ export class SystemLogClusterRelay {
     const publishMessage = (message: SystemLogMessage | null) => {
       const eventMessage: RemoteLogEventMessage = { sessionId, instanceId: this.instanceId, tailId, seq, message }
       seq += 1
-      this.bus.publish({ targetType, targetId: sessionId, eventType: BusEventTypes.message, message: eventMessage })
+      this.bus
+        .publish({ targetType, targetId: sessionId, eventType: BusEventTypes.message, message: eventMessage })
+        .catch((error) => this.onError(error))
     }
 
     const remoteTail: RemoteTail = {
