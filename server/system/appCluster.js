@@ -47,10 +47,6 @@ export const run = async () => {
     initialMiddlewares: httpRequestLogger ? [httpRequestLogger] : [],
   })
   const { express: app, serviceRegistry } = arenaApp
-  // TODO remove once @openforis/arena-server supporting initialMiddlewares is required (> 2.4.8)
-  if (httpRequestLogger && !app.router.stack.some((layer) => layer.handle === httpRequestLogger)) {
-    app.use(httpRequestLogger)
-  }
 
   // Fail any pending/running job rows left behind by a previous incarnation of this exact process
   // (crash or restart): must run before this process enqueues any job of its own, since a

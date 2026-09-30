@@ -34,11 +34,8 @@ never reached the log file. It now writes through log4js (`HttpRequest` logger, 
 colors) and can be enabled in production too with `LOG_HTTP_REQUESTS=true`.
 
 To log also the requests rejected by arena-server's own middlewares (rate limit, authentication: 401)
-and the auth routes, the logger must run before them: arena-server's `initApp` gets a new
-`initialMiddlewares` option (registered before any other middleware; arena-server branch
-`feat/init-app-initial-middlewares`). Until arena is updated to an arena-server version with that
-option, the logger is registered after arena-server's middlewares (checked on the Express router
-stack), as before.
+and the auth routes, the logger runs before them: it is passed to `ArenaServer.init` as
+`initialMiddlewares` (registered before any other middleware, available since arena-server 2.5.0).
 
 The webpack-dev-server proxy lines (`[HPM] ...`) come from the separate dev-server process
 (development only) and cannot be part of the server log.

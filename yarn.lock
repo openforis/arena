@@ -3959,9 +3959,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.4.8":
-  version: 2.4.8
-  resolution: "@openforis/arena-server@npm:2.4.8"
+"@openforis/arena-server@npm:^2.5.0":
+  version: 2.5.0
+  resolution: "@openforis/arena-server@npm:2.5.0"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1141.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -3987,7 +3987,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.4"
-  checksum: 10c0/fcba198ddf6184ce468f72b11fa16e5907e58598e30ecdb33e1e8f608e1d469fbf4f1ab63bd5b8908a16538d4815603fcee2216fb11561c891d2b796423f5e89
+  checksum: 10c0/e9e0a0e749615038bd820fcce4f28ae3e231f9d7e02dd1ff2b2c53dc81cb34ab304f8d290fa30390ae746919e019641f3713998815f9c38171be2ca4dc178588
   languageName: node
   linkType: hard
 
@@ -14297,7 +14297,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9"
     "@mui/x-tree-view": "npm:^9"
     "@ngageoint/geopackage": "patch:@ngageoint/geopackage@npm%3A4.2.9#~/.yarn/patches/@ngageoint-geopackage-npm-4.2.9-0462c5ae41.patch"
-    "@openforis/arena-server": "npm:^2.4.8"
+    "@openforis/arena-server": "npm:^2.5.0"
     "@playwright/test": "npm:1.63.0"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@reduxjs/toolkit": "npm:^2.12.0"
