@@ -388,7 +388,9 @@ export default {
     message: 'メッセージ',
     message_plural: '$t(common.message_plural)',
 
+    systemAdmin: 'システム管理',
     jobMonitor: 'ジョブモニター',
+    systemLogs: 'システムログ',
 
     help: 'ヘルプ',
     about: 'このアプリについて',

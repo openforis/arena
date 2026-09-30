@@ -354,7 +354,9 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Instancias',
 
+    systemAdmin: 'Administración del sistema',
     jobMonitor: 'Monitor de trabajos',
+    systemLogs: 'Registros del sistema',
 
     help: 'Ayuda',
     about: 'Acerca de',

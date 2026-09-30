@@ -393,7 +393,9 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     message: 'Mensagem',
     message_plural: '$t(common.message_plural)',
 
+    systemAdmin: 'Administração do sistema',
     jobMonitor: 'Monitor de tarefas',
+    systemLogs: 'Registos do sistema',
 
     help: 'Ajuda',
     about: 'Sobre',
