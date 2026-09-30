@@ -390,7 +390,9 @@ Try again?`,
     message: 'Message',
     message_plural: '$t(common.message_plural)',
 
+    systemAdmin: 'System Administration',
     jobMonitor: 'Job Monitor',
+    systemLogs: 'System Logs',
 
     help: 'Help',
     about: 'About',

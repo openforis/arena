@@ -95,6 +95,8 @@ export const ENV = {
   whispApiKey: process.env.WHISP_API_KEY,
   // Activity log
   activityLogDisabled: isTrue(process.env.ACTIVITY_LOG_DISABLED),
+  // HTTP requests log (always enabled in development)
+  logHttpRequests: isTrue(process.env.LOG_HTTP_REQUESTS),
   // Experimental features
   experimentalFeatures: isTrue(process.env.EXPERIMENTAL_FEATURES),
   // ===== AI =====

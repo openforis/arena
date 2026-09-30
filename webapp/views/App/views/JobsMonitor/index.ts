@@ -1,1 +1,1 @@
-export { default } from './JobsMonitorModule'
+export { default } from './JobsMonitor'

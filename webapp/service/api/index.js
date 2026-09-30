@@ -110,6 +110,7 @@ export {
   getEarthMapPolygonUrl,
 } from './map'
 export { fetchNotifiedMessages } from './messageNotification'
+export { streamSystemLog } from './systemLog'
 export {
   fetchSurveyFull,
   fetchSurveys,

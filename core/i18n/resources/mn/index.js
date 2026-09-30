@@ -10,6 +10,7 @@ import jobMonitorView from './jobMonitorView'
 import messageView from './messageView'
 import surveyCreate from './surveyCreate'
 import surveyForm from './surveyForm'
+import systemLogsView from './systemLogsView'
 import userAiSettings from './userAiSettings'
 import user2FADevice from './user2FADevice'
 import usersView from './usersView'
@@ -29,6 +30,7 @@ export default {
   messageView,
   surveyCreate,
   surveyForm,
+  systemLogsView,
   userAiSettings,
   user2FADevice,
   usersView,
