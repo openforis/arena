@@ -31,10 +31,17 @@ backups, compression), using `ProcessEnv` exported by `@openforis/arena-server`.
 
 `morgan` (HTTP requests log, enabled in development only) wrote to stdout directly, so request lines
 never reached the log file. It now writes through log4js (`HttpRequest` logger, DEBUG level, without ANSI
-colors) and can be enabled in production too with `LOG_HTTP_REQUESTS=true`. Requests rejected by
-arena-server's middlewares registered before it (e.g. authentication, 401) are not logged. The
-webpack-dev-server proxy lines (`[HPM] ...`) come from the separate dev-server process (development only)
-and cannot be part of the server log.
+colors) and can be enabled in production too with `LOG_HTTP_REQUESTS=true`.
+
+To log also the requests rejected by arena-server's own middlewares (rate limit, authentication: 401)
+and the auth routes, the logger must run before them: arena-server's `initApp` gets a new
+`initialMiddlewares` option (registered before any other middleware; arena-server branch
+`feat/init-app-initial-middlewares`). Until arena is updated to an arena-server version with that
+option, the logger is registered after arena-server's middlewares (checked on the Express router
+stack), as before.
+
+The webpack-dev-server proxy lines (`[HPM] ...`) come from the separate dev-server process
+(development only) and cannot be part of the server log.
 
 ## Approach
 

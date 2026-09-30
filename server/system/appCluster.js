@@ -24,6 +24,14 @@ import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup
 import * as UserTempAuthTokensCleanup from './schedulers/userTempAuthTokensCleanup'
 import { SwaggerInitializer } from './swaggerInitializer'
 
+const createHttpRequestLogger = () => {
+  if (!ProcessUtils.isEnvDevelopment && !ProcessUtils.ENV.logHttpRequests) return null
+  // written through log4js (not to stdout directly), so requests end up in the log file too
+  const httpLogger = Log.getLogger('HttpRequest')
+  const stream = { write: (message) => httpLogger.debug(message.trimEnd()) }
+  return morgan(':method :url :status :response-time ms - :res[content-length]', { stream })
+}
+
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
 
@@ -32,8 +40,17 @@ export const run = async () => {
   // Skip arena-server's own startup-time survey-schema migration loop (still migrates the public schema
   // synchronously here, as before): AllSurveysDataMigrationJob (below) now migrates each survey's schema
   // itself, together with that survey's data migration, so the two no longer need to run twice.
-  const arenaApp = await ArenaServer.init({ skipSurveySchemaDbMigrations: true })
+  // registered by arena-server before its own middlewares, so rejected requests (e.g. 401) are logged too
+  const httpRequestLogger = createHttpRequestLogger()
+  const arenaApp = await ArenaServer.init({
+    skipSurveySchemaDbMigrations: true,
+    initialMiddlewares: httpRequestLogger ? [httpRequestLogger] : [],
+  })
   const { express: app, serviceRegistry } = arenaApp
+  // TODO remove once @openforis/arena-server supporting initialMiddlewares is required (> 2.4.8)
+  if (httpRequestLogger && !app.router.stack.some((layer) => layer.handle === httpRequestLogger)) {
+    app.use(httpRequestLogger)
+  }
 
   // Fail any pending/running job rows left behind by a previous incarnation of this exact process
   // (crash or restart): must run before this process enqueues any job of its own, since a
@@ -43,13 +60,6 @@ export const run = async () => {
   const orphanedJobsCount = await JobRepository.failOrphanedByInstanceId(ProcessEnv.instanceId)
   if (orphanedJobsCount > 0) {
     logger.warn(`marked ${orphanedJobsCount} orphaned job(s) as failed (instanceId: ${ProcessEnv.instanceId})`)
-  }
-
-  if (ProcessUtils.isEnvDevelopment || ProcessUtils.ENV.logHttpRequests) {
-    // written through log4js (not to stdout directly), so requests end up in the log file too
-    const httpLogger = Log.getLogger('HttpRequest')
-    const stream = { write: (message) => httpLogger.debug(message.trimEnd()) }
-    app.use(morgan(':method :url :status :response-time ms - :res[content-length]', { stream }))
   }
 
   // ====== app initializations
