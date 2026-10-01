@@ -47,6 +47,17 @@ export default {
       totalItems: 'Total des éléments : {{totalItems}}',
       remainingItems: 'Éléments restants',
     },
+    kpi: {
+      records: 'Enregistrements',
+      contributors: 'Contributeurs',
+      storage: 'Stockage',
+      expandDetails: 'Afficher les détails',
+      collapseDetails: 'Masquer les détails',
+    },
+    recordsCard: {
+      total: "Total d'enregistrements",
+      byStep: 'Par étape du flux de travail',
+    },
     step: {
       entry: 'Saisie de données',
       cleansing: 'Nettoyage de données',

@@ -47,6 +47,17 @@ export default {
       totalItems: 'Total items: {{totalItems}}',
       remainingItems: 'Remaining items',
     },
+    kpi: {
+      records: 'Records',
+      contributors: 'Contributors',
+      storage: 'Storage',
+      expandDetails: 'Show details',
+      collapseDetails: 'Hide details',
+    },
+    recordsCard: {
+      total: 'Total records',
+      byStep: 'By workflow step',
+    },
     step: {
       entry: 'Data Entry',
       cleansing: 'Data Cleansing',

@@ -1,6 +1,6 @@
 import './RecordsSummaryPeriodSelector.scss'
 
-import React, { useContext } from 'react'
+import React from 'react'
 
 import * as DateUtils from '@core/dateUtils'
 
@@ -9,18 +9,24 @@ import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
 
 import { useTimeRanges } from './store'
-import { RecordsSummaryContext } from '../RecordsSummaryContext'
+import { useRecordsSummaryContext } from '../RecordsSummaryContext'
 
-const formatDate = (dateStr) => (dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'DD MMMM YYYY') : '')
+type RecordsSummaryPeriodSelectorProps = {
+  testId?: string
+}
 
-const RecordsSummaryPeriodSelector = () => {
+const formatDate = (dateStr: string): string =>
+  dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'DD MMMM YYYY') : ''
+
+const RecordsSummaryPeriodSelector = (props: RecordsSummaryPeriodSelectorProps) => {
+  const { testId } = props
   const i18n = useI18n()
 
-  const { from, to, timeRange, onChangeTimeRange } = useContext(RecordsSummaryContext)
+  const { from, to, timeRange, onChangeTimeRange } = useRecordsSummaryContext()
   const { timeRangeItems, timeRangeSelection } = useTimeRanges({ timeRange })
 
   return (
-    <div className="home-dashboard__records-period-selector">
+    <div className="home-dashboard__records-period-selector" data-testid={testId}>
       <div>{i18n.t('homeView:recordsSummary.recordsAddedInTheLast')}</div>
       <div className="time-range">
         <span className="icon icon-calendar icon-12px icon-left" />
