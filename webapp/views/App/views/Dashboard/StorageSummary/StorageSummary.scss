@@ -1,6 +1,8 @@
 .storage-summary-container {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
+  gap: 1rem;
 
   .storage-summary-item {
     display: flex;

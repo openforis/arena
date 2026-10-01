@@ -5,15 +5,11 @@ import { convertDateFromISOToDisplay } from '@core/dateUtils'
 
 import { LineChart } from '@webapp/charts/LineChart'
 
-import { useI18n } from '@webapp/store/system'
-
-import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector'
 import { NoRecordsAddedInSelectedPeriod } from '../NoRecordsAddedInSelectedPeriod'
 
+// The period selector and the title live at page/section level, so the chart renders only the data.
 const TotalRecordsSummaryChart = (props) => {
   const { counts } = props
-
-  const i18n = useI18n()
 
   const chartData = useMemo(
     () =>
@@ -24,19 +20,9 @@ const TotalRecordsSummaryChart = (props) => {
     [counts]
   )
 
-  return (
-    <>
-      <h4 className="dashboard-chart-header">{i18n.t('homeView:dashboard.totalRecords')}</h4>
+  if (chartData.length === 0) return <NoRecordsAddedInSelectedPeriod />
 
-      <RecordsSummaryPeriodSelector />
-
-      {chartData.length > 0 ? (
-        <LineChart allowDecimals={false} data={chartData} dataKeys={['count']} labelDataKey="date" />
-      ) : (
-        <NoRecordsAddedInSelectedPeriod />
-      )}
-    </>
-  )
+  return <LineChart allowDecimals={false} data={chartData} dataKeys={['count']} labelDataKey="date" />
 }
 
 TotalRecordsSummaryChart.propTypes = {

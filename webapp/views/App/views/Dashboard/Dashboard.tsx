@@ -18,9 +18,11 @@ import { useRecordsSummary } from './RecordsSummaryPeriodSelector/store'
 import { RecordsSummaryContext } from './RecordsSummaryContext'
 import RecordsSummaryCard from './RecordsSummaryCard'
 import ContributorsCard from './ContributorsCard'
+import StorageCard from './StorageCard'
+import RecordTrendSection from './RecordTrendSection'
 
 /**
- * Single-page dashboard: survey info, period filter and KPI cards.
+ * Single-page dashboard: survey info, period filter, KPI cards and record trend.
  *
  * @returns {React.ReactElement} The dashboard.
  */
@@ -46,7 +48,9 @@ const Dashboard = () => {
                 <div className="home-dashboard__kpi-row">
                   <RecordsSummaryCard />
                   <ContributorsCard />
+                  {canEditSurvey && <StorageCard />}
                 </div>
+                <RecordTrendSection />
               </>
             )}
           </RecordsSummaryContext.Provider>

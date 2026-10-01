@@ -1,0 +1,14 @@
+@use '~@webapp/style/vars' as *;
+
+.record-trend-section__chart {
+  padding: 1rem;
+  border: 1px solid $greyBorder;
+  border-radius: 4px;
+  background: #fff;
+
+  .no-records-added {
+    padding: 2rem 0;
+    text-align: center;
+    color: $blueDark;
+  }
+}
