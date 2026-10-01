@@ -57,8 +57,19 @@ export const sendErr = (res, err) => {
   }
 }
 
+// Unquoted file names with commas make Chromium reject the response (multiple Content-Disposition headers)
+const getContentDispositionAttachment = (fileName) => {
+  const name = String(fileName)
+  const fallbackName = name.replaceAll(/[^\x20-\x7e]|["\\%]/g, '_')
+  const encodedName = encodeURIComponent(name).replaceAll(
+    /['()*]/g,
+    (char) => `%${char.codePointAt(0).toString(16).toUpperCase()}`
+  )
+  return `attachment; filename="${fallbackName}"; filename*=UTF-8''${encodedName}`
+}
+
 export const setContentTypeFile = ({ res, fileName, fileSize = null, contentType = null, fileFormat = null }) => {
-  res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
+  res.setHeader('Content-Disposition', getContentDispositionAttachment(fileName))
   if (fileSize) {
     res.setHeader('Content-Length', fileSize)
   }

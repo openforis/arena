@@ -87,6 +87,9 @@ export default {
       backgroundFileTooLarge: 'Background image must be {{maxMb}} MB or smaller',
       invalidPrimaryColor: 'Enter a valid #RRGGBB color or leave empty',
       invalidSaveBlocked: 'Fix invalid branding fields before saving survey info',
+      imageLoadError: 'Could not load image "{{name}}". Delete it and upload a new one.',
+      imageLoadErrorReadOnly: 'Could not load image "{{name}}"',
+      downloadImage: 'Click to download the image',
     },
     configuration: {
       title: 'Configuration',

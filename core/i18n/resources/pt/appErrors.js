@@ -67,6 +67,7 @@ Tente atualizar a página.`,
   survey: {
     nodeDefNameNotFound: 'Definição de nó não encontrada: {{name}}',
     dataMigrationInProgress: 'Esta pesquisa está sendo atualizada; tente novamente em breve.',
+    fileNotFound: 'Arquivo não encontrado',
   },
   unsupportedFunctionType: 'Tipo de função não suportado: {{exprType}}',
   userHasPendingInvitation: `Já existe um convite pendente para o usuário com email '{{email}}'; ele(a) não pode ser convidado(a) para este inventário até aceitá-lo`,

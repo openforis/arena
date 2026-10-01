@@ -50,8 +50,12 @@ export const fetchSurveyTemplatesPublished = async () => {
 
 export const getSurveyFileDownloadUrl = ({ surveyId, fileUuid }) => `/api/survey/${surveyId}/file/${fileUuid}`
 
-export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
-  const response = await axios.get(getSurveyFileDownloadUrl({ surveyId, fileUuid }), { responseType: 'blob' })
+export const fetchSurveyFile = async ({ surveyId, fileUuid, errorHandledLocally = false }) => {
+  const response = await axios.get(getSurveyFileDownloadUrl({ surveyId, fileUuid }), {
+    responseType: 'blob',
+    // when true, the global service error notification is skipped (see appErrorsMiddleware)
+    errorHandledLocally,
+  })
   return response
 }
 

@@ -63,6 +63,7 @@ export default {
   survey: {
     nodeDefNameNotFound: 'ノード定義が見つかりません：{{name}}',
     dataMigrationInProgress: 'この調査はアップグレード中です。しばらくしてから再度お試しください。',
+    fileNotFound: 'ファイルが見つかりません',
   },
   unsupportedFunctionType: 'サポートされていない関数の型です：{{exprType}}',
   // AI gateway errors

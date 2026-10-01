@@ -71,6 +71,7 @@ export default {
   survey: {
     nodeDefNameNotFound: 'Definición de nodo no encontrada: {{name}}',
     dataMigrationInProgress: 'Esta encuesta se está actualizando; vuelva a intentarlo en breve.',
+    fileNotFound: 'Archivo no encontrado',
   },
   unsupportedFunctionType: 'Tipo de función no compatible: {{exprType}}',
   userHasPendingInvitation:
