@@ -6,6 +6,7 @@ export default {
     activityLog: {
       title: 'Activity log',
       size: '$t(homeView:dashboard.activityLog.title) size: {{size}}',
+      loadError: 'Activity could not be loaded.',
     },
     exportWithData: 'Export + data (Backup)',
     exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',

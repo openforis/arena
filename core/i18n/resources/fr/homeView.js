@@ -6,6 +6,7 @@ export default {
     activityLog: {
       title: "Journal d'activité",
       size: '$t(homeView:dashboard.activityLog.title) taille : {{size}}',
+      loadError: "Impossible de charger l'activité.",
     },
     exportWithData: 'Exporter + données (Sauvegarde)',
     exportWithDataNoActivityLog: "Exporter + données (SANS Journal d'activité)",

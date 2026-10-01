@@ -14,7 +14,7 @@ import * as ActivityLogMessageParser from '../parsers'
 
 const POLL_INTERVAL = 5000
 
-export const useFetchMessages = ({ messages, setMessages }) => {
+export const useFetchMessages = ({ messages, setMessages, onError = null }) => {
   const i18n = useI18n()
   const survey = useSurvey()
   const surveyId = useSurveyId()
@@ -40,8 +40,9 @@ export const useFetchMessages = ({ messages, setMessages }) => {
     return newMessages
   }
 
-  const handleError = () => {
+  const handleError = (error) => {
     setHasError(true)
+    onError?.(error)
   }
 
   useRequest({
@@ -74,8 +75,8 @@ export const useFetchMessages = ({ messages, setMessages }) => {
   }
 }
 
-export const useGetActivityLogMessages = ({ messages, setMessages }) => {
-  const fetchMessages = useFetchMessages({ messages, setMessages })
+export const useGetActivityLogMessages = ({ messages, setMessages, onError = null }) => {
+  const fetchMessages = useFetchMessages({ messages, setMessages, onError })
 
   useInterval(() => messages.length > 0 && fetchMessages({ newest: true }), POLL_INTERVAL)
 
@@ -84,8 +85,8 @@ export const useGetActivityLogMessages = ({ messages, setMessages }) => {
   }
 }
 
-export const useGetActivityLogMessagesNext = ({ messages, setMessages }) => {
-  const fetchMessages = useFetchMessages({ messages, setMessages })
+export const useGetActivityLogMessagesNext = ({ messages, setMessages, onError = null }) => {
+  const fetchMessages = useFetchMessages({ messages, setMessages, onError })
   return () => {
     ;(async () => fetchMessages({ newest: false }))()
   }

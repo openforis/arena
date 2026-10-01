@@ -8,6 +8,7 @@ import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useSystemConfigActivityLogDisabled } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import Helper, { helperTypes } from './Helper'
@@ -22,12 +23,14 @@ import StorageCard from './StorageCard'
 import RecordTrendSection from './RecordTrendSection'
 import DashboardMapSection from './DashboardMapSection'
 import SamplingPointSection from './SamplingPointSection'
+import RecentActivitySection from './RecentActivitySection'
 import { useHasSamplingPointData } from './hooks/useHasSamplingPointData'
 
 /**
  * Single-page dashboard shell: survey info, period filter, KPI cards, record trend,
  * a conditional map section when the survey has geo attributes,
- * and a conditional sampling-point section when the survey has sampling keys and the user can edit.
+ * a conditional sampling-point section when the survey has sampling keys and the user can edit,
+ * and recent activity when the activity log is enabled and the user can edit.
  *
  * @returns {React.ReactElement} The dashboard.
  */
@@ -37,6 +40,7 @@ const Dashboard = () => {
   const surveyInfo = useSurveyInfo()
   const recordsSummaryState = useRecordsSummary()
   const hasSamplingPointData = useHasSamplingPointData()
+  const activityLogDisabled = useSystemConfigActivityLogDisabled()
 
   const canHaveRecords = Survey.canHaveRecords(surveyInfo)
 
@@ -59,6 +63,7 @@ const Dashboard = () => {
                 <RecordTrendSection />
                 <DashboardMapSection />
                 {hasSamplingPointData && canEditSurvey && <SamplingPointSection />}
+                {!activityLogDisabled && canEditSurvey && <RecentActivitySection />}
               </>
             )}
           </RecordsSummaryContext.Provider>

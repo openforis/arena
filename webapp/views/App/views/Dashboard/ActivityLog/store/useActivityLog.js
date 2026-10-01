@@ -4,10 +4,12 @@ import { useActions } from './actions'
 
 export const useActivityLog = () => {
   const [messages, setMessages] = useState([])
+  const [hasError, setHasError] = useState(false)
 
   const { onGetActivityLogMessages, onGetActivityLogMessagesNext } = useActions({
     messages,
     setMessages,
+    onError: () => setHasError(true),
   })
 
   useEffect(() => {
@@ -16,6 +18,7 @@ export const useActivityLog = () => {
 
   return {
     messages,
+    hasError,
     onGetActivityLogMessagesNext,
   }
 }
