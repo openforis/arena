@@ -61,6 +61,10 @@ export default {
     contributorsCard: {
       active: 'Contributeurs actifs sur la période sélectionnée : {{count}}',
     },
+    map: {
+      title: 'Carte',
+      allOwners: 'Tous les propriétaires',
+    },
     step: {
       entry: 'Saisie de données',
       cleansing: 'Nettoyage de données',

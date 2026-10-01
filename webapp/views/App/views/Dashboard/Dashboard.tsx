@@ -20,11 +20,13 @@ import RecordsSummaryCard from './RecordsSummaryCard'
 import ContributorsCard from './ContributorsCard'
 import StorageCard from './StorageCard'
 import RecordTrendSection from './RecordTrendSection'
+import DashboardMapSection from './DashboardMapSection'
 import SamplingPointSection from './SamplingPointSection'
 import { useHasSamplingPointData } from './hooks/useHasSamplingPointData'
 
 /**
  * Single-page dashboard shell: survey info, period filter, KPI cards, record trend,
+ * a conditional map section when the survey has geo attributes,
  * and a conditional sampling-point section when the survey has sampling keys and the user can edit.
  *
  * @returns {React.ReactElement} The dashboard.
@@ -55,6 +57,7 @@ const Dashboard = () => {
                   {canEditSurvey && <StorageCard />}
                 </div>
                 <RecordTrendSection />
+                <DashboardMapSection />
                 {hasSamplingPointData && canEditSurvey && <SamplingPointSection />}
               </>
             )}

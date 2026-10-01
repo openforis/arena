@@ -374,4 +374,9 @@ export const getModuleByPathPart = ({ levelIndex, pathPart }) => {
   return foundModule
 }
 
+/**
+ * Builds the route of the specified app module.
+ * @param {{ key: string, path: string, icon?: string }} [module] - The app module.
+ * @returns {string} The module route.
+ */
 export const appModuleUri = (module = appModules.home) => `/${_getModulePathParts(module).join('/')}/`

@@ -9,7 +9,7 @@ import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 
 export const GeoAttributeDataLayer = (props) => {
-  const { attributeDef, onRecordEditClick } = props
+  const { attributeDef, checked = false, onRecordEditClick, renderPopup = null } = props
 
   const {
     layerName,
@@ -45,7 +45,7 @@ export const GeoAttributeDataLayer = (props) => {
   useLayerRegistration({ layerKey, layerName: layerInnerName, points, flyToPoint })
 
   return (
-    <LayersControl.Overlay name={layerName}>
+    <LayersControl.Overlay name={layerName} checked={checked}>
       <LayerGroup>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a node value point
@@ -82,6 +82,7 @@ export const GeoAttributeDataLayer = (props) => {
               onPopupClose={onMarkerPopupClose}
               onPopupOpen={onMarkerPopupOpen}
               onRecordEditClick={onRecordEditClick}
+              renderPopup={renderPopup}
               setMarkerByKey={setMarkerByKey}
             />
           )
@@ -100,6 +101,7 @@ export const GeoAttributeDataLayer = (props) => {
             onPopupOpen={onMarkerPopupOpen}
             onRecordEditClick={onRecordEditClick}
             popupOpen={currentPointPopupOpen}
+            renderPopup={renderPopup}
             setMarkerByKey={setMarkerByKey}
           />
         )}
@@ -110,6 +112,10 @@ export const GeoAttributeDataLayer = (props) => {
 
 GeoAttributeDataLayer.propTypes = {
   attributeDef: PropTypes.any,
+  checked: PropTypes.bool, // when true, the layer is selected (and its data fetched) on mount
   markersColor: PropTypes.any,
+  onPointsLoaded: PropTypes.func, // called with ({ layerKey, points }) on every data fetch, before filtering
   onRecordEditClick: PropTypes.func,
+  pointsFilter: PropTypes.func, // when specified, only the matching points are shown
+  renderPopup: PropTypes.func, // when specified, replaces the default marker popup
 }
