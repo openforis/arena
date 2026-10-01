@@ -5,6 +5,7 @@ import * as SurveyBranding from '@core/survey/surveyBranding'
 import type { BrandingImageDescriptor } from '@core/survey/surveyBranding'
 
 import * as API from '@webapp/service/api'
+import { getFileNameFromContentDisposition } from '@webapp/utils/contentDispositionUtils'
 
 const MIME_BY_EXTENSION: Record<string, string> = {
   png: 'image/png',
@@ -19,9 +20,7 @@ const MIME_BY_EXTENSION: Record<string, string> = {
  * Infers an image MIME type from a Content-Disposition filename.
  */
 const mimeTypeFromContentDisposition = (contentDisposition: string | undefined | null): string | null => {
-  if (!contentDisposition) return null
-  const fileNameMatch = /filename\*?=(?:UTF-8''|")?([^";]+)/i.exec(contentDisposition)
-  const fileName = fileNameMatch?.[1] ? decodeURIComponent(fileNameMatch[1].replaceAll('"', '')) : null
+  const fileName = getFileNameFromContentDisposition(contentDisposition)
   if (!fileName) return null
   const extension = fileName.split('.').pop()?.toLowerCase()
   return extension ? MIME_BY_EXTENSION[extension] || null : null
