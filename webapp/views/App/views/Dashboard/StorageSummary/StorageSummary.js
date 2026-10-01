@@ -9,6 +9,9 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
+const GAUGE_WIDTH = 280
+const GAUGE_HEIGHT = 210
+
 const GenericStorageSummary = ({ statistics, titleKey }) => {
   const i18n = useI18n()
 
@@ -28,7 +31,7 @@ const GenericStorageSummary = ({ statistics, titleKey }) => {
           total: totalLabel,
         })}
       </div>
-      <GaugeChart height={300} width={400} value={usePercent} />
+      <GaugeChart height={GAUGE_HEIGHT} width={GAUGE_WIDTH} value={usePercent} />
     </div>
   )
 }

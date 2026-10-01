@@ -1,3 +1,5 @@
+import './StorageCard.scss'
+
 import React, { useCallback, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
@@ -30,15 +32,17 @@ const StorageCard = () => {
   const toggleExpanded = useCallback(() => setExpanded((expandedPrev) => !expandedPrev), [])
 
   return (
-    <DashboardKpiCard
-      titleKey="homeView:dashboard.kpi.storage"
-      value={getUsedPercentLabel(Survey.getFilesStatistics(surveyInfo))}
-      testId={TestId.dashboard.kpiStorage}
-      expanded={expanded}
-      onToggleExpand={toggleExpanded}
-    >
-      <StorageSummary />
-    </DashboardKpiCard>
+    <div className={`storage-card${expanded ? ' storage-card--expanded' : ''}`}>
+      <DashboardKpiCard
+        titleKey="homeView:dashboard.kpi.storage"
+        value={getUsedPercentLabel(Survey.getFilesStatistics(surveyInfo))}
+        testId={TestId.dashboard.kpiStorage}
+        expanded={expanded}
+        onToggleExpand={toggleExpanded}
+      >
+        <StorageSummary />
+      </DashboardKpiCard>
+    </div>
   )
 }
 

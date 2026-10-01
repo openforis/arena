@@ -8,5 +8,9 @@
     display: flex;
     flex-direction: column;
     row-gap: 2rem;
+    max-width: 100%;
+    min-width: 0;
+    align-items: center;
+    box-sizing: border-box;
   }
 }

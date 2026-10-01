@@ -1,0 +1,13 @@
+.storage-card {
+  flex: 1;
+  min-width: 220px;
+
+  &--expanded {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .dashboard-kpi-card {
+    height: 100%;
+  }
+}

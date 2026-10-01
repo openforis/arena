@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react'
 
 import type { UserCountRow } from './utils/filterActiveContributors'
 
-type RecordsCountRow = { count?: string | number }
+type RecordsCountRow = { count?: string | number; date?: string }
 
 export type RecordsSummaryState = {
   from: string
