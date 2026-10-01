@@ -67,6 +67,7 @@ export default {
   survey: {
     nodeDefNameNotFound: 'Определение узла не найдено: {{name}}',
     dataMigrationInProgress: 'Это анкетирование обновляется; повторите попытку через некоторое время.',
+    fileNotFound: 'Файл не найден',
   },
   unsupportedFunctionType: 'Неподдерживаемый тип функции: {{exprType}}',
   userHasPendingInvitation:

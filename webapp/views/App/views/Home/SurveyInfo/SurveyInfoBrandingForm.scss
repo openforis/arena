@@ -123,6 +123,10 @@
       max-height: 4rem;
     }
 
+    &--background .survey-info-branding-form__image-download {
+      flex: 1 1 auto;
+    }
+
     &--background {
       min-height: 6rem;
 
@@ -133,6 +137,27 @@
         border-radius: 4px;
       }
     }
+  }
+
+  &__image-download {
+    display: flex;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  &__image-error {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 3.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid $red;
+    border-radius: 4px;
+    color: $red;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
   }
 
   &__preview {

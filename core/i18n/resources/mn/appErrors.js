@@ -67,6 +67,7 @@ export default {
   survey: {
     nodeDefNameNotFound: 'Зангилааны тодорхойлолт олдсонгүй: {{name}}',
     dataMigrationInProgress: 'Энэ судалгааг шинэчилж байна; түр хүлээгээд дахин оролдоно уу.',
+    fileNotFound: 'Файл олдсонгүй',
   },
   unsupportedFunctionType: 'Дэмжигдээгүй функцийн төрөл: {{exprType}}',
   userHasPendingInvitation:

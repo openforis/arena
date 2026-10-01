@@ -86,6 +86,9 @@ export default {
       backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
       invalidPrimaryColor: 'Insira uma cor #RRGGBB válida ou deixe em branco',
       invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
+      imageLoadError: '$t(homeView:surveyInfo.branding.imageLoadError)',
+      imageLoadErrorReadOnly: '$t(homeView:surveyInfo.branding.imageLoadErrorReadOnly)',
+      downloadImage: '$t(homeView:surveyInfo.branding.downloadImage)',
     },
     configuration: {
       title: 'Configuração',

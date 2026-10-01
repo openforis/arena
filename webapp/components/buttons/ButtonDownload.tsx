@@ -2,6 +2,7 @@ import React, { forwardRef, useCallback } from 'react'
 import axios from 'axios'
 
 import { Button, ButtonProps } from '@webapp/components/buttons'
+import { getFileNameFromContentDisposition } from '@webapp/utils/contentDispositionUtils'
 import * as DomUtils from '@webapp/utils/domUtils'
 
 type ButtonDownloadProps = Omit<ButtonProps, 'onClick'> & {
@@ -31,8 +32,7 @@ export const ButtonDownload = forwardRef<HTMLButtonElement, ButtonDownloadProps>
       responseType: 'blob',
     })
 
-    const contentDisposition: string | undefined = response.headers['content-disposition']
-    const extractedFileName = contentDisposition?.split('filename=')[1]?.replaceAll('"', '')
+    const extractedFileName = getFileNameFromContentDisposition(response.headers['content-disposition'])
 
     DomUtils.downloadBlobToFile(response.data, fileName ?? extractedFileName ?? 'download')
   }, [href, requestParams, fileName])
