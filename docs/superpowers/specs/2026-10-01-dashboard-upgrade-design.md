@@ -3,7 +3,7 @@
 **Date:** 2026-10-01  
 **Status:** Approved — implementation plan written  
 **Trello:** [SSiIk18R — Integrate the improved dashboard into Arena](https://trello.com/c/SSiIk18R)  
-**Related:** [What's next overview](../../dashboard-upgrade-next-steps.md) · [Implementation plan](../plans/2026-10-01-dashboard-upgrade.md)
+**Related:** [Implementation plan](../plans/2026-10-01-dashboard-upgrade.md)
 
 ## Priority of sources
 
