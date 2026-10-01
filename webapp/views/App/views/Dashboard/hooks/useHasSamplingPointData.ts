@@ -5,7 +5,12 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey } from '@webapp/store/survey'
 
-export const useHasSamplingPointData = () => {
+/**
+ * Whether the active survey identifies records via sampling-point data keys.
+ *
+ * @returns {boolean} True when all root key defs map to sampling-point data node defs.
+ */
+export const useHasSamplingPointData = (): boolean => {
   const survey = useSurvey()
   const [hasSamplingPointData, setHasSamplingPointData] = useState(false)
 

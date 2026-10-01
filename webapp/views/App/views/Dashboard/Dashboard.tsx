@@ -20,6 +20,8 @@ import RecordsSummaryCard from './RecordsSummaryCard'
 import ContributorsCard from './ContributorsCard'
 import StorageCard from './StorageCard'
 import RecordTrendSection from './RecordTrendSection'
+import SamplingPointSection from './SamplingPointSection'
+import { useHasSamplingPointData } from './hooks/useHasSamplingPointData'
 
 /**
  * Single-page dashboard: survey info, period filter, KPI cards and record trend.
@@ -31,6 +33,7 @@ const Dashboard = () => {
   const canEditSurvey = useAuthCanEditSurvey()
   const surveyInfo = useSurveyInfo()
   const recordsSummaryState = useRecordsSummary()
+  const hasSamplingPointData = useHasSamplingPointData()
 
   const canHaveRecords = Survey.canHaveRecords(surveyInfo)
 
@@ -51,6 +54,7 @@ const Dashboard = () => {
                   {canEditSurvey && <StorageCard />}
                 </div>
                 <RecordTrendSection />
+                {hasSamplingPointData && canEditSurvey && <SamplingPointSection />}
               </>
             )}
           </RecordsSummaryContext.Provider>
