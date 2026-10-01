@@ -9,7 +9,6 @@ export type RecordsSummaryState = {
   to: string
   counts: RecordsCountRow[]
   userCounts: UserCountRow[]
-  userDateCounts: unknown[]
   dataEntry: number
   dataCleansing: number
   dataAnalysis: number

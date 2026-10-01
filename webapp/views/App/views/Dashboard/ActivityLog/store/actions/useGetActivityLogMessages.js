@@ -14,7 +14,7 @@ import * as ActivityLogMessageParser from '../parsers'
 
 const POLL_INTERVAL = 5000
 
-export const useFetchMessages = ({ messages, setMessages, onError = null }) => {
+export const useFetchMessages = ({ messages, setMessages, onError = null, onLoaded = null }) => {
   const i18n = useI18n()
   const survey = useSurvey()
   const surveyId = useSurveyId()
@@ -27,6 +27,7 @@ export const useFetchMessages = ({ messages, setMessages, onError = null }) => {
     const initialized = messages.length > 0
     const { activityLogs } = fetchedData
     if (A.isEmpty(activityLogs)) {
+      onLoaded?.()
       return null
     }
     const highlighted = newest && initialized
@@ -37,6 +38,7 @@ export const useFetchMessages = ({ messages, setMessages, onError = null }) => {
     if (newMessages) {
       setMessages(newMessages)
     }
+    onLoaded?.()
     return newMessages
   }
 
@@ -75,8 +77,8 @@ export const useFetchMessages = ({ messages, setMessages, onError = null }) => {
   }
 }
 
-export const useGetActivityLogMessages = ({ messages, setMessages, onError = null }) => {
-  const fetchMessages = useFetchMessages({ messages, setMessages, onError })
+export const useGetActivityLogMessages = ({ messages, setMessages, onError = null, onLoaded = null }) => {
+  const fetchMessages = useFetchMessages({ messages, setMessages, onError, onLoaded })
 
   useInterval(() => messages.length > 0 && fetchMessages({ newest: true }), POLL_INTERVAL)
 
@@ -85,8 +87,8 @@ export const useGetActivityLogMessages = ({ messages, setMessages, onError = nul
   }
 }
 
-export const useGetActivityLogMessagesNext = ({ messages, setMessages, onError = null }) => {
-  const fetchMessages = useFetchMessages({ messages, setMessages, onError })
+export const useGetActivityLogMessagesNext = ({ messages, setMessages, onError = null, onLoaded = null }) => {
+  const fetchMessages = useFetchMessages({ messages, setMessages, onError, onLoaded })
   return () => {
     ;(async () => fetchMessages({ newest: false }))()
   }

@@ -28,13 +28,15 @@ const LOAD_MORE_OFFSET = 10
 const RecentActivityContent = () => {
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
-  const { messages, hasError, onGetActivityLogMessagesNext } = useActivityLog()
+  const { messages, hasError, loaded, onGetActivityLogMessagesNext } = useActivityLog()
   const [setLoadMoreTriggerElement] = useOnIntersect(onGetActivityLogMessagesNext)
   const aiSummaryEnabled = useAiFeatureEnabled('userActivity')
   const [summaryOpen, setSummaryOpen] = useState(false)
 
   const activityLogSize = FileUtils.toHumanReadableFileSize(Survey.getActivityLogSize(surveyInfo))
   const loadMoreTriggerIndex = messages.length - LOAD_MORE_OFFSET
+  const isEmpty = loaded && !hasError && messages.length === 0
+  const isLoading = !loaded && !hasError
 
   return (
     <>
@@ -54,7 +56,12 @@ const RecentActivityContent = () => {
           {i18n.t('homeView:dashboard.activityLog.loadError') as string}
         </p>
       )}
-      {!hasError && messages.length === 0 && <LoadingBar />}
+      {isLoading && <LoadingBar />}
+      {isEmpty && (
+        <p className="recent-activity__empty" data-testid={TestId.dashboard.activityEmpty}>
+          {i18n.t('homeView:dashboard.activityLog.empty') as string}
+        </p>
+      )}
       {messages.length > 0 && (
         <ul className="recent-activity__list">
           {messages.map((message, index) => (

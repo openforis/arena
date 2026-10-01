@@ -7,6 +7,7 @@ export default {
       title: "Journal d'activité",
       size: '$t(homeView:dashboard.activityLog.title) taille : {{size}}',
       loadError: "Impossible de charger l'activité.",
+      empty: 'Aucune activité pour le moment.',
     },
     exportWithData: 'Exporter + données (Sauvegarde)',
     exportWithDataNoActivityLog: "Exporter + données (SANS Journal d'activité)",
@@ -56,8 +57,8 @@ export default {
       collapseDetails: 'Masquer les détails',
     },
     recordsCard: {
-      total: "Total d'enregistrements",
-      byStep: 'Par étape du flux de travail',
+      total: 'Enregistrements ajoutés sur la période sélectionnée',
+      byStep: 'Par étape du flux de travail (tout le temps)',
     },
     contributorsCard: {
       active: 'Contributeurs actifs sur la période sélectionnée : {{count}}',

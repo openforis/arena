@@ -13,7 +13,6 @@ const initialState: RecordsSummaryState = {
   to: '',
   counts: [],
   userCounts: [],
-  userDateCounts: [],
   dataEntry: 0,
   dataCleansing: 0,
   dataAnalysis: 0,

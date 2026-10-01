@@ -9,7 +9,7 @@ import { aggregateRecordsTotal } from '../utils/aggregateRecordsTotal'
 import { useRecordsStepBreakdown } from './useRecordsStepBreakdown'
 
 /**
- * KPI card with the total of records added in the selected period and the per-step breakdown.
+ * KPI card with records added in the selected period and an all-time per-step breakdown.
  *
  * @returns {React.ReactElement} The card.
  */
@@ -23,7 +23,7 @@ const RecordsSummaryCard = () => {
 
   return (
     <DashboardKpiCard
-      titleKey="homeView:dashboard.kpi.records"
+      titleKey="homeView:dashboard.recordsCard.total"
       value={aggregateRecordsTotal(counts)}
       testId={TestId.dashboard.kpiRecords}
       expanded={expanded}

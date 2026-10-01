@@ -7,6 +7,7 @@ export default {
       title: 'Activity log',
       size: '$t(homeView:dashboard.activityLog.title) size: {{size}}',
       loadError: 'Activity could not be loaded.',
+      empty: 'No activity yet.',
     },
     exportWithData: 'Export + data (Backup)',
     exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
@@ -56,8 +57,8 @@ export default {
       collapseDetails: 'Hide details',
     },
     recordsCard: {
-      total: 'Total records',
-      byStep: 'By workflow step',
+      total: 'Records added in selected period',
+      byStep: 'By workflow step (all time)',
     },
     contributorsCard: {
       active: 'Active contributors in selected period: {{count}}',

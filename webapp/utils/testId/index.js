@@ -52,6 +52,7 @@ export const TestId = {
     mapSection: 'dashboard-map-section',
     activitySection: 'dashboard-activity-section',
     activityError: 'dashboard-activity-error',
+    activityEmpty: 'dashboard-activity-empty',
     trendSection: 'dashboard-trend-section',
     samplingSection: 'dashboard-sampling-section',
   },
