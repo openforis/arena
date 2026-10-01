@@ -17,6 +17,7 @@ import RecordsSummaryPeriodSelector from './RecordsSummaryPeriodSelector'
 import { useRecordsSummary } from './RecordsSummaryPeriodSelector/store'
 import { RecordsSummaryContext } from './RecordsSummaryContext'
 import RecordsSummaryCard from './RecordsSummaryCard'
+import ContributorsCard from './ContributorsCard'
 
 /**
  * Single-page dashboard: survey info, period filter and KPI cards.
@@ -44,6 +45,7 @@ const Dashboard = () => {
                 <RecordsSummaryPeriodSelector testId={TestId.dashboard.periodSelector} />
                 <div className="home-dashboard__kpi-row">
                   <RecordsSummaryCard />
+                  <ContributorsCard />
                 </div>
               </>
             )}

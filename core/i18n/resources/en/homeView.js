@@ -58,6 +58,9 @@ export default {
       total: 'Total records',
       byStep: 'By workflow step',
     },
+    contributorsCard: {
+      active: 'Active contributors in selected period: {{count}}',
+    },
     step: {
       entry: 'Data Entry',
       cleansing: 'Data Cleansing',

@@ -1,12 +1,14 @@
 import { createContext, useContext } from 'react'
 
+import type { UserCountRow } from './utils/filterActiveContributors'
+
 type RecordsCountRow = { count?: string | number }
 
 export type RecordsSummaryState = {
   from: string
   to: string
   counts: RecordsCountRow[]
-  userCounts: unknown[]
+  userCounts: UserCountRow[]
   userDateCounts: unknown[]
   dataEntry: number
   dataCleansing: number

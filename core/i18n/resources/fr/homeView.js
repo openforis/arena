@@ -58,6 +58,9 @@ export default {
       total: "Total d'enregistrements",
       byStep: 'Par étape du flux de travail',
     },
+    contributorsCard: {
+      active: 'Contributeurs actifs sur la période sélectionnée : {{count}}',
+    },
     step: {
       entry: 'Saisie de données',
       cleansing: 'Nettoyage de données',
