@@ -70,18 +70,27 @@ const buildOwners = ({
 const areSameUuids = (uuidsA: string[] = [], uuidsB: string[] = []): boolean =>
   uuidsA.length === uuidsB.length && uuidsA.every((uuid, index) => uuid === uuidsB[index])
 
+type UseDashboardMapOwnersOptions = {
+  /** When false, survey users are not fetched (map section not yet visible). */
+  fetchUserNamesEnabled: boolean
+}
+
 /**
  * Collects the record owners of the loaded map features and exposes the client-side owner filter.
  *
+ * @param {UseDashboardMapOwnersOptions} options - When to load owner display names.
  * @returns {object} Owner options, current selection and the points filter to pass to the map layers.
  */
-export const useDashboardMapOwners = () => {
+export const useDashboardMapOwners = ({ fetchUserNamesEnabled }: UseDashboardMapOwnersOptions) => {
   const surveyId = useSurveyId()
   const [ownerUuidsByLayer, setOwnerUuidsByLayer] = useState<OwnerUuidsByLayer>({})
   const [userNamesByUuid, setUserNamesByUuid] = useState<Record<string, string>>({})
   const [selectedOwnerUuid, setSelectedOwnerUuid] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!fetchUserNamesEnabled) {
+      return undefined
+    }
     let cancelled = false
     const fetchUserNames = async () => {
       // fetch failures are already notified by the global axios error middleware: without names the filter stays hidden
@@ -94,7 +103,7 @@ export const useDashboardMapOwners = () => {
     return () => {
       cancelled = true
     }
-  }, [surveyId])
+  }, [surveyId, fetchUserNamesEnabled])
 
   const onLayerPointsLoaded = useCallback(({ layerKey, points }: { layerKey: string; points: DashboardMapPoint[] }) => {
     const ownerUuids = extractOwnerUuids(points)
@@ -110,10 +119,21 @@ export const useDashboardMapOwners = () => {
     [ownerUuidsByLayer, userNamesByUuid]
   )
 
+  const activeOwnerUuid = useMemo((): string | null => {
+    if (selectedOwnerUuid === null) {
+      return null
+    }
+    if (owners.length < 2) {
+      return null
+    }
+    const selectedStillAvailable = owners.some((owner) => owner.uuid === selectedOwnerUuid)
+    return selectedStillAvailable ? selectedOwnerUuid : null
+  }, [owners, selectedOwnerUuid])
+
   const pointsFilter = useMemo(
-    () => (selectedOwnerUuid ? (point: DashboardMapPoint) => getPointOwnerUuid(point) === selectedOwnerUuid : null),
-    [selectedOwnerUuid]
+    () => (activeOwnerUuid ? (point: DashboardMapPoint) => getPointOwnerUuid(point) === activeOwnerUuid : null),
+    [activeOwnerUuid]
   )
 
-  return { onLayerPointsLoaded, owners, pointsFilter, selectedOwnerUuid, setSelectedOwnerUuid }
+  return { onLayerPointsLoaded, owners, pointsFilter, selectedOwnerUuid: activeOwnerUuid, setSelectedOwnerUuid }
 }
