@@ -119,11 +119,15 @@ export default {
     measurePrevSteps: 'Medir pasos previos',
     measurePrevSteps_plural: 'Medidas pasos previos',
     min: 'Mínimo',
+    moveUp: 'Mover arriba',
+    moveDown: 'Mover abajo',
     name: 'Nombre',
     new: 'Nuevo',
     next: 'Siguiente',
     no: 'No',
     noItems: '$t(common.no) $t(common.item_plural)',
+    notification: 'Notificación',
+    notification_other: 'Notificaciones',
     notSpecified: '---No especificado---',
     orderBy: 'Ordenar por',
     of: 'de',
@@ -353,6 +357,8 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     entities: 'Entidades virtuales',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Instancias',
+    message: 'Mensaje',
+    message_plural: '$t(common.message_plural)',
 
     systemAdmin: 'Administración del sistema',
     jobMonitor: 'Monitor de trabajos',
@@ -405,12 +411,18 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       'Nuestros recursos son limitados, por lo que debe solicitar acceso a la plataforma. También nos interesa saber qué desea hacer con ella, ¡así que háganoslo saber! Tiene la posibilidad de empezar desde una **nueva encuesta en blanco** o clonar una **plantilla** existente y tendrá que sugerir un nombre para la nueva encuesta creada. Se le asignará el rol de ***Administrador de encuestas*** para esa encuesta: podrá editarla e invitar a nuevos usuarios a unirse a su encuesta y contribuir a ella. También será un ***Gerente de encuestas*** y podrá **crear nuevas encuestas** (hasta 5) si es necesario. Para obtener más información, visite nuestro sitio web: $t(links.openforisArenaWebsite) $t(common.raiseTicketInSupportForum) **Una vez que envíe la solicitud, espere un correo electrónico de invitación para acceder a Arena.**',
     reCaptchaNotAnswered: 'ReCaptcha no respondido',
     requestSent: 'Solicitud de acceso enviada correctamente',
-    requestSentMessage:
-      'Por favor, concédanos un par de días para procesar su solicitud. Le enviaremos pronto un correo electrónico a **{{email}}** con las instrucciones sobre cómo acceder a $t(common.appName). ¡Gracias y disfrute de **$t(common.appNameFull)**!',
+    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
+$t(accessRequestView.whitelistSenderSuggestion)
+
+Por favor, concédanos un par de días para procesar su solicitud.
+Una vez aceptada, le enviaremos otro correo electrónico a **{{email}}** con las instrucciones sobre cómo acceder a $t(common.appName).
+¡Gracias y disfrute de **$t(common.appNameFull)**!`,
     sendRequest: 'Enviar solicitud',
     sendRequestConfirm: '¿Solicitar acceso a $t(common.appNameFull)?',
     templateNotSelected: 'No seleccionado (empezar desde cero)',
     title: 'Solicitando acceso a $t(common.appNameFull)',
+    whitelistSenderSuggestion:
+      'Si lo encuentra en la carpeta de Spam/Correo no deseado, añada **{{senderEmail}}** a sus contactos (libreta de direcciones) o márquelo como seguro/no es spam, para que nuestros próximos correos lleguen directamente a su bandeja de entrada.',
   },
   resetPasswordView: {
     title: {
@@ -489,6 +501,10 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       showPlotReferencePoint: 'Punto de referencia de parcela',
       showUtmGrid: 'Mostrar cuadrícula UTM',
     },
+    rulerTooltip: `Presione el botón para comenzar a medir distancias.
+- haga clic varias veces para medir trayectos
+- haga doble clic o presione la tecla ESC para terminar de medir
+- presione el botón de nuevo para ocultar las mediciones`,
     samplingPointDataLayerName: 'Datos de puntos de muestreo - nivel {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (cargando...)',
     samplingPointItemPopup: {
@@ -566,6 +582,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     rotate: 'Rotar',
     dragAndDrop: 'Arrastre y suelte una imagen aquí o',
     upload: 'haga clic aquí para subir',
+    remove: '¿Eliminar la foto de perfil?',
     sendNewInvitation: 'Enviar nueva invitación',
     removeFromSurvey: 'Eliminar de la encuesta',
     confirmRemove: '¿Está seguro de que desea revocar el acceso de {{user}} a la encuesta {{survey}}?',
@@ -574,6 +591,12 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     preferredUILanguage: {
       label: 'Idioma de interfaz de usuario preferido',
       auto: 'Detectado automáticamente ({{detectedLanguage}})',
+    },
+    newPassword: 'Contraseña',
+    confirmPassword: 'Confirmar contraseña',
+    manageTwoFactorDevices: {
+      label: 'Gestionar 2FA',
+      title: 'Gestionar dispositivos de autenticación de dos factores',
     },
   },
   userPasswordChangeView: {
@@ -592,6 +615,10 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       '$t(common.emailSentConfirmation)\n\n    $t(userInviteView.skippedEmailsNotice)',
     skippedEmailsNotice:
       'Se han omitido {{skppedEmailsCount}} direcciones (ya fueron invitadas a esta encuesta anteriormente): {{skippedEmails}}',
+    invalidEmailsWarning:
+      'No se pudo contactar con la dirección de correo electrónico {{emails}} y es posible que no exista. Se ha mantenido en la lista de abajo: corríjala o elimínela e intente invitar de nuevo.',
+    invalidEmailsWarning_other:
+      'No se pudo contactar con las direcciones de correo electrónico {{emails}} y es posible que no existan. Se han mantenido en la lista de abajo: corríjalas o elimínelas e intente invitar de nuevo.',
     groupPermissions: {
       label: 'Permisos',
       systemAdmin: '        <li>Derechos de acceso completos al sistema</li>',
@@ -919,6 +946,10 @@ $t(common.appNameFull)
         label: 'Enumerar',
         info: 'Las filas se generarán automáticamente utilizando los elementos de categoría asociados a un atributo de código marcado como Clave definido dentro de la entidad; las filas no se pueden añadir ni eliminar y el atributo de código clave no será editable',
       },
+      enumeratingItemsExpression: {
+        label: 'Expresión de elementos de enumeración',
+        info: 'Expresión opcional que filtra qué elementos de la categoría se enumeran (p. ej. unique(table_source.source_type)). Si está vacía, se usan todos los elementos de la categoría.',
+      },
       enumerator: {
         label: 'Enumerador',
         info: 'Los elementos de la categoría se utilizarán para generar las filas de la entidad padre',
@@ -1117,6 +1148,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       label: 'Único',
       info: 'Cuando un atributo está marcado como **Único**, su valor debe ser único dentro de la entidad múltiple más cercana (se mostrará un error en caso contrario). \n\n---\n\nEj.: en una estructura como *clúster -> parcela -> árbol*, si tiene un atributo *tree_species* marcado como **Único**, solo puede tener un árbol por especie dentro de la misma *parcela*.',
     },
+    nodeDefClonedSuccessfully:
+      'Definición de nodo "{{nodeDefName}}" clonada correctamente en "{{targetParentNodeDefName}}"',
     categoriesClonedFromSurvey: 'Las siguientes categorías también se clonaron desde la encuesta de origen: {{names}}',
     taxonomiesClonedFromSurvey: 'Las siguientes taxonomías también se clonaron desde la encuesta de origen: {{names}}',
   },
@@ -1347,5 +1380,76 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       constant: 'Constante',
       expression: 'Expresión',
     },
+  },
+
+  urls: {
+    openforisWebsite: 'https://www.openforis.org',
+    openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
+    supportForum: 'https://openforis.support',
+  },
+
+  links: {
+    openforis: '<a href="$t(urls.openforisWebsite)" target="_blank" rel="noopener noreferrer">$t(common.openForis)</a>',
+    openforisArenaWebsite:
+      '<a href="$t(urls.openforisArenaWebsite)" target="_blank" rel="noopener noreferrer">$t(urls.openforisArenaWebsite)</a>',
+    supportForum: '<a href="$t(urls.supportForum)" target="_blank" rel="noopener noreferrer">$t(urls.supportForum)</a>',
+    arenaVideoTutorialsInFaoElearningAcademy:
+      '<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank" rel="noopener noreferrer">FAO elearning Academy</a>',
+    arenaVideoTutorialsInYouTube:
+      '<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank" rel="noopener noreferrer">YouTube</a>',
+    arenaInGitHub:
+      '<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>',
+    arenaRScriptsInGitHub:
+      '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
+  },
+
+  aiExpression: {
+    title: 'Generar expresión a partir de una descripción',
+    hint: 'Describa en lenguaje sencillo lo que debe hacer la expresión. La IA la traducirá a la sintaxis de Arena. Presione Ctrl+Enter para generar.',
+    placeholder: 'p. ej. la altura del árbol debe ser mayor que 0 y menor que 200',
+    generate: 'Generar',
+    generating: 'Generando…',
+    use: 'Usar esta expresión',
+    useAnyway: 'Usar de todos modos',
+    tryAgain: 'Probar con otra descripción',
+    parseError:
+      'La expresión generada no se pudo analizar correctamente: {{message}}. Aun así puede aplicarla y editarla a mano, o intentar reformularla.',
+    explain: {
+      title: 'Explicar esta expresión',
+      thinking: 'Pidiendo a la IA que explique esta expresión…',
+      error: 'Error al obtener la explicación: {{message}}',
+      timeout: 'La IA tardó demasiado en responder. Inténtelo de nuevo.',
+    },
+  },
+
+  aiTranslation: {
+    translateButton_one: 'Traducir a {{count}} otro idioma',
+    translateButton_other: 'Traducir a {{count}} otros idiomas',
+    translateButton: 'Traducir a otros idiomas',
+    success_one: 'Traducido a {{count}} idioma. Revise y guarde.',
+    success_other: 'Traducido a {{count}} idiomas. Revise y guarde.',
+    success: 'Traducido. Revise y guarde.',
+    failed: 'La traducción falló: {{message}}',
+    timeout: 'La solicitud de traducción ha caducado. Inténtelo de nuevo.',
+  },
+
+  aiActivityLog: {
+    title: 'Resumen del registro de actividad',
+    summarizeButton: 'Resumir',
+    thinking: 'Agregando eventos y pidiendo a la IA que los resuma…',
+    error: 'Error al obtener el resumen: {{message}}',
+  },
+
+  aiChatbot: {
+    open: 'Ayuda y documentación',
+    title: 'Ayuda y documentación',
+    empty: 'Pregúnteme lo que quiera sobre Open Foris Arena.',
+    placeholder: 'Escriba su pregunta…',
+    send: 'Enviar',
+    stop: 'Detener',
+    clear: 'Borrar',
+    showReasoning: 'Mostrar razonamiento',
+    error: 'Error del chatbot: {{message}}',
+    language: 'Idioma de respuesta',
   },
 }

@@ -7,17 +7,6 @@ export default {
       title: 'Registro de actividad',
       size: '$t(homeView:dashboard.activityLog.title) tamaño: {{size}}',
     },
-    deleteActivityLog: 'Borrar registro de actividad',
-    deleteActivityLogConfirm: {
-      headerText: '¿Borrar TODOS los datos del registro de actividad de esta encuesta?',
-      message: `
-  - TODOS los datos del registro de actividad para la encuesta **{{surveyName}}** se eliminarán;\n\n
-  - el espacio ocupado por la encuesta en la BD se reducirá;\n\n
-  - no afectará a los datos de entrada de la encuesta;\n\n
-  
-  $t(common.cantUndoWarning)`,
-      confirmName: 'Escriba el nombre de esta encuesta para confirmar:',
-    },
     exportWithData: 'Exportar + datos (Copia de seguridad)',
     exportWithDataNoActivityLog: 'Exportar + datos (SIN registro de actividad)',
     exportWithDataNoResultAttributes: 'Exportar + datos (SIN atributos de resultado)',
@@ -67,27 +56,27 @@ export default {
     branding: {
       title: 'Marca',
       primaryColor: 'Color primario',
-      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
-      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      titleFontSize: 'Tamaño de fuente del título',
+      descriptionFontSize: 'Tamaño de fuente de la descripción',
       fontSizePreset: {
-        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
-        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
-        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+        small: 'Pequeño',
+        default: 'Predeterminado',
+        large: 'Grande',
       },
-      surveyLogo1: '$t(homeView:surveyInfo.branding.surveyLogo1)',
-      surveyLogo2: '$t(homeView:surveyInfo.branding.surveyLogo2)',
-      surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
-      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
+      surveyLogo1: 'Logo de la encuesta 1',
+      surveyLogo2: 'Logo de la encuesta 2',
+      surveyLogo3: 'Logo de la encuesta 3',
+      landingBackground: 'Imagen de fondo de la página de inicio',
       uploadLogo: 'Subir logo',
-      logoFileFormatHint: '$t(homeView:surveyInfo.branding.logoFileFormatHint)',
-      logoFileTooLarge: '$t(homeView:surveyInfo.branding.logoFileTooLarge)',
+      logoFileFormatHint: 'PNG, JPEG, WebP o SVG (máx. {{maxMb}} MB)',
+      logoFileTooLarge: 'La imagen del logo debe ser de {{maxMb}} MB o menos',
       preview: 'Vista previa',
-      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
+      backgroundFileTooLarge: 'La imagen de fondo debe ser de {{maxMb}} MB o menos',
       invalidPrimaryColor: 'Introduzca un color #RRGGBB válido o déjelo vacío',
-      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
-      imageLoadError: '$t(homeView:surveyInfo.branding.imageLoadError)',
-      imageLoadErrorReadOnly: '$t(homeView:surveyInfo.branding.imageLoadErrorReadOnly)',
-      downloadImage: '$t(homeView:surveyInfo.branding.downloadImage)',
+      invalidSaveBlocked: 'Corrija los campos de marca no válidos antes de guardar la información de la encuesta',
+      imageLoadError: 'No se pudo cargar la imagen "{{name}}". Elimínela y cargue una nueva.',
+      imageLoadErrorReadOnly: 'No se pudo cargar la imagen "{{name}}"',
+      downloadImage: 'Haga clic para descargar la imagen',
     },
     configuration: {
       title: 'Configuración',
@@ -97,6 +86,17 @@ export default {
     confirmDeleteCycle:
       '¿Está seguro de que desea eliminar el ciclo {{cycle}}?\n\n$t(common.cantUndoWarning)\n\nSi hay registros asociados a este ciclo, se eliminarán.',
     cycleForArenaMobile: 'Ciclo para Arena Mobile',
+    deleteActivityLog: 'Borrar registro de actividad',
+    deleteActivityLogConfirm: {
+      headerText: '¿Borrar TODOS los datos del registro de actividad de esta encuesta?',
+      message: `
+  - TODOS los datos del registro de actividad para la encuesta **{{surveyName}}** se eliminarán;\n\n
+  - el espacio ocupado por la encuesta en la BD se reducirá;\n\n
+  - no afectará a los datos de entrada de la encuesta;\n\n
+  
+  $t(common.cantUndoWarning)`,
+      confirmName: 'Escriba el nombre de esta encuesta para confirmar:',
+    },
     fieldManualLink: 'Enlace al manual de campo',
     map: 'Mapa',
     editInfo: 'Editar información',
@@ -143,6 +143,10 @@ export default {
       visibleInMobile: 'Visible en Arena Mobile',
       allowRecordsDownloadInMobile: 'Permitir la descarga de registros del servidor a Arena Mobile',
       allowRecordsUploadFromMobile: 'Permitir la carga de registros de Arena Mobile al servidor',
+      allowRecordsWithErrorsUploadFromMobile:
+        'Permitir la carga al servidor de registros con errores de validación desde Arena Mobile',
+      allowRecordsMergeWithSameKeys:
+        'Permitir la fusión de registros con las mismas claves (p. ej. registros creados en distintos dispositivos con Arena Mobile)',
     },
     srsPlaceholder: 'Escriba el código o la etiqueta',
     unpublish: 'Despublicar y eliminar datos',

@@ -13,6 +13,7 @@ export default {
     label: 'ソース',
     arena: 'Arena（.zip）',
     collect: 'Collect（.collect、.collect-backup、.collect-data）',
+    odk: 'ODK (.xml)',
   },
   startImport: 'インポートを開始',
   survey: '調査',

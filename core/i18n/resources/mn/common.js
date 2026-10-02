@@ -11,6 +11,8 @@ export default {
     apply: 'Хэрэгжүүлэх',
     aggregateFunction: 'Нэгдсэн функц',
     aggregateFunction_other: 'Нэгдсэн функцууд',
+    attribute: 'Шинж чанар',
+    attribute_other: 'Шинж чанарууд',
     avg: 'Дундаж',
     ascending: 'Өсөх',
     areaBased: 'талбай дээр суурилсан',
@@ -122,11 +124,15 @@ export default {
     measurePrevSteps: 'Өмнөх алхмуудыг хэмжих',
     measurePrevSteps_plural: 'Өмнөх алхмуудыг хэмжих',
     min: 'Хамгийн бага',
+    moveUp: 'Дээш зөөх',
+    moveDown: 'Доош зөөх',
     name: 'Нэр',
     new: 'Шинэ',
     next: 'Дараах',
     no: 'Үгүй',
     noItems: `$t(common.no) $t(common.item_plural)`,
+    notification: 'Мэдэгдэл',
+    notification_other: 'Мэдэгдлүүд',
     notSpecified: '---Заагаагүй---',
     orderBy: 'Эрэмбэлэх',
     of: '-ийн',
@@ -383,6 +389,8 @@ export default {
     entities: 'Виртуал объектууд',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Жишээнүүд',
+    message: 'Мессеж',
+    message_plural: '$t(common.message_plural)',
 
     systemAdmin: 'Системийн удирдлага',
     jobMonitor: 'Ажлын хяналт',
@@ -390,7 +398,7 @@ export default {
 
     help: 'Тусламж',
     about: 'Тухай',
-    changelog: 'Changelog',
+    changelog: 'Өөрчлөлтийн түүх',
     whatsNew: 'Шинэ боломжууд',
     disclaimer: 'Хариуцлагаас татгалзах',
     userManual: 'Хэрэглэгчийн гарын авлага',
@@ -444,13 +452,18 @@ $t(common.raiseTicketInSupportForum)
 **Хүсэлтээ илгээсний дараа Арена руу нэвтрэх урилгын имэйлийг хүлээгээрэй.**`,
     reCaptchaNotAnswered: 'ReCaptcha хариулагдаагүй',
     requestSent: 'Хандалтын хүсэлт амжилттай илгээгдсэн',
-    requestSentMessage: `Таны хүсэлтийг боловсруулахад хэдхэн хоног өгнө үү.
-Бид удахгүй **{{email}}** хаяг руу $t(common.appName) руу хэрхэн нэвтрэх тухай заавар бүхий имэйл илгээх болно.
+    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
+$t(accessRequestView.whitelistSenderSuggestion)
+
+Таны хүсэлтийг боловсруулахад хэдхэн хоног өгнө үү.
+Хүсэлт зөвшөөрөгдсөний дараа бид **{{email}}** хаяг руу $t(common.appName) руу хэрхэн нэвтрэх тухай заавар бүхий өөр нэг имэйл илгээх болно.
 Баярлалаа, **$t(common.appNameFull)**-г ашиглаарай!`,
     sendRequest: 'Хүсэлт илгээх',
     sendRequestConfirm: '$t(common.appNameFull) руу хандах хүсэлт илгээх үү?',
     templateNotSelected: 'Сонгогдоогүй (эхнээс нь эхлэх)',
     title: '$t(common.appNameFull) руу хандах хүсэлт гаргах',
+    whitelistSenderSuggestion:
+      'Хэрэв та үүнийг Спам/Хэрэггүй имэйлийн хавтаснаас олсон бол **{{senderEmail}}** хаягийг харилцагчдын жагсаалтдаа (хаягийн дэвтэр) нэмэх эсвэл аюулгүй/спам биш гэж тэмдэглэнэ үү. Ингэснээр бидний дараагийн имэйлүүд таны ирсэн имэйлийн хайрцагт шууд очих болно.',
   },
 
   resetPasswordView: {
@@ -535,6 +548,10 @@ $t(common.raiseTicketInSupportForum)
       showPlotReferencePoint: `Газрын зургийн лавлах цэг`,
       showUtmGrid: 'UTM торыг харуулах',
     },
+    rulerTooltip: `Зай хэмжиж эхлэхийн тулд товчийг дарна уу.
+- замыг хэмжихийн тулд олон удаа дарна уу
+- хэмжилтийг дуусгахын тулд давхар дарах эсвэл ESC товчийг дарна уу
+- хэмжилтийг нуухын тулд товчийг дахин дарна уу`,
     samplingPointDataLayerName: 'Түүвэрлэх цэгийн өгөгдөл - түвшин {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (ачаалж байна...)',
     samplingPointItemPopup: {
@@ -618,6 +635,7 @@ $t(common.raiseTicketInSupportForum)
     rotate: 'Эргүүлэх',
     dragAndDrop: 'Зургийг дээр нь чирж оруулах эсвэл',
     upload: 'байршуулахын тулд энд дарна уу',
+    remove: 'Профайл зургийг устгах уу?',
     sendNewInvitation: 'Шинэ урилга илгээх',
     removeFromSurvey: 'Судалгаанаас хасах',
     confirmRemove: 'Та {{user}}-г {{survey}} судалгаанаас хасахдаа итгэлтэй байна уу?',
@@ -626,6 +644,12 @@ $t(common.raiseTicketInSupportForum)
     preferredUILanguage: {
       label: 'Хэрэглэгчийн интерфэйсийн хүссэн хэл',
       auto: 'Автоматаар илрүүлсэн ({{detectedLanguage}})',
+    },
+    newPassword: 'Нууц үг',
+    confirmPassword: 'Нууц үгээ баталгаажуулах',
+    manageTwoFactorDevices: {
+      label: '2FA удирдах',
+      title: 'Хоёр хүчин зүйлийн баталгаажуулалтын төхөөрөмжүүдийг удирдах',
     },
   },
 
@@ -646,6 +670,10 @@ $t(common.raiseTicketInSupportForum)
 
     $t(userInviteView.skippedEmailsNotice)`,
     skippedEmailsNotice: `{{skppedEmailsCount}} хаяг алгассан (тэдгээр нь энэ судалгаанд өмнө нь уригдсан байсан): {{skippedEmails}}`,
+    invalidEmailsWarning:
+      '{{emails}} имэйл хаягт хүрч чадсангүй, энэ хаяг байхгүй байж магадгүй. Үүнийг доорх жагсаалтад үлдээсэн: засах эсвэл устгаад дахин урьж үзнэ үү.',
+    invalidEmailsWarning_other:
+      '{{emails}} имэйл хаягуудад хүрч чадсангүй, эдгээр хаяг байхгүй байж магадгүй. Тэдгээрийг доорх жагсаалтад үлдээсэн: засах эсвэл устгаад дахин урьж үзнэ үү.',
     groupPermissions: {
       label: 'Эрхүүд',
       systemAdmin: `
@@ -1031,6 +1059,10 @@ $t(common.appNameFull)
         label: 'Тоолох',
         info: `Мөрүүд нь объектын дотор тодорхойлогдсон Түлхүүр гэж тэмдэглэгдсэн кодын шинж чанартай холбоотой ангиллын элементүүдийг ашиглан автоматаар үүсгэгдэнэ; мөр нэмэх эсвэл устгах боломжгүй бөгөөд түлхүүр кодын шинж чанарыг засах боломжгүй`,
       },
+      enumeratingItemsExpression: {
+        label: 'Тоочих элементүүдийн илэрхийлэл',
+        info: 'Ангиллын аль элементүүдийг тоочихыг шүүх нэмэлт илэрхийлэл (жишээ нь unique(table_source.source_type)). Хоосон үед ангиллын бүх элементийг ашиглана.',
+      },
       enumerator: {
         label: 'Тоологч',
         info: 'Ангиллын элементүүд эцэг объектын мөрүүдийг үүсгэхэд ашиглагдана',
@@ -1231,6 +1263,8 @@ $t(common.appNameFull)
 
 Жишээ нь, *бүлэглэл -> талбай -> мод* гэсэн бүтэцтэй бол, хэрэв танд **Өвөрмөц** гэж тэмдэглэгдсэн *tree_species* гэсэн шинж чанар байвал, нэг *талбай* дотор зөвхөн нэг төрлийн мод байж болно.`,
     },
+    nodeDefClonedSuccessfully:
+      'Зангилааны тодорхойлолт "{{nodeDefName}}"-г "{{targetParentNodeDefName}}" руу амжилттай хувиллаа',
     categoriesClonedFromSurvey: 'Дараах ангилалууд эх судалгаанаас мөн хувилагдсан: {{names}}',
     taxonomiesClonedFromSurvey: 'Дараах таксономууд эх судалгаанаас мөн хувилагдсан: {{names}}',
   },
@@ -1498,5 +1532,76 @@ $t(common.cantUndoWarning)`,
       constant: 'Тогтмол',
       expression: 'Илэрхийлэл',
     },
+  },
+
+  urls: {
+    openforisWebsite: 'https://www.openforis.org',
+    openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
+    supportForum: 'https://openforis.support',
+  },
+
+  links: {
+    openforis: '<a href="$t(urls.openforisWebsite)" target="_blank" rel="noopener noreferrer">$t(common.openForis)</a>',
+    openforisArenaWebsite:
+      '<a href="$t(urls.openforisArenaWebsite)" target="_blank" rel="noopener noreferrer">$t(urls.openforisArenaWebsite)</a>',
+    supportForum: '<a href="$t(urls.supportForum)" target="_blank" rel="noopener noreferrer">$t(urls.supportForum)</a>',
+    arenaVideoTutorialsInFaoElearningAcademy:
+      '<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank" rel="noopener noreferrer">FAO elearning Academy</a>',
+    arenaVideoTutorialsInYouTube:
+      '<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank" rel="noopener noreferrer">YouTube</a>',
+    arenaInGitHub:
+      '<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>',
+    arenaRScriptsInGitHub:
+      '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
+  },
+
+  aiExpression: {
+    title: 'Тайлбараас илэрхийлэл үүсгэх',
+    hint: 'Илэрхийлэл юу хийх ёстойг энгийн үгээр тайлбарлана уу. AI үүнийг Arena-ийн синтакс руу хөрвүүлнэ. Үүсгэхийн тулд Ctrl+Enter дарна уу.',
+    placeholder: 'жишээ нь: модны өндөр 0-ээс их, 200-аас бага байх ёстой',
+    generate: 'Үүсгэх',
+    generating: 'Үүсгэж байна…',
+    use: 'Энэ илэрхийллийг ашиглах',
+    useAnyway: 'Ямар ч байсан ашиглах',
+    tryAgain: 'Өөр тайлбар оруулж үзэх',
+    parseError:
+      'Үүсгэсэн илэрхийллийг зөв задлан шинжилж чадсангүй: {{message}}. Та үүнийг хэрэглээд гараар засах эсвэл тайлбараа өөрөөр бичиж үзэх боломжтой.',
+    explain: {
+      title: 'Энэ илэрхийллийг тайлбарлах',
+      thinking: 'AI-аас энэ илэрхийллийг тайлбарлахыг хүсэж байна…',
+      error: 'Тайлбарыг авч чадсангүй: {{message}}',
+      timeout: 'AI хариу өгөхөд хэт удлаа. Дахин оролдоно уу.',
+    },
+  },
+
+  aiTranslation: {
+    translateButton_one: 'Өөр {{count}} хэл рүү орчуулах',
+    translateButton_other: 'Өөр {{count}} хэл рүү орчуулах',
+    translateButton: 'Бусад хэл рүү орчуулах',
+    success_one: '{{count}} хэл рүү орчууллаа. Хянаад хадгална уу.',
+    success_other: '{{count}} хэл рүү орчууллаа. Хянаад хадгална уу.',
+    success: 'Орчууллаа. Хянаад хадгална уу.',
+    failed: 'Орчуулга амжилтгүй боллоо: {{message}}',
+    timeout: 'Орчуулгын хүсэлтийн хугацаа дууслаа. Дахин оролдоно уу.',
+  },
+
+  aiActivityLog: {
+    title: 'Үйл ажиллагааны бүртгэлийн хураангуй',
+    summarizeButton: 'Хураангуйлах',
+    thinking: 'Үйл явдлуудыг нэгтгэж, AI-аас хураангуй хүсэж байна…',
+    error: 'Хураангуйг авч чадсангүй: {{message}}',
+  },
+
+  aiChatbot: {
+    open: 'Тусламж ба баримт бичиг',
+    title: 'Тусламж ба баримт бичиг',
+    empty: 'Open Foris Arena-ийн талаар юу ч асуугаарай.',
+    placeholder: 'Асуултаа бичнэ үү…',
+    send: 'Илгээх',
+    stop: 'Зогсоох',
+    clear: 'Цэвэрлэх',
+    showReasoning: 'Үндэслэлийг харуулах',
+    error: 'Чатботын алдаа: {{message}}',
+    language: 'Хариултын хэл',
   },
 }
