@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: arena
+  labels:
+    app.kubernetes.io/name: arena
+  annotations:
+    # Issuer name set by the overlays.
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Matches the default FILE_UPLOAD_LIMIT (1 GB).
+    nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+    # WebSockets, long uploads and exports.
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '3600'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '3600'
+    # socket.io long-polling needs sticky sessions when running more than one replica.
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/session-cookie-name: arena-affinity
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        # Host set by the overlays.
+        - arena.example.org
+      secretName: arena-tls
+  rules:
+    - host: arena.example.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: arena
+                port:
+                  name: http

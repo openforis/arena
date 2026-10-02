@@ -303,3 +303,8 @@ sample-survey.zip
 # Playwright Test (test/e2e) outputs
 test/e2e/test-results/
 test/e2e/playwright-report/
+
+# Kubernetes deployment: local secrets
+infra/k8s/overlays/*/secrets.env
+infra/k8s/overlays/*/db.env
+infra/k8s/overlays/*/rstudio.htpasswd
