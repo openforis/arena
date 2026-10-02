@@ -25,6 +25,7 @@ const RecordsSummaryCard = () => {
     <DashboardKpiCard
       titleKey="homeView:dashboard.recordsCard.total"
       value={aggregateRecordsTotal(counts)}
+      accent="records"
       testId={TestId.dashboard.kpiRecords}
       expanded={expanded}
       onToggleExpand={toggleExpanded}

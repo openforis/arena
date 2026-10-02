@@ -36,6 +36,7 @@ const StorageCard = () => {
       <DashboardKpiCard
         titleKey="homeView:dashboard.kpi.storage"
         value={getUsedPercentLabel(Survey.getFilesStatistics(surveyInfo))}
+        accent="storage"
         testId={TestId.dashboard.kpiStorage}
         expanded={expanded}
         onToggleExpand={toggleExpanded}

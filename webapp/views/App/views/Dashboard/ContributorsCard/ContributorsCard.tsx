@@ -39,6 +39,7 @@ const ContributorsCard = () => {
     <DashboardKpiCard
       titleKey="homeView:dashboard.kpi.contributors"
       value={visibleUserCounts.length}
+      accent="contributors"
       testId={TestId.dashboard.kpiContributors}
       expanded={expanded}
       onToggleExpand={toggleExpanded}
