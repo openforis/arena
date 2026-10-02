@@ -15,20 +15,23 @@ import TotalRecordsSummaryChart from '../TotalRecordsSummaryChart'
  */
 const RecordTrendSection = () => {
   const { counts } = useRecordsSummaryContext()
+  const hasTrendData = counts.length > 0
 
   return (
     <DashboardSection titleKey="homeView:dashboard.totalRecords" testId={TestId.dashboard.trendSection}>
       <Box
         sx={{
-          // Recharts ResponsiveContainer uses height 100%; needs a definite parent height.
           width: '100%',
-          minHeight: '16rem',
-          height: '16rem',
-          '& .no-records-added': {
-            padding: '2rem 0',
-            textAlign: 'center',
-            color: defaultTokens.colors.blueDark,
-          },
+          // Recharts ResponsiveContainer needs a definite parent height only when charting.
+          ...(hasTrendData
+            ? { minHeight: '16rem', height: '16rem' }
+            : {
+                '& .no-records-added': {
+                  padding: '2rem 0',
+                  textAlign: 'center',
+                  color: defaultTokens.colors.blueDark,
+                },
+              }),
         }}
       >
         <TotalRecordsSummaryChart counts={counts} />

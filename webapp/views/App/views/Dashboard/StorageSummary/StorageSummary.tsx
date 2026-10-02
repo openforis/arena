@@ -22,6 +22,21 @@ type StorageSummaryItemProps = {
 }
 
 /**
+ * Narrows unknown survey storage stats into used/total byte counts.
+ *
+ * @param {unknown} value - Raw statistics from the survey info getters.
+ * @returns {StorageStatistics} Used and total space when present.
+ */
+const toStorageStatistics = (value: unknown): StorageStatistics => {
+  if (typeof value !== 'object' || value === null) return {}
+  const record = value as Record<string, unknown>
+  return {
+    usedSpace: typeof record.usedSpace === 'number' ? record.usedSpace : undefined,
+    totalSpace: typeof record.totalSpace === 'number' ? record.totalSpace : undefined,
+  }
+}
+
+/**
  * Computes used space as a percentage of total, clamped to 0–100.
  *
  * @param {StorageStatistics} statistics - Used and total byte counts.
@@ -46,6 +61,7 @@ const StorageSummaryItem = (props: StorageSummaryItemProps) => {
   const usedSpace = typeof statistics.usedSpace === 'number' ? statistics.usedSpace : 0
   const totalSpace = typeof statistics.totalSpace === 'number' ? statistics.totalSpace : 0
   const usePercent = getUsePercent(statistics)
+  const title = i18n.t(titleKey) as string
 
   return (
     <Box
@@ -67,7 +83,7 @@ const StorageSummaryItem = (props: StorageSummaryItemProps) => {
           color: defaultTokens.colors.blueDark,
         }}
       >
-        {i18n.t(titleKey) as string}
+        {title}
       </Typography>
       <Typography
         component="div"
@@ -82,7 +98,7 @@ const StorageSummaryItem = (props: StorageSummaryItemProps) => {
           total: FileUtils.toHumanReadableFileSize(totalSpace),
         }) as string}
       </Typography>
-      <StorageUsageMeter percent={usePercent} />
+      <StorageUsageMeter ariaLabel={title} percent={usePercent} />
     </Box>
   )
 }
@@ -94,8 +110,8 @@ const StorageSummaryItem = (props: StorageSummaryItemProps) => {
  */
 export const StorageSummary = () => {
   const surveyInfo = useSurveyInfo()
-  const filesStatistics = Survey.getFilesStatistics(surveyInfo) as StorageStatistics
-  const dbStatistics = Survey.getDbStatistics(surveyInfo) as StorageStatistics
+  const filesStatistics = toStorageStatistics(Survey.getFilesStatistics(surveyInfo))
+  const dbStatistics = toStorageStatistics(Survey.getDbStatistics(surveyInfo))
 
   return (
     <Box

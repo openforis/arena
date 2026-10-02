@@ -1,11 +1,11 @@
 import React from 'react'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 
 import { defaultTokens } from '@webapp/theme/tokens'
 
 type StorageUsageMeterProps = {
   percent: number
+  ariaLabel: string
 }
 
 const WARN_THRESHOLD = 70
@@ -30,12 +30,19 @@ export const getStorageUsageFillColor = (percent: number): string => {
  * @returns {React.ReactElement} The meter.
  */
 export const StorageUsageMeter = (props: StorageUsageMeterProps) => {
-  const { percent } = props
+  const { percent, ariaLabel } = props
   const clamped = Number.isFinite(percent) ? Math.min(100, Math.max(0, percent)) : 0
   const fillColor = getStorageUsageFillColor(clamped)
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 360 }} role="meter" aria-valuenow={Math.floor(clamped)} aria-valuemin={0} aria-valuemax={100}>
+    <Box
+      sx={{ width: '100%', maxWidth: 360 }}
+      role="meter"
+      aria-label={ariaLabel}
+      aria-valuenow={Math.floor(clamped)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
       <Box
         sx={{
           height: 10,
@@ -54,18 +61,6 @@ export const StorageUsageMeter = (props: StorageUsageMeterProps) => {
           }}
         />
       </Box>
-      <Typography
-        component="span"
-        sx={{
-          display: 'block',
-          mt: 0.75,
-          fontSize: '0.75rem',
-          color: defaultTokens.colors.blueDark,
-          fontWeight: 600,
-        }}
-      >
-        {Math.floor(clamped)}%
-      </Typography>
     </Box>
   )
 }

@@ -25,6 +25,7 @@ const LINE_COLOR = defaultTokens.colors.blue
 const AREA_FILL = `${defaultTokens.colors.blue}33`
 const GRID_STROKE = defaultTokens.colors.greyBorder
 const AXIS_STROKE = defaultTokens.colors.blueDark
+const SERIES_NAME = 'Records'
 
 /**
  * Line/area trend of records added over the selected period.
@@ -53,12 +54,24 @@ const TotalRecordsSummaryChart = (props: TotalRecordsSummaryChartProps) => {
         <XAxis dataKey="date" tick={RotatedCustomAxisTick} stroke={AXIS_STROKE} tickLine={false} />
         <YAxis allowDecimals={false} stroke={AXIS_STROKE} tickLine={false} axisLine={false} />
         <Tooltip />
-        <Area type="monotone" dataKey="count" stroke="none" fill={AREA_FILL} />
+        <Area
+          type="monotone"
+          dataKey="count"
+          name={SERIES_NAME}
+          stroke="none"
+          fill={AREA_FILL}
+          fillOpacity={1}
+          tooltipType="none"
+          activeDot={false}
+          isAnimationActive={false}
+        />
         <Line
           type="monotone"
           dataKey="count"
+          name={SERIES_NAME}
           stroke={LINE_COLOR}
           strokeWidth={2}
+          isAnimationActive={false}
           dot={{ r: 3, fill: LINE_COLOR, strokeWidth: 0 }}
           activeDot={{ r: 5 }}
         />
