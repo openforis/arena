@@ -40,6 +40,23 @@
   &__actions {
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 0.5rem;
+    margin-top: 0.5rem;
+
+    .MuiButton-root,
+    .button-menu__button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .icon-left {
+      margin-right: 0;
+    }
   }
 }

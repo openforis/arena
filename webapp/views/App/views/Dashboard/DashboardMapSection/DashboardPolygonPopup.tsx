@@ -1,11 +1,12 @@
 import React, { useCallback, useState } from 'react'
 import { Popup } from 'react-leaflet'
-import { Link } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { Button } from '@webapp/components'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useUserName } from '@webapp/store/user/hooks'
@@ -59,10 +60,14 @@ export const DashboardPolygonPopup = (props: DashboardPolygonPopupProps) => {
         <div className="dashboard-polygon-popup__attribute">{attributeLabel}</div>
         {ownerName && <div className="dashboard-polygon-popup__owner">{`${i18n.t('common.owner')}: ${ownerName}`}</div>}
         <div className="dashboard-polygon-popup__actions">
-          <Link className="btn btn-s" to={recordEditUrl} title={i18n.t('mapView.editRecord') as string}>
-            <span className="icon icon-12px icon-pencil2 icon-left" />
-            {i18n.t('mapView.editRecord') as string}
-          </Link>
+          <Button
+            component={RouterLink}
+            to={recordEditUrl}
+            iconClassName="icon-pencil2 icon-12px"
+            label="mapView.editRecord"
+            size="small"
+            variant="outlined"
+          />
           {polygon && <WhispMenuButton geoJsonGenerator={generateGeoJson} />}
         </div>
       </div>
