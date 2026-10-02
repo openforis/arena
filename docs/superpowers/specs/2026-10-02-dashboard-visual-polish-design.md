@@ -1,7 +1,7 @@
 # Arena Dashboard Visual Polish — Design Spec
 
 **Date:** 2026-10-02  
-**Status:** Approved — implementation plan written  
+**Status:** Implemented — see [implementation plan](../plans/2026-10-02-dashboard-visual-polish.md)  
 **Parent:** [Dashboard upgrade design](./2026-10-01-dashboard-upgrade-design.md)  
 **Related plan:** [Dashboard visual polish implementation](../plans/2026-10-02-dashboard-visual-polish.md)  
 **Related plan (parent):** [Dashboard upgrade implementation](../plans/2026-10-01-dashboard-upgrade.md)
