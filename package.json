@@ -133,7 +133,7 @@
     "@mui/x-date-pickers": "^9",
     "@mui/x-tree-view": "^9",
     "@ngageoint/geopackage": "patch:@ngageoint/geopackage@npm%3A4.2.9#~/.yarn/patches/@ngageoint-geopackage-npm-4.2.9-0462c5ae41.patch",
-    "@openforis/arena-server": "^2.5.0",
+    "@openforis/arena-server": "^2.5.1",
     "@reduxjs/toolkit": "^2.13.0",
     "@sendgrid/mail": "^8.1.6",
     "@shopify/draggable": "^1.2.1",
