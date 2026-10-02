@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arena
+  labels:
+    app.kubernetes.io/name: arena
+spec:
+  # More than one replica requires S3 file storage (see README).
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: arena
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: arena
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: arena
+          # Tag set by the overlays (images transformer).
+          image: openforis/arena
+          ports:
+            - name: http
+              containerPort: 9090
+          envFrom:
+            - configMapRef:
+                name: arena-config
+            - secretRef:
+                name: arena-secrets
+            - secretRef:
+                name: arena-db-credentials
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: ARENA_PORT
+              value: '9090'
+            # TLS is terminated by the ingress: plain HTTP requests are redirected to HTTPS.
+            - name: USE_HTTPS
+              value: 'true'
+            # Writable paths: the root filesystem is read-only.
+            - name: TEMP_FOLDER
+              value: /tmp/arena_upload
+            - name: ANALYSIS_OUTPUT_DIR
+              value: /tmp/arena_analysis
+            - name: PM2_HOME
+              value: /tmp/.pm2
+          # Database migrations run before the server starts listening.
+          startupProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          # Starting values: tune them to the size of the installation.
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1Gi
+            limits:
+              memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: logs
+          emptyDir: {}
+        # Holds uploads and analysis output: uses the node's ephemeral storage.
+        - name: tmp
+          emptyDir: {}

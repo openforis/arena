@@ -228,3 +228,28 @@ downloaded to a scratch folder:
    excluded or without TLS) and the Arena pod must become Ready. If that is not possible, the final
    report says the manifests were validated statically only.
 5. Unit test for the `/api/rstudio` no-pool behaviour; `yarn test:unit` passes.
+
+## Implementation notes
+
+Changes made while implementing and testing, where the result differs from the design above:
+
+- **Database credentials** (`PGDATABASE`, `PGUSER`, `PGPASSWORD`) are in their own `db.env` file and
+  `arena-db-credentials` Secret, read by both Arena and Postgres. With a single ConfigMap/Secret, every
+  Arena configuration change would have changed the generated name referenced by the StatefulSet and
+  restarted the database.
+- **Namespace and common labels** are set in the overlays, not in the base: Kustomize only rewrites
+  references to generated ConfigMaps/Secrets within the same namespace, and the generators are in the
+  overlays.
+- **`ADMIN_EMAIL`** is in `config.env` (it is not a secret and stays after the first startup).
+- **`NODE_ENV=production`** is set in the Deployment: the image does not define it.
+- **Email credentials are mandatory**: the server exits at startup without them.
+- **`readOnlyRootFilesystem: true`** is enabled: the image runs with it, given the two `emptyDir`
+  volumes.
+- **RStudio path prefix**: the Ingress strips `/rstudio` (`rewrite-target`) and RStudio is told about it
+  with `www-root-path=/rstudio`. The setting is delivered by mounting a ConfigMap over
+  `/etc/rstudio/disable_auth_rserver.conf`, the file the image copies to `rserver.conf` when
+  `DISABLE_AUTH=true`. A rewrite alone loses the prefix on RStudio's redirects.
+- **RStudio basic auth Secret** is generated in the overlay (from `rstudio.htpasswd`) with a fixed name,
+  since Kustomize does not rewrite names inside annotations.
+- **Verification** was done on a local `kind` cluster with ingress-nginx (no cert-manager: the
+  certificate issuing was not exercised).

@@ -174,6 +174,10 @@ $ docker container restart arena-rstudio
 
 Visit http://localhost:8787 in your browser to access the rStudio server instance.
 
+## Deploy on Kubernetes
+
+Kustomize manifests and instructions are in [infra/k8s](./infra/k8s/README.md).
+
 # License
 
 Arena is [MIT licensed](./LICENSE).
