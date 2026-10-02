@@ -65,9 +65,10 @@ export const WhispMenuButton = (props) => {
           <Button
             disabled={whispDataLoading}
             label={label}
-            iconHeight={25}
+            labelIsI18nKey={false}
+            iconHeight={20}
             iconSrc="/img/of_whisp_icon.png"
-            iconWidth={25}
+            iconWidth={20}
             onClick={onClick}
             size="small"
             variant="text"

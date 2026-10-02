@@ -1,5 +1,29 @@
 /* menuClassName lands on the MUI Menu modal root (portaled). */
-.whisp-menu .MuiPaper-root.MuiMenu-paper .MuiMenuItem-root.button-menu__item button {
-  justify-content: center;
-  text-align: center;
+.whisp-menu .MuiPaper-root.MuiMenu-paper .MuiMenuItem-root.button-menu__item {
+  padding: 0.15rem 0.5rem;
+
+  button.MuiButton-root {
+    width: 100%;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: left;
+    min-height: 2.25rem;
+    padding-left: 0.5rem;
+    padding-right: 0.75rem;
+  }
+
+  /* Keep icons in a shared column so rows line up (centering each row misaligns short labels). */
+  .MuiButton-startIcon {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    flex-shrink: 0;
+
+    img {
+      display: block;
+    }
+  }
 }
