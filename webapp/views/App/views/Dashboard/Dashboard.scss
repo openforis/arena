@@ -14,17 +14,6 @@
     align-items: flex-start;
     gap: 1rem;
   }
-
-  &__section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  &__section-title {
-    margin: 0;
-    text-transform: none;
-  }
 }
 
 .dashboard-records-card {

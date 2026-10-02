@@ -1,6 +1,9 @@
 import React from 'react'
+import Box from '@mui/material/Box'
 
 import { useI18n } from '@webapp/store/system'
+
+import { dashboardSurfaces } from '../theme/dashboardSurfaces'
 
 type DashboardSectionProps = {
   titleKey?: string
@@ -19,9 +22,13 @@ export const DashboardSection = (props: DashboardSectionProps) => {
   const i18n = useI18n()
 
   return (
-    <section className="home-dashboard__section" data-testid={testId}>
-      {titleKey && <h3 className="home-dashboard__section-title">{i18n.t(titleKey) as string}</h3>}
+    <Box component="section" data-testid={testId} sx={dashboardSurfaces.section}>
+      {titleKey && (
+        <Box component="h3" sx={dashboardSurfaces.sectionTitle}>
+          {i18n.t(titleKey) as string}
+        </Box>
+      )}
       {children}
-    </section>
+    </Box>
   )
 }

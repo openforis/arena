@@ -1,8 +1,8 @@
-import './RecordTrendSection.scss'
-
 import React from 'react'
+import Box from '@mui/material/Box'
 
 import { TestId } from '@webapp/utils/testId'
+import { defaultTokens } from '@webapp/theme/tokens'
 
 import { DashboardSection } from '../components/DashboardSection'
 import { useRecordsSummaryContext } from '../RecordsSummaryContext'
@@ -18,9 +18,17 @@ const RecordTrendSection = () => {
 
   return (
     <DashboardSection titleKey="homeView:dashboard.totalRecords" testId={TestId.dashboard.trendSection}>
-      <div className="record-trend-section__chart">
+      <Box
+        sx={{
+          '& .no-records-added': {
+            padding: '2rem 0',
+            textAlign: 'center',
+            color: defaultTokens.colors.blueDark,
+          },
+        }}
+      >
         <TotalRecordsSummaryChart counts={counts} />
-      </div>
+      </Box>
     </DashboardSection>
   )
 }
