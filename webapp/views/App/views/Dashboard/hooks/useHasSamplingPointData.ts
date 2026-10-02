@@ -25,9 +25,9 @@ export const useHasSamplingPointData = (): boolean => {
       return
     }
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
-    const samplingPointDataNodeDefUuids = samplingPointDataNodeDefs.map(NodeDef.getUuid)
+    const samplingPointDataNodeDefUuids = new Set(samplingPointDataNodeDefs.map(NodeDef.getUuid))
     const allKeysUseSamplingPointData = rootKeyDefs.every((rootKeyDef) =>
-      samplingPointDataNodeDefUuids.includes(NodeDef.getUuid(rootKeyDef))
+      samplingPointDataNodeDefUuids.has(NodeDef.getUuid(rootKeyDef))
     )
     setHasSamplingPointData(allKeysUseSamplingPointData)
   }, [survey])

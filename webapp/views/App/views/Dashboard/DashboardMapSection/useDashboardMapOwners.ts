@@ -99,7 +99,7 @@ export const useDashboardMapOwners = ({ fetchUserNamesEnabled }: UseDashboardMap
         setUserNamesByUuid(indexUserNamesByUuid(users))
       }
     }
-    fetchUserNames()
+    void fetchUserNames()
     return () => {
       cancelled = true
     }

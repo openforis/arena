@@ -15,11 +15,6 @@ import { DashboardMapOwnerFilter } from './DashboardMapOwnerFilter'
 import { DashboardPolygonPopup } from './DashboardPolygonPopup'
 import { useDashboardMapOwners } from './useDashboardMapOwners'
 
-type RenderPopupParams = {
-  attributeDef: unknown
-  pointFeature: { properties?: Record<string, unknown> }
-}
-
 /**
  * Map section body: layers, owner filter and lazy map mount once the section is in view.
  *
@@ -42,8 +37,8 @@ export const DashboardMapContent = () => {
   const layerColors = useRandomColors(geoAttributeDefs.length)
 
   const renderPopup = useCallback(
-    ({ attributeDef, pointFeature }: RenderPopupParams) => (
-      <DashboardPolygonPopup attributeDef={attributeDef} pointFeature={pointFeature} />
+    (params: { attributeDef: unknown; pointFeature: { properties?: Record<string, unknown> } }) => (
+      <DashboardPolygonPopup attributeDef={params.attributeDef} pointFeature={params.pointFeature} />
     ),
     []
   )

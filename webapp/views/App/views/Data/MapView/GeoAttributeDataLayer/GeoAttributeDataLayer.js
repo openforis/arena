@@ -9,7 +9,15 @@ import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
 
 export const GeoAttributeDataLayer = (props) => {
-  const { attributeDef, checked = false, onRecordEditClick, renderPopup = null } = props
+  const {
+    attributeDef,
+    checked = false,
+    markersColor,
+    onPointsLoaded = null,
+    onRecordEditClick,
+    pointsFilter = null,
+    renderPopup = null,
+  } = props
 
   const {
     layerName,
@@ -21,7 +29,13 @@ export const GeoAttributeDataLayer = (props) => {
     getClusterLeaves,
     totalPoints,
     points,
-  } = useGeoAttributeDataLayer(props)
+  } = useGeoAttributeDataLayer({
+    attributeDef,
+    checked,
+    markersColor,
+    onPointsLoaded,
+    pointsFilter,
+  })
 
   const layerKey = NodeDef.getUuid(attributeDef)
   const { selectPoint, layerSortOrders } = useMapLayersPanel()
