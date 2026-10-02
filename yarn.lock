@@ -3519,6 +3519,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mui/icons-material@npm:^9.4.0":
+  version: 9.4.0
+  resolution: "@mui/icons-material@npm:9.4.0"
+  dependencies:
+    "@babel/runtime": "npm:^7.29.7"
+  peerDependencies:
+    "@mui/material": ^9.4.0
+    "@types/react": ^17.0.0 || ^18.0.0 || ^19.0.0
+    react: ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/929f818e1d514a9478776eac33063956732f353a24cb061221e889c9ee1f69b9b1a16d78157d5c01ab9647a9ba33af37dacd255a3c5f4dff2e1bd3fc4386a55c
+  languageName: node
+  linkType: hard
+
 "@mui/material@npm:^9":
   version: 9.4.0
   resolution: "@mui/material@npm:9.4.0"
@@ -14292,6 +14308,7 @@ __metadata:
     "@emotion/styled": "npm:^11.14.1"
     "@fontsource/noto-sans": "npm:^5.3.0"
     "@maplibre/maplibre-gl-leaflet": "npm:0.1.4"
+    "@mui/icons-material": "npm:^9.4.0"
     "@mui/material": "npm:^9"
     "@mui/x-data-grid": "npm:^9"
     "@mui/x-date-pickers": "npm:^9"
