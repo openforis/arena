@@ -287,13 +287,15 @@ export const init = (app) => {
       try {
         const { surveyId } = Request.getParams(req)
         const recordUuids = Request.getJsonParam(req, 'recordUuids')
+        // uuids of the files the client already has: their content is left out of the exported file
+        const excludedFileUuids = Request.getJsonParam(req, 'excludedFileUuids', [])
         const user = Request.getUser(req)
 
         if (Objects.isEmpty(recordUuids)) {
           throw new Error('record uuids not specified')
         }
 
-        const job = RecordService.startRecordsExportJob({ user, surveyId, recordUuids })
+        const job = RecordService.startRecordsExportJob({ user, surveyId, recordUuids, excludedFileUuids })
         res.json({ job: JobUtils.jobToJSON(job) })
       } catch (error) {
         next(error)
