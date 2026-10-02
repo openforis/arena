@@ -79,9 +79,9 @@ export default {
         - {{insertedRecords}} enregistrements créés`,
     },
     OdkDataImportJob: {
-      importCompleteSuccessfully: `ODK data import complete:
-        - {{submittedCount}} records created
-        - {{skippedCount}} duplicate submissions skipped`,
+      importCompleteSuccessfully: `Importation de données ODK terminée :
+        - {{submittedCount}} enregistrements créés
+        - {{skippedCount}} soumissions en double ignorées`,
     },
     DataImportJob: {
       importCompleteSummary: `

@@ -219,6 +219,7 @@ export default {
   },
 
   user: {
+    emailDuplicate: 'Ya existe un usuario con el mismo correo electrónico',
     emailRequired: 'El correo electrónico es obligatorio',
     emailInvalid: 'Correo electrónico no válido',
     emailNotFound: 'Correo electrónico no encontrado',
@@ -233,6 +234,7 @@ export default {
     passwordChangeRequired: 'Cambio de contraseña obligatorio',
     passwordResetNotAllowedWithPendingInvitation:
       'Restablecimiento de contraseña no permitido: el usuario ha sido invitado a una encuesta pero la invitación aún no ha sido aceptada',
+    twoFactorTokenRequired: 'El código de verificación es obligatorio',
   },
 
   userAccessRequest: {
@@ -246,6 +248,8 @@ export default {
     invalidRequest: 'Solicitud de acceso de usuario no válida',
     userAlreadyExisting: 'Usuario con correo electrónico {{email}} ya existente',
     requestAlreadySent: 'Solicitud de acceso para el usuario con correo electrónico {{email}} ya enviada',
+    emailNotReachable:
+      'El correo electrónico de confirmación no se pudo entregar a {{email}}; compruebe que la dirección sea correcta',
     invalidReCaptcha: 'ReCaptcha no válido',
   },
 
@@ -256,6 +260,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'El rol es obligatorio',
     surveyNameRequired: 'El nombre de la encuesta es obligatorio',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Ya existe un grupo con el mismo nombre: {{name}}',
+    qualifiersInvalid: 'Uno o más calificadores tienen una clave no válida o duplicada',
+    qualifierNameDuplicate: 'Ya existe un calificador con el mismo nombre en este grupo: {{name}}',
+    qualifierNameInvalid: 'Nombre de calificador no válido',
+    qualifierNameRequired: 'El nombre del calificador es obligatorio',
   },
 
   userPasswordChange: {

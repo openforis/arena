@@ -87,6 +87,9 @@ export default {
       backgroundFileTooLarge: '背景画像は{{maxMb}} MB以下にしてください',
       invalidPrimaryColor: '有効な#RRGGBB形式の色を入力するか、空欄のままにしてください',
       invalidSaveBlocked: '調査情報を保存する前に、無効なブランディング項目を修正してください',
+      imageLoadError: '画像「{{name}}」を読み込めませんでした。削除して新しい画像をアップロードしてください。',
+      imageLoadErrorReadOnly: '画像「{{name}}」を読み込めませんでした',
+      downloadImage: 'クリックして画像をダウンロード',
     },
     configuration: {
       title: '設定',

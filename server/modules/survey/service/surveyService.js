@@ -4,6 +4,7 @@ import { NodeDefExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@op
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
@@ -271,7 +272,12 @@ export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
 
 export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
   const summary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
-  const contentStream = await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileSummary: summary })
+  const contentStream = summary
+    ? await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileSummary: summary })
+    : null
+  if (!contentStream) {
+    throw new SystemError('appErrors:survey.fileNotFound', { fileUuid }, StatusCodes.NOT_FOUND)
+  }
   return { summary, contentStream }
 }
 

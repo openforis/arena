@@ -18,6 +18,9 @@ export default {
   errors: {
     rowNum: 'Мөр #',
   },
+  fileUploadChunkSize: {
+    label: 'Файл байршуулах хэсгийн хэмжээ',
+  },
   forceImportFromAnotherSurvey: 'Өөр судалгаанаас албадан импортлох',
 
   importFromArena: 'Арена/Арена Мобайл',
@@ -76,9 +79,9 @@ export default {
         - {{insertedRecords}} бичлэг үүсгэгдсэн`,
     },
     OdkDataImportJob: {
-      importCompleteSuccessfully: `ODK data import complete:
-        - {{submittedCount}} records created
-        - {{skippedCount}} duplicate submissions skipped`,
+      importCompleteSuccessfully: `ODK өгөгдлийн импорт амжилттай боллоо:
+        - {{submittedCount}} бичлэг үүсгэгдсэн
+        - {{skippedCount}} давхардсан илгээлт алгассан`,
     },
     DataImportJob: {
       importCompleteSummary: `

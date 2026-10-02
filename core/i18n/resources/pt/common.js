@@ -453,13 +453,18 @@ $t(common.raiseTicketInSupportForum)
 **Depois de enviar a solicitação, aguarde um e-mail de convite para acessar a Arena.**`,
     reCaptchaNotAnswered: 'ReCaptcha não respondido',
     requestSent: 'Solicitação de acesso enviada com sucesso',
-    requestSentMessage: `Por favor, dê-nos alguns dias para processar sua solicitação.
-Enviaremos em breve um email para **{{email}}** com as instruções de como acessar $t(common.appName).
+    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
+$t(accessRequestView.whitelistSenderSuggestion)
+
+Por favor, dê-nos alguns dias para processar sua solicitação.
+Assim que ela for aceita, enviaremos outro email para **{{email}}** com as instruções de como acessar $t(common.appName).
 Obrigado e aproveite **$t(common.appNameFull)**!`,
     sendRequest: 'Enviar solicitação',
     sendRequestConfirm: 'Solicitar acesso ao $t(common.appNameFull)?',
     templateNotSelected: 'Não selecionado (começar do zero)',
     title: 'Solicitando acesso ao $t(common.appNameFull)',
+    whitelistSenderSuggestion:
+      'Se você o encontrar na pasta de Spam/Lixo eletrônico, adicione **{{senderEmail}}** aos seus contatos (catálogo de endereços) ou marque-o como seguro/não é spam, para que nossos próximos emails cheguem diretamente à sua caixa de entrada.',
   },
 
   resetPasswordView: {
@@ -666,6 +671,10 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
 
     $t(userInviteView.skippedEmailsNotice)`,
     skippedEmailsNotice: `{{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
+    invalidEmailsWarning:
+      'O endereço de email {{emails}} não pôde ser alcançado e pode não existir. Ele foi mantido na lista abaixo: corrija-o ou remova-o e tente convidar novamente.',
+    invalidEmailsWarning_other:
+      'Os endereços de email {{emails}} não puderam ser alcançados e podem não existir. Eles foram mantidos na lista abaixo: corrija-os ou remova-os e tente convidar novamente.',
     groupPermissions: {
       label: 'Permissões',
       systemAdmin: `
@@ -1064,6 +1073,10 @@ $t(common.appNameFull)
         label: 'Enumerar',
         info: `As linhas serão geradas automaticamente usando os itens de categoria associados a um atributo de código marcado como Chave definido dentro da entidade; as linhas não podem ser adicionadas nem excluídas e o atributo de código-chave não será editável`,
       },
+      enumeratingItemsExpression: {
+        label: 'Expressão dos itens de enumeração',
+        info: 'Expressão opcional que filtra quais itens da categoria são enumerados (ex.: unique(table_source.source_type)). Quando vazia, todos os itens da categoria são usados.',
+      },
       enumerator: {
         label: 'Enumerador',
         info: 'Os itens da categoria serão usados para gerar as linhas da entidade pai',
@@ -1265,6 +1278,7 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
 
 Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo *tree_species* marcado como **Único**, poderá ter apenas uma árvore por espécie dentro do mesmo *plot*.`,
     },
+    nodeDefClonedSuccessfully: 'Definição de nó "{{nodeDefName}}" clonada com sucesso em "{{targetParentNodeDefName}}"',
     categoriesClonedFromSurvey: 'As seguintes categorias também foram clonadas do inventário de origem: {{names}}',
     taxonomiesClonedFromSurvey: 'As seguintes taxonomias também foram clonadas do inventário de origem: {{names}}',
   },
@@ -1542,5 +1556,63 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     openforis: `<a href="$t(urls.openforisWebsite)" target="_blank">$t(common.openForis)</a>`,
     openforisArenaWebsite: `<a href="$t(urls.openforisArenaWebsite)" target="_blank">$t(urls.openforisArenaWebsite)</a>`,
     supportForum: `<a href="$t(urls.supportForum)" target="_blank">$t(urls.supportForum)</a>`,
+    arenaVideoTutorialsInFaoElearningAcademy:
+      '<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank" rel="noopener noreferrer">FAO elearning Academy</a>',
+    arenaVideoTutorialsInYouTube:
+      '<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank" rel="noopener noreferrer">YouTube</a>',
+    arenaInGitHub:
+      '<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>',
+    arenaRScriptsInGitHub:
+      '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
+  },
+
+  aiExpression: {
+    title: 'Gerar expressão a partir de uma descrição',
+    hint: 'Descreva em linguagem simples o que a expressão deve fazer. A IA irá traduzi-la para a sintaxe do Arena. Pressione Ctrl+Enter para gerar.',
+    placeholder: 'ex.: a altura da árvore deve ser maior que 0 e menor que 200',
+    generate: 'Gerar',
+    generating: 'Gerando…',
+    use: 'Usar esta expressão',
+    useAnyway: 'Usar mesmo assim',
+    tryAgain: 'Tentar uma descrição diferente',
+    parseError:
+      'A expressão gerada não pôde ser analisada corretamente: {{message}}. Você ainda pode aplicá-la e editá-la manualmente, ou tentar reformular.',
+    explain: {
+      title: 'Explicar esta expressão',
+      thinking: 'Pedindo à IA para explicar esta expressão…',
+      error: 'Falha ao obter a explicação: {{message}}',
+      timeout: 'A IA demorou demais para responder. Tente novamente.',
+    },
+  },
+
+  aiTranslation: {
+    translateButton_one: 'Traduzir para {{count}} outro idioma',
+    translateButton_other: 'Traduzir para {{count}} outros idiomas',
+    translateButton: 'Traduzir para outros idiomas',
+    success_one: 'Traduzido para {{count}} idioma. Revise e salve.',
+    success_other: 'Traduzido para {{count}} idiomas. Revise e salve.',
+    success: 'Traduzido. Revise e salve.',
+    failed: 'Falha na tradução: {{message}}',
+    timeout: 'A solicitação de tradução expirou. Tente novamente.',
+  },
+
+  aiActivityLog: {
+    title: 'Resumo do log de atividades',
+    summarizeButton: 'Resumir',
+    thinking: 'Agregando eventos e pedindo à IA para resumir…',
+    error: 'Falha ao obter o resumo: {{message}}',
+  },
+
+  aiChatbot: {
+    open: 'Ajuda e documentação',
+    title: 'Ajuda e documentação',
+    empty: 'Pergunte-me qualquer coisa sobre o Open Foris Arena.',
+    placeholder: 'Digite sua pergunta…',
+    send: 'Enviar',
+    stop: 'Parar',
+    clear: 'Limpar',
+    showReasoning: 'Mostrar raciocínio',
+    error: 'Erro do chatbot: {{message}}',
+    language: 'Idioma da resposta',
   },
 }

@@ -18,6 +18,9 @@ export default {
   errors: {
     rowNum: 'Fila #',
   },
+  fileUploadChunkSize: {
+    label: 'Tamaño de los fragmentos de carga de archivos',
+  },
   forceImportFromAnotherSurvey: 'Forzar importación desde otra encuesta',
   importFromArena: 'Arena/Arena Mobile',
   importFromCollect: 'Collect / Collect Mobile',
@@ -68,9 +71,9 @@ export default {
         'Importación de datos de Collect completada:\n        - {{insertedRecords}} registros creados',
     },
     OdkDataImportJob: {
-      importCompleteSuccessfully: `ODK data import complete:
-        - {{submittedCount}} records created
-        - {{skippedCount}} duplicate submissions skipped`,
+      importCompleteSuccessfully: `Importación de datos de ODK completada:
+        - {{submittedCount}} registros creados
+        - {{skippedCount}} envíos duplicados omitidos`,
     },
     DataImportJob: {
       importCompleteSummary:

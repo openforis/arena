@@ -202,6 +202,13 @@ const _addNodeToUpdateResult = ({
   updateResult.addNode(newNodeToAdd, { sideEffect })
 }
 
+// when a record is merged with another version of itself (same record uuid, e.g. the copy of it edited
+// in a mobile device), the nodes added from the source keep their uuids: the client can then keep working
+// on its own copy and merge it again without the same nodes being added twice (or not found anymore).
+// Nodes coming from a different record always get new uuids: the source record can exist on its own.
+const _canKeepNodeUuid = ({ keepNodeUuids, record, node }) =>
+  keepNodeUuids && !RecordReader.getNodeByUuid(Node.getUuid(node))(record)
+
 const _mergeSingleAttributeValues = ({
   survey,
   record,
@@ -267,6 +274,7 @@ const _mergeMultipleAttributes = ({
   childrenSource,
   childrenTarget,
   entityTarget,
+  keepNodeUuids,
   sideEffect,
 }) => {
   if (childrenSource.length > 0) {
@@ -296,25 +304,29 @@ const _mergeMultipleAttributes = ({
           )
         ) {
           // value not in target values => add it to the record
-          _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget, assignNewUuid: true })
+          const assignNewUuid = !_canKeepNodeUuid({ keepNodeUuids, record: updateResult.record, node: childSource })
+          _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget, assignNewUuid })
         }
       })
     }
   }
 }
 
-const _cloneEntityAndDescendants = async ({
+const _cloneEntityAndDescendants = ({
   updateResult,
   recordSource,
   entitySource,
   parentEntity,
+  keepNodeUuids = false,
   sideEffect = false,
 }) => {
   const newNodeUuidByOldUuid = {}
   RecordReader.visitDescendantsAndSelf(entitySource, (visitedChildSource) => {
     const oldUuid = Node.getUuid(visitedChildSource)
     const oldParentUuid = Node.getParentUuid(visitedChildSource)
-    const newUuid = UUIDs.v4()
+    const newUuid = _canKeepNodeUuid({ keepNodeUuids, record: updateResult.record, node: visitedChildSource })
+      ? oldUuid
+      : UUIDs.v4()
     newNodeUuidByOldUuid[oldUuid] = newUuid
     const newParentEntityUuid =
       visitedChildSource === entitySource
@@ -338,6 +350,7 @@ const _mergeMultipleEntities = ({
   childrenSource,
   entityTarget,
   stack,
+  keepNodeUuids = false,
   sideEffect = false,
 }) => {
   childrenSource.forEach((childSource) => {
@@ -365,6 +378,7 @@ const _mergeMultipleEntities = ({
         recordSource,
         entitySource: childSource,
         parentEntity: entityTarget,
+        keepNodeUuids,
         sideEffect,
       })
     }
@@ -379,6 +393,7 @@ const _mergeRecordsNodes = ({
   entitySource,
   entityTarget,
   stack,
+  keepNodeUuids,
   sideEffect,
 }) => {
   const childDefUuid = NodeDef.getUuid(childDef)
@@ -417,6 +432,7 @@ const _mergeRecordsNodes = ({
       childDefUuid,
       entityTarget,
       stack,
+      keepNodeUuids,
       sideEffect,
     })
   } else {
@@ -428,6 +444,7 @@ const _mergeRecordsNodes = ({
       entityTarget,
       childrenSource,
       childrenTarget,
+      keepNodeUuids,
       sideEffect,
     })
   }
@@ -441,6 +458,9 @@ export const mergeRecords =
     const rootTarget = RecordReader.getRootNode(recordTarget)
 
     const updateResult = new RecordUpdateResult({ record: recordTarget })
+
+    const recordUuid = ObjectUtils.getUuid(recordTarget)
+    const keepNodeUuids = !!recordUuid && recordUuid === ObjectUtils.getUuid(recordSource)
 
     const stack = [{ entitySource: rootSource, entityTarget: rootTarget }]
     while (stack.length > 0) {
@@ -457,6 +477,7 @@ export const mergeRecords =
           entitySource,
           entityTarget,
           stack,
+          keepNodeUuids,
           sideEffect,
         })
       })

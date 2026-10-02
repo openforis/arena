@@ -222,8 +222,8 @@ export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, u
 }
 
 // Records export job
-export const startRecordsExportJob = ({ user, surveyId, recordUuids }) => {
-  const job = new SelectedRecordsExportJob({ user, surveyId, recordUuids })
+export const startRecordsExportJob = ({ user, surveyId, recordUuids, excludedFileUuids = [] }) => {
+  const job = new SelectedRecordsExportJob({ user, surveyId, recordUuids, excludedFileUuids })
   JobManager.enqueueJob(job)
   return job
 }

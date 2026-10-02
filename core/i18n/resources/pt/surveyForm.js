@@ -1,4 +1,9 @@
 export default {
+  completion: '{{percent}}% concluído',
+  pagesValidationProgress: '{{valid}}/{{total}} páginas válidas ({{percent}}%)',
+  pageComplete: 'Concluída',
+  copyPath: 'Copiar caminho',
+  pathCopiedToClipboard: 'Caminho copiado para a área de transferência',
   subPage: 'Subpágina',
   addChildTo: 'Adicionar a {{nodeDefLabel}}',
   addChildToTitle: 'Adicionar novo nó a {{nodeDefLabel}}',

@@ -18,6 +18,9 @@ export default {
   errors: {
     rowNum: 'Строка #',
   },
+  fileUploadChunkSize: {
+    label: 'Размер фрагмента при загрузке файла',
+  },
   forceImportFromAnotherSurvey: 'Принудительный импорт из другого опроса',
 
   importFromArena: 'Arena/Arena Mobile',
@@ -76,9 +79,9 @@ export default {
         - {{insertedRecords}} записей создано`,
     },
     OdkDataImportJob: {
-      importCompleteSuccessfully: `ODK data import complete:
-        - {{submittedCount}} records created
-        - {{skippedCount}} duplicate submissions skipped`,
+      importCompleteSuccessfully: `Импорт данных ODK завершен:
+        - {{submittedCount}} записей создано
+        - {{skippedCount}} повторных отправок пропущено`,
     },
     DataImportJob: {
       importCompleteSummary: `

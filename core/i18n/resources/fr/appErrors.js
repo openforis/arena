@@ -5,6 +5,15 @@ export default {
   aiDataQueryNoEntities: 'Ce formulaire ne contient aucune entité pouvant être interrogée.',
   aiDataQuerySummaryInvalid:
     "L'IA n'a pas pu suggérer un nom et une description pour cette requête. Veuillez réessayer.",
+  userCannotDeleteHasMessages:
+    "Cet utilisateur ne peut pas être supprimé : il est l'auteur de {{count}} message(s) ; supprimez-les ou réattribuez-les d'abord",
+  userCannotDeleteLastSystemAdmin:
+    'Cet utilisateur ne peut pas être supprimé : il est le dernier administrateur système',
+  userCannotDeleteOwnsSurveys:
+    "Cet utilisateur ne peut pas être supprimé : il est propriétaire de {{count}} formulaire(s) ; transférez-en d'abord la propriété",
+  userCannotDeleteSelf: 'Vous ne pouvez pas supprimer votre propre compte utilisateur',
+  userEmailInvalid:
+    "L'e-mail d'invitation n'a pas pu être remis à {{email}} ; veuillez vérifier que l'adresse est correcte",
   cannotGetChild: `Impossible d'obtenir l'enfant '{{childName}}' depuis l'attribut {{name}}`,
   cannotImportFilesExceedingQuota:
     "Impossible d'importer les fichiers d'enregistrement : le quota de stockage serait dépassé",
@@ -71,8 +80,37 @@ Essayez de rafraîchir la page.`,
   survey: {
     nodeDefNameNotFound: 'Définition de nœud introuvable : {{name}}',
     dataMigrationInProgress: 'Ce formulaire est en cours de mise à niveau ; veuillez réessayer sous peu.',
+    fileNotFound: 'Fichier introuvable',
   },
   unsupportedFunctionType: 'Type de fonction non pris en charge : {{exprType}}',
+  aiNotConfigured:
+    "L'IA n'est pas configurée. Définissez un fournisseur personnel dans les paramètres IA ou demandez à votre administrateur de configurer un fournisseur par défaut.",
+  aiFeaturesDisabled: 'Les fonctionnalités IA sont désactivées sur ce déploiement.',
+  aiFeatureDisabled: 'La fonctionnalité IA "{{feature}}" est désactivée.',
+  aiPromptTooLarge: 'Le prompt IA est trop volumineux ({{size}} caractères ; limite {{limit}}).',
+  aiInputTooLong: 'Le champ de saisie IA "{{field}}" dépasse la limite de {{limit}} caractères.',
+  aiSchemaMissing: 'Le schéma de sortie structurée IA est manquant pour la fonctionnalité "{{feature}}".',
+  aiProviderInvalid: 'Fournisseur IA non pris en charge : {{provider}}.',
+  aiModelMissing: "L'identifiant du modèle IA est requis.",
+  aiApiKeyMissing: 'Une clé API est requise pour le fournisseur {{provider}}.',
+  aiBaseUrlMissing: 'Une URL de base est requise pour le fournisseur compatible OpenAI.',
+  aiModelListFailed: 'Impossible de lister les modèles du fournisseur : {{message}}',
+  aiExpressionDescriptionMissing: "Veuillez décrire en langage courant l'expression souhaitée.",
+  aiExpressionTypeInvalid: "Type d'expression inconnu : {{expressionType}}.",
+  aiExpressionNodeDefMissing: 'Impossible de générer une expression sans champ cible.',
+  aiExpressionNodeDefNotFound: 'Champ cible introuvable (uuid {{nodeDefUuid}}).',
+  aiExpressionExpressionMissing: "Impossible d'expliquer une expression vide.",
+  aiTranslationSocketMissing: 'WebSocket non connecté. Veuillez patienter un instant et réessayer.',
+  aiTranslationSourceLangMissing: 'La langue source est requise pour la traduction.',
+  aiTranslationTargetLangsMissing: 'Au moins une langue cible est requise pour la traduction.',
+  aiTranslationItemsMissing: 'Rien à traduire.',
+  aiTranslationTooManyItems: "Trop d'éléments dans un seul lot ({{count}}) ; la limite est de {{limit}}.",
+  aiActivityLogSurveyMissing: "Un formulaire est requis pour résumer le journal d'activité.",
+  aiChatbotDisabled: 'Le chatbot de documentation est désactivé sur ce déploiement.',
+  aiChatbotUpstreamError:
+    'Le chatbot de documentation est temporairement indisponible. Veuillez réessayer dans un instant.',
+  aiChatbotPayloadTooLarge:
+    'Votre conversation est trop volumineuse. Effacez la discussion et essayez une question plus courte.',
   userHasPendingInvitation: `Il existe déjà une invitation en attente pour l'utilisateur avec l'email '{{email}}' ; il/elle ne peut pas être invité(e) à ce formulaire jusqu'à ce qu'elle soit acceptée`,
   userHasRole: "L'utilisateur a déjà un rôle dans ce formulaire",
   userHasRole_other: 'Les utilisateurs ont déjà un rôle dans ce formulaire',
@@ -80,4 +118,5 @@ Essayez de rafraîchir la page.`,
   userIsAdmin: "L'utilisateur est déjà administrateur système",
   userNotAllowedToChangePref: 'Utilisateur non autorisé à modifier les préférences',
   userNotAuthorized: 'Utilisateur {{userName}} non autorisé',
+  userNotFound: 'Utilisateur introuvable : {{userUuid}}',
 }

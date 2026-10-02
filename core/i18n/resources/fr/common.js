@@ -454,13 +454,18 @@ $t(common.raiseTicketInSupportForum)
 **Une fois votre demande envoyée, veuillez attendre un e-mail d'invitation pour accéder à Arena.**`,
     reCaptchaNotAnswered: 'ReCaptcha non répondu',
     requestSent: "Demande d'accès envoyée correctement",
-    requestSentMessage: `Veuillez nous accorder quelques jours pour traiter votre demande.
-Nous enverrons bientôt un e-mail à **{{email}}** avec les instructions pour accéder à $t(common.appName).
+    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
+$t(accessRequestView.whitelistSenderSuggestion)
+
+Veuillez nous accorder quelques jours pour traiter votre demande.
+Une fois celle-ci acceptée, nous vous enverrons un autre e-mail à **{{email}}** avec les instructions pour accéder à $t(common.appName).
 Merci et profitez de **$t(common.appNameFull)** !`,
     sendRequest: 'Envoyer la demande',
     sendRequestConfirm: "Demander l'accès à $t(common.appNameFull) ?",
     templateNotSelected: 'Non sélectionné (commencer de zéro)',
     title: "Demande d'accès à $t(common.appNameFull)",
+    whitelistSenderSuggestion:
+      "Si vous le trouvez dans le dossier Spam/Courrier indésirable, veuillez ajouter **{{senderEmail}}** à vos contacts (carnet d'adresses) ou le marquer comme sûr/non indésirable, afin que nos prochains e-mails arrivent directement dans votre boîte de réception.",
   },
 
   resetPasswordView: {
@@ -669,6 +674,10 @@ Merci et profitez de **$t(common.appNameFull)** !`,
 
     $t(userInviteView.skippedEmailsNotice)`,
     skippedEmailsNotice: `{{skppedEmailsCount}} adresses ont été ignorées (elles ont déjà été invitées à ce formulaire précédemment) : {{skippedEmails}}`,
+    invalidEmailsWarning:
+      "L'adresse e-mail {{emails}} n'a pas pu être jointe et n'existe peut-être pas. Elle a été conservée dans la liste ci-dessous : veuillez la corriger ou la supprimer, puis réessayer l'invitation.",
+    invalidEmailsWarning_other:
+      "Les adresses e-mail {{emails}} n'ont pas pu être jointes et n'existent peut-être pas. Elles ont été conservées dans la liste ci-dessous : veuillez les corriger ou les supprimer, puis réessayer l'invitation.",
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `
@@ -1069,6 +1078,10 @@ $t(common.appNameFull)
         label: 'Énumérer',
         info: `Les lignes seront générées automatiquement à partir des éléments de catégorie associés à un attribut code marqué comme Clé définie dans l'entité ; les lignes ne peuvent pas être ajoutées ou supprimées et l'attribut code clé ne sera pas modifiable`,
       },
+      enumeratingItemsExpression: {
+        label: "Expression des éléments d'énumération",
+        info: 'Expression facultative qui filtre les éléments de catégorie à énumérer (par ex. unique(table_source.source_type)). Si elle est vide, tous les éléments de la catégorie sont utilisés.',
+      },
       enumerator: {
         label: 'Énumérateur',
         info: "Les éléments de la catégorie seront utilisés pour générer les lignes de l'entité parente",
@@ -1272,6 +1285,8 @@ Ex. this.region = nom_attribut_region
 
 Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un attribut *espece_arbre* marqué comme **Unique**, vous ne pouvez avoir qu'un seul arbre par espèce dans la même *parcelle*.`,
     },
+    nodeDefClonedSuccessfully:
+      'Définition de nœud "{{nodeDefName}}" clonée avec succès dans "{{targetParentNodeDefName}}"',
     categoriesClonedFromSurvey:
       "Les catégories suivantes ont également été clonées depuis l'enquête source : {{names}}",
     taxonomiesClonedFromSurvey:
@@ -1552,5 +1567,63 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     openforis: `<a href="$t(urls.openforisWebsite)" target="_blank">$t(common.openForis)</a>`,
     openforisArenaWebsite: `<a href="$t(urls.openforisArenaWebsite)" target="_blank">$t(urls.openforisArenaWebsite)</a>`,
     supportForum: `<a href="$t(urls.supportForum)" target="_blank">$t(urls.supportForum)</a>`,
+    arenaVideoTutorialsInFaoElearningAcademy:
+      '<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank" rel="noopener noreferrer">FAO elearning Academy</a>',
+    arenaVideoTutorialsInYouTube:
+      '<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank" rel="noopener noreferrer">YouTube</a>',
+    arenaInGitHub:
+      '<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>',
+    arenaRScriptsInGitHub:
+      '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
+  },
+
+  aiExpression: {
+    title: 'Générer une expression à partir d’une description',
+    hint: "Décrivez en langage courant ce que l'expression doit faire. L'IA la traduira en syntaxe Arena. Appuyez sur Ctrl+Entrée pour générer.",
+    placeholder: "par ex. la hauteur de l'arbre doit être supérieure à 0 et inférieure à 200",
+    generate: 'Générer',
+    generating: 'Génération en cours…',
+    use: 'Utiliser cette expression',
+    useAnyway: 'Utiliser quand même',
+    tryAgain: 'Essayer une autre description',
+    parseError:
+      "L'expression générée n'a pas pu être analysée correctement : {{message}}. Vous pouvez tout de même l'appliquer et la modifier à la main, ou essayer de reformuler.",
+    explain: {
+      title: 'Expliquer cette expression',
+      thinking: "Demande à l'IA d'expliquer cette expression…",
+      error: "Échec de la récupération de l'explication : {{message}}",
+      timeout: "L'IA a mis trop de temps à répondre. Veuillez réessayer.",
+    },
+  },
+
+  aiTranslation: {
+    translateButton_one: 'Traduire dans {{count}} autre langue',
+    translateButton_other: 'Traduire dans {{count}} autres langues',
+    translateButton: "Traduire dans d'autres langues",
+    success_one: 'Traduit dans {{count}} langue. Vérifiez et enregistrez.',
+    success_other: 'Traduit dans {{count}} langues. Vérifiez et enregistrez.',
+    success: 'Traduit. Vérifiez et enregistrez.',
+    failed: 'Échec de la traduction : {{message}}',
+    timeout: 'La demande de traduction a expiré. Veuillez réessayer.',
+  },
+
+  aiActivityLog: {
+    title: "Résumé du journal d'activité",
+    summarizeButton: 'Résumer',
+    thinking: "Agrégation des événements et demande de résumé à l'IA…",
+    error: 'Échec de la récupération du résumé : {{message}}',
+  },
+
+  aiChatbot: {
+    open: 'Aide et documentation',
+    title: 'Aide et documentation',
+    empty: "Posez-moi n'importe quelle question sur Open Foris Arena.",
+    placeholder: 'Saisissez votre question…',
+    send: 'Envoyer',
+    stop: 'Arrêter',
+    clear: 'Effacer',
+    showReasoning: 'Afficher le raisonnement',
+    error: 'Erreur du chatbot : {{message}}',
+    language: 'Langue de réponse',
   },
 }

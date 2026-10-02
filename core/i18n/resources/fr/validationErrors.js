@@ -251,6 +251,8 @@ export default {
     invalidRequest: "Demande d'accès utilisateur invalide",
     userAlreadyExisting: "Un utilisateur avec l'e-mail {{email}} existe déjà",
     requestAlreadySent: `La demande d'accès pour l'utilisateur avec l'e-mail {{email}} a déjà été envoyée`,
+    emailNotReachable:
+      "L'e-mail de confirmation n'a pas pu être remis à {{email}} ; veuillez vérifier que l'adresse est correcte",
     invalidReCaptcha: 'ReCaptcha invalide',
   },
 
@@ -261,6 +263,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Le rôle est requis',
     surveyNameRequired: 'Le nom du formulaire est requis',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Un groupe avec le même nom existe déjà : {{name}}',
+    qualifiersInvalid: 'Un ou plusieurs qualificatifs ont une clé invalide ou en double',
+    qualifierNameDuplicate: 'Un qualificatif avec le même nom existe déjà dans ce groupe : {{name}}',
+    qualifierNameInvalid: 'Nom de qualificatif invalide',
+    qualifierNameRequired: 'Le nom du qualificatif est requis',
   },
 
   userPasswordChange: {

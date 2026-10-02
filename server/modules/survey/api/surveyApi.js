@@ -372,7 +372,7 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/file/:fileUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/file/:fileUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
     try {
       const { surveyId, fileUuid } = Request.getParams(req)
       const { summary, contentStream } = await SurveyService.fetchSurveyFile({ surveyId, fileUuid })
@@ -381,7 +381,8 @@ export const init = (app) => {
       Response.setContentTypeFile({ res, fileName, fileSize })
       contentStream.pipe(res)
     } catch (error) {
-      next(error)
+      // sendErr preserves the "file not found" status code and key (next(error) would not)
+      Response.sendErr(res, error)
     }
   })
 

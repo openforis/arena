@@ -12,12 +12,18 @@ export default class RecordFilesExportJob extends Job {
   }
 
   async execute() {
-    const { archive, surveyId, recordUuids } = this.context
+    const { archive, surveyId, recordUuids, excludedFileUuids = [] } = this.context
+    // files the client asking for the export already has (see the records export API): only their content is
+    // left out, the records still reference them
+    const excludedFileUuidsSet = new Set(excludedFileUuids)
 
     const filesSummaries = await SurveyFileService.fetchFileSummariesBySurveyId(surveyId, this.tx)
     const filesSummariesIncluded = filesSummaries.filter((fileSummary) => {
       const type = SurveyFile.getType(fileSummary)
       if (type !== SurveyFile.SurveyFileType.recordAttachment) {
+        return false
+      }
+      if (excludedFileUuidsSet.has(SurveyFile.getUuid(fileSummary))) {
         return false
       }
       return Objects.isEmpty(recordUuids) || recordUuids.includes(SurveyFile.getRecordUuid(fileSummary))

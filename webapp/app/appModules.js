@@ -314,7 +314,7 @@ export const helpModules = {
   },
   disclaimer: {
     key: 'disclaimer',
-    uri: 'https://openforis.org/legal-disclaimer/',
+    uri: 'https://openforis.org/arena-legal-disclaimer/',
     external: true,
   },
   userManual: {
