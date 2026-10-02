@@ -219,6 +219,7 @@ export default {
   },
 
   user: {
+    emailDuplicate: 'Пользователь с таким адресом электронной почты уже существует',
     emailRequired: 'Электронная почта обязательна',
     emailInvalid: 'Неверный адрес электронной почты',
     emailNotFound: 'Адрес электронной почты не найден',
@@ -233,6 +234,7 @@ export default {
     userNotFound: 'Пользователь не найден. Убедитесь, что email и пароль верны',
     passwordChangeRequired: 'Требуется смена пароля',
     passwordResetNotAllowedWithPendingInvitation: `Сброс пароля не разрешен: пользователь был приглашен в опрос, но приглашение еще не принято`,
+    twoFactorTokenRequired: 'Код подтверждения обязателен',
   },
 
   userAccessRequest: {
@@ -246,6 +248,7 @@ export default {
     invalidRequest: 'Неверный запрос на доступ пользователя',
     userAlreadyExisting: 'Пользователь с адресом электронной почты {{email}} уже существует',
     requestAlreadySent: `Запрос на доступ для пользователя с адресом электронной почты {{email}} уже отправлен`,
+    emailNotReachable: 'Не удалось доставить письмо с подтверждением на адрес {{email}}; проверьте правильность адреса',
     invalidReCaptcha: 'Неверная ReCaptcha',
   },
 
@@ -256,6 +259,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Роль обязательна',
     surveyNameRequired: 'Название опроса обязательно',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Группа с таким именем уже существует: {{name}}',
+    qualifiersInvalid: 'Один или несколько квалификаторов имеют недопустимый или повторяющийся ключ',
+    qualifierNameDuplicate: 'Квалификатор с таким именем уже существует в этой группе: {{name}}',
+    qualifierNameInvalid: 'Недопустимое имя квалификатора',
+    qualifierNameRequired: 'Имя квалификатора обязательно',
   },
 
   userPasswordChange: {

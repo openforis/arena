@@ -394,6 +394,7 @@ export default {
 
     help: 'ヘルプ',
     about: 'このアプリについて',
+    changelog: '変更履歴',
     whatsNew: '新機能',
     disclaimer: '免責事項',
     userManual: 'ユーザーマニュアル',
@@ -960,6 +961,9 @@ $t(common.appNameFull)
  * GitHub上のArena Rスクリプト：$t(links.arenaRScriptsInGitHub)
 `,
     },
+    changelog: {
+      title: '$t(appModules.changelog)',
+    },
   },
 
   // ====== Survey views
@@ -1162,6 +1166,9 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
     },
     mobileProps: {
       title: 'モバイルアプリ',
+    },
+    timeProps: {
+      includeSeconds: '秒を含める',
     },
     formHeaderProps: {
       headerColorLabel: 'ヘッダーの色',

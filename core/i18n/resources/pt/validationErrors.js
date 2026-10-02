@@ -248,6 +248,7 @@ export default {
     invalidRequest: 'Solicitação de acesso de usuário inválida',
     userAlreadyExisting: 'Usuário com email {{email}} já existe',
     requestAlreadySent: `Solicitação de acesso para o usuário com email {{email}} já enviada`,
+    emailNotReachable: 'O email de confirmação não pôde ser entregue a {{email}}; verifique se o endereço está correto',
     invalidReCaptcha: 'ReCaptcha inválido',
   },
 
@@ -258,6 +259,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Papel obrigatório',
     surveyNameRequired: 'Nome do inventário obrigatório',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Já existe um grupo com o mesmo nome: {{name}}',
+    qualifiersInvalid: 'Um ou mais qualificadores têm uma chave inválida ou duplicada',
+    qualifierNameDuplicate: 'Já existe um qualificador com o mesmo nome neste grupo: {{name}}',
+    qualifierNameInvalid: 'Nome de qualificador inválido',
+    qualifierNameRequired: 'O nome do qualificador é obrigatório',
   },
 
   userPasswordChange: {

@@ -1,4 +1,9 @@
 export default {
+  completion: 'Заполнено на {{percent}}%',
+  pagesValidationProgress: 'Корректных страниц: {{valid}}/{{total}} ({{percent}}%)',
+  pageComplete: 'Заполнена',
+  copyPath: 'Копировать путь',
+  pathCopiedToClipboard: 'Путь скопирован в буфер обмена',
   subPage: 'Подстраница',
   addChildTo: 'Добавить к {{nodeDefLabel}}',
   addChildToTitle: 'Добавить новый узел к {{nodeDefLabel}}',
