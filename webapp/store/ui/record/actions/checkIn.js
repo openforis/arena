@@ -7,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import { RecordNodesCompactor } from '@core/record/_record/recordNodesCompactor'
 
 import { I18nState } from '@webapp/store/system'
 import { SurveyState } from '@webapp/store/survey'
@@ -33,6 +34,9 @@ export const checkInRecord =
       dispatch(LoaderActions.hideLoader())
       return
     }
+
+    // share identical uuid strings and ref data objects among the nodes parsed from the response
+    RecordNodesCompactor.compactNodes(Record.getNodes(record))
 
     // This is used by dataQuery when user is editing a specific entity
     if (pageNodeUuid) {
