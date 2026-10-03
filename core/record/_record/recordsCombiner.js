@@ -110,7 +110,8 @@ const _replaceUpdatedNodesInEntities = ({
     _getNodesArrayDifference(childrenSource, childrenTarget).forEach((childSourceToAdd) => {
       RecordReader.visitDescendantsAndSelf(childSourceToAdd, (visitedChildSource) => {
         const newNodeToAdd = Node.assocCreated(true)(visitedChildSource) // new node for the server
-        delete newNodeToAdd[Node.keys.id] // clear internal id
+        // clear internal id (not deleted: it would switch the node to the V8 dictionary mode)
+        newNodeToAdd[Node.keys.id] = undefined
         updateResult.addNode(newNodeToAdd, { sideEffect })
       })(recordSource)
     })
@@ -194,7 +195,8 @@ const _addNodeToUpdateResult = ({
   if (assignNewUuid) {
     newNodeToAdd[Node.keys.uuid] = UUIDs.v4()
   }
-  delete newNodeToAdd[Node.keys.id] // clear internal id
+  // clear internal id (not deleted: it would switch the node to the V8 dictionary mode)
+  newNodeToAdd[Node.keys.id] = undefined
   newNodeToAdd[Node.keys.recordUuid] = updateResult.record.uuid
 
   const parentEntity = parentEntityParam ?? RecordReader.getNodeByUuid(Node.getParentUuid(node))(updateResult.record)

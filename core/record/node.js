@@ -137,7 +137,8 @@ export const isDescendantOf = (ancestor) => (node) => A.includes(getUuid(ancesto
 //
 
 export const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => {
-  const now = new Date()
+  // ISO string (as in arena-core nodes and in the nodes fetched from the db): smaller than a Date object
+  const now = new Date().toISOString()
   return {
     [keys.uuid]: uuidv4(),
     [keys.nodeDefUuid]: nodeDefUuid,
@@ -187,8 +188,9 @@ export const removeFlags =
   (node) => {
     const keysToRemove = removeDirtyFlag ? flagKeysIncludingDirty : flagKeysArray
     if (sideEffect) {
+      // do not use "delete": it would switch the node object to the (much bigger) V8 dictionary mode
       for (const key of keysToRemove) {
-        delete node[key]
+        if (node[key] !== undefined) node[key] = undefined
       }
       return node
     } else {
