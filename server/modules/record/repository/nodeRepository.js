@@ -5,6 +5,7 @@ import { Schemata } from '@common/model/db'
 import * as A from '@core/arena'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import { RecordNodesCompactor } from '@core/record/_record/recordNodesCompactor'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
@@ -36,19 +37,33 @@ const tableColumnsSelect = ['id', ...tableColumnsInsert]
 // cache of camelized keys
 const nodeKeyByColumnName = {}
 
-const dbTransformCallback = (node) => {
+const _toISOString = (date) => (date instanceof Date ? date.toISOString() : date)
+
+const dbTransformCallback = (row) => {
   // use a cache of camelized keys; "camelize" is too slow when running on thousands of objects
-  // (do not camelize meta properties)
-  for (const [columnName, value] of Object.entries(node)) {
-    const nodeKey = nodeKeyByColumnName[columnName] ?? A.camelize(columnName)
-    if (nodeKey !== columnName) {
-      node[nodeKey] = value
-      delete node[columnName]
+  // (do not camelize meta properties);
+  // build a new object instead of deleting the row keys: "delete" would switch it to the (much bigger) V8 dictionary mode
+  const node = {}
+  for (const [columnName, value] of Object.entries(row)) {
+    let nodeKey = nodeKeyByColumnName[columnName]
+    if (!nodeKey) {
+      nodeKey = A.camelize(columnName)
+      nodeKeyByColumnName[columnName] = nodeKey
     }
+    node[nodeKey] = value
   }
   // cast id to Number
   node.id = Number(node.id)
+  // ISO strings (as in arena-core nodes) take much less memory than Date objects
+  node.dateCreated = _toISOString(node.dateCreated)
+  node.dateModified = _toISOString(node.dateModified)
   return node
+}
+
+// shares identical uuid strings and ref data objects among the fetched nodes (see RecordNodesCompactor)
+const createDbTransformCallbackCompacting = () => {
+  const compact = RecordNodesCompactor.createCompactor()
+  return (row) => compact(dbTransformCallback(row))
 }
 
 const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
@@ -279,7 +294,7 @@ export const fetchNodesByRecordUuid = async (
     WHERE n.record_uuid = $/recordUuid/
     ORDER BY n.date_created`,
     { surveyId, recordUuid },
-    dbTransformCallback
+    createDbTransformCallbackCompacting()
   )
 
 export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
@@ -298,7 +313,7 @@ export const fetchNodesWithRefDataByUuids = async ({ surveyId, nodeUuids, draft 
     WHERE n.uuid IN ($/nodeUuids:list/)
   `,
     { surveyId, nodeUuids },
-    dbTransformCallback
+    createDbTransformCallbackCompacting()
   )
 
 export const fetchNodeWithRefDataByUuid = async ({ surveyId, nodeUuid, draft }, client = db) =>
@@ -312,7 +327,7 @@ export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUu
       AND n.parent_uuid ${nodeUuid ? '= $/nodeUuid/' : 'is null'}
       AND n.node_def_uuid IN ($/childDefUuids:csv/)`,
     { surveyId, recordUuid, nodeUuid, childDefUuids },
-    dbTransformCallback
+    createDbTransformCallbackCompacting()
   )
 
 // ============== UPDATE

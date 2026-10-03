@@ -89,10 +89,11 @@ export const findNodeValueByPath = (path) => (survey, record) => Node.getValue(f
 // future removes the ambiguity.
 export const shiftDateModifiedIntoTheFuture = (record, offsetMillis = 60000) => ({
   ...record,
-  nodes: A.map(
-    (node) => Node.assocDateModified(new Date(Node.getDateModified(node).getTime() + offsetMillis))(node),
-    record.nodes
-  ),
+  nodes: A.map((node) => {
+    // node dates can be Date objects or ISO strings
+    const dateModified = new Date(new Date(Node.getDateModified(node)).getTime() + offsetMillis)
+    return Node.assocDateModified(dateModified.toISOString())(node)
+  }, record.nodes),
 })
 
 export const getValidationChildrenCount = (parentNode, childDef) =>
