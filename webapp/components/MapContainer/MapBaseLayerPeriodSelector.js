@@ -15,6 +15,7 @@ import { baseLayerUrlByProviderFunction } from './baseLayers'
 import { useMapContextBaseLayer } from './MapContext'
 import { Checkbox } from '../form'
 import { useSurveyId } from '@webapp/store/survey'
+import { MAP_MAX_ZOOM, MAP_MIN_ZOOM } from './mapZoom'
 
 const getPeriodValue = (period) => {
   const { year, month, yearTo } = period
@@ -237,7 +238,7 @@ export const MapBaseLayerPeriodSelector = () => {
         )}
       </div>
 
-      <TileLayer id={'right'} attribution={''} url={''} maxZoom={17} minZoom={3} />
+      <TileLayer id={'right'} attribution={''} url={''} maxZoom={MAP_MAX_ZOOM} minZoom={MAP_MIN_ZOOM} />
     </div>
   )
 }

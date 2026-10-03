@@ -1,0 +1,75 @@
+@use '~@webapp/style/vars' as *;
+@use '~@webapp/style/animate' as *;
+
+.recent-activity {
+  min-height: 3rem;
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: $blueDark;
+  }
+
+  &__error {
+    margin: 0;
+    color: $red;
+    font-size: 0.85rem;
+  }
+
+  &__empty {
+    margin: 0;
+    color: $blueDark;
+    font-size: 0.85rem;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 22rem;
+    overflow-y: auto;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 8rem 10rem 1fr;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.45rem 0.25rem;
+    border-bottom: 1px solid $greyBorder;
+    font-size: 0.8rem;
+    transition: background-color 160ms ease;
+
+    &:hover {
+      background-color: $blueLightFocus;
+    }
+
+    &--deleted {
+      text-decoration: line-through;
+    }
+
+    &--highlighted {
+      animation-name: animate-highlight;
+      animation-duration: 4s;
+    }
+  }
+
+  &__date {
+    color: $blueDark;
+  }
+
+  &__user {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__message p {
+    margin: 0;
+  }
+}
