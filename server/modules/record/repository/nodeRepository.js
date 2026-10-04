@@ -416,3 +416,16 @@ export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>
     [nodeUuids],
     dbTransformCallback
   )
+
+// ============== MAINTENANCE
+
+/**
+ * Rewrites the node table of the specified survey reclaiming the space of dead rows (it locks the table while running).
+ * It cannot be run inside a transaction.
+ * @param {!object} params - The parameters.
+ * @param {!number} params.surveyId - The survey ID.
+ * @param {pgPromise.IDatabase} [client] - The database client (not a transaction).
+ * @returns {Promise<null>} - The query result.
+ */
+export const vacuumFullNodeTable = async ({ surveyId }, client = db) =>
+  client.none(`VACUUM (FULL, ANALYZE) ${getSurveyDBSchema(surveyId)}.node`)

@@ -3,7 +3,7 @@ import { DBMigrator, runWithClusterLock } from '@openforis/arena-server'
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { isSurveyDataMigrationPending } from './surveyDataMigrationSteps'
-import SurveyDataMigrationJob from './surveyDataMigrationJob'
+import SurveyDataMigrationJob, { getPendingSurveyDataMigrationSteps } from './surveyDataMigrationJob'
 
 type SurveyIdAndAppVersion = { id: number; appVersion?: string }
 
@@ -63,6 +63,7 @@ export default class AllSurveysDataMigrationJob extends Job {
 
             if (innerJob.isSucceeded()) {
               this.logDebug(`data for survey ${surveyId} migrated successfully`)
+              await this.runStepsAfterCommit({ surveyId, appVersion })
               this.incrementProcessedItems()
             } else {
               surveyIdsWithErrors.push(surveyId)
@@ -81,5 +82,22 @@ export default class AllSurveysDataMigrationJob extends Job {
     })
 
     this.result = { surveyIdsWithErrors }
+  }
+
+  /**
+   * Runs the "after commit" part of the steps applied to the survey (outside of any transaction).
+   * Errors are only logged: the survey data is already migrated and stamped with the new app version.
+   */
+  private async runStepsAfterCommit({ surveyId, appVersion }: { surveyId: number; appVersion?: string }) {
+    const steps = getPendingSurveyDataMigrationSteps({ surveyAppVersion: appVersion })
+    for (const step of steps) {
+      if (!step.migrateAfterCommit) continue
+      try {
+        this.logDebug(`running after commit migration step ${step.version} for survey ${surveyId}`)
+        await step.migrateAfterCommit({ surveyId })
+      } catch (error: any) {
+        this.logWarn(`error running after commit migration step ${step.version} for survey ${surveyId}: ${error}`)
+      }
+    }
   }
 }
