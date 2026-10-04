@@ -6,6 +6,8 @@ export default {
     activityLog: {
       title: 'Activity log',
       size: '$t(homeView:dashboard.activityLog.title) size: {{size}}',
+      loadError: 'Activity could not be loaded.',
+      empty: 'No activity yet.',
     },
     exportWithData: 'Export + data (Backup)',
     exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
@@ -46,6 +48,24 @@ export default {
       title: 'Sampling Point Data Completion',
       totalItems: 'Total items: {{totalItems}}',
       remainingItems: 'Remaining items',
+    },
+    kpi: {
+      records: 'Records',
+      contributors: 'Contributors',
+      storage: 'Storage',
+      expandDetails: 'Show details',
+      collapseDetails: 'Hide details',
+    },
+    recordsCard: {
+      total: 'Records added in selected period',
+      byStep: 'By workflow step (all time)',
+    },
+    contributorsCard: {
+      active: 'Active contributors in selected period: {{count}}',
+    },
+    map: {
+      title: 'Map',
+      allOwners: 'All owners',
     },
     step: {
       entry: 'Data Entry',

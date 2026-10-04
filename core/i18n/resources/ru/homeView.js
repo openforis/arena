@@ -6,6 +6,8 @@ export default {
     activityLog: {
       title: 'Журнал активности',
       size: '$t(homeView:dashboard.activityLog.title) размер: {{size}}',
+      loadError: 'Не удалось загрузить активность.',
+      empty: 'Активности пока нет.',
     },
     exportWithData: 'Экспорт + данные (резервная копия)',
     exportWithDataNoActivityLog: 'Экспорт + данные (БЕЗ журнала активности)',
@@ -46,6 +48,24 @@ export default {
       title: 'Завершение данных по точкам выборки',
       totalItems: 'Всего элементов: {{totalItems}}',
       remainingItems: 'Оставшиеся элементы',
+    },
+    kpi: {
+      records: 'Записи',
+      contributors: 'Участники',
+      storage: 'Хранилище',
+      expandDetails: 'Показать подробности',
+      collapseDetails: 'Скрыть подробности',
+    },
+    recordsCard: {
+      total: 'Записи, добавленные за выбранный период',
+      byStep: 'По этапу рабочего процесса (за всё время)',
+    },
+    contributorsCard: {
+      active: 'Активные участники за выбранный период: {{count}}',
+    },
+    map: {
+      title: 'Карта',
+      allOwners: 'Все владельцы',
     },
     step: {
       entry: 'Ввод данных',

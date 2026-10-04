@@ -1,0 +1,62 @@
+@use '~@webapp/style/vars' as *;
+
+.dashboard-map-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__owner-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .dropdown-wrapper {
+      min-width: 15rem;
+    }
+  }
+
+  &__owner-filter-label {
+    font-weight: bold;
+  }
+
+  &__map {
+    height: 25rem;
+    border: 1px solid $greyBorder;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+}
+
+.dashboard-polygon-popup {
+  &__title {
+    margin: 0 0 0.25rem;
+  }
+
+  &__attribute,
+  &__owner {
+    margin-bottom: 0.25rem;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+
+    .MuiButton-root,
+    .button-menu__button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .icon-left {
+      margin-right: 0;
+    }
+  }
+}

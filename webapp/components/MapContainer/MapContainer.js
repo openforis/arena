@@ -25,6 +25,7 @@ import { MapBaseLayerPeriodSelector } from './MapBaseLayerPeriodSelector'
 import { KmlUploader } from './KmlUploader'
 import { ZoomLevel } from './ZoomLevel'
 import { UtmGrid } from './UtmGrid'
+import { INITIAL_ZOOM_LEVEL, MAP_MAX_ZOOM, MAP_MIN_ZOOM } from './mapZoom'
 
 // start of workaround to show leaflet marker icon
 import L from 'leaflet'
@@ -37,15 +38,6 @@ L.Marker.prototype.options.icon = L.icon({
 })
 // end of workaround
 
-const INITIAL_ZOOM_LEVEL = 3
-// 2, not 3, so a user can manually zoom out one step from the default view (still
-// INITIAL_ZOOM_LEVEL = 3) without hitting the floor immediately. Accepted trade-off:
-// raster base layers below this hardcode minZoom={3} on their own TileLayer (see
-// MapLayersControl.js), so zooming one of them out to exactly level 2 shows a blank
-// map at that level - recoverable by zooming back in or switching layers. Narrower
-// than the regression this constant was raised from (was 1, affecting two zoom levels
-// for every raster layer); deliberately kept at 2 rather than reverting further.
-const MAP_MIN_ZOOM = 2
 // Explicit, unconditional map-level maxZoom keeps map.getMaxZoom() finite and stable
 // regardless of which base layer is active. Without it, Leaflet derives the max
 // dynamically from whichever GridLayer-based TileLayers are currently registered - but
@@ -57,7 +49,6 @@ const MAP_MIN_ZOOM = 2
 // Imagery); layers with a lower native maxZoom (e.g. ESRI Terrain's 9) still stop
 // fetching new tiles at their own maxZoom and show stretched tiles beyond it - same as
 // normal over-zoom behavior, this doesn't change what tiles are available.
-const MAP_MAX_ZOOM = 17
 const MAP_MAX_BOUNDS = [
   [180, -Infinity],
   [-180, Infinity],

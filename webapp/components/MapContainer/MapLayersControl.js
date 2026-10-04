@@ -11,6 +11,7 @@ import { baseLayers, baseLayerTypes } from './baseLayers'
 import { EqualEarthBaseLayer } from './EqualEarthBaseLayer'
 import { useMapContext } from './MapContext'
 import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
+import { MAP_MIN_ZOOM } from './mapZoom'
 import { WmtsComponent } from './WmtsComponent'
 
 export const MapLayersControl = (props) => {
@@ -78,7 +79,7 @@ export const MapLayersControl = (props) => {
 
       result.push(
         <LayersControl.BaseLayer key={key} name={name} checked={checked}>
-          <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} minZoom={3} />
+          <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} minZoom={MAP_MIN_ZOOM} />
         </LayersControl.BaseLayer>
       )
     }
