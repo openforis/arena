@@ -428,4 +428,4 @@ export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>
  * @returns {Promise<null>} - The query result.
  */
 export const vacuumFullNodeTable = async ({ surveyId }, client = db) =>
-  client.none(`VACUUM (FULL, ANALYZE) ${getSurveyDBSchema(surveyId)}.node`)
+  DbUtils.vacuumTable({ schema: getSurveyDBSchema(surveyId), table: 'node', full: true, analyze: true }, client)
