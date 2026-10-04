@@ -6,6 +6,8 @@ export default {
     activityLog: {
       title: 'アクティビティログ',
       size: '$t(homeView:dashboard.activityLog.title)のサイズ：{{size}}',
+      loadError: 'アクティビティを読み込めませんでした。',
+      empty: 'まだアクティビティはありません。',
     },
     exportWithData: 'エクスポート＋データ（バックアップ）',
     exportWithDataNoActivityLog: 'エクスポート＋データ（アクティビティログを除く）',
@@ -46,6 +48,24 @@ export default {
       title: '抽出地点データの完了状況',
       totalItems: '合計項目数：{{totalItems}}',
       remainingItems: '残り項目数',
+    },
+    kpi: {
+      records: '記録',
+      contributors: '貢献者',
+      storage: 'ストレージ',
+      expandDetails: '詳細を表示',
+      collapseDetails: '詳細を隠す',
+    },
+    recordsCard: {
+      total: '選択した期間に追加された記録',
+      byStep: 'ワークフロー段階別（全期間）',
+    },
+    contributorsCard: {
+      active: '選択した期間のアクティブな貢献者：{{count}}',
+    },
+    map: {
+      title: '地図',
+      allOwners: 'すべての所有者',
     },
     step: {
       entry: 'データ入力',

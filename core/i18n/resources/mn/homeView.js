@@ -6,6 +6,8 @@ export default {
     activityLog: {
       title: 'Үйл ажиллагааны бүртгэл',
       size: '$t(homeView:dashboard.activityLog.title) хэмжээ: {{size}}',
+      loadError: 'Үйл ажиллагааг ачаалж чадсангүй.',
+      empty: 'Одоогоор үйл ажиллагаа байхгүй.',
     },
     exportWithData: 'Экспорт + өгөгдөл (Нөөц)',
     exportWithDataNoActivityLog: 'Экспорт + өгөгдөл (ҮЙЛ АЖИЛЛАГААНЫ БҮРТГЭЛГҮЙ)',
@@ -46,6 +48,24 @@ export default {
       title: 'Түүвэрлэлтийн цэгийн өгөгдлийн гүйцэтгэл',
       totalItems: 'Нийт элемент: {{totalItems}}',
       remainingItems: 'Үлдсэн элемент',
+    },
+    kpi: {
+      records: 'Бичлэг',
+      contributors: 'Оролцогчид',
+      storage: 'Хадгалалт',
+      expandDetails: 'Дэлгэрэнгүй харуулах',
+      collapseDetails: 'Дэлгэрэнгүйг нуух',
+    },
+    recordsCard: {
+      total: 'Сонгосон хугацаанд нэмэгдсэн бичлэг',
+      byStep: 'Ажлын урсгалын шатаар (бүх хугацаа)',
+    },
+    contributorsCard: {
+      active: 'Сонгосон хугацааны идэвхтэй оролцогчид: {{count}}',
+    },
+    map: {
+      title: 'Газрын зураг',
+      allOwners: 'Бүх эзэмшигчид',
     },
     step: {
       entry: 'Өгөгдөл оруулах',

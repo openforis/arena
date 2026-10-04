@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 
@@ -32,7 +32,14 @@ const onGeoJsonDataExportComplete =
   }
 
 export const useGeoAttributeDataLayer = (props) => {
-  const { attributeDef, markersColor, editingRecordUuid } = props
+  const {
+    attributeDef,
+    markersColor,
+    editingRecordUuid,
+    checked = false,
+    onPointsLoaded = null,
+    pointsFilter = null,
+  } = props
 
   const attributeDefUuid = NodeDef.getUuid(attributeDef)
 
@@ -99,20 +106,38 @@ export const useGeoAttributeDataLayer = (props) => {
     return () => earthMapButton.removeEventListener('click', onEarthMapButtonClick)
   }, [earthMapButton, onEarthMapButtonClick])
 
+  const createDataQuery = useCallback(
+    () =>
+      Query.create({
+        entityDefUuid: NodeDef.getUuid(nodeDefParent),
+        attributeDefUuids: [...ancestorsKeyAttributeDefs.map((nd) => NodeDef.getUuid(nd)), attributeDefUuid],
+      }),
+    [ancestorsKeyAttributeDefs, attributeDefUuid, nodeDefParent]
+  )
+
+  // guard against fetching the same data twice when the layer is checked on mount
+  const dataRequestedRef = useRef(false)
+
   // on layer add, create query and fetch data; on layer remove, clear points
   useMapLayerToggle({
     layerName,
     onAdd: () => {
-      const query = Query.create({
-        entityDefUuid: NodeDef.getUuid(nodeDefParent),
-        attributeDefUuids: [...ancestorsKeyAttributeDefs.map((nd) => NodeDef.getUuid(nd)), attributeDefUuid],
-      })
-      setState((statePrev) => ({ ...statePrev, query }))
+      if (dataRequestedRef.current) return
+      dataRequestedRef.current = true
+      setState((statePrev) => ({ ...statePrev, query: createDataQuery() }))
     },
     onRemove: () => {
+      dataRequestedRef.current = false
       setState((statePrev) => ({ ...statePrev, query: Query.create(), points: [] }))
     },
   })
+
+  // layers checked on mount cannot rely on the overlay add event alone
+  useEffect(() => {
+    if (!checked || dataRequestedRef.current) return
+    dataRequestedRef.current = true
+    setState((statePrev) => ({ ...statePrev, query: createDataQuery() }))
+  }, [checked, createDataQuery])
 
   const {
     data: dataFetchedTemp,
@@ -167,8 +192,14 @@ export const useGeoAttributeDataLayer = (props) => {
     setState,
   })
 
+  useEffect(() => {
+    onPointsLoaded?.({ layerKey: attributeDefUuid, points })
+  }, [attributeDefUuid, onPointsLoaded, points])
+
+  const visiblePoints = useMemo(() => (pointsFilter ? points.filter(pointsFilter) : points), [points, pointsFilter])
+
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, getClusterLeaves } = useMapClusters({
-    points,
+    points: visiblePoints,
   })
 
   return {
@@ -179,7 +210,7 @@ export const useGeoAttributeDataLayer = (props) => {
     clusterExpansionZoomExtractor,
     clusterIconCreator,
     getClusterLeaves,
-    totalPoints: points.length,
-    points,
+    totalPoints: visiblePoints.length,
+    points: visiblePoints,
   }
 }

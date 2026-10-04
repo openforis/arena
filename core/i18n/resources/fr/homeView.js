@@ -6,6 +6,8 @@ export default {
     activityLog: {
       title: "Journal d'activité",
       size: '$t(homeView:dashboard.activityLog.title) taille : {{size}}',
+      loadError: "Impossible de charger l'activité.",
+      empty: 'Aucune activité pour le moment.',
     },
     exportWithData: 'Exporter + données (Sauvegarde)',
     exportWithDataNoActivityLog: "Exporter + données (SANS Journal d'activité)",
@@ -46,6 +48,24 @@ export default {
       title: "Complétude des données de points d'échantillonnage",
       totalItems: 'Total des éléments : {{totalItems}}',
       remainingItems: 'Éléments restants',
+    },
+    kpi: {
+      records: 'Enregistrements',
+      contributors: 'Contributeurs',
+      storage: 'Stockage',
+      expandDetails: 'Afficher les détails',
+      collapseDetails: 'Masquer les détails',
+    },
+    recordsCard: {
+      total: 'Enregistrements ajoutés sur la période sélectionnée',
+      byStep: 'Par étape du flux de travail (tout le temps)',
+    },
+    contributorsCard: {
+      active: 'Contributeurs actifs sur la période sélectionnée : {{count}}',
+    },
+    map: {
+      title: 'Carte',
+      allOwners: 'Tous les propriétaires',
     },
     step: {
       entry: 'Saisie de données',
