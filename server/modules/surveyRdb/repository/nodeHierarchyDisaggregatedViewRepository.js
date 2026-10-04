@@ -18,7 +18,10 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
       (
         SELECT
           n.record_uuid    AS ${columns.recordUuid},
-          h.*,
+          h.${columns.nodeId},
+          h.${columns.nodeIId},
+          h.${columns.nodeDefUuid},
+          h.${columns.nodeAncestorIId},
           n.id             AS ${columns.nodeAncestorId},
           nd_a.uuid        AS ${columns.nodeDefAncestorUuid}
         FROM
@@ -27,6 +30,7 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
         JOIN
           (
             SELECT
+              n.record_uuid                                    AS ${columns.recordUuid},
               n.id                                             AS ${columns.nodeId},
               n.i_id                                            AS ${columns.nodeIId},
               nd.uuid                                           AS ${columns.nodeDefUuid},
@@ -36,7 +40,9 @@ export const createNodeHierarchyDisaggregatedView = async (survey, client = db) 
             JOIN ${surveySchema}.node_def nd ON nd.id = n.node_def_id
            ) h
         ON
-          n.i_id = h.${columns.nodeAncestorIId}
+          -- internal ids are unique only within a record
+          n.record_uuid = h.${columns.recordUuid}
+          AND n.i_id = h.${columns.nodeAncestorIId}
         -- Union with root nodes
         UNION ALL
         SELECT
