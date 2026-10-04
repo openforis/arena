@@ -4,6 +4,7 @@ import { Area, CartesianGrid, Line, LineChart as ReChartsLineChart, Tooltip, XAx
 import { convertDateFromISOToDisplay } from '@core/dateUtils'
 
 import { ChartWrapper, RotatedCustomAxisTick } from '@webapp/charts/common'
+import { useI18n } from '@webapp/store/system'
 import { defaultTokens } from '@webapp/theme/tokens'
 
 import { NoRecordsAddedInSelectedPeriod } from '../NoRecordsAddedInSelectedPeriod'
@@ -25,7 +26,6 @@ const LINE_COLOR = defaultTokens.colors.blue
 const AREA_FILL = `${defaultTokens.colors.blue}33`
 const GRID_STROKE = defaultTokens.colors.greyBorder
 const AXIS_STROKE = defaultTokens.colors.blueDark
-const SERIES_NAME = 'Records'
 
 /**
  * Line/area trend of records added over the selected period.
@@ -35,6 +35,8 @@ const SERIES_NAME = 'Records'
  */
 const TotalRecordsSummaryChart = (props: TotalRecordsSummaryChartProps) => {
   const { counts } = props
+  const i18n = useI18n()
+  const seriesName = i18n.t('homeView:dashboard.kpi.records') as string
 
   const chartData = useMemo(
     () =>
@@ -57,7 +59,7 @@ const TotalRecordsSummaryChart = (props: TotalRecordsSummaryChartProps) => {
         <Area
           type="monotone"
           dataKey="count"
-          name={SERIES_NAME}
+          name={seriesName}
           stroke="none"
           fill={AREA_FILL}
           fillOpacity={1}
@@ -68,7 +70,7 @@ const TotalRecordsSummaryChart = (props: TotalRecordsSummaryChartProps) => {
         <Line
           type="monotone"
           dataKey="count"
-          name={SERIES_NAME}
+          name={seriesName}
           stroke={LINE_COLOR}
           strokeWidth={2}
           isAnimationActive={false}

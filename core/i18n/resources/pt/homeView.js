@@ -6,6 +6,8 @@ export default {
     activityLog: {
       title: 'Log de atividades',
       size: 'Tamanho do $t(homeView:dashboard.activityLog.title): {{size}}',
+      loadError: 'Não foi possível carregar a atividade.',
+      empty: 'Ainda não há atividade.',
     },
     exportWithData: 'Exportar + dados (Backup)',
     exportWithDataNoActivityLog: 'Exportar + dados (SEM log de atividades)',
@@ -46,6 +48,24 @@ export default {
       title: 'Conclusão de Dados de Pontos Amostrais',
       totalItems: 'Total de itens: {{totalItems}}',
       remainingItems: 'Itens restantes',
+    },
+    kpi: {
+      records: 'Registros',
+      contributors: 'Colaboradores',
+      storage: 'Armazenamento',
+      expandDetails: 'Mostrar detalhes',
+      collapseDetails: 'Ocultar detalhes',
+    },
+    recordsCard: {
+      total: 'Registros adicionados no período selecionado',
+      byStep: 'Por etapa do fluxo de trabalho (todo o período)',
+    },
+    contributorsCard: {
+      active: 'Colaboradores ativos no período selecionado: {{count}}',
+    },
+    map: {
+      title: 'Mapa',
+      allOwners: 'Todos os proprietários',
     },
     step: {
       entry: 'Entrada de dados',
