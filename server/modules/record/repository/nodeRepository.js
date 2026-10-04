@@ -225,10 +225,10 @@ export const fetchFileValueNodesByNodeDefUuids = async ({ surveyId, nodeDefUuids
 // ============== CREATE
 
 export const insertNode = async (surveyId, node, draft, client = db) => {
+  // child applicability is not inserted (applicable by default); do not store an empty object to save space
   const meta = {
-    ...Node.getMeta(node),
+    ...A.dissoc(Node.metaKeys.childApplicability, Node.getMeta(node)),
     [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
-    [Node.metaKeys.childApplicability]: {},
   }
 
   await client.query(
