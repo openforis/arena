@@ -220,7 +220,7 @@ const validateItemsAndDescendants = async ({
 
     if (visited || childrenCount === 0) {
       // Validate leaf items or items without children or items already visited (all descendants have been already visited)
-      validation = await Validator.validate(
+      validation = /* NOSONAR */ await Validator.validate(
         item,
         itemValidators({ isLeaf, itemsByParentAndCode, childrenCount }),
         false

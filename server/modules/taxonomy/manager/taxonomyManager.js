@@ -187,7 +187,7 @@ const associateSingleVernacularNamesToTaxa = async ({ surveyId, taxonomyUuid, ta
   const result = []
   for (const taxon of taxa) {
     const taxonUuid = Taxon.getUuid(taxon)
-    const taxaWithVernacularNames = await TaxonomyRepository.fetchTaxaWithVernacularNamesByTaxonUuid(
+    const taxaWithVernacularNames = /* NOSONAR */ await TaxonomyRepository.fetchTaxaWithVernacularNamesByTaxonUuid(
       { surveyId, taxonomyUuid, taxonUuid, draft },
       client
     )

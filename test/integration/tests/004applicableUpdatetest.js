@@ -79,7 +79,7 @@ describe('Applicable Test', () => {
       global.applicableRecord = record
 
       // Update dependent nodes
-      const { record: recordUpdate } = await RecordManager.updateNodesDependents({
+      const { record: recordUpdate } = /* NOSONAR */ await RecordManager.updateNodesDependents({
         survey,
         record,
         nodes: nodesUpdated,

@@ -35,7 +35,7 @@ export default class CategoriesExportJob extends Job {
     // export categories one by one
     for (let index = 0; index < categories.length; index++) {
       const category = categories[index]
-      await this.exportCategory({ category, index })
+      await this.exportCategory({ category, index }) // NOSONAR
     }
   }
 

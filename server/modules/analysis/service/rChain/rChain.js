@@ -318,7 +318,7 @@ class RChain {
 
       for (let index = 0; index < samplingDefs.length; index++) {
         const nodeDef = samplingDefs[index]
-        await this._initNodeDefFile({ nodeDef, index: index - 1, path: samplingPath })
+        await this._initNodeDefFile({ nodeDef, index: index - 1, path: samplingPath }) // NOSONAR
       }
 
       const entityPath = this.dirUser
@@ -327,13 +327,13 @@ class RChain {
       const nonSamplingDefs = this._analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef))
       for (let index = 0; index < nonSamplingDefs.length; index++) {
         const nodeDef = nonSamplingDefs[index]
-        await this._initNodeDefFile({ nodeDef, index, path: entityPath })
+        await this._initNodeDefFile({ nodeDef, index, path: entityPath }) // NOSONAR
         const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)
 
         // at this moment we dont like to have the areaBasedEstimated files
         const DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES = false
         if (areaBasedEstimated && DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES) {
-          await this._initNodeDefFile({
+          /* NOSONAR */ await this._initNodeDefFile({
             nodeDef: areaBasedEstimated,
             path: entityPath,
             index,

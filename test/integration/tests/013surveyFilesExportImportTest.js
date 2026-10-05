@@ -85,7 +85,7 @@ describe('Survey files export/import - branding and doc-layout images', () => {
 
   afterAll(async () => {
     for (const surveyId of createdSurveyIds) {
-      await SurveyManager.deleteSurvey(surveyId)
+      await SurveyManager.deleteSurvey(surveyId) // NOSONAR
     }
     if (sourceSurveyId) await SurveyManager.deleteSurvey(sourceSurveyId)
   })

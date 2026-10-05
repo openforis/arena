@@ -72,7 +72,7 @@ export const addNodeDefDependencies = (nodeDef) => async (survey) => Surveys.add
 export const addNodeDefsDependencies = (nodeDefsIndexedByUuid) => async (survey) => {
   let surveyUpdated = survey
   for (const nodeDef of Object.values(nodeDefsIndexedByUuid)) {
-    surveyUpdated = await addNodeDefDependencies(nodeDef)(surveyUpdated)
+    surveyUpdated = await addNodeDefDependencies(nodeDef)(surveyUpdated) // NOSONAR
   }
   return surveyUpdated
 }

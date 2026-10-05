@@ -39,19 +39,19 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
 
       // ===== create table and view
       this.logDebug(`create data table ${nodeDefName} - start`)
-      await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx)
+      await SurveyRdbManager.createDataTable({ survey, nodeDef }, tx) // NOSONAR
       this.logDebug(`create data table ${nodeDefName} - end`)
 
       // ===== insert into table
       this.logDebug(`insert into table ${nodeDefName} - start`)
-      await SurveyRdbManager.populateTable({ survey, nodeDef, stopIfFunction }, tx)
+      await SurveyRdbManager.populateTable({ survey, nodeDef, stopIfFunction }, tx) // NOSONAR
       this.logDebug(`insert into table ${nodeDefName} - end`)
 
       if (this.isCanceled()) break
 
       // ===== create indexes (after populating the table, to speed up the insert)
       this.logDebug(`create indexes on table ${nodeDefName} - start`)
-      await SurveyRdbManager.createDataTableIndexes({ survey, nodeDef }, tx)
+      await SurveyRdbManager.createDataTableIndexes({ survey, nodeDef }, tx) // NOSONAR
       this.logDebug(`create indexes on table ${nodeDefName} - end`)
 
       this.incrementProcessedItems()
@@ -63,7 +63,7 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
 
       const nodeDefName = NodeDef.getName(nodeDef)
       this.logDebug(`create view for ${nodeDefName} - start`)
-      await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
+      await SurveyRdbManager.createDataView({ survey, nodeDef }, tx) // NOSONAR
       this.logDebug(`create view for ${nodeDefName} - end`)
     }
 

@@ -26,7 +26,7 @@ export default class RecordsValidationJob extends Job {
 
     for (let index = 0; index < recordSummaries.length && !this.isCanceled(); index++) {
       const recordSummary = recordSummaries[index]
-      await this.validateRecord({ recordSummary })
+      await this.validateRecord({ recordSummary }) // NOSONAR
     }
   }
 

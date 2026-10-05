@@ -499,7 +499,7 @@ export const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) =
   await visitorFn(nodeDefItem, depth)
   const children = A.propOr([], 'children', nodeDefItem)
   for (const child of children) {
-    await traverseHierarchyItem(child, visitorFn, depth + 1)
+    await traverseHierarchyItem(child, visitorFn, depth + 1) // NOSONAR
   }
 }
 

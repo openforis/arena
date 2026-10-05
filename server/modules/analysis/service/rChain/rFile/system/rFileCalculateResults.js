@@ -12,9 +12,9 @@ export default class RFileCalculateResults extends RFileSystem {
     for (const entity of entitiesWithActiveQuantitativeVariables) {
       const dfResults = new DfResults(this.rChain, entity)
 
-      await this.logInfo(`'Generating results for entity ${dfResults.dfSourceName} started'`)
-      await this.appendContent(...dfResults.scripts)
-      await this.logInfo(`'Generating results for entity ${dfResults.dfSourceName} completed'`)
+      await this.logInfo(`'Generating results for entity ${dfResults.dfSourceName} started'`) // NOSONAR
+      await this.appendContent(...dfResults.scripts) // NOSONAR
+      await this.logInfo(`'Generating results for entity ${dfResults.dfSourceName} completed'`) // NOSONAR
     }
   }
 

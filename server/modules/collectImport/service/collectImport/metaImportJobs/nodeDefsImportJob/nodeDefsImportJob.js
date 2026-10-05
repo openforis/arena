@@ -68,6 +68,18 @@ const _updateVisibilityLayoutProps = ({ collectNodeDef, updateLayoutProp }) => {
   }
 }
 
+const _addNodeDefInfoToCache = ({ nodeDefsInfoByCollectPath, collectNodeDefPath, nodeDefUuid, field }) => {
+  let nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
+  if (!nodeDefsInfo) {
+    nodeDefsInfo = []
+    nodeDefsInfoByCollectPath[collectNodeDefPath] = nodeDefsInfo
+  }
+  nodeDefsInfo.push({
+    uuid: nodeDefUuid,
+    ...(field ? { field } : {}),
+  })
+}
+
 export default class NodeDefsImportJob extends Job {
   constructor(params) {
     super(NodeDefsImportJob.type, params)
@@ -167,18 +179,6 @@ export default class NodeDefsImportJob extends Job {
    * @param {string} field - Node sub-field.
    * @returns {Promise<object>} - Inserted node definitions.
    */
-  _addNodeDefInfoToCache({ collectNodeDefPath, nodeDefUuid, field }) {
-    let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]
-    if (!nodeDefsInfo) {
-      nodeDefsInfo = []
-      this.nodeDefsInfoByCollectPath[collectNodeDefPath] = nodeDefsInfo
-    }
-    nodeDefsInfo.push({
-      uuid: nodeDefUuid,
-      ...(field ? { field } : {}),
-    })
-  }
-
   async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
     const nodeDefsUpdated = {}
     const nodeDefsInserted = {}
@@ -285,7 +285,12 @@ export default class NodeDefsImportJob extends Job {
     nodeDef = nodeDefsUpdated[nodeDefUuid]
 
     // 6. store nodeDef in cache
-    this._addNodeDefInfoToCache({ collectNodeDefPath, nodeDefUuid, field })
+    _addNodeDefInfoToCache({
+      nodeDefsInfoByCollectPath: this.nodeDefsInfoByCollectPath,
+      collectNodeDefPath,
+      nodeDefUuid,
+      field,
+    })
 
     nodeDefsInserted[nodeDefUuid] = nodeDef
 
@@ -305,7 +310,7 @@ export default class NodeDefsImportJob extends Job {
         for (const childDefField of childDefFields) {
           const { type: childType, field = null } = childDefField
 
-          const nodeDefsInserted = await this.insertNodeDef(nodeDef, collectNodeDefPath, collectChild, childType, field)
+          const nodeDefsInserted = await this.insertNodeDef(nodeDef, collectNodeDefPath, collectChild, childType, field) // NOSONAR
           // sort inserted node defs by id
           const insertedUuids = A.pipe(A.values, A.sortBy(NodeDef.getId), A.map(NodeDef.getUuid))(nodeDefsInserted)
           if (tableLayout) {
@@ -533,7 +538,7 @@ export default class NodeDefsImportJob extends Job {
         [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression({ expression: applicableIfExpr })],
       }
       const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props, propsAdvanced)
-      const qualifierNodeDefAndOthersUpdated = await NodeDefManager.insertNodeDef(
+      const qualifierNodeDefAndOthersUpdated = /* NOSONAR */ await NodeDefManager.insertNodeDef(
         {
           user: this.user,
           survey: this.survey,

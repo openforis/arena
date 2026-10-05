@@ -41,7 +41,7 @@ const forEachFileInZip = async (file, callback) => {
           throw new Error('Reached max. size')
         }
       })
-    await callback(fileName, fileEntry)
+    await callback(fileName, fileEntry) // NOSONAR
   }
 }
 

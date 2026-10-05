@@ -104,7 +104,7 @@ const _applyGroupQualifierValues = async (
       existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(recordUpdated), rootNode)
     const nodeWithValue = Node.assocIsQualifierValueApplied(true)(Node.assocValue(value)(nodeToPersist))
 
-    recordUpdated = await persistNode(
+    recordUpdated = /* NOSONAR */ await persistNode(
       {
         user,
         survey,
@@ -182,7 +182,7 @@ export const deleteRecord = async (user, survey, record, client = db) =>
       )
       const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
       for (const nodeDefUnique of nodeDefsUnique) {
-        await RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
+        /* NOSONAR */ await RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
           { survey, record, nodeDefUniqueUuid: nodeDefUnique.uuid, excludeRecordFromCount: true },
           t
         )
@@ -473,7 +473,7 @@ const _afterNodesUpdate = async ({ survey, record, nodes, nodesValidationListene
   // for each modified node def, validate record uniqueness of records with same record unique nodes
   for (const nodeDefUnique of rootUniqueNodeDefsModified) {
     const validationByRecordUuid =
-      await RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
+      /* NOSONAR */ await RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
         { survey, record, nodeDefUniqueUuid: NodeDef.getUuid(nodeDefUnique), excludeRecordFromCount: false },
         t
       )

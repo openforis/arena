@@ -249,7 +249,7 @@ export const deleteRecords = async ({ socketId, user, surveyId, recordUuids }) =
   Logger.debug('deleting records - surveyId:', surveyId, 'recordUuids:', recordUuids)
 
   for (const recordUuid of recordUuids) {
-    await deleteRecord({ socketId, user, surveyId, recordUuid })
+    await deleteRecord({ socketId, user, surveyId, recordUuid }) // NOSONAR
   }
 
   Logger.debug('records deleted - surveyId:', surveyId, 'recordUuids:', recordUuids)
@@ -259,7 +259,7 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
   let count = 0
   for (const surveyId of surveyIds) {
-    const deletedRecordsCount = await RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)
+    const deletedRecordsCount = await RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours) // NOSONAR
     count += deletedRecordsCount
   }
   return count
@@ -608,7 +608,7 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
 
   for (const node of nodesArray) {
     if (Node.isDeleted(node)) {
-      await nodesDeleteBatchPersister.addItem(node)
+      await nodesDeleteBatchPersister.addItem(node) // NOSONAR
       if (isPreview) {
         const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
         if (NodeDef.isFile(nodeDef) && Node.getFileUuid(node)) {
@@ -616,9 +616,9 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
         }
       }
     } else if (Node.isCreated(node)) {
-      await nodesInsertBatchPersister.addItem(node)
+      await nodesInsertBatchPersister.addItem(node) // NOSONAR
     } else if (Node.isUpdated(node)) {
-      await nodesUpdateBatchPersister.addItem(node)
+      await nodesUpdateBatchPersister.addItem(node) // NOSONAR
     }
   }
   await nodesDeleteBatchPersister.flush()
@@ -718,10 +718,10 @@ const generateDocumentWithQrCode = async ({
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const publicUrl = `${serverUrl}/api/public/record-export/${accessToken}`
-    qrCodeImage = await toQrPngBuffer(publicUrl)
-    pdfResult = await SurveyPdfGenerator.generateSurveyPdf({ ...generatorOptions, qrCodeImage })
+    qrCodeImage = await toQrPngBuffer(publicUrl) // NOSONAR
+    pdfResult = await SurveyPdfGenerator.generateSurveyPdf({ ...generatorOptions, qrCodeImage }) // NOSONAR
 
-    const share = await upsertShareWithPdf({
+    const share = /* NOSONAR */ await upsertShareWithPdf({
       surveyId,
       recordUuid,
       entityDefUuid,
@@ -730,7 +730,7 @@ const generateDocumentWithQrCode = async ({
       accessToken,
     })
     if (share.accessToken === accessToken) {
-      return extension === 'pdf' ? pdfResult : await generator({ ...generatorOptions, qrCodeImage })
+      return extension === 'pdf' ? pdfResult : await generator({ ...generatorOptions, qrCodeImage }) // NOSONAR
     }
     accessToken = share.accessToken
   }

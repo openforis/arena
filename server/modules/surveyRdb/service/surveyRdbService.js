@@ -254,7 +254,7 @@ export const fetchEntitiesDataSummaryToFlatData = async ({ exportUuid, survey, c
   for (const entityDef of entityDefs) {
     const entityDefUuid = NodeDef.getUuid(entityDef)
     const query = Query.create({ entityDefUuid })
-    const count = await SurveyRdbManager.countTable({ survey, cycle, query })
+    const count = await SurveyRdbManager.countTable({ survey, cycle, query }) // NOSONAR
     items.push({ name: NodeDef.getName(entityDef), label: NodeDef.getLabel(entityDef, lang), count })
   }
   const tempFilePath = FileUtils.tempFilePath(`${exportUuid}.${getExtensionByFileFormat(fileFormat)}`)

@@ -275,7 +275,7 @@ const addAiDescriptions = async ({ user, surveyName, items, processed, total, on
     const batch = capped.slice(i, i + AI_DESCRIPTION_BATCH_SIZE)
     const batchIndex = Math.floor(i / AI_DESCRIPTION_BATCH_SIZE)
     try {
-      const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex })
+      const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex }) // NOSONAR
       for (const { uuid, description } of result.descriptions) {
         if (itemByUuid[uuid]) itemByUuid[uuid].aiDescription = description
       }

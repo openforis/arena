@@ -48,18 +48,18 @@ export default class AllSurveysDataMigrationJob extends Job {
         for (const { id: surveyId, appVersion } of surveysToMigrate) {
           if (this.isCanceled()) return
           try {
-            const stillExists = (await SurveyManager.fetchAllSurveyIds()).includes(surveyId)
+            const stillExists = (await SurveyManager.fetchAllSurveyIds()).includes(surveyId) // NOSONAR
             if (!stillExists) {
               this.logWarn(`skipping survey ${surveyId}: it no longer exists (deleted concurrently)`)
               continue
             }
 
             this.logDebug(`migrating schema for survey ${surveyId}`)
-            await DBMigrator.migrateSurveySchema(surveyId)
+            await DBMigrator.migrateSurveySchema(surveyId) // NOSONAR
 
             this.logDebug(`migrating data for survey ${surveyId}`)
             const innerJob = new SurveyDataMigrationJob({ surveyId, surveyAppVersion: appVersion })
-            await innerJob.start() // own transaction, like SurveysRdbRefreshJob's inner job
+            await innerJob.start() // own transaction, like SurveysRdbRefreshJob's inner job NOSONAR
 
             if (innerJob.isSucceeded()) {
               this.logDebug(`data for survey ${surveyId} migrated successfully`)

@@ -103,7 +103,7 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, fil
 
   for (let idx = 0; idx < multipleNodeDefUuids.length; idx++) {
     const nodeDefUuid = multipleNodeDefUuids[idx]
-    const { template, nodeDef } = await extractDataImportTemplate({
+    const { template, nodeDef } = /* NOSONAR */ await extractDataImportTemplate({
       survey,
       cycle,
       nodeDefUuid,
@@ -114,7 +114,7 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, fil
     const zipEntryName = `${prefix}_${NodeDef.getName(nodeDef)}.${fileFormat}`
     const tempFilePath = FileUtils.newTempFilePath()
 
-    await FlatDataWriter.writeItemsToStream({
+    /* NOSONAR */ await FlatDataWriter.writeItemsToStream({
       outputStream: FileUtils.createWriteStream(tempFilePath),
       fileFormat,
       items: [template],

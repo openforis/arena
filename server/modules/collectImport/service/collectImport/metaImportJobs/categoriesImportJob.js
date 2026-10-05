@@ -46,11 +46,11 @@ export default class CategoriesImportJob extends Job {
       if (!A.includes(categoryName, CollectSurvey.samplingPointDataCodeListNames)) {
         // Skip sampling_design (sampling point data) code list, imported by SamplingPointDataImportJob
 
-        const category = await this._insertCategory(collectCodeList)
+        const category = await this._insertCategory(collectCodeList) // NOSONAR
 
         // Insert items
         const collectFirstLevelItems = CollectSurvey.getElementsByPath(['items', 'item'])(collectCodeList)
-        await this.insertItems(category, 0, null, defaultLanguage, collectFirstLevelItems, tx)
+        await this.insertItems(category, 0, null, defaultLanguage, collectFirstLevelItems, tx) // NOSONAR
 
         categories.push(category)
       }
@@ -118,7 +118,7 @@ export default class CategoriesImportJob extends Job {
         }),
         categoryUuid, // Used to revalidate categories after items import
       }
-      await this.itemBatchPersister.addItem(item, tx)
+      await this.itemBatchPersister.addItem(item, tx) // NOSONAR
 
       // Update qualifiable item codes cache
       if (CollectSurvey.getAttribute('qualifiable')(collectItem) === 'true') {
@@ -132,7 +132,7 @@ export default class CategoriesImportJob extends Job {
       // Insert child items recursively
       const collectChildItems = CollectSurvey.getElementsByName('item')(collectItem)
       if (!A.isEmpty(collectChildItems)) {
-        await this.insertItems(category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx)
+        await this.insertItems(category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx) // NOSONAR
       }
     }
   }

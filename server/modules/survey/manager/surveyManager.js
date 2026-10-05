@@ -392,7 +392,7 @@ const _filterSurveysWithChains = async (surveys) => {
   for (const survey of surveys) {
     const surveyId = Survey.getId(survey)
     try {
-      const count = await ChainRepository.countChains({ surveyId })
+      const count = await ChainRepository.countChains({ surveyId }) // NOSONAR
       if (count > 0) surveysWithChains.push(survey)
     } catch (error) {
       Logger.error(`fetchUserSurveysInfo: error counting chains for survey ${surveyId}: ${error}`)
@@ -461,7 +461,7 @@ const _fetchSurveysWithCounts = async ({ surveys, draft, includeDbSize, onProgre
       break
     }
     const batch = surveys.slice(i, i + _fetchSurveysWithCountsConcurrency)
-    const batchWithCounts = await Promise.all(
+    const batchWithCounts = /* NOSONAR */ await Promise.all(
       batch.map((survey) => _fetchSurveyWithCounts({ survey, draft, includeDbSize }))
     )
     surveysWithCounts.push(...batchWithCounts)
@@ -560,7 +560,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
       const valuePrev = propsPrev[key]
 
       if (!A.equals(value, valuePrev)) {
-        await DbUtils.runQueries(t, [
+        /* NOSONAR */ await DbUtils.runQueries(t, [
           () => SurveyRepository.updateSurveyProp(surveyId, key, value, t),
           () => SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
           () =>
@@ -568,7 +568,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
         ])
 
         if (key === Survey.infoKeys.cycles) {
-          await updateSurveyCyclesProp({ surveyId, value, valuePrev }, t)
+          await updateSurveyCyclesProp({ surveyId, value, valuePrev }, t) // NOSONAR
         }
       }
     }
@@ -577,16 +577,16 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
     const preloadedMapLayersUpdated = Survey.getPreloadedMapLayers(surveyInfoUpdated)
     for (const preloadedMapLayer of preloadedMapLayersUpdated) {
       const fileUuid = SurveyFile.getUuid(preloadedMapLayer)
-      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t)
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
     }
     const surveyDocImagesUpdated = Survey.getSurveyDocImages(surveyInfoUpdated)
     for (const surveyDocImage of surveyDocImagesUpdated) {
       const fileUuid = SurveyFile.getUuid(surveyDocImage)
-      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t)
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
     }
     const branding = SurveyBranding.getBranding(surveyInfoUpdated)
     for (const fileUuid of SurveyBranding.getBrandingFileUuids(branding)) {
-      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t)
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
     }
     await SurveyFileManager.deleteTemporaryFiles(surveyId, t)
 
@@ -697,7 +697,7 @@ export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) 
   client.tx(async (t) => {
     const surveyIds = await SurveyRepository.fetchTemporarySurveyIds({ olderThan24Hours }, t)
     for (const surveyId of surveyIds) {
-      await deleteSurvey(surveyId, { deleteUserPrefs: true }, t)
+      await deleteSurvey(surveyId, { deleteUserPrefs: true }, t) // NOSONAR
     }
     return surveyIds.length
   })

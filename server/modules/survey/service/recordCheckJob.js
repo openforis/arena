@@ -65,14 +65,14 @@ export default class RecordCheckJob extends Job {
     for (const { uuid: recordUuid, cycle } of recordsUuidAndCycle) {
       const startTime = Date.now()
 
-      const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
+      const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle) // NOSONAR
 
-      await this._deleteNodesForDeletedNodeDefsOnce(surveyAndNodeDefs)
+      await this._deleteNodesForDeletedNodeDefsOnce(surveyAndNodeDefs) // NOSONAR
 
       const { requiresCheck } = surveyAndNodeDefs
 
       if (requiresCheck) {
-        await this._checkRecord({ surveyAndNodeDefs, recordUuid })
+        await this._checkRecord({ surveyAndNodeDefs, recordUuid }) // NOSONAR
       }
 
       this.logDebugOptional(
@@ -280,7 +280,7 @@ export default class RecordCheckJob extends Job {
     const { surveyId, tx } = this
     for (const nodeDefDeletedUuid of nodeDefDeletedUuids) {
       this.logDebugOptional(`deleting nodes for removed node def ${nodeDefDeletedUuid}...`)
-      const deletedCount = await RecordManager.deleteNodesByNodeDefUuids(
+      const deletedCount = /* NOSONAR */ await RecordManager.deleteNodesByNodeDefUuids(
         { user: this.user, surveyId, nodeDefUuids: [nodeDefDeletedUuid] },
         tx
       )
@@ -358,9 +358,9 @@ export default class RecordCheckJob extends Job {
     const allUpdatedNodesArray = Object.values(allUpdatedNodesByUuid)
     for (const node of allUpdatedNodesArray) {
       if (Node.isCreated(node)) {
-        await this.nodesBatchInserter.addItem(node, tx)
+        await this.nodesBatchInserter.addItem(node, tx) // NOSONAR
       } else if (Node.isUpdated(node)) {
-        await this.nodesBatchUpdater.addItem(node, tx)
+        await this.nodesBatchUpdater.addItem(node, tx) // NOSONAR
       }
     }
 
@@ -399,7 +399,7 @@ export default class RecordCheckJob extends Job {
       const parentNodeDefUuid = NodeDef.getParentUuid(nodeDef)
       const parentNodes = Record.getNodesByDefUuid(parentNodeDefUuid)(recordUpdated)
       for (const parentNode of parentNodes) {
-        const { record: recordUpdatedNodeInsert, nodes } = await _insertMissingSingleNode({
+        const { record: recordUpdatedNodeInsert, nodes } = /* NOSONAR */ await _insertMissingSingleNode({
           survey,
           childDef: nodeDef,
           record: recordUpdated,

@@ -32,7 +32,7 @@ export default class FilesImportJob extends FileImportBaseJob {
         // load file content from a separate file
         const fileUuid = SurveyFile.getUuid(fileSummary)
         const fileName = SurveyFile.getName(fileSummary)
-        const fileContent = await this.fetchFileContent({ fileName, fileUuid })
+        const fileContent = await this.fetchFileContent({ fileName, fileUuid }) // NOSONAR
         const recordUuid = SurveyFile.getRecordUuid(fileSummary)
         if (fileContent) {
           file = SurveyFile.assocContent(fileContent)(file)
@@ -40,7 +40,7 @@ export default class FilesImportJob extends FileImportBaseJob {
           // update file size with actual file content length
           file = SurveyFile.assocSize(Buffer.byteLength(fileContent))(file)
 
-          await this.persistFile(file)
+          await this.persistFile(file) // NOSONAR
         } else {
           const missingFileContentMessage = `Record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`
           if (skipMissingFiles) {
@@ -127,7 +127,7 @@ export default class FilesImportJob extends FileImportBaseJob {
       const fileUuid = SurveyFile.getUuid(file)
       if (!updatedFilesByUuid[fileUuid]) {
         if (!dryRun) {
-          await SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+          await SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, tx) // NOSONAR
         }
         this.deletedFileUuids.push(fileUuid)
       }

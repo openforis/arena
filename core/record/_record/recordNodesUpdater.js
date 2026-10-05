@@ -227,7 +227,7 @@ const _addEntityAndKeyValues =
         })
       }
 
-      const keyAttributeUpdateResult = await _addOrUpdateAttribute({
+      const keyAttributeUpdateResult = /* NOSONAR */ await _addOrUpdateAttribute({
         survey,
         categoryItemProvider,
         entity,
@@ -429,7 +429,7 @@ const updateAttributesInEntityWithValues =
 
         const refData = refDataByDefUuid?.[attributeDefUuid] ?? null
 
-        const attributeUpdateResult = await _addOrUpdateAttribute({
+        const attributeUpdateResult = /* NOSONAR */ await _addOrUpdateAttribute({
           survey,
           categoryItemProvider,
           taxonProvider,
@@ -440,7 +440,7 @@ const updateAttributesInEntityWithValues =
           sideEffect,
         })(currentRecord)
 
-        await updateDependentNodes(attributeUpdateResult)
+        await updateDependentNodes(attributeUpdateResult) // NOSONAR
       }
     }
     return updateResult

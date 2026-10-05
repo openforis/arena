@@ -605,7 +605,7 @@ export const deleteUser = async ({ user, userUuidToDelete }) =>
     // Postgres already has to run against every survey schema to allow the delete at all.
     const allSurveyIds = await SurveyManager.fetchAllSurveyIds(t)
     for (const surveyId of allSurveyIds) {
-      await RecordManager.updateRecordsOwner(
+      /* NOSONAR */ await RecordManager.updateRecordsOwner(
         { surveyId, fromOwnerUuid: userUuidToDelete, toOwnerUuid: User.getUuid(user) },
         t
       )
@@ -639,7 +639,7 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
       const userUuid = User.getUuid(user)
       const userEmail = User.getEmail(user)
       try {
-        await UserManager.deleteUser(userUuid, client)
+        await UserManager.deleteUser(userUuid, client) // NOSONAR
         deletedUsers.push(user)
         deletedUsersEmails.push(userEmail)
       } catch (error) {

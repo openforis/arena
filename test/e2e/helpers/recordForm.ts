@@ -129,8 +129,8 @@ export class RecordForm {
       ['minutes', minutes],
     ] as const) {
       const option = picker.locator(`li[aria-label="${partValue} ${key}"]`)
-      await option.scrollIntoViewIfNeeded()
-      await option.click()
+      await option.scrollIntoViewIfNeeded() // NOSONAR
+      await option.click() // NOSONAR
     }
     const okBtn = this.page.locator('.MuiDialogActions-root').getByRole('button', { name: 'OK' })
     if (await okBtn.isVisible()) await okBtn.click()

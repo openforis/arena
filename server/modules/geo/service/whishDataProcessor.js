@@ -37,7 +37,7 @@ const waitForProcessing = async ({ token }) => {
   while (true) {
     let response
     try {
-      response = await axios.get(url, { headers })
+      response = await axios.get(url, { headers }) // NOSONAR
     } catch (error) {
       throw wrapWhispApiError(error)
     }
@@ -56,7 +56,7 @@ const waitForProcessing = async ({ token }) => {
         throw new Error('Error fetching Whisp processing status')
     }
     // If not completed or an error, wait 2 seconds before the next iteration
-    await wait(processingStatusPollingPeriod)
+    await wait(processingStatusPollingPeriod) // NOSONAR
   }
 }
 
