@@ -23,7 +23,7 @@ const ButtonGroup = ({
       if (selected && !multiple && !deselectable) return
       let value
       if (multiple) {
-        value = A.ifElse(A.always(selected), A.without(item.key), A.append(item.key))(selectedItemKey)
+        value = A.ifElse(A.always(selected), A.without([item.key]), A.append(item.key))(selectedItemKey)
       } else if (!selected) {
         value = item.key
       } else {

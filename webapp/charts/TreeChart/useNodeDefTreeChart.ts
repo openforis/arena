@@ -56,7 +56,14 @@ export const useNodeDefTreeChart = ({ ref, nodeDefLabelType }: Params): Result =
 
   const wrapperRef = useRef<HTMLDivElement | null>(null)
 
-  useEffect(() => () => ref.current?.destroy(), [ref])
+  // clear the ref too: it can be owned by a parent that outlives this chart and remounts it later
+  useEffect(
+    () => () => {
+      ref.current?.destroy()
+      ref.current = null
+    },
+    [ref]
+  )
 
   // force updating labels in TreeChart when label and tooltip function change (depending on lang and labelType)
   // no-op until the TreeChart instance has been created
