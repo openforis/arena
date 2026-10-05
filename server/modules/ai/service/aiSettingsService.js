@@ -174,6 +174,34 @@ export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
   }
 }
 
+// Throws when the provider config is incomplete.
+const validateProviderConfig = ({ provider, model, baseUrl, isFixedEndpoint }) => {
+  if (!model && !isFixedEndpoint) throw new SystemError('aiModelMissing', { provider })
+  const requiresBaseUrl =
+    provider === ProviderRegistry.providers.openaiCompatible || provider === ProviderRegistry.providers.vercelAiSdk
+  if (requiresBaseUrl && !baseUrl) {
+    throw new SystemError('aiBaseUrlMissing', { provider })
+  }
+}
+
+/**
+ * Sanitises the submitted provider config, validating it only when the override is enabled.
+ * @param {object} args - Args.
+ * @param {object} args.update - The submitted settings.
+ * @param {boolean} args.overrideEnabled - Whether the user-provider override is active.
+ * @returns {{provider: string, model: string|null, baseUrl: string|null}} - The sanitised provider config.
+ */
+const extractProviderConfig = ({ update, overrideEnabled }) => {
+  const provider = sanitiseProvider(update.provider)
+  const isFixedEndpoint = provider === ProviderRegistry.providers.vercelAiSdk
+  const model = isFixedEndpoint ? ProviderRegistry.providers.vercelAiSdk : (update.model || '').trim() || null
+  const baseUrl = update.baseUrl ? String(update.baseUrl).trim() : null
+  if (overrideEnabled) {
+    validateProviderConfig({ provider, model, baseUrl, isFixedEndpoint })
+  }
+  return { provider, model, baseUrl }
+}
+
 /**
  * Persists the user's AI settings, merging into the existing prefs blob and
  * encrypting the key before storage. Pass `apiKey: undefined` to leave the
@@ -221,20 +249,7 @@ export const saveSettings = async ({ user, update }) => {
   let baseUrl = existing.baseUrl || null
 
   if (featuresEnabled && update.provider) {
-    // User submitted a provider — sanitise + validate at the level
-    // appropriate for the override flag.
-    provider = sanitiseProvider(update.provider)
-    const isFixedEndpoint = provider === ProviderRegistry.providers.vercelAiSdk
-    model = isFixedEndpoint ? ProviderRegistry.providers.vercelAiSdk : (update.model || '').trim() || null
-    baseUrl = update.baseUrl ? String(update.baseUrl).trim() : null
-    if (overrideEnabled) {
-      if (!model && !isFixedEndpoint) throw new SystemError('aiModelMissing', { provider })
-      const requiresBaseUrl =
-        provider === ProviderRegistry.providers.openaiCompatible || provider === ProviderRegistry.providers.vercelAiSdk
-      if (requiresBaseUrl && !baseUrl) {
-        throw new SystemError('aiBaseUrlMissing', { provider })
-      }
-    }
+    ;({ provider, model, baseUrl } = extractProviderConfig({ update, overrideEnabled }))
   }
 
   const newAi = {
