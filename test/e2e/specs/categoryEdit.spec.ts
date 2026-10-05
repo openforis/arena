@@ -10,6 +10,7 @@ import { expectDropdownValue, getDropdown, selectDropdownItem } from '../helpers
 import { FormDesigner } from '../helpers/formDesigner'
 import { publishSurvey } from '../helpers/publish'
 import { exportSurvey, verifySampleCategories } from '../helpers/surveyExport'
+import { Urls } from '../helpers/urls'
 
 const input = (page: Page, testId: string) => page.locator(`input[data-testid="${testId}"]`)
 
@@ -79,6 +80,28 @@ const selectCategoryAndParentCode = async (
     await expect(parentCodeDropdown).toHaveClass(/dropdown--is-disabled/)
   }
 }
+
+test.describe('Category editor navigation', () => {
+  test('goes back to the categories list when closing a category opened from it', async ({ page, sampleSurvey: _ }) => {
+    await page.goto(Urls.formDesigner)
+    // navigate inside the app: the form designer must be the page before the categories list in the history
+    await page.getByTestId('sidebar-module-designer').hover()
+    await page.locator('a[href*="/designer/categories"]').first().click()
+    await expect(page).toHaveURL(/\/designer\/categories\/$/)
+
+    await page.locator('.table__row', { hasText: category.name }).getByRole('button').first().click()
+    await expect(page).toHaveURL(/\/designer\/category\//)
+
+    // closing the editor cleans up the category and then navigates back
+    const categoryCleanedUp = page.waitForResponse((response) => /\/cleanup/.test(response.url()))
+    await page.getByRole('button', { name: 'Done' }).click()
+    await categoryCleanedUp
+    await expect(page).toHaveURL(/\/designer\/categories\/$/)
+    // no further back navigation: the list is loaded and still shown
+    await expect(page.locator('.table__row', { hasText: category.name })).toBeVisible()
+    await expect(page).toHaveURL(/\/designer\/categories\/$/)
+  })
+})
 
 test.describe('Category edit', () => {
   // long UI flow (many node defs edited and saved one by one)
