@@ -120,10 +120,18 @@ export const fetchUsersGroups = async (userUuids, client = db) =>
     dbTransformCallback
   )
 
+// max distance between survey last modification and user invitation to consider the survey untouched
+const untouchedSurveyTolerance = '10 MINUTES'
+
+/**
+ * Fetches the ids of the surveys never modified since their only user (with expired invitation) was invited.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<number[]>} - The ids of the surveys.
+ */
 export const fetchSurveyIdsOfExpiredInvitationUsers = async (client = db) =>
   client.map(
     `
-    SELECT s.id
+    SELECT DISTINCT s.id
     FROM auth_group_user agu
       JOIN auth_group ag ON ag.uuid = agu.group_uuid 
       JOIN "user" u ON u.uuid = agu.user_uuid
@@ -138,6 +146,15 @@ export const fetchSurveyIdsOfExpiredInvitationUsers = async (client = db) =>
           JOIN auth_group ag2 ON ag2."uuid" = agu2.group_uuid
         WHERE ag2.survey_uuid = ag.survey_uuid
           AND agu2.user_uuid <> agu.user_uuid
+      )
+      -- survey not modified after the user invitation (activity log could be disabled)
+      AND EXISTS (
+        SELECT * 
+        FROM user_invitation ui
+        WHERE ui.user_uuid = u.uuid
+          AND ui.survey_uuid = s.uuid
+          AND s.date_modified BETWEEN ui.invited_date - INTERVAL '${untouchedSurveyTolerance}' 
+            AND ui.invited_date + INTERVAL '${untouchedSurveyTolerance}'
       )
       AND ${UserRepository.expiredInvitationWhereCondition}`,
     [],
