@@ -1,3 +1,5 @@
-export * as ActivityLogMessage from './activityLogMessage'
+import * as ActivityLogMessage from './activityLogMessage'
 
 export { useActivityLog } from './useActivityLog'
+
+export { ActivityLogMessage }

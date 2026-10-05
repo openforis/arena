@@ -1,5 +1,5 @@
-export * as NodeDefsActions from './actions'
-export * as NodeDefsState from './state'
+import * as NodeDefsActions from './actions'
+import * as NodeDefsState from './state'
 import NodeDefsReducer from './reducer'
 
-export { NodeDefsReducer }
+export { NodeDefsActions, NodeDefsState, NodeDefsReducer }

@@ -1,4 +1,4 @@
-export * as NodeDefsIndexState from './state'
+import * as NodeDefsIndexState from './state'
 import NodeDefsIndexReducer from './reducer'
 
-export { NodeDefsIndexReducer }
+export { NodeDefsIndexState, NodeDefsIndexReducer }

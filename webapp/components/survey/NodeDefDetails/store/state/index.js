@@ -1,1 +1,3 @@
-export * as State from './state'
+import * as State from './state'
+
+export { State }

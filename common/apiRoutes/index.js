@@ -1,2 +1,4 @@
-export * as rChain from './rChain'
-export * as survey from './survey'
+import * as rChain from './rChain'
+import * as survey from './survey'
+
+export { rChain, survey }

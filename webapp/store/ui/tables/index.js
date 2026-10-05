@@ -1,6 +1,6 @@
-export * as TablesActions from './actions'
+import * as TablesActions from './actions'
 import TablesReducer from './reducer'
-export * as TablesState from './state'
+import * as TablesState from './state'
 
-export { TablesReducer }
+export { TablesActions, TablesState, TablesReducer }
 export { useTableMaxRows, useTableSort, useTableVisibleColumns } from './hooks'
