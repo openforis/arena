@@ -1,3 +1,1 @@
-import * as Query from './query'
-
-export { Query }
+export * as Query from './query'

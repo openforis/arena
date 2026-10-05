@@ -1,5 +1,3 @@
-import * as NodeDefsActions from './actions'
-import * as NodeDefsState from './state'
-import NodeDefsReducer from './reducer'
-
-export { NodeDefsActions, NodeDefsState, NodeDefsReducer }
+export * as NodeDefsActions from './actions'
+export * as NodeDefsState from './state'
+export { default as NodeDefsReducer } from './reducer'

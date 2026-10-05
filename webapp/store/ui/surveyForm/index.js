@@ -1,8 +1,7 @@
-import * as SurveyFormActions from './actions'
-import SurveyFormReducer from './reducer'
-import * as SurveyFormState from './state'
+export * as SurveyFormActions from './actions'
+export { default as SurveyFormReducer } from './reducer'
+export * as SurveyFormState from './state'
 
-export { SurveyFormActions, SurveyFormState, SurveyFormReducer }
 export {
   useActiveNodeDefUuid,
   useDependentEnumeratedEntityDefs,

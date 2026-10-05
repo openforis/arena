@@ -1,9 +1,7 @@
 // ====== survey
-import * as SurveyActions from './actions'
-import * as SurveyState from './state'
-import SurveyReducer from './reducer'
-
-export { SurveyActions, SurveyState, SurveyReducer }
+export * as SurveyActions from './actions'
+export * as SurveyState from './state'
+export { default as SurveyReducer } from './reducer'
 
 // ====== survey info
 export { SurveyInfoActions } from './surveyInfo'

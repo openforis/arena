@@ -1,7 +1,5 @@
 import { Validation, ValidationFactory, ValidationFields, ValidationResult, Validations } from '@openforis/arena-core'
 
-import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
-
 // Const objectInvalid = {
 //   [keys.valid]: false,
 //   [keys.errors]: [{ key: 'error_key', params }],
@@ -25,7 +23,7 @@ export type ValidationInstance = Validation
 
 export const keys = Validations.keys
 
-export const messageKeys = ValidatorErrorKeys
+export { ValidatorErrorKeys as messageKeys } from './_validator/validatorErrorKeys'
 
 // ====== CREATE
 
