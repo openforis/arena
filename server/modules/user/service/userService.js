@@ -652,7 +652,7 @@ const _deleteUntouchedSurveysOfExpiredInvitationUsers = async (client) => {
 }
 
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
-  // surveys must be deleted before their users: they are identified by the users expired invitations
+  // surveys must be deleted before their users: they are identified by the users' expired invitations
   const deletedSurveyIds = await _deleteUntouchedSurveysOfExpiredInvitationUsers(client)
 
   Logger.debug('deleting users with expired invitations')
