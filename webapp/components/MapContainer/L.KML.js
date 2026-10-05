@@ -1,4 +1,4 @@
-var L = require('leaflet')
+const L = require('leaflet')
 
 const styleAttributes = new Set(['color', 'width', 'Icon', 'href', 'hotSpot'])
 const groundOverlayAttributes = new Set(['Icon', 'href', 'color'])
@@ -430,9 +430,9 @@ L.KMLIcon = L.Icon.extend({
     return el
   },
   applyCustomStyles: function (img) {
-    var options = this.options
-    var width = options.iconSize[0]
-    var height = options.iconSize[1]
+    const options = this.options
+    const width = options.iconSize[0]
+    const height = options.iconSize[1]
 
     this.options.popupAnchor = [0, -0.83 * height]
     if (options.anchorType.x === 'fraction') img.style.marginLeft = -options.anchorRef.x * width + 'px'
@@ -467,9 +467,9 @@ L.RotatedImageOverlay = L.ImageOverlay.extend({
       this._image.style[L.DomUtil.TRANSFORM] += ' rotate(' + this.options.angle + 'deg)'
     } else if (L.Browser.ie) {
       // fallback for IE6, IE7, IE8
-      var rad = this.options.angle * (Math.PI / 180),
-        costheta = Math.cos(rad),
-        sintheta = Math.sin(rad)
+      const rad = this.options.angle * (Math.PI / 180)
+      const costheta = Math.cos(rad)
+      const sintheta = Math.sin(rad)
       this._image.style.filter +=
         " progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=" +
         costheta +

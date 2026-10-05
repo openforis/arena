@@ -22,13 +22,11 @@ RUN git reset --hard
 
 FROM rocker/rstudio:3.6.1 AS arena-web
 
-# Set RStudio Server working directory
+# Set RStudio Server working directory and install required RStudio Server libraries, NGINX and curl
 RUN mkdir -p /home/rstudio/chains \
-    && echo 'setwd("/home/rstudio/chains")' >> /usr/local/lib/R/etc/Rprofile.site
-
-# Install required RStudio Server libraries, NGINX and curl
-RUN apt-get update \
-    && apt-get install -y libpq-dev nginx curl \
+    && echo 'setwd("/home/rstudio/chains")' >> /usr/local/lib/R/etc/Rprofile.site \
+    && apt-get update \
+    && apt-get install -y curl libpq-dev nginx \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=base /app/infra/nginx/nginx.conf /etc/nginx/sites-available/default
@@ -39,13 +37,14 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
     && apt-get install -y nodejs git \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && npm install pm2 -g
+    && npm install -g --ignore-scripts pm2@5.3.1
 COPY --from=base /app /app
 WORKDIR /app
-RUN npm run build:server:prod && npm run build-prod
+RUN npm run build:server:prod \
+    && npm run build-prod \
+    && ln -s dist/server.js .
 
 # Start
-RUN ln -s dist/server.js .
 COPY --from=base /app/infra/web/start.sh /app/start.sh
 RUN chmod +x start.sh
 CMD ["./start.sh"]

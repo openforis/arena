@@ -208,5 +208,13 @@ describe('RecordExpressionParser Test', () => {
     },
   ]
 
-  NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })
+  const expressionEvaluator = NodeDefExpressionUtils.recordExpressionEvaluator({
+    surveyFn: () => survey,
+    recordFn: () => record,
+  })
+
+  test.each(NodeDefExpressionUtils.toTestCases(queries))('%s', async (_title, query) => {
+    const { actual, expected } = await NodeDefExpressionUtils.evaluateQuery({ query, expressionEvaluator })
+    expect(actual).toEqual(expected)
+  })
 })

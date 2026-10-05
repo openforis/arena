@@ -279,14 +279,7 @@ export const persistNode = async (
 export const updateNodesDependents = NodeUpdateManager.updateNodesDependents
 
 export const deleteNode = async (
-  user,
-  survey,
-  record,
-  nodeUuid,
-  timezoneOffset,
-  lang,
-  nodesUpdateListener = null,
-  nodesValidationListener = null,
+  { user, survey, record, nodeUuid, timezoneOffset, lang, nodesUpdateListener = null, nodesValidationListener = null },
   t = db
 ) =>
   _updateNodeAndValidateRecordUniqueness(

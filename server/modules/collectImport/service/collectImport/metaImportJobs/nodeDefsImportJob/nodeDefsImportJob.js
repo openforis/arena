@@ -54,6 +54,20 @@ const _extractTextProps = (collectNodeDef) =>
     ? { [NodeDef.propKeys.textInputType]: NodeDef.textInputTypes.multiLine }
     : {}
 
+const _updateVisibilityLayoutProps = ({ collectNodeDef, updateLayoutProp }) => {
+  const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
+  if (hiddenWhenNotRelevant) {
+    updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
+  }
+  const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
+  const hiddenInMobile =
+    StringUtils.isNotBlank(relevantExpr) &&
+    ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/g, ''))
+  if (hiddenInMobile) {
+    updateLayoutProp({ propName: NodeDefLayout.keys.hiddenInMobile, value: true })
+  }
+}
+
 export default class NodeDefsImportJob extends Job {
   constructor(params) {
     super(NodeDefsImportJob.type, params)
@@ -153,6 +167,18 @@ export default class NodeDefsImportJob extends Job {
    * @param {string} field - Node sub-field.
    * @returns {Promise<object>} - Inserted node definitions.
    */
+  _addNodeDefInfoToCache({ collectNodeDefPath, nodeDefUuid, field }) {
+    let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]
+    if (!nodeDefsInfo) {
+      nodeDefsInfo = []
+      this.nodeDefsInfoByCollectPath[collectNodeDefPath] = nodeDefsInfo
+    }
+    nodeDefsInfo.push({
+      uuid: nodeDefUuid,
+      ...(field ? { field } : {}),
+    })
+  }
+
   async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
     const nodeDefsUpdated = {}
     const nodeDefsInserted = {}
@@ -233,20 +259,8 @@ export default class NodeDefsImportJob extends Job {
       Object.assign(propsUpdated, _extractTextProps(collectNodeDef))
     }
 
-    // 4a. update hidden when not relevant layout prop
-    const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
-    if (hiddenWhenNotRelevant) {
-      _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
-    }
-
-    // 4b. update hiddenInMobile layout prop
-    const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
-    const hiddenInMobile =
-      StringUtils.isNotBlank(relevantExpr) &&
-      ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/g, ''))
-    if (hiddenInMobile) {
-      _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenInMobile, value: true })
-    }
+    // 4. update visibility layout props
+    _updateVisibilityLayoutProps({ collectNodeDef, updateLayoutProp: _updateLayoutProp })
 
     Object.assign(this.nodeDefs, nodeDefsInserted, nodeDefsUpdated)
 
@@ -271,16 +285,7 @@ export default class NodeDefsImportJob extends Job {
     nodeDef = nodeDefsUpdated[nodeDefUuid]
 
     // 6. store nodeDef in cache
-    let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]
-    if (!nodeDefsInfo) {
-      nodeDefsInfo = []
-      this.nodeDefsInfoByCollectPath[collectNodeDefPath] = nodeDefsInfo
-    }
-
-    nodeDefsInfo.push({
-      uuid: nodeDefUuid,
-      ...(field ? { field } : {}),
-    })
+    this._addNodeDefInfoToCache({ collectNodeDefPath, nodeDefUuid, field })
 
     nodeDefsInserted[nodeDefUuid] = nodeDef
 

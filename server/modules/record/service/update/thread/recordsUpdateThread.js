@@ -278,14 +278,16 @@ export class RecordsUpdateThread extends Thread {
       fn: async (t) => {
         let record = await this.getOrFetchRecord({ msg, recordUuid, t })
         record = await RecordManager.deleteNode(
-          user,
-          survey,
-          record,
-          nodeUuid,
-          timezoneOffset,
-          lang,
-          (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
-          (validations) => this.handleNodesValidationUpdated({ record, validations }),
+          {
+            user,
+            survey,
+            record,
+            nodeUuid,
+            timezoneOffset,
+            lang,
+            nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
+            nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
+          },
           t
         )
         await this.cacheRecordWithDbDateModified({ surveyId, recordUuid, record, recordsCache, t })
