@@ -41,6 +41,7 @@ const LevelDetails = (props) => {
     <div
       id={`category-level-${levelIndex}`}
       className={classNames('category__level', { single })}
+      data-level-index={levelIndex}
       data-testid={TestId.categoryDetails.level(levelIndex)}
     >
       <ErrorBadge

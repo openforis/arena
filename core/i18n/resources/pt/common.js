@@ -1395,6 +1395,7 @@ O nome da categoria será apagado (você precisará dar um novo nome a ela), e a
     geoPackageCategoryInfo: `Esta categoria possui uma propriedade extra chamada '${locationItemExtraDefName}', que permite exportá-la como um arquivo GeoPackage.`,
     samplingPointDataCategoryType: 'Esta é a categoria de Dados de Ponto Amostral',
     samplingPointDataCategoryTypeInfo: `Esta é uma categoria predefinida para dados de ponto amostral. Ela possui uma propriedade extra chamada '${locationItemExtraDefName}', que permite exportá-la como um arquivo GeoPackage.`,
+    samplingPointDataCategoryLocationMissing: `A propriedade extra '${locationItemExtraDefName}' está ausente`,
     createCategory: {
       menuLabel: 'Adicionar categoria',
       simple: 'Categoria simples',

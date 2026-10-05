@@ -1379,6 +1379,7 @@ $t(common.cantUndoWarning)`,
     geoPackageCategoryInfo: `このカテゴリには「${locationItemExtraDefName}」という追加プロパティがあり、GeoPackageファイルとしてエクスポートできます。`,
     samplingPointDataCategoryType: 'これは抽出地点データカテゴリです',
     samplingPointDataCategoryTypeInfo: `これは抽出地点データ用の定義済みカテゴリです。「${locationItemExtraDefName}」という追加プロパティがあり、GeoPackageファイルとしてエクスポートできます。`,
+    samplingPointDataCategoryLocationMissing: `追加プロパティ「${locationItemExtraDefName}」がありません`,
     createCategory: {
       menuLabel: 'カテゴリを追加',
       simple: '単純カテゴリ',

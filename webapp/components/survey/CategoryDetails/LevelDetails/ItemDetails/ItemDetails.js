@@ -3,6 +3,8 @@ import './itemDetails.scss'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
+import ErrorRounded from '@mui/icons-material/ErrorRounded'
+import ExpandMore from '@mui/icons-material/ExpandMore'
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -36,6 +38,7 @@ const ItemDetails = (props) => {
   const categoryUuid = useMemo(() => Category.getUuid(category), [category])
   const itemExtraDefsArray = Category.getItemExtraDefsArray(category)
   const validation = Category.getItemValidation(item)(category)
+  const valid = Validation.isValid(validation)
   const { published: disabled } = item
   const code = CategoryItem.getCode(item)
   const label = CategoryItem.getLabel(lang, false)(item)
@@ -52,8 +55,7 @@ const ItemDetails = (props) => {
     (levelIsLast || !Category.isReportingData(category) || itemExtraDefsArray.length > 1)
 
   const Actions = useActions({ setState })
-
-  const setActive = () => (active ? null : Actions.setItemActive({ categoryUuid, levelIndex, itemUuid }))
+  const { setItemActive, resetItemActive } = Actions
 
   const updateProp = useCallback(
     ({ key, value }) => {
@@ -74,6 +76,7 @@ const ItemDetails = (props) => {
 
   // Update item when itemProp changes (e.g. after saving the item or when another item is selected)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- keeps the local item in sync with the item prop
     setItem(itemProp)
   }, [itemProp])
 
@@ -95,34 +98,98 @@ const ItemDetails = (props) => {
 
   const prefixId = `category-level-${levelIndex}-item-${index}`
 
+  const toggleActive = useCallback(() => {
+    if (active) {
+      resetItemActive({ levelIndex })
+    } else {
+      setItemActive({ categoryUuid, levelIndex, itemUuid })
+    }
+  }, [active, categoryUuid, itemUuid, levelIndex, resetItemActive, setItemActive])
+
+  const onHeaderKeyDown = useCallback(
+    (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        toggleActive()
+      }
+    },
+    [toggleActive]
+  )
+
+  const onToggleBtnClick = useCallback(
+    (event) => {
+      event.stopPropagation()
+      toggleActive()
+    },
+    [toggleActive]
+  )
+
+  // collapse the item when clicking outside of it, unless nested levels are showing its descendants
+  useEffect(() => {
+    if (!active) return undefined
+
+    const onDocumentClick = (event) => {
+      const { target } = event
+      const elem = elemRef.current
+      const categoryElem = elem?.closest('.category')
+      // ignore clicks outside of the category editor (e.g. dialogs) or inside the item itself
+      if (!categoryElem?.contains(target) || elem.contains(target)) return
+      if (!leaf) return
+      const targetLevelElem = target.closest('.category__level')
+      if (targetLevelElem && Number(targetLevelElem.dataset.levelIndex) > levelIndex) return
+      resetItemActive({ levelIndex, itemUuid })
+    }
+    document.addEventListener('click', onDocumentClick)
+    return () => document.removeEventListener('click', onDocumentClick)
+  }, [active, itemUuid, leaf, levelIndex, resetItemActive])
+
   return (
     <div
       id={prefixId}
       data-testid={TestId.categoryDetails.item(levelIndex, index)}
-      className={classNames('category__item', { active, 'not-valid': !Validation.isValid(validation) })}
+      className={classNames('category__item', { active, 'not-valid': !valid })}
       key={CategoryItem.getUuid(item)}
-      onKeyDown={setActive}
-      onClick={setActive}
       ref={elemRef}
-      role="button"
-      tabIndex={0}
     >
-      <ErrorBadge
-        id={TestId.categoryDetails.itemErrorBadge(levelIndex, index)}
-        validation={validation}
-        showLabel={false}
-        showIcon
-      />
-      {active ? (
-        <>
-          <Button
-            id={`${prefixId}-btn-close`}
-            testId={TestId.categoryDetails.itemCloseBtn(levelIndex, index)}
-            className="btn-s btn-close"
-            iconClassName="icon-arrow-up icon-12px"
-            onClick={() => Actions.resetItemActive({ levelIndex })}
-          />
+      <div
+        className="category__item-header"
+        onClick={toggleActive}
+        onKeyDown={onHeaderKeyDown}
+        role="button"
+        tabIndex={0}
+        aria-expanded={active}
+      >
+        {!valid && (
+          <ErrorBadge
+            className="error-badge-inverse"
+            id={TestId.categoryDetails.itemErrorBadge(levelIndex, index)}
+            validation={validation}
+            showLabel={false}
+          >
+            <ErrorRounded
+              className={classNames('category__item-error-icon', {
+                warning: !Validation.isError(validation) && Validation.isWarning(validation),
+              })}
+            />
+          </ErrorBadge>
+        )}
+        <div className="category__item-index">#{index + 1}</div>
+        <div className={classNames('ellipsis', 'category__item-code', { empty: !code })}>{code || '---'}</div>
+        <div className={classNames('ellipsis', 'category__item-label', { empty: !label })}>{label || '---'}</div>
+        <Button
+          id={`${prefixId}-btn-toggle`}
+          testId={active ? TestId.categoryDetails.itemCloseBtn(levelIndex, index) : null}
+          className="category__item-toggle-btn"
+          icon={<ExpandMore className="category__item-toggle-icon" />}
+          onClick={onToggleBtnClick}
+          size="small"
+          tabIndex={-1}
+          variant="text"
+        />
+      </div>
 
+      {active && (
+        <div className="category__item-body">
           <FormItem label="common.code">
             <Input
               autoFocus
@@ -188,16 +255,7 @@ const ItemDetails = (props) => {
               />
             </div>
           )}
-        </>
-      ) : (
-        <>
-          <div className="category__item-index">#{index + 1}</div>
-          <div className={classNames('ellipsis', 'category__item-code', { empty: !code })}>{code || '---'}</div>
-          <div>
-            {'\u00A0'}-{'\u00A0'}
-          </div>
-          <div className={classNames('ellipsis', { empty: !label })}>{label || '---'}</div>
-        </>
+        </div>
       )}
     </div>
   )
