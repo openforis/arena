@@ -11,7 +11,7 @@ const ValidationTooltip = (props) => {
 
   const isValid = Validation.isValid(validation)
 
-  let type = undefined
+  let type
   if (Validation.isError(validation)) type = 'error'
   else if (Validation.isWarning(validation)) type = 'warning'
 
