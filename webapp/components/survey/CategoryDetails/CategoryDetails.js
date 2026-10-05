@@ -269,7 +269,7 @@ const CategoryDetails = (props) => {
               {isSamplingPointData ? (
                 <span className="category-type-label">
                   {i18n.t('categoryEdit.samplingPointDataCategoryType')}
-                  <ButtonIconInfo title="categoryEdit.samplingPointDataCategoryTypeInfo" />
+                  {hasLocationExtraProp && <ButtonIconInfo title="categoryEdit.samplingPointDataCategoryTypeInfo" />}
                 </span>
               ) : (
                 hasLocationExtraProp && (
@@ -280,6 +280,14 @@ const CategoryDetails = (props) => {
                 )
               )}
             </div>
+            {isSamplingPointData && !hasLocationExtraProp && (
+              <div className="row">
+                <span className="category-type-warning">
+                  <span className="icon icon-warning icon-12px" />
+                  {i18n.t('categoryEdit.samplingPointDataCategoryLocationMissing')}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

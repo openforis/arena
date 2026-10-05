@@ -1388,6 +1388,7 @@ The category name will be cleared (you'll need to give it a new name), and the '
     geoPackageCategoryInfo: `This category has an extra property called '${locationItemExtraDefName}', which allows it to be exported as a GeoPackage file.`,
     samplingPointDataCategoryType: 'This is the Sampling Point Data category',
     samplingPointDataCategoryTypeInfo: `This is a predefined category for sampling point data. It has an extra property called '${locationItemExtraDefName}', which allows it to be exported as a GeoPackage file.`,
+    samplingPointDataCategoryLocationMissing: `The '${locationItemExtraDefName}' extra property is missing`,
     createCategory: {
       menuLabel: 'Add category',
       simple: 'Simple category',
