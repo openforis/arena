@@ -20,7 +20,7 @@ import * as FlatDataReader from '@server/utils/file/flatDataReader'
 const SPECIES_FILES_PATH = 'species/'
 const VERNACULAR_NAMES_SEPARATOR_REGEX = /[,/]/
 
-const fixedColumns = ['id', 'parent_id', 'rank', 'no', 'code', 'scientific_name', 'synonyms']
+const fixedColumns = new Set(['id', 'parent_id', 'rank', 'no', 'code', 'scientific_name', 'synonyms'])
 
 /**
  * Inserts a taxonomy for each taxonomy in the Collect survey.
@@ -126,7 +126,7 @@ export default class TaxonomiesImportJob extends Job {
   async onHeaders(headers) {
     this.vernacularLangCodes = A.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
     this.extraPropsDefs = headers.reduce((extraPropsAcc, header) => {
-      if (!fixedColumns.includes(header) && !languageCodesISO639part2.includes(header)) {
+      if (!fixedColumns.has(header) && !languageCodesISO639part2.includes(header)) {
         extraPropsAcc[header] = { key: header }
       }
       return extraPropsAcc

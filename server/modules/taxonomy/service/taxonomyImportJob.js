@@ -21,10 +21,10 @@ import TaxonCSVParser from './taxonCSVParser'
 import SystemError from '@core/systemError'
 
 const requiredColumns = ['code', 'scientific_name']
-const fixedColumns = [...requiredColumns, 'family', 'genus']
+const fixedColumns = new Set([...requiredColumns, 'family', 'genus'])
 
 const filterExtraPropsColumns = (columns) =>
-  columns.filter((column) => !fixedColumns.includes(column) && !languageCodesISO639part2.includes(column))
+  columns.filter((column) => !fixedColumns.has(column) && !languageCodesISO639part2.includes(column))
 
 export default class TaxonomyImportJob extends Job {
   static maxMissingPublishedTaxaCodesPreview = 10

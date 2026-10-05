@@ -79,12 +79,12 @@ const Dropzone = (props) => {
     (fileRejections) => {
       const errorMessages = fileRejections.map((fileRejection) => {
         const { errors, file } = fileRejection
-        const errorCodes = errors.map((error) => error.code)
+        const errorCodes = new Set(errors.map((error) => error.code))
 
-        if (errorCodes.includes('file-invalid-type')) {
+        if (errorCodes.has('file-invalid-type')) {
           const extension = FileUtils.getExtension(file.path)
           return i18n.t('dropzone.error.invalidFileExtension', { extension })
-        } else if (errorCodes.includes('file-too-large')) {
+        } else if (errorCodes.has('file-too-large')) {
           return i18n.t('dropzone.error.fileTooBig')
         } else {
           return i18n.t('dropzone.error.fileNotValid')

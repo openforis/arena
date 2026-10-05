@@ -144,9 +144,9 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
 
   // check if some existing entity area node def is not valid anymore and must be deleted
   const existingEntityAreaNodeDefs = getAllEntityAreaNodeDefs({ survey, chain })
-  const validNodeDefsAlreadyExistingUuids = validNodeDefsAlreadyExisting.map(NodeDef.getUuid)
+  const validNodeDefsAlreadyExistingUuids = new Set(validNodeDefsAlreadyExisting.map(NodeDef.getUuid))
   const existingEntityAreaNodeDefsToDelete = existingEntityAreaNodeDefs.filter(
-    (existingSamplingNodeDef) => !validNodeDefsAlreadyExistingUuids.includes(NodeDef.getUuid(existingSamplingNodeDef))
+    (existingSamplingNodeDef) => !validNodeDefsAlreadyExistingUuids.has(NodeDef.getUuid(existingSamplingNodeDef))
   )
 
   nodeDefsToDelete.push(...existingEntityAreaNodeDefsToDelete)
@@ -155,11 +155,10 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
 }
 
 const getSamplingDefsInEntities = ({ survey, chain, entities, analysisNodeDefs }) => {
-  const entityUuids = entities.map(NodeDef.getUuid)
+  const entityUuids = new Set(entities.map(NodeDef.getUuid))
 
   const samplingDefs = analysisNodeDefs.filter(
-    (analysisNodeDef) =>
-      NodeDef.isSampling(analysisNodeDef) && entityUuids.includes(NodeDef.getParentUuid(analysisNodeDef))
+    (analysisNodeDef) => NodeDef.isSampling(analysisNodeDef) && entityUuids.has(NodeDef.getParentUuid(analysisNodeDef))
   )
 
   // put the "weight" node def first
