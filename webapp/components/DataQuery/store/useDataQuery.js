@@ -69,8 +69,8 @@ export const useDataQuery = ({ query, limitData = true }) => {
   }, [entityDefUuid, hasSelection, modeAggregate, countDimensions, filter, filterRecordUuid])
 
   return {
-    count: count && count.data,
-    data: data && data.data,
+    count: count?.data,
+    data: data?.data,
     dataEmpty,
     dataLoaded,
     dataLoading,

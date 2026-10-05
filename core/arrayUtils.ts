@@ -83,7 +83,8 @@ const last = <T>(array?: T[] | null): T | undefined => array?.at(-1)
 
 const sortByProps =
   <T extends Record<string, any>>(props: string[]) =>
-  (array: T[]): T[] =>
+  (array: T[]): T[] => {
+    // sorts in place, as callers may rely on it
     array.sort((item1, item2) => {
       for (const prop of props) {
         const value1 = item1[prop]
@@ -93,6 +94,8 @@ const sortByProps =
       }
       return 0
     })
+    return array
+  }
 
 const sortById = sortByProps(['id'])
 

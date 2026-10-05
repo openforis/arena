@@ -12,7 +12,7 @@ const keys = {
 } as const
 
 const getUuid = (device: Record<string, unknown>): string | undefined => device[keys.uuid] as string | undefined
-const getDeviceName = (device: Record<string, unknown>): string => String(device[keys.deviceName] ?? '')
+const getDeviceName = (device: Record<string, unknown>): string => (device[keys.deviceName] as string | undefined) ?? ''
 const isEnabled = (device: Record<string, unknown>): boolean => Boolean(device[keys.enabled] ?? false)
 const getDateCreated = (device: Record<string, unknown>): unknown => device[keys.dateCreated] ?? null
 const getDateModified = (device: Record<string, unknown>): unknown => device[keys.dateModified] ?? null

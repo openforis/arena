@@ -137,10 +137,10 @@ export const DataImportArenaView = () => {
   )
 
   const onFilesDrop = useCallback(async (files) => {
-    const _file = files.filter((file) => {
+    const _file = files.find((file) => {
       const extension = FileUtils.getExtension(file)
       return acceptedFileExtensions.includes(extension)
-    })[0]
+    })
     setState((state) => ({ ...state, file: _file, fileId: UUIDs.v4(), previewItems: null }))
   }, [])
 

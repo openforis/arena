@@ -2,17 +2,17 @@ import { useCallback } from 'react'
 
 import { State } from '../state'
 
+const wrapItemsFetchFunction = (itemsFetchFn, itemsFilter) => async (searchValue) => {
+  const itemsRes = await itemsFetchFn(searchValue)
+  const itemsArray = Array.isArray(itemsRes) ? itemsRes : Object.values(itemsRes?.data?.items ?? {})
+  return itemsArray.filter(itemsFilter)
+}
+
 export const useRejectSelectedItems = () =>
   useCallback(({ selection, state, items }) => {
     const selectionKeys = new Set(selection.map(State.getItemKey(state)))
     const removeSelectedItems = (item) => !selectionKeys.has(State.getItemKey(state)(item))
 
-    if (items.constructor === Array) {
-      return items.filter(removeSelectedItems)
-    }
-    return async (searchValue) => {
-      const itemsRes = await items(searchValue)
-      const itemsArray = Array.isArray(itemsRes) ? itemsRes : Object.values(itemsRes?.data?.items ?? {})
-      return itemsArray.filter(removeSelectedItems)
-    }
+    // items can be an array or a function fetching them
+    return Array.isArray(items) ? items.filter(removeSelectedItems) : wrapItemsFetchFunction(items, removeSelectedItems)
   }, [])

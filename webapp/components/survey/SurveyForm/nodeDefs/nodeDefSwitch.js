@@ -206,6 +206,18 @@ const getClassName = ({
   })
 }
 
+const NodeDefBody = ({ renderType, nestedComponentsProps }) =>
+  renderType === NodeDefLayout.renderType.tableBody ? (
+    <NodeDefTableCellBody {...nestedComponentsProps} />
+  ) : (
+    <NodeDefFormItem {...nestedComponentsProps} />
+  )
+
+NodeDefBody.propTypes = {
+  nestedComponentsProps: PropTypes.object.isRequired,
+  renderType: PropTypes.string.isRequired,
+}
+
 const NodeDefSwitch = (props) => {
   const {
     canEditDef,
@@ -368,10 +380,8 @@ const NodeDefSwitch = (props) => {
           sortCriteria={sortCriteria}
           onSortBy={onSortBy}
         />
-      ) : renderType === NodeDefLayout.renderType.tableBody ? (
-        <NodeDefTableCellBody {...nestedComponentsProps} />
       ) : (
-        <NodeDefFormItem {...nestedComponentsProps} />
+        <NodeDefBody renderType={renderType} nestedComponentsProps={nestedComponentsProps} />
       )}
     </div>
   )

@@ -84,28 +84,29 @@ export const insertItem = (
     transformCallback
   )
 
-export const insertItems = async (
+export const insertItems = (
   {
     surveyId,
     source,
     items = [],
   }: { surveyId: number; source: ImportReportSource; items?: { nodeDefUuid: string; props: any; resolved: boolean }[] },
   client: any = db
-) =>
-  items.length > 0 &&
-  client.none(
-    DbUtils.insertAllQueryBatch(
-      Schemata.getSchemaSurvey(surveyId),
-      table,
-      ['node_def_uuid', 'props', 'resolved', 'source'],
-      items.map((item) => ({
-        node_def_uuid: item.nodeDefUuid,
-        props: item.props,
-        resolved: item.resolved,
-        source,
-      }))
-    )
-  )
+): Promise<unknown> =>
+  items.length === 0
+    ? Promise.resolve()
+    : client.none(
+        DbUtils.insertAllQueryBatch(
+          Schemata.getSchemaSurvey(surveyId),
+          table,
+          ['node_def_uuid', 'props', 'resolved', 'source'],
+          items.map((item) => ({
+            node_def_uuid: item.nodeDefUuid,
+            props: item.props,
+            resolved: item.resolved,
+            source,
+          }))
+        )
+      )
 
 export const updateItem = (
   surveyId: number,

@@ -175,12 +175,12 @@ export const deleteByRecordUuid = async (
 /**
  * Deletes all printable export shares for multiple records.
  */
-export const deleteByRecordUuids = async (
+export const deleteByRecordUuids = (
   { surveyId, recordUuids }: { surveyId: number; recordUuids: string[] },
   client: DbClient = db
 ): Promise<DeletedShareFileRow[]> => {
   if (!recordUuids?.length) {
-    return []
+    return Promise.resolve([])
   }
   return client.manyOrNone(
     `

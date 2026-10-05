@@ -47,8 +47,7 @@ const _getGeometryPointTypeItemName = ({ columnName }) => {
 const _getGeometryPointTypeColumnNames = ({ itemName }) => locationColumnsSuffixes.map((suffix) => itemName + suffix)
 
 const _isGeometryPointType = ({ columnName, columnNames }) => {
-  const locationColSuffix = locationColumnsSuffixes.find((suffix) => columnName.endsWith(suffix))
-  if (!locationColSuffix) {
+  if (!locationColumnsSuffixes.some((suffix) => columnName.endsWith(suffix))) {
     return false
   }
   const itemName = _getGeometryPointTypeItemName({ columnName })

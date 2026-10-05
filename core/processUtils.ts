@@ -1,9 +1,9 @@
-const isTrue = (val: unknown): boolean => String(val).toLocaleLowerCase() === 'true' || String(val) === '1'
+const isTrue = (val: string | undefined): boolean => val?.toLocaleLowerCase() === 'true' || val === '1'
 
-const getJson = (val: unknown): unknown => {
+const getJson = (val: string | undefined): unknown => {
   if (!val) return undefined
   try {
-    return JSON.parse(String(val))
+    return JSON.parse(val)
   } catch {
     return undefined
   }
