@@ -172,7 +172,7 @@ export const generate = async ({ user, surveyId, nodeDefUuid, expressionType, de
  *   The streaming result.
  */
 export const explain = async ({ user, surveyId, nodeDefUuid, expression, errorMessage, signal }) => {
-  if (!expression || !expression.trim()) {
+  if (!expression?.trim()) {
     throw new SystemError('aiExpressionExpressionMissing')
   }
   if (expression.length > MAX_EXPRESSION_LEN) {

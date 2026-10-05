@@ -40,7 +40,7 @@ const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
 class SurveyBuilder {
   constructor(user, rootDefBuilder) {
     this.user = user
-    this.name = `do_not_use__test_${new Date().getTime()}`
+    this.name = `do_not_use__test_${Date.now()}`
     this.label = 'DO NOT USE! Test'
     this.lang = 'en'
     this.rootDefBuilder = rootDefBuilder

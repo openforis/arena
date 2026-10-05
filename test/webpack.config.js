@@ -1,5 +1,5 @@
 const fs = require('node:fs')
-const path = require('path')
+const path = require('node:path')
 const glob = require('glob')
 const nodeExternals = require('webpack-node-externals')
 
@@ -19,7 +19,7 @@ const isEsmOnlyModule = (moduleName) => {
 const getEntry = (type) =>
   // glob v13 requires forward slashes; path.resolve uses backslashes on Windows.
   glob
-    .globSync(path.resolve(__dirname, type, 'tests', '*.{js,jsx,ts,tsx}').replace(/\\/g, '/'))
+    .globSync(path.resolve(__dirname, type, 'tests', '*.{js,jsx,ts,tsx}').replaceAll('\\', '/'))
     .sort((fileA, fileB) => {
       const idxA = path.basename(fileA).substr(0, 3)
       const idxB = path.basename(fileB).substr(0, 3)

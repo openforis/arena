@@ -15,7 +15,7 @@ class JobThread extends Thread {
     this.jobEndNotified = false
 
     this.job.onEvent(() => this.sendJobToParentThread())
-    startJobEnsuringEndNotification({
+    void startJobEnsuringEndNotification({
       job: this.job,
       isEndNotified: () => this.jobEndNotified,
       notifyJob: () => this.sendJobToParentThread(),

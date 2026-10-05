@@ -60,7 +60,7 @@ const ChainDetails = () => {
         navigate(`${appModuleUri(analysisModules.chain)}${chainUuid}/`, { replace: true })
       }
     }
-    init()
+    void init()
   }, [dispatch, chainUuid, canHaveRecords, justCreated, navigate])
 
   const locationPathMatcher = useLocationPathMatcher()

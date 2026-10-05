@@ -32,7 +32,8 @@ export const WhispMenuButton = (props) => {
       const csvDownloadUrl = getWhispDataDownloadUrl(token)
       setWhispDataLoading(false)
       window.open(csvDownloadUrl, labels.whisp)
-    } catch (_error) {
+    } catch {
+      // the error is notified by the global axios interceptor
       setWhispDataLoading(false)
     }
   }, [geoJsonGenerator, surveyId])

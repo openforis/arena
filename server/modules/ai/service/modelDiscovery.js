@@ -23,7 +23,8 @@ const fetchWithTimeout = async (url, { headers, timeoutMs = DEFAULT_TIMEOUT_MS }
     const response = await fetch(url, { method: 'GET', headers, signal: controller.signal })
     if (!response.ok) {
       const body = await response.text().catch(() => '')
-      throw new Error(`HTTP ${response.status}${body ? ` — ${body.slice(0, 200)}` : ''}`)
+      const bodySuffix = body ? ` — ${body.slice(0, 200)}` : ''
+      throw new Error(`HTTP ${response.status}${bodySuffix}`)
     }
     return response.json()
   } finally {
@@ -31,7 +32,12 @@ const fetchWithTimeout = async (url, { headers, timeoutMs = DEFAULT_TIMEOUT_MS }
   }
 }
 
-const stripTrailingSlash = (s) => (s ? s.replace(/\/+$/, '') : s)
+const stripTrailingSlash = (s) => {
+  if (!s) return s
+  let end = s.length
+  while (end > 0 && s[end - 1] === '/') end -= 1
+  return s.slice(0, end)
+}
 
 const normaliseOpenAiBase = (baseUrl) => stripTrailingSlash(baseUrl || 'https://api.openai.com/v1')
 

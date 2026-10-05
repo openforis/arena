@@ -109,7 +109,6 @@ const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
 }
 
 // ====== PERSIST
-/* eslint-disable */
 /**
  * @deprecated
  */
@@ -127,7 +126,7 @@ export const _deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cl
   const deletedChainUuid = Chain.getUuid(deletedChain)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
     { surveyId, draft: true, advanced: true, includeAnalysis: true },
-    (client = DB.client)
+    client
   )
 
   const nodeDefsUuidsInDeleteChains = Survey.getNodeDefsArray(survey)

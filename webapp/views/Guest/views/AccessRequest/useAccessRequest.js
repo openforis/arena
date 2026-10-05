@@ -14,7 +14,7 @@ export const useAccessRequest = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
 
-  const [request, setRequestState] = useState({})
+  const [request, setRequest] = useState({})
   const [requestSentSuccessfully, setRequestSentSuccessfully] = useState(false)
   const [validation, setValidation] = useState(null)
   const reCaptchaRef = useRef(null)
@@ -24,7 +24,7 @@ export const useAccessRequest = () => {
   const validate = async () => setValidation(await UserAccessRequestValidator.validateUserAccessRequest(request))
 
   const onFieldValueChange = async ({ name, value }) => {
-    setRequestState((reqPrev) => ObjectUtils.setInPath(name.split('.'), value)({ ...reqPrev }))
+    setRequest((reqPrev) => ObjectUtils.setInPath(name.split('.'), value)({ ...reqPrev }))
     await validate()
   }
 

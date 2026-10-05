@@ -260,7 +260,7 @@ arena.login = function(tentative) {
 
 arena.waitForJobToComplete = function(job) {
   if (is.null(job)) {
-    stop("Error: job not started properly")
+    stop("Error: job not started properly", call. = FALSE)
   }
   pb <- txtProgressBar(min = 0, max = 100)
   while (!is.null(job) && (job$status == 'pending' || job$status == 'running')) {
@@ -274,10 +274,10 @@ arena.waitForJobToComplete = function(job) {
   }
   close(pb)
   if (is.null(job)) {
-    stop("Job complete but state is unknown")
+    stop("Job complete but state is unknown", call. = FALSE)
   }
   if (job$status == 'succeeded') {
     return(TRUE)
   }
-  stop("Error: job failed or canceled")
+  stop("Error: job failed or canceled", call. = FALSE)
 }

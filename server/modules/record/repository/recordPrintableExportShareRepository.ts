@@ -26,7 +26,7 @@ export type DeletedShareFileRow = {
 /**
  * Fetches a printable export share for an entity node.
  */
-export const fetchBySurveyRecordEntityNode = async (
+export const fetchBySurveyRecordEntityNode = (
   {
     surveyId,
     recordUuid,
@@ -51,7 +51,7 @@ export const fetchBySurveyRecordEntityNode = async (
 /**
  * Fetches and locks a printable export share for an entity node.
  */
-export const fetchBySurveyRecordEntityNodeForUpdate = async (
+export const fetchBySurveyRecordEntityNodeForUpdate = (
   {
     surveyId,
     recordUuid,
@@ -77,7 +77,7 @@ export const fetchBySurveyRecordEntityNodeForUpdate = async (
 /**
  * Fetches a printable export share by access token.
  */
-export const fetchByAccessToken = async (
+export const fetchByAccessToken = (
   { accessToken }: { accessToken: string },
   client: DbClient = db
 ): Promise<RecordPrintableExportShareRow | null> =>
@@ -92,7 +92,7 @@ export const fetchByAccessToken = async (
 /**
  * Inserts a printable export share.
  */
-export const insert = async (
+export const insert = (
   {
     surveyId,
     recordUuid,
@@ -127,7 +127,7 @@ export const insert = async (
 /**
  * Refreshes a printable export share after re-export.
  */
-export const updateOnReexport = async (
+export const updateOnReexport = (
   {
     uuid,
     fileUuid,
@@ -155,7 +155,7 @@ export const updateOnReexport = async (
 /**
  * Increments the download count of a printable export share.
  */
-export const incrementDownloadCount = async ({ uuid }: { uuid: string }, client: DbClient = db): Promise<null> =>
+export const incrementDownloadCount = ({ uuid }: { uuid: string }, client: DbClient = db): Promise<null> =>
   client.none(
     `
     UPDATE ${TABLE_NAME}

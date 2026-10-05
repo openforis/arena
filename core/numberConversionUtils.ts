@@ -48,7 +48,7 @@ const dataStorageUnitToBytesConversionFactor = {
 const _convertNumberToUnit =
   (converter: (value: number) => number) =>
   (value: unknown): number =>
-    Objects.isNil(value) ? NaN : converter(Number(value))
+    Objects.isNil(value) ? Number.NaN : converter(Number(value))
 
 const squareMetersToUnit =
   (unit: keyof typeof areaUnitToSquareMetersConversionFactor) =>

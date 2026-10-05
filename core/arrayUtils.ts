@@ -79,7 +79,7 @@ const fromNumberOfElements = (numOfElements: number): number[] => Array.from(new
 
 const first = <T>(array?: T[] | null): T | undefined => array?.[0]
 
-const last = <T>(array?: T[] | null): T | undefined => (array && array.length > 0 ? array[array.length - 1] : undefined)
+const last = <T>(array?: T[] | null): T | undefined => array?.at(-1)
 
 const sortByProps =
   <T extends Record<string, any>>(props: string[]) =>

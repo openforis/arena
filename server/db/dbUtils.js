@@ -145,9 +145,9 @@ export const getPropsPublishedCondition = ({ draft, tableAlias = null }) => {
  */
 export const getPropsCombined = (draft, tableAlias = '', alias = 'props') => {
   const columnPrefix = tableAlias ? Strings.appendIfMissing('.')(tableAlias) : ''
-  return draft
-    ? `${columnPrefix}props || ${columnPrefix}props_draft${alias ? ` AS ${alias}` : ''}`
-    : `${columnPrefix}props${alias ? ` AS ${alias}` : ''}`
+  const aliasSql = alias ? ` AS ${alias}` : ''
+  const propsSql = draft ? `${columnPrefix}props || ${columnPrefix}props_draft` : `${columnPrefix}props`
+  return `${propsSql}${aliasSql}`
 }
 /**
  * Combines a draft and a published column prop, if needed.
@@ -158,8 +158,10 @@ export const getPropsCombined = (draft, tableAlias = '', alias = 'props') => {
  * @param {string} alias - Alias of the result column.
  * @returns {string} - The column with combined props.
  */
-export const getPropColCombined = (propName, draft, columnPrefix = '', asText = true, alias = null) =>
-  `(${getPropsCombined(draft, columnPrefix, null)})${asText ? '->>' : '->'}'${propName}'${alias ? ` AS ${alias}` : ''}`
+export const getPropColCombined = (propName, draft, columnPrefix = '', asText = true, alias = null) => {
+  const aliasSql = alias ? ` AS ${alias}` : ''
+  return `(${getPropsCombined(draft, columnPrefix, null)})${asText ? '->>' : '->'}'${propName}'${aliasSql}`
+}
 
 /**
  * Generates a filter condition (LIKE) with a named parameter.

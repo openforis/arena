@@ -78,7 +78,7 @@ export const AiGenerateQueryPopup = (props: Props) => {
           onKeyDown={(e) => {
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
               e.preventDefault()
-              onGenerate()
+              void onGenerate()
             }
           }}
         />

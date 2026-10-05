@@ -162,6 +162,27 @@ const _propsUpdateRequiresParentLayoutUpdate = ({ nodeDef, props }) =>
     NodeDef.propKeys.includeAltitudeAccuracy,
   ]).length > 0
 
+const _isNameOrLabelOrActiveChanged = ({ nodeDefPrev, nodeDef, props, propsAdvanced }) =>
+  (NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)) ||
+  (NodeDef.propKeys.labels in props && !Objects.isEqual(NodeDef.getLabels(nodeDefPrev), NodeDef.getLabels(nodeDef))) ||
+  (NodeDef.keysPropsAdvanced.active in propsAdvanced && NodeDef.isActive(nodeDefPrev) !== NodeDef.isActive(nodeDef))
+
+// Returns the area based estimate node def inserted, deleted or updated (if any).
+const _updateAreaBasedEstimateOnPropsUpdate = async ({ survey, nodeDefPrev, nodeDef, props, propsAdvanced }, t) => {
+  const hasAreaBasedEstimateChanged =
+    NodeDef.keysPropsAdvanced.hasAreaBasedEstimated in propsAdvanced &&
+    NodeDef.hasAreaBasedEstimated(nodeDefPrev) !== NodeDef.hasAreaBasedEstimated(nodeDef)
+
+  if (hasAreaBasedEstimateChanged) {
+    return NodeDefAreaBasedEstimateManager.insertOrDeleteNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
+  }
+  // node def name, label or active state changed => update node def area based estimate accordingly
+  if (_isNameOrLabelOrActiveChanged({ nodeDefPrev, nodeDef, props, propsAdvanced })) {
+    return NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
+  }
+  return null
+}
+
 export const updateNodeDefProps = async (
   { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false, markSurveyAsDraft = true },
   client = db
@@ -236,32 +257,9 @@ export const updateNodeDefProps = async (
     }
 
     if (NodeDef.isAnalysis(nodeDef)) {
-      const hasAreaBasedEstimateChanged =
-        NodeDef.keysPropsAdvanced.hasAreaBasedEstimated in propsAdvanced &&
-        NodeDef.hasAreaBasedEstimated(nodeDefPrev) !== NodeDef.hasAreaBasedEstimated(nodeDef)
-
-      if (hasAreaBasedEstimateChanged) {
-        const nodeDefAreaBasedEstimateUpdated =
-          await NodeDefAreaBasedEstimateManager.insertOrDeleteNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
-        _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
-      } else {
-        // node def name, label or active state changed => update node def area based estimate accordingly
-        const nameOrLabelChanged =
-          (NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)) ||
-          (NodeDef.propKeys.labels in props &&
-            !Objects.isEqual(NodeDef.getLabels(nodeDefPrev), NodeDef.getLabels(nodeDef)))
-        const activeChanged =
-          NodeDef.keysPropsAdvanced.active in propsAdvanced &&
-          NodeDef.isActive(nodeDefPrev) !== NodeDef.isActive(nodeDef)
-
-        if (nameOrLabelChanged || activeChanged) {
-          const nodeDefAreaBasedEstimateUpdated = await NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate(
-            { survey, nodeDef },
-            t
-          )
-          _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
-        }
-      }
+      _addNodeDefUpdatedToSurvey(
+        await _updateAreaBasedEstimateOnPropsUpdate({ survey, nodeDefPrev, nodeDef, props, propsAdvanced }, t)
+      )
     }
     const logContent = {
       uuid: nodeDefUuid,

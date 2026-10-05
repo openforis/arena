@@ -32,7 +32,7 @@ const FENCE_RE = /^```[a-zA-Z]*\s*([\s\S]*?)\s*```$/
  */
 export const parseJsonResponse = (text) => {
   const trimmed = (text || '').trim()
-  const fenceMatch = trimmed.match(FENCE_RE)
+  const fenceMatch = FENCE_RE.exec(trimmed)
   const candidate = (fenceMatch ? fenceMatch[1] : trimmed).trim()
   const start = candidate.indexOf('{')
   const end = candidate.lastIndexOf('}')

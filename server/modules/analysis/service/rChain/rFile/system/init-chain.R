@@ -11,7 +11,7 @@ options(
 #**
 checkError <- function(e) {
   if (inherits(e, "try-error") || inherits(e, "simpleError")) {
-    print("ARENA-ERROR", quote = F)
+    print("ARENA-ERROR", quote = FALSE)
     stop(e)
   }
 }

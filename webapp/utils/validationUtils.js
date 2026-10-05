@@ -34,10 +34,10 @@ export const getValidationFieldMessages =
       // Extract invalid fields error messages
       Validation.getFieldValidations,
       Object.entries,
-      A.map(
-        ([field, fieldValidation]) =>
-          `${showKeys ? `${i18n.t(field)}: ` : ''}${getValidationFieldErrorMessage(i18n, field)(fieldValidation)}`
-      ),
+      A.map(([field, fieldValidation]) => {
+        const message = getValidationFieldErrorMessage(i18n, field)(fieldValidation)
+        return showKeys ? `${i18n.t(field)}: ${message}` : message
+      }),
       // Prepend validation error messages
       (messages) => A.pipe(getValidationErrorMessages(i18n), A.concat(messages))(validation)
     )(validation)

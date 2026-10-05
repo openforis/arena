@@ -22,7 +22,7 @@ const ResetPassword = () => {
     navigateToHomePage,
   } = useResetPassword()
 
-  if (!user || !user.email)
+  if (!user?.email)
     return (
       <form onSubmit={(event) => event.preventDefault()} className="guest__form">
         <Button className="btn-goto-home" label="common.goToHomePage" onClick={navigateToHomePage} />

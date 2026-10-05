@@ -80,7 +80,8 @@ export const testMapApiKey = async ({ provider, apiKey }) => {
   try {
     const mosaics = await fetchAvailableMapPeriods({ provider, apiKey })
     return mosaics.length > 0
-  } catch (_e) {
+  } catch {
+    // invalid API key or provider not reachable
     return false
   }
 }

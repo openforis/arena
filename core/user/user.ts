@@ -51,10 +51,8 @@ export const assocProfilePicture = A.assoc(keys.profilePicture)
 export const assocProfilePictureSet = A.assoc(keys.profilePictureSet)
 
 // ====== CHECK
-export const isSystemAdmin = (user: any | null | undefined) =>
-  !!user && A.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
-export const isSurveyManager = (user: any | null | undefined) =>
-  !!user && A.any(AuthGroup.isSurveyManagerGroup)(getAuthGroups(user))
+export const isSystemAdmin = (user: any) => !!user && A.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))
+export const isSurveyManager = (user: any) => !!user && A.any(AuthGroup.isSurveyManagerGroup)(getAuthGroups(user))
 export const hasAccepted = A.propEq(keys.status, userStatus.ACCEPTED)
 export const isInvited = A.propEq(keys.status, userStatus.INVITED)
 export const isInvitationExpired = A.propEq(keys.invitationExpired, true)
@@ -84,10 +82,8 @@ export const getAuthGroupsNonSurvey = () => (user: any) => {
   return authGroups.filter((group: unknown) => !AuthGroup.getSurveyId(group as never))
 }
 
-export const getSystemAdminGroup = (user: any | null | undefined) =>
-  user && getAuthGroups(user).find(AuthGroup.isSystemAdminGroup)
-export const getSurveyManagerGroup = (user: any | null | undefined) =>
-  user && getAuthGroups(user).find(AuthGroup.isSurveyManagerGroup)
+export const getSystemAdminGroup = (user: any) => user && getAuthGroups(user).find(AuthGroup.isSystemAdminGroup)
+export const getSurveyManagerGroup = (user: any) => user && getAuthGroups(user).find(AuthGroup.isSurveyManagerGroup)
 
 export const assocAuthGroups = (authGroups: any[]) =>
   A.pipe(

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useLocation } from 'react-router'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 
 /**
  * Intercepts the browser back button press and calls the specified callback.

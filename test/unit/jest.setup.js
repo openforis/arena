@@ -1,7 +1,7 @@
 const crypto = require('node:crypto')
 const streamWeb = require('node:stream/web')
 
-if (typeof global.crypto === 'undefined') {
+if (global.crypto === undefined) {
   global.crypto = crypto.webcrypto
 }
 
@@ -18,7 +18,7 @@ for (const name of [
   'TextEncoderStream',
   'TextDecoderStream',
 ]) {
-  if (typeof global[name] === 'undefined' && streamWeb[name]) {
+  if (global[name] === undefined && streamWeb[name]) {
     global[name] = streamWeb[name]
   }
 }

@@ -164,74 +164,72 @@ const SurveyInfo = (props) => {
   }, [activityLogDisabled, dispatch, hasChains, surveyInfo])
 
   return (
-    <>
-      <div className="home-dashboard__survey-info">
-        <header>
-          <div className="row">
-            <Button onClick={navigateToSurveyInfo} testId={TestId.dashboard.surveyInfoBtnHeader} variant="text">
-              <h2 data-testid={TestId.dashboard.surveyLabelOrName}>
-                <LabelWithTooltip label={hasLabel ? surveyLabel : surveyName} />
-              </h2>
-            </Button>
+    <div className="home-dashboard__survey-info">
+      <header>
+        <div className="row">
+          <Button onClick={navigateToSurveyInfo} testId={TestId.dashboard.surveyInfoBtnHeader} variant="text">
+            <h2 data-testid={TestId.dashboard.surveyLabelOrName}>
+              <LabelWithTooltip label={hasLabel ? surveyLabel : surveyName} />
+            </h2>
+          </Button>
 
-            <div className="survey-status" data-testid={TestId.dashboard.surveyStatus}>
-              ({i18n.t(`surveysView.status.${Survey.getStatus(surveyInfo)}`)})
-            </div>
+          <div className="survey-status" data-testid={TestId.dashboard.surveyStatus}>
+            ({i18n.t(`surveysView.status.${Survey.getStatus(surveyInfo)}`)})
           </div>
-          {hasLabel && (
-            <div className="row">
-              <Button onClick={navigateToSurveyInfo} variant="text">
-                <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>
-              </Button>
-            </div>
-          )}
-        </header>
-
-        <div>
-          <Button
-            iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
-            label={canEditSurvey ? 'homeView:surveyInfo.editInfo' : 'homeView:surveyInfo.viewInfo'}
-            onClick={navigateToSurveyInfo}
-            size="small"
-            testId={TestId.dashboard.surveyInfoBtn}
-            variant="text"
-          />
-
-          {!firstTime && canEditSurvey && <ButtonPublishSurvey disabled={!Survey.isDraft(surveyInfo)} variant="text" />}
-
-          {!firstTime && canExportSurvey && (
-            <ButtonMenu
-              className="btn-menu-export"
-              items={exportMenuItems}
-              iconClassName="icon-download2 icon-14px"
-              label="common.export"
-              size="small"
-              testId={TestId.dashboard.surveyExportBtn}
-            />
-          )}
-          {canEditSurvey && (
-            <ButtonMenu
-              className="btn-menu-advanced"
-              iconClassName="icon-cog icon-14px"
-              items={advancedFunctionsItems}
-              label="common.advancedFunctions"
-              size="small"
-              testId={TestId.dashboard.advancedFunctionsBtn}
-            />
-          )}
-          {canEditSurvey && Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
-            <Link
-              data-testid={TestId.dashboard.collectReportBtn}
-              to={appModuleUri(homeModules.collectImportReport)}
-              className="btn-s btn-transparent"
-            >
-              <span className="icon icon-clipboard icon-12px icon-left" />
-              {i18n.t('appModules.collectImportReport')}
-            </Link>
-          )}
         </div>
+        {hasLabel && (
+          <div className="row">
+            <Button onClick={navigateToSurveyInfo} variant="text">
+              <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>
+            </Button>
+          </div>
+        )}
+      </header>
+
+      <div>
+        <Button
+          iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
+          label={canEditSurvey ? 'homeView:surveyInfo.editInfo' : 'homeView:surveyInfo.viewInfo'}
+          onClick={navigateToSurveyInfo}
+          size="small"
+          testId={TestId.dashboard.surveyInfoBtn}
+          variant="text"
+        />
+
+        {!firstTime && canEditSurvey && <ButtonPublishSurvey disabled={!Survey.isDraft(surveyInfo)} variant="text" />}
+
+        {!firstTime && canExportSurvey && (
+          <ButtonMenu
+            className="btn-menu-export"
+            items={exportMenuItems}
+            iconClassName="icon-download2 icon-14px"
+            label="common.export"
+            size="small"
+            testId={TestId.dashboard.surveyExportBtn}
+          />
+        )}
+        {canEditSurvey && (
+          <ButtonMenu
+            className="btn-menu-advanced"
+            iconClassName="icon-cog icon-14px"
+            items={advancedFunctionsItems}
+            label="common.advancedFunctions"
+            size="small"
+            testId={TestId.dashboard.advancedFunctionsBtn}
+          />
+        )}
+        {canEditSurvey && Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
+          <Link
+            data-testid={TestId.dashboard.collectReportBtn}
+            to={appModuleUri(homeModules.collectImportReport)}
+            className="btn-s btn-transparent"
+          >
+            <span className="icon icon-clipboard icon-12px icon-left" />
+            {i18n.t('appModules.collectImportReport')}
+          </Link>
+        )}
       </div>
-    </>
+    </div>
   )
 }
 

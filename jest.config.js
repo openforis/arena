@@ -7,8 +7,8 @@ module.exports = {
   // dist/__tests__/bundle.unit.js. Without these, `roots: ['<rootDir>/']` sweeps those stale,
   // frozen builds into every test run as extra suites (and their package.json, sharing this
   // repo's name, causes haste module-naming collisions).
-  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/\\.claude/worktrees/'],
-  modulePathIgnorePatterns: ['<rootDir>/\\.claude/worktrees/'],
+  testPathIgnorePatterns: ['/node_modules/', String.raw`<rootDir>/\.claude/worktrees/`],
+  modulePathIgnorePatterns: [String.raw`<rootDir>/\.claude/worktrees/`],
   // The allowlist below only applies to a package's own (deepest) node_modules segment: the
   // `(?!.*/node_modules/)` guard forces the match position to be the LAST /node_modules/ in the
   // path, so a package that itself nests inside another, non-allowlisted package (e.g.

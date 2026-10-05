@@ -32,7 +32,8 @@ const loadSurveyDefs =
       const surveyUpdated = await fetchAndAssocCategoryItemsCounts({ survey, draft })
 
       dispatch({ type: surveyDefsLoad, ...surveyUpdated, draft, includeAnalysis, validate })
-    } catch (error) {
+    } catch {
+      // survey cannot be loaded (e.g. deleted or not accessible): go back to the surveys list
       navigate(appModuleUri(homeModules.surveyList))
     }
     if (showLoader) {

@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import * as fs from 'node:fs'
 import * as A from '@core/arena'
 
 import { Objects, Points } from '@openforis/arena-core'
@@ -91,16 +91,14 @@ export class CategoryImportInternalJob extends Job {
       // Errors found in csv rows
       this.logDebug(`${Object.keys(this.errors).length} errors found`)
       await this.setStatusFailed()
+    } else if (await this.itemsUpdater.flush()) {
+      // 6. no errors found, remaining items inserted
+      this.incrementProcessedItems()
+      this.logDebug(`${this.totalItemsInserted} items inserted`)
+      // 7. initialize category item indexes etc.
+      await this.afterCategoryImport()
     } else {
-      // 6. no errors found, insert remaining items
-      if (await this.itemsUpdater.flush()) {
-        this.incrementProcessedItems()
-        this.logDebug(`${this.totalItemsInserted} items inserted`)
-        // 7. initialize category item indexes etc.
-        await this.afterCategoryImport()
-      } else {
-        this.setStatusFailed()
-      }
+      await this.setStatusFailed()
     }
   }
 
@@ -240,7 +238,7 @@ export class CategoryImportInternalJob extends Job {
         .filter((oldLevelName) => !levelNames.includes(oldLevelName))
         .flat()
       this._addError(Validation.messageKeys.categoryImport.cannotDeleteLevelsOfPublishedCategory, { deletedLevelNames })
-      this.setStatusFailed()
+      await this.setStatusFailed()
       return
     }
 

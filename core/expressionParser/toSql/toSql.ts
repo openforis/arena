@@ -50,7 +50,7 @@ export const binary = (node: Record<string, unknown>, params: SqlParams): SqlRes
 
   if (sqlOperator === 'OR') {
     return {
-      clause: logicalOrTemplate.replace(/{left}/g, clauseLeft).replace(/{right}/g, clauseRight),
+      clause: logicalOrTemplate.replaceAll('{left}', clauseLeft).replaceAll('{right}', clauseRight),
       params: { ...paramsLeft, ...paramsRight },
     }
   }
@@ -88,7 +88,7 @@ export const unary = (node: Record<string, unknown>, params: SqlParams): SqlResu
  * @returns {boolean} - True if the value is quoted, false otherwise.
  */
 const _isQuotedString = (value: unknown): boolean =>
-  typeof value === 'string' && value.length >= 2 && value[0] === '"' && value[value.length - 1] === '"'
+  typeof value === 'string' && value.length >= 2 && value.startsWith('"') && value.endsWith('"')
 
 /**
  * Expression node value could have been "stringified" (e.g. Attributes of type code/taxon/text)

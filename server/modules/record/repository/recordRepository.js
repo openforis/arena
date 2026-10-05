@@ -243,6 +243,38 @@ const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
     .join(', ')}) AS ${alias}`
 }
 
+const buildRecordsSummarySearchCondition = ({ nodeDefKeysWhereConditions, summaryDefsWhereConditions }) => {
+  const searchConditions = []
+  if (nodeDefKeysWhereConditions) searchConditions.push(`(${nodeDefKeysWhereConditions})`)
+  if (summaryDefsWhereConditions) searchConditions.push(`(${summaryDefsWhereConditions})`)
+  searchConditions.push(`(owner_name ilike '%$/search:value/%')`)
+  return searchConditions.join(' OR ')
+}
+
+const buildRecordsSummarySelectWhereConditions = ({
+  cycle,
+  step,
+  search,
+  ownerUuid,
+  recordUuids,
+  includePreview,
+  includeMerged,
+  nodeDefKeysWhereConditions,
+  summaryDefsWhereConditions,
+}) => {
+  const conditions = []
+  if (!includePreview) conditions.push('preview = FALSE')
+  conditions.push(`merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
+  if (!A.isNull(cycle)) conditions.push('cycle = $/cycle/')
+  if (!A.isNull(step)) conditions.push('step = $/step/')
+  if (!A.isNull(recordUuids)) conditions.push('uuid IN ($/recordUuids:csv/)')
+  if (!A.isEmpty(search)) {
+    conditions.push(buildRecordsSummarySearchCondition({ nodeDefKeysWhereConditions, summaryDefsWhereConditions }))
+  }
+  if (!A.isNull(ownerUuid)) conditions.push('owner_uuid = $/ownerUuid/')
+  return conditions
+}
+
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
@@ -317,20 +349,17 @@ export const fetchRecordsSummaryBySurveyId = async (
     objAlias: recordSummaryAttributesObjAlias,
   })
 
-  const recordsSelectWhereConditions = []
-  if (!includePreview) recordsSelectWhereConditions.push('preview = FALSE')
-  recordsSelectWhereConditions.push(`merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
-  if (!A.isNull(cycle)) recordsSelectWhereConditions.push('cycle = $/cycle/')
-  if (!A.isNull(step)) recordsSelectWhereConditions.push('step = $/step/')
-  if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('uuid IN ($/recordUuids:csv/)')
-  if (!A.isEmpty(search)) {
-    const searchConditions = []
-    if (nodeDefKeysWhereConditions) searchConditions.push(`(${nodeDefKeysWhereConditions})`)
-    if (summaryDefsWhereConditions) searchConditions.push(`(${summaryDefsWhereConditions})`)
-    searchConditions.push(`(owner_name ilike '%$/search:value/%')`)
-    recordsSelectWhereConditions.push(searchConditions.join(' OR '))
-  }
-  if (!A.isNull(ownerUuid)) recordsSelectWhereConditions.push('owner_uuid = $/ownerUuid/')
+  const recordsSelectWhereConditions = buildRecordsSummarySelectWhereConditions({
+    cycle,
+    step,
+    search,
+    ownerUuid,
+    recordUuids,
+    includePreview,
+    includeMerged,
+    nodeDefKeysWhereConditions,
+    summaryDefsWhereConditions,
+  })
 
   // note: qualifier columns are selected (unqualified) in the "records" CTE below, since the
   // WHERE clause here applies to the outer query, where the root entity table alias is out of scope

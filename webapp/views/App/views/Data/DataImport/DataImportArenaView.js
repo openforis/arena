@@ -25,20 +25,19 @@ const acceptedFileExtensions = ['zip']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
 
 const missingFilesSummaryItemKey = 'missingFiles'
-const importSummaryItemKeys = [
+const importSummaryItemKeys = new Set([
   'processed',
   'insertedRecords',
   'updatedRecords',
   'skippedRecords',
   missingFilesSummaryItemKey,
-]
-const importSummaryItemKeysExcludedIfEmpty = [missingFilesSummaryItemKey]
+])
+const importSummaryItemKeysExcludedIfEmpty = new Set([missingFilesSummaryItemKey])
 
 const generateImportSummary = ({ result, i18n }) =>
   Object.entries(result)
     .filter(
-      ([key, value]) =>
-        importSummaryItemKeys.includes(key) && (!importSummaryItemKeysExcludedIfEmpty.includes(key) || value > 0)
+      ([key, value]) => importSummaryItemKeys.has(key) && (!importSummaryItemKeysExcludedIfEmpty.has(key) || value > 0)
     )
     .reduce((acc, [summaryItemKey, summaryItemValue]) => {
       const summaryItemLabel = i18n.t(`dataImportView:jobs.ArenaDataImportJob.importSummaryItem.${summaryItemKey}`)

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 
-const Error = (props) => {
+const GuestError = (props) => {
   const { error = null } = props
   const i18n = useI18n()
   if (!error) return null
@@ -11,8 +11,8 @@ const Error = (props) => {
   return <div className="guest-errors text-center">{i18n.t(error)}</div>
 }
 
-Error.propTypes = {
+GuestError.propTypes = {
   error: PropTypes.string,
 }
 
-export default Error
+export default GuestError

@@ -95,7 +95,7 @@ export const useBrandingLogo = ({
       }
     }
 
-    resolve()
+    void resolve()
 
     return () => {
       cancelled = true

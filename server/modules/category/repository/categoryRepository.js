@@ -141,7 +141,8 @@ const _getFetchCategoriesAndLevelsQuery = ({
               'propsDraft', ${tableAlias}.props_draft`
     }
     // combine props and props_draft column into one
-    return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''},
+    const propsDraftConcat = draft ? ` || ${tableAlias}.props_draft` : ''
+    return `'props', ${tableAlias}.props${propsDraftConcat},
             'published', ${tableAlias}.props::text <> '{}',
             'draft', ${tableAlias}.props_draft::text <> '{}'`
   }
@@ -203,16 +204,16 @@ const _getFetchCategoriesAndLevelsQuery = ({
       levels l
     ON
       c.uuid = l.category_uuid
-    ${backup || draft ? '' : `WHERE c.published`}`
+    ${backup || draft ? '' : 'WHERE c.published'}`
 }
 
 export const countCategories = async ({ surveyId, draft = false }, client = db) =>
   client.one(
     `SELECT COUNT(*) 
      FROM ${getSurveyDBSchema(surveyId)}.category
-     ${draft ? '' : `WHERE props::text <> '{}'::text`}`,
+     ${draft ? '' : "WHERE props::text <> '{}'::text"}`,
     [],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 
 export const fetchCategoriesBySurveyId = async (
@@ -370,7 +371,7 @@ export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = 
         ON l.uuid = i.level_uuid
         AND l.category_uuid = $1`,
     [categoryUuid],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 
 export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db) =>
@@ -379,7 +380,7 @@ export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
     WHERE i.level_uuid = $1`,
     [levelUuid],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 
 const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
@@ -395,7 +396,7 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
 const _getSearchQueryParam = ({ searchValue }) =>
   `%${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
-const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
+const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = Number.NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
   const schema = Schemata.getSchemaSurvey(surveyId)
   const indexCol = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
@@ -420,7 +421,15 @@ export const countItemsByParentUuid = async (
 }
 
 export const fetchItemsByParentUuid = async (
-  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null, limit = NaN },
+  {
+    surveyId,
+    categoryUuid,
+    parentUuid = null,
+    draft = false,
+    search: searchValue = null,
+    lang = null,
+    limit = Number.NaN,
+  },
   client = db
 ) => {
   const search = _getSearchQueryParam({ searchValue })
@@ -469,8 +478,9 @@ export const fetchItemsByLevelIndex = async (
     ],
     []
   )
+  const selectFields = [`i${levelIndex}.*`, ...codesSelectFields].join(', ')
   return client.map(
-    `SELECT i${levelIndex}.* ${codesSelectFields.length > 0 ? `, ${codesSelectFields.join(', ')}` : ''}
+    `SELECT ${selectFields}
      FROM ${schema}.category_item i${levelIndex}
        JOIN ${schema}.category_level l 
          ON l.uuid = i${levelIndex}.level_uuid

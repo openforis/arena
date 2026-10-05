@@ -104,10 +104,8 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     if (!virtual && !NodeDef.isMultipleAttribute(nodeDef)) {
       columns.push(new ColumnNodeDef(tableData, nodeDef))
     }
-    // attribute columns
-    columns.push(...tableData.columnNodeDefs)
-    // multiple attribute columns
-    columns.push(...this._multipleAttributeColumns)
+    // attribute columns and multiple attribute columns
+    columns.push(...tableData.columnNodeDefs, ...this._multipleAttributeColumns)
     // parent view columns
     if (viewDataParent) {
       columns.unshift(...this._parentViewColumns)

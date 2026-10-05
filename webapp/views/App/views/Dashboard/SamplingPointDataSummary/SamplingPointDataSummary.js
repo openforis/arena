@@ -58,7 +58,7 @@ const SamplingPointDataSummary = () => {
       const response = await countData.request
       setTotalItems(response.data.count)
     }
-    fetchTotalItems()
+    void fetchTotalItems()
   }, [surveyId])
 
   if (!totalItems) return null

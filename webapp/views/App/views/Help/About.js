@@ -19,7 +19,7 @@ export const About = () => {
       setVersion(await API.fetchVersion())
     }
     if (!initialVersion) {
-      fetchVersion()
+      void fetchVersion()
     }
   }, [])
 

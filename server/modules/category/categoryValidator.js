@@ -208,7 +208,7 @@ const validateItemsAndDescendants = async ({
   pushItems(itemsToValidate)
 
   while (!A.isEmpty(stack) && !stopIfFn?.()) {
-    const item = stack[stack.length - 1] // Do not pop item: it can be visited again
+    const item = stack.at(-1) // Do not pop item: it can be visited again
     const { itemsByParentAndCode } = item
     const itemUuid = CategoryItem.getUuid(item)
     const isLeaf = Category.isItemLeaf(item)(category)

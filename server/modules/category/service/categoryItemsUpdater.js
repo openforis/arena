@@ -202,7 +202,7 @@ export default class CategoryItemsUpdater {
 
   _getParentItemUuid(itemCodes) {
     if (itemCodes.length > 1) {
-      const parentItemCodes = itemCodes.slice(0, itemCodes.length - 1)
+      const parentItemCodes = itemCodes.slice(0, -1)
       const itemParent = this.getItemCachedByCodes(parentItemCodes)
       if (itemParent) {
         return CategoryItem.getUuid(itemParent)

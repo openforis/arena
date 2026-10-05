@@ -23,7 +23,7 @@ const ButtonGroup = ({
       if (selected && !multiple && !deselectable) return
       let value
       if (multiple) {
-        value = A.ifElse(A.always(selected), A.without(item.key), A.append(item.key))(selectedItemKey)
+        value = A.ifElse(A.always(selected), A.without([item.key]), A.append(item.key))(selectedItemKey)
       } else if (!selected) {
         value = item.key
       } else {
@@ -62,7 +62,7 @@ export const toButtonGroupItems = ({ i18n, object, labelPrefix, icon = null }) =
   Object.keys(object).map((key) => ({
     key,
     label: i18n.t(`${labelPrefix}${key}`),
-    icon: icon ? (typeof icon === 'function' ? icon({ key }) : icon) : null,
+    icon: typeof icon === 'function' ? icon({ key }) : icon || null,
   }))
 
 ButtonGroup.propTypes = {

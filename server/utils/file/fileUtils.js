@@ -1,6 +1,6 @@
-import fs, { promises as fsp } from 'fs'
+import fs, { promises as fsp } from 'node:fs'
 import { ncp } from 'ncp'
-import { join, sep } from 'path'
+import { join, sep } from 'node:path'
 
 import * as ProcessUtils from '@core/processUtils'
 import { isUuid, uuidv4 } from '@core/uuid'
@@ -28,7 +28,8 @@ export const canReadWritePath = (path) => {
   try {
     fs.accessSync(path, fs.constants.R_OK | fs.constants.W_OK)
     return true
-  } catch (e) {
+  } catch {
+    // file not accessible
     return false
   }
 }

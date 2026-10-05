@@ -25,6 +25,9 @@ LoadingRows.propTypes = {
   rows: PropTypes.number.isRequired,
 }
 
+const getGridTemplateColumnsFromColumns = ({ columns, expandableRows }) =>
+  [...columns.map((column) => column.width || '1fr'), ...(expandableRows ? ['40px'] : [])].join(' ')
+
 const Content = (props) => {
   const {
     cellProps,
@@ -101,7 +104,7 @@ const Content = (props) => {
     : rowHeaderComponentParam
 
   const gridTemplateColumns = hasColumns
-    ? [...columns.map((column) => column.width || '1fr'), ...(expandableRows ? ['40px'] : [])].join(' ')
+    ? getGridTemplateColumnsFromColumns({ columns, expandableRows })
     : gridTemplateColumnsParam
 
   return (
@@ -129,7 +132,7 @@ const Content = (props) => {
               gridTemplateColumns,
               onRowClick,
               onRowDoubleClick,
-              selected: Boolean(selectedItems.find((_item) => keyExtractor({ item: _item }) === key)),
+              selected: selectedItems.some((_item) => keyExtractor({ item: _item }) === key),
             })
           })}
         </div>

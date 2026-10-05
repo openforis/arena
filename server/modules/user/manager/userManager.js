@@ -265,7 +265,7 @@ export {
 export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFormat }) => {
   const fields = [
     'email',
-    ...Object.values(UserAccessRequest.keysProps).map(StringUtils.toSnakeCase),
+    ...Object.values(UserAccessRequest.keysProps).map((key) => StringUtils.toSnakeCase(key)),
     'status',
     'date_created',
   ]

@@ -14,7 +14,7 @@ import * as FlatDataReader from '@server/utils/file/flatDataReader'
 const _checkSrs = ({ survey, srs, columnName }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveySrss = Survey.getSRS(surveyInfo)
-  if (!surveySrss.find((surveySrs) => Srs.getCode(surveySrs) === srs)) {
+  if (!surveySrss.some((surveySrs) => Srs.getCode(surveySrs) === srs)) {
     throw new SystemError(Validation.messageKeys.categoryImport.srsNotDefined, { columnName, srs })
   }
 }

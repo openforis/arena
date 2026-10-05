@@ -107,7 +107,7 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
     setDragInProgress(false)
 
     const childNodes = rowRef.current.childNodes
-    const uuids = [...childNodes].map((child) => child.dataset.uuid).filter((uuid) => uuid)
+    const uuids = [...childNodes].map((child) => child.dataset.uuid).filter(Boolean)
 
     dispatch(NodeDefsActions.putNodeDefLayoutProp({ nodeDef, key: NodeDefLayout.keys.layoutChildren, value: uuids }))
   }

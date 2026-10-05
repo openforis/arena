@@ -60,8 +60,8 @@ export const useExpressionEditorPopupState = (props) => {
     return {
       ...initialState,
       advanced: initialAdvanced,
-      query: initialAdvanced ? query.trimRight() : queryDraft,
-      queryDraft: initialAdvanced ? query.trimRight() : queryDraft,
+      query: initialAdvanced ? query.trimEnd() : queryDraft,
+      queryDraft: initialAdvanced ? query.trimEnd() : queryDraft,
       queryIsBasic: !initialAdvanced,
       exprDraft,
       exprDraftValid: true,
@@ -136,7 +136,7 @@ export const useExpressionEditorPopupState = (props) => {
   const [variables, setVariables] = useState([])
   useEffect(() => {
     const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
-    ExpressionVariables.getVariables({
+    void ExpressionVariables.getVariables({
       survey,
       cycle,
       nodeDefContext,

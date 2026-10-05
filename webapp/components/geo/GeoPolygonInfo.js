@@ -27,7 +27,7 @@ export const GeoPolygonInfo = (props) => {
   )
 
   const areaTooltipContent = useMemo(
-    () => [areaUnits.squareMeter, areaUnits.squareFoot, areaUnits.acre].map(areaInUnit).join('<br>'),
+    () => [areaUnits.squareMeter, areaUnits.squareFoot, areaUnits.acre].map((unit) => areaInUnit(unit)).join('<br>'),
     [areaInUnit]
   )
 
@@ -38,7 +38,10 @@ export const GeoPolygonInfo = (props) => {
     [perimeterInMeters]
   )
 
-  const perimeterTooltipContent = useMemo(() => [lengthUnits.foot].map(perimeterInUnit).join('<br>'), [perimeterInUnit])
+  const perimeterTooltipContent = useMemo(
+    () => [lengthUnits.foot].map((unit) => perimeterInUnit(unit)).join('<br>'),
+    [perimeterInUnit]
+  )
 
   const verticesCount = useMemo(() => GeoJsonUtils.countVertices(geoJson), [geoJson])
   const area = useMemo(() => areaInUnit(areaUnits.hectare), [areaInUnit])

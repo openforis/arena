@@ -2,7 +2,7 @@
 import * as AppState from './state'
 import AppReducer from './reducer'
 
-export { AppReducer, AppState }
+export { AppState, AppReducer }
 
 // ====== job
 export { JobActions, useJob } from './job'

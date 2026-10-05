@@ -49,7 +49,7 @@ const useRecordOrFetchByParentNode = ({ nodeDef, parentNode }) => {
   useEffect(() => {
     if (!recordUuid || getResolvedRecord(recordUuid)) return
     let cancelled = false
-    fetchRecordAndNodesOnce({ surveyId, recordUuid }).then(() => {
+    void fetchRecordAndNodesOnce({ surveyId, recordUuid }).then(() => {
       if (!cancelled) forceRenderAfterFetch((n) => n + 1)
     })
     return () => {

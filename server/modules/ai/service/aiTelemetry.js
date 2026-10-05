@@ -25,7 +25,7 @@ export const track = async (ctx, fn) => {
   try {
     const result = await fn()
     const latencyMs = Date.now() - start
-    const usage = (result && result.usage) || {}
+    const usage = result?.usage || {}
     const tokensIn = Number(usage.promptTokens || usage.inputTokens || 0)
     const tokensOut = Number(usage.completionTokens || usage.outputTokens || 0)
 

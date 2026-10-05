@@ -80,7 +80,7 @@ export const writeItemsToStream = async ({
         maxLength = columnLength
       }
     })
-    column.width = maxLength < 10 ? 10 : maxLength
+    column.width = Math.max(10, maxLength)
   }
 
   const outputCompletePromise = StreamUtils.waitForWritableStreamComplete(outputStream)

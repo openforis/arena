@@ -5,7 +5,7 @@ export const getSelector = (id, tag = '') => `${tag}[data-testid="${id}"]`
 const _withLang =
   (key) =>
   (lang = defaults.lang) =>
-    `${key}${lang && lang.length > 0 ? `-${lang}` : ''}`
+    lang?.length > 0 ? `${key}-${lang}` : key
 
 export const TestId = {
   categoryDetails: {
@@ -51,6 +51,7 @@ export const TestId = {
     periodSelector: 'dashboard-period-selector',
     mapSection: 'dashboard-map-section',
     activitySection: 'dashboard-activity-section',
+    activityToggle: 'dashboard-activity-toggle',
     activityError: 'dashboard-activity-error',
     activityEmpty: 'dashboard-activity-empty',
     trendSection: 'dashboard-trend-section',

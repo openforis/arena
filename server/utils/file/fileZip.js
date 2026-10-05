@@ -68,7 +68,7 @@ export default class FileZip {
       const { name, isDirectory } = entry
       if (
         (excludeDirectories && isDirectory) ||
-        (excludeHiddenFiles && hiddenFilePaths.find((hiddenFilePath) => name.startsWith(hiddenFilePath)))
+        (excludeHiddenFiles && hiddenFilePaths.some((hiddenFilePath) => name.startsWith(hiddenFilePath)))
       ) {
         return acc
       }
