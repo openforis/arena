@@ -36,7 +36,7 @@ COPY --from=base /app/infra/nginx/rstudio_pass /etc/nginx/rstudio_pass
 ARG legacy_node_version=14.21.3
 ARG legacy_node_sha256=05c08a107c50572ab39ce9e8663a2a2d696b5d262d5bd6f98d84b997ce932d9a
 RUN curl --proto '=https' --tlsv1.2 -fsSLo /tmp/node.tar.xz \
-      https://nodejs.org/dist/v${legacy_node_version}/node-v${legacy_node_version}-linux-x64.tar.xz \
+      "https://nodejs.org/dist/v${legacy_node_version}/node-v${legacy_node_version}-linux-x64.tar.xz" \
     && echo "${legacy_node_sha256}  /tmp/node.tar.xz" | sha256sum -c - \
     && tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 \
     && rm /tmp/node.tar.xz \
