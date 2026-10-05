@@ -20,6 +20,8 @@ export const useOnBrowserBack = (params) => {
   const tempLocationSetRef = useRef(false)
   // used to know if the popstate event listener has been added
   const listenerAddedRef = useRef(false)
+  // used to ignore the popstate events triggered by onBack itself when it navigates back
+  const handlingBackRef = useRef(false)
 
   const addPopStateEventListener = () => {
     if (!listenerAddedRef.current) {
@@ -51,11 +53,16 @@ export const useOnBrowserBack = (params) => {
   const onBackButtonEvent = async (event) => {
     event.preventDefault()
 
+    // the listener could still be attached when the navigate(-1) called by onBack is processed
+    if (handlingBackRef.current) return
+    handlingBackRef.current = true
+
     // the browser went back from the temp location
     tempLocationSetRef.current = false
 
     const wentBackSuccessfully = await onBack()
     if (!wentBackSuccessfully) {
+      handlingBackRef.current = false
       // add again a temp location to prevent browser back
       addTempLocationToHistory()
     }
@@ -63,6 +70,7 @@ export const useOnBrowserBack = (params) => {
 
   useEffect(() => {
     if (active) {
+      handlingBackRef.current = false
       addTempLocationToHistory()
       addPopStateEventListener()
 

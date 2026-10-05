@@ -1393,6 +1393,7 @@ $t(common.cantUndoWarning)`,
     geoPackageCategoryInfo: `У этой категории есть дополнительное свойство '${locationItemExtraDefName}', которое позволяет экспортировать её в виде файла GeoPackage.`,
     samplingPointDataCategoryType: 'Это категория данных точек выборки',
     samplingPointDataCategoryTypeInfo: `Это предопределенная категория для данных точек выборки. У неё есть дополнительное свойство '${locationItemExtraDefName}', которое позволяет экспортировать её в виде файла GeoPackage.`,
+    samplingPointDataCategoryLocationMissing: `Дополнительное свойство '${locationItemExtraDefName}' отсутствует`,
     createCategory: {
       menuLabel: 'Добавить категорию',
       simple: 'Простая категория',

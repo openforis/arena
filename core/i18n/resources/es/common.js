@@ -1249,6 +1249,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     geoPackageCategoryInfo: `Esta categoría tiene una propiedad extra llamada '${locationItemExtraDefName}', que permite exportarla como un archivo GeoPackage.`,
     samplingPointDataCategoryType: 'Esta es la categoría de Datos de puntos de muestreo',
     samplingPointDataCategoryTypeInfo: `Esta es una categoría predefinida para datos de puntos de muestreo. Tiene una propiedad extra llamada '${locationItemExtraDefName}', que permite exportarla como un archivo GeoPackage.`,
+    samplingPointDataCategoryLocationMissing: `Falta la propiedad extra '${locationItemExtraDefName}'`,
     createCategory: {
       menuLabel: 'Añadir categoría',
       simple: 'Categoría simple',

@@ -1405,6 +1405,7 @@ Le nom de la catégorie sera effacé (vous devrez lui donner un nouveau nom), et
     geoPackageCategoryInfo: `Cette catégorie possède une propriété supplémentaire nommée '${locationItemExtraDefName}', qui lui permet d'être exportée au format GeoPackage.`,
     samplingPointDataCategoryType: "Ceci est la catégorie Données de points d'échantillonnage",
     samplingPointDataCategoryTypeInfo: `Il s'agit d'une catégorie prédéfinie pour les données de points d'échantillonnage. Elle possède une propriété supplémentaire nommée '${locationItemExtraDefName}', qui lui permet d'être exportée au format GeoPackage.`,
+    samplingPointDataCategoryLocationMissing: `La propriété supplémentaire '${locationItemExtraDefName}' est manquante`,
     createCategory: {
       menuLabel: 'Ajouter une catégorie',
       simple: 'Catégorie simple',

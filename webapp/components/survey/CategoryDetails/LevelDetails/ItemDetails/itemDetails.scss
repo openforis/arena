@@ -4,26 +4,40 @@ $borderColor: $greyBorder;
 
 .category__item {
   position: relative;
-  // each collapsed item is a distinct card, so existing (even empty) items are easy to spot
-  border: 1px solid $borderColor;
-  border-left: 4px solid $blue;
-  border-radius: 4px;
   background-color: $white;
-  box-shadow: 0 1px 2px rgba($black, 0.1);
-  // min-height + margin-bottom = rowHeight of the virtualized list (34px)
-  min-height: 30px;
-  margin-bottom: 4px;
-  padding: 0 0.5rem 0 0;
-  display: grid;
-  align-content: center;
-  align-items: center;
-  grid-template-columns: 4rem 80px auto 1fr;
-  column-gap: 10px;
-  grid-row-gap: 0.2rem;
+  // accordion: items are contiguous and share their borders
+  border: 1px solid $borderColor;
+  border-top-width: 0;
   font-size: 0.9rem;
 
-  &:nth-child(even):not(.active) {
-    background-color: $greyAppBg;
+  &:first-child {
+    border-top-width: 1px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+
+  &:last-child {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
+  .category__item-header {
+    // height = rowHeight of the virtualized list (34px) - bottom border
+    min-height: 33px;
+    display: grid;
+    grid-template-columns: 4rem 80px 1fr 2rem;
+    align-items: center;
+    column-gap: 10px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba($greenLight, 0.6);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $blue;
+      outline-offset: -2px;
+    }
   }
 
   .category__item-index {
@@ -47,37 +61,88 @@ $borderColor: $greyBorder;
     font-weight: normal;
   }
 
+  .category__item-toggle-btn {
+    min-width: 0;
+    padding: 4px;
+    color: $colorTextPrimary;
+
+    .MuiButton-startIcon {
+      margin: 0;
+    }
+
+    .category__item-toggle-icon {
+      font-size: 20px;
+      transition: transform 0.2s;
+    }
+  }
+
   &.not-valid {
-    grid-template-columns: 26px 4rem 44px auto 1fr;
-    border-left-color: $red;
+    .category__item-header {
+      grid-template-columns: 16px 4rem 80px 1fr 2rem;
+      box-shadow: inset 4px 0 0 $red;
+    }
 
     .badge {
       position: relative;
+      // keep the icon clear of the red left border
+      margin-left: 6px;
+      padding: 0;
+    }
+
+    .badge__content {
+      display: flex;
+    }
+
+    // explicit color and fill: don't rely on the badge or header text color
+    .category__item-error-icon {
+      font-size: 16px;
+      color: $red;
+      fill: currentColor;
+
+      &.warning {
+        color: $orange;
+      }
     }
   }
 
   &.active {
-    grid-template-columns: 1fr;
-    border: 2px dashed $borderColor;
-    border-radius: 0;
-    box-shadow: none;
-    background-color: rgba($grey, 0.4);
-    padding: 1.5rem 0;
+    .category__item-header {
+      background-color: $blue;
+      color: $white;
 
-    .badge {
-      position: absolute;
+      .category__item-index {
+        background-color: $blueDark;
+        color: $white;
+      }
+
+      .empty {
+        color: $white;
+      }
+
+      // white ring around the icon to keep it visible on the blue background
+      .category__item-error-icon {
+        border-radius: 50%;
+        background-color: $white;
+        box-shadow: 0 0 0 1.5px $white;
+      }
+
+      .category__item-toggle-btn {
+        color: $white;
+      }
+
+      .category__item-toggle-icon {
+        transform: rotate(180deg);
+      }
     }
   }
 
-  &:not(.active):hover {
-    background-color: rgba($greenLight, 0.6);
-    cursor: pointer;
-  }
-
-  .btn-close {
-    position: absolute;
-    right: 0;
-    top: 0;
+  .category__item-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-row-gap: 0.2rem;
+    padding: 0.8rem 1rem 1rem;
+    background-color: $greyAppBg;
+    border-top: 1px solid $borderColor;
   }
 
   .btn-delete {

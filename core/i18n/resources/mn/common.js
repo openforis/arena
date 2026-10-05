@@ -1381,6 +1381,7 @@ $t(common.cantUndoWarning)`,
     geoPackageCategoryInfo: `Энэ ангилалд GeoPackage файл болгон экспортлох боломжийг олгодог '${locationItemExtraDefName}' нэртэй нэмэлт талбар байдаг.`,
     samplingPointDataCategoryType: 'Энэ бол Дээж цэгийн өгөгдлийн ангилал юм',
     samplingPointDataCategoryTypeInfo: `Энэ бол дээж цэгийн өгөгдлийн урьдчилан тодорхойлсон ангилал юм. Үүнд GeoPackage файл болгон экспортлох боломжийг олгодог '${locationItemExtraDefName}' нэртэй нэмэлт талбар байдаг.`,
+    samplingPointDataCategoryLocationMissing: `'${locationItemExtraDefName}' нэртэй нэмэлт талбар алга байна`,
     createCategory: {
       menuLabel: 'Ангилал нэмэх',
       simple: 'Энгийн ангилал',

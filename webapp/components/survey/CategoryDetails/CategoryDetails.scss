@@ -63,6 +63,14 @@ $borderColor: $greyBorder;
     gap: 0.3rem;
   }
 
+  .category-type-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: $orange;
+    font-weight: 600;
+  }
+
   .date-import-template-menu-btn {
     width: 14rem;
   }
