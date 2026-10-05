@@ -202,39 +202,54 @@ export default class RecordsImportJob extends Job {
       },
     ])
 
-    while (!queue.isEmpty()) {
-      const item = queue.dequeue()
-      const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
-
-      const nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
-
-      if (!nodeDefsInfo) {
-        this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
-      } else {
-        for (const { uuid: nodeDefUuid, field } of nodeDefsInfo) {
-          const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-          if (nodeDef) {
-            recordUpdated = await this._insertNodeFromCollectNode({
-              survey,
-              record: recordUpdated,
-              nodeDefNamesByPath,
-              nodeDef,
-              nodeParent,
-              collectNodeDef,
-              collectNodeDefPath,
-              collectNode,
-              field,
-              queue,
-            })
-          } else {
-            this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
-          }
-        }
-      }
-    }
+    recordUpdated = await this._insertNodesFromQueue({ survey, record: recordUpdated, nodeDefNamesByPath, queue })
     recordUpdated = await this._updateRelevance(survey, recordUpdated, this.user)
 
     await this._insertRecordNodes(recordUpdated)
+  }
+
+  // processes the queue items one by one: each node insert depends on the record updated by the previous one
+  async _insertNodesFromQueue({ survey, record, nodeDefNamesByPath, queue }) {
+    if (queue.isEmpty()) return record
+    // awaiting before recursing keeps the call stack flat
+    const recordUpdated = await this._insertNodesFromQueueItem({
+      survey,
+      record,
+      nodeDefNamesByPath,
+      queue,
+      item: queue.dequeue(),
+    })
+    return this._insertNodesFromQueue({ survey, record: recordUpdated, nodeDefNamesByPath, queue })
+  }
+
+  async _insertNodesFromQueueItem({ survey, record, nodeDefNamesByPath, queue, item }) {
+    const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
+
+    const nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
+    if (!nodeDefsInfo) {
+      this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
+      return record
+    }
+    return nodeDefsInfo.reduce(async (recordPromise, { uuid: nodeDefUuid, field }) => {
+      const recordCurrent = await recordPromise
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      if (!nodeDef) {
+        this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
+        return recordCurrent
+      }
+      return this._insertNodeFromCollectNode({
+        survey,
+        record: recordCurrent,
+        nodeDefNamesByPath,
+        nodeDef,
+        nodeParent,
+        collectNodeDef,
+        collectNodeDefPath,
+        collectNode,
+        field,
+        queue,
+      })
+    }, Promise.resolve(record))
   }
 
   async _insertNodeFromCollectNode({

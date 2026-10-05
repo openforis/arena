@@ -62,20 +62,13 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
   }
 
   async push(rowResult) {
-    for (const [columnName, nodeDef] of Object.entries(this.nodeDefsByColumnName)) {
-
-      const value = extractValueFromRowResult({ rowResult, nodeDef, columnName })
-
-      const values = {
-        [TableNode.columnSet.parentUuid]: rowResult[TableNode.columnSet.parentUuid],
-        [TableNode.columnSet.recordUuid]: rowResult[TableNode.columnSet.recordUuid],
-        [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
-        [TableNode.columnSet.value]: value,
-      }
-
-      // flush must complete before the buffer is filled again
-      await super.push(values)
-    }
+    const valuesList = Object.entries(this.nodeDefsByColumnName).map(([columnName, nodeDef]) => ({
+      [TableNode.columnSet.parentUuid]: rowResult[TableNode.columnSet.parentUuid],
+      [TableNode.columnSet.recordUuid]: rowResult[TableNode.columnSet.recordUuid],
+      [TableNode.columnSet.nodeDefUuid]: NodeDef.getUuid(nodeDef),
+      [TableNode.columnSet.value]: extractValueFromRowResult({ rowResult, nodeDef, columnName }),
+    }))
+    await super.push(...valuesList)
 
     return true
   }
