@@ -30,7 +30,8 @@ export const isExprValid = ({ expr, canBeConstant = false, canBeCall = false }) 
   try {
     const exprToValidate = normalize({ expr, canBeConstant, canBeCall })
     return Expression.isValid(exprToValidate)
-  } catch (error) {
+  } catch {
+    // expression cannot be parsed
     return false
   }
 }

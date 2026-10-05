@@ -1,8 +1,8 @@
-import * as RecordActions from './actions'
+export * as RecordActions from './actions'
 import RecordReducer from './reducer'
-import * as RecordState from './state'
+export * as RecordState from './state'
 
-export { RecordActions, RecordReducer, RecordState }
+export { RecordReducer }
 export {
   useRecord,
   useRecordNode,

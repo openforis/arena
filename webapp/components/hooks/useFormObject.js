@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 
 import * as Validation from '@core/validation/validation'
 
-export default (obj, validatorFn = null, validationEnabled = false) => {
+const useFormObject = (obj, validatorFn = null, validationEnabled = false) => {
   const [state, setState] = useState({
     validation: {},
     validationEnabled,
@@ -63,3 +63,5 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
     validation,
   }
 }
+
+export default useFormObject

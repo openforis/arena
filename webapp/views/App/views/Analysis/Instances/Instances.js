@@ -23,7 +23,8 @@ const Instances = () => {
       const { instance, rStudioProxyUrl } = data
       setInstance(instance)
       setUrl(`${rStudioProxyUrl}${instance.instanceId}_${User.getUuid(user)}`)
-    } catch (err) {
+    } catch {
+      // no RStudio instance available
       return false
     } finally {
       setLoading(false)

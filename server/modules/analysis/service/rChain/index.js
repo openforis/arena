@@ -98,7 +98,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
 
   const findEntry = ({ folderNames = [RChain.dirNames.user, RChain.dirNames.sampling], name }) =>
     entryNames.find((entryName) =>
-      folderNames.some((folder) => new RegExp(`^${folder}\\/\\d{3}-${name}\\.R$`).test(entryName))
+      folderNames.some((folder) => new RegExp(String.raw`^${folder}\/\d{3}-${name}\.R$`).test(entryName))
     )
 
   const getZipEntryAsText = (name) => fileZip.getEntryAsText(findEntry({ name }))?.trim()

@@ -5,7 +5,7 @@ import * as Chain from '@common/analysis/chain'
 
 const PLOT_AREA_SUFFIX = '_plot_area_'
 const WEIGHT_NODE_DEF_NAME = 'weight'
-const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = new RegExp(`^\\w+${PLOT_AREA_SUFFIX}$`)
+const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = new RegExp(String.raw`^\w+${PLOT_AREA_SUFFIX}$`)
 
 const getEntityAreaNodeDefName = ({ nodeDefParent }) => `${NodeDef.getName(nodeDefParent)}${PLOT_AREA_SUFFIX}`
 

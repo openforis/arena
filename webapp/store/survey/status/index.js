@@ -1,4 +1,4 @@
-import * as SurveyStatusState from './state'
+export * as SurveyStatusState from './state'
 import SurveyStatusReducer from './reducer'
 
-export { SurveyStatusState, SurveyStatusReducer }
+export { SurveyStatusReducer }

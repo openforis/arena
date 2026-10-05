@@ -56,7 +56,8 @@ export const init = (app) => {
         const url = getMapTileForwardUrl(req)
         const { data: dataStream } = await axios.get(url, { responseType: 'stream' })
         dataStream.pipe(res)
-      } catch (error) {
+      } catch {
+        // remote service not reachable: return an empty result
         res.json({})
       }
     }

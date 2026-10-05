@@ -1,7 +1,5 @@
 // ====== Schema
-import * as Schemata from './schemata'
-
-export { Schemata }
+export * as Schemata from './schemata'
 
 // ====== Tables
 export { default as TableRecord } from './tables/record'

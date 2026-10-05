@@ -84,8 +84,7 @@ const plugins = [
 ]
 
 if (isDevelopment) {
-  plugins.push(new webpack.HotModuleReplacementPlugin())
-  plugins.push(new ReactRefreshWebpackPlugin())
+  plugins.push(new webpack.HotModuleReplacementPlugin(), new ReactRefreshWebpackPlugin())
 }
 
 if (process.env.BUILD_REPORT === 'true') {

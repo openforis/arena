@@ -28,7 +28,8 @@ export const canReadWritePath = (path) => {
   try {
     fs.accessSync(path, fs.constants.R_OK | fs.constants.W_OK)
     return true
-  } catch (e) {
+  } catch {
+    // file not accessible
     return false
   }
 }

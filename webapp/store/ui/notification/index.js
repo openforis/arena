@@ -1,6 +1,6 @@
-import * as NotificationActions from './actions'
-import * as NotificationState from './state'
+export * as NotificationActions from './actions'
+export * as NotificationState from './state'
 import NotificationReducer from './reducer'
-import { useNotification } from './hooks'
+export { useNotification } from './hooks'
 
-export { NotificationActions, NotificationReducer, NotificationState, useNotification }
+export { NotificationReducer }

@@ -15,7 +15,7 @@ const actionHandlersByType = {
   [ACTION_TYPES.error]: (error) => ({ error, loading: false, loaded: false }),
 }
 
-export default ({ method, url, data, params, ...rest }) => {
+const useAsync = ({ method, url, data, params, ...rest }) => {
   const [state, _dispatch] = useReducer((_state, { type, payload }) => actionHandlersByType[type](payload), {
     loading: false,
     loaded: false,
@@ -55,3 +55,5 @@ export default ({ method, url, data, params, ...rest }) => {
     setState,
   }
 }
+
+export default useAsync

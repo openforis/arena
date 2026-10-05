@@ -29,7 +29,7 @@ export default class SurveysRdbRefreshJob extends Job {
         }
       } catch (error) {
         surveysIdsWithErrors.push(surveyId)
-        this.logDebug(`something went wrong updating RDB for survey ${surveyId}`)
+        this.logDebug(`something went wrong updating RDB for survey ${surveyId}: ${error}`)
       }
     }
     const message =

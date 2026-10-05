@@ -1,8 +1,8 @@
-import * as SystemActions from './actions'
-import * as SystemState from './state'
+export * as SystemActions from './actions'
+export * as SystemState from './state'
 import SystemReducer from './reducer'
 
-export { SystemActions, SystemState, SystemReducer }
+export { SystemReducer }
 
 // info
 export {

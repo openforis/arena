@@ -21,8 +21,8 @@ const convert = async ({ survey, nodeDefCurrent, expression, advancedExpressionE
     { pattern: ' and ', replace: ' && ', ignoreCase: true },
     { pattern: ' or ', replace: ' || ', ignoreCase: true },
     // predefined variables
-    { pattern: '\\$this', replace: Expression.thisVariable },
-    { pattern: '\\$context', replace: Expression.contextVariable },
+    { pattern: String.raw`\$this`, replace: Expression.thisVariable },
+    { pattern: String.raw`\$context`, replace: Expression.contextVariable },
     // not function
     { pattern: /not\(/, replace: '!(' },
     // parent function

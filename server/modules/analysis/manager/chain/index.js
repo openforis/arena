@@ -109,7 +109,6 @@ const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
 }
 
 // ====== PERSIST
-/* eslint-disable */
 /**
  * @deprecated
  */

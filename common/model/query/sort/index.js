@@ -1,3 +1,1 @@
-import * as Sort from './sort'
-
-export { Sort }
+export * as Sort from './sort'

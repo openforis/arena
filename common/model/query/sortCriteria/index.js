@@ -1,3 +1,1 @@
-import * as SortCriteria from './sortCriteria'
-
-export { SortCriteria }
+export * as SortCriteria from './sortCriteria'
