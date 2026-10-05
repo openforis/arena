@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
 
-import { ServiceRegistry } from '@openforis/arena-core'
+import { Promises, ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { db } from '@server/db/db'
@@ -642,11 +642,12 @@ const _deleteUntouchedSurveysOfExpiredInvitationUsers = async (client) => {
   const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
   Logger.info(`IDs of untouched surveys of users with expired invitation to delete: ${surveyIds}`)
   const deletedSurveyIds = []
-  for (const surveyId of surveyIds) {
+  // one at a time: every deletion drops a schema and the client could be a transaction
+  await Promises.each(surveyIds, async (surveyId) => {
     if (await _deleteUntouchedSurvey({ surveyId }, client)) {
       deletedSurveyIds.push(surveyId)
     }
-  }
+  })
   return deletedSurveyIds
 }
 

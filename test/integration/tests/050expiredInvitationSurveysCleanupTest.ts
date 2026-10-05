@@ -1,3 +1,5 @@
+import { Promises } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as User from '@core/user/user'
@@ -67,10 +69,10 @@ const createSurveyWithInvitedUser = async (params: {
 
 describe('Expired invitations: untouched surveys cleanup', () => {
   afterAll(async () => {
-    for (const { surveyId, userUuid } of createdItems) {
+    await Promises.each(createdItems, async ({ surveyId, userUuid }) => {
       await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true })
       await UserManager.deleteUser(userUuid)
-    }
+    })
   })
 
   test('survey never modified after the invitation is selected', async () => {
