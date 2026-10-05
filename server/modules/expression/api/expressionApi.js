@@ -12,18 +12,13 @@ import * as TaxonomyManager from '../../taxonomy/manager/taxonomyManager'
 
 const toItem =
   (type, lang = null) =>
-  (item) =>
-    item
-      ? type === NodeDef.nodeDefType.code
-        ? {
-            value: CategoryItem.getCode(item),
-            label: CategoryItem.getLabel(lang)(item),
-          }
-        : {
-            value: Taxon.getCode(item),
-            label: `(${Taxon.getCode(item)}) ${Taxon.getScientificName(item)}`,
-          }
-      : null
+  (item) => {
+    if (!item) return null
+    if (type === NodeDef.nodeDefType.code) {
+      return { value: CategoryItem.getCode(item), label: CategoryItem.getLabel(lang)(item) }
+    }
+    return { value: Taxon.getCode(item), label: `(${Taxon.getCode(item)}) ${Taxon.getScientificName(item)}` }
+  }
 
 export const init = (app) => {
   // ==== READ

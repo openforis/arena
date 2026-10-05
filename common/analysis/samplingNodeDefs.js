@@ -5,7 +5,7 @@ import * as Chain from '@common/analysis/chain'
 
 const PLOT_AREA_SUFFIX = '_plot_area_'
 const WEIGHT_NODE_DEF_NAME = 'weight'
-const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = new RegExp(`^\\w+${PLOT_AREA_SUFFIX}$`)
+const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = new RegExp(String.raw`^\w+${PLOT_AREA_SUFFIX}$`)
 
 const getEntityAreaNodeDefName = ({ nodeDefParent }) => `${NodeDef.getName(nodeDefParent)}${PLOT_AREA_SUFFIX}`
 
@@ -144,9 +144,9 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
 
   // check if some existing entity area node def is not valid anymore and must be deleted
   const existingEntityAreaNodeDefs = getAllEntityAreaNodeDefs({ survey, chain })
-  const validNodeDefsAlreadyExistingUuids = validNodeDefsAlreadyExisting.map(NodeDef.getUuid)
+  const validNodeDefsAlreadyExistingUuids = new Set(validNodeDefsAlreadyExisting.map(NodeDef.getUuid))
   const existingEntityAreaNodeDefsToDelete = existingEntityAreaNodeDefs.filter(
-    (existingSamplingNodeDef) => !validNodeDefsAlreadyExistingUuids.includes(NodeDef.getUuid(existingSamplingNodeDef))
+    (existingSamplingNodeDef) => !validNodeDefsAlreadyExistingUuids.has(NodeDef.getUuid(existingSamplingNodeDef))
   )
 
   nodeDefsToDelete.push(...existingEntityAreaNodeDefsToDelete)
@@ -155,11 +155,10 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
 }
 
 const getSamplingDefsInEntities = ({ survey, chain, entities, analysisNodeDefs }) => {
-  const entityUuids = entities.map(NodeDef.getUuid)
+  const entityUuids = new Set(entities.map(NodeDef.getUuid))
 
   const samplingDefs = analysisNodeDefs.filter(
-    (analysisNodeDef) =>
-      NodeDef.isSampling(analysisNodeDef) && entityUuids.includes(NodeDef.getParentUuid(analysisNodeDef))
+    (analysisNodeDef) => NodeDef.isSampling(analysisNodeDef) && entityUuids.has(NodeDef.getParentUuid(analysisNodeDef))
   )
 
   // put the "weight" node def first

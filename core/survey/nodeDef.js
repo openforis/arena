@@ -303,8 +303,8 @@ export const getCoordinateAdditionalFields = NodeDefs.getCoordinateAdditionalFie
 export const getUnit = getProp(propKeys.unit, '')
 // decimal
 export const getMaxNumberDecimalDigits = (nodeDef) => {
-  const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef)
-  return A.isEmpty(decimalDigits) ? NaN : Number(decimalDigits)
+  const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, Number.NaN)(nodeDef)
+  return A.isEmpty(decimalDigits) ? Number.NaN : Number(decimalDigits)
 }
 // file
 export const isNumberOfFilesEnabled = isMultiple
@@ -370,7 +370,9 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultT
     firstPart = name
   }
 
-  const suffix = isVirtual(nodeDef) ? ' (V)' : isAnalysis(nodeDef) && isAttribute(nodeDef) ? ' (C)' : ''
+  let suffix = ''
+  if (isVirtual(nodeDef)) suffix = ' (V)'
+  else if (isAnalysis(nodeDef) && isAttribute(nodeDef)) suffix = ' (C)'
 
   return firstPart + suffix
 }

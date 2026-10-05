@@ -184,9 +184,8 @@ export default class RecordsImportJob extends Job {
   }
 
   async traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath }) {
-    const { collectSurveyFileZip, collectSurvey } = this.context
+    const { collectSurvey } = this.context
 
-    const recordUuid = Record.getUuid(record)
     let recordUpdated = { ...record }
 
     const collectRootEntityName = CollectRecord.getRootEntityName(collectRecordJson)
@@ -203,64 +202,107 @@ export default class RecordsImportJob extends Job {
       },
     ])
 
-    while (!queue.isEmpty()) {
-      const item = queue.dequeue()
-      const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
-
-      const nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
-
-      if (!nodeDefsInfo) {
-        this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
-      } else {
-        for (const { uuid: nodeDefUuid, field } of nodeDefsInfo) {
-          const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-          if (!nodeDef) {
-            this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
-            continue
-          }
-
-          let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
-
-          const valueAndMeta = NodeDef.isAttribute(nodeDef)
-            ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
-                survey,
-                categoryItemProvider,
-                taxonProvider,
-                nodeDef,
-                record: recordUpdated,
-                node: nodeToInsert,
-                collectSurveyFileZip,
-                collectNodeDef,
-                collectNode,
-                collectNodeField: field,
-                tx: this.tx,
-              })
-            : {}
-
-          const { value = null, meta = {} } = valueAndMeta || {}
-
-          nodeToInsert = A.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
-
-          recordUpdated = Record.assocNode(nodeToInsert, { sideEffect: true })(recordUpdated)
-
-          if (NodeDef.isEntity(nodeDef)) {
-            // Create child items to insert
-            const { itemsToInsert } = this._extractChildrenItemsToInsert({
-              survey,
-              nodeDefNamesByPath,
-              collectNodeDef,
-              collectNodeDefPath,
-              collectNode,
-              node: nodeToInsert,
-            })
-            queue.enqueueItems(itemsToInsert)
-          }
-        }
-      }
-    }
+    recordUpdated = await this._insertNodesFromQueue({ survey, record: recordUpdated, nodeDefNamesByPath, queue })
     recordUpdated = await this._updateRelevance(survey, recordUpdated, this.user)
 
     await this._insertRecordNodes(recordUpdated)
+  }
+
+  // processes the queue items one by one: each node insert depends on the record updated by the previous one
+  async _insertNodesFromQueue({ survey, record, nodeDefNamesByPath, queue }) {
+    if (queue.isEmpty()) return record
+    // awaiting before recursing keeps the call stack flat
+    const recordUpdated = await this._insertNodesFromQueueItem({
+      survey,
+      record,
+      nodeDefNamesByPath,
+      queue,
+      item: queue.dequeue(),
+    })
+    return this._insertNodesFromQueue({ survey, record: recordUpdated, nodeDefNamesByPath, queue })
+  }
+
+  async _insertNodesFromQueueItem({ survey, record, nodeDefNamesByPath, queue, item }) {
+    const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
+
+    const nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
+    if (!nodeDefsInfo) {
+      this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
+      return record
+    }
+    return nodeDefsInfo.reduce(async (recordPromise, { uuid: nodeDefUuid, field }) => {
+      const recordCurrent = await recordPromise
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      if (!nodeDef) {
+        this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
+        return recordCurrent
+      }
+      return this._insertNodeFromCollectNode({
+        survey,
+        record: recordCurrent,
+        nodeDefNamesByPath,
+        nodeDef,
+        nodeParent,
+        collectNodeDef,
+        collectNodeDefPath,
+        collectNode,
+        field,
+        queue,
+      })
+    }, Promise.resolve(record))
+  }
+
+  async _insertNodeFromCollectNode({
+    survey,
+    record,
+    nodeDefNamesByPath,
+    nodeDef,
+    nodeParent,
+    collectNodeDef,
+    collectNodeDefPath,
+    collectNode,
+    field,
+    queue,
+  }) {
+    const { collectSurveyFileZip } = this.context
+
+    let nodeToInsert = Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), nodeParent)
+
+    const valueAndMeta = NodeDef.isAttribute(nodeDef)
+      ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
+          survey,
+          categoryItemProvider,
+          taxonProvider,
+          nodeDef,
+          record,
+          node: nodeToInsert,
+          collectSurveyFileZip,
+          collectNodeDef,
+          collectNode,
+          collectNodeField: field,
+          tx: this.tx,
+        })
+      : {}
+
+    const { value = null, meta = {} } = valueAndMeta || {}
+
+    nodeToInsert = A.pipe(Node.assocValue(value), Node.mergeMeta(meta))(nodeToInsert)
+
+    const recordUpdated = Record.assocNode(nodeToInsert, { sideEffect: true })(record)
+
+    if (NodeDef.isEntity(nodeDef)) {
+      // Create child items to insert
+      const { itemsToInsert } = this._extractChildrenItemsToInsert({
+        survey,
+        nodeDefNamesByPath,
+        collectNodeDef,
+        collectNodeDefPath,
+        collectNode,
+        node: nodeToInsert,
+      })
+      queue.enqueueItems(itemsToInsert)
+    }
+    return recordUpdated
   }
 
   _extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath }) {

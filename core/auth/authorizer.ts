@@ -47,7 +47,7 @@ const _hasPermissionInSomeGroup =
 export const canCreateSurvey = _hasPermissionInSomeGroup(permissions.surveyCreate)
 export const canCreateTemplate = (user: ArenaUser): boolean => User.isSystemAdmin(user)
 export const getMaxSurveysUserCanCreate = (user: ArenaUser): number => {
-  if (User.isSystemAdmin(user)) return NaN
+  if (User.isSystemAdmin(user)) return Number.NaN
   if (canCreateSurvey(user)) return User.getMaxSurveys(user)
   return 0
 }

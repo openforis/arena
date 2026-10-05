@@ -39,13 +39,10 @@ const _hasSiblingWithoutKeys = ({ survey, nodeDef, record, parentNode }) => {
   if (Objects.isEmpty(keyDefs)) return false
 
   const siblings = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
-  return (
-    siblings.length > 0 &&
-    siblings.some((sibling) => {
-      const keyValues = Record.getEntityKeyValues(survey, sibling)(record)
-      return keyValues.every((keyValue) => Objects.isEmpty(keyValue))
-    })
-  )
+  return siblings.some((sibling) => {
+    const keyValues = Record.getEntityKeyValues(survey, sibling)(record)
+    return keyValues.every((keyValue) => Objects.isEmpty(keyValue))
+  })
 }
 
 const _isNodesCountAboveMin = ({ parentNode, nodeDef, nodes }) => {
@@ -66,11 +63,12 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode, editable }) 
 
     const survey = SurveyState.getSurvey(state)
 
-    const nodes = NodeDef.isRoot(nodeDef)
-      ? [rootNode]
-      : parentNode
-        ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
-        : []
+    let nodes = []
+    if (NodeDef.isRoot(nodeDef)) {
+      nodes = [rootNode]
+    } else if (parentNode) {
+      nodes = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
+    }
 
     const canAddOrDeleteNodeCommon =
       editable && canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)

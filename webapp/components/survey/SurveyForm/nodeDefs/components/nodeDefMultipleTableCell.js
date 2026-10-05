@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
-import * as A from '@core/arena'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -26,14 +25,10 @@ const getNodeValues = (nodeDef, nodes, lang) => {
     return Node.getValue(node)
   }
 
-  return A.reduce(
-    (accString, node) =>
-      Node.isPlaceholder(node) || Node.isValueBlank(node)
-        ? accString
-        : `${accString === '' ? '' : `${accString}, `}${getNodeValue(node)}`,
-    '',
-    nodes
-  )
+  return nodes
+    .filter((node) => !Node.isPlaceholder(node) && !Node.isValueBlank(node))
+    .map((node) => getNodeValue(node))
+    .join(', ')
 }
 
 const NodeDefMultipleTableCell = (props) => {

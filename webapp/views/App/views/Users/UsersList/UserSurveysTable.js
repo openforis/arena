@@ -15,7 +15,7 @@ export const UserSurveysTable = (props) => {
   const i18n = useI18n()
 
   useEffect(() => {
-    ;(async () => {
+    void (async () => {
       const { surveys: surveysLoaded } = await API.fetchUserSurveys({ userUuid: user.uuid })
       setState({ surveys: surveysLoaded, loading: false })
     })()

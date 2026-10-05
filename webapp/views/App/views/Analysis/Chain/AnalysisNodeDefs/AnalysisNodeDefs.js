@@ -54,37 +54,35 @@ const AnalysisNodeDefs = () => {
           <p>{i18n.t('chain.emptyNodeDefs')}</p>
         </div>
       )}
-      <>
-        <AnalysisNodeDefsHeader
-          toggleShowSamplingNodeDefs={() => setShowSamplingNodeDefs(!showSamplingNodeDefs)}
-          showSamplingNodeDefs={showSamplingNodeDefs}
-        />
+      <AnalysisNodeDefsHeader
+        toggleShowSamplingNodeDefs={() => setShowSamplingNodeDefs(!showSamplingNodeDefs)}
+        showSamplingNodeDefs={showSamplingNodeDefs}
+      />
 
-        {analysisNodeDefsToShow.length > 0 && (
-          <div className="analysis-node-defs__list">
-            <div className="analysis-node-defs__list-header">
-              <div />
-              <div>{i18n.t('common.entity')}</div>
-              <div>{i18n.t('common.name')}</div>
-              <div>{i18n.t('common.label')}</div>
-              <div>{i18n.t('common.areaBased')}</div>
-              <div>{i18n.t('common.type')}</div>
-              <div>{i18n.t('common.active')}</div>
-              <div />
-            </div>
-
-            <div className="analysis-node-defs__list-content" ref={analysisNodeDefsContainerRef}>
-              {analysisNodeDefsToShow.map((analysisNodeDef) => (
-                <AnalysisNodeDef
-                  key={NodeDef.getUuid(analysisNodeDef)}
-                  nodeDefUuid={NodeDef.getUuid(analysisNodeDef)}
-                  dataCount={entityViewDataCountsByUuid[NodeDef.getParentUuid(analysisNodeDef)]}
-                />
-              ))}
-            </div>
+      {analysisNodeDefsToShow.length > 0 && (
+        <div className="analysis-node-defs__list">
+          <div className="analysis-node-defs__list-header">
+            <div />
+            <div>{i18n.t('common.entity')}</div>
+            <div>{i18n.t('common.name')}</div>
+            <div>{i18n.t('common.label')}</div>
+            <div>{i18n.t('common.areaBased')}</div>
+            <div>{i18n.t('common.type')}</div>
+            <div>{i18n.t('common.active')}</div>
+            <div />
           </div>
-        )}
-      </>
+
+          <div className="analysis-node-defs__list-content" ref={analysisNodeDefsContainerRef}>
+            {analysisNodeDefsToShow.map((analysisNodeDef) => (
+              <AnalysisNodeDef
+                key={NodeDef.getUuid(analysisNodeDef)}
+                nodeDefUuid={NodeDef.getUuid(analysisNodeDef)}
+                dataCount={entityViewDataCountsByUuid[NodeDef.getParentUuid(analysisNodeDef)]}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

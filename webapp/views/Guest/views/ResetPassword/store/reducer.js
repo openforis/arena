@@ -1,7 +1,7 @@
 import initialState from './initialState'
 import * as actionTypes from './actionTypes'
 
-export default (state, action) => {
+const reducer = (state, action) => {
   switch (action.type) {
     case actionTypes.USER_INIT:
       return {
@@ -25,3 +25,5 @@ export default (state, action) => {
       return initialState
   }
 }
+
+export default reducer

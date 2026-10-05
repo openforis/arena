@@ -19,7 +19,7 @@ const NodeDefTaxonAutocompleteItemRenderer = (props) => {
       onKeyDown={onKeyDown}
       onMouseDown={onMouseDown}
       role="button"
-      tabIndex="1"
+      tabIndex="0"
     >
       <div>{Taxon.getCode(taxon)}</div>
       <div>{Taxon.getScientificName(taxon)}</div>

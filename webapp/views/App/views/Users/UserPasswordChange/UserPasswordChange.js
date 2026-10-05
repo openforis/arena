@@ -39,7 +39,7 @@ const UserPasswordChange = () => {
       setState((statePrev) => ({ ...statePrev, userToUpdate: userLoaded }))
     }
     if (userUuid) {
-      fetchAndSetUser()
+      void fetchAndSetUser()
     }
   }, [userUuid])
 

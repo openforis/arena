@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import { ZipArchive } from 'archiver'
 
 import { SystemError as CoreSystemError } from '@openforis/arena-core'

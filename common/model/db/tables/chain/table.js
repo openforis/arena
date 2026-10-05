@@ -24,8 +24,8 @@ const tableName = 'chain'
 export default class TableChain extends TableSurvey {
   constructor(surveyId) {
     super(surveyId, tableName, columnSet)
-    const scriptColumns = scriptColumnNames.map((col) => this.getColumn(col))
-    this._columnsNoScript = this.columns.filter((column) => !scriptColumns.includes(column))
+    const scriptColumns = new Set(scriptColumnNames.map((col) => this.getColumn(col)))
+    this._columnsNoScript = this.columns.filter((column) => !scriptColumns.has(column))
     this.getSelect = getSelect.bind(this)
   }
 

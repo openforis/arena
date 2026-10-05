@@ -7,7 +7,7 @@ export const Changelog = () => {
   const [content, setContent] = useState('')
 
   useEffect(() => {
-    API.fetchChangelog().then(setContent)
+    void API.fetchChangelog().then(setContent)
   }, [])
 
   return <Markdown source={content} />

@@ -59,7 +59,7 @@ export const UsersAccessRequest = () => {
       const templates = await API.fetchSurveyTemplatesPublished()
       setSurveyTemplates(templates)
     }
-    loadSurveyTemplates()
+    void loadSurveyTemplates()
   }, [])
 
   return (

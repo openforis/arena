@@ -47,7 +47,7 @@ export const useUserGroupsList = (): UseUserGroupsListResult => {
   useEffect(() => {
     let ignore = false
 
-    fetchUserGroupsListRows(surveyId).then((data) => {
+    void fetchUserGroupsListRows(surveyId).then((data) => {
       if (!ignore) {
         setRows(data)
         setLoading(false)

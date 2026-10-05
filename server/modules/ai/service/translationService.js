@@ -52,6 +52,66 @@ const MAX_GLOSSARY_VALUE_LEN = 200
 // be a full validator. The point is to bound length, not parse locales.
 const isValidLang = (lang) => typeof lang === 'string' && lang.length > 0 && lang.length <= MAX_LANG_CODE_LEN
 
+const validateLangs = ({ sourceLang, targetLangs }) => {
+  if (!sourceLang) throw new SystemError('aiTranslationSourceLangMissing')
+  if (!isValidLang(sourceLang)) {
+    throw new SystemError('aiInputTooLong', { field: 'sourceLang', limit: MAX_LANG_CODE_LEN })
+  }
+  if (!Array.isArray(targetLangs) || targetLangs.length === 0) {
+    throw new SystemError('aiTranslationTargetLangsMissing')
+  }
+  if (targetLangs.length > MAX_TARGET_LANGS) {
+    throw new SystemError('aiTranslationTooManyItems', { count: targetLangs.length, limit: MAX_TARGET_LANGS })
+  }
+  if (!targetLangs.every((lang) => isValidLang(lang))) {
+    throw new SystemError('aiInputTooLong', { field: 'targetLangs', limit: MAX_LANG_CODE_LEN })
+  }
+}
+
+const validateItems = (items) => {
+  if (!Array.isArray(items) || items.length === 0) {
+    throw new SystemError('aiTranslationItemsMissing')
+  }
+  if (items.length > MAX_ITEMS_PER_CALL) {
+    throw new SystemError('aiTranslationTooManyItems', { count: items.length, limit: MAX_ITEMS_PER_CALL })
+  }
+  for (const item of items) {
+    ItemSchema.parse(item)
+  }
+}
+
+const validateGlossaryEntryByLang = (byLang) => {
+  for (const [lang, value] of Object.entries(byLang)) {
+    if (!isValidLang(lang)) {
+      throw new SystemError('aiInputTooLong', { field: 'glossary.byLang.key', limit: MAX_LANG_CODE_LEN })
+    }
+    if (typeof value === 'string' && value.length > MAX_GLOSSARY_VALUE_LEN) {
+      throw new SystemError('aiInputTooLong', { field: 'glossary.byLang.value', limit: MAX_GLOSSARY_VALUE_LEN })
+    }
+  }
+}
+
+const validateGlossary = (glossary) => {
+  if (!Array.isArray(glossary)) return
+  if (glossary.length > MAX_GLOSSARY_ENTRIES) {
+    throw new SystemError('aiTranslationTooManyItems', { count: glossary.length, limit: MAX_GLOSSARY_ENTRIES })
+  }
+  for (const g of glossary) {
+    if (g?.source != null && String(g.source).length > MAX_GLOSSARY_VALUE_LEN) {
+      throw new SystemError('aiInputTooLong', { field: 'glossary.source', limit: MAX_GLOSSARY_VALUE_LEN })
+    }
+    if (g?.byLang && typeof g.byLang === 'object') {
+      validateGlossaryEntryByLang(g.byLang)
+    }
+  }
+}
+
+const validateTranslateArgs = ({ sourceLang, targetLangs, items, glossary }) => {
+  validateLangs({ sourceLang, targetLangs })
+  validateItems(items)
+  validateGlossary(glossary)
+}
+
 /**
  * Translates a batch of survey labels.
  * @param {object} args - Args.
@@ -64,49 +124,7 @@ const isValidLang = (lang) => typeof lang === 'string' && lang.length > 0 && lan
  *   The translations grouped by item id.
  */
 export const translate = async ({ user, sourceLang, targetLangs, items, glossary = [] }) => {
-  if (!sourceLang) throw new SystemError('aiTranslationSourceLangMissing')
-  if (!isValidLang(sourceLang)) {
-    throw new SystemError('aiInputTooLong', { field: 'sourceLang', limit: MAX_LANG_CODE_LEN })
-  }
-  if (!Array.isArray(targetLangs) || targetLangs.length === 0) {
-    throw new SystemError('aiTranslationTargetLangsMissing')
-  }
-  if (targetLangs.length > MAX_TARGET_LANGS) {
-    throw new SystemError('aiTranslationTooManyItems', { count: targetLangs.length, limit: MAX_TARGET_LANGS })
-  }
-  if (!targetLangs.every(isValidLang)) {
-    throw new SystemError('aiInputTooLong', { field: 'targetLangs', limit: MAX_LANG_CODE_LEN })
-  }
-  if (!Array.isArray(items) || items.length === 0) {
-    throw new SystemError('aiTranslationItemsMissing')
-  }
-  if (items.length > MAX_ITEMS_PER_CALL) {
-    throw new SystemError('aiTranslationTooManyItems', { count: items.length, limit: MAX_ITEMS_PER_CALL })
-  }
-
-  // Validate item shape
-  items.forEach((it) => ItemSchema.parse(it))
-
-  if (Array.isArray(glossary)) {
-    if (glossary.length > MAX_GLOSSARY_ENTRIES) {
-      throw new SystemError('aiTranslationTooManyItems', { count: glossary.length, limit: MAX_GLOSSARY_ENTRIES })
-    }
-    for (const g of glossary) {
-      if (g?.source != null && String(g.source).length > MAX_GLOSSARY_VALUE_LEN) {
-        throw new SystemError('aiInputTooLong', { field: 'glossary.source', limit: MAX_GLOSSARY_VALUE_LEN })
-      }
-      if (g?.byLang && typeof g.byLang === 'object') {
-        for (const [lang, value] of Object.entries(g.byLang)) {
-          if (!isValidLang(lang)) {
-            throw new SystemError('aiInputTooLong', { field: 'glossary.byLang.key', limit: MAX_LANG_CODE_LEN })
-          }
-          if (typeof value === 'string' && value.length > MAX_GLOSSARY_VALUE_LEN) {
-            throw new SystemError('aiInputTooLong', { field: 'glossary.byLang.value', limit: MAX_GLOSSARY_VALUE_LEN })
-          }
-        }
-      }
-    }
-  }
+  validateTranslateArgs({ sourceLang, targetLangs, items, glossary })
 
   const runOnce = async (previousError) => {
     const { system, prompt } = buildTranslationPrompt({

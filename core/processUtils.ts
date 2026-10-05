@@ -15,7 +15,7 @@ const environments = {
 } as const
 
 const dbUrl = process.env.DATABASE_URL
-const regExDbUrl = /postgres:\/\/(\w+):(\w+)@([\w-.\d]+):(\d+)\/(\w+)/
+const regExDbUrl = /postgres:\/\/(\w+):(\w+)@([\w.-]+):(\d+)\/(\w+)/
 const dbUrlMatch = dbUrl ? dbUrl.match(regExDbUrl) : null
 
 const [pgUser, pgPassword, pgHost, pgPort, pgDatabase] = dbUrlMatch

@@ -41,7 +41,7 @@ const AdvancedFunctionsMenu = () => {
       const file = await API.fetchChainMauFileSummary({ surveyId, chainUuid, cycle })
       if (!cancelled) setMauFile(file)
     }
-    fetchMauFile()
+    void fetchMauFile()
     return () => {
       cancelled = true
     }

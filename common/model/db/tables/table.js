@@ -80,7 +80,7 @@ export default class Table {
 
   // ======= common columns
   _getColumnCommon(column) {
-    if (Object.values(this._columnSet).indexOf(column) < 0) {
+    if (!Object.values(this._columnSet).includes(column)) {
       throw new TypeError(`Column ${column} does not exist`)
     }
     return this.getColumn(column)

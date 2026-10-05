@@ -147,7 +147,7 @@ const AiExpressionPopup = (props) => {
           onKeyDown={(e) => {
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
               e.preventDefault()
-              onGenerate()
+              void onGenerate()
             }
           }}
         />

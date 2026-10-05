@@ -11,7 +11,7 @@ const extractName = (row) => {
   const authNameAndCode = `${auth_name}:${auth_srid}`
 
   if (datumNameMatch) {
-    const name = datumNameMatch[1].replaceAll(/_/g, ' ')
+    const name = datumNameMatch[1].replaceAll('_', ' ')
     return `${name} (${authNameAndCode})`
   }
   return authNameAndCode

@@ -51,8 +51,10 @@ const isCategoryUsedInExpressions = (category) => (survey) =>
   !!SurveyNodeDefs.findNodeDef((nodeDef) => {
     const expressions = NodeDef.getAllExpressions(nodeDef)
     const categoryName = Category.getName(category)
-    return !!expressions.find((expression) =>
-      new RegExp(`${functionNames.categoryItemProp}\\s*\\(\\s*['|"]${categoryName}['|"]\\s*,.*\\)`).test(expression)
+    return expressions.some((expression) =>
+      new RegExp(String.raw`${functionNames.categoryItemProp}\s*\(\s*['|"]${categoryName}['|"]\s*,.*\)`).test(
+        expression
+      )
     )
   })(survey)
 

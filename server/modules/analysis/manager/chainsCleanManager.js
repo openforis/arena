@@ -16,10 +16,10 @@ const Logger = Log.getLogger('ChainsCleanManager')
 const _cleanChainsOrphans = async ({ user, surveyId }, tx) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true }, tx)
   const chains = await ChainRepository.fetchChains({ surveyId }, tx)
-  const chainsUuids = chains.map(Chain.getUuid)
+  const chainsUuids = new Set(chains.map(Chain.getUuid))
 
   const orphanNodeDefsUuids = Survey.getNodeDefsArray(survey)
-    .filter((_nodeDef) => NodeDef.getChainUuid(_nodeDef) && !chainsUuids.includes(NodeDef.getChainUuid(_nodeDef)))
+    .filter((_nodeDef) => NodeDef.getChainUuid(_nodeDef) && !chainsUuids.has(NodeDef.getChainUuid(_nodeDef)))
     .map(NodeDef.getUuid)
 
   Logger.info(`Deleting orphan node def uuids: ${orphanNodeDefsUuids}`)

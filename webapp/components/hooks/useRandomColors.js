@@ -58,7 +58,7 @@ const determineAvailableColors = ({ onlyLightColors = false, onlyDarkColors = fa
 }
 
 export const useRandomColor = (dependencies = []) => {
-  const availableColorsRef = useRef([...Object.values(possibleColors)])
+  const availableColorsRef = useRef(Object.values(possibleColors))
 
   const nextColor = useCallback(() => {
     const availableColors = availableColorsRef.current
@@ -71,7 +71,7 @@ export const useRandomColor = (dependencies = []) => {
     const availableColorsUpdated = [...availableColors]
     availableColorsUpdated.splice(colorIndex, 1)
     availableColorsRef.current =
-      availableColorsUpdated.length > 0 ? availableColorsUpdated : [...Object.values(possibleColors)]
+      availableColorsUpdated.length > 0 ? availableColorsUpdated : Object.values(possibleColors)
 
     return color
   }, dependencies)
@@ -84,7 +84,7 @@ export const useRandomColor = (dependencies = []) => {
 export const useRandomColors = (size, { onlyDarkColors = false, onlyLightColors = false } = {}) =>
   useMemo(() => {
     const availableColorsObj = determineAvailableColors({ onlyDarkColors, onlyLightColors })
-    const availableColors = [...Object.values(availableColorsObj)]
+    const availableColors = Object.values(availableColorsObj)
 
     const colors = []
 

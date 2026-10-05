@@ -56,12 +56,12 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
   if (hierarchicalCategories.length === 0) {
     return {}
   }
-  const hierarchicalCategoriesUuids = hierarchicalCategories.map(Category.getUuid)
+  const hierarchicalCategoriesUuids = new Set(hierarchicalCategories.map(Category.getUuid))
 
   const codeAttributes2ndLevel = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) =>
       NodeDef.isCode(nodeDef) &&
-      hierarchicalCategoriesUuids.includes(NodeDef.getCategoryUuid(nodeDef)) &&
+      hierarchicalCategoriesUuids.has(NodeDef.getCategoryUuid(nodeDef)) &&
       !!NodeDef.getParentCodeDefUuid(nodeDef)
   )
 

@@ -294,7 +294,7 @@ const _mergeMultipleAttributes = ({
       childrenSource.forEach((childSource) => {
         const sourceValue = Node.getValue(childSource)
         if (
-          !targetValues.find((targetValue) =>
+          !targetValues.some((targetValue) =>
             NodeValues.isValueEqual({
               survey,
               nodeDef: childDef,

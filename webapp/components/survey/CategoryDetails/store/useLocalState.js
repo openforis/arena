@@ -20,7 +20,7 @@ export const useLocalState = (props) => {
   const categoryCleaned = State.isCleaned(state)
 
   useEffect(() => {
-    ;(async () => {
+    void (async () => {
       await Actions.init({ state, categoryUuid, onCategoryUpdate })
     })()
   }, [])

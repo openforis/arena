@@ -73,9 +73,9 @@ const getCategoryExportHeaders = ({
   if (language) {
     headers.push('label', 'description')
   }
-  headers.push(...languages.map((language) => CategoryExportFile.getLabelHeader({ language })))
-  headers.push(...languages.map((language) => CategoryExportFile.getDescriptionHeader({ language })))
   headers.push(
+    ...languages.map((language) => CategoryExportFile.getLabelHeader({ language })),
+    ...languages.map((language) => CategoryExportFile.getDescriptionHeader({ language })),
     ...Category.getItemExtraDefsArray(category).flatMap((extraPropDef) =>
       CategoryExportFile.getExtraPropHeaders({ extraPropDef })
     )

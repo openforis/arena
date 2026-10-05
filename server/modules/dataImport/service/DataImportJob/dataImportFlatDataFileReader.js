@@ -17,8 +17,8 @@ import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const VALUE_PROP_DEFAULT = 'value'
 
-const allowedBooleanValues = ['true', 'false', 'yes', 'no', '1', '0']
-const booleanTrueValues = ['true', 'yes', '1']
+const allowedBooleanValues = new Set(['true', 'false', 'yes', 'no', '1', '0'])
+const booleanTrueValues = new Set(['true', 'yes', '1'])
 
 const generateAllowedDateFormats = (sep) => [
   `DD${sep}MM${sep}YYYY`,
@@ -134,10 +134,10 @@ export const extractTimeValue = ({ value, headers, nodeDef }) => {
 const nodeValueAndRefDataExtractorByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ value, headers }) => {
     const val = singlePropValueConverter({ value })
-    if (!allowedBooleanValues.includes(String(val).toLocaleLowerCase())) {
+    if (!allowedBooleanValues.has(String(val).toLocaleLowerCase())) {
       throw new SystemError('validationErrors:dataImport.invalidBoolean', { value: val, headers })
     }
-    return { value: String(booleanTrueValues.includes(String(val).toLocaleLowerCase())), refData: null }
+    return { value: String(booleanTrueValues.has(String(val).toLocaleLowerCase())), refData: null }
   },
   [NodeDef.nodeDefType.code]: async ({ survey, categoryItemProvider, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]

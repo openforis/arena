@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import path from 'path'
+import path from 'node:path'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
@@ -84,8 +84,7 @@ const plugins = [
 ]
 
 if (isDevelopment) {
-  plugins.push(new webpack.HotModuleReplacementPlugin())
-  plugins.push(new ReactRefreshWebpackPlugin())
+  plugins.push(new webpack.HotModuleReplacementPlugin(), new ReactRefreshWebpackPlugin())
 }
 
 if (process.env.BUILD_REPORT === 'true') {

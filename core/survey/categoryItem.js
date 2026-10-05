@@ -27,9 +27,9 @@ const codeAllowedCharacters = [
   '*',
   '+',
   '\\\\', // single backslash "\" character (it requires a double escape to be used in the RegExp)
-  '\\/',
+  String.raw`\/`,
   '|',
-  '\\w',
+  String.raw`\w`,
 ]
 const codeNotAllowedCharactersRegExp = new RegExp(`[^${codeAllowedCharacters.join('')}]`, 'g')
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-export default (callback, elementRef) => {
+const useOnResize = (callback, elementRef) => {
   useEffect(() => {
     const resizeObserver = new ResizeObserver(callback)
     resizeObserver.observe(elementRef.current)
@@ -10,3 +10,5 @@ export default (callback, elementRef) => {
     }
   }, [callback, elementRef])
 }
+
+export default useOnResize

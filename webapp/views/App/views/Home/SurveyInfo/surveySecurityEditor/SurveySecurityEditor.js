@@ -49,7 +49,7 @@ export const SurveySecurityEditor = (props) => {
   const security = useMemo(
     () => ({
       ...surveySecurityDefaults,
-      ...(securityProp ?? {}),
+      ...securityProp,
     }),
     [securityProp]
   )

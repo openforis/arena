@@ -33,6 +33,27 @@ const arenaFileTypeByCollectFileType = {
   VIDEO: NodeDef.fileTypeValues.video,
 }
 
+// coordinate specific props: allowOnlyDeviceCoordinate, accuracy and altitude
+const _extractCoordinateProps = (collectNodeDef) => {
+  const props = {}
+  for (const [uiAttributeName, propKey] of [
+    ['allowOnlyDeviceCoordinate', NodeDef.propKeys.allowOnlyDeviceCoordinate],
+    ['includeAccuracy', NodeDef.propKeys.includeAccuracy],
+    ['includeAltitude', NodeDef.propKeys.includeAltitude],
+  ]) {
+    if (CollectSurvey.getUiAttribute(uiAttributeName, false)(collectNodeDef)) {
+      props[propKey] = true
+    }
+  }
+  return props
+}
+
+// text input type (short/memo => singleLine/multiLine)
+const _extractTextProps = (collectNodeDef) =>
+  CollectSurvey.getAttribute('type', 'short')(collectNodeDef) === 'memo'
+    ? { [NodeDef.propKeys.textInputType]: NodeDef.textInputTypes.multiLine }
+    : {}
+
 export default class NodeDefsImportJob extends Job {
   constructor(params) {
     super(NodeDefsImportJob.type, params)
@@ -82,37 +103,11 @@ export default class NodeDefsImportJob extends Job {
     })
   }
 
-  /**
-   * Inserts a node definition and all its descendants (if any).
-   *
-   * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
-   * (used to import Collect composite attribute definitions like Range).
-   * @param {NodeDef} parentNodeDef - Parent node def definition.
-   * @param {!string} parentPath - Parent node path.
-   * @param {!object} collectNodeDef - Collect node definition.
-   * @param {!string} type - Node definition type.
-   * @param {string} field - Node sub-field.
-   * @returns {Promise<object>} - Inserted node definitions.
-   */
-  async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
+  _buildNodeDefProps({ parentNodeDef, collectNodeDef, type, field, multiple, tableLayout }) {
     const { defaultLanguage } = this.context
-
-    const nodeDefsUpdated = {}
-    const nodeDefsInserted = {}
-
-    // 1. determine basic props
     const collectNodeDefName = CollectSurvey.getAttribute('name')(collectNodeDef)
-    const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
     const calculated = CollectSurvey.getAttributeBoolean('calculated')(collectNodeDef)
     const key = CollectSurvey.getAttributeBoolean('key')(collectNodeDef)
-
-    const collectNodeDefPath = `${parentPath}/${collectNodeDefName}`
-
-    const tableLayout =
-      multiple &&
-      CollectSurvey.getUiAttribute('layout', CollectSurvey.layoutTypes.table)(collectNodeDef) ===
-        CollectSurvey.layoutTypes.table
-
     const nodeDefNameSuffix = field ? `_${field}` : ''
 
     const props = {
@@ -142,6 +137,38 @@ export default class NodeDefsImportJob extends Job {
         props[NodeDef.propKeys.hidden] = true
       }
     }
+
+    return props
+  }
+
+  /**
+   * Inserts a node definition and all its descendants (if any).
+   *
+   * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
+   * (used to import Collect composite attribute definitions like Range).
+   * @param {NodeDef} parentNodeDef - Parent node def definition.
+   * @param {!string} parentPath - Parent node path.
+   * @param {!object} collectNodeDef - Collect node definition.
+   * @param {!string} type - Node definition type.
+   * @param {string} field - Node sub-field.
+   * @returns {Promise<object>} - Inserted node definitions.
+   */
+  async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
+    const nodeDefsUpdated = {}
+    const nodeDefsInserted = {}
+
+    // 1. determine basic props
+    const collectNodeDefName = CollectSurvey.getAttribute('name')(collectNodeDef)
+    const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
+
+    const collectNodeDefPath = `${parentPath}/${collectNodeDefName}`
+
+    const tableLayout =
+      multiple &&
+      CollectSurvey.getUiAttribute('layout', CollectSurvey.layoutTypes.table)(collectNodeDef) ===
+        CollectSurvey.layoutTypes.table
+
+    const props = this._buildNodeDefProps({ parentNodeDef, collectNodeDef, type, field, multiple, tableLayout })
 
     // 2. insert node def into db
     const nodeDefParam = _createNodeDef(parentNodeDef, type, props)
@@ -201,27 +228,9 @@ export default class NodeDefsImportJob extends Job {
       Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
     } else if (type === NodeDef.nodeDefType.coordinate) {
-      // 3e. allowOnlyDeviceCoordinate
-      const allowOnlyDeviceCoordinate = CollectSurvey.getUiAttribute('allowOnlyDeviceCoordinate', false)(collectNodeDef)
-      if (allowOnlyDeviceCoordinate) {
-        propsUpdated[NodeDef.propKeys.allowOnlyDeviceCoordinate] = true
-      }
-      // 3f. accuracy
-      const includeAccuracy = CollectSurvey.getUiAttribute('includeAccuracy', false)(collectNodeDef)
-      if (includeAccuracy) {
-        propsUpdated[NodeDef.propKeys.includeAccuracy] = true
-      }
-      // 3g. altitude
-      const includeAltitude = CollectSurvey.getUiAttribute('includeAltitude', false)(collectNodeDef)
-      if (includeAltitude) {
-        propsUpdated[NodeDef.propKeys.includeAltitude] = true
-      }
+      Object.assign(propsUpdated, _extractCoordinateProps(collectNodeDef))
     } else if (type === NodeDef.nodeDefType.text) {
-      // 3f. text input type (short/memo => singleLine/multiLine)
-      const collectTextInputType = CollectSurvey.getAttribute('type', 'short')(collectNodeDef)
-      if (collectTextInputType === 'memo') {
-        propsUpdated[NodeDef.propKeys.textInputType] = NodeDef.textInputTypes.multiLine
-      }
+      Object.assign(propsUpdated, _extractTextProps(collectNodeDef))
     }
 
     // 4a. update hidden when not relevant layout prop

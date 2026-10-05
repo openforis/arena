@@ -154,7 +154,7 @@ export const useUserName = ({ userUuid, active = true }) => {
 
   useEffect(() => {
     if (canViewUsersName && userUuid && active) {
-      API.fetchUserName({ userUuid, surveyId }).then((name) => {
+      void API.fetchUserName({ userUuid, surveyId }).then((name) => {
         setUserName(name)
       })
     }

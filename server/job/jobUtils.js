@@ -46,7 +46,7 @@ const calculateJobProgress = (job) => {
 }
 
 const calculatedElapsedMillis = (job) =>
-  job.startTime ? (job.endTime ? job.endTime : new Date()).getTime() - job.startTime.getTime() : 0
+  job.startTime ? (job.endTime ?? new Date()).getTime() - job.startTime.getTime() : 0
 
 export const jobToJSON = (job) => ({
   [JobSerialized.keys.uuid]: job.uuid,

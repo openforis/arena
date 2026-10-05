@@ -2,7 +2,7 @@
 import * as UiState from './state'
 import UiReducer from './reducer'
 
-export { UiReducer, UiState }
+export { UiState, UiReducer }
 
 // ====== Notification
 export { NotificationActions, NotificationState, useNotification } from './notification'

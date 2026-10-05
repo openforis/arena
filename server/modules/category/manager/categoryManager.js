@@ -145,7 +145,7 @@ const _afterItemUpdate = async ({ surveyId, categoryUuid, itemUuid, prevItem }, 
     }
   }
   const addItemToValidate = (item) => {
-    if (item && !itemsToValidate.find(CategoryItem.isEqual(item))) {
+    if (item && !itemsToValidate.some(CategoryItem.isEqual(item))) {
       itemsToValidate.push(item)
     }
   }

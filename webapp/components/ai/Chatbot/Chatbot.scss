@@ -220,7 +220,7 @@
       // them to wrap when possible (prose-y text in code fences is common
       // for chat answers) and only scroll for genuinely long tokens.
       white-space: pre-wrap;
-      word-break: break-word;
+      overflow-wrap: anywhere;
 
       code {
         background: transparent;
