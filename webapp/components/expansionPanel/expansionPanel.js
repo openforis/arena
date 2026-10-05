@@ -46,8 +46,10 @@ const ExpansionPanel = (props) => {
   return (
     <div className={className} ref={panelRef}>
       {showHeader && (
+        // mouse click convenience only: the inner toggle button is the keyboard accessible control
         <div
           className="expansion-panel__header"
+          role="presentation"
           onClick={toggleCloseState}
           onKeyDown={(event) => {
             // keys pressed on the inner toggle button already trigger a click

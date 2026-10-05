@@ -90,8 +90,14 @@
         li {
           line-height: 1.5rem;
 
-          a {
+          .cluster-marker__clustered-point-btn {
             max-width: 100%;
+            border: none;
+            background: none;
+            padding: 0;
+            text-align: left;
+            line-height: inherit;
+            color: #0078a8; // same as leaflet links
           }
         }
       }

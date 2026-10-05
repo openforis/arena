@@ -33,12 +33,11 @@
       transition-property: none;
     }
 
-    .react-grid-item>.react-resizable-handle {
+    .react-grid-item > .react-resizable-handle {
       display: none;
     }
 
     &.mounted {
-
       //react-grid-item css animation are enabled after component didMount
       .react-grid-item.cssTransforms {
         transition-property: transform;
@@ -54,26 +53,8 @@
     height: 100%;
     width: 100%;
   }
-}
 
-// Survey form edit mode grid style
-.survey-form.edit {
-  .react-grid-item {
-    border: $formBorderEdit;
-
-    .react-resizable-handle {
-      display: block;
-
-      &::after {
-        border-right: 2px solid $greyBorder;
-        border-bottom: 2px solid $greyBorder;
-      }
-    }
-  }
-}
-
-// nodedef-tree-select
-.survey-form {
+  // nodedef-tree-select
   .survey-form__sidebar {
     height: 100%;
     position: relative;
@@ -93,7 +74,21 @@
     }
   }
 
+  // edit mode grid style
   &.edit {
+    .react-grid-item {
+      border: $formBorderEdit;
+
+      .react-resizable-handle {
+        display: block;
+
+        &::after {
+          border-right: 2px solid $greyBorder;
+          border-bottom: 2px solid $greyBorder;
+        }
+      }
+    }
+
     .nodedef-tree-select {
       border: $formBorderEdit;
     }

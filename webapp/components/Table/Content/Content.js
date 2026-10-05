@@ -11,10 +11,13 @@ import { ContentRowCells } from './ContentRowCells'
 import { ContentHeaders } from './ContentHeaders'
 import { ContentRow } from './ContentRow'
 
+// placeholder rows have no identity: give them positional ids
+const getLoadingRowIds = (rows) => Array.from({ length: rows }, (_item, index) => `loading-row-${index}`)
+
 const LoadingRows = ({ rows }) => (
   <div className="table__rows">
-    {new Array(rows).fill(0).map((_item, index) => (
-      <div className="table__row" key={String(index)}>
+    {getLoadingRowIds(rows).map((rowId) => (
+      <div className="table__row" key={rowId}>
         <LoadingBar />
       </div>
     ))}

@@ -51,10 +51,7 @@
       display: none;
     }
   }
-}
 
-.survey-form__node-def-page,
-.survey-form__node-def-page-item {
   // === page / page item - read-only
   &.read-only {
     input,
@@ -113,6 +110,11 @@
     text-overflow: ellipsis;
     text-align: left;
   }
+
+  .survey-form__node-def-error-badge {
+    padding-bottom: 0;
+    position: relative;
+  }
 }
 
 //multiple node def
@@ -152,13 +154,6 @@
     > .icon:not(:first-child) {
       margin-left: 6px;
     }
-  }
-}
-
-.survey-form__node-def-form-item {
-  .survey-form__node-def-error-badge {
-    padding-bottom: 0;
-    position: relative;
   }
 }
 

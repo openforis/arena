@@ -232,7 +232,7 @@ const ChatbotPanel = ({ onClose }) => {
   }
 
   return (
-    <div className="ai-chatbot-panel" role="dialog" aria-modal="false">
+    <dialog className="ai-chatbot-panel" open>
       <div className="ai-chatbot-panel__header">
         <div className="ai-chatbot-panel__title">{title || i18n.t('aiChatbot.title')}</div>
         <div className="ai-chatbot-panel__header-actions">
@@ -297,7 +297,7 @@ const ChatbotPanel = ({ onClose }) => {
           )}
         </div>
       </div>
-    </div>
+    </dialog>
   )
 }
 

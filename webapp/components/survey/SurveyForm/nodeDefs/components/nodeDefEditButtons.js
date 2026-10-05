@@ -51,6 +51,7 @@ const NodeDefEditButtons = (props) => {
       ref={elementRef}
       style={style}
       draggable={false}
+      role="presentation"
       onMouseDown={(e) => e.stopPropagation()}
     >
       {NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) && (

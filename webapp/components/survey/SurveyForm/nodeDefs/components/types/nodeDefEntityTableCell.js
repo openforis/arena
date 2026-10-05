@@ -131,6 +131,7 @@ const NodeDefEntityTableCell = (props) => {
       ref={elementRef}
       data-uuid={nodeDefUuid}
       className="react-grid-item draggable-item"
+      role="presentation"
       onMouseDown={(e) => e.stopPropagation()}
       draggable={draggable}
       onDragStart={onDragStart}
