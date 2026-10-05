@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import * as fs from 'node:fs'
 import { randomBytes } from 'node:crypto'
 
 import { NodeValues, Objects, RecordExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'

@@ -212,7 +212,7 @@ export const countCategories = async ({ surveyId, draft = false }, client = db) 
      FROM ${getSurveyDBSchema(surveyId)}.category
      ${draft ? '' : `WHERE props::text <> '{}'::text`}`,
     [],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 
 export const fetchCategoriesBySurveyId = async (
@@ -370,7 +370,7 @@ export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = 
         ON l.uuid = i.level_uuid
         AND l.category_uuid = $1`,
     [categoryUuid],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 
 export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db) =>
@@ -379,7 +379,7 @@ export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
     WHERE i.level_uuid = $1`,
     [levelUuid],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 
 const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
@@ -395,7 +395,7 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
 const _getSearchQueryParam = ({ searchValue }) =>
   `%${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
-const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
+const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = Number.NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
   const schema = Schemata.getSchemaSurvey(surveyId)
   const indexCol = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
@@ -420,7 +420,15 @@ export const countItemsByParentUuid = async (
 }
 
 export const fetchItemsByParentUuid = async (
-  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null, limit = NaN },
+  {
+    surveyId,
+    categoryUuid,
+    parentUuid = null,
+    draft = false,
+    search: searchValue = null,
+    lang = null,
+    limit = Number.NaN,
+  },
   client = db
 ) => {
   const search = _getSearchQueryParam({ searchValue })

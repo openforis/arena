@@ -303,8 +303,8 @@ export const getCoordinateAdditionalFields = NodeDefs.getCoordinateAdditionalFie
 export const getUnit = getProp(propKeys.unit, '')
 // decimal
 export const getMaxNumberDecimalDigits = (nodeDef) => {
-  const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef)
-  return A.isEmpty(decimalDigits) ? NaN : Number(decimalDigits)
+  const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, Number.NaN)(nodeDef)
+  return A.isEmpty(decimalDigits) ? Number.NaN : Number(decimalDigits)
 }
 // file
 export const isNumberOfFilesEnabled = isMultiple

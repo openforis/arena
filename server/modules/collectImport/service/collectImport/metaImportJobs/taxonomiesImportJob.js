@@ -79,7 +79,7 @@ export default class TaxonomiesImportJob extends Job {
     this.rowNumberByScientificName = {}
 
     // 2. insert taxonomy
-    const taxonomyName = speciesFileName.slice(0, speciesFileName.length - 4)
+    const taxonomyName = speciesFileName.slice(0, -4)
 
     const taxonomyParam = Taxonomy.newTaxonomy({
       [Taxonomy.keysProps.name]: taxonomyName,

@@ -31,7 +31,7 @@ const collectConstantTimeValueRegExp = /(\d{2})(\d{2})/ // time in mmss format
 const operandConverterByNodeDefType = {
   [NodeDef.nodeDefType.date]: ({ collectOperand }) => {
     // convert constant date values to Arena format
-    const match = String(collectOperand).trim().match(collectConstantDateValueRegExp)
+    const match = collectConstantDateValueRegExp.exec(String(collectOperand).trim())
     if (match) {
       // eslint-disable-next-line no-unused-vars
       const [_, year, month, day] = match
@@ -41,7 +41,7 @@ const operandConverterByNodeDefType = {
   },
   [NodeDef.nodeDefType.time]: ({ collectOperand }) => {
     // convert constant time values to Arena format
-    const match = String(collectOperand).trim().match(collectConstantTimeValueRegExp)
+    const match = collectConstantTimeValueRegExp.exec(String(collectOperand).trim())
     if (match) {
       // eslint-disable-next-line no-unused-vars
       const [_, minute, second] = match

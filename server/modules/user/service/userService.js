@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import * as fs from 'node:fs'
 
 import { ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'

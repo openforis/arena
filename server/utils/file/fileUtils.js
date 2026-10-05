@@ -1,6 +1,6 @@
-import fs, { promises as fsp } from 'fs'
+import fs, { promises as fsp } from 'node:fs'
 import { ncp } from 'ncp'
-import { join, sep } from 'path'
+import { join, sep } from 'node:path'
 
 import * as ProcessUtils from '@core/processUtils'
 import { isUuid, uuidv4 } from '@core/uuid'

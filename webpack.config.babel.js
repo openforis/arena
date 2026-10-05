@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import path from 'path'
+import path from 'node:path'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'

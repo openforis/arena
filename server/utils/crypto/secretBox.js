@@ -10,7 +10,7 @@
  * string). The hex is decoded eagerly on first use so misconfiguration
  * fails loudly at first encrypt/decrypt call rather than silently.
  */
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 const ALGO = 'aes-256-gcm'
 const IV_LEN = 12

@@ -80,7 +80,7 @@ export const MapBaseLayerPeriodSelector = () => {
         provider,
         periodType,
       })
-      const lastPeriodValue = getPeriodValue(availablePeriods[availablePeriods.length - 1])
+      const lastPeriodValue = getPeriodValue(availablePeriods.at(-1))
       setState({
         ready: true,
         periods: availablePeriods,

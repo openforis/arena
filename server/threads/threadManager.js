@@ -1,5 +1,5 @@
-import * as path from 'path'
-import { Worker } from 'worker_threads'
+import * as path from 'node:path'
+import { Worker } from 'node:worker_threads'
 
 import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 

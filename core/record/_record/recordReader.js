@@ -102,7 +102,7 @@ export const visitDescendantsAndSelf =
 
       visitor(node)
 
-      if (stopIfFn && stopIfFn(node)) {
+      if (stopIfFn?.(node)) {
         break
       }
       const children = getNodeChildren(node)(record)

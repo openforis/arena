@@ -165,7 +165,7 @@ export const isCategoryEnabledForUser = (user, category) => {
  */
 export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
   const raw = getRawPrefs(user)
-  if (!raw || !raw.featuresEnabled || !raw.enabled || !raw.provider || !raw.model) return null
+  if (!raw?.featuresEnabled || !raw.enabled || !raw.provider || !raw.model) return null
   return {
     provider: raw.provider,
     model: raw.model,

@@ -223,7 +223,7 @@ export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
       SELECT COUNT(*) 
       FROM ${Schemata.getSchemaSurvey(surveyId)}.taxonomy`,
     [],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 
 export const countTaxaBySurveyId = async ({ surveyId, draft = false }, client = db) => {
@@ -249,7 +249,7 @@ export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = fa
       WHERE t.taxonomy_uuid = $1
       ${publishedCondition}`,
     [taxonomyUuid],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 }
 
@@ -468,7 +468,7 @@ const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searc
 
 const toSearchValue = (filterValue, searchType = searchTypes.equals) => {
   if (A.isEmpty(filterValue)) return null
-  let searchValue = String(filterValue).trim().toLowerCase().replace(/\*/g, '%')
+  let searchValue = String(filterValue).trim().toLowerCase().replaceAll('*', '%')
   searchValue = searchValueProcessorByType[searchType](searchValue)
   return searchValue
 }

@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import * as fs from 'node:fs'
 import * as A from '@core/arena'
 
 import { Objects, Points } from '@openforis/arena-core'
