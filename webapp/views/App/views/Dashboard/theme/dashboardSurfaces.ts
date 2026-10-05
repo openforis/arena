@@ -28,6 +28,31 @@ export const dashboardSurfaces = {
     fontWeight: 600,
     fontSize: '1rem',
   },
+  sectionToggle: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '0.5rem',
+    width: '100%',
+    border: 0,
+    padding: 0,
+    backgroundColor: 'transparent',
+    textAlign: 'left',
+    letterSpacing: 'inherit',
+    color: 'inherit',
+    fontWeight: 'inherit',
+    fontSize: 'inherit',
+    '&:focus-visible': {
+      outline: `2px solid ${defaultTokens.colors.blueDark}`,
+      outlineOffset: '2px',
+    },
+  },
+  sectionToggleIcon: {
+    transition: 'transform 160ms ease',
+  },
+  sectionToggleIconCollapsed: {
+    transform: 'rotate(180deg)',
+  },
   kpiActionHover: {
     transition: 'background-color 160ms ease',
     '&:hover': {

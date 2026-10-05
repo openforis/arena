@@ -21,7 +21,7 @@ import { RecentActivityRow } from './RecentActivityRow'
 const LOAD_MORE_OFFSET = 10
 
 /**
- * Fetches and lists activity log messages; mounted only once the section is in view.
+ * Fetches and lists activity log messages; mounted only while the section is expanded.
  *
  * @returns {React.ReactElement} The activity list, with an inline error state when the fetch fails.
  */
@@ -79,19 +79,24 @@ const RecentActivityContent = () => {
 }
 
 /**
- * Dashboard section listing the latest survey activity; fetching starts when the section scrolls into view.
+ * Dashboard section listing the latest survey activity; collapsed by default, fetching starts when it is expanded.
  *
  * @returns {React.ReactElement} The section.
  */
 const RecentActivitySection = () => {
-  const [visible, setVisible] = useState(false)
-  const onSectionVisible = useCallback(() => setVisible(true), [])
-  const [setSectionRef] = useOnIntersect(onSectionVisible)
+  const [expanded, setExpanded] = useState(false)
+  const onToggle = useCallback(() => setExpanded((expandedPrev) => !expandedPrev), [])
 
   return (
-    <DashboardSection titleKey="homeView:dashboard.activityLog.title" testId={TestId.dashboard.activitySection}>
-      <div ref={setSectionRef} className="recent-activity">
-        {visible && <RecentActivityContent />}
+    <DashboardSection
+      titleKey="homeView:dashboard.activityLog.title"
+      testId={TestId.dashboard.activitySection}
+      toggleTestId={TestId.dashboard.activityToggle}
+      expanded={expanded}
+      onToggle={onToggle}
+    >
+      <div className="recent-activity">
+        <RecentActivityContent />
       </div>
     </DashboardSection>
   )
