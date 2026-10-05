@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
-import { Button } from '../buttons'
 
 const closeClassName = 'close'
 
@@ -46,21 +45,12 @@ const ExpansionPanel = (props) => {
   return (
     <div className={className} ref={panelRef}>
       {showHeader && (
-        // mouse click convenience only: the inner toggle button is the keyboard accessible control
-        <div
-          className="expansion-panel__header"
-          role="presentation"
-          onClick={toggleCloseState}
-          onKeyDown={(event) => {
-            // keys pressed on the inner toggle button already trigger a click
-            if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
-              toggleCloseState()
-            }
-          }}
-        >
-          <Button className="btn-xs btn-transparent btn-toggle" iconClassName="icon-play3 icon-10px" variant="text" />
+        <button type="button" className="expansion-panel__header" onClick={toggleCloseState}>
+          <span className="btn-toggle">
+            <span className="icon icon-play3 icon-10px" />
+          </span>
           {i18n.t(buttonLabel, buttonLabelParams)}
-        </div>
+        </button>
       )}
 
       <div className="expansion-panel__content" ref={contentRef}>
