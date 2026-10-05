@@ -141,7 +141,8 @@ const _getFetchCategoriesAndLevelsQuery = ({
               'propsDraft', ${tableAlias}.props_draft`
     }
     // combine props and props_draft column into one
-    return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''},
+    const propsDraftConcat = draft ? ` || ${tableAlias}.props_draft` : ''
+    return `'props', ${tableAlias}.props${propsDraftConcat},
             'published', ${tableAlias}.props::text <> '{}',
             'draft', ${tableAlias}.props_draft::text <> '{}'`
   }
@@ -203,14 +204,14 @@ const _getFetchCategoriesAndLevelsQuery = ({
       levels l
     ON
       c.uuid = l.category_uuid
-    ${backup || draft ? '' : `WHERE c.published`}`
+    ${backup || draft ? '' : 'WHERE c.published'}`
 }
 
 export const countCategories = async ({ surveyId, draft = false }, client = db) =>
   client.one(
     `SELECT COUNT(*) 
      FROM ${getSurveyDBSchema(surveyId)}.category
-     ${draft ? '' : `WHERE props::text <> '{}'::text`}`,
+     ${draft ? '' : "WHERE props::text <> '{}'::text"}`,
     [],
     (r) => Number.parseInt(r.count, 10)
   )
@@ -477,8 +478,9 @@ export const fetchItemsByLevelIndex = async (
     ],
     []
   )
+  const selectFields = [`i${levelIndex}.*`, ...codesSelectFields].join(', ')
   return client.map(
-    `SELECT i${levelIndex}.* ${codesSelectFields.length > 0 ? `, ${codesSelectFields.join(', ')}` : ''}
+    `SELECT ${selectFields}
      FROM ${schema}.category_item i${levelIndex}
        JOIN ${schema}.category_level l 
          ON l.uuid = i${levelIndex}.level_uuid

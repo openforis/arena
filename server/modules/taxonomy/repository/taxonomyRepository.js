@@ -434,11 +434,9 @@ export const fetchTaxaWithVernacularNamesStream = ({
     A.join(', ')
   )([Taxon.propKeys.code, Taxon.propKeys.family, Taxon.propKeys.genus, Taxon.propKeys.scientificName])
 
+  const propsCol = draft ? 't.props || t.props_draft' : 't.props'
   const extraPropsFields = Object.keys(extraPropsDefs)
-    .map(
-      (extraProp) =>
-        `(t.props${draft ? ` || t.props_draft` : ''})#>>'{${Taxon.propKeys.extra},${extraProp}}' AS ${extraProp}`
-    )
+    .map((extraProp) => `(${propsCol})#>>'{${Taxon.propKeys.extra},${extraProp}}' AS ${extraProp}`)
     .join(', ')
 
   const select = `SELECT
