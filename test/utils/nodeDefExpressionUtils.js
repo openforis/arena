@@ -7,7 +7,7 @@ import * as RecordUtils from './recordUtils'
 const _expectResult = ({ result, resultExpected }) => {
   const resKeys = resultExpected && typeof resultExpected === 'object' ? Object.keys(resultExpected) : []
   if (resKeys.length === 0) {
-    const resExpected = resultExpected instanceof Function ? resultExpected() : resultExpected
+    const resExpected = typeof resultExpected === 'function' ? resultExpected() : resultExpected
     expect(result).toEqual(resExpected)
   } else {
     resKeys.forEach((key) => expect(result[key]).toEqual(resultExpected[key]))

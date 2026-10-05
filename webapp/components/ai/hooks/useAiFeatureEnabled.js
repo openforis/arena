@@ -10,7 +10,7 @@
  * `aiFeaturesDisabled`), the cache is set to a "force off" state so every
  * category returns false.
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer } from 'react'
 
 import * as API from '@webapp/service/api'
 import { useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
@@ -79,10 +79,11 @@ export const onAiSettingsInvalidated = (cb) => {
  */
 export const useAiFeatureEnabled = (category) => {
   const aiFeaturesEnabledInSystemConfig = useSystemConfigAiFeaturesEnabled()
-  const [, setCounter] = useState(0)
+  // re-render when the shared settings cache changes
+  const [, forceRender] = useReducer((count) => count + 1, 0)
 
   useEffect(() => {
-    const onChange = () => setCounter((n) => n + 1)
+    const onChange = () => forceRender()
     listeners.add(onChange)
 
     if (aiFeaturesEnabledInSystemConfig && !cache && !inflight) {

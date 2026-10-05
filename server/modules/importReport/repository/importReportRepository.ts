@@ -25,7 +25,7 @@ const table = 'import_report'
 const _getSelectWhereCondition = ({ excludeResolved }: { excludeResolved: boolean }) =>
   `WHERE source = $/source/${excludeResolved ? ' AND resolved = FALSE' : ''}`
 
-export const fetchItems = async (
+export const fetchItems = (
   {
     surveyId,
     source,
@@ -54,7 +54,7 @@ export const fetchItems = async (
     transformCallback
   )
 
-export const countItems = async (
+export const countItems = (
   { surveyId, source, excludeResolved }: { surveyId: number; source: ImportReportSource; excludeResolved: boolean },
   client: any = db
 ) =>
@@ -68,7 +68,7 @@ export const countItems = async (
     A.prop('tot')
   )
 
-export const insertItem = async (
+export const insertItem = (
   surveyId: number,
   source: ImportReportSource,
   item: { nodeDefUuid: string; props: any; resolved: boolean },
@@ -107,7 +107,7 @@ export const insertItems = async (
     )
   )
 
-export const updateItem = async (
+export const updateItem = (
   surveyId: number,
   source: ImportReportSource,
   itemId: number,

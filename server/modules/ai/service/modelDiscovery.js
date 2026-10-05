@@ -32,7 +32,12 @@ const fetchWithTimeout = async (url, { headers, timeoutMs = DEFAULT_TIMEOUT_MS }
   }
 }
 
-const stripTrailingSlash = (s) => (s ? s.replace(/\/+$/, '') : s)
+const stripTrailingSlash = (s) => {
+  if (!s) return s
+  let end = s.length
+  while (end > 0 && s[end - 1] === '/') end -= 1
+  return s.slice(0, end)
+}
 
 const normaliseOpenAiBase = (baseUrl) => stripTrailingSlash(baseUrl || 'https://api.openai.com/v1')
 
