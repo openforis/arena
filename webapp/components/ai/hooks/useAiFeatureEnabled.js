@@ -79,7 +79,7 @@ export const onAiSettingsInvalidated = (cb) => {
  */
 export const useAiFeatureEnabled = (category) => {
   const aiFeaturesEnabledInSystemConfig = useSystemConfigAiFeaturesEnabled()
-  const [_counter, setCounter] = useState(0)
+  const [, setCounter] = useState(0)
 
   useEffect(() => {
     const onChange = () => setCounter((n) => n + 1)

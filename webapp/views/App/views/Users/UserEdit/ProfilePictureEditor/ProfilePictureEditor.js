@@ -84,85 +84,83 @@ const ProfilePictureEditor = (props) => {
   }, [confirm, onImageDeleted])
 
   return (
-    <>
-      <div ref={dropRef} className="profile-picture-editor">
-        {image && (
-          <>
-            {image === profilePicturePlaceholderImgSrc && <ProfilePicturePlaceholder />}
-            {image !== profilePicturePlaceholderImgSrc && (
-              <div>
-                <AvatarEditor
-                  ref={avatarRef}
-                  image={image}
-                  onImageChange={onImageChange}
-                  onImageReady={onImageChange}
-                  onLoadSuccess={resetSliders}
-                  width={width}
-                  height={height}
-                  border={border}
-                  color={[255, 255, 255]}
-                  scale={scale}
-                  rotate={rotate}
-                />
-                <ButtonIconDelete onClick={onDeleteClick} />
-              </div>
-            )}
-          </>
-        )}
+    <div ref={dropRef} className="profile-picture-editor">
+      {image && (
+        <>
+          {image === profilePicturePlaceholderImgSrc && <ProfilePicturePlaceholder />}
+          {image !== profilePicturePlaceholderImgSrc && (
+            <div>
+              <AvatarEditor
+                ref={avatarRef}
+                image={image}
+                onImageChange={onImageChange}
+                onImageReady={onImageChange}
+                onLoadSuccess={resetSliders}
+                width={width}
+                height={height}
+                border={border}
+                color={[255, 255, 255]}
+                scale={scale}
+                rotate={rotate}
+              />
+              <ButtonIconDelete onClick={onDeleteClick} />
+            </div>
+          )}
+        </>
+      )}
 
-        <div>
-          {i18n.t('userView.dragAndDrop')}{' '}
-          <UploadButton
-            label="userView.upload"
-            showLabel
-            showIcon={false}
-            className="btn btn-transparent btn-upload"
-            accept="image/*"
-            onChange={([file]) => setImage(file)}
-          />
+      <div>
+        {i18n.t('userView.dragAndDrop')}{' '}
+        <UploadButton
+          label="userView.upload"
+          showLabel
+          showIcon={false}
+          className="btn btn-transparent btn-upload"
+          accept="image/*"
+          onChange={([file]) => setImage(file)}
+        />
+      </div>
+
+      <div className="form profile-picture-editor__sliders">
+        <div className="form-item">
+          <label className="form-label" htmlFor="profile-picture-editor-scale">
+            {i18n.t('userView.scale')}
+          </label>
+          <div>
+            <input
+              id="profile-picture-editor-scale"
+              value={scale}
+              onChange={(e) => setScale(Number(e.target.value))}
+              className="slider"
+              type="range"
+              step="0.01"
+              min="1"
+              max="3"
+              name="scale"
+            />
+          </div>
         </div>
 
-        <div className="form profile-picture-editor__sliders">
-          <div className="form-item">
-            <label className="form-label" htmlFor="profile-picture-editor-scale">
-              {i18n.t('userView.scale')}
-            </label>
-            <div>
-              <input
-                id="profile-picture-editor-scale"
-                value={scale}
-                onChange={(e) => setScale(Number(e.target.value))}
-                className="slider"
-                type="range"
-                step="0.01"
-                min="1"
-                max="3"
-                name="scale"
-              />
-            </div>
-          </div>
-
-          <div className="form-item">
-            <label className="form-label" htmlFor="profile-picture-editor-rotate">
-              {i18n.t('userView.rotate')}
-            </label>
-            <div>
-              <input
-                id="profile-picture-editor-rotate"
-                value={rotate}
-                onChange={(e) => setRotate(Number(e.target.value))}
-                className="slider"
-                type="range"
-                step="1"
-                min="0"
-                max="360"
-                name="rotate"
-              />
-            </div>
+        <div className="form-item">
+          <label className="form-label" htmlFor="profile-picture-editor-rotate">
+            {i18n.t('userView.rotate')}
+          </label>
+          <div>
+            <input
+              id="profile-picture-editor-rotate"
+              value={rotate}
+              onChange={(e) => setRotate(Number(e.target.value))}
+              className="slider"
+              type="range"
+              step="1"
+              min="0"
+              max="360"
+              name="rotate"
+            />
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

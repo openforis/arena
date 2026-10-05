@@ -52,7 +52,7 @@ export const downloadToFile = (url, outputFileName) => {
   link.download = outputFileName
   document.body.appendChild(link)
   link.click()
-  document.body.removeChild(link)
+  link.remove()
 }
 
 export const downloadBlobToFile = (blob, outputFileName) => {

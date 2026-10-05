@@ -157,13 +157,11 @@ export const MapContainer = (props) => {
 
 MapContainer.propTypes = {
   baseLayersLabel: PropTypes.string,
-  centerPoint: PropTypes.object,
   editable: PropTypes.bool,
   geoJson: PropTypes.object,
   layers: PropTypes.array,
   markerPoint: PropTypes.object,
   markerTitle: PropTypes.string,
-  onMarkerPointChange: PropTypes.func,
   overlayGroups: PropTypes.array,
   showOptions: PropTypes.bool,
 }

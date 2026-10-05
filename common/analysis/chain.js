@@ -127,13 +127,10 @@ export const isDraft = A.ifElse(A.pipe(getDateExecuted, A.isNil), A.always(true)
 export const checkChangeRequiresSurveyPublish = ({ chainPrev, chainNext }) => {
   const samplingDesignPrev = getSamplingDesign(chainPrev)
   const samplingDesignNext = getSamplingDesign(chainNext)
-  if (
+  return (
     ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesignPrev) !==
     ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesignNext)
-  ) {
-    return true
-  }
-  return false
+  )
 }
 
 // ====== VALIDATION

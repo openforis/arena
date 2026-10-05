@@ -96,54 +96,52 @@ const Dropzone = (props) => {
   )
 
   return (
-    <>
-      <ReactDropzone
-        accept={accept}
-        disabled={disabled}
-        maxSize={maxSize}
-        multiple={multiple}
-        onDropAccepted={onDropAccepted}
-        onDropRejected={onDropRejected}
-      >
-        {({ isDragReject, isDragAccept, isFocused, getRootProps, getInputProps }) => (
-          <div
-            className={classNames('dropzone', {
-              disabled,
-              focused: isFocused,
-              'drag-accept': isDragAccept,
-              'drag-reject': isDragReject,
-            })}
-            {...getRootProps()}
-          >
-            <input {...getInputProps()} />
-            <p>{i18n.t('dropzone.message')}</p>
-            {acceptedExtensions.length > 0 && (
-              <em>
-                {i18n.t('dropzone.acceptedFilesMessage', {
-                  acceptedExtensions: acceptedExtensionsText,
-                  maxSize: FileUtils.toHumanReadableFileSize(maxSize, { decimalPlaces: 0 }),
-                })}
-              </em>
-            )}
-            {droppedFiles?.length > 0 && (
-              <aside>
-                <h5>{i18n.t('dropzone.selectedFile', { count: droppedFiles.length })}</h5>
-                <ul>
-                  {droppedFiles.map((file) => (
-                    <li key={file.name}>
-                      {file.name} - {FileUtils.toHumanReadableFileSize(file.size)}
-                    </li>
-                  ))}
-                </ul>
-              </aside>
-            )}
-            {errorMessage && (
-              <Alert autoDismiss onDismiss={() => setErrorMessage(null)} severity="error" text={errorMessage} />
-            )}
-          </div>
-        )}
-      </ReactDropzone>
-    </>
+    <ReactDropzone
+      accept={accept}
+      disabled={disabled}
+      maxSize={maxSize}
+      multiple={multiple}
+      onDropAccepted={onDropAccepted}
+      onDropRejected={onDropRejected}
+    >
+      {({ isDragReject, isDragAccept, isFocused, getRootProps, getInputProps }) => (
+        <div
+          className={classNames('dropzone', {
+            disabled,
+            focused: isFocused,
+            'drag-accept': isDragAccept,
+            'drag-reject': isDragReject,
+          })}
+          {...getRootProps()}
+        >
+          <input {...getInputProps()} />
+          <p>{i18n.t('dropzone.message')}</p>
+          {acceptedExtensions.length > 0 && (
+            <em>
+              {i18n.t('dropzone.acceptedFilesMessage', {
+                acceptedExtensions: acceptedExtensionsText,
+                maxSize: FileUtils.toHumanReadableFileSize(maxSize, { decimalPlaces: 0 }),
+              })}
+            </em>
+          )}
+          {droppedFiles?.length > 0 && (
+            <aside>
+              <h5>{i18n.t('dropzone.selectedFile', { count: droppedFiles.length })}</h5>
+              <ul>
+                {droppedFiles.map((file) => (
+                  <li key={file.name}>
+                    {file.name} - {FileUtils.toHumanReadableFileSize(file.size)}
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
+          {errorMessage && (
+            <Alert autoDismiss onDismiss={() => setErrorMessage(null)} severity="error" text={errorMessage} />
+          )}
+        </div>
+      )}
+    </ReactDropzone>
   )
 }
 

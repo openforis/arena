@@ -22,8 +22,6 @@ import * as API from '@webapp/service/api'
 export const WmtsComponent = () => {
   const apiKey = ''
   const [baseMaps, setBaseMaps] = useState([])
-  const [tileMatrixSets, setTileMatrixSets] = useState([])
-  const [currentTileMatrixSet, setCurrentTileMatrixSet] = useState('')
 
   const surveyId = useSurveyId()
 
@@ -70,8 +68,6 @@ export const WmtsComponent = () => {
       const newTileMatrixSets = getTileMatrixSets(capabilities.Capabilities.Contents.TileMatrixSet)
       const base = makeBaseMaps(capabilities.Capabilities.Contents.Layer, newTileMatrixSets[0])
       if (isMounted) {
-        setTileMatrixSets(newTileMatrixSets)
-        setCurrentTileMatrixSet(newTileMatrixSets[0])
         setBaseMaps(base)
       }
     })

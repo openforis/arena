@@ -90,14 +90,14 @@ export const isEmailValueValid = (email: unknown): boolean =>
   Objects.isEmpty(email) || validEmailRegex.test(email as string)
 
 export const validateEmail =
-  ({ errorKey }: { errorKey: string } = { errorKey: ValidatorErrorKeys.invalidEmail }): ValidatorFn =>
+  ({ errorKey = ValidatorErrorKeys.invalidEmail }: { errorKey?: string } = {}): ValidatorFn =>
   (propName, item) => {
     const email = getProp(propName)(item)
     return isEmailValueValid(email) ? null : { key: errorKey }
   }
 
 export const validateEmails =
-  ({ errorKey }: { errorKey: string } = { errorKey: ValidatorErrorKeys.invalidEmail }): ValidatorFn =>
+  ({ errorKey = ValidatorErrorKeys.invalidEmail }: { errorKey?: string } = {}): ValidatorFn =>
   (propName, item) => {
     const emails = getProp(propName, [])(item) as unknown[]
     const hasErrors = emails.some((email) => !isEmailValueValid(email))

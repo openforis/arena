@@ -25,7 +25,7 @@ const _getJsType = (nodeDefOrValue) => {
   // the parameter is a value (number or string)
   return classByName[typeof nodeDefOrValue]
 }
-const _hasProperty = ({ JsType, propName }) => Object.prototype.hasOwnProperty.call(JsType, propName)
+const _hasProperty = ({ JsType, propName }) => Object.hasOwn(JsType, propName)
 const _hasFunction = ({ JsType, funcName }) => Boolean(JsType.prototype[funcName])
 
 export const hasNativeProperty = ({ nodeDefOrValue, propName }) => {

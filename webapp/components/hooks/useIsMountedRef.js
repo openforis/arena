@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react'
 
-const useIsMountedRef = ({ delay = 0 } = { delay: 0 }) => {
+const useIsMountedRef = ({ delay = 0 } = {}) => {
   const mountedRef = useRef(false)
   const mountedTimeoutRef = useRef(null) // avoid a render after unmount
 

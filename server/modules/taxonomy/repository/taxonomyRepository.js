@@ -297,7 +297,7 @@ export const fetchTaxa = async (
     }
     ORDER BY
         t.id
-    LIMIT ${limit ? limit : 'ALL'} 
+    LIMIT ${limit || 'ALL'} 
     OFFSET $/offset/
     `,
     { taxonomyUuid, offset },
