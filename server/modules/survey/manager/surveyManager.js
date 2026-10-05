@@ -71,7 +71,7 @@ const _fetchAndAssocAdditionalInfo = async ({ surveyInfo }, client) => {
 // ====== VALIDATION
 
 export const validateNewSurvey = async ({ newSurvey }) => {
-  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name) // TODO add object model for newSurvey
+  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)
   return SurveyValidator.validateNewSurvey({ newSurvey, surveyInfos })
 }
 

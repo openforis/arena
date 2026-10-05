@@ -114,12 +114,6 @@ export default class FilesImportJob extends FileImportBaseJob {
     if (actuallyMissingFileUuids.length > 0) {
       throw new Error(`missing files with UUIDs ${actuallyMissingFileUuids}`)
     }
-
-    // TODO check if it's necessary to check that all files are in the updated records data
-    // const missingFileUuids = filesUuids.filter((fileUuid) => !recordsFileUuids.includes(fileUuid))
-    // if (missingFileUuids.length > 0) {
-    //   throw new Error(`files with UUIDs ${missingFileUuids} not found in records`)
-    // }
   }
 
   async deleteOrphanFiles() {

@@ -311,7 +311,6 @@ export const {
   getNodeDefCodeCandidateParents,
 } = SurveyNodeDefs
 
-// TODO check where used
 export const { canUpdateCategory, isNodeDefParentCode } = SurveyNodeDefs
 
 // ====== Categories

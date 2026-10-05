@@ -15,7 +15,7 @@ import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 const Row = (props) => {
-  const { rowNo, row } = props
+  const { item: row, itemPosition: rowNo } = props
 
   const lang = useSurveyPreferredLang()
   const user = useUser()
@@ -61,8 +61,8 @@ const Row = (props) => {
 }
 
 Row.propTypes = {
-  row: PropTypes.object.isRequired,
-  rowNo: PropTypes.number.isRequired,
+  item: PropTypes.object.isRequired,
+  itemPosition: PropTypes.number.isRequired,
 }
 
 export default Row

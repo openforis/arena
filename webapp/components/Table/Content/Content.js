@@ -113,8 +113,7 @@ const Content = (props) => {
   return (
     <div className="table__content">
       <div className="table__row-header" ref={headerRef} style={{ gridTemplateColumns }}>
-        {/* TODO check why props is passed in this way*/}
-        {React.createElement(rowHeaderComponent, { props, sort, handleSortBy, ...rowProps })}
+        {React.createElement(rowHeaderComponent, { sort, handleSortBy, ...rowProps })}
       </div>
 
       {loading ? (
@@ -127,7 +126,6 @@ const Content = (props) => {
               ...props,
               ...rowProps,
               key,
-              row: item, // TODO do not pass "row" but "item" instead
               index,
               item,
               rowComponent,

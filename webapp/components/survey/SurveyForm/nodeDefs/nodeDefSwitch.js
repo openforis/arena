@@ -228,6 +228,7 @@ const NodeDefSwitch = (props) => {
     nodeDef,
     onSortBy,
     parentNode,
+    preview,
     readOnly: readOnlyProp,
     renderType,
     sortCriteria = [],
@@ -334,6 +335,7 @@ const NodeDefSwitch = (props) => {
   const nestedComponentsProps = {
     ...props,
     ...entryProps,
+    preview,
     surveyInfo,
     readOnly:
       readOnlyProp ||

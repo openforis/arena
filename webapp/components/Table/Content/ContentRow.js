@@ -60,8 +60,6 @@ export const ContentRow = (props) => {
         offset,
         item,
         itemPosition,
-        row: item, // TODO remove it and pass only item
-        rowNo: itemPosition, // TODO remove it and pass only itemPosition
         onRowExpandToggle,
         expandableRows,
         isRowExpandable,

@@ -52,7 +52,6 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
 }
 
 const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
-  // TODO check if it should be removed
   const surveyId = Survey.getId(survey)
 
   let updatedNodes = nodeDependents || {}

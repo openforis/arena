@@ -20,8 +20,6 @@ const columnProps = {
 
 const locationColumnsSuffixes = ['_x', '_y', '_srs']
 
-// TODO remove code from here if needed // categories export
-
 const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns, [columnType, columnProp]) => {
   // columns will be like code (or level_name_code in case of hierarchical categories), label, label_en, description, description_en
   // the language suffix is optional
