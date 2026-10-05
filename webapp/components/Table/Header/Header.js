@@ -30,8 +30,12 @@ const Header = (props) => {
 
 Header.propTypes = {
   columns: PropTypes.array,
+  count: PropTypes.number.isRequired,
   headerLeftComponent: PropTypes.elementType.isRequired,
   headerProps: PropTypes.object,
+  limit: PropTypes.number.isRequired,
+  list: PropTypes.array.isRequired,
+  offset: PropTypes.number.isRequired,
   onVisibleColumnsChange: PropTypes.func.isRequired,
   totalCount: PropTypes.number.isRequired,
   visibleColumnsSelectionEnabled: PropTypes.bool,
