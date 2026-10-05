@@ -7,7 +7,7 @@ export const useFetchCategoryByUuid = ({ surveyId, categoryUuid }) => {
 
   useEffect(() => {
     if (categoryUuid) {
-      ;(async () => {
+      void (async () => {
         const categoryFetched = await API.fetchCategory({ surveyId, categoryUuid })
         setCategory(categoryFetched)
       })()

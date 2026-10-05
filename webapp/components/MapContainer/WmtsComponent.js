@@ -66,7 +66,7 @@ export const WmtsComponent = () => {
   useEffect(() => {
     if (componentDisabled) return
     let isMounted = true
-    API.fetchMapWmtsCapabilities({ surveyId, url }).then((capabilities) => {
+    void API.fetchMapWmtsCapabilities({ surveyId, url }).then((capabilities) => {
       const newTileMatrixSets = getTileMatrixSets(capabilities.Capabilities.Contents.TileMatrixSet)
       const base = makeBaseMaps(capabilities.Capabilities.Contents.Layer, newTileMatrixSets[0])
       if (isMounted) {

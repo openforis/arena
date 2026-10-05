@@ -29,7 +29,7 @@ export default class ItemsCache {
   }
 
   findKeys(filterFunction) {
-    return this.keys.filter(filterFunction)
+    return this.keys.filter((key) => filterFunction(key))
   }
 
   set(key, item) {

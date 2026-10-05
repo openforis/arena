@@ -99,7 +99,7 @@ export class CategoryImportInternalJob extends Job {
         // 7. initialize category item indexes etc.
         await this.afterCategoryImport()
       } else {
-        this.setStatusFailed()
+        await this.setStatusFailed()
       }
     }
   }
@@ -240,7 +240,7 @@ export class CategoryImportInternalJob extends Job {
         .filter((oldLevelName) => !levelNames.includes(oldLevelName))
         .flat()
       this._addError(Validation.messageKeys.categoryImport.cannotDeleteLevelsOfPublishedCategory, { deletedLevelNames })
-      this.setStatusFailed()
+      await this.setStatusFailed()
       return
     }
 

@@ -84,7 +84,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
   }
 
   async execute() {
-    super.execute()
+    await super.execute()
 
     const { context } = this
     const { abortOnErrors, dryRun } = context
@@ -110,7 +110,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     }
     if (this.isRunning() && this.hasErrors() && abortOnErrors && !dryRun) {
       this.logDebug('Errors found and abortOnErrors is true: aborting transaction')
-      this.setStatusFailed()
+      await this.setStatusFailed()
       throw new Error('abort_transaction')
     } else {
       this.setContext({

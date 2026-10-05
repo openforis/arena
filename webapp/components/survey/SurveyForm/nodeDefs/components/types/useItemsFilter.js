@@ -45,7 +45,7 @@ export const useItemsFilter = ({ nodeDef, parentNode, items, alwaysIncludeItemFu
 
     const record = RecordState.getRecord(state)
 
-    filterItems({
+    void filterItems({
       user,
       survey,
       record,

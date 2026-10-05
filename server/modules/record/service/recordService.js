@@ -578,7 +578,7 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
               })
               return encodeURIComponent(keyValueFormatted)
             })
-            .filter(Objects.isNotEmpty)
+            .filter((part) => Objects.isNotEmpty(part))
           fileNameParts.unshift(keyValuesFormatted.join('_'))
         }
       }
@@ -676,8 +676,8 @@ export const mergeRecords = async (
     }
     return {
       record: recordTargetUpdated,
-      nodesCreated: nodesArray.filter(Node.isCreated).length,
-      nodesUpdated: nodesArray.filter(Node.isUpdated).length,
+      nodesCreated: nodesArray.filter((node) => Node.isCreated(node)).length,
+      nodesUpdated: nodesArray.filter((node) => Node.isUpdated(node)).length,
     }
   })
 

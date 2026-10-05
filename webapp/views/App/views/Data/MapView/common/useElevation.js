@@ -24,7 +24,7 @@ export const useElevation = ({ point, active = true }) => {
       }
     }
     if (active && surveyId && pointLatLng) {
-      fetchElevation()
+      void fetchElevation()
     } else {
       setElevation('...')
     }

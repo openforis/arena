@@ -95,7 +95,7 @@ const SurveyDocImageEditor = (props: Props) => {
     if (documentPlace) draft = SurveyDocImages.assocDocumentPlace(documentPlace)(draft)
     draft = SurveyDocImages.assocApplyIf(applyIf)(draft)
 
-    SurveyDocImageValidator.validate({ survey, surveyDocImages, surveyDocImage: draft }).then((v) => {
+    void SurveyDocImageValidator.validate({ survey, surveyDocImages, surveyDocImage: draft }).then((v) => {
       setState((prev) => ({ ...prev, draftSurveyDocImage: draft, validation: v }))
     })
   }, [editedSurveyDocImage, file, labels, documentPlace, applyIf, survey, surveyDocImages])

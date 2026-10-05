@@ -487,7 +487,7 @@ export const getHierarchy =
         childDefs.push(...childDefsNotFiltered.filter(filterFn))
       }
       length += childDefs.length
-      const item = { ...nodeDef, children: childDefs.reduce(h, []) }
+      const item = { ...nodeDef, children: childDefs.reduce((acc, childDef) => h(acc, childDef), []) }
       array.push(item)
       return array
     }

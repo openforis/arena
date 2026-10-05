@@ -22,7 +22,7 @@ export const SurveyTemplateSelect = (props) => {
       const fetchedItems = await API.fetchSurveyTemplatesPublished()
       setState({ loading: false, items: fetchedItems })
     }
-    loadItems()
+    void loadItems()
   }, [])
 
   if (loading) return <LoadingBar />

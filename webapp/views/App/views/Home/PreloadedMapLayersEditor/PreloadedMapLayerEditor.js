@@ -49,7 +49,7 @@ const PreloadedMapLayerEditor = (props) => {
         temporary: true,
       })
     }
-    SurveyPreloadedMapLayerValidator.validate({ preloadedMapLayers, preloadedMapLayer: draftPreloadedMapLayer }).then(
+    void SurveyPreloadedMapLayerValidator.validate({ preloadedMapLayers, preloadedMapLayer: draftPreloadedMapLayer }).then(
       (validation) => {
         setState((statePrev) => ({
           ...statePrev,

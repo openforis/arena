@@ -7,7 +7,7 @@ export const useOnUpdate = ({ rowItem: item, setRowItem }) => {
   const itemId = item.id
 
   return ({ resolved }) => {
-    ;(async () => {
+    void (async () => {
       const {
         data: { item: itemUpdated },
       } = await axios.post(`/api/survey/${surveyId}/collect-import/report/${itemId}/resolve`, {

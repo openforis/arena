@@ -62,8 +62,7 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
   }
 
   async push(rowResult) {
-    Object.keys(this.nodeDefsByColumnName).forEach((columnName) => {
-      const nodeDef = this.nodeDefsByColumnName[columnName]
+    for (const [columnName, nodeDef] of Object.entries(this.nodeDefsByColumnName)) {
 
       const value = extractValueFromRowResult({ rowResult, nodeDef, columnName })
 
@@ -74,8 +73,9 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
         [TableNode.columnSet.value]: value,
       }
 
-      super.push(values)
-    })
+      // flush must complete before the buffer is filled again
+      await super.push(values)
+    }
 
     return true
   }

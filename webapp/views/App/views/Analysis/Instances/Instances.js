@@ -43,7 +43,7 @@ const Instances = () => {
   }
 
   useEffect(() => {
-    getRStudioInstances()
+    void getRStudioInstances()
   }, [])
 
   if (loading) return <p>loading...</p>

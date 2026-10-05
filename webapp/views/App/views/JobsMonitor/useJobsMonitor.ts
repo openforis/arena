@@ -47,7 +47,7 @@ export const useJobsMonitor = (): UseJobsMonitorResult => {
     const loadJobs = async () => {
       await fetchJobs()
     }
-    loadJobs()
+    void loadJobs()
   }, [fetchJobs])
 
   useInterval(fetchJobs, refreshIntervalMillis)

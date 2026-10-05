@@ -140,7 +140,7 @@ export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = fals
           })
         )
       } else {
-        invite()
+        void invite()
       }
     } else {
       setUserInvite(userInviteValidated)

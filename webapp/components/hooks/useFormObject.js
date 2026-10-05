@@ -25,7 +25,7 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
 
   // Validation effect
   useEffect(() => {
-    ;(async () => {
+    void (async () => {
       const validationNext = validatorFn ? await validatorFn(object) : Validation.getValidation(object)
       setValidation(validationNext)
     })()

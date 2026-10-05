@@ -63,7 +63,7 @@ export const User2FADeviceDetails = () => {
           if (isMounted) {
             setExistingDevices(list)
             const newDeviceObj = {}
-            User2FADeviceValidator.validateDevice(list)(newDeviceObj).then((nextValidation) => {
+            void User2FADeviceValidator.validateDevice(list)(newDeviceObj).then((nextValidation) => {
               if (isMounted) {
                 setDevice(Validation.assocValidation(nextValidation))
               }
@@ -150,7 +150,7 @@ export const User2FADeviceDetails = () => {
     (value) => {
       setDevice((prevDevice) => {
         const nextDevice = { ...prevDevice, [User2FADevice.keys.deviceName]: value }
-        User2FADeviceValidator.validateDevice(existingDevices)(nextDevice).then((nextValidation) => {
+        void User2FADeviceValidator.validateDevice(existingDevices)(nextDevice).then((nextValidation) => {
           const nextDeviceWithValidation = Validation.assocValidation(nextValidation)(nextDevice)
           setDevice(nextDeviceWithValidation)
         })
