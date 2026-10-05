@@ -66,11 +66,12 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode, editable }) 
 
     const survey = SurveyState.getSurvey(state)
 
-    const nodes = NodeDef.isRoot(nodeDef)
-      ? [rootNode]
-      : parentNode
-        ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
-        : []
+    let nodes = []
+    if (NodeDef.isRoot(nodeDef)) {
+      nodes = [rootNode]
+    } else if (parentNode) {
+      nodes = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
+    }
 
     const canAddOrDeleteNodeCommon =
       editable && canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)

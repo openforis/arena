@@ -83,13 +83,13 @@ export const useGetActivityLogMessages = ({ messages, setMessages, onError = nul
   useInterval(() => messages.length > 0 && fetchMessages({ newest: true }), POLL_INTERVAL)
 
   return () => {
-    void fetchMessages({ newest: true })
+    fetchMessages({ newest: true })
   }
 }
 
 export const useGetActivityLogMessagesNext = ({ messages, setMessages, onError = null, onLoaded = null }) => {
   const fetchMessages = useFetchMessages({ messages, setMessages, onError, onLoaded })
   return () => {
-    void fetchMessages({ newest: false })
+    fetchMessages({ newest: false })
   }
 }

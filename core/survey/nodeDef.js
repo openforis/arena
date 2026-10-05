@@ -370,7 +370,9 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultT
     firstPart = name
   }
 
-  const suffix = isVirtual(nodeDef) ? ' (V)' : isAnalysis(nodeDef) && isAttribute(nodeDef) ? ' (C)' : ''
+  let suffix = ''
+  if (isVirtual(nodeDef)) suffix = ' (V)'
+  else if (isAnalysis(nodeDef) && isAttribute(nodeDef)) suffix = ' (C)'
 
   return firstPart + suffix
 }

@@ -82,7 +82,8 @@ export const validatePositiveOrZeroNumber =
 
     const value = getProp(propName)(item) as number
 
-    return value && (allowZero ? value < 0 : value <= 0) ? { key: errorKey, params: errorParams } : null
+    const invalid = allowZero ? value < 0 : value <= 0
+    return value && invalid ? { key: errorKey, params: errorParams } : null
   }
 
 export const isEmailValueValid = (email: unknown): boolean =>

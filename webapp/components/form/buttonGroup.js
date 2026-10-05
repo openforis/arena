@@ -62,7 +62,7 @@ export const toButtonGroupItems = ({ i18n, object, labelPrefix, icon = null }) =
   Object.keys(object).map((key) => ({
     key,
     label: i18n.t(`${labelPrefix}${key}`),
-    icon: icon ? (typeof icon === 'function' ? icon({ key }) : icon) : null,
+    icon: typeof icon === 'function' ? icon({ key }) : icon || null,
   }))
 
 ButtonGroup.propTypes = {

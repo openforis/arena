@@ -23,7 +23,8 @@ const fetchWithTimeout = async (url, { headers, timeoutMs = DEFAULT_TIMEOUT_MS }
     const response = await fetch(url, { method: 'GET', headers, signal: controller.signal })
     if (!response.ok) {
       const body = await response.text().catch(() => '')
-      throw new Error(`HTTP ${response.status}${body ? ` — ${body.slice(0, 200)}` : ''}`)
+      const bodySuffix = body ? ` — ${body.slice(0, 200)}` : ''
+      throw new Error(`HTTP ${response.status}${bodySuffix}`)
     }
     return response.json()
   } finally {

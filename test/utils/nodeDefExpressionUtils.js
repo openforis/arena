@@ -16,7 +16,7 @@ const _expectResult = ({ result, resultExpected }) => {
 
 const _testExpressions = ({ queries, expressionEvaluator }) =>
   queries.forEach(({ q, r, n = null, e = null, s = true }) => {
-    const testTitle = `${q}${n ? ` (${n})` : ''}`
+    const testTitle = n ? `${q} (${n})` : q
 
     it(testTitle, async () => {
       try {
