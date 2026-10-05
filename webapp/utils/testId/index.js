@@ -51,6 +51,7 @@ export const TestId = {
     periodSelector: 'dashboard-period-selector',
     mapSection: 'dashboard-map-section',
     activitySection: 'dashboard-activity-section',
+    activityToggle: 'dashboard-activity-toggle',
     activityError: 'dashboard-activity-error',
     activityEmpty: 'dashboard-activity-empty',
     trendSection: 'dashboard-trend-section',
