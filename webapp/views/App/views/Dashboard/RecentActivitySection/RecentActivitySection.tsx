@@ -56,7 +56,11 @@ const RecentActivityContent = () => {
           {i18n.t('homeView:dashboard.activityLog.loadError') as string}
         </p>
       )}
-      {isLoading && <LoadingBar />}
+      {isLoading && (
+        <div className="recent-activity__loading">
+          <LoadingBar />
+        </div>
+      )}
       {isEmpty && (
         <p className="recent-activity__empty" data-testid={TestId.dashboard.activityEmpty}>
           {i18n.t('homeView:dashboard.activityLog.empty') as string}
