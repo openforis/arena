@@ -1,4 +1,9 @@
-const isTrue = (val: string | undefined): boolean => val?.toLocaleLowerCase() === 'true' || val === '1'
+// values can be missing or (when injected by webpack DefinePlugin) not strings
+const isTrue = (val: unknown): boolean => {
+  if (val === null || val === undefined) return false
+  if (typeof val === 'string') return ['true', '1'].includes(val.trim().toLocaleLowerCase())
+  return val === true || val === 1
+}
 
 const getJson = (val: string | undefined): unknown => {
   if (!val) return undefined
