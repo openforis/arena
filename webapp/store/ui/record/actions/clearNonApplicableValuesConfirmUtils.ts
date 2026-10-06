@@ -22,9 +22,7 @@ export const getNodeDefLabelsToShow = ({
   lang: string
   nodeDefUuidsToClear: string[]
 }): string[] => {
-  const nodeDefs = nodeDefUuidsToClear
-    .map((uuid) => Survey.getNodeDefByUuid(uuid)(survey))
-    .filter((nodeDef) => Boolean(nodeDef))
+  const nodeDefs = nodeDefUuidsToClear.map((uuid) => Survey.getNodeDefByUuid(uuid)(survey)).filter(Boolean)
   const multipleEntityDefs = nodeDefs.filter(NodeDef.isMultipleEntity)
   const multipleEntityDefUuids = new Set(multipleEntityDefs.map(NodeDef.getUuid))
   const otherDefs = nodeDefs.filter((nodeDef) => {
