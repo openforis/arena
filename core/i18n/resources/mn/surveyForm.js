@@ -26,6 +26,11 @@ export default {
   },
   clone: `'{{nodeDefLabel}}' хуулах`,
   compressFormItems: `'{{nodeDefLabel}}'-н маягтын зүйлсийг шахах`,
+  confirmClearNonApplicableValues: `Дараах талбарууд хамааралгүй болж, тэдгээрийн утгыг устгана:
+
+{{nodeDefLabels}}
+
+Үргэлжлүүлэх үү?`,
   confirmUpdateDependentEnumeratedEntities: `Хэрэв та үргэлжлүүлбэл, зарим тоологдсон объектууд ({{entityDefs}}) дахин тоологдох болно, 
 тэдгээрт оруулсан одоо байгаа утгуудыг (хэрэв байгаа бол) устгана. 
 Үргэлжлүүлэх үү?`,

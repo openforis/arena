@@ -13,6 +13,7 @@ export {
 
 export { applicationError, cycleChanged, sessionExpired } from './application'
 export { recordNodesUpdate } from './common'
+export { confirmClearNonApplicableValues } from './clearNonApplicableValuesConfirm'
 export { createNodePlaceholder, createRecord } from './create'
 export { nodeValidationsUpdate, nodesUpdateCompleted, updateNode, updateRecordStep } from './update'
 export { checkInRecord, checkOutRecord } from './checkIn'
