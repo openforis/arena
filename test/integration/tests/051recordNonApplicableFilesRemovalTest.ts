@@ -1,4 +1,4 @@
-import { Promises, UUIDs } from '@openforis/arena-core'
+import { UUIDs } from '@openforis/arena-core'
 
 import { db } from '@server/db/db'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
@@ -138,7 +138,9 @@ const fetchRecord = (survey, record) =>
 
 describe('Records update thread: files of attributes becoming non-applicable', () => {
   afterAll(async () => {
-    await Promises.each(surveysToDelete, (survey) => SurveyManager.deleteSurvey(Survey.getId(survey)))
+    for (const survey of surveysToDelete) {
+      await SurveyManager.deleteSurvey(Survey.getId(survey)) //NOSONAR
+    }
   })
 
   test('files of cleared attributes and of deleted entities are marked as deleted (normal record)', async () => {

@@ -1,5 +1,3 @@
-import { Promises } from '@openforis/arena-core'
-
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
 
@@ -130,7 +128,9 @@ const isValueBlank = ({ survey, record, path }) => Node.isValueBlank(RecordUtils
 
 describe('Records update thread: clear values of attributes becoming non-applicable', () => {
   afterAll(async () => {
-    await Promises.each(surveysToDelete, (survey) => SurveyManager.deleteSurvey(Survey.getId(survey)))
+    for (const survey of surveysToDelete) {
+      await SurveyManager.deleteSurvey(Survey.getId(survey)) //NOSONAR
+    }
   })
 
   test('Entity deletion is not applied until the user confirms it', async () => {
