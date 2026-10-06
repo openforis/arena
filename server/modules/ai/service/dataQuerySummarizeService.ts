@@ -20,7 +20,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as ModelClient from './modelClient'
 import { buildDataQuerySummarizePrompt } from './prompts/dataQuerySummarize'
-import { parseJsonResponse } from './responseParsers'
+import { parseJsonResponse } from '@common/ai/parsing'
 
 const logger = Log.getLogger('AiDataQuerySummarizeService')
 

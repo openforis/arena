@@ -22,7 +22,7 @@ import * as Log from '@server/log/log'
 
 import * as ModelClient from './modelClient'
 import { buildTranslationPrompt } from './prompts/translation'
-import { parseJsonResponse } from './responseParsers'
+import { parseJsonResponse } from '@common/ai/parsing'
 
 const logger = Log.getLogger('AiTranslationService')
 
