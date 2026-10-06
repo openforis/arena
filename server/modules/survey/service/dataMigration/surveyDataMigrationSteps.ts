@@ -45,7 +45,7 @@ export const surveyDataMigrationSteps: SurveyDataMigrationStep[] = [
     // node table partial value indexes and meta empty dictionaries removal (arena-server schema migrations):
     // reclaim the space of the rows updated by the schema migration.
     // The release with this version must include the arena-server version with those migrations.
-    version: '2.9.7',
+    version: '2.9.8',
     migrate: async () => {},
     migrateAfterCommit: async ({ surveyId }) => {
       await NodeRepository.vacuumFullNodeTable({ surveyId })
