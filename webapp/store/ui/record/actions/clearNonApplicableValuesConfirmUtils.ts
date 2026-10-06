@@ -4,8 +4,19 @@ import * as Survey from '@core/survey/survey'
 
 const maxNodeDefLabelsShown = 10
 
+// labels of the ancestors (root entity excluded) and of the node definition itself, to tell apart duplicate labels
+const _getNodeDefLabelPath = ({ survey, lang, nodeDef }: { survey: any; lang: string; nodeDef: any }): string => {
+  const labels: string[] = []
+  let current = nodeDef
+  while (current && !NodeDef.isRoot(current)) {
+    labels.unshift(NodeDef.getLabel(current, lang))
+    current = Survey.getNodeDefParent(current)(survey)
+  }
+  return labels.join(' / ')
+}
+
 /**
- * Generates the list of labels of the node definitions whose values will be cleared:
+ * Generates the list of labels (with their path, root entity excluded) of the node definitions whose values will be cleared:
  * cleared multiple entities first, then the attributes not inside them.
  * @param {!object} params - The parameters.
  * @param {!object} params.survey - The survey.
@@ -30,7 +41,9 @@ export const getNodeDefLabelsToShow = ({
     const ancestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
     return !ancestorMultipleEntity || !multipleEntityDefUuids.has(NodeDef.getUuid(ancestorMultipleEntity))
   })
-  const labels = [...multipleEntityDefs, ...otherDefs].map((nodeDef) => `- ${NodeDef.getLabel(nodeDef, lang)}`)
+  const labels = [...multipleEntityDefs, ...otherDefs].map(
+    (nodeDef) => `- ${_getNodeDefLabelPath({ survey, lang, nodeDef })}`
+  )
   if (labels.length <= maxNodeDefLabelsShown) return labels
   return [...labels.slice(0, maxNodeDefLabelsShown), '- …']
 }

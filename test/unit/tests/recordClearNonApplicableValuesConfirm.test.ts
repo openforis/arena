@@ -45,7 +45,7 @@ describe('Record: confirm clear of non-applicable values', () => {
       lang: 'en',
       nodeDefUuidsToClear: [getNodeDefUuid('dbh'), getNodeDefUuid('distance')],
     })
-    expect(labels).toEqual(['- dbh', '- distance'])
+    expect(labels).toEqual(['- tree / dbh', '- distance'])
   })
 
   test('nodes to restore are marked as dirty, so that they replace the ones being edited locally', () => {
