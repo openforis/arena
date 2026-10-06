@@ -1,10 +1,15 @@
+import { Promises } from '@openforis/arena-core'
+
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
 
+import * as Log from '@server/log/log'
 import * as FileRepository from '@server/modules/record/repository/fileRepository'
-import * as RecordFileManager from '@server/modules/record/manager/recordFileManager'
+import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
+
+const logger = Log.getLogger('NodeFilesRemover')
 
 export type FileToRemove = { fileUuid: string; recordUuid: string }
 
@@ -51,11 +56,24 @@ export const findFilesToRemove = ({
   return files
 }
 
+// a file whose content cannot be deleted (already missing, storage error) must not block the record update
+const _deleteFileContentSafely = async ({ surveyId, fileUuid, recordUuid }: FileToRemove & { surveyId: number }) => {
+  try {
+    await SurveyFileManager.deleteFilesContentByUuids({
+      surveyId,
+      fileSummaries: [{ uuid: fileUuid, props: { recordUuid } }],
+    })
+  } catch (error: any) {
+    logger.warn(`Cannot delete content of file ${fileUuid} (survey ${surveyId}): ${error?.message}; ignoring`)
+  }
+}
+
 /**
  * Removes the given files.
  * Normal records: the files are marked as deleted, as when the user changes the value of a file attribute
  * (soft-deleted files are never purged, their content is kept in the storage).
  * Preview records: the files are deleted immediately, content (file system or S3 bucket) and DB row.
+ * Missing file rows or contents are tolerated: the removal is best effort and never fails the update.
  * @param {!object} params - The parameters.
  * @param {!number} params.surveyId - The survey id.
  * @param {!FileToRemove[]} params.files - The files to remove.
@@ -67,15 +85,14 @@ export const removeFiles = async (
   { surveyId, files, isPreview = false }: { surveyId: number; files: FileToRemove[]; isPreview?: boolean },
   tx: any
 ): Promise<void> => {
-  if (files.length === 0) return
+  const fileUuids = [...new Set(files.map(({ fileUuid }) => fileUuid))]
+  if (fileUuids.length === 0) return
 
   if (isPreview) {
-    await RecordFileManager.deleteFiles({ surveyId, files }, tx)
+    await Promises.each(files, (file) => _deleteFileContentSafely({ surveyId, ...file }))
+    await FileRepository.deleteFilesByUuids(surveyId, fileUuids, tx)
     return
   }
-  await FileRepository.markFilesAsDeleted(
-    surveyId,
-    files.map(({ fileUuid }) => fileUuid),
-    tx
-  )
+  // no-op for uuids without a row in the file table
+  await FileRepository.markFilesAsDeleted(surveyId, fileUuids, tx)
 }

@@ -11,6 +11,7 @@ import * as SurveyFile from '@core/survey/surveyFile'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
+import * as FileRepository from '@server/modules/record/repository/fileRepository'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
 
@@ -184,6 +185,31 @@ describe('Records update thread: files of attributes becoming non-applicable', (
     await makeNotRelevant({ survey, record })
 
     expect(await fetchFile(survey, photoFileUuid)).toBeNull()
+    expect(await fetchFile(survey, itemPhotoFileUuid)).toBeNull()
+  })
+
+  test('missing file rows do not make the update fail (normal record)', async () => {
+    const survey = await createSurvey()
+    const { record, photoFileUuid, itemPhotoFileUuid } = await createRecordWithFiles({ survey })
+    await FileRepository.deleteFilesByUuids(Survey.getId(survey), [photoFileUuid])
+    expect(await fetchFile(survey, photoFileUuid)).toBeNull()
+
+    await makeNotRelevant({ survey, record })
+
+    const recordDb = await fetchRecord(survey, record)
+    expect(Node.isValueBlank(RecordUtils.findNodeByPath('cluster/photo')(survey, recordDb))).toBe(true)
+    expect(SurveyFile.isDeleted(await fetchFile(survey, itemPhotoFileUuid))).toBe(true)
+  })
+
+  test('missing file rows and contents do not make the update fail (preview record)', async () => {
+    const survey = await createSurvey()
+    const { record, photoFileUuid, itemPhotoFileUuid } = await createRecordWithFiles({ survey, preview: true })
+    await FileRepository.deleteFilesByUuids(Survey.getId(survey), [photoFileUuid])
+
+    await makeNotRelevant({ survey, record })
+
+    const recordDb = await fetchRecord(survey, record)
+    expect(Node.isValueBlank(RecordUtils.findNodeByPath('cluster/photo')(survey, recordDb))).toBe(true)
     expect(await fetchFile(survey, itemPhotoFileUuid)).toBeNull()
   })
 })
