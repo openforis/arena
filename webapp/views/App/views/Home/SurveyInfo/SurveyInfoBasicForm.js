@@ -5,7 +5,6 @@ import * as Survey from '@core/survey/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
@@ -19,7 +18,6 @@ export const SurveyInfoBasicForm = (props) => {
     surveyInfoObject,
     getFieldValidation,
     setFieldManualLinks,
-    setKeepNonApplicableValues,
     setName,
     setLanguages,
     setSrs,
@@ -28,18 +26,8 @@ export const SurveyInfoBasicForm = (props) => {
     setDescriptions,
     setCycles,
   } = props
-  const {
-    cycleKeys,
-    cycles,
-    defaultCycleKey,
-    descriptions,
-    fieldManualLinks,
-    keepNonApplicableValues,
-    labels,
-    languages,
-    name,
-    srs,
-  } = surveyInfoObject
+  const { cycleKeys, cycles, defaultCycleKey, descriptions, fieldManualLinks, labels, languages, name, srs } =
+    surveyInfoObject
 
   const readOnly = !useAuthCanEditSurvey()
 
@@ -114,14 +102,6 @@ export const SurveyInfoBasicForm = (props) => {
           />
         </FormItem>
       )}
-
-      <Checkbox
-        checked={Boolean(keepNonApplicableValues)}
-        disabled={readOnly}
-        info="homeView:surveyInfo.keepNonApplicableValuesInfo"
-        label="homeView:surveyInfo.keepNonApplicableValues"
-        onChange={setKeepNonApplicableValues}
-      />
     </div>
   )
 }
@@ -130,7 +110,6 @@ SurveyInfoBasicForm.propTypes = {
   surveyInfoObject: PropTypes.object.isRequired,
   getFieldValidation: PropTypes.func.isRequired,
   setFieldManualLinks: PropTypes.func.isRequired,
-  setKeepNonApplicableValues: PropTypes.func.isRequired,
   setName: PropTypes.func.isRequired,
   setLanguages: PropTypes.func.isRequired,
   setSrs: PropTypes.func.isRequired,
