@@ -98,6 +98,7 @@ export default {
   aiTranslationSourceLangMissing: 'Для перевода требуется исходный язык.',
   aiTranslationTargetLangsMissing: 'Для перевода требуется хотя бы один целевой язык.',
   aiTranslationItemsMissing: 'Нечего переводить.',
+  aiTranslationInvalid: 'ИИ не вернул пригодный перевод. Попробуйте ещё раз.',
   aiTranslationTooManyItems: 'Слишком много элементов в одном пакете ({{count}}); лимит — {{limit}}.',
   aiActivityLogSurveyMissing: 'Для составления сводки журнала активности требуется опрос.',
   aiChatbotDisabled: 'Чат-бот документации отключен в этом развертывании.',

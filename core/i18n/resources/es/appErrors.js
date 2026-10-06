@@ -103,6 +103,7 @@ export default {
   aiTranslationSourceLangMissing: 'El idioma de origen es obligatorio para la traducción.',
   aiTranslationTargetLangsMissing: 'Se requiere al menos un idioma de destino para la traducción.',
   aiTranslationItemsMissing: 'Nada que traducir.',
+  aiTranslationInvalid: 'La IA no devolvió una traducción utilizable. Inténtelo de nuevo.',
   aiTranslationTooManyItems: 'Demasiados elementos en un solo lote ({{count}}); el límite es {{limit}}.',
   aiActivityLogSurveyMissing: 'Se requiere una encuesta para resumir el registro de actividad.',
   aiChatbotDisabled: 'El chatbot de documentación está deshabilitado en este despliegue.',

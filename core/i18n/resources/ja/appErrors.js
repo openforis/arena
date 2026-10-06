@@ -88,6 +88,7 @@ export default {
   aiTranslationSourceLangMissing: '翻訳には元言語の指定が必要です。',
   aiTranslationTargetLangsMissing: '翻訳には少なくとも1つの対象言語の指定が必要です。',
   aiTranslationItemsMissing: '翻訳する項目がありません。',
+  aiTranslationInvalid: 'AIから利用可能な翻訳が返されませんでした。もう一度お試しください。',
   aiTranslationTooManyItems: '一度に処理できる項目数（{{limit}}件）を超えています（{{count}}件指定されました）。',
   aiActivityLogSurveyMissing: 'アクティビティログを要約するには調査の指定が必要です。',
   aiChatbotDisabled: 'このデプロイメントではドキュメントチャットボットが無効になっています。',

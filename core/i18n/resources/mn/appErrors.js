@@ -98,6 +98,7 @@ export default {
   aiTranslationSourceLangMissing: 'Орчуулгад эх хэл шаардлагатай.',
   aiTranslationTargetLangsMissing: 'Орчуулгад дор хаяж нэг зорилтот хэл шаардлагатай.',
   aiTranslationItemsMissing: 'Орчуулах зүйл алга.',
+  aiTranslationInvalid: 'AI ашиглах боломжтой орчуулга буцаасангүй. Дахин оролдоно уу.',
   aiTranslationTooManyItems: 'Нэг багцад хэт олон элемент байна ({{count}}); хязгаар нь {{limit}}.',
   aiActivityLogSurveyMissing: 'Үйл ажиллагааны бүртгэлийг хураангуйлахад судалгаа шаардлагатай.',
   aiChatbotDisabled: 'Энэ суулгацад баримт бичгийн чатбот идэвхгүй байна.',
