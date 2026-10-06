@@ -1,7 +1,7 @@
 /**
  * SSE route for the activity-log summarization feature (Tier 1 #5).
  *
- *   GET /api/ai/survey/:surveyId/activityLog/summarize?from=...&to=...&userUuid=...
+ *   GET /api/ai/survey/:surveyId/activityLog/summarize
  */
 import * as Log from '@server/log/log'
 import * as Request from '@server/utils/request'
@@ -23,7 +23,7 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { surveyId, from, to, userUuid } = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
 
         openSseStream(res)
 
@@ -36,9 +36,6 @@ export const init = (app) => {
           const result = await ActivityLogSummarizerService.summarize({
             user,
             surveyId: Number(surveyId),
-            from,
-            to,
-            userUuid,
             signal: abortController.signal,
           })
           for await (const chunk of result.textStream) {

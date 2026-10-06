@@ -10,10 +10,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import { Query, SortCriteria } from '@common/model/query'
 
-import { toQuery } from '@server/modules/ai/service/dataQueryGenerateService'
+import { generateDataQuery, normalizeQueryName, summarizeDataQuery, toQuery } from '@common/ai/tasks/dataQuery'
 import { buildDataQueryGeneratePrompt } from '@common/ai/prompts/dataQueryGenerate'
-import { normalizeQueryName } from '@server/modules/ai/service/dataQuerySummarizeService'
 import { buildDataQuerySummarizePrompt } from '@common/ai/prompts/dataQuerySummarize'
+
+import { expectSystemErrorKey, scriptedTextGenerator } from '@test/unit/utils/aiTestUtils'
 
 import * as DataTest from '../../utils/dataTest'
 import * as SurveyUtils from '../../utils/surveyUtils'
@@ -245,6 +246,37 @@ describe('AI data query generation', () => {
       expect(normalizeQueryName({ name: '', label: 'Average DBH' })).toBe('average_dbh')
       expect(normalizeQueryName({ name: null, label: null })).toBe('ai_query')
       expect(normalizeQueryName({ name: 'a'.repeat(60) })).toHaveLength(40)
+    })
+  })
+  describe('generateDataQuery', () => {
+    const answer = (entity: string) => JSON.stringify({ entity, mode: 'raw', attributes: [], explanation: 'x' })
+
+    test('retries once with the validation errors, then fails with aiDataQueryInvalid', async () => {
+      const { generateText, calls } = scriptedTextGenerator(answer('nope'), answer('still_nope'))
+      const error = await expectSystemErrorKey(
+        generateDataQuery({ generateText, survey, cycle, lang, description: 'trees', includeAnalysis: false }),
+        'aiDataQueryInvalid'
+      )
+      expect(error.statusCode).toBe(502)
+      expect(calls).toHaveLength(2)
+      // prompts quote untrusted text with JSON.stringify (pq), hence the escaped quotes
+      expect(calls[1].prompt).toContain(String.raw`entity \"nope\" not found`)
+    })
+
+    test('rejects a blank description without calling the model', async () => {
+      const { generateText, calls } = scriptedTextGenerator()
+      await expectSystemErrorKey(
+        generateDataQuery({ generateText, survey, cycle, lang, description: ' ', includeAnalysis: false }),
+        'aiDataQueryDescriptionMissing'
+      )
+      expect(calls).toHaveLength(0)
+    })
+  })
+
+  describe('summarizeDataQuery', () => {
+    test('rejects an empty query', async () => {
+      const { generateText } = scriptedTextGenerator()
+      await expectSystemErrorKey(summarizeDataQuery({ generateText, survey, query: {}, lang }), 'aiDataQueryEmpty')
     })
   })
 })
