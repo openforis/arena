@@ -467,6 +467,7 @@ export const persistNode = async ({
   file = null,
   timezoneOffset = null,
   lang = null,
+  clearNonApplicableValuesConfirmed = false,
 }) => {
   const recordUuid = Node.getRecordUuid(node)
 
@@ -501,11 +502,24 @@ export const persistNode = async ({
       user,
       timezoneOffset,
       lang,
+      socketId,
+      clearNonApplicableValuesConfirmed,
     },
   })
 }
 
-export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset, lang }) =>
+export const deleteNode = ({
+  socketId,
+  user,
+  surveyId,
+  cycle,
+  draft,
+  recordUuid,
+  nodeUuid,
+  timezoneOffset,
+  lang,
+  clearNonApplicableValuesConfirmed = false,
+}) =>
   _sendNodeUpdateMessage({
     socketId,
     user,
@@ -520,6 +534,8 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
       user,
       timezoneOffset,
       lang,
+      socketId,
+      clearNonApplicableValuesConfirmed,
     },
   })
 

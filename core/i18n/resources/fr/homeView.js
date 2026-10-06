@@ -120,6 +120,9 @@ export default {
     confirmDeleteCycle: `Êtes-vous sûr(e) de vouloir supprimer le cycle {{cycle}} ?\n\n$t(common.cantUndoWarning)\n\n
 Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
     cycleForArenaMobile: 'Cycle pour Arena Mobile',
+    keepNonApplicableValues: `Conserver les valeurs des attributs non pertinents`,
+    keepNonApplicableValuesInfo: `Si la case n'est pas cochée (par défaut), lors de la saisie des données, les valeurs des attributs qui ne sont plus pertinents sont effacées (après confirmation de l'utilisateur).
+Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même si les attributs ne sont plus pertinents.`,
     deleteActivityLog: "Effacer le journal d'activité",
     deleteActivityLogConfirm: {
       headerText: "Effacer TOUTES les données du journal d'activité pour ce formulaire ?",

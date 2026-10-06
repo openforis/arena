@@ -1,5 +1,7 @@
 import { ClusterBus, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+
 import * as Log from '@server/log/log'
 import ThreadManager from '@server/threads/threadManager'
 
@@ -62,7 +64,7 @@ const _createThread = () => {
         thread.terminate()
       }
     } else {
-      notifyRecordUpdateToSockets({ eventType: type, content }).catch((error) =>
+      notifyThreadMessageToSockets({ eventType: type, content }).catch((error) =>
         Logger.error(`error notifying record update to sockets: ${error}`)
       )
     }
@@ -159,6 +161,22 @@ const notifyRecordUpdateToSockets = async ({ eventType, content }) => {
   }
 }
 
+const notifyRecordUpdateToSocket = async ({ socketId, eventType, content }) => {
+  if (socketId && (await WebSocketServer.isSocketConnected(socketId))) {
+    WebSocketServer.notifySocket(socketId, eventType, content)
+  }
+}
+
+// forwards a message coming from the records update thread to the sockets interested in it
+const notifyThreadMessageToSockets = async ({ eventType, content }) => {
+  if (eventType === WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm) {
+    // only the user who requested the update has to confirm it
+    await notifyRecordUpdateToSocket({ socketId: content.socketId, eventType, content })
+  } else {
+    await notifyRecordUpdateToSockets({ eventType, content })
+  }
+}
+
 const notifyRecordDeleteToSockets = async ({ socketIdUser, recordUuid, notifySameUser = true }) => {
   // Notify other users viewing or editing the record it has been deleted
   const socketIds = await RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
@@ -179,6 +197,7 @@ export const RecordsUpdateThreadService = {
   // sockets
   assocSocket,
   notifyRecordUpdateToSockets,
+  notifyThreadMessageToSockets,
   notifyRecordDeleteToSockets,
   dissocSocket,
   dissocSocketBySocketId,

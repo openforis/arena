@@ -15,27 +15,40 @@ import * as ActionTypes from './actionTypes'
 import { checkAndConfirmUpdateNode } from './common'
 import { enqueueNodeRequest } from './nodeRequestsQueue'
 
+const _sendNodeDeleteRequest = async ({ dispatch, getState, nodeUuid, clearNonApplicableValuesConfirmed = false }) => {
+  dispatch(AppSavingActions.showAppSaving())
+
+  const state = getState()
+  const record = RecordState.getRecord(state)
+  const surveyId = SurveyState.getSurveyId(state)
+  const recordUuid = Record.getUuid(record)
+  const cycle = Record.getCycle(record)
+  const draft = Record.isPreview(record)
+
+  await enqueueNodeRequest(() =>
+    axios.delete(`/api/survey/${surveyId}/record/${recordUuid}/node/${nodeUuid}`, {
+      data: {
+        cycle,
+        draft,
+        timezoneOffset: Dates.getTimezoneOffset(),
+        lang: I18nState.getLang(),
+        ...(clearNonApplicableValuesConfirmed ? { clearNonApplicableValuesConfirmed } : {}),
+      },
+    })
+  )
+}
+
 export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   const onOk = async () => {
-    dispatch(AppSavingActions.showAppSaving())
     dispatch({ type: ActionTypes.nodeDelete, node })
-
-    const state = getState()
-    const record = RecordState.getRecord(state)
-    const surveyId = SurveyState.getSurveyId(state)
-    const recordUuid = Record.getUuid(record)
-    const cycle = Record.getCycle(record)
-    const draft = Record.isPreview(record)
-    const nodeUuid = Node.getUuid(node)
-
-    await enqueueNodeRequest(() =>
-      axios.delete(`/api/survey/${surveyId}/record/${recordUuid}/node/${nodeUuid}`, {
-        data: { cycle, draft, timezoneOffset: Dates.getTimezoneOffset(), lang: I18nState.getLang() },
-      })
-    )
+    await _sendNodeDeleteRequest({ dispatch, getState, nodeUuid: Node.getUuid(node) })
   }
   checkAndConfirmUpdateNode({ dispatch, getState, node, nodeDef, onOk })
 }
+
+// sends again a node deletion, confirming that the values of attributes becoming non-applicable can be cleared
+export const deleteNodeClearNonApplicableValuesConfirmed = (nodeUuid) => async (dispatch, getState) =>
+  _sendNodeDeleteRequest({ dispatch, getState, nodeUuid, clearNonApplicableValuesConfirmed: true })
 
 export const recordDeleted =
   (navigate, goBack = true) =>
