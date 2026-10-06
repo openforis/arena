@@ -72,7 +72,7 @@ const buildRecord = ({ survey, photoValue, itemPhotoValue }) =>
     )
   )
 
-const storeRecord = async ({ survey, recordBuilder, preview }) =>
+const storeRecord = ({ survey, recordBuilder, preview }) =>
   preview
     ? db.tx(async (t) => {
         const record = await RecordUtils.insertAndInitRecord(getContextUser(), survey, true, t as any)
