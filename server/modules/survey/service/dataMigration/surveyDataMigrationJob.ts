@@ -3,26 +3,21 @@ import { Versions } from '@openforis/arena-core'
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import {
-  getApplicableSurveyDataMigrationSteps,
   getCurrentAppVersionStamp,
+  surveyDataMigrationSteps,
   SurveyDataMigrationStep,
 } from './surveyDataMigrationSteps'
 
 /**
  * Determines the data migration steps that still need to be applied to a survey, given the app version
- * it was last migrated to (null/undefined is treated as '0.0.0'). Steps registered for a version greater than
- * the current app version are not applied yet.
+ * it was last migrated to (null/undefined is treated as '0.0.0').
  */
 export const getPendingSurveyDataMigrationSteps = ({
   surveyAppVersion,
-  currentAppVersion,
 }: {
   surveyAppVersion?: string
-  currentAppVersion?: string
 }): SurveyDataMigrationStep[] =>
-  getApplicableSurveyDataMigrationSteps(currentAppVersion).filter((step) =>
-    Versions.isLessThan(surveyAppVersion ?? '0.0.0', step.version)
-  )
+  surveyDataMigrationSteps.filter((step) => Versions.isLessThan(surveyAppVersion ?? '0.0.0', step.version))
 
 /**
  * Job that applies every pending data migration step to a single survey, then stamps the survey with the

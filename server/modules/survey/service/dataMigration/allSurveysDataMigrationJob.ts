@@ -9,19 +9,14 @@ type SurveyIdAndAppVersion = { id: number; appVersion?: string }
 
 /**
  * Filters the given surveys, keeping only the ones whose stored app version is lower than the latest
- * applicable survey data migration version, i.e. the ones that still need to be migrated.
- * Steps registered for a version greater than the current app version are not applicable yet, so they don't
- * select any survey (and don't run the survey schema migrations) before the app reaches that version.
+ * survey data migration version, i.e. the ones that still need to be migrated.
  */
-export const getSurveysToMigrate = (
-  surveys: SurveyIdAndAppVersion[],
-  currentAppVersion?: string
-): SurveyIdAndAppVersion[] =>
-  surveys.filter(({ appVersion }) => isSurveyDataMigrationPending({ appVersion, currentAppVersion }))
+export const getSurveysToMigrate = (surveys: SurveyIdAndAppVersion[]): SurveyIdAndAppVersion[] =>
+  surveys.filter(({ appVersion }) => isSurveyDataMigrationPending({ appVersion }))
 
 /**
- * Job that migrates every survey whose stored app version is behind the latest applicable survey data migration
- * version (steps for a future app version are skipped until the app reaches it). For each survey to migrate, it first brings the survey's DDL schema up to date
+ * Job that migrates every survey whose stored app version is behind the latest survey data migration
+ * version. For each survey to migrate, it first brings the survey's DDL schema up to date
  * (`DBMigrator.migrateSurveySchema`, idempotent), then runs a `SurveyDataMigrationJob` in its own transaction
  * to apply the data-migration steps and stamp the survey's app version — strictly in that order, so a crash
  * partway through leaves already-completed surveys correctly stamped (and not re-run) while the rest are
