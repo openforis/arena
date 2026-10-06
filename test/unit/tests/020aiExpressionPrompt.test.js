@@ -3,7 +3,7 @@
  * feature (Tier 1 #2). The builder is a pure function so we can verify it
  * here without going through the LLM gateway.
  */
-import { buildExpressionGeneratePrompt } from '@server/modules/ai/service/prompts/expressionGenerate'
+import { buildExpressionGeneratePrompt } from '@common/ai/prompts/expressionGenerate'
 
 const makeNodeDef = ({ uuid, name, type = 'decimal' }) => ({
   uuid,

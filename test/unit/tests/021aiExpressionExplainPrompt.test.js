@@ -2,7 +2,7 @@
  * Tests for the prompt builder used by the streaming "explain expression"
  * feature (Tier 1 #3).
  */
-import { buildExpressionExplainPrompt } from '@server/modules/ai/service/prompts/expressionExplain'
+import { buildExpressionExplainPrompt } from '@common/ai/prompts/expressionExplain'
 
 const makeNodeDef = ({ uuid, name, type = 'decimal' }) => ({
   uuid,

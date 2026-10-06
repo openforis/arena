@@ -28,7 +28,7 @@ import * as Log from '@server/log/log'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as ModelClient from './modelClient'
-import { buildDataQueryGeneratePrompt } from './prompts/dataQueryGenerate'
+import { buildDataQueryGeneratePrompt } from '@common/ai/prompts/dataQueryGenerate'
 import { parseJsonResponse } from '@common/ai/parsing'
 
 const logger = Log.getLogger('AiDataQueryGenerateService')

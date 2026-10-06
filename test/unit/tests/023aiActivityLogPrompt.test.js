@@ -2,7 +2,7 @@
  * Tests for the prompt builder used by the activity-log summarizer
  * (Tier 1 #5).
  */
-import { buildActivityLogSummaryPrompt } from '@server/modules/ai/service/prompts/activityLogSummary'
+import { buildActivityLogSummaryPrompt } from '@common/ai/prompts/activityLogSummary'
 
 describe('buildActivityLogSummaryPrompt', () => {
   test('emits a non-empty system prompt with style guidance', () => {

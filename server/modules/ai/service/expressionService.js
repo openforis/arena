@@ -25,8 +25,8 @@ import * as Log from '@server/log/log'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as ModelClient from './modelClient'
-import { buildExpressionGeneratePrompt } from './prompts/expressionGenerate'
-import { buildExpressionExplainPrompt } from './prompts/expressionExplain'
+import { buildExpressionGeneratePrompt } from '@common/ai/prompts/expressionGenerate'
+import { buildExpressionExplainPrompt } from '@common/ai/prompts/expressionExplain'
 
 const logger = Log.getLogger('AiExpressionService')
 
