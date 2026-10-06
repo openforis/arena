@@ -24,6 +24,11 @@ export default {
   },
   clone: "Клонировать '{{nodeDefLabel}}'",
   compressFormItems: "Сжать элементы формы для '{{nodeDefLabel}}'",
+  confirmClearNonApplicableValues: `Следующие поля станут неактуальными, и их значения будут удалены:
+
+{{nodeDefLabels}}
+
+Продолжить?`,
   confirmUpdateDependentEnumeratedEntities:
     'Если вы продолжите, некоторые перечисленные сущности ({{entityDefs}}) будут перечислимы заново, удалив существующие в них значения (если таковые имеются).\nПродолжить?',
   convert: "Преобразовать '{{nodeDefLabel}}'",

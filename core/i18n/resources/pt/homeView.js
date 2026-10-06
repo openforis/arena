@@ -118,6 +118,9 @@ export default {
     confirmDeleteCycle: `Tem certeza de que deseja excluir o ciclo {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 Se houver registros associados a este ciclo, eles serão excluídos.`,
     cycleForArenaMobile: 'Ciclo para Arena Mobile',
+    keepNonApplicableValues: `Manter os valores dos atributos não relevantes`,
+    keepNonApplicableValuesInfo: `Se desmarcado (padrão), durante a entrada de dados os valores dos atributos que deixam de ser relevantes são apagados (após a confirmação do usuário).
+Se marcado, esses valores são mantidos no registro, mesmo que os atributos não sejam mais relevantes.`,
     deleteActivityLog: 'Limpar log de atividades',
     deleteActivityLogConfirm: {
       headerText: 'Limpar TODOS os dados de log de atividades deste inventário?',
