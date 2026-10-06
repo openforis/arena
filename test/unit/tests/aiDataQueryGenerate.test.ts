@@ -11,9 +11,9 @@ import * as Expression from '@core/expressionParser/expression'
 import { Query, SortCriteria } from '@common/model/query'
 
 import { toQuery } from '@server/modules/ai/service/dataQueryGenerateService'
-import { buildDataQueryGeneratePrompt } from '@server/modules/ai/service/prompts/dataQueryGenerate'
+import { buildDataQueryGeneratePrompt } from '@common/ai/prompts/dataQueryGenerate'
 import { normalizeQueryName } from '@server/modules/ai/service/dataQuerySummarizeService'
-import { buildDataQuerySummarizePrompt } from '@server/modules/ai/service/prompts/dataQuerySummarize'
+import { buildDataQuerySummarizePrompt } from '@common/ai/prompts/dataQuerySummarize'
 
 import * as DataTest from '../../utils/dataTest'
 import * as SurveyUtils from '../../utils/surveyUtils'

@@ -15,9 +15,9 @@
 import * as ExpressionParser from '@core/expressionParser/expression'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Survey from '@core/survey/survey'
 
 import { pq } from './promptSafety'
+import { getSiblingNodeDefs } from './nodeDefContext'
 
 const allowedFunctions = Object.keys(ExpressionParser.functionNames || {})
 
@@ -58,12 +58,7 @@ const expressionTypeHints = {
 export const buildExpressionGeneratePrompt = ({ survey, nodeDef, expressionType, description, previousError }) => {
   const nodeName = String(NodeDef.getName(nodeDef) || '')
   const nodeType = String(NodeDef.getType(nodeDef) || '')
-  const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
-  const siblings = parentNodeDef
-    ? Survey.getNodeDefChildren({ nodeDef: parentNodeDef })(survey).filter(
-        (nd) => NodeDef.getUuid(nd) !== NodeDef.getUuid(nodeDef)
-      )
-    : []
+  const siblings = getSiblingNodeDefs({ survey, nodeDef })
 
   const siblingsList = siblings
     .slice(0, 50)

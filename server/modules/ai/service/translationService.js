@@ -21,7 +21,7 @@ import SystemError from '@core/systemError'
 import * as Log from '@server/log/log'
 
 import * as ModelClient from './modelClient'
-import { buildTranslationPrompt } from './prompts/translation'
+import { buildTranslationPrompt } from '@common/ai/prompts/translation'
 import { parseJsonResponse } from '@common/ai/parsing'
 
 const logger = Log.getLogger('AiTranslationService')

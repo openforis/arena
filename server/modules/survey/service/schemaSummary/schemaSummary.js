@@ -19,7 +19,7 @@ import * as Log from '@server/log/log'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as ModelClient from '@server/modules/ai/service/modelClient'
-import { buildDataDictionaryPrompt } from '@server/modules/ai/service/prompts/dataDictionary'
+import { buildDataDictionaryPrompt } from '@common/ai/prompts/dataDictionary'
 import { parseJsonResponse } from '@common/ai/parsing'
 
 const logger = Log.getLogger('SchemaSummary')

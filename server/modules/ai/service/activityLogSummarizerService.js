@@ -14,7 +14,7 @@ import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
 
 import * as ModelClient from './modelClient'
-import { buildActivityLogSummaryPrompt } from './prompts/activityLogSummary'
+import { buildActivityLogSummaryPrompt } from '@common/ai/prompts/activityLogSummary'
 
 const MAX_FETCH = 1000
 
