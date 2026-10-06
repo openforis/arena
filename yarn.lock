@@ -78,6 +78,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ai-sdk/provider@npm:^4":
+  version: 4.0.22
+  resolution: "@ai-sdk/provider@npm:4.0.22"
+  dependencies:
+    json-schema: "npm:^0.4.0"
+  checksum: 10c0/e13f0718fba425c1ed03785ad3f9a8cb7c468760f7c3f7aca658d23025af41ece9a9ab69a9b3dde026a3e4ff5bc261a07fbaff03f8a3003cfc6612578991760a
+  languageName: node
+  linkType: hard
+
 "@apidevtools/json-schema-ref-parser@npm:14.0.1":
   version: 14.0.1
   resolution: "@apidevtools/json-schema-ref-parser@npm:14.0.1"
@@ -14256,6 +14265,7 @@ __metadata:
     "@ai-sdk/anthropic": "npm:^4"
     "@ai-sdk/google": "npm:^4"
     "@ai-sdk/openai": "npm:^4"
+    "@ai-sdk/provider": "npm:^4"
     "@aws-sdk/client-s3": "npm:^3.1145.0"
     "@babel/cli": "npm:^7.29.7"
     "@babel/core": "npm:^7.29.7"

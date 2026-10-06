@@ -16,46 +16,9 @@ import { ENV } from '@core/processUtils'
 
 import SystemError from '@core/systemError'
 
-import * as AiSettingsService from './aiSettingsService'
 import * as AiTelemetry from './aiTelemetry'
+import { assertFeatureEnabled } from './featureGate'
 import * as ProviderResolver from './providerResolver'
-
-// Maps each Tier-1 feature key to the user-facing category it belongs to
-// (see `featureCategories` in aiSettingsService). Unknown features fall
-// through to the ENV check only — add new feature keys here when they
-// ship.
-const featureToCategory = {
-  chatbot: AiSettingsService.featureCategories.chat,
-  translation: AiSettingsService.featureCategories.translation,
-  expressionGenerate: AiSettingsService.featureCategories.expressions,
-  expressionExplain: AiSettingsService.featureCategories.expressions,
-  activityLogSummary: AiSettingsService.featureCategories.userActivity,
-  schemaSummary: AiSettingsService.featureCategories.dataDictionary,
-  dataQueryGenerate: AiSettingsService.featureCategories.dataQuery,
-  dataQuerySummarize: AiSettingsService.featureCategories.dataQuery,
-}
-
-const assertFeaturesEnabled = (feature, user) => {
-  if (!ENV.aiFeaturesEnabled) {
-    throw new SystemError('aiFeaturesDisabled', { feature })
-  }
-  const flags = ENV.aiFeatureFlags
-  if (flags && Object.hasOwn(flags, feature) && !flags[feature]) {
-    throw new SystemError('aiFeatureDisabled', { feature })
-  }
-  // User-level master + category gating (defense in depth: the UI hides
-  // the entry-point button, but a direct API call still has to clear this
-  // check).
-  if (user) {
-    if (!AiSettingsService.areFeaturesEnabledForUser(user)) {
-      throw new SystemError('aiFeaturesDisabled', { feature })
-    }
-    const category = featureToCategory[feature]
-    if (category && !AiSettingsService.isCategoryEnabledForUser(user, category)) {
-      throw new SystemError('aiFeatureDisabled', { feature })
-    }
-  }
-}
 
 const assertPromptSize = (prompt, system, feature) => {
   const total = (prompt?.length || 0) + (system?.length || 0)
@@ -83,7 +46,7 @@ const buildContext = ({ user, feature, meta }) => ({
  * @returns {Promise<{text: string, usage: object, finishReason: string}>} Vercel AI SDK result.
  */
 export const generate = async ({ user, feature, prompt, system, signal }) => {
-  assertFeaturesEnabled(feature, user)
+  assertFeatureEnabled(feature, user)
   assertPromptSize(prompt, system, feature)
   const { model, meta } = await ProviderResolver.resolveModelForUser({ user, feature })
   return AiTelemetry.track(buildContext({ user, feature, meta }), () =>
@@ -109,7 +72,7 @@ export const generate = async ({ user, feature, prompt, system, signal }) => {
  * @returns {Promise<{object: *, usage: object, finishReason: string}>} Vercel AI SDK result.
  */
 export const generateStructured = async ({ user, feature, prompt, system, schema, signal }) => {
-  assertFeaturesEnabled(feature, user)
+  assertFeatureEnabled(feature, user)
   assertPromptSize(prompt, system, feature)
   if (!schema) throw new SystemError('aiSchemaMissing', { feature })
   const { model, meta } = await ProviderResolver.resolveModelForUser({ user, feature })
@@ -140,7 +103,7 @@ export const generateStructured = async ({ user, feature, prompt, system, schema
  *   The SDK stream result.
  */
 export const streamChat = async ({ user, feature, messages, system, signal }) => {
-  assertFeaturesEnabled(feature, user)
+  assertFeatureEnabled(feature, user)
   const totalChars =
     (messages || []).reduce((acc, m) => acc + (typeof m.content === 'string' ? m.content.length : 0), 0) +
     (system?.length || 0)
@@ -179,7 +142,7 @@ export const streamChat = async ({ user, feature, messages, system, signal }) =>
  *   The SDK stream result; callers iterate `textStream` and may await `.usage`.
  */
 export const stream = async ({ user, feature, prompt, system, signal }) => {
-  assertFeaturesEnabled(feature, user)
+  assertFeatureEnabled(feature, user)
   assertPromptSize(prompt, system, feature)
   const { model, meta } = await ProviderResolver.resolveModelForUser({ user, feature })
   const ctx = buildContext({ user, feature, meta })

@@ -44,7 +44,7 @@ const getParentPath = (nodeDef, survey) => {
 const runAiDescriptionBatch = async ({ user, surveyName, batch, previousError }) => {
   const batchNodeDefs = batch.map((e) => ({ uuid: e.uuid, name: e.name, type: e.type, parentPath: e.parentPath }))
   const { system, prompt } = buildDataDictionaryPrompt({ surveyName, nodeDefs: batchNodeDefs, previousError })
-  const { text } = await ModelClient.generate({ user, feature: 'schemaSummary', prompt, system })
+  const { text } = await ModelClient.generate({ user, feature: 'dataDictionary', prompt, system })
   const json = parseJsonResponse(text)
   return AiDescriptionsSchema.parse(json)
 }

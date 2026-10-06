@@ -9,6 +9,15 @@ const getJson = (val: unknown): unknown => {
   }
 }
 
+// Comma-separated list → trimmed, non-empty items.
+const getList = (val: unknown): string[] =>
+  typeof val === 'string'
+    ? val
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0)
+    : []
+
 const environments = {
   development: 'development',
   production: 'production',
@@ -102,11 +111,11 @@ export const ENV = {
   // ===== AI =====
   // Master kill switch for all AI features
   aiFeaturesEnabled: isTrue(process.env.AI_FEATURES_ENABLED ?? 'false'),
-  // Per-feature flags as a JSON object, e.g.
-  // {"translation":true,"expressionGenerate":true,"expressionExplain":true,"activityLogSummary":true,"dataDictionary":true}
+  // Per-feature flags as a JSON object; a flag can only disable a feature, e.g.
+  // {"translation":false,"dataDictionary":false}
   aiFeatureFlags: getJson(process.env.AI_FEATURE_FLAGS),
   // Default provider (used when user has no override)
-  aiDefaultProvider: process.env.AI_DEFAULT_PROVIDER, // openai | anthropic | google | openai-compatible
+  aiDefaultProvider: process.env.AI_DEFAULT_PROVIDER, // openai | anthropic | google | openai-compatible | vercel-ai-sdk
   aiDefaultModel: process.env.AI_DEFAULT_MODEL,
   aiDefaultApiKey: process.env.AI_DEFAULT_API_KEY,
   aiDefaultBaseUrl: process.env.AI_DEFAULT_BASE_URL,
@@ -114,7 +123,14 @@ export const ENV = {
   aiUserKeyEncryptionSecret: process.env.AI_USER_KEY_ENCRYPTION_SECRET,
   // Limits
   aiMaxPromptChars: Number(process.env.AI_MAX_PROMPT_CHARS) || 200000,
+  aiMaxOutputTokens: Number(process.env.AI_MAX_OUTPUT_TOKENS) || 4096,
   aiRequestTimeoutMs: Number(process.env.AI_REQUEST_TIMEOUT_MS) || 60000,
+  // Requests per user per minute on the gateway endpoint; 0 or negative = unlimited
+  aiRateLimitPerMinute: Number(process.env.AI_RATE_LIMIT_PER_MINUTE ?? 30),
+  // User-configured base URLs allowed even if they resolve to a private address (org-hosted models)
+  aiOrgHostedBaseUrls: getList(process.env.AI_ORG_HOSTED_BASE_URLS),
+  // Test servers only: enables the canned "mock" provider (AI_DEFAULT_PROVIDER=mock)
+  aiMockProviderEnabled: isTrue(process.env.AI_MOCK_PROVIDER_ENABLED),
 }
 
 export const isEnvDevelopment = ENV.nodeEnv === environments.development
