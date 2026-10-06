@@ -73,8 +73,9 @@ export const removeFiles = async (
     await RecordFileManager.deleteFiles({ surveyId, files }, tx)
     return
   }
-  // sequential: queries of the same transaction cannot run concurrently
-  for (const { fileUuid } of files) {
-    await FileRepository.markFileAsDeleted(surveyId, fileUuid, tx) // NOSONAR
-  }
+  await FileRepository.markFilesAsDeleted(
+    surveyId,
+    files.map(({ fileUuid }) => fileUuid),
+    tx
+  )
 }
