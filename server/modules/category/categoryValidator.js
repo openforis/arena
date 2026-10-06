@@ -318,7 +318,7 @@ export const validateItems = async ({ category, itemsToValidate, itemsCountByIte
     itemsValidationUpdated = Validation.assocFieldValidation(itemUuid, itemValidation)(itemsValidationUpdated)
   }
   for (const item of itemsToValidate) {
-    await _validateItem(item)
+    await _validateItem(item) // NOSONAR sequential: each call updates the shared validation
   }
   const categoryValidationUpdated = Validation.assocFieldValidation(keys.items, itemsValidationUpdated)(prevValidation)
   return Validation.cleanup(categoryValidationUpdated)
