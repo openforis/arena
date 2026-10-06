@@ -25,6 +25,11 @@ export default {
   },
   clone: `「{{nodeDefLabel}}」を複製`,
   compressFormItems: `「{{nodeDefLabel}}」のフォーム項目を圧縮表示`,
+  confirmClearNonApplicableValues: `次の項目は適用対象外となり、その値は消去されます：
+
+{{nodeDefLabels}}
+
+続行しますか？`,
   confirmUpdateDependentEnumeratedEntities: `続行すると、一部の列挙項目（{{entityDefs}}）が再列挙され、
 既に入力されている値は削除されます（存在する場合）。
 続行しますか？`,

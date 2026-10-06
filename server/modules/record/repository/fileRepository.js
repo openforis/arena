@@ -169,6 +169,18 @@ export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
+export const markFilesAsDeleted = async (surveyId, uuids, client = db) =>
+  uuids.length === 0
+    ? []
+    : client.manyOrNone(
+        `
+    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
+    SET props = jsonb_set(props, '{${SurveyFile.propKeys.deleted}}', 'true')
+    WHERE uuid IN ($1:csv)
+    RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
+        [uuids]
+      )
+
 export const markRecordFilesAsDeleted = async (surveyId, recordUuid, client = db) =>
   client.manyOrNone(
     `
