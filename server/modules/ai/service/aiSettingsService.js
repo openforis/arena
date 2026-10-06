@@ -28,53 +28,29 @@ import SystemError from '@core/systemError'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
+import { AiFeatureCategory } from '@common/ai/features'
+
+import {
+  areFeaturesEnabledForUser,
+  defaultFeatureToggles,
+  getAiPrefs as getRawPrefs,
+  isCategoryEnabledForUser,
+  sanitiseFeatureToggles,
+} from './aiUserPrefs'
 import * as ModelDiscovery from './modelDiscovery'
 import * as ProviderRegistry from './providerRegistry'
 
+export { areFeaturesEnabledForUser, isCategoryEnabledForUser }
+
+export const featureCategories = AiFeatureCategory
+
 const PREFS_KEY = 'ai'
-
-export const featureCategories = {
-  chat: 'chat',
-  expressions: 'expressions',
-  translation: 'translation',
-  dataDictionary: 'dataDictionary',
-  userActivity: 'userActivity',
-  dataQuery: 'dataQuery',
-}
-
-const defaultFeatureToggles = () => ({
-  [featureCategories.chat]: false,
-  [featureCategories.expressions]: false,
-  [featureCategories.translation]: false,
-  [featureCategories.dataDictionary]: false,
-  [featureCategories.userActivity]: false,
-  [featureCategories.dataQuery]: false,
-})
-
-const sanitiseFeatureToggles = (input) => {
-  const base = defaultFeatureToggles()
-  if (!input || typeof input !== 'object') return base
-  for (const key of Object.keys(base)) {
-    if (typeof input[key] === 'boolean') base[key] = input[key]
-  }
-  return base
-}
 
 const sanitiseProvider = (provider) => {
   if (!ProviderRegistry.isSupported(provider)) {
     throw new SystemError('aiProviderInvalid', { provider })
   }
   return provider
-}
-
-/**
- * Returns the raw `prefs.ai` object for a user, or `null` if none.
- * @param {object} user - Arena user.
- * @returns {?object} The persisted AI prefs, or null.
- */
-const getRawPrefs = (user) => {
-  const prefs = User.getPrefs(user) || {}
-  return prefs[PREFS_KEY] || null
 }
 
 /**
@@ -128,28 +104,6 @@ export const getPublicSettings = (user) => {
     lastTestOk: raw.lastTestOk ?? null,
     lastTestAt: raw.lastTestAt || null,
   }
-}
-
-/**
- * Returns true when the user has opted into AI features overall.
- * @param {object} user - Arena user.
- * @returns {boolean} The master-toggle state (default false).
- */
-export const areFeaturesEnabledForUser = (user) => !!getRawPrefs(user)?.featuresEnabled
-
-/**
- * Returns true when the user has both the master toggle on and the given
- * category toggle on. Admin-level ENV flags are checked separately by the
- * caller (see `modelClient.assertFeaturesEnabled`).
- * @param {object} user - Arena user.
- * @param {string} category - One of {@link featureCategories}.
- * @returns {boolean} Whether the user wants this category active.
- */
-export const isCategoryEnabledForUser = (user, category) => {
-  const raw = getRawPrefs(user)
-  if (!raw?.featuresEnabled) return false
-  const toggles = sanitiseFeatureToggles(raw.featureToggles)
-  return !!toggles[category]
 }
 
 /**
