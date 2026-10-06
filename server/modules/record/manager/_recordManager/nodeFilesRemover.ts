@@ -1,5 +1,3 @@
-import { Promises } from '@openforis/arena-core'
-
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -76,5 +74,7 @@ export const removeFiles = async (
     return
   }
   // sequential: queries of the same transaction cannot run concurrently
-  await Promises.each(files, ({ fileUuid }) => FileRepository.markFileAsDeleted(surveyId, fileUuid, tx))
+  for (const { fileUuid } of files) {
+    await FileRepository.markFileAsDeleted(surveyId, fileUuid, tx) // NOSONAR
+  }
 }
