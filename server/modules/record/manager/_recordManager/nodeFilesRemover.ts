@@ -1,5 +1,3 @@
-import { Promises } from '@openforis/arena-core'
-
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -89,7 +87,9 @@ export const removeFiles = async (
   if (fileUuids.length === 0) return
 
   if (isPreview) {
-    await Promises.each(files, (file) => _deleteFileContentSafely({ surveyId, ...file }))
+    for (const file of files) {
+      await _deleteFileContentSafely({ surveyId, ...file }) //NOSONAR
+    }
     await FileRepository.deleteFilesByUuids(surveyId, fileUuids, tx)
     return
   }
