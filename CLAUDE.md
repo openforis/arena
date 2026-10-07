@@ -217,11 +217,14 @@ Keep comments short and to the point (JSDoc descriptions included): one line whe
 
 ## Pull Requests
 
-After creating a PR, wait for the SonarCloud analysis and the Copilot review to complete, then go through their findings:
+**Branch names:**
+Give new branches a meaningful, possibly short name describing the change (e.g. `dashboard-activity-log-env-visibility`).
+
+After creating a PR, wait for the SonarCloud analysis and the Copilot review to complete, then keep watching them and address every finding:
 
 - Fetch them with `gh` (e.g. `gh pr view <PR#> --comments`, `gh api repos/openforis/arena/pulls/<PR#>/comments` for inline review comments, `gh pr checks <PR#>` for the SonarCloud quality gate).
 - Fix every finding that can reasonably be solved, and push the fixes to the PR branch.
-- Reply to each finding on GitHub with a comment: explain how it was fixed (referencing the commit), or why it was not fixed (false positive, out of scope, etc.).
+- Reply to each SonarCloud/Copilot comment on GitHub: explain how it was fixed (referencing the commit), or why it was not fixed (false positive, out of scope, etc.).
 
 ## Important Notes
 

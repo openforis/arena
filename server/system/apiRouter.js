@@ -25,6 +25,7 @@ import * as mobileApi from '@server/modules/mobile/api/mobileApi'
 import * as messageApi from '@server/modules/message/api'
 import * as fileDownloadApi from '@server/modules/fileDownload/api/fileDownloadApi'
 import * as aiApi from '@server/modules/ai/api/aiApi'
+import * as infoApi from '@server/system/infoApi'
 
 export const router = expressRouter()
 
@@ -66,3 +67,5 @@ messageApi.init(router)
 fileDownloadApi.init(router)
 
 aiApi.init(router)
+
+infoApi.init(router)
