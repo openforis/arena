@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
 
-import { ServiceRegistry } from '@openforis/arena-core'
+import { Promises, ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { db } from '@server/db/db'
@@ -623,9 +623,37 @@ export const deleteUser = async ({ user, userUuidToDelete }) =>
     return UserManager.deleteUser(userUuidToDelete, t)
   })
 
-export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
+const _deleteUntouchedSurvey = async ({ surveyId }, client) => {
+  try {
+    const recordsCount = await RecordManager.countAllRecordsBySurveyId({ surveyId }, client)
+    if (recordsCount > 0) {
+      Logger.debug(`survey ${surveyId} not deleted: it has ${recordsCount} records`)
+      return false
+    }
+    await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, client)
+    return true
+  } catch (error) {
+    Logger.error(`error deleting survey ${surveyId}: ${String(error)}`)
+    return false
+  }
+}
+
+const _deleteUntouchedSurveysOfExpiredInvitationUsers = async (client) => {
   const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
-  Logger.info(`IDs of surveys that could be deleted (if without any activity): ${surveyIds}`)
+  Logger.info(`IDs of untouched surveys of users with expired invitation to delete: ${surveyIds}`)
+  const deletedSurveyIds = []
+  // one at a time: every deletion drops a schema and the client could be a transaction
+  await Promises.each(surveyIds, async (surveyId) => {
+    if (await _deleteUntouchedSurvey({ surveyId }, client)) {
+      deletedSurveyIds.push(surveyId)
+    }
+  })
+  return deletedSurveyIds
+}
+
+export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
+  // surveys must be deleted before their users: they are identified by the users' expired invitations
+  const deletedSurveyIds = await _deleteUntouchedSurveysOfExpiredInvitationUsers(client)
 
   Logger.debug('deleting users with expired invitations')
   const usersWithExpiredInvitation = await UserManager.fetchUsersWithExpiredInvitation(client)
@@ -654,7 +682,7 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   Logger.debug('deleting expired users access requests')
   await UserManager.deleteExpiredUserAccessRequests(client)
 
-  return { deletedUsers, deletedSurveyIds: surveyIds }
+  return { deletedUsers, deletedSurveyIds }
 }
 
 // ==== User prefs

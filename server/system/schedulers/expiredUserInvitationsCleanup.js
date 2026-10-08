@@ -20,7 +20,7 @@ const deleteExpiredItems = async () => {
 
         const { deletedUsers, deletedSurveyIds } = await UserService.deleteExpiredInvitationsUsersAndSurveys()
 
-        Logger.debug(`${deletedUsers.length} users deleted, ${deletedSurveyIds.length} surveys could be deleted`)
+        Logger.debug(`${deletedUsers.length} users deleted, ${deletedSurveyIds.length} surveys deleted`)
       },
     })
   } catch (error) {
