@@ -217,8 +217,22 @@ export const getWhereClause = (...conditions) => {
 export const disableParallelQueryForTransaction = async (client) =>
   client.none('SET LOCAL max_parallel_workers_per_gather = 0')
 
-// VACUUM (removes dead tuples)
-export const vacuumTable = async ({ schema, table }, client = db) => client.query(`VACUUM ${schema}.${table}`)
+/**
+ * Runs VACUUM on the specified table: it removes dead tuples, making their space reusable.
+ * It cannot be run inside a transaction.
+ * @param {!object} params - The parameters.
+ * @param {!string} params.schema - The table schema.
+ * @param {!string} params.table - The table name.
+ * @param {boolean} [params.full] - If true, rewrites the table giving the space back to the OS (it locks the table while running).
+ * @param {boolean} [params.analyze] - If true, updates the table statistics too.
+ * @param {pgPromise.IDatabase} [client] - The database client (not a transaction).
+ * @returns {Promise<null>} - The query result.
+ */
+export const vacuumTable = async ({ schema, table, full = false, analyze = false }, client = db) => {
+  const options = [full && 'FULL', analyze && 'ANALYZE'].filter(Boolean)
+  const optionsClause = options.length > 0 ? `(${options.join(', ')}) ` : ''
+  return client.none(`VACUUM ${optionsClause}$1:name.$2:name`, [schema, table])
+}
 
 export const fetchSchemaTablesSize = async ({ schema }, client = db) =>
   client.one(
