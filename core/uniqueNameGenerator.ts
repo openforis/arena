@@ -1,7 +1,7 @@
 const nameWithCountPattern = /^(.*)_(\d)$/
 
 const parseName = (name: string): { nameWithoutCount: string; count: number } => {
-  const match = name.match(nameWithCountPattern)
+  const match = nameWithCountPattern.exec(name)
   return match
     ? {
         nameWithoutCount: match[1],

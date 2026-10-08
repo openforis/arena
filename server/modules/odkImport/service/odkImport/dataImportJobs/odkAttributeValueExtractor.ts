@@ -89,7 +89,7 @@ const extractCode = async ({
 
   const values = []
   for (const code of codes) {
-    const item = await categoryItemProvider.getItemByCode({ survey, categoryUuid, code, draft: true, client: tx })
+    const item = await categoryItemProvider.getItemByCode({ survey, categoryUuid, code, draft: true, client: tx }) // NOSONAR
     if (item) {
       values.push(Node.newNodeValueCode({ itemUuid: item.uuid }))
     }

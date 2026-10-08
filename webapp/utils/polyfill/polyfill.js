@@ -1,6 +1,8 @@
+import { Buffer } from 'buffer/'
+
 import ResizeObserver from './resizeObserver'
 
-if (typeof window.ResizeObserver === 'undefined') {
+if (window.ResizeObserver === undefined) {
   window.ResizeObserver = ResizeObserver
 }
-global.Buffer = global.Buffer || require('buffer').Buffer
+global.Buffer = global.Buffer || Buffer

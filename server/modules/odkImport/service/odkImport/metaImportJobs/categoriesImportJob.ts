@@ -69,8 +69,8 @@ export default class CategoriesImportJob extends Job {
     for (const source of sources) {
       if (this.isCanceled()) break
 
-      const category = await this._insertCategory(source.name)
-      await this._insertItems(category, source.items)
+      const category = await this._insertCategory(source.name) // NOSONAR
+      await this._insertItems(category, source.items) // NOSONAR
       categoriesByKey[source.key] = category
       categories.push(category)
 
@@ -172,7 +172,7 @@ export default class CategoriesImportJob extends Job {
         }),
         categoryUuid, // used to revalidate categories after items import, same as collectImport's CategoriesImportJob
       }
-      await this.itemBatchPersister.addItem(item, this.tx)
+      await this.itemBatchPersister.addItem(item, this.tx) // NOSONAR
     }
   }
 

@@ -81,7 +81,7 @@ export const validateCycles = async (cycles) => {
     const cycle = cyclesArray[index]
 
     const isLast = index === cyclesSize - 1
-    const cycleValidation = await Validator.validate(cycle, _cycleValidators(cyclePrev, isLast))
+    const cycleValidation = await Validator.validate(cycle, _cycleValidators(cyclePrev, isLast)) // NOSONAR
 
     if (!Validation.isValid(cycleValidation)) {
       Validation.setField(String(index), cycleValidation)(result)

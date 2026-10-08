@@ -4,6 +4,50 @@ import { _isPlaceholder } from './_isPlaceholder'
 
 type AnyFn = (...args: any[]) => any
 
+const _applyTwoArgs = ({ fn, f3, a, b }: { fn: AnyFn; f3: AnyFn; a: unknown; b: unknown }): any => {
+  const aPlaceholder = _isPlaceholder(a)
+  const bPlaceholder = _isPlaceholder(b)
+  if (aPlaceholder && bPlaceholder) return f3
+  if (aPlaceholder) return _curry2((_a, _c) => fn(_a, b, _c))
+  if (bPlaceholder) return _curry2((_b, _c) => fn(a, _b, _c))
+  return _curry1((_c) => fn(a, b, _c))
+}
+
+const _applyThreeArgsWithTwoPlaceholders = ({
+  fn,
+  a,
+  b,
+  c,
+  aPlaceholder,
+  bPlaceholder,
+}: {
+  fn: AnyFn
+  a: unknown
+  b: unknown
+  c: unknown
+  aPlaceholder: boolean
+  bPlaceholder: boolean
+}): any => {
+  if (aPlaceholder && bPlaceholder) return _curry2((_a, _b) => fn(_a, _b, c))
+  if (aPlaceholder) return _curry2((_a, _c) => fn(_a, b, _c))
+  return _curry2((_b, _c) => fn(a, _b, _c))
+}
+
+const _applyThreeArgs = ({ fn, f3, a, b, c }: { fn: AnyFn; f3: AnyFn; a: unknown; b: unknown; c: unknown }): any => {
+  const aPlaceholder = _isPlaceholder(a)
+  const bPlaceholder = _isPlaceholder(b)
+  const cPlaceholder = _isPlaceholder(c)
+  const placeholdersCount = [aPlaceholder, bPlaceholder, cPlaceholder].filter(Boolean).length
+  if (placeholdersCount === 3) return f3
+  if (placeholdersCount === 2) {
+    return _applyThreeArgsWithTwoPlaceholders({ fn, a, b, c, aPlaceholder, bPlaceholder })
+  }
+  if (aPlaceholder) return _curry1((_a) => fn(_a, b, c))
+  if (bPlaceholder) return _curry1((_b) => fn(a, _b, c))
+  if (cPlaceholder) return _curry1((_c) => fn(a, b, _c))
+  return fn(a, b, c)
+}
+
 /**
  * Optimized internal three-arity curry function.
  *
@@ -21,29 +65,9 @@ export const _curry3 = (fn: AnyFn) =>
         return _isPlaceholder(a) ? f3 : _curry2((_b, _c) => fn(a, _b, _c))
 
       case 2:
-        return _isPlaceholder(a) && _isPlaceholder(b)
-          ? f3
-          : _isPlaceholder(a)
-            ? _curry2((_a, _c) => fn(_a, b, _c))
-            : _isPlaceholder(b)
-              ? _curry2((_b, _c) => fn(a, _b, _c))
-              : _curry1((_c) => fn(a, b, _c))
+        return _applyTwoArgs({ fn, f3, a, b })
 
       default:
-        return _isPlaceholder(a) && _isPlaceholder(b) && _isPlaceholder(c)
-          ? f3
-          : _isPlaceholder(a) && _isPlaceholder(b)
-            ? _curry2((_a, _b) => fn(_a, _b, c))
-            : _isPlaceholder(a) && _isPlaceholder(c)
-              ? _curry2((_a, _c) => fn(_a, b, _c))
-              : _isPlaceholder(b) && _isPlaceholder(c)
-                ? _curry2((_b, _c) => fn(a, _b, _c))
-                : _isPlaceholder(a)
-                  ? _curry1((_a) => fn(_a, b, c))
-                  : _isPlaceholder(b)
-                    ? _curry1((_b) => fn(a, _b, c))
-                    : _isPlaceholder(c)
-                      ? _curry1((_c) => fn(a, b, _c))
-                      : fn(a, b, c)
+        return _applyThreeArgs({ fn, f3, a, b, c })
     }
   }

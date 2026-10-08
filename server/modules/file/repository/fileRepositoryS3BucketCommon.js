@@ -114,7 +114,7 @@ export const createS3BucketRepository = ({ getFileKey }) => {
 
   const deleteFiles = async ({ fileUuids, ...params }) => {
     for (const fileUuid of fileUuids) {
-      await deleteFile({ ...params, fileUuid })
+      await deleteFile({ ...params, fileUuid }) // NOSONAR
     }
   }
 
@@ -130,7 +130,7 @@ export const createS3BucketRepository = ({ getFileKey }) => {
         Prefix: prefix,
         ...(continuationToken ? { ContinuationToken: continuationToken } : {}),
       })
-      const response = await _sendCommand(command)
+      const response = await _sendCommand(command) // NOSONAR
       results.push(...(response.Contents ?? []))
       continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined
     } while (continuationToken)

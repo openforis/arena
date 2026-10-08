@@ -68,11 +68,13 @@ export const readHeadersAndRows = async ({ stream, fileFormat }: { stream: Reada
   const reader = FlatDataReader.createReaderFromStream({
     stream,
     fileFormat,
-    onHeaders: async (headersRead: string[]) => {
+    onHeaders: (headersRead: string[]) => {
       headers = headersRead
+      return Promise.resolve()
     },
-    onRow: async (row: any) => {
+    onRow: (row: any) => {
       rows.push({ ...row })
+      return Promise.resolve()
     },
   })
   await reader.start()
@@ -131,12 +133,13 @@ export const readRowItems = async ({
     fileFormat,
     survey,
     // items not found in the survey index are looked up in the DB by the default provider: stub it
-    categoryItemProvider: { getItemByCodePaths: async () => null },
-    taxonProvider: { getTaxonByCode: async () => null },
+    categoryItemProvider: { getItemByCodePaths: () => Promise.resolve(null) },
+    taxonProvider: { getTaxonByCode: () => Promise.resolve(null) },
     cycle: Survey.cycleOneKey,
     nodeDefUuid: NodeDef.getUuid(Survey.getNodeDefByName(entityName)(survey)),
-    onRowItem: async (item: any) => {
+    onRowItem: (item: any) => {
       items.push(item)
+      return Promise.resolve()
     },
   })
   await reader.start()

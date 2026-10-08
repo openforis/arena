@@ -16,14 +16,13 @@ const ClusteredPointsPopup = (props) => {
           const { key } = properties
           return (
             <li key={key}>
-              <a
+              <button
+                type="button"
+                className="cluster-marker__clustered-point-btn"
                 onClick={() => openPopupOfPoint(point)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') openPopupOfPoint(point)
-                }}
               >
                 <LabelWithTooltip label={pointLabelFunction(point)} />
-              </a>
+              </button>
             </li>
           )
         })}

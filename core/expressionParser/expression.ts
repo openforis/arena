@@ -23,7 +23,7 @@ export const toString = (expr: unknown, exprMode: string = modes.json): string =
   const string = ExpressionUtils.toString(expr as ExpressionUtils.ExpressionNode)
 
   return exprMode === modes.sql
-    ? A.pipe(A.replace(/&&/g, 'AND'), A.replace(/\|\|/g, 'OR'), A.replace(/==/g, '='), A.replace(/"/g, `'`))(string)
+    ? string.replaceAll('&&', 'AND').replaceAll('||', 'OR').replaceAll('==', '=').replaceAll('"', `'`)
     : string
 }
 
@@ -31,14 +31,13 @@ export const fromString = (string: string, exprMode: string = modes.json): unkno
   const exprString =
     exprMode === modes.json
       ? string
-      : A.pipe(
-          A.replace(/AND/g, '&&'),
-          A.replace(/OR/g, '||'),
-          A.replace(/=+/g, '=='),
-          A.replace(/!==/g, '!='),
-          A.replace(/>==/g, '>='),
-          A.replace(/<==/g, '<=')
-        )(string)
+      : string
+          .replaceAll('AND', '&&')
+          .replaceAll('OR', '||')
+          .replaceAll(/=+/g, '==')
+          .replaceAll('!==', '!=')
+          .replaceAll('>==', '>=')
+          .replaceAll('<==', '<=')
 
   return new JavascriptExpressionParser().parse(exprString)
 }

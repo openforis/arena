@@ -45,7 +45,7 @@ const _fetchCategoryItemAndAncestors = async ({ surveyId, itemUuid }, tx) => {
   const items = []
   let currentItemUuid = itemUuid
   while (currentItemUuid) {
-    const categoryItem = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: currentItemUuid }, tx)
+    const categoryItem = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: currentItemUuid }, tx) // NOSONAR
     items.unshift(categoryItem)
     currentItemUuid = CategoryItem.getParentUuid(categoryItem)
   }

@@ -179,8 +179,8 @@ export default class CategoryGeoPackageExportJob extends Job {
   // return type widened to Promise<any>: JobBase.generateResult() is declared Promise<R | undefined>
   // with R defaulting to undefined (Job, the untyped JS parent, never specializes it), so a concrete
   // object literal return type would fail the override-compatibility check against Promise<undefined>
-  async generateResult(): Promise<any> {
+  generateResult(): Promise<any> {
     const { tempFileName } = this.context as any
-    return { tempFileName, skippedItems: this.skippedItems }
+    return Promise.resolve({ tempFileName, skippedItems: this.skippedItems })
   }
 }

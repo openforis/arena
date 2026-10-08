@@ -13,7 +13,7 @@ import * as ImportReportRepository from '@server/modules/importReport/repository
 // `messages`, since ODK report messages are derived from XForm paths/type names, not translated text).
 const source = 'odk'
 
-export const fetchItems = async (
+export const fetchItems = (
   {
     surveyId,
     excludeResolved = false,
@@ -23,7 +23,7 @@ export const fetchItems = async (
   client?: any
 ) => ImportReportRepository.fetchItems({ surveyId, source, excludeResolved, offset, limit }, client)
 
-export const fetchItemsStream = async ({ surveyId }: { surveyId: number }) => {
+export const fetchItemsStream = ({ surveyId }: { surveyId: number }) => {
   const select = `
       SELECT
         ir.id,
@@ -43,12 +43,12 @@ export const fetchItemsStream = async ({ surveyId }: { surveyId: number }) => {
   return new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
 }
 
-export const countItems = async (
+export const countItems = (
   { surveyId, excludeResolved }: { surveyId: number; excludeResolved: boolean },
   client?: any
 ) => ImportReportRepository.countItems({ surveyId, source, excludeResolved }, client)
 
-export const insertItem = async (surveyId: number, item: any, client?: any) =>
+export const insertItem = (surveyId: number, item: any, client?: any) =>
   ImportReportRepository.insertItem(
     surveyId,
     source,
@@ -74,5 +74,5 @@ export const insertItems = async ({ surveyId, items = [] }: { surveyId: number; 
     client
   )
 
-export const updateItem = async (surveyId: number, itemId: number, props: any, resolved: boolean, client?: any) =>
+export const updateItem = (surveyId: number, itemId: number, props: any, resolved: boolean, client?: any) =>
   ImportReportRepository.updateItem(surveyId, source, itemId, props, resolved, client)

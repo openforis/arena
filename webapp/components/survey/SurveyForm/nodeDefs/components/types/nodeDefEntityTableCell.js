@@ -130,8 +130,7 @@ const NodeDefEntityTableCell = (props) => {
     <div
       ref={elementRef}
       data-uuid={nodeDefUuid}
-      className="react-grid-item draggable-item"
-      onMouseDown={(e) => e.stopPropagation()}
+      className="react-grid-item draggable-item survey-form__node-def-entity-table-cell"
       draggable={draggable}
       onDragStart={onDragStart}
       onDragOver={onDragOver}

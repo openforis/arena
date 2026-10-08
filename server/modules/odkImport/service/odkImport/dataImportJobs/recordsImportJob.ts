@@ -129,11 +129,11 @@ export default class RecordsImportJob extends Job {
       }
 
       const recordToCreate = { ...Record.newRecord(user, cycle), ...(instanceUuid ? { uuid: instanceUuid } : {}) }
-      let record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
+      let record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx) // NOSONAR
       const rootNode = Node.newNode(rootNodeDefUuid, Record.getUuid(record), null)
       record = Record.assocNode(rootNode, { sideEffect: true })(record)
 
-      record = await this._buildRecordNodes({
+      record = /* NOSONAR */ await this._buildRecordNodes({
         survey,
         nodeDefsInfoByPath,
         parentNode: rootNode,
@@ -157,7 +157,7 @@ export default class RecordsImportJob extends Job {
         continue
       }
 
-      await this._insertRecordNodes(record)
+      await this._insertRecordNodes(record) // NOSONAR
       this.submittedCount += 1
       this.incrementProcessedItems()
     }
@@ -206,7 +206,7 @@ export default class RecordsImportJob extends Job {
       for (const childElement of childElements) {
         if (this.isCanceled()) break
 
-        recordUpdated = await this._buildChildNode({
+        recordUpdated = /* NOSONAR */ await this._buildChildNode({
           survey,
           nodeDefsInfoByPath,
           nodeDef,
@@ -367,7 +367,7 @@ export default class RecordsImportJob extends Job {
 
   async _insertRecordNodes(record: any) {
     for (const node of Record.getNodesArray(record)) {
-      await this.batchPersister.addItem(node, this.tx)
+      await this.batchPersister.addItem(node, this.tx) // NOSONAR
     }
   }
 

@@ -181,6 +181,8 @@ const NodeDefEntityFormGrid = (props) => {
           containerPadding={canEditDef ? [15, 40] : [15, 15]}
           margin={[5, 5]}
           isDraggable={canEditDef}
+          // pressing the edit buttons or dragging a table column must not drag the grid item
+          draggableCancel=".survey-form__node-def-edit-buttons, .survey-form__node-def-entity-table-cell"
           isResizable={canEditDef}
           compactType={null}
           preventCollision

@@ -134,11 +134,10 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
 
     for (let index = 0; index < cycles.length && !stopIfFunction(); index++) {
       const cycle = cycles[index]
-      // TODO generate only reporting tables
       for (let index = 0; index < entityDefs.length && !stopIfFunction(); index++) {
         const entityDef = entityDefs[index]
         this.logDebug(`create OLAP table for entity def ${NodeDef.getName(entityDef)}`)
-        await SurveyRdbManager.createOlapDataTable({ survey, cycle, baseUnitDef, entityDef }, tx)
+        await SurveyRdbManager.createOlapDataTable({ survey, cycle, baseUnitDef, entityDef }, tx) // NOSONAR
         this.incrementProcessedItems()
       }
     }

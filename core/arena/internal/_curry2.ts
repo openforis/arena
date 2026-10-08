@@ -3,6 +3,15 @@ import { _isPlaceholder } from './_isPlaceholder'
 
 type AnyFn = (...args: any[]) => any
 
+const _applyTwoArgs = ({ fn, f2, a, b }: { fn: AnyFn; f2: AnyFn; a: unknown; b: unknown }): any => {
+  const aPlaceholder = _isPlaceholder(a)
+  const bPlaceholder = _isPlaceholder(b)
+  if (aPlaceholder && bPlaceholder) return f2
+  if (aPlaceholder) return _curry1((_a) => fn(_a, b))
+  if (bPlaceholder) return _curry1((_b) => fn(a, _b))
+  return fn(a, b)
+}
+
 /**
  * Optimized internal two-arity curry function.
  *
@@ -20,12 +29,6 @@ export const _curry2 = (fn: AnyFn) =>
         return _isPlaceholder(a) ? f2 : _curry1((_b) => fn(a, _b))
 
       default:
-        return _isPlaceholder(a) && _isPlaceholder(b)
-          ? f2
-          : _isPlaceholder(a)
-            ? _curry1((_a) => fn(_a, b))
-            : _isPlaceholder(b)
-              ? _curry1((_b) => fn(a, _b))
-              : fn(a, b)
+        return _applyTwoArgs({ fn, f2, a, b })
     }
   }

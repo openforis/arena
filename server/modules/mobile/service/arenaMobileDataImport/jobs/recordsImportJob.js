@@ -82,11 +82,11 @@ export default class RecordsImportJob extends DataImportBaseJob {
         continue
       }
 
-      const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
+      const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid) // NOSONAR
       this.currentRecord = record
-      await this.cleanupCurrentRecord()
+      await this.cleanupCurrentRecord() // NOSONAR
 
-      await this.insertOrSkipRecord()
+      await this.insertOrSkipRecord() // NOSONAR
 
       this.incrementProcessedItems()
     }
@@ -128,7 +128,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     for (const [nodeUuid, node] of Object.entries(nodes)) {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const { valid, error, warn } = await checkNodeIsValid({ survey, nodes, node, nodeDef })
+      const { valid, error, warn } = await checkNodeIsValid({ survey, nodes, node, nodeDef }) // NOSONAR
       if (valid) {
         // ensure recordUuid is set in node
         node[Node.keys.recordUuid] = recordUuid

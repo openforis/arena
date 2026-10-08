@@ -37,7 +37,7 @@ const _recomputeBooleanState = async ({ user, survey, record, nodeDefs, getExpre
     const parentNodes = RecordReader.getNodesByDefUuid(NodeDef.getUuid(parentNodeDef))(recordUpdated)
 
     for (const parentNode of parentNodes) {
-      const exprEval = await evaluator.evalApplicableExpression({
+      const exprEval = /* NOSONAR */ await evaluator.evalApplicableExpression({
         user,
         survey,
         record: recordUpdated,

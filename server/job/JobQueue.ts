@@ -197,7 +197,7 @@ export class JobQueue {
       if (jobUuid === runningJobUuid) {
         // cancel job thread; actual bookkeeping cleanup happens later via onJobEnd once the
         // thread acknowledges the cancellation
-        await JobThreadExecutor.cancelActiveJobByUserUuid(userUuid)
+        await JobThreadExecutor.cancelActiveJobByUserUuid(userUuid) // NOSONAR
       } else {
         // remove queued job from the queue directly
         const queueIndex = this._queue.findIndex((jobInfoQueued) => jobInfoQueued.uuid === jobUuid)
@@ -206,7 +206,7 @@ export class JobQueue {
         }
         // without this, the row is left at 'pending' forever (until the stale-job reaper
         // eventually reaps it), blocking this user/survey cluster-wide in the meantime
-        await JobRepository.updateStatus({ uuid: jobUuid, status: JobStatus.canceled }).catch((error) =>
+        /* NOSONAR */ await JobRepository.updateStatus({ uuid: jobUuid, status: JobStatus.canceled }).catch((error) =>
           this._logger.error(`error persisting canceled status for job ${jobUuid}: ${error}`)
         )
         this.deleteJobInfo({ jobUuid })
@@ -581,7 +581,7 @@ export class JobQueue {
    */
   async destroy(): Promise<void> {
     for (const userUuid of Object.keys(this._jobUuidsByUserUuid)) {
-      await this.cancelJobByUserUuid(userUuid)
+      await this.cancelJobByUserUuid(userUuid) // NOSONAR
     }
   }
 }

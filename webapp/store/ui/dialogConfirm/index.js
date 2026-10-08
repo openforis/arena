@@ -1,6 +1,4 @@
-import * as DialogConfirmActions from './actions'
-import * as DialogConfirmState from './state'
-import DialogConfirmReducer from './reducer'
+export * as DialogConfirmActions from './actions'
+export * as DialogConfirmState from './state'
+export { default as DialogConfirmReducer } from './reducer'
 export { useDialogConfirm } from './hooks'
-
-export { DialogConfirmActions, DialogConfirmState, DialogConfirmReducer }

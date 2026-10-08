@@ -40,7 +40,7 @@ export default class RecordsUniquenessValidationJob extends Job {
 
     // one cycle at a time: the validation runs queries in the job transaction
     for (const cycle of cycleKeys) {
-      await this.validateRecordsUniquenessByCycle(cycle)
+      await this.validateRecordsUniquenessByCycle(cycle) // NOSONAR
     }
   }
 
@@ -79,7 +79,7 @@ export default class RecordsUniquenessValidationJob extends Job {
         // 2. for each duplicate node entity, update record validation
         const { uuid: recordUuid, validation, node_duplicate_uuids: nodeDuplicateUuids } = rowRecordDuplicate
         const nodeRootUuid = nodeDuplicateUuids[0]
-        const nodesKeyDuplicate = await RecordManager.fetchChildNodesByNodeDefUuids(
+        const nodesKeyDuplicate = /* NOSONAR */ await RecordManager.fetchChildNodesByNodeDefUuids(
           this.surveyId,
           recordUuid,
           nodeRootUuid,
@@ -98,7 +98,7 @@ export default class RecordsUniquenessValidationJob extends Job {
         )(nodesKeyDuplicate)
 
         // 3. add record validation to batch update
-        await this.addRecordValidationToBatchUpdate(recordUuid, validationRecordUpdated)
+        await this.addRecordValidationToBatchUpdate(recordUuid, validationRecordUpdated) // NOSONAR
       }
     }
 

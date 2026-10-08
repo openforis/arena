@@ -48,7 +48,7 @@ const acceptByExtension = {
   zip: { 'application/zip': ['.zip'] },
 }
 
-const readAsText = async (file, ignoreErrors = true) => {
+const readText = async (file, ignoreErrors = true) => {
   try {
     return await file.text()
   } catch (error) {
@@ -85,7 +85,7 @@ export const FileUtils = {
   getExtension,
   toHumanReadableFileSize,
   acceptByExtension,
-  readAsText,
+  readText,
   checkFileIsReadable,
   determineFileFormatFromFileName,
 }

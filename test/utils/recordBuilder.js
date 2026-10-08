@@ -51,7 +51,7 @@ class EntityBuilder extends NodeBuilder {
     }
 
     for (const childBuilder of this.childBuilders) {
-      record = await childBuilder.buildAndStore(user, survey, record, node, t)
+      record = await childBuilder.buildAndStore(user, survey, record, node, t) // NOSONAR
     }
 
     return record

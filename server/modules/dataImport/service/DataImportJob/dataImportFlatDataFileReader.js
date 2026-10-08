@@ -345,7 +345,7 @@ const createReaderFromStream = ({
         try {
           const { value: nodeValue, refData } = Objects.isEmpty(valueTemp)
             ? { value: null, refData: null }
-            : await extractor({ survey, categoryItemProvider, taxonProvider, nodeDef, value: valueTemp, headers })
+            : await extractor({ survey, categoryItemProvider, taxonProvider, nodeDef, value: valueTemp, headers }) // NOSONAR
           valuesByDefUuid[nodeDefUuid] = nodeValue
           refDataByDefUuid[nodeDefUuid] = refData
         } catch (error) {

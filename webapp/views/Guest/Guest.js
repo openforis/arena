@@ -20,7 +20,11 @@ const OfArenaLogo = () => (
   </a>
 )
 
-const WordSplitter = ({ word }) => word.split('').map((letter, i) => <div key={String(i)}>{letter}</div>)
+// letters can repeat, so they are keyed by their position in the word
+const WordSplitter = ({ word }) =>
+  Array.from(word, (letter, index) => ({ letter, letterId: `${word}_${index}` })).map(({ letter, letterId }) => (
+    <div key={letterId}>{letter}</div>
+  ))
 
 const OfArenaBanner = () => (
   <div className="guest__openforis">

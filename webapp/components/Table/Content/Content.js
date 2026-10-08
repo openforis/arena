@@ -11,10 +11,13 @@ import { ContentRowCells } from './ContentRowCells'
 import { ContentHeaders } from './ContentHeaders'
 import { ContentRow } from './ContentRow'
 
+// placeholder rows have no identity: give them positional ids
+const getLoadingRowIds = (rows) => Array.from({ length: rows }, (_item, index) => `loading-row-${index}`)
+
 const LoadingRows = ({ rows }) => (
   <div className="table__rows">
-    {new Array(rows).fill(0).map((_item, index) => (
-      <div className="table__row" key={String(index)}>
+    {getLoadingRowIds(rows).map((rowId) => (
+      <div className="table__row" key={rowId}>
         <LoadingBar />
       </div>
     ))}
@@ -110,8 +113,7 @@ const Content = (props) => {
   return (
     <div className="table__content">
       <div className="table__row-header" ref={headerRef} style={{ gridTemplateColumns }}>
-        {/* TODO check why props is passed in this way*/}
-        {React.createElement(rowHeaderComponent, { props, sort, handleSortBy, ...rowProps })}
+        {React.createElement(rowHeaderComponent, { sort, handleSortBy, ...rowProps })}
       </div>
 
       {loading ? (
@@ -124,7 +126,6 @@ const Content = (props) => {
               ...props,
               ...rowProps,
               key,
-              row: item, // TODO do not pass "row" but "item" instead
               index,
               item,
               rowComponent,

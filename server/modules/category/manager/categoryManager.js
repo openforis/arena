@@ -136,7 +136,7 @@ const _afterItemUpdate = async ({ surveyId, categoryUuid, itemUuid, prevItem }, 
   }
   const itemsToValidate = []
   for (const code of codes) {
-    const items = await CategoryRepository.fetchItemsByLevelParentAndCode(
+    const items = /* NOSONAR */ await CategoryRepository.fetchItemsByLevelParentAndCode(
       { surveyId, levelUuid, parentUuid, code, draft },
       client
     )
@@ -583,8 +583,8 @@ export const cleanupCategory = async ({ user, surveyId, categoryUuid }, client =
 
     for (const level of levelsToCheck) {
       if (followingLevelIsNotEmpty) {
-        if ((await CategoryRepository.countItemsByLevelUuid({ surveyId, levelUuid: level.uuid })) === 0) {
-          await deleteLevel(user, surveyId, categoryUuid, level.uuid)
+        if (/* NOSONAR */ (await CategoryRepository.countItemsByLevelUuid({ surveyId, levelUuid: level.uuid })) === 0) {
+          await deleteLevel(user, surveyId, categoryUuid, level.uuid) // NOSONAR
           updated = true
         } else {
           // breaks the loop

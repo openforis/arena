@@ -29,9 +29,9 @@ export default class OdkImportJob extends Job {
     super(OdkImportJob.type, params, createInnerJobs())
   }
 
-  async beforeSuccess() {
+  generateResult(): Promise<any> {
     const context: any = this.context
-    this.setResult({ surveyId: context.surveyId } as any)
+    return Promise.resolve({ surveyId: context.surveyId })
   }
 
   async onEnd() {

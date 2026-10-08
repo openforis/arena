@@ -40,7 +40,7 @@ export default class SurveyDataMigrationJob extends Job {
     this.total = stepsToRun.length
 
     for (const step of stepsToRun) {
-      await step.migrate({ surveyId, client: this.tx })
+      await step.migrate({ surveyId, client: this.tx }) // NOSONAR
       this.incrementProcessedItems()
     }
 

@@ -12,7 +12,7 @@ export interface ExpressionNode {
 
 // ToString
 const binaryToString = (node: ExpressionNode): string =>
-  `${toString(node.left as ExpressionNode)} ${node.operator} ${toString(node.right as ExpressionNode)}`
+  `${toString(node.left as ExpressionNode)} ${node.operator as string} ${toString(node.right as ExpressionNode)}`
 
 // Valid
 const propValid = (prop: string) => A.pipe(A.prop(prop), isNotBlank)
@@ -47,7 +47,7 @@ const typeProps: Record<string, TypeProps> = {
     isValid: (node) => isValid(node.callee as ExpressionNode),
   },
   [types.UnaryExpression]: {
-    toString: (node) => `${node.operator} ${toString(node.argument as ExpressionNode)}`,
+    toString: (node) => `${node.operator as string} ${toString(node.argument as ExpressionNode)}`,
     isValid: (node) => propValid('operator')(node) && isValid(node.argument as ExpressionNode),
   },
   [types.BinaryExpression]: {

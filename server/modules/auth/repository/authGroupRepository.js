@@ -30,7 +30,7 @@ export const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
   // one at a time: queries cannot run concurrently on the same client (e.g. a transaction)
   const groups = []
   for (const authGroup of surveyGroups) {
-    groups.push(await insertGroup(authGroup, surveyId, client))
+    groups.push(await insertGroup(authGroup, surveyId, client)) // NOSONAR
   }
   return groups
 }

@@ -54,6 +54,32 @@ const _extractTextProps = (collectNodeDef) =>
     ? { [NodeDef.propKeys.textInputType]: NodeDef.textInputTypes.multiLine }
     : {}
 
+const _updateVisibilityLayoutProps = ({ collectNodeDef, updateLayoutProp }) => {
+  const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
+  if (hiddenWhenNotRelevant) {
+    updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
+  }
+  const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
+  const hiddenInMobile =
+    StringUtils.isNotBlank(relevantExpr) &&
+    ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/g, ''))
+  if (hiddenInMobile) {
+    updateLayoutProp({ propName: NodeDefLayout.keys.hiddenInMobile, value: true })
+  }
+}
+
+const _addNodeDefInfoToCache = ({ nodeDefsInfoByCollectPath, collectNodeDefPath, nodeDefUuid, field }) => {
+  let nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
+  if (!nodeDefsInfo) {
+    nodeDefsInfo = []
+    nodeDefsInfoByCollectPath[collectNodeDefPath] = nodeDefsInfo
+  }
+  nodeDefsInfo.push({
+    uuid: nodeDefUuid,
+    ...(field ? { field } : {}),
+  })
+}
+
 export default class NodeDefsImportJob extends Job {
   constructor(params) {
     super(NodeDefsImportJob.type, params)
@@ -233,20 +259,8 @@ export default class NodeDefsImportJob extends Job {
       Object.assign(propsUpdated, _extractTextProps(collectNodeDef))
     }
 
-    // 4a. update hidden when not relevant layout prop
-    const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
-    if (hiddenWhenNotRelevant) {
-      _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
-    }
-
-    // 4b. update hiddenInMobile layout prop
-    const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
-    const hiddenInMobile =
-      StringUtils.isNotBlank(relevantExpr) &&
-      ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/g, ''))
-    if (hiddenInMobile) {
-      _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenInMobile, value: true })
-    }
+    // 4. update visibility layout props
+    _updateVisibilityLayoutProps({ collectNodeDef, updateLayoutProp: _updateLayoutProp })
 
     Object.assign(this.nodeDefs, nodeDefsInserted, nodeDefsUpdated)
 
@@ -271,15 +285,11 @@ export default class NodeDefsImportJob extends Job {
     nodeDef = nodeDefsUpdated[nodeDefUuid]
 
     // 6. store nodeDef in cache
-    let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]
-    if (!nodeDefsInfo) {
-      nodeDefsInfo = []
-      this.nodeDefsInfoByCollectPath[collectNodeDefPath] = nodeDefsInfo
-    }
-
-    nodeDefsInfo.push({
-      uuid: nodeDefUuid,
-      ...(field ? { field } : {}),
+    _addNodeDefInfoToCache({
+      nodeDefsInfoByCollectPath: this.nodeDefsInfoByCollectPath,
+      collectNodeDefPath,
+      nodeDefUuid,
+      field,
     })
 
     nodeDefsInserted[nodeDefUuid] = nodeDef
@@ -300,7 +310,7 @@ export default class NodeDefsImportJob extends Job {
         for (const childDefField of childDefFields) {
           const { type: childType, field = null } = childDefField
 
-          const nodeDefsInserted = await this.insertNodeDef(nodeDef, collectNodeDefPath, collectChild, childType, field)
+          const nodeDefsInserted = await this.insertNodeDef(nodeDef, collectNodeDefPath, collectChild, childType, field) // NOSONAR
           // sort inserted node defs by id
           const insertedUuids = A.pipe(A.values, A.sortBy(NodeDef.getId), A.map(NodeDef.getUuid))(nodeDefsInserted)
           if (tableLayout) {
@@ -528,7 +538,7 @@ export default class NodeDefsImportJob extends Job {
         [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression({ expression: applicableIfExpr })],
       }
       const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props, propsAdvanced)
-      const qualifierNodeDefAndOthersUpdated = await NodeDefManager.insertNodeDef(
+      const qualifierNodeDefAndOthersUpdated = /* NOSONAR */ await NodeDefManager.insertNodeDef(
         {
           user: this.user,
           survey: this.survey,

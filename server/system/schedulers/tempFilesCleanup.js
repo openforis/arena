@@ -23,21 +23,21 @@ const initSchedule = () =>
     await cleanupTempFilesWithLock(6)
   })
 
-const cleanupFileSystemTempFiles = async (olderThanHours = 4) => {
+const cleanupFileSystemTempFiles = (olderThanHours = 4) => {
   const tempFolder = ProcessUtils.ENV.tempFolder
 
   Logger.debug(`Cleaning up temp files in folder ${tempFolder}`)
 
   let count = 0
   try {
-    if (await fs.existsSync(tempFolder)) {
+    if (fs.existsSync(tempFolder)) {
       const now = new Date()
-      const files = await fs.readdirSync(tempFolder)
+      const files = fs.readdirSync(tempFolder)
       for (const file of files) {
         const filePath = path.join(tempFolder, file)
-        const stat = await fs.statSync(filePath)
+        const stat = fs.statSync(filePath)
         if (stat.isFile() && DateUtils.diffInHours(now, new Date(stat.ctime)) >= olderThanHours) {
-          await fs.unlinkSync(filePath)
+          fs.unlinkSync(filePath)
           Logger.debug('Temp file deleted', filePath)
           count++
         }
@@ -64,7 +64,7 @@ const cleanupS3TempFiles = async (olderThanHours = 4) => {
 const cleanupTempFiles = async (olderThanHours = 4) => {
   // Local-filesystem temp files are per-dyno by nature (each dyno only has its own disk), so this
   // part is safe to run on every dyno unconditionally - only the shared S3 cleanup below needs the lock.
-  await cleanupFileSystemTempFiles(olderThanHours)
+  cleanupFileSystemTempFiles(olderThanHours)
 
   if (getFileContentStorageType() === fileContentStorageTypes.s3Bucket) {
     try {

@@ -371,16 +371,18 @@ export class RecordsUpdateThread extends Thread {
         }
 
         record = await RecordManager.deleteNode(
-          user,
-          survey,
-          record,
-          nodeUuid,
-          timezoneOffset,
-          lang,
-          (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
-          (validations) => this.handleNodesValidationUpdated({ record, validations }),
-          t,
-          { clearNonApplicableValues: isClearNonApplicableValuesEnabled(survey) }
+          {
+            user,
+            survey,
+            record,
+            nodeUuid,
+            timezoneOffset,
+            lang,
+            nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
+            nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
+            clearNonApplicableValues: isClearNonApplicableValuesEnabled(survey),
+          },
+          t
         )
         await this.cacheRecordWithDbDateModified({ surveyId, recordUuid, record, recordsCache, t })
       },

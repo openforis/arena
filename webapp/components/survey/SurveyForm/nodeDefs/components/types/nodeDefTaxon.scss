@@ -23,3 +23,17 @@
     }
   }
 }
+
+// reset the default button style of the autocomplete items
+.survey-form__node-def-taxon-autocomplete-list button.item {
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  background: none;
+  padding: 0.4rem 0;
+  text-align: left;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  color: inherit;
+}

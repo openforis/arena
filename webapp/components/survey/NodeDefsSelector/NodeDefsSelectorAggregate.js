@@ -28,7 +28,7 @@ const getPrevCalculations = ({ nodeDefUuidEntity, survey }) => {
     const children = Survey.getNodeDefChildren({ nodeDef: ancestorDef })(survey)
     const analysisChildren = children.filter(NodeDef.isAnalysis).map((object) => ({
       ...object,
-      aggregate: Query.DEFAULT_AGGREGATE_FUNCTIONS.sum, // TODO_ADD_AGGREGATE_EXPRESSION
+      aggregate: Query.DEFAULT_AGGREGATE_FUNCTIONS.sum,
     }))
     variablesPrevCalculations.push(...analysisChildren)
   })(survey)

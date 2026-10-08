@@ -42,9 +42,9 @@ import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 import FormHeader from './FormHeader'
 
 const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
-  Survey.getNodeDefChildren({ nodeDef })(survey).filter((childDef) =>
+  Survey.getNodeDefChildren({ nodeDef })(survey).some((childDef) =>
     NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(childDef)
-  ).length > 0
+  )
 
 const treeSelectViewModeItems = Object.keys(TreeSelectViewMode).map((mode) => ({
   key: mode,

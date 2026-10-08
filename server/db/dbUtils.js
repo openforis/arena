@@ -274,7 +274,7 @@ export const runQueries = async (client, queryFns) => {
   }
   const results = []
   for (const queryFn of queryFns) {
-    results.push(await queryFn())
+    results.push(await queryFn()) // NOSONAR
   }
   return results
 }

@@ -248,14 +248,14 @@ export class CategoryImportInternalJob extends Job {
       if (!levelOld) {
         // insert new level
         const level = Category.newLevel(category, { [CategoryLevel.keysProps.name]: levelName }, index)
-        const { category: categoryUpdated } = await CategoryManager.insertLevel(
+        const { category: categoryUpdated } = /* NOSONAR */ await CategoryManager.insertLevel(
           { user, surveyId, level, system: true },
           tx
         )
         this.category = categoryUpdated
       } else if (CategoryLevel.getName(levelOld) !== levelName) {
         // update level name
-        const { category: categoryUpdated } = await CategoryManager.updateLevelProp(
+        const { category: categoryUpdated } = /* NOSONAR */ await CategoryManager.updateLevelProp(
           user,
           surveyId,
           Category.getUuid(category),
@@ -273,7 +273,7 @@ export class CategoryImportInternalJob extends Job {
       const levelsToDelete = levelsExisting.slice(levelNames.length).reverse()
 
       for (const levelToDelete of levelsToDelete) {
-        this.category = await CategoryManager.deleteLevel(
+        this.category = /* NOSONAR */ await CategoryManager.deleteLevel(
           user,
           surveyId,
           Category.getUuid(category),

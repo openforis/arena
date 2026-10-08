@@ -77,16 +77,18 @@ const MapResizeHandler = () => {
 export const MapContainer = (props) => {
   const {
     baseLayersLabel,
+    centerPoint,
     editable = false,
     geoJson = null,
     layers = [],
     markerPoint,
     markerTitle,
+    onMarkerPointChange,
     overlayGroups,
     showOptions = true,
   } = props
   const { centerPositionLatLon, markerPointUpdated, markerPointUpdatedToString, onMarkerPointUpdated, onSaveClick } =
-    useMap(props)
+    useMap({ centerPoint, geoJson, markerPoint, onMarkerPointChange })
 
   if (!centerPositionLatLon) {
     return null

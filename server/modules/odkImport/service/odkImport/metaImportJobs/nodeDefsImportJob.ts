@@ -230,7 +230,7 @@ export default class NodeDefsImportJob extends Job {
 
     for (const childElement of childElements) {
       if (this.isCanceled()) break
-      await this._insertNodeDef({ parentNodeDef: nodeDef, parentPath: path, instanceElement: childElement })
+      await this._insertNodeDef({ parentNodeDef: nodeDef, parentPath: path, instanceElement: childElement }) // NOSONAR
     }
 
     return nodeDef
@@ -462,7 +462,7 @@ export default class NodeDefsImportJob extends Job {
     ]
     for (const { bindValue, itemType, apply } of expressionBindings) {
       if (!bindValue) continue
-      const converted = await convertAndReport({ itemType, expression: bindValue })
+      const converted = await convertAndReport({ itemType, expression: bindValue }) // NOSONAR
       if (converted) apply(converted)
     }
 

@@ -13,7 +13,7 @@ import * as API from '@webapp/service/api'
  * Basemaps is a list of all available layers.
  *
  * TileMatrixSets is a list of ALL available TileMatrixSets. Some layers may not have support all TileMatrixSets.
- * TileMatrixSet is basically the projection. TODO is to find a way to find the projection that leaflet uses (EPSG:3857).
+ * TileMatrixSet is basically the projection: the one used by leaflet is EPSG:3857.
  * (The problem is that no all providers use the same name in the TileMatrixSet list. For some it is with the EPSG code, for some it is custom name...).
  *
  * CurrentTileMatrixSet is the TileMatrixSet that is used currently...
