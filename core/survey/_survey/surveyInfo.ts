@@ -34,6 +34,7 @@ export const keys = {
   defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
   fieldManualLinks: 'fieldManualLinks',
+  keepNonApplicableValues: 'keepNonApplicableValues',
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
   languages: 'languages',
@@ -134,6 +135,9 @@ export const isDocHeaderOnFirstPageOnly = (surveyInfo: any): boolean =>
 
 export const isDocPageNumberingEnabled = (surveyInfo: any): boolean =>
   (getSurveyDocOptions(surveyInfo) as Record<string, unknown>)?.pageNumbering !== false
+
+// when false (default), values of attributes becoming non-applicable are cleared during data entry
+export const isKeepNonApplicableValues = ObjectUtils.isPropTrue(keys.keepNonApplicableValues)
 
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled

@@ -25,6 +25,11 @@ export default {
   },
   clone: `Clonar '{{nodeDefLabel}}'`,
   compressFormItems: `Comprimir elementos de formulario para '{{nodeDefLabel}}'`,
+  confirmClearNonApplicableValues: `Los siguientes campos ya no serán relevantes y sus valores se borrarán:
+
+{{nodeDefLabels}}
+
+¿Continuar?`,
   confirmUpdateDependentEnumeratedEntities: `Si continúa, algunas entidades enumeradas ({{entityDefs}}) se volverán a enumerar, 
 eliminando los valores existentes insertados en ellas (si los hay). 
 ¿Continuar?`,

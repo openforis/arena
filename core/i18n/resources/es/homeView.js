@@ -106,6 +106,9 @@ export default {
     confirmDeleteCycle:
       '¿Está seguro de que desea eliminar el ciclo {{cycle}}?\n\n$t(common.cantUndoWarning)\n\nSi hay registros asociados a este ciclo, se eliminarán.',
     cycleForArenaMobile: 'Ciclo para Arena Mobile',
+    keepNonApplicableValues: `Conservar los valores de los atributos no relevantes`,
+    keepNonApplicableValuesInfo: `Si no está marcado (predeterminado), durante la entrada de datos se borran los valores de los atributos que ya no son relevantes (tras la confirmación del usuario).
+Si está marcado, esos valores se conservan en el registro, aunque los atributos ya no sean relevantes.`,
     deleteActivityLog: 'Borrar registro de actividad',
     deleteActivityLogConfirm: {
       headerText: '¿Borrar TODOS los datos del registro de actividad de esta encuesta?',

@@ -103,12 +103,24 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { surveyId, cycle, draft, timezoneOffset, lang } = Request.getParams(req)
+        const { surveyId, cycle, draft, timezoneOffset, lang, clearNonApplicableValuesConfirmed } =
+          Request.getParams(req)
         const node = Request.getJsonParam(req, 'node')
         const file = Request.getFile(req)
         const socketId = Request.getSocketId(req)
 
-        await RecordService.persistNode({ socketId, user, surveyId, cycle, draft, node, file, timezoneOffset, lang })
+        await RecordService.persistNode({
+          socketId,
+          user,
+          surveyId,
+          cycle,
+          draft,
+          node,
+          file,
+          timezoneOffset,
+          lang,
+          clearNonApplicableValuesConfirmed,
+        })
 
         sendOk(res)
       } catch (error) {
@@ -667,7 +679,16 @@ export const init = (app) => {
     requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset, lang } = Request.getParams(req)
+        const {
+          surveyId,
+          cycle,
+          draft,
+          recordUuid,
+          nodeUuid,
+          timezoneOffset,
+          lang,
+          clearNonApplicableValuesConfirmed,
+        } = Request.getParams(req)
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
 
@@ -681,6 +702,7 @@ export const init = (app) => {
           nodeUuid,
           timezoneOffset,
           lang,
+          clearNonApplicableValuesConfirmed,
         })
 
         sendOk(res)

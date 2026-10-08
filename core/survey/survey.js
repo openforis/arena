@@ -108,6 +108,7 @@ export const {
   getDescription,
   getDescriptions,
   getFieldManualLinks,
+  isKeepNonApplicableValues,
   getUserExtraPropDefs,
   getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,

@@ -339,6 +339,11 @@ export {
   updateNodesDependents,
 } from './_recordManager/recordUpdateManager'
 
+export {
+  findNodeDefUuidsToClearOnNodeDelete,
+  findNodeDefUuidsToClearOnNodePersist,
+} from './_recordManager/nonApplicableValuesClearPreview'
+
 export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepTo, recordUuids }, client = db) =>
   client.tx(async (t) => {
     const recordsSummaryToMove = await RecordRepository.fetchRecordsSummaryBySurveyId(

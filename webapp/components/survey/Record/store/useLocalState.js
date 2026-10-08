@@ -62,6 +62,13 @@ export const useLocalState = (props) => {
     eventHandler: useCallback((content) => dispatch(RecordActions.nodeValidationsUpdate(content)), []),
   })
   useOnWebSocketEvent({
+    eventName: WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm,
+    eventHandler: useCallback(
+      (content) => dispatch(RecordActions.confirmClearNonApplicableValues(content)),
+      [dispatch]
+    ),
+  })
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdateCompleted,
     eventHandler: useCallback((content) => dispatch(RecordActions.nodesUpdateCompleted(content)), []),
   })

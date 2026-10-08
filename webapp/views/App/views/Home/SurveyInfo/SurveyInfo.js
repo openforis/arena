@@ -38,6 +38,7 @@ const SurveyInfoForm = () => {
     setDefaultCycleKey,
     setDescriptions,
     setFieldManualLinks,
+    setKeepNonApplicableValues,
     setLabels,
     setLanguages,
     setName,
@@ -140,6 +141,8 @@ const SurveyInfoForm = () => {
         props: {
           security,
           onSecurityUpdate: setSecurity,
+          keepNonApplicableValues: surveyInfoObject.keepNonApplicableValues,
+          onKeepNonApplicableValuesUpdate: setKeepNonApplicableValues,
         },
       }
     )

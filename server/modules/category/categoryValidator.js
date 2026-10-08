@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { Points, Promises } from '@openforis/arena-core'
+import { Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -317,7 +317,9 @@ export const validateItems = async ({ category, itemsToValidate, itemsCountByIte
     )
     itemsValidationUpdated = Validation.assocFieldValidation(itemUuid, itemValidation)(itemsValidationUpdated)
   }
-  await Promises.each(itemsToValidate, _validateItem)
+  for (const item of itemsToValidate) {
+    await _validateItem(item) // NOSONAR sequential: each call updates the shared validation
+  }
   const categoryValidationUpdated = Validation.assocFieldValidation(keys.items, itemsValidationUpdated)(prevValidation)
   return Validation.cleanup(categoryValidationUpdated)
 }

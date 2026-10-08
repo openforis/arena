@@ -48,6 +48,7 @@ class SurveyBuilder {
     this.categoryBuilders = []
     this.taxonomyBuilders = []
     this.isTemplate = false
+    this.extraProps = {}
   }
 
   categories(...categoryBuilders) {
@@ -65,6 +66,12 @@ class SurveyBuilder {
     return this
   }
 
+  // additional survey info props (e.g. survey settings)
+  props(props) {
+    this.extraProps = props
+    return this
+  }
+
   async build() {
     let survey = Survey.newSurvey({
       ownerUuid: User.getUuid(this.user),
@@ -72,6 +79,7 @@ class SurveyBuilder {
       label: this.label,
       languages: [this.lang],
       template: this.isTemplate,
+      ...this.extraProps,
     })
 
     // categories

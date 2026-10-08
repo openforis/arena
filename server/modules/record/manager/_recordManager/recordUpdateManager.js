@@ -246,6 +246,7 @@ export const persistNode = async (
     nodesValidationListener = null,
     system = false,
     createMultipleEntities = true,
+    clearNonApplicableValues = false,
   },
   client = db
 ) =>
@@ -257,6 +258,7 @@ export const persistNode = async (
       node,
       timezoneOffset,
       lang,
+      clearNonApplicableValues,
       nodesUpdateFn: async (user, survey, record, node, t) => {
         const nodeUuid = Node.getUuid(node)
 
@@ -279,7 +281,17 @@ export const persistNode = async (
 export const updateNodesDependents = NodeUpdateManager.updateNodesDependents
 
 export const deleteNode = async (
-  { user, survey, record, nodeUuid, timezoneOffset, lang, nodesUpdateListener = null, nodesValidationListener = null },
+  {
+    user,
+    survey,
+    record,
+    nodeUuid,
+    timezoneOffset,
+    lang,
+    nodesUpdateListener = null,
+    nodesValidationListener = null,
+    clearNonApplicableValues = false,
+  },
   t = db
 ) =>
   _updateNodeAndValidateRecordUniqueness(
@@ -290,6 +302,7 @@ export const deleteNode = async (
       node: Record.getNodeByUuid(nodeUuid)(record),
       timezoneOffset,
       lang,
+      clearNonApplicableValues,
       nodesUpdateFn: (user, survey, record, node, t) =>
         NodeUpdateManager.deleteNode(user, survey, record, Node.getUuid(node), t),
       nodesUpdateListener,
@@ -312,6 +325,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
     categoryItemProvider,
     timezoneOffset,
     lang,
+    clearNonApplicableValues = false,
     nodesUpdateFn,
     nodesUpdateListener = null,
     nodesValidationListener = null,
@@ -332,6 +346,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
         nodesUpdated,
         timezoneOffset,
         lang,
+        clearNonApplicableValues,
         nodesUpdateListener,
         nodesValidationListener,
       },
@@ -407,7 +422,17 @@ const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
 }
 
 const _onNodesUpdate = async (
-  { user, survey, record, nodesUpdated, timezoneOffset, lang, nodesUpdateListener, nodesValidationListener },
+  {
+    user,
+    survey,
+    record,
+    nodesUpdated,
+    timezoneOffset,
+    lang,
+    clearNonApplicableValues,
+    nodesUpdateListener,
+    nodesValidationListener,
+  },
   t
 ) => {
   // 1. update record and notify
@@ -418,7 +443,7 @@ const _onNodesUpdate = async (
   // 2. update dependent nodes
   const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } =
     await NodeUpdateManager.updateNodesDependents(
-      { user, survey, record, nodes: nodesUpdated, timezoneOffset, lang },
+      { user, survey, record, nodes: nodesUpdated, timezoneOffset, lang, clearNonApplicableValues },
       t
     )
   if (nodesUpdateListener) {
