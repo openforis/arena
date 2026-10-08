@@ -81,6 +81,12 @@ describe('Expired invitations: untouched surveys cleanup', () => {
     expect(surveyIds).toContain(surveyId)
   })
 
+  test('untouched survey is fetched together with the uuid of its user', async () => {
+    const item = await createSurveyWithInvitedUser({ label: 'with_user' })
+    const surveys = await UserManager.fetchSurveysOfExpiredInvitationUsers()
+    expect(surveys).toContainEqual(item)
+  })
+
   test('survey modified shortly after the invitation is selected', async () => {
     const { surveyId } = await createSurveyWithInvitedUser({ label: 'close', modifiedAfterInvitation: '2 MINUTES' })
     const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers()

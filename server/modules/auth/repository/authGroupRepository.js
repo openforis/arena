@@ -124,14 +124,14 @@ export const fetchUsersGroups = async (userUuids, client = db) =>
 const untouchedSurveyTolerance = '10 MINUTES'
 
 /**
- * Fetches the ids of the surveys never modified since their only user (with expired invitation) was invited.
+ * Fetches the surveys never modified since their only user (with expired invitation) was invited.
  * @param {pgPromise.IDatabase} [client] - The database client.
- * @returns {Promise<number[]>} - The ids of the surveys.
+ * @returns {Promise<Array<{surveyId: number, userUuid: string}>>} - The ids of the surveys with the uuid of their user.
  */
-export const fetchSurveyIdsOfExpiredInvitationUsers = async (client = db) =>
+export const fetchSurveysOfExpiredInvitationUsers = async (client = db) =>
   client.map(
     `
-    SELECT DISTINCT s.id
+    SELECT DISTINCT s.id, u.uuid AS user_uuid
     FROM auth_group_user agu
       JOIN auth_group ag ON ag.uuid = agu.group_uuid 
       JOIN "user" u ON u.uuid = agu.user_uuid
@@ -158,8 +158,18 @@ export const fetchSurveyIdsOfExpiredInvitationUsers = async (client = db) =>
       )
       AND ${UserRepository.expiredInvitationWhereCondition}`,
     [],
-    (row) => row.id
+    (row) => ({ surveyId: row.id, userUuid: row.user_uuid })
   )
+
+/**
+ * Fetches the ids of the surveys never modified since their only user (with expired invitation) was invited.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<number[]>} - The ids of the surveys.
+ */
+export const fetchSurveyIdsOfExpiredInvitationUsers = async (client = db) => {
+  const surveys = await fetchSurveysOfExpiredInvitationUsers(client)
+  return surveys.map(({ surveyId }) => surveyId)
+}
 
 // ==== UPDATE
 

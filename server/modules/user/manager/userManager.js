@@ -51,7 +51,7 @@ export const {
   deleteUserResetPasswordExpired,
 } = UserResetPasswordRepository
 
-export const { fetchSurveyIdsOfExpiredInvitationUsers } = AuthGroupRepository
+export const { fetchSurveyIdsOfExpiredInvitationUsers, fetchSurveysOfExpiredInvitationUsers } = AuthGroupRepository
 
 // ==== CREATE
 const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo = null }, client = db) => {
