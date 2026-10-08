@@ -12,7 +12,23 @@ const metaKeys = {
   defaultValue: 'defaultValueApplied', // True if default value has been applied, false if the value is user defined
   hierarchyCode: 'hCode', // Hierarchy of code attribute ancestors (according to the parent code defs specified)
   qualifierValueApplied: 'qualifierValueApplied', // True if the value has been auto-filled from the user group qualifier
+  childEditability: 'cEdit', // Editability by child def uuid
+  childVisibility: 'cVis', // Visibility by child def uuid
+  childrenMaxCount: 'childrenMaxCount', // Max count by child def uuid
+  childrenMinCount: 'childrenMinCount', // Min count by child def uuid
 }
+
+// meta keys omitted when empty (a missing value is read as an empty one)
+const metaKeysOmittedWhenEmpty = new Set([
+  metaKeys.childApplicability,
+  metaKeys.childEditability,
+  metaKeys.childVisibility,
+  metaKeys.childrenMaxCount,
+  metaKeys.childrenMinCount,
+  metaKeys.hierarchyCode,
+])
+// meta keys omitted when falsy (a missing value is read as false)
+const metaKeysOmittedWhenFalsy = new Set([metaKeys.defaultValue, metaKeys.qualifierValueApplied])
 
 // READ
 
@@ -30,6 +46,18 @@ const isChildVisible = (childDefUuid) => (node) => Nodes.isChildVisible(node, ch
 
 // Code metadata
 const getHierarchyCode = A.pathOr([], [keys.meta, metaKeys.hierarchyCode])
+
+const _isMetaValueDefault = ([key, value]) =>
+  (metaKeysOmittedWhenEmpty.has(key) && A.isEmpty(value)) || (metaKeysOmittedWhenFalsy.has(key) && !value)
+
+/**
+ * Removes from the node meta the items having the default value (they are read back in the same way), to save space.
+ * It must be used only when the meta is stored as a whole (e.g. Insert), not when it is merged into the stored one.
+ * @param {object} [meta] - The node meta.
+ * @returns {object} - The node meta without the items having the default value.
+ */
+const compactMeta = (meta) =>
+  Object.fromEntries(Object.entries(meta ?? {}).filter((entry) => !_isMetaValueDefault(entry)))
 
 // UPDATE
 
@@ -101,6 +129,7 @@ export const NodeMeta = {
   getHierarchyCode,
   isChildEditable,
   isChildVisible,
+  compactMeta,
 
   assocMeta,
   mergeMeta,

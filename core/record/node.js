@@ -125,6 +125,7 @@ export const {
   isQualifierValueApplied,
   getHierarchy,
   getHierarchyCode,
+  compactMeta,
 } = NodeMeta
 
 // Hierarchy

@@ -225,9 +225,9 @@ export const fetchFileValueNodesByNodeDefUuids = async ({ surveyId, nodeDefUuids
 // ============== CREATE
 
 export const insertNode = async (surveyId, node, draft, client = db) => {
-  // child applicability is not inserted (applicable by default); do not store an empty object to save space
+  // items with default values (e.g. empty child applicability) are not stored to save space
   const meta = {
-    ...A.dissoc(Node.metaKeys.childApplicability, Node.getMeta(node)),
+    ...Node.compactMeta(Node.getMeta(node)),
     [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
   }
 
@@ -271,7 +271,7 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
       parent_uuid: Node.getParentUuid(node),
       node_def_uuid: Node.getNodeDefUuid(node),
       value: _toValueQueryParam(Node.getValue(node)),
-      meta: Node.getMeta(node),
+      meta: Node.compactMeta(Node.getMeta(node)),
     }))
   )
   // Passing no parameters (rather than []) tells pg-promise to send the query as-is: `query` was
@@ -357,7 +357,8 @@ export const updateNodes = async ({ surveyId, nodes }, client = db) => {
   const values = nodes.map((node) => [
     Node.getId(node),
     _toValueQueryParam(Node.getValue(node)),
-    Node.getMeta(node),
+    // meta is replaced as a whole: items with default values are not stored to save space
+    Node.compactMeta(Node.getMeta(node)),
     Dates.formatForStorage(Node.getDateModified(node)),
   ])
   await client.none(
