@@ -335,15 +335,16 @@ export const updateNode = async (
   { surveyId, nodeUuid, value = null, meta = {}, draft, reloadNode = true },
   client = db
 ) => {
+  // meta is merged into the stored one: items with default values are deleted instead of stored, to save space
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1::jsonb,
-    meta = meta || $2::jsonb, 
+    meta = (meta - $4::text[]) || $2::jsonb, 
     date_modified = ${DbUtils.now}
     WHERE uuid = $3
     `,
-    [_toValueQueryParam(value), meta || {}, nodeUuid]
+    [_toValueQueryParam(value), Node.compactMeta(meta), nodeUuid, Node.getMetaKeysWithDefaultValue(meta)]
   )
   if (!reloadNode) return null
 

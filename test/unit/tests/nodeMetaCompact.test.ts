@@ -39,3 +39,14 @@ describe('Node.compactMeta', () => {
     expect(Node.compactMeta(undefined)).toEqual({})
   })
 })
+
+describe('Node.getMetaKeysWithDefaultValue', () => {
+  it('returns only the keys of the items having the default value', () => {
+    const meta = { h: [], hCode: [], cVis: { 'def-1': false }, defaultValueApplied: false, qualifierValueApplied: true }
+    expect(Node.getMetaKeysWithDefaultValue(meta)).toEqual(['hCode', 'defaultValueApplied'])
+  })
+
+  it('returns an empty array when the meta is missing', () => {
+    expect(Node.getMetaKeysWithDefaultValue(null)).toEqual([])
+  })
+})

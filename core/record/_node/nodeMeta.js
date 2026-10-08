@@ -51,8 +51,18 @@ const _isMetaValueDefault = ([key, value]) =>
   (metaKeysOmittedWhenEmpty.has(key) && A.isEmpty(value)) || (metaKeysOmittedWhenFalsy.has(key) && !value)
 
 /**
+ * Returns the keys of the node meta items having the default value (a missing item is read back in the same way).
+ * @param {object} [meta] - The node meta.
+ * @returns {string[]} - The keys of the items having the default value.
+ */
+const getMetaKeysWithDefaultValue = (meta) =>
+  Object.entries(meta ?? {})
+    .filter(_isMetaValueDefault)
+    .map(([key]) => key)
+
+/**
  * Removes from the node meta the items having the default value (they are read back in the same way), to save space.
- * It must be used only when the meta is stored as a whole (e.g. Insert), not when it is merged into the stored one.
+ * When the meta is merged into the stored one, the removed keys must be deleted from the stored meta too.
  * @param {object} [meta] - The node meta.
  * @returns {object} - The node meta without the items having the default value.
  */
@@ -129,6 +139,7 @@ export const NodeMeta = {
   getHierarchyCode,
   isChildEditable,
   isChildVisible,
+  getMetaKeysWithDefaultValue,
   compactMeta,
 
   assocMeta,
