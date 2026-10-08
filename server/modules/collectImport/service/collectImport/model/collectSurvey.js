@@ -58,7 +58,7 @@ export const samplingPointDataCodeListNames = ['sampling_design', 'ofc_sampling_
 export const getNodeDefFieldsByCollectNodeDef = (collectNodeDef) => {
   const collectType = getElementName(collectNodeDef)
   const fieldsExtractor = nodeDefFieldsExtractorByCollectType[collectType]
-  return fieldsExtractor && fieldsExtractor(collectNodeDef)
+  return fieldsExtractor?.(collectNodeDef)
 }
 
 export const toLabels =

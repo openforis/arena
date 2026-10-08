@@ -36,9 +36,9 @@ const ModuleSwitch = (props) => {
 
   return (
     <Routes>
-      {modules.map((module, i) => (
+      {modules.map((module) => (
         <Route
-          key={i}
+          key={module.path}
           path={module.path}
           element={
             <React.Suspense fallback={<FallbackComponent />}>

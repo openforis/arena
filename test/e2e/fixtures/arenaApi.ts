@@ -71,14 +71,14 @@ export class ArenaApi {
   async waitForJob(jobUuid: string): Promise<JobSummary> {
     const start = Date.now()
     for (;;) {
-      const job: JobSummary = await this.get(`/api/jobs/${jobUuid}`)
+      const job: JobSummary = await this.get(`/api/jobs/${jobUuid}`) // NOSONAR
       expect(job.uuid).toBe(jobUuid)
       if (job.ended) {
         expect(job.succeeded, `job ${jobUuid} did not succeed: ${JSON.stringify(job.errors)}`).toBe(true)
         return job
       }
       if (Date.now() - start > jobTimeoutMs) throw new Error(`job ${jobUuid} did not end in ${jobTimeoutMs}ms`)
-      await new Promise((resolve) => setTimeout(resolve, jobPollIntervalMs))
+      await new Promise((resolve) => setTimeout(resolve, jobPollIntervalMs)) // NOSONAR
     }
   }
 

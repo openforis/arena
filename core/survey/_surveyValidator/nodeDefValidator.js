@@ -306,7 +306,7 @@ export const validateNodeDefs = async (survey) => {
 
   const nodeDefsValidation = []
   for (const nodeDef of Object.values(nodeDefs)) {
-    nodeDefsValidation.push(await validateNodeDef(survey, nodeDef))
+    nodeDefsValidation.push(await validateNodeDef(survey, nodeDef)) // NOSONAR
   }
 
   // exclude valid node def validations

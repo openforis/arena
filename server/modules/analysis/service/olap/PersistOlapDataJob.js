@@ -57,7 +57,7 @@ export default class PersistOlapDataJob extends Job {
     this.total = zipEntryNames.length
 
     for (const zipEntryName of zipEntryNames) {
-      await this.importZipEntry({ zipEntryName })
+      await this.importZipEntry({ zipEntryName }) // NOSONAR
       this.incrementProcessedItems()
     }
   }

@@ -16,7 +16,7 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import { CopyPasswordResetLinkButton } from './CopyResetPasswordLinkButton'
 
 const Row = (props) => {
-  const { onEditSurveyUserExtraProps, row: userListItem } = props
+  const { onEditSurveyUserExtraProps, item: userListItem } = props
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
   const i18n = useI18n()
@@ -97,8 +97,8 @@ const Row = (props) => {
 }
 
 Row.propTypes = {
+  item: PropTypes.object.isRequired,
   onEditSurveyUserExtraProps: PropTypes.func.isRequired,
-  row: PropTypes.object.isRequired,
 }
 
 export default Row

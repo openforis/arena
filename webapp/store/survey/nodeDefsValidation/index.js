@@ -1,4 +1,2 @@
-import * as NodeDefsValidationState from './state'
-import NodeDefsValidationReducer from './reducer'
-
-export { NodeDefsValidationState, NodeDefsValidationReducer }
+export * as NodeDefsValidationState from './state'
+export { default as NodeDefsValidationReducer } from './reducer'

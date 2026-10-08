@@ -153,7 +153,7 @@ export default class TaxonomyImportManager {
 
     // one at a time: adding a taxon can run queries in the import transaction and flush the update buffer
     for (const predefinedTaxon of predefinedTaxaToInsert) {
-      await this.addTaxonToUpdateBuffer(predefinedTaxon)
+      await this.addTaxonToUpdateBuffer(predefinedTaxon) // NOSONAR
     }
 
     await this.batchPersisterInsert.flush()

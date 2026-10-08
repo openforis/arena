@@ -207,7 +207,7 @@ export const inviteUsers = async (
   const invalidEmails = []
   for (const email of emails) {
     try {
-      const invitedUser = await _inviteUser(
+      const invitedUser = /* NOSONAR */ await _inviteUser(
         {
           user,
           i18n,

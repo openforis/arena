@@ -23,9 +23,9 @@ export default class OdkDataImportJob extends Job {
     super(OdkDataImportJob.type, params, createInnerJobs())
   }
 
-  async beforeSuccess() {
+  generateResult(): Promise<any> {
     const context: any = this.context
-    this.setResult({ submittedCount: context.submittedCount, skippedCount: context.skippedCount } as any)
+    return Promise.resolve({ submittedCount: context.submittedCount, skippedCount: context.skippedCount })
   }
 
   async onEnd() {

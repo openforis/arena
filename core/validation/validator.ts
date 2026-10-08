@@ -65,7 +65,7 @@ export const validate = async (
   const validation = Validation.newInstance()
 
   for (const [prop, propValidations] of Object.entries(propsValidations)) {
-    const validationProp = await validateProp(obj, prop, propValidations)
+    const validationProp = await validateProp(obj, prop, propValidations) // NOSONAR
     const validationPropValid = Validation.isValid(validationProp)
 
     if (!validationPropValid || !removeValidFields) {

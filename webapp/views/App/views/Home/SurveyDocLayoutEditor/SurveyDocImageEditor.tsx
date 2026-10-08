@@ -104,7 +104,7 @@ const SurveyDocImageEditor = (props: Props) => {
     await onOkProp({ file, surveyDocImage: draftSurveyDocImage })
   }, [file, draftSurveyDocImage, onOkProp])
 
-  const documentPlaceItems = Object.values(SurveyDocPlace).map((value) => ({
+  const documentPlaceItems = Object.values(SurveyDocPlace).map((value: string) => ({
     key: value,
     label: i18n.t(`homeView:surveyInfo.surveyDocLayout.documentPlaceValues.${value}`),
   }))

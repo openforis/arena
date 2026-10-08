@@ -7,7 +7,7 @@ FROM node:24.11.1 AS test
 # Install git, netcat and PM2 (cross-env is a project dependency)
 RUN apt-get update; \
     apt-get install -y git netcat-openbsd; \
-    apt-get autoremove; apt-get autoclean; \
+    apt-get autoremove; apt-get clean; rm -rf /var/lib/apt/lists/*; \
     npm install -g --ignore-scripts pm2@7.0.4
 
 WORKDIR /app

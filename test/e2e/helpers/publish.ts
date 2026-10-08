@@ -50,7 +50,7 @@ export const publishSurveyWithErrors = async (page: Page, errors: string[]): Pro
   await expect(jobModal.locator('.app-job-monitor__job-errors').first()).toBeAttached({ timeout: 30_000 })
   // errors are listed (expanded) in the details of the failed inner job
   for (const error of errors) {
-    await expect(jobModal.getByText(error).filter({ visible: true }).first()).toBeVisible()
+    await expect(jobModal.getByText(error).filter({ visible: true }).first()).toBeVisible() // NOSONAR
   }
   await page.getByTestId(TestId.modal.modal).getByRole('button', { name: 'Close' }).click()
 }

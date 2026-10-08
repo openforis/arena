@@ -52,7 +52,7 @@ export const fetchUserQualifierFilters = async ({ user, survey }, client = db) =
 
     if (NodeDef.isCode(nodeDef)) {
       const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-      const item = await CategoryItemProviderDefault.getItemByCode(
+      const item = /* NOSONAR */ await CategoryItemProviderDefault.getItemByCode(
         { survey, categoryUuid, code: qualifierValue },
         client
       )

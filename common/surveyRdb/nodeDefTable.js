@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-import toSnakeCase from 'to-snake-case'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import ColumnNodeDef from '@common/model/db/tables/dataNodeDef/columnNodeDef'
@@ -41,14 +40,6 @@ export const getNodeDefsByColumnNames = ({ nodeDefs, includeExtendedCols }) =>
   getNodeDefsWithColumnNames({ nodeDefs, includeExtendedCols }).reduce(
     (_nodeDefs, { columnName, nodeDef }) => ({ ..._nodeDefs, [columnName]: nodeDef }),
     {}
-  )
-
-export const extractColumnName = (nodeDef, col) =>
-  A.replace(
-    // TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
-    `${toSnakeCase(NodeDef.getName(nodeDef))}_`,
-    '',
-    col
   )
 
 export const extractNodeDefNameFromViewName = A.pipe(

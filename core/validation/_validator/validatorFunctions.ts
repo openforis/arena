@@ -17,8 +17,19 @@ export type ValidatorFn = (propName: string, obj: unknown) => ValidatorResult | 
  */
 const validNameRegex = /^[a-z][a-z0-9_]{0,39}$/ // At most 40 characters long
 
-const validEmailRegex =
-  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+// Email local part and domain are validated separately to keep each regex simple
+const validEmailLocalPartRegex = /^([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*|".+")$/
+const validEmailDomainRegex = /^(\[\d{1,3}(\.\d{1,3}){3}]|([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/
+
+const isEmailFormatValid = (email: string): boolean => {
+  // the domain cannot contain '@', so the local part ends at the last one
+  const atIndex = email.lastIndexOf('@')
+  return (
+    atIndex >= 0 &&
+    validEmailLocalPartRegex.test(email.substring(0, atIndex)) &&
+    validEmailDomainRegex.test(email.substring(atIndex + 1))
+  )
+}
 
 export const getProp =
   (propName: string, defaultValue: unknown = null) =>
@@ -66,7 +77,7 @@ export const validateNumber =
   (propName, item) => {
     const value = getProp(propName)(item)
 
-    return value && isNaN(value as number) ? { key: errorKey, params: errorParams } : null
+    return value && Number.isNaN(Number(value)) ? { key: errorKey, params: errorParams } : null
   }
 
 export const validatePositiveNumber = (errorKey: string, errorParams: Record<string, unknown> = {}): ValidatorFn =>
@@ -87,7 +98,7 @@ export const validatePositiveOrZeroNumber =
   }
 
 export const isEmailValueValid = (email: unknown): boolean =>
-  Objects.isEmpty(email) || validEmailRegex.test(email as string)
+  Objects.isEmpty(email) || isEmailFormatValid(String(email as string))
 
 export const validateEmail =
   ({ errorKey = ValidatorErrorKeys.invalidEmail }: { errorKey?: string } = {}): ValidatorFn =>

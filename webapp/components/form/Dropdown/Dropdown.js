@@ -61,7 +61,7 @@ const Dropdown = (props) => {
     onBeforeChange = null,
     onChange: onChangeProp,
     placeholder = undefined,
-    readOnly = false, // TODO: investigate why there are both disabled and readOnly
+    readOnly = false, // unlike disabled, the dropdown is not greyed out but its menu cannot be opened
     renderOptionLabel = null,
     searchable = true,
     selection = undefined,

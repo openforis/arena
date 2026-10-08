@@ -104,7 +104,7 @@ describe('Calculated value test', () => {
     for (const testValue of testValues) {
       const [sourceValue, expectedValue] = testValue
 
-      global.applicableRecord = await updateNodeAndExpectDependentNodeValueToBe(
+      global.applicableRecord = /* NOSONAR */ await updateNodeAndExpectDependentNodeValueToBe(
         'cluster/num',
         sourceValue,
         'cluster/num_range',

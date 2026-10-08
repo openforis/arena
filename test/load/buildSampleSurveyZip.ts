@@ -18,9 +18,8 @@ const DEFAULT_OUTPUT_PATH = './sample-survey.zip'
  * not trace validation performed inside an imported function, so from this file's local view a
  * write using CLI-controlled data with no visible guard reads as unvalidated. This guard is what
  * that scan needs to see; it is not expected to ever actually trip in normal operation.
- * @returns Resolves once the file has been written.
  */
-export const main = async (): Promise<void> => {
+export const main = (): void => {
   const outputPath = resolveValidatedOutputPath(process.argv[2] || DEFAULT_OUTPUT_PATH)
   const allowedRoots = [process.cwd(), fs.realpathSync(os.tmpdir())].map((root) => path.resolve(root))
   if (!allowedRoots.some((root) => isWithinAllowedRoot(outputPath, root))) {
@@ -31,8 +30,10 @@ export const main = async (): Promise<void> => {
 }
 
 if (import.meta.main) {
-  main().catch((error) => {
+  try {
+    main()
+  } catch (error) {
     console.error('Failed to build sample survey zip:', error)
     process.exitCode = 1
-  })
+  }
 }

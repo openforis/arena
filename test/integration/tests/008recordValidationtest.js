@@ -31,7 +31,12 @@ const _deleteNode = async (parentNode, childNodeName, childNodePosition) => {
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
   const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
   const node = children[childNodePosition - 1]
-  global.applicableRecord = await RecordManager.deleteNode(getContextUser(), survey, record, Node.getUuid(node))
+  global.applicableRecord = await RecordManager.deleteNode({
+    user: getContextUser(),
+    survey,
+    record,
+    nodeUuid: Node.getUuid(node),
+  })
 }
 
 const _updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpected) => {

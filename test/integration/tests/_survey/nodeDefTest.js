@@ -31,7 +31,7 @@ export const createNodeDefsTest = async () => {
 
   for (const nodeType of Object.keys(NodeDef.nodeDefType)) {
     const nodeDefReq = createNodeDef(rootDef, nodeType, `node_def_${nodeType}`)
-    const nodeDefDb = await NodeDefRepository.insertNodeDef(surveyId, nodeDefReq)
+    const nodeDefDb = await NodeDefRepository.insertNodeDef(surveyId, nodeDefReq) // NOSONAR
 
     expect(nodeDefDb.id).toBeDefined()
     expect(nodeDefDb.type).toBe(nodeType)

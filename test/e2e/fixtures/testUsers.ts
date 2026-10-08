@@ -47,7 +47,7 @@ const insertTestUser = async ({ tx, user }: { tx: any; user: TestUser }): Promis
  * @param {TestUser} user - The user to insert.
  * @returns {Promise<void>} - Resolves when the user exists in the DB.
  */
-export const insertTestUserIfMissing = async (user: TestUser): Promise<void> =>
+export const insertTestUserIfMissing = (user: TestUser): Promise<void> =>
   DB.tx(async (tx) => {
     const { email } = user
     const userDb = await tx.oneOrNone(`SELECT uuid FROM "user" WHERE email = $1`, [email])

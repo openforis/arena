@@ -66,7 +66,7 @@ const getResolve = () => ({
   },
 })
 
-module.exports = (type) => ({
+const createWebpackConfig = (type) => ({
   entry: getEntry(type),
   target: 'node', // Ignore built-in modules like path, fs, etc.
   // Ignore all modules in node_modules folder, except the ESM-only ones: Jest can only require() ESM
@@ -86,3 +86,5 @@ module.exports = (type) => ({
   resolve: getResolve(),
   module: getModule(),
 })
+
+module.exports = createWebpackConfig

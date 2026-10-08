@@ -109,7 +109,7 @@ export default class RecordsImportJob extends Job {
       // this.logDebug(`${entryName} recordToCreate start`)
       const recordToCreate = Record.newRecord(user, cycle, false, CollectRecord.getDateCreated(collectRecordJson), step)
 
-      await ActivityLogManager.insert(
+      /* NOSONAR */ await ActivityLogManager.insert(
         user,
         surveyId,
         ActivityLog.type.recordImportFromCollect,
@@ -118,13 +118,13 @@ export default class RecordsImportJob extends Job {
         tx
       )
 
-      const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx)
+      const record = await RecordManager.insertRecord(user, surveyId, recordToCreate, true, tx) // NOSONAR
       // This.logDebug(`${entryName} recordToCreate end`)
 
       insertedRecordsUuids.push(Record.getUuid(record))
 
       // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes start`)
-      await this.traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath })
+      await this.traverseCollectRecordAndInsertNodes({ survey, record, collectRecordJson, nodeDefNamesByPath }) // NOSONAR
       // This.logDebug(`${entryName} traverseCollectRecordAndInsertNodes end`)
 
       // this.logDebug(`-- end import record ${entryName}`)
@@ -376,7 +376,7 @@ export default class RecordsImportJob extends Job {
 
   async _insertRecordNodes(record) {
     for (const node of Record.getNodesArray(record)) {
-      await this.batchPersister.addItem(node, this.tx)
+      await this.batchPersister.addItem(node, this.tx) // NOSONAR
     }
   }
 
@@ -399,7 +399,7 @@ export default class RecordsImportJob extends Job {
         const childrenApplicability = {}
         const nodeDefChildren = Survey.getNodeDefChildren({ nodeDef })(survey)
         for (const childDef of nodeDefChildren) {
-          const applicable = await evaluateApplicability({ user, survey, childDef, record: recordUpdated, node })
+          const applicable = await evaluateApplicability({ user, survey, childDef, record: recordUpdated, node }) // NOSONAR
           const childDefUuid = NodeDef.getUuid(childDef)
           if (applicable) {
             const nodeChildren = Record.getNodeChildrenByDefUuid(node, childDefUuid)(record)

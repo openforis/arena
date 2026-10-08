@@ -156,7 +156,7 @@ export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<
     const taxonValue = (code: string) => (code ? { taxonUuid: taxonUuidByCode[code] } : null)
 
     for (const record of records) {
-      await RB.record(
+      /* NOSONAR */ await RB.record(
         user,
         survey,
         RB.entity(

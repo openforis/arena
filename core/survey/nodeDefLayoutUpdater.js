@@ -145,7 +145,6 @@ const _addLayoutForCycle = ({ nodeDef, cycle, cyclePrev = null }) =>
     }
     // previous cycle does not exist: set the default layout
     const layoutUpdated = A.mergeLeft(
-      // TODO use NodeDefLayout default props layout
       NodeDef.isEntity(nodeDef)
         ? NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.form, uuidv4())
         : NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.checkbox)

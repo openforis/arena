@@ -7,6 +7,8 @@ export { toSnakeCase }
 export const NEW_LINE = '\r\n'
 const NEW_LINE_REG_EX = /\r\n|\r|\n/g
 
+type Stringifiable = string | number | boolean | bigint | null | undefined
+
 export const nbsp = '\u00A0'
 
 export const isString = A.is(String)
@@ -17,7 +19,7 @@ export const leftTrim = A.replace(/^\s+/, '')
 
 export const padStart =
   (length: number, padString: string) =>
-  (s: unknown): string =>
+  (s: string | number): string =>
     String(s).padStart(length, padString)
 
 const toLower = A.pipe(trim, A.toLower)
@@ -63,7 +65,8 @@ export const removeNewLines = (value: unknown): unknown => {
 /**
  * Convert null or undefined to empty string.
  */
-export const nullToEmpty = (value: unknown): string => (value === null || value === undefined ? '' : String(value))
+export const nullToEmpty = (value: Stringifiable): string =>
+  value === null || value === undefined ? '' : String(value)
 
 /**
  * Append suffix if not already present.
@@ -86,7 +89,7 @@ export const prependIfMissing =
  */
 export const removePrefix =
   (prefix: string) =>
-  (text: unknown): string => {
+  (text: Stringifiable): string => {
     if (isBlank(text)) return String(text)
     const txt = String(text)
     return txt.startsWith(prefix) ? txt.substring(prefix.length) : txt
@@ -97,7 +100,7 @@ export const removePrefix =
  */
 export const removeSuffix =
   (suffix: string) =>
-  (text: unknown): string => {
+  (text: Stringifiable): string => {
     if (isBlank(text)) return String(text)
     const txt = String(text)
     return txt.endsWith(suffix) ? txt.substring(0, txt.length - suffix.length) : txt
@@ -132,7 +135,7 @@ export const hashCode = (str: unknown): string => {
     return String(hash)
   }
   for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i)
+    const char = str.codePointAt(i) ?? 0
     hash = (hash << 5) - hash + char
     hash = hash & hash // convert to 32bit integer
   }

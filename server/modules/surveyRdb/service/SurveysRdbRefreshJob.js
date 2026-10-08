@@ -18,7 +18,7 @@ export default class SurveysRdbRefreshJob extends Job {
       try {
         this.logDebug(`refreshing RDB for survey ${surveyId}`)
         const innerJob = new SurveyRdbCreationJob({ surveyId })
-        await innerJob.start()
+        await innerJob.start() // NOSONAR
 
         if (innerJob.isSucceeded()) {
           this.logDebug(`RDB for survey ${surveyId} refreshed successfully`)

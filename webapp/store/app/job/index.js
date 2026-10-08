@@ -1,6 +1,4 @@
-import * as JobActions from './actions'
-import * as JobState from './state'
-import JobReducer from './reducer'
+export * as JobActions from './actions'
+export * as JobState from './state'
+export { default as JobReducer } from './reducer'
 export { useJob } from './hooks'
-
-export { JobActions, JobState, JobReducer }

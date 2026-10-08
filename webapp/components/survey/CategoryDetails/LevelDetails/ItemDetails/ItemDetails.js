@@ -106,24 +106,6 @@ const ItemDetails = (props) => {
     }
   }, [active, categoryUuid, itemUuid, levelIndex, resetItemActive, setItemActive])
 
-  const onHeaderKeyDown = useCallback(
-    (event) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault()
-        toggleActive()
-      }
-    },
-    [toggleActive]
-  )
-
-  const onToggleBtnClick = useCallback(
-    (event) => {
-      event.stopPropagation()
-      toggleActive()
-    },
-    [toggleActive]
-  )
-
   // collapse the item when clicking outside of it, unless nested levels are showing its descendants
   useEffect(() => {
     if (!active) return undefined
@@ -151,12 +133,12 @@ const ItemDetails = (props) => {
       key={CategoryItem.getUuid(item)}
       ref={elemRef}
     >
-      <div
+      <button
+        type="button"
+        id={`${prefixId}-btn-toggle`}
         className="category__item-header"
+        data-testid={active ? TestId.categoryDetails.itemCloseBtn(levelIndex, index) : undefined}
         onClick={toggleActive}
-        onKeyDown={onHeaderKeyDown}
-        role="button"
-        tabIndex={0}
         aria-expanded={active}
       >
         {!valid && (
@@ -176,17 +158,10 @@ const ItemDetails = (props) => {
         <div className="category__item-index">#{index + 1}</div>
         <div className={classNames('ellipsis', 'category__item-code', { empty: !code })}>{code || '---'}</div>
         <div className={classNames('ellipsis', 'category__item-label', { empty: !label })}>{label || '---'}</div>
-        <Button
-          id={`${prefixId}-btn-toggle`}
-          testId={active ? TestId.categoryDetails.itemCloseBtn(levelIndex, index) : null}
-          className="category__item-toggle-btn"
-          icon={<ExpandMore className="category__item-toggle-icon" />}
-          onClick={onToggleBtnClick}
-          size="small"
-          tabIndex={-1}
-          variant="text"
-        />
-      </div>
+        <span className="category__item-toggle-btn">
+          <ExpandMore className="category__item-toggle-icon" />
+        </span>
+      </button>
 
       {active && (
         <div className="category__item-body">

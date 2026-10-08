@@ -29,6 +29,10 @@
   position: fixed;
   top: 50%;
   right: 1rem;
+  // override the default (centered) placement of the dialog element
+  left: auto;
+  margin: 0;
+  color: inherit;
   transform: translateY(-50%);
   width: 28rem;
   max-width: calc(100vw - 2rem);

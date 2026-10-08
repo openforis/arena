@@ -1,6 +1,6 @@
 import fs, { promises as fsp } from 'node:fs'
 import { ncp } from 'ncp'
-import { join, sep } from 'node:path'
+import { join } from 'node:path'
 
 import * as ProcessUtils from '@core/processUtils'
 import { isUuid, uuidv4 } from '@core/uuid'
@@ -36,7 +36,7 @@ export const canReadWritePath = (path) => {
 
 export const copyDir = ({ source, destination }) => ncp(source, destination)
 
-export { join, sep }
+export { join, sep } from 'node:path'
 
 // ====== FILE
 

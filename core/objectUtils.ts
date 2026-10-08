@@ -182,7 +182,7 @@ export const groupByProps =
 
 export const groupByProp = groupByProps
 
-export const clone = (obj: any): any => (A.isNil(obj) ? obj : JSON.parse(JSON.stringify(obj)))
+export const clone = (obj: any): any => (A.isNil(obj) ? obj : structuredClone(obj))
 
 export const getPropsAndPropsDraft =
   ({ backup = false } = {}): ((obj: Record<string, unknown>) => Record<string, unknown>) =>

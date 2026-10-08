@@ -23,7 +23,7 @@ export default class TaxonomiesImportJob extends Job {
 
     for (const taxonomy of taxonomies) {
       if (!this.isCanceled()) {
-        await this._insertTaxonomy({ taxonomy })
+        await this._insertTaxonomy({ taxonomy }) // NOSONAR
         this.incrementProcessedItems()
       }
     }
@@ -46,8 +46,8 @@ export default class TaxonomiesImportJob extends Job {
       const partsCount = ArenaSurveyFileZip.getTaxaPartsCount({ zipFile, taxonomyUuid })
       let partIndex = 0
       while (partIndex < partsCount) {
-        taxa = await ArenaSurveyFileZip.getTaxaPart({ zipFile, taxonomyUuid, index: partIndex })
-        await this.insertTaxa({ taxa })
+        taxa = await ArenaSurveyFileZip.getTaxaPart({ zipFile, taxonomyUuid, index: partIndex }) // NOSONAR
+        await this.insertTaxa({ taxa }) // NOSONAR
         partIndex = partIndex + 1
       }
     }

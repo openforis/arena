@@ -60,9 +60,9 @@ const _populateRefDataForBigNodes = async ({ survey, nodes, categoryItemProvider
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const value = Node.getValue(node)
     if (NodeDef.isCode(nodeDef)) {
-      await _populateRefDataForCodeNode({ survey, node, nodeDef, value, categoryItemProvider })
+      await _populateRefDataForCodeNode({ survey, node, nodeDef, value, categoryItemProvider }) // NOSONAR
     } else if (NodeDef.isTaxon(nodeDef)) {
-      await _populateRefDataForTaxonNode({ survey, node, nodeDef, value, taxonProvider })
+      await _populateRefDataForTaxonNode({ survey, node, nodeDef, value, taxonProvider }) // NOSONAR
     }
   }
 }

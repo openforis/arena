@@ -66,10 +66,10 @@ export const CollectDataImportView = () => {
   )
 
   const onFilesDrop = async (files) => {
-    const _file = files.filter((file) => {
+    const _file = files.find((file) => {
       const extension = FileUtils.getExtension(file)
       return acceptedFileExtensions.includes(extension)
-    })[0]
+    })
     setFile(_file)
   }
 

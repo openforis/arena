@@ -1,6 +1,4 @@
-import * as SystemErrorActions from './actions'
-import * as SystemErrorState from './state'
-import SystemErrorReducer from './reducer'
+export * as SystemErrorActions from './actions'
+export * as SystemErrorState from './state'
+export { default as SystemErrorReducer } from './reducer'
 export { useSystemError } from './hooks'
-
-export { SystemErrorActions, SystemErrorState, SystemErrorReducer }

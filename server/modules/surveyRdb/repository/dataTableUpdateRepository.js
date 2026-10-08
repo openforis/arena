@@ -157,7 +157,7 @@ export const updateTablesFromUpdates = async ({ rdbUpdates }, client) => {
   // run the updates one at a time, in the order they have been generated (e.g. a row can be updated right after
   // being inserted); they share the same client (usually a transaction), where queries cannot run concurrently
   for (const update of rdbUpdates.getAll()) {
-    await queryByType[update.type](update, client)
+    await queryByType[update.type](update, client) // NOSONAR
   }
 }
 
