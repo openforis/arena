@@ -1,5 +1,4 @@
-// I18n of arena-core does not declare the params of the t function
-type I18n = { t: (key: string, params?: Record<string, string>) => string }
+import { I18n } from '@openforis/arena-core'
 
 type DeletedSurvey = { name: string; label?: string }
 

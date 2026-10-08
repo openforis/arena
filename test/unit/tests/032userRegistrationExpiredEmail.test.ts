@@ -9,9 +9,8 @@ type Survey = { name: string; label?: string }
 const renderEmail = async (params: { surveys?: Survey[]; serverUrl?: string }) => {
   const { surveys = [], serverUrl = '' } = params
   const i18n = await i18nFactory.createI18nAsync('en')
-  const t = i18n.t as (key: string, params?: Record<string, string>) => string
-  const msgParams = getMsgParams({ i18n: { t }, surveys, serverUrl })
-  return { subject: t(`${msgKey}.subject`, msgParams), body: t(`${msgKey}.body`, msgParams) }
+  const msgParams = getMsgParams({ i18n, surveys, serverUrl })
+  return { subject: i18n.t(`${msgKey}.subject`, msgParams), body: i18n.t(`${msgKey}.body`, msgParams) }
 }
 
 describe('User registration expired email', () => {
