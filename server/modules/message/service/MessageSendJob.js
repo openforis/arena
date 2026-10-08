@@ -59,7 +59,7 @@ export default class MessageSendJob extends Job {
       const messageWithReplacedVariables = Messages.replaceBodyTemplateVariables({ i18n, user })(messageWithBodyHtml)
       const bodyHtmlWithReplacedVariables = Messages.getBody(messageWithReplacedVariables)
       const to = User.getEmail(user)
-      await Mailer.sendCustomEmail({ to, subject, html: bodyHtmlWithReplacedVariables, log: false })
+      await Mailer.sendCustomEmail({ to, subject, html: bodyHtmlWithReplacedVariables, log: false }) // NOSONAR
       this.incrementProcessedItems()
     }
 

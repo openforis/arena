@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import { Button } from '../buttons/Button'
 
 const checkFilesSize = (files, maxSizeMB) =>
-  Array.from(files).find((file) => file.size > maxSizeMB * 1024 * 1024)
+  Array.from(files).some((file) => file.size > maxSizeMB * 1024 * 1024)
     ? alert(`File exceeds maximum size (${maxSizeMB}MB)`)
     : true
 

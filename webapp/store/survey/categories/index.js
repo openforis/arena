@@ -1,4 +1,2 @@
-import * as CategoriesState from './state'
-import CategoriesReducer from './reducer'
-
-export { CategoriesState, CategoriesReducer }
+export * as CategoriesState from './state'
+export { default as CategoriesReducer } from './reducer'

@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { DateFormats, Dates } from '@openforis/arena-core'
+import { DateFormats, Dates, I18n } from '@openforis/arena-core'
 
 const {
   add,
@@ -46,10 +46,7 @@ export const format = (date: unknown, format: string = formats.dateDefault): str
 /**
  * Get a relative date string (e.g., "2 weeks ago").
  */
-export const getRelativeDate = (
-  i18n: { t: (key: string, params?: Record<string, unknown>) => string },
-  date: unknown
-): string | null => {
+export const getRelativeDate = (i18n: Pick<I18n, 't'>, date: unknown): string | null => {
   if (A.isNil(date)) {
     return null
   }

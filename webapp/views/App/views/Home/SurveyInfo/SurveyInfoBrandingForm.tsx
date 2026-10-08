@@ -91,7 +91,6 @@ const isAcceptedBackgroundFile = (file: File): boolean =>
   isAcceptedFile(file, ACCEPTED_BACKGROUND_TYPES, ACCEPTED_BACKGROUND_EXTENSIONS)
 
 type BrandingImageSectionProps = {
-  imageKey: BrandingImageKey
   labelKey: string
   image?: BrandingImageDescriptor
   localObjectUrl?: string | null
@@ -504,7 +503,6 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
           return (
             <BrandingImageSection
               key={imageKey}
-              imageKey={imageKey}
               labelKey={labelKey}
               image={logo}
               localObjectUrl={localObjectUrls[imageKey] ?? null}
@@ -521,7 +519,6 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
       </div>
 
       <BrandingImageSection
-        imageKey={brandingKeys.landingBackground}
         labelKey="homeView:surveyInfo.branding.landingBackground"
         image={landingBackground}
         localObjectUrl={localObjectUrls[brandingKeys.landingBackground] ?? null}

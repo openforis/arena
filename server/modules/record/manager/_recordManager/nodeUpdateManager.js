@@ -16,6 +16,7 @@ import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProv
 import * as NodeRepository from '../../repository/nodeRepository'
 import * as FileRepository from '../../repository/fileRepository'
 import * as RecordFileManager from '../recordFileManager'
+import { findFilesToRemove, removeFiles } from './nodeFilesRemover'
 import * as DbUtils from '@server/db/dbUtils'
 
 const logger = Log.getLogger('NodeUpdateManager')
@@ -52,7 +53,6 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
 }
 
 const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
-  // TODO check if it should be removed
   const surveyId = Survey.getId(survey)
 
   let updatedNodes = nodeDependents || {}
@@ -183,7 +183,7 @@ const _groupNodesByFlags = (nodesArray) =>
     { nodesInserted: [], nodesUpdated: [], nodesDeleted: [] }
   )
 
-const _persistNodes = async ({ survey, nodesArray, isPreview = false }, tx) => {
+const _persistNodes = async ({ survey, record, nodesArray, isPreview = false }, tx) => {
   const surveyId = Survey.getId(survey)
   const { nodesInserted, nodesUpdated, nodesDeleted } = _groupNodesByFlags(nodesArray)
 
@@ -193,22 +193,28 @@ const _persistNodes = async ({ survey, nodesArray, isPreview = false }, tx) => {
   if (nodesUpdated.length) {
     await NodeRepository.updateNodes({ surveyId, nodes: nodesUpdated }, tx)
   }
+  // dependency/applicability-driven updates and deletions (e.g. attributes cleared because not applicable):
+  // nodesArray already includes every individual descendant node explicitly (Record.updateNodesDependents
+  // flattens the whole subtree), so no separate subtree lookup is needed - use the nodes we already have in memory
+  const files = findFilesToRemove({ survey, record, nodes: nodesArray })
   if (nodesDeleted.length) {
-    if (isPreview) {
-      // dependency/applicability-driven deletion: nodesDeleted already includes every individual
-      // descendant node explicitly (Record.updateNodesDependents flattens the whole subtree), so
-      // no separate subtree lookup is needed - just filter the nodes we already have in memory.
-      const files = nodesDeleted.filter((node) => _isFileValueNode(survey, node)).map(_toFileDeleteParams)
-      if (files.length > 0) {
-        await RecordFileManager.deleteFiles({ surveyId, files }, tx)
-      }
-    }
     await NodeRepository.deleteNodesByUuids(surveyId, nodesDeleted.map(Node.getUuid), tx)
   }
+  await removeFiles({ surveyId, files, isPreview }, tx)
 }
 
 export const updateNodesDependents = async (
-  { user, survey, record, nodes, timezoneOffset, lang, persistNodes = true, sideEffect = false },
+  {
+    user,
+    survey,
+    record,
+    nodes,
+    timezoneOffset,
+    lang,
+    persistNodes = true,
+    sideEffect = false,
+    clearNonApplicableValues = false,
+  },
   tx
 ) => {
   const { record: recordUpdatedDependents, nodes: allNodesUpdated } = await Record.updateNodesDependents({
@@ -224,6 +230,7 @@ export const updateNodesDependents = async (
     lang: lang ?? Survey.getDefaultLanguage(survey),
     logger,
     sideEffect,
+    clearNonApplicableValues,
   })
 
   let recordUpdated = recordUpdatedDependents
@@ -233,7 +240,7 @@ export const updateNodesDependents = async (
     const nodesArray = Object.values(allNodesUpdated)
     const surveyId = Survey.getId(survey)
 
-    await _persistNodes({ survey, nodesArray, isPreview: Record.isPreview(record) }, tx)
+    await _persistNodes({ survey, record, nodesArray, isPreview: Record.isPreview(record) }, tx)
 
     // reload nodes to get nodes ref data
     const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: allNodesUpdated }, tx)

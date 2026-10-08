@@ -4,7 +4,7 @@ import { useActions } from './actions'
 import { State } from './state'
 
 export const useLocalState = (props) => {
-  const { selectedItemUuid, row: taxonomy, canDelete, onTaxonomySelect, canSelect, initData, onTaxonomyOpen } = props
+  const { selectedItemUuid, item: taxonomy, canDelete, onTaxonomySelect, canSelect, initData, onTaxonomyOpen } = props
 
   const [state, setState] = useState(() =>
     State.create({ taxonomy, canDelete, selectedItemUuid, onTaxonomySelect, canSelect, initData, onTaxonomyOpen })

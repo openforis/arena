@@ -32,7 +32,7 @@ const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
 
     // insert node defs in order to avoid foreign keys violations
     for (const child of children) {
-      await _insertNodeDefRecursively(surveyId, survey, t)(child)
+      await _insertNodeDefRecursively(surveyId, survey, t)(child) // NOSONAR
     }
   }
 }
@@ -48,6 +48,7 @@ class SurveyBuilder {
     this.categoryBuilders = []
     this.taxonomyBuilders = []
     this.isTemplate = false
+    this.extraProps = {}
   }
 
   categories(...categoryBuilders) {
@@ -65,6 +66,12 @@ class SurveyBuilder {
     return this
   }
 
+  // additional survey info props (e.g. survey settings)
+  props(props) {
+    this.extraProps = props
+    return this
+  }
+
   async build() {
     let survey = Survey.newSurvey({
       ownerUuid: User.getUuid(this.user),
@@ -72,6 +79,7 @@ class SurveyBuilder {
       label: this.label,
       languages: [this.lang],
       template: this.isTemplate,
+      ...this.extraProps,
     })
 
     // categories
@@ -128,10 +136,10 @@ class SurveyBuilder {
 
         // Categories and taxonomies (one at a time: queries cannot run concurrently on the same transaction)
         for (const categoryBuilder of this.categoryBuilders) {
-          await categoryBuilder.buildAndStore(this.user, surveyId, t)
+          await categoryBuilder.buildAndStore(this.user, surveyId, t) // NOSONAR
         }
         for (const taxonomyBuilder of this.taxonomyBuilders) {
-          await taxonomyBuilder.buildAndStore(this.user, surveyId, t)
+          await taxonomyBuilder.buildAndStore(this.user, surveyId, t) // NOSONAR
         }
       })
 

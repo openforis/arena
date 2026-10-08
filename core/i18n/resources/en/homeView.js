@@ -119,6 +119,9 @@ export default {
     confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
     cycleForArenaMobile: 'Cycle for Arena Mobile',
+    keepNonApplicableValues: 'Keep values of non-relevant attributes',
+    keepNonApplicableValuesInfo: `When unchecked (default), during data entry the values of attributes that are no longer relevant are cleared (after the user confirms it).
+When checked, those values are kept in the record, even if the attributes are not relevant anymore.`,
     deleteActivityLog: 'Clear activity log',
     deleteActivityLogConfirm: {
       headerText: 'Clear ALL the activity log data for this survey?',

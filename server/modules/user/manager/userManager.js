@@ -51,7 +51,7 @@ export const {
   deleteUserResetPasswordExpired,
 } = UserResetPasswordRepository
 
-export const { fetchSurveyIdsOfExpiredInvitationUsers } = AuthGroupRepository
+export const { fetchSurveyIdsOfExpiredInvitationUsers, fetchSurveysOfExpiredInvitationUsers } = AuthGroupRepository
 
 // ==== CREATE
 const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo = null }, client = db) => {
@@ -82,14 +82,14 @@ export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, cli
     const groupsToAdd = await _determineGroupsToAddTo({ user, userToAdd, group, surveyInfo }, t)
     for (const groupToAdd of groupsToAdd) {
       const groupUuid = AuthGroup.getUuid(groupToAdd)
-      await AuthGroupRepository.insertUserGroup({ groupUuid, userUuid }, t)
+      await AuthGroupRepository.insertUserGroup({ groupUuid, userUuid }, t) // NOSONAR
 
       if (AuthGroup.isSurveyGroup(groupToAdd)) {
         const logContent = {
           [ActivityLog.keysContent.uuid]: userUuid,
           [ActivityLog.keysContent.groupUuid]: groupUuid,
         }
-        await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userInvite, logContent, false, t)
+        await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userInvite, logContent, false, t) // NOSONAR
       }
     }
   })

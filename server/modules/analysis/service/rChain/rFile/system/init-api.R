@@ -43,13 +43,18 @@ arena.parseResponse = function(resp) {
   return(respJson)
 }
 
+# auth tokens are stored in the global environment, where the chain scripts are sourced
+arena.setAuthTokens = function(authToken, authRefreshToken) {
+  assign(".arena.authToken", authToken, envir = .GlobalEnv)
+  assign(".arena.authRefreshToken", authRefreshToken, envir = .GlobalEnv)
+}
+
 arena.refreshAuthTokens = function() {
   resp <- httr::POST(paste0(arena.host, "auth/token/refresh"), config = set_cookies(refreshToken = .arena.authRefreshToken))
   if (resp$status == 200) {
     respParsed <- arena.parseResponse(resp)
 
-    .arena.authToken <<- respParsed$authToken
-    .arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')  
+    arena.setAuthTokens(respParsed$authToken, arena.getCookie(resp, 'refreshToken'))
     return(TRUE)
   }
   return(FALSE)
@@ -69,7 +74,7 @@ arena.handleUnauthorizedAndRetry = function(requestFn) {
     }
   }
 
-  print('*** Session expired or unauthorized request, login required')
+  message('*** Session expired or unauthorized request, login required')
   if (!arena.login()) {
     return(resp)
   }
@@ -87,7 +92,7 @@ arena.get = function(url, query = NULL) {
   return(arena.parseResponse(resp))
 }
 
-arena._getToFileInternal = function (url, query = NULL, file) {
+arena._getToFileInternal = function (url, file, query = NULL) {
   resp <- httr::GET(
     url = arena.getApiUrl(url), 
     query = arena.prepareQueryParams(query), 
@@ -97,14 +102,14 @@ arena._getToFileInternal = function (url, query = NULL, file) {
   return(resp)
  }
 
-arena.getToFile = function (url, query = NULL, file) {
-  resp <- arena.handleUnauthorizedAndRetry(function() arena._getToFileInternal(url, query, file))
+arena.getToFile = function (url, file, query = NULL) {
+  resp <- arena.handleUnauthorizedAndRetry(function() arena._getToFileInternal(url, file, query))
   return(resp)
 }
 
 arena.getCSV = function (url, query = NULL) {
   tmpFile <- tempfile()
-  arena.getToFile(url, query, file = tmpFile)
+  arena.getToFile(url, file = tmpFile, query = query)
   if (file.info(tmpFile)$size > 0) {
     content <- suppressWarnings(read.csv(tmpFile))
   } else {
@@ -136,7 +141,7 @@ arena.put = function(url, body) {
 
 arena.putFile = function(url, filePath) {
   return(
-    arena.put(url, body = list('file' = httr::upload_file(filePath)))
+    arena.put(url, body = list(file = httr::upload_file(filePath)))
   )
 }
 
@@ -150,112 +155,112 @@ arena.delete = function(url, body) {
   return(arena.parseResponse(resp))
 }
 
-arena.login = function(tentative) {
-  if (missing(tentative)) {
-    tentative <- 1
-  }
-  if (tentative > 1) {
-    enterEmailMessage <- "Invalid email or password specified, try again!\r\nUsername (email):"
+arena.promptLoginCredentials = function(tentative) {
+  enterEmailMessage <- if (tentative > 1) {
+    "Invalid email or password specified, try again!\r\nUsername (email):"
   } else {
-    enterEmailMessage <- "Username (email):"
+    "Username (email):"
   }
   username <- rstudioapi::showPrompt(title = "Enter your username (email)", message = enterEmailMessage)
-  
-  if (is.null(username)) return(FALSE)
-  
-  username <- trimws(tolower(username))
-  
+  if (is.null(username)) return(NULL)
+
   password <- rstudioapi::askForPassword(prompt = "Enter your password:")
-  if (is.null(password)) return(FALSE)
-  
-  password <- trimws(password)
+  if (is.null(password)) return(NULL)
 
-  loginRequest <- function(twoFactorToken = NULL) {
-    body <- list(email = username, password = password)
-    if (!is.null(twoFactorToken) && nchar(twoFactorToken) > 0) {
-      body$twoFactorToken <- twoFactorToken
-    }
-    httr::POST(paste0(arena.host, 'auth/login'), body = body)
+  return(list(username = trimws(tolower(username)), password = trimws(password)))
+}
+
+arena.sendLoginRequest = function(credentials, twoFactorToken = NULL) {
+  body <- list(email = credentials$username, password = credentials$password)
+  if (!is.null(twoFactorToken) && nchar(twoFactorToken) > 0) {
+    body$twoFactorToken <- twoFactorToken
   }
+  httr::POST(paste0(arena.host, 'auth/login'), body = body)
+}
 
-  promptTwoFactorToken <- function(twoFactorTentative = 1) {
-    if (twoFactorTentative > 1) {
-      message <- "Invalid verification code specified, try again!"
-    } else {
-      message <- "Enter your verification code:"
-    }
-    token <- rstudioapi::askForPassword(prompt = message)
-    if (is.null(token)) {
+arena.getLoginResponseJson = function(resp) {
+  respText <- httr::content(resp, as = "text")
+  return(tryCatch(jsonlite::fromJSON(respText), error = function(e) list()))
+}
+
+arena.isTwoFactorRequired = function(resp) {
+  return(isTRUE(arena.getLoginResponseJson(resp)$twoFactorRequired))
+}
+
+arena.promptTwoFactorToken = function(twoFactorTentative = 1) {
+  if (twoFactorTentative > 1) {
+    message <- "Invalid verification code specified, try again!"
+  } else {
+    message <- "Enter your verification code:"
+  }
+  token <- rstudioapi::askForPassword(prompt = message)
+  if (is.null(token)) {
+    return(NULL)
+  }
+  trimws(token)
+}
+
+# returns the login response, or NULL if the verification is canceled or fails 3 times
+arena.loginWithTwoFactorToken = function(credentials) {
+  for (twoFactorTentative in 1:3) {
+    twoFactorToken <- arena.promptTwoFactorToken(twoFactorTentative)
+    if (is.null(twoFactorToken) || nchar(twoFactorToken) == 0) {
       return(NULL)
     }
-    trimws(token)
-  }
-
-  getLoginResponseJson <- function(resp) {
-    respText <- httr::content(resp, as = "text")
-    return(tryCatch(jsonlite::fromJSON(respText), error = function(e) list()))
-  }
-  
-  resp <- loginRequest()
-  respJson <- getLoginResponseJson(resp)
-
-  if (isTRUE(respJson$twoFactorRequired)) {
-    twoFactorTentative <- 1
-    repeat {
-      twoFactorToken <- promptTwoFactorToken(twoFactorTentative)
-      if (is.null(twoFactorToken) || nchar(twoFactorToken) == 0) {
-        return(FALSE)
-      }
-
-      resp <- loginRequest(twoFactorToken)
-      respJson <- getLoginResponseJson(resp)
-      if (!isTRUE(respJson$twoFactorRequired)) {
-        break
-      }
-
-      if (twoFactorTentative >= 3) {
-        print('*** Login failed: invalid verification code')
-        return(FALSE)
-      }
-      twoFactorTentative <- twoFactorTentative + 1
+    resp <- arena.sendLoginRequest(credentials, twoFactorToken)
+    if (!arena.isTwoFactorRequired(resp)) {
+      return(resp)
     }
+  }
+  message('*** Login failed: invalid verification code')
+  return(NULL)
+}
+
+arena.isLoginSucceeded = function(respParsed) {
+  hasAuthToken <- !is.null(respParsed$authToken) && nchar(respParsed$authToken) > 0
+  return(hasAuthToken || !is.null(respParsed$user))
+}
+
+arena.isInvalidCredentialsResponse = function(respParsed) {
+  invalidCredentialsMessages <- c('validationErrors:user.userNotFound', 'validationErrors:user.emailInvalid', 'Missing credentials')
+  return("message" %in% names(respParsed) && isTRUE(respParsed$message %in% invalidCredentialsMessages))
+}
+
+arena.onLoginFailed = function(respParsed, tentative) {
+  if (arena.isInvalidCredentialsResponse(respParsed)) {
+    if (tentative < 3) {
+      message('*** Invalid email or password specified, try again')
+      return(arena.login(tentative + 1))
+    }
+    message(paste("*** Login failed:", respParsed$message, sep = ' '))
+    return(FALSE)
+  }
+  failureMessage <- if ("message" %in% names(respParsed) && !is.na(respParsed$message)) {
+    respParsed$message
+  } else {
+    'Login failed'
+  }
+  message(paste("***", failureMessage))
+  return(FALSE)
+}
+
+arena.login = function(tentative = 1) {
+  credentials <- arena.promptLoginCredentials(tentative)
+  if (is.null(credentials)) return(FALSE)
+
+  resp <- arena.sendLoginRequest(credentials)
+  if (arena.isTwoFactorRequired(resp)) {
+    resp <- arena.loginWithTwoFactorToken(credentials)
+    if (is.null(resp)) return(FALSE)
   }
 
   respParsed <- arena.parseResponse(resp)
-  loginSucceeded <- !is.null(respParsed$authToken) && nchar(respParsed$authToken) > 0
-  if (!loginSucceeded && !is.null(respParsed$user)) {
-    loginSucceeded <- TRUE
+  if (!arena.isLoginSucceeded(respParsed)) {
+    return(arena.onLoginFailed(respParsed, tentative))
   }
-
-  if (loginSucceeded) {
-    .arena.authToken <<- respParsed$authToken
-    .arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')
-    print(paste('*** User', username, 'successfully logged in', sep = ' '))
-    return(TRUE)
-  }
-
-  if ("message" %in% names(respParsed) && (
-    (respParsed$message == 'validationErrors:user.userNotFound') || 
-    (respParsed$message == 'validationErrors:user.emailInvalid') || 
-    (respParsed$message == 'Missing credentials')
-  )) 
-  {
-    if (tentative < 3) {
-      print('*** Invalid email or password specified, try again')
-      return(arena.login(tentative + 1))
-    } else if (tentative >= 3) {
-      print(paste("*** Login failed:", respParsed$message, sep = ' '))
-      return(FALSE)
-    }
-  } else {
-    failureMessage <- if ("message" %in% names(respParsed) && !is.na(respParsed$message)) {
-      respParsed$message
-    } else {
-      'Login failed'
-    }
-    print(paste("***", failureMessage))
-    return(FALSE)
-  }
+  arena.setAuthTokens(respParsed$authToken, arena.getCookie(resp, 'refreshToken'))
+  message(paste('*** User', credentials$username, 'successfully logged in', sep = ' '))
+  return(TRUE)
 }
 
 arena.waitForJobToComplete = function(job) {

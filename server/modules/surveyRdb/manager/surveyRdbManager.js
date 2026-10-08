@@ -348,7 +348,7 @@ const checkCanExportEntitiesData = async ({ fileFormat, nodeDefs, fetchParamsByN
   if (fileFormat === FileFormats.xlsx) {
     for (const nodeDefContext of nodeDefs) {
       const fetchViewDataParams = fetchParamsByNodeDefUuid[NodeDef.getUuid(nodeDefContext)]
-      const { selectFields, count } = await DataViewRepository.countViewData(fetchViewDataParams, client)
+      const { selectFields, count } = await DataViewRepository.countViewData(fetchViewDataParams, client) // NOSONAR
       const estimatedCellsCount = selectFields.length * count
       if (estimatedCellsCount > StreamUtils.defaultMaxCellsLimit) {
         throw new SystemError(`dataExport.excelMaxCellsLimitExceeded`, {
@@ -418,7 +418,7 @@ export const fetchEntitiesDataToCsvFiles = async (
   for (const nodeDefContext of nodeDefs) {
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
     const fetchViewDataParams = fetchParamsByNodeDefUuid[NodeDef.getUuid(nodeDefContext)]
-    await fetchViewData(fetchViewDataParams, client)
+    await fetchViewData(fetchViewDataParams, client) // NOSONAR
     idx++
   }
   return { fileNamesByFileUuid: uniqueFileNamesGenerator.fileNamesByKey }
@@ -453,7 +453,7 @@ export const fetchEntitiesFileUuidsByCycle = async (
       filterRecordUuids,
     })
 
-    const entityData = await fetchViewData({ survey, cycle, recordOwnerUuid, query, addCycle: true }, client)
+    const entityData = await fetchViewData({ survey, cycle, recordOwnerUuid, query, addCycle: true }, client) // NOSONAR
     const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDefContext)
 
     for (const entityRow of entityData) {

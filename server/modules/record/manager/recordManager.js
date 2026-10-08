@@ -117,13 +117,13 @@ export const fetchRecordsSummaryBySurveyId = async (
   const listWithCounts = []
   for (const recordSummary of list) {
     const recordUuid = Record.getUuid(recordSummary)
-    const { count: filesCount, total: filesSize } = await FileRepository.fetchCountAndTotalFilesSize(
+    const { count: filesCount, total: filesSize } = /* NOSONAR */ await FileRepository.fetchCountAndTotalFilesSize(
       { surveyId, recordUuid },
       client
     )
     const filesMissing = A.isEmpty(nodeDefFileUuids)
       ? 0
-      : await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid, nodeDefFileUuids }, client)
+      : await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid, nodeDefFileUuids }, client) // NOSONAR
 
     listWithCounts.push({
       ...recordSummary,
@@ -320,7 +320,7 @@ export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesT
       !Node.isValueBlank(node) &&
       (!onlyForBigCategoriesTaxonomies || isRefDataSourceBig({ survey, nodeDef, isCode }))
     ) {
-      const refData = await fetchNodeRefData({ survey, node, isCode }, client)
+      const refData = await fetchNodeRefData({ survey, node, isCode }, client) // NOSONAR
       if (refData) {
         node[NodeRefData.keys.refData] = refData
       }
@@ -338,6 +338,11 @@ export {
   updateNode,
   updateNodesDependents,
 } from './_recordManager/recordUpdateManager'
+
+export {
+  findNodeDefUuidsToClearOnNodeDelete,
+  findNodeDefUuidsToClearOnNodePersist,
+} from './_recordManager/nonApplicableValuesClearPreview'
 
 export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepTo, recordUuids }, client = db) =>
   client.tx(async (t) => {

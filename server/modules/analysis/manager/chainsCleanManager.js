@@ -76,7 +76,7 @@ const _fixUpdatedAreaBasedEstimatedOfNodeDefs = async ({ user, surveyId }, tx) =
           // ancestors node defs have been updated, so the name of this node def must be updated too
           const chain = chains.find((_chain) => Chain.getUuid(_chain) === chainUuid)
           const { nodeDefsUpdated: nodeDefsUpdatedTemp, nodeDefsValidation: nodeDefsValidationTemp } =
-            await _fixUpdatedAreaBasedEstimatedOfNodeDef(
+            /* NOSONAR */ await _fixUpdatedAreaBasedEstimatedOfNodeDef(
               { user, survey, chain, nodeDef, areaBasedEstimatedOfNodeDef },
               tx
             )

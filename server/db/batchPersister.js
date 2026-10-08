@@ -18,7 +18,7 @@ export default class BatchPersister {
   async addItems(items, t = null) {
     const tx = t || this.tx
     for (const item of items) {
-      await this.addItem(item, tx)
+      await this.addItem(item, tx) // NOSONAR
     }
   }
 

@@ -74,4 +74,18 @@ export default {
       <p>If you want to have access again to that survey, please contact the survey administrator.</p>
       $t(emails:signature)`,
   },
+  userRegistrationExpired: {
+    subject: 'Your $t(common.appNameFull) account has been removed',
+    accountRemoved: '<p>For this reason your account has been removed.</p>',
+    accountAndSurveysRemoved: `<p>For this reason your account has been removed, together with the following survey(s), which had not been modified since they were created:</p>
+      <ul>{{-surveysList}}</ul>`,
+    surveyItem: '<li><b>{{survey}}</b></li>',
+    requestAccessAgain: `<p>If you still want to use $t(common.appNameFull), you can request access again here: <a href="{{serverUrl}}">{{serverUrl}}</a></p>`,
+    body: `<p>Hello,</p>
+      <p>Your registration to $t(common.appNameFull) was not completed within 7 days of receiving the registration link, so the link has expired.</p>
+      {{-accountRemovedMsg}}
+      {{-requestAccessAgainMsg}}
+      <p>$t(common.raiseTicketInSupportForum)</p>
+      $t(emails:signature)`,
+  },
 }

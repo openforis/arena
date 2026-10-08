@@ -55,11 +55,11 @@ const plugins = [
     process: {
       env: {
         NODE_ENV: JSON.stringify(environment),
-        ALLOW_USER_ACCESS_REQUEST: process.env.ALLOW_USER_ACCESS_REQUEST,
+        ALLOW_USER_ACCESS_REQUEST: JSON.stringify(process.env.ALLOW_USER_ACCESS_REQUEST),
         APP_VERSION: gitRevisionPlugin
           ? JSON.stringify(gitRevisionPlugin.version())
           : JSON.stringify(process.env.APP_VERSION),
-        RECAPTCHA_ENABLED: process.env.RECAPTCHA_ENABLED,
+        RECAPTCHA_ENABLED: JSON.stringify(process.env.RECAPTCHA_ENABLED),
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
         RSTUDIO_DOWNLOAD_SERVER_URL: JSON.stringify(process.env.RSTUDIO_DOWNLOAD_SERVER_URL),
         EMAIL_FROM_RESOLVED: JSON.stringify(

@@ -8,7 +8,7 @@ import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 import { SamplingPointDataMarker } from './SamplingPointDataMarker'
 
 export const SamplingPointDataLayer = (props) => {
-  const { levelIndex = 0, onRecordEditClick, createRecordFromSamplingPointDataItem } = props
+  const { levelIndex = 0, markersColor, onRecordEditClick, createRecordFromSamplingPointDataItem } = props
 
   const {
     clusters,
@@ -21,7 +21,7 @@ export const SamplingPointDataLayer = (props) => {
     currentMarkersColor,
     totalPoints,
     points,
-  } = useSamplingPointDataLayer(props)
+  } = useSamplingPointDataLayer({ levelIndex, markersColor })
 
   const layerKey = `sampling-point-data-${levelIndex}`
   const { selectPoint, layerSortOrders } = useMapLayersPanel()

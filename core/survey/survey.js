@@ -108,6 +108,7 @@ export const {
   getDescription,
   getDescriptions,
   getFieldManualLinks,
+  isKeepNonApplicableValues,
   getUserExtraPropDefs,
   getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,
@@ -311,7 +312,6 @@ export const {
   getNodeDefCodeCandidateParents,
 } = SurveyNodeDefs
 
-// TODO check where used
 export const { canUpdateCategory, isNodeDefParentCode } = SurveyNodeDefs
 
 // ====== Categories

@@ -206,7 +206,7 @@ export const parseValidationRules = async ({ survey, nodeDef, collectValidationR
   let unique = false
 
   for (const collectValidationRule of collectValidationRules) {
-    const parseResult = await parseValidationRule({ survey, collectValidationRule, nodeDef, defaultLanguage })
+    const parseResult = await parseValidationRule({ survey, collectValidationRule, nodeDef, defaultLanguage }) // NOSONAR
     if (parseResult) {
       const { validationRule, importIssue, unique: _unique } = parseResult
       if (validationRule) {

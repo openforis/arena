@@ -5,13 +5,9 @@ import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as RecordValidation from '@core/record/recordValidation'
-import { LanguageCode, ValidationSeverity } from '@openforis/arena-core'
+import { I18n as I18nCore, LanguageCode, ValidationSeverity } from '@openforis/arena-core'
 
-interface I18n {
-  language: string
-  t: (key: string, params?: Record<string, unknown>) => string
-  exists: (key: string) => boolean
-}
+type I18n = I18nCore & { language: string }
 
 const getValidationCountErrorText =
   ({ survey, i18n }: { survey: unknown; i18n: I18n }) =>

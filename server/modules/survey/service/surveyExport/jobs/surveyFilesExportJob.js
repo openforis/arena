@@ -52,7 +52,7 @@ export default class SurveyFilesExportJob extends Job {
           break
         }
         const fileUuid = SurveyFile.getUuid(fileSummary)
-        const fileContentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary }, this.tx)
+        const fileContentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary }, this.tx) // NOSONAR
         const archiveEntryName = ExportFile.surveyFile({ fileUuid })
         archive.append(fileContentStream, { name: archiveEntryName })
 

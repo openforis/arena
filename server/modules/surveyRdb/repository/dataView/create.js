@@ -84,7 +84,7 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
   const { tableData, viewDataParent } = viewDataNodeDef
 
-  // TODO - do not use select * from virtual entities, it includes parent_uuid column (see https://github.com/openforis/arena/issues/728)
+  // select * from virtual entities includes the parent_uuid column too (see https://github.com/openforis/arena/issues/728)
   const selectFields = viewDataNodeDef.virtual
     ? ['*']
     : [

@@ -1,6 +1,8 @@
 import { Objects, Queue, SystemError } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 
@@ -17,6 +19,18 @@ import * as RecordManager from '../../../manager/recordManager'
 import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
+
+const isClearNonApplicableValuesEnabled = (survey) => !Survey.isKeepNonApplicableValues(Survey.getSurveyInfo(survey))
+
+// the user must confirm the update first (if it clears values) only when the request comes from a socket
+const isClearNonApplicableValuesConfirmationNeeded = ({ msg, survey }) =>
+  isClearNonApplicableValuesEnabled(survey) && !msg.clearNonApplicableValuesConfirmed && Boolean(msg.socketId)
+
+const getNodeAndDescendants = ({ record, nodeUuid }) => {
+  const node = Record.getNodeByUuid(nodeUuid)(record)
+  if (!node) return []
+  return Record.getNodesArray(record).filter((n) => Node.getUuid(n) === nodeUuid || Node.isDescendantOf(node)(n))
+}
 
 // Maximum time to wait for another dyno to release a record's advisory lock.
 // There's a single RecordsUpdateThread per dyno processing messages one at a time, so an unbounded
@@ -84,6 +98,40 @@ export class RecordsUpdateThread extends Thread {
         },
       })
     }
+  }
+
+  /**
+   * Asks the user (only the socket that sent the update) to confirm an update that would clear the values of
+   * attributes becoming non-applicable; the update is not applied until it is sent again as confirmed.
+   * @param {!object} params - The parameters.
+   * @param {!object} params.msg - The message with the node update not applied yet.
+   * @param {!string} params.recordUuid - The uuid of the record.
+   * @param {!string[]} params.nodeDefUuidsToClear - The uuids of the node definitions whose values would be cleared.
+   * @param {!object[]} params.nodesToRestore - The nodes (as stored) the client must restore if the user cancels.
+   * @param {string[]} [params.nodeUuidsToRemove] - The uuids of nodes not stored yet the client must remove if the user cancels.
+   * @returns {void}
+   */
+  postClearNonApplicableValuesConfirm({
+    msg,
+    recordUuid,
+    nodeDefUuidsToClear,
+    nodesToRestore,
+    nodeUuidsToRemove = [],
+  }) {
+    const { type, socketId, node, nodeUuid } = msg
+    this.postMessage({
+      type: WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm,
+      content: {
+        recordUuid,
+        socketId,
+        nodeDelete: type === RecordsUpdateThreadMessageTypes.nodeDelete,
+        node,
+        nodeUuid,
+        nodeDefUuidsToClear,
+        nodesToRestore,
+        nodeUuidsToRemove,
+      },
+    })
   }
 
   async handleNodesValidationUpdated({ record, validations }) {
@@ -250,6 +298,29 @@ export class RecordsUpdateThread extends Thread {
       fn: async (t) => {
         let record = await this.getOrFetchRecord({ msg, recordUuid, t })
 
+        if (isClearNonApplicableValuesConfirmationNeeded({ msg, survey })) {
+          const nodeDefUuidsToClear = await RecordManager.findNodeDefUuidsToClearOnNodePersist({
+            user,
+            survey,
+            record,
+            node,
+            timezoneOffset,
+            lang,
+          })
+          if (nodeDefUuidsToClear.length > 0) {
+            const nodeUuid = Node.getUuid(node)
+            const nodeStored = Record.getNodeByUuid(nodeUuid)(record)
+            this.postClearNonApplicableValuesConfirm({
+              msg,
+              recordUuid,
+              nodeDefUuidsToClear,
+              nodesToRestore: nodeStored ? [nodeStored] : [],
+              nodeUuidsToRemove: nodeStored ? [] : [nodeUuid],
+            })
+            return
+          }
+        }
+
         record = await RecordManager.persistNode(
           {
             user,
@@ -258,6 +329,7 @@ export class RecordsUpdateThread extends Thread {
             node,
             timezoneOffset,
             lang,
+            clearNonApplicableValues: isClearNonApplicableValuesEnabled(survey),
             nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
             nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
           },
@@ -277,15 +349,39 @@ export class RecordsUpdateThread extends Thread {
       recordUuid,
       fn: async (t) => {
         let record = await this.getOrFetchRecord({ msg, recordUuid, t })
+
+        if (isClearNonApplicableValuesConfirmationNeeded({ msg, survey })) {
+          const nodeDefUuidsToClear = await RecordManager.findNodeDefUuidsToClearOnNodeDelete({
+            user,
+            survey,
+            record,
+            nodeUuid,
+            timezoneOffset,
+            lang,
+          })
+          if (nodeDefUuidsToClear.length > 0) {
+            this.postClearNonApplicableValuesConfirm({
+              msg,
+              recordUuid,
+              nodeDefUuidsToClear,
+              nodesToRestore: getNodeAndDescendants({ record, nodeUuid }),
+            })
+            return
+          }
+        }
+
         record = await RecordManager.deleteNode(
-          user,
-          survey,
-          record,
-          nodeUuid,
-          timezoneOffset,
-          lang,
-          (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
-          (validations) => this.handleNodesValidationUpdated({ record, validations }),
+          {
+            user,
+            survey,
+            record,
+            nodeUuid,
+            timezoneOffset,
+            lang,
+            nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
+            nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
+            clearNonApplicableValues: isClearNonApplicableValuesEnabled(survey),
+          },
           t
         )
         await this.cacheRecordWithDbDateModified({ surveyId, recordUuid, record, recordsCache, t })

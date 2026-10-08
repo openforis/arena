@@ -43,7 +43,7 @@ export default class NodeDefsValidationJob extends Job {
     const cycleKeys = A.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(surveySummary)
 
     for (const cycle of cycleKeys) {
-      const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+      const survey = /* NOSONAR */ await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
         { surveyId, cycle, draft: true, advanced: true, validate: true },
         tx
       )

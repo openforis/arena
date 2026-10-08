@@ -6,6 +6,7 @@ import { Trans } from 'react-i18next'
 import * as Survey from '@core/survey/survey'
 
 import { useSurveyInfo } from '@webapp/store/survey'
+import { TransTitle } from '@webapp/components/TransTitle'
 import { appModuleUri, homeModules, designerModules } from '@webapp/app/appModules'
 
 import SurveyInfo from '../SurveyInfo'
@@ -19,7 +20,7 @@ const HelperFirstTimeSurvey = () => {
           i18nKey="homeView:dashboard.surveyPropUpdate.main"
           values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
           components={{
-            title: <h2 />,
+            title: <TransTitle />,
             linkWithIcon: <LinkWithIcon to={appModuleUri(homeModules.surveyInfo)} iconLeft="icon-pencil" />,
             basicLink: <Link to={appModuleUri(homeModules.surveyInfo)} className="btn-s btn-transparent" />,
           }}
@@ -56,7 +57,7 @@ const HelperWithoutAttributes = () => {
             i18nKey="homeView:dashboard.nodeDefCreate.main"
             values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
             components={{
-              title: <h2 />,
+              title: <TransTitle />,
               linkWithIcon: <LinkWithIcon to={appModuleUri(designerModules.formDesigner)} iconLeft="icon-pencil" />,
             }}
           />

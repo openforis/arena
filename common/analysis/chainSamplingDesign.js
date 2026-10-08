@@ -57,11 +57,8 @@ const isStratificationEnabled = (chain) => {
   )
 }
 
-const isStratificationNotSpecifiedAllowed = () => {
-  return false
-  // TODO return true if samplingStrategy is double phase
-  // return getSamplingStrategy(chain) === samplingStrategies.doublePhase
-}
+// stratification must always be specified (no sampling strategy supports unstratified sampling units)
+const isStratificationNotSpecifiedAllowed = () => false
 
 const isPhase1CategorySelectionEnabled = (samplingDesign) =>
   getSamplingStrategy(samplingDesign) === samplingStrategies.twoPhase

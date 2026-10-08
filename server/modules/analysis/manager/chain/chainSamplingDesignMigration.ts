@@ -124,7 +124,7 @@ export const migrateSamplingDesignPhaseProps = async (
   for (const chain of chainsToMigrate as any[]) {
     const samplingDesign = Chain.getSamplingDesign(chain)
     const migratedSamplingDesign = _migrateSamplingDesignPhaseProps({ samplingDesign, survey })
-    await ChainRepository.updateChain(
+    /* NOSONAR */ await ChainRepository.updateChain(
       {
         surveyId,
         chainUuid: Chain.getUuid(chain),

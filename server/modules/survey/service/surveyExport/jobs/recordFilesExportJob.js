@@ -43,7 +43,7 @@ export default class RecordFilesExportJob extends Job {
           break
         }
         const fileUuid = SurveyFile.getUuid(fileSummary)
-        const fileContentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary }, this.tx)
+        const fileContentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary }, this.tx) // NOSONAR
         archive.append(fileContentStream, { name: ExportFile.file({ fileUuid }) })
         this.incrementProcessedItems()
       }

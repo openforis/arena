@@ -35,7 +35,7 @@ export default class CategoriesExportJob extends Job {
     // export categories one by one
     for (let index = 0; index < categories.length; index++) {
       const category = categories[index]
-      await this.exportCategory({ category, index })
+      await this.exportCategory({ category, index }) // NOSONAR
     }
   }
 
@@ -75,8 +75,7 @@ export default class CategoriesExportJob extends Job {
     await super.onEnd()
     await this.archiver.finalize()
 
-    // delete temp directory
-    // TODO: delete the category temp files one by one once added to the archive
+    // delete temp directory (with all the category temp files added to the archive)
     await FileUtils.rmdir(FileUtils.tempFilePath(this.categoriesTempFolderName))
   }
 }

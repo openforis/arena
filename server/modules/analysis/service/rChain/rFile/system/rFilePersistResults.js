@@ -44,9 +44,9 @@ export default class RFilePersistResults extends RFilePersistScriptsGeneric {
     for (const entity of entitiesWithActiveQuantitativeVariables) {
       const dfResults = new DfResults(this.rChain, entity)
 
-      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
-      await this.appendContent(...getSendResultsToServerScripts({ rChain: this.rChain, entity, dfResults }))
-      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
+      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`) // NOSONAR
+      await this.appendContent(...getSendResultsToServerScripts({ rChain: this.rChain, entity, dfResults })) // NOSONAR
+      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`) // NOSONAR
     }
   }
 }

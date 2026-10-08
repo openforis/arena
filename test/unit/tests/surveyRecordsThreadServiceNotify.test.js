@@ -1,4 +1,5 @@
 import { ClusterBus, WebSocketServer, WebSocketEvent, RecordSocketAssociationRepository } from '@openforis/arena-server'
+import { WebSocketEvents } from '../../../common/webSocket/webSocketEvents'
 import {
   RecordsUpdateThreadService,
   _handleClusterEventForTest as handleClusterEvent,
@@ -78,6 +79,30 @@ describe('RecordsUpdateThreadService notify functions', () => {
     expect(isSocketConnectedSpy).toHaveBeenCalledWith('socket-stale')
     expect(dissocSocketSpy).toHaveBeenCalledWith({ recordUuid: 'record-1', socketId: 'socket-stale' })
     expect(notifySocketSpy).not.toHaveBeenCalled()
+  })
+
+  test('notifyThreadMessageToSockets sends the clear non-applicable values confirmation only to the requesting socket', async () => {
+    getSocketIdsByRecordUuidSpy.mockResolvedValue(['socket-1', 'socket-2'])
+    isSocketConnectedSpy.mockResolvedValue(true)
+    const eventType = WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm
+    const content = { recordUuid: 'record-1', socketId: 'socket-2' }
+
+    await RecordsUpdateThreadService.notifyThreadMessageToSockets({ eventType, content })
+
+    expect(notifySocketSpy).toHaveBeenCalledTimes(1)
+    expect(notifySocketSpy).toHaveBeenCalledWith('socket-2', eventType, content)
+  })
+
+  test('notifyThreadMessageToSockets sends other record updates to every socket of the record', async () => {
+    getSocketIdsByRecordUuidSpy.mockResolvedValue(['socket-1', 'socket-2'])
+    isSocketConnectedSpy.mockResolvedValue(true)
+    const content = { recordUuid: 'record-1' }
+
+    await RecordsUpdateThreadService.notifyThreadMessageToSockets({ eventType: WebSocketEvent.nodesUpdate, content })
+
+    expect(notifySocketSpy).toHaveBeenCalledTimes(2)
+    expect(notifySocketSpy).toHaveBeenCalledWith('socket-1', WebSocketEvent.nodesUpdate, content)
+    expect(notifySocketSpy).toHaveBeenCalledWith('socket-2', WebSocketEvent.nodesUpdate, content)
   })
 })
 

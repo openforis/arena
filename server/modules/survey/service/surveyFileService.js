@@ -28,7 +28,7 @@ export const checkFilesStorage = async () => {
       let errorsFound = false
       for (const surveyId of surveyIds) {
         try {
-          const surveyFilesMoved = await SurveyFileManager.moveFilesToNewStorageIfNecessary({ surveyId })
+          const surveyFilesMoved = await SurveyFileManager.moveFilesToNewStorageIfNecessary({ surveyId }) // NOSONAR
           allSurveysFilesMoved = allSurveysFilesMoved || surveyFilesMoved
         } catch (error) {
           errorsFound = true
@@ -58,7 +58,7 @@ export const cleanupAllSurveysFilesProps = async () => {
   const surveyIds = await SurveyRepository.fetchAllSurveyIds()
   let count = 0
   for (const surveyId of surveyIds) {
-    const cleanedFiles = await SurveyFileManager.cleanupSurveyFilesProps({ surveyId })
+    const cleanedFiles = await SurveyFileManager.cleanupSurveyFilesProps({ surveyId }) // NOSONAR
     count += cleanedFiles
   }
   return count

@@ -22,6 +22,18 @@ $borderColor: $greyBorder;
   }
 
   .category__item-header {
+    // reset the default button style
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    font: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+    color: inherit;
+    text-align: left;
     // height = rowHeight of the virtualized list (34px) - bottom border
     min-height: 33px;
     display: grid;
@@ -62,13 +74,11 @@ $borderColor: $greyBorder;
   }
 
   .category__item-toggle-btn {
-    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 4px;
     color: $colorTextPrimary;
-
-    .MuiButton-startIcon {
-      margin: 0;
-    }
 
     .category__item-toggle-icon {
       font-size: 20px;

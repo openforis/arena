@@ -100,12 +100,12 @@ export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db
 
   await client.tx(async (tx) => {
     for (const fileUuid of fileUuids) {
-      const file = await FileRepository.fetchFileAndContentByUuid(surveyId, fileUuid, tx)
+      const file = await FileRepository.fetchFileAndContentByUuid(surveyId, fileUuid, tx) // NOSONAR
 
       const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
       const content = SurveyFile.getContent(file)
       const recordUuid = SurveyFile.getRecordUuid(file)
-      await contentStoreFunction({ surveyId, fileUuid, content, recordUuid })
+      await contentStoreFunction({ surveyId, fileUuid, content, recordUuid }) // NOSONAR
     }
     logger.debug(`Files moved from DB; clearing 'content' column in DB 'file' table`)
     await FileRepository.clearAllSurveyFilesContent({ surveyId }, tx)
@@ -186,9 +186,9 @@ export const migrateFilesToNewPathFormat = async ({ surveyId }, client = db) => 
     const recordUuid = SurveyFile.getRecordUuid(fileSummary)
     let migrated = false
     if (storageType === fileContentStorageTypes.fileSystem) {
-      migrated = await FileRepositoryFileSystem.migrateFileToNewPath({ surveyId, fileUuid, recordUuid })
+      migrated = await FileRepositoryFileSystem.migrateFileToNewPath({ surveyId, fileUuid, recordUuid }) // NOSONAR
     } else if (storageType === fileContentStorageTypes.s3Bucket) {
-      migrated = await FileRepositoryS3Bucket.migrateFileToNewKey({ surveyId, fileUuid, recordUuid })
+      migrated = await FileRepositoryS3Bucket.migrateFileToNewKey({ surveyId, fileUuid, recordUuid }) // NOSONAR
     }
     if (migrated) {
       migratedCount++

@@ -6,6 +6,7 @@ import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/a
 import { db } from '@server/db/db'
 
 import * as ProcessUtils from '@core/processUtils'
+import * as i18nFactory from '@core/i18n/i18nFactory'
 import { Countries } from '@core/Countries'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -37,6 +38,7 @@ import * as UserInvitationManager from '../manager/userInvitationManager'
 import * as UserPasswordUtils from './userPasswordUtils'
 import { SystemAdminUserValidator } from './systemAdminUserValidator'
 import * as UserInviteService from './userInviteService'
+import { UserRegistrationExpiredEmail } from './userRegistrationExpiredEmail'
 
 const Logger = Log.getLogger('UserService')
 
@@ -605,7 +607,7 @@ export const deleteUser = async ({ user, userUuidToDelete }) =>
     // Postgres already has to run against every survey schema to allow the delete at all.
     const allSurveyIds = await SurveyManager.fetchAllSurveyIds(t)
     for (const surveyId of allSurveyIds) {
-      await RecordManager.updateRecordsOwner(
+      /* NOSONAR */ await RecordManager.updateRecordsOwner(
         { surveyId, fromOwnerUuid: userUuidToDelete, toOwnerUuid: User.getUuid(user) },
         t
       )
@@ -623,9 +625,57 @@ export const deleteUser = async ({ user, userUuidToDelete }) =>
     return UserManager.deleteUser(userUuidToDelete, t)
   })
 
+// returns name and label of the survey if deleted, null otherwise
+const _deleteUntouchedSurvey = async ({ surveyId }, client) => {
+  try {
+    const recordsCount = await RecordManager.countAllRecordsBySurveyId({ surveyId }, client)
+    if (recordsCount > 0) {
+      Logger.debug(`survey ${surveyId} not deleted: it has ${recordsCount} records`)
+      return null
+    }
+    // only name and label are read: a pending data migration must not prevent the deletion
+    const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true, skipMigrationCheck: true }, client)
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, client)
+    return { surveyId, name: Survey.getName(surveyInfo), label: Survey.getDefaultLabel(surveyInfo) }
+  } catch (error) {
+    Logger.error(`error deleting survey ${surveyId}: ${String(error)}`)
+    return null
+  }
+}
+
+const _deleteUntouchedSurveysOfExpiredInvitationUsers = async (client) => {
+  const surveys = await UserManager.fetchSurveysOfExpiredInvitationUsers(client)
+  Logger.info(
+    `IDs of untouched surveys of users with expired invitation to delete: ${surveys.map(({ surveyId }) => surveyId)}`
+  )
+  const deletedSurveys = []
+  // one at a time: every deletion drops a schema and the client could be a transaction
+  for (const { surveyId, userUuid } of surveys) {
+    const deletedSurvey = await _deleteUntouchedSurvey({ surveyId }, client) // NOSONAR
+    if (deletedSurvey) {
+      deletedSurveys.push({ ...deletedSurvey, userUuid })
+    }
+  }
+  return deletedSurveys
+}
+
+// a failure sending the email must not interrupt the cleanup
+const _notifyUserRegistrationExpired = async ({ user, surveys, i18n }) => {
+  const email = User.getEmail(user)
+  try {
+    const { msgKey, getMsgParams } = UserRegistrationExpiredEmail
+    const msgParams = getMsgParams({ i18n, surveys, serverUrl: ProcessUtils.ENV.arenaPublicUrl })
+    await Mailer.sendEmail({ to: email, msgKey, msgParams, i18n })
+  } catch (error) {
+    Logger.error(`error notifying user ${email} about the account deletion: ${String(error)}`)
+  }
+}
+
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
-  const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
-  Logger.info(`IDs of surveys that could be deleted (if without any activity): ${surveyIds}`)
+  // surveys must be deleted before their users: they are identified by the users' expired invitations
+  const deletedSurveys = await _deleteUntouchedSurveysOfExpiredInvitationUsers(client)
+  const deletedSurveyIds = deletedSurveys.map(({ surveyId }) => surveyId)
 
   Logger.debug('deleting users with expired invitations')
   const usersWithExpiredInvitation = await UserManager.fetchUsersWithExpiredInvitation(client)
@@ -635,16 +685,20 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
     const usersWithExpiredInvitationEmails = usersWithExpiredInvitation.map(User.getEmail)
     const usersWithExpiredInvitationUuids = usersWithExpiredInvitation.map(User.getUuid)
     Logger.debug(`deleting users: ${usersWithExpiredInvitationEmails} ${usersWithExpiredInvitationUuids}`)
+    const i18n = await i18nFactory.createI18nAsync()
     for (const user of usersWithExpiredInvitation) {
       const userUuid = User.getUuid(user)
       const userEmail = User.getEmail(user)
       try {
-        await UserManager.deleteUser(userUuid, client)
+        await UserManager.deleteUser(userUuid, client) // NOSONAR
         deletedUsers.push(user)
         deletedUsersEmails.push(userEmail)
       } catch (error) {
         Logger.debug(`error deleting user ${userEmail} [${userUuid}]: ${String(error)}`)
+        continue
       }
+      const surveys = deletedSurveys.filter((survey) => survey.userUuid === userUuid)
+      await _notifyUserRegistrationExpired({ user, surveys, i18n }) // NOSONAR
     }
     if (deletedUsersEmails.length > 0) {
       Logger.debug('deleting expired users access requests by expired invitations')
@@ -654,7 +708,7 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   Logger.debug('deleting expired users access requests')
   await UserManager.deleteExpiredUserAccessRequests(client)
 
-  return { deletedUsers, deletedSurveyIds: surveyIds }
+  return { deletedUsers, deletedSurveyIds }
 }
 
 // ==== User prefs

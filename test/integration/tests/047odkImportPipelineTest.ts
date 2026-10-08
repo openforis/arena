@@ -200,7 +200,7 @@ describe('ODK import pipeline - real form + real submissions (onaio/onadata)', (
     })
 
     for (const recordUuid of [submission1Uuid, submission3Uuid]) {
-      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft: true })
+      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft: true }) // NOSONAR
       expect(record).not.toBeNull()
 
       // real multi-select answer "ambulance bicycle" -> one sibling node per selected code, each

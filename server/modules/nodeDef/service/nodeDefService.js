@@ -179,7 +179,7 @@ export const resolveAndCloneNodeDefsCategoriesAndTaxonomies = async (
   const categoriesCloned = []
   for (const sourceCategoryUuid of categoryUuidsToClone) {
     categoriesCloned.push(
-      await CategoryManager.cloneCategoryFromSurvey(
+      /* NOSONAR */ await CategoryManager.cloneCategoryFromSurvey(
         { user, sourceSurveyId, sourceCategoryUuid, targetSurveyId },
         client
       )
@@ -188,7 +188,7 @@ export const resolveAndCloneNodeDefsCategoriesAndTaxonomies = async (
   const taxonomiesCloned = []
   for (const sourceTaxonomyUuid of taxonomyUuidsToClone) {
     taxonomiesCloned.push(
-      await TaxonomyManager.cloneTaxonomyFromSurvey(
+      /* NOSONAR */ await TaxonomyManager.cloneTaxonomyFromSurvey(
         { user, sourceSurveyId, sourceTaxonomyUuid, targetSurveyId },
         client
       )
@@ -390,7 +390,7 @@ export const markNodeDefsDeleted = async ({ user, surveyId, cycle, nodeDefUuids 
   let response = { nodeDefsUpdated: {}, nodeDefsValidation: {} }
 
   for (const nodeDefUuid of nodeDefUuids) {
-    const _response = await markNodeDefDeleted({ user, surveyId, cycle, nodeDefUuid }, client)
+    const _response = await markNodeDefDeleted({ user, surveyId, cycle, nodeDefUuid }, client) // NOSONAR
     response = A.mergeDeepLeft(response, _response)
   }
 

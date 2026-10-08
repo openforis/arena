@@ -1,5 +1,3 @@
-import * as SurveyInfoActions from './actions'
-import * as SurveyInfoState from './state'
-import SurveyInfoReducer from './reducer'
-
-export { SurveyInfoActions, SurveyInfoState, SurveyInfoReducer }
+export * as SurveyInfoActions from './actions'
+export * as SurveyInfoState from './state'
+export { default as SurveyInfoReducer } from './reducer'

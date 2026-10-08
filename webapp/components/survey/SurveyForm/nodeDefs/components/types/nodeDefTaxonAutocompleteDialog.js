@@ -13,18 +13,11 @@ const NodeDefTaxonAutocompleteItemRenderer = (props) => {
   const vernacularLang = Taxon.getVernacularLanguage(taxon)
 
   return (
-    <div
-      key={Taxon.getUuid(taxon)}
-      className="item"
-      onKeyDown={onKeyDown}
-      onMouseDown={onMouseDown}
-      role="button"
-      tabIndex="0"
-    >
+    <button key={Taxon.getUuid(taxon)} className="item" onKeyDown={onKeyDown} onMouseDown={onMouseDown} type="button">
       <div>{Taxon.getCode(taxon)}</div>
       <div>{Taxon.getScientificName(taxon)}</div>
       {vernacularLang && <div style={{ gridColumn: 2 }}>{`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}</div>}
-    </div>
+    </button>
   )
 }
 

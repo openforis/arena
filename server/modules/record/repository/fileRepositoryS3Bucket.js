@@ -24,7 +24,7 @@ const {
 
 const deleteFiles = async ({ surveyId, files }) => {
   for (const { fileUuid, recordUuid } of files) {
-    await deleteFile({ surveyId, fileUuid, recordUuid })
+    await deleteFile({ surveyId, fileUuid, recordUuid }) // NOSONAR
   }
 }
 

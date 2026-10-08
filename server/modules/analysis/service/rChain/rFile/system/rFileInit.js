@@ -37,7 +37,7 @@ export default class RFileInit extends RFileSystem {
       const dirRelativeSplit = pathRelativeSplit.slice(0, -1)
       const fileInitSourcePath = FileUtils.join(...dirRelativeSplit, dirNameInit, fileName)
 
-      await Promise.all([FileUtils.copyFile(fileInitSrc, fileInitDest), this.appendContent(source(fileInitSourcePath))])
+      await Promise.all([FileUtils.copyFile(fileInitSrc, fileInitDest), this.appendContent(source(fileInitSourcePath))]) // NOSONAR
     }
 
     const { survey, serverUrl, token } = this.rChain

@@ -119,6 +119,9 @@ export default {
     confirmDeleteCycle: `サイクル{{cycle}}を削除してもよろしいですか？\n\n$t(common.cantUndoWarning)\n\n
 このサイクルに紐づく記録がある場合、それらも削除されます。`,
     cycleForArenaMobile: 'Arena Mobile用サイクル',
+    keepNonApplicableValues: `適用対象外の属性の値を保持する`,
+    keepNonApplicableValuesInfo: `チェックしない場合（既定）、データ入力中に適用対象外となった属性の値は（ユーザーの確認後に）消去されます。
+チェックした場合、属性が適用対象外となっても、それらの値はレコードに保持されます。`,
     deleteActivityLog: 'アクティビティログを消去',
     deleteActivityLogConfirm: {
       headerText: 'この調査のアクティビティログをすべて消去しますか？',
