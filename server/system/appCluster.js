@@ -23,6 +23,7 @@ import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
 import * as UserTempAuthTokensCleanup from './schedulers/userTempAuthTokensCleanup'
 import { SwaggerInitializer } from './swaggerInitializer'
+import { systemErrorMiddleware } from './systemErrorMiddleware'
 
 const createHttpRequestLogger = () => {
   if (!ProcessUtils.isEnvDevelopment && !ProcessUtils.ENV.logHttpRequests) return null
@@ -78,6 +79,9 @@ export const run = async () => {
   app.use('/api', apiRouter.router)
 
   SwaggerInitializer.init(app)
+
+  // registered after the routes: the arena-server error middleware is registered before them and never reached
+  app.use(systemErrorMiddleware)
 
   // ====== System Admin user creation
   await runWithClusterLock({

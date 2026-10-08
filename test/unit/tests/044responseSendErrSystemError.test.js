@@ -15,8 +15,9 @@ const mockRes = () => {
 }
 
 // The error middleware installed by ArenaServer.init() is registered before the api routes in the
-// Express stack, so next(error) never reaches it: routes that need a specific error key to reach the
-// client (read as error.response.data.key by the webapp) must respond with Response.sendErr instead.
+// Express stack, so next(error) never reaches it: the error key reaches the client (read as
+// error.response.data.key by the webapp) through Response.sendErr, called by the routes or, for the
+// system errors forwarded with next(error), by systemErrorMiddleware (registered after the routes).
 describe('Response.sendErr', () => {
   it('preserves key, params and status code of a SystemError', () => {
     const res = mockRes()

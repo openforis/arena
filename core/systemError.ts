@@ -24,7 +24,7 @@ export default class SystemError extends Error {
   private readonly _params: any
   private readonly _statusCode: number
 
-  constructor(key: string, params?: any, statusCode = StatusCodes.INTERNAL_SERVER_ERROR) {
+  constructor(key: string, params?: any, statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR) {
     super(key)
 
     this.name = 'SystemError'
