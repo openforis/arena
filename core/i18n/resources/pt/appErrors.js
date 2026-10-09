@@ -77,6 +77,8 @@ Tente atualizar a página.`,
     fileNotFound: 'Arquivo não encontrado',
   },
   unsupportedFunctionType: 'Tipo de função não suportado: {{exprType}}',
+  aiSessionExpired: 'A sua sessão expirou. Inicie sessão novamente.',
+  aiNotAuthorized: 'Não tem permissão para usar esta funcionalidade de IA aqui.',
   aiNotConfigured:
     'A IA não está configurada. Defina um provedor pessoal nas Configurações de IA ou peça ao seu administrador para configurar um padrão.',
   aiFeaturesDisabled: 'Os recursos de IA estão desativados nesta implantação.',

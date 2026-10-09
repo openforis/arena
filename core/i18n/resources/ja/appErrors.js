@@ -67,6 +67,8 @@ export default {
   },
   unsupportedFunctionType: 'サポートされていない関数の型です：{{exprType}}',
   // AI gateway errors
+  aiSessionExpired: 'セッションの有効期限が切れました。もう一度ログインしてください。',
+  aiNotAuthorized: 'ここではこのAI機能を使用する権限がありません。',
   aiNotConfigured:
     'AIが設定されていません。AI設定で個人用プロバイダーを設定するか、管理者にデフォルトの設定を依頼してください。',
   aiFeaturesDisabled: 'このデプロイメントではAI機能が無効になっています。',

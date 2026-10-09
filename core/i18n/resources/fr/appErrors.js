@@ -83,6 +83,8 @@ Essayez de rafraîchir la page.`,
     fileNotFound: 'Fichier introuvable',
   },
   unsupportedFunctionType: 'Type de fonction non pris en charge : {{exprType}}',
+  aiSessionExpired: 'Votre session a expiré. Veuillez vous reconnecter.',
+  aiNotAuthorized: "Vous n'êtes pas autorisé à utiliser cette fonction IA ici.",
   aiNotConfigured:
     "L'IA n'est pas configurée. Définissez un fournisseur personnel dans les paramètres IA ou demandez à votre administrateur de configurer un fournisseur par défaut.",
   aiFeaturesDisabled: 'Les fonctionnalités IA sont désactivées sur ce déploiement.',

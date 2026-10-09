@@ -65,6 +65,8 @@ Try to refresh the page.`,
   },
   unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
   // AI gateway errors
+  aiSessionExpired: 'Your session has expired. Please log in again.',
+  aiNotAuthorized: 'You are not allowed to use this AI feature here.',
   aiNotConfigured:
     'AI is not configured. Set a personal provider in AI Settings or ask your administrator to configure a default.',
   aiFeaturesDisabled: 'AI features are disabled on this deployment.',
