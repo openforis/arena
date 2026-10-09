@@ -14,6 +14,11 @@ test.describe('AI features (mock provider)', () => {
     await api.enableAiFeatures()
   })
 
+  // the user is shared by the worker: leave it with AI off for the other specs
+  test.afterEach(async ({ api }) => {
+    await api.disableAiFeatures()
+  })
+
   test.describe('unpublished survey without expressions', () => {
     test.use({ sampleSurveyOptions: { withExpressions: false, publish: false } })
 

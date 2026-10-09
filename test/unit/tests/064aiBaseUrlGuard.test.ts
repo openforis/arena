@@ -1,3 +1,5 @@
+import * as AiSettingsService from '@server/modules/ai/service/aiSettingsService'
+import * as ModelDiscovery from '@server/modules/ai/service/modelDiscovery'
 import { buildUserModel } from '@server/modules/ai/service/providerRegistry'
 import { assertBaseUrlAllowed, isAllowlisted, isBlockedAddress } from '@server/modules/ai/service/baseUrlGuard'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
@@ -33,6 +35,10 @@ describe('isBlockedAddress', () => {
     '::ffff:127.0.0.1',
     '::ffff:7f00:1',
     '::ffff:a9fe:a9fe',
+    '2002:7f00:1::1', // 6to4
+    '2001:0:7f00:1::1', // Teredo
+    '64:ff9b:1::7f00:1', // local-use NAT64
+    '::ffff:0:7f00:1', // IPv4-translated
     'not-an-ip',
   ])('blocks %s', (address) => {
     expect(isBlockedAddress(address)).toBe(true)
@@ -143,5 +149,35 @@ describe('buildUserModel redirects', () => {
     }
     expect(calls.length).toBeGreaterThan(0)
     expect(calls[0].redirect).toBe('error')
+  })
+})
+
+describe('guard wiring', () => {
+  const internalUrl = 'http://127.0.0.1:1234/v1'
+
+  test('buildUserModel refuses an internal base URL', async () => {
+    await expectSystemErrorKey(
+      buildUserModel({ provider: 'openai-compatible', model: 'm', baseUrl: internalUrl }, { allowlist: [] }),
+      'aiBaseUrlNotAllowed'
+    )
+  })
+
+  test('testConnection reports aiBaseUrlNotAllowed for an internal base URL', async () => {
+    const result: any = await AiSettingsService.testConnection({
+      user: { uuid: 'u1' } as any,
+      provider: 'openai-compatible',
+      model: 'm',
+      baseUrl: internalUrl,
+      apiKey: 'k',
+    })
+    expect(result.ok).toBe(false)
+    expect(result.errorKey).toBe('aiBaseUrlNotAllowed')
+  })
+
+  test('listForProvider (openai-compatible) refuses an internal base URL', async () => {
+    await expectSystemErrorKey(
+      ModelDiscovery.listForProvider({ provider: 'openai-compatible', baseUrl: internalUrl, apiKey: 'k' }),
+      'aiBaseUrlNotAllowed'
+    )
   })
 })

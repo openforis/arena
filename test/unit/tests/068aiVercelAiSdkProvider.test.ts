@@ -15,6 +15,13 @@ const sseResponse = (frames: string[]) =>
     { status: 200, headers: { 'Content-Type': 'text/event-stream' } }
   )
 
+const readPartTypes = async (stream: ReadableStream<any>): Promise<string[]> => {
+  const types: string[] = []
+  const reader = stream.getReader()
+  for (let result = await reader.read(); !result.done; result = await reader.read()) types.push(result.value.type)
+  return types
+}
+
 const frames = [
   'data: {"type":"start"}\n\n',
   'data: {"type":"text-delta","delta":"Hel"}\n\n',
@@ -95,5 +102,46 @@ describe('vercel-ai-sdk provider (LanguageModelV4)', () => {
     const fetchImpl = async () => new Response(new ReadableStream({ start() {} }), { status: 200 })
     const model = createVercelAiSdkModel({ baseUrl: 'https://agent.example/chat', timeoutMs: 20, fetchImpl })
     await expect(generateText({ model, prompt: 'Hi', maxRetries: 0 })).rejects.toThrow()
+  })
+
+  test('generation fails when the upstream closes without [DONE]', async () => {
+    const model = createVercelAiSdkModel({
+      baseUrl: 'https://agent.example/chat',
+      fetchImpl: async () => sseResponse(['data: {"type":"text-delta","delta":"Hel"}\n\n']),
+    })
+    await expect(generateText({ model, prompt: 'Hi', maxRetries: 0 })).rejects.toThrow()
+  })
+
+  test('a stream closed without [DONE] ends with an error part and no finish', async () => {
+    const model = createVercelAiSdkModel({
+      baseUrl: 'https://agent.example/chat',
+      fetchImpl: async () => sseResponse(['data: {"type":"text-delta","delta":"Hel"}\n\n']),
+    })
+    const { stream } = await model.doStream({ prompt: [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }] })
+    const types = await readPartTypes(stream)
+    expect(types).toContain('error')
+    expect(types).not.toContain('finish')
+  })
+
+  test('an error event in a stream is not followed by a finish part', async () => {
+    const model = createVercelAiSdkModel({
+      baseUrl: 'https://agent.example/chat',
+      fetchImpl: async () => sseResponse(['data: {"type":"error","errorText":"agent down"}\n\n', 'data: [DONE]\n\n']),
+    })
+    const { stream } = await model.doStream({ prompt: [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }] })
+    const types = await readPartTypes(stream)
+    expect(types).toContain('error')
+    expect(types).not.toContain('finish')
+  })
+
+  test('a complete stream still ends with finish', async () => {
+    const model = createVercelAiSdkModel({
+      baseUrl: 'https://agent.example/chat',
+      fetchImpl: async () => sseResponse(frames),
+    })
+    const { stream } = await model.doStream({ prompt: [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }] })
+    const types = await readPartTypes(stream)
+    expect(types[types.length - 1]).toBe('finish')
+    expect(types).not.toContain('error')
   })
 })
