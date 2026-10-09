@@ -19,7 +19,7 @@ module.exports = {
   // transformed based on its own immediate package name, instead of being skipped just because an
   // earlier, non-allowlisted wrapper package appears earlier in the path.
   transformIgnorePatterns: [
-    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/|n2words/|@workflow/|archiver/|is-stream/|zip-stream/|compress-commons/|crc32-stream/|normalize-path/|readdir-glob/)',
+    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/|n2words/|@workflow/|archiver/|is-stream/|zip-stream/|compress-commons/|crc32-stream/)',
   ],
   // Path aliases (mirrors jsconfig.json / the webpack configs): unit and integration tests are bundled
   // by webpack, which resolves them; they are needed here only for tests run directly through Jest.

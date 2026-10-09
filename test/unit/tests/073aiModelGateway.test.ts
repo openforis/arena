@@ -159,6 +159,24 @@ describe('handleModelRequest: generate', () => {
     expect(res.body.key).toBe('aiNotConfigured')
   })
 
+  test('unexpected errors before the provider call are logged; SystemErrors are not', async () => {
+    const SystemError = (await import('@core/systemError')).default
+    const failing = (error: Error) =>
+      createDeps(generateModel(), {
+        resolveModel: async () => {
+          throw error
+        },
+      })
+    const unexpected = failing(new Error('db exploded'))
+    const res1 = await run(body(), unexpected.deps)
+    expect(res1.statusCode).toBe(502)
+    expect(unexpected.logged.join('\n')).toMatch(/db exploded/)
+
+    const expected = failing(new SystemError('aiNotConfigured', {}, 503))
+    await run(body(), expected.deps)
+    expect(expected.logged).toEqual([])
+  })
+
   test('the policy hook gets survey, data class and hosting class, and can refuse before the provider call', async () => {
     const SystemError = (await import('@core/systemError')).default
     const policyCalls: any[] = []
@@ -229,6 +247,35 @@ describe('handleModelRequest: stream', () => {
     expect(state.signal.aborted).toBe(true)
     expect(telemetry).toHaveLength(1)
     expect(telemetry[0].outcome.error).toBeDefined()
+  })
+
+  test.each([
+    ['piped through a TransformStream', (stream: ReadableStream) => stream.pipeThrough(new TransformStream())],
+    ['ignoring the abort signal', null],
+  ])('timeout with a stream %s still ends with aiRequestTimeout then [DONE]', async (_label, wrap) => {
+    const model = new MockLanguageModelV4({
+      doStream: async ({ abortSignal }) => {
+        const source = new ReadableStream({
+          start(controller) {
+            controller.enqueue({ type: 'stream-start', warnings: [] })
+            controller.enqueue({ type: 'text-start', id: 't' })
+            controller.enqueue({ type: 'text-delta', id: 't', delta: 'partial' })
+            if (wrap) abortSignal?.addEventListener('abort', () => controller.error(abortSignal.reason))
+          },
+        })
+        return { stream: wrap ? wrap(source) : source } as any
+      },
+    })
+    const { deps, telemetry, logged } = createDeps(model, {
+      limits: { maxPromptChars: 1000, maxOutputTokens: 100, timeoutMs: 50 },
+    })
+    const res = await run(body({ stream: true }), deps)
+    const frames = parseSseWrites(res)
+    expect(frames).toContainEqual({ type: 'error', error: { key: 'aiRequestTimeout', params: {} } })
+    expect(frames.at(-1)).toBe('[DONE]')
+    expect(telemetry).toHaveLength(1)
+    expect(telemetry[0].outcome.error).toBeDefined()
+    expect(logged).toHaveLength(1)
   })
 
   test('client disconnect mid-stream: upstream aborted, nothing more written, recorded once', async () => {
