@@ -52,6 +52,6 @@ export const summarizeActivityLogWorkflow = async ({
 }): Promise<void> => {
   const entries = await fetchEntries({ surveyId, limit: AiLimits.activityLogMaxEntries, signal })
   const request = buildActivityLogSummaryRequest({ surveyName, entries })
-  const resolvedModel = model ?? (await resolveModel({ feature: 'activityLogSummary', surveyId })).model
+  const resolvedModel = model ?? (await resolveModel({ feature: 'activityLogSummary', surveyId, signal })).model
   await streamTextChunks({ model: resolvedModel, ...request, onChunk, signal })
 }

@@ -1,10 +1,12 @@
 import type { AiPolicy } from '@common/ai/policy'
 import { loadLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
 import { defaultLocalServerSettings } from '@webapp/ai/engines/localServerSettings'
+import type { AiFeatureSwitches } from '@webapp/ai/engines/featureSwitches'
 import {
   createModelResolver,
   type LocalServerConsentAnswer,
   type LocalServerConsentRequest,
+  type ModelResolverDeps,
 } from '@webapp/ai/engines/resolveModel'
 import type { AiCapabilities, AiEngine, AiLocalServerSettings, StorageLike } from '@webapp/ai/engines/types'
 
@@ -13,6 +15,11 @@ const memoryStorage = (): StorageLike => {
   return { getItem: (key) => data.get(key) ?? null, setItem: (key, value) => void data.set(key, value) }
 }
 
+const ON_SETTINGS: AiFeatureSwitches = {
+  featuresEnabled: true,
+  featureToggles: { expressions: true, chat: true, dataQuery: true, userActivity: true, assistant: true },
+  disabledFeatures: [],
+}
 const DEFAULT_POLICY: AiPolicy = { schema: 'cloud', data: 'onDevice' }
 const BASE_URL = 'http://localhost:1234/v1'
 
@@ -44,7 +51,11 @@ const setup = ({
   answers = [] as LocalServerConsentAnswer[],
   userUuid = 'u1' as string | null,
   withStorage = true,
+  settings = ON_SETTINGS as AiFeatureSwitches | null,
+  instanceEnabled = true,
+  requestConsent = undefined as ModelResolverDeps['requestConsent'] | undefined,
 } = {}) => {
+  const currentUser = { uuid: userUuid }
   const storage = memoryStorage()
   const localSettings: AiLocalServerSettings = {
     ...defaultLocalServerSettings(),
@@ -63,7 +74,9 @@ const setup = ({
   const gatewayModel = { id: 'gateway' } as any
   const localModel = { id: 'local' } as any
   const resolve = createModelResolver({
-    getUserUuid: () => userUuid,
+    getUserUuid: () => currentUser.uuid,
+    isInstanceEnabled: () => instanceEnabled,
+    getSettings: () => settings,
     loadCapabilities: async () => capabilities({ localEnabled, baseUrl: state.baseUrl }),
     getEffectivePolicy: async (surveyId) => {
       state.policyCalls.push(surveyId)
@@ -71,10 +84,12 @@ const setup = ({
     },
     getLocalSettings: () => localSettings,
     storage: withStorage ? storage : null,
-    requestConsent: async (request) => {
-      state.requests.push(request)
-      return answers.shift() ?? 'cancel'
-    },
+    requestConsent:
+      requestConsent ??
+      (async (request) => {
+        state.requests.push(request)
+        return answers.shift() ?? 'cancel'
+      }),
     onConsentChange: () => {
       state.consentChanges += 1
     },
@@ -87,7 +102,7 @@ const setup = ({
       return { id: 'localServer', createModel: () => localModel, baseUrl: localServer.baseUrl } as unknown as AiEngine
     },
   })
-  return { resolve, state, storage, gatewayModel, localModel }
+  return { resolve, state, storage, gatewayModel, localModel, currentUser }
 }
 
 describe('createModelResolver', () => {
@@ -184,10 +199,10 @@ describe('createModelResolver', () => {
     expect(state.policyCalls).toEqual([undefined])
   })
 
-  test('an unknown feature is treated as data (fails closed)', async () => {
+  test('an unknown feature fails closed (it belongs to no enabled category)', async () => {
     const { resolve } = setup({ localEnabled: false })
     const error = await resolve({ feature: 'unknownFeature' as any, surveyId: 1 }).catch((e) => e)
-    expect(error.params.dataClass).toBe('data')
+    expect(error.key).toBe('aiFeaturesDisabled')
   })
 
   test('a null policy fails closed with policyForbidsAll', async () => {
@@ -228,5 +243,66 @@ describe('createModelResolver', () => {
     await resolve({ feature: 'activityLogSummary', surveyId: 1 })
     await resolve({ feature: 'activityLogSummary', surveyId: 1 })
     expect(state.requests.length).toBe(2)
+  })
+
+  describe('the AI switches', () => {
+    const FEATURE = 'activityLogSummary'
+    const cases: [string, Parameters<typeof setup>[0]][] = [
+      ['the user switch is off', { settings: { ...ON_SETTINGS, featuresEnabled: false } }],
+      ['the category toggle is off', { settings: { ...ON_SETTINGS, featureToggles: {} } }],
+      ['the feature is disabled on the server', { settings: { ...ON_SETTINGS, disabledFeatures: [FEATURE] } }],
+      ['the instance switch is off', { instanceEnabled: false }],
+      ['the settings failed to load', { settings: null }],
+    ]
+
+    test.each(cases)('%s: rejects even with a reachable local server', async (_name, options) => {
+      const { resolve, state } = setup({ answers: ['continue'], ...options })
+      const error = await resolve({ feature: FEATURE, surveyId: 1 }).catch((e) => e)
+      expect(error.key).toBe('aiFeaturesDisabled')
+      expect(state.requests).toEqual([])
+      expect(state.localEngines).toBe(0)
+      expect(state.gatewayCalls).toEqual([])
+    })
+  })
+
+  describe('user change and abort during the consent', () => {
+    test('another user after the dialog: cancelled, nothing is stored', async () => {
+      let switchUser: () => void = () => undefined
+      const { resolve, state, storage, currentUser } = setup({
+        requestConsent: async () => {
+          switchUser()
+          return 'continue'
+        },
+      })
+      switchUser = () => {
+        currentUser.uuid = 'u2'
+      }
+      const error = await resolve({ feature: 'activityLogSummary', surveyId: 1 }).catch((e) => e)
+      expect(error.key).toBe('aiLocalServerConsentCancelled')
+      for (const userUuid of ['u1', 'u2']) {
+        expect(loadLocalServerConsent({ storage, userUuid, surveyId: 1, baseUrl: BASE_URL })).toBeNull()
+      }
+      expect(state.consentChanges).toBe(0)
+      expect(state.localEngines).toBe(0)
+    })
+
+    test('abort while the dialog is open: the request is cancelled and the resolve rejects as an abort', async () => {
+      const controller = new AbortController()
+      let received: AbortSignal | undefined
+      const { resolve, state } = setup({
+        requestConsent: (_request, signal) =>
+          new Promise((resolveAnswer) => {
+            received = signal
+            signal?.addEventListener('abort', () => resolveAnswer('cancel'))
+          }),
+      })
+      const pending = resolve({ feature: 'activityLogSummary', surveyId: 1, signal: controller.signal })
+      await new Promise((done) => setTimeout(done, 0))
+      controller.abort()
+      const error = await pending.catch((e) => e)
+      expect(received).toBe(controller.signal)
+      expect(error.name).toBe('AbortError')
+      expect(state.localEngines).toBe(0)
+    })
   })
 })

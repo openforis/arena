@@ -37,7 +37,7 @@ export const generateDataQueryWorkflow = async ({
   signal?: AbortSignal
   model?: LanguageModel
 }): Promise<AiDataQueryGenerateResult> => {
-  const resolvedModel = model ?? (await resolveModel({ feature: 'dataQueryGenerate', surveyId })).model
+  const resolvedModel = model ?? (await resolveModel({ feature: 'dataQueryGenerate', surveyId, signal })).model
   return generateDataQuery({
     generateText: createGatewayTextGenerator(resolvedModel),
     survey,
@@ -69,6 +69,6 @@ export const summarizeDataQueryWorkflow = async ({
   signal?: AbortSignal
   model?: LanguageModel
 }): Promise<AiDataQuerySummarizeResult> => {
-  const resolvedModel = model ?? (await resolveModel({ feature: 'dataQuerySummarize', surveyId })).model
+  const resolvedModel = model ?? (await resolveModel({ feature: 'dataQuerySummarize', surveyId, signal })).model
   return summarizeDataQuery({ generateText: createGatewayTextGenerator(resolvedModel), survey, query, lang, signal })
 }

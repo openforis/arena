@@ -4,6 +4,8 @@
  */
 import type { AiPolicy } from '@common/ai/policy'
 
+import { isConfigAiFeaturesEnabled } from '@webapp/store/system/info/state'
+import { store as reduxStore } from '@webapp/store/store'
 import { isSurveyScopedFeature } from '@webapp/ai/policy/aiFeatureAvailability'
 import { fetchSurveyAiPolicy } from '@webapp/ai/policy/surveyAiPolicyClient'
 import { getGatewayModel } from '@webapp/ai/runtime/getModel'
@@ -23,6 +25,8 @@ const OFF_POLICY: AiPolicy = { schema: 'off', data: 'off' }
 
 export const appModelResolverDeps: ModelResolverDeps = {
   getUserUuid: getCurrentUserUuid,
+  isInstanceEnabled: () => isConfigAiFeaturesEnabled(reduxStore.getState()),
+  getSettings: () => getAiCapabilitiesStore().getSettings(),
   loadCapabilities: loadAiCapabilities,
   // like B: survey features use the survey's effective policy, the others (Help) the instance ceilings
   getEffectivePolicy: async (surveyId, capabilities, feature) => {

@@ -23,7 +23,7 @@ const keyOf = ({ surveyId, baseUrl, canUseOther }: LocalServerConsentRequest): s
 
 /**
  * Creates a consent request queue.
- * @returns {object} The queue: request, getPending, answer, subscribe.
+ * @returns {object} The queue: request, getPending, answer, cancelAll, subscribe.
  */
 export const createConsentRequestQueue = () => {
   const entries: Entry[] = []
@@ -43,21 +43,39 @@ export const createConsentRequestQueue = () => {
 
   return {
     /**
-     * Asks the user; resolves with their answer.
+     * Asks the user; resolves with their answer ('cancel' when the signal aborts: the dialog closes if nobody else waits).
      * @param {LocalServerConsentRequest} request - What the card shows.
+     * @param {AbortSignal} [signal] - Aborts this caller's wait.
      * @returns {Promise<LocalServerConsentAnswer>} The answer.
      */
-    request: (request: LocalServerConsentRequest): Promise<LocalServerConsentAnswer> =>
+    request: (request: LocalServerConsentRequest, signal?: AbortSignal): Promise<LocalServerConsentAnswer> =>
       new Promise((resolve) => {
-        const key = keyOf(request)
-        const existing = entries.find((entry) => entry.key === key)
-        if (existing) {
-          existing.resolvers.push(resolve)
+        if (signal?.aborted) {
+          resolve('cancel')
           return
         }
-        nextId += 1
-        entries.push({ id: nextId, key, request, resolvers: [resolve] })
-        changed()
+        const key = keyOf(request)
+        const existing = entries.find((entry) => entry.key === key)
+        // resolves this caller only, and drops the dialog when nobody else waits for it
+        const entry: Entry = existing ?? { id: (nextId += 1), key, request, resolvers: [] }
+        const abandon = () => {
+          entry.resolvers = entry.resolvers.filter((candidate) => candidate !== settle)
+          resolve('cancel')
+          if (entry.resolvers.length === 0 && entries.includes(entry)) {
+            entries.splice(entries.indexOf(entry), 1)
+            changed()
+          }
+        }
+        const settle = (answer: LocalServerConsentAnswer) => {
+          signal?.removeEventListener('abort', abandon)
+          resolve(answer)
+        }
+        signal?.addEventListener('abort', abandon, { once: true })
+        entry.resolvers.push(settle)
+        if (!existing) {
+          entries.push(entry)
+          changed()
+        }
       }),
     /**
      * Returns the request the dialog must show (same object until the queue changes).
@@ -75,6 +93,15 @@ export const createConsentRequestQueue = () => {
       if (index < 0) return
       const [entry] = entries.splice(index, 1)
       for (const resolve of entry.resolvers) resolve(answer)
+      changed()
+    },
+    /**
+     * Cancels every pending request (login, logout: a dialog must not outlive the user who triggered it).
+     * @returns {void}
+     */
+    cancelAll: (): void => {
+      const cancelled = entries.splice(0, entries.length)
+      for (const entry of cancelled) for (const resolve of entry.resolvers) resolve('cancel')
       changed()
     },
     /**
@@ -96,4 +123,5 @@ const appQueue = createConsentRequestQueue()
 export const requestLocalServerConsent = appQueue.request
 export const getPendingConsentRequest = appQueue.getPending
 export const answerConsentRequest = appQueue.answer
+export const cancelAllConsentRequests = appQueue.cancelAll
 export const subscribeConsentRequests = appQueue.subscribe

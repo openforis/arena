@@ -31,6 +31,7 @@ export type AssistantEngine<TModel, TAccess extends Access> = {
  * @param {AiFeatureKey} params.feature - Feature of the area.
  * @param {number} [params.surveyId] - Survey (none for Help).
  * @param {AiDataClass} params.dataClass - Data class of the conversation.
+ * @param {AbortSignal} [params.signal] - Stop: closes a pending consent dialog.
  * @param {Function} params.resolve - resolveModel.
  * @returns {Promise<AssistantEngine>} The turn's engine.
  */
@@ -42,6 +43,7 @@ export const resolveAssistantEngine = async <TModel, TAccess extends Access>({
   feature,
   surveyId,
   dataClass,
+  signal,
   resolve,
 }: {
   model?: TModel
@@ -51,10 +53,11 @@ export const resolveAssistantEngine = async <TModel, TAccess extends Access>({
   feature: AiFeatureKey
   surveyId?: number
   dataClass: AiDataClass
+  signal?: AbortSignal
   resolve: (params: ResolveModelParams) => Promise<{ model: TModel; engine: AiSelectedEngine }>
 }): Promise<AssistantEngine<TModel, TAccess>> => {
   if (model) return { model, limits: limits ?? defaultLimits, access, engine: null }
-  const resolved = await resolve({ feature, surveyId, dataClass })
+  const resolved = await resolve({ feature, surveyId, dataClass, signal })
   return {
     model: resolved.model,
     limits: limits ?? resolved.engine.limits,
