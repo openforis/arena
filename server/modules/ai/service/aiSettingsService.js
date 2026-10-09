@@ -12,6 +12,7 @@
  *   user.prefs.ai = {
  *     featuresEnabled,        // master switch — user wants AI at all
  *     featureToggles,         // { chat, expressions, translation, dataDictionary, userActivity, dataQuery } booleans
+ *     capabilityStats,        // opt-in anonymous capability statistics (default false)
  *     provider, model, baseUrl, apiKeyEncrypted,
  *     enabled,                // use OWN provider vs. admin default
  *     lastTestOk, lastTestAt,
@@ -35,7 +36,9 @@ import {
   areFeaturesEnabledForUser,
   defaultFeatureToggles,
   getAiPrefs as getRawPrefs,
+  isCapabilityStatsEnabledForUser,
   isCategoryEnabledForUser,
+  resolveCapabilityStatsUpdate,
   sanitiseFeatureToggles,
 } from './aiUserPrefs'
 import * as AiTelemetry from './aiTelemetry'
@@ -97,6 +100,7 @@ export const getPublicSettings = (user) => {
     return {
       featuresEnabled: false,
       featureToggles: defaultFeatureToggles(),
+      capabilityStats: false,
       provider: null,
       model: null,
       baseUrl: null,
@@ -110,6 +114,7 @@ export const getPublicSettings = (user) => {
   return {
     featuresEnabled: !!raw.featuresEnabled,
     featureToggles: sanitiseFeatureToggles(raw.featureToggles),
+    capabilityStats: isCapabilityStatsEnabledForUser(user),
     provider: raw.provider || null,
     model: raw.model || null,
     baseUrl: raw.baseUrl || null,
@@ -229,6 +234,7 @@ export const saveSettings = async ({ user, update }) => {
   const newAi = {
     featuresEnabled,
     featureToggles,
+    capabilityStats: resolveCapabilityStatsUpdate({ existing, update }),
     provider,
     model,
     baseUrl,
