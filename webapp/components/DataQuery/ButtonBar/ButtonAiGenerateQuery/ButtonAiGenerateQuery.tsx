@@ -8,9 +8,8 @@ import { Button } from '@webapp/components/buttons'
 import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
 import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
-import * as ExpressionParser from '@webapp/components/expression/expressionParser'
 import { useNotifyInfo } from '@webapp/components/hooks'
-import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
+import { DataExplorerActions, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import type { AiDataQueryGenerateResult } from '@webapp/ai/workflows'
@@ -30,23 +29,15 @@ export const ButtonAiGenerateQuery = (props: Props) => {
   const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
   const availability = useAiFeatureAvailability('dataQueryGenerate')
   const query = DataExplorerSelectors.useQuery()
-  const onChangeQuery = DataExplorerHooks.useSetQuery()
   const notifyInfo = useNotifyInfo()
 
   const applyGeneratedQuery = useCallback(
     ({ query: queryGenerated, explanation }: AiDataQueryGenerateResult) => {
-      const filter = Query.getFilter(queryGenerated)
-      const queryToApply = filter
-        ? Query.assocFilter(ExpressionParser.normalize({ expr: filter, canBeCall: true }))(queryGenerated)
-        : queryGenerated
-
-      dispatch(DataExplorerActions.setSelectedQuerySummaryUuid(null))
-      dispatch(DataExplorerActions.setNodeDefsSelectorVisible(true))
-      onChangeQuery(queryToApply)
+      dispatch(DataExplorerActions.showQuery({ query: queryGenerated }))
       Actions.closePanels()
       notifyInfo({ key: 'dataView:dataQuery.ai.generatedSuccessfully', params: { explanation } })
     },
-    [Actions, dispatch, notifyInfo, onChangeQuery]
+    [Actions, dispatch, notifyInfo]
   )
 
   const onGenerated = useCallback(
