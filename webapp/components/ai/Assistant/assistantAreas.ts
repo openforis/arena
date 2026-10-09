@@ -110,7 +110,9 @@ export const isAssistantShown = (statuses: AssistantAreaStatus[]): boolean =>
  * Picks the area to show.
  * @param {object} params - Parameters.
  * @param {AssistantAreaStatus[]} params.statuses - Area statuses.
- * @param {AssistantArea|null} params.current - Area shown now.
+ * @param {AssistantArea|null} params.current - Area shown now (kept only while the panel is open: it protects the
+ * conversation on screen; a closed panel re-evaluates the area, so Design is picked when the user reaches the designer).
+ * @param {boolean} params.panelOpen - The panel is open.
  * @param {AssistantArea|null} params.userSelectedArea - Tab the user clicked (until the panel closes).
  * @param {string|null} params.module - Current app module.
  * @returns {AssistantArea|null} The area; null when every area is hidden.
@@ -118,11 +120,13 @@ export const isAssistantShown = (statuses: AssistantAreaStatus[]): boolean =>
 export const pickArea = ({
   statuses,
   current,
+  panelOpen,
   userSelectedArea,
   module,
 }: {
   statuses: AssistantAreaStatus[]
   current: AssistantArea | null
+  panelOpen: boolean
   userSelectedArea: AssistantArea | null
   module: string | null
 }): AssistantArea | null => {
@@ -132,7 +136,7 @@ export const pickArea = ({
     area !== null && statuses.some((status) => status.area === area && status.status !== 'hidden')
   // an unavailable tab the user clicked stays selected: it shows why
   if (isShown(userSelectedArea)) return userSelectedArea
-  if (isAvailable(current)) return current
+  if (panelOpen && isAvailable(current)) return current
   const preferred: AssistantArea = module === 'designer' ? 'design' : 'help'
   if (isAvailable(preferred)) return preferred
   const firstAvailable = statuses.find((status) => status.status === 'available')

@@ -27,9 +27,9 @@ export const AssistantPanelHost = () => {
   }, [open, shown])
 
   useEffect(() => {
-    const next = pickArea({ statuses, current: area, userSelectedArea, module })
+    const next = pickArea({ statuses, current: area, panelOpen: open, userSelectedArea, module })
     if (next !== area) assistantPanelStore.setArea(next)
-  }, [area, module, statuses, userSelectedArea])
+  }, [area, module, open, statuses, userSelectedArea])
 
   if (!mounted || !shown) return null
 
