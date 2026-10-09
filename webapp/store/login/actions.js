@@ -80,10 +80,13 @@ export const logout =
     const userUuid = User.getUuid(UserState.getUser(getState()))
     dispatch(LoaderActions.showLoader())
 
-    await axios.post('/auth/logout')
-
-    ApiConstants.setAuthToken(null)
-    await clearAssistantData(userUuid)
+    try {
+      await axios.post('/auth/logout')
+      ApiConstants.setAuthToken(null)
+    } finally {
+      // also when the logout request fails (network error, expired session): no conversation stays in the browser
+      await clearAssistantData(userUuid)
+    }
     dispatch(SystemActions.resetSystem())
     dispatch(LoaderActions.hideLoader())
 
