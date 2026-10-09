@@ -45,4 +45,11 @@ describe('nodes batch reply channel', () => {
     jest.advanceTimersByTime(1)
     await expect(promise).resolves.toBeNull()
   })
+
+  test('a per-call timeout overrides the registry timeout', async () => {
+    const registry = createNodesBatchReplyRegistry({ timeoutMs: 1000 })
+    const promise = registry.waitFor('req-4', 200)
+    jest.advanceTimersByTime(200)
+    await expect(promise).resolves.toBeNull()
+  })
 })

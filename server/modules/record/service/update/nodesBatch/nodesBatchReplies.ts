@@ -9,7 +9,7 @@ type Timer = ReturnType<typeof setTimeout>
 type PendingReply = { resolve: (results: NodesBatchEditResult[] | null) => void; timer: Timer }
 
 export type NodesBatchReplyRegistry = {
-  waitFor: (requestId: string) => Promise<NodesBatchEditResult[] | null>
+  waitFor: (requestId: string, timeoutMs?: number) => Promise<NodesBatchEditResult[] | null>
   resolveReply: (reply: { requestId: string; results: NodesBatchEditResult[] }) => boolean
   size: () => number
 }
@@ -36,17 +36,21 @@ export const createNodesBatchReplyRegistry = ({
   /**
    * Waits for the reply of a request; resolves null on timeout (the entry is then dropped).
    * @param {string} requestId - The request id.
+   * @param {number} [waitMs] - How long to wait for this request (never more than the registry timeout, which is the default).
    * @returns {Promise<NodesBatchEditResult[]|null>} The results, or null.
    */
-  const waitFor = (requestId: string): Promise<NodesBatchEditResult[] | null> =>
+  const waitFor = (requestId: string, waitMs: number = timeoutMs): Promise<NodesBatchEditResult[] | null> =>
     new Promise((resolve) => {
       const entry: PendingReply = {
         resolve,
-        timer: setTimer(() => {
-          // only drop our own entry: the id may have been reused since
-          if (pending.get(requestId) === entry) pending.delete(requestId)
-          resolve(null)
-        }, timeoutMs),
+        timer: setTimer(
+          () => {
+            // only drop our own entry: the id may have been reused since
+            if (pending.get(requestId) === entry) pending.delete(requestId)
+            resolve(null)
+          },
+          Math.min(waitMs, timeoutMs)
+        ),
       }
       pending.set(requestId, entry)
     })

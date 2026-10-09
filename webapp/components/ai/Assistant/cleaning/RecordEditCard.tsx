@@ -153,7 +153,7 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
                 key={operation.id}
                 operation={operation}
                 result={resultById.get(operation.id)}
-                selected={!deselectedIds.includes(operation.id)}
+                selected={selectableIds.includes(operation.id) && !deselectedIds.includes(operation.id)}
                 selectable={!locked && selectableIds.includes(operation.id)}
                 onToggle={onToggle}
               />

@@ -58,6 +58,8 @@ type RequestContext = {
   survey: any
   qualifierFilters: any
   canEditQualifierValue: boolean
+  // one deadline for the whole request: the records are checked one after the other
+  deadline: number
   deps: NodesBatchServiceDeps
 }
 
@@ -164,17 +166,17 @@ const checkRecordEdits = async (context: RequestContext, recordUuid: string, edi
  * @param {RequestContext} context - The request context.
  * @param {string} recordUuid - The record uuid.
  * @param {NodesBatchRecordEdit[]} edits - The edits to apply.
- * @returns {Promise<NodesBatchEditResult[]>} The results (failed with appErrors:aiApplyTimeout without reply in 60 s).
+ * @returns {Promise<NodesBatchEditResult[]>} The results (failed with appErrors:aiApplyTimeout without reply before the request deadline).
  */
 const sendRecordEdits = async (
   context: RequestContext,
   recordUuid: string,
   edits: NodesBatchRecordEdit[]
 ): Promise<NodesBatchEditResult[]> => {
-  const { user, surveyId, cycle, timezoneOffset, lang, deps } = context
+  const { user, surveyId, cycle, timezoneOffset, lang, deadline, deps } = context
   const requestId = uuidv4()
   // registered before posting, so the reply can't be missed
-  const reply = deps.replies.waitFor(requestId)
+  const reply = deps.replies.waitFor(requestId, Math.max(0, deadline - Date.now()))
   deps.postBatchMessage({
     type: RecordsUpdateThreadMessageTypes.nodesBatchPersist,
     requestId,
@@ -186,7 +188,7 @@ const sendRecordEdits = async (
     edits,
     timezoneOffset,
     lang,
-    deadline: Date.now() + NodesBatchLimits.replyTimeoutMs,
+    deadline,
   })
   const results = await reply
   return results ?? failedResults(edits, NodesBatchMessageKeys.applyTimeout)
@@ -222,6 +224,7 @@ export const updateNodesBatch = async (
   },
   deps: NodesBatchServiceDeps = createDefaultNodesBatchServiceDeps()
 ): Promise<NodesBatchEditResult[]> => {
+  const deadline = Date.now() + NodesBatchLimits.replyTimeoutMs
   const survey = await deps.fetchSurvey({ surveyId, cycle })
   const context: RequestContext = {
     user,
@@ -232,6 +235,7 @@ export const updateNodesBatch = async (
     survey,
     qualifierFilters: await deps.fetchQualifierFilters({ user, survey }),
     canEditQualifierValue: Authorizer.canEditQualifierAttributeValue(user, Survey.getSurveyInfo(survey)),
+    deadline,
     deps,
   }
   const results: NodesBatchEditResult[] = []

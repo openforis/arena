@@ -7,31 +7,40 @@ import { isRecordEditOperation, type RecordAttributeUpdateOperation, type Record
 // the endpoint accepts at most 50 records per request
 export const RECORDS_PER_REQUEST = 50
 
+// ... and at most 200 edits
+export const EDITS_PER_REQUEST = 200
+
 /**
- * Splits edits into chunks of at most `maxRecords` records; all the edits of a record go to the same chunk.
+ * Splits edits into chunks of at most `maxRecords` records and `maxEdits` edits; all the edits of a record go to
+ * the same chunk (a record with more than `maxEdits` edits gets a chunk of its own).
  * @param {RecordAttributeUpdateOperation[]} operations - Edits, in change set order.
  * @param {number} [maxRecords] - Records per chunk.
+ * @param {number} [maxEdits] - Edits per chunk.
  * @returns {RecordAttributeUpdateOperation[][]} The chunks.
  */
 export const chunkOperationsByRecord = (
   operations: RecordAttributeUpdateOperation[],
-  maxRecords: number = RECORDS_PER_REQUEST
+  maxRecords: number = RECORDS_PER_REQUEST,
+  maxEdits: number = EDITS_PER_REQUEST
 ): RecordAttributeUpdateOperation[][] => {
-  const chunks: RecordAttributeUpdateOperation[][] = []
-  const chunkIndexByRecord = new Map<string, number>()
-  let recordsInLastChunk = 0
+  const operationsByRecord = new Map<string, RecordAttributeUpdateOperation[]>()
   for (const operation of operations) {
-    let chunkIndex = chunkIndexByRecord.get(operation.recordUuid)
-    if (chunkIndex === undefined) {
-      if (chunks.length === 0 || recordsInLastChunk === maxRecords) {
-        chunks.push([])
-        recordsInLastChunk = 0
-      }
-      chunkIndex = chunks.length - 1
-      chunkIndexByRecord.set(operation.recordUuid, chunkIndex)
+    const recordOperations = operationsByRecord.get(operation.recordUuid) ?? []
+    recordOperations.push(operation)
+    operationsByRecord.set(operation.recordUuid, recordOperations)
+  }
+  const chunks: RecordAttributeUpdateOperation[][] = []
+  let recordsInLastChunk = 0
+  for (const recordOperations of operationsByRecord.values()) {
+    const last = chunks[chunks.length - 1]
+    const fits = last && recordsInLastChunk < maxRecords && last.length + recordOperations.length <= maxEdits
+    if (fits) {
+      last.push(...recordOperations)
       recordsInLastChunk += 1
+    } else {
+      chunks.push([...recordOperations])
+      recordsInLastChunk = 1
     }
-    chunks[chunkIndex].push(operation)
   }
   return chunks
 }
@@ -54,10 +63,11 @@ const toOperationResult = (id: string, result?: RecordEditResult): OperationResu
  * @param {unknown} error - The axios error.
  * @returns {OperationResult} The result.
  */
-const toRequestErrorResult = (id: string, error: any): OperationResult => {
+const toChunkErrorResult = (id: string, error: any): OperationResult => {
   const data = error?.response?.data
   // the edits may have been written: the message tells the user to check the records
-  if (isTimeoutError(error) && !data?.key) return { id, status: 'failed', message: 'appErrors:aiApplyTimeout' }
+  if ((isTimeoutError(error) || error?.code === 'ERR_CANCELED') && !data?.key)
+    return { id, status: 'failed', message: 'appErrors:aiApplyTimeout' }
   if (data?.key) return { id, status: 'failed', message: data.key, params: data.params ?? {} }
   return { id, status: 'failed', message: 'appErrors:networkError' }
 }
@@ -87,7 +97,7 @@ const applyChunk = async ({
     const resultByIndex = new Map(results.map((result) => [result.index, result]))
     return chunk.map((operation, index) => toOperationResult(operation.id, resultByIndex.get(index)))
   } catch (error) {
-    return chunk.map((operation) => toRequestErrorResult(operation.id, error))
+    return chunk.map((operation) => toChunkErrorResult(operation.id, error))
   }
 }
 

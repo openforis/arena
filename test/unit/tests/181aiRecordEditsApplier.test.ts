@@ -46,6 +46,19 @@ describe('chunkOperationsByRecord', () => {
   })
 })
 
+describe('chunkOperationsByRecord edit limit', () => {
+  test('at most 200 edits per chunk, a record never split', () => {
+    const operations = [
+      ...Array.from({ length: 150 }, (_, index) => operation('a', `n${index}`)),
+      ...Array.from({ length: 60 }, (_, index) => operation('b', `n${index}`)),
+      operation('c', 'n'),
+    ]
+    const chunks = chunkOperationsByRecord(operations)
+    expect(chunks.map((chunk) => chunk.length)).toEqual([150, 61])
+    expect(chunks[1].map((op) => op.recordUuid)).toEqual([...Array(60).fill('b'), 'c'])
+  })
+})
+
 describe('applyRecordEdits', () => {
   test('posts each chunk and merges the results by edit, in operation order', async () => {
     const operations = Array.from({ length: 60 }, (_, index) => operation(`r${index}`, 'n'))
