@@ -22,7 +22,7 @@ export type ApplierDeps = {
     propsAdvanced: Record<string, unknown>
   }) => Promise<void>
   onNodeDefCreated: (nodeDef: any) => void
-  onNodeDefUpdated: (nodeDef: any) => void
+  onNodeDefUpdated: (nodeDef: any, prevNodeDef: any) => void
   onNodeDefSaved: (params: { nodeDef: any; nodeDefParent: any }) => void
 }
 
@@ -101,7 +101,7 @@ const persistGroup = async (group: Group, deps: ApplierDeps): Promise<void> => {
       props,
       propsAdvanced,
     })
-    deps.onNodeDefUpdated(nodeDef)
+    deps.onNodeDefUpdated(nodeDef, before)
   }
   deps.onNodeDefSaved({ nodeDef, nodeDefParent: Survey.getNodeDefParent(nodeDef)(deps.getSurvey()) })
 }
@@ -113,7 +113,12 @@ const applyGroups = async (
   results: Map<string, OperationResult>
 ) => {
   const appliedCreates = new Set<string>()
-  for (const group of groups) {
+  for (const [index, group] of groups.entries()) {
+    // the designer may have become dirty while earlier groups were saving
+    if (index > 0 && deps.isSurveyDirty()) {
+      setGroupStatus(results, group, 'skipped', 'surveyDirty')
+      continue
+    }
     if (dependsOnMissingCreate(group, deps.getSurvey(), appliedCreates, changeSet)) {
       setGroupStatus(results, group, 'skipped', 'dependencyNotApplied')
       continue

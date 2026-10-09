@@ -18,6 +18,7 @@ beforeAll(async () => {
 const createFakeDeps = (overrides: Partial<ApplierDeps> = {}) => {
   let survey = initialSurvey
   const calls: [string, any][] = []
+  const prevDefs: any[] = []
   const deps: ApplierDeps = {
     getSurvey: () => survey,
     getCycle: () => '0',
@@ -32,8 +33,9 @@ const createFakeDeps = (overrides: Partial<ApplierDeps> = {}) => {
       calls.push(['created', NodeDef.getName(nodeDef)])
       survey = Survey.assocNodeDef({ nodeDef })(survey)
     },
-    onNodeDefUpdated: (nodeDef) => {
+    onNodeDefUpdated: (nodeDef, prevNodeDef) => {
       calls.push(['updated', NodeDef.getName(nodeDef)])
+      prevDefs.push(prevNodeDef)
       survey = Survey.assocNodeDef({ nodeDef })(survey)
     },
     onNodeDefSaved: ({ nodeDef, nodeDefParent }) => {
@@ -41,7 +43,7 @@ const createFakeDeps = (overrides: Partial<ApplierDeps> = {}) => {
     },
     ...overrides,
   }
-  return { deps, calls, setSurvey: (value: any) => (survey = value), getSurvey: () => survey }
+  return { deps, calls, prevDefs, setSurvey: (value: any) => (survey = value), getSurvey: () => survey }
 }
 
 const uuidOf = (name: string) => NodeDef.getUuid(getDefByName(initialSurvey, name))
@@ -149,6 +151,38 @@ describe('applyChangeSet', () => {
     ])
     expect(calls.filter(([type]) => type === 'put').map(([, params]) => params.nodeDefUuid)).toEqual([
       uuidOf('cluster_notes'),
+    ])
+  })
+
+  test('the updated callback receives the previous definition (rename)', async () => {
+    const operations: ChangeOperation[] = [
+      {
+        id: 'r1',
+        type: 'nodeDef.update',
+        nodeDefUuid: uuidOf('cluster_notes'),
+        prop: 'name',
+        from: 'cluster_notes',
+        to: 'notes_renamed',
+      },
+    ]
+    const { deps, prevDefs } = createFakeDeps()
+    await applyChangeSet({ changeSet: changeSetOf(operations), operationIds: ['r1'], deps })
+    expect(prevDefs.map((def) => NodeDef.getName(def))).toEqual(['cluster_notes'])
+  })
+
+  test('becoming dirty mid-way skips the remaining groups', async () => {
+    const operations = buildOperations()
+    let dirty = false
+    const { deps } = createFakeDeps({
+      isSurveyDirty: () => dirty,
+      putNodeDefProps: async () => {
+        dirty = true
+      },
+    })
+    const results = await applyChangeSet({ changeSet: changeSetOf(operations), operationIds: ['o3', 'o5'], deps })
+    expect(results).toEqual([
+      { id: 'o3', status: 'applied' },
+      { id: 'o5', status: 'skipped', message: 'surveyDirty' },
     ])
   })
 

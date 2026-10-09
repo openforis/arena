@@ -31,7 +31,7 @@ export const createApplierDeps = ({
     await dispatch(NodeDefsActions.putNodeDefProps(params))
   },
   onNodeDefCreated: (nodeDef) => dispatch({ type: NodeDefsActions.nodeDefCreate, nodeDef }),
-  onNodeDefUpdated: (nodeDef) => dispatch(NodeDefsActions.updateNodeDef({ nodeDef })),
+  onNodeDefUpdated: (nodeDef, prevNodeDef) => dispatch(NodeDefsActions.updateNodeDef({ nodeDef, prevNodeDef })),
   onNodeDefSaved: ({ nodeDef, nodeDefParent }) =>
     dispatch(
       NodeDefsActions.saveNodeDef({
