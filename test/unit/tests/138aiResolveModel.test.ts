@@ -16,14 +16,20 @@ const memoryStorage = (): StorageLike => {
 const DEFAULT_POLICY: AiPolicy = { schema: 'cloud', data: 'onDevice' }
 const BASE_URL = 'http://localhost:1234/v1'
 
-const capabilities = ({ localEnabled }: { localEnabled: boolean }): AiCapabilities => ({
+const capabilities = ({
+  localEnabled,
+  baseUrl = BASE_URL,
+}: {
+  localEnabled: boolean
+  baseUrl?: string
+}): AiCapabilities => ({
   localServer: {
     enabled: localEnabled,
     reachable: localEnabled ? true : null,
     models: localEnabled ? ['local-model'] : [],
     hostingClass: localEnabled ? 'onDevice' : null,
     contextTokens: 4096,
-    baseUrl: localEnabled ? BASE_URL : null,
+    baseUrl: localEnabled ? baseUrl : null,
     modelId: 'local-model',
     error: null,
   },
@@ -32,7 +38,13 @@ const capabilities = ({ localEnabled }: { localEnabled: boolean }): AiCapabiliti
   instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [] },
 })
 
-const setup = ({ localEnabled = true, policy = DEFAULT_POLICY, answers = [] as LocalServerConsentAnswer[] } = {}) => {
+const setup = ({
+  localEnabled = true,
+  policy = DEFAULT_POLICY,
+  answers = [] as LocalServerConsentAnswer[],
+  userUuid = 'u1' as string | null,
+  withStorage = true,
+} = {}) => {
   const storage = memoryStorage()
   const localSettings: AiLocalServerSettings = {
     ...defaultLocalServerSettings(),
@@ -40,7 +52,8 @@ const setup = ({ localEnabled = true, policy = DEFAULT_POLICY, answers = [] as L
     modelId: 'local-model',
   }
   const state = {
-    policy,
+    baseUrl: BASE_URL,
+    policy: policy as AiPolicy | null,
     requests: [] as LocalServerConsentRequest[],
     policyCalls: [] as (number | undefined)[],
     gatewayCalls: [] as unknown[],
@@ -50,14 +63,14 @@ const setup = ({ localEnabled = true, policy = DEFAULT_POLICY, answers = [] as L
   const gatewayModel = { id: 'gateway' } as any
   const localModel = { id: 'local' } as any
   const resolve = createModelResolver({
-    getUserUuid: () => 'u1',
-    loadCapabilities: async () => capabilities({ localEnabled }),
+    getUserUuid: () => userUuid,
+    loadCapabilities: async () => capabilities({ localEnabled, baseUrl: state.baseUrl }),
     getEffectivePolicy: async (surveyId) => {
       state.policyCalls.push(surveyId)
       return state.policy
     },
     getLocalSettings: () => localSettings,
-    storage,
+    storage: withStorage ? storage : null,
     requestConsent: async (request) => {
       state.requests.push(request)
       return answers.shift() ?? 'cancel'
@@ -175,5 +188,45 @@ describe('createModelResolver', () => {
     const { resolve } = setup({ localEnabled: false })
     const error = await resolve({ feature: 'unknownFeature' as any, surveyId: 1 }).catch((e) => e)
     expect(error.params.dataClass).toBe('data')
+  })
+
+  test('a null policy fails closed with policyForbidsAll', async () => {
+    const { resolve } = setup({ policy: null as any })
+    const error = await resolve({ feature: 'expressionExplain', surveyId: 1 }).catch((e) => e)
+    expect(error.key).toBe('aiNoEngineAvailable')
+    expect(error.params.reasons).toEqual(['policyForbidsAll'])
+  })
+
+  test('without a survey (Help) the card is asked once, then remembered', async () => {
+    const { resolve, state } = setup({ answers: ['continue'] })
+    await resolve({ feature: 'chatbot' })
+    await resolve({ feature: 'chatbot' })
+    expect(state.requests.length).toBe(1)
+    expect(state.requests[0].surveyId).toBeUndefined()
+  })
+
+  test('a changed server address asks again although the old one was accepted', async () => {
+    const { resolve, state } = setup({ answers: ['continue', 'continue'] })
+    await resolve({ feature: 'activityLogSummary', surveyId: 1 })
+    state.baseUrl = 'http://localhost:5678/v1'
+    await resolve({ feature: 'activityLogSummary', surveyId: 1 })
+    expect(state.requests.map((r) => r.baseUrl)).toEqual([BASE_URL, 'http://localhost:5678/v1'])
+  })
+
+  test('after Use another engine the engine is the gateway one with its limits', async () => {
+    const { resolve } = setup({ answers: ['useOther'] })
+    const { engine } = await resolve({ feature: 'expressionExplain', surveyId: 1 })
+    expect(engine.hostingClass).toBe('cloud')
+    expect(engine.limits).toEqual({ maxPromptChars: 1000, maxSteps: 10 })
+  })
+
+  test.each([
+    ['no storage', { withStorage: false }],
+    ['no user', { userUuid: null }],
+  ])('%s: the card is asked on every request', async (_name, options) => {
+    const { resolve, state } = setup({ answers: ['continue', 'continue'], ...options })
+    await resolve({ feature: 'activityLogSummary', surveyId: 1 })
+    await resolve({ feature: 'activityLogSummary', surveyId: 1 })
+    expect(state.requests.length).toBe(2)
   })
 })

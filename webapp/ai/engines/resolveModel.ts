@@ -63,6 +63,13 @@ type Context = {
 const consentCancelled = () => new SystemError('aiLocalServerConsentCancelled', {}, StatusCodes.CONFLICT)
 
 /**
+ * Returns the address of the server the model is built from (normalized, from the capabilities).
+ * @param {Context} context - Request context.
+ * @returns {string} The base URL.
+ */
+const getServerBaseUrl = (context: Context): string => context.capabilities.localServer.baseUrl ?? ''
+
+/**
  * Runs the engine selection, optionally ignoring the local server.
  * @param {Context} context - Request context.
  * @param {object} params - Parameters.
@@ -104,7 +111,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
     storage: deps.storage,
     userUuid: deps.getUserUuid(),
     surveyId: context.options.surveyId,
-    baseUrl: context.localSettings.baseUrl,
+    baseUrl: getServerBaseUrl(context),
   })
 
   /**
@@ -153,7 +160,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
     const alternative = select(context, { preferLocal: false, withLocal: false })
     const answer = await deps.requestConsent({
       surveyId: context.options.surveyId,
-      baseUrl: context.localSettings.baseUrl,
+      baseUrl: getServerBaseUrl(context),
       modelId: engine.model,
       hostingClass: engine.hostingClass,
       canUseOther: 'engine' in alternative,
