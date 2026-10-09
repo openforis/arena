@@ -42,6 +42,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ai-sdk/openai-compatible@npm:3.0.62":
+  version: 3.0.62
+  resolution: "@ai-sdk/openai-compatible@npm:3.0.62"
+  dependencies:
+    "@ai-sdk/provider": "npm:4.0.21"
+    "@ai-sdk/provider-utils": "npm:5.0.53"
+  peerDependencies:
+    zod: ^3.25.76 || ^4.1.8
+  checksum: 10c0/9bfb186094b85b50cec63df6830e233ccb463b7f874fe423a4e2d1877ce965f8f6a0f1400b9f918273de724e462710ab9b293f0a03f89a605c37da68b20e73d4
+  languageName: node
+  linkType: hard
+
 "@ai-sdk/openai@npm:^4":
   version: 4.0.83
   resolution: "@ai-sdk/openai@npm:4.0.83"
@@ -75,15 +87,6 @@ __metadata:
   dependencies:
     json-schema: "npm:^0.4.0"
   checksum: 10c0/54853cafef755babbf0e1f3d7f2cdac28bb0b8d3bfcb28bb0eace9210fcfbc0e1448d331519ba879713c0fa5b6df7902117e54be047f451b9eecdb281e0a0b6e
-  languageName: node
-  linkType: hard
-
-"@ai-sdk/provider@npm:^4":
-  version: 4.0.22
-  resolution: "@ai-sdk/provider@npm:4.0.22"
-  dependencies:
-    json-schema: "npm:^0.4.0"
-  checksum: 10c0/e13f0718fba425c1ed03785ad3f9a8cb7c468760f7c3f7aca658d23025af41ece9a9ab69a9b3dde026a3e4ff5bc261a07fbaff03f8a3003cfc6612578991760a
   languageName: node
   linkType: hard
 
@@ -14272,7 +14275,8 @@ __metadata:
     "@ai-sdk/anthropic": "npm:^4"
     "@ai-sdk/google": "npm:^4"
     "@ai-sdk/openai": "npm:^4"
-    "@ai-sdk/provider": "npm:^4"
+    "@ai-sdk/openai-compatible": "npm:3.0.62"
+    "@ai-sdk/provider": "npm:4.0.21"
     "@aws-sdk/client-s3": "npm:^3.1145.0"
     "@babel/cli": "npm:^7.29.7"
     "@babel/core": "npm:^7.29.7"
