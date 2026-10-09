@@ -67,15 +67,18 @@ export const mapLocalServerFetchError = ({ error, baseUrl }: { error: unknown; b
   isAbortLike(error) ? error : new SystemError(UNREACHABLE_KEY, { baseUrl }, StatusCodes.SERVICE_UNAVAILABLE)
 
 /**
- * Adds Chrome's Local Network Access opt-in (`targetAddressSpace: 'local'`) for private addresses.
+ * Adds Chrome's Local Network Access opt-in (`targetAddressSpace: 'local'`) for private addresses, and refuses
+ * redirects: the data class was decided from the configured address, a redirect could send the prompt elsewhere
+ * (a refused redirect fails the fetch, which maps to the unreachable error).
  * @param {RequestInit} init - Request init.
  * @param {string} url - Request URL.
  * @returns {RequestInit} The init to use.
  */
 export const withAddressSpace = (init: RequestInit, url: string): RequestInit => {
   const targetAddressSpace = getTargetAddressSpace(url)
+  const strict: RequestInit = { ...init, redirect: 'error' }
   // not in the TypeScript DOM types yet
-  return targetAddressSpace ? ({ ...init, targetAddressSpace } as RequestInit) : init
+  return targetAddressSpace ? ({ ...strict, targetAddressSpace } as RequestInit) : strict
 }
 
 /**
