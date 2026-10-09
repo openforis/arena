@@ -10,7 +10,7 @@ import {
   type AiTranslationResult,
 } from '@common/ai/tasks/translation'
 
-import { resolveGatewayModel } from '../runtime/resolveModel'
+import { resolveModel } from '@webapp/ai/engines/resolveModel'
 import { createGatewayTextGenerator } from '../runtime/textGenerators'
 
 /**
@@ -35,7 +35,7 @@ export const translateLabelsWorkflow = async ({
   signal?: AbortSignal
   model?: LanguageModel
 }): Promise<AiTranslationResult> => {
-  const resolvedModel = await resolveGatewayModel({ model, feature: 'translation', surveyId })
+  const resolvedModel = model ?? (await resolveModel({ feature: 'translation', surveyId })).model
   return translateItems({
     generateText: createGatewayTextGenerator(resolvedModel),
     sourceLang,

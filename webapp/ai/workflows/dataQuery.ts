@@ -10,7 +10,7 @@ import {
   type AiDataQuerySummarizeResult,
 } from '@common/ai/tasks/dataQuery'
 
-import { resolveGatewayModel } from '../runtime/resolveModel'
+import { resolveModel } from '@webapp/ai/engines/resolveModel'
 import { createGatewayTextGenerator } from '../runtime/textGenerators'
 
 /**
@@ -37,7 +37,7 @@ export const generateDataQueryWorkflow = async ({
   signal?: AbortSignal
   model?: LanguageModel
 }): Promise<AiDataQueryGenerateResult> => {
-  const resolvedModel = await resolveGatewayModel({ model, feature: 'dataQueryGenerate', surveyId })
+  const resolvedModel = model ?? (await resolveModel({ feature: 'dataQueryGenerate', surveyId })).model
   return generateDataQuery({
     generateText: createGatewayTextGenerator(resolvedModel),
     survey,
@@ -69,6 +69,6 @@ export const summarizeDataQueryWorkflow = async ({
   signal?: AbortSignal
   model?: LanguageModel
 }): Promise<AiDataQuerySummarizeResult> => {
-  const resolvedModel = await resolveGatewayModel({ model, feature: 'dataQuerySummarize', surveyId })
+  const resolvedModel = model ?? (await resolveModel({ feature: 'dataQuerySummarize', surveyId })).model
   return summarizeDataQuery({ generateText: createGatewayTextGenerator(resolvedModel), survey, query, lang, signal })
 }

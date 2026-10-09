@@ -12,7 +12,7 @@ import type { AiPolicy } from '@common/ai/policy'
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { getHandbookOutline } from '@webapp/ai/help/handbookSearch'
 import { loadHandbook } from '@webapp/ai/help/loadHandbook'
-import { resolveGatewayModel } from '@webapp/ai/runtime/resolveModel'
+import { resolveModel } from '@webapp/ai/engines/resolveModel'
 import { getAiErrorKey, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
@@ -153,7 +153,7 @@ export const runAssistantTurn = async ({
     const feature = assistantAreaFeatures[area]
     // Help sends no survey content and no surveyId (deviation 9)
     const surveyId = area !== 'help' && ctx.survey ? Survey.getId(ctx.survey) : undefined
-    const turnModel = model ?? (await resolveGatewayModel({ feature, surveyId }))
+    const turnModel = model ?? (await resolveModel({ feature, surveyId })).model
     const toolList = getTools({
       area,
       ctx: turnCtx,

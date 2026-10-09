@@ -40,7 +40,7 @@ export const useAiFeatureAvailability = (feature: string): AiFeatureAvailability
   const ceilings = settings ? getCeilingsFromSettings(settings) : null
   const effective = resolveEffectivePolicy({ surveyScoped, state, error, ceilings })
   const location = {
-    // an unknown class is null, like in resolveGatewayModel
+    // an unknown class is null, like in resolveModel
     hostingClass: toHostingClass(settings?.hostingClass),
     provider: settings?.effectiveProvider ?? null,
     model: settings?.effectiveModel ?? null,

@@ -1,6 +1,6 @@
 /**
  * Resolves the model of an AI request: engine selection (policy, data class, capabilities, preference),
- * first-use consent for the local server, then the model. Replaces A's resolveGatewayModel.
+ * first-use consent for the local server, then the model. Replaces A's gateway-only resolver.
  */
 import type { LanguageModel } from 'ai'
 
@@ -39,8 +39,12 @@ export type ResolvedModel = { model: LanguageModel; engine: AiSelectedEngine }
 export type ModelResolverDeps = {
   getUserUuid: () => string | null
   loadCapabilities: () => Promise<AiCapabilities>
-  // survey policy within the ceilings (the ceilings alone without a survey); null fails closed
-  getEffectivePolicy: (surveyId: number | undefined, capabilities: AiCapabilities) => Promise<AiPolicy | null>
+  // survey policy within the ceilings (the ceilings alone for features without a survey); null fails closed
+  getEffectivePolicy: (
+    surveyId: number | undefined,
+    capabilities: AiCapabilities,
+    feature: AiFeatureKey
+  ) => Promise<AiPolicy | null>
   getLocalSettings: () => AiLocalServerSettings
   storage: StorageLike | null
   requestConsent: (request: LocalServerConsentRequest) => Promise<LocalServerConsentAnswer>
@@ -189,7 +193,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
       surveyId,
     }
     const capabilities = await deps.loadCapabilities()
-    const effective = await deps.getEffectivePolicy(surveyId, capabilities)
+    const effective = await deps.getEffectivePolicy(surveyId, capabilities, feature)
     const context: Context = { options, capabilities, effective, localSettings: deps.getLocalSettings() }
 
     const consent = context.localSettings.enabled ? loadLocalServerConsent(consentParams(context)) : null
@@ -199,4 +203,20 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
     if (engine.id === 'gateway') return createWithGateway(context, engine)
     return consent === 'accepted' ? createWithLocal(context, engine) : askConsent(context, engine)
   }
+}
+
+let appResolver: ((params: ResolveModelParams) => Promise<ResolvedModel>) | null = null
+
+/**
+ * Returns the model and the engine for an AI request (app entry point; replaces A's gateway-only resolver).
+ * The app wiring is loaded lazily: it imports the redux store, which the workflow unit tests must not load.
+ * @param {ResolveModelParams} params - Feature, survey and optional data class (the assistant's conversation class).
+ * @returns {Promise<ResolvedModel>} The model and the engine description.
+ */
+export const resolveModel = async (params: ResolveModelParams): Promise<ResolvedModel> => {
+  if (!appResolver) {
+    const { appModelResolverDeps } = await import('./appModelResolverDeps')
+    appResolver = createModelResolver(appModelResolverDeps)
+  }
+  return appResolver(params)
 }
