@@ -484,13 +484,31 @@ const parseSinglePropInput: InputParser = (params) =>
     headers: headersOf(params.nodeDef),
   })
 
+const decimalPattern = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/
+
 /**
- * Parses an integer: layer 1, plus a whole-number check.
+ * Parses a decimal: layer 1, plus a plain decimal notation and finite check (no hex, Infinity, etc.).
+ * @param {InputParserParams} params - The parser parameters.
+ * @returns {Promise<ParsedNodeValue>} The node value.
+ */
+const parseDecimalInput: InputParser = async (params) => {
+  const text = String(params.input).trim()
+  if (!decimalPattern.test(text) || !Number.isFinite(Number(text))) {
+    throw new SystemError('validationErrors:dataImport.invalidNumber', {
+      value: String(params.input),
+      headers: headersOf(params.nodeDef),
+    })
+  }
+  return parseSinglePropInput(params)
+}
+
+/**
+ * Parses an integer: a decimal that must be a whole number.
  * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value.
  */
 const parseIntegerInput: InputParser = async (params) => {
-  const parsed = await parseSinglePropInput(params)
+  const parsed = await parseDecimalInput(params)
   if (!Number.isInteger(parsed.value)) {
     throw new SystemError('validationErrors:dataImport.invalidNumber', {
       value: String(params.input),
@@ -501,11 +519,19 @@ const parseIntegerInput: InputParser = async (params) => {
 }
 
 /**
- * Parses a text value (kept as is).
+ * Parses a text value (kept as is); objects are refused so that "[object Object]" is never stored.
  * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value.
  */
-const parseTextInput: InputParser = async ({ input }) => ({ value: String(input), refData: null })
+const parseTextInput: InputParser = async ({ nodeDef, input }) => {
+  if (typeof input === 'object') {
+    throw new SystemError('validationErrors:nodeValueParser.unsupportedType', {
+      attributeName: NodeDef.getName(nodeDef),
+      type: 'object',
+    })
+  }
+  return { value: String(input), refData: null }
+}
 
 /**
  * Splits a coordinate input into x, y and srs.
@@ -649,7 +675,7 @@ const inputParserByNodeDefType: Record<string, InputParser> = {
   [NodeDef.nodeDefType.code]: parseCodeInput,
   [NodeDef.nodeDefType.coordinate]: parseCoordinateInput,
   [NodeDef.nodeDefType.date]: parseSinglePropInput,
-  [NodeDef.nodeDefType.decimal]: parseSinglePropInput,
+  [NodeDef.nodeDefType.decimal]: parseDecimalInput,
   [NodeDef.nodeDefType.integer]: parseIntegerInput,
   [NodeDef.nodeDefType.taxon]: parseTaxonInput,
   [NodeDef.nodeDefType.text]: parseTextInput,
