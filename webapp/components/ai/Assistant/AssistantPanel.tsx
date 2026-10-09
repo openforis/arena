@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef } from 'react'
 
 import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
+import { AiNotAvailable } from '@webapp/components/ai/AiNotAvailable'
 import { ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
@@ -113,6 +114,14 @@ const AssistantBody = ({
   api: AssistantConversationApi
 }) => {
   const t = useI18nT({ unescapeHtml: true })
+  if (status?.engineAvailability && status.status !== 'available') {
+    // the reasons with their actions (turn on the local server, choose a model, change the policy, retry)
+    return (
+      <div className="ai-assistant-panel__unavailable" data-testid={TestId.aiAssistant.unavailable}>
+        <AiNotAvailable availability={status.engineAvailability} />
+      </div>
+    )
+  }
   if (status?.status !== 'available') {
     return (
       <div className="ai-assistant-panel__unavailable" data-testid={TestId.aiAssistant.unavailable}>
