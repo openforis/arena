@@ -46,6 +46,7 @@ export const TestId = {
     newConversationBtn: 'ai-assistant-new-conversation-btn',
     openBtn: 'ai-assistant-open-btn',
     panel: 'ai-assistant-panel',
+    recordDataNotice: 'ai-assistant-record-data-notice',
     retryBtn: 'ai-assistant-retry-btn',
     sendBtn: 'ai-assistant-send-btn',
     stale: 'ai-assistant-stale',
