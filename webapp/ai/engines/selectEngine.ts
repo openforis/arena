@@ -82,7 +82,7 @@ const applyPolicy = (
 /**
  * Selects the engine for a request.
  * @param {object} params - Parameters.
- * @param {AiPolicy} params.effective - Effective policy (survey policy within the instance ceilings).
+ * @param {AiPolicy|null} params.effective - Effective policy, null fails closed (survey policy within the instance ceilings).
  * @param {AiDataClass} params.dataClass - Data class of the request.
  * @param {AiCapabilities} params.capabilities - What this browser can use.
  * @param {object} params.prefs - User preferences.
@@ -95,12 +95,12 @@ export const selectEngine = ({
   capabilities,
   prefs,
 }: {
-  effective: AiPolicy
+  effective: AiPolicy | null
   dataClass: AiDataClass
   capabilities: AiCapabilities
   prefs: { preferLocal: boolean }
 }): AiEngineSelection => {
-  if (effective[dataClass] === 'off') return { unavailable: ['policyForbidsAll'] }
+  if (!effective || effective[dataClass] === 'off') return { unavailable: ['policyForbidsAll'] }
 
   const local = applyPolicy(localCandidate(capabilities), { effective, dataClass })
   const gateway = applyPolicy(gatewayCandidate(capabilities), { effective, dataClass })
