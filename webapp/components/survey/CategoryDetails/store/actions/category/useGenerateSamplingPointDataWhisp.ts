@@ -36,6 +36,7 @@ export const useGenerateSamplingPointDataWhisp = () => {
       DialogConfirmActions.showDialogConfirm({
         key: 'categoryEdit.generateSamplingPointDataWhisp.confirmMessage',
         onOk: startJob,
+        scrollableList: false,
       }) as any
     )
   }, [dispatch, startJob])
