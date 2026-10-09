@@ -9,6 +9,7 @@ import type { AiFeatureKey } from '@common/ai/features'
 import { AiLimits } from '@common/ai/limits'
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 
+import { isDataToolResult } from '@webapp/ai/conversations/dataClass'
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { getHandbookOutline } from '@webapp/ai/help/handbookSearch'
 import { loadHandbook } from '@webapp/ai/help/loadHandbook'
@@ -21,6 +22,7 @@ import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
 
 import { buildHistory, getHistoryBudget } from './agentMessages'
 import { buildAssistantSystemPrompt, type AssistantPromptArea } from './assistantSystemPrompt'
+import { resolveAssistantTurnModel } from './turnModel'
 import { createTurnState, type TurnState } from './turnState'
 
 export type AssistantLimits = { maxPromptChars: number; maxSteps: number }
@@ -35,6 +37,7 @@ export const DEFAULT_ASSISTANT_LIMITS: AssistantLimits = {
 export const assistantAreaFeatures: Record<AssistantPromptArea, AiFeatureKey> = {
   design: 'assistantDesign',
   help: 'chatbot',
+  analysis: 'assistantAnalysis',
 }
 
 const PROVIDER_ERROR_KEY = 'aiProviderUnavailable'
@@ -172,7 +175,14 @@ export const runAssistantTurn = async ({
       // the conversation's class ('schema' for the assistant)
       dataClass: conversation.dataClass,
       signal,
-      resolve,
+      // D2: declare data when the selected engine is offered a data tool (wraps the injected resolver)
+      resolve: (params) =>
+        resolveAssistantTurnModel({
+          params,
+          getToolsForHosting: (hostingClass) =>
+            getTools({ area, ctx: turnCtx, effective: access.effective, hostingClass, tools }),
+          resolve,
+        }),
     })
     if (turn.engine) onEngine?.(turn.engine)
     const toolList = getTools({
@@ -200,7 +210,14 @@ export const runAssistantTurn = async ({
       // errors arrive as 'error' parts of the full stream
       onError: () => undefined,
     })
-    for await (const part of result.fullStream) handleStreamPart(part, state, outcome)
+    for await (const part of result.fullStream) {
+      handleStreamPart(part, state, outcome)
+      if (part.type === 'tool-result') {
+        const tool = toolList.find((candidate) => candidate.name === part.toolName)
+        // saved with the tool result: a turn stopped after a data result keeps the class
+        if (tool && isDataToolResult({ tool, output: part.output })) state.escalateDataClass(tool.dataClass)
+      }
+    }
   } catch (error) {
     outcome.error = error
   }

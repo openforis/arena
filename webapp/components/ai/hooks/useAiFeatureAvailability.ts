@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { type AiDataClass, getAiFeature } from '@common/ai/features'
+import { type AiDataClass, getAiFeature, getAiFeatureMinDataClass } from '@common/ai/features'
 import * as User from '@core/user/user'
 
 import { isCapabilitiesLoadedForUser } from '@webapp/ai/engines/capabilities'
@@ -28,7 +28,7 @@ type AiSettingsSnapshot = AiFeatureSwitches & { policyCeilings?: unknown }
  * goes (from the engine selection, with the same inputs as resolveModel).
  * @param {string} feature - Feature key (common/ai/features).
  * @param {object} [options] - Options.
- * @param {AiDataClass} [options.dataClass] - Data class of the request (default: the feature's; the assistant passes its conversation's).
+ * @param {AiDataClass} [options.dataClass] - Data class of the request (default: the feature's lowest; the assistant passes its conversation's).
  * @returns {AiEngineFeatureAvailability} The availability.
  */
 export const useAiFeatureAvailability = (
@@ -47,7 +47,7 @@ export const useAiFeatureAvailability = (
   const capabilities = useAiCapabilities()
   const user = useUser()
   const userUuid = user ? (User.getUuid(user) ?? null) : null
-  const requestDataClass = dataClass ?? definition?.dataClass ?? 'data'
+  const requestDataClass = dataClass ?? getAiFeatureMinDataClass(feature)
   // without a survey (Help) only the instance ceilings apply; a survey policy error fails closed
   const settingsCeilings = useMemo(() => (settings ? getCeilingsFromSettings(settings) : null), [settings])
   const ceilings = capabilities.instance.policyCeilings ?? settingsCeilings

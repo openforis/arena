@@ -4,7 +4,7 @@
  */
 import type { LanguageModel } from 'ai'
 
-import { type AiDataClass, type AiFeatureKey, getAiFeature } from '@common/ai/features'
+import { type AiDataClass, type AiFeatureKey, getAiFeatureMinDataClass } from '@common/ai/features'
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 import SystemError, { StatusCodes } from '@core/systemError'
 
@@ -225,10 +225,10 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    */
   return async ({ feature, surveyId, dataClass, signal }: ResolveModelParams): Promise<ResolvedModel> => {
     const userUuid = deps.getUserUuid()
-    // an unknown feature is treated as the most sensitive class
+    // an unknown feature is treated as the most sensitive class (getAiFeatureMinDataClass)
     const options: AiEngineModelOptions = {
       feature,
-      dataClass: dataClass ?? getAiFeature(feature)?.dataClass ?? 'data',
+      dataClass: dataClass ?? getAiFeatureMinDataClass(feature),
       surveyId,
     }
     const capabilities = await deps.loadCapabilities()
