@@ -49,6 +49,7 @@ describe('updateNodesBatch', () => {
 
   const buildDeps = (overrides: Partial<NodesBatchServiceDeps> = {}) => {
     const posted: any[] = []
+    const errors: string[] = []
     const replies = createNodesBatchReplyRegistry()
     const deps: NodesBatchServiceDeps = {
       fetchSurvey: async () => survey,
@@ -64,9 +65,12 @@ describe('updateNodesBatch', () => {
         })
       },
       replies,
+      logError: (message) => {
+        errors.push(message)
+      },
       ...overrides,
     }
-    return { deps, posted }
+    return { deps, posted, errors }
   }
 
   const run = (user: any, edits: any[], deps: NodesBatchServiceDeps, recordCycle = cycle) =>
@@ -146,5 +150,33 @@ describe('updateNodesBatch', () => {
       { index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.nodeNotInRecord },
       { index: 1, status: 'conflict' },
     ])
+  })
+
+  test('an exception on one record fails its edits with generic, is logged, and the other records proceed', async () => {
+    const otherRecord = RB.record(
+      admin,
+      survey,
+      RB.entity('root', RB.attribute('root_key', '2'), RB.attribute('a', 1), RB.attribute('b', 2))
+    ).build()
+    const otherUuid = Record.getUuid(otherRecord)
+    const otherNode = Node.getUuid(RecordUtils.findNodeByPath('root/a')(survey, otherRecord))
+    const { deps, errors } = buildDeps({
+      fetchRecord: async ({ recordUuid: uuid }) => {
+        if (uuid === recordUuid) throw new Error('db down')
+        return otherRecord
+      },
+    })
+    const results = await run(
+      admin,
+      [edit(aUuid, 5), { recordUuid: otherUuid, nodeUuid: otherNode, from: 1, to: 5 }, edit(bUuid, 6)],
+      deps
+    )
+    expect(results).toEqual([
+      { index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.generic },
+      { index: 1, status: 'applied' },
+      { index: 2, status: 'failed', messageKey: NodesBatchMessageKeys.generic },
+    ])
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toContain('db down')
   })
 })

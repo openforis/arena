@@ -39,6 +39,8 @@ export type NodesBatchProcessorDeps = {
   clearCachedRecord: (params: { msg: NodesBatchPersistMessage; recordUuid: string }) => Promise<void>
   postMessage: (message: ThreadMessage) => void
   logError: (message: string) => void
+  // current time in epoch ms (injectable for tests)
+  now: () => number
 }
 
 type BatchState = {
@@ -191,6 +193,13 @@ const refineMissingNodeResult = async ({
 }
 
 /**
+ * Returns true when the caller stopped waiting for this request.
+ * @param {BatchState} state - The batch state.
+ * @returns {boolean} Whether the deadline has passed.
+ */
+const isPastDeadline = (state: BatchState): boolean => state.deps.now() > state.msg.deadline
+
+/**
  * Checks and persists the edits of the record, inside the record lock.
  * @param {BatchState} state - The batch state.
  * @param {object} t - The transaction.
@@ -199,6 +208,8 @@ const refineMissingNodeResult = async ({
 const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEditResult[]> => {
   const { msg, deps, survey, refusedResults, appliedEdits } = state
   const { recordUuid, edits } = msg
+  // the lock wait may have used up the time: the caller already reported these edits as timed out
+  if (isPastDeadline(state)) return failedResults(edits, NodesBatchMessageKeys.applyTimeout)
   let record = await deps.getOrFetchRecord({ msg, recordUuid, t })
   if (!record) return edits.map(({ index }) => conflictResult(index))
 
@@ -267,6 +278,8 @@ export const processNodesBatch = async ({
 }): Promise<NodesBatchEditResult[]> => {
   const state: BatchState = { msg, deps, survey: null, refusedResults: [], appliedEdits: [], events: [] }
   try {
+    // late message (queued behind others): the caller reported a timeout, so nothing is written
+    if (isPastDeadline(state)) return failedResults(msg.edits, NodesBatchMessageKeys.applyTimeout)
     state.survey = await deps.getSurvey(msg)
     const results = await deps.runWithRecordLock(msg.recordUuid, (t) => applyEditsInLock(state, t))
     for (const event of state.events) {

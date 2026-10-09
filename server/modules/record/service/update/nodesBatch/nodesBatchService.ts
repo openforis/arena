@@ -12,6 +12,8 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
+import * as Log from '@server/log/log'
+
 import { RecordsUpdateThreadService } from '../surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '../thread/recordsThreadMessageTypes'
 import { NodesBatchReplies, NodesBatchReplyRegistry } from './nodesBatchReplies'
@@ -19,6 +21,7 @@ import { groupEditsByRecord } from './nodesBatchRequest'
 import {
   NodesBatchEdit,
   NodesBatchEditResult,
+  NodesBatchLimits,
   NodesBatchMessageKeys,
   NodesBatchPersistMessage,
   NodesBatchRecordEdit,
@@ -26,6 +29,8 @@ import {
   failedResult,
   failedResults,
 } from './nodesBatchTypes'
+
+const Logger = Log.getLogger('NodesBatchService')
 
 export type NodesBatchServiceDeps = {
   fetchSurvey: (params: { surveyId: number; cycle: string }) => Promise<any>
@@ -41,6 +46,7 @@ export type NodesBatchServiceDeps = {
   }) => boolean
   postBatchMessage: (msg: NodesBatchPersistMessage) => void
   replies: NodesBatchReplyRegistry
+  logError: (message: string) => void
 }
 
 type RequestContext = {
@@ -68,6 +74,7 @@ export const createDefaultNodesBatchServiceDeps = (): NodesBatchServiceDeps => (
   recordMatchesQualifierFilters: (params) => RecordManager.recordMatchesQualifierFilters(params),
   postBatchMessage: (msg) => RecordsUpdateThreadService.getOrCreatedThread().postMessage(msg),
   replies: NodesBatchReplies,
+  logError: (message) => Logger.error(message),
 })
 
 /**
@@ -179,6 +186,7 @@ const sendRecordEdits = async (
     edits,
     timezoneOffset,
     lang,
+    deadline: Date.now() + NodesBatchLimits.replyTimeoutMs,
   })
   const results = await reply
   return results ?? failedResults(edits, NodesBatchMessageKeys.applyTimeout)
@@ -229,10 +237,16 @@ export const updateNodesBatch = async (
   const results: NodesBatchEditResult[] = []
   const pendingReplies: Promise<NodesBatchEditResult[]>[] = []
   for (const [recordUuid, recordEdits] of groupEditsByRecord(edits)) {
-    const { results: refused, accepted } = await checkRecordEdits(context, recordUuid, recordEdits)
-    results.push(...refused)
-    if (accepted.length > 0) {
-      pendingReplies.push(sendRecordEdits(context, recordUuid, accepted))
+    try {
+      const { results: refused, accepted } = await checkRecordEdits(context, recordUuid, recordEdits)
+      results.push(...refused)
+      if (accepted.length > 0) {
+        pendingReplies.push(sendRecordEdits(context, recordUuid, accepted))
+      }
+    } catch (error) {
+      // one record's failure must not hide the results of the others
+      deps.logError(`error checking the batch edits of record ${recordUuid}: ${(error as Error)?.stack ?? error}`)
+      results.push(...failedResults(recordEdits, NodesBatchMessageKeys.generic))
     }
   }
   for (const replyResults of await Promise.all(pendingReplies)) {
