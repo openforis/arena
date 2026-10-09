@@ -1,6 +1,7 @@
 import './SurveyInfo.scss'
 
-import { useLocation } from 'react-router'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -29,7 +30,20 @@ const SurveyInfoForm = () => {
   const canUseAnalysis = useAuthCanUseAnalysis()
   const aiFeaturesEnabled = useSystemConfigAiFeaturesEnabled()
   // the AI policy tooltip links here with { tab: 'aiPolicy' }
-  const { state: locationState } = useLocation()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const locationState = location.state
+  const requestedTab = locationState?.tab
+  // tab selection applied from the navigation state; `nonce` remounts the TabBar so a new request is re-applied
+  const [tabRequest, setTabRequest] = useState({ locationKey: location.key, nonce: 0, tab: requestedTab })
+  if (requestedTab && tabRequest.locationKey !== location.key) {
+    setTabRequest({ locationKey: location.key, nonce: tabRequest.nonce + 1, tab: requestedTab })
+  }
+
+  // clear the state once read, so Back/Forward does not reopen the tab later
+  useEffect(() => {
+    if (requestedTab) navigate(location.pathname, { replace: true, state: null })
+  }, [requestedTab, location.pathname, navigate])
 
   const {
     preloadedMapLayers,
@@ -169,12 +183,12 @@ const SurveyInfoForm = () => {
 
   const initialTabIndex = Math.max(
     0,
-    tabs.findIndex((tab) => tab.key === locationState?.tab)
+    tabs.findIndex((tab) => tab.key === tabRequest.tab)
   )
 
   return (
     <div className="home-survey-info">
-      <TabBar selection={initialTabIndex} showTabs={tabs.length > 1} tabs={tabs} />
+      <TabBar key={tabRequest.nonce} selection={initialTabIndex} showTabs={tabs.length > 1} tabs={tabs} />
       {!readOnly && (
         <ButtonSave className="survey-info-save-btn" onClick={saveProps} testId={TestId.surveyInfo.saveBtn} />
       )}
