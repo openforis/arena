@@ -54,6 +54,11 @@ export const TestId = {
     toolRow: (toolName) => `ai-assistant-tool-${toolName}`,
     unavailable: 'ai-assistant-unavailable',
   },
+  aiQueryCard: {
+    root: (queryId) => `ai-query-card-${queryId}`,
+    openInExplorer: (queryId) => `ai-query-card-${queryId}-open-in-explorer`,
+    showAsChart: (queryId) => `ai-query-card-${queryId}-show-as-chart`,
+  },
   categoryDetails: {
     addLevelBtn: 'add-level-btn',
     categoryName: 'category-name',
