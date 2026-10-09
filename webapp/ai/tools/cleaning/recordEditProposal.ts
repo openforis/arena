@@ -34,6 +34,7 @@ type ProposalContext = {
   cycle: string
   lang: string
   timezoneOffset: number
+  signal?: AbortSignal
   providers: Providers
 }
 
@@ -100,7 +101,8 @@ const parseEditValue = async ({
     })
     return { parsed }
   } catch (error) {
-    if (!(error instanceof SystemError)) throw error
+    // a timeout of a ref-data lookup is not a wrong value: the tool reports it as such
+    if (!(error instanceof SystemError) || error.key === 'queryTimeout') throw error
     return { refusal: { code: 'invalidValue', message: context.i18n.t(error.key, error.params) } }
   }
 }
@@ -220,7 +222,11 @@ const proposeRecordEdits = async ({
   recordUuid: string
   edits: IndexedEdit[]
 }) => {
-  const record = await context.api.fetchRecordAndNodes({ surveyId: context.surveyId, recordUuid })
+  const record = await context.api.fetchRecordAndNodes({
+    surveyId: context.surveyId,
+    recordUuid,
+    signal: context.signal,
+  })
   const recordRefusal: EditRefusal | null = record
     ? checkRecordEditable({ user: context.user, survey: context.survey, record })
     : { code: 'recordNotAvailable', message: 'The record does not exist or you may not see it.' }
@@ -250,7 +256,7 @@ export const buildRecordEditProposal = async ({
 }: Omit<ProposalContext, 'providers'> & { edits: RecordEditInput[] }) => {
   const context: ProposalContext = {
     ...params,
-    providers: createRefDataProviders({ api: params.api, surveyId: params.surveyId }),
+    providers: createRefDataProviders({ api: params.api, surveyId: params.surveyId, signal: params.signal }),
   }
   const drafts: ChangeOperationDraft[] = []
   const rejected: RecordEditRejection[] = []

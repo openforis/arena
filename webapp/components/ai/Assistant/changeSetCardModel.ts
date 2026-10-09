@@ -176,7 +176,9 @@ export const buildCardRows = ({
 export const getPendingOperationIds = (cardState: ChangeSetCardState): string[] => {
   if (cardState.discarded) return []
   const applied = new Set((cardState.results ?? []).filter((r) => r.status === 'applied').map((r) => r.id))
-  return cardState.changeSet.operations.filter((op) => !applied.has(op.id)).map((op) => op.id)
+  return cardState.changeSet.operations
+    .filter((op) => !isRecordEditOperation(op) && !applied.has(op.id))
+    .map((op) => op.id)
 }
 
 /**

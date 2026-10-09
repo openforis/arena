@@ -23,9 +23,18 @@ const findExact = (items: any[], getText: (item: any) => string, text: string, i
  * @param {object} params - Parameters.
  * @param {CleaningApi} params.api - Cleaning API.
  * @param {number} params.surveyId - Survey id.
+ * @param {AbortSignal} [params.signal] - Aborts the lookups.
  * @returns {{categoryItemProvider: object, taxonProvider: object}} The providers.
  */
-export const createRefDataProviders = ({ api, surveyId }: { api: CleaningApi; surveyId: number }) => {
+export const createRefDataProviders = ({
+  api,
+  surveyId,
+  signal,
+}: {
+  api: CleaningApi
+  surveyId: number
+  signal?: AbortSignal
+}) => {
   const itemsByUuid = new Map<string, any>()
   const taxaByUuid = new Map<string, any>()
 
@@ -50,6 +59,7 @@ export const createRefDataProviders = ({ api, surveyId }: { api: CleaningApi; su
           categoryUuid,
           parentUuid: item?.uuid ?? null,
           search: code,
+          signal,
         })
         item = findExact(items, CategoryItem.getCode, code)
         if (!item) return null
@@ -74,7 +84,7 @@ export const createRefDataProviders = ({ api, surveyId }: { api: CleaningApi; su
      * @returns {Promise<object[]>} The items.
      */
     getItems: async ({ categoryUuid, parentItemUuid }: { categoryUuid: string; parentItemUuid?: string | null }) =>
-      api.fetchCategoryItems({ surveyId, categoryUuid, parentUuid: parentItemUuid ?? null, search: '' }),
+      api.fetchCategoryItems({ surveyId, categoryUuid, parentUuid: parentItemUuid ?? null, search: '', signal }),
   }
 
   const taxonProvider = {
@@ -86,7 +96,7 @@ export const createRefDataProviders = ({ api, surveyId }: { api: CleaningApi; su
      * @returns {Promise<object|null>} The taxon.
      */
     getTaxonByCode: async ({ taxonomyUuid, taxonCode }: { taxonomyUuid: string; taxonCode: string }) => {
-      const taxa = await api.findTaxa({ surveyId, taxonomyUuid, filterProp: 'code', filterValue: taxonCode })
+      const taxa = await api.findTaxa({ surveyId, taxonomyUuid, filterProp: 'code', filterValue: taxonCode, signal })
       return keepTaxon(findExact(taxa, Taxon.getCode, taxonCode, true))
     },
     /**
@@ -108,6 +118,7 @@ export const createRefDataProviders = ({ api, surveyId }: { api: CleaningApi; su
         taxonomyUuid,
         filterProp: 'scientificName',
         filterValue: scientificName,
+        signal,
       })
       return keepTaxon(findExact(taxa, Taxon.getScientificName, scientificName, true))
     },

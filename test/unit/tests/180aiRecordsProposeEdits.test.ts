@@ -1,5 +1,6 @@
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
+import SystemError from '@core/systemError'
 
 import { createRecordsProposeEditsTool } from '@webapp/ai/tools/cleaning/recordsProposeEditsTool'
 import { RECORD_EDITS_MAX } from '@webapp/ai/changeSets/recordEdits/types'
@@ -71,6 +72,7 @@ describe('records_proposeEdits', () => {
     expect(result).toEqual({
       changeSetId: changeSet.id,
       proposed: 2,
+      operations: 2,
       rejected: [
         expect.objectContaining({ index: 2, code: 'invalidValue', message: expect.stringContaining('invalidNumber') }),
         expect.objectContaining({ index: 3, code: 'nodeNotFound' }),
@@ -159,5 +161,86 @@ describe('records_proposeEdits', () => {
       ctx
     )
     expect(ctx.changeSets[0].operations[0]).toMatchObject({ from: 'ABC-123-xyz', to: null, display: { to: null } })
+  })
+
+  test('several records: one load each, rejections sorted across records', async () => {
+    const second = { ...record, uuid: 'second-record' }
+    const { tool, calls } = newTool(({ recordUuid }) => (recordUuid === 'second-record' ? second : record))
+    const ctx = newCleaningToolContext({ survey })
+    const firstUuid = Record.getUuid(record)
+    const result = await runTool(
+      tool,
+      {
+        summary: 's',
+        edits: [
+          { recordUuid: firstUuid, nodeUuid: 'missing-1', value: '1' },
+          { recordUuid: 'second-record', nodeUuid: 'missing-2', value: '1' },
+          { recordUuid: firstUuid, nodeUuid: nodeUuidAt('cluster/remarks'), value: 'ok' },
+          { recordUuid: firstUuid, nodeUuid: 'missing-3', value: '1' },
+        ],
+      },
+      ctx
+    )
+    expect(calls.filter((call) => call.name === 'fetchRecordAndNodes')).toHaveLength(2)
+    expect(result.rejected.map((rejection: any) => rejection.index)).toEqual([0, 1, 3])
+    expect(result.proposed).toBe(1)
+  })
+
+  test('a timeout in a ref-data lookup is reported as queryTimeout, not as an invalid value', async () => {
+    const fake = newFakeCleaningApi({
+      fetchRecordAndNodes: () => record,
+      fetchCategoryItems: () => {
+        throw new SystemError('queryTimeout')
+      },
+    })
+    const tool = createRecordsProposeEditsTool({ api: fake.api, getI18n: () => fakeI18n }) as any
+    const result = await runTool(
+      tool,
+      {
+        summary: 's',
+        edits: [
+          {
+            recordUuid: Record.getUuid(record),
+            nodeUuid: nodeUuidAt('cluster/plot[0]/tree[0]/tree_status'),
+            value: 'B',
+          },
+        ],
+      },
+      newCleaningToolContext({ survey })
+    )
+    expect(result).toEqual({ error: { code: 'queryTimeout', message: expect.any(String) } })
+  })
+
+  test('the abort signal reaches the record request', async () => {
+    const { tool, calls } = newTool()
+    const ctx = newCleaningToolContext({ survey })
+    await runTool(
+      tool,
+      {
+        summary: 's',
+        edits: [{ recordUuid: Record.getUuid(record), nodeUuid: nodeUuidAt('cluster/remarks'), value: 'x' }],
+      },
+      ctx
+    )
+    expect(calls[0].params.signal).toBe(ctx.signal)
+  })
+
+  test('more than 50 distinct records are refused before any request', async () => {
+    const { tool, calls } = newTool()
+    const edits = Array.from({ length: 51 }, (_, index) => ({ recordUuid: `r${index}`, nodeUuid: 'n', value: '1' }))
+    const result = await runTool(tool, { summary: 's', edits }, newCleaningToolContext({ survey }))
+    expect(result.error.code).toBe('invalidProposal')
+    expect(result.error.issues[0].field).toBe('tooManyRecords')
+    expect(calls).toEqual([])
+  })
+
+  test('a missing cycle is a tool error', async () => {
+    const { tool } = newTool()
+    const result = await runTool(
+      tool,
+      { summary: 's', edits: [{ recordUuid: 'r', nodeUuid: 'n', value: '1' }] },
+      newCleaningToolContext({ survey, cycle: null })
+    )
+    expect(result.error.code).toBe('noCycle')
   })
 })
