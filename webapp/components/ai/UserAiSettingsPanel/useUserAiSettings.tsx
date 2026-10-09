@@ -230,7 +230,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       setLastModelsKey(null)
       setDirty(false)
     } catch (error: any) {
-      const code = error?.response?.data?.error
+      const code = error?.response?.data?.key ?? error?.response?.data?.error
       if (code === 'aiFeaturesDisabled' || error?.response?.status === 404) {
         setSettings({ aiFeaturesDisabled: true })
       } else {
