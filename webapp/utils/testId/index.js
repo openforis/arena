@@ -14,6 +14,7 @@ export const TestId = {
     consentDialog: 'ai-local-server-consent',
     consentUseOther: 'ai-local-server-consent-use-other',
     dataLocationBadge: 'ai-data-location-badge',
+    engineNotice: 'ai-engine-notice',
     engineErrorOpenSettings: 'ai-engine-error-open-settings',
     engineErrorRetry: 'ai-engine-error-retry',
     localServerBaseUrl: 'ai-local-server-base-url',

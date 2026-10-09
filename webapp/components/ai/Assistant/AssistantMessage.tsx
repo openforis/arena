@@ -7,7 +7,9 @@ import type {
   ConversationMessage,
   ConversationToolPart,
 } from '@webapp/ai/conversations/types'
+import { getAiEngineErrorView } from '@webapp/ai/engines/engineUi'
 import { Button } from '@webapp/components/buttons'
+import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
@@ -80,7 +82,7 @@ const AnswerPart = ({
 }
 
 /**
- * End status of an answer: Stopped, or the error with Retry.
+ * End status of an answer: Stopped, or the error with Retry (or the engine error actions).
  * @param {object} props - Props.
  * @param {AssistantMessage} props.message - Answer.
  * @param {boolean} props.isLast - Last message.
@@ -99,10 +101,14 @@ const AnswerFooter = ({
   const t = useI18nT({ unescapeHtml: true })
   if (message.status === 'stopped') return <p className="ai-assistant-message__stopped">{t('aiAssistant.stopped')}</p>
   if (message.status !== 'error') return null
+  // only the key is stored with the message: engine errors get their own Retry / Open settings buttons
+  const engineError = { key: message.errorKey }
+  const hasEngineRetry = getAiEngineErrorView(engineError)?.retry === true
   return (
     <div className="ai-assistant-message__error" role="alert">
       <span>{t(`appErrors:${message.errorKey ?? 'aiProviderUnavailable'}`)}</span>
-      {isLast && (
+      {isLast && <AiEngineErrorActions error={engineError} onRetry={api.retry} />}
+      {isLast && !hasEngineRetry && (
         <Button
           disabled={api.busy}
           label="aiAssistant.retry"

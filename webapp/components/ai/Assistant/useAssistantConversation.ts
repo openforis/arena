@@ -7,9 +7,13 @@ import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
 import { applierDepsReady, createApplierDeps } from '@webapp/ai/changeSets/applierDeps'
 import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
 import { summarizeResults } from '@webapp/ai/changeSets/describeOperation'
+import { getEngineChangeNotice } from '@webapp/ai/engines/assistantEngine'
+import { toDataLocation } from '@webapp/ai/engines/featureAvailability'
+import type { AiSelectedEngine } from '@webapp/ai/engines/types'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { getConversationStore, type ConversationStore } from '@webapp/ai/conversations/conversationStore'
 import type { Conversation } from '@webapp/ai/conversations/types'
+import type { AiDataLocation } from '@webapp/ai/policy/aiFeatureAvailability'
 import { loadPolicyContext } from '@webapp/ai/policy/policyContext'
 import { useSurveyId } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
@@ -23,6 +27,8 @@ import { useAssistantToolContext } from './useAssistantToolContext'
 export type AssistantConversationApi = {
   conversation: Conversation | null
   busy: boolean
+  // "Now using: …" when the engine changed since the previous turn
+  engineNotice: AiDataLocation | null
   // a change set card is being applied or discarded
   applying: boolean
   // false when the browser can't store conversations (memory store)
@@ -63,12 +69,15 @@ export const useAssistantConversation = ({
   const [conversationStore, setConversationStore] = useState<ConversationStore | null>(null)
   const [conversation, setConversation] = useState<Conversation | null>(null)
   const [busy, setBusy] = useState(false)
+  const [engineNotice, setEngineNotice] = useState<AiDataLocation | null>(null)
   const [applying, setApplying] = useState(false)
   const [history, setHistory] = useState<Conversation[]>([])
   const conversationRef = useRef<Conversation | null>(null)
   const controllerRef = useRef<AbortController | null>(null)
   const applyingRef = useRef(false)
   // id of the conversation whose turn is running (its streaming answer is live, not left over)
+  // location of the previous turn: kept across conversations (the notice is about the engine)
+  const lastLocationRef = useRef<AiDataLocation | null>(null)
   const runningIdRef = useRef<string | null>(null)
 
   const show = useCallback((next: Conversation | null) => {
@@ -152,6 +161,10 @@ export const useAssistantConversation = ({
           area,
           ctx: buildToolContext(area),
           access,
+          onEngine: (engine: AiSelectedEngine) => {
+            if (isCurrent()) setEngineNotice(getEngineChangeNotice({ previous: lastLocationRef.current, engine }))
+            lastLocationRef.current = toDataLocation(engine)
+          },
           signal: controller.signal,
           onUpdate: (next) => {
             if (isCurrent()) show(next)
@@ -301,6 +314,7 @@ export const useAssistantConversation = ({
     // a stale conversation (New conversation, or another one still loading) is not shown
     conversation: conversation?.id === conversationId ? conversation : null,
     busy,
+    engineNotice,
     applying,
     persistent: conversationStore?.persistent ?? true,
     history,
