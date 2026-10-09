@@ -49,7 +49,7 @@ export const buildAssistantSystemPrompt = ({
         uiLang: ctx.uiLang,
         surveyName: Survey.getName(surveyInfo),
         surveyLabel: Survey.getLabel(surveyInfo, ctx.lang),
-        languages: Survey.getLanguages(surveyInfo),
+        languages: Survey.getLanguages(surveyInfo) as string[],
         cycle: ctx.cycle,
         viewDescription: describeView(ctx.getCurrentView(), ctx.survey),
       })
