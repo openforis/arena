@@ -97,10 +97,10 @@ describe('MOCK_SCRIPTS', () => {
     for (const script of MOCK_SCRIPTS) {
       for (const step of script.steps) {
         if (!('toolCall' in step)) continue
-        // inputs built from the user message need real data: 183 checks the resolved input against the schema
-        if (typeof step.toolCall.input === 'function') continue
         const tool = ALL_TOOLS.find((candidate) => candidate.name === step.toolCall.toolName)
         expect([step.toolCall.toolName, Boolean(tool)]).toEqual([step.toolCall.toolName, true])
+        // inputs built from the user message need real data: 183 checks the resolved input against the schema
+        if (typeof step.toolCall.input === 'function') continue
         const parsed = tool!.inputSchema.safeParse(step.toolCall.input)
         expect([step.toolCall.toolName, parsed.success]).toEqual([step.toolCall.toolName, true])
       }

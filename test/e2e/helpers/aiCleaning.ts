@@ -69,7 +69,7 @@ export const useLocalServer = async (
   await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub.baseUrl, modelId: stub.modelId })
   // wait for the app to boot: refresh tokens rotate, so a navigation that aborts the boot's refresh logs the user out
   await Promise.all([
-    page.waitForResponse((response) => response.url().includes('/api/ai/settings') && response.ok()),
+    page.waitForResponse((response) => response.url().includes('/api/ai/settings') && response.request().method() === 'GET' && response.ok()),
     page.reload(),
   ])
 }
@@ -85,6 +85,8 @@ export const askAssistantAboutFirstRow = async (page: Page): Promise<void> => {
   // deviation 10: the row context is pre-filled, never sent by itself
   await expect(composer).toHaveValue(/\[cleaning-row-context\]/)
   await expect(page.getByTestId(TestId.aiCleaning.card)).toHaveCount(0)
+  // nothing was sent yet
+  await expect(page.getByTestId(TestId.aiAssistant.message('user'))).toHaveCount(0)
   await sendAssistantMessage(page, await composer.inputValue())
 }
 
