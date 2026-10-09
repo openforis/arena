@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useId, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 
 import type { AiFeatureAvailability } from '@webapp/ai/policy/aiFeatureAvailability'
@@ -7,6 +7,15 @@ import { TooltipNew } from '@webapp/components/TooltipNew'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurveyAiPolicy } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
+
+const visuallyHidden: React.CSSProperties = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  whiteSpace: 'nowrap',
+}
 
 type Props = {
   availability: AiFeatureAvailability
@@ -23,6 +32,7 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
   const { availability, children } = props
   const i18n = useI18n()
   const navigate = useNavigate()
+  const reasonId = useId()
   const canEditPolicy = useAuthCanEditSurveyAiPolicy()
 
   const reasonKeys = useMemo(() => availability.reasonKeys ?? [], [availability.reasonKeys])
@@ -59,8 +69,16 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
   return (
     <TooltipNew renderTitle={renderTitle}>
       {/* hover target: a disabled button (MUI or native, e.g. the chat FAB) does not reliably receive hover itself */}
-      <span className="ai-policy-blocked" data-testid={TestId.ai.policyBlocked}>
+      <span
+        className="ai-policy-blocked"
+        data-testid={TestId.ai.policyBlocked}
+        tabIndex={0}
+        aria-describedby={reasonId}
+      >
         {children}
+        <span id={reasonId} style={visuallyHidden}>
+          {reasonKeys.map((key) => i18n.t(key)).join(' ')}
+        </span>
       </span>
     </TooltipNew>
   )
