@@ -8,9 +8,11 @@ import { Button, ButtonDownload } from '@webapp/components/buttons'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const SchemaSummaryExportCloseButton = ({ job, fileFormat }) => {
-  const { tempFileName } = job.result
+  const { tempFileName, aiDescriptionsFailedCount = 0 } = job.result
+  const i18n = useI18n()
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
@@ -18,12 +20,19 @@ const SchemaSummaryExportCloseButton = ({ job, fileFormat }) => {
   const onDownload = useCallback(() => dispatch(JobActions.hideJobMonitor()), [dispatch])
 
   return (
-    <ButtonDownload
-      href={`/api/survey/${surveyId}/schema-summary/export/download`}
-      requestParams={{ tempFileName, cycle, fileFormat }}
-      onClick={onDownload}
-      variant="contained"
-    />
+    <>
+      {aiDescriptionsFailedCount > 0 && (
+        <div className="schema-summary-export__warning" role="status">
+          {i18n.t('surveyForm:schemaSummaryAiDescriptionsFailed', { count: aiDescriptionsFailedCount })}
+        </div>
+      )}
+      <ButtonDownload
+        href={`/api/survey/${surveyId}/schema-summary/export/download`}
+        requestParams={{ tempFileName, cycle, fileFormat }}
+        onClick={onDownload}
+        variant="contained"
+      />
+    </>
   )
 }
 
