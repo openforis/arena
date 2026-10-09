@@ -1658,6 +1658,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       docs_search: 'Pesquisou "{{query}}" no manual',
       default: 'Usou uma ferramenta',
       failed: 'Falhou',
+      interrupted: 'Interrompido',
     },
     card: {
       title: 'Alterações propostas',

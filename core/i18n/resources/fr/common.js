@@ -1670,6 +1670,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       docs_search: 'A recherché « {{query}} » dans le manuel',
       default: 'A utilisé un outil',
       failed: 'Échec',
+      interrupted: 'Interrompu',
     },
     card: {
       title: 'Modifications proposées',

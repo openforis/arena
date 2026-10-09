@@ -1647,6 +1647,7 @@ $t(common.cantUndoWarning)`,
       docs_search: 'Гарын авлагаас "{{query}}"-г хайлаа',
       default: 'Хэрэгсэл ашиглалаа',
       failed: 'Амжилтгүй',
+      interrupted: 'Тасалдсан',
     },
     card: {
       title: 'Санал болгож буй өөрчлөлт',

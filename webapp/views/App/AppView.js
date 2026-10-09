@@ -11,7 +11,7 @@ import { useAuthCanUseAnalysis, useAuthCanUseMessages, useUserIsSystemAdmin } fr
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
-import ChatbotFab from '@webapp/components/ai/Chatbot'
+import { AssistantPanelHost } from '@webapp/components/ai/Assistant'
 import { WhatsNewDialog } from '@webapp/components/WhatsNew'
 
 import Header from './Header'
@@ -96,7 +96,7 @@ const AppView = () => {
       <JobMonitor />
       <FileUploadDialog />
       <ServiceErrors />
-      <ChatbotFab />
+      <AssistantPanelHost />
       <WhatsNewDialog />
     </>
   )

@@ -1640,6 +1640,7 @@ $t(common.cantUndoWarning)`,
       docs_search: 'マニュアルで「{{query}}」を検索しました',
       default: 'ツールを使用しました',
       failed: '失敗',
+      interrupted: '中断されました',
     },
     card: {
       title: '提案された変更',

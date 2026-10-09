@@ -42,3 +42,10 @@ export const createApplierDeps = ({
       })
     ),
 })
+
+/**
+ * Returns true when Apply may run now (the form designer has no unsaved edit).
+ * @param {ApplierDeps} deps - Applier dependencies.
+ * @returns {boolean} True when ready.
+ */
+export const applierDepsReady = (deps: ApplierDeps): boolean => !deps.isSurveyDirty()

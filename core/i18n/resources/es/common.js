@@ -1495,6 +1495,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       docs_search: 'Buscó "{{query}}" en el manual',
       default: 'Usó una herramienta',
       failed: 'Falló',
+      interrupted: 'Interrumpido',
     },
     card: {
       title: 'Cambios propuestos',
