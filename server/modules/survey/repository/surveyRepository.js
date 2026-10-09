@@ -300,6 +300,21 @@ export const fetchFilesTotalSpace = async (surveyId, client = db) =>
     A.prop('value')
   )
 
+/**
+ * Fetches the raw AI policy stored in the survey configuration (one-column select by primary key).
+ * @param {number} surveyId - The survey id.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<object|null>} The stored value (untrusted JSON), or null when not set.
+ */
+export const fetchSurveyAiPolicy = async (surveyId, client = db) =>
+  client.oneOrNone(
+    `SELECT config#>'{${Survey.configKeys.aiPolicy}}' AS value
+     FROM survey
+     WHERE id = $1`,
+    [surveyId],
+    (row) => row?.value ?? null
+  )
+
 export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {}, client = db) =>
   client.map(
     `SELECT id 
@@ -421,8 +436,16 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, cl
     { surveyId, value }
   )
 
-export const clearSurveyConfiguration = async ({ surveyId }, client = db) =>
-  client.none(`UPDATE survey SET config = null WHERE id = $1`, [surveyId])
+/**
+ * Removes one key from the survey configuration, keeping the others (e.g. the AI policy).
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.key - The configuration key to remove.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<null>} The result promise.
+ */
+export const clearSurveyConfigurationProp = async ({ surveyId, key }, client = db) =>
+  client.none(`UPDATE survey SET config = config - $/key/ WHERE id = $/surveyId/`, { surveyId, key })
 
 // ============== DELETE
 // the survey row could be missing (e.g. when cleaning up after a failed survey creation): do not fail in that case,
