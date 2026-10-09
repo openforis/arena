@@ -20,9 +20,14 @@ type FetchEntries = (params: { surveyId: number; limit: number; signal?: AbortSi
 const fetchEntriesFromApi: FetchEntries = async ({ surveyId, limit, signal }) => {
   const { fetchActivityLogs } = await import('@webapp/service/api/activityLog')
   const { request, cancel } = fetchActivityLogs({ surveyId, params: { limit } })
+  if (signal?.aborted) cancel()
   signal?.addEventListener('abort', cancel, { once: true })
-  const { data } = await request
-  return data?.activityLogs ?? []
+  try {
+    const { data } = await request
+    return data?.activityLogs ?? []
+  } finally {
+    signal?.removeEventListener('abort', cancel)
+  }
 }
 
 /**

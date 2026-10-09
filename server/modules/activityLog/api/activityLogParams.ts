@@ -2,7 +2,7 @@ import SystemError, { StatusCodes } from '@core/systemError'
 
 const DEFAULT_LIMIT = 30
 const MAX_LIMIT = 1000
-const INVALID_PARAMS_KEY = 'invalidParams'
+const INVALID_PARAMS_KEY = 'appErrors:invalidParams'
 
 /**
  * Creates the error thrown for an invalid parameter.
@@ -17,11 +17,13 @@ const invalid = (name: string) => new SystemError(INVALID_PARAMS_KEY, { name }, 
  * @param {string} name - Parameter name.
  * @returns {?number} The number, or null when missing.
  */
-const parsePositiveInt = (value: unknown, name: string): number | null => {
+const parseNonNegativeInt = (value: unknown, name: string): number | null => {
   if (value === undefined || value === null || value === '') return null
   const text = String(value)
   if (!/^\d+$/.test(text)) throw invalid(name)
-  return Number(text)
+  const number = Number(text)
+  if (!Number.isSafeInteger(number)) throw invalid(name)
+  return number
 }
 
 /**
@@ -30,11 +32,11 @@ const parsePositiveInt = (value: unknown, name: string): number | null => {
  * @returns {{idGreaterThan: ?number, idLessThan: ?number, limit: number}} The parsed params.
  */
 export const parseActivityLogFetchParams = (params: Record<string, unknown>) => {
-  const limit = parsePositiveInt(params.limit, 'limit') ?? DEFAULT_LIMIT
+  const limit = parseNonNegativeInt(params.limit, 'limit') ?? DEFAULT_LIMIT
   if (limit < 1 || limit > MAX_LIMIT) throw invalid('limit')
   return {
-    idGreaterThan: parsePositiveInt(params.idGreaterThan, 'idGreaterThan'),
-    idLessThan: parsePositiveInt(params.idLessThan, 'idLessThan'),
+    idGreaterThan: parseNonNegativeInt(params.idGreaterThan, 'idGreaterThan'),
+    idLessThan: parseNonNegativeInt(params.idLessThan, 'idLessThan'),
     limit,
   }
 }
