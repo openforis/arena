@@ -1,8 +1,7 @@
 import React, { Suspense, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
-import { shouldSelectAnalysisArea } from './analysis/analysisArea'
-
+import { isAnalysisRoute } from './analysis/analysisArea'
 import { isAssistantShown, pickArea } from './assistantAreas'
 import { assistantPanelStore } from './assistantPanelStore'
 import { useAssistantAreas } from './useAssistantAreas'
@@ -22,7 +21,6 @@ export const AssistantPanelHost = () => {
   const [mounted, setMounted] = useState(open)
   const shown = isAssistantShown(statuses)
   const { pathname } = useLocation()
-  const analysisStatus = statuses.find((item) => item.area === 'analysis')?.status ?? 'hidden'
 
   // mounted on the first open, then kept
   if (open && !mounted) setMounted(true)
@@ -32,11 +30,16 @@ export const AssistantPanelHost = () => {
   }, [open, shown])
 
   useEffect(() => {
-    const next = shouldSelectAnalysisArea({ pathname, status: analysisStatus, userSelectedArea })
-      ? 'analysis'
-      : pickArea({ statuses, current: area, panelOpen: open, userSelectedArea, module })
+    const next = pickArea({
+      statuses,
+      current: area,
+      panelOpen: open,
+      userSelectedArea,
+      module,
+      analysisRoute: isAnalysisRoute(pathname),
+    })
     if (next !== area) assistantPanelStore.setArea(next)
-  }, [analysisStatus, area, module, open, pathname, statuses, userSelectedArea])
+  }, [area, module, open, pathname, statuses, userSelectedArea])
 
   if (!mounted || !shown) return null
 

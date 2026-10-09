@@ -227,6 +227,24 @@ describe('runAssistantTurn', () => {
     expect(answerOf(result)).toMatchObject({ status: 'stopped', parts: [{ type: 'text', text: 'Partial' }] })
   })
 
+  test('the turn query store continues the conversation queries and they survive an abort', async () => {
+    const entry = { query: {}, explanation: 'E', entityName: 'tree', mode: 'raw', createdAt: 'T' }
+    const conversation = {
+      ...createConversation({ userUuid: 'user-1', surveyId: 7, area: 'design' }),
+      queries: { q1: { ...entry, id: 'q1' }, q2: { ...entry, id: 'q2' } },
+    }
+    const controller = new AbortController()
+    const propose = makeTool('test_query', async (_input, ctx) => {
+      const added = ctx.analysisQueries?.add({ query: {}, explanation: 'E', entityName: 'tree', mode: 'raw' })
+      controller.abort()
+      return { queryId: added?.id }
+    })
+    const model = scriptedModel(() => toolCallStream('call-1', 'test_query', { summary: 'x' }))
+    const result = await run({ model, tools: [propose], conversation, signal: controller.signal })
+    expect(answerOf(result).status).toBe('stopped')
+    expect(Object.keys(result.queries ?? {})).toEqual(['q1', 'q2', 'q3'])
+  })
+
   test('gateway error ends the turn with its key', async () => {
     const model = new MockLanguageModelV4({
       doStream: async () => {

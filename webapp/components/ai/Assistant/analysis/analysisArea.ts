@@ -43,24 +43,6 @@ export const getAnalysisAreaStatus = ({
 }
 
 /**
- * Tells whether the panel should switch to the Analysis area.
- * @param {object} params - Parameters.
- * @param {string} params.pathname - Current path.
- * @param {string} params.status - Status of the Analysis tab (D1's `AssistantAreaStatus['status']`).
- * @param {string|null} params.userSelectedArea - Area picked by the user in this panel session, if any.
- * @returns {boolean} True to select the Analysis area.
- */
-export const shouldSelectAnalysisArea = ({
-  pathname,
-  status,
-  userSelectedArea,
-}: {
-  pathname: string
-  status: AssistantAreaStatus['status']
-  userSelectedArea: string | null
-}): boolean => !userSelectedArea && status === 'available' && isAnalysisRoute(pathname)
-
-/**
  * Tells whether a conversation with record data can no longer continue on any allowed engine.
  * @param {object} params - Parameters.
  * @param {AiDataClass} params.conversationDataClass - Conversation class.
@@ -73,7 +55,9 @@ export const shouldShowRecordDataNotice = ({
 }: {
   conversationDataClass: AiDataClass
   dataAvailability: Availability
-}): boolean => conversationDataClass === 'data' && dataAvailability.status !== 'available'
+}): boolean =>
+  // 'disabled' also covers capabilities not loaded yet: no notice until the availability is known
+  conversationDataClass === 'data' && dataAvailability.status !== 'available' && dataAvailability.status !== 'disabled'
 
 /**
  * Returns the id of the query shown by a query_propose result.
