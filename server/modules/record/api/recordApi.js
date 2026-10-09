@@ -46,7 +46,7 @@ import {
   requireRecordsMatchUserGroupQualifiers,
   requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
-import { requireNotOwnedRecordsViewAllowed, requireNotOwnedRecordViewAllowed } from './recordOwnerMiddleware'
+import { requireNodeBelongsToRecord } from './recordNodeOwnership'
 
 const fetchRecordNodeFileAsStream = async ({ surveyId, recordUuid, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
@@ -107,6 +107,7 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/record/:recordUuid/node',
     requireRecordEditPermission,
+    requireNodeBelongsToRecord,
     requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {
