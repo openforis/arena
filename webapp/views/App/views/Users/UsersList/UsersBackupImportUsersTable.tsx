@@ -63,6 +63,8 @@ const useRoleLabel = () => {
   return (role: string | undefined) => (role ? i18n.t(`auth:authGroups.${role}.label`) : '-')
 }
 
+const systemAdminRole = 'systemAdmin'
+
 // survey manager is not shown: (almost) every user becomes one sooner or later
 const hiddenMainRoles = new Set(['surveyManager'])
 
@@ -81,6 +83,8 @@ const UserRolesDetails = ({ user }: { user: ImportPreviewUser }) => {
   const roleLabel = useRoleLabel()
   const mainRolesLabel = useMainRolesLabel()
   const { backup, current, existing } = user
+  const backupMainRoles = mainRolesLabel(backup.mainRoles)
+  const currentMainRoles = existing ? mainRolesLabel(current.mainRoles) : ''
 
   const surveyNames = [
     ...new Set([...backup.surveyRoles, ...(current?.surveyRoles ?? [])].map((item) => item.surveyName)),
@@ -109,13 +113,15 @@ const UserRolesDetails = ({ user }: { user: ImportPreviewUser }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          <TableRow>
-            <TableCell>
-              <strong>{i18n.t('usersView:usersBackup.details.mainRole')}</strong>
-            </TableCell>
-            <TableCell>{mainRolesLabel(backup.mainRoles) || '-'}</TableCell>
-            {existing && <TableCell>{mainRolesLabel(current.mainRoles) || '-'}</TableCell>}
-          </TableRow>
+          {(backupMainRoles || currentMainRoles) && (
+            <TableRow>
+              <TableCell>
+                <strong>{i18n.t('usersView:usersBackup.details.mainRole')}</strong>
+              </TableCell>
+              <TableCell>{backupMainRoles || '-'}</TableCell>
+              {existing && <TableCell>{currentMainRoles || '-'}</TableCell>}
+            </TableRow>
+          )}
           {surveyNames.map((surveyName) => {
             const backupRole = backup.surveyRoles.find((item) => item.surveyName === surveyName)
             const currentRole = current?.surveyRoles.find((item) => item.surveyName === surveyName)
@@ -177,12 +183,15 @@ const UserRow = ({
   const [expanded, setExpanded] = useState(false)
   const { email, name, existing, backup, current } = user
   const mainRoles = mainRolesLabel(existing ? current.mainRoles : backup.mainRoles)
+  // system admins have no survey roles: nothing to show in the expanded row
+  const isSystemAdmin = [...backup.mainRoles, ...(current?.mainRoles ?? [])].includes(systemAdminRole)
 
   return (
     <>
       <TableRow className={classNames({ expanded })} hover>
         <TableCell padding="checkbox">
           <Button
+            disabled={isSystemAdmin}
             iconClassName={expanded ? 'icon-circle-up' : 'icon-circle-down'}
             onClick={() => setExpanded(!expanded)}
             title="common.expandCollapse"
