@@ -28,6 +28,7 @@ export const AiFeaturePermission = {
   surveyView: 'surveyView',
   surveyEdit: 'surveyEdit',
   recordListView: 'recordListView',
+  recordCleanse: 'recordCleanse',
   admin: 'admin',
 } as const
 
@@ -43,6 +44,7 @@ export type AiFeatureKey =
   | 'chatbot'
   | 'assistantDesign'
   | 'assistantAnalysis'
+  | 'assistantCleaning'
   | 'dataDictionary'
   | 'internalPing'
 
@@ -61,7 +63,7 @@ export type AiFeatureDef = {
 
 const { chat, expressions, translation, dataDictionary, userActivity, dataQuery, assistant } = AiFeatureCategory
 const { schema, data } = AiDataClass
-const { loggedIn, surveyView, surveyEdit, recordListView, admin } = AiFeaturePermission
+const { loggedIn, surveyView, surveyEdit, recordListView, recordCleanse, admin } = AiFeaturePermission
 
 export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
   expressionGenerate: {
@@ -119,6 +121,16 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
     dataClass: data,
     variableDataClass: true,
     permission: recordListView,
+    gateway: true,
+    tools: true,
+  },
+  // the cleaning assistant reads and edits record values: data from the first message
+  assistantCleaning: {
+    key: 'assistantCleaning',
+    category: assistant,
+    dataClass: data,
+    variableDataClass: true,
+    permission: recordCleanse,
     gateway: true,
     tools: true,
   },

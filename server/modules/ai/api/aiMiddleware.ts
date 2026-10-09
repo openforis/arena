@@ -28,6 +28,7 @@ export const permissionMiddlewares: Record<string, Middleware> = {
   [AiFeaturePermission.surveyView]: AuthMiddleware.requireSurveyViewPermission,
   [AiFeaturePermission.surveyEdit]: AuthMiddleware.requireSurveyEditPermission,
   [AiFeaturePermission.recordListView]: AuthMiddleware.requireRecordListViewPermission,
+  [AiFeaturePermission.recordCleanse]: AuthMiddleware.requireRecordCleansePermission,
 }
 
 /**
