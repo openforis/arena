@@ -200,8 +200,7 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
         cloud: "Peut être traité par un fournisseur d'IA dans le cloud.",
       },
       notAllowedOnInstance: "Non autorisé sur cette instance d'Arena : {{levels}}",
-      onDeviceNote:
-        "« Sur cet appareil » nécessite un moteur d'IA local, disponible dans une prochaine version d'Arena.",
+      onDeviceNote: "Sur cet appareil : les utilisateurs ont besoin d'un serveur d'IA local (par exemple LM Studio).",
       readOnly: "Seuls les administrateurs du formulaire peuvent modifier la politique d'IA.",
       saved: "Politique d'IA enregistrée",
       saveError: "Impossible d'enregistrer la politique d'IA : {{message}}",

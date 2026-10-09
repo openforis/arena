@@ -9,12 +9,18 @@ const _withLang =
 
 export const TestId = {
   ai: {
+    capabilityStats: 'ai-capability-stats',
     consentContinue: 'ai-local-server-consent-continue',
     consentDialog: 'ai-local-server-consent',
     consentUseOther: 'ai-local-server-consent-use-other',
     dataLocationBadge: 'ai-data-location-badge',
     engineErrorOpenSettings: 'ai-engine-error-open-settings',
     engineErrorRetry: 'ai-engine-error-retry',
+    localServerBaseUrl: 'ai-local-server-base-url',
+    localServerEnabled: 'ai-local-server-enabled',
+    localServerModel: 'ai-local-server-model',
+    localServerTest: 'ai-local-server-test',
+    localServerTestResult: 'ai-local-server-test-result',
     notAvailable: 'ai-not-available',
     notAvailableAction: (action) => `ai-not-available-action-${action}`,
     openPolicyTabBtn: 'ai-policy-open-tab-btn',

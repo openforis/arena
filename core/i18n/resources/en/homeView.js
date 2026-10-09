@@ -199,7 +199,7 @@ When checked, those values are kept in the record, even if the attributes are no
         cloud: 'May be processed by a cloud AI provider.',
       },
       notAllowedOnInstance: 'Not allowed on this Arena instance: {{levels}}',
-      onDeviceNote: "'On this device' needs a local AI engine, available in a later version of Arena.",
+      onDeviceNote: 'On this device: users need a local AI server (for example LM Studio).',
       readOnly: 'Only survey administrators can change the AI policy.',
       saved: 'AI policy saved',
       saveError: 'Could not save the AI policy: {{message}}',

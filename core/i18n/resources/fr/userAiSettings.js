@@ -65,4 +65,29 @@ export default {
   savedSuccessfully: 'Parametres IA enregistres.',
   saveFailed: 'Echec de l enregistrement des parametres IA : {{message}}',
   cleared: 'Parametres IA personnels supprimes.',
+  localServer: {
+    section: "Serveur d'IA local",
+    enabled: "Utiliser un serveur d'IA local",
+    baseUrl: 'URL du serveur',
+    test: 'Tester la connexion',
+    testing: 'Test en cours…',
+    reachable: 'Le serveur a répondu.',
+    noModels: 'Le serveur ne liste aucun modèle. Chargez un modèle dans LM Studio.',
+    location: 'Emplacement : {{location}}',
+    contextTokens: 'Contexte : {{count}} tokens',
+    contextUnknown: 'Contexte : inconnu (8 192 tokens supposés)',
+    model: 'Modèle',
+    modelPlaceholder: 'Testez la connexion pour lister les modèles',
+    preferLocal: 'Préférer le serveur local quand il est autorisé',
+    help: "LM Studio : démarrez le serveur et activez Enable CORS. Votre navigateur peut demander l'autorisation d'accéder aux appareils du réseau local.",
+    docsLink: 'Documentation de LM Studio',
+    httpsHint:
+      'Arena est servi en HTTPS : un serveur sur une autre machine de votre réseau doit être en HTTPS, ou il faut un navigateur avec Local Network Access (Chrome) et votre autorisation.',
+    cloudWarning:
+      "Cette adresse n'est ni sur cet appareil ni dans la liste des serveurs de l'organisation : la politique d'IA de l'enquête la traite comme un service cloud.",
+    deviceNote: 'Ces paramètres sont enregistrés dans ce navigateur uniquement.',
+    capabilityStats: 'Partager des statistiques anonymes de capacités',
+    capabilityStatsHint:
+      "Une fois par session : si ce navigateur dispose de WebGPU et d'une IA intégrée, une plage de mémoire, la famille du navigateur et si un serveur local est utilisé. Aucun utilisateur, adresse, nom de modèle ni contenu d'enquête.",
+  },
 }

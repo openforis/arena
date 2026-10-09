@@ -64,4 +64,29 @@ export default {
   savedSuccessfully: 'AI設定を保存しました。',
   saveFailed: 'AI設定の保存に失敗しました：{{message}}',
   cleared: '個人用AI設定を削除しました。',
+  localServer: {
+    section: 'ローカル AI サーバー',
+    enabled: 'ローカル AI サーバーを使用する',
+    baseUrl: 'サーバー URL',
+    test: '接続をテスト',
+    testing: 'テスト中…',
+    reachable: 'サーバーが応答しました。',
+    noModels: 'サーバーにモデルがありません。LM Studio でモデルを読み込んでください。',
+    location: '場所: {{location}}',
+    contextTokens: 'コンテキスト: {{count}} トークン',
+    contextUnknown: 'コンテキスト: 不明 (8,192 トークンと仮定)',
+    model: 'モデル',
+    modelPlaceholder: '接続をテストするとモデルが一覧表示されます',
+    preferLocal: '許可されている場合はローカルサーバーを優先する',
+    help: 'LM Studio: サーバーを起動し、Enable CORS をオンにしてください。ブラウザーがローカルネットワーク上のデバイスへのアクセス許可を求める場合があります。',
+    docsLink: 'LM Studio のドキュメント',
+    httpsHint:
+      'Arena は HTTPS で提供されています。ネットワーク内の別のマシンのサーバーには HTTPS が必要です。または Local Network Access に対応したブラウザー (Chrome) とあなたの許可が必要です。',
+    cloudWarning:
+      'このアドレスはこのデバイス上でも組織のサーバー一覧にもありません。調査の AI ポリシーではクラウドサービスとして扱われます。',
+    deviceNote: 'この設定はこのブラウザーにのみ保存されます。',
+    capabilityStats: '匿名の機能統計を共有する',
+    capabilityStatsHint:
+      'セッションごとに 1 回: このブラウザーに WebGPU と組み込み AI があるか、メモリの範囲、ブラウザーの種類、ローカルサーバーを使用しているか。ユーザー、アドレス、モデル名、調査の内容は含まれません。',
+  },
 }
