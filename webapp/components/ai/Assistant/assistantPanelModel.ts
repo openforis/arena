@@ -162,3 +162,23 @@ export const withDiscarded = ({
     updatedAt: now,
   }
 }
+
+/**
+ * Marks as stopped the answers a closed tab or a crash left "streaming" (they would spin forever and offer no Retry).
+ * @param {Conversation} conversation - Conversation read from the store.
+ * @param {boolean} running - A turn of this conversation is running now (nothing to normalize).
+ * @returns {Conversation} The conversation (the same object when nothing changed).
+ */
+export const normalizeLoadedConversation = (conversation: Conversation, running = false): Conversation => {
+  if (running || !conversation.messages.some((m) => m.role === 'assistant' && m.status === 'streaming')) {
+    return conversation
+  }
+  return {
+    ...conversation,
+    messages: conversation.messages.map((message) =>
+      message.role === 'assistant' && message.status === 'streaming'
+        ? { ...message, status: 'stopped' as const }
+        : message
+    ),
+  }
+}

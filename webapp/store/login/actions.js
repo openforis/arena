@@ -9,6 +9,7 @@ import { AppInfo } from '@core/app/appInfo'
 import * as User from '@core/user/user'
 
 import { getConversationStore } from '@webapp/ai/conversations/conversationStore'
+import { abortAssistantTurns, settleAssistantSaves } from '@webapp/components/ai/Assistant/assistantTurnRegistry'
 import { assistantPanelStore } from '@webapp/components/ai/Assistant/assistantPanelStore'
 import * as UserState from '@webapp/store/user/state'
 
@@ -61,6 +62,9 @@ export const login = (email, password, twoFactorToken) =>
  * @returns {Promise<void>} - Resolves when done (storage errors are ignored: nothing to clear).
  */
 const clearAssistantData = async (userUuid) => {
+  // stop the running answers and wait for their saves, or they would write the conversation back
+  abortAssistantTurns()
+  await settleAssistantSaves()
   assistantPanelStore.reset()
   try {
     const store = await getConversationStore()

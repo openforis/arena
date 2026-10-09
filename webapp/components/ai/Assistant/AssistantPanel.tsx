@@ -11,18 +11,10 @@ import { TestId } from '@webapp/utils/testId'
 import { AssistantChat } from './AssistantChat'
 import { AssistantHistory } from './AssistantHistory'
 import type { AssistantArea, AssistantAreaStatus } from './assistantAreas'
+import { closeAssistantPanel } from './assistantPanelActions'
 import { assistantPanelStore, type AssistantPanelView } from './assistantPanelStore'
 import { useAssistantConversation, type AssistantConversationApi } from './useAssistantConversation'
 import { useAssistantPanel } from './useAssistantPanel'
-
-/**
- * Closes the panel and gives the focus back to the header button.
- * @returns {void} Nothing.
- */
-const closePanel = () => {
-  assistantPanelStore.close()
-  document.querySelector<HTMLElement>(`[data-testid="${TestId.aiAssistant.openBtn}"]`)?.focus()
-}
 
 /**
  * Area tabs (disabled while an answer runs).
@@ -162,7 +154,7 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
   const onKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (event.key !== 'Escape') return
     event.stopPropagation()
-    closePanel()
+    closeAssistantPanel()
   }, [])
 
   return (
@@ -178,7 +170,7 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
         <h2 className="ai-assistant-panel__title">{t('aiAssistant.title')}</h2>
         <AiFeatureDataLocationBadge compact feature={assistantAreaFeatures[area]} />
         <AssistantMenu api={api} />
-        <ButtonIconClose label="aiAssistant.close" onClick={closePanel} testId={TestId.aiAssistant.closeBtn} />
+        <ButtonIconClose label="aiAssistant.close" onClick={closeAssistantPanel} testId={TestId.aiAssistant.closeBtn} />
       </div>
       <AssistantTabs area={area} busy={api.busy} statuses={statuses} />
       <AssistantBody api={api} area={area} status={statuses.find((item) => item.area === area)} view={view} />

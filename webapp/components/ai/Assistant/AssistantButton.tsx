@@ -5,7 +5,7 @@ import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { isAssistantShown } from './assistantAreas'
-import { assistantPanelStore } from './assistantPanelStore'
+import { toggleAssistantPanel } from './assistantPanelActions'
 import { useAssistantAreas } from './useAssistantAreas'
 import { useAssistantPanel } from './useAssistantPanel'
 
@@ -36,7 +36,7 @@ export const AssistantButton = () => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (!isToggleShortcut(event)) return
       event.preventDefault()
-      assistantPanelStore.toggle()
+      toggleAssistantPanel()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -50,7 +50,7 @@ export const AssistantButton = () => {
       aria-expanded={open}
       aria-label={t('aiAssistant.open')}
       iconClassName="icon-magic-wand icon-16px"
-      onClick={assistantPanelStore.toggle}
+      onClick={toggleAssistantPanel}
       testId={TestId.aiAssistant.openBtn}
       title="aiAssistant.open"
       variant="text"
