@@ -1,7 +1,8 @@
 /**
  * Error helpers for the AI UI: every failure shows a translated appErrors message, never raw HTTP text.
  */
-type I18n = { t: (key: string, params?: object) => string }
+// loose on purpose: i18next's `t` returns a wider type than string
+type I18n = { t: (key: any, params?: any) => unknown }
 
 const AI_KEY = /^ai[A-Z]/
 
@@ -35,5 +36,5 @@ export const isAiAbortError = (error: unknown): boolean => unwrap(error).some((e
 export const getAiErrorMessage = ({ error, i18n }: { error: unknown; i18n: I18n }): string => {
   const key = getAiErrorKey(error) ?? 'aiProviderUnavailable'
   const withParams = unwrap(error).find((candidate) => candidate?.key === key)
-  return i18n.t(`appErrors:${key}`, withParams?.params ?? {})
+  return String(i18n.t(`appErrors:${key}`, withParams?.params ?? {}))
 }

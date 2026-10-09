@@ -83,28 +83,6 @@ const drainFrames = (buffer, handlers) => {
 }
 
 /**
- * Read the response body and try to extract the server's translation key
- * from a JSON `{ error }` envelope. Returns null on any failure so the
- * caller can fall back to the HTTP status text.
- * @param {Response} response - Failed fetch response.
- * @returns {Promise<?string>} Translation key, or null.
- */
-const parseErrorKey = async (response) => {
-  let bodyText = ''
-  try {
-    bodyText = await response.text()
-  } catch {
-    return null
-  }
-  try {
-    const parsed = JSON.parse(bodyText)
-    return parsed?.error || null
-  } catch {
-    return null
-  }
-}
-
-/**
  * Drive the SSE reader loop on a successful response, dispatching frames
  * to `handlers` until the server closes the stream, the consumer cancels,
  * or a terminal frame (`[DONE]` / error) is observed.
@@ -179,48 +157,6 @@ export const streamSse = (url, handlers = {}) => {
       })
       if (!response.ok) {
         handlers.onError?.(new Error(`HTTP ${response.status} ${response.statusText || ''}`.trim()))
-        return
-      }
-      if (!response.body) {
-        handlers.onError?.(new Error('Streaming response has no body'))
-        return
-      }
-      await pumpResponse(response, handlers, state, cancel)
-    } catch (err) {
-      if (state.cancelled || err?.name === 'AbortError') return
-      handlers.onError?.(err)
-    }
-  }
-
-  void run()
-  return cancel
-}
-
-/**
- * POST variant of `streamSse`. Same wire format and same callback shape,
- * but sends a JSON body — used by the documentation chatbot, where the
- * conversation history is too large for a query string.
- * @param {string} url - The streaming endpoint URL.
- * @param {*} body - JSON-serialisable request body.
- * @param {object} handlers - Same handler shape as `streamSse`, plus
- *   optional `onReasoning(text)` and `onTitle(text)` for the chatbot.
- * @returns {Function} A cancel function.
- */
-export const streamSsePost = (url, body, handlers = {}) => {
-  const { controller, state, cancel } = makeCanceller()
-
-  const run = async () => {
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: authHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify(body),
-        signal: controller.signal,
-        credentials: 'same-origin',
-      })
-      if (!response.ok) {
-        const errorKey = await parseErrorKey(response)
-        handlers.onError?.(new Error(errorKey || `HTTP ${response.status} ${response.statusText || ''}`.trim()))
         return
       }
       if (!response.body) {

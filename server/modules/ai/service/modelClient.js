@@ -1,8 +1,8 @@
 /**
  * Single entry point that every Tier-1 AI feature calls. Hides the
- * provider plumbing behind three Vercel-AI-SDK-shaped methods: `generate`
- * for plain text, `generateStructured` for JSON validated against a Zod
- * schema, and `stream` for token-by-token streaming.
+ * provider plumbing behind two Vercel-AI-SDK-shaped methods: `generate`
+ * for plain text and `generateStructured` for JSON validated against a Zod
+ * schema.
  *
  * Each method:
  *   1. Resolves the model via `providerResolver` (user → admin → 503).
@@ -10,7 +10,7 @@
  *   3. Wraps the call in `aiTelemetry.track` so latency, tokens, and
  *      outcome are recorded uniformly.
  */
-import { generateObject, generateText, streamText } from 'ai'
+import { generateObject, generateText } from 'ai'
 
 import { ENV } from '@core/processUtils'
 
@@ -85,84 +85,4 @@ export const generateStructured = async ({ user, feature, prompt, system, schema
       abortSignal: signal,
     })
   )
-}
-
-/**
- * Multi-turn streaming chat. Like {@link stream} but accepts a Vercel AI
- * SDK v4 `messages` array (`[{role, content}]`) for back-and-forth
- * conversations. Routed through the same per-user provider resolution and
- * telemetry path as the single-shot calls. Used by the documentation
- * chatbot.
- * @param {object} args - Args.
- * @param {object} args.user - Arena user.
- * @param {string} args.feature - Feature key (e.g. "chatbot").
- * @param {Array<{role: string, content: string}>} args.messages - Conversation history.
- * @param {string} [args.system] - Optional system prompt.
- * @param {AbortSignal} [args.signal] - Optional cancellation signal.
- * @returns {Promise<{textStream: AsyncIterable<string>, usage: Promise<object>}>}
- *   The SDK stream result.
- */
-export const streamChat = async ({ user, feature, messages, system, signal }) => {
-  assertFeatureEnabled(feature, user)
-  const totalChars =
-    (messages || []).reduce((acc, m) => acc + (typeof m.content === 'string' ? m.content.length : 0), 0) +
-    (system?.length || 0)
-  if (totalChars > ENV.aiMaxPromptChars) {
-    throw new SystemError('aiPromptTooLarge', { feature, size: totalChars, limit: ENV.aiMaxPromptChars })
-  }
-  const { model, meta } = await ProviderResolver.resolveModelForUser({ user, feature })
-  const ctx = buildContext({ user, feature, meta })
-  const start = Date.now()
-  const result = streamText({
-    model,
-    messages,
-    system,
-    abortSignal: signal,
-  })
-  result.usage
-    .then(async (usage) => {
-      await AiTelemetry.track({ ...ctx }, async () => ({ usage }))
-    })
-    .catch(() => {})
-  result._aiStartedAt = start
-  return result
-}
-
-/**
- * Streaming text generation. Returns the Vercel AI SDK stream handle whose
- * `textStream` async-iterates over chunks. Telemetry is recorded once the
- * stream completes, and the final usage block is awaited via `.usage`.
- * @param {object} args - Args.
- * @param {object} args.user - Arena user.
- * @param {string} args.feature - Feature key.
- * @param {string} args.prompt - User prompt.
- * @param {string} [args.system] - Optional system prompt.
- * @param {AbortSignal} [args.signal] - Optional cancellation signal.
- * @returns {Promise<{textStream: AsyncIterable<string>, usage: Promise<object>}>}
- *   The SDK stream result; callers iterate `textStream` and may await `.usage`.
- */
-export const stream = async ({ user, feature, prompt, system, signal }) => {
-  assertFeatureEnabled(feature, user)
-  assertPromptSize(prompt, system, feature)
-  const { model, meta } = await ProviderResolver.resolveModelForUser({ user, feature })
-  const ctx = buildContext({ user, feature, meta })
-  const start = Date.now()
-  const result = streamText({
-    model,
-    prompt,
-    system,
-    abortSignal: signal,
-  })
-  // Fire-and-forget telemetry once the stream finishes.
-  result.usage
-    .then(async (usage) => {
-      await AiTelemetry.track({ ...ctx }, async () => ({ usage }))
-    })
-    .catch(() => {
-      // The error path is handled by the route's stream consumer; suppress
-      // here to avoid an unhandled-rejection warning on cancellation.
-    })
-  // Annotate the returned object so route handlers can log start time if needed.
-  result._aiStartedAt = start
-  return result
 }

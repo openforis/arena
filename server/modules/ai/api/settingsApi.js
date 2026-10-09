@@ -14,6 +14,7 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as AiSettingsService from '../service/aiSettingsService'
 import * as ProviderResolver from '../service/providerResolver'
 import * as SecretBox from '@server/utils/crypto/secretBox'
+import { getDisabledFeatureKeys } from '../service/featureGate'
 import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 const buildResponseBody = async (user) => {
@@ -25,6 +26,7 @@ const buildResponseBody = async (user) => {
     effectiveProvider: effective.provider,
     effectiveModel: effective.model,
     encryptionConfigured: SecretBox.isConfigured(),
+    disabledFeatures: getDisabledFeatureKeys(),
   }
 }
 
