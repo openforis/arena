@@ -10,7 +10,7 @@ import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { AnalysisApi } from './analysisApi'
-import { canViewCurrentSurvey, getAnalysisContext, toolError } from './toolResults'
+import { canViewCurrentSurvey, fitListToBudget, getAnalysisContext, toolError } from './toolResults'
 
 export const categoryItemsMax = 20
 
@@ -80,7 +80,7 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
       )
     }
     const found = items.filter(matches(text, lang))
-    return {
+    const result = {
       attribute,
       columns: ColumnNodeDef.getColumnNames(nodeDef),
       items: found
@@ -89,6 +89,8 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
       total: found.length,
       truncated: found.length > categoryItemsMax,
     }
+    const fitted = fitListToBudget(result, 'items')
+    return { ...fitted, truncated: result.truncated || (fitted.truncated ?? false) }
   }
 
   return {
