@@ -30,7 +30,6 @@ export const WebSocketEvents = {
   userRemovedFromSurvey: 'userRemovedFromSurvey',
 
   // AI events
-  translationUpdate: 'translationUpdate',
 
   // temp auth token events
   tempLoginSuccessful: 'tempLoginSuccessful',

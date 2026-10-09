@@ -188,4 +188,4 @@ export {
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
 
-export { aiSettings, aiTranslation, aiActivityLog, aiChatbot, aiDataQuery, streamSse as aiStreamSse } from './ai'
+export { aiSettings, aiActivityLog, aiChatbot, aiDataQuery, streamSse as aiStreamSse } from './ai'
