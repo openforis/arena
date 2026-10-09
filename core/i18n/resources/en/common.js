@@ -1,4 +1,8 @@
-import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
 
 export default {
   common: {
@@ -1433,6 +1437,13 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     reportingData: 'Reporting data',
     exportToGeoPackage: 'Export to GeoPackage',
     exportToGeoPackageSkippedItems: '{{count}} item(s) without a valid location were skipped.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Generate Whisp analysis',
+      confirmMessage: `Generate the Whisp analysis for all the sampling points?
+
+The results will be combined with the sampling point data and stored in the '${samplingPointDataWhispCategoryName}' category (it will be overwritten if it already exists).
+The analysis can take several minutes.`,
+    },
     templateFor_samplingPointDataImport_csv: 'Template for Sampling Point Data import (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Template for Sampling Point Data import (Excel)',
   },

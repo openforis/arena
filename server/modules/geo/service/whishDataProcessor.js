@@ -60,8 +60,8 @@ const waitForProcessing = async ({ token }) => {
   }
 }
 
-const generateData = async ({ geojson }) => {
-  const requestPayload = { ...geojson, analysisOptions: { async: true } }
+const generateData = async ({ geojson, analysisOptions = {} }) => {
+  const requestPayload = { ...geojson, analysisOptions: { ...analysisOptions, async: true } }
   const headers = getRequestHeaders()
   let processStartData
   try {

@@ -103,6 +103,11 @@ export const startGeoAttributeJsonDataExport = async ({ surveyId, attributeDefUu
   return data
 }
 
+export const startSamplingPointDataWhispJob = async ({ surveyId }) => {
+  const { data: job } = await axios.post(`/api/survey/${surveyId}/geo/whisp/sampling-point-data/start`)
+  return job
+}
+
 export const getGeoJsonDataDownloadUrl = ({ surveyId, tempFileName }) =>
   `${window.location.origin}/api/survey/${surveyId}/geo/geojsondata/download/${tempFileName}`
 
