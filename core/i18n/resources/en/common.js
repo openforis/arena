@@ -1441,8 +1441,10 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       buttonLabel: 'Generate Whisp analysis',
       confirmMessage: `Generate the Whisp analysis for all the sampling points?
 
-The results will be combined with the sampling point data and stored in the '${samplingPointDataWhispCategoryName}' category (it will be overwritten if it already exists).
-The analysis can take several minutes.`,
+- every sampling point with a location will be sent to Whisp for the analysis
+- the results will be combined with the sampling point data and stored in the category '${samplingPointDataWhispCategoryName}'
+- if the category '${samplingPointDataWhispCategoryName}' already exists, its content will be replaced
+- the analysis runs in the background and it can take several minutes, depending on the number of sampling points`,
     },
     templateFor_samplingPointDataImport_csv: 'Template for Sampling Point Data import (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Template for Sampling Point Data import (Excel)',

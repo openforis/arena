@@ -251,8 +251,10 @@ const CategoryDetails = (props) => {
                   variant="outlined"
                 />
               )}
+            </div>
 
-              {!readOnly && isSamplingPointData && hasLocationExtraProp && (
+            {!readOnly && isSamplingPointData && hasLocationExtraProp && (
+              <div className="row">
                 <Button
                   className="generate-whisp-btn"
                   iconAlt="Whisp"
@@ -263,8 +265,8 @@ const CategoryDetails = (props) => {
                   onClick={Actions.generateSamplingPointDataWhisp}
                   variant="outlined"
                 />
-              )}
-            </div>
+              </div>
+            )}
 
             {Category.isReportingData(category) && (
               <div className="row">
