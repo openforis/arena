@@ -2,6 +2,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
+import { writeImportedSurveyAiPolicy } from '@server/modules/ai/service/surveyAiPolicyService'
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyUniqueNameGenerator from '@server/modules/survey/service/surveyUniqueNameGenerator'
@@ -76,6 +77,9 @@ export default class SurveyCreatorJob extends Job {
     })
 
     const surveyId = Survey.getId(survey)
+
+    // carry the source survey's AI policy (privacy-preserving), clamped to this instance's ceilings
+    await writeImportedSurveyAiPolicy({ surveyId, surveyInfo: surveyInfoArenaSurvey })
 
     this.setContext({ survey, surveyId, defaultLanguage })
   }

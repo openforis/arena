@@ -10,6 +10,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import type { AiDataClass } from '@common/ai/features'
 import {
   aiPolicyDataClasses,
+  clampAiPolicy,
   findLevelsAboveCeiling,
   getEffectiveAiPolicy,
   isAiPolicyLevel,
@@ -168,4 +169,38 @@ export const assertSurveyAiAllowed = async (
   const { provider, baseUrl } = resolved.cfg
   const hostingClass = getProviderHostingClass({ provider, baseUrl, allowlist: deps.allowlist })
   await deps.assertPolicyAllows({ surveyId: Number(surveyId), dataClass, hostingClass })
+}
+
+/**
+ * Returns the exported survey with its raw AI policy in the survey info (only when one is set).
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Exported survey (with `info`).
+ * @param {unknown} params.rawPolicy - Stored policy, or null.
+ * @returns {object} The survey to write in the export file.
+ */
+export const addAiPolicyToExportedSurvey = ({ survey, rawPolicy }: { survey: any; rawPolicy: unknown }): any => {
+  if (rawPolicy === null || rawPolicy === undefined) return survey
+  const key = Survey.configKeys.aiPolicy
+  // survey.json is the survey info itself; only old exports nest it in `info` (see Survey.getSurveyInfo)
+  if (survey.info) return { ...survey, info: { ...survey.info, [key]: rawPolicy } }
+  return { ...survey, [key]: rawPolicy }
+}
+
+/**
+ * Stores the AI policy of an imported (or cloned) survey, clamped to this instance's ceilings.
+ * @param {object} params - Parameters.
+ * @param {number} params.surveyId - Id of the new survey.
+ * @param {object} params.surveyInfo - Survey info read from the import file.
+ * @param {Pick<SurveyAiPolicyDeps, 'storePolicy' | 'getCeilings'>} [deps] - Dependencies (tests).
+ * @returns {Promise<AiPolicy|null>} The stored policy, or null when the file has none (defaults apply).
+ */
+export const writeImportedSurveyAiPolicy = async (
+  { surveyId, surveyInfo }: { surveyId: number; surveyInfo: any },
+  deps: Pick<SurveyAiPolicyDeps, 'storePolicy' | 'getCeilings'> = createDefaultSurveyAiPolicyDeps()
+): Promise<AiPolicy | null> => {
+  const raw = surveyInfo?.[Survey.configKeys.aiPolicy]
+  if (raw === undefined || raw === null) return null
+  const policy = clampAiPolicy({ policy: normalizeAiPolicy(raw), ceilings: deps.getCeilings() })
+  await deps.storePolicy({ surveyId, policy }, undefined)
+  return policy
 }
