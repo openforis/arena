@@ -10,7 +10,13 @@ import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { AnalysisApi } from './analysisApi'
-import { canViewCurrentSurvey, fitListToBudget, getAnalysisContext, toolError } from './toolResults'
+import {
+  canViewCurrentSurvey,
+  fitListToBudget,
+  getAnalysisContext,
+  toolError,
+  toRequestErrorResult,
+} from './toolResults'
 
 export const categoryItemsMax = 20
 
@@ -72,7 +78,12 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
     }
     const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     const text = (search ?? '').trim().toLowerCase()
-    const items = await fetchItems({ ctx, nodeDef, category, search: text })
+    let items: object[] | null
+    try {
+      items = await fetchItems({ ctx, nodeDef, category, search: text })
+    } catch (error) {
+      return toRequestErrorResult(error, 'The search took too long. Use a more specific search text.')
+    }
     if (!items) {
       return toolError(
         'largeCategoryLevel',

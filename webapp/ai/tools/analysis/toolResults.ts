@@ -16,6 +16,24 @@ export const RESULT_MAX_CHARS = 7000
 export const toolError = (code: string, message: string) => ({ error: { code, message } })
 
 /**
+ * Turns the expected request failures into a result the model can act on: a timeout (queryTimeout, with the
+ * given hint) or a forbidden request (noPermission). Other errors are re-thrown.
+ * @param {any} error - The error.
+ * @param {string} timeoutHint - What the model can do after a timeout.
+ * @returns {object} The error result.
+ */
+export const toRequestErrorResult = (error: any, timeoutHint: string) => {
+  if (error?.key === 'queryTimeout') return toolError('queryTimeout', timeoutHint)
+  if (error?.response?.status === 403) {
+    return toolError(
+      'noPermission',
+      'The user is not allowed to see this data. Do not retry: tell the user they lack the permission.'
+    )
+  }
+  throw error
+}
+
+/**
  * Removes items from the end of a list until the JSON of the result fits the budget.
  * @param {object} result - Tool result.
  * @param {string} key - Key of the list in the result.
