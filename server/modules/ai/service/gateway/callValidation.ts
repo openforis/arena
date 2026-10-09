@@ -47,26 +47,33 @@ export const parseGatewayRequest = (body: unknown): AiGatewayRequest => {
 
 const isTextPart = (part: unknown): boolean => isObject(part) && part.type === 'text' && typeof part.text === 'string'
 
-// returns the message size in chars; system content is a string, user/assistant content text parts only
-const checkMessage = (message: unknown): number => {
+// Rebuilds the message from { role, content } (and text parts from { type, text }) so that extra keys,
+// e.g. providerOptions, are dropped. System content is a string, user/assistant content text parts only.
+const rebuildMessage = (message: unknown): any => {
   if (!isObject(message)) throw invalid('prompt')
   const { role, content } = message
   if (role === 'system') {
     if (typeof content !== 'string') throw invalid('prompt.system')
-    return content.length
+    return { role, content }
   }
   if (role !== 'user' && role !== 'assistant') throw invalid('prompt.role')
   if (!Array.isArray(content) || !content.every(isTextPart)) throw invalid('prompt.content')
-  return content.reduce((total, part) => total + part.text.length, 0)
+  return { role, content: content.map((part) => ({ type: 'text', text: part.text })) }
 }
 
-const checkPrompt = (prompt: unknown, maxPromptChars: number): void => {
+const messageSize = (message: any): number =>
+  typeof message.content === 'string'
+    ? message.content.length
+    : message.content.reduce((total: number, part: any) => total + part.text.length, 0)
+
+const sanitizePrompt = (prompt: unknown, maxPromptChars: number): AiGatewayCall['prompt'] => {
   if (!Array.isArray(prompt) || prompt.length === 0) throw invalid('prompt')
-  let size = 0
-  for (const message of prompt) size += checkMessage(message)
+  const rebuilt = prompt.map(rebuildMessage)
+  const size = rebuilt.reduce((total, message) => total + messageSize(message), 0)
   if (size > maxPromptChars) {
     throw new SystemError('aiPromptTooLarge', { size, limit: maxPromptChars }, PAYLOAD_TOO_LARGE)
   }
+  return rebuilt
 }
 
 const pickNumericOptions = (call: Record<string, any>): Partial<AiGatewayCall> => {
@@ -116,9 +123,8 @@ export const sanitizeCall = (
 ): AiGatewayCall => {
   if (!isObject(call)) throw invalid('call')
   if (call.tools !== undefined || call.toolChoice !== undefined) throw invalid('tools')
-  checkPrompt(call.prompt, maxPromptChars)
   const sanitized: AiGatewayCall = {
-    prompt: call.prompt,
+    prompt: sanitizePrompt(call.prompt, maxPromptChars),
     ...pickNumericOptions(call),
     maxOutputTokens: capOutputTokens(call.maxOutputTokens, maxOutputTokens),
   }
