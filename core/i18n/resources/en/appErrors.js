@@ -118,6 +118,8 @@ Try to refresh the page.`,
   aiLocalServerContextExceeded:
     'The request is too long for the context size of the local model. Load the model with a larger context in LM Studio, or shorten the request.',
   aiLocalServerError: 'The local AI server returned an error (HTTP {{status}}).',
+  aiNoEngineAvailable: 'No AI engine can be used for this request.',
+  aiLocalServerConsentCancelled: 'The request was cancelled.',
   aiDataQuerySummaryInvalid: 'The AI could not suggest a name and description for this query. Please try again.',
   userCannotDeleteHasMessages:
     'This user cannot be deleted: they authored {{count}} message(s); delete or reassign them first',

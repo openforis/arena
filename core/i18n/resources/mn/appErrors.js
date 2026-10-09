@@ -8,6 +8,8 @@ export default {
   aiLocalServerContextExceeded:
     'Хүсэлт дотоод загварын контекстын хэмжээнээс урт байна. LM Studio-д загварыг илүү том контексттэй ачаалах эсвэл хүсэлтээ богиносгоно уу.',
   aiLocalServerError: 'Дотоод AI сервер алдаа буцаалаа (HTTP {{status}}).',
+  aiNoEngineAvailable: 'Энэ хүсэлтэд ашиглах боломжтой AI хөдөлгүүр алга.',
+  aiLocalServerConsentCancelled: 'Хүсэлтийг цуцаллаа.',
   aiDataQueryInvalid: 'AI энэ тайлбарт тохирох зөв хүсэлт үүсгэж чадсангүй: {{errors}}',
   aiDataQueryNoEntities: 'Энэ судалгаанд хүсэлт гаргах боломжтой объект байхгүй байна.',
   aiDataQuerySummaryInvalid: 'AI энэ хүсэлтийн нэр, тайлбарыг санал болгож чадсангүй. Дахин оролдоно уу.',

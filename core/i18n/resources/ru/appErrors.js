@@ -8,6 +8,8 @@ export default {
   aiLocalServerContextExceeded:
     'Запрос слишком длинный для размера контекста локальной модели. Загрузите модель с большим контекстом в LM Studio или сократите запрос.',
   aiLocalServerError: 'Локальный сервер ИИ вернул ошибку (HTTP {{status}}).',
+  aiNoEngineAvailable: 'Для этого запроса нельзя использовать ни один движок ИИ.',
+  aiLocalServerConsentCancelled: 'Запрос отменён.',
   aiDataQueryInvalid: 'ИИ не удалось сформировать корректный запрос по этому описанию: {{errors}}',
   aiDataQueryNoEntities: 'В этом опросе нет сущностей, по которым можно выполнить запрос.',
   aiDataQuerySummaryInvalid: 'ИИ не удалось предложить название и описание для этого запроса. Попробуйте ещё раз.',

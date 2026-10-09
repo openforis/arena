@@ -119,6 +119,8 @@ export default {
   aiLocalServerContextExceeded:
     'リクエストがローカルモデルのコンテキストサイズを超えています。LM Studio でより大きなコンテキストでモデルを読み込むか、リクエストを短くしてください。',
   aiLocalServerError: 'ローカル AI サーバーがエラーを返しました (HTTP {{status}})。',
+  aiNoEngineAvailable: 'このリクエストに使用できる AI エンジンがありません。',
+  aiLocalServerConsentCancelled: 'リクエストはキャンセルされました。',
   aiDataQuerySummaryInvalid: 'AIはこのクエリの名前と説明を提案できませんでした。もう一度お試しください。',
   userCannotDeleteHasMessages:
     'このユーザーは削除できません：{{count}}件のメッセージを作成しています。先にメッセージを削除するか、担当を変更してください',

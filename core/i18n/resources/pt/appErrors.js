@@ -8,6 +8,8 @@ export default {
   aiLocalServerContextExceeded:
     'A solicitação é longa demais para o tamanho de contexto do modelo local. Carregue o modelo com um contexto maior no LM Studio ou encurte a solicitação.',
   aiLocalServerError: 'O servidor de IA local retornou um erro (HTTP {{status}}).',
+  aiNoEngineAvailable: 'Nenhum mecanismo de IA pode ser usado para esta solicitação.',
+  aiLocalServerConsentCancelled: 'A solicitação foi cancelada.',
   aiDataQueryInvalid: 'A IA não conseguiu gerar uma consulta válida para esta solicitação: {{errors}}',
   aiDataQueryNoEntities: 'Este inventário não possui entidades que possam ser consultadas.',
   aiDataQuerySummaryInvalid: 'A IA não conseguiu sugerir um nome e uma descrição para esta consulta. Tente novamente.',
