@@ -9,6 +9,13 @@ const getJson = (val: unknown): unknown => {
   }
 }
 
+// Empty or non-numeric → default; 0 (or negative) is kept as is ("unlimited" for the rate limit).
+export const getNumberOrDefault = (val: unknown, defaultValue: number): number => {
+  if (typeof val !== 'string' || val.trim() === '') return defaultValue
+  const parsed = Number(val)
+  return Number.isNaN(parsed) ? defaultValue : parsed
+}
+
 // Comma-separated list → trimmed, non-empty items.
 const getList = (val: unknown): string[] =>
   typeof val === 'string'
@@ -126,7 +133,7 @@ export const ENV = {
   aiMaxOutputTokens: Number(process.env.AI_MAX_OUTPUT_TOKENS) || 4096,
   aiRequestTimeoutMs: Number(process.env.AI_REQUEST_TIMEOUT_MS) || 60000,
   // Requests per user per minute on the gateway endpoint; 0 or negative = unlimited
-  aiRateLimitPerMinute: Number(process.env.AI_RATE_LIMIT_PER_MINUTE ?? 30),
+  aiRateLimitPerMinute: getNumberOrDefault(process.env.AI_RATE_LIMIT_PER_MINUTE, 30),
   // User-configured base URLs allowed even if they resolve to a private address (org-hosted models)
   aiOrgHostedBaseUrls: getList(process.env.AI_ORG_HOSTED_BASE_URLS),
   // Test servers only: enables the canned "mock" provider (AI_DEFAULT_PROVIDER=mock)
