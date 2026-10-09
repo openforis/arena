@@ -4,8 +4,10 @@ export default {
   enableFeatures: 'Enable AI features',
   categoriesSection: 'AI integration levels',
   categories: {
-    chat: 'Documentation chatbot',
-    chatHint: 'Floating help button that answers questions about Arena, powered by your configured AI provider.',
+    chat: 'Help assistant',
+    chatHint: 'Assistant area that answers questions about Arena from the user manual.',
+    assistant: 'Design assistant',
+    assistantHint: 'Assistant area that reads the survey and proposes changes to it (you review and apply them).',
     expressions: 'Expression generation & validation',
     expressionsHint: 'AI assistance to draft and explain survey validation expressions.',
     translation: 'Label translation',

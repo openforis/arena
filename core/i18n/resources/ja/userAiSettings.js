@@ -4,8 +4,10 @@ export default {
   enableFeatures: 'AI機能を有効にする',
   categoriesSection: 'AI統合レベル',
   categories: {
-    chat: 'ドキュメントチャットボット',
-    chatHint: '設定されたAIプロバイダーを利用し、Arenaに関する質問に答える浮遊ヘルプボタンです。',
+    chat: 'ヘルプアシスタント',
+    chatHint: 'ユーザーマニュアルをもとにArenaに関する質問に答えるアシスタントの領域です。',
+    assistant: 'デザインアシスタント',
+    assistantHint: '調査を読み取り、変更を提案するアシスタントの領域です（確認して適用するのはあなたです）。',
     expressions: '式の生成・検証',
     expressionsHint: '調査の検証式の下書き作成・説明を支援するAI機能です。',
     translation: 'ラベルの翻訳',

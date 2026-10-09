@@ -4,8 +4,10 @@ export default {
   enableFeatures: 'Habilitar funciones de IA',
   categoriesSection: 'Niveles de integracion de IA',
   categories: {
-    chat: 'Chatbot de documentacion',
-    chatHint: 'Boton de ayuda flotante que responde preguntas sobre Arena, usando el proveedor de IA configurado.',
+    chat: 'Asistente de ayuda',
+    chatHint: 'Área del asistente que responde preguntas sobre Arena a partir del manual de usuario.',
+    assistant: 'Asistente de diseño',
+    assistantHint: 'Área del asistente que lee la encuesta y propone cambios (usted los revisa y aplica).',
     expressions: 'Generacion y validacion de expresiones',
     expressionsHint: 'Asistencia de IA para redactar y explicar expresiones de validacion de encuesta.',
     translation: 'Traduccion de etiquetas',

@@ -4,8 +4,11 @@ export default {
   enableFeatures: 'Activer les fonctionnalites IA',
   categoriesSection: 'Niveaux d integration IA',
   categories: {
-    chat: 'Chatbot de documentation',
-    chatHint: 'Bouton d aide flottant qui repond aux questions sur Arena, alimente par votre fournisseur IA configure.',
+    chat: "Assistant d'aide",
+    chatHint: "Espace de l'assistant qui répond aux questions sur Arena à partir du manuel d'utilisation.",
+    assistant: 'Assistant de conception',
+    assistantHint:
+      "Espace de l'assistant qui lit le formulaire et propose des modifications (vous les vérifiez et les appliquez).",
     expressions: 'Generation et validation d expressions',
     expressionsHint: 'Assistance IA pour rediger et expliquer les expressions de validation de formulaire.',
     translation: 'Traduction des libelles',
