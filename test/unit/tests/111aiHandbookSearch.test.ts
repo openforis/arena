@@ -2,7 +2,7 @@ import en from '@core/i18n/resources/en/common'
 
 import { buildHandbookIndex, getHandbookOutline, searchHandbook, tokenize } from '@webapp/ai/help/handbookSearch'
 import type { Handbook } from '@webapp/ai/help/handbookSplitter'
-import { loadHandbook } from '@webapp/ai/help/loadHandbook'
+import { createHandbookLoader, loadHandbook } from '@webapp/ai/help/loadHandbook'
 import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 import { createDocsSearchTool } from '@webapp/ai/tools/help/docsSearch'
 import { AI_TOOL_NAME_PATTERN, runTool } from '@webapp/ai/tools/registry'
@@ -74,6 +74,16 @@ describe('docs_search', () => {
     expect(tool.requires(createToolContext())).toBe(true)
   })
 
+  test('a failing index load becomes a structured error', async () => {
+    const failing = createDocsSearchTool({
+      loadIndex: async () => {
+        throw new Error('chunk failed')
+      },
+    })
+    const result: any = await runTool(failing, { query: 'table' }, createToolContext())
+    expect(result.error).toMatchObject({ code: 'toolFailed', message: 'chunk failed' })
+  })
+
   test('says so when nothing matches', async () => {
     const result: any = await runTool(tool, { query: 'kubernetes' }, createToolContext())
     expect(result.results).toEqual([])
@@ -89,6 +99,28 @@ describe('the committed handbook', () => {
     expect(searchHandbook(loaded.index, 'branding logo')[0].title).toMatch(/Branding/)
     expect(getHandbookOutline(loaded.handbook).length).toBeLessThanOrEqual(3000)
     expect(await loadHandbook()).toBe(loaded)
+  })
+})
+
+describe('handbook loader', () => {
+  test('retries after a failed import, then loads once', async () => {
+    const importer = jest.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue({ default: handbook })
+    const load = createHandbookLoader(importer)
+    await expect(load()).rejects.toThrow('offline')
+    const loaded = await load()
+    expect(loaded.handbook).toBe(handbook)
+    expect(await load()).toBe(loaded)
+    expect(importer).toHaveBeenCalledTimes(2)
+  })
+
+  test('empty sections never take a result slot', async () => {
+    const loaded = await loadHandbook()
+    expect(loaded.handbook.sections.some((item) => item.text === '')).toBe(true)
+    for (const query of ['analysis', 'data', 'survey']) {
+      const results = searchHandbook(loaded.index, query)
+      expect(results.length).toBeGreaterThan(0)
+      expect(results.every((result) => result.text !== '')).toBe(true)
+    }
   })
 })
 

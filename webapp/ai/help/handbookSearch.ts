@@ -20,7 +20,11 @@ const TITLE_WEIGHT = 3
 const K1 = 1.2
 const B = 0.75
 
-// crude plural folding, enough for "categories" / "category" and "surveys" / "survey"
+/**
+ * Folds a plural term to its singular (crude, enough for "categories" / "category" and "surveys" / "survey").
+ * @param {string} token - Term.
+ * @returns {string} The singular term.
+ */
 const toSingular = (token: string): string => {
   if (token.length > 4 && token.endsWith('ies')) return `${token.slice(0, -3)}y`
   if (token.length > 3 && token.endsWith('s') && !token.endsWith('ss')) return token.slice(0, -1)
@@ -51,6 +55,11 @@ export type HandbookIndex = {
 
 export type HandbookSearchResult = HandbookSection & { truncated?: true }
 
+/**
+ * Counts the terms of a section (title terms weigh more).
+ * @param {HandbookSection} section - Section.
+ * @returns {object} The term counts and the weighted length.
+ */
 const countTerms = (section: HandbookSection): { termCounts: Map<string, number>; length: number } => {
   const termCounts = new Map<string, number>()
   let length = 0
@@ -80,6 +89,13 @@ export const buildHandbookIndex = (handbook: Handbook): HandbookIndex => {
   return { sections, documentFrequency, averageLength: sections.length > 0 ? totalLength / sections.length : 0 }
 }
 
+/**
+ * Computes the BM25 score of a section for the query terms.
+ * @param {HandbookIndex} index - Index.
+ * @param {IndexedSection} indexed - Section.
+ * @param {string[]} terms - Query terms.
+ * @returns {number} The score.
+ */
 const scoreSection = (index: HandbookIndex, indexed: IndexedSection, terms: string[]): number => {
   const count = index.sections.length
   const lengthNorm = K1 * (1 - B + (B * indexed.length) / (index.averageLength || 1))
@@ -110,14 +126,19 @@ export const searchHandbook = (
 ): HandbookSearchResult[] => {
   const terms = [...new Set(tokenize(query))]
   if (terms.length === 0) return []
-  return index.sections
-    .map((indexed, position) => ({ indexed, position, score: scoreSection(index, indexed, terms) }))
-    .filter(({ score }) => score > 0)
-    .sort((a, b) => b.score - a.score || a.position - b.position)
-    .slice(0, limit)
-    .map(({ indexed: { section } }) =>
-      section.text.length > maxChars ? { ...section, text: section.text.slice(0, maxChars), truncated: true } : section
-    )
+  return (
+    index.sections
+      .map((indexed, position) => ({ indexed, position, score: scoreSection(index, indexed, terms) }))
+      // empty parent sections only exist for the outline: they must not take a result slot
+      .filter(({ indexed, score }) => score > 0 && indexed.section.text.trim() !== '')
+      .sort((a, b) => b.score - a.score || a.position - b.position)
+      .slice(0, limit)
+      .map(({ indexed: { section } }) =>
+        section.text.length > maxChars
+          ? { ...section, text: section.text.slice(0, maxChars), truncated: true }
+          : section
+      )
+  )
 }
 
 const PART_SUFFIX = / \(\d+\/\d+\)$/
