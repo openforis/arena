@@ -328,7 +328,7 @@ export const generateSchemaSummaryItems = async ({
 
   if (includeAiDescriptions) {
     await addAiDescriptions({
-      generateText: createServerTextGenerator({ user, feature: 'dataDictionary' }),
+      generateText: createServerTextGenerator({ user, feature: 'dataDictionary', surveyId }),
       surveyName,
       items,
       processed,

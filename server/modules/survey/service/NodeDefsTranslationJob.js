@@ -119,7 +119,7 @@ export default class NodeDefsTranslationJob extends Job {
 
     const aiByNodeDef = {}
 
-    const generateText = createServerTextGenerator({ user, feature: 'translation' })
+    const generateText = createServerTextGenerator({ user, feature: 'translation', surveyId })
     // the task accepts a limited number of target languages per call
     const langGroups = chunkArray(otherLangs, AiLimits.translationMaxTargetLangs)
 

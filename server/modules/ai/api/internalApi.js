@@ -31,6 +31,7 @@ export const init = (app) => {
         const result = await ModelClient.generateStructured({
           user,
           feature: 'internalPing',
+          surveyId: null, // admin ping: no survey, ceilings only
           prompt: 'Reply with a JSON object whose only field "reply" contains the single word "ok".',
           schema: PingSchema,
         })

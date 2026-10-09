@@ -3,9 +3,11 @@
  */
 import type { User } from '@openforis/arena-core'
 
+import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 import * as Survey from '@core/survey/survey'
 import * as ActivityLog from '@common/activityLog/activityLog'
+import type { AiDataClass } from '@common/ai/features'
 import {
   aiPolicyDataClasses,
   findLevelsAboveCeiling,
@@ -19,7 +21,10 @@ import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 
+import { assertPolicyAllows, type AiPolicyCheck } from './gateway/policy'
+import { getProviderHostingClass } from './hostingClass'
 import { getAiPolicyCeilings } from './policyCeilings'
+import * as ProviderResolver from './providerResolver'
 
 export type SurveyAiPolicyState = { policy: AiPolicy; ceilings: AiPolicy; effective: AiPolicy }
 
@@ -130,4 +135,37 @@ export const updateSurveyAiPolicy = async (
     }
     return toState({ policy: requested, ceilings })
   })
+}
+
+type SurveyAiAllowedDeps = {
+  resolveConfigForUser: (user: User) => { cfg: { provider: string; baseUrl?: string | null }; source: string } | null
+  assertPolicyAllows: (check: AiPolicyCheck) => Promise<void>
+  allowlist: string[]
+}
+
+const createDefaultSurveyAiAllowedDeps = (): SurveyAiAllowedDeps => ({
+  resolveConfigForUser: (user) => ProviderResolver.resolveConfigForUser(user),
+  assertPolicyAllows,
+  allowlist: ENV.aiOrgHostedBaseUrls,
+})
+
+/**
+ * Checks, before a job starts, that the survey AI policy allows sending the data class to the user's provider.
+ * Resolves the provider config only (no model is built), so the request fails fast instead of on the first batch.
+ * @param {object} params - Parameters.
+ * @param {User} params.user - Acting user.
+ * @param {number} params.surveyId - Survey id.
+ * @param {AiDataClass} params.dataClass - Data class sent by the job.
+ * @param {SurveyAiAllowedDeps} [deps] - Dependencies (tests).
+ * @returns {Promise<void>} Resolves when allowed; rejects with aiNotConfigured (503) or aiPolicyRefused (403).
+ */
+export const assertSurveyAiAllowed = async (
+  { user, surveyId, dataClass }: { user: User; surveyId: number; dataClass: AiDataClass },
+  deps: SurveyAiAllowedDeps = createDefaultSurveyAiAllowedDeps()
+): Promise<void> => {
+  const resolved = deps.resolveConfigForUser(user)
+  if (!resolved) throw new SystemError('aiNotConfigured', {}, StatusCodes.SERVICE_UNAVAILABLE)
+  const { provider, baseUrl } = resolved.cfg
+  const hostingClass = getProviderHostingClass({ provider, baseUrl, allowlist: deps.allowlist })
+  await deps.assertPolicyAllows({ surveyId: Number(surveyId), dataClass, hostingClass })
 }
