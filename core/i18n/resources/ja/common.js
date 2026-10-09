@@ -1577,7 +1577,6 @@ $t(common.cantUndoWarning)`,
     success: '翻訳しました。確認して保存してください。',
 
     failed: '翻訳に失敗しました：{{message}}',
-    timeout: '翻訳リクエストがタイムアウトしました。もう一度お試しください。',
   },
 
   aiActivityLog: {
@@ -1595,7 +1594,6 @@ $t(common.cantUndoWarning)`,
     send: '送信',
     stop: '停止',
     clear: 'クリア',
-    showReasoning: '思考過程を表示',
     error: 'チャットボットエラー：{{message}}',
     language: '応答言語',
   },

@@ -109,16 +109,11 @@ export default {
   aiExpressionNodeDefMissing: 'Зорилтот талбаргүйгээр илэрхийлэл үүсгэх боломжгүй.',
   aiExpressionNodeDefNotFound: 'Зорилтот талбар олдсонгүй (uuid {{nodeDefUuid}}).',
   aiExpressionExpressionMissing: 'Хоосон илэрхийллийг тайлбарлах боломжгүй.',
-  aiTranslationSocketMissing: 'WebSocket холбогдоогүй байна. Түр хүлээгээд дахин оролдоно уу.',
   aiTranslationSourceLangMissing: 'Орчуулгад эх хэл шаардлагатай.',
   aiTranslationTargetLangsMissing: 'Орчуулгад дор хаяж нэг зорилтот хэл шаардлагатай.',
   aiTranslationItemsMissing: 'Орчуулах зүйл алга.',
   aiTranslationInvalid: 'AI ашиглах боломжтой орчуулга буцаасангүй. Дахин оролдоно уу.',
   aiTranslationTooManyItems: 'Нэг багцад хэт олон элемент байна ({{count}}); хязгаар нь {{limit}}.',
-  aiActivityLogSurveyMissing: 'Үйл ажиллагааны бүртгэлийг хураангуйлахад судалгаа шаардлагатай.',
-  aiChatbotDisabled: 'Энэ суулгацад баримт бичгийн чатбот идэвхгүй байна.',
-  aiChatbotUpstreamError:
-    'Баримт бичгийн чатбот түр хугацаанд ашиглах боломжгүй байна. Хэсэг хугацааны дараа дахин оролдоно уу.',
   aiChatbotPayloadTooLarge: 'Таны харилцан яриа хэт том байна. Чатыг цэвэрлээд богино асуулт асууж үзнэ үү.',
   userHasPendingInvitation:
     "'{{email}}' имэйлтэй хэрэглэгчид хүлээгдэж буй урилга аль хэдийн байна; үүнийг хүлээн авах хүртэл түүнийг энэ судалгаанд урих боломжгүй",

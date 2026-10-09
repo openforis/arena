@@ -1605,7 +1605,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     success_other: 'Traduit dans {{count}} langues. Vérifiez et enregistrez.',
     success: 'Traduit. Vérifiez et enregistrez.',
     failed: 'Échec de la traduction : {{message}}',
-    timeout: 'La demande de traduction a expiré. Veuillez réessayer.',
   },
 
   aiActivityLog: {
@@ -1623,7 +1622,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     send: 'Envoyer',
     stop: 'Arrêter',
     clear: 'Effacer',
-    showReasoning: 'Afficher le raisonnement',
     error: 'Erreur du chatbot : {{message}}',
     language: 'Langue de réponse',
   },

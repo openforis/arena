@@ -1431,7 +1431,6 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     success_other: 'Traducido a {{count}} idiomas. Revise y guarde.',
     success: 'Traducido. Revise y guarde.',
     failed: 'La traducción falló: {{message}}',
-    timeout: 'La solicitud de traducción ha caducado. Inténtelo de nuevo.',
   },
 
   aiActivityLog: {
@@ -1449,7 +1448,6 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     send: 'Enviar',
     stop: 'Detener',
     clear: 'Borrar',
-    showReasoning: 'Mostrar razonamiento',
     error: 'Error del chatbot: {{message}}',
     language: 'Idioma de respuesta',
   },

@@ -1594,7 +1594,6 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     success_other: 'Traduzido para {{count}} idiomas. Revise e salve.',
     success: 'Traduzido. Revise e salve.',
     failed: 'Falha na tradução: {{message}}',
-    timeout: 'A solicitação de tradução expirou. Tente novamente.',
   },
 
   aiActivityLog: {
@@ -1612,7 +1611,6 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     send: 'Enviar',
     stop: 'Parar',
     clear: 'Limpar',
-    showReasoning: 'Mostrar raciocínio',
     error: 'Erro do chatbot: {{message}}',
     language: 'Idioma da resposta',
   },

@@ -1585,7 +1585,6 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     success: 'Translated. Review and save.',
 
     failed: 'Translation failed: {{message}}',
-    timeout: 'Translation request timed out. Please try again.',
   },
 
   aiActivityLog: {
@@ -1603,7 +1602,6 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     send: 'Send',
     stop: 'Stop',
     clear: 'Clear',
-    showReasoning: 'Show reasoning',
     error: 'Chatbot error: {{message}}',
     language: 'Response language',
   },

@@ -114,16 +114,11 @@ export default {
   aiExpressionNodeDefMissing: 'No se puede generar una expresión sin un campo de destino.',
   aiExpressionNodeDefNotFound: 'No se pudo encontrar el campo de destino (uuid {{nodeDefUuid}}).',
   aiExpressionExpressionMissing: 'No se puede explicar una expresión vacía.',
-  aiTranslationSocketMissing: 'WebSocket no conectado. Espere un momento e inténtelo de nuevo.',
   aiTranslationSourceLangMissing: 'El idioma de origen es obligatorio para la traducción.',
   aiTranslationTargetLangsMissing: 'Se requiere al menos un idioma de destino para la traducción.',
   aiTranslationItemsMissing: 'Nada que traducir.',
   aiTranslationInvalid: 'La IA no devolvió una traducción utilizable. Inténtelo de nuevo.',
   aiTranslationTooManyItems: 'Demasiados elementos en un solo lote ({{count}}); el límite es {{limit}}.',
-  aiActivityLogSurveyMissing: 'Se requiere una encuesta para resumir el registro de actividad.',
-  aiChatbotDisabled: 'El chatbot de documentación está deshabilitado en este despliegue.',
-  aiChatbotUpstreamError:
-    'El chatbot de documentación no está disponible temporalmente. Inténtelo de nuevo en un momento.',
   aiChatbotPayloadTooLarge: 'Su conversación es demasiado grande. Borre el chat e intente con una pregunta más corta.',
   userHasPendingInvitation:
     "Ya hay una invitación pendiente para el usuario con el correo electrónico '{{email}}'; no se le puede invitar a esta encuesta hasta que sea aceptada",
