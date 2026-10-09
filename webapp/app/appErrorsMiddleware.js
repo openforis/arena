@@ -49,7 +49,11 @@ const processFailedRequestsQueue = ({ error = null, authToken = null }) => {
   failedRequestsQueue = []
 }
 
-const refreshAuthToken = async () => {
+/**
+ * Refreshes the Arena auth token (also used by the AI gateway fetch).
+ * @returns {Promise<{authToken?: string, error?: unknown}>} The new token or the error.
+ */
+export const refreshAuthToken = async () => {
   isRefreshingToken = true
   try {
     const response = await axios.post(tokenRefreshEndpoint, null, {

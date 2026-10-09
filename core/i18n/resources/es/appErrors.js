@@ -112,6 +112,8 @@ export default {
     srsCodeInvalid: 'El código del sistema de referencia espacial no es válido: {{code}}',
   },
   unsupportedFunctionType: 'Tipo de función no compatible: {{exprType}}',
+  aiSessionExpired: 'Su sesión ha caducado. Vuelva a iniciar sesión.',
+  aiNotAuthorized: 'No tiene permiso para usar esta función de IA aquí.',
   aiNotConfigured:
     'La IA no está configurada. Configure un proveedor personal en la Configuración de IA o pida a su administrador que configure uno predeterminado.',
   aiFeaturesDisabled: 'Las funciones de IA están deshabilitadas en este despliegue.',
