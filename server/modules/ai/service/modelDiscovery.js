@@ -12,6 +12,7 @@
  */
 import SystemError from '@core/systemError'
 
+import { assertBaseUrlAllowed } from './baseUrlGuard'
 import * as ProviderRegistry from './providerRegistry'
 
 const DEFAULT_TIMEOUT_MS = 10000
@@ -20,7 +21,7 @@ const fetchWithTimeout = async (url, { headers, timeoutMs = DEFAULT_TIMEOUT_MS }
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
   try {
-    const response = await fetch(url, { method: 'GET', headers, signal: controller.signal })
+    const response = await fetch(url, { method: 'GET', headers, signal: controller.signal, redirect: 'error' })
     if (!response.ok) {
       const body = await response.text().catch(() => '')
       const bodySuffix = body ? ` — ${body.slice(0, 200)}` : ''
@@ -136,6 +137,7 @@ export const listForProvider = async ({ provider, baseUrl, apiKey }) => {
         return await listGoogle({ apiKey })
       case ProviderRegistry.providers.openaiCompatible: {
         if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })
+        await assertBaseUrlAllowed(baseUrl)
         return await listOpenAiCompatible({ baseUrl, apiKey })
       }
       case ProviderRegistry.providers.vercelAiSdk:

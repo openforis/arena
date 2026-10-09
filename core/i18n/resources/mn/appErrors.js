@@ -88,6 +88,9 @@ export default {
   aiModelMissing: 'AI загварын танигч шаардлагатай.',
   aiApiKeyMissing: '{{provider}} үйлчилгээ үзүүлэгчид API түлхүүр шаардлагатай.',
   aiBaseUrlMissing: 'OpenAI-тай нийцтэй үйлчилгээ үзүүлэгчид суурь URL шаардлагатай.',
+  aiBaseUrlNotAllowed:
+    'Энэ үндсэн URL дотоод хаяг руу заасан тул зөвшөөрөгдөхгүй. Байгууллагын загварын серверүүдэд нэмүүлэхийг админаасаа хүснэ үү.',
+  aiProviderUnavailable: 'AI үйлчилгээ үзүүлэгчтэй холбогдож чадсангүй. Дараа дахин оролдоно уу.',
   aiModelListFailed: 'Үйлчилгээ үзүүлэгчээс загваруудын жагсаалтыг авч чадсангүй: {{message}}',
   aiExpressionDescriptionMissing: 'Хүссэн илэрхийллээ энгийн үгээр тайлбарлана уу.',
   aiExpressionTypeInvalid: 'Тодорхойгүй илэрхийллийн төрөл: {{expressionType}}.',

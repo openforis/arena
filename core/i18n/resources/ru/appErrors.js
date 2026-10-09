@@ -88,6 +88,9 @@ export default {
   aiModelMissing: 'Требуется идентификатор модели ИИ.',
   aiApiKeyMissing: 'Для провайдера {{provider}} требуется ключ API.',
   aiBaseUrlMissing: 'Для провайдера, совместимого с OpenAI, требуется базовый URL.',
+  aiBaseUrlNotAllowed:
+    'Этот базовый URL указывает на внутренний адрес и не разрешён. Попросите администратора добавить его в серверы моделей организации.',
+  aiProviderUnavailable: 'Не удалось связаться с поставщиком ИИ. Повторите попытку позже.',
   aiModelListFailed: 'Не удалось получить список моделей от провайдера: {{message}}',
   aiExpressionDescriptionMissing: 'Опишите нужное выражение простыми словами.',
   aiExpressionTypeInvalid: 'Неизвестный тип выражения: {{expressionType}}.',

@@ -78,6 +78,9 @@ export default {
   aiModelMissing: 'AIモデルの識別子が必要です。',
   aiApiKeyMissing: 'プロバイダー{{provider}}にはAPIキーが必要です。',
   aiBaseUrlMissing: 'openai-compatibleプロバイダーにはベースURLが必要です。',
+  aiBaseUrlNotAllowed:
+    'このベースURLは内部アドレスを指しているため使用できません。組織のモデルサーバーへの追加を管理者に依頼してください。',
+  aiProviderUnavailable: 'AIプロバイダーに接続できませんでした。しばらくしてから再度お試しください。',
   aiModelListFailed: 'プロバイダーからモデル一覧を取得できませんでした：{{message}}',
   aiExpressionDescriptionMissing: '生成したい式の内容を自然な言葉で説明してください。',
   aiExpressionTypeInvalid: '不明な式の種類です：{{expressionType}}。',

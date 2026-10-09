@@ -41,7 +41,7 @@ export const resolveModelForUser = async ({ user, feature }) => {
   const userCfg = AiSettingsService.getEffectiveUserConfig(user)
   if (userCfg) {
     return {
-      model: ProviderRegistry.buildModel(userCfg),
+      model: await ProviderRegistry.buildUserModel(userCfg),
       meta: {
         source: sources.user,
         provider: userCfg.provider,

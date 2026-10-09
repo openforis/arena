@@ -281,7 +281,7 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
   }
   const start = Date.now()
   try {
-    const model = ProviderRegistry.buildModel(cfg)
+    const model = await ProviderRegistry.buildUserModel(cfg)
     await generateText({
       model,
       prompt: 'Reply with the single word: ok',
@@ -293,7 +293,13 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
   } catch (error) {
     const latencyMs = Date.now() - start
     await stampTestResult({ user, ok: false })
-    return { ok: false, latencyMs, errorMessage: error?.message || String(error) }
+    return {
+      ok: false,
+      latencyMs,
+      errorMessage: error?.message || String(error),
+      errorKey: error instanceof SystemError ? error.key : undefined,
+      errorParams: error instanceof SystemError ? error.params : undefined,
+    }
   }
 }
 

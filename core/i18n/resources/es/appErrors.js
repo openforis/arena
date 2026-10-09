@@ -93,6 +93,9 @@ export default {
   aiModelMissing: 'El identificador del modelo de IA es obligatorio.',
   aiApiKeyMissing: 'La clave de API es obligatoria para el proveedor {{provider}}.',
   aiBaseUrlMissing: 'Se requiere una URL base para el proveedor compatible con OpenAI.',
+  aiBaseUrlNotAllowed:
+    'Esta URL base apunta a una dirección interna y no está permitida. Pida a su administrador que la añada a los servidores de modelos de la organización.',
+  aiProviderUnavailable: 'No se pudo contactar con el proveedor de IA. Inténtelo de nuevo más tarde.',
   aiModelListFailed: 'No se pudieron listar los modelos del proveedor: {{message}}',
   aiExpressionDescriptionMissing: 'Describa en lenguaje sencillo la expresión que desea.',
   aiExpressionTypeInvalid: 'Tipo de expresión desconocido: {{expressionType}}.',
