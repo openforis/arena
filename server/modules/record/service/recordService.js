@@ -456,6 +456,7 @@ const _sendNodeUpdateMessage = async ({ socketId, user, recordUuid, msg }) => {
 }
 
 export const { fetchNodeByUuid } = RecordManager
+export { updateNodesBatch } from './update/nodesBatch/nodesBatchService'
 
 export const persistNode = async ({
   socketId,
