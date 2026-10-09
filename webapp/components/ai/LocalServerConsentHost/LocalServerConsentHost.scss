@@ -1,0 +1,16 @@
+.local-server-consent {
+  .modal-content {
+    max-width: 32rem;
+  }
+
+  &__model {
+    color: var(--colorGrey700);
+    font-family: monospace;
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+}
