@@ -178,4 +178,43 @@ describe('selectEngine: examples', () => {
     expect(isPolicyReason('policyForbidsAll')).toBe(true)
     expect(isPolicyReason('localServerUnreachable')).toBe(false)
   })
+
+  const run = (overrides: Record<string, unknown>) =>
+    selectEngine({
+      effective: defaults,
+      dataClass: 'data',
+      capabilities: capabilitiesFor('onDevice', 'cloud'),
+      prefs: { preferLocal: true },
+      ...overrides,
+    } as Parameters<typeof selectEngine>[0])
+
+  test('null effective policy fails closed', () => {
+    expect(run({ effective: null })).toEqual({ unavailable: ['policyForbidsAll'] })
+  })
+
+  test('invalid policy level is unavailable', () => {
+    expect('unavailable' in run({ effective: { schema: 'bogus', data: 'bogus' } })).toBe(true)
+  })
+
+  test('unknown data class is unavailable', () => {
+    expect('unavailable' in run({ dataClass: 'other' })).toBe(true)
+  })
+
+  test('enabled local server not probed yet is unreachable', () => {
+    const capabilities = capabilitiesFor('onDevice', 'none')
+    capabilities.localServer.reachable = null
+    expect(run({ capabilities })).toEqual({ unavailable: ['localServerUnreachable', 'gatewayNotConfigured'] })
+  })
+
+  test('local server without a chosen model has no model', () => {
+    const capabilities = capabilitiesFor('onDevice', 'none')
+    capabilities.localServer.modelId = null
+    expect(run({ capabilities })).toEqual({ unavailable: ['localServerNoModel', 'gatewayNotConfigured'] })
+  })
+
+  test('gateway available without a hosting class is not configured', () => {
+    const capabilities = capabilitiesFor('off', 'cloud')
+    capabilities.gateway.hostingClass = null
+    expect(run({ capabilities })).toEqual({ unavailable: ['localServerNotEnabled', 'gatewayNotConfigured'] })
+  })
 })
