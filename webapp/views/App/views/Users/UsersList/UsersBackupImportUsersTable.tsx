@@ -63,10 +63,23 @@ const useRoleLabel = () => {
   return (role: string | undefined) => (role ? i18n.t(`auth:authGroups.${role}.label`) : '-')
 }
 
+// survey manager is not shown: (almost) every user becomes one sooner or later
+const hiddenMainRoles = new Set(['surveyManager'])
+
+const useMainRolesLabel = () => {
+  const roleLabel = useRoleLabel()
+  return (roles: string[]) =>
+    roles
+      .filter((role) => !hiddenMainRoles.has(role))
+      .map(roleLabel)
+      .join(', ')
+}
+
 // survey roles in the backup compared with the ones already defined in this server
 const UserRolesDetails = ({ user }: { user: ImportPreviewUser }) => {
   const i18n = useI18n()
   const roleLabel = useRoleLabel()
+  const mainRolesLabel = useMainRolesLabel()
   const { backup, current, existing } = user
 
   const surveyNames = [
@@ -100,8 +113,8 @@ const UserRolesDetails = ({ user }: { user: ImportPreviewUser }) => {
             <TableCell>
               <strong>{i18n.t('usersView:usersBackup.details.mainRole')}</strong>
             </TableCell>
-            <TableCell>{backup.mainRoles.map(roleLabel).join(', ') || '-'}</TableCell>
-            {existing && <TableCell>{current.mainRoles.map(roleLabel).join(', ') || '-'}</TableCell>}
+            <TableCell>{mainRolesLabel(backup.mainRoles) || '-'}</TableCell>
+            {existing && <TableCell>{mainRolesLabel(current.mainRoles) || '-'}</TableCell>}
           </TableRow>
           {surveyNames.map((surveyName) => {
             const backupRole = backup.surveyRoles.find((item) => item.surveyName === surveyName)
@@ -160,10 +173,10 @@ const UserRow = ({
   onActionChange: (action: string) => void
 }) => {
   const i18n = useI18n()
-  const roleLabel = useRoleLabel()
+  const mainRolesLabel = useMainRolesLabel()
   const [expanded, setExpanded] = useState(false)
   const { email, name, existing, backup, current } = user
-  const mainRoles = (existing ? current.mainRoles : backup.mainRoles).map(roleLabel).join(', ')
+  const mainRoles = mainRolesLabel(existing ? current.mainRoles : backup.mainRoles)
 
   return (
     <>

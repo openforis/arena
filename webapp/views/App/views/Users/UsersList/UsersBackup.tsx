@@ -168,7 +168,15 @@ const UsersBackupImportFileModal = ({
   )
 }
 
-const UsersBackupImportUsersModal = ({ onClose, preview }: { onClose: () => void; preview: ImportPreview }) => {
+const UsersBackupImportUsersModal = ({
+  onClose,
+  onRestored,
+  preview,
+}: {
+  onClose: () => void
+  onRestored?: () => void
+  preview: ImportPreview
+}) => {
   const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
   const i18n = useI18n()
   const { tempFileName, info, users } = preview
@@ -202,7 +210,10 @@ const UsersBackupImportUsersModal = ({ onClose, preview }: { onClose: () => void
       await API.cancelUsersBackupImport({ tempFileName })
     }
     onClose()
-  }, [onClose, started, tempFileName])
+    if (summary) {
+      onRestored?.()
+    }
+  }, [onClose, onRestored, started, summary, tempFileName])
 
   const onConfirm = useCallback(async () => {
     setStarted(true)
@@ -271,7 +282,7 @@ const UsersBackupImportUsersModal = ({ onClose, preview }: { onClose: () => void
       </ModalBody>
       <ModalFooter>
         {summary ? (
-          <Button className="modal-footer__item" label="common.close" onClick={onClose} primary />
+          <Button className="modal-footer__item" label="common.close" onClick={onCancel} primary />
         ) : (
           <>
             <Button className="modal-footer__item" label="common.cancel" onClick={onCancel} />
@@ -289,7 +300,7 @@ const UsersBackupImportUsersModal = ({ onClose, preview }: { onClose: () => void
   )
 }
 
-export const UsersBackupButtons = () => {
+export const UsersBackupButtons = ({ onUsersRestored }: { onUsersRestored?: () => void }) => {
   const [openModal, setOpenModal] = useState<'export' | 'importFile' | 'importUsers' | null>(null)
   const [importPreview, setImportPreview] = useState<ImportPreview | null>(null)
 
@@ -329,7 +340,7 @@ export const UsersBackupButtons = () => {
         <UsersBackupImportFileModal onClose={closeModal} onPreviewRead={onImportPreviewRead} />
       )}
       {openModal === 'importUsers' && importPreview && (
-        <UsersBackupImportUsersModal onClose={closeModal} preview={importPreview} />
+        <UsersBackupImportUsersModal onClose={closeModal} onRestored={onUsersRestored} preview={importPreview} />
       )}
     </>
   )
