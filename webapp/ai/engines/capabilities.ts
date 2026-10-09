@@ -231,6 +231,9 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     if (dataUser !== undefined && dataUser !== userUuid) reset()
   }
 
+  const newerRun = (userUuid: string | null): Promise<AiCapabilities> =>
+    inflight && inflight.userUuid === userUuid ? inflight.promise : Promise.resolve(capabilities)
+
   const compute = async ({ userUuid, force }: { userUuid: string | null; force: boolean }) => {
     const current = ++sequence
     const nextSettings = await safely(() => deps.loadSettings({ force }), null)
@@ -238,8 +241,8 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     const probe = nextLocal.enabled
       ? await safely(() => deps.probe({ baseUrl: nextLocal.baseUrl, modelId: nextLocal.modelId }), null)
       : null
-    // a newer run or a reset started meanwhile: its result wins
-    if (current !== sequence) return capabilities
+    // a newer run started meanwhile: wait for its result; after a reset or a user change nothing is returned
+    if (current !== sequence) return newerRun(userUuid)
     settings = nextSettings
     localSettings = nextLocal
     const instance = buildInstanceCapability(nextSettings)
