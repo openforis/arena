@@ -28,11 +28,9 @@ const DONE_TOKEN = '[DONE]'
  * @param handlers.onChunk
  * @param handlers.onDone
  * @param handlers.onError
- * @param handlers.onReasoning
- * @param handlers.onTitle
  * @returns {boolean} True when the payload terminates the stream.
  */
-const dispatchPayload = (payload, { onChunk, onDone, onError, onReasoning, onTitle }) => {
+const dispatchPayload = (payload, { onChunk, onDone, onError }) => {
   if (payload === DONE_TOKEN) {
     onDone?.()
     return true
@@ -50,8 +48,6 @@ const dispatchPayload = (payload, { onChunk, onDone, onError, onReasoning, onTit
   }
   if (parsed?.chunk !== undefined) onChunk?.(parsed.chunk)
   else if (parsed?.text !== undefined) onChunk?.(parsed.text)
-  if (parsed?.reasoning !== undefined) onReasoning?.(parsed.reasoning)
-  if (parsed?.title !== undefined) onTitle?.(parsed.title)
   return false
 }
 

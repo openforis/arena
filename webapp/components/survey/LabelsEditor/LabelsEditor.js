@@ -1,6 +1,6 @@
 import './LabelsEditor.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 import classNames from 'classnames'
@@ -51,6 +51,14 @@ const LabelsEditor = (props) => {
   const notifyError = useNotifyError()
   const [editingLabels, setEditingLabels] = useState(false)
   const [translating, setTranslating] = useState(false)
+  // aborts an in-flight translation when the editor unmounts (its result would be applied to a closed editor)
+  const translationAbortRef = useRef(null)
+  useEffect(
+    () => () => {
+      translationAbortRef.current?.abort()
+    },
+    []
+  )
   const surveyLanguages = useSurveyLangs()
   const languages = useMemo(
     () => (A.isEmpty(languagesFromProps) ? surveyLanguages : languagesFromProps),
@@ -81,6 +89,8 @@ const LabelsEditor = (props) => {
 
   const onTranslate = useCallback(async () => {
     if (!canTranslate) return
+    const controller = new AbortController()
+    translationAbortRef.current = controller
     setTranslating(true)
     try {
       const result = await AiWorkflows.translateLabels({
@@ -88,7 +98,9 @@ const LabelsEditor = (props) => {
         sourceLang: populatedLang,
         targetLangs: emptyLangs,
         items: [{ id: 'label', text: labels[populatedLang], kind: 'nodeDefLabel' }],
+        signal: controller.signal,
       })
+      if (controller.signal.aborted) return
       const byLang = result.translations?.[0]?.byLang ?? {}
       const merged = { ...labels }
       for (const [lang, text] of Object.entries(byLang)) {
@@ -97,11 +109,11 @@ const LabelsEditor = (props) => {
       onChange(merged)
       notifyInfo({ key: 'aiTranslation.success', params: { count: Object.keys(byLang).length } })
     } catch (error) {
-      if (!isAiAbortError(error)) {
+      if (!controller.signal.aborted && !isAiAbortError(error)) {
         notifyError({ key: 'aiTranslation.failed', params: { message: getAiErrorMessage({ error, i18n }) } })
       }
     } finally {
-      setTranslating(false)
+      if (!controller.signal.aborted) setTranslating(false)
     }
   }, [canTranslate, emptyLangs, i18n, labels, notifyError, notifyInfo, onChange, populatedLang, surveyId])
 
