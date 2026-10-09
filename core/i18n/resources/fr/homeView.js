@@ -170,6 +170,28 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
     preferredLanguage: 'Langue préférée',
     sampleBasedImageInterpretation: "Interprétation d'images basée sur des échantillons",
     sampleBasedImageInterpretationEnabled: "Interprétation d'images basée sur des échantillons activée",
+    aiPolicy: {
+      title: "Politique d'IA",
+      intro:
+        "Choisissez où l'IA peut traiter le contenu de ce formulaire. Le plus strict entre cette politique et les limites de cette instance d'Arena s'applique.",
+      schemaLabel: 'Conception du formulaire (schéma)',
+      schemaHint: 'Définitions de nœuds, libellés et expressions.',
+      dataLabel: 'Données des enregistrements',
+      dataHint: 'Valeurs collectées et activité des utilisateurs.',
+      levelHint: {
+        off: "L'IA n'est jamais utilisée pour ce contenu.",
+        onDevice: "Traité uniquement par un moteur d'IA qui s'exécute sur l'appareil de l'utilisateur.",
+        orgHosted: "Traité par un serveur d'IA géré par votre organisation.",
+        cloud: "Peut être traité par un fournisseur d'IA dans le cloud.",
+      },
+      notAllowedOnInstance: "Non autorisé sur cette instance d'Arena : {{levels}}",
+      onDeviceNote:
+        "« Sur cet appareil » nécessite un moteur d'IA local, disponible dans une prochaine version d'Arena.",
+      readOnly: "Seuls les administrateurs du formulaire peuvent modifier la politique d'IA.",
+      saved: "Politique d'IA enregistrée",
+      saveError: "Impossible d'enregistrer la politique d'IA : {{message}}",
+      loadError: "Impossible de charger la politique d'IA",
+    },
     security: {
       title: 'Sécurité',
       dataEditorViewNotOwnedRecordsAllowed:

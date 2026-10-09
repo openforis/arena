@@ -1451,4 +1451,52 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     error: 'Error del chatbot: {{message}}',
     language: 'Idioma de respuesta',
   },
+
+  aiPolicy: {
+    dataClass: {
+      schema: 'el diseño de la encuesta',
+      data: 'los datos de los registros',
+    },
+    hostingClass: {
+      onDevice: 'este dispositivo',
+      orgHosted: 'un servidor de la organización',
+      cloud: 'la nube',
+      unknown: 'un servicio de IA desconocido',
+    },
+    level: {
+      off: 'Desactivado',
+      onDevice: 'En este dispositivo',
+      orgHosted: 'Servidor de la organización',
+      cloud: 'Nube',
+    },
+    blocked: {
+      schema: {
+        off: 'La política de IA de esta encuesta no permite usar IA con el diseño de la encuesta.',
+        onDevice: 'La política de IA de esta encuesta mantiene el diseño de la encuesta en este dispositivo.',
+        orgHosted:
+          'La política de IA de esta encuesta mantiene el diseño de la encuesta en el servidor de la organización.',
+      },
+      data: {
+        off: 'La política de IA de esta encuesta no permite usar IA con los datos de los registros.',
+        onDevice: 'La política de IA de esta encuesta mantiene los datos de los registros en este dispositivo.',
+        orgHosted:
+          'La política de IA de esta encuesta mantiene los datos de los registros en el servidor de la organización.',
+      },
+    },
+    blockedByInstance: {
+      schema: 'Esta instancia de Arena no permite enviar el diseño de la encuesta a este servicio de IA.',
+      data: 'Esta instancia de Arena no permite enviar los datos de los registros a este servicio de IA.',
+    },
+    openPolicyTab: 'Abrir la política de IA',
+  },
+
+  aiDataLocation: {
+    cloud: 'Nube',
+    cloudWithProvider: 'Nube · {{provider}}',
+    orgHosted: 'Servidor de la organización',
+    onDevice: 'En este dispositivo',
+    onDeviceWithEngine: 'En este dispositivo · {{engine}}',
+    ariaLabel: 'Los datos se procesan en: {{location}}',
+    modelTitle: '{{location}} ({{model}})',
+  },
 }

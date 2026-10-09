@@ -82,6 +82,11 @@ export default {
   aiNotAuthorized: 'Та энд энэ AI боломжийг ашиглах эрхгүй байна.',
   aiNotConfigured:
     'AI тохируулагдаагүй байна. AI тохиргоонд хувийн үйлчилгээ үзүүлэгчийг тохируулах эсвэл администратороос анхдагч тохиргоо хийлгэнэ үү.',
+  aiPolicyRefused:
+    'Энэ судалгааны AI бодлого $t(common:aiPolicy.dataClass.{{dataClass}}) $t(common:aiPolicy.hostingClass.{{hostingClass}}) илгээхийг зөвшөөрөхгүй байна.',
+  aiPolicyInvalid: 'AI бодлого буруу байна: судалгааны бүтэц болон бичлэгийн өгөгдөл тус бүрд түвшин сонгоно уу.',
+  aiPolicyAboveCeiling:
+    '«$t(common:aiPolicy.level.{{level}})» түвшинг энэ Arena суулгац зөвшөөрөхгүй (дээд хязгаар: «$t(common:aiPolicy.level.{{ceiling}})»).',
   aiFeaturesDisabled: 'Энэ суулгацад AI функцууд идэвхгүй байна.',
   aiFeatureDisabled: 'AI функц "{{feature}}" идэвхгүй байна.',
   aiPromptTooLarge: 'AI хүсэлт хэт том байна ({{size}} тэмдэгт; хязгаар {{limit}}).',

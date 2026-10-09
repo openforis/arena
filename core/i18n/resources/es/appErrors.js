@@ -87,6 +87,12 @@ export default {
   aiNotAuthorized: 'No tiene permiso para usar esta función de IA aquí.',
   aiNotConfigured:
     'La IA no está configurada. Configure un proveedor personal en la Configuración de IA o pida a su administrador que configure uno predeterminado.',
+  aiPolicyRefused:
+    'La política de IA de esta encuesta no permite enviar $t(common:aiPolicy.dataClass.{{dataClass}}) a $t(common:aiPolicy.hostingClass.{{hostingClass}}).',
+  aiPolicyInvalid:
+    'La política de IA no es válida: elija un nivel para el diseño de la encuesta y otro para los datos de los registros.',
+  aiPolicyAboveCeiling:
+    '«$t(common:aiPolicy.level.{{level}})» no está permitido para $t(common:aiPolicy.dataClass.{{dataClass}}) en esta instancia de Arena (máximo: «$t(common:aiPolicy.level.{{ceiling}})»).',
   aiFeaturesDisabled: 'Las funciones de IA están deshabilitadas en este despliegue.',
   aiFeatureDisabled: 'La función de IA "{{feature}}" está deshabilitada.',
   aiPromptTooLarge: 'El prompt de IA es demasiado grande ({{size}} caracteres; límite {{limit}}).',

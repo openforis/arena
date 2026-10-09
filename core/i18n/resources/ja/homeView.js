@@ -167,6 +167,27 @@ export default {
     preferredLanguage: '優先言語',
     sampleBasedImageInterpretation: 'サンプルベースの画像判読',
     sampleBasedImageInterpretationEnabled: 'サンプルベースの画像判読が有効です',
+    aiPolicy: {
+      title: 'AIポリシー',
+      intro:
+        'この調査の内容をAIがどこで処理できるかを選択します。このポリシーとこのArenaインスタンスの上限のうち、より厳しい方が適用されます。',
+      schemaLabel: '調査の設計（スキーマ）',
+      schemaHint: 'ノード定義、ラベル、式。',
+      dataLabel: 'レコードデータ',
+      dataHint: '収集された値とユーザーのアクティビティ。',
+      levelHint: {
+        off: 'このコンテンツにAIは使用されません。',
+        onDevice: 'ユーザーのデバイス上で動作するAIエンジンのみが処理します。',
+        orgHosted: '組織が運用するAIサーバーが処理します。',
+        cloud: 'クラウドのAIプロバイダーが処理する場合があります。',
+      },
+      notAllowedOnInstance: 'このArenaインスタンスでは許可されていません: {{levels}}',
+      onDeviceNote: '「このデバイス上」にはローカルAIエンジンが必要です。今後のArenaのバージョンで利用可能になります。',
+      readOnly: 'AIポリシーを変更できるのは調査の管理者のみです。',
+      saved: 'AIポリシーを保存しました',
+      saveError: 'AIポリシーを保存できませんでした: {{message}}',
+      loadError: 'AIポリシーを読み込めませんでした',
+    },
     security: {
       title: 'セキュリティ',
       dataEditorViewNotOwnedRecordsAllowed: 'データ編集者が他者所有の記録を閲覧可能にする',

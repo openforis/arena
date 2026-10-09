@@ -88,6 +88,12 @@ Essayez de rafraîchir la page.`,
   aiNotAuthorized: "Vous n'êtes pas autorisé à utiliser cette fonction IA ici.",
   aiNotConfigured:
     "L'IA n'est pas configurée. Définissez un fournisseur personnel dans les paramètres IA ou demandez à votre administrateur de configurer un fournisseur par défaut.",
+  aiPolicyRefused:
+    "La politique d'IA de ce formulaire ne permet pas d'envoyer $t(common:aiPolicy.dataClass.{{dataClass}}) vers $t(common:aiPolicy.hostingClass.{{hostingClass}}).",
+  aiPolicyInvalid:
+    "La politique d'IA n'est pas valide : choisissez un niveau pour la conception du formulaire et un pour les données des enregistrements.",
+  aiPolicyAboveCeiling:
+    "« $t(common:aiPolicy.level.{{level}}) » n'est pas autorisé pour $t(common:aiPolicy.dataClass.{{dataClass}}) sur cette instance d'Arena (maximum : « $t(common:aiPolicy.level.{{ceiling}}) »).",
   aiFeaturesDisabled: 'Les fonctionnalités IA sont désactivées sur ce déploiement.',
   aiFeatureDisabled: 'La fonctionnalité IA "{{feature}}" est désactivée.',
   aiPromptTooLarge: 'Le prompt IA est trop volumineux ({{size}} caractères ; limite {{limit}}).',

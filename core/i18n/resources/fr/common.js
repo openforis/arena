@@ -1625,4 +1625,52 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     error: 'Erreur du chatbot : {{message}}',
     language: 'Langue de réponse',
   },
+
+  aiPolicy: {
+    dataClass: {
+      schema: 'la conception du formulaire',
+      data: 'les données des enregistrements',
+    },
+    hostingClass: {
+      onDevice: 'cet appareil',
+      orgHosted: "le serveur de l'organisation",
+      cloud: 'le cloud',
+      unknown: "un service d'IA inconnu",
+    },
+    level: {
+      off: 'Désactivé',
+      onDevice: 'Sur cet appareil',
+      orgHosted: "Serveur de l'organisation",
+      cloud: 'Cloud',
+    },
+    blocked: {
+      schema: {
+        off: "La politique d'IA de ce formulaire n'autorise pas l'IA sur la conception du formulaire.",
+        onDevice: "La politique d'IA de ce formulaire garde la conception du formulaire sur cet appareil.",
+        orgHosted:
+          "La politique d'IA de ce formulaire garde la conception du formulaire sur le serveur de l'organisation.",
+      },
+      data: {
+        off: "La politique d'IA de ce formulaire n'autorise pas l'IA sur les données des enregistrements.",
+        onDevice: "La politique d'IA de ce formulaire garde les données des enregistrements sur cet appareil.",
+        orgHosted:
+          "La politique d'IA de ce formulaire garde les données des enregistrements sur le serveur de l'organisation.",
+      },
+    },
+    blockedByInstance: {
+      schema: "Cette instance d'Arena n'autorise pas l'envoi de la conception du formulaire vers ce service d'IA.",
+      data: "Cette instance d'Arena n'autorise pas l'envoi des données des enregistrements vers ce service d'IA.",
+    },
+    openPolicyTab: "Ouvrir la politique d'IA",
+  },
+
+  aiDataLocation: {
+    cloud: 'Cloud',
+    cloudWithProvider: 'Cloud · {{provider}}',
+    orgHosted: "Serveur de l'organisation",
+    onDevice: 'Sur cet appareil',
+    onDeviceWithEngine: 'Sur cet appareil · {{engine}}',
+    ariaLabel: 'Données traitées par : {{location}}',
+    modelTitle: '{{location}} ({{model}})',
+  },
 }

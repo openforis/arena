@@ -1597,4 +1597,50 @@ $t(common.cantUndoWarning)`,
     error: 'チャットボットエラー：{{message}}',
     language: '応答言語',
   },
+
+  aiPolicy: {
+    dataClass: {
+      schema: '調査の設計',
+      data: 'レコードデータ',
+    },
+    hostingClass: {
+      onDevice: 'このデバイス',
+      orgHosted: '組織のサーバー',
+      cloud: 'クラウド',
+      unknown: '不明なAIサービス',
+    },
+    level: {
+      off: 'オフ',
+      onDevice: 'このデバイス上',
+      orgHosted: '組織のサーバー',
+      cloud: 'クラウド',
+    },
+    blocked: {
+      schema: {
+        off: 'この調査のAIポリシーでは、調査の設計にAIを使用できません。',
+        onDevice: 'この調査のAIポリシーでは、調査の設計をこのデバイス上に保持します。',
+        orgHosted: 'この調査のAIポリシーでは、調査の設計を組織のサーバー内に保持します。',
+      },
+      data: {
+        off: 'この調査のAIポリシーでは、レコードデータにAIを使用できません。',
+        onDevice: 'この調査のAIポリシーでは、レコードデータをこのデバイス上に保持します。',
+        orgHosted: 'この調査のAIポリシーでは、レコードデータを組織のサーバー内に保持します。',
+      },
+    },
+    blockedByInstance: {
+      schema: 'このArenaインスタンスでは、調査の設計をこのAIサービスに送信することは許可されていません。',
+      data: 'このArenaインスタンスでは、レコードデータをこのAIサービスに送信することは許可されていません。',
+    },
+    openPolicyTab: 'AIポリシーを開く',
+  },
+
+  aiDataLocation: {
+    cloud: 'クラウド',
+    cloudWithProvider: 'クラウド · {{provider}}',
+    orgHosted: '組織のサーバー',
+    onDevice: 'このデバイス上',
+    onDeviceWithEngine: 'このデバイス上 · {{engine}}',
+    ariaLabel: 'データの処理先: {{location}}',
+    modelTitle: '{{location}} ({{model}})',
+  },
 }

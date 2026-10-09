@@ -82,6 +82,12 @@ Tente atualizar a página.`,
   aiNotAuthorized: 'Não tem permissão para usar esta funcionalidade de IA aqui.',
   aiNotConfigured:
     'A IA não está configurada. Defina um provedor pessoal nas Configurações de IA ou peça ao seu administrador para configurar um padrão.',
+  aiPolicyRefused:
+    'A política de IA deste inventário não permite enviar $t(common:aiPolicy.dataClass.{{dataClass}}) para $t(common:aiPolicy.hostingClass.{{hostingClass}}).',
+  aiPolicyInvalid:
+    'A política de IA não é válida: escolha um nível para a estrutura do inventário e outro para os dados dos registros.',
+  aiPolicyAboveCeiling:
+    '"$t(common:aiPolicy.level.{{level}})" não é permitido para $t(common:aiPolicy.dataClass.{{dataClass}}) nesta instância do Arena (máximo: "$t(common:aiPolicy.level.{{ceiling}})").',
   aiFeaturesDisabled: 'Os recursos de IA estão desativados nesta implantação.',
   aiFeatureDisabled: 'O recurso de IA "{{feature}}" está desativado.',
   aiPromptTooLarge: 'O prompt de IA é muito grande ({{size}} caracteres; limite {{limit}}).',

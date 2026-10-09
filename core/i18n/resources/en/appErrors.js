@@ -70,6 +70,11 @@ Try to refresh the page.`,
   aiNotAuthorized: 'You are not allowed to use this AI feature here.',
   aiNotConfigured:
     'AI is not configured. Set a personal provider in AI Settings or ask your administrator to configure a default.',
+  aiPolicyRefused:
+    "This survey's AI policy doesn't allow sending $t(common:aiPolicy.dataClass.{{dataClass}}) to $t(common:aiPolicy.hostingClass.{{hostingClass}}).",
+  aiPolicyInvalid: 'The AI policy is not valid: choose a level for the survey design and one for record data.',
+  aiPolicyAboveCeiling:
+    "'$t(common:aiPolicy.level.{{level}})' is not allowed for $t(common:aiPolicy.dataClass.{{dataClass}}) on this Arena instance (maximum: '$t(common:aiPolicy.level.{{ceiling}})').",
   aiFeaturesDisabled: 'AI features are disabled on this deployment.',
   aiFeatureDisabled: 'AI feature "{{feature}}" is disabled.',
   aiPromptTooLarge: 'AI prompt is too large ({{size}} chars; limit {{limit}}).',

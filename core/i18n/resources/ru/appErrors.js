@@ -82,6 +82,11 @@ export default {
   aiNotAuthorized: 'У вас нет прав на использование этой функции ИИ здесь.',
   aiNotConfigured:
     'ИИ не настроен. Укажите личного провайдера в настройках ИИ или попросите администратора настроить провайдера по умолчанию.',
+  aiPolicyRefused:
+    'Политика ИИ этого опроса не разрешает отправлять $t(common:aiPolicy.dataClass.{{dataClass}}) $t(common:aiPolicy.hostingClass.{{hostingClass}}).',
+  aiPolicyInvalid: 'Недопустимая политика ИИ: выберите уровень для структуры опроса и для данных записей.',
+  aiPolicyAboveCeiling:
+    'Уровень «$t(common:aiPolicy.level.{{level}})» не разрешён на этом экземпляре Arena (максимум: «$t(common:aiPolicy.level.{{ceiling}})»).',
   aiFeaturesDisabled: 'Функции ИИ отключены в этом развертывании.',
   aiFeatureDisabled: 'Функция ИИ "{{feature}}" отключена.',
   aiPromptTooLarge: 'Запрос к ИИ слишком большой ({{size}} символов; лимит {{limit}}).',

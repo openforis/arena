@@ -1605,4 +1605,51 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     error: 'Chatbot error: {{message}}',
     language: 'Response language',
   },
+
+  aiPolicy: {
+    dataClass: {
+      schema: 'the survey design',
+      data: 'record data',
+    },
+    // used inside appErrors:aiPolicyRefused ("… sending X to <hostingClass>")
+    hostingClass: {
+      onDevice: 'this device',
+      orgHosted: 'the organisation server',
+      cloud: 'the cloud',
+      unknown: 'an unknown AI service',
+    },
+    level: {
+      off: 'Off',
+      onDevice: 'On this device',
+      orgHosted: 'Organisation server',
+      cloud: 'Cloud',
+    },
+    blocked: {
+      schema: {
+        off: "This survey's AI policy doesn't allow AI on the survey design.",
+        onDevice: "This survey's AI policy keeps the survey design on this device.",
+        orgHosted: "This survey's AI policy keeps the survey design on the organisation server.",
+      },
+      data: {
+        off: "This survey's AI policy doesn't allow AI on record data.",
+        onDevice: "This survey's AI policy keeps record data on this device.",
+        orgHosted: "This survey's AI policy keeps record data on the organisation server.",
+      },
+    },
+    blockedByInstance: {
+      schema: "This Arena instance doesn't allow sending the survey design to this AI service.",
+      data: "This Arena instance doesn't allow sending record data to this AI service.",
+    },
+    openPolicyTab: 'Open the AI policy',
+  },
+
+  aiDataLocation: {
+    cloud: 'Cloud',
+    cloudWithProvider: 'Cloud · {{provider}}',
+    orgHosted: 'Organisation server',
+    onDevice: 'On this device',
+    onDeviceWithEngine: 'On this device · {{engine}}',
+    ariaLabel: 'Data is processed by: {{location}}',
+    modelTitle: '{{location}} ({{model}})',
+  },
 }

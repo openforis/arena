@@ -1614,4 +1614,50 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     error: 'Erro do chatbot: {{message}}',
     language: 'Idioma da resposta',
   },
+
+  aiPolicy: {
+    dataClass: {
+      schema: 'a estrutura do inventário',
+      data: 'os dados dos registros',
+    },
+    hostingClass: {
+      onDevice: 'este dispositivo',
+      orgHosted: 'um servidor da organização',
+      cloud: 'a nuvem',
+      unknown: 'um serviço de IA desconhecido',
+    },
+    level: {
+      off: 'Desativado',
+      onDevice: 'Neste dispositivo',
+      orgHosted: 'Servidor da organização',
+      cloud: 'Nuvem',
+    },
+    blocked: {
+      schema: {
+        off: 'A política de IA deste inventário não permite usar IA na estrutura do inventário.',
+        onDevice: 'A política de IA deste inventário mantém a estrutura do inventário neste dispositivo.',
+        orgHosted: 'A política de IA deste inventário mantém a estrutura do inventário no servidor da organização.',
+      },
+      data: {
+        off: 'A política de IA deste inventário não permite usar IA nos dados dos registros.',
+        onDevice: 'A política de IA deste inventário mantém os dados dos registros neste dispositivo.',
+        orgHosted: 'A política de IA deste inventário mantém os dados dos registros no servidor da organização.',
+      },
+    },
+    blockedByInstance: {
+      schema: 'Esta instância do Arena não permite enviar a estrutura do inventário para este serviço de IA.',
+      data: 'Esta instância do Arena não permite enviar os dados dos registros para este serviço de IA.',
+    },
+    openPolicyTab: 'Abrir a política de IA',
+  },
+
+  aiDataLocation: {
+    cloud: 'Nuvem',
+    cloudWithProvider: 'Nuvem · {{provider}}',
+    orgHosted: 'Servidor da organização',
+    onDevice: 'Neste dispositivo',
+    onDeviceWithEngine: 'Neste dispositivo · {{engine}}',
+    ariaLabel: 'Os dados são processados em: {{location}}',
+    modelTitle: '{{location}} ({{model}})',
+  },
 }
