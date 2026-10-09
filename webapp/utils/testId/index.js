@@ -223,6 +223,13 @@ export const TestId = {
     surveyLabel: _withLang('survey-label'),
     surveyLanguage: 'survey-language',
     surveySamplingPolygon: 'survey-sampling-polygon',
+    aiPolicy: {
+      container: 'survey-ai-policy',
+      ceilingNote: (dataClass) => `survey-ai-policy-${dataClass}-ceiling-note`,
+      // ButtonGroup item test id: `${levelGroup(dataClass)}_${level}`
+      levelGroup: (dataClass) => `survey-ai-policy-${dataClass}`,
+      readOnlyNote: 'survey-ai-policy-read-only',
+    },
   },
   surveyList: {
     surveyRow: (rowIdx) => `surveys_${rowIdx}`,
