@@ -1,4 +1,5 @@
 import SystemError, { StatusCodes } from '@core/systemError'
+import { isUuid } from '@core/uuid'
 
 import {
   NodesBatchEdit,
@@ -7,8 +8,6 @@ import {
   NodesBatchRecordEdit,
   NodesBatchRequest,
 } from './nodesBatchTypes'
-
-const maxUuidLength = 64
 
 /**
  * Builds the 400 error of an invalid request.
@@ -20,12 +19,11 @@ const invalidRequest = (reason: string, params: Record<string, unknown> = {}): S
   new SystemError(NodesBatchMessageKeys.invalidRequest, { reason, ...params }, StatusCodes.BAD_REQUEST)
 
 /**
- * Returns true for a non-empty string of uuid size.
+ * Returns true for a valid uuid (a malformed one would make the database query fail and roll the record back).
  * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a usable id.
  */
-const isId = (value: unknown): value is string =>
-  typeof value === 'string' && value.length > 0 && value.length <= maxUuidLength
+const isId = (value: unknown): value is string => typeof value === 'string' && isUuid(value)
 
 /**
  * Validates one edit and fills the missing from/to with null.
