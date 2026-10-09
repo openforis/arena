@@ -1,3 +1,4 @@
+import { buildUserModel } from '@server/modules/ai/service/providerRegistry'
 import { assertBaseUrlAllowed, isAllowlisted, isBlockedAddress } from '@server/modules/ai/service/baseUrlGuard'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
@@ -120,5 +121,27 @@ describe('assertBaseUrlAllowed', () => {
       'aiProviderUnavailable'
     )
     expect(error.statusCode).toBe(502)
+  })
+})
+
+describe('buildUserModel redirects', () => {
+  test('openai-compatible model calls refuse redirects', async () => {
+    const calls: any[] = []
+    const originalFetch = globalThis.fetch
+    globalThis.fetch = (async (_input: any, init: any) => {
+      calls.push(init)
+      throw new Error('stop')
+    }) as any
+    try {
+      const model: any = await buildUserModel(
+        { provider: 'openai-compatible', model: 'm', baseUrl: 'http://10.0.0.5:8000/v1' },
+        { allowlist: ['http://10.0.0.5:8000/v1'], lookup: neverCalledLookup }
+      )
+      await model.doGenerate({ prompt: [{ role: 'user', content: [{ type: 'text', text: 'hi' }] }] }).catch(() => {})
+    } finally {
+      globalThis.fetch = originalFetch
+    }
+    expect(calls.length).toBeGreaterThan(0)
+    expect(calls[0].redirect).toBe('error')
   })
 })

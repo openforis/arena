@@ -3,8 +3,8 @@
  * become a proxy towards internal addresses. Org-hosted model servers are allowed via AI_ORG_HOSTED_BASE_URLS.
  *
  * Known limits (documented, accepted for step A): the name is resolved here and again by fetch, so a DNS server
- * answering differently the second time (DNS rebinding) is not caught; HTTP redirects followed by the AI SDK
- * are not re-checked. Deployments that need more should route egress through a proxy.
+ * answering differently the second time (DNS rebinding) is not caught. Redirects are refused by the callers
+ * (redirect: 'error'), so they cannot bypass the check. Deployments that need more should route egress through a proxy.
  */
 import { lookup as dnsLookup } from 'node:dns/promises'
 import { BlockList, isIP, isIPv4 } from 'node:net'
