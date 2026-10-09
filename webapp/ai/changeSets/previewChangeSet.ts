@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
+import { isKeyEditDisabled, isMaxKeysCountReached, isMultipleEditDisabled } from '@core/survey/nodeDefEditGuards'
 
 import { checkNodeDefExpression, singleExpressionProps } from './expressionProps'
 import { isAssistantNodeDefType } from './newNodeDef'
@@ -36,6 +37,34 @@ const issue = (t: Translate, field: string, key: string, params: Record<string, 
 
 const nodeDefNotFound = (t: Translate, uuid: string) => issue(t, 'nodeDefUuid', 'nodeDefNotFound', { name: uuid })
 
+const surveyLanguages = (survey: any): string[] =>
+  Survey.getLanguages(Survey.getSurveyInfo(survey)) as unknown as string[]
+
+// languages of a labels/descriptions map that the survey does not have
+const checkTextLanguages = (survey: any, nodeDef: any, t: Translate): FieldIssue[] => {
+  const languages = surveyLanguages(survey)
+  const kinds = [
+    ['labels', NodeDef.getLabels(nodeDef)],
+    ['descriptions', NodeDef.getDescriptions(nodeDef)],
+  ] as const
+  return kinds.flatMap(([kind, texts]) =>
+    Object.keys(texts ?? {})
+      .filter((lang) => !languages.includes(lang))
+      .flatMap((lang) => issue(t, `${kind}.${lang}`, 'languageNotInSurvey', { lang }))
+  )
+}
+
+// the designer's multiple/key guards on a node definition that is about to be created
+const checkCreateMultipleAndKey = ({ survey, nodeDef, t }: { survey: any; nodeDef: any; t: Translate }) => {
+  const name = NodeDef.getName(nodeDef)
+  const multiple = NodeDef.isMultiple(nodeDef)
+  if (multiple && !NodeDef.canNodeDefBeMultiple(nodeDef)) return issue(t, 'multiple', 'multipleNotAllowed', { name })
+  if (!NodeDef.isKey(nodeDef)) return []
+  if (!NodeDef.canNodeDefBeKey(nodeDef)) return issue(t, 'key', 'keyNotAllowed', { name })
+  const maxKeysCountReached = isMaxKeysCountReached({ survey, nodeDef })
+  return isKeyEditDisabled({ nodeDef, maxKeysCountReached }) ? issue(t, 'key', 'keyEditDisabled', { name }) : []
+}
+
 const checkCreate = ({ survey, op, t }: CheckParams<NodeDefCreateOperation>): FieldIssue[] => {
   const { nodeDef, parentUuid } = op
   const type = NodeDef.getType(nodeDef)
@@ -54,7 +83,25 @@ const checkCreate = ({ survey, op, t }: CheckParams<NodeDefCreateOperation>): Fi
   if (NodeDef.isEntity(nodeDef) && NodeDefLayout.isRenderTable(cycle)(parent)) {
     return issue(t, 'parentUuid', 'entityUnderTable', { name })
   }
-  return []
+  return [...checkTextLanguages(survey, nodeDef, t), ...checkCreateMultipleAndKey({ survey, nodeDef, t })]
+}
+
+// the designer's guards on changing "multiple" or "key" of an existing node definition
+const checkMultipleOrKeyUpdate = ({
+  survey,
+  nodeDef,
+  op,
+  t,
+}: CheckParams<NodeDefUpdateOperation> & { nodeDef: any }) => {
+  const name = NodeDef.getName(nodeDef)
+  if (op.prop === 'multiple') {
+    if (!NodeDef.canNodeDefBeMultiple(nodeDef)) return issue(t, op.prop, 'multipleNotAllowed', { name })
+    const cycle = NodeDef.getCycles(nodeDef)[0]
+    return isMultipleEditDisabled({ survey, nodeDef, cycle }) ? issue(t, op.prop, 'multipleEditDisabled', { name }) : []
+  }
+  if (!NodeDef.canNodeDefBeKey(nodeDef)) return issue(t, op.prop, 'keyNotAllowed', { name })
+  const maxKeysCountReached = isMaxKeysCountReached({ survey, nodeDef })
+  return isKeyEditDisabled({ nodeDef, maxKeysCountReached }) ? issue(t, op.prop, 'keyEditDisabled', { name }) : []
 }
 
 const checkUpdate = ({ survey, op, t }: CheckParams<NodeDefUpdateOperation>): FieldIssue[] => {
@@ -66,12 +113,13 @@ const checkUpdate = ({ survey, op, t }: CheckParams<NodeDefUpdateOperation>): Fi
   if (op.prop === 'multiple' && op.to === true && NodeDef.getDefaultValues(nodeDef).length > 0) {
     return issue(t, field, 'multipleWithDefaultValues')
   }
+  if (op.prop === 'multiple' || op.prop === 'key') return checkMultipleOrKeyUpdate({ survey, nodeDef, op, t })
   return []
 }
 
 const checkLabel = ({ survey, op, t }: CheckParams<LabelSetOperation>): FieldIssue[] => {
   if (!Survey.getNodeDefByUuid(op.nodeDefUuid)(survey)) return nodeDefNotFound(t, op.nodeDefUuid)
-  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey)) as unknown as string[]
+  const languages = surveyLanguages(survey)
   return languages.includes(op.lang) ? [] : issue(t, `${op.kind}.${op.lang}`, 'languageNotInSurvey', { lang: op.lang })
 }
 
