@@ -42,12 +42,7 @@ const DataQuery = () => {
     setLimit,
     setOffset,
     setData,
-  } = useDataQuery({
-    query,
-    // scatter chart (available only in raw mode) is used to find outliers: fetch a random sample including them
-    randomize:
-      displayType === DataExplorerState.displayTypes.chart && chartType === DataExplorerState.chartTypes.scatter,
-  })
+  } = useDataQuery({ query, displayType })
 
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
 
@@ -68,8 +63,6 @@ const DataQuery = () => {
             dataLoading={dataLoading}
             nodeDefLabelType={nodeDefLabelType}
             onNodeDefLabelTypeChange={toggleLabelFunction}
-            setQueryLimit={setLimit}
-            setQueryOffset={setOffset}
           />
         </div>
 

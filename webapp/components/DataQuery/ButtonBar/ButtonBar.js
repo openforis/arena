@@ -24,15 +24,7 @@ import { ButtonGroupDisplayType } from './ButtonGroupDisplayType'
 import { ButtonViewOptions } from './ButtonViewOptions'
 
 const ButtonBar = (props) => {
-  const {
-    dataEmpty,
-    dataLoaded,
-    dataLoading,
-    nodeDefLabelType,
-    onNodeDefLabelTypeChange,
-    setQueryLimit,
-    setQueryOffset,
-  } = props
+  const { dataCount, dataEmpty, dataLoaded, dataLoading, nodeDefLabelType, onNodeDefLabelTypeChange } = props
 
   const dispatch = useDispatch()
   const appSaving = useIsAppSaving()
@@ -69,20 +61,21 @@ const ButtonBar = (props) => {
         )}
       </div>
 
-      <div className="data-query-button-bar__internal-container">
-        <ButtonAiGenerateQuery disabled={appSaving || modeEdit} state={state} Actions={Actions} />
-        <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
-        <ButtonViewOptions nodeDefLabelType={nodeDefLabelType} onNodeDefLabelTypeChange={onNodeDefLabelTypeChange} />
-        {hasSelection && (
-          <>
-            <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />
-            <ButtonSort disabled={queryChangeDisabled} state={state} Actions={Actions} />
-            <ButtonDownload disabled={queryChangeDisabled} label="common.export" onClick={Actions.togglePanelExport} />
-          </>
-        )}
-        {State.isPanelExportShown(state) && <DataQueryExportModal onClose={Actions.togglePanelExport} />}
-        <ButtonGroupDisplayType setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
-      </div>
+      <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
+
+      {displayType === DataExplorerState.displayTypes.table && (
+        <Checkbox
+          checked={codesVisible}
+          onChange={(val) => dispatch(DataExplorerActions.setCodesVisible(val))}
+          label="dataView:dataQuery.showCodes"
+        />
+      )}
+
+      <ButtonAiGenerateQuery disabled={appSaving || modeEdit} state={state} Actions={Actions} />
+
+      <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
+
+      <ButtonGroupDisplayType dataCount={dataCount} />
     </div>
   )
 }
@@ -93,8 +86,6 @@ ButtonBar.propTypes = {
   dataLoading: PropTypes.bool.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   onNodeDefLabelTypeChange: PropTypes.func.isRequired,
-  setQueryLimit: PropTypes.func.isRequired,
-  setQueryOffset: PropTypes.func.isRequired,
 }
 
 export default ButtonBar
