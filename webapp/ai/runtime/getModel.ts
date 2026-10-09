@@ -4,7 +4,7 @@
 import type { LanguageModelV4 } from '@ai-sdk/provider'
 
 import SystemError from '@core/systemError'
-import { getAiFeature } from '@common/ai/features'
+import { type AiDataClass, getAiFeature } from '@common/ai/features'
 
 import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 import { refreshAuthToken } from '@webapp/app/appErrorsMiddleware'
@@ -23,10 +23,24 @@ const authorizedFetch = createAuthorizedFetch({
  * @param {object} params - Parameters.
  * @param {string} params.feature - Feature key.
  * @param {number} [params.surveyId] - Survey (required for survey-scoped features).
+ * @param {AiDataClass} [params.dataClass] - Data class of the request (default: the feature's).
  * @returns {LanguageModelV4} The model.
  */
-export const getGatewayModel = ({ feature, surveyId }: { feature: string; surveyId?: number }): LanguageModelV4 => {
+export const getGatewayModel = ({
+  feature,
+  surveyId,
+  dataClass,
+}: {
+  feature: string
+  surveyId?: number
+  dataClass?: AiDataClass
+}): LanguageModelV4 => {
   const aiFeature = getAiFeature(feature)
   if (!aiFeature) throw new SystemError('aiFeatureUnknown', { feature }, 400)
-  return createGatewayModel({ feature, dataClass: aiFeature.dataClass, surveyId, fetchImpl: authorizedFetch })
+  return createGatewayModel({
+    feature,
+    dataClass: dataClass ?? aiFeature.dataClass,
+    surveyId,
+    fetchImpl: authorizedFetch,
+  })
 }
