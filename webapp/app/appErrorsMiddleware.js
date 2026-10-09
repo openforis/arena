@@ -3,6 +3,7 @@ import axios from 'axios'
 import { ServiceErrorActions } from '@webapp/store/system'
 import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
+import { singleFlight } from '@webapp/app/singleFlight'
 
 const tokenRefreshEndpoint = '/auth/token/refresh'
 
@@ -27,34 +28,11 @@ const isErrorIgnoredUrlIgnored = (url) => errorIgnoredUrlRegExps.some((ignoredUr
 const isAuthorizationIgnoredUrl = (url) =>
   authorizationIgnoredUrlRegExps.some((ignoredUrlRegExp) => ignoredUrlRegExp.test(url))
 
-let isRefreshingToken = false
-let failedRequestsQueue = []
-
 const setAuthorizationHeader = ({ config, authToken }) => {
   config.headers = { ...config.headers, Authorization: `Bearer ${authToken}` }
 }
 
-const processFailedRequestsQueue = ({ error = null, authToken = null }) => {
-  for (const failedRequest of failedRequestsQueue) {
-    const { resolve, reject, config } = failedRequest
-    if (error) {
-      reject(error)
-    } else if (authToken) {
-      // Mark as retried so a further 401 on this request doesn't re-enter the refresh flow.
-      config._retry = true
-      setAuthorizationHeader({ config, authToken })
-      resolve(axios.request(config))
-    }
-  }
-  failedRequestsQueue = []
-}
-
-/**
- * Refreshes the Arena auth token (also used by the AI gateway fetch).
- * @returns {Promise<{authToken?: string, error?: unknown}>} The new token or the error.
- */
-export const refreshAuthToken = async () => {
-  isRefreshingToken = true
+const requestTokenRefresh = async () => {
   try {
     const response = await axios.post(tokenRefreshEndpoint, null, {
       withCredentials: true, // Important if using HttpOnly cookies
@@ -65,22 +43,18 @@ export const refreshAuthToken = async () => {
     return { authToken }
   } catch (error) {
     return { error }
-  } finally {
-    isRefreshingToken = false
   }
 }
 
+/**
+ * Refreshes the Arena auth token (also used by the AI gateway fetch). Concurrent calls (axios 401s and AI
+ * fetch 401s) share one in-flight refresh, so every waiting caller settles with the same result.
+ * @returns {Promise<{authToken?: string, error?: unknown}>} The new token or the error.
+ */
+export const refreshAuthToken = singleFlight(requestTokenRefresh)
+
 const handleAuthorizationError = async ({ originalRequest }) => {
-  if (isRefreshingToken) {
-    // Queue the request if a token refresh is already in progress
-    return new Promise((resolve, reject) => {
-      failedRequestsQueue.push({ resolve, reject, config: originalRequest })
-    })
-  }
-
   const { authToken, error } = await refreshAuthToken()
-
-  processFailedRequestsQueue({ authToken, error })
 
   if (authToken) {
     // Retry the original failed request only once: a 401 surviving a token refresh means it wasn't
@@ -88,14 +62,11 @@ const handleAuthorizationError = async ({ originalRequest }) => {
     originalRequest._retry = true
     setAuthorizationHeader({ config: originalRequest, authToken })
     return axios.request(originalRequest)
-  } else {
-    processFailedRequestsQueue({ error }) // Reject all queued requests
-
-    // Log the user out and redirect to the login page
-    // window.location.href = '/'
-
-    throw error
   }
+  // Log the user out and redirect to the login page
+  // window.location.href = '/'
+
+  throw error
 }
 
 const createAxiosMiddleware =
