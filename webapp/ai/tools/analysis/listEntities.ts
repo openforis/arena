@@ -61,8 +61,10 @@ const execute = async (input: Input, ctx: any) => {
       return toolError('unknownEntity', `Unknown entity; valid entities: ${entityDefs.map(NodeDef.getName).join(', ')}`)
     }
     const item = toItem(entityDef)
-    const attributes = fitListToBudget({ attributes: item.attributes }, 'attributes')
-    return { entities: [{ ...item, attributes: attributes.attributes }], truncated: attributes.truncated ?? false }
+    // the wrapper of the single entity counts in the budget
+    const wrapperLength = JSON.stringify({ entities: [], truncated: true }).length
+    const fitted = fitListToBudget(item, 'attributes', RESULT_MAX_CHARS - wrapperLength)
+    return { entities: [fitted], truncated: fitted.truncated ?? false }
   }
 
   const result = { entities: entityDefs.map(toItem) }
