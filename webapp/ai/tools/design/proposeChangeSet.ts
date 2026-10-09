@@ -67,14 +67,6 @@ const changesNothing = (draft: ChangeOperationDraft): boolean => {
   return isDeepEqual(draft.from, draft.to)
 }
 
-/**
- * Validates the proposed operations and hands the change set to the conversation.
- * @param {object} params - Parameters.
- * @param {AiToolContext} params.ctx - Tool context.
- * @param {ChangeOperationDraft[]} params.drafts - Proposed operations, in order.
- * @param {string} params.summary - The model's summary.
- * @returns {Promise<ProposeResult>} The change set id and the number of operations.
- */
 const ISSUES_BUDGET = AiLimits.assistantToolResultMaxChars - 500
 
 /**
@@ -93,6 +85,14 @@ const capIssues = (issues: ChangeSetIssue[]): ChangeSetIssue[] => {
   return kept
 }
 
+/**
+ * Validates the proposed operations and hands the change set to the conversation.
+ * @param {object} params - Parameters.
+ * @param {AiToolContext} params.ctx - Tool context.
+ * @param {ChangeOperationDraft[]} params.drafts - Proposed operations, in order.
+ * @param {string} params.summary - The model's summary.
+ * @returns {Promise<ProposeResult>} The change set id and the number of operations.
+ */
 export const proposeChangeSet = async ({
   ctx,
   drafts,
