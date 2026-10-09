@@ -8,6 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { isDeepEqual } from './deepEqual'
 import { findConflicts } from './findConflicts'
 import { applyOperationToNodeDef, getOperationNodeDefUuid } from './operations'
+import { isRecordEditOperation } from './recordEdits/types'
 import type { ChangeOperation, ChangeSet, OperationResult } from './types'
 
 export type ApplierDeps = {
@@ -156,7 +157,8 @@ export const applyChangeSet = async ({
   operationIds: string[]
   deps: ApplierDeps
 }): Promise<OperationResult[]> => {
-  const selected = changeSet.operations.filter((op) => operationIds.includes(op.id))
+  // the record-edit card has its own applier
+  const selected = changeSet.operations.filter((op) => operationIds.includes(op.id) && !isRecordEditOperation(op))
   if (deps.isSurveyDirty()) return selected.map((op) => ({ id: op.id, status: 'skipped', message: 'surveyDirty' }))
 
   const results = new Map<string, OperationResult>()

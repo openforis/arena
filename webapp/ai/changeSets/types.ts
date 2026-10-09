@@ -3,6 +3,8 @@
  */
 import type { NodeDef as ArenaNodeDef, NodeDefExpression, NodeDefType } from '@openforis/arena-core'
 
+import type { RecordAttributeUpdateOperation } from './recordEdits/types'
+
 export type NodeDefBasicProp = 'name' | 'key' | 'multiple' | 'readOnly'
 
 // tuples (as const), so zod's z.enum accepts them
@@ -57,7 +59,11 @@ export type ExpressionSetOperation = {
 }
 
 export type ChangeOperation =
-  NodeDefCreateOperation | NodeDefUpdateOperation | LabelSetOperation | ExpressionSetOperation
+  | NodeDefCreateOperation
+  | NodeDefUpdateOperation
+  | LabelSetOperation
+  | ExpressionSetOperation
+  | RecordAttributeUpdateOperation
 
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
 
@@ -74,7 +80,13 @@ export type ChangeSet = {
 
 export type OperationStatus = 'applied' | 'conflict' | 'failed' | 'skipped'
 
-export type OperationResult = { id: string; status: OperationStatus; message?: string }
+// params: the server's message params (record edits)
+export type OperationResult = {
+  id: string
+  status: OperationStatus
+  message?: string
+  params?: Record<string, unknown>
+}
 
 // operation: index in the change set; field: what the message is about (e.g. "name", "defaultValues")
 export type ChangeSetIssue = { operation: number; field: string; message: string }

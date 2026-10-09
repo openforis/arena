@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { getExpressionProp, setExpressionProp } from './expressionProps'
+import { isRecordEditOperation } from './recordEdits/types'
 import type { ChangeOperation, ChangeOperationDraft, LabelKind, NodeDefBasicProp } from './types'
 
 type AnyOperation = ChangeOperation | ChangeOperationDraft
@@ -24,7 +25,7 @@ export const getOperationNodeDefUuid = (op: AnyOperation): string =>
  * @returns {string|null} The key, null for creates.
  */
 export const getOperationTargetKey = (op: AnyOperation): string | null => {
-  if (op.type === 'nodeDef.create') return null
+  if (op.type === 'nodeDef.create' || isRecordEditOperation(op)) return null
   if (op.type === 'label.set') return `${op.nodeDefUuid}|${op.kind}|${op.lang}`
   return `${op.nodeDefUuid}|${op.prop}`
 }
@@ -57,6 +58,7 @@ export const getLabelValue = (nodeDef: any, kind: LabelKind, lang: string): stri
  * @returns {unknown} The current value.
  */
 export const getOperationCurrentValue = (nodeDef: any, op: AnyOperation): unknown => {
+  if (isRecordEditOperation(op)) return null
   if (op.type === 'nodeDef.update') return getBasicPropValue(nodeDef, op.prop)
   if (op.type === 'label.set') return getLabelValue(nodeDef, op.kind, op.lang)
   if (op.type === 'expression.set') return getExpressionProp(nodeDef, op.prop)
@@ -75,6 +77,7 @@ const assocText = (nodeDef: any, kind: LabelKind, lang: string, text: string): a
  * @returns {object} The updated node definition.
  */
 export const applyOperationToNodeDef = (nodeDef: any, op: AnyOperation): any => {
+  if (isRecordEditOperation(op)) return nodeDef
   if (op.type === 'nodeDef.update') return NodeDef.assocProp({ key: op.prop, value: op.to })(nodeDef)
   if (op.type === 'label.set') return assocText(nodeDef, op.kind, op.lang, op.to)
   if (op.type === 'expression.set') return setExpressionProp(nodeDef, op.prop, op.to)
@@ -88,6 +91,7 @@ export const applyOperationToNodeDef = (nodeDef: any, op: AnyOperation): any => 
  * @returns {object} The updated survey.
  */
 export const applyOperationToSurvey = (survey: any, op: AnyOperation): any => {
+  if (isRecordEditOperation(op)) return survey
   if (op.type === 'nodeDef.create') return Survey.assocNodeDef({ nodeDef: op.nodeDef })(survey)
   const nodeDef = Survey.getNodeDefByUuid(op.nodeDefUuid)(survey)
   return Survey.assocNodeDef({ nodeDef: applyOperationToNodeDef(nodeDef, op) })(survey)

@@ -45,15 +45,8 @@ export const cleaningTestSurvey = async () =>
  * @param {string} [params.ownerUuid] - Owner uuid.
  * @returns {object} The record.
  */
-export const cleaningTestRecord = ({ survey, step = '1', ownerUuid = 'record-owner' }: any) => {
-  const record = DataTest.createTestRecord({ user: getContextUser(), survey })
-  return {
-    ...record,
-    [Record.keys.surveyUuid]: Survey.getUuid(Survey.getSurveyInfo(survey)),
-    [Record.keys.step]: step,
-    [Record.keys.ownerUuid]: ownerUuid,
-  }
-}
+export const cleaningTestRecord = ({ survey, step = '1', ownerUuid = 'record-owner' }: any) =>
+  asCleaningRecord({ survey, record: DataTest.createTestRecord({ user: getContextUser(), survey }), step, ownerUuid })
 
 /**
  * Returns a user of the given default group of the survey.
@@ -191,3 +184,59 @@ export const newValidation = (key: string, severity: 'error' | 'warning' = 'erro
   warnings: severity === 'warning' ? [{ key }] : [],
   fields: {},
 })
+
+/**
+ * Makes a survey built by the survey builder usable by the cleaning tools: id 1, published.
+ * @param {object} survey - The survey.
+ * @returns {object} The survey.
+ */
+export const asCleaningSurvey = (survey: any) => withInfoProps(survey, { id: 1, published: true })
+
+/**
+ * Sets the survey uuid, step and owner of a record built by the record builder.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - The survey.
+ * @param {object} params.record - The record.
+ * @param {string} [params.step] - Record step.
+ * @param {string} [params.ownerUuid] - Owner uuid.
+ * @returns {object} The record.
+ */
+export const asCleaningRecord = ({ survey, record, step = '1', ownerUuid = 'record-owner' }: any) => ({
+  ...record,
+  [Record.keys.surveyUuid]: Survey.getUuid(Survey.getSurveyInfo(survey)),
+  [Record.keys.step]: step,
+  [Record.keys.ownerUuid]: ownerUuid,
+})
+
+// ref data providers that only know the survey index (the test surveys have small categories)
+export const surveyIndexProviders = {
+  categoryItemProvider: {
+    getItemByCodePaths: async () => null,
+    getItemByUuid: async ({ survey, itemUuid }: any) => Survey.getCategoryItemByUuid(itemUuid)(survey) ?? null,
+    getItems: async () => [],
+  },
+  taxonProvider: {
+    getTaxonByCode: async () => null,
+    getTaxonByUuid: async ({ survey, taxonUuid }: any) => Survey.getTaxonByUuid(taxonUuid)(survey) ?? null,
+  },
+}
+
+/**
+ * Validates every node of a record (and applies its dependents), as the server does when it stores it.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - The survey.
+ * @param {object} params.record - The record.
+ * @returns {Promise<object>} The record with its validation.
+ */
+export const validateWholeRecord = async ({ survey, record }: any) => {
+  const { record: validated } = await Record.afterNodesUpdate({
+    user: getContextUser(),
+    survey,
+    record,
+    nodes: Record.getNodes(record),
+    ...surveyIndexProviders,
+    timezoneOffset: 0,
+    lang: 'en',
+  })
+  return validated
+}

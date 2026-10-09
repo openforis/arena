@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { isDeepEqual } from './deepEqual'
 import { getOperationCurrentValue } from './operations'
+import { isRecordEditOperation, type RecordAttributeUpdateOperation } from './recordEdits/types'
 import type { ChangeOperation, ChangeSet, ConflictReason, NodeDefCreateOperation, OperationConflict } from './types'
 
 const isNameTaken = (survey: any, name: unknown, ownUuid: string): boolean =>
@@ -24,7 +25,7 @@ const checkCreate = (op: NodeDefCreateOperation, survey: any, createdUuids: Set<
 }
 
 const checkChange = (
-  op: Exclude<ChangeOperation, NodeDefCreateOperation>,
+  op: Exclude<ChangeOperation, NodeDefCreateOperation | RecordAttributeUpdateOperation>,
   survey: any,
   createdUuids: Set<string>
 ): ConflictReason | null => {
@@ -53,6 +54,8 @@ export const findConflicts = (
   const createdUuids = new Set<string>()
   const conflicts: OperationConflict[] = []
   for (const op of changeSet.operations) {
+    // record edits are checked by the server at Apply
+    if (isRecordEditOperation(op)) continue
     const reason =
       op.type === 'nodeDef.create' ? checkCreate(op, survey, createdUuids) : checkChange(op, survey, createdUuids)
     if (op.type === 'nodeDef.create' && reason === null) createdUuids.add(NodeDef.getUuid(op.nodeDef))
