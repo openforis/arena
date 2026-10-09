@@ -9,6 +9,9 @@ const _withLang =
 
 export const TestId = {
   ai: {
+    consentContinue: 'ai-local-server-consent-continue',
+    consentDialog: 'ai-local-server-consent',
+    consentUseOther: 'ai-local-server-consent-use-other',
     dataLocationBadge: 'ai-data-location-badge',
     engineErrorOpenSettings: 'ai-engine-error-open-settings',
     engineErrorRetry: 'ai-engine-error-retry',
