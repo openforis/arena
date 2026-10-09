@@ -1,6 +1,10 @@
 import { Query } from '@common/model/query'
 
-import { getQueryLimitForDisplayType, tablePageSize } from '@webapp/components/DataQuery/store/queryLimit'
+import {
+  getQueryLimitForDisplayType,
+  isChartTruncated,
+  tablePageSize,
+} from '@webapp/components/DataQuery/store/queryLimit'
 import { getEntityViewDataCountRequest } from '@webapp/service/api/surveyRdb'
 import { DataExplorerState } from '@webapp/store/dataExplorer/state'
 
@@ -48,5 +52,19 @@ describe('Explorer: count request', () => {
     expect(url).toBe('/api/surveyRdb/3/e1/query/count')
     expect(body).toEqual({ cycle: '0', query })
     expect(typeof body.query).toBe('object')
+  })
+})
+
+describe('Explorer: chart row cap notice', () => {
+  const max = DataExplorerState.chartMaxItems
+
+  test('a chart with more rows than the cap is truncated', () => {
+    expect(isChartTruncated({ displayType: displayTypes.chart, count: max + 1 })).toBe(true)
+  })
+
+  test('not at the cap, with a table, or without a count', () => {
+    expect(isChartTruncated({ displayType: displayTypes.chart, count: max })).toBe(false)
+    expect(isChartTruncated({ displayType: displayTypes.table, count: max + 1 })).toBe(false)
+    expect(isChartTruncated({ displayType: displayTypes.chart, count: null })).toBe(false)
   })
 })
