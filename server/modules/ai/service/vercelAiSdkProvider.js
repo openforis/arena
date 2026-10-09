@@ -167,6 +167,7 @@ const postChatEndpoint = async ({ endpoint, messages, signal }) => {
     headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
     body: JSON.stringify({ messages }),
     signal,
+    redirect: 'error', // a redirect would bypass the base URL guard
   })
   if (!response.ok || !response.body) {
     const bodyText = response.ok ? '' : await response.text().catch(() => '')

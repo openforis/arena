@@ -38,6 +38,14 @@ const validProviders = new Set(Object.values(providers))
 export const isSupported = (provider) => validProviders.has(provider)
 
 /**
+ * Fetch that rejects redirects: the base URL guard checks the host once, so a 3xx to an internal address would bypass it.
+ * @param {RequestInfo | URL} input - Request URL.
+ * @param {RequestInit} [init] - Fetch options.
+ * @returns {Promise<Response>} The response.
+ */
+const noRedirectFetch = (input, init) => fetch(input, { ...init, redirect: 'error' })
+
+/**
  * Builds a Vercel AI SDK `LanguageModel` instance for the given config.
  * Throws a `SystemError` with key `aiProviderInvalid` for unknown providers
  * or `aiApiKeyMissing` when a required API key is absent.
@@ -78,7 +86,7 @@ export const buildModel = (cfg) => {
       // apiKey is optional for some local servers (e.g. Ollama with no auth)
       // Use .chat() explicitly — the default call now routes to the OpenAI Responses API
       // (/v1/responses), which most OpenAI-compatible providers don't implement.
-      return createOpenAI({ apiKey: apiKey || 'not-used', baseURL: baseUrl }).chat(model)
+      return createOpenAI({ apiKey: apiKey || 'not-used', baseURL: baseUrl, fetch: noRedirectFetch }).chat(model)
     }
     case providers.vercelAiSdk: {
       if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })
