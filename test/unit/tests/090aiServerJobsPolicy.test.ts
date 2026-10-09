@@ -29,7 +29,10 @@ const textModel = (text: string) =>
 const createDeps = ({ model, refuse = false }: { model: any; refuse?: boolean }) => {
   const checks: any[] = []
   const deps = {
-    resolveModel: async () => ({ model, meta: { source: 'admin-default', provider: 'mock', model: 'mock', hostingClass: 'cloud' } }),
+    resolveModel: async () => ({
+      model,
+      meta: { source: 'admin-default', provider: 'mock', model: 'mock', hostingClass: 'cloud' },
+    }),
     assertPolicyAllows: async (check: any) => {
       checks.push(check)
       if (refuse) throw new SystemError('aiPolicyRefused', { dataClass: check.dataClass }, 403)
@@ -114,7 +117,10 @@ describe('assertSurveyAiAllowed (job pre-start check)', () => {
 
   test('no provider → aiNotConfigured (503)', async () => {
     const { deps } = createCheckDeps(null)
-    const error: any = await expectSystemErrorKey(assertSurveyAiAllowed({ user, surveyId: 9, dataClass: 'schema' }, deps), 'aiNotConfigured')
+    const error: any = await expectSystemErrorKey(
+      assertSurveyAiAllowed({ user, surveyId: 9, dataClass: 'schema' }, deps),
+      'aiNotConfigured'
+    )
     expect(error.statusCode).toBe(503)
   })
 
