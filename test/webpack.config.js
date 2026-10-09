@@ -41,6 +41,9 @@ const getModule = () => ({
       exclude: /(node_modules|bower_components)/,
       use: [{ loader: 'babel-loader', options: { cacheDirectory: true } }],
     },
+    // styles are never evaluated in Node: the lazy app wiring of the AI model resolver (dynamic import, which
+    // webpack bundles) reaches the redux store and, through it, components that import stylesheets
+    { test: /\.(scss|sass|css)$/, type: 'asset/source' },
   ],
 })
 

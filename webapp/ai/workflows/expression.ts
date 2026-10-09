@@ -5,7 +5,7 @@ import type { LanguageModel } from 'ai'
 
 import { buildExplainExpressionRequest, generateExpression, type AiExpressionResult } from '@common/ai/tasks/expression'
 
-import { resolveGatewayModel } from '../runtime/resolveModel'
+import { resolveModel } from '@webapp/ai/engines/resolveModel'
 import { createGatewayTextGenerator, streamTextChunks } from '../runtime/textGenerators'
 
 type ExpressionContext = { survey: any; surveyId: number; nodeDefUuid: string; model?: LanguageModel }
@@ -28,7 +28,7 @@ export const generateExpressionWorkflow = async ({
   description: string
   signal?: AbortSignal
 }): Promise<AiExpressionResult> => {
-  const resolvedModel = await resolveGatewayModel({ model, feature: 'expressionGenerate', surveyId })
+  const resolvedModel = model ?? (await resolveModel({ feature: 'expressionGenerate', surveyId })).model
   return generateExpression({
     generateText: createGatewayTextGenerator(resolvedModel),
     survey,
@@ -61,6 +61,6 @@ export const explainExpressionWorkflow = async ({
 }): Promise<void> => {
   // validated before resolving the model: an empty expression never reaches the network
   const request = buildExplainExpressionRequest({ survey, nodeDefUuid, expression, errorMessage })
-  const resolvedModel = await resolveGatewayModel({ model, feature: 'expressionExplain', surveyId })
+  const resolvedModel = model ?? (await resolveModel({ feature: 'expressionExplain', surveyId })).model
   await streamTextChunks({ model: resolvedModel, ...request, onChunk, signal })
 }
