@@ -14,6 +14,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import {
   buildCardRows,
+  getConflictingOperationIds,
   getNodeDefNavigation,
   getPendingOperationIds,
   isCardStale,
@@ -55,6 +56,7 @@ const CardValueView = ({ value }: { value: CardValue }) => {
  * @param {CardRow} props.row - Row.
  * @param {boolean} props.pending - Row can still be applied.
  * @param {boolean} props.selected - Row is selected.
+ * @param {boolean} props.conflict - The survey changed since the proposal: the row cannot be selected.
  * @param {boolean} props.exists - Item exists in the survey.
  * @param {Function} props.onToggle - Toggles the selection.
  * @param {Function} props.onNameClick - Shows the item in the form designer.
@@ -64,6 +66,7 @@ const CardRowView = ({
   row,
   pending,
   selected,
+  conflict,
   exists,
   onToggle,
   onNameClick,
@@ -71,6 +74,7 @@ const CardRowView = ({
   row: CardRow
   pending: boolean
   selected: boolean
+  conflict: boolean
   exists: boolean
   onToggle: () => void
   onNameClick: () => void
@@ -81,8 +85,9 @@ const CardRowView = ({
     <li className="ai-assistant-card__row" data-testid={TestId.aiAssistant.changeSetRow(row.nodeDefName)}>
       {pending && (
         <input
-          aria-label={t('aiAssistant.card.selectOperation')}
-          checked={selected}
+          aria-label={`${row.nodeDefName}: ${t(row.titleKey, row.titleParams)}`}
+          checked={selected && !conflict}
+          disabled={conflict}
           onChange={onToggle}
           type="checkbox"
         />
@@ -158,7 +163,8 @@ export const ChangeSetCard = ({
   const rows = useMemo(() => buildCardRows({ cardState, survey, lang }), [cardState, lang, survey])
   const pendingIds = useMemo(() => getPendingOperationIds(cardState), [cardState])
   const stale = useMemo(() => isCardStale({ cardState, survey }), [cardState, survey])
-  const selectedIds = pendingIds.filter((id) => !deselected.includes(id))
+  const conflictIds = useMemo(() => getConflictingOperationIds({ cardState, survey }), [cardState, survey])
+  const selectedIds = pendingIds.filter((id) => !deselected.includes(id) && !conflictIds.includes(id))
 
   /**
    * Toggles the selection of an operation.
@@ -221,6 +227,7 @@ export const ChangeSetCard = ({
       aria-label={t('aiAssistant.card.title')}
       className="ai-assistant-card"
       data-testid={TestId.aiAssistant.changeSetCard}
+      role="group"
     >
       <div className="ai-assistant-card__header">
         <strong>{t('aiAssistant.card.title')}</strong>
@@ -235,6 +242,7 @@ export const ChangeSetCard = ({
         {rows.map((row) => (
           <CardRowView
             exists={Boolean(Survey.getNodeDefByUuid(row.nodeDefUuid)(survey))}
+            conflict={conflictIds.includes(row.id)}
             key={row.id}
             onNameClick={() => showNodeDef(row.nodeDefUuid)}
             onToggle={() => toggle(row.id)}

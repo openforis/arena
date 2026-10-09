@@ -17,6 +17,7 @@ import {
 import { createAssistantPanelStore } from '@webapp/components/ai/Assistant/assistantPanelStore'
 import {
   buildCardRows,
+  getConflictingOperationIds,
   getNodeDefNavigation,
   getPendingOperationIds,
   isCardStale,
@@ -239,6 +240,8 @@ describe('change set card model', () => {
     const relabelled = NodeDef.assocLabels({ ...NodeDef.getLabels(clusterId), fr: 'Autre' })(clusterId)
     const changedSurvey = Survey.assocNodeDef({ nodeDef: relabelled })(survey)
     expect(isCardStale({ cardState: { changeSet }, survey: changedSurvey })).toBe(true)
+    expect(getConflictingOperationIds({ cardState: { changeSet }, survey })).toEqual([])
+    expect(getConflictingOperationIds({ cardState: { changeSet }, survey: changedSurvey })).toEqual([clusterIdLabel.id])
     const appliedLabel = [{ id: clusterIdLabel.id, status: 'applied' as const }]
     expect(isCardStale({ cardState: { changeSet, results: appliedLabel }, survey: changedSurvey })).toBe(false)
   })
