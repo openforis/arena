@@ -8,6 +8,7 @@ import ThreadManager from '@server/threads/threadManager'
 import { RecordsUpdateThreadMessageTypes } from './thread/recordsThreadMessageTypes'
 import { SurveyRecordsThreadMap } from './surveyRecordsThreadMap'
 import * as RecordSocketsMap from './recordSocketsMap'
+import { NodesBatchReplies } from './nodesBatch/nodesBatchReplies'
 
 const Logger = Log.getLogger('SurveyRecordsThreadService')
 
@@ -64,6 +65,9 @@ const _createThread = () => {
         const thread = getThreadByKey(threadKey)
         thread.terminate()
       }
+    } else if (type === RecordsUpdateThreadMessageTypes.nodesBatchPersistResult) {
+      // reply to a pending batch request: not a socket event
+      NodesBatchReplies.resolveReply(content)
     } else {
       // errors are already logged by the notifier
       void notifyThreadMessage({ eventType: type, content })
