@@ -69,6 +69,12 @@
     background-color: var(--orangeLight);
   }
 
+  &__engine-notice {
+    padding: 0 0.75rem 0.5rem;
+    font-size: 0.8rem;
+    color: var(--colorGrey700);
+  }
+
   &__messages {
     flex: 1;
     overflow-y: auto;

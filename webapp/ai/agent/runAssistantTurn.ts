@@ -7,12 +7,14 @@ import * as Survey from '@core/survey/survey'
 
 import type { AiFeatureKey } from '@common/ai/features'
 import { AiLimits } from '@common/ai/limits'
-import type { AiPolicy } from '@common/ai/policy'
+import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { getHandbookOutline } from '@webapp/ai/help/handbookSearch'
 import { loadHandbook } from '@webapp/ai/help/loadHandbook'
+import { resolveAssistantEngine } from '@webapp/ai/engines/assistantEngine'
 import { resolveModel } from '@webapp/ai/engines/resolveModel'
+import type { AiSelectedEngine } from '@webapp/ai/engines/types'
 import { getAiErrorKey, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
@@ -42,13 +44,15 @@ export type RunAssistantTurnParams = {
   userMessage: string
   area: AssistantPromptArea
   ctx: AiToolContext
-  access: { effective: AiPolicy | null; hostingClass: string | null }
+  access: { effective: AiPolicy | null; hostingClass: AiHostingClass | null }
   onUpdate: (conversation: Conversation) => void
   signal: AbortSignal
   model?: LanguageModel
   limits?: AssistantLimits
   systemPrompt?: string
   tools?: AiTool[]
+  // called once per turn with the selected engine (not when `model` is given)
+  onEngine?: (engine: AiSelectedEngine) => void
 }
 
 /**
@@ -123,6 +127,7 @@ const finishTurn = (state: TurnState, outcome: StreamOutcome, signal: AbortSigna
 /**
  * Runs one assistant turn. The conversation is reported through onUpdate on every change; the final one is returned.
  * Errors never throw: they end the turn with status "error" (or "stopped" on abort).
+ * Without a `model`, the engine is selected for the conversation's data class: its model, limits and hosting class.
  * @param {RunAssistantTurnParams} params - Parameters.
  * @returns {Promise<Conversation>} The conversation after the turn.
  */
@@ -135,9 +140,10 @@ export const runAssistantTurn = async ({
   onUpdate,
   signal,
   model,
-  limits = DEFAULT_ASSISTANT_LIMITS,
+  limits,
   systemPrompt,
   tools,
+  onEngine,
 }: RunAssistantTurnParams): Promise<Conversation> => {
   const state = createTurnState({ conversation, userMessage, onUpdate })
   const turnCtx: AiToolContext = {
@@ -153,27 +159,38 @@ export const runAssistantTurn = async ({
     const feature = assistantAreaFeatures[area]
     // Help sends no survey content and no surveyId (deviation 9)
     const surveyId = area !== 'help' && ctx.survey ? Survey.getId(ctx.survey) : undefined
-    const turnModel = model ?? (await resolveModel({ feature, surveyId })).model
+    const turn = await resolveAssistantEngine({
+      model,
+      limits,
+      defaultLimits: DEFAULT_ASSISTANT_LIMITS,
+      access,
+      feature,
+      surveyId,
+      // the conversation's class ('schema' for the assistant)
+      dataClass: conversation.dataClass,
+      resolve: resolveModel,
+    })
+    if (turn.engine) onEngine?.(turn.engine)
     const toolList = getTools({
       area,
       ctx: turnCtx,
-      effective: access.effective,
-      hostingClass: access.hostingClass,
+      effective: turn.access.effective,
+      hostingClass: turn.access.hostingClass,
       tools,
     })
     const outline = area === 'help' && !systemPrompt ? await loadOutline() : null
     const system = systemPrompt ?? buildAssistantSystemPrompt({ area, ctx: turnCtx, outline })
     const budgetChars = getHistoryBudget({
-      maxPromptChars: limits.maxPromptChars,
+      maxPromptChars: turn.limits.maxPromptChars,
       systemPrompt: system,
       tools: toolList,
     })
     const result = streamText({
-      model: turnModel,
+      model: turn.model,
       system,
       messages: buildHistory({ messages: conversation.messages, userMessage, budgetChars }),
       tools: toolList.length > 0 ? toAiSdkTools(toolList, turnCtx) : undefined,
-      stopWhen: stepCountIs(limits.maxSteps),
+      stopWhen: stepCountIs(turn.limits.maxSteps),
       abortSignal: signal,
       maxRetries: 0,
       // errors arrive as 'error' parts of the full stream

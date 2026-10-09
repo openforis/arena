@@ -45,7 +45,7 @@ const makeTool = (name: string, execute: AiTool['execute']): AiTool => ({
   execute,
 })
 
-const cloudAccess = { effective: { schema: 'cloud', data: 'onDevice' } as any, hostingClass: 'cloud' }
+const cloudAccess = { effective: { schema: 'cloud', data: 'onDevice' } as any, hostingClass: 'cloud' as const }
 
 const answerOf = (conversation: Conversation): AssistantMessage => conversation.messages.at(-1) as AssistantMessage
 

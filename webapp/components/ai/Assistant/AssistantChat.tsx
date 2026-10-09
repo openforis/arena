@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { AiLimits } from '@common/ai/limits'
 
+import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { Button } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
@@ -21,7 +22,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
   const t = useI18nT({ unescapeHtml: true })
   const [input, setInput] = useState('')
   const listRef = useRef<HTMLDivElement>(null)
-  const { conversation, busy, applying } = api
+  const { conversation, busy, applying, engineNotice } = api
   const messages = conversation?.messages ?? []
   const lastId = messages.at(-1)?.id
 
@@ -75,6 +76,11 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
           />
         ))}
       </div>
+      {engineNotice && (
+        <div className="ai-assistant-panel__engine-notice" data-testid={TestId.ai.engineNotice}>
+          {t('aiEngine.nowUsing', { location: getAiDataLocationText({ location: engineNotice, t }) })}
+        </div>
+      )}
       <div className="ai-assistant-panel__composer">
         <textarea
           aria-label={t('aiAssistant.placeholder')}
