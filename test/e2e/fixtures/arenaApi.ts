@@ -20,6 +20,7 @@ export type SurveyCreateParams = {
 
 const jobPollIntervalMs = 250
 const jobTimeoutMs = 30_000
+const jobThreadCleanupWaitMs = 1500
 
 /**
  * Thin client of the Arena REST API, used to prepare (and clean up) the data needed by a test
@@ -122,6 +123,56 @@ export class ArenaApi {
     expect(validation, `survey validation failed: ${JSON.stringify(validation)}`).toBeUndefined()
     const jobEnded = await this.waitForJob(job.uuid)
     return Number(jobEnded.result!.surveyId)
+  }
+
+  /**
+   * Clones a survey (job) and returns the id of the clone.
+   * @param {object} params - Parameters.
+   * @param {number} params.cloneFrom - Id of the survey to clone.
+   * @param {string} [params.cloneFromCycle] - Cycle of the survey to clone.
+   * @param {string} params.name - Name of the clone.
+   * @param {string} params.label - Label of the clone.
+   * @param {string} [params.lang] - Language.
+   * @returns {Promise<number>} - The id of the clone.
+   */
+  async cloneSurvey({
+    cloneFrom,
+    cloneFromCycle = '0',
+    name,
+    label,
+    lang = 'en',
+  }: {
+    cloneFrom: number
+    cloneFromCycle?: string
+    name: string
+    label: string
+    lang?: string
+  }): Promise<number> {
+    // the server ends the user's job thread 1 s after a job ends: a job started in that window would be killed
+    await new Promise((resolve) => setTimeout(resolve, jobThreadCleanupWaitMs))
+    const { job, validation } = await this.post('/api/survey', { name, label, lang, cloneFrom, cloneFromCycle })
+    expect(validation, `survey clone validation failed: ${JSON.stringify(validation)}`).toBeUndefined()
+    const jobEnded = await this.waitForJob(job.uuid)
+    return Number(jobEnded.result!.surveyId)
+  }
+
+  /**
+   * Returns the AI policy of a survey.
+   * @param {number} surveyId - Survey id.
+   * @returns {Promise<any>} - `{ policy, ceilings, effective, canEdit }`.
+   */
+  async getSurveyAiPolicy(surveyId: number): Promise<any> {
+    return this.get(`/api/survey/${surveyId}/ai-policy`)
+  }
+
+  /**
+   * Sets the AI policy of a survey (the test user is a system administrator).
+   * @param {number} surveyId - Survey id.
+   * @param {{schema: string, data: string}} policy - Policy.
+   * @returns {Promise<any>} - `{ policy, ceilings, effective, canEdit }`.
+   */
+  async putSurveyAiPolicy(surveyId: number, policy: { schema: string; data: string }): Promise<any> {
+    return this.put(`/api/survey/${surveyId}/ai-policy`, policy)
   }
 
   /**
