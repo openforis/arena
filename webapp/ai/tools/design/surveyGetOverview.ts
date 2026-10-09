@@ -62,7 +62,7 @@ export const surveyGetOverviewTool: AiTool<Record<string, never>> = {
     'Returns the survey name, languages, cycles and all node definitions (entities and attributes) depth-first ' +
     'with name, type, label, parent, key and multiple flags. Call it first to learn the survey structure.',
   inputSchema: z.object({}).strict(),
-  area: ['design'],
+  area: ['design', 'analysis'],
   dataClass: 'schema',
   effect: 'read',
   requires: canViewSurveyTool,

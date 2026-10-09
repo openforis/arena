@@ -2,6 +2,7 @@
  * Every assistant tool. getTools filters this list by area, permission and policy.
  * D2 / D3 append their own lists here.
  */
+import { analysisTools } from './analysis'
 import { viewGetCurrentTool } from './common/viewGetCurrent'
 import { expressionCheckTool } from './design/expressionCheck'
 import { expressionsProposeSetTool } from './design/expressionsProposeSet'
@@ -25,4 +26,5 @@ export const ALL_TOOLS: AiTool[] = [
   labelsProposeSetTool,
   expressionsProposeSetTool,
   docsSearchTool,
+  ...analysisTools,
 ]

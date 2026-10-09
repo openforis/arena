@@ -11,7 +11,7 @@ export const viewGetCurrentTool: AiTool<Record<string, never>> = {
     'Returns where the user is in Arena: the module (e.g. designer, data, analysis), the sub-module and, in the ' +
     'Design area, the name of the selected node definition.',
   inputSchema: z.object({}).strict(),
-  area: ['design', 'help'],
+  area: ['design', 'help', 'analysis'],
   dataClass: 'schema',
   effect: 'read',
   requires: () => true,
