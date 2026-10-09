@@ -16,8 +16,17 @@ describe('getAiPolicyCeilings', () => {
     })
   })
 
+  test('matches levels without regard to case', () => {
+    expect(getAiPolicyCeilings({ aiPolicyMaxSchema: 'orghosted', aiPolicyMaxData: ' ONDEVICE ' })).toEqual({
+      schema: 'orgHosted',
+      data: 'onDevice',
+    })
+    expect(getAiPolicyCeilings({ aiPolicyMaxSchema: 'Cloud' }).schema).toBe('cloud')
+    expect(getAiPolicyCeilingErrors({ aiPolicyMaxSchema: 'ORGHOSTED' })).toEqual([])
+  })
+
   test('invalid values become off', () => {
-    expect(getAiPolicyCeilings({ aiPolicyMaxSchema: 'CLOUD', aiPolicyMaxData: 'local' })).toEqual({
+    expect(getAiPolicyCeilings({ aiPolicyMaxSchema: 'cloudd', aiPolicyMaxData: 'local' })).toEqual({
       schema: 'off',
       data: 'off',
     })

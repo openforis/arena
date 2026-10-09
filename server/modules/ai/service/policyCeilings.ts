@@ -2,7 +2,7 @@
  * Instance ceilings of the survey AI policy: the most permissive level a survey may choose, per data class.
  */
 import { ENV } from '@core/processUtils'
-import { aiPolicyLevels, isAiPolicyLevel, type AiPolicy, type AiPolicyLevel } from '@common/ai/policy'
+import { aiPolicyLevels, type AiPolicy, type AiPolicyLevel } from '@common/ai/policy'
 
 export type AiPolicyCeilingEnv = { aiPolicyMaxSchema?: string; aiPolicyMaxData?: string }
 
@@ -21,14 +21,23 @@ const variables = [
 const isBlank = (raw: string | undefined): boolean => raw === undefined || raw === null || raw.trim() === ''
 
 /**
+ * Matches an env value to a canonical level, ignoring case and surrounding spaces.
+ * @param {string} raw - Non blank raw env value.
+ * @returns {AiPolicyLevel | undefined} The canonical level, or undefined when unknown.
+ */
+const toLevel = (raw: string): AiPolicyLevel | undefined => {
+  const value = raw.trim().toLowerCase()
+  return aiPolicyLevels.find((level) => level.toLowerCase() === value)
+}
+
+/**
  * Parses one ceiling (unset → cloud, invalid → off).
  * @param {string | undefined} raw - Raw env value.
  * @returns {AiPolicyLevel} The ceiling level.
  */
 const parseCeiling = (raw: string | undefined): AiPolicyLevel => {
   if (isBlank(raw)) return DEFAULT_CEILING
-  const value = (raw as string).trim()
-  return isAiPolicyLevel(value) ? value : 'off'
+  return toLevel(raw as string) ?? 'off'
 }
 
 /**
@@ -50,7 +59,7 @@ export const getAiPolicyCeilingErrors = (env: AiPolicyCeilingEnv = ENV): string[
   const errors: string[] = []
   for (const { envKey, name } of variables) {
     const raw = env[envKey]
-    if (!isBlank(raw) && !isAiPolicyLevel((raw as string).trim())) {
+    if (!isBlank(raw) && !toLevel(raw as string)) {
       errors.push(`${name}="${raw}" is not one of ${aiPolicyLevels.join(', ')}: treated as off`)
     }
   }
