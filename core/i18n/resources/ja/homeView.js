@@ -182,7 +182,7 @@ export default {
         cloud: 'クラウドのAIプロバイダーが処理する場合があります。',
       },
       notAllowedOnInstance: 'このArenaインスタンスでは許可されていません: {{levels}}',
-      onDeviceNote: '「このデバイス上」にはローカルAIエンジンが必要です。今後のArenaのバージョンで利用可能になります。',
+      onDeviceNote: 'このデバイス上: ユーザーにはローカル AI サーバー (例: LM Studio) が必要です。',
       readOnly: 'AIポリシーを変更できるのは調査の管理者のみです。',
       saved: 'AIポリシーを保存しました',
       saveError: 'AIポリシーを保存できませんでした: {{message}}',

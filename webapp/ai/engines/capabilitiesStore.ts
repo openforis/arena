@@ -15,7 +15,7 @@ import {
   getCapabilitiesSnapshotForUser,
 } from './capabilities'
 import { getBrowserStorage, loadLocalServerSettings } from './localServerSettings'
-import { probeLocalServer } from './localServerProbe'
+import { type LocalServerProbeResult, probeLocalServer } from './localServerProbe'
 import type { AiCapabilities } from './types'
 
 // bound call: an unbound window.fetch throws "Illegal invocation"
@@ -60,6 +60,21 @@ export const loadAiCapabilities = (): Promise<AiCapabilities> =>
  */
 export const refreshAiCapabilities = (): Promise<AiCapabilities> =>
   capabilitiesStore.refresh({ userUuid: getCurrentUserUuid() })
+
+/**
+ * Probes a local server for the settings' Test button, with the same fetch as the engine (the capabilities do not change).
+ * @param {object} params - Parameters.
+ * @param {string} params.baseUrl - Server URL.
+ * @param {string|null} params.modelId - Chosen model.
+ * @returns {Promise<LocalServerProbeResult>} The probe result.
+ */
+export const testLocalServer = ({
+  baseUrl,
+  modelId,
+}: {
+  baseUrl: string
+  modelId: string | null
+}): Promise<LocalServerProbeResult> => probeLocalServer({ baseUrl, modelId, fetchImpl: browserFetch })
 
 /**
  * Tells the subscribers that something they derive from the capabilities changed (e.g. a consent decision).

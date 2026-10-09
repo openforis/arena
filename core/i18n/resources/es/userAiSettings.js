@@ -64,4 +64,29 @@ export default {
   savedSuccessfully: 'Configuracion de IA guardada.',
   saveFailed: 'Error al guardar la configuracion de IA: {{message}}',
   cleared: 'Se eliminaron las configuraciones personales de IA.',
+  localServer: {
+    section: 'Servidor de IA local',
+    enabled: 'Usar un servidor de IA local',
+    baseUrl: 'URL del servidor',
+    test: 'Probar conexión',
+    testing: 'Probando…',
+    reachable: 'El servidor respondió.',
+    noModels: 'El servidor no lista ningún modelo. Cargue un modelo en LM Studio.',
+    location: 'Ubicación: {{location}}',
+    contextTokens: 'Contexto: {{count}} tokens',
+    contextUnknown: 'Contexto: desconocido (se suponen 8.192 tokens)',
+    model: 'Modelo',
+    modelPlaceholder: 'Pruebe la conexión para listar los modelos',
+    preferLocal: 'Preferir el servidor local cuando esté permitido',
+    help: 'LM Studio: inicie el servidor y active Enable CORS. Su navegador puede pedir permiso para acceder a los dispositivos de la red local.',
+    docsLink: 'Documentación de LM Studio',
+    httpsHint:
+      'Arena se sirve por HTTPS: un servidor en otro equipo de su red necesita HTTPS, o un navegador con Local Network Access (Chrome) y su permiso.',
+    cloudWarning:
+      'Esta dirección no está en este dispositivo ni en la lista de servidores de la organización: la política de IA de la encuesta la trata como un servicio en la nube.',
+    deviceNote: 'Esta configuración se guarda solo en este navegador.',
+    capabilityStats: 'Compartir estadísticas anónimas de capacidades',
+    capabilityStatsHint:
+      'Una vez por sesión: si este navegador tiene WebGPU e IA integrada, un rango de memoria, la familia del navegador y si se usa un servidor local. Sin usuario, dirección, nombre de modelo ni contenido de encuestas.',
+  },
 }

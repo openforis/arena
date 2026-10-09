@@ -5,6 +5,7 @@ import { AiProvider } from '@common/ai/aiProvider'
 import * as API from '@webapp/service/api'
 
 import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
+import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useI18n } from '@webapp/store/system'
 
@@ -77,6 +78,7 @@ export const MODEL_PLACEHOLDERS: Record<string, string> = {
 
 type AiSettings = {
   featuresEnabled?: boolean
+  capabilityStats?: boolean
   featureToggles?: Partial<FeatureToggles>
   enabled?: boolean
   provider?: string
@@ -107,6 +109,7 @@ type TestResult = {
 type SettingsUpdate = {
   featuresEnabled: boolean
   featureToggles: FeatureToggles
+  capabilityStats: boolean
   enabled: boolean
   provider?: string
   model?: string | null
@@ -117,6 +120,7 @@ type SettingsUpdate = {
 type FormState = {
   featuresEnabled: boolean
   featureToggles: FeatureToggles
+  capabilityStats: boolean
   provider: string
   model: string
   baseUrl: string
@@ -129,6 +133,7 @@ type FormState = {
 const emptyForm: FormState = {
   featuresEnabled: false,
   featureToggles: defaultFeatureToggles(),
+  capabilityStats: false,
   provider: DEFAULT_PROVIDER_VALUE,
   model: '',
   baseUrl: '',
@@ -173,6 +178,7 @@ type UseUserAiSettingsResult = {
   onBaseUrlChange: (value: string) => void
   onApiKeyChange: (value: string) => void
   onFeaturesEnabledChange: (checked: boolean) => void
+  onCapabilityStatsChange: (checked: boolean) => void
   onFeatureToggleChange: (category: FeatureCategory) => (checked: boolean) => void
   onModelSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
   fetchModels: (opts?: { force?: boolean }) => Promise<void>
@@ -218,6 +224,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       setForm({
         featuresEnabled: !!data.featuresEnabled,
         featureToggles: { ...defaultFeatureToggles(), ...data.featureToggles },
+        capabilityStats: !!data.capabilityStats,
         // When the user has an active override (`enabled`), show their
         // provider; otherwise show "Default" (= admin-configured).
         provider: data.enabled && data.provider ? data.provider : DEFAULT_PROVIDER_VALUE,
@@ -269,6 +276,10 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   }, [])
   const onApiKeyChange = useCallback((value: string) => {
     setForm((prev) => ({ ...prev, apiKey: value, apiKeyDirty: true, apiKeyVersion: prev.apiKeyVersion + 1 }))
+    setDirty(true)
+  }, [])
+  const onCapabilityStatsChange = useCallback((checked: boolean) => {
+    setForm((prev) => ({ ...prev, capabilityStats: checked }))
     setDirty(true)
   }, [])
   const onFeaturesEnabledChange = useCallback((checked: boolean) => {
@@ -382,6 +393,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       const update: SettingsUpdate = {
         featuresEnabled: form.featuresEnabled,
         featureToggles: form.featureToggles,
+        capabilityStats: form.capabilityStats,
         enabled: !useAdminDefault,
         ...(useAdminDefault
           ? {}
@@ -397,6 +409,8 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       setForm((prev) => ({ ...prev, apiKey: '', apiKeyDirty: false }))
       setDirty(false)
       invalidateAiSettingsCache()
+      // the gateway and its hosting class may have changed
+      refreshAiCapabilities().catch(() => undefined)
       notifyInfo({ key: 'userAiSettings:savedSuccessfully' })
     } catch (error: any) {
       notifyError({ key: 'userAiSettings:saveFailed', params: { message: error?.message || 'unknown' } })
@@ -409,6 +423,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     providerSpec.requiresBaseUrl,
     form.featuresEnabled,
     form.featureToggles,
+    form.capabilityStats,
     form.provider,
     form.model,
     form.baseUrl,
@@ -451,6 +466,8 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       setLastModelsKey(null)
       setDirty(false)
       invalidateAiSettingsCache()
+      // the gateway and its hosting class may have changed
+      refreshAiCapabilities().catch(() => undefined)
       notifyInfo({ key: 'userAiSettings:cleared' })
     } catch (error: any) {
       notifyError({ key: 'userAiSettings:saveFailed', params: { message: error?.message || 'unknown' } })
@@ -492,6 +509,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     onBaseUrlChange,
     onApiKeyChange,
     onFeaturesEnabledChange,
+    onCapabilityStatsChange,
     onFeatureToggleChange,
     onModelSelectChange,
     fetchModels,

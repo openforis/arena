@@ -64,4 +64,29 @@ export default {
   savedSuccessfully: 'AI settings saved.',
   saveFailed: 'Failed to save AI settings: {{message}}',
   cleared: 'Personal AI settings removed.',
+  localServer: {
+    section: 'Local AI server',
+    enabled: 'Use a local AI server',
+    baseUrl: 'Server URL',
+    test: 'Test connection',
+    testing: 'Testing…',
+    reachable: 'The server answered.',
+    noModels: 'The server lists no model. Load a model in LM Studio.',
+    location: 'Location: {{location}}',
+    contextTokens: 'Context: {{count}} tokens',
+    contextUnknown: 'Context: unknown (8,192 tokens assumed)',
+    model: 'Model',
+    modelPlaceholder: 'Test the connection to list the models',
+    preferLocal: 'Prefer the local server when allowed',
+    help: 'LM Studio: start the server and turn on Enable CORS. Your browser may ask to allow access to local network devices.',
+    docsLink: 'LM Studio documentation',
+    httpsHint:
+      'Arena is served over HTTPS: a server on another machine of your network needs HTTPS, or a browser with Local Network Access (Chrome) and your permission.',
+    cloudWarning:
+      "This address is neither on this device nor on the organisation's list of servers: the survey AI policy treats it as a cloud service.",
+    deviceNote: 'These settings are stored in this browser only.',
+    capabilityStats: 'Share anonymous capability statistics',
+    capabilityStatsHint:
+      'Once per session: whether this browser has WebGPU and built-in AI, a memory range, the browser family and whether a local server is used. No user, address, model name or survey content.',
+  },
 }

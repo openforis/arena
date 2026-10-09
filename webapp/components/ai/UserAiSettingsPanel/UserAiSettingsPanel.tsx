@@ -18,6 +18,7 @@ import {
   BASE_URL_PLACEHOLDERS,
   useUserAiSettings,
 } from './useUserAiSettings'
+import { LocalAiSection } from './LocalAiSection'
 
 // forwardRef JS components lose their prop types in TS — cast to restore usability
 const Input = InputJS as React.ComponentType<any>
@@ -54,6 +55,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       onBaseUrlChange,
       onApiKeyChange,
       onFeaturesEnabledChange,
+      onCapabilityStatsChange,
       onFeatureToggleChange,
       onModelSelectChange,
       fetchModels,
@@ -218,6 +220,8 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
                 </>
               )}
             </Fieldset>
+
+            <LocalAiSection capabilityStats={form.capabilityStats} onCapabilityStatsChange={onCapabilityStatsChange} />
           </>
         )}
 

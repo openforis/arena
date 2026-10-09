@@ -171,7 +171,7 @@ export default {
         cloud: 'Puede procesarlo un proveedor de IA en la nube.',
       },
       notAllowedOnInstance: 'No permitido en esta instancia de Arena: {{levels}}',
-      onDeviceNote: '«En este dispositivo» requiere un motor de IA local, disponible en una versión futura de Arena.',
+      onDeviceNote: 'En este dispositivo: los usuarios necesitan un servidor de IA local (por ejemplo, LM Studio).',
       readOnly: 'Solo los administradores de la encuesta pueden cambiar la política de IA.',
       saved: 'Política de IA guardada',
       saveError: 'No se pudo guardar la política de IA: {{message}}',
