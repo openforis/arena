@@ -2,7 +2,7 @@
  * Tests for the AI SDK v5 SSE parser used by the Vercel AI SDK provider
  * adapter.
  */
-import { createV5StreamParser } from '@server/modules/ai/service/vercelAiSdkProvider'
+import { createSseParser as createV5StreamParser } from '@common/ai/sseParser'
 
 describe('createV5StreamParser', () => {
   test('parses multiple events delivered in one push', () => {
