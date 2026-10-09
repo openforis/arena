@@ -47,7 +47,7 @@ describe('record editor: socket events of other records are ignored', () => {
   test('validations of another record are ignored; those of the open record are merged', () => {
     const { slice, recordUuid, root } = buildSlice()
     const validations = Validation.newInstance(false, {
-      [Node.getUuid(root)]: Validation.newInstance(false, {}, [{ key: 'some.error' }]),
+      [Node.getUuid(root)]: Validation.newInstance(false, {}, [{ key: 'some.error', valid: false }]),
     })
     expect(mergeValidationsOfOpenRecord(slice, { recordUuid: 'other-record-uuid', validations })).toBe(slice)
     const sliceAfter = mergeValidationsOfOpenRecord(slice, { recordUuid, validations })
