@@ -1,5 +1,6 @@
 import './dataQuery.scss'
 
+import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
@@ -9,10 +10,13 @@ import { Paginator } from '@webapp/components/Table'
 
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
+import { NotificationActions } from '@webapp/store/ui'
+
 import { RecordEditModal } from '@webapp/views/App/views/Data/common/RecordEditModal'
 
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
+import { isChartTruncated } from './store/queryLimit'
 import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
 import Visualizer from './Visualizer'
@@ -42,6 +46,19 @@ const DataQuery = () => {
     setOffset,
     setData,
   } = useDataQuery({ query, displayType })
+
+  // a chart set from code (assistant query card) skips the display type button check: same warning as there
+  const chartTruncated = isChartTruncated({ displayType, count })
+  useEffect(() => {
+    if (chartTruncated) {
+      dispatch(
+        NotificationActions.showNotification({
+          key: 'dataView:charts.warning.tooManyItemsToShowChart',
+          params: { maxItems: DataExplorerState.chartMaxItems },
+        })
+      )
+    }
+  }, [chartTruncated, dispatch])
 
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
 
