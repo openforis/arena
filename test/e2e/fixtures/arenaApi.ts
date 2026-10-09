@@ -68,6 +68,36 @@ export class ArenaApi {
     return response.json()
   }
 
+  private async put(url: string, data: unknown) {
+    const response = await this.requestContext.put(url, { headers: this.headers, data })
+    expect(response.ok(), `PUT ${url} failed: ${response.status()}`).toBeTruthy()
+    return response.json()
+  }
+
+  /**
+   * Turns on the AI features (all categories) for the test user, using the server default provider.
+   * @returns {Promise<void>} - Resolves when saved.
+   */
+  async enableAiFeatures(): Promise<void> {
+    const featureToggles = {
+      chat: true,
+      expressions: true,
+      translation: true,
+      dataDictionary: true,
+      userActivity: true,
+      dataQuery: true,
+    }
+    await this.put('/api/ai/settings', { featuresEnabled: true, featureToggles, enabled: false })
+  }
+
+  /**
+   * Turns off the AI features for the test user.
+   * @returns {Promise<void>} - Resolves when saved.
+   */
+  async disableAiFeatures(): Promise<void> {
+    await this.put('/api/ai/settings', { featuresEnabled: false, enabled: false })
+  }
+
   async waitForJob(jobUuid: string): Promise<JobSummary> {
     const start = Date.now()
     for (;;) {

@@ -140,6 +140,7 @@ const ExpressionEditor = (props) => {
               iconClassName="icon-question icon-14px"
               id={`${idPrefix}-ai-explain-btn`}
               onClick={() => setExplainOpen(true)}
+              testId={TestId.expressionEditor.explainBtn(qualifier, index)}
               title="aiExpression.explain.title"
             />
           )}

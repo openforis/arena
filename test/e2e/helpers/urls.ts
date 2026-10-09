@@ -8,6 +8,7 @@ export const Urls = {
   dashboard: '/app/dashboard/',
   formDesigner: '/app/designer/formDesigner/',
   records: '/app/data/records/',
+  dataExplorer: '/app/data/explorer/',
   dataExport: '/app/data/export/',
   validationReport: '/app/data/validationReport/',
 }

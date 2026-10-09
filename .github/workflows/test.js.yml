@@ -124,6 +124,12 @@ jobs:
           name: dist
           path: dist
       - name: Run server
+        # the mock AI provider lets the e2e specs exercise the AI features without a real provider
+        env:
+          AI_FEATURES_ENABLED: true
+          AI_MOCK_PROVIDER_ENABLED: true
+          AI_DEFAULT_PROVIDER: mock
+          AI_DEFAULT_MODEL: mock
         run: |
           ln -s dist/server.js .
           exec pm2-runtime server.js &
@@ -131,6 +137,8 @@ jobs:
         run: while ! nc -z localhost 9090; do sleep 5; done;
       - name: Run tests
         if: ${{ !matrix.load }}
+        env:
+          E2E_AI_MOCK: true
         run: ${{ matrix.test-command }}
       - name: Run load-test unit tests
         if: matrix.load

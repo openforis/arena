@@ -88,6 +88,7 @@ export const TestId = {
     aiPopupBtn: 'expression-ai-popup-btn',
     applyBtn: 'expression-apply-btn',
     editBtn: (qualifier, index) => `${qualifier}-edit-btn-${index}`,
+    explainBtn: (qualifier, index) => `${qualifier}-explain-btn-${index}`,
     literalDropdown: 'expression-literal-dropdown',
     modeRadio: (qualifier, mode) => `${qualifier}-${mode}-radio`,
     newBtn: (qualifier) => `${qualifier}-new-btn`,
