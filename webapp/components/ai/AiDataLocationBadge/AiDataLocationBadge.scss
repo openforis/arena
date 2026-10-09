@@ -1,0 +1,29 @@
+.ai-data-location-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--greyBorder);
+  border-radius: 0.75rem;
+  color: var(--colorGrey700);
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  vertical-align: middle;
+
+  &--cloud {
+    background-color: var(--blueLight);
+  }
+
+  &--orgHosted {
+    background-color: var(--greenLight);
+  }
+
+  &--onDevice {
+    background-color: var(--white);
+  }
+
+  &--compact {
+    padding: 0.1rem 0.25rem;
+  }
+}

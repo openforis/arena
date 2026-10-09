@@ -22,7 +22,7 @@ const allOff: AiPolicy = Object.freeze({ schema: 'off', data: 'off' })
  * @param {unknown} value - Hosting class sent by the settings.
  * @returns {AiHostingClass | null} The hosting class or null.
  */
-const toHostingClass = (value: unknown): AiHostingClass | null =>
+export const toHostingClass = (value: unknown): AiHostingClass | null =>
   (aiHostingClasses as readonly unknown[]).includes(value) ? (value as AiHostingClass) : null
 
 /**

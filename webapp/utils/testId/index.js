@@ -8,6 +8,12 @@ const _withLang =
     lang?.length > 0 ? `${key}-${lang}` : key
 
 export const TestId = {
+  ai: {
+    dataLocationBadge: 'ai-data-location-badge',
+    openPolicyTabBtn: 'ai-policy-open-tab-btn',
+    policyBlocked: 'ai-policy-blocked',
+    policyBlockedTooltip: 'ai-policy-blocked-tooltip',
+  },
   categoryDetails: {
     addLevelBtn: 'add-level-btn',
     categoryName: 'category-name',
