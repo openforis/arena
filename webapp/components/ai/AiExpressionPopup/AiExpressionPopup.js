@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 
-import * as API from '@webapp/service/api'
+import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/store/system'
@@ -20,20 +20,6 @@ const expressionTypeFromQualifier = (qualifier) => {
   if (qualifier.includes('applyIf')) return 'applicableIf'
   if (qualifier.includes('default')) return 'defaultValue'
   return 'validation'
-}
-
-/**
- * Extracts a user-readable error message from a failed API request.
- * @param {!object} params - Parameters.
- * @param {!object} params.err - The error thrown by the request.
- * @param {!object} params.i18n - The i18n instance.
- * @returns {string} - The error message.
- */
-const getErrorMessage = ({ err, i18n }) => {
-  const data = err?.response?.data
-  const key = data?.error?.key || data?.errorKey
-  const params = data?.error?.params || data?.errorParams
-  return key ? i18n.t(`appErrors:${key}`, params) : err?.message || 'unknown'
 }
 
 /**
@@ -98,7 +84,8 @@ const AiExpressionPopup = (props) => {
     setResult(null)
     setValidationError(null)
     try {
-      const res = await API.aiExpression.generate({
+      const res = await AiWorkflows.generateExpression({
+        survey,
         surveyId,
         nodeDefUuid,
         expressionType,
@@ -117,7 +104,7 @@ const AiExpressionPopup = (props) => {
         setValidationError(validatorError)
       }
     } catch (err) {
-      setError(getErrorMessage({ err, i18n }))
+      setError(getAiErrorMessage({ error: err, i18n }))
     } finally {
       setBusy(false)
     }
