@@ -21,6 +21,15 @@ describe('runtime errors', () => {
     expect(getAiErrorMessage({ error: new Error('<html>502</html>'), i18n })).toBe('appErrors:aiProviderUnavailable{}')
   })
 
+  test('uses the appErrors key of an API error response before the generic fallback', () => {
+    const apiError = Object.assign(new Error('403'), {
+      response: { data: { key: 'appErrors:unauthorized', params: { user: 'u' } } },
+    })
+    expect(getAiErrorMessage({ error: apiError, i18n })).toBe('appErrors:unauthorized{"user":"u"}')
+    const plainKey = Object.assign(new Error('x'), { response: { data: { key: 'surveyNotFound' } } })
+    expect(getAiErrorMessage({ error: plainKey, i18n })).toBe('appErrors:surveyNotFound{}')
+  })
+
   test('detects aborts', () => {
     expect(isAiAbortError(Object.assign(new Error('x'), { name: 'AbortError' }))).toBe(true)
     expect(isAiAbortError(new Error('x'))).toBe(false)

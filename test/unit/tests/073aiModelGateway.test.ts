@@ -249,6 +249,31 @@ describe('handleModelRequest: stream', () => {
     expect(telemetry[0].outcome.error).toBeDefined()
   })
 
+  test('timer firing after the finish part keeps a completed answer (no timeout error)', async () => {
+    const model = new MockLanguageModelV4({
+      doStream: async ({ abortSignal }) => {
+        const stream = new ReadableStream({
+          start(controller) {
+            for (const part of textParts) controller.enqueue(part)
+            // the provider is slow to close after finishing
+            abortSignal?.addEventListener('abort', () => controller.close())
+          },
+        })
+        return { stream } as any
+      },
+    })
+    const { deps, telemetry } = createDeps(model, {
+      limits: { maxPromptChars: 1000, maxOutputTokens: 100, timeoutMs: 50 },
+    })
+    const res = await run(body({ stream: true }), deps)
+    const frames = parseSseWrites(res)
+    expect(frames.find((frame: any) => frame?.type === 'error')).toBeUndefined()
+    expect(frames.some((frame: any) => frame?.type === 'finish')).toBe(true)
+    expect(frames.at(-1)).toBe('[DONE]')
+    expect(telemetry).toHaveLength(1)
+    expect(telemetry[0].outcome.error).toBeUndefined()
+  })
+
   test.each([
     ['piped through a TransformStream', (stream: ReadableStream) => stream.pipeThrough(new TransformStream())],
     ['ignoring the abort signal', null],
