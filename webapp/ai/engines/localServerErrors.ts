@@ -13,7 +13,7 @@ export type FetchFunction = (input: RequestInfo | URL, init?: RequestInit) => Pr
 const PAYLOAD_TOO_LARGE = 413
 const MAX_BODY_CHARS = 2000
 const MODEL_MISSING_PATTERN = /model\b[^.]*\b(not found|not loaded|does not exist)|no models? (are )?loaded/i
-const CONTEXT_PATTERN = /context|tokens?\b/i
+const CONTEXT_PATTERN = /context (length|size|window)|exceed/i
 const UNREACHABLE_KEY = 'aiLocalServerUnreachable'
 
 /**

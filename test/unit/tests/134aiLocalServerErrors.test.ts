@@ -49,6 +49,7 @@ describe('mapLocalServerHttpError', () => {
     ],
     [400, 'POST', '{"error":{"message":"Context size has been exceeded."}}', 'aiLocalServerContextExceeded', 413, {}],
     [400, 'POST', '{"error":{"message":"\'messages\' field is required"}}', 'aiLocalServerError', 400, { status: 400 }],
+    [400, 'POST', '{"error":{"message":"max_tokens must be positive"}}', 'aiLocalServerError', 400, { status: 400 }],
     [500, 'POST', 'boom', 'aiLocalServerError', 500, { status: 500 }],
     [503, 'GET', '', 'aiLocalServerError', 503, { status: 503 }],
   ])('%i %s %s → %s', (status, method, bodyText, key, statusCode, params) => {
