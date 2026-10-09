@@ -4,6 +4,8 @@
  */
 import type { AiExpressionResult } from '@common/ai/tasks/expression'
 
+export type { AiDataQueryGenerateResult, AiDataQuerySummarizeResult } from '@common/ai/tasks/dataQuery'
+
 import { runStreamWithCallbacks } from '../runtime/streamCallbacks'
 
 export { getAiErrorKey, getAiErrorMessage, isAiAbortError } from '../runtime/runtimeErrors'
@@ -88,9 +90,35 @@ const summarizeActivityLog = ({
     onError,
   })
 
+/**
+ * Loads the data query workflow module on first use.
+ * @returns {Promise<object>} The module.
+ */
+const loadDataQuery = () => import('./dataQuery')
+
+type DataQueryModule = Awaited<ReturnType<typeof loadDataQuery>>
+
+/**
+ * Generates a Data Explorer query (see workflows/dataQuery).
+ * @param {object} params - Workflow parameters.
+ * @returns {Promise<object>} The query and its explanation.
+ */
+const generateDataQuery = async (params: Parameters<DataQueryModule['generateDataQueryWorkflow']>[0]) =>
+  (await loadDataQuery()).generateDataQueryWorkflow(params)
+
+/**
+ * Suggests a name, a label and a description for a query (see workflows/dataQuery).
+ * @param {object} params - Workflow parameters.
+ * @returns {Promise<object>} The suggestions.
+ */
+const summarizeDataQuery = async (params: Parameters<DataQueryModule['summarizeDataQueryWorkflow']>[0]) =>
+  (await loadDataQuery()).summarizeDataQueryWorkflow(params)
+
 export const AiWorkflows = {
   generateExpression,
   explainExpression,
   translateLabels,
   summarizeActivityLog,
+  generateDataQuery,
+  summarizeDataQuery,
 }
