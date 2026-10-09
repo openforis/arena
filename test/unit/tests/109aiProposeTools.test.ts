@@ -5,6 +5,7 @@ import { expressionsProposeSetTool } from '@webapp/ai/tools/design/expressionsPr
 import { labelsProposeSetTool } from '@webapp/ai/tools/design/labelsProposeSet'
 import { nodeDefProposeCreateTool } from '@webapp/ai/tools/design/nodeDefProposeCreate'
 import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefProposeUpdate'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 import { AI_TOOL_NAME_PATTERN, getTools, runTool } from '@webapp/ai/tools/registry'
 import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
@@ -226,5 +227,52 @@ describe('tool list gateway limits', () => {
     }
     expect(new Set(names).size).toBe(names.length)
     expect(names.length).toBeLessThanOrEqual(32)
+  })
+})
+
+describe('result size and issue indexes', () => {
+  test('many issues are capped within the result budget', async () => {
+    const items = Array.from({ length: 200 }, () => ({
+      nodeDefName: 'cluster_id',
+      kind: 'labels',
+      lang: 'fr',
+      text: 'x',
+    }))
+    const result: any = await runTool(labelsProposeSetTool, { summary: 'x', items }, ctxWithSurvey())
+    expect(result.error.code).toBe('invalidProposal')
+    expect(result.error.issuesTotal).toBeGreaterThanOrEqual(200)
+    expect(result.error.issues.length).toBeLessThan(result.error.issuesTotal)
+    expect(JSON.stringify(result).length).toBeLessThanOrEqual(8000)
+  })
+
+  test('an error with huge details stays within the budget', async () => {
+    const tool: any = {
+      ...labelsProposeSetTool,
+      execute: async () => {
+        throw new AiToolFailure('big', 'too big', { blob: 'x'.repeat(20000) })
+      },
+    }
+    const result: any = await runTool(
+      tool,
+      { summary: 'x', items: [{ nodeDefName: 'a', kind: 'labels', lang: 'en', text: 'x' }] },
+      ctxWithSurvey()
+    )
+    expect(result.error).toMatchObject({ code: 'big', detailsDropped: true })
+    expect(JSON.stringify(result).length).toBeLessThanOrEqual(8000)
+  })
+
+  test('issue operation indexes refer to the model input, not the filtered list', async () => {
+    const items = [
+      { nodeDefName: 'cluster_id', kind: 'labels', lang: 'en', text: 'Cluster id' },
+      { nodeDefName: 'cluster_id', kind: 'labels', lang: 'fr', text: 'Identifiant' },
+    ]
+    const result: any = await runTool(labelsProposeSetTool, { summary: 'x', items }, ctxWithSurvey())
+    expect(result.error.issues[0].operation).toBe(1)
+  })
+
+  test('readOnly true without default values is refused', async () => {
+    const input = { summary: 'x', changes: [{ nodeDefName: 'cluster_notes', prop: 'readOnly', value: true }] }
+    const result: any = await runTool(nodeDefProposeUpdateTool, input, ctxWithSurvey())
+    expect(result.error.code).toBe('invalidProposal')
   })
 })

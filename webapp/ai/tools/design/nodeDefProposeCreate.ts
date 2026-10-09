@@ -32,6 +32,12 @@ type NewNodeDefInput = z.infer<typeof newNodeDefSchema>
 
 type CreateInput = { summary: string; nodeDefs: NewNodeDefInput[] }
 
+/**
+ * Converts the model's node definitions to create operations; a parent may be created earlier in the list.
+ * @param {NewNodeDefInput[]} nodeDefs - Proposed node definitions.
+ * @param {AiToolContext} ctx - Tool context.
+ * @returns {ChangeOperationDraft[]} The drafts, in order.
+ */
 const toCreateDrafts = (nodeDefs: NewNodeDefInput[], ctx: AiToolContext): ChangeOperationDraft[] => {
   const survey = requireSurvey(ctx)
   const createdByName = new Map<string, any>()

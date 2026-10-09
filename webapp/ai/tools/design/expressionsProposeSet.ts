@@ -24,11 +24,16 @@ type ExpressionsInput = {
   expressions: ExpressionItem[]
 }
 
-// severity and messages exist only on validation expressions
+/**
+ * Builds an expression; severity and messages exist only on validation expressions.
+ * @param {NodeDefExpressionProp} prop - Expression property.
+ * @param {ExpressionItem} item - Proposed expression.
+ * @returns {object} The expression.
+ */
 const toExpression = (prop: NodeDefExpressionProp, item: ExpressionItem) =>
   NodeDefExpression.createExpression({
     expression: item.expression,
-    applyIf: item.applyIf || undefined,
+    applyIf: item.applyIf?.trim() || undefined,
     ...(prop === 'validations.expressions' ? { severity: item.severity, messages: toTextMap(item.messages) } : {}),
   })
 
