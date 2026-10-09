@@ -2,6 +2,8 @@ import React, { Suspense, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 import { isAnalysisRoute } from './analysis/analysisArea'
+import { isCleaningRoute } from './cleaning/cleaningArea'
+import { useExplorerEditMode } from './cleaning/useCleaningArea'
 import { isAssistantShown, pickArea } from './assistantAreas'
 import { assistantPanelStore } from './assistantPanelStore'
 import { useAssistantAreas } from './useAssistantAreas'
@@ -21,6 +23,7 @@ export const AssistantPanelHost = () => {
   const [mounted, setMounted] = useState(open)
   const shown = isAssistantShown(statuses)
   const { pathname } = useLocation()
+  const explorerEditMode = useExplorerEditMode()
 
   // mounted on the first open, then kept
   if (open && !mounted) setMounted(true)
@@ -37,9 +40,10 @@ export const AssistantPanelHost = () => {
       userSelectedArea,
       module,
       analysisRoute: isAnalysisRoute(pathname),
+      cleaningRoute: isCleaningRoute({ pathname, explorerEditMode }),
     })
     if (next !== area) assistantPanelStore.setArea(next)
-  }, [area, module, open, pathname, statuses, userSelectedArea])
+  }, [area, explorerEditMode, module, open, pathname, statuses, userSelectedArea])
 
   if (!mounted || !shown) return null
 

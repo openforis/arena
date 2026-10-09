@@ -13,6 +13,8 @@ export type AssistantPanelState = {
   userSelectedArea: AssistantArea | null
   conversationId: string | null
   view: AssistantPanelView
+  // composer text set by openWithDraft, never sent by itself
+  draft: string | null
 }
 
 export const initialAssistantPanelState: AssistantPanelState = {
@@ -21,6 +23,7 @@ export const initialAssistantPanelState: AssistantPanelState = {
   userSelectedArea: null,
   conversationId: null,
   view: 'chat',
+  draft: null,
 }
 
 export type AssistantPanelStore = {
@@ -33,6 +36,9 @@ export type AssistantPanelStore = {
   setConversationId: (conversationId: string | null) => void
   showHistory: () => void
   showChat: () => void
+  // opens an area as a user choice (the automatic selection keeps it), in a new conversation, with a composer text
+  openWithDraft: (params: { area: AssistantArea; draft: string }) => void
+  clearDraft: () => void
   reset: () => void
 }
 
@@ -72,6 +78,9 @@ export const createAssistantPanelStore = (): AssistantPanelStore => {
     setConversationId: (conversationId) => set({ conversationId, view: 'chat' }),
     showHistory: () => set({ view: 'history' }),
     showChat: () => set({ view: 'chat' }),
+    openWithDraft: ({ area, draft }) =>
+      set({ open: true, area, userSelectedArea: area, conversationId: null, view: 'chat', draft }),
+    clearDraft: () => set({ draft: null }),
     reset: () => set(initialAssistantPanelState),
   }
 }

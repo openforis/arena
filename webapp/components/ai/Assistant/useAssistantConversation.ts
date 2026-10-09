@@ -15,6 +15,7 @@ import { getEngineChangeNotice } from '@webapp/ai/engines/assistantEngine'
 import { toDataLocation } from '@webapp/ai/engines/featureAvailability'
 import type { AiSelectedEngine } from '@webapp/ai/engines/types'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
+import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
 import { getConversationStore, type ConversationStore } from '@webapp/ai/conversations/conversationStore'
 import type { Conversation } from '@webapp/ai/conversations/types'
 import type { AiDataLocation } from '@webapp/ai/policy/aiFeatureAvailability'
@@ -26,6 +27,7 @@ import type { AssistantArea } from './assistantAreas'
 import { getRetryBase, normalizeLoadedConversation, withApplyResults, withDiscarded } from './assistantPanelModel'
 import { assistantPanelStore } from './assistantPanelStore'
 import { assistantTurnRegistry } from './assistantTurnRegistry'
+import { startsAsDataConversation } from './cleaning/cleaningArea'
 import { useAssistantToolContext } from './useAssistantToolContext'
 
 export type AssistantConversationApi = {
@@ -56,6 +58,26 @@ export type AssistantConversationApi = {
 }
 
 const NO_ACCESS = { effective: null, hostingClass: null }
+
+/**
+ * Creates the conversation of a first message. A Cleaning conversation has record content from its first turn, so
+ * it starts as `data`: the engine is selected for `data` already for that turn.
+ * @param {object} params - Parameters.
+ * @param {string} params.userUuid - User.
+ * @param {number|null} params.surveyId - Survey.
+ * @param {AssistantArea} params.area - Area.
+ * @returns {Conversation} The new conversation.
+ */
+const createNewConversation = (params: {
+  userUuid: string
+  surveyId: number | null
+  area: AssistantArea
+}): Conversation => {
+  const created = createConversation(params)
+  return startsAsDataConversation(params.area)
+    ? escalateConversationDataClass({ conversation: created, dataClass: 'data' })
+    : created
+}
 
 /**
  * Conversation of the current area: load, turns, Stop / Retry, history, Apply / Discard, all saved in the store.
@@ -207,7 +229,7 @@ export const useAssistantConversation = ({
       if (busy || applyingRef.current) return
       // no selected id: a new conversation, whatever the ref still holds
       const selected = conversationId && conversationRef.current?.id === conversationId ? conversationRef.current : null
-      void runTurn(selected ?? createConversation({ userUuid, surveyId, area }), text)
+      void runTurn(selected ?? createNewConversation({ userUuid, surveyId, area }), text)
     },
     [area, busy, conversationId, runTurn, surveyId, userUuid]
   )

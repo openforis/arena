@@ -70,7 +70,7 @@ describe('docs_search', () => {
   test('returns the best sections; offered in Help and Design without a survey', async () => {
     const result: any = await runTool(tool, { query: 'table' }, createToolContext())
     expect(result.results[0]).toMatchObject({ id: '7.2.3', title: 'Tables' })
-    expect(tool.area).toEqual(['help', 'design', 'analysis'])
+    expect(tool.area).toEqual(['help', 'design', 'analysis', 'cleaning'])
     expect(tool.requires(createToolContext())).toBe(true)
   })
 

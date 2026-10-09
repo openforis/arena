@@ -101,7 +101,7 @@ describe('query_propose', () => {
       name: 'query_propose',
       dataClass: 'schema',
       effect: 'propose',
-      area: ['analysis'],
+      area: ['analysis', 'cleaning'],
     })
   })
 

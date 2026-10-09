@@ -87,7 +87,7 @@ export const proposeQueryTool: AiTool<ProposeQueryInput, unknown> = {
     'Proposes an Explorer query. It is validated and shown to the user as a card with "Open in Explorer" and, ' +
     'when possible, "Show as chart". Returns the query id (q1, q2, …) or the problems to fix.',
   inputSchema: proposeQueryInputSchema,
-  area: ['analysis'],
+  area: ['analysis', 'cleaning'],
   dataClass: 'schema',
   effect: 'propose',
   requires: canViewCurrentSurvey,

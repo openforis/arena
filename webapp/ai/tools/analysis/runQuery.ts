@@ -72,7 +72,7 @@ const fetchCappedRows = async ({ api, requestParams, max }: { api: AnalysisApi; 
 export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input, unknown>[] => {
   const common: Pick<AiTool<Input>, 'inputSchema' | 'area' | 'dataClass' | 'effect' | 'requires'> = {
     inputSchema,
-    area: ['analysis'],
+    area: ['analysis', 'cleaning'],
     dataClass: 'data',
     effect: 'read',
     requires: canViewCurrentSurvey,

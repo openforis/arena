@@ -5,13 +5,14 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { buildAssistantAnalysisPrompt } from '@common/ai/prompts/assistantAnalysis'
+import { buildAssistantCleaningPrompt } from '@common/ai/prompts/assistantCleaning'
 import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
 import { buildAssistantHelpPrompt } from '@common/ai/prompts/assistantHelp'
 import { getEffectiveQueryLang } from '@common/ai/tasks/dataQuery'
 
 import type { AiCurrentView, AiToolContext } from '@webapp/ai/tools/types'
 
-export type AssistantPromptArea = 'design' | 'help' | 'analysis'
+export type AssistantPromptArea = 'design' | 'help' | 'analysis' | 'cleaning'
 
 /**
  * Describes the current view for the model.
@@ -74,6 +75,14 @@ export const buildAssistantSystemPrompt = ({
         uiLang: ctx.uiLang,
         viewDescription: describeView(ctx.getCurrentView(), ctx.survey),
         dataToolsAvailable,
+      })
+    case 'cleaning':
+      return buildAssistantCleaningPrompt({
+        survey: ctx.survey,
+        cycle: ctx.cycle,
+        lang: ctx.lang,
+        uiLang: ctx.uiLang,
+        viewDescription: describeView(ctx.getCurrentView(), ctx.survey),
       })
     default:
       throw new Error(`Unknown assistant area: ${area}`)

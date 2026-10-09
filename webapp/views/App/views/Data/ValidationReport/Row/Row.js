@@ -14,8 +14,10 @@ import { TestId } from '@webapp/utils/testId'
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
+import { AskAssistantButton } from './AskAssistantButton'
+
 const Row = (props) => {
-  const { item: row, itemPosition: rowNo } = props
+  const { rowNo, row, askAssistantAvailable = false } = props
 
   const lang = useSurveyPreferredLang()
   const user = useUser()
@@ -56,13 +58,15 @@ const Row = (props) => {
       <div>
         <span className={`icon icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`} />
       </div>
+      <div>{askAssistantAvailable && <AskAssistantButton row={row} />}</div>
     </>
   )
 }
 
 Row.propTypes = {
-  item: PropTypes.object.isRequired,
-  itemPosition: PropTypes.number.isRequired,
+  row: PropTypes.object.isRequired,
+  rowNo: PropTypes.number.isRequired,
+  askAssistantAvailable: PropTypes.bool,
 }
 
 export default Row

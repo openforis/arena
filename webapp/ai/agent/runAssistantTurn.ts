@@ -34,11 +34,12 @@ export const DEFAULT_ASSISTANT_LIMITS: AssistantLimits = {
   maxSteps: AiLimits.assistantMaxSteps,
 }
 
-// gateway feature of each area (D2 adds analysis, D3 cleaning)
+// gateway feature of each area (design, help, analysis, cleaning)
 export const assistantAreaFeatures: Record<AssistantPromptArea, AiFeatureKey> = {
   design: 'assistantDesign',
   help: 'chatbot',
   analysis: 'assistantAnalysis',
+  cleaning: 'assistantCleaning',
 }
 
 const PROVIDER_ERROR_KEY = 'aiProviderUnavailable'

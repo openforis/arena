@@ -24,7 +24,7 @@ export const nodeDefSearchTool: AiTool<{ text: string }> = {
     'Finds node definitions whose name or label (any language) contains the text, case-insensitive. ' +
     `Returns at most ${SEARCH_MAX_RESULTS}.`,
   inputSchema: z.object({ text: z.string().trim().min(1).max(200).describe('Text to look for') }),
-  area: ['design', 'analysis'],
+  area: ['design', 'analysis', 'cleaning'],
   dataClass: 'schema',
   effect: 'read',
   requires: canViewSurveyTool,
