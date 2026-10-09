@@ -50,6 +50,18 @@ const fetchOnce = () => {
 }
 
 /**
+ * Returns the AI settings of the user (fetched once per session, shared with the hooks).
+ * @returns {Promise<object>} The settings response (a "force off" object when the fetch failed).
+ */
+export const fetchAiSettingsOnce = () => fetchOnce()
+
+/**
+ * Returns the cached AI settings without fetching.
+ * @returns {object|null} The settings, or null while not loaded.
+ */
+export const getAiSettingsSnapshot = () => cache
+
+/**
  * Drops the cached AI settings and triggers a re-fetch. Call this from the
  * AI Settings panel after `Save` / `Clear` so other components pick up the
  * new toggles immediately.
