@@ -1,6 +1,9 @@
+import type { Page } from '@playwright/test'
+
 import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
+import type { ArenaApi } from '../fixtures/arenaApi'
 import { sampleRecords } from '../fixtures/seed/sampleSurveyModel'
 import {
   acceptConsentAndWait,
@@ -51,6 +54,10 @@ test.describe('AI analysis assistant (mock provider)', () => {
       expect(text).not.toContain('query_run')
       expect(text).not.toContain('query_count')
       for (const value of expectedAverages) expect(text).not.toContain(value)
+      // the offered tools, when listed, include no data tool
+      for (const tool of body.call?.tools ?? []) {
+        expect(String(tool?.name ?? tool)).not.toMatch(/^query_(run|count)$/)
+      }
     }
   })
 
@@ -80,12 +87,12 @@ test.describe('AI analysis assistant (mock provider)', () => {
     })
 
     /**
-     * Runs the scripted "run the average" turn on the local server and checks the answer.
-     * @param {import('@playwright/test').Page} page - The page.
-     * @param {object} api - The ArenaApi fixture.
+     * Runs the scripted "run the average" turn on the local server until its query card shows.
+     * @param {Page} page - The page.
+     * @param {ArenaApi} api - The ArenaApi fixture.
      * @returns {Promise<string>} The user uuid.
      */
-    const runAverageLocally = async (page, api) => {
+    const runAverageLocally = async (page: Page, api: ArenaApi): Promise<string> => {
       await page.goto(Urls.dataExplorer)
       const userUuid = await api.getCurrentUserUuid()
       await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub.baseUrl, modelId: stub.modelId })
@@ -119,6 +126,7 @@ test.describe('AI analysis assistant (mock provider)', () => {
       sampleSurvey: _,
     }) => {
       const userUuid = await runAverageLocally(page, api)
+      const gatewayBodies = collectRequestBodies(page, isGatewayRequest)
 
       // review focus 3: the local server is switched off
       await setLocalServerSettings(page, { userUuid, enabled: false, baseUrl: stub.baseUrl, modelId: stub.modelId })
@@ -128,8 +136,12 @@ test.describe('AI analysis assistant (mock provider)', () => {
       await reopenLastConversation(page)
 
       const panel = assistantPanel(page)
-      await expect(panel.getByText('This conversation contains record data.')).toBeVisible()
-      await expect(panel.getByRole('button', { name: 'New conversation' })).toBeVisible()
+      const notice = panel.getByTestId(TestId.aiAssistant.recordDataNotice)
+      await expect(notice).toContainText('This conversation contains record data.')
+      await expect(notice.getByRole('button', { name: 'New conversation' })).toBeVisible()
+      // nothing falls back to the cloud: no gateway request, and the composer is gone so no new turn can be sent
+      expect(gatewayBodies).toEqual([])
+      await expect(panel.getByTestId(TestId.aiAssistant.input)).toHaveCount(0)
     })
   })
 })
