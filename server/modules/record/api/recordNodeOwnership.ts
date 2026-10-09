@@ -1,9 +1,11 @@
 import SystemError, { StatusCodes } from '@core/systemError'
 import * as Node from '@core/record/node'
+import { isUuid } from '@core/uuid'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 
+import * as NodeRepository from '../repository/nodeRepository'
 import { NodesBatchMessageKeys } from '../service/update/nodesBatch/nodesBatchTypes'
 
 /**
@@ -47,3 +49,35 @@ export const requireNodeBelongsToRecord = (req: any, res: any, next: (error?: un
     next(error)
   }
 }
+
+type FetchNodeRecordUuid = (surveyId: number, nodeUuid: string) => Promise<string | null>
+
+/**
+ * Creates the middleware refusing a node deletion whose :nodeUuid belongs to another record than :recordUuid
+ * (the delete query only filters by node uuid).
+ * @param {Function} fetchNodeRecordUuid - Returns the record uuid of a node, or null (injectable for tests).
+ * @returns {Function} The Express middleware.
+ */
+export const createRequireNodeUuidBelongsToRecord =
+  (fetchNodeRecordUuid: FetchNodeRecordUuid) =>
+  async (req: any, res: any, next: (error?: unknown) => void): Promise<void> => {
+    try {
+      const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
+      // a malformed uuid is refused before querying the database
+      const nodeRecordUuid = isUuid(String(nodeUuid)) ? await fetchNodeRecordUuid(surveyId, nodeUuid) : null
+      if (nodeRecordUuid !== recordUuid) {
+        Response.sendErr(
+          res,
+          new SystemError(NodesBatchMessageKeys.nodeNotInRecord, { recordUuid }, StatusCodes.BAD_REQUEST)
+        )
+        return
+      }
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+export const requireNodeUuidBelongsToRecord = createRequireNodeUuidBelongsToRecord((surveyId, nodeUuid) =>
+  NodeRepository.fetchNodeRecordUuid(surveyId, nodeUuid)
+)
