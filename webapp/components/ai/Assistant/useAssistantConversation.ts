@@ -109,14 +109,14 @@ export const useAssistantConversation = ({
     let active = true
     conversationStore.get(conversationId).then((loaded) => {
       if (!active) return
-      if (loaded?.userUuid === userUuid && loaded.area === area) {
+      if (loaded?.userUuid === userUuid && loaded.area === area && loaded.surveyId === surveyId) {
         show(normalizeLoadedConversation(loaded, runningIdRef.current === loaded.id))
       } else assistantPanelStore.setConversationId(null)
     })
     return () => {
       active = false
     }
-  }, [area, conversationId, conversationStore, show, userUuid])
+  }, [area, conversationId, conversationStore, show, surveyId, userUuid])
 
   /**
    * Runs one turn on a base conversation, saving it when it starts and when it ends.
@@ -206,10 +206,11 @@ export const useAssistantConversation = ({
 
   const clearConversations = useCallback(async () => {
     if (!conversationStore) return
-    for (const item of await listAreaConversations()) await conversationStore.remove(item.id)
+    // all the conversations of the user, whatever the area and the survey
+    await conversationStore.clearUser(userUuid)
     setHistory([])
     assistantPanelStore.setConversationId(null)
-  }, [conversationStore, listAreaConversations])
+  }, [conversationStore, userUuid])
 
   /**
    * Saves a conversation (tracked, so logout can wait for it) and shows it when it is the selected one.
