@@ -1,8 +1,10 @@
 import React, { useCallback, useId, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 
+import type { AiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import type { AiFeatureAvailability } from '@webapp/ai/policy/aiFeatureAvailability'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import { AiNotAvailable } from '@webapp/components/ai/AiNotAvailable'
 import { TooltipNew } from '@webapp/components/TooltipNew'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurveyAiPolicy } from '@webapp/store/user'
@@ -23,8 +25,8 @@ type Props = {
 }
 
 /**
- * Wraps a disabled AI entry point with the reason it is blocked by the AI policy; survey administrators also get
- * a link to the AI policy tab. Renders the children unchanged when the feature is not blocked.
+ * Wraps a disabled AI entry point with the reason it is blocked: the AI policy (with a link to the tab for survey
+ * administrators), or no engine (the reasons, each with an action). Renders the children unchanged otherwise.
  * @param {Props} props - Props.
  * @returns {React.ReactElement} The children, with the tooltip when blocked.
  */
@@ -43,8 +45,12 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
     navigate(appModuleUri(homeModules.surveyInfo), { state: { tab: 'aiPolicy' } })
   }, [navigate])
 
-  const renderTitle = useCallback(
-    () => (
+  const renderTitle = useCallback(() => {
+    if (availability.status === 'noEngine') {
+      // C's reasons and actions (the availability hook returns AiEngineFeatureAvailability)
+      return <AiNotAvailable availability={availability as AiEngineFeatureAvailability} />
+    }
+    return (
       <div className="ai-policy-blocked-tooltip" data-testid={TestId.ai.policyBlockedTooltip}>
         {reasonKeys.map((key) => (
           <p key={key}>{i18n.t(key)}</p>
@@ -60,11 +66,10 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
           </button>
         )}
       </div>
-    ),
-    [i18n, openPolicyTab, reasonKeys, showPolicyLink]
-  )
+    )
+  }, [availability, i18n, openPolicyTab, reasonKeys, showPolicyLink])
 
-  if (availability.status !== 'policyBlocked') return <>{children}</>
+  if (availability.status !== 'policyBlocked' && availability.status !== 'noEngine') return <>{children}</>
 
   return (
     <TooltipNew renderTitle={renderTitle}>
