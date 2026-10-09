@@ -9,8 +9,6 @@ import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 
-import * as Log from '@server/log/log'
-
 import { checkBatchEdit, findUniquenessErrorKey } from './nodesBatchEditCheck'
 import {
   NodesBatchEditResult,
@@ -23,8 +21,6 @@ import {
   failedResult,
   failedResults,
 } from './nodesBatchTypes'
-
-const Logger = Log.getLogger('NodesBatchProcessor')
 
 // thrown by acquireRecordLockAndRun (records update thread) when the record stays locked for too long
 const lockTimeoutErrorKey = 'record.lockTimeout'
@@ -42,6 +38,7 @@ export type NodesBatchProcessorDeps = {
   cacheRecord: (params: { msg: NodesBatchPersistMessage; recordUuid: string; record: any; t: any }) => Promise<void>
   clearCachedRecord: (params: { msg: NodesBatchPersistMessage; recordUuid: string }) => Promise<void>
   postMessage: (message: ThreadMessage) => void
+  logError: (message: string) => void
 }
 
 type BatchState = {
@@ -242,7 +239,7 @@ const clearCachedRecordSafely = async (state: BatchState): Promise<void> => {
   try {
     await state.deps.clearCachedRecord({ msg: state.msg, recordUuid: state.msg.recordUuid })
   } catch (error) {
-    Logger.error(`error clearing the cached record ${state.msg.recordUuid}: ${error}`)
+    state.deps.logError(`error clearing the cached record ${state.msg.recordUuid}: ${error}`)
   }
 }
 
@@ -281,7 +278,7 @@ export const processNodesBatch = async ({
     return sortByIndex(results)
   } catch (error) {
     if (typeof (error as any)?.key !== 'string') {
-      Logger.error(`error applying the batch edits of record ${msg.recordUuid}: ${(error as Error)?.stack ?? error}`)
+      deps.logError(`error applying the batch edits of record ${msg.recordUuid}: ${(error as Error)?.stack ?? error}`)
     }
     await clearCachedRecordSafely(state)
     return sortByIndex(rolledBackResults(state, error))

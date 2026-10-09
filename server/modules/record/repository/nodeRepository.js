@@ -306,6 +306,16 @@ export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
     dbTransformCallback
   )
 
+// Returns the uuid of the record owning the node, or null when the node does not exist.
+export const fetchNodeRecordUuid = async (surveyId, uuid, client = db) =>
+  client.oneOrNone(
+    `
+    SELECT record_uuid FROM ${getSurveyDBSchema(surveyId)}.node
+    WHERE uuid = $1`,
+    [uuid],
+    (row) => row?.record_uuid ?? null
+  )
+
 export const fetchNodesWithRefDataByUuids = async ({ surveyId, nodeUuids, draft }, client = db) =>
   client.map(
     `

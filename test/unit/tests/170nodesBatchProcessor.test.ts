@@ -75,6 +75,7 @@ describe('processNodesBatch', () => {
     nodeRecordUuids?: Record<string, string>
   } = {}) => {
     const posted: any[] = []
+    const errors: string[] = []
     const calls = { cacheRecord: 0, clearCachedRecord: 0, persistNode: 0, insideLock: false, postedInsideLock: 0 }
     const deps: NodesBatchProcessorDeps = {
       getSurvey: async () => survey,
@@ -88,7 +89,13 @@ describe('processNodesBatch', () => {
         }
       },
       getOrFetchRecord: async () => recordInDb,
-      findNodeRecordUuid: async ({ nodeUuid }: { nodeUuid: string }) => nodeRecordUuids[nodeUuid] ?? null,
+      findNodeRecordUuid: async ({ nodeUuid, t }) => {
+        expect(t).toBe('tx')
+        return nodeRecordUuids[nodeUuid] ?? null
+      },
+      logError: (message) => {
+        errors.push(message)
+      },
       persistNode: async (
         { record: recordParam, node, nodesUpdateListener, nodesValidationListener }: any,
         t: unknown
@@ -111,7 +118,7 @@ describe('processNodesBatch', () => {
         posted.push(message)
       },
     }
-    return { deps, posted, calls }
+    return { deps, posted, calls, errors }
   }
 
   test('applies the matching edits, refuses the changed ones, and posts events after commit', async () => {
@@ -140,7 +147,7 @@ describe('processNodesBatch', () => {
   })
 
   test('a persist error rolls back the record: applied and pending edits fail, conflicts stay, no events', async () => {
-    const { deps, posted, calls } = createDeps({ failOnNodeUuid: bUuid })
+    const { deps, posted, calls, errors } = createDeps({ failOnNodeUuid: bUuid })
     const results = await processNodesBatch({
       msg: msgOf([
         { index: 0, nodeUuid: aUuid, from: 1, to: 10 },
@@ -159,6 +166,8 @@ describe('processNodesBatch', () => {
     expect(posted).toEqual([])
     expect(calls.cacheRecord).toBe(0)
     expect(calls.clearCachedRecord).toBe(1)
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toContain('boom')
   })
 
   test('a lock timeout fails every edit with appErrors:record.lockTimeout', async () => {
@@ -216,5 +225,28 @@ describe('processNodesBatch', () => {
       deps,
     })
     expect(results).toEqual([{ index: 0, status: 'conflict' }])
+  })
+
+  test('a duplicate on the second edit rolls back the first one too: both fail, cache cleared, no events', async () => {
+    const { deps, posted, calls } = createDeps({
+      validationFor: (node) =>
+        Node.getUuid(node) === bUuid
+          ? Validation.newInstance(false, { [bUuid]: RecordValidation.newValidationRecordDuplicate() })
+          : {},
+    })
+    const results = await processNodesBatch({
+      msg: msgOf([
+        { index: 0, nodeUuid: aUuid, from: 1, to: 10 },
+        { index: 1, nodeUuid: bUuid, from: 2, to: 20 },
+      ]),
+      deps,
+    })
+    expect(results).toEqual([
+      { index: 0, status: 'failed', messageKey: 'validationErrors:record.keyDuplicate' },
+      { index: 1, status: 'failed', messageKey: 'validationErrors:record.keyDuplicate' },
+    ])
+    expect(calls.clearCachedRecord).toBe(1)
+    expect(calls.cacheRecord).toBe(0)
+    expect(posted).toEqual([])
   })
 })

@@ -10,6 +10,7 @@ import IdleTimeoutCache from '@server/utils/IdleTimeoutCache'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
+import { isUuid } from '@core/uuid'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
@@ -305,17 +306,10 @@ export class RecordsUpdateThread extends Thread {
       getSurvey: async (msg) => (await this.getOrFetchSurveyData(msg)).survey,
       runWithRecordLock: (recordUuid, fn) => acquireRecordLockAndRun({ recordUuid, fn }),
       getOrFetchRecord: (params) => this.getOrFetchRecord(params),
-      findNodeRecordUuid: async ({ msg, nodeUuid, t }) => {
-        try {
-          // the node table is shared by draft and published records
-          const node = await NodeRepository.fetchNodeByUuid(msg.surveyId, nodeUuid, t)
-          return Node.getRecordUuid(node)
-        } catch (error) {
-          // fetchNodeByUuid uses one(): a node that does not exist throws a QueryResultError
-          if (error?.name === 'QueryResultError') return null
-          throw error
-        }
-      },
+      findNodeRecordUuid: async ({ msg, nodeUuid, t }) =>
+        // a malformed uuid would make the query fail and abort the record transaction
+        isUuid(nodeUuid) ? NodeRepository.fetchNodeRecordUuid(msg.surveyId, nodeUuid, t) : null,
+      logError: (message) => Logger.error(message),
       persistNode: (params, t) => RecordManager.persistNode(params, t),
       cacheRecord: async ({ msg, recordUuid, record, t }) => {
         const { recordsCache } = await this.getOrFetchSurveyData(msg)
