@@ -40,11 +40,15 @@ export const createNodesBatchReplyRegistry = ({
    */
   const waitFor = (requestId: string): Promise<NodesBatchEditResult[] | null> =>
     new Promise((resolve) => {
-      const timer = setTimer(() => {
-        pending.delete(requestId)
-        resolve(null)
-      }, timeoutMs)
-      pending.set(requestId, { resolve, timer })
+      const entry: PendingReply = {
+        resolve,
+        timer: setTimer(() => {
+          // only drop our own entry: the id may have been reused since
+          if (pending.get(requestId) === entry) pending.delete(requestId)
+          resolve(null)
+        }, timeoutMs),
+      }
+      pending.set(requestId, entry)
     })
 
   /**
@@ -63,7 +67,13 @@ export const createNodesBatchReplyRegistry = ({
     return true
   }
 
-  return { waitFor, resolveReply, size: () => pending.size }
+  /**
+   * Counts the pending requests.
+   * @returns {number} The number of requests waiting for a reply.
+   */
+  const size = (): number => pending.size
+
+  return { waitFor, resolveReply, size }
 }
 
 export const NodesBatchReplies = createNodesBatchReplyRegistry()

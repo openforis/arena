@@ -18,6 +18,7 @@ describe('nodes batch reply channel', () => {
     expect(registry.resolveReply({ requestId: 'req-1', results })).toBe(true)
     await expect(promise).resolves.toEqual(results)
     expect(registry.size()).toBe(0)
+    expect(jest.getTimerCount()).toBe(0)
   })
 
   test('no reply within the timeout resolves null and removes the entry; a late reply is ignored', async () => {
