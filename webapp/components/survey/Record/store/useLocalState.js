@@ -7,6 +7,7 @@ import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as Survey from '@core/survey/survey'
 
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
+import { isEventOfOpenRecord } from '@webapp/store/ui/record/recordEventFilter'
 import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
@@ -67,7 +68,14 @@ export const useLocalState = (props) => {
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.recordDelete,
-    eventHandler: useCallback(() => dispatch(RecordActions.recordDeleted(navigate)), []),
+    eventHandler: useCallback(
+      (deletedRecordUuid) => {
+        if (isEventOfOpenRecord({ recordUuid: deletedRecordUuid, openRecordUuid: recordUuid })) {
+          dispatch(RecordActions.recordDeleted(navigate))
+        }
+      },
+      [dispatch, navigate, recordUuid]
+    ),
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.recordSessionExpired,
