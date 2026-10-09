@@ -59,7 +59,7 @@ export const isTimeoutError = (error: any): boolean =>
  * @param {Function} request - The request.
  * @returns {Promise<any>} The request result.
  */
-const withTimeoutError = async <T>(request: () => Promise<T>): Promise<T> => {
+export const withTimeoutError = async <T>(request: () => Promise<T>): Promise<T> => {
   try {
     return await request()
   } catch (error) {

@@ -58,3 +58,15 @@ export const toValidationListItems = ({
     canEdit: canEditRowRecord({ surveyInfo, user, row }),
   }))
 }
+
+export const LIST_ROWS_MAX = 50
+
+/**
+ * Applies the page cap to the fetched rows (one more than the cap is fetched to detect further rows).
+ * @param {object[]} fetched - The fetched rows.
+ * @returns {{rows: object[], hasMore: boolean}} The rows within the cap and whether there are more.
+ */
+export const pageValidationRows = <T>(fetched: T[]): { rows: T[]; hasMore: boolean } => ({
+  rows: fetched.slice(0, LIST_ROWS_MAX),
+  hasMore: fetched.length > LIST_ROWS_MAX,
+})

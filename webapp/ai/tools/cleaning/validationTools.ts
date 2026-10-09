@@ -13,10 +13,9 @@ import type { CleaningApi } from './cleaningApi'
 import { canCleanseCurrentSurvey, getCleaningContext, resolveAttributeDefs } from './cleaningContext'
 import type { CleaningI18n } from './validationRows'
 import { summarizeValidationRows } from './validationSummary'
-import { toValidationListItems } from './validationList'
+import { LIST_ROWS_MAX, pageValidationRows, toValidationListItems } from './validationList'
 
 const SUMMARY_ROWS_MAX = 1000
-const LIST_ROWS_MAX = 50
 
 const summarizeInputSchema = z.object({
   recordUuid: z.string().nullish().describe('Only this record (UUID); omit for the whole cycle.'),
@@ -63,7 +62,7 @@ const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summ
    */
   execute: async ({ recordUuid }, ctx) => {
     const { survey, surveyId, cycle } = getCleaningContext(ctx)
-    const filter = { surveyId, cycle, recordUuid: recordUuid ?? null }
+    const filter = { surveyId, cycle, recordUuid: recordUuid ?? null, signal: ctx.signal }
     let rows: any[]
     let total: number
     try {
@@ -89,7 +88,8 @@ const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInput
   name: 'validation_list',
   description:
     'Lists validation report rows (at most 50): record keys and UUID, node UUID, path with entity keys, messages, ' +
-    'record step and whether the user can edit the record. Filter by attribute names, message categories, record.',
+    'record step and whether the user can edit the record. Filter by attribute names, message categories, record. ' +
+    'When more rows exist the result has nextOffset: pass it as offset to get the next page.',
   inputSchema: listInputSchema,
   /**
    * Fetches one row more than the cap to know whether there are others.
@@ -106,6 +106,7 @@ const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInput
     const filter = {
       surveyId,
       cycle,
+      signal: ctx.signal,
       recordUuid: recordUuid ?? null,
       attributeDefUuids: nodeDefs.map(NodeDef.getUuid),
       messageTypeKeys: categories?.length ? expandMessageTypeFilterCategoriesToKeys(categories) : null,
@@ -114,19 +115,18 @@ const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInput
     let total: number
     try {
       fetched = await api.fetchValidationReportRows({ ...filter, offset, limit: LIST_ROWS_MAX + 1 })
-      total = fetched.length > LIST_ROWS_MAX ? await api.countValidationReportRows(filter) : offset + fetched.length
+      total = pageValidationRows(fetched).hasMore
+        ? await api.countValidationReportRows(filter)
+        : offset + fetched.length
     } catch (error) {
       return toRequestErrorResult(error, TIMEOUT_HINT)
     }
-    const truncated = fetched.length > LIST_ROWS_MAX
-    const rows = toValidationListItems({
-      survey,
-      rows: fetched.slice(0, LIST_ROWS_MAX),
-      user: ctx.user,
-      i18n: getI18n(),
-      lang,
-    })
-    return fitListToBudget({ rows, total, truncated, offset }, 'rows')
+    const { rows: pageRows, hasMore } = pageValidationRows(fetched)
+    const rows = toValidationListItems({ survey, rows: pageRows, user: ctx.user, i18n: getI18n(), lang })
+    const fitted = fitListToBudget({ rows, total, truncated: hasMore, offset }, 'rows')
+    // the budget may cut rows of the page: the next page starts after the last one returned
+    const moreRows = hasMore || fitted.rows.length < rows.length
+    return moreRows ? { ...fitted, truncated: true, nextOffset: offset + fitted.rows.length } : fitted
   },
 })
 
