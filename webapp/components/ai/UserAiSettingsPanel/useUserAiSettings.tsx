@@ -96,6 +96,8 @@ type TestResult = {
   ok: boolean
   latencyMs?: number
   errorMessage?: string
+  errorKey?: string
+  errorParams?: Record<string, unknown>
 }
 
 type SettingsUpdate = {
@@ -452,9 +454,12 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       return <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings:testing')}</div>
     }
     if (testResult) {
+      const failureMessage = testResult.errorKey
+        ? i18n.t(`appErrors:${testResult.errorKey}`, testResult.errorParams)
+        : testResult.errorMessage || 'unknown'
       const testResultMessage = testResult.ok
         ? i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs })
-        : i18n.t('userAiSettings:testFailed', { message: testResult.errorMessage || 'unknown' })
+        : i18n.t('userAiSettings:testFailed', { message: failureMessage })
       return <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>{testResultMessage}</div>
     }
     return null

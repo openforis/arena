@@ -18,6 +18,7 @@ import { createOpenAI } from '@ai-sdk/openai'
 import SystemError from '@core/systemError'
 
 import { AiProvider } from '@common/ai/aiProvider'
+import { assertProviderBaseUrlAllowed } from './baseUrlGuard'
 import { createVercelAiSdkModel } from './vercelAiSdkProvider'
 
 export const providers = AiProvider
@@ -86,4 +87,15 @@ export const buildModel = (cfg) => {
     default:
       throw new SystemError('aiProviderInvalid', { provider })
   }
+}
+
+/**
+ * Builds the model for a user-supplied config, refusing base URLs that point to internal addresses.
+ * @param {object} cfg - User provider config (see buildModel).
+ * @param {object} [guardOptions] - Options for the base URL guard (tests).
+ * @returns {Promise<object>} The model handle.
+ */
+export const buildUserModel = async (cfg, guardOptions) => {
+  await assertProviderBaseUrlAllowed(cfg, guardOptions)
+  return buildModel(cfg)
 }
