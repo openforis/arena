@@ -171,6 +171,7 @@ export const runAssistantTurn = async ({
       surveyId,
       // the conversation's class ('schema' for the assistant)
       dataClass: conversation.dataClass,
+      signal,
       resolve,
     })
     if (turn.engine) onEngine?.(turn.engine)

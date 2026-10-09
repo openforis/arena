@@ -35,7 +35,7 @@ export const translateLabelsWorkflow = async ({
   signal?: AbortSignal
   model?: LanguageModel
 }): Promise<AiTranslationResult> => {
-  const resolvedModel = model ?? (await resolveModel({ feature: 'translation', surveyId })).model
+  const resolvedModel = model ?? (await resolveModel({ feature: 'translation', surveyId, signal })).model
   return translateItems({
     generateText: createGatewayTextGenerator(resolvedModel),
     sourceLang,

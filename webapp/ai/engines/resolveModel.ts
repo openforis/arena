@@ -8,6 +8,7 @@ import { type AiDataClass, type AiFeatureKey, getAiFeature } from '@common/ai/fe
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 import SystemError, { StatusCodes } from '@core/systemError'
 
+import { type AiFeatureSwitches, isAiFeatureEnabledInSettings } from './featureSwitches'
 import { createGatewayEngine, type GatewayModelFactory } from './gatewayEngine'
 import { getEffectivePreferLocal, loadLocalServerConsent, saveLocalServerConsent } from './localServerConsent'
 import { selectEngine } from './selectEngine'
@@ -32,12 +33,22 @@ export type LocalServerConsentRequest = {
 
 export type LocalServerConsentAnswer = 'continue' | 'useOther' | 'cancel'
 
-export type ResolveModelParams = { feature: AiFeatureKey; surveyId?: number; dataClass?: AiDataClass }
+export type ResolveModelParams = {
+  feature: AiFeatureKey
+  surveyId?: number
+  dataClass?: AiDataClass
+  // aborting closes a pending consent dialog and rejects with an AbortError
+  signal?: AbortSignal
+}
 
 export type ResolvedModel = { model: LanguageModel; engine: AiSelectedEngine }
 
 export type ModelResolverDeps = {
   getUserUuid: () => string | null
+  // the instance switch (system config); the user's own switches come from getSettings
+  isInstanceEnabled: () => boolean
+  // the AI settings of the loaded capabilities (null: not loaded or failed to load)
+  getSettings: () => AiFeatureSwitches | null
   loadCapabilities: () => Promise<AiCapabilities>
   // survey policy within the ceilings (the ceilings alone for features without a survey); null fails closed
   getEffectivePolicy: (
@@ -47,13 +58,15 @@ export type ModelResolverDeps = {
   ) => Promise<AiPolicy | null>
   getLocalSettings: () => AiLocalServerSettings
   storage: StorageLike | null
-  requestConsent: (request: LocalServerConsentRequest) => Promise<LocalServerConsentAnswer>
+  requestConsent: (request: LocalServerConsentRequest, signal?: AbortSignal) => Promise<LocalServerConsentAnswer>
   onConsentChange: () => void
   createGatewayModel: GatewayModelFactory
   createLocalEngine: (localServer: AiLocalServerCapability) => Promise<AiEngine>
 }
 
 type Context = {
+  userUuid: string | null
+  signal?: AbortSignal
   options: AiEngineModelOptions
   capabilities: AiCapabilities
   effective: AiPolicy | null
@@ -65,6 +78,12 @@ type Context = {
  * @returns {SystemError} The error.
  */
 const consentCancelled = () => new SystemError('aiLocalServerConsentCancelled', {}, StatusCodes.CONFLICT)
+
+/**
+ * Builds the error of an aborted request (recognised by isAiAbortError).
+ * @returns {DOMException} The error.
+ */
+const aborted = () => new DOMException('The request was aborted.', 'AbortError')
 
 /**
  * Returns the address of the server the model is built from (normalized, from the capabilities).
@@ -113,7 +132,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    */
   const consentParams = (context: Context) => ({
     storage: deps.storage,
-    userUuid: deps.getUserUuid(),
+    userUuid: context.userUuid,
     surveyId: context.options.surveyId,
     baseUrl: getServerBaseUrl(context),
   })
@@ -162,13 +181,19 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    */
   const askConsent = async (context: Context, engine: AiSelectedEngine): Promise<ResolvedModel> => {
     const alternative = select(context, { preferLocal: false, withLocal: false })
-    const answer = await deps.requestConsent({
-      surveyId: context.options.surveyId,
-      baseUrl: getServerBaseUrl(context),
-      modelId: engine.model,
-      hostingClass: engine.hostingClass,
-      canUseOther: 'engine' in alternative,
-    })
+    const answer = await deps.requestConsent(
+      {
+        surveyId: context.options.surveyId,
+        baseUrl: getServerBaseUrl(context),
+        modelId: engine.model,
+        hostingClass: engine.hostingClass,
+        canUseOther: 'engine' in alternative,
+      },
+      context.signal
+    )
+    if (context.signal?.aborted) throw aborted()
+    // logged out (or another user logged in) while the dialog was open: nothing is stored for the new user
+    if (deps.getUserUuid() !== context.userUuid) throw consentCancelled()
     if (answer === 'continue') {
       storeDecision(context, 'accepted')
       return createWithLocal(context, engine)
@@ -181,11 +206,25 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
   }
 
   /**
+   * Fails closed unless the instance, the user and the server allow the feature: a local engine never reaches
+   * /api/ai/model, so the gate that route applies is applied here.
+   * @param {string} feature - Feature key.
+   * @throws {SystemError} aiFeaturesDisabled when the feature is switched off or the settings are unknown.
+   */
+  const assertFeatureEnabled = (feature: AiFeatureKey): void => {
+    if (!deps.isInstanceEnabled()) throw new SystemError('aiFeaturesDisabled', { feature }, StatusCodes.NOT_FOUND)
+    if (!isAiFeatureEnabledInSettings(deps.getSettings(), feature)) {
+      throw new SystemError('aiFeaturesDisabled', { feature }, StatusCodes.FORBIDDEN)
+    }
+  }
+
+  /**
    * Resolves the model of a request.
-   * @param {ResolveModelParams} params - Feature, survey and optional data class.
+   * @param {ResolveModelParams} params - Feature, survey, optional data class and abort signal.
    * @returns {Promise<ResolvedModel>} The model and the engine.
    */
-  return async ({ feature, surveyId, dataClass }: ResolveModelParams): Promise<ResolvedModel> => {
+  return async ({ feature, surveyId, dataClass, signal }: ResolveModelParams): Promise<ResolvedModel> => {
+    const userUuid = deps.getUserUuid()
     // an unknown feature is treated as the most sensitive class
     const options: AiEngineModelOptions = {
       feature,
@@ -193,8 +232,17 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
       surveyId,
     }
     const capabilities = await deps.loadCapabilities()
+    assertFeatureEnabled(feature)
     const effective = await deps.getEffectivePolicy(surveyId, capabilities, feature)
-    const context: Context = { options, capabilities, effective, localSettings: deps.getLocalSettings() }
+    if (signal?.aborted) throw aborted()
+    const context: Context = {
+      userUuid,
+      signal,
+      options,
+      capabilities,
+      effective,
+      localSettings: deps.getLocalSettings(),
+    }
 
     const consent = context.localSettings.enabled ? loadLocalServerConsent(consentParams(context)) : null
     const preferLocal = getEffectivePreferLocal({ settings: context.localSettings, consent })

@@ -11,6 +11,7 @@ import * as User from '@core/user/user'
 import { getConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { abortAssistantTurns, settleAssistantSaves } from '@webapp/components/ai/Assistant/assistantTurnRegistry'
 import { assistantPanelStore } from '@webapp/components/ai/Assistant/assistantPanelStore'
+import { cancelAllConsentRequests } from '@webapp/ai/engines/consentRequests'
 import { resetAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import * as UserState from '@webapp/store/user/state'
 
@@ -49,6 +50,7 @@ export const login = (email, password, twoFactorToken) =>
     if (user) {
       ApiConstants.setAuthToken(authToken)
       resetAiSettingsCache()
+      cancelAllConsentRequests()
       dispatch(resetState)
       dispatch(SystemActions.initSystem())
     } else if (twoFactorRequired) {
@@ -88,6 +90,7 @@ export const logout =
     } finally {
       // also when the logout request fails (network error, expired session): no conversation stays in the browser
       resetAiSettingsCache()
+      cancelAllConsentRequests()
       await clearAssistantData(userUuid)
     }
     dispatch(SystemActions.resetSystem())

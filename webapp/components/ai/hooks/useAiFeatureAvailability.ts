@@ -9,6 +9,7 @@ import {
   type AiEngineFeatureAvailability,
   getAiEngineFeatureAvailability,
 } from '@webapp/ai/engines/featureAvailability'
+import { type AiFeatureSwitches, isAiFeatureEnabledInSettings } from '@webapp/ai/engines/featureSwitches'
 import { getEffectivePreferLocal, loadLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
 import { getBrowserStorage } from '@webapp/ai/engines/localServerSettings'
 import { isSurveyScopedFeature, resolveEffectivePolicy } from '@webapp/ai/policy/aiFeatureAvailability'
@@ -20,11 +21,7 @@ import { useUser } from '@webapp/store/user'
 import { useAiCapabilities } from './useAiCapabilities'
 import { getAiSettingsSnapshot, useAiFeatureEnabled } from './useAiFeatureEnabled'
 
-type AiSettingsSnapshot = {
-  policyCeilings?: unknown
-  // features turned off on the server (AI_FEATURE_FLAGS, A)
-  disabledFeatures?: string[]
-}
+type AiSettingsSnapshot = AiFeatureSwitches & { policyCeilings?: unknown }
 
 /**
  * Returns whether the AI feature is hidden, usable or blocked, which engine a click would use and where its data
@@ -43,7 +40,7 @@ export const useAiFeatureAvailability = (
   const categoryEnabled = useAiFeatureEnabled(definition?.category ?? null)
   const settings = getAiSettingsSnapshot() as AiSettingsSnapshot | null
   // useAiFeatureEnabled checks the category; one feature of it may still be off on the server
-  const enabled = categoryEnabled && !(settings?.disabledFeatures ?? []).includes(feature)
+  const enabled = categoryEnabled && isAiFeatureEnabledInSettings(settings, feature)
   const surveyScoped = isSurveyScopedFeature(feature)
   const surveyId = useSurveyId()
   const { state, error } = useSurveyAiPolicy({ skip: !enabled || !surveyScoped })

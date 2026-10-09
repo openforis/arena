@@ -28,7 +28,7 @@ export const generateExpressionWorkflow = async ({
   description: string
   signal?: AbortSignal
 }): Promise<AiExpressionResult> => {
-  const resolvedModel = model ?? (await resolveModel({ feature: 'expressionGenerate', surveyId })).model
+  const resolvedModel = model ?? (await resolveModel({ feature: 'expressionGenerate', surveyId, signal })).model
   return generateExpression({
     generateText: createGatewayTextGenerator(resolvedModel),
     survey,
@@ -61,6 +61,6 @@ export const explainExpressionWorkflow = async ({
 }): Promise<void> => {
   // validated before resolving the model: an empty expression never reaches the network
   const request = buildExplainExpressionRequest({ survey, nodeDefUuid, expression, errorMessage })
-  const resolvedModel = model ?? (await resolveModel({ feature: 'expressionExplain', surveyId })).model
+  const resolvedModel = model ?? (await resolveModel({ feature: 'expressionExplain', surveyId, signal })).model
   await streamTextChunks({ model: resolvedModel, ...request, onChunk, signal })
 }

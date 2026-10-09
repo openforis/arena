@@ -13,8 +13,8 @@
  */
 import { useEffect, useReducer } from 'react'
 
-import { isAiCategoryAvailable } from '@common/ai/features'
 import * as User from '@core/user/user'
+import { isAiCategoryEnabledInSettings } from '@webapp/ai/engines/featureSwitches'
 import * as API from '@webapp/service/api'
 import { useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
@@ -123,9 +123,5 @@ export const useAiFeatureEnabled = (category) => {
 
   if (!aiFeaturesEnabledInSystemConfig) return false
   if (!cache) return false
-  return (
-    !!cache.featuresEnabled &&
-    !!cache.featureToggles?.[category] &&
-    isAiCategoryAvailable(category, cache.disabledFeatures ?? [])
-  )
+  return isAiCategoryEnabledInSettings(cache, category)
 }
