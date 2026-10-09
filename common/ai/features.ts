@@ -120,3 +120,13 @@ export const getAiFeature = (key: string): AiFeatureDef | null =>
  * @returns {boolean} Whether the feature is a gateway feature.
  */
 export const isGatewayFeature = (key: string): boolean => getAiFeature(key)?.gateway === true
+
+/**
+ * Returns true when at least one feature of the category is not disabled (UI entry points of a category whose
+ * features are all disabled by the server are hidden).
+ * @param {string} category - Feature category.
+ * @param {string[]} disabledFeatures - Feature keys disabled by the server.
+ * @returns {boolean} Whether the category can be used.
+ */
+export const isAiCategoryAvailable = (category: string, disabledFeatures: string[]): boolean =>
+  Object.values(AiFeatures).some((feature) => feature.category === category && !disabledFeatures.includes(feature.key))

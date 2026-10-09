@@ -52,7 +52,7 @@ export const AiGenerateQueryPopup = (props: Props) => {
       setBusy(false)
       onGenerated(result)
     } catch (err) {
-      setError(getAiErrorMessage({ error: err, i18n: { t: (key, params) => String(i18n.t(key, { ...params })) } }))
+      setError(getAiErrorMessage({ error: err, i18n }))
       setBusy(false)
     }
   }

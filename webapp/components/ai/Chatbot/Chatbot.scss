@@ -266,25 +266,6 @@
     animation: ai-chatbot-blink 1s infinite;
     margin-left: 2px;
   }
-
-  &__reasoning {
-    max-width: 90%;
-    font-size: 0.8rem;
-    color: var(--colorGrey700, #616161);
-
-    summary {
-      cursor: pointer;
-      user-select: none;
-    }
-
-    &-content {
-      margin-top: 0.25rem;
-      padding: 0.4rem 0.6rem;
-      background: var(--colorGrey300, #eee);
-      border-radius: 4px;
-      white-space: pre-wrap;
-    }
-  }
 }
 
 @keyframes ai-chatbot-blink {

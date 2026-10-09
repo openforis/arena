@@ -4,14 +4,13 @@ import PropTypes from 'prop-types'
 import { getLanguageLabel } from '@core/app/languages'
 import { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
 
-import * as API from '@webapp/service/api'
+import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
 import { Button, ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
 import { useI18n, useI18nT, useLang } from '@webapp/store/system'
 
 import ChatbotMessage from './ChatbotMessage'
 
 const HISTORY_KEY = 'arena.chatbot.history'
-const TITLE_KEY = 'arena.chatbot.title'
 const LANG_KEY = 'arena.chatbot.language'
 
 // Arena's resolved language can be region-qualified (e.g. `en-US`) and is
@@ -48,17 +47,8 @@ const ChatbotPanel = ({ onClose }) => {
 
   // The full conversation. Stored in the v5 shape (`parts: [{ type:
   // 'text', text }]`) because that's exactly what we POST to the server,
-  // saving an in/out conversion. Reasoning is held alongside per index in
-  // a separate map (it doesn't round-trip to AIDA).
+  // saving an in/out conversion.
   const [messages, setMessages] = useState(loadHistory)
-  const [reasoningByIdx, setReasoningByIdx] = useState({})
-  const [title, setTitle] = useState(() => {
-    try {
-      return sessionStorage.getItem(TITLE_KEY) || ''
-    } catch {
-      return ''
-    }
-  })
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
   const [error, setError] = useState(null)
@@ -87,14 +77,6 @@ const ChatbotPanel = ({ onClose }) => {
 
   useEffect(() => {
     try {
-      if (title) sessionStorage.setItem(TITLE_KEY, title)
-    } catch {
-      // ignore
-    }
-  }, [title])
-
-  useEffect(() => {
-    try {
       sessionStorage.setItem(LANG_KEY, language)
     } catch {
       // ignore
@@ -104,7 +86,7 @@ const ChatbotPanel = ({ onClose }) => {
   // Auto-scroll on new content.
   useEffect(() => {
     if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight
-  }, [messages, reasoningByIdx])
+  }, [messages])
 
   // Cancel any in-flight stream on unmount.
   useEffect(
@@ -133,7 +115,17 @@ const ChatbotPanel = ({ onClose }) => {
     setInput('')
     setStreaming(true)
 
-    cancelRef.current = API.aiChatbot.streamConversation({
+    // drops the assistant placeholder when the answer produced no text
+    const dropEmptyPlaceholder = () =>
+      setMessages((prev) => {
+        const current = prev[assistantIdx]
+        if (current && stripText(current).length === 0) {
+          return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
+        }
+        return prev
+      })
+
+    cancelRef.current = AiWorkflows.streamChat({
       messages: outboundMessages,
       language,
       onChunk: (chunk) => {
@@ -141,54 +133,23 @@ const ChatbotPanel = ({ onClose }) => {
           const updated = prev.slice()
           const current = updated[assistantIdx]
           if (!current) return prev
-          updated[assistantIdx] = {
-            ...current,
-            parts: [{ type: 'text', text: stripText(current) + chunk }],
-          }
+          updated[assistantIdx] = { ...current, parts: [{ type: 'text', text: stripText(current) + chunk }] }
           return updated
         })
       },
-      onReasoning: (chunk) => {
-        setReasoningByIdx((prev) => ({
-          ...prev,
-          [assistantIdx]: (prev[assistantIdx] || '') + chunk,
-        }))
-      },
-      onTitle: (next) => setTitle(next),
       onDone: () => {
-        // Drop the placeholder if the stream produced no text at all, instead of persisting it.
-        setMessages((prev) => {
-          const current = prev[assistantIdx]
-          if (current && stripText(current).length === 0) {
-            setReasoningByIdx((prevReasoning) => {
-              const { [assistantIdx]: _removed, ...rest } = prevReasoning
-              return rest
-            })
-            return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
-          }
-          return prev
-        })
+        dropEmptyPlaceholder()
         setStreaming(false)
         cancelRef.current = null
       },
       onError: (err) => {
-        setMessages((prev) => {
-          const current = prev[assistantIdx]
-          if (current && stripText(current).length === 0) {
-            setReasoningByIdx((prevReasoning) => {
-              const { [assistantIdx]: _removed, ...rest } = prevReasoning
-              return rest
-            })
-            return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
-          }
-          return prev
-        })
-        setError(err?.message || 'unknown')
+        dropEmptyPlaceholder()
+        setError(getAiErrorMessage({ error: err, i18n }))
         setStreaming(false)
         cancelRef.current = null
       },
     })
-  }, [input, language, messages, streaming, stripText])
+  }, [i18n, input, language, messages, streaming, stripText])
 
   const onStop = useCallback(() => {
     cancelRef.current?.()
@@ -200,13 +161,10 @@ const ChatbotPanel = ({ onClose }) => {
     cancelRef.current?.()
     cancelRef.current = null
     setMessages([])
-    setReasoningByIdx({})
-    setTitle('')
     setStreaming(false)
     setError(null)
     try {
       sessionStorage.removeItem(HISTORY_KEY)
-      sessionStorage.removeItem(TITLE_KEY)
     } catch {
       // ignore
     }
@@ -234,7 +192,7 @@ const ChatbotPanel = ({ onClose }) => {
   return (
     <div className="ai-chatbot-panel" role="dialog" aria-modal="false">
       <div className="ai-chatbot-panel__header">
-        <div className="ai-chatbot-panel__title">{title || i18n.t('aiChatbot.title')}</div>
+        <div className="ai-chatbot-panel__title">{i18n.t('aiChatbot.title')}</div>
         <div className="ai-chatbot-panel__header-actions">
           <ButtonMenu
             className="btn-s"
@@ -270,7 +228,6 @@ const ChatbotPanel = ({ onClose }) => {
               key={idx}
               role={m.role}
               text={stripText(m)}
-              reasoning={reasoningByIdx[idx]}
               streaming={streaming && idx === messages.length - 1 && m.role === 'assistant'}
             />
           ))

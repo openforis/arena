@@ -6,12 +6,13 @@ import type { User } from '@openforis/arena-core'
 
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
-import { getAiFeature } from '@common/ai/features'
+import { AiFeatures, getAiFeature } from '@common/ai/features'
 
 import { areFeaturesEnabledForUser, isCategoryEnabledForUser } from './aiUserPrefs'
 
 type GateEnv = { aiFeaturesEnabled: boolean; aiFeatureFlags: unknown }
 
+/** Returns true when AI_FEATURE_FLAGS explicitly turns the feature off. */
 const isDisabledByFlag = (flags: unknown, feature: string): boolean =>
   !!flags && typeof flags === 'object' && Object.hasOwn(flags, feature) && !flags[feature]
 
@@ -38,3 +39,11 @@ export const assertFeatureEnabled = (feature: string, user: User | null, env: Ga
     throw new SystemError('aiFeatureDisabled', { feature }, StatusCodes.FORBIDDEN)
   }
 }
+
+/**
+ * Returns the keys of the features disabled by AI_FEATURE_FLAGS.
+ * @param {GateEnv} [env] - Environment (defaults to ENV).
+ * @returns {string[]} Disabled feature keys.
+ */
+export const getDisabledFeatureKeys = (env: GateEnv = ENV): string[] =>
+  Object.keys(AiFeatures).filter((key) => isDisabledByFlag(env.aiFeatureFlags, key))

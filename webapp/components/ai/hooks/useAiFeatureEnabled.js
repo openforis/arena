@@ -8,10 +8,12 @@
  *
  * When the server reports AI features disabled at the admin level (404 or
  * `aiFeaturesDisabled`), the cache is set to a "force off" state so every
- * category returns false.
+ * category returns false. Entry points also hide when the server disables every
+ * feature of the category (`AI_FEATURE_FLAGS`).
  */
 import { useEffect, useReducer } from 'react'
 
+import { isAiCategoryAvailable } from '@common/ai/features'
 import * as API from '@webapp/service/api'
 import { useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
 
@@ -28,13 +30,15 @@ const fetchOnce = () => {
     try {
       cache = await API.aiSettings.fetchSettings()
     } catch (error) {
-      const code = error?.response?.data?.key ?? error?.response?.data?.error
-      if (code === 'aiFeaturesDisabled' || error?.response?.status === 404) {
-        cache = { featuresEnabled: false, featureToggles: {} }
+      const data = error?.response?.data
+      const code = data?.key ?? data?.error
+      const status = error?.response?.status
+      if (code === 'aiFeaturesDisabled' || status === 404 || status === 403) {
+        cache = { featuresEnabled: false, featureToggles: {}, disabledFeatures: [] }
       } else {
         // Network or other error: leave cache as the safest fallback so
         // we hide AI buttons rather than flashing them in.
-        cache = { featuresEnabled: false, featureToggles: {}, _fetchError: true }
+        cache = { featuresEnabled: false, featureToggles: {}, disabledFeatures: [], _fetchError: true }
       }
     } finally {
       inflight = null
@@ -55,19 +59,6 @@ export const invalidateAiSettingsCache = () => {
   cache = null
   inflight = null
   fetchOnce()
-}
-
-/**
- * Subscribe to cache-invalidation / re-fetch events. Useful for components
- * that don't read the hook's value but maintain their own AI-status state
- * (e.g. the chatbot FAB, which probes a separate status endpoint).
- * @param {Function} cb - Called whenever the cache changes (after a fetch
- *   completes, including after `invalidateAiSettingsCache`).
- * @returns {Function} Unsubscribe function.
- */
-export const onAiSettingsInvalidated = (cb) => {
-  listeners.add(cb)
-  return () => listeners.delete(cb)
 }
 
 /**
@@ -96,5 +87,9 @@ export const useAiFeatureEnabled = (category) => {
 
   if (!aiFeaturesEnabledInSystemConfig) return false
   if (!cache) return false
-  return !!cache.featuresEnabled && !!cache.featureToggles?.[category]
+  return (
+    !!cache.featuresEnabled &&
+    !!cache.featureToggles?.[category] &&
+    isAiCategoryAvailable(category, cache.disabledFeatures ?? [])
+  )
 }
