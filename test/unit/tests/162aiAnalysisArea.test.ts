@@ -2,10 +2,10 @@ import {
   getAnalysisAreaStatus,
   getProposedQueryId,
   isAnalysisRoute,
-  shouldSelectAnalysisArea,
   shouldShowRecordDataNotice,
 } from '@webapp/components/ai/Assistant/analysis/analysisArea'
 
+import { pickArea } from '@webapp/components/ai/Assistant/assistantAreas'
 import { createTurnState } from '@webapp/ai/agent/turnState'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
@@ -53,14 +53,27 @@ describe('area status', () => {
     ).toEqual({ area: 'analysis', status: 'unavailable', reasonKeys: ['aiAssistant.unavailable.policy'] })
   })
 
-  test('selected automatically on analysis routes only when available and not overridden', () => {
-    const pathname = '/app/data/explorer/'
-    expect(shouldSelectAnalysisArea({ pathname, status: 'available', userSelectedArea: null })).toBe(true)
-    expect(shouldSelectAnalysisArea({ pathname, status: 'unavailable', userSelectedArea: null })).toBe(false)
-    expect(shouldSelectAnalysisArea({ pathname, status: 'available', userSelectedArea: 'design' })).toBe(false)
-    expect(
-      shouldSelectAnalysisArea({ pathname: '/app/data/records/', status: 'available', userSelectedArea: null })
-    ).toBe(false)
+  test('pickArea prefers analysis on analysis routes only where the preferred area applies', () => {
+    const statuses: any[] = ['design', 'analysis', 'help'].map((area) => ({
+      area,
+      status: 'available',
+      reasonKeys: [],
+    }))
+    const base = { statuses, module: 'data', analysisRoute: true }
+    // (a) panel closed
+    expect(pickArea({ ...base, current: null, panelOpen: false, userSelectedArea: null })).toBe('analysis')
+    // (b) panel open on an available area: kept
+    expect(pickArea({ ...base, current: 'design', panelOpen: true, userSelectedArea: null })).toBe('design')
+    // (c) the user's tab is kept
+    expect(pickArea({ ...base, current: 'help', panelOpen: true, userSelectedArea: 'help' })).toBe('help')
+    // not an analysis route, or analysis unavailable
+    expect(pickArea({ ...base, analysisRoute: false, current: null, panelOpen: false, userSelectedArea: null })).toBe(
+      'help'
+    )
+    const unavailable = statuses.map((item) => (item.area === 'analysis' ? { ...item, status: 'unavailable' } : item))
+    expect(pickArea({ ...base, statuses: unavailable, current: null, panelOpen: false, userSelectedArea: null })).toBe(
+      'help'
+    )
   })
 })
 
@@ -73,6 +86,12 @@ describe('record data notice (review focus 3)', () => {
         dataAvailability: { status: 'policyBlocked' } as any,
       })
     ).toBe(true)
+  })
+
+  test('not shown while the availability is not known yet (disabled)', () => {
+    expect(
+      shouldShowRecordDataNotice({ conversationDataClass: 'data', dataAvailability: { status: 'disabled' } as any })
+    ).toBe(false)
   })
 
   test('not shown while a data engine is available, nor for schema conversations', () => {

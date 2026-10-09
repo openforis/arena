@@ -125,6 +125,7 @@ export const isAssistantShown = (statuses: AssistantAreaStatus[]): boolean =>
  * @param {boolean} params.panelOpen - The panel is open.
  * @param {AssistantArea|null} params.userSelectedArea - Tab the user clicked (until the panel closes).
  * @param {string|null} params.module - Current app module.
+ * @param {boolean} [params.analysisRoute] - The route is the Explorer or the dashboard (Analysis is preferred there).
  * @returns {AssistantArea|null} The area; null when every area is hidden.
  */
 export const pickArea = ({
@@ -133,12 +134,14 @@ export const pickArea = ({
   panelOpen,
   userSelectedArea,
   module,
+  analysisRoute = false,
 }: {
   statuses: AssistantAreaStatus[]
   current: AssistantArea | null
   panelOpen: boolean
   userSelectedArea: AssistantArea | null
   module: string | null
+  analysisRoute?: boolean
 }): AssistantArea | null => {
   const isAvailable = (area: AssistantArea | null) =>
     area !== null && statuses.some((status) => status.area === area && status.status === 'available')
@@ -147,7 +150,8 @@ export const pickArea = ({
   // an unavailable tab the user clicked stays selected: it shows why
   if (isShown(userSelectedArea)) return userSelectedArea
   if (panelOpen && isAvailable(current)) return current
-  const preferred: AssistantArea = module === 'designer' ? 'design' : 'help'
+  const moduleArea: AssistantArea = module === 'designer' ? 'design' : 'help'
+  const preferred: AssistantArea = analysisRoute && isAvailable('analysis') ? 'analysis' : moduleArea
   if (isAvailable(preferred)) return preferred
   const firstAvailable = statuses.find((status) => status.status === 'available')
   return (firstAvailable ?? statuses.find((status) => status.status !== 'hidden'))?.area ?? null

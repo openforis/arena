@@ -17,6 +17,7 @@ import { TestId } from '@webapp/utils/testId'
 import { AssistantMarkdown } from './AssistantMarkdown'
 import { getProposedChangeSetId, getToolRowLabel } from './assistantPanelModel'
 import { getProposedQueryId } from './analysis/analysisArea'
+import { useRecordDataNotice } from './analysis/useAnalysisArea'
 import { QueryCard } from './analysis/QueryCard'
 import { ChangeSetCard } from './ChangeSetCard'
 import type { AssistantConversationApi } from './useAssistantConversation'
@@ -109,6 +110,8 @@ const AnswerFooter = ({
   api: AssistantConversationApi
 }) => {
   const t = useI18nT({ unescapeHtml: true })
+  // the record-data notice replaces the composer: the conversation can't continue, so no Retry
+  const recordDataNotice = useRecordDataNotice(api.conversation)
   if (message.status === 'stopped') return <p className="ai-assistant-message__stopped">{t('aiAssistant.stopped')}</p>
   if (message.status !== 'error') return null
   // only the key is stored with the message: engine errors get their own Retry / Open settings buttons
@@ -117,8 +120,10 @@ const AnswerFooter = ({
   return (
     <div className="ai-assistant-message__error" role="alert">
       <span>{t(`appErrors:${message.errorKey ?? 'aiProviderUnavailable'}`)}</span>
-      {isLast && <AiEngineErrorActions disabled={api.busy} error={engineError} onRetry={api.retry} />}
-      {isLast && !hasEngineRetry && (
+      {isLast && !recordDataNotice && (
+        <AiEngineErrorActions disabled={api.busy} error={engineError} onRetry={api.retry} />
+      )}
+      {isLast && !recordDataNotice && !hasEngineRetry && (
         <Button
           disabled={api.busy}
           label="aiAssistant.retry"
