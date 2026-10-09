@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { AiWorkflows, getAiErrorKey, getAiErrorMessage } from '@webapp/ai/workflows'
+import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Modal, ModalBody } from '@webapp/components/modal'
 import Markdown from '@webapp/components/markdown'
 import { useI18n, useI18nT } from '@webapp/store/system'
@@ -64,6 +65,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
   return (
     <Modal className="ai-explain-panel" title="aiExpression.explain.title" showCloseButton onClose={onCancel}>
       <ModalBody>
+        <AiFeatureDataLocationBadge feature="expressionExplain" />
         <div className="ai-explain-panel__expression">{expression}</div>
 
         <div className={`ai-explain-panel__body${done ? '' : ' ai-explain-panel__cursor'}`}>

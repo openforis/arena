@@ -5,6 +5,7 @@ import { getLanguageLabel } from '@core/app/languages'
 import { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
 
 import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
+import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Button, ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
 import { useI18n, useI18nT, useLang } from '@webapp/store/system'
 
@@ -193,6 +194,7 @@ const ChatbotPanel = ({ onClose }) => {
     <div className="ai-chatbot-panel" role="dialog" aria-modal="false">
       <div className="ai-chatbot-panel__header">
         <div className="ai-chatbot-panel__title">{i18n.t('aiChatbot.title')}</div>
+        <AiFeatureDataLocationBadge feature="chatbot" compact />
         <div className="ai-chatbot-panel__header-actions">
           <ButtonMenu
             className="btn-s"

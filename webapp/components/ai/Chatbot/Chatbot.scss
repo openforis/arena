@@ -19,10 +19,29 @@
     filter: brightness(1.1);
   }
 
+  // a disabled native button can swallow pointer events: let the policy tooltip wrapper receive the hover instead
+  &:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.5;
+    filter: none;
+  }
+
   &__icon::before {
     content: '?';
     font-weight: 700;
   }
+}
+
+// the FAB is fixed, so its tooltip wrapper would be an empty inline box: give it the FAB's box
+.ai-policy-blocked:has(> .ai-chatbot-fab:disabled) {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  cursor: not-allowed;
 }
 
 .ai-chatbot-panel {

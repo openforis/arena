@@ -16,7 +16,9 @@ import { Button } from '../buttons'
 import AiExpressionPopup from '@webapp/components/ai/AiExpressionPopup'
 import AiExplainPanel from '@webapp/components/ai/AiExplainPanel'
 import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
-import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
+import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 
 const ExpressionEditor = (props) => {
   const {
@@ -41,7 +43,9 @@ const ExpressionEditor = (props) => {
 
   const i18n = useI18n()
   const nodeDefCurrent = useNodeDefByUuid(nodeDefUuidCurrent)
-  const aiExpressionsEnabled = useAiFeatureEnabled('expressions')
+  const aiGenerate = useAiFeatureAvailability('expressionGenerate')
+  const aiExplain = useAiFeatureAvailability('expressionExplain')
+  const aiGenerateShown = isAiFeatureShown(aiGenerate) && !readOnly && Boolean(nodeDefUuidCurrent)
 
   const [edit, setEdit] = useState(placeholder)
   const [aiOpen, setAiOpen] = useState(false)
@@ -111,7 +115,7 @@ const ExpressionEditor = (props) => {
           isBoolean={isBoolean}
           onClose={handleClose}
           onChange={applyChange}
-          onGenerateWithAi={aiExpressionsEnabled && !readOnly && nodeDefUuidCurrent ? onOpenAiFromEditor : null}
+          onGenerateWithAi={aiGenerateShown && isAiFeatureUsable(aiGenerate) ? onOpenAiFromEditor : null}
           types={types}
           header={popupHeader}
         />
@@ -131,18 +135,27 @@ const ExpressionEditor = (props) => {
               testId={TestId.expressionEditor.editBtn(qualifier, index)}
             />
           )}
-          {aiExpressionsEnabled && !readOnly && nodeDefUuidCurrent && (
-            <ButtonAiGenerateExpression id={`${idPrefix}-ai-btn`} onClick={() => setAiOpen(true)} />
+          {aiGenerateShown && (
+            <AiPolicyBlockedTooltip availability={aiGenerate}>
+              <ButtonAiGenerateExpression
+                id={`${idPrefix}-ai-btn`}
+                disabled={!isAiFeatureUsable(aiGenerate)}
+                onClick={() => setAiOpen(true)}
+              />
+            </AiPolicyBlockedTooltip>
           )}
-          {aiExpressionsEnabled && !A.isEmpty(query) && nodeDefUuidCurrent && (
-            <Button
-              className="btn-s btn-ai-explain"
-              iconClassName="icon-question icon-14px"
-              id={`${idPrefix}-ai-explain-btn`}
-              onClick={() => setExplainOpen(true)}
-              testId={TestId.expressionEditor.explainBtn(qualifier, index)}
-              title="aiExpression.explain.title"
-            />
+          {isAiFeatureShown(aiExplain) && !A.isEmpty(query) && nodeDefUuidCurrent && (
+            <AiPolicyBlockedTooltip availability={aiExplain}>
+              <Button
+                className="btn-s btn-ai-explain"
+                disabled={!isAiFeatureUsable(aiExplain)}
+                iconClassName="icon-question icon-14px"
+                id={`${idPrefix}-ai-explain-btn`}
+                onClick={() => setExplainOpen(true)}
+                testId={TestId.expressionEditor.explainBtn(qualifier, index)}
+                title="aiExpression.explain.title"
+              />
+            </AiPolicyBlockedTooltip>
           )}
         </div>
       )}

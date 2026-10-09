@@ -23,7 +23,9 @@ import { TestId } from '@webapp/utils/testId'
 
 import AiExpressionPopup from '@webapp/components/ai/AiExpressionPopup'
 import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
-import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
+import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 
 import ExpressionProp from './ExpressionProp'
 
@@ -101,7 +103,7 @@ const ExpressionsProp = (props) => {
 
   const dispatch = useDispatch()
   const confirm = useConfirmAsync()
-  const aiExpressionsEnabled = useAiFeatureEnabled('expressions')
+  const aiGenerate = useAiFeatureAvailability('expressionGenerate')
 
   const [valueType, setValueType] = useState(determineValueType?.())
   const [expressionPlaceholder, setExpressionPlaceholder] = useState(null)
@@ -271,11 +273,14 @@ const ExpressionsProp = (props) => {
             {!readOnly && (multiple || uiValuesIsEmpty) && (
               <div className="node-def-edit__expressions-actions">
                 <ButtonNew onClick={onAddPlaceholder} testId={TestId.expressionEditor.newBtn(qualifier)} />
-                {aiExpressionsEnabled && nodeDefUuidCurrent && (
-                  <ButtonAiGenerateExpression
-                    onClick={() => setAiOpen(true)}
-                    testId={TestId.expressionEditor.aiGenerateBtn(qualifier)}
-                  />
+                {isAiFeatureShown(aiGenerate) && nodeDefUuidCurrent && (
+                  <AiPolicyBlockedTooltip availability={aiGenerate}>
+                    <ButtonAiGenerateExpression
+                      disabled={!isAiFeatureUsable(aiGenerate)}
+                      onClick={() => setAiOpen(true)}
+                      testId={TestId.expressionEditor.aiGenerateBtn(qualifier)}
+                    />
+                  </AiPolicyBlockedTooltip>
                 )}
               </div>
             )}

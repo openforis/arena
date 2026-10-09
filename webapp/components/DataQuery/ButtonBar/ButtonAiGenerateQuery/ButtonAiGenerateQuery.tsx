@@ -5,7 +5,9 @@ import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 import { Query } from '@common/model/query'
 
 import { Button } from '@webapp/components/buttons'
-import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
+import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import * as ExpressionParser from '@webapp/components/expression/expressionParser'
 import { useNotifyInfo } from '@webapp/components/hooks'
 import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
@@ -26,7 +28,7 @@ export const ButtonAiGenerateQuery = (props: Props) => {
   const { disabled = false, state, Actions } = props
 
   const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
-  const enabled = useAiFeatureEnabled('dataQuery')
+  const availability = useAiFeatureAvailability('dataQueryGenerate')
   const query = DataExplorerSelectors.useQuery()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
   const notifyInfo = useNotifyInfo()
@@ -63,19 +65,21 @@ export const ButtonAiGenerateQuery = (props: Props) => {
     [applyGeneratedQuery, dispatch, query]
   )
 
-  if (!enabled) return null
+  if (!isAiFeatureShown(availability)) return null
 
   return (
     <>
-      <Button
-        className="btn-s btn-ai"
-        disabled={disabled}
-        iconClassName="icon-magic-wand icon-14px"
-        label="dataView:dataQuery.ai.button"
-        onClick={Actions.togglePanelAi}
-        title="dataView:dataQuery.ai.buttonTitle"
-        variant="outlined"
-      />
+      <AiPolicyBlockedTooltip availability={availability}>
+        <Button
+          className="btn-s btn-ai"
+          disabled={disabled || !isAiFeatureUsable(availability)}
+          iconClassName="icon-magic-wand icon-14px"
+          label="dataView:dataQuery.ai.button"
+          onClick={Actions.togglePanelAi}
+          title="dataView:dataQuery.ai.buttonTitle"
+          variant="outlined"
+        />
+      </AiPolicyBlockedTooltip>
       {State.isPanelAiShown(state) && <AiGenerateQueryPopup onClose={Actions.closePanels} onGenerated={onGenerated} />}
     </>
   )

@@ -58,7 +58,7 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
 
   return (
     <TooltipNew renderTitle={renderTitle}>
-      {/* hover target: a disabled MUI button has pointer-events: none */}
+      {/* hover target: a disabled button (MUI or native, e.g. the chat FAB) does not reliably receive hover itself */}
       <span className="ai-policy-blocked" data-testid={TestId.ai.policyBlocked}>
         {children}
       </span>

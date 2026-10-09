@@ -4,6 +4,7 @@ import './AiGenerateQueryPopup.scss'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { AiWorkflows, getAiErrorMessage, type AiDataQueryGenerateResult } from '@webapp/ai/workflows'
+import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/store/system'
@@ -60,6 +61,7 @@ export const AiGenerateQueryPopup = (props: Props) => {
   return (
     <Modal className="ai-generate-query-popup" title="dataView:dataQuery.ai.title" showCloseButton onClose={onClose}>
       <ModalBody>
+        <AiFeatureDataLocationBadge feature="dataQueryGenerate" />
         <div className="ai-generate-query-popup__hint">{i18n.t('dataView:dataQuery.ai.hint')}</div>
 
         <textarea

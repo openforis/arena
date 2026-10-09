@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 
 import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
+import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Modal, ModalBody } from '@webapp/components/modal'
 import Markdown from '@webapp/components/markdown'
 import { useI18n, useI18nT } from '@webapp/store/system'
@@ -70,6 +71,7 @@ const AiActivityLogSummaryModal = ({ onClose }) => {
   return (
     <Modal className="ai-activity-log-summary-modal" title="aiActivityLog.title" showCloseButton onClose={onCancel}>
       <ModalBody>
+        <AiFeatureDataLocationBadge feature="activityLogSummary" />
         <div className={`ai-activity-log-summary-modal__body${done ? '' : ' ai-activity-log-summary-modal__cursor'}`}>
           {bodyContent}
         </div>
