@@ -9,6 +9,8 @@ import type { AiDataClass } from '@common/ai/features'
 
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
 
+import type { AnalysisQueryStore } from './analysis/queryStore'
+
 export type AiToolArea = 'design' | 'help' | 'analysis' | 'cleaning'
 
 export type AiToolEffect = 'read' | 'propose'
@@ -37,6 +39,8 @@ export type AiToolContext = {
   t: AiTranslate
   // a propose tool hands its validated change set to the conversation here (never persisted by the tool)
   onChangeSet: (changeSet: ChangeSet) => void
+  // analysis area: queries proposed in the current conversation (D2)
+  analysisQueries?: AnalysisQueryStore
 }
 
 export type AiTool<I = any, O = unknown> = {
