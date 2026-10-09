@@ -1,5 +1,6 @@
 import React from 'react'
 
+import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import type {
   AssistantMessage,
@@ -15,10 +16,13 @@ import { TestId } from '@webapp/utils/testId'
 
 import { AssistantMarkdown } from './AssistantMarkdown'
 import { getProposedChangeSetId, getToolRowLabel } from './assistantPanelModel'
+import { getProposedQueryId } from './analysis/analysisArea'
+import { QueryCard } from './analysis/QueryCard'
 import { ChangeSetCard } from './ChangeSetCard'
 import type { AssistantConversationApi } from './useAssistantConversation'
 
 type ChangeSets = Record<string, ChangeSetCardState>
+type Queries = Record<string, AnalysisQueryEntry>
 
 /**
  * One tool row. A call still "running" in an answer that is no longer streaming was interrupted (stopped, failed or
@@ -48,6 +52,7 @@ const ToolRow = ({ part, interrupted }: { part: ConversationToolPart; interrupte
  * @param {object} props - Props.
  * @param {AssistantMessagePart} props.part - Part.
  * @param {ChangeSets} props.changeSets - Cards of the conversation.
+ * @param {object} props.queries - Queries of the conversation.
  * @param {boolean} props.streaming - The answer is still streaming.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @returns {React.ReactElement} The part.
@@ -55,17 +60,21 @@ const ToolRow = ({ part, interrupted }: { part: ConversationToolPart; interrupte
 const AnswerPart = ({
   part,
   changeSets,
+  queries,
   streaming,
   api,
 }: {
   part: AssistantMessagePart
   changeSets: ChangeSets
+  queries: Queries
   streaming: boolean
   api: AssistantConversationApi
 }) => {
   if (part.type === 'text') return <AssistantMarkdown text={part.text} />
   const changeSetId = getProposedChangeSetId(part)
   const cardState = changeSetId ? changeSets[changeSetId] : undefined
+  const queryId = getProposedQueryId({ toolName: part.toolName, output: part.output })
+  const queryEntry = queryId ? (queries[queryId] ?? null) : undefined
   return (
     <>
       <ToolRow interrupted={part.state === 'running' && !streaming} part={part} />
@@ -77,6 +86,7 @@ const AnswerPart = ({
           onDiscard={() => api.discard(cardState.changeSet.id)}
         />
       )}
+      {queryEntry !== undefined && <QueryCard entry={queryEntry} />}
     </>
   )
 }
@@ -127,6 +137,7 @@ const AnswerFooter = ({
  * @param {object} props - Props.
  * @param {ConversationMessage} props.message - Message.
  * @param {object} props.changeSets - Cards of the conversation.
+ * @param {object} props.queries - Queries of the conversation.
  * @param {boolean} props.isLast - Last message (Retry).
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @returns {React.ReactElement|null} The message.
@@ -134,11 +145,13 @@ const AnswerFooter = ({
 export const AssistantMessageView = ({
   message,
   changeSets,
+  queries,
   isLast,
   api,
 }: {
   message: ConversationMessage
   changeSets: ChangeSets
+  queries: Queries
   isLast: boolean
   api: AssistantConversationApi
 }) => {
@@ -160,6 +173,7 @@ export const AssistantMessageView = ({
         <AnswerPart
           api={api}
           changeSets={changeSets}
+          queries={queries}
           key={part.type === 'tool' ? part.toolCallId : `text-${index}`}
           part={part}
           streaming={message.status === 'streaming'}

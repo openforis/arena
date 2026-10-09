@@ -276,3 +276,15 @@
     color: var(--colorGrey600);
   }
 }
+
+.ai-record-data-notice {
+  border-top: 1px solid var(--greyBorder);
+  padding: 0.5rem 0.75rem;
+  color: var(--colorGrey700);
+}
+
+.ai-record-data-shared {
+  font-size: 0.75rem;
+  color: var(--colorGrey700);
+  margin-left: 0.5rem;
+}

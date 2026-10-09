@@ -4,6 +4,7 @@
 import { getMaxAiDataClass, type AiDataClass } from '@common/ai/features'
 import { uuidv4 } from '@core/uuid'
 
+import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import { toConversationTitle } from '@webapp/ai/conversations/conversationModel'
 import type {
@@ -20,6 +21,7 @@ export type TurnState = {
   endTool: (result: { toolCallId: string; output: unknown }) => void
   addChangeSet: (changeSet: ChangeSet) => void
   escalateDataClass: (dataClass: AiDataClass) => void
+  setQueries: (queries: Record<string, AnalysisQueryEntry>) => void
   finish: (status: AssistantMessageStatus, errorKey?: string) => void
 }
 
@@ -116,6 +118,7 @@ export const createTurnState = ({
     escalateDataClass: (dataClass) => {
       if (getMaxAiDataClass(current.dataClass, dataClass) !== current.dataClass) set({ ...current, dataClass })
     },
+    setQueries: (queries) => set({ ...current, queries }),
     finish: (status, errorKey) =>
       updateAnswer((message) => (errorKey ? { ...message, status, errorKey } : { ...message, status })),
   }

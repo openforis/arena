@@ -8,8 +8,17 @@ import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import type { AssistantArea } from './assistantAreas'
+import { RecordDataNotice } from './analysis/RecordDataNotice'
+import { useRecordDataNotice } from './analysis/useAnalysisArea'
 import { AssistantMessageView } from './AssistantMessage'
 import type { AssistantConversationApi } from './useAssistantConversation'
+
+// D3 adds cleaning
+const areaEmptyKeys: Record<AssistantArea, string> = {
+  design: 'aiAssistant.emptyDesign',
+  analysis: 'aiAnalysis.empty',
+  help: 'aiAssistant.emptyHelp',
+}
 
 /**
  * Messages and composer of the current conversation.
@@ -25,6 +34,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
   const { conversation, busy, applying, engineNotice } = api
   const messages = conversation?.messages ?? []
   const lastId = messages.at(-1)?.id
+  const recordDataNotice = useRecordDataNotice(conversation)
 
   useEffect(() => {
     const list = listRef.current
@@ -61,11 +71,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
         </div>
       )}
       <div aria-live="polite" className="ai-assistant-panel__messages" ref={listRef}>
-        {messages.length === 0 && (
-          <p className="ai-assistant-panel__empty">
-            {t(area === 'design' ? 'aiAssistant.emptyDesign' : 'aiAssistant.emptyHelp')}
-          </p>
-        )}
+        {messages.length === 0 && <p className="ai-assistant-panel__empty">{t(areaEmptyKeys[area])}</p>}
         {messages.map((message) => (
           <AssistantMessageView
             api={api}
@@ -73,6 +79,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
             isLast={message.id === lastId}
             key={message.id}
             message={message}
+            queries={conversation?.queries ?? {}}
           />
         ))}
       </div>
@@ -81,29 +88,33 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
           {t('aiEngine.nowUsing', { location: getAiDataLocationText({ location: engineNotice, t }) })}
         </div>
       )}
-      <div className="ai-assistant-panel__composer">
-        <textarea
-          aria-label={t('aiAssistant.placeholder')}
-          data-testid={TestId.aiAssistant.input}
-          maxLength={AiLimits.assistantMessageMaxChars}
-          onChange={(event) => setInput(event.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder={t('aiAssistant.placeholder')}
-          rows={3}
-          value={input}
-        />
-        {busy ? (
-          <Button label="aiAssistant.stop" onClick={api.stop} testId={TestId.aiAssistant.stopBtn} />
-        ) : (
-          <Button
-            disabled={!input.trim() || applying}
-            label="aiAssistant.send"
-            onClick={onSend}
-            primary
-            testId={TestId.aiAssistant.sendBtn}
+      {recordDataNotice ? (
+        <RecordDataNotice onNewConversation={api.newConversation} />
+      ) : (
+        <div className="ai-assistant-panel__composer">
+          <textarea
+            aria-label={t('aiAssistant.placeholder')}
+            data-testid={TestId.aiAssistant.input}
+            maxLength={AiLimits.assistantMessageMaxChars}
+            onChange={(event) => setInput(event.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder={t('aiAssistant.placeholder')}
+            rows={3}
+            value={input}
           />
-        )}
-      </div>
+          {busy ? (
+            <Button label="aiAssistant.stop" onClick={api.stop} testId={TestId.aiAssistant.stopBtn} />
+          ) : (
+            <Button
+              disabled={!input.trim() || applying}
+              label="aiAssistant.send"
+              onClick={onSend}
+              primary
+              testId={TestId.aiAssistant.sendBtn}
+            />
+          )}
+        </div>
+      )}
     </>
   )
 }
