@@ -72,6 +72,19 @@ describe('sanitizeCall', () => {
     })
   })
 
+  test('drops extra keys on messages and on parts', () => {
+    const dirty = [
+      { role: 'system', content: 'Be brief.', providerOptions: { openai: { store: true } }, extra: 1 },
+      {
+        role: 'user',
+        content: [{ type: 'text', text: 'Hi', providerOptions: { openai: { store: true } }, extra: 2 }],
+        providerOptions: { openai: { store: true } },
+        extra: 3,
+      },
+    ]
+    expect(sanitizeCall({ prompt: dirty }, limits).prompt).toEqual(prompt)
+  })
+
   test('caps maxOutputTokens and sets it when missing', () => {
     expect(sanitizeCall({ prompt, maxOutputTokens: 999999 }, limits).maxOutputTokens).toBe(1000)
     expect(sanitizeCall({ prompt }, limits).maxOutputTokens).toBe(1000)
