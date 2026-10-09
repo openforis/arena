@@ -95,7 +95,8 @@ export const runTool = async (tool: AiTool, input: unknown, ctx: AiToolContext):
  * @returns {object} The JSON schema.
  */
 const toToolJsonSchema = (tool: AiTool): Record<string, unknown> => {
-  const { $schema, ...schema } = z.toJSONSchema(tool.inputSchema) as Record<string, unknown>
+  const schema = { ...(z.toJSONSchema(tool.inputSchema) as Record<string, unknown>) }
+  delete schema.$schema
   return schema
 }
 
