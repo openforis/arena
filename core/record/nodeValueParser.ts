@@ -9,10 +9,12 @@ import * as Srs from '@core/geo/srs'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import * as RecordReader from '@core/record/_record/recordReader'
 import * as DateUtils from '@core/dateUtils'
 import * as StringUtils from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
@@ -429,4 +431,274 @@ export const parseNodeValueProps = async ({
     })
   }
   return extractor({ survey, categoryItemProvider, taxonProvider, nodeDef, value: valueProps, headers })
+}
+
+// ===== Layer 2: a single value written by the assistant
+
+export type NodeValueInput = string | number | boolean | null | Record<string, unknown>
+
+type InputParserParams = {
+  survey: any
+  nodeDef: any
+  input: NodeValueInput
+  record: any
+  parentNode: any
+  categoryItemProvider: CategoryItemProvider
+  taxonProvider: TaxonProvider
+}
+
+type InputParser = (params: InputParserParams) => Promise<ParsedNodeValue>
+
+/**
+ * Returns true when the value of the attribute can be set by hand (not an entity, read-only or analysis attribute).
+ * @param {object} nodeDef - The node definition.
+ * @returns {boolean} Whether the value is editable.
+ */
+export const isNodeDefValueEditable = (nodeDef: any): boolean =>
+  Boolean(nodeDef) && NodeDef.isAttribute(nodeDef) && !NodeDef.isReadOnly(nodeDef) && !NodeDef.isAnalysis(nodeDef)
+
+/**
+ * Returns true when the input means "no value".
+ * @param {NodeValueInput} input - The input.
+ * @returns {boolean} Whether the input is empty.
+ */
+const isEmptyInput = (input: NodeValueInput): boolean =>
+  input === null || input === undefined || (typeof input === 'string' && input.trim() === '')
+
+/**
+ * Returns the headers used in the import error messages: the attribute name.
+ * @param {object} nodeDef - The attribute definition.
+ * @returns {string[]} The headers.
+ */
+const headersOf = (nodeDef: any): string[] => [NodeDef.getName(nodeDef)]
+
+/**
+ * Parses a single-prop value (number, boolean, date, time) with layer 1.
+ * @param {InputParserParams} params - The parser parameters.
+ * @returns {Promise<ParsedNodeValue>} The node value.
+ */
+const parseSinglePropInput: InputParser = (params) =>
+  parseNodeValueProps({
+    ...params,
+    valueProps: { [VALUE_PROP_DEFAULT]: String(params.input).trim() },
+    headers: headersOf(params.nodeDef),
+  })
+
+/**
+ * Parses an integer: layer 1, plus a whole-number check.
+ * @param {InputParserParams} params - The parser parameters.
+ * @returns {Promise<ParsedNodeValue>} The node value.
+ */
+const parseIntegerInput: InputParser = async (params) => {
+  const parsed = await parseSinglePropInput(params)
+  if (!Number.isInteger(parsed.value)) {
+    throw new SystemError('validationErrors:dataImport.invalidNumber', {
+      value: String(params.input),
+      headers: headersOf(params.nodeDef),
+    })
+  }
+  return parsed
+}
+
+/**
+ * Parses a text value (kept as is).
+ * @param {InputParserParams} params - The parser parameters.
+ * @returns {Promise<ParsedNodeValue>} The node value.
+ */
+const parseTextInput: InputParser = async ({ input }) => ({ value: String(input), refData: null })
+
+/**
+ * Splits a coordinate input into x, y and srs.
+ * @param {NodeValueInput} input - "x y srs", "x,y,srs", "x y" or { x, y, srs }.
+ * @returns {{x: unknown, y: unknown, srs: unknown}|null} The parts, or null when the shape is wrong.
+ */
+const toCoordinateParts = (input: NodeValueInput): { x: unknown; y: unknown; srs: unknown } | null => {
+  if (typeof input === 'object') {
+    return { x: input.x, y: input.y, srs: input.srs ?? input.srsId }
+  }
+  const parts = String(input)
+    .trim()
+    .split(/[\s,;]+/)
+  if (parts.length < 2 || parts.length > 3) return null
+  const [x, y, srs] = parts
+  return { x, y, srs }
+}
+
+/**
+ * Returns the SRS code of a coordinate: the given one without the "EPSG:" prefix, or the only SRS of the survey.
+ * @param {object} survey - The survey.
+ * @param {unknown} srs - The given SRS, if any.
+ * @returns {string|null} The SRS code, or null when it isn't one of the survey.
+ */
+const resolveSrsCode = (survey: any, srs: unknown): string | null => {
+  const srsCodes: string[] = Survey.getSRSCodes(Survey.getSurveyInfo(survey))
+  if (Objects.isEmpty(srs)) {
+    return srsCodes.length === 1 ? srsCodes[0] : null
+  }
+  const code = StringUtils.removePrefix(Srs.idPrefix)(String(srs).trim())
+  return srsCodes.includes(code) ? code : null
+}
+
+/**
+ * Parses a coordinate.
+ * @param {InputParserParams} params - The parser parameters.
+ * @returns {Promise<ParsedNodeValue>} The node value.
+ */
+const parseCoordinateInput: InputParser = async ({ survey, nodeDef, input }) => {
+  const parts = toCoordinateParts(input)
+  const x = Number(parts?.x)
+  const y = Number(parts?.y)
+  const srsId = parts ? resolveSrsCode(survey, parts.srs) : null
+  if (
+    !parts ||
+    Objects.isEmpty(parts.x) ||
+    Objects.isEmpty(parts.y) ||
+    !Number.isFinite(x) ||
+    !Number.isFinite(y) ||
+    !srsId
+  ) {
+    throw new SystemError('validationErrors:dataImport.invalidCoordinate', {
+      headers: headersOf(nodeDef),
+      value: typeof input === 'object' ? JSON.stringify(input) : String(input),
+    })
+  }
+  return { value: Node.newNodeValueCoordinate({ x, y, srsId }), refData: null }
+}
+
+/**
+ * Returns the code of a code attribute: its value, its ref data item, or the survey item.
+ * @param {object} survey - The survey.
+ * @param {object} node - The code attribute.
+ * @returns {string|null} The code, or null when the attribute has no value.
+ */
+const getCodeAttributeCode = (survey: any, node: any): string | null => {
+  const value = Node.getValue(node, {})
+  if (value?.[Node.valuePropsCode.code]) return value[Node.valuePropsCode.code]
+  const item = NodeRefData.getCategoryItem(node) ?? Survey.getCategoryItemByUuid(Node.getCategoryItemUuid(node))(survey)
+  return item ? CategoryItem.getCode(item) || null : null
+}
+
+/**
+ * Returns the codes of the ancestor code attributes (top-down), [] for a first-level code,
+ * or null when they can't be determined (no record, or an ancestor without a value).
+ * @param {InputParserParams} params - The parser parameters.
+ * @returns {string[]|null} The ancestor codes.
+ */
+const getAncestorCodes = ({ survey, nodeDef, record, parentNode }: InputParserParams): string[] | null => {
+  if (!NodeDef.getParentCodeDefUuid(nodeDef)) return []
+  if (!record || !parentNode) return null
+  const ancestors = RecordReader.getAncestorCodeAttributes({ survey, parentNode, nodeDef })(record)
+  if (ancestors.length === 0) return null
+  const codes = ancestors.map((ancestor: any) => getCodeAttributeCode(survey, ancestor))
+  return codes.includes(null) ? null : codes
+}
+
+/**
+ * Parses a code: the survey index (under the parent item for hierarchical codes), else the provider by code path.
+ * @param {InputParserParams} params - The parser parameters.
+ * @returns {Promise<ParsedNodeValue>} The node value and the category item as ref data.
+ */
+const parseCodeInput: InputParser = async (params) => {
+  const { survey, nodeDef, input, record, parentNode, categoryItemProvider } = params
+  const code = String(typeof input === 'object' ? (input.code ?? '') : input).trim()
+  const invalidCode = () =>
+    new SystemError('validationErrors:dataImport.invalidCode', { code, attributeName: NodeDef.getName(nodeDef) })
+
+  const ancestorCodes = getAncestorCodes(params)
+  if (!code || ancestorCodes === null) throw invalidCode()
+
+  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code, record, parentNode })(survey)
+  const item = itemUuid
+    ? (Survey.getCategoryItemByUuid(itemUuid)(survey) ?? { uuid: itemUuid })
+    : await categoryItemProvider.getItemByCodePaths({
+        survey,
+        categoryUuid: NodeDef.getCategoryUuid(nodeDef),
+        codePaths: [...ancestorCodes, code],
+      })
+  if (!item) throw invalidCode()
+
+  return {
+    value: Node.newNodeValueCode({ itemUuid: item.uuid, code }),
+    refData: { [NodeRefData.keys.categoryItem]: item },
+  }
+}
+
+/**
+ * Parses a taxon: by code (index, then provider), then by scientific name (provider). Unlisted taxa are refused.
+ * @param {InputParserParams} params - The parser parameters.
+ * @returns {Promise<ParsedNodeValue>} The node value and the taxon as ref data.
+ */
+const parseTaxonInput: InputParser = async ({ survey, nodeDef, input, taxonProvider }) => {
+  const text = String(typeof input === 'object' ? (input.code ?? input.scientificName ?? '') : input).trim()
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  const taxon =
+    (await findTaxonByCode({ survey, taxonProvider, nodeDef, taxonCode: text })) ??
+    (await taxonProvider.findTaxonByScientificName?.({ survey, taxonomyUuid, scientificName: text }))
+  // an unlisted taxon needs the scientific name typed in the form: not supported here
+  if (!taxon || Taxon.isUnlistedTaxon(taxon)) {
+    throw new SystemError('validationErrors:dataImport.invalidTaxonCode', { value: text, headers: headersOf(nodeDef) })
+  }
+  return {
+    value: Node.newNodeValueTaxon({ taxonUuid: Taxon.getUuid(taxon) }),
+    refData: { [NodeRefData.keys.taxon]: taxon },
+  }
+}
+
+const inputParserByNodeDefType: Record<string, InputParser> = {
+  [NodeDef.nodeDefType.boolean]: parseSinglePropInput,
+  [NodeDef.nodeDefType.code]: parseCodeInput,
+  [NodeDef.nodeDefType.coordinate]: parseCoordinateInput,
+  [NodeDef.nodeDefType.date]: parseSinglePropInput,
+  [NodeDef.nodeDefType.decimal]: parseSinglePropInput,
+  [NodeDef.nodeDefType.integer]: parseIntegerInput,
+  [NodeDef.nodeDefType.taxon]: parseTaxonInput,
+  [NodeDef.nodeDefType.text]: parseTextInput,
+  [NodeDef.nodeDefType.time]: parseSinglePropInput,
+}
+
+/**
+ * Converts a value written by the assistant into the node value of an attribute.
+ * @param {object} params - The parameters.
+ * @param {object} params.survey - The survey (with the ref data index).
+ * @param {object} params.nodeDef - The attribute definition.
+ * @param {NodeValueInput} params.input - The value: a string, a number, a boolean, an object, or null to clear.
+ * @param {object} [params.record] - The record (needed for hierarchical codes).
+ * @param {object} [params.parentNode] - The parent entity of the attribute (needed for hierarchical codes).
+ * @param {CategoryItemProvider} params.categoryItemProvider - Finds items of big categories.
+ * @param {TaxonProvider} params.taxonProvider - Finds taxa of big taxonomies, and by scientific name.
+ * @returns {Promise<ParsedNodeValue>} The node value (null to clear) and its ref data.
+ */
+export const parseNodeValueInput = async ({
+  survey,
+  nodeDef,
+  input,
+  record = null,
+  parentNode = null,
+  categoryItemProvider,
+  taxonProvider,
+}: {
+  survey: any
+  nodeDef: any
+  input: NodeValueInput
+  record?: any
+  parentNode?: any
+  categoryItemProvider: CategoryItemProvider
+  taxonProvider: TaxonProvider
+}): Promise<ParsedNodeValue> => {
+  if (!isNodeDefValueEditable(nodeDef)) {
+    throw new SystemError('validationErrors:nodeValueParser.attributeNotEditable', {
+      attributeName: NodeDef.getName(nodeDef),
+    })
+  }
+  const type = NodeDef.getType(nodeDef)
+  const parser = inputParserByNodeDefType[type]
+  if (!parser) {
+    throw new SystemError('validationErrors:nodeValueParser.unsupportedType', {
+      attributeName: NodeDef.getName(nodeDef),
+      type,
+    })
+  }
+  if (isEmptyInput(input)) return { value: null, refData: null }
+
+  return parser({ survey, nodeDef, input, record, parentNode, categoryItemProvider, taxonProvider })
 }
