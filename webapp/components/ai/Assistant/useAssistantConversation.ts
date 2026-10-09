@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useStore } from 'react-redux'
 
+import { Dates } from '@openforis/arena-core'
+
 import * as User from '@core/user/user'
 
 import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
 import { applierDepsReady, createApplierDeps } from '@webapp/ai/changeSets/applierDeps'
 import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
+import { summarizeRecordEditResults } from '@webapp/ai/changeSets/recordEdits/recordEditCardModel'
+import { applyRecordEdits as applyRecordEditsRequest } from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
 import { summarizeResults } from '@webapp/ai/changeSets/describeOperation'
 import { getEngineChangeNotice } from '@webapp/ai/engines/assistantEngine'
 import { toDataLocation } from '@webapp/ai/engines/featureAvailability'
@@ -15,7 +19,7 @@ import { getConversationStore, type ConversationStore } from '@webapp/ai/convers
 import type { Conversation } from '@webapp/ai/conversations/types'
 import type { AiDataLocation } from '@webapp/ai/policy/aiFeatureAvailability'
 import { loadPolicyContext } from '@webapp/ai/policy/policyContext'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
 import type { AssistantArea } from './assistantAreas'
@@ -42,6 +46,12 @@ export type AssistantConversationApi = {
   loadHistory: () => Promise<void>
   clearConversations: () => Promise<void>
   apply: (changeSetId: string, operationIds: string[]) => Promise<void>
+  // record-edit card: sends the edits to the batch endpoint (onProgress: chunks done, chunks total) and stores the results
+  applyRecordEdits: (
+    changeSetId: string,
+    operationIds: string[],
+    onProgress?: (done: number, total: number) => void
+  ) => Promise<void>
   discard: (changeSetId: string) => Promise<void>
 }
 
@@ -64,6 +74,8 @@ export const useAssistantConversation = ({
   const reduxStore = useStore()
   const userUuid: string = User.getUuid(useUser())
   const surveyId: number | null = useSurveyId() ?? null
+  const cycle: string = useSurveyCycleKey()
+  const lang: string = useSurveyPreferredLang()
   const buildToolContext = useAssistantToolContext()
 
   const [conversationStore, setConversationStore] = useState<ConversationStore | null>(null)
@@ -75,6 +87,8 @@ export const useAssistantConversation = ({
   const conversationRef = useRef<Conversation | null>(null)
   const controllerRef = useRef<AbortController | null>(null)
   const applyingRef = useRef(false)
+  // request of a record-edit Apply in flight
+  const recordEditsControllerRef = useRef<AbortController | null>(null)
   // location of the previous turn: kept across conversations (the notice is about the engine)
   const lastLocationRef = useRef<AiDataLocation | null>(null)
   // id of the conversation whose turn is running (its streaming answer is live, not left over)
@@ -96,7 +110,13 @@ export const useAssistantConversation = ({
   }, [])
 
   // the panel unmounts on logout: stop the running answer
-  useEffect(() => () => controllerRef.current?.abort(), [])
+  useEffect(
+    () => () => {
+      controllerRef.current?.abort()
+      recordEditsControllerRef.current?.abort()
+    },
+    []
+  )
 
   // another survey or user: start over
   useEffect(() => {
@@ -305,6 +325,44 @@ export const useAssistantConversation = ({
   )
 
   /**
+   * Applies the selected edits of a record-edit card through the batch endpoint and tells the model.
+   * @param {string} changeSetId - Card.
+   * @param {string[]} operationIds - Edits to apply.
+   * @param {Function} [onProgress] - Called with (chunks done, chunks total).
+   * @returns {Promise<void>} Resolves when done.
+   */
+  const applyRecordEdits = useCallback(
+    (changeSetId: string, operationIds: string[], onProgress?: (done: number, total: number) => void) =>
+      runCardAction(async (id, generation) => {
+        const cardState = (await readConversation(id))?.changeSets[changeSetId]
+        if (!cardState) return
+        const { changeSet } = cardState
+        const controller = new AbortController()
+        recordEditsControllerRef.current = controller
+        let results
+        try {
+          results = await applyRecordEditsRequest({
+            changeSet,
+            operationIds,
+            cycle,
+            timezoneOffset: Dates.getTimezoneOffset(),
+            lang,
+            onProgress,
+            signal: controller.signal,
+          })
+        } finally {
+          if (recordEditsControllerRef.current === controller) recordEditsControllerRef.current = null
+        }
+        const note = summarizeRecordEditResults({ changeSet, results })
+        // the user may have switched conversation meanwhile: write the results into the one that was applied
+        const current = await readConversation(id)
+        if (current)
+          await saveShown(withApplyResults({ conversation: current, changeSetId, results, note }), generation)
+      }),
+    [cycle, lang, readConversation, runCardAction, saveShown]
+  )
+
+  /**
    * Discards a card and tells the model.
    * @param {string} changeSetId - Card.
    * @returns {Promise<void>} Resolves when done.
@@ -334,6 +392,7 @@ export const useAssistantConversation = ({
     loadHistory,
     clearConversations,
     apply,
+    applyRecordEdits,
     discard,
   }
 }
