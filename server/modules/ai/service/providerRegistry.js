@@ -15,10 +15,12 @@ import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenAI } from '@ai-sdk/openai'
 
+import { ENV } from '@core/processUtils'
 import SystemError from '@core/systemError'
 
 import { AiProvider } from '@common/ai/aiProvider'
 import { assertProviderBaseUrlAllowed } from './baseUrlGuard'
+import { createMockModel, MOCK_PROVIDER } from './mockProvider'
 import { createVercelAiSdkModel } from './vercelAiSdkProvider'
 
 export const providers = AiProvider
@@ -61,6 +63,8 @@ const noRedirectFetch = (input, init) => fetch(input, { ...init, redirect: 'erro
  */
 export const buildModel = (cfg) => {
   const { provider, model, apiKey, baseUrl } = cfg
+  // test servers only: canned answers, no network (e2e)
+  if (provider === MOCK_PROVIDER && ENV.aiMockProviderEnabled) return createMockModel()
   if (!isSupported(provider)) {
     throw new SystemError('aiProviderInvalid', { provider })
   }

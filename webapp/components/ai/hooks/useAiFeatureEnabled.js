@@ -28,7 +28,7 @@ const fetchOnce = () => {
     try {
       cache = await API.aiSettings.fetchSettings()
     } catch (error) {
-      const code = error?.response?.data?.error
+      const code = error?.response?.data?.key ?? error?.response?.data?.error
       if (code === 'aiFeaturesDisabled' || error?.response?.status === 404) {
         cache = { featuresEnabled: false, featureToggles: {} }
       } else {

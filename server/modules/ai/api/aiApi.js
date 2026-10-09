@@ -12,12 +12,14 @@ import * as ChatbotApi from './chatbotApi'
 import * as DataQueryApi from './dataQueryApi'
 import * as ExpressionApi from './expressionApi'
 import * as InternalApi from './internalApi'
+import * as ModelApi from './modelApi'
 import * as SettingsApi from './settingsApi'
 import * as TranslationApi from './translationApi'
 
 const logger = Log.getLogger('AiApi')
 
 export const init = (app) => {
+  ModelApi.init(app)
   SettingsApi.init(app)
   InternalApi.init(app)
   ExpressionApi.init(app)
@@ -27,6 +29,6 @@ export const init = (app) => {
   DataQueryApi.init(app)
 
   logger.info(
-    'AI module initialised (settings, internal, expression, translation, activityLog, chatbot, dataQuery routes registered)'
+    'AI module initialised (model, settings, internal, expression, translation, activityLog, chatbot, dataQuery routes registered)'
   )
 }
