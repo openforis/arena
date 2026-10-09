@@ -35,11 +35,40 @@ test.describe('AI assistant (mock provider)', () => {
     await api.disableAiFeatures()
   })
 
-  const openDesignArea = async (page: Page): Promise<FormDesigner> => {
+  // Design must be selected on its own: no tab is clicked
+  const expectDesignSelected = async (page: Page): Promise<void> => {
+    await expect(assistantPanel(page).getByRole('tab', { name: 'Design', exact: true })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+  }
+
+  // client-side navigation, as a user reaches the designer from the sidebar
+  const navigateInApp = async (page: Page, uri: string): Promise<void> => {
+    await page.evaluate((target) => {
+      window.history.pushState({}, '', target)
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    }, uri)
+  }
+
+  const openDesignArea = async (page: Page, { fromHome = false } = {}): Promise<FormDesigner> => {
     const designer = new FormDesigner(page)
-    await designer.goto()
+    if (fromHome) {
+      // the panel opens on Help on the home page; reaching the designer must then select Design
+      await page.goto(Urls.home)
+      await openAssistantPanel(page)
+      await expect(assistantPanel(page).getByRole('tab', { name: 'Help', exact: true })).toHaveAttribute(
+        'aria-selected',
+        'true'
+      )
+      await closeAssistantPanel(page)
+      await navigateInApp(page, Urls.formDesigner)
+      await expect(designer.surveyForm).toBeVisible()
+    } else {
+      await designer.goto()
+    }
     await openAssistantPanel(page)
-    await selectAssistantArea(page, 'Design')
+    await expectDesignSelected(page)
     return designer
   }
 
@@ -53,11 +82,15 @@ test.describe('AI assistant (mock provider)', () => {
   }
 
   test('proposes a label, applied on Apply selected', async ({ page, sampleSurvey: _ }) => {
-    const designer = await openDesignArea(page)
+    const designer = await openDesignArea(page, { fromHome: true })
     await proposeLabel(page)
     const panel = assistantPanel(page)
     await panel.getByTestId(TestId.aiAssistant.applyBtn).click()
     await expect(panel.getByTestId(TestId.aiAssistant.changeSetRowStatus).first()).toHaveText('Applied')
+    await expect(designer.surveyForm.getByText('Cluster identifier', { exact: true }).first()).toBeVisible()
+
+    // saved on the server, not only in the page
+    await page.reload()
     await expect(designer.surveyForm.getByText('Cluster identifier', { exact: true }).first()).toBeVisible()
   })
 
@@ -71,6 +104,9 @@ test.describe('AI assistant (mock provider)', () => {
     )
     await panel.getByTestId(TestId.aiAssistant.applyBtn).click()
     await expect(panel.getByTestId(TestId.aiAssistant.changeSetRowStatus).first()).toHaveText('Applied')
+    await expect(designer.nodeDefWrapper('cluster_remarks')).toBeVisible()
+
+    await page.reload()
     await expect(designer.nodeDefWrapper('cluster_remarks')).toBeVisible()
   })
 
@@ -86,7 +122,10 @@ test.describe('AI assistant (mock provider)', () => {
     await expect(lastAssistantAnswer(page)).toContainText('MOCK help: publish the survey from the survey list')
   })
 
-  test('a label changed after the proposal is a conflict, never overwritten', async ({ page, sampleSurvey: _ }) => {
+  test('a label changed after the proposal is a disabled conflict, never overwritten', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
     const designer = await openDesignArea(page)
     await proposeLabel(page)
     await closeAssistantPanel(page)
@@ -98,8 +137,11 @@ test.describe('AI assistant (mock provider)', () => {
     await openAssistantPanel(page)
     const panel = assistantPanel(page)
     await expect(panel.getByTestId(TestId.aiAssistant.stale)).toBeVisible()
-    await panel.getByTestId(TestId.aiAssistant.applyBtn).click()
-    await expect(panel.getByTestId(TestId.aiAssistant.changeSetRowStatus).first()).toHaveText('Conflict')
+    // the conflicting row is unchecked and disabled: nothing is left to apply
+    const checkbox = panel.getByTestId(TestId.aiAssistant.changeSetRow('cluster_id')).getByRole('checkbox')
+    await expect(checkbox).toBeDisabled()
+    await expect(checkbox).not.toBeChecked()
+    await expect(panel.getByTestId(TestId.aiAssistant.applyBtn)).toBeDisabled()
     await expect(designer.surveyForm.getByText('Cluster code', { exact: true }).first()).toBeVisible()
   })
 
@@ -127,7 +169,7 @@ test.describe('AI assistant (mock provider)', () => {
 
     await page.reload()
     await openAssistantPanel(page)
-    await selectAssistantArea(page, 'Design')
+    await expectDesignSelected(page)
     await openHistory()
     await expect(panel.getByTestId(TestId.aiAssistant.historyItem)).toHaveCount(1)
   })
