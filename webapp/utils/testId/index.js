@@ -10,6 +10,10 @@ const _withLang =
 export const TestId = {
   ai: {
     dataLocationBadge: 'ai-data-location-badge',
+    engineErrorOpenSettings: 'ai-engine-error-open-settings',
+    engineErrorRetry: 'ai-engine-error-retry',
+    notAvailable: 'ai-not-available',
+    notAvailableAction: (action) => `ai-not-available-action-${action}`,
     openPolicyTabBtn: 'ai-policy-open-tab-btn',
     policyBlocked: 'ai-policy-blocked',
     policyBlockedTooltip: 'ai-policy-blocked-tooltip',

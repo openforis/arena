@@ -20,11 +20,13 @@ export const getAiErrorKey = (error: unknown): string | null => {
 }
 
 /**
- * Returns true for errors caused by a user cancel (to be ignored by the UI).
+ * Returns true for errors caused by a user cancel (to be ignored by the UI): an abort, or the local server's
+ * first-use dialog closed without an answer.
  * @param {unknown} error - The error.
- * @returns {boolean} True when aborted.
+ * @returns {boolean} True when cancelled by the user.
  */
-export const isAiAbortError = (error: unknown): boolean => unwrap(error).some((e) => e?.name === 'AbortError')
+export const isAiAbortError = (error: unknown): boolean =>
+  unwrap(error).some((e) => e?.name === 'AbortError') || getAiErrorKey(error) === 'aiLocalServerConsentCancelled'
 
 /**
  * Returns the translated message for an AI error.

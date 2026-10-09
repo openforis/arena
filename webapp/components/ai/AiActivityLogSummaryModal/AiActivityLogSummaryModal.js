@@ -1,11 +1,12 @@
 import './AiActivityLogSummaryModal.scss'
 
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
-import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
+import { AiWorkflows, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workflows'
+import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Modal, ModalBody } from '@webapp/components/modal'
 import Markdown from '@webapp/components/markdown'
@@ -27,6 +28,13 @@ const AiActivityLogSummaryModal = ({ onClose }) => {
   const [text, setText] = useState('')
   const [done, setDone] = useState(false)
   const [error, setError] = useState(null)
+  // the latest onClose at call time: a new callback identity must not restart the stream
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
+  const [attempt, setAttempt] = useState(0)
+  const onRetry = useCallback(() => setAttempt((count) => count + 1), [])
 
   useEffect(() => {
     if (!surveyId) return undefined
@@ -44,7 +52,12 @@ const AiActivityLogSummaryModal = ({ onClose }) => {
       onChunk: (chunk) => setText((prev) => prev + chunk),
       onDone: () => setDone(true),
       onError: (err) => {
-        setError(getAiErrorMessage({ error: err, i18n }))
+        if (isAiAbortError(err)) {
+          // the user closed the first-use dialog
+          onCloseRef.current()
+          return
+        }
+        setError(err)
         setDone(true)
       },
     })
@@ -52,7 +65,7 @@ const AiActivityLogSummaryModal = ({ onClose }) => {
     return () => {
       cancelRef.current?.()
     }
-  }, [surveyId, surveyName, i18n])
+  }, [surveyId, surveyName, attempt])
 
   const onCancel = () => {
     cancelRef.current?.()
@@ -78,7 +91,8 @@ const AiActivityLogSummaryModal = ({ onClose }) => {
 
         {error ? (
           <div className="ai-activity-log-summary-modal__error">
-            {tUnescaped('aiActivityLog.error', { message: error })}
+            {tUnescaped('aiActivityLog.error', { message: getAiErrorMessage({ error, i18n }) })}
+            <AiEngineErrorActions error={error} onRetry={onRetry} />
           </div>
         ) : null}
       </ModalBody>

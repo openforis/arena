@@ -1,9 +1,10 @@
 import './AiExplainPanel.scss'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
-import { AiWorkflows, getAiErrorKey, getAiErrorMessage } from '@webapp/ai/workflows'
+import { AiWorkflows, getAiErrorKey, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workflows'
+import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Modal, ModalBody } from '@webapp/components/modal'
 import Markdown from '@webapp/components/markdown'
@@ -28,6 +29,13 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
   const [text, setText] = useState('')
   const [done, setDone] = useState(false)
   const [error, setError] = useState(null)
+  // the latest onClose at call time: a new callback identity must not restart the stream
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
+  const [attempt, setAttempt] = useState(0)
+  const onRetry = useCallback(() => setAttempt((count) => count + 1), [])
 
   useEffect(() => {
     // Reset stream state when inputs change; the stream subscription below
@@ -47,6 +55,11 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
       onChunk: (chunk) => setText((prev) => prev + chunk),
       onDone: () => setDone(true),
       onError: (err) => {
+        if (isAiAbortError(err)) {
+          // the user closed the first-use dialog
+          onCloseRef.current()
+          return
+        }
         setError(err)
         setDone(true)
       },
@@ -55,7 +68,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
     return () => {
       cancelRef.current?.()
     }
-  }, [surveyId, nodeDefUuid, expression, errorMessage])
+  }, [surveyId, nodeDefUuid, expression, errorMessage, attempt])
 
   const onCancel = () => {
     cancelRef.current?.()
@@ -78,6 +91,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
             {getAiErrorKey(error) === 'aiRequestTimeout'
               ? i18n.t('aiExpression.explain.timeout')
               : tUnescaped('aiExpression.explain.error', { message: getAiErrorMessage({ error, i18n }) })}
+            <AiEngineErrorActions error={error} onRetry={onRetry} />
           </div>
         ) : null}
       </ModalBody>
