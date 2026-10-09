@@ -8,7 +8,12 @@ import { isSurveyScopedFeature } from '@webapp/ai/policy/aiFeatureAvailability'
 import { fetchSurveyAiPolicy } from '@webapp/ai/policy/surveyAiPolicyClient'
 import { getGatewayModel } from '@webapp/ai/runtime/getModel'
 
-import { getAiCapabilitiesStore, getCurrentUserUuid, loadAiCapabilities, notifyAiCapabilities } from './capabilitiesStore'
+import {
+  getAiCapabilitiesStore,
+  getCurrentUserUuid,
+  loadAiCapabilities,
+  notifyAiCapabilities,
+} from './capabilitiesStore'
 import { requestLocalServerConsent } from './consentRequests'
 import { getBrowserStorage } from './localServerSettings'
 import type { ModelResolverDeps } from './resolveModel'
