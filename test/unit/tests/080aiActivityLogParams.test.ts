@@ -26,13 +26,9 @@ describe('parseActivityLogFetchParams', () => {
   })
 
   test('throws a 400 SystemError with the appErrors key', () => {
-    try {
-      parseActivityLogFetchParams({ limit: '0' })
-      throw new Error('expected to throw')
-    } catch (error: any) {
-      expect(error.key).toBe('appErrors:invalidParams')
-      expect(error.statusCode).toBe(400)
-    }
+    expect(() => parseActivityLogFetchParams({ limit: '0' })).toThrow(
+      expect.objectContaining({ key: 'appErrors:invalidParams', statusCode: 400 })
+    )
   })
 
   test('treats empty strings as missing', () => {
