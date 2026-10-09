@@ -193,7 +193,14 @@ export const runAssistantTurn = async ({
       tools,
     })
     const outline = area === 'help' && !systemPrompt ? await loadOutline() : null
-    const system = systemPrompt ?? buildAssistantSystemPrompt({ area, ctx: turnCtx, outline })
+    const system =
+      systemPrompt ??
+      buildAssistantSystemPrompt({
+        area,
+        ctx: turnCtx,
+        outline,
+        dataToolsAvailable: toolList.some((tool) => tool.dataClass === 'data'),
+      })
     const budgetChars = getHistoryBudget({
       maxPromptChars: turn.limits.maxPromptChars,
       systemPrompt: system,

@@ -26,7 +26,11 @@ beforeAll(async () => {
 
 describe('assistant prompts', () => {
   test('markers', () => {
-    expect(assistantMarkers).toEqual({ design: '[arena-assistant:design]', help: '[arena-assistant:help]' })
+    expect(assistantMarkers).toEqual({
+      design: '[arena-assistant:design]',
+      help: '[arena-assistant:help]',
+      analysis: '[arena-assistant:analysis]',
+    })
   })
 
   test('design: marker first, survey, languages, rules, answer language', () => {

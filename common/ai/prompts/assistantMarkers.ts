@@ -5,4 +5,5 @@
 export const assistantMarkers = {
   design: '[arena-assistant:design]',
   help: '[arena-assistant:help]',
+  analysis: '[arena-assistant:analysis]',
 } as const
