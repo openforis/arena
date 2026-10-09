@@ -28,6 +28,8 @@ import {
 
 // max number of features submitted to Whisp in a single analysis request
 const whispBatchSize = 1000
+// long analyses: poll less frequently, to stay within the Whisp API rate limit
+const whispPollingPeriod = 10000
 
 const locationColumnNames = CategoryExportFile.geometryPointColumnsSuffixes.map(
   (suffix: string) => `${Category.locationItemExtraDefName}${suffix}`
@@ -186,6 +188,7 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
       const { data } = await WhishDataProcessor.generateData({
         geojson: { type: 'FeatureCollection', features: batch },
         analysisOptions: { externalIdColumn: whispExternalIdProp },
+        pollingPeriod: whispPollingPeriod,
       })
       whispFeatures.push(...(data?.features ?? []))
       this.incrementProcessedItems()

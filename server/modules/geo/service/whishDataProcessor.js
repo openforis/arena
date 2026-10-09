@@ -3,12 +3,21 @@ import axios from 'axios'
 import * as ProcessUtils from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 
+import * as Log from '@server/log/log'
+
+const logger = Log.getLogger('WhispDataProcessor')
+
 const whispApiUrl = 'https://whisp.openforis.org/api/'
 
 const whispApiPostGeojsonUrl = `${whispApiUrl}submit/geojson`
 const whispApiGeoProcessingStatusUrl = `${whispApiUrl}status`
 
-const processingStatusPollingPeriod = 2000 // 2 seconds
+const defaultPollingPeriod = 2000 // 2 seconds
+
+// Whisp limits the requests per API key (30 per minute by default, status polling included)
+const rateLimitExceededStatus = 429
+const rateLimitDefaultWaitMs = 60000
+const rateLimitMaxRetries = 10
 
 const getRequestHeaders = () => {
   const apiKey = ProcessUtils.ENV.whispApiKey
@@ -25,24 +34,42 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const wrapWhispApiError = (error) => {
   const whispStatus = error.response?.status
   const message = error.response?.data?.message ?? error.message
+  logger.error(`Whisp API error (status ${whispStatus}): ${message}`)
   return new SystemError('appErrors:geoWhispApiError', { whispStatus, message }, StatusCodes.BAD_GATEWAY)
 }
 
-const waitForProcessing = async ({ token }) => {
+// Whisp rate limit error message is like "Rate limit exceeded. Try again in 12 seconds."
+const extractRateLimitWaitMs = (error) => {
+  const message = error.response?.data?.message ?? ''
+  const seconds = Number(/(\d+) seconds/.exec(message)?.[1])
+  return seconds > 0 ? (seconds + 1) * 1000 : rateLimitDefaultWaitMs
+}
+
+// Sends a request to the Whisp API, waiting and retrying when its rate limit is exceeded
+const sendRequest = async (requestFn) => {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await requestFn() // NOSONAR
+    } catch (error) {
+      if (error.response?.status !== rateLimitExceededStatus || attempt >= rateLimitMaxRetries) {
+        throw wrapWhispApiError(error)
+      }
+      const waitMs = extractRateLimitWaitMs(error)
+      logger.debug(`Whisp API rate limit exceeded: retrying in ${waitMs}ms`)
+      await wait(waitMs) // NOSONAR
+    }
+  }
+}
+
+const waitForProcessing = async ({ token, pollingPeriod }) => {
   const url = `${whispApiGeoProcessingStatusUrl}/${token}`
   const headers = getRequestHeaders()
 
   // Start an indefinite loop
 
   while (true) {
-    let response
-    try {
-      response = await axios.get(url, { headers }) // NOSONAR
-    } catch (error) {
-      throw wrapWhispApiError(error)
-    }
-    const { data: responseData } = response
-    const { code, data } = responseData
+    const { data: responseData } = await sendRequest(() => axios.get(url, { headers })) // NOSONAR
+    const { code, data, message } = responseData
 
     switch (code) {
       case 'analysis_completed':
@@ -53,22 +80,18 @@ const waitForProcessing = async ({ token }) => {
         // The loop continues after the await
         break
       default:
-        throw new Error('Error fetching Whisp processing status')
+        throw wrapWhispApiError({ message: `Unexpected Whisp processing status: ${code} ${message ?? ''}` })
     }
-    // If not completed or an error, wait 2 seconds before the next iteration
-    await wait(processingStatusPollingPeriod) // NOSONAR
+    await wait(pollingPeriod) // NOSONAR
   }
 }
 
-const generateData = async ({ geojson, analysisOptions = {} }) => {
+const generateData = async ({ geojson, analysisOptions = {}, pollingPeriod = defaultPollingPeriod }) => {
   const requestPayload = { ...geojson, analysisOptions: { ...analysisOptions, async: true } }
   const headers = getRequestHeaders()
-  let processStartData
-  try {
-    ;({ data: processStartData } = await axios.post(whispApiPostGeojsonUrl, requestPayload, { headers }))
-  } catch (error) {
-    throw wrapWhispApiError(error)
-  }
+  const { data: processStartData } = await sendRequest(() =>
+    axios.post(whispApiPostGeojsonUrl, requestPayload, { headers })
+  )
   const token = processStartData?.data?.token
   if (!token) {
     throw new SystemError(
@@ -77,7 +100,7 @@ const generateData = async ({ geojson, analysisOptions = {} }) => {
       StatusCodes.BAD_GATEWAY
     )
   }
-  const data = await waitForProcessing({ token })
+  const data = await waitForProcessing({ token, pollingPeriod })
   return { token, data }
 }
 
