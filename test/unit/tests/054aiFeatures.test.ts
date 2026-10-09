@@ -35,6 +35,7 @@ describe('AI feature registry', () => {
       [
         'activityLogSummary',
         'assistantAnalysis',
+        'assistantCleaning',
         'assistantDesign',
         'chatbot',
         'dataQueryGenerate',
