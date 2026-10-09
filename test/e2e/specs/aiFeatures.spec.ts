@@ -3,6 +3,14 @@ import type { Page } from '@playwright/test'
 import { TestId } from '@webapp/utils/testId'
 
 import { expect, generateSurveyName, test } from '../fixtures'
+import {
+  assistantPanel,
+  lastAssistantAnswer,
+  openAssistantPanel,
+  selectAssistantArea,
+  sendAssistantMessage,
+  waitForAssistantTurn,
+} from '../helpers/assistantPanel'
 import { FormDesigner } from '../helpers/formDesigner'
 import { Urls } from '../helpers/urls'
 import { getWorkerSurveyEditor, insertSurveyEditor } from '../fixtures/testUsers'
@@ -61,17 +69,19 @@ test.describe('AI features (mock provider)', () => {
 
   test('answers in the help chat', async ({ page }) => {
     await page.goto(Urls.home)
-    await page.locator('.ai-chatbot-fab').click()
-    const panel = page.locator('.ai-chatbot-panel')
-    await panel.locator('textarea').fill('How do I add a table?')
-    await panel.getByRole('button', { name: 'Send' }).click()
-    await expect(panel).toContainText('MOCK')
+    await openAssistantPanel(page)
+    await selectAssistantArea(page, 'Help')
+    await sendAssistantMessage(page, 'How do I add a table?')
+    await waitForAssistantTurn(page)
+    // the Help prompt has the help marker: no script matches, so the default scripted answer
+    await expect(lastAssistantAnswer(page)).toContainText('MOCK answer.')
+    await expect(assistantPanel(page)).toBeVisible()
   })
 
   test('hides the AI entry points when the user turns AI off', async ({ page, api }) => {
     await api.disableAiFeatures()
     await page.goto(Urls.home)
-    await expect(page.locator('.ai-chatbot-fab')).toHaveCount(0)
+    await expect(page.getByTestId(TestId.aiAssistant.openBtn)).toHaveCount(0)
   })
 })
 
