@@ -109,6 +109,10 @@ $t(common.pressRefreshToReloadPage)`,
       updateRoles: 'Обновить роли в опросах',
       updateAll: 'Обновить роли в опросах и данные',
     },
+    sysAdmin: 'Сист. админ',
+    restorePassword: 'Пароль',
+    restorePasswordInfo:
+      'Восстановить пароль из резервной копии (только при добавлении пользователя или обновлении его данных)',
     userActionShort: {
       insert: 'Добавить',
       skip: 'Пропустить',
@@ -116,7 +120,6 @@ $t(common.pressRefreshToReloadPage)`,
       updateAll: 'Роли + данные',
     },
     details: {
-      mainRole: 'Основная роль',
       survey: 'Опрос',
       roleInBackup: 'Роль в резервной копии',
       currentRole: 'Текущая роль',

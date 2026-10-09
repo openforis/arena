@@ -25,6 +25,7 @@ import {
   ImportPreviewUser,
   UserAction,
   UserActionButtonGroup,
+  isPasswordRestorable,
   UsersBackupImportUsersTable,
   existingUserActions,
   newUserActions,
@@ -183,6 +184,10 @@ const UsersBackupImportUsersModal = ({
   const [actionsByEmail, setActionsByEmail] = useState<Record<string, string>>(() =>
     Object.fromEntries(users.map((user) => [user.email, defaultUserAction(user)]))
   )
+  // by default the backup password is restored only for new users
+  const [restorePasswordByEmail, setRestorePasswordByEmail] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(users.map((user) => [user.email, user.hasPassword && !user.existing]))
+  )
   const [started, setStarted] = useState(false)
   const [summary, setSummary] = useState<ImportSummary | null>(null)
 
@@ -204,6 +209,15 @@ const UsersBackupImportUsersModal = ({
     []
   )
 
+  const setRestorePasswordForUsers = useCallback(
+    (usersToUpdate: ImportPreviewUser[]) => (value: boolean) =>
+      setRestorePasswordByEmail((prev) => ({
+        ...prev,
+        ...Object.fromEntries(usersToUpdate.map((user) => [user.email, value])),
+      })),
+    []
+  )
+
   const onCancel = useCallback(async () => {
     if (!started) {
       // the uploaded backup contains password hashes: delete it
@@ -217,7 +231,10 @@ const UsersBackupImportUsersModal = ({
 
   const onConfirm = useCallback(async () => {
     setStarted(true)
-    const job = await API.startUsersBackupImport({ tempFileName, actionsByEmail })
+    const restorePasswordEmails = users
+      .filter((user) => restorePasswordByEmail[user.email] && isPasswordRestorable(user, actionsByEmail[user.email]))
+      .map((user) => user.email)
+    const job = await API.startUsersBackupImport({ tempFileName, actionsByEmail, restorePasswordEmails })
     dispatch(
       JobActions.showJobMonitor({
         job,
@@ -225,7 +242,7 @@ const UsersBackupImportUsersModal = ({
         onComplete: (jobCompleted: any) => setSummary(jobCompleted.result?.summary ?? null),
       })
     )
-  }, [actionsByEmail, dispatch, tempFileName])
+  }, [actionsByEmail, dispatch, restorePasswordByEmail, tempFileName, users])
 
   return (
     <Modal
@@ -276,6 +293,8 @@ const UsersBackupImportUsersModal = ({
               users={users}
               actionsByEmail={actionsByEmail}
               onActionChange={(user) => setActionForUsers([user])}
+              restorePasswordByEmail={restorePasswordByEmail}
+              onRestorePasswordChange={setRestorePasswordForUsers}
             />
           </>
         )}

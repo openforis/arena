@@ -64,6 +64,7 @@
 
     th {
       font-weight: 600;
+      white-space: nowrap;
     }
 
     // long emails can break anywhere
@@ -117,4 +118,11 @@
     color: $colorError;
     font-size: 0.8rem;
   }
+}
+
+.users-backup-import-users-table__password-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }

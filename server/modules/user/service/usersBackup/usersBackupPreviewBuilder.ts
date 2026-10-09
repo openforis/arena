@@ -71,6 +71,7 @@ export const buildUsersBackupPreviewUsers = async (users: UsersBackupUser[]): Pr
       email,
       name,
       existing: Boolean(existingUserUuid),
+      hasPassword: Boolean(user.password),
       backup: toPreviewRoles({ authGroups, userGroups, existingSurveyNames, existingUserGroupKeys }),
       current: existingUserUuid
         ? toCurrentRoles({

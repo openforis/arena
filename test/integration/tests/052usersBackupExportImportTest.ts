@@ -68,11 +68,11 @@ const copyBackupFile = async () => {
   return filePath
 }
 
-const runImport = async (action?: UsersBackupUserAction) => {
+const runImport = async (action?: UsersBackupUserAction, restorePasswordEmails: string[] | null = null) => {
   // the import job deletes the imported file: work on a copy
   const filePath = await copyBackupFile()
   const actionsByEmail = action ? { [email]: action } : {}
-  const job = new UsersBackupImportJob({ user: getContextUser(), filePath, actionsByEmail })
+  const job = new UsersBackupImportJob({ user: getContextUser(), filePath, actionsByEmail, restorePasswordEmails })
   await job.start()
   expect(job.status).toBe(JobStatus.succeeded)
   expect(FileUtils.exists(filePath)).toBeFalsy()
@@ -172,6 +172,7 @@ describe('Users backup export/import', () => {
     const newUser = await findPreviewUser()
     expect(newUser.existing).toBe(false)
     expect(newUser.current).toBeNull()
+    expect(newUser.hasPassword).toBe(true)
   })
 
   test('new user with skip action is not inserted', async () => {
@@ -204,6 +205,18 @@ describe('Users backup export/import', () => {
     user = await fetchUserState()
     expect(user.surveyRoles).toEqual([AuthGroup.groupNames.dataEditor])
     expect(user.name).toBe('changed')
+  })
+
+  test('updateAll keeps the current password when it is not selected for restore', async () => {
+    await db.none(`UPDATE "user" SET password = 'current_hash', name = 'changed' WHERE uuid = $1`, [userUuid])
+
+    await runImport(UsersBackupUserAction.updateAll, [])
+    const user = await fetchUserState()
+    expect(user.password).toBe('current_hash')
+    expect(user.name).toBe(name)
+
+    await runImport(UsersBackupUserAction.updateAll, [email])
+    expect((await fetchUserState()).password).toBe('pwd_hash')
   })
 
   test('updateAll updates also the user details', async () => {

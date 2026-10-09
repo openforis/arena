@@ -111,6 +111,10 @@ $t(common.pressRefreshToReloadPage)`,
       updateRoles: 'Mettre à jour les rôles dans les formulaires',
       updateAll: 'Mettre à jour les rôles dans les formulaires et les informations',
     },
+    sysAdmin: 'Admin. sys.',
+    restorePassword: 'Mot de passe',
+    restorePasswordInfo:
+      "Restaurer le mot de passe enregistré dans la sauvegarde (uniquement lors de l'ajout de l'utilisateur ou de la mise à jour de ses informations)",
     userActionShort: {
       insert: 'Ajouter',
       skip: 'Ignorer',
@@ -118,7 +122,6 @@ $t(common.pressRefreshToReloadPage)`,
       updateAll: 'Rôles + infos',
     },
     details: {
-      mainRole: 'Rôle principal',
       survey: 'Formulaire',
       roleInBackup: 'Rôle dans la sauvegarde',
       currentRole: 'Rôle actuel',

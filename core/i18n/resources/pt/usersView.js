@@ -108,6 +108,10 @@ $t(common.pressRefreshToReloadPage)`,
       updateRoles: 'Atualizar papéis nos inventários',
       updateAll: 'Atualizar papéis nos inventários e dados',
     },
+    sysAdmin: 'Admin. sist.',
+    restorePassword: 'Senha',
+    restorePasswordInfo:
+      'Restaurar a senha armazenada no backup (apenas ao adicionar o usuário ou atualizar seus dados)',
     userActionShort: {
       insert: 'Adicionar',
       skip: 'Ignorar',
@@ -115,7 +119,6 @@ $t(common.pressRefreshToReloadPage)`,
       updateAll: 'Papéis + dados',
     },
     details: {
-      mainRole: 'Papel principal',
       survey: 'Inventário',
       roleInBackup: 'Papel no backup',
       currentRole: 'Papel atual',

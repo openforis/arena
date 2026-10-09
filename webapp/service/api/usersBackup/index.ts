@@ -20,13 +20,15 @@ export const readUsersBackupImportPreview = async ({ file }: { file: File }) => 
 export const startUsersBackupImport = async ({
   tempFileName,
   actionsByEmail,
+  restorePasswordEmails,
 }: {
   tempFileName: string
   actionsByEmail: Record<string, string>
+  restorePasswordEmails: string[]
 }) => {
   const {
     data: { job },
-  } = await axios.post('/api/users/backup/import', { tempFileName, actionsByEmail })
+  } = await axios.post('/api/users/backup/import', { tempFileName, actionsByEmail, restorePasswordEmails })
   return job
 }
 

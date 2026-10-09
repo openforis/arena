@@ -51,10 +51,13 @@ const startImportJob = ({
   user,
   tempFileName,
   actionsByEmail = {},
+  restorePasswordEmails = null,
 }: {
   user: any
   tempFileName: string
   actionsByEmail?: Record<string, UsersBackupUserAction>
+  // when null, all the passwords in the backup are restored
+  restorePasswordEmails?: string[] | null
 }) => {
   FileUtils.checkIsValidTempFileName(tempFileName)
   const validActions = Object.values(UsersBackupUserAction)
@@ -63,7 +66,7 @@ const startImportJob = ({
     throw new Error(`Invalid user action: ${invalidAction}`)
   }
   const filePath = FileUtils.tempFilePath(tempFileName)
-  const job = new UsersBackupImportJob({ user, filePath, actionsByEmail })
+  const job = new UsersBackupImportJob({ user, filePath, actionsByEmail, restorePasswordEmails })
   JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
 }

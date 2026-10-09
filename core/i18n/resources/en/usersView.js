@@ -108,6 +108,10 @@ $t(common.pressRefreshToReloadPage)`,
       updateRoles: 'Update survey roles',
       updateAll: 'Update survey roles and details',
     },
+    sysAdmin: 'Sys. admin',
+    restorePassword: 'Password',
+    restorePasswordInfo:
+      'Restore the password stored in the backup (only when adding the user or updating its details)',
     userActionShort: {
       insert: 'Add',
       skip: 'Skip',
@@ -115,7 +119,6 @@ $t(common.pressRefreshToReloadPage)`,
       updateAll: 'Roles + details',
     },
     details: {
-      mainRole: 'Main role',
       survey: 'Survey',
       roleInBackup: 'Role in backup',
       currentRole: 'Current role',

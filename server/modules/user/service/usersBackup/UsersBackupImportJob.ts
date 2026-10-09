@@ -13,6 +13,7 @@ const existingUserActions = new Set([UsersBackupUserAction.updateRoles, UsersBac
 
 /**
  * Imports the users exported with UsersBackupExportJob, performing on every user the action chosen in actionsByEmail
+ * (passwords are restored only for the users in restorePasswordEmails, when specified)
  * (by default new users are inserted and existing ones are skipped).
  * Users are matched by email; survey roles and user groups are matched by survey name and group name.
  */
@@ -91,6 +92,11 @@ export default class UsersBackupImportJob extends Job {
     return action === UsersBackupUserAction.skip ? UsersBackupUserAction.skip : UsersBackupUserAction.insert
   }
 
+  shouldRestorePassword(user: UsersBackupUser): boolean {
+    const { restorePasswordEmails = null } = this.context as any
+    return !restorePasswordEmails || restorePasswordEmails.includes(user.email)
+  }
+
   async importUser(user: UsersBackupUser) {
     const existingUserUuid = await UsersBackupRepository.fetchUserUuidByEmail({ email: user.email }, this.tx)
     const action = this.getUserAction({ user, existing: Boolean(existingUserUuid) })
@@ -128,7 +134,7 @@ export default class UsersBackupImportJob extends Job {
     const values = {
       uuid: userUuid,
       name: user.name ?? null,
-      password: user.password ?? null,
+      password: this.shouldRestorePassword(user) ? (user.password ?? null) : null,
       status: user.status,
       props: user.props ?? {},
       profilePicture,

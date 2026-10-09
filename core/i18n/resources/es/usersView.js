@@ -106,6 +106,10 @@ $t(common.pressRefreshToReloadPage)`,
       updateRoles: 'Actualizar roles en las encuestas',
       updateAll: 'Actualizar roles en las encuestas y datos',
     },
+    sysAdmin: 'Admin. sist.',
+    restorePassword: 'Contraseña',
+    restorePasswordInfo:
+      'Restaurar la contraseña guardada en la copia de seguridad (solo al añadir el usuario o actualizar sus datos)',
     userActionShort: {
       insert: 'Añadir',
       skip: 'Omitir',
@@ -113,7 +117,6 @@ $t(common.pressRefreshToReloadPage)`,
       updateAll: 'Roles + datos',
     },
     details: {
-      mainRole: 'Rol principal',
       survey: 'Encuesta',
       roleInBackup: 'Rol en la copia de seguridad',
       currentRole: 'Rol actual',

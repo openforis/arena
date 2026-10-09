@@ -107,6 +107,10 @@ $t(common.pressRefreshToReloadPage)`,
       updateRoles: 'Судалгааны үүргийг шинэчлэх',
       updateAll: 'Судалгааны үүрэг болон мэдээллийг шинэчлэх',
     },
+    sysAdmin: 'Сист. админ',
+    restorePassword: 'Нууц үг',
+    restorePasswordInfo:
+      'Нөөцөд хадгалагдсан нууц үгийг сэргээх (зөвхөн хэрэглэгчийг нэмэх эсвэл мэдээллийг шинэчлэх үед)',
     userActionShort: {
       insert: 'Нэмэх',
       skip: 'Алгасах',
@@ -114,7 +118,6 @@ $t(common.pressRefreshToReloadPage)`,
       updateAll: 'Үүрэг + мэдээлэл',
     },
     details: {
-      mainRole: 'Үндсэн үүрэг',
       survey: 'Судалгаа',
       roleInBackup: 'Нөөц дэх үүрэг',
       currentRole: 'Одоогийн үүрэг',

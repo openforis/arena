@@ -69,6 +69,8 @@ export type UsersBackupPreviewUser = {
   email: string
   name?: string | null
   existing: boolean
+  // true if the backup contains the user password
+  hasPassword: boolean
   // roles in the backup (surveyExists/groupExists tell if they can be restored in this server)
   backup: UsersBackupPreviewRoles
   // roles already defined in this server (only for existing users)

@@ -238,8 +238,8 @@ export const init = (app) => {
   app.post('/users/backup/import', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { tempFileName, actionsByEmail } = Request.getParams(req)
-      const job = UsersBackupService.startImportJob({ user, tempFileName, actionsByEmail })
+      const { tempFileName, actionsByEmail, restorePasswordEmails } = Request.getParams(req)
+      const job = UsersBackupService.startImportJob({ user, tempFileName, actionsByEmail, restorePasswordEmails })
       res.json({ job })
     } catch (error) {
       next(error)

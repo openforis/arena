@@ -9,7 +9,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 
 import { Button } from '@webapp/components'
-import { ButtonGroup, TextInput } from '@webapp/components/form'
+import { ButtonGroup, Checkbox, TextInput } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 
 export const UserAction = {
@@ -31,6 +31,7 @@ export type ImportPreviewUser = {
   email: string
   name?: string | null
   existing: boolean
+  hasPassword: boolean
   backup: PreviewRoles
   current: PreviewRoles | null
 }
@@ -65,26 +66,15 @@ const useRoleLabel = () => {
 
 const systemAdminRole = 'systemAdmin'
 
-// survey manager is not shown: (almost) every user becomes one sooner or later
-const hiddenMainRoles = new Set(['surveyManager'])
-
-const useMainRolesLabel = () => {
-  const roleLabel = useRoleLabel()
-  return (roles: string[]) =>
-    roles
-      .filter((role) => !hiddenMainRoles.has(role))
-      .map(roleLabel)
-      .join(', ')
-}
+// the backup password can be restored only when user details are written
+export const isPasswordRestorable = (user: ImportPreviewUser, action: string) =>
+  user.hasPassword && (action === UserAction.insert || action === UserAction.updateAll)
 
 // survey roles in the backup compared with the ones already defined in this server
 const UserRolesDetails = ({ user }: { user: ImportPreviewUser }) => {
   const i18n = useI18n()
   const roleLabel = useRoleLabel()
-  const mainRolesLabel = useMainRolesLabel()
   const { backup, current, existing } = user
-  const backupMainRoles = mainRolesLabel(backup.mainRoles)
-  const currentMainRoles = existing ? mainRolesLabel(current.mainRoles) : ''
 
   const surveyNames = [
     ...new Set([...backup.surveyRoles, ...(current?.surveyRoles ?? [])].map((item) => item.surveyName)),
@@ -113,15 +103,6 @@ const UserRolesDetails = ({ user }: { user: ImportPreviewUser }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {(backupMainRoles || currentMainRoles) && (
-            <TableRow>
-              <TableCell>
-                <strong>{i18n.t('usersView:usersBackup.details.mainRole')}</strong>
-              </TableCell>
-              <TableCell>{backupMainRoles || '-'}</TableCell>
-              {existing && <TableCell>{currentMainRoles || '-'}</TableCell>}
-            </TableRow>
-          )}
           {surveyNames.map((surveyName) => {
             const backupRole = backup.surveyRoles.find((item) => item.surveyName === surveyName)
             const currentRole = current?.surveyRoles.find((item) => item.surveyName === surveyName)
@@ -173,25 +154,30 @@ const UserRow = ({
   user,
   action,
   onActionChange,
+  restorePassword,
+  onRestorePasswordChange,
 }: {
   user: ImportPreviewUser
   action: string
   onActionChange: (action: string) => void
+  restorePassword: boolean
+  onRestorePasswordChange: (value: boolean) => void
 }) => {
   const i18n = useI18n()
-  const mainRolesLabel = useMainRolesLabel()
   const [expanded, setExpanded] = useState(false)
   const { email, name, existing, backup, current } = user
-  const mainRoles = mainRolesLabel(existing ? current.mainRoles : backup.mainRoles)
+  // system admin in this server (existing users) or in the backup (new users)
+  const isSystemAdmin = (existing ? current : backup).mainRoles.includes(systemAdminRole)
   // system admins have no survey roles: nothing to show in the expanded row
-  const isSystemAdmin = [...backup.mainRoles, ...(current?.mainRoles ?? [])].includes(systemAdminRole)
+  const expandable = ![...backup.mainRoles, ...(current?.mainRoles ?? [])].includes(systemAdminRole)
+  const passwordRestorable = isPasswordRestorable(user, action)
 
   return (
     <>
       <TableRow className={classNames({ expanded })} hover>
         <TableCell padding="checkbox">
           <Button
-            disabled={isSystemAdmin}
+            disabled={!expandable}
             iconClassName={expanded ? 'icon-circle-up' : 'icon-circle-down'}
             onClick={() => setExpanded(!expanded)}
             title="common.expandCollapse"
@@ -202,7 +188,7 @@ const UserRow = ({
           {email}
         </TableCell>
         <TableCell>{name}</TableCell>
-        <TableCell>{mainRoles}</TableCell>
+        <TableCell align="center">{isSystemAdmin && <span className="icon icon-checkmark icon-14px" />}</TableCell>
         <TableCell>
           <span
             className={classNames('users-backup-user-status', {
@@ -220,9 +206,18 @@ const UserRow = ({
             short
           />
         </TableCell>
+        <TableCell align="center">
+          {user.hasPassword && (
+            <Checkbox
+              checked={passwordRestorable && restorePassword}
+              disabled={!passwordRestorable}
+              onChange={onRestorePasswordChange}
+            />
+          )}
+        </TableCell>
       </TableRow>
       <TableRow className="users-backup-import-users-table__details-row">
-        <TableCell colSpan={6}>
+        <TableCell colSpan={7}>
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             <UserRolesDetails user={user} />
           </Collapse>
@@ -236,13 +231,23 @@ export const UsersBackupImportUsersTable = ({
   users,
   actionsByEmail,
   onActionChange,
+  restorePasswordByEmail,
+  onRestorePasswordChange,
 }: {
   users: ImportPreviewUser[]
   actionsByEmail: Record<string, string>
   onActionChange: (user: ImportPreviewUser) => (action: string) => void
+  restorePasswordByEmail: Record<string, boolean>
+  onRestorePasswordChange: (users: ImportPreviewUser[]) => (value: boolean) => void
 }) => {
   const i18n = useI18n()
   const [search, setSearch] = useState('')
+
+  // header checkbox: (de)selects all the users whose password can be restored
+  const passwordRestorableUsers = users.filter((user) => isPasswordRestorable(user, actionsByEmail[user.email]))
+  const restorePasswordCount = passwordRestorableUsers.filter((user) => restorePasswordByEmail[user.email]).length
+  const allPasswordsRestored =
+    passwordRestorableUsers.length > 0 && restorePasswordCount === passwordRestorableUsers.length
 
   const usersFiltered = useMemo(() => {
     const searchLower = search.trim().toLowerCase()
@@ -267,15 +272,32 @@ export const UsersBackupImportUsersTable = ({
               <TableCell padding="checkbox" />
               <TableCell>{i18n.t('common.email')}</TableCell>
               <TableCell>{i18n.t('common.name')}</TableCell>
-              <TableCell>{i18n.t('usersView:usersBackup.details.mainRole')}</TableCell>
+              <TableCell align="center">{i18n.t('usersView:usersBackup.sysAdmin')}</TableCell>
               <TableCell>{i18n.t('usersView:usersBackup.userStatus')}</TableCell>
               <TableCell>{i18n.t('usersView:usersBackup.userActionHeader')}</TableCell>
+              <TableCell align="center" title={i18n.t('usersView:usersBackup.restorePasswordInfo')}>
+                <div className="users-backup-import-users-table__password-header">
+                  {i18n.t('usersView:usersBackup.restorePassword')}
+                  <Checkbox
+                    checked={allPasswordsRestored}
+                    disabled={passwordRestorableUsers.length === 0}
+                    indeterminate={restorePasswordCount > 0 && !allPasswordsRestored}
+                    onChange={onRestorePasswordChange(passwordRestorableUsers)}
+                  />
+                </div>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {usersFiltered.map((user) => (
               <Fragment key={user.email}>
-                <UserRow user={user} action={actionsByEmail[user.email]} onActionChange={onActionChange(user)} />
+                <UserRow
+                  user={user}
+                  action={actionsByEmail[user.email]}
+                  onActionChange={onActionChange(user)}
+                  restorePassword={Boolean(restorePasswordByEmail[user.email])}
+                  onRestorePasswordChange={onRestorePasswordChange([user])}
+                />
               </Fragment>
             ))}
           </TableBody>
