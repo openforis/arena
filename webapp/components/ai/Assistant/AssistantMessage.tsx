@@ -16,6 +16,7 @@ import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
+import type { AssistantArea } from './assistantAreas'
 import { AssistantMarkdown } from './AssistantMarkdown'
 import { getProposedChangeSetId, getToolRowLabel } from './assistantPanelModel'
 import { getProposedQueryId } from './analysis/analysisArea'
@@ -110,24 +111,24 @@ const AnswerPart = ({
  * @param {object} props - Props.
  * @param {AssistantMessage} props.message - Answer.
  * @param {boolean} props.isLast - Last message.
+ * @param {AssistantArea} props.area - Current area (its feature decides the record-data notice).
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @returns {React.ReactElement|null} The footer.
  */
 const AnswerFooter = ({
   message,
   isLast,
+  area,
   api,
 }: {
   message: AssistantMessage
   isLast: boolean
+  area: AssistantArea
   api: AssistantConversationApi
 }) => {
   const t = useI18nT({ unescapeHtml: true })
   // the record-data notice replaces the composer: the conversation can't continue, so no Retry
-  const recordDataNotice = useRecordDataNotice(
-    api.conversation,
-    assistantAreaFeatures[api.conversation?.area ?? 'analysis']
-  )
+  const recordDataNotice = useRecordDataNotice(api.conversation, assistantAreaFeatures[area])
   if (message.status === 'stopped') return <p className="ai-assistant-message__stopped">{t('aiAssistant.stopped')}</p>
   if (message.status !== 'error') return null
   // only the key is stored with the message: engine errors get their own Retry / Open settings buttons
@@ -160,6 +161,7 @@ const AnswerFooter = ({
  * @param {object} props.changeSets - Cards of the conversation.
  * @param {object} props.queries - Queries of the conversation.
  * @param {boolean} props.isLast - Last message (Retry).
+ * @param {AssistantArea} props.area - Current area.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @returns {React.ReactElement|null} The message.
  */
@@ -168,12 +170,14 @@ export const AssistantMessageView = ({
   changeSets,
   queries,
   isLast,
+  area,
   api,
 }: {
   message: ConversationMessage
   changeSets: ChangeSets
   queries: Queries
   isLast: boolean
+  area: AssistantArea
   api: AssistantConversationApi
 }) => {
   if (message.role === 'applyNote') return null
@@ -201,7 +205,7 @@ export const AssistantMessageView = ({
         />
       ))}
       {message.status === 'streaming' && <span aria-hidden="true" className="ai-assistant-message__typing" />}
-      <AnswerFooter api={api} isLast={isLast} message={message} />
+      <AnswerFooter api={api} area={area} isLast={isLast} message={message} />
     </div>
   )
 }
