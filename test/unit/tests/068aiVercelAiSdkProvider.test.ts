@@ -79,4 +79,21 @@ describe('vercel-ai-sdk provider (LanguageModelV4)', () => {
     await reader.cancel()
     expect(upstreamSignal.aborted).toBe(true)
   })
+
+  test('an upstream error event aborts the upstream request', async () => {
+    let upstreamSignal: AbortSignal
+    const fetchImpl = async (_url, init) => {
+      upstreamSignal = init.signal
+      return sseResponse(['data: {"type":"error","errorText":"agent down"}\n\n'])
+    }
+    const model = createVercelAiSdkModel({ baseUrl: 'https://agent.example/chat', fetchImpl })
+    await expect(generateText({ model, prompt: 'Hi', maxRetries: 0 })).rejects.toThrow('agent down')
+    expect(upstreamSignal.aborted).toBe(true)
+  })
+
+  test('a timeout fails generation instead of returning a truncated answer', async () => {
+    const fetchImpl = async () => new Response(new ReadableStream({ start() {} }), { status: 200 })
+    const model = createVercelAiSdkModel({ baseUrl: 'https://agent.example/chat', timeoutMs: 20, fetchImpl })
+    await expect(generateText({ model, prompt: 'Hi', maxRetries: 0 })).rejects.toThrow()
+  })
 })

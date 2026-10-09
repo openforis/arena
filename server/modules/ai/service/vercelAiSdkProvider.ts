@@ -121,13 +121,19 @@ const postChat = async ({
 const readAll = async (response: Response, onText: (text: string) => void, signal: AbortSignal): Promise<void> => {
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
+  // cancelling the reader unblocks a pending read when the call is aborted
+  const onAbort = () => reader.cancel(signal.reason).catch(() => undefined)
+  signal.addEventListener('abort', onAbort, { once: true })
   try {
     while (!signal.aborted) {
       const { value, done } = await reader.read()
       if (done) break
       onText(decoder.decode(value, { stream: true }))
     }
+    // an abort (timeout, caller) must not look like a complete answer
+    if (signal.aborted) throw signal.reason
   } finally {
+    signal.removeEventListener('abort', onAbort)
     reader.releaseLock()
   }
 }
@@ -233,6 +239,9 @@ export const createVercelAiSdkModel = ({
         usage: unknownUsageV4(),
         warnings: [],
       }
+    } catch (error) {
+      call.abort(error) // closes the upstream connection on any failure
+      throw error
     } finally {
       call.cleanup()
     }
