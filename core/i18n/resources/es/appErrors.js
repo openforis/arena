@@ -1,6 +1,13 @@
 export default {
   aiDataQueryDescriptionMissing: 'Describa en lenguaje natural los datos que desea ver.',
   aiDataQueryEmpty: 'Primero seleccione una entidad y algunos atributos (o dimensiones y medidas).',
+  aiLocalServerUnreachable:
+    'No se pudo conectar con el servidor de IA local en {{baseUrl}}. ¿Está en marcha, con CORS activado? ¿Bloqueó el navegador el acceso a los dispositivos de la red local?',
+  aiLocalServerModelMissing:
+    'El modelo "{{modelId}}" no está disponible en el servidor de IA local. Cárguelo en LM Studio o elija otro modelo en su configuración de IA.',
+  aiLocalServerContextExceeded:
+    'La solicitud es demasiado larga para el tamaño de contexto del modelo local. Cargue el modelo con un contexto mayor en LM Studio o acorte la solicitud.',
+  aiLocalServerError: 'El servidor de IA local devolvió un error (HTTP {{status}}).',
   aiDataQueryInvalid: 'La IA no pudo generar una consulta válida para esta solicitud: {{errors}}',
   aiDataQueryNoEntities: 'Esta encuesta no tiene entidades que se puedan consultar.',
   aiDataQuerySummaryInvalid:

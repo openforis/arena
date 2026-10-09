@@ -1,6 +1,13 @@
 export default {
   aiDataQueryDescriptionMissing: 'Veuillez décrire en langage naturel les données que vous souhaitez voir.',
   aiDataQueryEmpty: "Sélectionnez d'abord une entité et des attributs (ou des dimensions et des mesures).",
+  aiLocalServerUnreachable:
+    "Le serveur d'IA local à l'adresse {{baseUrl}} est injoignable. Est-il démarré, avec CORS activé ? Le navigateur a-t-il bloqué l'accès aux appareils du réseau local ?",
+  aiLocalServerModelMissing:
+    "Le modèle « {{modelId}} » n'est pas disponible sur le serveur d'IA local. Chargez-le dans LM Studio ou choisissez un autre modèle dans vos paramètres d'IA.",
+  aiLocalServerContextExceeded:
+    'La requête est trop longue pour la taille de contexte du modèle local. Chargez le modèle avec un contexte plus grand dans LM Studio ou raccourcissez la requête.',
+  aiLocalServerError: "Le serveur d'IA local a renvoyé une erreur (HTTP {{status}}).",
   aiDataQueryInvalid: "L'IA n'a pas pu générer une requête valide pour cette demande : {{errors}}",
   aiDataQueryNoEntities: 'Ce formulaire ne contient aucune entité pouvant être interrogée.',
   aiDataQuerySummaryInvalid:

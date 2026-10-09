@@ -1,6 +1,13 @@
 export default {
   aiDataQueryDescriptionMissing: 'Descreva em linguagem natural os dados que deseja ver.',
   aiDataQueryEmpty: 'Selecione primeiro uma entidade e alguns atributos (ou dimensões e medidas).',
+  aiLocalServerUnreachable:
+    'Não foi possível conectar ao servidor de IA local em {{baseUrl}}. Ele está em execução, com CORS ativado? O navegador bloqueou o acesso a dispositivos da rede local?',
+  aiLocalServerModelMissing:
+    'O modelo "{{modelId}}" não está disponível no servidor de IA local. Carregue-o no LM Studio ou escolha outro modelo nas suas configurações de IA.',
+  aiLocalServerContextExceeded:
+    'A solicitação é longa demais para o tamanho de contexto do modelo local. Carregue o modelo com um contexto maior no LM Studio ou encurte a solicitação.',
+  aiLocalServerError: 'O servidor de IA local retornou um erro (HTTP {{status}}).',
   aiDataQueryInvalid: 'A IA não conseguiu gerar uma consulta válida para esta solicitação: {{errors}}',
   aiDataQueryNoEntities: 'Este inventário não possui entidades que possam ser consultadas.',
   aiDataQuerySummaryInvalid: 'A IA não conseguiu sugerir um nome e uma descrição para esta consulta. Tente novamente.',

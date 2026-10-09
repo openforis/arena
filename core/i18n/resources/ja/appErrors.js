@@ -112,6 +112,13 @@ export default {
   aiDataQueryNoEntities: 'この調査にはクエリ可能な項目がありません。',
   aiDataQueryInvalid: 'AIはこのリクエストに対して有効なクエリを生成できませんでした：{{errors}}',
   aiDataQueryEmpty: '先に項目と属性（またはディメンションとメジャー）を選択してください。',
+  aiLocalServerUnreachable:
+    'ローカル AI サーバー ({{baseUrl}}) に接続できませんでした。CORS を有効にして起動していますか？ブラウザーがローカルネットワーク上のデバイスへのアクセスをブロックしていませんか？',
+  aiLocalServerModelMissing:
+    'モデル「{{modelId}}」はローカル AI サーバーで利用できません。LM Studio で読み込むか、AI 設定で別のモデルを選択してください。',
+  aiLocalServerContextExceeded:
+    'リクエストがローカルモデルのコンテキストサイズを超えています。LM Studio でより大きなコンテキストでモデルを読み込むか、リクエストを短くしてください。',
+  aiLocalServerError: 'ローカル AI サーバーがエラーを返しました (HTTP {{status}})。',
   aiDataQuerySummaryInvalid: 'AIはこのクエリの名前と説明を提案できませんでした。もう一度お試しください。',
   userCannotDeleteHasMessages:
     'このユーザーは削除できません：{{count}}件のメッセージを作成しています。先にメッセージを削除するか、担当を変更してください',
