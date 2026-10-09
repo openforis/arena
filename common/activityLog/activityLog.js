@@ -7,6 +7,7 @@ export const type = {
   surveyCreate: 'surveyCreate',
   surveyOwnerUpdate: 'surveyOwnerUpdate',
   surveyPropUpdate: 'surveyPropUpdate',
+  surveyAiPolicyUpdate: 'surveyAiPolicyUpdate',
   surveyPublish: 'surveyPublish',
   surveyUnpublish: 'surveyUnpublish',
   surveyCollectImport: 'surveyCollectImport',

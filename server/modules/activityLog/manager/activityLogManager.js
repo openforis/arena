@@ -14,6 +14,7 @@ const activityTypesCommon = [ActivityLog.type.surveyCreate]
 const activityTypesByPermission = {
   [AuthGroups.permissions.surveyEdit]: [
     ActivityLog.type.surveyPropUpdate,
+    ActivityLog.type.surveyAiPolicyUpdate,
     ActivityLog.type.surveyPublish,
     ActivityLog.type.nodeDefCreate,
     ActivityLog.type.nodeDefUpdate,
