@@ -84,9 +84,13 @@ describe('withAddressSpace', () => {
   test('adds targetAddressSpace for private addresses only', () => {
     expect(withAddressSpace({ method: 'GET' }, 'http://192.168.1.20:1234/v1/models')).toEqual({
       method: 'GET',
+      redirect: 'error',
       targetAddressSpace: 'local',
     })
-    expect(withAddressSpace({ method: 'GET' }, 'http://localhost:1234/v1/models')).toEqual({ method: 'GET' })
+    expect(withAddressSpace({ method: 'GET' }, 'http://localhost:1234/v1/models')).toEqual({
+      method: 'GET',
+      redirect: 'error',
+    })
   })
 })
 
@@ -99,6 +103,16 @@ describe('createLocalServerFetch', () => {
     }
     return { calls, fetchImpl }
   }
+
+  test('never follows redirects; a refused redirect is unreachable', async () => {
+    const { calls, fetchImpl } = recorder(async () => {
+      throw new TypeError('Failed to fetch')
+    })
+    const localFetch = createLocalServerFetch({ fetchImpl, baseUrl: BASE_URL, modelId: 'local-model' })
+    const error = await localFetch(`${BASE_URL}/chat/completions`, { method: 'POST' }).catch((e) => e)
+    expect(calls[0].init?.redirect).toBe('error')
+    expect(error.key).toBe('aiLocalServerUnreachable')
+  })
 
   test('passes a successful response through', async () => {
     const { calls, fetchImpl } = recorder(async () => jsonResponse(200, { ok: true }))

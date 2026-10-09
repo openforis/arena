@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { getAiErrorMessage } from '@webapp/ai/runtime/runtimeErrors'
-import { getCurrentUserUuid, refreshAiCapabilities, testLocalServer } from '@webapp/ai/engines/capabilitiesStore'
+import {
+  getCurrentUserUuid,
+  loadAiCapabilities,
+  refreshAiCapabilities,
+  testLocalServer,
+} from '@webapp/ai/engines/capabilitiesStore'
 import {
   getBrowserStorage,
   loadLocalServerSettings,
@@ -66,7 +71,11 @@ export const LocalAiSection = (props: Props) => {
     setTesting(true)
     setTestView(null)
     try {
-      const probe = await testLocalServer({ baseUrl: current.baseUrl, modelId: current.modelId })
+      // the allowlist comes with the capabilities: classify with the loaded one, never the empty snapshot's
+      const [probe, loaded] = await Promise.all([
+        testLocalServer({ baseUrl: current.baseUrl, modelId: current.modelId }),
+        loadAiCapabilities(),
+      ])
       // the user logged out or switched meanwhile: write nothing for the new session
       if (getCurrentUserUuid() !== testedUserUuid) return
       // the URL was edited meanwhile: the result belongs to another server
@@ -76,7 +85,7 @@ export const LocalAiSection = (props: Props) => {
         getLocalServerTestView({
           probe,
           baseUrl: current.baseUrl,
-          allowlist: capabilities.instance.orgHostedBaseUrls,
+          allowlist: loaded.instance.orgHostedBaseUrls,
           pageProtocol: window.location.protocol,
         })
       )
@@ -90,7 +99,7 @@ export const LocalAiSection = (props: Props) => {
     } finally {
       setTesting(false)
     }
-  }, [capabilities.instance.orgHostedBaseUrls, save, settings])
+  }, [save, settings])
 
   const onBaseUrlBlur = useCallback(() => {
     const next = normalizeLocalServerSettings(settings)
