@@ -15,6 +15,7 @@ import * as AiSettingsService from '../service/aiSettingsService'
 import * as ProviderResolver from '../service/providerResolver'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 import { getDisabledFeatureKeys } from '../service/featureGate'
+import { getAiPolicyCeilings } from '../service/policyCeilings'
 import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 const buildResponseBody = async (user) => {
@@ -25,6 +26,9 @@ const buildResponseBody = async (user) => {
     effectiveSource: effective.source,
     effectiveProvider: effective.provider,
     effectiveModel: effective.model,
+    // where the gateway sends the data, and the instance ceilings (browser policy check, Help chat)
+    hostingClass: effective.hostingClass,
+    policyCeilings: getAiPolicyCeilings(),
     encryptionConfigured: SecretBox.isConfigured(),
     disabledFeatures: getDisabledFeatureKeys(),
   }

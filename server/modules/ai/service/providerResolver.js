@@ -12,6 +12,7 @@ import SystemError, { StatusCodes } from '@core/systemError'
 
 import * as AiSettingsService from './aiSettingsService'
 import * as ProviderRegistry from './providerRegistry'
+import { getProviderHostingClass } from './hostingClass'
 
 export const sources = {
   user: 'user',
@@ -42,11 +43,28 @@ export const resolveConfigForUser = (user, adminConfig = adminDefaultConfig()) =
 }
 
 /**
+ * Describes a resolved provider config: provenance plus where the data goes.
+ * @param {{cfg: object, source: string}|null} resolved - Result of resolveConfigForUser.
+ * @param {string[]} [allowlist] - Org-hosted base URLs (defaults to AI_ORG_HOSTED_BASE_URLS).
+ * @returns {{source: ?string, provider: ?string, model: ?string, hostingClass: ?string}} The description.
+ */
+export const describeResolvedConfig = (resolved, allowlist = ENV.aiOrgHostedBaseUrls) => {
+  if (!resolved) return { source: null, provider: null, model: null, hostingClass: null }
+  const { cfg, source } = resolved
+  return {
+    source,
+    provider: cfg.provider,
+    model: cfg.model,
+    hostingClass: getProviderHostingClass({ provider: cfg.provider, baseUrl: cfg.baseUrl, allowlist }),
+  }
+}
+
+/**
  * Resolves the model handle for a (user, feature) pair.
  * @param {object} args - Resolver inputs.
  * @param {object} args.user - The Arena user object.
  * @param {string} args.feature - Feature key (e.g. "translation"). Used for telemetry.
- * @returns {Promise<{model: object, meta: {source: string, provider: string, model: string}}>}
+ * @returns {Promise<{model: object, meta: {source: string, provider: string, model: string, hostingClass: string}}>}
  *   The AI SDK model handle plus telemetry metadata.
  * @throws {SystemError} `aiNotConfigured` when no provider is available.
  */
@@ -56,17 +74,15 @@ export const resolveModelForUser = async ({ user, feature }) => {
   const { cfg, source } = resolved
   // user-supplied config goes through the guarded builder (SSRF checks)
   const model = source === sources.user ? await ProviderRegistry.buildUserModel(cfg) : ProviderRegistry.buildModel(cfg)
-  return { model, meta: { source, provider: cfg.provider, model: cfg.model } }
+  return { model, meta: describeResolvedConfig(resolved) }
 }
 
 /**
  * Returns the provenance label that the AI Settings UI displays under "Currently using:".
  * Decrypts the user key, so an unreadable key reports the admin default actually used.
  * @param {object} user - The Arena user object.
- * @returns {Promise<{source: ?string, provider: ?string, model: ?string}>} Provenance info.
+ * @returns {Promise<{source: ?string, provider: ?string, model: ?string, hostingClass: ?string}>} Provenance info.
  */
 export const describeEffectiveSource = async (user) => {
-  const resolved = resolveConfigForUser(user)
-  if (!resolved) return { source: null, provider: null, model: null }
-  return { source: resolved.source, provider: resolved.cfg.provider, model: resolved.cfg.model }
+  return describeResolvedConfig(resolveConfigForUser(user))
 }
