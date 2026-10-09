@@ -7,6 +7,9 @@ import { getQueryChartType } from '@webapp/store/dataExplorer/explorerQuery'
 
 import { canViewCurrentSurvey, getAnalysisContext } from './toolResults'
 
+const MAX_ISSUES = 10
+const MAX_ISSUE_CHARS = 300
+
 const name = z.string().max(100)
 const nameList = z.array(name).max(50).nullish()
 
@@ -64,7 +67,7 @@ const execute = async (input: ProposeQueryInput, ctx: any) => {
       error: {
         code: 'invalidProposal',
         message: 'The proposed query is not valid: fix the issues and propose it again.',
-        issues: errors.map((message) => ({ message })),
+        issues: errors.slice(0, MAX_ISSUES).map((message) => ({ message: message.slice(0, MAX_ISSUE_CHARS) })),
       },
     }
   }

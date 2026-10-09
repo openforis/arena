@@ -121,8 +121,17 @@ describe('query_propose', () => {
       ctx
     )
     expect(result.error.code).toBe('invalidProposal')
-    expect(result.error.issues.length).toBeGreaterThan(0)
+    expect(result.error.issues[0].message).toBe('"dbh" cannot be used as attribute for entity "plot"')
     expect(ctx.analysisQueries.list()).toEqual([])
+  })
+
+  test('issues are capped in number and length', async () => {
+    const ctx = newAnalysisToolContext({ survey })
+    const dimensions = Array.from({ length: 50 }, (_, i) => `n${i}_${'x'.repeat(90)}`)
+    const result = await runTool(proposeQueryTool, { ...aggregateInput, dimensions }, ctx)
+    expect(result.error.issues).toHaveLength(10)
+    expect(result.error.issues.every((issue) => issue.message.length <= 300)).toBe(true)
+    expect(JSON.stringify(result).length).toBeLessThanOrEqual(7000)
   })
 
   test('an unparsable filter expression is rejected', async () => {
