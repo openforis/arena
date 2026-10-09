@@ -107,7 +107,7 @@ const AnswerFooter = ({
   return (
     <div className="ai-assistant-message__error" role="alert">
       <span>{t(`appErrors:${message.errorKey ?? 'aiProviderUnavailable'}`)}</span>
-      {isLast && <AiEngineErrorActions error={engineError} onRetry={api.retry} />}
+      {isLast && <AiEngineErrorActions disabled={api.busy} error={engineError} onRetry={api.retry} />}
       {isLast && !hasEngineRetry && (
         <Button
           disabled={api.busy}

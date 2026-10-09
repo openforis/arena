@@ -13,7 +13,7 @@ import type { Conversation } from '@webapp/ai/conversations/types'
 import { getHandbookOutline } from '@webapp/ai/help/handbookSearch'
 import { loadHandbook } from '@webapp/ai/help/loadHandbook'
 import { resolveAssistantEngine } from '@webapp/ai/engines/assistantEngine'
-import { resolveModel } from '@webapp/ai/engines/resolveModel'
+import { resolveModel, type ResolveModelParams, type ResolvedModel } from '@webapp/ai/engines/resolveModel'
 import type { AiSelectedEngine } from '@webapp/ai/engines/types'
 import { getAiErrorKey, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
@@ -53,6 +53,8 @@ export type RunAssistantTurnParams = {
   tools?: AiTool[]
   // called once per turn with the selected engine (not when `model` is given)
   onEngine?: (engine: AiSelectedEngine) => void
+  // engine resolver (injected by tests)
+  resolve?: (params: ResolveModelParams) => Promise<ResolvedModel>
 }
 
 /**
@@ -144,6 +146,7 @@ export const runAssistantTurn = async ({
   systemPrompt,
   tools,
   onEngine,
+  resolve = resolveModel,
 }: RunAssistantTurnParams): Promise<Conversation> => {
   const state = createTurnState({ conversation, userMessage, onUpdate })
   const turnCtx: AiToolContext = {
@@ -168,7 +171,7 @@ export const runAssistantTurn = async ({
       surveyId,
       // the conversation's class ('schema' for the assistant)
       dataClass: conversation.dataClass,
-      resolve: resolveModel,
+      resolve,
     })
     if (turn.engine) onEngine?.(turn.engine)
     const toolList = getTools({

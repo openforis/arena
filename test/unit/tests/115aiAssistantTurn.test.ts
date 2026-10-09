@@ -59,8 +59,9 @@ const run = ({
   onUpdate = () => {},
   limits,
   ctx = createToolContext(),
+  extra = {},
 }: {
-  model: MockLanguageModelV4
+  model?: MockLanguageModelV4
   tools?: AiTool[]
   conversation?: Conversation
   userMessage?: string
@@ -69,6 +70,7 @@ const run = ({
   onUpdate?: (conversation: Conversation) => void
   limits?: { maxPromptChars: number; maxSteps: number }
   ctx?: ReturnType<typeof createToolContext>
+  extra?: Partial<Parameters<typeof runAssistantTurn>[0]>
 }) =>
   runAssistantTurn({
     conversation,
@@ -80,6 +82,7 @@ const run = ({
     signal,
     model,
     limits,
+    ...extra,
     systemPrompt: 'SYSTEM',
     tools,
   })
@@ -215,5 +218,41 @@ describe('runAssistantTurn', () => {
     const withTools = scriptedModel(() => textStream('ok'))
     await run({ model: withTools, tools: [echo] })
     expect(withTools.doStreamCalls[0].tools?.map((tool: any) => tool.name)).toEqual(['test_echo'])
+  })
+  describe('engine resolution (no model given)', () => {
+    const localEngine: any = {
+      id: 'localServer',
+      hostingClass: 'onDevice',
+      label: 'LM Studio',
+      model: 'local-model',
+      limits: { maxPromptChars: 5000, maxSteps: 1 },
+    }
+
+    test('a consent cancel ends as stopped, without an error key', async () => {
+      const cancelled = Object.assign(new Error('aiLocalServerConsentCancelled'), {
+        key: 'aiLocalServerConsentCancelled',
+      })
+      const resolve = async () => {
+        throw cancelled
+      }
+      const result = await run({ extra: { resolve } })
+      expect(answerOf(result).status).toBe('stopped')
+      expect(answerOf(result).errorKey).toBeUndefined()
+    })
+
+    test('onEngine is called once and the engine limits and hosting class are used', async () => {
+      const echo = makeTool('test_echo', async () => ({ ok: true }))
+      const model = scriptedModel(
+        () => toolCallStream('c1', 'test_echo', { summary: 'a' }),
+        () => textStream('never')
+      )
+      const resolve = async () => ({ model, engine: localEngine })
+      const engines: unknown[] = []
+      const result = await run({ tools: [echo], extra: { resolve, onEngine: (engine) => engines.push(engine) } })
+      expect(engines).toEqual([localEngine])
+      // maxSteps 1: the loop stops after the first model call
+      expect(model.doStreamCalls).toHaveLength(1)
+      expect(answerOf(result).status).toBe('done')
+    })
   })
 })

@@ -75,9 +75,9 @@ export const useAssistantConversation = ({
   const conversationRef = useRef<Conversation | null>(null)
   const controllerRef = useRef<AbortController | null>(null)
   const applyingRef = useRef(false)
-  // id of the conversation whose turn is running (its streaming answer is live, not left over)
   // location of the previous turn: kept across conversations (the notice is about the engine)
   const lastLocationRef = useRef<AiDataLocation | null>(null)
+  // id of the conversation whose turn is running (its streaming answer is live, not left over)
   const runningIdRef = useRef<string | null>(null)
 
   const show = useCallback((next: Conversation | null) => {
@@ -150,6 +150,7 @@ export const useAssistantConversation = ({
           ? assistantTurnRegistry.track(conversationStore.save(next))
           : Promise.resolve()
       setBusy(true)
+      setEngineNotice(null)
       show(base)
       assistantPanelStore.setConversationId(base.id)
       let saved = false
@@ -162,7 +163,8 @@ export const useAssistantConversation = ({
           ctx: buildToolContext(area),
           access,
           onEngine: (engine: AiSelectedEngine) => {
-            if (isCurrent()) setEngineNotice(getEngineChangeNotice({ previous: lastLocationRef.current, engine }))
+            if (!isCurrent()) return
+            setEngineNotice(getEngineChangeNotice({ previous: lastLocationRef.current, engine }))
             lastLocationRef.current = toDataLocation(engine)
           },
           signal: controller.signal,
@@ -205,9 +207,15 @@ export const useAssistantConversation = ({
 
   const stop = useCallback(() => controllerRef.current?.abort(), [])
 
-  const newConversation = useCallback(() => assistantPanelStore.setConversationId(null), [])
+  const newConversation = useCallback(() => {
+    setEngineNotice(null)
+    assistantPanelStore.setConversationId(null)
+  }, [])
 
-  const openConversation = useCallback((id: string) => assistantPanelStore.setConversationId(id), [])
+  const openConversation = useCallback((id: string) => {
+    setEngineNotice(null)
+    assistantPanelStore.setConversationId(id)
+  }, [])
 
   const listAreaConversations = useCallback(async () => {
     if (!conversationStore) return []
