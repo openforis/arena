@@ -92,7 +92,7 @@ $t(common.pressRefreshToReloadPage)`,
     restoreTitle: 'Restaurar usuários a partir de um backup',
     restoreInfo: `- Os usuários são identificados pelo e-mail
 - Os papéis nos inventários e os grupos de usuários são identificados pelo nome do inventário e pelo nome do grupo
-- Os inventários que não existem neste servidor são ignorados
+- Os papéis e grupos de usuários de inventários que não existem neste servidor são ignorados
 - Execute primeiro "Validar" para verificar o que será alterado`,
     conflictMode: {
       skip: 'Ignorar usuários existentes',

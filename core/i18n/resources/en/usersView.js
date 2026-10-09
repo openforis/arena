@@ -92,7 +92,7 @@ $t(common.pressRefreshToReloadPage)`,
     restoreTitle: 'Restore users from backup',
     restoreInfo: `- Users are matched by email
 - Survey roles and user groups are matched by survey name and group name
-- Surveys not existing in this server are ignored
+- Roles and user groups of surveys not existing in this server are ignored
 - Run "Validate" first to check what will change`,
     conflictMode: {
       skip: 'Skip existing users',

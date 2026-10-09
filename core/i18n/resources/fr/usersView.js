@@ -94,7 +94,7 @@ $t(common.pressRefreshToReloadPage)`,
     restoreTitle: 'Restaurer les utilisateurs depuis une sauvegarde',
     restoreInfo: `- Les utilisateurs sont identifiés par leur adresse e-mail
 - Les rôles dans les formulaires et les groupes d'utilisateurs sont identifiés par le nom du formulaire et le nom du groupe
-- Les formulaires inexistants sur ce serveur sont ignorés
+- Les rôles et groupes d'utilisateurs des formulaires inexistants sur ce serveur sont ignorés
 - Lancez d'abord « Valider » pour vérifier ce qui va changer`,
     conflictMode: {
       skip: 'Ignorer les utilisateurs existants',

@@ -89,7 +89,7 @@ $t(common.pressRefreshToReloadPage)`,
     restoreTitle: 'Restaurar usuarios desde una copia de seguridad',
     restoreInfo: `- Los usuarios se identifican por su correo electrónico
 - Los roles en las encuestas y los grupos de usuarios se identifican por el nombre de la encuesta y el nombre del grupo
-- Las encuestas que no existen en este servidor se ignoran
+- Los roles y grupos de usuarios de encuestas que no existen en este servidor se ignoran
 - Ejecute primero "Validar" para comprobar qué cambiará`,
     conflictMode: {
       skip: 'Omitir usuarios existentes',
