@@ -27,6 +27,8 @@ const displayTypes = {
   chart: 'chart',
 }
 
+const chartMaxItems = 5000
+
 const availableChartTypeByMode = {
   [Query.modes.aggregate]: [chartTypes.bar, chartTypes.line, chartTypes.area, chartTypes.pie],
   [Query.modes.raw]: [chartTypes.scatter],
@@ -88,7 +90,7 @@ const assocQuery = (queryParam) => (state) => {
     // query mode could have changed;
     // check that the selected chart type is still available,
     // otherwise reset it to the default
-    const chartType = A.prop(keys.chart)(stateUpdated)
+    const chartType = A.prop(keys.chartType)(stateUpdated)
     const queryMode = Query.getMode(queryUpdated)
     const availableChartTypes = availableChartTypeByMode[queryMode]
     if (!availableChartTypes.includes(chartType)) {
@@ -118,6 +120,7 @@ export const DataExplorerState = {
   keys,
   chartTypes,
   displayTypes,
+  chartMaxItems,
   // read
   isEditMode,
   isNodeDefsSelectorVisible,

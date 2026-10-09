@@ -2,17 +2,25 @@ import axios from 'axios'
 
 import { Query } from '@common/model/query'
 
-import * as A from '@core/arena'
-
 const getEntityViewUrlPrefix = ({ surveyId, query }) =>
   `/api/surveyRdb/${surveyId}/${Query.getEntityDefUuid(query)}/query`
 
+/**
+ * Returns the URL and body of the Explorer count request (the server reads the query as an object).
+ * @param {object} params - Parameters.
+ * @param {number} params.surveyId - Survey id.
+ * @param {object} params.query - Explorer query.
+ * @param {string} params.cycle - Survey cycle.
+ * @returns {{url: string, body: object}} The request.
+ */
+export const getEntityViewDataCountRequest = ({ surveyId, query, cycle }) => ({
+  url: `${getEntityViewUrlPrefix({ surveyId, query })}/count`,
+  body: { cycle, query },
+})
+
 export const fetchEntityViewDataCount = async ({ surveyId, query, cycle }) => {
-  const url = `${getEntityViewUrlPrefix({ surveyId, query })}/count`
-  const { data } = await axios.post(url, {
-    cycle,
-    query: A.stringify(query),
-  })
+  const { url, body } = getEntityViewDataCountRequest({ surveyId, query, cycle })
+  const { data } = await axios.post(url, body)
   return data
 }
 

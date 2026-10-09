@@ -53,16 +53,7 @@ const uiModeByQueryMode = {
 }
 
 const ButtonBar = (props) => {
-  const {
-    dataCount,
-    dataEmpty,
-    dataLoaded,
-    dataLoading,
-    nodeDefLabelType,
-    onNodeDefLabelTypeChange,
-    setQueryLimit,
-    setQueryOffset,
-  } = props
+  const { dataCount, dataEmpty, dataLoaded, dataLoading, nodeDefLabelType, onNodeDefLabelTypeChange } = props
 
   const dispatch = useDispatch()
   const appSaving = useIsAppSaving()
@@ -133,7 +124,7 @@ const ButtonBar = (props) => {
 
       <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
 
-      <ButtonGroupDisplayType dataCount={dataCount} setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
+      <ButtonGroupDisplayType dataCount={dataCount} />
     </div>
   )
 }
@@ -145,8 +136,6 @@ ButtonBar.propTypes = {
   dataLoading: PropTypes.bool.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   onNodeDefLabelTypeChange: PropTypes.func.isRequired,
-  setQueryLimit: PropTypes.func.isRequired,
-  setQueryOffset: PropTypes.func.isRequired,
 }
 
 export default ButtonBar

@@ -41,7 +41,7 @@ const DataQuery = () => {
     setLimit,
     setOffset,
     setData,
-  } = useDataQuery({ query })
+  } = useDataQuery({ query, displayType })
 
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
 
@@ -63,8 +63,6 @@ const DataQuery = () => {
             dataLoading={dataLoading}
             nodeDefLabelType={nodeDefLabelType}
             onNodeDefLabelTypeChange={toggleLabelFunction}
-            setQueryLimit={setLimit}
-            setQueryOffset={setOffset}
           />
         </div>
 

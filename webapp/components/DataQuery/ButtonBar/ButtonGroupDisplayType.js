@@ -8,7 +8,7 @@ import { ButtonGroup } from '@webapp/components/form'
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 import { NotificationActions } from '@webapp/store/ui'
 
-const { displayTypes, chartTypes, isChartTypeAvailable } = DataExplorerState
+const { displayTypes, chartTypes, chartMaxItems, isChartTypeAvailable } = DataExplorerState
 
 const iconByDisplayType = {
   [displayTypes.chart]: 'icon-pie-chart',
@@ -35,10 +35,8 @@ const getChartTypeItemByKey = (chartType) => ({
   title: `dataView:charts.type.${chartType}`,
 })
 
-const chartMaxItems = 5000
-
 export const ButtonGroupDisplayType = (props) => {
-  const { dataCount, setQueryLimit, setQueryOffset } = props
+  const { dataCount } = props
   const dispatch = useDispatch()
   const displayType = DataExplorerSelectors.useDisplayType()
   const chartType = DataExplorerSelectors.useChartType()
@@ -66,9 +64,6 @@ export const ButtonGroupDisplayType = (props) => {
             return
           }
           dispatch(DataExplorerActions.setDisplayType(type))
-          setQueryOffset(0)
-          const limitUpdated = type === displayTypes.chart ? null : 15
-          setQueryLimit(limitUpdated)
         }}
         items={displayTypeItems}
       />
@@ -86,6 +81,4 @@ export const ButtonGroupDisplayType = (props) => {
 
 ButtonGroupDisplayType.propTypes = {
   dataCount: PropTypes.number,
-  setQueryLimit: PropTypes.func.isRequired,
-  setQueryOffset: PropTypes.func.isRequired,
 }
