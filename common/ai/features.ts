@@ -10,6 +10,7 @@ export const AiFeatureCategory = {
   dataDictionary: 'dataDictionary',
   userActivity: 'userActivity',
   dataQuery: 'dataQuery',
+  assistant: 'assistant',
 } as const
 
 export type AiFeatureCategory = (typeof AiFeatureCategory)[keyof typeof AiFeatureCategory]
@@ -40,6 +41,7 @@ export type AiFeatureKey =
   | 'dataQueryGenerate'
   | 'dataQuerySummarize'
   | 'chatbot'
+  | 'assistantDesign'
   | 'dataDictionary'
   | 'internalPing'
 
@@ -54,7 +56,7 @@ export type AiFeatureDef = {
   tools?: boolean
 }
 
-const { chat, expressions, translation, dataDictionary, userActivity, dataQuery } = AiFeatureCategory
+const { chat, expressions, translation, dataDictionary, userActivity, dataQuery, assistant } = AiFeatureCategory
 const { schema, data } = AiDataClass
 const { loggedIn, surveyView, surveyEdit, recordListView, admin } = AiFeaturePermission
 
@@ -97,6 +99,15 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
   },
   // Help area of the assistant: no survey content, only the handbook tools
   chatbot: { key: 'chatbot', category: chat, dataClass: schema, permission: loggedIn, gateway: true, tools: true },
+  // Design area of the assistant: reads the draft survey, proposes change sets
+  assistantDesign: {
+    key: 'assistantDesign',
+    category: assistant,
+    dataClass: schema,
+    permission: surveyEdit,
+    gateway: true,
+    tools: true,
+  },
   // server jobs
   dataDictionary: {
     key: 'dataDictionary',

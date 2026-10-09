@@ -93,6 +93,7 @@ export class ArenaApi {
   async enableAiFeatures(): Promise<void> {
     const featureToggles = {
       chat: true,
+      assistant: true,
       expressions: true,
       translation: true,
       dataDictionary: true,

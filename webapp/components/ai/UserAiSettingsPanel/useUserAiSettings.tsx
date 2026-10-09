@@ -8,10 +8,12 @@ import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useI18n } from '@webapp/store/system'
 
-export type FeatureCategory = 'chat' | 'expressions' | 'translation' | 'dataDictionary' | 'userActivity' | 'dataQuery'
+export type FeatureCategory =
+  'chat' | 'assistant' | 'expressions' | 'translation' | 'dataDictionary' | 'userActivity' | 'dataQuery'
 
 export const FEATURE_CATEGORIES: FeatureCategory[] = [
   'chat',
+  'assistant',
   'expressions',
   'translation',
   'dataDictionary',
@@ -23,6 +25,7 @@ type FeatureToggles = Record<FeatureCategory, boolean>
 
 const defaultFeatureToggles = (): FeatureToggles => ({
   chat: false,
+  assistant: false,
   expressions: false,
   translation: false,
   dataDictionary: false,
