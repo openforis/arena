@@ -1,33 +1,21 @@
-import SystemError from '@core/systemError'
 import { uuidv4 } from '@core/uuid'
 
 import Job from '@server/job/job'
-import FileZip from '@server/utils/file/fileZip'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as UsersBackupRepository from '@server/modules/user/repository/usersBackupRepository'
 import type { AuthGroupRow, UserGroupRow } from '@server/modules/user/repository/usersBackupRepository'
 
-import {
-  UsersBackupConflictMode,
-  UsersBackupFile,
-  UsersBackupImportSummary,
-  UsersBackupInfo,
-  UsersBackupUser,
-  usersBackupFormatVersion,
-  usersBackupType,
-} from './usersBackupModel'
+import { UsersBackupFileReader } from './usersBackupFileReader'
+import { UsersBackupImportSummary, UsersBackupUser, UsersBackupUserAction } from './usersBackupModel'
 
 const surveyGroupKey = ({ surveyName, name }: { surveyName?: string | null; name: string }) => `${surveyName}|${name}`
 
-const readJsonEntry = (fileZip: any, entryName: string) => {
-  const content = fileZip.getEntryAsText(entryName)
-  return content ? JSON.parse(content) : null
-}
+const existingUserActions = new Set([UsersBackupUserAction.updateRoles, UsersBackupUserAction.updateAll])
 
 /**
- * Imports the users exported with UsersBackupExportJob.
+ * Imports the users exported with UsersBackupExportJob, performing on every user the action chosen in actionsByEmail
+ * (by default new users are inserted and existing ones are skipped).
  * Users are matched by email; survey roles and user groups are matched by survey name and group name.
- * With dryRun, nothing is written and only the summary of the changes is generated.
  */
 export default class UsersBackupImportJob extends Job {
   static readonly type = 'UsersBackupImportJob'
@@ -42,25 +30,11 @@ export default class UsersBackupImportJob extends Job {
     super(UsersBackupImportJob.type, params)
   }
 
-  get dryRun(): boolean {
-    return Boolean((this.context as any).dryRun)
-  }
-
-  get conflictMode(): UsersBackupConflictMode {
-    return (this.context as any).conflictMode ?? UsersBackupConflictMode.skip
-  }
-
   async onStart() {
     await super.onStart()
     const { filePath } = this.context as any
 
-    this.fileZip = new FileZip(filePath)
-    await this.fileZip.init()
-
-    const info: UsersBackupInfo | null = readJsonEntry(this.fileZip, UsersBackupFile.info)
-    if (info?.type !== usersBackupType || info.formatVersion !== usersBackupFormatVersion) {
-      throw new SystemError('usersBackupImport.invalidFile')
-    }
+    this.fileZip = await UsersBackupFileReader.open(filePath)
 
     const authGroups = await UsersBackupRepository.fetchAuthGroups(this.tx)
     for (const group of authGroups) {
@@ -74,11 +48,10 @@ export default class UsersBackupImportJob extends Job {
   }
 
   async execute() {
-    const users: UsersBackupUser[] = readJsonEntry(this.fileZip, UsersBackupFile.users) ?? []
+    const users = UsersBackupFileReader.readUsers(this.fileZip)
 
     this.total = users.length
     this.summary = {
-      dryRun: this.dryRun,
       usersTotal: users.length,
       usersInserted: 0,
       usersUpdated: 0,
@@ -110,33 +83,39 @@ export default class UsersBackupImportJob extends Job {
     }
   }
 
+  getUserAction({ user, existing }: { user: UsersBackupUser; existing: boolean }): UsersBackupUserAction {
+    const { actionsByEmail = {} } = this.context as any
+    const action: UsersBackupUserAction | undefined = actionsByEmail[user.email]
+    if (existing) {
+      return existingUserActions.has(action) ? action : UsersBackupUserAction.skip
+    }
+    return action === UsersBackupUserAction.skip ? UsersBackupUserAction.skip : UsersBackupUserAction.insert
+  }
+
   async importUser(user: UsersBackupUser) {
     const existingUserUuid = await UsersBackupRepository.fetchUserUuidByEmail({ email: user.email }, this.tx)
+    const action = this.getUserAction({ user, existing: Boolean(existingUserUuid) })
 
-    if (existingUserUuid && this.conflictMode === UsersBackupConflictMode.skip) {
+    if (action === UsersBackupUserAction.skip) {
       this.summary.usersSkipped += 1
       return
     }
-    let userUuid: string
-    let detailsUpdated = false
-    if (existingUserUuid) {
-      userUuid = existingUserUuid
-      if (this.conflictMode === UsersBackupConflictMode.overwrite) {
-        await this.writeUser({ user, userUuid, insert: false })
-        detailsUpdated = true
-      }
-    } else {
+    let userUuid = existingUserUuid
+    if (action === UsersBackupUserAction.insert) {
       // keep the uuid of the source server when not already used
       const uuidUsed = await UsersBackupRepository.existsUserByUuid({ uuid: user.uuid }, this.tx)
       userUuid = uuidUsed ? uuidv4() : user.uuid
       await this.writeUser({ user, userUuid, insert: true })
+    } else if (action === UsersBackupUserAction.updateAll) {
+      await this.writeUser({ user, userUuid, insert: false })
     }
-    const groupsAdded = await this.importAuthGroups({ user, userUuid, isNewUser: !existingUserUuid })
-    const userGroupsAdded = await this.importUserGroups({ user, userUuid, isNewUser: !existingUserUuid })
+    const isNewUser = !existingUserUuid
+    const groupsAdded = await this.importAuthGroups({ user, userUuid, isNewUser })
+    const userGroupsAdded = await this.importUserGroups({ user, userUuid, isNewUser })
 
-    if (!existingUserUuid) {
+    if (isNewUser) {
       this.summary.usersInserted += 1
-    } else if (detailsUpdated || groupsAdded + userGroupsAdded > 0) {
+    } else if (action === UsersBackupUserAction.updateAll || groupsAdded + userGroupsAdded > 0) {
       this.summary.usersUpdated += 1
     } else {
       this.summary.usersSkipped += 1
@@ -144,10 +123,8 @@ export default class UsersBackupImportJob extends Job {
   }
 
   async writeUser({ user, userUuid, insert }: { user: UsersBackupUser; userUuid: string; insert: boolean }) {
-    if (this.dryRun) return
-
     const profilePicture = user.hasProfilePicture
-      ? this.fileZip.getEntryData(UsersBackupFile.profilePicture({ userUuid: user.uuid }))
+      ? UsersBackupFileReader.readProfilePicture(this.fileZip, user.uuid)
       : null
     const values = {
       uuid: userUuid,
@@ -189,22 +166,17 @@ export default class UsersBackupImportJob extends Job {
       const group = this.findAuthGroup(authGroup)
       if (!group || currentGroupUuids.includes(group.uuid)) continue
 
-      // only one auth group per survey is allowed
+      // only one auth group per survey is allowed: replace the current one
       const otherSurveyGroupUuids = group.surveyUuid
         ? currentGroupUuids.filter((uuid) => this.authGroupsByUuid[uuid]?.surveyUuid === group.surveyUuid)
         : []
       if (otherSurveyGroupUuids.length > 0) {
-        if (this.conflictMode !== UsersBackupConflictMode.overwrite) continue
-        if (!this.dryRun) {
-          await UsersBackupRepository.deleteAuthGroupUsers({ userUuid, groupUuids: otherSurveyGroupUuids }, this.tx)
-        }
+        await UsersBackupRepository.deleteAuthGroupUsers({ userUuid, groupUuids: otherSurveyGroupUuids }, this.tx)
       }
-      if (!this.dryRun) {
-        await UsersBackupRepository.insertAuthGroupUser(
-          { userUuid, groupUuid: group.uuid, props: authGroup.props ?? null },
-          this.tx
-        )
-      }
+      await UsersBackupRepository.insertAuthGroupUser(
+        { userUuid, groupUuid: group.uuid, props: authGroup.props ?? null },
+        this.tx
+      )
       added += 1
     }
     this.summary.authGroupsAdded += added
@@ -232,9 +204,7 @@ export default class UsersBackupImportJob extends Job {
       }
       if (currentGroupUuids.includes(group.uuid)) continue
 
-      if (!this.dryRun) {
-        await UsersBackupRepository.insertUserGroupUser({ userUuid, groupUuid: group.uuid }, this.tx)
-      }
+      await UsersBackupRepository.insertUserGroupUser({ userUuid, groupUuid: group.uuid }, this.tx)
       added += 1
     }
     this.summary.userGroupsAdded += added

@@ -90,15 +90,22 @@ $t(common.pressRefreshToReloadPage)`,
     restoreInfo: `- Los usuarios se identifican por su correo electrónico
 - Los roles en las encuestas y los grupos de usuarios se identifican por el nombre de la encuesta y el nombre del grupo
 - Los roles y grupos de usuarios de encuestas que no existen en este servidor se ignoran
-- Ejecute primero "Validar" para comprobar qué cambiará`,
-    conflictMode: {
-      skip: 'Omitir usuarios existentes',
-      merge: 'Usuarios existentes: añadir los roles en las encuestas y los grupos de usuarios que faltan',
-      overwrite:
-        'Usuarios existentes: sobrescribir datos (nombre, contraseña, estado), roles en las encuestas y grupos de usuarios',
+- Después de pulsar "Restaurar usuarios", podrá elegir qué hacer con cada usuario`,
+    backupFileInfo: 'Copia de seguridad generada por {{email}} el {{date}} (servidor: {{serverUrl}})',
+    passwordsNotIncluded:
+      'Las contraseñas no están incluidas en esta copia de seguridad: los usuarios nuevos tendrán que restablecer su contraseña',
+    allNewUsers: 'Todos los usuarios nuevos ({{count}})',
+    allExistingUsers: 'Todos los usuarios existentes ({{count}})',
+    userStatus: 'Estado',
+    userActionHeader: 'Acción',
+    userNew: 'Nuevo',
+    userExisting: 'Existente',
+    userAction: {
+      insert: 'Añadir',
+      skip: 'Omitir',
+      updateRoles: 'Actualizar roles en las encuestas',
+      updateAll: 'Actualizar roles en las encuestas y datos',
     },
-    validate: 'Validar',
-    summaryDryRun: 'Validación completada: todavía no se ha modificado nada',
     summaryImported: 'Usuarios restaurados',
     summary: {
       usersTotal: 'Usuarios en la copia de seguridad: {{count}}',

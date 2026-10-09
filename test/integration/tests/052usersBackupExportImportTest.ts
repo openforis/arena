@@ -12,10 +12,11 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import FileZip from '@server/utils/file/fileZip'
 import UsersBackupExportJob from '@server/modules/user/service/usersBackup/UsersBackupExportJob'
 import UsersBackupImportJob from '@server/modules/user/service/usersBackup/UsersBackupImportJob'
+import { UsersBackupService } from '@server/modules/user/service/usersBackup/usersBackupService'
 import {
-  UsersBackupConflictMode,
   UsersBackupFile,
   UsersBackupUser,
+  UsersBackupUserAction,
   usersBackupType,
 } from '@server/modules/user/service/usersBackup/usersBackupModel'
 
@@ -61,21 +62,28 @@ const fetchUserState = async () => {
   return { ...user, surveyRoles, userGroups }
 }
 
-const runImport = async ({
-  conflictMode,
-  dryRun = false,
-}: {
-  conflictMode: UsersBackupConflictMode
-  dryRun?: boolean
-}) => {
-  // the import job deletes the imported file: work on a copy
+const copyBackupFile = async () => {
   const filePath = FileUtils.newTempFilePath()
   await fsp.copyFile(backupFilePath, filePath)
-  const job = new UsersBackupImportJob({ user: getContextUser(), filePath, conflictMode, dryRun })
+  return filePath
+}
+
+const runImport = async (action?: UsersBackupUserAction) => {
+  // the import job deletes the imported file: work on a copy
+  const filePath = await copyBackupFile()
+  const actionsByEmail = action ? { [email]: action } : {}
+  const job = new UsersBackupImportJob({ user: getContextUser(), filePath, actionsByEmail })
   await job.start()
   expect(job.status).toBe(JobStatus.succeeded)
   expect(FileUtils.exists(filePath)).toBeFalsy()
   return (job.result as any).summary
+}
+
+const findPreviewUser = async () => {
+  const preview = await UsersBackupService.readImportPreview({ uploadedFilePath: await copyBackupFile() })
+  await UsersBackupService.cancelImport({ tempFileName: preview.tempFileName })
+  expect(FileUtils.exists(FileUtils.tempFilePath(preview.tempFileName))).toBeFalsy()
+  return preview.users.find((user) => user.email === email)
 }
 
 describe('Users backup export/import', () => {
@@ -150,18 +158,22 @@ describe('Users backup export/import', () => {
     expect(user.userGroups).toContainEqual({ name: userGroupName, surveyName: name })
   })
 
-  test('dry run does not write anything', async () => {
+  test('preview tells if the user exists in this server', async () => {
+    expect(await findPreviewUser()).toEqual({ email, name, existing: true })
+
     await db.none(`DELETE FROM "user" WHERE email = $1`, [email])
+    expect((await findPreviewUser()).existing).toBe(false)
+  })
 
-    const summary = await runImport({ conflictMode: UsersBackupConflictMode.skip, dryRun: true })
+  test('new user with skip action is not inserted', async () => {
+    const summary = await runImport(UsersBackupUserAction.skip)
 
-    expect(summary.dryRun).toBe(true)
-    expect(summary.usersInserted).toBe(1)
+    expect(summary.usersSkipped).toBeGreaterThanOrEqual(1)
     expect(await fetchUserState()).toBeNull()
   })
 
-  test('deleted user is restored with same uuid, password, survey role and user group', async () => {
-    const summary = await runImport({ conflictMode: UsersBackupConflictMode.skip })
+  test('new user is inserted by default with same uuid, password, survey role and user group', async () => {
+    const summary = await runImport()
 
     expect(summary.usersInserted).toBe(1)
     const user = await fetchUserState()
@@ -171,29 +183,23 @@ describe('Users backup export/import', () => {
     expect(user.userGroups).toEqual([userGroupName])
   })
 
-  test('skip mode leaves existing users untouched, merge mode adds missing survey roles', async () => {
-    await db.none(`DELETE FROM auth_group_user WHERE user_uuid = $1`, [userUuid])
-
-    await runImport({ conflictMode: UsersBackupConflictMode.skip })
-    expect((await fetchUserState()).surveyRoles).toEqual([])
-
-    await runImport({ conflictMode: UsersBackupConflictMode.merge })
-    expect((await fetchUserState()).surveyRoles).toEqual([AuthGroup.groupNames.dataEditor])
-  })
-
-  test('only overwrite mode replaces a different survey role and the user details', async () => {
+  test('existing user is skipped by default; updateRoles replaces survey roles but not details', async () => {
     await setUserSurveyRole(AuthGroup.groupNames.surveyAdmin)
     await db.none(`UPDATE "user" SET name = 'changed' WHERE uuid = $1`, [userUuid])
 
-    await runImport({ conflictMode: UsersBackupConflictMode.merge })
+    await runImport()
     let user = await fetchUserState()
     expect(user.surveyRoles).toEqual([AuthGroup.groupNames.surveyAdmin])
-    expect(user.name).toBe('changed')
 
-    await runImport({ conflictMode: UsersBackupConflictMode.overwrite })
+    await runImport(UsersBackupUserAction.updateRoles)
     user = await fetchUserState()
     expect(user.surveyRoles).toEqual([AuthGroup.groupNames.dataEditor])
-    expect(user.name).toBe(name)
+    expect(user.name).toBe('changed')
+  })
+
+  test('updateAll updates also the user details', async () => {
+    await runImport(UsersBackupUserAction.updateAll)
+    expect((await fetchUserState()).name).toBe(name)
   })
 
   test('roles in surveys not existing in the target server are reported', async () => {
@@ -202,11 +208,18 @@ describe('Users backup export/import', () => {
       [surveyId]
     )
     try {
-      const summary = await runImport({ conflictMode: UsersBackupConflictMode.merge, dryRun: true })
+      const summary = await runImport(UsersBackupUserAction.updateRoles)
       expect(summary.surveysNotFound).toContain(name)
       expect(summary.userGroupsNotFound).toContain(`${name} / ${userGroupName}`)
     } finally {
       await db.none(`UPDATE survey SET props_draft = props_draft || $2::jsonb WHERE id = $1`, [surveyId, { name }])
     }
+  })
+
+  test('invalid file is rejected by the preview and deleted', async () => {
+    const uploadedFilePath = FileUtils.newTempFilePath()
+    await fsp.writeFile(uploadedFilePath, 'not a zip')
+    await expect(UsersBackupService.readImportPreview({ uploadedFilePath })).rejects.toThrow()
+    expect(FileUtils.exists(uploadedFilePath)).toBeFalsy()
   })
 })

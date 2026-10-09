@@ -93,15 +93,21 @@ $t(common.pressRefreshToReloadPage)`,
     restoreInfo: `- Os usuários são identificados pelo e-mail
 - Os papéis nos inventários e os grupos de usuários são identificados pelo nome do inventário e pelo nome do grupo
 - Os papéis e grupos de usuários de inventários que não existem neste servidor são ignorados
-- Execute primeiro "Validar" para verificar o que será alterado`,
-    conflictMode: {
-      skip: 'Ignorar usuários existentes',
-      merge: 'Usuários existentes: adicionar os papéis nos inventários e os grupos de usuários que faltam',
-      overwrite:
-        'Usuários existentes: sobrescrever dados (nome, senha, status), papéis nos inventários e grupos de usuários',
+- Depois de clicar em "Restaurar usuários", você poderá escolher o que fazer com cada usuário`,
+    backupFileInfo: 'Backup gerado por {{email}} em {{date}} (servidor: {{serverUrl}})',
+    passwordsNotIncluded: 'As senhas não estão incluídas neste backup: os novos usuários terão que redefinir sua senha',
+    allNewUsers: 'Todos os novos usuários ({{count}})',
+    allExistingUsers: 'Todos os usuários existentes ({{count}})',
+    userStatus: 'Status',
+    userActionHeader: 'Ação',
+    userNew: 'Novo',
+    userExisting: 'Existente',
+    userAction: {
+      insert: 'Adicionar',
+      skip: 'Ignorar',
+      updateRoles: 'Atualizar papéis nos inventários',
+      updateAll: 'Atualizar papéis nos inventários e dados',
     },
-    validate: 'Validar',
-    summaryDryRun: 'Validação concluída: nada foi alterado ainda',
     summaryImported: 'Usuários restaurados',
     summary: {
       usersTotal: 'Usuários no backup: {{count}}',

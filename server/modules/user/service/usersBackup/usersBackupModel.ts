@@ -9,13 +9,16 @@ export const usersBackupType = 'arenaUsersBackup'
 
 export const usersBackupFormatVersion = 1
 
-export enum UsersBackupConflictMode {
-  // existing users (matched by email) are left untouched
+// action to perform on a single user when restoring a backup
+export enum UsersBackupUserAction {
+  // new users only
+  insert = 'insert',
   skip = 'skip',
-  // existing users get the missing survey roles and user groups
-  merge = 'merge',
-  // like merge, but user details and survey roles are replaced with the ones in the backup
-  overwrite = 'overwrite',
+  // existing users only: add the survey roles and user groups in the backup
+  // (a different role in the same survey is replaced)
+  updateRoles = 'updateRoles',
+  // existing users only: like updateRoles, but user details (name, password, status, title, picture) are updated too
+  updateAll = 'updateAll',
 }
 
 export type UsersBackupAuthGroup = {
@@ -55,8 +58,19 @@ export type UsersBackupInfo = {
   usersCount: number
 }
 
+export type UsersBackupPreviewUser = {
+  email: string
+  name?: string | null
+  existing: boolean
+}
+
+export type UsersBackupPreview = {
+  tempFileName: string
+  info: Pick<UsersBackupInfo, 'serverUrl' | 'dateExported' | 'exportedByUserEmail' | 'includePasswords'>
+  users: UsersBackupPreviewUser[]
+}
+
 export type UsersBackupImportSummary = {
-  dryRun: boolean
   usersTotal: number
   usersInserted: number
   usersUpdated: number

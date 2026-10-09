@@ -224,13 +224,33 @@ export const init = (app) => {
     }
   })
 
+  // reads the uploaded backup: the import starts only after choosing what to do with every user
+  app.post('/users/backup/import/preview', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const uploadedFilePath = Request.getFilePath(req)
+      const preview = await UsersBackupService.readImportPreview({ uploadedFilePath })
+      res.json(preview)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.post('/users/backup/import', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const filePath = Request.getFilePath(req)
-      const { conflictMode, dryRun = false } = Request.getParams(req)
-      const job = UsersBackupService.startImportJob({ user, filePath, conflictMode, dryRun })
+      const { tempFileName, actionsByEmail } = Request.getParams(req)
+      const job = UsersBackupService.startImportJob({ user, tempFileName, actionsByEmail })
       res.json({ job })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/users/backup/import/cancel', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const { tempFileName } = Request.getParams(req)
+      await UsersBackupService.cancelImport({ tempFileName })
+      Response.sendOk(res)
     } catch (error) {
       next(error)
     }

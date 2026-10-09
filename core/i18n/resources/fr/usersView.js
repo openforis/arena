@@ -95,15 +95,22 @@ $t(common.pressRefreshToReloadPage)`,
     restoreInfo: `- Les utilisateurs sont identifiés par leur adresse e-mail
 - Les rôles dans les formulaires et les groupes d'utilisateurs sont identifiés par le nom du formulaire et le nom du groupe
 - Les rôles et groupes d'utilisateurs des formulaires inexistants sur ce serveur sont ignorés
-- Lancez d'abord « Valider » pour vérifier ce qui va changer`,
-    conflictMode: {
-      skip: 'Ignorer les utilisateurs existants',
-      merge: "Utilisateurs existants : ajouter les rôles dans les formulaires et les groupes d'utilisateurs manquants",
-      overwrite:
-        "Utilisateurs existants : remplacer les informations (nom, mot de passe, statut), les rôles dans les formulaires et les groupes d'utilisateurs",
+- Après avoir cliqué sur « Restaurer les utilisateurs », vous pourrez choisir quoi faire pour chaque utilisateur`,
+    backupFileInfo: 'Sauvegarde générée par {{email}} le {{date}} (serveur : {{serverUrl}})',
+    passwordsNotIncluded:
+      'Les mots de passe ne sont pas inclus dans cette sauvegarde : les nouveaux utilisateurs devront réinitialiser leur mot de passe',
+    allNewUsers: 'Tous les nouveaux utilisateurs ({{count}})',
+    allExistingUsers: 'Tous les utilisateurs existants ({{count}})',
+    userStatus: 'Statut',
+    userActionHeader: 'Action',
+    userNew: 'Nouveau',
+    userExisting: 'Existant',
+    userAction: {
+      insert: 'Ajouter',
+      skip: 'Ignorer',
+      updateRoles: 'Mettre à jour les rôles dans les formulaires',
+      updateAll: 'Mettre à jour les rôles dans les formulaires et les informations',
     },
-    validate: 'Valider',
-    summaryDryRun: "Validation terminée : rien n'a encore été modifié",
     summaryImported: 'Utilisateurs restaurés',
     summary: {
       usersTotal: 'Utilisateurs dans la sauvegarde : {{count}}',

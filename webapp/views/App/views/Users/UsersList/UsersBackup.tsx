@@ -1,8 +1,10 @@
 import './UsersBackup.scss'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
+
+import * as DateUtils from '@core/dateUtils'
 
 import {
   Button,
@@ -13,20 +15,25 @@ import {
   Modal,
   ModalBody,
   ModalFooter,
-  RadioButtonGroup,
 } from '@webapp/components'
-import { Checkbox } from '@webapp/components/form'
+import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 
-// keep in sync with UsersBackupConflictMode (server)
-const conflictModes = ['skip', 'merge', 'overwrite']
+// keep in sync with UsersBackupUserAction (server)
+const UserAction = {
+  insert: 'insert',
+  skip: 'skip',
+  updateRoles: 'updateRoles',
+  updateAll: 'updateAll',
+}
+const newUserActions = [UserAction.insert, UserAction.skip]
+const existingUserActions = [UserAction.skip, UserAction.updateRoles, UserAction.updateAll]
 
 const acceptedFiles = { 'application/zip': ['.zip'] }
 
 type ImportSummary = {
-  dryRun: boolean
   usersTotal: number
   usersInserted: number
   usersUpdated: number
@@ -36,6 +43,16 @@ type ImportSummary = {
   surveysNotFound: string[]
   userGroupsNotFound: string[]
 }
+
+type ImportPreviewUser = { email: string; name?: string | null; existing: boolean }
+
+type ImportPreview = {
+  tempFileName: string
+  info: { serverUrl?: string; dateExported: string; exportedByUserEmail: string; includePasswords: boolean }
+  users: ImportPreviewUser[]
+}
+
+const defaultUserAction = (user: ImportPreviewUser) => (user.existing ? UserAction.skip : UserAction.insert)
 
 const BackupDownloadButton = ({ job }: { job: any }) => {
   const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
@@ -82,12 +99,10 @@ const UsersBackupExportModal = ({ onClose }: { onClose: () => void }) => {
 
 const ImportSummaryView = ({ summary }: { summary: ImportSummary }) => {
   const i18n = useI18n()
-  const { dryRun, surveysNotFound, userGroupsNotFound } = summary
+  const { surveysNotFound, userGroupsNotFound } = summary
   return (
     <div className="users-backup-modal__summary">
-      <strong>
-        {i18n.t(dryRun ? 'usersView:usersBackup.summaryDryRun' : 'usersView:usersBackup.summaryImported')}
-      </strong>
+      <strong>{i18n.t('usersView:usersBackup.summaryImported')}</strong>
       <ul>
         {['usersTotal', 'usersInserted', 'usersUpdated', 'usersSkipped', 'authGroupsAdded', 'userGroupsAdded'].map(
           (key) => (
@@ -105,69 +120,200 @@ const ImportSummaryView = ({ summary }: { summary: ImportSummary }) => {
   )
 }
 
-const UsersBackupImportModal = ({ onClose }: { onClose: () => void }) => {
-  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+const UsersBackupImportFileModal = ({
+  onClose,
+  onPreviewRead,
+}: {
+  onClose: () => void
+  onPreviewRead: (preview: ImportPreview) => void
+}) => {
   const i18n = useI18n()
   const [file, setFile] = useState<File | null>(null)
-  const [conflictMode, setConflictMode] = useState(conflictModes[0])
-  const [summary, setSummary] = useState<ImportSummary | null>(null)
+  const [reading, setReading] = useState(false)
 
-  const onFilesDrop = useCallback((files: File[]) => {
-    setFile(files[0] ?? null)
-    setSummary(null)
-  }, [])
+  const onFilesDrop = useCallback((files: File[]) => setFile(files[0] ?? null), [])
 
-  const onConflictModeChange = useCallback((value: string) => {
-    setConflictMode(value)
-    setSummary(null)
-  }, [])
-
-  const startImport = useCallback(
-    async (dryRun: boolean) => {
-      if (!file) return
-      setSummary(null)
-      const job = await API.startUsersBackupImport({ file, conflictMode, dryRun })
-      dispatch(
-        JobActions.showJobMonitor({
-          job,
-          autoHide: true,
-          onComplete: (jobCompleted: any) => setSummary(jobCompleted.result?.summary ?? null),
-        })
-      )
-    },
-    [conflictMode, dispatch, file]
-  )
-
-  const imported = summary && !summary.dryRun
+  const onRestoreClick = useCallback(async () => {
+    setReading(true)
+    try {
+      onPreviewRead(await API.readUsersBackupImportPreview({ file }))
+    } finally {
+      setReading(false)
+    }
+  }, [file, onPreviewRead])
 
   return (
     <Modal className="users-backup-modal" title="usersView:usersBackup.restoreTitle" onClose={onClose} showCloseButton>
       <ModalBody>
         <Markdown className="users-backup-modal__info" source={i18n.t('usersView:usersBackup.restoreInfo')} />
-        <Dropzone accept={acceptedFiles} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} disabled={imported} />
-        <RadioButtonGroup
-          items={conflictModes.map((mode) => ({ key: mode, label: `usersView:usersBackup.conflictMode.${mode}` }))}
-          onChange={onConflictModeChange}
-          value={conflictMode}
-        />
-        {summary && <ImportSummaryView summary={summary} />}
+        <Dropzone accept={acceptedFiles} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
       </ModalBody>
       <ModalFooter>
-        {imported ? (
+        <Button
+          className="modal-footer__item"
+          disabled={!file || reading}
+          label="usersView:usersBackup.restore"
+          onClick={onRestoreClick}
+          primary
+        />
+      </ModalFooter>
+    </Modal>
+  )
+}
+
+const UserActionButtonGroup = ({
+  actions,
+  onChange,
+  selectedAction,
+}: {
+  actions: string[]
+  onChange: (action: string) => void
+  selectedAction: string | null
+}) => (
+  <ButtonGroup
+    items={actions.map((action) => ({ key: action, label: `usersView:usersBackup.userAction.${action}` }))}
+    // ButtonGroup (JS) passes the selected item key to onChange, but its inferred type has no params
+    onChange={onChange as () => void}
+    selectedItemKey={selectedAction}
+  />
+)
+
+const UsersBackupImportUsersModal = ({ onClose, preview }: { onClose: () => void; preview: ImportPreview }) => {
+  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
+  const i18n = useI18n()
+  const { tempFileName, info, users } = preview
+  const [actionsByEmail, setActionsByEmail] = useState<Record<string, string>>(() =>
+    Object.fromEntries(users.map((user) => [user.email, defaultUserAction(user)]))
+  )
+  const [started, setStarted] = useState(false)
+  const [summary, setSummary] = useState<ImportSummary | null>(null)
+
+  const newUsers = useMemo(() => users.filter((user) => !user.existing), [users])
+  const existingUsers = useMemo(() => users.filter((user) => user.existing), [users])
+
+  // action selected for all the specified users (null if they have different actions)
+  const getCommonAction = (usersToCheck: ImportPreviewUser[]) => {
+    const actions = new Set(usersToCheck.map((user) => actionsByEmail[user.email]))
+    return actions.size === 1 ? [...actions][0] : null
+  }
+
+  const setActionForUsers = useCallback(
+    (usersToUpdate: ImportPreviewUser[]) => (action: string) =>
+      setActionsByEmail((prev) => ({
+        ...prev,
+        ...Object.fromEntries(usersToUpdate.map((user) => [user.email, action])),
+      })),
+    []
+  )
+
+  const onCancel = useCallback(async () => {
+    if (!started) {
+      // the uploaded backup contains password hashes: delete it
+      await API.cancelUsersBackupImport({ tempFileName })
+    }
+    onClose()
+  }, [onClose, started, tempFileName])
+
+  const onConfirm = useCallback(async () => {
+    setStarted(true)
+    const job = await API.startUsersBackupImport({ tempFileName, actionsByEmail })
+    dispatch(
+      JobActions.showJobMonitor({
+        job,
+        autoHide: true,
+        onComplete: (jobCompleted: any) => setSummary(jobCompleted.result?.summary ?? null),
+      })
+    )
+  }, [actionsByEmail, dispatch, tempFileName])
+
+  return (
+    <Modal
+      className="users-backup-modal users-backup-import-users-modal"
+      title="usersView:usersBackup.restoreTitle"
+      onClose={onCancel}
+      showCloseButton
+    >
+      <ModalBody>
+        <p>
+          {i18n.t('usersView:usersBackup.backupFileInfo', {
+            serverUrl: info.serverUrl ?? '-',
+            date: DateUtils.formatDateTimeDisplay(new Date(info.dateExported)),
+            email: info.exportedByUserEmail,
+          })}
+        </p>
+        {!info.includePasswords && (
+          <p className="users-backup-modal__warning">{i18n.t('usersView:usersBackup.passwordsNotIncluded')}</p>
+        )}
+        {summary ? (
+          <ImportSummaryView summary={summary} />
+        ) : (
+          <>
+            <div className="users-backup-import-users-modal__bulk-actions">
+              {newUsers.length > 0 && (
+                <>
+                  <span>{i18n.t('usersView:usersBackup.allNewUsers', { count: newUsers.length })}</span>
+                  <UserActionButtonGroup
+                    actions={newUserActions}
+                    onChange={setActionForUsers(newUsers)}
+                    selectedAction={getCommonAction(newUsers)}
+                  />
+                </>
+              )}
+              {existingUsers.length > 0 && (
+                <>
+                  <span>{i18n.t('usersView:usersBackup.allExistingUsers', { count: existingUsers.length })}</span>
+                  <UserActionButtonGroup
+                    actions={existingUserActions}
+                    onChange={setActionForUsers(existingUsers)}
+                    selectedAction={getCommonAction(existingUsers)}
+                  />
+                </>
+              )}
+            </div>
+            <div className="users-backup-import-users-modal__table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{i18n.t('common.email')}</th>
+                    <th>{i18n.t('common.name')}</th>
+                    <th>{i18n.t('usersView:usersBackup.userStatus')}</th>
+                    <th>{i18n.t('usersView:usersBackup.userActionHeader')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.email}>
+                      <td>{user.email}</td>
+                      <td>{user.name}</td>
+                      <td>
+                        {i18n.t(user.existing ? 'usersView:usersBackup.userExisting' : 'usersView:usersBackup.userNew')}
+                      </td>
+                      <td>
+                        <UserActionButtonGroup
+                          actions={user.existing ? existingUserActions : newUserActions}
+                          onChange={setActionForUsers([user])}
+                          selectedAction={actionsByEmail[user.email]}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </ModalBody>
+      <ModalFooter>
+        {summary ? (
           <Button className="modal-footer__item" label="common.close" onClick={onClose} primary />
         ) : (
           <>
+            <Button className="modal-footer__item" label="common.cancel" onClick={onCancel} />
             <Button
               className="modal-footer__item"
-              disabled={!file}
-              label="usersView:usersBackup.validate"
-              onClick={() => startImport(true)}
-            />
-            <Button
-              className="modal-footer__item"
-              disabled={!file}
+              disabled={started}
               label="usersView:usersBackup.restore"
-              onClick={() => startImport(false)}
+              onClick={onConfirm}
               primary
             />
           </>
@@ -178,8 +324,18 @@ const UsersBackupImportModal = ({ onClose }: { onClose: () => void }) => {
 }
 
 export const UsersBackupButtons = () => {
-  const [openModal, setOpenModal] = useState<'export' | 'import' | null>(null)
-  const closeModal = useCallback(() => setOpenModal(null), [])
+  const [openModal, setOpenModal] = useState<'export' | 'importFile' | 'importUsers' | null>(null)
+  const [importPreview, setImportPreview] = useState<ImportPreview | null>(null)
+
+  const closeModal = useCallback(() => {
+    setOpenModal(null)
+    setImportPreview(null)
+  }, [])
+
+  const onImportPreviewRead = useCallback((preview: ImportPreview) => {
+    setImportPreview(preview)
+    setOpenModal('importUsers')
+  }, [])
 
   return (
     <>
@@ -197,13 +353,18 @@ export const UsersBackupButtons = () => {
             key: 'users-restore',
             iconClassName: 'icon-upload2 icon-14px',
             label: 'usersView:usersBackup.restore',
-            onClick: () => setOpenModal('import'),
+            onClick: () => setOpenModal('importFile'),
           },
         ]}
         variant="outlined"
       />
       {openModal === 'export' && <UsersBackupExportModal onClose={closeModal} />}
-      {openModal === 'import' && <UsersBackupImportModal onClose={closeModal} />}
+      {openModal === 'importFile' && (
+        <UsersBackupImportFileModal onClose={closeModal} onPreviewRead={onImportPreviewRead} />
+      )}
+      {openModal === 'importUsers' && importPreview && (
+        <UsersBackupImportUsersModal onClose={closeModal} preview={importPreview} />
+      )}
     </>
   )
 }

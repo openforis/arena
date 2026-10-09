@@ -28,3 +28,37 @@
     list-style: none;
   }
 }
+
+.users-backup-import-users-modal {
+  .users-backup-import-users-modal__bulk-actions {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    text-align: right;
+  }
+
+  .users-backup-import-users-modal__table {
+    align-self: stretch;
+    max-height: 50vh;
+    overflow-y: auto;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background-color: $grey;
+    }
+
+    th,
+    td {
+      padding: 0.3rem 0.5rem;
+      border-bottom: 1px solid $greyBorder;
+    }
+  }
+}

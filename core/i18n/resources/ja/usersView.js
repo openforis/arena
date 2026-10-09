@@ -93,14 +93,22 @@ $t(common.pressRefreshToReloadPage)`,
     restoreInfo: `- ユーザーはメールアドレスで照合されます
 - 調査でのロールとユーザーグループは、調査名とグループ名で照合されます
 - このサーバーに存在しない調査のロールとユーザーグループは無視されます
-- 変更内容を確認するため、まず「検証」を実行してください`,
-    conflictMode: {
-      skip: '既存のユーザーをスキップ',
-      merge: '既存のユーザー：不足している調査でのロールとユーザーグループを追加',
-      overwrite: '既存のユーザー：詳細（名前、パスワード、ステータス）、調査でのロール、ユーザーグループを上書き',
+- 「ユーザーの復元」を押した後、ユーザーごとに処理を選択できます`,
+    backupFileInfo: '{{email}} が {{date}} に作成したバックアップ（サーバー：{{serverUrl}}）',
+    passwordsNotIncluded:
+      'このバックアップにはパスワードが含まれていません：新規ユーザーはパスワードをリセットする必要があります',
+    allNewUsers: 'すべての新規ユーザー（{{count}}）',
+    allExistingUsers: 'すべての既存ユーザー（{{count}}）',
+    userStatus: '状態',
+    userActionHeader: '処理',
+    userNew: '新規',
+    userExisting: '既存',
+    userAction: {
+      insert: '追加',
+      skip: 'スキップ',
+      updateRoles: '調査でのロールを更新',
+      updateAll: '調査でのロールと詳細を更新',
     },
-    validate: '検証',
-    summaryDryRun: '検証が完了しました：まだ何も変更されていません',
     summaryImported: 'ユーザーを復元しました',
     summary: {
       usersTotal: 'バックアップ内のユーザー：{{count}}',

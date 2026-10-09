@@ -162,7 +162,13 @@ export {
   createTempAuthToken,
 } from './user'
 
-export { startUsersBackupExport, getUsersBackupDownloadUrl, startUsersBackupImport } from './usersBackup'
+export {
+  startUsersBackupExport,
+  getUsersBackupDownloadUrl,
+  readUsersBackupImportPreview,
+  startUsersBackupImport,
+  cancelUsersBackupImport,
+} from './usersBackup'
 
 export { getDevices, getDevice, addDevice, verifyDevice, regenerateBackupCodes, removeDevice } from './user2FA'
 

@@ -12,18 +12,23 @@ export const startUsersBackupExport = async ({ includePasswords }: { includePass
 export const getUsersBackupDownloadUrl = ({ tempFileName }: { tempFileName: string }) =>
   `/api/users/backup/export/download?${new URLSearchParams({ tempFileName })}`
 
+export const readUsersBackupImportPreview = async ({ file }: { file: File }) => {
+  const { data } = await axios.post('/api/users/backup/import/preview', objectToFormData({ file }))
+  return data
+}
+
 export const startUsersBackupImport = async ({
-  file,
-  conflictMode,
-  dryRun,
+  tempFileName,
+  actionsByEmail,
 }: {
-  file: File
-  conflictMode: string
-  dryRun: boolean
+  tempFileName: string
+  actionsByEmail: Record<string, string>
 }) => {
-  const formData = objectToFormData({ file, conflictMode, dryRun })
   const {
     data: { job },
-  } = await axios.post('/api/users/backup/import', formData)
+  } = await axios.post('/api/users/backup/import', { tempFileName, actionsByEmail })
   return job
 }
+
+export const cancelUsersBackupImport = async ({ tempFileName }: { tempFileName: string }) =>
+  axios.post('/api/users/backup/import/cancel', { tempFileName })
