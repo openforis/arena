@@ -19,7 +19,9 @@ export type CleaningApi = {
   countValidationReportRows: (params: ValidationReportFilter & WithSignal) => Promise<number>
   // null when the user may not see the record (403, group qualifiers) or it doesn't exist (404)
   fetchRecordAndNodes: (params: { surveyId: number; recordUuid: string } & WithSignal) => Promise<any | null>
-  searchRecordsSummary: (params: { surveyId: number; cycle: string; search: string } & WithSignal) => Promise<any[]>
+  searchRecordsSummary: (
+    params: { surveyId: number; cycle: string; search: string; limit?: number; offset?: number } & WithSignal
+  ) => Promise<any[]>
   fetchCategoryItems: (
     params: {
       surveyId: number
@@ -110,9 +112,9 @@ export const axiosCleaningApi: CleaningApi = {
    * @param {object} params - Request parameters.
    * @returns {Promise<any>} The summaries.
    */
-  searchRecordsSummary: async ({ surveyId, cycle, search, signal }) => {
-    const { data } = await axios.get(`/api/survey/${surveyId}/records/summary`, {
-      params: { cycle, search, limit: 20, offset: 0 },
+  searchRecordsSummary: async ({ surveyId, cycle, search, limit = 20, offset = 0, signal }) => {
+    const { data } = await getWithTimeout(`/api/survey/${surveyId}/records/summary`, {
+      params: { cycle, search, limit, offset },
       signal,
     })
     return data.list

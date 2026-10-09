@@ -15,10 +15,43 @@ import type { CleaningApi } from './cleaningApi'
  * @returns {boolean} Whether all keys match.
  */
 const matchesKeys = ({ item, keyDefs, keys }: { item: any; keyDefs: any[]; keys: Record<string, unknown> }) =>
-  keyDefs.every(
-    (keyDef) =>
-      String(item.keysObj?.[NodeDefTable.getColumnName(keyDef)] ?? '') === String(keys[NodeDef.getName(keyDef)])
-  )
+  keyDefs.every((keyDef) => {
+    const actual = String(item.keysObj?.[NodeDefTable.getColumnName(keyDef)] ?? '')
+    const wanted = String(keys[NodeDef.getName(keyDef)])
+    // the server search ignores case, so text keys do too
+    return NodeDef.getType(keyDef) === NodeDef.nodeDefType.text
+      ? actual.trim().toLowerCase() === wanted.trim().toLowerCase()
+      : actual === wanted
+  })
+
+const PAGE_SIZE = 100
+const MAX_PAGES = 5
+
+/**
+ * Collects the records matching all the keys, paging through the search results up to a cap.
+ * @param {object} params - Parameters.
+ * @param {CleaningApi} params.api - Cleaning API.
+ * @param {object} params.search - Search request (surveyId, cycle, search text, signal).
+ * @param {Function} params.isMatch - Tells whether a summary item matches.
+ * @returns {Promise<{matching: object[], complete: boolean}>} The matches and whether all pages were read.
+ */
+const collectMatches = async ({
+  api,
+  search,
+  isMatch,
+}: {
+  api: CleaningApi
+  search: { surveyId: number; cycle: string; search: string; signal?: AbortSignal }
+  isMatch: (item: any) => boolean
+}) => {
+  const matching: any[] = []
+  for (let page = 0; page < MAX_PAGES; page += 1) {
+    const items = await api.searchRecordsSummary({ ...search, limit: PAGE_SIZE, offset: page * PAGE_SIZE })
+    matching.push(...items.filter(isMatch))
+    if (items.length < PAGE_SIZE) return { matching, complete: true }
+  }
+  return { matching, complete: false }
+}
 
 /**
  * Finds the UUID of the record with the given root key values (all keys, exact match).
@@ -56,10 +89,16 @@ export const findRecordUuidByKeys = async ({
   ) {
     return toolError('recordKeysInvalid', `Give exactly the record key attributes: ${keyNames.join(', ')}.`)
   }
-  const items = await api.searchRecordsSummary({ surveyId, cycle, search: String(keys[keyNames[0]]), signal })
-  const matching = items.filter((item) => matchesKeys({ item, keyDefs, keys }))
-  if (matching.length === 0) return toolError('recordNotFound', 'No record of the current cycle has these keys.')
+  const { matching, complete } = await collectMatches({
+    api,
+    search: { surveyId, cycle, search: String(keys[keyNames[0]]), signal },
+    isMatch: (item) => matchesKeys({ item, keyDefs, keys }),
+  })
   if (matching.length > 1)
     return toolError('recordAmbiguous', 'Several records have these keys: use validation_list to get their UUIDs.')
+  if (!complete) {
+    return toolError('recordSearchTooBroad', 'Too many records match the first key. Give the values of all the keys.')
+  }
+  if (matching.length === 0) return toolError('recordNotFound', 'No record of the current cycle has these keys.')
   return { recordUuid: matching[0].uuid as string }
 }
