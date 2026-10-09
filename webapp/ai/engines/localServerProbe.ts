@@ -103,11 +103,11 @@ const readJson = async (response: Response): Promise<unknown> => {
 
 /**
  * Fetches LM Studio's model details (best effort: other servers do not have this endpoint).
+ * @param {FetchFunction} localFetch - The local server fetch.
  * @param {string} baseUrl - Server base URL.
  * @param {AbortSignal} signal - Abort signal.
  * @returns {Promise<unknown>} The body, or null.
  */
-// best effort: other OpenAI-compatible servers do not have this endpoint
 const fetchLmStudioModels = async (localFetch: FetchFunction, baseUrl: string, signal: AbortSignal) => {
   try {
     return await readJson(await localFetch(new URL('/api/v0/models', `${baseUrl}/`).href, { method: 'GET', signal }))
