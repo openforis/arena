@@ -11,6 +11,7 @@ import { nodeDefProposeCreateTool } from './design/nodeDefProposeCreate'
 import { nodeDefProposeUpdateTool } from './design/nodeDefProposeUpdate'
 import { nodeDefSearchTool } from './design/nodeDefSearch'
 import { surveyGetOverviewTool } from './design/surveyGetOverview'
+import { docsSearchTool } from './help/docsSearch'
 import type { AiTool } from './types'
 
 export const ALL_TOOLS: AiTool[] = [
@@ -23,4 +24,5 @@ export const ALL_TOOLS: AiTool[] = [
   nodeDefProposeUpdateTool,
   labelsProposeSetTool,
   expressionsProposeSetTool,
+  docsSearchTool,
 ]
