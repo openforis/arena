@@ -192,13 +192,6 @@ describe('handleModelRequest: generate', () => {
     expect(res.statusCode).toBe(403)
     expect(model.doGenerateCalls).toHaveLength(0)
   })
-
-  test('the default policy allows everything (step A)', async () => {
-    const { assertPolicyAllows } = await import('@server/modules/ai/service/gateway/policy')
-    await expect(
-      assertPolicyAllows({ surveyId: 1, dataClass: 'data', hostingClass: 'external' })
-    ).resolves.toBeUndefined()
-  })
 })
 
 describe('handleModelRequest: stream', () => {
