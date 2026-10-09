@@ -5,6 +5,7 @@ import * as User from '@core/user/user'
 import {
   getAiCapabilitiesSnapshot,
   loadAiCapabilities,
+  resetAiCapabilities,
   subscribeAiCapabilities,
 } from '@webapp/ai/engines/capabilitiesStore'
 import type { AiCapabilities } from '@webapp/ai/engines/types'
@@ -22,7 +23,8 @@ export const useAiCapabilities = (): AiCapabilities => {
   const capabilities = useSyncExternalStore(subscribeAiCapabilities, getAiCapabilitiesSnapshot)
 
   useEffect(() => {
-    if (aiEnabledInSystem && userUuid) loadAiCapabilities()
+    if (aiEnabledInSystem && userUuid) loadAiCapabilities().catch(() => undefined)
+    else if (!userUuid) resetAiCapabilities()
   }, [aiEnabledInSystem, userUuid])
 
   return capabilities

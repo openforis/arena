@@ -74,6 +74,17 @@ export const invalidateAiSettingsCache = () => {
 }
 
 /**
+ * Drops the cached AI settings and the fetch in flight without fetching again (login, logout): the next
+ * consumer fetches the settings of the then logged-in user.
+ * @returns {void}
+ */
+export const resetAiSettingsCache = () => {
+  cache = null
+  inflight = null
+  notify()
+}
+
+/**
  * Returns true when the master toggle is on AND the given category toggle
  * is on for the current user. Returns false while the initial fetch is in
  * flight so AI buttons don't flash in then disappear.
