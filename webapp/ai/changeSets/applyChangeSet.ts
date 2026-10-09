@@ -114,6 +114,11 @@ const applyGroups = async (
 ) => {
   const appliedCreates = new Set<string>()
   for (const [index, group] of groups.entries()) {
+    // another survey was opened meanwhile: the next saves would go to it
+    if (Survey.getId(deps.getSurvey()) !== changeSet.surveyId) {
+      setGroupStatus(results, group, 'skipped', 'surveyChanged')
+      continue
+    }
     // the designer may have become dirty while earlier groups were saving
     if (index > 0 && deps.isSurveyDirty()) {
       setGroupStatus(results, group, 'skipped', 'surveyDirty')

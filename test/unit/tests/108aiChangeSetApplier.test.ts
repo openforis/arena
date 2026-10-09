@@ -186,6 +186,25 @@ describe('applyChangeSet', () => {
     ])
   })
 
+  test('switching to another survey mid-way skips the remaining groups', async () => {
+    const operations = buildOperations()
+    let switched = false
+    let puts = 0
+    const { deps, getSurvey } = createFakeDeps({
+      putNodeDefProps: async () => {
+        puts += 1
+        switched = true
+      },
+    })
+    deps.getSurvey = () => (switched ? { ...getSurvey(), id: 8 } : getSurvey())
+    const results = await applyChangeSet({ changeSet: changeSetOf(operations), operationIds: ['o3', 'o5'], deps })
+    expect(results).toEqual([
+      { id: 'o3', status: 'applied' },
+      { id: 'o5', status: 'skipped', message: 'surveyChanged' },
+    ])
+    expect(puts).toBe(1)
+  })
+
   test('refuses everything while the survey is dirty', async () => {
     const operations = buildOperations()
     const { deps, calls } = createFakeDeps({ isSurveyDirty: () => true })
