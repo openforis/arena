@@ -21,7 +21,7 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as ExpressionService from '../service/expressionService'
 import { closeSseStream, createSseEventWriter, openSseStream } from './serverSentEvents'
-import { formatStreamErrorForLog, formatStreamErrorForWire } from './sseErrorHelpers'
+import { formatErrorForLog, toAiWireError } from '../service/gateway/errorMapping'
 import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 const logger = Log.getLogger('AiExpressionApi')
@@ -95,8 +95,8 @@ export const init = (app) => {
             if (timedOut) writeEvent({ error: 'aiRequestTimeout' })
             // client disconnect: swallow silently
           } else {
-            logger.error(formatStreamErrorForLog('expressionExplain', error))
-            writeEvent({ error: formatStreamErrorForWire(error) })
+            logger.error(formatErrorForLog('expressionExplain', error))
+            writeEvent({ error: toAiWireError(error).key })
           }
         } finally {
           clearTimeout(timeoutHandle)

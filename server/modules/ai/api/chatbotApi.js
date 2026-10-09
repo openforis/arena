@@ -22,7 +22,7 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as AiSettingsService from '../service/aiSettingsService'
 import * as ModelClient from '../service/modelClient'
 import { closeSseStream, createSseEventWriter, openSseStream } from './serverSentEvents'
-import { formatStreamErrorForLog, formatStreamErrorForWire } from './sseErrorHelpers'
+import { formatErrorForLog, toAiWireError } from '../service/gateway/errorMapping'
 
 const logger = Log.getLogger('AiChatbotApi')
 
@@ -81,8 +81,8 @@ export const init = (app) => {
         }
       } catch (error) {
         if (error?.name !== 'AbortError') {
-          logger.error(formatStreamErrorForLog('chatbotConversation', error))
-          writeEvent({ error: formatStreamErrorForWire(error) })
+          logger.error(formatErrorForLog('chatbotConversation', error))
+          writeEvent({ error: toAiWireError(error).key })
         }
       } finally {
         clearTimeout(timeoutHandle)

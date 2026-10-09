@@ -9,7 +9,7 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as ActivityLogSummarizerService from '../service/activityLogSummarizerService'
 import { closeSseStream, createSseEventWriter, openSseStream } from './serverSentEvents'
-import { formatStreamErrorForLog, formatStreamErrorForWire } from './sseErrorHelpers'
+import { formatErrorForLog, toAiWireError } from '../service/gateway/errorMapping'
 import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 const logger = Log.getLogger('AiActivityLogApi')
@@ -43,8 +43,8 @@ export const init = (app) => {
             writeEvent({ chunk })
           }
         } catch (error) {
-          logger.error(formatStreamErrorForLog('activityLogSummary', error))
-          writeEvent({ error: formatStreamErrorForWire(error) })
+          logger.error(formatErrorForLog('activityLogSummary', error))
+          writeEvent({ error: toAiWireError(error).key })
         }
 
         closeSseStream(res)
