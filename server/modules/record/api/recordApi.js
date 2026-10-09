@@ -46,7 +46,7 @@ import {
   requireRecordsMatchUserGroupQualifiers,
   requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
-import { requireNodeBelongsToRecord } from './recordNodeOwnership'
+import { requireNodeBelongsToRecord, requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
 
 const fetchRecordNodeFileAsStream = async ({ surveyId, recordUuid, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
@@ -736,6 +736,7 @@ export const init = (app) => {
   app.delete(
     '/survey/:surveyId/record/:recordUuid/node/:nodeUuid',
     requireRecordEditPermission,
+    requireNodeUuidBelongsToRecord,
     requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {

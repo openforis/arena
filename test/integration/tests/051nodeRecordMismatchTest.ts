@@ -5,7 +5,10 @@ import * as Record from '@core/record/record'
 
 import * as RecordApi from '@server/modules/record/api/recordApi'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
-import { requireNodeBelongsToRecord } from '@server/modules/record/api/recordNodeOwnership'
+import {
+  requireNodeBelongsToRecord,
+  requireNodeUuidBelongsToRecord,
+} from '@server/modules/record/api/recordNodeOwnership'
 
 import { createFakeResponse } from '../../unit/utils/fakeExpress'
 
@@ -82,5 +85,38 @@ describe('Per-node endpoint: node of another record', () => {
     expect(res.statusCode).toBe(400)
     const nodeBDb = await RecordManager.fetchNodeByUuid(surveyId, Node.getUuid(nodeB))
     expect(Node.getValue(nodeBDb)).toBe(2)
+  })
+
+  test('the delete route checks the node record right after the edit permission', () => {
+    const route = collectRoutes(RecordApi.init).find(
+      ({ method, path }) => method === 'delete' && path === '/survey/:surveyId/record/:recordUuid/node/:nodeUuid'
+    )
+    expect(route).toBeDefined()
+    expect(route?.handlers.indexOf(requireNodeUuidBelongsToRecord)).toBe(1)
+  })
+
+  test('deleting a node of record B through the URL of record A is refused and the node still exists', async () => {
+    const surveyId = Survey.getId(survey)
+    const nodeB = RecordUtils.findNodeByPath('root/num')(survey, recordB)
+    const nodeUuid = Node.getUuid(nodeB)
+    const req: any = {
+      params: { surveyId: String(surveyId), recordUuid: Record.getUuid(recordA), nodeUuid },
+      query: {},
+      body: {},
+    }
+    const res = createFakeResponse()
+    const next = jest.fn()
+
+    await requireNodeUuidBelongsToRecord(req, res, next)
+
+    expect(next).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(400)
+    expect(await RecordManager.fetchNodeByUuid(surveyId, nodeUuid)).toBeTruthy()
+
+    // the node of the right record passes
+    const reqOk: any = { ...req, params: { ...req.params, recordUuid: Record.getUuid(recordB) } }
+    const nextOk = jest.fn()
+    await requireNodeUuidBelongsToRecord(reqOk, createFakeResponse(), nextOk)
+    expect(nextOk).toHaveBeenCalledWith()
   })
 })
