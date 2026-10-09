@@ -76,4 +76,65 @@ $t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: 'El usuario {{name}} ha sido actualizado',
   userNotInvitedToAnySurvey: 'Usuario no invitado a ninguna encuesta',
   userSurveys: 'Encuestas de usuario',
+  usersBackup: {
+    menu: 'Copia de seguridad / Restaurar',
+    backup: 'Copia de seguridad de usuarios',
+    backupTitle: 'Copia de seguridad de usuarios',
+    backupInfo:
+      'Todos los usuarios se exportarán con sus roles en las encuestas y sus grupos de usuarios, para poder restaurarlos en otro servidor de Arena. Los dispositivos 2FA no se exportan.',
+    includePasswords: 'Incluir contraseñas',
+    passwordsWarning:
+      'El archivo de copia de seguridad contendrá los hashes de las contraseñas: guárdelo en un lugar seguro y elimínelo después de usarlo.',
+    restore: 'Restaurar usuarios',
+    restoreTitle: 'Restaurar usuarios desde una copia de seguridad',
+    restoreInfo: `- Los usuarios se identifican por su correo electrónico
+- Los roles en las encuestas y los grupos de usuarios se identifican por el nombre de la encuesta y el nombre del grupo
+- Los roles y grupos de usuarios de encuestas que no existen en este servidor se ignoran
+- Después de pulsar "Restaurar usuarios", podrá elegir qué hacer con cada usuario`,
+    backupFileInfo: 'Copia de seguridad generada por {{email}} el {{date}} (servidor: {{serverUrl}})',
+    passwordsNotIncluded:
+      'Las contraseñas no están incluidas en esta copia de seguridad: los usuarios nuevos tendrán que restablecer su contraseña',
+    allNewUsers: 'Todos los usuarios nuevos ({{count}})',
+    allExistingUsers: 'Todos los usuarios existentes ({{count}})',
+    userStatus: 'Estado',
+    userActionHeader: 'Acción',
+    userNew: 'Nuevo',
+    userExisting: 'Existente',
+    userAction: {
+      insert: 'Añadir',
+      skip: 'Omitir',
+      updateRoles: 'Actualizar roles en las encuestas',
+      updateAll: 'Actualizar roles en las encuestas y datos',
+    },
+    sysAdmin: 'Admin. sist.',
+    restorePassword: 'Contraseña',
+    restorePasswordInfo:
+      'Restaurar la contraseña guardada en la copia de seguridad (solo al añadir el usuario o actualizar sus datos)',
+    userActionShort: {
+      insert: 'Añadir',
+      skip: 'Omitir',
+      updateRoles: 'Roles',
+      updateAll: 'Roles + datos',
+    },
+    details: {
+      survey: 'Encuesta',
+      roleInBackup: 'Rol en la copia de seguridad',
+      currentRole: 'Rol actual',
+      notFoundInThisServer: '(no encontrado en este servidor)',
+      userGroup: 'Grupo de usuarios',
+      inBackup: 'En la copia de seguridad',
+      currentMember: 'Miembro actual',
+    },
+    summaryImported: 'Usuarios restaurados',
+    summary: {
+      usersTotal: 'Usuarios en la copia de seguridad: {{count}}',
+      usersInserted: 'Usuarios nuevos: {{count}}',
+      usersUpdated: 'Usuarios actualizados: {{count}}',
+      usersSkipped: 'Usuarios omitidos: {{count}}',
+      authGroupsAdded: 'Roles en encuestas añadidos: {{count}}',
+      userGroupsAdded: 'Pertenencias a grupos de usuarios añadidas: {{count}}',
+    },
+    surveysNotFound: 'Encuestas no encontradas (roles ignorados): {{names}}',
+    userGroupsNotFound: 'Grupos de usuarios no encontrados (pertenencias ignoradas): {{names}}',
+  },
 }

@@ -111,4 +111,7 @@ Try to refresh the page.`,
   userNotAllowedToChangePref: 'User not allowed to change pref',
   userNotAuthorized: 'User {{userName}} is not authorized',
   userNotFound: 'User not found: {{userUuid}}',
+  usersBackupImport: {
+    invalidFile: 'The file is not a valid Arena users backup',
+  },
 }
