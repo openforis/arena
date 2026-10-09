@@ -1585,6 +1585,7 @@ $t(common.cantUndoWarning)`,
     thinking: 'イベントを集計し、AIに要約を依頼しています…',
     error: '要約の取得に失敗しました：{{message}}',
   },
+
   aiEngine: {
     unavailableTitle: '利用できません',
     unavailable: {

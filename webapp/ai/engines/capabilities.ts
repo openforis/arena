@@ -179,6 +179,16 @@ export const getCapabilitiesSnapshotForUser = (
 }
 
 /**
+ * Returns whether the store holds the loaded capabilities of the current user (false before the first load, and for
+ * another user's data), so a feature is not reported as having no engine from the empty snapshot.
+ * @param {AiCapabilitiesStore} store - The store.
+ * @param {string|null} currentUserUuid - UUID of the logged-in user.
+ * @returns {boolean} True when loaded for this user.
+ */
+export const isCapabilitiesLoadedForUser = (store: AiCapabilitiesStore, currentUserUuid: string | null): boolean =>
+  currentUserUuid !== null && store.getLoadedFor() === currentUserUuid
+
+/**
  * Creates a capabilities store.
  * @param {CapabilitiesStoreDeps} deps - Settings, local settings, probe and device readers.
  * @returns {AiCapabilitiesStore} The store.

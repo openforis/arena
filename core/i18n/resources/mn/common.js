@@ -1591,6 +1591,7 @@ $t(common.cantUndoWarning)`,
     thinking: 'Үйл явдлуудыг нэгтгэж, AI-аас хураангуй хүсэж байна…',
     error: 'Хураангуйг авч чадсангүй: {{message}}',
   },
+
   aiEngine: {
     unavailableTitle: 'Боломжгүй',
     unavailable: {

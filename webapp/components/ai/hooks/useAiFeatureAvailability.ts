@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { type AiDataClass, getAiFeature } from '@common/ai/features'
 import * as User from '@core/user/user'
 
+import { isCapabilitiesLoadedForUser } from '@webapp/ai/engines/capabilities'
 import { getAiCapabilitiesStore } from '@webapp/ai/engines/capabilitiesStore'
 import {
   type AiEngineFeatureAvailability,
@@ -51,8 +52,12 @@ export const useAiFeatureAvailability = (
   const userUuid = user ? (User.getUuid(user) ?? null) : null
   const requestDataClass = dataClass ?? definition?.dataClass ?? 'data'
   // without a survey (Help) only the instance ceilings apply; a survey policy error fails closed
-  const ceilings = capabilities.instance.policyCeilings ?? (settings ? getCeilingsFromSettings(settings) : null)
+  const settingsCeilings = useMemo(() => (settings ? getCeilingsFromSettings(settings) : null), [settings])
+  const ceilings = capabilities.instance.policyCeilings ?? settingsCeilings
   const effective = resolveEffectivePolicy({ surveyScoped, state, error, ceilings })
+
+  // the empty snapshot before the first load must not read as "no engine": nothing is shown until it is loaded
+  const loaded = isCapabilitiesLoadedForUser(getAiCapabilitiesStore(), userUuid)
 
   return useMemo(() => {
     const localSettings = getAiCapabilitiesStore().getLocalSettings()
@@ -65,12 +70,12 @@ export const useAiFeatureAvailability = (
         })
       : null
     return getAiEngineFeatureAvailability({
-      enabled,
+      enabled: enabled && loaded,
       effective,
       dataClass: requestDataClass,
       surveyScoped,
       capabilities,
       preferLocal: getEffectivePreferLocal({ settings: localSettings, consent }),
     })
-  }, [capabilities, effective, enabled, requestDataClass, surveyId, surveyScoped, userUuid])
+  }, [capabilities, effective, enabled, loaded, requestDataClass, surveyId, surveyScoped, userUuid])
 }

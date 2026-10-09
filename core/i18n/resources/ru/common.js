@@ -1608,6 +1608,7 @@ $t(common.cantUndoWarning)`,
     thinking: 'Собираем события и запрашиваем у ИИ сводку…',
     error: 'Не удалось получить сводку: {{message}}',
   },
+
   aiEngine: {
     unavailableTitle: 'Недоступно',
     unavailable: {

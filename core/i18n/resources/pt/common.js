@@ -1602,6 +1602,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     thinking: 'Agregando eventos e pedindo à IA para resumir…',
     error: 'Falha ao obter o resumo: {{message}}',
   },
+
   aiEngine: {
     unavailableTitle: 'Indisponível',
     unavailable: {
