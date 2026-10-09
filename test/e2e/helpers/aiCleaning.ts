@@ -69,7 +69,10 @@ export const useLocalServer = async (
   await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub.baseUrl, modelId: stub.modelId })
   // wait for the app to boot: refresh tokens rotate, so a navigation that aborts the boot's refresh logs the user out
   await Promise.all([
-    page.waitForResponse((response) => response.url().includes('/api/ai/settings') && response.request().method() === 'GET' && response.ok()),
+    page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/ai/settings') && response.request().method() === 'GET' && response.ok()
+    ),
     page.reload(),
   ])
 }
