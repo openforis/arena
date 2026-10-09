@@ -3,7 +3,10 @@ import { getAiPolicyCeilingErrors, getAiPolicyCeilings } from '@server/modules/a
 describe('getAiPolicyCeilings', () => {
   test('defaults to cloud when unset or empty', () => {
     expect(getAiPolicyCeilings({})).toEqual({ schema: 'cloud', data: 'cloud' })
-    expect(getAiPolicyCeilings({ aiPolicyMaxSchema: '', aiPolicyMaxData: '  ' })).toEqual({ schema: 'cloud', data: 'cloud' })
+    expect(getAiPolicyCeilings({ aiPolicyMaxSchema: '', aiPolicyMaxData: '  ' })).toEqual({
+      schema: 'cloud',
+      data: 'cloud',
+    })
   })
 
   test('reads valid levels (trimmed)', () => {
