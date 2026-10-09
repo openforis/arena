@@ -18,6 +18,15 @@ PGDATABASE=arena_e2e yarn test:e2e:debug                 # step by step with the
 yarn test:e2e:report                                     # open the HTML report of the last run (traces of the failed tests)
 ```
 
+The AI specs (`specs/aiFeatures.spec.ts`) run only against a server started with the mock AI provider, and are
+skipped unless `E2E_AI_MOCK=true`:
+
+```bash
+AI_FEATURES_ENABLED=true AI_MOCK_PROVIDER_ENABLED=true AI_DEFAULT_PROVIDER=mock AI_DEFAULT_MODEL=mock \
+  PGDATABASE=arena_e2e node dist/server.js                                        # in another terminal
+E2E_AI_MOCK=true PGDATABASE=arena_e2e yarn test:e2e specs/aiFeatures.spec.ts
+```
+
 Set `E2E_KEEP_DATA=true` to keep the surveys created by the tests (e.g. to inspect them after a failure).
 
 ## Writing tests
