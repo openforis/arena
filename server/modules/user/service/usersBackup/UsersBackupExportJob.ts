@@ -13,16 +13,7 @@ import {
   usersBackupFormatVersion,
   usersBackupType,
 } from './usersBackupModel'
-
-const groupByUserUuid = <T extends { userUuid: string }>(items: T[]): Record<string, T[]> => {
-  const result: Record<string, T[]> = {}
-  for (const item of items) {
-    const userItems = result[item.userUuid] ?? []
-    userItems.push(item)
-    result[item.userUuid] = userItems
-  }
-  return result
-}
+import { groupByUserUuid } from './usersBackupUtils'
 
 /**
  * Exports all the users (with their survey roles and user groups) into a zip file

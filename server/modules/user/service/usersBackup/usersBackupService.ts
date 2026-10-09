@@ -1,11 +1,11 @@
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
-import * as UsersBackupRepository from '@server/modules/user/repository/usersBackupRepository'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import UsersBackupExportJob from './UsersBackupExportJob'
 import UsersBackupImportJob from './UsersBackupImportJob'
 import { UsersBackupFileReader } from './usersBackupFileReader'
+import { buildUsersBackupPreviewUsers } from './usersBackupPreviewBuilder'
 import { UsersBackupPreview, UsersBackupUserAction } from './usersBackupModel'
 
 const startExportJob = ({
@@ -34,13 +34,10 @@ const readImportPreview = async ({ uploadedFilePath }: { uploadedFilePath: strin
     fileZip = await UsersBackupFileReader.open(filePath)
     const { serverUrl, dateExported, exportedByUserEmail, includePasswords } = UsersBackupFileReader.readInfo(fileZip)
     const users = UsersBackupFileReader.readUsers(fileZip)
-    const existingEmails = new Set(
-      await UsersBackupRepository.fetchExistingEmails({ emails: users.map((user) => user.email) })
-    )
     return {
       tempFileName,
       info: { serverUrl, dateExported, exportedByUserEmail, includePasswords },
-      users: users.map(({ email, name }) => ({ email, name, existing: existingEmails.has(email) })),
+      users: await buildUsersBackupPreviewUsers(users),
     }
   } catch (error) {
     await FileUtils.deleteFileAsync(filePath)

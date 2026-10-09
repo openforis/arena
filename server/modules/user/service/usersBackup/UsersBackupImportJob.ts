@@ -7,8 +7,7 @@ import type { AuthGroupRow, UserGroupRow } from '@server/modules/user/repository
 
 import { UsersBackupFileReader } from './usersBackupFileReader'
 import { UsersBackupImportSummary, UsersBackupUser, UsersBackupUserAction } from './usersBackupModel'
-
-const surveyGroupKey = ({ surveyName, name }: { surveyName?: string | null; name: string }) => `${surveyName}|${name}`
+import { surveyGroupKey } from './usersBackupUtils'
 
 const existingUserActions = new Set([UsersBackupUserAction.updateRoles, UsersBackupUserAction.updateAll])
 

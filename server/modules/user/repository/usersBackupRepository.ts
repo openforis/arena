@@ -85,10 +85,11 @@ export const fetchUserGroupMembershipsForBackup = async (client: any = db): Prom
 export const fetchUserUuidByEmail = async ({ email }: { email: string }, client: any = db): Promise<string | null> =>
   client.oneOrNone(`SELECT uuid FROM "user" WHERE email = $1`, [email], (row: any) => row?.uuid ?? null)
 
-export const fetchExistingEmails = async ({ emails }: { emails: string[] }, client: any = db): Promise<string[]> =>
-  emails.length === 0
-    ? []
-    : client.map(`SELECT email FROM "user" WHERE email IN ($1:csv)`, [emails], (row: any) => row.email)
+export const fetchUserUuidsByEmails = async (
+  { emails }: { emails: string[] },
+  client: any = db
+): Promise<{ email: string; uuid: string }[]> =>
+  emails.length === 0 ? [] : client.map(`SELECT email, uuid FROM "user" WHERE email IN ($1:csv)`, [emails], camelize)
 
 export const existsUserByUuid = async ({ uuid }: { uuid: string }, client: any = db): Promise<boolean> =>
   client.one(`SELECT EXISTS (SELECT 1 FROM "user" WHERE uuid = $1)`, [uuid], (row: any) => row.exists)

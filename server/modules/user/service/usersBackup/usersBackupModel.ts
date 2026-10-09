@@ -58,10 +58,21 @@ export type UsersBackupInfo = {
   usersCount: number
 }
 
+export type UsersBackupPreviewRoles = {
+  // global roles (e.g. systemAdmin, surveyManager)
+  mainRoles: string[]
+  surveyRoles: { surveyName: string; role: string; surveyExists?: boolean }[]
+  userGroups: { surveyName: string; name: string; groupExists?: boolean }[]
+}
+
 export type UsersBackupPreviewUser = {
   email: string
   name?: string | null
   existing: boolean
+  // roles in the backup (surveyExists/groupExists tell if they can be restored in this server)
+  backup: UsersBackupPreviewRoles
+  // roles already defined in this server (only for existing users)
+  current: UsersBackupPreviewRoles | null
 }
 
 export type UsersBackupPreview = {

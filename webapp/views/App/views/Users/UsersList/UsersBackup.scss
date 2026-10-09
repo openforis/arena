@@ -30,6 +30,12 @@
 }
 
 .users-backup-import-users-modal {
+  .modal-content {
+    width: 90vw;
+    max-width: 75rem;
+    margin: 5vh auto auto;
+  }
+
   .users-backup-import-users-modal__bulk-actions {
     display: grid;
     grid-template-columns: auto auto;
@@ -37,28 +43,78 @@
     gap: 0.5rem 1rem;
     text-align: right;
   }
+}
 
-  .users-backup-import-users-modal__table {
-    align-self: stretch;
-    max-height: 50vh;
-    overflow-y: auto;
+.users-backup-import-users-table {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
+  .users-backup-import-users-table__search {
+    width: 20rem;
+  }
+
+  .users-backup-import-users-table__container {
+    max-height: 40vh;
+    background-color: white;
+    border: 1px solid $greyBorder;
+    border-radius: 4px;
 
     th {
-      position: sticky;
-      top: 0;
-      background-color: $grey;
+      font-weight: 600;
     }
 
-    th,
-    td {
-      padding: 0.3rem 0.5rem;
-      border-bottom: 1px solid $greyBorder;
+    // long emails can break anywhere
+    .users-backup-import-users-table__email-cell {
+      overflow-wrap: anywhere;
     }
+
+    .users-backup-import-users-table__action-cell {
+      white-space: nowrap;
+
+      .btn {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  tr.expanded > td {
+    border-bottom: none;
+  }
+
+  .users-backup-import-users-table__details-row > td {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.users-backup-user-status {
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+  background-color: $grey;
+  white-space: nowrap;
+
+  &.users-backup-user-status--new {
+    background-color: $green;
+    color: white;
+  }
+}
+
+.users-backup-roles-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.5rem 0 1rem 3rem;
+
+  table {
+    width: auto;
+  }
+
+  .users-backup-roles-details__not-found {
+    color: $colorError;
+    font-size: 0.8rem;
   }
 }

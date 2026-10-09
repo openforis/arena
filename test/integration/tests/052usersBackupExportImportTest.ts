@@ -159,10 +159,19 @@ describe('Users backup export/import', () => {
   })
 
   test('preview tells if the user exists in this server', async () => {
-    expect(await findPreviewUser()).toEqual({ email, name, existing: true })
+    const existingUser = await findPreviewUser()
+    expect(existingUser).toMatchObject({ email, name, existing: true })
+    expect(existingUser.backup.surveyRoles).toEqual([
+      { surveyName: name, role: AuthGroup.groupNames.dataEditor, surveyExists: true },
+    ])
+    expect(existingUser.backup.userGroups).toEqual([{ surveyName: name, name: userGroupName, groupExists: true }])
+    expect(existingUser.current.surveyRoles).toEqual([{ surveyName: name, role: AuthGroup.groupNames.dataEditor }])
+    expect(existingUser.current.mainRoles).toEqual([])
 
     await db.none(`DELETE FROM "user" WHERE email = $1`, [email])
-    expect((await findPreviewUser()).existing).toBe(false)
+    const newUser = await findPreviewUser()
+    expect(newUser.existing).toBe(false)
+    expect(newUser.current).toBeNull()
   })
 
   test('new user with skip action is not inserted', async () => {

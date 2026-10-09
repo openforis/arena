@@ -16,20 +16,19 @@ import {
   ModalBody,
   ModalFooter,
 } from '@webapp/components'
-import { ButtonGroup, Checkbox } from '@webapp/components/form'
+import { Checkbox } from '@webapp/components/form'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 
-// keep in sync with UsersBackupUserAction (server)
-const UserAction = {
-  insert: 'insert',
-  skip: 'skip',
-  updateRoles: 'updateRoles',
-  updateAll: 'updateAll',
-}
-const newUserActions = [UserAction.insert, UserAction.skip]
-const existingUserActions = [UserAction.skip, UserAction.updateRoles, UserAction.updateAll]
+import {
+  ImportPreviewUser,
+  UserAction,
+  UserActionButtonGroup,
+  UsersBackupImportUsersTable,
+  existingUserActions,
+  newUserActions,
+} from './UsersBackupImportUsersTable'
 
 const acceptedFiles = { 'application/zip': ['.zip'] }
 
@@ -43,8 +42,6 @@ type ImportSummary = {
   surveysNotFound: string[]
   userGroupsNotFound: string[]
 }
-
-type ImportPreviewUser = { email: string; name?: string | null; existing: boolean }
 
 type ImportPreview = {
   tempFileName: string
@@ -111,10 +108,20 @@ const ImportSummaryView = ({ summary }: { summary: ImportSummary }) => {
         )}
       </ul>
       {surveysNotFound.length > 0 && (
-        <p>{i18n.t('usersView:usersBackup.surveysNotFound', { names: surveysNotFound.join(', ') })}</p>
+        <p>
+          {i18n.t('usersView:usersBackup.surveysNotFound', {
+            names: surveysNotFound.join(', '),
+            interpolation: { escapeValue: false },
+          })}
+        </p>
       )}
       {userGroupsNotFound.length > 0 && (
-        <p>{i18n.t('usersView:usersBackup.userGroupsNotFound', { names: userGroupsNotFound.join(', ') })}</p>
+        <p>
+          {i18n.t('usersView:usersBackup.userGroupsNotFound', {
+            names: userGroupsNotFound.join(', '),
+            interpolation: { escapeValue: false },
+          })}
+        </p>
       )}
     </div>
   )
@@ -160,23 +167,6 @@ const UsersBackupImportFileModal = ({
     </Modal>
   )
 }
-
-const UserActionButtonGroup = ({
-  actions,
-  onChange,
-  selectedAction,
-}: {
-  actions: string[]
-  onChange: (action: string) => void
-  selectedAction: string | null
-}) => (
-  <ButtonGroup
-    items={actions.map((action) => ({ key: action, label: `usersView:usersBackup.userAction.${action}` }))}
-    // ButtonGroup (JS) passes the selected item key to onChange, but its inferred type has no params
-    onChange={onChange as () => void}
-    selectedItemKey={selectedAction}
-  />
-)
 
 const UsersBackupImportUsersModal = ({ onClose, preview }: { onClose: () => void; preview: ImportPreview }) => {
   const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
@@ -239,6 +229,7 @@ const UsersBackupImportUsersModal = ({ onClose, preview }: { onClose: () => void
             serverUrl: info.serverUrl ?? '-',
             date: DateUtils.formatDateTimeDisplay(new Date(info.dateExported)),
             email: info.exportedByUserEmail,
+            interpolation: { escapeValue: false },
           })}
         </p>
         {!info.includePasswords && (
@@ -270,36 +261,11 @@ const UsersBackupImportUsersModal = ({ onClose, preview }: { onClose: () => void
                 </>
               )}
             </div>
-            <div className="users-backup-import-users-modal__table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>{i18n.t('common.email')}</th>
-                    <th>{i18n.t('common.name')}</th>
-                    <th>{i18n.t('usersView:usersBackup.userStatus')}</th>
-                    <th>{i18n.t('usersView:usersBackup.userActionHeader')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <tr key={user.email}>
-                      <td>{user.email}</td>
-                      <td>{user.name}</td>
-                      <td>
-                        {i18n.t(user.existing ? 'usersView:usersBackup.userExisting' : 'usersView:usersBackup.userNew')}
-                      </td>
-                      <td>
-                        <UserActionButtonGroup
-                          actions={user.existing ? existingUserActions : newUserActions}
-                          onChange={setActionForUsers([user])}
-                          selectedAction={actionsByEmail[user.email]}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <UsersBackupImportUsersTable
+              users={users}
+              actionsByEmail={actionsByEmail}
+              onActionChange={(user) => setActionForUsers([user])}
+            />
           </>
         )}
       </ModalBody>
