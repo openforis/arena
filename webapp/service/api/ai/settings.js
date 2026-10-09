@@ -73,3 +73,12 @@ export const clearSettings = async () => {
   const { data } = await axios.delete(BASE)
   return data
 }
+
+/**
+ * Posts the anonymous capability statistics (only called when the user opted in).
+ * @param {object} stats - The five values of common/ai/capabilityStats.
+ * @returns {Promise<void>} Resolves when the server answered.
+ */
+export const sendCapabilityStats = async (stats) => {
+  await axios.post('/api/ai/capability-stats', stats)
+}

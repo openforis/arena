@@ -121,6 +121,7 @@ export default {
   aiLocalServerError: 'ローカル AI サーバーがエラーを返しました (HTTP {{status}})。',
   aiNoEngineAvailable: 'このリクエストに使用できる AI エンジンがありません。',
   aiLocalServerConsentCancelled: 'リクエストはキャンセルされました。',
+  aiCapabilityStatsInvalid: '機能統計が無効です。',
   aiDataQuerySummaryInvalid: 'AIはこのクエリの名前と説明を提案できませんでした。もう一度お試しください。',
   userCannotDeleteHasMessages:
     'このユーザーは削除できません：{{count}}件のメッセージを作成しています。先にメッセージを削除するか、担当を変更してください',

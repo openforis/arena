@@ -7,6 +7,7 @@
  */
 import * as Log from '@server/log/log'
 
+import * as CapabilityStatsApi from './capabilityStatsApi'
 import * as InternalApi from './internalApi'
 import * as ModelApi from './modelApi'
 import * as SettingsApi from './settingsApi'
@@ -17,8 +18,9 @@ const logger = Log.getLogger('AiApi')
 export const init = (app) => {
   ModelApi.init(app)
   SettingsApi.init(app)
+  CapabilityStatsApi.init(app)
   InternalApi.init(app)
   SurveyAiPolicyApi.init(app)
 
-  logger.info('AI module initialised (model, settings, internal, surveyAiPolicy routes registered)')
+  logger.info('AI module initialised (model, settings, capabilityStats, internal, surveyAiPolicy routes registered)')
 }

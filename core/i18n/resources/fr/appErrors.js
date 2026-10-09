@@ -10,6 +10,7 @@ export default {
   aiLocalServerError: "Le serveur d'IA local a renvoyé une erreur (HTTP {{status}}).",
   aiNoEngineAvailable: "Aucun moteur d'IA ne peut être utilisé pour cette requête.",
   aiLocalServerConsentCancelled: 'La requête a été annulée.',
+  aiCapabilityStatsInvalid: 'Les statistiques de capacités ne sont pas valides.',
   aiDataQueryInvalid: "L'IA n'a pas pu générer une requête valide pour cette demande : {{errors}}",
   aiDataQueryNoEntities: 'Ce formulaire ne contient aucune entité pouvant être interrogée.',
   aiDataQuerySummaryInvalid:

@@ -120,6 +120,7 @@ Try to refresh the page.`,
   aiLocalServerError: 'The local AI server returned an error (HTTP {{status}}).',
   aiNoEngineAvailable: 'No AI engine can be used for this request.',
   aiLocalServerConsentCancelled: 'The request was cancelled.',
+  aiCapabilityStatsInvalid: 'The capability statistics are invalid.',
   aiDataQuerySummaryInvalid: 'The AI could not suggest a name and description for this query. Please try again.',
   userCannotDeleteHasMessages:
     'This user cannot be deleted: they authored {{count}} message(s); delete or reassign them first',

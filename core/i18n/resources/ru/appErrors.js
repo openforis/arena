@@ -10,6 +10,7 @@ export default {
   aiLocalServerError: 'Локальный сервер ИИ вернул ошибку (HTTP {{status}}).',
   aiNoEngineAvailable: 'Для этого запроса нельзя использовать ни один движок ИИ.',
   aiLocalServerConsentCancelled: 'Запрос отменён.',
+  aiCapabilityStatsInvalid: 'Статистика возможностей недействительна.',
   aiDataQueryInvalid: 'ИИ не удалось сформировать корректный запрос по этому описанию: {{errors}}',
   aiDataQueryNoEntities: 'В этом опросе нет сущностей, по которым можно выполнить запрос.',
   aiDataQuerySummaryInvalid: 'ИИ не удалось предложить название и описание для этого запроса. Попробуйте ещё раз.',

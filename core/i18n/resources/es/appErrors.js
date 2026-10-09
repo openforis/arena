@@ -10,6 +10,7 @@ export default {
   aiLocalServerError: 'El servidor de IA local devolvió un error (HTTP {{status}}).',
   aiNoEngineAvailable: 'No se puede usar ningún motor de IA para esta solicitud.',
   aiLocalServerConsentCancelled: 'La solicitud se canceló.',
+  aiCapabilityStatsInvalid: 'Las estadísticas de capacidades no son válidas.',
   aiDataQueryInvalid: 'La IA no pudo generar una consulta válida para esta solicitud: {{errors}}',
   aiDataQueryNoEntities: 'Esta encuesta no tiene entidades que se puedan consultar.',
   aiDataQuerySummaryInvalid:
