@@ -53,6 +53,7 @@ export default {
   geoWhispSamplingPointDataCategoryMissing: 'Sampling point data category not found.',
   geoWhispSamplingPointDataLocationsMissing: 'No sampling point data item with a valid location found.',
   importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
+  invalidParams: 'Invalid request parameters.',
   invalidType: 'Invalid type {{type}}',
   jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
   jobOrphanedOnRestart: 'The job was interrupted by a server restart. Please try again.',

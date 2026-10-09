@@ -55,6 +55,7 @@ export default {
   geoWhispSamplingPointDataCategoryMissing: '抽出地点データのカテゴリが見つかりません。',
   geoWhispSamplingPointDataLocationsMissing: '有効な位置情報を持つ抽出地点データの項目が見つかりません。',
   importingDataIntoWrongCollectSurvey: '誤った調査へのデータインポートです。期待されるURI：{{collectSurveyUri}}',
+  invalidParams: 'リクエストパラメータが無効です。',
   invalidType: '無効な型です：{{type}}',
   jobCanceledOrErrorsFound: 'ジョブがキャンセルされたか、エラーが発生しました。トランザクションをロールバックします',
   jobOrphanedOnRestart: 'サーバーの再起動によりジョブが中断されました。もう一度お試しください。',
