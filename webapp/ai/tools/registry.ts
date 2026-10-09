@@ -60,9 +60,18 @@ export const limitToolResult = (output: unknown, maxChars: number = AiLimits.ass
   return { truncated: true, json: json.slice(0, maxChars) }
 }
 
-const toolError = (code: string, message: string, details: Record<string, unknown> = {}): AiToolErrorResult => ({
-  error: { code, message, ...details },
-})
+/**
+ * Builds the structured error result; when it exceeds the result budget the details are dropped.
+ * @param {string} code - Error code.
+ * @param {string} message - Message for the model.
+ * @param {object} [details] - Extra fields.
+ * @returns {AiToolErrorResult} The error result, always within the budget.
+ */
+const toolError = (code: string, message: string, details: Record<string, unknown> = {}): AiToolErrorResult => {
+  const result = { error: { code, message, ...details } }
+  if (JSON.stringify(result).length <= AiLimits.assistantToolResultMaxChars) return result
+  return { error: { code, message: message.slice(0, 1000), detailsDropped: true } }
+}
 
 const isAbortError = (error: unknown): boolean => (error as { name?: string })?.name === 'AbortError'
 

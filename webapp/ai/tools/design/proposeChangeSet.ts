@@ -6,10 +6,12 @@ import { z } from 'zod'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 
+import { AiLimits } from '@common/ai/limits'
+
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
 import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
 import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
-import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
+import type { ChangeOperationDraft, ChangeSetIssue } from '@webapp/ai/changeSets/types'
 
 import { AiToolFailure } from '../toolFailure'
 import type { AiToolContext } from '../types'
@@ -39,6 +41,12 @@ export const toTextMap = (items?: { lang: string; text: string }[]): Record<stri
   return Object.fromEntries(items.map(({ lang, text }) => [lang, text]))
 }
 
+/**
+ * Tells whether two expression lists are the same for the user (expression, severity and messages).
+ * @param {object[]} from - Current expressions.
+ * @param {object[]} to - Proposed expressions.
+ * @returns {boolean} True when nothing differs.
+ */
 const expressionsAreSimilar = (from: any[], to: any[]): boolean =>
   from.length === to.length &&
   from.every(
@@ -48,7 +56,11 @@ const expressionsAreSimilar = (from: any[], to: any[]): boolean =>
       isDeepEqual(expression.messages, to[index].messages)
   )
 
-// an operation whose target already has the proposed value: it would only add noise to the card
+/**
+ * Tells whether the target already has the proposed value (it would only add noise to the card).
+ * @param {ChangeOperationDraft} draft - The proposed operation.
+ * @returns {boolean} True when the operation changes nothing.
+ */
 const changesNothing = (draft: ChangeOperationDraft): boolean => {
   if (draft.type === 'nodeDef.create') return false
   if (draft.type === 'expression.set') return expressionsAreSimilar(draft.from, draft.to)
@@ -63,6 +75,24 @@ const changesNothing = (draft: ChangeOperationDraft): boolean => {
  * @param {string} params.summary - The model's summary.
  * @returns {Promise<ProposeResult>} The change set id and the number of operations.
  */
+const ISSUES_BUDGET = AiLimits.assistantToolResultMaxChars - 500
+
+/**
+ * Keeps the first issues whose JSON fits the result budget.
+ * @param {ChangeSetIssue[]} issues - All issues.
+ * @returns {ChangeSetIssue[]} The leading issues that fit.
+ */
+const capIssues = (issues: ChangeSetIssue[]): ChangeSetIssue[] => {
+  const kept: ChangeSetIssue[] = []
+  let size = 2
+  for (const issue of issues) {
+    size += JSON.stringify(issue).length + 1
+    if (size > ISSUES_BUDGET) break
+    kept.push(issue)
+  }
+  return kept
+}
+
 export const proposeChangeSet = async ({
   ctx,
   drafts,
@@ -73,7 +103,13 @@ export const proposeChangeSet = async ({
   summary: string
 }): Promise<ProposeResult> => {
   const survey = requireSurvey(ctx)
-  const effective = drafts.filter((draft) => !changesNothing(draft))
+  // issue indexes must point at the model's own list, not at the filtered one
+  const originalIndexes: number[] = []
+  const effective = drafts.filter((draft, index) => {
+    const keep = !changesNothing(draft)
+    if (keep) originalIndexes.push(index)
+    return keep
+  })
   if (effective.length === 0) {
     throw new AiToolFailure('noChange', 'Every proposed value is already set: there is nothing to propose.')
   }
@@ -83,7 +119,15 @@ export const proposeChangeSet = async ({
     throw new AiToolFailure(
       'invalidProposal',
       'The proposal was not shown to the user. Fix the issues (operation = index in your proposal) and propose again.',
-      { issues: validation.issues }
+      {
+        issues: capIssues(
+          validation.issues.map((issue) => ({
+            ...issue,
+            operation: originalIndexes[issue.operation] ?? issue.operation,
+          }))
+        ),
+        issuesTotal: validation.issues.length,
+      }
     )
   }
   ctx.onChangeSet(changeSet)

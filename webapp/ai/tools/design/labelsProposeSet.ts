@@ -13,6 +13,12 @@ type LabelItem = { nodeDefName: string; kind: LabelKind; lang: string; text: str
 
 type LabelsInput = { summary: string; items: LabelItem[] }
 
+/**
+ * Converts the model's items to label operations, recording the current texts.
+ * @param {LabelItem[]} items - Proposed texts.
+ * @param {AiToolContext} ctx - Tool context.
+ * @returns {ChangeOperationDraft[]} The drafts, in order.
+ */
 const toLabelDrafts = (items: LabelItem[], ctx: AiToolContext): ChangeOperationDraft[] => {
   const survey = requireSurvey(ctx)
   return items.map(({ nodeDefName, kind, lang, text }) => {
