@@ -1,49 +1,76 @@
-import { getAiFeature } from '@common/ai/features'
-import type { AiHostingClass } from '@common/ai/policy'
+import { useMemo } from 'react'
 
+import { type AiDataClass, getAiFeature } from '@common/ai/features'
+import * as User from '@core/user/user'
+
+import { getAiCapabilitiesStore } from '@webapp/ai/engines/capabilitiesStore'
 import {
-  getAiFeatureAvailability,
-  isSurveyScopedFeature,
-  resolveEffectivePolicy,
-  type AiFeatureAvailability,
-} from '@webapp/ai/policy/aiFeatureAvailability'
-import { getCeilingsFromSettings, toHostingClass } from '@webapp/ai/policy/policyContextLoader'
+  type AiEngineFeatureAvailability,
+  getAiEngineFeatureAvailability,
+} from '@webapp/ai/engines/featureAvailability'
+import { getEffectivePreferLocal, loadLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
+import { getBrowserStorage } from '@webapp/ai/engines/localServerSettings'
+import { isSurveyScopedFeature, resolveEffectivePolicy } from '@webapp/ai/policy/aiFeatureAvailability'
+import { getCeilingsFromSettings } from '@webapp/ai/policy/policyContextLoader'
 import { useSurveyAiPolicy } from '@webapp/ai/policy/useSurveyAiPolicy'
+import { useSurveyId } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
 
+import { useAiCapabilities } from './useAiCapabilities'
 import { getAiSettingsSnapshot, useAiFeatureEnabled } from './useAiFeatureEnabled'
 
 type AiSettingsSnapshot = {
-  hostingClass?: AiHostingClass | string | null
-  effectiveProvider?: string | null
-  effectiveModel?: string | null
   policyCeilings?: unknown
   // features turned off on the server (AI_FEATURE_FLAGS, A)
   disabledFeatures?: string[]
 }
 
 /**
- * Returns whether the inline AI feature is hidden, usable or blocked by the survey AI policy, and where its data
- * goes. Replaces useAiFeatureEnabled in the inline features.
+ * Returns whether the AI feature is hidden, usable or blocked, which engine a click would use and where its data
+ * goes (from the engine selection, with the same inputs as resolveModel).
  * @param {string} feature - Feature key (common/ai/features).
- * @returns {AiFeatureAvailability} The availability.
+ * @param {object} [options] - Options.
+ * @param {AiDataClass} [options.dataClass] - Data class of the request (default: the feature's; the assistant passes its conversation's).
+ * @returns {AiEngineFeatureAvailability} The availability.
  */
-export const useAiFeatureAvailability = (feature: string): AiFeatureAvailability => {
-  const category = getAiFeature(feature)?.category ?? null
+export const useAiFeatureAvailability = (
+  feature: string,
+  { dataClass }: { dataClass?: AiDataClass } = {}
+): AiEngineFeatureAvailability => {
+  const definition = getAiFeature(feature)
   // re-renders on every settings change, so the snapshot below is current
-  const categoryEnabled = useAiFeatureEnabled(category)
+  const categoryEnabled = useAiFeatureEnabled(definition?.category ?? null)
   const settings = getAiSettingsSnapshot() as AiSettingsSnapshot | null
   // useAiFeatureEnabled checks the category; one feature of it may still be off on the server
   const enabled = categoryEnabled && !(settings?.disabledFeatures ?? []).includes(feature)
   const surveyScoped = isSurveyScopedFeature(feature)
+  const surveyId = useSurveyId()
   const { state, error } = useSurveyAiPolicy({ skip: !enabled || !surveyScoped })
-
-  const ceilings = settings ? getCeilingsFromSettings(settings) : null
+  const capabilities = useAiCapabilities()
+  const user = useUser()
+  const userUuid = user ? (User.getUuid(user) ?? null) : null
+  const requestDataClass = dataClass ?? definition?.dataClass ?? 'data'
+  // without a survey (Help) only the instance ceilings apply; a survey policy error fails closed
+  const ceilings = capabilities.instance.policyCeilings ?? (settings ? getCeilingsFromSettings(settings) : null)
   const effective = resolveEffectivePolicy({ surveyScoped, state, error, ceilings })
-  const location = {
-    // an unknown class is null, like in resolveModel
-    hostingClass: toHostingClass(settings?.hostingClass),
-    provider: settings?.effectiveProvider ?? null,
-    model: settings?.effectiveModel ?? null,
-  }
-  return getAiFeatureAvailability({ feature, enabled, effective, location })
+
+  return useMemo(() => {
+    const localSettings = getAiCapabilitiesStore().getLocalSettings()
+    const consent = localSettings.enabled
+      ? loadLocalServerConsent({
+          storage: getBrowserStorage(),
+          userUuid,
+          surveyId: surveyScoped ? surveyId : undefined,
+          baseUrl: capabilities.localServer.baseUrl ?? '',
+        })
+      : null
+    return getAiEngineFeatureAvailability({
+      enabled,
+      effective,
+      dataClass: requestDataClass,
+      surveyScoped,
+      capabilities,
+      preferLocal: getEffectivePreferLocal({ settings: localSettings, consent }),
+    })
+  }, [capabilities, effective, enabled, requestDataClass, surveyId, surveyScoped, userUuid])
 }

@@ -1,15 +1,9 @@
 /**
- * Whether an inline AI feature is hidden, usable or blocked by the survey AI policy, and where its data goes.
- * Pure: the hook useAiFeatureAvailability feeds it. Shared with C (local engines) and D1 (assistant).
+ * Types and helpers of the AI feature availability (the availability itself comes from the engine selection,
+ * `webapp/ai/engines/featureAvailability.ts`).
  */
 import { AiFeaturePermission, getAiFeature } from '@common/ai/features'
-import {
-  isAiPolicyLevel,
-  isHostingAllowed,
-  type AiHostingClass,
-  type AiPolicy,
-  type AiPolicyLevel,
-} from '@common/ai/policy'
+import type { AiHostingClass, AiPolicy, AiPolicyLevel } from '@common/ai/policy'
 
 export type AiFeatureAvailabilityStatus = 'available' | 'disabled' | 'policyBlocked' | 'noEngine'
 
@@ -90,37 +84,6 @@ export const resolveEffectivePolicy = ({
 }
 
 /**
- * Returns the availability of an AI feature.
- * @param {object} params - Parameters.
- * @param {string} params.feature - Feature key.
- * @param {boolean} params.enabled - Whether AI is on for this feature (system, server flags, user settings).
- * @param {AiPolicy|null} params.effective - Effective policy (survey, or ceilings for the chat); null while loading.
- * @param {AiDataLocation} params.location - Where the gateway provider processes the data.
- * @returns {AiFeatureAvailability} The availability.
- */
-export const getAiFeatureAvailability = ({
-  feature,
-  enabled,
-  effective,
-  location,
-}: {
-  feature: string
-  enabled: boolean
-  effective: AiPolicy | null
-  location: AiDataLocation
-}): AiFeatureAvailability => {
-  if (!enabled || !effective) return { status: 'disabled', location }
-  const { hostingClass } = location
-  if (!hostingClass) return { status: 'available', location }
-  const dataClass = getAiFeature(feature)?.dataClass ?? 'data'
-  if (isHostingAllowed({ effective, dataClass, hostingClass })) return { status: 'available', location }
-  const level = effective[dataClass]
-  const allowed: AiPolicyLevel = isAiPolicyLevel(level) ? level : 'off'
-  const reasonKeys = getPolicyBlockedReasonKeys({ dataClass, allowed, surveyScoped: isSurveyScopedFeature(feature) })
-  return { status: 'policyBlocked', location, reasonKeys }
-}
-
-/**
  * Returns true when the feature's entry point is rendered (usable or shown disabled).
  * @param {AiFeatureAvailability} availability - Availability.
  * @returns {boolean} True when shown.
@@ -153,7 +116,9 @@ export const getAiDataLocationText = ({
     const providerName = provider ? (providerDisplayNames[provider] ?? provider) : null
     return providerName ? t('aiDataLocation.cloudWithProvider', { provider: providerName }) : t('aiDataLocation.cloud')
   }
-  if (hostingClass === 'orgHosted') return t('aiDataLocation.orgHosted')
+  if (hostingClass === 'orgHosted') {
+    return engine ? t('aiDataLocation.orgHostedWithEngine', { engine }) : t('aiDataLocation.orgHosted')
+  }
   if (hostingClass === 'onDevice') {
     return engine ? t('aiDataLocation.onDeviceWithEngine', { engine }) : t('aiDataLocation.onDevice')
   }

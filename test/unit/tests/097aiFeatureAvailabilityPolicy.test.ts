@@ -1,9 +1,10 @@
 import { aiPolicyDataClasses } from '@common/ai/policy'
 import en from '@core/i18n/resources/en'
 
+import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
+import type { AiCapabilities } from '@webapp/ai/engines/types'
 import {
   getAiDataLocationText,
-  getAiFeatureAvailability,
   getPolicyBlockedReasonKeys,
   isAiFeatureShown,
   isAiFeatureUsable,
@@ -16,89 +17,14 @@ const orgHosted = { hostingClass: 'orgHosted' as const, provider: 'openai-compat
 const notConfigured = { hostingClass: null, provider: null, model: null }
 const defaults = { schema: 'cloud', data: 'onDevice' } as const
 
-describe('getAiFeatureAvailability', () => {
-  test('AI off for the user → disabled', () => {
-    const result = getAiFeatureAvailability({
-      feature: 'expressionGenerate',
-      enabled: false,
-      effective: defaults,
-      location: cloud,
-    })
-    expect(result.status).toBe('disabled')
-    expect(isAiFeatureShown(result)).toBe(false)
-  })
-
-  test('policy not loaded yet → disabled', () => {
-    const result = getAiFeatureAvailability({
-      feature: 'expressionGenerate',
-      enabled: true,
-      effective: null,
-      location: cloud,
-    })
-    expect(result.status).toBe('disabled')
-  })
-
-  test('no provider configured → available (the call reports aiNotConfigured)', () => {
-    const result = getAiFeatureAvailability({
-      feature: 'activityLogSummary',
-      enabled: true,
-      effective: defaults,
-      location: notConfigured,
-    })
-    expect(result.status).toBe('available')
-  })
-
-  test('a schema feature with the defaults → available, with the location', () => {
-    const result = getAiFeatureAvailability({
-      feature: 'translation',
-      enabled: true,
-      effective: defaults,
-      location: cloud,
-    })
-    expect(result).toEqual({ status: 'available', location: cloud })
-    expect(isAiFeatureUsable(result)).toBe(true)
-  })
-
-  test('the activity-log summary with the defaults → policyBlocked (record data on this device)', () => {
-    const result = getAiFeatureAvailability({
-      feature: 'activityLogSummary',
-      enabled: true,
-      effective: defaults,
-      location: cloud,
-    })
-    expect(result).toEqual({ status: 'policyBlocked', location: cloud, reasonKeys: ['aiPolicy.blocked.data.onDevice'] })
-    expect(isAiFeatureShown(result)).toBe(true)
-    expect(isAiFeatureUsable(result)).toBe(false)
-  })
-
-  test('survey design Off blocks the expression features', () => {
-    const effective = { schema: 'off', data: 'cloud' } as const
-    const result = getAiFeatureAvailability({ feature: 'expressionExplain', enabled: true, effective, location: cloud })
-    expect(result.reasonKeys).toEqual(['aiPolicy.blocked.schema.off'])
-  })
-
-  test('organisation server level: org server allowed, cloud blocked', () => {
-    const effective = { schema: 'orgHosted', data: 'orgHosted' } as const
-    expect(
-      getAiFeatureAvailability({ feature: 'dataQueryGenerate', enabled: true, effective, location: orgHosted }).status
-    ).toBe('available')
-    expect(
-      getAiFeatureAvailability({ feature: 'dataQueryGenerate', enabled: true, effective, location: cloud }).reasonKeys
-    ).toEqual(['aiPolicy.blocked.schema.orgHosted'])
-  })
-
+describe('isSurveyScopedFeature', () => {
   test('the Help chat is checked against the instance ceilings', () => {
     expect(isSurveyScopedFeature('chatbot')).toBe(false)
     expect(isSurveyScopedFeature('expressionGenerate')).toBe(true)
-    const result = getAiFeatureAvailability({
-      feature: 'chatbot',
-      enabled: true,
-      effective: { schema: 'orgHosted', data: 'off' },
-      location: cloud,
-    })
-    expect(result.reasonKeys).toEqual(['aiPolicy.blockedByInstance.schema'])
   })
+})
 
+describe('policy blocked reason keys', () => {
   test('every reason key has an English text', () => {
     const getPath = (obj: any, path: string) => path.split('.').reduce((acc, part) => acc?.[part], obj)
     for (const dataClass of aiPolicyDataClasses) {
@@ -121,6 +47,7 @@ describe('getAiDataLocationText', () => {
     [{ hostingClass: 'cloud', provider: 'mock', model: null }, 'aiDataLocation.cloudWithProvider{"provider":"mock"}'],
     [{ hostingClass: 'cloud', provider: null, model: null }, 'aiDataLocation.cloud'],
     [orgHosted, 'aiDataLocation.orgHosted'],
+    [{ ...orgHosted, engine: '10.0.0.5:8000' }, 'aiDataLocation.orgHostedWithEngine{"engine":"10.0.0.5:8000"}'],
     [{ hostingClass: 'onDevice', provider: null, model: null }, 'aiDataLocation.onDevice'],
     [
       { hostingClass: 'onDevice', provider: null, model: null, engine: 'LM Studio' },
@@ -156,7 +83,21 @@ describe('resolveEffectivePolicy', () => {
 
   test('a failed refetch makes the feature disabled, never available', () => {
     const effective = resolveEffectivePolicy({ surveyScoped: true, state, error: new Error('network'), ceilings })
-    const result = getAiFeatureAvailability({ feature: 'translation', enabled: true, effective, location: cloud })
+    const capabilities = {
+      localServer: { enabled: false },
+      gateway: { available: true, hostingClass: 'cloud', provider: 'openai', model: 'm', maxPromptChars: 1000 },
+      instance: { policyCeilings: ceilings, orgHostedBaseUrls: [] },
+    } as unknown as AiCapabilities
+    const result = getAiEngineFeatureAvailability({
+      enabled: true,
+      effective,
+      dataClass: 'schema',
+      surveyScoped: true,
+      capabilities,
+      preferLocal: true,
+    })
     expect(result.status).toBe('disabled')
+    expect(isAiFeatureShown(result)).toBe(false)
+    expect(isAiFeatureUsable(result)).toBe(false)
   })
 })
