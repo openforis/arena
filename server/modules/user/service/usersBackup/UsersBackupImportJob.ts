@@ -14,6 +14,7 @@ import {
   UsersBackupInfo,
   UsersBackupUser,
   usersBackupFormatVersion,
+  usersBackupType,
 } from './usersBackupModel'
 
 const surveyGroupKey = ({ surveyName, name }: { surveyName?: string | null; name: string }) => `${surveyName}|${name}`
@@ -57,7 +58,7 @@ export default class UsersBackupImportJob extends Job {
     await this.fileZip.init()
 
     const info: UsersBackupInfo | null = readJsonEntry(this.fileZip, UsersBackupFile.info)
-    if (!info || info.formatVersion !== usersBackupFormatVersion) {
+    if (info?.type !== usersBackupType || info.formatVersion !== usersBackupFormatVersion) {
       throw new SystemError('usersBackupImport.invalidFile')
     }
 

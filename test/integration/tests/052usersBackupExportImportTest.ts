@@ -16,6 +16,7 @@ import {
   UsersBackupConflictMode,
   UsersBackupFile,
   UsersBackupUser,
+  usersBackupType,
 } from '@server/modules/user/service/usersBackup/usersBackupModel'
 
 import { getContextUser } from '../config/context'
@@ -102,7 +103,11 @@ describe('Users backup export/import', () => {
     )
     await db.none(`INSERT INTO user_group_user (user_uuid, group_uuid) VALUES ($1, $2)`, [userUuid, userGroupUuid])
 
-    const exportJob = new UsersBackupExportJob({ user: contextUser, includePasswords: true })
+    const exportJob = new UsersBackupExportJob({
+      user: contextUser,
+      includePasswords: true,
+      serverUrl: 'https://arena-dev.example.org',
+    })
     await exportJob.start()
     if (exportJob.status !== JobStatus.succeeded) throw new Error('users backup export failed')
     backupFilePath = FileUtils.tempFilePath((exportJob.result as any).outputFileName)
@@ -114,6 +119,20 @@ describe('Users backup export/import', () => {
     if (backupFilePath && FileUtils.exists(backupFilePath)) {
       await fsp.unlink(backupFilePath)
     }
+  })
+
+  test('backup info contains type, server address and exporting user email', async () => {
+    const fileZip = new FileZip(backupFilePath)
+    await fileZip.init()
+    const info = JSON.parse(fileZip.getEntryAsText(UsersBackupFile.info))
+    fileZip.close()
+
+    expect(info).toMatchObject({
+      type: usersBackupType,
+      serverUrl: 'https://arena-dev.example.org',
+      exportedByUserEmail: User.getEmail(getContextUser()),
+      includePasswords: true,
+    })
   })
 
   test('backup contains the user with password, survey role and user group', async () => {

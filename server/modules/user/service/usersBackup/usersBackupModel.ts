@@ -4,6 +4,9 @@ export const UsersBackupFile = {
   profilePicture: ({ userUuid }: { userUuid: string }) => `profilePictures/${userUuid}`,
 }
 
+// identifies the content of the zip file
+export const usersBackupType = 'arenaUsersBackup'
+
 export const usersBackupFormatVersion = 1
 
 export enum UsersBackupConflictMode {
@@ -39,9 +42,14 @@ export type UsersBackupUser = {
 }
 
 export type UsersBackupInfo = {
+  type: string
   formatVersion: number
   appVersion?: string
+  // address of the server that generated the backup (e.g. dev, qa or prod)
+  serverUrl?: string
   dateExported: string
+  // email identifies the user across servers (uuids can differ)
+  exportedByUserEmail: string
   exportedByUserUuid: string
   includePasswords: boolean
   usersCount: number

@@ -6,7 +6,13 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UsersBackupRepository from '@server/modules/user/repository/usersBackupRepository'
 
-import { UsersBackupFile, UsersBackupInfo, UsersBackupUser, usersBackupFormatVersion } from './usersBackupModel'
+import {
+  UsersBackupFile,
+  UsersBackupInfo,
+  UsersBackupUser,
+  usersBackupFormatVersion,
+  usersBackupType,
+} from './usersBackupModel'
 
 const groupByUserUuid = <T extends { userUuid: string }>(items: T[]): Record<string, T[]> => {
   const result: Record<string, T[]> = {}
@@ -32,7 +38,7 @@ export default class UsersBackupExportJob extends ZipFileCreatorBaseJob {
   }
 
   async execute() {
-    const { archive, user, includePasswords = true } = this.context as any
+    const { archive, user, includePasswords = true, serverUrl } = this.context as any
     const { tx } = this
 
     const users = await UsersBackupRepository.fetchUsersForBackup({ includePasswords }, tx)
@@ -67,9 +73,12 @@ export default class UsersBackupExportJob extends ZipFileCreatorBaseJob {
     archive.append(JSON.stringify(usersBackup, null, 2), { name: UsersBackupFile.users })
 
     const info: UsersBackupInfo = {
+      type: usersBackupType,
       formatVersion: usersBackupFormatVersion,
       appVersion: AppInfo.currentAppInfo?.version,
+      serverUrl,
       dateExported: new Date().toISOString(),
+      exportedByUserEmail: User.getEmail(user),
       exportedByUserUuid: User.getUuid(user),
       includePasswords,
       usersCount: usersBackup.length,

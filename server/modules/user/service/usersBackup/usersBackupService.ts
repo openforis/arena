@@ -5,8 +5,16 @@ import UsersBackupExportJob from './UsersBackupExportJob'
 import UsersBackupImportJob from './UsersBackupImportJob'
 import { UsersBackupConflictMode } from './usersBackupModel'
 
-const startExportJob = ({ user, includePasswords = true }: { user: any; includePasswords?: boolean }) => {
-  const job = new UsersBackupExportJob({ user, includePasswords })
+const startExportJob = ({
+  user,
+  includePasswords = true,
+  serverUrl,
+}: {
+  user: any
+  includePasswords?: boolean
+  serverUrl: string
+}) => {
+  const job = new UsersBackupExportJob({ user, includePasswords, serverUrl })
   JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
 }

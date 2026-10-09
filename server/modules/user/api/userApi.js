@@ -203,7 +203,8 @@ export const init = (app) => {
     try {
       const user = Request.getUser(req)
       const { includePasswords = true } = Request.getParams(req)
-      const job = UsersBackupService.startExportJob({ user, includePasswords })
+      const serverUrl = Request.getPublicServerUrl(req)
+      const job = UsersBackupService.startExportJob({ user, includePasswords, serverUrl })
       res.json({ job })
     } catch (error) {
       next(error)
