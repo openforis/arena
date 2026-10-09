@@ -2,6 +2,7 @@
  * Assistant areas: which tabs the panel shows, which are usable, which is selected.
  */
 import type { AssistantPromptArea } from '@webapp/ai/agent/assistantSystemPrompt'
+import type { AiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import type { AiFeatureAvailability } from '@webapp/ai/policy/aiFeatureAvailability'
 
 export type AssistantArea = AssistantPromptArea
@@ -14,6 +15,8 @@ export type AssistantAreaStatus = {
   status: 'hidden' | 'unavailable' | 'available'
   // i18n keys (common namespace) explaining why the area is unavailable
   reasonKeys: string[]
+  // the engine availability behind an unavailable engine/policy status: the reasons with their actions (AiNotAvailable)
+  engineAvailability?: AiEngineFeatureAvailability
 }
 
 /**
@@ -38,18 +41,25 @@ const unavailable = (area: AssistantArea, reasonKeys: string[]): AssistantAreaSt
 /**
  * Maps the availability of a feature (B) to an area status.
  * @param {AssistantArea} area - Area.
- * @param {AiFeatureAvailability} availability - Feature availability.
+ * @param {AiFeatureAvailability|AiEngineFeatureAvailability} availability - Feature availability.
  * @returns {AssistantAreaStatus} The status.
  */
-const fromAvailability = (area: AssistantArea, availability: AiFeatureAvailability): AssistantAreaStatus => {
+const fromAvailability = (
+  area: AssistantArea,
+  availability: AiFeatureAvailability | AiEngineFeatureAvailability
+): AssistantAreaStatus => {
   const { status, reasonKeys = [] } = availability
   if (status === 'disabled') return hidden(area)
   if (status === 'available') return { area, status: 'available', reasonKeys: [] }
+  const engineAvailability = 'reasons' in availability ? availability : undefined
   if (status === 'policyBlocked') {
-    return unavailable(area, reasonKeys.length > 0 ? reasonKeys : ['aiAssistant.unavailable.policy'])
+    return {
+      ...unavailable(area, reasonKeys.length > 0 ? reasonKeys : ['aiAssistant.unavailable.policy']),
+      engineAvailability,
+    }
   }
   // noEngine (C)
-  return unavailable(area, reasonKeys)
+  return { ...unavailable(area, reasonKeys), engineAvailability }
 }
 
 /**
@@ -64,7 +74,7 @@ export const getHelpAreaStatus = ({
   availability,
 }: {
   categoryEnabled: boolean
-  availability: AiFeatureAvailability
+  availability: AiFeatureAvailability | AiEngineFeatureAvailability
 }): AssistantAreaStatus => (categoryEnabled ? fromAvailability('help', availability) : hidden('help'))
 
 /**
@@ -88,7 +98,7 @@ export const getDesignAreaStatus = ({
   surveyOpen: boolean
   canEditSurvey: boolean
   hasDraftSurvey: boolean
-  availability: AiFeatureAvailability
+  availability: AiFeatureAvailability | AiEngineFeatureAvailability
 }): AssistantAreaStatus => {
   if (!categoryEnabled) return hidden('design')
   if (!surveyOpen) return unavailable('design', ['aiAssistant.unavailable.noSurvey'])

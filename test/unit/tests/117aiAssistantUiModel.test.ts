@@ -87,6 +87,21 @@ beforeAll(async () => {
 })
 
 describe('assistant areas', () => {
+  test('an engine availability is kept on the unavailable status, so the panel can show the actions', () => {
+    const noEngine = {
+      status: 'noEngine',
+      location,
+      reasonKeys: ['aiEngine.unavailable.localServerNotEnabled'],
+      reasons: ['localServerNotEnabled'],
+      engine: null,
+      surveyScoped: false,
+    } as any
+    const status = getHelpAreaStatus({ categoryEnabled: true, availability: noEngine })
+    expect(status.status).toBe('unavailable')
+    expect(status.engineAvailability).toBe(noEngine)
+    expect(getHelpAreaStatus({ categoryEnabled: true, availability: blocked }).engineAvailability).toBeUndefined()
+  })
+
   test('help: hidden when off, available, blocked with the policy reasons', () => {
     expect(getHelpAreaStatus({ categoryEnabled: false, availability: available }).status).toBe('hidden')
     expect(getHelpAreaStatus({ categoryEnabled: true, availability: disabled }).status).toBe('hidden')
