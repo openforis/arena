@@ -43,6 +43,8 @@ export default {
   apiKey: 'API key',
   apiKeyPlaceholder: 'Paste your provider API key',
   apiKeyKept: 'Leave blank to keep the existing key.',
+  apiKeyUnreadable:
+    'The saved API key can no longer be read (the server encryption secret changed). AI features use the default provider until you enter the key again.',
   vercelAiSdkHint:
     'A Vercel AI SDK chat endpoint is treated as a fixed agent - model selection and API key do not apply. Free-text generation works; structured-output features may not.',
   fetchModels: 'Fetch models',

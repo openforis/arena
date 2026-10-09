@@ -44,6 +44,8 @@ export default {
   apiKey: 'API tulhuur',
   apiKeyPlaceholder: 'Uilchilgee uzuulegchiin API tulhuuree oruulna uu',
   apiKeyKept: 'Odoogiin tulhuuriig hadgalah bol hooson uldeeh uu.',
+  apiKeyUnreadable:
+    'Хадгалсан API түлхүүрийг уншиж чадахгүй байна (серверийн шифрлэлтийн нууц өөрчлөгдсөн). Түлхүүрээ дахин оруулах хүртэл AI боломжууд үндсэн үйлчилгээ үзүүлэгчийг ашиглана.',
   vercelAiSdkHint:
     'Vercel AI SDK chat endpoint ni togtmol agent gej uzegdeh - zagvar songolt ba API tulhuur hamaarahgui. Chuluut tekst uusgelt ajillana; butetstei garaltyn funkcud ajillahgui baj bolno.',
   fetchModels: 'Zagvaruud avah',

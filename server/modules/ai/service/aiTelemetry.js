@@ -1,50 +1,64 @@
 /**
  * Telemetry wrapper for every model call. Every AI request flows through
- * {@link track}, which records latency, token counts, and outcome via the
+ * {@link track} or {@link record}, which records latency, token counts, and outcome via the
  * standard log4js logger.
  */
 import * as Log from '@server/log/log'
 
 const logger = Log.getLogger('AiGateway')
 
+const toCount = (value) => {
+  const count = typeof value === 'object' && value !== null ? value.total : value
+  return Number.isFinite(Number(count)) ? Number(count) : 0
+}
+
 /**
- * Wraps an async model call so that latency, status, and token counts are
- * recorded uniformly. The wrapped function should resolve to an object that
- * may include `usage: { promptTokens, completionTokens }`.
- * @param {object} ctx - Telemetry context.
- * @param {string} ctx.feature - Feature key (e.g. "translation").
- * @param {string} ctx.source - One of "user" | "admin-default".
- * @param {string} ctx.provider - Provider key (openai | anthropic | google | openai-compatible).
- * @param {string} ctx.model - Model identifier.
- * @param {string} ctx.userUuid - User UUID making the request.
- * @param {Function} fn - The async work to time.
+ * Reads token counts from any usage shape: v4 provider (nested `total`), AI SDK result (flat) or legacy.
+ * @param {object} [usage] - Usage object.
+ * @returns {{tokensIn: number, tokensOut: number}} Token counts (0 when unknown).
+ */
+export const normalizeUsage = (usage) => ({
+  tokensIn: toCount(usage?.inputTokens ?? usage?.promptTokens),
+  tokensOut: toCount(usage?.outputTokens ?? usage?.completionTokens),
+})
+
+const describeContext = (ctx) =>
+  `feature=${ctx.feature} source=${ctx.source} provider=${ctx.provider} model=${ctx.model} user=${ctx.userUuid}`
+
+/**
+ * Logs the outcome of one model call (exactly one line per call).
+ * @param {object} ctx - Telemetry context: feature, source, provider (openai | anthropic | google |
+ *   openai-compatible | vercel-ai-sdk | mock), model, userUuid.
+ * @param {object} outcome - Outcome.
+ * @param {number} outcome.latencyMs - Duration.
+ * @param {object} [outcome.usage] - Usage, any shape (see normalizeUsage).
+ * @param {Error} [outcome.error] - Error, when the call failed or was aborted.
+ * @returns {void}
+ */
+export const record = (ctx, { latencyMs, usage, error }) => {
+  if (error) {
+    logger.error(`fail ${describeContext(ctx)} latencyMs=${latencyMs} error=${error?.message || error}`)
+    return
+  }
+  if (!logger.infoEnabled) return
+  const { tokensIn, tokensOut } = normalizeUsage(usage)
+  logger.info(`ok ${describeContext(ctx)} latencyMs=${latencyMs} tokensIn=${tokensIn} tokensOut=${tokensOut}`)
+}
+
+/**
+ * Wraps an async model call so that latency, status, and token counts are recorded uniformly.
+ * @param {object} ctx - Telemetry context (see record).
+ * @param {Function} fn - The async work to time; may resolve to an object with `usage`.
  * @returns {Promise<*>} Whatever fn resolves to.
  */
 export const track = async (ctx, fn) => {
   const start = Date.now()
   try {
     const result = await fn()
-    const latencyMs = Date.now() - start
-    const usage = result?.usage || {}
-    const tokensIn = Number(usage.promptTokens || usage.inputTokens || 0)
-    const tokensOut = Number(usage.completionTokens || usage.outputTokens || 0)
-
-    if (logger.infoEnabled) {
-      logger.info(
-        `ok feature=${ctx.feature} source=${ctx.source} provider=${ctx.provider} ` +
-          `model=${ctx.model} user=${ctx.userUuid} latencyMs=${latencyMs} ` +
-          `tokensIn=${tokensIn} tokensOut=${tokensOut}`
-      )
-    }
-
+    record(ctx, { latencyMs: Date.now() - start, usage: result?.usage })
     return result
   } catch (error) {
-    const latencyMs = Date.now() - start
-    logger.error(
-      `fail feature=${ctx.feature} source=${ctx.source} provider=${ctx.provider} ` +
-        `model=${ctx.model} user=${ctx.userUuid} latencyMs=${latencyMs} ` +
-        `error=${error?.message || error}`
-    )
+    record(ctx, { latencyMs: Date.now() - start, error })
     throw error
   }
 }

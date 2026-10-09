@@ -44,6 +44,8 @@ export default {
   apiKey: 'API-kljuch',
   apiKeyPlaceholder: 'Vstavte API-kljuch vashego provajdera',
   apiKeyKept: 'Ostavte pustym, chtoby sohranit sushchestvujuschij kljuch.',
+  apiKeyUnreadable:
+    'Сохранённый ключ API больше не читается (изменился секрет шифрования сервера). Функции ИИ используют поставщика по умолчанию, пока вы не введёте ключ снова.',
   vercelAiSdkHint:
     'Chat endpoint Vercel AI SDK rassmatrivaetsja kak fiksirovannyj agent - vybor modeli i API-kljuch ne primenjajutsja. Generacija svobodnogo teksta rabotaet; funkcionalnost strukturirovannogo vyvoda mozhet ne rabotat.',
   fetchModels: 'Poluchit modeli',

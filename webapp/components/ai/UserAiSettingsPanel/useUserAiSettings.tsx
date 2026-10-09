@@ -80,6 +80,7 @@ type AiSettings = {
   model?: string
   baseUrl?: string
   hasApiKey?: boolean
+  apiKeyReadable?: boolean
   aiFeaturesDisabled?: boolean
   effectiveSource?: string
   effectiveProvider?: string

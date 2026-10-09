@@ -27,6 +27,10 @@
     &--error {
       color: #c62828;
     }
+
+    &--warning {
+      color: var(--orange);
+    }
   }
 
   &__model-row {
