@@ -95,30 +95,41 @@ export const createAnalysisApi = ({ http }: { http: AnalysisHttp }): AnalysisApi
   },
   fetchQueryCount: async ({ surveyId, cycle, query, signal }) => {
     const { url, body } = getEntityViewDataCountRequest({ surveyId, query, cycle })
-    return withTimeoutError(async () =>
+    const count = await withTimeoutError(async () =>
       Number(await http.post(url, body, { signal, timeout: analysisRequestTimeoutMs }))
     )
+    if (!Number.isFinite(count)) throw new Error('invalid query count response')
+    return count
   },
   fetchRecordsCountByStep: async ({ surveyId, cycle, signal }) =>
-    (await http.get(`/api/survey/${surveyId}/records/count/by-step`, {
-      params: { cycle },
-      signal,
-      timeout: analysisRequestTimeoutMs,
-    })) as Record<string, number | string>,
+    withTimeoutError(
+      async () =>
+        (await http.get(`/api/survey/${surveyId}/records/count/by-step`, {
+          params: { cycle },
+          signal,
+          timeout: analysisRequestTimeoutMs,
+        })) as Record<string, number | string>
+    ),
   fetchRecordsCountByDay: async ({ surveyId, cycle, from, to, signal }) =>
-    (await http.get(`/api/survey/${surveyId}/records/dashboard/count`, {
-      // countType=user would expose owner names: never used
-      params: { cycle, from, to, countType: 'default' },
-      signal,
-      timeout: analysisRequestTimeoutMs,
-    })) as { date: string; count: number | string }[],
+    withTimeoutError(
+      async () =>
+        (await http.get(`/api/survey/${surveyId}/records/dashboard/count`, {
+          // countType=user would expose owner names: never used
+          params: { cycle, from, to, countType: 'default' },
+          signal,
+          timeout: analysisRequestTimeoutMs,
+        })) as { date: string; count: number | string }[]
+    ),
   fetchCategoryItems: async ({ surveyId, categoryUuid, search, lang, draft, signal }) => {
-    const data = (await http.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, {
-      // no parentUuid: first level items
-      params: { draft, search, lang },
-      signal,
-      timeout: analysisRequestTimeoutMs,
-    })) as { items?: Record<string, object> } | null
+    const data = await withTimeoutError(
+      async () =>
+        (await http.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, {
+          // no parentUuid: first level items
+          params: { draft, search, lang },
+          signal,
+          timeout: analysisRequestTimeoutMs,
+        })) as { items?: Record<string, object> } | null
+    )
     return Object.values(data?.items ?? {})
   },
 })

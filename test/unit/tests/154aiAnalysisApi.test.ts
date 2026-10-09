@@ -62,6 +62,36 @@ describe('analysis API', () => {
     }
   )
 
+  test('timeouts of the other calls become queryTimeout too', async () => {
+    const { http } = newFakeHttp(() => Promise.reject(Object.assign(new Error('timeout'), { code: 'ECONNABORTED' })))
+    const api = createAnalysisApi({ http })
+    await expectSystemErrorKey(api.fetchRecordsCountByStep({ surveyId: 3, cycle: '0' }), 'queryTimeout')
+    await expectSystemErrorKey(
+      api.fetchRecordsCountByDay({ surveyId: 3, cycle: '0', from: '2024-01-01', to: '2024-01-31' }),
+      'queryTimeout'
+    )
+    await expectSystemErrorKey(
+      api.fetchCategoryItems({ surveyId: 3, categoryUuid: 'c1', search: '', lang: 'en', draft: false }),
+      'queryTimeout'
+    )
+  })
+
+  test('the abort signal reaches the http layer', async () => {
+    const { http, calls } = newFakeHttp(() => '1')
+    const api = createAnalysisApi({ http })
+    const { signal } = new AbortController()
+    await api.fetchQueryCount({ surveyId: 3, cycle: '0', query, signal })
+    await api.fetchQueryRows({ surveyId: 3, cycle: '0', query, limit: 5, signal })
+    expect(calls[0].signal).toBe(signal)
+    expect(calls[1].signal).toBe(signal)
+  })
+
+  test('count: a non-numeric response is an error, not NaN', async () => {
+    const { http } = newFakeHttp(() => 'oops')
+    const api = createAnalysisApi({ http })
+    await expect(api.fetchQueryCount({ surveyId: 3, cycle: '0', query })).rejects.toThrow('count')
+  })
+
   test('other errors are re-thrown as they are', async () => {
     const failure = Object.assign(new Error('forbidden'), { response: { status: 403 } })
     const { http } = newFakeHttp(() => Promise.reject(failure))
