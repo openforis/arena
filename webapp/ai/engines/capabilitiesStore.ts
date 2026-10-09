@@ -12,6 +12,7 @@ import {
   type AiSettingsSnapshot,
   createCapabilitiesStore,
   detectDeviceCapabilities,
+  getCapabilitiesSnapshotForUser,
 } from './capabilities'
 import { getBrowserStorage, loadLocalServerSettings } from './localServerSettings'
 import { probeLocalServer } from './localServerProbe'
@@ -74,10 +75,11 @@ export const notifyAiCapabilities = (): void => capabilitiesStore.notify()
 export const subscribeAiCapabilities = (listener: () => void): (() => void) => capabilitiesStore.subscribe(listener)
 
 /**
- * Returns the current capabilities (same object until something changes).
+ * Returns the current capabilities (same object until something changes), never another user's.
  * @returns {AiCapabilities} The capabilities.
  */
-export const getAiCapabilitiesSnapshot = (): AiCapabilities => capabilitiesStore.get()
+export const getAiCapabilitiesSnapshot = (): AiCapabilities =>
+  getCapabilitiesSnapshotForUser(capabilitiesStore, getCurrentUserUuid())
 
 /**
  * Drops the capabilities of the previous user (login, logout).

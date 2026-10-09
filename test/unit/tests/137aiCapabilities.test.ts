@@ -5,6 +5,7 @@ import {
   createCapabilitiesStore,
   detectDeviceCapabilities,
   emptyCapabilities,
+  getCapabilitiesSnapshotForUser,
 } from '@webapp/ai/engines/capabilities'
 import { defaultLocalServerSettings } from '@webapp/ai/engines/localServerSettings'
 import type { LocalServerProbeResult } from '@webapp/ai/engines/localServerProbe'
@@ -297,5 +298,19 @@ describe('user switch and failures', () => {
     const capabilities = await store.load({ userUuid: 'u1' })
     expect(capabilities.gateway.available).toBe(false)
     expect(capabilities.localServer.reachable).toBeNull()
+  })
+})
+
+describe('getCapabilitiesSnapshotForUser', () => {
+  test('is a stable empty object for a different current user or nobody, the data for its owner', async () => {
+    const { deps } = fakeDeps(enabledLocal)
+    const store = createCapabilitiesStore(deps)
+    expect(getCapabilitiesSnapshotForUser(store, null)).toBe(store.get())
+    await store.load({ userUuid: 'u1' })
+    expect(getCapabilitiesSnapshotForUser(store, 'u1')).toBe(store.get())
+    const other = getCapabilitiesSnapshotForUser(store, 'u2')
+    expect(other).toEqual(emptyCapabilities())
+    expect(getCapabilitiesSnapshotForUser(store, null)).toBe(other)
+    expect(getCapabilitiesSnapshotForUser(store, 'u2')).toBe(other)
   })
 })
