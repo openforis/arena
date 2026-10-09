@@ -25,7 +25,7 @@ export const createDocsSearchTool = ({
   inputSchema: z.object({
     query: z.string().trim().min(1).max(200).describe('English keywords, e.g. "publish survey"'),
   }),
-  area: ['help', 'design', 'analysis'],
+  area: ['help', 'design', 'analysis', 'cleaning'],
   dataClass: 'schema',
   effect: 'read',
   requires: () => true,

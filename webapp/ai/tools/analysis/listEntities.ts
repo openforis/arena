@@ -82,7 +82,7 @@ export const listEntitiesTool: AiTool<Input, unknown> = {
     'Lists the entities that can be queried and their attributes (name, label, type; "dimension" = can group by, ' +
     '"measure" = can be aggregated). An entity can also use the attributes of its ancestor entities.',
   inputSchema,
-  area: ['analysis'],
+  area: ['analysis', 'cleaning'],
   dataClass: 'schema',
   effect: 'read',
   requires: canViewCurrentSurvey,

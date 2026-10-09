@@ -3,6 +3,7 @@
  * D2 / D3 append their own lists here.
  */
 import { analysisTools } from './analysis'
+import { cleaningTools } from './cleaning'
 import { viewGetCurrentTool } from './common/viewGetCurrent'
 import { expressionCheckTool } from './design/expressionCheck'
 import { expressionsProposeSetTool } from './design/expressionsProposeSet'
@@ -27,4 +28,5 @@ export const ALL_TOOLS: AiTool[] = [
   expressionsProposeSetTool,
   docsSearchTool,
   ...analysisTools,
+  ...cleaningTools,
 ]

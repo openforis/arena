@@ -22,6 +22,7 @@ const RowHeader = ({ handleSortBy, sort }) => {
         {i18n.t('common.owner')}
       </div>
       <div />
+      <div />
     </>
   )
 }

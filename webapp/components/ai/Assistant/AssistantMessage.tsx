@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
 import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import { isRecordEditChangeSet } from '@webapp/ai/changeSets/recordEdits/types'
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
@@ -123,7 +124,10 @@ const AnswerFooter = ({
 }) => {
   const t = useI18nT({ unescapeHtml: true })
   // the record-data notice replaces the composer: the conversation can't continue, so no Retry
-  const recordDataNotice = useRecordDataNotice(api.conversation)
+  const recordDataNotice = useRecordDataNotice(
+    api.conversation,
+    assistantAreaFeatures[api.conversation?.area ?? 'analysis']
+  )
   if (message.status === 'stopped') return <p className="ai-assistant-message__stopped">{t('aiAssistant.stopped')}</p>
   if (message.status !== 'error') return null
   // only the key is stored with the message: engine errors get their own Retry / Open settings buttons

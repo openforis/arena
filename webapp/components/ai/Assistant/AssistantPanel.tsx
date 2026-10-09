@@ -19,10 +19,11 @@ import { assistantPanelStore, type AssistantPanelView } from './assistantPanelSt
 import { useAssistantConversation, type AssistantConversationApi } from './useAssistantConversation'
 import { useAssistantPanel } from './useAssistantPanel'
 
-// D3 adds cleaning (the Record type makes a missing area a type error)
+// the Record type makes a missing area a type error
 const areaTabLabelKeys: Record<AssistantArea, string> = {
   design: 'aiAssistant.tabs.design',
   analysis: 'aiAnalysis.area',
+  cleaning: 'aiCleaning.area',
   help: 'aiAssistant.tabs.help',
 }
 

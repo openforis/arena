@@ -8,3 +8,9 @@ import { assistantPanelStore, type AssistantPanelState } from './assistantPanelS
  */
 export const useAssistantPanel = (): AssistantPanelState =>
   useSyncExternalStore(assistantPanelStore.subscribe, assistantPanelStore.getState)
+
+/**
+ * Returns the action that opens an area in a new conversation with a composer text.
+ * @returns {Function} openWithDraft({ area, draft }).
+ */
+export const useAssistantOpenWithDraft = () => assistantPanelStore.openWithDraft

@@ -7,8 +7,8 @@ import type { AiFeatureAvailability } from '@webapp/ai/policy/aiFeatureAvailabil
 
 export type AssistantArea = AssistantPromptArea
 
-// tab order (D3 adds cleaning)
-export const assistantAreas: AssistantArea[] = ['design', 'analysis', 'help']
+// tab order
+export const assistantAreas: AssistantArea[] = ['design', 'analysis', 'cleaning', 'help']
 
 export type AssistantAreaStatus = {
   area: AssistantArea
@@ -126,6 +126,7 @@ export const isAssistantShown = (statuses: AssistantAreaStatus[]): boolean =>
  * @param {AssistantArea|null} params.userSelectedArea - Tab the user clicked (until the panel closes).
  * @param {string|null} params.module - Current app module.
  * @param {boolean} [params.analysisRoute] - The route is the Explorer or the dashboard (Analysis is preferred there).
+ * @param {boolean} [params.cleaningRoute] - The route is a cleaning view (Cleaning is preferred there, over Analysis).
  * @returns {AssistantArea|null} The area; null when every area is hidden.
  */
 export const pickArea = ({
@@ -135,6 +136,7 @@ export const pickArea = ({
   userSelectedArea,
   module,
   analysisRoute = false,
+  cleaningRoute = false,
 }: {
   statuses: AssistantAreaStatus[]
   current: AssistantArea | null
@@ -142,6 +144,7 @@ export const pickArea = ({
   userSelectedArea: AssistantArea | null
   module: string | null
   analysisRoute?: boolean
+  cleaningRoute?: boolean
 }): AssistantArea | null => {
   const isAvailable = (area: AssistantArea | null) =>
     area !== null && statuses.some((status) => status.area === area && status.status === 'available')
@@ -151,7 +154,9 @@ export const pickArea = ({
   if (isShown(userSelectedArea)) return userSelectedArea
   if (panelOpen && isAvailable(current)) return current
   const moduleArea: AssistantArea = module === 'designer' ? 'design' : 'help'
-  const preferred: AssistantArea = analysisRoute && isAvailable('analysis') ? 'analysis' : moduleArea
+  let preferred: AssistantArea = moduleArea
+  if (cleaningRoute && isAvailable('cleaning')) preferred = 'cleaning'
+  else if (analysisRoute && isAvailable('analysis')) preferred = 'analysis'
   if (isAvailable(preferred)) return preferred
   const firstAvailable = statuses.find((status) => status.status === 'available')
   return (firstAvailable ?? statuses.find((status) => status.status !== 'hidden'))?.area ?? null

@@ -14,6 +14,7 @@ import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
+import { useCleaningAreaStatus } from '@webapp/components/ai/Assistant/cleaning/useCleaningArea'
 import Table from '@webapp/components/Table'
 import { ButtonBack } from '@webapp/components/buttons'
 
@@ -27,6 +28,9 @@ const ValidationReport = () => {
   const surveyCycleKey = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
   const { recordUuid } = useParams()
+  // computed once for the report: the row action is shown on every row only when the Cleaning area is available
+  const askAssistantAvailable = useCleaningAreaStatus().status === 'available'
+  const rowProps = useMemo(() => ({ askAssistantAvailable }), [askAssistantAvailable])
   const [query, setQuery] = useState(null)
   const [selectedAttributeDefUuids, setSelectedAttributeDefUuids] = useState([])
   const [selectedMessageTypeCategoryIds, setSelectedMessageTypeCategoryIds] = useState(MessageTypeFilterCategoryIds)
@@ -110,9 +114,10 @@ const ValidationReport = () => {
         }}
         module="validationReport"
         restParams={restParams}
-        gridTemplateColumns="50px 1fr 2fr 6rem 50px"
+        gridTemplateColumns="50px 1fr 2fr 6rem 50px 50px"
         rowHeaderComponent={RowHeader}
         rowComponent={Row}
+        rowProps={rowProps}
         onRowClick={onRowClick}
       />
       {recordUuid && (

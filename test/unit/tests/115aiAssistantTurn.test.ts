@@ -90,7 +90,12 @@ const run = ({
 describe('runAssistantTurn', () => {
   test('constants', () => {
     expect(DEFAULT_ASSISTANT_LIMITS).toEqual({ maxPromptChars: 200000, maxSteps: 10 })
-    expect(assistantAreaFeatures).toEqual({ design: 'assistantDesign', help: 'chatbot', analysis: 'assistantAnalysis' })
+    expect(assistantAreaFeatures).toEqual({
+      design: 'assistantDesign',
+      help: 'chatbot',
+      analysis: 'assistantAnalysis',
+      cleaning: 'assistantCleaning',
+    })
   })
 
   test('a text turn: user message, answer, title, system prompt and history sent', async () => {

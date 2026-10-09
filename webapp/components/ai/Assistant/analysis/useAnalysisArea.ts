@@ -1,5 +1,7 @@
 import * as Survey from '@core/survey/survey'
 
+import type { AiFeatureKey } from '@common/ai/features'
+
 import { getConversationDataClass } from '@webapp/ai/conversations/dataClass'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { useSurveyInfo } from '@webapp/store/survey'
@@ -22,9 +24,10 @@ export const useAnalysisAreaStatus = (): AssistantAreaStatus => {
 /**
  * Tells whether the conversation contains record data that no allowed engine may receive any more.
  * @param {object|null} conversation - The current conversation.
+ * @param {AiFeatureKey} feature - Gateway feature of the area shown (its data policy decides).
  * @returns {boolean} True to show the notice and disable the composer.
  */
-export const useRecordDataNotice = (conversation: { dataClass?: unknown } | null): boolean => {
-  const dataAvailability = useAiFeatureAvailability('assistantAnalysis', { dataClass: 'data' })
+export const useRecordDataNotice = (conversation: { dataClass?: unknown } | null, feature: AiFeatureKey): boolean => {
+  const dataAvailability = useAiFeatureAvailability(feature, { dataClass: 'data' })
   return shouldShowRecordDataNotice({ conversationDataClass: getConversationDataClass(conversation), dataAvailability })
 }

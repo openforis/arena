@@ -107,7 +107,7 @@ export const nodeDefGetTool: AiTool<{ name: string }> = {
     'its expressions (defaultValues, applicable, validations.expressions, visibleIf, editableIf), its parent path ' +
     'and, for entities, the child names. Call it before proposing a change to that node definition.',
   inputSchema: z.object({ name: z.string().min(1).max(100).describe('Node definition name, e.g. "tree_height"') }),
-  area: ['design'],
+  area: ['design', 'cleaning'],
   dataClass: 'schema',
   effect: 'read',
   requires: canViewSurveyTool,

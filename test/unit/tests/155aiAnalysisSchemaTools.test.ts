@@ -112,12 +112,12 @@ describe('query_listEntities', () => {
     expect(listEntitiesTool.requires(newAnalysisToolContext({ survey: null }))).toBe(false)
   })
 
-  test('is a schema read tool of the analysis area', () => {
+  test('is a schema read tool of the analysis and cleaning areas', () => {
     expect(listEntitiesTool).toMatchObject({
       name: 'query_listEntities',
       dataClass: 'schema',
       effect: 'read',
-      area: ['analysis'],
+      area: ['analysis', 'cleaning'],
     })
   })
 })

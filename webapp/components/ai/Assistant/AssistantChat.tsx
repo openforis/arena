@@ -2,21 +2,24 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { AiLimits } from '@common/ai/limits'
 
+import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { Button } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import type { AssistantArea } from './assistantAreas'
+import { assistantPanelStore } from './assistantPanelStore'
 import { RecordDataNotice } from './analysis/RecordDataNotice'
 import { useRecordDataNotice } from './analysis/useAnalysisArea'
 import { AssistantMessageView } from './AssistantMessage'
+import { useAssistantPanel } from './useAssistantPanel'
 import type { AssistantConversationApi } from './useAssistantConversation'
 
-// D3 adds cleaning
 const areaEmptyKeys: Record<AssistantArea, string> = {
   design: 'aiAssistant.emptyDesign',
   analysis: 'aiAnalysis.empty',
+  cleaning: 'aiCleaning.empty',
   help: 'aiAssistant.emptyHelp',
 }
 
@@ -30,11 +33,22 @@ const areaEmptyKeys: Record<AssistantArea, string> = {
 export const AssistantChat = ({ area, api }: { area: AssistantArea; api: AssistantConversationApi }) => {
   const t = useI18nT({ unescapeHtml: true })
   const [input, setInput] = useState('')
+  const { draft } = useAssistantPanel()
+  const [appliedDraft, setAppliedDraft] = useState<string | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const { conversation, busy, applying, engineNotice } = api
   const messages = conversation?.messages ?? []
   const lastId = messages.at(-1)?.id
-  const recordDataNotice = useRecordDataNotice(conversation)
+  const recordDataNotice = useRecordDataNotice(conversation, assistantAreaFeatures[area])
+
+  // a composer text set by "Ask the assistant": shown for the user to send, never sent by itself
+  if (draft !== appliedDraft) {
+    setAppliedDraft(draft)
+    if (draft !== null) setInput(draft)
+  }
+  useEffect(() => {
+    if (draft !== null) assistantPanelStore.clearDraft()
+  }, [draft])
 
   useEffect(() => {
     const list = listRef.current

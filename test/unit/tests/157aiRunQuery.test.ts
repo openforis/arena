@@ -173,7 +173,7 @@ describe('query_count', () => {
   test('both tools are data read tools of the analysis area', async () => {
     const { countTool, runQueryTool } = await setUp()
     for (const tool of [countTool, runQueryTool]) {
-      expect(tool).toMatchObject({ dataClass: 'data', effect: 'read', area: ['analysis'] })
+      expect(tool).toMatchObject({ dataClass: 'data', effect: 'read', area: ['analysis', 'cleaning'] })
     }
     expect([countTool.name, runQueryTool.name]).toEqual(['query_count', 'query_run'])
   })
