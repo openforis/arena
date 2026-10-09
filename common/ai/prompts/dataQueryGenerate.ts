@@ -23,10 +23,16 @@ const MAX_DESCRIPTION_IN_PROMPT = 2000
 
 const aggregateFunctions = Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS)
 
-const system = `You are an assistant that builds data queries for the Data Explorer of Open Foris Arena,
-a platform for field inventories and surveys (e.g. forest inventories with cluster / plot / tree entities).
+const defaultSchemaSource = 'the schema is given in the user message'
 
-A query always targets ONE entity (a table: one row per entity instance) and has one of two modes:
+/**
+ * Returns the Explorer query rules, shared with the analysis assistant.
+ * @param {object} [params] - Parameters.
+ * @param {string} [params.schemaSource] - Where the model finds the schema.
+ * @returns {string} The rules.
+ */
+export const getDataQueryRules = ({ schemaSource = defaultSchemaSource }: { schemaSource?: string } = {}) =>
+  `A query always targets ONE entity (a table: one row per entity instance) and has one of two modes:
 - "raw": lists rows; "attributes" are the columns to show.
 - "aggregate": groups rows; "dimensions" are the group-by attributes, "measures" are the aggregated values.
   Each measure has one or more aggregate functions among: ${aggregateFunctions.join(', ')}
@@ -34,7 +40,7 @@ A query always targets ONE entity (a table: one row per entity instance) and has
   To COUNT the entity instances (e.g. "number of trees"), use the entity name itself as measure attribute
   with the function "cnt".
 
-Schema rules (the schema is given in the user message):
+Schema rules (${schemaSource}):
 - Only use entity and attribute names that appear in the schema, spelled exactly.
 - An entity can use its own attributes and the attributes of its ancestor entities (listed under them).
 - Dimensions: only attributes tagged [dimension] of the entity or of its ancestors.
@@ -50,9 +56,9 @@ for taxon attributes "<name>" contains the taxon code and "<name>_scientific_nam
 Sort (optional, empty list if not needed): list of { "attribute", "order" } where attribute is one of the
 selected raw attributes (raw mode) or one of the dimensions (aggregate mode) and order is "asc" or "desc".
 
-Also write a short explanation of the query for the user.
+Also write a short explanation of the query for the user.`
 
-Output format (very important):
+const outputFormat = `Output format (very important):
 Reply with EXACTLY one JSON object, nothing else, in this exact shape:
 {
   "entity": "<entity name>",
@@ -67,13 +73,22 @@ Reply with EXACTLY one JSON object, nothing else, in this exact shape:
 - In raw mode "attributes" must contain at least one attribute, "dimensions" and "measures" must be empty.
 - In aggregate mode "dimensions" and "measures" must contain at least one item each, "attributes" must be empty.
 - Do not wrap the JSON in code fences or backticks.
-- Do not add prose before or after the JSON.
+- Do not add prose before or after the JSON.`
 
-Example: in a survey with entities cluster / plot / tree, where tree has the attributes species (taxon, [dimension])
+export const dataQueryExamples = `Example: in a survey with entities cluster / plot / tree, where tree has the attributes species (taxon, [dimension])
 and dbh (decimal, [measure]), the request "number of trees by species" becomes:
 {"entity":"tree","mode":"aggregate","attributes":[],"dimensions":["species"],"measures":[{"attribute":"tree","functions":["cnt"]}],"filter":null,"sort":[],"explanation":"Counts the trees grouped by species."}
 and "average dbh of trees with dbh greater than 10 by plot" becomes:
 {"entity":"tree","mode":"aggregate","attributes":[],"dimensions":["plot_id"],"measures":[{"attribute":"dbh","functions":["avg"]}],"filter":"dbh > 10","sort":[{"attribute":"plot_id","order":"asc"}],"explanation":"Averages the DBH of the trees with DBH > 10 for each plot."}`
+
+const system = `You are an assistant that builds data queries for the Data Explorer of Open Foris Arena,
+a platform for field inventories and surveys (e.g. forest inventories with cluster / plot / tree entities).
+
+${getDataQueryRules()}
+
+${outputFormat}
+
+${dataQueryExamples}`
 
 const describeAttribute = ({ survey, nodeDef, entityDef, lang, cycle, includeAnalysis }) => {
   const name = NodeDef.getName(nodeDef)

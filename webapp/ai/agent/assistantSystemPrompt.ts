@@ -4,8 +4,10 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { buildAssistantAnalysisPrompt } from '@common/ai/prompts/assistantAnalysis'
 import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
 import { buildAssistantHelpPrompt } from '@common/ai/prompts/assistantHelp'
+import { getEffectiveQueryLang } from '@common/ai/tasks/dataQuery'
 
 import type { AiCurrentView, AiToolContext } from '@webapp/ai/tools/types'
 
@@ -31,16 +33,19 @@ export const describeView = (view: AiCurrentView, survey: any): string | null =>
  * @param {AssistantPromptArea} params.area - Area.
  * @param {AiToolContext} params.ctx - Tool context of the turn.
  * @param {string|null} params.outline - Handbook outline (Help only).
+ * @param {boolean} [params.dataToolsAvailable] - Whether a data tool is offered in the turn (Analysis).
  * @returns {string} The system prompt.
  */
 export const buildAssistantSystemPrompt = ({
   area,
   ctx,
   outline,
+  dataToolsAvailable = false,
 }: {
   area: AssistantPromptArea
   ctx: AiToolContext
   outline: string | null
+  dataToolsAvailable?: boolean
 }): string => {
   switch (area) {
     case 'design': {
@@ -60,6 +65,15 @@ export const buildAssistantSystemPrompt = ({
         outline,
         // no survey: the module names only (deviation 9)
         viewDescription: describeView(ctx.getCurrentView(), null),
+      })
+    case 'analysis':
+      return buildAssistantAnalysisPrompt({
+        survey: ctx.survey,
+        cycle: ctx.cycle,
+        lang: getEffectiveQueryLang({ survey: ctx.survey, lang: ctx.lang }),
+        uiLang: ctx.uiLang,
+        viewDescription: describeView(ctx.getCurrentView(), ctx.survey),
+        dataToolsAvailable,
       })
     default:
       throw new Error(`Unknown assistant area: ${area}`)
