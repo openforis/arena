@@ -136,6 +136,8 @@ export default [
       'jest/prefer-to-be': 'warn', // Example Jest rule
       'jest/no-focused-tests': 'error',
       'jest/no-export': 'off',
+      // helpers performing assertions
+      'jest/expect-expect': ['warn', { assertFunctionNames: ['expect', 'expectSystemError', 'expectSystemErrorKey'] }],
     },
   },
 
