@@ -191,6 +191,16 @@ export const canManageUserGroups = (user: ArenaUser, surveyInfo: ArenaSurvey): b
 // mirroring the group management permission since qualifiers are tied to user groups
 export const canEditQualifierAttributeValue = canManageUserGroups
 
+/**
+ * Returns true when the user can change the survey AI policy (system admin or survey administrator).
+ * Delegates to canManageUserGroups today; a separate name lets the AI policy rule change on its own.
+ * @param {ArenaUser} user - The user.
+ * @param {ArenaSurvey} surveyInfo - The survey info.
+ * @returns {boolean} True when allowed.
+ */
+export const canEditSurveyAiPolicy = (user: ArenaUser, surveyInfo: ArenaSurvey): boolean =>
+  canManageUserGroups(user, surveyInfo)
+
 export const canRemoveUser = (user: ArenaUser, surveyInfo: ArenaSurvey, userToRemove: ArenaUser): boolean =>
   !User.isEqual(user as Record<string, any>)(userToRemove as Record<string, any>) &&
   !User.isSystemAdmin(userToRemove) &&
