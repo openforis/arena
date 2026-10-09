@@ -43,6 +43,8 @@ export default {
   apiKey: 'Chave API',
   apiKeyPlaceholder: 'Cole a chave API do seu provedor',
   apiKeyKept: 'Deixe em branco para manter a chave existente.',
+  apiKeyUnreadable:
+    'A chave de API guardada já não pode ser lida (o segredo de encriptação do servidor mudou). As funcionalidades de IA usam o provedor predefinido até introduzir a chave novamente.',
   vercelAiSdkHint:
     'Um endpoint de chat do Vercel AI SDK e tratado como um agente fixo - selecao de modelo e chave API nao se aplicam. A geracao de texto livre funciona; recursos de saida estruturada podem nao funcionar.',
   fetchModels: 'Buscar modelos',

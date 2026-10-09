@@ -43,6 +43,8 @@ export default {
   apiKey: 'APIキー',
   apiKeyPlaceholder: 'プロバイダーのAPIキーを貼り付けてください',
   apiKeyKept: '既存のキーを維持する場合は空欄のままにしてください。',
+  apiKeyUnreadable:
+    '保存されたAPIキーを読み取れなくなりました（サーバーの暗号化シークレットが変更されました）。キーを再入力するまで、AI機能は既定のプロバイダーを使用します。',
   vercelAiSdkHint:
     'Vercel AI SDKチャットエンドポイントは固定エージェントとして扱われ、モデル選択やAPIキーは適用されません。自由記述の生成は機能しますが、構造化出力機能は動作しない場合があります。',
   fetchModels: 'モデルを取得',

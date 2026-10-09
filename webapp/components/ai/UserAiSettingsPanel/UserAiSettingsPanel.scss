@@ -29,6 +29,10 @@
     &--error {
       color: $colorError;
     }
+
+    &--warning {
+      color: var(--orange);
+    }
   }
 
   &__model-row {

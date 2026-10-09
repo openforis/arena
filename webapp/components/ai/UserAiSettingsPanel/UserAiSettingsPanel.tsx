@@ -204,6 +204,11 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
                   {settings?.hasApiKey && !form.apiKeyDirty && form.provider !== AiProvider.vercelAiSdk && (
                     <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:apiKeyKept')}</div>
                   )}
+                  {settings?.hasApiKey && settings.apiKeyReadable === false && !form.apiKeyDirty && (
+                    <div className="user-ai-settings-panel__hint user-ai-settings-panel__hint--warning" role="alert">
+                      {i18n.t('userAiSettings:apiKeyUnreadable')}
+                    </div>
+                  )}
 
                   {renderModelField()}
 

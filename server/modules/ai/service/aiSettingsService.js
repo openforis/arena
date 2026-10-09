@@ -25,6 +25,7 @@ import { generateText } from 'ai'
 import * as User from '@core/user/user'
 import SystemError from '@core/systemError'
 
+import * as Log from '@server/log/log'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
@@ -37,6 +38,7 @@ import {
   isCategoryEnabledForUser,
   sanitiseFeatureToggles,
 } from './aiUserPrefs'
+import * as AiTelemetry from './aiTelemetry'
 import * as ModelDiscovery from './modelDiscovery'
 import * as ProviderRegistry from './providerRegistry'
 
@@ -45,6 +47,21 @@ export { areFeaturesEnabledForUser, isCategoryEnabledForUser }
 export const featureCategories = AiFeatureCategory
 
 const PREFS_KEY = 'ai'
+
+const logger = Log.getLogger('AiSettings')
+
+/**
+ * Decrypts a saved API key, returning null when it can't be read (e.g. the encryption secret was rotated).
+ * @param {string} apiKeyEncrypted - Encrypted key.
+ * @returns {string|null} The key, or null.
+ */
+const tryDecrypt = (apiKeyEncrypted) => {
+  try {
+    return SecretBox.decrypt(apiKeyEncrypted)
+  } catch {
+    return null
+  }
+}
 
 const sanitiseProvider = (provider) => {
   if (!ProviderRegistry.isSupported(provider)) {
@@ -65,11 +82,7 @@ const resolveApiKey = ({ user, apiKey }) => {
   if (typeof apiKey === 'string' && apiKey.length > 0) return apiKey
   const raw = getRawPrefs(user)
   if (!raw?.apiKeyEncrypted) return null
-  try {
-    return SecretBox.decrypt(raw.apiKeyEncrypted)
-  } catch {
-    return null
-  }
+  return tryDecrypt(raw.apiKeyEncrypted)
 }
 
 /**
@@ -89,6 +102,7 @@ export const getPublicSettings = (user) => {
       baseUrl: null,
       enabled: false,
       hasApiKey: false,
+      apiKeyReadable: false,
       lastTestOk: null,
       lastTestAt: null,
     }
@@ -101,6 +115,7 @@ export const getPublicSettings = (user) => {
     baseUrl: raw.baseUrl || null,
     enabled: !!raw.enabled,
     hasApiKey: !!raw.apiKeyEncrypted,
+    apiKeyReadable: !!raw.apiKeyEncrypted && tryDecrypt(raw.apiKeyEncrypted) !== null,
     lastTestOk: raw.lastTestOk ?? null,
     lastTestAt: raw.lastTestAt || null,
   }
@@ -115,17 +130,22 @@ export const getPublicSettings = (user) => {
  * @param {object} user - Arena user.
  * @param {object} [options] - Tuning.
  * @param {boolean} [options.decrypt] - Decrypt the API key (default true).
+ * Returns null when the saved key can't be decrypted.
  * @returns {?object} Provider config or null.
  */
 export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
   const raw = getRawPrefs(user)
   if (!raw?.featuresEnabled || !raw.enabled || !raw.provider || !raw.model) return null
-  return {
-    provider: raw.provider,
-    model: raw.model,
-    baseUrl: raw.baseUrl || null,
-    apiKey: decrypt && raw.apiKeyEncrypted ? SecretBox.decrypt(raw.apiKeyEncrypted) : null,
+  let apiKey = null
+  if (decrypt && raw.apiKeyEncrypted) {
+    apiKey = tryDecrypt(raw.apiKeyEncrypted)
+    if (apiKey === null) {
+      // never fail the request: fall back to the admin default, the settings panel flags the key
+      logger.warn(`user ${user?.uuid}: saved AI API key can't be decrypted (secret rotated?); using admin default`)
+      return null
+    }
   }
+  return { provider: raw.provider, model: raw.model, baseUrl: raw.baseUrl || null, apiKey }
 }
 
 // Throws when the provider config is incomplete.
@@ -282,11 +302,16 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
   const start = Date.now()
   try {
     const model = await ProviderRegistry.buildUserModel(cfg)
-    await generateText({
-      model,
-      prompt: 'Reply with the single word: ok',
-      maxOutputTokens: 16,
-    })
+    const ctx = {
+      feature: 'testConnection',
+      source: 'user',
+      provider: cfg.provider,
+      model: cfg.model,
+      userUuid: user.uuid,
+    }
+    await AiTelemetry.track(ctx, () =>
+      generateText({ model, prompt: 'Reply with the single word: ok', maxOutputTokens: 16, maxRetries: 0 })
+    )
     const latencyMs = Date.now() - start
     await stampTestResult({ user, ok: true })
     return { ok: true, latencyMs }
