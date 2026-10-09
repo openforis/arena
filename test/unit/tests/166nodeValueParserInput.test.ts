@@ -191,6 +191,62 @@ describe('nodeValueParser: parseNodeValueInput (the assistant layer)', () => {
     })
   })
 
+  test('unlisted taxa are refused, whatever the way they are found (UNL, UNK, provider)', async () => {
+    await expect(parse('cluster_species', 'UNL')).rejects.toMatchObject({
+      key: 'validationErrors:dataImport.invalidTaxonCode',
+    })
+    await expect(parse('cluster_species', 'UNK')).rejects.toMatchObject({
+      key: 'validationErrors:dataImport.invalidTaxonCode',
+    })
+    const unlistedProvider = {
+      getTaxonByCode: async () => null,
+      findTaxonByScientificName: async () => ({ uuid: 'unl-uuid', props: { code: 'UNL' } }),
+    }
+    await expect(
+      parseNodeValueInput({
+        survey,
+        nodeDef: Survey.getNodeDefByName('cluster_species')(survey),
+        input: 'Some unlisted name',
+        record,
+        parentNode: rootNode,
+        categoryItemProvider,
+        taxonProvider: unlistedProvider,
+      })
+    ).rejects.toMatchObject({ key: 'validationErrors:dataImport.invalidTaxonCode' })
+  })
+
+  test('scientific names are looked up through the provider only, never the survey index', async () => {
+    const emptyProvider = { getTaxonByCode: async () => null, findTaxonByScientificName: async () => null }
+    await expect(
+      parseNodeValueInput({
+        survey,
+        nodeDef: Survey.getNodeDefByName('cluster_species')(survey),
+        input: 'Afzelia quanzensis',
+        record,
+        parentNode: rootNode,
+        categoryItemProvider,
+        taxonProvider: emptyProvider,
+      })
+    ).rejects.toMatchObject({ key: 'validationErrors:dataImport.invalidTaxonCode' })
+  })
+
+  test('non-finite and non-decimal numbers are refused', async () => {
+    for (const bad of ['Infinity', '-Infinity', 'NaN', '0x10', '1e999', '1,5', Infinity, NaN]) {
+      await expect(parse('cluster_size', bad)).rejects.toMatchObject({
+        key: 'validationErrors:dataImport.invalidNumber',
+      })
+      await expect(parse('cluster_id', bad)).rejects.toMatchObject({ key: 'validationErrors:dataImport.invalidNumber' })
+    }
+    expect((await parse('cluster_size', '-1.5e2')).value).toBe(-150)
+    expect((await parse('cluster_id', 7)).value).toBe(7)
+  })
+
+  test('objects are refused for text attributes', async () => {
+    await expect(parse('cluster_remarks', { a: 1 })).rejects.toMatchObject({
+      key: 'validationErrors:nodeValueParser.unsupportedType',
+    })
+  })
+
   test('file attributes are refused', async () => {
     await expect(parse('cluster_photo', 'photo.jpg')).rejects.toMatchObject({
       key: 'validationErrors:nodeValueParser.unsupportedType',
