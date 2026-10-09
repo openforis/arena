@@ -79,6 +79,13 @@ describe('builders', () => {
     expect(buildInstanceCapability(null)).toEqual({ policyCeilings: null, orgHostedBaseUrls: [] })
   })
 
+  test('instance: partial ceilings get the defaults, garbled ones fail closed', () => {
+    const build = (policyCeilings: unknown) => buildInstanceCapability({ ...settingsSnapshot, policyCeilings } as never)
+    expect(build({ schema: 'cloud' }).policyCeilings).toEqual({ schema: 'cloud', data: 'onDevice' })
+    expect(build({ schema: 'bogus', data: 7 }).policyCeilings).toEqual({ schema: 'off', data: 'off' })
+    expect(build('cloud').policyCeilings).toEqual({ schema: 'off', data: 'off' })
+  })
+
   test('local server: class from the URL and the allowlist, probe results', () => {
     const local = buildLocalServerCapability({
       localSettings: { ...enabledLocal, baseUrl: 'http://10.0.0.5:8000/v1' },

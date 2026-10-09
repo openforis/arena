@@ -21,6 +21,14 @@ describe('consent request queue', () => {
     expect(queue.getPending()).toBeNull()
   })
 
+  test('a request without an alternative never shares a card that offers another engine', () => {
+    const queue = createConsentRequestQueue()
+    queue.request({ ...request(1), canUseOther: true })
+    queue.request(request(1))
+    queue.answer(queue.getPending()!.id, 'continue')
+    expect(queue.getPending()).toEqual({ id: 2, ...request(1) })
+  })
+
   test('requests for other surveys wait for their turn', async () => {
     const queue = createConsentRequestQueue()
     const forOne = queue.request(request(1))

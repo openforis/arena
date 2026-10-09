@@ -4,6 +4,7 @@
  */
 import { getLocalServerHostingClass } from '@common/ai/localServerAddress'
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
+import { normalizeAiPolicy } from '@common/ai/policy'
 
 import { defaultLocalServerSettings } from './localServerSettings'
 import type { LocalServerProbeResult } from './localServerProbe'
@@ -77,7 +78,8 @@ export const buildGatewayCapability = (settings: AiSettingsSnapshot | null): AiG
  * @returns {AiInstanceCapability} Policy ceilings and org-hosted allowlist.
  */
 export const buildInstanceCapability = (settings: AiSettingsSnapshot | null): AiInstanceCapability => ({
-  policyCeilings: settings?.policyCeilings ?? null,
+  // normalized: a partial or garbled object from the server fails closed
+  policyCeilings: settings?.policyCeilings ? normalizeAiPolicy(settings.policyCeilings) : null,
   orgHostedBaseUrls: Array.isArray(settings?.orgHostedBaseUrls) ? settings.orgHostedBaseUrls : [],
 })
 
