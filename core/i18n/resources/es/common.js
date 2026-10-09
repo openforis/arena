@@ -1363,7 +1363,6 @@ $t(common.appNameFull)
     success_other: 'Traducido a {{count}} idiomas. Revise y guarde.',
     success: 'Traducido. Revise y guarde.',
     failed: 'La traducción falló: {{message}}',
-    timeout: 'La solicitud de traducción ha caducado. Inténtelo de nuevo.',
   },
   aiActivityLog: {
     title: 'Resumen del registro de actividad',
@@ -1379,7 +1378,6 @@ $t(common.appNameFull)
     send: 'Enviar',
     stop: 'Detener',
     clear: 'Borrar',
-    showReasoning: 'Mostrar razonamiento',
     error: 'Error del chatbot: {{message}}',
     language: 'Idioma de respuesta',
   },
