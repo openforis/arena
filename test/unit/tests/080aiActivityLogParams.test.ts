@@ -20,7 +20,26 @@ describe('parseActivityLogFetchParams', () => {
     [{ limit: '1001' }],
     [{ limit: '0' }],
     [{ limit: 'ALL' }],
+    [{ idLessThan: '9'.repeat(400) }],
   ])('rejects %p', (params) => {
     expect(() => parseActivityLogFetchParams(params)).toThrow()
+  })
+
+  test('throws a 400 SystemError with the appErrors key', () => {
+    try {
+      parseActivityLogFetchParams({ limit: '0' })
+      throw new Error('expected to throw')
+    } catch (error: any) {
+      expect(error.key).toBe('appErrors:invalidParams')
+      expect(error.statusCode).toBe(400)
+    }
+  })
+
+  test('treats empty strings as missing', () => {
+    expect(parseActivityLogFetchParams({ idGreaterThan: '', limit: '' })).toEqual({
+      idGreaterThan: null,
+      idLessThan: null,
+      limit: 30,
+    })
   })
 })
