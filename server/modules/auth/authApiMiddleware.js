@@ -83,6 +83,31 @@ export const requireSurveyUserExtraPropsEditPermission = async (req, res, next) 
   }
 }
 
+/**
+ * Builds the middleware allowing only survey administrators (and system admins) to change the survey AI policy.
+ * @param {object} [deps] - Dependencies (tests).
+ * @param {(surveyId: string) => Promise<object>} [deps.fetchSurveyInfo] - `(surveyId) => Promise<surveyInfo>`.
+ * @returns {(req: object, res: object, next: (error?: unknown) => void) => Promise<void>} The Express middleware.
+ */
+export const createRequireSurveyAiPolicyEditPermission =
+  ({ fetchSurveyInfo = (surveyId) => SurveyManager.fetchSurveyById({ surveyId }) } = {}) =>
+  async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const surveyInfo = await fetchSurveyInfo(surveyId)
+      if (Authorizer.canEditSurveyAiPolicy(user, surveyInfo)) {
+        next()
+        return
+      }
+      sendForbiddenError({ req, res })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+export const requireSurveyAiPolicyEditPermission = createRequireSurveyAiPolicyEditPermission()
+
 export const requireSurveyCloneFromViewPermission = async (req, res, next) => {
   try {
     const { cloneFrom } = Request.getBody(req)
