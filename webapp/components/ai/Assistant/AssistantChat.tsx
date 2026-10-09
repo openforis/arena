@@ -21,7 +21,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
   const t = useI18nT({ unescapeHtml: true })
   const [input, setInput] = useState('')
   const listRef = useRef<HTMLDivElement>(null)
-  const { conversation, busy } = api
+  const { conversation, busy, applying } = api
   const messages = conversation?.messages ?? []
   const lastId = messages.at(-1)?.id
 
@@ -36,7 +36,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
    */
   const onSend = () => {
     const text = input.trim()
-    if (!text || busy) return
+    if (!text || busy || applying) return
     setInput('')
     api.send(text)
   }
@@ -90,7 +90,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
           <Button label="aiAssistant.stop" onClick={api.stop} testId={TestId.aiAssistant.stopBtn} />
         ) : (
           <Button
-            disabled={!input.trim()}
+            disabled={!input.trim() || applying}
             label="aiAssistant.send"
             onClick={onSend}
             primary

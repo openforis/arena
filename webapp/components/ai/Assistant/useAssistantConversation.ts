@@ -15,13 +15,16 @@ import { useSurveyId } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
 import type { AssistantArea } from './assistantAreas'
-import { getRetryBase, withApplyResults, withDiscarded } from './assistantPanelModel'
+import { getRetryBase, normalizeLoadedConversation, withApplyResults, withDiscarded } from './assistantPanelModel'
 import { assistantPanelStore } from './assistantPanelStore'
+import { assistantTurnRegistry } from './assistantTurnRegistry'
 import { useAssistantToolContext } from './useAssistantToolContext'
 
 export type AssistantConversationApi = {
   conversation: Conversation | null
   busy: boolean
+  // a change set card is being applied or discarded
+  applying: boolean
   // false when the browser can't store conversations (memory store)
   persistent: boolean
   history: Conversation[]
@@ -60,9 +63,13 @@ export const useAssistantConversation = ({
   const [conversationStore, setConversationStore] = useState<ConversationStore | null>(null)
   const [conversation, setConversation] = useState<Conversation | null>(null)
   const [busy, setBusy] = useState(false)
+  const [applying, setApplying] = useState(false)
   const [history, setHistory] = useState<Conversation[]>([])
   const conversationRef = useRef<Conversation | null>(null)
   const controllerRef = useRef<AbortController | null>(null)
+  const applyingRef = useRef(false)
+  // id of the conversation whose turn is running (its streaming answer is live, not left over)
+  const runningIdRef = useRef<string | null>(null)
 
   const show = useCallback((next: Conversation | null) => {
     conversationRef.current = next
@@ -102,8 +109,9 @@ export const useAssistantConversation = ({
     let active = true
     conversationStore.get(conversationId).then((loaded) => {
       if (!active) return
-      if (loaded?.userUuid === userUuid && loaded.area === area) show(loaded)
-      else assistantPanelStore.setConversationId(null)
+      if (loaded?.userUuid === userUuid && loaded.area === area) {
+        show(normalizeLoadedConversation(loaded, runningIdRef.current === loaded.id))
+      } else assistantPanelStore.setConversationId(null)
     })
     return () => {
       active = false
@@ -120,7 +128,18 @@ export const useAssistantConversation = ({
     async (base: Conversation, text: string) => {
       if (!conversationStore) return
       const controller = new AbortController()
+      const generation = assistantTurnRegistry.getGeneration()
       controllerRef.current = controller
+      runningIdRef.current = base.id
+      assistantTurnRegistry.register(controller)
+      // a stopped or replaced turn must not bring back a conversation the user left
+      const isCurrent = () =>
+        controllerRef.current === controller && assistantPanelStore.getState().conversationId === base.id
+      // saves are skipped after a reset (logout), which clears the store
+      const persist = (next: Conversation) =>
+        assistantTurnRegistry.getGeneration() === generation
+          ? assistantTurnRegistry.track(conversationStore.save(next))
+          : Promise.resolve()
       setBusy(true)
       show(base)
       assistantPanelStore.setConversationId(base.id)
@@ -135,18 +154,22 @@ export const useAssistantConversation = ({
           access,
           signal: controller.signal,
           onUpdate: (next) => {
-            show(next)
+            if (isCurrent()) show(next)
             if (!saved) {
               saved = true
-              void conversationStore.save(next)
+              void persist(next)
             }
           },
         })
-        show(final)
-        await conversationStore.save(final)
+        if (isCurrent()) show(final)
+        await persist(final)
       } finally {
-        controllerRef.current = null
-        setBusy(false)
+        assistantTurnRegistry.unregister(controller)
+        if (controllerRef.current === controller) {
+          controllerRef.current = null
+          runningIdRef.current = null
+          setBusy(false)
+        }
       }
     },
     [area, buildToolContext, conversationStore, show, surveyId]
@@ -154,16 +177,17 @@ export const useAssistantConversation = ({
 
   const send = useCallback(
     (text: string) => {
-      if (busy) return
-      const base = conversationRef.current ?? createConversation({ userUuid, surveyId, area })
-      void runTurn(base, text)
+      if (busy || applyingRef.current) return
+      // no selected id: a new conversation, whatever the ref still holds
+      const selected = conversationId && conversationRef.current?.id === conversationId ? conversationRef.current : null
+      void runTurn(selected ?? createConversation({ userUuid, surveyId, area }), text)
     },
-    [area, busy, runTurn, surveyId, userUuid]
+    [area, busy, conversationId, runTurn, surveyId, userUuid]
   )
 
   const retry = useCallback(() => {
     const retryBase = conversationRef.current ? getRetryBase(conversationRef.current) : null
-    if (retryBase && !busy) void runTurn(retryBase.base, retryBase.text)
+    if (retryBase && !busy && !applyingRef.current) void runTurn(retryBase.base, retryBase.text)
   }, [busy, runTurn])
 
   const stop = useCallback(() => controllerRef.current?.abort(), [])
@@ -188,16 +212,50 @@ export const useAssistantConversation = ({
   }, [conversationStore, listAreaConversations])
 
   /**
-   * Shows a conversation and saves it.
+   * Saves a conversation (tracked, so logout can wait for it) and shows it when it is the selected one.
    * @param {Conversation} next - Conversation.
+   * @param {number} generation - Registry generation when the work started (a reset skips the save).
    * @returns {Promise<void>} Resolves when saved.
    */
   const saveShown = useCallback(
-    async (next: Conversation) => {
-      show(next)
-      await conversationStore?.save(next)
+    async (next: Conversation, generation: number) => {
+      if (assistantPanelStore.getState().conversationId === next.id) show(next)
+      if (assistantTurnRegistry.getGeneration() !== generation) return
+      await assistantTurnRegistry.track(conversationStore?.save(next) ?? Promise.resolve())
     },
     [conversationStore, show]
+  )
+
+  /**
+   * Reads a conversation by id: the shown one, or the stored one.
+   * @param {string} id - Conversation id.
+   * @returns {Promise<Conversation|null>} The conversation.
+   */
+  const readConversation = useCallback(
+    async (id: string): Promise<Conversation | null> =>
+      conversationRef.current?.id === id ? conversationRef.current : ((await conversationStore?.get(id)) ?? null),
+    [conversationStore]
+  )
+
+  /**
+   * Runs an Apply or Discard of a card unless another one runs (also blocks new turns meanwhile).
+   * @param {Function} action - Receives the conversation id and the registry generation.
+   * @returns {Promise<void>} Resolves when done.
+   */
+  const runCardAction = useCallback(
+    async (action: (id: string, generation: number) => Promise<void>) => {
+      const id = conversationRef.current?.id
+      if (busy || !id || applyingRef.current) return
+      applyingRef.current = true
+      setApplying(true)
+      try {
+        await action(id, assistantTurnRegistry.getGeneration())
+      } finally {
+        applyingRef.current = false
+        setApplying(false)
+      }
+    },
+    [busy]
   )
 
   /**
@@ -207,18 +265,21 @@ export const useAssistantConversation = ({
    * @returns {Promise<void>} Resolves when done.
    */
   const apply = useCallback(
-    async (changeSetId: string, operationIds: string[]) => {
-      const cardState = conversationRef.current?.changeSets[changeSetId]
-      const deps = createApplierDeps({ dispatch: reduxStore.dispatch, getState: reduxStore.getState })
-      // the card disables Apply while the designer has an unsaved edit; checked again here
-      if (busy || !cardState || !applierDepsReady(deps)) return
-      const { changeSet } = cardState
-      const results = await applyChangeSet({ changeSet, operationIds, deps })
-      const note = summarizeResults({ changeSet, results, survey: deps.getSurvey() })
-      const current = conversationRef.current as Conversation
-      await saveShown(withApplyResults({ conversation: current, changeSetId, results, note }))
-    },
-    [busy, reduxStore, saveShown]
+    (changeSetId: string, operationIds: string[]) =>
+      runCardAction(async (id, generation) => {
+        const cardState = (await readConversation(id))?.changeSets[changeSetId]
+        const deps = createApplierDeps({ dispatch: reduxStore.dispatch, getState: reduxStore.getState })
+        // the card disables Apply while the designer has an unsaved edit; checked again here
+        if (!cardState || !applierDepsReady(deps)) return
+        const { changeSet } = cardState
+        const results = await applyChangeSet({ changeSet, operationIds, deps })
+        const note = summarizeResults({ changeSet, results, survey: deps.getSurvey() })
+        // the user may have switched conversation meanwhile: write the results into the one that was applied
+        const current = await readConversation(id)
+        if (current)
+          await saveShown(withApplyResults({ conversation: current, changeSetId, results, note }), generation)
+      }),
+    [readConversation, reduxStore, runCardAction, saveShown]
   )
 
   /**
@@ -227,18 +288,19 @@ export const useAssistantConversation = ({
    * @returns {Promise<void>} Resolves when done.
    */
   const discard = useCallback(
-    async (changeSetId: string) => {
-      const current = conversationRef.current
-      if (busy || !current) return
-      await saveShown(withDiscarded({ conversation: current, changeSetId }))
-    },
-    [busy, saveShown]
+    (changeSetId: string) =>
+      runCardAction(async (id, generation) => {
+        const current = await readConversation(id)
+        if (current) await saveShown(withDiscarded({ conversation: current, changeSetId }), generation)
+      }),
+    [readConversation, runCardAction, saveShown]
   )
 
   return {
     // a stale conversation (New conversation, or another one still loading) is not shown
     conversation: conversation?.id === conversationId ? conversation : null,
     busy,
+    applying,
     persistent: conversationStore?.persistent ?? true,
     history,
     send,

@@ -6,6 +6,7 @@ import {
   getRetryBase,
   getToolRowLabel,
   mergeOperationResults,
+  normalizeLoadedConversation,
   withApplyResults,
   withDiscarded,
 } from '@webapp/components/ai/Assistant/assistantPanelModel'
@@ -125,5 +126,19 @@ describe('assistant panel model', () => {
       createdAt,
     })
     expect(withDiscarded({ conversation, changeSetId: 'missing' })).toBe(conversation)
+  })
+})
+
+describe('loaded conversations', () => {
+  test('an answer left streaming is shown as stopped, unless its turn is running', () => {
+    const user = { id: 'u-1', role: 'user' as const, text: 'Hi', createdAt }
+    const loaded = conversationWith([user, answer('streaming', 'Par'), answer('done', 'Ok')])
+    const normalized = normalizeLoadedConversation(loaded)
+    expect(
+      normalized.messages.map((message) => (message.role === 'assistant' ? message.status : message.role))
+    ).toEqual(['user', 'stopped', 'done'])
+    expect(normalizeLoadedConversation(loaded, true)).toBe(loaded)
+    const clean = conversationWith([user, answer('done', 'Ok')])
+    expect(normalizeLoadedConversation(clean)).toBe(clean)
   })
 })
