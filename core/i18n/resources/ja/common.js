@@ -1636,6 +1636,33 @@ $t(common.cantUndoWarning)`,
     recordDataShared: 'アシスタントと共有されたレコードデータ',
   },
 
+  aiCleaning: {
+    area: 'クリーニング',
+    empty: '検証エラーや疑わしい値について質問してください。レコードの編集を提案します。確認してから適用してください。',
+    rowAction: {
+      askAssistant: 'アシスタントに質問',
+      question: 'この値が無効なのはなぜですか？どう修正すればよいですか？',
+    },
+    card: {
+      empty: '(空)',
+      newErrors: 'このレコードの新しいエラー: {{count}}',
+      applySelected: '選択項目を適用 ({{count}})',
+      retryFailed: '失敗した項目を再試行 ({{count}})',
+      applying: '適用中… {{done}} / {{total}}',
+      counts: '適用: {{applied}} · 競合: {{conflict}} · 失敗: {{failed}}',
+    },
+    badge: {
+      fixes: 'エラーを修正',
+      stillInvalid: 'まだ無効',
+      noErrors: 'エラーなし',
+    },
+    result: {
+      applied: '適用済み',
+      conflict: '未適用: 提案後に値が変更されました',
+      failed: '失敗: {{message}}',
+      skipped: 'スキップ',
+    },
+  },
   aiAssistant: {
     open: 'AIアシスタント',
     title: 'AIアシスタント',

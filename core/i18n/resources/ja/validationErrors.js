@@ -105,6 +105,10 @@ export default {
     targetsRequired: '少なくとも1つの対象が必要です',
   },
 
+  nodeValueParser: {
+    attributeNotEditable: '「{{attributeName}}」は編集できません（読み取り専用または計算属性）。',
+    unsupportedType: '「{{attributeName}}」: {{type}} 型の値はここでは設定できません。',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: '項目は必須です',
     applyIfDuplicate: '「$t(nodeDefEdit.expressionsProp.applyIf)」条件が重複しています',

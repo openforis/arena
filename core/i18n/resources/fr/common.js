@@ -1665,6 +1665,34 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     recordDataShared: "Données d'enregistrements partagées avec l'assistant",
   },
 
+  aiCleaning: {
+    area: 'Nettoyage',
+    empty:
+      "Interrogez-moi sur les erreurs de validation ou les valeurs suspectes. Je propose des modifications d'enregistrements ; vous les vérifiez et les appliquez.",
+    rowAction: {
+      askAssistant: "Demander à l'assistant",
+      question: "Pourquoi cette valeur n'est-elle pas valide et comment la corriger ?",
+    },
+    card: {
+      empty: '(vide)',
+      newErrors: 'Nouvelles erreurs dans cet enregistrement : {{count}}',
+      applySelected: 'Appliquer la sélection ({{count}})',
+      retryFailed: 'Réessayer les échecs ({{count}})',
+      applying: 'Application… {{done}} sur {{total}}',
+      counts: 'Appliquées : {{applied}} · Conflits : {{conflict}} · Échecs : {{failed}}',
+    },
+    badge: {
+      fixes: "Corrige l'erreur",
+      stillInvalid: 'Toujours invalide',
+      noErrors: 'Aucune erreur',
+    },
+    result: {
+      applied: 'Appliquée',
+      conflict: 'Non appliquée : la valeur a changé depuis la proposition',
+      failed: 'Échec : {{message}}',
+      skipped: 'Ignorée',
+    },
+  },
   aiAssistant: {
     open: 'Assistant IA',
     title: 'Assistant IA',

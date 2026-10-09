@@ -107,6 +107,10 @@ export default {
     targetsRequired: 'Требуется как минимум одна целевая аудитория',
   },
 
+  nodeValueParser: {
+    attributeNotEditable: '«{{attributeName}}» нельзя изменить (только чтение или вычисляемый атрибут).',
+    unsupportedType: '«{{attributeName}}»: значения типа {{type}} нельзя задать здесь.',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: 'Сущность обязательна',
     applyIfDuplicate: 'Условие "$t(nodeDefEdit.expressionsProp.applyIf)" повторяется',

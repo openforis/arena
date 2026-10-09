@@ -15,6 +15,8 @@ export default {
   aiDataQueryNoEntities: 'Ce formulaire ne contient aucune entité pouvant être interrogée.',
   aiDataQuerySummaryInvalid:
     "L'IA n'a pas pu suggérer un nom et une description pour cette requête. Veuillez réessayer.",
+  aiApplyTimeout:
+    "Le serveur n'a pas répondu à temps. Certaines modifications ont peut-être été appliquées : rechargez pour vérifier.",
   userCannotDeleteHasMessages:
     "Cet utilisateur ne peut pas être supprimé : il est l'auteur de {{count}} message(s) ; supprimez-les ou réattribuez-les d'abord",
   userCannotDeleteLastSystemAdmin:
@@ -57,6 +59,7 @@ export default {
     identifierNotFound: '$t(expression.identifierNotFound)',
     undefinedFunction: '$t(expression.undefinedFunction)',
   },
+  forbidden: "Vous n'êtes pas autorisé à effectuer cette action.",
   functionHasTooFewArguments: 'La fonction {{fnName}} nécessite au moins {{minArity}} arguments (reçu {{numArgs}})',
   functionHasTooManyArguments: 'La fonction {{fnName}} accepte au maximum {{maxArity}} arguments (reçu {{numArgs}})',
   generic: 'Erreur inattendue : {{text}}',
@@ -79,6 +82,9 @@ export default {
     entityNotFound: 'Entité "{{entityName}}" avec les clés "{{keyValues}}" introuvable',
     updateSelfAndDependentsDefaultValues:
       "$t(appErrors:record.errorUpdating) ; erreur lors de l'évaluation de l'expression dans le nœud {{nodeDefName}} : {{details}}",
+    lockTimeout: "L'enregistrement est occupé ; réessayez dans quelques secondes.",
+    nodeNotInRecord: "Le nœud n'appartient pas à l'enregistrement {{recordUuid}}.",
+    nodesBatchInvalid: 'Requête de modification groupée invalide ({{reason}}).',
   },
   recordPrintableExport: {
     missingEntityParams: "L'export de la page actuelle nécessite entityDefUuid et entityNodeUuid",

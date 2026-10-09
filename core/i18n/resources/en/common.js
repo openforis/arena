@@ -1643,6 +1643,33 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     recordDataShared: 'Record data shared with the assistant',
   },
 
+  aiCleaning: {
+    area: 'Cleaning',
+    empty: 'Ask me about validation errors or suspicious values. I propose record edits; you review and apply them.',
+    rowAction: {
+      askAssistant: 'Ask the assistant',
+      question: 'Why is this value invalid, and how can I fix it?',
+    },
+    card: {
+      empty: '(empty)',
+      newErrors: 'New errors in this record: {{count}}',
+      applySelected: 'Apply selected ({{count}})',
+      retryFailed: 'Retry failed ({{count}})',
+      applying: 'Applying… {{done}} of {{total}}',
+      counts: 'Applied: {{applied}} · Conflicts: {{conflict}} · Failed: {{failed}}',
+    },
+    badge: {
+      fixes: 'Fixes the error',
+      stillInvalid: 'Still invalid',
+      noErrors: 'No errors',
+    },
+    result: {
+      applied: 'Applied',
+      conflict: 'Not applied: the value changed since the proposal',
+      failed: 'Failed: {{message}}',
+      skipped: 'Skipped',
+    },
+  },
   aiAssistant: {
     open: 'AI assistant',
     title: 'AI assistant',

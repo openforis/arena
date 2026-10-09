@@ -1653,6 +1653,34 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     recordDataShared: 'Dados de registros compartilhados com o assistente',
   },
 
+  aiCleaning: {
+    area: 'Limpeza',
+    empty:
+      'Pergunte-me sobre erros de validação ou valores suspeitos. Eu proponho edições de registros; você as revisa e aplica.',
+    rowAction: {
+      askAssistant: 'Perguntar ao assistente',
+      question: 'Por que este valor é inválido e como posso corrigi-lo?',
+    },
+    card: {
+      empty: '(vazio)',
+      newErrors: 'Novos erros neste registro: {{count}}',
+      applySelected: 'Aplicar selecionados ({{count}})',
+      retryFailed: 'Tentar novamente os que falharam ({{count}})',
+      applying: 'Aplicando… {{done}} de {{total}}',
+      counts: 'Aplicados: {{applied}} · Conflitos: {{conflict}} · Falhas: {{failed}}',
+    },
+    badge: {
+      fixes: 'Corrige o erro',
+      stillInvalid: 'Continua inválido',
+      noErrors: 'Sem erros',
+    },
+    result: {
+      applied: 'Aplicado',
+      conflict: 'Não aplicado: o valor mudou desde a proposta',
+      failed: 'Falhou: {{message}}',
+      skipped: 'Ignorado',
+    },
+  },
   aiAssistant: {
     open: 'Assistente de IA',
     title: 'Assistente de IA',

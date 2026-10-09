@@ -15,6 +15,8 @@ export default {
   aiDataQueryNoEntities: 'Esta encuesta no tiene entidades que se puedan consultar.',
   aiDataQuerySummaryInvalid:
     'La IA no pudo sugerir un nombre y una descripción para esta consulta. Inténtelo de nuevo.',
+  aiApplyTimeout:
+    'El servidor no respondió a tiempo. Puede que algunos cambios se hayan aplicado: recargue para comprobarlo.',
   userCannotDeleteHasMessages:
     'Este usuario no se puede eliminar: es autor de {{count}} mensaje(s); elimínelos o reasígnelos primero',
   userCannotDeleteLastSystemAdmin: 'Este usuario no se puede eliminar: es el último administrador del sistema',
@@ -57,6 +59,7 @@ export default {
     identifierNotFound: 'Identificador no encontrado',
     undefinedFunction: 'Función indefinida',
   },
+  forbidden: 'No tiene permiso para hacer esto.',
   functionHasTooFewArguments: 'La función {{fnName}} requiere al menos {{minArity}} (obtenido {{numArgs}})',
   functionHasTooManyArguments: 'La función {{fnName}} solo acepta un máximo de {{maxArity}} (obtenido {{numArgs}})',
   generic: 'Error inesperado: {{text}}',
@@ -79,6 +82,9 @@ export default {
     entityNotFound: 'Entidad "{{entityName}}" con claves "{{keyValues}}" no encontrada',
     updateSelfAndDependentsDefaultValues:
       'Error al actualizar el registro; error al evaluar la expresión en el nodo {{nodeDefName}}: {{details}}',
+    lockTimeout: 'El registro está ocupado; inténtelo de nuevo en unos segundos.',
+    nodeNotInRecord: 'El nodo no pertenece al registro {{recordUuid}}.',
+    nodesBatchInvalid: 'Solicitud de edición por lotes no válida ({{reason}}).',
   },
   recordPrintableExport: {
     missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeUuid',

@@ -107,6 +107,10 @@ export default {
     targetsRequired: 'Au moins une cible est requise',
   },
 
+  nodeValueParser: {
+    attributeNotEditable: '« {{attributeName}} » ne peut pas être modifié (lecture seule ou calculé).',
+    unsupportedType: '« {{attributeName}} » : les valeurs de type {{type}} ne peuvent pas être définies ici.',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: "L'entité est requise",
     applyIfDuplicate: 'La condition "$t(nodeDefEdit.expressionsProp.applyIf)" est dupliquée',

@@ -14,6 +14,7 @@ export default {
   aiDataQueryInvalid: 'AI энэ тайлбарт тохирох зөв хүсэлт үүсгэж чадсангүй: {{errors}}',
   aiDataQueryNoEntities: 'Энэ судалгаанд хүсэлт гаргах боломжтой объект байхгүй байна.',
   aiDataQuerySummaryInvalid: 'AI энэ хүсэлтийн нэр, тайлбарыг санал болгож чадсангүй. Дахин оролдоно уу.',
+  aiApplyTimeout: 'Сервер цагтаа хариу өгсөнгүй. Зарим өөрчлөлт хэрэгжсэн байж магадгүй: дахин ачаалж шалгана уу.',
   userCannotDeleteHasMessages:
     'Энэ хэрэглэгчийг устгах боломжгүй: {{count}} мессежийн зохиогч байна; эхлээд тэдгээрийг устгах эсвэл өөр хэрэглэгчид шилжүүлнэ үү',
   userCannotDeleteLastSystemAdmin: 'Энэ хэрэглэгчийг устгах боломжгүй: системийн сүүлчийн администратор байна',
@@ -52,6 +53,7 @@ export default {
     identifierNotFound: 'Танигч олдсонгүй',
     undefinedFunction: 'Тодорхойлогдоогүй функц',
   },
+  forbidden: 'Танд үүнийг хийх эрх байхгүй.',
   functionHasTooFewArguments: 'Функц {{fnName}} нь дор хаяж {{minArity}} шаарддаг ({{numArgs}} авсан)',
   functionHasTooManyArguments: 'Функц {{fnName}} нь хамгийн ихдээ {{maxArity}} зөвшөөрдөг ({{numArgs}} авсан)',
   generic: 'Гэнэтийн алдаа: {{text}}',
@@ -74,6 +76,9 @@ export default {
     entityNotFound: '"{{entityName}}" нэртэй объект "{{keyValues}}" түлхүүрээр олдсонгүй',
     updateSelfAndDependentsDefaultValues:
       'Бичлэг шинэчлэхэд алдаа гарлаа; {{nodeDefName}} зангилааны илэрхийллийг үнэлэхэд алдаа гарлаа: {{details}}',
+    lockTimeout: 'Бүртгэл завгүй байна; хэдэн секундын дараа дахин оролдоно уу.',
+    nodeNotInRecord: 'Зангилаа {{recordUuid}} бүртгэлд хамаарахгүй.',
+    nodesBatchInvalid: 'Багц засварын хүсэлт буруу байна ({{reason}}).',
   },
   recordPrintableExport: {
     missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',

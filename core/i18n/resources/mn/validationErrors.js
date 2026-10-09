@@ -107,6 +107,10 @@ export default {
     targetsRequired: 'Наад зах нь нэг зорилтот шаардлагатай',
   },
 
+  nodeValueParser: {
+    attributeNotEditable: '"{{attributeName}}"-г засах боломжгүй (зөвхөн унших эсвэл тооцоолсон).',
+    unsupportedType: '"{{attributeName}}": {{type}} төрлийн утгыг энд оноох боломжгүй.',
+  },
   nodeDefEdit: {
     analysisParentEntityRequired: 'Объект шаардлагатай',
     applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" нөхцөл давхцсан',

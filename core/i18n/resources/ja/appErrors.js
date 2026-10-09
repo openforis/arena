@@ -30,6 +30,7 @@ export default {
     identifierNotFound: '$t(expression.identifierNotFound)',
     undefinedFunction: '$t(expression.undefinedFunction)',
   },
+  forbidden: 'この操作を行う権限がありません。',
   functionHasTooFewArguments:
     '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
   functionHasTooManyArguments: '関数{{fnName}}が受け付ける引数は最大{{maxArity}}個です（{{numArgs}}個指定されました）',
@@ -52,6 +53,9 @@ export default {
     entityNotFound: 'キー「{{keyValues}}」の項目「{{entityName}}」が見つかりません',
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating)。ノード{{nodeDefName}}での式の評価中にエラーが発生しました：{{details}}',
+    lockTimeout: 'レコードは使用中です。数秒後にもう一度お試しください。',
+    nodeNotInRecord: 'このノードはレコード {{recordUuid}} に属していません。',
+    nodesBatchInvalid: '一括編集リクエストが無効です ({{reason}})。',
   },
   recordPrintableExport: {
     missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeUuidが必要です',
@@ -123,6 +127,8 @@ export default {
   aiLocalServerConsentCancelled: 'リクエストはキャンセルされました。',
   aiCapabilityStatsInvalid: '機能統計が無効です。',
   aiDataQuerySummaryInvalid: 'AIはこのクエリの名前と説明を提案できませんでした。もう一度お試しください。',
+  aiApplyTimeout:
+    'サーバーが時間内に応答しませんでした。一部の変更が適用された可能性があります。再読み込みして確認してください。',
   userCannotDeleteHasMessages:
     'このユーザーは削除できません：{{count}}件のメッセージを作成しています。先にメッセージを削除するか、担当を変更してください',
   userCannotDeleteLastSystemAdmin: 'このユーザーは削除できません：最後のシステム管理者です',

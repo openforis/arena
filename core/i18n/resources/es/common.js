@@ -1491,6 +1491,34 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     recordDataShared: 'Datos de registros compartidos con el asistente',
   },
 
+  aiCleaning: {
+    area: 'Depuración',
+    empty:
+      'Pregúnteme por errores de validación o valores sospechosos. Propongo ediciones de registros; usted las revisa y las aplica.',
+    rowAction: {
+      askAssistant: 'Preguntar al asistente',
+      question: '¿Por qué este valor no es válido y cómo puedo corregirlo?',
+    },
+    card: {
+      empty: '(vacío)',
+      newErrors: 'Nuevos errores en este registro: {{count}}',
+      applySelected: 'Aplicar seleccionados ({{count}})',
+      retryFailed: 'Reintentar fallidos ({{count}})',
+      applying: 'Aplicando… {{done}} de {{total}}',
+      counts: 'Aplicados: {{applied}} · Conflictos: {{conflict}} · Fallidos: {{failed}}',
+    },
+    badge: {
+      fixes: 'Corrige el error',
+      stillInvalid: 'Sigue sin ser válido',
+      noErrors: 'Sin errores',
+    },
+    result: {
+      applied: 'Aplicado',
+      conflict: 'No aplicado: el valor cambió desde la propuesta',
+      failed: 'Falló: {{message}}',
+      skipped: 'Omitido',
+    },
+  },
   aiAssistant: {
     open: 'Asistente de IA',
     title: 'Asistente de IA',

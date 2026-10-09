@@ -14,6 +14,8 @@ export default {
   aiDataQueryInvalid: 'A IA não conseguiu gerar uma consulta válida para esta solicitação: {{errors}}',
   aiDataQueryNoEntities: 'Este inventário não possui entidades que possam ser consultadas.',
   aiDataQuerySummaryInvalid: 'A IA não conseguiu sugerir um nome e uma descrição para esta consulta. Tente novamente.',
+  aiApplyTimeout:
+    'O servidor não respondeu a tempo. Algumas alterações podem ter sido aplicadas: recarregue para verificar.',
   userCannotDeleteHasMessages:
     'Este usuário não pode ser excluído: ele é autor de {{count}} mensagem(ns); exclua-as ou reatribua-as primeiro',
   userCannotDeleteLastSystemAdmin: 'Este usuário não pode ser excluído: ele é o último administrador do sistema',
@@ -52,6 +54,7 @@ export default {
     identifierNotFound: '$t(expression.identifierNotFound)',
     undefinedFunction: '$t(expression.undefinedFunction)',
   },
+  forbidden: 'Você não tem permissão para fazer isto.',
   functionHasTooFewArguments: 'A função {{fnName}} requer no mínimo {{minArity}} (recebido {{numArgs}})',
   functionHasTooManyArguments: 'A função {{fnName}} aceita no máximo {{maxArity}} (recebido {{numArgs}})',
   generic: 'Erro inesperado: {{text}}',
@@ -73,6 +76,9 @@ export default {
     entityNotFound: 'Entidade "{{entityName}}" com chaves "{{keyValues}}" não encontrada',
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating); erro ao avaliar expressão no nó {{nodeDefName}}: {{details}}',
+    lockTimeout: 'O registro está ocupado; tente novamente em alguns segundos.',
+    nodeNotInRecord: 'O nó não pertence ao registro {{recordUuid}}.',
+    nodesBatchInvalid: 'Pedido de edição em lote inválido ({{reason}}).',
   },
   recordPrintableExport: {
     missingEntityParams: 'A exportação da página atual requer entityDefUuid e entityNodeUuid',

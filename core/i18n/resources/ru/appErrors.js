@@ -14,6 +14,8 @@ export default {
   aiDataQueryInvalid: 'ИИ не удалось сформировать корректный запрос по этому описанию: {{errors}}',
   aiDataQueryNoEntities: 'В этом опросе нет сущностей, по которым можно выполнить запрос.',
   aiDataQuerySummaryInvalid: 'ИИ не удалось предложить название и описание для этого запроса. Попробуйте ещё раз.',
+  aiApplyTimeout:
+    'Сервер не ответил вовремя. Некоторые изменения могли быть применены: перезагрузите страницу, чтобы проверить.',
   userCannotDeleteHasMessages:
     'Этого пользователя нельзя удалить: он является автором сообщений ({{count}}); сначала удалите или переназначьте их',
   userCannotDeleteLastSystemAdmin: 'Этого пользователя нельзя удалить: он последний системный администратор',
@@ -53,6 +55,7 @@ export default {
     identifierNotFound: 'Идентификатор не найден',
     undefinedFunction: 'Неопределенная функция',
   },
+  forbidden: 'У вас нет прав на это действие.',
   functionHasTooFewArguments: 'Функция {{fnName}} требует как минимум {{minArity}} (получено {{numArgs}})',
   functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} (получено {{numArgs}})',
   generic: 'Неожиданная ошибка: {{text}}',
@@ -74,6 +77,9 @@ export default {
     entityNotFound: 'Сущность "{{entityName}}" с ключами "{{keyValues}}" не найдена',
     updateSelfAndDependentsDefaultValues:
       'Ошибка обновления записи; ошибка при оценке выражения в узле {{nodeDefName}}: {{details}}',
+    lockTimeout: 'Запись занята; повторите попытку через несколько секунд.',
+    nodeNotInRecord: 'Узел не принадлежит записи {{recordUuid}}.',
+    nodesBatchInvalid: 'Недопустимый запрос пакетного редактирования ({{reason}}).',
   },
   recordPrintableExport: {
     missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeUuid',
