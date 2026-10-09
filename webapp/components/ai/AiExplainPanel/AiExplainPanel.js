@@ -18,6 +18,11 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
   const survey = useSurvey()
   const surveyId = useSurveyId()
   const cancelRef = useRef(null)
+  // read the latest survey at call time: a store update must not restart the stream
+  const surveyRef = useRef(survey)
+  useEffect(() => {
+    surveyRef.current = survey
+  }, [survey])
 
   const [text, setText] = useState('')
   const [done, setDone] = useState(false)
@@ -33,7 +38,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
 
     setError(null)
     const cancel = AiWorkflows.explainExpression({
-      survey,
+      survey: surveyRef.current,
       surveyId,
       nodeDefUuid,
       expression,
@@ -49,7 +54,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
     return () => {
       cancelRef.current?.()
     }
-  }, [survey, surveyId, nodeDefUuid, expression, errorMessage])
+  }, [surveyId, nodeDefUuid, expression, errorMessage])
 
   const onCancel = () => {
     cancelRef.current?.()

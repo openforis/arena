@@ -34,7 +34,12 @@ export const isAiAbortError = (error: unknown): boolean => unwrap(error).some((e
  * @returns {string} The message.
  */
 export const getAiErrorMessage = ({ error, i18n }: { error: unknown; i18n: I18n }): string => {
-  const key = getAiErrorKey(error) ?? 'aiProviderUnavailable'
-  const withParams = unwrap(error).find((candidate) => candidate?.key === key)
-  return String(i18n.t(`appErrors:${key}`, withParams?.params ?? {}))
+  const aiKey = getAiErrorKey(error)
+  const withParams = aiKey ? unwrap(error).find((candidate) => candidate?.key === aiKey) : null
+  if (aiKey) return String(i18n.t(`appErrors:${aiKey}`, withParams?.params ?? {}))
+  // an API error (axios) carrying an appErrors-style key, e.g. the activity-log fetch failing
+  const data = (error as any)?.response?.data
+  const responseKey = typeof data?.key === 'string' ? data.key.replace(/^appErrors:/, '') : ''
+  if (responseKey) return String(i18n.t(`appErrors:${responseKey}`, data.params ?? {}))
+  return String(i18n.t('appErrors:aiProviderUnavailable', {}))
 }

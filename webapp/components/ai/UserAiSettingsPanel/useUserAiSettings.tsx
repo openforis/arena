@@ -342,7 +342,10 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
         }
       } catch (error: any) {
         setModels([])
-        setModelsError(error?.response?.data?.error || error?.message || 'unknown')
+        const data = error?.response?.data
+        setModelsError(
+          data?.key ? i18n.t(`appErrors:${data.key}`, data.params) : data?.error || error?.message || 'unknown'
+        )
       } finally {
         setModelsFetching(false)
       }
@@ -359,6 +362,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       form.model,
       settings?.hasApiKey,
       lastModelsKey,
+      i18n,
     ]
   )
 
