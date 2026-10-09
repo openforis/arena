@@ -343,8 +343,10 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       } catch (error: any) {
         setModels([])
         const data = error?.response?.data
+        // server keys may already carry the namespace prefix
+        const errorKey = typeof data?.key === 'string' ? data.key.replace(/^appErrors:/, '') : ''
         setModelsError(
-          data?.key ? i18n.t(`appErrors:${data.key}`, data.params) : data?.error || error?.message || 'unknown'
+          errorKey ? i18n.t(`appErrors:${errorKey}`, data.params) : data?.error || error?.message || 'unknown'
         )
       } finally {
         setModelsFetching(false)
